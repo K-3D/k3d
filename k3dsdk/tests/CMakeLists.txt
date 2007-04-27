@@ -1,0 +1,60 @@
+PROJECT(k3dsdk-tests)
+
+INCLUDE_DIRECTORIES(${k3d_SOURCE_DIR})
+INCLUDE_DIRECTORIES(${k3d_BINARY_DIR})
+INCLUDE_DIRECTORIES(${K3D_BOOST_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${K3D_SIGC_INCLUDE_DIRS})
+
+LINK_DIRECTORIES(${K3D_BOOST_LIB_DIRS})
+LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
+
+LINK_LIBRARIES(k3dsdk)
+
+ADD_EXECUTABLE(test-backtrace backtrace.cpp)
+ADD_TEST(k3dsdk.backtrace ${EXECUTABLE_OUTPUT_PATH}/test-backtrace)
+
+ADD_EXECUTABLE(test-bitmap-conversion bitmap_conversion.cpp)
+ADD_TEST(k3dsdk.bitmap.conversion ${EXECUTABLE_OUTPUT_PATH}/test-bitmap-conversion)
+
+ADD_EXECUTABLE(test-boost-blas-performance boost_blas_performance.cpp)
+ADD_TEST(k3dsdk.performance.blas.boost ${EXECUTABLE_OUTPUT_PATH}/test-boost-blas-performance)
+
+ADD_EXECUTABLE(test-k3dsdk-blas-performance k3dsdk_blas_performance.cpp)
+ADD_TEST(k3dsdk.performance.blas.k3dsdk ${EXECUTABLE_OUTPUT_PATH}/test-k3dsdk-blas-performance)
+
+ADD_EXECUTABLE(test-circular-signals circular_signals.cpp)
+ADD_TEST(k3dsdk.circular-signals ${EXECUTABLE_OUTPUT_PATH}/test-circular-signals)
+
+ADD_EXECUTABLE(test-data-sizes data_sizes.cpp)
+ADD_TEST(k3dsdk.data-sizes ${EXECUTABLE_OUTPUT_PATH}/test-data-sizes)
+
+ADD_EXECUTABLE(test-float-to-string float_to_string.cpp)
+ADD_TEST(k3dsdk.float-to-string.001 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-string 123)
+ADD_TEST(k3dsdk.float-to-string.002 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-string 123.4)
+ADD_TEST(k3dsdk.float-to-string.003 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-string 123.456)
+ADD_TEST(k3dsdk.float-to-string.004 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-string 123.456789012)
+ADD_TEST(k3dsdk.float-to-string.005 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-string 123.4567890123456)
+
+ADD_EXECUTABLE(test-mesh-selection mesh_selection.cpp)
+ADD_TEST(k3dsdk.mesh_selection.001 ${EXECUTABLE_OUTPUT_PATH}/test-mesh-selection "[0, 1) 1" 0 1 1)
+ADD_TEST(k3dsdk.mesh_selection.002 ${EXECUTABLE_OUTPUT_PATH}/test-mesh-selection "[0, 1) 1 [1, 2) 2" 0 1 1 1 2 2)
+ADD_TEST(k3dsdk.mesh_selection.003 ${EXECUTABLE_OUTPUT_PATH}/test-mesh-selection "[0, 1) 1 [1, 2) 2 [2, 3) 3" 0 1 1 1 2 2 2 3 3)
+ADD_TEST(k3dsdk.mesh_selection.004 ${EXECUTABLE_OUTPUT_PATH}/test-mesh-selection "[0, 1) 1 [0, 1) 1" 0 1 1 0 1 1)
+
+ADD_EXECUTABLE(test-mesh-sizes mesh_sizes.cpp)
+ADD_TEST(k3dsdk.mesh-sizes ${EXECUTABLE_OUTPUT_PATH}/test-mesh-sizes)
+
+ADD_EXECUTABLE(test-path-decomposition path_decomposition.cpp)
+ADD_TEST(k3dsdk.path.decomposition ${EXECUTABLE_OUTPUT_PATH}/test-path-decomposition)
+
+ADD_EXECUTABLE(test-path-relative relative_path.cpp)
+ADD_TEST(k3dsdk.path.relative.001 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/" "home/bubba/k3d/test.k3d")
+ADD_TEST(k3dsdk.path.relative.002 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/home/bubba" "k3d/test.k3d")
+ADD_TEST(k3dsdk.path.relative.003 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/var/documents" "../../home/bubba/k3d/test.k3d")
+
+ADD_EXECUTABLE(test-shared-arrays shared_arrays.cpp)
+ADD_TEST(k3dsdk.shared-arrays ${EXECUTABLE_OUTPUT_PATH}/test-shared-arrays)
+
+ADD_EXECUTABLE(test-xml-sanity-checks xml_sanity_checks.cpp)
+ADD_TEST(k3dsdk.xml-sanity-checks ${EXECUTABLE_OUTPUT_PATH}/test-xml-sanity-checks)
+

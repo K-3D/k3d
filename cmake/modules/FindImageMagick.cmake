@@ -1,0 +1,20 @@
+FIND_PATH(K3D_IMAGEMAGICK_INCLUDE_DIR Magick++.h
+	/usr/include
+	DOC "Directory where the imagemagick header files are located"
+	)
+MARK_AS_ADVANCED(K3D_IMAGEMAGICK_INCLUDE_DIR)
+
+SET(K3D_IMAGEMAGICK_LIB Magick++ CACHE STRING "")
+MARK_AS_ADVANCED(K3D_IMAGEMAGICK_LIB)
+
+# Following are the consolidated variables that should be used for builds
+SET(K3D_IMAGEMAGICK_INCLUDE_DIRS
+	${K3D_IMAGEMAGICK_INCLUDE_DIR}
+	)
+
+SET(K3D_IMAGEMAGICK_LIBS
+	${K3D_IMAGEMAGICK_LIB}
+	)
+
+SET(K3D_IMAGEMAGICK_FOUND 1)
+

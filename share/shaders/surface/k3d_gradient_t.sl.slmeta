@@ -1,0 +1,16 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_gradient_t">
+			<description>Gradient along t texture coordinates</description>
+			<authors>Timothy M. Shead</authors>
+			<copyright>Copyright (c) 1995-2004, Timothy M. Shead</copyright>
+			<argument name="start_color" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 0 0"/>
+			<argument name="end_color" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 0"/>
+			<argument name="additive" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

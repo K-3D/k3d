@@ -1,0 +1,33 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_luna">
+			<description>Surface shader for Earth's moon</description>
+			<authors>F. Kenton Musgrave, Larry Gritz</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".5"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="lacunarity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="2"/>
+			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="8"/>
+			<argument name="H" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".3"/>
+			<argument name="highland_color" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.7 0.7 0.7"/>
+			<argument name="maria_basecolor" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".7"/>
+			<argument name="maria_color" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".1"/>
+			<argument name="arg22" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="arg23" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".3"/>
+			<argument name="highland_threshold" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="-0.2"/>
+			<argument name="highland_altitude" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.001"/>
+			<argument name="maria_altitude" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0004"/>
+			<argument name="peak_rad" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".0075"/>
+			<argument name="inner_rad" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".01"/>
+			<argument name="rim_rad" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".02"/>
+			<argument name="outer_rad" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".05"/>
+			<argument name="peak_ht" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.005"/>
+			<argument name="rim_ht" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.003"/>
+			<argument name="numrays" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="8"/>
+			<argument name="rayfade" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

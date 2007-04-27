@@ -1,0 +1,13 @@
+<k3dml>
+	<shaders>
+		<shader type="imager" name="k3d_background">
+			<description>Imager shader to put a solid background color behind an image</description>
+			<authors>Timothy M. Shead</authors>
+			<argument name="bgcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

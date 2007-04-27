@@ -1,0 +1,24 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_stones">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".6"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".85"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Km" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.01"/>
+			<argument name="displace" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="minfreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="maxfreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="10"/>
+			<argument name="tilefreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="6"/>
+			<argument name="grungefreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="30"/>
+			<argument name="grunge_Pow" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="3"/>
+			<argument name="grunginess" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="-0.8"/>
+			<argument name="stonecolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.498039 0.498039 0.498039"/>
+			<argument name="groundcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.678431 0.847059 0.901961"/>
+			<argument name="varyhue" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".03"/>
+			<argument name="varysat" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="varylum" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".25"/>
+		</shader>
+	</shaders>
+</k3dml>
+

@@ -1,0 +1,18 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_painted_constant">
+			<description>Unlit surface with texture mapping (good for backgrounds and foregrounds)</description>
+			<authors>Timothy M. Shead</authors>
+			<copyright>Copyright (c) 1995-2004, Timothy M. Shead</copyright>
+			<argument name="texturename" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="s0" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="s1" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="t0" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="t1" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

@@ -1,0 +1,16 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_puffyclouds">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="txtscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="skycolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.255024 0.383627 0.656184"/>
+			<argument name="cloudcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="8"/>
+			<argument name="omega" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+			<argument name="lambda" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="2"/>
+			<argument name="threshold" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+		</shader>
+	</shaders>
+</k3dml>
+

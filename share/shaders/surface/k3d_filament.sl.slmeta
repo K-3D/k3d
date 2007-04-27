@@ -1,0 +1,10 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_filament">
+			<argument name="frequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="5.0"/>
+			<argument name="phase" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.0"/>
+			<argument name="width" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.3"/>
+		</shader>
+	</shaders>
+</k3dml>
+

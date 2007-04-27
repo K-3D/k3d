@@ -1,0 +1,15 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_glow">
+			<description>Gives geometry a transparent "glow" effect</description>
+			<authors>Steve Upstill</authors>
+			<argument name="attenuation" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="2.0"/>
+			<argument name="centercolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+			<argument name="edgecolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 0"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

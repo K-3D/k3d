@@ -1,0 +1,68 @@
+<k3dml>
+	<application>
+		<user_interface>
+			<toolbars>
+				<toolbar name="create" label="Create" description="Primitive Geometry">
+					<node name="PolyCube"/>
+					<node name="PolyGrid"/>
+					<node name="PolyCone"/>
+					<node name="PolyCylinder"/>
+					<node name="PolySphere"/>
+					<node name="PolySphereTessellation"/>
+					<node name="PolyTorus"/>
+					<separator/>
+					<node name="Cone"/>
+					<node name="Cylinder"/>
+					<node name="Disk"/>
+					<node name="Sphere"/>
+					<node name="Torus"/>
+					<node name="Hyperboloid"/>
+					<node name="Paraboloid"/>
+					<separator/>
+					<node name="NurbsCone"/>
+					<node name="NurbsCylinder"/>
+					<node name="NurbsDisk"/>
+					<node name="NurbsSphere"/>
+					<node name="NurbsTorus"/>
+					<node name="NurbsHyperboloid"/>
+				</toolbar>
+				<toolbar name="modify" label="Modify" description="Modify Geometry">
+					<node name="TranslatePoints"/>
+					<node name="RotatePoints"/>
+					<node name="ScalePoints"/>
+					<node name="ShearPoints"/>
+					<node name="TaperPoints"/>
+					<node name="BendPoints"/>
+					<node name="BulgePoints"/>
+					<node name="TwistPoints"/>
+					<node name="LinearWavePoints"/>
+					<node name="CylindricalWavePoints"/>
+					<separator/>
+					<node name="BevelFaces"/>
+					<node name="BevelPoints"/>
+				</toolbar>
+				<toolbar name="bitmap" label="Bitmap" description="Bitmap effects and pipeline">
+					<node name="BitmapImageAdd"/>
+					<node name="BitmapImageSubtract"/>
+					<node name="BitmapImageSubtractAbs"/>
+					<node name="BitmapImageMultiply"/>
+					<node name="BitmapImageDivide"/>
+					<node name="BitmapImageMin"/>
+					<node name="BitmapImageMax"/>
+					<node name="BitmapImageMix"/>
+					<node name="BitmapImageXOR"/>
+					<node name="BitmapImageUnder"/>
+					<node name="BitmapImageOver"/>
+					<node name="BitmapImageAtop"/>
+					<node name="BitmapImageInside"/>
+					<node name="BitmapImageOutside"/>
+				</toolbar>
+				<toolbar name="light" label="Light" description="Light Sources">
+					<node name="RenderManLight"/>
+					<separator/>
+					<node name="YafrayPointLight"/>
+				</toolbar>
+			</toolbars>
+		</user_interface>
+	</application>
+</k3dml>

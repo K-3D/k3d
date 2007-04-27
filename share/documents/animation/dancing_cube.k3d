@@ -1,0 +1,291 @@
+<?xml version="1.0" ?>
+<k3dml package="k3d" version="0.7.0.0" host="Linux-2.6.19-gentoo-r5;AMD Sempron(tm)   2600+">
+	<application>
+		<plugins/>
+	</application>
+	<document>
+		<nodes>
+			<node name="Axes" class="00000001 00000000 00000000 00000001" id="2">
+				<properties>
+					<property name="axes">true</property>
+					<property name="gridcolor">0.4 0.4 0.4</property>
+					<property name="gridcount">5</property>
+					<property name="gridsize">2</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="viewport_visible">true</property>
+					<property name="xcolor">1 0 0</property>
+					<property name="xyplane">true</property>
+					<property name="xzplane">false</property>
+					<property name="ycolor">0 0.7 0</property>
+					<property name="yzplane">false</property>
+					<property name="zcolor">0 0 0.7</property>
+				</properties>
+			</node>
+			<node name="OpenGL Engine" class="0059ba47 7bf740f3 93fb523d 5899f22c" id="3">
+				<properties>
+					<property name="background_color">0.8 0.8 0.8</property>
+					<property name="draw_aimpoint">true</property>
+					<property name="draw_crop_window">true</property>
+					<property name="draw_frustum">true</property>
+					<property name="draw_safe_zone">false</property>
+					<property name="draw_two_sided">false</property>
+					<property name="fog">false</property>
+					<property name="fog_far">100</property>
+					<property name="fog_near">0</property>
+					<property name="headlight">true</property>
+					<property name="point_size">4</property>
+					<property name="show_lights">false</property>
+				</properties>
+			</node>
+			<node name="TimeSource" class="1978f1f7 4a864c99 8caf7cfc d2591baf" id="4">
+				<properties>
+					<property name="end_time">30</property>
+					<property name="frame_rate">30</property>
+					<property name="start_time">0</property>
+					<property name="time">8.099999999999982</property>
+				</properties>
+			</node>
+			<node name="Camera" class="45ce1872 af184b6d b391e136 0dcfe8b5" id="5">
+				<properties>
+					<property name="aspect_ratio"/>
+					<property name="bottom">-0.5</property>
+					<property name="crop_window_bottom">1</property>
+					<property name="crop_window_left">0</property>
+					<property name="crop_window_right">1</property>
+					<property name="crop_window_top">0</property>
+					<property name="far">1000</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="left">-0.6666666666666666</property>
+					<property name="navigation_target">5</property>
+					<property name="near">1</property>
+					<property name="orthographic">false</property>
+					<property name="parent">0</property>
+					<property name="reference_plane">0</property>
+					<property name="reference_plane_color">0 0 0.7</property>
+					<property name="right">0.6666666666666666</property>
+					<property name="show_projection">false</property>
+					<property name="show_reference_plane">false</property>
+					<property name="top">0.5</property>
+					<property name="viewport_visible">true</property>
+					<property name="world_target">0 0 0</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="6">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">0.958526 0.168264 0.230034 -8.40293 0.285006 -0.565901 -0.773646 28.2606 1.92624e-14 0.80712 -0.590387 21.5663 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Material" class="00000001 00000000 00000000 00000024" id="7">
+				<properties>
+					<property name="atmosphere_shader">0</property>
+					<property name="color">1 1 1</property>
+					<property name="displacement_bounds">1</property>
+					<property name="displacement_shader">0</property>
+					<property name="exterior_shader">0</property>
+					<property name="interior_shader">0</property>
+					<property name="matte">false</property>
+					<property name="opacity">1 1 1</property>
+					<property name="surface_shader">8</property>
+				</properties>
+			</node>
+			<node name="Surface Shader" class="b553a3bd d1044c6e b3f21e07 87132c31" id="8">
+				<properties>
+					<property name="Ka" label="Ambient" description="Ambient Amount" type="double" user_property="vanilla">1</property>
+					<property name="Kd" label="Diffuse" description="Diffuse Amount" type="double" user_property="vanilla">0.5</property>
+					<property name="Ks" label="Specular" description="Specular Amount" type="double" user_property="vanilla">0.5</property>
+					<property name="roughness" label="Roughness" description="Surface Roughness (affects specular reflection size)" type="double" user_property="vanilla">0.1</property>
+					<property name="shader_path" reference="relative" relative_path="shaders/surface/k3d_plastic.sl">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+					<property name="specularcolor" label="Specular Color" description="Specular Reflection Color" type="k3d::color" user_property="vanilla">1 1 1</property>
+				</properties>
+			</node>
+			<node name="Light" class="00000001 00000000 00000000 0000001d" id="9">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="shader">10</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Light Shader" class="830e867b 7bc94c6c 8d5087ee 8aa35db2" id="10">
+				<properties>
+					<property name="from" label="" description="" type="k3d::point3" user_property="vanilla">0 0 0</property>
+					<property name="intensity" label="" description="" type="double" user_property="vanilla">3000</property>
+					<property name="lightcolor" label="" description="" type="k3d::color" user_property="vanilla">1 1 1</property>
+					<property name="shader_path" reference="relative" relative_path="shaders/light/k3d_pointlight.sl">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+				</properties>
+			</node>
+			<node name="RenderMan Engine" class="0dc5e733 fa684e05 86a3865f 42f7a99d" id="11">
+				<properties>
+					<property name="bucket_height">16</property>
+					<property name="bucket_width">16</property>
+					<property name="default_atmosphere_shader">0</property>
+					<property name="default_exterior_shader">0</property>
+					<property name="default_interior_shader">0</property>
+					<property name="dof">false</property>
+					<property name="exposure">1</property>
+					<property name="eye_splits">10</property>
+					<property name="focal_length">1.6</property>
+					<property name="focus_plane">30</property>
+					<property name="fstop">0.3</property>
+					<property name="gamma">1</property>
+					<property name="grid_size">256</property>
+					<property name="hider"/>
+					<property name="imager_shader">0</property>
+					<property name="motion_blur">false</property>
+					<property name="pixel_aspect_ratio">1</property>
+					<property name="pixel_filter">gaussian</property>
+					<property name="pixel_filter_height">2</property>
+					<property name="pixel_filter_width">2</property>
+					<property name="pixel_height">240</property>
+					<property name="pixel_width">320</property>
+					<property name="pixel_xsamples">1</property>
+					<property name="pixel_ysamples">1</property>
+					<property name="render_alpha">true</property>
+					<property name="render_engine">aqsis</property>
+					<property name="render_motion_blur">false</property>
+					<property name="resolution"/>
+					<property name="shading_interpolation">constant</property>
+					<property name="shading_rate">1</property>
+					<property name="texture_memory">1024</property>
+					<property name="two_sided">true</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="12">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 -20 0 1 0 20 0 0 1 30 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="ScalarSine_X" class="b00248d6 9d6843d5 ab5a24bc 852519e5" id="13">
+				<properties>
+					<property name="input">0</property>
+				</properties>
+			</node>
+			<node name="ScalarMultiply_X" class="d5d068d2 b4f2470d b99280ae 1b092e59" id="14">
+				<properties>
+					<property name="input1">0</property>
+					<property name="input2">1</property>
+				</properties>
+			</node>
+			<node name="PolyCube" class="7ec966d1 d78a445c 8806b8a3 5593f241" id="15">
+				<properties>
+					<property name="Phase_X" label="Phase_X" description="Phase_X" type="double" user_property="vanilla">1.5</property>
+					<property name="Phase_Y" label="Phase_Y" description="Phase_Y" type="double" user_property="vanilla">0</property>
+					<property name="Phase_Z" label="Phase_Z" description="Phase_Z" type="double" user_property="vanilla">2</property>
+					<property name="Scale_X" label="Scale_X" description="Scale_X" type="double" user_property="vanilla">3</property>
+					<property name="Scale_Y" label="Scale_Y" description="Scale_Y" type="double" user_property="vanilla">6</property>
+					<property name="Scale_Z" label="Scale_Z" description="Scale_Z" type="double" user_property="vanilla">4</property>
+					<property name="columns">1</property>
+					<property name="depth">1</property>
+					<property name="height">1</property>
+					<property name="material">7</property>
+					<property name="rows">1</property>
+					<property name="slices">1</property>
+					<property name="width">1</property>
+				</properties>
+			</node>
+			<node name="PolyCube Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="16">
+				<properties>
+					<property name="gl_painter">17</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="parent">0</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="ri_painter">0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Position" class="e2edd795 08f9416a 84139876 9c25a60a" id="18">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="space">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="x">0</property>
+					<property name="y">0</property>
+					<property name="z">0</property>
+				</properties>
+			</node>
+			<node name="ScalarMultiply_Y" class="d5d068d2 b4f2470d b99280ae 1b092e59" id="19">
+				<properties>
+					<property name="input1">0</property>
+					<property name="input2">1</property>
+				</properties>
+			</node>
+			<node name="ScalarMultiply_Z" class="d5d068d2 b4f2470d b99280ae 1b092e59" id="20">
+				<properties>
+					<property name="input1">0</property>
+					<property name="input2">1</property>
+				</properties>
+			</node>
+			<node name="ScalarAdd_Phase_X" class="e2d5e227 98a6424f ae607c8c c4e99bec" id="21">
+				<properties>
+					<property name="input1">0</property>
+					<property name="input2">0</property>
+				</properties>
+			</node>
+			<node name="ScalarAdd_Phase_Y" class="e2d5e227 98a6424f ae607c8c c4e99bec" id="22">
+				<properties>
+					<property name="input1">0</property>
+					<property name="input2">0</property>
+				</properties>
+			</node>
+			<node name="ScalarAdd_Phase_Z" class="e2d5e227 98a6424f ae607c8c c4e99bec" id="23">
+				<properties>
+					<property name="input1">0</property>
+					<property name="input2">0</property>
+				</properties>
+			</node>
+			<node name="GraphVizEngine" class="be72cb50 011f41d8 90449ae0 4c24ace5" id="24">
+				<properties>
+					<property name="render_engine">.dot to SVG</property>
+				</properties>
+			</node>
+			<node name="ScalarSine_Y" class="b00248d6 9d6843d5 ab5a24bc 852519e5" id="25">
+				<properties>
+					<property name="input">0</property>
+				</properties>
+			</node>
+			<node name="ScalarSine_Z" class="b00248d6 9d6843d5 ab5a24bc 852519e5" id="26">
+				<properties>
+					<property name="input">0</property>
+				</properties>
+			</node>
+			<node name="OpenGLFacePainter" class="a8f9e6e8 59b14fa4 8dde0fad 89cea90d" id="17">
+				<properties>
+					<property name="enabled">true</property>
+				</properties>
+			</node>
+		</nodes>
+		<dependencies>
+			<dependency from_node="6" from_property="output_matrix" to_node="5" to_property="input_matrix"/>
+			<dependency from_node="12" from_property="output_matrix" to_node="9" to_property="input_matrix"/>
+			<dependency from_node="21" from_property="output" to_node="13" to_property="input"/>
+			<dependency from_node="13" from_property="output" to_node="14" to_property="input1"/>
+			<dependency from_node="15" from_property="Scale_X" to_node="14" to_property="input2"/>
+			<dependency from_node="18" from_property="output_matrix" to_node="16" to_property="input_matrix"/>
+			<dependency from_node="15" from_property="output_mesh" to_node="16" to_property="input_mesh"/>
+			<dependency from_node="14" from_property="output" to_node="18" to_property="x"/>
+			<dependency from_node="19" from_property="output" to_node="18" to_property="y"/>
+			<dependency from_node="20" from_property="output" to_node="18" to_property="z"/>
+			<dependency from_node="25" from_property="output" to_node="19" to_property="input1"/>
+			<dependency from_node="15" from_property="Scale_Y" to_node="19" to_property="input2"/>
+			<dependency from_node="26" from_property="output" to_node="20" to_property="input1"/>
+			<dependency from_node="15" from_property="Scale_Z" to_node="20" to_property="input2"/>
+			<dependency from_node="4" from_property="time" to_node="21" to_property="input1"/>
+			<dependency from_node="15" from_property="Phase_X" to_node="21" to_property="input2"/>
+			<dependency from_node="4" from_property="time" to_node="22" to_property="input1"/>
+			<dependency from_node="15" from_property="Phase_Y" to_node="22" to_property="input2"/>
+			<dependency from_node="4" from_property="time" to_node="23" to_property="input1"/>
+			<dependency from_node="15" from_property="Phase_Z" to_node="23" to_property="input2"/>
+			<dependency from_node="22" from_property="output" to_node="25" to_property="input"/>
+			<dependency from_node="23" from_property="output" to_node="26" to_property="input"/>
+		</dependencies>
+	</document>
+</k3dml>
+

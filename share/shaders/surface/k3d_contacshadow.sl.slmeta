@@ -1,0 +1,12 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_contactshadow">
+			<argument name="shadowname" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="0" default_value=""/>
+			<argument name="samples" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="10"/>
+			<argument name="influence" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.0"/>
+			<argument name="gamma" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+			<argument name="maxdist" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="10000"/>
+		</shader>
+	</shaders>
+</k3dml>
+

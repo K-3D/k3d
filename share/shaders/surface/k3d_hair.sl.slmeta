@@ -1,0 +1,19 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_hair">
+			<description>Hair surface from RenderMan AppNote #19</description>
+			<authors>Pixar</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.6"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.35"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.15"/>
+			<argument name="rootcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.109 0.037 0.007"/>
+			<argument name="tipcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.519 0.325 0.125"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.75 0.65 0.6"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

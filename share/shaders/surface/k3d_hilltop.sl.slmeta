@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<shaders>
+		<shader name="k3d_hilltop" type="surface">
+			<description/>
+			<authors/>
+			<copyright/>
+			<argument name="Ka" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="Kd" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".8"/>
+			<argument name="ambientcolor8" label="" description="" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+			<argument name="aColor3" label="" description="" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+			<argument name="aColor6" label="" description="" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.45 0.58 0.32"/>
+			<argument name="TopDir" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="2"/>
+			<argument name="geospace" label="" description="" storage_class="uniform" type="string" extended_type="space" array_count="1" space="" output="false" default_value="world"/>
+			<argument name="Altitude" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.8"/>
+			<argument name="Blend" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".7"/>
+			<argument name="octaves2" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="4"/>
+			<argument name="freq2" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="10"/>
+		</shader>
+	</shaders>
+</k3dml>
+

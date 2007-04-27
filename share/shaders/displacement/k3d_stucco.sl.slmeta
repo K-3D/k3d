@@ -1,0 +1,15 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_stucco">
+			<description>Displacement shader for stucco</description>
+			<authors>Larry Gritz</authors>
+			<argument name="Km" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.05"/>
+			<argument name="power" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="5"/>
+			<argument name="frequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="10"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

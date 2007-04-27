@@ -1,0 +1,17 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_water">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Kr" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="blur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="samples" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="radius" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="8"/>
+			<argument name="half_width" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.1"/>
+		</shader>
+	</shaders>
+</k3dml>
+

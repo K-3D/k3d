@@ -1,0 +1,12 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_threads">
+			<argument name="Km" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".1"/>
+			<argument name="frequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="5.0"/>
+			<argument name="phase" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".0"/>
+			<argument name="offset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".0"/>
+			<argument name="dampzone" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".05"/>
+		</shader>
+	</shaders>
+</k3dml>
+

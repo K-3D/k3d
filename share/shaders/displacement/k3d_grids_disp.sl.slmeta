@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_grids_disp">
+			<argument name="freq0" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="22.2"/>
+			<argument name="rotation0" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="26.5"/>
+			<argument name="fuzz0" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.136"/>
+			<argument name="linewidth0" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.368"/>
+			<argument name="SurfaceColor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+			<argument name="GridColor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+			<argument name="freq1" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="44.9"/>
+			<argument name="rotation1" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="61.8"/>
+			<argument name="fuzz1" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.269"/>
+			<argument name="linewidth1" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.122"/>
+		</shader>
+	</shaders>
+</k3dml>
+

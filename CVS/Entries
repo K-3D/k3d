@@ -1,0 +1,38 @@
+/AUTHORS/1.26/Tue Mar  7 20:01:03 2006//
+/COPYING/1.1/Mon Nov 25 20:02:33 2002//
+/CTestCustom.ctest.in/1.1/Sun Jan 21 16:37:00 2007//
+/ChangeLog/1.123/Thu Aug 17 23:51:00 2006//
+/DartConfig.cmake/1.1/Sun Dec 24 01:39:35 2006//
+/INSTALL/1.10/Fri Mar 25 05:54:05 2005//
+/NEWS/1.2/Thu Apr 29 16:26:56 2004//
+/README/1.3/Fri Mar 25 05:54:05 2005//
+/README.win.txt/1.1/Sat Jan 22 08:30:20 2005/-kb/
+/TODO/1.3/Thu Apr 29 16:26:56 2004//
+/k3d-makempeg.in/1.1/Sun May  2 06:14:35 2004//
+D/application////
+D/bug-buddy////
+D/cmake////
+D/desktop////
+D/distribution////
+D/docs////
+D/gil////
+D/glew////
+D/k3dsdk////
+D/k3dsdk_python////
+D/make-module-proxy////
+D/man////
+D/modules////
+D/ngui////
+D/nui////
+D/po////
+D/pyui////
+D/qtui////
+D/renderframe////
+D/renderjob////
+D/share////
+D/sl2xml////
+D/subdivision_surface////
+D/surface_polygonizer////
+D/tests////
+D/uuidgen////
+/CMakeLists.txt/1.43/Sat Apr 21 03:42:05 2007//

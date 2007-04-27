@@ -1,0 +1,11 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_fill">
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".7"/>
+			<argument name="min" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.05"/>
+			<argument name="max" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.055"/>
+		</shader>
+	</shaders>
+</k3dml>
+

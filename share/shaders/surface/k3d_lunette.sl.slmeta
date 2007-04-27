@@ -1,0 +1,26 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_lunette">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".1"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="urepeats" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="30"/>
+			<argument name="ulinewidth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.125"/>
+			<argument name="vrepeats" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="30"/>
+			<argument name="vlinewidth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.12"/>
+			<argument name="colorA" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.36 0.58 .67"/>
+			<argument name="colorB" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.88 0.88 0.71"/>
+			<argument name="baselinecolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.51 0.48 0.52"/>
+			<argument name="colorBenhance" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.6"/>
+			<argument name="gridDensity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="noiseScale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".3"/>
+			<argument name="noiseRandom" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="maxOctaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="5"/>
+			<argument name="lunacrity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.3"/>
+			<argument name="gain" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".7"/>
+		</shader>
+	</shaders>
+</k3dml>
+

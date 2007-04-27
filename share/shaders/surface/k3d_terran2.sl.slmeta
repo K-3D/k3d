@@ -1,0 +1,29 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_terran2">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".7"/>
+			<argument name="spectral_exp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+			<argument name="lacunarity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="2"/>
+			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="7"/>
+			<argument name="bump_scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.07"/>
+			<argument name="multifractal" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="dist_scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="offset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="sea_level" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="mtn_scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="lat_scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.95"/>
+			<argument name="nonlinear" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="purt_scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".9"/>
+			<argument name="map_exp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="ice_caps" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.9"/>
+			<argument name="depth_scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="depth_max" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="mottle_limit" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.75"/>
+			<argument name="mottle_scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="20"/>
+			<argument name="mottle_dim" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".25"/>
+			<argument name="mottle_mag" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".02"/>
+		</shader>
+	</shaders>
+</k3dml>
+

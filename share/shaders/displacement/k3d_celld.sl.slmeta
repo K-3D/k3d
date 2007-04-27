@@ -1,0 +1,15 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_celld">
+			<argument name="Kvoro" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="voro_freq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="voro_step" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.05"/>
+			<argument name="voro_jitter" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="PSpace" storage_class="uniform" type="string" extended_type="space" array_count="1" space="" output="0" default_value="shader"/>
+			<argument name="usePref" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="__Pref" storage_class="varying" type="point" extended_type="point" array_count="1" space="" output="0" default_value="0 0 0"/>
+			<argument name="VoroVal" storage_class="varying" type="float" extended_type="float" array_count="1" space="" output="1" default_value="0"/>
+		</shader>
+	</shaders>
+</k3dml>
+

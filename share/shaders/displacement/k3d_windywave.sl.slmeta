@@ -1,0 +1,17 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_windywave">
+			<description>Displacement shader for wave with small wind-ripples</description>
+			<authors>F. Kenton Musgrave, Larry Gritz</authors>
+			<argument name="Km" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="txtscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="windfreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="windamp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="minwind" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.3"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

@@ -1,0 +1,28 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_ruledpaper">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.1"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="linestr" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="texturename" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="0" default_value=""/>
+			<argument name="pw" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="21"/>
+			<argument name="ph" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="29.7"/>
+			<argument name="shiny" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.25/pw"/>
+			<argument name="lines" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.7/ph"/>
+			<argument name="linet" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.05/ph"/>
+			<argument name="linef" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5/pw"/>
+			<argument name="margt" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="2/ph"/>
+			<argument name="margb" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1-(1.35/ph)"/>
+			<argument name="verts" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="2.75/pw"/>
+			<argument name="verte" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="2.85/pw"/>
+			<argument name="circms" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.25"/>
+			<argument name="circr" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.3"/>
+			<argument name="boundl" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="(circms-circr)/pw"/>
+			<argument name="boundr" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="(circms+circr)/pw"/>
+		</shader>
+	</shaders>
+</k3dml>
+

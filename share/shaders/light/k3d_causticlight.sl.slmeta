@@ -1,0 +1,22 @@
+<k3dml>
+	<shaders>
+		<shader type="light" name="k3d_causticlight">
+			<argument name="intensity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="lightcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="from" storage_class="uniform" type="point" extended_type="point" array_count="1" space="shader" output="0" default_value="0 0 0"/>
+			<argument name="to" storage_class="uniform" type="point" extended_type="point" array_count="1" space="shader" output="0" default_value="0 0 0"/>
+			<argument name="coneangle" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="30"/>
+			<argument name="conedeltaangle" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="5"/>
+			<argument name="beamdistribution" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="2"/>
+			<argument name="shadowname" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="0" default_value=""/>
+			<argument name="samples" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="16"/>
+			<argument name="blur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.01"/>
+			<argument name="bias" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.01"/>
+			<argument name="threshold" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+			<argument name="noiseamp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="noisefreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="noisepow" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+		</shader>
+	</shaders>
+</k3dml>
+

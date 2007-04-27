@@ -1,0 +1,16 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_dented">
+			<description>Makes a surface appear worn and dented</description>
+			<authors>Larry Gritz</authors>
+			<argument name="Km" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="power" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="3"/>
+			<argument name="frequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="maxoctaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="6"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

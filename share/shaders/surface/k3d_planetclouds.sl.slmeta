@@ -1,0 +1,19 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_planetclouds">
+			<description>Semi-opaque cloud layer for an Earth-like planetary model</description>
+			<authors>Ken Musgrave</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.75"/>
+			<argument name="distortionscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="omega" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.7"/>
+			<argument name="lambda" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="2"/>
+			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="9"/>
+			<argument name="offset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

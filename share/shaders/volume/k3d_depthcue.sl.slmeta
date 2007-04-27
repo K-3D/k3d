@@ -1,0 +1,16 @@
+<k3dml>
+	<shaders>
+		<shader type="volume" name="k3d_depthcue">
+			<description>Standard depthcue volume shader for RenderMan Interface</description>
+			<authors>Pixar</authors>
+			<copyright>(c) Copyright 1988, Pixar</copyright>
+			<argument name="mindistance" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="maxdistance" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="background" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

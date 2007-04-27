@@ -1,0 +1,30 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_fur2">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.0287"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.77"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.285"/>
+			<argument name="roughness1" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.008"/>
+			<argument name="SPEC1" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.01"/>
+			<argument name="roughness2" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.016"/>
+			<argument name="SPEC2" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.003"/>
+			<argument name="start_spec" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.3"/>
+			<argument name="end_spec" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.95"/>
+			<argument name="spec_size_fade" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.1"/>
+			<argument name="illum_width" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="180"/>
+			<argument name="var_fade_start" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.005"/>
+			<argument name="var_fade_end" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.001"/>
+			<argument name="clump_dark_strength" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.0"/>
+			<argument name="rootcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.488655 0 0"/>
+			<argument name="tipcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 0.855543 0.272877"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="static_ambient" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.804532 0.463371 0.0615091"/>
+			<argument name="hair_col_var" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.0"/>
+			<argument name="hair_length" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.0"/>
+			<argument name="surface_normal" storage_class="uniform" type="normal" extended_type="normal" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="clump_vect" storage_class="varying" type="vector" extended_type="vector" array_count="1" space="" output="0" default_value="0 0 0"/>
+			<argument name="hair_id" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.0"/>
+		</shader>
+	</shaders>
+</k3dml>
+

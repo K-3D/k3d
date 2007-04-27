@@ -1,0 +1,20 @@
+FIND_PATH(K3D_JPEG_INCLUDE_DIR jpeglib.h
+	/usr/include
+	c:/gtk/include
+	DOC "Directory where the jpeg header files are located"
+	)
+MARK_AS_ADVANCED(K3D_JPEG_INCLUDE_DIR)
+
+SET(K3D_JPEG_LIB jpeg CACHE STRING "")
+MARK_AS_ADVANCED(K3D_JPEG_LIB)
+
+SET(K3D_JPEG_INCLUDE_DIRS
+	${K3D_JPEG_INCLUDE_DIR}
+	)
+
+SET(K3D_JPEG_LIBS
+	${K3D_JPEG_LIB}
+	)
+
+SET(K3D_JPEG_FOUND 1)
+

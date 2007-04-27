@@ -1,0 +1,13 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_saturn">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".7"/>
+			<argument name="dist_scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="offset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="lat_scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.95"/>
+			<argument name="map_exp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+		</shader>
+	</shaders>
+</k3dml>
+

@@ -1,0 +1,12 @@
+<k3dml>
+	<shaders>
+		<shader type="light" name="k3d_ambientlight">
+			<description>Standard ambient light source for RenderMan Interface</description>
+			<authors>Pixar</authors>
+			<copyright>(c) Copyright 1988, Pixar</copyright>
+			<argument name="intensity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="lightcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+		</shader>
+	</shaders>
+</k3dml>
+

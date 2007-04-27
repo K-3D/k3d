@@ -1,0 +1,134 @@
+% Class & Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article} % Options : fleqn
+
+\usepackage{a4wide}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{fancyhdr}
+\usepackage[]{graphicx} % OPtions : draft
+\usepackage[]{color}
+\usepackage{mathptm}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{palatino}
+\usepackage{multirow}
+\pdfadjustspacing=1
+\bibliographystyle{plain}
+\usepackage{longtable}
+\usepackage{hyperref}
+%\usepackage{algorithmicx}
+%\usepackage{algorithm}
+%\usepackage{algpseudocode}
+
+% Style & Lengths %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setlength{\parindent}{0cm}
+\setlength{\headheight}{26pt}
+\setlength{\textheight}{21cm}
+\frenchspacing
+
+% Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\baselinestretch}{1}
+
+\renewcommand{\[}{\begin{equation}}
+\renewcommand{\]}{\end{equation}}
+\renewcommand{\(}{\begin{displaymath}}
+\renewcommand{\)}{\end{displaymath}}
+
+\newcommand{\dx}{\Delta x}
+\newcommand{\dy}{\Delta y}
+\newcommand{\dz}{\Delta z}
+\newcommand{\dt}{\Delta t}
+
+% Headers Foot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{fancy} 
+\lhead{\leftmark}
+\rhead{}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Title %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{SDS preview design}
+\author{Bart Janssens}
+
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Introduction to the design of the SDS preview module, detailing what classes exist and what they do.
+\end{abstract}
+
+Figure \ref{classes} shows the class diagram for the SDS cache.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{classes}
+	\caption{The class diagram.}
+	\label{classes}
+\end{figure}
+
+\section{catmull\_clark\_cache}
+This class provides the interface to the client program for all SDS operations. It can be seen as a mediator class, and has the advantage that it never becomes invalid, so the client only has to create it once. \texttt{set\_input} and \texttt{update} must be called (in this order) to update the cache. The \texttt{set\_input} method makes sure the \texttt{cache\_input} is valid, the \texttt{update} method handles the updating of point positions assuming a valid \texttt{cache\_input} is present, and creates or updates the \texttt{highr\_level\_cache}. Sequence diagrams for these operations under different circumstances are shown below.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{set_input_initial}
+	\caption{Input set when the cache is used for the first time.}
+	\label{input_initial}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{set_input_invalid}
+	\caption{Input set when the cache is invalid.}
+	\label{input_invalid}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{update_invalid}
+	\caption{Update in case the cache is invalid. All points are recalculated in this case, and a new \texttt{higher\_level\_cache} is created. THe old cache is deleted if needed, but this is not shown in the diagram.}
+	\label{update_invalid}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{update_valid}
+	\caption{In case the cache is valid, \texttt{update\_detail} is called.}
+	\label{update_valid}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{update_detail}
+	\caption{The \texttt{update\_detail} operation updates point positions in the first level cache and in the higher level cache. The parameter controls if all points are updated or if only the modified points (as determined by \texttt{cache\_input}) are updated.}
+	\label{update_detail}
+\end{figure}
+
+In the \texttt{catmull\_clark\_cache} class there are two pure virtual functions: \texttt{create\_cache\_input} and \texttt{client\_output} These need to be defined by "client" software like k3d. The \texttt{create\_cache\_input} method is a factory method for creating a client-specific \texttt{cache\_input} class. The \texttt{client\_output} method is used to output the result of the subdivided mesh. Figure \ref{classes} shows there are three subclasses defined for k3d:
+\begin{enumerate}
+\item \texttt{k3d\_sds\_cache\_base} handles the input side of things. It is independent of what output module is used.
+\item \texttt{k3d\_opengl\_sds\_cache} handles output to opengl.
+\item \texttt{k3d\_mesh\_sds\_cache} handles output to a k3d::mesh.
+\end{enumerate}
+
+\section{cache\_input}
+This class forms the glue between the client mesh representation and the data structure used for the SDS calculations. It has the following tasks:
+\begin{enumerate}
+\item Apply the first level of SDS, converting the original mesh format to internal SDS format. The first level calculation is different from subsequent levels since the original mesh may contain non-quadrilateral faces.
+\item Keep track of what was changed on the original mesh. The faces affected by a chenge are placed in the \texttt{updated\_faces} parameter for \texttt{update}.
+\item Detect if the cache is still valid (notification is done through \texttt{set\_input}, which returns true if the cache is valid).
+\end{enumerate}
+
+If the \texttt{cache\_input} becomes invalid, it must be destroyed and recreated, as is shown in figure \ref{input_invalid}. The \texttt{catmull\_clark\_cache} makes this process transparent for the client.\\
+As seen in figure \ref{classes}, only a single subclass is needed for k3d since there is only one mesh format. The face ordering is preserved by \texttt{k3d\_cache\_input}, which makes associating per-face properties of the original mesh with the resulting faces of the subdiveded mesh (accessed through the \texttt{face\_vertices} method) possible.
+
+\section{higher\_level\_cache}
+This class calculates SDS level 2 and up. It can work on the assumption that all faces are quadrilaterals, which makes an efficient representation using \texttt{boost::multi\_array} possible. The \texttt{update} method expects a list of faces that need updating. This list is filled by the \texttt{update} method from \texttt{cache\_input}.
+
+
+\end{document}

@@ -1,0 +1,19 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_strata">
+			<description>surface shader for sedimentary rock strata</description>
+			<authors>F. Kenton Musgrave, Larry Gritz</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="txtscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="yscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="2"/>
+			<argument name="turbscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="offset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="8"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

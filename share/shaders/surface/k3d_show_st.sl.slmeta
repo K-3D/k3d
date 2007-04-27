@@ -1,0 +1,9 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_show_st">
+			<description>Colors surface point according to its s,t coordinates</description>
+			<authors>Pixar</authors>
+			<copyright>(c) Copyright 1988, Pixar</copyright>
+		</shader>
+	</shaders>
+</k3dml>

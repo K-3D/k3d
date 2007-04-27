@@ -1,0 +1,22 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_hexatile_bump">
+			<argument name="Name" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="0" default_value="FGHexaTile_bump"/>
+			<argument name="Edge1" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="Edge2" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="ScaleSS" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="3"/>
+			<argument name="ScaleTT" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="3"/>
+			<argument name="Rotate" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="180"/>
+			<argument name="P1" storage_class="uniform" type="point" extended_type="point" array_count="1" space="" output="0" default_value="0 0 0"/>
+			<argument name="P2" storage_class="uniform" type="point" extended_type="point" array_count="1" space="" output="0" default_value="0 0 0"/>
+			<argument name="Projection" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="0" default_value="planar"/>
+			<argument name="Space" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="0" default_value="shader"/>
+			<argument name="mx" storage_class="uniform" type="float" extended_type="float" array_count="16" space="" output="0" default_value="{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}"/>
+			<argument name="C1" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="C2" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="2"/>
+			<argument name="Km" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="-.015"/>
+			<argument name="Truedisp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+		</shader>
+	</shaders>
+</k3dml>
+

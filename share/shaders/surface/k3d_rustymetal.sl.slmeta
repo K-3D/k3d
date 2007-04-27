@@ -1,0 +1,16 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_rustymetal">
+			<argument name="metalKa" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="metalKs" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="metalroughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".1"/>
+			<argument name="rustKa" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="rustKd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="rustcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.437 0.084 0"/>
+			<argument name="txtscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="rusty" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.2"/>
+			<argument name="rustbump" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.035"/>
+		</shader>
+	</shaders>
+</k3dml>
+

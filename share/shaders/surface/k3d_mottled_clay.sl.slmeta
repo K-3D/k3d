@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<shaders>
+		<shader name="k3d_mottled_clay" type="surface">
+			<description/>
+			<authors/>
+			<copyright/>
+			<argument name="Ka1" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.8"/>
+			<argument name="Kd1" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="roughness1" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="claycol1" label="" description="" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.88 0.74 0.42"/>
+			<argument name="claycol2" label="" description="" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.59 0.37 0.19"/>
+			<argument name="stucco_freq3" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="15"/>
+			<argument name="transp" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+		</shader>
+	</shaders>
+</k3dml>
+

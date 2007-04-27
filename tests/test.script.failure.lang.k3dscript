@@ -1,0 +1,5 @@
+#k3dscript
+
+# Tests to ensure that syntactically-incorrect k3dscript is recognized by the test framework as a failure
+Non-existent command
+

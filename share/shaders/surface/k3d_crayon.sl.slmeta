@@ -1,0 +1,20 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_crayon">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".1"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="txtscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="width" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".05"/>
+			<argument name="micro" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="15.32"/>
+			<argument name="stretch" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="10"/>
+			<argument name="density0" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="density1" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="topcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="basecolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0 0 0"/>
+		</shader>
+	</shaders>
+</k3dml>
+

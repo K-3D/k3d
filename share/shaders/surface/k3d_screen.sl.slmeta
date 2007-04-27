@@ -1,0 +1,18 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_screen">
+			<description>Metal screen</description>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.75"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.4"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+			<argument name="density" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.25"/>
+			<argument name="frequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="20"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

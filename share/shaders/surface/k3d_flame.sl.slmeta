@@ -1,0 +1,19 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_flame">
+			<description>Makes something that looks like fire</description>
+			<authors>F. Kenton Musgrave, Larry Gritz</authors>
+			<argument name="distortion" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="chaosscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="chaosoffset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="7"/>
+			<argument name="flameoffset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="flameamplitude" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="2.0"/>
+			<argument name="phase" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

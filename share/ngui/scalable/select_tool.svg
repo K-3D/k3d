@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   id="svg3433"
+   sodipodi:version="0.32"
+   inkscape:version="0.39"
+   width="24.000000pt"
+   height="24.000000pt"
+   sodipodi:docbase="/home/jdmoline/Projects/k3d/icons"
+   sodipodi:docname="select.svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs
+     id="defs3435" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ff61ff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0000000"
+     inkscape:pageshadow="2"
+     inkscape:zoom="21.000000"
+     inkscape:cx="12.000000"
+     inkscape:cy="12.000000"
+     inkscape:window-width="836"
+     inkscape:window-height="672"
+     inkscape:window-x="322"
+     inkscape:window-y="252"
+     showguides="true"
+     inkscape:guide-bbox="true" />
+  <metadata
+     id="metadata3436">
+    <rdf:RDF
+       id="RDF3437">
+      <cc:Work
+         rdf:about=""
+         id="Work3438">
+        <dc:format
+           id="format3439">image/svg+xml</dc:format>
+        <dc:type
+           id="type3441"
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     style="fill:#000000;fill-opacity:1.0000000;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.2500000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4.0000000;stroke-opacity:1.0000000;stroke-dasharray:none;"
+     d="M 8.9474532,2.6390474 L 8.7700002,24.294993 L 13.968980,20.818816 L 17.486905,28.023912 L 21.563055,25.556743 L 17.974761,18.854928 L 23.340773,17.146497 L 8.9474532,2.6390474 z "
+     id="path3453"
+     sodipodi:nodetypes="cccccccc" />
+</svg>

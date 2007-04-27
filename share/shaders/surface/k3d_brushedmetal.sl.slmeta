@@ -1,0 +1,17 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_brushedmetal">
+			<description>Simple anisotropic metal shader</description>
+			<authors>Larry Gritz</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".9"/>
+			<argument name="uroughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.15"/>
+			<argument name="vroughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

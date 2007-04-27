@@ -1,0 +1,23 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_leather">
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Kr" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".1"/>
+			<argument name="red" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.8 0.6 0.4"/>
+			<argument name="dred" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.5 0.3 0.1"/>
+			<argument name="green" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.8 0.6 0.4"/>
+			<argument name="brown" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.5 0.3 0.1"/>
+			<argument name="black" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.5 0.3 0.1"/>
+			<argument name="BLOTCH_TCF" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="5"/>
+			<argument name="BLOTCH_SF" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="5"/>
+			<argument name="BLOTCH_TF" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="5"/>
+			<argument name="paramdisp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="txtscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".05"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+		</shader>
+	</shaders>
+</k3dml>
+

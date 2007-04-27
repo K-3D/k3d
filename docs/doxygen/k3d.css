@@ -1,0 +1,33 @@
+DIV.tabs A:link, DIV.tabs A:visited, DIV.tabs A:active, DIV.tabs A:hover
+{
+	color: DarkRed;
+}
+
+a, a:visited, a:active, a:hover
+{
+	color: DarkRed;
+}
+
+a.qindex, a.qindex:visited, a.qindex:active, a.qindex:hover
+{
+	color: DarkRed;
+}
+
+.memitem
+{
+	background-color: #eedddd;
+	border-top-color: #886666;
+	border-right-color: #886666;
+	border-bottom-color: #886666;
+	border-left-color: #886666;
+}
+
+.memproto
+{
+	background-color: #f2f2f2;
+	border-top-color: #bbbbbb;
+	border-right-color: #bbbbbb;
+	border-bottom-color: #bbbbbb;
+	border-left-color: #bbbbbb;
+}
+

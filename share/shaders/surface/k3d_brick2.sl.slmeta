@@ -1,0 +1,11 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_brick2">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Cbrick" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.5 0.15 0.14"/>
+			<argument name="Cmortar" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.5 0.5 0.5"/>
+		</shader>
+	</shaders>
+</k3dml>
+

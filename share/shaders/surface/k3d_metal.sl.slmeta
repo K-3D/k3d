@@ -1,0 +1,16 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_metal">
+			<description>Standard metal surface for RenderMan Interface</description>
+			<authors>Pixar</authors>
+			<copyright>(c) Copyright 1988, Pixar</copyright>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".1"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

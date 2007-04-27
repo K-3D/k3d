@@ -1,0 +1,18 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_plastic">
+			<description>Standard plastic surface for RenderMan Interface</description>
+			<authors>Pixar</authors>
+			<copyright>(c) Copyright 1988, Pixar</copyright>
+			<argument name="Ka" label="Ambient" description="Ambient Amount" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" label="Diffuse" description="Diffuse Amount" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".5"/>
+			<argument name="Ks" label="Specular" description="Specular Amount" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".5"/>
+			<argument name="roughness" label="Roughness" description="Surface Roughness (affects specular reflection size)" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".1"/>
+			<argument name="specularcolor" label="Specular Color" description="Specular Reflection Color" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

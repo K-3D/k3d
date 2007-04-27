@@ -1,0 +1,6 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_ez"/>
+	</shaders>
+</k3dml>
+

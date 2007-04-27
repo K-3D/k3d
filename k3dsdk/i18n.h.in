@@ -1,0 +1,20 @@
+#ifndef K3DSDK_I18N_H
+#define K3DSDK_I18N_H
+
+// Generated file, do not edit!  Make changes to i18n.h.in instead.
+
+#cmakedefine K3D_BUILD_NLS
+
+#ifdef K3D_BUILD_NLS
+
+	#include <libintl.h>
+	#define _(String) gettext(String)
+
+#else // K3D_BUILD_NLS
+
+	#define _(String) (String)
+
+#endif // !K3D_BUILD_NLS
+
+#endif // K3DSDK_I18N_H
+

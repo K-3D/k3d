@@ -1,0 +1,12 @@
+<k3dml>
+	<shaders>
+		<shader type="volume" name="k3d_altitude_fog">
+			<description>Altitude fog</description>
+			<authors>Timothy M. Shead</authors>
+			<copyright>Copyright (c) 1995-2004, Timothy M. Shead</copyright>
+			<argument name="max_height" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="min_height" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="background" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+		</shader>
+	</shaders>
+</k3dml>

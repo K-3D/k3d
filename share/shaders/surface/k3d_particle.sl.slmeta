@@ -1,0 +1,12 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_particle">
+			<description>Basic additive shader for particles</description>
+			<authors>RenderMan AppNote #18</authors>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

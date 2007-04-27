@@ -1,0 +1,17 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_paintedplastic">
+			<description>Standard texture map surface for RenderMan Interface</description>
+			<authors>Pixar</authors>
+			<copyright>(c) Copyright 1988, Pixar</copyright>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".5"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".5"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".1"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+			<argument name="texturename" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+		</shader>
+	</shaders>
+</k3dml>
+
+

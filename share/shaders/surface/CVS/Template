@@ -1,0 +1,22 @@
+CVS: ----------------------------------------------------------------------
+CVS: 
+CVS: CVS commits to K-3D require a commit type for each comment,
+CVS: one comment per line.  Empty lines are not allowed.
+CVS:
+CVS: Valid commit types are:
+CVS:
+CVS:   BUG:   - a change made to fix a runtime issue
+CVS:            (crash, segmentation fault, exception, or incorrect result)
+CVS:   COMP:  - a fix for a compilation issue, error or warning
+CVS:   ENH:   - new functionality added to the project
+CVS:            (or removal of obsolete functionality)
+CVS:   PERF:  - a performance improvement
+CVS:   STYLE: - a change that does not impact the logic or execution of the
+CVS:            code. (improve coding style, comments, documentation)
+CVS: 
+CVS: Example:
+CVS: 
+CVS: BUG: Fixed crash reparenting nodes
+CVS: ENH: Added new flurb filter
+CVS: 
+CVS: ----------------------------------------------------------------------

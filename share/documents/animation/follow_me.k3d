@@ -1,0 +1,594 @@
+<?xml version="1.0" ?>
+<k3dml package="k3d" version="0.7.0.0" host="Linux-2.6.19-gentoo-r5;AMD Sempron(tm)   2600+">
+	<application>
+		<plugins/>
+	</application>
+	<document>
+		<nodes>
+			<node name="Axes" class="00000001 00000000 00000000 00000001" id="2">
+				<properties>
+					<property name="axes">true</property>
+					<property name="gridcolor">0.4 0.4 0.4</property>
+					<property name="gridcount">5</property>
+					<property name="gridsize">2</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="viewport_visible">true</property>
+					<property name="xcolor">1 0 0</property>
+					<property name="xyplane">true</property>
+					<property name="xzplane">false</property>
+					<property name="ycolor">0 0.7 0</property>
+					<property name="yzplane">false</property>
+					<property name="zcolor">0 0 0.7</property>
+				</properties>
+			</node>
+			<node name="OpenGL Engine" class="0059ba47 7bf740f3 93fb523d 5899f22c" id="3">
+				<properties>
+					<property name="background_color">0.8 0.8 0.8</property>
+					<property name="draw_aimpoint">true</property>
+					<property name="draw_crop_window">true</property>
+					<property name="draw_frustum">true</property>
+					<property name="draw_safe_zone">false</property>
+					<property name="draw_two_sided">true</property>
+					<property name="fog">false</property>
+					<property name="fog_far">100</property>
+					<property name="fog_near">0</property>
+					<property name="headlight">true</property>
+					<property name="point_size">4</property>
+					<property name="show_lights">false</property>
+				</properties>
+			</node>
+			<node name="TimeSource" class="1978f1f7 4a864c99 8caf7cfc d2591baf" id="4">
+				<properties>
+					<property name="end_time">40</property>
+					<property name="frame_rate">5</property>
+					<property name="start_time">0</property>
+					<property name="time">29.19999999999993</property>
+				</properties>
+			</node>
+			<node name="Camera" class="45ce1872 af184b6d b391e136 0dcfe8b5" id="5">
+				<properties>
+					<property name="aspect_ratio"/>
+					<property name="bottom">-0.5</property>
+					<property name="crop_window_bottom">1</property>
+					<property name="crop_window_left">0</property>
+					<property name="crop_window_right">1</property>
+					<property name="crop_window_top">0</property>
+					<property name="far">1000</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="left">-0.6666666666666666</property>
+					<property name="navigation_target">5</property>
+					<property name="near">1</property>
+					<property name="orthographic">false</property>
+					<property name="parent">0</property>
+					<property name="reference_plane">0</property>
+					<property name="reference_plane_color">0 0 0.7</property>
+					<property name="right">0.6666666666666666</property>
+					<property name="show_projection">false</property>
+					<property name="show_reference_plane">false</property>
+					<property name="top">0.5</property>
+					<property name="viewport_visible">true</property>
+					<property name="world_target">-1.52009 -1.0206 -0.238949</property>
+				</properties>
+			</node>
+			<node name="Camera Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="6">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">0.868134 0.213549 0.44804 -15.5375 0.49633 -0.373521 -0.78367 23.4973 4.0401e-07 0.902706 -0.430257 13.2221 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Material" class="00000001 00000000 00000000 00000024" id="7">
+				<properties>
+					<property name="atmosphere_shader">0</property>
+					<property name="color">1 1 1</property>
+					<property name="displacement_bounds">1</property>
+					<property name="displacement_shader">0</property>
+					<property name="exterior_shader">0</property>
+					<property name="interior_shader">0</property>
+					<property name="matte">false</property>
+					<property name="opacity">1 1 1</property>
+					<property name="surface_shader">8</property>
+				</properties>
+			</node>
+			<node name="Surface Shader" class="b553a3bd d1044c6e b3f21e07 87132c31" id="8">
+				<properties>
+					<property name="Ka" label="Ambient" description="Ambient Amount" type="double" user_property="vanilla">1</property>
+					<property name="Kd" label="Diffuse" description="Diffuse Amount" type="double" user_property="vanilla">0.5</property>
+					<property name="Ks" label="Specular" description="Specular Amount" type="double" user_property="vanilla">0.5</property>
+					<property name="roughness" label="Roughness" description="Surface Roughness (affects specular reflection size)" type="double" user_property="vanilla">0.1</property>
+					<property name="shader_path" reference="relative" relative_path="shaders/surface/k3d_plastic.sl">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+					<property name="specularcolor" label="Specular Color" description="Specular Reflection Color" type="k3d::color" user_property="vanilla">1 1 1</property>
+				</properties>
+			</node>
+			<node name="Light" class="00000001 00000000 00000000 0000001d" id="9">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="shader">10</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Light Shader" class="830e867b 7bc94c6c 8d5087ee 8aa35db2" id="10">
+				<properties>
+					<property name="from" label="" description="" type="k3d::point3" user_property="vanilla">0 0 0</property>
+					<property name="intensity" label="" description="" type="double" user_property="vanilla">3000</property>
+					<property name="lightcolor" label="" description="" type="k3d::color" user_property="vanilla">1 1 1</property>
+					<property name="shader_path" reference="relative" relative_path="shaders/light/k3d_pointlight.sl">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+				</properties>
+			</node>
+			<node name="RenderMan Engine" class="0dc5e733 fa684e05 86a3865f 42f7a99d" id="11">
+				<properties>
+					<property name="bucket_height">16</property>
+					<property name="bucket_width">16</property>
+					<property name="default_atmosphere_shader">0</property>
+					<property name="default_exterior_shader">0</property>
+					<property name="default_interior_shader">0</property>
+					<property name="dof">false</property>
+					<property name="exposure">1</property>
+					<property name="eye_splits">10</property>
+					<property name="focal_length">1.6</property>
+					<property name="focus_plane">30</property>
+					<property name="fstop">0.3</property>
+					<property name="gamma">1</property>
+					<property name="grid_size">256</property>
+					<property name="hider"/>
+					<property name="imager_shader">0</property>
+					<property name="motion_blur">false</property>
+					<property name="pixel_aspect_ratio">1</property>
+					<property name="pixel_filter">gaussian</property>
+					<property name="pixel_filter_height">2</property>
+					<property name="pixel_filter_width">2</property>
+					<property name="pixel_height">240</property>
+					<property name="pixel_width">320</property>
+					<property name="pixel_xsamples">3</property>
+					<property name="pixel_ysamples">3</property>
+					<property name="render_alpha">true</property>
+					<property name="render_engine">aqsis</property>
+					<property name="render_motion_blur">false</property>
+					<property name="resolution"/>
+					<property name="shading_interpolation">constant</property>
+					<property name="shading_rate">1</property>
+					<property name="texture_memory">1024</property>
+					<property name="two_sided">true</property>
+				</properties>
+			</node>
+			<node name="Light Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="12">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 -20 0 1 0 20 0 0 1 30 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="PolyCube" class="7ec966d1 d78a445c 8806b8a3 5593f241" id="13">
+				<properties>
+					<property name="columns">1</property>
+					<property name="depth">5</property>
+					<property name="height">3</property>
+					<property name="material">7</property>
+					<property name="rows">1</property>
+					<property name="slices">1</property>
+					<property name="width">1</property>
+				</properties>
+			</node>
+			<node name="PolyCube Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="14">
+				<properties>
+					<property name="gl_painter">15</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="parent">0</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="ri_painter">0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Position tracker" class="e2edd795 08f9416a 84139876 9c25a60a" id="16">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="space">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="x">-9.912000000000022</property>
+					<property name="y">-4.140000000000003</property>
+					<property name="z">6.276000000000183</property>
+				</properties>
+			</node>
+			<node name="ViewMatrix" class="8c5f4eef a858499f 83774152 147b7fe2" id="17">
+				<properties>
+					<property name="look">1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 1</property>
+					<property name="position">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="up">1 0 0 0 0 1 0 1 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="PolyCone" class="7c41b43f 385143ab 86969795 368d6199" id="18">
+				<properties>
+					<property name="bottom">true</property>
+					<property name="height">2</property>
+					<property name="material">7</property>
+					<property name="radius">1</property>
+					<property name="u_power">1</property>
+					<property name="u_segments">32</property>
+					<property name="v_power">1</property>
+					<property name="v_segments">5</property>
+				</properties>
+			</node>
+			<node name="PolyCone Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="19">
+				<properties>
+					<property name="gl_painter">15</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection">
+						<points>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</points>
+						<edges>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</edges>
+						<faces>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</faces>
+						<linearcurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</linearcurves>
+						<cubiccurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</cubiccurves>
+						<nurbscurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</nurbscurves>
+						<bilinearpatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</bilinearpatches>
+						<bicubicpatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</bicubicpatches>
+						<nurbspatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</nurbspatches>
+					</property>
+					<property name="motion_blur">false</property>
+					<property name="parent">0</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="ri_painter">0</property>
+					<property name="show_component_selection">true</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Position target" class="e2edd795 08f9416a 84139876 9c25a60a" id="20">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="space">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="x">0</property>
+					<property name="y">0</property>
+					<property name="z">0</property>
+				</properties>
+			</node>
+			<node name="SubdivideFaces" class="b9d4d815 241c473d a22d3523 406fa390" id="21">
+				<properties>
+					<property name="mesh_selection">
+						<points>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</points>
+						<edges>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</edges>
+						<faces>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</faces>
+						<linearcurves>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</linearcurves>
+						<cubiccurves>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</cubiccurves>
+						<nurbscurves>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</nurbscurves>
+						<bilinearpatches>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</bilinearpatches>
+						<bicubicpatches>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</bicubicpatches>
+						<nurbspatches>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</nurbspatches>
+					</property>
+					<property name="middle_offset">0</property>
+					<property name="subdivision_type">centermidpoints</property>
+				</properties>
+			</node>
+			<node name="SubdivideFaces 2" class="b9d4d815 241c473d a22d3523 406fa390" id="22">
+				<properties>
+					<property name="mesh_selection">
+						<points>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</points>
+						<edges>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</edges>
+						<faces>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</faces>
+						<linearcurves>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</linearcurves>
+						<cubiccurves>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</cubiccurves>
+						<nurbscurves>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</nurbscurves>
+						<bilinearpatches>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</bilinearpatches>
+						<bicubicpatches>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</bicubicpatches>
+						<nurbspatches>
+							<selection begin="0" end="4294967295" weight="1"/>
+						</nurbspatches>
+					</property>
+					<property name="middle_offset">0</property>
+					<property name="subdivision_type">centermidpoints</property>
+				</properties>
+			</node>
+			<node name="JoinPoints" class="915ba4d4 d4154a12 938bec97 60f819f3" id="23">
+				<properties>
+					<property name="mesh_selection">
+						<points>
+							<selection begin="0" end="1" weight="1"/>
+							<selection begin="1" end="2" weight="1"/>
+							<selection begin="2" end="3" weight="1"/>
+							<selection begin="3" end="4" weight="1"/>
+							<selection begin="4" end="8" weight="0"/>
+							<selection begin="8" end="9" weight="1"/>
+							<selection begin="9" end="10" weight="1"/>
+							<selection begin="10" end="11" weight="1"/>
+							<selection begin="11" end="12" weight="1"/>
+							<selection begin="12" end="13" weight="1"/>
+							<selection begin="13" end="26" weight="0"/>
+							<selection begin="26" end="27" weight="1"/>
+							<selection begin="27" end="28" weight="1"/>
+							<selection begin="28" end="29" weight="1"/>
+							<selection begin="29" end="30" weight="1"/>
+							<selection begin="30" end="31" weight="1"/>
+							<selection begin="31" end="32" weight="1"/>
+							<selection begin="32" end="36" weight="0"/>
+							<selection begin="36" end="37" weight="1"/>
+							<selection begin="37" end="45" weight="0"/>
+							<selection begin="45" end="46" weight="1"/>
+							<selection begin="46" end="55" weight="0"/>
+							<selection begin="55" end="56" weight="1"/>
+							<selection begin="56" end="57" weight="1"/>
+							<selection begin="57" end="58" weight="1"/>
+							<selection begin="58" end="59" weight="1"/>
+							<selection begin="59" end="60" weight="1"/>
+							<selection begin="60" end="61" weight="1"/>
+							<selection begin="61" end="62" weight="1"/>
+							<selection begin="62" end="63" weight="1"/>
+							<selection begin="63" end="4294967295" weight="0"/>
+						</points>
+						<edges>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</edges>
+						<faces>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</faces>
+						<linearcurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</linearcurves>
+						<cubiccurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</cubiccurves>
+						<nurbscurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</nurbscurves>
+						<bilinearpatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</bilinearpatches>
+						<bicubicpatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</bicubicpatches>
+						<nurbspatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</nurbspatches>
+					</property>
+				</properties>
+			</node>
+			<node name="ScalePoints" class="d3829136 1f934c4d 89151994 a49d9f65" id="24">
+				<properties>
+					<property name="mesh_selection">
+						<points>
+							<selection begin="0" end="5" weight="0"/>
+							<selection begin="5" end="6" weight="1"/>
+							<selection begin="6" end="7" weight="0"/>
+							<selection begin="7" end="8" weight="1"/>
+							<selection begin="8" end="9" weight="1"/>
+							<selection begin="9" end="10" weight="0"/>
+							<selection begin="10" end="11" weight="1"/>
+							<selection begin="11" end="12" weight="1"/>
+							<selection begin="12" end="13" weight="0"/>
+							<selection begin="13" end="14" weight="1"/>
+							<selection begin="14" end="15" weight="1"/>
+							<selection begin="15" end="16" weight="0"/>
+							<selection begin="16" end="17" weight="1"/>
+							<selection begin="17" end="19" weight="0"/>
+							<selection begin="19" end="20" weight="1"/>
+							<selection begin="20" end="23" weight="0"/>
+							<selection begin="23" end="24" weight="1"/>
+							<selection begin="24" end="27" weight="0"/>
+							<selection begin="27" end="28" weight="1"/>
+							<selection begin="28" end="31" weight="0"/>
+							<selection begin="31" end="32" weight="1"/>
+							<selection begin="32" end="44" weight="0"/>
+							<selection begin="44" end="45" weight="1"/>
+							<selection begin="45" end="51" weight="0"/>
+							<selection begin="51" end="52" weight="1"/>
+							<selection begin="52" end="59" weight="0"/>
+							<selection begin="59" end="60" weight="1"/>
+							<selection begin="60" end="66" weight="0"/>
+							<selection begin="66" end="67" weight="1"/>
+							<selection begin="67" end="4294967295" weight="0"/>
+						</points>
+						<edges>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</edges>
+						<faces>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</faces>
+						<linearcurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</linearcurves>
+						<cubiccurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</cubiccurves>
+						<nurbscurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</nurbscurves>
+						<bilinearpatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</bilinearpatches>
+						<bicubicpatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</bicubicpatches>
+						<nurbspatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</nurbspatches>
+					</property>
+					<property name="x">2.748000000000002</property>
+					<property name="y">1.5368</property>
+					<property name="z">1</property>
+				</properties>
+			</node>
+			<node name="TranslatePoints" class="460b8dac 780240a3 a2f87b5b ba0272cd" id="25">
+				<properties>
+					<property name="mesh_selection">
+						<points>
+							<selection begin="0" end="39" weight="0"/>
+							<selection begin="39" end="40" weight="1"/>
+							<selection begin="40" end="41" weight="0"/>
+							<selection begin="41" end="42" weight="1"/>
+							<selection begin="42" end="43" weight="1"/>
+							<selection begin="43" end="44" weight="1"/>
+							<selection begin="44" end="45" weight="0"/>
+							<selection begin="45" end="46" weight="1"/>
+							<selection begin="46" end="47" weight="0"/>
+							<selection begin="47" end="48" weight="1"/>
+							<selection begin="48" end="49" weight="1"/>
+							<selection begin="49" end="50" weight="0"/>
+							<selection begin="50" end="51" weight="1"/>
+							<selection begin="51" end="52" weight="0"/>
+							<selection begin="52" end="53" weight="1"/>
+							<selection begin="53" end="55" weight="0"/>
+							<selection begin="55" end="56" weight="1"/>
+							<selection begin="56" end="57" weight="1"/>
+							<selection begin="57" end="58" weight="0"/>
+							<selection begin="58" end="59" weight="1"/>
+							<selection begin="59" end="60" weight="0"/>
+							<selection begin="60" end="61" weight="1"/>
+							<selection begin="61" end="63" weight="0"/>
+							<selection begin="63" end="64" weight="1"/>
+							<selection begin="64" end="65" weight="1"/>
+							<selection begin="65" end="67" weight="0"/>
+							<selection begin="67" end="68" weight="1"/>
+							<selection begin="68" end="4294967295" weight="0"/>
+						</points>
+						<edges>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</edges>
+						<faces>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</faces>
+						<linearcurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</linearcurves>
+						<cubiccurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</cubiccurves>
+						<nurbscurves>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</nurbscurves>
+						<bilinearpatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</bilinearpatches>
+						<bicubicpatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</bicubicpatches>
+						<nurbspatches>
+							<selection begin="0" end="4294967295" weight="0"/>
+						</nurbspatches>
+					</property>
+					<property name="x">0</property>
+					<property name="y">0</property>
+					<property name="z">1.404000000000001</property>
+				</properties>
+			</node>
+			<node name="ScalarSubtract" class="2b788bf5 09e44dd4 866a2d39 1b782873" id="26">
+				<properties>
+					<property name="input1">0</property>
+					<property name="input2">20</property>
+				</properties>
+			</node>
+			<node name="Annotation2D" class="2ad16705 62f1410d bcc9800c fa93762e" id="27">
+				<properties>
+					<property name="color">1 0 0</property>
+					<property name="text">Play animation to watch tracking</property>
+					<property name="x">-0.2404000000000001</property>
+					<property name="y">0.8152000000000005</property>
+				</properties>
+			</node>
+			<node name="up reference" class="00000001 00000000 00000000 00000001" id="28">
+				<properties>
+					<property name="axes">true</property>
+					<property name="gridcolor">0.4 0.4 0.4</property>
+					<property name="gridcount">2</property>
+					<property name="gridsize">1</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="viewport_visible">true</property>
+					<property name="xcolor">1 0 0</property>
+					<property name="xyplane">true</property>
+					<property name="xzplane">true</property>
+					<property name="ycolor">0 0.7 0</property>
+					<property name="yzplane">true</property>
+					<property name="zcolor">0 0 0.7</property>
+				</properties>
+			</node>
+			<node name="Position" class="e2edd795 08f9416a 84139876 9c25a60a" id="29">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="space">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="x">0</property>
+					<property name="y">0</property>
+					<property name="z">38.23600000000003</property>
+				</properties>
+			</node>
+			<node name="OpenGLFacePainter" class="a8f9e6e8 59b14fa4 8dde0fad 89cea90d" id="15">
+				<properties>
+					<property name="enabled">true</property>
+				</properties>
+			</node>
+		</nodes>
+		<dependencies>
+			<dependency from_node="23" from_property="output_mesh" to_node="24" to_property="input_mesh"/>
+			<dependency from_node="13" from_property="output_mesh" to_node="21" to_property="input_mesh"/>
+			<dependency from_node="21" from_property="output_mesh" to_node="22" to_property="input_mesh"/>
+			<dependency from_node="26" from_property="output" to_node="20" to_property="x"/>
+			<dependency from_node="20" from_property="output_matrix" to_node="19" to_property="input_matrix"/>
+			<dependency from_node="18" from_property="output_mesh" to_node="19" to_property="input_mesh"/>
+			<dependency from_node="12" from_property="output_matrix" to_node="9" to_property="input_matrix"/>
+			<dependency from_node="29" from_property="output_matrix" to_node="28" to_property="input_matrix"/>
+			<dependency from_node="24" from_property="output_mesh" to_node="25" to_property="input_mesh"/>
+			<dependency from_node="4" from_property="time" to_node="26" to_property="input1"/>
+			<dependency from_node="6" from_property="output_matrix" to_node="5" to_property="input_matrix"/>
+			<dependency from_node="17" from_property="output_matrix" to_node="14" to_property="input_matrix"/>
+			<dependency from_node="25" from_property="output_mesh" to_node="14" to_property="input_mesh"/>
+			<dependency from_node="16" from_property="output_matrix" to_node="17" to_property="position"/>
+			<dependency from_node="19" from_property="output_matrix" to_node="17" to_property="look"/>
+			<dependency from_node="28" from_property="output_matrix" to_node="17" to_property="up"/>
+			<dependency from_node="22" from_property="output_mesh" to_node="23" to_property="input_mesh"/>
+		</dependencies>
+	</document>
+</k3dml>
+

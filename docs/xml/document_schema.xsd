@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<!-- Defines a name-value pair that is used to store object state, particularly object property values -->
+	<xs:complexType name="property">
+		<xs:attribute name="name" type="xs:string"/>
+		<!-- Storing values as attributes is deprecated, new code should store values as element text -->
+		<xs:attribute name="value" type="xs:string" minOccurs="0" maxOccurs="1"/>
+		<xs:simpleContent type="xs:string"/>
+	</xs:complexType>
+
+	<!-- Defines a collection of zero-to-many properties, uniquely-identified by their name -->
+	<xs:complexType name="properties">
+		<xs:sequence>
+			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:key name="property">
+			<xs:selector xpath="property"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+	</xs:complexType>
+
+	<!-- Defines storage for a single plugin -->
+	<xs:complexType name="plugin">
+		<xs:attribute name="class" type="xs:string"/>
+	</xs:complexType>
+
+	<!-- Defines storage for a collection of zero-to-many plugins, uniquely identified by their class -->
+	<xs:complexType name="plugins">
+		<xs:sequence>
+			<xs:element name="plugin" type="plugin" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:key name="plugin">
+			<xs:selector xpath="object"/>
+			<xs:field xpath="@class"/>
+		</xs:key>
+	</xs:complexType>
+
+	<!-- Defines storage for a single document plugin instance -->
+	<xs:complexType name="node">
+		<xs:sequence>
+			<xs:element name="properties" type="properties" minOccurs="0" maxOccurs="1"/>	
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="class" type="xs:string"/>
+		<xs:attribute name="id" type="xs:string"/>
+	</xs:complexType>
+
+	<!-- Defines storage for a collection of zero-to-many document plugin instances, uniquely identified by their id -->
+	<xs:complexType name="nodes">
+		<xs:sequence>
+			<xs:element name="node" type="node" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:key name="node">
+			<xs:selector xpath="node"/>
+			<xs:field xpath="@id"/>
+		</xs:key>
+	</xs:complexType>
+
+	<!-- Defines storage for a dependency between two document node properties -->
+	<xs:complexType name="dependency">
+		<xs:attribute name="from_node" type="xs:string"/>
+		<xs:attribute name="from_property" type="xs:string"/>
+		<xs:attribute name="to_node" type="xs:string"/>
+		<xs:attribute name="to_property" type="xs:string"/>
+	</xs:complexType>
+
+	<!-- Defines storage for a collection of property dependencies -->
+	<xs:complexType name="dependencies">
+		<xs:sequence>
+			<xs:element name="dependency" type="dependency" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:key name="dependency">
+			<xs:selector xpath="dependency"/>
+			<xs:field xpath="@to_node"/>
+			<xs:field xpath="@to_property"/>
+		</xs:key>
+	</xs:complexType>
+
+	<!-- Defines storage for application-wide data (e.g. user options -->
+	<xs:complexType name="application">
+		<xs:sequence>
+			<xs:element name="plugins" type="plugins" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- Defines storage for a single document -->
+	<xs:complexType name="document">
+		<xs:sequence>
+			<xs:element name="nodes" type="nodes" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="dependencies" type="dependencies" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- Defines the top-level structure for the K-3D document -->
+	<xs:element name="k3dml">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="application" type="application" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="document" type="document" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="package" type="xs:string"/> <!-- Stores the name of the application that wrote the file -->
+			<xs:attribute name="version" type="xs:string"/> <!-- Stores the version of the application that wrote the file -->
+			<xs:attribute name="host" type="xs:string"/> <!-- Stores the platform of the application that wrote the file -->
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
+

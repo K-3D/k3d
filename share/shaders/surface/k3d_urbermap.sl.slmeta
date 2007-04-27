@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_urbermap">
+			<argument name="abColorMap" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="abColorMapBlur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="abUseColorMapAlpha" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="abDiffuse" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.8"/>
+			<argument name="abDiffuseMap" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="abDiffuseMapBlur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="abSpecular" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.3"/>
+			<argument name="abSpecularMap" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="abSpecularMapBlur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="abSpecularColor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+			<argument name="abSpecularColorMap" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="abSpecularColorMapBlur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="abRoughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.3"/>
+			<argument name="abRoughnessMap" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="abRoughnessMapBlur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="abTransparencyMap" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="abInvertTransparencyMap" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="abTransparencyMapBlur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="abIncandescence" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+			<argument name="abIncandescenseMap" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="abIncandescenseMapBlur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="abReflectionMap" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="abReflectionUp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="abReflectivity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="abReflectionMapBlur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="abBumpMap" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="abBumpMapBlur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="abBumpScale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="abDoDisplacement" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="abUseNormals" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="STMatrix0" storage_class="uniform" type="point" extended_type="point" array_count="1" space="" output="false" default_value="0 0 0"/>
+			<argument name="STMatrix1" storage_class="uniform" type="point" extended_type="point" array_count="1" space="" output="false" default_value="0 0 0"/>
+		</shader>
+	</shaders>
+</k3dml>
+

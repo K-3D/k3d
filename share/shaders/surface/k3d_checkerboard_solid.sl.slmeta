@@ -1,0 +1,23 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_checkerboard_solid">
+			<description>Creates a solid, volumetric checkerboard pattern</description>
+			<authors>Timothy M. Shead</authors>
+			<copyright>Copyright (c) 1995-2004, Timothy M. Shead</copyright>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+			<argument name="TileX" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="TileY" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="TileZ" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="EvenColor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+			<argument name="shadingspace" storage_class="uniform" type="string" extended_type="space" array_count="1" space="" output="false" default_value="shader"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

@@ -1,0 +1,44 @@
+#k3dscript
+
+<command node="/ui" command="tutorial_message" arguments="Howdy!  This &quot;Panel Basics&quot; tutorial will introduce you to the various types of panels in K-3D ..."/>
+<command node="/document/window/menus/file_new" command="activate" arguments=""/>
+<command node="/ui" command="tutorial_message" arguments="Remember from the &quot;Getting Started&quot; tutorial that panels are &quot;mounted&quot; in Panel Frames ..."/>
+<command node="/ui" command="tutorial_message" arguments="... you can mount any type of Panel in a Panel Frame, so let&apos;s begin by covering the different types of panels."/>
+<command node="/ui" command="tutorial_message" arguments="First, and most important is the Node List Panel ..."/>
+<command node="/document/window/node_list" command="highlight" arguments=""/>
+<command node="/ui" command="tutorial_message" arguments="Every K-3D document is a collection of Nodes, which will be described in greater detail later."/>
+<command node="/ui" command="tutorial_message" arguments="The Node List Panel lists every Node in the document - you can select a Node by clicking on it ..."/>
+<command node="/document/window/node_list" command="select" arguments="&lt;arguments&gt;&lt;selection&gt;&lt;node&gt;00000001 00000000 00000000 00000001 1&lt;/node&gt;&lt;/selection&gt;&lt;context_menu/&gt;&lt;/arguments&gt;"/>
+<command node="/document/window/node_list" command="select" arguments="&lt;arguments&gt;&lt;selection&gt;&lt;node&gt;e058ab07 44384acd ba321d58 cdb3ef25 1&lt;/node&gt;&lt;/selection&gt;&lt;context_menu/&gt;&lt;/arguments&gt;"/>
+<command node="/document/window/node_list" command="select" arguments="&lt;arguments&gt;&lt;selection&gt;&lt;node&gt;0dc5e733 fa684e05 86a3865f 42f7a99d 1&lt;/node&gt;&lt;/selection&gt;&lt;context_menu/&gt;&lt;/arguments&gt;"/>
+<command node="/document/window/node_properties/render_engine" command="value" arguments="aqsis"/>
+<command node="/document/window/node_properties/pixel_filter" command="value" arguments="gaussian"/>
+<command node="/document/window/node_properties/shading_interpolation" command="value" arguments="constant"/>
+<command node="/ui" command="tutorial_message" arguments="Next, let&apos;s look at the Node Properties Panel ..."/>
+<command node="/document/window/node_properties" command="highlight" arguments=""/>
+<command node="/ui" command="tutorial_message" arguments="Each K-3D Node contains a collection of Properties that you can modify - the available Properties are specific to the type of Node, and control its behavior."/>
+<command node="/ui" command="tutorial_message" arguments="Thus, working with a Document in K-3D is a process of adding or removing Nodes, and changing their Properties."/>
+<command node="/ui" command="tutorial_message" arguments="Next, the Node History Panel displays relationships between Nodes ..."/>
+<command node="/document/window/node_history" command="highlight" arguments=""/>
+<command node="/ui" command="tutorial_message" arguments="K-3D allows you to connect Node Properties together, so that the output from one Node is directed to an input on some other Node."/>
+<command node="/document/window/toolbar/create/create_PolyCube" command="activate" arguments=""/>
+<command node="/ui" command="tutorial_message" arguments="... In this example, the output of the &quot;PolyCube&quot; Node is connected to &quot;PolyCube Instance&quot; ..."/>
+<command node="/document/window/node_history" command="select" arguments="&lt;arguments&gt;&lt;node&gt;7ec966d1 d78a445c 8806b8a3 5593f241 1&lt;/node&gt;&lt;/arguments&gt;"/>
+<command node="/document/window/node_history" command="select" arguments="&lt;arguments&gt;&lt;node&gt;2c1d60a6 863541a1 bd649bd1 1ea8ae24 1&lt;/node&gt;&lt;/arguments&gt;"/>
+<command node="/ui" command="tutorial_message" arguments="... in the Node History Panel, &quot;PolyCube&quot; appears underneath &quot;PolyCube Instance&quot; as a dependency."/>
+<command node="/ui" command="tutorial_message" arguments="We&apos;ll cover Node dependencies in much greater detail later.  For now, let&apos;s move on to the Viewport Panel ..."/>
+<command node="/document/window/viewport" command="highlight" arguments=""/>
+<command node="/ui" command="tutorial_message" arguments="... which provides a 3D view into your Document.  "/>
+<command node="/ui" command="tutorial_message" arguments="The Toolbar Panel displays the main K-3D Tools, along with a user-customizable set of shortcut buttons ..."/>
+<command node="/document/window/toolbar" command="highlight" arguments=""/>
+<command node="/ui" command="tutorial_message" arguments="The Timeline Panel can be used to control playback of animations ..."/>
+<command node="/document/window/timeline" command="highlight" arguments=""/>
+<command node="/ui" command="tutorial_message" arguments="The Tool Properties Panel is used to display Tool-specific options (and resembles the Node Properties Panel) ..."/>
+<command node="/document/window/panel" command="mount_tool_properties" arguments=""/>
+<command node="/ui" command="tutorial_message" arguments="Finally, the Undo Tree Panel displays all of the changes you&apos;ve made to your Document, allowing you to undo or redo changes, exploring &quot;branches&quot; of modification ..."/>
+<command node="/document/window/panel1" command="mount_undo_tree" arguments=""/>
+<command node="/document/window/undo_tree/toolbar/undo" command="activate" arguments=""/>
+<command node="/document/window/undo_tree/toolbar/redo" command="activate" arguments=""/>
+<command node="/ui" command="tutorial_message" arguments="That&apos;s it for the Panels overview ... we&apos;ll explore the individual Panel types in more detail as we go.  For now, let&apos;s move on to the next Tutorial ..."/>
+<command node="/document/window/menus/file_close" command="activate" arguments=""/>
+<command node="/document/window/menus/help_tutorials" command="activate" arguments=""/>

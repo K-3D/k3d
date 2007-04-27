@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_depthcue_surf">
+			<description/>
+			<authors/>
+			<copyright/>
+			<argument name="mindistance" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="maxdistance" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="CScale" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1000"/>
+			<argument name="debug" label="" description="" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="false" default_value="y"/>
+		</shader>
+	</shaders>
+</k3dml>
+

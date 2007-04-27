@@ -1,0 +1,8 @@
+<k3dml>
+	<shaders>
+		<shader type="imager" name="k3d_clamptoalpha">
+			<description>Forces Ci to be non-negative with all components greater than the alpha default_value of a pixel</description>
+		</shader>
+	</shaders>
+</k3dml>
+

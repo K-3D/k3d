@@ -1,0 +1,22 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_hextile">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".1"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="tilecolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.6 0.1 0.1"/>
+			<argument name="mortarcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.6 0.6 0.6"/>
+			<argument name="tileradius" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.2"/>
+			<argument name="mortarwidth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.02"/>
+			<argument name="tilevary" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.15"/>
+			<argument name="scuffing" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+			<argument name="stains" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.4"/>
+			<argument name="stainfrequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="2"/>
+			<argument name="scufffrequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="4"/>
+			<argument name="scuffcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0 0 0"/>
+		</shader>
+	</shaders>
+</k3dml>
+

@@ -1,0 +1,13 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_brushedmetal3">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.1"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".9"/>
+			<argument name="uroughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.35"/>
+			<argument name="vroughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.2"/>
+			<argument name="basecolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+		</shader>
+	</shaders>
+</k3dml>
+

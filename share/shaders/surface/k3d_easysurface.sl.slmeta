@@ -1,0 +1,10 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_easysurface">
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".8"/>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="falloff" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="2.0"/>
+		</shader>
+	</shaders>
+</k3dml>
+

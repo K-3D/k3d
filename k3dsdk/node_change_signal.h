@@ -1,0 +1,66 @@
+#ifndef K3DSDK_NODE_CHANGE_SIGNAL_H
+#define K3DSDK_NODE_CHANGE_SIGNAL_H
+
+// K-3D
+// Copyright (c) 1995-2005, Timothy M. Shead
+//
+// Contact: tshead@k-3d.com
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public
+// License as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public
+// License along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+/** \file
+		\brief Declares k3d::node_change_signal, a boilerplate implementation of k3d::inode_change_signal
+		\author Tim Shead (tshead@k-3d.com)
+*/
+
+#include "inode_change_signal.h"
+#include "signal_slots.h"
+
+namespace k3d
+{
+
+class idocument;
+class iplugin_factory;
+	
+/// Provides a boilerplate implementation of k3d::inode_change_signal
+template<typename base_t>
+class node_change_signal :
+	public base_t,
+	public inode_change_signal
+{
+public:
+	node_change_signal(iplugin_factory& Factory, idocument& Document) :
+		base_t(Factory, Document)
+	{
+	}
+
+	signal::loop_safe_slot<inode_change_signal::node_changed_signal_t> make_node_change_slot()
+	{
+		return signal::make_loop_safe_slot(m_node_changed_signal);
+	}
+	
+	inode_change_signal::node_changed_signal_t& node_changed_signal()
+	{
+		return m_node_changed_signal;
+	}
+	
+private:
+	inode_change_signal::node_changed_signal_t m_node_changed_signal;
+};
+
+} // namespace k3d
+
+#endif // K3DSDK_NODE_CHANGE_SIGNAL_H
+

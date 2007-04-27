@@ -1,0 +1,19 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_venus">
+			<description>A cloudy, Venus-like planet</description>
+			<authors>Ken Musgrave, Larry Gritz</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="offset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.6"/>
+			<argument name="twist" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.22"/>
+			<argument name="omega" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.65"/>
+			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="8"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

@@ -1,0 +1,23 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_greenmarble">
+			<description>Green veined marble</description>
+			<authors>Larry Gritz</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.6"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.4"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+			<argument name="darkcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.01 0.12 0.004"/>
+			<argument name="lightcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.06 0.18 0.02"/>
+			<argument name="veincolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.47 0.57 0.03"/>
+			<argument name="veinfreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="sharpness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="25"/>
+			<argument name="txtscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

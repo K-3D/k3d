@@ -1,0 +1,23 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_spaceshiphull1">
+			<description>Simple surface for spacecraft hulls with random plates / grime</description>
+			<authors>Timothy M. Shead</authors>
+			<copyright>Copyright (c) 1995-2004, Timothy M. Shead</copyright>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.25"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.8"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+			<argument name="width" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".1"/>
+			<argument name="height" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".06"/>
+			<argument name="lumavary" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".4"/>
+			<argument name="rowvary" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="3.0"/>
+			<argument name="grime" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

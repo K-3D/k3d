@@ -1,0 +1,33 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_oak">
+			<description>Procedural solid wood grain texture</description>
+			<authors>Larry Gritz</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".25"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.2"/>
+			<argument name="shadingspace" storage_class="uniform" type="string" extended_type="space" array_count="1" space="" output="false" default_value="shader"/>
+			<argument name="shadingfreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="ringfreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="8"/>
+			<argument name="ringunevenness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="ringnoise" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.02"/>
+			<argument name="ringnoisefreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="grainfreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="25"/>
+			<argument name="trunkwobble" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.15"/>
+			<argument name="trunkwobblefreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.025"/>
+			<argument name="angularwobble" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="angularwobblefreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.5"/>
+			<argument name="divotdepth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.05"/>
+			<argument name="Clightwood" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.5 0.2 0.067"/>
+			<argument name="Cdarkwood" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.15 0.077 0.028"/>
+			<argument name="ringy" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="grainy" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="truedisp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

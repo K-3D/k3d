@@ -1,0 +1,22 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_wood2">
+			<description>Basic wood surface shader</description>
+			<authors>Larry Gritz</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".75"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".4"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".1"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+			<argument name="ringscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="15"/>
+			<argument name="txtscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="lightwood" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.69 0.44 0.25"/>
+			<argument name="darkwood" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.35 0.22 0.08"/>
+			<argument name="grainy" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

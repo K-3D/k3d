@@ -1,0 +1,17 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_castucco">
+			<description>California-style stucco</description>
+			<authors>Larry Gritz</authors>
+			<argument name="freq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Km" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.2"/>
+			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="3"/>
+			<argument name="trough" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="-0.15"/>
+			<argument name="peak" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.35"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

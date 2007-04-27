@@ -1,0 +1,18 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_craters">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.7"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.1"/>
+			<argument name="Km" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.03"/>
+			<argument name="swidth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".6"/>
+			<argument name="pitfactor" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".7"/>
+			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="9"/>
+			<argument name="lac" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.91341"/>
+			<argument name="amp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.91341"/>
+			<argument name="jitter" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.0"/>
+			<argument name="distortamp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.0005"/>
+		</shader>
+	</shaders>
+</k3dml>
+

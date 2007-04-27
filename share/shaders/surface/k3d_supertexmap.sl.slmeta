@@ -1,0 +1,37 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_supertexmap">
+			<description>Texture mapped color, opacity, and displacement</description>
+			<authors>Larry Gritz</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".5"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".5"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".1"/>
+			<argument name="Csmapname" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="Csproj" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="false" default_value="st"/>
+			<argument name="Csspace" storage_class="uniform" type="string" extended_type="space" array_count="1" space="" output="false" default_value="shader"/>
+			<argument name="Csmx" storage_class="uniform" type="float" extended_type="float" array_count="16" space="" output="false" default_value="{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}"/>
+			<argument name="Csblur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="Osmapname" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="Osproj" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="false" default_value="st"/>
+			<argument name="Osspace" storage_class="uniform" type="string" extended_type="space" array_count="1" space="" output="false" default_value="shader"/>
+			<argument name="Osmx" storage_class="uniform" type="float" extended_type="float" array_count="16" space="" output="false" default_value="{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}"/>
+			<argument name="Osblur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="Ksmapname" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="Ksproj" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="false" default_value="st"/>
+			<argument name="Ksspace" storage_class="uniform" type="string" extended_type="space" array_count="1" space="" output="false" default_value="shader"/>
+			<argument name="Ksmx" storage_class="uniform" type="float" extended_type="float" array_count="16" space="" output="false" default_value="{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}"/>
+			<argument name="Ksblur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="dispmapname" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="dispproj" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="false" default_value="st"/>
+			<argument name="dispspace" storage_class="uniform" type="string" extended_type="space" array_count="1" space="" output="false" default_value="shader"/>
+			<argument name="dispmx" storage_class="uniform" type="float" extended_type="float" array_count="16" space="" output="false" default_value="{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}"/>
+			<argument name="dispblur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="truedisp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_graphic_lines">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.6"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="paint_spec" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.6"/>
+			<argument name="paint_trans" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="paint_fuzz" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="ink_thresh" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.10"/>
+			<argument name="ink_fuzz" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="line_scale_master" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="up_highlight" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="false" default_value="z"/>
+			<argument name="line_scale_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="16.0"/>
+			<argument name="contrast_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="brightness_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="randomness_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="noise_size_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="color_curve_highlight_color1" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>        
+			<argument name="color_curve_highlight_color2" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.1 0.05 0.0"/> 
+			<argument name="color_curve_highlight_color3" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.8 0.6 0.4"/>  
+			<argument name="color_curve_highlight_color4" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1.0 1.0 0.8"/>  
+			<argument name="color_curve_highlight_color5" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1.0 1.0 1.0"/>  
+			<argument name="color_curve_highlight_color6" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1.0 1.0 1.0"/>  
+			<argument name="surface_opac_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="surface_trans_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="fuzz_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.3"/>
+			<argument name="tfreq_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="50"/>
+			<argument name="illumcolor_highlight" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+			<argument name="illumination_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="Ka_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.10"/>
+			<argument name="Kd_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.70"/>
+			<argument name="Ks_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.20"/>
+			<argument name="roughness_highlight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.2"/>
+			<argument name="up_paint" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="false" default_value="y"/>
+			<argument name="line_scale_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="16.0"/>
+			<argument name="contrast_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="brightness_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.3"/>
+			<argument name="randomness_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="noise_size_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="color_curve_paint_color1" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>        
+			<argument name="color_curve_paint_color2" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.1 0.05 0.0"/> 
+			<argument name="color_curve_paint_color3" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.8 0.6 0.4"/>  
+			<argument name="color_curve_paint_color4" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1.0 1.0 0.8"/>  
+			<argument name="color_curve_paint_color5" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1.0 1.0 1.0"/>  
+			<argument name="color_curve_paint_color6" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1.0 1.0 1.0"/>  
+			<argument name="surface_opac_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="surface_trans_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="fuzz_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.3"/>
+			<argument name="tfreq_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="50"/>
+			<argument name="illumcolor_paint" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+			<argument name="illumination_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="Ka_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.10"/>
+			<argument name="Kd_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.70"/>
+			<argument name="Ks_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.20"/>
+			<argument name="roughness_paint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.2"/>
+			<argument name="up_ink" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="false" default_value="x"/>
+			<argument name="line_scale_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="16.0"/>
+			<argument name="contrast_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="brightness_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="randomness_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="noise_size_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="color_curve_ink_color1" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>        
+			<argument name="color_curve_ink_color2" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.1 0.05 0.0"/> 
+			<argument name="color_curve_ink_color3" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.8 0.6 0.4"/>  
+			<argument name="color_curve_ink_color4" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1.0 1.0 0.8"/>  
+			<argument name="color_curve_ink_color5" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1.0 1.0 1.0"/>  
+			<argument name="color_curve_ink_color6" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1.0 1.0 1.0"/>  
+			<argument name="surface_opac_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="surface_trans_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="fuzz_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.3"/>
+			<argument name="tfreq_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="50"/>
+			<argument name="illumcolor_ink" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+			<argument name="illumination_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="Ka_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.10"/>
+			<argument name="Kd_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.70"/>
+			<argument name="Ks_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.20"/>
+			<argument name="roughness_ink" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.2"/>
+		</shader>
+	</shaders>
+</k3dml>
+

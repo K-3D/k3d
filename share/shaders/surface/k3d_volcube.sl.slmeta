@@ -1,0 +1,18 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_volcube">
+			<argument name="StepSize" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="StepJitter" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="Density" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Epsilon" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".001"/>
+			<argument name="Vol_Mult" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Vol_Offset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="Do_Shading" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="SurfNormalDepth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".05"/>
+			<argument name="Additive" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="ShowActiveVol" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="RunShadowPass" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+		</shader>
+	</shaders>
+</k3dml>
+

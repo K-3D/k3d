@@ -1,0 +1,9 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_fakesky">
+			<argument name="up" storage_class="uniform" type="vector" extended_type="vector" array_count="1" space="" output="0" default_value="0 0 0"/>
+			<argument name="skycolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.5 0.6 1"/>
+		</shader>
+	</shaders>
+</k3dml>
+

@@ -1,0 +1,22 @@
+<k3dml>
+	<shaders>
+		<shader type="light" name="k3d_waterlight">
+			<description>Cheap simulation of underwater light caustic effects</description>
+			<authors>Timothy M. Shead</authors>
+			<copyright>Copyright (c) 1995-2004, Timothy M. Shead</copyright>
+			<argument name="minimum_intensity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="maximum_intensity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="2.5"/>
+			<argument name="frequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="phase" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="lightcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.2 0.6 0.9"/>
+			<argument name="shadowname" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="shader" output="false" default_value=""/>
+			<argument name="samples" storage_class="uniform" type="float" extended_type="float" array_count="1" space="shader" output="false" default_value="16"/>
+			<argument name="blur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="shader" output="false" default_value="0.01"/>
+			<argument name="bias" storage_class="uniform" type="float" extended_type="float" array_count="1" space="shader" output="false" default_value="0.01"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

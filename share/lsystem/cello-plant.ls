@@ -1,0 +1,19 @@
+# --- L-System Parser/Mutator --- Lj Lapre ----------------------------------
+10
+10
+80
+FS
+S=WZ'!cS
+W=R%R>>>>>>>>>R%R>>>>
+R=[da%a%g%g]
+a=[{nmmn}]
+g=[NMMNL]
+m=+zm
+n=-zn
+M=+ZM
+N=-ZoN
+d=^d
+L=Z';+Z';+Z';+Z';+[&&&l]L
+l=[c{--z++z++z--|--z++z++z}]
+o=[---------!!!'''cZl]
+@

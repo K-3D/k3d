@@ -1,0 +1,68 @@
+This is the free-as-in-freedom K-3D 3D modeling, animation, and rendering system.
+
+The following folks have contributed to the project:
+
+* 1995 - present - Created K-3D - Timothy M. Shead <tshead at k-3d dot com>
+* 2000 - present - New maintainer (february 2002) - Romain Behar <romainbehar at yahoo dot com>
+* 2000 - present - Maintainance of Win32 project files / builds; SubDivision Mesh surfaces; too many bugfixes to count - Paul Gregory <pgregory at aqsis dot com>
+* 2001 - present - Many, many feature enhancements (including RenderMan system and OBJ reader), lots of bug fixes, maintainer of Win32 version, as well as documentation, support, etc - Wladyslaw Strugala <fizws at julia dot univ dot gda dot pl>
+* 2001 - present - Remote troubleshooting of the **Bad-Font** crash, RedHat RPM packages, submitted patches - Fred Labrosse
+* 2000 - 2001 - Too many new tools to count (including a brand-new implementation of the SubDivide tool, the new Bend, Bulge, Displace, and Magnet tools) - Andy Gill <buzz at ucky dot com>
+* 2000 - Improved flexibility / standardized behaviour for xxxxx-config scripts - Lukas Schroeder <lukas at azzit dot de>
+* 2001 - Created GNU Triangulated Surface filters - Tom Browder <tbrowder at home dot com>
+* 2001 - Added support for Pixar Photorealistic Renderman engine, additional render engine controls in Camera - Giuseppe Zompatori <mailus at tin dot it>
+* 2001 - Improved configurelib to recognize older versions of glib/GTK+ and recognize 3Delight better, expanded the JavaScript object model - Dave Crane <ulunum at bigfoot dot com>
+* 2001 - Patches for portability to BSD, build cleanup - Alexander Leidinger <Alexander at Leidinger dot net>
+* 2001 - "k3d" script - Francisco Andrades Grassi <bigjocker at yahoo dot com>
+* 2001 - Found double-click errors in windows - <s dot chauveau at chello dot nl>
+* 2001 - Fixed syntax errors in header files - Gilles J. Seguin <segg at infonet dot ca>
+* 2001 - Patch to load cached shader information at startup time - German Gomez Garcia <german at piraos dot com>
+* 2001 - 3DS file format reader - Ben Campbell <ben dot campbell at ntlworld dot com>
+* 2001 - k3dSpinButton, SDPGTK updates - Dan Erikson <derikson at montana dot com>
+* 2002 - .X file format writer - Adam Sakareassen <amsaka at ugrad dot unimelb dot edu dot au>
+* 2002 - Created exhaustive .cvsignore files, solved objects ID bug, submitted several bugs and patches - Louis-Dominique Dubeau <ldd at step dot polymtl dot ca>
+* 2002 - Submitted gcc 3.0+ compatibility patch - Dave Wallace <hundo at users dot sourceforge dot net>
+* 2002 - Submitted lots of bugs, author the first "K-3D fan page" - Manuel Bastioni <liquiriziapura at hotmail dot com>
+* 2002 - Tips to compile K-3D on Suse 8.0 - Chris Funke <ChrisFunke at t-online dot de>
+* 2002 - Wrote first italian tutorial - Marco Amato from Udine <Amato_M83 at jumpy dot it>
+* 2002 - Pointed out inconsistencies in the autoconf/automake files, explained the "no font in hierarchy" bug - Brett W. McCoy <bmccoy at chapelperilous dot net>
+* 2002 - Provided Hand objects with rendered pictures for the gallery - Joal Heagney <Joal dot Heagney at student dot gu dot edu dot au>
+* 2002 - DEPRECATED - PPC binaries for K-3D - Daniel MacDonald <danboid at yahoo dot co dot uk> 
+* 2002 - DEPRECATED - SGI IRIX port of K-3D, gcc 3.1 fixes - Ilya Volynets <>
+* 2002 - Submitted patch to allow plugin compilation outside the K-3D source tree - Patrick Mauritz <oxygene at studentenbude dot ath dot cx>
+* 2002 - Documentation framework, Python and Ruby scripting engines, new web site - Anders Dahnielson <anders at dahnielson dot com>
+* 2002 - Autoconf scripts help, C++ compliance - Joshua Moline <jdmoline at attbi dot com>
+* 2002 - Contributed the first PHP gallery - Alper Ersoy <aersoy at tfz dot net>
+* 2003 - Shaders aren't recompiled for every frame of an animation - Gregory Junker <gjunker at cinci dot rr dot com>
+* 2003 - Converted "Position Constraint" object to more general-purpose "Constraint", Spaceship Hull tutorial, OpenGL representation of Teapot object, submitted fixes, interactive subdivision mesh display - Bart Janssens <bart dot janssens at polytechnic dot be>
+* 2003 - Provided Mandrake 9 RPMs <tobbe at nyvalls dot com>
+* 2003 - Submitted a patch to reduce flicker when resizing OpenGL views, Created DAG view - Ed Millard <emillard at direcway dot com>
+* 2003 - Sent GCC 3.3 compatibility fixes - Peter Balon <Peter dot Balon at t-online dot de>
+* 2003 - Updated Python engine - Adam Hupp <hupp at cs dot wisc dot edu>
+* 2004 - Created Debian packages - David Martínez Moreno <ender at debian dot org>
+* 2004 - NSIS installer for Win32 - Kirstyn Amanda Fox (AKA: GeekGirl) <GeekGirl at CyberBrats dot Org>
+* 2004 - Proposal and general NGUI guru - Joe Crawford <joetainment at gmail dot com>
+* 2004 - Icons for the NGUI - Rene Jensen <centipede at takhis dot net>
+* 2005 - Dynamically linked Win32 build - Andreas Haferburg <ndhmail at gmx dot de>
+* 2005 - Win32 build enhancements and optimizations, installer maintenance, more NGUI icons, documentation, example scenes, many tests and ideas - Daniel S. Matthews <dsmatthews at gmail dot com>
+* 2005 - Created DarwinPorts files to build K-3D on MacOS X - Damien Pollet <dpollet at users dot sf dot net>
+* 2006 - Fixed NLS/gettext issues - Diego Pettenò <flameeyes at gentoo dot org>
+* 2006 - Proposed a patch to build K-3D with GCC 4.1 - Denis Leroy <denis at poolshark dot org>
+
+
+The following libraries have been included in K-3D's source tree:
+
+* Kaleido, kaleidoscopic construction of uniform polyhedra (GPL) - Dr. Zvi Har'El <rl at math dot technion dot ac dot il> (http://www.math.technion.ac.il/~rl/kaleido/)
+* Evert, to generate a representation of the everting sphere - Michael McGuffin and Nathaniel Thurston (http://www.geom.umn.edu/docs/outreach/oi/software.html)
+* Hapy library, integrated to the geometry module to parse geometry files (Public Domain) - Alex Rousskov, The Measurement Factory http://www.measurement-factory.com/ (http://hapy.sourceforge.net/)
+* QSlim 2.0 decimation library (LGPL) - Michael Garland <garland at cs dot cmu dot edu> (http://graphics.cs.uiuc.edu/~garland/software/qslim.html)
+* OpenEXR / Half (See k3dsdk/Half/LICENSE file) - Industrial Light & Magic (http://www.openexr.com/)
+* sgi_tesselator, robust GLU tesselator replacement (SGI Free Software License B) - Eric Veach / SGI (http://www.mesa3d.org/)
+
+
+
+If anyone's work has been overlooked here, contact the maintainers through k3d.sourceforge.net ASAP.
+
+Thank You,
+The K-3D Team
+

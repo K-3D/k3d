@@ -1,0 +1,41 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_texblender">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".5"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".3"/>
+			<argument name="Kr" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="selft" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="Rblur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.1"/>
+			<argument name="RFblur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.1"/>
+			<argument name="Krfr" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="eta" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.8"/>
+			<argument name="Ko" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="cKmap" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{0,0,0,0,0}"/>
+			<argument name="oKmap" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{0,0,0,0,0}"/>
+			<argument name="sKmap" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{0,0,0,0,0}"/>
+			<argument name="mKmap" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{0,0,0,0,0}"/>
+			<argument name="bKmap" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{0,0,0,0,0}"/>
+			<argument name="rKmap" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{0,0,0,0,0}"/>
+			<argument name="iKmap" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{0,0,0,0,0}"/>
+			<argument name="aKmap" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{0,0,0,0,0}"/>
+			<argument name="nGmap" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="Kcs" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Sgmx" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{1,1,1,1,1}"/>
+			<argument name="Sgmy" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{1,1,1,1,1}"/>
+			<argument name="Sgmz" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{1,1,1,1,1}"/>
+			<argument name="Depth" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{3,3,3,3,3}"/>
+			<argument name="Gblur" storage_class="uniform" type="float" extended_type="float" array_count="5" space="" output="0" default_value="{0,0,0,0,0}"/>
+			<argument name="Gmapname" storage_class="uniform" type="string" extended_type="texture" array_count="5" space="" output="0" default_value="{&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;}"/>
+			<argument name="Gspace" storage_class="uniform" type="string" extended_type="space" array_count="5" space="" output="0" default_value="{&quot;object&quot;,&quot;object&quot;,&quot;object&quot;,&quot;object&quot;,&quot;object&quot;}"/>
+			<argument name="Gmode" storage_class="uniform" type="string" extended_type="string" array_count="5" space="" output="0" default_value="{&quot;m&quot;,&quot;m&quot;,&quot;m&quot;,&quot;m&quot;,&quot;m&quot;}"/>
+			<argument name="envname" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="0" default_value=""/>
+			<argument name="envspace" storage_class="uniform" type="string" extended_type="space" array_count="1" space="" output="0" default_value="world"/>
+			<argument name="envrad" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="100"/>
+			<argument name="rayjitter" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="raysamples" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+		</shader>
+	</shaders>
+</k3dml>
+

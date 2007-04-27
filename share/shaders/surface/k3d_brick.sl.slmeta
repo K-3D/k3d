@@ -1,0 +1,27 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_brick">
+			<description>Makes a good looking staggered brick masonry</description>
+			<authors>Larry Gritz</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="brickcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="rgb" output="false" default_value="0.6 0.1 0.1"/>
+			<argument name="mortarcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="rgb" output="false" default_value="0.6 0.6 0.6"/>
+			<argument name="raggedamp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.04"/>
+			<argument name="raggedfreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="12"/>
+			<argument name="jagged" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.006"/>
+			<argument name="brickvary" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.3"/>
+			<argument name="brickwidth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".28"/>
+			<argument name="brickheight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".07"/>
+			<argument name="mortarthickness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".014"/>
+			<argument name="rowvary" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".5"/>
+			<argument name="pitting" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.01"/>
+			<argument name="pockfrequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="10"/>
+			<argument name="groovedepth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.01"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

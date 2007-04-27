@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_woodcut">
+			<argument name="up" storage_class="uniform" type="string" extended_type="string" array_count="1" space="" output="0" default_value="z"/>
+			<argument name="ringscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="15"/>
+			<argument name="contrast" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+			<argument name="brightness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="random" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="nsize" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="15"/>
+		</shader>
+	</shaders>
+</k3dml>
+

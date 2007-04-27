@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<shaders>
+		<shader type="imager" name="k3d_bluescreen">
+			<description/>
+			<authors/>
+			<copyright/>
+			<argument name="background" label="" description="" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 1"/>
+			<argument name="texturename" label="" description="" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+		</shader>
+	</shaders>
+</k3dml>
+

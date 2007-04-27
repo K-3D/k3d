@@ -1,0 +1,15 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_incandplastic">
+			<argument name="SurfaceColor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0 0.25 1"/>
+			<argument name="SurfaceOpacity" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.9"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+			<argument name="Roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.05"/>
+			<argument name="SpecularColor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="Incandescence" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0 0 0.3"/>
+		</shader>
+	</shaders>
+</k3dml>
+

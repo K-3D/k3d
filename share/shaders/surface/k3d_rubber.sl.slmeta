@@ -1,0 +1,10 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_rubber">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.0"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.0"/>
+			<argument name="txtscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.5"/>
+		</shader>
+	</shaders>
+</k3dml>
+

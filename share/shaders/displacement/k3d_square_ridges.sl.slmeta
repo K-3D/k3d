@@ -1,0 +1,15 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_square_ridges">
+			<description></description>
+			<authors>Timothy M. Shead</authors>
+			<copyright>Copyright (c) 1995-2004, Timothy M. Shead</copyright>
+			<argument name="Km" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Frequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="6"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

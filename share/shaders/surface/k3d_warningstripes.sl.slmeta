@@ -1,0 +1,15 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_warningstripes">
+			<description>Creates diagonal stripes as seen around heavy equipment</description>
+			<authors>Timothy M. Shead</authors>
+			<copyright>Copyright (c) 1995-2004, Timothy M. Shead</copyright>
+			<argument name="Frequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="6"/>
+			<argument name="StripeColor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0 0 0"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

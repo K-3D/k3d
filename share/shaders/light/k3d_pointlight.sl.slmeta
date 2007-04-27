@@ -1,0 +1,16 @@
+<k3dml>
+	<shaders>
+		<shader type="light" name="k3d_pointlight">
+			<description>Standard point light source for RenderMan Interface</description>
+			<authors>Pixar</authors>
+			<copyright>(c) Copyright 1988, Pixar</copyright>
+			<argument name="intensity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="3000"/>
+			<argument name="lightcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="1 1 1"/>
+			<argument name="from" storage_class="uniform" type="point" extended_type="point" array_count="1" space="shader" output="false" default_value="0 0 0"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

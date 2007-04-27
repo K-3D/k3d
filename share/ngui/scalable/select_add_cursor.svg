@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   id="svg3433"
+   sodipodi:version="0.32"
+   inkscape:version="0.37"
+   width="24.000000pt"
+   height="24.000000pt"
+   sodipodi:docname="select_add_cursor.svg"
+   sodipodi:docbase="/home/tshead/k3d/share/ngui/scalable"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs
+     id="defs3435" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ff61ff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0000000"
+     inkscape:pageshadow="2"
+     inkscape:zoom="21"
+     inkscape:cx="12"
+     inkscape:cy="12"
+     inkscape:window-width="836"
+     inkscape:window-height="672"
+     inkscape:window-x="646"
+     inkscape:window-y="210"
+     showguides="true"
+     inkscape:guide-bbox="true" />
+  <metadata
+     id="metadata3436">
+    <rdf:RDF
+       id="RDF3437">
+      <cc:Work
+         rdf:about=""
+         id="Work3438">
+        <dc:format
+           id="format3439">image/svg+xml</dc:format>
+        <dc:type
+           id="type3441"
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     style="fill:#000000;fill-opacity:1.0000000;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.2500000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4.0000000;stroke-opacity:1.0000000;stroke-dasharray:none;"
+     d="M 0.75107835 1.6843123 L 0.74657819 23.340984 L 5.917631 19.823398 L 9.4929846 27.00017 L 13.549302 24.500527 L 9.9075996 17.827582 L 15.259798 16.076352 L 0.75107835 1.6843123 z "
+     id="path3453"
+     sodipodi:nodetypes="cccccccc" />
+  <path
+     style="font-size:12;font-weight:bold;stroke:#ffffff;stroke-width:0.5;font-family:Bitstream Charter;"
+     d="M 13.531715 1.7170473 L 12.535715 1.7170473 L 12.535715 4.8010473 L 9.5237149 4.8010473 L 9.5237149 5.7730473 L 12.535715 5.7730473 L 12.535715 8.8690473 L 13.531715 8.8690473 L 13.531715 5.7730473 L 16.543715 5.7730473 L 16.543715 4.8010473 L 13.531715 4.8010473 L 13.531715 1.7170473 z "
+     id="path579" />
+</svg>

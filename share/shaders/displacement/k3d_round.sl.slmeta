@@ -1,0 +1,8 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_round">
+			<argument name="radius" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".10"/>
+		</shader>
+	</shaders>
+</k3dml>
+

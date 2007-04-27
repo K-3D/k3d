@@ -1,0 +1,14 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_defaultsurface">
+			<description>Just color the surface, don't even look at lights</description>
+			<authors>Pixar</authors>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".8"/>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".2"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

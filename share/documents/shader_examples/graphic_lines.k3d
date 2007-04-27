@@ -1,0 +1,336 @@
+<?xml version="1.0" ?>
+<k3dml package="k3d" version="0.6.3.0" host="i686-pc-linux-gnu">
+	<application>
+		<plugins/>
+	</application>
+	<document>
+		<nodes>
+			<node name="Axes" class="00000001 00000000 00000000 00000001" id="2">
+				<properties>
+					<property name="axes">true</property>
+					<property name="gridcolor">0.4 0.4 0.4</property>
+					<property name="gridcount">5</property>
+					<property name="gridsize">2</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="viewport_visible">true</property>
+					<property name="xcolor">1 0 0</property>
+					<property name="xyplane">false</property>
+					<property name="xzplane">true</property>
+					<property name="ycolor">0 0.7 0</property>
+					<property name="yzplane">false</property>
+					<property name="zcolor">0 0 0.7</property>
+				</properties>
+			</node>
+			<node name="Material" class="00000001 00000000 00000000 00000024" id="3">
+				<properties>
+					<property name="atmosphere_shader">0</property>
+					<property name="color">1 1 1</property>
+					<property name="displacement_bounds">1</property>
+					<property name="displacement_shader">0</property>
+					<property name="exterior_shader">0</property>
+					<property name="interior_shader">0</property>
+					<property name="matte">false</property>
+					<property name="opacity">1 1 1</property>
+					<property name="surface_shader">4</property>
+				</properties>
+			</node>
+			<node name="MaterialShader" class="b553a3bd d1044c6e b3f21e07 87132c31" id="4">
+				<properties>
+					<property name="Ka" label="" description="" type="double" user_property="vanilla">1</property>
+					<property name="Kd" label="" description="" type="double" user_property="vanilla">1</property>
+					<property name="Ks" label="" description="" type="double" user_property="vanilla">0.6000000000000001</property>
+					<property name="ink_fuzz" label="" description="" type="double" user_property="vanilla">0</property>
+					<property name="ink_thresh" label="" description="" type="double" user_property="vanilla">0.1</property>
+					<property name="paint_fuzz" label="" description="" type="double" user_property="vanilla">0</property>
+					<property name="paint_spec" label="" description="" type="double" user_property="vanilla">0.6000000000000001</property>
+					<property name="paint_trans" label="" description="" type="double" user_property="vanilla">0</property>
+					<property name="roughness" label="" description="" type="double" user_property="vanilla">1</property>
+					<property name="shader_path" reference="relative" relative_path="shaders/surface/k3d_graphic_lines.sl">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+				</properties>
+			</node>
+			<node name="Light" class="00000001 00000000 00000000 0000001d" id="5">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="shader">6</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="LightShader" class="830e867b 7bc94c6c 8d5087ee 8aa35db2" id="6">
+				<properties>
+					<property name="intensity" label="" description="" type="double" user_property="vanilla">3000</property>
+					<property name="lightcolor" label="" description="" type="k3d::color" user_property="vanilla">1 1 1</property>
+					<property name="shader_path" reference="relative" relative_path="shaders/light/k3d_pointlight.sl">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+				</properties>
+			</node>
+			<node name="Camera" class="45ce1872 af184b6d b391e136 0dcfe8b5" id="7">
+				<properties>
+					<property name="aspect_ratio"/>
+					<property name="bottom">-0.5</property>
+					<property name="crop_window_bottom">1</property>
+					<property name="crop_window_left">0</property>
+					<property name="crop_window_right">1</property>
+					<property name="crop_window_top">0</property>
+					<property name="far">1000</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="left">-0.6666666666666666</property>
+					<property name="navigation_target">7</property>
+					<property name="near">1</property>
+					<property name="orthographic">false</property>
+					<property name="parent">0</property>
+					<property name="reference_plane">0</property>
+					<property name="reference_plane_color">0 0 0.7</property>
+					<property name="right">0.6666666666666666</property>
+					<property name="show_projection">false</property>
+					<property name="show_reference_plane">false</property>
+					<property name="top">0.5</property>
+					<property name="viewport_visible">true</property>
+					<property name="world_target">0 -5 0</property>
+				</properties>
+			</node>
+			<node name="RenderEngine" class="0dc5e733 fa684e05 86a3865f 42f7a99d" id="8">
+				<properties>
+					<property name="bucket_height">16</property>
+					<property name="bucket_width">16</property>
+					<property name="default_atmosphere_shader">0</property>
+					<property name="default_exterior_shader">0</property>
+					<property name="default_interior_shader">0</property>
+					<property name="dof">false</property>
+					<property name="exposure">1.0042</property>
+					<property name="eye_splits">10</property>
+					<property name="focal_length">1.6</property>
+					<property name="focus_plane">30</property>
+					<property name="fstop">0.3</property>
+					<property name="gamma">0.8</property>
+					<property name="grid_size">256</property>
+					<property name="imager_shader">0</property>
+					<property name="motion_blur">false</property>
+					<property name="pixel_aspect_ratio">1</property>
+					<property name="pixel_filter">gaussian</property>
+					<property name="pixel_filter_height">2</property>
+					<property name="pixel_filter_width">2</property>
+					<property name="pixel_height">240</property>
+					<property name="pixel_width">320</property>
+					<property name="pixel_xsamples">3</property>
+					<property name="pixel_ysamples">3</property>
+					<property name="render_alpha">true</property>
+					<property name="render_engine">aqsis</property>
+					<property name="render_motion_blur">false</property>
+					<property name="resolution">320x240</property>
+					<property name="shading_interpolation">smooth</property>
+					<property name="shading_rate">1</property>
+					<property name="texture_memory">1024</property>
+					<property name="two_sided">true</property>
+				</properties>
+			</node>
+			<node name="Viewport" class="0059ba47 7bf740f3 93fb523d 5899f22c" id="9">
+				<properties>
+					<property name="background_color">0.8 0.8 0.8</property>
+					<property name="draw_aimpoint">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_crop_window">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_frustum">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_safe_zone">false</property>
+					<property name="draw_two_sided">false</property>
+					<property name="fog">false</property>
+					<property name="fog_far">100</property>
+					<property name="fog_near">0</property>
+					<property name="headlight">true</property>
+					<property name="point_size">4</property>
+					<property name="show_lights">false</property>
+				</properties>
+			</node>
+			<node name="TimeSource" class="1978f1f7 4a864c99 8caf7cfc d2591baf" id="10">
+				<properties>
+					<property name="end_time">4</property>
+					<property name="frame_rate">30</property>
+					<property name="start_time">0</property>
+					<property name="time">0</property>
+				</properties>
+			</node>
+			<node name="Newell" class="274c0cae 2efd5bbf 986a500f ff5e2de6" id="11">
+				<properties>
+					<property name="material">3</property>
+					<property name="size">1</property>
+					<property name="type">teapot</property>
+				</properties>
+			</node>
+			<node name="Newell Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="12">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="RenderManLightAmbient" class="00000001 00000000 00000000 0000001d" id="13">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="shader">14</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="AmbientRenderManLightShader" class="830e867b 7bc94c6c 8d5087ee 8aa35db2" id="14">
+				<properties>
+					<property name="intensity" label="" description="" type="double" user_property="vanilla">0.1</property>
+					<property name="lightcolor" label="" description="" type="k3d::color" user_property="vanilla">0.806455 0.806455 1</property>
+					<property name="shader_path" reference="relative" relative_path="shaders/light/k3d_ambientlight.sl">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+				</properties>
+			</node>
+			<node name="PolyGrid" class="acb3b4f8 5cd6471c aed72686 c576987c" id="15">
+				<properties>
+					<property name="columns">10</property>
+					<property name="height">20</property>
+					<property name="material">3</property>
+					<property name="orientation">-z</property>
+					<property name="rows">10</property>
+					<property name="width">20</property>
+				</properties>
+			</node>
+			<node name="PolyGrid Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="16">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="BevelFaces Selection" class="ac9b1faf 28ed4b34 8ad9e556 da333f81" id="17">
+				<properties>
+					<property name="mesh_selection"/>
+				</properties>
+			</node>
+			<node name="RotatePoints" class="89a6a016 3db04f26 b626bb37 6c812533" id="18">
+				<properties>
+					<property name="mesh_selection"/>
+					<property name="x">-1.5707963268</property>
+					<property name="y">0</property>
+					<property name="z">0</property>
+				</properties>
+			</node>
+			<node name="RotatePoints Selection" class="ac9b1faf 28ed4b34 8ad9e556 da333f81" id="19">
+				<properties>
+					<property name="mesh_selection"/>
+				</properties>
+			</node>
+			<node name="TranslatePoints" class="460b8dac 780240a3 a2f87b5b ba0272cd" id="20">
+				<properties>
+					<property name="mesh_selection"/>
+					<property name="x">0</property>
+					<property name="y">3</property>
+					<property name="z">2</property>
+				</properties>
+			</node>
+			<node name="TranslatePoints Selection" class="ac9b1faf 28ed4b34 8ad9e556 da333f81" id="21">
+				<properties>
+					<property name="mesh_selection"/>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="22">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 -20 0 1 0 20 0 0 1 -30 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="23">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">0.963431 0.0686899 0.259004 -2.1146 1.21706e-07 0.966585 -0.256347 2.92892 -0.267957 0.246972 0.931238 -4.77216 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="24">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">-1 -1.87637e-06 1.87638e-06 0 1.87638e-06 1.76017e-12 1 0 -1.87637e-06 1 1.76017e-12 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="25">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 3 0 -3.67321e-06 -1 0 0 1 -3.67321e-06 5 0 0 0 1</property>
+				</properties>
+			</node>
+		</nodes>
+		<dependencies>
+			<dependency from_node="25" from_property="output_matrix" to_node="16" to_property="input_matrix"/>
+			<dependency from_node="20" from_property="output_mesh" to_node="16" to_property="input_mesh"/>
+			<dependency from_node="15" from_property="output_mesh" to_node="17" to_property="input_mesh"/>
+			<dependency from_node="19" from_property="output_mesh" to_node="18" to_property="input_mesh"/>
+			<dependency from_node="21" from_property="output_mesh" to_node="20" to_property="input_mesh"/>
+			<dependency from_node="18" from_property="output_mesh" to_node="21" to_property="input_mesh"/>
+			<dependency from_node="22" from_property="output_matrix" to_node="5" to_property="input_matrix"/>
+			<dependency from_node="23" from_property="output_matrix" to_node="7" to_property="input_matrix"/>
+			<dependency from_node="24" from_property="output_matrix" to_node="12" to_property="input_matrix"/>
+			<dependency from_node="11" from_property="output_mesh" to_node="12" to_property="input_mesh"/>
+		</dependencies>
+	</document>
+</k3dml>
+

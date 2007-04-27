@@ -1,0 +1,32 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_superkagee">
+			<argument name="shadColor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0 0 0"/>
+			<argument name="shadownamea" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="0" default_value=""/>
+			<argument name="shadowfilta" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowblura" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowbiasa" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowsamplesa" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="16"/>
+			<argument name="shadowdensitya" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="shadownameb" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="0" default_value=""/>
+			<argument name="shadowfiltb" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowblurb" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowbiasb" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowsamplesb" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="16"/>
+			<argument name="shadowdensityb" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="shadownamec" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="0" default_value=""/>
+			<argument name="shadowfiltc" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowblurc" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowbiasc" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowsamplesc" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="16"/>
+			<argument name="shadowdensityc" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="shadownamed" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="0" default_value=""/>
+			<argument name="shadowfiltd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowblurd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowbiasd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+			<argument name="shadowsamplesd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="16"/>
+			<argument name="shadowdensityd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+		</shader>
+	</shaders>
+</k3dml>
+

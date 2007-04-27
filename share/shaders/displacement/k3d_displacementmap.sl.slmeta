@@ -1,0 +1,16 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_displacementmap">
+			<description>Applies a texture as a displacement map</description>
+			<authors>Timothy M. Shead</authors>
+			<copyright>Copyright (c) 1995-2004, Timothy M. Shead</copyright>
+			<argument name="Km" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="ZeroPoint" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+			<argument name="texturename" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

@@ -1,0 +1,22 @@
+# --- L-System Parser/Mutator --- Lj Lapre ----------------------------------
+9
+19
+25
+#
+A
+#
+A=U[---P]a
+a=U[-P]B
+B=U[+++P]b
+b=U[+P]A
+C=V[-D][+D]
+D=V[-E][+E]
+E=VV[-G][+G]
+G=V-VV
+P=WV[-C][+C]
+U=f[---f+++X][+++f---Y]FFFFF
+V=fFF
+W=f[---F++++++F]F
+X=FFFF
+Y=X
+@

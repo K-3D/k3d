@@ -1,0 +1,18 @@
+#ifndef K3DSDK_VERSION_H
+#define K3DSDK_VERSION_H
+
+// Generated file, do not edit!  Make changes to version.h.in instead.
+
+#define K3D_PACKAGE "@PACKAGE@"
+#define K3D_COPYRIGHT "@COPYRIGHT@"
+#define K3D_VERSION "@VERSION@"
+#define K3D_HOST "@host@"
+
+#define K3D_PREFIX "@prefix@"
+#define K3D_DATADIR "@prefix@/share"
+#define K3D_LIBDIR "@prefix@/lib"
+#define K3D_PKGDATADIR "@prefix@/share/@PACKAGE@"
+#define K3D_PKGLIBDIR "@prefix@/lib/@PACKAGE@"
+
+#endif // !K3DSDK_VERSION_H
+

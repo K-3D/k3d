@@ -1,0 +1,17 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_starfield">
+			<description>Antialiased starfield</description>
+			<authors>Timothy M. Shead</authors>
+			<copyright>Copyright (c) 1995-2004, Timothy M. Shead</copyright>
+			<argument name="intensity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="2"/>
+			<argument name="frequency" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="size" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.3"/>
+			<argument name="irregularity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="2"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

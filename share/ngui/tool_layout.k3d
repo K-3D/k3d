@@ -1,0 +1,52 @@
+<k3dml>
+	<application>
+		<user_interface>
+			<tools>
+				<move
+					size="10"
+					current_color="1 1 0"
+					x_color="1 0 0"
+					y_color="0 1 0"
+					z_color="0 0 1"
+					screen_xy_color="0.9 0.9 0.9"
+					plane_offset="5"
+					plane_size="4.8"
+					screen_xy_radius="0.5"
+					screen_xy_slices="8"
+					screen_xy_stacks="8"
+					axis_start="5"
+					axis_end="10"
+					axis_line_width="1"
+					axis_arrow_radius="0.5"
+					axis_arrow_length="2.0"
+					axis_arrow_slices="8" />
+				<rotate
+					size="10"
+					current_color="1 1 0"
+					x_color="1 0 0"
+					y_color="0 1 0"
+					z_color="0 0 1"
+					screen_z_color="0.9 0.9 0.9"
+					handle_size="6"
+					handle_major_radius="1"
+					handle_minor_radius="0.03"
+					handle_u_segments="32"
+					handle_v_segments="8"
+					screen_z_handle_size="8" />
+				<scale
+					size="10"
+					current_color="1 1 0"
+					x_color="1 0 0"
+					y_color="0 1 0"
+					z_color="0 0 1"
+					screen_xy_color="0.9 0.9 0.9"
+					plane_offset="5"
+					plane_size="4.8"
+					axis_start="0"
+					axis_end="10"
+					axis_line_width="1"
+					axis_box_size="0.5" />
+			</tools>
+		</user_interface>
+	</application>
+</k3dml>

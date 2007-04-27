@@ -1,0 +1,29 @@
+/CMakeLists.txt/1.1/Fri Dec 22 23:28:30 2006//
+/Shader_tokens_Xref.7z/1.1/Wed Apr 20 15:50:43 2005/-kb/
+/k3d_colors.h/1.2/Mon Mar 13 21:11:02 2006//
+/k3d_constants.h/1.3/Tue Mar 14 02:20:56 2006//
+/k3d_displace.h/1.1/Wed May 19 18:15:19 2004//
+/k3d_filterwidth.h/1.2/Thu Mar 16 15:31:45 2006//
+/k3d_functions.h/1.4/Fri Mar 17 17:31:39 2006//
+/k3d_isshad.h/1.1/Wed May 19 18:15:19 2004//
+/k3d_km.h/1.1/Wed May 19 18:15:19 2004//
+/k3d_locillum.h/1.1/Wed May 19 18:15:19 2004//
+/k3d_material.h/1.1/Wed May 19 18:15:19 2004//
+/k3d_noises.h/1.7/Fri Mar 17 17:31:39 2006//
+/k3d_oak.h/1.1/Wed May 19 18:15:19 2004//
+/k3d_patterns.h/1.2/Fri Mar 17 16:00:41 2006//
+/k3d_proctext.h/1.2/Mon Mar 13 21:13:01 2006//
+/k3d_project.h/1.1/Wed May 19 18:15:20 2004//
+/k3d_pshad.h/1.1/Wed May 19 18:15:20 2004//
+/k3d_rayserver.h/1.1/Wed May 19 18:15:20 2004//
+/k3d_raysphere.h/1.1/Wed May 19 18:15:20 2004//
+/k3d_reflections.h/1.1/Wed May 19 18:15:20 2004//
+/k3d_rmannotes.h/1.3/Fri Mar 17 17:45:52 2006//
+/k3d_tile.h/1.1/Wed May 19 18:15:20 2004//
+D/displacement////
+D/glsl////
+D/imager////
+D/layered////
+D/light////
+D/surface////
+D/volume////

@@ -1,0 +1,3 @@
+K3D_BUILD_MODULE(k3d-graphviz)
+K3D_CREATE_MODULE_PROXY(k3d-graphviz)
+

@@ -1,0 +1,10 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_constant">
+			<description>Standard constant surface for the RenderMan Interface</description>
+			<authors>Pixar</authors>
+			<copyright>(c) Copyright 1988, Pixar</copyright>
+			<argument name="intensity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+		</shader>
+	</shaders>
+</k3dml>

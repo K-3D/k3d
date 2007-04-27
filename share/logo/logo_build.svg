@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   width="249.25"
+   height="116"
+   viewBox="0 0 249.25 116"
+   id="svg1694"
+   xml:space="preserve"
+   sodipodi:version="0.32"
+   inkscape:version="0.43"
+   sodipodi:docname="K-3D_Logo_Build.svg"
+   sodipodi:docbase="I:\ArtWorks\K3d_Tests\2d_art"><metadata
+   id="metadata1951"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><sodipodi:namedview
+   inkscape:window-height="543"
+   inkscape:window-width="802"
+   inkscape:pageshadow="2"
+   inkscape:pageopacity="0.0"
+   borderopacity="1.0"
+   bordercolor="#666666"
+   pagecolor="#ffffff"
+   id="base"
+   inkscape:zoom="2.8525577"
+   inkscape:cx="124.625"
+   inkscape:cy="58"
+   inkscape:window-x="72"
+   inkscape:window-y="72"
+   inkscape:current-layer="svg1694" /><defs
+   id="defs1760" />
+	
+		<g
+   id="Strokes">
+			
+				<line
+   x1="11.5"
+   y1="11.5"
+   x2="11.5"
+   y2="70"
+   id="line1699"
+   style="fill:none;stroke:#0ab14b;stroke-width:23;stroke-linecap:round;stroke-linejoin:round" />
+			
+				<line
+   x1="37.5"
+   y1="63"
+   x2="62.917"
+   y2="88.417"
+   id="line1701"
+   style="fill:none;stroke:#0ab14b;stroke-width:23;stroke-linecap:round;stroke-linejoin:round" />
+			
+				<line
+   x1="71"
+   y1="57.5"
+   x2="90.917"
+   y2="57.5"
+   id="line1703"
+   style="fill:none;stroke:#0ab14b;stroke-width:23;stroke-linecap:round;stroke-linejoin:round" />
+			
+				<line
+   x1="172"
+   y1="29"
+   x2="172"
+   y2="104.5"
+   id="line1705"
+   style="fill:none;stroke:#0ab14b;stroke-width:23;stroke-linecap:round;stroke-linejoin:round" />
+			<path
+   d="M 98.5,80.25 C 98.5,93.367 109.133,104.001 122.25,104.001 C 135.367,104.001 146.001,93.367 146.001,80.25 C 146.001,67.134 135.367,56.5 122.25,56.5 C 120.785,56.5 119.351,56.633 117.959,56.887 L 117.959,57.041 L 145,30 L 100.5,30"
+   style="fill:none;stroke:#0ab14b;stroke-width:23;stroke-linecap:round;stroke-linejoin:round"
+   id="path1707" />
+			<path
+   d="M 197.5,29.5 C 218.072,29.5 237.75,46.178 237.75,66.75 C 237.75,87.322 218.072,104 197.5,104"
+   style="fill:none;stroke:#0ab14b;stroke-width:23;stroke-linecap:round;stroke-linejoin:round"
+   id="path1709" />
+			<circle
+   cx="47"
+   cy="39"
+   r="11.5"
+   style="fill:#0ab14b"
+   id="circle1711"
+   sodipodi:cx="47"
+   sodipodi:cy="39"
+   sodipodi:rx="11.5"
+   sodipodi:ry="11.5" /> 
+		</g>
+		<g
+   id="Centers">
+			<polyline
+   points="2.5,11.5 11.5,11.5 11.5,2.5 11.5,20.5 11.5,11.5 20.5,11.5 "
+   id="polyline1714"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="2.5,70 11.5,70 11.5,61 11.5,79 11.5,70 20.5,70 "
+   id="polyline1716"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="38,39 47,39 47,30 47,48 47,39 56,39 "
+   id="polyline1718"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="28.5,63 37.5,63 37.5,54 37.5,72 37.5,63 46.5,63 "
+   id="polyline1720"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="53.25,87.75 62.25,87.75 62.25,78.75 62.25,96.75 62.25,87.75 71.25,87.75 "
+   id="polyline1722"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="62,57.5 71,57.5 71,48.5 71,66.5 71,57.5 80,57.5 "
+   id="polyline1724"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="81,57.5 90,57.5 90,48.5 90,66.5 90,57.5 99,57.5 "
+   id="polyline1726"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="91.5,30 100.5,30 100.5,21 100.5,39 100.5,30 109.5,30 "
+   id="polyline1728"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="136,30 145,30 145,21 145,39 145,30 154,30 "
+   id="polyline1730"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="108.959,57.041 117.959,57.041 117.959,48.041 117.959,66.041 117.959,57.041      126.959,57.041 "
+   id="polyline1732"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="89.5,81 98.5,81 98.5,72 98.5,90 98.5,81 107.5,81 "
+   id="polyline1734"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="188.5,29.5 197.5,29.5 197.5,20.5 197.5,38.5 197.5,29.5 206.5,29.5 "
+   id="polyline1736"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="163,29 172,29 172,20 172,38 172,29 181,29 "
+   id="polyline1738"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="163,104.5 172,104.5 172,95.5 172,113.5 172,104.5 181,104.5 "
+   id="polyline1740"
+   style="fill:none;stroke:#ed1b23" />
+			<polyline
+   points="188.5,104 197.5,104 197.5,95 197.5,113 197.5,104 206.5,104 "
+   id="polyline1742"
+   style="fill:none;stroke:#ed1b23" />
+		</g>
+		<g
+   id="Lines">
+			<line
+   x1="11.5"
+   y1="11.5"
+   x2="11.5"
+   y2="70"
+   id="line1745"
+   style="fill:none;stroke:#ec008c" />
+			<line
+   x1="37.5"
+   y1="63"
+   x2="62.917"
+   y2="88.417"
+   id="line1747"
+   style="fill:none;stroke:#ec008c" />
+			<line
+   x1="71"
+   y1="57.5"
+   x2="90.917"
+   y2="57.5"
+   id="line1749"
+   style="fill:none;stroke:#ec008c" />
+			<path
+   style="fill:none;stroke:#ec008c"
+   id="path1751"
+   d="" />
+			<line
+   x1="172"
+   y1="29"
+   x2="172"
+   y2="104.5"
+   id="line1753"
+   style="fill:none;stroke:#ec008c" />
+			<path
+   d="M 98.5,80.25 C 98.5,93.367 109.133,104.001 122.25,104.001 C 135.367,104.001 146.001,93.367 146.001,80.25 C 146.001,67.134 135.367,56.5 122.25,56.5 C 120.785,56.5 119.351,56.633 117.959,56.887 L 117.959,57.041 L 145,30 L 100.5,30"
+   style="fill:none;stroke:#ec008c"
+   id="path1755" />
+			<path
+   d="M 197.5,29.5 C 218.072,29.5 234.75,46.178 234.75,66.75 C 234.75,87.322 218.072,104 197.5,104"
+   style="fill:none;stroke:#ec008c"
+   id="path1757" />
+		</g>
+	</svg>

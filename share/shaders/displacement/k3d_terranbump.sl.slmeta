@@ -1,0 +1,20 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_terranbump">
+			<description>An Earth-like planet displacement</description>
+			<authors>Key Musgrave</authors>
+			<argument name="spectral_exp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="lacunarity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="2"/>
+			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="7"/>
+			<argument name="bump_scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.04"/>
+			<argument name="multifractal" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="dist_scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".2"/>
+			<argument name="offset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="sea_level" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+

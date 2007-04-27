@@ -1,0 +1,24 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_parquet_tile">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.75"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".15"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".025"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="ringscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="25"/>
+			<argument name="grainscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="55"/>
+			<argument name="txtscale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="plankspertile" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="lightwood" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.57 0.292 0.125"/>
+			<argument name="darkwood" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.275 0.15 0.06"/>
+			<argument name="groovecolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.05 0.04 0.015"/>
+			<argument name="plankwidth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="groovewidth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.001"/>
+			<argument name="plankvary" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.8"/>
+			<argument name="grainy" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="wavy" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.08"/>
+		</shader>
+	</shaders>
+</k3dml>
+

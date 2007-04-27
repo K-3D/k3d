@@ -1,0 +1,15 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_spacecloud">
+			<argument name="txtFile" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="0" default_value=""/>
+			<argument name="startPulse" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="endPulse" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".9"/>
+			<argument name="afuzz" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".1"/>
+			<argument name="bfuzz" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".2"/>
+			<argument name="minAdjust" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="-.4"/>
+			<argument name="maxAdjust" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".4"/>
+			<argument name="maxOpacity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".4"/>
+		</shader>
+	</shaders>
+</k3dml>
+

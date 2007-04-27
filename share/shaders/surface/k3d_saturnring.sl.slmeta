@@ -1,0 +1,12 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_saturnring">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.0"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.0"/>
+			<argument name="cutoff" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.55"/>
+			<argument name="ringrad" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.0"/>
+			<argument name="opacity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+		</shader>
+	</shaders>
+</k3dml>
+

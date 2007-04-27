@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<shaders>
+		<shader name="k3d_environment_plastic" type="surface">
+			<description/>
+			<authors/>
+			<copyright/>
+			<argument name="Ka" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="Kd" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="Ks" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="roughness" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="Kr" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.0"/>
+			<argument name="environment_map" label="" description="" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="blur" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.0"/>
+		</shader>
+	</shaders>
+</k3dml>
+

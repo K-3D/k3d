@@ -1,0 +1,24 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_eyeball">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value=".75"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.75"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.4"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.1"/>
+			<argument name="specularcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="iriscolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.135289 0.84323 0.372417"/>
+			<argument name="irisoutercolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.403882 0.343944 0.68276"/>
+			<argument name="irisinnercolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.065142 0.040605 0.179311"/>
+			<argument name="eyeballcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="1 1 1"/>
+			<argument name="bloodcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0.8 0.05 0.05"/>
+			<argument name="pupilcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0 0 0"/>
+			<argument name="pupilsize" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.05"/>
+			<argument name="irissize" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.12"/>
+			<argument name="bloodshot" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.0"/>
+			<argument name="veinfreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="8"/>
+			<argument name="veinlevel" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="4"/>
+			<argument name="index" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0"/>
+		</shader>
+	</shaders>
+</k3dml>
+

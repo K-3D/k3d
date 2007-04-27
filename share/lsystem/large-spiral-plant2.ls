@@ -1,0 +1,20 @@
+# --- L-System Parser/Mutator --- Lj Lapre ----------------------------------
+12
+30
+100
+[|ffff|?FFFF]&&&^D
+D=AB!'DcZO
+B=[---'''!:D]
+A=&+^FLA
+O=[!iw>>w>>w>>w>>w>>w]
+w=[ccccc&{-f+f|-f+f}]
+i=;i
+L=[--->c!!!!!!!1cl[a][b]]
+a=[+a{.].C.}
+b=[-b{.].C.}
+C=gC
+l='l
+1=2
+2=3
+3=F
+@

@@ -1,0 +1,14 @@
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_ridged_multifractal">
+			<argument name="H" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.8"/>
+			<argument name="lacunarity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="2.5"/>
+			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="7"/>
+			<argument name="offset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.9"/>
+			<argument name="sharpness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="4"/>
+			<argument name="threshold" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="12"/>
+			<argument name="Kt" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.1"/>
+		</shader>
+	</shaders>
+</k3dml>
+

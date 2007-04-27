@@ -1,0 +1,1367 @@
+<?xml version="1.0" ?>
+<k3dml package="k3d" version="0.5.15.0" host="i686-pc-linux-gnu">
+	<application>
+		<plugins/>
+	</application>
+	<document>
+		<nodes>
+			<node name="3" class="305ceb88 7cf34870 8b5e673c 636beab9" id="2">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="3 Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="3">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="3-0" class="00000001 00000000 00000000 00000069" id="4">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">1</property>
+					<property name="zmin">0</property>
+				</properties>
+			</node>
+			<node name="3-1" class="00000001 00000000 00000000 00000065" id="6">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">2.5</property>
+					<property name="zmin">-2.5</property>
+				</properties>
+			</node>
+			<node name="3-2" class="00000001 00000000 00000000 00000069" id="7">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">0</property>
+					<property name="zmin">-1</property>
+				</properties>
+			</node>
+			<node name="3-3" class="00000001 00000000 00000000 00000065" id="8">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">4</property>
+					<property name="zmin">0</property>
+				</properties>
+			</node>
+			<node name="3-4" class="00000001 00000000 00000000 00000069" id="9">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">1</property>
+					<property name="zmin">0</property>
+				</properties>
+			</node>
+			<node name="3-5" class="00000001 00000000 00000000 0000006a" id="10">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="majorradius">2.4</property>
+					<property name="material">5</property>
+					<property name="minorradius">1</property>
+					<property name="motion_blur">false</property>
+					<property name="phimax">6.28319</property>
+					<property name="phimin">0</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">4.71239</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="3-6" class="00000001 00000000 00000000 00000069" id="11">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">0</property>
+					<property name="zmin">-1</property>
+				</properties>
+			</node>
+			<node name="Axes" class="00000001 00000000 00000000 00000001" id="12">
+				<properties>
+					<property name="axes">true</property>
+					<property name="gridcount">35</property>
+					<property name="gridsize">2</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="viewport_visible">true</property>
+					<property name="xyplane">true</property>
+					<property name="xzplane">false</property>
+					<property name="yzplane">false</property>
+				</properties>
+			</node>
+			<node name="Bottom" class="305ceb88 7cf34870 8b5e673c 636beab9" id="13">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="Bottom Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="14">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Camera" class="45ce1872 af184b6d b391e136 0dcfe8b5" id="15">
+				<properties>
+					<property name="aspect_ratio"/>
+					<property name="bottom">-0.5</property>
+					<property name="crop_window_bottom">1</property>
+					<property name="crop_window_left">0</property>
+					<property name="crop_window_right">1</property>
+					<property name="crop_window_top">0</property>
+					<property name="far">1000</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="left">-0.6666666666666666</property>
+					<property name="navigation_target">15</property>
+					<property name="near">1</property>
+					<property name="orthographic">false</property>
+					<property name="parent">0</property>
+					<property name="reference_plane">0</property>
+					<property name="reference_plane_color">0 0 0.7</property>
+					<property name="right">0.6666666666666666</property>
+					<property name="show_projection">false</property>
+					<property name="show_reference_plane">false</property>
+					<property name="top">0.5</property>
+					<property name="viewport_visible">true</property>
+					<property name="world_target">0 -5 0</property>
+				</properties>
+			</node>
+			<node name="D" class="305ceb88 7cf34870 8b5e673c 636beab9" id="16">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="D Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="17">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="D1" class="305ceb88 7cf34870 8b5e673c 636beab9" id="18">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="D1 Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="19">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="D1-1" class="00000001 00000000 00000000 00000069" id="20">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">1</property>
+					<property name="zmin">0</property>
+				</properties>
+			</node>
+			<node name="D1-2" class="00000001 00000000 00000000 00000065" id="21">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">3.75</property>
+					<property name="zmin">-3.75</property>
+				</properties>
+			</node>
+			<node name="D1-3" class="00000001 00000000 00000000 00000069" id="22">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">0</property>
+					<property name="zmin">-1</property>
+				</properties>
+			</node>
+			<node name="D2" class="305ceb88 7cf34870 8b5e673c 636beab9" id="23">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="D2 Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="24">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="D2-1" class="00000001 00000000 00000000 00000069" id="25">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">1</property>
+					<property name="zmin">0</property>
+				</properties>
+			</node>
+			<node name="D2-2" class="00000001 00000000 00000000 0000006a" id="26">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="majorradius">3.75</property>
+					<property name="material">5</property>
+					<property name="minorradius">1</property>
+					<property name="motion_blur">false</property>
+					<property name="phimax">6.28319</property>
+					<property name="phimin">0</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">3.14159</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="D2-3" class="00000001 00000000 00000000 00000069" id="27">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">0</property>
+					<property name="zmin">-1</property>
+				</properties>
+			</node>
+			<node name="Dash" class="305ceb88 7cf34870 8b5e673c 636beab9" id="28">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="Dash Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="29">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Dash-1" class="00000001 00000000 00000000 00000069" id="30">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">1</property>
+					<property name="zmin">0</property>
+				</properties>
+			</node>
+			<node name="Dash-2" class="00000001 00000000 00000000 00000065" id="31">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">1</property>
+					<property name="zmin">-1</property>
+				</properties>
+			</node>
+			<node name="Dash-3" class="00000001 00000000 00000000 00000069" id="32">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">0</property>
+					<property name="zmin">-1</property>
+				</properties>
+			</node>
+			<node name="K" class="305ceb88 7cf34870 8b5e673c 636beab9" id="33">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="K Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="34">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="K1" class="305ceb88 7cf34870 8b5e673c 636beab9" id="35">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="K1 Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="36">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="K1-1" class="00000001 00000000 00000000 00000069" id="37">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">1</property>
+					<property name="zmin">0</property>
+				</properties>
+			</node>
+			<node name="K1-2" class="00000001 00000000 00000000 00000065" id="38">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">3</property>
+					<property name="zmin">-3</property>
+				</properties>
+			</node>
+			<node name="K1-3" class="00000001 00000000 00000000 00000069" id="39">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">0</property>
+					<property name="zmin">-1</property>
+				</properties>
+			</node>
+			<node name="K2" class="305ceb88 7cf34870 8b5e673c 636beab9" id="40">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="K2 Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="41">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="K2-1" class="00000001 00000000 00000000 00000069" id="42">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">1</property>
+					<property name="zmin">0</property>
+				</properties>
+			</node>
+			<node name="K2-2" class="00000001 00000000 00000000 00000065" id="43">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">1.75</property>
+					<property name="zmin">-1.75</property>
+				</properties>
+			</node>
+			<node name="K2-3" class="00000001 00000000 00000000 00000069" id="44">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">0</property>
+					<property name="zmin">-1</property>
+				</properties>
+			</node>
+			<node name="K3" class="00000001 00000000 00000000 00000069" id="45">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="material">5</property>
+					<property name="motion_blur">false</property>
+					<property name="radius">1</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="thetamax">6.28319</property>
+					<property name="viewport_visible">true</property>
+					<property name="zmax">1</property>
+					<property name="zmin">-1</property>
+				</properties>
+			</node>
+			<node name="Light" class="00000001 00000000 00000000 0000001d" id="46">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="shader">47</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Light Shader" class="830e867b 7bc94c6c 8d5087ee 8aa35db2" id="47">
+				<properties>
+					<property name="from" label="" description="" type="k3d::point3" user_property="vanilla">0 0 0</property>
+					<property name="intensity" label="" description="" type="double" user_property="vanilla">4000</property>
+					<property name="lightcolor" label="" description="" type="k3d::color" user_property="vanilla">1 1 1</property>
+					<property name="shader_path" reference="relative" relative_path="shaders/light/k3d_pointlight.sl">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+				</properties>
+			</node>
+			<node name="Logo" class="305ceb88 7cf34870 8b5e673c 636beab9" id="48">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="Logo Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="49">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Logo Material" class="00000001 00000000 00000000 00000024" id="5">
+				<properties>
+					<property name="atmosphere_shader">0</property>
+					<property name="color">1 1 1</property>
+					<property name="displacement_bounds">1</property>
+					<property name="displacement_shader">0</property>
+					<property name="exterior_shader">0</property>
+					<property name="interior_shader">0</property>
+					<property name="matte">false</property>
+					<property name="opacity">1 1 1</property>
+					<property name="surface_shader">50</property>
+				</properties>
+			</node>
+			<node name="Logo Material Shader" class="b553a3bd d1044c6e b3f21e07 87132c31" id="50">
+				<properties>
+					<property name="Ka" label="" description="" type="double" user_property="vanilla">1</property>
+					<property name="Kd" label="" description="" type="double" user_property="vanilla">0.1</property>
+					<property name="Kr" label="" description="" type="double" user_property="vanilla">0.7000000000000001</property>
+					<property name="Ks" label="" description="" type="double" user_property="vanilla">1</property>
+					<property name="blur" label="" description="" type="double" user_property="vanilla">0.01</property>
+					<property name="environment_map" label="" description="" type="k3d::ri::itexture*" user_property="vanilla">51</property>
+					<property name="roughness" label="" description="" type="double" user_property="vanilla">0.2</property>
+					<property name="shader_path" reference="relative" relative_path="shaders/surface/k3d_environment_plastic.sl">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+				</properties>
+			</node>
+			<node name="Logo Radius" class="35b28760 0547458f b4e3d324 84ae3545" id="52">
+				<properties>
+					<property name="value">1</property>
+				</properties>
+			</node>
+			<node name="Middle" class="305ceb88 7cf34870 8b5e673c 636beab9" id="53">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="Middle Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="54">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="OpenGL Engine" class="0059ba47 7bf740f3 93fb523d 5899f22c" id="55">
+				<properties>
+					<property name="background_color">0.8 0.8 0.8</property>
+					<property name="draw_aimpoint">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_crop_window">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_frustum">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">false</property>
+					<property name="draw_safe_zone">false</property>
+					<property name="draw_two_sided">false</property>
+					<property name="fog">false</property>
+					<property name="fog_far">100</property>
+					<property name="fog_near">30</property>
+					<property name="headlight">true</property>
+					<property name="point_size">4</property>
+					<property name="show_lights">false</property>
+				</properties>
+			</node>
+			<node name="RenderMan Engine" class="0dc5e733 fa684e05 86a3865f 42f7a99d" id="56">
+				<properties>
+					<property name="bucket_height">16</property>
+					<property name="bucket_width">16</property>
+					<property name="default_atmosphere_shader">0</property>
+					<property name="default_exterior_shader">0</property>
+					<property name="default_interior_shader">0</property>
+					<property name="dof">false</property>
+					<property name="exposure">1</property>
+					<property name="eye_splits">10</property>
+					<property name="focal_length">1.75123</property>
+					<property name="focus_plane">35</property>
+					<property name="fstop">0.3</property>
+					<property name="gamma">1</property>
+					<property name="grid_size">256</property>
+					<property name="imager_shader">0</property>
+					<property name="motion_blur">false</property>
+					<property name="pixel_aspect_ratio">1</property>
+					<property name="pixel_filter">gaussian</property>
+					<property name="pixel_filter_height">2</property>
+					<property name="pixel_filter_width">2</property>
+					<property name="pixel_height">240</property>
+					<property name="pixel_width">320</property>
+					<property name="pixel_xsamples">3</property>
+					<property name="pixel_ysamples">3</property>
+					<property name="render_alpha">true</property>
+					<property name="render_engine">aqsis</property>
+					<property name="render_motion_blur">false</property>
+					<property name="resolution"/>
+					<property name="shading_interpolation">constant</property>
+					<property name="shading_rate">1</property>
+					<property name="texture_memory">1024</property>
+					<property name="two_sided">true</property>
+				</properties>
+			</node>
+			<node name="TimeSource" class="1978f1f7 4a864c99 8caf7cfc d2591baf" id="57">
+				<properties>
+					<property name="end_time">4</property>
+					<property name="frame_rate">30</property>
+					<property name="start_time">0</property>
+					<property name="time">0</property>
+				</properties>
+			</node>
+			<node name="Top" class="305ceb88 7cf34870 8b5e673c 636beab9" id="58">
+				<mesh>
+					<polyhedra>
+						<polyhedron type="polygons">
+							<edges/>
+						</polyhedron>
+					</polyhedra>
+				</mesh>
+			</node>
+			<node name="Top Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="59">
+				<properties>
+					<property name="blobby_surface">true</property>
+					<property name="color">0 0 0</property>
+					<property name="display_lists">true</property>
+					<property name="draw_bicubic_patches">true</property>
+					<property name="draw_bilinear_patches">true</property>
+					<property name="draw_blobbies">true</property>
+					<property name="draw_cubic_curves">true</property>
+					<property name="draw_edges">true</property>
+					<property name="draw_faces">true</property>
+					<property name="draw_linear_curves">true</property>
+					<property name="draw_nucurves">true</property>
+					<property name="draw_nupatches">true</property>
+					<property name="draw_points">true</property>
+					<property name="draw_two_sided">false</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="nurbs_sds">false</property>
+					<property name="parent">0</property>
+					<property name="polyhedron_render_type">default</property>
+					<property name="preview_sds">true</property>
+					<property name="proxy_type">none</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="sds_borders">true</property>
+					<property name="sds_crease">false</property>
+					<property name="sds_level">2</property>
+					<property name="sds_render_level">3</property>
+					<property name="selected_color">1 0 0</property>
+					<property name="show_component_selection">false</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="60">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 3.61679 0 1 0 -2.40972 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="61">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 2.5 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="62">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 0 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="63">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 -2.5 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="64">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 0 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="65">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 4 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="66">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 2.4 0 -3.67321e-06 1 0 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="67">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">-1 -2.65359e-06 0 -0.3 2.65359e-06 -1 0 0.05 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="68">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">0.916118 0.0173602 0.400532 -9.09775 0.400642 -0.0760869 -0.91307 19.304 0.0146242 0.99695 -0.0766598 1.27505 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="69">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 8.48064 0 1 0 -1.01404 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="70">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 3.75 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="71">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 0 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="72">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 -3.75 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="73">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 2.29581 0 1 0 -2.13163e-14 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="74">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">-5.13704e-06 1.67294e-06 -1 0 1 -1.67293e-06 -5.13704e-06 3.75 -1.67294e-06 -1 -1.67293e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="75">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">-3.67321e-06 1 0 0 -1 -3.67321e-06 0 0 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="76">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">-5.13704e-06 -1.67294e-06 1 0 -1 -1.67293e-06 -5.13704e-06 -3.75 1.67294e-06 -1 -1.67293e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="77">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">-3.67321e-06 -1 0 0 1 -3.67321e-06 0 0 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="78">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 1 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="79">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 0 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="80">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 -1 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="81">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 -6.4851 0 1 0 0.956864 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="82">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 3 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="83">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 0 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="84">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 -3 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="85">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">0.707107 -0.707107 0 3.60245 0.707107 0.707107 0 -2.90954 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="86">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 1.75 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="87">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 0 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="88">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -3.67321e-06 1 -1.75 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="89">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 3.11926 0 -3.67321e-06 1 0.51956 0 -1 -3.67321e-06 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="90">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 -20 0 1 0 20 0 0 1 -30 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="91">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 -3.92248 0 1 0 0.158764 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="92">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">-0.707104 -0.70711 0 2.5 0.70711 -0.707104 0 5.3 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="93">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">-3.67321e-06 -1 0 0 1 -3.67321e-06 0 5.3 0 0 1 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Rotate Logo Instance" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="94">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 -5.10341e-12 -1 0 0 1 -5.10341e-12 0 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Move Logo Instance" class="e2edd795 08f9416a 84139876 9c25a60a" id="95">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="space">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="x">-2.756286487691005</property>
+					<property name="y">0</property>
+					<property name="z">0</property>
+				</properties>
+			</node>
+			<node name="Move Light" class="e2edd795 08f9416a 84139876 9c25a60a" id="96">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="space">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="x">-13.49675010496521</property>
+					<property name="y">41.32949880665228</property>
+					<property name="z">23.09533004728714</property>
+				</properties>
+			</node>
+			<node name="RenderManLatLongEnvironmentMap" class="04354dba 91a7411c 88b73725 5808a415" id="51">
+				<properties>
+					<property name="filter">gaussian</property>
+					<property name="swidth">2</property>
+					<property name="twidth">2</property>
+				</properties>
+			</node>
+			<node name="BitmapFileIn" class="00000001 00000000 00000000 00000003" id="97">
+				<properties>
+					<property name="file" reference="relative" relative_path="textures/chrome_map.png">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+				</properties>
+			</node>
+		</nodes>
+		<dependencies>
+			<dependency from_node="60" from_property="output_matrix" to_node="3" to_property="input_matrix"/>
+			<dependency from_node="2" from_property="output_mesh" to_node="3" to_property="input_mesh"/>
+			<dependency from_node="14" from_property="output_matrix" to_node="10" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="10" to_property="minorradius"/>
+			<dependency from_node="66" from_property="output_matrix" to_node="11" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="11" to_property="radius"/>
+			<dependency from_node="67" from_property="output_matrix" to_node="14" to_property="input_matrix"/>
+			<dependency from_node="13" from_property="output_mesh" to_node="14" to_property="input_mesh"/>
+			<dependency from_node="64" from_property="output_matrix" to_node="8" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="8" to_property="radius"/>
+			<dependency from_node="65" from_property="output_matrix" to_node="9" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="9" to_property="radius"/>
+			<dependency from_node="61" from_property="output_matrix" to_node="4" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="4" to_property="radius"/>
+			<dependency from_node="62" from_property="output_matrix" to_node="6" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="6" to_property="radius"/>
+			<dependency from_node="63" from_property="output_matrix" to_node="7" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="7" to_property="radius"/>
+			<dependency from_node="68" from_property="output_matrix" to_node="15" to_property="input_matrix"/>
+			<dependency from_node="69" from_property="output_matrix" to_node="17" to_property="input_matrix"/>
+			<dependency from_node="16" from_property="output_mesh" to_node="17" to_property="input_mesh"/>
+			<dependency from_node="17" from_property="output_matrix" to_node="19" to_property="input_matrix"/>
+			<dependency from_node="18" from_property="output_mesh" to_node="19" to_property="input_mesh"/>
+			<dependency from_node="70" from_property="output_matrix" to_node="20" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="20" to_property="radius"/>
+			<dependency from_node="71" from_property="output_matrix" to_node="21" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="21" to_property="radius"/>
+			<dependency from_node="72" from_property="output_matrix" to_node="22" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="22" to_property="radius"/>
+			<dependency from_node="73" from_property="output_matrix" to_node="24" to_property="input_matrix"/>
+			<dependency from_node="23" from_property="output_mesh" to_node="24" to_property="input_mesh"/>
+			<dependency from_node="74" from_property="output_matrix" to_node="25" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="25" to_property="radius"/>
+			<dependency from_node="75" from_property="output_matrix" to_node="26" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="26" to_property="minorradius"/>
+			<dependency from_node="76" from_property="output_matrix" to_node="27" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="27" to_property="radius"/>
+			<dependency from_node="77" from_property="output_matrix" to_node="29" to_property="input_matrix"/>
+			<dependency from_node="28" from_property="output_mesh" to_node="29" to_property="input_mesh"/>
+			<dependency from_node="78" from_property="output_matrix" to_node="30" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="30" to_property="radius"/>
+			<dependency from_node="79" from_property="output_matrix" to_node="31" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="31" to_property="radius"/>
+			<dependency from_node="80" from_property="output_matrix" to_node="32" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="32" to_property="radius"/>
+			<dependency from_node="81" from_property="output_matrix" to_node="34" to_property="input_matrix"/>
+			<dependency from_node="33" from_property="output_mesh" to_node="34" to_property="input_mesh"/>
+			<dependency from_node="34" from_property="output_matrix" to_node="36" to_property="input_matrix"/>
+			<dependency from_node="35" from_property="output_mesh" to_node="36" to_property="input_mesh"/>
+			<dependency from_node="82" from_property="output_matrix" to_node="37" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="37" to_property="radius"/>
+			<dependency from_node="83" from_property="output_matrix" to_node="38" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="38" to_property="radius"/>
+			<dependency from_node="84" from_property="output_matrix" to_node="39" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="39" to_property="radius"/>
+			<dependency from_node="85" from_property="output_matrix" to_node="41" to_property="input_matrix"/>
+			<dependency from_node="40" from_property="output_mesh" to_node="41" to_property="input_mesh"/>
+			<dependency from_node="86" from_property="output_matrix" to_node="42" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="42" to_property="radius"/>
+			<dependency from_node="87" from_property="output_matrix" to_node="43" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="43" to_property="radius"/>
+			<dependency from_node="88" from_property="output_matrix" to_node="44" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="44" to_property="radius"/>
+			<dependency from_node="89" from_property="output_matrix" to_node="45" to_property="input_matrix"/>
+			<dependency from_node="52" from_property="value" to_node="45" to_property="radius"/>
+			<dependency from_node="96" from_property="output_matrix" to_node="46" to_property="input_matrix"/>
+			<dependency from_node="95" from_property="output_matrix" to_node="49" to_property="input_matrix"/>
+			<dependency from_node="48" from_property="output_mesh" to_node="49" to_property="input_mesh"/>
+			<dependency from_node="92" from_property="output_matrix" to_node="54" to_property="input_matrix"/>
+			<dependency from_node="53" from_property="output_mesh" to_node="54" to_property="input_mesh"/>
+			<dependency from_node="93" from_property="output_matrix" to_node="59" to_property="input_matrix"/>
+			<dependency from_node="58" from_property="output_mesh" to_node="59" to_property="input_mesh"/>
+			<dependency from_node="49" from_property="output_matrix" to_node="60" to_property="input_matrix"/>
+			<dependency from_node="59" from_property="output_matrix" to_node="61" to_property="input_matrix"/>
+			<dependency from_node="59" from_property="output_matrix" to_node="62" to_property="input_matrix"/>
+			<dependency from_node="59" from_property="output_matrix" to_node="63" to_property="input_matrix"/>
+			<dependency from_node="54" from_property="output_matrix" to_node="64" to_property="input_matrix"/>
+			<dependency from_node="54" from_property="output_matrix" to_node="65" to_property="input_matrix"/>
+			<dependency from_node="14" from_property="output_matrix" to_node="66" to_property="input_matrix"/>
+			<dependency from_node="3" from_property="output_matrix" to_node="67" to_property="input_matrix"/>
+			<dependency from_node="49" from_property="output_matrix" to_node="69" to_property="input_matrix"/>
+			<dependency from_node="19" from_property="output_matrix" to_node="70" to_property="input_matrix"/>
+			<dependency from_node="19" from_property="output_matrix" to_node="71" to_property="input_matrix"/>
+			<dependency from_node="19" from_property="output_matrix" to_node="72" to_property="input_matrix"/>
+			<dependency from_node="17" from_property="output_matrix" to_node="73" to_property="input_matrix"/>
+			<dependency from_node="24" from_property="output_matrix" to_node="74" to_property="input_matrix"/>
+			<dependency from_node="24" from_property="output_matrix" to_node="75" to_property="input_matrix"/>
+			<dependency from_node="24" from_property="output_matrix" to_node="76" to_property="input_matrix"/>
+			<dependency from_node="49" from_property="output_matrix" to_node="77" to_property="input_matrix"/>
+			<dependency from_node="29" from_property="output_matrix" to_node="78" to_property="input_matrix"/>
+			<dependency from_node="29" from_property="output_matrix" to_node="79" to_property="input_matrix"/>
+			<dependency from_node="29" from_property="output_matrix" to_node="80" to_property="input_matrix"/>
+			<dependency from_node="49" from_property="output_matrix" to_node="81" to_property="input_matrix"/>
+			<dependency from_node="36" from_property="output_matrix" to_node="82" to_property="input_matrix"/>
+			<dependency from_node="36" from_property="output_matrix" to_node="83" to_property="input_matrix"/>
+			<dependency from_node="36" from_property="output_matrix" to_node="84" to_property="input_matrix"/>
+			<dependency from_node="34" from_property="output_matrix" to_node="85" to_property="input_matrix"/>
+			<dependency from_node="41" from_property="output_matrix" to_node="86" to_property="input_matrix"/>
+			<dependency from_node="41" from_property="output_matrix" to_node="87" to_property="input_matrix"/>
+			<dependency from_node="41" from_property="output_matrix" to_node="88" to_property="input_matrix"/>
+			<dependency from_node="34" from_property="output_matrix" to_node="89" to_property="input_matrix"/>
+			<dependency from_node="3" from_property="output_matrix" to_node="92" to_property="input_matrix"/>
+			<dependency from_node="3" from_property="output_matrix" to_node="93" to_property="input_matrix"/>
+			<dependency from_node="94" from_property="output_matrix" to_node="95" to_property="input_matrix"/>
+			<dependency from_node="97" from_property="output_bitmap" to_node="51" to_property="input_bitmap"/>
+		</dependencies>
+	</document>
+</k3dml>
+

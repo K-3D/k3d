@@ -1,0 +1,280 @@
+<?xml version="1.0" ?>
+<k3dml package="k3d" version="0.7.0.0" host="Linux-2.6.18-gentoo-r4;AMD Sempron(tm)   2600+">
+	<application>
+		<plugins/>
+	</application>
+	<document>
+		<nodes>
+			<node name="Axes" class="00000001 00000000 00000000 00000001" id="2">
+				<properties>
+					<property name="axes">true</property>
+					<property name="gridcolor">0.4 0.4 0.4</property>
+					<property name="gridcount">5</property>
+					<property name="gridsize">2</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="viewport_visible">false</property>
+					<property name="xcolor">1 0 0</property>
+					<property name="xyplane">false</property>
+					<property name="xzplane">true</property>
+					<property name="ycolor">0 0.7 0</property>
+					<property name="yzplane">false</property>
+					<property name="zcolor">0 0 0.7</property>
+				</properties>
+			</node>
+			<node name="Material" class="00000001 00000000 00000000 00000024" id="3">
+				<properties>
+					<property name="atmosphere_shader">0</property>
+					<property name="color">1 1 1</property>
+					<property name="displacement_bounds">1</property>
+					<property name="displacement_shader">0</property>
+					<property name="exterior_shader">0</property>
+					<property name="interior_shader">0</property>
+					<property name="matte">false</property>
+					<property name="opacity">1 1 1</property>
+					<property name="surface_shader">4</property>
+				</properties>
+			</node>
+			<node name="MaterialShader" class="b553a3bd d1044c6e b3f21e07 87132c31" id="4">
+				<properties>
+					<property name="Ka" label="" description="" type="double" user_property="vanilla">1</property>
+					<property name="Kd" label="" description="" type="double" user_property="vanilla">0.5</property>
+					<property name="Ks" label="" description="" type="double" user_property="vanilla">0.5</property>
+					<property name="roughness" label="" description="" type="double" user_property="vanilla">0.1</property>
+					<property name="shader_path" reference="relative" relative_path="shaders/surface/k3d_plastic.sl">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+					<property name="specularcolor" label="" description="" type="k3d::color" user_property="vanilla">1 1 1</property>
+				</properties>
+			</node>
+			<node name="Light" class="00000001 00000000 00000000 0000001d" id="5">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="shader">6</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="LightShader" class="830e867b 7bc94c6c 8d5087ee 8aa35db2" id="6">
+				<properties>
+					<property name="from" label="" description="" type="k3d::point3" user_property="vanilla">0 0 0</property>
+					<property name="intensity" label="" description="" type="double" user_property="vanilla">3000</property>
+					<property name="lightcolor" label="" description="" type="k3d::color" user_property="vanilla">1 1 1</property>
+					<property name="shader_path" reference="relative" relative_path="shaders/light/k3d_pointlight.sl">
+						<root>$K3D_SHARE_PATH</root>
+					</property>
+				</properties>
+			</node>
+			<node name="RenderEngine" class="0dc5e733 fa684e05 86a3865f 42f7a99d" id="7">
+				<properties>
+					<property name="bucket_height">16</property>
+					<property name="bucket_width">16</property>
+					<property name="default_atmosphere_shader">0</property>
+					<property name="default_exterior_shader">0</property>
+					<property name="default_interior_shader">0</property>
+					<property name="dof">false</property>
+					<property name="exposure">1</property>
+					<property name="eye_splits">10</property>
+					<property name="focal_length">1.6</property>
+					<property name="focus_plane">30</property>
+					<property name="fstop">0.3</property>
+					<property name="gamma">1</property>
+					<property name="grid_size">256</property>
+					<property name="hider"/>
+					<property name="imager_shader">0</property>
+					<property name="motion_blur">false</property>
+					<property name="pixel_aspect_ratio">1</property>
+					<property name="pixel_filter">gaussian</property>
+					<property name="pixel_filter_height">2</property>
+					<property name="pixel_filter_width">2</property>
+					<property name="pixel_height">240</property>
+					<property name="pixel_width">320</property>
+					<property name="pixel_xsamples">5</property>
+					<property name="pixel_ysamples">5</property>
+					<property name="render_alpha">false</property>
+					<property name="render_engine">aqsis</property>
+					<property name="render_motion_blur">false</property>
+					<property name="resolution"/>
+					<property name="shading_interpolation">constant</property>
+					<property name="shading_rate">0.5</property>
+					<property name="texture_memory">1024</property>
+					<property name="two_sided">true</property>
+				</properties>
+			</node>
+			<node name="CameraViewport" class="0059ba47 7bf740f3 93fb523d 5899f22c" id="8">
+				<properties>
+					<property name="background_color">0.8 0.8 0.8</property>
+					<property name="draw_aimpoint">false</property>
+					<property name="draw_crop_window">true</property>
+					<property name="draw_frustum">true</property>
+					<property name="draw_safe_zone">false</property>
+					<property name="draw_two_sided">false</property>
+					<property name="fog">false</property>
+					<property name="fog_far">100</property>
+					<property name="fog_near">0</property>
+					<property name="headlight">true</property>
+					<property name="point_size">4</property>
+					<property name="show_lights">false</property>
+				</properties>
+			</node>
+			<node name="TimeSource" class="1978f1f7 4a864c99 8caf7cfc d2591baf" id="9">
+				<properties>
+					<property name="end_time">4</property>
+					<property name="frame_rate">30</property>
+					<property name="start_time">0</property>
+					<property name="time">0</property>
+				</properties>
+			</node>
+			<node name="RenderManScript" class="ded017f6 a08849fd a9d8dd63 e3cd6f1d" id="10">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="motion_blur">false</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="script">#python
+
+# Load this script into a K-3D RenderManScript object to create
+# what is either a Tribble or a really bad-hair-day ...
+
+import k3d
+import sys
+import ri
+from ri import *
+from random import *
+from cgtypes import vec3
+from noise import vsnoise
+from sl import mix
+
+message = &quot;&quot;&quot;You&apos;re probably trying to run this script manually, which won&apos;t work - this script is meant to be loaded into a RenderManScript node, where it will be run at render-time.
+
+Use the Create &gt; RenderMan &gt; RenderManScript menu item to create the node, then load this file into its Script property.&quot;&quot;&quot;
+
+try:
+      Archive
+except:
+      k3d.ui.error_message(message)
+      raise
+
+
+# Redirect output to our RIB archive
+ri._ribout = open(Archive, &quot;w&quot;)
+
+body_size = 5
+lumpyness = 1
+hair_length = 2
+hair_count = 10000
+hair_wavyness = 1
+
+control_point_counts = []
+control_points = []
+widths = []
+
+seed(12345)
+
+for i in range(hair_count):
+	control_point_counts.append(4)
+
+	v = vec3(random() - 0.5, random() - 0.5, random() - 0.5).normalize()
+
+	p1 = v * body_size
+	p1 += vsnoise(p1) * lumpyness
+
+	p4 = p1 + v * hair_length
+	p4 += vsnoise(p4) * hair_wavyness
+
+	p2 = mix(p1, p4, 0.2)
+	p2 += vsnoise(p2)
+
+	p3 = mix(p1, p4, 0.8)
+	p3 += vsnoise(p3)
+
+	control_points.append(p1)
+	control_points.append(p2)
+	control_points.append(p3)
+	control_points.append(p4)
+
+	widths.append(0.08)
+	widths.append(0.01)
+
+RiSurface(&quot;k3d_hair&quot;)
+RiCurves(RI_CUBIC, control_point_counts, RI_NONPERIODIC, &quot;P&quot;, control_points, &quot;width&quot;, widths)
+
+ri._ribout.flush()
+
+</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Camera" class="45ce1872 af184b6d b391e136 0dcfe8b5" id="11">
+				<properties>
+					<property name="aspect_ratio"/>
+					<property name="bottom">-0.5</property>
+					<property name="crop_window_bottom">1</property>
+					<property name="crop_window_left">0</property>
+					<property name="crop_window_right">1</property>
+					<property name="crop_window_top">0</property>
+					<property name="far">1000</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="left">-0.6666666666666666</property>
+					<property name="navigation_target">11</property>
+					<property name="near">1</property>
+					<property name="orthographic">false</property>
+					<property name="parent">0</property>
+					<property name="reference_plane">0</property>
+					<property name="reference_plane_color">0 0 0.7</property>
+					<property name="right">0.6666666666666666</property>
+					<property name="show_projection">false</property>
+					<property name="show_reference_plane">false</property>
+					<property name="top">0.5</property>
+					<property name="viewport_visible">true</property>
+					<property name="world_target">0 -5 0</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="12">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 -20 0 1 0 20 0 0 1 -30 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="13">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">0.992249 0.0402089 0.117579 -2.10019 4.8468e-09 0.946202 -0.323576 5.77969 -0.124264 0.321068 0.938868 -16.77 0 0 0 1</property>
+				</properties>
+			</node>
+			<node name="Annotation" class="951d3c20 e2f74d6d 8bc90ef8 9a8967b6" id="14">
+				<properties>
+					<property name="color">0 0 1</property>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="leader">true</property>
+					<property name="leader_target">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="text">RenderManScript node generates a Tribble at render-time</property>
+					<property name="viewport_visible">true</property>
+				</properties>
+			</node>
+			<node name="Move Annotation" class="e2edd795 08f9416a 84139876 9c25a60a" id="15">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="space">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="x">-7.879737076133496</property>
+					<property name="y">3.914984762270808</property>
+					<property name="z">0</property>
+				</properties>
+			</node>
+			<node name="Move Axes" class="e2edd795 08f9416a 84139876 9c25a60a" id="16">
+				<properties>
+					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="space">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="x">-9.183215410144635</property>
+					<property name="y">0.3093498577374492</property>
+					<property name="z">0</property>
+				</properties>
+			</node>
+		</nodes>
+		<dependencies>
+			<dependency from_node="12" from_property="output_matrix" to_node="5" to_property="input_matrix"/>
+			<dependency from_node="16" from_property="output_matrix" to_node="2" to_property="input_matrix"/>
+			<dependency from_node="13" from_property="output_matrix" to_node="11" to_property="input_matrix"/>
+			<dependency from_node="15" from_property="output_matrix" to_node="14" to_property="input_matrix"/>
+		</dependencies>
+	</document>
+</k3dml>
+

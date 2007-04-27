@@ -1,0 +1,13 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_star">
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1"/>
+			<argument name="starcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0 0 0"/>
+			<argument name="npoints" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="5"/>
+			<argument name="sctr" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+			<argument name="tctr" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="0.5"/>
+		</shader>
+	</shaders>
+</k3dml>
+

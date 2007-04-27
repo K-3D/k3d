@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<shaders>
+		<shader type="displacement" name="k3d_bumpy">
+			<description>Standard bumpy displacement for RenderMan Interface</description>
+			<authors>Pixar</authors>
+			<copyright>(c) Copyright 1988, Pixar</copyright>
+			<argument name="Km" label="" description="" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="texturename" label="" description="" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+		</shader>
+	</shaders>
+</k3dml>
+

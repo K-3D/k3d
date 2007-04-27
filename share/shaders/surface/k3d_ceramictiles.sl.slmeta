@@ -1,0 +1,47 @@
+<k3dml>
+	<shaders>
+		<shader type="surface" name="k3d_ceramictiles">
+			<description>Ceramic tiles (like you'd find in a bathroom)</description>
+			<authors>Larry Gritz</authors>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Ks" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".75"/>
+			<argument name="roughness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.1"/>
+			<argument name="specsharpness" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="Kr" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="blur" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="eta" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1.5"/>
+			<argument name="Kdtile" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+			<argument name="Kdmortar" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.8"/>
+			<argument name="mortarcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.5 0.5 0.5"/>
+			<argument name="envname" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value=""/>
+			<argument name="envspace" storage_class="uniform" type="string" extended_type="space" array_count="1" space="" output="false" default_value="world"/>
+			<argument name="envrad" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="100"/>
+			<argument name="rayjitter" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="raysamples" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="stilespacing" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="10"/>
+			<argument name="ttilespacing" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="10"/>
+			<argument name="groovewidth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.06"/>
+			<argument name="grooveheight" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.06"/>
+			<argument name="groovedepth" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.2"/>
+			<argument name="truedisp" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0"/>
+			<argument name="projection" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="false" default_value="st"/>
+			<argument name="textureprojspace" storage_class="uniform" type="string" extended_type="space" array_count="1" space="" output="false" default_value="shader"/>
+			<argument name="mx" storage_class="uniform" type="float" extended_type="float" array_count="16" space="" output="false" default_value="{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}"/>
+			<argument name="edgevary" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="mottling" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="speckly" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="mottlefreq" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="7"/>
+			<argument name="Cbase" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.05 0.075 0.6"/>
+			<argument name="Cedge" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.025 0.025 0.2"/>
+			<argument name="Cmottle" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.2 0.2 0.7"/>
+			<argument name="Cspeck" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="false" default_value="0.015 0.015 0.015"/>
+			<argument name="varyhue" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.025"/>
+			<argument name="varysat" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.4"/>
+			<argument name="varylum" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
+		</shader>
+	</shaders>
+</k3dml>
+
+
+
+
