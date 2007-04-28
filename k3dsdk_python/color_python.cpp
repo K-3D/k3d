@@ -41,11 +41,11 @@ void export_color()
 		"Values outside the range [0, 1] are explicitly allowed.")
 		.def(init<double, double, double>())
 		.def_readwrite("red", &k3d::color::red,
-			"The red component of the color.")
+			"Stores red component of the color.")
 		.def_readwrite("green", &k3d::color::green,
-			"The green component of the color.")
+			"Stores green component of the color.")
 		.def_readwrite("blue", &k3d::color::blue,
-			"The blue component of the color.")
+			"Stores blue component of the color.")
 		.def(self + self)
 		.def(self - self)
 		.def(self * double())
@@ -54,7 +54,6 @@ void export_color()
 		.def(self != self)
 		.def(self_ns::str(self));
 }
-
 
 } // namespace python
 
