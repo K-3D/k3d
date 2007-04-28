@@ -36,27 +36,6 @@ namespace k3d
 namespace python
 {
 
-/*
-////////////////////////////////////////////////////////////////////////////////////
-// k3d::bounding_box helpers
-
-k3d::bounding_box bounding_box_init_vector3(double angle, k3d::vector3 axis)
-{
-	return k3d::bounding_box(k3d::radians(angle), axis);
-}
-
-const double bounding_box_get_angle(const k3d::bounding_box& lhs)
-{
-	return k3d::degrees(lhs.angle);
-}
-
-const k3d::vector3 bounding_box_get_axis(const k3d::bounding_box& lhs)
-{
-	return lhs.axis;
-}
-
-*/
-
 void export_bounding_box3()
 {
 	class_<k3d::bounding_box3>("bounding_box3",
