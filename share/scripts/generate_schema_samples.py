@@ -33,8 +33,8 @@ unique_id = 1
 
 plugins = {}
 for plugin in k3d.plugins():
-	if plugin.is_document_plugin:
-		plugins[plugin.name] = plugin
+	if plugin.is_document_plugin():
+		plugins[plugin.name()] = plugin
 
 sorted_plugins = plugins.keys()
 sorted_plugins.sort()
@@ -42,12 +42,12 @@ sorted_plugins.sort()
 for plugin_name in sorted_plugins:
 	plugin = plugins[plugin_name]
 
-	class_id = plugin.class_id
-	node = doc.new_node(plugin.name)
-	node.name = plugin.name
+	class_id = plugin.class_id()
+	node = doc.new_node(plugin.name())
+	node.name = plugin.name()
 
-	print """\t\t\t<!-- %s -->""" % plugin.short_description
-	print """\t\t\t<node name=\"%s\" id=\"%u\" class=\"%.08x %.08x %.08x %.08x\">""" % (plugin.name, unique_id, class_id[0], class_id[1], class_id[2], class_id[3])
+	print """\t\t\t<!-- %s -->""" % plugin.short_description()
+	print """\t\t\t<node name=\"%s\" id=\"%u\" class=\"%.08x %.08x %.08x %.08x\">""" % (plugin.name(), unique_id, class_id[0], class_id[1], class_id[2], class_id[3])
 	
 	if node.is_property_collection:
 		print """\t\t\t\t<properties>"""

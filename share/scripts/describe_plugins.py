@@ -1,21 +1,32 @@
 #python
 
 import k3d
-import sys
 
 factories = k3d.plugins()
 
-print "\nApplication Plugins:"
-for factory in factories :
-	if factory.is_application_plugin :
-		print "\t" + factory.name
+application_plugins = []
+document_plugins = []
 
+for factory in factories :
+	if factory.is_application_plugin():
+		application_plugins.append(factory.name())
+	if factory.is_document_plugin():
+		document_plugins.append(factory.name())
+
+application_plugins.sort()
+document_plugins.sort()
+
+print "\nApplication Plugins:"
+for plugin in application_plugins:
+	print "\t" + plugin
+print "\n\t" + "Total: " + str(len(application_plugins))
 
 print "\nDocument Plugins:"
-for factory in factories :
-	if factory.is_document_plugin :
-		print "\t" + factory.name
+for plugin in document_plugins:
+	print "\t" + plugin
+print "\n\t" + "Total: " + str(len(document_plugins))
 
+import sys
 sys.stdout.flush()
 
 k3d.ui.message("Output sent to console")

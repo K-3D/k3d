@@ -106,14 +106,22 @@ const std::string iplugin_factory::quality()
 
 void export_iplugin_factory()
 {
-	class_<iplugin_factory>("iplugin_factory")
-		.add_property("class_id", &iplugin_factory::class_id)
-		.add_property("name", &iplugin_factory::name)
-		.add_property("short_description", &iplugin_factory::short_description)
-		.add_property("is_application_plugin", &iplugin_factory::is_application_plugin)
-		.add_property("is_document_plugin", &iplugin_factory::is_document_plugin)
-		.add_property("categories", &iplugin_factory::categories)
-		.add_property("quality", &iplugin_factory::quality);
+	class_<iplugin_factory>("iplugin_factory",
+		"Encapsulates a K-3D plugin factory, which stores metadata describing a plugin type.")
+		.def("class_id", &iplugin_factory::class_id,
+			"Returns a universally-unique identifier for this plugin type.")
+		.def("name", &iplugin_factory::name,
+			"Returns the human-readable plugin name, which is displayed in the user interface and can be used to instantiate plugins.")
+		.def("short_description", &iplugin_factory::short_description,
+			"Returns a short human-readable description of the plugin's purpose.")
+		.def("is_application_plugin", &iplugin_factory::is_application_plugin,
+			"Returns true if the plugin is an application plugin.")
+		.def("is_document_plugin", &iplugin_factory::is_document_plugin,
+			"Returns true if the plugin is a document plugin.")
+		.def("categories", &iplugin_factory::categories,
+			"Returns an arbitrary collection of human-readable categories used to organize the list of plugins in the user interface.")
+		.def("quality", &iplugin_factory::quality,
+			"Returns the string \"stable\", \"experimental\", or \"deprecated\".");
 }
 
 } // namespace python

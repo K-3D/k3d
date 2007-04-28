@@ -14,7 +14,7 @@ unsupported_types = [ "k3d::legacy::mesh*", "std::vector<k3d::point3>", "k3d::ty
 
 factories = k3d.plugins()
 for factory in factories:
-	if factory.is_document_plugin:
+	if factory.is_document_plugin():
 		node = doc.new_node(factory)
 		for property in node.properties():
 			try:
