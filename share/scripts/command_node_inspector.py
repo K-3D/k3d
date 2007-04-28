@@ -8,9 +8,9 @@ class inspector:
 		for j in range(Level):
 			print " ",
 
-		print "node: " + Node.command_node_name
+		print "node: " + Node.command_node_name()
 
-		for child in Node.children:
+		for child in Node.children():
 			self.print_node(child, Level + 1)
 
 for node in k3d.command_nodes():
@@ -19,3 +19,4 @@ for node in k3d.command_nodes():
 sys.stdout.flush()
 
 k3d.ui.message("Output sent to console")
+

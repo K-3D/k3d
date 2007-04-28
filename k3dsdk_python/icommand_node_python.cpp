@@ -92,8 +92,8 @@ void icommand_node::execute_command(const std::string& Command, const std::strin
 void export_icommand_node()
 {
 	class_<icommand_node>("icommand_node")
-		.add_property("command_node_name", &icommand_node::name)
-		.add_property("children", &icommand_node::children)
+		.def("command_node_name", &icommand_node::name)
+		.def("children", &icommand_node::children)
 		.def("get_child", &icommand_node::get_child)
 		.def("execute_command", &icommand_node::execute_command);
 }
