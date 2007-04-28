@@ -102,11 +102,11 @@ void export_bitmap()
 			">>> mybitmap.reset(640, 480)\n\n")
 //		.def("get_pixel", &bitmap::get_pixel)
 //		.def("set_pixel", &bitmap::set_pixel)
-		.add_property("width", &bitmap::width,
-			"Stores the width of the image in pixels.")
-		.add_property("height", &bitmap::height,
-			"Stores the height of the image in pixels.")
-			;
+		.def("width", &bitmap::width,
+			"Returns the width of the image in pixels.")
+		.def("height", &bitmap::height,
+			"Returns the height of the image in pixels.")
+		;
 }
 
 } // namespace python

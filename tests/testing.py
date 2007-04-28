@@ -66,7 +66,7 @@ def image_comparison(document, image, image_name, threshold):
 	difference_writer.file= difference_file
 	document.set_dependency(difference_writer.get_property("input_bitmap"), difference.get_property("output"))
 
-	pixel_count = image.internal_value.width * image.internal_value.height
+	pixel_count = image.internal_value.width() * image.internal_value.height()
 	pixel_difference = difference.difference
 	difference_measurement = float(pixel_difference) / float(pixel_count)
 
@@ -80,6 +80,14 @@ def image_comparison(document, image, image_name, threshold):
 
 	if difference_measurement > threshold:
 		raise "pixel difference exceeds threshold"
+
+def bitmap_reader_test(reader_name, source_file, width, height):
+	doc = k3d.application.new_document()
+	reader = doc.new_node(reader_name)
+	reader.file = "@CMAKE_CURRENT_SOURCE_DIR@/bitmaps/" + source_file
+	bitmap = reader.output_bitmap
+	if bitmap.width() != width or bitmap.height() != height:
+		raise "Error loading test bitmap"
 
 def setup_mesh_modifier_test(source_name, modifier_name):
 	doc = k3d.application.new_document()
