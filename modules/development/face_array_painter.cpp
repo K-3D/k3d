@@ -29,10 +29,13 @@
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/new_mesh.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/painter_render_state_gl.h>
+#include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
+#include "colored_selection_painter_gl.h"
 #include "vbo.h"
 
 namespace libk3ddevelopment
@@ -43,13 +46,13 @@ namespace libk3ddevelopment
 
 template<class face_t>
 class face_array_painter :
-	public k3d::persistent<k3d::node>,
-	public k3d::gl::imesh_painter
+	public colored_selection_painter
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef colored_selection_painter base;
 public:
 	face_array_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
+		// overrride default colors to differ between selected/unselected meshes and to contrast edges and faces
+		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6)),
 		m_points_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, vbo>::instance(Document)),
 		m_faces_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::indices_t>, face_t>::instance(Document)),
 		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::indices_t>, selection_records_t>::instance(Document)),
@@ -129,14 +132,14 @@ public:
 		k3d::gl::store_attributes attributes;
 
 		glFrontFace(GL_CW);
-		glEnable(GL_CULL_FACE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
 
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 		
-		const k3d::color color = k3d::color(0.6, 0.6, 0.6);
-		const k3d::color selected_color = k3d::color(1, 0, 0);
+		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color();
+		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
 		face* faces = m_faces_cache.get_data(Mesh.polyhedra->face_first_loops);
 		return_if_fail(faces);
@@ -218,8 +221,8 @@ public:
 		glDisable(GL_LIGHTING);
 
 		glFrontFace(GL_CW);
-		glEnable(GL_CULL_FACE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
 
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
@@ -253,12 +256,13 @@ public:
 		m_faces_cache.register_painter(Mesh.polyhedra->face_first_loops, this);
 		m_selection_cache.register_painter(Mesh.polyhedra->face_first_loops, this);
 		
+		k3d::hint::mesh_geometry_changed_t* changed_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
 		k3d::hint::selection_changed_t* selection_hint = dynamic_cast<k3d::hint::selection_changed_t*>(Hint);
 		if (selection_hint)
 		{
 			m_selection_cache.remove_data(Mesh.polyhedra->face_first_loops);
 		}
-		else if (k3d::hint::mesh_geometry_changed_t* changed_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint))
+		else if (changed_hint && !changed_hint->changed_points.empty())
 		{
 			k3d::hint::mesh_geometry_changed_t& stored_changed_hint = *(m_hint_cache.create_data(Mesh.points));
 			stored_changed_hint = *changed_hint;

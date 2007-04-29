@@ -29,10 +29,12 @@
 #include <k3dsdk/new_mesh.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
+#include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
+#include "colored_selection_painter_gl.h"
 #include "vbo.h"
 
 namespace libk3ddevelopment
@@ -42,10 +44,9 @@ namespace libk3ddevelopment
 // edge_array_painter
 
 class edge_array_painter :
-	public k3d::persistent<k3d::node>,
-	public k3d::gl::imesh_painter
+	public colored_selection_painter
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef colored_selection_painter base;
 public:
 	edge_array_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
@@ -128,8 +129,8 @@ public:
 
 		update_buffer(Mesh);
 		
-		const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0);
-		const k3d::color selected_color = k3d::color(1, 0, 0);
+		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color();
+		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
@@ -232,13 +233,14 @@ public:
 		m_points_cache.register_painter(Mesh.points, this);
 		m_edges_cache.register_painter(Mesh.polyhedra->edge_points, this);
 		m_selection_cache.register_painter(Mesh.polyhedra->edge_points, this);
-
+		
+		k3d::hint::mesh_geometry_changed_t* changed_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
 		k3d::hint::selection_changed_t* selection_hint = dynamic_cast<k3d::hint::selection_changed_t*>(Hint);
 		if (selection_hint)
 		{
 			m_selection_cache.remove_data(Mesh.polyhedra->edge_points);
 		}
-		else if (k3d::hint::mesh_geometry_changed_t* changed_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint))
+		else if (changed_hint && !changed_hint->changed_points.empty())
 		{
 			k3d::hint::mesh_geometry_changed_t& stored_changed_hint = *(m_hint_cache.create_data(Mesh.points));
 			stored_changed_hint = *changed_hint;
