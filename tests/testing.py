@@ -66,7 +66,7 @@ def image_comparison(document, image, image_name, threshold):
 	difference_writer.file= difference_file
 	document.set_dependency(difference_writer.get_property("input_bitmap"), difference.get_property("output"))
 
-	pixel_count = image.internal_value.width() * image.internal_value.height()
+	pixel_count = image.internal_value().width() * image.internal_value().height()
 	pixel_difference = difference.difference
 	difference_measurement = float(pixel_difference) / float(pixel_count)
 

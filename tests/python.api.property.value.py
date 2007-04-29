@@ -9,9 +9,9 @@ axes.axes = True
 axes.xyplane = False
 doc.set_dependency(axes.get_property("xyplane"), axes.get_property("axes"));
 
-if axes.get_property("xyplane").internal_value != False:
+if axes.get_property("xyplane").internal_value() != False:
 	raise "incorrect internal value"
 
-if axes.get_property("xyplane").value != True:
+if axes.get_property("xyplane").value() != True:
 	raise "incorrect value"
 

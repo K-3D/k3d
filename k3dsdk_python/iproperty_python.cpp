@@ -24,6 +24,7 @@
 #include "any_python.h"
 #include "iproperty_python.h"
 #include "node_python.h"
+
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
 #include <k3dsdk/inode.h>
@@ -155,18 +156,30 @@ const std::string iproperty::units()
 
 void export_iproperty()
 {
-	class_<iproperty>("iproperty")
-		.add_property("name", &iproperty::name)
-		.add_property("label", &iproperty::label)
-		.add_property("description", &iproperty::description)
-		.add_property("type", &iproperty::type)
-		.add_property("internal_value", &iproperty::internal_value)
-		.add_property("value", &iproperty::value)
-		.add_property("node", &iproperty::node)
-		.add_property("is_writable", &iproperty::is_writable)
-		.add_property("is_enumeration", &iproperty::is_enumeration)
-		.add_property("enumeration_values", &iproperty::enumeration_values)
-		.add_property("units", &iproperty::units);
+	class_<iproperty>("iproperty",
+		"Encapsulates a K-3D property. In K-3D, a document contains nodes, and nodes contain properties, which are the external representations of a node's internal state.")
+		.def("name", &iproperty::name,
+			"Unique identifier, used for serialization and scripting.")
+		.def("label", &iproperty::label,
+			"Localized, human-readable text that labels the property in the user interface.")
+		.def("description", &iproperty::description,
+			"Localized, human-readable description of the property.")
+		.def("type", &iproperty::type,
+			"Returns the type of data the property stores as a string.")
+		.def("internal_value", &iproperty::internal_value,
+			"Returns the current value stored in the property.")
+		.def("value", &iproperty::value,
+			"Returns the property value, which may be different from its internal_value, if the property has been connected to another using the Visualization Pipeline.")
+		.def("node", &iproperty::node,
+			"Returns the node (if any) that owns the property, or None.")
+		.def("is_writable", &iproperty::is_writable,
+			"Returns true if the property's internal value can be modified.")
+		.def("is_enumeration", &iproperty::is_enumeration,
+			"Returns true if the property datatype is an enumeration.")
+		.def("enumeration_values", &iproperty::enumeration_values,
+			"Returns a list containing the set of allowable property values, if the property is an enumeration.")
+		.def("units", &iproperty::units,
+			"Returns a string describing the real-world unit-of-measure stored by the property, if any.");
 }
 
 } // namespace python

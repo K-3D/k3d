@@ -18,12 +18,12 @@ for factory in factories:
 		node = doc.new_node(factory)
 		for property in node.properties():
 			try:
-				if property.type in unsupported_types:
+				if property.type() in unsupported_types:
 					continue
 
-				value = property.internal_value
+				value = property.internal_value()
 			except:
-				print "Error reading value from " + factory.name + "." + property.name + " [" + property.type + "]"
+				print "Error reading value from " + factory.name() + "." + property.name() + " [" + property.type() + "]"
 				result = 1
 
 sys.exit(result)
