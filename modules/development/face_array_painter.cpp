@@ -117,7 +117,7 @@ public:
 		}
 	}
 	
-	void paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -204,7 +204,7 @@ public:
 		clean_vbo_state();
 	}
 	
-	void select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -242,7 +242,7 @@ public:
 		clean_vbo_state();
 	}
 	
-	void mesh_changed(const k3d::dev::mesh& Mesh, k3d::iunknown* Hint)
+	void on_mesh_changed(const k3d::dev::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
