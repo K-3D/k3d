@@ -9,3 +9,4 @@ k3d.ui.message("World!")
 """
 
 k3d.execute_script(recursive_script)
+

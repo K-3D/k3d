@@ -5,8 +5,11 @@ import k3d
 positions = [(-5, -5, 0), (5, -5, 0), (5, 5, 0), (-5, 5, 0)]
 
 points = Output.create_points()
+point_selection = Output.create_point_selection()
+
 for position in positions:
 	points.append(k3d.point3(position[0], position[1], position[2]))
+	point_selection.append(0.0)
 
 nurbs_curve_groups = Output.create_nurbs_curve_groups()
 
@@ -28,6 +31,9 @@ curve_orders.assign([3])
 curve_first_knots = nurbs_curve_groups.create_curve_first_knots()
 curve_first_knots.assign([0])
 
+curve_materials = nurbs_curve_groups.create_materials()
+curve_materials.assign([None])
+
 curve_selection = nurbs_curve_groups.create_curve_selection()
 curve_selection.assign([0])
 
@@ -39,3 +45,4 @@ curve_point_weights.assign([1, 0.5, 1, 1])
 
 curve_knots = nurbs_curve_groups.create_curve_knots()
 curve_knots.assign([1,1,1,2,3,3,3])
+

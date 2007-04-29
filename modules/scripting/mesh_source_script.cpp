@@ -32,8 +32,10 @@
 import k3d\n\n\
 positions = [(-5, -5, 0), (5, -5, 0), (5, 5, 0), (-5, 5, 0)]\n\n\
 points = Output.create_points()\n\
+point_selection = Output.create_point_selection()\n\
 for position in positions:\n\
 	points.append(k3d.point3(position[0], position[1], position[2]))\n\n\
+	point_selection.append(0.0)\n\
 polyhedra = Output.create_polyhedra()\n\n\
 first_faces = polyhedra.create_first_faces()\n\
 first_faces.assign([0])\n\n\
@@ -47,12 +49,16 @@ face_loop_counts = polyhedra.create_face_loop_counts()\n\
 face_loop_counts.assign([1])\n\n\
 face_materials = polyhedra.create_face_materials()\n\
 face_materials.assign([None])\n\n\
+face_selection = polyhedra.create_face_selection()\n\
+face_selection.assign([0.0])\n\n\
 loop_first_edges = polyhedra.create_loop_first_edges()\n\
 loop_first_edges.assign([0])\n\n\
 edge_points = polyhedra.create_edge_points()\n\
 edge_points.assign([0, 1, 2, 3])\n\n\
 clockwise_edges = polyhedra.create_clockwise_edges()\n\
-clockwise_edges.assign([1, 2, 3, 0])\n\n"
+clockwise_edges.assign([1, 2, 3, 0])\n\n\
+edge_selection = polyhedra.create_edge_selection()\n\
+edge_selection.assign([0.0, 0.0, 0.0, 0.0])\n\n"
 
 namespace libk3dscripting
 {

@@ -12,3 +12,4 @@ k3d.ui.message(a)
 
 k3d.execute_script(recursive_script)
 k3d.ui.message(a)
+

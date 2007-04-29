@@ -2,7 +2,7 @@
 
 from OpenGL.GL import *
 
-points = Mesh.points
+points = Mesh.points()
 if points:
 	glDisable(GL_LIGHTING)
 

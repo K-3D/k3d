@@ -46,7 +46,7 @@ floats.append(1)
 for i in k3d.identity3().column_major_list():
 	floats.append(i)
 
-Cs = blobbies.writable_varying_data.create_array("Cs", "k3d::color")
+Cs = blobbies.writable_varying_data().create_array("Cs", "k3d::color")
 Cs.assign([k3d.color(1, 0, 0), k3d.color(0, 1, 0), k3d.color(0, 0, 1), k3d.color(1, 1, 0), k3d.color(1, 1, 1)])
 
 
@@ -59,3 +59,4 @@ operators.append(k3d.operator_type.add)
 operator_first_operands.append(len(operands))
 operator_operand_counts.append(6)
 operands.assign([5, 0, 1, 2, 3, 4])
+

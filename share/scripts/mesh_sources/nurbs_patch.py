@@ -5,10 +5,15 @@ import k3d
 positions = [(-5, 5, 0), (5, 5, 0), (5, 5, 5)]
 
 points = Output.create_points()
+point_selection = Output.create_point_selection()
+
 for position in positions:
 	points.append(k3d.point3(position[0], position[1], position[2]))
+	point_selection.append(0.0)
+
 for position in positions:
 	points.append(k3d.point3(position[0], position[1] - 10, position[2]))
+	point_selection.append(0.0)
 
 nurbs_patches = Output.create_nurbs_patches()
 
@@ -51,6 +56,7 @@ patch_u_knots.assign([1,1,1,2,2,2])
 patch_v_knots = nurbs_patches.create_patch_v_knots()
 patch_v_knots.assign([1,1,2,2])
 
-Cs = nurbs_patches.writable_varying_data.create_array("Cs", "k3d::color")
+Cs = nurbs_patches.writable_varying_data().create_array("Cs", "k3d::color")
 Cs.assign([k3d.color(1, 0, 0), k3d.color(0, 1, 0), k3d.color(0, 0, 1), k3d.color(1, 1, 1)])
+
 

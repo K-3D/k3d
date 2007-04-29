@@ -12,7 +12,7 @@ dz = z2 - z1
 
 Output.copy(Input)
 
-points = Output.writable_points
+points = Output.writable_points()
 for i in range(len(points)):
 	point = points[i]
 	wiggle = 10 * vsnoise((point[0], point[1], point[2]), time / 2)
