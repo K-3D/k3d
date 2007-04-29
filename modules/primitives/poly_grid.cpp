@@ -87,11 +87,11 @@ public:
 				x = k3d::vector3(0, width, 0);
 				y = k3d::vector3(0, 0, height);
 				break;
-			case k3d::PY:
+			case k3d::NY:
 				x = k3d::vector3(-width, 0, 0);
 				y = k3d::vector3(0, 0, height);
 				break;
-			case k3d::NY:
+			case k3d::PY:
 				x = k3d::vector3(width, 0, 0);
 				y = k3d::vector3(0, 0, height);
 				break;
