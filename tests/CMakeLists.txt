@@ -33,18 +33,34 @@ ENDMACRO(K3D_ADD_SCRIPTED_TEST)
 
 MACRO(K3D_ADD_PYTHON_TEST SCRIPT_NAME)
 	IF(K3D_BUILD_PYTHON_MODULES)
-		CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME})
-		ADD_TEST(${SCRIPT_NAME}
-			${k3d_BINARY_DIR}/bin/k3d
-			--log-level=debug
-			--color
-			--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
-			--share=${k3d_SOURCE_DIR}/share
-			--ui=${K3D_NUI_BINARY}
-			--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}
-			--setenv "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"
-			${ARGN}
-			)
+		IF(K3D_TEST_VBO)
+			CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME})
+			ADD_TEST(${SCRIPT_NAME}
+				${k3d_BINARY_DIR}/bin/k3d
+				--log-level=debug
+				--color
+				--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
+				--share=${k3d_SOURCE_DIR}/share
+				--ui=${K3D_NUI_BINARY}
+				--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}
+				--setenv "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"
+				--setenv "USE_VBO=True"
+				${ARGN}
+				)
+		ELSE(K3D_TEST_VBO)
+			CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME})
+			ADD_TEST(${SCRIPT_NAME}
+				${k3d_BINARY_DIR}/bin/k3d
+				--log-level=debug
+				--color
+				--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
+				--share=${k3d_SOURCE_DIR}/share
+				--ui=${K3D_NUI_BINARY}
+				--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}
+				--setenv "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"
+				${ARGN}
+				)
+		ENDIF(K3D_TEST_VBO)
 	ENDIF(K3D_BUILD_PYTHON_MODULES)
 ENDMACRO(K3D_ADD_PYTHON_TEST)
 

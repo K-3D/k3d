@@ -1,6 +1,7 @@
 #python
 
 import k3d
+import os
 
 def create_camera(document):
 	
@@ -25,8 +26,28 @@ def create_opengl_engine(document):
 
 def create_default_painter(document):
 	
-	edge_painter = document.new_node("OpenGLEdgePainter")
-	face_painter = document.new_node("OpenGLFacePainter")
+	use_vbo = False
+	try:
+		if (os.environ['USE_VBO']):
+			use_vbo = True
+	except KeyError:
+		pass
+       
+	if (not use_vbo):
+		edge_painter = document.new_node("OpenGLEdgePainter")
+		face_painter = document.new_node("OpenGLFacePainter")
+	else:
+		edge_painter = document.new_node("VBOEdgePainter")
+		face_painter = document.new_node("VBOFacePainterFlatNormals")
+
+		edge_painter.unselected_mesh_color = k3d.color(0, 0, 0)
+		edge_painter.selected_mesh_color = k3d.color(1, 1, 1)
+		edge_painter.selected_component_color = k3d.color(1, 0, 0)
+		
+		face_painter.unselected_mesh_color = k3d.color(0.8, 0.8, 0.8)
+		face_painter.selected_mesh_color = k3d.color(0.8, 0.8, 0.8)
+		face_painter.selected_component_color = k3d.color(1, 0, 0)
+		
 	nurbs_curve_painter = document.new_node("OpenGLNURBSCurvePainter")
 	nurbs_patch_painter = document.new_node("OpenGLNURBSPatchPainter")
 

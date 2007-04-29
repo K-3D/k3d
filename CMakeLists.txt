@@ -93,6 +93,9 @@ OPTION(K3D_BUILD_WGL_MODULE "Build the Windows offscreen rendering module" ${K3D
 OPTION(K3D_BUILD_WINDOWS_MODULE "Build the Windows integration module" ${K3D_WINDOWS_DEFAULT})
 OPTION(K3D_BUILD_YAFRAY_MODULE "Build the YAFRAY render engine integration module" ON)
 
+OPTION(K3D_TEST_VBO "Run tests using VBO painters" OFF)
+MARK_AS_ADVANCED(K3D_TEST_VBO)
+
 # Find required external packages
 INCLUDE(FindBoost)
 IF(NOT K3D_BOOST_FOUND)
