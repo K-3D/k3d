@@ -32,8 +32,18 @@ namespace k3d
 namespace python
 {
 
-angle_axis angle_axis_init_vector3(double angle, vector3 axis);
-void export_angle_axis();
+class angle_axis :
+	public k3d::angle_axis
+{
+	typedef k3d::angle_axis base;
+
+public:
+	angle_axis();
+	angle_axis(double Angle, const vector3& Axis);
+	angle_axis(const k3d::angle_axis& Value);
+
+	static void define_class();
+};
 
 } // namespace python
 

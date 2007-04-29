@@ -222,13 +222,13 @@ const list module_plugins()
 
 const k3d::matrix4 module_rotate3(const object& Value)
 {
-	extract<k3d::angle_axis> angle_axis(Value);
-	if(angle_axis.check())
-		return k3d::rotation3D(angle_axis());
+	extract<angle_axis> angle_axis_value(Value);
+	if(angle_axis_value.check())
+		return k3d::rotation3D(angle_axis_value());
 
-	extract<k3d::euler_angles> euler_angles(Value);
-	if(euler_angles.check())
-		return k3d::rotation3D(k3d::quaternion(euler_angles()));
+	extract<k3d::euler_angles> euler_angles_value(Value);
+	if(euler_angles_value.check())
+		return k3d::rotation3D(k3d::quaternion(euler_angles_value()));
 
 	throw std::invalid_argument("can't generate rotation matrix from given type");
 }
@@ -259,7 +259,7 @@ BOOST_PYTHON_MODULE(k3d)
 	to_python_converter<k3d::filesystem::path, python_wrap<k3d::filesystem::path> >();
 	to_python_converter<k3d::mesh_selection::records_t, python_wrap<k3d::mesh_selection::records_t> >();
 
-	export_angle_axis();
+	angle_axis::define_class();
 	export_bitmap();
 	export_bounding_box3();
 	export_color();
@@ -286,7 +286,6 @@ BOOST_PYTHON_MODULE(k3d)
 	export_uuid();
 	export_vector3();
 
-	def("angle_axis", angle_axis_init_vector3, "Returns an instance of L{angle_axis}."); // Special-case the angle_axis ctor to handle the degrees-to-radians conversion
 	def("command_nodes", module_command_nodes, "Returns the root(s) of the command node hierarchy.");
 	def("component_deselect_all", k3d::mesh_selection::component_deselect_all);
 	def("component_select_all", k3d::mesh_selection::component_select_all);
