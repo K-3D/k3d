@@ -180,6 +180,7 @@ IF(K3D_BUILD_OFFSCREEN_MODULE)
 	K3D_ADD_PYTHON_TEST(offscreen.py)
 ENDIF(K3D_BUILD_OFFSCREEN_MODULE)
 
+K3D_ADD_PYTHON_TEST(python.api.angle_axis.py)
 K3D_ADD_PYTHON_TEST(python.api.get_dependency.py)
 K3D_ADD_PYTHON_TEST(python.api.property.value.py)
 

@@ -42,6 +42,11 @@ public:
 	angle_axis(double Angle, const vector3& Axis);
 	angle_axis(const k3d::angle_axis& Value);
 
+	const double get_angle_radians() const;
+	const double get_angle() const;
+	void set_angle(const double Value);
+	const std::string str() const;
+
 	static void define_class();
 };
 
