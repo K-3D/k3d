@@ -49,10 +49,17 @@ std::set<std::string>& extensions()
 
 	if(!initialized)
 	{
-		initialized = true;
-
 		const char* const extension_c_string = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
-		const std::string extension_string = extension_c_string ? extension_c_string : "";
+		
+		if (!extension_c_string)
+		{
+			k3d::log() << warning << "GL extension query executed before context creation" << std::endl;
+			return results;
+		}
+		
+		const std::string extension_string = extension_c_string;
+		
+		initialized = true;
 
 		boost::char_separator<char> separator(" ");
 		boost::tokenizer<boost::char_separator<char> > tokenizer(extension_string, separator);
