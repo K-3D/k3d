@@ -26,6 +26,7 @@ namespace k3d
 {
 
 /// Provides a boilerplate implementation of k3d::iselectable
+/** \deprecated Get rid of this once k3d::legacy::mesh is gone */
 class selectable :
 	public iselectable
 {

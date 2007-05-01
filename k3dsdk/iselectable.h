@@ -31,6 +31,7 @@ namespace k3d
 {
 
 /// Abstract interface for an object that supports the "selection" concept, affecting downstream editing operations
+/** \deprecated Get rid of this once k3d::legacy::mesh is gone */
 class iselectable :
 	public virtual iunknown
 {
