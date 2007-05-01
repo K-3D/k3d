@@ -35,7 +35,6 @@
 #include "iplugin_factory_python.h"
 #include "iproperty_python.h"
 #include "iproperty_collection_python.h"
-#include "iselectable_python.h"
 #include "iunknown_python.h"
 #include "iuser_interface_python.h"
 #include "matrix4_python.h"
@@ -272,13 +271,12 @@ BOOST_PYTHON_MODULE(k3d)
 	export_iplugin_factory();
 	export_iproperty();
 	export_iproperty_collection();
-	export_iselectable();
 	export_iunknown();
 	export_iuser_interface();
 	export_matrix4();
 	export_mesh();
 	export_mesh_selection();
-	export_node();
+	node::define_class();
 	export_normal3();
 	export_point3();
 	export_point4();

@@ -199,6 +199,7 @@ ENDIF(K3D_BUILD_OFFSCREEN_MODULE)
 K3D_ADD_PYTHON_TEST(python.api.angle_axis.py)
 K3D_ADD_PYTHON_TEST(python.api.get_dependency.py)
 K3D_ADD_PYTHON_TEST(python.api.property.value.py)
+K3D_ADD_PYTHON_TEST(python.api.node.selection.py)
 
 IF(K3D_BUILD_NGUI_MODULE)
 	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.startup)

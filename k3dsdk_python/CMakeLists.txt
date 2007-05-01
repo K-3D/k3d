@@ -67,8 +67,6 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	iproperty_collection_python.h
 	iproperty_python.cpp
 	iproperty_python.h
-	iselectable_python.cpp
-	iselectable_python.h
 	iunknown_python.cpp
 	iunknown_python.h
 	iuser_interface_python.cpp

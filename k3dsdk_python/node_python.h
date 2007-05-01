@@ -26,7 +26,6 @@
 
 #include "inode_python.h"
 #include "iproperty_collection_python.h"
-#include "iselectable_python.h"
 
 namespace k3d
 {
@@ -38,15 +37,17 @@ namespace python
 
 class node :
 	public inode,
-	public iproperty_collection,
-	public iselectable
+	public iproperty_collection
 {
 public:
 	node();
 	node(k3d::iunknown* Node);
-};
 
-void export_node();
+	const double get_selection_weight() const;
+	void set_selection_weight(const double Weight);
+
+	static void define_class();
+};
 
 } // namespace python
 

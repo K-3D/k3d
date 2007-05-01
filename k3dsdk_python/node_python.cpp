@@ -38,21 +38,39 @@ namespace python
 
 node::node() :
 	inode(),
-	iproperty_collection(),
-	iselectable()
+	iproperty_collection()
 {
 }
 
 node::node(k3d::iunknown* Node) :
 	inode(dynamic_cast<k3d::inode*>(Node)),
-	iproperty_collection(dynamic_cast<k3d::iproperty_collection*>(Node)),
-	iselectable(dynamic_cast<k3d::iselectable*>(Node))
+	iproperty_collection(dynamic_cast<k3d::iproperty_collection*>(Node))
 {
 }
 
-void export_node()
+const double node::get_selection_weight() const
 {
-	class_<node, bases<inode, iproperty_collection, iselectable> >("node");
+	if(k3d::iselectable* const selectable = dynamic_cast<k3d::iselectable*>(inode::wrapped_ptr()))
+		return selectable->get_selection_weight();
+
+	throw std::runtime_error("internal error: node does not implement k3d::iselectable");
+}
+
+void node::set_selection_weight(const double Weight)
+{
+	if(k3d::iselectable* const selectable = dynamic_cast<k3d::iselectable*>(inode::wrapped_ptr()))
+	{
+		selectable->set_selection_weight(Weight);
+		return;
+	}
+
+	throw std::runtime_error("internal error: node does not implement k3d::iselectable");
+}
+
+void node::define_class()
+{
+	class_<node, bases<inode, iproperty_collection> >("node")
+		.add_property("selection_weight", &node::get_selection_weight, &node::set_selection_weight);
 }
 
 } // namespace python
