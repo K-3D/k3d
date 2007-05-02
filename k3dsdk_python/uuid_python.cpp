@@ -78,10 +78,13 @@ void uuid_setitem(k3d::uuid& LHS, const int Item, unsigned long Value)
 
 void export_uuid()
 {
-	class_<k3d::uuid>("uuid")
+	class_<k3d::uuid>("uuid",
+		"Stores a 128-bit universally unique identifier.")
 		.def(init<unsigned long, unsigned long, unsigned long, unsigned long>())
-		.def("null", &k3d::uuid::null)
-		.staticmethod("null")
+		.def("null", &k3d::uuid::null,
+			"Returns a null (all zeros) identifier.").staticmethod("null")
+		.def("random", &k3d::uuid::random,
+			"Returns a randomly-generated identifier.").staticmethod("random")
 		.def("__len__", uuid_len)
 		.def("__getitem__", uuid_getitem)
 		.def("__setitem__", uuid_setitem)
