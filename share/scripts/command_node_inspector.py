@@ -18,5 +18,5 @@ for node in k3d.command_nodes():
 
 sys.stdout.flush()
 
-k3d.ui.message("Output sent to console")
+k3d.ui().message("Output sent to console")
 

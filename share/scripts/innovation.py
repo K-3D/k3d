@@ -6,7 +6,7 @@ def innovate(doc):
 	global k3d
 
 	# Give folks a chance to bail ...
-	if k3d.ui.query_message("Are you sure?  Don't run this script on a real working document!", ["OK", "Cancel"]) == 2:
+	if k3d.ui().query_message("Are you sure?  Don't run this script on a real working document!", ["OK", "Cancel"]) == 2:
 		return
 
 	# Start recording changes for undo-purposes ...
@@ -20,7 +20,7 @@ def innovate(doc):
 		doc.finish_change_set("Innovate!")
 
 		# Communicate the good news to our "customer"!
-		k3d.ui.message("You have been Innovated ... check your Node List Panel (it's undo-able)")
+		k3d.ui().message("You have been Innovated ... check your Node List Panel (it's undo-able)")
 
 	except:
 		doc.cancel_change_set()

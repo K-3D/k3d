@@ -36,7 +36,7 @@ try:
 
 	doc.finish_change_set("Create Test Blobby")
 
-	k3d.ui.message("Note: not all RenderMan engines can render blobby geometry!")
+	k3d.ui().message("Note: not all RenderMan engines can render blobby geometry!")
 
 except:
 	doc.cancel_change_set()

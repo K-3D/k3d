@@ -250,6 +250,11 @@ const k3d::matrix4 module_translate3(const object& Value)
 	throw std::invalid_argument("cannot generate translation matrix from given type");
 }
 
+iuser_interface module_ui()
+{
+	return iuser_interface(k3d::user_interface());
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // k3d module
 
@@ -284,32 +289,51 @@ BOOST_PYTHON_MODULE(k3d)
 	export_uuid();
 	export_vector3();
 
-	def("command_nodes", module_command_nodes, "Returns the root(s) of the command node hierarchy.");
+	def("command_nodes", module_command_nodes,
+		"Returns the root(s) of the command node hierarchy.");
 	def("component_deselect_all", k3d::mesh_selection::component_deselect_all);
 	def("component_select_all", k3d::mesh_selection::component_select_all);
-	def("create_plugin", module_create_plugin, "Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
-	def("deselect_all", k3d::mesh_selection::deselect_all, "Returns a L{mesh_selection} that explicitly deselects every component.");
+	def("create_plugin", module_create_plugin,
+		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
+	def("deselect_all", k3d::mesh_selection::deselect_all,
+		"Returns a L{mesh_selection} that explicitly deselects every component.");
 	def("euler_angles", euler_angles_init); // Special-case the euler_angles ctor to handle the degrees-to-radians conversion
-	def("execute_script", module_execute_script, "Executes a script (which does not have to be written in Python).");
-	def("identity3", k3d::identity3D, "Returns a L{matrix4} containing a three-dimensional identity matrix.");
-	def("length", module_length, "Returns the length of a L{vector3}.");
-	def("log_critical", module_log_critical, "Sends a critical message to the K-3D log.");
-	def("log_debug", module_log_debug, "Sends a debug message to the K-3D log.");
-	def("log_error", module_log_error, "Sends an error message to the K-3D log.");
-	def("log_info", module_log_info, "Sends an informational message to the K-3D log.");
-	def("log_warning", module_log_warning, "Sends a warning message to the K-3D log.");
-	def("plugins", module_plugins, "Returns a list containing the set of all plugin factories.");
-	def("rotate3", module_rotate3, "Returns a L{matrix4} containing a three-dimensional rotation matrix.");
-	def("scale3", module_scale3, "Returns a L{matrix4} containing a three-dimensional scaling matrix.");
-	def("select_all", k3d::mesh_selection::select_all, "Returns a L{mesh_selection} that explicitly selects every component.");
-	def("select_null", k3d::mesh_selection::select_null, "Returns a L{mesh_selection} that does not select or deselect any components.");
-	def("translate3", module_translate3);
+	def("execute_script", module_execute_script,
+		"Executes a script (which does not have to be written in Python).");
+	def("identity3", k3d::identity3D,
+		"Returns a L{matrix4} containing a three-dimensional identity matrix.");
+	def("length", module_length,
+		"Returns the length of a L{vector3}.");
+	def("log_critical", module_log_critical,
+		"Sends a critical message to the K-3D log.");
+	def("log_debug", module_log_debug,
+		"Sends a debug message to the K-3D log.");
+	def("log_error", module_log_error,
+		"Sends an error message to the K-3D log.");
+	def("log_info", module_log_info,
+		"Sends an informational message to the K-3D log.");
+	def("log_warning", module_log_warning,
+		"Sends a warning message to the K-3D log.");
+	def("plugins", module_plugins,
+		"Returns a list containing the set of all plugin factories.");
+	def("rotate3", module_rotate3,
+		"Returns a L{matrix4} containing a three-dimensional rotation matrix.");
+	def("scale3", module_scale3,
+		"Returns a L{matrix4} containing a three-dimensional scaling matrix.");
+	def("select_all", k3d::mesh_selection::select_all,
+		"Returns a L{mesh_selection} that explicitly selects every component.");
+	def("select_null", k3d::mesh_selection::select_null,
+		"Returns a L{mesh_selection} that does not select or deselect any components.");
+	def("share_path", k3d::share_path,
+		"Returns the runtime path to shared data.");
+	def("translate3", module_translate3,
+		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
+	def("ui", module_ui,
+		"Returns the singleton runtime L{iuser_interface} plugin instance.");
 
 	scope().attr("application") = iapplication(&k3d::application());
-	scope().attr("share_path") = k3d::share_path();
-	scope().attr("ui") = iuser_interface(&k3d::user_interface());
 
-	scope().attr("__doc__") = "Main module exporting the K-3D API";
+	scope().attr("__doc__") = "Provides access to the K-3D API";
 }
 
 /////////////////////////////////////////////////////////////////////////////

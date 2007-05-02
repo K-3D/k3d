@@ -9,5 +9,5 @@ for node in Document.nodes():
 import sys
 sys.stdout.flush()
 
-k3d.ui.message("Output sent to console")
+k3d.ui().message("Output sent to console")
 

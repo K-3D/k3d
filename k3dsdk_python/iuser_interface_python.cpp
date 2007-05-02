@@ -40,7 +40,7 @@ iuser_interface::iuser_interface() :
 {
 }
 
-iuser_interface::iuser_interface(k3d::iuser_interface* UserInterface) :
+iuser_interface::iuser_interface(k3d::iuser_interface& UserInterface) :
 	base(UserInterface)
 {
 }

@@ -29,5 +29,5 @@ print "\n\t" + "Total: " + str(len(document_plugins))
 import sys
 sys.stdout.flush()
 
-k3d.ui.message("Output sent to console")
+k3d.ui().message("Output sent to console")
 

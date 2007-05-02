@@ -7,7 +7,7 @@ doc.start_change_set()
 try:
 	shader = doc.new_node("RenderManSurfaceShader")
 	shader.name = "Group Shader"
-	shader.shader_path = k3d.share_path + "/shaders/surface/k3d_constant.sl"
+	shader.shader_path = k3d.share_path() + "/shaders/surface/k3d_constant.sl"
 
 	material = doc.new_node("RenderManMaterial")
 	material.name = "Group Material"

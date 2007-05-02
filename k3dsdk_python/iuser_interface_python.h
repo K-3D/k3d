@@ -43,7 +43,7 @@ class iuser_interface :
 
 public:
 	iuser_interface();
-	iuser_interface(k3d::iuser_interface* UserInterface);
+	iuser_interface(k3d::iuser_interface& UserInterface);
 
 	void message(const std::string& Message);
 	void warning_message(const std::string& Message);
