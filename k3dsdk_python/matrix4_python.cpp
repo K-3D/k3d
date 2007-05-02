@@ -39,11 +39,17 @@ int matrix4_len(const k3d::matrix4& lhs)
 
 const k3d::point4 matrix4_getitem(const k3d::matrix4& lhs, int item)
 {
+	if(item < 0 || item > 3)
+		throw std::out_of_range("index out-of-range");
+
 	return lhs[item];
 }
 
 void matrix4_setitem(k3d::matrix4& lhs, int item, const k3d::point4& value)
 {
+	if(item < 0 || item > 3)
+		throw std::out_of_range("index out-of-range");
+
 	lhs[item] = value;
 }
 

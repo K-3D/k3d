@@ -40,11 +40,17 @@ int point4_len(const k3d::point4& lhs)
 
 double point4_getitem(const k3d::point4& lhs, int item)
 {
+	if(item < 0 || item > 3)
+		throw std::out_of_range("index out-of-range");
+
 	return lhs[item];
 }
 
 void point4_setitem(k3d::point4& lhs, int item, double value)
 {
+	if(item < 0 || item > 3)
+		throw std::out_of_range("index out-of-range");
+
 	lhs[item] = value;
 }
 

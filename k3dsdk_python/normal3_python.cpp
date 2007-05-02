@@ -40,11 +40,17 @@ int normal3_len(const k3d::normal3& lhs)
 
 double normal3_getitem(const k3d::normal3& lhs, int item)
 {
+	if(item < 0 || item > 2)
+		throw std::out_of_range("index out-of-range");
+
 	return lhs[item];
 }
 
 void normal3_setitem(k3d::normal3& lhs, int item, double value)
 {
+	if(item < 0 || item > 2)
+		throw std::out_of_range("index out-of-range");
+
 	lhs[item] = value;
 }
 

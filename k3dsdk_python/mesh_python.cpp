@@ -105,17 +105,21 @@ public:
 
 	value_type get_item(int item)
 	{
+		if(item < 0 || item >= wrapped().size())
+			throw std::out_of_range("index out-of-range");
+
 		return wrapped().at(item);
 	}
 
 	void set_item(int item, const value_type& value)
 	{
-		array_type& storage = wrapped();
+		if(item < 0)
+			throw std::out_of_range("index out-of-range");
 
-		if(static_cast<size_t>(item) >= storage.size())
-			storage.resize(item + 1);
+		if(static_cast<size_t>(item) >= wrapped().size())
+			wrapped().resize(item + 1);
 
-		storage[item] = value;
+		wrapped()[item] = value;
 	}
 
 	void append(const value_type& Value)
@@ -171,25 +175,29 @@ public:
 
 	object get_item(int item)
 	{
+		if(item < 0 || item >= wrapped().size())
+			throw std::out_of_range("index out-of-range");
+
 		k3d::imaterial* const result = wrapped().at(item);
 		return result ? object(k3d::python::imaterial(result)) : object();
 	}
 
 	void set_item(int item, const object& value)
 	{
-		array_type& storage = wrapped();
+		if(item < 0)
+			throw std::out_of_range("index out-of-range");
 
-		if(static_cast<size_t>(item) >= storage.size())
-			storage.resize(item + 1);
+		if(static_cast<size_t>(item) >= wrapped().size())
+			wrapped().resize(item + 1);
 
 		if(value)
 		{
 			k3d::python::imaterial material = extract<k3d::python::imaterial>(value);
-			storage[item] = &material.wrapped();
+			wrapped()[item] = &material.wrapped();
 		}
 		else
 		{
-			storage[item] = static_cast<k3d::imaterial*>(0);
+			wrapped()[item] = static_cast<k3d::imaterial*>(0);
 		}
 	}
 
@@ -278,6 +286,9 @@ public:
 
 	value_type get_item(int item)
 	{
+		if(item < 0 || item >= wrapped().size())
+			throw std::out_of_range("index out-of-range");
+
 		return wrapped().at(item);
 	}
 
@@ -319,6 +330,9 @@ public:
 
 	object get_item(int item)
 	{
+		if(item < 0 || item >= wrapped().size())
+			throw std::out_of_range("index out-of-range");
+
 		k3d::imaterial* const result = wrapped().at(item);
 		return result ? object(k3d::python::imaterial(result)) : object();
 	}
@@ -426,6 +440,9 @@ public:
 
 	object get_item(int item)
 	{
+		if(item < 0 || item >= wrapped().size())
+			throw std::out_of_range("index out-of-range");
+
 		k3d::dev::mesh::named_arrays::const_iterator array_iterator = wrapped().begin();
 		std::advance(array_iterator, item);
 
@@ -533,6 +550,9 @@ public:
 
 	object get_item(int item)
 	{
+		if(item < 0 || item >= wrapped().size())
+			throw std::out_of_range("index out-of-range");
+
 		k3d::dev::mesh::named_arrays::const_iterator array_iterator = wrapped().begin();
 		std::advance(array_iterator, item);
 

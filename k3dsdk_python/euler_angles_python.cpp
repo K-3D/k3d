@@ -46,11 +46,17 @@ int euler_angles_len(const k3d::euler_angles& LHS)
 
 double euler_angles_getitem(const k3d::euler_angles& LHS, int item)
 {
+	if(item < 0 || item > 2)
+		throw std::out_of_range("index out-of-range");
+
 	return k3d::degrees(LHS[item]);
 }
 
 void euler_angles_setitem(k3d::euler_angles& LHS, int item, double value)
 {
+	if(item < 0 || item > 2)
+		throw std::out_of_range("index out-of-range");
+
 	LHS[item] = k3d::radians(value);
 }
 

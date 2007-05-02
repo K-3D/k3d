@@ -40,11 +40,17 @@ int vector3_len(const k3d::vector3& lhs)
 
 double vector3_getitem(const k3d::vector3& lhs, int item)
 {
+	if(item < 0 || item > 2)
+		throw std::out_of_range("index out-of-range");
+
 	return lhs[item];
 }
 
 void vector3_setitem(k3d::vector3& lhs, int item, double value)
 {
+	if(item < 0 || item > 2)
+		throw std::out_of_range("index out-of-range");
+
 	lhs[item] = value;
 }
 
