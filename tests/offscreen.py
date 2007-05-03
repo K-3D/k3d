@@ -6,7 +6,7 @@ sys.path.append("@k3d-tests_BINARY_DIR@")
 import k3d
 import testing
 
-doc = k3d.application.new_document()
+doc = k3d.new_document()
 
 axes = doc.new_node("Axes")
 axes.xyplane = False

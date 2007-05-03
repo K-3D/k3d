@@ -2,7 +2,7 @@
 
 import k3d
 
-doc = k3d.application.new_document()
+doc = k3d.new_document()
 
 source_a = doc.new_node("PolyGrid")
 source_b = doc.new_node("PolyGrid")

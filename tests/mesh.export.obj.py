@@ -2,7 +2,7 @@
 
 import k3d
 
-doc = k3d.application.new_document()
+doc = k3d.new_document()
 
 # We will be writing a temporary file ...
 file = "@k3d-tests_BINARY_DIR@/mesh.export.obj.file"

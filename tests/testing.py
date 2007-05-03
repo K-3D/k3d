@@ -103,7 +103,7 @@ def image_comparison(document, image, image_name, threshold):
 		raise "pixel difference exceeds threshold"
 
 def bitmap_reader_test(reader_name, source_file, width, height):
-	doc = k3d.application.new_document()
+	doc = k3d.new_document()
 	reader = doc.new_node(reader_name)
 	reader.file = "@CMAKE_CURRENT_SOURCE_DIR@/bitmaps/" + source_file
 	bitmap = reader.output_bitmap
@@ -111,7 +111,7 @@ def bitmap_reader_test(reader_name, source_file, width, height):
 		raise "Error loading test bitmap"
 
 def setup_mesh_modifier_test(source_name, modifier_name):
-	doc = k3d.application.new_document()
+	doc = k3d.new_document()
 
 	axes = doc.new_node("Axes")
 	axes.xyplane = False
@@ -151,7 +151,7 @@ def setup_mesh_modifier_test(source_name, modifier_name):
 	return result
 
 def setup_mesh_source_test(source_name):
-	doc = k3d.application.new_document()
+	doc = k3d.new_document()
 
 	axes = doc.new_node("Axes")
 	axes.xyplane = False

@@ -50,8 +50,6 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	any_python.h
 	dynamic_cast_python.cpp
 	dynamic_cast_python.h
-	iapplication_python.cpp
-	iapplication_python.h
 	icommand_node_python.cpp
 	icommand_node_python.h
 	idocument_python.cpp

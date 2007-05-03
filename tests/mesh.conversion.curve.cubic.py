@@ -2,7 +2,7 @@
 
 import k3d
 
-doc = k3d.application.new_document()
+doc = k3d.new_document()
 
 # Create a simple cubic curve source ...
 source = doc.new_node("MeshSourceScript")

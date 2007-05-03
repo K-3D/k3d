@@ -27,7 +27,6 @@
 #include "bounding_box3_python.h"
 #include "color_python.h"
 #include "euler_angles_python.h"
-#include "iapplication_python.h"
 #include "icommand_node_python.h"
 #include "idocument_python.h"
 #include "imaterial_python.h"
@@ -50,9 +49,13 @@
 #include "vector3_python.h"
 
 #include <k3dsdk/algebra.h>
+#include <k3dsdk/auto_ptr.h>
+#include <k3dsdk/classes.h>
+#include <k3dsdk/command_node.h>
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/idocument.h>
+#include <k3dsdk/idocument_read_format.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/new_mesh.h>
@@ -255,6 +258,47 @@ iuser_interface module_ui()
 	return iuser_interface(k3d::user_interface());
 }
 
+void module_exit()
+{
+	k3d::application().exit();
+}
+
+idocument module_new_document()
+{
+	return idocument(k3d::application().create_document());
+}
+
+void module_close_document(idocument& Document)
+{
+	k3d::application().close_document(Document.wrapped());
+}
+
+object module_get_command_node(const std::string& Path)
+{
+	if(k3d::icommand_node* const command_node = k3d::command_node::lookup(Path))
+		return object(icommand_node(command_node));
+
+	return object();
+}
+
+idocument module_open_document(const std::string& Path)
+{
+	const filesystem::path document_path = filesystem::native_path(ustring::from_utf8(Path));
+
+	k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentReader()));
+	if(!filter.get())
+		throw std::runtime_error("no document loader plugin");
+
+	k3d::idocument* const document = k3d::application().create_document();
+	if(!document)
+		throw std::runtime_error("couldn't create empty document");
+
+	if(!filter->read_file(*document, document_path))
+		throw std::runtime_error("error loading document");
+
+	return idocument(document);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // k3d module
 
@@ -268,7 +312,6 @@ BOOST_PYTHON_MODULE(k3d)
 	export_bounding_box3();
 	export_color();
 	export_euler_angles();
-	export_iapplication();
 	export_icommand_node();
 	export_idocument();
 	export_imaterial();
@@ -289,6 +332,8 @@ BOOST_PYTHON_MODULE(k3d)
 	export_uuid();
 	export_vector3();
 
+	def("close_document", module_close_document,
+		"Closes an open document.");
 	def("command_nodes", module_command_nodes,
 		"Returns the root(s) of the command node hierarchy.");
 	def("component_deselect_all", k3d::mesh_selection::component_deselect_all);
@@ -300,6 +345,10 @@ BOOST_PYTHON_MODULE(k3d)
 	def("euler_angles", euler_angles_init); // Special-case the euler_angles ctor to handle the degrees-to-radians conversion
 	def("execute_script", module_execute_script,
 		"Executes a script (which does not have to be written in Python).");
+	def("exit", module_exit,
+		"Request program exit (may be overridden by user input).");
+	def("get_command_node", module_get_command_node,
+		"Returns a command node by path.");
 	def("identity3", k3d::identity3D,
 		"Returns a L{matrix4} containing a three-dimensional identity matrix.");
 	def("length", module_length,
@@ -314,6 +363,10 @@ BOOST_PYTHON_MODULE(k3d)
 		"Sends an informational message to the K-3D log.");
 	def("log_warning", module_log_warning,
 		"Sends a warning message to the K-3D log.");
+	def("new_document", module_new_document,
+		"Returns a new (completely empty) document.");
+	def("open_document", module_open_document,
+		"Opens an existing document stored on disk.");
 	def("plugins", module_plugins,
 		"Returns a list containing the set of all plugin factories.");
 	def("rotate3", module_rotate3,
@@ -330,8 +383,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
 	def("ui", module_ui,
 		"Returns the singleton runtime L{iuser_interface} plugin instance.");
-
-	scope().attr("application") = iapplication(&k3d::application());
 
 	scope().attr("__doc__") = "Provides access to the K-3D API";
 }

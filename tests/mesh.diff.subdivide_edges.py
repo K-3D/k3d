@@ -2,7 +2,7 @@
 
 import k3d
 
-doc = k3d.application.new_document()
+doc = k3d.new_document()
 
 memory_pools = k3d.create_plugin("MemoryPools").dynamic_cast("icommand_node")
 memory_pools.execute_command("shuffle", "4000 points")

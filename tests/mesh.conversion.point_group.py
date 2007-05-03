@@ -2,7 +2,7 @@
 
 import k3d
 
-doc = k3d.application.new_document()
+doc = k3d.new_document()
 
 # Create a point group ...
 poly_source = doc.new_node("PolyCube")

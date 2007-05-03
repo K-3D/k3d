@@ -2,7 +2,7 @@
 
 import k3d
 
-doc = k3d.application.new_document()
+doc = k3d.new_document()
 
 axes = doc.new_node("Axes")
 doc.set_dependency(axes.get_property("xyplane"), axes.get_property("axes"));

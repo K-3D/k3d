@@ -4,7 +4,7 @@ import k3d
 import sys
 import os
 
-doc = k3d.application.new_document()
+doc = k3d.new_document()
 
 plugins = {}
 for plugin in k3d.plugins():
@@ -82,7 +82,7 @@ for plugin_name in sorted_plugins:
 
 	detail.write("<!-- Machine-generated file, do not edit by hand! -->\n")
 
-k3d.application.close_document(doc)
+k3d.close_document(doc)
 
 sys.stdout.flush()
 

@@ -28,7 +28,7 @@ All data that is expressed using real-world units of measure use SI units.  All 
 \t<document>
 \t\t<nodes>"""
 
-doc = k3d.application.new_document()
+doc = k3d.new_document()
 unique_id = 1
 
 plugins = {}
@@ -122,7 +122,7 @@ for plugin_name in sorted_plugins:
 
 	unique_id += 1
 
-k3d.application.close_document(doc)
+k3d.close_document(doc)
 
 print """\t\t</nodes>
 \t</document>
