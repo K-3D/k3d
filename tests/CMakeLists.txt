@@ -183,6 +183,7 @@ K3D_ADD_PYTHON_TEST(mesh.selection.all.py)
 K3D_ADD_PYTHON_TEST(mesh.selection.points.py)
 
 K3D_ADD_PYTHON_TEST(mesh.modifier.extrude_faces.py)
+K3D_ADD_PYTHON_TEST(mesh.modifier.triangulate_faces.py)
 
 IF(K3D_BUILD_GLX_MODULE)
 	K3D_ADD_PYTHON_TEST(offscreen.glx.py)

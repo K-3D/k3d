@@ -79,6 +79,7 @@ public:
 		base(Factory, Document),
 		m_holes_only(init_owner(*this) + init_name("holes_only") + init_label(_("Holes only")) + init_description(_("Triangulate only faces that contain holes")) + init_value(false))
 	{
+		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
 		m_holes_only.changed_signal().connect(make_reset_mesh_slot());
 	}
 
