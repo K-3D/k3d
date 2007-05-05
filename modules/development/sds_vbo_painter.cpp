@@ -36,6 +36,7 @@
 #include <subdivision_surface/k3d_sds_binding.h>
 
 #include "vbo.h"
+#include "colored_selection_painter_gl.h"
 
 namespace libk3ddevelopment
 {
@@ -44,15 +45,13 @@ namespace libk3ddevelopment
 // sds_face_painter
 
 class sds_face_painter :
-		public k3d::persistent<k3d::node>,
-	public k3d::gl::imesh_painter
-	{
-		typedef k3d::persistent<k3d::node> base;
-
+	public colored_selection_painter
+{
+	typedef colored_selection_painter base;
 public:
-	sds_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_sds_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::sds::k3d_opengl_sds_cache>::instance(Document)),
+	sds_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document, const k3d::color Unselected = k3d::color(0.2,0.2,0.2), const k3d::color Selected = k3d::color(0.6,0.6,0.6)) :
+		base(Factory, Document, Unselected, Selected),
+		m_sds_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::sds::k3d_vbo_sds_cache>::instance(Document)),
 		m_levels(init_owner(*this) + init_name("levels") + init_label(_("Levels")) + init_description(_("Number of SDS levels")) + init_value(2) + init_constraint(constraint::minimum(2L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_levels.changed_signal().connect(sigc::mem_fun(*this, &sds_face_painter::on_levels_changed));
@@ -69,7 +68,7 @@ public:
 		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
 	}
 	
-	void paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -79,7 +78,7 @@ public:
 		if (!k3d::dev::is_sds(Mesh))
 			return;
 
-		k3d::sds::k3d_opengl_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
+		k3d::sds::k3d_vbo_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
 		if (!cache)
 		{
 			cache = m_sds_cache.create_data(Mesh.points);
@@ -98,6 +97,8 @@ public:
 			m_levels_changed = false;
 		}
 		
+		cache->set_colors(selected_mesh_color(), selected_component_color());
+		
 		k3d::gl::store_attributes attributes;
 		
 		clean_vbo_state();
@@ -106,7 +107,7 @@ public:
 		clean_vbo_state();
 	}
 	
-	void select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 		if(!k3d::dev::validate_polyhedra(Mesh))
@@ -115,7 +116,7 @@ public:
 		if (!k3d::dev::is_sds(Mesh))
 			return;
 		
-		k3d::sds::k3d_opengl_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
+		k3d::sds::k3d_vbo_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
 		if (!cache)
 		{
 			cache = m_sds_cache.create_data(Mesh.points);
@@ -140,7 +141,7 @@ public:
 		clean_vbo_state();
 	}
 	
-	void mesh_changed(const k3d::dev::mesh& Mesh, k3d::iunknown* Hint)
+	void on_mesh_changed(const k3d::dev::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 		if(!k3d::dev::validate_polyhedra(Mesh))
@@ -149,7 +150,7 @@ public:
 		if (!k3d::dev::is_sds(Mesh))
 			return;
 
-		k3d::sds::k3d_opengl_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
+		k3d::sds::k3d_vbo_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
 		
 		bool newcache = false;
 		if (!cache)
@@ -171,7 +172,7 @@ public:
 	{
 		static k3d::document_plugin_factory<sds_face_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 				k3d::uuid(0x6db5cbd0, 0x0c4c42eb, 0x81142404, 0x3c25889e),
-		"SDSFacePainter",
+		"SDSVBOFacePainter",
 		_("Renders mesh as SDS faces"),
 		"Development",
 		k3d::iplugin_factory::EXPERIMENTAL);
@@ -180,12 +181,12 @@ public:
 	}
 
 protected:
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::sds::k3d_opengl_sds_cache>& m_sds_cache;
+	painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::sds::k3d_vbo_sds_cache>& m_sds_cache;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_levels;
 	bool m_levels_changed;
 	
 	// override to choose drawing mode
-	virtual void draw(k3d::sds::k3d_opengl_sds_cache* Cache, bool Selected)
+	virtual void draw(k3d::sds::k3d_vbo_sds_cache* Cache, bool Selected)
 	{
 		glFrontFace(GL_CW);
 		glEnable(GL_CULL_FACE);
@@ -196,13 +197,13 @@ protected:
 		glEnable(GL_COLOR_MATERIAL);
 		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 		if (!Selected)
-			k3d::gl::color3d(k3d::color(0.2,0.2,0.2));
+			k3d::gl::color3d(unselected_mesh_color());
 		
 		Cache->draw_faces(m_levels.value(), Selected);
 	}
 	
 	// override to choose selection mode
-	virtual void select(k3d::sds::k3d_opengl_sds_cache* Cache)
+	virtual void select(k3d::sds::k3d_vbo_sds_cache* Cache)
 	{
 		Cache->select_faces(m_levels.value());
 	}
@@ -236,7 +237,7 @@ public:
 	{
 		static k3d::document_plugin_factory<sds_edge_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 				k3d::uuid(0x4282a7b2, 0xb34a138f, 0xcda9df91, 0xa9c9c8ab),
-		"SDSEdgePainter",
+		"SDSVBOEdgePainter",
 		_("Renders mesh as SDS patch borders"),
 		"Development",
 		k3d::iplugin_factory::EXPERIMENTAL);
@@ -245,14 +246,14 @@ public:
 	}
 	
 private:
-	virtual void draw(k3d::sds::k3d_opengl_sds_cache* Cache, bool Selected)
+	virtual void draw(k3d::sds::k3d_vbo_sds_cache* Cache, bool Selected)
 	{
 		glDisable(GL_LIGHTING);
-		k3d::gl::color3d(k3d::color(0, 0, 0));
+		k3d::gl::color3d(unselected_mesh_color());
 		Cache->draw_borders(m_levels.value(), Selected);
 	}
 	
-	virtual void select(k3d::sds::k3d_opengl_sds_cache* Cache)
+	virtual void select(k3d::sds::k3d_vbo_sds_cache* Cache)
 	{
 		Cache->select_borders(m_levels.value());
 	}
@@ -286,7 +287,7 @@ public:
 	{
 		static k3d::document_plugin_factory<sds_point_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 				k3d::uuid(0x44621bcb, 0x404a76ea, 0x1a256ebd, 0xb119ad07),
-		"SDSPointPainter",
+		"SDSVBOPointPainter",
 		_("Renders mesh as SDS patch corners"),
 		"Development",
 		k3d::iplugin_factory::EXPERIMENTAL);
@@ -295,14 +296,14 @@ public:
 	}
 	
 private:
-	virtual void draw(k3d::sds::k3d_opengl_sds_cache* Cache, bool Selected)
+	virtual void draw(k3d::sds::k3d_vbo_sds_cache* Cache, bool Selected)
 	{
 		glDisable(GL_LIGHTING);
-		k3d::gl::color3d(k3d::color(0, 0, 0));
+		k3d::gl::color3d(unselected_mesh_color());
 		Cache->draw_corners(m_levels.value(), Selected);
 	}
 	
-	virtual void select(k3d::sds::k3d_opengl_sds_cache* Cache)
+	virtual void select(k3d::sds::k3d_vbo_sds_cache* Cache)
 	{
 		Cache->select_corners(m_levels.value());
 	}

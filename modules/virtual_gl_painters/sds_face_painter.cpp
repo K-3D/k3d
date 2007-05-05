@@ -56,7 +56,13 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("SDSFacePainter");
+				const k3d::factories_t factories = k3d::plugins("SDSVBOFacePainter");
+				if(1 == factories.size())
+					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
+			}
+			else
+			{
+				const k3d::factories_t factories = k3d::plugins("SDSGLFacePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}

@@ -39,6 +39,8 @@ namespace sds
 // Keeps track of modified faces and their number in the original mesh
 typedef std::map<size_t, face_vertex*> facevertices_map;
 
+typedef std::vector<size_t> companions_t; // Keep track of edge companions
+
 /// convert k3d::legacy::mesh to the internal sds cache structure. This one does a lot of work, it should be looked into if part of this can be moved to the generic SDS part. (doubtful, since it deals heavily with k3d::edge and k3d::legacy::face)
 class k3d_cache_input : public cache_input<k3d::dev::mesh>
 {
@@ -86,6 +88,12 @@ public:
 
 	// True if the given face or its neighbours contain selected elements
 	bool selected(size_t Face, int Recurse = 4);
+	
+	/// Return the edge companions for the original mesh
+	const companions_t& companions() const
+	{
+		return m_companions;
+	}
 
 private:
 	bool m_hint_validated;
@@ -114,7 +122,6 @@ private:
 	
 	typedef std::vector<size_t> edge_to_face_t; // Map edge numbers to face numbers
 	edge_to_face_t m_edge_to_face;
-	typedef std::vector<size_t> companions_t; // Keep track of edge companions
 	companions_t m_companions;
 	
 	// get or create the edge vertex belonging to Edge
@@ -144,25 +151,109 @@ protected:
 	}
 };
 
-/// SDS cache that outputs to OpenGL
+/// Base class for K3D SDS caches that output to OpenGL
 class k3d_opengl_sds_cache : public k3d_sds_cache_base
 {
 public:
+	k3d_opengl_sds_cache() : m_unselected_color(1,1,1), m_selected_color(1,0,0) {}
 
-	k3d_opengl_sds_cache() :
+	virtual ~k3d_opengl_sds_cache() {}
+	
+	/// (K-3D specific) draw subdivided faces ("patches")
+	virtual void draw_faces(size_t Level, bool Selected) = 0;
+	
+	/// (K-3D specific) draw patch borders
+	virtual void draw_borders(size_t Level, bool Selected) = 0;
+	
+	/// (K-3D specific) draw patch corner points
+	virtual void draw_corners(size_t Level, bool Selected) = 0;
+	
+	/// (K-3D specific) selection for faces
+	virtual void select_faces(size_t Level) = 0;
+	
+	/// (K-3D specific) selection for borders
+	virtual void select_borders(size_t Level) = 0;
+	
+	/// (K-3D specific) selection for corners
+	virtual void select_corners(size_t Level) = 0;
+	
+	/// (K-3D specific) update selection color arrays
+	virtual void update_selection() = 0;
+	
+	/// Validate cache through hint
+	virtual void validate(k3d::iunknown* Hint) = 0;
+	
+	/// Set the colors of unselected and selected mesh components
+	virtual void set_colors(const k3d::color Unselected, const k3d::color Selected)
+	{
+		m_unselected_color = Unselected;
+		m_selected_color = Selected;
+	}
+	
+protected:
+	k3d::color m_unselected_color;
+	k3d::color m_selected_color;
+	
+}; // class k3d_opengl_sds_cache
+
+/// SDS cache that outputs using basic OpenGL
+class k3d_basic_opengl_sds_cache : public k3d_opengl_sds_cache
+{
+public:
+	/// (K-3D specific) draw subdivided faces ("patches")
+	virtual void draw_faces(size_t Level, bool Selected);
+	
+	/// (K-3D specific) draw patch borders
+	virtual void draw_borders(size_t Level, bool Selected);
+	
+	/// (K-3D specific) draw patch corner points
+	virtual void draw_corners(size_t Level, bool Selected);
+	
+	/// (K-3D specific) selection for faces
+	virtual void select_faces(size_t Level);
+	
+	/// (K-3D specific) selection for borders
+	virtual void select_borders(size_t Level);
+	
+	/// (K-3D specific) selection for corners
+	virtual void select_corners(size_t Level);
+	
+	/// (K-3D specific) update selection color arrays
+	virtual void update_selection() {}
+	
+	/// Validate cache through hint
+	virtual void validate(k3d::iunknown* Hint) {}
+
+protected:
+
+	////////
+	// catmull_clark_cache<k3d::legacy::mesh> implementation
+	///////
+	
+	/// Equivalent to draw_faces
+	void client_output(k3d::dev::mesh* Output = 0) {}
+
+	void client_output_nurbs(k3d::dev::mesh* Output = 0) {}
+}; // class k3d_basic_opengl_sds_cache
+
+/// SDS cache that outputs to OpenGL using VBOs
+class k3d_vbo_sds_cache : public k3d_opengl_sds_cache
+{
+public:
+
+	k3d_vbo_sds_cache() :
 		m_n_faces(0),
 		m_n_edges(0),
 		m_n_points(0),
 		m_n_corners(0),
 		m_mesh_selection(false),
 		m_update_selection(true),
-		m_unselected_color(1.0,1.0,1.0),
 		m_validated_hint(false)
 	{
 		m_first_level_cache_mesh = 0;
 	}
 
-	~k3d_opengl_sds_cache();
+	~k3d_vbo_sds_cache();
 	
 	/// (K-3D specific) draw subdivided faces ("patches")
 	void draw_faces(size_t Level, bool Selected);
@@ -185,11 +276,10 @@ public:
 	/// (K-3D specific) update selection color arrays
 	void update_selection();
 	
-	/// Regenerate VBOs if the mesh structure has changed
-	void regenerate_vbos();
-	
 	/// Validate cache through hint
 	void validate(k3d::iunknown* Hint);
+	
+	void set_colors(const k3d::color Unselected, const k3d::color Selected);
 	
 protected:
 	////////
@@ -202,6 +292,8 @@ protected:
 	void client_output_nurbs(k3d::dev::mesh* Output = 0);
 
 private:
+	/// Regenerate VBOs if the mesh structure has changed
+	void regenerate_vbos();
 	// VBOs for the cached data
 	std::vector<GLuint> m_point_vbos, m_face_vbos, m_normals_vbos, m_edge_vbos, m_corner_vbos;
 	// Color VBOs for selection color
@@ -219,10 +311,10 @@ private:
 	void update_positions();
 	// Old mesh selection state
 	bool m_mesh_selection;
-	// Color for unselected components
-	k3d::color m_unselected_color;
 	bool m_validated_hint;
-};
+	/// Initialise color buffers
+	void init_color_vbos();
+}; // class k3d_vbo_sds_cache
 
 /// Output to a k3d::legacy::mesh
 class k3d_mesh_sds_cache : public k3d_sds_cache_base

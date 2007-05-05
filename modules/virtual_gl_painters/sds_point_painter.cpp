@@ -56,7 +56,13 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("SDSPointPainter");
+				const k3d::factories_t factories = k3d::plugins("SDSVBOPointPainter");
+				if(1 == factories.size())
+					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
+			}
+			else
+			{
+				const k3d::factories_t factories = k3d::plugins("SDSGLPointPainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}

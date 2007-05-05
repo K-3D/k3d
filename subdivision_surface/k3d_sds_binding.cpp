@@ -316,10 +316,334 @@ bool k3d_cache_input::selected(size_t Face, int Recurse)
 }
 
 ////////
-// k3d_opengl_sds_cache
+// k3d_basic_opengl_sds_cache
 ////////
 
-k3d_opengl_sds_cache::~k3d_opengl_sds_cache()
+void k3d_basic_opengl_sds_cache::draw_faces(size_t Level, bool Selected)
+{
+	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+		return;
+	if (Level > m_levels)
+	{
+		k3d::log() << debug << "Setting level to " << Level << std::endl;
+		set_levels(Level);
+		set_input(m_first_level_cache_mesh);
+		update();
+	}
+	
+	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
+
+	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
+	const k3d::dev::mesh::selection_t& face_selection = *m_first_level_cache_mesh->polyhedra->face_selection;
+	
+	std::vector<position_t> points_array;
+	std::vector<position_t> normals_array;
+	std::vector<k3d::color> colors_array;
+	std::vector<GLuint> indices;
+	
+	size_t mipmap_start = 0;
+	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
+	{
+		face_vertex& f = *(face_vertex_iterator->second);
+		k3d::color color = face_selection[face_vertex_iterator->first] ? m_selected_color : m_unselected_color;
+		for(face_vertex::mipmaps_t::iterator mipmap = f.mipmaps.begin(); mipmap != f.mipmaps.end(); ++mipmap)
+		{
+			const point_array& points = (*mipmap)->points(Level-1);
+			const point_array& normals = (*mipmap)->normals(Level-1);
+			for(int i = 0; i < size; ++i)
+			{
+				for(int j = 0; j < size; ++j)
+				{
+					points_array.push_back(*(points[i][j]));
+					normals_array.push_back(*(normals[i][j]));
+					colors_array.push_back(color);
+				}
+			}
+			for(int i = 0; i < size-1; ++i)
+			{
+				for(int j = 0; j < size-1; ++j)
+				{
+					indices.push_back(static_cast<GLuint>(mipmap_start + i * size + j));
+					indices.push_back(static_cast<GLuint>(mipmap_start + i * size + (j + 1)));
+					indices.push_back(static_cast<GLuint>(mipmap_start + (i + 1) * size + (j + 1)));
+					indices.push_back(static_cast<GLuint>(mipmap_start + (i + 1) * size + j));
+				}
+			}
+			mipmap_start += size*size;
+		}
+	}
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	if (Selected)
+	{
+		glEnableClientState(GL_COLOR_ARRAY);
+		glColorPointer(3, GL_DOUBLE, 0, &colors_array[0]);
+	}
+	glVertexPointer(3, GL_DOUBLE, 0, &points_array[0]);
+	glNormalPointer(GL_DOUBLE, 0, &normals_array[0]);
+	glDrawElements(GL_QUADS, indices.size(), GL_UNSIGNED_INT, &indices[0]);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+}
+
+void k3d_basic_opengl_sds_cache::draw_borders(size_t Level, bool Selected)
+{
+	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+		return;
+	if (Level > m_levels)
+	{
+		k3d::log() << debug << "Setting level to " << Level << std::endl;
+		set_levels(Level);
+		set_input(m_first_level_cache_mesh);
+		update();
+	}
+	
+	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
+
+	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
+	const companions_t& companions = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->companions();
+	
+	const k3d::dev::mesh::selection_t& edge_selection = *m_first_level_cache_mesh->polyhedra->edge_selection;
+	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
+	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	
+	std::vector<position_t> points_array;
+	std::vector<k3d::color> colors_array;
+
+	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
+	{
+		face_vertex& f = *(face_vertex_iterator->second);
+		face_vertex::mipmaps_t::iterator next_mipmap = f.mipmaps.begin();
+		size_t face = face_vertex_iterator->first;
+		size_t edge = loop_first_edges[face_first_loops[face]];
+		for(face_vertex::mipmaps_t::iterator mipmap = f.mipmaps.begin(); mipmap != f.mipmaps.end(); ++mipmap)
+		{
+			const point_array& points = (*mipmap)->points(Level-1);
+			++next_mipmap;
+			const point_array& next_points = next_mipmap == f.mipmaps.end() ? (*f.mipmaps.begin())->points(Level-1) : (*next_mipmap)->points(Level-1);
+			for(int i = 0; i < size-1; ++i)
+			{
+				points_array.push_back(*(points[i][size-1]));
+				points_array.push_back(*(points[i+1][size-1]));
+				points_array.push_back(*(next_points[0][i]));
+				points_array.push_back(*(next_points[0][i+1]));
+				k3d::color color = edge_selection[edge] || edge_selection[companions[edge]] ? m_selected_color : m_unselected_color;
+				colors_array.push_back(color);
+				colors_array.push_back(color);
+				colors_array.push_back(color);
+				colors_array.push_back(color);
+			}
+			edge = clockwise_edges[edge];
+		}
+	}
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_DOUBLE, 0, &points_array[0]);
+	if (Selected)
+	{
+		glEnableClientState(GL_COLOR_ARRAY);
+		glColorPointer(3, GL_DOUBLE, 0, &colors_array[0]);
+	}
+	glDrawArrays(GL_LINES, 0, points_array.size());
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+}
+
+void k3d_basic_opengl_sds_cache::draw_corners(size_t Level, bool Selected)
+{
+	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+		return;
+	if (Level > m_levels)
+	{
+		k3d::log() << debug << "Setting level to " << Level << std::endl;
+		set_levels(Level);
+		set_input(m_first_level_cache_mesh);
+		update();
+	}
+	
+	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
+
+	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
+	
+	const k3d::dev::mesh::selection_t& point_selection = *m_first_level_cache_mesh->point_selection;
+	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
+	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	
+	std::vector<position_t> points_array;
+	std::vector<k3d::color> colors_array;
+	
+	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
+	{
+		face_vertex& f = *(face_vertex_iterator->second);
+		size_t face = face_vertex_iterator->first;
+		size_t edge = loop_first_edges[face_first_loops[face]];
+		for(face_vertex::mipmaps_t::iterator mipmap = f.mipmaps.begin(); mipmap != f.mipmaps.end(); ++mipmap)
+		{
+			const point_array& points = (*mipmap)->points(Level-1);
+			points_array.push_back(*(points[0][size-1]));
+			k3d::color color = point_selection[edge_points[edge]] ? m_selected_color : m_unselected_color;
+			colors_array.push_back(color);
+			edge = clockwise_edges[edge];
+		}
+	}
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_DOUBLE, 0, &points_array[0]);
+	if (Selected)
+	{
+		glEnableClientState(GL_COLOR_ARRAY);
+		glColorPointer(3, GL_DOUBLE, 0, &colors_array[0]);
+	}
+	glDrawArrays(GL_POINTS, 0, points_array.size());
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+}
+
+void k3d_basic_opengl_sds_cache::select_faces(size_t Level)
+{
+	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+		return;
+		
+	return_if_fail(Level <= m_levels);
+	
+	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
+
+	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
+	const k3d::dev::mesh::selection_t& face_selection = *m_first_level_cache_mesh->polyhedra->face_selection;
+	
+	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
+	{
+		face_vertex& f = *(face_vertex_iterator->second);	
+		std::vector<position_t> points_array;
+		std::vector<GLuint> indices;
+		size_t mipmap_start = 0;
+		for(face_vertex::mipmaps_t::iterator mipmap = f.mipmaps.begin(); mipmap != f.mipmaps.end(); ++mipmap)
+		{
+			const point_array& points = (*mipmap)->points(Level-1);
+			for(int i = 0; i < size; ++i)
+			{
+				for(int j = 0; j < size; ++j)
+				{
+					points_array.push_back(*(points[i][j]));
+				}
+			}
+			for(int i = 0; i < size-1; ++i)
+			{
+				for(int j = 0; j < size-1; ++j)
+				{
+					indices.push_back(static_cast<GLuint>(mipmap_start + i * size + j));
+					indices.push_back(static_cast<GLuint>(mipmap_start + i * size + (j + 1)));
+					indices.push_back(static_cast<GLuint>(mipmap_start + (i + 1) * size + (j + 1)));
+					indices.push_back(static_cast<GLuint>(mipmap_start + (i + 1) * size + j));
+				}
+			}
+			mipmap_start += size*size;
+		}
+		k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face_vertex_iterator->first);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_DOUBLE, 0, &points_array[0]);
+		glDrawElements(GL_QUADS, indices.size(), GL_UNSIGNED_INT, &indices[0]);
+		glDisableClientState(GL_VERTEX_ARRAY);
+		k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+	}
+}
+
+void k3d_basic_opengl_sds_cache::select_borders(size_t Level)
+{
+	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+		return;
+	
+	return_if_fail(Level <= m_levels);
+	
+	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
+
+	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
+	
+	const k3d::dev::mesh::selection_t& edge_selection = *m_first_level_cache_mesh->polyhedra->edge_selection;
+	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
+	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	
+	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
+	{
+		face_vertex& f = *(face_vertex_iterator->second);
+		face_vertex::mipmaps_t::iterator next_mipmap = f.mipmaps.begin();
+		size_t face = face_vertex_iterator->first;
+		size_t edge = loop_first_edges[face_first_loops[face]];
+		std::vector<position_t> points_array;
+		for(face_vertex::mipmaps_t::iterator mipmap = f.mipmaps.begin(); mipmap != f.mipmaps.end(); ++mipmap)
+		{
+			const point_array& points = (*mipmap)->points(Level-1);
+			++next_mipmap;
+			const point_array& next_points = next_mipmap == f.mipmaps.end() ? (*f.mipmaps.begin())->points(Level-1) : (*next_mipmap)->points(Level-1);
+			for(int i = 0; i < size-1; ++i)
+			{
+				points_array.push_back(*(points[i][size-1]));
+				points_array.push_back(*(points[i+1][size-1]));
+				points_array.push_back(*(next_points[0][i]));
+				points_array.push_back(*(next_points[0][i+1]));
+			}
+			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glVertexPointer(3, GL_DOUBLE, 0, &points_array[0]);
+			glDrawArrays(GL_LINES, 0, points_array.size());
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableClientState(GL_COLOR_ARRAY);
+			k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
+			edge = clockwise_edges[edge];
+		}
+	}
+}
+
+void k3d_basic_opengl_sds_cache::select_corners(size_t Level)
+{
+	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+		return;
+
+	return_if_fail(Level <= m_levels);
+	
+	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
+
+	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
+	
+	const k3d::dev::mesh::selection_t& point_selection = *m_first_level_cache_mesh->point_selection;
+	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
+	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	
+	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
+	{
+		face_vertex& f = *(face_vertex_iterator->second);
+		size_t face = face_vertex_iterator->first;
+		size_t edge = loop_first_edges[face_first_loops[face]];
+		for(face_vertex::mipmaps_t::iterator mipmap = f.mipmaps.begin(); mipmap != f.mipmaps.end(); ++mipmap)
+		{
+			const point_array& points = (*mipmap)->points(Level-1);
+			const position_t& position = (*(points[0][size-1]));
+			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, edge_points[edge]);
+			glBegin(GL_POINTS);
+			glVertex3d(position[0], position[1], position[2]);
+			glEnd();
+			k3d::gl::pop_selection_token(); // ABSOLUTE_POINT
+			edge = clockwise_edges[edge];
+		}
+	}
+}
+
+////////
+// k3d_vbo_sds_cache
+////////
+
+k3d_vbo_sds_cache::~k3d_vbo_sds_cache()
 {
 	for (size_t i = 0; i < m_point_vbos.size(); ++i)
 	{
@@ -332,7 +656,7 @@ k3d_opengl_sds_cache::~k3d_opengl_sds_cache()
 	}
 }
 
-void k3d_opengl_sds_cache::draw_faces(size_t Level, bool Selected)
+void k3d_vbo_sds_cache::draw_faces(size_t Level, bool Selected)
 {
 	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
@@ -380,7 +704,7 @@ void k3d_opengl_sds_cache::draw_faces(size_t Level, bool Selected)
 	glDrawElements(GL_QUADS, 4*m_n_faces[Level-2], GL_UNSIGNED_INT, static_cast<GLuint*>(0));
 }
 
-void k3d_opengl_sds_cache::draw_borders(size_t Level, bool Selected)
+void k3d_vbo_sds_cache::draw_borders(size_t Level, bool Selected)
 {
 	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
@@ -424,7 +748,7 @@ void k3d_opengl_sds_cache::draw_borders(size_t Level, bool Selected)
 	glDrawElements(GL_LINES, 2*m_n_edges[Level-2], GL_UNSIGNED_INT, static_cast<GLuint*>(0));
 }
 
-void k3d_opengl_sds_cache::draw_corners(size_t Level, bool Selected)
+void k3d_vbo_sds_cache::draw_corners(size_t Level, bool Selected)
 {
 	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
@@ -467,7 +791,7 @@ void k3d_opengl_sds_cache::draw_corners(size_t Level, bool Selected)
 	glDrawElements(GL_POINTS, m_n_corners[Level-2], GL_UNSIGNED_INT, static_cast<GLuint*>(0));
 }
 
-void k3d_opengl_sds_cache::select_faces(size_t Level)
+void k3d_vbo_sds_cache::select_faces(size_t Level)
 {
 	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
@@ -506,7 +830,7 @@ void k3d_opengl_sds_cache::select_faces(size_t Level)
 	}
 }
 
-void k3d_opengl_sds_cache::select_borders(size_t Level)
+void k3d_vbo_sds_cache::select_borders(size_t Level)
 {
 	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
@@ -545,7 +869,7 @@ void k3d_opengl_sds_cache::select_borders(size_t Level)
 	}
 }
 
-void k3d_opengl_sds_cache::select_corners(size_t Level)
+void k3d_vbo_sds_cache::select_corners(size_t Level)
 {
 	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
@@ -590,7 +914,7 @@ void k3d_opengl_sds_cache::select_corners(size_t Level)
 	}
 }
 
-void k3d_opengl_sds_cache::update_selection()
+void k3d_vbo_sds_cache::update_selection()
 {
 	if (m_update_selection) // make sure the modified faces are only cleared once
 		return;
@@ -601,7 +925,7 @@ void k3d_opengl_sds_cache::update_selection()
 		modified_faces.clear();
 }
 
-void k3d_opengl_sds_cache::do_selection_update()
+void k3d_vbo_sds_cache::do_selection_update()
 {
 	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh) || !m_update_selection)
 		return;
@@ -619,7 +943,7 @@ void k3d_opengl_sds_cache::do_selection_update()
 	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
 	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
 	
-	k3d::color selected_color(1.0,0.0,0.0); // TODO make user-defined
+	const k3d::color& selected_color = m_selected_color;
 	
 	if (m_selected_corners.size() != m_levels-1)
 	{
@@ -680,6 +1004,8 @@ void k3d_opengl_sds_cache::do_selection_update()
 		glBindBuffer(GL_ARRAY_BUFFER, m_edge_color_vbos[i]);
 		k3d::color* point_colors = static_cast<k3d::color*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 		
+		const companions_t& companions = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->companions();
+		
 		// color last selection to unselected color
 		for (size_t point = 0; point != m_selected_edges[i].size(); ++point)
 		{
@@ -695,18 +1021,18 @@ void k3d_opengl_sds_cache::do_selection_update()
 			for(size_t edge = first_edge; ; )
 			{
 				size_t next_mipmap_start = clockwise_edges[edge] == first_edge ? m_face_indices[i][face] : mipmap_start + size*size;
-				if (edge_selection[edge])
+				if (edge_selection[edge] || edge_selection[companions[edge]])
 				{
 					// points at the corner are shared between patch borders, so we only color interior points.
 					// This results in a faded look at the selected edge endpoints 
 					for(int j = 1; j < size; ++j)
 					{
-						point_colors[mipmap_start + (size-1) + size * j] = k3d::color(1.0,0.0,0.0);
+						point_colors[mipmap_start + (size-1) + size * j] = m_selected_color;
 						m_selected_edges[i].push_back(mipmap_start + (size-1) + size * j);
 					}
 					for(int j = 0; j < size-1; ++j)
 					{
-						point_colors[next_mipmap_start + j] = k3d::color(1.0,0.0,0.0);
+						point_colors[next_mipmap_start + j] = m_selected_color;
 						m_selected_edges[i].push_back(next_mipmap_start + j);
 					}
 				}
@@ -731,7 +1057,7 @@ void k3d_opengl_sds_cache::do_selection_update()
 		// color last selection to unselected color
 		for (size_t point = 0; point != m_selected_faces[i].size(); ++point)
 		{
-			point_colors[m_selected_faces[i][point]] = color4d(m_unselected_color.red-0.2, m_unselected_color.green-0.2, m_unselected_color.blue-0.2);
+			point_colors[m_selected_faces[i][point]] = color4d(m_unselected_color.red, m_unselected_color.green, m_unselected_color.blue);
 		}
 		m_selected_faces[i].clear();
 		
@@ -748,7 +1074,7 @@ void k3d_opengl_sds_cache::do_selection_update()
 					{
 						for(int k = 0; k < size; ++k)
 						{
-							point_colors[mipmap_start + j * size + k] = color4d(1.0,0.0,0.0);
+							point_colors[mipmap_start + j * size + k] = color4d(m_selected_color.red, m_selected_color.green, m_selected_color.blue);
 							m_selected_faces[i].push_back(mipmap_start + j * size + k);
 						}
 					}
@@ -765,16 +1091,16 @@ void k3d_opengl_sds_cache::do_selection_update()
 	}
 }
 
-void k3d_opengl_sds_cache::client_output( k3d::dev::mesh * Output )
+void k3d_vbo_sds_cache::client_output( k3d::dev::mesh * Output )
 {
 	draw_faces(m_levels, false);
 }
 
-void k3d_opengl_sds_cache::client_output_nurbs( k3d::dev::mesh * Output )
+void k3d_vbo_sds_cache::client_output_nurbs( k3d::dev::mesh * Output )
 {
 }
 
-void k3d_opengl_sds_cache::regenerate_vbos()
+void k3d_vbo_sds_cache::regenerate_vbos()
 {
 	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
@@ -853,16 +1179,10 @@ void k3d_opengl_sds_cache::regenerate_vbos()
 		glBufferData(GL_ARRAY_BUFFER, m_n_points[i] * sizeof(position_t), 0, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, m_normals_vbos[i]);
 		glBufferData(GL_ARRAY_BUFFER, m_n_points[i] * sizeof(position_t), 0, GL_STATIC_DRAW);
-		
-		std::vector<k3d::color> default_colors(m_n_points[i], m_unselected_color);
+
 		glGenBuffers(1, &m_corner_color_vbos[i]);
-		glBindBuffer(GL_ARRAY_BUFFER, m_corner_color_vbos[i]);
-		glBufferData(GL_ARRAY_BUFFER, m_n_points[i] * sizeof(k3d::color), &default_colors[0], GL_STATIC_DRAW);
-		
-		std::vector<color4d> default_colors4d(m_n_points[i], color4d(m_unselected_color.red-0.2, m_unselected_color.green-0.2, m_unselected_color.blue-0.2));
+		glGenBuffers(1, &m_edge_color_vbos[i]);
 		glGenBuffers(1, &m_face_color_vbos[i]);
-		glBindBuffer(GL_ARRAY_BUFFER, m_face_color_vbos[i]);
-		glBufferData(GL_ARRAY_BUFFER, m_n_points[i] * sizeof(color4d), &default_colors4d[0], GL_STATIC_DRAW);
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_face_vbos[i]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * m_n_faces[i] * sizeof(GLuint), 0, GL_STATIC_DRAW);
@@ -923,10 +1243,6 @@ void k3d_opengl_sds_cache::regenerate_vbos()
 		}
 		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 		
-		glGenBuffers(1, &m_edge_color_vbos[i]);
-		glBindBuffer(GL_ARRAY_BUFFER, m_edge_color_vbos[i]);
-		glBufferData(GL_ARRAY_BUFFER, m_n_points[i] * sizeof(k3d::color), &default_colors[0], GL_STATIC_DRAW);
-		
 		// Fill the corner index VBO
 		glGenBuffers(1, &m_corner_vbos[i]);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_corner_vbos[i]);
@@ -947,14 +1263,34 @@ void k3d_opengl_sds_cache::regenerate_vbos()
 		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 	}
 	
+	init_color_vbos();
+	
 	update_selection();
 	update_positions();
 	
 	k3d::log() << debug << "SDS: regenerate_vbos for " << modified_faces.size() << " faces took " << timer.elapsed() << "s" << std::endl;
-	
 }
 
-void k3d_opengl_sds_cache::validate(k3d::iunknown* Hint)
+void k3d_vbo_sds_cache::init_color_vbos()
+{
+	for (size_t level = 2; level <= m_levels; ++level)
+	{
+		size_t i = level - 2;
+		size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(level-1)))+1;
+		
+		std::vector<k3d::color> default_colors(m_n_points[i], m_unselected_color);
+		glBindBuffer(GL_ARRAY_BUFFER, m_corner_color_vbos[i]);
+		glBufferData(GL_ARRAY_BUFFER, m_n_points[i] * sizeof(k3d::color), &default_colors[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, m_edge_color_vbos[i]);
+		glBufferData(GL_ARRAY_BUFFER, m_n_points[i] * sizeof(k3d::color), &default_colors[0], GL_STATIC_DRAW);
+		
+		std::vector<color4d> default_colors4d(m_n_points[i], color4d(m_unselected_color.red, m_unselected_color.green, m_unselected_color.blue));
+		glBindBuffer(GL_ARRAY_BUFFER, m_face_color_vbos[i]);
+		glBufferData(GL_ARRAY_BUFFER, m_n_points[i] * sizeof(color4d), &default_colors4d[0], GL_STATIC_DRAW);
+	}
+}
+
+void k3d_vbo_sds_cache::validate(k3d::iunknown* Hint)
 {
 	bool validated = false;
 	if (m_first_level_cache)
@@ -964,7 +1300,7 @@ void k3d_opengl_sds_cache::validate(k3d::iunknown* Hint)
 		m_validated_hint = false;
 }
 
-void k3d_opengl_sds_cache::update_positions()
+void k3d_vbo_sds_cache::update_positions()
 {
 	if (!dynamic_cast<k3d_cache_input*>(m_first_level_cache)->updated() || (dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_modified_faces()).empty())
 		return; // nothing changed since last update
@@ -1021,6 +1357,18 @@ void k3d_opengl_sds_cache::update_positions()
 			}
 		}
 		glUnmapBuffer(GL_ARRAY_BUFFER);
+	}
+}
+
+void k3d_vbo_sds_cache::set_colors(const k3d::color Unselected, const k3d::color Selected)
+{
+	if (Unselected != m_unselected_color || Selected != m_selected_color)
+	{
+		k3d::log() << debug << "SDS: Colors changed" << std::endl;
+		k3d_opengl_sds_cache::set_colors(Unselected, Selected);
+		regenerate_vbos();
+		init_color_vbos();
+		update_selection();
 	}
 }
 
