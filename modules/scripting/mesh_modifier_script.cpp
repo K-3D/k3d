@@ -32,8 +32,8 @@
 import k3d\n\n\
 Output.copy(Input)\n\n\
 scale = 1.5\n\n\
-input_points = Input.points\n\
-output_points = Output.writable_points\n\n\
+input_points = Input.points()\n\
+output_points = Output.writable_points()\n\n\
 for i in range(len(output_points)):\n\
 		output_points[i] = input_points[i] * scale\n\n"
 
