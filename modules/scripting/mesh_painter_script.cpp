@@ -33,13 +33,15 @@
 
 #define DEFAULT_SCRIPT "#python\n\n\
 from OpenGL.GL import *\n\n\
+glPushAttrib(GL_ALL_ATTRIB_BITS)\n\
 glDisable(GL_LIGHTING)\n\
 glPointSize(5)\n\
 glColor3d(0, 0, 1)\n\n\
 glBegin(GL_POINTS)\n\
-for point in Mesh.points:\n\
+for point in Mesh.points():\n\
 	glVertex3d(point[0], point[1], point[2])\n\
-glEnd()\n\n"
+glEnd()\n\n\
+glPopAttrib()\n\n"
 
 namespace libk3dscripting
 {
@@ -103,7 +105,7 @@ public:
 			"MeshPainterScript",
 			_("Scripted Mesh Painter"),
 			"OpenGL Painters Scripting",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

@@ -94,7 +94,7 @@ public:
 			"MeshModifierScript",
 			_("Mesh modifier that uses a script to modify geometry"),
 			"Mesh Scripting",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

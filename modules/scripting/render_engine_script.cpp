@@ -75,7 +75,7 @@ public:
 			"RenderEngineScript",
 			_("Script node that acts as a render engine"),
 			"Scripting",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

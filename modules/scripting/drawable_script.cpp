@@ -96,7 +96,7 @@ public:
 			"DrawableScript",
 			_("Scripted OpenGL Drawable"),
 			"OpenGL Scripting",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
