@@ -37,7 +37,7 @@ const resolutions_t& resolutions()
 	{
 		try
 		{
-			const filesystem::path path = share_path() / filesystem::generic_path("aspect_ratios.k3d");
+			const filesystem::path path = share_path() / filesystem::generic_path("resolutions.k3d");
 			filesystem::ifstream stream(path);
 
 			k3d::xml::element xml("k3dml");
@@ -74,18 +74,18 @@ const ienumeration_property::enumeration_values_t& resolution_values()
 {
 	static ienumeration_property::enumeration_values_t values;
 	if(values.empty())
+	{
+		values.push_back(ienumeration_property::enumeration_value_t("<Custom>", "", "Custom resolution"));
+		const resolutions_t& resolutions = k3d::resolutions();
+		for(resolutions_t::const_iterator resolution = resolutions.begin(); resolution != resolutions.end(); ++resolution)
 		{
-			values.push_back(ienumeration_property::enumeration_value_t("<Custom>", "", "Custom resolution"));
-			const resolutions_t& resolutions = k3d::resolutions();
-			for(resolutions_t::const_iterator resolution = resolutions.begin(); resolution != resolutions.end(); ++resolution)
-				{
-					const double ratio = static_cast<double>(resolution->width) / static_cast<double>(resolution->height);
-					const std::string label = string_cast(boost::format("%1% (%2%:1)") % resolution->name % ratio);
-					const std::string value = resolution->name;
-					const std::string description = resolution->description;
-					values.push_back(ienumeration_property::enumeration_value_t(label, value, description));
-				}
+			const double ratio = static_cast<double>(resolution->width) / static_cast<double>(resolution->height);
+			const std::string label = string_cast(boost::format("%1% (%2%:1)") % resolution->name % ratio);
+			const std::string value = resolution->name;
+			const std::string description = resolution->description;
+			values.push_back(ienumeration_property::enumeration_value_t(label, value, description));
 		}
+	}
 
 	return values;
 }

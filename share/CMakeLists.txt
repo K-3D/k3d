@@ -1,4 +1,7 @@
-INSTALL(FILES aspect_ratios.k3d DESTINATION share/k3d)
+INSTALL(FILES
+	aspect_ratios.k3d
+	resolutions.k3d
+	DESTINATION share/k3d)
 
 ADD_SUBDIRECTORY(documents)
 ADD_SUBDIRECTORY(fonts)

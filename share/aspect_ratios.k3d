@@ -11,47 +11,6 @@
 			<aspectratio name="Anamorphic Squeezed" description="" value="1.18"/>
 			<aspectratio name="Anamorphic Unsqueezed" description="" value="2.35"/>
 		</aspectratios>
-		
-		<resolutions>
-			<resolution name="320x240" description="" width="320" height="240"/>
-			<resolution name="480x360" description="" width="480" height="360"/>
-			<resolution name="640x480" description="" width="640" height="480"/>
-			<resolution name="800x600" description="" width="800" height="600"/>
-			<resolution name="1024x768" description="" width="1024" height="768"/>
-			<resolution name="1280x960" description="" width="1280" height="960"/>
-			<resolution name="1600x1200" description="" width="1600" height="1200"/>
-	
-			<resolution name="32x32" description="" width="32" height="32"/>
-			<resolution name="64x64" description="" width="64" height="64"/>
-			<resolution name="128x128" description="" width="128" height="128"/>
-			<resolution name="256x256" description="" width="256" height="256"/>
-			<resolution name="512x512" description="" width="512" height="512"/>
-			<resolution name="1024x1024" description="" width="1024" height="1024"/>
-	
-			<resolution name="Full Camera Aperture (1K)" description="" width="1024" height="768"/>
-			<resolution name="Full Camera Aperture (2K)" description="" width="2048" height="1536"/>
-			<resolution name="Full Camera Aperture (4K)" description="" width="4096" height="3072"/>
-
-			<resolution name="Academy Full Frame (1K)" description="" width="914" height="666"/>
-			<resolution name="Academy Full Frame (2K)" description="" width="1828" height="1332"/>
-			<resolution name="Academy Full Frame (4K)" description="" width="3656" height="2664"/>
-
-			<resolution name="Academy Projection 1.66 (1K)" description="" width="914" height="550"/>
-			<resolution name="Academy Projection 1.66 (2K)" description="" width="1828" height="1102"/>
-			<resolution name="Academy Projection 1.66 (4K)" description="" width="3656" height="2202"/>
-
-			<resolution name="Academy Projection 1.85 (1K)" description="" width="914" height="494"/>
-			<resolution name="Academy Projection 1.85 (2K)" description="" width="1828" height="988"/>
-			<resolution name="Academy Projection 1.85 (4K)" description="" width="3656" height="1976"/>
-
-			<resolution name="Anamorphic Squeezed (1K)" description="" width="914" height="774"/>
-			<resolution name="Anamorphic Squeezed (2K)" description="" width="1828" height="1550"/>
-			<resolution name="Anamorphic Squeezed (4K)" description="" width="3656" height="3098"/>
-			
-			<resolution name="Anamorphic Unsqueezed (1K)" description="" width="914" height="388"/>
-			<resolution name="Anamorphic Unsqueezed (2K)" description="" width="1828" height="778"/>
-			<resolution name="Anamorphic Unsqueezed (4K)" description="" width="3656" height="1556"/>
-		</resolutions>
 	</application>
 </k3dml>
 
