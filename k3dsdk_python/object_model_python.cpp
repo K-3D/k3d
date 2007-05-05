@@ -30,6 +30,7 @@
 #include "icommand_node_python.h"
 #include "idocument_python.h"
 #include "imaterial_python.h"
+#include "imesh_storage_python.h"
 #include "inode_python.h"
 #include "iplugin_factory_python.h"
 #include "iproperty_python.h"
@@ -315,6 +316,7 @@ BOOST_PYTHON_MODULE(k3d)
 	export_icommand_node();
 	export_idocument();
 	export_imaterial();
+	imesh_storage::define_class();
 	export_inode();
 	export_iplugin_factory();
 	export_iproperty();

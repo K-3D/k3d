@@ -1,44 +1,52 @@
 #python
 
+import k3d
+
 doc = Document
 doc.start_change_set()
 try:
 	material = doc.new_node("RenderManMaterial")
 	material.name = "Patch Material"
-	material.color = (1, 1, 1)
+	material.color = k3d.color(1, 1, 1)
 
 	frozen_mesh = doc.new_node("FrozenMesh")
 	frozen_mesh.name = "Bicubic Patch"
 
-	mesh = frozen_mesh.new_mesh()
+	mesh = frozen_mesh.dynamic_cast("imesh_storage").new_mesh()
 
-	points = (
+	positions = [
 		(-5, -5, 0), (-2, -5, 2), (2, -5, -2), (5, -5, 0),
 		(-5, -2, 2), (-2, -2, 5), (2, -2, -5), (5, -2, -2),
 		(-5, 2, 2), (-2, 2, 5), (2, 2, -5), (5, 2, -2),
 		(-5, 5, 0), (-2, 5, 2), (2, 5, -2), (5, 5, 0)
-		)
+		]
 
-	for position in points:
-		mesh.new_point((position[0], position[2], -position[1]))
+	points = mesh.create_points()
+	point_selection = mesh.create_point_selection()
 
-	patch = mesh.new_bicubic_patch()
-	patch.material = material
+	for position in positions:
+		points.append(k3d.point3(position[0], position[2], -position[1]))
+
+	bicubic_patches = mesh.create_bicubic_patches()
+
+	patch_selection = bicubic_patches.create_patch_selection()
+	patch_selection.append(0)
+
+	patch_materials = bicubic_patches.create_patch_materials()
+	patch_materials.append(material.dynamic_cast("imaterial"))
+
+	patch_points = bicubic_patches.create_patch_points()
 	for i in range(16):
-		patch.control_points[i] = mesh.points[i]
+		patch_points.append(i)
 
-#	patch.uniform_data.set_color("Cs", (1, 0, 0))
-#	mesh.points[0].vertex_data.set_color("Cs", (1, 0, 0))
-#	mesh.points[1].vertex_data.set_color("Cs", (0, 1, 0))
-#	mesh.points[2].vertex_data.set_color("Cs", (0, 0, 1))
-#	mesh.points[3].vertex_data.set_color("Cs", (1, 1, 1))
-	patch.varying_data[0].set_color("Cs", (1, 0, 0))
-	patch.varying_data[1].set_color("Cs", (0, 1, 0))
-	patch.varying_data[2].set_color("Cs", (0, 0, 1))
-	patch.varying_data[3].set_color("Cs", (1, 1, 1))
+	Cs = bicubic_patches.writable_varying_data().create_array("Cs", "k3d::color")
+	Cs.assign([k3d.color(1, 0, 0), k3d.color(0, 1, 0), k3d.color(0, 0, 1), k3d.color(1, 1, 1)])
 
 	mesh_instance = doc.new_node("MeshInstance")
 	mesh_instance.name = "Bicubic Patch Instance"
+	mesh_instance.gl_painter = doc.get_node("GL Default Painter")
+	mesh_instance.ri_painter = doc.get_node("RenderMan Default Painter")
+
 	doc.set_dependency(mesh_instance.get_property("input_mesh"), frozen_mesh.get_property("output_mesh"))
 
 	doc.finish_change_set("Create Bicubic Patch")

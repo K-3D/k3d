@@ -24,11 +24,13 @@
 #include "dynamic_cast_python.h"
 #include "icommand_node_python.h"
 #include "imaterial_python.h"
+#include "imesh_storage_python.h"
 #include "inode_python.h"
 #include "iproperty_collection_python.h"
 
 #include <k3dsdk/icommand_node.h>
 #include <k3dsdk/imaterial.h>
+#include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iproperty_collection.h>
 
@@ -61,6 +63,8 @@ object do_dynamic_cast(k3d::iunknown* const Source, const std::string& Type)
 		return detail::do_dynamic_cast<k3d::icommand_node, k3d::python::icommand_node>(Source);
 	if(Type == "imaterial")
 		return detail::do_dynamic_cast<k3d::imaterial, k3d::python::imaterial>(Source);
+	if(Type == "imesh_storage")
+		return detail::do_dynamic_cast<k3d::imesh_storage, k3d::python::imesh_storage>(Source);
 	if(Type == "inode")
 		return detail::do_dynamic_cast<k3d::inode, k3d::python::inode>(Source);
 	if(Type == "iproperty_collection")
