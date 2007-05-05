@@ -4,6 +4,8 @@ from OpenGL.GL import *
 
 points = Mesh.points()
 if points:
+	glPushAttrib(GL_ALL_ATTRIB_BITS)
+
 	glDisable(GL_LIGHTING)
 
 	glPointSize(1)
@@ -31,3 +33,4 @@ if points:
 		glVertex3d(point[0], point[1], point[2])
 	glEnd()
 
+	glPopAttrib()
