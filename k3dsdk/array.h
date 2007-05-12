@@ -37,6 +37,10 @@ public:
 	virtual array* clone() const = 0;
 	/// Returns a copy of a half-open range of the original array (virtual ctor)
 	virtual array* clone(size_t Begin, size_t End) const = 0;
+	/// Returns the size of the array
+	virtual const size_t size() const = 0;
+	/// Returns true iff the array is empty
+	virtual const bool empty() const = 0;
 };
 
 /// Strongly-typed dynamic array of objects, based on std::vector
@@ -45,7 +49,8 @@ class typed_array :
 	public std::vector<T>,
 	public array
 {
-    typedef typed_array<T> this_type;
+	typedef std::vector<T> base_type;
+	typedef typed_array<T> this_type;
 
 public:
 	typedef typename std::vector<T>::size_type size_type;
@@ -89,6 +94,16 @@ public:
 	array* clone(size_t Begin, size_t End) const
 	{
 	    return new this_type(this->begin() + Begin, this->begin() + End);
+	}
+
+	const size_t size() const
+	{
+		return base_type::size();
+	}
+
+	const bool empty() const
+	{
+		return base_type::empty();
 	}
 };
 
