@@ -58,6 +58,7 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_read_format.h>
 #include <k3dsdk/inode.h>
+#include <k3dsdk/mesh_diff.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/new_mesh.h>
 #include <k3dsdk/plugins.h>
@@ -300,6 +301,21 @@ idocument module_open_document(const std::string& Path)
 	return idocument(document);
 }
 
+const std::string module_print_diff(const object& A, const object& B)
+{
+	extract<mesh> a(A);
+	extract<mesh> b(B);
+	if(a.check() && b.check())
+	{
+		std::ostringstream buffer;
+		k3d::dev::print_diff(buffer, a().wrapped(), b().wrapped());
+
+		return buffer.str();
+	}
+
+	throw std::invalid_argument("cannot diff given objects");
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // k3d module
 
@@ -344,6 +360,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
 	def("deselect_all", k3d::mesh_selection::deselect_all,
 		"Returns a L{mesh_selection} that explicitly deselects every component.");
+	def("print_diff", module_print_diff,
+		"Returns the difference of two L{mesh} objects as a string.");
 	def("euler_angles", euler_angles_init); // Special-case the euler_angles ctor to handle the degrees-to-radians conversion
 	def("execute_script", module_execute_script,
 		"Executes a script (which does not have to be written in Python).");
