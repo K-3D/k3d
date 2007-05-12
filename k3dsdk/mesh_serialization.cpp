@@ -47,11 +47,18 @@ namespace detail
 template<typename array_type>
 void save_array(element& Container, element Storage, const array_type& Array, const ipersistent::save_context& Context)
 {
-	if(!Array.size())
+	if(Array.empty())
 		return;
 
+	typename array_type::const_iterator item = Array.begin();
+	const typename array_type::const_iterator end = Array.end();
+
 	std::ostringstream buffer;
-	std::copy(Array.begin(), Array.end(), std::ostream_iterator<typename array_type::value_type>(buffer, " "));
+
+	buffer << *item++;
+	for(; item != end; ++item)
+		buffer << " " << *item;
+
 	Storage.text = buffer.str();
 	Container.append(Storage);
 }
@@ -61,12 +68,20 @@ void save_array(element& Container, element Storage, const array_type& Array, co
 
 void save_array(element& Container, element Storage, const typed_array<imaterial*>& Array, const ipersistent::save_context& Context)
 {
-	if(!Array.size())
+	typedef typed_array<imaterial*> array_type;
+
+	if(Array.empty())
 		return;
 
+	array_type::const_iterator item = Array.begin();
+	const array_type::const_iterator end = Array.end();
+
 	std::ostringstream buffer;
-	for(typed_array<imaterial*>::const_iterator value = Array.begin(); value != Array.end(); ++value)
-		buffer << Context.lookup.lookup_id(*value) << " ";
+
+	buffer << Context.lookup.lookup_id(*item);
+	for(; item != end; ++item)
+		buffer << " " << Context.lookup.lookup_id(*item);
+
 	Storage.text = buffer.str();
 	Container.append(Storage);
 }
@@ -145,10 +160,18 @@ void save_arrays(element& Container, element Storage, const dev::mesh::named_arr
 template<typename array_type>
 void load_array(const element& Storage, array_type& Array, const ipersistent::load_context& Context)
 {
-	typedef std::istream_iterator<typename array_type::value_type> input_iterator;
+	typename array_type::value_type value;
 
 	std::istringstream buffer(Storage.text);
-	std::copy(input_iterator(buffer), input_iterator(), std::back_inserter(Array));
+	while(true)
+	{
+		buffer >> value;
+
+		if(!buffer)
+			break;
+
+		Array.push_back(value);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -553,402 +576,6 @@ void load_mesh(dev::mesh& Mesh, element& Container, const ipersistent::load_cont
 		detail::load_arrays(*container, "face_varying_data", polyhedra->face_varying_data, Context);
 	}
 }
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-// load_mesh
-
-void load_mesh(legacy::mesh& Mesh, element& XML, const ipersistent::load_context& Context)
-{
-	// Load points ...
-	if(element* const xml_points = find_element(XML, "points"))
-	{
-		for(element::elements_t::const_iterator xml_point = xml_points->children.begin(); xml_point != xml_points->children.end(); ++xml_point)
-		{
-			if(xml_point->name != "point")
-				continue;
-
-			Mesh.points.push_back(new legacy::point(attribute_value<point3>(*xml_point, "position", point3(0, 0, 0))));
-			detail::load_parameters(*xml_point, ri::VERTEX, Mesh.points.back()->vertex_data);
-			detail::load_tags(*xml_point, Mesh.points.back()->tags);
-		}
-	}
-
-	// Load point groups ...
-	if(element* const xml_point_groups = find_element(XML, "pointgroups"))
-	{
-		for(element::elements_t::iterator xml_group = xml_point_groups->children.begin(); xml_group != xml_point_groups->children.end(); ++xml_group)
-		{
-			if(xml_group->name != "group")
-				continue;
-
-			legacy::point_group* const group = new legacy::point_group();
-			group->material = dynamic_cast<imaterial*>(Context.lookup.lookup_object(attribute_value<ipersistent_lookup::id_type>(*xml_group, "material", 0)));
-			Mesh.point_groups.push_back(group);
-
-			element* const xml_points = find_element(*xml_group, "points");
-			if(xml_points)
-			{
-				std::istringstream points_buffer(xml_points->text);
-				for(std::istream_iterator<unsigned long> point(points_buffer); point != std::istream_iterator<unsigned long>(); ++point)
-				{
-					const unsigned long point_index = *point - 1;
-					return_if_fail(point_index < Mesh.points.size());
-					group->points.push_back(Mesh.points[point_index]);
-				}
-			}
-
-			detail::load_parameters(*xml_group, ri::CONSTANT, group->constant_data);
-		}
-	}
-
-	// Load polyhedra ...
-	if(element* const xml_polyhedra = find_element(XML, "polyhedra"))
-	{
-		for(element::elements_t::iterator xml_polyhedron = xml_polyhedra->children.begin(); xml_polyhedron != xml_polyhedra->children.end(); ++xml_polyhedron)
-		{
-			if(xml_polyhedron->name != "polyhedron")
-				continue;
-
-			k3d::legacy::polyhedron* const polyhedron = new k3d::legacy::polyhedron();
-
-			polyhedron->type = attribute_value(*xml_polyhedron, "type", legacy::polyhedron::POLYGONS);
-			Mesh.polyhedra.push_back(polyhedron);
-
-			detail::load_tags(*xml_polyhedron, polyhedron->tags);
-
-			// Load edges ...
-			typedef std::vector<legacy::split_edge*> edges_t;
-			edges_t edges;
-			if(element* const xml_edges = find_element(*xml_polyhedron, "edges"))
-			{
-				//const unsigned long edge_count = std::count_if(xml_edges->children.begin(), xml_edges->children.end(), same_name("edge"));
-				// Above statement often crashes, count eges the old fashioned way
-				unsigned long edge_count = 0;
-				for(xml::element::elements_t::const_iterator xe = xml_edges->children.begin(); xe != xml_edges->children.end(); ++xe)
-				{
-					if((*xe).name == "edge")
-						++edge_count;
-				}
-
-				edges.resize(edge_count);
-				for(edges_t::iterator edge = edges.begin(); edge != edges.end(); ++edge)
-					*edge = new legacy::split_edge(0, 0, 0);
-
-				edges_t::iterator edge = edges.begin();
-				for(element::elements_t::iterator xml_edge = xml_edges->children.begin(); xml_edge != xml_edges->children.end(); ++xml_edge)
-				{
-					if(xml_edge->name != "edge")
-						continue;
-
-					unsigned long vertex_index = attribute_value<unsigned long>(*xml_edge, "vertex", 0);
-					return_if_fail(vertex_index <= Mesh.points.size());
-
-					unsigned long face_clockwise_index = attribute_value<unsigned long>(*xml_edge, "faceclockwise", 0);
-					return_if_fail(face_clockwise_index <= edges.size());
-
-					unsigned long companion_index = attribute_value<unsigned long>(*xml_edge, "companion", 0);
-					return_if_fail(companion_index <= edges.size());
-
-					if(vertex_index)
-						(*edge)->vertex = Mesh.points[vertex_index-1];
-
-					if(face_clockwise_index)
-						(*edge)->face_clockwise = edges[face_clockwise_index-1];
-
-					if(companion_index)
-						(*edge)->companion = edges[companion_index-1];
-
-					detail::load_parameters(*xml_edge, ri::FACEVARYING, (*edge)->facevarying_data);
-					detail::load_tags(*xml_edge, (*edge)->tags);
-
-					++edge;
-				}
-			}
-
-			// Load faces ...
-			if(element* const xml_faces = find_element(*xml_polyhedron, "faces"))
-			{
-				for(element::elements_t::iterator xml_face = xml_faces->children.begin(); xml_face != xml_faces->children.end(); ++xml_face)
-				{
-					if(xml_face->name != "face")
-						continue;
-
-					unsigned long first_edge_index = attribute_value<unsigned long>(*xml_face, "firstedge", 0);
-					return_if_fail(first_edge_index);
-					return_if_fail(first_edge_index <= edges.size());
-
-					k3d::legacy::face* const face = new k3d::legacy::face(
-						first_edge_index ? edges[first_edge_index-1] : 0,
-						dynamic_cast<imaterial*>(Context.lookup.lookup_object(attribute_value<ipersistent_lookup::id_type>(*xml_face, "material", 0))));
-					polyhedron->faces.push_back(face);
-
-					detail::load_parameters(*xml_face, ri::UNIFORM, face->uniform_data);
-					detail::load_tags(*xml_face, face->tags);
-
-					if(element* const xml_holes = find_element(*xml_face, "holes"))
-					{
-						for(element::elements_t::iterator xml_hole = xml_holes->children.begin(); xml_hole != xml_holes->children.end(); ++xml_hole)
-						{
-							if(xml_hole->name != "hole")
-								continue;
-
-							unsigned long first_edge_index = attribute_value<unsigned long>(*xml_hole, "firstedge", 0);
-							return_if_fail(first_edge_index);
-							return_if_fail(first_edge_index <= edges.size());
-
-							face->holes.push_back(first_edge_index ? edges[first_edge_index-1] : 0);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// Load linear curve groups ...
-	if(element* const xml_linear_curve_groups = find_element(XML, "linearcurvegroups"))
-	{
-		for(element::elements_t::iterator xml_group = xml_linear_curve_groups->children.begin(); xml_group != xml_linear_curve_groups->children.end(); ++xml_group)
-		{
-			if(xml_group->name != "group")
-				continue;
-
-			legacy::linear_curve_group* const group = new legacy::linear_curve_group();
-			group->wrap = attribute_value<bool>(*xml_group, "wrap", false);
-			group->material = dynamic_cast<imaterial*>(Context.lookup.lookup_object(attribute_value<ipersistent_lookup::id_type>(*xml_group, "material", 0)));
-			detail::load_parameters(*xml_group, ri::CONSTANT, group->constant_data);
-			Mesh.linear_curve_groups.push_back(group);
-
-			element* const xml_curves = find_element(*xml_group, "curves");
-			if(!xml_curves)
-				continue;
-
-			for(element::elements_t::iterator xml_curve = xml_curves->children.begin(); xml_curve != xml_curves->children.end(); ++xml_curve)
-			{
-				if(xml_curve->name != "curve")
-					continue;
-
-				legacy::linear_curve* const curve = new legacy::linear_curve();
-				detail::load_parameters(*xml_curve, ri::UNIFORM, curve->uniform_data);
-				group->curves.push_back(curve);
-
-				element* const xml_control_points = find_element(*xml_curve, "controlpoints");
-				if(!xml_control_points)
-					continue;
-
-				std::istringstream points_buffer(xml_control_points->text);
-				for(std::istream_iterator<unsigned long> control_point(points_buffer); control_point != std::istream_iterator<unsigned long>(); ++control_point)
-				{
-					const unsigned long control_point_index = *control_point - 1;
-					return_if_fail(control_point_index < Mesh.points.size());
-					curve->control_points.push_back(Mesh.points[control_point_index]);
-				}
-				detail::load_varying_parameters(*xml_curve, curve->varying_data, varying_count(*curve, group->wrap));
-			}
-		}
-	}
-
-	// Load cubic curve groups ...
-	if(element* const xml_cubic_curve_groups = find_element(XML, "cubiccurvegroups"))
-	{
-		for(element::elements_t::iterator xml_group = xml_cubic_curve_groups->children.begin(); xml_group != xml_cubic_curve_groups->children.end(); ++xml_group)
-		{
-			if(xml_group->name != "group")
-				continue;
-
-			legacy::cubic_curve_group* const group = new legacy::cubic_curve_group();
-			group->wrap = attribute_value<bool>(*xml_group, "wrap", false);
-			group->material = dynamic_cast<imaterial*>(Context.lookup.lookup_object(attribute_value<ipersistent_lookup::id_type>(*xml_group, "material", 0)));
-			detail::load_parameters(*xml_group, ri::CONSTANT, group->constant_data);
-			Mesh.cubic_curve_groups.push_back(group);
-
-			element* const xml_curves = find_element(*xml_group, "curves");
-			if(!xml_curves)
-				continue;
-
-			for(element::elements_t::iterator xml_curve = xml_curves->children.begin(); xml_curve != xml_curves->children.end(); ++xml_curve)
-			{
-				if(xml_curve->name != "curve")
-					continue;
-
-				legacy::cubic_curve* const curve = new legacy::cubic_curve();
-				detail::load_parameters(*xml_curve, ri::UNIFORM, curve->uniform_data);
-				group->curves.push_back(curve);
-
-				element* const xml_control_points = find_element(*xml_curve, "controlpoints");
-				if(!xml_control_points)
-					continue;
-
-				std::istringstream points_buffer(xml_control_points->text);
-				for(std::istream_iterator<unsigned long> control_point(points_buffer); control_point != std::istream_iterator<unsigned long>(); ++control_point)
-				{
-					const unsigned long control_point_index = *control_point - 1;
-					return_if_fail(control_point_index < Mesh.points.size());
-					curve->control_points.push_back(Mesh.points[control_point_index]);
-				}
-
-				detail::load_varying_parameters(*xml_curve, curve->varying_data, varying_count(*curve, group->wrap));
-			}
-		}
-	}
-
-	// Load NURBS curve groups ...
-	if(element* const xml_nucurve_groups = find_element(XML, "nucurvegroups"))
-	{
-		for(element::elements_t::iterator xml_group = xml_nucurve_groups->children.begin(); xml_group != xml_nucurve_groups->children.end(); ++xml_group)
-		{
-			if(xml_group->name != "group")
-				continue;
-
-			legacy::nucurve_group* const group = new legacy::nucurve_group();
-			group->material = dynamic_cast<imaterial*>(Context.lookup.lookup_object(attribute_value<ipersistent_lookup::id_type>(*xml_group, "material", 0)));
-			Mesh.nucurve_groups.push_back(group);
-
-			element* const xml_curves = find_element(*xml_group, "curves");
-			if(!xml_curves)
-				continue;
-
-			for(element::elements_t::iterator xml_curve = xml_curves->children.begin(); xml_curve != xml_curves->children.end(); ++xml_curve)
-			{
-				if(xml_curve->name != "curve")
-					continue;
-
-				element* const xml_knot_vector = find_element(*xml_curve, "knotvector");
-				element* const xml_control_points = find_element(*xml_curve, "controlpoints");
-				element* const xml_weights = find_element(*xml_curve, "weights");
-
-				if(xml_knot_vector && xml_control_points && xml_weights)
-				{
-					legacy::nucurve* const curve = new legacy::nucurve();
-					curve->order = attribute_value<unsigned long>(*xml_curve, "order", 0);
-					group->curves.push_back(curve);
-
-					std::istringstream knots_buffer(xml_knot_vector->text);
-					std::copy(std::istream_iterator<double>(knots_buffer), std::istream_iterator<double>(), std::back_inserter(curve->knots));
-
-					std::istringstream points_buffer(xml_control_points->text);
-					std::istringstream weights_buffer(xml_weights->text);
-
-					std::istream_iterator<unsigned long> control_point(points_buffer);
-					std::istream_iterator<double> weight(weights_buffer);
-					for(; control_point != std::istream_iterator<unsigned long>() && weight != std::istream_iterator<double>(); ++control_point, ++weight)
-					{
-						const unsigned long control_point_index = *control_point - 1;
-						return_if_fail(control_point_index < Mesh.points.size());
-						curve->control_points.push_back(legacy::nucurve::control_point(Mesh.points[control_point_index], *weight));
-					}
-				}
-			}
-		}
-	}
-
-	// Load bilinear patches ...
-	if(element* const xml_bilinear_patches = find_element(XML, "bilinearpatches"))
-	{
-		for(element::elements_t::iterator xml_patch = xml_bilinear_patches->children.begin(); xml_patch != xml_bilinear_patches->children.end(); ++xml_patch)
-		{
-			if(xml_patch->name != "patch")
-				continue;
-
-			legacy::bilinear_patch* const patch = new legacy::bilinear_patch();
-			patch->material = dynamic_cast<imaterial*>(Context.lookup.lookup_object(attribute_value<ipersistent_lookup::id_type>(*xml_patch, "material", 0)));
-			Mesh.bilinear_patches.push_back(patch);
-
-			element* const xml_control_points = find_element(*xml_patch, "controlpoints");
-			if(!xml_control_points)
-				continue;
-
-			unsigned long storage_index = 0;
-			std::istringstream points_buffer(xml_control_points->text);
-			for(std::istream_iterator<unsigned long> control_point(points_buffer); control_point != std::istream_iterator<unsigned long>(); ++control_point)
-			{
-				return_if_fail(storage_index < 4);
-
-				const unsigned long control_point_index = *control_point - 1;
-				return_if_fail(control_point_index < Mesh.points.size());
-				patch->control_points[storage_index++] = Mesh.points[control_point_index];
-			}
-
-			detail::load_parameters(*xml_patch, ri::UNIFORM, patch->uniform_data);
-			detail::load_varying_parameters(*xml_patch, patch->varying_data);
-		}
-	}
-
-	// Load bicubic patches ...
-	if(element* const xml_bicubic_patches = find_element(XML, "bicubicpatches"))
-	{
-		for(element::elements_t::iterator xml_patch = xml_bicubic_patches->children.begin(); xml_patch != xml_bicubic_patches->children.end(); ++xml_patch)
-		{
-			if(xml_patch->name != "patch")
-				continue;
-
-			legacy::bicubic_patch* const patch = new legacy::bicubic_patch();
-			patch->material = dynamic_cast<imaterial*>(Context.lookup.lookup_object(attribute_value<ipersistent_lookup::id_type>(*xml_patch, "material", 0)));
-			Mesh.bicubic_patches.push_back(patch);
-
-			element* const xml_control_points = find_element(*xml_patch, "controlpoints");
-			if(!xml_control_points)
-				continue;
-
-			unsigned long storage_index = 0;
-			std::istringstream points_buffer(xml_control_points->text);
-			for(std::istream_iterator<unsigned long> control_point(points_buffer); control_point != std::istream_iterator<unsigned long>(); ++control_point)
-			{
-				return_if_fail(storage_index < 16);
-
-				const unsigned long control_point_index = *control_point - 1;
-				return_if_fail(control_point_index < Mesh.points.size());
-				patch->control_points[storage_index++] = Mesh.points[control_point_index];
-			}
-
-			detail::load_parameters(*xml_patch, ri::UNIFORM, patch->uniform_data);
-			detail::load_varying_parameters(*xml_patch, patch->varying_data);
-		}
-	}
-
-	// Load NURBS patches ...
-	if(element* const xml_nupatches = find_element(XML, "nupatches"))
-	{
-		for(element::elements_t::iterator xml_patch = xml_nupatches->children.begin(); xml_patch != xml_nupatches->children.end(); ++xml_patch)
-		{
-			if(xml_patch->name != "patch")
-				continue;
-
-			element* const xml_u_knot_vector = find_element(*xml_patch, "uknotvector");
-			element* const xml_v_knot_vector = find_element(*xml_patch, "vknotvector");
-			element* const xml_control_points = find_element(*xml_patch, "controlpoints");
-			element* const xml_weights = find_element(*xml_patch, "weights");
-
-			if(xml_u_knot_vector && xml_v_knot_vector && xml_control_points && xml_weights)
-			{
-				legacy::nupatch* const patch = new legacy::nupatch();
-				patch->u_order = attribute_value<unsigned long>(*xml_patch, "uorder", 0);
-				patch->v_order = attribute_value<unsigned long>(*xml_patch, "vorder", 0);
-				patch->material = dynamic_cast<imaterial*>(Context.lookup.lookup_object(attribute_value<ipersistent_lookup::id_type>(*xml_patch, "material", 0)));
-				Mesh.nupatches.push_back(patch);
-
-				std::istringstream u_knots_buffer(xml_u_knot_vector->text);
-				std::copy(std::istream_iterator<double>(u_knots_buffer), std::istream_iterator<double>(), std::back_inserter(patch->u_knots));
-
-				std::istringstream v_knots_buffer(xml_v_knot_vector->text);
-				std::copy(std::istream_iterator<double>(v_knots_buffer), std::istream_iterator<double>(), std::back_inserter(patch->v_knots));
-
-				std::istringstream points_buffer(xml_control_points->text);
-				std::istringstream weights_buffer(xml_weights->text);
-
-				std::istream_iterator<unsigned long> control_point(points_buffer);
-				std::istream_iterator<double> weight(weights_buffer);
-				for(; control_point != std::istream_iterator<unsigned long>() && weight != std::istream_iterator<double>(); ++control_point, ++weight)
-				{
-					const unsigned long control_point_index = *control_point - 1;
-					return_if_fail(control_point_index < Mesh.points.size());
-					patch->control_points.push_back(legacy::nupatch::control_point(Mesh.points[control_point_index], *weight));
-				}
-			}
-		}
-	}
-}
-*/
 
 void save_mesh_selection(const mesh_selection& Selection, xml::element& XML, const ipersistent::save_context& Context)
 {
