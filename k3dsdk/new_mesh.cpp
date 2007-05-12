@@ -95,7 +95,7 @@ void print(std::ostream& Stream, const std::string& Label, const pointer_type& P
 {
 	if(Pointer)
 	{
-		Stream << Label << " (builtin): ";
+		Stream << Label << " (" << Pointer->size() <<  "): ";
 		std::copy(Pointer->begin(), Pointer->end(), std::ostream_iterator<typename pointer_type::element_type::value_type>(Stream, " "));
 		Stream << "\n";
 	}
@@ -105,7 +105,7 @@ void print(std::ostream& Stream, const std::string& Label, const k3d::dev::mesh:
 {
     for(k3d::dev::mesh::named_arrays::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
     {
-        Stream << Label << " \"" << array_iterator->first << "\" (user): ";
+        Stream << Label << " " << array_iterator->first << " (" << array_iterator->second->size() << "): ";
         if(typed_array<double>* const array = dynamic_cast<typed_array<double>*>(array_iterator->second.get()))
             std::copy(array->begin(), array->end(), std::ostream_iterator<double>(Stream, " "));
         else if(typed_array<k3d::color>* const array = dynamic_cast<typed_array<k3d::color>*>(array_iterator->second.get()))
