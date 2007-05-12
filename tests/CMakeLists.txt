@@ -9,7 +9,6 @@ MACRO(K3D_ADD_TEST TEST_NAME)
 	ADD_TEST(${TEST_NAME}
 		${k3d_BINARY_DIR}/bin/k3d
 		--log-level=debug
-		--color
 		--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
 		--share=${k3d_SOURCE_DIR}/share
 		--ui=${K3D_NUI_BINARY}
@@ -22,7 +21,6 @@ MACRO(K3D_ADD_SCRIPTED_TEST SCRIPT_NAME)
 	ADD_TEST(${SCRIPT_NAME}
 		${k3d_BINARY_DIR}/bin/k3d
 		--log-level=debug
-		--color
 		--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
 		--share=${k3d_SOURCE_DIR}/share
 		--ui=${K3D_NUI_BINARY}
@@ -38,7 +36,6 @@ MACRO(K3D_ADD_PYTHON_TEST SCRIPT_NAME)
 			ADD_TEST(${SCRIPT_NAME}
 				${k3d_BINARY_DIR}/bin/k3d
 				--log-level=debug
-				--color
 				--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
 				--share=${k3d_SOURCE_DIR}/share
 				--ui=${K3D_NUI_BINARY}
@@ -69,7 +66,6 @@ MACRO(K3D_ADD_SCRIPTED_NGUI_TEST SCRIPT_NAME)
 	ADD_TEST(${SCRIPT_NAME}
 		${k3d_BINARY_DIR}/bin/k3d
 		--log-level=debug
-		--color
 		--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
 		--share=${k3d_SOURCE_DIR}/share
 		--ui=${K3D_NGUI_BINARY}
@@ -86,7 +82,6 @@ MACRO(K3D_ADD_NGUI_TUTORIAL_TEST TUTORIAL_NAME TUTORIAL_SCRIPT)
 	ADD_TEST(${TUTORIAL_NAME}
 		${k3d_BINARY_DIR}/bin/k3d
 		--log-level=debug
-		--color
 		--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
 		--share=${k3d_SOURCE_DIR}/share
 		--ui=${K3D_NGUI_BINARY}
@@ -175,7 +170,8 @@ K3D_ADD_PYTHON_TEST(mesh.conversion.patch.bilinear.py)
 K3D_ADD_PYTHON_TEST(mesh.conversion.patch.nurbs.py)
 K3D_ADD_PYTHON_TEST(mesh.conversion.polyhedron.py)
 
-K3D_ADD_PYTHON_TEST(mesh.export.obj.py)
+K3D_ADD_PYTHON_TEST(mesh.writer.obj.py)
+K3D_ADD_PYTHON_TEST(mesh.writer.k3d.py)
 
 K3D_ADD_PYTHON_TEST(mesh.selection.null.py)
 K3D_ADD_PYTHON_TEST(mesh.selection.none.py)

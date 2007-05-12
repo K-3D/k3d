@@ -65,43 +65,6 @@ def create_default_painter(document):
 
 	return painter
 
-def image_comparison(document, image, image_name, threshold):
-
-	output_file = "@k3d-tests_BINARY_DIR@/" + image_name + ".output.png"
-	reference_file = "@k3d-tests_SOURCE_DIR@/bitmaps/" + image_name + ".reference.png"
-	difference_file = "@k3d-tests_BINARY_DIR@/" + image_name + ".difference.png"
-
-	reference = document.new_node("PNGBitmapReader")
-	reference.file = reference_file
-
-	difference = document.new_node("BitmapPerceptualDifference")
-	difference.field_of_view = 10.0
-	document.set_dependency(difference.get_property("input_a"), image)
-	document.set_dependency(difference.get_property("input_b"), reference.get_property("output_bitmap"))
-
-	image_writer = document.new_node("PNGBitmapWriter")
-	image_writer.file = output_file
-	document.set_dependency(image_writer.get_property("input_bitmap"), image)
-
-	difference_writer = document.new_node("PNGBitmapWriter")
-	difference_writer.file= difference_file
-	document.set_dependency(difference_writer.get_property("input_bitmap"), difference.get_property("output"))
-
-	pixel_count = image.internal_value().width() * image.internal_value().height()
-	pixel_difference = difference.difference
-	difference_measurement = float(pixel_difference) / float(pixel_count)
-
-	print """<DartMeasurement name="Pixel Difference" type="numeric/float">""" + str(pixel_difference) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Pixel Count" type="numeric/float">""" + str(pixel_count) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Difference" type="numeric/float">""" + str(difference_measurement) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Threshold" type="numeric/float">""" + str(threshold) + """</DartMeasurement>"""
-	print """<DartMeasurementFile name="Output Image" type="image/png">""" + output_file + """</DartMeasurementFile>"""
-	print """<DartMeasurementFile name="Reference Image" type="image/png">""" + reference_file + """</DartMeasurementFile>"""
-	print """<DartMeasurementFile name="Difference Image" type="image/png">""" + difference_file + """</DartMeasurementFile>"""
-
-	if difference_measurement > threshold:
-		raise "pixel difference exceeds threshold"
-
 def bitmap_reader_test(reader_name, source_file, width, height):
 	doc = k3d.new_document()
 	reader = doc.new_node(reader_name)
@@ -109,6 +72,42 @@ def bitmap_reader_test(reader_name, source_file, width, height):
 	bitmap = reader.output_bitmap
 	if bitmap.width() != width or bitmap.height() != height:
 		raise "Error loading test bitmap"
+
+def setup_mesh_source_test(source_name):
+	doc = k3d.new_document()
+
+	axes = doc.new_node("Axes")
+	axes.xyplane = False
+
+	painter = create_default_painter(doc)
+
+	source = doc.new_node(source_name)
+
+	mesh_instance = doc.new_node("MeshInstance")
+	mesh_instance.gl_painter = painter
+	doc.set_dependency(mesh_instance.get_property("input_mesh"), source.get_property("output_mesh"))
+
+	camera = create_camera(doc)
+	render_engine = create_opengl_engine(doc)
+
+	camera_to_bitmap = doc.new_node("CameraToBitmap")
+	camera_to_bitmap.camera = camera
+	camera_to_bitmap.render_engine = render_engine
+
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = doc
+	result.axes = axes
+	result.painter = painter
+	result.source = source
+	result.mesh_instance = mesh_instance
+	result.camera = camera
+	result.render_engine = render_engine
+	result.camera_to_bitmap = camera_to_bitmap
+
+	return result
 
 def setup_mesh_modifier_test(source_name, modifier_name):
 	doc = k3d.new_document()
@@ -150,39 +149,64 @@ def setup_mesh_modifier_test(source_name, modifier_name):
 
 	return result
 
-def setup_mesh_source_test(source_name):
-	doc = k3d.new_document()
+def mesh_comparison(document, mesh, mesh_name):
+	
+	output_file = "@k3d-tests_BINARY_DIR@/" + mesh_name + ".output.k3d"
+	reference_file = "@k3d-tests_SOURCE_DIR@/meshes/" + mesh_name + ".reference.k3d"
+	
+	reference = document.new_node("K3DMeshReader")
+	reference.file = reference_file
 
-	axes = doc.new_node("Axes")
-	axes.xyplane = False
+	difference = document.new_node("MeshDiff")
+	difference.add_user_property("k3d::dev::mesh*", "input_a", "InputA", "First input mesh")
+	difference.add_user_property("k3d::dev::mesh*", "input_b", "InputB", "Second input mesh")
+	document.set_dependency(difference.get_property("input_a"), mesh)
+	document.set_dependency(difference.get_property("input_b"), reference.get_property("output_mesh"))
 
-	painter = create_default_painter(doc)
+	mesh_writer = document.new_node("K3DMeshWriter")
+	mesh_writer.file = output_file
+	document.set_dependency(mesh_writer.get_property("input_mesh"), mesh)
 
-	source = doc.new_node(source_name)
+	if not difference.equal:
+		print """<DartMeasurement name="Mesh Difference" type="text/text">\n"""
+		print k3d.print_diff(mesh.value(), reference.output_mesh)
+		print """</DartMeasurement>\n"""
+		raise Exception("output mesh differs from reference")
 
-	mesh_instance = doc.new_node("MeshInstance")
-	mesh_instance.gl_painter = painter
-	doc.set_dependency(mesh_instance.get_property("input_mesh"), source.get_property("output_mesh"))
+def image_comparison(document, image, image_name, threshold):
 
-	camera = create_camera(doc)
-	render_engine = create_opengl_engine(doc)
+	output_file = "@k3d-tests_BINARY_DIR@/" + image_name + ".output.png"
+	reference_file = "@k3d-tests_SOURCE_DIR@/bitmaps/" + image_name + ".reference.png"
+	difference_file = "@k3d-tests_BINARY_DIR@/" + image_name + ".difference.png"
 
-	camera_to_bitmap = doc.new_node("CameraToBitmap")
-	camera_to_bitmap.camera = camera
-	camera_to_bitmap.render_engine = render_engine
+	reference = document.new_node("PNGBitmapReader")
+	reference.file = reference_file
 
-	class result_object:
-		pass
+	difference = document.new_node("BitmapPerceptualDifference")
+	difference.field_of_view = 10.0
+	document.set_dependency(difference.get_property("input_a"), image)
+	document.set_dependency(difference.get_property("input_b"), reference.get_property("output_bitmap"))
 
-	result = result_object
-	result.document = doc
-	result.axes = axes
-	result.painter = painter
-	result.source = source
-	result.mesh_instance = mesh_instance
-	result.camera = camera
-	result.render_engine = render_engine
-	result.camera_to_bitmap = camera_to_bitmap
+	image_writer = document.new_node("PNGBitmapWriter")
+	image_writer.file = output_file
+	document.set_dependency(image_writer.get_property("input_bitmap"), image)
 
-	return result
+	difference_writer = document.new_node("PNGBitmapWriter")
+	difference_writer.file= difference_file
+	document.set_dependency(difference_writer.get_property("input_bitmap"), difference.get_property("output"))
+
+	pixel_count = image.internal_value().width() * image.internal_value().height()
+	pixel_difference = difference.difference
+	difference_measurement = float(pixel_difference) / float(pixel_count)
+
+	print """<DartMeasurement name="Pixel Difference" type="numeric/float">""" + str(pixel_difference) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Pixel Count" type="numeric/float">""" + str(pixel_count) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Difference" type="numeric/float">""" + str(difference_measurement) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Threshold" type="numeric/float">""" + str(threshold) + """</DartMeasurement>"""
+	print """<DartMeasurementFile name="Output Image" type="image/png">""" + output_file + """</DartMeasurementFile>"""
+	print """<DartMeasurementFile name="Reference Image" type="image/png">""" + reference_file + """</DartMeasurementFile>"""
+	print """<DartMeasurementFile name="Difference Image" type="image/png">""" + difference_file + """</DartMeasurementFile>"""
+
+	if difference_measurement > threshold:
+		raise "pixel difference exceeds threshold"
 
