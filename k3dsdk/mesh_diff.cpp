@@ -33,27 +33,6 @@ namespace dev
 namespace detail
 {
 
-/*
-/// Return true if two shared arrays are equivalent (handles cases where they point to the same memory, etc)
-template<typename array_type>
-const bool equal(const array_type& LHS, const array_type& RHS)
-{
-	if(LHS.get() == RHS.get())
-		return true;
-
-	if(LHS && RHS)
-		return *LHS == *RHS;
-
-	return false;
-}
-
-/// Return true if two groups of named arrays are equivalent (handles cases where they point to the same memory, etc)
-const bool equal(const mesh::named_arrays& LHS, const mesh::named_arrays& RHS)
-{
-	return true;
-}
-*/
-
 template<typename pointer_type>
 void print_diff(std::ostream& Stream, const std::string& Label, const pointer_type& A, const pointer_type& B)
 {
@@ -121,6 +100,7 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		Stream << "point groups:" << std::endl;
 		detail::print_diff(Stream, "first points", A.point_groups->first_points, B.point_groups->first_points);
 		detail::print_diff(Stream, "point counts", A.point_groups->point_counts, B.point_groups->point_counts);
+		detail::print_diff(Stream, "materials", A.point_groups->materials, B.point_groups->materials);
 		detail::print_diff(Stream, "constant data", A.point_groups->constant_data, B.point_groups->constant_data);
 		detail::print_diff(Stream, "points", A.point_groups->points, B.point_groups->points);
 		detail::print_diff(Stream, "varying data", A.point_groups->varying_data, B.point_groups->varying_data);
@@ -136,6 +116,7 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "first curves", A.linear_curve_groups->first_curves, B.linear_curve_groups->first_curves);
 		detail::print_diff(Stream, "curve counts", A.linear_curve_groups->curve_counts, B.linear_curve_groups->curve_counts);
 		detail::print_diff(Stream, "periodic curves", A.linear_curve_groups->periodic_curves, B.linear_curve_groups->periodic_curves);
+		detail::print_diff(Stream, "materials", A.linear_curve_groups->materials, B.linear_curve_groups->materials);
 		detail::print_diff(Stream, "constant data", A.linear_curve_groups->constant_data, B.linear_curve_groups->constant_data);
 		detail::print_diff(Stream, "curve first points", A.linear_curve_groups->curve_first_points, B.linear_curve_groups->curve_first_points);
 		detail::print_diff(Stream, "curve point counts", A.linear_curve_groups->curve_point_counts, B.linear_curve_groups->curve_point_counts);
@@ -154,6 +135,7 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "first curves", A.cubic_curve_groups->first_curves, B.cubic_curve_groups->first_curves);
 		detail::print_diff(Stream, "curve counts", A.cubic_curve_groups->curve_counts, B.cubic_curve_groups->curve_counts);
 		detail::print_diff(Stream, "periodic curves", A.cubic_curve_groups->periodic_curves, B.cubic_curve_groups->periodic_curves);
+		detail::print_diff(Stream, "materials", A.cubic_curve_groups->materials, B.cubic_curve_groups->materials);
 		detail::print_diff(Stream, "constant data", A.cubic_curve_groups->constant_data, B.cubic_curve_groups->constant_data);
 		detail::print_diff(Stream, "curve first points", A.cubic_curve_groups->curve_first_points, B.cubic_curve_groups->curve_first_points);
 		detail::print_diff(Stream, "curve point counts", A.cubic_curve_groups->curve_point_counts, B.cubic_curve_groups->curve_point_counts);
@@ -171,6 +153,7 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		Stream << "nurbs curve groups:" << std::endl;
 		detail::print_diff(Stream, "first curves", A.nurbs_curve_groups->first_curves, B.nurbs_curve_groups->first_curves);
 		detail::print_diff(Stream, "curve counts", A.nurbs_curve_groups->curve_counts, B.nurbs_curve_groups->curve_counts);
+		detail::print_diff(Stream, "materials", A.nurbs_curve_groups->materials, B.nurbs_curve_groups->materials);
 		detail::print_diff(Stream, "constant data", A.nurbs_curve_groups->constant_data, B.nurbs_curve_groups->constant_data);
 		detail::print_diff(Stream, "curve first points", A.nurbs_curve_groups->curve_first_points, B.nurbs_curve_groups->curve_first_points);
 		detail::print_diff(Stream, "curve point counts", A.nurbs_curve_groups->curve_point_counts, B.nurbs_curve_groups->curve_point_counts);
@@ -190,6 +173,7 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 	{
 		Stream << "bilinear patches:" << std::endl;
 		detail::print_diff(Stream, "patch selection", A.bilinear_patches->patch_selection, B.bilinear_patches->patch_selection);
+		detail::print_diff(Stream, "patch materials", A.bilinear_patches->patch_materials, B.bilinear_patches->patch_materials);
 		detail::print_diff(Stream, "constant data", A.bilinear_patches->constant_data, B.bilinear_patches->constant_data);
 		detail::print_diff(Stream, "uniform data", A.bilinear_patches->uniform_data, B.bilinear_patches->uniform_data);
 		detail::print_diff(Stream, "patch points", A.bilinear_patches->patch_points, B.bilinear_patches->patch_points);
@@ -204,6 +188,7 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 	{
 		Stream << "bicubic patches:" << std::endl;
 		detail::print_diff(Stream, "patch selection", A.bicubic_patches->patch_selection, B.bicubic_patches->patch_selection);
+		detail::print_diff(Stream, "patch materials", A.bicubic_patches->patch_materials, B.bicubic_patches->patch_materials);
 		detail::print_diff(Stream, "constant data", A.bicubic_patches->constant_data, B.bicubic_patches->constant_data);
 		detail::print_diff(Stream, "uniform data", A.bicubic_patches->uniform_data, B.bicubic_patches->uniform_data);
 		detail::print_diff(Stream, "patch points", A.bicubic_patches->patch_points, B.bicubic_patches->patch_points);
@@ -223,6 +208,7 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "patch u orders", A.nurbs_patches->patch_u_orders, B.nurbs_patches->patch_u_orders);
 		detail::print_diff(Stream, "patch v orders", A.nurbs_patches->patch_v_orders, B.nurbs_patches->patch_v_orders);
 		detail::print_diff(Stream, "patch selection", A.nurbs_patches->patch_selection, B.nurbs_patches->patch_selection);
+		detail::print_diff(Stream, "patch materials", A.nurbs_patches->patch_materials, B.nurbs_patches->patch_materials);
 		detail::print_diff(Stream, "constant data", A.nurbs_patches->constant_data, B.nurbs_patches->constant_data);
 		detail::print_diff(Stream, "uniform data", A.nurbs_patches->uniform_data, B.nurbs_patches->uniform_data);
 		detail::print_diff(Stream, "patch points", A.nurbs_patches->patch_points, B.nurbs_patches->patch_points);
@@ -246,6 +232,7 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "face first loops", A.polyhedra->face_first_loops, B.polyhedra->face_first_loops);
 		detail::print_diff(Stream, "face loop counts", A.polyhedra->face_loop_counts, B.polyhedra->face_loop_counts);
 		detail::print_diff(Stream, "face selection", A.polyhedra->face_selection, B.polyhedra->face_selection);
+		detail::print_diff(Stream, "face materials", A.polyhedra->face_materials, B.polyhedra->face_materials);
 		detail::print_diff(Stream, "uniform data", A.polyhedra->uniform_data, B.polyhedra->uniform_data);
 		detail::print_diff(Stream, "loop first edges", A.polyhedra->loop_first_edges, B.polyhedra->loop_first_edges);
 		detail::print_diff(Stream, "edge points", A.polyhedra->edge_points, B.polyhedra->edge_points);
@@ -265,6 +252,7 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "primitive counts", A.blobbies->primitive_counts, B.blobbies->primitive_counts);
 		detail::print_diff(Stream, "first operators", A.blobbies->first_operators, B.blobbies->first_operators);
 		detail::print_diff(Stream, "operator counts", A.blobbies->operator_counts, B.blobbies->operator_counts);
+		detail::print_diff(Stream, "materials", A.blobbies->materials, B.blobbies->materials);
 		detail::print_diff(Stream, "constant data", A.blobbies->constant_data, B.blobbies->constant_data);
 		detail::print_diff(Stream, "uniform data", A.blobbies->uniform_data, B.blobbies->uniform_data);
 		detail::print_diff(Stream, "primitives", A.blobbies->primitives, B.blobbies->primitives);
@@ -285,7 +273,7 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 
 	detail::print_diff(Stream, "points", A.points, B.points);
 	detail::print_diff(Stream, "point selection", A.point_selection, B.point_selection);
-//	detail::print_diff(Stream, "vertex data", RHS.vertex_data);
+	detail::print_diff(Stream, "vertex data", A.vertex_data, B.vertex_data);
 }
 
 } // namespace dev
