@@ -78,7 +78,7 @@ void save_array(element& Container, element Storage, const typed_array<imaterial
 
 	std::ostringstream buffer;
 
-	buffer << Context.lookup.lookup_id(*item);
+	buffer << Context.lookup.lookup_id(*item++);
 	for(; item != end; ++item)
 		buffer << " " << Context.lookup.lookup_id(*item);
 
