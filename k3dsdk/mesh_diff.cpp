@@ -34,6 +34,31 @@ namespace detail
 {
 
 template<typename pointer_type>
+void print_group(std::ostream& Stream, const std::string& Label, const pointer_type& A, const pointer_type& B)
+{
+	if(!A && !B)
+		return;
+
+	boost::format format("%1%%|6t|%2%%|40t|%3%\n");
+	const std::string divider(32, '-');
+
+	const std::string difference_buffer = (A && B) ? std::string("") : std::string("*****");
+
+	std::ostringstream a_label_buffer;
+	if(A)
+		a_label_buffer << Label;
+
+	std::ostringstream b_label_buffer;
+	if(B)
+		b_label_buffer << Label;
+
+
+	Stream << format % difference_buffer % a_label_buffer.str() % b_label_buffer.str();
+	Stream << format % "" % divider % divider;
+	Stream << "\n";
+}
+
+template<typename pointer_type>
 void print_diff(std::ostream& Stream, const std::string& Label, const pointer_type& A, const pointer_type& B)
 {
 	if(!A && !B)
@@ -74,6 +99,7 @@ void print_diff(std::ostream& Stream, const std::string& Label, const pointer_ty
 	Stream << "\n";
 }
 
+/** \todo Implement comparisons for user arrays */
 void print_diff(std::ostream& Stream, const std::string& Label, const k3d::dev::mesh::named_arrays& A, const k3d::dev::mesh::named_arrays& B)
 {
 /*
@@ -95,9 +121,9 @@ void print_diff(std::ostream& Stream, const std::string& Label, const k3d::dev::
 
 void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 {
+	detail::print_group(Stream, "point groups", A.point_groups, B.point_groups);
 	if(A.point_groups && B.point_groups)
 	{
-		Stream << "point groups:" << std::endl;
 		detail::print_diff(Stream, "first points", A.point_groups->first_points, B.point_groups->first_points);
 		detail::print_diff(Stream, "point counts", A.point_groups->point_counts, B.point_groups->point_counts);
 		detail::print_diff(Stream, "materials", A.point_groups->materials, B.point_groups->materials);
@@ -105,14 +131,10 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "points", A.point_groups->points, B.point_groups->points);
 		detail::print_diff(Stream, "varying data", A.point_groups->varying_data, B.point_groups->varying_data);
 	}
-	else if(A.point_groups || B.point_groups)
-	{
-		Stream << "***** missing point_groups" << std::endl;
-	}
 
+	detail::print_group(Stream, "linear curve groups", A.linear_curve_groups, B.linear_curve_groups);
 	if(A.linear_curve_groups && B.linear_curve_groups)
 	{
-		Stream << "linear curve groups:" << std::endl;
 		detail::print_diff(Stream, "first curves", A.linear_curve_groups->first_curves, B.linear_curve_groups->first_curves);
 		detail::print_diff(Stream, "curve counts", A.linear_curve_groups->curve_counts, B.linear_curve_groups->curve_counts);
 		detail::print_diff(Stream, "periodic curves", A.linear_curve_groups->periodic_curves, B.linear_curve_groups->periodic_curves);
@@ -124,14 +146,10 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "uniform data", A.linear_curve_groups->uniform_data, B.linear_curve_groups->uniform_data);
 		detail::print_diff(Stream, "curve points", A.linear_curve_groups->curve_points, B.linear_curve_groups->curve_points);
 	}
-	else if(A.linear_curve_groups || B.linear_curve_groups)
-	{
-		Stream << "***** missing linear_curve_groups" << std::endl;
-	}
 
+	detail::print_group(Stream, "cubic curve groups", A.cubic_curve_groups, B.cubic_curve_groups);
 	if(A.cubic_curve_groups && B.cubic_curve_groups)
 	{
-		Stream << "cubic curve groups:" << std::endl;
 		detail::print_diff(Stream, "first curves", A.cubic_curve_groups->first_curves, B.cubic_curve_groups->first_curves);
 		detail::print_diff(Stream, "curve counts", A.cubic_curve_groups->curve_counts, B.cubic_curve_groups->curve_counts);
 		detail::print_diff(Stream, "periodic curves", A.cubic_curve_groups->periodic_curves, B.cubic_curve_groups->periodic_curves);
@@ -143,14 +161,10 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "uniform data", A.cubic_curve_groups->uniform_data, B.cubic_curve_groups->uniform_data);
 		detail::print_diff(Stream, "curve points", A.cubic_curve_groups->curve_points, B.cubic_curve_groups->curve_points);
 	}
-	else if(A.cubic_curve_groups || B.cubic_curve_groups)
-	{
-		Stream << "***** missing cubic_curve_groups" << std::endl;
-	}
 
+	detail::print_group(Stream, "nurbs curve groups", A.nurbs_curve_groups, B.nurbs_curve_groups);
 	if(A.nurbs_curve_groups && B.nurbs_curve_groups)
 	{
-		Stream << "nurbs curve groups:" << std::endl;
 		detail::print_diff(Stream, "first curves", A.nurbs_curve_groups->first_curves, B.nurbs_curve_groups->first_curves);
 		detail::print_diff(Stream, "curve counts", A.nurbs_curve_groups->curve_counts, B.nurbs_curve_groups->curve_counts);
 		detail::print_diff(Stream, "materials", A.nurbs_curve_groups->materials, B.nurbs_curve_groups->materials);
@@ -164,14 +178,10 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "curve point weights", A.nurbs_curve_groups->curve_point_weights, B.nurbs_curve_groups->curve_point_weights);
 		detail::print_diff(Stream, "curve knots", A.nurbs_curve_groups->curve_knots, B.nurbs_curve_groups->curve_knots);
 	}
-	else if(A.nurbs_curve_groups || B.nurbs_curve_groups)
-	{
-		Stream << "***** missing nurbs_curve_groups" << std::endl;
-	}
 
+	detail::print_group(Stream, "bilinear patches", A.bilinear_patches, B.bilinear_patches);
 	if(A.bilinear_patches && B.bilinear_patches)
 	{
-		Stream << "bilinear patches:" << std::endl;
 		detail::print_diff(Stream, "patch selection", A.bilinear_patches->patch_selection, B.bilinear_patches->patch_selection);
 		detail::print_diff(Stream, "patch materials", A.bilinear_patches->patch_materials, B.bilinear_patches->patch_materials);
 		detail::print_diff(Stream, "constant data", A.bilinear_patches->constant_data, B.bilinear_patches->constant_data);
@@ -179,14 +189,10 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "patch points", A.bilinear_patches->patch_points, B.bilinear_patches->patch_points);
 		detail::print_diff(Stream, "varying data", A.bilinear_patches->varying_data, B.bilinear_patches->varying_data);
 	}
-	else if(A.bilinear_patches || B.bilinear_patches)
-	{
-		Stream << "***** missing bilinear_patches" << std::endl;
-	}
 
+	detail::print_group(Stream, "bicubic patches", A.bicubic_patches, B.bicubic_patches);
 	if(A.bicubic_patches && B.bicubic_patches)
 	{
-		Stream << "bicubic patches:" << std::endl;
 		detail::print_diff(Stream, "patch selection", A.bicubic_patches->patch_selection, B.bicubic_patches->patch_selection);
 		detail::print_diff(Stream, "patch materials", A.bicubic_patches->patch_materials, B.bicubic_patches->patch_materials);
 		detail::print_diff(Stream, "constant data", A.bicubic_patches->constant_data, B.bicubic_patches->constant_data);
@@ -194,14 +200,10 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "patch points", A.bicubic_patches->patch_points, B.bicubic_patches->patch_points);
 		detail::print_diff(Stream, "varying data", A.bicubic_patches->varying_data, B.bicubic_patches->varying_data);
 	}
-	else if(A.bicubic_patches || B.bicubic_patches)
-	{
-		Stream << "***** missing bicubic_patches" << std::endl;
-	}
 
+	detail::print_group(Stream, "nurbs patches", A.nurbs_patches, B.nurbs_patches);
 	if(A.nurbs_patches && B.nurbs_patches)
 	{
-		Stream << "nurbs patches:" << std::endl;
 		detail::print_diff(Stream, "patch first points", A.nurbs_patches->patch_first_points, B.nurbs_patches->patch_first_points);
 		detail::print_diff(Stream, "patch u point counts", A.nurbs_patches->patch_u_point_counts, B.nurbs_patches->patch_u_point_counts);
 		detail::print_diff(Stream, "patch v point counts", A.nurbs_patches->patch_v_point_counts, B.nurbs_patches->patch_v_point_counts);
@@ -217,14 +219,10 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "patch v knots", A.nurbs_patches->patch_v_knots, B.nurbs_patches->patch_v_knots);
 		detail::print_diff(Stream, "varying data", A.nurbs_patches->varying_data, B.nurbs_patches->varying_data);
 	}
-	else if(A.nurbs_patches || B.nurbs_patches)
-	{
-		Stream << "***** missing nurbs_patches" << std::endl;
-	}
 
+	detail::print_group(Stream, "polyhedra", A.polyhedra, B.polyhedra);
 	if(A.polyhedra && B.polyhedra)
 	{
-		Stream << "polyhedra:" << std::endl;
 		detail::print_diff(Stream, "first faces", A.polyhedra->first_faces, B.polyhedra->first_faces);
 		detail::print_diff(Stream, "face counts", A.polyhedra->face_counts, B.polyhedra->face_counts);
 		detail::print_diff(Stream, "types", A.polyhedra->types, B.polyhedra->types);
@@ -240,14 +238,10 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "edge selection", A.polyhedra->edge_selection, B.polyhedra->edge_selection);
 		detail::print_diff(Stream, "face varying data", A.polyhedra->face_varying_data, B.polyhedra->face_varying_data);
 	}
-	else if(A.polyhedra || B.polyhedra)
-	{
-		Stream << "***** missing polyhedra" << std::endl;
-	}
 
+	detail::print_group(Stream, "blobbies", A.blobbies, B.blobbies);
 	if(A.blobbies && B.blobbies)
 	{
-		Stream << "blobbies:" << std::endl;
 		detail::print_diff(Stream, "first primitives", A.blobbies->first_primitives, B.blobbies->first_primitives);
 		detail::print_diff(Stream, "primitive counts", A.blobbies->primitive_counts, B.blobbies->primitive_counts);
 		detail::print_diff(Stream, "first operators", A.blobbies->first_operators, B.blobbies->first_operators);
@@ -266,11 +260,8 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 		detail::print_diff(Stream, "floats", A.blobbies->floats, B.blobbies->floats);
 		detail::print_diff(Stream, "operands", A.blobbies->operands, B.blobbies->operands);
 	}
-	else if(A.blobbies || B.blobbies)
-	{
-		Stream << "***** missing blobbies" << std::endl;
-	}
 
+	detail::print_group(Stream, "mesh", &A, &B);
 	detail::print_diff(Stream, "points", A.points, B.points);
 	detail::print_diff(Stream, "point selection", A.point_selection, B.point_selection);
 	detail::print_diff(Stream, "vertex data", A.vertex_data, B.vertex_data);
