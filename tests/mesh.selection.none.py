@@ -3,7 +3,7 @@
 import k3d
 import testing
 
-setup = testing.setup_mesh_modifier_test("PolyGrid", "ScalePoints")
+setup = testing.setup_mesh_modifier_image_test("PolyGrid", "ScalePoints")
 
 setup.source.rows = 1
 setup.source.columns = 1

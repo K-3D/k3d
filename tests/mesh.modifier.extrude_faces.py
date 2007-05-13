@@ -3,7 +3,7 @@
 import k3d
 import testing
 
-setup = testing.setup_mesh_modifier_test("PolyGrid", "ExtrudeFaces")
+setup = testing.setup_mesh_modifier_image_test("PolyGrid", "ExtrudeFaces")
 
 setup.source.rows = 3
 setup.source.columns = 3

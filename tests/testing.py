@@ -2,6 +2,7 @@
 
 import k3d
 import os
+import sys
 
 def create_camera(document):
 	
@@ -112,6 +113,24 @@ def setup_mesh_source_test(source_name):
 def setup_mesh_modifier_test(source_name, modifier_name):
 	doc = k3d.new_document()
 
+	source = doc.new_node(source_name)
+
+	modifier = doc.new_node(modifier_name)
+	doc.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
+
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = doc
+	result.source = source
+	result.modifier = modifier
+
+	return result
+
+def setup_mesh_modifier_image_test(source_name, modifier_name):
+	doc = k3d.new_document()
+
 	axes = doc.new_node("Axes")
 	axes.xyplane = False
 
@@ -171,6 +190,8 @@ def mesh_comparison(document, mesh, mesh_name):
 		print """<DartMeasurement name="Mesh Difference" type="text/text">\n"""
 		print k3d.print_diff(mesh.value(), reference.output_mesh)
 		print """</DartMeasurement>\n"""
+		sys.stdout.flush()
+
 		raise Exception("output mesh differs from reference")
 
 def image_comparison(document, image, image_name, threshold):
@@ -206,6 +227,7 @@ def image_comparison(document, image, image_name, threshold):
 	print """<DartMeasurementFile name="Output Image" type="image/png">""" + output_file + """</DartMeasurementFile>"""
 	print """<DartMeasurementFile name="Reference Image" type="image/png">""" + reference_file + """</DartMeasurementFile>"""
 	print """<DartMeasurementFile name="Difference Image" type="image/png">""" + difference_file + """</DartMeasurementFile>"""
+	sys.stdout.flush()
 
 	if difference_measurement > threshold:
 		raise "pixel difference exceeds threshold"
