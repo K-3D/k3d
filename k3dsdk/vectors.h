@@ -49,7 +49,10 @@
 
 #include "result.h"
 
+#include <boost/io/ios_state.hpp>
+
 #include <cmath>
+#include <iomanip>
 #include <iostream>
 
 namespace k3d
@@ -180,7 +183,8 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& Stream, const point2& RHS)
 	{
-		Stream << RHS.n[0] << " " << RHS.n[1];
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.n[0] << " " << RHS.n[1];
 		return Stream;
 	}
 
@@ -325,7 +329,8 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& Stream, const point3& RHS)
 	{
-		Stream << RHS.n[0] << " " << RHS.n[1] << " " << RHS.n[2];
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.n[0] << " " << RHS.n[1] << " " << RHS.n[2];
 		return Stream;
 	}
 
@@ -473,7 +478,8 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& Stream, const point4& RHS)
 	{
-		Stream << RHS.n[0] << " " << RHS.n[1] << " " << RHS.n[2] << " " << RHS.n[3];
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.n[0] << " " << RHS.n[1] << " " << RHS.n[2] << " " << RHS.n[3];
 		return Stream;
 	}
 
@@ -562,7 +568,8 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& Stream, const vector2& RHS)
 	{
-		Stream << RHS.n[0] << " " << RHS.n[1];
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.n[0] << " " << RHS.n[1];
 		return Stream;
 	}
 
@@ -663,7 +670,8 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& Stream, const vector3& RHS)
 	{
-		Stream << RHS.n[0] << " " << RHS.n[1] << " " << RHS.n[2];
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.n[0] << " " << RHS.n[1] << " " << RHS.n[2];
 		return Stream;
 	}
 
@@ -764,7 +772,8 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& Stream, const normal3& RHS)
 	{
-		Stream << RHS.n[0] << " " << RHS.n[1] << " " << RHS.n[2];
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.n[0] << " " << RHS.n[1] << " " << RHS.n[2];
 		return Stream;
 	}
 
