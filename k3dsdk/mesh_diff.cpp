@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -17,6 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "imaterial.h"
 #include "mesh_diff.h"
 #include "new_mesh.h"
 
@@ -39,7 +40,7 @@ void print_group(std::ostream& Stream, const std::string& Label, const pointer_t
 	if(!A && !B)
 		return;
 
-	boost::format format("%1%%|6t|%2%%|40t|%3%\n");
+	boost::format format("%1% %|6t|%2% %|40t|%3%\n");
 	const std::string divider(32, '-');
 
 	const std::string difference_buffer = (A && B) ? std::string("") : std::string("*****");
@@ -75,7 +76,7 @@ void print_diff(std::ostream& Stream, const std::string& Label, const pointer_ty
 	if(B)
 		b_label_buffer << Label << " (" << b_size << ")";
 
-	boost::format format("%1%%|10t|%2%%|40t|%3%\n");
+	boost::format format("%1% %|10t|%2% %|40t|%3%\n");
 	const std::string divider(28, '-');
 
 	Stream << format % "" % a_label_buffer.str() % b_label_buffer.str();
