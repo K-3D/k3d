@@ -66,13 +66,19 @@ def create_default_painter(document):
 
 	return painter
 
-def bitmap_reader_test(reader_name, source_file, width, height):
+def setup_bitmap_reader_test(reader_name, source_file):
 	doc = k3d.new_document()
 	reader = doc.new_node(reader_name)
 	reader.file = "@CMAKE_CURRENT_SOURCE_DIR@/bitmaps/" + source_file
-	bitmap = reader.output_bitmap
-	if bitmap.width() != width or bitmap.height() != height:
-		raise "Error loading test bitmap"
+
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = doc
+	result.reader = reader
+
+	return result
 
 def setup_mesh_source_test(source_name):
 	doc = k3d.new_document()
@@ -181,6 +187,17 @@ def setup_mesh_modifier_image_test(source_name, modifier_name):
 	result.camera_to_bitmap = camera_to_bitmap
 
 	return result
+
+def bitmap_size_comparison(bitmap, width, height):
+
+	print """<DartMeasurement name="Bitmap Width" type="numeric/float">""" + str(bitmap.width()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Bitmap Height" type="numeric/float">""" + str(bitmap.height()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Target Width" type="numeric/float">""" + str(width) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Target Height" type="numeric/float">""" + str(height) + """</DartMeasurement>"""
+	sys.stdout.flush()
+	
+	if bitmap.width() != width or bitmap.height() != height:
+		raise "bitmap dimensions incorrect"
 
 def mesh_comparison(document, mesh, mesh_name):
 	

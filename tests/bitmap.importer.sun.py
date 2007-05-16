@@ -1,5 +1,6 @@
 #python
 
 import testing
-testing.bitmap_reader_test("BitmapReader", "test_rgb_8.sun", 200, 150)
+setup = testing.setup_bitmap_reader_test("BitmapReader", "test_rgb_8.sun")
+testing.bitmap_size_comparison(setup.reader.output_bitmap, 200, 150)
 

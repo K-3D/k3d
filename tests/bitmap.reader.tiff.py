@@ -1,5 +1,6 @@
 #python
 
 import testing
-testing.bitmap_reader_test("TIFFBitmapReader", "test_rgb_8.tif", 200, 150)
+setup = testing.setup_bitmap_reader_test("TIFFBitmapReader", "test_rgb_8.tif")
+testing.bitmap_size_comparison(setup.reader.output_bitmap, 200, 150)
 
