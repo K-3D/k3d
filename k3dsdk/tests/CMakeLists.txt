@@ -19,9 +19,6 @@ ADD_TEST(k3dsdk.bitmap.conversion ${EXECUTABLE_OUTPUT_PATH}/test-bitmap-conversi
 ADD_EXECUTABLE(test-boost-blas-performance boost_blas_performance.cpp)
 ADD_TEST(k3dsdk.performance.blas.boost ${EXECUTABLE_OUTPUT_PATH}/test-boost-blas-performance)
 
-ADD_EXECUTABLE(test-k3dsdk-blas-performance k3dsdk_blas_performance.cpp)
-ADD_TEST(k3dsdk.performance.blas.k3dsdk ${EXECUTABLE_OUTPUT_PATH}/test-k3dsdk-blas-performance)
-
 ADD_EXECUTABLE(test-circular-signals circular_signals.cpp)
 ADD_TEST(k3dsdk.circular-signals ${EXECUTABLE_OUTPUT_PATH}/test-circular-signals)
 
@@ -34,6 +31,9 @@ ADD_TEST(k3dsdk.float-to-string.002 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-stri
 ADD_TEST(k3dsdk.float-to-string.003 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-string 123.456)
 ADD_TEST(k3dsdk.float-to-string.004 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-string 123.456789012)
 ADD_TEST(k3dsdk.float-to-string.005 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-string 123.4567890123456)
+
+ADD_EXECUTABLE(test-k3dsdk-blas-performance k3dsdk_blas_performance.cpp)
+ADD_TEST(k3dsdk.performance.blas.k3dsdk ${EXECUTABLE_OUTPUT_PATH}/test-k3dsdk-blas-performance)
 
 ADD_EXECUTABLE(test-mesh-selection mesh_selection.cpp)
 ADD_TEST(k3dsdk.mesh_selection.001 ${EXECUTABLE_OUTPUT_PATH}/test-mesh-selection "[0, 1) 1" 0 1 1)
@@ -51,6 +51,9 @@ ADD_EXECUTABLE(test-path-relative relative_path.cpp)
 ADD_TEST(k3dsdk.path.relative.001 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/" "home/bubba/k3d/test.k3d")
 ADD_TEST(k3dsdk.path.relative.002 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/home/bubba" "k3d/test.k3d")
 ADD_TEST(k3dsdk.path.relative.003 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/var/documents" "../../home/bubba/k3d/test.k3d")
+
+ADD_EXECUTABLE(test-representable-difference representable_difference.cpp)
+ADD_TEST(k3dsdk.difference.representable ${EXECUTABLE_OUTPUT_PATH}/test-representable-difference)
 
 ADD_EXECUTABLE(test-shared-arrays shared_arrays.cpp)
 ADD_TEST(k3dsdk.shared-arrays ${EXECUTABLE_OUTPUT_PATH}/test-shared-arrays)
