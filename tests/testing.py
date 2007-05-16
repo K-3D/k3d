@@ -74,6 +74,20 @@ def bitmap_reader_test(reader_name, source_file, width, height):
 	if bitmap.width() != width or bitmap.height() != height:
 		raise "Error loading test bitmap"
 
+def setup_mesh_source_test(source_name):
+	doc = k3d.new_document()
+
+	source = doc.new_node(source_name)
+
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = doc
+	result.source = source
+
+	return result
+
 def setup_mesh_source_image_test(source_name):
 	doc = k3d.new_document()
 
