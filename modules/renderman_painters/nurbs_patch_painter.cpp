@@ -62,28 +62,28 @@ public:
                         gluDeleteNurbsRenderer(nurbs_renderer);
 	}
 
-	void paint_mesh(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
-		if(!k3d::dev::validate_nurbs_patches(Mesh))
+		if(!k3d::validate_nurbs_patches(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& patch_first_points = *Mesh.nurbs_patches->patch_first_points;
-		const k3d::dev::mesh::counts_t& patch_u_point_counts = *Mesh.nurbs_patches->patch_u_point_counts;
-		const k3d::dev::mesh::counts_t& patch_v_point_counts = *Mesh.nurbs_patches->patch_v_point_counts;
-		const k3d::dev::mesh::orders_t& patch_u_orders = *Mesh.nurbs_patches->patch_u_orders;
-		const k3d::dev::mesh::orders_t& patch_v_orders = *Mesh.nurbs_patches->patch_v_orders;
-		const k3d::dev::mesh::indices_t& patch_u_first_knots = *Mesh.nurbs_patches->patch_u_first_knots;
-		const k3d::dev::mesh::indices_t& patch_v_first_knots = *Mesh.nurbs_patches->patch_v_first_knots;
-		const k3d::dev::mesh::materials_t& patch_materials = *Mesh.nurbs_patches->patch_materials;
-		const k3d::dev::mesh::named_arrays& constant_data = Mesh.nurbs_patches->constant_data;
-		const k3d::dev::mesh::named_arrays& uniform_data = Mesh.nurbs_patches->uniform_data;
-		const k3d::dev::mesh::indices_t& patch_points = *Mesh.nurbs_patches->patch_points;
-		const k3d::dev::mesh::weights_t& patch_point_weights = *Mesh.nurbs_patches->patch_point_weights;
-		const k3d::dev::mesh::knots_t& patch_u_knots = *Mesh.nurbs_patches->patch_u_knots;
-		const k3d::dev::mesh::knots_t& patch_v_knots = *Mesh.nurbs_patches->patch_v_knots;
-		const k3d::dev::mesh::named_arrays& varying_data = Mesh.nurbs_patches->varying_data;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
-		const k3d::dev::mesh::named_arrays& vertex_data = Mesh.vertex_data;
+		const k3d::mesh::indices_t& patch_first_points = *Mesh.nurbs_patches->patch_first_points;
+		const k3d::mesh::counts_t& patch_u_point_counts = *Mesh.nurbs_patches->patch_u_point_counts;
+		const k3d::mesh::counts_t& patch_v_point_counts = *Mesh.nurbs_patches->patch_v_point_counts;
+		const k3d::mesh::orders_t& patch_u_orders = *Mesh.nurbs_patches->patch_u_orders;
+		const k3d::mesh::orders_t& patch_v_orders = *Mesh.nurbs_patches->patch_v_orders;
+		const k3d::mesh::indices_t& patch_u_first_knots = *Mesh.nurbs_patches->patch_u_first_knots;
+		const k3d::mesh::indices_t& patch_v_first_knots = *Mesh.nurbs_patches->patch_v_first_knots;
+		const k3d::mesh::materials_t& patch_materials = *Mesh.nurbs_patches->patch_materials;
+		const k3d::mesh::named_arrays& constant_data = Mesh.nurbs_patches->constant_data;
+		const k3d::mesh::named_arrays& uniform_data = Mesh.nurbs_patches->uniform_data;
+		const k3d::mesh::indices_t& patch_points = *Mesh.nurbs_patches->patch_points;
+		const k3d::mesh::weights_t& patch_point_weights = *Mesh.nurbs_patches->patch_point_weights;
+		const k3d::mesh::knots_t& patch_u_knots = *Mesh.nurbs_patches->patch_u_knots;
+		const k3d::mesh::knots_t& patch_v_knots = *Mesh.nurbs_patches->patch_v_knots;
+		const k3d::mesh::named_arrays& varying_data = Mesh.nurbs_patches->varying_data;
+		const k3d::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::named_arrays& vertex_data = Mesh.vertex_data;
 
 		const size_t patch_begin = 0;
 		const size_t patch_end = patch_begin + patch_first_points.size();
@@ -145,7 +145,7 @@ public:
 		}
 	}
 
-	void paint_complete(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_complete(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
 	}
 

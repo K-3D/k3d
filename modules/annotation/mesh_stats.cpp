@@ -36,9 +36,9 @@ namespace libk3dannotation
 // mesh_stats
 
 class mesh_stats :
-	public k3d::dev::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::mesh_modifier<k3d::persistent<k3d::node> >
 {
-	typedef k3d::dev::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_modifier<k3d::persistent<k3d::node> > base;
 
 public:
 	mesh_stats(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -72,18 +72,18 @@ public:
 		m_input_mesh.changed_signal().connect(m_nupatch_count.make_reset_slot());
 	}
 
-	void on_create_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
 	}
 
-	void on_update_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 
 	unsigned long get_point_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->points)
 				return mesh->points->size();
@@ -94,7 +94,7 @@ public:
 
 	unsigned long get_polyhedron_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->polyhedra && mesh->polyhedra->first_faces)
 				return mesh->polyhedra->first_faces->size();
@@ -105,7 +105,7 @@ public:
 
 	unsigned long get_edge_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->polyhedra && mesh->polyhedra->edge_points)
 				return mesh->polyhedra->edge_points->size();
@@ -116,7 +116,7 @@ public:
 
 	unsigned long get_face_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->polyhedra && mesh->polyhedra->face_first_loops)
 				return mesh->polyhedra->face_first_loops->size();
@@ -127,7 +127,7 @@ public:
 
 	unsigned long get_linear_curve_group_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->linear_curve_groups && mesh->linear_curve_groups->first_curves)
 				return mesh->linear_curve_groups->first_curves->size();
@@ -138,7 +138,7 @@ public:
 
 	unsigned long get_linear_curve_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->linear_curve_groups && mesh->linear_curve_groups->curve_first_points)
 				return mesh->linear_curve_groups->curve_first_points->size();
@@ -149,7 +149,7 @@ public:
 
 	unsigned long get_cubic_curve_group_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->cubic_curve_groups && mesh->cubic_curve_groups->first_curves)
 				return mesh->cubic_curve_groups->first_curves->size();
@@ -160,7 +160,7 @@ public:
 
 	unsigned long get_cubic_curve_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->cubic_curve_groups && mesh->cubic_curve_groups->curve_first_points)
 				return mesh->cubic_curve_groups->curve_first_points->size();
@@ -171,7 +171,7 @@ public:
 
 	unsigned long get_nucurve_group_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->nurbs_curve_groups && mesh->nurbs_curve_groups->first_curves)
 				return mesh->nurbs_curve_groups->first_curves->size();
@@ -182,7 +182,7 @@ public:
 
 	unsigned long get_nucurve_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->nurbs_curve_groups && mesh->nurbs_curve_groups->curve_first_points)
 				return mesh->nurbs_curve_groups->curve_first_points->size();
@@ -193,7 +193,7 @@ public:
 
 	unsigned long get_bilinear_patch_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->bilinear_patches && mesh->bilinear_patches->patch_selection)
 				return mesh->bilinear_patches->patch_selection->size();
@@ -204,7 +204,7 @@ public:
 
 	unsigned long get_bicubic_patch_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->bicubic_patches && mesh->bicubic_patches->patch_selection)
 				return mesh->bicubic_patches->patch_selection->size();
@@ -215,7 +215,7 @@ public:
 
 	unsigned long get_nupatch_count()
 	{
-		if(k3d::dev::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.value())
 		{
 			if(mesh->nurbs_patches && mesh->nurbs_patches->patch_first_points)
 				return mesh->nurbs_patches->patch_first_points->size();

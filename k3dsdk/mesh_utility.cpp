@@ -22,9 +22,6 @@
 namespace k3d
 {
 
-namespace dev
-{
-
 const mesh create_grid(const size_t Rows, const size_t Columns, imaterial* const Material)
 {
 	return_val_if_fail(Rows, mesh());
@@ -174,8 +171,6 @@ const mesh create_cylinder(const size_t Rows, const size_t Columns, imaterial* c
 
 	return result;
 }
-
-} // namespace dev
 
 } // namespace k3d
 

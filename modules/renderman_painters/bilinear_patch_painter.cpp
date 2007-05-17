@@ -51,18 +51,18 @@ public:
 	{
 	}
 
-	void paint_mesh(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
-		if(!k3d::dev::validate_bilinear_patches(Mesh))
+		if(!k3d::validate_bilinear_patches(Mesh))
 			return;
 
-		const k3d::dev::mesh::materials_t& patch_materials = *Mesh.bilinear_patches->patch_materials;
-		const k3d::dev::mesh::named_arrays& constant_data = Mesh.bilinear_patches->constant_data;
-		const k3d::dev::mesh::named_arrays& uniform_data = Mesh.bilinear_patches->uniform_data;
-		const k3d::dev::mesh::indices_t& patch_points = *Mesh.bilinear_patches->patch_points;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
-		const k3d::dev::mesh::named_arrays& varying_data = Mesh.bilinear_patches->varying_data;
-		const k3d::dev::mesh::named_arrays& vertex_data = Mesh.vertex_data;
+		const k3d::mesh::materials_t& patch_materials = *Mesh.bilinear_patches->patch_materials;
+		const k3d::mesh::named_arrays& constant_data = Mesh.bilinear_patches->constant_data;
+		const k3d::mesh::named_arrays& uniform_data = Mesh.bilinear_patches->uniform_data;
+		const k3d::mesh::indices_t& patch_points = *Mesh.bilinear_patches->patch_points;
+		const k3d::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::named_arrays& varying_data = Mesh.bilinear_patches->varying_data;
+		const k3d::mesh::named_arrays& vertex_data = Mesh.vertex_data;
 
 		const size_t patch_begin = 0;
 		const size_t patch_end = patch_begin + (patch_points.size() / 4);
@@ -101,7 +101,7 @@ public:
 		}
 	}
 
-	void paint_complete(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_complete(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
 	}
 

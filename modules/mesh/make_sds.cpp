@@ -37,9 +37,9 @@ namespace libk3dmesh
 // make_sds_implementation
 
 class make_sds_implementation :
-	public k3d::dev::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::mesh_modifier<k3d::persistent<k3d::node> >
 {
-	typedef k3d::dev::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_modifier<k3d::persistent<k3d::node> > base;
 
 public:
 	make_sds_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -49,7 +49,7 @@ public:
 		m_interpolateboundary.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		const bool interpolateboundary = m_interpolateboundary.value();
 
@@ -57,15 +57,15 @@ public:
 
 		if(Output.polyhedra && Output.polyhedra->types)
 		{
-			k3d::dev::mesh::polyhedra_t* const polyhedra = k3d::make_unique(Output.polyhedra);
-			k3d::dev::mesh::polyhedra_t::types_t* const types = k3d::make_unique(polyhedra->types);
-			std::fill(types->begin(), types->end(), k3d::dev::mesh::polyhedra_t::CATMULL_CLARK);
+			k3d::mesh::polyhedra_t* const polyhedra = k3d::make_unique(Output.polyhedra);
+			k3d::mesh::polyhedra_t::types_t* const types = k3d::make_unique(polyhedra->types);
+			std::fill(types->begin(), types->end(), k3d::mesh::polyhedra_t::CATMULL_CLARK);
 
 //			(*polyhedron)->tags["interpolateboundary"] = interpolateboundary;
 		}
 	}
 
-	void on_update_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 

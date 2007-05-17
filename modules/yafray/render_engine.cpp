@@ -371,16 +371,16 @@ private:
 					continue;
 
 				// Check for transformed output mesh
-				k3d::dev::mesh* mesh = 0;
+				k3d::mesh* mesh = 0;
 				if(k3d::iproperty* property = get_property(**node, "transformed_output_mesh"))
 				{
-					mesh = boost::any_cast<k3d::dev::mesh*>(property->property_value());
+					mesh = boost::any_cast<k3d::mesh*>(property->property_value());
 				}
 				else
 				{
 					// Fall back to mesh source
 					k3d::iproperty& property = mesh_source->mesh_source_output();
-					mesh = boost::any_cast<k3d::dev::mesh*>(property.property_value());
+					mesh = boost::any_cast<k3d::mesh*>(property.property_value());
 				}
 
 				if(!mesh)

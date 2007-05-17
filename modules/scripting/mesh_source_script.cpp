@@ -67,9 +67,9 @@ namespace libk3dscripting
 // mesh_source_script
 
 class mesh_source_script :
-	public k3d::scripted_node<k3d::dev::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::scripted_node<k3d::mesh_source<k3d::persistent<k3d::node> > >
 {
-	typedef k3d::scripted_node<k3d::dev::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::scripted_node<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
 	mesh_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -80,7 +80,7 @@ public:
 		connect_script_changed_signal(make_topology_changed_slot());
 	}
 
-	void on_create_mesh_topology(k3d::dev::mesh& Mesh)
+	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
 		k3d::iscript_engine::context_t context;
 		context["Document"] = static_cast<k3d::iunknown*>(&document());
@@ -89,10 +89,10 @@ public:
 
 		execute_script(context);
 
-		k3d::dev::validate(Mesh);
+		k3d::validate(Mesh);
 	}
 
-	void on_update_mesh_geometry(k3d::dev::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Mesh)
 	{
 	}
 

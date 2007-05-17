@@ -47,7 +47,7 @@ public:
 	{
 	}
 
-	void paint_mesh(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
@@ -63,7 +63,7 @@ public:
 		}
 	}
 	
-	void paint_complete(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_complete(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)

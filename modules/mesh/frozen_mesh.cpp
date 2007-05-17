@@ -53,15 +53,15 @@ class frozen_mesh :
 public:
 	frozen_mesh(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::dev::mesh*>(0)),
+		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::mesh*>(0)),
 		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")) + init_slot(sigc::mem_fun(*this, &frozen_mesh::create_mesh)))
 	{
 	}
 
-	void create_mesh(k3d::dev::mesh& Output)
+	void create_mesh(k3d::mesh& Output)
 	{
-		if(const k3d::dev::mesh* const input = m_input_mesh.value())
-			k3d::dev::deep_copy(*input, Output);
+		if(const k3d::mesh* const input = m_input_mesh.value())
+			k3d::deep_copy(*input, Output);
 	}
 
 	k3d::iproperty& mesh_source_output()
@@ -74,7 +74,7 @@ public:
 		return m_input_mesh;
 	}
 
-	void reset_mesh(k3d::dev::mesh* const Mesh)
+	void reset_mesh(k3d::mesh* const Mesh)
 	{
 		m_output_mesh.reset(Mesh);
 	}
@@ -83,7 +83,7 @@ public:
 	{
 		base::save(Element, Context);
 
-		if(k3d::dev::mesh* const mesh = m_output_mesh.internal_value())
+		if(k3d::mesh* const mesh = m_output_mesh.internal_value())
 		{
 			element& xml_mesh = Element.append(element("mesh_arrays"));
 			k3d::save_mesh(*mesh, xml_mesh, Context);
@@ -95,7 +95,7 @@ public:
 		base::load(Element, Context);
 
 		// Create a new mesh ...
-		k3d::dev::mesh* const mesh = new k3d::dev::mesh();
+		k3d::mesh* const mesh = new k3d::mesh();
 		m_output_mesh.reset(mesh);
 
 		// Load the stored mesh data ...
@@ -120,8 +120,8 @@ public:
 		return factory;
 	}
 
-	k3d_data(k3d::dev::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_input_mesh;
-	k3d_data(k3d::dev::mesh*, immutable_name, change_signal, no_undo, demand_storage, no_constraint, read_only_property, no_serialization) m_output_mesh;
+	k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_input_mesh;
+	k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, demand_storage, no_constraint, read_only_property, no_serialization) m_output_mesh;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -153,8 +153,8 @@ void initialize_types()
 	register_type(typeid(k3d::bitmap*), "k3d::bitmap*");
 	register_type(typeid(k3d::bounding_box3), "k3d::bounding_box3");
 	register_type(typeid(k3d::color), "k3d::color");
-	register_type(typeid(k3d::dev::mesh), "k3d::dev::mesh");
-	register_type(typeid(k3d::dev::mesh*), "k3d::dev::mesh*");
+	register_type(typeid(k3d::mesh), "k3d::mesh");
+	register_type(typeid(k3d::mesh*), "k3d::mesh*");
 	register_type(typeid(k3d::filesystem::path), "k3d::filesystem::path");
 	register_type(typeid(k3d::gl::ilight), "k3d::gl::ilight");
 	register_type(typeid(k3d::gl::imaterial), "k3d::gl::imaterial");

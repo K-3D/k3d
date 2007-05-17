@@ -66,7 +66,7 @@ class mesh_geometry_changed_t :
 public:
 	mesh_geometry_changed_t() {}
 	/// Indices of the points affected by the change
-	k3d::dev::mesh::indices_t changed_points;
+	k3d::mesh::indices_t changed_points;
 	/// Transformation matrix used for the change
 	k3d::matrix4 transformation_matrix;
 };

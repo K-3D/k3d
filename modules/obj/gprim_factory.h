@@ -31,11 +31,11 @@ namespace libk3dobj
 class gprim_factory
 {
 public:
-	gprim_factory(k3d::dev::mesh& Mesh);
+	gprim_factory(k3d::mesh& Mesh);
 	~gprim_factory();
 
 	void add_point(const k3d::point3& Point);
-	void add_polygon(const k3d::dev::mesh::indices_t& Points);
+	void add_polygon(const k3d::mesh::indices_t& Points);
 
 private:
 	class implementation;

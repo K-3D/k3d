@@ -34,11 +34,11 @@ namespace libk3dopengl
 {
 
 class named_arrays :
-	public k3d::dev::mesh::named_arrays
+	public k3d::mesh::named_arrays
 {
-	typedef k3d::dev::mesh::named_arrays base;
+	typedef k3d::mesh::named_arrays base;
 public:
-	named_arrays(const k3d::dev::mesh::named_arrays& Arrays) :
+	named_arrays(const k3d::mesh::named_arrays& Arrays) :
 		base(Arrays)
 	{
 	}
@@ -69,27 +69,27 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		if(!k3d::dev::validate_polyhedra(Mesh))
+		if(!k3d::validate_polyhedra(Mesh))
 			return;
 			
-		if (k3d::dev::is_sds(Mesh))
+		if (k3d::is_sds(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::dev::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
-		const k3d::dev::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::dev::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::dev::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
+		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+		const k3d::mesh::points_t& points = *Mesh.points;
 
 		const size_t face_count = face_first_loops.size();
 
 		// Calculate face normals ...
 		k3d::typed_array<k3d::normal3> normals(face_count, k3d::normal3(0, 0, 1));
 		for(size_t face = 0; face != face_count; ++face)
-			normals[face] = k3d::dev::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
+			normals[face] = k3d::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
 
 		// Define a default face color array (in case the user's choice of color array doesn't exist) ...
 		k3d::typed_array<k3d::color> default_color_array;
@@ -133,22 +133,22 @@ public:
 		}
 	}
 	
-	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if(!SelectionState.select_faces)
 			return;
 
-		if(!k3d::dev::validate_polyhedra(Mesh))
+		if(!k3d::validate_polyhedra(Mesh))
 			return;
 		
-		if (k3d::dev::is_sds(Mesh))
+		if (k3d::is_sds(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::dev::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::dev::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::dev::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+		const k3d::mesh::points_t& points = *Mesh.points;
 
 		const size_t face_count = face_first_loops.size();
 

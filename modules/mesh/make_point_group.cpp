@@ -37,9 +37,9 @@ namespace libk3dmesh
 // make_point_group
 
 class make_point_group :
-	public k3d::dev::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::mesh_modifier<k3d::persistent<k3d::node> >
 {
-	typedef k3d::dev::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_modifier<k3d::persistent<k3d::node> > base;
 
 public:
 	make_point_group(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -47,7 +47,7 @@ public:
 	{
 	}
 
-	void on_create_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		if(!validate_points(Input))
 			return;
@@ -58,11 +58,11 @@ public:
 		Output.point_selection = Input.point_selection;
 		Output.vertex_data = Input.vertex_data;
 
-		k3d::dev::mesh::point_groups_t* const point_groups = new k3d::dev::mesh::point_groups_t();
-		k3d::dev::mesh::indices_t* const first_points = new k3d::dev::mesh::indices_t(1, 0);
-		k3d::dev::mesh::counts_t* const point_counts = new k3d::dev::mesh::counts_t(1, point_count);
-		k3d::dev::mesh::materials_t* const materials = new k3d::dev::mesh::materials_t(1, static_cast<k3d::imaterial*>(0));
-		k3d::dev::mesh::indices_t* const points = new k3d::dev::mesh::indices_t(point_count);
+		k3d::mesh::point_groups_t* const point_groups = new k3d::mesh::point_groups_t();
+		k3d::mesh::indices_t* const first_points = new k3d::mesh::indices_t(1, 0);
+		k3d::mesh::counts_t* const point_counts = new k3d::mesh::counts_t(1, point_count);
+		k3d::mesh::materials_t* const materials = new k3d::mesh::materials_t(1, static_cast<k3d::imaterial*>(0));
+		k3d::mesh::indices_t* const points = new k3d::mesh::indices_t(point_count);
 		for(size_t i = 0; i != point_count; ++i)
 			(*points)[i] = i;
 
@@ -74,7 +74,7 @@ public:
 		Output.point_groups.reset(point_groups);
 	}
 
-	void on_update_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 

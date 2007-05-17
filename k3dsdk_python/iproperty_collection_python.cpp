@@ -100,7 +100,7 @@ iproperty iproperty_collection::add_user_property(const std::string& Type, const
 	else if(Type == k3d::type_string<k3d::normal3>()) return detail::create_user_property<k3d::user::normal3_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::normal3(0, 0, 0));
 	else if(Type == k3d::type_string<k3d::matrix4>()) return detail::create_user_property<k3d::user::matrix4_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::identity3D());
 	else if(Type == k3d::type_string<k3d::color>()) return detail::create_user_property<k3d::user::color_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::color(1, 1, 1));
-	else if(Type == k3d::type_string<k3d::dev::mesh*>()) return detail::create_user_property<k3d::user::dev_mesh_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::dev::mesh*>(0));
+	else if(Type == k3d::type_string<k3d::mesh*>()) return detail::create_user_property<k3d::user::mesh_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::mesh*>(0));
 	else if(Type == k3d::type_string<k3d::gl::imesh_painter*>()) return detail::create_user_property<k3d::user::gl_mesh_painter_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::gl::imesh_painter*>(0));
 	else if(Type == k3d::type_string<k3d::ri::imesh_painter*>()) return detail::create_user_property<k3d::user::ri_mesh_painter_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::ri::imesh_painter*>(0));
 

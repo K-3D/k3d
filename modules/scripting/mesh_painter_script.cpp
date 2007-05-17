@@ -62,25 +62,25 @@ public:
 		set_script(DEFAULT_SCRIPT);
 	}
 
-	void paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		k3d::iscript_engine::context_t context;
 		context["Document"] = static_cast<k3d::iunknown*>(&document());
 		context["Node"] = static_cast<k3d::iunknown*>(this);
-		context["Mesh"] = &const_cast<k3d::dev::mesh&>(Mesh);
+		context["Mesh"] = &const_cast<k3d::mesh&>(Mesh);
 		context["PaintMesh"] = true;
 		context["SelectMesh"] = false;
 		execute_script(context);
 	}
 
-	void select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		k3d::gl::push_selection_token(this);
 
 		k3d::iscript_engine::context_t context;
 		context["Document"] = static_cast<k3d::iunknown*>(&document());
 		context["Node"] = static_cast<k3d::iunknown*>(this);
-		context["Mesh"] = &const_cast<k3d::dev::mesh&>(Mesh);
+		context["Mesh"] = &const_cast<k3d::mesh&>(Mesh);
 		context["PaintMesh"] = false;
 		context["SelectMesh"] = true;
 		execute_script(context);
@@ -88,7 +88,7 @@ public:
 		k3d::gl::pop_selection_token();
 	}
 
-	void mesh_changed(const k3d::dev::mesh& Mesh, k3d::iunknown* Hint)
+	void mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 	}
 

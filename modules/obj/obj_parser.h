@@ -43,12 +43,12 @@ private:
 	/// @name Override these methods in a derived class to handle the given parsing events
 
 	virtual void on_curve_type(const std::string& Type);
-	virtual void on_face(const k3d::dev::mesh::indices_t& Points, const k3d::dev::mesh::indices_t& TexturePoints, const k3d::dev::mesh::indices_t& Normals);
+	virtual void on_face(const k3d::mesh::indices_t& Points, const k3d::mesh::indices_t& TexturePoints, const k3d::mesh::indices_t& Normals);
 	virtual void on_group(const std::string& Name);
-	virtual void on_line(const k3d::dev::mesh::indices_t& Points);
+	virtual void on_line(const k3d::mesh::indices_t& Points);
 	virtual void on_material_library(const std::string& Name);
 	virtual void on_object(const std::string& Name);
-	virtual void on_points(const k3d::dev::mesh::indices_t& Points);
+	virtual void on_points(const k3d::mesh::indices_t& Points);
 	virtual void on_use_material(const std::string& Name);
 	virtual void on_vertex(const k3d::point4& Vertex);
 	virtual void on_normal_vertex(const k3d::normal3& NormalVertex);
@@ -63,12 +63,12 @@ class print_obj :
 {
 private:
 	void on_curve_type(const std::string& Type);
-	void on_face(const k3d::dev::mesh::indices_t& Points, const k3d::dev::mesh::indices_t& TexturePoints, const k3d::dev::mesh::indices_t& Normals);
+	void on_face(const k3d::mesh::indices_t& Points, const k3d::mesh::indices_t& TexturePoints, const k3d::mesh::indices_t& Normals);
 	void on_group(const std::string& Name);
-	void on_line(const k3d::dev::mesh::indices_t& Points);
+	void on_line(const k3d::mesh::indices_t& Points);
 	void on_material_library(const std::string& Name);
 	void on_object(const std::string& Name);
-	void on_points(const k3d::dev::mesh::indices_t& Points);
+	void on_points(const k3d::mesh::indices_t& Points);
 	void on_use_material(const std::string& Name);
 	void on_vertex(const k3d::point4& Vertex);
 	void on_normal_vertex(const k3d::normal3& NormalVertex);

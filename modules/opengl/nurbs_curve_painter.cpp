@@ -57,22 +57,22 @@ public:
                         gluDeleteNurbsRenderer(nurbs_renderer);
 	}
 
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		if(!k3d::dev::validate_nurbs_curve_groups(Mesh))
+		if(!k3d::validate_nurbs_curve_groups(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& first_curves = *Mesh.nurbs_curve_groups->first_curves;
-		const k3d::dev::mesh::counts_t& curve_counts = *Mesh.nurbs_curve_groups->curve_counts;
-		const k3d::dev::mesh::indices_t& curve_first_points = *Mesh.nurbs_curve_groups->curve_first_points;
-		const k3d::dev::mesh::counts_t& curve_point_counts = *Mesh.nurbs_curve_groups->curve_point_counts;
-		const k3d::dev::mesh::orders_t& curve_orders = *Mesh.nurbs_curve_groups->curve_orders;
-		const k3d::dev::mesh::indices_t& curve_first_knots = *Mesh.nurbs_curve_groups->curve_first_knots;
-		const k3d::dev::mesh::selection_t& curve_selection = *Mesh.nurbs_curve_groups->curve_selection;
-		const k3d::dev::mesh::indices_t& curve_points = *Mesh.nurbs_curve_groups->curve_points;
-		const k3d::dev::mesh::weights_t& curve_point_weights = *Mesh.nurbs_curve_groups->curve_point_weights;
-		const k3d::dev::mesh::knots_t& curve_knots = *Mesh.nurbs_curve_groups->curve_knots;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::indices_t& first_curves = *Mesh.nurbs_curve_groups->first_curves;
+		const k3d::mesh::counts_t& curve_counts = *Mesh.nurbs_curve_groups->curve_counts;
+		const k3d::mesh::indices_t& curve_first_points = *Mesh.nurbs_curve_groups->curve_first_points;
+		const k3d::mesh::counts_t& curve_point_counts = *Mesh.nurbs_curve_groups->curve_point_counts;
+		const k3d::mesh::orders_t& curve_orders = *Mesh.nurbs_curve_groups->curve_orders;
+		const k3d::mesh::indices_t& curve_first_knots = *Mesh.nurbs_curve_groups->curve_first_knots;
+		const k3d::mesh::selection_t& curve_selection = *Mesh.nurbs_curve_groups->curve_selection;
+		const k3d::mesh::indices_t& curve_points = *Mesh.nurbs_curve_groups->curve_points;
+		const k3d::mesh::weights_t& curve_point_weights = *Mesh.nurbs_curve_groups->curve_point_weights;
+		const k3d::mesh::knots_t& curve_knots = *Mesh.nurbs_curve_groups->curve_knots;
+		const k3d::mesh::points_t& points = *Mesh.points;
 		
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
@@ -122,24 +122,24 @@ public:
 		}
 	}
 	
-	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if(!SelectionState.select_nurbs_curves)
 			return;
 
-		if(!k3d::dev::validate_nurbs_curve_groups(Mesh))
+		if(!k3d::validate_nurbs_curve_groups(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& first_curves = *Mesh.nurbs_curve_groups->first_curves;
-		const k3d::dev::mesh::counts_t& curve_counts = *Mesh.nurbs_curve_groups->curve_counts;
-		const k3d::dev::mesh::indices_t& curve_first_points = *Mesh.nurbs_curve_groups->curve_first_points;
-		const k3d::dev::mesh::counts_t& curve_point_counts = *Mesh.nurbs_curve_groups->curve_point_counts;
-		const k3d::dev::mesh::orders_t& curve_orders = *Mesh.nurbs_curve_groups->curve_orders;
-		const k3d::dev::mesh::indices_t& curve_first_knots = *Mesh.nurbs_curve_groups->curve_first_knots;
-		const k3d::dev::mesh::indices_t& curve_points = *Mesh.nurbs_curve_groups->curve_points;
-		const k3d::dev::mesh::weights_t& curve_point_weights = *Mesh.nurbs_curve_groups->curve_point_weights;
-		const k3d::dev::mesh::knots_t& curve_knots = *Mesh.nurbs_curve_groups->curve_knots;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::indices_t& first_curves = *Mesh.nurbs_curve_groups->first_curves;
+		const k3d::mesh::counts_t& curve_counts = *Mesh.nurbs_curve_groups->curve_counts;
+		const k3d::mesh::indices_t& curve_first_points = *Mesh.nurbs_curve_groups->curve_first_points;
+		const k3d::mesh::counts_t& curve_point_counts = *Mesh.nurbs_curve_groups->curve_point_counts;
+		const k3d::mesh::orders_t& curve_orders = *Mesh.nurbs_curve_groups->curve_orders;
+		const k3d::mesh::indices_t& curve_first_knots = *Mesh.nurbs_curve_groups->curve_first_knots;
+		const k3d::mesh::indices_t& curve_points = *Mesh.nurbs_curve_groups->curve_points;
+		const k3d::mesh::weights_t& curve_point_weights = *Mesh.nurbs_curve_groups->curve_point_weights;
+		const k3d::mesh::knots_t& curve_knots = *Mesh.nurbs_curve_groups->curve_knots;
+		const k3d::mesh::points_t& points = *Mesh.points;
 		
 		k3d::gl::store_attributes attributes;
 

@@ -27,9 +27,6 @@
 namespace k3d
 {
 
-namespace dev
-{
-
 mesh_deformation_modifier::mesh_deformation_modifier(iplugin_factory& Factory, idocument& Document) :
 	base(Factory, Document)
 {
@@ -58,8 +55,6 @@ void mesh_deformation_modifier::on_update_mesh(const mesh& Input, mesh& Output)
 
 	on_deform_mesh(Input, input_points, selection, output_points);
 }
-
-} // namespace dev
 
 } // namespace k3d
 

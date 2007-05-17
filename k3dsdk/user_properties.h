@@ -222,8 +222,8 @@ typedef user_property<k3d_data(k3d::normal3, immutable_name, change_signal, with
 typedef user_property<k3d_data(k3d::point4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> point4_property;
 typedef user_property<k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> matrix4_property;
 typedef user_property<k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> color_property;
-typedef user_property<k3d_data(k3d::legacy::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, detail::mesh_serialization)> mesh_property;
-typedef user_property<k3d_data(k3d::dev::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, detail::mesh_serialization)> dev_mesh_property;
+typedef user_property<k3d_data(k3d::legacy::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, detail::mesh_serialization)> legacy_mesh_property;
+typedef user_property<k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, detail::mesh_serialization)> mesh_property;
 typedef user_property<k3d_data(k3d::gl::imesh_painter*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, detail::node_serialization)> gl_mesh_painter_property;
 typedef user_property<k3d_data(k3d::ri::imesh_painter*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, detail::node_serialization)> ri_mesh_painter_property;
 typedef user_property<k3d_data(k3d::ri::itexture*, immutable_name, change_signal, with_undo, node_storage, no_constraint, k3d::data::node_property, detail::node_serialization)> ri_texture_property;

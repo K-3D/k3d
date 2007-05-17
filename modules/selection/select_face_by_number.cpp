@@ -35,9 +35,9 @@ namespace libk3dselection
 // select_face_by_number
 
 class select_face_by_number :
-	public k3d::dev::mesh_selection_modifier
+	public k3d::mesh_selection_modifier
 {
-	typedef k3d::dev::mesh_selection_modifier base;
+	typedef k3d::mesh_selection_modifier base;
 
 public:
 	select_face_by_number(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -48,12 +48,12 @@ public:
 		m_index.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	void on_select_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_select_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		if(Output.polyhedra && Output.polyhedra->face_selection)
 		{
-		    k3d::dev::mesh::polyhedra_t& polyhedra = *k3d::make_unique(Output.polyhedra);
-		    k3d::dev::mesh::selection_t& face_selection = *k3d::make_unique(polyhedra.face_selection);
+		    k3d::mesh::polyhedra_t& polyhedra = *k3d::make_unique(Output.polyhedra);
+		    k3d::mesh::selection_t& face_selection = *k3d::make_unique(polyhedra.face_selection);
 			std::fill(face_selection.begin(), face_selection.end(), 0.0);
 
 			const unsigned long index = m_index.value();

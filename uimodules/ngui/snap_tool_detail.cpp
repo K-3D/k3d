@@ -286,7 +286,7 @@ unsigned long snap_tool_detail::mesh_target::target_number()
 void snap_tool_detail::mesh_target::reset_selection()
 {
 k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-	k3d::dev::mesh* const mesh = boost::any_cast<k3d::dev::mesh*>(mesh_source_property.property_value());
+	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
 	return_if_fail(mesh);
 
 	// Get selection and save initial position
@@ -309,7 +309,7 @@ void snap_tool_detail::mesh_target::init_transformation()
 	assert_not_implemented();
 /*
 	// Save initial positions
-	k3d::dev::mesh* const mesh = boost::any_cast<k3d::dev::mesh*>(mesh_source_property.property_value());
+	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
 	return_if_fail(mesh);
 	for(detail::component_points_t::iterator point = selected_points.begin(); point != selected_points.end(); ++point)
 	{
@@ -393,7 +393,7 @@ void snap_tool_detail::mesh_target::create_mesh_modifier(const std::string& Name
 	return_if_fail(node);
 
 	// Get mesh to tweak
-	k3d::dev::mesh* const mesh = boost::any_cast<k3d::dev::mesh*>(mesh_source_property.property_value());
+	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
 	return_if_fail(mesh);
 
 	// Modify with TweakPoints

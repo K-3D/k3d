@@ -57,13 +57,13 @@ public:
 	}
 
 	template<typename FunctorT>
-	void draw(const k3d::dev::mesh& Mesh, const k3d::typed_array<k3d::point3>& Centers, const k3d::color& Color, const FunctorT& FaceTest)
+	void draw(const k3d::mesh& Mesh, const k3d::typed_array<k3d::point3>& Centers, const k3d::color& Color, const FunctorT& FaceTest)
 	{
-		const k3d::dev::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::dev::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::dev::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::dev::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+		const k3d::mesh::points_t& points = *Mesh.points;
 
 		const size_t face_count = face_first_loops.size();
 
@@ -91,28 +91,28 @@ public:
 		glEnd();
 	}
 
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		const bool draw_selected = m_draw_selected.value() && RenderState.show_component_selection;
 		const bool draw_unselected = m_draw_unselected.value();
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		if(!k3d::dev::validate_polyhedra(Mesh))
+		if(!k3d::validate_polyhedra(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::dev::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::dev::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::dev::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+		const k3d::mesh::points_t& points = *Mesh.points;
 
 		const size_t face_count = face_first_loops.size();
 
 		// Calculate face centers ...
 		k3d::typed_array<k3d::point3> centers(face_count);
 		for(size_t face = 0; face != face_count; ++face)
-			centers[face] = k3d::dev::center(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
+			centers[face] = k3d::center(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);

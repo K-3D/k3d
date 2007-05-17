@@ -35,9 +35,6 @@ class mesh_selection;
 
 namespace legacy { class mesh; }
 
-namespace dev
-{
-
 ////////////////////////////////////////////////////////////////////////////////
 // mesh
 
@@ -498,8 +495,6 @@ const bool validate_blobbies(const mesh& Mesh);
 
 /// Returns true iff the given mesh should be rendered as SDS
 const bool is_sds(const mesh& Mesh);
-
-} // namespace dev
 
 } // namespace k3d
 

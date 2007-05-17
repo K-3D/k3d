@@ -47,20 +47,20 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		if(!k3d::dev::validate_cubic_curve_groups(Mesh))
+		if(!k3d::validate_cubic_curve_groups(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& first_curves = *Mesh.cubic_curve_groups->first_curves;
-		const k3d::dev::mesh::counts_t& curve_counts = *Mesh.cubic_curve_groups->curve_counts;
+		const k3d::mesh::indices_t& first_curves = *Mesh.cubic_curve_groups->first_curves;
+		const k3d::mesh::counts_t& curve_counts = *Mesh.cubic_curve_groups->curve_counts;
 /** \todo Handle periodic curves */
-//		const k3d::dev::mesh::bools_t& periodic_curves = *Mesh.cubic_curve_groups->periodic_curves;
-		const k3d::dev::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
-		const k3d::dev::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
-		const k3d::dev::mesh::selection_t& curve_selection = *Mesh.cubic_curve_groups->curve_selection;
-		const k3d::dev::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+//		const k3d::mesh::bools_t& periodic_curves = *Mesh.cubic_curve_groups->periodic_curves;
+		const k3d::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
+		const k3d::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
+		const k3d::mesh::selection_t& curve_selection = *Mesh.cubic_curve_groups->curve_selection;
+		const k3d::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
+		const k3d::mesh::points_t& points = *Mesh.points;
 		
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
@@ -115,22 +115,22 @@ public:
 		}
 	}
 	
-	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if(!SelectionState.select_cubic_curves)
 			return;
 
-		if(!k3d::dev::validate_cubic_curve_groups(Mesh))
+		if(!k3d::validate_cubic_curve_groups(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& first_curves = *Mesh.cubic_curve_groups->first_curves;
-		const k3d::dev::mesh::counts_t& curve_counts = *Mesh.cubic_curve_groups->curve_counts;
+		const k3d::mesh::indices_t& first_curves = *Mesh.cubic_curve_groups->first_curves;
+		const k3d::mesh::counts_t& curve_counts = *Mesh.cubic_curve_groups->curve_counts;
 /** \todo Handle periodic curves */
-//		const k3d::dev::mesh::bools_t& periodic_curves = *Mesh.cubic_curve_groups->periodic_curves;
-		const k3d::dev::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
-		const k3d::dev::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
-		const k3d::dev::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+//		const k3d::mesh::bools_t& periodic_curves = *Mesh.cubic_curve_groups->periodic_curves;
+		const k3d::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
+		const k3d::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
+		const k3d::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
+		const k3d::mesh::points_t& points = *Mesh.points;
 		
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);

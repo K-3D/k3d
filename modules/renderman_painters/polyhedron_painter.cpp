@@ -53,31 +53,31 @@ public:
 	{
 	}
 
-	void paint_mesh(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
-		if(!k3d::dev::validate_polyhedra(Mesh))
+		if(!k3d::validate_polyhedra(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& first_faces = *Mesh.polyhedra->first_faces;
-		const k3d::dev::mesh::counts_t& face_counts = *Mesh.polyhedra->face_counts;
-		const k3d::dev::mesh::polyhedra_t::types_t& types = *Mesh.polyhedra->types;
-		const k3d::dev::mesh::named_arrays& constant_data = Mesh.polyhedra->constant_data;
-		const k3d::dev::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::dev::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-		const k3d::dev::mesh::materials_t& face_materials = *Mesh.polyhedra->face_materials;
-		const k3d::dev::mesh::named_arrays& uniform_data = Mesh.polyhedra->uniform_data; 
-		const k3d::dev::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::dev::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::dev::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::dev::mesh::named_arrays& face_varying_data = Mesh.polyhedra->face_varying_data;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
-		const k3d::dev::mesh::named_arrays& vertex_data = Mesh.vertex_data;
+		const k3d::mesh::indices_t& first_faces = *Mesh.polyhedra->first_faces;
+		const k3d::mesh::counts_t& face_counts = *Mesh.polyhedra->face_counts;
+		const k3d::mesh::polyhedra_t::types_t& types = *Mesh.polyhedra->types;
+		const k3d::mesh::named_arrays& constant_data = Mesh.polyhedra->constant_data;
+		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+		const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+		const k3d::mesh::materials_t& face_materials = *Mesh.polyhedra->face_materials;
+		const k3d::mesh::named_arrays& uniform_data = Mesh.polyhedra->uniform_data; 
+		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+		const k3d::mesh::named_arrays& face_varying_data = Mesh.polyhedra->face_varying_data;
+		const k3d::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::named_arrays& vertex_data = Mesh.vertex_data;
 
 		const size_t polyhedron_begin = 0;
 		const size_t polyhedron_end = polyhedron_begin + types.size();
 		for(size_t polyhedron = polyhedron_begin; polyhedron != polyhedron_end; ++polyhedron)
 		{
-			if(types[polyhedron] != k3d::dev::mesh::polyhedra_t::POLYGONS)
+			if(types[polyhedron] != k3d::mesh::polyhedra_t::POLYGONS)
 				continue;
 
 			// Get the set of all materials used in this polyhedron ...
@@ -161,7 +161,7 @@ public:
 		}
 	}
 
-	void paint_complete(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_complete(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
 	}
 

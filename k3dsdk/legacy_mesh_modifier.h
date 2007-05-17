@@ -44,7 +44,7 @@ class mesh_modifier :
 public:
 	mesh_modifier(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
-		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<dev::mesh*>(0)),
+		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::mesh*>(0)),
 		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")) + init_slot(sigc::mem_fun(*this, &mesh_modifier<base_t>::create_mesh)))
 	{
 		m_input_mesh.changed_signal().connect(make_reset_mesh_slot());
@@ -71,8 +71,8 @@ public:
 	}
 
 protected:
-	k3d_data(dev::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::local_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_input_mesh;
-	k3d_data(dev::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
+	k3d_data(k3d::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::local_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_input_mesh;
+	k3d_data(k3d::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
 
 private:
 	void reset_mesh(iunknown* const Hint)
@@ -80,9 +80,9 @@ private:
 		m_output_mesh.reset(0, Hint);
 	}
 
-	void create_mesh(dev::mesh& Output)
+	void create_mesh(k3d::mesh& Output)
 	{
-		if(const dev::mesh* const input = m_input_mesh.value())
+		if(const k3d::mesh* const input = m_input_mesh.value())
 		{
 			base_t::document().pipeline_profiler().start_execution(*this, "Convert Input");
 			legacy::mesh legacy_input;
@@ -106,9 +106,9 @@ private:
 
 	void update_mesh(iunknown* const Hint)
 	{
-		if(const dev::mesh* const input = m_input_mesh.value())
+		if(const k3d::mesh* const input = m_input_mesh.value())
 		{
-			if(dev::mesh* const output = m_output_mesh.internal_value())
+			if(k3d::mesh* const output = m_output_mesh.internal_value())
 			{
 				base_t::document().pipeline_profiler().start_execution(*this, "Convert Input");
 				legacy::mesh legacy_input;

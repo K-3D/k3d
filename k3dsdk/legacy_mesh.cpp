@@ -603,12 +603,12 @@ mesh::~mesh()
 }
 
 /** \todo support all gprims */
-mesh& mesh::operator=(const dev::mesh& Mesh)
+mesh& mesh::operator=(const k3d::mesh& Mesh)
 {
 	if(Mesh.points && Mesh.point_selection)
 	{
-		const dev::mesh::points_t& new_points = *Mesh.points;
-		const dev::mesh::selection_t& point_selection = *Mesh.point_selection.get();
+		const k3d::mesh::points_t& new_points = *Mesh.points;
+		const k3d::mesh::selection_t& point_selection = *Mesh.point_selection.get();
 
 		const size_t point_begin = 0;
 		const size_t point_end = point_begin + Mesh.points->size();
@@ -623,10 +623,10 @@ mesh& mesh::operator=(const dev::mesh& Mesh)
 
 	if(validate_point_groups(Mesh))
 	{
-		const dev::mesh::indices_t& first_points = *Mesh.point_groups->first_points;
-		const dev::mesh::counts_t& point_counts = *Mesh.point_groups->point_counts;
-		const dev::mesh::materials_t& materials = *Mesh.point_groups->materials;
-		const dev::mesh::indices_t& group_points = *Mesh.point_groups->points;
+		const k3d::mesh::indices_t& first_points = *Mesh.point_groups->first_points;
+		const k3d::mesh::counts_t& point_counts = *Mesh.point_groups->point_counts;
+		const k3d::mesh::materials_t& materials = *Mesh.point_groups->materials;
+		const k3d::mesh::indices_t& group_points = *Mesh.point_groups->points;
 
 		const size_t group_begin = 0;
 		const size_t group_end = group_begin + first_points.size();
@@ -646,14 +646,14 @@ mesh& mesh::operator=(const dev::mesh& Mesh)
 
 	if(validate_linear_curve_groups(Mesh))
 	{
-		const dev::mesh::indices_t& first_curves = *Mesh.linear_curve_groups->first_curves;
-		const dev::mesh::counts_t& curve_counts = *Mesh.linear_curve_groups->curve_counts;
-		const dev::mesh::bools_t& periodic_curves = *Mesh.linear_curve_groups->periodic_curves;
-		const dev::mesh::materials_t& materials = *Mesh.linear_curve_groups->materials;
-		const dev::mesh::indices_t& curve_first_points = *Mesh.linear_curve_groups->curve_first_points;
-		const dev::mesh::counts_t& curve_point_counts = *Mesh.linear_curve_groups->curve_point_counts;
-		const dev::mesh::selection_t& curve_selection = *Mesh.linear_curve_groups->curve_selection;
-		const dev::mesh::indices_t& curve_points = *Mesh.linear_curve_groups->curve_points;
+		const k3d::mesh::indices_t& first_curves = *Mesh.linear_curve_groups->first_curves;
+		const k3d::mesh::counts_t& curve_counts = *Mesh.linear_curve_groups->curve_counts;
+		const k3d::mesh::bools_t& periodic_curves = *Mesh.linear_curve_groups->periodic_curves;
+		const k3d::mesh::materials_t& materials = *Mesh.linear_curve_groups->materials;
+		const k3d::mesh::indices_t& curve_first_points = *Mesh.linear_curve_groups->curve_first_points;
+		const k3d::mesh::counts_t& curve_point_counts = *Mesh.linear_curve_groups->curve_point_counts;
+		const k3d::mesh::selection_t& curve_selection = *Mesh.linear_curve_groups->curve_selection;
+		const k3d::mesh::indices_t& curve_points = *Mesh.linear_curve_groups->curve_points;
 
 		const size_t group_begin = 0;
 		const size_t group_end = group_begin + first_curves.size();
@@ -684,14 +684,14 @@ mesh& mesh::operator=(const dev::mesh& Mesh)
 
 	if(validate_cubic_curve_groups(Mesh))
 	{
-		const dev::mesh::indices_t& first_curves = *Mesh.cubic_curve_groups->first_curves;
-		const dev::mesh::counts_t& curve_counts = *Mesh.cubic_curve_groups->curve_counts;
-		const dev::mesh::bools_t& periodic_curves = *Mesh.cubic_curve_groups->periodic_curves;
-		const dev::mesh::materials_t& materials = *Mesh.cubic_curve_groups->materials;
-		const dev::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
-		const dev::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
-		const dev::mesh::selection_t& curve_selection = *Mesh.cubic_curve_groups->curve_selection;
-		const dev::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
+		const k3d::mesh::indices_t& first_curves = *Mesh.cubic_curve_groups->first_curves;
+		const k3d::mesh::counts_t& curve_counts = *Mesh.cubic_curve_groups->curve_counts;
+		const k3d::mesh::bools_t& periodic_curves = *Mesh.cubic_curve_groups->periodic_curves;
+		const k3d::mesh::materials_t& materials = *Mesh.cubic_curve_groups->materials;
+		const k3d::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
+		const k3d::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
+		const k3d::mesh::selection_t& curve_selection = *Mesh.cubic_curve_groups->curve_selection;
+		const k3d::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
 
 		const size_t group_begin = 0;
 		const size_t group_end = group_begin + first_curves.size();
@@ -722,17 +722,17 @@ mesh& mesh::operator=(const dev::mesh& Mesh)
 
 	if(validate_nurbs_curve_groups(Mesh))
 	{
-		const dev::mesh::indices_t& first_curves = *Mesh.nurbs_curve_groups->first_curves;
-		const dev::mesh::counts_t& curve_counts = *Mesh.nurbs_curve_groups->curve_counts;
-		const dev::mesh::materials_t& materials = *Mesh.nurbs_curve_groups->materials;
-		const dev::mesh::indices_t& curve_first_points = *Mesh.nurbs_curve_groups->curve_first_points;
-		const dev::mesh::counts_t& curve_point_counts = *Mesh.nurbs_curve_groups->curve_point_counts;
-		const dev::mesh::orders_t& curve_orders = *Mesh.nurbs_curve_groups->curve_orders;
-		const dev::mesh::indices_t& curve_first_knots = *Mesh.nurbs_curve_groups->curve_first_knots;
-		const dev::mesh::selection_t& curve_selection = *Mesh.nurbs_curve_groups->curve_selection;
-		const dev::mesh::indices_t& curve_points = *Mesh.nurbs_curve_groups->curve_points;
-		const dev::mesh::weights_t& curve_point_weights = *Mesh.nurbs_curve_groups->curve_point_weights;
-		const dev::mesh::knots_t& curve_knots = *Mesh.nurbs_curve_groups->curve_knots;
+		const k3d::mesh::indices_t& first_curves = *Mesh.nurbs_curve_groups->first_curves;
+		const k3d::mesh::counts_t& curve_counts = *Mesh.nurbs_curve_groups->curve_counts;
+		const k3d::mesh::materials_t& materials = *Mesh.nurbs_curve_groups->materials;
+		const k3d::mesh::indices_t& curve_first_points = *Mesh.nurbs_curve_groups->curve_first_points;
+		const k3d::mesh::counts_t& curve_point_counts = *Mesh.nurbs_curve_groups->curve_point_counts;
+		const k3d::mesh::orders_t& curve_orders = *Mesh.nurbs_curve_groups->curve_orders;
+		const k3d::mesh::indices_t& curve_first_knots = *Mesh.nurbs_curve_groups->curve_first_knots;
+		const k3d::mesh::selection_t& curve_selection = *Mesh.nurbs_curve_groups->curve_selection;
+		const k3d::mesh::indices_t& curve_points = *Mesh.nurbs_curve_groups->curve_points;
+		const k3d::mesh::weights_t& curve_point_weights = *Mesh.nurbs_curve_groups->curve_point_weights;
+		const k3d::mesh::knots_t& curve_knots = *Mesh.nurbs_curve_groups->curve_knots;
 
 		const size_t group_begin = 0;
 		const size_t group_end = group_begin + first_curves.size();
@@ -767,9 +767,9 @@ mesh& mesh::operator=(const dev::mesh& Mesh)
 
 	if(validate_bilinear_patches(Mesh))
 	{
-		const dev::mesh::selection_t& patch_selection = *Mesh.bilinear_patches->patch_selection;
-		const dev::mesh::materials_t& patch_materials = *Mesh.bilinear_patches->patch_materials;
-		const dev::mesh::indices_t& patch_points = *Mesh.bilinear_patches->patch_points;
+		const k3d::mesh::selection_t& patch_selection = *Mesh.bilinear_patches->patch_selection;
+		const k3d::mesh::materials_t& patch_materials = *Mesh.bilinear_patches->patch_materials;
+		const k3d::mesh::indices_t& patch_points = *Mesh.bilinear_patches->patch_points;
 
 		const size_t patch_begin = 0;
 		const size_t patch_end = patch_begin + (patch_points.size() / 4);
@@ -790,9 +790,9 @@ mesh& mesh::operator=(const dev::mesh& Mesh)
 
 	if(validate_bicubic_patches(Mesh))
 	{
-		const dev::mesh::selection_t& patch_selection = *Mesh.bicubic_patches->patch_selection;
-		const dev::mesh::materials_t& patch_materials = *Mesh.bicubic_patches->patch_materials;
-		const dev::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
+		const k3d::mesh::selection_t& patch_selection = *Mesh.bicubic_patches->patch_selection;
+		const k3d::mesh::materials_t& patch_materials = *Mesh.bicubic_patches->patch_materials;
+		const k3d::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
 
 		const size_t patch_begin = 0;
 		const size_t patch_end = patch_begin + (patch_points.size() / 16);
@@ -813,19 +813,19 @@ mesh& mesh::operator=(const dev::mesh& Mesh)
 
 	if(validate_nurbs_patches(Mesh))
 	{
-		const dev::mesh::indices_t& patch_first_points = *Mesh.nurbs_patches->patch_first_points;
-		const dev::mesh::counts_t& patch_u_point_counts = *Mesh.nurbs_patches->patch_u_point_counts;
-		const dev::mesh::counts_t& patch_v_point_counts = *Mesh.nurbs_patches->patch_v_point_counts;
-		const dev::mesh::orders_t& patch_u_orders = *Mesh.nurbs_patches->patch_u_orders;
-		const dev::mesh::orders_t& patch_v_orders = *Mesh.nurbs_patches->patch_v_orders;
-		const dev::mesh::indices_t& patch_u_first_knots = *Mesh.nurbs_patches->patch_u_first_knots;
-		const dev::mesh::indices_t& patch_v_first_knots = *Mesh.nurbs_patches->patch_v_first_knots;
-		const dev::mesh::selection_t& patch_selection = *Mesh.nurbs_patches->patch_selection;
-		const dev::mesh::materials_t& patch_materials = *Mesh.nurbs_patches->patch_materials;
-		const dev::mesh::indices_t& patch_points = *Mesh.nurbs_patches->patch_points;
-		const dev::mesh::weights_t& patch_point_weights = *Mesh.nurbs_patches->patch_point_weights;
-		const dev::mesh::knots_t& patch_u_knots = *Mesh.nurbs_patches->patch_u_knots;
-		const dev::mesh::knots_t& patch_v_knots = *Mesh.nurbs_patches->patch_v_knots;
+		const k3d::mesh::indices_t& patch_first_points = *Mesh.nurbs_patches->patch_first_points;
+		const k3d::mesh::counts_t& patch_u_point_counts = *Mesh.nurbs_patches->patch_u_point_counts;
+		const k3d::mesh::counts_t& patch_v_point_counts = *Mesh.nurbs_patches->patch_v_point_counts;
+		const k3d::mesh::orders_t& patch_u_orders = *Mesh.nurbs_patches->patch_u_orders;
+		const k3d::mesh::orders_t& patch_v_orders = *Mesh.nurbs_patches->patch_v_orders;
+		const k3d::mesh::indices_t& patch_u_first_knots = *Mesh.nurbs_patches->patch_u_first_knots;
+		const k3d::mesh::indices_t& patch_v_first_knots = *Mesh.nurbs_patches->patch_v_first_knots;
+		const k3d::mesh::selection_t& patch_selection = *Mesh.nurbs_patches->patch_selection;
+		const k3d::mesh::materials_t& patch_materials = *Mesh.nurbs_patches->patch_materials;
+		const k3d::mesh::indices_t& patch_points = *Mesh.nurbs_patches->patch_points;
+		const k3d::mesh::weights_t& patch_point_weights = *Mesh.nurbs_patches->patch_point_weights;
+		const k3d::mesh::knots_t& patch_u_knots = *Mesh.nurbs_patches->patch_u_knots;
+		const k3d::mesh::knots_t& patch_v_knots = *Mesh.nurbs_patches->patch_v_knots;
 
 		const size_t patch_begin = 0;
 		const size_t patch_end = patch_begin + patch_first_points.size();
@@ -859,17 +859,17 @@ mesh& mesh::operator=(const dev::mesh& Mesh)
 
 	if(validate_polyhedra(Mesh))
 	{
-		const dev::mesh::indices_t& first_faces = *Mesh.polyhedra->first_faces;
-		const dev::mesh::counts_t& face_counts = *Mesh.polyhedra->face_counts;
-		const dev::mesh::polyhedra_t::types_t& types = *Mesh.polyhedra->types;
-		const dev::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const dev::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-		const dev::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection.get();
-		const dev::mesh::materials_t& face_materials = *Mesh.polyhedra->face_materials.get();
-		const dev::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const dev::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const dev::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const dev::mesh::selection_t& edge_selection = *Mesh.polyhedra->edge_selection.get();
+		const k3d::mesh::indices_t& first_faces = *Mesh.polyhedra->first_faces;
+		const k3d::mesh::counts_t& face_counts = *Mesh.polyhedra->face_counts;
+		const k3d::mesh::polyhedra_t::types_t& types = *Mesh.polyhedra->types;
+		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+		const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection.get();
+		const k3d::mesh::materials_t& face_materials = *Mesh.polyhedra->face_materials.get();
+		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+		const k3d::mesh::selection_t& edge_selection = *Mesh.polyhedra->edge_selection.get();
 
 		const size_t polyhedron_begin = 0;
 		const size_t polyhedron_end = polyhedron_begin + first_faces.size();
@@ -880,10 +880,10 @@ mesh& mesh::operator=(const dev::mesh& Mesh)
 
 			switch(types[polyhedron])
 			{
-				case dev::mesh::polyhedra_t::POLYGONS:
+				case k3d::mesh::polyhedra_t::POLYGONS:
 					legacy_polyhedron->type = legacy::polyhedron::POLYGONS;
 					break;
-				case dev::mesh::polyhedra_t::CATMULL_CLARK:
+				case k3d::mesh::polyhedra_t::CATMULL_CLARK:
 					legacy_polyhedron->type = legacy::polyhedron::CATMULL_CLARK_SUBDIVISION_MESH;
 					break;
 			}

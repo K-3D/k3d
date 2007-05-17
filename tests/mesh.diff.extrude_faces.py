@@ -20,7 +20,7 @@ for i in range(100):
 	selection.faces = [(0, 3, 1), (3, 1000, 0)]
 	extrude_faces.mesh_selection = selection
 
-	diff_input = diff.add_user_property("k3d::dev::mesh*", "input_" + str(i), "Input " + str(i), "Input mesh " + str(i))
+	diff_input = diff.add_user_property("k3d::mesh*", "input_" + str(i), "Input " + str(i), "Input mesh " + str(i))
 
 	doc.set_dependency(extrude_faces.get_property("input_mesh"), cube.get_property("output_mesh"));
 	doc.set_dependency(diff_input, extrude_faces.get_property("output_mesh"));

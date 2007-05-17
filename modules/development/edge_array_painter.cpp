@@ -50,10 +50,10 @@ class edge_array_painter :
 public:
 	edge_array_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_points_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, vbo>::instance(Document)),
-		m_edges_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::indices_t>, vbo>::instance(Document)),
-		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::indices_t>, selection_records_t>::instance(Document)),
-		m_hint_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>::instance(Document))
+		m_points_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>::instance(Document)),
+		m_edges_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, vbo>::instance(Document)),
+		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, selection_records_t>::instance(Document)),
+		m_hint_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>::instance(Document))
 	{
 	}
 	
@@ -65,7 +65,7 @@ public:
 	}
 	
 	/// Updates the vertex buffer object.
-	void update_buffer(const k3d::dev::mesh& Mesh)
+	void update_buffer(const k3d::mesh& Mesh)
 	{
 		if(!Mesh.points || Mesh.points->empty())
 			return;
@@ -89,8 +89,8 @@ public:
 		vbo* edge_buffer = m_edges_cache.get_data(Mesh.polyhedra->edge_points);
 		if (!edge_buffer)
 		{
-			const k3d::dev::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-			const k3d::dev::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+			const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+			const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 			return_if_fail(edge_points.size() == clockwise_edges.size());
 			edge_buffer = m_edges_cache.create_data(Mesh.polyhedra->edge_points);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *edge_buffer);
@@ -114,7 +114,7 @@ public:
 		}
 	}
 	
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -173,7 +173,7 @@ public:
 		clean_vbo_state();
 	}
 	
-	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -217,7 +217,7 @@ public:
 		clean_vbo_state();
 	}
 	
-	void on_mesh_changed(const k3d::dev::mesh& Mesh, k3d::iunknown* Hint)
+	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -267,10 +267,10 @@ public:
 	}
 	
 private:
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, vbo>& m_points_cache;
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::indices_t>, vbo>& m_edges_cache;
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::indices_t>, selection_records_t>& m_selection_cache;
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>& m_hint_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>& m_points_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, vbo>& m_edges_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, selection_records_t>& m_selection_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>& m_hint_cache;
 };
 
 	/////////////////////////////////////////////////////////////////////////////

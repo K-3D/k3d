@@ -25,15 +25,10 @@
 namespace k3d
 {
 
-namespace dev
-{
-
 class mesh;
 
 /// Prints the difference between two meshes to a stream
 void print_diff(std::ostream& Stream, const mesh& A, const mesh& B);
-
-} // namespace dev
 
 } // namespace k3d
 

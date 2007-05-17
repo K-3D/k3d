@@ -51,19 +51,19 @@ public:
 	{
 	}
 
-	void paint_mesh(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
-		if(!k3d::dev::validate_point_groups(Mesh))
+		if(!k3d::validate_point_groups(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& first_points = *Mesh.point_groups->first_points;
-		const k3d::dev::mesh::counts_t& point_counts = *Mesh.point_groups->point_counts;
-		const k3d::dev::mesh::named_arrays& constant_data = Mesh.point_groups->constant_data;
-		const k3d::dev::mesh::materials_t& materials = *Mesh.point_groups->materials;
-		const k3d::dev::mesh::indices_t& group_points = *Mesh.point_groups->points;
-		const k3d::dev::mesh::named_arrays& varying_data = Mesh.point_groups->varying_data;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
-		const k3d::dev::mesh::named_arrays& vertex_data = Mesh.vertex_data;
+		const k3d::mesh::indices_t& first_points = *Mesh.point_groups->first_points;
+		const k3d::mesh::counts_t& point_counts = *Mesh.point_groups->point_counts;
+		const k3d::mesh::named_arrays& constant_data = Mesh.point_groups->constant_data;
+		const k3d::mesh::materials_t& materials = *Mesh.point_groups->materials;
+		const k3d::mesh::indices_t& group_points = *Mesh.point_groups->points;
+		const k3d::mesh::named_arrays& varying_data = Mesh.point_groups->varying_data;
+		const k3d::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::named_arrays& vertex_data = Mesh.vertex_data;
 
 		const size_t point_group_begin = 0;
 		const size_t point_group_end = point_group_begin + first_points.size();
@@ -97,7 +97,7 @@ public:
 		}
 	}
 
-	void paint_complete(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_complete(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
 	}
 

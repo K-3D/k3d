@@ -43,14 +43,14 @@ class mesh_to_stdout :
 public:
 	mesh_to_stdout(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::dev::mesh*>(0))
+		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::mesh*>(0))
 	{
 		m_input_mesh.changed_signal().connect(sigc::mem_fun(*this, &mesh_to_stdout::mesh_changed));
 	}
 
 	void mesh_changed(iunknown* const Hint)
 	{
-		if(const k3d::dev::mesh* const input_mesh = m_input_mesh.value())
+		if(const k3d::mesh* const input_mesh = m_input_mesh.value())
 			std::cout << *input_mesh << std::endl;
 	}
 	
@@ -72,7 +72,7 @@ public:
 		return factory;
 	}
 
-	k3d_data(k3d::dev::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input_mesh;
+	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input_mesh;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -29,7 +29,7 @@
 namespace k3d
 {
 
-namespace dev { class mesh; }
+class mesh;
 
 namespace ri
 {
@@ -42,9 +42,9 @@ class imesh_painter :
 {
 public:
 	/// Called to render a mesh using RenderMan
-	virtual void paint_mesh(const dev::mesh& Mesh, const render_state& RenderState) = 0;
+	virtual void paint_mesh(const mesh& Mesh, const render_state& RenderState) = 0;
 	/// Called once rendering is complete, so painters can release resources
-	virtual void paint_complete(const dev::mesh& Mesh, const render_state& RenderState) = 0;
+	virtual void paint_complete(const mesh& Mesh, const render_state& RenderState) = 0;
 };
 
 } // namespace ri

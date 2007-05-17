@@ -39,9 +39,9 @@ namespace libk3dobj
 // obj_mesh_writer
 
 class obj_mesh_writer :
-	public k3d::dev::mesh_sink<k3d::persistent<k3d::node> >
+	public k3d::mesh_sink<k3d::persistent<k3d::node> >
 {
-	typedef k3d::dev::mesh_sink<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_sink<k3d::persistent<k3d::node> > base;
 
 public:
 	obj_mesh_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -55,7 +55,7 @@ public:
 	void on_write_file(k3d::iunknown*)
 	{
 		const k3d::filesystem::path path = m_file.value();
-		k3d::dev::mesh* const mesh = m_input_mesh.value();
+		k3d::mesh* const mesh = m_input_mesh.value();
 
 		if(!mesh || path.empty())
 			return;
@@ -74,7 +74,7 @@ public:
 		// Store points ...
 		if(mesh->points)
 		{
-			const k3d::dev::mesh::points_t& points = *mesh->points;
+			const k3d::mesh::points_t& points = *mesh->points;
 			
 			const size_t point_begin = 0;
 			const size_t point_end = point_begin + points.size();
@@ -85,17 +85,17 @@ public:
 		// Store polyhedra ...
 		if(validate_polyhedra(*mesh))
 		{
-			const k3d::dev::mesh::indices_t& first_faces = *mesh->polyhedra->first_faces;
-			const k3d::dev::mesh::counts_t& face_counts = *mesh->polyhedra->face_counts;
-			const k3d::dev::mesh::polyhedra_t::types_t& types = *mesh->polyhedra->types;
-			const k3d::dev::mesh::indices_t& face_first_loops = *mesh->polyhedra->face_first_loops;
-			const k3d::dev::mesh::counts_t& face_loop_counts = *mesh->polyhedra->face_loop_counts;
-//			const k3d::dev::mesh::selection_t& face_selection = *mesh->polyhedra->face_selection.get();
-//			const k3d::dev::mesh::materials_t& face_materials = *mesh->polyhedra->face_materials.get();
-			const k3d::dev::mesh::indices_t& loop_first_edges = *mesh->polyhedra->loop_first_edges;
-			const k3d::dev::mesh::indices_t& edge_points = *mesh->polyhedra->edge_points;
-			const k3d::dev::mesh::indices_t& clockwise_edges = *mesh->polyhedra->clockwise_edges;
-//			const k3d::dev::mesh::selection_t& edge_selection = *mesh->polyhedra->edge_selection.get();
+			const k3d::mesh::indices_t& first_faces = *mesh->polyhedra->first_faces;
+			const k3d::mesh::counts_t& face_counts = *mesh->polyhedra->face_counts;
+			const k3d::mesh::polyhedra_t::types_t& types = *mesh->polyhedra->types;
+			const k3d::mesh::indices_t& face_first_loops = *mesh->polyhedra->face_first_loops;
+			const k3d::mesh::counts_t& face_loop_counts = *mesh->polyhedra->face_loop_counts;
+//			const k3d::mesh::selection_t& face_selection = *mesh->polyhedra->face_selection.get();
+//			const k3d::mesh::materials_t& face_materials = *mesh->polyhedra->face_materials.get();
+			const k3d::mesh::indices_t& loop_first_edges = *mesh->polyhedra->loop_first_edges;
+			const k3d::mesh::indices_t& edge_points = *mesh->polyhedra->edge_points;
+			const k3d::mesh::indices_t& clockwise_edges = *mesh->polyhedra->clockwise_edges;
+//			const k3d::mesh::selection_t& edge_selection = *mesh->polyhedra->edge_selection.get();
 
 			const size_t polyhedron_begin = 0;
 			const size_t polyhedron_end = polyhedron_begin + first_faces.size();

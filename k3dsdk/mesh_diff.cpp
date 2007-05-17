@@ -28,9 +28,6 @@
 namespace k3d
 {
 
-namespace dev
-{
-
 namespace detail
 {
 
@@ -101,10 +98,10 @@ void print_diff(std::ostream& Stream, const std::string& Label, const pointer_ty
 }
 
 /** \todo Implement comparisons for user arrays */
-void print_diff(std::ostream& Stream, const std::string& Label, const k3d::dev::mesh::named_arrays& A, const k3d::dev::mesh::named_arrays& B)
+void print_diff(std::ostream& Stream, const std::string& Label, const k3d::mesh::named_arrays& A, const k3d::mesh::named_arrays& B)
 {
 /*
-    for(k3d::dev::mesh::named_arrays::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
+    for(k3d::mesh::named_arrays::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
     {
         Stream << Label << " " << array_iterator->first << " (" << array_iterator->second->size() << "): ";
         if(typed_array<double>* const array = dynamic_cast<typed_array<double>*>(array_iterator->second.get()))
@@ -267,8 +264,6 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B)
 	detail::print_diff(Stream, "point selection", A.point_selection, B.point_selection);
 	detail::print_diff(Stream, "vertex data", A.vertex_data, B.vertex_data);
 }
-
-} // namespace dev
 
 } // namespace k3d
 

@@ -38,9 +38,9 @@ namespace libk3dply
 // ply_mesh_reader
 
 class ply_mesh_reader :
-	public k3d::material_client<k3d::dev::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_client<k3d::mesh_source<k3d::persistent<k3d::node> > >
 {
-	typedef k3d::material_client<k3d::dev::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_client<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
 	ply_mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -50,7 +50,7 @@ public:
 		m_file.changed_signal().connect(make_topology_changed_slot());
 	}
 
-	void on_create_mesh_topology(k3d::dev::mesh& Mesh)
+	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
 		const k3d::filesystem::path path = m_file.value();
 		if(path.empty())
@@ -114,8 +114,8 @@ public:
 
 		for(size_t i = 0; i != element_types.size(); ++i)
 		{
-			boost::shared_ptr<k3d::dev::mesh::points_t> points(new k3d::dev::mesh::points_t());
-			boost::shared_ptr<k3d::dev::mesh::selection_t> point_selection(new k3d::dev::mesh::selection_t());
+			boost::shared_ptr<k3d::mesh::points_t> points(new k3d::mesh::points_t());
+			boost::shared_ptr<k3d::mesh::selection_t> point_selection(new k3d::mesh::selection_t());
 
 			const std::string element_type = element_types[i];
 			const size_t element_count = element_counts[i];
@@ -149,22 +149,22 @@ public:
 			}
 			else if(element_type == "face")
 			{
-				boost::shared_ptr<k3d::dev::mesh::polyhedra_t> polyhedra(new k3d::dev::mesh::polyhedra_t());
-				boost::shared_ptr<k3d::dev::mesh::indices_t> first_faces(new k3d::dev::mesh::indices_t());
-				boost::shared_ptr<k3d::dev::mesh::counts_t> face_counts(new k3d::dev::mesh::counts_t());
-				boost::shared_ptr<k3d::dev::mesh::polyhedra_t::types_t> types(new k3d::dev::mesh::polyhedra_t::types_t());
-				boost::shared_ptr<k3d::dev::mesh::indices_t> face_first_loops(new k3d::dev::mesh::indices_t());
-				boost::shared_ptr<k3d::dev::mesh::counts_t> face_loop_counts(new k3d::dev::mesh::counts_t());
-				boost::shared_ptr<k3d::dev::mesh::selection_t> face_selection(new k3d::dev::mesh::selection_t());
-				boost::shared_ptr<k3d::dev::mesh::materials_t> face_materials(new k3d::dev::mesh::materials_t());
-				boost::shared_ptr<k3d::dev::mesh::indices_t> loop_first_edges(new k3d::dev::mesh::indices_t());
-				boost::shared_ptr<k3d::dev::mesh::indices_t> edge_points(new k3d::dev::mesh::indices_t());
-				boost::shared_ptr<k3d::dev::mesh::indices_t> clockwise_edges(new k3d::dev::mesh::indices_t());
-				boost::shared_ptr<k3d::dev::mesh::selection_t> edge_selection(new k3d::dev::mesh::selection_t());
+				boost::shared_ptr<k3d::mesh::polyhedra_t> polyhedra(new k3d::mesh::polyhedra_t());
+				boost::shared_ptr<k3d::mesh::indices_t> first_faces(new k3d::mesh::indices_t());
+				boost::shared_ptr<k3d::mesh::counts_t> face_counts(new k3d::mesh::counts_t());
+				boost::shared_ptr<k3d::mesh::polyhedra_t::types_t> types(new k3d::mesh::polyhedra_t::types_t());
+				boost::shared_ptr<k3d::mesh::indices_t> face_first_loops(new k3d::mesh::indices_t());
+				boost::shared_ptr<k3d::mesh::counts_t> face_loop_counts(new k3d::mesh::counts_t());
+				boost::shared_ptr<k3d::mesh::selection_t> face_selection(new k3d::mesh::selection_t());
+				boost::shared_ptr<k3d::mesh::materials_t> face_materials(new k3d::mesh::materials_t());
+				boost::shared_ptr<k3d::mesh::indices_t> loop_first_edges(new k3d::mesh::indices_t());
+				boost::shared_ptr<k3d::mesh::indices_t> edge_points(new k3d::mesh::indices_t());
+				boost::shared_ptr<k3d::mesh::indices_t> clockwise_edges(new k3d::mesh::indices_t());
+				boost::shared_ptr<k3d::mesh::selection_t> edge_selection(new k3d::mesh::selection_t());
 		
 				first_faces->push_back(face_first_loops->size());
 				face_counts->push_back(element_count);
-				types->push_back(k3d::dev::mesh::polyhedra_t::POLYGONS);
+				types->push_back(k3d::mesh::polyhedra_t::POLYGONS);
 
 				face_first_loops->reserve(element_count);
 				face_loop_counts->reserve(element_count);
@@ -229,7 +229,7 @@ public:
 			Mesh.polyhedra.reset();
 	}
 
-	void on_update_mesh_geometry(k3d::dev::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Mesh)
 	{
 	}
 

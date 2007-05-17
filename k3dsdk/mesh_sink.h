@@ -28,9 +28,6 @@
 namespace k3d
 {
 
-namespace dev
-{
-
 template<typename base_t>
 class mesh_sink :
 	public base_t,
@@ -49,10 +46,8 @@ public:
 	}
 
 protected:
-	k3d_data(dev::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::local_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_input_mesh;
+	k3d_data(mesh*, data::immutable_name, data::change_signal, data::no_undo, data::local_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_input_mesh;
 };
-
-} // namespace dev
 
 } // namespace k3d
 

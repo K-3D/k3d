@@ -36,9 +36,9 @@ namespace libk3ddeformation
 // transform_points
 
 class transform_points :
-	public k3d::transformable<k3d::dev::mesh_simple_deformation_modifier>
+	public k3d::transformable<k3d::mesh_simple_deformation_modifier>
 {
-	typedef k3d::transformable<k3d::dev::mesh_simple_deformation_modifier> base;
+	typedef k3d::transformable<k3d::mesh_simple_deformation_modifier> base;
 
 public:
 	transform_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -48,7 +48,7 @@ public:
 		m_input_matrix.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	void on_deform_mesh(const k3d::dev::mesh::points_t& InputPoints, const k3d::dev::mesh::selection_t& PointSelection, k3d::dev::mesh::points_t& OutputPoints)
+	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
 		const k3d::matrix4 matrix = m_input_matrix.value();
 

@@ -29,9 +29,6 @@
 namespace k3d
 {
 
-namespace dev
-{
-
 namespace detail
 {
 
@@ -101,9 +98,9 @@ void print(std::ostream& Stream, const std::string& Label, const pointer_type& P
 	}
 }
 
-void print(std::ostream& Stream, const std::string& Label, const k3d::dev::mesh::named_arrays& Arrays)
+void print(std::ostream& Stream, const std::string& Label, const k3d::mesh::named_arrays& Arrays)
 {
-    for(k3d::dev::mesh::named_arrays::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
+    for(k3d::mesh::named_arrays::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
     {
         Stream << Label << " " << array_iterator->first << " (" << array_iterator->second->size() << "): ";
         if(typed_array<double>* const array = dynamic_cast<typed_array<double>*>(array_iterator->second.get()))
@@ -670,7 +667,7 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 		{
 			size_t first_face = face_first_loops->size();
 			size_t face_count = 0;
-			k3d::dev::mesh::polyhedra_t::polyhedron_type type = k3d::dev::mesh::polyhedra_t::POLYGONS;
+			k3d::mesh::polyhedra_t::polyhedron_type type = k3d::mesh::polyhedra_t::POLYGONS;
 
 			for(k3d::legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
 			{
@@ -1087,49 +1084,49 @@ void replace_selection(const mesh_selection& MeshSelection, mesh& Mesh)
 
 	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
 	{
-		dev::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
+		k3d::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
 		detail::replace_selection(MeshSelection.edges, polyhedra->edge_points, polyhedra->edge_selection);
 	}
 
 	if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops)
 	{
-		dev::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
+		k3d::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
 		detail::replace_selection(MeshSelection.faces, polyhedra->face_first_loops, polyhedra->face_selection);
 	}
 
 	if(Mesh.linear_curve_groups)
 	{
-		dev::mesh::linear_curve_groups_t* const linear_curve_groups = make_unique(Mesh.linear_curve_groups);
+		k3d::mesh::linear_curve_groups_t* const linear_curve_groups = make_unique(Mesh.linear_curve_groups);
 		detail::replace_selection(MeshSelection.linear_curves, linear_curve_groups->curve_first_points, linear_curve_groups->curve_selection);
 	}
 
 	if(Mesh.cubic_curve_groups)
 	{
-		dev::mesh::cubic_curve_groups_t* const cubic_curve_groups = make_unique(Mesh.cubic_curve_groups);
+		k3d::mesh::cubic_curve_groups_t* const cubic_curve_groups = make_unique(Mesh.cubic_curve_groups);
 		detail::replace_selection(MeshSelection.cubic_curves, cubic_curve_groups->curve_first_points, cubic_curve_groups->curve_selection);
 	}
 
 	if(Mesh.nurbs_curve_groups)
 	{
-		dev::mesh::nurbs_curve_groups_t* const nurbs_curve_groups = make_unique(Mesh.nurbs_curve_groups);
+		k3d::mesh::nurbs_curve_groups_t* const nurbs_curve_groups = make_unique(Mesh.nurbs_curve_groups);
 		detail::replace_selection(MeshSelection.nurbs_curves, nurbs_curve_groups->curve_first_points, nurbs_curve_groups->curve_selection);
 	}
 
 	if(Mesh.bilinear_patches)
 	{
-		dev::mesh::bilinear_patches_t* const bilinear_patches = make_unique(Mesh.bilinear_patches);
+		k3d::mesh::bilinear_patches_t* const bilinear_patches = make_unique(Mesh.bilinear_patches);
 		detail::replace_selection(MeshSelection.bilinear_patches, bilinear_patches->patch_materials, bilinear_patches->patch_selection);
 	}
 
 	if(Mesh.bicubic_patches)
 	{
-		dev::mesh::bicubic_patches_t* const bicubic_patches = make_unique(Mesh.bicubic_patches);
+		k3d::mesh::bicubic_patches_t* const bicubic_patches = make_unique(Mesh.bicubic_patches);
 		detail::replace_selection(MeshSelection.bicubic_patches, bicubic_patches->patch_materials, bicubic_patches->patch_selection);
 	}
 
 	if(Mesh.nurbs_patches)
 	{
-		dev::mesh::nurbs_patches_t* const nurbs_patches = make_unique(Mesh.nurbs_patches);
+		k3d::mesh::nurbs_patches_t* const nurbs_patches = make_unique(Mesh.nurbs_patches);
 		detail::replace_selection(MeshSelection.nurbs_patches, nurbs_patches->patch_materials, nurbs_patches->patch_selection);
 	}
 }
@@ -1137,7 +1134,7 @@ void replace_selection(const mesh_selection& MeshSelection, mesh& Mesh)
 /////////////////////////////////////////////////////////////////////////////
 // bounds
 
-const bounding_box3 bounds(const dev::mesh& Mesh)
+const bounding_box3 bounds(const k3d::mesh& Mesh)
 {
 	bounding_box3 results;
 
@@ -1150,7 +1147,7 @@ const bounding_box3 bounds(const dev::mesh& Mesh)
 /////////////////////////////////////////////////////////////////////////////
 // bounds
 
-const bounding_box3 bounds(const dev::mesh::points_t& Points)
+const bounding_box3 bounds(const k3d::mesh::points_t& Points)
 {
 	bounding_box3 results;
 
@@ -1453,8 +1450,6 @@ const bool is_sds(const mesh& Mesh)
 	}
 	return false;
 }
-
-} // namespace dev
 
 } // namespace k3d
 

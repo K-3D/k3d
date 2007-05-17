@@ -47,14 +47,14 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		if(!k3d::dev::validate_bicubic_patches(Mesh))
+		if(!k3d::validate_bicubic_patches(Mesh))
 			return;
 
-		const k3d::dev::mesh::selection_t& patch_selection = *Mesh.bicubic_patches->patch_selection;
-		const k3d::dev::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::selection_t& patch_selection = *Mesh.bicubic_patches->patch_selection;
+		const k3d::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
+		const k3d::mesh::points_t& points = *Mesh.points;
 
 		k3d::gl::store_attributes attributes;
 		glEnable(GL_LIGHTING);
@@ -100,16 +100,16 @@ public:
 		}
 	}
 	
-	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if(!SelectionState.select_bicubic_patches)
 			return;
 
-		if(!k3d::dev::validate_bicubic_patches(Mesh))
+		if(!k3d::validate_bicubic_patches(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
+		const k3d::mesh::points_t& points = *Mesh.points;
 
 		k3d::gl::store_attributes attributes;
 

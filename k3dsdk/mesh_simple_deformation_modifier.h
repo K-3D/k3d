@@ -32,9 +32,6 @@
 namespace k3d
 {
 
-namespace dev
-{
-
 /// Mesh modifier implementation for use in plugins that deform a mesh (modify its points) without altering topology, and based solely on the input point positions and selection.  To create a plugin, derive from mesh_simple_deformation_modifier and implement the on_deform_mesh() method.  If you are only modifying points but need more information about the input mesh, consider using mesh_deformation_modifier instead. 
 class mesh_simple_deformation_modifier :
 	public mesh_selection_sink<mesh_modifier<persistent<node> > >
@@ -52,8 +49,6 @@ private:
 	virtual void on_deform_mesh(const mesh::points_t& InputPoints, const mesh::selection_t& PointSelection, mesh::points_t& OutputPoints) = 0;
 };
 
-} // namespace dev
-	
 } // namespace k3d
 
 #endif // !K3DSDK_NEW_MESH_SIMPLE_DEFORMATION_MODIFIER

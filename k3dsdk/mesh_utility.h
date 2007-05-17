@@ -27,15 +27,10 @@ namespace k3d
 
 class imaterial;
 
-namespace dev
-{
-
 /// Returns a mesh containing a topological "grid" of polygons with the given number of polys in each parametric direction
 const mesh create_grid(const size_t Rows, const size_t Columns, imaterial* const Material = 0);
 /// Returns a mesh containing a topological "cylinder" of polygons with the given number of polys in each parametric direction
 const mesh create_cylinder(const size_t Rows, const size_t Columns, imaterial* const Material = 0);
-
-} // namespace dev
 
 } // namespace k3d
 

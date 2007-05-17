@@ -68,7 +68,7 @@ public:
 	}
 
 protected:
-	k3d_data(dev::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
+	k3d_data(k3d::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
 
 private:
 	void mesh_topology_changed(iunknown* Hint)
@@ -76,7 +76,7 @@ private:
 		m_output_mesh.reset(0, hint::mesh_topology_changed());
 	}
 
-	void create_mesh(dev::mesh& Mesh)
+	void create_mesh(k3d::mesh& Mesh)
 	{
 		legacy::mesh legacy_mesh;
 
@@ -95,7 +95,7 @@ private:
 
 	void mesh_geometry_changed(iunknown* const Hint)
 	{
-		if(dev::mesh* const output = m_output_mesh.internal_value())
+		if(k3d::mesh* const output = m_output_mesh.internal_value())
 		{
 			legacy::mesh legacy_output = *output;
 

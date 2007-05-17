@@ -46,10 +46,10 @@ namespace libk3dk3d
 // k3d_mesh_reader
 
 class k3d_mesh_reader :
-	public k3d::dev::mesh_source<k3d::persistent<k3d::node> >,
+	public k3d::mesh_source<k3d::persistent<k3d::node> >,
 	public k3d::imesh_storage
 {
-	typedef k3d::dev::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_source<k3d::persistent<k3d::node> > base;
 
 public:
 	k3d_mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -59,12 +59,12 @@ public:
 		m_file.changed_signal().connect(make_topology_changed_slot());
 	}
 
-	void reset_mesh(k3d::dev::mesh* const Mesh)
+	void reset_mesh(k3d::mesh* const Mesh)
 	{
 		m_output_mesh.reset(Mesh);
 	}
 
-	void on_create_mesh_topology(k3d::dev::mesh& Mesh)
+	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
 		const k3d::filesystem::path path = m_file.value();
 		if(path.empty())
@@ -89,7 +89,7 @@ public:
 			k3d::load_mesh(Mesh, *xml_mesh_arrays, context);
 	}
 
-	void on_update_mesh_geometry(k3d::dev::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Mesh)
 	{
 	}
 

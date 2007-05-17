@@ -48,15 +48,15 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		if(!Mesh.points)
 			return;
 		if(!Mesh.point_selection)
 			return;
 
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
-		const k3d::dev::mesh::selection_t& point_selection = *Mesh.point_selection;
+		const k3d::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
 		
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_DOUBLE, 0, &points[0]);
@@ -78,7 +78,7 @@ public:
 		glEnd();
 	}
 	
-	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if(!SelectionState.select_points)
 			return;
@@ -86,7 +86,7 @@ public:
 		if(!Mesh.points)
 			return;
 
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::points_t& points = *Mesh.points;
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_DOUBLE, 0, &points[0]);

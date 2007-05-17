@@ -410,7 +410,7 @@ public:
 	{
 	}
 
-	const_named_arrays(const k3d::dev::mesh::named_arrays& NamedArrays) :
+	const_named_arrays(const k3d::mesh::named_arrays& NamedArrays) :
 		m_wrapped(&NamedArrays)
 	{
 	}
@@ -419,7 +419,7 @@ public:
 	{
 		list results;
 
-		for(k3d::dev::mesh::named_arrays::const_iterator array = wrapped().begin(); array != wrapped().end(); ++array)
+		for(k3d::mesh::named_arrays::const_iterator array = wrapped().begin(); array != wrapped().end(); ++array)
 			results.append(array->first);
 
 		return results;
@@ -443,7 +443,7 @@ public:
 		if(item < 0 || item >= wrapped().size())
 			throw std::out_of_range("index out-of-range");
 
-		k3d::dev::mesh::named_arrays::const_iterator array_iterator = wrapped().begin();
+		k3d::mesh::named_arrays::const_iterator array_iterator = wrapped().begin();
 		std::advance(array_iterator, item);
 
 		return wrap_array(array_iterator->second.get());
@@ -455,7 +455,7 @@ private:
 		return object();
 	}
 
-	const k3d::dev::mesh::named_arrays& wrapped()
+	const k3d::mesh::named_arrays& wrapped()
 	{
 		if(!m_wrapped)
 			throw std::runtime_error("wrapped object is null");
@@ -463,7 +463,7 @@ private:
 		return *m_wrapped;
 	}
 
-	const k3d::dev::mesh::named_arrays* const m_wrapped;
+	const k3d::mesh::named_arrays* const m_wrapped;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -489,7 +489,7 @@ public:
 	{
 	}
 
-	named_arrays(k3d::dev::mesh::named_arrays& NamedArrays) :
+	named_arrays(k3d::mesh::named_arrays& NamedArrays) :
 		m_wrapped(&NamedArrays)
 	{
 	}
@@ -498,7 +498,7 @@ public:
 	{
 		list results;
 
-		for(k3d::dev::mesh::named_arrays::const_iterator array = wrapped().begin(); array != wrapped().end(); ++array)
+		for(k3d::mesh::named_arrays::const_iterator array = wrapped().begin(); array != wrapped().end(); ++array)
 			results.append(array->first);
 
 		return results;
@@ -553,7 +553,7 @@ public:
 		if(item < 0 || item >= wrapped().size())
 			throw std::out_of_range("index out-of-range");
 
-		k3d::dev::mesh::named_arrays::const_iterator array_iterator = wrapped().begin();
+		k3d::mesh::named_arrays::const_iterator array_iterator = wrapped().begin();
 		std::advance(array_iterator, item);
 
 		return wrap_array(array_iterator->second.get());
@@ -565,7 +565,7 @@ private:
 		return object();
 	}
 
-	k3d::dev::mesh::named_arrays& wrapped()
+	k3d::mesh::named_arrays& wrapped()
 	{
 		if(!m_wrapped)
 			throw std::runtime_error("wrapped object is null");
@@ -573,7 +573,7 @@ private:
 		return *m_wrapped;
 	}
 
-	k3d::dev::mesh::named_arrays* const m_wrapped;
+	k3d::mesh::named_arrays* const m_wrapped;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -592,7 +592,7 @@ void export_named_arrays()
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // wrap_const_named_arrays
 
-object wrap_const_named_arrays(const k3d::dev::mesh::named_arrays& NamedArrays)
+object wrap_const_named_arrays(const k3d::mesh::named_arrays& NamedArrays)
 {
 	return object(const_named_arrays(NamedArrays));
 }
@@ -600,7 +600,7 @@ object wrap_const_named_arrays(const k3d::dev::mesh::named_arrays& NamedArrays)
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // wrap_non_const_named_arrays
 
-object wrap_non_const_named_arrays(k3d::dev::mesh::named_arrays& NamedArrays)
+object wrap_non_const_named_arrays(k3d::mesh::named_arrays& NamedArrays)
 {
 	return object(named_arrays(NamedArrays));
 }
@@ -609,21 +609,21 @@ object wrap_non_const_named_arrays(k3d::dev::mesh::named_arrays& NamedArrays)
 // const_point_groups
 
 class const_point_groups :
-	public interface_wrapper<const k3d::dev::mesh::point_groups_t>
+	public interface_wrapper<const k3d::mesh::point_groups_t>
 {
-	typedef interface_wrapper<const k3d::dev::mesh::point_groups_t> base;
+	typedef interface_wrapper<const k3d::mesh::point_groups_t> base;
 public:
 	const_point_groups() :
 		base()
 	{
 	}
 
-	const_point_groups(const k3d::dev::mesh::point_groups_t* CurveGroups) :
+	const_point_groups(const k3d::mesh::point_groups_t* CurveGroups) :
 		base(CurveGroups)
 	{
 	}
 
-	const_point_groups(const k3d::dev::mesh::point_groups_t& CurveGroups) :
+	const_point_groups(const k3d::mesh::point_groups_t& CurveGroups) :
 		base(CurveGroups)
 	{
 	}
@@ -640,21 +640,21 @@ public:
 // point_groups
 
 class point_groups :
-	public interface_wrapper<k3d::dev::mesh::point_groups_t>
+	public interface_wrapper<k3d::mesh::point_groups_t>
 {
-	typedef interface_wrapper<k3d::dev::mesh::point_groups_t> base;
+	typedef interface_wrapper<k3d::mesh::point_groups_t> base;
 public:
 	point_groups() :
 		base()
 	{
 	}
 
-	point_groups(k3d::dev::mesh::point_groups_t* CurveGroups) :
+	point_groups(k3d::mesh::point_groups_t* CurveGroups) :
 		base(CurveGroups)
 	{
 	}
 
-	point_groups(k3d::dev::mesh::point_groups_t& CurveGroups) :
+	point_groups(k3d::mesh::point_groups_t& CurveGroups) :
 		base(CurveGroups)
 	{
 	}
@@ -683,21 +683,21 @@ public:
 // const_linear_curve_groups
 
 class const_linear_curve_groups :
-	public interface_wrapper<const k3d::dev::mesh::linear_curve_groups_t>
+	public interface_wrapper<const k3d::mesh::linear_curve_groups_t>
 {
-	typedef interface_wrapper<const k3d::dev::mesh::linear_curve_groups_t> base;
+	typedef interface_wrapper<const k3d::mesh::linear_curve_groups_t> base;
 public:
 	const_linear_curve_groups() :
 		base()
 	{
 	}
 
-	const_linear_curve_groups(const k3d::dev::mesh::linear_curve_groups_t* CurveGroups) :
+	const_linear_curve_groups(const k3d::mesh::linear_curve_groups_t* CurveGroups) :
 		base(CurveGroups)
 	{
 	}
 
-	const_linear_curve_groups(const k3d::dev::mesh::linear_curve_groups_t& CurveGroups) :
+	const_linear_curve_groups(const k3d::mesh::linear_curve_groups_t& CurveGroups) :
 		base(CurveGroups)
 	{
 	}
@@ -718,21 +718,21 @@ public:
 // linear_curve_groups
 
 class linear_curve_groups :
-	public interface_wrapper<k3d::dev::mesh::linear_curve_groups_t>
+	public interface_wrapper<k3d::mesh::linear_curve_groups_t>
 {
-	typedef interface_wrapper<k3d::dev::mesh::linear_curve_groups_t> base;
+	typedef interface_wrapper<k3d::mesh::linear_curve_groups_t> base;
 public:
 	linear_curve_groups() :
 		base()
 	{
 	}
 
-	linear_curve_groups(k3d::dev::mesh::linear_curve_groups_t* CurveGroups) :
+	linear_curve_groups(k3d::mesh::linear_curve_groups_t* CurveGroups) :
 		base(CurveGroups)
 	{
 	}
 
-	linear_curve_groups(k3d::dev::mesh::linear_curve_groups_t& CurveGroups) :
+	linear_curve_groups(k3d::mesh::linear_curve_groups_t& CurveGroups) :
 		base(CurveGroups)
 	{
 	}
@@ -773,21 +773,21 @@ public:
 // const_cubic_curve_groups
 
 class const_cubic_curve_groups :
-	public interface_wrapper<const k3d::dev::mesh::cubic_curve_groups_t>
+	public interface_wrapper<const k3d::mesh::cubic_curve_groups_t>
 {
-	typedef interface_wrapper<const k3d::dev::mesh::cubic_curve_groups_t> base;
+	typedef interface_wrapper<const k3d::mesh::cubic_curve_groups_t> base;
 public:
 	const_cubic_curve_groups() :
 		base()
 	{
 	}
 
-	const_cubic_curve_groups(const k3d::dev::mesh::cubic_curve_groups_t* CurveGroups) :
+	const_cubic_curve_groups(const k3d::mesh::cubic_curve_groups_t* CurveGroups) :
 		base(CurveGroups)
 	{
 	}
 
-	const_cubic_curve_groups(const k3d::dev::mesh::cubic_curve_groups_t& CurveGroups) :
+	const_cubic_curve_groups(const k3d::mesh::cubic_curve_groups_t& CurveGroups) :
 		base(CurveGroups)
 	{
 	}
@@ -808,21 +808,21 @@ public:
 // cubic_curve_groups
 
 class cubic_curve_groups :
-	public interface_wrapper<k3d::dev::mesh::cubic_curve_groups_t>
+	public interface_wrapper<k3d::mesh::cubic_curve_groups_t>
 {
-	typedef interface_wrapper<k3d::dev::mesh::cubic_curve_groups_t> base;
+	typedef interface_wrapper<k3d::mesh::cubic_curve_groups_t> base;
 public:
 	cubic_curve_groups() :
 		base()
 	{
 	}
 
-	cubic_curve_groups(k3d::dev::mesh::cubic_curve_groups_t* CurveGroups) :
+	cubic_curve_groups(k3d::mesh::cubic_curve_groups_t* CurveGroups) :
 		base(CurveGroups)
 	{
 	}
 
-	cubic_curve_groups(k3d::dev::mesh::cubic_curve_groups_t& CurveGroups) :
+	cubic_curve_groups(k3d::mesh::cubic_curve_groups_t& CurveGroups) :
 		base(CurveGroups)
 	{
 	}
@@ -863,21 +863,21 @@ public:
 // const_nurbs_curve_groups
 
 class const_nurbs_curve_groups :
-	public interface_wrapper<const k3d::dev::mesh::nurbs_curve_groups_t>
+	public interface_wrapper<const k3d::mesh::nurbs_curve_groups_t>
 {
-	typedef interface_wrapper<const k3d::dev::mesh::nurbs_curve_groups_t> base;
+	typedef interface_wrapper<const k3d::mesh::nurbs_curve_groups_t> base;
 public:
 	const_nurbs_curve_groups() :
 		base()
 	{
 	}
 
-	const_nurbs_curve_groups(const k3d::dev::mesh::nurbs_curve_groups_t* CurveGroups) :
+	const_nurbs_curve_groups(const k3d::mesh::nurbs_curve_groups_t* CurveGroups) :
 		base(CurveGroups)
 	{
 	}
 
-	const_nurbs_curve_groups(const k3d::dev::mesh::nurbs_curve_groups_t& CurveGroups) :
+	const_nurbs_curve_groups(const k3d::mesh::nurbs_curve_groups_t& CurveGroups) :
 		base(CurveGroups)
 	{
 	}
@@ -901,21 +901,21 @@ public:
 // nurbs_curve_groups
 
 class nurbs_curve_groups :
-	public interface_wrapper<k3d::dev::mesh::nurbs_curve_groups_t>
+	public interface_wrapper<k3d::mesh::nurbs_curve_groups_t>
 {
-	typedef interface_wrapper<k3d::dev::mesh::nurbs_curve_groups_t> base;
+	typedef interface_wrapper<k3d::mesh::nurbs_curve_groups_t> base;
 public:
 	nurbs_curve_groups() :
 		base()
 	{
 	}
 
-	nurbs_curve_groups(k3d::dev::mesh::nurbs_curve_groups_t* CurveGroups) :
+	nurbs_curve_groups(k3d::mesh::nurbs_curve_groups_t* CurveGroups) :
 		base(CurveGroups)
 	{
 	}
 
-	nurbs_curve_groups(k3d::dev::mesh::nurbs_curve_groups_t& CurveGroups) :
+	nurbs_curve_groups(k3d::mesh::nurbs_curve_groups_t& CurveGroups) :
 		base(CurveGroups)
 	{
 	}
@@ -965,21 +965,21 @@ public:
 // const_bilinear_patches
 
 class const_bilinear_patches :
-	public interface_wrapper<const k3d::dev::mesh::bilinear_patches_t>
+	public interface_wrapper<const k3d::mesh::bilinear_patches_t>
 {
-	typedef interface_wrapper<const k3d::dev::mesh::bilinear_patches_t> base;
+	typedef interface_wrapper<const k3d::mesh::bilinear_patches_t> base;
 public:
 	const_bilinear_patches() :
 		base()
 	{
 	}
 
-	const_bilinear_patches(const k3d::dev::mesh::bilinear_patches_t* Patches) :
+	const_bilinear_patches(const k3d::mesh::bilinear_patches_t* Patches) :
 		base(Patches)
 	{
 	}
 
-	const_bilinear_patches(const k3d::dev::mesh::bilinear_patches_t& Patches) :
+	const_bilinear_patches(const k3d::mesh::bilinear_patches_t& Patches) :
 		base(Patches)
 	{
 	}
@@ -996,21 +996,21 @@ public:
 // bilinear_patches
 
 class bilinear_patches :
-	public interface_wrapper<k3d::dev::mesh::bilinear_patches_t>
+	public interface_wrapper<k3d::mesh::bilinear_patches_t>
 {
-	typedef interface_wrapper<k3d::dev::mesh::bilinear_patches_t> base;
+	typedef interface_wrapper<k3d::mesh::bilinear_patches_t> base;
 public:
 	bilinear_patches() :
 		base()
 	{
 	}
 
-	bilinear_patches(k3d::dev::mesh::bilinear_patches_t* Patches) :
+	bilinear_patches(k3d::mesh::bilinear_patches_t* Patches) :
 		base(Patches)
 	{
 	}
 
-	bilinear_patches(k3d::dev::mesh::bilinear_patches_t& Patches) :
+	bilinear_patches(k3d::mesh::bilinear_patches_t& Patches) :
 		base(Patches)
 	{
 	}
@@ -1038,21 +1038,21 @@ public:
 // const_bicubic_patches
 
 class const_bicubic_patches :
-	public interface_wrapper<const k3d::dev::mesh::bicubic_patches_t>
+	public interface_wrapper<const k3d::mesh::bicubic_patches_t>
 {
-	typedef interface_wrapper<const k3d::dev::mesh::bicubic_patches_t> base;
+	typedef interface_wrapper<const k3d::mesh::bicubic_patches_t> base;
 public:
 	const_bicubic_patches() :
 		base()
 	{
 	}
 
-	const_bicubic_patches(const k3d::dev::mesh::bicubic_patches_t* Patches) :
+	const_bicubic_patches(const k3d::mesh::bicubic_patches_t* Patches) :
 		base(Patches)
 	{
 	}
 
-	const_bicubic_patches(const k3d::dev::mesh::bicubic_patches_t& Patches) :
+	const_bicubic_patches(const k3d::mesh::bicubic_patches_t& Patches) :
 		base(Patches)
 	{
 	}
@@ -1069,21 +1069,21 @@ public:
 // bicubic_patches
 
 class bicubic_patches :
-	public interface_wrapper<k3d::dev::mesh::bicubic_patches_t>
+	public interface_wrapper<k3d::mesh::bicubic_patches_t>
 {
-	typedef interface_wrapper<k3d::dev::mesh::bicubic_patches_t> base;
+	typedef interface_wrapper<k3d::mesh::bicubic_patches_t> base;
 public:
 	bicubic_patches() :
 		base()
 	{
 	}
 
-	bicubic_patches(k3d::dev::mesh::bicubic_patches_t* Patches) :
+	bicubic_patches(k3d::mesh::bicubic_patches_t* Patches) :
 		base(Patches)
 	{
 	}
 
-	bicubic_patches(k3d::dev::mesh::bicubic_patches_t& Patches) :
+	bicubic_patches(k3d::mesh::bicubic_patches_t& Patches) :
 		base(Patches)
 	{
 	}
@@ -1111,21 +1111,21 @@ public:
 // const_nurbs_patches
 
 class const_nurbs_patches :
-	public interface_wrapper<const k3d::dev::mesh::nurbs_patches_t>
+	public interface_wrapper<const k3d::mesh::nurbs_patches_t>
 {
-	typedef interface_wrapper<const k3d::dev::mesh::nurbs_patches_t> base;
+	typedef interface_wrapper<const k3d::mesh::nurbs_patches_t> base;
 public:
 	const_nurbs_patches() :
 		base()
 	{
 	}
 
-	const_nurbs_patches(const k3d::dev::mesh::nurbs_patches_t* Patches) :
+	const_nurbs_patches(const k3d::mesh::nurbs_patches_t* Patches) :
 		base(Patches)
 	{
 	}
 
-	const_nurbs_patches(const k3d::dev::mesh::nurbs_patches_t& Patches) :
+	const_nurbs_patches(const k3d::mesh::nurbs_patches_t& Patches) :
 		base(Patches)
 	{
 	}
@@ -1152,21 +1152,21 @@ public:
 // nurbs_patches
 
 class nurbs_patches :
-	public interface_wrapper<k3d::dev::mesh::nurbs_patches_t>
+	public interface_wrapper<k3d::mesh::nurbs_patches_t>
 {
-	typedef interface_wrapper<k3d::dev::mesh::nurbs_patches_t> base;
+	typedef interface_wrapper<k3d::mesh::nurbs_patches_t> base;
 public:
 	nurbs_patches() :
 		base()
 	{
 	}
 
-	nurbs_patches(k3d::dev::mesh::nurbs_patches_t* Patches) :
+	nurbs_patches(k3d::mesh::nurbs_patches_t* Patches) :
 		base(Patches)
 	{
 	}
 
-	nurbs_patches(k3d::dev::mesh::nurbs_patches_t& Patches) :
+	nurbs_patches(k3d::mesh::nurbs_patches_t& Patches) :
 		base(Patches)
 	{
 	}
@@ -1224,21 +1224,21 @@ public:
 // const_polyhedra
 
 class const_polyhedra :
-	public interface_wrapper<const k3d::dev::mesh::polyhedra_t>
+	public interface_wrapper<const k3d::mesh::polyhedra_t>
 {
-	typedef interface_wrapper<const k3d::dev::mesh::polyhedra_t> base;
+	typedef interface_wrapper<const k3d::mesh::polyhedra_t> base;
 public:
 	const_polyhedra() :
 		base()
 	{
 	}
 
-	const_polyhedra(const k3d::dev::mesh::polyhedra_t* Polyhedra) :
+	const_polyhedra(const k3d::mesh::polyhedra_t* Polyhedra) :
 		base(Polyhedra)
 	{
 	}
 
-	const_polyhedra(const k3d::dev::mesh::polyhedra_t& Polyhedra) :
+	const_polyhedra(const k3d::mesh::polyhedra_t& Polyhedra) :
 		base(Polyhedra)
 	{
 	}
@@ -1263,21 +1263,21 @@ public:
 // polyhedra
 
 class polyhedra :
-	public interface_wrapper<k3d::dev::mesh::polyhedra_t>
+	public interface_wrapper<k3d::mesh::polyhedra_t>
 {
-	typedef interface_wrapper<k3d::dev::mesh::polyhedra_t> base;
+	typedef interface_wrapper<k3d::mesh::polyhedra_t> base;
 public:
 	polyhedra() :
 		base()
 	{
 	}
 
-	polyhedra(k3d::dev::mesh::polyhedra_t* Polyhedra) :
+	polyhedra(k3d::mesh::polyhedra_t* Polyhedra) :
 		base(Polyhedra)
 	{
 	}
 
-	polyhedra(k3d::dev::mesh::polyhedra_t& Polyhedra) :
+	polyhedra(k3d::mesh::polyhedra_t& Polyhedra) :
 		base(Polyhedra)
 	{
 	}
@@ -1329,21 +1329,21 @@ public:
 // const_blobbies
 
 class const_blobbies :
-	public interface_wrapper<const k3d::dev::mesh::blobbies_t>
+	public interface_wrapper<const k3d::mesh::blobbies_t>
 {
-	typedef interface_wrapper<const k3d::dev::mesh::blobbies_t> base;
+	typedef interface_wrapper<const k3d::mesh::blobbies_t> base;
 public:
 	const_blobbies() :
 		base()
 	{
 	}
 
-	const_blobbies(const k3d::dev::mesh::blobbies_t* Blobbies) :
+	const_blobbies(const k3d::mesh::blobbies_t* Blobbies) :
 		base(Blobbies)
 	{
 	}
 
-	const_blobbies(const k3d::dev::mesh::blobbies_t& Blobbies) :
+	const_blobbies(const k3d::mesh::blobbies_t& Blobbies) :
 		base(Blobbies)
 	{
 	}
@@ -1371,21 +1371,21 @@ public:
 //blobbies 
 
 class blobbies :
-	public interface_wrapper<k3d::dev::mesh::blobbies_t>
+	public interface_wrapper<k3d::mesh::blobbies_t>
 {
-	typedef interface_wrapper<k3d::dev::mesh::blobbies_t> base;
+	typedef interface_wrapper<k3d::mesh::blobbies_t> base;
 public:
 	blobbies() :
 		base()
 	{
 	}
 
-	blobbies(k3d::dev::mesh::blobbies_t* Blobbies) :
+	blobbies(k3d::mesh::blobbies_t* Blobbies) :
 		base(Blobbies)
 	{
 	}
 
-	blobbies(k3d::dev::mesh::blobbies_t& Blobbies) :
+	blobbies(k3d::mesh::blobbies_t& Blobbies) :
 		base(Blobbies)
 	{
 	}
@@ -1451,7 +1451,7 @@ mesh::mesh() :
 {
 }
 
-mesh::mesh(k3d::dev::mesh* Mesh) :
+mesh::mesh(k3d::mesh* Mesh) :
 	base(Mesh)
 {
 }
@@ -1464,17 +1464,17 @@ void mesh::copy(const mesh& RHS)
 object mesh::bicubic_patches() { return detail::wrap_const_object<detail::const_bicubic_patches>(wrapped().bicubic_patches); } 
 object mesh::bilinear_patches() { return detail::wrap_const_object<detail::const_bilinear_patches>(wrapped().bilinear_patches); } 
 object mesh::blobbies() { return detail::wrap_const_object<detail::const_blobbies>(wrapped().blobbies); }
-object mesh::create_bicubic_patches() { return detail::create_object<detail::bicubic_patches, k3d::dev::mesh::bicubic_patches_t>(wrapped().bicubic_patches); }
-object mesh::create_bilinear_patches() { return detail::create_object<detail::bilinear_patches, k3d::dev::mesh::bilinear_patches_t>(wrapped().bilinear_patches); }
-object mesh::create_blobbies() { return detail::create_object<detail::blobbies, k3d::dev::mesh::blobbies_t>(wrapped().blobbies); }
-object mesh::create_cubic_curve_groups() { return detail::create_object<detail::cubic_curve_groups, k3d::dev::mesh::cubic_curve_groups_t>(wrapped().cubic_curve_groups); }
-object mesh::create_linear_curve_groups() { return detail::create_object<detail::linear_curve_groups, k3d::dev::mesh::linear_curve_groups_t>(wrapped().linear_curve_groups); }
-object mesh::create_nurbs_curve_groups() { return detail::create_object<detail::nurbs_curve_groups, k3d::dev::mesh::nurbs_curve_groups_t>(wrapped().nurbs_curve_groups); }
-object mesh::create_nurbs_patches() { return detail::create_object<detail::nurbs_patches, k3d::dev::mesh::nurbs_patches_t>(wrapped().nurbs_patches); }
-object mesh::create_point_groups() { return detail::create_object<detail::point_groups, k3d::dev::mesh::point_groups_t>(wrapped().point_groups); } 
+object mesh::create_bicubic_patches() { return detail::create_object<detail::bicubic_patches, k3d::mesh::bicubic_patches_t>(wrapped().bicubic_patches); }
+object mesh::create_bilinear_patches() { return detail::create_object<detail::bilinear_patches, k3d::mesh::bilinear_patches_t>(wrapped().bilinear_patches); }
+object mesh::create_blobbies() { return detail::create_object<detail::blobbies, k3d::mesh::blobbies_t>(wrapped().blobbies); }
+object mesh::create_cubic_curve_groups() { return detail::create_object<detail::cubic_curve_groups, k3d::mesh::cubic_curve_groups_t>(wrapped().cubic_curve_groups); }
+object mesh::create_linear_curve_groups() { return detail::create_object<detail::linear_curve_groups, k3d::mesh::linear_curve_groups_t>(wrapped().linear_curve_groups); }
+object mesh::create_nurbs_curve_groups() { return detail::create_object<detail::nurbs_curve_groups, k3d::mesh::nurbs_curve_groups_t>(wrapped().nurbs_curve_groups); }
+object mesh::create_nurbs_patches() { return detail::create_object<detail::nurbs_patches, k3d::mesh::nurbs_patches_t>(wrapped().nurbs_patches); }
+object mesh::create_point_groups() { return detail::create_object<detail::point_groups, k3d::mesh::point_groups_t>(wrapped().point_groups); } 
 object mesh::create_point_selection() { return detail::create_array(wrapped().point_selection); } 
 object mesh::create_points() { return detail::create_array(wrapped().points); }
-object mesh::create_polyhedra() { return detail::create_object<detail::polyhedra, k3d::dev::mesh::polyhedra_t>(wrapped().polyhedra); } 
+object mesh::create_polyhedra() { return detail::create_object<detail::polyhedra, k3d::mesh::polyhedra_t>(wrapped().polyhedra); } 
 object mesh::cubic_curve_groups() { return detail::wrap_const_object<detail::const_cubic_curve_groups>(wrapped().cubic_curve_groups); }
 object mesh::linear_curve_groups() { return detail::wrap_const_object<detail::const_linear_curve_groups>(wrapped().linear_curve_groups); } 
 object mesh::nurbs_curve_groups() { return detail::wrap_const_object<detail::const_nurbs_curve_groups>(wrapped().nurbs_curve_groups); } 
@@ -1990,33 +1990,33 @@ void export_mesh()
 		.def("create_operands", &detail::blobbies::create_operands)
 		.def("create_floats", &detail::blobbies::create_floats);
 
-	enum_<k3d::dev::mesh::polyhedra_t::polyhedron_type>("polyhedron_type")
-		.value("polygons", k3d::dev::mesh::polyhedra_t::POLYGONS)
-		.value("catmull_clark", k3d::dev::mesh::polyhedra_t::CATMULL_CLARK)
+	enum_<k3d::mesh::polyhedra_t::polyhedron_type>("polyhedron_type")
+		.value("polygons", k3d::mesh::polyhedra_t::POLYGONS)
+		.value("catmull_clark", k3d::mesh::polyhedra_t::CATMULL_CLARK)
 		.attr("__module__") = "k3d";
 
-	enum_<k3d::dev::mesh::blobbies_t::primitive_type>("primitive_type")
-		.value("constant", k3d::dev::mesh::blobbies_t::CONSTANT)
-		.value("ellipsoid", k3d::dev::mesh::blobbies_t::ELLIPSOID)
-		.value("segment", k3d::dev::mesh::blobbies_t::SEGMENT)
+	enum_<k3d::mesh::blobbies_t::primitive_type>("primitive_type")
+		.value("constant", k3d::mesh::blobbies_t::CONSTANT)
+		.value("ellipsoid", k3d::mesh::blobbies_t::ELLIPSOID)
+		.value("segment", k3d::mesh::blobbies_t::SEGMENT)
 		.attr("__module__") = "k3d";
 
-	enum_<k3d::dev::mesh::blobbies_t::operator_type>("operator_type")
-		.value("add", k3d::dev::mesh::blobbies_t::ADD)
-		.value("multiply", k3d::dev::mesh::blobbies_t::MULTIPLY)
-		.value("maximum", k3d::dev::mesh::blobbies_t::MAXIMUM)
-		.value("minimum", k3d::dev::mesh::blobbies_t::MINIMUM)
-		.value("divide", k3d::dev::mesh::blobbies_t::DIVIDE)
-		.value("subtract", k3d::dev::mesh::blobbies_t::SUBTRACT)
-		.value("negate", k3d::dev::mesh::blobbies_t::NEGATE)
-		.value("identity", k3d::dev::mesh::blobbies_t::IDENTITY)
+	enum_<k3d::mesh::blobbies_t::operator_type>("operator_type")
+		.value("add", k3d::mesh::blobbies_t::ADD)
+		.value("multiply", k3d::mesh::blobbies_t::MULTIPLY)
+		.value("maximum", k3d::mesh::blobbies_t::MAXIMUM)
+		.value("minimum", k3d::mesh::blobbies_t::MINIMUM)
+		.value("divide", k3d::mesh::blobbies_t::DIVIDE)
+		.value("subtract", k3d::mesh::blobbies_t::SUBTRACT)
+		.value("negate", k3d::mesh::blobbies_t::NEGATE)
+		.value("identity", k3d::mesh::blobbies_t::IDENTITY)
 		.attr("__module__") = "k3d";
 
 	detail::export_const_array<const k3d::typed_array<bool> >("const_bool_array");
 	detail::export_const_array<const k3d::typed_array<double> >("const_double_array");
-	detail::export_const_array<const k3d::typed_array<k3d::dev::mesh::polyhedra_t::polyhedron_type> >("const_polyhedron_type_array");
-	detail::export_const_array<const k3d::typed_array<k3d::dev::mesh::blobbies_t::operator_type> >("const_blobby_operator_type_array");
-	detail::export_const_array<const k3d::typed_array<k3d::dev::mesh::blobbies_t::primitive_type> >("const_blobby_primitive_type_array");
+	detail::export_const_array<const k3d::typed_array<k3d::mesh::polyhedra_t::polyhedron_type> >("const_polyhedron_type_array");
+	detail::export_const_array<const k3d::typed_array<k3d::mesh::blobbies_t::operator_type> >("const_blobby_operator_type_array");
+	detail::export_const_array<const k3d::typed_array<k3d::mesh::blobbies_t::primitive_type> >("const_blobby_primitive_type_array");
 	detail::export_const_array<const k3d::typed_array<k3d::imaterial*> >("const_material_array");
 	detail::export_const_array<const k3d::typed_array<k3d::color> >("const_color_array");
 	detail::export_const_array<const k3d::typed_array<k3d::matrix4> >("const_matrix4_array");
@@ -2028,9 +2028,9 @@ void export_mesh()
 
 	detail::export_array<k3d::typed_array<bool> >("bool_array");
 	detail::export_array<k3d::typed_array<double> >("double_array");
-	detail::export_array<k3d::typed_array<k3d::dev::mesh::polyhedra_t::polyhedron_type> >("polyhedron_type_array");
-	detail::export_array<k3d::typed_array<k3d::dev::mesh::blobbies_t::operator_type> >("blobby_operator_type_array");
-	detail::export_array<k3d::typed_array<k3d::dev::mesh::blobbies_t::primitive_type> >("blobby_primitive_type_array");
+	detail::export_array<k3d::typed_array<k3d::mesh::polyhedra_t::polyhedron_type> >("polyhedron_type_array");
+	detail::export_array<k3d::typed_array<k3d::mesh::blobbies_t::operator_type> >("blobby_operator_type_array");
+	detail::export_array<k3d::typed_array<k3d::mesh::blobbies_t::primitive_type> >("blobby_primitive_type_array");
 	detail::export_array<k3d::typed_array<k3d::imaterial*> >("material_array");
 	detail::export_array<k3d::typed_array<k3d::matrix4> >("matrix_array");
 	detail::export_array<k3d::typed_array<k3d::color> >("color_array");

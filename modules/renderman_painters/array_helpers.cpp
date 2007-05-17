@@ -43,9 +43,9 @@ public:
 //		std::for_each(destinations.begin(), destinations.end(), k3d::delete_object());
 	}
 
-	void add_arrays(const k3d::dev::mesh::named_arrays& Sources)
+	void add_arrays(const k3d::mesh::named_arrays& Sources)
 	{
-		for(k3d::dev::mesh::named_arrays::const_iterator array_iterator = Sources.begin(); array_iterator != Sources.end(); ++array_iterator)
+		for(k3d::mesh::named_arrays::const_iterator array_iterator = Sources.begin(); array_iterator != Sources.end(); ++array_iterator)
 		{
 			const std::string name = array_iterator->first;
 			const k3d::array* const source = array_iterator->second.get();
@@ -152,7 +152,7 @@ array_copier::~array_copier()
 	delete m_implementation;
 }
 
-void array_copier::add_arrays(const k3d::dev::mesh::named_arrays& Sources)
+void array_copier::add_arrays(const k3d::mesh::named_arrays& Sources)
 {
 	m_implementation->add_arrays(Sources);
 }

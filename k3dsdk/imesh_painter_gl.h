@@ -29,7 +29,7 @@
 namespace k3d
 {
 
-namespace dev { class mesh; }
+class mesh;
 
 namespace gl
 {
@@ -43,11 +43,11 @@ class imesh_painter :
 {
 public:
 	/// Called to render a mesh for on-screen display
-	virtual void paint_mesh(const dev::mesh& Mesh, const painter_render_state& RenderState) = 0;
+	virtual void paint_mesh(const mesh& Mesh, const painter_render_state& RenderState) = 0;
 	/// Called to render a mesh for interactive selection
-	virtual void select_mesh(const dev::mesh& Mesh, const painter_render_state& RenderState, const painter_selection_state& SelectionState) = 0;
+	virtual void select_mesh(const mesh& Mesh, const painter_render_state& RenderState, const painter_selection_state& SelectionState) = 0;
 	/// Called when a mesh changes to allow painters to clear any cached data
-	virtual void mesh_changed(const dev::mesh& Mesh, iunknown* Hint) = 0;
+	virtual void mesh_changed(const mesh& Mesh, iunknown* Hint) = 0;
 };
 
 } // namespace gl

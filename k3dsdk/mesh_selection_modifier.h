@@ -32,9 +32,6 @@
 namespace k3d
 {
 
-namespace dev
-{
-
 /// Mesh modifier implementation for use in plugins that alter the selection state of a mesh without altering its topology or geometry.  To create a plugin, derive from mesh_selection_modifier and implement the on_select_mesh() method.
 class mesh_selection_modifier :
 	public mesh_selection_sink<mesh_modifier<persistent<node> > >
@@ -51,8 +48,6 @@ private:
 	/// Implement this method in derived classes and alter the output selection(s) as-desired.
 	virtual void on_select_mesh(const mesh& Input, mesh& Output) = 0;
 };
-
-} // namespace dev
 
 } // namespace k3d
 

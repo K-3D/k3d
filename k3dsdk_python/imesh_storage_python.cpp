@@ -48,7 +48,7 @@ imesh_storage::imesh_storage(k3d::imesh_storage* Node) :
 
 boost::python::object imesh_storage::new_mesh()
 {
-	k3d::dev::mesh* const mesh = new k3d::dev::mesh();
+	k3d::mesh* const mesh = new k3d::mesh();
 	wrapped().reset_mesh(mesh);
 
 	return boost::python::object(k3d::python::mesh(mesh));

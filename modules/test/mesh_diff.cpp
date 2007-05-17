@@ -51,16 +51,16 @@ public:
 
 	bool get_equal()
 	{
-		const k3d::dev::mesh* first_mesh = 0;
+		const k3d::mesh* first_mesh = 0;
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
 		{
 			k3d::iproperty& property = **prop;
-			if(property.property_type() == typeid(k3d::dev::mesh*))
+			if(property.property_type() == typeid(k3d::mesh*))
 			{
 				if(first_mesh)
 				{
-					if(const k3d::dev::mesh* const mesh = boost::any_cast<k3d::dev::mesh*>(k3d::get_value(document().dag(), property)))
+					if(const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::get_value(document().dag(), property)))
 					{
 						if(*first_mesh != *mesh)
 							return false;
@@ -68,7 +68,7 @@ public:
 				}
 				else
 				{
-					first_mesh = boost::any_cast<k3d::dev::mesh*>(k3d::get_value(document().dag(), property));
+					first_mesh = boost::any_cast<k3d::mesh*>(k3d::get_value(document().dag(), property));
 				}
 			}
 		}

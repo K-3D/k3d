@@ -210,9 +210,9 @@ void persistent_container::load(xml::element& Element, const ipersistent::load_c
 				else if(type == type_string<k3d::color>() || type == "k3d::ri::color")
 					load_user_property<user::color_property>(*element->second, Context, *property_collection, *persistent_container, *object, color(1, 1, 1));
 				else if(type == type_string<k3d::legacy::mesh*>())
-					load_user_property<user::mesh_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::legacy::mesh*>(0));
-				else if(type == type_string<k3d::dev::mesh*>())
-					load_user_property<user::dev_mesh_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::dev::mesh*>(0));
+					load_user_property<user::legacy_mesh_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::legacy::mesh*>(0));
+				else if(type == type_string<k3d::mesh*>())
+					load_user_property<user::mesh_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::mesh*>(0));
 				else if(type == type_string<k3d::gl::imesh_painter*>())
 					load_user_property<user::gl_mesh_painter_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::gl::imesh_painter*>(0));
 				else if(type == type_string<k3d::ri::imesh_painter*>())

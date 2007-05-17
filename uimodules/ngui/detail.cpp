@@ -198,12 +198,12 @@ k3d::inode* duplicate_mesh(k3d::idocument& Document, k3d::inode& Node)
 
 	// Copy upstream mesh to our new FrozenMesh ...
 k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-	if(k3d::dev::mesh* const upstream_mesh = boost::any_cast<k3d::dev::mesh*>(k3d::get_value(Document.dag(), upstream_mesh_source->mesh_source_output())))
+	if(k3d::mesh* const upstream_mesh = boost::any_cast<k3d::mesh*>(k3d::get_value(Document.dag(), upstream_mesh_source->mesh_source_output())))
 	{
 		if(k3d::imesh_storage* const frozen_mesh_storage = dynamic_cast<k3d::imesh_storage*>(frozen_mesh))
 		{
-			k3d::dev::mesh* const new_mesh = new k3d::dev::mesh();
-			k3d::dev::deep_copy(*upstream_mesh, *new_mesh);
+			k3d::mesh* const new_mesh = new k3d::mesh();
+			k3d::deep_copy(*upstream_mesh, *new_mesh);
 			frozen_mesh_storage->reset_mesh(new_mesh);
 		}
 	}

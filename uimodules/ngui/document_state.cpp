@@ -99,7 +99,7 @@ const k3d::ienumeration_property::enumeration_values_t& selection_mode_values()
 
 const bool is_point_selected(const k3d::selection::record& Record)
 {
-	k3d::dev::mesh* const mesh = k3d::selection::get_mesh(Record);
+	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
 	if(!mesh)
 		return false;
 
@@ -116,7 +116,7 @@ const bool is_point_selected(const k3d::selection::record& Record)
 /** \todo Support nucurves */
 const bool is_line_selected(const k3d::selection::record& Record)
 {
-	k3d::dev::mesh* const mesh = k3d::selection::get_mesh(Record);
+	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
 	if(!mesh)
 		return false;
 
@@ -147,7 +147,7 @@ const bool is_line_selected(const k3d::selection::record& Record)
 /** \todo Support patches */
 const bool is_face_selected(const k3d::selection::record& Record)
 {
-	k3d::dev::mesh* const mesh = k3d::selection::get_mesh(Record);
+	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
 	if(!mesh)
 		return false;
 
@@ -342,7 +342,7 @@ void update_component_selection(const k3d::nodes_t& Nodes, const UpdatePolicyT& 
 		if(!mesh_source)
             continue;
 
-		const k3d::dev::mesh* const mesh = boost::any_cast<k3d::dev::mesh*>(mesh_source->mesh_source_output().property_value());
+		const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_value());
 		if(!mesh)
             continue;
 
@@ -358,7 +358,7 @@ void update_component_selection(const k3d::nodes_t& Nodes, const UpdatePolicyT& 
 
 struct select_all_points
 {
-	void operator()(const k3d::dev::mesh& Mesh, k3d::mesh_selection& Selection) const
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		Selection.points = k3d::mesh_selection::component_select_all();
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
@@ -374,7 +374,7 @@ struct select_all_points
 
 struct select_all_lines
 {
-	void operator()(const k3d::dev::mesh& Mesh, k3d::mesh_selection& Selection) const
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		Selection.points = k3d::mesh_selection::component_deselect_all();
 		Selection.edges = k3d::mesh_selection::component_select_all();
@@ -390,7 +390,7 @@ struct select_all_lines
 
 struct select_all_faces
 {
-	void operator()(const k3d::dev::mesh& Mesh, k3d::mesh_selection& Selection) const
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		Selection.points = k3d::mesh_selection::component_deselect_all();
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
@@ -406,7 +406,7 @@ struct select_all_faces
 
 struct deselect_all
 {
-	void operator()(const k3d::dev::mesh& Mesh, k3d::mesh_selection& Selection) const
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		Selection = k3d::mesh_selection::deselect_all();
 	}
@@ -414,7 +414,7 @@ struct deselect_all
 
 struct select_null
 {
-	void operator()(const k3d::dev::mesh& Mesh, k3d::mesh_selection& Selection) const
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		Selection = k3d::mesh_selection::select_null();
 	}
@@ -428,7 +428,7 @@ void invert(k3d::mesh_selection::records_t& Records)
 
 struct invert_points
 {
-	void operator()(const k3d::dev::mesh& Mesh, k3d::mesh_selection& Selection) const
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		invert(Selection.points);
 	}
@@ -436,7 +436,7 @@ struct invert_points
 
 struct invert_lines
 {
-	void operator()(const k3d::dev::mesh& Mesh, k3d::mesh_selection& Selection) const
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		invert(Selection.edges);
 		invert(Selection.linear_curves);
@@ -447,7 +447,7 @@ struct invert_lines
 
 struct invert_faces
 {
-	void operator()(const k3d::dev::mesh& Mesh, k3d::mesh_selection& Selection) const
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		invert(Selection.faces);
 		invert(Selection.bilinear_patches);
@@ -477,7 +477,7 @@ void deselect_gaps(k3d::mesh_selection& Selection)
 /** \todo Handle adjacent edges */
 struct convert_to_points
 {
-	void operator()(const k3d::dev::mesh& Mesh, k3d::mesh_selection& Selection) const
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		if(!(Mesh.points && Mesh.point_selection))
 			return;
@@ -654,15 +654,15 @@ struct convert_to_points
 /** \todo Select adjacent edges */
 struct convert_to_lines
 {
-	void operator()(const k3d::dev::mesh& Mesh, k3d::mesh_selection& Selection) const
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		// Convert point selections to edge selections ...
 		if(Mesh.polyhedra && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges && Mesh.polyhedra->edge_selection && Mesh.point_selection)
 		{
-			const k3d::dev::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-			const k3d::dev::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-			const k3d::dev::mesh::selection_t edge_selection = *Mesh.polyhedra->edge_selection;
-			const k3d::dev::mesh::selection_t point_selection = *Mesh.point_selection;
+			const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+			const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+			const k3d::mesh::selection_t edge_selection = *Mesh.polyhedra->edge_selection;
+			const k3d::mesh::selection_t point_selection = *Mesh.point_selection;
 
 			const size_t edge_begin = 0;
 			const size_t edge_end = edge_begin + edge_points.size();
@@ -679,11 +679,11 @@ struct convert_to_lines
 		// Convert point selections to linear curve selections ...
 		if(Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_first_points && Mesh.linear_curve_groups->curve_point_counts && Mesh.linear_curve_groups->curve_selection && Mesh.linear_curve_groups->curve_points && Mesh.point_selection)
 		{
-			const k3d::dev::mesh::indices_t& curve_first_points = *Mesh.linear_curve_groups->curve_first_points;
-			const k3d::dev::mesh::counts_t& curve_point_counts = *Mesh.linear_curve_groups->curve_point_counts;
-			const k3d::dev::mesh::selection_t& curve_selection = *Mesh.linear_curve_groups->curve_selection;
-			const k3d::dev::mesh::indices_t& curve_points = *Mesh.linear_curve_groups->curve_points;
-			const k3d::dev::mesh::selection_t& point_selection = *Mesh.point_selection;
+			const k3d::mesh::indices_t& curve_first_points = *Mesh.linear_curve_groups->curve_first_points;
+			const k3d::mesh::counts_t& curve_point_counts = *Mesh.linear_curve_groups->curve_point_counts;
+			const k3d::mesh::selection_t& curve_selection = *Mesh.linear_curve_groups->curve_selection;
+			const k3d::mesh::indices_t& curve_points = *Mesh.linear_curve_groups->curve_points;
+			const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
 
 			const size_t curve_begin = 0;
 			const size_t curve_end = curve_begin + curve_first_points.size();
@@ -705,11 +705,11 @@ struct convert_to_lines
 		// Convert point selections to cubic curve selections ...
 		if(Mesh.cubic_curve_groups && Mesh.cubic_curve_groups->curve_first_points && Mesh.cubic_curve_groups->curve_point_counts && Mesh.cubic_curve_groups->curve_selection && Mesh.cubic_curve_groups->curve_points && Mesh.point_selection)
 		{
-			const k3d::dev::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
-			const k3d::dev::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
-			const k3d::dev::mesh::selection_t& curve_selection = *Mesh.cubic_curve_groups->curve_selection;
-			const k3d::dev::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
-			const k3d::dev::mesh::selection_t& point_selection = *Mesh.point_selection;
+			const k3d::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
+			const k3d::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
+			const k3d::mesh::selection_t& curve_selection = *Mesh.cubic_curve_groups->curve_selection;
+			const k3d::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
+			const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
 
 			const size_t curve_begin = 0;
 			const size_t curve_end = curve_begin + curve_first_points.size();
@@ -731,11 +731,11 @@ struct convert_to_lines
 		// Convert point selections to nurbs curve selections ...
 		if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_first_points && Mesh.nurbs_curve_groups->curve_point_counts && Mesh.nurbs_curve_groups->curve_selection && Mesh.nurbs_curve_groups->curve_points && Mesh.point_selection)
 		{
-			const k3d::dev::mesh::indices_t& curve_first_points = *Mesh.nurbs_curve_groups->curve_first_points;
-			const k3d::dev::mesh::counts_t& curve_point_counts = *Mesh.nurbs_curve_groups->curve_point_counts;
-			const k3d::dev::mesh::selection_t& curve_selection = *Mesh.nurbs_curve_groups->curve_selection;
-			const k3d::dev::mesh::indices_t& curve_points = *Mesh.nurbs_curve_groups->curve_points;
-			const k3d::dev::mesh::selection_t& point_selection = *Mesh.point_selection;
+			const k3d::mesh::indices_t& curve_first_points = *Mesh.nurbs_curve_groups->curve_first_points;
+			const k3d::mesh::counts_t& curve_point_counts = *Mesh.nurbs_curve_groups->curve_point_counts;
+			const k3d::mesh::selection_t& curve_selection = *Mesh.nurbs_curve_groups->curve_selection;
+			const k3d::mesh::indices_t& curve_points = *Mesh.nurbs_curve_groups->curve_points;
+			const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
 
 			const size_t curve_begin = 0;
 			const size_t curve_end = curve_begin + curve_first_points.size();
@@ -757,11 +757,11 @@ struct convert_to_lines
 		// Convert face selections to edge selections ...
 		if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops && Mesh.polyhedra->face_loop_counts && Mesh.polyhedra->face_selection && Mesh.polyhedra->loop_first_edges && Mesh.polyhedra->clockwise_edges)
 		{
-			const k3d::dev::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-			const k3d::dev::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-			const k3d::dev::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
-			const k3d::dev::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-			const k3d::dev::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+			const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+			const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+			const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
+			const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+			const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 
 			const size_t face_begin = 0;
 			const size_t face_end = face_begin + face_first_loops.size();
@@ -801,7 +801,7 @@ struct convert_to_lines
 /** \todo Handle adjacent edge selections */
 struct convert_to_faces
 {
-	void operator()(const k3d::dev::mesh& Mesh, k3d::mesh_selection& Selection) const
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		// Convert point and edge selections to face selections ...
 		if(Mesh.point_selection && Mesh.polyhedra && Mesh.polyhedra->face_first_loops && Mesh.polyhedra->face_loop_counts && Mesh.polyhedra->face_selection && Mesh.polyhedra->loop_first_edges && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges && Mesh.polyhedra->edge_selection)

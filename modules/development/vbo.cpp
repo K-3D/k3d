@@ -83,8 +83,8 @@ typedef std::vector< std::pair<size_t, bool> > corners_t;
 // helper function for face::convert
 void insert_face(const size_t Face, const bool DuplicatePoints,
 								 const corners_t& FaceCorners,
-								 const k3d::dev::mesh::points_t& Points,
-								 k3d::dev::mesh::points_t& FlatPoints,
+								 const k3d::mesh::points_t& Points,
+								 k3d::mesh::points_t& FlatPoints,
 								 k3d::typed_array<GLuint>& SmoothIndices,
 								 k3d::typed_array<GLuint>& FlatIndices,
 								 indexmap_t& SmoothMap, indexmap_t& FlatMap,
@@ -123,7 +123,7 @@ void insert_face(const size_t Face, const bool DuplicatePoints,
 }
 
 // helper function to calculate normals (placed in Mormals and LinkedNormals) in face::convert
-void calculate_normals(std::vector<k3d::normal3>& Normals, std::vector<k3d::normal3> LinkedNormals, const k3d::dev::mesh::points_t& Points, const k3d::typed_array<GLuint>& FaceIndices, std::vector<size_t>* FaceCornerCounts, size_t FaceCornerCount, indexmultimap_t& PointLinks)
+void calculate_normals(std::vector<k3d::normal3>& Normals, std::vector<k3d::normal3> LinkedNormals, const k3d::mesh::points_t& Points, const k3d::typed_array<GLuint>& FaceIndices, std::vector<size_t>* FaceCornerCounts, size_t FaceCornerCount, indexmultimap_t& PointLinks)
 {
 	size_t face = 0;
 	for (size_t face_corner = 0; face_corner != FaceIndices.size(); )
@@ -166,12 +166,12 @@ void calculate_normals(std::vector<k3d::normal3>& Normals, std::vector<k3d::norm
 	}
 }
 
-void face::convert(const k3d::dev::mesh::points_t& Points, const k3d::dev::mesh::polyhedra_t & Polyhedra )
+void face::convert(const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t & Polyhedra )
 {
-	const k3d::dev::mesh::indices_t& face_first_loops = *Polyhedra.face_first_loops;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *Polyhedra.loop_first_edges;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *Polyhedra.clockwise_edges;
-	const k3d::dev::mesh::indices_t& edge_points = *Polyhedra.edge_points;
+	const k3d::mesh::indices_t& face_first_loops = *Polyhedra.face_first_loops;
+	const k3d::mesh::indices_t& loop_first_edges = *Polyhedra.loop_first_edges;
+	const k3d::mesh::indices_t& clockwise_edges = *Polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& edge_points = *Polyhedra.edge_points;
 	
 	m_smooth_trimap.clear();
 	m_smooth_quadmap.clear();
@@ -182,7 +182,7 @@ void face::convert(const k3d::dev::mesh::points_t& Points, const k3d::dev::mesh:
 	
 	k3d::typed_array<GLuint> smooth_polys, smooth_quads, smooth_tris, flat_polys, flat_quads, flat_tris; // face corner indices into Points and flat_points
 	std::set<size_t> duplicated_points; // Keep track of what points have been added to the flat point list
-	k3d::dev::mesh::points_t flat_points; // Growing buffer of points belonging to flat faces
+	k3d::mesh::points_t flat_points; // Growing buffer of points belonging to flat faces
 
 	const size_t face_count = face_first_loops.size();
 	for(size_t face = 0; face != face_count; ++face)
@@ -495,14 +495,14 @@ void face::draw_selection( ) const
 	}
 }
 
-void face::update( const k3d::dev::mesh::points_t & Points, const k3d::dev::mesh::polyhedra_t & Polyhedra, const k3d::dev::mesh::indices_t & TransformedPoints )
+void face::update( const k3d::mesh::points_t & Points, const k3d::mesh::polyhedra_t & Polyhedra, const k3d::mesh::indices_t & TransformedPoints )
 {
 	typedef std::map<size_t, k3d::normal3> normal_map_t;
 	
-	const k3d::dev::mesh::indices_t& face_first_loops = *Polyhedra.face_first_loops;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *Polyhedra.loop_first_edges;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *Polyhedra.clockwise_edges;
-	const k3d::dev::mesh::indices_t& edge_points = *Polyhedra.edge_points;
+	const k3d::mesh::indices_t& face_first_loops = *Polyhedra.face_first_loops;
+	const k3d::mesh::indices_t& loop_first_edges = *Polyhedra.loop_first_edges;
+	const k3d::mesh::indices_t& clockwise_edges = *Polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& edge_points = *Polyhedra.edge_points;
 	
 	if (m_last_transformed_points.size() != TransformedPoints.size() || m_last_transformed_points != TransformedPoints) // check if points changed
  	{
@@ -522,7 +522,7 @@ void face::update( const k3d::dev::mesh::points_t & Points, const k3d::dev::mesh
 	normal_map_t face_normals;
 	for (indexlist_t::iterator face = m_affected_faces.begin(); face != m_affected_faces.end(); ++face)
 	{
-		face_normals.insert(std::make_pair(*face, k3d::dev::normal(edge_points, clockwise_edges, Points, loop_first_edges[face_first_loops[*face]])));
+		face_normals.insert(std::make_pair(*face, k3d::normal(edge_points, clockwise_edges, Points, loop_first_edges[face_first_loops[*face]])));
 	}
 
 	// update positions of the "flat" points
@@ -710,7 +710,7 @@ void face::get_face_points(global_corners_t& Corners, bool Flat)
 // flat_face
 ///////////
 
-bool flat_face::is_sharp( const size_t Edge, const k3d::dev::mesh::points_t & Points, const k3d::dev::mesh::polyhedra_t & Polyhedra )
+bool flat_face::is_sharp( const size_t Edge, const k3d::mesh::points_t & Points, const k3d::mesh::polyhedra_t & Polyhedra )
 {
 	return true;
 }
@@ -719,7 +719,7 @@ bool flat_face::is_sharp( const size_t Edge, const k3d::dev::mesh::points_t & Po
 // smooth face
 ///////////
 
-bool smooth_face::is_sharp( const size_t Edge, const k3d::dev::mesh::points_t & Points, const k3d::dev::mesh::polyhedra_t & Polyhedra )
+bool smooth_face::is_sharp( const size_t Edge, const k3d::mesh::points_t & Points, const k3d::mesh::polyhedra_t & Polyhedra )
 {
 	return false;
 }
@@ -730,9 +730,9 @@ bool smooth_face::is_sharp( const size_t Edge, const k3d::dev::mesh::points_t & 
 
 typedef k3d::typed_array<bool> sharpness_array_t;
 
-bool edge_face::is_sharp( const size_t Edge, const k3d::dev::mesh::points_t & Points, const k3d::dev::mesh::polyhedra_t & Polyhedra )
+bool edge_face::is_sharp( const size_t Edge, const k3d::mesh::points_t & Points, const k3d::mesh::polyhedra_t & Polyhedra )
 {
-	k3d::dev::mesh::named_arrays::const_iterator array_it = Polyhedra.face_varying_data.find("N");
+	k3d::mesh::named_arrays::const_iterator array_it = Polyhedra.face_varying_data.find("N");
 	if (array_it ==  Polyhedra.face_varying_data.end())
 		return false;
 	if (!dynamic_cast<sharpness_array_t*>(array_it->second.get()))
@@ -746,7 +746,7 @@ bool edge_face::is_sharp( const size_t Edge, const k3d::dev::mesh::points_t & Po
 // Convenience functions
 //////////////
 
-void array_to_selection( const k3d::dev::mesh::selection_t & SelectionArray, selection_records_t& Selection )
+void array_to_selection( const k3d::mesh::selection_t & SelectionArray, selection_records_t& Selection )
 {
 	Selection.clear();
 	for (size_t i = 0; i < SelectionArray.size();)
@@ -762,19 +762,19 @@ void array_to_selection( const k3d::dev::mesh::selection_t & SelectionArray, sel
 	}
 }
 
-void create_point_vbo( const boost::shared_ptr< const k3d::dev::mesh::points_t > & Points, painter_cache< boost::shared_ptr < const k3d::dev::mesh::points_t >, vbo > & Cache )
+void create_point_vbo( const boost::shared_ptr< const k3d::mesh::points_t > & Points, painter_cache< boost::shared_ptr < const k3d::mesh::points_t >, vbo > & Cache )
 {
 	vbo* point_buffer = Cache.get_data(Points);
 	if (!point_buffer)
 	{
-		const k3d::dev::mesh::points_t& points = *Points;
+		const k3d::mesh::points_t& points = *Points;
 		point_buffer = Cache.create_data(Points);
 		glBindBuffer(GL_ARRAY_BUFFER, *point_buffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(points[0]) * points.size(), &points[0], GL_STATIC_DRAW);
 	}
 }
 
-void update_point_vbo( const boost::shared_ptr< const k3d::dev::mesh::points_t > & Points, painter_cache< boost::shared_ptr < const k3d::dev::mesh::points_t >, vbo > & Cache, const k3d::dev::mesh::indices_t & Indices )
+void update_point_vbo( const boost::shared_ptr< const k3d::mesh::points_t > & Points, painter_cache< boost::shared_ptr < const k3d::mesh::points_t >, vbo > & Cache, const k3d::mesh::indices_t & Indices )
 {
 	vbo* point_buffer = Cache.get_data(Points);
 	return_if_fail(point_buffer);
@@ -787,12 +787,12 @@ void update_point_vbo( const boost::shared_ptr< const k3d::dev::mesh::points_t >
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-void get_deformed_faces(const k3d::dev::mesh::polyhedra_t& Polyhedra, const k3d::dev::mesh::indices_t& Points, indexlist_t& AffectedFaces, std::set<size_t>& AffectedPoints)
+void get_deformed_faces(const k3d::mesh::polyhedra_t& Polyhedra, const k3d::mesh::indices_t& Points, indexlist_t& AffectedFaces, std::set<size_t>& AffectedPoints)
 {
-	const k3d::dev::mesh::indices_t& face_first_loops = *Polyhedra.face_first_loops;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *Polyhedra.loop_first_edges;
-	const k3d::dev::mesh::indices_t& edge_points = *Polyhedra.edge_points;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *Polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& face_first_loops = *Polyhedra.face_first_loops;
+	const k3d::mesh::indices_t& loop_first_edges = *Polyhedra.loop_first_edges;
+	const k3d::mesh::indices_t& edge_points = *Polyhedra.edge_points;
+	const k3d::mesh::indices_t& clockwise_edges = *Polyhedra.clockwise_edges;
 
 	std::set<size_t> moving_points; // faster lookup of concerned points
 	moving_points.insert(Points.begin(), Points.end());

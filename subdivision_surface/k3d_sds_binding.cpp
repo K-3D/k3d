@@ -58,7 +58,7 @@ typedef k3d::basic_rgba<float> color4d;
 // k3d_cache_input
 ///////////
 
-bool k3d_cache_input::set_input(const k3d::dev::mesh* Input)
+bool k3d_cache_input::set_input(const k3d::mesh* Input)
 {
 	// Sanity check of new mesh
 	return_val_if_fail(Input && Input->points && Input->polyhedra && Input->polyhedra->face_first_loops, false);
@@ -77,7 +77,7 @@ bool k3d_cache_input::set_input(const k3d::dev::mesh* Input)
 	return true;
 }
 
-k3d_cache_input::k3d_cache_input(boost::shared_ptr<const k3d::dev::mesh::points_t> Points, boost::shared_ptr<const k3d::dev::mesh::polyhedra_t> Polyhedra, boost::shared_ptr<const k3d::dev::mesh::selection_t> PointSelection) :
+k3d_cache_input::k3d_cache_input(boost::shared_ptr<const k3d::mesh::points_t> Points, boost::shared_ptr<const k3d::mesh::polyhedra_t> Polyhedra, boost::shared_ptr<const k3d::mesh::selection_t> PointSelection) :
 		m_hint_validated(false),
 		m_updated(true),
 		m_input_points(Points),
@@ -88,11 +88,11 @@ k3d_cache_input::k3d_cache_input(boost::shared_ptr<const k3d::dev::mesh::points_
 {
 	if (m_input_points && m_input_polyhedra && m_input_polyhedra->face_first_loops)
 	{
-		const k3d::dev::mesh::points_t& points = *m_input_points;
-		const k3d::dev::mesh::indices_t& face_first_loops = *m_input_polyhedra->face_first_loops;
-		const k3d::dev::mesh::indices_t& loop_first_edges = *m_input_polyhedra->loop_first_edges;
-		const k3d::dev::mesh::indices_t& clockwise_edges = *m_input_polyhedra->clockwise_edges;
-		const k3d::dev::mesh::indices_t& edge_points = *m_input_polyhedra->edge_points;
+		const k3d::mesh::points_t& points = *m_input_points;
+		const k3d::mesh::indices_t& face_first_loops = *m_input_polyhedra->face_first_loops;
+		const k3d::mesh::indices_t& loop_first_edges = *m_input_polyhedra->loop_first_edges;
+		const k3d::mesh::indices_t& clockwise_edges = *m_input_polyhedra->clockwise_edges;
+		const k3d::mesh::indices_t& edge_points = *m_input_polyhedra->edge_points;
 		init_counters();
 		const size_t face_count = face_first_loops.size();
 		for(size_t face = 0; face != face_count; ++face)
@@ -132,11 +132,11 @@ k3d_cache_input::k3d_cache_input(boost::shared_ptr<const k3d::dev::mesh::points_
 void k3d_cache_input::update(bool all, facevertices_t& updated_maps)
 {
 	return_if_fail(m_input_points && m_input_polyhedra && m_input_polyhedra->face_first_loops);
-	const k3d::dev::mesh::points_t& points = *m_input_points;
-	const k3d::dev::mesh::indices_t& face_first_loops = *m_input_polyhedra->face_first_loops;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *m_input_polyhedra->loop_first_edges;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *m_input_polyhedra->clockwise_edges;
-	const k3d::dev::mesh::indices_t& edge_points = *m_input_polyhedra->edge_points;
+	const k3d::mesh::points_t& points = *m_input_points;
+	const k3d::mesh::indices_t& face_first_loops = *m_input_polyhedra->face_first_loops;
+	const k3d::mesh::indices_t& loop_first_edges = *m_input_polyhedra->loop_first_edges;
+	const k3d::mesh::indices_t& clockwise_edges = *m_input_polyhedra->clockwise_edges;
+	const k3d::mesh::indices_t& edge_points = *m_input_polyhedra->edge_points;
 	init_counters();
 	const size_t face_count = face_first_loops.size();
 	k3d::timer timer;
@@ -286,14 +286,14 @@ sds_point* k3d_cache_input::get_corner(size_t Point)
 
 bool k3d_cache_input::selected(size_t Face, int Recurse)
 {
-	const k3d::dev::mesh::indices_t& clockwise_edges = *m_input_polyhedra->clockwise_edges;
-	const k3d::dev::mesh::indices_t& edge_points = *m_input_polyhedra->edge_points;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *m_input_polyhedra->loop_first_edges;
-	const k3d::dev::mesh::indices_t& face_first_loops = *m_input_polyhedra->face_first_loops;
-	const k3d::dev::mesh::selection_t& point_selection = *m_point_selection;
-	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_input_polyhedra;
-	const k3d::dev::mesh::selection_t& edge_selection = *polyhedra.edge_selection;
-	const k3d::dev::mesh::selection_t& face_selection = *polyhedra.face_selection;
+	const k3d::mesh::indices_t& clockwise_edges = *m_input_polyhedra->clockwise_edges;
+	const k3d::mesh::indices_t& edge_points = *m_input_polyhedra->edge_points;
+	const k3d::mesh::indices_t& loop_first_edges = *m_input_polyhedra->loop_first_edges;
+	const k3d::mesh::indices_t& face_first_loops = *m_input_polyhedra->face_first_loops;
+	const k3d::mesh::selection_t& point_selection = *m_point_selection;
+	const k3d::mesh::polyhedra_t& polyhedra = *m_input_polyhedra;
+	const k3d::mesh::selection_t& edge_selection = *polyhedra.edge_selection;
+	const k3d::mesh::selection_t& face_selection = *polyhedra.face_selection;
 	
 	if (face_selection[Face])
 		return true;
@@ -321,7 +321,7 @@ bool k3d_cache_input::selected(size_t Face, int Recurse)
 
 void k3d_basic_opengl_sds_cache::draw_faces(size_t Level, bool Selected)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
 	if (Level > m_levels)
 	{
@@ -334,7 +334,7 @@ void k3d_basic_opengl_sds_cache::draw_faces(size_t Level, bool Selected)
 	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
 
 	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
-	const k3d::dev::mesh::selection_t& face_selection = *m_first_level_cache_mesh->polyhedra->face_selection;
+	const k3d::mesh::selection_t& face_selection = *m_first_level_cache_mesh->polyhedra->face_selection;
 	
 	std::vector<position_t> points_array;
 	std::vector<position_t> normals_array;
@@ -389,7 +389,7 @@ void k3d_basic_opengl_sds_cache::draw_faces(size_t Level, bool Selected)
 
 void k3d_basic_opengl_sds_cache::draw_borders(size_t Level, bool Selected)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
 	if (Level > m_levels)
 	{
@@ -404,12 +404,12 @@ void k3d_basic_opengl_sds_cache::draw_borders(size_t Level, bool Selected)
 	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
 	const companions_t& companions = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->companions();
 	
-	const k3d::dev::mesh::selection_t& edge_selection = *m_first_level_cache_mesh->polyhedra->edge_selection;
-	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-	const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
-	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	const k3d::mesh::selection_t& edge_selection = *m_first_level_cache_mesh->polyhedra->edge_selection;
+	const k3d::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
+	const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
 	
 	std::vector<position_t> points_array;
 	std::vector<k3d::color> colors_array;
@@ -454,7 +454,7 @@ void k3d_basic_opengl_sds_cache::draw_borders(size_t Level, bool Selected)
 
 void k3d_basic_opengl_sds_cache::draw_corners(size_t Level, bool Selected)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
 	if (Level > m_levels)
 	{
@@ -468,12 +468,12 @@ void k3d_basic_opengl_sds_cache::draw_corners(size_t Level, bool Selected)
 
 	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
 	
-	const k3d::dev::mesh::selection_t& point_selection = *m_first_level_cache_mesh->point_selection;
-	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-	const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
-	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	const k3d::mesh::selection_t& point_selection = *m_first_level_cache_mesh->point_selection;
+	const k3d::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
+	const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
 	
 	std::vector<position_t> points_array;
 	std::vector<k3d::color> colors_array;
@@ -506,7 +506,7 @@ void k3d_basic_opengl_sds_cache::draw_corners(size_t Level, bool Selected)
 
 void k3d_basic_opengl_sds_cache::select_faces(size_t Level)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
 		
 	return_if_fail(Level <= m_levels);
@@ -514,7 +514,7 @@ void k3d_basic_opengl_sds_cache::select_faces(size_t Level)
 	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
 
 	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
-	const k3d::dev::mesh::selection_t& face_selection = *m_first_level_cache_mesh->polyhedra->face_selection;
+	const k3d::mesh::selection_t& face_selection = *m_first_level_cache_mesh->polyhedra->face_selection;
 	
 	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
 	{
@@ -555,7 +555,7 @@ void k3d_basic_opengl_sds_cache::select_faces(size_t Level)
 
 void k3d_basic_opengl_sds_cache::select_borders(size_t Level)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
 	
 	return_if_fail(Level <= m_levels);
@@ -564,12 +564,12 @@ void k3d_basic_opengl_sds_cache::select_borders(size_t Level)
 
 	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
 	
-	const k3d::dev::mesh::selection_t& edge_selection = *m_first_level_cache_mesh->polyhedra->edge_selection;
-	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-	const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
-	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	const k3d::mesh::selection_t& edge_selection = *m_first_level_cache_mesh->polyhedra->edge_selection;
+	const k3d::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
+	const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
 	
 	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
 	{
@@ -604,7 +604,7 @@ void k3d_basic_opengl_sds_cache::select_borders(size_t Level)
 
 void k3d_basic_opengl_sds_cache::select_corners(size_t Level)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
 
 	return_if_fail(Level <= m_levels);
@@ -613,12 +613,12 @@ void k3d_basic_opengl_sds_cache::select_corners(size_t Level)
 
 	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
 	
-	const k3d::dev::mesh::selection_t& point_selection = *m_first_level_cache_mesh->point_selection;
-	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-	const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
-	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	const k3d::mesh::selection_t& point_selection = *m_first_level_cache_mesh->point_selection;
+	const k3d::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
+	const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
 	
 	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
 	{
@@ -658,7 +658,7 @@ k3d_vbo_sds_cache::~k3d_vbo_sds_cache()
 
 void k3d_vbo_sds_cache::draw_faces(size_t Level, bool Selected)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
 	if (Level > m_levels)
 	{
@@ -706,7 +706,7 @@ void k3d_vbo_sds_cache::draw_faces(size_t Level, bool Selected)
 
 void k3d_vbo_sds_cache::draw_borders(size_t Level, bool Selected)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
 	if (Level > m_levels)
 	{
@@ -750,7 +750,7 @@ void k3d_vbo_sds_cache::draw_borders(size_t Level, bool Selected)
 
 void k3d_vbo_sds_cache::draw_corners(size_t Level, bool Selected)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
 	if (Level > m_levels)
 	{
@@ -793,12 +793,12 @@ void k3d_vbo_sds_cache::draw_corners(size_t Level, bool Selected)
 
 void k3d_vbo_sds_cache::select_faces(size_t Level)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
-	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
-	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	const k3d::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
 	
 	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
 	
@@ -832,12 +832,12 @@ void k3d_vbo_sds_cache::select_faces(size_t Level)
 
 void k3d_vbo_sds_cache::select_borders(size_t Level)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
-	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
-	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	const k3d::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
 	
 	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
 	
@@ -871,13 +871,13 @@ void k3d_vbo_sds_cache::select_borders(size_t Level)
 
 void k3d_vbo_sds_cache::select_corners(size_t Level)
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
-	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-	const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
-	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	const k3d::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
+	const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
 
 	size_t i = Level - 2;
 	
@@ -927,21 +927,21 @@ void k3d_vbo_sds_cache::update_selection()
 
 void k3d_vbo_sds_cache::do_selection_update()
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh) || !m_update_selection)
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh) || !m_update_selection)
 		return;
 		
 	regenerate_vbos();
 		
 	m_update_selection = false;
 	
-	const k3d::dev::mesh::selection_t& point_selection = *m_first_level_cache_mesh->point_selection;
-	const k3d::dev::mesh::selection_t& face_selection = *m_first_level_cache_mesh->polyhedra->face_selection;
-	const k3d::dev::mesh::selection_t& edge_selection = *m_first_level_cache_mesh->polyhedra->edge_selection;
-	const k3d::dev::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
-	const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-	const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
-	const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
-	const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	const k3d::mesh::selection_t& point_selection = *m_first_level_cache_mesh->point_selection;
+	const k3d::mesh::selection_t& face_selection = *m_first_level_cache_mesh->polyhedra->face_selection;
+	const k3d::mesh::selection_t& edge_selection = *m_first_level_cache_mesh->polyhedra->edge_selection;
+	const k3d::mesh::polyhedra_t& polyhedra = *m_first_level_cache_mesh->polyhedra;
+	const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
+	const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
 	
 	const k3d::color& selected_color = m_selected_color;
 	
@@ -1091,18 +1091,18 @@ void k3d_vbo_sds_cache::do_selection_update()
 	}
 }
 
-void k3d_vbo_sds_cache::client_output( k3d::dev::mesh * Output )
+void k3d_vbo_sds_cache::client_output( k3d::mesh * Output )
 {
 	draw_faces(m_levels, false);
 }
 
-void k3d_vbo_sds_cache::client_output_nurbs( k3d::dev::mesh * Output )
+void k3d_vbo_sds_cache::client_output_nurbs( k3d::mesh * Output )
 {
 }
 
 void k3d_vbo_sds_cache::regenerate_vbos()
 {
-	if (!m_first_level_cache_mesh || !k3d::dev::validate_polyhedra(*m_first_level_cache_mesh))
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
 
 	if (m_validated_hint && m_point_vbos.size() == m_levels-1)

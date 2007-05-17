@@ -34,7 +34,7 @@ namespace libk3dobj
 class gprim_factory::implementation
 {
 public:
-	implementation(k3d::dev::mesh& Mesh) :
+	implementation(k3d::mesh& Mesh) :
 		target_mesh(Mesh),
 
 		points(0),
@@ -61,27 +61,27 @@ public:
 		}
 	}
 
-	k3d::dev::mesh& target_mesh;
-	k3d::dev::mesh::points_t* points;
-	k3d::dev::mesh::selection_t* point_selection;
+	k3d::mesh& target_mesh;
+	k3d::mesh::points_t* points;
+	k3d::mesh::selection_t* point_selection;
 
-	k3d::dev::mesh::indices_t* first_faces;
-	k3d::dev::mesh::counts_t* face_counts;
-	k3d::dev::mesh::polyhedra_t::types_t* types;
-	k3d::dev::mesh::indices_t* face_first_loops;
-	k3d::dev::mesh::counts_t* face_loop_counts;
-	k3d::dev::mesh::selection_t* face_selection;
-	k3d::dev::mesh::materials_t* face_materials;
-	k3d::dev::mesh::indices_t* loop_first_edges;
-	k3d::dev::mesh::indices_t* edge_points;
-	k3d::dev::mesh::indices_t* clockwise_edges;
-	k3d::dev::mesh::selection_t* edge_selection;
+	k3d::mesh::indices_t* first_faces;
+	k3d::mesh::counts_t* face_counts;
+	k3d::mesh::polyhedra_t::types_t* types;
+	k3d::mesh::indices_t* face_first_loops;
+	k3d::mesh::counts_t* face_loop_counts;
+	k3d::mesh::selection_t* face_selection;
+	k3d::mesh::materials_t* face_materials;
+	k3d::mesh::indices_t* loop_first_edges;
+	k3d::mesh::indices_t* edge_points;
+	k3d::mesh::indices_t* clockwise_edges;
+	k3d::mesh::selection_t* edge_selection;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // gprim_factory
 
-gprim_factory::gprim_factory(k3d::dev::mesh& Mesh) :
+gprim_factory::gprim_factory(k3d::mesh& Mesh) :
 	m_implementation(new implementation(Mesh))
 {
 }
@@ -103,13 +103,13 @@ void gprim_factory::add_point(const k3d::point3& Point)
 	m_implementation->point_selection->push_back(0.0);
 }
 
-void gprim_factory::add_polygon(const k3d::dev::mesh::indices_t& Points)
+void gprim_factory::add_polygon(const k3d::mesh::indices_t& Points)
 {
 	return_if_fail(Points.size());
 
 	if(!m_implementation->first_faces)
 	{
-		k3d::dev::mesh::polyhedra_t* const polyhedra = k3d::make_unique(m_implementation->target_mesh.polyhedra);
+		k3d::mesh::polyhedra_t* const polyhedra = k3d::make_unique(m_implementation->target_mesh.polyhedra);
 		m_implementation->first_faces = k3d::make_unique(polyhedra->first_faces);
 		m_implementation->face_counts = k3d::make_unique(polyhedra->face_counts);
 		m_implementation->types = k3d::make_unique(polyhedra->types);
@@ -123,7 +123,7 @@ void gprim_factory::add_polygon(const k3d::dev::mesh::indices_t& Points)
 		m_implementation->edge_selection = k3d::make_unique(polyhedra->edge_selection);
 
 		m_implementation->first_faces->push_back(0);
-		m_implementation->types->push_back(k3d::dev::mesh::polyhedra_t::POLYGONS);
+		m_implementation->types->push_back(k3d::mesh::polyhedra_t::POLYGONS);
 	}
 
 	m_implementation->face_first_loops->push_back(m_implementation->loop_first_edges->size());

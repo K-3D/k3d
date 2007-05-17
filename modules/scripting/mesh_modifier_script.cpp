@@ -44,9 +44,9 @@ namespace libk3dscripting
 // mesh_modifier_script
 
 class mesh_modifier_script :
-	public k3d::scripted_node<k3d::dev::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::scripted_node<k3d::mesh_modifier<k3d::persistent<k3d::node> > >
 {
-	typedef k3d::scripted_node<k3d::dev::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::scripted_node<k3d::mesh_modifier<k3d::persistent<k3d::node> > > base;
 
 public:
 	mesh_modifier_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -64,20 +64,20 @@ public:
 		return 0;
 	}
 
-	void on_create_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		k3d::iscript_engine::context_t context;
 		context["Document"] = static_cast<k3d::iunknown*>(&document());
 		context["Node"] = static_cast<k3d::iunknown*>(this);
-		context["Input"] = const_cast<k3d::dev::mesh*>(&Input);
+		context["Input"] = const_cast<k3d::mesh*>(&Input);
 		context["Output"] = &Output;
 
 		execute_script(context);
 
-		k3d::dev::validate(Output);
+		k3d::validate(Output);
 	}
 
-	void on_update_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 

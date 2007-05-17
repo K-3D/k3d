@@ -37,9 +37,9 @@ namespace libk3dmesh
 // make_bilinear_patches_implementation
 
 class make_bilinear_patches_implementation :
-	public k3d::dev::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::mesh_modifier<k3d::persistent<k3d::node> >
 {
-	typedef k3d::dev::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_modifier<k3d::persistent<k3d::node> > base;
 
 public:
 	make_bilinear_patches_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -47,26 +47,26 @@ public:
 	{
 	}
 
-	void on_create_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		if(!validate_polyhedra(Input))
 			return;
 
-		const k3d::dev::mesh::indices_t& face_first_loops = *Input.polyhedra->face_first_loops;
-		const k3d::dev::mesh::selection_t& face_selection = *Input.polyhedra->face_selection;
-		const k3d::dev::mesh::materials_t& face_materials = *Input.polyhedra->face_materials;
-		const k3d::dev::mesh::indices_t& loop_first_edges = *Input.polyhedra->loop_first_edges;
-		const k3d::dev::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
-		const k3d::dev::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
+		const k3d::mesh::indices_t& face_first_loops = *Input.polyhedra->face_first_loops;
+		const k3d::mesh::selection_t& face_selection = *Input.polyhedra->face_selection;
+		const k3d::mesh::materials_t& face_materials = *Input.polyhedra->face_materials;
+		const k3d::mesh::indices_t& loop_first_edges = *Input.polyhedra->loop_first_edges;
+		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
 
 		Output.points = Input.points;
 		Output.point_selection = Input.point_selection;
 		Output.vertex_data = Input.vertex_data;
 
-		k3d::dev::mesh::bilinear_patches_t* const bilinear_patches = new k3d::dev::mesh::bilinear_patches_t();
-		k3d::dev::mesh::selection_t* const patch_selection = new k3d::dev::mesh::selection_t();
-		k3d::dev::mesh::materials_t* const patch_materials = new k3d::dev::mesh::materials_t();
-		k3d::dev::mesh::indices_t* const patch_points = new k3d::dev::mesh::indices_t();
+		k3d::mesh::bilinear_patches_t* const bilinear_patches = new k3d::mesh::bilinear_patches_t();
+		k3d::mesh::selection_t* const patch_selection = new k3d::mesh::selection_t();
+		k3d::mesh::materials_t* const patch_materials = new k3d::mesh::materials_t();
+		k3d::mesh::indices_t* const patch_points = new k3d::mesh::indices_t();
 
 		const size_t face_begin = 0;
 		const size_t face_end = face_begin + face_first_loops.size();
@@ -102,7 +102,7 @@ public:
 		Output.bilinear_patches.reset(bilinear_patches);
 	}
 
-	void on_update_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 

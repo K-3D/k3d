@@ -261,7 +261,7 @@ private:
 };
 
 /// Convenience function used to choose whichever point is closest to the given window coordinates
-void select_nearest_point(const k3d::dev::mesh::points_t& Points, const k3d::selection::id Point, const k3d::point2& Coordinates, const double ScreenHeight, const GLdouble ModelViewMatrix[16], const GLdouble ProjectionMatrix[16], const GLint Viewport[4], k3d::selection::id& OutputPoint, double& OutputDistance)
+void select_nearest_point(const k3d::mesh::points_t& Points, const k3d::selection::id Point, const k3d::point2& Coordinates, const double ScreenHeight, const GLdouble ModelViewMatrix[16], const GLdouble ProjectionMatrix[16], const GLint Viewport[4], k3d::selection::id& OutputPoint, double& OutputDistance)
 {
 	k3d::point2 coords;
 	double unused;
@@ -286,7 +286,7 @@ void select_nearest_point(const k3d::dev::mesh::points_t& Points, const k3d::sel
 }
 
 /// Convenience function used to choose whichever edge is closest to the given window coordinates
-void select_nearest_edge(const k3d::dev::mesh::indices_t& EdgePoints, const k3d::dev::mesh::indices_t& ClockwiseEdges, const k3d::dev::mesh::points_t& Points, const k3d::selection::id Edge, const k3d::point2& Coordinates, const double ScreenHeight, const GLdouble ModelViewMatrix[16], const GLdouble ProjectionMatrix[16], const GLint Viewport[4], k3d::selection::id& OutputEdge, double& OutputDistance)
+void select_nearest_edge(const k3d::mesh::indices_t& EdgePoints, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::points_t& Points, const k3d::selection::id Edge, const k3d::point2& Coordinates, const double ScreenHeight, const GLdouble ModelViewMatrix[16], const GLdouble ProjectionMatrix[16], const GLint Viewport[4], k3d::selection::id& OutputEdge, double& OutputDistance)
 {
 	double x1, y1, x2, y2;
 	double unused;
@@ -856,7 +856,7 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << " " << record << std::endl;
 	if(!node)
 		return k3d::selection::record::empty_record();
 
-	k3d::dev::mesh* const mesh = k3d::selection::get_mesh(record);
+	k3d::mesh* const mesh = k3d::selection::get_mesh(record);
 	if(!mesh)
 		return k3d::selection::record::empty_record();
 	if(!mesh->points)
@@ -1057,7 +1057,7 @@ k3d::selection::record control::pick_line(const k3d::point2& Coordinates, k3d::s
 	if(!node)
 		return k3d::selection::record::empty_record();
 
-	k3d::dev::mesh* const mesh = k3d::selection::get_mesh(record);
+	k3d::mesh* const mesh = k3d::selection::get_mesh(record);
 	if(!mesh)
 		return k3d::selection::record::empty_record();
 

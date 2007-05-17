@@ -30,7 +30,7 @@
 namespace k3d
 {
 
-namespace dev { class mesh; }
+class mesh;
 
 /// Abstract interface for objects that can provide persistent storage of meshes (the FrozenMesh object being the canonical example)
 class imesh_storage :
@@ -38,7 +38,7 @@ class imesh_storage :
 {
 public:
 	/// Replaces any existing stored mesh with the given object, assuming responsibility for its lifetime
-	virtual void reset_mesh(dev::mesh* const Mesh) = 0;
+	virtual void reset_mesh(mesh* const Mesh) = 0;
 
 protected:
 	imesh_storage() {}

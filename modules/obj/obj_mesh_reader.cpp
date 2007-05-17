@@ -40,10 +40,10 @@ namespace libk3dobj
 // obj_mesh_reader_implementation
 
 class obj_mesh_reader_implementation :
-	public k3d::dev::mesh_source<k3d::persistent<k3d::node> >,
+	public k3d::mesh_source<k3d::persistent<k3d::node> >,
 	public k3d::imesh_storage
 {
-	typedef k3d::dev::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_source<k3d::persistent<k3d::node> > base;
 
 public:
 	obj_mesh_reader_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -59,12 +59,12 @@ public:
 //		m_texture_w.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void reset_mesh(k3d::dev::mesh* const Mesh)
+	void reset_mesh(k3d::mesh* const Mesh)
 	{
 		m_output_mesh.reset(Mesh);
 	}
 
-	void on_create_mesh_topology(k3d::dev::mesh& Mesh)
+	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
 		const k3d::filesystem::path path = m_file.value();
 		if(path.empty())
@@ -82,7 +82,7 @@ public:
 		parser.parse(file);
 	}
 
-	void on_update_mesh_geometry(k3d::dev::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Mesh)
 	{
 	}
 
@@ -110,7 +110,7 @@ private:
 		public obj_parser
 	{
 	public:
-		my_parser(k3d::dev::mesh& Mesh) :
+		my_parser(k3d::mesh& Mesh) :
 			factory(Mesh)
 		{
 		}
@@ -123,7 +123,7 @@ private:
 			factory.add_point(k3d::point3(Vertex[0] / Vertex[3], Vertex[1] / Vertex[3], Vertex[2] / Vertex[3]));
 		}
 
-		void on_face(const k3d::dev::mesh::indices_t& Points, const k3d::dev::mesh::indices_t& TexturePoints, const k3d::dev::mesh::indices_t& Normals)
+		void on_face(const k3d::mesh::indices_t& Points, const k3d::mesh::indices_t& TexturePoints, const k3d::mesh::indices_t& Normals)
 		{
 			factory.add_polygon(Points);
 		}

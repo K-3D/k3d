@@ -116,13 +116,13 @@ bool save_typed_array(element& Container, const std::string& Name, array& Array,
 /////////////////////////////////////////////////////////////////////////////
 // save_arrays
 
-void save_arrays(element& Container, element Storage, const dev::mesh::named_arrays& Arrays, const ipersistent::save_context& Context)
+void save_arrays(element& Container, element Storage, const mesh::named_arrays& Arrays, const ipersistent::save_context& Context)
 {
 	if(!Arrays.size())
 		return;
 
 	element& container = Container.append(Storage);
-	for(dev::mesh::named_arrays::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
+	for(mesh::named_arrays::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
 	{
 		const std::string name = array_iterator->first;
 		array* const abstract_array = array_iterator->second.get();
@@ -213,7 +213,7 @@ void load_array(const element& Container, const std::string& Storage, boost::sha
 // load_typed_array
 
 template<typename value_type>
-bool load_typed_array(const element& Storage, const std::string& Name, const std::string& Type, dev::mesh::named_arrays& Arrays, const ipersistent::load_context& Context)
+bool load_typed_array(const element& Storage, const std::string& Name, const std::string& Type, mesh::named_arrays& Arrays, const ipersistent::load_context& Context)
 {
 	if(type_string<value_type>() == Type)
 	{
@@ -229,7 +229,7 @@ bool load_typed_array(const element& Storage, const std::string& Name, const std
 /////////////////////////////////////////////////////////////////////////////
 // load_arrays
 
-void load_arrays(const element& Container, const std::string& Storage, dev::mesh::named_arrays& Arrays, const ipersistent::load_context& Context)
+void load_arrays(const element& Container, const std::string& Storage, mesh::named_arrays& Arrays, const ipersistent::load_context& Context)
 {
 	const element* const container = find_element(Container, Storage);
 	if(!container)
@@ -317,7 +317,7 @@ void load_selection(const element& Element, mesh_selection::records_t& Records)
 /////////////////////////////////////////////////////////////////////////////
 // save_mesh
 
-void save_mesh(const dev::mesh& Mesh, element& Container, const ipersistent::save_context& Context)
+void save_mesh(const mesh& Mesh, element& Container, const ipersistent::save_context& Context)
 {
 	// Save points ...
 	detail::save_array(Container, element("points"), Mesh.points, Context);
@@ -449,7 +449,7 @@ void save_mesh(const dev::mesh& Mesh, element& Container, const ipersistent::sav
 /////////////////////////////////////////////////////////////////////////////
 // load_mesh
 
-void load_mesh(dev::mesh& Mesh, element& Container, const ipersistent::load_context& Context)
+void load_mesh(mesh& Mesh, element& Container, const ipersistent::load_context& Context)
 {
 	detail::load_array(Container, "points", Mesh.points, Context);
 	detail::load_array(Container, "point_selection", Mesh.point_selection, Context);
@@ -457,7 +457,7 @@ void load_mesh(dev::mesh& Mesh, element& Container, const ipersistent::load_cont
 
 	if(element* const container = find_element(Container, "point_groups"))
 	{
-		dev::mesh::point_groups_t* const point_groups = make_unique(Mesh.point_groups);
+		mesh::point_groups_t* const point_groups = make_unique(Mesh.point_groups);
 		detail::load_array(*container, "first_points", point_groups->first_points, Context);
 		detail::load_array(*container, "point_counts", point_groups->point_counts, Context);
 		detail::load_array(*container, "materials", point_groups->materials, Context);
@@ -468,7 +468,7 @@ void load_mesh(dev::mesh& Mesh, element& Container, const ipersistent::load_cont
 
 	if(element* const container = find_element(Container, "linear_curve_groups"))
 	{
-		dev::mesh::linear_curve_groups_t* const linear_curve_groups = make_unique(Mesh.linear_curve_groups);
+		mesh::linear_curve_groups_t* const linear_curve_groups = make_unique(Mesh.linear_curve_groups);
 		detail::load_array(*container, "first_curves", linear_curve_groups->first_curves, Context);
 		detail::load_array(*container, "curve_counts", linear_curve_groups->curve_counts, Context);
 		detail::load_array(*container, "periodic_curves", linear_curve_groups->periodic_curves, Context);
@@ -483,7 +483,7 @@ void load_mesh(dev::mesh& Mesh, element& Container, const ipersistent::load_cont
 
 	if(element* const container = find_element(Container, "cubic_curve_groups"))
 	{
-		dev::mesh::cubic_curve_groups_t* const cubic_curve_groups = make_unique(Mesh.cubic_curve_groups);
+		mesh::cubic_curve_groups_t* const cubic_curve_groups = make_unique(Mesh.cubic_curve_groups);
 		detail::load_array(*container, "first_curves", cubic_curve_groups->first_curves, Context);
 		detail::load_array(*container, "curve_counts", cubic_curve_groups->curve_counts, Context);
 		detail::load_array(*container, "periodic_curves", cubic_curve_groups->periodic_curves, Context);
@@ -498,7 +498,7 @@ void load_mesh(dev::mesh& Mesh, element& Container, const ipersistent::load_cont
 
 	if(element* const container = find_element(Container, "nurbs_curve_groups"))
 	{
-		dev::mesh::nurbs_curve_groups_t* const nurbs_curve_groups = make_unique(Mesh.nurbs_curve_groups);
+		mesh::nurbs_curve_groups_t* const nurbs_curve_groups = make_unique(Mesh.nurbs_curve_groups);
 		detail::load_array(*container, "first_curves", nurbs_curve_groups->first_curves, Context);
 		detail::load_array(*container, "curve_counts", nurbs_curve_groups->curve_counts, Context);
 		detail::load_array(*container, "materials", nurbs_curve_groups->materials, Context);
@@ -516,7 +516,7 @@ void load_mesh(dev::mesh& Mesh, element& Container, const ipersistent::load_cont
 
 	if(element* const container = find_element(Container, "bilinear_patches"))
 	{
-		dev::mesh::bilinear_patches_t* const bilinear_patches = make_unique(Mesh.bilinear_patches);
+		mesh::bilinear_patches_t* const bilinear_patches = make_unique(Mesh.bilinear_patches);
 		detail::load_array(*container, "patch_selection", bilinear_patches->patch_selection, Context);
 		detail::load_array(*container, "patch_materials", bilinear_patches->patch_materials, Context);
 		detail::load_arrays(*container, "constant_data", bilinear_patches->constant_data, Context);
@@ -527,7 +527,7 @@ void load_mesh(dev::mesh& Mesh, element& Container, const ipersistent::load_cont
 
 	if(element* const container = find_element(Container, "bicubic_patches"))
 	{
-		dev::mesh::bicubic_patches_t* const bicubic_patches = make_unique(Mesh.bicubic_patches);
+		mesh::bicubic_patches_t* const bicubic_patches = make_unique(Mesh.bicubic_patches);
 		detail::load_array(*container, "patch_selection", bicubic_patches->patch_selection, Context);
 		detail::load_array(*container, "patch_materials", bicubic_patches->patch_materials, Context);
 		detail::load_arrays(*container, "constant_data", bicubic_patches->constant_data, Context);
@@ -538,7 +538,7 @@ void load_mesh(dev::mesh& Mesh, element& Container, const ipersistent::load_cont
 
 	if(element* const container = find_element(Container, "nurbs_patches"))
 	{
-		dev::mesh::nurbs_patches_t* const nurbs_patches = make_unique(Mesh.nurbs_patches);
+		mesh::nurbs_patches_t* const nurbs_patches = make_unique(Mesh.nurbs_patches);
 		detail::load_array(*container, "patch_first_points", nurbs_patches->patch_first_points, Context);
 		detail::load_array(*container, "patch_u_point_counts", nurbs_patches->patch_u_point_counts, Context);
 		detail::load_array(*container, "patch_v_point_counts", nurbs_patches->patch_v_point_counts, Context);
@@ -559,7 +559,7 @@ void load_mesh(dev::mesh& Mesh, element& Container, const ipersistent::load_cont
 
 	if(element* const container = find_element(Container, "polyhedra"))
 	{
-		dev::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
+		mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
 		detail::load_array(*container, "first_faces", polyhedra->first_faces, Context);
 		detail::load_array(*container, "face_counts", polyhedra->face_counts, Context);
 		detail::load_array(*container, "types", polyhedra->types, Context);

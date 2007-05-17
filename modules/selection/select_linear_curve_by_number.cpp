@@ -35,9 +35,9 @@ namespace libk3dselection
 // select_linear_curve_by_number
 
 class select_linear_curve_by_number :
-	public k3d::dev::mesh_selection_modifier
+	public k3d::mesh_selection_modifier
 {
-	typedef k3d::dev::mesh_selection_modifier base;
+	typedef k3d::mesh_selection_modifier base;
 
 public:
 	select_linear_curve_by_number(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -48,12 +48,12 @@ public:
 		m_index.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	void on_select_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_select_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		if(Output.linear_curve_groups && Output.linear_curve_groups->curve_selection)
 		{
-		    k3d::dev::mesh::linear_curve_groups_t& linear_curve_groups = *k3d::make_unique(Output.linear_curve_groups);
-		    k3d::dev::mesh::selection_t& curve_selection = *k3d::make_unique(linear_curve_groups.curve_selection);
+		    k3d::mesh::linear_curve_groups_t& linear_curve_groups = *k3d::make_unique(Output.linear_curve_groups);
+		    k3d::mesh::selection_t& curve_selection = *k3d::make_unique(linear_curve_groups.curve_selection);
 			std::fill(curve_selection.begin(), curve_selection.end(), 0.0);
 
 			const unsigned long index = m_index.value();

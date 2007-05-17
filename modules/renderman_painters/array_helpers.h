@@ -38,7 +38,7 @@ public:
 	~array_copier();
 
 	/// Adds a collection of named mesh arrays to be copied
-	void add_arrays(const k3d::dev::mesh::named_arrays& Sources);
+	void add_arrays(const k3d::mesh::named_arrays& Sources);
 	/// Adds a single named mesh array to be copied
 	void add_array(const std::string& Name, const k3d::array& Source);
 

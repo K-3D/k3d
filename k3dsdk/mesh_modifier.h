@@ -36,9 +36,6 @@
 namespace k3d
 {
 
-namespace dev
-{
-
 template<typename base_t>
 class mesh_modifier :
 	public base_t,
@@ -128,8 +125,6 @@ private:
 	virtual void on_update_mesh(const mesh& Input, mesh& Output) = 0;
 };
 
-} // namespace dev
-	
 } // namespace k3d
 
 #endif // !K3DSDK_NEW_MESH_MODIFIER

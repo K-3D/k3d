@@ -51,9 +51,9 @@ class point_array_painter :
 public:
 	point_array_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_points_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, vbo>::instance(Document)),
-		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, selection_records_t>::instance(Document)),
-		m_hint_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>::instance(Document))
+		m_points_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>::instance(Document)),
+		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, selection_records_t>::instance(Document)),
+		m_hint_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>::instance(Document))
 	{
 	}
 	
@@ -64,7 +64,7 @@ public:
 	}
 	
 	/// Updates the vertex buffer object.
-	void update_buffer(const k3d::dev::mesh& Mesh)
+	void update_buffer(const k3d::mesh& Mesh)
 	{
 		if(!Mesh.points || Mesh.points->empty())
 			return;
@@ -90,7 +90,7 @@ public:
 		}
 	}
 	
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -141,7 +141,7 @@ public:
 		clean_vbo_state();
 	}
 	
-	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -179,7 +179,7 @@ public:
 		clean_vbo_state();
 	}
 	
-	void on_mesh_changed(const k3d::dev::mesh& Mesh, k3d::iunknown* Hint)
+	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -220,9 +220,9 @@ public:
 	}
 
 private:
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, vbo>& m_points_cache;
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, selection_records_t>& m_selection_cache;
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>& m_hint_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>& m_points_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, selection_records_t>& m_selection_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>& m_hint_cache;
 };
 
 	/////////////////////////////////////////////////////////////////////////////

@@ -41,9 +41,9 @@ namespace libk3dprimitives
 // poly_grid
 
 class poly_grid :
-	public k3d::material_client<k3d::dev::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_client<k3d::mesh_source<k3d::persistent<k3d::node> > >
 {
-	typedef k3d::material_client<k3d::dev::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_client<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
 	poly_grid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -63,12 +63,12 @@ public:
 		m_orientation.changed_signal().connect(make_geometry_changed_slot());
 	}
 
-	void on_create_mesh_topology(k3d::dev::mesh& Mesh)
+	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
-		Mesh = k3d::dev::create_grid(m_rows.value(), m_columns.value(), m_material.value());
+		Mesh = k3d::create_grid(m_rows.value(), m_columns.value(), m_material.value());
 	}
 
-	void on_update_mesh_geometry(k3d::dev::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Mesh)
 	{
 		const unsigned long point_rows = m_rows.value() + 1;
 		const unsigned long point_columns = m_columns.value() + 1;
@@ -105,7 +105,7 @@ public:
 				break;
 		}
 
-		k3d::dev::mesh::points_t::iterator point = const_cast<k3d::dev::mesh::points_t&>(*Mesh.points).begin();
+		k3d::mesh::points_t::iterator point = const_cast<k3d::mesh::points_t&>(*Mesh.points).begin();
 		for(unsigned long row = 0; row != point_rows; ++row)
 		{
 			const double row_percent = 0.5 - (static_cast<double>(row) / static_cast<double>(point_rows-1));

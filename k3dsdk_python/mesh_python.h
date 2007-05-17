@@ -30,18 +30,18 @@
 namespace k3d
 {
 
-namespace dev { class mesh; }
+class mesh;
 	
 namespace python
 {
 
 class mesh :
-	public interface_wrapper<k3d::dev::mesh>
+	public interface_wrapper<k3d::mesh>
 {
-	typedef interface_wrapper<k3d::dev::mesh> base;
+	typedef interface_wrapper<k3d::mesh> base;
 public:
 	mesh();
-	mesh(k3d::dev::mesh* Mesh);
+	mesh(k3d::mesh* Mesh);
 
 	void copy(const mesh& RHS);
 

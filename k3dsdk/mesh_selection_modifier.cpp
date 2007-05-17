@@ -27,9 +27,6 @@
 namespace k3d
 {
 
-namespace dev
-{
-
 mesh_selection_modifier::mesh_selection_modifier(iplugin_factory& Factory, idocument& Document) :
 	base(Factory, Document)
 {
@@ -44,8 +41,6 @@ void mesh_selection_modifier::on_update_mesh(const mesh& Input, mesh& Output)
 {
 	on_select_mesh(Input, Output);
 }
-
-} // namespace dev
 
 } // namespace k3d
 

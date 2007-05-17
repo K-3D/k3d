@@ -33,7 +33,7 @@ namespace libk3dopengl
 class selected_points
 {
 public:
-	selected_points(const k3d::dev::mesh& Mesh) :
+	selected_points(const k3d::mesh& Mesh) :
 		point_selection(*Mesh.point_selection)
 	{
 	}
@@ -44,14 +44,14 @@ public:
 	}
 
 private:
-	const k3d::dev::mesh::selection_t& point_selection;	
+	const k3d::mesh::selection_t& point_selection;	
 };
 
 /// Functor object that returns "true" for unselected points only
 class unselected_points
 {
 public:
-	unselected_points(const k3d::dev::mesh& Mesh) :
+	unselected_points(const k3d::mesh& Mesh) :
 		point_selection(*Mesh.point_selection)
 	{
 	}
@@ -62,14 +62,14 @@ public:
 	}
 
 private:
-	const k3d::dev::mesh::selection_t& point_selection;	
+	const k3d::mesh::selection_t& point_selection;	
 };
 
 /// Functor object that returns "true" for selected faces only
 class selected_faces
 {
 public:
-	selected_faces(const k3d::dev::mesh& Mesh) :
+	selected_faces(const k3d::mesh& Mesh) :
 		face_selection(*Mesh.polyhedra->face_selection)
 	{
 	}
@@ -80,14 +80,14 @@ public:
 	}
 
 private:
-	const k3d::dev::mesh::selection_t& face_selection;	
+	const k3d::mesh::selection_t& face_selection;	
 };
 
 /// Functor object that returns "true" for unselected faces only
 class unselected_faces
 {
 public:
-	unselected_faces(const k3d::dev::mesh& Mesh) :
+	unselected_faces(const k3d::mesh& Mesh) :
 		face_selection(*Mesh.polyhedra->face_selection)
 	{
 	}
@@ -98,7 +98,7 @@ public:
 	}
 
 private:
-	const k3d::dev::mesh::selection_t& face_selection;	
+	const k3d::mesh::selection_t& face_selection;	
 };
 
 } // namespace libk3dopengl

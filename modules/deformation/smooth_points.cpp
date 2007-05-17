@@ -34,9 +34,9 @@ namespace libk3ddeformation
 // smooth_points
 
 class smooth_points :
-	public k3d::dev::mesh_deformation_modifier
+	public k3d::mesh_deformation_modifier
 {
-	typedef k3d::dev::mesh_deformation_modifier base;
+	typedef k3d::mesh_deformation_modifier base;
 
 public:
 	smooth_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -47,17 +47,17 @@ public:
 		m_smoothing.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	void on_deform_mesh(const k3d::dev::mesh& Input, const k3d::dev::mesh::points_t& InputPoints, const k3d::dev::mesh::selection_t& PointSelection, k3d::dev::mesh::points_t& OutputPoints)
+	void on_deform_mesh(const k3d::mesh& Input, const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
 		const double smoothing = m_smoothing.value();
 
-        k3d::dev::mesh::points_t sums(InputPoints.size(), k3d::point3(0, 0, 0));
+        k3d::mesh::points_t sums(InputPoints.size(), k3d::point3(0, 0, 0));
         std::vector<size_t> counts(InputPoints.size(), 0);
 
         if(Input.polyhedra && Input.polyhedra->edge_points && Input.polyhedra->clockwise_edges)
         {
-            const k3d::dev::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
-            const k3d::dev::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
+            const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
+            const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
 
             const size_t edge_begin = 0;
             const size_t edge_end = edge_begin + edge_points.size();

@@ -34,9 +34,6 @@
 namespace k3d
 {
 
-namespace dev
-{
-
 template<typename base_t>
 class mesh_source :
 	public base_t,
@@ -65,7 +62,7 @@ public:
 	}
 
 protected:
-	k3d_data(dev::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
+	k3d_data(mesh*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
 
 private:
 	void mesh_topology_changed(iunknown* Hint)
@@ -73,7 +70,7 @@ private:
 		m_output_mesh.reset(0, hint::mesh_topology_changed());
 	}
 
-	void create_mesh(dev::mesh& Mesh)
+	void create_mesh(mesh& Mesh)
 	{
 		base_t::document().pipeline_profiler().start_execution(*this, "Create Mesh");
 		on_create_mesh_topology(Mesh);
@@ -86,7 +83,7 @@ private:
 
 	void mesh_geometry_changed(iunknown* const Hint)
 	{
-		if(dev::mesh* const output_mesh = m_output_mesh.internal_value())
+		if(mesh* const output_mesh = m_output_mesh.internal_value())
 		{
 			base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
 			on_update_mesh_geometry(*output_mesh);
@@ -96,11 +93,9 @@ private:
 		}
 	}
 
-	virtual void on_create_mesh_topology(dev::mesh& Mesh) = 0;
-	virtual void on_update_mesh_geometry(dev::mesh& Mesh) = 0;
+	virtual void on_create_mesh_topology(mesh& Mesh) = 0;
+	virtual void on_update_mesh_geometry(mesh& Mesh) = 0;
 };
-
-} // namespace dev
 
 } // namespace k3d
 

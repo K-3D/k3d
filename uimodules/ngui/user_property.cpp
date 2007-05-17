@@ -88,7 +88,7 @@ add_user_property::add_user_property(k3d::inode& Object, k3d::icommand_node& Par
 	add_user_type(k3d::type_string<k3d::matrix4>());
 	add_user_type(k3d::type_string<k3d::color>());
 //	add_user_type(k3d::type_string<k3d::legacy::mesh*>());
-	add_user_type(k3d::type_string<k3d::dev::mesh*>());
+	add_user_type(k3d::type_string<k3d::mesh*>());
 	add_user_type(k3d::type_string<k3d::gl::imesh_painter*>(), _("OpenGL Mesh Painter"));
 	add_user_type(k3d::type_string<k3d::ri::imesh_painter*>(), _("RenderMan Mesh Painter"));
 	add_user_type("aqsis_displacement_layer", _("Aqsis Displacement Layer"));
@@ -247,8 +247,8 @@ void add_user_property::on_add()
 			k3d::undoable_new(k3d::user::create_property<k3d::user::color_property>(name, label, description, node().document(), *property_collection, *persistent_container, &node(), k3d::color(1, 1, 1)), node().document());
 //		else if(value_type == k3d::type_string<k3d::legacy::mesh*>())
 //			k3d::undoable_new(k3d::user::create_property<k3d::user::mesh_property>(name, label, description, node().document(), *property_collection, *persistent_container, &node(), static_cast<k3d::legacy::mesh*>(0)), node().document());
-		else if(value_type == k3d::type_string<k3d::dev::mesh*>())
-			k3d::undoable_new(k3d::user::create_property<k3d::user::dev_mesh_property>(name, label, description, node().document(), *property_collection, *persistent_container, &node(), static_cast<k3d::dev::mesh*>(0)), node().document());
+		else if(value_type == k3d::type_string<k3d::mesh*>())
+			k3d::undoable_new(k3d::user::create_property<k3d::user::mesh_property>(name, label, description, node().document(), *property_collection, *persistent_container, &node(), static_cast<k3d::mesh*>(0)), node().document());
 		else if(value_type == k3d::type_string<k3d::gl::imesh_painter*>())
 			k3d::undoable_new(k3d::user::create_property<k3d::user::gl_mesh_painter_property>(name, label, description, node().document(), *property_collection, *persistent_container, &node(), static_cast<k3d::gl::imesh_painter*>(0)), node().document());
 		else if(value_type == k3d::type_string<k3d::ri::imesh_painter*>())

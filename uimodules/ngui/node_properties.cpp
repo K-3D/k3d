@@ -479,7 +479,7 @@ public:
 				else if(property_type == typeid(k3d::legacy::mesh*))
 				{
 				}
-				else if(property_type == typeid(k3d::dev::mesh*))
+				else if(property_type == typeid(k3d::mesh*))
 				{
 				}
 				// HPoint properties ...

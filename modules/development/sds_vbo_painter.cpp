@@ -51,7 +51,7 @@ class sds_face_painter :
 public:
 	sds_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document, const k3d::color Unselected = k3d::color(0.2,0.2,0.2), const k3d::color Selected = k3d::color(0.6,0.6,0.6)) :
 		base(Factory, Document, Unselected, Selected),
-		m_sds_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::sds::k3d_vbo_sds_cache>::instance(Document)),
+		m_sds_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::sds::k3d_vbo_sds_cache>::instance(Document)),
 		m_levels(init_owner(*this) + init_name("levels") + init_label(_("Levels")) + init_description(_("Number of SDS levels")) + init_value(2) + init_constraint(constraint::minimum(2L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_levels.changed_signal().connect(sigc::mem_fun(*this, &sds_face_painter::on_levels_changed));
@@ -68,14 +68,14 @@ public:
 		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
 	}
 	
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		if(!k3d::dev::validate_polyhedra(Mesh))
+		if(!k3d::validate_polyhedra(Mesh))
 			return;
 
-		if (!k3d::dev::is_sds(Mesh))
+		if (!k3d::is_sds(Mesh))
 			return;
 
 		k3d::sds::k3d_vbo_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
@@ -107,13 +107,13 @@ public:
 		clean_vbo_state();
 	}
 	
-	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
-		if(!k3d::dev::validate_polyhedra(Mesh))
+		if(!k3d::validate_polyhedra(Mesh))
 			return;
 			
-		if (!k3d::dev::is_sds(Mesh))
+		if (!k3d::is_sds(Mesh))
 			return;
 		
 		k3d::sds::k3d_vbo_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
@@ -141,13 +141,13 @@ public:
 		clean_vbo_state();
 	}
 	
-	void on_mesh_changed(const k3d::dev::mesh& Mesh, k3d::iunknown* Hint)
+	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
-		if(!k3d::dev::validate_polyhedra(Mesh))
+		if(!k3d::validate_polyhedra(Mesh))
 			return;
 			
-		if (!k3d::dev::is_sds(Mesh))
+		if (!k3d::is_sds(Mesh))
 			return;
 
 		k3d::sds::k3d_vbo_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
@@ -181,7 +181,7 @@ public:
 	}
 
 protected:
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::sds::k3d_vbo_sds_cache>& m_sds_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::sds::k3d_vbo_sds_cache>& m_sds_cache;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_levels;
 	bool m_levels_changed;
 	

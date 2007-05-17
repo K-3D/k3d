@@ -41,9 +41,9 @@ namespace libk3dk3d
 // k3d_mesh_writer
 
 class k3d_mesh_writer :
-	public k3d::dev::mesh_sink<k3d::persistent<k3d::node> >
+	public k3d::mesh_sink<k3d::persistent<k3d::node> >
 {
-	typedef k3d::dev::mesh_sink<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_sink<k3d::persistent<k3d::node> > base;
 
 public:
 	k3d_mesh_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -57,7 +57,7 @@ public:
 	void on_write_file(k3d::iunknown*)
 	{
 		const k3d::filesystem::path path = m_file.value();
-		k3d::dev::mesh* const mesh = m_input_mesh.value();
+		k3d::mesh* const mesh = m_input_mesh.value();
 
 		if(!mesh || path.empty())
 			return;

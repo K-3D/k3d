@@ -14,7 +14,7 @@ class ipersistent;
 class ipersistent::load_context;
 class ipersistent::save_context;
 class mesh_selection;
-namespace dev { class mesh; }
+class mesh;
 namespace legacy { class mesh; }
 namespace xml { class element; }
 
@@ -27,9 +27,9 @@ void save_dag(idocument& Document, xml::element& XML, const ipersistent::save_co
 void load_dag(idocument& Document, xml::element& XML, const ipersistent::load_context& Context);
 
 /// Serializes a mesh to an XML document
-void save_mesh(const dev::mesh& Mesh, xml::element& Container, const ipersistent::save_context& Context);
+void save_mesh(const mesh& Mesh, xml::element& Container, const ipersistent::save_context& Context);
 /// Deserializes a mesh from an XML document
-void load_mesh(dev::mesh& Mesh, xml::element& Container, const ipersistent::load_context& Context);
+void load_mesh(mesh& Mesh, xml::element& Container, const ipersistent::load_context& Context);
 
 /// Imports data into a document from a file
 bool import_file(idocument& Document, idocument_read_format& FormatFilter, const filesystem::path& FilePath);

@@ -88,7 +88,7 @@ bool is_front_facing(viewport::control& Viewport, const k3d::vector3& Normal, co
 	return k3d::to_vector(matrix * a).length2() < k3d::to_vector(matrix * b).length2();
 }
 
-k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::dev::mesh& Mesh, component_points_t& PointList)
+k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh& Mesh, component_points_t& PointList)
 {
 	PointList.clear();
 	k3d::point3 component_center(0, 0, 0);
@@ -96,8 +96,8 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::dev::
 	return_val_if_fail(Mesh.points, component_center);
 	return_val_if_fail(Mesh.point_selection, component_center);
 	
-	const k3d::dev::mesh::points_t& points = *Mesh.points;
-	const k3d::dev::mesh::selection_t& point_selection = *Mesh.point_selection;
+	const k3d::mesh::points_t& points = *Mesh.points;
+	const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
 	const size_t point_count = points.size();
 
 	switch(SelectionMode)
@@ -119,13 +119,13 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::dev::
 		case SELECT_LINES:
 		{
 			return_val_if_fail(Mesh.polyhedra, component_center);
-			const k3d::dev::mesh::polyhedra_t& polyhedra = *Mesh.polyhedra;
+			const k3d::mesh::polyhedra_t& polyhedra = *Mesh.polyhedra;
 			return_val_if_fail(polyhedra.clockwise_edges, component_center);
 			return_val_if_fail(polyhedra.edge_points, component_center);
 			return_val_if_fail(polyhedra.edge_selection, component_center);
-			const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-			const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
-			const k3d::dev::mesh::selection_t& edge_selection = *polyhedra.edge_selection;
+			const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+			const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
+			const k3d::mesh::selection_t& edge_selection = *polyhedra.edge_selection;
 			
 			const size_t edge_count = edge_points.size();
 			std::set<size_t> pointset; //ensure each point gets added only once
@@ -147,17 +147,17 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::dev::
 		case SELECT_FACES:
 		{
 			return_val_if_fail(Mesh.polyhedra, component_center);
-			const k3d::dev::mesh::polyhedra_t& polyhedra = *Mesh.polyhedra;
+			const k3d::mesh::polyhedra_t& polyhedra = *Mesh.polyhedra;
 			return_val_if_fail(polyhedra.clockwise_edges, component_center);
 			return_val_if_fail(polyhedra.edge_points, component_center);
 			return_val_if_fail(polyhedra.face_first_loops, component_center);
 			return_val_if_fail(polyhedra.loop_first_edges, component_center);
 			return_val_if_fail(polyhedra.face_selection, component_center);
-			const k3d::dev::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-			const k3d::dev::mesh::indices_t& edge_points = *polyhedra.edge_points;
-			const k3d::dev::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
-			const k3d::dev::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
-			const k3d::dev::mesh::selection_t& face_selection = *polyhedra.face_selection;
+			const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+			const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
+			const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+			const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+			const k3d::mesh::selection_t& face_selection = *polyhedra.face_selection;
 
 			std::set<size_t> pointset; //ensure each point gets added only once
 				const size_t face_count = face_first_loops.size();
@@ -394,7 +394,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::dev::
 			return;
 
 k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-		k3d::dev::mesh* const mesh = boost::any_cast<k3d::dev::mesh*>(mesh_source_property.property_value());
+		k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
 		return_if_fail(mesh);
 
 		// Get selection and save initial position
@@ -483,7 +483,7 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 			return_if_fail(node);
 
 			// Get mesh to tweak
-			k3d::dev::mesh* const mesh = boost::any_cast<k3d::dev::mesh*>(mesh_source_property.property_value());
+			k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
 			return_if_fail(mesh);
 
 			// Modify with TransformPoints

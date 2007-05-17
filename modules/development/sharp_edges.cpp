@@ -45,9 +45,9 @@ namespace libk3ddevelopment
 // sharp_edges
 
 class sharp_edges :
-	public k3d::mesh_selection_sink<k3d::dev::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > >
 {
-	typedef k3d::mesh_selection_sink<k3d::dev::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > > base;
 	typedef std::vector<size_t> sharp_edges_t;
 	typedef k3d::typed_array<bool> sharpness_array_t;
 public:
@@ -60,7 +60,7 @@ public:
 	}
 
 	/// Mesh modifier implementation
-	void on_create_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
 		k3d::make_unique(Output.points);
@@ -82,17 +82,17 @@ public:
 			}
 		}
 		
-		k3d::dev::mesh::polyhedra_t* writable_polyhedra = const_cast<k3d::dev::mesh::polyhedra_t*>(Output.polyhedra.get());
+		k3d::mesh::polyhedra_t* writable_polyhedra = const_cast<k3d::mesh::polyhedra_t*>(Output.polyhedra.get());
 		if (Output.polyhedra->face_varying_data.find("N") == Output.polyhedra->face_varying_data.end())
 			writable_polyhedra->face_varying_data["N"] = boost::shared_ptr<sharpness_array_t>(new sharpness_array_t(edgecount, false));
 		m_sharp_edges.set_value(sharp_edge_list);
 	}
 	
 	/// Mesh modifier implementation
-	void on_update_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		return_if_fail(Output.polyhedra);
-		k3d::dev::mesh::named_arrays::const_iterator array_it = Output.polyhedra->face_varying_data.find("N");
+		k3d::mesh::named_arrays::const_iterator array_it = Output.polyhedra->face_varying_data.find("N");
 		return_if_fail(array_it !=  Output.polyhedra->face_varying_data.end());
 		return_if_fail(dynamic_cast<sharpness_array_t*>(array_it->second.get()));
 		

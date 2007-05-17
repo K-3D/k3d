@@ -40,8 +40,7 @@ namespace k3d
 {
 
 class imaterial;
-
-namespace dev { class mesh; }
+class mesh;
 
 namespace legacy
 {
@@ -706,7 +705,7 @@ public:
 	blobbies_t blobbies;
 
 	/// Conversion from a new mesh to a legacy mesh
-	mesh& operator=(const dev::mesh& RHS);
+	mesh& operator=(const k3d::mesh& RHS);
 	
 private:
 	mesh(const mesh& RHS);

@@ -353,7 +353,7 @@ inode* get_node(const record& Record)
 ///////////////////////////////////////////////////////////////////////////////////
 // get_mesh
 
-dev::mesh* get_mesh(const record& Record)
+mesh* get_mesh(const record& Record)
 {
 	inode* const node = get_node(Record);
 	if(!node)
@@ -365,7 +365,7 @@ dev::mesh* get_mesh(const record& Record)
 	imesh_source* const mesh_source = dynamic_cast<imesh_source*>(node);
 	return_val_if_fail(mesh_source, 0);
 
-	return boost::any_cast<k3d::dev::mesh*>(mesh_source->mesh_source_output().property_value());
+	return boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_value());
 }
 
 /*

@@ -21,7 +21,7 @@ for i in range(100):
 
 	dissolve = doc.new_node("Dissolve")
 
-	diff_input = diff.add_user_property("k3d::dev::mesh*", "input_" + str(i), "Input " + str(i), "Input mesh " + str(i))
+	diff_input = diff.add_user_property("k3d::mesh*", "input_" + str(i), "Input " + str(i), "Input mesh " + str(i))
 
 	doc.set_dependency(subdivide_edges.get_property("input_mesh"), cube.get_property("output_mesh"));
 	doc.set_dependency(dissolve.get_property("input_mesh"), subdivide_edges.get_property("output_mesh"));

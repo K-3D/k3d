@@ -62,7 +62,7 @@ public:
 	face();
 	virtual ~face();
 	/// Convert the faces in Polyhedra to the internal representation
-	void convert(const k3d::dev::mesh::points_t& Points, const k3d::dev::mesh::polyhedra_t& Polyhedra);
+	void convert(const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra);
 	/// Draw smooth faces with global indices from start to end (end included)
 	void draw_smooth_range(const size_t Start, const size_t End) const;
 	/// Draw flat faces with global indices from start to end (end included)
@@ -72,9 +72,9 @@ public:
 	/// Draw the faces for selection
 	void draw_selection() const;
 	/// True if the given Edge is sharp
-	virtual bool is_sharp(const size_t Edge, const k3d::dev::mesh::points_t& Points, const k3d::dev::mesh::polyhedra_t& Polyhedra) = 0;
+	virtual bool is_sharp(const size_t Edge, const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra) = 0;
 	/// Update the normals and faces using the given set of TransformedPoints
-	void update(const k3d::dev::mesh::points_t& Points, const k3d::dev::mesh::polyhedra_t& Polyhedra, const k3d::dev::mesh::indices_t& TransformedPoints);
+	void update(const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra, const k3d::mesh::indices_t& TransformedPoints);
 private:
 	typedef std::pair<size_t, size_t> range_t;
 	typedef std::map<size_t, std::vector<size_t> > global_corners_t;
@@ -98,7 +98,7 @@ private:
 	/// List of faces affected by the last transformation
 	indexlist_t m_affected_faces;
 	/// Points used in the last update (used to check if this set has changed)
-	k3d::dev::mesh::indices_t m_last_transformed_points;
+	k3d::mesh::indices_t m_last_transformed_points;
 	/// Set of points affected by the last transformation
 	std::set<size_t> m_affected_points;
 	/// Face corners for the affected smooth faces
@@ -112,19 +112,19 @@ private:
 /// Flat shaded faces
 class flat_face : public face
 {
-	virtual bool is_sharp(const size_t Edge, const k3d::dev::mesh::points_t& Points, const k3d::dev::mesh::polyhedra_t& Polyhedra);
+	virtual bool is_sharp(const size_t Edge, const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra);
 };
 
 /// Smooth shaded faces
 class smooth_face : public face
 {
-	virtual bool is_sharp(const size_t Edge, const k3d::dev::mesh::points_t& Points, const k3d::dev::mesh::polyhedra_t& Polyhedra);
+	virtual bool is_sharp(const size_t Edge, const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra);
 };
 
 /// Normal calculation based on edge settings
 class edge_face : public face
 {
-	virtual bool is_sharp(const size_t Edge, const k3d::dev::mesh::points_t& Points, const k3d::dev::mesh::polyhedra_t& Polyhedra);
+	virtual bool is_sharp(const size_t Edge, const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra);
 };
 
 /// Keep track of cached data for the VBO mesh painters
@@ -218,16 +218,16 @@ template<class T1, class T2> std::map<const k3d::idocument*, painter_cache<T1, T
 typedef std::vector<k3d::mesh_selection::record> selection_records_t;
 
 /// Convert the array selection in SelectionArray to continuous blocks of maximal size in Selection
-void array_to_selection(const k3d::dev::mesh::selection_t& SelectionArray, selection_records_t& Selection);
+void array_to_selection(const k3d::mesh::selection_t& SelectionArray, selection_records_t& Selection);
 
 /// Insert Points in the VBO representing the point positions, if it doesn't exist
-void create_point_vbo(const boost::shared_ptr<const k3d::dev::mesh::points_t>& Points, painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, vbo>& Cache);
+void create_point_vbo(const boost::shared_ptr<const k3d::mesh::points_t>& Points, painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>& Cache);
 
 /// Updates the VBO for Points at the given indices
-void update_point_vbo(const boost::shared_ptr<const k3d::dev::mesh::points_t>& Points, painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, vbo>& Cache, const k3d::dev::mesh::indices_t& Indices);
+void update_point_vbo(const boost::shared_ptr<const k3d::mesh::points_t>& Points, painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>& Cache, const k3d::mesh::indices_t& Indices);
 
 /// Derives deformed or transformed faces and their neighbours from the points listed in Points and puts them in DeformedFaces. All points belonging to a transformed or deformed face are placed into AffectedPoints.
-void get_deformed_faces(const k3d::dev::mesh::polyhedra_t& Polyhedra, const k3d::dev::mesh::indices_t& Points, std::list<size_t>& AffectedFaces, std::set<size_t>& AffectedPoints);
+void get_deformed_faces(const k3d::mesh::polyhedra_t& Polyhedra, const k3d::mesh::indices_t& Points, std::list<size_t>& AffectedFaces, std::set<size_t>& AffectedPoints);
 
 /// Clean VBO state. Call before and after VBO command sequence to ensure OpenGL state consistancy across painters
 void clean_vbo_state();

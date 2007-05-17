@@ -51,28 +51,28 @@ public:
 	{
 	}
 
-	void paint_mesh(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
-		if(!k3d::dev::validate_blobbies(Mesh))
+		if(!k3d::validate_blobbies(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& first_primitives = *Mesh.blobbies->first_primitives;
-		const k3d::dev::mesh::counts_t& primitive_counts = *Mesh.blobbies->primitive_counts;
-		const k3d::dev::mesh::indices_t& first_operators = *Mesh.blobbies->first_operators;
-		const k3d::dev::mesh::counts_t& operator_counts = *Mesh.blobbies->operator_counts;
-		const k3d::dev::mesh::materials_t& materials = *Mesh.blobbies->materials;
-		const k3d::dev::mesh::named_arrays& constant_data = Mesh.blobbies->constant_data;
-		const k3d::dev::mesh::named_arrays& uniform_data = Mesh.blobbies->uniform_data;
-		const k3d::dev::mesh::blobbies_t::primitives_t& primitives = *Mesh.blobbies->primitives;
-		const k3d::dev::mesh::indices_t& primitive_first_floats = *Mesh.blobbies->primitive_first_floats;
-		const k3d::dev::mesh::counts_t& primitive_float_counts = *Mesh.blobbies->primitive_float_counts;
-		const k3d::dev::mesh::named_arrays& varying_data = Mesh.blobbies->varying_data;
-		const k3d::dev::mesh::named_arrays& vertex_data = Mesh.blobbies->vertex_data;
-		const k3d::dev::mesh::blobbies_t::operators_t& operators = *Mesh.blobbies->operators;
-		const k3d::dev::mesh::indices_t& operator_first_operands = *Mesh.blobbies->operator_first_operands;
-		const k3d::dev::mesh::counts_t& operator_operand_counts = *Mesh.blobbies->operator_operand_counts;
-		const k3d::dev::mesh::blobbies_t::floats_t& floats = *Mesh.blobbies->floats;
-		const k3d::dev::mesh::blobbies_t::operands_t& operands = *Mesh.blobbies->operands;
+		const k3d::mesh::indices_t& first_primitives = *Mesh.blobbies->first_primitives;
+		const k3d::mesh::counts_t& primitive_counts = *Mesh.blobbies->primitive_counts;
+		const k3d::mesh::indices_t& first_operators = *Mesh.blobbies->first_operators;
+		const k3d::mesh::counts_t& operator_counts = *Mesh.blobbies->operator_counts;
+		const k3d::mesh::materials_t& materials = *Mesh.blobbies->materials;
+		const k3d::mesh::named_arrays& constant_data = Mesh.blobbies->constant_data;
+		const k3d::mesh::named_arrays& uniform_data = Mesh.blobbies->uniform_data;
+		const k3d::mesh::blobbies_t::primitives_t& primitives = *Mesh.blobbies->primitives;
+		const k3d::mesh::indices_t& primitive_first_floats = *Mesh.blobbies->primitive_first_floats;
+		const k3d::mesh::counts_t& primitive_float_counts = *Mesh.blobbies->primitive_float_counts;
+		const k3d::mesh::named_arrays& varying_data = Mesh.blobbies->varying_data;
+		const k3d::mesh::named_arrays& vertex_data = Mesh.blobbies->vertex_data;
+		const k3d::mesh::blobbies_t::operators_t& operators = *Mesh.blobbies->operators;
+		const k3d::mesh::indices_t& operator_first_operands = *Mesh.blobbies->operator_first_operands;
+		const k3d::mesh::counts_t& operator_operand_counts = *Mesh.blobbies->operator_operand_counts;
+		const k3d::mesh::blobbies_t::floats_t& floats = *Mesh.blobbies->floats;
+		const k3d::mesh::blobbies_t::operands_t& operands = *Mesh.blobbies->operands;
 
 		const size_t blobby_begin = 0;
 		const size_t blobby_end = blobby_begin + first_primitives.size();
@@ -136,7 +136,7 @@ public:
 		}
 	}
 
-	void paint_complete(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_complete(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
 	}
 

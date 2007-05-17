@@ -35,9 +35,9 @@ namespace libk3dtest
 // legacy_mesh_conversion
 
 class legacy_mesh_conversion :
-	public k3d::dev::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::mesh_modifier<k3d::persistent<k3d::node> >
 {
-	typedef k3d::dev::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_modifier<k3d::persistent<k3d::node> > base;
 
 public:
 	legacy_mesh_conversion(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -52,15 +52,15 @@ public:
 		return 0;
 	}
 
-	void on_create_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		k3d::legacy::mesh legacy_mesh;
 		legacy_mesh = Input;
 		Output = legacy_mesh;
-		k3d::dev::validate(Output);
+		k3d::validate(Output);
 	}
 
-	void on_update_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 

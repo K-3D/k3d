@@ -44,10 +44,10 @@ namespace libk3ddevelopment
 // tweak_points
 
 class tweak_points :
-	public k3d::mesh_selection_sink<k3d::dev::mesh_modifier<k3d::persistent<k3d::node> > >,
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > >,
 	public k3d::icommand_node
 {
-	typedef k3d::mesh_selection_sink<k3d::dev::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > > base;
 	typedef std::map<size_t, k3d::point3> tweaks_t;
 public:
 	tweak_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -64,7 +64,7 @@ public:
 	}
 
 	/// If the mesh was reset, see if we can apply tweaks and if not clear them
-	void on_create_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
 		k3d::make_unique(Output.points);
@@ -86,7 +86,7 @@ public:
 	}
 	
 	/// Mesh modifier implementation
-	void on_update_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		if(!Input.points)
 			return;
@@ -102,12 +102,12 @@ public:
 		return_if_fail(Output.point_selection);
 		return_if_fail(Output.point_selection->size() == Output.points->size());
 
-		const k3d::dev::mesh::points_t& input_points = *Input.points;
-		k3d::dev::mesh::points_t& output_points = *(const_cast<k3d::dev::mesh::points_t*>(Output.points.get()));
+		const k3d::mesh::points_t& input_points = *Input.points;
+		k3d::mesh::points_t& output_points = *(const_cast<k3d::mesh::points_t*>(Output.points.get()));
 		m_input_points = Input.points;
 		m_output_points = Output.points;
 		
-		const k3d::dev::mesh::indices_t selected_points = m_selected_points.value();
+		const k3d::mesh::indices_t selected_points = m_selected_points.value();
 		m_hint.transformation_matrix = m_matrix.value();
 		k3d::point3 center = m_center.value();
 		for (size_t i = 0; i != selected_points.size(); ++i)
@@ -120,7 +120,7 @@ public:
 	/// Update affected mesh components in the hint. This needs to be done only when the selection changed
 	void on_selected_points_changed(k3d::iunknown* Hint)
 	{
-		const k3d::dev::mesh::indices_t selected_points = m_selected_points.value();
+		const k3d::mesh::indices_t selected_points = m_selected_points.value();
 		const size_t selected_count = selected_points.size();
 
 		// reset hint
@@ -144,8 +144,8 @@ public:
 		if (!m_output_points)
 			return;
 		const tweaks_t tweaks = m_tweaks.internal_value();
-		const k3d::dev::mesh::points_t& input_points = *m_input_points;
-		k3d::dev::mesh::points_t& output_points = *const_cast<k3d::dev::mesh::points_t*>(m_output_points.get());
+		const k3d::mesh::points_t& input_points = *m_input_points;
+		k3d::mesh::points_t& output_points = *const_cast<k3d::mesh::points_t*>(m_output_points.get());
 		return_if_fail(output_points.size() == input_points.size());
 		if (!dynamic_cast<internal_update_hint*>(Hint)) // external change to hints: restore all point positions
 		{
@@ -174,11 +174,11 @@ public:
 		if (!m_output_points)
 			return k3d::icommand_node::RESULT_ERROR;
 		
-		const k3d::dev::mesh::indices_t selected_points = m_selected_points.value();
+		const k3d::mesh::indices_t selected_points = m_selected_points.value();
 		const size_t selection_count = selected_points.size();
 		tweaks_t tweaks = m_tweaks.value();
-		const k3d::dev::mesh::points_t& input_points = *m_input_points;
-		const k3d::dev::mesh::points_t& output_points = *m_output_points;
+		const k3d::mesh::points_t& input_points = *m_input_points;
+		const k3d::mesh::points_t& output_points = *m_output_points;
 		m_selected_tweaks.clear();
 		for (size_t i = 0; i != selection_count; ++i) // update tweaks map
 		{
@@ -253,7 +253,7 @@ public:
 	
 	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_matrix;
 	k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_center;
-	k3d_data(k3d::dev::mesh::indices_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_selected_points; // no undo to ensure synchronisation with the actual selection
+	k3d_data(k3d::mesh::indices_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_selected_points; // no undo to ensure synchronisation with the actual selection
 	k3d_data(tweaks_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_tweaks;
 
 protected:
@@ -264,8 +264,8 @@ protected:
 	
 private:
 	k3d::hint::mesh_geometry_changed_t m_hint;
-	boost::shared_ptr<const k3d::dev::mesh::points_t> m_input_points; // cached for access in on_drag_changed
-	boost::shared_ptr<const k3d::dev::mesh::points_t> m_output_points; // cached for access in on_drag_changed
+	boost::shared_ptr<const k3d::mesh::points_t> m_input_points; // cached for access in on_drag_changed
+	boost::shared_ptr<const k3d::mesh::points_t> m_output_points; // cached for access in on_drag_changed
 	std::vector<k3d::point3> m_selected_tweaks; // Cache for fast access to tweaks needed during drag motion
 	bool m_selection_copied;
 
@@ -281,7 +281,7 @@ private:
 	/// Update fast selected tweaks cache
 	void update_selected_tweaks()
 	{
-		const k3d::dev::mesh::indices_t selected_points = m_selected_points.value();
+		const k3d::mesh::indices_t selected_points = m_selected_points.value();
 		const size_t selected_count = selected_points.size();
 		m_selected_tweaks.clear();
 		const tweaks_t& tweaks = m_tweaks.internal_value();

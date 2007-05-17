@@ -35,9 +35,9 @@ namespace libk3dselection
 // select_edge_by_number
 
 class select_edge_by_number :
-	public k3d::dev::mesh_selection_modifier
+	public k3d::mesh_selection_modifier
 {
-	typedef k3d::dev::mesh_selection_modifier base;
+	typedef k3d::mesh_selection_modifier base;
 
 public:
 	select_edge_by_number(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -48,12 +48,12 @@ public:
 		m_index.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	void on_select_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_select_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		if(Output.polyhedra && Output.polyhedra->edge_selection)
 		{
-		    k3d::dev::mesh::polyhedra_t& polyhedra = *k3d::make_unique(Output.polyhedra);
-		    k3d::dev::mesh::selection_t& edge_selection = *k3d::make_unique(polyhedra.edge_selection);
+		    k3d::mesh::polyhedra_t& polyhedra = *k3d::make_unique(Output.polyhedra);
+		    k3d::mesh::selection_t& edge_selection = *k3d::make_unique(polyhedra.edge_selection);
 			std::fill(edge_selection.begin(), edge_selection.end(), 0.0);
 
 			const unsigned long index = m_index.value();

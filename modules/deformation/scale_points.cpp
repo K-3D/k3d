@@ -35,9 +35,9 @@ namespace libk3ddeformation
 // scale_points
 
 class scale_points :
-	public k3d::dev::mesh_simple_deformation_modifier
+	public k3d::mesh_simple_deformation_modifier
 {
-	typedef k3d::dev::mesh_simple_deformation_modifier base;
+	typedef k3d::mesh_simple_deformation_modifier base;
 
 public:
 	scale_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -52,7 +52,7 @@ public:
 		m_z.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	void on_deform_mesh(const k3d::dev::mesh::points_t& InputPoints, const k3d::dev::mesh::selection_t& PointSelection, k3d::dev::mesh::points_t& OutputPoints)
+	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
 		const k3d::matrix4 matrix = k3d::scaling3D(k3d::point3(m_x.value(), m_y.value(), m_z.value()));
 

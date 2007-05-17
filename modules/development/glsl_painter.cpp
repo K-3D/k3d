@@ -115,7 +115,7 @@ public:
 		}
 	}
 
-	void paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		if(!m_program_object)
 		{
@@ -147,7 +147,7 @@ public:
 		glUseProgramObjectARB(0);
 	}
 	
-	void select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
@@ -163,7 +163,7 @@ public:
 		}
 	}
 	
-	void mesh_changed(const k3d::dev::mesh& Mesh, k3d::iunknown* Hint)
+	void mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)

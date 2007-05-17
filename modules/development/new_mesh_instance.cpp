@@ -61,7 +61,7 @@ class new_mesh_instance :
 public:
 	new_mesh_instance(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::dev::mesh*>(0)),
+		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::mesh*>(0)),
 		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")) + init_slot(sigc::mem_fun(*this, &new_mesh_instance::create_mesh))),
 		m_gl_painter(init_owner(*this) + init_name("gl_painter") + init_label(_("OpenGL Mesh Painter")) + init_description(_("OpenGL Mesh Painter")) + init_value(static_cast<k3d::gl::imesh_painter*>(0))),
 		m_ri_painter(init_owner(*this) + init_name("ri_painter") + init_label(_("RenderMan Mesh Painter")) + init_description(_("RenderMan Mesh Painter")) + init_value(static_cast<k3d::ri::imesh_painter*>(0))),
@@ -102,7 +102,7 @@ public:
 			m_output_mesh.changed_signal().emit(Hint);
 		}
 		
-		if(const k3d::dev::mesh* const output_mesh = m_output_mesh.value())
+		if(const k3d::mesh* const output_mesh = m_output_mesh.value())
 		{
 			if(k3d::gl::imesh_painter* const painter = m_gl_painter.value())
 				painter->mesh_changed(*output_mesh, Hint);
@@ -118,22 +118,22 @@ public:
 			reset_mesh(Hint);
 			return;
 		}
-		if(k3d::dev::mesh* output_mesh = m_output_mesh.value())
+		if(k3d::mesh* output_mesh = m_output_mesh.value())
 		{
-			k3d::dev::replace_selection(m_mesh_selection.value(), *output_mesh);
+			k3d::replace_selection(m_mesh_selection.value(), *output_mesh);
 		}
 		k3d::hint::selection_changed_t hint;
 		hint.set_selection(m_mesh_selection.value()); // provide current selection as hint
 		reset_mesh(&hint);
 	}
 
-	void create_mesh(k3d::dev::mesh& OutputMesh)
+	void create_mesh(k3d::mesh& OutputMesh)
 	{
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Copy Input");
-		if(const k3d::dev::mesh* const input_mesh = m_input_mesh.value())
+		if(const k3d::mesh* const input_mesh = m_input_mesh.value())
 		{
 			OutputMesh = *input_mesh;
-			k3d::dev::replace_selection(m_mesh_selection.value(), OutputMesh);
+			k3d::replace_selection(m_mesh_selection.value(), OutputMesh);
 		}
 	}
 
@@ -141,12 +141,12 @@ public:
 	{
 		k3d::bounding_box3 results;
 
-		const k3d::dev::mesh* const output_mesh = m_output_mesh.value();
+		const k3d::mesh* const output_mesh = m_output_mesh.value();
 		return_val_if_fail(output_mesh, results);
 
 		if(output_mesh->points)
 		{
-			for(k3d::dev::mesh::points_t::const_iterator point = output_mesh->points->begin(); point != output_mesh->points->end(); ++point)
+			for(k3d::mesh::points_t::const_iterator point = output_mesh->points->begin(); point != output_mesh->points->end(); ++point)
 			{
 				results.px = std::max(results.px, (*point)[0]);
 				results.py = std::max(results.py, (*point)[1]);
@@ -165,7 +165,7 @@ public:
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Draw");
 		if(k3d::gl::imesh_painter* const painter = m_gl_painter.value())
 		{
-			const k3d::dev::mesh* const output_mesh = m_output_mesh.value();
+			const k3d::mesh* const output_mesh = m_output_mesh.value();
 			return_if_fail(output_mesh);
 
 			k3d::gl::painter_render_state render_state(State);
@@ -187,7 +187,7 @@ public:
 		if(k3d::gl::imesh_painter* const painter = m_gl_painter.value())
 		{
 
-			const k3d::dev::mesh* const output_mesh = m_output_mesh.value();
+			const k3d::mesh* const output_mesh = m_output_mesh.value();
 			return_if_fail(output_mesh);
 
 			k3d::gl::painter_render_state render_state(State);
@@ -212,7 +212,7 @@ public:
 	{
 		if(k3d::ri::imesh_painter* const painter = m_ri_painter.value())
 		{
-			const k3d::dev::mesh* const input_mesh = m_input_mesh.value();
+			const k3d::mesh* const input_mesh = m_input_mesh.value();
 			return_if_fail(input_mesh);
 
 			painter->paint_mesh(*input_mesh, State);
@@ -223,7 +223,7 @@ public:
 	{
 		if(k3d::ri::imesh_painter* const painter = m_ri_painter.value())
 		{
-			const k3d::dev::mesh* const input_mesh = m_input_mesh.value();
+			const k3d::mesh* const input_mesh = m_input_mesh.value();
 			return_if_fail(input_mesh);
 
 			painter->paint_complete(*input_mesh, State);
@@ -256,8 +256,8 @@ public:
 		return factory;
 	}
 
-	k3d_data(k3d::dev::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input_mesh;
-	k3d_data(k3d::dev::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::demand_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output_mesh;
+	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input_mesh;
+	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::demand_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output_mesh;
 	k3d_data(k3d::gl::imesh_painter*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_gl_painter;
 	k3d_data(k3d::ri::imesh_painter*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_ri_painter;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_component_selection;

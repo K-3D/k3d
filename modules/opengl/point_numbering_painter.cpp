@@ -76,17 +76,17 @@ public:
 		}
 	}
 
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		const bool draw_selected = m_draw_selected.value();
 		const bool draw_unselected = m_draw_unselected.value();
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		if(!k3d::dev::validate_points(Mesh))
+		if(!k3d::validate_points(Mesh))
 			return;
 
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::points_t& points = *Mesh.points;
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);

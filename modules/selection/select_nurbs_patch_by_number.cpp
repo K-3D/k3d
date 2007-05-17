@@ -35,9 +35,9 @@ namespace libk3dselection
 // select_nurbs_patch_by_number
 
 class select_nurbs_patch_by_number :
-	public k3d::dev::mesh_selection_modifier
+	public k3d::mesh_selection_modifier
 {
-	typedef k3d::dev::mesh_selection_modifier base;
+	typedef k3d::mesh_selection_modifier base;
 
 public:
 	select_nurbs_patch_by_number(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -48,12 +48,12 @@ public:
 		m_index.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	void on_select_mesh(const k3d::dev::mesh& Input, k3d::dev::mesh& Output)
+	void on_select_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		if(Output.nurbs_patches && Output.nurbs_patches->patch_selection)
 		{
-		    k3d::dev::mesh::nurbs_patches_t& nurbs_patches = *k3d::make_unique(Output.nurbs_patches);
-		    k3d::dev::mesh::selection_t& patch_selection = *k3d::make_unique(nurbs_patches.patch_selection);
+		    k3d::mesh::nurbs_patches_t& nurbs_patches = *k3d::make_unique(Output.nurbs_patches);
+		    k3d::mesh::selection_t& patch_selection = *k3d::make_unique(nurbs_patches.patch_selection);
 			std::fill(patch_selection.begin(), patch_selection.end(), 0.0);
 
 			const unsigned long index = m_index.value();

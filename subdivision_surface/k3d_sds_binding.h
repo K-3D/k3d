@@ -42,17 +42,17 @@ typedef std::map<size_t, face_vertex*> facevertices_map;
 typedef std::vector<size_t> companions_t; // Keep track of edge companions
 
 /// convert k3d::legacy::mesh to the internal sds cache structure. This one does a lot of work, it should be looked into if part of this can be moved to the generic SDS part. (doubtful, since it deals heavily with k3d::edge and k3d::legacy::face)
-class k3d_cache_input : public cache_input<k3d::dev::mesh>
+class k3d_cache_input : public cache_input<k3d::mesh>
 {
 public:
 	
-	k3d_cache_input(boost::shared_ptr<const k3d::dev::mesh::points_t> Points, boost::shared_ptr<const k3d::dev::mesh::polyhedra_t> Polyhedra,  boost::shared_ptr<const k3d::dev::mesh::selection_t> PointSelection);
+	k3d_cache_input(boost::shared_ptr<const k3d::mesh::points_t> Points, boost::shared_ptr<const k3d::mesh::polyhedra_t> Polyhedra,  boost::shared_ptr<const k3d::mesh::selection_t> PointSelection);
 	~k3d_cache_input();
 
 	//////
-	// cache_input<k3d::dev::mesh> implementation
+	// cache_input<k3d::mesh> implementation
 	//////
-	bool set_input(const k3d::dev::mesh* Input);
+	bool set_input(const k3d::mesh* Input);
 
 	void update(bool all, facevertices_t& updated_maps);
 
@@ -99,9 +99,9 @@ private:
 	bool m_hint_validated;
 	bool m_updated;
 
-	boost::shared_ptr<const k3d::dev::mesh::points_t> m_input_points;
-	boost::shared_ptr<const k3d::dev::mesh::polyhedra_t> m_input_polyhedra;
-	boost::shared_ptr<const k3d::dev::mesh::selection_t> m_point_selection;
+	boost::shared_ptr<const k3d::mesh::points_t> m_input_points;
+	boost::shared_ptr<const k3d::mesh::polyhedra_t> m_input_polyhedra;
+	boost::shared_ptr<const k3d::mesh::selection_t> m_point_selection;
 	
 	facevertices_map m_modified_faces;
 	
@@ -139,13 +139,13 @@ private:
 };
 
 /// Base class for the caches used by k3d, handling only the input side of things.
-class k3d_sds_cache_base : public catmull_clark_cache<k3d::dev::mesh>
+class k3d_sds_cache_base : public catmull_clark_cache<k3d::mesh>
 {
 protected:
 	////////////
-	// catmull_clark_cache<k3d::dev::mesh> implementation
+	// catmull_clark_cache<k3d::mesh> implementation
 	////////////
-	cache_input<k3d::dev::mesh>* create_cache_input(const k3d::dev::mesh* Input)
+	cache_input<k3d::mesh>* create_cache_input(const k3d::mesh* Input)
 	{
 		return new k3d_cache_input(Input->points, Input->polyhedra, Input->point_selection);
 	}
@@ -231,9 +231,9 @@ protected:
 	///////
 	
 	/// Equivalent to draw_faces
-	void client_output(k3d::dev::mesh* Output = 0) {}
+	void client_output(k3d::mesh* Output = 0) {}
 
-	void client_output_nurbs(k3d::dev::mesh* Output = 0) {}
+	void client_output_nurbs(k3d::mesh* Output = 0) {}
 }; // class k3d_basic_opengl_sds_cache
 
 /// SDS cache that outputs to OpenGL using VBOs
@@ -287,9 +287,9 @@ protected:
 	///////
 	
 	/// Equivalent to draw_faces
-	void client_output(k3d::dev::mesh* Output = 0);
+	void client_output(k3d::mesh* Output = 0);
 
-	void client_output_nurbs(k3d::dev::mesh* Output = 0);
+	void client_output_nurbs(k3d::mesh* Output = 0);
 
 private:
 	/// Regenerate VBOs if the mesh structure has changed

@@ -35,9 +35,9 @@ namespace libk3ddeformation
 // linear_point_noise
 
 class linear_point_noise :
-	public k3d::dev::mesh_simple_deformation_modifier
+	public k3d::mesh_simple_deformation_modifier
 {
-	typedef k3d::dev::mesh_simple_deformation_modifier base;
+	typedef k3d::mesh_simple_deformation_modifier base;
 
 public:
 	linear_point_noise(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -76,7 +76,7 @@ public:
 		m_amplitude_z.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	void on_deform_mesh(const k3d::dev::mesh::points_t& InputPoints, const k3d::dev::mesh::selection_t& PointSelection, k3d::dev::mesh::points_t& OutputPoints)
+	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
 		const bool use_x = m_use_x.value();
 		const bool use_y = m_use_y.value();

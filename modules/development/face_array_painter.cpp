@@ -53,10 +53,10 @@ public:
 	face_array_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		// overrride default colors to differ between selected/unselected meshes and to contrast edges and faces
 		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6)),
-		m_points_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, vbo>::instance(Document)),
-		m_faces_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::indices_t>, face_t>::instance(Document)),
-		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::indices_t>, selection_records_t>::instance(Document)),
-		m_hint_cache(painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>::instance(Document))
+		m_points_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>::instance(Document)),
+		m_faces_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_t>::instance(Document)),
+		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, selection_records_t>::instance(Document)),
+		m_hint_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>::instance(Document))
 	{
 	}
 	
@@ -68,7 +68,7 @@ public:
 	}
 	
 	/// Updates the vertex buffer object.
-	void update_buffer(const k3d::dev::mesh& Mesh)
+	void update_buffer(const k3d::mesh& Mesh)
 	{
 		if(!Mesh.polyhedra)
 			return;
@@ -117,14 +117,14 @@ public:
 		}
 	}
 	
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
 		if(!validate_polyhedra(Mesh))
 			return;
 			
-		if (k3d::dev::is_sds(Mesh))
+		if (k3d::is_sds(Mesh))
 			return;
 
 		update_buffer(Mesh);
@@ -204,14 +204,14 @@ public:
 		clean_vbo_state();
 	}
 	
-	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
 		if(!validate_polyhedra(Mesh))
 			return;
 			
-		if (k3d::dev::is_sds(Mesh))
+		if (k3d::is_sds(Mesh))
 			return;
 
 		update_buffer(Mesh);
@@ -242,14 +242,14 @@ public:
 		clean_vbo_state();
 	}
 	
-	void on_mesh_changed(const k3d::dev::mesh& Mesh, k3d::iunknown* Hint)
+	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		if(!k3d::dev::validate_polyhedra(Mesh))
+		if(!k3d::validate_polyhedra(Mesh))
 			return;
 			
-		if (k3d::dev::is_sds(Mesh))
+		if (k3d::is_sds(Mesh))
 			return;
 		
 		m_points_cache.register_painter(Mesh.points, this);
@@ -277,10 +277,10 @@ public:
 	}
 	
 private:
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, vbo>& m_points_cache;
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::indices_t>, face_t>& m_faces_cache;
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::indices_t>, selection_records_t>& m_selection_cache;
-	painter_cache<boost::shared_ptr<const k3d::dev::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>& m_hint_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>& m_points_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_t>& m_faces_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, selection_records_t>& m_selection_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>& m_hint_cache;
 };
 
 class face_painter_edge_normals : public face_array_painter<edge_face>

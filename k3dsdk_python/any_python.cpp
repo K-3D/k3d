@@ -102,9 +102,9 @@ const object any_to_python(const boost::any& Value)
 	if(type == typeid(unsigned long))
 		return object(boost::any_cast<unsigned long>(Value));
 
-	if(type == typeid(k3d::dev::mesh*))
+	if(type == typeid(k3d::mesh*))
 	{
-		k3d::dev::mesh* const k3d_mesh = boost::any_cast<k3d::dev::mesh*>(Value);
+		k3d::mesh* const k3d_mesh = boost::any_cast<k3d::mesh*>(Value);
 		return k3d_mesh ? object(mesh(k3d_mesh)) : object();
 	}
 

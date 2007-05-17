@@ -51,22 +51,22 @@ public:
 	{
 	}
 
-	void paint_mesh(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
-		if(!k3d::dev::validate_cubic_curve_groups(Mesh))
+		if(!k3d::validate_cubic_curve_groups(Mesh))
 			return;
 
-		const k3d::dev::mesh::indices_t& first_curves = *Mesh.cubic_curve_groups->first_curves;
-		const k3d::dev::mesh::counts_t& curve_counts = *Mesh.cubic_curve_groups->curve_counts;
-		const k3d::dev::mesh::bools_t& periodic_curves = *Mesh.cubic_curve_groups->periodic_curves;
-		const k3d::dev::mesh::materials_t& materials = *Mesh.cubic_curve_groups->materials;
-		const k3d::dev::mesh::named_arrays& constant_data = Mesh.cubic_curve_groups->constant_data;
-		const k3d::dev::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
-		const k3d::dev::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
-		const k3d::dev::mesh::named_arrays& uniform_data = Mesh.cubic_curve_groups->uniform_data;
-		const k3d::dev::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
-		const k3d::dev::mesh::points_t& points = *Mesh.points;
-		const k3d::dev::mesh::named_arrays& vertex_data = Mesh.vertex_data;
+		const k3d::mesh::indices_t& first_curves = *Mesh.cubic_curve_groups->first_curves;
+		const k3d::mesh::counts_t& curve_counts = *Mesh.cubic_curve_groups->curve_counts;
+		const k3d::mesh::bools_t& periodic_curves = *Mesh.cubic_curve_groups->periodic_curves;
+		const k3d::mesh::materials_t& materials = *Mesh.cubic_curve_groups->materials;
+		const k3d::mesh::named_arrays& constant_data = Mesh.cubic_curve_groups->constant_data;
+		const k3d::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
+		const k3d::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
+		const k3d::mesh::named_arrays& uniform_data = Mesh.cubic_curve_groups->uniform_data;
+		const k3d::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
+		const k3d::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::named_arrays& vertex_data = Mesh.vertex_data;
 
 		const size_t group_begin = 0;
 		const size_t group_end = group_begin + first_curves.size();
@@ -109,7 +109,7 @@ public:
 		}
 	}
 
-	void paint_complete(const k3d::dev::mesh& Mesh, const k3d::ri::render_state& RenderState)
+	void paint_complete(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
 	}
 

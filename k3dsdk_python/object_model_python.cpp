@@ -308,7 +308,7 @@ const std::string module_print_diff(const object& A, const object& B)
 	if(a.check() && b.check())
 	{
 		std::ostringstream buffer;
-		k3d::dev::print_diff(buffer, a().wrapped(), b().wrapped());
+		k3d::print_diff(buffer, a().wrapped(), b().wrapped());
 
 		return buffer.str();
 	}
@@ -425,9 +425,9 @@ void set_context(const k3d::iscript_engine::context_t& Context, boost::python::d
 			{
 				Dictionary[context->first] = node(k3d_node);
 			}
-			else if(context->second.type() == typeid(k3d::dev::mesh*))
+			else if(context->second.type() == typeid(k3d::mesh*))
 			{
-				Dictionary[context->first] = mesh(boost::any_cast<k3d::dev::mesh*>(context->second));
+				Dictionary[context->first] = mesh(boost::any_cast<k3d::mesh*>(context->second));
 			}
 			else if(context->second.type() == typeid(const k3d::ri::render_state*))
 			{
@@ -458,7 +458,7 @@ void get_context(boost::python::dict& Dictionary, k3d::iscript_engine::context_t
 			continue;
 		else if(dynamic_cast<k3d::inode*>(unknown))
 			continue;
-		else if(context->second.type() == typeid(k3d::dev::mesh*))
+		else if(context->second.type() == typeid(k3d::mesh*))
 			continue;
 		else if(context->second.type() == typeid(const k3d::ri::render_state*))
 			continue;

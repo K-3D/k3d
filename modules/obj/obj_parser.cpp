@@ -69,9 +69,9 @@ void obj_parser::parse(std::istream& Stream)
 		}
 		else if(keyword == "f")
 		{
-			k3d::dev::mesh::indices_t points;
-			k3d::dev::mesh::indices_t texture_points;
-			k3d::dev::mesh::indices_t normals; 
+			k3d::mesh::indices_t points;
+			k3d::mesh::indices_t texture_points;
+			k3d::mesh::indices_t normals; 
 
 			size_t index;
 			char separator;
@@ -131,7 +131,7 @@ void obj_parser::parse(std::istream& Stream)
 		}
  		else if(keyword == "l")
 		{
-			k3d::dev::mesh::indices_t points;
+			k3d::mesh::indices_t points;
 
 			size_t point;
 			for(line_stream >> point; line_stream; line_stream >> point)
@@ -155,7 +155,7 @@ void obj_parser::parse(std::istream& Stream)
 		}
 		else if(keyword == "p")
 		{
-			k3d::dev::mesh::indices_t points;
+			k3d::mesh::indices_t points;
 
 			size_t point;
 			for(line_stream >> point; line_stream; line_stream >> point)
@@ -202,7 +202,7 @@ void obj_parser::on_curve_type(const std::string& Type)
 {
 }
 
-void obj_parser::on_face(const k3d::dev::mesh::indices_t& Points, const k3d::dev::mesh::indices_t& TexturePoints, const k3d::dev::mesh::indices_t& Normals)
+void obj_parser::on_face(const k3d::mesh::indices_t& Points, const k3d::mesh::indices_t& TexturePoints, const k3d::mesh::indices_t& Normals)
 {
 }
 
@@ -210,7 +210,7 @@ void obj_parser::on_group(const std::string& Name)
 {
 }
 
-void obj_parser::on_line(const k3d::dev::mesh::indices_t& Points)
+void obj_parser::on_line(const k3d::mesh::indices_t& Points)
 {
 }
 
@@ -222,7 +222,7 @@ void obj_parser::on_object(const std::string& Name)
 {
 }
 
-void obj_parser::on_points(const k3d::dev::mesh::indices_t& Points)
+void obj_parser::on_points(const k3d::mesh::indices_t& Points)
 {
 }
 
@@ -250,7 +250,7 @@ void print_obj::on_curve_type(const std::string& Type)
 	k3d::log() << debug << __PRETTY_FUNCTION__ << " " << Type << std::endl;
 }
 
-void print_obj::on_face(const k3d::dev::mesh::indices_t& Points, const k3d::dev::mesh::indices_t& TexturePoints, const k3d::dev::mesh::indices_t& Normals)
+void print_obj::on_face(const k3d::mesh::indices_t& Points, const k3d::mesh::indices_t& TexturePoints, const k3d::mesh::indices_t& Normals)
 {
 	k3d::log() << debug << __PRETTY_FUNCTION__ << " ";
 	std::copy(Points.begin(), Points.end(), std::ostream_iterator<size_t>(k3d::log(), " "));
@@ -262,7 +262,7 @@ void print_obj::on_group(const std::string& Name)
 	k3d::log() << debug << __PRETTY_FUNCTION__ << " " << Name << std::endl;
 }
 
-void print_obj::on_line(const k3d::dev::mesh::indices_t& Points)
+void print_obj::on_line(const k3d::mesh::indices_t& Points)
 {
 	k3d::log() << debug << __PRETTY_FUNCTION__ << " ";
 	std::copy(Points.begin(), Points.end(), std::ostream_iterator<size_t>(k3d::log(), " "));
@@ -279,7 +279,7 @@ void print_obj::on_object(const std::string& Name)
 	k3d::log() << debug << __PRETTY_FUNCTION__ << " " << Name << std::endl;
 }
 
-void print_obj::on_points(const k3d::dev::mesh::indices_t& Points)
+void print_obj::on_points(const k3d::mesh::indices_t& Points)
 {
 	k3d::log() << debug << __PRETTY_FUNCTION__ << " ";
 	std::copy(Points.begin(), Points.end(), std::ostream_iterator<size_t>(k3d::log(), " "));

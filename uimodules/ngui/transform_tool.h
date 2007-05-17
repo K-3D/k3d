@@ -58,10 +58,10 @@ typedef std::vector<std::string> manipulators_t;
 // 	k3d::point3 tweak_value;
 // } component_point_t;
 
-typedef k3d::dev::mesh::indices_t component_points_t;
+typedef k3d::mesh::indices_t component_points_t;
 
 /// Lists selected points in a mesh and returns average component position
-k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::dev::mesh& Mesh, component_points_t& PointList);
+k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh& Mesh, component_points_t& PointList);
 
 template<typename Type>
 class imanipulators

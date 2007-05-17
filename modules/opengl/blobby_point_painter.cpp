@@ -47,15 +47,15 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		if(!k3d::dev::validate_blobbies(Mesh))
+		if(!k3d::validate_blobbies(Mesh))
 			return;
 
-		const k3d::dev::mesh::blobbies_t::primitives_t& primitives = *Mesh.blobbies->primitives;
-		const k3d::dev::mesh::indices_t& primitive_first_floats = *Mesh.blobbies->primitive_first_floats;
-		const k3d::dev::mesh::counts_t& primitive_float_counts = *Mesh.blobbies->primitive_float_counts;
-		const k3d::dev::mesh::blobbies_t::floats_t& floats = *Mesh.blobbies->floats;
+		const k3d::mesh::blobbies_t::primitives_t& primitives = *Mesh.blobbies->primitives;
+		const k3d::mesh::indices_t& primitive_first_floats = *Mesh.blobbies->primitive_first_floats;
+		const k3d::mesh::counts_t& primitive_float_counts = *Mesh.blobbies->primitive_float_counts;
+		const k3d::mesh::blobbies_t::floats_t& floats = *Mesh.blobbies->floats;
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
@@ -72,9 +72,9 @@ public:
 
 			switch(primitives[primitive])
 			{
-				case k3d::dev::mesh::blobbies_t::CONSTANT:
+				case k3d::mesh::blobbies_t::CONSTANT:
 					break;
-				case k3d::dev::mesh::blobbies_t::ELLIPSOID:
+				case k3d::mesh::blobbies_t::ELLIPSOID:
 				{
 					return_if_fail(float_count == 16);
 
@@ -92,7 +92,7 @@ public:
 					
 					break;
 				}
-				case k3d::dev::mesh::blobbies_t::SEGMENT:
+				case k3d::mesh::blobbies_t::SEGMENT:
 				{
 					return_if_fail(float_count == 23);
 
@@ -116,7 +116,7 @@ public:
 		}
 	}
 	
-	void on_select_mesh(const k3d::dev::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if(!SelectionState.select_blobbies)
 			return;
