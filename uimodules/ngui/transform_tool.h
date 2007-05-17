@@ -39,7 +39,7 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/transform.h>
 

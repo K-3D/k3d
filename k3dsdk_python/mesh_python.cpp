@@ -27,7 +27,7 @@
 
 #include <k3dsdk/color.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/types.h>
 

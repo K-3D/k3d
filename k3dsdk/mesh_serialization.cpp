@@ -27,7 +27,7 @@
 #include "ipersistent_lookup.h"
 #include "legacy_mesh.h"
 #include "mesh_selection.h"
-#include "new_mesh.h"
+#include "mesh.h"
 #include "shared_pointer.h"
 #include "types.h"
 #include "types_ri.h"

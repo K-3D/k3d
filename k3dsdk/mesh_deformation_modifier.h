@@ -25,7 +25,7 @@
 */
 
 #include "mesh_selection_sink.h"
-#include "new_mesh_modifier.h"
+#include "mesh_modifier.h"
 #include "node.h"
 #include "persistent.h"
 

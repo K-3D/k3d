@@ -34,7 +34,7 @@
 #include "itexture_ri.h"
 #include "iuser_property.h"
 #include "legacy_mesh.h"
-#include "new_mesh.h"
+#include "mesh.h"
 #include "tokens.h"
 #include "types.h"
 #include "types_ri.h"

@@ -1,5 +1,5 @@
-#ifndef K3DSDK_NEW_MESH_SELECTION_MODIFIER_H
-#define K3DSDK_NEW_MESH_SELECTION_MODIFIER_H
+#ifndef K3DSDK_NEW_MESH_SIMPLE_DEFORMATION_MODIFIER_H
+#define K3DSDK_NEW_MESH_SIMPLE_DEFORMATION_MODIFIER_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -22,10 +22,10 @@
 
 /** \file
 	\author Timothy M. Shead (tshead@k-3d.com)
-*/
+ */
 
 #include "mesh_selection_sink.h"
-#include "new_mesh_modifier.h"
+#include "mesh_modifier.h"
 #include "node.h"
 #include "persistent.h"
 
@@ -35,26 +35,26 @@ namespace k3d
 namespace dev
 {
 
-/// Mesh modifier implementation for use in plugins that alter the selection state of a mesh without altering its topology or geometry.  To create a plugin, derive from mesh_selection_modifier and implement the on_select_mesh() method.
-class mesh_selection_modifier :
+/// Mesh modifier implementation for use in plugins that deform a mesh (modify its points) without altering topology, and based solely on the input point positions and selection.  To create a plugin, derive from mesh_simple_deformation_modifier and implement the on_deform_mesh() method.  If you are only modifying points but need more information about the input mesh, consider using mesh_deformation_modifier instead. 
+class mesh_simple_deformation_modifier :
 	public mesh_selection_sink<mesh_modifier<persistent<node> > >
 {
 	typedef mesh_selection_sink<mesh_modifier<persistent<node> > > base;
 
 public:
-	mesh_selection_modifier(iplugin_factory& Factory, idocument& Document);
+	mesh_simple_deformation_modifier(iplugin_factory& Factory, idocument& Document);
 
 private:
 	void on_create_mesh(const mesh& Input, mesh& Output);
 	void on_update_mesh(const mesh& Input, mesh& Output);
 
-	/// Implement this method in derived classes and alter the output selection(s) as-desired.
-	virtual void on_select_mesh(const mesh& Input, mesh& Output) = 0;
+	/// Implement this method in derived classes and deform the output mesh using its input points and selection.
+	virtual void on_deform_mesh(const mesh::points_t& InputPoints, const mesh::selection_t& PointSelection, mesh::points_t& OutputPoints) = 0;
 };
 
 } // namespace dev
-
+	
 } // namespace k3d
 
-#endif // !K3DSDK_NEW_MESH_SELECTION_MODIFIER
+#endif // !K3DSDK_NEW_MESH_SIMPLE_DEFORMATION_MODIFIER
 

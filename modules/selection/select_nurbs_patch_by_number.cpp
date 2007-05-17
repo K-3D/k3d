@@ -25,7 +25,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/i18n.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/new_mesh_selection_modifier.h>
+#include <k3dsdk/mesh_selection_modifier.h>
 #include <k3dsdk/shared_pointer.h>
 
 namespace libk3dselection

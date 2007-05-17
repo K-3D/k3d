@@ -27,7 +27,7 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/new_mesh_modifier.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/serialization.h>

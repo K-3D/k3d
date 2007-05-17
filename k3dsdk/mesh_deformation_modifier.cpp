@@ -21,7 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "new_mesh_deformation_modifier.h"
+#include "mesh_deformation_modifier.h"
 #include "shared_pointer.h"
 
 namespace k3d

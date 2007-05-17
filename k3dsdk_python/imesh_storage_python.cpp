@@ -24,7 +24,7 @@
 #include "imesh_storage_python.h"
 #include "mesh_python.h"
 
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/imesh_storage.h>
 
 #include <boost/python.hpp>

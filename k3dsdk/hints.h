@@ -26,7 +26,7 @@
 
 #include "iunknown.h"
 #include "mesh_selection.h"
-#include "new_mesh.h"
+#include "mesh.h"
 
 #include <iosfwd>
 

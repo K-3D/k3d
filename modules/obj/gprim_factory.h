@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 
 namespace libk3dobj
 {

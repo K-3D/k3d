@@ -20,7 +20,7 @@
 #include "color.h"
 #include "legacy_mesh.h"
 #include "mesh_selection.h"
-#include "new_mesh.h"
+#include "mesh.h"
 #include "shared_pointer.h"
 
 #include <iterator>

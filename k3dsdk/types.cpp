@@ -72,7 +72,7 @@
 #include "legacy_mesh.h"
 #include "log.h"
 #include "mesh_selection.h"
-#include "new_mesh.h"
+#include "mesh.h"
 #include "types.h"
 
 #include <map>

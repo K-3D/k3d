@@ -23,7 +23,7 @@
 #include "data.h"
 #include "i18n.h"
 #include "imesh_sink.h"
-#include "new_mesh.h"
+#include "mesh.h"
 
 namespace k3d
 {

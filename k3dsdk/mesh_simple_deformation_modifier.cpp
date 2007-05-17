@@ -19,9 +19,9 @@
 
 /** \file
 	\author Timothy M. Shead (tshead@k-3d.com)
-*/
+ */
 
-#include "new_mesh_selection_modifier.h"
+#include "mesh_simple_deformation_modifier.h"
 #include "shared_pointer.h"
 
 namespace k3d
@@ -30,22 +30,37 @@ namespace k3d
 namespace dev
 {
 
-mesh_selection_modifier::mesh_selection_modifier(iplugin_factory& Factory, idocument& Document) :
+mesh_simple_deformation_modifier::mesh_simple_deformation_modifier(iplugin_factory& Factory, idocument& Document) :
 	base(Factory, Document)
 {
 }
 
-void mesh_selection_modifier::on_create_mesh(const mesh& Input, mesh& Output)
+void mesh_simple_deformation_modifier::on_create_mesh(const mesh& Input, mesh& Output)
 {
 	Output = Input;
 }
 
-void mesh_selection_modifier::on_update_mesh(const mesh& Input, mesh& Output)
+void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& Output)
 {
-	on_select_mesh(Input, Output);
+	if(!Input.points)
+		return;
+	if(!Output.points)
+		return;
+	return_if_fail(Input.points->size() == Output.points->size());
+
+	replace_selection(m_mesh_selection.value(), Output);
+	return_if_fail(Output.point_selection);
+	return_if_fail(Output.point_selection->size() == Output.points->size());
+
+	const mesh::points_t& input_points = *Input.points;
+	const mesh::selection_t& selection = *Output.point_selection;
+
+	mesh::points_t& output_points = *make_unique(Output.points);
+
+	on_deform_mesh(input_points, selection, output_points);
 }
 
 } // namespace dev
-
+	
 } // namespace k3d
 

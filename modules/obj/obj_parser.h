@@ -24,7 +24,7 @@
 */
 
 #include <iosfwd>
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 
 namespace k3d { class normal3; }
 namespace k3d { class point4; }

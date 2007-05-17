@@ -32,7 +32,7 @@
 #include <k3dsdk/color.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/mesh_selection.h>
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/types.h>
 #include <k3dsdk/vectors.h>
 

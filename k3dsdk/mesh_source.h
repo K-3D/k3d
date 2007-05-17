@@ -29,7 +29,7 @@
 #include "i18n.h"
 #include "ipipeline_profiler.h"
 #include "imesh_source.h"
-#include "new_mesh.h"
+#include "mesh.h"
 
 namespace k3d
 {

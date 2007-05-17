@@ -31,7 +31,7 @@
 #include "imesh_sink.h"
 #include "imesh_source.h"
 #include "ipipeline_profiler.h"
-#include "new_mesh.h"
+#include "mesh.h"
 
 namespace k3d
 {

@@ -24,7 +24,7 @@
 		\author Bart Janssens <bart.janssens@lid.kviv.be>
 */
 
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 
 #include <boost/multi_array.hpp>
 

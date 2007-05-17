@@ -1,5 +1,5 @@
 #include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 
 #include <iostream>
 

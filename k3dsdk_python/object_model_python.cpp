@@ -60,7 +60,7 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/mesh_diff.h>
 #include <k3dsdk/mesh_selection.h>
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/render_state_ri.h>
 #include <k3dsdk/scripting.h>

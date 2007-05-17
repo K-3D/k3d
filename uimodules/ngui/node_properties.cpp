@@ -73,7 +73,7 @@
 #include <k3dsdk/istill_render_engine.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/mesh_selection.h>
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/types_ri.h>

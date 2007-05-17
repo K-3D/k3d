@@ -34,7 +34,7 @@
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>

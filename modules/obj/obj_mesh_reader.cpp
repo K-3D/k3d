@@ -27,7 +27,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/i18n.h>
 #include <k3dsdk/imesh_storage.h>
-#include <k3dsdk/new_mesh_source.h>
+#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 

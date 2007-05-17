@@ -43,7 +43,7 @@
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/iselection_engine_gl.h>
 #include <k3dsdk/itransform_source.h>
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/selection_state_gl.h>
 #include <k3dsdk/time_source.h>

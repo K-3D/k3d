@@ -66,7 +66,7 @@
 #include <k3dsdk/itime_sink.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_selection.h>
-#include <k3dsdk/new_mesh.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/time_source.h>

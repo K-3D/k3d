@@ -19,7 +19,7 @@
 
 #include "imaterial.h"
 #include "mesh_diff.h"
-#include "new_mesh.h"
+#include "mesh.h"
 
 #include <boost/format.hpp>
 
