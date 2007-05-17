@@ -2,5 +2,5 @@
 
 import testing
 setup = testing.setup_bitmap_reader_test("BitmapReader", "test_rgb_8.bmp")
-testing.bitmap_size_comparison(setup.reader.output_image, 200, 150)
+testing.bitmap_size_comparison(setup.reader.output_bitmap, 200, 150)
 
