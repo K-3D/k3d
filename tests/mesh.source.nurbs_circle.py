@@ -2,6 +2,6 @@
 
 import testing
 
-setup = testing.setup_mesh_source_image_test("NurbsCircle")
-testing.image_comparison(setup.document, setup.camera_to_bitmap.get_property("output_bitmap"), "mesh.source.nurbs_circle", 0.01)
+setup = testing.setup_mesh_source_test("NurbsCircle")
+testing.mesh_comparison(setup.document, setup.source.get_property("output_mesh"), "mesh.source.nurbs_circle", 1)
 

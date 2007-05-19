@@ -2,6 +2,6 @@
 
 import testing
 
-setup = testing.setup_mesh_source_image_test("NurbsParaboloid")
-testing.image_comparison(setup.document, setup.camera_to_bitmap.get_property("output_bitmap"), "mesh.source.nurbs_paraboloid", 0.006)
+setup = testing.setup_mesh_source_test("NurbsParaboloid")
+testing.mesh_comparison(setup.document, setup.source.get_property("output_mesh"), "mesh.source.nurbs_paraboloid", 1)
 

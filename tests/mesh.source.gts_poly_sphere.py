@@ -2,6 +2,6 @@
 
 import testing
 
-setup = testing.setup_mesh_source_image_test("GTSPolySphere")
-testing.image_comparison(setup.document, setup.camera_to_bitmap.get_property("output_bitmap"), "mesh.source.gts_poly_sphere", 0.015)
+setup = testing.setup_mesh_source_test("GTSPolySphere")
+testing.mesh_comparison(setup.document, setup.source.get_property("output_mesh"), "mesh.source.gts_poly_sphere", 1)
 
