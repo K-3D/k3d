@@ -152,8 +152,7 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 
 	if(TargetType == typeid(unsigned long))
 	{
-		return_val_if_fail(PyLong_Check(value), boost::any());
-		return boost::any(static_cast<unsigned long>(PyLong_AsLong(value)));
+		return boost::any(extract<unsigned long>(Value)());
 	}
 
 	if(TargetType == typeid(double))
