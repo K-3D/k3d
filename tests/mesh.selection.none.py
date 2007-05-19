@@ -3,7 +3,7 @@
 import k3d
 import testing
 
-setup = testing.setup_mesh_modifier_image_test("PolyGrid", "ScalePoints")
+setup = testing.setup_mesh_modifier_test("PolyGrid", "ScalePoints")
 
 setup.source.rows = 1
 setup.source.columns = 1
@@ -12,5 +12,5 @@ mesh_selection = k3d.deselect_all()
 setup.modifier.mesh_selection = mesh_selection
 setup.modifier.x = 2
 
-testing.image_comparison(setup.document, setup.camera_to_bitmap.get_property("output_bitmap"), "mesh.selection.none", 0.005)
+testing.mesh_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.selection.none", 1)
 
