@@ -208,6 +208,7 @@ def mesh_comparison(document, mesh, mesh_name, threshold):
 	reference.file = reference_file
 
 	difference = document.new_node("MeshDiff")
+	difference.threshold = threshold
 	difference.add_user_property("k3d::mesh*", "input_a", "InputA", "First input mesh")
 	difference.add_user_property("k3d::mesh*", "input_b", "InputB", "Second input mesh")
 	document.set_dependency(difference.get_property("input_a"), mesh)

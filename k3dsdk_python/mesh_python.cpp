@@ -1511,16 +1511,6 @@ const std::string mesh::str()
 	return buffer.str();
 }
 
-const bool operator==(const mesh& LHS, const mesh& RHS)
-{
-	return LHS.wrapped() == RHS.wrapped();
-}
-
-const bool operator!=(const mesh& LHS, const mesh& RHS)
-{
-	return LHS.wrapped() != RHS.wrapped();
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // export_mesh
 
@@ -1563,8 +1553,6 @@ void export_mesh()
 		.def("create_point_selection", &mesh::create_point_selection)
 		.def("create_points", &mesh::create_points)
 		.def("create_polyhedra", &mesh::create_polyhedra)
-		.def(self != self)
-		.def(self == self)
 		.def("__repr__", &mesh::repr)
 		.def("__str__", &mesh::str);
 

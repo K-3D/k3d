@@ -29,14 +29,77 @@
 namespace k3d
 {
 
-namespace diff
+/// Specialization of almost_equal that tests imaterial pointers for equality
+template<>
+class almost_equal<imaterial*>
 {
+public:
+	almost_equal(const boost::uint64_t) { } 
+	inline const bool operator()(imaterial* const A, imaterial* const B) const { return A == B; }
+};
+
+template<>
+class almost_equal<mesh::polyhedra_t::polyhedron_type>
+{
+public:
+	almost_equal(const boost::uint64_t) { } 
+	inline const bool operator()(const mesh::polyhedra_t::polyhedron_type A, const mesh::polyhedra_t::polyhedron_type B) const { return A == B; }
+};
+
+template<>
+class almost_equal<mesh::blobbies_t::primitive_type>
+{
+public:
+	almost_equal(const boost::uint64_t) { } 
+	inline const bool operator()(const mesh::blobbies_t::primitive_type A, const mesh::blobbies_t::primitive_type B) const { return A == B; }
+};
+
+template<>
+class almost_equal<mesh::blobbies_t::operator_type>
+{
+public:
+	almost_equal(const boost::uint64_t) { } 
+	inline const bool operator()(const mesh::blobbies_t::operator_type A, const mesh::blobbies_t::operator_type B) const { return A == B; }
+};
 
 namespace detail
 {
 
+/// Return true iff two arrays are equivalent (handles "fuzzy" floating-point comparisons)
+template<typename T>
+const bool equal(const typed_array<T>& A, const typed_array<T>& B, const boost::uint64_t Threshold)
+{
+	if(A.size() != B.size())
+		return false;
+
+	return std::equal(A.begin(), A.end(), B.begin(), almost_equal<T>(Threshold));
+}
+
+/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons)
+template<typename array_type>
+const bool equal(const boost::shared_ptr<array_type>& A, const boost::shared_ptr<array_type>& B, const boost::uint64_t Threshold)
+{
+	if(A.get() == B.get())
+		return true;
+
+	if(A && B)
+		return equal(*A, *B, Threshold);
+
+	return false;
+}
+
+/// Return true iff two groups of named arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons)
+const bool equal(const mesh::named_arrays& A, const mesh::named_arrays& B, const boost::uint64_t Threshold)
+{
+	if(A.empty() && B.empty())
+		return true;
+
+	assert_not_implemented();
+	return false;
+}
+
 template<typename pointer_type>
-void print(std::ostream& Stream, const std::string& Label, const pointer_type& A, const pointer_type& B)
+void print_diff(std::ostream& Stream, const std::string& Label, const pointer_type& A, const pointer_type& B)
 {
 	if(!A && !B)
 		return;
@@ -61,7 +124,7 @@ void print(std::ostream& Stream, const std::string& Label, const pointer_type& A
 }
 
 template<typename pointer_type>
-void print(std::ostream& Stream, const std::string& Label, const pointer_type& A, const pointer_type& B, const boost::uint64_t Threshold)
+void print_diff(std::ostream& Stream, const std::string& Label, const pointer_type& A, const pointer_type& B, const boost::uint64_t Threshold)
 {
 	if(!A && !B)
 		return;
@@ -83,7 +146,7 @@ void print(std::ostream& Stream, const std::string& Label, const pointer_type& A
 	Stream << format % "" % a_label_buffer.str() % b_label_buffer.str();
 	Stream << format % "" % divider % divider;
 
-	k3d::almost_equal almost_equal(Threshold);
+	k3d::almost_equal<typename pointer_type::value_type::value_type> almost_equal(Threshold);
 
 	for(size_t i = 0; i < a_size || i < b_size; ++i)
 	{
@@ -104,174 +167,323 @@ void print(std::ostream& Stream, const std::string& Label, const pointer_type& A
 }
 
 /** \todo Implement comparisons for user arrays */
-void print(std::ostream& Stream, const std::string& Label, const k3d::mesh::named_arrays& A, const k3d::mesh::named_arrays& B, const boost::uint64_t Threshold)
+void print_diff(std::ostream& Stream, const std::string& Label, const k3d::mesh::named_arrays& A, const k3d::mesh::named_arrays& B, const boost::uint64_t Threshold)
 {
-/*
-    for(k3d::mesh::named_arrays::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
-    {
-        Stream << Label << " " << array_iterator->first << " (" << array_iterator->second->size() << "): ";
-        if(typed_array<double>* const array = dynamic_cast<typed_array<double>*>(array_iterator->second.get()))
-            std::copy(array->begin(), array->end(), std::ostream_iterator<double>(Stream, " "));
-        else if(typed_array<k3d::color>* const array = dynamic_cast<typed_array<k3d::color>*>(array_iterator->second.get()))
-            std::copy(array->begin(), array->end(), std::ostream_iterator<k3d::color>(Stream, " "));
-        else
-            Stream << "<unknown type>" << std::endl;
-        Stream << "\n";
-    }
-*/
+	if(A.empty() && B.empty())
+		return;
+
+	assert_not_implemented();
 }
 
 } // namespace detail
 
-void print(std::ostream& Stream, const mesh& A, const mesh& B, const boost::uint64_t Threshold)
+const bool equal(const mesh::point_groups_t& A, const mesh::point_groups_t& B, const boost::uint64_t Threshold)
 {
-	detail::print(Stream, "point groups", A.point_groups, B.point_groups);
-	if(A.point_groups && B.point_groups)
-	{
-		detail::print(Stream, "first points", A.point_groups->first_points, B.point_groups->first_points, Threshold);
-		detail::print(Stream, "point counts", A.point_groups->point_counts, B.point_groups->point_counts, Threshold);
-		detail::print(Stream, "materials", A.point_groups->materials, B.point_groups->materials, Threshold);
-		detail::print(Stream, "constant data", A.point_groups->constant_data, B.point_groups->constant_data, Threshold);
-		detail::print(Stream, "points", A.point_groups->points, B.point_groups->points, Threshold);
-		detail::print(Stream, "varying data", A.point_groups->varying_data, B.point_groups->varying_data, Threshold);
-	}
-
-	detail::print(Stream, "linear curve groups", A.linear_curve_groups, B.linear_curve_groups);
-	if(A.linear_curve_groups && B.linear_curve_groups)
-	{
-		detail::print(Stream, "first curves", A.linear_curve_groups->first_curves, B.linear_curve_groups->first_curves, Threshold);
-		detail::print(Stream, "curve counts", A.linear_curve_groups->curve_counts, B.linear_curve_groups->curve_counts, Threshold);
-		detail::print(Stream, "periodic curves", A.linear_curve_groups->periodic_curves, B.linear_curve_groups->periodic_curves, Threshold);
-		detail::print(Stream, "materials", A.linear_curve_groups->materials, B.linear_curve_groups->materials, Threshold);
-		detail::print(Stream, "constant data", A.linear_curve_groups->constant_data, B.linear_curve_groups->constant_data, Threshold);
-		detail::print(Stream, "curve first points", A.linear_curve_groups->curve_first_points, B.linear_curve_groups->curve_first_points, Threshold);
-		detail::print(Stream, "curve point counts", A.linear_curve_groups->curve_point_counts, B.linear_curve_groups->curve_point_counts, Threshold);
-		detail::print(Stream, "curve selection", A.linear_curve_groups->curve_selection, B.linear_curve_groups->curve_selection, Threshold);
-		detail::print(Stream, "uniform data", A.linear_curve_groups->uniform_data, B.linear_curve_groups->uniform_data, Threshold);
-		detail::print(Stream, "curve points", A.linear_curve_groups->curve_points, B.linear_curve_groups->curve_points, Threshold);
-	}
-
-	detail::print(Stream, "cubic curve groups", A.cubic_curve_groups, B.cubic_curve_groups);
-	if(A.cubic_curve_groups && B.cubic_curve_groups)
-	{
-		detail::print(Stream, "first curves", A.cubic_curve_groups->first_curves, B.cubic_curve_groups->first_curves, Threshold);
-		detail::print(Stream, "curve counts", A.cubic_curve_groups->curve_counts, B.cubic_curve_groups->curve_counts, Threshold);
-		detail::print(Stream, "periodic curves", A.cubic_curve_groups->periodic_curves, B.cubic_curve_groups->periodic_curves, Threshold);
-		detail::print(Stream, "materials", A.cubic_curve_groups->materials, B.cubic_curve_groups->materials, Threshold);
-		detail::print(Stream, "constant data", A.cubic_curve_groups->constant_data, B.cubic_curve_groups->constant_data, Threshold);
-		detail::print(Stream, "curve first points", A.cubic_curve_groups->curve_first_points, B.cubic_curve_groups->curve_first_points, Threshold);
-		detail::print(Stream, "curve point counts", A.cubic_curve_groups->curve_point_counts, B.cubic_curve_groups->curve_point_counts, Threshold);
-		detail::print(Stream, "curve selection", A.cubic_curve_groups->curve_selection, B.cubic_curve_groups->curve_selection, Threshold);
-		detail::print(Stream, "uniform data", A.cubic_curve_groups->uniform_data, B.cubic_curve_groups->uniform_data, Threshold);
-		detail::print(Stream, "curve points", A.cubic_curve_groups->curve_points, B.cubic_curve_groups->curve_points, Threshold);
-	}
-
-	detail::print(Stream, "nurbs curve groups", A.nurbs_curve_groups, B.nurbs_curve_groups);
-	if(A.nurbs_curve_groups && B.nurbs_curve_groups)
-	{
-		detail::print(Stream, "first curves", A.nurbs_curve_groups->first_curves, B.nurbs_curve_groups->first_curves, Threshold);
-		detail::print(Stream, "curve counts", A.nurbs_curve_groups->curve_counts, B.nurbs_curve_groups->curve_counts, Threshold);
-		detail::print(Stream, "materials", A.nurbs_curve_groups->materials, B.nurbs_curve_groups->materials, Threshold);
-		detail::print(Stream, "constant data", A.nurbs_curve_groups->constant_data, B.nurbs_curve_groups->constant_data, Threshold);
-		detail::print(Stream, "curve first points", A.nurbs_curve_groups->curve_first_points, B.nurbs_curve_groups->curve_first_points, Threshold);
-		detail::print(Stream, "curve point counts", A.nurbs_curve_groups->curve_point_counts, B.nurbs_curve_groups->curve_point_counts, Threshold);
-		detail::print(Stream, "curve orders", A.nurbs_curve_groups->curve_orders, B.nurbs_curve_groups->curve_orders, Threshold);
-		detail::print(Stream, "curve selection", A.nurbs_curve_groups->curve_selection, B.nurbs_curve_groups->curve_selection, Threshold);
-		detail::print(Stream, "uniform data", A.nurbs_curve_groups->uniform_data, B.nurbs_curve_groups->uniform_data, Threshold);
-		detail::print(Stream, "curve points", A.nurbs_curve_groups->curve_points, B.nurbs_curve_groups->curve_points, Threshold);
-		detail::print(Stream, "curve point weights", A.nurbs_curve_groups->curve_point_weights, B.nurbs_curve_groups->curve_point_weights, Threshold);
-		detail::print(Stream, "curve knots", A.nurbs_curve_groups->curve_knots, B.nurbs_curve_groups->curve_knots, Threshold);
-	}
-
-	detail::print(Stream, "bilinear patches", A.bilinear_patches, B.bilinear_patches);
-	if(A.bilinear_patches && B.bilinear_patches)
-	{
-		detail::print(Stream, "patch selection", A.bilinear_patches->patch_selection, B.bilinear_patches->patch_selection, Threshold);
-		detail::print(Stream, "patch materials", A.bilinear_patches->patch_materials, B.bilinear_patches->patch_materials, Threshold);
-		detail::print(Stream, "constant data", A.bilinear_patches->constant_data, B.bilinear_patches->constant_data, Threshold);
-		detail::print(Stream, "uniform data", A.bilinear_patches->uniform_data, B.bilinear_patches->uniform_data, Threshold);
-		detail::print(Stream, "patch points", A.bilinear_patches->patch_points, B.bilinear_patches->patch_points, Threshold);
-		detail::print(Stream, "varying data", A.bilinear_patches->varying_data, B.bilinear_patches->varying_data, Threshold);
-	}
-
-	detail::print(Stream, "bicubic patches", A.bicubic_patches, B.bicubic_patches);
-	if(A.bicubic_patches && B.bicubic_patches)
-	{
-		detail::print(Stream, "patch selection", A.bicubic_patches->patch_selection, B.bicubic_patches->patch_selection, Threshold);
-		detail::print(Stream, "patch materials", A.bicubic_patches->patch_materials, B.bicubic_patches->patch_materials, Threshold);
-		detail::print(Stream, "constant data", A.bicubic_patches->constant_data, B.bicubic_patches->constant_data, Threshold);
-		detail::print(Stream, "uniform data", A.bicubic_patches->uniform_data, B.bicubic_patches->uniform_data, Threshold);
-		detail::print(Stream, "patch points", A.bicubic_patches->patch_points, B.bicubic_patches->patch_points, Threshold);
-		detail::print(Stream, "varying data", A.bicubic_patches->varying_data, B.bicubic_patches->varying_data, Threshold);
-	}
-
-	detail::print(Stream, "nurbs patches", A.nurbs_patches, B.nurbs_patches);
-	if(A.nurbs_patches && B.nurbs_patches)
-	{
-		detail::print(Stream, "patch first points", A.nurbs_patches->patch_first_points, B.nurbs_patches->patch_first_points, Threshold);
-		detail::print(Stream, "patch u point counts", A.nurbs_patches->patch_u_point_counts, B.nurbs_patches->patch_u_point_counts, Threshold);
-		detail::print(Stream, "patch v point counts", A.nurbs_patches->patch_v_point_counts, B.nurbs_patches->patch_v_point_counts, Threshold);
-		detail::print(Stream, "patch u orders", A.nurbs_patches->patch_u_orders, B.nurbs_patches->patch_u_orders, Threshold);
-		detail::print(Stream, "patch v orders", A.nurbs_patches->patch_v_orders, B.nurbs_patches->patch_v_orders, Threshold);
-		detail::print(Stream, "patch selection", A.nurbs_patches->patch_selection, B.nurbs_patches->patch_selection, Threshold);
-		detail::print(Stream, "patch materials", A.nurbs_patches->patch_materials, B.nurbs_patches->patch_materials, Threshold);
-		detail::print(Stream, "constant data", A.nurbs_patches->constant_data, B.nurbs_patches->constant_data, Threshold);
-		detail::print(Stream, "uniform data", A.nurbs_patches->uniform_data, B.nurbs_patches->uniform_data, Threshold);
-		detail::print(Stream, "patch points", A.nurbs_patches->patch_points, B.nurbs_patches->patch_points, Threshold);
-		detail::print(Stream, "patch point weights", A.nurbs_patches->patch_point_weights, B.nurbs_patches->patch_point_weights, Threshold);
-		detail::print(Stream, "patch u knots", A.nurbs_patches->patch_u_knots, B.nurbs_patches->patch_u_knots, Threshold);
-		detail::print(Stream, "patch v knots", A.nurbs_patches->patch_v_knots, B.nurbs_patches->patch_v_knots, Threshold);
-		detail::print(Stream, "varying data", A.nurbs_patches->varying_data, B.nurbs_patches->varying_data, Threshold);
-	}
-
-	detail::print(Stream, "polyhedra", A.polyhedra, B.polyhedra);
-	if(A.polyhedra && B.polyhedra)
-	{
-		detail::print(Stream, "first faces", A.polyhedra->first_faces, B.polyhedra->first_faces, Threshold);
-		detail::print(Stream, "face counts", A.polyhedra->face_counts, B.polyhedra->face_counts, Threshold);
-		detail::print(Stream, "types", A.polyhedra->types, B.polyhedra->types, Threshold);
-		detail::print(Stream, "constant data", A.polyhedra->constant_data, B.polyhedra->constant_data, Threshold);
-		detail::print(Stream, "face first loops", A.polyhedra->face_first_loops, B.polyhedra->face_first_loops, Threshold);
-		detail::print(Stream, "face loop counts", A.polyhedra->face_loop_counts, B.polyhedra->face_loop_counts, Threshold);
-		detail::print(Stream, "face selection", A.polyhedra->face_selection, B.polyhedra->face_selection, Threshold);
-		detail::print(Stream, "face materials", A.polyhedra->face_materials, B.polyhedra->face_materials, Threshold);
-		detail::print(Stream, "uniform data", A.polyhedra->uniform_data, B.polyhedra->uniform_data, Threshold);
-		detail::print(Stream, "loop first edges", A.polyhedra->loop_first_edges, B.polyhedra->loop_first_edges, Threshold);
-		detail::print(Stream, "edge points", A.polyhedra->edge_points, B.polyhedra->edge_points, Threshold);
-		detail::print(Stream, "clockwise edges", A.polyhedra->clockwise_edges, B.polyhedra->clockwise_edges, Threshold);
-		detail::print(Stream, "edge selection", A.polyhedra->edge_selection, B.polyhedra->edge_selection, Threshold);
-		detail::print(Stream, "face varying data", A.polyhedra->face_varying_data, B.polyhedra->face_varying_data, Threshold);
-	}
-
-	detail::print(Stream, "blobbies", A.blobbies, B.blobbies);
-	if(A.blobbies && B.blobbies)
-	{
-		detail::print(Stream, "first primitives", A.blobbies->first_primitives, B.blobbies->first_primitives, Threshold);
-		detail::print(Stream, "primitive counts", A.blobbies->primitive_counts, B.blobbies->primitive_counts, Threshold);
-		detail::print(Stream, "first operators", A.blobbies->first_operators, B.blobbies->first_operators, Threshold);
-		detail::print(Stream, "operator counts", A.blobbies->operator_counts, B.blobbies->operator_counts, Threshold);
-		detail::print(Stream, "materials", A.blobbies->materials, B.blobbies->materials, Threshold);
-		detail::print(Stream, "constant data", A.blobbies->constant_data, B.blobbies->constant_data, Threshold);
-		detail::print(Stream, "uniform data", A.blobbies->uniform_data, B.blobbies->uniform_data, Threshold);
-		detail::print(Stream, "primitives", A.blobbies->primitives, B.blobbies->primitives, Threshold);
-		detail::print(Stream, "primitive first floats", A.blobbies->primitive_first_floats, B.blobbies->primitive_first_floats, Threshold);
-		detail::print(Stream, "primitive float counts", A.blobbies->primitive_float_counts, B.blobbies->primitive_float_counts, Threshold);
-		detail::print(Stream, "varying data", A.blobbies->varying_data, B.blobbies->varying_data, Threshold);
-		detail::print(Stream, "vertex data", A.blobbies->vertex_data, B.blobbies->vertex_data, Threshold);
-		detail::print(Stream, "operators", A.blobbies->operators, B.blobbies->operators, Threshold);
-		detail::print(Stream, "operator first operands", A.blobbies->operator_first_operands, B.blobbies->operator_first_operands, Threshold);
-		detail::print(Stream, "operator operand counts", A.blobbies->operator_operand_counts, B.blobbies->operator_operand_counts, Threshold);
-		detail::print(Stream, "floats", A.blobbies->floats, B.blobbies->floats, Threshold);
-		detail::print(Stream, "operands", A.blobbies->operands, B.blobbies->operands, Threshold);
-	}
-
-	detail::print(Stream, "mesh", &A, &B);
-	detail::print(Stream, "points", A.points, B.points, Threshold);
-	detail::print(Stream, "point selection", A.point_selection, B.point_selection, Threshold);
-	detail::print(Stream, "vertex data", A.vertex_data, B.vertex_data, Threshold);
+	return
+		detail::equal(A.first_points, B.first_points, Threshold) &&
+		detail::equal(A.point_counts, B.point_counts, Threshold) &&
+		detail::equal(A.materials, B.materials, Threshold) &&
+		detail::equal(A.constant_data, B.constant_data, Threshold) &&
+		detail::equal(A.points, B.points, Threshold) &&
+		detail::equal(A.varying_data, B.varying_data, Threshold);
 }
 
-} // namespace diff
+const bool equal(const mesh::linear_curve_groups_t& A, const mesh::linear_curve_groups_t& B, const boost::uint64_t Threshold)
+{
+	return
+		detail::equal(A.first_curves, B.first_curves, Threshold) &&
+		detail::equal(A.curve_counts, B.curve_counts, Threshold) &&
+		detail::equal(A.periodic_curves, B.periodic_curves, Threshold) &&
+		detail::equal(A.materials, B.materials, Threshold) &&
+		detail::equal(A.constant_data, B.constant_data, Threshold) &&
+		detail::equal(A.curve_first_points, B.curve_first_points, Threshold) &&
+		detail::equal(A.curve_point_counts, B.curve_point_counts, Threshold) &&
+		detail::equal(A.curve_selection, B.curve_selection, Threshold) &&
+		detail::equal(A.uniform_data, B.uniform_data, Threshold) &&
+		detail::equal(A.curve_points, B.curve_points, Threshold);
+}
+
+const bool equal(const mesh::cubic_curve_groups_t& A, const mesh::cubic_curve_groups_t& B, const boost::uint64_t Threshold)
+{
+	return
+		detail::equal(A.first_curves, B.first_curves, Threshold) &&
+		detail::equal(A.curve_counts, B.curve_counts, Threshold) &&
+		detail::equal(A.periodic_curves, B.periodic_curves, Threshold) &&
+		detail::equal(A.materials, B.materials, Threshold) &&
+		detail::equal(A.constant_data, B.constant_data, Threshold) &&
+		detail::equal(A.curve_first_points, B.curve_first_points, Threshold) &&
+		detail::equal(A.curve_point_counts, B.curve_point_counts, Threshold) &&
+		detail::equal(A.curve_selection, B.curve_selection, Threshold) &&
+		detail::equal(A.uniform_data, B.uniform_data, Threshold) &&
+		detail::equal(A.curve_points, B.curve_points, Threshold);
+}
+
+const bool equal(const mesh::nurbs_curve_groups_t& A, const mesh::nurbs_curve_groups_t& B, const boost::uint64_t Threshold)
+{
+	return
+		detail::equal(A.first_curves, B.first_curves, Threshold) &&
+		detail::equal(A.curve_counts, B.curve_counts, Threshold) &&
+		detail::equal(A.materials, B.materials, Threshold) &&
+		detail::equal(A.constant_data, B.constant_data, Threshold) &&
+		detail::equal(A.curve_first_points, B.curve_first_points, Threshold) &&
+		detail::equal(A.curve_point_counts, B.curve_point_counts, Threshold) &&
+		detail::equal(A.curve_orders, B.curve_orders, Threshold) &&
+		detail::equal(A.curve_first_knots, B.curve_first_knots, Threshold) &&
+		detail::equal(A.curve_selection, B.curve_selection, Threshold) &&
+		detail::equal(A.uniform_data, B.uniform_data, Threshold) &&
+		detail::equal(A.curve_points, B.curve_points, Threshold) &&
+		detail::equal(A.curve_point_weights, B.curve_point_weights, Threshold) &&
+		detail::equal(A.curve_knots, B.curve_knots, Threshold);
+}
+
+const bool equal(const mesh::bilinear_patches_t& A, const mesh::bilinear_patches_t& B, const boost::uint64_t Threshold)
+{
+	return
+		detail::equal(A.patch_selection, B.patch_selection, Threshold) &&
+		detail::equal(A.patch_materials, B.patch_materials, Threshold) &&
+		detail::equal(A.constant_data, B.constant_data, Threshold) &&
+		detail::equal(A.uniform_data, B.uniform_data, Threshold) &&
+		detail::equal(A.patch_points, B.patch_points, Threshold) &&
+		detail::equal(A.varying_data, B.varying_data, Threshold);
+}
+
+const bool equal(const mesh::bicubic_patches_t& A, const mesh::bicubic_patches_t& B, const boost::uint64_t Threshold)
+{
+	return
+		detail::equal(A.patch_selection, B.patch_selection, Threshold) &&
+		detail::equal(A.patch_materials, B.patch_materials, Threshold) &&
+		detail::equal(A.constant_data, B.constant_data, Threshold) &&
+		detail::equal(A.uniform_data, B.uniform_data, Threshold) &&
+		detail::equal(A.patch_points, B.patch_points, Threshold) &&
+		detail::equal(A.varying_data, B.varying_data, Threshold);
+}
+
+const bool equal(const mesh::nurbs_patches_t& A, const mesh::nurbs_patches_t& B, const boost::uint64_t Threshold)
+{
+	return
+		detail::equal(A.patch_first_points, B.patch_first_points, Threshold) &&
+		detail::equal(A.patch_u_point_counts, B.patch_u_point_counts, Threshold) &&
+		detail::equal(A.patch_v_point_counts, B.patch_v_point_counts, Threshold) &&
+		detail::equal(A.patch_u_orders, B.patch_u_orders, Threshold) &&
+		detail::equal(A.patch_v_orders, B.patch_v_orders, Threshold) &&
+		detail::equal(A.patch_u_first_knots, B.patch_u_first_knots, Threshold) &&
+		detail::equal(A.patch_v_first_knots, B.patch_v_first_knots, Threshold) &&
+		detail::equal(A.patch_selection, B.patch_selection, Threshold) &&
+		detail::equal(A.patch_materials, B.patch_materials, Threshold) &&
+		detail::equal(A.constant_data, B.constant_data, Threshold) &&
+		detail::equal(A.uniform_data, B.uniform_data, Threshold) &&
+		detail::equal(A.patch_points, B.patch_points, Threshold) &&
+		detail::equal(A.patch_point_weights, B.patch_point_weights, Threshold) &&
+		detail::equal(A.patch_u_knots, B.patch_u_knots, Threshold) &&
+		detail::equal(A.patch_v_knots, B.patch_v_knots, Threshold) &&
+		detail::equal(A.varying_data, B.varying_data, Threshold);
+}
+
+const bool equal(const mesh::polyhedra_t& A, const mesh::polyhedra_t& B, const boost::uint64_t Threshold)
+{
+	return
+		detail::equal(A.first_faces, B.first_faces, Threshold) &&
+		detail::equal(A.face_counts, B.face_counts, Threshold) &&
+		detail::equal(A.types, B.types, Threshold) &&
+		detail::equal(A.constant_data, B.constant_data, Threshold) &&
+		detail::equal(A.face_first_loops, B.face_first_loops, Threshold) &&
+		detail::equal(A.face_loop_counts, B.face_loop_counts, Threshold) &&
+		detail::equal(A.face_selection, B.face_selection, Threshold) &&
+		detail::equal(A.face_materials, B.face_materials, Threshold) &&
+		detail::equal(A.uniform_data, B.uniform_data, Threshold) &&
+		detail::equal(A.loop_first_edges, B.loop_first_edges, Threshold) &&
+		detail::equal(A.edge_points, B.edge_points, Threshold) &&
+		detail::equal(A.clockwise_edges, B.clockwise_edges, Threshold) &&
+		detail::equal(A.edge_selection, B.edge_selection, Threshold) &&
+		detail::equal(A.face_varying_data, B.face_varying_data, Threshold);
+}
+
+const bool equal(const mesh::blobbies_t& A, const mesh::blobbies_t& B, const boost::uint64_t Threshold)
+{
+	return
+		detail::equal(A.first_primitives, B.first_primitives, Threshold) &&
+		detail::equal(A.primitive_counts, B.primitive_counts, Threshold) &&
+		detail::equal(A.first_operators, B.first_operators, Threshold) &&
+		detail::equal(A.operator_counts, B.operator_counts, Threshold) &&
+		detail::equal(A.materials, B.materials, Threshold) &&
+		detail::equal(A.constant_data, B.constant_data, Threshold) &&
+		detail::equal(A.uniform_data, B.uniform_data, Threshold) &&
+		detail::equal(A.primitives, B.primitives, Threshold) &&
+		detail::equal(A.primitive_first_floats, B.primitive_first_floats, Threshold) &&
+		detail::equal(A.primitive_float_counts, B.primitive_float_counts, Threshold) &&
+		detail::equal(A.varying_data, B.varying_data, Threshold) &&
+		detail::equal(A.vertex_data, B.vertex_data, Threshold) &&
+		detail::equal(A.operators, B.operators, Threshold) &&
+		detail::equal(A.operator_first_operands, B.operator_first_operands, Threshold) &&
+		detail::equal(A.operator_operand_counts, B.operator_operand_counts, Threshold) &&
+		detail::equal(A.floats, B.floats, Threshold) &&
+		detail::equal(A.operands, B.operands, Threshold);
+}
+
+const bool equal(const mesh& A, const mesh& B, const boost::uint64_t Threshold)
+{
+	return
+		detail::equal(A.points, B.points, Threshold) &&
+		detail::equal(A.point_selection, B.point_selection, Threshold) &&
+		detail::equal(A.vertex_data, B.vertex_data, Threshold) &&
+		detail::equal(A.point_groups, B.point_groups, Threshold) &&
+		detail::equal(A.linear_curve_groups, B.linear_curve_groups, Threshold) &&
+		detail::equal(A.cubic_curve_groups, B.cubic_curve_groups, Threshold) &&
+		detail::equal(A.nurbs_curve_groups, B.nurbs_curve_groups, Threshold) &&
+		detail::equal(A.bilinear_patches, B.bilinear_patches, Threshold) &&
+		detail::equal(A.bicubic_patches, B.bicubic_patches, Threshold) &&
+		detail::equal(A.nurbs_patches, B.nurbs_patches, Threshold) &&
+		detail::equal(A.polyhedra, B.polyhedra, Threshold) &&
+		detail::equal(A.blobbies, B.blobbies, Threshold);
+}
+
+void print_diff(std::ostream& Stream, const mesh& A, const mesh& B, const boost::uint64_t Threshold)
+{
+	detail::print_diff(Stream, "point groups", A.point_groups, B.point_groups);
+	if(A.point_groups && B.point_groups)
+	{
+		detail::print_diff(Stream, "first points", A.point_groups->first_points, B.point_groups->first_points, Threshold);
+		detail::print_diff(Stream, "point counts", A.point_groups->point_counts, B.point_groups->point_counts, Threshold);
+		detail::print_diff(Stream, "materials", A.point_groups->materials, B.point_groups->materials, Threshold);
+		detail::print_diff(Stream, "constant data", A.point_groups->constant_data, B.point_groups->constant_data, Threshold);
+		detail::print_diff(Stream, "points", A.point_groups->points, B.point_groups->points, Threshold);
+		detail::print_diff(Stream, "varying data", A.point_groups->varying_data, B.point_groups->varying_data, Threshold);
+	}
+
+	detail::print_diff(Stream, "linear curve groups", A.linear_curve_groups, B.linear_curve_groups);
+	if(A.linear_curve_groups && B.linear_curve_groups)
+	{
+		detail::print_diff(Stream, "first curves", A.linear_curve_groups->first_curves, B.linear_curve_groups->first_curves, Threshold);
+		detail::print_diff(Stream, "curve counts", A.linear_curve_groups->curve_counts, B.linear_curve_groups->curve_counts, Threshold);
+		detail::print_diff(Stream, "periodic curves", A.linear_curve_groups->periodic_curves, B.linear_curve_groups->periodic_curves, Threshold);
+		detail::print_diff(Stream, "materials", A.linear_curve_groups->materials, B.linear_curve_groups->materials, Threshold);
+		detail::print_diff(Stream, "constant data", A.linear_curve_groups->constant_data, B.linear_curve_groups->constant_data, Threshold);
+		detail::print_diff(Stream, "curve first points", A.linear_curve_groups->curve_first_points, B.linear_curve_groups->curve_first_points, Threshold);
+		detail::print_diff(Stream, "curve point counts", A.linear_curve_groups->curve_point_counts, B.linear_curve_groups->curve_point_counts, Threshold);
+		detail::print_diff(Stream, "curve selection", A.linear_curve_groups->curve_selection, B.linear_curve_groups->curve_selection, Threshold);
+		detail::print_diff(Stream, "uniform data", A.linear_curve_groups->uniform_data, B.linear_curve_groups->uniform_data, Threshold);
+		detail::print_diff(Stream, "curve points", A.linear_curve_groups->curve_points, B.linear_curve_groups->curve_points, Threshold);
+	}
+
+	detail::print_diff(Stream, "cubic curve groups", A.cubic_curve_groups, B.cubic_curve_groups);
+	if(A.cubic_curve_groups && B.cubic_curve_groups)
+	{
+		detail::print_diff(Stream, "first curves", A.cubic_curve_groups->first_curves, B.cubic_curve_groups->first_curves, Threshold);
+		detail::print_diff(Stream, "curve counts", A.cubic_curve_groups->curve_counts, B.cubic_curve_groups->curve_counts, Threshold);
+		detail::print_diff(Stream, "periodic curves", A.cubic_curve_groups->periodic_curves, B.cubic_curve_groups->periodic_curves, Threshold);
+		detail::print_diff(Stream, "materials", A.cubic_curve_groups->materials, B.cubic_curve_groups->materials, Threshold);
+		detail::print_diff(Stream, "constant data", A.cubic_curve_groups->constant_data, B.cubic_curve_groups->constant_data, Threshold);
+		detail::print_diff(Stream, "curve first points", A.cubic_curve_groups->curve_first_points, B.cubic_curve_groups->curve_first_points, Threshold);
+		detail::print_diff(Stream, "curve point counts", A.cubic_curve_groups->curve_point_counts, B.cubic_curve_groups->curve_point_counts, Threshold);
+		detail::print_diff(Stream, "curve selection", A.cubic_curve_groups->curve_selection, B.cubic_curve_groups->curve_selection, Threshold);
+		detail::print_diff(Stream, "uniform data", A.cubic_curve_groups->uniform_data, B.cubic_curve_groups->uniform_data, Threshold);
+		detail::print_diff(Stream, "curve points", A.cubic_curve_groups->curve_points, B.cubic_curve_groups->curve_points, Threshold);
+	}
+
+	detail::print_diff(Stream, "nurbs curve groups", A.nurbs_curve_groups, B.nurbs_curve_groups);
+	if(A.nurbs_curve_groups && B.nurbs_curve_groups)
+	{
+		detail::print_diff(Stream, "first curves", A.nurbs_curve_groups->first_curves, B.nurbs_curve_groups->first_curves, Threshold);
+		detail::print_diff(Stream, "curve counts", A.nurbs_curve_groups->curve_counts, B.nurbs_curve_groups->curve_counts, Threshold);
+		detail::print_diff(Stream, "materials", A.nurbs_curve_groups->materials, B.nurbs_curve_groups->materials, Threshold);
+		detail::print_diff(Stream, "constant data", A.nurbs_curve_groups->constant_data, B.nurbs_curve_groups->constant_data, Threshold);
+		detail::print_diff(Stream, "curve first points", A.nurbs_curve_groups->curve_first_points, B.nurbs_curve_groups->curve_first_points, Threshold);
+		detail::print_diff(Stream, "curve point counts", A.nurbs_curve_groups->curve_point_counts, B.nurbs_curve_groups->curve_point_counts, Threshold);
+		detail::print_diff(Stream, "curve orders", A.nurbs_curve_groups->curve_orders, B.nurbs_curve_groups->curve_orders, Threshold);
+		detail::print_diff(Stream, "curve selection", A.nurbs_curve_groups->curve_selection, B.nurbs_curve_groups->curve_selection, Threshold);
+		detail::print_diff(Stream, "uniform data", A.nurbs_curve_groups->uniform_data, B.nurbs_curve_groups->uniform_data, Threshold);
+		detail::print_diff(Stream, "curve points", A.nurbs_curve_groups->curve_points, B.nurbs_curve_groups->curve_points, Threshold);
+		detail::print_diff(Stream, "curve point weights", A.nurbs_curve_groups->curve_point_weights, B.nurbs_curve_groups->curve_point_weights, Threshold);
+		detail::print_diff(Stream, "curve knots", A.nurbs_curve_groups->curve_knots, B.nurbs_curve_groups->curve_knots, Threshold);
+	}
+
+	detail::print_diff(Stream, "bilinear patches", A.bilinear_patches, B.bilinear_patches);
+	if(A.bilinear_patches && B.bilinear_patches)
+	{
+		detail::print_diff(Stream, "patch selection", A.bilinear_patches->patch_selection, B.bilinear_patches->patch_selection, Threshold);
+		detail::print_diff(Stream, "patch materials", A.bilinear_patches->patch_materials, B.bilinear_patches->patch_materials, Threshold);
+		detail::print_diff(Stream, "constant data", A.bilinear_patches->constant_data, B.bilinear_patches->constant_data, Threshold);
+		detail::print_diff(Stream, "uniform data", A.bilinear_patches->uniform_data, B.bilinear_patches->uniform_data, Threshold);
+		detail::print_diff(Stream, "patch points", A.bilinear_patches->patch_points, B.bilinear_patches->patch_points, Threshold);
+		detail::print_diff(Stream, "varying data", A.bilinear_patches->varying_data, B.bilinear_patches->varying_data, Threshold);
+	}
+
+	detail::print_diff(Stream, "bicubic patches", A.bicubic_patches, B.bicubic_patches);
+	if(A.bicubic_patches && B.bicubic_patches)
+	{
+		detail::print_diff(Stream, "patch selection", A.bicubic_patches->patch_selection, B.bicubic_patches->patch_selection, Threshold);
+		detail::print_diff(Stream, "patch materials", A.bicubic_patches->patch_materials, B.bicubic_patches->patch_materials, Threshold);
+		detail::print_diff(Stream, "constant data", A.bicubic_patches->constant_data, B.bicubic_patches->constant_data, Threshold);
+		detail::print_diff(Stream, "uniform data", A.bicubic_patches->uniform_data, B.bicubic_patches->uniform_data, Threshold);
+		detail::print_diff(Stream, "patch points", A.bicubic_patches->patch_points, B.bicubic_patches->patch_points, Threshold);
+		detail::print_diff(Stream, "varying data", A.bicubic_patches->varying_data, B.bicubic_patches->varying_data, Threshold);
+	}
+
+	detail::print_diff(Stream, "nurbs patches", A.nurbs_patches, B.nurbs_patches);
+	if(A.nurbs_patches && B.nurbs_patches)
+	{
+		detail::print_diff(Stream, "patch first points", A.nurbs_patches->patch_first_points, B.nurbs_patches->patch_first_points, Threshold);
+		detail::print_diff(Stream, "patch u point counts", A.nurbs_patches->patch_u_point_counts, B.nurbs_patches->patch_u_point_counts, Threshold);
+		detail::print_diff(Stream, "patch v point counts", A.nurbs_patches->patch_v_point_counts, B.nurbs_patches->patch_v_point_counts, Threshold);
+		detail::print_diff(Stream, "patch u orders", A.nurbs_patches->patch_u_orders, B.nurbs_patches->patch_u_orders, Threshold);
+		detail::print_diff(Stream, "patch v orders", A.nurbs_patches->patch_v_orders, B.nurbs_patches->patch_v_orders, Threshold);
+		detail::print_diff(Stream, "patch selection", A.nurbs_patches->patch_selection, B.nurbs_patches->patch_selection, Threshold);
+		detail::print_diff(Stream, "patch materials", A.nurbs_patches->patch_materials, B.nurbs_patches->patch_materials, Threshold);
+		detail::print_diff(Stream, "constant data", A.nurbs_patches->constant_data, B.nurbs_patches->constant_data, Threshold);
+		detail::print_diff(Stream, "uniform data", A.nurbs_patches->uniform_data, B.nurbs_patches->uniform_data, Threshold);
+		detail::print_diff(Stream, "patch points", A.nurbs_patches->patch_points, B.nurbs_patches->patch_points, Threshold);
+		detail::print_diff(Stream, "patch point weights", A.nurbs_patches->patch_point_weights, B.nurbs_patches->patch_point_weights, Threshold);
+		detail::print_diff(Stream, "patch u knots", A.nurbs_patches->patch_u_knots, B.nurbs_patches->patch_u_knots, Threshold);
+		detail::print_diff(Stream, "patch v knots", A.nurbs_patches->patch_v_knots, B.nurbs_patches->patch_v_knots, Threshold);
+		detail::print_diff(Stream, "varying data", A.nurbs_patches->varying_data, B.nurbs_patches->varying_data, Threshold);
+	}
+
+	detail::print_diff(Stream, "polyhedra", A.polyhedra, B.polyhedra);
+	if(A.polyhedra && B.polyhedra)
+	{
+		detail::print_diff(Stream, "first faces", A.polyhedra->first_faces, B.polyhedra->first_faces, Threshold);
+		detail::print_diff(Stream, "face counts", A.polyhedra->face_counts, B.polyhedra->face_counts, Threshold);
+		detail::print_diff(Stream, "types", A.polyhedra->types, B.polyhedra->types, Threshold);
+		detail::print_diff(Stream, "constant data", A.polyhedra->constant_data, B.polyhedra->constant_data, Threshold);
+		detail::print_diff(Stream, "face first loops", A.polyhedra->face_first_loops, B.polyhedra->face_first_loops, Threshold);
+		detail::print_diff(Stream, "face loop counts", A.polyhedra->face_loop_counts, B.polyhedra->face_loop_counts, Threshold);
+		detail::print_diff(Stream, "face selection", A.polyhedra->face_selection, B.polyhedra->face_selection, Threshold);
+		detail::print_diff(Stream, "face materials", A.polyhedra->face_materials, B.polyhedra->face_materials, Threshold);
+		detail::print_diff(Stream, "uniform data", A.polyhedra->uniform_data, B.polyhedra->uniform_data, Threshold);
+		detail::print_diff(Stream, "loop first edges", A.polyhedra->loop_first_edges, B.polyhedra->loop_first_edges, Threshold);
+		detail::print_diff(Stream, "edge points", A.polyhedra->edge_points, B.polyhedra->edge_points, Threshold);
+		detail::print_diff(Stream, "clockwise edges", A.polyhedra->clockwise_edges, B.polyhedra->clockwise_edges, Threshold);
+		detail::print_diff(Stream, "edge selection", A.polyhedra->edge_selection, B.polyhedra->edge_selection, Threshold);
+		detail::print_diff(Stream, "face varying data", A.polyhedra->face_varying_data, B.polyhedra->face_varying_data, Threshold);
+	}
+
+	detail::print_diff(Stream, "blobbies", A.blobbies, B.blobbies);
+	if(A.blobbies && B.blobbies)
+	{
+		detail::print_diff(Stream, "first primitives", A.blobbies->first_primitives, B.blobbies->first_primitives, Threshold);
+		detail::print_diff(Stream, "primitive counts", A.blobbies->primitive_counts, B.blobbies->primitive_counts, Threshold);
+		detail::print_diff(Stream, "first operators", A.blobbies->first_operators, B.blobbies->first_operators, Threshold);
+		detail::print_diff(Stream, "operator counts", A.blobbies->operator_counts, B.blobbies->operator_counts, Threshold);
+		detail::print_diff(Stream, "materials", A.blobbies->materials, B.blobbies->materials, Threshold);
+		detail::print_diff(Stream, "constant data", A.blobbies->constant_data, B.blobbies->constant_data, Threshold);
+		detail::print_diff(Stream, "uniform data", A.blobbies->uniform_data, B.blobbies->uniform_data, Threshold);
+		detail::print_diff(Stream, "primitives", A.blobbies->primitives, B.blobbies->primitives, Threshold);
+		detail::print_diff(Stream, "primitive first floats", A.blobbies->primitive_first_floats, B.blobbies->primitive_first_floats, Threshold);
+		detail::print_diff(Stream, "primitive float counts", A.blobbies->primitive_float_counts, B.blobbies->primitive_float_counts, Threshold);
+		detail::print_diff(Stream, "varying data", A.blobbies->varying_data, B.blobbies->varying_data, Threshold);
+		detail::print_diff(Stream, "vertex data", A.blobbies->vertex_data, B.blobbies->vertex_data, Threshold);
+		detail::print_diff(Stream, "operators", A.blobbies->operators, B.blobbies->operators, Threshold);
+		detail::print_diff(Stream, "operator first operands", A.blobbies->operator_first_operands, B.blobbies->operator_first_operands, Threshold);
+		detail::print_diff(Stream, "operator operand counts", A.blobbies->operator_operand_counts, B.blobbies->operator_operand_counts, Threshold);
+		detail::print_diff(Stream, "floats", A.blobbies->floats, B.blobbies->floats, Threshold);
+		detail::print_diff(Stream, "operands", A.blobbies->operands, B.blobbies->operands, Threshold);
+	}
+
+	detail::print_diff(Stream, "mesh", &A, &B);
+	detail::print_diff(Stream, "points", A.points, B.points, Threshold);
+	detail::print_diff(Stream, "point selection", A.point_selection, B.point_selection, Threshold);
+	detail::print_diff(Stream, "vertex data", A.vertex_data, B.vertex_data, Threshold);
+}
 
 } // namespace k3d
 

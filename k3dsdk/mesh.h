@@ -81,11 +81,6 @@ public:
 		boost::shared_ptr<const indices_t> points;
 		/// Stores user-defined per-point-group-point data (maps to RenderMan varying data)
 		named_arrays varying_data;
-
-		/// Equality
-		const bool operator==(const point_groups_t& RHS) const;
-		/// Inequality
-		const bool operator!=(const point_groups_t& RHS) const;
 	};
 
 	/// Defines storage for linear curve groups
@@ -112,11 +107,6 @@ public:
 		named_arrays uniform_data;
 		/// Stores per-curve point lists
 		boost::shared_ptr<const indices_t> curve_points;
-
-		/// Equality
-		const bool operator==(const linear_curve_groups_t& RHS) const;
-		/// Inequality
-		const bool operator!=(const linear_curve_groups_t& RHS) const;
 	};
 
 	/// Defines storage for cubic curve groups
@@ -143,11 +133,6 @@ public:
 		named_arrays uniform_data;
 		/// Stores per-curve point lists
 		boost::shared_ptr<const indices_t> curve_points;
-
-		/// Equality
-		const bool operator==(const cubic_curve_groups_t& RHS) const;
-		/// Inequality
-		const bool operator!=(const cubic_curve_groups_t& RHS) const;
 	};
 
 	/// Defines storage for NURBS curve groups
@@ -180,11 +165,6 @@ public:
 		boost::shared_ptr<const weights_t> curve_point_weights;
 		/// Stores per-curve knot vectors
 		boost::shared_ptr<const knots_t> curve_knots;
-
-		/// Equality
-		const bool operator==(const nurbs_curve_groups_t& RHS) const;
-		/// Inequality
-		const bool operator!=(const nurbs_curve_groups_t& RHS) const;
 	};
 
 	/// Defines storage for bilinear patches
@@ -203,11 +183,6 @@ public:
 		boost::shared_ptr<const indices_t> patch_points;
 		/// Stores user-defined per-parametric-corner data (maps to RenderMan varying data)
 		named_arrays varying_data;
-
-		/// Equality
-		const bool operator==(const bilinear_patches_t& RHS) const;
-		/// Inequality
-		const bool operator!=(const bilinear_patches_t& RHS) const;
 	};
 	
 	/// Defines storage for bicubic patches
@@ -226,11 +201,6 @@ public:
 		boost::shared_ptr<const indices_t> patch_points;
 		/// Stores the set of per-parametric-corner data (maps to RenderMan varying data)
 		named_arrays varying_data;
-
-		/// Equality
-		const bool operator==(const bicubic_patches_t& RHS) const;
-		/// Inequality
-		const bool operator!=(const bicubic_patches_t& RHS) const;
 	};
 	
 	/// Defines storage for NURBS patches
@@ -269,11 +239,6 @@ public:
 		boost::shared_ptr<const knots_t> patch_v_knots;
 		/// Stores user-defined per-parametric-corner data (maps to RenderMan varying data)
 		named_arrays varying_data;
-
-		/// Equality
-		const bool operator==(const nurbs_patches_t& RHS) const;
-		/// Inequality
-		const bool operator!=(const nurbs_patches_t& RHS) const;
 	};
 
 	/// Defines storage for polyhedra (polygons and subdivision surfaces)
@@ -318,11 +283,6 @@ public:
 		boost::shared_ptr<const selection_t> edge_selection;
 		/// Stores user-defined per-edge data (maps to RenderMan facevarying data)
 		named_arrays face_varying_data;
-
-		/// Equality
-		const bool operator==(const polyhedra_t& RHS) const;
-		/// Inequality
-		const bool operator!=(const polyhedra_t& RHS) const;
 	};
 
 	/// Defines storage for blobbies (implicit surfaces)
@@ -393,11 +353,6 @@ public:
 		boost::shared_ptr<const floats_t> floats;
 		/// Stores operator operands
 		boost::shared_ptr<const operands_t> operands;
-
-		/// Equality
-		const bool operator==(const blobbies_t& RHS) const;
-		/// Inequality
-		const bool operator!=(const blobbies_t& RHS) const;
 	};
 
 	/// Stores the set of mesh points
@@ -425,11 +380,7 @@ public:
 	boost::shared_ptr<const polyhedra_t> polyhedra;
 	/// Stores blobbies (implicit surfaces)
 	boost::shared_ptr<const blobbies_t> blobbies;
-
-	/// Mesh equality (tests geometry, topology, selection, and user-defined data)
-	const bool operator==(const mesh& RHS) const;
-	/// Inequality
-	const bool operator!=(const mesh& RHS) const;
+	
 	/// Conversion from a legacy mesh to a new mesh
 	mesh& operator=(const k3d::legacy::mesh& RHS);
 };

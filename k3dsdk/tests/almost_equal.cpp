@@ -1,5 +1,6 @@
 #include <k3dsdk/almost_equal.h>
 #include <k3dsdk/types.h>
+#include <k3dsdk/vectors.h>
 
 #include <cassert>
 #include <iomanip>
@@ -10,7 +11,7 @@ template<typename T>
 void test_almost_equal(const T& A, const T& B, const boost::uint64_t Threshold)
 {
 	std::cout << std::setprecision(17) << k3d::demangle(typeid(T)) << ": " << A << " == " << B << std::endl;
-	if(!k3d::almost_equal(Threshold)(A, B))
+	if(!k3d::almost_equal<T>(Threshold)(A, B))
 		throw std::runtime_error("values not equal");
 }
 

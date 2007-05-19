@@ -309,7 +309,7 @@ const std::string module_print_diff(const object& A, const object& B, const obje
 	if(a.check() && b.check() && threshold.check())
 	{
 		std::ostringstream buffer;
-		k3d::diff::print(buffer, a().wrapped(), b().wrapped(), threshold());
+		k3d::print_diff(buffer, a().wrapped(), b().wrapped(), threshold());
 		return buffer.str();
 	}
 

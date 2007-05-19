@@ -23,7 +23,7 @@
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/i18n.h>
-#include <k3dsdk/mesh.h>
+#include <k3dsdk/mesh_diff.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property.h>
@@ -44,13 +44,17 @@ public:
 	mesh_diff(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_equal(init_owner(*this) + init_name("equal") + init_label(_("Equal")) + init_description(_("True iff all input meshes are completely equivalent")) + init_slot(sigc::mem_fun(*this, &mesh_diff::get_equal))),
+		m_threshold(init_owner(*this) + init_name("threshold") + init_label(_("Threshold")) + init_description(_("Sets the maximum allowable difference between floating-point numbers")) + init_value(0UL)),
 		m_user_property_changed_signal(*this)
 	{
+		m_threshold.changed_signal().connect(m_equal.make_reset_slot());
 		m_user_property_changed_signal.connect(m_equal.make_reset_slot());
 	}
 
 	bool get_equal()
 	{
+		const unsigned long threshold = m_threshold.value();
+
 		const k3d::mesh* first_mesh = 0;
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
@@ -62,7 +66,7 @@ public:
 				{
 					if(const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::get_value(document().dag(), property)))
 					{
-						if(*first_mesh != *mesh)
+						if(!k3d::equal(*first_mesh, *mesh, threshold))
 							return false;
 					}
 				}
@@ -89,7 +93,8 @@ public:
 		return factory;
 	}
 
-	k3d_data(bool, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::computed_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_equal;
+	k3d_data(bool, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_equal;
+	k3d_data(unsigned long, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_threshold;
 
 	k3d::user_property_changed_signal m_user_property_changed_signal;
 };

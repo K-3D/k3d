@@ -47,10 +47,12 @@
 
 // Modified by Tim Shead for use with K-3D, January 1998
 
+#include "almost_equal.h"
 #include "result.h"
 
 #include <boost/io/ios_state.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -1230,6 +1232,102 @@ inline const vector3 spherical(const vector3& Vector)
 	return point3(atan2(Vector[1], sqrt(Vector[0] * Vector[0] + Vector[2] * Vector[2])), atan2(Vector[0], Vector[2]), Vector.length());
 */
 }
+
+/// Specialization of almost_equal that tests two point2 objects for near-equality
+template<>
+class almost_equal<point2>
+{
+	typedef point2 T;
+public:
+	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
+	inline const bool operator()(const T& A, const T& B) const
+	{
+		return std::equal(A.n, A.n + 2, B.n, almost_equal<double>(threshold));
+	}
+
+private:
+	const boost::uint64_t threshold;
+};
+
+/// Specialization of almost_equal that tests two point3 objects for near-equality
+template<>
+class almost_equal<point3>
+{
+	typedef point3 T;
+public:
+	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
+	inline const bool operator()(const T& A, const T& B) const
+	{
+		return std::equal(A.n, A.n + 3, B.n, almost_equal<double>(threshold));
+	}
+
+private:
+	const boost::uint64_t threshold;
+};
+
+/// Specialization of almost_equal that tests two point4 objects for near-equality
+template<>
+class almost_equal<point4>
+{
+	typedef point4 T;
+public:
+	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
+	inline const bool operator()(const T& A, const T& B) const
+	{
+		return std::equal(A.n, A.n + 4, B.n, almost_equal<double>(threshold));
+	}
+
+private:
+	const boost::uint64_t threshold;
+};
+
+/// Specialization of almost_equal that tests two vector2 objects for near-equality
+template<>
+class almost_equal<vector2>
+{
+	typedef vector2 T;
+public:
+	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
+	inline const bool operator()(const T& A, const T& B) const
+	{
+		return std::equal(A.n, A.n + 2, B.n, almost_equal<double>(threshold));
+	}
+
+private:
+	const boost::uint64_t threshold;
+};
+
+/// Specialization of almost_equal that tests two vector3 objects for near-equality
+template<>
+class almost_equal<vector3>
+{
+	typedef vector3 T;
+public:
+	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
+	inline const bool operator()(const T& A, const T& B) const
+	{
+		return std::equal(A.n, A.n + 3, B.n, almost_equal<double>(threshold));
+	}
+
+private:
+	const boost::uint64_t threshold;
+};
+
+/// Specialization of almost_equal that tests two normal3 objects for near-equality
+template<>
+class almost_equal<normal3>
+{
+	typedef normal3 T;
+public:
+	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
+	inline const bool operator()(const T& A, const T& B) const
+	{
+		return std::equal(A.n, A.n + 3, B.n, almost_equal<double>(threshold));
+	}
+
+private:
+	const boost::uint64_t threshold;
+};
 
 } // namespace k3d
 

@@ -20,21 +20,35 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "mesh.h"
 #include <boost/cstdint.hpp>
 #include <iosfwd>
 
 namespace k3d
 {
 
-class mesh;
-
-namespace diff
-{
-
+/// Returns true iff two point groups are equivalent (handles fuzzy floating-point comparisons)
+const bool equal(const mesh::point_groups_t& A, const mesh::point_groups_t& B, const boost::uint64_t Threshold);
+/// Returns true iff two lineary curve groups are equivalent (handles fuzzy floating-point comparisons)
+const bool equal(const mesh::linear_curve_groups_t& A, const mesh::linear_curve_groups_t& B, const boost::uint64_t Threshold);
+/// Returns true iff two cubic curve groups are equivalent (handles fuzzy floating-point comparisons)
+const bool equal(const mesh::cubic_curve_groups_t& A, const mesh::cubic_curve_groups_t& B, const boost::uint64_t Threshold);
+/// Returns true iff two nurbs curve groups are equivalent (handles fuzzy floating-point comparisons)
+const bool equal(const mesh::nurbs_curve_groups_t& A, const mesh::nurbs_curve_groups_t& B, const boost::uint64_t Threshold);
+/// Returns true iff two sets of bilinear patches are equivalent (handles fuzzy floating-point comparisons)
+const bool equal(const mesh::bilinear_patches_t& A, const mesh::bilinear_patches_t& B, const boost::uint64_t Threshold);
+/// Returns true iff two sets of bicubic patches are equivalent (handles fuzzy floating-point comparisons)
+const bool equal(const mesh::bicubic_patches_t& A, const mesh::bicubic_patches_t& B, const boost::uint64_t Threshold);
+/// Returns true iff two sets of nurbs are equivalent (handles fuzzy floating-point comparisons)
+const bool equal(const mesh::nurbs_patches_t& A, const mesh::nurbs_patches_t& B, const boost::uint64_t Threshold);
+/// Returns true iff two sets of polyhedra are equivalent (handles fuzzy floating-point comparisons)
+const bool equal(const mesh::polyhedra_t& A, const mesh::polyhedra_t& B, const boost::uint64_t Threshold);
+/// Returns true iff two sets of blobbies are equivalent (handles fuzzy floating-point comparisons)
+const bool equal(const mesh::blobbies_t& A, const mesh::blobbies_t& B, const boost::uint64_t Threshold);
+/// Returns true iff two meshes are equivalent (handles fuzzy floating-point comparisons)
+const bool equal(const mesh& A, const mesh& B, const boost::uint64_t Threshold);
 /// Prints the difference between two meshes to a stream
-void print(std::ostream& Stream, const mesh& A, const mesh& B, const boost::uint64_t Threshold);
-
-} // namespace diff
+void print_diff(std::ostream& Stream, const mesh& A, const mesh& B, const boost::uint64_t Threshold);
 
 } // namespace k3d
 

@@ -118,245 +118,35 @@ void print(std::ostream& Stream, const std::string& Label, const k3d::mesh::name
 ///////////////////////////////////////////////////////////////////////////////////
 // mesh::point_groups_t
 
-const bool mesh::point_groups_t::operator==(const mesh::point_groups_t& RHS) const
-{
-	return
-		detail::equal(first_points, RHS.first_points) &&
-		detail::equal(point_counts, RHS.point_counts) &&
-		detail::equal(materials, RHS.materials) &&
-		detail::equal(constant_data, RHS.constant_data) &&
-		detail::equal(points, RHS.points) &&
-		detail::equal(varying_data, RHS.varying_data);
-}
-
-const bool mesh::point_groups_t::operator!=(const mesh::point_groups_t& RHS) const
-{
-	return !(*this == RHS);
-}
-
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::linear_curve_groups_t
-
-const bool mesh::linear_curve_groups_t::operator==(const mesh::linear_curve_groups_t& RHS) const
-{
-	return
-		detail::equal(first_curves, RHS.first_curves) &&
-		detail::equal(curve_counts, RHS.curve_counts) &&
-		detail::equal(periodic_curves, RHS.periodic_curves) &&
-		detail::equal(materials, RHS.materials) &&
-		detail::equal(constant_data, RHS.constant_data) &&
-		detail::equal(curve_first_points, RHS.curve_first_points) &&
-		detail::equal(curve_point_counts, RHS.curve_point_counts) &&
-		detail::equal(curve_selection, RHS.curve_selection) &&
-		detail::equal(uniform_data, RHS.uniform_data) &&
-		detail::equal(curve_points, RHS.curve_points);
-}
-
-const bool mesh::linear_curve_groups_t::operator!=(const mesh::linear_curve_groups_t& RHS) const
-{
-	return !(*this == RHS);
-}
 
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::cubic_curve_groups_t
 
-const bool mesh::cubic_curve_groups_t::operator==(const mesh::cubic_curve_groups_t& RHS) const
-{
-	return
-		detail::equal(first_curves, RHS.first_curves) &&
-		detail::equal(curve_counts, RHS.curve_counts) &&
-		detail::equal(periodic_curves, RHS.periodic_curves) &&
-		detail::equal(materials, RHS.materials) &&
-		detail::equal(constant_data, RHS.constant_data) &&
-		detail::equal(curve_first_points, RHS.curve_first_points) &&
-		detail::equal(curve_point_counts, RHS.curve_point_counts) &&
-		detail::equal(curve_selection, RHS.curve_selection) &&
-		detail::equal(uniform_data, RHS.uniform_data) &&
-		detail::equal(curve_points, RHS.curve_points);
-}
-
-const bool mesh::cubic_curve_groups_t::operator!=(const mesh::cubic_curve_groups_t& RHS) const
-{
-	return !(*this == RHS);
-}
-
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::nurbs_curve_groups_t
-
-const bool mesh::nurbs_curve_groups_t::operator==(const mesh::nurbs_curve_groups_t& RHS) const
-{
-	return
-		detail::equal(first_curves, RHS.first_curves) &&
-		detail::equal(curve_counts, RHS.curve_counts) &&
-		detail::equal(materials, RHS.materials) &&
-		detail::equal(constant_data, RHS.constant_data) &&
-		detail::equal(curve_first_points, RHS.curve_first_points) &&
-		detail::equal(curve_point_counts, RHS.curve_point_counts) &&
-		detail::equal(curve_orders, RHS.curve_orders) &&
-		detail::equal(curve_first_knots, RHS.curve_first_knots) &&
-		detail::equal(curve_selection, RHS.curve_selection) &&
-		detail::equal(uniform_data, RHS.uniform_data) &&
-		detail::equal(curve_points, RHS.curve_points) &&
-		detail::equal(curve_point_weights, RHS.curve_point_weights) &&
-		detail::equal(curve_knots, RHS.curve_knots);
-}
-
-const bool mesh::nurbs_curve_groups_t::operator!=(const mesh::nurbs_curve_groups_t& RHS) const
-{
-	return !(*this == RHS);
-}
 
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::bilinear_patches_t
 
-const bool mesh::bilinear_patches_t::operator==(const mesh::bilinear_patches_t& RHS) const
-{
-	return
-		detail::equal(patch_selection, RHS.patch_selection) &&
-		detail::equal(patch_materials, RHS.patch_materials) &&
-		detail::equal(constant_data, RHS.constant_data) &&
-		detail::equal(uniform_data, RHS.uniform_data) &&
-		detail::equal(patch_points, RHS.patch_points) &&
-		detail::equal(varying_data, RHS.varying_data);
-}
-
-const bool mesh::bilinear_patches_t::operator!=(const mesh::bilinear_patches_t& RHS) const
-{
-	return !(*this == RHS);
-}
-
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::bicubic_patches_t
-
-const bool mesh::bicubic_patches_t::operator==(const mesh::bicubic_patches_t& RHS) const
-{
-	return
-		detail::equal(patch_selection, RHS.patch_selection) &&
-		detail::equal(patch_materials, RHS.patch_materials) &&
-		detail::equal(constant_data, RHS.constant_data) &&
-		detail::equal(uniform_data, RHS.uniform_data) &&
-		detail::equal(patch_points, RHS.patch_points) &&
-		detail::equal(varying_data, RHS.varying_data);
-}
-
-const bool mesh::bicubic_patches_t::operator!=(const mesh::bicubic_patches_t& RHS) const
-{
-	return !(*this == RHS);
-}
 
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::nurbs_patches_t
 
-const bool mesh::nurbs_patches_t::operator==(const mesh::nurbs_patches_t& RHS) const
-{
-	return
-		detail::equal(patch_first_points, RHS.patch_first_points) &&
-		detail::equal(patch_u_point_counts, RHS.patch_u_point_counts) &&
-		detail::equal(patch_v_point_counts, RHS.patch_v_point_counts) &&
-		detail::equal(patch_u_orders, RHS.patch_u_orders) &&
-		detail::equal(patch_v_orders, RHS.patch_v_orders) &&
-		detail::equal(patch_u_first_knots, RHS.patch_u_first_knots) &&
-		detail::equal(patch_v_first_knots, RHS.patch_v_first_knots) &&
-		detail::equal(patch_selection, RHS.patch_selection) &&
-		detail::equal(patch_materials, RHS.patch_materials) &&
-		detail::equal(constant_data, RHS.constant_data) &&
-		detail::equal(uniform_data, RHS.uniform_data) &&
-		detail::equal(patch_points, RHS.patch_points) &&
-		detail::equal(patch_point_weights, RHS.patch_point_weights) &&
-		detail::equal(patch_u_knots, RHS.patch_u_knots) &&
-		detail::equal(patch_v_knots, RHS.patch_v_knots) &&
-		detail::equal(varying_data, RHS.varying_data);
-}
-
-const bool mesh::nurbs_patches_t::operator!=(const mesh::nurbs_patches_t& RHS) const
-{
-	return !(*this == RHS);
-}
-
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::polyhedra_t
 
-const bool mesh::polyhedra_t::operator==(const mesh::polyhedra_t& RHS) const
-{
-	return
-		detail::equal(first_faces, RHS.first_faces) &&
-		detail::equal(face_counts, RHS.face_counts) &&
-		detail::equal(types, RHS.types) &&
-		detail::equal(constant_data, RHS.constant_data) &&
-		detail::equal(face_first_loops, RHS.face_first_loops) &&
-		detail::equal(face_loop_counts, RHS.face_loop_counts) &&
-		detail::equal(face_selection, RHS.face_selection) &&
-		detail::equal(face_materials, RHS.face_materials) &&
-		detail::equal(uniform_data, RHS.uniform_data) &&
-		detail::equal(loop_first_edges, RHS.loop_first_edges) &&
-		detail::equal(edge_points, RHS.edge_points) &&
-		detail::equal(clockwise_edges, RHS.clockwise_edges) &&
-		detail::equal(edge_selection, RHS.edge_selection) &&
-		detail::equal(face_varying_data, RHS.face_varying_data);
-}
-
-const bool mesh::polyhedra_t::operator!=(const mesh::polyhedra_t& RHS) const
-{
-	return !(*this == RHS);
-}
-
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::blobbies_t
-
-const bool mesh::blobbies_t::operator==(const mesh::blobbies_t& RHS) const
-{
-	return
-		detail::equal(first_primitives, RHS.first_primitives) &&
-		detail::equal(primitive_counts, RHS.primitive_counts) &&
-		detail::equal(first_operators, RHS.first_operators) &&
-		detail::equal(operator_counts, RHS.operator_counts) &&
-		detail::equal(materials, RHS.materials) &&
-		detail::equal(constant_data, RHS.constant_data) &&
-		detail::equal(uniform_data, RHS.uniform_data) &&
-		detail::equal(primitives, RHS.primitives) &&
-		detail::equal(primitive_first_floats, RHS.primitive_first_floats) &&
-		detail::equal(primitive_float_counts, RHS.primitive_float_counts) &&
-		detail::equal(varying_data, RHS.varying_data) &&
-		detail::equal(vertex_data, RHS.vertex_data) &&
-		detail::equal(operators, RHS.operators) &&
-		detail::equal(operator_first_operands, RHS.operator_first_operands) &&
-		detail::equal(operator_operand_counts, RHS.operator_operand_counts) &&
-		detail::equal(floats, RHS.floats) &&
-		detail::equal(operands, RHS.operands);
-}
-
-const bool mesh::blobbies_t::operator!=(const mesh::blobbies_t& RHS) const
-{
-	return !(*this == RHS);
-}
 
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh
 
 mesh::mesh()
 {
-}
-
-const bool mesh::operator==(const mesh& RHS) const
-{
-	return
-		detail::equal(points, RHS.points) &&
-		detail::equal(point_selection, RHS.point_selection) &&
-		detail::equal(vertex_data, RHS.vertex_data) &&
-		detail::equal(point_groups, RHS.point_groups) &&
-		detail::equal(linear_curve_groups, RHS.linear_curve_groups) &&
-		detail::equal(cubic_curve_groups, RHS.cubic_curve_groups) &&
-		detail::equal(nurbs_curve_groups, RHS.nurbs_curve_groups) &&
-		detail::equal(bilinear_patches, RHS.bilinear_patches) &&
-		detail::equal(bicubic_patches, RHS.bicubic_patches) &&
-		detail::equal(nurbs_patches, RHS.nurbs_patches) &&
-		detail::equal(polyhedra, RHS.polyhedra) &&
-		detail::equal(blobbies, RHS.blobbies);
-}
-
-const bool mesh::operator!=(const mesh& RHS) const
-{
-	return !(*this == RHS);
 }
 
 mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
