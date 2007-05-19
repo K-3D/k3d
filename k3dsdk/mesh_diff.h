@@ -20,6 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <boost/cstdint.hpp>
 #include <iosfwd>
 
 namespace k3d
@@ -27,8 +28,13 @@ namespace k3d
 
 class mesh;
 
+namespace diff
+{
+
 /// Prints the difference between two meshes to a stream
-void print_diff(std::ostream& Stream, const mesh& A, const mesh& B);
+void print(std::ostream& Stream, const mesh& A, const mesh& B, const boost::uint64_t Threshold);
+
+} // namespace diff
 
 } // namespace k3d
 

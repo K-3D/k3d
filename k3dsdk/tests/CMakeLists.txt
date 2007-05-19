@@ -10,6 +10,9 @@ LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
 
 LINK_LIBRARIES(k3dsdk)
 
+ADD_EXECUTABLE(test-almost-equal almost_equal.cpp)
+ADD_TEST(k3dsdk.equal.almost ${EXECUTABLE_OUTPUT_PATH}/test-almost-equal)
+
 ADD_EXECUTABLE(test-backtrace backtrace.cpp)
 ADD_TEST(k3dsdk.backtrace ${EXECUTABLE_OUTPUT_PATH}/test-backtrace)
 
@@ -51,9 +54,6 @@ ADD_EXECUTABLE(test-path-relative relative_path.cpp)
 ADD_TEST(k3dsdk.path.relative.001 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/" "home/bubba/k3d/test.k3d")
 ADD_TEST(k3dsdk.path.relative.002 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/home/bubba" "k3d/test.k3d")
 ADD_TEST(k3dsdk.path.relative.003 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/var/documents" "../../home/bubba/k3d/test.k3d")
-
-ADD_EXECUTABLE(test-representable-difference representable_difference.cpp)
-ADD_TEST(k3dsdk.difference.representable ${EXECUTABLE_OUTPUT_PATH}/test-representable-difference)
 
 ADD_EXECUTABLE(test-shared-arrays shared_arrays.cpp)
 ADD_TEST(k3dsdk.shared-arrays ${EXECUTABLE_OUTPUT_PATH}/test-shared-arrays)

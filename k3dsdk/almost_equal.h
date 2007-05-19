@@ -20,31 +20,84 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "log.h"
+#include "vectors.h"
+
 #include <boost/cstdint.hpp>
-#include <cmath>
+
+#include <algorithm>
+#include <iostream>
 
 namespace k3d
 {
 
-/// Convert a double to an integer
-const boost::int64_t to_integer(const double Value)
+/// Convert a double to a lexicographically-ordered twos-complement integer
+inline const boost::int64_t to_integer(const double Value)
 {
 	const boost::int64_t value = *(boost::int64_t*)&Value;
 	return value < 0 ? 0x8000000000000000LL - value : value;
 }
 
-/// Given two doubles, returns their difference in terms of the number of uniquely-representable floating-point values that separate them
-const boost::int64_t representable_difference(const double A, const double B)
+/// Given two doubles, returns their difference expressed as the number of uniquely-representable floating-point values that separate them
+inline const boost::int64_t representable_difference(const double A, const double B)
 {
 	return to_integer(B) - to_integer(A);
 }
 
-/// Return true iff two doubles are nearly the same
-const bool almost_equal(const double A, const double B, const boost::uint64_t Epsilon)
+/// Functor for testing objects for equality - based on "Comparing floating point numbers" by Bruce Dawson
+class almost_equal
 {
-	const boost::int64_t difference = representable_difference(A, B);
-	return difference < 0 ? -difference < Epsilon : difference < Epsilon;
-}
+public:
+	almost_equal(const boost::uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	template<typename T>
+	const bool operator()(const T& A, const T& B)
+	{
+		return A == B;
+	}
+
+	const bool operator()(const double A, const double B)
+	{
+		const boost::int64_t difference = representable_difference(A, B);
+		return difference < 0 ? -difference <= threshold : difference <= threshold;
+	}
+
+	const bool operator()(const point2& A, const point2& B)
+	{
+		return std::equal(A.n, A.n + 2, B.n, *this);
+	}
+
+	const bool operator()(const point3& A, const point3& B)
+	{
+		return std::equal(A.n, A.n + 3, B.n, *this);
+	}
+
+	const bool operator()(const point4& A, const point4& B)
+	{
+		return std::equal(A.n, A.n + 4, B.n, *this);
+	}
+
+	const bool operator()(const vector2& A, const vector2& B)
+	{
+		return std::equal(A.n, A.n + 2, B.n, *this);
+	}
+
+	const bool operator()(const vector3& A, const vector3& B)
+	{
+		return std::equal(A.n, A.n + 3, B.n, *this);
+	}
+
+	const bool operator()(const normal3& A, const normal3& B)
+	{
+		return std::equal(A.n, A.n + 3, B.n, *this);
+	}
+
+private:
+	const boost::uint64_t threshold;
+};
 
 } // namespace k3d
 

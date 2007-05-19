@@ -199,7 +199,7 @@ def bitmap_size_comparison(bitmap, width, height):
 	if bitmap.width() != width or bitmap.height() != height:
 		raise "bitmap dimensions incorrect"
 
-def mesh_comparison(document, mesh, mesh_name):
+def mesh_comparison(document, mesh, mesh_name, threshold):
 	
 	output_file = "@k3d-tests_BINARY_DIR@/" + mesh_name + ".output.k3d"
 	reference_file = "@k3d-tests_SOURCE_DIR@/meshes/" + mesh_name + ".reference.k3d"
@@ -219,7 +219,7 @@ def mesh_comparison(document, mesh, mesh_name):
 
 	if not difference.equal:
 		print """<DartMeasurement name="Mesh Difference" type="text/text">\n"""
-		print k3d.print_diff(mesh.value(), reference.output_mesh)
+		print k3d.print_diff(mesh.value(), reference.output_mesh, threshold)
 		print """</DartMeasurement>\n"""
 		sys.stdout.flush()
 
