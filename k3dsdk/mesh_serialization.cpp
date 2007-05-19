@@ -66,6 +66,31 @@ void save_array(element& Container, element Storage, const array_type& Array, co
 /////////////////////////////////////////////////////////////////////////////
 // save_array
 
+/// Specialization of save_array to ensure we don't lose precision when writing arrays of double
+void save_array(element& Container, element Storage, const typed_array<double>& Array, const ipersistent::save_context& Context)
+{
+	typedef typed_array<double> array_type;
+
+	if(Array.empty())
+		return;
+
+	array_type::const_iterator item = Array.begin();
+	const array_type::const_iterator end = Array.end();
+
+	std::ostringstream buffer;
+	buffer << std::setprecision(17);
+
+	buffer << *item++;
+	for(; item != end; ++item)
+		buffer << " " << *item;
+
+	Storage.text = buffer.str();
+	Container.append(Storage);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// save_array
+
 void save_array(element& Container, element Storage, const typed_array<imaterial*>& Array, const ipersistent::save_context& Context)
 {
 	typedef typed_array<imaterial*> array_type;
