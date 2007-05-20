@@ -21,6 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <boost/cstdint.hpp>
+#include <cstddef>
 
 namespace k3d
 {
