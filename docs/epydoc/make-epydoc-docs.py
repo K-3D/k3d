@@ -1,6 +1,7 @@
 #python
 
 import k3d
+import shutil
 
 import epydoc.docbuilder
 import epydoc.docwriter.html
@@ -11,4 +12,7 @@ import epydoc.docwriter.html
 
 index = epydoc.docbuilder.build_doc_index([k3d])
 epydoc.docwriter.html.HTMLWriter(index).write("html")
+
+# Overwrite the default CSS
+shutil.copy("@epydoc_SOURCE_DIR@/epydoc.css", "@epydoc_BINARY_DIR@/html")
 
