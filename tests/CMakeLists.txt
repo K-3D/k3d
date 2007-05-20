@@ -189,6 +189,7 @@ K3D_ADD_PYTHON_TEST(mesh.modifier.BendPoints.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.BulgePoints.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.ExtrudeFaces.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.TriangulateFaces.py)
+K3D_ADD_PYTHON_TEST(mesh.modifier.TwistPoints.py)
 
 IF(K3D_BUILD_GLX_MODULE)
 	K3D_ADD_PYTHON_TEST(offscreen.glx.py)
