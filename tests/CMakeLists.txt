@@ -49,7 +49,6 @@ MACRO(K3D_ADD_PYTHON_TEST SCRIPT_NAME)
 			ADD_TEST(${SCRIPT_NAME}
 				${k3d_BINARY_DIR}/bin/k3d
 				--log-level=debug
-				--color
 				--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
 				--share=${k3d_SOURCE_DIR}/share
 				--ui=${K3D_NUI_BINARY}
