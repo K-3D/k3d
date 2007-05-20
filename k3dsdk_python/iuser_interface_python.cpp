@@ -82,14 +82,42 @@ const filesystem::path iuser_interface::get_file_path(const std::string& Directi
 	return new_path;
 }
 
-void export_iuser_interface()
+void iuser_interface::define_class()
 {
-	class_<iuser_interface>("iuser_interface")
-		.def("message", &iuser_interface::message)
-		.def("warning_message", &iuser_interface::warning_message)
-		.def("error_message", &iuser_interface::error_message)
-		.def("query_message", &iuser_interface::query_message)
-		.def("get_file_path", &iuser_interface::get_file_path);
+	class_<iuser_interface>("iuser_interface",
+		"Provides access to the user interface plugin chosen by the user at program startup.")
+		.def("message", &iuser_interface::message,
+			"Displays an information message to the user.\n"
+			"@param message: The message string to be displayed.\n" 
+			"@note: Depending on the user interface plugin, this might print a message "
+			"to the console, display a dialog box, or do nothing.")
+		.def("warning_message", &iuser_interface::warning_message,
+			"Displays a warning message to the user.\n"
+			"@param message: The warning message string to be displayed.\n" 
+			"@note: Depending on the user interface plugin, this might print a message "
+			"to the console, display a dialog box, or do nothing.")
+		.def("error_message", &iuser_interface::error_message,
+			"Displays a warning message to the user.\n"
+			"@param message: The error message string to be displayed.\n" 
+			"@note: Depending on the user interface plugin, this might print a message "
+			"to the console, display a dialog box, or do nothing.")
+		.def("query_message", &iuser_interface::query_message,
+			"Query the user to choose from among a set of fixed options.\n"
+			"@param message: The error message string to be displayed.\n" 
+			"@param options: A list of strings where each string is an option to be displayed.\n" 
+			"@return: Returns the one-based index of the option chosen by the user, or zero if "
+			"the user cancelled the query.\n" 
+			"@note: Depending on the user interface plugin, this might print a message "
+			"to the console, display a dialog box, or do nothing.")
+		.def("get_file_path", &iuser_interface::get_file_path,
+			"Query the user to choose a filesystem path.\n"
+			"@param direction: Either \"read\" or \"write\".\n"
+			"@param type: The type of path to be accessed (used to group most-recently-used paths.\n"
+			"@param message: Message string displayed to the user.\n" 
+			"@param start: The initial path to be displayed to the user.\n"
+			"@return: Returns the path chosen by the as a string, empty string if the user cancels.\n"
+			"@note: Depending on the user interface plugin, this might print a message "
+			"to the console, display a dialog box, or do nothing.");
 }
 
 } // namespace python

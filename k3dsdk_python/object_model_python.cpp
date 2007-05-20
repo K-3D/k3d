@@ -338,7 +338,7 @@ BOOST_PYTHON_MODULE(k3d)
 	export_iproperty();
 	export_iproperty_collection();
 	export_iunknown();
-	export_iuser_interface();
+	iuser_interface::define_class();
 	export_matrix4();
 	export_mesh();
 	export_mesh_selection();
