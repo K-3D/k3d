@@ -191,6 +191,7 @@ K3D_ADD_PYTHON_TEST(mesh.modifier.CylindricalWavePoints.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.ExtrudeFaces.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.LinearPointNoise.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.LinearWavePoints.py)
+K3D_ADD_PYTHON_TEST(mesh.modifier.RotatePoints.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.TriangulateFaces.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.TwistPoints.py)
 
