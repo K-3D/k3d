@@ -21,6 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "array_python.h"
+#include "const_array_python.h"
 #include "imaterial_python.h"
 #include "interface_wrapper_python.h"
 #include "mesh_python.h"
@@ -149,217 +151,6 @@ private:
 	array_type* const m_wrapped;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////
-// array
-
-template<>
-class array<typed_array<k3d::imaterial*> >
-{
-public:
-	typedef typed_array<k3d::imaterial*> array_type;
-
-	array() :
-		m_wrapped(0)
-	{
-	}
-
-	array(array_type& Array) :
-		m_wrapped(&Array)
-	{
-	}
-
-	int len()
-	{
-		return wrapped().size();
-	}
-
-	object get_item(int item)
-	{
-		if(item < 0 || item >= wrapped().size())
-			throw std::out_of_range("index out-of-range");
-
-		k3d::imaterial* const result = wrapped().at(item);
-		return result ? object(k3d::python::imaterial(result)) : object();
-	}
-
-	void set_item(int item, const object& value)
-	{
-		if(item < 0)
-			throw std::out_of_range("index out-of-range");
-
-		if(static_cast<size_t>(item) >= wrapped().size())
-			wrapped().resize(item + 1);
-
-		if(value)
-		{
-			k3d::python::imaterial material = extract<k3d::python::imaterial>(value);
-			wrapped()[item] = &material.wrapped();
-		}
-		else
-		{
-			wrapped()[item] = static_cast<k3d::imaterial*>(0);
-		}
-	}
-
-	void append(const object& Value)
-	{
-		if(Value)
-		{
-			k3d::python::imaterial material = extract<k3d::python::imaterial>(Value);
-			wrapped().push_back(&material.wrapped());
-		}
-		else
-		{
-			wrapped().push_back(static_cast<k3d::imaterial*>(0));
-		}
-	}
-
-	void assign(const list& Value)
-	{
-		array_type& storage = wrapped();
-
-		const size_t count = boost::python::len(Value);
-		storage.resize(count);
-		for(size_t i = 0; i != count; ++i)
-		{
-			if(Value[i])
-			{
-				k3d::python::imaterial material = extract<k3d::python::imaterial>(Value[i]);
-				storage[i] = &material.wrapped();
-			}
-			else
-			{
-				storage[i] = static_cast<k3d::imaterial*>(0);
-			}
-		}
-	}
-
-private:
-	array_type& wrapped()
-	{
-		if(!m_wrapped)
-			throw std::runtime_error("wrapped array is null");
-
-		return *m_wrapped;
-	}
-
-	array_type* const m_wrapped;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////
-// export_array
-
-template<typename array_type>
-void export_array(const char* const ClassName)
-{
-	class_<array<array_type> >(ClassName)
-		.def("__len__", &array<array_type>::len)
-		.def("__getitem__", &array<array_type>::get_item)
-		.def("__setitem__", &array<array_type>::set_item)
-		.def("append", &array<array_type>::append)
-		.def("assign", &array<array_type>::assign);
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////
-// const_array
-
-template<typename array_type>
-class const_array
-{
-public:
-	typedef typename array_type::value_type value_type;
-
-	const_array() :
-		m_wrapped(0)
-	{
-	}
-
-	const_array(array_type& Array) :
-		m_wrapped(&Array)
-	{
-	}
-
-	int len()
-	{
-		return wrapped().size();
-	}
-
-	value_type get_item(int item)
-	{
-		if(item < 0 || item >= wrapped().size())
-			throw std::out_of_range("index out-of-range");
-
-		return wrapped().at(item);
-	}
-
-private:
-	array_type& wrapped()
-	{
-		if(!m_wrapped)
-			throw std::runtime_error("wrapped array is null");
-
-		return *m_wrapped;
-	}
-
-	array_type* const m_wrapped;
-};
-
-/////////////////////////////////////////////////////////////////////////////////////////
-// const_array
-
-template<>
-class const_array<const typed_array<k3d::imaterial*> >
-{
-public:
-	typedef const typed_array<k3d::imaterial*> array_type;
-
-	const_array() :
-		m_wrapped(0)
-	{
-	}
-
-	const_array(array_type& Array) :
-		m_wrapped(&Array)
-	{
-	}
-
-	int len()
-	{
-		return wrapped().size();
-	}
-
-	object get_item(int item)
-	{
-		if(item < 0 || item >= wrapped().size())
-			throw std::out_of_range("index out-of-range");
-
-		k3d::imaterial* const result = wrapped().at(item);
-		return result ? object(k3d::python::imaterial(result)) : object();
-	}
-
-private:
-	array_type& wrapped()
-	{
-		if(!m_wrapped)
-			throw std::runtime_error("wrapped array is null");
-
-		return *m_wrapped;
-	}
-
-	array_type* const m_wrapped;
-};
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-// export_const_array
-
-template<typename array_type>
-void export_const_array(const char* const ClassName)
-{
-	class_<const_array<array_type> >(ClassName)
-		.def("__len__", &const_array<array_type>::len)
-		.def("__getitem__", &const_array<array_type>::get_item);
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // wrap_const_array
 
@@ -369,7 +160,7 @@ object wrap_const_array(pointer_type& Pointer)
 	if(!Pointer)
 		return object();
 
-	return object(const_array<typename pointer_type::element_type>(*Pointer));
+	return object(k3d::python::const_array<typename pointer_type::element_type>(*Pointer));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -383,7 +174,7 @@ object wrap_non_const_array(pointer_type& Pointer)
 	if(!Pointer)
 		return object();
 
-	return object(array<array_type>(*k3d::make_unique(Pointer)));
+	return object(k3d::python::array<array_type>(*k3d::make_unique(Pointer)));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -396,7 +187,7 @@ object create_array(pointer_type& Pointer)
 
 	array_type* const new_array = new array_type();
 	Pointer.reset(new_array);
-	return object(array<array_type>(*new_array));
+	return object(k3d::python::array<array_type>(*new_array));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -517,7 +308,7 @@ public:
     {
         k3d::typed_array<array_type>* const new_array = new k3d::typed_array<array_type>();
         wrapped()[Name].reset(new_array);
-        return object(k3d::python::detail::array<k3d::typed_array<array_type> >(*new_array));
+        return object(k3d::python::array<k3d::typed_array<array_type> >(*new_array));
     }
 
 	object create_array(const std::string& Name, const std::string& Type)
@@ -1999,34 +1790,6 @@ void export_mesh()
 		.value("negate", k3d::mesh::blobbies_t::NEGATE)
 		.value("identity", k3d::mesh::blobbies_t::IDENTITY)
 		.attr("__module__") = "k3d";
-
-	detail::export_const_array<const k3d::typed_array<bool> >("const_bool_array");
-	detail::export_const_array<const k3d::typed_array<double> >("const_double_array");
-	detail::export_const_array<const k3d::typed_array<k3d::mesh::polyhedra_t::polyhedron_type> >("const_polyhedron_type_array");
-	detail::export_const_array<const k3d::typed_array<k3d::mesh::blobbies_t::operator_type> >("const_blobby_operator_type_array");
-	detail::export_const_array<const k3d::typed_array<k3d::mesh::blobbies_t::primitive_type> >("const_blobby_primitive_type_array");
-	detail::export_const_array<const k3d::typed_array<k3d::imaterial*> >("const_material_array");
-	detail::export_const_array<const k3d::typed_array<k3d::color> >("const_color_array");
-	detail::export_const_array<const k3d::typed_array<k3d::matrix4> >("const_matrix4_array");
-	detail::export_const_array<const k3d::typed_array<k3d::normal3> >("const_normal3_array");
-	detail::export_const_array<const k3d::typed_array<k3d::point3> >("const_point3_array");
-	detail::export_const_array<const k3d::typed_array<k3d::point4> >("const_point4_array");
-	detail::export_const_array<const k3d::typed_array<size_t> >("const_size_t_array");
-	detail::export_const_array<const k3d::typed_array<k3d::vector3> >("const_vector3_array");
-
-	detail::export_array<k3d::typed_array<bool> >("bool_array");
-	detail::export_array<k3d::typed_array<double> >("double_array");
-	detail::export_array<k3d::typed_array<k3d::mesh::polyhedra_t::polyhedron_type> >("polyhedron_type_array");
-	detail::export_array<k3d::typed_array<k3d::mesh::blobbies_t::operator_type> >("blobby_operator_type_array");
-	detail::export_array<k3d::typed_array<k3d::mesh::blobbies_t::primitive_type> >("blobby_primitive_type_array");
-	detail::export_array<k3d::typed_array<k3d::imaterial*> >("material_array");
-	detail::export_array<k3d::typed_array<k3d::matrix4> >("matrix_array");
-	detail::export_array<k3d::typed_array<k3d::color> >("color_array");
-	detail::export_array<k3d::typed_array<k3d::normal3> >("normal3_array");
-	detail::export_array<k3d::typed_array<k3d::point3> >("point3_array");
-	detail::export_array<k3d::typed_array<k3d::point4> >("point4_array");
-	detail::export_array<k3d::typed_array<size_t> >("size_t_array");
-	detail::export_array<k3d::typed_array<k3d::vector3> >("vector3_array");
 
 	detail::export_const_named_arrays();
 	detail::export_named_arrays();

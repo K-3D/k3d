@@ -84,8 +84,8 @@ const filesystem::path iuser_interface::get_file_path(const std::string& Directi
 
 void iuser_interface::define_class()
 {
-	class_<iuser_interface>("iuser_interface",
-		"Provides access to the user interface plugin chosen by the user at program startup.")
+	class_<iuser_interface>("iuser_interface", 
+		"Provides access to the user interface plugin specified by the user at program startup.", no_init)
 		.def("message", &iuser_interface::message,
 			"Displays an information message to the user.\n"
 			"@param message: The message string to be displayed.\n" 

@@ -23,9 +23,11 @@
 
 #include "angle_axis_python.h"
 #include "any_python.h"
+#include "array_python.h"
 #include "bitmap_python.h"
 #include "bounding_box3_python.h"
 #include "color_python.h"
+#include "const_array_python.h"
 #include "euler_angles_python.h"
 #include "icommand_node_python.h"
 #include "idocument_python.h"
@@ -325,9 +327,11 @@ BOOST_PYTHON_MODULE(k3d)
 	to_python_converter<k3d::mesh_selection::records_t, python_wrap<k3d::mesh_selection::records_t> >();
 
 	angle_axis::define_class();
+	export_arrays();
 	export_bitmap();
 	export_bounding_box3();
 	export_color();
+	export_const_arrays();
 	export_euler_angles();
 	export_icommand_node();
 	export_idocument();
