@@ -5,7 +5,7 @@ import k3d
 doc = k3d.new_document()
 
 # We will be writing a temporary file ...
-file = "@k3d-tests_BINARY_DIR@/mesh.writer.obj.obj"
+file = "@k3d-tests_BINARY_DIR@/mesh.sink.OBJMeshWriter.obj"
 
 # Create a simple polyhedron source ...
 source = doc.new_node("PolyCube")

@@ -178,9 +178,6 @@ K3D_ADD_PYTHON_TEST(mesh.conversion.patch.bilinear.py)
 K3D_ADD_PYTHON_TEST(mesh.conversion.patch.nurbs.py)
 K3D_ADD_PYTHON_TEST(mesh.conversion.polyhedron.py)
 
-K3D_ADD_PYTHON_TEST(mesh.writer.obj.py)
-K3D_ADD_PYTHON_TEST(mesh.writer.k3d.py)
-
 K3D_ADD_PYTHON_TEST(mesh.selection.null.py)
 K3D_ADD_PYTHON_TEST(mesh.selection.none.py)
 K3D_ADD_PYTHON_TEST(mesh.selection.all.py)
@@ -202,6 +199,9 @@ K3D_ADD_PYTHON_TEST(mesh.modifier.TransformPoints.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.TranslatePoints.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.TriangulateFaces.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.TwistPoints.py)
+
+K3D_ADD_PYTHON_TEST(mesh.sink.K3DMeshWriter.py)
+K3D_ADD_PYTHON_TEST(mesh.sink.OBJMeshWriter.py)
 
 IF(K3D_BUILD_GLX_MODULE)
 	K3D_ADD_PYTHON_TEST(offscreen.glx.py)
