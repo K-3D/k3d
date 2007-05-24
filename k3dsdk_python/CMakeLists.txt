@@ -13,16 +13,12 @@ LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
 ADD_LIBRARY(k3dsdk-python-types SHARED
 	angle_axis_python.cpp
 	angle_axis_python.h
-	array_python.cpp
-	array_python.h
 	bitmap_python.cpp
 	bitmap_python.h
 	bounding_box3_python.cpp
 	bounding_box3_python.h
 	color_python.cpp
 	color_python.h
-	const_array_python.cpp
-	const_array_python.h
 	euler_angles_python.cpp
 	euler_angles_python.h
 	matrix4_python.cpp
@@ -52,6 +48,10 @@ ENDIF(NOT WIN32)
 ADD_LIBRARY(k3dsdk-python SHARED
 	any_python.cpp
 	any_python.h
+	array_python.cpp
+	array_python.h
+	const_array_python.cpp
+	const_array_python.h
 	dynamic_cast_python.cpp
 	dynamic_cast_python.h
 	icommand_node_python.cpp
