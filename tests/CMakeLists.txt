@@ -184,6 +184,7 @@ K3D_ADD_PYTHON_TEST(mesh.selection.all.py)
 K3D_ADD_PYTHON_TEST(mesh.selection.points.py)
 
 K3D_ADD_PYTHON_TEST(mesh.modifier.BendPoints.py)
+K3D_ADD_PYTHON_TEST(mesh.modifier.BevelFaces.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.BevelPoints.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.BulgePoints.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.CylindricalWavePoints.py)
