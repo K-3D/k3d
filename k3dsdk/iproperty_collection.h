@@ -36,7 +36,7 @@ namespace k3d
 // Forward declarations
 class iproperty;
 
-/// Abstract interface for objects that can accept commands from external entities
+/// Abstract interface for a collection of iproperty objects
 class iproperty_collection :
 	public virtual iunknown
 {
@@ -69,5 +69,4 @@ protected:
 } // namespace k3d
 
 #endif // K3DSDK_IPROPERTY_COLLECTION_H
-
 
