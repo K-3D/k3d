@@ -48,12 +48,10 @@ public:
 	boost::python::object document();
 	boost::python::object factory();
 
-	boost::python::object do_dynamic_cast(const std::string& Type);
-
 	uint64_t hash();
-};
 
-void export_inode();
+	static void define_class();
+};
 
 } // namespace python
 

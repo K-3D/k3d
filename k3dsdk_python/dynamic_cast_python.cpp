@@ -27,6 +27,8 @@
 #include "imesh_storage_python.h"
 #include "inode_python.h"
 #include "iproperty_collection_python.h"
+#include "iunknown_python.h"
+#include "node_python.h"
 
 #include <k3dsdk/icommand_node.h>
 #include <k3dsdk/imaterial.h>
@@ -54,7 +56,7 @@ object do_dynamic_cast(k3d::iunknown* Unknown)
 
 	return object();
 }
-	
+
 } // namespace detail
 	
 object do_dynamic_cast(k3d::iunknown* const Source, const std::string& Type)
@@ -69,8 +71,43 @@ object do_dynamic_cast(k3d::iunknown* const Source, const std::string& Type)
 		return detail::do_dynamic_cast<k3d::inode, k3d::python::inode>(Source);
 	if(Type == "iproperty_collection")
 		return detail::do_dynamic_cast<k3d::iproperty_collection, k3d::python::iproperty_collection>(Source);
+	if(Type == "iunknown")
+		return detail::do_dynamic_cast<k3d::iunknown, k3d::python::iunknown>(Source);
 
 	throw std::invalid_argument("unknown cast type: " + Type);
+}
+
+object do_dynamic_cast(const object& Source, const std::string& Type)
+{
+	extract<k3d::python::icommand_node> icommand_node(Source);
+	if(icommand_node.check())
+		return do_dynamic_cast(icommand_node().wrapped_ptr(), Type);
+
+	extract<k3d::python::imaterial> imaterial(Source);
+	if(imaterial.check())
+		return do_dynamic_cast(imaterial().wrapped_ptr(), Type);
+
+	extract<k3d::python::imesh_storage> imesh_storage(Source);
+	if(imesh_storage.check())
+		return do_dynamic_cast(imesh_storage().wrapped_ptr(), Type);
+
+	extract<k3d::python::inode> inode(Source);
+	if(inode.check())
+		return do_dynamic_cast(inode().wrapped_ptr(), Type);
+
+	extract<k3d::python::iproperty_collection> iproperty_collection(Source);
+	if(iproperty_collection.check())
+		return do_dynamic_cast(iproperty_collection().wrapped_ptr(), Type);
+
+	extract<k3d::python::iunknown> iunknown(Source);
+	if(iunknown.check())
+		return do_dynamic_cast(iunknown().wrapped_ptr(), Type);
+
+	extract<k3d::python::node> node(Source);
+	if(node.check())
+		return do_dynamic_cast(static_cast<const k3d::python::inode&>(node()).wrapped_ptr(), Type);
+
+	throw std::invalid_argument("unknown source type for dynamic cast");
 }
 
 } // namespace python

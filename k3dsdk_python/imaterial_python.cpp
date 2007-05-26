@@ -21,7 +21,6 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "dynamic_cast_python.h"
 #include "imaterial_python.h"
 
 #include <k3dsdk/imaterial.h>
@@ -44,15 +43,9 @@ imaterial::imaterial(k3d::imaterial* Material) :
 {
 }
 
-object imaterial::do_dynamic_cast(const std::string& Type)
+void imaterial::define_class()
 {
-	return k3d::python::do_dynamic_cast(wrapped_ptr(), Type);
-}
-
-void export_imaterial()
-{
-	class_<imaterial>("imaterial")
-		.def("dynamic_cast", &imaterial::do_dynamic_cast);
+	class_<imaterial>("imaterial", no_init);
 }
 
 } // namespace python

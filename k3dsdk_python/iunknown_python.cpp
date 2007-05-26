@@ -21,7 +21,6 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "dynamic_cast_python.h"
 #include "iunknown_python.h"
 
 #include <boost/python.hpp>
@@ -43,15 +42,9 @@ iunknown::iunknown(k3d::iunknown* Unknown) :
 {
 }
 
-object iunknown::do_dynamic_cast(const std::string& Type)
+void iunknown::define_class()
 {
-	return k3d::python::do_dynamic_cast(wrapped_ptr(), Type);
-}
-
-void export_iunknown()
-{
-	class_<iunknown>("iunknown")
-		.def("dynamic_cast", &iunknown::do_dynamic_cast);
+	class_<iunknown>("iunknown", no_init);
 }
 
 } // namespace python

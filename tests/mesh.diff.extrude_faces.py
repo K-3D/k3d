@@ -4,7 +4,7 @@ import k3d
 
 doc = k3d.new_document()
 
-memory_pools = k3d.create_plugin("MemoryPools").dynamic_cast("icommand_node")
+memory_pools = k3d.dynamic_cast(k3d.create_plugin("MemoryPools"), "icommand_node")
 memory_pools.execute_command("shuffle", "4000 points")
 memory_pools.execute_command("shuffle", "4000 split_edges")
 memory_pools.execute_command("shuffle", "4000 faces")

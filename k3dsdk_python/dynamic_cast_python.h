@@ -35,6 +35,7 @@ namespace python
 {
 
 boost::python::object do_dynamic_cast(k3d::iunknown* Source, const std::string& Type);
+boost::python::object do_dynamic_cast(const boost::python::object& Source, const std::string& Type);
 
 } // namespace python
 

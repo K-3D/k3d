@@ -21,7 +21,6 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "dynamic_cast_python.h"
 #include "inode_python.h"
 
 #include <k3dsdk/inode.h>
@@ -54,22 +53,16 @@ object inode::factory()
 	return object(iplugin_factory(wrapped().factory()));
 }
 
-object inode::do_dynamic_cast(const std::string& Type)
-{
-	return k3d::python::do_dynamic_cast(wrapped_ptr(), Type);
-}
-
 uint64_t inode::hash()
 {
 	return reinterpret_cast<uint64_t>(wrapped_ptr());
 }
 
-void export_inode()
+void inode::define_class()
 {
-	class_<inode>("inode")
+	class_<inode>("inode", no_init)
 		.def("document", &inode::document)
 		.def("factory", &inode::factory)
-		.def("dynamic_cast", &inode::do_dynamic_cast)
 		.def("__hash__", &inode::hash);
 }
 

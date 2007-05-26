@@ -43,10 +43,8 @@ public:
 	imaterial();
 	imaterial(k3d::imaterial* Material);
 
-	boost::python::object do_dynamic_cast(const std::string& Type);
+	static void define_class();
 };
-
-void export_imaterial();
 
 } // namespace python
 

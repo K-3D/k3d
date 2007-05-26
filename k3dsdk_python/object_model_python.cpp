@@ -28,6 +28,7 @@
 #include "bounding_box3_python.h"
 #include "color_python.h"
 #include "const_array_python.h"
+#include "dynamic_cast_python.h"
 #include "euler_angles_python.h"
 #include "icommand_node_python.h"
 #include "idocument_python.h"
@@ -318,6 +319,11 @@ const std::string module_print_diff(const object& A, const object& B, const obje
 	throw std::invalid_argument("cannot diff given objects");
 }
 
+object module_dynamic_cast(const object& Source, const std::string& Target)
+{
+	return do_dynamic_cast(Source, Target);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // k3d module
 
@@ -335,13 +341,13 @@ BOOST_PYTHON_MODULE(k3d)
 	export_euler_angles();
 	export_icommand_node();
 	export_idocument();
-	export_imaterial();
+	imaterial::define_class();
 	imesh_storage::define_class();
-	export_inode();
+	inode::define_class();
 	export_iplugin_factory();
 	export_iproperty();
 	export_iproperty_collection();
-	export_iunknown();
+	iunknown::define_class();
 	iuser_interface::define_class();
 	export_matrix4();
 	export_mesh();
@@ -364,6 +370,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
 	def("deselect_all", k3d::mesh_selection::deselect_all,
 		"Returns a L{mesh_selection} that explicitly deselects every component.");
+	def("dynamic_cast", module_dynamic_cast,
+		"Attempts to coerce an object from one type to another.");
 	def("print_diff", module_print_diff,
 		"Returns the difference of two L{mesh} objects as a string.");
 	def("euler_angles", euler_angles_init); // Special-case the euler_angles ctor to handle the degrees-to-radians conversion

@@ -43,10 +43,8 @@ public:
 	iunknown();
 	iunknown(k3d::iunknown* Unknown);
 
-	boost::python::object do_dynamic_cast(const std::string& Type);
+	static void define_class();
 };
-
-void export_iunknown();
 
 } // namespace python
 

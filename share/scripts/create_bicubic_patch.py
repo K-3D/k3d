@@ -12,7 +12,7 @@ try:
 	frozen_mesh = doc.new_node("FrozenMesh")
 	frozen_mesh.name = "Bicubic Patch"
 
-	mesh = frozen_mesh.dynamic_cast("imesh_storage").new_mesh()
+	mesh = k3d.dynamic_cast(frozen_mesh, "imesh_storage").new_mesh()
 
 	positions = [
 		(-5, -5, 0), (-2, -5, 2), (2, -5, -2), (5, -5, 0),
@@ -33,7 +33,7 @@ try:
 	patch_selection.append(0)
 
 	patch_materials = bicubic_patches.create_patch_materials()
-	patch_materials.append(material.dynamic_cast("imaterial"))
+	patch_materials.append(k3d.dynamic_cast(material, "imaterial"))
 
 	patch_points = bicubic_patches.create_patch_points()
 	for i in range(16):

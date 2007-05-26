@@ -19,7 +19,7 @@ operator_counts = blobbies.create_operator_counts()
 operator_counts.append(1)
 
 materials = blobbies.create_materials()
-materials.append(Document.get_node("Material").dynamic_cast("imaterial"))
+materials.append(k3d.dynamic_cast(Document.get_node("Material"), "imaterial"))
 
 primitives = blobbies.create_primitives()
 primitive_first_floats = blobbies.create_primitive_first_floats()
