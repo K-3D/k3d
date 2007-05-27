@@ -47,19 +47,12 @@ class nurbs_patch_painter :
 
 public:
 	nurbs_patch_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		nurbs_renderer(gluNewNurbsRenderer())
+		base(Factory, Document)
 	{
-		// Important!  We load our own matrices for efficiency (saves round-trips to the server) and to prevent problems with selection
-		gluNurbsProperty(nurbs_renderer, GLU_AUTO_LOAD_MATRIX, GL_FALSE);
-		gluNurbsProperty(nurbs_renderer, GLU_CULLING, GL_TRUE);
-		gluNurbsProperty(nurbs_renderer, GLU_DISPLAY_MODE, GLU_FILL);
 	}
 
 	~nurbs_patch_painter()
 	{
-		if(nurbs_renderer)
-                        gluDeleteNurbsRenderer(nurbs_renderer);
 	}
 
 	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
@@ -160,9 +153,6 @@ public:
 
 		return factory;
 	}
-
-private:
-	GLUnurbsObj* const nurbs_renderer;
 };
 
 /////////////////////////////////////////////////////////////////////////////
