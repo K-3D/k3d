@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/bounded.h>
@@ -45,13 +45,13 @@
 #include <k3dsdk/snappable.h>
 #include <k3dsdk/transformable.h>
 
-namespace libk3ddevelopment
+namespace libk3dmeshinstance
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// new_mesh_instance
+// mesh_instance
 
-class new_mesh_instance :
+class mesh_instance :
 	public k3d::snappable<k3d::bounded<k3d::gl::drawable<k3d::ri::renderable<k3d::mesh_selection_sink<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > > > > > >,
 	public k3d::imesh_sink,
 	public k3d::imesh_source
@@ -59,10 +59,10 @@ class new_mesh_instance :
 	typedef k3d::snappable<k3d::bounded<k3d::gl::drawable<k3d::ri::renderable<k3d::mesh_selection_sink<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > > > > > > base;
 
 public:
-	new_mesh_instance(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	mesh_instance(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::mesh*>(0)),
-		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")) + init_slot(sigc::mem_fun(*this, &new_mesh_instance::create_mesh))),
+		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")) + init_slot(sigc::mem_fun(*this, &mesh_instance::create_mesh))),
 		m_gl_painter(init_owner(*this) + init_name("gl_painter") + init_label(_("OpenGL Mesh Painter")) + init_description(_("OpenGL Mesh Painter")) + init_value(static_cast<k3d::gl::imesh_painter*>(0))),
 		m_ri_painter(init_owner(*this) + init_name("ri_painter") + init_label(_("RenderMan Mesh Painter")) + init_description(_("RenderMan Mesh Painter")) + init_value(static_cast<k3d::ri::imesh_painter*>(0))),
 		m_show_component_selection(init_owner(*this) + init_name("show_component_selection") + init_label(_("Show Component Selection")) + init_description(_("Show component selection")) + init_value(false))
@@ -76,25 +76,25 @@ public:
 		m_show_component_selection.changed_signal().connect(make_async_redraw_slot());
 	}
 
-	~new_mesh_instance()
+	~mesh_instance()
 	{
 	}
 
 	sigc::slot<void, iunknown*> make_reset_mesh_slot()
 	{
-		return sigc::mem_fun(*this, &new_mesh_instance::reset_mesh);
+		return sigc::mem_fun(*this, &mesh_instance::reset_mesh);
 	}
 
 	sigc::slot<void, iunknown*> make_selection_changed_slot()
 	{
-		return sigc::mem_fun(*this, &new_mesh_instance::selection_changed);
+		return sigc::mem_fun(*this, &mesh_instance::selection_changed);
 	}
 
 	void reset_mesh(iunknown* const Hint)
 	{
 		if (dynamic_cast<k3d::hint::mesh_topology_changed_t*>(Hint) || !Hint)
 		{
-			k3d::log() << debug << "new_mesh_instance: doing real mesh reset" << std::endl;
+			k3d::log() << debug << "mesh_instance: doing real mesh reset" << std::endl;
 			m_output_mesh.reset(0, Hint);
 		}
 		else
@@ -242,7 +242,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<new_mesh_instance,
+		static k3d::document_plugin_factory<mesh_instance,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink,
 			k3d::interface_list<k3d::itransform_source,
@@ -264,12 +264,12 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// new_mesh_instance_factory
+// mesh_instance_factory
 
-k3d::iplugin_factory& new_mesh_instance_factory()
+k3d::iplugin_factory& mesh_instance_factory()
 {
-	return new_mesh_instance::get_factory();
+	return mesh_instance::get_factory();
 }
 
-} // namespace libk3ddevelopment
+} // namespace libk3dmeshinstance
 

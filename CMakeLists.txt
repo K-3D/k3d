@@ -73,6 +73,7 @@ OPTION(K3D_BUILD_K3DSCRIPT_MODULE "Build the k3dscript scripting language module
 OPTION(K3D_BUILD_K3D_MODULE "Build the K-3D file format module" ON)
 OPTION(K3D_BUILD_LSYSTEM_MODULE "Build the l-system parser module" ON)
 OPTION(K3D_BUILD_MESH_MODULE "Build the mesh plugin module" ON)
+OPTION(K3D_BUILD_MESH_INSTANCE_MODULE "Build the mesh-instance plugin module" ON)
 OPTION(K3D_BUILD_NGUI_MODULE "Build the standard graphical user interface plugin" ON)
 OPTION(K3D_BUILD_NLS "Build K-3D with native language support" OFF)
 OPTION(K3D_BUILD_NUI_MODULE "Build the Null User Interface module" ON)
