@@ -48,12 +48,6 @@ IF(WIN32)
 
 ENDIF(WIN32)
 
-######################################################################
-# Mac OS X specific configuration
-
-IF(APPLE)
-ENDIF(APPLE)
-
 # Following are the consolidated variables that should be used for builds
 SET(K3D_BOOST_INCLUDE_DIRS
 	${K3D_BOOST_INCLUDE_DIR}

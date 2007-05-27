@@ -168,9 +168,3 @@ IF(WIN32)
 
 ENDIF(WIN32)
 
-######################################################################
-# Mac OS X specific configuration
-
-IF(APPLE)
-ENDIF(APPLE)
-

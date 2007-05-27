@@ -101,16 +101,21 @@ K3D_ADD_SCRIPTED_TEST(test.script.detect.lang.null)
 SET_TESTS_PROPERTIES(test.script.detect.lang.null PROPERTIES WILL_FAIL TRUE)
 
 K3D_ADD_SCRIPTED_TEST(test.script.detect.lang.k3dscript)
-K3D_ADD_SCRIPTED_TEST(test.script.detect.lang.python.py)
+
+IF(K3D_BUILD_PYTHON_MODULES)
+	K3D_ADD_SCRIPTED_TEST(test.script.detect.lang.python.py)
+ENDIF(K3D_BUILD_PYTHON_MODULES)
 
 K3D_ADD_SCRIPTED_TEST(test.script.failure.lang.k3dscript)
 SET_TESTS_PROPERTIES(test.script.failure.lang.k3dscript PROPERTIES WILL_FAIL TRUE)
 
-K3D_ADD_SCRIPTED_TEST(test.script.failure.lang.python.py)
-SET_TESTS_PROPERTIES(test.script.failure.lang.python.py PROPERTIES WILL_FAIL TRUE)
+IF(K3D_BUILD_PYTHON_MODULES)
+	K3D_ADD_SCRIPTED_TEST(test.script.failure.lang.python.py)
+	SET_TESTS_PROPERTIES(test.script.failure.lang.python.py PROPERTIES WILL_FAIL TRUE)
 
-K3D_ADD_SCRIPTED_TEST(test.script.failure.lang.python.exception.py)
-SET_TESTS_PROPERTIES(test.script.failure.lang.python.exception.py PROPERTIES WILL_FAIL TRUE)
+	K3D_ADD_SCRIPTED_TEST(test.script.failure.lang.python.exception.py)
+	SET_TESTS_PROPERTIES(test.script.failure.lang.python.exception.py PROPERTIES WILL_FAIL TRUE)
+ENDIF(K3D_BUILD_PYTHON_MODULES)
 
 K3D_ADD_PYTHON_TEST(document.create.py)
 K3D_ADD_PYTHON_TEST(document.stress.high_node_count.py)

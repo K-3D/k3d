@@ -42,6 +42,12 @@
 
 #endif // !K3D_PLATFORM_WIN32
 
+#ifdef K3D_PLATFORM_DARWIN
+
+	#define MSG_NOSIGNAL SO_NOSIGPIPE
+
+#endif // K3D_PLATFORM_DARWIN
+
 namespace k3d
 {
 

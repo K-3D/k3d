@@ -172,14 +172,14 @@ namespace detail
 		void* module = dlopen(FilePath.native_filesystem_string().c_str(), 0);
 		if(!module)
 		{
-			log() << error << "Module " << FilePath.leaf() << ": " << dlerror() << std::endl;
+			log() << error << "Module " << FilePath.leaf().raw() << ": " << dlerror() << std::endl;
 			return;
 		}
 
 		RegisterPlugins = register_plugins_entry_point(dlsym(module, "register_k3d_plugins"));
 		if(!RegisterPlugins)
 		{
-			log() << error << "Module " << FilePath.leaf() << " does not contain required register_k3d_plugins() entry point" << std::endl;
+			log() << error << "Module " << FilePath.leaf().raw() << " does not contain required register_k3d_plugins() entry point" << std::endl;
 			return;
 		}
 	}
