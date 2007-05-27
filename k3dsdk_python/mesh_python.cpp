@@ -1302,10 +1302,7 @@ const std::string mesh::str()
 	return buffer.str();
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-// export_mesh
-
-void export_mesh()
+void mesh::define_class()
 {
 	class_<mesh>("mesh")
 		.def("bicubic_patches", &mesh::bicubic_patches)

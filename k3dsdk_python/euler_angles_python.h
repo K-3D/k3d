@@ -32,8 +32,24 @@ namespace k3d
 namespace python
 {
 
-const euler_angles euler_angles_init(euler_angles::AngleOrder order, double a, double b, double c);
-void export_euler_angles();
+class euler_angles :
+	public k3d::euler_angles
+{
+	typedef k3d::euler_angles base;
+public:
+	euler_angles(const AngleOrder Order, const double A, const double B, const double C);
+
+	const int len() const;
+	const double getitem(const int Item) const;
+	void setitem(const int Item, const double Value);
+	const std::string str() const;
+
+	static void define_class();
+};
+
+const euler_angles operator+(const euler_angles& LHS, const euler_angles& RHS);
+const euler_angles operator*(const euler_angles& LHS, const double RHS);
+const euler_angles operator*(const double LHS, const euler_angles& RHS);
 
 } // namespace python
 

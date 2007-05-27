@@ -58,7 +58,8 @@ void point3_setitem(k3d::point3& lhs, int item, double value)
 
 void export_point3()
 {
-	class_<k3d::point3>("point3", "A position in three-space", no_init)
+	class_<k3d::point3>("point3",
+		"Stores a position in three-dimensional space", no_init)
 		.def(init<double, double, double>())
 		.def(init<const k3d::point3&>())
 		.def("__len__", point3_len)

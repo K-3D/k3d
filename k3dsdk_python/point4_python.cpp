@@ -56,7 +56,8 @@ void point4_setitem(k3d::point4& lhs, int item, double value)
 
 void export_point4()
 {
-	class_<k3d::point4>("point4")
+	class_<k3d::point4>("point4",
+		"Stores a position in four-dimensional space", no_init)
 		.def(init<double, double, double, double>())
 		.def(init<const k3d::point4&>())
 		.def("__len__", point4_len)

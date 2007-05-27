@@ -51,9 +51,9 @@ public:
 
 	boost::python::object getattr(const std::string& Name);
 	void setattr(const std::string& Name, const boost::python::object& Value);
-};
 
-void export_iproperty_collection();
+	static void define_class();
+};
 
 } // namespace python
 

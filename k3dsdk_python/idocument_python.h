@@ -60,9 +60,9 @@ public:
 
 	boost::python::object get_dependency(iproperty& Property);
 	void set_dependency(iproperty& LHS, iproperty& RHS);
-};
 
-void export_idocument();
+	static void define_class();
+};
 
 } // namespace python
 

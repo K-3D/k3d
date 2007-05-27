@@ -154,10 +154,11 @@ const std::string iproperty::units()
 	return "";
 }
 
-void export_iproperty()
+void iproperty::define_class()
 {
 	class_<iproperty>("iproperty",
-		"Encapsulates a K-3D property. In K-3D, a document contains nodes, and nodes contain properties, which are the external representations of a node's internal state.")
+		"Encapsulates a K-3D property. In K-3D, a document contains nodes, and nodes contain properties, "
+		"which are the external representations of a node's internal state.", no_init)
 		.def("name", &iproperty::name,
 			"Unique identifier, used for serialization and scripting.")
 		.def("label", &iproperty::label,

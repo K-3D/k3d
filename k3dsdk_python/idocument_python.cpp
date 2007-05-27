@@ -160,7 +160,7 @@ void idocument::set_dependency(iproperty& From, iproperty& To)
 	wrapped().dag().set_dependencies(dependencies);
 }
 
-void export_idocument()
+void idocument::define_class()
 {
 	class_<idocument>("idocument")
 		.def("save", &idocument::save)

@@ -89,13 +89,19 @@ void icommand_node::execute_command(const std::string& Command, const std::strin
 	throw std::runtime_error("Unknown command result");
 }
 
-void export_icommand_node()
+void icommand_node::define_class()
 {
-	class_<icommand_node>("icommand_node")
-		.def("command_node_name", &icommand_node::name)
-		.def("children", &icommand_node::children)
-		.def("get_child", &icommand_node::get_child)
-		.def("execute_command", &icommand_node::execute_command);
+	class_<icommand_node>("icommand_node",
+		"Abstract interface implemented by object that can execute arbitrary commands.\n\n"
+		"Use L{dynamic_cast} to convert an icommand_node object to some other interface type.", no_init)
+		.def("command_node_name", &icommand_node::name,
+			"Returns the name of this command node as a string.")
+		.def("children", &icommand_node::children,
+			"Returns this command node's children (if any) as a list of icommand_node objects.")
+		.def("get_child", &icommand_node::get_child,
+			"Given a string name, returns the given child.")
+		.def("execute_command", &icommand_node::execute_command,
+			"Executes a command.");
 }
 
 } // namespace python

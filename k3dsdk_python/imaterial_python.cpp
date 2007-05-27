@@ -45,7 +45,9 @@ imaterial::imaterial(k3d::imaterial* Material) :
 
 void imaterial::define_class()
 {
-	class_<imaterial>("imaterial", no_init);
+	class_<imaterial>("imaterial",
+		"Abstract interface implemented by objects that can act as surface materials within a shading model.\n\n"
+		"Use L{dynamic_cast} to convert an imaterial object to another interface type.", no_init);
 }
 
 } // namespace python

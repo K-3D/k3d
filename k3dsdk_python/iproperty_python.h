@@ -54,9 +54,9 @@ public:
 	const bool is_enumeration();
 	boost::python::list enumeration_values();
 	const std::string units();
-};
 
-void export_iproperty();
+	static void define_class();
+};
 
 } // namespace python
 

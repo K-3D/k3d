@@ -38,7 +38,6 @@ class angle_axis :
 	typedef k3d::angle_axis base;
 
 public:
-	angle_axis();
 	angle_axis(double Angle, const vector3& Axis);
 	angle_axis(const k3d::angle_axis& Value);
 

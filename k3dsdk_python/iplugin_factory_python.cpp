@@ -104,7 +104,7 @@ const std::string iplugin_factory::quality()
 	return "unknown";
 }
 
-void export_iplugin_factory()
+void iplugin_factory::define_class()
 {
 	class_<iplugin_factory>("iplugin_factory",
 		"Encapsulates a K-3D plugin factory, which stores metadata describing a plugin type.")

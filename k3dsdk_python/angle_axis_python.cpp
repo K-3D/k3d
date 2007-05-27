@@ -37,11 +37,6 @@ namespace python
 ////////////////////////////////////////////////////////////////////////////////////
 // angle_axis
 
-angle_axis::angle_axis() :
-	base()
-{
-}
-
 angle_axis::angle_axis(double Angle, const vector3& Axis) :
 	base(k3d::radians(Angle), Axis)
 {
@@ -77,9 +72,9 @@ const std::string angle_axis::str() const
 void angle_axis::define_class()
 {
 	class_<angle_axis>("angle_axis",
-		"Stores a rotation around an arbitrary axis.\n"
+		"Encodes a change in orientation as a rotation around an arbitrary axis.\n"
 		"@note: This is the preferred datatype for storing orientation "
-		"in K-3D because it does not suffer from gimbal-lock.")
+		"in K-3D because it does not suffer from gimbal-lock.", no_init)
 		.def(init<double, const k3d::vector3&>())
 		.add_property("angle_radians", &angle_axis::get_angle_radians)
 		.add_property("angle", &angle_axis::get_angle, &angle_axis::set_angle,

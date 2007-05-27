@@ -56,7 +56,8 @@ void normal3_setitem(k3d::normal3& lhs, int item, double value)
 
 void export_normal3()
 {
-	class_<k3d::normal3>("normal3")
+	class_<k3d::normal3>("normal3",
+		"Stores a normal vector in three-dimensional space", no_init)
 		.def(init<double, double, double>())
 		.def(init<const k3d::normal3&>())
 		.def("__len__", normal3_len)

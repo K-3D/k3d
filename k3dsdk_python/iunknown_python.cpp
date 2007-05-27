@@ -44,7 +44,10 @@ iunknown::iunknown(k3d::iunknown* Unknown) :
 
 void iunknown::define_class()
 {
-	class_<iunknown>("iunknown", no_init);
+	class_<iunknown>("iunknown", 
+		"Abstract interface that represents an object with unknown capabilities.\n\n"
+		"Use L{dynamic_cast} to test whether an iunknown object implements a specific interface / "
+		"convert an iunknown object to a specific interface type.", no_init);
 }
 
 } // namespace python

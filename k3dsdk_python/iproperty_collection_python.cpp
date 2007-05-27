@@ -185,16 +185,26 @@ void iproperty_collection::setattr(const std::string& Name, const object& Value)
 	throw std::invalid_argument("unknown property: " + Name);
 }
 
-void export_iproperty_collection()
+void iproperty_collection::define_class()
 {
-	class_<iproperty_collection>("iproperty_collection")
-		.def("properties", &iproperty_collection::properties)
-		.def("get_property", &iproperty_collection::get_property)
-		.def("add_user_property", &iproperty_collection::add_user_property)
-		.def("add_ri_attribute", &iproperty_collection::add_ri_attribute)
-		.def("add_ri_option", &iproperty_collection::add_ri_option)
-		.def("__getattr__", &iproperty_collection::getattr)
-		.def("__setattr__", &iproperty_collection::setattr);
+	class_<iproperty_collection>("iproperty_collection",
+		"Abstract interface for a collection of L{iproperty} objects.", no_init)
+		.def("properties", &iproperty_collection::properties,
+			"Returns the set of all properties held within this collection.\n\n"
+			"@return: A list of L{iproperty} objects.")
+		.def("get_property", &iproperty_collection::get_property,
+			"Returns a single property by name.\n\n"
+			"@return: An L{iproperty} object, or None.")
+		.def("add_user_property", &iproperty_collection::add_user_property,
+			"Adds a custom user property to the collection.")
+		.def("add_ri_attribute", &iproperty_collection::add_ri_attribute,
+			"Adds a custom RenderMan attribute property to the collection.")
+		.def("add_ri_option", &iproperty_collection::add_ri_option,
+			"Adds a custom RenderMan option property to the collection.")
+		.def("__getattr__", &iproperty_collection::getattr,
+			"Provides direct retrieval of L{iproperty} values by name.")
+		.def("__setattr__", &iproperty_collection::setattr,
+			"Provides direct assignment of L{iproperty} values by name.");
 }
 
 } // namespace python

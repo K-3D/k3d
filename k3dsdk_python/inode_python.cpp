@@ -60,10 +60,16 @@ uint64_t inode::hash()
 
 void inode::define_class()
 {
-	class_<inode>("inode", no_init)
-		.def("document", &inode::document)
-		.def("factory", &inode::factory)
-		.def("__hash__", &inode::hash);
+	class_<inode>("inode",
+		"Abstract interface implemented by all document nodes.\n\n"
+		"Use L{dynamic_cast} to test whether an inode object implements a specific interface / "
+		"convert an inode object to a specific interface type.", no_init)
+		.def("document", &inode::document,
+			"Returns the L{idocument} that owns this node.")
+		.def("factory", &inode::factory,
+			"Returns the L{iplugin_factory} used to create this node type.")
+		.def("__hash__", &inode::hash,
+			"Returns a hash value that can be used as a key when storing inode objects in a map.");
 }
 
 } // namespace python

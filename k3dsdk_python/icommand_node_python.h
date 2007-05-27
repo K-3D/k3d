@@ -48,9 +48,9 @@ public:
 	icommand_node get_child(const std::string& Name);
 
 	void execute_command(const std::string& Command, const std::string& Arguments);
-};
 
-void export_icommand_node();
+	static void define_class();
+};
 
 } // namespace python
 

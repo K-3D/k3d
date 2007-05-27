@@ -338,19 +338,19 @@ BOOST_PYTHON_MODULE(k3d)
 	export_bounding_box3();
 	export_color();
 	export_const_arrays();
-	export_euler_angles();
-	export_icommand_node();
-	export_idocument();
+	euler_angles::define_class();
+	icommand_node::define_class();
+	idocument::define_class();
 	imaterial::define_class();
 	imesh_storage::define_class();
 	inode::define_class();
-	export_iplugin_factory();
-	export_iproperty();
-	export_iproperty_collection();
+	iplugin_factory::define_class();
+	iproperty::define_class();
+	iproperty_collection::define_class();
 	iunknown::define_class();
 	iuser_interface::define_class();
 	export_matrix4();
-	export_mesh();
+	mesh::define_class();
 	export_mesh_selection();
 	node::define_class();
 	export_normal3();
@@ -374,7 +374,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Attempts to coerce an object from one type to another.");
 	def("print_diff", module_print_diff,
 		"Returns the difference of two L{mesh} objects as a string.");
-	def("euler_angles", euler_angles_init); // Special-case the euler_angles ctor to handle the degrees-to-radians conversion
 	def("execute_script", module_execute_script,
 		"Executes a script (which does not have to be written in Python).");
 	def("exit", module_exit,

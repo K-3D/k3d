@@ -54,9 +54,9 @@ public:
 	const bool is_document_plugin();
 	const boost::python::list categories();
 	const std::string quality();
-};
 
-void export_iplugin_factory();
+	static void define_class();
+};
 
 } // namespace python
 

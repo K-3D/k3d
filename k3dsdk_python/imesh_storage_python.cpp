@@ -56,8 +56,11 @@ boost::python::object imesh_storage::new_mesh()
 
 void imesh_storage::define_class()
 {
-	class_<imesh_storage>("imesh_storage", no_init)
-		.def("new_mesh", &imesh_storage::new_mesh);
+	class_<imesh_storage>("imesh_storage",
+		"Abstract interface implemented by nodes that can provide persistent storage of L{mesh} objects.", no_init)
+		.def("new_mesh", &imesh_storage::new_mesh,
+			"Creates a new L{mesh} object whose lifetime will be managed by the imesh_storage object.\n\n"
+			"@return: Returns a new L{mesh} object.");
 }
 
 } // namespace python

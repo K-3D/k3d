@@ -56,7 +56,8 @@ void vector3_setitem(k3d::vector3& lhs, int item, double value)
 
 void export_vector3()
 {
-	class_<k3d::vector3>("vector3")
+	class_<k3d::vector3>("vector3",
+		"Stores a direction vector in three-dimensional space", no_init)
 		.def(init<double, double, double>())
 		.def(init<const k3d::vector3&>())
 		.def("__len__", vector3_len)
