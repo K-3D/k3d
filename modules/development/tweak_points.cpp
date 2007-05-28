@@ -117,6 +117,11 @@ public:
 		}
 	}
 	
+	virtual iunknown* hint() const
+	{
+		return k3d::hint::mesh_address_changed();
+	}
+	
 	/// Update affected mesh components in the hint. This needs to be done only when the selection changed
 	void on_selected_points_changed(k3d::iunknown* Hint)
 	{
@@ -159,6 +164,7 @@ public:
 		
 		if (!dynamic_cast<internal_update_hint*>(Hint))
 		{
+			k3d::log() << debug << "TweakPoints: Emitting 0 hint!" << std::endl;
 			base::emit_hint(0); // we need to flush any cached data if the tweaks changed from an external cause
 		}
 	}

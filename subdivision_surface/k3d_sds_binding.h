@@ -60,8 +60,8 @@ public:
 	// Extra K3D specific methods
 	//////////
 
-	/// Store cache validity status based on the supplied hint
-	bool validate(k3d::iunknown* Hint);
+	/// Reset mesh addresses
+	void set_new_addresses(const k3d::mesh& Mesh);
 
 	/// Get the faces that were modified by the last update
 	facevertices_map& get_modified_faces()
@@ -74,17 +74,6 @@ public:
 	{
 		return m_all_faces;
 	}
-	
-	/// True if the cache was updated. Only the first call after update() returns "true"
-	bool updated()
-	{
-		if (m_updated)
-		{
-			m_updated = false;
-			return true;
-		}
-		return false;
-	}
 
 	// True if the given face or its neighbours contain selected elements
 	bool selected(size_t Face, int Recurse = 4);
@@ -96,8 +85,6 @@ public:
 	}
 
 private:
-	bool m_hint_validated;
-	bool m_updated;
 
 	boost::shared_ptr<const k3d::mesh::points_t> m_input_points;
 	boost::shared_ptr<const k3d::mesh::polyhedra_t> m_input_polyhedra;
@@ -180,14 +167,24 @@ public:
 	/// (K-3D specific) update selection color arrays
 	virtual void update_selection() = 0;
 	
-	/// Validate cache through hint
-	virtual void validate(k3d::iunknown* Hint) = 0;
-	
 	/// Set the colors of unselected and selected mesh components
 	virtual void set_colors(const k3d::color Unselected, const k3d::color Selected)
 	{
 		m_unselected_color = Unselected;
 		m_selected_color = Selected;
+	}
+	
+	/// Reset mesh addresses
+	void set_new_addresses(const k3d::mesh& Mesh)
+	{
+		m_first_level_cache_mesh = &Mesh;
+		dynamic_cast<k3d_cache_input*>(m_first_level_cache)->set_new_addresses(Mesh);
+	}
+		
+	/// Clear the list of modified faces to force recalculation of the geometry affected by a change
+	void clear_modified_faces()
+	{
+		dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_modified_faces().clear();
 	}
 	
 protected:
@@ -220,9 +217,6 @@ public:
 	
 	/// (K-3D specific) update selection color arrays
 	virtual void update_selection() {}
-	
-	/// Validate cache through hint
-	virtual void validate(k3d::iunknown* Hint) {}
 
 protected:
 
@@ -246,9 +240,7 @@ public:
 		m_n_edges(0),
 		m_n_points(0),
 		m_n_corners(0),
-		m_mesh_selection(false),
-		m_update_selection(true),
-		m_validated_hint(false)
+		m_mesh_selection(false)
 	{
 		m_first_level_cache_mesh = 0;
 	}
@@ -276,10 +268,14 @@ public:
 	/// (K-3D specific) update selection color arrays
 	void update_selection();
 	
-	/// Validate cache through hint
-	void validate(k3d::iunknown* Hint);
-	
+	/// Set component colors
 	void set_colors(const k3d::color Unselected, const k3d::color Selected);
+	
+	/// Regenerate VBOs
+	void regenerate_vbos();
+
+	/// Update point VBO positions
+	void update_vbo_positions();
 	
 protected:
 	////////
@@ -292,8 +288,6 @@ protected:
 	void client_output_nurbs(k3d::mesh* Output = 0);
 
 private:
-	/// Regenerate VBOs if the mesh structure has changed
-	void regenerate_vbos();
 	// VBOs for the cached data
 	std::vector<GLuint> m_point_vbos, m_face_vbos, m_normals_vbos, m_edge_vbos, m_corner_vbos;
 	// Color VBOs for selection color
@@ -304,14 +298,8 @@ private:
 	std::vector<std::vector<size_t> > m_face_indices;
 	// Number of components to draw
 	std::vector<size_t> m_n_faces, m_n_edges, m_n_points, m_n_corners;
-	bool m_update_selection;
-	// Execute the scheduled selection update
-	void do_selection_update();
-	// Update point positions
-	void update_positions();
 	// Old mesh selection state
 	bool m_mesh_selection;
-	bool m_validated_hint;
 	/// Initialise color buffers
 	void init_color_vbos();
 }; // class k3d_vbo_sds_cache

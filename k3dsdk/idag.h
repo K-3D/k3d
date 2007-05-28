@@ -49,7 +49,7 @@ public:
 	typedef std::vector<iproperty*> properties_t;
 
 	/// Updates dependencies between a set of properties
-	virtual void set_dependencies(dependencies_t& Dependencies) = 0;
+	virtual void set_dependencies(dependencies_t& Dependencies, iunknown* Hint = 0) = 0;
 
 	/// Returns the dependency for a given property - may return NULL for no dependency
 	virtual iproperty* dependency(iproperty& Target) = 0;

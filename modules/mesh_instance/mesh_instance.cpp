@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Timothy M. Shead (tshead@k-3d.com)
+		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/bounded.h>
@@ -26,6 +26,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/drawable_gl.h>
 #include <k3dsdk/hints.h>
+#include <k3dsdk/idag.h>
 #include <k3dsdk/i18n.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/imesh_painter_ri.h>
@@ -74,10 +75,15 @@ public:
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 		m_gl_painter.changed_signal().connect(make_async_redraw_slot());
 		m_show_component_selection.changed_signal().connect(make_async_redraw_slot());
+		
+		deleted_signal().connect(sigc::mem_fun(*this, &mesh_instance::on_instance_delete));
+		
+		Document.dag().dependency_signal().connect(sigc::mem_fun(*this, &mesh_instance::on_dependency_change));
 	}
 
 	~mesh_instance()
 	{
+		m_output_mesh.changed_signal().emit(k3d::hint::mesh_deleted());
 	}
 
 	sigc::slot<void, iunknown*> make_reset_mesh_slot()
@@ -89,11 +95,48 @@ public:
 	{
 		return sigc::mem_fun(*this, &mesh_instance::selection_changed);
 	}
-
-	void reset_mesh(iunknown* const Hint)
+	
+	/// Needed to notify caches that we are deleted
+	void on_instance_delete()
 	{
-		if (dynamic_cast<k3d::hint::mesh_topology_changed_t*>(Hint) || !Hint)
+		reset_mesh(k3d::hint::mesh_deleted());
+	}
+	
+	/// Elimination of nodes in the pipeline needs to be passed to the painters for correct cache clean-up
+	void on_dependency_change(const k3d::idag::dependencies_t& Dependencies)
+	{
+		k3d::idag::dependencies_t::const_iterator new_mesh_it = Dependencies.find(&m_input_mesh);
+		if (new_mesh_it != Dependencies.end())
 		{
+			for (k3d::idag::dependencies_t::const_iterator dep = Dependencies.begin(); dep != Dependencies.end(); ++dep)
+			{
+				if (!dep->second) // a node was deleted from the mesh tree, so any cached data needs to be flushed
+				{
+					reset_mesh(k3d::hint::mesh_deleted());
+					return;
+				}
+			}
+		} 
+	}
+
+	void reset_mesh(iunknown* Hint)
+	{
+		if (dynamic_cast<k3d::hint::mesh_topology_changed_t*>(Hint) || dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint) || !Hint)
+		{
+			if (k3d::hint::mesh_address_changed_t* address_hint = dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint))
+			{
+				k3d::mesh* output_mesh = m_output_mesh.value();
+				address_hint->old_points_address.reset();
+				address_hint->old_edge_points_address.reset();
+				address_hint->old_face_first_loops_address.reset();
+				if (output_mesh) {
+					address_hint->old_points_address = output_mesh->points;
+					if (output_mesh->polyhedra) {
+						address_hint->old_edge_points_address = output_mesh->polyhedra->edge_points;
+						address_hint->old_face_first_loops_address = output_mesh->polyhedra->face_first_loops;
+					}
+				}
+			}
 			k3d::log() << debug << "mesh_instance: doing real mesh reset" << std::endl;
 			m_output_mesh.reset(0, Hint);
 		}
@@ -123,7 +166,6 @@ public:
 			k3d::replace_selection(m_mesh_selection.value(), *output_mesh);
 		}
 		k3d::hint::selection_changed_t hint;
-		hint.set_selection(m_mesh_selection.value()); // provide current selection as hint
 		reset_mesh(&hint);
 	}
 

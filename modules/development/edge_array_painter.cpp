@@ -44,16 +44,16 @@ namespace libk3ddevelopment
 // edge_array_painter
 
 class edge_array_painter :
-	public colored_selection_painter
+	public colored_selection_painter,
+	public hint_processor
 {
 	typedef colored_selection_painter base;
 public:
 	edge_array_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_points_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>::instance(Document)),
-		m_edges_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, vbo>::instance(Document)),
-		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, selection_records_t>::instance(Document)),
-		m_hint_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>::instance(Document))
+		m_points_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, point_vbo>::instance(Document)),
+		m_edges_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, edge_vbo>::instance(Document)),
+		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, edge_selection>::instance(Document))
 	{
 	}
 	
@@ -64,96 +64,38 @@ public:
 		m_selection_cache.remove_painter(this);
 	}
 	
-	/// Updates the vertex buffer object.
-	void update_buffer(const k3d::mesh& Mesh)
-	{
-		if(!Mesh.points || Mesh.points->empty())
-			return;
-		if(!Mesh.polyhedra)
-			return;
-		if(!Mesh.polyhedra->edge_points)
-			return;
-		if(!Mesh.polyhedra->clockwise_edges)
-			return;
-				
-		// Fill vertex buffer
-		create_point_vbo(Mesh.points, m_points_cache);
-		k3d::hint::mesh_geometry_changed_t* changed_hint = m_hint_cache.get_data(Mesh.points);
-		if (changed_hint)
-		{
-			update_point_vbo(Mesh.points, m_points_cache, changed_hint->changed_points);
-// 			m_hint_cache.remove_data(Mesh.points);
-		}
-		
-		//VBO for edge indices
-		vbo* edge_buffer = m_edges_cache.get_data(Mesh.polyhedra->edge_points);
-		if (!edge_buffer)
-		{
-			const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-			const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-			return_if_fail(edge_points.size() == clockwise_edges.size());
-			edge_buffer = m_edges_cache.create_data(Mesh.polyhedra->edge_points);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *edge_buffer);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * edge_points.size() * 2, 0, GL_STATIC_DRAW); // left uninited
-			// init index buffer with indices from edge_points and clockwise_edges
-			GLuint* indices = static_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE)); // map buffer memory in indices
-			for (size_t i = 0; i < edge_points.size(); ++i)
-			{
-				indices[2*i] = static_cast<GLuint>(edge_points[i]);
-				indices[2*i + 1] = static_cast<GLuint>(edge_points[clockwise_edges[i]]);
-			}
-			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER); // release indices
-		}
-
-		// selection data
-		selection_records_t* selection = m_selection_cache.get_data(Mesh.polyhedra->edge_points);
-		if (!selection)
-		{
-			selection = m_selection_cache.create_data(Mesh.polyhedra->edge_points);
-			array_to_selection(*Mesh.polyhedra->edge_selection, *selection);
-		}
-	}
-	
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		if(!Mesh.points || Mesh.points->empty())
+		if(!k3d::validate_polyhedra(Mesh))
 			return;
-		if(!Mesh.polyhedra)
-			return;
-		if(!Mesh.polyhedra->edge_points)
-			return;
-		if(!Mesh.polyhedra->clockwise_edges)
-			return;
-
-		update_buffer(Mesh);
 		
 		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color();
 		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
-
-		vbo* const point_buffer = m_points_cache.get_data(Mesh.points);
-		vbo* const edge_buffer = m_edges_cache.get_data(Mesh.polyhedra->edge_points);
-		
-		return_if_fail(glIsBuffer(*point_buffer));
-		return_if_fail(glIsBuffer(*edge_buffer));
 		
 		clean_vbo_state();
 		
-		glBindBuffer(GL_ARRAY_BUFFER, *point_buffer);
-		glVertexPointer(3, GL_DOUBLE, 0, 0);
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *edge_buffer);
+		point_vbo* const point_buffer = m_points_cache.create_data(Mesh.points);
+		edge_vbo* const edge_buffer = m_edges_cache.create_data(Mesh.polyhedra->edge_points);
+		
+		point_buffer->execute(Mesh);
+		point_buffer->bind();
+		
+		edge_buffer->execute(Mesh);
+		edge_buffer->bind();
+		
+		edge_selection* selected_edges = m_selection_cache.create_data(Mesh.polyhedra->edge_points);
+		selected_edges->execute(Mesh);
 		
 		size_t edge_count = Mesh.polyhedra->edge_points->size();
-		const selection_records_t* edge_selection = m_selection_cache.get_data(Mesh.polyhedra->edge_points);
-		return_if_fail(edge_selection);
-		if (!edge_selection->empty())
+		const selection_records_t& edge_selection_records = selected_edges->records();
+		if (!edge_selection_records.empty())
 		{
-			for (selection_records_t::const_iterator record = edge_selection->begin(); record != edge_selection->end(); ++record)
+			for (selection_records_t::const_iterator record = edge_selection_records.begin(); record != edge_selection_records.end(); ++record)
 			{
 				k3d::gl::color3d(record->weight ? selected_color : color);
 				size_t start = record->begin * 2;
@@ -177,32 +119,25 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		if(!Mesh.points || Mesh.points->empty())
+		if(!k3d::validate_polyhedra(Mesh))
 			return;
-		if(!Mesh.polyhedra)
+			
+		if (!SelectionState.select_edges)
 			return;
-		if(!Mesh.polyhedra->edge_points)
-			return;
-		if(!Mesh.polyhedra->clockwise_edges)
-			return;
-
-		update_buffer(Mesh);
 		
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
-		
-		vbo* const point_buffer = m_points_cache.get_data(Mesh.points);
-		vbo* const edge_buffer = m_edges_cache.get_data(Mesh.polyhedra->edge_points);
-		
-		return_if_fail(glIsBuffer(*point_buffer));
-		return_if_fail(glIsBuffer(*edge_buffer));
-		
+
 		clean_vbo_state();
 		
-		glBindBuffer(GL_ARRAY_BUFFER, *point_buffer);
-		glVertexPointer(3, GL_DOUBLE, 0, 0);
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *edge_buffer);
+		point_vbo* const point_buffer = m_points_cache.create_data(Mesh.points);
+		edge_vbo* const edge_buffer = m_edges_cache.create_data(Mesh.polyhedra->edge_points);
+		
+		point_buffer->execute(Mesh);
+		point_buffer->bind();
+		
+		edge_buffer->execute(Mesh);
+		edge_buffer->bind();
 		
 		const size_t edge_count = Mesh.polyhedra->edge_points->size();
 		for(size_t edge = 0; edge < edge_count; ++edge)
@@ -221,37 +156,14 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		if(!Mesh.points || Mesh.points->empty())
-			return;
-		if(!Mesh.polyhedra)
-			return;
-		if(!Mesh.polyhedra->edge_points)
-			return;
-		if(!Mesh.polyhedra->clockwise_edges)
+		if (!k3d::validate_polyhedra(Mesh))
 			return;
 		
 		m_points_cache.register_painter(Mesh.points, this);
 		m_edges_cache.register_painter(Mesh.polyhedra->edge_points, this);
 		m_selection_cache.register_painter(Mesh.polyhedra->edge_points, this);
 		
-		k3d::hint::mesh_geometry_changed_t* changed_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
-		k3d::hint::selection_changed_t* selection_hint = dynamic_cast<k3d::hint::selection_changed_t*>(Hint);
-		if (selection_hint)
-		{
-			m_selection_cache.remove_data(Mesh.polyhedra->edge_points);
-		}
-		else if (changed_hint && !changed_hint->changed_points.empty())
-		{
-			k3d::hint::mesh_geometry_changed_t& stored_changed_hint = *(m_hint_cache.create_data(Mesh.points));
-			stored_changed_hint = *changed_hint;
-		}
-		else
-		{
-			k3d::log() << debug << "removing edge data" << std::endl;
-			m_points_cache.remove_data(Mesh.points);
-			m_edges_cache.remove_data(Mesh.polyhedra->edge_points);
-			m_selection_cache.remove_data(Mesh.polyhedra->edge_points);
-		}
+		process(Mesh, Hint);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -266,11 +178,47 @@ public:
 		return factory;
 	}
 	
+protected:
+
+	///////
+	// hint processor implementation
+	///////
+	
+	virtual void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_points_cache.create_data(Mesh.points)->schedule(Mesh, Hint);
+	}
+	
+	virtual void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_selection_cache.create_data(Mesh.polyhedra->edge_points)->schedule(Mesh, Hint);
+	}
+	
+	virtual void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		on_mesh_deleted(Mesh, Hint);
+	}
+	
+	virtual void on_address_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		k3d::hint::mesh_address_changed_t* address_hint = dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint);
+		return_if_fail(address_hint);
+		m_points_cache.switch_key(address_hint->old_points_address, Mesh.points);
+		m_edges_cache.switch_key(address_hint->old_edge_points_address, Mesh.polyhedra->edge_points);
+		m_selection_cache.switch_key(address_hint->old_edge_points_address, Mesh.polyhedra->edge_points);
+	}
+	
+	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_points_cache.remove_data(Mesh.points);
+		m_edges_cache.remove_data(Mesh.polyhedra->edge_points);
+		m_selection_cache.remove_data(Mesh.polyhedra->edge_points);
+	}
+	
 private:
-	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>& m_points_cache;
-	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, vbo>& m_edges_cache;
-	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, selection_records_t>& m_selection_cache;
-	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>& m_hint_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, point_vbo>& m_points_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, edge_vbo>& m_edges_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, edge_selection>& m_selection_cache;
 };
 
 	/////////////////////////////////////////////////////////////////////////////

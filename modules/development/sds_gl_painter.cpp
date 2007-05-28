@@ -30,6 +30,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
+#include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
@@ -45,14 +46,17 @@ namespace libk3ddevelopment
 // sds_gl_face_painter
 
 class sds_gl_face_painter :
-	public colored_selection_painter
+	public colored_selection_painter,
+	public hint_processor
 {
 	typedef colored_selection_painter base;
+	/// Defines the set of sds caches associated with this painter
+	typedef std::set<sds_gl_cache*> sds_cache_set_t;
 
 public:
 	sds_gl_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document, const k3d::color Unselected = k3d::color(0.2,0.2,0.2), const k3d::color Selected = k3d::color(0.6,0.6,0.6)) :
 		base(Factory, Document, Unselected, Selected),
-		m_sds_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::sds::k3d_basic_opengl_sds_cache>::instance(Document)),
+		m_sds_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, sds_gl_cache>::instance(Document)),
 		m_levels(init_owner(*this) + init_name("levels") + init_label(_("Levels")) + init_description(_("Number of SDS levels")) + init_value(2) + init_constraint(constraint::minimum(2L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_levels.changed_signal().connect(sigc::mem_fun(*this, &sds_gl_face_painter::on_levels_changed));
@@ -65,7 +69,10 @@ public:
 	
 	void on_levels_changed(k3d::iunknown* Hint)
 	{
-		m_levels_changed = true;
+		for (sds_cache_set_t::iterator cache = m_sds_cache_set.begin(); cache != m_sds_cache_set.end(); ++cache) {
+			(*cache)->level_changed();
+		}
+		
 		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
 	}
 	
@@ -76,31 +83,22 @@ public:
 
 		if (!k3d::is_sds(Mesh))
 			return;
-
-		k3d::sds::k3d_basic_opengl_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
+		
+		sds_gl_cache* cache = m_sds_cache.get_data(Mesh.points);
 		if (!cache)
 		{
 			cache = m_sds_cache.create_data(Mesh.points);
-			cache->set_levels(m_levels.value());
-			cache->set_input(&Mesh);
-			cache->update_selection();
-			cache->update();
-			m_levels_changed = false;
-		}
-		else if (m_levels_changed)
-		{
-			cache->set_levels(m_levels.value());
-			cache->set_input(&Mesh);
-			cache->update_selection();
-			cache->update();
-			m_levels_changed = false;
+			cache->cache.set_input(&Mesh);
 		}
 		
-		cache->set_colors(selected_mesh_color(), selected_component_color());
+		m_sds_cache_set.insert(cache);
+		cache->register_property(&m_levels);
+		
+		cache->execute(Mesh);
 		
 		k3d::gl::store_attributes attributes;
 		
-		draw(cache, RenderState.node_selection);
+		draw(cache->cache, RenderState.node_selection);
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
@@ -111,26 +109,19 @@ public:
 		if (!k3d::is_sds(Mesh))
 			return;
 		
-		k3d::sds::k3d_basic_opengl_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
+		sds_gl_cache* cache = m_sds_cache.get_data(Mesh.points);
 		if (!cache)
 		{
 			cache = m_sds_cache.create_data(Mesh.points);
-			cache->set_levels(m_levels.value());
-			cache->set_input(&Mesh);
-			cache->update_selection();
-			cache->update();
-			m_levels_changed = false;
-		}
-		else if (m_levels_changed)
-		{
-			cache->set_levels(m_levels.value());
-			cache->set_input(&Mesh);
-			cache->update_selection();
-			cache->update();
-			m_levels_changed = false;
+			cache->cache.set_input(&Mesh);
 		}
 		
-		select(cache);
+		m_sds_cache_set.insert(cache);
+		cache->register_property(&m_levels);
+		
+		cache->execute(Mesh);
+		
+		select(cache->cache, SelectionState);
 	}
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
@@ -141,16 +132,11 @@ public:
 		if (!k3d::is_sds(Mesh))
 			return;
 
-		k3d::sds::k3d_basic_opengl_sds_cache* cache = m_sds_cache.get_data(Mesh.points);
+		process(Mesh, Hint);
 		
-		if (!cache)
-		{
-			cache = m_sds_cache.create_data(Mesh.points);
-			cache->set_levels(m_levels.value());
-		}
-		cache->validate(Hint);
-		cache->set_input(&Mesh);
-		cache->update();
+		sds_gl_cache* cache = m_sds_cache.get_data(Mesh.points);
+		if (cache)
+			cache->schedule(Mesh, Hint);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -166,12 +152,35 @@ public:
 	}
 
 protected:
-	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::sds::k3d_basic_opengl_sds_cache>& m_sds_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, sds_gl_cache>& m_sds_cache;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_levels;
-	bool m_levels_changed;
+	bool m_do_update;
+	
+	/// Hint processor implementation
+	void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_sds_cache.create_data(Mesh.points)->update = true;
+	}
+	
+	void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		on_mesh_deleted(Mesh, Hint);
+	}
+	
+	void on_address_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		k3d::hint::mesh_address_changed_t* address_hint = dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint);
+		return_if_fail(address_hint);
+		m_sds_cache.switch_key(address_hint->old_points_address, Mesh.points);
+	}
+	
+	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_sds_cache.remove_data(Mesh.points);
+	}
 	
 	// override to choose drawing mode
-	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache* Cache, bool Selected)
+	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache& Cache, bool Selected)
 	{
 		glFrontFace(GL_CW);
 		glEnable(GL_CULL_FACE);
@@ -184,14 +193,19 @@ protected:
 		if (!Selected)
 			k3d::gl::color3d(unselected_mesh_color());
 		
-		Cache->draw_faces(m_levels.value(), Selected);
+		Cache.draw_faces(m_levels.value(), Selected);
 	}
 	
 	// override to choose selection mode
-	virtual void select(k3d::sds::k3d_basic_opengl_sds_cache* Cache)
+	virtual void select(k3d::sds::k3d_basic_opengl_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		Cache->select_faces(m_levels.value());
+		if (!SelectionState.select_faces)
+			return;
+		Cache.select_faces(m_levels.value());
 	}
+	
+private:
+	sds_cache_set_t m_sds_cache_set;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -231,16 +245,18 @@ public:
 	}
 	
 private:
-	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache* Cache, bool Selected)
+	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache& Cache, bool Selected)
 	{
 		glDisable(GL_LIGHTING);
 		k3d::gl::color3d(unselected_mesh_color());
-		Cache->draw_borders(m_levels.value(), Selected);
+		Cache.draw_borders(m_levels.value(), Selected);
 	}
 	
-	virtual void select(k3d::sds::k3d_basic_opengl_sds_cache* Cache)
+	virtual void select(k3d::sds::k3d_basic_opengl_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		Cache->select_borders(m_levels.value());
+		if (!SelectionState.select_edges)
+			return;
+		Cache.select_borders(m_levels.value());
 	}
 };
 
@@ -281,16 +297,18 @@ public:
 	}
 	
 private:
-	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache* Cache, bool Selected)
+	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache& Cache, bool Selected)
 	{
 		glDisable(GL_LIGHTING);
 		k3d::gl::color3d(unselected_mesh_color());
-		Cache->draw_corners(m_levels.value(), Selected);
+		Cache.draw_corners(m_levels.value(), Selected);
 	}
 	
-	virtual void select(k3d::sds::k3d_basic_opengl_sds_cache* Cache)
+	virtual void select(k3d::sds::k3d_basic_opengl_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		Cache->select_corners(m_levels.value());
+		if (!SelectionState.select_points)
+			return;
+		Cache.select_corners(m_levels.value());
 	}
 };
 

@@ -30,8 +30,11 @@
 
 #include <k3dsdk/gl.h>
 #include <k3dsdk/imesh_painter_gl.h>
+#include <k3dsdk/iproperty.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
+
+#include <subdivision_surface/k3d_sds_binding.h>
 
 namespace libk3ddevelopment
 {
@@ -39,7 +42,72 @@ namespace libk3ddevelopment
 typedef std::map<size_t, size_t> indexmap_t;
 typedef std::multimap<size_t, size_t> indexmultimap_t;
 typedef std::list<size_t> indexlist_t;
+
+/// Split an operation between a cheap scheduled part and an expensive execution part
+class scheduler
+{
+public:
+	scheduler() : m_scheduled(true) {} 
+	virtual ~scheduler(){}
 	
+	/// Schedule the operation to be performed
+	void schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_scheduled = true;
+		on_schedule(Mesh, Hint);
+	}
+	
+	/// Execute the operation only on the first call after schedule
+	void execute(const k3d::mesh& Mesh)
+	{
+		if (m_scheduled)
+		{
+			on_execute(Mesh);
+		}
+		m_scheduled = false;
+	}
+protected:
+	/// Implements the scheduling phase of the operation
+	virtual void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint) {}
+	
+	/// Implements the execution phase of the operation
+	virtual void on_execute(const k3d::mesh& Mesh) = 0;
+	
+	/// Provides implementing classes access to the mesh data
+	bool m_scheduled;
+};
+
+
+/// Common interface for classes that need to process incoming hints
+class hint_processor
+{
+public:
+	/// Process the given hint, calling the required on_... method
+	virtual void process(const k3d::mesh& Mesh, k3d::iunknown* Hint);
+
+protected:
+	/// Called when only the geometry changed
+	virtual void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint) {}
+	
+	/// Called when only the selection changed
+	virtual void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint) {}
+	
+	/// Called when the mesh topology changed
+	virtual void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint) {}
+	
+	/// Called when the mesh address changed
+	virtual void on_address_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint) {}
+	
+	/// Called when the mesh is deleted
+	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint) {}
+	
+	/// Called when an unknown hint is encountered
+	virtual void on_unknown_change(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		on_topology_changed(Mesh, Hint);
+	}
+};
+
 /// Convenience wrapper for OpenGL vertex buffer objects
 class vbo
 {
@@ -55,14 +123,102 @@ private:
 	GLuint m_name;
 };
 
+/// Storage for selection data
+typedef std::vector<k3d::mesh_selection::record> selection_records_t;
+
+/// Keep track of component selections
+class component_selection : public scheduler
+{
+public:
+	/// Provide access to the stored selection records
+	const selection_records_t& records() const
+	{
+		return m_selection_records;
+	}
+protected:
+	/// Executes the selection update based on the mesh array selection
+	virtual void on_execute(const k3d::mesh& Mesh);
+
+	selection_records_t m_selection_records;
+	boost::shared_ptr<const k3d::mesh::selection_t> m_selection_array;
+};
+
+/// Implement component_selection::on_schedule for a point selection
+class point_selection : public component_selection
+{
+protected:
+	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_selection_records.clear();
+		m_selection_array=Mesh.point_selection;
+	}
+};
+
+/// Implement component_selection::on_schedule for an edge selection
+class edge_selection : public component_selection
+{
+protected:
+	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_selection_records.clear();
+		m_selection_array=Mesh.polyhedra->edge_selection;
+	}
+};
+
+
+/// Implement component_selection::on_schedule for a face selection
+class face_selection : public component_selection
+{
+protected:
+	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_selection_records.clear();
+		m_selection_array=Mesh.polyhedra->face_selection;
+	}
+};
+
+/// Keep track of point position data in a VBO
+class point_vbo : public scheduler
+{
+public:
+	point_vbo() : m_vbo(0) {}
+	/// Bind the internal VBO for usage by the array drawing commands
+	void bind();
+protected:
+	/// Implements the scheduling phase of a point position update
+	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint);
+	
+	/// Executes the point position update
+	virtual void on_execute(const k3d::mesh& Mesh);
+private:
+	/// Stores the data itself
+	vbo* m_vbo;
+	
+	/// Stores the modified point indices provided by the hint
+	k3d::mesh::indices_t m_indices;
+};
+
+/// Keep track of edge indices in a VBO
+class edge_vbo : public scheduler
+{
+public:
+	edge_vbo() : m_vbo(0) {}
+	/// Bind the internal VBO for usage by the array drawing commands
+	void bind();
+protected:
+	/// Creates the edge vbo
+	virtual void on_execute(const k3d::mesh& Mesh);
+private:
+	/// Stores the data itself
+	vbo* m_vbo;
+};
+
 /// Keep track of face data, separated in polygons, quadrilaterals and triangles
-class face
+class face : public scheduler
 {
 public:
 	face();
 	virtual ~face();
-	/// Convert the faces in Polyhedra to the internal representation
-	void convert(const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra);
 	/// Draw smooth faces with global indices from start to end (end included)
 	void draw_smooth_range(const size_t Start, const size_t End) const;
 	/// Draw flat faces with global indices from start to end (end included)
@@ -71,11 +227,15 @@ public:
 	bool bind_flat_points() const;
 	/// Draw the faces for selection
 	void draw_selection() const;
-	/// True if the given Edge is sharp
-	virtual bool is_sharp(const size_t Edge, const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra) = 0;
+	
+	/// Scheduler implementation
+	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint);
+	virtual void on_execute(const k3d::mesh& Mesh);
+private:
+	/// Convert the faces in Polyhedra to the internal representation
+	void convert(const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra);
 	/// Update the normals and faces using the given set of TransformedPoints
 	void update(const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra, const k3d::mesh::indices_t& TransformedPoints);
-private:
 	typedef std::pair<size_t, size_t> range_t;
 	typedef std::map<size_t, std::vector<size_t> > global_corners_t;
 	/// return local start and end indices as a pair. End is converted to one past the corresponding index 
@@ -107,24 +267,86 @@ private:
 	global_corners_t m_affected_flat_corners;
 	/// Collect the corner indices m_affected_faces and put them in Corners.
 	void get_face_points(global_corners_t& Corners, bool Flat);
+	/// True if the given Edge is sharp
+	virtual bool is_sharp(const size_t Edge, const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra) = 0;
+	/// Stores the modified point indices provided by the hint
+	k3d::mesh::indices_t m_indices;
 };
 
 /// Flat shaded faces
 class flat_face : public face
 {
+private:
 	virtual bool is_sharp(const size_t Edge, const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra);
 };
 
 /// Smooth shaded faces
 class smooth_face : public face
 {
+private:
 	virtual bool is_sharp(const size_t Edge, const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra);
 };
 
 /// Normal calculation based on edge settings
 class edge_face : public face
 {
+private:
 	virtual bool is_sharp(const size_t Edge, const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra);
+};
+
+/// Common SDS cache functionality
+class sds_cache : public scheduler
+{
+public:
+	sds_cache() : levels(2) {}
+	
+	/// Notify the cache that one of the registered painters changed level
+	void level_changed();
+	
+	/// Register a level property
+	void register_property(k3d::iproperty* LevelProperty);
+	
+	/// Remove a level property
+	void remove_property(k3d::iproperty* LevelProperty);
+	
+	int levels;
+private:
+	typedef std::set<k3d::iproperty*> levels_t;
+	levels_t m_levels;
+};
+
+/// Encapsulates a VBO SDS cache in a scheduler
+class sds_vbo_cache : public sds_cache
+{
+public:
+	sds_vbo_cache() : regenerate(true), update(true), update_selection(true) {}
+	
+	k3d::sds::k3d_vbo_sds_cache cache;
+	bool regenerate;
+	bool update;
+	bool update_selection;
+protected:
+	/// Scheduler implementation
+	virtual void on_execute(const k3d::mesh& Mesh);
+private:
+	typedef std::set<k3d::iproperty*> levels_t;
+	levels_t m_levels;
+};
+
+/// Encapsulates a basic SDS cache in a scheduler
+class sds_gl_cache : public sds_cache
+{
+public:
+	sds_gl_cache() : update(true) {}
+	
+	k3d::sds::k3d_basic_opengl_sds_cache cache;
+	bool update;
+protected:
+	/// Scheduler implementation
+	virtual void on_execute(const k3d::mesh& Mesh);
+private:
+	typedef std::set<k3d::iproperty*> levels_t;
+	levels_t m_levels;
 };
 
 /// Keep track of cached data for the VBO mesh painters
@@ -147,6 +369,13 @@ template<class key_t, class data_t> class painter_cache
 				instance = (m_instances.insert(std::make_pair(&Document, painter_cache()))).first;
 			return instance->second;
 		}
+		
+		/// Debug output in destructor
+		~painter_cache()
+		{
+			if (!m_data.empty())
+				k3d::log() << warning << "cache for <" << typeid(key_t).name() << ", " << typeid(data_t).name() << "> still has " << m_data.size() << " entries." << std::endl;
+		}
 
 		/// Get the data associated with Key, or NULL if there is none.
 		data_t* get_data(const key_t& Key)
@@ -162,7 +391,10 @@ template<class key_t, class data_t> class painter_cache
 		{
 			typename data_collection_t::iterator data = m_data.find(Key);
 			if (data == m_data.end())
+			{
 				data = m_data.insert(std::make_pair(Key, new data_t())).first;
+				k3d::log() << debug << "cache for <" << typeid(&Key).name() << ", " << typeid(data->second).name() << "> now has " << m_data.size() << " entries. Last key: " << Key << std::endl;
+			}
 			return data->second;
 		}
 
@@ -174,6 +406,17 @@ template<class key_t, class data_t> class painter_cache
 			{
 				delete data->second;
 				m_data.erase(data);
+			}
+		}
+		
+		/// Change the key of a data item, keeping the data
+		void switch_key(const key_t& OldKey, const key_t& NewKey)
+		{
+			typename data_collection_t::iterator data = m_data.find(OldKey);
+			if (data != m_data.end())
+			{
+				m_data.erase(data);
+				m_data.insert(std::make_pair(NewKey, data->second));
 			}
 		}
 
@@ -214,17 +457,8 @@ template<class T1, class T2> std::map<const k3d::idocument*, painter_cache<T1, T
 // Convenience functions  and types for functionality used by several mesh painters
 /////////////
 
-/// Used to keep track of selection data, ensures k3d "old style" selection constraints (no overlap, ...)
-typedef std::vector<k3d::mesh_selection::record> selection_records_t;
-
 /// Convert the array selection in SelectionArray to continuous blocks of maximal size in Selection
 void array_to_selection(const k3d::mesh::selection_t& SelectionArray, selection_records_t& Selection);
-
-/// Insert Points in the VBO representing the point positions, if it doesn't exist
-void create_point_vbo(const boost::shared_ptr<const k3d::mesh::points_t>& Points, painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>& Cache);
-
-/// Updates the VBO for Points at the given indices
-void update_point_vbo(const boost::shared_ptr<const k3d::mesh::points_t>& Points, painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>& Cache, const k3d::mesh::indices_t& Indices);
 
 /// Derives deformed or transformed faces and their neighbours from the points listed in Points and puts them in DeformedFaces. All points belonging to a transformed or deformed face are placed into AffectedPoints.
 void get_deformed_faces(const k3d::mesh::polyhedra_t& Polyhedra, const k3d::mesh::indices_t& Points, std::list<size_t>& AffectedFaces, std::set<size_t>& AffectedPoints);

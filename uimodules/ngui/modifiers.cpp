@@ -267,7 +267,7 @@ k3d::inode* insert_mesh_modifier(k3d::inode& Object, const k3d::uuid& ModifierTy
 	k3d::idag::dependencies_t dependencies;
 	dependencies.insert(std::make_pair(&modifier.sink->mesh_sink_input(), upstream_output));
 	dependencies.insert(std::make_pair(&downstream_input, &modifier.source->mesh_source_output()));
-	Object.document().dag().set_dependencies(dependencies);
+	Object.document().dag().set_dependencies(dependencies, modifier.source->hint());
 
 	return modifier.node;
 }

@@ -392,8 +392,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 	{
 		if(m_drag_mutex)
 			return;
-
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
+		
 		k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
 		return_if_fail(mesh);
 

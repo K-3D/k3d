@@ -46,17 +46,17 @@ namespace libk3ddevelopment
 
 template<class face_t>
 class face_array_painter :
-	public colored_selection_painter
+	public colored_selection_painter,
+	public hint_processor
 {
 	typedef colored_selection_painter base;
 public:
 	face_array_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		// overrride default colors to differ between selected/unselected meshes and to contrast edges and faces
 		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6)),
-		m_points_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>::instance(Document)),
+		m_points_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, point_vbo>::instance(Document)),
 		m_faces_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_t>::instance(Document)),
-		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, selection_records_t>::instance(Document)),
-		m_hint_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>::instance(Document))
+		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_selection>::instance(Document))
 	{
 	}
 	
@@ -65,56 +65,6 @@ public:
 		m_points_cache.remove_painter(this);
 		m_faces_cache.remove_painter(this);
 		m_selection_cache.remove_painter(this);
-	}
-	
-	/// Updates the vertex buffer object.
-	void update_buffer(const k3d::mesh& Mesh)
-	{
-		if(!Mesh.polyhedra)
-			return;
-		if(!Mesh.polyhedra->face_first_loops)
-			return;
-		if(!Mesh.polyhedra->face_selection)
-			return;
-		if(!Mesh.polyhedra->loop_first_edges)
-			return;
-		if(!Mesh.polyhedra->edge_points)
-			return;
-		if(!Mesh.polyhedra->clockwise_edges)
-			return;
-		if(!Mesh.points)
-			return;
-		
-		// Fill vertex buffer and update normals if needed
-		create_point_vbo(Mesh.points, m_points_cache);
-		k3d::hint::mesh_geometry_changed_t* changed_hint = m_hint_cache.get_data(Mesh.points);
-		if (changed_hint)
-		{
-			update_point_vbo(Mesh.points, m_points_cache, changed_hint->changed_points);
-			// Update normals
-			face_t* face_indices = m_faces_cache.get_data(Mesh.polyhedra->face_first_loops);
-			if (face_indices)
-			{
-				face_indices->update(*Mesh.points, *Mesh.polyhedra, changed_hint->changed_points);
-			}
-			m_hint_cache.remove_data(Mesh.points);
-		}
-		
-		// Create face index buffers
-		face* face_indices = m_faces_cache.get_data(Mesh.polyhedra->face_first_loops);
-		if (!face_indices)
-		{
-			face_indices = m_faces_cache.create_data(Mesh.polyhedra->face_first_loops);
-			face_indices->convert(*Mesh.points, *Mesh.polyhedra);
-		}
-		
-		// Create selection
-		selection_records_t* selection = m_selection_cache.get_data(Mesh.polyhedra->face_first_loops);
-		if (!selection)
-		{
-			selection = m_selection_cache.create_data(Mesh.polyhedra->face_first_loops);
-			array_to_selection(*Mesh.polyhedra->face_selection, *selection);
-		}
 	}
 	
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
@@ -126,8 +76,6 @@ public:
 			
 		if (k3d::is_sds(Mesh))
 			return;
-
-		update_buffer(Mesh);
 
 		k3d::gl::store_attributes attributes;
 
@@ -141,27 +89,27 @@ public:
 		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color();
 		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
-		face* faces = m_faces_cache.get_data(Mesh.polyhedra->face_first_loops);
-		return_if_fail(faces);
+		point_vbo* const point_buffer = m_points_cache.create_data(Mesh.points);
+		face* faces = m_faces_cache.create_data(Mesh.polyhedra->face_first_loops);
+		point_buffer->execute(Mesh);
+		point_buffer->bind();
+		
+		face_selection* selected_faces = m_selection_cache.create_data(Mesh.polyhedra->face_first_loops);
+		selected_faces->execute(Mesh);
+		
+		faces->execute(Mesh);
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
-		selection_records_t* const face_selection = m_selection_cache.get_data(Mesh.polyhedra->face_first_loops); // obtain selection data
-		return_if_fail(face_selection);
+		const selection_records_t& face_selection_records = selected_faces->records();
 
 		glEnable(GL_LIGHTING);
 
 		clean_vbo_state();
 
-		// Draw smooth points
-		vbo* const buffer = m_points_cache.get_data(Mesh.points);
-		return_if_fail(glIsBuffer(*buffer));
-		glBindBuffer(GL_ARRAY_BUFFER, *buffer);
-		glVertexPointer(3, GL_DOUBLE, 0, 0);
-		glEnableClientState(GL_VERTEX_ARRAY);
-		if (!face_selection->empty())
+		if (!face_selection_records.empty())
 		{
 			size_t drawn_faces = 0;
-			for (selection_records_t::const_iterator record = face_selection->begin(); record != face_selection->end() && record->begin < face_count; ++record)
+			for (selection_records_t::const_iterator record = face_selection_records.begin(); record != face_selection_records.end() && record->begin < face_count; ++record)
 			{ // color by selection
 				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, record->weight ? selected_color : color);
 				size_t start = record->begin;
@@ -183,9 +131,9 @@ public:
 		// Draw flat points
 		if (faces->bind_flat_points())
 		{
-			if (!face_selection->empty())
+			if (!face_selection_records.empty())
 			{
-				for (selection_records_t::const_iterator record = face_selection->begin(); record != face_selection->end() && record->begin < face_count; ++record)
+				for (selection_records_t::const_iterator record = face_selection_records.begin(); record != face_selection_records.end() && record->begin < face_count; ++record)
 				{ // color by selection
 					k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, record->weight ? selected_color : color);
 					size_t start = record->begin;
@@ -213,8 +161,9 @@ public:
 			
 		if (k3d::is_sds(Mesh))
 			return;
-
-		update_buffer(Mesh);
+			
+		if (!SelectionState.select_faces)
+			return;
 
 		k3d::gl::store_attributes attributes;
 		
@@ -229,14 +178,12 @@ public:
 		
 		clean_vbo_state();
 		
-		vbo* const buffer = m_points_cache.get_data(Mesh.points);
-		return_if_fail(glIsBuffer(*buffer));
-		glBindBuffer(GL_ARRAY_BUFFER, *buffer);
-		glVertexPointer(3, GL_DOUBLE, 0, 0);
-		glEnableClientState(GL_VERTEX_ARRAY);
+		point_vbo* const point_buffer = m_points_cache.create_data(Mesh.points);
+		face* faces = m_faces_cache.create_data(Mesh.polyhedra->face_first_loops);
+		point_buffer->execute(Mesh);
+		point_buffer->bind();
 		
-		face* faces = m_faces_cache.get_data(Mesh.polyhedra->face_first_loops);
-		return_if_fail(faces);
+		faces->execute(Mesh);
 		faces->draw_selection();
 		
 		clean_vbo_state();
@@ -256,31 +203,51 @@ public:
 		m_faces_cache.register_painter(Mesh.polyhedra->face_first_loops, this);
 		m_selection_cache.register_painter(Mesh.polyhedra->face_first_loops, this);
 		
-		k3d::hint::mesh_geometry_changed_t* changed_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
-		k3d::hint::selection_changed_t* selection_hint = dynamic_cast<k3d::hint::selection_changed_t*>(Hint);
-		if (selection_hint)
-		{
-			m_selection_cache.remove_data(Mesh.polyhedra->face_first_loops);
-		}
-		else if (changed_hint && !changed_hint->changed_points.empty())
-		{
-			k3d::hint::mesh_geometry_changed_t& stored_changed_hint = *(m_hint_cache.create_data(Mesh.points));
-			stored_changed_hint = *changed_hint;
-		}
-		else
-		{
-			m_points_cache.remove_data(Mesh.points);
-			m_faces_cache.remove_data(Mesh.polyhedra->face_first_loops);
-			m_selection_cache.remove_data(Mesh.polyhedra->face_first_loops);
-			m_hint_cache.remove_data(Mesh.points);
-		}
+		process(Mesh, Hint);
 	}
 	
+protected:
+
+	///////
+	// hint processor implementation
+	///////
+	
+	virtual void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_points_cache.create_data(Mesh.points)->schedule(Mesh, Hint);
+		m_faces_cache.create_data(Mesh.polyhedra->face_first_loops)->schedule(Mesh, Hint);
+	}
+	
+	virtual void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_selection_cache.create_data(Mesh.polyhedra->face_first_loops)->schedule(Mesh, Hint);
+	}
+	
+	virtual void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		on_mesh_deleted(Mesh, Hint);
+	}
+	
+	virtual void on_address_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		k3d::hint::mesh_address_changed_t* address_hint = dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint);
+		return_if_fail(address_hint);
+		m_points_cache.switch_key(address_hint->old_points_address, Mesh.points);
+		m_faces_cache.switch_key(address_hint->old_face_first_loops_address, Mesh.polyhedra->face_first_loops);
+		m_selection_cache.switch_key(address_hint->old_face_first_loops_address, Mesh.polyhedra->face_first_loops);
+	}
+	
+	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		m_points_cache.remove_data(Mesh.points);
+		m_faces_cache.remove_data(Mesh.polyhedra->face_first_loops);
+		m_selection_cache.remove_data(Mesh.polyhedra->face_first_loops);
+	}
+
 private:
-	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, vbo>& m_points_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, point_vbo>& m_points_cache;
 	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_t>& m_faces_cache;
-	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, selection_records_t>& m_selection_cache;
-	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, k3d::hint::mesh_geometry_changed_t>& m_hint_cache;
+	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_selection>& m_selection_cache;
 };
 
 class face_painter_edge_normals : public face_array_painter<edge_face>

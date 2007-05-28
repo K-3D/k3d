@@ -39,6 +39,9 @@ class imesh_source :
 {
 public:
 	virtual iproperty& mesh_source_output() = 0;
+	
+	/// Hint for the type of change the creation of this source entails
+	virtual iunknown* hint() const { return 0; }
 
 protected:
 	imesh_source() {}

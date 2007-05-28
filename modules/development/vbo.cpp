@@ -21,13 +21,49 @@
 
 #include "vbo.h"
 
+#include <k3dsdk/hints.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
+
+#include <boost/any.hpp>
 
 #include <map>
 
 namespace libk3ddevelopment
 {
+
+////////
+// hint_processor
+//////////
+
+void hint_processor::process(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+{
+	if (dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint))
+	{
+		on_geometry_changed(Mesh, Hint);
+	}
+	else if (dynamic_cast<k3d::hint::selection_changed_t*>(Hint))
+	{
+		on_selection_changed(Mesh, Hint);
+	}
+	else if (dynamic_cast<k3d::hint::mesh_topology_changed_t*>(Hint))
+	{
+		on_topology_changed(Mesh, Hint);
+	}
+	else if (dynamic_cast<k3d::hint::mesh_deleted_t*>(Hint))
+	{
+		on_mesh_deleted(Mesh, Hint);
+	}
+	else if (dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint))
+	{
+		on_address_changed(Mesh, Hint);
+	}
+	else
+	{
+		k3d::log() << warning << "Unknown hint " << Hint << " encountered" << std::endl;
+		on_unknown_change(Mesh, Hint);
+	}
+}
 
 ////////
 // class vbo
@@ -46,6 +82,118 @@ vbo::~ vbo( )
 vbo::operator GLuint( ) const
 {
 	return m_name;
+}
+
+////////
+// class component_selection
+///////
+
+void component_selection::on_execute(const k3d::mesh& Mesh)
+{
+	if (!m_selection_array)
+		on_schedule(Mesh, 0);
+	const k3d::mesh::selection_t& selection_array = *m_selection_array;
+	for (size_t i = 0; i < selection_array.size();)
+	{
+		size_t start = i;
+		k3d::mesh_selection::record record(start, i+1, selection_array[i]);
+		while (record.weight == selection_array[i] && i < selection_array.size())
+		{
+			record.end = i+1;
+			++i;
+		}
+		m_selection_records.push_back(record);
+	}
+}
+
+///////////
+// class point_vbo
+///////////
+
+void point_vbo::bind()
+{
+	return_if_fail(glIsBuffer(*m_vbo));
+	glBindBuffer(GL_ARRAY_BUFFER, *m_vbo);	
+	glVertexPointer(3, GL_DOUBLE, 0, 0);
+	glEnableClientState(GL_VERTEX_ARRAY);
+}
+
+void point_vbo::on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+{
+	k3d::hint::mesh_geometry_changed_t* geometry_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
+	if (!geometry_hint)
+	{
+		delete m_vbo;
+		m_vbo = 0;
+		m_indices.clear();
+	}
+	else if (m_indices.empty()) // Only set indices once (they are cleared upon execute()
+	{
+		m_indices = geometry_hint->changed_points;
+	}
+}
+
+void point_vbo::on_execute(const k3d::mesh& Mesh)
+{
+	return_if_fail(k3d::validate_points(Mesh));
+	const k3d::mesh::points_t& points = *(Mesh.points);
+	bool new_vbo = false;
+	
+	if (!m_vbo) // OpenGL VBO functions may only be called in the drawing context, i.e. during paint_mesh or select_mesh
+	{
+		m_vbo = new vbo();
+		new_vbo = true;
+	}
+	
+	glBindBuffer(GL_ARRAY_BUFFER, *m_vbo);
+	
+	if (m_indices.empty() || new_vbo)
+	{
+		k3d::log() << debug << "VBO: Creating new point VBO. Empty buffer: " << m_indices.empty() << ", new_vbo: " << new_vbo << std::endl;
+		glBufferData(GL_ARRAY_BUFFER, sizeof(points[0]) * points.size(), &points[0], GL_STATIC_DRAW);
+	}
+	else
+	{
+		k3d::point3* vertices = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+		for (size_t index = 0; index != m_indices.size(); ++index)
+		{
+			vertices[m_indices[index]] = points[m_indices[index]];
+		}
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+	}
+	
+	m_indices.clear(); // Clear indices for next schedule call
+}
+
+////////
+// Class edge_vbo
+////////
+
+void edge_vbo::bind()
+{
+	return_if_fail(glIsBuffer(*m_vbo));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_vbo);
+}
+
+void edge_vbo::on_execute(const k3d::mesh& Mesh)
+{
+	return_if_fail(k3d::validate_polyhedra(Mesh));
+	delete m_vbo;
+	m_vbo = new vbo();
+	
+	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_vbo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * edge_points.size() * 2, 0, GL_STATIC_DRAW); // left uninited
+	// init index buffer with indices from edge_points and clockwise_edges
+	GLuint* indices = static_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE)); // map buffer memory in indices
+	for (size_t i = 0; i < edge_points.size(); ++i)
+	{
+		indices[2*i] = static_cast<GLuint>(edge_points[i]);
+		indices[2*i + 1] = static_cast<GLuint>(edge_points[clockwise_edges[i]]);
+	}
+	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER); // release indices
 }
 
 //////////
@@ -495,6 +643,31 @@ void face::draw_selection( ) const
 	}
 }
 
+void face::on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+{
+	k3d::hint::mesh_geometry_changed_t* geometry_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
+	if (!geometry_hint)
+		return;
+	if (m_indices.empty()) // Only set indices once (they are cleared upon execute()
+	{
+		m_indices = geometry_hint->changed_points;
+	}
+}
+
+void face::on_execute(const k3d::mesh& Mesh)
+{
+	if (!glIsBuffer(m_smooth_normals) || !glIsBuffer(m_flat_normals))
+		convert(*Mesh.points, *Mesh.polyhedra);
+	if (m_indices.empty())
+	{
+		size_t n = Mesh.points->size();
+		for (size_t i = 0; i != n; ++i)
+			m_indices.push_back(i);
+	}
+	update(*Mesh.points, *Mesh.polyhedra, m_indices);
+	m_indices.clear();
+}
+
 void face::update( const k3d::mesh::points_t & Points, const k3d::mesh::polyhedra_t & Polyhedra, const k3d::mesh::indices_t & TransformedPoints )
 {
 	typedef std::map<size_t, k3d::normal3> normal_map_t;
@@ -742,6 +915,98 @@ bool edge_face::is_sharp( const size_t Edge, const k3d::mesh::points_t & Points,
 	return sharpness_array[Edge];
 }
 
+////////////
+// sds_cache
+/////////////
+
+void sds_cache::level_changed()
+{
+	// search the highest level requested by the clients
+	levels = 0;
+	for (sds_cache::levels_t::iterator level_it = m_levels.begin(); level_it != m_levels.end(); ++level_it)
+	{
+		const long new_level = boost::any_cast<const long>((*level_it)->property_value());
+		levels = new_level > levels ? new_level : levels;
+	}
+	k3d::log() << debug << "New maximum level: " << levels << std::endl;
+	m_scheduled = true;
+}
+
+void sds_cache::register_property(k3d::iproperty* LevelProperty)
+{
+	if (m_levels.insert(LevelProperty).second)
+		level_changed();
+}
+
+void sds_cache::remove_property(k3d::iproperty* LevelProperty)
+{
+	m_levels.erase(LevelProperty);
+}
+
+////////////
+// sds_vbo_cache
+/////////////
+
+void sds_vbo_cache::on_execute(const k3d::mesh& Mesh)
+{
+	cache.set_new_addresses(Mesh);
+	if (levels > 0 || regenerate)
+	{
+		k3d::log() << debug << "SDS: Setting new level to " << levels << std::endl;
+		cache.set_input(&Mesh);
+		cache.set_levels(levels);
+		update = true;
+		update_selection = true;
+		regenerate = true;
+	}
+	if (update)
+	{
+		cache.update();
+	}
+	if (regenerate)
+	{
+		cache.regenerate_vbos();
+	}
+	if (update)
+	{
+		cache.update_vbo_positions();
+	}
+	if (update_selection)
+	{
+		cache.update_selection();
+		if (!update)
+			cache.clear_modified_faces();
+	}
+	
+	regenerate = false;
+	update = false;
+	update_selection = false;
+	levels = 0;
+}
+
+////////////
+// sds_gl_cache
+/////////////
+
+void sds_gl_cache::on_execute(const k3d::mesh& Mesh)
+{
+	cache.set_new_addresses(Mesh);
+	if (levels > 0)
+	{
+		k3d::log() << debug << "SDS: Setting new level to " << levels << std::endl;
+		cache.set_input(&Mesh);
+		cache.set_levels(levels);
+		update = true;
+	}
+	if (update)
+	{
+		cache.update();
+		cache.clear_modified_faces();
+	}
+	update = false;
+	levels = 0;
+}
+
 ///////////////
 // Convenience functions
 //////////////
@@ -760,31 +1025,6 @@ void array_to_selection( const k3d::mesh::selection_t & SelectionArray, selectio
 		}
 		Selection.push_back(record);
 	}
-}
-
-void create_point_vbo( const boost::shared_ptr< const k3d::mesh::points_t > & Points, painter_cache< boost::shared_ptr < const k3d::mesh::points_t >, vbo > & Cache )
-{
-	vbo* point_buffer = Cache.get_data(Points);
-	if (!point_buffer)
-	{
-		const k3d::mesh::points_t& points = *Points;
-		point_buffer = Cache.create_data(Points);
-		glBindBuffer(GL_ARRAY_BUFFER, *point_buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(points[0]) * points.size(), &points[0], GL_STATIC_DRAW);
-	}
-}
-
-void update_point_vbo( const boost::shared_ptr< const k3d::mesh::points_t > & Points, painter_cache< boost::shared_ptr < const k3d::mesh::points_t >, vbo > & Cache, const k3d::mesh::indices_t & Indices )
-{
-	vbo* point_buffer = Cache.get_data(Points);
-	return_if_fail(point_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, *point_buffer);
-	k3d::point3* vertices = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-	for (size_t index = 0; index != Indices.size(); ++index)
-	{
-		vertices[Indices[index]] = (*Points)[Indices[index]];
-	}
-	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 void get_deformed_faces(const k3d::mesh::polyhedra_t& Polyhedra, const k3d::mesh::indices_t& Points, indexlist_t& AffectedFaces, std::set<size_t>& AffectedPoints)

@@ -60,26 +60,18 @@ typedef k3d::basic_rgba<float> color4d;
 
 bool k3d_cache_input::set_input(const k3d::mesh* Input)
 {
-	// Sanity check of new mesh
-	return_val_if_fail(Input && Input->points && Input->polyhedra && Input->polyhedra->face_first_loops, false);
-	
-	// If the hint validation failed, pass this on
-	if (!m_hint_validated)
-		return false;
-	
-	// Compare parameters of new and old mesh to determine compatibility (should be OK after hints)
-	if (m_npoints != Input->points->size() || m_nfaces != Input->polyhedra->face_first_loops->size())
-		return false;
-	m_input_points = Input->points;
-	m_input_polyhedra = Input->polyhedra;
-	m_point_selection = Input->point_selection;
-	init_counters();
-	return true;
+	set_new_addresses(*Input);
+	return false; // Hint processing makes sure this gets called only if the input topology changed
+}
+
+void k3d_cache_input::set_new_addresses(const k3d::mesh& Mesh)
+{
+	m_input_points = Mesh.points;
+	m_input_polyhedra = Mesh.polyhedra;
+	m_point_selection = Mesh.point_selection;
 }
 
 k3d_cache_input::k3d_cache_input(boost::shared_ptr<const k3d::mesh::points_t> Points, boost::shared_ptr<const k3d::mesh::polyhedra_t> Polyhedra, boost::shared_ptr<const k3d::mesh::selection_t> PointSelection) :
-		m_hint_validated(false),
-		m_updated(true),
 		m_input_points(Points),
 		m_input_polyhedra(Polyhedra),
 		m_point_selection(PointSelection),
@@ -140,13 +132,10 @@ void k3d_cache_input::update(bool all, facevertices_t& updated_maps)
 	init_counters();
 	const size_t face_count = face_first_loops.size();
 	k3d::timer timer;
-	if (all || (m_modified_faces.size() == face_first_loops.size() && !m_updated))
+	if (all || (m_modified_faces.size() == face_first_loops.size()))
 	{
-		if (m_modified_faces.size() > 100) // debug output only for large meshes, since small meshes are always in this case
-			k3d::log() << debug << "SDS: doing full SDS update" << std::endl;
 		m_modified_faces.clear();
 	}
-	m_updated = true;
 	if (m_modified_faces.empty()) // search faces to modify using selection data
 	{
 		k3d::timer timer;
@@ -206,8 +195,6 @@ void k3d_cache_input::update(bool all, facevertices_t& updated_maps)
 	{
 		m_all_faces = m_modified_faces;
 	}
-	
-	m_hint_validated = true;
 }
 
 k3d_cache_input::~k3d_cache_input()
@@ -224,19 +211,6 @@ k3d_cache_input::~k3d_cache_input()
 	{
 		delete *it;
 	}
-}
-
-bool k3d_cache_input::validate(k3d::iunknown* Hint)
-{
-	if (!Hint)
-	{
-		m_hint_validated = false;
-	}
-	else if (dynamic_cast<k3d::hint::mesh_topology_changed_t*>(Hint))
-	{
-		m_hint_validated = false;
-	}
-	return m_hint_validated;
 }
 
 k3d_cache_input::edgemap_t::iterator k3d_cache_input::find_edge(size_t Start, size_t End)
@@ -327,7 +301,6 @@ void k3d_basic_opengl_sds_cache::draw_faces(size_t Level, bool Selected)
 	{
 		k3d::log() << debug << "Setting level to " << Level << std::endl;
 		set_levels(Level);
-		set_input(m_first_level_cache_mesh);
 		update();
 	}
 	
@@ -395,7 +368,6 @@ void k3d_basic_opengl_sds_cache::draw_borders(size_t Level, bool Selected)
 	{
 		k3d::log() << debug << "Setting level to " << Level << std::endl;
 		set_levels(Level);
-		set_input(m_first_level_cache_mesh);
 		update();
 	}
 	
@@ -460,7 +432,6 @@ void k3d_basic_opengl_sds_cache::draw_corners(size_t Level, bool Selected)
 	{
 		k3d::log() << debug << "Setting level to " << Level << std::endl;
 		set_levels(Level);
-		set_input(m_first_level_cache_mesh);
 		update();
 	}
 	
@@ -660,21 +631,8 @@ void k3d_vbo_sds_cache::draw_faces(size_t Level, bool Selected)
 {
 	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
-	if (Level > m_levels)
-	{
-		k3d::log() << debug << "Setting level to " << Level << std::endl;
-		set_levels(Level);
-		set_input(m_first_level_cache_mesh);
-		update();
-		m_validated_hint = false;
-		regenerate_vbos();
-	}
 	
 	return_if_fail(m_levels > 1); // VBO support for levels > 1 is easier, looks better and should work comfortably on any modern PC
-	
-	do_selection_update();
-	
-	update_positions();
 	
 	if (Selected)
 	{
@@ -708,21 +666,8 @@ void k3d_vbo_sds_cache::draw_borders(size_t Level, bool Selected)
 {
 	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
-	if (Level > m_levels)
-	{
-		k3d::log() << debug << "Setting level to " << Level << std::endl;
-		set_levels(Level);
-		set_input(m_first_level_cache_mesh);
-		update();
-		m_validated_hint = false;
-		regenerate_vbos();
-	}
-	
+		
 	return_if_fail(m_levels > 1);
-	
-	do_selection_update();
-	
-	update_positions();
 	
 	if (Selected)
 	{
@@ -752,21 +697,8 @@ void k3d_vbo_sds_cache::draw_corners(size_t Level, bool Selected)
 {
 	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
-	if (Level > m_levels)
-	{
-		k3d::log() << debug << "Setting level to " << Level << std::endl;
-		set_levels(Level);
-		set_input(m_first_level_cache_mesh);
-		update();
-		m_validated_hint = false;
-		regenerate_vbos();
-	}
 	
 	return_if_fail(m_levels > 1);
-	
-	do_selection_update();
-	
-	update_positions();
 	
 	return_if_fail(!m_point_vbos.empty());
 	return_if_fail(glIsBuffer(m_point_vbos[Level-2]));
@@ -916,23 +848,8 @@ void k3d_vbo_sds_cache::select_corners(size_t Level)
 
 void k3d_vbo_sds_cache::update_selection()
 {
-	if (m_update_selection) // make sure the modified faces are only cleared once
+	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
-	m_update_selection = true;
-	update_positions();
-	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_modified_faces();
-	if (m_validated_hint)
-		modified_faces.clear();
-}
-
-void k3d_vbo_sds_cache::do_selection_update()
-{
-	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh) || !m_update_selection)
-		return;
-		
-	regenerate_vbos();
-		
-	m_update_selection = false;
 	
 	const k3d::mesh::selection_t& point_selection = *m_first_level_cache_mesh->point_selection;
 	const k3d::mesh::selection_t& face_selection = *m_first_level_cache_mesh->polyhedra->face_selection;
@@ -1104,11 +1021,6 @@ void k3d_vbo_sds_cache::regenerate_vbos()
 {
 	if (!m_first_level_cache_mesh || !k3d::validate_polyhedra(*m_first_level_cache_mesh))
 		return;
-
-	if (m_validated_hint && m_point_vbos.size() == m_levels-1)
-		return;
-		
-	m_validated_hint = true;
 	
 	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
 	
@@ -1265,9 +1177,6 @@ void k3d_vbo_sds_cache::regenerate_vbos()
 	
 	init_color_vbos();
 	
-	update_selection();
-	update_positions();
-	
 	k3d::log() << debug << "SDS: regenerate_vbos for " << modified_faces.size() << " faces took " << timer.elapsed() << "s" << std::endl;
 }
 
@@ -1290,21 +1199,8 @@ void k3d_vbo_sds_cache::init_color_vbos()
 	}
 }
 
-void k3d_vbo_sds_cache::validate(k3d::iunknown* Hint)
+void k3d_vbo_sds_cache::update_vbo_positions()
 {
-	bool validated = false;
-	if (m_first_level_cache)
-		validated = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->validate(Hint);
-		 
-	if (!validated)
-		m_validated_hint = false;
-}
-
-void k3d_vbo_sds_cache::update_positions()
-{
-	if (!dynamic_cast<k3d_cache_input*>(m_first_level_cache)->updated() || (dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_modified_faces()).empty())
-		return; // nothing changed since last update
-	regenerate_vbos();
 	facevertices_map& modified_faces = dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_modified_faces();
 	
 	for (size_t level = 2; level <= m_levels; ++level)
@@ -1366,7 +1262,6 @@ void k3d_vbo_sds_cache::set_colors(const k3d::color Unselected, const k3d::color
 	{
 		k3d::log() << debug << "SDS: Colors changed" << std::endl;
 		k3d_opengl_sds_cache::set_colors(Unselected, Selected);
-		regenerate_vbos();
 		init_color_vbos();
 		update_selection();
 	}

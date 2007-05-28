@@ -73,6 +73,7 @@ protected:
 private:
 	void mesh_topology_changed(iunknown* Hint)
 	{
+		m_output_mesh.changed_signal().emit(hint::mesh_deleted());
 		m_output_mesh.reset(0, hint::mesh_topology_changed());
 	}
 

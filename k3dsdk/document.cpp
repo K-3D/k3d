@@ -427,7 +427,7 @@ public:
 	{
 	}
 
-	void set_dependencies(dependencies_t& Dependencies)
+	void set_dependencies(dependencies_t& Dependencies, iunknown* Hint = 0)
 	{
 		// Don't let any NULLs creep in ...
 		if(Dependencies.erase(static_cast<iproperty*>(0)))
@@ -465,7 +465,7 @@ public:
 
 		// Synthesize change notifications for every property whose parent was set ...
 		for(dependencies_t::iterator dependency = Dependencies.begin(); dependency != Dependencies.end(); ++dependency)
-			dependency->first->property_changed_signal().emit(0);
+			dependency->first->property_changed_signal().emit(Hint);
 	}
 
 	iproperty* dependency(iproperty& Target)

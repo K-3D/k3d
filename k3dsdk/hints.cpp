@@ -33,25 +33,6 @@ namespace hint
 {
 
 //////////////////////////////////////////////////////////////////////////////
-// selection_changed
-
-// selection_changed_t* selection_changed()
-// {
-// 	static selection_changed_t hint;
-// 	return &hint;
-// }
-
-void selection_changed_t::set_selection( const mesh_selection & MeshSelection )
-{
-	m_selection = MeshSelection;
-}
-
-const mesh_selection & selection_changed_t::selection( ) const
-{
-	return m_selection;
-}
-
-//////////////////////////////////////////////////////////////////////////////
 // mesh_geometry_changed
 
 mesh_geometry_changed_t* mesh_geometry_changed()
@@ -66,6 +47,24 @@ mesh_geometry_changed_t* mesh_geometry_changed()
 mesh_topology_changed_t* mesh_topology_changed()
 {
 	static mesh_topology_changed_t hint;
+	return &hint;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// mesh_address_changed
+
+mesh_address_changed_t* mesh_address_changed()
+{
+	static mesh_address_changed_t hint;
+	return &hint;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// mesh_deleted
+
+mesh_deleted_t* mesh_deleted()
+{
+	static mesh_deleted_t hint;
 	return &hint;
 }
 

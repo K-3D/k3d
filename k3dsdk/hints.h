@@ -43,17 +43,6 @@ namespace hint
 class selection_changed_t :
 	public iunknown
 {
-public:
-	selection_changed_t() : m_selection(mesh_selection::select_null()) {
-	}
-	
-	/// Set a new mesh_selection object
-	void set_selection(const mesh_selection& MeshSelection);
-	
-	/// Get the current mesh_selection object
-	const mesh_selection& selection() const;
-private:
-	mesh_selection m_selection;
 };
 
 ///// Convenience function that returns a reference to a static instance of selection_changed_t
@@ -82,6 +71,28 @@ class mesh_topology_changed_t :
 
 /// Convenience function that returns a reference to a static instance of mesh_topology_changed_t
 mesh_topology_changed_t* mesh_topology_changed();
+
+/// Hint object that indicates that only the mesh's address has changed and provides access to the old addresses
+class mesh_address_changed_t :
+	public iunknown
+{
+public:
+	boost::shared_ptr<const k3d::mesh::points_t> old_points_address;
+	boost::shared_ptr<const k3d::mesh::indices_t> old_edge_points_address;
+	boost::shared_ptr<const k3d::mesh::indices_t> old_face_first_loops_address;
+};
+
+/// Convenience function that returns a reference to a static instance of mesh_address_changed_t
+mesh_address_changed_t* mesh_address_changed();
+
+/// Hint object that indicates a mesh was deleted
+class mesh_deleted_t :
+	public iunknown
+{
+};
+
+/// Convenience function that returns a reference to a static instance of mesh_deleted_t
+mesh_deleted_t* mesh_deleted();
 
 /// iostream-compatible manipulator object that serializes information about a hint object
 class print
