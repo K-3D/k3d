@@ -105,7 +105,6 @@ modules/development/colored_selection_painter_gl.h
 modules/development/edge_array_painter.cpp
 modules/development/face_array_painter.cpp
 modules/development/glsl_painter.cpp
-modules/development/new_mesh_instance.cpp
 modules/development/point_array_painter.cpp
 modules/development/sds_gl_painter.cpp
 modules/development/sds_vbo_painter.cpp
@@ -163,6 +162,7 @@ modules/mesh/subdivide_faces.cpp
 modules/mesh/tag_color.cpp
 modules/mesh/triangulate_faces.cpp
 modules/mesh/weld.cpp
+modules/mesh_instance/mesh_instance.cpp
 modules/nurbs/nurbs_circle.cpp
 modules/nurbs/nurbs_cone.cpp
 modules/nurbs/nurbs_cylinder.cpp
