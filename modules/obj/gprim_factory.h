@@ -35,7 +35,9 @@ public:
 	~gprim_factory();
 
 	void add_point(const k3d::point3& Point);
+	void add_point(const k3d::point4& Point);
 	void add_polygon(const k3d::mesh::indices_t& Points);
+	void add_nurbs_patch(const size_t UOrder, const size_t VOrder, const k3d::mesh::indices_t& Points, const k3d::mesh::knots_t& UKnots, const k3d::mesh::knots_t VKnots);
 
 private:
 	class implementation;

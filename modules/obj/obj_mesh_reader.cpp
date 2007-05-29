@@ -111,21 +111,108 @@ private:
 	{
 	public:
 		my_parser(k3d::mesh& Mesh) :
-			factory(Mesh)
+			factory(Mesh),
+			u_order(0),
+			v_order(0),
+			s0(0),
+			s1(0),
+			t0(0),
+			t1(0)
 		{
 		}
 
 	private:
 		gprim_factory factory;
 
-		void on_vertex(const k3d::point4& Vertex)
+		std::string curve_surface_type;
+		size_t u_order;
+		size_t v_order;
+		double s0;
+		double s1;
+		double t0;
+		double t1;
+		k3d::mesh::indices_t vertex_coordinates;
+		k3d::mesh::indices_t texture_coordinates;
+		k3d::mesh::indices_t normal_coordinates;
+		k3d::mesh::knots_t u_knots;
+		k3d::mesh::knots_t v_knots;
+
+		void on_vertex_coordinates(const k3d::point4& Vertex)
 		{
-			factory.add_point(k3d::point3(Vertex[0] / Vertex[3], Vertex[1] / Vertex[3], Vertex[2] / Vertex[3]));
+			factory.add_point(Vertex);
 		}
 
 		void on_face(const k3d::mesh::indices_t& Points, const k3d::mesh::indices_t& TexturePoints, const k3d::mesh::indices_t& Normals)
 		{
 			factory.add_polygon(Points);
+		}
+
+		void on_curve_surface_type(const std::string& Type)
+		{
+			curve_surface_type = Type;
+		}
+
+		void on_degree(const size_t& UDegree, const size_t& VDegree)
+		{
+			u_order = UDegree + 1;
+			v_order = VDegree + 1;
+		}
+
+		void on_surface(const double& S0, const double& S1, const double& T0, const double& T1, const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates, const k3d::mesh::indices_t& NormalCoordinates)
+		{
+			s0 = S0;
+			s1 = S1;
+			t0 = T0;
+			t1 = T1;
+			vertex_coordinates = VertexCoordinates;
+			texture_coordinates = TextureCoordinates;
+			normal_coordinates = NormalCoordinates;
+		}
+
+		void on_parameter(const std::string& Direction, const k3d::mesh::knots_t& Knots)
+		{
+			if(Direction == "u")
+			{
+				u_knots = Knots;
+				return;
+			}
+			else if(Direction == "v")
+			{
+				v_knots = Knots;
+				return;
+			}
+
+			throw std::runtime_error("unknown knot direction: " + Direction);
+		}
+
+		void on_curve_surface_end()
+		{
+			if(curve_surface_type == "bspline")
+			{
+				// Do some sanity-checking ...
+				const size_t expected_vertex_count = (u_knots.size() - u_order) * (v_knots.size() - v_order);
+				if(expected_vertex_count != vertex_coordinates.size())
+					throw std::runtime_error("invalid vertex count for bspline surface");
+
+				factory.add_nurbs_patch(u_order, v_order, vertex_coordinates, u_knots, v_knots);
+			}
+			else
+			{
+				k3d::log() << warning << "unknown surface type [" << curve_surface_type << "] will be ignored" << std::endl;
+			}
+
+			curve_surface_type.clear();
+			u_order = 0;
+			v_order = 0;
+			s0 = 0;
+			s1 = 0;
+			t0 = 0;
+			t1 = 0;
+			vertex_coordinates.clear();
+			texture_coordinates.clear();
+			normal_coordinates.clear();
+			u_knots.clear();
+			v_knots.clear();
 		}
 	};
 };
