@@ -47,16 +47,16 @@ namespace libk3ddevelopment
 template<class face_t>
 class face_array_painter :
 	public colored_selection_painter,
-	public hint_processor
+	public k3d::hint::hint_processor
 {
 	typedef colored_selection_painter base;
 public:
 	face_array_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		// overrride default colors to differ between selected/unselected meshes and to contrast edges and faces
 		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6)),
-		m_points_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, point_vbo>::instance(Document)),
-		m_faces_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_t>::instance(Document)),
-		m_selection_cache(painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_selection>::instance(Document))
+		m_points_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, point_vbo>::instance(Document)),
+		m_faces_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_t>::instance(Document)),
+		m_selection_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_selection>::instance(Document))
 	{
 	}
 	
@@ -245,9 +245,9 @@ protected:
 	}
 
 private:
-	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, point_vbo>& m_points_cache;
-	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_t>& m_faces_cache;
-	painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_selection>& m_selection_cache;
+	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, point_vbo>& m_points_cache;
+	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_t>& m_faces_cache;
+	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_selection>& m_selection_cache;
 };
 
 class face_painter_edge_normals : public face_array_painter<edge_face>

@@ -47,7 +47,7 @@ namespace libk3ddevelopment
 
 class sds_gl_face_painter :
 	public colored_selection_painter,
-	public hint_processor
+	public k3d::hint::hint_processor
 {
 	typedef colored_selection_painter base;
 	/// Defines the set of sds caches associated with this painter
@@ -56,7 +56,7 @@ class sds_gl_face_painter :
 public:
 	sds_gl_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document, const k3d::color Unselected = k3d::color(0.2,0.2,0.2), const k3d::color Selected = k3d::color(0.6,0.6,0.6)) :
 		base(Factory, Document, Unselected, Selected),
-		m_sds_cache(painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, sds_gl_cache>::instance(Document)),
+		m_sds_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, sds_gl_cache>::instance(Document)),
 		m_levels(init_owner(*this) + init_name("levels") + init_label(_("Levels")) + init_description(_("Number of SDS levels")) + init_value(2) + init_constraint(constraint::minimum(2L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_levels.changed_signal().connect(sigc::mem_fun(*this, &sds_gl_face_painter::on_levels_changed));
@@ -152,7 +152,7 @@ public:
 	}
 
 protected:
-	painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, sds_gl_cache>& m_sds_cache;
+	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, sds_gl_cache>& m_sds_cache;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_levels;
 	bool m_do_update;
 	
