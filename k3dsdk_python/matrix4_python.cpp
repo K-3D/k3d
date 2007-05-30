@@ -83,12 +83,15 @@ list matrix4_column_major_list(const k3d::matrix4& lhs)
 
 void export_matrix4()
 {
-	class_<k3d::matrix4>("matrix4")
+	class_<k3d::matrix4>("matrix4",
+		"Stores a 4x4 transformation matrix.")
 		.def("__len__", matrix4_len)
 		.def("__getitem__", matrix4_getitem)
 		.def("__setitem__", matrix4_setitem)
-		.def("row_major_list", matrix4_row_major_list)
-		.def("column_major_list", matrix4_column_major_list)
+		.def("row_major_list", matrix4_row_major_list,
+			"Returns the contents of the matrix as a list of floating-point values in row-major order.")
+		.def("column_major_list", matrix4_column_major_list,
+			"Returns the contents of the matrix as a list of floating-point values in column-major order.")
 		.def(self * k3d::normal3())
 		.def(self * k3d::point3())
 		.def(self * k3d::vector3())

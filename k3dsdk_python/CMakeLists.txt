@@ -29,8 +29,8 @@ ADD_LIBRARY(k3dsdk-python-types SHARED
 	point3_python.h
 	point4_python.cpp
 	point4_python.h
-	render_state_ri_python.cpp
-	render_state_ri_python.h
+	ri_render_state_python.cpp
+	ri_render_state_python.h
 	uuid_python.cpp
 	uuid_python.h
 	vector3_python.cpp
@@ -52,6 +52,8 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	array_python.h
 	const_array_python.cpp
 	const_array_python.h
+	const_named_arrays_python.cpp
+	const_named_arrays_python.h
 	dynamic_cast_python.cpp
 	dynamic_cast_python.h
 	icommand_node_python.cpp
@@ -79,6 +81,8 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	mesh_python.h
 	mesh_selection_python.cpp
 	mesh_selection_python.h
+	named_arrays_python.cpp
+	named_arrays_python.h
 	node_python.cpp
 	node_python.h
 	object_model_python.cpp

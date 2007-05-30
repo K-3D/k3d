@@ -23,9 +23,11 @@
 
 #include "array_python.h"
 #include "const_array_python.h"
+#include "const_named_arrays_python.h"
 #include "imaterial_python.h"
 #include "interface_wrapper_python.h"
 #include "mesh_python.h"
+#include "named_arrays_python.h"
 
 #include <k3dsdk/color.h>
 #include <k3dsdk/imaterial.h>
@@ -81,76 +83,6 @@ object create_object(pointer_type& Pointer)
 	return object(return_type(*new_object));
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
-// array
-
-template<typename array_type>
-class array
-{
-public:
-	typedef typename array_type::value_type value_type;
-
-	array() :
-		m_wrapped(0)
-	{
-	}
-
-	array(array_type& Array) :
-		m_wrapped(&Array)
-	{
-	}
-
-	int len()
-	{
-		return wrapped().size();
-	}
-
-	value_type get_item(int item)
-	{
-		if(item < 0 || item >= wrapped().size())
-			throw std::out_of_range("index out-of-range");
-
-		return wrapped().at(item);
-	}
-
-	void set_item(int item, const value_type& value)
-	{
-		if(item < 0)
-			throw std::out_of_range("index out-of-range");
-
-		if(static_cast<size_t>(item) >= wrapped().size())
-			wrapped().resize(item + 1);
-
-		wrapped()[item] = value;
-	}
-
-	void append(const value_type& Value)
-	{
-		wrapped().push_back(Value);
-	}
-
-	void assign(const list& Value)
-	{
-		array_type& storage = wrapped();
-
-		const size_t count = boost::python::len(Value);
-		storage.resize(count);
-		for(size_t i = 0; i != count; ++i)
-			storage[i] = extract<typename array_type::value_type>(Value[i]);
-	}
-
-private:
-	array_type& wrapped()
-	{
-		if(!m_wrapped)
-			throw std::runtime_error("wrapped array is null");
-
-		return *m_wrapped;
-	}
-
-	array_type* const m_wrapped;
-};
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // wrap_const_array
 
@@ -188,196 +120,6 @@ object create_array(pointer_type& Pointer)
 	array_type* const new_array = new array_type();
 	Pointer.reset(new_array);
 	return object(k3d::python::array<array_type>(*new_array));
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// const_named_arrays
-
-class const_named_arrays
-{
-public:
-	const_named_arrays() :
-		m_wrapped(0)
-	{
-	}
-
-	const_named_arrays(const k3d::mesh::named_arrays& NamedArrays) :
-		m_wrapped(&NamedArrays)
-	{
-	}
-
-	list array_names()
-	{
-		list results;
-
-		for(k3d::mesh::named_arrays::const_iterator array = wrapped().begin(); array != wrapped().end(); ++array)
-			results.append(array->first);
-
-		return results;
-	}
-
-	object array(const std::string& Name)
-	{
-		if(!wrapped().count(Name))
-			throw std::runtime_error("Unknown array name: " + Name);
-
-		return wrap_array(wrapped().find(Name)->second.get());
-	}
-
-	int len()
-	{
-		return wrapped().size();
-	}
-
-	object get_item(int item)
-	{
-		if(item < 0 || item >= wrapped().size())
-			throw std::out_of_range("index out-of-range");
-
-		k3d::mesh::named_arrays::const_iterator array_iterator = wrapped().begin();
-		std::advance(array_iterator, item);
-
-		return wrap_array(array_iterator->second.get());
-	}
-
-private:
-	object wrap_array(const k3d::array* const Array)
-	{
-		return object();
-	}
-
-	const k3d::mesh::named_arrays& wrapped()
-	{
-		if(!m_wrapped)
-			throw std::runtime_error("wrapped object is null");
-
-		return *m_wrapped;
-	}
-
-	const k3d::mesh::named_arrays* const m_wrapped;
-};
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-// export_const_named_arrays
-
-void export_const_named_arrays()
-{
-	class_<const_named_arrays>("const_named_arrays")
-		.def("array_names", &const_named_arrays::array_names)
-		.def("array", &const_named_arrays::array)
-		.def("__len__", &const_named_arrays::len)
-		.def("__getitem__", &const_named_arrays::get_item);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// named_arrays
-
-class named_arrays
-{
-public:
-	named_arrays() :
-		m_wrapped(0)
-	{
-	}
-
-	named_arrays(k3d::mesh::named_arrays& NamedArrays) :
-		m_wrapped(&NamedArrays)
-	{
-	}
-
-	list array_names()
-	{
-		list results;
-
-		for(k3d::mesh::named_arrays::const_iterator array = wrapped().begin(); array != wrapped().end(); ++array)
-			results.append(array->first);
-
-		return results;
-	}
-
-	object array(const std::string& Name)
-	{
-		if(!wrapped().count(Name))
-			throw std::runtime_error("Unknown array name: " + Name);
-
-		return wrap_array(wrapped().find(Name)->second.get());
-	}
-
-    template<typename array_type>
-    object create_typed_array(const std::string& Name)
-    {
-        k3d::typed_array<array_type>* const new_array = new k3d::typed_array<array_type>();
-        wrapped()[Name].reset(new_array);
-        return object(k3d::python::array<k3d::typed_array<array_type> >(*new_array));
-    }
-
-	object create_array(const std::string& Name, const std::string& Type)
-	{
-	    if(Name.empty())
-            throw std::runtime_error("Empty array name");
-
-        if(Type == k3d::type_string<double>())
-            return create_typed_array<double>(Name);
-        else if(Type == k3d::type_string<k3d::color>())
-            return create_typed_array<k3d::color>(Name);
-        else if(Type == k3d::type_string<k3d::point3>())
-            return create_typed_array<k3d::point3>(Name);
-        else if(Type == k3d::type_string<k3d::vector3>())
-            return create_typed_array<k3d::vector3>(Name);
-        else if(Type == k3d::type_string<k3d::normal3>())
-            return create_typed_array<k3d::normal3>(Name);
-        else if(Type == k3d::type_string<k3d::matrix4>())
-            return create_typed_array<k3d::matrix4>(Name);
-        else if(Type == k3d::type_string<k3d::point4>())
-            return create_typed_array<k3d::point4>(Name);
-
-        throw std::runtime_error("Unknown type[" + Type + "] for array [" + Name + "]");
-	}
-
-	int len()
-	{
-		return wrapped().size();
-	}
-
-	object get_item(int item)
-	{
-		if(item < 0 || item >= wrapped().size())
-			throw std::out_of_range("index out-of-range");
-
-		k3d::mesh::named_arrays::const_iterator array_iterator = wrapped().begin();
-		std::advance(array_iterator, item);
-
-		return wrap_array(array_iterator->second.get());
-	}
-
-private:
-	object wrap_array(const k3d::array* const Array)
-	{
-		return object();
-	}
-
-	k3d::mesh::named_arrays& wrapped()
-	{
-		if(!m_wrapped)
-			throw std::runtime_error("wrapped object is null");
-
-		return *m_wrapped;
-	}
-
-	k3d::mesh::named_arrays* const m_wrapped;
-};
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-// export_named_arrays
-
-void export_named_arrays()
-{
-	class_<named_arrays>("named_arrays")
-		.def("array_names", &named_arrays::array_names)
-		.def("array", &named_arrays::array)
-		.def("create_array", &named_arrays::create_array)
-		.def("__len__", &named_arrays::len)
-		.def("__getitem__", &named_arrays::get_item);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1787,9 +1529,6 @@ void mesh::define_class()
 		.value("negate", k3d::mesh::blobbies_t::NEGATE)
 		.value("identity", k3d::mesh::blobbies_t::IDENTITY)
 		.attr("__module__") = "k3d";
-
-	detail::export_const_named_arrays();
-	detail::export_named_arrays();
 }
 
 } // namespace python

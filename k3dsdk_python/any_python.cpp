@@ -26,6 +26,7 @@
 #include "bitmap_python.h"
 #include "mesh_python.h"
 #include "node_python.h"
+#include "ri_render_state_python.h"
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/bitmap.h>
@@ -33,6 +34,7 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/render_state_ri.h>
 #include <k3dsdk/types.h>
 #include <k3dsdk/vectors.h>
 
@@ -118,6 +120,11 @@ const object any_to_python(const boost::any& Value)
 	{
 		k3d::inode* const k3d_node = boost::any_cast<k3d::inode*>(Value);
 		return k3d_node ? object(node(k3d_node)) : object();
+	}
+
+	if(type == typeid(const k3d::ri::render_state*))
+	{
+		return object(ri_render_state(boost::any_cast<const k3d::ri::render_state*>(Value)));
 	}
 
 	throw std::invalid_argument("can't convert unrecognized type [" + demangle(type) + "] to boost::python::object");

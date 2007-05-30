@@ -1,5 +1,5 @@
-#ifndef K3DSDK_RENDER_STATE_RI_PYTHON_H
-#define K3DSDK_RENDER_STATE_RI_PYTHON_H
+#ifndef K3DSDK_RI_RENDER_STATE_PYTHON_H
+#define K3DSDK_RI_RENDER_STATE_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -36,24 +36,23 @@ namespace ri { class render_state; }
 namespace python
 {
 
-class render_state_ri :
+class ri_render_state :
 	public interface_wrapper<const k3d::ri::render_state>
 {
 	typedef interface_wrapper<const k3d::ri::render_state> base;
 
 public:
-	render_state_ri();
-	render_state_ri(const k3d::ri::render_state* Value);
-	render_state_ri(const k3d::ri::render_state& Value);
+	ri_render_state(const k3d::ri::render_state* Value);
+	ri_render_state(const k3d::ri::render_state& Value);
 
 	void use_shader(const std::string& Shader);
-};
 
-void export_render_state_ri();
+	static void define_class();
+};
 
 } // namespace python
 
 } // namespace k3d
 
-#endif // !K3DSDK_RENDER_STATE_RI_PYTHON_H
+#endif // !K3DSDK_RI_RENDER_STATE_PYTHON_H
 

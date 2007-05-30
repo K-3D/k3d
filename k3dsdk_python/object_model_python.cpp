@@ -28,6 +28,7 @@
 #include "bounding_box3_python.h"
 #include "color_python.h"
 #include "const_array_python.h"
+#include "const_named_arrays_python.h"
 #include "dynamic_cast_python.h"
 #include "euler_angles_python.h"
 #include "icommand_node_python.h"
@@ -43,12 +44,13 @@
 #include "matrix4_python.h"
 #include "mesh_python.h"
 #include "mesh_selection_python.h"
+#include "named_arrays_python.h"
 #include "node_python.h"
 #include "normal3_python.h"
 #include "object_model_python.h"
 #include "point3_python.h"
 #include "point4_python.h"
-#include "render_state_ri_python.h"
+#include "ri_render_state_python.h"
 #include "uuid_python.h"
 #include "vector3_python.h"
 
@@ -65,7 +67,6 @@
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/plugins.h>
-#include <k3dsdk/render_state_ri.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/types.h>
@@ -333,12 +334,20 @@ BOOST_PYTHON_MODULE(k3d)
 	to_python_converter<k3d::mesh_selection::records_t, python_wrap<k3d::mesh_selection::records_t> >();
 
 	angle_axis::define_class();
+	const_named_arrays::define_class();
+	euler_angles::define_class();
 	export_arrays();
 	export_bitmap();
 	export_bounding_box3();
 	export_color();
 	export_const_arrays();
-	euler_angles::define_class();
+	export_matrix4();
+	export_mesh_selection();
+	export_normal3();
+	export_point3();
+	export_point4();
+	export_uuid();
+	export_vector3();
 	icommand_node::define_class();
 	idocument::define_class();
 	imaterial::define_class();
@@ -349,16 +358,10 @@ BOOST_PYTHON_MODULE(k3d)
 	iproperty_collection::define_class();
 	iunknown::define_class();
 	iuser_interface::define_class();
-	export_matrix4();
 	mesh::define_class();
-	export_mesh_selection();
+	named_arrays::define_class();
 	node::define_class();
-	export_normal3();
-	export_point3();
-	export_point4();
-	export_render_state_ri();
-	export_uuid();
-	export_vector3();
+	ri_render_state::define_class();
 
 	def("close_document", module_close_document,
 		"Closes an open document.");
@@ -439,10 +442,6 @@ void set_context(const k3d::iscript_engine::context_t& Context, boost::python::d
 			else if(context->second.type() == typeid(k3d::mesh*))
 			{
 				Dictionary[context->first] = mesh(boost::any_cast<k3d::mesh*>(context->second));
-			}
-			else if(context->second.type() == typeid(const k3d::ri::render_state*))
-			{
-				Dictionary[context->first] = render_state_ri(boost::any_cast<const k3d::ri::render_state*>(context->second));
 			}
 			else
 			{
