@@ -80,6 +80,20 @@ def setup_bitmap_reader_test(reader_name, source_file):
 
 	return result
 
+def setup_mesh_reader_test(reader_name, source_file):
+	doc = k3d.new_document()
+	reader = doc.new_node(reader_name)
+	reader.file = "@CMAKE_CURRENT_SOURCE_DIR@/meshes/" + source_file
+
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = doc
+	result.reader = reader
+
+	return result
+
 def setup_mesh_source_test(source_name):
 	doc = k3d.new_document()
 
