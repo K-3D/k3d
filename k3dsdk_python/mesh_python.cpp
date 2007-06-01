@@ -1049,53 +1049,77 @@ void mesh::define_class()
 	class_<mesh>("mesh", 
 		"Stores geometric mesh data.", no_init)
 		.def("bicubic_patches", &mesh::bicubic_patches,
-			"Returns a L{const_bicubic_patches} object containing an immutable (read-only) collection of bicubic patch primitives.")
+			"Returns a L{const_bicubic_patches} object containing an immutable (read-only) collection of bicubic patch primitives, or None.")
 		.def("bilinear_patches", &mesh::bilinear_patches,
-			"Returna a L{const_bilinear_patches} object containing an immutable (read-only) collection of bilinear patch primitives.")
+			"Returna a L{const_bilinear_patches} object containing an immutable (read-only) collection of bilinear patch primitives, or None.")
 		.def("blobbies", &mesh::blobbies,
-			"Returns a L{const_blobbies} object containing an immutable (read-only) collection of blobby primitives.")
+			"Returns a L{const_blobbies} object containing an immutable (read-only) collection of blobby primitives, or None.")
 		.def("cubic_curve_groups", &mesh::cubic_curve_groups,
-			"Returns a L{const_cubic_curve_groups} object containing an immutable (read-only) collection of cubic curve primitives.")
+			"Returns a L{const_cubic_curve_groups} object containing an immutable (read-only) collection of cubic curve primitives, or None.")
 		.def("linear_curve_groups", &mesh::linear_curve_groups,
-			"Returns a L{const_linear_curve_groups} object containing an immutable (read-only) collection of linear curve primitives.")
+			"Returns a L{const_linear_curve_groups} object containing an immutable (read-only) collection of linear curve primitives, or None.")
 		.def("nurbs_curve_groups", &mesh::nurbs_curve_groups,
-			"Returns a L{const_nurbs_curve_groups} object containing an immutable (read-only) collection of NURBS curve primitives.")
+			"Returns a L{const_nurbs_curve_groups} object containing an immutable (read-only) collection of NURBS curve primitives, or None.")
 		.def("nurbs_patches", &mesh::nurbs_patches,
-			"Returns a L{const_nurbs_patches} object containing an immutable (read-only) collection of NURBS patch primitives.")
+			"Returns a L{const_nurbs_patches} object containing an immutable (read-only) collection of NURBS patch primitives, or None.")
 		.def("vertex_data", &mesh::vertex_data,
-			"Returns a L{const_named_arrays} object containing a collection of immutable (read-only) per-vertex data.")
+			"Returns a L{const_named_arrays} object containing a collection of immutable (read-only) per-vertex data, or None.")
 		.def("point_groups", &mesh::point_groups,
-			"Returns a L{const_point_groups} object containing a collection of immutable (read-only) point primitives.")
+			"Returns a L{const_point_groups} object containing a collection of immutable (read-only) point primitives, or None.")
 		.def("point_selection", &mesh::point_selection,
-			"Returns an immutable (read-only) L{const_double_array} object containing the selection state of every vertex in the mesh.")
+			"Returns an immutable (read-only) L{const_double_array} object containing the selection state of every vertex in the mesh, or None.")
 		.def("points", &mesh::points,
-			"Returns an immutable (read-only) L{const_point3_array} object containing the geometric coordinates of every vertex in the mesh.")
+			"Returns an immutable (read-only) L{const_point3_array} object containing the geometric coordinates of every vertex in the mesh, or None.")
 		.def("polyhedra", &mesh::polyhedra,
-			"Returns a L{const_polyhedra} object containing a collection of immutable (read-only) polyhedron primitives.")
-		.def("writable_bicubic_patches", &mesh::writable_bicubic_patches)
-		.def("writable_bilinear_patches", &mesh::writable_bilinear_patches)
-		.def("writable_blobbies", &mesh::writable_blobbies)
-		.def("writable_cubic_curve_groups", &mesh::writable_cubic_curve_groups)
-		.def("writable_linear_curve_groups", &mesh::writable_linear_curve_groups)
-		.def("writable_nurbs_curve_groups", &mesh::writable_nurbs_curve_groups)
-		.def("writable_nurbs_patches", &mesh::writable_nurbs_patches)
-		.def("writable_vertex_data", &mesh::writable_vertex_data)
-		.def("writable_point_groups", &mesh::writable_point_groups)
-		.def("writable_point_selection", &mesh::writable_point_selection)
-		.def("writable_points", &mesh::writable_points)
-		.def("writable_polyhedra", &mesh::writable_polyhedra)
-		.def("copy", &mesh::copy)
-		.def("create_bicubic_patches", &mesh::create_bicubic_patches)
-		.def("create_bilinear_patches", &mesh::create_bilinear_patches)
-		.def("create_blobbies", &mesh::create_blobbies)
-		.def("create_cubic_curve_groups", &mesh::create_cubic_curve_groups)
-		.def("create_linear_curve_groups", &mesh::create_linear_curve_groups)
-		.def("create_nurbs_curve_groups", &mesh::create_nurbs_curve_groups)
-		.def("create_nurbs_patches", &mesh::create_nurbs_patches)
-		.def("create_point_groups", &mesh::create_point_groups)
-		.def("create_point_selection", &mesh::create_point_selection)
-		.def("create_points", &mesh::create_points)
-		.def("create_polyhedra", &mesh::create_polyhedra)
+			"Returns a L{const_polyhedra} object containing a collection of immutable (read-only) polyhedron primitives, or None.")
+		.def("writable_bicubic_patches", &mesh::writable_bicubic_patches,
+			"Returns a L{bicubic_patches} object containing a mutable (read-write) collection of bicubic patch primitives, or None.")
+		.def("writable_bilinear_patches", &mesh::writable_bilinear_patches,
+			"Returns a L{bilinear_patches} object containing a mutable (read-write) collection of bilinear patch primitives, or None.")
+		.def("writable_blobbies", &mesh::writable_blobbies,
+			"Returns a L{blobbies} object containing a mutable (read-write) collection of blobby primitives, or None.")
+		.def("writable_cubic_curve_groups", &mesh::writable_cubic_curve_groups,
+			"Returns a L{cubic_curve_groups} object containing a mutable (read-write) collection of cubic curve primitives, or None.")
+		.def("writable_linear_curve_groups", &mesh::writable_linear_curve_groups,
+			"Returns a L{linear_curve_groups} object containing a mutable (read-write) collection of linear curve primitives, or None.")
+		.def("writable_nurbs_curve_groups", &mesh::writable_nurbs_curve_groups,
+			"Returns a L{nurbs_curve_groups} object containing a mutable (read-write) collection of NURBS curve primitives, or None.")
+		.def("writable_nurbs_patches", &mesh::writable_nurbs_patches,
+			"Returns a L{nurbs_patches} object containing a mutable (read-write) collection of NURBS patch primitives, or None.")
+		.def("writable_vertex_data", &mesh::writable_vertex_data,
+			"Returns a L{named_arrays} object containing a collection of mutable (read-write) per-vertex data, or None.")
+		.def("writable_point_groups", &mesh::writable_point_groups,
+			"Returns a L{point_groups} object containing a collection of mutable (read-write) point primitives, or None.")
+		.def("writable_point_selection", &mesh::writable_point_selection,
+			"Returns a mutable (read-write) L{double_array} object containing the selection state of every vertex in the mesh, or None.")
+		.def("writable_points", &mesh::writable_points,
+			"Returns a mutable (read-write) L{point3_array} object containing the geometric coordinates of every vertex in the mesh, or None.")
+		.def("writable_polyhedra", &mesh::writable_polyhedra,
+			"Returns a L{polyhedra} object containing a mutable (read-write) collection of polyhedron primitives, or None.")
+		.def("copy", &mesh::copy,
+			"Store a shallow copy of the given L{mesh}.")
+		.def("create_bicubic_patches", &mesh::create_bicubic_patches,
+			"Creates and returns a new L{bicubic_patches} object for storing bicubic patch primitives.")
+		.def("create_bilinear_patches", &mesh::create_bilinear_patches,
+			"Creates and returns a new L{bilinear_patches} object for storing bilinear patch primitives.")
+		.def("create_blobbies", &mesh::create_blobbies,
+			"Creates and returns a new L{blobbies} object for storing blobby primitives.")
+		.def("create_cubic_curve_groups", &mesh::create_cubic_curve_groups,
+			"Creates and returns a new L{cubic_curve_groups} object for storing cubic curve primitives.")
+		.def("create_linear_curve_groups", &mesh::create_linear_curve_groups,
+			"Creates and returns a new L{linear_curve_groups} object for storing linear curve primitives.")
+		.def("create_nurbs_curve_groups", &mesh::create_nurbs_curve_groups,
+			"Creates and returns a new L{nurbs_curve_groups} object for storing NURBS curve primitives.")
+		.def("create_nurbs_patches", &mesh::create_nurbs_patches,
+			"Creates and returns a new L{nurbs_patches} object for storing NURBS patch primitives.")
+		.def("create_point_groups", &mesh::create_point_groups,
+			"Creates and returns a new L{point_groups} object for storing point primitives.")
+		.def("create_point_selection", &mesh::create_point_selection,
+			"Creates and returns a new L{double_array} object used to store the selection state of every vertex in the mesh.")
+		.def("create_points", &mesh::create_points,
+			"Creates and returns a new L{point3_array} object used to store the geometric coordinates of every vertex in the mesh.")
+		.def("create_polyhedra", &mesh::create_polyhedra,
+			"Create and returns a new L{polyhedra} object for storing polyhedron primitives.")
 		.def("__repr__", &mesh::repr)
 		.def("__str__", &mesh::str);
 
