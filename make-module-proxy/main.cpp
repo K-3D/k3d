@@ -71,11 +71,9 @@ int main(int argc, char* argv[])
 		k3d::xml::attribute("version", K3D_VERSION),
 		k3d::xml::attribute("host", K3D_HOST));
 
-	/** \todo Store the real module class here instead of k3d::uuid::null() */
 	k3d::xml::element& xml_module = xml_proxy.append(
 		k3d::xml::element("module",
-			k3d::xml::attribute("name", module_path.leaf().raw()),
-			k3d::xml::attribute("class", k3d::uuid::null())));
+			k3d::xml::attribute("name", module_path.leaf().raw())));
 
 	k3d::xml::element& xml_plugins = xml_module.append(k3d::xml::element("plugins"));
 
