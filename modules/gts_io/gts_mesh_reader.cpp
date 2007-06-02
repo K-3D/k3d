@@ -51,17 +51,6 @@ void gts_line(std::istream& Stream, std::string& Buffer)
 	}
 }
 
-/*
-// All GTS indices are 1-indexed
-unsigned long k3d_index(const unsigned long& external_index)
-{
-	return external_index - 1;
-}
-
-// Define an edge type
-typedef std::pair<unsigned long, unsigned long> edge_t;
-*/
-
 /////////////////////////////////////////////////////////////////////////////
 // gts_mesh_reader
 
