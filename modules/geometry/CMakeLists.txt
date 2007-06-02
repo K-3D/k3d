@@ -1,3 +1,0 @@
-K3D_BUILD_MODULE(k3d-geometry)
-K3D_CREATE_MODULE_PROXY(k3d-geometry)
-
