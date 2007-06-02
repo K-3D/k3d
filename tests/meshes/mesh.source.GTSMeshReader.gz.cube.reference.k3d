@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>0 -1.6329899999999999 -1.1547000000000001 -1.6329899999999999 0 -1.1547000000000001 0 1.6329899999999999 -1.1547000000000001 1.6329899999999999 0 -1.1547000000000001 0 -1.6329899999999999 1.1547000000000001 -1.6329899999999999 0 1.1547000000000001 0 1.6329899999999999 1.1547000000000001 1.6329899999999999 0 1.1547000000000001</points>
+		<point_selection>0 0 0 0 0 0 0 0</point_selection>
+		<polyhedra>
+			<first_faces>0</first_faces>
+			<face_counts>12</face_counts>
+			<types>polygons</types>
+			<face_first_loops>0 1 2 3 4 5 6 7 8 9 10 11</face_first_loops>
+			<face_loop_counts>1 1 1 1 1 1 1 1 1 1 1 1</face_loop_counts>
+			<face_selection>0 0 0 0 0 0 0 0 0 0 0 0</face_selection>
+			<face_materials>0 0 0 0 0 0 0 0 0 0 0 0</face_materials>
+			<loop_first_edges>0 3 6 9 12 15 18 21 24 27 30 33</loop_first_edges>
+			<edge_points>2 3 0 1 2 0 5 1 0 4 5 0 1 5 6 2 1 6 2 6 7 3 2 7 3 7 4 0 3 4 6 5 4 7 6 4</edge_points>
+			<clockwise_edges>1 2 0 4 5 3 7 8 6 10 11 9 13 14 12 16 17 15 19 20 18 22 23 21 25 26 24 28 29 27 31 32 30 34 35 33</clockwise_edges>
+			<edge_selection>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</edge_selection>
+		</polyhedra>
+	</mesh_arrays>
+</k3dml>

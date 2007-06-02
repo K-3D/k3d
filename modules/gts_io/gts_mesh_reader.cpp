@@ -26,7 +26,7 @@
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/file_helpers.h>
-#include <k3dsdk/fstream.h>
+#include <k3dsdk/gzstream.h>
 #include <k3dsdk/material_client.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
@@ -73,7 +73,7 @@ public:
 		if(path.empty())
 			return;
 		
-		k3d::filesystem::ifstream file(path);
+		k3d::filesystem::igzstream file(path);
 		if(!file)
 			return;
 
