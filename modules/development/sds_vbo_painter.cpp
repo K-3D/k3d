@@ -64,10 +64,10 @@ public:
 	
 	~sds_face_painter()
 	{
-		m_sds_cache.remove_painter(this);
 		for (sds_cache_set_t::iterator cache = m_sds_cache_set.begin(); cache != m_sds_cache_set.end(); ++cache) {
 			(*cache)->remove_property(&m_levels);
 		}
+		m_sds_cache.remove_painter(this);
 	}
 	
 	void on_levels_changed(k3d::iunknown* Hint)
