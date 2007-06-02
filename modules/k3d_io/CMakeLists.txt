@@ -1,0 +1,3 @@
+K3D_BUILD_MODULE(k3d-k3d-io)
+K3D_CREATE_MODULE_PROXY(k3d-k3d-io)
+

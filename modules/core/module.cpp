@@ -31,8 +31,6 @@ namespace libk3dcore
 extern k3d::iplugin_factory& axes_factory();
 extern k3d::iplugin_factory& camera_factory();
 extern k3d::iplugin_factory& color_property_factory();
-extern k3d::iplugin_factory& document_reader_factory();
-extern k3d::iplugin_factory& document_writer_factory();
 extern k3d::iplugin_factory& format_scalar_factory();
 extern k3d::iplugin_factory& format_time_factory();
 extern k3d::iplugin_factory& frozen_transformation_factory();
@@ -60,8 +58,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(libk3dcore::axes_factory());
 	Registry.register_factory(libk3dcore::camera_factory());
 	Registry.register_factory(libk3dcore::color_property_factory());
-	Registry.register_factory(libk3dcore::document_reader_factory());
-	Registry.register_factory(libk3dcore::document_writer_factory());
 	Registry.register_factory(libk3dcore::format_scalar_factory());
 	Registry.register_factory(libk3dcore::format_time_factory());
 	Registry.register_factory(libk3dcore::frozen_transformation_factory());
