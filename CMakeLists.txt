@@ -70,6 +70,7 @@ OPTION(K3D_BUILD_GLX_MODULE "Build the GLX offscreen rendering module" ${K3D_GLX
 OPTION(K3D_BUILD_GNOME_MODULE "Build the GNOME integration plugin module" ${K3D_GNOME_DEFAULT})
 OPTION(K3D_BUILD_GRAPHVIZ_MODULE "Build the GraphViz integration plugin module" ON)
 OPTION(K3D_BUILD_GTS_MODULE "Build the GNU Triangulated Surfaces plugin module" OFF)
+OPTION(K3D_BUILD_GTS_IO_MODULE "Build the GNU Triangulated Surfaces IO plugin module" ON)
 OPTION(K3D_BUILD_IMAGEMAGICK_MODULE "Build the ImageMagick plugin module" ${K3D_IMAGEMAGICK_DEFAULT})
 OPTION(K3D_BUILD_JPEG_MODULE "Build the jpeg plugin module" ON)
 OPTION(K3D_BUILD_K3DSCRIPT_MODULE "Build the k3dscript scripting language module" ON)

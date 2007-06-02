@@ -139,6 +139,7 @@ IF(K3D_BUILD_GTS_MODULE)
 	K3D_ADD_PYTHON_TEST(mesh.source.GTSPolySphere.py)
 ENDIF(K3D_BUILD_GTS_MODULE)
 
+K3D_ADD_PYTHON_TEST(mesh.source.GTSMeshReader.cube.py)
 K3D_ADD_PYTHON_TEST(mesh.source.KnotCurve.py)
 K3D_ADD_PYTHON_TEST(mesh.source.LSystemParser.py)
 K3D_ADD_PYTHON_TEST(mesh.source.LissajousCurve.py)
