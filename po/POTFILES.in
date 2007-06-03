@@ -134,7 +134,6 @@ modules/mesh/bevel_points.cpp
 modules/mesh/cap_hole.cpp
 modules/mesh/catmull_clark_subdivider.cpp
 modules/mesh/collapse_edges.cpp
-modules/mesh/extrude_faces.cpp
 modules/mesh/face_normals.cpp
 modules/mesh/fillet_edges.cpp
 modules/mesh/filter_faces_by_color.cpp
@@ -196,6 +195,7 @@ modules/ply_io/ply_mesh_reader.cpp
 modules/png_io/png_bitmap_importer.cpp
 modules/png_io/png_bitmap_reader.cpp
 modules/png_io/png_bitmap_writer.cpp
+modules/polyhedra/extrude_faces.cpp
 modules/primitives/knot_curve.cpp
 modules/primitives/lissajous_curve.cpp
 modules/primitives/newell_primitives.cpp
