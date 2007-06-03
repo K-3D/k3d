@@ -37,7 +37,7 @@
 
 #include <set>
 
-namespace libk3dmesh
+namespace libk3dpolyhedra
 {
 
 namespace detail
@@ -964,5 +964,5 @@ k3d::iplugin_factory& extrude_faces_factory()
 	return extrude_faces::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace libk3dpolyhedra
 

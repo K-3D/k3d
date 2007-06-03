@@ -42,7 +42,6 @@ extern k3d::iplugin_factory& connect_vertices_factory();
 extern k3d::iplugin_factory& connect_vertices2_factory();
 extern k3d::iplugin_factory& delete_components_factory();
 extern k3d::iplugin_factory& dissolve_components_factory();
-extern k3d::iplugin_factory& extrude_faces_factory();
 extern k3d::iplugin_factory& face_normals_factory();
 extern k3d::iplugin_factory& fill_selected_holes_factory();
 extern k3d::iplugin_factory& fillet_edges_factory();
@@ -90,7 +89,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(libk3dmesh::connect_vertices2_factory());
 	Registry.register_factory(libk3dmesh::delete_components_factory());
 	Registry.register_factory(libk3dmesh::dissolve_components_factory());
-	Registry.register_factory(libk3dmesh::extrude_faces_factory());
 	Registry.register_factory(libk3dmesh::face_normals_factory());
 	Registry.register_factory(libk3dmesh::fill_selected_holes_factory());
 	Registry.register_factory(libk3dmesh::fillet_edges_factory());
