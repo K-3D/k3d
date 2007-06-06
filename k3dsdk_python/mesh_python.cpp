@@ -1123,7 +1123,8 @@ void mesh::define_class()
 		.def("__repr__", &mesh::repr)
 		.def("__str__", &mesh::str);
 
-	class_<detail::const_point_groups>("const_point_groups")
+	class_<detail::const_point_groups>("const_point_groups",
+		"Stores an immutable (read-only) collection of point primitives.")
 		.def("first_points", &detail::const_point_groups::first_points)
 		.def("point_counts", &detail::const_point_groups::point_counts)
 		.def("materials", &detail::const_point_groups::materials)
@@ -1131,7 +1132,8 @@ void mesh::define_class()
 		.def("points", &detail::const_point_groups::points)
 		.def("varying_data", &detail::const_point_groups::varying_data);
 
-	class_<detail::point_groups>("point_groups")
+	class_<detail::point_groups>("point_groups",
+		"Stores a mutable (read-write) collection of point primitives.")
 		.def("first_points", &detail::point_groups::first_points)
 		.def("point_counts", &detail::point_groups::point_counts)
 		.def("materials", &detail::point_groups::materials)
@@ -1151,7 +1153,8 @@ void mesh::define_class()
 		.def("create_materials", &detail::point_groups::create_materials)
 		.def("create_points", &detail::point_groups::create_points);
 
-	class_<detail::const_linear_curve_groups>("const_linear_curve_groups")
+	class_<detail::const_linear_curve_groups>("const_linear_curve_groups",
+		"Stores an immutable (read-only) collection of linear curve primitives.")
 		.def("first_curves", &detail::const_linear_curve_groups::first_curves)
 		.def("curve_counts", &detail::const_linear_curve_groups::curve_counts)
 		.def("periodic_curves", &detail::const_linear_curve_groups::periodic_curves)
@@ -1163,7 +1166,8 @@ void mesh::define_class()
 		.def("uniform_data", &detail::const_linear_curve_groups::uniform_data)
 		.def("curve_points", &detail::const_linear_curve_groups::curve_points);
 
-	class_<detail::linear_curve_groups>("linear_curve_groups")
+	class_<detail::linear_curve_groups>("linear_curve_groups",
+		"Stores a mutable (read-write) collection of linear curve primitives.")
 		.def("first_curves", &detail::linear_curve_groups::first_curves)
 		.def("curve_counts", &detail::linear_curve_groups::curve_counts)
 		.def("periodic_curves", &detail::linear_curve_groups::periodic_curves)
@@ -1195,7 +1199,8 @@ void mesh::define_class()
 		.def("create_curve_selection", &detail::linear_curve_groups::create_curve_selection)
 		.def("create_curve_points", &detail::linear_curve_groups::create_curve_points);
 
-	class_<detail::const_cubic_curve_groups>("const_cubic_curve_groups")
+	class_<detail::const_cubic_curve_groups>("const_cubic_curve_groups",
+		"Stores an immutable (read-only) collection of cubic curve primitives.")
 		.def("first_curves", &detail::const_cubic_curve_groups::first_curves)
 		.def("curve_counts", &detail::const_cubic_curve_groups::curve_counts)
 		.def("periodic_curves", &detail::const_cubic_curve_groups::periodic_curves)
@@ -1207,7 +1212,8 @@ void mesh::define_class()
 		.def("uniform_data", &detail::const_cubic_curve_groups::uniform_data)
 		.def("curve_points", &detail::const_cubic_curve_groups::curve_points);
 
-	class_<detail::cubic_curve_groups>("cubic_curve_groups")
+	class_<detail::cubic_curve_groups>("cubic_curve_groups",
+		"Stores a mutable (read-write) collection of cubic curve primitives.")
 		.def("first_curves", &detail::cubic_curve_groups::first_curves)
 		.def("curve_counts", &detail::cubic_curve_groups::curve_counts)
 		.def("periodic_curves", &detail::cubic_curve_groups::periodic_curves)
@@ -1239,7 +1245,8 @@ void mesh::define_class()
 		.def("create_curve_selection", &detail::cubic_curve_groups::create_curve_selection)
 		.def("create_curve_points", &detail::cubic_curve_groups::create_curve_points);
 
-	class_<detail::const_nurbs_curve_groups>("const_nurbs_curve_groups")
+	class_<detail::const_nurbs_curve_groups>("const_nurbs_curve_groups",
+		"Stores an immutable (read-only) collection of NURBS curve primitives.")
 		.def("first_curves", &detail::const_nurbs_curve_groups::first_curves)
 		.def("curve_counts", &detail::const_nurbs_curve_groups::curve_counts)
 		.def("materials", &detail::const_nurbs_curve_groups::materials)
@@ -1254,7 +1261,8 @@ void mesh::define_class()
 		.def("curve_point_weights", &detail::const_nurbs_curve_groups::curve_point_weights)
 		.def("curve_knots", &detail::const_nurbs_curve_groups::curve_knots);
 
-	class_<detail::nurbs_curve_groups>("nurbs_curve_groups")
+	class_<detail::nurbs_curve_groups>("nurbs_curve_groups",
+		"Stores a mutable (read-write) collection of NURBS curve primitives.")
 		.def("first_curves", &detail::nurbs_curve_groups::first_curves)
 		.def("curve_counts", &detail::nurbs_curve_groups::curve_counts)
 		.def("materials", &detail::nurbs_curve_groups::materials)
@@ -1295,7 +1303,8 @@ void mesh::define_class()
 		.def("create_curve_point_weights", &detail::nurbs_curve_groups::create_curve_point_weights)
 		.def("create_curve_knots", &detail::nurbs_curve_groups::create_curve_knots);
 
-	class_<detail::const_bilinear_patches>("const_bilinear_patches")
+	class_<detail::const_bilinear_patches>("const_bilinear_patches",
+		"Stores an immutable (read-only) collection of bilinear patch primitives.")
 		.def("patch_selection", &detail::const_bilinear_patches::patch_selection)
 		.def("patch_materials", &detail::const_bilinear_patches::patch_materials)
 		.def("constant_data", &detail::const_bilinear_patches::constant_data)
@@ -1303,7 +1312,8 @@ void mesh::define_class()
 		.def("patch_points", &detail::const_bilinear_patches::patch_points)
 		.def("varying_data", &detail::const_bilinear_patches::varying_data);
 
-	class_<detail::bilinear_patches>("bilinear_patches")
+	class_<detail::bilinear_patches>("bilinear_patches",
+		"Stores a mutable (read-write) collection of bilinear patch primitives.")
 		.def("patch_selection", &detail::bilinear_patches::patch_selection)
 		.def("patch_materials", &detail::bilinear_patches::patch_materials)
 		.def("constant_data", &detail::bilinear_patches::constant_data)
@@ -1322,7 +1332,8 @@ void mesh::define_class()
 		.def("create_patch_materials", &detail::bilinear_patches::create_patch_materials)
 		.def("create_patch_points", &detail::bilinear_patches::create_patch_points);
 
-	class_<detail::const_bicubic_patches>("const_bicubic_patches")
+	class_<detail::const_bicubic_patches>("const_bicubic_patches",
+		"Stores an immutable (read-only) collection of bicubic patch primitives.")
 		.def("patch_selection", &detail::const_bicubic_patches::patch_selection)
 		.def("patch_materials", &detail::const_bicubic_patches::patch_materials)
 		.def("constant_data", &detail::const_bicubic_patches::constant_data)
@@ -1330,7 +1341,8 @@ void mesh::define_class()
 		.def("patch_points", &detail::const_bicubic_patches::patch_points)
 		.def("varying_data", &detail::const_bicubic_patches::varying_data);
 
-	class_<detail::bicubic_patches>("bicubic_patches")
+	class_<detail::bicubic_patches>("bicubic_patches",
+		"Stores a mutable (read-write) collection of bicubic patch primitives.")
 		.def("patch_selection", &detail::bicubic_patches::patch_selection)
 		.def("patch_materials", &detail::bicubic_patches::patch_materials)
 		.def("constant_data", &detail::bicubic_patches::constant_data)
@@ -1349,7 +1361,8 @@ void mesh::define_class()
 		.def("create_patch_materials", &detail::bicubic_patches::create_patch_materials)
 		.def("create_patch_points", &detail::bicubic_patches::create_patch_points);
 
-	class_<detail::const_nurbs_patches>("const_nurbs_patches")
+	class_<detail::const_nurbs_patches>("const_nurbs_patches",
+		"Stores an immutable (read-only) collection of NURBS patch primitives.")
 		.def("patch_first_points", &detail::const_nurbs_patches::patch_first_points)
 		.def("patch_u_point_counts", &detail::const_nurbs_patches::patch_u_point_counts)
 		.def("patch_v_point_counts", &detail::const_nurbs_patches::patch_v_point_counts)
@@ -1367,7 +1380,8 @@ void mesh::define_class()
 		.def("patch_v_knots", &detail::const_nurbs_patches::patch_v_knots)
 		.def("varying_data", &detail::const_nurbs_patches::varying_data);
 
-	class_<detail::nurbs_patches>("nurbs_patches")
+	class_<detail::nurbs_patches>("nurbs_patches",
+		"Stores a mutable (read-write) collection of NURBS patch primitives.")
 		.def("patch_first_points", &detail::nurbs_patches::patch_first_points)
 		.def("patch_u_point_counts", &detail::nurbs_patches::patch_u_point_counts)
 		.def("patch_v_point_counts", &detail::nurbs_patches::patch_v_point_counts)
@@ -1416,7 +1430,8 @@ void mesh::define_class()
 		.def("create_patch_u_knots", &detail::nurbs_patches::create_patch_u_knots)
 		.def("create_patch_v_knots", &detail::nurbs_patches::create_patch_v_knots);
 
-	class_<detail::const_polyhedra>("const_polyhedra")
+	class_<detail::const_polyhedra>("const_polyhedra",
+		"Stores an immutable (read-only) collection of polyhedron primitives.")
 		.def("first_faces", &detail::const_polyhedra::first_faces)
 		.def("face_counts", &detail::const_polyhedra::face_counts)
 		.def("types", &detail::const_polyhedra::types)
@@ -1432,7 +1447,8 @@ void mesh::define_class()
 		.def("edge_selection", &detail::const_polyhedra::edge_selection)
 		.def("face_varying_data", &detail::const_polyhedra::face_varying_data);
 
-	class_<detail::polyhedra>("polyhedra")
+	class_<detail::polyhedra>("polyhedra",
+		"Stores a mutable (read-write) collection of polyhedron primitives.")
 		.def("first_faces", &detail::polyhedra::first_faces)
 		.def("face_counts", &detail::polyhedra::face_counts)
 		.def("types", &detail::polyhedra::types)
@@ -1475,7 +1491,8 @@ void mesh::define_class()
 		.def("create_clockwise_edges", &detail::polyhedra::create_clockwise_edges)
 		.def("create_edge_selection", &detail::polyhedra::create_edge_selection);
 
-	class_<detail::const_blobbies>("const_blobbies")
+	class_<detail::const_blobbies>("const_blobbies",
+		"Stores an immutable (read-only) collection of blobby (implicit surface) primitives.")
 		.def("first_primitives", &detail::const_blobbies::first_primitives)
 		.def("primitive_counts", &detail::const_blobbies::primitive_counts)
 		.def("first_operators", &detail::const_blobbies::first_operators)
@@ -1494,7 +1511,8 @@ void mesh::define_class()
 		.def("operands", &detail::const_blobbies::operands)
 		.def("floats", &detail::const_blobbies::floats);
 
-	class_<detail::blobbies>("blobbies")
+	class_<detail::blobbies>("blobbies",
+		"Stores a mutable (read-write) collection of blobby (implicit surface) primitives.")
 		.def("first_primitives", &detail::blobbies::first_primitives)
 		.def("primitive_counts", &detail::blobbies::primitive_counts)
 		.def("first_operators", &detail::blobbies::first_operators)

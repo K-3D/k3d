@@ -367,8 +367,10 @@ BOOST_PYTHON_MODULE(k3d)
 		"Closes an open document.");
 	def("command_nodes", module_command_nodes,
 		"Returns the root(s) of the command node hierarchy.");
-	def("component_deselect_all", k3d::mesh_selection::component_deselect_all);
-	def("component_select_all", k3d::mesh_selection::component_select_all);
+	def("component_deselect_all", k3d::mesh_selection::component_deselect_all,
+		"Returns a list for use with L{mesh_selection} that deselects an entire range of mesh components.");
+	def("component_select_all", k3d::mesh_selection::component_select_all,
+		"Returns a list for use with L{mesh_selection} that selects an entire range of mesh components.");
 	def("create_plugin", module_create_plugin,
 		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
 	def("deselect_all", k3d::mesh_selection::deselect_all,
