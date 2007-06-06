@@ -144,17 +144,31 @@ void mesh_selection_set_nurbs_patches(k3d::mesh_selection& lhs, const list& rhs)
 
 void export_mesh_selection()
 {
-	class_<k3d::mesh_selection>("mesh_selection")
-		.def("empty", &k3d::mesh_selection::empty)
-		.add_property("points", mesh_selection_get_points, mesh_selection_set_points)
-		.add_property("edges", mesh_selection_get_edges, mesh_selection_set_edges)
-		.add_property("faces", mesh_selection_get_faces, mesh_selection_set_faces)
-		.add_property("linear_curves", mesh_selection_get_linear_curves, mesh_selection_set_linear_curves)
-		.add_property("cubic_curves", mesh_selection_get_cubic_curves, mesh_selection_set_cubic_curves)
-		.add_property("nurbs_curves", mesh_selection_get_nurbs_curves, mesh_selection_set_nurbs_curves)
-		.add_property("bilinear_patches", mesh_selection_get_bilinear_patches, mesh_selection_set_bilinear_patches)
-		.add_property("bicubic_patches", mesh_selection_get_bicubic_patches, mesh_selection_set_bicubic_patches)
-		.add_property("nurbs_patches", mesh_selection_get_nurbs_patches, mesh_selection_set_nurbs_patches)
+	class_<k3d::mesh_selection>("mesh_selection",
+		"Stores a change in mesh selection state.\n\n"
+		"Changes are stored as lists of tuples, where each tuple represents a seletion weight to be applied to a range of indices.  "
+		"There is one list for each type of primitive: vertices, polyhedron edges, polyhedron faces, linear curves, cubic curves, "
+		"NURBS curves, bilinear patches, bicubic patches, and NURBS patches.")
+		.def("empty", &k3d::mesh_selection::empty,
+			"Returns True if the entire mesh selection is empty (will not have any effect on mesh selection state).")
+		.add_property("points", mesh_selection_get_points, mesh_selection_set_points,
+			"Stores changes in selection state for mesh vertices.")
+		.add_property("edges", mesh_selection_get_edges, mesh_selection_set_edges,
+			"Stores changes in selection state for polyhedron vertices.")
+		.add_property("faces", mesh_selection_get_faces, mesh_selection_set_faces,
+			"Stores changes in selection state for polyhedron face primitives.")
+		.add_property("linear_curves", mesh_selection_get_linear_curves, mesh_selection_set_linear_curves,
+			"Stores changes in selection state for linear curve primitives.")
+		.add_property("cubic_curves", mesh_selection_get_cubic_curves, mesh_selection_set_cubic_curves,
+			"Stores changes in selection state for cubic curve primitives.")
+		.add_property("nurbs_curves", mesh_selection_get_nurbs_curves, mesh_selection_set_nurbs_curves,
+			"Stores changes in selection state for NURBS curve primitives.")
+		.add_property("bilinear_patches", mesh_selection_get_bilinear_patches, mesh_selection_set_bilinear_patches,
+			"Stores changes in selection state for bilinear patch primitives.")
+		.add_property("bicubic_patches", mesh_selection_get_bicubic_patches, mesh_selection_set_bicubic_patches,
+			"Stores changes in selection state for bicubic patch primitives.")
+		.add_property("nurbs_patches", mesh_selection_get_nurbs_patches, mesh_selection_set_nurbs_patches,
+			"Stores changes in selection state for NURBS patch primitives.")
 		.def(self == self)
 		.def(self != self)
 		.def(self_ns::str(self));

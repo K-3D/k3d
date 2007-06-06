@@ -1047,7 +1047,7 @@ const std::string mesh::str()
 void mesh::define_class()
 {
 	class_<mesh>("mesh", 
-		"Stores geometric mesh data.", no_init)
+		"Stores a heterogeneous collection of geometric mesh primitives.", no_init)
 		.def("bicubic_patches", &mesh::bicubic_patches,
 			"Returns a L{const_bicubic_patches} object containing an immutable (read-only) collection of bicubic patch primitives, or None.")
 		.def("bilinear_patches", &mesh::bilinear_patches,
