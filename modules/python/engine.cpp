@@ -174,7 +174,7 @@ public:
 
 	void append_command(std::ostream& Script, k3d::icommand_node& CommandNode, const std::string& Command, const std::string& Arguments)
 	{
-		Script << "k3d.application.get_command_node(\"";
+		Script << "k3d.get_command_node(\"";
 		Script << k3d::command_node::path(CommandNode);
 		Script << "\").execute_command(\"";
 		Script << Command;
