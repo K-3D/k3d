@@ -33,6 +33,15 @@ namespace hint
 {
 
 //////////////////////////////////////////////////////////////////////////////
+// selection_changed
+
+selection_changed_t* selection_changed()
+{
+	static selection_changed_t hint;
+	return &hint;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // mesh_geometry_changed
 
 mesh_geometry_changed_t* mesh_geometry_changed()

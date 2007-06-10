@@ -45,8 +45,8 @@ class selection_changed_t :
 {
 };
 
-///// Convenience function that returns a reference to a static instance of selection_changed_t
-// selection_changed_t* selection_changed();
+/// Convenience function that returns a reference to a static instance of selection_changed_t
+selection_changed_t* selection_changed();
 
 /// Hint object that indicates that a mesh's geometry (the locations of its points) has changed
 class mesh_geometry_changed_t :
