@@ -1449,7 +1449,7 @@ public:
 		m_size.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		k3d::imaterial* const material = m_material.value();
 		const unsigned long number = m_number.value();

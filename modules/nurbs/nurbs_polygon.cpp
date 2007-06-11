@@ -53,7 +53,7 @@ public:
 		m_radius.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		k3d::legacy::nucurve_group* const nucurve_group = new k3d::legacy::nucurve_group();
 		k3d::legacy::nucurve* const nucurve = new k3d::legacy::nucurve();

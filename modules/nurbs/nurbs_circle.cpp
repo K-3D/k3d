@@ -56,7 +56,7 @@ public:
 		m_u_segments.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		const double radius = m_radius.value();
 		const double thetamax = m_thetamax.value();

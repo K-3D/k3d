@@ -60,7 +60,7 @@ public:
 		m_size_z.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		k3d::legacy::point* position = new k3d::legacy::point(m_x.value(), m_y.value(), m_z.value());
 		Mesh.points.push_back(position);
@@ -127,7 +127,7 @@ public:
 		m_radius.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		k3d::legacy::point* start = new k3d::legacy::point(m_x1.value(), m_y1.value(), m_z1.value());
 		k3d::legacy::point* end = new k3d::legacy::point(m_x2.value(), m_y2.value(), m_z2.value());
@@ -191,7 +191,7 @@ public:
 		m_input_mesh2.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
 		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();
@@ -256,7 +256,7 @@ public:
 		m_input_mesh2.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
 		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();
@@ -321,7 +321,7 @@ public:
 		m_input_mesh2.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
 		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();
@@ -386,7 +386,7 @@ public:
 		m_input_mesh2.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
 		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();
@@ -452,7 +452,7 @@ public:
 		m_input_mesh2.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
 		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();
@@ -571,7 +571,7 @@ public:
 		m_input_mesh2.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
 		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();

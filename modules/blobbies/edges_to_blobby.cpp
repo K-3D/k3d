@@ -139,7 +139,7 @@ public:
 		return 0;
 	}
 
-	void on_create_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		// Collect edges ...
 		detail::ordered_edges_t edges;

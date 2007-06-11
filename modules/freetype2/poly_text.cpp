@@ -359,7 +359,7 @@ public:
 		m_orientation.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		const k3d::filesystem::path font_path = m_font_path.value();
 		const std::string text = m_text.value();

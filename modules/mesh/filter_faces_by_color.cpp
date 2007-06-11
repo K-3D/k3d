@@ -73,7 +73,7 @@ public:
 		return 0;
 	}
 
-	void on_create_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		// Find Nth color
 		const unsigned long color_number = m_color_number.value();

@@ -97,7 +97,7 @@ public:
 		m_polyhedron->faces.push_back(new k3d::legacy::face(edge1, m_material.value()));
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		/** \todo Get rid of this - pass the mesh as a method argument instead */
 		m_mesh = &Mesh;

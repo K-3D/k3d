@@ -58,7 +58,7 @@ public:
 		m_number.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		// Create output geometry ...
 		k3d::legacy::deep_copy(InputMesh, Mesh);

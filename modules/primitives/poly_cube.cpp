@@ -64,7 +64,7 @@ public:
 		m_depth.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		Mesh.polyhedra.push_back(new k3d::legacy::polyhedron());
 		k3d::legacy::polyhedron& polyhedron = *Mesh.polyhedra.back();

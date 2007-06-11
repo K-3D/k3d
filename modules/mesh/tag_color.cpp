@@ -79,7 +79,7 @@ public:
 		return 0;
 	}
 
-	void on_create_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		k3d::legacy::deep_copy(InputMesh, Mesh);
 		k3d::replace_selection(m_mesh_selection.value(), Mesh);

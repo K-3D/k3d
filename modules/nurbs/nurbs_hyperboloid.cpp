@@ -64,7 +64,7 @@ public:
 		m_thetamax.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		const double x1 = m_x1.value();
 		const double y1 = m_y1.value();

@@ -27,11 +27,13 @@
 namespace libk3dpolyhedra
 {
 
+extern k3d::iplugin_factory& bevel_points_factory();
 extern k3d::iplugin_factory& extrude_faces_factory();
 
 } // namespace libk3dpolyhedra
 
 K3D_MODULE_START(Registry)
+	Registry.register_factory(libk3dpolyhedra::bevel_points_factory());
 	Registry.register_factory(libk3dpolyhedra::extrude_faces_factory());
 K3D_MODULE_END
 

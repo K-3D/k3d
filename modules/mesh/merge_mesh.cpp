@@ -61,7 +61,7 @@ public:
 		return 0;
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
 		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();

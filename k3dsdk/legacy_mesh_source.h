@@ -48,8 +48,10 @@ class mesh_source :
 public:
 	mesh_source(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
-		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description("Output mesh") + init_slot(sigc::mem_fun(*this, &mesh_source<base_t>::create_mesh)))
+		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description("Output mesh"))
 	{
+		m_output_mesh.set_initialize_slot(sigc::mem_fun(*this, &mesh_source<base_t>::initialize_mesh));
+		m_output_mesh.set_update_slot(sigc::mem_fun(*this, &mesh_source<base_t>::update_mesh));
 	}
 
 	iproperty& mesh_source_output()
@@ -59,61 +61,59 @@ public:
 
 	sigc::slot<void, iunknown*> make_reset_mesh_slot()
 	{
-		return sigc::mem_fun(*this, &mesh_source<base_t>::mesh_topology_changed);
+		return sigc::mem_fun(*this, &mesh_source<base_t>::reset_mesh);
 	}
 
 	sigc::slot<void, iunknown*> make_update_mesh_slot()
 	{
-		return sigc::mem_fun(*this, &mesh_source<base_t>::mesh_geometry_changed);
+		return m_output_mesh.make_update_slot();
 	}
 
 protected:
-	k3d_data(k3d::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
+	k3d_data(k3d::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::pointer_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
 
 private:
-	void mesh_topology_changed(iunknown* Hint)
+	void reset_mesh(iunknown* Hint)
 	{
+		m_legacy_output.reset();
 		m_output_mesh.changed_signal().emit(hint::mesh_deleted());
 		m_output_mesh.reset(0, hint::mesh_topology_changed());
 	}
 
-	void create_mesh(k3d::mesh& Mesh)
+	void initialize_mesh(k3d::mesh& Output)
 	{
-		legacy::mesh legacy_mesh;
+		m_legacy_output.reset(new legacy::mesh());
 
 		base_t::document().pipeline_profiler().start_execution(*this, "Create Mesh");
-		on_create_mesh(legacy_mesh);
+		on_initialize_mesh(*m_legacy_output);
 		base_t::document().pipeline_profiler().finish_execution(*this, "Create Mesh");
 
 		base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
-		on_update_mesh(legacy_mesh);
+		on_update_mesh(*m_legacy_output);
 		base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
 
-		base_t::document().pipeline_profiler().start_execution(*this, "Convert Mesh");
-		Mesh = legacy_mesh;
-		base_t::document().pipeline_profiler().finish_execution(*this, "Convert Mesh");
+		base_t::document().pipeline_profiler().start_execution(*this, "Convert Output");
+		Output = *m_legacy_output;
+		base_t::document().pipeline_profiler().finish_execution(*this, "Convert Output");
 	}
 
-	void mesh_geometry_changed(iunknown* const Hint)
+	void update_mesh(k3d::mesh& Output)
 	{
-		if(k3d::mesh* const output = m_output_mesh.internal_value())
-		{
-			legacy::mesh legacy_output = *output;
+		return_if_fail(m_legacy_output.get());
 
-			base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
-			on_update_mesh(legacy_output);
-			base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
+		base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
+		on_update_mesh(*m_legacy_output);
+		base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
 
-			base_t::document().pipeline_profiler().start_execution(*this, "Convert Mesh");
-			(*output) = legacy_output;
-			base_t::document().pipeline_profiler().finish_execution(*this, "Convert Mesh");
-
-			m_output_mesh.changed_signal().emit(hint::mesh_geometry_changed());
-		}
+		base_t::document().pipeline_profiler().start_execution(*this, "Convert Output");
+		Output = *m_legacy_output;
+		base_t::document().pipeline_profiler().finish_execution(*this, "Convert Output");
 	}
 
-	virtual void on_create_mesh(legacy::mesh& Output) = 0;
+	virtual void on_initialize_mesh(legacy::mesh& Output) = 0;
 	virtual void on_update_mesh(legacy::mesh& Output) = 0;
+
+	std::auto_ptr<legacy::mesh> m_legacy_output;
 };
 
 } // namespace legacy

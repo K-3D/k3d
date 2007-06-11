@@ -115,7 +115,7 @@ public:
 		m_input2.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
 		const k3d::legacy::mesh* const input1 = m_input1.value();

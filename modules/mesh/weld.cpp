@@ -140,7 +140,7 @@ public:
 		point_map_t& point_map;
 	};
 
-	void on_create_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		const double distance = m_distance.value();
 

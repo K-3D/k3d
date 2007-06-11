@@ -22,6 +22,8 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "helpers.h"
+
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/i18n.h>
@@ -32,8 +34,6 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility.h>
-
-#include "helpers.h"
 
 #include <set>
 
@@ -819,7 +819,7 @@ public:
 		return 0;
 	}
 
-	void on_create_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		k3d::legacy::deep_copy(InputMesh, Mesh);
 		k3d::replace_selection(m_mesh_selection.value(), Mesh);

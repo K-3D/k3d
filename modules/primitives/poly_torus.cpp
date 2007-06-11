@@ -63,7 +63,7 @@ public:
 		m_v_power.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		const double majorradius = m_majorradius.value();
 		const double minorradius = m_minorradius.value();

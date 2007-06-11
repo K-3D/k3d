@@ -45,9 +45,12 @@ public:
 	mesh_modifier(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
 		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::mesh*>(0)),
-		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")) + init_slot(sigc::mem_fun(*this, &mesh_modifier<base_t>::create_mesh)))
+		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")))
 	{
 		m_input_mesh.changed_signal().connect(make_reset_mesh_slot());
+
+		m_output_mesh.set_initialize_slot(sigc::mem_fun(*this, &mesh_modifier<base_t>::initialize_mesh));
+		m_output_mesh.set_update_slot(sigc::mem_fun(*this, &mesh_modifier<base_t>::update_mesh));
 	}
 
 	iproperty& mesh_source_output()
@@ -67,73 +70,70 @@ public:
 
 	sigc::slot<void, iunknown*> make_update_mesh_slot()
 	{
-		return sigc::mem_fun(*this, &mesh_modifier<base_t>::update_mesh);
+		return m_output_mesh.make_update_slot();
 	}
 
 protected:
 	k3d_data(k3d::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::local_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_input_mesh;
-	k3d_data(k3d::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
+	k3d_data(k3d::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::pointer_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
 
 private:
 	void reset_mesh(iunknown* const Hint)
 	{
+		m_legacy_output.reset();
 		m_output_mesh.reset(0, Hint);
 	}
 
-	void create_mesh(k3d::mesh& Output)
+	void initialize_mesh(k3d::mesh& Output)
 	{
 		if(const k3d::mesh* const input = m_input_mesh.value())
 		{
+			m_legacy_output.reset(new legacy::mesh());
+
 			base_t::document().pipeline_profiler().start_execution(*this, "Convert Input");
 			legacy::mesh legacy_input;
 			legacy_input = *input;
-			legacy::mesh legacy_output;
 			base_t::document().pipeline_profiler().finish_execution(*this, "Convert Input");
 
 			base_t::document().pipeline_profiler().start_execution(*this, "Create Mesh");
-			on_create_mesh(legacy_input, legacy_output);
+			on_initialize_mesh(legacy_input, *m_legacy_output);
 			base_t::document().pipeline_profiler().finish_execution(*this, "Create Mesh");
 
 			base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
-			on_update_mesh(legacy_input, legacy_output);
+			on_update_mesh(legacy_input, *m_legacy_output);
 			base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
 
 			base_t::document().pipeline_profiler().start_execution(*this, "Convert Output");
-			Output = legacy_output;
+			Output = *m_legacy_output;
 			base_t::document().pipeline_profiler().finish_execution(*this, "Convert Output");
 		}
 	}
 
-	void update_mesh(iunknown* const Hint)
+	void update_mesh(k3d::mesh& Output)
 	{
 		if(const k3d::mesh* const input = m_input_mesh.value())
 		{
-			if(k3d::mesh* const output = m_output_mesh.internal_value())
-			{
-				base_t::document().pipeline_profiler().start_execution(*this, "Convert Input");
-				legacy::mesh legacy_input;
-				legacy_input = *input;
-				
-				legacy::mesh legacy_output;
-				legacy_output = *output;
-				base_t::document().pipeline_profiler().finish_execution(*this, "Convert Input");
-				
-				base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
-				on_update_mesh(legacy_input, legacy_output);
-				base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
+			return_if_fail(m_legacy_output.get());
 
-				base_t::document().pipeline_profiler().start_execution(*this, "Convert Output");
-				(*output) = legacy_output;
-				base_t::document().pipeline_profiler().finish_execution(*this, "Convert Output");
+			base_t::document().pipeline_profiler().start_execution(*this, "Convert Input");
+			legacy::mesh legacy_input;
+			legacy_input = *input;
+			base_t::document().pipeline_profiler().finish_execution(*this, "Convert Input");
+			
+			base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
+			on_update_mesh(legacy_input, *m_legacy_output);
+			base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
 
-				/** \todo The implementation really should decide which hint to emit */
-				m_output_mesh.changed_signal().emit(0);
-			}
+			base_t::document().pipeline_profiler().start_execution(*this, "Convert Output");
+			Output = *m_legacy_output;
+			base_t::document().pipeline_profiler().finish_execution(*this, "Convert Output");
 		}
 	}
 
-	virtual void on_create_mesh(const legacy::mesh& Input, legacy::mesh& Output) = 0;
+	virtual void on_initialize_mesh(const legacy::mesh& Input, legacy::mesh& Output) = 0;
 	virtual void on_update_mesh(const legacy::mesh& Input, legacy::mesh& Output) = 0;
+
+	std::auto_ptr<legacy::mesh> m_legacy_output;
 };
 
 } // namespace legacy

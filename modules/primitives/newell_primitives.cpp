@@ -970,7 +970,7 @@ public:
 		m_size.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		const double size = m_size.value();
 		k3d::imaterial* const material = m_material.value();

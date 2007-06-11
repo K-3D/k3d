@@ -42,8 +42,10 @@ class mesh_source :
 public:
 	mesh_source(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
-		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description("Output mesh") + init_slot(sigc::mem_fun(*this, &mesh_source<base_t>::create_mesh)))
+		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description("Output mesh"))
 	{
+		m_output_mesh.set_initialize_slot(sigc::mem_fun(*this, &mesh_source<base_t>::initialize_mesh));
+		m_output_mesh.set_update_slot(sigc::mem_fun(*this, &mesh_source<base_t>::update_mesh));
 	}
 
 	iproperty& mesh_source_output()
@@ -62,35 +64,39 @@ public:
 	}
 
 protected:
-	k3d_data(mesh*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
+	k3d_data(mesh*, data::immutable_name, data::change_signal, data::no_undo, data::pointer_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
 
 private:
-	void mesh_topology_changed(iunknown* Hint)
+	void mesh_topology_changed(iunknown* const Hint)
 	{
+k3d::log() << __PRETTY_FUNCTION__ << std::endl;
 		m_output_mesh.reset(0, hint::mesh_topology_changed());
-	}
-
-	void create_mesh(mesh& Mesh)
-	{
-		base_t::document().pipeline_profiler().start_execution(*this, "Create Mesh");
-		on_create_mesh_topology(Mesh);
-		base_t::document().pipeline_profiler().finish_execution(*this, "Create Mesh");
-
-		base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
-		on_update_mesh_geometry(Mesh);
-		base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
 	}
 
 	void mesh_geometry_changed(iunknown* const Hint)
 	{
-		if(mesh* const output_mesh = m_output_mesh.internal_value())
-		{
-			base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
-			on_update_mesh_geometry(*output_mesh);
-			base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
+k3d::log() << __PRETTY_FUNCTION__ << std::endl;
+		m_output_mesh.update(hint::mesh_geometry_changed());
+	}
 
-			m_output_mesh.changed_signal().emit(hint::mesh_geometry_changed());
-		}
+	void initialize_mesh(mesh& Output)
+	{
+k3d::log() << __PRETTY_FUNCTION__ << std::endl;
+		base_t::document().pipeline_profiler().start_execution(*this, "Create Mesh");
+		on_create_mesh_topology(Output);
+		base_t::document().pipeline_profiler().finish_execution(*this, "Create Mesh");
+
+		base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
+		on_update_mesh_geometry(Output);
+		base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
+	}
+
+	void update_mesh(mesh& Output)
+	{
+k3d::log() << __PRETTY_FUNCTION__ << std::endl;
+		base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
+		on_update_mesh_geometry(Output);
+		base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
 	}
 
 	virtual void on_create_mesh_topology(mesh& Mesh) = 0;

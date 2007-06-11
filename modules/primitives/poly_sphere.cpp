@@ -389,7 +389,7 @@ public:
 		m_type.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		const unsigned long u_segments = m_u_segments.value();
 		const unsigned long v_segments = m_v_segments.value();

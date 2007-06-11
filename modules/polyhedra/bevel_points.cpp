@@ -21,6 +21,8 @@
 		\author Romain Behar <romainbehar@yahoo.com>
 */
 
+#include "helpers.h"
+
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
@@ -32,9 +34,7 @@
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/utility.h>
 
-#include "helpers.h"
-
-namespace libk3dmesh
+namespace libk3dpolyhedra
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ public:
 		return 0;
 	}
 
-	void on_create_mesh(const k3d::legacy::mesh& Input, k3d::legacy::mesh& Output)
+	void on_initialize_mesh(const k3d::legacy::mesh& Input, k3d::legacy::mesh& Output)
 	{
 		// Clear previously cached data
 		m_bevel_points.clear();
@@ -442,5 +442,5 @@ k3d::iplugin_factory& bevel_points_factory()
 	return bevel_points_implementation::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace libk3dpolyhedra
 

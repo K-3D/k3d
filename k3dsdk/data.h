@@ -1803,6 +1803,98 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
+// pointer_storage
+
+/// Read-only storage policy that stores a value by pointer, created on-demand
+template<typename pointer_t, typename signal_policy_t>
+class pointer_storage :
+	public signal_policy_t
+{
+	// This policy only works for data stored by-pointer
+	BOOST_STATIC_ASSERT((boost::is_pointer<pointer_t>::value));
+
+public:
+	typedef typename boost::remove_pointer<pointer_t>::type value_t;
+	typedef pointer_storage<pointer_t, signal_policy_t> this_t;
+
+	/// Set a slot that will be called to initialize the value when first created
+	void set_initialize_slot(const sigc::slot<void, value_t&>& Slot)
+	{
+		m_initialize_slot = Slot;
+		reset();
+	}
+
+	/// Set the slot that will be called to update the value whenever it changes
+	void set_update_slot(const sigc::slot<void, value_t&>& Slot)
+	{
+		m_update_slot = Slot;
+	}
+
+	/// Returns a slot that will invoke the reset() method
+	sigc::slot<void, iunknown*> make_reset_slot()
+	{
+		return sigc::bind<0>(sigc::mem_fun(*this, &this_t::reset), static_cast<pointer_t>(0));
+	}
+
+	/// Returns a slot that will invoke the update() method
+	sigc::slot<void, iunknown*> make_update_slot()
+	{
+		return sigc::mem_fun(*this, &this_t::update);
+	}
+
+	/// Store an object as the new value, taking control of its lifetime
+	void reset(pointer_t NewValue = 0, iunknown* const Hint = 0)
+	{
+		m_value.reset(NewValue);
+		signal_policy_t::set_value(Hint);
+	}
+
+	/// Schedule an update for the value the next time it's read
+	void update(iunknown* const Hint = 0)
+	{
+		m_update = true;
+		signal_policy_t::set_value(Hint);
+	}
+
+	/// Accesses the underlying value, creating it if it doesn't already exist
+	pointer_t internal_value()
+	{
+		if(!m_value.get())
+		{
+			// We can cancel pending updates since we're creating the value from scratch
+			m_update = false;
+
+			// Note: we create the value and update its state in two steps
+			// because m_data_slot() may cause this method to be executed in a loop
+			m_value.reset(new value_t());
+			m_initialize_slot(*m_value);
+		}
+		
+		if(m_update)
+		{
+			m_update = false;
+			m_update_slot(*m_value);
+		}
+
+		return m_value.get();
+	}
+
+protected:
+	template<typename init_t>
+	pointer_storage(const init_t& Init) :
+		signal_policy_t(Init),
+		m_update(false)
+	{
+	}
+
+private:
+	std::auto_ptr<value_t> m_value;
+	bool m_update;
+	sigc::slot<void, value_t&> m_initialize_slot;
+	sigc::slot<void, value_t&> m_update_slot;
+};
+
+/////////////////////////////////////////////////////////////////////////////
 // computed_storage
 
 /// Read-only storage policy that returns a computed value, storing nothing

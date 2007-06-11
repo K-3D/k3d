@@ -55,7 +55,7 @@ public:
 		m_radius.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Create new GTS surface
 		GtsSurface* s = gts_surface_new(gts_surface_class(),

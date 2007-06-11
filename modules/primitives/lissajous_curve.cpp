@@ -82,7 +82,7 @@ public:
 		m_wrap.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		const unsigned long edges = m_edge_count.value();
 		const double mamp = m_mamp.value();

@@ -1561,7 +1561,7 @@ public:
 		make_reset_mesh_slot()(0);
 	}
 
-	void on_create_mesh(k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		const double recursion = m_recursion.value();
 		const double basic_angle = m_basic_angle.value();

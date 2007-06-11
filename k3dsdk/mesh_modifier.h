@@ -46,9 +46,12 @@ public:
 	mesh_modifier(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
 		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<mesh*>(0)),
-		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")) + init_slot(sigc::mem_fun(*this, &mesh_modifier<base_t>::create_mesh)))
+		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")))
 	{
 		m_input_mesh.changed_signal().connect(make_reset_mesh_slot());
+
+		m_output_mesh.set_initialize_slot(sigc::mem_fun(*this, &mesh_modifier<base_t>::initialize_mesh));
+		m_output_mesh.set_update_slot(sigc::mem_fun(*this, &mesh_modifier<base_t>::update_mesh));
 	}
 
 	iproperty& mesh_source_output()
@@ -63,12 +66,12 @@ public:
 
 	sigc::slot<void, iunknown*> make_reset_mesh_slot()
 	{
-		return sigc::mem_fun(*this, &mesh_modifier<base_t>::reset_mesh);
+		return m_output_mesh.make_reset_slot();
 	}
 
 	sigc::slot<void, iunknown*> make_update_mesh_slot()
 	{
-		return sigc::mem_fun(*this, &mesh_modifier<base_t>::update_mesh);
+		return m_output_mesh.make_update_slot();
 	}
 
 protected:
@@ -84,15 +87,10 @@ protected:
 	}
 
 	k3d_data(mesh*, data::immutable_name, data::change_signal, data::no_undo, data::local_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_input_mesh;
-	k3d_data(mesh*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
+	k3d_data(mesh*, data::immutable_name, data::change_signal, data::no_undo, data::pointer_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
 
 private:
-	void reset_mesh(iunknown* const Hint)
-	{
-		m_output_mesh.reset(0, Hint);
-	}
-
-	void create_mesh(mesh& Output)
+	void initialize_mesh(mesh& Output)
 	{
 		if(const mesh* const input = m_input_mesh.value())
 		{
@@ -106,18 +104,13 @@ private:
 		}
 	}
 
-	void update_mesh(iunknown* const Hint)
+	void update_mesh(mesh& Output)
 	{
 		if(const mesh* const input = m_input_mesh.value())
 		{
-			if(mesh* const output = m_output_mesh.internal_value())
-			{
-				base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
-				on_update_mesh(*input, *output);
-				base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
-
-				emit_hint();
-			}
+			base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
+			on_update_mesh(*input, Output);
+			base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");
 		}
 	}
 
