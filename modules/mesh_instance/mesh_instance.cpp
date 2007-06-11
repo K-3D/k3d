@@ -147,6 +147,7 @@ public:
 			clear_hints();
 			m_hint_list.push_back(0);
 		}
+		async_redraw(0);
 	}
 	
 	/// Needed to notify caches that we are deleted
@@ -154,6 +155,7 @@ public:
 	{
 		m_hint_list.clear(); // previous changes don't need to be executed when we're deleted anyway
 		m_hint_list.push_back(k3d::hint::mesh_deleted());
+		async_redraw(0);
 	}
 	
 	/// Elimination of nodes in the pipeline needs to be passed to the painters for correct cache clean-up
@@ -168,6 +170,7 @@ public:
 				{
 					clear_hints(); // previous changes don't need to be executed when we're deleted anyway
 					m_hint_list.push_back(k3d::hint::mesh_deleted());
+					async_redraw(0);
 					return;
 				}
 			}
@@ -178,6 +181,7 @@ public:
 	{
 		if (m_hint_list.empty() || !dynamic_cast<k3d::hint::selection_changed_t*>(m_hint_list.back()))
 			m_hint_list.push_back(new k3d::hint::selection_changed_t());
+		async_redraw(0);
 	}
 
 	void create_mesh(k3d::mesh& OutputMesh)
