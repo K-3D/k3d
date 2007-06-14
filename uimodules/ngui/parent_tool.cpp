@@ -106,7 +106,7 @@ struct parent_tool::implementation
 
 		k3d::idag::dependencies_t dependencies;
 
-		k3d::record_state_change_set changeset(m_document_state.document(), _("Set Parent"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set changeset(m_document_state.document(), _("Set Parent"), K3D_CHANGE_SET_CONTEXT);
 
 		// Note - we enumerate over a *copy* of the set of document nodes, since we're adding nodes as we go ...
 		const k3d::nodes_t nodes = m_document_state.document().nodes().collection();

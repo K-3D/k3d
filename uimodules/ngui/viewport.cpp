@@ -850,7 +850,7 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 
 	const k3d::selection::record& record = Records.front();
 
-k3d::log() << debug << __PRETTY_FUNCTION__ << " " << record << std::endl;
+k3d::log() << debug << K3D_CHANGE_SET_CONTEXT << " " << record << std::endl;
 
 	k3d::inode* const node = k3d::selection::get_node(record);
 	if(!node)

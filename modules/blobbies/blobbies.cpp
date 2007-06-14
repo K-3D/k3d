@@ -542,7 +542,7 @@ private:
 		else if(text == "reverse_subtraction")
 			Value = REVERSE_SUBTRACTION;
 		else
-			k3d::log() << __PRETTY_FUNCTION__ << ": unknown enumeration [" << text << "]"<< std::endl;
+			k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]"<< std::endl;
 
 		return Stream;
 	}
@@ -661,7 +661,7 @@ private:
 		else if(text == "reverse_division")
 			Value = REVERSE_DIVISION;
 		else
-			k3d::log() << __PRETTY_FUNCTION__ << ": unknown enumeration [" << text << "]"<< std::endl;
+			k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]"<< std::endl;
 
 		return Stream;
 	}

@@ -92,7 +92,7 @@ struct navigation_input_model::implementation
 			motion_state = MOTION_TRACK;
 		}
 
-		k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+		k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 		m_last_mouse = screen_pointer_coordinates(Viewport);
 		m_timer.restart();
 
@@ -169,7 +169,7 @@ struct navigation_input_model::implementation
 			motion_state = MOTION_ORBIT;
 		}
 
-		k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+		k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 		m_last_mouse = screen_pointer_coordinates(Viewport);
 		m_timer.restart();
 
@@ -239,27 +239,27 @@ struct navigation_input_model::implementation
 		switch(motion_state)
 		{
 			case MOTION_TRACK:
-				k3d::finish_state_change_set(m_document_state.document(), _("Track Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Track Viewport"), K3D_CHANGE_SET_CONTEXT);
 				m_command_signal.emit("finish_track", "");
 				break;
 			case MOTION_DOLLY:
-				k3d::finish_state_change_set(m_document_state.document(), _("Dolly Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Dolly Viewport"), K3D_CHANGE_SET_CONTEXT);
 				m_command_signal.emit("finish_dolly", "");
 				break;
 			case MOTION_ZOOM:
-				k3d::finish_state_change_set(m_document_state.document(), _("Zoom Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Zoom Viewport"), K3D_CHANGE_SET_CONTEXT);
 				m_command_signal.emit("finish_zoom", "");
 				break;
 			case MOTION_PAN_TILT:
-				k3d::finish_state_change_set(m_document_state.document(), _("Pan & Tilt Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Pan & Tilt Viewport"), K3D_CHANGE_SET_CONTEXT);
 				m_command_signal.emit("finish_pan_tilt", "");
 				break;
 			case MOTION_ORBIT:
-				k3d::finish_state_change_set(m_document_state.document(), _("Orbit Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Orbit Viewport"), K3D_CHANGE_SET_CONTEXT);
 				m_command_signal.emit("finish_orbit", "");
 				break;
 			case MOTION_ROLL:
-				k3d::finish_state_change_set(m_document_state.document(), _("Roll Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Roll Viewport"), K3D_CHANGE_SET_CONTEXT);
 				m_command_signal.emit("finish_roll", "");
 				break;
 		}
@@ -576,7 +576,7 @@ struct navigation_input_model::implementation
 
 		const k3d::matrix4 new_view_matrix = k3d::view_matrix(look, up, position + (m_dolly_sensitivity * direction * look));
 
-		k3d::record_state_change_set change_set(m_document_state.document(), change_set_label, __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), change_set_label, K3D_CHANGE_SET_CONTEXT);
 		Viewport.set_view_matrix(new_view_matrix);
 
 		command_arguments arguments;
@@ -616,7 +616,7 @@ struct navigation_input_model::implementation
 			arguments.append("new_target", new_target);
 			m_command_signal.emit("pick_target", arguments);
 
-			k3d::record_state_change_set change_set(m_document_state.document(), _("Pick Target"), __PRETTY_FUNCTION__);
+			k3d::record_state_change_set change_set(m_document_state.document(), _("Pick Target"), K3D_CHANGE_SET_CONTEXT);
 			Viewport.set_view_matrix(new_view_matrix);
 			Viewport.set_target(new_target);
 		}
@@ -626,7 +626,7 @@ struct navigation_input_model::implementation
 			arguments.append_viewport_coordinates("mouse", Viewport, Event);
 			m_command_signal.emit("aim_selection", arguments);
 
-			k3d::record_state_change_set change_set(m_document_state.document(), _("Aim Selection"), __PRETTY_FUNCTION__);
+			k3d::record_state_change_set change_set(m_document_state.document(), _("Aim Selection"), K3D_CHANGE_SET_CONTEXT);
 			aim_selection(m_document_state, Viewport);
 		}
 	}
@@ -653,7 +653,7 @@ struct navigation_input_model::implementation
 				m_timer.restart();
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -676,7 +676,7 @@ struct navigation_input_model::implementation
 			}
 			else if(Command == "finish_track")
 			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Track Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Track Viewport"), K3D_CHANGE_SET_CONTEXT);
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 			else if(Command == "start_zoom")
@@ -688,7 +688,7 @@ struct navigation_input_model::implementation
 				m_timer.restart();
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -735,7 +735,7 @@ struct navigation_input_model::implementation
 			}
 			else if(Command == "finish_zoom")
 			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Zoom Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Zoom Viewport"), K3D_CHANGE_SET_CONTEXT);
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 			else if(Command == "start_pan_tilt")
@@ -747,7 +747,7 @@ struct navigation_input_model::implementation
 				m_timer.restart();
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -770,7 +770,7 @@ struct navigation_input_model::implementation
 			}
 			else if(Command == "finish_pan_tilt")
 			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Pan & Tilt Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Pan & Tilt Viewport"), K3D_CHANGE_SET_CONTEXT);
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 			else if(Command == "start_dolly")
@@ -782,7 +782,7 @@ struct navigation_input_model::implementation
 				m_timer.restart();
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -803,7 +803,7 @@ struct navigation_input_model::implementation
 			}
 			else if(Command == "finish_dolly")
 			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Dolly Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Dolly Viewport"), K3D_CHANGE_SET_CONTEXT);
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 			else if(Command == "start_roll")
@@ -815,7 +815,7 @@ struct navigation_input_model::implementation
 				m_timer.restart();
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -836,7 +836,7 @@ struct navigation_input_model::implementation
 			}
 			else if(Command == "finish_roll")
 			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Roll Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Roll Viewport"), K3D_CHANGE_SET_CONTEXT);
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 			else if(Command == "start_orbit")
@@ -848,7 +848,7 @@ struct navigation_input_model::implementation
 				m_timer.restart();
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -869,7 +869,7 @@ struct navigation_input_model::implementation
 			}
 			else if(Command == "finish_orbit")
 			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Orbit Viewport"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Orbit Viewport"), K3D_CHANGE_SET_CONTEXT);
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 			else if(Command == "context_menu")
@@ -894,7 +894,7 @@ struct navigation_input_model::implementation
 
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Pick Target"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Pick Target"), K3D_CHANGE_SET_CONTEXT);
 				viewport.set_view_matrix(new_view_matrix);
 				viewport.set_target(new_target);
 
@@ -908,7 +908,7 @@ struct navigation_input_model::implementation
 
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Aim Selection"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Aim Selection"), K3D_CHANGE_SET_CONTEXT);
 				aim_selection(m_document_state, viewport);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
@@ -929,7 +929,7 @@ struct navigation_input_model::implementation
 				else if(direction == "backward")
 					change_set_label = _("Dolly Backward");
 
-				k3d::record_state_change_set change_set(m_document_state.document(), change_set_label, __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), change_set_label, K3D_CHANGE_SET_CONTEXT);
 				viewport.set_view_matrix(new_view_matrix);
 
 				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::SYNCHRONOUS);

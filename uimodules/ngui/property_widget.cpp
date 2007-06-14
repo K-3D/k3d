@@ -252,7 +252,7 @@ void control::on_connect_to(k3d::iproperty* Property)
 	arguments.append("property", Property->property_name());
 	record_command("connect_to", arguments);
 
-	k3d::record_state_change_set changeset(m_data->document().document(), _("Connect Properties"), __PRETTY_FUNCTION__);
+	k3d::record_state_change_set changeset(m_data->document().document(), _("Connect Properties"), K3D_CHANGE_SET_CONTEXT);
 	connect_to(Property);
 }
 
@@ -278,7 +278,7 @@ void control::on_disconnect(k3d::inode* Node)
 {
 	record_command("disconnect");
 
-	k3d::record_state_change_set changeset(m_data->document().document(), m_data->change_message + " Disconnect", __PRETTY_FUNCTION__);
+	k3d::record_state_change_set changeset(m_data->document().document(), m_data->change_message + " Disconnect", K3D_CHANGE_SET_CONTEXT);
 	disconnect(Node);
 }
 

@@ -280,7 +280,7 @@ private:
 		else if(text == "reverse_difference")
 			Value = BOOLEAN_REVERSE_DIFFERENCE;
 		else
-			k3d::log() << __PRETTY_FUNCTION__ << ": unknown enumeration [" << text << "]"<< std::endl;
+			k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]"<< std::endl;
 
 		return Stream;
 	}

@@ -70,17 +70,17 @@ const bool idocument::save(const std::string& Path)
 
 void idocument::start_change_set()
 {
-	k3d::start_state_change_set(wrapped(), __PRETTY_FUNCTION__);
+	k3d::start_state_change_set(wrapped(), K3D_CHANGE_SET_CONTEXT);
 }
 
 void idocument::cancel_change_set()
 {
-	k3d::cancel_state_change_set(wrapped(), __PRETTY_FUNCTION__);
+	k3d::cancel_state_change_set(wrapped(), K3D_CHANGE_SET_CONTEXT);
 }
 
 void idocument::finish_change_set(const std::string& Label)
 {
-	k3d::finish_state_change_set(wrapped(), Label, __PRETTY_FUNCTION__);
+	k3d::finish_state_change_set(wrapped(), Label, K3D_CHANGE_SET_CONTEXT);
 }
 
 void idocument::redraw_all()

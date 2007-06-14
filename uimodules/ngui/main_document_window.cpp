@@ -1473,7 +1473,7 @@ private:
 
 		// If the user didn't select a specific filter, try automatic detection ...
 		// Make this an undoable operation ...
-		k3d::record_state_change_set change_set(document(), k3d::string_cast(boost::format(_("Import %1%")) % filepath.native_utf8_string().raw()), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(document(), k3d::string_cast(boost::format(_("Import %1%")) % filepath.native_utf8_string().raw()), K3D_CHANGE_SET_CONTEXT);
 		if(!k3d::import_file(document(), *filter, filepath))
 		{
 			error_message(
@@ -1661,7 +1661,7 @@ private:
 
 	void on_delete()
 	{
-		k3d::record_state_change_set changeset(m_document_state.document(), _("Delete nodes"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set changeset(m_document_state.document(), _("Delete nodes"), K3D_CHANGE_SET_CONTEXT);
 
 		k3d::nodes_t nodes = m_document_state.selected_nodes();
 		k3d::delete_nodes(m_document_state.document(), nodes);
@@ -1676,19 +1676,19 @@ private:
 
 	void on_select_all()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select All"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select All"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.select_all();
 	}
 
 	void on_select_none()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select None"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select None"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.deselect_all();
 	}
 
 	void on_select_invert()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Invert"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Invert"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.invert_selection();
 	}
 
@@ -1715,7 +1715,7 @@ private:
 		if(parents.empty())
 			return;
 
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select parent"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select parent"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.deselect_all();
 		std::for_each(parents.begin(), parents.end(), k3d::selection::select);
 	}
@@ -1744,7 +1744,7 @@ private:
 		if(children.empty())
 			return;
 
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select child"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select child"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.deselect_all();
 		std::for_each(children.begin(), children.end(), k3d::selection::select);
 	}
@@ -1798,32 +1798,32 @@ private:
 		if(siblings.empty())
 			return;
 
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select sibling"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select sibling"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.deselect_all();
 		std::for_each(siblings.begin(), siblings.end(), k3d::selection::select);
 	}
 
 	void on_select_nodes()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Nodes mode"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Nodes mode"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.set_selection_mode(SELECT_NODES);
 	}
 
 	void on_select_vertices()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Points mode"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Points mode"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.set_selection_mode(SELECT_POINTS);
 	}
 
 	void on_select_edges()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Lines mode"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Lines mode"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.set_selection_mode(SELECT_LINES);
 	}
 
 	void on_select_faces()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Faces mode"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Faces mode"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.set_selection_mode(SELECT_FACES);
 	}
 
@@ -2090,7 +2090,7 @@ private:
 
 	void on_view_hide_selection()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Hide selection"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Hide selection"), K3D_CHANGE_SET_CONTEXT);
 
 		const k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
@@ -2104,7 +2104,7 @@ private:
 
 	void on_view_show_selection()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Show selection"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Show selection"), K3D_CHANGE_SET_CONTEXT);
 
 		const k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
@@ -2118,7 +2118,7 @@ private:
 
 	void on_view_hide_unselected()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Hide unselected"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Hide unselected"), K3D_CHANGE_SET_CONTEXT);
 
 		const k3d::nodes_t& nodes = m_document_state.document().nodes().collection();
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
@@ -2135,7 +2135,7 @@ private:
 
 	void on_view_show_all()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Show all"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Show all"), K3D_CHANGE_SET_CONTEXT);
 
 		const k3d::nodes_t& nodes = m_document_state.document().nodes().collection();
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
@@ -2152,7 +2152,7 @@ private:
 		viewport::control* const viewport_control = m_document_state.get_focus_viewport();
 		return_if_fail(viewport_control);
 
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Aim selection"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Aim selection"), K3D_CHANGE_SET_CONTEXT);
 		aim_selection(m_document_state, *viewport_control);
 	}
 
@@ -2161,7 +2161,7 @@ private:
 		viewport::control* const viewport_control = m_document_state.get_focus_viewport();
 		return_if_fail(viewport_control);
 
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Frame selection"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Frame selection"), K3D_CHANGE_SET_CONTEXT);
 		frame_selection(m_document_state, *viewport_control);
 	}
 
@@ -2362,7 +2362,7 @@ private:
 		if(nodes.empty())
 			return;
 
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Unparent selected"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Unparent selected"), K3D_CHANGE_SET_CONTEXT);
 
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 			libk3dngui::unparent(**node);

@@ -212,7 +212,7 @@ private:
 		else if(text == "angle")
 			Value = ANGLE;
 		else
-			k3d::log() << __PRETTY_FUNCTION__ << ": unknown enumeration [" << text << "]" << std::endl;
+			k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]" << std::endl;
 
 		return Stream;
 	}
@@ -262,7 +262,7 @@ private:
 		else if(text == "volumeoptimized")
 			Value = VOLUMEOPTIMIZED;
 		else
-			k3d::log() << __PRETTY_FUNCTION__ << ": unknown enumeration [" << text << "]" << std::endl;
+			k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]" << std::endl;
 
 		return Stream;
 	}
@@ -311,7 +311,7 @@ private:
 		else if(text == "cost")
 			Value = COST;
 		else
-			k3d::log() << __PRETTY_FUNCTION__ << ": unknown enumeration [" << text << "]" << std::endl;
+			k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]" << std::endl;
 
 		return Stream;
 	}

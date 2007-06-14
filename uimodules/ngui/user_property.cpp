@@ -216,7 +216,7 @@ void add_user_property::on_add()
 	const std::string label = m_label.value();
 	const std::string description = m_description.value();
 
-	k3d::record_state_change_set change_set(node().document(), "Add user property " + name, __PRETTY_FUNCTION__);
+	k3d::record_state_change_set change_set(node().document(), "Add user property " + name, K3D_CHANGE_SET_CONTEXT);
 	
 	if(node().document().state_recorder().current_change_set())
 		node().document().state_recorder().current_change_set()->record_old_state(new k3d::user::property_container(node()));

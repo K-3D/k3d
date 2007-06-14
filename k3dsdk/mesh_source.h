@@ -69,19 +69,16 @@ protected:
 private:
 	void mesh_topology_changed(iunknown* const Hint)
 	{
-k3d::log() << __PRETTY_FUNCTION__ << std::endl;
 		m_output_mesh.reset(0, hint::mesh_topology_changed());
 	}
 
 	void mesh_geometry_changed(iunknown* const Hint)
 	{
-k3d::log() << __PRETTY_FUNCTION__ << std::endl;
 		m_output_mesh.update(hint::mesh_geometry_changed());
 	}
 
 	void initialize_mesh(mesh& Output)
 	{
-k3d::log() << __PRETTY_FUNCTION__ << std::endl;
 		base_t::document().pipeline_profiler().start_execution(*this, "Create Mesh");
 		on_create_mesh_topology(Output);
 		base_t::document().pipeline_profiler().finish_execution(*this, "Create Mesh");
@@ -93,7 +90,6 @@ k3d::log() << __PRETTY_FUNCTION__ << std::endl;
 
 	void update_mesh(mesh& Output)
 	{
-k3d::log() << __PRETTY_FUNCTION__ << std::endl;
 		base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
 		on_update_mesh_geometry(Output);
 		base_t::document().pipeline_profiler().finish_execution(*this, "Update Mesh");

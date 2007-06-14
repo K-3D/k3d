@@ -140,14 +140,14 @@ void control::on_select_all()
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
-		m_data->state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 	// Update everything with the new value ...
 	m_data->set_value(k3d::mesh_selection::select_all());
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
-		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(__PRETTY_FUNCTION__), _("Select All"), __PRETTY_FUNCTION__);
+		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), _("Select All"), K3D_CHANGE_SET_CONTEXT);
 }
 
 void control::on_deselect_all()
@@ -157,14 +157,14 @@ void control::on_deselect_all()
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
-		m_data->state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 	// Update everything with the new value ...
 	m_data->set_value(k3d::mesh_selection::deselect_all());
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
-		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(__PRETTY_FUNCTION__), _("Deselect All"), __PRETTY_FUNCTION__);
+		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), _("Deselect All"), K3D_CHANGE_SET_CONTEXT);
 }
 
 void control::on_select_null()
@@ -174,14 +174,14 @@ void control::on_select_null()
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
-		m_data->state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 	// Update everything with the new value ...
 	m_data->set_value(k3d::mesh_selection::select_null());
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
-		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(__PRETTY_FUNCTION__), _("Clear Selection"), __PRETTY_FUNCTION__);
+		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), _("Clear Selection"), K3D_CHANGE_SET_CONTEXT);
 }
 
 void control::update(k3d::iunknown*)

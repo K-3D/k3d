@@ -140,7 +140,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				arguments.append("selection", m_start_selection);
 				m_command_signal.emit("pick_select", arguments);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Select"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Select"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.select(m_start_selection);
 				break;
 			}
@@ -152,7 +152,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				arguments.append("selection", m_start_selection);
 				m_command_signal.emit("pick_deselect", arguments);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect(m_start_selection);
 				break;
 			}
@@ -164,7 +164,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				arguments.append("selection", m_start_selection);
 				m_command_signal.emit("pick_replace", arguments);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Replace"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Replace"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect_all();
 				m_document_state.select(m_start_selection);
 				break;
@@ -185,7 +185,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				arguments.append_viewport_coordinates("mouse", Viewport, Event);
 				m_command_signal.emit("deselect_all", arguments);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect All"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect All"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect_all();
 				break;
 			}
@@ -196,7 +196,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				arguments.append_viewport_coordinates("mouse", Viewport, Event);
 				m_command_signal.emit("node_selection", arguments);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Node Selection"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Node Selection"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.set_selection_mode(SELECT_NODES);
 				break;
 			}
@@ -250,7 +250,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				arguments.append("selection", m_start_selection);
 				m_command_signal.emit("start_paint_select", arguments);
 
-				k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.select(m_start_selection);
 
 				break;
@@ -263,7 +263,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				arguments.append("selection", m_start_selection);
 				m_command_signal.emit("start_paint_deselect", arguments);
 
-				k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect(m_start_selection);
 
 				break;
@@ -397,7 +397,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				command_arguments arguments;
 				arguments.append_viewport_coordinates("mouse", Viewport, Event);
 				m_command_signal.emit("end_paint_select", arguments);
-				k3d::finish_state_change_set(m_document_state.document(), _("Paint Select"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Paint Select"), K3D_CHANGE_SET_CONTEXT);
 				break;
 			}
 
@@ -406,7 +406,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				command_arguments arguments;
 				arguments.append_viewport_coordinates("mouse", Viewport, Event);
 				m_command_signal.emit("end_paint_deselect", arguments);
-				k3d::finish_state_change_set(m_document_state.document(), _("Paint Deselect"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Paint Deselect"), K3D_CHANGE_SET_CONTEXT);
 				break;
 			}
 
@@ -421,7 +421,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				m_rubber_band.draw(Viewport);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Replace"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Replace"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect_all();
 				m_document_state.select(selection);
 				break;
@@ -438,7 +438,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				m_rubber_band.draw(Viewport);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Select"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Select"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.select(selection);
 				break;
 			}
@@ -454,7 +454,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				m_rubber_band.draw(Viewport);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Deselect"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Deselect"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect(selection);
 				break;
 			}
@@ -475,7 +475,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Select"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Select"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.select(selection);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
@@ -490,7 +490,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect(selection);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
@@ -505,7 +505,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Replace Selection"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Replace Selection"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect_all();
 				m_document_state.select(selection);
 
@@ -520,7 +520,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect All"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect All"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect_all();
 
 				return k3d::icommand_node::RESULT_CONTINUE;
@@ -534,7 +534,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Node Selection"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Node Selection"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.set_selection_mode(SELECT_NODES);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
@@ -549,7 +549,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.select(selection);
 
 				m_timer.restart();
@@ -566,7 +566,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				interactive::move_pointer(viewport, mouse);
 
-				k3d::start_state_change_set(m_document_state.document(), __PRETTY_FUNCTION__);
+				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect(selection);
 
 				m_timer.restart();
@@ -624,7 +624,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				interactive::warp_pointer(viewport, mouse);
 
-				k3d::finish_state_change_set(m_document_state.document(), _("Paint Select"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Paint Select"), K3D_CHANGE_SET_CONTEXT);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -637,7 +637,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 
 				interactive::warp_pointer(viewport, mouse);
 
-				k3d::finish_state_change_set(m_document_state.document(), _("Paint Deselect"), __PRETTY_FUNCTION__);
+				k3d::finish_state_change_set(m_document_state.document(), _("Paint Deselect"), K3D_CHANGE_SET_CONTEXT);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -716,7 +716,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				interactive::warp_pointer(viewport, mouse);
 				m_rubber_band.draw(viewport);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Select"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Select"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect_all();
 				m_document_state.select(selection);
 
@@ -733,7 +733,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				interactive::warp_pointer(viewport, mouse);
 				m_rubber_band.draw(viewport);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Select"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Select"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.select(selection);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
@@ -749,7 +749,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 				interactive::warp_pointer(viewport, mouse);
 				m_rubber_band.draw(viewport);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Deselect"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Deselect"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect(selection);
 
 				return k3d::icommand_node::RESULT_CONTINUE;

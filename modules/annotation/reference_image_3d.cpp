@@ -246,7 +246,7 @@ private:
 		else if(text == "absolute")
 			Value = ASPECT_RATIO_ABSOLUTE;
 		else
-			k3d::log() << __PRETTY_FUNCTION__ << ": unknown enumeration [" << text << "]"<< std::endl;
+			k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]"<< std::endl;
 
 		return Stream;
 	}

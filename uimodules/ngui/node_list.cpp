@@ -495,7 +495,7 @@ public:
 		arguments.append("newname", NewText);
 		m_command_signal.emit("rename", arguments);
 
-		k3d::record_state_change_set change_set(m_document_state.document(), k3d::string_cast(boost::format(_("Rename node %1%")) % NewText), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), k3d::string_cast(boost::format(_("Rename node %1%")) % NewText), K3D_CHANGE_SET_CONTEXT);
 		node->set_name(NewText);
 	}
 
@@ -584,7 +584,7 @@ public:
 		{
 			m_document_selection_change_mutex = true;
 
-			k3d::record_state_change_set change_set(m_document_state.document(), _("Select nodes"), __PRETTY_FUNCTION__);
+			k3d::record_state_change_set change_set(m_document_state.document(), _("Select nodes"), K3D_CHANGE_SET_CONTEXT);
 
 			m_document_state.set_selection_mode(SELECT_NODES);
 			m_document_state.deselect(deselected_records);

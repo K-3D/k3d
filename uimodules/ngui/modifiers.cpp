@@ -107,7 +107,7 @@ k3d::inode* modify_transformation(k3d::idocument& Document, k3d::inode& Object, 
 
 	// This block is recorded for undo purposes ...
 	{
-		k3d::record_state_change_set changeset(Document, k3d::string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set changeset(Document, k3d::string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), K3D_CHANGE_SET_CONTEXT);
 
 		// Create our modifier object ...
 		modifier = k3d::create_plugin<k3d::inode>(*Modifier, Document, k3d::unique_name(Document.nodes(), Modifier->name()));
@@ -150,7 +150,7 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 
 	// This block is recorded for undo purposes ...
 	{
-		k3d::record_state_change_set changeset(document, k3d::string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set changeset(document, k3d::string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), K3D_CHANGE_SET_CONTEXT);
 
 		// Create our modifier object ...
 		modifier = k3d::create_plugin<k3d::inode>(*Modifier, document, k3d::unique_name(document.nodes(), Modifier->name()));

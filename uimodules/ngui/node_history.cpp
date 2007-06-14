@@ -227,7 +227,7 @@ public:
 		buffer << k3d::xml::single_line() << arguments;
 		m_command_signal.emit("rename", buffer.str());
 
-		k3d::record_state_change_set change_set(m_document_state.document(), k3d::string_cast(boost::format(_("Rename node %1%")) % NewText), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), k3d::string_cast(boost::format(_("Rename node %1%")) % NewText), K3D_CHANGE_SET_CONTEXT);
 		node->set_name(NewText);
 	}
 

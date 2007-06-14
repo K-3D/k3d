@@ -249,12 +249,12 @@ void control::on_select_none()
 	return_if_fail(m_data.get());
 
 	if(m_data->state_recorder)
-		m_data->state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 	m_data->set_node(0);
 
 	if(m_data->state_recorder)
-		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(__PRETTY_FUNCTION__), _("Select None"), __PRETTY_FUNCTION__);
+		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), _("Select None"), K3D_CHANGE_SET_CONTEXT);
 }
 
 void control::on_create_node(k3d::iplugin_factory* const Factory)
@@ -266,7 +266,7 @@ void control::on_create_node(k3d::iplugin_factory* const Factory)
 	return_if_fail(m_data.get());
 
 	if(m_data->state_recorder)
-		m_data->state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 	k3d::inode* const node = k3d::create_plugin<k3d::inode>(*Factory, m_data->document().document(), k3d::unique_name(m_data->document().document().nodes(), Factory->name()));
 	assert_warning(node);
@@ -274,7 +274,7 @@ void control::on_create_node(k3d::iplugin_factory* const Factory)
 	m_data->set_node(node);
 
 	if(m_data->state_recorder)
-		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(__PRETTY_FUNCTION__), k3d::string_cast(boost::format(_("Create %1%")) % Factory->name()), __PRETTY_FUNCTION__);
+		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), k3d::string_cast(boost::format(_("Create %1%")) % Factory->name()), K3D_CHANGE_SET_CONTEXT);
 
 	if(node)
 		m_data->document().view_node_properties_signal().emit(node);
@@ -289,12 +289,12 @@ void control::on_select_node(k3d::inode* const Object)
 	return_if_fail(m_data.get());
 
 	if(m_data->state_recorder)
-		m_data->state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 	m_data->set_node(Object);
 
 	if(m_data->state_recorder)
-		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(__PRETTY_FUNCTION__), k3d::string_cast(boost::format(_("Select %1%")) % Object->name()), __PRETTY_FUNCTION__);
+		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), k3d::string_cast(boost::format(_("Select %1%")) % Object->name()), K3D_CHANGE_SET_CONTEXT);
 }
 
 void control::on_edit()

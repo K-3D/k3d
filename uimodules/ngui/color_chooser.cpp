@@ -110,12 +110,12 @@ private:
 		record_command("set_value", k3d::string_cast(color));
 
 		if(m_data->state_recorder)
-			m_data->state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+			m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 		m_data->set_value(color);
 
 		if(m_data->state_recorder)
-			m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(__PRETTY_FUNCTION__), m_data->change_message + " " + k3d::string_cast(color), __PRETTY_FUNCTION__);
+			m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_data->change_message + " " + k3d::string_cast(color), K3D_CHANGE_SET_CONTEXT);
 	}
 
 	void on_data_changed(k3d::iunknown*)

@@ -624,7 +624,7 @@ public:
 		return_if_fail(Property);
 		return_if_fail(dynamic_cast<k3d::iuser_property*>(Property));
 
-		k3d::record_state_change_set change_set(m_document_state.document(), "Delete user property", __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), "Delete user property", K3D_CHANGE_SET_CONTEXT);
 
 		if(m_document_state.document().state_recorder().current_change_set())
 			m_document_state.document().state_recorder().current_change_set()->record_old_state(new k3d::user::property_container(*Collection));

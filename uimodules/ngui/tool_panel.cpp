@@ -375,7 +375,7 @@ struct control::implementation
 		if(nodes.empty())
 			return;
 
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Unparent selected"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Unparent selected"), K3D_CHANGE_SET_CONTEXT);
 
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 			libk3dngui::unparent(**node);

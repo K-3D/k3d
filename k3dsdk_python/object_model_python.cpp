@@ -91,7 +91,7 @@ struct python_wrap
 	static PyObject* convert(const T&)
 	{
 		BOOST_STATIC_ASSERT(sizeof(T) == 0);
-		k3d::log() << critical << __PRETTY_FUNCTION__ << " should not be reached" << std::endl;
+		k3d::log() << critical << k3d_file_reference << " should not be reached" << std::endl;
 		return 0;
 	}
 };

@@ -182,13 +182,13 @@ void control::on_reset()
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
-		m_data->state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 	m_data->set_value(k3d::angle_axis(0, k3d::point3(1, 0, 0)));
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
-		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(__PRETTY_FUNCTION__), m_data->change_message + " reset", __PRETTY_FUNCTION__);
+		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_data->change_message + " reset", K3D_CHANGE_SET_CONTEXT);
 }
 
 /////////////////////////////////////////////////////////////////////////////

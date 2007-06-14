@@ -285,7 +285,7 @@ unsigned long snap_tool_detail::mesh_target::target_number()
 
 void snap_tool_detail::mesh_target::reset_selection()
 {
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
+k3d::log() << debug << K3D_CHANGE_SET_CONTEXT << std::endl;
 	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
 	return_if_fail(mesh);
 
@@ -502,7 +502,7 @@ void snap_tool_detail::lbutton_down(viewport::control& Viewport, const k3d::poin
 // LMB down actions
 void snap_tool_detail::lmb_down_add()
 {
-	k3d::start_state_change_set(m_document, __PRETTY_FUNCTION__);
+	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
 	m_tutorial_action = "lmb_down_add";
 
 	m_mouse_down_content = SELECTION_ADD;
@@ -510,7 +510,7 @@ void snap_tool_detail::lmb_down_add()
 
 void snap_tool_detail::lmb_down_subtract()
 {
-	k3d::start_state_change_set(m_document, __PRETTY_FUNCTION__);
+	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
 	m_tutorial_action = "lmb_down_subtract";
 
 	m_mouse_down_content = SELECTION_SUBTRACT;
@@ -518,7 +518,7 @@ void snap_tool_detail::lmb_down_subtract()
 
 void snap_tool_detail::lmb_down_manipulator(const std::string& ManipulatorName)
 {
-	k3d::start_state_change_set(m_document, __PRETTY_FUNCTION__);
+	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
 	m_tutorial_action = "lmb_down_manipulator_" + ManipulatorName;
 
 	m_abstract_tool.set_manipulator(ManipulatorName);
@@ -529,7 +529,7 @@ void snap_tool_detail::lmb_down_manipulator(const std::string& ManipulatorName)
 
 void snap_tool_detail::lmb_down_selected()
 {
-	k3d::start_state_change_set(m_document, __PRETTY_FUNCTION__);
+	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
 	m_tutorial_action = "lmb_down_selected";
 
 	m_mouse_down_content = SELECTED_OBJECT;
@@ -537,7 +537,7 @@ void snap_tool_detail::lmb_down_selected()
 
 void snap_tool_detail::lmb_down_deselected()
 {
-	k3d::start_state_change_set(m_document, __PRETTY_FUNCTION__);
+	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
 	m_tutorial_action = "lmb_down_deselected";
 
 	m_mouse_down_content = DESELECTED_OBJECT;
@@ -550,7 +550,7 @@ void snap_tool_detail::lmb_down_deselected()
 
 void snap_tool_detail::lmb_down_nothing()
 {
-	k3d::start_state_change_set(m_document, __PRETTY_FUNCTION__);
+	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
 	m_tutorial_action = "lmb_down_nothing";
 
 	m_mouse_down_content = NOTHING;
@@ -596,7 +596,7 @@ void snap_tool_detail::lmb_click_add()
 	if(k3d::selection::get_node(m_mouse_down_selection))
 		m_document_state.select(m_mouse_down_selection);
 
-	k3d::finish_state_change_set(m_document, "Selection add", __PRETTY_FUNCTION__);
+	k3d::finish_state_change_set(m_document, "Selection add", K3D_CHANGE_SET_CONTEXT);
 
 	redraw_all();
 }
@@ -609,7 +609,7 @@ void snap_tool_detail::lmb_click_subtract()
 	if(k3d::selection::get_node(m_mouse_down_selection))
 		m_document_state.deselect(m_mouse_down_selection);
 
-	k3d::finish_state_change_set(m_document, "Selection subtract", __PRETTY_FUNCTION__);
+	k3d::finish_state_change_set(m_document, "Selection subtract", K3D_CHANGE_SET_CONTEXT);
 
 	redraw_all();
 }
@@ -623,7 +623,7 @@ void snap_tool_detail::lmb_click_replace()
 	if(k3d::selection::get_node(m_mouse_down_selection))
 		m_document_state.select(m_mouse_down_selection);
 
-	k3d::finish_state_change_set(m_document, "Selection replace", __PRETTY_FUNCTION__);
+	k3d::finish_state_change_set(m_document, "Selection replace", K3D_CHANGE_SET_CONTEXT);
 
 	redraw_all();
 }
@@ -645,7 +645,7 @@ void snap_tool_detail::lmb_click_stop_motion()
 	m_tutorial_action = "lmb_click_stop_motion";
 
 	const std::string label = complete_mouse_move();
-	k3d::finish_state_change_set(m_document, label, __PRETTY_FUNCTION__);
+	k3d::finish_state_change_set(m_document, label, K3D_CHANGE_SET_CONTEXT);
 
 	connect_navigation_input_model();
 
@@ -659,7 +659,7 @@ void snap_tool_detail::lmb_click_deselect_all()
 	// Deselect all
 	m_document_state.deselect_all();
 
-	k3d::finish_state_change_set(m_document, "Deselect all", __PRETTY_FUNCTION__);
+	k3d::finish_state_change_set(m_document, "Deselect all", K3D_CHANGE_SET_CONTEXT);
 
 	redraw_all();
 }
@@ -727,7 +727,7 @@ void snap_tool_detail::lmb_end_drag_stop_motion()
 	m_tutorial_action = "lmb_end_drag_stop_motion";
 
 	const std::string label = complete_mouse_move();
-	k3d::finish_state_change_set(m_document, label, __PRETTY_FUNCTION__);
+	k3d::finish_state_change_set(m_document, label, K3D_CHANGE_SET_CONTEXT);
 
 	redraw_all();
 }
@@ -743,7 +743,7 @@ void snap_tool_detail::lmb_end_drag_box_select(viewport::control& Viewport, cons
 	// Stop motion
 	set_motion(MOTION_NONE);
 
-	k3d::finish_state_change_set(m_document, "Box selection", __PRETTY_FUNCTION__);
+	k3d::finish_state_change_set(m_document, "Box selection", K3D_CHANGE_SET_CONTEXT);
 
 	redraw_all();
 }
@@ -855,12 +855,12 @@ void snap_tool_detail::rbutton_click(const viewport::control& Viewport, const k3
 // RMB click actions
 void snap_tool_detail::rmb_click_selection_tool()
 {
-	k3d::start_state_change_set(m_document, __PRETTY_FUNCTION__);
+	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
 	m_tutorial_action = "rmb_click_selection_tool";
 
 	m_document_state.set_active_tool(m_document_state.selection_tool());
 
-	k3d::finish_state_change_set(m_document, "Selection tool", __PRETTY_FUNCTION__);
+	k3d::finish_state_change_set(m_document, "Selection tool", K3D_CHANGE_SET_CONTEXT);
 
 	redraw_all();
 }
@@ -880,7 +880,7 @@ void snap_tool_detail::cancel_mouse_move()
 	set_motion(MOTION_NONE);
 
 	// Undo changes
-	k3d::cancel_state_change_set(m_document, __PRETTY_FUNCTION__);
+	k3d::cancel_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
 
 	// Reset targets
 	for(targets_t::iterator target = m_targets.begin(); target != m_targets.end(); ++target)

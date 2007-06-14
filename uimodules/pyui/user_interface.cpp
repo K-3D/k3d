@@ -103,7 +103,7 @@ public:
 
 	void stop_event_loop()
 	{
-		k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
+		k3d::log() << debug << k3d_file_reference << std::endl;
 	}
 
 	bool batch_mode()

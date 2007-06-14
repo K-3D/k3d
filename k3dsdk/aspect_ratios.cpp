@@ -59,11 +59,11 @@ const aspect_ratios_t& aspect_ratios()
 		}
 		catch(std::exception& e)
 		{
-			log() << error << __PRETTY_FUNCTION__ << ": " << e.what() << std::endl;
+			log() << error << k3d_file_reference << ": " << e.what() << std::endl;
 		}
 		catch(...)
 		{
-			log() << error << __PRETTY_FUNCTION__ << ": Unknown exception" << std::endl;
+			log() << error << k3d_file_reference << ": Unknown exception" << std::endl;
 		}
 	}
 

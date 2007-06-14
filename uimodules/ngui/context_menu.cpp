@@ -476,7 +476,7 @@ private:
 
 	void on_delete()
 	{
-		k3d::record_state_change_set changeset(m_document_state.document(), _("Delete nodes"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set changeset(m_document_state.document(), _("Delete nodes"), K3D_CHANGE_SET_CONTEXT);
 
 		k3d::nodes_t nodes = m_document_state.selected_nodes();
 
@@ -540,25 +540,25 @@ private:
 
 	void on_hide_selection()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Hide selection"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Hide selection"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.hide_selection();
 	}
 
 	void on_show_selection()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Show selection"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Show selection"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.show_selection();
 	}
 
 	void on_hide_unselected()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Hide unselected"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Hide unselected"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.hide_unselected();
 	}
 
 	void on_show_all()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Show all"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Show all"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.show_all_nodes();
 	}
 

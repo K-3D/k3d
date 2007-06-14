@@ -70,6 +70,9 @@ private:
 	implementation* const m_implementation;
 };
 
+#define K3D_CHANGE_SET_CONTEXT_STRINGIZE2(x) #x
+#define K3D_CHANGE_SET_CONTEXT_STRINGIZE(x) K3D_CHANGE_SET_CONTEXT_STRINGIZE2(x)
+#define K3D_CHANGE_SET_CONTEXT __FILE__ " (" K3D_CHANGE_SET_CONTEXT_STRINGIZE(__LINE__) ")"
 
 /// Factory function for creating standard state change set objects
 std::auto_ptr<state_change_set> create_state_change_set(const char* const Context);

@@ -1504,7 +1504,7 @@ public:
 			set_selection_mode(SELECT_NODES);
 
 		// Create the requested node ...
-		k3d::record_state_change_set changeset(m_document, k3d::string_cast(boost::format(_("Create %1%")) % Factory->name()), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set changeset(m_document, k3d::string_cast(boost::format(_("Create %1%")) % Factory->name()), K3D_CHANGE_SET_CONTEXT);
 		const std::string node_name = k3d::unique_name(m_document.nodes(), Factory->name());
 		k3d::inode* const node = k3d::create_plugin<k3d::inode>(*Factory, m_document, node_name);
 		return_val_if_fail(node, 0);

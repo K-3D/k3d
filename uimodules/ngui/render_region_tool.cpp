@@ -90,7 +90,7 @@ public:
 
 			if(!window.contains(widget_to_ndc(Viewport, k3d::point2(Event.x, Event.y))))
 			{
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Reset Camera Crop Window"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Reset Camera Crop Window"), K3D_CHANGE_SET_CONTEXT);
 				k3d::set_value(crop_window->crop_left(), 0.0);
 				k3d::set_value(crop_window->crop_right(), 1.0);
 				k3d::set_value(crop_window->crop_top(), 0.0);
@@ -165,7 +165,7 @@ public:
 		const k3d::point2 top_left = widget_to_ndc(Viewport, k3d::point2(box.left, box.top));
 		const k3d::point2 bottom_right = widget_to_ndc(Viewport, k3d::point2(box.right, box.bottom));
 
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Set Camera Crop Window"), __PRETTY_FUNCTION__);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Set Camera Crop Window"), K3D_CHANGE_SET_CONTEXT);
 
 		const double left = top_left[0];
 		const double right = bottom_right[0];
@@ -244,7 +244,7 @@ public:
 				k3d::icrop_window* const crop_window = dynamic_cast<k3d::icrop_window*>(viewport.camera());
 				return_val_if_fail(crop_window, false);
 		
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Set Camera Crop Window"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Set Camera Crop Window"), K3D_CHANGE_SET_CONTEXT);
 		
 				k3d::set_value(crop_window->crop_left(), left);
 				k3d::set_value(crop_window->crop_right(), right);
@@ -291,7 +291,7 @@ public:
 				k3d::icrop_window* const crop_window = dynamic_cast<k3d::icrop_window*>(viewport.camera());
 				return_val_if_fail(crop_window, false);
 
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Reset Camera Crop Window"), __PRETTY_FUNCTION__);
+				k3d::record_state_change_set change_set(m_document_state.document(), _("Reset Camera Crop Window"), K3D_CHANGE_SET_CONTEXT);
 				k3d::set_value(crop_window->crop_left(), 0.0);
 				k3d::set_value(crop_window->crop_right(), 1.0);
 				k3d::set_value(crop_window->crop_top(), 0.0);

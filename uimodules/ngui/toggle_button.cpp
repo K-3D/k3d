@@ -156,14 +156,14 @@ void control::on_toggled()
 
 			// Turn this into an undo/redo -able event ...
 			if(m_data->state_recorder)
-				m_data->state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+				m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 			// Update everything with the new value ...
 			m_data->set_value(new_value);
 
 			// Turn this into an undo/redo -able event ...
 			if(m_data->state_recorder)
-				m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(__PRETTY_FUNCTION__), new_value ? m_data->change_message + " \"On\"" : m_data->change_message + " \"Off\"", __PRETTY_FUNCTION__);
+				m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), new_value ? m_data->change_message + " \"On\"" : m_data->change_message + " \"Off\"", K3D_CHANGE_SET_CONTEXT);
 		}
 	}
 	else

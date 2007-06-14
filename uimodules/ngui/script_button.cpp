@@ -151,12 +151,12 @@ void control::on_load()
 	if(buffer.str() != m_data->value())
 	{
 		if(m_data->state_recorder)
-			m_data->state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+			m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 		m_data->set_value(buffer.str());
 
 		if(m_data->state_recorder)
-			m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(__PRETTY_FUNCTION__), m_data->change_message, __PRETTY_FUNCTION__);
+			m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_data->change_message, K3D_CHANGE_SET_CONTEXT);
 	}
 }
 
@@ -212,12 +212,12 @@ void control::on_edit()
 		if(buffer.str() != original_value.source())
 		{
 			if(m_data->state_recorder)
-				m_data->state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+				m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 			m_data->set_value(buffer.str());
 
 			if(m_data->state_recorder)
-				m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(__PRETTY_FUNCTION__), m_data->change_message, __PRETTY_FUNCTION__);
+				m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_data->change_message, K3D_CHANGE_SET_CONTEXT);
 		}
 
 		k3d::filesystem::remove(temp_path);

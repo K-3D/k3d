@@ -217,12 +217,12 @@ void control::on_list_changed()
 	const Glib::ustring change_message = m_data->change_message;
 
 	if(state_recorder)
-		state_recorder->start_recording(k3d::create_state_change_set(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__);
+		state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 	m_data->set_value(value);
 
 	if(state_recorder)
-		state_recorder->commit_change_set(state_recorder->stop_recording(__PRETTY_FUNCTION__), change_message + " " + value, __PRETTY_FUNCTION__);
+		state_recorder->commit_change_set(state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), change_message + " " + value, K3D_CHANGE_SET_CONTEXT);
 }
 
 } // namespace enumeration_chooser

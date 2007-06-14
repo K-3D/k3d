@@ -197,7 +197,6 @@ k3d::inode* duplicate_mesh(k3d::idocument& Document, k3d::inode& Node)
 	}
 
 	// Copy upstream mesh to our new FrozenMesh ...
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 	if(k3d::mesh* const upstream_mesh = boost::any_cast<k3d::mesh*>(k3d::get_value(Document.dag(), upstream_mesh_source->mesh_source_output())))
 	{
 		if(k3d::imesh_storage* const frozen_mesh_storage = dynamic_cast<k3d::imesh_storage*>(frozen_mesh))
@@ -257,7 +256,7 @@ void instantiate_selected_nodes(document_state& DocumentState)
 	std::string action = "Instantiate Nodes";
 	if(nodes.size() == 1)
 		action = k3d::string_cast(boost::format(_("Instantiate %1%")) % (*nodes.begin())->name());
-	k3d::record_state_change_set changeset(DocumentState.document(), action, __PRETTY_FUNCTION__);
+	k3d::record_state_change_set changeset(DocumentState.document(), action, K3D_CHANGE_SET_CONTEXT);
 
 	// Deselect all
 	DocumentState.deselect_all();
@@ -289,7 +288,7 @@ void duplicate_selected_nodes(document_state& DocumentState)
 	std::string action = "Duplicate Nodes";
 	if(nodes.size() == 1)
 		action = k3d::string_cast(boost::format(_("Duplicate %1%")) % (*nodes.begin())->name());
-	k3d::record_state_change_set changeset(DocumentState.document(), action, __PRETTY_FUNCTION__);
+	k3d::record_state_change_set changeset(DocumentState.document(), action, K3D_CHANGE_SET_CONTEXT);
 
 	// Deselect all
 	DocumentState.deselect_all();
