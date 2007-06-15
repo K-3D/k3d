@@ -6,7 +6,6 @@
 			<tutorial title="Panel Basics" path="panel_basics.k3dscript"/>
 			<tutorial title="Viewport Navigation" path="navigation.k3dscript"/>
 			<tutorial title="Basic Selection" path="basic_selection.k3dscript"/>
-			<tutorial title="Mug" path="mug.k3dscript"/>
 			<tutorial title="GTS Boolean (Advanced)" path="gts_boolean.py"/>
 		</tutorials>
 	</application>
