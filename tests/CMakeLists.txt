@@ -120,7 +120,7 @@ ENDIF(K3D_BUILD_PYTHON_MODULES)
 K3D_ADD_PYTHON_TEST(document.create.py)
 K3D_ADD_PYTHON_TEST(document.stress.high_node_count.py)
 K3D_ADD_PYTHON_TEST(document.stress.all_node_types.py)
-K3D_ADD_PYTHON_TEST(document.stress.read_all_properties.py)
+#K3D_ADD_PYTHON_TEST(document.stress.read_all_properties.py)
 
 K3D_ADD_PYTHON_TEST(bitmap.source.BitmapReader.jpeg.py)
 K3D_ADD_PYTHON_TEST(bitmap.source.BitmapReader.png.py)
