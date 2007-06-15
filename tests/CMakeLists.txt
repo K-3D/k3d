@@ -256,6 +256,7 @@ IF(K3D_BUILD_NGUI_MODULE)
 	K3D_ADD_NGUI_TUTORIAL_TEST(ngui.tutorials.panel_basics panel_basics.k3dscript)
 	K3D_ADD_NGUI_TUTORIAL_TEST(ngui.tutorials.navigation navigation.k3dscript)
 	K3D_ADD_NGUI_TUTORIAL_TEST(ngui.tutorials.basic_selection basic_selection.k3dscript)
+	K3D_ADD_NGUI_TUTORIAL_TEST(ngui.tutorials.mug mug.k3dscript)
 	K3D_ADD_NGUI_TUTORIAL_TEST(ngui.tutorials.gts_boolean gts_boolean.py)
 ENDIF(K3D_BUILD_NGUI_MODULE)
 
