@@ -902,11 +902,15 @@ void sds_cache::level_changed()
 void sds_cache::register_property(k3d::iproperty* LevelProperty)
 {
 	if (m_levels.insert(LevelProperty).second)
+	{
+		LevelProperty->property_deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &sds_cache::remove_property), LevelProperty));
 		level_changed();
+	}
 }
 
 void sds_cache::remove_property(k3d::iproperty* LevelProperty)
 {
+	k3d::log() << debug << "sds_cache: removing level property " << LevelProperty << std::endl;
 	m_levels.erase(LevelProperty);
 }
 
@@ -916,7 +920,6 @@ void sds_cache::remove_property(k3d::iproperty* LevelProperty)
 
 void sds_vbo_cache::on_execute(const k3d::mesh& Mesh)
 {
-	cache.set_new_addresses(Mesh);
 	if (levels > 0 || regenerate)
 	{
 		k3d::log() << debug << "SDS: Setting new level to " << levels << std::endl;
@@ -926,6 +929,7 @@ void sds_vbo_cache::on_execute(const k3d::mesh& Mesh)
 		update_selection = true;
 		regenerate = true;
 	}
+	cache.set_new_addresses(Mesh);
 	if (update)
 	{
 		cache.update();

@@ -457,7 +457,7 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 		{
 			size_t first_face = face_first_loops->size();
 			size_t face_count = 0;
-			k3d::mesh::polyhedra_t::polyhedron_type type = k3d::mesh::polyhedra_t::POLYGONS;
+			k3d::mesh::polyhedra_t::polyhedron_type type = (*polyhedron)->type == k3d::legacy::polyhedron::POLYGONS ? k3d::mesh::polyhedra_t::POLYGONS : k3d::mesh::polyhedra_t::CATMULL_CLARK;
 
 			for(k3d::legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
 			{
