@@ -75,16 +75,6 @@ public:
 	}
 
 protected:
-	/// Allow implementations to override emitted hint
-	virtual void emit_hint()
-	{
-		m_output_mesh.changed_signal().emit(0);
-	}
-
-	void emit_hint(iunknown* Hint)
-	{
-		m_output_mesh.changed_signal().emit(Hint);
-	}
 
 	k3d_data(mesh*, data::immutable_name, data::change_signal, data::no_undo, data::local_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_input_mesh;
 	k3d_data(mesh*, data::immutable_name, data::change_signal, data::no_undo, data::pointer_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;

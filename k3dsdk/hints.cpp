@@ -147,6 +147,35 @@ void hint_processor::process(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	}
 }
 
+void hint_processor::process(const k3d::mesh& Mesh, boost::any& Hint)
+{
+	if (k3d::iunknown* hint = boost::any_cast<k3d::hint::mesh_geometry_changed_t>(&Hint))
+	{
+		on_geometry_changed(Mesh, hint);
+	}
+	else if (k3d::iunknown* hint = boost::any_cast<k3d::hint::selection_changed_t>(&Hint))
+	{
+		on_selection_changed(Mesh, hint);
+	}
+	else if (k3d::iunknown* hint = boost::any_cast<k3d::hint::mesh_topology_changed_t>(&Hint))
+	{
+		on_topology_changed(Mesh, hint);
+	}
+	else if (k3d::iunknown* hint = boost::any_cast<k3d::hint::mesh_deleted_t>(&Hint))
+	{
+		on_mesh_deleted(Mesh, hint);
+	}
+	else if (k3d::iunknown* hint = boost::any_cast<k3d::hint::mesh_address_changed_t>(&Hint))
+	{
+		on_address_changed(Mesh, hint);
+	}
+	else
+	{
+		k3d::log() << warning << "Unknown hint " << Hint.type().name() << " encountered" << std::endl;
+		on_unknown_change(Mesh, 0);
+	}
+}
+
 } // namespace hint
 
 } // namespace k3d

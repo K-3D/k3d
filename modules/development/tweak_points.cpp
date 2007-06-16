@@ -58,9 +58,15 @@ public:
 		m_tweaks(init_owner(*this) + init_name("tweaks") + init_label(_("Tweaks")) + init_description(_("Map containing the difference vectors for all transformations performed by this node")) + init_value(tweaks_t())),
 		m_selection_copied(false)
 	{
-		m_matrix.changed_signal().connect(make_update_mesh_slot());
+		m_matrix.changed_signal().connect(sigc::mem_fun(*this, &tweak_points::on_matrix_changed));
 		m_selected_points.changed_signal().connect(sigc::mem_fun(*this, &tweak_points::on_selected_points_changed));
 		m_tweaks.changed_signal().connect(sigc::mem_fun(*this, &tweak_points::on_tweaks_changed));
+	}
+	
+	void on_matrix_changed(k3d::iunknown* Hint)
+	{
+		m_hint.transformation_matrix = m_matrix.value();
+		m_output_mesh.update(&m_hint);
 	}
 
 	/// If the mesh was reset, see if we can apply tweaks and if not clear them
@@ -165,7 +171,7 @@ public:
 		if (!dynamic_cast<internal_update_hint*>(Hint))
 		{
 			k3d::log() << debug << "TweakPoints: Emitting 0 hint!" << std::endl;
-			base::emit_hint(0); // we need to flush any cached data if the tweaks changed from an external cause
+			m_output_mesh.update(0);
 		}
 	}
 		
@@ -261,12 +267,6 @@ public:
 	k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_center;
 	k3d_data(k3d::mesh::indices_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_selected_points; // no undo to ensure synchronisation with the actual selection
 	k3d_data(tweaks_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_tweaks;
-
-protected:
-	virtual void emit_hint()
-	{
-		base::emit_hint(&m_hint);
-	}
 	
 private:
 	k3d::hint::mesh_geometry_changed_t m_hint;

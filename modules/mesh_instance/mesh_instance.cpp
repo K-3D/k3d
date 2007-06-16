@@ -46,10 +46,85 @@
 #include <k3dsdk/snappable.h>
 #include <k3dsdk/transformable.h>
 
+#include <boost/any.hpp>
+
 #include <list>
 
 namespace libk3dmeshinstance
 {
+
+// Helper class to store a copy of the hints
+class hint_cache : public k3d::hint::hint_processor
+{
+public:
+	typedef std::list<boost::any> hint_list_t;
+	
+	/// Copy Hint and append it to the list of received events
+	void append_hint(k3d::iunknown* Hint)
+	{
+		process(k3d::mesh(), Hint); // mesh is not used at this point
+	}
+	
+	hint_list_t::iterator begin()
+	{
+		return m_hint_list.begin();
+	}
+	
+	hint_list_t::iterator end()
+	{
+		return m_hint_list.end();
+	}
+	
+	void clear()
+	{
+		m_hint_list.clear();
+	}
+	
+protected:
+	// hint processor implementation
+	void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		k3d::hint::mesh_geometry_changed_t* casted_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
+		return_if_fail(casted_hint);
+		{
+			boost::any to_append(*casted_hint);
+			m_hint_list.push_back(to_append);
+		}
+	}
+	
+	void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		if (m_hint_list.empty() || !boost::any_cast<k3d::hint::selection_changed_t>(&(m_hint_list.back())))
+		{
+			boost::any to_append(*(k3d::hint::selection_changed()));
+			m_hint_list.push_back(to_append);
+		}
+	}
+	
+	void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		clear();
+		boost::any to_append(*(k3d::hint::mesh_topology_changed()));
+		m_hint_list.push_back(to_append);
+	}
+	
+	void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		clear();
+		boost::any to_append(*(k3d::hint::mesh_deleted()));
+		m_hint_list.push_back(to_append);
+	}
+	
+	void on_address_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		boost::any to_append(*(k3d::hint::mesh_address_changed()));
+		m_hint_list.push_back(to_append);
+	}
+	
+private:
+	hint_list_t m_hint_list;
+};
+
 
 /////////////////////////////////////////////////////////////////////////////
 // mesh_instance
@@ -61,7 +136,6 @@ class mesh_instance :
 	public k3d::hint::hint_processor
 {
 	typedef k3d::snappable<k3d::bounded<k3d::gl::drawable<k3d::ri::renderable<k3d::mesh_selection_sink<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > > > > > > base;
-	typedef std::list<k3d::iunknown*> hint_list_t;
 public:
 	mesh_instance(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
@@ -99,63 +173,21 @@ public:
 		return sigc::mem_fun(*this, &mesh_instance::selection_changed);
 	}
 	
-	void clear_hints()
-	{
-		for (hint_list_t::iterator hint = m_hint_list.begin(); hint != m_hint_list.end(); ++hint)
-		{
-			if (k3d::hint::mesh_geometry_changed_t* casted_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(*hint))
-				delete casted_hint;
-			else if (k3d::hint::selection_changed_t* casted_hint = dynamic_cast<k3d::hint::selection_changed_t*>(*hint))
-				delete casted_hint;
-			else if (k3d::hint::mesh_topology_changed_t* casted_hint =  dynamic_cast<k3d::hint::mesh_topology_changed_t*>(*hint))
-				delete casted_hint;
-			else if  (k3d::hint::mesh_deleted_t* casted_hint = dynamic_cast<k3d::hint::mesh_deleted_t*>(*hint))
-				delete casted_hint;
-			else if (k3d::hint::mesh_address_changed_t* casted_hint = dynamic_cast<k3d::hint::mesh_address_changed_t*>(*hint))
-				delete casted_hint;
-		}
-		m_hint_list.clear();
-	}
-	
-	/// Copy Hint and append it to the list of received events
+		/// Copy Hint and append it to the list of received events
 	void append_hint(k3d::iunknown* Hint)
 	{
-		if (k3d::hint::mesh_geometry_changed_t* casted_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint))
-		{
-			m_hint_list.push_back(new k3d::hint::mesh_geometry_changed_t(*casted_hint));
-		}
-		else if (k3d::hint::selection_changed_t* casted_hint = dynamic_cast<k3d::hint::selection_changed_t*>(Hint))
-		{
-			m_hint_list.push_back(new k3d::hint::selection_changed_t(*casted_hint));
-		}
-		else if (k3d::hint::mesh_topology_changed_t* casted_hint = dynamic_cast<k3d::hint::mesh_topology_changed_t*>(Hint))
-		{
-			clear_hints();
-			m_hint_list.push_back(new k3d::hint::mesh_topology_changed_t(*casted_hint));
-		}
-		else if (k3d::hint::mesh_deleted_t* casted_hint = dynamic_cast<k3d::hint::mesh_deleted_t*>(Hint))
-		{
-			clear_hints();
-			m_hint_list.push_back(new k3d::hint::mesh_deleted_t(*casted_hint));
-		}
-		else if (k3d::hint::mesh_address_changed_t* casted_hint = dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint))
-		{
-			m_hint_list.push_back(new k3d::hint::mesh_address_changed_t(*casted_hint));
-		}
-		else
-		{
-			clear_hints();
-			m_hint_list.push_back(0);
-		}
+		m_hint_cache.append_hint(Hint); // mesh is not used at this point
 		async_redraw(0);
 	}
 	
 	/// Needed to notify caches that we are deleted
 	void on_instance_delete()
 	{
-		m_hint_list.clear(); // previous changes don't need to be executed when we're deleted anyway
-		m_hint_list.push_back(k3d::hint::mesh_deleted());
-		async_redraw(0);
+		// explicit delete, notify painter immediately, otherwise the address is lost
+		m_hint_cache.clear();
+		const k3d::mesh* const output_mesh = m_output_mesh.value();
+		if (m_gl_painter.value() && output_mesh)
+			m_gl_painter.value()->mesh_changed(*output_mesh, k3d::hint::mesh_deleted());
 	}
 	
 	/// Elimination of nodes in the pipeline needs to be passed to the painters for correct cache clean-up
@@ -168,9 +200,7 @@ public:
 			{
 				if (!dep->second) // a node was deleted from the mesh tree, so any cached data needs to be flushed
 				{
-					clear_hints(); // previous changes don't need to be executed when we're deleted anyway
-					m_hint_list.push_back(k3d::hint::mesh_deleted());
-					async_redraw(0);
+					append_hint(k3d::hint::mesh_deleted());
 					return;
 				}
 			}
@@ -179,9 +209,7 @@ public:
 
 	void selection_changed(iunknown* const Hint)
 	{
-		if (m_hint_list.empty() || !dynamic_cast<k3d::hint::selection_changed_t*>(m_hint_list.back()))
-			m_hint_list.push_back(new k3d::hint::selection_changed_t());
-		async_redraw(0);
+		append_hint(k3d::hint::selection_changed());
 	}
 
 	void create_mesh(k3d::mesh& OutputMesh)
@@ -219,21 +247,20 @@ public:
 	
 	void process_changes()
 	{
-		const k3d::mesh* const output_mesh = m_output_mesh.value();
-		size_t hint_count = m_hint_list.size();
-		if (hint_count != 0)
-			k3d::log() << debug << "mesh_instance: checking " << hint_count << " hints" << std::endl;
-		if (!output_mesh)
+		const k3d::mesh* const input_mesh = m_input_mesh.value(); // Make sure we trigger any updates that were made to the input mesh 
+		const k3d::mesh* output_mesh = m_output_mesh.value();
+
+		if (!input_mesh || !output_mesh)
 			return;
 		
 		// Process all hints in the order ther were received
-		for (hint_list_t::iterator hint = m_hint_list.begin(); hint != m_hint_list.end(); ++hint)
+		for (hint_cache::hint_list_t::iterator hint = m_hint_cache.begin(); hint != m_hint_cache.end(); ++hint)
 		{
-			k3d::log() << debug << "mesh_instance: checking hint " << *hint << std::endl;
+			output_mesh = m_output_mesh.value(); // output mesh may have been reset during hint processing
 			process(*output_mesh, *hint);
 		}
 
-		clear_hints();
+		m_hint_cache.clear();
 	}
 
 	void on_gl_draw(const k3d::gl::render_state& State)
@@ -343,6 +370,7 @@ protected:
 	
 	void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
+		return_if_fail(k3d::validate_points(Mesh));
 		k3d::replace_selection(m_mesh_selection.value(), const_cast<k3d::mesh&>(Mesh));
 		m_output_mesh.changed_signal().emit(Hint);
 		m_gl_painter.value()->mesh_changed(Mesh, Hint);
@@ -381,7 +409,7 @@ protected:
 	}
 	
 private:
-	hint_list_t m_hint_list;
+	hint_cache m_hint_cache;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -28,6 +28,8 @@
 #include "mesh_selection.h"
 #include "mesh.h"
 
+#include <boost/any.hpp>
+
 #include <iosfwd>
 
 namespace k3d
@@ -112,6 +114,9 @@ class hint_processor
 public:
 	/// Process the given hint, calling the required on_... method
 	virtual void process(const k3d::mesh& Mesh, k3d::iunknown* Hint);
+	
+	/// Process the given hint (stored as boost::any), calling the required on_... method
+	virtual void process(const k3d::mesh& Mesh, boost::any& Hint);
 
 protected:
 	/// Called when only the geometry changed
