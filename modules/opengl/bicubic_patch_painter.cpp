@@ -62,7 +62,7 @@ public:
 		const k3d::color color = k3d::color(0.8, 0.8, 0.8);
 		const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
 
-		glFrontFace(GL_CCW);
+		glFrontFace(RenderState.inside_out ? GL_CW : GL_CCW);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
 
@@ -113,7 +113,7 @@ public:
 
 		k3d::gl::store_attributes attributes;
 
-		glFrontFace(GL_CCW);
+		glFrontFace(RenderState.inside_out ? GL_CW : GL_CCW);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
 

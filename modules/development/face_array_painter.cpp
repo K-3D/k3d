@@ -79,7 +79,7 @@ public:
 
 		k3d::gl::store_attributes attributes;
 
-		glFrontFace(GL_CW);
+		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
 
@@ -169,7 +169,7 @@ public:
 		
 		glDisable(GL_LIGHTING);
 
-		glFrontFace(GL_CW);
+		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
 

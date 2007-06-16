@@ -207,6 +207,16 @@ inline matrix4 inverse(const matrix4& v)
 	return b;
 }
 
+/// Returns true if a matrix contains negative scale factors that will flip an object "inside-out"
+inline const bool inside_out(const matrix4& m)
+{
+	const vector3 a(m[0][0], m[0][1], m[0][2]);
+	const vector3 b(m[1][0], m[1][1], m[1][2]);
+	const vector3 c(m[2][0], m[2][1], m[2][2]);
+
+	return ((a ^ b) * c) < 0 ? true : false;
+}
+
 /// Linear transformation
 inline const vector3 operator*(const matrix4& a, const vector3& v)
 {

@@ -245,11 +245,7 @@ public:
 			const k3d::mesh* const output_mesh = m_output_mesh.value();
 			return_if_fail(output_mesh);
 
-			k3d::gl::painter_render_state render_state(State);
-
-			render_state.node_selection = m_selection_weight.value();
-			render_state.show_component_selection = m_show_component_selection.value();
-
+			k3d::gl::painter_render_state render_state(State, matrix(), m_selection_weight.value(), m_show_component_selection.value());
 			painter->paint_mesh(*output_mesh, render_state);
 		}
 	}
@@ -267,10 +263,7 @@ public:
 			const k3d::mesh* const output_mesh = m_output_mesh.value();
 			return_if_fail(output_mesh);
 
-			k3d::gl::painter_render_state render_state(State);
-			render_state.node_selection = selection_weight;
-			render_state.show_component_selection = m_show_component_selection.value();
-
+			k3d::gl::painter_render_state render_state(State, matrix(), selection_weight, m_show_component_selection.value());
 			k3d::gl::painter_selection_state selection_state(SelectionState);
 
 			// At the top-level, ID the entire instance ...

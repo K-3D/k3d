@@ -101,7 +101,7 @@ public:
 		
 		k3d::gl::store_attributes attributes;
 		
-		draw(cache->cache, RenderState.node_selection);
+		draw(cache->cache, RenderState);
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
@@ -183,9 +183,9 @@ protected:
 	}
 	
 	// override to choose drawing mode
-	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache& Cache, bool Selected)
+	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache& Cache, const k3d::gl::painter_render_state& RenderState)
 	{
-		glFrontFace(GL_CW);
+		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
 		glEnable(GL_CULL_FACE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_POLYGON_OFFSET_FILL);
@@ -193,10 +193,10 @@ protected:
 		glEnable(GL_LIGHTING);
 		glEnable(GL_COLOR_MATERIAL);
 		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
-		if (!Selected)
+		if (!RenderState.node_selection)
 			k3d::gl::color3d(unselected_mesh_color());
 		
-		Cache.draw_faces(m_levels.value(), Selected);
+		Cache.draw_faces(m_levels.value(), RenderState.node_selection);
 	}
 	
 	// override to choose selection mode
@@ -248,11 +248,11 @@ public:
 	}
 	
 private:
-	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache& Cache, bool Selected)
+	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache& Cache, const k3d::gl::painter_render_state& RenderState)
 	{
 		glDisable(GL_LIGHTING);
 		k3d::gl::color3d(unselected_mesh_color());
-		Cache.draw_borders(m_levels.value(), Selected);
+		Cache.draw_borders(m_levels.value(), RenderState.node_selection);
 	}
 	
 	virtual void select(k3d::sds::k3d_basic_opengl_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
@@ -300,11 +300,11 @@ public:
 	}
 	
 private:
-	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache& Cache, bool Selected)
+	virtual void draw(k3d::sds::k3d_basic_opengl_sds_cache& Cache, const k3d::gl::painter_render_state& RenderState)
 	{
 		glDisable(GL_LIGHTING);
 		k3d::gl::color3d(unselected_mesh_color());
-		Cache.draw_corners(m_levels.value(), Selected);
+		Cache.draw_corners(m_levels.value(), RenderState.node_selection);
 	}
 	
 	virtual void select(k3d::sds::k3d_basic_opengl_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
