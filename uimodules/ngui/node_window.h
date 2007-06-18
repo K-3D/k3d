@@ -21,14 +21,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "ui_component.h"
 
 #include <gtkmm/window.h>
 
-// Forward declarations
 namespace k3d { class inode; }
 
 namespace libk3dngui
@@ -46,6 +45,7 @@ class node_window :
 
 public:
 	node_window(k3d::inode& Object, k3d::icommand_node& Parent, const std::string& Name);
+	virtual ~node_window();
 
 	k3d::inode& node();
 
@@ -59,13 +59,16 @@ public:
 	/// Closes the window
 	void close();
 
+	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
+
 private:
 	/// Override in derived classes to determine whether it is safe to close the window
 	virtual bool on_safe_to_close();
 	/// Override in derived classes to handle cleanup when the window is closed
 	virtual void on_close();
-	/// Stores the owning node
-	k3d::inode& m_node;
+
+	class implementation;
+	implementation* const m_implementation;
 };
 
 } // namespace libk3dngui
