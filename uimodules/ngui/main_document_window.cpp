@@ -18,8 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Tim Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
 #include "about_box.h"
@@ -31,12 +31,12 @@
 #include "document.h"
 #include "document_state.h"
 #include "file_chooser_dialog.h"
-#include "modifiers.h"
 #include "icons.h"
 #include "image_menu_item.h"
 #include "image_toggle_button.h"
 #include "interactive.h"
 #include "knife_tool.h"
+#include "learning_menu.h"
 #include "log_window.h"
 #include "main_document_window.h"
 #include "menu_item.h"
@@ -44,6 +44,7 @@
 #include "menus.h"
 #include "merge_nodes.h"
 #include "messages.h"
+#include "modifiers.h"
 #include "node_list.h"
 #include "node_properties.h"
 #include "open_uri.h"
@@ -56,10 +57,9 @@
 #include "target.h"
 #include "test_case_recorder.h"
 #include "timeline.h"
-#include "toolbar.h"
 #include "tool_panel.h"
+#include "toolbar.h"
 #include "transform.h"
-#include "tutorial_menu.h"
 #include "tutorial_message.h"
 #include "tutorial_recorder.h"
 #include "undo_utility.h"
@@ -1212,9 +1212,9 @@ private:
 		menu->set_accel_group(get_accel_group());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "help_tutorials", _("_Tutorials ..."), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_tutorials))
-			<< set_accelerator_path("<k3d-document>/actions/help/tutorials", get_accel_group())));
+			new menu_item::control(Parent, "help_learning", _("_Tutorials and Examples ..."), true)
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_learning_menu))
+			<< set_accelerator_path("<k3d-document>/actions/help/learning_menu", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
 			new menu_item::control(Parent, "help_file_bug_report", _("File _Bug Report ..."), true)
@@ -2330,9 +2330,9 @@ private:
 			unfullscreen();
 	}
 
-	void on_help_tutorials()
+	void on_help_learning_menu()
 	{
-		create_tutorial_menu();
+		create_learning_menu();
 	}
 
 	void on_help_file_bug_report()

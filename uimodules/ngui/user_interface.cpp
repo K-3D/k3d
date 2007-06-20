@@ -28,13 +28,13 @@
 #include "document.h"
 #include "document_state.h"
 #include "file_chooser_dialog.h"
+#include "learning_menu.h"
 #include "main_document_window.h"
 #include "messages.h"
 #include "module.h"
 #include "open_uri.h"
 #include "options.h"
 #include "splash_box.h"
-#include "tutorial_menu.h"
 #include "tutorial_message.h"
 #include "tutorial_recorder.h"
 #include "utility.h"
@@ -180,7 +180,7 @@ class user_interface :
 public:
 	user_interface() :
 		base("ui", 0),
-		m_show_tutorials(options::nag("show_tutorials")),
+		m_show_learning_menu(options::nag("show_learning_menu")),
 		m_record_tutorials(false)
 	{
 		/// Redirect glib-based logging to our own standard logging mechanism
@@ -344,7 +344,7 @@ public:
 			}
 			else if(argument->string_key == "show-tutorials")
 			{
-				m_show_tutorials = true;
+				m_show_learning_menu = true;
 			}
 			else if(argument->string_key == "record-tutorials")
 			{
@@ -380,8 +380,8 @@ public:
 
         create_document();
 
-		if(m_show_tutorials)
-			create_tutorial_menu();
+		if(m_show_learning_menu)
+			create_learning_menu();
 
 		if(m_record_tutorials)
 			create_tutorial_recorder();
@@ -517,7 +517,7 @@ public:
 
 private:
 	/// Set to true iff we should display the tutorial menu at startup
-	bool m_show_tutorials;
+	bool m_show_learning_menu;
 	/// Set to true iff we should begin recording a tutorial immediately at startup
 	bool m_record_tutorials;
 	/// Stores the path where tutorials should be displayed

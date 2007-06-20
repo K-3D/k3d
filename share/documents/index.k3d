@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<application>
+		<examples>
+			<example title="K-3D Logo" path="logo.k3d">
+				<description>This example contains the K-3D logo, created using quadric primitives.</description>
+			</example>
+			<example title="Old SDP Logo" path="old_logo.k3d">
+				<description>This example reproduces the old Shead Data Processing logo, implemented using a displacement map on a textured concrete cube.  Render it using a RenderMan engine such as Aqsis or Pixie to see the results.</description>
+			</example>
+		</examples>
+	</application>
+</k3dml>
+
