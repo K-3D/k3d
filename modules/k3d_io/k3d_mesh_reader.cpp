@@ -70,7 +70,7 @@ public:
 		if(path.empty())
 			return;
 
-		k3d::log() << info << "Loading .k3d file: " << path.native_console_string() << std::endl;
+		k3d::log() << info << "Reading " << path.native_console_string() << " using " << get_factory().name() << std::endl;
 		k3d::filesystem::ifstream file(path);
 		if(!file)
 		{

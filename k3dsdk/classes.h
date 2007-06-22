@@ -90,8 +90,8 @@ inline const uuid Scale() { return uuid(0x542de0d6, 0xe1e94e4a, 0x883eb23c, 0x36
 inline const uuid K3DScriptEngine() { return uuid(0x6598ab84, 0xfa0f48f2, 0xbc690f11, 0xe686e11b); }
 inline const uuid FrozenTransformation() { return uuid(0x6ea85710, 0x90da4d35, 0xacec30ee, 0xa6aacb9d); }
 inline const uuid Camera() { return uuid(0x45ce1872, 0xaf184b6d, 0xb391e136, 0x0dcfe8b5); }
-inline const uuid DocumentWriter() { return uuid(0x0cbc9131, 0x172541b2, 0xb424afab, 0x25143d55); }
-inline const uuid DocumentReader() { return uuid(0xf02e8dac, 0xa57d4d76, 0xa6170c3a, 0x9bf09d3b); }
+inline const uuid DocumentExporter() { return uuid(0x0cbc9131, 0x172541b2, 0xb424afab, 0x25143d55); }
+inline const uuid DocumentImporter() { return uuid(0xf02e8dac, 0xa57d4d76, 0xa6170c3a, 0x9bf09d3b); }
 inline const uuid AqsisDisplacementShaderLayer() { return uuid(0x1802dce3, 0x71004329, 0x80cbdf0e, 0xbc7f142c); }
 inline const uuid AqsisSurfaceShaderLayer() { return uuid(0x261e244e, 0xd82947ba, 0x9e56a9af, 0x03d4cc0f); }
 inline const uuid Material() { return uuid(0x00000001, 0x00000002, 0x00000003, 0x00000004); }

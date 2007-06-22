@@ -27,16 +27,16 @@
 namespace libk3dk3dio
 {
 
-extern k3d::iplugin_factory& k3d_document_reader_factory();
-extern k3d::iplugin_factory& k3d_document_writer_factory();
+extern k3d::iplugin_factory& k3d_document_importer_factory();
+extern k3d::iplugin_factory& k3d_document_exporter_factory();
 extern k3d::iplugin_factory& k3d_mesh_reader_factory();
 extern k3d::iplugin_factory& k3d_mesh_writer_factory();
 
 } // libk3dk3dio
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dk3dio::k3d_document_reader_factory());
-	Registry.register_factory(libk3dk3dio::k3d_document_writer_factory());
+	Registry.register_factory(libk3dk3dio::k3d_document_importer_factory());
+	Registry.register_factory(libk3dk3dio::k3d_document_exporter_factory());
 	Registry.register_factory(libk3dk3dio::k3d_mesh_reader_factory());
 	Registry.register_factory(libk3dk3dio::k3d_mesh_writer_factory());
 K3D_MODULE_END

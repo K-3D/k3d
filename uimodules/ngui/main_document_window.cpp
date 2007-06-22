@@ -1290,7 +1290,7 @@ private:
 		if(document_path.empty())
 			return on_file_save_as();
 
-		k3d::auto_ptr<k3d::idocument_write_format> filter(k3d::create_plugin<k3d::idocument_write_format>(k3d::classes::DocumentWriter()));
+		k3d::auto_ptr<k3d::idocument_write_format> filter(k3d::create_plugin<k3d::idocument_write_format>(k3d::classes::DocumentExporter()));
 		return_val_if_fail(filter.get(), false);
 
 		if(!filter->write_file(document(), document_path))
@@ -1316,7 +1316,7 @@ private:
 				return false;
 		}
 
-		k3d::auto_ptr<k3d::idocument_write_format> filter(k3d::create_plugin<k3d::idocument_write_format>(k3d::classes::DocumentWriter()));
+		k3d::auto_ptr<k3d::idocument_write_format> filter(k3d::create_plugin<k3d::idocument_write_format>(k3d::classes::DocumentExporter()));
 		return_val_if_fail(filter.get(), false);
 
 		if(!filter->write_file(document(), document_path))
@@ -1350,7 +1350,7 @@ private:
 
 	void file_revert()
 	{
-		k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentReader()));
+		k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentImporter()));
 		if(!filter.get())
 		{
 			error_message(_("Document reader plugin not installed."));

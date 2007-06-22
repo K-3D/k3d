@@ -51,9 +51,9 @@ namespace libk3dk3dio
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// k3d_document_reader
+// k3d_document_importer
 
-class k3d_document_reader :
+class k3d_document_importer :
 	public k3d::ifile_format,
 	public k3d::idocument_read_format,
 	public k3d::ideletable
@@ -71,7 +71,7 @@ public:
 
 	bool read_file(k3d::idocument& Document, const k3d::filesystem::path& FilePath)
 	{
-		k3d::log() << info << "Reading " << FilePath.native_console_string() << " with K-3D document reader" << std::endl;
+		k3d::log() << info << "Reading " << FilePath.native_console_string() << " using " << get_factory().name() << std::endl;
 
 		element xml("k3dml");
 		try
@@ -232,9 +232,9 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<k3d_document_reader, k3d::interface_list<k3d::idocument_read_format> > factory(
-			k3d::classes::DocumentReader(),
-			"K3DDocumentReader",
+		static k3d::application_plugin_factory<k3d_document_importer, k3d::interface_list<k3d::idocument_read_format> > factory(
+			k3d::classes::DocumentImporter(),
+			"K3DDocumentImporter",
 			_("K-3D Native ( .k3d )"),
 			"");
 
@@ -242,9 +242,9 @@ public:
 	}
 };
 
-k3d::iplugin_factory& k3d_document_reader_factory()
+k3d::iplugin_factory& k3d_document_importer_factory()
 {
-	return k3d_document_reader::get_factory();
+	return k3d_document_importer::get_factory();
 }
 
 } // namespace libk3dk3dio

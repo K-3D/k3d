@@ -183,10 +183,10 @@ void create_document()
 
 void open_document(const k3d::filesystem::path& Path)
 {
-	k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentReader()));
+	k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentImporter()));
 	if(!filter.get())
 	{
-		error_message(_("Document reader plugin not installed."));
+		error_message(_("Document importer plugin not installed."));
 		return;
 	}
 

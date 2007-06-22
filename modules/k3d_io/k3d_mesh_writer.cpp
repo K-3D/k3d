@@ -62,7 +62,8 @@ public:
 		if(!mesh || path.empty())
 			return;
 
-		k3d::log() << info << "Writing .k3d file: " << path.native_console_string() << std::endl;
+		k3d::log() << info << "Writing " << path.native_console_string() << " using " << get_factory().name() << std::endl;
+
 		k3d::filesystem::ofstream file(path);
 		if(!file)
 		{

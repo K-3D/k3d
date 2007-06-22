@@ -291,9 +291,9 @@ idocument module_open_document(const std::string& Path)
 {
 	const filesystem::path document_path = filesystem::native_path(ustring::from_utf8(Path));
 
-	k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentReader()));
+	k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentImporter()));
 	if(!filter.get())
-		throw std::runtime_error("no document loader plugin");
+		throw std::runtime_error("no importer plugin available");
 
 	k3d::idocument* const document = k3d::application().create_document();
 	if(!document)

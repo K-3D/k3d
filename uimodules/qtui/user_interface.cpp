@@ -202,7 +202,7 @@ main_window::main_window(QApplication& Application) :
 
 void main_window::on_file_open()
 {
-	k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentReader()));
+	k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentImporter()));
 	if(!filter.get())
 	{
 		QMessageBox::warning(this, _("Open K-3D Document:"), _("Document reader plugin not installed."), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);

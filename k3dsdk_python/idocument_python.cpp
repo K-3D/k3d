@@ -61,9 +61,9 @@ idocument::idocument(k3d::idocument& Document) :
 
 const bool idocument::save(const std::string& Path)
 {
-	k3d::auto_ptr<k3d::idocument_write_format> filter(k3d::create_plugin<k3d::idocument_write_format>(k3d::classes::DocumentWriter()));
+	k3d::auto_ptr<k3d::idocument_write_format> filter(k3d::create_plugin<k3d::idocument_write_format>(k3d::classes::DocumentExporter()));
 	if(!filter.get())
-		throw std::runtime_error("no export plugin available");
+		throw std::runtime_error("no exporter plugin available");
 
 	return filter->write_file(wrapped(), filesystem::native_path(ustring::from_utf8(Path)));
 }

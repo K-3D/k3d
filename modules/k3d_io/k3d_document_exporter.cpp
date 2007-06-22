@@ -48,10 +48,10 @@ namespace libk3dk3dio
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// k3d_document_writer
+// k3d_document_exporter
 
 /// Serializes a K-3D document using the native K-3D XML format
-class k3d_document_writer :
+class k3d_document_exporter :
 	public k3d::ifile_format,
 	public k3d::idocument_write_format,
 	public k3d::ideletable
@@ -69,7 +69,7 @@ public:
 
 	bool write_file(k3d::idocument& Document, const k3d::filesystem::path& Path)
 	{
-		k3d::log() << info << "Writing " << Path.native_console_string() << " with K-3D document writer" << std::endl;
+		k3d::log() << info << "Writing " << Path.native_console_string() << " using " << get_factory().name() << std::endl;
 
 		// Try to open the file ...
 		k3d::filesystem::ofstream filestream(Path);
@@ -134,9 +134,9 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<k3d_document_writer, k3d::interface_list<k3d::idocument_write_format> > factory(
-			k3d::classes::DocumentWriter(),
-			"K3DDocumentWriter",
+		static k3d::application_plugin_factory<k3d_document_exporter, k3d::interface_list<k3d::idocument_write_format> > factory(
+			k3d::classes::DocumentExporter(),
+			"K3DDocumentExporter",
 			_("K-3D Native ( .k3d )"),
 			"");
 
@@ -144,9 +144,9 @@ public:
 	}
 };
 
-k3d::iplugin_factory& k3d_document_writer_factory()
+k3d::iplugin_factory& k3d_document_exporter_factory()
 {
-	return k3d_document_writer::get_factory();
+	return k3d_document_exporter::get_factory();
 }
 
 } // namespace libk3dk3dio
