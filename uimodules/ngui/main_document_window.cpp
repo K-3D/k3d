@@ -1212,7 +1212,7 @@ private:
 		menu->set_accel_group(get_accel_group());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "help_learning", _("_Tutorials and Examples ..."), true)
+			new menu_item::control(Parent, "help_tutorials", _("_Tutorials and Examples ..."), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_learning_menu))
 			<< set_accelerator_path("<k3d-document>/actions/help/learning_menu", get_accel_group())));
 
