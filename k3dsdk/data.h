@@ -1927,7 +1927,9 @@ public:
 			// Note: we create the cache and set its value in two steps
 			// because m_data_slot() may cause this method to be executed in a loop
 			m_cache.reset(new value_t());
-			*m_cache = m_data_slot();
+			value_t new_data = m_data_slot();
+			m_cache.reset(new value_t()); // in case m_data_slot called reset()
+			*m_cache = new_data;
 		}
 
 		return *m_cache;
