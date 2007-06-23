@@ -818,14 +818,14 @@ private:
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "select_nodes", _("_Nodes"), true)
+			new menu_item::control(Parent, "select_nodes", _("N_odes"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_nodes))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_nodes", get_accel_group())));
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "select_vertices", _("_Points"), true)
+			new menu_item::control(Parent, "select_vertices", _("Poin_ts"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_vertices))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_points", get_accel_group())));
 
