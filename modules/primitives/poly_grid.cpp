@@ -96,12 +96,12 @@ public:
 				y = k3d::vector3(0, 0, height);
 				break;
 			case k3d::PZ:
-				x = k3d::vector3(-width, 0, 0);
-				y = k3d::vector3(0, height, 0);
+				x = k3d::vector3(width, 0, 0);
+				y = k3d::vector3(0, -height, 0);
 				break;
 			case k3d::NZ:
-				x = k3d::vector3(-width, 0, 0);
-				y = k3d::vector3(0, -height, 0);
+				x = k3d::vector3(width, 0, 0);
+				y = k3d::vector3(0, height, 0);
 				break;
 		}
 
