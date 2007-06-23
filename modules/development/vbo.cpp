@@ -64,7 +64,7 @@ void component_selection::on_execute(const k3d::mesh& Mesh)
 	{
 		size_t start = i;
 		k3d::mesh_selection::record record(start, i+1, selection_array[i]);
-		while (record.weight == selection_array[i] && i < selection_array.size())
+		while (i < selection_array.size() && record.weight == selection_array[i])
 		{
 			record.end = i+1;
 			++i;
