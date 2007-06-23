@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <k3dml>
 	<mesh_arrays>
-		<points>-5 -5 0 5 -5 0 -5 5 0 5 5 0</points>
+		<points>5 5 0 -5 5 0 5 -5 0 -5 -5 0</points>
 		<point_selection>0 0 0 0</point_selection>
 		<polyhedra>
 			<first_faces>0</first_faces>
