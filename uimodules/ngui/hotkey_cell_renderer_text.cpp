@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "hotkey_cell_renderer_text.h"
@@ -39,10 +39,10 @@ Gtk::CellEditable* hotkey_cell_renderer_text::start_editing_vfunc(GdkEvent* even
 {
 	m_window = dynamic_cast<Gtk::Window*>(widget.get_toplevel());
 	if(m_window)
-		{
-			m_disabled_accel_group = m_window->get_accel_group();
-			m_window->remove_accel_group(m_window->get_accel_group());
-		}
+	{
+		m_disabled_accel_group = m_window->get_accel_group();
+		m_window->remove_accel_group(m_window->get_accel_group());
+	}
 	
 	return base::start_editing_vfunc(event, widget, path, background_area, cell_area, flags);
 }
@@ -50,10 +50,10 @@ Gtk::CellEditable* hotkey_cell_renderer_text::start_editing_vfunc(GdkEvent* even
 void hotkey_cell_renderer_text::on_editing_canceled()
 {
 	if(m_window)
-		{
-			m_window->add_accel_group(m_disabled_accel_group);
-			m_disabled_accel_group.clear();
-		}
+	{
+		m_window->add_accel_group(m_disabled_accel_group);
+		m_disabled_accel_group.clear();
+	}
 
 	base::on_editing_canceled();
 }
@@ -61,14 +61,13 @@ void hotkey_cell_renderer_text::on_editing_canceled()
 void hotkey_cell_renderer_text::on_edited(const Glib::ustring& path, const Glib::ustring& new_text)
 {
 	if(m_window)
-		{
-			m_window->add_accel_group(m_disabled_accel_group);
-			m_disabled_accel_group.clear();
-		}
+	{
+		m_window->add_accel_group(m_disabled_accel_group);
+		m_disabled_accel_group.clear();
+	}
 
 	base::on_edited(path, new_text);
 }
 
 } // namespace libk3dngui
-
 

@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "hotkey_entry.h"
@@ -35,10 +35,10 @@ bool hotkey_entry::on_focus_in_event(GdkEventFocus* Event)
 	// Disable accelerators for this window
 	Gtk::Window* const window = dynamic_cast<Gtk::Window*>(get_toplevel());
 	if(window)
-		{
-			m_disabled_accel_group = window->get_accel_group();
-			window->remove_accel_group(window->get_accel_group());
-		}
+	{
+		m_disabled_accel_group = window->get_accel_group();
+		window->remove_accel_group(window->get_accel_group());
+	}
 
 	return base::on_focus_in_event(Event);
 }
@@ -48,14 +48,13 @@ bool hotkey_entry::on_focus_out_event(GdkEventFocus* Event)
 	// Enable accelerators for this window
 	Gtk::Window* const window = dynamic_cast<Gtk::Window*>(get_toplevel());
 	if(window)
-		{
-			window->add_accel_group(m_disabled_accel_group);
-			m_disabled_accel_group.clear();
-		}
+	{
+		window->add_accel_group(m_disabled_accel_group);
+		m_disabled_accel_group.clear();
+	}
 
 	return base::on_focus_out_event(Event);
 }
 
 } // namespace libk3dngui
-
 
