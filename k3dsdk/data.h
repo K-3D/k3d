@@ -1747,6 +1747,7 @@ private:
 // demand_storage
 
 /// Read-only storage policy that stores a value by pointer, created on-demand
+/** \deprecated You should prefer to use pointer_storage, instead */
 template<typename value_t, typename signal_policy_t>
 class demand_storage :
 	public signal_policy_t
@@ -1764,6 +1765,10 @@ public:
 	/// Resets the underlying data so it will be created-again next read
 	void reset(value_t NewValue = 0, iunknown* const Hint = 0)
 	{
+		// Ensure that our value doesn't go out-of-scope while it's getting initialized ...
+		if(m_executing)
+			return;
+
 		m_cache.reset(NewValue);
 		signal_policy_t::set_value(Hint);
 	}
@@ -1773,10 +1778,14 @@ public:
 	{
 		if(!m_cache.get())
 		{
+			m_executing = true;
+
 			// Note: we create the value and update its state in two steps
 			// because m_data_slot() may cause this method to be executed in a loop
 			m_cache.reset(new typename boost::remove_pointer<value_t>::type());
 			m_data_slot(*m_cache);
+
+			m_executing = false;
 		}
 
 		return m_cache.get();
@@ -1786,7 +1795,8 @@ protected:
 	template<typename init_t>
 	demand_storage(const init_t& Init) :
 		signal_policy_t(Init),
-		m_data_slot(Init.slot())
+		m_data_slot(Init.slot()),
+		m_executing(false)
 	{
 	}
 
@@ -1794,12 +1804,20 @@ private:
 	/// Resets the underlying data so it will be created-again next read
 	void internal_reset(iunknown* const Hint = 0)
 	{
+		// Ensure that our value doesn't go out-of-scope while it's getting initialized ...
+		if(m_executing)
+			return;
+
 		m_cache.reset();
 		signal_policy_t::set_value(Hint);
 	}
 
-	sigc::slot<void, typename boost::remove_pointer<value_t>::type&> m_data_slot;
+	/// Storage for this policy's value
 	std::auto_ptr<typename boost::remove_pointer<value_t>::type> m_cache;
+	/// Stores a slot that will be executed to initialize this policy's value
+	sigc::slot<void, typename boost::remove_pointer<value_t>::type&> m_data_slot;
+	/// Set to true during initialization of the policy's value, to prevent problems with recursion
+	bool m_executing;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1828,6 +1846,7 @@ public:
 	void set_update_slot(const sigc::slot<void, value_t&>& Slot)
 	{
 		m_update_slot = Slot;
+		update();
 	}
 
 	/// Returns a slot that will invoke the reset() method
@@ -1845,6 +1864,10 @@ public:
 	/// Store an object as the new value, taking control of its lifetime
 	void reset(pointer_t NewValue = 0, iunknown* const Hint = 0)
 	{
+		// Ensure that our value doesn't go out-of-scope while it's being modified
+		if(m_executing)
+			return;
+
 		m_value.reset(NewValue);
 		signal_policy_t::set_value(Hint);
 	}
@@ -1852,6 +1875,10 @@ public:
 	/// Schedule an update for the value the next time it's read
 	void update(iunknown* const Hint = 0)
 	{
+		// Ensure that our value doesn't go out-of-scope while it's being modified
+		if(m_executing)
+			return;
+
 		m_update = true;
 		signal_policy_t::set_value(Hint);
 	}
@@ -1861,6 +1888,8 @@ public:
 	{
 		if(!m_value.get())
 		{
+			m_executing = true;
+
 			// We can cancel pending updates since we're creating the value from scratch
 			m_update = false;
 
@@ -1868,12 +1897,18 @@ public:
 			// because m_data_slot() may cause this method to be executed in a loop
 			m_value.reset(new value_t());
 			m_initialize_slot(*m_value);
+
+			m_executing = false;
 		}
 		
 		if(m_update)
 		{
+			m_executing = true;
+
 			m_update = false;
 			m_update_slot(*m_value);
+
+			m_executing = false;
 		}
 
 		return m_value.get();
@@ -1883,15 +1918,22 @@ protected:
 	template<typename init_t>
 	pointer_storage(const init_t& Init) :
 		signal_policy_t(Init),
-		m_update(false)
+		m_update(false),
+		m_executing(false)
 	{
 	}
 
 private:
+	/// Storage for this policy's value
 	std::auto_ptr<value_t> m_value;
+	/// Set to true if this policy's value is stale and needs to be updated
 	bool m_update;
+	/// Stores a slot that will be executed to initialize this policy's value
 	sigc::slot<void, value_t&> m_initialize_slot;
+	/// Stores a slot that will be executed to update this policy's value
 	sigc::slot<void, value_t&> m_update_slot;
+	/// Set to true during initialization / update of the policy value, to prevent problems with recursion
+	bool m_executing;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1915,6 +1957,9 @@ public:
 	/// Resets the underlying data so it will be recalculated the next time it's read
 	void reset(iunknown* const Hint = 0)
 	{
+		if(m_executing)
+			return;
+
 		m_cache.reset();
 		signal_policy_t::set_value(0);
 	}
@@ -1924,12 +1969,14 @@ public:
 	{
 		if(!m_cache.get())
 		{
+			m_executing = true;
+
 			// Note: we create the cache and set its value in two steps
 			// because m_data_slot() may cause this method to be executed in a loop
 			m_cache.reset(new value_t());
-			value_t new_data = m_data_slot();
-			m_cache.reset(new value_t()); // in case m_data_slot called reset()
-			*m_cache = new_data;
+			*m_cache = m_data_slot();
+
+			m_executing = false;
 		}
 
 		return *m_cache;
@@ -1939,13 +1986,18 @@ protected:
 	template<typename init_t>
 	computed_storage(const init_t& Init) :
 		signal_policy_t(Init),
-		m_data_slot(Init.slot())
+		m_data_slot(Init.slot()),
+		m_executing(false)
 	{
 	}
 
 private:
-	sigc::slot<value_t> m_data_slot;
+	/// Storage for this policy's value
 	std::auto_ptr<value_t> m_cache;
+	/// Stores a slot that will be executed to initialize this policy's value
+	sigc::slot<value_t> m_data_slot;
+	/// Set to true during initialization of the policy value, to prevent problems with recursion
+	bool m_executing;
 };
 
 /////////////////////////////////////////////////////////////////////////////
