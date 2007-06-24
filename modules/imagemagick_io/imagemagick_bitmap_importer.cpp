@@ -24,7 +24,7 @@
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/i18n.h>
-#include <k3dsdk/ibitmap_read_format.h>
+#include <k3dsdk/ibitmap_importer.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/ifile_format.h>
 #include <k3dsdk/path.h>
@@ -40,7 +40,7 @@ namespace libk3dimagemagickio
 /// Reads and writes a large number of image file formats, using the ImageMagick Magick++ API
 class imagemagick_bitmap_importer :
 	public k3d::ifile_format,
-	public k3d::ibitmap_read_format,
+	public k3d::ibitmap_importer,
 	public k3d::ideletable
 {
 public:
@@ -125,7 +125,7 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<imagemagick_bitmap_importer, 
-			k3d::interface_list<k3d::ibitmap_read_format> > factory(
+			k3d::interface_list<k3d::ibitmap_importer> > factory(
 				k3d::uuid(0x4eb70e35, 0x4e654a53, 0xa8e4b07c, 0x4219d946),
 				"ImageMagickBitmapImporter",
 				_("ImageMagick Formats ( many )"),

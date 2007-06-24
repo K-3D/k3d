@@ -73,7 +73,7 @@ inline const uuid PerlEngine() { return uuid(0x00000001, 0x00000000, 0x00000000,
 inline const uuid PythonEngine() { return uuid(0x00000001, 0x00000000, 0x00000000, 0x00000076); }
 inline const uuid ScalarBezierChannel() { return uuid(0x00000001, 0x00000000, 0x00000000, 0x0000007c); }
 inline const uuid ColorBezierChannel() { return uuid(0x00000001, 0x00000000, 0x00000000, 0x0000007d); }
-inline const uuid TIFFWriter() { return uuid(0x00000001, 0x00000000, 0x00000000, 0x00000085); }
+inline const uuid TIFFBitmapExporter() { return uuid(0x00000001, 0x00000000, 0x00000000, 0x00000085); }
 inline const uuid FrozenMesh() { return uuid(0x305ceb88, 0x7cf34870, 0x8b5e673c, 0x636beab9); }
 inline const uuid MeshInstance() { return uuid(0x2c1d60a6, 0x863541a1, 0xbd649bd1, 0x1ea8ae24); }
 inline const uuid TimeSource() { return uuid(0x1978f1f7, 0x4a864c99, 0x8caf7cfc, 0xd2591baf); }

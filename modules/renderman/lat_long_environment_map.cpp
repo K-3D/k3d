@@ -28,7 +28,7 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/file_filter.h>
 #include <k3dsdk/i18n.h>
-#include <k3dsdk/ibitmap_write_format.h>
+#include <k3dsdk/ibitmap_exporter.h>
 #include <k3dsdk/irender_engine_ri.h>
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/itexture_ri.h>
@@ -95,7 +95,7 @@ public:
 		else
 */
 		{
-			k3d::ibitmap_write_format* const filter = k3d::file_filter<k3d::ibitmap_write_format>(k3d::classes::TIFFWriter());
+			k3d::ibitmap_exporter* const filter = k3d::file_filter<k3d::ibitmap_exporter>(k3d::classes::TIFFBitmapExporter());
 			return_if_fail(filter);
 			return_if_fail(filter->write_file(m_ri_image_path, *input));
 		}

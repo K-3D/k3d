@@ -38,7 +38,7 @@
 #include <k3dsdk/i18n.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
-#include <k3dsdk/idocument_read_format.h>
+#include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/iuser_interface_plugin.h>
 #include <k3dsdk/log.h>

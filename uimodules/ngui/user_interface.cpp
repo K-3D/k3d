@@ -51,7 +51,7 @@
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
 #include <k3dsdk/ideletable.h>
-#include <k3dsdk/idocument_read_format.h>
+#include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/iuser_interface_plugin.h>

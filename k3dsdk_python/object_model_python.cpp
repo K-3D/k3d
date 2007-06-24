@@ -61,7 +61,7 @@
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/idocument.h>
-#include <k3dsdk/idocument_read_format.h>
+#include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/mesh_diff.h>
 #include <k3dsdk/mesh_selection.h>
@@ -291,7 +291,7 @@ idocument module_open_document(const std::string& Path)
 {
 	const filesystem::path document_path = filesystem::native_path(ustring::from_utf8(Path));
 
-	k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentImporter()));
+	k3d::auto_ptr<k3d::idocument_importer> filter(k3d::create_plugin<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
 	if(!filter.get())
 		throw std::runtime_error("no importer plugin available");
 

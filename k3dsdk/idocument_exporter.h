@@ -1,8 +1,8 @@
-#ifndef K3DSDK_IBITMAP_READ_FORMAT_H
-#define K3DSDK_IBITMAP_READ_FORMAT_H
+#ifndef K3DSDK_IDOCUMENT_EXPORTER_H
+#define K3DSDK_IDOCUMENT_EXPORTER_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2004, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,29 +24,28 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "bitmap.h"
 #include "iunknown.h"
 
 namespace k3d
 {
 
-namespace filesystem { class path; }
-
-/// Abstract interface for objects capable of loading bitmaps from a filesystem
-class ibitmap_read_format :
+class idocument;
+	
+/// Abstract interface implemented by objects that can export data from a K-3D document
+class idocument_exporter :
 	public virtual iunknown
 {
 public:
-	virtual bool read_file(const filesystem::path& File, bitmap& Bitmap) = 0;
+	virtual bool write_file(idocument& Document, const filesystem::path& File) = 0;
 
 protected:
-	ibitmap_read_format() {}
-	ibitmap_read_format(const ibitmap_read_format&) {}
-	ibitmap_read_format& operator=(const ibitmap_read_format&) { return *this; }
-	virtual ~ibitmap_read_format() {}
+	idocument_exporter() {}
+	idocument_exporter(const idocument_exporter&) {}
+	idocument_exporter& operator = (const idocument_exporter&) { return *this; }
+	virtual ~idocument_exporter() {}
 };
 
-} // namespace k3d
+} //namespace k3d
 
-#endif // K3DSDK_IBITMAP_READ_FORMAT_H
+#endif // K3DSDK_IDOCUMENT_EXPORTER_H
 

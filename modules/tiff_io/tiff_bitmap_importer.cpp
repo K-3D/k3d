@@ -23,7 +23,7 @@
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/i18n.h>
-#include <k3dsdk/ibitmap_read_format.h>
+#include <k3dsdk/ibitmap_importer.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/ifile_format.h>
 #include <k3dsdk/path.h>
@@ -39,7 +39,7 @@ namespace libk3dtiffio
 
 class tiff_bitmap_importer :
 	public k3d::ifile_format,
-	public k3d::ibitmap_read_format,
+	public k3d::ibitmap_importer,
 	public k3d::ideletable
 {
 public:
@@ -80,7 +80,7 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<tiff_bitmap_importer,
-			k3d::interface_list<k3d::ibitmap_read_format> > factory(
+			k3d::interface_list<k3d::ibitmap_importer> > factory(
 				k3d::uuid(0x3cfedd91, 0xd5764d3a, 0x91b15d47, 0xdcdcf962),
 				"TIFFBitmapImporter",
 				_("TIFF (*.tiff)"),

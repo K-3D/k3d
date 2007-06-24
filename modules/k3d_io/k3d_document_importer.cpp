@@ -31,7 +31,7 @@
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>
-#include <k3dsdk/idocument_read_format.h>
+#include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/ifile_format.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/ipersistent.h>
@@ -55,7 +55,7 @@ namespace libk3dk3dio
 
 class k3d_document_importer :
 	public k3d::ifile_format,
-	public k3d::idocument_read_format,
+	public k3d::idocument_importer,
 	public k3d::ideletable
 {
 public:
@@ -232,7 +232,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<k3d_document_importer, k3d::interface_list<k3d::idocument_read_format> > factory(
+		static k3d::application_plugin_factory<k3d_document_importer, k3d::interface_list<k3d::idocument_importer> > factory(
 			k3d::classes::DocumentImporter(),
 			"K3DDocumentImporter",
 			_("K-3D Native ( .k3d )"),

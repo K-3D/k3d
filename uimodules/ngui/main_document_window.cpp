@@ -79,8 +79,8 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>
-#include <k3dsdk/idocument_read_format.h>
-#include <k3dsdk/idocument_write_format.h>
+#include <k3dsdk/idocument_importer.h>
+#include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/iparentable.h>
@@ -1290,7 +1290,7 @@ private:
 		if(document_path.empty())
 			return on_file_save_as();
 
-		k3d::auto_ptr<k3d::idocument_write_format> filter(k3d::create_plugin<k3d::idocument_write_format>(k3d::classes::DocumentExporter()));
+		k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::create_plugin<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
 		return_val_if_fail(filter.get(), false);
 
 		if(!filter->write_file(document(), document_path))
@@ -1316,7 +1316,7 @@ private:
 				return false;
 		}
 
-		k3d::auto_ptr<k3d::idocument_write_format> filter(k3d::create_plugin<k3d::idocument_write_format>(k3d::classes::DocumentExporter()));
+		k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::create_plugin<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
 		return_val_if_fail(filter.get(), false);
 
 		if(!filter->write_file(document(), document_path))
@@ -1350,7 +1350,7 @@ private:
 
 	void file_revert()
 	{
-		k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentImporter()));
+		k3d::auto_ptr<k3d::idocument_importer> filter(k3d::create_plugin<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
 		if(!filter.get())
 		{
 			error_message(_("Document reader plugin not installed."));
@@ -1402,7 +1402,7 @@ private:
 	void on_file_import()
 	{
 		// Make sure we have some file formats to choose from ...
-		const k3d::factories_t factories = k3d::plugins<k3d::idocument_read_format>();
+		const k3d::factories_t factories = k3d::plugins<k3d::idocument_importer>();
 		if(factories.empty())
 		{
 			error_message(_("No import file filters available"));
@@ -1426,7 +1426,7 @@ private:
 
 		// Prompt the user for a file to import ...
 		k3d::filesystem::path filepath;
-		k3d::auto_ptr<k3d::idocument_read_format> filter;
+		k3d::auto_ptr<k3d::idocument_importer> filter;
 
 		{
 			file_chooser_dialog dialog(_("Import Document:"), k3d::options::path::documents(), Gtk::FILE_CHOOSER_ACTION_OPEN);
@@ -1453,13 +1453,13 @@ private:
 			k3d::iplugin_factory* factory = import_combo.get_active()->get_value(columns.factory);
 			if(factory)
 			{
-				filter.reset(k3d::file_filter<k3d::idocument_read_format>(*factory));
+				filter.reset(k3d::file_filter<k3d::idocument_importer>(*factory));
 			}
 			else
 			{
 				k3d::log() << info << "Using automatic filetype detection" << std::endl;
 
-				filter.reset(k3d::auto_file_filter<k3d::idocument_read_format>(filepath));
+				filter.reset(k3d::auto_file_filter<k3d::idocument_importer>(filepath));
 				if(!filter.get())
 				{
 					error_message(
@@ -1488,7 +1488,7 @@ private:
 	void on_file_export()
 	{
 		// Make sure we have some file formats to choose from ...
-		const k3d::factories_t factories = k3d::plugins<k3d::idocument_write_format>();
+		const k3d::factories_t factories = k3d::plugins<k3d::idocument_exporter>();
 		if(factories.empty())
 		{
 			error_message(_("No export file filters available"));
@@ -1507,7 +1507,7 @@ private:
 
 		// Prompt the user for a file to export ...
 		k3d::filesystem::path filepath;
-		k3d::auto_ptr<k3d::idocument_write_format> filter;
+		k3d::auto_ptr<k3d::idocument_exporter> filter;
 
 		{
 			file_chooser_dialog dialog(_("Export Document:"), k3d::options::path::documents(), Gtk::FILE_CHOOSER_ACTION_SAVE);
@@ -1533,7 +1533,7 @@ private:
 			k3d::iplugin_factory* factory = export_combo.get_active()->get_value(columns.factory);
 			if(factory)
 			{
-				filter.reset(k3d::file_filter<k3d::idocument_write_format>(*factory));
+				filter.reset(k3d::file_filter<k3d::idocument_exporter>(*factory));
 			}
 			return_if_fail(filter.get());
 		}

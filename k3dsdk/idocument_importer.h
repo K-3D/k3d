@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IBITMAP_WRITE_FORMAT_H
-#define K3DSDK_IBITMAP_WRITE_FORMAT_H
+#ifndef K3DSDK_IDOCUMENT_IMPORTER_H
+#define K3DSDK_IDOCUMENT_IMPORTER_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -21,31 +21,32 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "bitmap.h"
 #include "iunknown.h"
 
 namespace k3d
 {
 
 namespace filesystem { class path; }
+class idocument;
 
-/// Abstract interface for objects capable of serializing bitmap images
-class ibitmap_write_format :
-	public virtual k3d::iunknown
+/// Abstract interface for objects that can import data into a K-3D document
+class idocument_importer :
+	public virtual iunknown
 {
 public:
-	virtual bool write_file(const filesystem::path& File, const bitmap& Bitmap) = 0;
+	virtual bool read_file(idocument& Document, const filesystem::path& File) = 0;
 
 protected:
-	ibitmap_write_format() {}
-	ibitmap_write_format(const ibitmap_write_format&) {}
-	ibitmap_write_format& operator = (const ibitmap_write_format&) { return *this; }
-	virtual ~ibitmap_write_format() {}
+	idocument_importer() {}
+	idocument_importer(const idocument_importer&) {}
+	idocument_importer& operator = (const idocument_importer&) { return *this; }
+	virtual ~idocument_importer() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_IBITMAP_WRITE_FORMAT_H
+#endif // K3DSDK_IDOCUMENT_IMPORTER_H
+

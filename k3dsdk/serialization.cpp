@@ -24,8 +24,8 @@
 #include "classes.h"
 #include "idag.h"
 #include "idocument.h"
-#include "idocument_read_format.h"
-#include "idocument_write_format.h"
+#include "idocument_importer.h"
+#include "idocument_exporter.h"
 #include "imaterial.h"
 #include "inode.h"
 #include "inode_collection.h"
@@ -850,12 +850,12 @@ void load_dag(idocument& Document, element& XML, const ipersistent::load_context
 	Document.dag().set_dependencies(dependencies);
 }
 
-bool import_file(idocument& Document, idocument_read_format& FormatFilter, const filesystem::path& File)
+bool import_file(idocument& Document, idocument_importer& FormatFilter, const filesystem::path& File)
 {
 	return FormatFilter.read_file(Document, File);
 }
 
-bool export_file(idocument& Document, idocument_write_format& FormatFilter, const filesystem::path& File)
+bool export_file(idocument& Document, idocument_exporter& FormatFilter, const filesystem::path& File)
 {
 	return FormatFilter.write_file(Document, File);
 }

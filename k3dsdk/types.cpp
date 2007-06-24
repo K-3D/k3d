@@ -25,18 +25,18 @@
 #include "color.h"
 #include "i3d_2d_mapping.h"
 #include "iaqsis.h"
-#include "ibitmap_read_format.h"
+#include "ibitmap_exporter.h"
+#include "ibitmap_importer.h"
 #include "ibitmap_sink.h"
 #include "ibitmap_source.h"
-#include "ibitmap_write_format.h"
 #include "icamera.h"
 #include "icamera_animation_render_engine.h"
 #include "icamera_preview_render_engine.h"
 #include "icamera_still_render_engine.h"
 #include "icolor_source.h"
 #include "idisplacement_shader_ri.h"
-#include "idocument_read_format.h"
-#include "idocument_write_format.h"
+#include "idocument_importer.h"
+#include "idocument_exporter.h"
 #include "ifile_format.h"
 #include "iimager_shader_ri.h"
 #include "ilight_gl.h"
@@ -71,8 +71,8 @@
 #include "iyafray.h"
 #include "legacy_mesh.h"
 #include "log.h"
-#include "mesh_selection.h"
 #include "mesh.h"
+#include "mesh_selection.h"
 #include "types.h"
 
 #include <map>
@@ -153,25 +153,23 @@ void initialize_types()
 	register_type(typeid(k3d::bitmap*), "k3d::bitmap*");
 	register_type(typeid(k3d::bounding_box3), "k3d::bounding_box3");
 	register_type(typeid(k3d::color), "k3d::color");
-	register_type(typeid(k3d::mesh), "k3d::mesh");
-	register_type(typeid(k3d::mesh*), "k3d::mesh*");
 	register_type(typeid(k3d::filesystem::path), "k3d::filesystem::path");
 	register_type(typeid(k3d::gl::ilight), "k3d::gl::ilight");
 	register_type(typeid(k3d::gl::imaterial), "k3d::gl::imaterial");
 	register_type(typeid(k3d::gl::imesh_painter), "k3d::gl::imesh_painter");
 	register_type(typeid(k3d::gl::imesh_painter*), "k3d::gl::imesh_painter*");
 	register_type(typeid(k3d::i3d_2d_mapping), "k3d::i3d_2d_mapping");
-	register_type(typeid(k3d::ibitmap_read_format), "k3d::ibitmap_read_format");
+	register_type(typeid(k3d::ibitmap_exporter), "k3d::ibitmap_exporter");
+	register_type(typeid(k3d::ibitmap_importer), "k3d::ibitmap_importer");
 	register_type(typeid(k3d::ibitmap_sink), "k3d::ibitmap_sink");
 	register_type(typeid(k3d::ibitmap_source), "k3d::ibitmap_source");
-	register_type(typeid(k3d::ibitmap_write_format), "k3d::ibitmap_write_format");
 	register_type(typeid(k3d::icamera), "k3d::icamera");
 	register_type(typeid(k3d::icamera_animation_render_engine), "k3d::icamera_animation_render_engine");
 	register_type(typeid(k3d::icamera_preview_render_engine), "k3d::icamera_preview_render_engine");
 	register_type(typeid(k3d::icamera_still_render_engine), "k3d::icamera_still_render_engine");
 	register_type(typeid(k3d::icolor_source), "k3d::icolor_source");
-	register_type(typeid(k3d::idocument_read_format), "k3d::idocument_read_format");
-	register_type(typeid(k3d::idocument_write_format), "k3d::idocument_write_format");
+	register_type(typeid(k3d::idocument_importer), "k3d::idocument_importer");
+	register_type(typeid(k3d::idocument_exporter), "k3d::idocument_exporter");
 	register_type(typeid(k3d::ifile_format), "k3d::ifile_format");
 	register_type(typeid(k3d::ilong_source), "k3d::ilong_source");
 	register_type(typeid(k3d::imaterial), "k3d::imaterial");
@@ -196,6 +194,8 @@ void initialize_types()
 	register_type(typeid(k3d::legacy::mesh), "k3d::legacy::mesh");
 	register_type(typeid(k3d::legacy::mesh*), "k3d::legacy::mesh*");
 	register_type(typeid(k3d::matrix4), "k3d::matrix4");
+	register_type(typeid(k3d::mesh), "k3d::mesh");
+	register_type(typeid(k3d::mesh*), "k3d::mesh*");
 	register_type(typeid(k3d::mesh_selection), "k3d::mesh_selection");
 	register_type(typeid(k3d::normal3), "k3d::normal3");
 	register_type(typeid(k3d::point3), "k3d::point3");

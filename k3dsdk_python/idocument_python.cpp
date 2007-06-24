@@ -29,7 +29,7 @@
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/idocument.h>
-#include <k3dsdk/idocument_write_format.h>
+#include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/state_change_set.h>
@@ -61,7 +61,7 @@ idocument::idocument(k3d::idocument& Document) :
 
 const bool idocument::save(const std::string& Path)
 {
-	k3d::auto_ptr<k3d::idocument_write_format> filter(k3d::create_plugin<k3d::idocument_write_format>(k3d::classes::DocumentExporter()));
+	k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::create_plugin<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
 	if(!filter.get())
 		throw std::runtime_error("no exporter plugin available");
 

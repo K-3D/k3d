@@ -34,7 +34,7 @@
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument.h>
-#include <k3dsdk/idocument_read_format.h>
+#include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/property.h>
@@ -183,7 +183,7 @@ void create_document()
 
 void open_document(const k3d::filesystem::path& Path)
 {
-	k3d::auto_ptr<k3d::idocument_read_format> filter(k3d::create_plugin<k3d::idocument_read_format>(k3d::classes::DocumentImporter()));
+	k3d::auto_ptr<k3d::idocument_importer> filter(k3d::create_plugin<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
 	if(!filter.get())
 	{
 		error_message(_("Document importer plugin not installed."));
