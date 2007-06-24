@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<k3dml package="k3d" version="0.7.0.0" host="Linux-2.6.19-gentoo-r5;AMD Sempron(tm)   2600+">
+<k3dml package="k3d" version="0.7.0.0" host="Linux-2.6.20-15-generic;unknown">
 	<application>
 		<plugins/>
 	</application>
@@ -74,9 +74,7 @@
 					<property name="from" label="" description="" type="k3d::point3" user_property="vanilla">0 0 0</property>
 					<property name="intensity" label="" description="" type="double" user_property="vanilla">3000</property>
 					<property name="lightcolor" label="" description="" type="k3d::color" user_property="vanilla">1 1 1</property>
-					<property name="shader_path" reference="relative" relative_path="shaders/light/k3d_pointlight.sl">
-						<root>$K3D_SHARE_PATH</root>
-					</property>
+					<property name="shader_path" reference="relative" relative_path="share/shaders/light/k3d_pointlight.sl"/>
 				</properties>
 			</node>
 			<node name="Material" class="00000001 00000000 00000000 00000024" id="7">
@@ -98,9 +96,7 @@
 					<property name="Kd" label="Diffuse" description="Diffuse Amount" type="double" user_property="vanilla">0.5</property>
 					<property name="Ks" label="Specular" description="Specular Amount" type="double" user_property="vanilla">0.5</property>
 					<property name="roughness" label="Roughness" description="Surface Roughness (affects specular reflection size)" type="double" user_property="vanilla">0.1</property>
-					<property name="shader_path" reference="relative" relative_path="shaders/surface/k3d_plastic.sl">
-						<root>$K3D_SHARE_PATH</root>
-					</property>
+					<property name="shader_path" reference="relative" relative_path="share/shaders/surface/k3d_plastic.sl"/>
 					<property name="specularcolor" label="Specular Color" description="Specular Reflection Color" type="k3d::color" user_property="vanilla">1 1 1</property>
 				</properties>
 			</node>
@@ -146,7 +142,7 @@ import k3d
 
 import sys
 import os
-sys.path.append(os.path.join(k3d.share_path, &quot;scripts&quot;, &quot;animation&quot;))
+sys.path.append(os.path.join(k3d.share_path(), &quot;scripts&quot;, &quot;animation&quot;))
 
 from keyframes import *
 
@@ -166,14 +162,15 @@ curve.control_points.append(control_point(k3d.vector3(0, 10, 0), 1.0))  # Tangen
 curve.control_points.append(control_point(k3d.vector3(0, 10, 0), 1.0))  # Fourth keyframe
 curve.knots = [0, 0, 0, 0, d/3, d/3, d/3, 2*d/3, 2*d/3, 2*d/3, d, d, d, d] # Bezier knots
 
-Output = k3d.translate3(evaluate(curve, Node.time))</property>
+Output = k3d.translate3(evaluate(curve, Node.time))
+</property>
 					<property name="time" label="Time" description="" type="double" user_property="vanilla">0</property>
 				</properties>
 			</node>
 			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="14">
 				<properties>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">0.908979 0.149031 0.38929 -15.3004 -1.47103e-07 0.933904 -0.357525 10.6919 -0.416842 0.324982 0.848899 -34.3921 0 0 0 1</property>
+					<property name="matrix">0.90897899999999998 0.149031 0.38929000000000002 -15.3004 -1.4710299999999999e-07 0.93390399999999996 -0.35752499999999998 10.6919 -0.41684199999999999 0.32498199999999999 0.84889899999999996 -34.392099999999999 0 0 0 1</property>
 				</properties>
 			</node>
 			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="15">
@@ -190,10 +187,10 @@ Output = k3d.translate3(evaluate(curve, Node.time))</property>
 		</nodes>
 		<dependencies>
 			<dependency from_node="15" from_property="output_matrix" to_node="5" to_property="input_matrix"/>
-			<dependency from_node="12" from_property="time" to_node="13" to_property="time"/>
 			<dependency from_node="14" from_property="output_matrix" to_node="3" to_property="input_matrix"/>
 			<dependency from_node="13" from_property="output_matrix" to_node="10" to_property="input_matrix"/>
 			<dependency from_node="9" from_property="output_mesh" to_node="10" to_property="input_mesh"/>
+			<dependency from_node="12" from_property="time" to_node="13" to_property="time"/>
 		</dependencies>
 	</document>
 </k3dml>

@@ -98,6 +98,10 @@ void export_matrix4()
 		.def(self * self)
 		.def(self == self)
 		.def(self != self)
+		.def(self - self)
+		.def(self + self)
+		.def(self * double())
+		.def(double() * self)
 		.def(self_ns::str(self));
 }
 
