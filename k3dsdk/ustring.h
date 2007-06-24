@@ -334,7 +334,7 @@ inline ustring::ustring(size_type n, gunichar uc) : storage(n, uc) {}
 inline ustring::ustring(const Glib::ustring& str) : storage(str) {}
 inline ustring ustring::from_utf8(const std::string& src) { return ustring(Glib::ustring(src)); }
 inline ustring ustring::from_utf8(const char* src) { return ustring(Glib::ustring(src)); }
-inline ustring::ustring& ustring::operator=(const ustring& other) { storage = other.storage; return *this; }
+inline ustring& ustring::operator=(const ustring& other) { storage = other.storage; return *this; }
 inline void ustring::swap(ustring& other) { storage.swap(other.storage); }
 inline ustring& ustring::assign(const ustring& src) { storage.assign(src.storage); return *this; }
 inline ustring& ustring::assign(const ustring& src, size_type i, size_type n) { storage.assign(src.storage, i, n); return *this; }
