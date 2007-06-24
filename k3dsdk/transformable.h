@@ -60,7 +60,7 @@ public:
 	}
 
 protected:
-	matrix4 matrix()
+	virtual matrix4 matrix()
 	{
 		return m_input_matrix.value();
 	}
