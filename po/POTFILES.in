@@ -120,8 +120,8 @@ modules/imagemagick_io/imagemagick_bitmap_importer.cpp
 modules/jpeg_io/jpeg_bitmap_importer.cpp
 modules/jpeg_io/jpeg_bitmap_reader.cpp
 modules/jpeg_io/jpeg_bitmap_writer.cpp
-modules/k3d_io/k3d_document_reader.cpp
-modules/k3d_io/k3d_document_writer.cpp
+modules/k3d_io/k3d_document_exporter.cpp
+modules/k3d_io/k3d_document_importer.cpp
 modules/k3d_io/k3d_mesh_reader.cpp
 modules/k3d_io/k3d_mesh_writer.cpp
 modules/k3dscript/engine.cpp
@@ -130,7 +130,6 @@ modules/mesh/array_1d.cpp
 modules/mesh/array_2d.cpp
 modules/mesh/array_3d.cpp
 modules/mesh/bevel_faces.cpp
-modules/mesh/bevel_points.cpp
 modules/mesh/cap_hole.cpp
 modules/mesh/catmull_clark_subdivider.cpp
 modules/mesh/collapse_edges.cpp
@@ -195,6 +194,7 @@ modules/ply_io/ply_mesh_reader.cpp
 modules/png_io/png_bitmap_importer.cpp
 modules/png_io/png_bitmap_reader.cpp
 modules/png_io/png_bitmap_writer.cpp
+modules/polyhedra/bevel_points.cpp
 modules/polyhedra/extrude_faces.cpp
 modules/primitives/knot_curve.cpp
 modules/primitives/lissajous_curve.cpp
@@ -290,6 +290,7 @@ modules/texture/planar_map.cpp
 modules/texture/planar_map2.cpp
 modules/texture/sphere_map.cpp
 modules/texture/texture_map.cpp
+modules/tiff_io/tiff_bitmap_exporter.cpp
 modules/tiff_io/tiff_bitmap_importer.cpp
 modules/tiff_io/tiff_bitmap_reader.cpp
 modules/tiff_io/tiff_bitmap_writer.cpp
@@ -318,6 +319,7 @@ uimodules/ngui/document.cpp
 uimodules/ngui/document_state.cpp
 uimodules/ngui/event_recorder.cpp
 uimodules/ngui/file_chooser_dialog.cpp
+uimodules/ngui/learning_menu.cpp
 uimodules/ngui/log_window.cpp
 uimodules/ngui/main_document_window.cpp
 uimodules/ngui/menus.cpp
@@ -357,7 +359,6 @@ uimodules/ngui/timeline.cpp
 uimodules/ngui/tool_panel.cpp
 uimodules/ngui/tool_properties.cpp
 uimodules/ngui/transform_tool.h
-uimodules/ngui/tutorial_menu.cpp
 uimodules/ngui/tutorial_recorder.cpp
 uimodules/ngui/undo_tree.cpp
 uimodules/ngui/user_property.cpp
