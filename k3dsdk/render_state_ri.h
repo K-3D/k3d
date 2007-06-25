@@ -41,8 +41,9 @@ class irender_engine;
 class ishader_collection;
 	
 /// Used to pass (potentially) useful rendering state from the engine to the object being rendered
-struct render_state
+class render_state
 {
+public:
 	render_state(irender_frame& Frame, irender_engine& Engine, ishader_collection& Shaders, iprojection& Projection, const render_context_t RenderContext, const sample_times_t& SampleTimes, const unsigned_integer SampleIndex, const matrix4& CameraMatrix) :
 		frame(Frame),
 		engine(Engine),
