@@ -62,8 +62,9 @@ class ipersistent :
 {
 public:
 	/// Placeholder for arguments passed at save time
-	struct save_context
+	class save_context
 	{
+	public:
 		save_context(const filesystem::path& RootPath, idependencies& Dependencies, ipersistent_lookup& Lookup) :
 			root_path(RootPath),
 			dependencies(Dependencies),
@@ -79,8 +80,9 @@ public:
 	virtual void save(xml::element& Element, const save_context& Context) = 0;
 
 	/// Placeholder for arguments passed at load time
-	struct load_context
+	class load_context
 	{
+	public:
 		load_context(const filesystem::path& RootPath, ipersistent_lookup& Lookup) :
 			root_path(RootPath),
 			lookup(Lookup)
