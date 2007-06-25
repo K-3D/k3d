@@ -35,7 +35,7 @@ class uuid
 {
 public:
 	uuid();
-	uuid(const uint32_t Data1, const uint32_t Data2, const uint32_t Data3, const uint32_t Data4);
+	uuid(const boost::uint32_t Data1, const boost::uint32_t Data2, const boost::uint32_t Data3, const boost::uint32_t Data4);
 
 	/// Creates a NULL (all zeros) uuid
 	static const uuid null();
@@ -49,10 +49,10 @@ public:
 	friend std::ostream& operator<<(std::ostream& Stream, const uuid& Value);
 	friend std::istream& operator>>(std::istream& Stream, uuid& Value);
 
-	uint32_t data1;
-	uint32_t data2;
-	uint32_t data3;
-	uint32_t data4;
+	boost::uint32_t data1;
+	boost::uint32_t data2;
+	boost::uint32_t data3;
+	boost::uint32_t data4;
 };
 
 } // namespace k3d

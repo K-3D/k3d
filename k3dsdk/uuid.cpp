@@ -45,7 +45,7 @@ uuid::uuid() :
 {
 }
 
-uuid::uuid(const uint32_t Data1, const uint32_t Data2, const uint32_t Data3, const uint32_t Data4) :
+uuid::uuid(const boost::uint32_t Data1, const boost::uint32_t Data2, const boost::uint32_t Data3, const boost::uint32_t Data4) :
 	data1(Data1),
 	data2(Data2),
 	data3(Data3),

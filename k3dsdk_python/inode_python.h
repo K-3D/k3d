@@ -48,7 +48,7 @@ public:
 	boost::python::object document();
 	boost::python::object factory();
 
-	uint64_t hash();
+	boost::uint64_t hash();
 
 	static void define_class();
 };

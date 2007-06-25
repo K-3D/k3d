@@ -53,9 +53,9 @@ object inode::factory()
 	return object(iplugin_factory(wrapped().factory()));
 }
 
-uint64_t inode::hash()
+boost::uint64_t inode::hash()
 {
-	return reinterpret_cast<uint64_t>(wrapped_ptr());
+	return reinterpret_cast<boost::uint64_t>(wrapped_ptr());
 }
 
 void inode::define_class()
