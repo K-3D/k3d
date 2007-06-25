@@ -151,7 +151,7 @@ public:
 		return m_node;
 	}
 
-	changed_signal_t& property_changed_signal()
+	typename name_policy_t::changed_signal_t& property_changed_signal()
 	{
 		return name_policy_t::changed_signal();
 	}
