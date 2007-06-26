@@ -225,7 +225,7 @@ typedef float GLclampf;
 typedef double GLdouble;
 typedef double GLclampd;
 typedef void GLvoid;
-#if defined(_MSC_VER) && _MSC_VER < 1400
+#if defined(_MSC_VER) && _MSC_VER < 1310
 #  ifdef _WIN64
 typedef __int64 GLint64EXT;
 typedef unsigned __int64 GLuint64EXT;
@@ -4582,6 +4582,8 @@ typedef void (GLAPIENTRY * PFNGLBLITFRAMEBUFFEREXTPROC) (GLint srcX0, GLint srcY
 #define GL_EXT_framebuffer_multisample 1
 
 #define GL_RENDERBUFFER_SAMPLES_EXT 0x8CAB
+#define GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT 0x8D56
+#define GL_MAX_SAMPLES_EXT 0x8D57
 
 typedef void (GLAPIENTRY * PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC) (GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
 
@@ -4745,11 +4747,11 @@ typedef void (GLAPIENTRY * PFNGLPROGRAMPARAMETERIEXTPROC) (GLuint program, GLenu
 #ifndef GL_EXT_gpu_program_parameters
 #define GL_EXT_gpu_program_parameters 1
 
-typedef void (GLAPIENTRY * PFNGLPROGRAMENVPARAMETERS4FVPROC) (GLenum target, GLuint index, GLsizei count, const GLfloat *params);
-typedef void (GLAPIENTRY * PFNGLPROGRAMLOCALPARAMETERS4FVPROC) (GLenum target, GLuint index, GLsizei count, const GLfloat *params);
+typedef void (GLAPIENTRY * PFNGLPROGRAMENVPARAMETERS4FVEXTPROC) (GLenum target, GLuint index, GLsizei count, const GLfloat* params);
+typedef void (GLAPIENTRY * PFNGLPROGRAMLOCALPARAMETERS4FVEXTPROC) (GLenum target, GLuint index, GLsizei count, const GLfloat* params);
 
-#define glProgramEnvParameters4fv GLEW_GET_FUN(__glewProgramEnvParameters4fv)
-#define glProgramLocalParameters4fv GLEW_GET_FUN(__glewProgramLocalParameters4fv)
+#define glProgramEnvParameters4fvEXT GLEW_GET_FUN(__glewProgramEnvParameters4fvEXT)
+#define glProgramLocalParameters4fvEXT GLEW_GET_FUN(__glewProgramLocalParameters4fvEXT)
 
 #define GLEW_EXT_gpu_program_parameters GLEW_GET_VAR(__GLEW_EXT_gpu_program_parameters)
 
@@ -6607,6 +6609,21 @@ typedef void (GLAPIENTRY * PFNGLDEPTHRANGEDNVPROC) (GLdouble zNear, GLdouble zFa
 
 #endif /* GL_NV_depth_clamp */
 
+/* ---------------------- GL_NV_depth_range_unclamped ---------------------- */
+
+#ifndef GL_NV_depth_range_unclamped
+#define GL_NV_depth_range_unclamped 1
+
+#define GL_SAMPLE_COUNT_BITS_NV 0x8864
+#define GL_CURRENT_SAMPLE_COUNT_QUERY_NV 0x8865
+#define GL_QUERY_RESULT_NV 0x8866
+#define GL_QUERY_RESULT_AVAILABLE_NV 0x8867
+#define GL_SAMPLE_COUNT_NV 0x8914
+
+#define GLEW_NV_depth_range_unclamped GLEW_GET_VAR(__GLEW_NV_depth_range_unclamped)
+
+#endif /* GL_NV_depth_range_unclamped */
+
 /* ---------------------------- GL_NV_evaluators --------------------------- */
 
 #ifndef GL_NV_evaluators
@@ -6797,11 +6814,9 @@ typedef void (GLAPIENTRY * PFNGLPROGRAMNAMEDPARAMETER4FVNVPROC) (GLuint id, GLsi
 #define GL_NV_framebuffer_multisample_coverage 1
 
 #define GL_RENDERBUFFER_COVERAGE_SAMPLES_NV 0x8CAB
-#define GL_MAX_RENDERBUFFER_COVERAGE_SAMPLES_NV 0x8D57
 #define GL_RENDERBUFFER_COLOR_SAMPLES_NV 0x8E10
-#define GL_MAX_RENDERBUFFER_COLOR_SAMPLES_NV 0x8E11
-#define GL_MAX_MULTISAMPLE_COVERAGE_MODES_NV 0x8E12
-#define GL_MULTISAMPLE_COVERAGE_MODES_NV 0x8E13
+#define GL_MAX_MULTISAMPLE_COVERAGE_MODES_NV 0x8E11
+#define GL_MULTISAMPLE_COVERAGE_MODES_NV 0x8E12
 
 typedef void (GLAPIENTRY * PFNGLRENDERBUFFERSTORAGEMULTISAMPLECOVERAGENVPROC) (GLenum target, GLsizei coverageSamples, GLsizei colorSamples, GLenum internalformat, GLsizei width, GLsizei height);
 
@@ -7484,7 +7499,7 @@ typedef void (GLAPIENTRY * PFNGLGETCOMBINERSTAGEPARAMETERFVNVPROC) (GLenum stage
 #define GL_PRIMITIVES_GENERATED_NV 0x8C87
 #define GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN_NV 0x8C88
 #define GL_RASTERIZER_DISCARD_NV 0x8C89
-#define GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_ATTRIBS_NV 0x8C8A
+#define GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS_NV 0x8C8A
 #define GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS_NV 0x8C8B
 #define GL_INTERLEAVED_ATTRIBS_NV 0x8C8C
 #define GL_SEPARATE_ATTRIBS_NV 0x8C8D
@@ -9720,8 +9735,8 @@ GLEW_FUN_EXPORT PFNGLFRAMEBUFFERTEXTUREFACEEXTPROC __glewFramebufferTextureFaceE
 GLEW_FUN_EXPORT PFNGLFRAMEBUFFERTEXTURELAYEREXTPROC __glewFramebufferTextureLayerEXT;
 GLEW_FUN_EXPORT PFNGLPROGRAMPARAMETERIEXTPROC __glewProgramParameteriEXT;
 
-GLEW_FUN_EXPORT PFNGLPROGRAMENVPARAMETERS4FVPROC __glewProgramEnvParameters4fv;
-GLEW_FUN_EXPORT PFNGLPROGRAMLOCALPARAMETERS4FVPROC __glewProgramLocalParameters4fv;
+GLEW_FUN_EXPORT PFNGLPROGRAMENVPARAMETERS4FVEXTPROC __glewProgramEnvParameters4fvEXT;
+GLEW_FUN_EXPORT PFNGLPROGRAMLOCALPARAMETERS4FVEXTPROC __glewProgramLocalParameters4fvEXT;
 
 GLEW_FUN_EXPORT PFNGLBINDFRAGDATALOCATIONEXTPROC __glewBindFragDataLocationEXT;
 GLEW_FUN_EXPORT PFNGLGETFRAGDATALOCATIONEXTPROC __glewGetFragDataLocationEXT;
@@ -10513,6 +10528,7 @@ GLEW_VAR_EXPORT GLboolean __GLEW_NV_blend_square;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_copy_depth_to_color;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_depth_buffer_float;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_depth_clamp;
+GLEW_VAR_EXPORT GLboolean __GLEW_NV_depth_range_unclamped;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_evaluators;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_fence;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_float_buffer;
@@ -10651,11 +10667,10 @@ GLEWAPI GLboolean glewContextIsSupported (GLEWContext* ctx, const char* name);
 #define glewIsSupported(x) glewContextIsSupported(glewGetContext(), x)
 #define glewIsExtensionSupported(x) glewIsSupported(x)
 
+#define GLEW_GET_VAR(x) (*(const GLboolean*)&(glewGetContext()->x))
 #ifdef _WIN32
-#  define GLEW_GET_VAR(x) glewGetContext()->x
 #  define GLEW_GET_FUN(x) glewGetContext()->x
 #else
-#  define GLEW_GET_VAR(x) glewGetContext()->x
 #  define GLEW_GET_FUN(x) x
 #endif
 
@@ -10665,7 +10680,7 @@ GLEWAPI GLenum glewInit ();
 GLEWAPI GLboolean glewIsSupported (const char* name);
 #define glewIsExtensionSupported(x) glewIsSupported(x)
 
-#define GLEW_GET_VAR(x) x
+#define GLEW_GET_VAR(x) (*(const GLboolean*)&x)
 #define GLEW_GET_FUN(x) x
 
 #endif /* GLEW_MX */

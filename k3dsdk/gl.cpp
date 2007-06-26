@@ -17,11 +17,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/** \file Singleton class to store the glew context, needed for multiple OpenGL windows on Win32
+/** \file Singleton class to store the glew context, needed for multiple OpenGL windows
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
-
-#if defined K3D_PLATFORM_WIN32
 
 #include "gl.h"
 
@@ -43,5 +41,3 @@ GLEWContext* glew_context::context()
 {
 	return m_context;
 }
-
-#endif

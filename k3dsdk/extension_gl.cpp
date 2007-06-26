@@ -109,20 +109,16 @@ void enable(const std::string& Extension)
 const bool query(const std::string& Extension)
 { 
 	bool result = (detail::enabled().count(Extension) || detail::extensions().count(Extension)) && !detail::disabled().count(Extension);
-	#ifdef K3D_PLATFORM_WIN32
-		// extra glew check on win32, to be sure the function pointer is initialised
-		if (glewGetContext()) 
-			return_val_if_fail(glewIsSupported(Extension.c_str()), false);
-	#endif
+	// extra glew check for glew, to be sure the function pointer is initialised
+	if (glewGetContext()) 
+		return_val_if_fail(glewIsSupported(Extension.c_str()), false);
 	return result;
 }
 
 bool query_vbo()
 {
-	#ifdef K3D_PLATFORM_WIN32
 	if (glewGetContext())
 		return GLEW_VERSION_1_5 || query("GL_ARB_vertex_buffer_object");
-	#endif
 	return query("GL_ARB_vertex_buffer_object");
 }
 

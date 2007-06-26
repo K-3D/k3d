@@ -364,12 +364,8 @@ public:
 		m_still_engine(init_value<k3d::icamera_still_render_engine*>(0)),
 		m_animation_engine(init_value<k3d::icamera_animation_render_engine*>(0)),
 		m_font_begin(0),
-		#ifdef K3D_PLATFORM_WIN32
 		m_font_end(0),
 		m_glew_context(0)
-		#else
-		m_font_end(0)
-		#endif
 	{
 	}
 
@@ -407,9 +403,7 @@ public:
 	sigc::signal<void> m_panel_grab_signal;
 	
 	/// Keep track of glew initialisation
-	#ifdef K3D_PLATFORM_WIN32
 	GLEWContext* m_glew_context;
-	#endif
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1256,8 +1250,7 @@ bool control::on_redraw()
 	return_val_if_fail(context, true);
 
 	return_val_if_fail(gdk_gl_drawable_gl_begin(drawable, context), true);
-	
-	#ifdef K3D_PLATFORM_WIN32	
+		
 	if (!m_implementation->m_glew_context)
 	{
 		m_implementation->m_glew_context = new GLEWContext();
@@ -1274,7 +1267,6 @@ bool control::on_redraw()
 	}
 	
 	glew_context::instance().set_context(m_implementation->m_glew_context);
-	#endif
 	
 	create_font();
 	glViewport(0, 0, width, height);
