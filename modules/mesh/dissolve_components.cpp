@@ -58,7 +58,7 @@ public:
 		if(!point_set.size())
 			return;
 
-		point_set_t::const_iterator point = point_set.find(Edge.vertex);
+		point_set_t::iterator point = point_set.find(Edge.vertex);
 		if(point != point_set.end())
 			point_set.erase(point);
 	}
@@ -70,7 +70,7 @@ public:
 
 		for(k3d::legacy::linear_curve::control_points_t::iterator curve_point = Curve.control_points.begin(); curve_point != Curve.control_points.end(); ++curve_point)
 		{
-			point_set_t::const_iterator point = point_set.find(*curve_point);
+			point_set_t::iterator point = point_set.find(*curve_point);
 			if(point != point_set.end())
 				point_set.erase(point);
 		}
@@ -85,7 +85,7 @@ public:
 
 		for(k3d::legacy::cubic_curve::control_points_t::iterator curve_point = Curve.control_points.begin(); curve_point != Curve.control_points.end(); ++curve_point)
 		{
-			point_set_t::const_iterator point = point_set.find(*curve_point);
+			point_set_t::iterator point = point_set.find(*curve_point);
 			if(point != point_set.end())
 				point_set.erase(point);
 		}
@@ -100,7 +100,7 @@ public:
 
 		for(k3d::legacy::nucurve::control_points_t::iterator curve_point = Curve.control_points.begin(); curve_point != Curve.control_points.end(); ++curve_point)
 		{
-			point_set_t::const_iterator point = point_set.find(curve_point->position);
+			point_set_t::iterator point = point_set.find(curve_point->position);
 			if(point != point_set.end())
 				point_set.erase(point);
 		}
@@ -115,7 +115,7 @@ public:
 
 		for(k3d::legacy::bilinear_patch::control_points_t::iterator control_point = Patch.control_points.begin(); control_point != Patch.control_points.end(); ++control_point)
 		{
-			point_set_t::const_iterator point = point_set.find(*control_point);
+			point_set_t::iterator point = point_set.find(*control_point);
 			if(point != point_set.end())
 				point_set.erase(point);
 		}
@@ -128,7 +128,7 @@ public:
 
 		for(k3d::legacy::bicubic_patch::control_points_t::iterator control_point = Patch.control_points.begin(); control_point != Patch.control_points.end(); ++control_point)
 		{
-			point_set_t::const_iterator point = point_set.find(*control_point);
+			point_set_t::iterator point = point_set.find(*control_point);
 			if(point != point_set.end())
 				point_set.erase(point);
 		}
@@ -141,7 +141,7 @@ public:
 
 		for(k3d::legacy::nupatch::control_points_t::iterator control_point = Patch.control_points.begin(); control_point != Patch.control_points.end(); ++control_point)
 		{
-			point_set_t::const_iterator point = point_set.find(control_point->position);
+			point_set_t::iterator point = point_set.find(control_point->position);
 			if(point != point_set.end())
 				point_set.erase(point);
 		}
@@ -370,7 +370,7 @@ void dissolve_polyhedron(k3d::legacy::polyhedron& Polyhedron, k3d::legacy::mesh&
 	}
 
 	// Erase deleted faces
-	Polyhedron.faces.erase(std::remove_if(Polyhedron.faces.begin(), Polyhedron.faces.end(), std::bind2nd(std::equal_to<k3d::legacy::face*>(), 0)), Polyhedron.faces.end());
+	Polyhedron.faces.erase(std::remove_if(Polyhedron.faces.begin(), Polyhedron.faces.end(), std::bind2nd(std::equal_to<k3d::legacy::face*>(), (k3d::legacy::face*)0)), Polyhedron.faces.end());
 
 	// DissolvePoints : select each edge connected to a selected point
 	bool possible_invalidation = false;
@@ -530,7 +530,7 @@ void dissolve_polyhedron(k3d::legacy::polyhedron& Polyhedron, k3d::legacy::mesh&
 	}
 
 	// Erase deleted faces
-	Polyhedron.faces.erase(std::remove_if(Polyhedron.faces.begin(), Polyhedron.faces.end(), std::bind2nd(std::equal_to<k3d::legacy::face*>(), 0)), Polyhedron.faces.end());
+	Polyhedron.faces.erase(std::remove_if(Polyhedron.faces.begin(), Polyhedron.faces.end(), std::bind2nd(std::equal_to<k3d::legacy::face*>(), (k3d::legacy::face*)0)), Polyhedron.faces.end());
 
 	// Delete floating points
 	k3d::legacy::for_each_component(Mesh, remove_used_points(touched_points));

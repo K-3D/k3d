@@ -528,7 +528,7 @@ public:
 		}
 		else if (Level == m_level + 1)
 		{
-			m_next_level = new sds_mipmap(m_top.next_level(), m_right.next_level(), m_bottom.next_level(), m_left.next_level(), m_points, Level, static_cast<int>(pow(2,Level)+1));
+			m_next_level = new sds_mipmap(m_top.next_level(), m_right.next_level(), m_bottom.next_level(), m_left.next_level(), m_points, Level, static_cast<int>(pow(2.0, static_cast<double>(Level))+1));
 		}
 	}
 

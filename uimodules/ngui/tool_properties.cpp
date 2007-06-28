@@ -158,7 +158,7 @@ public:
 
 		// Create a toolbar ...
 		toolbar::control* const toolbar_control = new toolbar::control(m_parent, "toolbar");
-		m_vbox.pack_start(*manage(toolbar_control), Gtk::PACK_SHRINK);
+		m_vbox.pack_start(*Gtk::manage(toolbar_control), Gtk::PACK_SHRINK);
 
 		k3d::istate_recorder* const state_recorder = 0;
 
@@ -192,10 +192,10 @@ public:
 				continue;
 
 			collapsible_frame::control* const frame = new collapsible_frame::control(property_group->name, m_collapsible_frame_group);
-			m_vbox.pack_start(*manage(frame), Gtk::PACK_SHRINK);
+			m_vbox.pack_start(*Gtk::manage(frame), Gtk::PACK_SHRINK);
 
 			Gtk::Table* const table = new Gtk::Table(property_group->properties.size(), 5, false);
-			frame->add(*manage(table));
+			frame->add(*Gtk::manage(table));
 
 			// Store entries for focus chain within table
 			std::list<Gtk::Widget*> entry_list;
@@ -217,12 +217,12 @@ public:
 				const std::type_info& property_type = property.property_type();
 
 				// Provide a property button for the property ...
-				table->attach(*manage(
+				table->attach(*Gtk::manage(
 					new property_button::control(m_parent, property_name + "_property", property_widget::proxy(m_document_state,property))),
 					prop_button_begin, prop_button_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
 
 				// Provide a label for the property ...
-				table->attach(*manage(
+				table->attach(*Gtk::manage(
 					new property_label::control(m_parent, property_name + "_label", property_widget::proxy(m_document_state, property))),
 					prop_label_begin, prop_label_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
@@ -230,7 +230,7 @@ public:
 				if(property_type == typeid(bool))
 				{
 					check_button::control* const control = new check_button::control(m_parent, property_name, check_button::proxy(property, state_recorder, property_name));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);
 				}
@@ -244,7 +244,7 @@ public:
 						control->set_step_increment(measurement_property->property_step_increment());
 						control->set_units(measurement_property->property_units());
 					}
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);
 				}
@@ -252,7 +252,7 @@ public:
 				else if(property_type == typeid(k3d::color) || property_type == typeid(k3d::ri::color))
 				{
 					color_chooser::control* const control = new color_chooser::control(m_parent, property_name, color_chooser::proxy(property, state_recorder, property_name));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);
 				}
@@ -262,7 +262,7 @@ public:
 					if(dynamic_cast<k3d::ienumeration_property*>(&property))
 					{
 						enumeration_chooser::control* const control = new enumeration_chooser::control(m_parent, property_name, enumeration_chooser::proxy(property, state_recorder, property_name));
-						table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+						table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 						entry_list.push_back(control);
 					}
@@ -277,14 +277,14 @@ public:
 					{
 						combo_box::control* const control = new combo_box::control(m_parent, property_name, combo_box::proxy(property, state_recorder, property_name));
 						control->set_values(list_property->property_values());
-						table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+						table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 						entry_list.push_back(control);
 					}
 					else
 					{
 						entry::control* const control = new entry::control(m_parent, property_name, entry::proxy(property, state_recorder, property_name));
-						table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+						table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 						entry_list.push_back(control);
 					}
@@ -293,7 +293,7 @@ public:
 				else if(k3d::aqsis::ilayer_connection_property* const layer_connection_property = dynamic_cast<k3d::aqsis::ilayer_connection_property*>(&property))
 				{
 					aqsis_layer_chooser::control* const control = new aqsis_layer_chooser::control(m_document_state, *layer_connection_property, m_parent, property_name, state_recorder);
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);
 				}
@@ -301,7 +301,7 @@ public:
 				else if(property_type == typeid(k3d::inode*))
 				{
 					node_chooser::control* const control = new node_chooser::control(m_parent, property_name, node_chooser::proxy(m_document_state, property, state_recorder, property_name), node_chooser::filter(property));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);
 				}
@@ -310,7 +310,7 @@ public:
 				else if(property_type == typeid(k3d::bitmap*))
 				{
 					bitmap_preview::control* const control = new bitmap_preview::control(m_parent, property_name, bitmap_preview::proxy(property));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);
 				}
@@ -319,7 +319,7 @@ public:
 				else if(property_type == typeid(k3d::filesystem::path))
 				{
 					path_chooser::control* const control = new path_chooser::control(m_parent, property_name, path_chooser::proxy(property, state_recorder, property_name));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);
 				}
@@ -327,7 +327,7 @@ public:
 				else if(property_type == typeid(k3d::bounding_box3))
 				{
 					bounding_box::control* const control = new bounding_box::control(m_parent, property_name, bounding_box::proxy(property));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);
 				}
@@ -335,7 +335,7 @@ public:
 				else if(property_type == typeid(k3d::vector3) || property_type == typeid(k3d::point3) || property_type == typeid(k3d::ri::point))
 				{
 					point::control* const control = new point::control(m_parent, property_name, point::proxy(property));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);
 				}
@@ -343,7 +343,7 @@ public:
 				else if(property_type == typeid(k3d::angle_axis))
 				{
 					angle_axis::control* const control = new angle_axis::control(m_parent, property_name, angle_axis::proxy(property, state_recorder, property_name));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);
 				}
@@ -359,7 +359,7 @@ public:
 				else if(property_type == typeid(k3d::mesh_selection))
 				{
 					selection_button::control* const control = new selection_button::control(m_parent, property_name, selection_button::proxy(property, state_recorder, property_name));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 				}
 				else
 				{

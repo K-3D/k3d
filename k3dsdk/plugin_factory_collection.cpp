@@ -51,8 +51,7 @@ namespace detail
 // os_load_module
 
 #if defined K3D_PLATFORM_WIN32
-
-	#include <windows.h>
+	#include "win32.h"
 
 	static void os_load_module(const filesystem::path& FilePath, register_plugins_entry_point& RegisterPlugins)
 	{

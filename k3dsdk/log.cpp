@@ -27,7 +27,7 @@
 #ifdef K3D_PLATFORM_WIN32
 
 	#include <time.h>
-	#include <windows.h>
+	#include "win32.h"
 
 #elif defined K3D_PLATFORM_DARWIN
 

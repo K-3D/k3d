@@ -26,7 +26,7 @@
 #include "uuid.h"
 
 #ifdef K3D_PLATFORM_WIN32
-	#include <windows.h>
+	#include "win32.h"
 #else // K3D_PLATFORM_WIN32
 	#include <uuid/uuid.h>
 #endif // !K3D_PLATFORM_WIN32

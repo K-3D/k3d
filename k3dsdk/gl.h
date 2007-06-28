@@ -25,12 +25,7 @@
 */
 
 #if defined K3D_PLATFORM_WIN32
-
-	#include <windows.h>
-	#undef min
-	#undef max
-	#undef interface
-
+	#include "win32.h"
 #endif // !K3D_PLATFORM_WIN32
 
 #define GLEW_MX // multiple-context glew as per http://glew.sourceforge.net/advanced.html

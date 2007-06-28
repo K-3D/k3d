@@ -37,8 +37,8 @@ using namespace k3d::xml;
 
 #ifdef K3D_PLATFORM_WIN32
 
+	#include <k3dsdk/win32.h>
 	#include <direct.h>
-	#include <windows.h>
 	#define chdir _chdir
 
 #endif // K3D_PLATFORM_WIN32

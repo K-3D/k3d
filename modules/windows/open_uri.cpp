@@ -27,10 +27,9 @@
 #include <k3dsdk/iuri.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/result.h>
+#include <k3dsdk/win32.h>
 
 #include <iostream>
-
-#include <windows.h>
 
 namespace libk3dwindows
 {

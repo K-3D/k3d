@@ -294,7 +294,7 @@ public:
 	{
 		// Calculate standard terrain parameters ...
 		const unsigned long iterations = m_iterations.value();
-		const unsigned long points = static_cast<unsigned long>(pow(2, iterations));
+		const unsigned long points = static_cast<unsigned long>(pow(2.0, static_cast<double>(iterations)));
 		const unsigned long segments = points - 1;
 		const double terrain_width = 20.0;
 		k3d::imaterial* const material = m_material.value();

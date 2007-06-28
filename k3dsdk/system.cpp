@@ -38,13 +38,13 @@
 
 // Define some platform-specific odds-and-ends
 #ifdef K3D_PLATFORM_WIN32
-
 	#define SEARCHPATH_SEPARATOR_STRING ";"
 	#define DEFAULT_TEMP_DIRECTORY "c:\\"
 	#define DEFAULT_HOME_DIRECTORY "c:\\"
 	#define popen _popen
+
+	#include "win32.h"
 	#include <io.h>
-	#include <windows.h>
 
 #else // K3D_PLATFORM_WIN32
 

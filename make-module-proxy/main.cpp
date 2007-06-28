@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
 	k3d::xml::element& xml_plugins = xml_module.append(k3d::xml::element("plugins"));
 
-	for(k3d::iplugin_factory_collection::factories_t::iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
 		k3d::xml::element& xml_plugin = xml_plugins.append(
 			k3d::xml::element("plugin",

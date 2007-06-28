@@ -121,7 +121,7 @@ const double basis(const unsigned long i, const unsigned long k, const double t,
 		}
 	else
 		{
-			if(knots[i] <= t and t <= knots[i + 1])
+			if(knots[i] <= t && t <= knots[i + 1])
 				ret = 1;
 			else
 				ret = 0;

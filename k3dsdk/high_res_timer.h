@@ -31,10 +31,11 @@
 #include <iostream>
 #include <string>
 
-#include <sys/time.h>
 
 #ifdef K3D_PLATFORM_WIN32
-#include <windows.h>
+	#include "win32.h"
+#else
+	#include <sys/time.h>
 #endif // K3D_PLATFORM_WIN32
 
 namespace k3d

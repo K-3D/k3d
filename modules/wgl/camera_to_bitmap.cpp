@@ -30,8 +30,7 @@
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-
-#include <windows.h>
+#include <k3dsdk/win32.h>
 
 #include <iterator>
 

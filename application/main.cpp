@@ -63,8 +63,7 @@
 #include <iterator>
 
 #ifdef K3D_PLATFORM_WIN32
-#include <windows.h>
-#undef interface
+	#include <k3dsdk/win32.h>
 #endif // K3D_PLATFORM_WIN32
 
 namespace

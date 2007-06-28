@@ -170,23 +170,23 @@ struct expression_grammar :
 			binary_function_arguments = ch_p('(') >> expression >> ch_p(',') >> expression >> ch_p(')');
 
 			builtins = primary_expression
-				 | (str_p("abs") >> unary_function_arguments)[unary_operator(&fabs, self.m_stack)]
-				 | (str_p("acos") >> unary_function_arguments)[unary_operator(&acos, self.m_stack)]
-				 | (str_p("asin") >> unary_function_arguments)[unary_operator(&asin, self.m_stack)]
-				 | (str_p("atan") >> unary_function_arguments)[unary_operator(&atan, self.m_stack)]
-				 | (str_p("ceil") >> unary_function_arguments)[unary_operator(&ceil, self.m_stack)]
-				 | (str_p("cos") >> unary_function_arguments)[unary_operator(&cos, self.m_stack)]
-				 | (str_p("cosh") >> unary_function_arguments)[unary_operator(&cosh, self.m_stack)]
-				 | (str_p("exp") >> unary_function_arguments)[unary_operator(&exp, self.m_stack)]
-				 | (str_p("floor") >> unary_function_arguments)[unary_operator(&floor, self.m_stack)]
-				 | (str_p("log") >> unary_function_arguments)[unary_operator(&::log, self.m_stack)]
-				 | (str_p("log10") >> unary_function_arguments)[unary_operator(&log10, self.m_stack)]
-				 | (str_p("pow") >> binary_function_arguments)[binary_operator(&pow, self.m_stack)]
-				 | (str_p("sin") >> unary_function_arguments)[unary_operator(&sin, self.m_stack)]
-				 | (str_p("sinh") >> unary_function_arguments)[unary_operator(&sinh, self.m_stack)]
-				 | (str_p("sqrt") >> unary_function_arguments)[unary_operator(&sqrt, self.m_stack)]
-				 | (str_p("tan") >> unary_function_arguments)[unary_operator(&tan, self.m_stack)]
-				 | (str_p("tanh") >> unary_function_arguments)[unary_operator(&tanh, self.m_stack)];
+				 | (str_p("abs") >> unary_function_arguments)[unary_operator((double(*)(double))&fabs, self.m_stack)]
+				 | (str_p("acos") >> unary_function_arguments)[unary_operator((double(*)(double))&acos, self.m_stack)]
+				 | (str_p("asin") >> unary_function_arguments)[unary_operator((double(*)(double))&asin, self.m_stack)]
+				 | (str_p("atan") >> unary_function_arguments)[unary_operator((double(*)(double))&atan, self.m_stack)]
+				 | (str_p("ceil") >> unary_function_arguments)[unary_operator((double(*)(double))&ceil, self.m_stack)]
+				 | (str_p("cos") >> unary_function_arguments)[unary_operator((double(*)(double))&cos, self.m_stack)]
+				 | (str_p("cosh") >> unary_function_arguments)[unary_operator((double(*)(double))&cosh, self.m_stack)]
+				 | (str_p("exp") >> unary_function_arguments)[unary_operator((double(*)(double))&exp, self.m_stack)]
+				 | (str_p("floor") >> unary_function_arguments)[unary_operator((double(*)(double))&floor, self.m_stack)]
+				 | (str_p("log") >> unary_function_arguments)[unary_operator((double(*)(double))&::log, self.m_stack)]
+				 | (str_p("log10") >> unary_function_arguments)[unary_operator((double(*)(double))&log10, self.m_stack)]
+				 | (str_p("pow") >> binary_function_arguments)[binary_operator((double(*)(double, double))&pow, self.m_stack)]
+				 | (str_p("sin") >> unary_function_arguments)[unary_operator((double(*)(double))&sin, self.m_stack)]
+				 | (str_p("sinh") >> unary_function_arguments)[unary_operator((double(*)(double))&sinh, self.m_stack)]
+				 | (str_p("sqrt") >> unary_function_arguments)[unary_operator((double(*)(double))&sqrt, self.m_stack)]
+				 | (str_p("tan") >> unary_function_arguments)[unary_operator((double(*)(double))&tan, self.m_stack)]
+				 | (str_p("tanh") >> unary_function_arguments)[unary_operator((double(*)(double))&tanh, self.m_stack)];
 
 			multiplicative_expression = builtins >>
 				*((ch_p('*') >> builtins)[binary_operator(std::multiplies<double>(), self.m_stack)]

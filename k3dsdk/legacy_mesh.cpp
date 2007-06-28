@@ -27,13 +27,29 @@
 namespace k3d
 {
 
+k3d_instantiate_memory_cache(legacy::point);
+k3d_instantiate_memory_cache(legacy::point_group);
+k3d_instantiate_memory_cache(legacy::split_edge);
+k3d_instantiate_memory_cache(legacy::face);
+k3d_instantiate_memory_cache(legacy::polyhedron);
+k3d_instantiate_memory_cache(legacy::linear_curve);
+k3d_instantiate_memory_cache(legacy::linear_curve_group);
+k3d_instantiate_memory_cache(legacy::cubic_curve);
+k3d_instantiate_memory_cache(legacy::cubic_curve_group);
+k3d_instantiate_memory_cache(legacy::nucurve);
+k3d_instantiate_memory_cache(legacy::nucurve_group);
+k3d_instantiate_memory_cache(legacy::bilinear_patch);
+k3d_instantiate_memory_cache(legacy::bicubic_patch);
+k3d_instantiate_memory_cache(legacy::nupatch);
+k3d_instantiate_memory_cache(legacy::blobby);
+k3d_instantiate_memory_cache(legacy::mesh);
+
 namespace legacy
 {
 	
 /////////////////////////////////////////////////////////////////////////////
 // point
 
-k3d_instantiate_memory_cache(point);
 
 point::point(const point3& Position) :
 	position(Position)
@@ -48,8 +64,6 @@ point::point(const double X, const double Y, const double Z) :
 /////////////////////////////////////////////////////////////////////////////
 // point_group
 
-k3d_instantiate_memory_cache(point_group);
-
 point_group::point_group() :
 	material(0)
 {
@@ -57,8 +71,6 @@ point_group::point_group() :
 
 /////////////////////////////////////////////////////////////////////////////
 // split_edge
-
-k3d_instantiate_memory_cache(split_edge);
 
 split_edge::~split_edge()
 {
@@ -69,8 +81,6 @@ split_edge::~split_edge()
 
 /////////////////////////////////////////////////////////////////////////////
 // face
-
-k3d_instantiate_memory_cache(face);
 
 face::face(split_edge* FirstEdge, imaterial* Material) :
 	first_edge(FirstEdge),
@@ -137,8 +147,6 @@ normal3 normal(const face& Face)
 
 /////////////////////////////////////////////////////////////////////////////
 // polyhedron
-
-k3d_instantiate_memory_cache(polyhedron);
 
 polyhedron::polyhedron() :
 	type(POLYGONS)
@@ -271,12 +279,9 @@ void set_companions(k3d::legacy::polyhedron& Polyhedron)
 /////////////////////////////////////////////////////////////////////////////
 // linear_curve
 
-k3d_instantiate_memory_cache(linear_curve);
 
 /////////////////////////////////////////////////////////////////////////////
 // linear_curve_group
-
-k3d_instantiate_memory_cache(linear_curve_group);
 
 linear_curve_group::linear_curve_group() :
 	wrap(false),
@@ -292,12 +297,8 @@ linear_curve_group::~linear_curve_group()
 /////////////////////////////////////////////////////////////////////////////
 // cubic_curve
 
-k3d_instantiate_memory_cache(cubic_curve);
-
 /////////////////////////////////////////////////////////////////////////////
 // cubic_curve_group
-
-k3d_instantiate_memory_cache(cubic_curve_group);
 
 cubic_curve_group::cubic_curve_group() :
 	wrap(false),
@@ -313,8 +314,6 @@ cubic_curve_group::~cubic_curve_group()
 /////////////////////////////////////////////////////////////////////////////
 // nucurve
 
-k3d_instantiate_memory_cache(nucurve);
-
 nucurve::nucurve() :
 	order(2)
 {
@@ -322,8 +321,6 @@ nucurve::nucurve() :
 
 /////////////////////////////////////////////////////////////////////////////
 // nucurve_group
-
-k3d_instantiate_memory_cache(nucurve_group);
 
 nucurve_group::nucurve_group() :
 	material(0)
@@ -338,8 +335,6 @@ nucurve_group::~nucurve_group()
 /////////////////////////////////////////////////////////////////////////////
 // bilinear_patch
 
-k3d_instantiate_memory_cache(bilinear_patch);
-
 bilinear_patch::bilinear_patch() :
 	material(0)
 {
@@ -348,8 +343,6 @@ bilinear_patch::bilinear_patch() :
 /////////////////////////////////////////////////////////////////////////////
 // bicubic_patch
 
-k3d_instantiate_memory_cache(bicubic_patch);
-
 bicubic_patch::bicubic_patch() :
 	material(0)
 {
@@ -357,8 +350,6 @@ bicubic_patch::bicubic_patch() :
 
 /////////////////////////////////////////////////////////////////////////////
 // nupatch
-
-k3d_instantiate_memory_cache(nupatch);
 
 nupatch::nupatch() :
 	u_order(2),
@@ -369,8 +360,6 @@ nupatch::nupatch() :
 
 /////////////////////////////////////////////////////////////////////////////
 // blobby
-
-k3d_instantiate_memory_cache(blobby);
 
 blobby::blobby(opcode* Opcode) :
 	root(Opcode),
@@ -584,8 +573,6 @@ void blobby::min::accept(visitor& Visitor)
 
 /////////////////////////////////////////////////////////////////////////////
 // mesh
-
-k3d_instantiate_memory_cache(mesh);
 
 mesh::mesh()
 {
