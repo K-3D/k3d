@@ -23,13 +23,15 @@
 		\author Dan Erikson (derikson@montana.com)
 */
 
+#include "k3d-i18n-config.h"
+#include "k3d-version-config.h"
+
 #include "application.h"
 #include "classes.h"
 #include "command_node.h"
 #include "data.h"
 #include "dependencies.h"
 #include "document.h"
-#include "i18n.h"
 #include "idag.h"
 #include "ideletable.h"
 #include "idocument.h"
@@ -49,7 +51,6 @@
 #include "string_cast.h"
 #include "string_modifiers.h"
 #include "utility.h"
-#include "version.h"
 #include "xml.h"
 using namespace k3d::xml;
 

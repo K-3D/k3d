@@ -24,11 +24,11 @@
 */
 
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/mesh_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/version.h>
+#include <k3d-version-config.h>
 
 #include <k3dsdk/fstream.h>
 

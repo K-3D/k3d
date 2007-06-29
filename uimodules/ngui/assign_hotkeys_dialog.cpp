@@ -27,7 +27,7 @@
 #include "button.h"
 #include "widget_manip.h"
 
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/buttonbox.h>

@@ -27,7 +27,7 @@
 #include "main_document_window.h"
 #include "messages.h"
 
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/classes.h>

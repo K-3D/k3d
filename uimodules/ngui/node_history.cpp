@@ -33,7 +33,7 @@
 #include "node_history.h"
 #include "ui_component.h"
 
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/idag.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iproperty_collection.h>

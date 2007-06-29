@@ -13,6 +13,7 @@ SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 # Disallow in-source builds
 INCLUDE(OutOfSourceBuild)
 
+# Set the K-3D version
 SET(MAJOR_VERSION 0)
 SET(MINOR_VERSION 7)
 SET(RELEASE_VERSION 0)
@@ -24,6 +25,7 @@ SET(host ${CMAKE_SYSTEM} ${CMAKE_SYSTEM_PROCESSOR})
 SET(COPYRIGHT "Copyright (c) 1995-2007, Timothy M. Shead.  All Rights Reserved.")
 SET(prefix ${CMAKE_INSTALL_PREFIX})
 
+# Setup testing
 INCLUDE(CTest)
 ENABLE_TESTING()
 MARK_AS_ADVANCED(BUILD_TESTING)
@@ -253,28 +255,29 @@ IF(K3D_BUILD_TIFF_IO_MODULE)
 	ENDIF(NOT K3D_TIFF_FOUND)
 ENDIF(K3D_BUILD_TIFF_IO_MODULE)
 
-######################################################################
-# Posix specific configuration
-
-IF(UNIX)
-	ADD_DEFINITIONS(-DK3D_PLATFORM_POSIX)
-ENDIF(UNIX)
-
-######################################################################
-# Win32 specific configuration
-
+# Compiler configuration
 IF(WIN32)
-	ADD_DEFINITIONS(-DK3D_PLATFORM_WIN32)
+	IF(MSVC)
+		SET(K3D_COMPILER_MSVC TRUE)
+	ELSE(MSVC)
+		SET(K3D_COMPILER_GCC TRUE)
+	ENDIF(MSVC)
+ELSE(WIN32)
+	SET(K3D_COMPILER_GCC TRUE)
+ENDIF(WIN32)
+
+# Win32 API configuration
+IF(WIN32)
+	SET(K3D_API_WIN32 TRUE)
 	SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,--enable-runtime-pseudo-reloc -Wl,--export-all-symbols" CACHE STRING "" FORCE)
 ENDIF(WIN32)
 
-######################################################################
-# Mac OS X specific configuration
-
+# Darwin API configuration
 IF(APPLE)
-	ADD_DEFINITIONS(-DK3D_PLATFORM_DARWIN)
+	SET(K3D_API_DARWIN TRUE)
 ENDIF(APPLE)
 
+# Setup output directories ...
 SET(EXECUTABLE_OUTPUT_PATH ${k3d_BINARY_DIR}/bin)
 
 IF(WIN32)
@@ -283,13 +286,13 @@ ELSE(WIN32)
 	SET(LIBRARY_OUTPUT_PATH ${k3d_BINARY_DIR}/lib)
 ENDIF(WIN32)
 
+# Setup subdirectories ...
 IF(MSVC)
 	ADD_SUBDIRECTORY(gendef)
 ENDIF(MSVC)
 
 
 ADD_SUBDIRECTORY(glew)
-
 
 ADD_SUBDIRECTORY(k3dsdk)
 
@@ -315,6 +318,7 @@ ADD_SUBDIRECTORY(distribution)
 ADD_SUBDIRECTORY(docs)
 ADD_SUBDIRECTORY(man)
 
+# Hide some cruft ...
 MARK_AS_ADVANCED(CMAKE_BACKWARDS_COMPATIBILITY)
 MARK_AS_ADVANCED(EXECUTABLE_OUTPUT_PATH)
 MARK_AS_ADVANCED(LIBRARY_OUTPUT_PATH)

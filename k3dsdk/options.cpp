@@ -26,6 +26,7 @@
 #include "log.h"
 #include "options.h"
 #include "options_policy.h"
+#include "k3d-platform-config.h"
 #include "result.h"
 #include "share.h"
 #include "system.h"
@@ -35,19 +36,19 @@
 
 #include <iostream>
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	#define DEFAULT_BITMAP_VIEWER "mspaint \"%1%\""
 	#define DEFAULT_HTML_VIEWER "firefox \"%1%\""
 	#define DEFAULT_TEXT_EDITOR "notepad \"%1%\""
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	#define DEFAULT_BITMAP_VIEWER "display \"%1%\""
 	#define DEFAULT_HTML_VIEWER "firefox \"%1%\""
 	#define DEFAULT_TEXT_EDITOR "gedit \"%1%\""
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 namespace k3d
 {

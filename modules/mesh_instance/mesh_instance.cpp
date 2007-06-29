@@ -27,7 +27,7 @@
 #include <k3dsdk/drawable_gl.h>
 #include <k3dsdk/hints.h>
 #include <k3dsdk/idag.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/imesh_sink.h>

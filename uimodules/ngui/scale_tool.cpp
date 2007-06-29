@@ -39,7 +39,7 @@
 
 #include <k3dsdk/color.h>
 #include <k3dsdk/geometry.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/property.h>

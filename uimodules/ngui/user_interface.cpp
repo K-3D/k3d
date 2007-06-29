@@ -47,7 +47,7 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/data.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
 #include <k3dsdk/ideletable.h>
@@ -62,7 +62,7 @@
 #include <k3dsdk/share.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/system.h>
-#include <k3dsdk/version.h>
+#include <k3d-version-config.h>
 
 #include <glibmm/main.h>
 

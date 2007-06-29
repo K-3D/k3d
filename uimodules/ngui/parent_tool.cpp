@@ -37,7 +37,7 @@
 #include "viewport.h"
 
 #include <k3dsdk/classes.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iparentable.h>
 #include <k3dsdk/iselectable.h>

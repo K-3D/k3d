@@ -26,7 +26,7 @@
 #include "interactive.h"
 #include "utility.h"
 
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/state_change_set.h>
 

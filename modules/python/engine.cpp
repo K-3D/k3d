@@ -30,10 +30,11 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/file_helpers.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/module.h>
+#include <k3d-platform-config.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/string_modifiers.h>
 
@@ -41,7 +42,7 @@
 
 #include <boost/python/dict.hpp>
 
-#if defined K3D_PLATFORM_DARWIN
+#if defined K3D_API_DARWIN
 	#define PYTHON_INITIALIZE PyMac_Initialize
 #else
 	#define PYTHON_INITIALIZE Py_Initialize

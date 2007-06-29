@@ -33,7 +33,7 @@
 #include "viewport.h"
 
 #include <k3dsdk/high_res_timer.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/iproperty.h>

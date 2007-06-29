@@ -24,21 +24,23 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "k3d-platform-config.h"
+
 #include "iplugin_registry.h"
 #include "uuid.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // K3D_MODULE_EXPORT
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	#define K3D_MODULE_EXPORT __declspec(dllexport)
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	#define K3D_MODULE_EXPORT
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 // K3D_MODULE_START

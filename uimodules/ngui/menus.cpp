@@ -26,7 +26,7 @@
 #include "menus.h"
 #include "widget_manip.h"
 
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/string_cast.h>
 

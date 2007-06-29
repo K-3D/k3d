@@ -37,7 +37,7 @@
 #include "tutorial_message.h"
 
 #include <k3dsdk/basic_math.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/iwritable_property.h>

@@ -22,9 +22,11 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
+
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
-#include <k3dsdk/i18n.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/log_control.h>
 #include <k3dsdk/signal_system.h>
@@ -32,7 +34,6 @@
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/utility.h>
-#include <k3dsdk/version.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>

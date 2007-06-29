@@ -21,21 +21,22 @@
 */
 
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3d-platform-config.h>
 #include <k3dsdk/user_interface.h>
 
 #include <limits>
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 #include <sys/types.h>
 #include <sys/timeb.h>
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 #include <sys/time.h>
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 namespace libk3dtime
 {
@@ -71,15 +72,15 @@ public:
 
 	double get_time()
 	{
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 		timeb tv;
 		ftime(&tv);
 		return tv.time + (static_cast<double>(tv.millitm) / 1000);
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 		timeval tv;
 		gettimeofday(&tv, 0);
 		return tv.tv_sec + static_cast<double>(tv.tv_usec) / 1000000;
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 	}
 
 	static k3d::iplugin_factory& get_factory()

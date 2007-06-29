@@ -28,7 +28,7 @@
 #include "interactive.h"
 #include "path_chooser.h"
 
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/result.h>

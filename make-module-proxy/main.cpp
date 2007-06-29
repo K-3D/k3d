@@ -17,12 +17,13 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <k3d-version-config.h>
+
 #include <k3dsdk/iapplication_plugin_factory.h>
 #include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/plugin_factory_collection.h>
 #include <k3dsdk/types.h>
-#include <k3dsdk/version.h>
 #include <k3dsdk/xml.h>
 
 #include <iostream>

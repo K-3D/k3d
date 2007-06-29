@@ -25,7 +25,7 @@
 #include "unsaved_document.h"
 
 #include <k3dsdk/application.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/iapplication.h>
 
 #include <gtkmm/dialog.h>

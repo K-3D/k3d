@@ -24,9 +24,11 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#if defined K3D_PLATFORM_WIN32
+#include "k3d-platform-config.h"
+
+#if defined K3D_API_WIN32
 	#include "win32.h"
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 #define GLEW_MX // multiple-context glew as per http://glew.sourceforge.net/advanced.html
 #include <glew/glew.h> // Needed for cross-platform OpenGL > 1.1

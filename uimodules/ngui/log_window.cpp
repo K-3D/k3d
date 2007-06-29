@@ -24,7 +24,7 @@
 #include "application_window.h"
 #include "console.h"
 
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/log_control.h>
 
 #include <gtkmm/texttag.h>

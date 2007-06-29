@@ -1,6 +1,7 @@
+#include <k3d-version-config.h>
+
 #include <k3dsdk/log.h>
 #include <k3dsdk/uuid.h>
-#include <k3dsdk/version.h>
 
 #include <iomanip>
 #include <iostream>

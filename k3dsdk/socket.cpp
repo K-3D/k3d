@@ -21,15 +21,16 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "k3d-platform-config.h"
 #include "result.h"
 #include "socket.h"
 #include "string_cast.h"
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	#include "winsock2.h"
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	#include <errno.h>
 	#include <fcntl.h>
@@ -40,13 +41,13 @@
 
 	extern int h_errno;
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
-#ifdef K3D_PLATFORM_DARWIN
+#ifdef K3D_API_DARWIN
 
 	#define MSG_NOSIGNAL SO_NOSIGPIPE
 
-#endif // K3D_PLATFORM_DARWIN
+#endif // K3D_API_DARWIN
 
 namespace k3d
 {
@@ -81,7 +82,7 @@ would_block::would_block() :
 /////////////////////////////////////////////////////////////////////
 // endpoint::implementation
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	/// Helper class that handles one-time winsock initialization
 	class wsa_startup
@@ -230,7 +231,7 @@ would_block::would_block() :
 		const SOCKET socket;
 	};
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	/// Provides a posix implementation of k3d::socket::endpoint
 	class endpoint::implementation
@@ -357,7 +358,7 @@ would_block::would_block() :
 		const int socket;
 	};
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 /////////////////////////////////////////////////////////////////////
 // endpoint

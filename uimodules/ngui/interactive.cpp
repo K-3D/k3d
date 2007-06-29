@@ -32,6 +32,7 @@
 #include <k3dsdk/bezier.h>
 #include <k3dsdk/geometry.h>
 #include <k3dsdk/high_res_timer.h>
+#include <k3d-platform-config.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/vectors.h>
 
@@ -51,17 +52,17 @@
 
 #include <gtk/gtk.h>
 
-#if defined K3D_PLATFORM_WIN32
+#if defined K3D_API_WIN32
 
 	#include <gdkwin32.h>
 	#undef min
 	#undef max
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	#include <gdk/gdkx.h>
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 namespace libk3dngui
 {
@@ -225,7 +226,7 @@ void button_triple_click(const guint Button)
 
 void key_press(const guint Character)
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	const SHORT virtual_key = VkKeyScan(Character) & 0xff;
 	const SHORT modifiers = VkKeyScan(Character) >> 8;
@@ -237,7 +238,7 @@ void key_press(const guint Character)
 
 	handle_pending_events();
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	GdkEvent* const event = gdk_event_new(GDK_KEY_PRESS);
 	event->key.window = gdk_window_at_pointer(0, 0);
@@ -255,12 +256,12 @@ void key_press(const guint Character)
 	handle_pending_events();
 	gdk_event_free(event);
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 void key_release(const guint Character)
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	const SHORT virtual_key = VkKeyScan(Character) & 0xff;
 	const SHORT modifiers = VkKeyScan(Character) >> 8;
@@ -272,7 +273,7 @@ void key_release(const guint Character)
 
 	handle_pending_events();
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	GdkEvent* const event = gdk_event_new(GDK_KEY_RELEASE);
 	event->key.window = gdk_window_at_pointer(0, 0);
@@ -290,7 +291,7 @@ void key_release(const guint Character)
 	handle_pending_events();
 	gdk_event_free(event);
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 void key_click(const guint Character)
@@ -301,12 +302,12 @@ void key_click(const guint Character)
 
 void warp_pointer(const k3d::point2& Offset)
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	// Make that pointer jump!
 	SetCursorPos(static_cast<int>(Offset[0]), static_cast<int>(Offset[1]));
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	// Get the X display ...
 	Display* xdisplay = GDK_WINDOW_XDISPLAY(Gdk::Display::get_default()->get_default_screen()->get_root_window()->gobj());
@@ -320,7 +321,7 @@ void warp_pointer(const k3d::point2& Offset)
 	XWarpPointer(xdisplay, None, xwindow, 0, 0, 0, 0, static_cast<int>(Offset[0]), static_cast<int>(Offset[1]));
 	XFlush(xdisplay);
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 void warp_pointer(Glib::RefPtr<Gdk::Window> Window, const k3d::point2& Offset)

@@ -27,9 +27,9 @@
 #include "utility.h"
 #include "widget_manip.h"
 
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/path.h>
-#include <k3dsdk/version.h>
+#include <k3d-version-config.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/buttonbox.h>

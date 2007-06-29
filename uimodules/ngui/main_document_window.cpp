@@ -75,7 +75,7 @@
 #include <k3dsdk/file_filter.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>

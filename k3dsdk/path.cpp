@@ -20,15 +20,16 @@
 // This code leans heavily on boost::filesystem::path, most changes are to support ustring UTF-8 storage
 
 #include "path.h"
+#include "k3d-platform-config.h"
 #include "result.h"
 
 #include <glibmm/convert.h>
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	#include "win32.h"
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	#include <sys/stat.h>
 	#include <sys/types.h>
@@ -36,7 +37,7 @@
 	#include <fcntl.h>
 	#include <unistd.h>
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 #include <boost/scoped_array.hpp>
 
@@ -50,17 +51,17 @@ namespace detail
 {
 
 // Define some platform-specific odds-and-ends
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 const char NATIVE_SEARCHPATH_SEPARATOR = ';';
 const char NATIVE_PATH_SEPARATOR = '\\';
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 const char NATIVE_SEARCHPATH_SEPARATOR = ':';
 const char NATIVE_PATH_SEPARATOR = '/';
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 const char GENERIC_PATH_SEPARATOR = '/';
 
@@ -339,15 +340,15 @@ std::string path::native_console_string() const
 
 std::string path::native_filesystem_string() const
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	return Glib::locale_from_utf8(native_utf8_string().raw());
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	return Glib::filename_from_utf8(native_utf8_string().raw());
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 path path::root_path() const
@@ -469,16 +470,16 @@ bool path::operator>=(const path& that) const
 
 bool exists(const path& Path)
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	return ::GetFileAttributesA(Path.native_filesystem_string().c_str()) != 0xFFFFFFFF;
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	struct stat path_stat;
 	return ::stat(Path.native_filesystem_string().c_str(), &path_stat) == 0;
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 const ustring extension(const path& Path);
@@ -548,13 +549,13 @@ bool create_directory(const path& Path)
 		return false;
 	}
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 	if ( ::CreateDirectoryA( Path.native_filesystem_string().c_str(), 0 ) )
 		return true;
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 	if ( ::mkdir( Path.native_filesystem_string().c_str(), S_IRWXU|S_IRWXG|S_IRWXO ) == 0 )
 		return true;
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 	k3d::log() << error << "Error creating directory [" << Path.native_console_string() << "]" << std::endl;
 	return false;
@@ -589,12 +590,12 @@ bool create_directories(const path& Path)
 
 bool is_directory(const path& Path)
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	const DWORD attributes = ::GetFileAttributesA(Path.native_filesystem_string().c_str());
 	return attributes & FILE_ATTRIBUTE_DIRECTORY;
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	struct stat path_stat;
 	if(::stat(Path.native_filesystem_string().c_str(), &path_stat) != 0)
@@ -602,7 +603,7 @@ bool is_directory(const path& Path)
 
 	return S_ISDIR(path_stat.st_mode);
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -610,21 +611,21 @@ bool is_directory(const path& Path)
 
 bool remove(const path& Path)
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	if(is_directory(Path))
 		return ::RemoveDirectory(Path.native_filesystem_string().c_str());
 
 	return ::DeleteFile(Path.native_filesystem_string().c_str());
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	if(is_directory(Path))
 		return 0 == ::rmdir(Path.native_filesystem_string().c_str());
 
 	return 0 == ::unlink(Path.native_filesystem_string().c_str());
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -632,15 +633,15 @@ bool remove(const path& Path)
 
 bool rename(const path& Source, const path& Target)
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	return ::MoveFile(Source.native_filesystem_string().c_str(), Target.native_filesystem_string().c_str());
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	return 0 == ::rename(Source.native_filesystem_string().c_str(), Target.native_filesystem_string().c_str());
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -648,11 +649,11 @@ bool rename(const path& Source, const path& Target)
 
 bool copy_file(const path& Source, const path& Target)
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	return ::CopyFile(Source.native_filesystem_string().c_str(), Target.native_filesystem_string().c_str(), false);
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	struct stat source_stat;
 	if(0 != ::stat(Source.native_filesystem_string().c_str(), &source_stat))
@@ -691,7 +692,7 @@ bool copy_file(const path& Source, const path& Target)
 
 	return result;
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -717,7 +718,7 @@ const path_list split_native_paths(const ustring& Paths)
 //////////////////////////////////////////////////////////////////////////////////
 // directory_iterator::implementation
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 class directory_iterator::implementation
 {
@@ -787,7 +788,7 @@ private:
 	path full_path;
 };
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 class directory_iterator::implementation
 {
@@ -863,7 +864,7 @@ private:
 	path full_path;
 };
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 //////////////////////////////////////////////////////////////////////////////////
 // directory_iterator

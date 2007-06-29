@@ -28,7 +28,7 @@
 
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/data.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/time_source.h>

@@ -22,7 +22,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "i18n.h"
+#include "k3d-i18n-config.h"
 #include "iplugin_factory.h"
 #include "node.h"
 

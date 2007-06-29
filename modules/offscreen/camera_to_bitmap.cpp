@@ -21,8 +21,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/module_config.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-module-config.h>
+
+#include <k3d-i18n-config.h>
 #include <k3dsdk/ibitmap_source.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/plugins.h>

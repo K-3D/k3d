@@ -24,7 +24,7 @@
 #include "file_chooser_dialog.h"
 #include "messages.h"
 
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/share.h>

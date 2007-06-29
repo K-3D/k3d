@@ -22,6 +22,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-platform-config.h>
+#include <k3d-version-config.h>
+
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/log_control.h>
@@ -30,18 +33,17 @@
 #include <k3dsdk/path.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/utility.h>
-#include <k3dsdk/version.h>
 
 #include <k3dsdk/xml.h>
 using namespace k3d::xml;
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	#include <k3dsdk/win32.h>
 	#include <direct.h>
 	#define chdir _chdir
 
-#endif // K3D_PLATFORM_WIN32
+#endif // K3D_API_WIN32
 
 #include <boost/format.hpp>
 
@@ -171,7 +173,7 @@ bool view_operation(const element& XMLOperation)
 
 	const std::string path = attribute_text(XMLOperation, "path");
 
-#ifndef K3D_PLATFORM_WIN32
+#ifndef K3D_API_WIN32
 
 	// View the image ...
 	boost::format command_line(k3d::options::get_command(k3d::options::command::bitmap_viewer()));
@@ -180,11 +182,11 @@ bool view_operation(const element& XMLOperation)
 	// Execute the command ...
 	k3d::system::spawn_async(command_line.str());
 
-#else // !K3D_PLATFORM_WIN32
+#else // !K3D_API_WIN32
 
 	ShellExecute(0, "open", path.c_str(), 0, 0, SW_SHOWDEFAULT);
 
-#endif // K3D_PLATFORM_WIN32
+#endif // K3D_API_WIN32
 
 	return true;
 }

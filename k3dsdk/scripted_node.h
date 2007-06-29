@@ -26,7 +26,7 @@
 
 #include "create_plugins.h"
 #include "data.h"
-#include "i18n.h"
+#include "k3d-i18n-config.h"
 #include "scripting.h"
 #include "user_property_changed_signal.h"
 

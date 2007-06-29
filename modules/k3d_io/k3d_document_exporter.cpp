@@ -21,11 +21,13 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
+
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/dependencies.h>
 #include <k3dsdk/fstream.h>
-#include <k3dsdk/i18n.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_exporter.h>
@@ -39,7 +41,6 @@
 #include <k3dsdk/result.h>
 #include <k3dsdk/serialization.h>
 #include <k3dsdk/string_modifiers.h>
-#include <k3dsdk/version.h>
 #include <k3dsdk/xml.h>
 
 using namespace k3d::xml;

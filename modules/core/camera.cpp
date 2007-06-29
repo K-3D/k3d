@@ -25,7 +25,7 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/drawable_gl.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icrop_window.h>
 #include <k3dsdk/iprojection.h>

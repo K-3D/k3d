@@ -24,6 +24,7 @@
 
 #include <errno.h>
 #include "path.h"
+#include "k3d-platform-config.h"
 #include "result.h"
 #include "string_modifiers.h"
 #include "system.h"
@@ -37,7 +38,7 @@
 #include <sys/stat.h>
 
 // Define some platform-specific odds-and-ends
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 	#define SEARCHPATH_SEPARATOR_STRING ";"
 	#define DEFAULT_TEMP_DIRECTORY "c:\\"
 	#define DEFAULT_HOME_DIRECTORY "c:\\"
@@ -46,7 +47,7 @@
 	#include "win32.h"
 	#include <io.h>
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	#define SEARCHPATH_SEPARATOR_STRING ":"
 	#define DEFAULT_TEMP_DIRECTORY "/tmp"
@@ -54,7 +55,7 @@
 
 	#include <time.h>
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 namespace k3d
 {
@@ -72,39 +73,39 @@ const std::string getenv(const std::string& Variable)
 
 void setenv(const std::string& Name, const std::string& Value)
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	// Use putenv on Win32 because it's the only thing available, and it copies its inputs
 	::putenv((Name + "=" + Value).c_str());
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	// Use setenv where possible because it copies its inputs
 	::setenv(Name.c_str(), Value.c_str(), true);
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 void setenv(const std::string& Variable)
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	// Use putenv on Win32 because it's the only thing available, and it copies its inputs
 	::putenv(Variable.c_str());
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	// On unix, we have to make a copy of the string to pass to putenv()
 	::putenv(::strdup(Variable.c_str()));
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 const filesystem::path get_home_directory()
 {
 	static filesystem::path home;
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	if(home.empty())
 		home = filesystem::native_path(ustring::from_utf8(getenv("APPDATA")));
@@ -112,7 +113,7 @@ const filesystem::path get_home_directory()
 	if(home.empty())
 		home = filesystem::native_path(ustring::from_utf8(getenv("USERPROFILE")));
 
-#endif // K3D_PLATFORM_WIN32
+#endif // K3D_API_WIN32
 
 	if(home.empty())
 		home = filesystem::native_path(ustring::from_utf8(getenv("HOME")));
@@ -155,7 +156,7 @@ const filesystem::path get_temp_directory()
 
 const filesystem::path generate_temp_file()
 {
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	std::string buffer(MAX_PATH, '\0');
 	return_val_if_fail(GetTempFileName(get_temp_directory().native_filesystem_string().c_str(), "k3d", 0, const_cast<char*>(buffer.c_str())), filesystem::path());
@@ -163,7 +164,7 @@ const filesystem::path generate_temp_file()
 
 	return filesystem::native_path(ustring::from_utf8(buffer));
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 	std::string buffer = (get_temp_directory() / filesystem::generic_path("k3d-XXXXXX")).native_filesystem_string();
 	int fd = mkstemp(const_cast<char*>(buffer.c_str()));
@@ -172,7 +173,7 @@ const filesystem::path generate_temp_file()
 
 	return filesystem::native_path(ustring::from_utf8(buffer));
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 }
 
 bool file_modification_time(const filesystem::path& File, time_t& ModificationTime)
@@ -242,23 +243,23 @@ const paths_t decompose_path_list(const std::string Input)
 	return results;
 }
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 const std::string executable_name(const std::string& Executable)
 {
 	return Executable + ".exe";
 }
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 const std::string executable_name(const std::string& Executable)
 {
 	return Executable;
 }
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 void sleep(const double Seconds)
 {
@@ -268,7 +269,7 @@ void sleep(const double Seconds)
 	Sleep(static_cast<DWORD>(Seconds * 1000));
 }
 
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 
 void sleep(const double Seconds)
 {
@@ -282,7 +283,7 @@ void sleep(const double Seconds)
 	nanosleep(&t, 0);
 }
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 } // namespace system
 

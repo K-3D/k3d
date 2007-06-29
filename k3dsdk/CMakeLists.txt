@@ -8,9 +8,10 @@ IF(CMAKE_HAS_SORT)
 	LIST(SORT SOURCES)
 ENDIF(CMAKE_HAS_SORT)
 
-CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/module_config.h.in ${k3dsdk_BINARY_DIR}/module_config.h)
-CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/i18n.h.in ${k3dsdk_BINARY_DIR}/i18n.h)
-CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/version.h.in ${k3dsdk_BINARY_DIR}/version.h)
+CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-i18n-config.h.in ${k3dsdk_BINARY_DIR}/k3d-i18n-config.h)
+CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-module-config.h.in ${k3dsdk_BINARY_DIR}/k3d-module-config.h)
+CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-platform-config.h.in ${k3dsdk_BINARY_DIR}/k3d-platform-config.h)
+CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-version-config.h.in ${k3dsdk_BINARY_DIR}/k3d-version-config.h)
 
 INCLUDE_DIRECTORIES(${k3d_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${k3d_SOURCE_DIR}/gil)

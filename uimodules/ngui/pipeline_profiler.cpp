@@ -32,7 +32,7 @@
 #include "icons.h"
 #include "pipeline_profiler.h"
 
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/ipipeline_profiler.h>
 

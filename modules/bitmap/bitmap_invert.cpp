@@ -25,7 +25,7 @@
 #include "simple_bitmap_modifier.h"
 
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 
 namespace libk3dbitmap
 {

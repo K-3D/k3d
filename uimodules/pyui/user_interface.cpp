@@ -29,12 +29,13 @@
 #include <k3dsdk/iuser_interface_plugin.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
+#include <k3d-platform-config.h>
 
 #include <k3dsdk_python/object_model_python.h>
 
 #include <iostream>
 
-#if defined K3D_PLATFORM_DARWIN
+#if defined K3D_API_DARWIN
 	#define PYTHON_INITIALIZE PyMac_Initialize
 #else
 	#define PYTHON_INITIALIZE Py_Initialize

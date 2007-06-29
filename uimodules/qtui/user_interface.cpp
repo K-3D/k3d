@@ -29,7 +29,7 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/high_res_timer.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/module.h>

@@ -27,7 +27,7 @@
 #include "widget_manip.h"
 
 #include <k3dsdk/aqsis_properties.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/ipersistent_container.h>
 #include <k3dsdk/iproperty_collection.h>

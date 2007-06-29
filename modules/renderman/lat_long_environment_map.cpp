@@ -27,7 +27,7 @@
 #include <k3dsdk/bitmap_modifier.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/file_filter.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/ibitmap_exporter.h>
 #include <k3dsdk/irender_engine_ri.h>
 #include <k3dsdk/irender_frame.h>
@@ -35,11 +35,12 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3d-platform-config.h>
 #include <k3dsdk/types_ri.h>
 
 #include <iterator>
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 	#define COPY_COMMAND "copy"
 #else
 	#define COPY_COMMAND "cp"

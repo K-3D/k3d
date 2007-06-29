@@ -25,7 +25,7 @@
 */
 
 #include "data.h"
-#include "i18n.h"
+#include "k3d-i18n-config.h"
 #include "iparentable.h"
 
 namespace k3d

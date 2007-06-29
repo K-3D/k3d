@@ -36,7 +36,7 @@
 #include "widget_manip.h"
 
 #include <k3dsdk/fstream.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/ipath_property.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/plugins.h>

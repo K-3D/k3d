@@ -26,7 +26,7 @@
 
 #include "data.h"
 #include "gl.h"
-#include "i18n.h"
+#include "k3d-i18n-config.h"
 #include "idrawable_gl.h"
 #include "irender_engine_gl.h"
 #include "render_state_gl.h"

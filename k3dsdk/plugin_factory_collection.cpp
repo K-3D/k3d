@@ -23,20 +23,20 @@
 */
 
 #include "fstream.h"
-#include "i18n.h"
+#include "k3d-i18n-config.h"
 #include "iapplication_plugin_factory.h"
 #include "idocument_plugin_factory.h"
 #include "iplugin_factory.h"
 #include "iplugin_registry.h"
 #include "iscript_engine.h"
 #include "log.h"
+#include "k3d-platform-config.h"
 #include "plugin_factory_collection.h"
 #include "result.h"
 #include "string_cast.h"
 #include "string_modifiers.h"
 #include "system.h"
 #include "types.h"
-#include "version.h"
 #include "xml.h"
 
 #include <iostream>
@@ -50,7 +50,7 @@ namespace detail
 //////////////////////////////////////////////////////////////////////////////
 // os_load_module
 
-#if defined K3D_PLATFORM_WIN32
+#if defined K3D_API_WIN32
 	#include "win32.h"
 
 	static void os_load_module(const filesystem::path& FilePath, register_plugins_entry_point& RegisterPlugins)
@@ -75,7 +75,7 @@ namespace detail
 		}
 	}
 
-#elif defined K3D_PLATFORM_DARWIN
+#elif defined K3D_API_DARWIN
 
 	#include <mach-o/dyld.h>
 

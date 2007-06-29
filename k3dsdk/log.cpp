@@ -18,18 +18,19 @@
 
 #include "log.h"
 #include "log_control.h"
+#include "k3d-platform-config.h"
 #include "result.h"
 
 #include <iostream>
 #include <sstream>
 #include <vector>
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 	#include <time.h>
 	#include "win32.h"
 
-#elif defined K3D_PLATFORM_DARWIN
+#elif defined K3D_API_DARWIN
 
 	#include <syslog.h>
 
@@ -161,7 +162,7 @@ void log_cache(const time_t Timestamp, const log_level_t Level, const std::strin
 ///////////////////////////////////////////////////////////
 // log_syslog
 
-#ifndef K3D_PLATFORM_WIN32
+#ifndef K3D_API_WIN32
 
 void log_syslog(const time_t Timestamp, const log_level_t Level, const std::string& Message)
 {
@@ -192,19 +193,19 @@ void log_syslog(const time_t Timestamp, const log_level_t Level, const std::stri
 	syslog(LOG_USER | priority, "%s", Message.c_str());
 }
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 ///////////////////////////////////////////////////////////
 // log_output_debug_string
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 
 void log_output_debug_string(const time_t Timestamp, const log_level_t Level, const std::string& Message)
 {
 	OutputDebugString((Message).c_str());
 }
 
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 ///////////////////////////////////////////////////////////
 // signal_buf
@@ -220,11 +221,11 @@ public:
 		connect(sigc::ptr_fun(log_cerr));
 		connect(sigc::ptr_fun(log_cache));
 
-#ifdef K3D_PLATFORM_WIN32
+#ifdef K3D_API_WIN32
 		connect(sigc::ptr_fun(log_output_debug_string));
-#else // K3D_PLATFORM_WIN32
+#else // K3D_API_WIN32
 		connect(sigc::ptr_fun(log_syslog));
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 	}
 
 	void init(std::ostream& Stream)
@@ -368,11 +369,11 @@ std::ostream& debug(std::ostream& Stream)
 
 std::ostream& backtrace(std::ostream& Stream)
 {
-#if defined K3D_PLATFORM_WIN32
+#if defined K3D_API_WIN32
 
 	Stream << "Backtrace unavailable on Win32\n";
 
-#elif defined K3D_PLATFORM_DARWIN
+#elif defined K3D_API_DARWIN
 
 	Stream << "Backtrace unavailable on Darwin\n";
 

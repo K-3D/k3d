@@ -51,7 +51,7 @@
 #include "widget_manip.h"
 
 #include <k3dsdk/command_tree.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/ianimation_render_engine.h>
 #include <k3dsdk/iaqsis.h>
 #include <k3dsdk/icamera.h>

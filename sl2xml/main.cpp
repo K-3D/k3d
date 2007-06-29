@@ -22,8 +22,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-version-config.h>
+
 #include <k3dsdk/sl.h>
-#include <k3dsdk/version.h>
 
 #include <iostream>
 #include <fstream>

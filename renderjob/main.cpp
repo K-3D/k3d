@@ -23,12 +23,14 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3d-platform-config.h>
+#include <k3d-version-config.h>
+
 #include <k3dsdk/log.h>
 #include <k3dsdk/log_control.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/utility.h>
-#include <k3dsdk/version.h>
 
 #include <iostream>
 #include <vector>
@@ -158,14 +160,14 @@ void setup_logging(const std::string& ProcessName)
 /// Program main
 int main(int argc, char* argv[])
 {
-#ifndef K3D_PLATFORM_WIN32
+#ifndef K3D_API_WIN32
 	// Fork ourselves so we don't become a zombie of the K-3D executable
 	const int fork_result = fork();
 	if(fork_result < 0)
 		return 1;
 	else if(fork_result > 0)
 		return 0;
-#endif // !K3D_PLATFORM_WIN32
+#endif // !K3D_API_WIN32
 
 	const std::string program_name = k3d::filesystem::native_path(k3d::ustring::from_utf8(std::string(argv[0]))).leaf().raw();
 

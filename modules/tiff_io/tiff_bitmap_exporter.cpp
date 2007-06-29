@@ -23,7 +23,7 @@
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/ibitmap_exporter.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/ifile_format.h>

@@ -25,15 +25,17 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "k3d-platform-config.h"
+
 #include "iunknown.h"
-#ifdef	K3D_PLATFORM_WIN32
+#ifdef	K3D_API_WIN32
 #ifdef	near
 #undef	near
 #endif	// near
 #ifdef	far
 #undef	far
 #endif	// far
-#endif	// K3D_PLATFORM_WIN32
+#endif	// K3D_API_WIN32
 
 namespace k3d
 {

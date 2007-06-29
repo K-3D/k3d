@@ -23,9 +23,10 @@
 */
 
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3d-platform-config.h>
 
 #include <boost/format.hpp>
 
@@ -54,7 +55,7 @@ public:
 		const time_t time = static_cast<time_t>(m_input.value());
 		tm time_value;
 
-#if defined K3D_PLATFORM_WIN32
+#if defined K3D_API_WIN32
 		time_value = *gmtime(&time);
 #else
 		gmtime_r(&time, &time_value);

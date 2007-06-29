@@ -35,7 +35,7 @@
 
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/xml.h>

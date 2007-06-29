@@ -41,7 +41,7 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/file_range.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/ianimation_render_engine.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icamera_animation_render_engine.h>

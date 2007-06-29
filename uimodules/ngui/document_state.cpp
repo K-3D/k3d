@@ -52,7 +52,7 @@
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/data.h>
-#include <k3dsdk/i18n.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/ianimation_render_engine.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
@@ -67,6 +67,7 @@
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
+#include <k3d-platform-config.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/time_source.h>
@@ -1012,7 +1013,7 @@ public:
 	}
 */
 
-#ifndef K3D_PLATFORM_WIN32
+#ifndef K3D_API_WIN32
 
 	/// Returns a "global" (to the document) gdkgl context that can be used to share display lists
 	GdkGLContext* gdkgl_share_list()
@@ -1039,7 +1040,7 @@ public:
 		return m_gdkgl_share_list;
 	}
 
-#else // !K3D_PLATFORM_WIN32
+#else // !K3D_API_WIN32
 
 	/// Returns a "global" (to the document) gdkgl context that can be used to share display lists
 	GdkGLContext* gdkgl_share_list()
@@ -1064,7 +1065,7 @@ public:
 		return m_gdkgl_share_list;
 	}
 
-#endif // K3D_PLATFORM_WIN32
+#endif // K3D_API_WIN32
 
 	/// Returns a signal that can be emitted to request display of the history for an node
 	view_node_history_signal_t& view_node_history_signal()

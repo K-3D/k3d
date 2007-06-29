@@ -22,7 +22,7 @@
 */
 
 #include "fstream.h"
-#include "i18n.h"
+#include "k3d-i18n-config.h"
 #include "istate_container.h"
 #include "iuser_property.h"
 #include "options.h"

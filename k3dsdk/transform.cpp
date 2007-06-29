@@ -23,7 +23,7 @@
 
 #include "classes.h"
 #include "create_plugins.h"
-#include "i18n.h"
+#include "k3d-i18n-config.h"
 #include "idag.h"
 #include "idocument.h"
 #include "inode.h"

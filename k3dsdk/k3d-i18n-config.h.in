@@ -1,7 +1,7 @@
-#ifndef K3DSDK_I18N_H
-#define K3DSDK_I18N_H
+#ifndef K3DSDK_I18N_CONFIG_H
+#define K3DSDK_I18N_CONFIG_H
 
-// Generated file, do not edit!  Make changes to i18n.h.in instead.
+// Generated file, do not edit!  Make changes to k3d-i18n-config.h.in instead.
 
 #cmakedefine K3D_BUILD_NLS
 
@@ -16,5 +16,5 @@
 
 #endif // !K3D_BUILD_NLS
 
-#endif // K3DSDK_I18N_H
+#endif // K3DSDK_I18N_CONFIG_H
 
