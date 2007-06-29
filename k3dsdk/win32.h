@@ -24,10 +24,15 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
+#ifndef NOMINMAX
+	#define NOMINMAX
+#endif // !NOMINMAX
+
 #include <windows.h>
+
 #undef interface
+#undef near
+#undef far
 
 #endif // K3DSDK_WIN32_H
 
