@@ -611,7 +611,7 @@ bool control::save_frame(k3d::icamera& Camera, const k3d::filesystem::path& Outp
 	glViewport(0, 0, width, height);
 	if(m_implementation->m_gl_engine.value())
 	{
-		m_implementation->m_gl_engine.value()->redraw(Camera, width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, m_implementation->m_gl_viewport);
+		m_implementation->m_gl_engine.value()->redraw(Camera, width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, static_cast<int*>(m_implementation->m_gl_viewport));
 	}
 	else
 	{
@@ -1274,7 +1274,7 @@ bool control::on_redraw()
 	{
 		k3d::timer timer;
 
-		m_implementation->m_gl_engine.value()->redraw(*m_implementation->m_camera.value(), width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, m_implementation->m_gl_viewport);
+		m_implementation->m_gl_engine.value()->redraw(*m_implementation->m_camera.value(), width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, static_cast<int*>(m_implementation->m_gl_viewport));
 		if(m_implementation->m_document_state.get_focus_viewport() == this)
 			m_implementation->m_document_state.active_tool().redraw(*this);
 
@@ -1390,7 +1390,7 @@ const GLint control::select(const k3d::gl::selection_state& SelectState, const k
 		glInitNames();
 
 		GLdouble projection_matrix[16];
-		selection_engine->select(SelectState, *m_implementation->m_camera.value(), width, height, m_implementation->m_font_begin, k3d::normalize(SelectionRegion), m_implementation->m_gl_view_matrix, projection_matrix, m_implementation->m_gl_viewport);
+		selection_engine->select(SelectState, *m_implementation->m_camera.value(), width, height, m_implementation->m_font_begin, k3d::normalize(SelectionRegion), m_implementation->m_gl_view_matrix, projection_matrix, static_cast<int*>(m_implementation->m_gl_viewport));
 		std::copy(m_implementation->m_gl_view_matrix, m_implementation->m_gl_view_matrix + 16, ViewMatrix);
 		std::copy(projection_matrix, projection_matrix + 16, ProjectionMatrix);
 		std::copy(m_implementation->m_gl_viewport, m_implementation->m_gl_viewport + 4, Viewport);

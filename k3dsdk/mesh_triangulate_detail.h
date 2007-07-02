@@ -35,11 +35,11 @@ public:
 		output_points(OutputPoints),
 		current_face(0)
 	{
-		sgiTessCallback(tessellator, GLU_TESS_BEGIN_DATA, reinterpret_cast<_GLUfuncptr>(&raw_begin));
-		sgiTessCallback(tessellator, GLU_TESS_VERTEX_DATA, reinterpret_cast<_GLUfuncptr>(&raw_vertex));
-		sgiTessCallback(tessellator, GLU_TESS_COMBINE_DATA, reinterpret_cast<_GLUfuncptr>(&raw_combine));
-		sgiTessCallback(tessellator, GLU_TESS_END_DATA, reinterpret_cast<_GLUfuncptr>(&raw_end));
-		sgiTessCallback(tessellator, GLU_TESS_ERROR_DATA, reinterpret_cast<_GLUfuncptr>(&raw_error));
+		sgiTessCallback(tessellator, GLU_TESS_BEGIN_DATA, reinterpret_cast<callback_t>(&raw_begin));
+		sgiTessCallback(tessellator, GLU_TESS_VERTEX_DATA, reinterpret_cast<callback_t>(&raw_vertex));
+		sgiTessCallback(tessellator, GLU_TESS_COMBINE_DATA, reinterpret_cast<callback_t>(&raw_combine));
+		sgiTessCallback(tessellator, GLU_TESS_END_DATA, reinterpret_cast<callback_t>(&raw_end));
+		sgiTessCallback(tessellator, GLU_TESS_ERROR_DATA, reinterpret_cast<callback_t>(&raw_error));
 	}
 
 	~glu_triangulator_t()

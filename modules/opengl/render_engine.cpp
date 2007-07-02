@@ -538,7 +538,7 @@ private:
 
 		// Setup viewport ...
 		glViewport(0, 0, PixelWidth, PixelHeight);
-		glGetIntegerv(GL_VIEWPORT, RenderState.gl_viewport);
+		glGetIntegerv(GL_VIEWPORT, static_cast<GLint*>(RenderState.gl_viewport));
 		glGetIntegerv(GL_VIEWPORT, Viewport);
 
 		k3d::rectangle window_rect(0, 0, 0, 0);
@@ -605,7 +605,7 @@ private:
 
 				const double width  = SelectionRegion.width();
 				const double height = SelectionRegion.height();
-				gluPickMatrix(SelectionRegion.left + (width * 0.5), RenderState.gl_viewport[3] - (SelectionRegion.top + (height * 0.5)), width, height, RenderState.gl_viewport);
+				gluPickMatrix(SelectionRegion.left + (width * 0.5), RenderState.gl_viewport[3] - (SelectionRegion.top + (height * 0.5)), width, height, static_cast<GLint*>(RenderState.gl_viewport));
 
 				glOrtho(-window_size * window_aspect, window_size * window_aspect, -window_size, window_size, near, far);
 			}
@@ -637,7 +637,7 @@ private:
 
 				const double width  = SelectionRegion.width();
 				const double height = SelectionRegion.height();
-				gluPickMatrix(SelectionRegion.left + (width * 0.5), RenderState.gl_viewport[3] - (SelectionRegion.top + (height * 0.5)), width, height, RenderState.gl_viewport);
+				gluPickMatrix(SelectionRegion.left + (width * 0.5), RenderState.gl_viewport[3] - (SelectionRegion.top + (height * 0.5)), width, height, static_cast<GLint*>(RenderState.gl_viewport));
 
 				glFrustum(window_rect.left, window_rect.right, window_rect.bottom, window_rect.top, near, far);
 			}

@@ -169,13 +169,15 @@ void GLAPIENTRY __gl_noCombineData( GLdouble coords[3], void *data[4],
       (*tess->callErrorData)((a),tess->polygonData); \
    else (*tess->callError)((a));
 
+typedef void (*callback_t)();
+
 extern SGItesselator* sgiNewTess (void);
 extern void sgiDeleteTess (SGItesselator* tess);
 extern void sgiGetTessProperty (SGItesselator* tess, GLenum which, GLdouble* data);
 
 extern void sgiTessBeginContour (SGItesselator* tess);
 extern void sgiTessBeginPolygon (SGItesselator* tess, GLvoid* data);
-extern void sgiTessCallback (SGItesselator* tess, GLenum which, _GLUfuncptr CallBackFunc);
+extern void sgiTessCallback (SGItesselator* tess, GLenum which, callback_t CallBackFunc);
 extern void sgiTessEndContour (SGItesselator* tess);
 extern void sgiTessEndPolygon (SGItesselator* tess);
 extern void sgiTessNormal (SGItesselator* tess, GLdouble valueX, GLdouble valueY, GLdouble valueZ);
