@@ -45,6 +45,7 @@
 #include "script_button.h"
 #include "selection_button.h"
 #include "spin_button.h"
+#include "toggle_button.h"
 #include "toolbar.h"
 #include "ui_component.h"
 #include "user_property.h"
@@ -63,6 +64,8 @@
 #include <k3dsdk/ienumeration_property.h>
 #include <k3dsdk/ilist_property.h>
 #include <k3dsdk/imeasurement_property.h>
+#include <k3dsdk/imesh_sink.h>
+#include <k3dsdk/imesh_source.h>
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iplugin_factory.h>
@@ -105,6 +108,55 @@ namespace libk3dngui
 
 namespace node_properties
 {
+
+namespace detail
+{
+
+class bypass_property_proxy :
+	public toggle_button::idata_proxy
+{
+public:
+	bypass_property_proxy(document_state& DocumentState, k3d::iproperty& InputProperty, k3d::iproperty& OutputProperty, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
+		idata_proxy(StateRecorder, ChangeMessage),
+		m_document_state(DocumentState),
+		m_input_property(InputProperty),
+		m_output_property(OutputProperty)
+	{
+	}
+
+	bool value()
+	{
+		// true == bypassed, false == normal
+		return m_document_state.document().dag().dependency(m_output_property) == &m_input_property;
+	}
+
+	void set_value(const bool Value)
+	{
+		// true == bypassed, false == normal
+		k3d::idag::dependencies_t dependencies;
+		dependencies.insert(std::make_pair(&m_output_property, Value ? &m_input_property : static_cast<k3d::iproperty*>(0)));
+		m_document_state.document().dag().set_dependencies(dependencies);
+
+		m_changed_signal.emit(0);
+	}
+
+	changed_signal_t& changed_signal()
+	{
+		return m_changed_signal;
+	}
+
+private:
+	bypass_property_proxy(const bypass_property_proxy&);
+	bypass_property_proxy& operator=(const bypass_property_proxy&);
+
+	document_state& m_document_state;
+	k3d::iproperty& m_input_property;
+	k3d::iproperty& m_output_property;
+
+	changed_signal_t m_changed_signal;
+};
+
+} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // control::implementation
@@ -285,6 +337,19 @@ public:
 					<< set_tooltip(_("Reset / Reload Mesh"));
 
 			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
+		}
+
+		// Add a "disable" button for mesh modifiers ...
+		if(k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(m_node))
+		{
+			if(k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(m_node))
+			{
+				toggle_button::control* const control =
+					new toggle_button::control(m_parent, "disable_mesh_modifier", std::auto_ptr<toggle_button::idata_proxy>(new detail::bypass_property_proxy(m_document_state, mesh_sink->mesh_sink_input(), mesh_source->mesh_source_output(), state_recorder, Glib::ustring("Disable mesh modifier"))), _("Disable"))
+						<< set_tooltip(_("Disable / bypass mesh modifier"));
+
+				toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
+			}
 		}
 
 		// Get the node properties, grouped together ...
@@ -610,13 +675,13 @@ public:
 		render_animation(m_document_state, *render_engine);
 	}
 
-    void on_reset_mesh()
-    {
-            k3d::imesh_storage* const mesh_storage = dynamic_cast<k3d::imesh_storage*>(m_node);
-            return_if_fail(mesh_storage);
+	void on_reset_mesh()
+	{
+		k3d::imesh_storage* const mesh_storage = dynamic_cast<k3d::imesh_storage*>(m_node);
+		return_if_fail(mesh_storage);
 
-            mesh_storage->reset_mesh(0);
-    }
+		mesh_storage->reset_mesh(0);
+	}
 
 	void on_delete_user_property(k3d::iproperty_collection* Collection, k3d::iproperty* Property)
 	{
