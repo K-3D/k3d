@@ -32,6 +32,7 @@
 #include <k3dsdk/system.h>
 #include <k3dsdk/utility.h>
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
 

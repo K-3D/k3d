@@ -12,6 +12,8 @@ SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 # Disallow in-source builds
 INCLUDE(OutOfSourceBuild)
+# Convenience macro for linking Win32 DLLs with MSVC
+INCLUDE(GenerateDEF)
 
 # Set the K-3D version
 SET(MAJOR_VERSION 0)
@@ -269,7 +271,9 @@ ENDIF(WIN32)
 # Win32 API configuration
 IF(WIN32)
 	SET(K3D_API_WIN32 TRUE)
-	SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,--enable-runtime-pseudo-reloc -Wl,--export-all-symbols" CACHE STRING "" FORCE)
+	IF(NOT MSVC)
+		SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,--enable-runtime-pseudo-reloc -Wl,--export-all-symbols" CACHE STRING "" FORCE)
+	ENDIF(NOT MSVC)
 ENDIF(WIN32)
 
 # Darwin API configuration

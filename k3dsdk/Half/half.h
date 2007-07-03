@@ -85,7 +85,26 @@
 #ifndef _HALF_H_
 #define _HALF_H_
 
+#include "k3d-platform-config.h" 
 #include <iostream>
+
+#ifdef K3D_COMPILER_MSVC
+
+    #ifdef k3dsdk_half_EXPORTS
+	    
+        #define K3D_HALF_EXPORT // No dllexport needed, since it's handled by gendef
+    
+    #else
+	    
+        #define K3D_HALF_EXPORT __declspec(dllimport)
+    
+    #endif
+
+#else // K3D_COMPILER_MSVC
+
+	#define K3D_HALF_EXPORT
+
+#endif // !K3D_COMPILER_MSVC
 
 class half
 {
@@ -217,9 +236,9 @@ class half
 
     unsigned short	_h;
 
-    static const uif		_toFloat[1 << 16];
-    static const unsigned short	_eLut[1 << 9];
-    static const bool		_itWorks;
+    K3D_HALF_EXPORT static const uif		_toFloat[1 << 16];
+    K3D_HALF_EXPORT static const unsigned short	_eLut[1 << 9];
+    K3D_HALF_EXPORT static const bool		_itWorks;
 };
 
 

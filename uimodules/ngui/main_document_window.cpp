@@ -2892,7 +2892,7 @@ private:
 	document_state& m_document_state;
 };
 
-unsigned long main_document_window::main_document_window::m_count = 0;
+unsigned long main_document_window::m_count = 0;
 
 /////////////////////////////////////////////////////////////////////////////
 // create_main_document_window

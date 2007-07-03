@@ -1,6 +1,7 @@
 FIND_PATH(K3D_PNG_INCLUDE_DIR png.h
 	/usr/include/libpng12
 	c:/gtk/include/libpng12
+	${K3D_GTK_DIR}/include/libpng12
 	DOC "Directory where the libpng header files are located"
 	)
 MARK_AS_ADVANCED(K3D_PNG_INCLUDE_DIR)

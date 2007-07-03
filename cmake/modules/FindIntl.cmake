@@ -1,6 +1,7 @@
 FIND_PATH(K3D_INTL_INCLUDE_DIR libintl.h
 	/usr/include
 	c:/gtk/include
+	${K3D_GTK_DIR}/include
 	DOC "Directory where the libintl header files are located"
 	)
 MARK_AS_ADVANCED(K3D_INTL_INCLUDE_DIR)

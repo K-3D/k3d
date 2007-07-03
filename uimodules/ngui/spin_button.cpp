@@ -314,7 +314,7 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 
 void control::setup_arrow_button(Gtk::Button* Button, const Gtk::ArrowType ArrowType, const bool Up)
 {
-	Gtk::Arrow* const arrow = manage(new Gtk::Arrow(ArrowType, Gtk::SHADOW_NONE));
+    Gtk::Arrow* const arrow = Gtk::manage(new Gtk::Arrow(ArrowType, Gtk::SHADOW_NONE));
 	arrow->set_size_request(0, 0);
 
 	Button->set_size_request(0, 0);

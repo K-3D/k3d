@@ -16,6 +16,8 @@
 ///         Adobe Systems Incorporated
 /// \date   2005-2007 \n Last updated September 24, 2006
 
+#define NOMINMAX
+
 #include <vector>
 #include <string>
 #include <algorithm>

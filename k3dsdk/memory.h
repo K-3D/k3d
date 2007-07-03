@@ -24,6 +24,27 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+/////////////////////////////////////////////////////////////////////////////
+// K3D_MEMORY_CACHE_EXPORT
+
+#ifdef K3D_COMPILER_MSVC
+
+    #ifdef k3dsdk_EXPORTS
+	    
+        #define K3D_MEMORY_CACHE_EXPORT // No dllexport needed, since it's handled by gendef
+    
+    #else
+	    
+        #define K3D_MEMORY_CACHE_EXPORT __declspec(dllimport)
+    
+    #endif
+
+#else // K3D_COMPILER_MSVC
+
+	#define K3D_MEMORY_CACHE_EXPORT
+
+#endif // !K3D_COMPILER_MSVC
+
 namespace k3d
 {
 
@@ -67,9 +88,9 @@ private:
 	};
 
 	/// Stores the singly-linked list of memory available for use
-	static link* m_available;
+	K3D_MEMORY_CACHE_EXPORT static link* m_available;
 	/// Keeps a running-count of how many allocations have been made (the "high-water mark")
-	static unsigned long m_total_allocations;
+	K3D_MEMORY_CACHE_EXPORT static unsigned long m_total_allocations;
 };
 
 #define k3d_instantiate_memory_cache(type) \

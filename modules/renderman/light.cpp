@@ -105,7 +105,7 @@ public:
 		glEnd();
 	}
 
-	void setup_gl_light(unsigned long Light)
+	void setup_gl_light(const unsigned long Light)
 	{
 		// Setup our own transformation matrix ...
 		glMatrixMode(GL_MODELVIEW);

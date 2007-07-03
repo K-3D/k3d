@@ -346,7 +346,7 @@ void check_dependencies(bool& Quit, bool& Error)
 	k3d::log() << info << "package: " << K3D_PACKAGE << std::endl;
 	k3d::log() << info << "version: " << K3D_VERSION << std::endl;
 	k3d::log() << info << "platform: " << K3D_HOST << std::endl;
-	k3d::log() << info << "compiler: " << __VERSION__ << std::endl;
+	k3d::log() << info << "compiler: " << K3D_COMPILER_NAME << std::endl;
 	k3d::log() << info << "build time: " << __DATE__ << " " << __TIME__ << " local" << std::endl;
 
 #ifdef K3D_HAVE_EXPAT

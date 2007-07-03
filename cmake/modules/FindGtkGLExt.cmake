@@ -38,12 +38,14 @@ IF(WIN32)
 
 	FIND_PATH(K3D_GTKGLEXT_CONFIG_INCLUDE_DIR gdkglext-config.h
 		c:/gtk/lib/gtkglext-1.0/include
+		${K3D_GTK_DIR}/lib/gtkglext-1.0/include 
 		DOC "Directory where the gtkglext config file is located"
 		)
 	MARK_AS_ADVANCED(K3D_GTKGLEXT_CONFIG_INCLUDE_DIR)
 
 	FIND_PATH(K3D_GTKGLEXT_INCLUDE_DIR gtk
 		c:/gtk/include/gtkglext-1.0
+		${K3D_GTK_DIR}/include/gtkglext-1.0
 		DOC "Directory where the gtkglext header files are located"
 		)
 	MARK_AS_ADVANCED(K3D_GTKGLEXT_INCLUDE_DIR)

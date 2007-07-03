@@ -28,12 +28,14 @@ ENDIF(UNIX)
 IF(WIN32)
 	FIND_PATH(K3D_FREETYPE2_CONFIG_INCLUDE_DIR ft2build.h
 		c:/gtk/include
+		${K3D_GTK_DIR}/include
 		DOC "Directory where the freetype2 config files are located"
 		)
 	MARK_AS_ADVANCED(K3D_FREETYPE2_CONFIG_INCLUDE_DIR)
 
 	FIND_PATH(K3D_FREETYPE2_INCLUDE_DIR freetype
 		c:/gtk/include/freetype2
+		${K3D_GTK_DIR}/include/freetype2
 		DOC "Directory where the freetype2 header files are located"
 		)
 	MARK_AS_ADVANCED(K3D_FREETYPE2_INCLUDE_DIR)

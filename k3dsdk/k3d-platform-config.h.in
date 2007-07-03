@@ -9,5 +9,13 @@
 #cmakedefine K3D_COMPILER_GCC
 #cmakedefine K3D_COMPILER_MSVC
 
+#if defined K3D_COMPILER_GCC
+	#define K3D_COMPILER_NAME __VERSION__
+#elif defined K3D_COMPILER_MSVC
+	#define K3D_COMPILER_NAME "Visual Studio " _MSC_VER
+#else
+	#error("Unknown compiler")
+#endif
+
 #endif // !K3DSDK_PLATFORM_CONFIG_H
 

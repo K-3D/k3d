@@ -54,7 +54,7 @@
 
 #if defined K3D_API_WIN32
 
-	#include <gdkwin32.h>
+	//#include <gdkwin32.h>
 	#undef min
 	#undef max
 

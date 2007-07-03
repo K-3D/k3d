@@ -409,12 +409,12 @@ public:
 				const std::type_info& property_type = property.property_type();
 
 				// Provide a property button for the property ...
-				table->attach(*manage(
+				table->attach(*Gtk::manage(
 					new property_button::control(m_parent, property_name + "_property", property_widget::proxy(m_document_state,property))),
 					prop_button_begin, prop_button_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
 
 				// Provide a label for the property ...
-				table->attach(*manage(
+				table->attach(*Gtk::manage(
 					new property_label::control(m_parent, property_name + "_label", property_widget::proxy(m_document_state, property))),
 					prop_label_begin, prop_label_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 

@@ -29,6 +29,7 @@ SET(SOURCES
 
 
 ADD_LIBRARY(k3dsdk-sgi-tesselator SHARED ${SOURCES})
+K3D_GENERATE_DEF_FILE(k3dsdk-sgi-tesselator)
 
 INSTALL(TARGETS k3dsdk-sgi-tesselator
 	RUNTIME DESTINATION bin

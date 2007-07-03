@@ -1,6 +1,7 @@
 FIND_PATH(K3D_TIFF_INCLUDE_DIR tiff.h
 	/usr/include
 	c:/gtk/include
+	${K3D_GTK_DIR}/include
 	DOC "Directory where the libtiff header files are located"
 	)
 MARK_AS_ADVANCED(K3D_TIFF_INCLUDE_DIR)

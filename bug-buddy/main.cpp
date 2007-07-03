@@ -23,6 +23,7 @@
 */
 
 #include <k3d-i18n-config.h>
+#include <k3d-platform-config.h>
 #include <k3d-version-config.h>
 
 #include <k3dsdk/fstream.h>
@@ -212,7 +213,7 @@ private:
 		content << "Package: " << K3D_PACKAGE << "\r\n";
 		content << "Version: " << K3D_VERSION << "\r\n";
 		content << "Platform: " << K3D_HOST << "\r\n";
-		content << "Compiler: " << __VERSION__ << "\r\n";
+		content << "Compiler: " << K3D_COMPILER_NAME << "\r\n";
 		content << "Build Time: " << __DATE__ << " " << __TIME__ << " local\r\n";
 		content << m_detail.get_buffer()->get_text() << "\r\n";
 

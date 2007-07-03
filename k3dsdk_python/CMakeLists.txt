@@ -37,6 +37,7 @@ ADD_LIBRARY(k3dsdk-python-types SHARED
 	vector3_python.cpp
 	vector3_python.h
 	)
+K3D_GENERATE_DEF_FILE(k3dsdk-python-types)
 
 TARGET_LINK_LIBRARIES(k3dsdk-python-types k3dsdk)
 TARGET_LINK_LIBRARIES(k3dsdk-python-types ${K3D_BOOST_PYTHON_LIBS})
@@ -89,7 +90,8 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	object_model_python.cpp
 	object_model_python.h
 	)
-
+K3D_GENERATE_DEF_FILE(k3dsdk-python)
+        
 TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-python-types)
 
 INSTALL(TARGETS k3dsdk-python-types
