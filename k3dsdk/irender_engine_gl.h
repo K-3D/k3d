@@ -24,6 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "gl.h"
 #include "iunknown.h"
 #include "signal_system.h"
 
@@ -46,7 +47,7 @@ public:
 
 	/** \brief Redraws the document
 	    \note The caller must setup an OpenGL render context before calling this method, and must call glFlush() after it returns */
-	virtual void redraw(icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, double ViewMatrix[16], double ProjectionMatrix[16], int Viewport[4]) = 0;
+	virtual void redraw(icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4]) = 0;
 
 	/// Enumerates redraw request types
 	typedef enum

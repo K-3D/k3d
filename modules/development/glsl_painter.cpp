@@ -42,11 +42,11 @@ GLhandleARB compile_shader(const GLenum ShaderType, const std::string& ShaderSou
 	glShaderSourceARB(shader_object, 1, &source, 0);
 	glCompileShaderARB(shader_object);
 
-	int compile_status = 0;
+	GLint compile_status = 0;
 	glGetObjectParameterivARB(shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &compile_status);
 	k3d::log() << debug << "compile status: " << compile_status << std::endl;
 
-	int log_length = 0;
+	GLint log_length = 0;
 	glGetObjectParameterivARB(shader_object, GL_OBJECT_INFO_LOG_LENGTH_ARB, &log_length);
 	std::string log(log_length, ' ');
 	glGetInfoLogARB(shader_object, log_length, 0, const_cast<char*>(log.data()));
@@ -66,11 +66,11 @@ GLhandleARB link_shader(const GLhandleARB VertexObject, const GLhandleARB Fragme
 
 	glLinkProgramARB(program_object);
 
-	int link_status = 0;
+	GLint link_status = 0;
 	glGetObjectParameterivARB(program_object, GL_OBJECT_LINK_STATUS_ARB, &link_status);
 	k3d::log() << debug << "link status: " << link_status << std::endl;
 
-	int log_length = 0;
+	GLint log_length = 0;
 	glGetObjectParameterivARB(program_object, GL_OBJECT_INFO_LOG_LENGTH_ARB, &log_length);
 	std::string log(log_length, ' ');
 	glGetInfoLogARB(program_object, log_length, 0, const_cast<char*>(log.data()));

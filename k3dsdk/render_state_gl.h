@@ -24,6 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "gl.h"
+
 namespace k3d
 {
 
@@ -77,7 +79,7 @@ public:
 	/// Stores the current OpenGL projection matrix
 	float gl_projection_matrix[16];
 	/// Stores the current OpenGL viewport
-	int gl_viewport[4];
+	GLint gl_viewport[4];
 	/// Stores an OpenGL call list index for an ASCII font
 	/** \todo Figure out a better way to do this - what about unicode?  Different font styles? */
 	unsigned int gl_ascii_font_list_base;

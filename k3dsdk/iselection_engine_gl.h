@@ -55,7 +55,7 @@ public:
 	  \param Viewport Returns the OpenGL viewport used for drawing
 	  \note The caller must setup the OpenGL render context, allocate the selection buffer, put OpenGL in selection mode, and call glFlush() when done
 	*/
-	virtual void select(const selection_state& SelectionState, icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, const rectangle& Rectangle, double ViewMatrix[16], double ProjectionMatrix[16], int Viewport[4]) = 0;
+	virtual void select(const selection_state& SelectionState, icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, const rectangle& Rectangle, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4]) = 0;
 
 protected:
 	iselection_engine() {}
