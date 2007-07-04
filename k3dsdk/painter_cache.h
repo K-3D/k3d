@@ -76,8 +76,9 @@ template<class key_t, class data_t> class painter_cache
 			typename data_collection_t::iterator data = m_data.find(OldKey);
 			if (data != m_data.end())
 			{
+				data_t* const value = data->second;
 				m_data.erase(data);
-				m_data.insert(std::make_pair(NewKey, data->second));
+				m_data.insert(std::make_pair(NewKey, value));
 			}
 		}
 
