@@ -30,6 +30,8 @@ void load_dag(idocument& Document, xml::element& XML, const ipersistent::load_co
 void save_mesh(const mesh& Mesh, xml::element& Container, const ipersistent::save_context& Context);
 /// Deserializes a mesh from an XML document
 void load_mesh(mesh& Mesh, xml::element& Container, const ipersistent::load_context& Context);
+/// Deserializes a legacy mesh from an XML document. Needed to parse documents with old FrozenMesh nodes.
+void load_legacy_mesh(legacy::mesh& Mesh, xml::element& XML, const ipersistent::load_context& Context);
 
 /// Imports data into a document from a file
 bool import_file(idocument& Document, idocument_importer& FormatFilter, const filesystem::path& FilePath);

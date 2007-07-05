@@ -85,6 +85,27 @@ public:
 
 	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
 	element(const std::string& Name, const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6, const T7& A7, const T8& A8) : name(Name) { push_back(A1); push_back(A2); push_back(A3); push_back(A4); push_back(A5); push_back(A6); push_back(A7); push_back(A8); }
+	
+	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
+	element(const std::string& Name, const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6, const T7& A7, const T8& A8, const T9& A9) : name(Name) { push_back(A1); push_back(A2); push_back(A3); push_back(A4); push_back(A5); push_back(A6); push_back(A7); push_back(A8); push_back(A9);}
+
+	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
+	element(const std::string& Name, const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6, const T7& A7, const T8& A8, const T9& A9, const T10& A10) : name(Name) { push_back(A1); push_back(A2); push_back(A3); push_back(A4); push_back(A5); push_back(A6); push_back(A7); push_back(A8); push_back(A9); push_back(A10);}
+
+	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11>
+	element(const std::string& Name, const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6, const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11) : name(Name) { push_back(A1); push_back(A2); push_back(A3); push_back(A4); push_back(A5); push_back(A6); push_back(A7); push_back(A8); push_back(A9); push_back(A10); push_back(A11); }
+
+	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12>
+	element(const std::string& Name, const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6, const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12& A12) : name(Name) { push_back(A1); push_back(A2); push_back(A3); push_back(A4); push_back(A5); push_back(A6); push_back(A7); push_back(A8); push_back(A9); push_back(A10); push_back(A11); push_back(A12); }
+
+	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13>
+	element(const std::string& Name, const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6, const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12& A12, const T13& A13) : name(Name) { push_back(A1); push_back(A2); push_back(A3); push_back(A4); push_back(A5); push_back(A6); push_back(A7); push_back(A8); push_back(A9); push_back(A10); push_back(A11); push_back(A12); push_back(A13); }
+
+	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13, typename T14>
+	element(const std::string& Name, const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6, const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12& A12, const T13& A13, const T14& A14) : name(Name) { push_back(A1); push_back(A2); push_back(A3); push_back(A4); push_back(A5); push_back(A6); push_back(A7); push_back(A8); push_back(A9); push_back(A10); push_back(A11); push_back(A12); push_back(A13); push_back(A14); }
+
+	template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13, typename T14, typename T15>
+	element(const std::string& Name, const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6, const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12& A12, const T13& A13, const T14& A14, const T15& A15) : name(Name) { push_back(A1); push_back(A2); push_back(A3); push_back(A4); push_back(A5); push_back(A6); push_back(A7); push_back(A8); push_back(A9); push_back(A10); push_back(A11); push_back(A12); push_back(A13); push_back(A14); push_back(A15); }
 
 	void push_back(const std::string& Value) { text += Value; }
 	void push_back(const attribute& Value) { attributes.push_back(Value); }

@@ -145,22 +145,28 @@ public:
 		m_ri_painter(init_owner(*this) + init_name("ri_painter") + init_label(_("RenderMan Mesh Painter")) + init_description(_("RenderMan Mesh Painter")) + init_value(static_cast<k3d::ri::imesh_painter*>(0))),
 		m_show_component_selection(init_owner(*this) + init_name("show_component_selection") + init_label(_("Show Component Selection")) + init_description(_("Show component selection")) + init_value(false))
 	{
-		m_input_mesh.changed_signal().connect(make_append_hint_slot());
-		m_mesh_selection.changed_signal().connect(make_selection_changed_slot());
-		m_selection_weight.changed_signal().connect(make_selection_changed_slot());
-
-		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
-		m_gl_painter.changed_signal().connect(make_async_redraw_slot());
-		m_show_component_selection.changed_signal().connect(make_async_redraw_slot());
-		
-		deleted_signal().connect(sigc::mem_fun(*this, &mesh_instance::on_instance_delete));
-		
-		Document.dag().dependency_signal().connect(sigc::mem_fun(*this, &mesh_instance::on_dependency_change));
+		connect();
+		// connect to the redo signal, in case we get deleted because of undo this is our last chance to be saved!
+		if (document().state_recorder().current_change_set())
+		{
+			document().state_recorder().current_change_set()->connect_redo_signal(sigc::mem_fun(*this, &mesh_instance::connect));
+		}
 	}
-
-	~mesh_instance()
+	
+	/// Make the connections
+	void connect()
 	{
-		m_output_mesh.changed_signal().emit(k3d::hint::mesh_deleted());
+		m_connections.push_back(m_input_mesh.changed_signal().connect(make_append_hint_slot()));
+		m_connections.push_back(m_mesh_selection.changed_signal().connect(make_selection_changed_slot()));
+		m_connections.push_back(m_selection_weight.changed_signal().connect(make_selection_changed_slot()));
+
+		m_connections.push_back(m_input_matrix.changed_signal().connect(make_async_redraw_slot()));
+		m_connections.push_back(m_gl_painter.changed_signal().connect(make_async_redraw_slot()));
+		m_connections.push_back(m_show_component_selection.changed_signal().connect(make_async_redraw_slot()));
+		
+		m_connections.push_back(deleted_signal().connect(sigc::mem_fun(*this, &mesh_instance::on_instance_delete)));
+		
+		m_connections.push_back(document().dag().dependency_signal().connect(sigc::mem_fun(*this, &mesh_instance::on_dependency_change)));
 	}
 
 	sigc::slot<void, iunknown*> make_append_hint_slot()
@@ -173,10 +179,10 @@ public:
 		return sigc::mem_fun(*this, &mesh_instance::selection_changed);
 	}
 	
-		/// Copy Hint and append it to the list of received events
+	/// Copy Hint and append it to the list of received events
 	void append_hint(k3d::iunknown* Hint)
 	{
-		m_hint_cache.append_hint(Hint); // mesh is not used at this point
+		m_hint_cache.append_hint(Hint);
 		async_redraw(0);
 	}
 	
@@ -188,6 +194,13 @@ public:
 		const k3d::mesh* const output_mesh = m_output_mesh.value();
 		if (m_gl_painter.value() && output_mesh)
 			m_gl_painter.value()->mesh_changed(*output_mesh, k3d::hint::mesh_deleted());
+		// clear connections to prevent crash on document close
+		if(!document().state_recorder().current_change_set()) // no undo recording: this is the end, my friend
+		{
+			for (size_t i = 0; i != m_connections.size(); ++i)
+				m_connections[i].disconnect();
+			m_connections.clear();
+		}
 	}
 	
 	/// Elimination of nodes in the pipeline needs to be passed to the painters for correct cache clean-up
@@ -410,6 +423,7 @@ protected:
 	
 private:
 	hint_cache m_hint_cache;
+	std::vector<sigc::connection> m_connections;
 };
 
 /////////////////////////////////////////////////////////////////////////////

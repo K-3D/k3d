@@ -27,6 +27,8 @@
 #include "idocument_importer.h"
 #include "idocument_exporter.h"
 #include "imaterial.h"
+#include "imesh_painter_gl.h"
+#include "imesh_painter_ri.h"
 #include "inode.h"
 #include "inode_collection.h"
 #include "ipersistent.h"
@@ -768,6 +770,393 @@ void upgrade_transformable_nodes(element& XMLDocument)
 	xml_dependencies.children.insert(xml_dependencies.children.end(), new_dependencies.begin(), new_dependencies.end());
 }
 
+/// Add default painters if no painters are present
+void upgrade_painters(element& XMLDocument)
+{
+	element* const xml_nodes = find_element(XMLDocument, "nodes");
+	if(!xml_nodes)
+		return;
+
+	ipersistent_lookup::id_type next_node_id = max_node_id(XMLDocument) + 1;
+
+	element::elements_t new_dependencies;
+	element::elements_t new_nodes;
+	
+	bool has_gl_painter = false;
+	bool has_ri_painter = false;
+	// Check if the document contains painters
+	for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
+	{
+		if(xml_node->name != "node")
+			continue;
+
+		const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
+		iplugin_factory* const node_factory = plugin(node_class_id);
+		if(!node_factory)
+			continue;
+
+		const ipersistent_lookup::id_type node_id = attribute_value<ipersistent_lookup::id_type>(*xml_node, "id", 0);
+		if(!node_id)
+			continue;
+
+		if(node_factory->implements(typeid(gl::imesh_painter)))
+			has_gl_painter = true;
+
+		if(node_factory->implements(typeid(ri::imesh_painter)))
+			has_ri_painter = true;
+			
+		if (has_gl_painter && has_ri_painter)
+			break;
+	}
+	
+	// if ri or gl painters are not found, a default version is constructed:
+	if (!has_gl_painter)
+	{
+		ipersistent_lookup::id_type gl_painter_id = next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL Default Painter"),
+				attribute("class", (*plugins("OpenGLMultiPainter").begin())->class_id()),
+				attribute("id", next_node_id),
+				element("properties",
+					element("property", string_cast(next_node_id + 1),
+						attribute("name", "points"),
+						attribute("label", "Points"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 2),
+						attribute("name", "edges"),
+						attribute("label", "Edges"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 3),
+						attribute("name", "faces"),
+						attribute("label", "Faces"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 4),
+						attribute("name", "sds_points"),
+						attribute("label", "SDS Points"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 5),
+						attribute("name", "sds_edges"),
+						attribute("label", "SDS Edges"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 6),
+						attribute("name", "sds_faces"),
+						attribute("label", "SDS Faces"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 7),
+						attribute("name", "linear_curves"),
+						attribute("label", "Linear Curves"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 8),
+						attribute("name", "cubic_curves"),
+						attribute("label", "Cubic Curves"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 9),
+						attribute("name", "nurbs_curves"),
+						attribute("label", "NURBS Curves"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 10),
+						attribute("name", "bilinear_patches"),
+						attribute("label", "Bilinear Patches"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 11),
+						attribute("name", "bicubic_patches"),
+						attribute("label", "Bicubic Patches"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 12),
+						attribute("name", "nurbs_patches"),
+						attribute("label", "NURBS Patches"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 13),
+						attribute("name", "blobbies"),
+						attribute("label", "Blobbies"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 14),
+						attribute("name", "face_normals"),
+						attribute("label", "Face Normals"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 15),
+						attribute("name", "face_orientation"),
+						attribute("label", "Face Orientation"),
+						attribute("description", ""),
+						attribute("type", "k3d::gl::imesh_painter*"),
+						attribute("user_property", "vanilla")))));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL Point Painter"),
+				attribute("class", (*plugins("GLPointPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL Edge Painter"),
+				attribute("class", (*plugins("GLEdgePainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL Face Painter"),
+				attribute("class", (*plugins("GLFacePainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "SDS Point Painter"),
+				attribute("class", (*plugins("GLSDSPointPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "SDS Edge Painter"),
+				attribute("class", (*plugins("GLSDSEdgePainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "SDS Face Painter"),
+				attribute("class", (*plugins("GLSDSFacePainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL Linear Curve Painter"),
+				attribute("class", (*plugins("OpenGLLinearCurvePainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL Cubic Curve Painter"),
+				attribute("class", (*plugins("OpenGLCubicCurvePainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL NURBS Curve Painter"),
+				attribute("class", (*plugins("OpenGLNURBSCurvePainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL Bilinear Patch Painter"),
+				attribute("class", (*plugins("OpenGLBilinearPatchPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL Bicubic Patch Painter"),
+				attribute("class", (*plugins("OpenGLBicubicPatchPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL NURBS Patch Painter"),
+				attribute("class", (*plugins("OpenGLNURBSPatchPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL Blobby Point Painter"),
+				attribute("class", (*plugins("OpenGLBlobbyPointPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL Face Normal Painter"),
+				attribute("class", (*plugins("OpenGLFaceNormalPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "GL Face Orientation Painter"),
+				attribute("class", (*plugins("OpenGLFaceOrientationPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+				
+		// Now add painter properties to the MeshInstance nodes
+		for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
+		{
+			if(xml_node->name != "node")
+				continue;
+	
+			const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
+			if(node_class_id != classes::MeshInstance())
+				continue;
+	
+			element* const xml_properties = find_element(*xml_node, "properties");
+			if(!xml_properties)
+				continue;
+			
+			xml_properties->push_back(element("property", string_cast(gl_painter_id), attribute("name", "gl_painter")));
+		}
+	}
+	if (!has_ri_painter)
+	{
+		++next_node_id;
+		ipersistent_lookup::id_type ri_painter_id = next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "Renderman Default Painter"),
+				attribute("class", (*plugins("RenderManMultiPainter").begin())->class_id()),
+				attribute("id", next_node_id),
+				element("properties",
+					element("property", string_cast(next_node_id + 1),
+						attribute("name", "point_groups"),
+						attribute("label", "Point Groups"),
+						attribute("description", ""),
+						attribute("type", "k3d::ri::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 2),
+						attribute("name", "polyhedra"),
+						attribute("label", "Polyhedra"),
+						attribute("description", ""),
+						attribute("type", "k3d::ri::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 3),
+						attribute("name", "subdivision_surfaces"),
+						attribute("label", "Subdivision Surfaces"),
+						attribute("description", ""),
+						attribute("type", "k3d::ri::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 4),
+						attribute("name", "linear_curves"),
+						attribute("label", "Linear Curves"),
+						attribute("description", ""),
+						attribute("type", "k3d::ri::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 5),
+						attribute("name", "cubic_curves"),
+						attribute("label", "Cubic Curves"),
+						attribute("description", ""),
+						attribute("type", "k3d::ri::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 6),
+						attribute("name", "bilinear_patches"),
+						attribute("label", "Bilinear Patches"),
+						attribute("description", ""),
+						attribute("type", "k3d::ri::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 7),
+						attribute("name", "bicubic_patches"),
+						attribute("label", "Bicubic Patches"),
+						attribute("description", ""),
+						attribute("type", "k3d::ri::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 8),
+						attribute("name", "nurbs_patches"),
+						attribute("label", "NURBS Patches"),
+						attribute("description", ""),
+						attribute("type", "k3d::ri::imesh_painter*"),
+						attribute("user_property", "vanilla")),
+					element("property", string_cast(next_node_id + 9),
+						attribute("name", "blobbies"),
+						attribute("label", "Blobbies"),
+						attribute("description", ""),
+						attribute("type", "k3d::ri::imesh_painter*"),
+						attribute("user_property", "vanilla")))));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "RenderMan Point Group Painter"),
+				attribute("class", (*plugins("RenderManPointGroupPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "RenderMan Polyhedron Painter"),
+				attribute("class", (*plugins("RenderManPolyhedronPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "RenderMan Subdivision Surface Painter"),
+				attribute("class", (*plugins("RenderManSubdivisionSurfacePainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "RenderMan Linear Curve Painter"),
+				attribute("class", (*plugins("RenderManLinearCurvePainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "RenderMan Cubic Curve Painter"),
+				attribute("class", (*plugins("RenderManCubicCurvePainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "RenderMan Bilinear Patch Painter"),
+				attribute("class", (*plugins("RenderManBilinearPatchPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "RenderMan Bicubic Patch Painter"),
+				attribute("class", (*plugins("RenderManBicubicPatchPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "RenderMan NURBS Patch Painter"),
+				attribute("class", (*plugins("RenderManNURBSPatchPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+		++next_node_id;
+		new_nodes.push_back(
+			element("node",
+				attribute("name", "RenderMan Blobby Painter"),
+				attribute("class", (*plugins("RenderManBlobbyPainter").begin())->class_id()),
+				attribute("id", next_node_id)));
+				
+		// Now add painter properties to the MeshInstance nodes
+		for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
+		{
+			if(xml_node->name != "node")
+				continue;
+	
+			const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
+			if(node_class_id != classes::MeshInstance())
+				continue;
+	
+			element* const xml_properties = find_element(*xml_node, "properties");
+			if(!xml_properties)
+				continue;
+			
+			xml_properties->push_back(element("property", string_cast(ri_painter_id), attribute("name", "ri_painter")));
+		}
+	}
+	
+	xml_nodes->children.insert(xml_nodes->children.end(), new_nodes.begin(), new_nodes.end());
+}
+
 /// Helper functor for searching for shaders by name
 struct same_name
 {
@@ -807,6 +1196,7 @@ void upgrade_document(element& XMLDocument)
 	detail::upgrade_poly_terrain_hfbm_nodes(XMLDocument);
 	detail::upgrade_poly_text_nodes(XMLDocument);
 	detail::upgrade_transformable_nodes(XMLDocument);
+	detail::upgrade_painters(XMLDocument);
 }
 
 /////////////////////////////////////////////////////////////////////////////

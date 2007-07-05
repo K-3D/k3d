@@ -236,6 +236,8 @@ class sds_cache : public k3d::scheduler
 public:
 	sds_cache() : levels(2) {}
 	
+	~sds_cache();
+	
 	/// Notify the cache that one of the registered painters changed level
 	void level_changed();
 	
@@ -249,6 +251,8 @@ public:
 private:
 	typedef std::set<k3d::iproperty*> levels_t;
 	levels_t m_levels;
+	// store connections for safe deletion of cache
+	std::vector<sigc::connection> m_connections;
 };
 
 /// Encapsulates a VBO SDS cache in a k3d::scheduler

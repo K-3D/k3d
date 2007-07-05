@@ -886,6 +886,13 @@ bool edge_face::is_sharp( const size_t Edge, const k3d::mesh::points_t & Points,
 // sds_cache
 /////////////
 
+sds_cache::~sds_cache()
+{
+	// disconnect these, so they no longer point into freed memory
+	for (size_t i = 0; i != m_connections.size(); ++i)
+		m_connections[i].disconnect();
+}
+
 void sds_cache::level_changed()
 {
 	// search the highest level requested by the clients
@@ -903,7 +910,7 @@ void sds_cache::register_property(k3d::iproperty* LevelProperty)
 {
 	if (m_levels.insert(LevelProperty).second)
 	{
-		LevelProperty->property_deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &sds_cache::remove_property), LevelProperty));
+		m_connections.push_back(LevelProperty->property_deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &sds_cache::remove_property), LevelProperty)));
 		level_changed();
 	}
 }

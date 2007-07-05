@@ -26,6 +26,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_storage.h>
+#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
@@ -99,11 +100,20 @@ public:
 		m_output_mesh.reset(mesh);
 
 		// Load the stored mesh data ...
-		element* const xml_mesh = find_element(Element, "mesh_arrays");
-		if(!xml_mesh)
-			return;
-
-		k3d::load_mesh(*mesh, *xml_mesh, Context);
+		element* xml_mesh = find_element(Element, "mesh_arrays");
+		if(xml_mesh)
+		{
+			k3d::load_mesh(*mesh, *xml_mesh, Context);
+		}
+		else
+		{ // try the legacy mesh loader
+			xml_mesh = find_element(Element, "mesh");
+			if(!xml_mesh)
+				return;
+			k3d::legacy::mesh legacy_mesh;
+			load_legacy_mesh(legacy_mesh, *xml_mesh, Context);
+			*mesh = legacy_mesh;
+		}
 	}
 
 	static k3d::iplugin_factory& get_factory()
