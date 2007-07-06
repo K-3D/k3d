@@ -22,12 +22,13 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
+
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/data.h>
-#include <k3dsdk/fstream.h>
-#include <k3d-i18n-config.h>
+#include <k3dsdk/gzstream.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>
@@ -76,7 +77,7 @@ public:
 		element xml("k3dml");
 		try
 		{
-			k3d::filesystem::ifstream stream(FilePath);
+			k3d::filesystem::igzstream stream(FilePath);
 			hide_progress progress;
 			parse(xml, stream, FilePath.native_utf8_string().raw(), progress);
 		}
