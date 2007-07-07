@@ -115,6 +115,11 @@ int main(int argc, char* argv[])
 
 			xml_interfaces.append(k3d::xml::element("interface", k3d::type_string(**interface)));
 		}
+
+		k3d::xml::element& xml_metadata = xml_plugin.append(k3d::xml::element("metadata"));
+		const k3d::iplugin_factory::metadata_t& metadata = (*factory)->metadata();
+		for(k3d::iplugin_factory::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
+			xml_metadata.append(k3d::xml::element("pair", k3d::xml::attribute("name", pair->first), k3d::xml::attribute("value", pair->second)));
 	}
 
 	std::cout << k3d::xml::declaration() << xml_proxy;
