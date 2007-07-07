@@ -25,28 +25,22 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
+
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/file_helpers.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/module.h>
-#include <k3d-platform-config.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/string_modifiers.h>
 
 #include <k3dsdk_python/object_model_python.h>
 
 #include <boost/python/dict.hpp>
-
-#if defined K3D_API_DARWIN
-	#define PYTHON_INITIALIZE PyMac_Initialize
-#else
-	#define PYTHON_INITIALIZE Py_Initialize
-#endif
 
 /// Namespace reserved for the Python scripting engine module, to protect public symbols from name clashes with other modules
 namespace libk3dpython
@@ -63,7 +57,7 @@ public:
 	{
 		if(!Py_IsInitialized())
 		{
-			PYTHON_INITIALIZE();
+			Py_Initialize();
 
 			try
 			{
