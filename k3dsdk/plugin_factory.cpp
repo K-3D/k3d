@@ -32,11 +32,12 @@ namespace k3d
 /////////////////////////////////////////////////////////////////////////////
 // plugin_factory
 
-plugin_factory::plugin_factory(const uuid& ClassID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality) :
+plugin_factory::plugin_factory(const uuid& ClassID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality, const metadata_t& Metadata) :
 	m_class_id(ClassID),
 	m_name(Name),
 	m_short_description(ShortDescription),
-	m_quality(Quality)
+	m_quality(Quality),
+	m_metadata(Metadata)
 {
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer_t;
 	boost::char_separator<char> separator;
@@ -67,6 +68,11 @@ const iplugin_factory::categories_t& plugin_factory::categories()
 k3d::iplugin_factory::quality_t plugin_factory::quality()
 {
 	return m_quality;
+}
+
+const k3d::iplugin_factory::metadata_t& plugin_factory::metadata()
+{
+	return m_metadata;
 }
 
 std::ostream& operator<<(std::ostream& Stream, const iplugin_factory::quality_t& RHS)

@@ -40,8 +40,8 @@ class application_plugin_factory :
 	public iapplication_plugin_factory
 {
 public:
-	application_plugin_factory(const uuid& ClassID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality = STABLE) :
-		plugin_factory(ClassID, Name, ShortDescription, Categories, Quality)
+	application_plugin_factory(const uuid& ClassID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality = STABLE, const metadata_t& Metadata = metadata_t()) :
+		plugin_factory(ClassID, Name, ShortDescription, Categories, Quality, Metadata)
 	{
 	}
 

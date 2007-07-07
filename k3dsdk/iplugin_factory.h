@@ -29,6 +29,7 @@
 #include "uuid.h"
 
 #include <iosfwd>
+#include <map>
 #include <string>
 #include <typeinfo>
 #include <vector>
@@ -53,6 +54,8 @@ public:
 	typedef std::vector<std::string> categories_t;
 	/// Defines a collection of interfaces implemented by the underlying plugin instance
 	typedef std::vector<const std::type_info*> interfaces_t;
+	/// Defines an arbitrary collection of name-value pair metadata describing the underlying plugin instance
+	typedef std::map<std::string, std::string> metadata_t;
 
 	/// Returns a guaranteed-unique plugin ID
 	virtual const k3d::uuid& class_id() = 0;
@@ -64,10 +67,12 @@ public:
 	virtual const categories_t& categories() = 0;
 	/// Returns the plugin quality (stable or experimental)
 	virtual quality_t quality() = 0;
-	/// Returns true iff a plugin instance implements the requested interface
+	/// Returns true iff a plugin implements the requested interface
 	virtual bool implements(const std::type_info& InterfaceType) = 0;
-	/// Returns the set of interfaces implemented by the plugin instance
+	/// Returns the set of interfaces implemented by the plugin 
 	virtual const interfaces_t interfaces() = 0;
+	/// Returns metadata describing the plugin
+	virtual const metadata_t& metadata() = 0;
 
 protected:
 	iplugin_factory() {}

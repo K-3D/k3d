@@ -330,7 +330,7 @@ class application_plugin_factory_proxy :
 	public iapplication_plugin_factory
 {
 public:
-	application_plugin_factory_proxy(const uuid& Class, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces) :
+	application_plugin_factory_proxy(const uuid& Class, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces, const iplugin_factory::metadata_t& Metadata) :
 		m_factory(0),
 		m_application_factory(0),
 		m_class_id(Class),
@@ -338,7 +338,8 @@ public:
 		m_short_description(ShortDescription),
 		m_categories(Categories),
 		m_quality(Quality),
-		m_interfaces(Interfaces)
+		m_interfaces(Interfaces),
+		m_metadata(Metadata)
 	{
 	}
 
@@ -399,6 +400,14 @@ public:
 	const interfaces_t interfaces()
 	{
 		return m_interfaces;
+	}
+
+	const metadata_t& metadata()
+	{
+		if(m_factory)
+			return m_factory->metadata();
+
+		return m_metadata;
 	}
 
 	iunknown* create_plugin()
@@ -423,6 +432,7 @@ private:
 	const iplugin_factory::categories_t m_categories;
 	const iplugin_factory::quality_t m_quality;
 	const iplugin_factory::interfaces_t m_interfaces;
+	const iplugin_factory::metadata_t m_metadata;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -434,7 +444,7 @@ class document_plugin_factory_proxy :
 	public idocument_plugin_factory
 {
 public:
-	document_plugin_factory_proxy(const uuid& Class, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces) :
+	document_plugin_factory_proxy(const uuid& Class, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces, const iplugin_factory::metadata_t& Metadata) :
 		m_factory(0),
 		m_document_factory(0),
 		m_class_id(Class),
@@ -442,7 +452,8 @@ public:
 		m_short_description(ShortDescription),
 		m_categories(Categories),
 		m_quality(Quality),
-		m_interfaces(Interfaces)
+		m_interfaces(Interfaces),
+		m_metadata(Metadata)
 	{
 	}
 
@@ -503,6 +514,14 @@ public:
 	const interfaces_t interfaces()
 	{
 		return m_interfaces;
+	}
+
+	const metadata_t& metadata()
+	{
+		if(m_factory)
+			return m_factory->metadata();
+
+		return m_metadata;
 	}
 
 	inode* create_plugin(iplugin_factory& Factory, idocument& Document)
@@ -532,6 +551,7 @@ private:
 	const iplugin_factory::categories_t m_categories;
 	const iplugin_factory::quality_t m_quality;
 	const iplugin_factory::interfaces_t m_interfaces;
+	const iplugin_factory::metadata_t m_metadata;
 };
 
 } // namespace detail
@@ -557,17 +577,6 @@ struct plugin_factory_collection::implementation
 			xml::element* const xml_module = xml::find_element(xml_document, "module");
 			if(!xml_module)
 				throw std::runtime_error("Missing <module> tag");
-
-			/** \todo Handle proxied module classes the same way we do it for un-proxied modules */
-/*
-			const uuid module_class = xml::attribute_value<uuid>(*xml_module, "class", uuid::null());
-			if(m_modules.count(module_class))
-			{
-				log() << info << "Skipping duplicate module " << Path.leaf() << std::endl;
-				return false;
-			}
-			m_modules.insert(module_class);
-*/
 
 			xml::element* const xml_plugins = xml::find_element(*xml_module, "plugins");
 			if(!xml_plugins)
@@ -611,13 +620,25 @@ struct plugin_factory_collection::implementation
 				}
 				plugin_interfaces.erase(std::find(plugin_interfaces.begin(), plugin_interfaces.end(), static_cast<std::type_info*>(0)), plugin_interfaces.end());
 
+				iplugin_factory::metadata_t metadata;
+				if(xml::element* const xml_metadata = xml::find_element(*xml_plugin, "metadata"))
+				{
+					for(xml::element::elements_t::iterator xml_pair = xml_metadata->children.begin(); xml_pair != xml_metadata->children.end(); ++xml_pair)
+					{
+						if(xml_pair->name != "pair")
+							continue;
+
+						metadata.insert(std::make_pair(xml::attribute_text(*xml_pair, "name"), xml::attribute_text(*xml_pair, "value")));
+					}
+				}
+
 				if(plugin_type == "application")
 				{
-					m_factories.insert(new detail::application_plugin_factory_proxy(plugin_class, plugin_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces));
+					m_factories.insert(new detail::application_plugin_factory_proxy(plugin_class, plugin_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces, metadata));
 				}
 				else if(plugin_type == "document")
 				{
-					m_factories.insert(new detail::document_plugin_factory_proxy(plugin_class, plugin_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces));
+					m_factories.insert(new detail::document_plugin_factory_proxy(plugin_class, plugin_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces, metadata));
 				}
 				else
 				{

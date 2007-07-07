@@ -40,13 +40,14 @@ class plugin_factory :
 	public iplugin_factory
 {
 public:
-	plugin_factory(const uuid& ClassID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality);
+	plugin_factory(const uuid& ClassID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality, const metadata_t& Metadata = metadata_t());
 
 	const uuid& class_id();
 	const std::string name();
 	const std::string short_description();
 	const categories_t& categories();
 	quality_t quality();
+	const metadata_t& metadata();
 
 private:
 	const uuid m_class_id;
@@ -54,6 +55,7 @@ private:
 	const std::string m_short_description;
 	categories_t m_categories;
 	const quality_t m_quality;
+	const metadata_t m_metadata;
 };
 
 } // namespace k3d
