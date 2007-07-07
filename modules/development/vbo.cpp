@@ -917,7 +917,6 @@ void sds_cache::register_property(k3d::iproperty* LevelProperty)
 
 void sds_cache::remove_property(k3d::iproperty* LevelProperty)
 {
-	k3d::log() << debug << "sds_cache: removing level property " << LevelProperty << std::endl;
 	m_levels.erase(LevelProperty);
 }
 

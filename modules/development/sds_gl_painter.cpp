@@ -51,7 +51,7 @@ class sds_gl_face_painter :
 {
 	typedef colored_selection_painter base;
 	/// Defines the set of sds caches associated with this painter
-	typedef std::set<sds_gl_cache*> sds_cache_set_t;
+	typedef std::set<boost::shared_ptr<const k3d::mesh::points_t> > sds_cache_set_t;
 
 public:
 	sds_gl_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document, const k3d::color Unselected = k3d::color(0.2,0.2,0.2), const k3d::color Selected = k3d::color(0.6,0.6,0.6)) :
@@ -69,8 +69,10 @@ public:
 	
 	void on_levels_changed(k3d::iunknown* Hint)
 	{
-		for (sds_cache_set_t::iterator cache = m_sds_cache_set.begin(); cache != m_sds_cache_set.end(); ++cache) {
-			(*cache)->level_changed();
+		for (sds_cache_set_t::iterator points = m_sds_cache_set.begin(); points != m_sds_cache_set.end(); ++points) {
+			sds_gl_cache* cache = m_sds_cache.get_data(*points);
+			if (cache)
+				cache->level_changed();
 		}
 		
 		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
@@ -91,7 +93,7 @@ public:
 			cache->cache.set_input(&Mesh);
 		}
 		
-		m_sds_cache_set.insert(cache);
+		m_sds_cache_set.insert(Mesh.points);
 		cache->register_property(&m_levels);
 		
 		cache->execute(Mesh);
@@ -116,7 +118,7 @@ public:
 			cache->cache.set_input(&Mesh);
 		}
 		
-		m_sds_cache_set.insert(cache);
+		m_sds_cache_set.insert(Mesh.points);
 		cache->register_property(&m_levels);
 		
 		cache->execute(Mesh);
@@ -172,10 +174,12 @@ protected:
 		k3d::hint::mesh_address_changed_t* address_hint = dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint);
 		return_if_fail(address_hint);
 		m_sds_cache.switch_key(address_hint->old_points_address, Mesh.points);
+		m_sds_cache_set.erase(address_hint->old_points_address);
 	}
 	
 	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
+		m_sds_cache_set.erase(Mesh.points);
 		m_sds_cache.remove_data(Mesh.points);
 	}
 	
