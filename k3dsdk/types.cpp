@@ -189,6 +189,8 @@ void initialize_types()
 	register_type(typeid(k3d::itransform_array_3d), "k3d::itransform_array_3d");
 	register_type(typeid(k3d::itransform_sink), "k3d::itransform_sink");
 	register_type(typeid(k3d::itransform_source), "k3d::itransform_source");
+	register_type(typeid(k3d::iunknown), "k3d::iunknown");
+	register_type(typeid(k3d::iunknown*), "k3d::iunknown*");
 	register_type(typeid(k3d::iuri), "k3d::iuri");
 	register_type(typeid(k3d::ivector3_source), "k3d::ivector3_source");
 	register_type(typeid(k3d::legacy::mesh), "k3d::legacy::mesh");
