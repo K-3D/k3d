@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,19 +18,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the plugin factory collection
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "fstream.h"
 #include "k3d-i18n-config.h"
+
+#include "fstream.h"
 #include "iapplication_plugin_factory.h"
 #include "idocument_plugin_factory.h"
 #include "iplugin_factory.h"
 #include "iplugin_registry.h"
 #include "iscript_engine.h"
 #include "log.h"
-#include "k3d-platform-config.h"
+#include "os_load_module.h"
 #include "plugin_factory_collection.h"
 #include "result.h"
 #include "string_cast.h"
@@ -46,165 +46,6 @@ namespace k3d
 
 namespace detail
 {
-
-//////////////////////////////////////////////////////////////////////////////
-// os_load_module
-
-#if defined K3D_API_WIN32
-	#include "win32.h"
-
-	static void os_load_module(const filesystem::path& FilePath, register_plugins_entry_point& RegisterPlugins)
-	{
-		const UINT old_error_mode = SetErrorMode(SetErrorMode(SEM_FAILCRITICALERRORS)); // Disable error dialogs when loading DLLs
-		HINSTANCE module = LoadLibrary(FilePath.native_filesystem_string().c_str());
-		SetErrorMode(old_error_mode);
-
-		if(!module)
-		{
-			log() << error << "Module [" << FilePath.native_console_string() << "] could not be loaded: error " << GetLastError() << std::endl;
-			return;
-		}
-
-		RegisterPlugins = register_plugins_entry_point(GetProcAddress(module, "register_k3d_plugins"));
-		if(!RegisterPlugins)
-			RegisterPlugins = register_plugins_entry_point(GetProcAddress(module, "_register_k3d_plugins"));
-		if(!RegisterPlugins)
-		{
-			log() << error << "Module " << FilePath.leaf().raw() << " does not contain required register_k3d_plugins() entry point" << std::endl;
-			return;
-		}
-	}
-
-#elif defined K3D_API_DARWIN
-
-	#include <mach-o/dyld.h>
-
-	static void ns_error_undefined_symbols(const char* symbol)
-	{
-		log() << error << "plugin loader : undefined symbol " << symbol << std::endl;
-		exit(0);
-	}
-
-	static NSModule ns_error_multiply_defined_symbols(NSSymbol s, NSModule oldModule, NSModule newModule)
-	{
-		log() << warning << "plugin loader : " << NSNameOfSymbol(s) << " redefined in " << NSNameOfModule(oldModule) << std::endl;
-		log() << warning << "                previously defined here : " << NSNameOfModule(newModule) << std::endl;
-
-		return newModule;
-	}
-
-	static void ns_error_other(NSLinkEditErrors errorClass, int errorNumber, const char* fileName, const char* errorString)
-	{
-		log() << warning << "plugin loader : " << fileName << " " << errorString << std::endl;
-	}
-
-	static NSLinkEditErrorHandlers ns_error_handlers =
-	{
-		ns_error_undefined_symbols,
-		ns_error_multiply_defined_symbols,
-		ns_error_other
-	};
-
-	static bool ns_initialized = false;
-
-	static void* dlopen(const char* path, int mode)
-	{
-		return_val_if_fail(path, 0);
-
-		if(!ns_initialized)
-		{
-			NSInstallLinkEditErrorHandlers(&ns_error_handlers);
-			ns_initialized = true;
-		}
-
-		NSObjectFileImage file_image = 0;
-		NSObjectFileImageReturnCode return_code = NSCreateObjectFileImageFromFile(path, &file_image);
-
-		void* handle = 0;
-		switch(return_code)
-		{
-			case NSObjectFileImageSuccess:
-				handle = NSLinkModule(file_image, path, NSLINKMODULE_OPTION_RETURN_ON_ERROR);
-				NSDestroyObjectFileImage(file_image);
-			break;
-			case NSObjectFileImageInappropriateFile:
-				handle = (void*)NSAddImage(path, NSADDIMAGE_OPTION_RETURN_ON_ERROR);
-			default:
-			break;
-		}
-
-		return_val_if_fail(handle, 0);
-
-		return handle;
-	}
-
-	static void* dlsym(void* handle, const char* symbol)
-	{
-		return_val_if_fail(handle, 0);
-
-		const std::string _symbol = '_' + std::string(symbol);
-
-		NSSymbol ns_symbol = 0;
-		if(MH_MAGIC == static_cast<mach_header*>(handle)->magic)
-		{
-			return_val_if_fail(NSIsSymbolNameDefinedInImage(static_cast<mach_header*>(handle), _symbol.c_str()), 0);
-
-			ns_symbol = NSLookupSymbolInImage(static_cast<mach_header*>(handle), _symbol.c_str(), NSLOOKUPSYMBOLINIMAGE_OPTION_BIND);
-		}
-		else
-		{
-			ns_symbol = NSLookupSymbolInModule(static_cast<NSModule>(handle), _symbol.c_str());
-		}
-
-		return_val_if_fail(ns_symbol, 0);
-
-		return NSAddressOfSymbol(ns_symbol);
-	}
-
-	static const char* dlerror()
-	{
-		return 0;
-	}
-
-	static void os_load_module(const filesystem::path& FilePath, register_plugins_entry_point& RegisterPlugins)
-	{
-		void* module = dlopen(FilePath.native_filesystem_string().c_str(), 0);
-		if(!module)
-		{
-			log() << error << "Module " << FilePath.leaf().raw() << ": " << dlerror() << std::endl;
-			return;
-		}
-
-		RegisterPlugins = register_plugins_entry_point(dlsym(module, "register_k3d_plugins"));
-		if(!RegisterPlugins)
-		{
-			log() << error << "Module " << FilePath.leaf().raw() << " does not contain required register_k3d_plugins() entry point" << std::endl;
-			return;
-		}
-	}
-
-#else // POSIX
-
-	#include <dlfcn.h>
-
-	static void os_load_module(const filesystem::path& FilePath, register_plugins_entry_point& RegisterPlugins)
-	{
-		void* module = dlopen(FilePath.native_filesystem_string().c_str(), RTLD_GLOBAL | RTLD_LAZY);
-		if(!module)
-		{
-			log() << error << "Module " << FilePath.leaf().raw() << ": " << dlerror() << std::endl;
-			return;
-		}
-
-		RegisterPlugins = register_plugins_entry_point(dlsym(module, "register_k3d_plugins"));
-		if(!RegisterPlugins)
-		{
-			log() << error << "Module " << FilePath.leaf().raw() << " does not contain required register_k3d_plugins() entry point" << std::endl;
-			return;
-		}
-	}
-
-#endif // POSIX
 
 /////////////////////////////////////////////////////////////////////////////
 // same_class_id
@@ -256,10 +97,9 @@ class plugin_registry :
 	public iplugin_registry
 {
 public:
-	plugin_registry(message_signal_t& MessageSignal, iplugin_factory_collection::factories_t& AllFactories, iplugin_factory_collection::factories_t& NewFactories) :
+	plugin_registry(message_signal_t& MessageSignal, iplugin_factory_collection::factories_t& Factories) :
 		m_message_signal(MessageSignal),
-		m_all_factories(AllFactories),
-		m_new_factories(NewFactories)
+		m_factories(Factories)
 	{
 	}
 
@@ -268,25 +108,23 @@ public:
 		m_message_signal.emit(string_cast(boost::format(_("Loading plugin %1%")) % Factory.name()));
 
 		// Ensure we don't have any duplicate class IDs ...
-		if(std::count_if(m_all_factories.begin(), m_all_factories.end(), same_class_id(Factory.class_id())))
+		if(std::count_if(m_factories.begin(), m_factories.end(), same_class_id(Factory.class_id())))
 		{
 			log() << error << "Plugin " << Factory.name() << " with duplicate class ID " << Factory.class_id() << " will not be loaded" << std::endl;
 			return;
 		}
 
 		// Warn if we have duplicate names ...
-		if(std::count_if(m_all_factories.begin(), m_all_factories.end(), same_name(Factory.name())))
+		if(std::count_if(m_factories.begin(), m_factories.end(), same_name(Factory.name())))
 			log() << warning << "Loading plugin with duplicate name " << Factory.name() << std::endl;
 
 		// Stash that baby!
-		m_all_factories.insert(&Factory);
-		m_new_factories.insert(&Factory);
+		m_factories.insert(&Factory);
 	}
 
 private:
 	message_signal_t& m_message_signal;
-	iplugin_factory_collection::factories_t& m_all_factories;
-	iplugin_factory_collection::factories_t& m_new_factories;
+	iplugin_factory_collection::factories_t& m_factories;
 };
 
 /// Stores a mapping of plugin class id to plugin factory, so we can lookup recently-loaded factories quickly
@@ -302,7 +140,7 @@ iplugin_factory* load_proxied_factory(const uuid& ClassID)
 
 	// OK, just load the module already!
 	register_plugins_entry_point register_plugins = 0;
-	detail::os_load_module(proxied_modules[ClassID], register_plugins);
+	os_load_module(proxied_modules[ClassID], register_plugins);
 
 	if(!register_plugins)
 		return 0;
@@ -312,8 +150,7 @@ iplugin_factory* load_proxied_factory(const uuid& ClassID)
 
 	message_signal_t message_signal;
 	iplugin_factory_collection::factories_t factories;
-	iplugin_factory_collection::factories_t new_factories;
-	plugin_registry registry(message_signal, factories, new_factories);
+	plugin_registry registry(message_signal, factories);
 	register_plugins(registry);
 	for(iplugin_factory_collection::factories_t::iterator factory = factories.begin(); factory != factories.end(); ++factory)
 		proxied_factories[(*factory)->class_id()] = (*factory);
@@ -345,49 +182,31 @@ public:
 
 	const uuid& class_id()
 	{
-		if(m_factory)
-			return m_factory->class_id();
-
 		return m_class_id;
 	}
 
 	const std::string name()
 	{
-		if(m_factory)
-			return m_factory->name();
-
 		return m_name;
 	}
 
 	const std::string short_description()
 	{
-		if(m_factory)
-			return m_factory->short_description();
-
 		return m_short_description;
 	}
 
 	const categories_t& categories()
 	{
-		if(m_factory)
-			return m_factory->categories();
-
 		return m_categories;
 	}
 
 	quality_t quality()
 	{
-		if(m_factory)
-			return m_factory->quality();
-
 		return m_quality;
 	}
 
 	bool implements(const std::type_info& InterfaceType)
 	{
-		if(m_factory)
-			return m_factory->implements(InterfaceType);
-
 		for(iplugin_factory::interfaces_t::const_iterator iface = m_interfaces.begin(); iface != m_interfaces.end(); ++iface)
 		{
 			if((**iface) == InterfaceType)
@@ -404,9 +223,6 @@ public:
 
 	const metadata_t& metadata()
 	{
-		if(m_factory)
-			return m_factory->metadata();
-
 		return m_metadata;
 	}
 
@@ -415,7 +231,12 @@ public:
 		if(!m_factory)
 		{
 			m_factory = load_proxied_factory(m_class_id);
+			if(!m_factory)
+				k3d::log() << error << "Couldn't load proxied factory for plugin: " << name() << std::endl;
+
 			m_application_factory = dynamic_cast<iapplication_plugin_factory*>(m_factory);
+			if(!m_application_factory)
+				k3d::log() << error << "Not an application plugin factory: " << name() << std::endl;
 		}
 
 		return_val_if_fail(m_application_factory, 0);
@@ -459,49 +280,31 @@ public:
 
 	const uuid& class_id()
 	{
-		if(m_factory)
-			return m_factory->class_id();
-
 		return m_class_id;
 	}
 
 	const std::string name()
 	{
-		if(m_factory)
-			return m_factory->name();
-
 		return m_name;
 	}
 
 	const std::string short_description()
 	{
-		if(m_factory)
-			return m_factory->short_description();
-
 		return m_short_description;
 	}
 
 	const categories_t& categories()
 	{
-		if(m_factory)
-			return m_factory->categories();
-
 		return m_categories;
 	}
 
 	quality_t quality()
 	{
-		if(m_factory)
-			return m_factory->quality();
-
 		return m_quality;
 	}
 
 	bool implements(const std::type_info& InterfaceType)
 	{
-		if(m_factory)
-			return m_factory->implements(InterfaceType);
-
 		for(iplugin_factory::interfaces_t::const_iterator iface = m_interfaces.begin(); iface != m_interfaces.end(); ++iface)
 		{
 			if((**iface) == InterfaceType)
@@ -518,9 +321,6 @@ public:
 
 	const metadata_t& metadata()
 	{
-		if(m_factory)
-			return m_factory->metadata();
-
 		return m_metadata;
 	}
 
@@ -530,11 +330,11 @@ public:
 		{
 			m_factory = load_proxied_factory(m_class_id);
 			if(!m_factory)
-				k3d::log() << error << "Couldn't load proxied factory for plugin " << name() << std::endl;
+				k3d::log() << error << "Couldn't load proxied factory for plugin: " << name() << std::endl;
 
 			m_document_factory = dynamic_cast<idocument_plugin_factory*>(m_factory);
 			if(!m_document_factory)
-				k3d::log() << error << "Couldn't cast proxied factory for document plugin " << name() << std::endl;
+				k3d::log() << error << "Not a document plugin factory: " << name() << std::endl;
 		}
 
 		return_val_if_fail(m_document_factory, 0);
@@ -591,6 +391,18 @@ struct plugin_factory_collection::implementation
 				m_message_signal.emit(string_cast(boost::format(_("Proxying plugin %1%")) % plugin_name));
 
 				const uuid plugin_class = xml::attribute_value<uuid>(*xml_plugin, "class", uuid::null());
+
+				// Ensure we don't have any duplicate class IDs ...
+				if(std::count_if(m_factories.begin(), m_factories.end(), detail::same_class_id(plugin_class)))
+				{
+					log() << error << "Plugin " << plugin_name << " with duplicate class ID " << plugin_class << " will not be loaded" << std::endl;
+					continue;
+				}
+
+				// Warn if we have duplicate names ...
+				if(std::count_if(m_factories.begin(), m_factories.end(), detail::same_name(plugin_name)))
+					log() << warning << "Loading plugin with duplicate name " << plugin_name << std::endl;
+
 				const std::string plugin_short_description = xml::element_text(*xml_plugin, "short_description");
 				const iplugin_factory::quality_t plugin_quality = xml::attribute_value<iplugin_factory::quality_t>(*xml_plugin, "quality", iplugin_factory::EXPERIMENTAL);
 				const std::string plugin_type = xml::attribute_text(*xml_plugin, "type");
@@ -661,35 +473,6 @@ struct plugin_factory_collection::implementation
 		return false;
 	}
 
-	void load_module(const filesystem::path& Path, const load_proxy_t LoadProxies)
-	{
-		// K-3D modules have the same extension on all platforms ...
-		if(filesystem::extension(Path).lowercase().raw() != ".module")
-			return;
-
-		// If the module can be proxied for fast startup, do that instead ...
-		filesystem::path proxy_path = Path + ".proxy";
-		if(LoadProxies == LOAD_PROXIES)
-		{
-			if(filesystem::exists(proxy_path) && proxy_module(Path, proxy_path))
-				return;
-		}
-
-		// OK, just load the module ...
-		m_message_signal.emit(string_cast(boost::format(_("Loading plugin module %1%")) % Path.native_utf8_string().raw()));
-
-		register_plugins_entry_point register_plugins = 0;
-		detail::os_load_module(Path, register_plugins);
-
-		if(!register_plugins)
-			return;
-
-		// It's a K-3D module, all-right - give it a chance to register its plugins
-		iplugin_factory_collection::factories_t new_factories;
-		detail::plugin_registry registry(m_message_signal, m_factories, new_factories);
-		register_plugins(registry);
-	}
-
 	/// Stores a signal that will be emitted to display loading progress
 	detail::message_signal_t m_message_signal;
 	/// Stores the set of available plugin factories
@@ -720,14 +503,35 @@ void plugin_factory_collection::bind_module(const std::string& ModuleName, regis
 
 	m_implementation->m_message_signal.emit(string_cast(boost::format(_("Binding plugin module %1%")) % ModuleName));
 
-	iplugin_factory_collection::factories_t new_factories;
-	detail::plugin_registry registry(m_implementation->m_message_signal, m_implementation->m_factories, new_factories);
+	detail::plugin_registry registry(m_implementation->m_message_signal, m_implementation->m_factories);
 	RegisterPlugins(registry);
 }
 
 void plugin_factory_collection::load_module(const filesystem::path& Path, const load_proxy_t LoadProxies)
 {
-	m_implementation->load_module(Path, LoadProxies);
+	// K-3D modules now have the same extension on all platforms ...
+	if(filesystem::extension(Path).lowercase().raw() != ".module")
+		return;
+
+	// If the module can be proxied for fast startup, do that and return ...
+	if(LoadProxies == LOAD_PROXIES)
+	{
+		filesystem::path proxy_path = Path + ".proxy";
+		if(filesystem::exists(proxy_path) && m_implementation->proxy_module(Path, proxy_path))
+			return;
+	}
+
+	// OK, just load the module ...
+	m_implementation->m_message_signal.emit(string_cast(boost::format(_("Loading plugin module %1%")) % Path.native_utf8_string().raw()));
+
+	register_plugins_entry_point register_plugins = 0;
+	os_load_module(Path, register_plugins);
+	if(!register_plugins)
+		return;
+
+	// It's a K-3D module, all-right - give it a chance to register its plugins
+	detail::plugin_registry registry(m_implementation->m_message_signal, m_implementation->m_factories);
+	register_plugins(registry);
 }
 
 void plugin_factory_collection::load_modules(const filesystem::path& Path, const bool Recursive, const load_proxy_t LoadProxies)

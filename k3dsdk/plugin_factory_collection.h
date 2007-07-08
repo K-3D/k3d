@@ -21,8 +21,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares plugin_factory_collection, an implementation of iplugin_factory_collection that can load plugin factories from shared libraries
-		\author Tim Shead (tshead@k-3d.com)
+	\brief Declares plugin_factory_collection, an implementation of iplugin_factory_collection that can load plugin factories from shared libraries
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iplugin_factory_collection.h"
