@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,12 +18,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <gtkmm/box.h>
 #include <gtkmm/eventbox.h>
 #include <gtkmm/stock.h>
+
+#include <k3d-i18n-config.h>
 
 #include "document_state.h"
 #include "document_window.h"
@@ -45,9 +47,12 @@
 #include "viewport.h"
 #include "widget_manip.h"
 
-#include <k3d-i18n-config.h>
+#include <k3dsdk/application.h>
+#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/iapplication.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/inode_collection.h>
+#include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/string_cast.h>
@@ -134,7 +139,7 @@ control::control(document_state& DocumentState, k3d::icommand_node& Parent, pane
 
 	base::add(*manage(vbox1));
 
-	on_update();
+	set_choices();
 	show_all();
 }
 
@@ -334,6 +339,23 @@ void control::on_mount_pipeline_profiler()
 	mount_pipeline_profiler();
 }
 
+void control::on_mount_plugin(k3d::iplugin_factory* Plugin)
+{
+	return_if_fail(Plugin);
+
+	k3d::iplugin_factory::metadata_t metadata = Plugin->metadata();
+	const std::string panel_name = metadata["panel_name"];
+
+	record_command("mount_" + panel_name);
+
+	panel::control* const panel = k3d::create_plugin<panel::control>(*Plugin);
+	return_if_fail(panel);
+
+	unmount();
+	Gtk::manage(dynamic_cast<Gtk::Widget*>(panel));
+	mount(*panel);
+}
+
 void control::mount_panel(const std::string Name)
 {
 	if("node_list" == Name)
@@ -473,7 +495,7 @@ void control::on_grab_focus()
 	grab_panel_focus();
 }
 
-void control::on_update()
+void control::set_choices()
 {
 	m_model->clear();
 
@@ -486,6 +508,34 @@ void control::on_update()
 	add_choice(quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::mem_fun(*this, &control::on_mount_viewport));
 	add_choice(quiet_load_icon("toolbar_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Toolbar"), sigc::mem_fun(*this, &control::on_mount_toolbar));
 	add_choice(quiet_load_icon("pipeline_profiler_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Pipeline Profiler"), sigc::mem_fun(*this, &control::on_mount_pipeline_profiler));
+
+	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
+	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	{
+		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
+
+		if(metadata["NextGenerationUI"] != "true")
+			continue;
+
+		if(metadata["component_type"] != "panel")
+			continue;
+
+		const std::string panel_name = metadata["panel_name"];
+		if(panel_name.empty())
+		{
+			k3d::log() << error << "Panel plugin without panel_name metadata will be ignored" << std::endl;
+			continue;
+		}
+
+		const std::string panel_label = metadata["panel_label"];
+		if(panel_label.empty())
+		{
+			k3d::log() << error << "Panel plugin [" << panel_name << "] without panel_label metadata will be ignored" << std::endl;
+			continue;
+		}
+
+		add_choice(quiet_load_icon(panel_name, Gtk::ICON_SIZE_SMALL_TOOLBAR), panel_label, sigc::bind(sigc::mem_fun(*this, &control::on_mount_plugin), *factory));
+	}
 }
 
 void control::add_choice(const Glib::RefPtr<Gdk::Pixbuf> Icon, const Glib::ustring& Label, sigc::slot<void> Slot)

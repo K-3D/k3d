@@ -2,7 +2,7 @@
 #define NGUI_PANEL_FRAME_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,10 +21,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "asynchronous_update.h"
 #include "ui_component.h"
 
 #include <k3dsdk/data.h>
@@ -39,6 +38,7 @@
 #include <gtkmm/liststore.h>
 
 namespace k3d { class icamera; }
+namespace k3d { class iplugin_factory; }
 namespace k3d { namespace gl { class irender_engine; } }
 namespace k3d { namespace xml { class element; } }
 
@@ -56,7 +56,6 @@ namespace panel_frame
 class control :
         public Gtk::Frame,
 	public ui_component,
-	public asynchronous_update,
 	public k3d::property_collection
 {
 	typedef Gtk::Frame base;
@@ -133,6 +132,7 @@ private:
 	void on_mount_viewport();
 	void on_mount_toolbar();
 	void on_mount_pipeline_profiler();
+	void on_mount_plugin(k3d::iplugin_factory* Plugin);
 
 	void on_panel_focus_changed(control* Container);
 	void on_grab_focus();
@@ -140,7 +140,7 @@ private:
 	void on_decorations_changed(k3d::iunknown*);
 
 	/// Called to update the contents of the combo-box for choosing panels
-	void on_update();
+	void set_choices();
 	/// Called to add a choice to the combo-box for choosing panels
 	void add_choice(const Glib::RefPtr<Gdk::Pixbuf> Icon, const Glib::ustring& Label, sigc::slot<void> Slot);
 
