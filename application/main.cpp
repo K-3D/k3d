@@ -676,9 +676,9 @@ int main(int argc, char* argv[])
 		k3d::options::set_storage(user_options);
 
 		// Handle creation of the required user interface plugin ...
-		k3d::plugin_factory_collection ui_plugins;
-		ui_plugins.connect_message_signal(sigc::ptr_fun(startup_message_handler));
-		create_user_interface(ui_plugins, quit, error);
+		k3d::plugin_factory_collection plugins;
+		plugins.connect_message_signal(sigc::ptr_fun(startup_message_handler));
+		create_user_interface(plugins, quit, error);
 		if(quit)
 			return error ? 1 : 0;
 		return_val_if_fail(g_user_interface, 1);
@@ -708,8 +708,6 @@ int main(int argc, char* argv[])
 			return error ? 1 : 0;
 
 		// Load plugins ...
-		k3d::plugin_factory_collection plugins;
-		plugins.connect_message_signal(sigc::ptr_fun(startup_message_handler));
 		load_modules(plugins, quit, error);
 		if(quit)
 			return error ? 1 : 0;
