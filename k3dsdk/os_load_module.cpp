@@ -24,6 +24,7 @@
 #include "log.h"
 #include "os_load_module.h"
 #include "path.h"
+#include "result.h"
 
 namespace k3d
 {
