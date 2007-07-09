@@ -1,3 +1,5 @@
+INCLUDE(FindGtk)
+
 FIND_PATH(K3D_JPEG_INCLUDE_DIR jpeglib.h
 	/usr/include
 	c:/gtk/include

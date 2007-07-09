@@ -274,7 +274,7 @@ sgiTessNormal( SGItesselator *tess, GLdouble x, GLdouble y, GLdouble z )
 }
 
 void GLAPIENTRY
-sgiTessCallback( SGItesselator *tess, GLenum which, _GLUfuncptr fn)
+sgiTessCallback( SGItesselator *tess, GLenum which, callback_t fn)
 {
   switch( which ) {
   case GLU_TESS_BEGIN:

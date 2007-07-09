@@ -1,3 +1,5 @@
+INCLUDE(FindGTK)
+
 FIND_PATH(K3D_ZLIB_INCLUDE_DIR zlib.h
 	/usr/include
 	c:/gtk/include

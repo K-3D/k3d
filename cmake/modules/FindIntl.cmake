@@ -1,3 +1,5 @@
+INCLUDE(FindGtk)
+
 FIND_PATH(K3D_INTL_INCLUDE_DIR libintl.h
 	/usr/include
 	c:/gtk/include
