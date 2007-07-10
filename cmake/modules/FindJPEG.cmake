@@ -1,4 +1,4 @@
-INCLUDE(FindGtk)
+INCLUDE(FindGTK)
 
 FIND_PATH(K3D_JPEG_INCLUDE_DIR jpeglib.h
 	/usr/include

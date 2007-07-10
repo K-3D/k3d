@@ -1,4 +1,4 @@
-INCLUDE(FindGtk)
+INCLUDE(FindGTK)
 
 FIND_PATH(K3D_TIFF_INCLUDE_DIR tiff.h
 	/usr/include
