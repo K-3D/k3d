@@ -46,7 +46,8 @@ class control :
 public:
 	control(document_state& DocumentState, k3d::icommand_node& Parent);
 	~control();
-	
+
+	const std::string panel_type();
 	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot);
 
 private:

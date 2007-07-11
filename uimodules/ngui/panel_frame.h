@@ -68,28 +68,11 @@ public:
 
 	/// Assigns the frame the panel focus
 	void grab_panel_focus();
-	/// Mounts a panel to the frame
-	void mount(panel::control& Panel);
-	/// Creates and mounts an node_list::control panel
-	void mount_node_list();
-	/// Creates and mounts and node_history::control panel
-	void mount_node_history();
-	/// Creates and mounts an node_properties::control panel
-	void mount_node_properties();
-	/// Creates and mounts and tool_properties::control panel
-	void mount_tool_properties();
-	/// Creates and mounts an undo_tree::control panel
-	void mount_undo_tree();
-	/// Creates and mounts a timeline::control panel
-	void mount_timeline();
-	/// Mounts a viewport
-	void mount_viewport(k3d::icamera& Camera, k3d::gl::irender_engine& RenderEngine);
-	/// Mounts a toolbar
-	void mount_toolbar();
-	/// Mounts a pipeline_profiler::control panel
-	void mount_pipeline_profiler();
-	/// Mounts a panel from its name
-	void mount_panel(const std::string Name);
+
+	/// Mounts a panel to the frame (note: mainly for hacking purposes, prefer mount_panel(const std::string& Type) instead)
+	void mount_panel(panel::control& Panel, const std::string& Type);
+	/// Mounts a panel based on type
+	void mount_panel(const std::string& Type);
 	/// Unmounts a mounted panel
 	void unmount();
 	/// Unmounts a mounted panel, placing it in a floating window
@@ -103,9 +86,7 @@ public:
 	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
 
 	/// Returns the mounted panel, if any (could return NULL)
-	Gtk::Widget* const mounted_panel();
-	/// Returns the mounted panel type, if any (could return "")
-	const std::string mounted_panel_type();
+	panel::control* const mounted_panel();
 
 	/// Serializes panel state
 	void save(k3d::xml::element& Document);
@@ -123,16 +104,7 @@ private:
 	void add(Widget&);
 	void remove();
 
-	void on_mount_node_list();
-	void on_mount_node_history();
-	void on_mount_node_properties();
-	void on_mount_tool_properties();
-	void on_mount_undo_tree();
-	void on_mount_timeline();
-	void on_mount_viewport();
-	void on_mount_toolbar();
-	void on_mount_pipeline_profiler();
-	void on_mount_plugin(k3d::iplugin_factory* Plugin);
+	void on_mount_panel(const std::string& Type);
 
 	void on_panel_focus_changed(control* Container);
 	void on_grab_focus();
@@ -142,7 +114,7 @@ private:
 	/// Called to update the contents of the combo-box for choosing panels
 	void set_choices();
 	/// Called to add a choice to the combo-box for choosing panels
-	void add_choice(const Glib::RefPtr<Gdk::Pixbuf> Icon, const Glib::ustring& Label, sigc::slot<void> Slot);
+	void add_choice(const std::string& PanelType, const Glib::RefPtr<Gdk::Pixbuf> Icon, const Glib::ustring& Label, sigc::slot<void> Slot);
 
 	class columns :
 		public Gtk::TreeModelColumnRecord
@@ -150,17 +122,24 @@ private:
 	public:
 		columns()
 		{
+			add(type);
 			add(label);
 			add(slot);
 			add(icon);
 		}
 
+		Gtk::TreeModelColumn<Glib::ustring> type;
 		Gtk::TreeModelColumn<Glib::ustring> label;
-		Gtk::TreeModelColumn< sigc::slot<void> > slot;
+		Gtk::TreeModelColumn<sigc::slot<void> > slot;
 		Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf> > icon;
 	};
 	columns m_columns;
 	Glib::RefPtr<Gtk::ListStore> m_model;
+
+	/// Stores a mapping from panel type to external plugin factory
+	std::map<std::string, k3d::iplugin_factory*> m_type_plugin_map;
+	/// Stores a mapping from panel type to combo box index
+	std::map<std::string, unsigned long> m_type_index_map;
 
 	Gtk::HBox m_decorations;
 	/// Provides a combo-box for choosing from available panel types

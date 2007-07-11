@@ -26,6 +26,7 @@
 #include "asynchronous_update.h"
 #include "button.h"
 #include "command_node_inspector.h"
+#include "panel.h"
 #include "panel_frame.h"
 #include "widget_manip.h"
 
@@ -124,7 +125,10 @@ private:
 	{
 		std::string node_name = k3d::command_tree().name(Node);
 		if(panel_frame::control* const frame = dynamic_cast<panel_frame::control*>(&Node))
-			node_name += " [" + frame->mounted_panel_type() + "]";
+		{
+			if(panel::control* const panel = frame->mounted_panel())
+				node_name += " [" + panel->panel_type() + "]";
+		}
 		
 		Gtk::TreeRow node_row = *m_node_store->append(Parent);
 		node_row[m_node_columns.m_node_name] = node_name;

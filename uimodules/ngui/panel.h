@@ -33,10 +33,11 @@ namespace libk3dngui
 namespace panel
 {
 
-/// Provides a panel control, a UI component that can be "mounted" in a panel_container
+/// Abstract interface for a "panel", a UI component that can be "mounted" in a panel_container
 class control
 {
 public:
+	virtual const std::string panel_type() = 0;
 	virtual sigc::connection connect_focus_signal(const sigc::slot<void>& Slot) = 0;
 
 protected:

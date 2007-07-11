@@ -448,6 +448,11 @@ control::~control()
 	delete m_implementation;
 }
 
+const std::string control::panel_type()
+{
+	return "toolbar";
+}
+
 sigc::connection control::connect_focus_signal(const sigc::slot<void>& Slot)
 {
 	return sigc::connection();

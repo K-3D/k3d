@@ -492,16 +492,16 @@ public:
 		m_panel_frame.add(*Gtk::manage(panel_frame1));
 
 		// First panel is the toolbar
-		panel_frame1->mount_toolbar();
+		panel_frame1->mount_panel("toolbar");
 		panel_frame1->decorations.set_value(false);
 
 		// Node list in the middle
 		panel_frame::control* const panel_frame2 = split_panel(*panel_frame1, *Gtk::manage(new Gtk::VPaned), -1);
-		panel_frame2->mount_node_list();
+		panel_frame2->mount_panel("node_list");
 
 		// Timeline at the bottom
 		panel_frame::control* const panel_frame3 = split_panel(*panel_frame2, *Gtk::manage(new Gtk::VPaned), -1, Gtk::SHRINK);
-		panel_frame3->mount_timeline();
+		panel_frame3->mount_panel("timeline");
 		panel_frame3->decorations.set_value(false);
 
 		// Viewport on node list's right
@@ -514,14 +514,19 @@ public:
 		k3d::icamera* const camera1 = cameras.size() > 0 ? dynamic_cast<k3d::icamera*>(*(cameras.begin())) : 0;
 
 		if(glengine1 && camera1)
-			panel_frame4->mount_viewport(*camera1, *glengine1);
+		{
+			viewport::control* const control = new viewport::control(m_document_state, *this);
+			control->set_camera(camera1);
+			control->set_gl_engine(glengine1);
+			panel_frame4->mount_panel(*Gtk::manage(control), "viewport");
+		}
 
 		// Node history below node list
 		panel_frame::control* const panel_frame5 = split_panel(*panel_frame2, *Gtk::manage(new Gtk::VPaned), -1);
-		panel_frame5->mount_node_history();
+		panel_frame5->mount_panel("node_history");
 		// Node properties below node history
 		panel_frame::control* const panel_frame6 = split_panel(*panel_frame5, *Gtk::manage(new Gtk::VPaned), -1);
-		panel_frame6->mount_node_properties();
+		panel_frame6->mount_panel("node_properties");
 	}
 
 private:
@@ -2025,9 +2030,9 @@ private:
 
 	void on_layout_split_horizontal()
 	{
-		return_if_fail(m_focus_panel);
+		return_if_fail(m_focus_panel && m_focus_panel->mounted_panel());
 
-		const std::string panel_type = m_focus_panel->mounted_panel_type();
+		const std::string panel_type = m_focus_panel->mounted_panel()->panel_type();
 		panel_frame::control* new_panel = split_panel(*m_focus_panel, *manage(new Gtk::VPaned), m_focus_panel->get_height() / 2);
 
 		new_panel->mount_panel(panel_type);
@@ -2036,9 +2041,9 @@ private:
 
 	void on_layout_split_vertical()
 	{
-		return_if_fail(m_focus_panel);
+		return_if_fail(m_focus_panel && m_focus_panel->mounted_panel());
 
-		const std::string panel_type = m_focus_panel->mounted_panel_type();
+		const std::string panel_type = m_focus_panel->mounted_panel()->panel_type();
 		panel_frame::control* new_panel = split_panel(*m_focus_panel, *manage(new Gtk::HPaned), m_focus_panel->get_width() / 2);
 
 		new_panel->mount_panel(panel_type);

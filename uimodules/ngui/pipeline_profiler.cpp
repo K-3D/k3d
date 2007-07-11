@@ -317,6 +317,11 @@ control::~control()
 	delete m_implementation;
 }
 
+const std::string control::panel_type()
+{
+	return "pipeline_profiler";
+}
+
 sigc::connection control::connect_focus_signal(const sigc::slot<void>& Slot)
 {
 	return m_implementation->m_panel_grab_signal.connect(Slot);

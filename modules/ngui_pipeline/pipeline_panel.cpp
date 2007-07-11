@@ -110,6 +110,11 @@ public:
 	{
 	}
 
+	const std::string panel_type()
+	{
+		return "pipeline";
+	}
+
 	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
 	{
 	        return m_focus_signal.connect(Slot);
@@ -361,7 +366,7 @@ public:
 				_("Provides a panel for displaying the visualization pipeline"),
 				"NGUI Panels",
 				k3d::iplugin_factory::EXPERIMENTAL,
-				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_name", "pipeline_panel")("panel_label", "Pipeline"));
+				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "pipeline")("panel_label", "Pipeline"));
 
 		return factory;
 	}

@@ -171,208 +171,69 @@ void control::grab_panel_focus()
 	m_panel_focus_signal.emit(this);
 }
 
-void control::mount(panel::control& Panel)
+void control::mount_panel(panel::control& Panel, const std::string& Type)
 {
+	unmount();
+
 	m_grab_focus_connection = Panel.connect_focus_signal(sigc::mem_fun(*this, &control::on_grab_focus));
 	m_frame.add(dynamic_cast<Gtk::Widget&>(Panel));
-}
-
-void control::mount_node_list()
-{
-	unmount();
-	mount(*Gtk::manage(new node_list::control(m_document_state, m_parent)));
 
 	m_panel_type_connection.block();
-	m_panel_type.set_active(0);
+	m_panel_type.set_active(m_type_index_map[Type]);
 	m_panel_type_connection.unblock();
 }
 
-void control::on_mount_node_list()
+void control::mount_panel(const std::string& Type)
 {
-	record_command("mount_node_list");
-	mount_node_list();
-}
-
-void control::mount_node_history()
-{
-	unmount();
-	mount(*Gtk::manage(new node_history::control(m_document_state, m_parent)));
-
-	m_panel_type_connection.block();
-	m_panel_type.set_active(1);
-	m_panel_type_connection.unblock();
-}
-
-void control::on_mount_node_history()
-{
-	record_command("mount_node_history");
-	mount_node_history();
-}
-
-void control::mount_node_properties()
-{
-	unmount();
-	mount(*Gtk::manage(new node_properties::control(m_document_state, m_parent)));
-
-	m_panel_type_connection.block();
-	m_panel_type.set_active(2);
-	m_panel_type_connection.unblock();
-}
-
-void control::on_mount_node_properties()
-{
-	record_command("mount_node_properties");
-	mount_node_properties();
-}
-
-void control::mount_tool_properties()
-{
-	unmount();
-	mount(*Gtk::manage(new tool_properties::control(m_document_state, m_parent)));
-
-	m_panel_type_connection.block();
-	m_panel_type.set_active(3);
-	m_panel_type_connection.unblock();
-}
-
-void control::on_mount_tool_properties()
-{
-	record_command("mount_tool_properties");
-	mount_tool_properties();
-}
-
-void control::mount_undo_tree()
-{
-	unmount();
-	mount(*Gtk::manage(new undo_tree::control(m_document_state, m_parent)));
-
-	m_panel_type_connection.block();
-	m_panel_type.set_active(4);
-	m_panel_type_connection.unblock();
-}
-
-void control::on_mount_undo_tree()
-{
-	record_command("mount_undo_tree");
-	mount_undo_tree();
-}
-
-void control::mount_timeline()
-{
-	unmount();
-	mount(*Gtk::manage(new timeline::control(m_document_state, m_parent)));
-
-	m_panel_type_connection.block();
-	m_panel_type.set_active(5);
-	m_panel_type_connection.unblock();
-}
-
-void control::on_mount_timeline()
-{
-	record_command("mount_timeline");
-	mount_timeline();
-}
-
-void control::mount_viewport(k3d::icamera& Camera, k3d::gl::irender_engine& RenderEngine)
-{
-	unmount();
-
-	viewport::control* const control = new viewport::control(m_document_state, m_parent);
-	control->set_camera(&Camera);
-	control->set_gl_engine(&RenderEngine);
-
-	mount(*Gtk::manage(control));
-
-	m_panel_type_connection.block();
-	m_panel_type.set_active(6);
-	m_panel_type_connection.unblock();
-}
-
-void control::on_mount_viewport()
-{
-	k3d::icamera* camera = default_camera(m_document_state);
-	if(!camera)
-		camera = pick_camera(m_document_state);
-	if(!camera)
+	if("node_list" == Type)
+	{
+		mount_panel(*Gtk::manage(new node_list::control(m_document_state, m_parent)), Type);
 		return;
+	}
 
-	k3d::gl::irender_engine* engine = default_gl_render_engine(m_document_state);
-	if(!engine)
-		engine = pick_gl_render_engine(m_document_state);
-	if(!engine)
-		return;
+	if("node_history" == Type)
+	{
+	   mount_panel(*Gtk::manage(new node_history::control(m_document_state, m_parent)), Type);
+	   return;
+	}
 
-	record_command("mount_viewport");
+	if("node_properties" == Type)
+	{
+	   mount_panel(*Gtk::manage(new node_properties::control(m_document_state, m_parent)), Type);
+	   return;
+	}
 
-	mount_viewport(*camera, *engine);
-}
+	if("tool_properties" == Type)
+	{
+	   mount_panel(*Gtk::manage(new tool_properties::control(m_document_state, m_parent)), Type);
+	   return;
+	}
 
-void control::mount_toolbar()
-{
-	unmount();
-	mount(*Gtk::manage(new tool_panel::control(m_document_state, m_parent)));
+	if("undo_tree" == Type)
+	{
+	   mount_panel(*Gtk::manage(new undo_tree::control(m_document_state, m_parent)), Type);
+	   return;
+	}
 
-	m_panel_type_connection.block();
-	m_panel_type.set_active(7);
-	m_panel_type_connection.unblock();
-}
+	if("timeline" == Type)
+	{
+	   mount_panel(*Gtk::manage(new timeline::control(m_document_state, m_parent)), Type);
+	   return;
+	}
 
-void control::on_mount_toolbar()
-{
-	record_command("mount_toolbar");
-	mount_toolbar();
-}
+	if("pipeline_profiler" == Type)
+	{
+	   mount_panel(*Gtk::manage(new pipeline_profiler::control(m_document_state, m_parent)), Type);
+	   return;
+	}
 
-void control::mount_pipeline_profiler()
-{
-	unmount();
-	mount(*Gtk::manage(new pipeline_profiler::control(m_document_state, m_parent)));
+	if("toolbar" == Type)
+	{
+	   mount_panel(*Gtk::manage(new tool_panel::control(m_document_state, m_parent)), Type);
+	   return;
+	}
 
-	m_panel_type_connection.block();
-	m_panel_type.set_active(8);
-	m_panel_type_connection.unblock();
-}
-
-void control::on_mount_pipeline_profiler()
-{
-	record_command("mount_pipeline_profiler");
-	mount_pipeline_profiler();
-}
-
-void control::on_mount_plugin(k3d::iplugin_factory* Plugin)
-{
-	return_if_fail(Plugin);
-
-	k3d::iplugin_factory::metadata_t metadata = Plugin->metadata();
-	const std::string panel_name = metadata["panel_name"];
-
-	record_command("mount_" + panel_name);
-
-	panel::control* const panel = k3d::create_plugin<panel::control>(*Plugin);
-	return_if_fail(panel);
-
-	unmount();
-	Gtk::manage(dynamic_cast<Gtk::Widget*>(panel));
-	mount(*panel);
-}
-
-void control::mount_panel(const std::string Name)
-{
-	if("node_list" == Name)
-		mount_node_list();
-	else if("node_history" == Name)
-		mount_node_history();
-	else if("node_properties" == Name)
-		mount_node_properties();
-	else if("tool_properties" == Name)
-		mount_tool_properties();
-	else if("undo_tree" == Name)
-		mount_undo_tree();
-	else if("timeline" == Name)
-		mount_timeline();
-	else if("pipeline_profiler" == Name)
-		mount_pipeline_profiler();
-	else if("viewport" == Name)
+	if("viewport" == Type)
 	{
 		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_engine>(m_document_state.document().nodes());
 		k3d::gl::irender_engine* const glengine1 = gl_engines.size() > 0 ? dynamic_cast<k3d::gl::irender_engine*>(*(gl_engines.begin())) : 0;
@@ -381,14 +242,36 @@ void control::mount_panel(const std::string Name)
 		k3d::icamera* const camera1 = cameras.size() > 0 ? dynamic_cast<k3d::icamera*>(*(cameras.begin())) : 0;
 
 		if(glengine1 && camera1)
-			mount_viewport(*camera1, *glengine1);
+		{
+			viewport::control* const control = new viewport::control(m_document_state, m_parent);
+			control->set_camera(camera1);
+			control->set_gl_engine(glengine1);
+
+			mount_panel(*Gtk::manage(control), Type);
+		}
+		return;
 	}
-	else if("toolbar" == Name)
-		mount_toolbar();
-	else
+
+	if(m_type_plugin_map.count(Type))
 	{
-		k3d::log() << error << "Couldn't mount panel of type : " << Name << std::endl;
+		k3d::iplugin_factory* const plugin = m_type_plugin_map[Type];
+		return_if_fail(plugin);
+
+		panel::control* const panel = k3d::create_plugin<panel::control>(*plugin);
+		return_if_fail(panel);
+
+		Gtk::manage(dynamic_cast<Gtk::Widget*>(panel));
+		mount_panel(*panel, Type);
+		return;
 	}
+
+	k3d::log() << error << "Couldn't mount panel of type : " << Type << std::endl;
+}
+
+void control::on_mount_panel(const std::string& Type)
+{
+	record_command("mount", Type);
+	mount_panel(Type);
 }
 
 void control::unmount()
@@ -422,40 +305,17 @@ void control::unset_bg_color()
 	unset_bg(Gtk::STATE_NORMAL);
 }
 
-Gtk::Widget* const control::mounted_panel()
+panel::control* const control::mounted_panel()
 {
-	return m_frame.get_child();
-}
-
-const std::string control::mounted_panel_type()
-{
-	if(dynamic_cast<node_list::control*>(mounted_panel()))
-		return "node_list";
-	if(dynamic_cast<node_history::control*>(mounted_panel()))
-		return "node_history";
-	if(dynamic_cast<node_properties::control*>(mounted_panel()))
-		return "node_properties";
-	if(dynamic_cast<tool_properties::control*>(mounted_panel()))
-		return "tool_properties";
-	if(dynamic_cast<undo_tree::control*>(mounted_panel()))
-		return "undo_tree";
-	if(dynamic_cast<timeline::control*>(mounted_panel()))
-		return "timeline";
-	if(dynamic_cast<viewport::control*>(mounted_panel()))
-		return "viewport";
-	if(dynamic_cast<tool_panel::control*>(mounted_panel()))
-		return "toolbar";
-	if(dynamic_cast<pipeline_profiler::control*>(mounted_panel()))
-		return "pipeline_profiler";
-
-	return "";
+	return dynamic_cast<panel::control*>(m_frame.get_child());
 }
 
 void control::save(k3d::xml::element& Document)
 {
 	k3d::xml::element& panel = Document.append(k3d::xml::element("panel"));
 
-	panel.append(k3d::xml::attribute("type", mounted_panel_type()));
+	if(mounted_panel())
+		panel.append(k3d::xml::attribute("type", mounted_panel()->panel_type()));
 	panel.append(k3d::xml::attribute("pinned", pinned.value()));
 	panel.append(k3d::xml::attribute("visible", is_visible()));
 	panel.append(k3d::xml::attribute("automagic", automagic.value()));
@@ -499,15 +359,15 @@ void control::set_choices()
 {
 	m_model->clear();
 
-	add_choice(quiet_load_icon("node_list_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node List"), sigc::mem_fun(*this, &control::on_mount_node_list));
-	add_choice(quiet_load_icon("node_history_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node History"), sigc::mem_fun(*this, &control::on_mount_node_history));
-	add_choice(quiet_load_icon("node_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node Properties"), sigc::mem_fun(*this, &control::on_mount_node_properties));
-	add_choice(quiet_load_icon("tool_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Tool Properties"), sigc::mem_fun(*this, &control::on_mount_tool_properties));
-	add_choice(quiet_load_icon("undo_tree_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Undo Tree"), sigc::mem_fun(*this, &control::on_mount_undo_tree));
-	add_choice(quiet_load_icon("timeline_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Timeline"), sigc::mem_fun(*this, &control::on_mount_timeline));
-	add_choice(quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::mem_fun(*this, &control::on_mount_viewport));
-	add_choice(quiet_load_icon("toolbar_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Toolbar"), sigc::mem_fun(*this, &control::on_mount_toolbar));
-	add_choice(quiet_load_icon("pipeline_profiler_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Pipeline Profiler"), sigc::mem_fun(*this, &control::on_mount_pipeline_profiler));
+	add_choice("node_list", quiet_load_icon("node_list_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node List"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_list"));
+	add_choice("node_history", quiet_load_icon("node_history_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node History"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_history"));
+	add_choice("node_properties", quiet_load_icon("node_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_properties"));
+	add_choice("tool_properties", quiet_load_icon("tool_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Tool Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "tool_properties"));
+	add_choice("undo_tree", quiet_load_icon("undo_tree_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Undo Tree"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "undo_tree"));
+	add_choice("timeline", quiet_load_icon("timeline_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Timeline"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "timeline"));
+	add_choice("viewport", quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "viewport"));
+	add_choice("toolbar", quiet_load_icon("toolbar_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Toolbar"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "toolbar"));
+	add_choice("pipeline_profiler", quiet_load_icon("pipeline_profiler_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Pipeline Profiler"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "pipeline_profiler"));
 
 	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
 	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
@@ -520,28 +380,33 @@ void control::set_choices()
 		if(metadata["component_type"] != "panel")
 			continue;
 
-		const std::string panel_name = metadata["panel_name"];
-		if(panel_name.empty())
+		const std::string panel_type = metadata["panel_type"];
+		if(panel_type.empty())
 		{
-			k3d::log() << error << "Panel plugin without panel_name metadata will be ignored" << std::endl;
+			k3d::log() << error << "Panel plugin without panel_type metadata will be ignored" << std::endl;
 			continue;
 		}
 
 		const std::string panel_label = metadata["panel_label"];
 		if(panel_label.empty())
 		{
-			k3d::log() << error << "Panel plugin [" << panel_name << "] without panel_label metadata will be ignored" << std::endl;
+			k3d::log() << error << "Panel plugin [" << panel_type << "] without panel_label metadata will be ignored" << std::endl;
 			continue;
 		}
 
-		add_choice(quiet_load_icon(panel_name, Gtk::ICON_SIZE_SMALL_TOOLBAR), panel_label, sigc::bind(sigc::mem_fun(*this, &control::on_mount_plugin), *factory));
+		m_type_plugin_map[panel_type] = *factory;
+
+		add_choice(panel_type, quiet_load_icon(panel_type, Gtk::ICON_SIZE_SMALL_TOOLBAR), panel_label, sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), panel_type));
 	}
 }
 
-void control::add_choice(const Glib::RefPtr<Gdk::Pixbuf> Icon, const Glib::ustring& Label, sigc::slot<void> Slot)
+void control::add_choice(const std::string& PanelType, const Glib::RefPtr<Gdk::Pixbuf> Icon, const Glib::ustring& Label, sigc::slot<void> Slot)
 {
+	m_type_index_map[PanelType] = m_model->children().size();
+
 	Gtk::TreeRow row = *m_model->append();
 
+	row[m_columns.type] = PanelType;
 	row[m_columns.label] = Label;
 	row[m_columns.slot] = Slot;
 	row[m_columns.icon] = Icon;
@@ -571,49 +436,64 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 		float_panel();
 		return RESULT_CONTINUE;
 	}
-	else if(Command == "mount_node_list")
+
+	if(Command == "mount")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath("0")));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map[Arguments]))));
 		return RESULT_CONTINUE;
 	}
-	else if(Command == "mount_node_history")
+
+	if(Command == "mount_node_list")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath("1")));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["node_list"]))));
 		return RESULT_CONTINUE;
 	}
-	else if(Command == "mount_node_properties")
+	
+	if(Command == "mount_node_history")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath("2")));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["node_history"]))));
 		return RESULT_CONTINUE;
 	}
-	else if(Command == "mount_tool_properties")
+	
+	if(Command == "mount_node_properties")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath("3")));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["node_properties"]))));
 		return RESULT_CONTINUE;
 	}
-	else if(Command == "mount_undo_tree")
+	
+	if(Command == "mount_tool_properties")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath("4")));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["tool_properties"]))));
 		return RESULT_CONTINUE;
 	}
-	else if(Command == "mount_timeline")
+	
+	if(Command == "mount_undo_tree")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath("5")));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["undo_tree"]))));
 		return RESULT_CONTINUE;
 	}
-	else if(Command == "mount_viewport")
+	
+	if(Command == "mount_timeline")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath("6")));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["timeline"]))));
 		return RESULT_CONTINUE;
 	}
-	else if(Command == "mount_toolbar")
+	
+	if(Command == "mount_viewport")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath("7")));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["viewport"]))));
 		return RESULT_CONTINUE;
 	}
-	else if(Command == "mount_pipeline_profiler")
+	
+	if(Command == "mount_toolbar")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath("8")));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["toolbar"]))));
+		return RESULT_CONTINUE;
+	}
+	
+	if(Command == "mount_pipeline_profiler")
+	{
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["pipeline_profiler"]))));
 		return RESULT_CONTINUE;
 	}
 
