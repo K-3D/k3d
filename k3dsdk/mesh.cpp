@@ -32,6 +32,7 @@ namespace k3d
 namespace detail
 {
 
+/*
 /// Return true if two shared arrays are equivalent (handles cases where they point to the same memory, etc)
 template<typename array_type>
 const bool equal(const array_type& LHS, const array_type& RHS)
@@ -50,6 +51,7 @@ const bool equal(const mesh::named_arrays& LHS, const mesh::named_arrays& RHS)
 {
 	return true;
 }
+*/
 
 void store_selection(const boost::shared_ptr<const mesh::selection_t>& MeshSelection, mesh_selection::records_t& Records)
 {
