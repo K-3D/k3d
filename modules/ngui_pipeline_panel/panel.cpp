@@ -30,6 +30,7 @@
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/options.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/result.h>
 
 #include <gtkmm/box.h>
@@ -108,6 +109,11 @@ public:
 
 	~pipeline_panel()
 	{
+	}
+
+	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent)
+	{
+		assert_not_implemented();
 	}
 
 	const std::string panel_type()
@@ -396,4 +402,8 @@ k3d::iplugin_factory& pipeline_panel_factory()
 } // namespace ngui_pipeline
 
 } // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui_pipeline::pipeline_panel_factory());
+K3D_MODULE_END
 

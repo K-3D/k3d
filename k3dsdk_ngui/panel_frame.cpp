@@ -260,6 +260,8 @@ void control::mount_panel(const std::string& Type)
 		panel::control* const panel = k3d::create_plugin<panel::control>(*plugin);
 		return_if_fail(panel);
 
+		panel->initialize(m_document_state, m_parent);
+
 		Gtk::manage(dynamic_cast<Gtk::Widget*>(panel));
 		mount_panel(*panel, Type);
 		return;

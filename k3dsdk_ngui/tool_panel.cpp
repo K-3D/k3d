@@ -448,6 +448,11 @@ control::~control()
 	delete m_implementation;
 }
 
+void control::initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+{
+	assert_not_implemented();
+}
+
 const std::string control::panel_type()
 {
 	return "toolbar";
