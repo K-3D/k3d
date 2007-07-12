@@ -32,7 +32,6 @@
 #include "context_menu.h"
 #include "document_state.h"
 #include "knife_tool.h"
-#include "module.h"
 #include "move_tool.h"
 #include "parent_tool.h"
 #include "plug_tool.h"

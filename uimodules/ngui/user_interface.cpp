@@ -22,22 +22,24 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_state.h"
-#include "application_window.h"
-#include "button.h"
-#include "document.h"
-#include "document_state.h"
-#include "file_chooser_dialog.h"
-#include "learning_menu.h"
-#include "main_document_window.h"
-#include "messages.h"
-#include "module.h"
-#include "open_uri.h"
-#include "options.h"
-#include "splash_box.h"
-#include "tutorial_message.h"
-#include "tutorial_recorder.h"
-#include "utility.h"
+#include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
+
+#include <k3dsdk_ngui/application_state.h>
+#include <k3dsdk_ngui/application_window.h>
+#include <k3dsdk_ngui/button.h>
+#include <k3dsdk_ngui/document.h>
+#include <k3dsdk_ngui/document_state.h>
+#include <k3dsdk_ngui/file_chooser_dialog.h>
+#include <k3dsdk_ngui/learning_menu.h>
+#include <k3dsdk_ngui/main_document_window.h>
+#include <k3dsdk_ngui/messages.h>
+#include <k3dsdk_ngui/open_uri.h>
+#include <k3dsdk_ngui/options.h>
+#include <k3dsdk_ngui/splash_box.h>
+#include <k3dsdk_ngui/tutorial_message.h>
+#include <k3dsdk_ngui/tutorial_recorder.h>
+#include <k3dsdk_ngui/utility.h>
 
 #include <k3dsdk/application.h>
 #include <k3dsdk/application_plugin_factory.h>
@@ -47,7 +49,6 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/data.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
 #include <k3dsdk/ideletable.h>
@@ -62,7 +63,6 @@
 #include <k3dsdk/share.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/system.h>
-#include <k3d-version-config.h>
 
 #include <glibmm/main.h>
 
@@ -507,7 +507,7 @@ public:
 	{
 		static k3d::application_plugin_factory<user_interface,
 			k3d::interface_list<k3d::iuser_interface_plugin> > factory(
-				get_class_id(),
+				k3d::uuid(0x444fbabf, 0x08164c85, 0x879751e7, 0x2d6d05b5),
 				"NextGenerationUI",
 				"Next Generation User Interface (NGUI)",
 				"");
@@ -537,4 +537,8 @@ k3d::iplugin_factory& user_interface_factory()
 }
 
 } // namespace libk3dngui
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(libk3dngui::user_interface_factory());
+K3D_MODULE_END
 
