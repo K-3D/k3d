@@ -73,15 +73,15 @@ private:
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
-// pipeline_panel
+// panel
 
-class pipeline_panel :
+class panel :
 	public libk3dngui::panel::control,
 	public Gtk::VBox,
 	public k3d::ideletable
 {
 public:
-	pipeline_panel() :
+	panel() :
 		m_radius(0.42),
 		m_lineWidth(0.05),
 		m_save_png("Save PNG"),
@@ -97,17 +97,17 @@ public:
 		pack_start(m_hbox, Gtk::PACK_SHRINK);
 		pack_start(m_drawing_area);
 
-		m_save_png.signal_clicked().connect(sigc::mem_fun(*this, &pipeline_panel::on_save_png));
-		m_save_pdf.signal_clicked().connect(sigc::mem_fun(*this, &pipeline_panel::on_save_pdf));
-		m_save_ps.signal_clicked().connect(sigc::mem_fun(*this, &pipeline_panel::on_save_ps));
-		m_save_svg.signal_clicked().connect(sigc::mem_fun(*this, &pipeline_panel::on_save_svg));
-		m_drawing_area.connect_expose_event(sigc::mem_fun(*this, &pipeline_panel::on_draw_clock));
-		Glib::signal_timeout().connect(sigc::mem_fun(*this, &pipeline_panel::on_second_elapsed), 1000);
+		m_save_png.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_png));
+		m_save_pdf.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_pdf));
+		m_save_ps.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_ps));
+		m_save_svg.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_svg));
+		m_drawing_area.connect_expose_event(sigc::mem_fun(*this, &panel::on_draw_clock));
+		Glib::signal_timeout().connect(sigc::mem_fun(*this, &panel::on_second_elapsed), 1000);
 
 		show_all();
 	}
 
-	~pipeline_panel()
+	~panel()
 	{
 	}
 
@@ -366,7 +366,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<pipeline_panel> factory(
+		static k3d::application_plugin_factory<panel> factory(
 				k3d::uuid(0xf37f08af, 0xf542d517, 0xde317099, 0x79394ed8),
 				"NGUIPipelinePanel",
 				_("Provides a panel for displaying the visualization pipeline"),
@@ -391,19 +391,11 @@ private:
 	detail::drawing_area m_drawing_area;
 };
 
-/////////////////////////////////////////////////////////////////////////////
-// pipeline_panel_factory
-
-k3d::iplugin_factory& pipeline_panel_factory()
-{
-	return pipeline_panel::get_factory();
-}
-
 } // namespace ngui_pipeline
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::ngui_pipeline::pipeline_panel_factory());
+	Registry.register_factory(module::ngui_pipeline::panel::get_factory());
 K3D_MODULE_END
 

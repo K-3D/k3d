@@ -65,6 +65,8 @@ public:
 	implementation(const std::string& Name, icommand_node* Parent);
 	virtual ~implementation();
 
+	void set_parent(const std::string& Name, icommand_node* Parent);
+
 	const result execute_command(const std::string& Command, const std::string& Arguments);
 };
 

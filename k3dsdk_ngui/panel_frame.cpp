@@ -37,7 +37,6 @@
 #include "node_properties.h"
 #include "panel.h"
 #include "panel_frame.h"
-#include "pipeline_profiler.h"
 #include "render.h"
 #include "timeline.h"
 #include "tool_panel.h"
@@ -221,12 +220,6 @@ void control::mount_panel(const std::string& Type)
 	   return;
 	}
 
-	if("pipeline_profiler" == Type)
-	{
-	   mount_panel(*Gtk::manage(new pipeline_profiler::control(m_document_state, m_parent)), Type);
-	   return;
-	}
-
 	if("toolbar" == Type)
 	{
 	   mount_panel(*Gtk::manage(new tool_panel::control(m_document_state, m_parent)), Type);
@@ -369,7 +362,6 @@ void control::set_choices()
 	add_choice("timeline", quiet_load_icon("timeline_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Timeline"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "timeline"));
 	add_choice("viewport", quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "viewport"));
 	add_choice("toolbar", quiet_load_icon("toolbar_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Toolbar"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "toolbar"));
-	add_choice("pipeline_profiler", quiet_load_icon("pipeline_profiler_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Pipeline Profiler"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "pipeline_profiler"));
 
 	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
 	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)

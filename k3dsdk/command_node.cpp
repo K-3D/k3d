@@ -201,6 +201,12 @@ implementation::~implementation()
 	k3d::command_tree().remove(*this);
 }
 
+void implementation::set_parent(const std::string& Name, icommand_node* const Parent)
+{
+	k3d::command_tree().remove(*this);
+	k3d::command_tree().add(*this, Name, Parent);
+}
+
 const icommand_node::result implementation::execute_command(const std::string& Command, const std::string& Arguments)
 {
 	log() << error << "Command node ["

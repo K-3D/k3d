@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,39 +18,52 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Tim Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
+
+#include <k3d-i18n-config.h>
 
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
+#include <gtkmm/box.h>
 
-#include "asynchronous_update.h"
-#include "document_state.h"
-#include "hotkey_cell_renderer_text.h"
-#include "icons.h"
-#include "pipeline_profiler.h"
+#include <k3dsdk_ngui/asynchronous_update.h>
+#include <k3dsdk_ngui/document_state.h>
+#include <k3dsdk_ngui/hotkey_cell_renderer_text.h>
+#include <k3dsdk_ngui/icons.h>
+#include <k3dsdk_ngui/panel.h>
+#include <k3dsdk_ngui/ui_component.h>
 
-#include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/ipipeline_profiler.h>
+#include <k3dsdk/module.h>
 
-namespace libk3dngui
+#include <boost/assign/list_of.hpp>
+
+namespace module
 {
 
-namespace pipeline_profiler
+namespace ngui_pipeline_profiler
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// control::implementation
+// panel
 
-class control::implementation :
-	public asynchronous_update
+class panel :
+	public Gtk::VBox,
+	public libk3dngui::panel::control,
+	public libk3dngui::ui_component,
+	public libk3dngui::asynchronous_update
 {
+	typedef Gtk::VBox base;
+
 public:
-	implementation(document_state& DocumentState) :
-		m_document_state(DocumentState)
+	panel() :
+		base(false, 0),
+		ui_component("pipeline_profiler", 0)
 	{
 		m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 		m_scrolled_window.add(m_view);
@@ -76,12 +89,47 @@ public:
 		m_view.get_column(2)->add_attribute(m_view.get_column(2)->get_first_cell_renderer()->property_cell_background_gdk(), m_columns.color);
 		m_view.get_column(3)->add_attribute(m_view.get_column(3)->get_first_cell_renderer()->property_cell_background_gdk(), m_columns.color);
 		
-		m_document_state.document().pipeline_profiler().connect_node_execution_signal(sigc::mem_fun(*this, &implementation::on_node_execution));
-		m_document_state.document().nodes().rename_node_signal().connect(sigc::mem_fun(*this, &implementation::on_node_renamed));
-		
 		schedule_update();
+
+		m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_panel_grab_signal.make_slot()), false), false);
+
+		pack_start(m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
+		show_all();
 	}
 
+	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent)
+	{
+		ui_component::set_parent("pipeline_profiler", &Parent);
+
+		DocumentState.document().pipeline_profiler().connect_node_execution_signal(sigc::mem_fun(*this, &panel::on_node_execution));
+		DocumentState.document().nodes().rename_node_signal().connect(sigc::mem_fun(*this, &panel::on_node_renamed));
+		
+	}
+
+	const std::string panel_type()
+	{
+		return "pipeline_profiler";
+	}
+
+	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
+	{
+		return m_panel_grab_signal.connect(Slot);
+	}
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<panel> factory(
+				k3d::uuid(0xcaadef85, 0xb848e17d, 0x9f4c8a8b, 0x15ed410f),
+				"NGUIPipelineProfilerPanel",
+				_("Provides a panel for profiling execution of the visualization pipeline"),
+				"NGUI Panels",
+				k3d::iplugin_factory::EXPERIMENTAL,
+				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "pipeline_profiler")("panel_label", "Pipeline Profiler"));
+
+		return factory;
+	}
+
+private:
 	/// Called by the signal system when profile data arrives
 	void on_node_execution(k3d::inode& Node, const std::string& Task, double Time)
 	{
@@ -221,7 +269,7 @@ public:
 				node_row = *m_model->append();
 
 				node_row[m_columns.node] = new_records[i].node;
-				node_row[m_columns.icon] = quiet_load_icon(new_records[i].node->factory().name(), Gtk::ICON_SIZE_MENU);
+				node_row[m_columns.icon] = libk3dngui::quiet_load_icon(new_records[i].node->factory().name(), Gtk::ICON_SIZE_MENU);
 				node_row[m_columns.name] = new_records[i].node->name();
 			}
 
@@ -240,9 +288,6 @@ public:
 
 		calculate_totals();
 	}
-
-	/// Stores a reference to the owning document
-	document_state& m_document_state;
 
 	class columns :
 		public Gtk::TreeModelColumnRecord
@@ -298,41 +343,11 @@ public:
 	std::vector<new_record> new_records;
 };
 
-/////////////////////////////////////////////////////////////////////////////
-// control
+} // namespace ngui_pipeline_profiler
 
-control::control(document_state& DocumentState, k3d::icommand_node& Parent) :
-	base(false, 0),
-	ui_component("pipeline_profiler", &Parent),
-	m_implementation(new implementation(DocumentState))
-{
-	m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
+} // namespace module
 
-	pack_start(m_implementation->m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
-	show_all();
-}
-
-control::~control()
-{
-	delete m_implementation;
-}
-
-void control::initialize(document_state& DocumentState, k3d::icommand_node& Parent)
-{
-	assert_not_implemented();
-}
-
-const std::string control::panel_type()
-{
-	return "pipeline_profiler";
-}
-
-sigc::connection control::connect_focus_signal(const sigc::slot<void>& Slot)
-{
-	return m_implementation->m_panel_grab_signal.connect(Slot);
-}
-
-} // namespace pipeline_profiler
-
-} // namespace libk3dngui
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui_pipeline_profiler::panel::get_factory());
+K3D_MODULE_END
 
