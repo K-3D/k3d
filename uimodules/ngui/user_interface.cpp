@@ -25,21 +25,21 @@
 #include <k3d-i18n-config.h>
 #include <k3d-version-config.h>
 
-#include <k3dsdk_ngui/application_state.h>
-#include <k3dsdk_ngui/application_window.h>
-#include <k3dsdk_ngui/button.h>
-#include <k3dsdk_ngui/document.h>
-#include <k3dsdk_ngui/document_state.h>
-#include <k3dsdk_ngui/file_chooser_dialog.h>
-#include <k3dsdk_ngui/learning_menu.h>
-#include <k3dsdk_ngui/main_document_window.h>
-#include <k3dsdk_ngui/messages.h>
-#include <k3dsdk_ngui/open_uri.h>
-#include <k3dsdk_ngui/options.h>
-#include <k3dsdk_ngui/splash_box.h>
-#include <k3dsdk_ngui/tutorial_message.h>
-#include <k3dsdk_ngui/tutorial_recorder.h>
-#include <k3dsdk_ngui/utility.h>
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/application_window.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/document.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/learning_menu.h>
+#include <k3dsdk/ngui/main_document_window.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/open_uri.h>
+#include <k3dsdk/ngui/options.h>
+#include <k3dsdk/ngui/splash_box.h>
+#include <k3dsdk/ngui/tutorial_message.h>
+#include <k3dsdk/ngui/tutorial_recorder.h>
+#include <k3dsdk/ngui/utility.h>
 
 #include <k3dsdk/application.h>
 #include <k3dsdk/application_plugin_factory.h>

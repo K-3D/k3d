@@ -29,12 +29,12 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/box.h>
 
-#include <k3dsdk_ngui/asynchronous_update.h>
-#include <k3dsdk_ngui/document_state.h>
-#include <k3dsdk_ngui/hotkey_cell_renderer_text.h>
-#include <k3dsdk_ngui/icons.h>
-#include <k3dsdk_ngui/panel.h>
-#include <k3dsdk_ngui/ui_component.h>
+#include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/ui_component.h>
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/inode.h>

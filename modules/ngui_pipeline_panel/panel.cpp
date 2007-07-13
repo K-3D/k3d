@@ -23,8 +23,8 @@
 
 #include <k3d-i18n-config.h>
 
-#include <k3dsdk_ngui/file_chooser_dialog.h>
-#include <k3dsdk_ngui/panel.h>
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/panel.h>
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/ideletable.h>

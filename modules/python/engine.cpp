@@ -38,7 +38,7 @@
 #include <k3dsdk/result.h>
 #include <k3dsdk/string_modifiers.h>
 
-#include <k3dsdk_python/object_model_python.h>
+#include <k3dsdk/python/object_model_python.h>
 
 #include <boost/python/dict.hpp>
 
