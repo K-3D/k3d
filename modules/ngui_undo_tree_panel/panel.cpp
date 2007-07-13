@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -17,21 +17,26 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "asynchronous_update.h"
-#include "button.h"
-#include "document_state.h"
-#include "toolbar.h"
-#include "undo_tree.h"
-#include "undo_utility.h"
+#include <k3d-i18n-config.h>
 
+#include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/toolbar.h>
+#include <k3dsdk/ngui/ui_component.h>
+#include <k3dsdk/ngui/undo_utility.h>
+
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/gl.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/idag.h>
+#include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/property.h>
@@ -46,16 +51,25 @@
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 
-namespace libk3dngui
+#include <boost/assign/list_of.hpp>
+
+// Temporary hack
+using namespace libk3dngui;
+
+namespace module
 {
 
-namespace undo_tree
+namespace ngui_undo_tree
+{
+
+namespace detail
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// control::implementation
+// implementation
 
-class control::implementation :
+/** \todo This use of the pimpl-idiom is obsolete and doesn't make much sense in the context of a plugin */
+class implementation :
 	public Gtk::VBox,
 	public asynchronous_update
 {
@@ -430,45 +444,80 @@ public:
 	sigc::signal<void> m_panel_grab_signal;
 };
 
-/////////////////////////////////////////////////////////////////////////////
-// control
+} // namespace detail
 
-control::control(document_state& DocumentState, k3d::icommand_node& Parent) :
-	base(false, 0),
-	ui_component("undo_tree", &Parent),
-	m_implementation(new implementation(DocumentState, *this))
-{
-	m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &control::record_command));
-	
-	m_implementation->m_undo_button->signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
-	m_implementation->m_redo_button->signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
-	m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
-	
-	pack_start(*m_implementation, Gtk::PACK_EXPAND_WIDGET);
-	show_all();
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// panel
 
-control::~control()
+class panel :
+	public Gtk::VBox,
+	public libk3dngui::panel::control,
+	public ui_component,
+	public k3d::ideletable
 {
-	delete m_implementation;
-}
+	typedef Gtk::VBox base;
 
-void control::initialize(document_state& DocumentState, k3d::icommand_node& Parent)
-{
-	assert_not_implemented();
-}
+public:
+	panel() :
+		base(false, 0),
+		ui_component("undo_tree", 0),
+		m_implementation(0)
+	{
+	}
 
-const std::string control::panel_type()
-{
-	return "undo_tree";
-}
+	~panel()
+	{
+		delete m_implementation;
+	}
 
-sigc::connection control::connect_focus_signal(const sigc::slot<void>& Slot)
-{
-	return m_implementation->m_panel_grab_signal.connect(Slot);
-}
+	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	{
+		ui_component::set_parent("undo_tree", &Parent);
+
+		m_implementation = new detail::implementation(DocumentState, *this);
+
+		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
+		
+		m_implementation->m_undo_button->signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
+		m_implementation->m_redo_button->signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
+		m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
+		
+		pack_start(*m_implementation, Gtk::PACK_EXPAND_WIDGET);
+		show_all();
+	}
+
+	const std::string panel_type()
+	{
+		return "undo_tree";
+	}
+
+	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
+	{
+		return m_implementation->m_panel_grab_signal.connect(Slot);
+	}
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<panel> factory(
+				k3d::uuid(),
+				"NGUIUndoTreePanel",
+				_("Provides a panel for displaying the undo tree"),
+				"NGUI Panels",
+				k3d::iplugin_factory::EXPERIMENTAL,
+				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "undo_tree")("panel_label", "Undo Tree"));
+
+		return factory;
+	}
+
+private:
+	detail::implementation* m_implementation;
+};
 
 } // namespace undo_tree
 
-} // namespace libk3dngui
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui_undo_tree::panel::get_factory());
+K3D_MODULE_END
 

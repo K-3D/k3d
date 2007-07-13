@@ -41,7 +41,6 @@
 #include "timeline.h"
 #include "tool_panel.h"
 #include "tool_properties.h"
-#include "undo_tree.h"
 #include "utility.h"
 #include "viewport.h"
 #include "widget_manip.h"
@@ -208,12 +207,6 @@ void control::mount_panel(const std::string& Type)
 	   return;
 	}
 
-	if("undo_tree" == Type)
-	{
-	   mount_panel(*Gtk::manage(new undo_tree::control(m_document_state, m_parent)), Type);
-	   return;
-	}
-
 	if("timeline" == Type)
 	{
 	   mount_panel(*Gtk::manage(new timeline::control(m_document_state, m_parent)), Type);
@@ -358,7 +351,6 @@ void control::set_choices()
 	add_choice("node_history", quiet_load_icon("node_history_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node History"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_history"));
 	add_choice("node_properties", quiet_load_icon("node_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_properties"));
 	add_choice("tool_properties", quiet_load_icon("tool_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Tool Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "tool_properties"));
-	add_choice("undo_tree", quiet_load_icon("undo_tree_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Undo Tree"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "undo_tree"));
 	add_choice("timeline", quiet_load_icon("timeline_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Timeline"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "timeline"));
 	add_choice("viewport", quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "viewport"));
 	add_choice("toolbar", quiet_load_icon("toolbar_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Toolbar"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "toolbar"));
