@@ -21,8 +21,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares the splash_box class, which provides a standardized startup "splash" box for K-3D
-		\author Tim Shead (tshead@k-3d.com)
+	\brief Declares the splash_box class, which provides a custom startup "splash" box for K-3D
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <gtkmm/window.h>
@@ -30,7 +30,10 @@
 namespace k3d { namespace filesystem { class path; } }
 namespace Gtk { class Label; }
 
-namespace libk3dngui
+namespace module
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -50,7 +53,9 @@ private:
 	Gtk::Label* const m_startup_message;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace module
 
 #endif // NGUI_SPLASH_BOX_H
 

@@ -21,14 +21,15 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "splash_box.h"
-#include "utility.h"
-#include "widget_manip.h"
-
 #include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
+#include "splash_box.h"
+
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/widget_manip.h>
+
 #include <k3dsdk/log.h>
 #include <k3dsdk/path.h>
-#include <k3d-version-config.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/frame.h>
@@ -37,7 +38,13 @@
 
 #include <iostream>
 
-namespace libk3dngui
+// Temporary hack
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -116,5 +123,8 @@ void splash_box::on_startup_message(const std::string& Message)
 	handle_pending_events();
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace module
+
 

@@ -18,12 +18,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the public interface for the K-3D Next Generation User Interface (NGUI) plugin
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
 #include <k3d-version-config.h>
+
+#include "splash_box.h"
 
 #include <k3dsdk/ngui/application_state.h>
 #include <k3dsdk/ngui/application_window.h>
@@ -36,7 +37,6 @@
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/open_uri.h>
 #include <k3dsdk/ngui/options.h>
-#include <k3dsdk/ngui/splash_box.h>
 #include <k3dsdk/ngui/tutorial_message.h>
 #include <k3dsdk/ngui/tutorial_recorder.h>
 #include <k3dsdk/ngui/utility.h>
@@ -81,7 +81,13 @@
 
 #include <iostream>
 
-namespace libk3dngui
+// Temporary hack ...
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -536,9 +542,11 @@ k3d::iplugin_factory& user_interface_factory()
 	return user_interface::get_factory();
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dngui::user_interface_factory());
+	Registry.register_factory(module::ngui::user_interface_factory());
 K3D_MODULE_END
 
