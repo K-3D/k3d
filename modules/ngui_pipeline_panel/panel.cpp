@@ -32,6 +32,7 @@
 #include <k3dsdk/options.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/result.h>
+#include <k3dsdk/vectors.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
@@ -51,6 +52,7 @@ namespace ngui_pipeline
 namespace detail
 {
 
+/// Drawing area widget that emits a signal when it needs to be redrawn
 class drawing_area :
 	public Gtk::DrawingArea
 {
@@ -87,7 +89,8 @@ public:
 		m_save_png("Save PNG"),
 		m_save_pdf("Save PDF"),
 		m_save_ps("Save PS"),
-		m_save_svg("Save SVG")
+		m_save_svg("Save SVG"),
+		m_zoom_factor(1.0)
 	{
 		m_hbox.pack_start(m_save_png, Gtk::PACK_SHRINK);
 		m_hbox.pack_start(m_save_pdf, Gtk::PACK_SHRINK);
@@ -101,8 +104,14 @@ public:
 		m_save_pdf.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_pdf));
 		m_save_ps.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_ps));
 		m_save_svg.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_svg));
+
+		m_drawing_area.add_events(Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK | Gdk::SCROLL_MASK);
 		m_drawing_area.connect_expose_event(sigc::mem_fun(*this, &panel::on_draw_clock));
-		Glib::signal_timeout().connect(sigc::mem_fun(*this, &panel::on_second_elapsed), 1000);
+		m_drawing_area.signal_button_press_event().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::on_button_press), true));
+		m_drawing_area.signal_motion_notify_event().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::on_mouse_motion), true));
+		m_drawing_area.signal_scroll_event().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::on_mouse_scroll), true));
+		
+		Glib::signal_timeout().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::redraw), true), 1000);
 
 		show_all();
 	}
@@ -147,9 +156,7 @@ public:
 		const Cairo::RefPtr<Cairo::Context> context = Cairo::Context::create(surface);
 		return_if_fail(context);
 
-		context->reset_clip();
-		context->scale(width, height);
-		draw_clock(context);
+		draw_clock(context, width, height);
 
 		surface->write_to_png(file_path.native_filesystem_string());
 	}
@@ -175,9 +182,7 @@ public:
 		const Cairo::RefPtr<Cairo::Context> context = Cairo::Context::create(surface);
 		return_if_fail(context);
 
-		context->reset_clip();
-		context->scale(width, height);
-		draw_clock(context);
+		draw_clock(context, width, height);
 	}
 
 	void on_save_ps()
@@ -201,9 +206,7 @@ public:
 		const Cairo::RefPtr<Cairo::Context> context = Cairo::Context::create(surface);
 		return_if_fail(context);
 
-		context->reset_clip();
-		context->scale(width, height);
-		draw_clock(context);
+		draw_clock(context, width, height);
 	}
 
 	void on_save_svg()
@@ -227,20 +230,16 @@ public:
 		const Cairo::RefPtr<Cairo::Context> context = Cairo::Context::create(surface);
 		return_if_fail(context);
 
-		context->reset_clip();
-		context->scale(width, height);
-		draw_clock(context);
+		draw_clock(context, width, height);
 	}
 
-	bool on_second_elapsed()
+	void redraw()
 	{
 		if(Glib::RefPtr<Gdk::Window> window = m_drawing_area.get_window())
 		{
 			Gdk::Rectangle r(0, 0, m_drawing_area.get_allocation().get_width(), m_drawing_area.get_allocation().get_height());
 			window->invalidate_rect(r, false);
 		}
-
-		return true;
 	}
 
 	void on_draw_clock(GdkEventExpose* event)
@@ -261,54 +260,108 @@ public:
 				context->clip();
 			}
 
-			context->scale(width, height);
-
-			draw_clock(context);
+			draw_clock(context, width, height);
 		}
 	}
 
-	void draw_clock(const Cairo::RefPtr<Cairo::Context> cr)
+	void on_button_press(GdkEventButton* Event)
 	{
-		cr->save();
+		m_last_mouse = k3d::point2(Event->x, Event->y);
+	}
+
+	void on_mouse_motion(GdkEventMotion* Event)
+	{
+//		if(Event->button == 2)
+		{
+			const k3d::point2 current_mouse = k3d::point2(Event->x, Event->y);
+			const k3d::point2 delta = current_mouse - m_last_mouse;
+
+			Gtk::Allocation allocation = m_drawing_area.get_allocation();
+			const double width = allocation.get_width();
+			const double height = allocation.get_height();
+
+			m_origin += delta /** (1.0 / m_zoom_factor)*/ * (1.0 / std::min(width, height));
+			m_last_mouse = current_mouse;
+
+			redraw();
+		}
+	}
+
+	void on_mouse_scroll(GdkEventScroll* Event)
+	{
+		static const double zoom_sensitivity = 1.2;
+
+		switch(Event->direction)
+		{
+			case GDK_SCROLL_UP:
+				m_zoom_factor *= zoom_sensitivity;
+				redraw();
+				break;
+			case GDK_SCROLL_DOWN:
+				m_zoom_factor *= (1.0 / zoom_sensitivity);
+				redraw();
+				break;
+			default:
+				break;
+		}
+	}
+
+	void draw_clock(const Cairo::RefPtr<Cairo::Context> Context, const double Width, const double Height)
+	{
+		Context->save();
+
+		if(Width > Height)
+		{
+			Context->translate((Width - Height) / 2, 0);
+			Context->scale(Height, Height);
+		}
+		else
+		{
+			Context->translate(0, (Height - Width) / 2);
+			Context->scale(Width, Width);
+		}
 
 		// Translate (0, 0) to be (0.5, 0.5), i.e. the center of the window
-		cr->translate(0.5, 0.5);
-		cr->set_line_width(m_lineWidth);
+		Context->translate(0.5, 0.5);
+		Context->translate(m_origin[0], m_origin[1]);
+		Context->scale(m_zoom_factor, m_zoom_factor);
 
-		cr->save();
-		cr->set_source_rgba(0.337, 0.612, 0.117, 0.9);   // green
-		cr->paint();
-		cr->restore();
-		cr->arc(0, 0, m_radius, 0, 2 * M_PI);
-		cr->save();
-		cr->set_source_rgba(1.0, 1.0, 1.0, 0.8);
-		cr->fill_preserve();
-		cr->restore();
-		cr->stroke_preserve();
-		cr->clip();
+		Context->set_line_width(m_lineWidth);
+
+		Context->save();
+		Context->set_source_rgba(0.337, 0.612, 0.117, 0.9);   // green
+		Context->paint();
+		Context->restore();
+		Context->arc(0, 0, m_radius, 0, 2 * M_PI);
+		Context->save();
+		Context->set_source_rgba(1.0, 1.0, 1.0, 0.8);
+		Context->fill_preserve();
+		Context->restore();
+		Context->stroke_preserve();
+		Context->clip();
 
 		//clock ticks
 		for (int i = 0; i < 12; i++)
 		{
 			double inset = 0.05;
 
-			cr->save();
-			cr->set_line_cap(Cairo::LINE_CAP_ROUND);
+			Context->save();
+			Context->set_line_cap(Cairo::LINE_CAP_ROUND);
 
 			if (i % 3 != 0)
 			{
 				inset *= 0.8;
-				cr->set_line_width(0.03);
+				Context->set_line_width(0.03);
 			}
 
-			cr->move_to(
+			Context->move_to(
 			(m_radius - inset) * cos (i * M_PI / 6),
 			(m_radius - inset) * sin (i * M_PI / 6));
-			cr->line_to (
+			Context->line_to (
 			m_radius * cos (i * M_PI / 6),
 			m_radius * sin (i * M_PI / 6));
-			cr->stroke();
-			cr->restore(); 
+			Context->stroke();
+			Context->restore(); 
 		}
 
 		// store the current time
@@ -321,47 +374,47 @@ public:
 		double hours = timeinfo->tm_hour * M_PI / 6;
 		double seconds= timeinfo->tm_sec * M_PI / 30;
 
-		cr->save();
-		cr->set_line_cap(Cairo::LINE_CAP_ROUND);
+		Context->save();
+		Context->set_line_cap(Cairo::LINE_CAP_ROUND);
 
 		// draw the seconds hand
-		cr->save();
-		cr->set_line_width(m_lineWidth / 3);
-		cr->set_source_rgba(0.7, 0.7, 0.7, 0.8); // gray
-		cr->move_to(0, 0);
-		cr->line_to(sin(seconds) * (m_radius * 0.9), 
+		Context->save();
+		Context->set_line_width(m_lineWidth / 3);
+		Context->set_source_rgba(0.7, 0.7, 0.7, 0.8); // gray
+		Context->move_to(0, 0);
+		Context->line_to(sin(seconds) * (m_radius * 0.9), 
 		-cos(seconds) * (m_radius * 0.9));
-		cr->stroke();
-		cr->restore();
+		Context->stroke();
+		Context->restore();
 
 		// draw the minutes hand
-		cr->set_source_rgba(0.117, 0.337, 0.612, 0.9);   // blue
-		cr->move_to(0, 0);
-		cr->line_to(sin(minutes + seconds / 60) * (m_radius * 0.8),
+		Context->set_source_rgba(0.117, 0.337, 0.612, 0.9);   // blue
+		Context->move_to(0, 0);
+		Context->line_to(sin(minutes + seconds / 60) * (m_radius * 0.8),
 		-cos(minutes + seconds / 60) * (m_radius * 0.8));
-		cr->stroke();
+		Context->stroke();
 
 		// draw the hours hand
-		cr->set_source_rgba(0.337, 0.612, 0.117, 0.9);   // green
-		cr->move_to(0, 0);
-		cr->line_to(sin(hours + minutes / 12.0) * (m_radius * 0.5),
+		Context->set_source_rgba(0.337, 0.612, 0.117, 0.9);   // green
+		Context->move_to(0, 0);
+		Context->line_to(sin(hours + minutes / 12.0) * (m_radius * 0.5),
 		-cos(hours + minutes / 12.0) * (m_radius * 0.5));
-		cr->stroke();
-		cr->restore();
+		Context->stroke();
+		Context->restore();
 
 		// draw a little dot in the middle
-		cr->arc(0, 0, m_lineWidth / 3.0, 0, 2 * M_PI);
-		cr->fill();
+		Context->arc(0, 0, m_lineWidth / 3.0, 0, 2 * M_PI);
+		Context->fill();
 
 /*
 		// Draw some text
-		cr->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
-		cr->set_font_size(0.15);
-		cr->move_to(-0.4, 0);
-		cr->show_text("Howdy!");
+		Context->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
+		Context->set_font_size(0.15);
+		Context->move_to(-0.4, 0);
+		Context->show_text("Howdy!");
 */
 
-		cr->restore();
+		Context->restore();
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -389,6 +442,11 @@ private:
 	Gtk::Button m_save_ps;
 	Gtk::Button m_save_svg;
 	detail::drawing_area m_drawing_area;
+
+	double m_zoom_factor;
+	k3d::point2 m_origin;
+
+	k3d::point2 m_last_mouse;
 };
 
 } // namespace ngui_pipeline
