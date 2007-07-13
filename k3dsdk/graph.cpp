@@ -63,18 +63,11 @@ graph::graph()
 {
 }
 
-/** \todo Print materials */
+/** \todo Print the topology */
 std::ostream& operator<<(std::ostream& Stream, const graph& RHS)
 {
 	Stream << "graph:" << std::endl;
-
-	detail::print(Stream, "  vertex first edges", RHS.vertex_first_edges);
-	detail::print(Stream, "  vertex edge counts", RHS.vertex_edge_counts);
-	detail::print(Stream, "  vertex selection", RHS.vertex_selection);
 	detail::print(Stream, "  vertex data", RHS.vertex_data);
-
-	detail::print(Stream, "  edges", RHS.edges);
-	detail::print(Stream, "  edge_selection", RHS.edge_selection);
 	detail::print(Stream, "  edge data", RHS.edge_data);
 
 	return Stream;
@@ -95,15 +88,7 @@ void deep_copy(const graph& From, graph& To)
 
 const bool validate(graph& Graph)
 {
-	if(!Graph.vertex_first_edges && !Graph.vertex_edge_counts && !Graph.vertex_selection && !Graph.edges && !Graph.edge_selection)
-		return true;
-
-	return_val_if_fail(Graph.vertex_first_edges, false);
-	return_val_if_fail(Graph.vertex_edge_counts, false);
-	return_val_if_fail(Graph.vertex_selection, false);
-	return_val_if_fail(Graph.edges, false);
-	return_val_if_fail(Graph.edge_selection, false);
-
+	assert_not_implemented();
 	return true;
 }
 

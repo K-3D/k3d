@@ -23,6 +23,7 @@
 #include "array.h"
 #include "vectors.h"
 
+#include <boost/graph/adjacency_list.hpp>
 #include <boost/shared_ptr.hpp>
 #include <map>
 
@@ -38,32 +39,21 @@ class graph
 public:
 	graph();
 
-	/// Defines storage for a generic collection of indices
-	typedef typed_array<size_t> indices_t;
-	/// Defines storage for a generic collection of counts
-	typedef typed_array<size_t> counts_t;
-	/// Defines storage for a generic collection of orders
-	typedef typed_array<size_t> orders_t;
-	/// Defines storage for a generic collection of booleans
-	typedef typed_array<bool> bools_t;
-	/// Defines storage for a generic collection of selection weights
-	typedef typed_array<double> selection_t;
+	/// Defines storage for a generic graph topology
+	typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS> topology_t;
+	/// Defines storage for a generic collection of strings
+	typedef typed_array<std::string> strings_t;
+	/// Defines storage for a generic collection of two-dimensional points
+	typedef typed_array<k3d::point2> points_t;
 	/// Defines a heterogeneous collection of named, shared arrays
 	typedef std::map<std::string, boost::shared_ptr<array> > named_arrays;
 
-	/// Stores the beginning of each vertex' edge list
-	boost::shared_ptr<const indices_t> vertex_first_edges;
-	/// Stores the number of edges in each vertex' edge list
-	boost::shared_ptr<const counts_t> vertex_edge_counts;
-	/// Stores per-vertex selection state
-	boost::shared_ptr<const selection_t> vertex_selection;
+	/// Stores the graph topology
+	boost::shared_ptr<const topology_t> topology;
+
 	/// Stores user-defined per-vertex data
 	named_arrays vertex_data;
 
-	/// Stores edges adjacent to a given vertex
-	boost::shared_ptr<const indices_t> edges;
-	/// Stores per-edge selection state
-	boost::shared_ptr<const selection_t> edge_selection;
 	/// Stores uder-defined per-edge data
 	named_arrays edge_data;
 };

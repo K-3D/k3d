@@ -54,11 +54,11 @@ namespace ngui_pipeline_profiler
 // panel
 
 class panel :
-	public Gtk::VBox,
 	public libk3dngui::panel::control,
 	public libk3dngui::ui_component,
 	public libk3dngui::asynchronous_update,
 	public k3d::ideletable
+	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
 
