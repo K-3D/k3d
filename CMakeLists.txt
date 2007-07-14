@@ -61,6 +61,7 @@ IF(APPLE)
 	SET(K3D_WINDOWS_DEFAULT OFF)
 ENDIF(APPLE)
 
+OPTION(K3D_BUILD_ANIMATION_MODULE "Build the animation plugin module" ON)
 OPTION(K3D_BUILD_ANNOTATION_MODULE "Build the annotation plugin module" ON)
 OPTION(K3D_BUILD_AQSIS_MODULE "Build the Aqsis render engine integration plugin module" ON)
 OPTION(K3D_BUILD_ARRAY_MODULE "Build the array plugin module" ON)
