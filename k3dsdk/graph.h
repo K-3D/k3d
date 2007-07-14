@@ -41,6 +41,8 @@ public:
 
 	/// Defines storage for a generic graph topology
 	typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS> topology_t;
+	/// Defines storage for a generic collection of indices
+	typedef typed_array<size_t> indices_t;
 	/// Defines storage for a generic collection of strings
 	typedef typed_array<std::string> strings_t;
 	/// Defines storage for a generic collection of two-dimensional points

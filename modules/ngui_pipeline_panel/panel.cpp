@@ -23,6 +23,8 @@
 
 #include <k3d-i18n-config.h>
 
+#include "graph_operations.h"
+
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/ngui/panel.h>
@@ -46,13 +48,7 @@
 #include <cairomm/context.h>
 
 #include <boost/assign/list_of.hpp>
-#include <boost/graph/circle_layout.hpp>
-#include <boost/graph/fruchterman_reingold.hpp>
-#include <boost/graph/gursoy_atun_layout.hpp>
-#include <boost/graph/random_layout.hpp>
-#include <boost/random/mersenne_twister.hpp>
 
-#include <cmath>
 #include <iostream>
 
 // Temporary hack ...
@@ -85,29 +81,6 @@ private:
 	}
 
 	sigc::signal<void, GdkEventExpose*> expose_event_signal;
-};
-
-class position_map
-{
-public:
-	struct point_proxy
-	{
-		double x;
-		double y;
-	};
-
-	position_map(k3d::typed_array<k3d::point2>& Storage) :
-		storage(Storage)
-	{
-	}
-
-	point_proxy& operator[](const size_t Index)
-	{
-		return reinterpret_cast<point_proxy&>(storage[Index]);
-	}
-
-private:
-	k3d::typed_array<k3d::point2>& storage;
 };
 
 } // namespace detail
@@ -408,117 +381,38 @@ public:
 		Context->paint();
 		Context->restore();
 
-		// Generate a sample graph ...
+		// Generate a graph from the visualization pipeline ...
 		k3d::graph graph;
-		{
-			const k3d::nodes_t nodes = m_document_state->document().nodes().collection();
-
-			boost::shared_ptr<k3d::graph::topology_t> topology(new k3d::graph::topology_t(nodes.size()));
-			boost::shared_ptr<k3d::graph::strings_t> vertex_labels(new k3d::graph::strings_t());
-
-			// Insert nodes ...
-			std::map<k3d::inode*, size_t> node_map;
-			for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-			{
-				node_map[*node] = node_map.size();
-				vertex_labels->push_back((*node)->name());
-			}
-
-			// Insert edges ...
-			for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-			{
-				if(k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(*node))
-				{
-					const k3d::iproperty_collection::properties_t properties = property_collection->properties();
-					for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-					{
-						if(typeid(k3d::inode*) == (*property)->property_type())
-						{
-							if(k3d::inode* const referenced_node = boost::any_cast<k3d::inode*>((*property)->property_value()))
-							{
-								boost::add_edge(node_map[referenced_node], node_map[*node], *topology);
-//								stream << " [style=dotted,label=\"" << escaped_string((*property)->property_name()) << "\"]\n";
-							}
-						}
-					}
-				}
-			}
-
-			const k3d::idag::dependencies_t dependencies = m_document_state->document().dag().dependencies();
-			for(k3d::idag::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
-			{
-				if(dependency->first && dependency->first->property_node() && dependency->second && dependency->second->property_node())
-				{
-					boost::add_edge(node_map[dependency->second->property_node()], node_map[dependency->first->property_node()], *topology);
-//					stream << to_integer(object_map[dependency->second]) << " -> " << to_integer(object_map[dependency->first]);
-//					stream << " [headlabel=\"" << escaped_string(dependency->first->property_name()) << "\" taillabel=\"" << escaped_string(dependency->second->property_name()) << "\"]\n";
-				}
-			}
-
-			graph.topology = topology;
-			graph.vertex_data["labels"] = vertex_labels;
-		}
-
-		// Do a simple circular layout for the graph ...
-		{
-			return_if_fail(graph.topology);
-
-			const k3d::graph::topology_t& topology = *graph.topology;
-			boost::shared_ptr<k3d::graph::points_t> vertex_positions(new k3d::graph::points_t(boost::num_vertices(topology)));
-
-			detail::position_map position_map(*vertex_positions);
-			boost::circle_graph_layout(topology, position_map, 0.5);
-
-			graph.vertex_data["positions"] = vertex_positions;
-		}
-
-/*
-		// Do a simple random layout for the graph ...
-		{
-			return_if_fail(graph.topology);
-
-			const k3d::graph::topology_t& topology = *graph.topology;
-			boost::shared_ptr<k3d::graph::points_t> vertex_positions(new k3d::graph::points_t(boost::num_vertices(topology)));
-
-			detail::position_map position_map(*vertex_positions);
-			boost::mt19937 rng;
-			boost::random_graph_layout(topology, position_map, 0.0, 1.0, 0.0, 1.0, rng);
-//			boost::fruchterman_reingold_force_directed_layout(topology, position_map, 1.0, 1.0);
-
-			graph.vertex_data["positions"] = vertex_positions;
-		}
-
-		// Do a simple space-filling layout for the graph ...
-		{
-			return_if_fail(graph.topology);
-
-			const k3d::graph::topology_t& topology = *graph.topology;
-			boost::shared_ptr<k3d::graph::points_t> vertex_positions(new k3d::graph::points_t(boost::num_vertices(topology)));
-
-			detail::position_map position_map(*vertex_positions);
-			boost::gursoy_atun_layout(topology, boost::square_topology<>(), position_map);
-
-			graph.vertex_data["positions"] = vertex_positions;
-		}
-*/
+		create_graph(*m_document_state, graph);
+//		connected_components(graph);
+		circular_layout(graph);
+//		random_layout(graph);
+//		space_filling_layout(graph);
 
 		// Render the graph vertices ...
 		try
 		{
-			return_if_fail(graph.vertex_data.count("labels"));
-			return_if_fail(graph.vertex_data.count("positions"));
+			return_if_fail(graph.vertex_data.count("label"));
+			return_if_fail(graph.vertex_data.count("position"));
+//			return_if_fail(graph.vertex_data.count("component"));
 
-			const k3d::graph::strings_t& vertex_labels = dynamic_cast<k3d::graph::strings_t&>(*graph.vertex_data["labels"].get());
-			const k3d::graph::points_t& vertex_positions = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["positions"].get());
-			return_if_fail(vertex_labels.size() == vertex_positions.size());
+			const k3d::graph::strings_t& vertex_label = dynamic_cast<k3d::graph::strings_t&>(*graph.vertex_data["label"].get());
+			const k3d::graph::points_t& vertex_position = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["position"].get());
+//			const k3d::graph::indices_t& vertex_component = dynamic_cast<k3d::graph::indices_t&>(*graph.vertex_data["component"].get());
+//			return_if_fail(vertex_label.size() == vertex_position.size() && vertex_position.size() == vertex_component.size());
 
 			Context->save();
 
 			Context->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
 			Context->set_font_size(0.03);
-			
-			for(size_t i = 0; i != vertex_labels.size(); ++i)
-				draw_centered_text(Context, vertex_positions[i], vertex_labels[i]);
+
+			for(size_t i = 0; i != vertex_label.size(); ++i)
+				draw_centered_text(Context, vertex_position[i], vertex_label[i]);
+
+/*
+			for(size_t i = 0; i != vertex_component.size(); ++i)
+				draw_centered_text(Context, vertex_position[i], k3d::string_cast(vertex_component[i]));
+*/
 
 			Context->restore();
 		}
@@ -535,11 +429,11 @@ public:
 		try
 		{
 			return_if_fail(graph.topology);
-			return_if_fail(graph.vertex_data.count("positions"));
+			return_if_fail(graph.vertex_data.count("position"));
 
 			const k3d::graph::topology_t& topology = *graph.topology;
-			const k3d::graph::points_t& vertex_positions = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["positions"].get());
-			return_if_fail(boost::num_vertices(topology) == vertex_positions.size());
+			const k3d::graph::points_t& vertex_position = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["position"].get());
+			return_if_fail(boost::num_vertices(topology) == vertex_position.size());
 
 			Context->save();
 			Context->set_line_width(0.003);
@@ -551,7 +445,7 @@ public:
 				const size_t source = boost::source(*edges.first, topology);
 				const size_t target = boost::target(*edges.first, topology);
 
-				draw_arrow(Context, vertex_positions[source], vertex_positions[target], 0.015);
+				draw_arrow(Context, vertex_position[source], vertex_position[target], 0.015);
 			}
 
 			Context->restore();
