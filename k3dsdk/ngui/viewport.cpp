@@ -277,7 +277,7 @@ void select_nearest_point(const k3d::mesh::points_t& Points, const k3d::selectio
 		&unused);
 	coords[1] = ScreenHeight - coords[1];
 
-	const double distance = k3d::to_vector(coords - Coordinates).length2();
+	const double distance = (coords - Coordinates).length2();
 	if(distance < OutputDistance)
 	{
 		OutputPoint = Point;
@@ -322,8 +322,8 @@ void select_nearest_edge(const k3d::mesh::indices_t& EdgePoints, const k3d::mesh
 	// Coordinates to segment distance
 	double distance = 0;
 
-	const k3d::point2 edge = S2 - S1;
-	const k3d::point2 w = Coordinates - S1;
+	const k3d::vector2 edge = S2 - S1;
+	const k3d::vector2 w = Coordinates - S1;
 
 	const double c1 = w * edge;
 	if(c1 <= 0)

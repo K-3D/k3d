@@ -268,7 +268,7 @@ void basic_input_model::motion_notify_event(viewport::control& Viewport, GdkEven
 
 	// If the mouse pointer hasn't moved much lately, we're done ...
 	const k3d::point2 mouse = k3d::point2(Event->x, Event->y);
-	const k3d::vector2 delta = k3d::to_vector(mouse - m_implementation->start_mouse);
+	const k3d::vector2 delta = mouse - m_implementation->start_mouse;
 
 	if(delta.length2() < 9)
 		return;

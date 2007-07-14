@@ -62,17 +62,18 @@ public:
 	void append_viewport_coordinates(const std::string& Name, viewport::control& Viewport, const GdkEventScroll& Event);
 	void append_viewport_coordinates(const std::string& Name, viewport::control& Viewport, const k3d::rectangle& Value);
 	void append(const std::string& Name, const bool& Value);
+	void append(const std::string& Name, const char* const Value);
 	void append(const std::string& Name, const double& Value);
+	void append(const std::string& Name, const k3d::angle_axis& Value);
 	void append(const std::string& Name, const k3d::matrix4& Value);
 	void append(const std::string& Name, const k3d::point2& Value);
 	void append(const std::string& Name, const k3d::point3& Value);
-	void append(const std::string& Name, const k3d::vector3& Value);
 	void append(const std::string& Name, const k3d::rectangle& Value);
-	void append(const std::string& Name, const k3d::angle_axis& Value);
-	void append(const std::string& Name, const std::string& Value);
-	void append(const std::string& Name, const char* const Value);
 	void append(const std::string& Name, const k3d::selection::record& Value);
 	void append(const std::string& Name, const k3d::selection::records& Value);
+	void append(const std::string& Name, const k3d::vector2& Value);
+	void append(const std::string& Name, const k3d::vector3& Value);
+	void append(const std::string& Name, const std::string& Value);
 	void append(const std::string& Name, k3d::inode* const Value);
 	void append(const k3d::xml::element& Value);
 
@@ -95,6 +96,8 @@ public:
 	const k3d::point2 get_point2(const std::string& Name) const;
 	/// Returns a point3, or throws std::runtime_error
 	const k3d::point3 get_point3(const std::string& Name) const;
+	/// Returns a vector2, or throws std::runtime_error
+	const k3d::vector2 get_vector2(const std::string& Name) const;
 	/// Returns a vector3, or throws std::runtime_error
 	const k3d::vector3 get_vector3(const std::string& Name) const;
 	/// Returns a rectangle, or throws std::runtime_error

@@ -171,7 +171,7 @@ line2::line2(const vector2& Direction, const point2& Point) :
 }
 
 line2::line2(const point2& Point1, const point2& Point2) :
-	direction(to_vector(Point2 - Point1)),
+	direction(Point2 - Point1),
 	point(Point1)
 {
 }

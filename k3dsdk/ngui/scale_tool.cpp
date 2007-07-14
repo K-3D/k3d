@@ -110,7 +110,7 @@ private:
 			if(m_relative_move)
 			{
 				// Relative move
-				const k3d::point2 difference = current_mouse - m_last_mouse;
+				const k3d::vector2 difference = current_mouse - m_last_mouse;
 				m_last_mouse = current_mouse;
 				double delta = 0;
 

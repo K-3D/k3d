@@ -111,6 +111,11 @@ void command_arguments::append(const std::string& Name, const k3d::point3& Value
 	m_storage->append(k3d::xml::element(Name, k3d::string_cast(Value)));
 }
 
+void command_arguments::append(const std::string& Name, const k3d::vector2& Value)
+{
+	m_storage->append(k3d::xml::element(Name, k3d::string_cast(Value)));
+}
+
 void command_arguments::append(const std::string& Name, const k3d::vector3& Value)
 {
 	m_storage->append(k3d::xml::element(Name, k3d::string_cast(Value)));
@@ -247,6 +252,12 @@ const k3d::point3 command_arguments::get_point3(const std::string& Name) const
 {
 	k3d::xml::element* const xml_storage = get_storage(Name);
 	return k3d::from_string<k3d::point3>(xml_storage->text, k3d::point3(0, 0, 0));
+}
+
+const k3d::vector2 command_arguments::get_vector2(const std::string& Name) const
+{
+	k3d::xml::element* const xml_storage = get_storage(Name);
+	return k3d::from_string<k3d::vector2>(xml_storage->text, k3d::vector2(0, 0));
 }
 
 const k3d::vector3 command_arguments::get_vector3(const std::string& Name) const

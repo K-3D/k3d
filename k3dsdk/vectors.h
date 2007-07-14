@@ -48,154 +48,20 @@
 // Modified by Tim Shead for use with K-3D, January 1998
 
 #include "almost_equal.h"
-#include "result.h"
-
-#include <boost/io/ios_state.hpp>
+#include "point2.h"
+#include "vector2.h"
 
 #include <algorithm>
 #include <cmath>
-#include <iomanip>
 #include <iostream>
 
 namespace k3d
 {
 
-class point2;
 class point3;
 class point4;
-class vector2;
 class vector3;
 class normal3;
-
-/////////////////////////////////////////////////////////////////////////////
-// point2
-
-/// Encapsulates a two-dimensional location
-class point2
-{
-public:
-	/// Stores the point values
-	double n[2];
-
-	// Constructors
-	point2()
-	{
-		n[0] = n[1] = 0.0;
-	}
-	
-	point2(const double x, const double y)
-	{
-		n[0] = x;
-		n[1] = y;
-	}
-
-	point2(const double d[2])
-	{
-		n[0] = d[0];
-		n[1] = d[1];
-	}
-	
-	point2(const point2& v)
-	{
-		n[0] = v.n[0];
-		n[1] = v.n[1];
-	}
-
-	/// Assignment
-	point2& operator=(const point2& v)
-	{
-		n[0] = v.n[0];
-		n[1] = v.n[1];
-		return *this;
-	}
-
-	/// Assigns a C/C++ style array
-	point2& operator=(const double d[2])
-	{
-		n[0] = d[0];
-		n[1] = d[1];
-		return *this;
-	}
-
-	/// Addition
-	point2& operator+=(const point2& v)
-	{
-		n[0] += v.n[0];
-		n[1] += v.n[1];
-		return *this;
-	}
-
-	/// Addition
-	point2& operator+=(const vector2& v);
-
-	/// Subtraction
-	point2& operator-=(const point2& v)
-	{
-		n[0] -= v.n[0];
-		n[1] -= v.n[1];
-		return *this;
-	}
-
-	/// Subtraction
-	point2& operator-=(const vector2& v);
-
-	/// Multiplication by a constant
-	point2& operator*=(const double d)
-	{
-		n[0] *= d;
-		n[1] *= d;
-		return *this;
-	}
-	
-	/// Division by a constant
-	point2& operator/=(const double d)
-	{
-		return_val_if_fail(d, *this);
-
-		double d_inv = 1./d;
-		n[0] *= d_inv;
-		n[1] *= d_inv;
-
-		return *this;
-	}
-
-	/// Returns an indexed dimension by reference
-	double& operator[](int i)
-	{
-		return n[i];
-	}
-
-	/// Returns an indexed dimension by value
-	double operator[](int i) const
-	{
-		return n[i];
-	}
-	
-	/// Integrate with legacy array-oriented APIs
-	const double* data() const
-	{
-		return &n[0];
-	}
-	
-	/// Integrate with legacy array-oriented APIs
-	double* data()
-	{
-		return &n[0];
-	}
-
-	friend std::ostream& operator<<(std::ostream& Stream, const point2& RHS)
-	{
-		boost::io::ios_flags_saver stream_state(Stream);
-		Stream << std::setprecision(17) << RHS.n[0] << " " << RHS.n[1];
-		return Stream;
-	}
-
-	friend std::istream& operator>>(std::istream& Stream, point2& RHS)
-	{
-		Stream >> RHS.n[0] >> RHS.n[1];
-		return Stream;
-	}
-};
 
 /////////////////////////////////////////////////////////////////////////////
 // point3
@@ -493,96 +359,6 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// vector2
-
-/// Encapsulates a 2D direction vector
-class vector2
-{
-public:
-	/// Stores the vector values
-	double n[2];
-
-	vector2()
-	{
-		n[0] = n[1] = 0.0;
-	}
-
-	vector2(const double x, const double y)
-	{
-		n[0] = x;
-		n[1] = y;
-	}
-
-	vector2& operator+=(const vector2& v)
-	{
-		n[0] += v.n[0];
-		n[1] += v.n[1];
-		return *this;
-	}
-
-	vector2& operator-=(const vector2& v)
-	{
-		n[0] += v.n[0];
-		n[1] += v.n[1];
-		return *this;
-	}
-
-	vector2& operator*=(const double d)
-	{
-		n[0] *= d;
-		n[1] *= d;
-		return *this;
-	}
-
-	vector2& operator/=(const double d)
-	{
-		return_val_if_fail(d, *this);
-
-		const double d_inv = 1./d;
-		n[0] *= d_inv;
-		n[1] *= d_inv;
-		return *this;
-	}
-
-	double& operator[](const unsigned int i)
-	{
-		assert_warning((i == 0) || (i == 1));
-		return n[i];
-	}
-
-	double operator[](const unsigned int i) const
-	{
-		return_val_if_fail((i == 0) || (i == 1), 0);
-		return n[i];
-	}
-
-	/// Returns the normal length
-	double length() const
-	{
-		return sqrt(length2());
-	}
-
-	/// Returns the squared normal length
-	double length2() const
-	{
-		return n[0] * n[0] + n[1] * n[1];
-	}
-
-	friend std::ostream& operator<<(std::ostream& Stream, const vector2& RHS)
-	{
-		boost::io::ios_flags_saver stream_state(Stream);
-		Stream << std::setprecision(17) << RHS.n[0] << " " << RHS.n[1];
-		return Stream;
-	}
-
-	friend std::istream& operator>>(std::istream& Stream, vector2& RHS)
-	{
-		Stream >> RHS.n[0] >> RHS.n[1];
-		return Stream;
-	}
-};
-
-/////////////////////////////////////////////////////////////////////////////
 // vector3
 
 /// Encapsulates a 3D direction vector
@@ -787,47 +563,6 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// point2 implementation
-
-inline point2& point2::operator+=(const vector2& v)
-{ n[0] += v.n[0]; n[1] += v.n[1]; return *this; }
-
-inline point2& point2::operator-=(const vector2& v)
-{ n[0] -= v.n[0]; n[1] -= v.n[1]; return *this; }
-
-inline point2 operator-(const point2& a)
-{ return point2(-a.n[0],-a.n[1]); }
-
-inline point2 operator+(const point2& a, const point2& b)
-{ return point2(a.n[0]+ b.n[0], a.n[1] + b.n[1]); }
-
-inline point2 operator-(const point2& a, const point2& b)
-{ return point2(a.n[0]-b.n[0], a.n[1]-b.n[1]); }
-
-inline point2 operator*(const point2& a, const double d)
-{ return point2(d*a.n[0], d*a.n[1]); }
-
-inline point2 operator*(const double d, const point2& a)
-{ return a*d; }
-
-inline double operator*(const point2& a, const point2& b)
-{ return (a.n[0]*b.n[0] + a.n[1]*b.n[1]); }
-
-inline point2 operator/(const point2& a, const double d)
-{
-	return_val_if_fail(d, point2());
-
-	double d_inv = 1./d;
-	return point2(a.n[0]*d_inv, a.n[1]*d_inv);
-}
-
-inline bool operator==(const point2& a, const point2& b)
-{ return (a.n[0] == b.n[0]) && (a.n[1] == b.n[1]); }
-
-inline bool operator!=(const point2& a, const point2& b)
-{ return !(a == b); }
-
-/////////////////////////////////////////////////////////////////////////////
 // point3 implementation
 
 inline point3& point3::operator+=(const vector3& v)
@@ -904,20 +639,8 @@ inline bool operator==(const point4& a, const point4& b)
 inline bool operator!=(const point4& a, const point4& b)
 { return !(a == b); }
 
-/////////////////////////////////////////////////////////////////////////////
-// vector2 implementation
 
-/// Negation
-inline const vector2 operator-(const vector2& v)
-{
-	return vector2(-v.n[0], -v.n[1]);
-}
-
-/// Addition
-inline const vector2 operator+(const vector2& a, const vector2& b)
-{
-	return vector2(a.n[0] + b.n[0], a.n[1] + b.n[1]);
-}
+/// vector2 / point2 operations
 
 /// Add a point and a vector, returning the moved point
 inline const point2 operator+(const point2& a, const vector2& b)
@@ -931,53 +654,30 @@ inline const point2 operator+(const vector2& a, const point2& b)
 	return point2(a.n[0] + b.n[0], a.n[1] + b.n[1]);
 }
 
-/// Subtraction
-inline const vector2 operator-(const vector2& a, const vector2& b)
-{
-	return vector2(a.n[0] - b.n[0], a.n[1] - b.n[1]);
-}
-
 /// Subtracts a vector from a point, returning the modified point
 inline const point2 operator-(const point2& a, const vector2& b)
 {
 	return point2(a.n[0] - b.n[0], a.n[1] - b.n[1]);
 }
 
-/// Multiplication by a constant
-inline const vector2 operator*(const vector2& a, const double d)
+/// Returns the vector difference between two points
+inline const vector2 operator-(const point2& a, const point2& b)
 {
-	return vector2(a.n[0] * d, a.n[1] * d);
+	return vector2(a.n[0] - b.n[0], a.n[1] - b.n[1]);
 }
 
-/// Multiplication by a constant
-inline const vector2 operator*(const double d, const vector2& a)
+inline point2& point2::operator+=(const vector2& v)
 {
-	return vector2(a.n[0] * d, a.n[1] * d);
+	n[0] += v.n[0];
+	n[1] += v.n[1];
+	return *this;
 }
 
-/// Returns the dot product of two vectors
-inline const double operator*(const vector2& a, const vector2& b)
+inline point2& point2::operator-=(const vector2& v)
 {
-	return a.n[0] * b.n[0] + a.n[1] * b.n[1];
-}
-
-/// Division by a constant
-inline const vector2 operator/(const vector2& a, const double d)
-{
-	return_val_if_fail(d, vector2());
-	return vector2(a.n[0] / d, a.n[1] / d);
-}
-
-/// Equality
-inline const bool operator==(const vector2& a, const vector2& b)
-{
-	return a.n[0] == b.n[0] && a.n[1] == b.n[1];
-}
-
-/// Non-equality
-inline const bool operator!=(const vector2& a, const vector2& b)
-{
-	return a.n[0] != b.n[0] || a.n[1] != b.n[1];
+	n[0] -= v.n[0];
+	n[1] -= v.n[1];
+	return *this;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1136,12 +836,6 @@ inline const bool operator!=(const normal3& a, const normal3& b)
 // Miscellaneous functions
 
 /// Returns the length of a vector
-inline const double length(const vector2& Vector)
-{
-	return Vector.length();
-}
-
-/// Returns the length of a vector
 inline const double length(const vector3& Vector)
 {
 	return Vector.length();
@@ -1160,8 +854,7 @@ const T normalize(const T& Vector)
 /// Returns the distance between two points
 inline const double distance(const point2& P1, const point2& P2)
 {
-	const point2 v = P2 - P1;
-	return sqrt(v.n[0]*v.n[0] + v.n[1]*v.n[1]);
+	return length(P2 - P1);
 }
 
 /// Returns the distance between two points
@@ -1171,11 +864,13 @@ inline const double distance(const point3& P1, const point3& P2)
 	return sqrt(v.n[0]*v.n[0] + v.n[1]*v.n[1] + v.n[2]*v.n[2]);
 }
 
+/*
 /// Explicit conversion
 inline const point2 to_point(const vector2& v)
 {
 	return point2(v.n[0], v.n[1]);
 }
+*/
 
 /// Explicit conversion
 inline const vector2 to_vector(const point2& v)
@@ -1233,22 +928,6 @@ inline const vector3 spherical(const vector3& Vector)
 */
 }
 
-/// Specialization of almost_equal that tests two point2 objects for near-equality
-template<>
-class almost_equal<point2>
-{
-	typedef point2 T;
-public:
-	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
-	inline const bool operator()(const T& A, const T& B) const
-	{
-		return std::equal(A.n, A.n + 2, B.n, almost_equal<double>(threshold));
-	}
-
-private:
-	const boost::uint64_t threshold;
-};
-
 /// Specialization of almost_equal that tests two point3 objects for near-equality
 template<>
 class almost_equal<point3>
@@ -1275,22 +954,6 @@ public:
 	inline const bool operator()(const T& A, const T& B) const
 	{
 		return std::equal(A.n, A.n + 4, B.n, almost_equal<double>(threshold));
-	}
-
-private:
-	const boost::uint64_t threshold;
-};
-
-/// Specialization of almost_equal that tests two vector2 objects for near-equality
-template<>
-class almost_equal<vector2>
-{
-	typedef vector2 T;
-public:
-	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
-	inline const bool operator()(const T& A, const T& B) const
-	{
-		return std::equal(A.n, A.n + 2, B.n, almost_equal<double>(threshold));
 	}
 
 private:

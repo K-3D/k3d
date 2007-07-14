@@ -273,7 +273,7 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 
 			command_arguments arguments(Arguments);
 			const double timestamp = arguments.get_double("timestamp");
-			const k3d::point2 mouse_delta = arguments.get_point2("mouse_delta");
+			const k3d::vector2 mouse_delta = arguments.get_vector2("mouse_delta");
 			const double value = arguments.get_double("value");
 
 			interactive::warp_pointer(interactive::get_pointer() + mouse_delta, timestamp, m_timer);

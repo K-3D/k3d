@@ -98,8 +98,8 @@ private:
 			const k3d::point2 current_mouse(Coordinates);
 			const k3d::point2 origin = Viewport.project(m_rotation_origin);
 
-			const k3d::vector2 v1 = k3d::to_vector(m_first_mouse - origin);
-			const k3d::vector2 v2 = k3d::to_vector(current_mouse - origin);
+			const k3d::vector2 v1 = m_first_mouse - origin;
+			const k3d::vector2 v2 = current_mouse - origin;
 
 			// First or current mouse is on the origin
 			if(!v1.length2() || !v2.length2())

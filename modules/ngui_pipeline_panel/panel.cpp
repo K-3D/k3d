@@ -47,6 +47,8 @@
 
 #include <boost/assign/list_of.hpp>
 #include <boost/graph/circle_layout.hpp>
+#include <boost/graph/fruchterman_reingold.hpp>
+#include <boost/graph/gursoy_atun_layout.hpp>
 #include <boost/graph/random_layout.hpp>
 #include <boost/random/mersenne_twister.hpp>
 
@@ -85,10 +87,27 @@ private:
 	sigc::signal<void, GdkEventExpose*> expose_event_signal;
 };
 
-struct point
+class position_map
 {
-	double x;
-	double y;
+public:
+	struct point_proxy
+	{
+		double x;
+		double y;
+	};
+
+	position_map(k3d::typed_array<k3d::point2>& Storage) :
+		storage(Storage)
+	{
+	}
+
+	point_proxy& operator[](const size_t Index)
+	{
+		return reinterpret_cast<point_proxy&>(storage[Index]);
+	}
+
+private:
+	k3d::typed_array<k3d::point2>& storage;
 };
 
 } // namespace detail
@@ -125,7 +144,7 @@ public:
 		m_save_ps.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_ps));
 		m_save_svg.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_svg));
 
-		m_drawing_area.add_events(Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK | Gdk::SCROLL_MASK);
+		m_drawing_area.add_events(Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK | Gdk::SCROLL_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
 		m_drawing_area.connect_expose_event(sigc::mem_fun(*this, &panel::on_draw_pipeline));
 		m_drawing_area.signal_button_press_event().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::on_button_press), true));
 		m_drawing_area.signal_motion_notify_event().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::on_mouse_motion), true));
@@ -289,7 +308,7 @@ public:
 //		if(Event->button == 2)
 		{
 			const k3d::point2 current_mouse = k3d::point2(Event->x, Event->y);
-			const k3d::point2 delta = current_mouse - m_last_mouse;
+			const k3d::vector2 delta = current_mouse - m_last_mouse;
 
 			Gtk::Allocation allocation = m_drawing_area.get_allocation();
 			const double width = allocation.get_width();
@@ -321,9 +340,49 @@ public:
 		}
 	}
 
-	void draw_pipeline(const Cairo::RefPtr<Cairo::Context> Context, const double Width, const double Height)
+	void draw_arrow(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Source, const k3d::point2& Target, const double Size)
 	{
-return_if_fail(m_document_state);
+		if(!k3d::length(Source - Target))
+			return;
+
+		const k3d::vector2 length_vector = k3d::normalize(Source - Target);
+		const k3d::vector2 width_vector = k3d::perpendicular(length_vector);
+
+		const k3d::point2 a = Source;
+		const k3d::point2 b = Target + (Size * length_vector);
+		const k3d::point2 c = Target + (Size * length_vector) + (0.3 * Size * width_vector);
+		const k3d::point2 d = Target;
+		const k3d::point2 e = Target + (Size * length_vector) + (-0.3 * Size * width_vector);
+
+		Context->set_line_cap(Cairo::LINE_CAP_BUTT);
+		Context->set_line_join(Cairo::LINE_JOIN_MITER);
+
+		Context->move_to(a[0], a[1]);
+		Context->line_to(b[0], b[1]);
+		Context->line_to(c[0], c[1]);
+		Context->line_to(d[0], d[1]);
+		Context->line_to(e[0], e[1]);
+		Context->line_to(b[0], b[1]);
+		Context->stroke();
+	}
+
+	void draw_centered_text(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Position, const std::string& Text)
+	{
+		Context->save();
+
+		Cairo::TextExtents extents;
+		Context->get_text_extents(Text, extents);
+
+		Context->translate(-extents.width / 2, extents.height / 2);
+		Context->move_to(Position[0], Position[1]);
+		Context->show_text(Text);
+
+		Context->restore();
+	}
+
+	void draw_pipeline(const Cairo::RefPtr<Cairo::Context>& Context, const double Width, const double Height)
+	{
+		return_if_fail(m_document_state);
 
 		Context->save();
 
@@ -352,70 +411,124 @@ return_if_fail(m_document_state);
 		// Generate a sample graph ...
 		k3d::graph graph;
 		{
-/*
-			std::vector<std::string> sample_vertices = boost::assign::list_of("a")("b")("c")("d");
-			std::multimap<size_t, size_t> sample_edges = boost::assign::map_list_of(0, 1)(0, 2)(1, 2)(2, 3)(0, 1);
-*/
-			boost::shared_ptr<k3d::graph::topology_t> topology(new k3d::graph::topology_t());
+			const k3d::nodes_t nodes = m_document_state->document().nodes().collection();
+
+			boost::shared_ptr<k3d::graph::topology_t> topology(new k3d::graph::topology_t(nodes.size()));
 			boost::shared_ptr<k3d::graph::strings_t> vertex_labels(new k3d::graph::strings_t());
 
-			const k3d::nodes_t nodes = m_document_state->document().nodes().collection();
+			// Insert nodes ...
+			std::map<k3d::inode*, size_t> node_map;
 			for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 			{
-				boost::add_vertex(*topology);
+				node_map[*node] = node_map.size();
 				vertex_labels->push_back((*node)->name());
 			}
-/*
-			for(size_t i = 0; i != sample_vertices.size(); ++i)
+
+			// Insert edges ...
+			for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 			{
-				boost::add_vertex(*topology);
-				vertex_labels->push_back(sample_vertices[i]);
+				if(k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(*node))
+				{
+					const k3d::iproperty_collection::properties_t properties = property_collection->properties();
+					for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+					{
+						if(typeid(k3d::inode*) == (*property)->property_type())
+						{
+							if(k3d::inode* const referenced_node = boost::any_cast<k3d::inode*>((*property)->property_value()))
+							{
+								boost::add_edge(node_map[referenced_node], node_map[*node], *topology);
+//								stream << " [style=dotted,label=\"" << escaped_string((*property)->property_name()) << "\"]\n";
+							}
+						}
+					}
+				}
 			}
 
-			for(std::multimap<size_t, size_t>::iterator edge = sample_edges.begin(); edge != sample_edges.end(); ++edge)
+			const k3d::idag::dependencies_t dependencies = m_document_state->document().dag().dependencies();
+			for(k3d::idag::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
 			{
-				boost::add_edge(edge->first, edge->second, *topology);
+				if(dependency->first && dependency->first->property_node() && dependency->second && dependency->second->property_node())
+				{
+					boost::add_edge(node_map[dependency->second->property_node()], node_map[dependency->first->property_node()], *topology);
+//					stream << to_integer(object_map[dependency->second]) << " -> " << to_integer(object_map[dependency->first]);
+//					stream << " [headlabel=\"" << escaped_string(dependency->first->property_name()) << "\" taillabel=\"" << escaped_string(dependency->second->property_name()) << "\"]\n";
+				}
 			}
-*/
 
 			graph.topology = topology;
 			graph.vertex_data["labels"] = vertex_labels;
 		}
 
-/*
-		// Create a (dirt simple) layout for the graph ...
+		// Do a simple circular layout for the graph ...
 		{
-			boost::shared_ptr<k3d::graph::points_t> vertex_positions(new k3d::graph::points_t());
+			return_if_fail(graph.topology);
 
-			const size_t vertex_count = boost::num_vertices(*graph.topology);
-			for(size_t i = 0; i != vertex_count; ++i)
-				vertex_positions->push_back(k3d::point2(i * 0.1, 0));
+			const k3d::graph::topology_t& topology = *graph.topology;
+			boost::shared_ptr<k3d::graph::points_t> vertex_positions(new k3d::graph::points_t(boost::num_vertices(topology)));
+
+			detail::position_map position_map(*vertex_positions);
+			boost::circle_graph_layout(topology, position_map, 0.5);
+
+			graph.vertex_data["positions"] = vertex_positions;
+		}
+
+/*
+		// Do a simple random layout for the graph ...
+		{
+			return_if_fail(graph.topology);
+
+			const k3d::graph::topology_t& topology = *graph.topology;
+			boost::shared_ptr<k3d::graph::points_t> vertex_positions(new k3d::graph::points_t(boost::num_vertices(topology)));
+
+			detail::position_map position_map(*vertex_positions);
+			boost::mt19937 rng;
+			boost::random_graph_layout(topology, position_map, 0.0, 1.0, 0.0, 1.0, rng);
+//			boost::fruchterman_reingold_force_directed_layout(topology, position_map, 1.0, 1.0);
+
+			graph.vertex_data["positions"] = vertex_positions;
+		}
+
+		// Do a simple space-filling layout for the graph ...
+		{
+			return_if_fail(graph.topology);
+
+			const k3d::graph::topology_t& topology = *graph.topology;
+			boost::shared_ptr<k3d::graph::points_t> vertex_positions(new k3d::graph::points_t(boost::num_vertices(topology)));
+
+			detail::position_map position_map(*vertex_positions);
+			boost::gursoy_atun_layout(topology, boost::square_topology<>(), position_map);
 
 			graph.vertex_data["positions"] = vertex_positions;
 		}
 */
 
-		// Do a simple layout for the graph ...
+		// Render the graph vertices ...
+		try
 		{
-			return_if_fail(graph.topology);
+			return_if_fail(graph.vertex_data.count("labels"));
+			return_if_fail(graph.vertex_data.count("positions"));
 
-			const k3d::graph::topology_t& topology = *graph.topology;
-			boost::shared_ptr<k3d::typed_array<detail::point> > vertex_positions(new k3d::typed_array<detail::point>(boost::num_vertices(topology)));
-			k3d::typed_array<detail::point>& position_map = *vertex_positions;
+			const k3d::graph::strings_t& vertex_labels = dynamic_cast<k3d::graph::strings_t&>(*graph.vertex_data["labels"].get());
+			const k3d::graph::points_t& vertex_positions = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["positions"].get());
+			return_if_fail(vertex_labels.size() == vertex_positions.size());
 
-			const double pi = 3.14159;
-			const size_t n = boost::num_vertices(topology);
-			for(size_t i = 0; i != n; ++i)
-			{
-				position_map[i].x = 0.5 * std::cos(i * 2 * pi / n);
-				position_map[i].y = 0.5 * std::sin(i * 2 * pi / n);
-			}
+			Context->save();
 
-//			boost::circle_graph_layout(topology, position_map, 0.5);
-//			boost::mt19937 rng;
-//			boost::random_graph_layout(topology, position_map, 0.0, 1.0, 0.0, 1.0, rng);
+			Context->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
+			Context->set_font_size(0.03);
+			
+			for(size_t i = 0; i != vertex_labels.size(); ++i)
+				draw_centered_text(Context, vertex_positions[i], vertex_labels[i]);
 
-			graph.vertex_data["positions"] = vertex_positions;
+			Context->restore();
+		}
+		catch(std::exception& e)
+		{
+			k3d::log() << error << "caught exception: " << e.what() << std::endl;
+		}
+		catch(...)
+		{
+			k3d::log() << error << "caught unknown exception" << std::endl;
 		}
 
 		// Render the graph edges ...
@@ -425,13 +538,12 @@ return_if_fail(m_document_state);
 			return_if_fail(graph.vertex_data.count("positions"));
 
 			const k3d::graph::topology_t& topology = *graph.topology;
-			const k3d::typed_array<detail::point>& vertex_positions = dynamic_cast<k3d::typed_array<detail::point>&>(*graph.vertex_data["positions"].get());
+			const k3d::graph::points_t& vertex_positions = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["positions"].get());
 			return_if_fail(boost::num_vertices(topology) == vertex_positions.size());
 
 			Context->save();
 			Context->set_line_width(0.003);
-			Context->set_source_rgba(0, 0, 0, 0.3);
-			Context->set_line_cap(Cairo::LINE_CAP_ROUND);
+			Context->set_source_rgb(0.0, 0.5, 0.7);
 
 			typedef boost::graph_traits<k3d::graph::topology_t>::edge_iterator iter_t;
 			for(std::pair<iter_t, iter_t> edges = boost::edges(topology); edges.first != edges.second; ++edges.first)
@@ -439,9 +551,7 @@ return_if_fail(m_document_state);
 				const size_t source = boost::source(*edges.first, topology);
 				const size_t target = boost::target(*edges.first, topology);
 
-				Context->move_to(vertex_positions[source].x, vertex_positions[source].y);
-				Context->line_to(vertex_positions[target].x, vertex_positions[target].y);
-				Context->stroke();
+				draw_arrow(Context, vertex_positions[source], vertex_positions[target], 0.015);
 			}
 
 			Context->restore();
@@ -454,122 +564,6 @@ return_if_fail(m_document_state);
 		{
 			k3d::log() << error << "caught unknown exception" << std::endl;
 		}
-
-		// Render the graph vertices ...
-		try
-		{
-			return_if_fail(graph.vertex_data.count("labels"));
-			return_if_fail(graph.vertex_data.count("positions"));
-
-			const k3d::graph::strings_t& vertex_labels = dynamic_cast<k3d::graph::strings_t&>(*graph.vertex_data["labels"].get());
-			const k3d::typed_array<detail::point>& vertex_positions = dynamic_cast<k3d::typed_array<detail::point>&>(*graph.vertex_data["positions"].get());
-			return_if_fail(vertex_labels.size() == vertex_positions.size());
-
-			Context->save();
-
-			Context->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
-			Context->set_font_size(0.03);
-			
-			for(size_t i = 0; i != vertex_labels.size(); ++i)
-			{
-				Context->move_to(vertex_positions[i].x, vertex_positions[i].y);
-				Context->show_text(vertex_labels[i]);
-			}
-
-			Context->restore();
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << error << "caught exception: " << e.what() << std::endl;
-		}
-		catch(...)
-		{
-			k3d::log() << error << "caught unknown exception" << std::endl;
-		}
-
-/*
-		Context->set_line_width(m_lineWidth);
-
-		Context->arc(0, 0, m_radius, 0, 2 * M_PI);
-		Context->save();
-		Context->set_source_rgba(1.0, 1.0, 1.0, 0.8);
-		Context->fill_preserve();
-		Context->restore();
-		Context->stroke_preserve();
-		Context->clip();
-
-		//clock ticks
-		for (int i = 0; i < 12; i++)
-		{
-			double inset = 0.05;
-
-			Context->save();
-			Context->set_line_cap(Cairo::LINE_CAP_ROUND);
-
-			if (i % 3 != 0)
-			{
-				inset *= 0.8;
-				Context->set_line_width(0.03);
-			}
-
-			Context->move_to(
-			(m_radius - inset) * cos (i * M_PI / 6),
-			(m_radius - inset) * sin (i * M_PI / 6));
-			Context->line_to (
-			m_radius * cos (i * M_PI / 6),
-			m_radius * sin (i * M_PI / 6));
-			Context->stroke();
-			Context->restore(); 
-		}
-
-		// store the current time
-		time_t rawtime;
-		time(&rawtime);
-		struct tm * timeinfo = localtime (&rawtime);
-
-		// compute the angles of the indicators of our clock
-		double minutes = timeinfo->tm_min * M_PI / 30;
-		double hours = timeinfo->tm_hour * M_PI / 6;
-		double seconds= timeinfo->tm_sec * M_PI / 30;
-
-		Context->save();
-		Context->set_line_cap(Cairo::LINE_CAP_ROUND);
-
-		// draw the seconds hand
-		Context->save();
-		Context->set_line_width(m_lineWidth / 3);
-		Context->set_source_rgba(0.7, 0.7, 0.7, 0.8); // gray
-		Context->move_to(0, 0);
-		Context->line_to(sin(seconds) * (m_radius * 0.9), 
-		-cos(seconds) * (m_radius * 0.9));
-		Context->stroke();
-		Context->restore();
-
-		// draw the minutes hand
-		Context->set_source_rgba(0.117, 0.337, 0.612, 0.9);   // blue
-		Context->move_to(0, 0);
-		Context->line_to(sin(minutes + seconds / 60) * (m_radius * 0.8),
-		-cos(minutes + seconds / 60) * (m_radius * 0.8));
-		Context->stroke();
-
-		// draw the hours hand
-		Context->set_source_rgba(0.337, 0.612, 0.117, 0.9);   // green
-		Context->move_to(0, 0);
-		Context->line_to(sin(hours + minutes / 12.0) * (m_radius * 0.5),
-		-cos(hours + minutes / 12.0) * (m_radius * 0.5));
-		Context->stroke();
-		Context->restore();
-
-		// draw a little dot in the middle
-		Context->arc(0, 0, m_lineWidth / 3.0, 0, 2 * M_PI);
-		Context->fill();
-
-		// Draw some text
-		Context->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
-		Context->set_font_size(0.15);
-		Context->move_to(-0.4, 0);
-		Context->show_text("Howdy!");
-*/
 
 		Context->restore();
 	}

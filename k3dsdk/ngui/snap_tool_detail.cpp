@@ -980,7 +980,7 @@ void snap_tool_detail::off_screen_warp(viewport::control& Viewport, k3d::point2&
 	if(!screen_warp)
 	{
 		// No warp
-		NewCoordinates += m_off_screen_offset;
+		NewCoordinates += k3d::to_vector(m_off_screen_offset);
 	}
 	else
 	{
@@ -988,7 +988,7 @@ void snap_tool_detail::off_screen_warp(viewport::control& Viewport, k3d::point2&
 		interactive::warp_pointer(mouse);
 
 		// Set new position
-		NewCoordinates += previous_offset;
+		NewCoordinates += k3d::to_vector(previous_offset);
 	}
 }
 
