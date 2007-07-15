@@ -50,6 +50,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include <iostream>
+#include <valarray>
 
 // Temporary hack ...
 using namespace libk3dngui;
@@ -129,6 +130,10 @@ public:
 		ui_component::set_parent("pipeline", &Parent);
 		m_document_state = &DocumentState;
 		
+		m_document_state->document().nodes().add_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
+		m_document_state->document().nodes().remove_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
+		m_document_state->document().nodes().rename_node_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
+
 		show_all();
 	}
 
@@ -249,6 +254,12 @@ public:
 		}
 	}
 
+	void reset_graph()
+	{
+		m_graph.reset();
+		redraw_panel();
+	}
+
 	void on_draw_pipeline(GdkEventExpose* event)
 	{
 		if(Glib::RefPtr<Gdk::Window> window = m_drawing_area.get_window())
@@ -330,13 +341,17 @@ public:
 		Context->set_line_cap(Cairo::LINE_CAP_BUTT);
 		Context->set_line_join(Cairo::LINE_JOIN_MITER);
 
+		// Draw the line ...
 		Context->move_to(a[0], a[1]);
 		Context->line_to(b[0], b[1]);
-		Context->line_to(c[0], c[1]);
+		Context->stroke();
+
+		// Draw the arrow ...
+		Context->move_to(c[0], c[1]);
 		Context->line_to(d[0], d[1]);
 		Context->line_to(e[0], e[1]);
-		Context->line_to(b[0], b[1]);
-		Context->stroke();
+		Context->line_to(c[0], c[1]);
+		Context->fill();
 	}
 
 	void draw_centered_text(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Position, const std::string& Text)
@@ -356,6 +371,16 @@ public:
 	void draw_pipeline(const Cairo::RefPtr<Cairo::Context>& Context, const double Width, const double Height)
 	{
 		return_if_fail(m_document_state);
+
+		// Create the visualization graph if it doesn't exist ...
+		if(!m_graph)
+		{
+			m_graph.reset(new k3d::graph());
+			create_graph(*m_document_state, *m_graph);
+//			circular_layout(*m_graph);
+			icicle_layout(*m_graph);
+		}
+		k3d::graph& graph = *m_graph;
 
 		Context->save();
 
@@ -381,25 +406,14 @@ public:
 		Context->paint();
 		Context->restore();
 
-		// Generate a graph from the visualization pipeline ...
-		k3d::graph graph;
-		create_graph(*m_document_state, graph);
-//		connected_components(graph);
-		circular_layout(graph);
-//		random_layout(graph);
-//		space_filling_layout(graph);
-
 		// Render the graph vertices ...
 		try
 		{
 			return_if_fail(graph.vertex_data.count("label"));
 			return_if_fail(graph.vertex_data.count("position"));
-//			return_if_fail(graph.vertex_data.count("component"));
 
 			const k3d::graph::strings_t& vertex_label = dynamic_cast<k3d::graph::strings_t&>(*graph.vertex_data["label"].get());
 			const k3d::graph::points_t& vertex_position = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["position"].get());
-//			const k3d::graph::indices_t& vertex_component = dynamic_cast<k3d::graph::indices_t&>(*graph.vertex_data["component"].get());
-//			return_if_fail(vertex_label.size() == vertex_position.size() && vertex_position.size() == vertex_component.size());
 
 			Context->save();
 
@@ -408,11 +422,6 @@ public:
 
 			for(size_t i = 0; i != vertex_label.size(); ++i)
 				draw_centered_text(Context, vertex_position[i], vertex_label[i]);
-
-/*
-			for(size_t i = 0; i != vertex_component.size(); ++i)
-				draw_centered_text(Context, vertex_position[i], k3d::string_cast(vertex_component[i]));
-*/
 
 			Context->restore();
 		}
@@ -430,20 +439,43 @@ public:
 		{
 			return_if_fail(graph.topology);
 			return_if_fail(graph.vertex_data.count("position"));
+			return_if_fail(graph.edge_data.count("type"));
 
 			const k3d::graph::topology_t& topology = *graph.topology;
+
 			const k3d::graph::points_t& vertex_position = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["position"].get());
 			return_if_fail(boost::num_vertices(topology) == vertex_position.size());
+
+			const k3d::graph::indices_t& edge_type = dynamic_cast<k3d::graph::indices_t&>(*graph.edge_data["type"].get());
+			return_if_fail(boost::num_edges(topology) == edge_type.size());
 
 			Context->save();
 			Context->set_line_width(0.003);
 			Context->set_source_rgb(0.0, 0.5, 0.7);
 
+			size_t edge_index = 0;
 			typedef boost::graph_traits<k3d::graph::topology_t>::edge_iterator iter_t;
-			for(std::pair<iter_t, iter_t> edges = boost::edges(topology); edges.first != edges.second; ++edges.first)
+			for(std::pair<iter_t, iter_t> edges = boost::edges(topology); edges.first != edges.second; ++edge_index, ++edges.first)
 			{
 				const size_t source = boost::source(*edges.first, topology);
 				const size_t target = boost::target(*edges.first, topology);
+
+				switch(edge_type[edge_index])
+				{
+					case BEHAVIOR_EDGE:
+					{
+						std::valarray<double> pattern(0.002, 1);
+						Context->set_dash(pattern, 0.1);
+						break;
+					}
+					case DATA_EDGE:
+					default:
+					{
+						std::valarray<double> pattern;
+						Context->set_dash(pattern, 0.0);
+						break;
+					}
+				}
 
 				draw_arrow(Context, vertex_position[source], vertex_position[target], 0.015);
 			}
@@ -491,6 +523,7 @@ private:
 	k3d::point2 m_last_mouse;
 
 	document_state* m_document_state;
+	boost::shared_ptr<k3d::graph> m_graph;
 };
 
 } // namespace ngui_pipeline

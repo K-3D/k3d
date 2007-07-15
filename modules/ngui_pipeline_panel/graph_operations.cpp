@@ -65,7 +65,6 @@ public:
 		return reinterpret_cast<point_proxy&>(storage[Index]);
 	}
 
-private:
 	k3d::typed_array<k3d::point2>& storage;
 };
 
@@ -100,6 +99,7 @@ void create_graph(document_state& DocumentState, k3d::graph& Graph)
 
 	boost::shared_ptr<k3d::graph::topology_t> topology(new k3d::graph::topology_t());
 	boost::shared_ptr<k3d::graph::strings_t> vertex_label(new k3d::graph::strings_t());
+	boost::shared_ptr<k3d::graph::indices_t> edge_type(new k3d::graph::indices_t());
 
 	// Insert nodes ...
 	std::map<k3d::inode*, size_t> node_map;
@@ -123,6 +123,7 @@ void create_graph(document_state& DocumentState, k3d::graph& Graph)
 					if(k3d::inode* const referenced_node = boost::any_cast<k3d::inode*>((*property)->property_value()))
 					{
 						boost::add_edge(node_map[referenced_node], node_map[*node], *topology);
+						edge_type->push_back(BEHAVIOR_EDGE);
 //								stream << " [style=dotted,label=\"" << escaped_string((*property)->property_name()) << "\"]\n";
 					}
 				}
@@ -136,28 +137,28 @@ void create_graph(document_state& DocumentState, k3d::graph& Graph)
 		if(dependency->first && dependency->first->property_node() && dependency->second && dependency->second->property_node())
 		{
 			boost::add_edge(node_map[dependency->second->property_node()], node_map[dependency->first->property_node()], *topology);
+			edge_type->push_back(DATA_EDGE);
 //					stream << " [headlabel=\"" << escaped_string(dependency->first->property_name()) << "\" taillabel=\"" << escaped_string(dependency->second->property_name()) << "\"]\n";
 		}
 	}
 
 	Graph.topology = topology;
 	Graph.vertex_data["label"] = vertex_label;
+	Graph.edge_data["type"] = edge_type;
 }
 
-void connected_components(k3d::graph& Graph)
+void random_layout(k3d::graph& Graph)
 {
-	assert_not_implemented();
-/*
 	return_if_fail(Graph.topology);
 
 	const k3d::graph::topology_t& topology = *Graph.topology;
-	boost::shared_ptr<k3d::graph::indices_t> vertex_component(new k3d::graph::indices_t(boost::num_vertices(topology)));
+	boost::shared_ptr<k3d::graph::points_t> vertex_position(new k3d::graph::points_t(boost::num_vertices(topology)));
 
-	detail::property_map<k3d::graph::indices_t> component_map(*vertex_component);
-	boost::connected_components(topology, component_map);
+	detail::position_map position_map(*vertex_position);
+	boost::mt19937 rng;
+	boost::random_graph_layout(topology, position_map, 0.0, 1.0, 0.0, 1.0, rng);
 
-	Graph.vertex_data["component"] = vertex_component;
-*/
+	Graph.vertex_data["position"] = vertex_position;
 }
 
 void circular_layout(k3d::graph& Graph)
@@ -173,35 +174,66 @@ void circular_layout(k3d::graph& Graph)
 	Graph.vertex_data["position"] = vertex_position;
 }
 
-void random_layout(k3d::graph& Graph)
+void icicle_layout(k3d::graph& Graph)
 {
 	return_if_fail(Graph.topology);
 
 	const k3d::graph::topology_t& topology = *Graph.topology;
 	boost::shared_ptr<k3d::graph::points_t> vertex_position(new k3d::graph::points_t(boost::num_vertices(topology)));
 
-	detail::position_map position_map(*vertex_position);
-	boost::mt19937 rng;
-	boost::random_graph_layout(topology, position_map, 0.0, 1.0, 0.0, 1.0, rng);
-//			boost::fruchterman_reingold_force_directed_layout(topology, position_map, 1.0, 1.0);
+	// Begin with a flat collection of vertices ...
+	typedef std::vector<size_t> icicle_t;
+	typedef std::map<size_t, icicle_t> icicles_t;
+	icicles_t icicles;
+
+	const size_t vertex_begin = 0;
+	const size_t vertex_end = boost::num_vertices(topology);
+	for(size_t vertex = vertex_begin; vertex != vertex_end; ++vertex)
+		icicles.insert(std::make_pair(vertex, std::vector<size_t>()));
+
+	// Merge vertices into vertical "icicles" based on connectivity ...
+	for(icicles_t::iterator icicle = icicles.begin(); icicle != icicles.end(); )
+	{
+		if(boost::out_degree(icicle->first, topology))
+		{
+			typedef boost::graph_traits<k3d::graph::topology_t>::out_edge_iterator iter_t;
+			std::pair<iter_t, iter_t> out_edges = boost::out_edges(icicle->first, topology);
+
+			const size_t target = boost::target(*out_edges.first, topology);
+			icicles[target].push_back(icicle->first);
+			icicles[target].insert(icicles[target].end(), icicle->second.begin(), icicle->second.end());
+			icicles.erase(icicle++);
+		}
+		else
+		{
+			++icicle;
+		}
+	}
+
+	// Assign coordinates to each vertex ...
+	const double x_offset = 0.2;
+	const double y_offset = 0.06;
+
+	double x = 0;
+	for(icicles_t::iterator icicle = icicles.begin(); icicle != icicles.end(); ++icicle)
+	{
+		double y = 0;
+
+		for(icicle_t::reverse_iterator vertex = icicle->second.rbegin(); vertex != icicle->second.rend(); ++vertex)
+		{
+			(*vertex_position)[*vertex][0] = x;
+			(*vertex_position)[*vertex][1] = y;
+
+			y += y_offset;
+		}
+
+		(*vertex_position)[icicle->first][0] = x;
+		(*vertex_position)[icicle->first][1] = y;
+
+		x += x_offset;
+	}
 
 	Graph.vertex_data["position"] = vertex_position;
-}
-
-void space_filling_layout(k3d::graph& Graph)
-{
-	assert_not_implemented();
-/*
-	return_if_fail(Graph.topology);
-
-	const k3d::graph::topology_t& topology = *Graph.topology;
-	boost::shared_ptr<k3d::graph::points_t> vertex_position(new k3d::graph::points_t(boost::num_vertices(topology)));
-
-	detail::position_map position_map(*vertex_position);
-	boost::gursoy_atun_layout(topology, boost::square_topology<>(), position_map);
-
-	Graph.vertex_data["position"] = vertex_position;
-*/
 }
 
 } // namespace ngui_pipeline

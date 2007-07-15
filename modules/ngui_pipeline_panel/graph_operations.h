@@ -30,11 +30,17 @@ namespace module
 namespace ngui_pipeline
 {
 
+enum edge_type
+{
+	DATA_EDGE,
+	BEHAVIOR_EDGE
+};	
+
 void create_graph(libk3dngui::document_state& DocumentState, k3d::graph& Graph);
-void connected_components(k3d::graph& Graph);
-void circular_layout(k3d::graph& Graph);
+
 void random_layout(k3d::graph& Graph);
-void space_filling_layout(k3d::graph& Graph);
+void circular_layout(k3d::graph& Graph);
+void icicle_layout(k3d::graph& Graph);
 
 } // namespace ngui_pipeline
 
