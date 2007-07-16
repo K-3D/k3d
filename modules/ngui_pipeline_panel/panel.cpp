@@ -134,6 +134,8 @@ public:
 		m_document_state->document().nodes().remove_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 		m_document_state->document().nodes().rename_node_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 
+		Glib::signal_timeout().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::update_layout), true), 100);
+
 		show_all();
 	}
 
@@ -260,6 +262,25 @@ public:
 		redraw_panel();
 	}
 
+	k3d::graph& get_graph()
+	{
+		// Create the visualization graph if it doesn't exist ...
+		if(!m_graph)
+		{
+			m_graph.reset(new k3d::graph());
+			create_graph(*m_document_state, *m_graph);
+			circular_layout(*m_graph);
+		}
+
+		return *m_graph;
+	}
+
+	void update_layout()
+	{
+		force_directed_layout(get_graph());
+		redraw_panel();
+	}
+
 	void on_draw_pipeline(GdkEventExpose* event)
 	{
 		if(Glib::RefPtr<Gdk::Window> window = m_drawing_area.get_window())
@@ -372,15 +393,7 @@ public:
 	{
 		return_if_fail(m_document_state);
 
-		// Create the visualization graph if it doesn't exist ...
-		if(!m_graph)
-		{
-			m_graph.reset(new k3d::graph());
-			create_graph(*m_document_state, *m_graph);
-//			circular_layout(*m_graph);
-			icicle_layout(*m_graph);
-		}
-		k3d::graph& graph = *m_graph;
+		k3d::graph& graph = get_graph();
 
 		Context->save();
 

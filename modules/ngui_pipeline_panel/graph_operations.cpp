@@ -147,33 +147,47 @@ void create_graph(document_state& DocumentState, k3d::graph& Graph)
 	Graph.edge_data["type"] = edge_type;
 }
 
-void random_layout(k3d::graph& Graph)
-{
-	return_if_fail(Graph.topology);
-
-	const k3d::graph::topology_t& topology = *Graph.topology;
-	boost::shared_ptr<k3d::graph::points_t> vertex_position(new k3d::graph::points_t(boost::num_vertices(topology)));
-
-	detail::position_map position_map(*vertex_position);
-	boost::mt19937 rng;
-	boost::random_graph_layout(topology, position_map, 0.0, 1.0, 0.0, 1.0, rng);
-
-	Graph.vertex_data["position"] = vertex_position;
-}
-
 void circular_layout(k3d::graph& Graph)
 {
 	return_if_fail(Graph.topology);
 
 	const k3d::graph::topology_t& topology = *Graph.topology;
-	boost::shared_ptr<k3d::graph::points_t> vertex_position(new k3d::graph::points_t(boost::num_vertices(topology)));
+	k3d::graph::points_t* vertex_position = 0;
+	if(Graph.vertex_data.count("position"))
+		vertex_position = dynamic_cast<k3d::graph::points_t*>(Graph.vertex_data["position"].get());
+	
+	if(!vertex_position)
+	{
+		vertex_position = new k3d::graph::points_t(boost::num_vertices(topology));
+		Graph.vertex_data["position"].reset(vertex_position);
+	}
 
 	detail::position_map position_map(*vertex_position);
 	boost::circle_graph_layout(topology, position_map, 0.5);
 
-	Graph.vertex_data["position"] = vertex_position;
 }
 
+void random_layout(k3d::graph& Graph)
+{
+	return_if_fail(Graph.topology);
+
+	const k3d::graph::topology_t& topology = *Graph.topology;
+	k3d::graph::points_t* vertex_position = 0;
+	if(Graph.vertex_data.count("position"))
+		vertex_position = dynamic_cast<k3d::graph::points_t*>(Graph.vertex_data["position"].get());
+	
+	if(!vertex_position)
+	{
+		vertex_position = new k3d::graph::points_t(boost::num_vertices(topology));
+		Graph.vertex_data["position"].reset(vertex_position);
+	}
+
+	detail::position_map position_map(*vertex_position);
+	boost::mt19937 rng;
+	boost::random_graph_layout(topology, position_map, 0.0, 1.0, 0.0, 1.0, rng);
+}
+
+/*
 void icicle_layout(k3d::graph& Graph)
 {
 	return_if_fail(Graph.topology);
@@ -234,6 +248,57 @@ void icicle_layout(k3d::graph& Graph)
 	}
 
 	Graph.vertex_data["position"] = vertex_position;
+}
+*/
+
+void force_directed_layout(k3d::graph& Graph)
+{
+	return_if_fail(Graph.topology);
+
+	const k3d::graph::topology_t& topology = *Graph.topology;
+	k3d::graph::points_t* vertex_position = 0;
+
+	if(Graph.vertex_data.count("position"))
+		vertex_position = dynamic_cast<k3d::graph::points_t*>(Graph.vertex_data["position"].get());
+	
+	if(!vertex_position)
+	{
+		vertex_position = new k3d::graph::points_t(boost::num_vertices(topology));
+		Graph.vertex_data["position"].reset(vertex_position);
+	}
+
+	const size_t vertex_begin = 0;
+	const size_t vertex_end = boost::num_vertices(topology);
+
+	// Handle repulsion forces ...
+	for(size_t vertex = vertex_begin; vertex != vertex_end; ++vertex)
+	{
+		for(size_t other = vertex_begin; other != vertex_end; ++other)
+		{
+			if(vertex != other)
+			{
+				const k3d::vector2 difference = (*vertex_position)[vertex] - (*vertex_position)[other];
+				(*vertex_position)[vertex] += k3d::normalize(difference) * (0.001 / difference.length2());
+			}
+		}
+	}
+
+	// Handle attraction forces ...
+	typedef boost::graph_traits<k3d::graph::topology_t>::edge_iterator iter_t;
+	for(std::pair<iter_t, iter_t> edges = boost::edges(topology); edges.first != edges.second; ++edges.first)
+	{
+		const size_t source = boost::source(*edges.first, topology);
+		const size_t target = boost::target(*edges.first, topology);
+
+		if(source != target)
+		{
+			const k3d::vector2 difference = (*vertex_position)[target] - (*vertex_position)[source];
+			const k3d::vector2 force = k3d::normalize(difference) * (0.01 * difference.length2());
+			
+			(*vertex_position)[source] += force;
+			(*vertex_position)[target] -= force;
+		}
+	}
 }
 
 } // namespace ngui_pipeline
