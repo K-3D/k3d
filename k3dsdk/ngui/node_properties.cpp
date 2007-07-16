@@ -59,6 +59,7 @@
 #include <k3dsdk/icamera_animation_render_engine.h>
 #include <k3dsdk/icamera_preview_render_engine.h>
 #include <k3dsdk/icamera_still_render_engine.h>
+#include <k3dsdk/icommand_node_simple.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
@@ -101,6 +102,7 @@
 #include <gtkmm/table.h>
 
 #include <k3dsdk/fstream.h>
+#include <boost/any.hpp>
 #include <boost/format.hpp>
 
 namespace libk3dngui
@@ -557,6 +559,15 @@ public:
 					selection_button::control* const control = new selection_button::control(m_parent, property_name, selection_button::proxy(property, state_recorder, property_name));
 					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 				}
+				else if(property_type == typeid(k3d::icommand_node_simple*))
+				{
+					button::control* const control =
+						new button::control(m_parent, property_name, property.property_label())
+						<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_simple_command_execute), &property))
+						<< set_tooltip(property.property_description());
+
+					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
+				}
 				else
 				{
 					k3d::log() << warning << k3d_file_reference << "unknown property type: " << property_type.name() << " name: " << property_name << std::endl;
@@ -714,6 +725,21 @@ public:
 		add_user_property* const window = new add_user_property(*m_node, m_parent);
 		window->show();
 	}
+	
+	void on_simple_command_execute(k3d::iproperty* Property)
+	{
+		return_if_fail(Property);
+		try
+		{
+			k3d::icommand_node_simple* simple_command_node = boost::any_cast<k3d::icommand_node_simple*>(Property->property_value());
+			simple_command_node->execute_command();
+		}
+		catch (boost::bad_any_cast& e)
+		{
+			assert_not_reached();
+		}
+	}
+		  
 
 	/// Stores a reference to the owning document
 	document_state& m_document_state;

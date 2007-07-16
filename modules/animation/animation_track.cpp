@@ -23,9 +23,12 @@
 */
 
 #include <k3dsdk/algebra.h>
+#include <k3dsdk/icommand_node.h>
+#include <k3dsdk/icommand_node_simple.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/tokens.h>
 #include <k3dsdk/vectors.h>
@@ -34,10 +37,20 @@
 
 namespace libk3danimation
 {
+	
+class set_keyframe : public k3d::icommand_node_simple
+{
+	virtual const k3d::icommand_node::result execute_command()
+	{
+		k3d::log() << debug << "Executing explicit keyframe" << std::endl;
+		return k3d::icommand_node::RESULT_CONTINUE;
+	}
+};
 
 template <typename time_t, typename value_t>
 class animation_track :
-	public k3d::persistent<k3d::node>
+	public k3d::persistent<k3d::node>,
+	public k3d::property_group_collection
 {
 	typedef k3d::persistent<k3d::node> base;
 	typedef k3d_data(time_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) time_property_t;
@@ -48,6 +61,7 @@ class animation_track :
 public:
 	animation_track(k3d::iplugin_factory& Factory, k3d::idocument& Document, time_t Time, value_t Value) :
 		base(Factory, Document),
+		m_keyframe_command(init_owner(*this) + init_name("keyframe_command") + init_label(("Set Keyframe")) + init_description(("Explicitely set a keyframe at the current time")) + init_value(new set_keyframe())),
 		m_time_input(init_owner(*this) + init_name("time_input") + init_label(("Time Input")) + init_description(("Time for the animation")) + init_value(Time)),
 		m_value_input(init_owner(*this) + init_name("value_input") + init_label(("Value Input")) + init_description(("Input that is keyframed when it changes")) + init_value(Value)),
 		m_output_value(init_owner(*this) + init_name("output_value") + init_label(("Output Value")) + init_description(("Interpolated output value")) + init_slot(sigc::mem_fun(*this, &animation_track::on_output_request))),
@@ -96,12 +110,17 @@ public:
 			std::string value_label = "Key Value " + key_number;
 			time_property_it = m_keytimes.insert(std::make_pair(time, new time_property_t(init_owner(*this) + init_name(k3d::make_token(time_name.c_str())) + init_label(k3d::make_token(time_label.c_str())) + init_description(("")) + init_value(time)))).first;
 			value_it = m_keyframes.insert(std::make_pair(time_property_it->second, new value_property_t(init_owner(*this) + init_name(k3d::make_token(value_name.c_str())) + init_label(k3d::make_token(value_label.c_str())) + init_description(("")) + init_value(m_value_input.value())))).first;
+			k3d::iproperty_group_collection::group key_group("Key " + key_number);
+			key_group.properties.push_back(static_cast<k3d::iproperty*>(time_property_it->second));
+			key_group.properties.push_back(static_cast<k3d::iproperty*>(value_it->second));
+			register_property_group(key_group);
 		}
 		else
 		{
 			value_it = m_keyframes.find(time_property_it->second);
 			value_it->second->set_value(m_value_input.value());
 		}
+		m_output_value.reset();
 	}
 	
 	/// Make sure the keyframe structures get updated on load
@@ -148,13 +167,19 @@ public:
 					k3d::log() << debug << "fetching key number: " << keynumber << std::endl;
 					typename std::map<std::string, time_property_t*>::iterator time_property_it = time_properties.find(keynumber);
 					return_if_fail(time_property_it != time_properties.end());
-					m_keyframes.insert(std::make_pair(time_property_it->second, new value_property_t(init_owner(*this) + init_name(k3d::make_token(property_name.c_str())) + init_label(k3d::make_token(label.c_str())) + init_description(("")) + init_value(value))));
+					value_property_t* value_property = new value_property_t(init_owner(*this) + init_name(k3d::make_token(property_name.c_str())) + init_label(k3d::make_token(label.c_str())) + init_description(("")) + init_value(value)); 
+					m_keyframes.insert(std::make_pair(time_property_it->second, value_property));
+					k3d::iproperty_group_collection::group key_group("Key " + keynumber);
+					key_group.properties.push_back(static_cast<k3d::iproperty*>(time_property_it->second));
+					key_group.properties.push_back(static_cast<k3d::iproperty*>(value_property));
+					register_property_group(key_group);
 				}
 			}
 		}
 	}
 
 private:
+	k3d_data(k3d::icommand_node_simple*, immutable_name, change_signal, with_undo, local_storage, no_constraint, read_only_property, no_serialization) m_keyframe_command;
 	time_property_t m_time_input;
 	value_property_t m_value_input;
 	k3d_data(value_t, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::computed_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output_value;
