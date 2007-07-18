@@ -49,6 +49,22 @@ void property_group_collection::register_property_group(const group& Group)
 	m_groups.push_back(Group);
 }
 
+void property_group_collection::unregister_property_group(const std::string& Name)
+{
+	groups_t::iterator group = m_groups.begin();
+	while (group != m_groups.end())
+	{
+		if (group->name == Name)
+		{
+			group = m_groups.erase(group);
+		}
+		else
+		{
+			++group;
+		}
+	}
+}
+
 void property_group_collection::clear()
 {
 	m_groups.clear();

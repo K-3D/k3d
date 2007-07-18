@@ -52,6 +52,8 @@ protected:
 	void clear();
 	/// Stores a new group
 	void register_property_group(const group& Group);
+	/// Removes the group(s) named Name
+	void unregister_property_group(const std::string& Name);
 
 private:
 	/// Contains the collection of property groups

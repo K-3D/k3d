@@ -409,16 +409,19 @@ public:
 
 				const std::string property_name = property.property_name();
 				const std::type_info& property_type = property.property_type();
-
-				// Provide a property button for the property ...
-				table->attach(*Gtk::manage(
-					new property_button::control(m_parent, property_name + "_property", property_widget::proxy(m_document_state,property))),
-					prop_button_begin, prop_button_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
-
-				// Provide a label for the property ...
-				table->attach(*Gtk::manage(
-					new property_label::control(m_parent, property_name + "_label", property_widget::proxy(m_document_state, property))),
-					prop_label_begin, prop_label_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+				
+				if (property_type != typeid(k3d::icommand_node_simple*)) // skip push buttons, since the label is in the button and connecting makes little sense
+				{
+					// Provide a property button for the property ...
+					table->attach(*Gtk::manage(
+						new property_button::control(m_parent, property_name + "_property", property_widget::proxy(m_document_state,property))),
+						prop_button_begin, prop_button_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
+	
+					// Provide a label for the property ...
+					table->attach(*Gtk::manage(
+						new property_label::control(m_parent, property_name + "_label", property_widget::proxy(m_document_state, property))),
+						prop_label_begin, prop_label_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
+				}
 
 				// Boolean properties ...
 				if(property_type == typeid(bool))
@@ -566,7 +569,7 @@ public:
 						<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_simple_command_execute), &property))
 						<< set_tooltip(property.property_description());
 
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
+					table->attach(*manage(control), prop_label_begin, prop_label_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
 				}
 				else
 				{
