@@ -547,7 +547,7 @@ public:
 	{
 		static k3d::application_plugin_factory<panel> factory(
 				k3d::uuid(0xc8cab7fd, 0xa14a55af, 0x79779fa5, 0x1b516756),
-				"NGUIUndoTreePanel",
+				"NGUITimelinePanel",
 				_("Provides a panel for manipulating the current time"),
 				"NGUI Panels",
 				k3d::iplugin_factory::EXPERIMENTAL,

@@ -32,7 +32,6 @@
 #include "icons.h"
 #include "image_toggle_button.h"
 #include "interactive.h"
-#include "node_list.h"
 #include "node_properties.h"
 #include "panel.h"
 #include "panel_frame.h"
@@ -181,12 +180,6 @@ void control::mount_panel(panel::control& Panel, const std::string& Type)
 
 void control::mount_panel(const std::string& Type)
 {
-	if("node_list" == Type)
-	{
-		mount_panel(*Gtk::manage(new node_list::control(m_document_state, m_parent)), Type);
-		return;
-	}
-
 	if("node_properties" == Type)
 	{
 	   mount_panel(*Gtk::manage(new node_properties::control(m_document_state, m_parent)), Type);
@@ -333,7 +326,6 @@ void control::set_choices()
 {
 	m_model->clear();
 
-	add_choice("node_list", quiet_load_icon("node_list_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node List"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_list"));
 	add_choice("node_properties", quiet_load_icon("node_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_properties"));
 	add_choice("tool_properties", quiet_load_icon("tool_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Tool Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "tool_properties"));
 	add_choice("viewport", quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "viewport"));
@@ -366,7 +358,7 @@ void control::set_choices()
 
 		m_type_plugin_map[panel_type] = *factory;
 
-		add_choice(panel_type, quiet_load_icon(panel_type, Gtk::ICON_SIZE_SMALL_TOOLBAR), panel_label, sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), panel_type));
+		add_choice(panel_type, quiet_load_icon(panel_type + "_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), panel_label, sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), panel_type));
 	}
 }
 

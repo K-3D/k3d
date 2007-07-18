@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,46 +22,175 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3d-i18n-config.h>
+
+#include <gtkmm/box.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/treeview.h>
 #include <gtk/gtkmain.h>
 
-#include "asynchronous_update.h"
-#include "command_arguments.h"
-#include "document_state.h"
-#include "hotkey_cell_renderer_text.h"
-#include "icons.h"
-#include "interactive.h"
-#include "keyboard.h"
-#include "node_list.h"
-#include "utility.h"
+#include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/command_arguments.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/keyboard.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/ui_component.h>
+#include <k3dsdk/ngui/utility.h>
 
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/gl.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/idag.h>
+#include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/inode_name_map.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/utility.h>
 
-namespace libk3dngui
+#include <boost/assign/list_of.hpp>
+
+// Temporary hack
+using namespace libk3dngui;
+
+namespace module
 {
 
-namespace node_list
+namespace ngui_node_list
 {
 
 namespace detail
 {
+
+/// Encapsulates an "edge" (a directed connection between two nodes) to be visualized by the control
+class edge
+{
+public:
+	k3d::iunknown* from;
+	k3d::iunknown* to;
+};
+
+/// Encapsulates a "node" (zero-to-many document nodes) to be visualized by the control
+class node
+{
+public:
+	std::string label;
+
+	typedef std::vector<k3d::iunknown*> nodes_t;
+	nodes_t nodes;
+};
+
+/// Defines a collection of nodes and dependencies
+class graph
+{
+public:
+	~graph();
+
+	typedef std::vector<node*> nodes_t;
+	nodes_t nodes;
+
+	typedef std::vector<edge*> edges_t;
+	edges_t edges;
+};
+
+/// Abstract interface for nodes that populate graphs - these control what the user ends-up seeing
+class filter_policy
+{
+public:
+	virtual ~filter_policy() {}
+
+	virtual void populate_graph(graph& Graph) = 0;
+};
+
+/// Concrete implementation of filter_policy that does nothing
+class null_filter_policy :
+	public filter_policy
+{
+public:
+	virtual ~null_filter_policy() {}
+
+	void populate_graph(graph& Graph);
+};
+
+/// Concrete implementation of filter_policy that displays every node in the document
+class all_nodes_filter_policy :
+	public filter_policy
+{
+public:
+	all_nodes_filter_policy(k3d::idocument& Document);
+	virtual ~all_nodes_filter_policy() {}
+
+	void populate_graph(graph& Graph);
+
+private:
+	k3d::idocument& m_document;
+};
+
+/// Concrete implementation of filter_policy that displays every node that matches given class ID
+class class_id_filter_policy :
+	public filter_policy
+{
+public:
+	class_id_filter_policy(k3d::idocument& Document, const k3d::uuid& ClassID);
+	~class_id_filter_policy() {}
+
+	void populate_graph(graph& Graph);
+
+private:
+	k3d::idocument& m_document;
+	const k3d::uuid m_class_id;
+};
+
+/// Abstract interface for nodes that adjust the layout of a graph
+class layout_policy
+{
+public:
+	virtual ~layout_policy() {}
+
+	virtual void update_layout(graph& Graph) = 0;
+};
+
+/// Concrete implementation of layout_policy that does nothing
+class null_layout_policy :
+	public layout_policy
+{
+public:
+	virtual ~null_layout_policy() {}
+
+	void update_layout(graph& Graph);
+};
+
+/// Concrete implementation of layout_policy that sorts nodes alphabetically by label
+class sort_by_label_layout_policy :
+	public layout_policy
+{
+public:
+	~sort_by_label_layout_policy() {}
+
+	void update_layout(graph& Graph);
+};
+
+/// Concrete implementation of layout_policy that sorts nodes based on the type of nodes they front for
+class sort_by_type_layout_policy :
+	public layout_policy
+{
+public:
+	~sort_by_type_layout_policy() {}
+
+	void update_layout(graph& Graph);
+};
 
 struct sort_by_label
 {
@@ -92,8 +221,6 @@ struct sort_by_name
 		return LHS->name() < RHS->name();
 	}
 };
-
-} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // graph
@@ -179,10 +306,10 @@ void sort_by_type_layout_policy::update_layout(graph& Graph)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// control::implementation
+// implementation
 
-class control::implementation :
-	public asynchronous_update
+class implementation :
+	public libk3dngui::asynchronous_update
 {
 public:
 	implementation(document_state& DocumentState) :
@@ -256,14 +383,14 @@ public:
 				command_arguments arguments(Arguments);
 
 				k3d::inode* const node = arguments.get_node(m_document_state.document(), "node");
-				return_val_if_fail(node, RESULT_ERROR);
+				return_val_if_fail(node, k3d::icommand_node::RESULT_ERROR);
 				const std::string new_name = arguments.get_string("newname");
 
 				Gtk::TreeIter row;
-				return_val_if_fail(get_row(node, row), RESULT_ERROR);
+				return_val_if_fail(get_row(node, row), k3d::icommand_node::RESULT_ERROR);
 
 				interactive::set_text(m_view, *m_view.get_column(1), *m_view.get_column_cell_renderer(1), row, new_name);
-				return RESULT_CONTINUE;
+				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 
 			if(Command == "select")
@@ -288,7 +415,7 @@ public:
 				if(1 == new_selection.size() && *new_selection.begin() == context_menu_node)
 				{
 					Gtk::TreeIter row;
-					return_val_if_fail(get_row(*new_selection.begin(), row), RESULT_ERROR);
+					return_val_if_fail(get_row(*new_selection.begin(), row), k3d::icommand_node::RESULT_ERROR);
 
 					interactive::move_pointer(m_view, *m_view.get_column(1), row);
 					m_view.get_selection()->unselect_all();
@@ -300,7 +427,7 @@ public:
 				else if(1 == new_selection.size())
 				{
 					Gtk::TreeIter row;
-					return_val_if_fail(get_row(*new_selection.begin(), row), RESULT_ERROR);
+					return_val_if_fail(get_row(*new_selection.begin(), row), k3d::icommand_node::RESULT_ERROR);
 
 					interactive::move_pointer(m_view, *m_view.get_column(1), row);
 					m_view.get_selection()->unselect_all();
@@ -342,7 +469,7 @@ public:
 					if(context_menu_node)
 					{
 						Gtk::TreeIter row;
-						return_val_if_fail(get_row(context_menu_node, row), RESULT_ERROR);
+						return_val_if_fail(get_row(context_menu_node, row), k3d::icommand_node::RESULT_ERROR);
 
 						interactive::move_pointer(m_view, *m_view.get_column(1), row);
 
@@ -357,16 +484,16 @@ public:
 
 				// Give the UI a chance to catch-up (in particular, ensure that other panels are completely synchronized before we return)
 				handle_pending_events();
-				return RESULT_CONTINUE;
+				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 		}
 		catch(std::exception& e)
 		{
 			k3d::log() << error << e.what() << std::endl;
-			return RESULT_ERROR;
+			return k3d::icommand_node::RESULT_ERROR;
 		}
 
-		return RESULT_UNKNOWN_COMMAND;
+		return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
 	}
 
 	typedef sigc::signal<void, const std::string&, const std::string&> command_signal_t;
@@ -692,62 +819,97 @@ public:
 	sigc::signal<void> m_panel_grab_signal;
 };
 
+} // namespace detail
+
 /////////////////////////////////////////////////////////////////////////////
-// control
+// panel
 
-control::control(document_state& DocumentState, k3d::icommand_node& Parent) :
-	base(false, 0),
-	ui_component("node_list", &Parent),
-	m_implementation(new implementation(DocumentState))
+class panel :
+	public libk3dngui::panel::control,
+	public libk3dngui::ui_component,
+	public k3d::ideletable,
+	public Gtk::VBox
 {
-	m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &control::record_command));
+	typedef Gtk::VBox base;
 
-	m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
+public:
+	panel() :
+		base(false, 0),
+		ui_component("node_list", 0),
+		m_implementation(0)
+	{
+	}
 
-	pack_start(m_implementation->m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
-	show_all();
-}
+	~panel()
+	{
+		delete m_implementation;
+	}
 
-control::~control()
-{
-	delete m_implementation;
-}
+	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	{
+		ui_component::set_parent("node_list", &Parent);
 
-void control::initialize(document_state& DocumentState, k3d::icommand_node& Parent)
-{
-	assert_not_implemented();
-}
+		m_implementation = new detail::implementation(DocumentState);
 
-const std::string control::panel_type()
-{
-	return "node_list";
-}
+		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
 
-sigc::connection control::connect_focus_signal(const sigc::slot<void>& Slot)
-{
-	return m_implementation->m_panel_grab_signal.connect(Slot);
-}
+		m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
 
-void control::set_filter_policy(filter_policy* const Policy)
-{
-	m_implementation->set_filter_policy(Policy);
-}
+		pack_start(m_implementation->m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
+		show_all();
+	}
 
-void control::set_layout_policy(layout_policy* const Policy)
-{
-	m_implementation->set_layout_policy(Policy);
-}
+	const std::string panel_type()
+	{
+		return "node_list";
+	}
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	const k3d::icommand_node::result result = m_implementation->execute_command(Command, Arguments);
-	if(result != RESULT_UNKNOWN_COMMAND)
-		return result;
+	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
+	{
+		return m_implementation->m_panel_grab_signal.connect(Slot);
+	}
 
-	return ui_component::execute_command(Command, Arguments);
-}
+	void set_filter_policy(detail::filter_policy* const Policy)
+	{
+		m_implementation->set_filter_policy(Policy);
+	}
 
-} // namespace node_list
+	void set_layout_policy(detail::layout_policy* const Policy)
+	{
+		m_implementation->set_layout_policy(Policy);
+	}
 
-} // namespace libk3dngui
+	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
+	{
+		const k3d::icommand_node::result result = m_implementation->execute_command(Command, Arguments);
+		if(result != RESULT_UNKNOWN_COMMAND)
+			return result;
+
+		return ui_component::execute_command(Command, Arguments);
+	}
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<panel> factory(
+				k3d::uuid(0xdae07bf6, 0xa64cc64e, 0xce15e798, 0x16f8eb43),
+				"NGUINodeListPanel",
+				_("Displays the document nodes as a flat list"),
+				"NGUI Panels",
+				k3d::iplugin_factory::EXPERIMENTAL,
+				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "node_list")("panel_label", "Node List"));
+
+		return factory;
+	}
+	
+private:
+	detail::implementation* m_implementation;
+};
+
+} // namespace ngui_node_list
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui_node_list::panel::get_factory());
+K3D_MODULE_END
 

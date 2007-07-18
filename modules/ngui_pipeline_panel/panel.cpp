@@ -553,7 +553,7 @@ public:
 		static k3d::application_plugin_factory<panel> factory(
 				k3d::uuid(0xf37f08af, 0xf542d517, 0xde317099, 0x79394ed8),
 				"NGUIPipelinePanel",
-				_("Provides a panel for displaying the visualization pipeline"),
+				_("Displays the visualization pipeline"),
 				"NGUI Panels",
 				k3d::iplugin_factory::EXPERIMENTAL,
 				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "pipeline")("panel_label", "Pipeline"));
