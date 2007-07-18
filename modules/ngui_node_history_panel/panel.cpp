@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -17,39 +17,49 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <k3d-i18n-config.h>
+
+#include <gtkmm/box.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 
-//#include <gtk/gtkmain.h>
+#include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/command_arguments.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/ui_component.h>
 
-#include "asynchronous_update.h"
-#include "command_arguments.h"
-#include "document_state.h"
-#include "hotkey_cell_renderer_text.h"
-#include "icons.h"
-#include "interactive.h"
-#include "node_history.h"
-#include "ui_component.h"
-
-#include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/idag.h>
+#include <k3dsdk/ideletable.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/xml.h>
 
+#include <boost/assign/list_of.hpp>
 #include <boost/format.hpp>
 
 #include <set>
 
-namespace libk3dngui
+// Temporary hack
+using namespace libk3dngui;
+
+namespace module
 {
 
-namespace node_history
+namespace ngui_node_history
+{
+
+namespace detail
 {
 
 /// This hack makes it easier to implement a context-menu
@@ -66,10 +76,10 @@ class tree_view :
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// control::implementation
+// implementation
 
-class control::implementation :
-	public asynchronous_update
+class implementation :
+	public libk3dngui::asynchronous_update
 {
 public:
 	implementation(document_state& DocumentState) :
@@ -137,46 +147,46 @@ public:
 				k3d::xml::element arguments;
 				buffer >> arguments;
 
-				return_val_if_fail(arguments.name == "arguments", RESULT_ERROR);
+				return_val_if_fail(arguments.name == "arguments", k3d::icommand_node::RESULT_ERROR);
 				const std::string old_name = k3d::xml::element_text(arguments, "oldname");
 				const std::string new_name = k3d::xml::element_text(arguments, "newname");
-				return_val_if_fail(!old_name.empty(), RESULT_ERROR);
-				return_val_if_fail(!new_name.empty(), RESULT_ERROR);
+				return_val_if_fail(!old_name.empty(), k3d::icommand_node::RESULT_ERROR);
+				return_val_if_fail(!new_name.empty(), k3d::icommand_node::RESULT_ERROR);
 
 				k3d::inode* const node = k3d::find_node(m_document_state.document().nodes(), old_name);
-				return_val_if_fail(node, RESULT_ERROR);
+				return_val_if_fail(node, k3d::icommand_node::RESULT_ERROR);
 
 				Gtk::TreeIter row;
-				return_val_if_fail(get_row(node, m_model->children(), row), RESULT_ERROR);
+				return_val_if_fail(get_row(node, m_model->children(), row), k3d::icommand_node::RESULT_ERROR);
 
 				interactive::set_text(m_view, *m_view.get_column(0), *m_view.get_column_cell_renderer(0), row, new_name);
-				return RESULT_CONTINUE;
+				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 			else if(Command == "select")
 			{
 				command_arguments arguments(Arguments);
 				k3d::inode* const node = arguments.get_node(m_document_state.document(), "node");
-				return_val_if_fail(node, RESULT_ERROR);
+				return_val_if_fail(node, k3d::icommand_node::RESULT_ERROR);
 
 				Gtk::TreeIter row;
-				return_val_if_fail(get_row(node, m_model->children(), row), RESULT_ERROR);
+				return_val_if_fail(get_row(node, m_model->children(), row), k3d::icommand_node::RESULT_ERROR);
 
 				interactive::select_row(m_view, *m_view.get_column(0), row);
-				return RESULT_CONTINUE;
+				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 			else if(Command == "context_menu")
 			{
 				m_document_state.popup_context_menu();
-				return RESULT_CONTINUE;
+				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 		}
 		catch(std::exception& e)
 		{
 			k3d::log() << error << e.what() << std::endl;
-			return RESULT_ERROR;
+			return k3d::icommand_node::RESULT_ERROR;
 		}
 
-		return RESULT_UNKNOWN_COMMAND;
+		return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
 	}
 
 	void on_button_press_event(GdkEventButton* Event)
@@ -387,52 +397,87 @@ public:
 	sigc::signal<void> m_panel_grab_signal;
 };
 
+} // namespace detail
+
 /////////////////////////////////////////////////////////////////////////////
-// control
+// panel
 
-control::control(document_state& DocumentState, k3d::icommand_node& Parent) :
-	base(false, 0),
-	ui_component("node_history", &Parent),
-	m_implementation(new implementation(DocumentState))
+class panel :
+	public libk3dngui::panel::control,
+	public libk3dngui::ui_component,
+	public k3d::ideletable,
+	public Gtk::VBox
 {
-	m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &control::record_command));
+	typedef Gtk::VBox base;
 
-	m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
-	
-	pack_start(m_implementation->m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
-	show_all();
-}
+public:
+	panel() :
+		base(false, 0),
+		ui_component("node_history", 0),
+		m_implementation(0)
+	{
+	}
 
-control::~control()
-{
-	delete m_implementation;
-}
+	~panel()
+	{
+		delete m_implementation;
+	}
 
-void control::initialize(document_state& DocumentState, k3d::icommand_node& Parent)
-{
-	assert_not_implemented();
-}
+	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	{
+		ui_component::set_parent("node_history", &Parent);
 
-const std::string control::panel_type()
-{
-	return "node_history";
-}
+		m_implementation = new detail::implementation(DocumentState);
 
-sigc::connection control::connect_focus_signal(const sigc::slot<void>& Slot)
-{
-	return m_implementation->m_panel_grab_signal.connect(Slot);
-}
+		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	const k3d::icommand_node::result result = m_implementation->execute_command(Command, Arguments);
-	if(result != RESULT_UNKNOWN_COMMAND)
-		return result;
+		m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
+		
+		pack_start(m_implementation->m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
+		show_all();
+	}
 
-	return ui_component::execute_command(Command, Arguments);
-}
+	const std::string panel_type()
+	{
+		return "node_history";
+	}
 
-} // namespace node_history
+	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
+	{
+		return m_implementation->m_panel_grab_signal.connect(Slot);
+	}
 
-} // namespace libk3dngui
+	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
+	{
+		const k3d::icommand_node::result result = m_implementation->execute_command(Command, Arguments);
+		if(result != RESULT_UNKNOWN_COMMAND)
+			return result;
+
+		return ui_component::execute_command(Command, Arguments);
+	}
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<panel> factory(
+				k3d::uuid(0x680e37df, 0xe5428bb2, 0x5e159d8d, 0x283bf0b6),
+				"NGUINodeHistoryPanel",
+				_("Displays a hierarchical list of node inputs"),
+				"NGUI Panels",
+				k3d::iplugin_factory::EXPERIMENTAL,
+				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "node_history")("panel_label", "Node History"));
+
+		return factory;
+	}
+
+private:
+	detail::implementation* m_implementation;
+};
+
+} // namespace ngui_node_history
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui_node_history::panel::get_factory());
+K3D_MODULE_END
 

@@ -32,7 +32,6 @@
 #include "icons.h"
 #include "image_toggle_button.h"
 #include "interactive.h"
-#include "node_history.h"
 #include "node_list.h"
 #include "node_properties.h"
 #include "panel.h"
@@ -188,12 +187,6 @@ void control::mount_panel(const std::string& Type)
 		return;
 	}
 
-	if("node_history" == Type)
-	{
-	   mount_panel(*Gtk::manage(new node_history::control(m_document_state, m_parent)), Type);
-	   return;
-	}
-
 	if("node_properties" == Type)
 	{
 	   mount_panel(*Gtk::manage(new node_properties::control(m_document_state, m_parent)), Type);
@@ -341,7 +334,6 @@ void control::set_choices()
 	m_model->clear();
 
 	add_choice("node_list", quiet_load_icon("node_list_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node List"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_list"));
-	add_choice("node_history", quiet_load_icon("node_history_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node History"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_history"));
 	add_choice("node_properties", quiet_load_icon("node_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_properties"));
 	add_choice("tool_properties", quiet_load_icon("tool_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Tool Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "tool_properties"));
 	add_choice("viewport", quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "viewport"));
@@ -421,7 +413,8 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 		return RESULT_CONTINUE;
 	}
 
-	// We leave the following for backwards-compatibility ...
+	// We leave the following commands in for backwards-compatibility ...
+	
 	if(Command == "mount_node_list")
 	{
 		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["node_list"]))));
