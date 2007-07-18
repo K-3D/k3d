@@ -39,6 +39,8 @@ plugin_factory::plugin_factory(const uuid& ClassID, const std::string& Name, con
 	m_quality(Quality),
 	m_metadata(Metadata)
 {
+	assert(m_class_id != k3d::uuid::null());
+
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer_t;
 	boost::char_separator<char> separator;
 	tokenizer_t tokenizer(Categories, separator);
