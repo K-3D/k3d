@@ -269,7 +269,7 @@ public:
 		{
 			m_graph.reset(new k3d::graph());
 			create_graph(*m_document_state, *m_graph);
-			circular_layout(*m_graph);
+			random_layout(*m_graph);
 		}
 
 		return *m_graph;
@@ -375,7 +375,28 @@ public:
 		Context->fill();
 	}
 
-	void draw_centered_text(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Position, const std::string& Text)
+	void draw_box_to_box_arrow(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Source, const double SourceWidth, const double SourceHeight, const k3d::point2& Target, const double TargetWidth, const double TargetHeight, const double Size)
+	{
+		k3d::point2 source(Source);
+		k3d::point2 target(Target);
+
+/*
+		if(source[1] < target[1])
+		{
+			source[1] += SourceHeight / 2;
+			target[1] -= TargetHeight / 2;
+		}
+		else
+		{
+			source[1] -= SourceHeight / 2;
+			target[1] += TargetHeight / 2;
+		}
+*/
+
+		draw_arrow(Context, source, target, Size);
+	}
+
+	void draw_centered_text(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Position, const std::string& Text, double& Width, double& Height)
 	{
 		Context->save();
 
@@ -387,6 +408,9 @@ public:
 		Context->show_text(Text);
 
 		Context->restore();
+
+		Width = extents.width;
+		Height = extents.height;
 	}
 
 	void draw_pipeline(const Cairo::RefPtr<Cairo::Context>& Context, const double Width, const double Height)
@@ -422,11 +446,16 @@ public:
 		// Render the graph vertices ...
 		try
 		{
+			return_if_fail(graph.topology);
 			return_if_fail(graph.vertex_data.count("label"));
 			return_if_fail(graph.vertex_data.count("position"));
 
+			const k3d::graph::topology_t& topology = *graph.topology;
+
 			const k3d::graph::strings_t& vertex_label = dynamic_cast<k3d::graph::strings_t&>(*graph.vertex_data["label"].get());
 			const k3d::graph::points_t& vertex_position = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["position"].get());
+			k3d::graph::doubles_t& vertex_width = get_array<k3d::graph::doubles_t>(graph.vertex_data, "width", boost::num_vertices(topology));
+			k3d::graph::doubles_t& vertex_height = get_array<k3d::graph::doubles_t>(graph.vertex_data, "height", boost::num_vertices(topology));
 
 			Context->save();
 
@@ -434,7 +463,7 @@ public:
 			Context->set_font_size(0.03);
 
 			for(size_t i = 0; i != vertex_label.size(); ++i)
-				draw_centered_text(Context, vertex_position[i], vertex_label[i]);
+				draw_centered_text(Context, vertex_position[i], vertex_label[i], vertex_width[i], vertex_height[i]);
 
 			Context->restore();
 		}
@@ -452,12 +481,16 @@ public:
 		{
 			return_if_fail(graph.topology);
 			return_if_fail(graph.vertex_data.count("position"));
+			return_if_fail(graph.vertex_data.count("width"));
+			return_if_fail(graph.vertex_data.count("height"));
 			return_if_fail(graph.edge_data.count("type"));
 
 			const k3d::graph::topology_t& topology = *graph.topology;
 
 			const k3d::graph::points_t& vertex_position = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["position"].get());
 			return_if_fail(boost::num_vertices(topology) == vertex_position.size());
+			const k3d::graph::doubles_t& vertex_width = dynamic_cast<k3d::graph::doubles_t&>(*graph.vertex_data["width"].get());
+			const k3d::graph::doubles_t& vertex_height = dynamic_cast<k3d::graph::doubles_t&>(*graph.vertex_data["height"].get());
 
 			const k3d::graph::indices_t& edge_type = dynamic_cast<k3d::graph::indices_t&>(*graph.edge_data["type"].get());
 			return_if_fail(boost::num_edges(topology) == edge_type.size());
@@ -490,7 +523,15 @@ public:
 					}
 				}
 
-				draw_arrow(Context, vertex_position[source], vertex_position[target], 0.015);
+				draw_box_to_box_arrow(
+					Context,
+					vertex_position[source],
+					vertex_width[source],
+					vertex_height[source] * 1.5,
+					vertex_position[target],
+					vertex_width[target],
+					vertex_height[target] * 1.5,
+					0.04);
 			}
 
 			Context->restore();

@@ -21,6 +21,8 @@
 	\author Timothy M. Shead
 */
 
+#include <string>
+
 namespace k3d { class graph; }
 namespace libk3dngui { class document_state; }
 
@@ -40,8 +42,26 @@ void create_graph(libk3dngui::document_state& DocumentState, k3d::graph& Graph);
 
 void random_layout(k3d::graph& Graph);
 void circular_layout(k3d::graph& Graph);
-void random_layout(k3d::graph& Graph);
 void force_directed_layout(k3d::graph& Graph);
+
+template<typename array_t, typename map_t>
+array_t& get_array(map_t& Map, const std::string& Name, const size_t Count)
+{
+	array_t* result = 0;
+	if(Map.count(Name))
+		result = dynamic_cast<array_t*>(Map[Name].get());
+
+	if(!result)
+	{
+		result = new array_t();
+		Map[Name].reset(result);
+	}
+
+	if(result->size() != Count)
+		result->resize(Count);
+
+	return *result;
+}
 
 } // namespace ngui_pipeline
 

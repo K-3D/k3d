@@ -152,17 +152,9 @@ void circular_layout(k3d::graph& Graph)
 	return_if_fail(Graph.topology);
 
 	const k3d::graph::topology_t& topology = *Graph.topology;
-	k3d::graph::points_t* vertex_position = 0;
-	if(Graph.vertex_data.count("position"))
-		vertex_position = dynamic_cast<k3d::graph::points_t*>(Graph.vertex_data["position"].get());
-	
-	if(!vertex_position)
-	{
-		vertex_position = new k3d::graph::points_t(boost::num_vertices(topology));
-		Graph.vertex_data["position"].reset(vertex_position);
-	}
+	k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(Graph.vertex_data, "position", boost::num_vertices(topology));
 
-	detail::position_map position_map(*vertex_position);
+	detail::position_map position_map(vertex_position);
 	boost::circle_graph_layout(topology, position_map, 0.5);
 
 }
@@ -172,17 +164,9 @@ void random_layout(k3d::graph& Graph)
 	return_if_fail(Graph.topology);
 
 	const k3d::graph::topology_t& topology = *Graph.topology;
-	k3d::graph::points_t* vertex_position = 0;
-	if(Graph.vertex_data.count("position"))
-		vertex_position = dynamic_cast<k3d::graph::points_t*>(Graph.vertex_data["position"].get());
-	
-	if(!vertex_position)
-	{
-		vertex_position = new k3d::graph::points_t(boost::num_vertices(topology));
-		Graph.vertex_data["position"].reset(vertex_position);
-	}
+	k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(Graph.vertex_data, "position", boost::num_vertices(topology));
 
-	detail::position_map position_map(*vertex_position);
+	detail::position_map position_map(vertex_position);
 	boost::mt19937 rng;
 	boost::random_graph_layout(topology, position_map, 0.0, 1.0, 0.0, 1.0, rng);
 }
@@ -256,16 +240,7 @@ void force_directed_layout(k3d::graph& Graph)
 	return_if_fail(Graph.topology);
 
 	const k3d::graph::topology_t& topology = *Graph.topology;
-	k3d::graph::points_t* vertex_position = 0;
-
-	if(Graph.vertex_data.count("position"))
-		vertex_position = dynamic_cast<k3d::graph::points_t*>(Graph.vertex_data["position"].get());
-	
-	if(!vertex_position)
-	{
-		vertex_position = new k3d::graph::points_t(boost::num_vertices(topology));
-		Graph.vertex_data["position"].reset(vertex_position);
-	}
+	k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(Graph.vertex_data, "position", boost::num_vertices(topology));
 
 	const size_t vertex_begin = 0;
 	const size_t vertex_end = boost::num_vertices(topology);
@@ -277,8 +252,8 @@ void force_directed_layout(k3d::graph& Graph)
 		{
 			if(vertex != other)
 			{
-				const k3d::vector2 difference = (*vertex_position)[vertex] - (*vertex_position)[other];
-				(*vertex_position)[vertex] += k3d::normalize(difference) * (0.001 / difference.length2());
+				const k3d::vector2 difference = vertex_position[vertex] - vertex_position[other];
+				vertex_position[vertex] += k3d::normalize(difference) * (0.0001 / difference.length2());
 			}
 		}
 	}
@@ -292,11 +267,11 @@ void force_directed_layout(k3d::graph& Graph)
 
 		if(source != target)
 		{
-			const k3d::vector2 difference = (*vertex_position)[target] - (*vertex_position)[source];
-			const k3d::vector2 force = k3d::normalize(difference) * (0.01 * difference.length2());
+			const k3d::vector2 difference = vertex_position[target] - vertex_position[source];
+			const k3d::vector2 force = k3d::normalize(difference) * (0.1 * difference.length2());
 			
-			(*vertex_position)[source] += force;
-			(*vertex_position)[target] -= force;
+			vertex_position[source] += force;
+			vertex_position[target] -= force;
 		}
 	}
 }
