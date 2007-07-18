@@ -56,7 +56,6 @@
 #include "statusbar.h"
 #include "target.h"
 #include "test_case_recorder.h"
-#include "timeline.h"
 #include "tool_panel.h"
 #include "toolbar.h"
 #include "transform.h"

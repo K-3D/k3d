@@ -38,7 +38,6 @@
 #include "panel.h"
 #include "panel_frame.h"
 #include "render.h"
-#include "timeline.h"
 #include "tool_panel.h"
 #include "tool_properties.h"
 #include "utility.h"
@@ -207,12 +206,6 @@ void control::mount_panel(const std::string& Type)
 	   return;
 	}
 
-	if("timeline" == Type)
-	{
-	   mount_panel(*Gtk::manage(new timeline::control(m_document_state, m_parent)), Type);
-	   return;
-	}
-
 	if("toolbar" == Type)
 	{
 	   mount_panel(*Gtk::manage(new tool_panel::control(m_document_state, m_parent)), Type);
@@ -351,7 +344,6 @@ void control::set_choices()
 	add_choice("node_history", quiet_load_icon("node_history_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node History"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_history"));
 	add_choice("node_properties", quiet_load_icon("node_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_properties"));
 	add_choice("tool_properties", quiet_load_icon("tool_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Tool Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "tool_properties"));
-	add_choice("timeline", quiet_load_icon("timeline_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Timeline"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "timeline"));
 	add_choice("viewport", quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "viewport"));
 	add_choice("toolbar", quiet_load_icon("toolbar_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Toolbar"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "toolbar"));
 
@@ -429,6 +421,7 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 		return RESULT_CONTINUE;
 	}
 
+	// We leave the following for backwards-compatibility ...
 	if(Command == "mount_node_list")
 	{
 		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["node_list"]))));

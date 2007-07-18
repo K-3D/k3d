@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -17,38 +17,48 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "asynchronous_update.h"
-#include "button.h"
-#include "document_state.h"
-#include "icons.h"
-#include "interactive.h"
-#include "timeline.h"
-#include "ui_component.h"
-#include "utility.h"
+#include <k3d-i18n-config.h>
 
+#include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/ui_component.h>
+#include <k3dsdk/ngui/utility.h>
+
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/data.h>
-#include <k3d-i18n-config.h>
+#include <k3dsdk/ideletable.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/time_source.h>
 
 #include <gtkmm/adjustment.h>
+#include <gtkmm/box.h>
 #include <gtkmm/image.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/scrollbar.h>
 
-namespace libk3dngui
+#include <boost/assign/list_of.hpp>
+
+// Temporary hack
+using namespace libk3dngui;
+
+namespace module
 {
 
-namespace timeline
+namespace ngui_timeline
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// control::implementation
+namespace detail
+{
 
-class control::implementation :
-	public asynchronous_update,
+class implementation :
+	public libk3dngui::asynchronous_update,
 	public k3d::property_collection
 {
 public:
@@ -177,10 +187,10 @@ public:
 			if(m_writable_time)
 				m_writable_time->property_set_value(new_time);
 
-			return RESULT_CONTINUE;
+			return k3d::icommand_node::RESULT_CONTINUE;
 		}
 
-		return RESULT_UNKNOWN_COMMAND;
+		return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
 	}
 
 	void on_update()
@@ -476,50 +486,84 @@ public:
 	sigc::signal<void, const std::string&, const std::string&> m_command_signal;
 };
 
+} // namespace detail
+
 /////////////////////////////////////////////////////////////////////////////
-// control
+// panel
 
-control::control(document_state& DocumentState, k3d::icommand_node& Parent) :
-	base(false, 0),
-	ui_component("timeline", &Parent),
-	m_implementation(new implementation(DocumentState, *this))
+class panel :
+	public libk3dngui::panel::control,
+	public libk3dngui::ui_component,
+	public k3d::ideletable,
+	public Gtk::VBox
 {
-	m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &control::record_command));
+	typedef Gtk::VBox base;
 
-	pack_start(m_implementation->m_container, Gtk::PACK_SHRINK);
-	show_all();
-}
+public:
+	panel() :
+		base(false, 0),
+		ui_component("timeline", 0),
+		m_implementation(0)
+	{
+	}
 
-control::~control()
-{
-	delete m_implementation;
-}
+	~panel()
+	{
+		delete m_implementation;
+	}
 
-void control::initialize(document_state& DocumentState, k3d::icommand_node& Parent)
-{
-	assert_not_implemented();
-}
+	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	{
+		ui_component::set_parent("timeline", &Parent);
 
-const std::string control::panel_type()
-{
-	return "timeline";
-}
+		m_implementation = new detail::implementation(DocumentState, Parent);
+		
+		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
 
-sigc::connection control::connect_focus_signal(const sigc::slot<void>& Slot)
-{
-	return sigc::connection();
-}
+		pack_start(m_implementation->m_container, Gtk::PACK_SHRINK);
+		show_all();
+	}
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	const k3d::icommand_node::result result = m_implementation->execute_command(Command, Arguments);
-	if(result != RESULT_UNKNOWN_COMMAND)
-		return result;
+	const std::string panel_type()
+	{
+		return "timeline";
+	}
 
-	return ui_component::execute_command(Command, Arguments);
-}
+	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
+	{
+		return sigc::connection();
+	}
 
-} // namespace timeline
+	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
+	{
+		const k3d::icommand_node::result result = m_implementation->execute_command(Command, Arguments);
+		if(result != RESULT_UNKNOWN_COMMAND)
+			return result;
 
-} // namespace libk3dngui
+		return ui_component::execute_command(Command, Arguments);
+	}
+	
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<panel> factory(
+				k3d::uuid(0xc8cab7fd, 0xa14a55af, 0x79779fa5, 0x1b516756),
+				"NGUIUndoTreePanel",
+				_("Provides a panel for manipulating the current time"),
+				"NGUI Panels",
+				k3d::iplugin_factory::EXPERIMENTAL,
+				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "timeline")("panel_label", "Timeline"));
+
+		return factory;
+	}
+private:
+	detail::implementation* m_implementation;
+};
+
+} // namespace ngui_timeline
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui_timeline::panel::get_factory());
+K3D_MODULE_END
 
