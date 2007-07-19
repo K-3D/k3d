@@ -36,7 +36,6 @@
 #include "panel.h"
 #include "panel_frame.h"
 #include "render.h"
-#include "tool_panel.h"
 #include "tool_properties.h"
 #include "utility.h"
 #include "viewport.h"
@@ -192,12 +191,6 @@ void control::mount_panel(const std::string& Type)
 	   return;
 	}
 
-	if("toolbar" == Type)
-	{
-	   mount_panel(*Gtk::manage(new tool_panel::control(m_document_state, m_parent)), Type);
-	   return;
-	}
-
 	if("viewport" == Type)
 	{
 		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_engine>(m_document_state.document().nodes());
@@ -329,7 +322,6 @@ void control::set_choices()
 	add_choice("node_properties", quiet_load_icon("node_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Node Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "node_properties"));
 	add_choice("tool_properties", quiet_load_icon("tool_properties_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Tool Properties"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "tool_properties"));
 	add_choice("viewport", quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "viewport"));
-	add_choice("toolbar", quiet_load_icon("toolbar_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Toolbar"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "toolbar"));
 
 	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
 	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)

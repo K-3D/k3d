@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,37 +18,49 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "tool_panel.h"
-
-#include "button.h"
-#include "document_state.h"
-#include "icons.h"
-#include "image_toggle_button.h"
-#include "render.h"
-#include "scripting.h"
-#include "tool.h"
-#include "toolbar.h"
-#include "transform.h"
-#include "viewport.h"
-#include "widget_manip.h"
-
-#include <k3dsdk/fstream.h>
 #include <k3d-i18n-config.h>
+
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/image_toggle_button.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/render.h>
+#include <k3dsdk/ngui/scripting.h>
+#include <k3dsdk/ngui/tool.h>
+#include <k3dsdk/ngui/toolbar.h>
+#include <k3dsdk/ngui/transform.h>
+#include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/ngui/widget_manip.h>
+
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/ideletable.h>
 #include <k3dsdk/ipath_property.h>
 #include <k3dsdk/iselectable.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/utility_gl.h>
 
+#include <gtkmm/box.h>
 #include <gtkmm/image.h>
 #include <gtkmm/notebook.h>
 #include <gtkmm/separatortoolitem.h>
 
-namespace libk3dngui
+#include <boost/assign/list_of.hpp>
+
+// Temporary hack
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui_toolbar
 {
 
 namespace detail
@@ -94,15 +106,10 @@ std::auto_ptr<image_toggle_button::idata_proxy> active_tool_proxy(document_state
 	return std::auto_ptr<image_toggle_button::idata_proxy>(new active_tool_proxy_t(DocumentState, Choice, StateRecorder, ChangeMessage));
 }
 
-} // namespace detail
-
-namespace tool_panel
-{
-
 /////////////////////////////////////////////////////////////////////////////
-// control::implementation
+// implementation
 
-struct control::implementation
+struct implementation
 {
 	implementation(document_state& DocumentState, k3d::icommand_node& Parent) :
 		m_document_state(DocumentState),
@@ -431,39 +438,74 @@ struct control::implementation
 	Gtk::HBox m_toolbox;
 };
 
+} // namespace detail
+
 /////////////////////////////////////////////////////////////////////////////
-// control
+// panel
 
-control::control(document_state& DocumentState, k3d::icommand_node& Parent) :
-	base(false, 0),
-	ui_component("toolbar", &Parent),
-	m_implementation(new implementation(DocumentState, *this))
+class panel :
+	public libk3dngui::panel::control,
+	public libk3dngui::ui_component,
+	public k3d::ideletable,
+        public Gtk::VBox
 {
-	pack_start(m_implementation->m_toolbox, Gtk::PACK_SHRINK);
-	show_all();
-}
+	typedef Gtk::VBox base;
 
-control::~control()
-{
-	delete m_implementation;
-}
+public:
+	panel() :
+		base(false, 0),
+		ui_component("toolbar", 0),
+		m_implementation(0)
+	{
+	}
 
-void control::initialize(document_state& DocumentState, k3d::icommand_node& Parent)
-{
-	assert_not_implemented();
-}
+	~panel()
+	{
+		delete m_implementation;
+	}
 
-const std::string control::panel_type()
-{
-	return "toolbar";
-}
+	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	{
+		ui_component::set_parent("toolbar", &Parent);
 
-sigc::connection control::connect_focus_signal(const sigc::slot<void>& Slot)
-{
-	return sigc::connection();
-}
+		m_implementation = new detail::implementation(DocumentState, Parent);
+		
+		pack_start(m_implementation->m_toolbox, Gtk::PACK_SHRINK);
+		show_all();
+	}
 
-} // namespace tool_panel
+	const std::string panel_type()
+	{
+		return "toolbar";
+	}
 
-} // namespace libk3dngui
+	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
+	{
+		return sigc::connection();
+	}
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<panel> factory(
+				k3d::uuid(0xc4d044fe, 0x5043a104, 0xd97f0988, 0x19c053d8),
+				"NGUIToolbarPanel",
+				_("Provides the standard toolbar"),
+				"NGUI Panels",
+				k3d::iplugin_factory::EXPERIMENTAL,
+				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "toolbar")("panel_label", "Toolbar"));
+
+		return factory;
+	}
+
+private:
+	detail::implementation* m_implementation;
+};
+
+} // namespace ngui_toolbar
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui_toolbar::panel::get_factory());
+K3D_MODULE_END
 

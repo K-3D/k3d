@@ -164,6 +164,7 @@ IF(K3D_BUILD_NGUI_MODULES)
 	ADD_SUBDIRECTORY(ngui_node_list_panel)
 	ADD_SUBDIRECTORY(ngui_pipeline_profiler_panel)
 	ADD_SUBDIRECTORY(ngui_timeline_panel)
+	ADD_SUBDIRECTORY(ngui_toolbar_panel)
 	ADD_SUBDIRECTORY(ngui_undo_tree_panel)
 ENDIF(K3D_BUILD_NGUI_MODULES)
 
