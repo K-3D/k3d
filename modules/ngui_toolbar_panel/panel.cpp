@@ -468,7 +468,7 @@ public:
 	{
 		ui_component::set_parent("toolbar", &Parent);
 
-		m_implementation = new detail::implementation(DocumentState, Parent);
+		m_implementation = new detail::implementation(DocumentState, *this);
 		
 		pack_start(m_implementation->m_toolbox, Gtk::PACK_SHRINK);
 		show_all();
