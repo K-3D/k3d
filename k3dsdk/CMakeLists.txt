@@ -81,5 +81,9 @@ INSTALL(TARGETS k3dsdk
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib)
 INSTALL(FILES ${HEADERS} DESTINATION include/k3d/k3dsdk)
-INSTALL(FILES ${k3dsdk_BINARY_DIR}/version.h DESTINATION include/k3d/k3dsdk)
+
+INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-i18n-config.h DESTINATION lib/k3d/include)
+INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-module-config.h DESTINATION lib/k3d/include)
+INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-platform-config.h DESTINATION lib/k3d/include)
+INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-version-config.h DESTINATION lib/k3d/include)
 
