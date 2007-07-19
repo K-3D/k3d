@@ -37,14 +37,17 @@
 
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>
+#include <k3dsdk/create_plugins.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/geometry.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idrawable_gl.h>
+#include <k3dsdk/ikeyframer.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/itransform_source.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/transform.h>
@@ -276,7 +279,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			assert_warning(k3d::set_value(*modifier, "matrix", k3d::identity3D()));
 
 		// Setup matrices
-		m_original_matrix = boost::any_cast<k3d::matrix4>(k3d::get_value(*modifier, "matrix"));
+		set_original_matrix();
 
 		set_coordinate_system_change_matrices();
 	}
@@ -296,7 +299,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			assert_warning(k3d::set_value(*modifier, "matrix", k3d::identity3D()));
 
 		// Setup matrices
-		m_original_matrix = boost::any_cast<k3d::matrix4>(k3d::get_value(*modifier, "matrix"));
+		set_original_matrix();
 
 		set_coordinate_system_change_matrices();
 	}
@@ -316,7 +319,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			assert_warning(k3d::set_value(*modifier, "matrix", k3d::identity3D()));
 
 		// Setup matrices
-		m_original_matrix = boost::any_cast<k3d::matrix4>(k3d::get_value(*modifier, "matrix"));
+		set_original_matrix();
 
 		set_coordinate_system_change_matrices();
 	}
@@ -342,18 +345,63 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		return_val_if_fail(node, false);
 
 		// Check for an existing transform modifier
-		k3d::inode* upstream_node = upstream_transform_modifier(*node);
+		k3d::inode* upstream_node = 0;
+		
+		k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(node);
+		return_val_if_fail(downstream_sink, false);
+		k3d::iproperty& downstream_input = downstream_sink->transform_sink_input();
+		k3d::iproperty* upstream_output = node->document().dag().dependency(downstream_input);
+
+		// Check upstream object
+		if(upstream_output)
+			upstream_node = upstream_output->property_node();
+		
 		/** \todo check for same name too */
 		if(upstream_node && (Class == upstream_node->factory().class_id()))
 		{
 			set_transform_modifier(upstream_node);
 			return false;
 		}
+		else if (upstream_node && dynamic_cast<k3d::ikeyframer*>(upstream_node))
+		{
+			k3d::ikeyframer* keyframer = dynamic_cast<k3d::ikeyframer*>(upstream_node);
+			k3d::iproperty& downstream_input2 = keyframer->input_property();
+			upstream_output = node->document().dag().dependency(downstream_input2);
+			if(upstream_output)
+				upstream_node = upstream_output->property_node();
+			if(upstream_node && (Class == upstream_node->factory().class_id()))
+			{
+				set_transform_modifier(upstream_node);
+				return false;
+			}
+			else
+			{
+				const std::string modifier_name = Name + node->name();
+				modifier = k3d::create_plugin<k3d::inode>(Class, node->document(), modifier_name);
+				return_val_if_fail(modifier, false);
+			
+				k3d::idag::dependencies_t dependencies;
+				dependencies.insert(std::make_pair(&dynamic_cast<k3d::itransform_sink*>(modifier)->transform_sink_input(), upstream_output));
+				dependencies.insert(std::make_pair(&downstream_input2, &dynamic_cast<k3d::itransform_source*>(modifier)->transform_source_output()));
+				node->document().dag().set_dependencies(dependencies);
+			
+				return true;
+			}
+		}	
 
 		const std::string modifier_name = Name + node->name();
 		set_transform_modifier(insert_transform_modifier(*node, Class, modifier_name));
 
 		return true;
+	}
+	
+	void transform_tool::transform_target::set_original_matrix()
+	{
+		return_if_fail(node && modifier);
+		k3d::matrix4 node_input_matrix = boost::any_cast<k3d::matrix4>(k3d::get_value(*node, "input_matrix"));
+		k3d::matrix4 modifier_input_matrix = boost::any_cast<k3d::matrix4>(k3d::get_value(*modifier, "input_matrix"));
+		// Calculate the original matrix back from the current node matrix, in case it got changed by i.e. an animation track
+		m_original_matrix = inverse(modifier_input_matrix) * node_input_matrix;
 	}
 
 	// mesh_target implementation

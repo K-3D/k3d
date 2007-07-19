@@ -347,6 +347,8 @@ private:
 	private:
 		/// Stores modifier's original matrix
 		k3d::matrix4 m_original_matrix;
+		/// Sets the original matrix, using the current state of the pipeline
+		void set_original_matrix();
 	};
 
 	class mesh_target :

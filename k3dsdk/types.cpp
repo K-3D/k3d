@@ -39,6 +39,7 @@
 #include "idocument_exporter.h"
 #include "ifile_format.h"
 #include "iimager_shader_ri.h"
+#include "ikeyframer.h"
 #include "ilight_gl.h"
 #include "ilight_ri.h"
 #include "ilight_shader_ri.h"
@@ -155,6 +156,7 @@ void initialize_types()
 	register_type(typeid(k3d::color), "k3d::color");
 	register_type(typeid(k3d::filesystem::path), "k3d::filesystem::path");
 	register_type(typeid(k3d::gl::ilight), "k3d::gl::ilight");
+	register_type(typeid(k3d::ikeyframer), "k3d::ikeyframer");
 	register_type(typeid(k3d::gl::imaterial), "k3d::gl::imaterial");
 	register_type(typeid(k3d::gl::imesh_painter), "k3d::gl::imesh_painter");
 	register_type(typeid(k3d::gl::imesh_painter*), "k3d::gl::imesh_painter*");

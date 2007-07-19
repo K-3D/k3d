@@ -23,11 +23,12 @@
 */
 
 #include <k3dsdk/algebra.h>
-#include <k3dsdk/icommand_node.h>
 #include <k3dsdk/icommand_node_simple.h>
+#include <k3dsdk/ikeyframer.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/tokens.h>
@@ -38,26 +39,12 @@
 namespace libk3danimation
 {
 
-/// Abstract interface for objects that set keyframes. Avoids template hassle with the command nodes 
-class ikeyframer
-{
-public:
-	/// Set a keyframe
-	virtual void keyframe() = 0;
-	
-	/// Delete the keyframe placed at the given time property
-	virtual void delete_key(k3d::iproperty* TimeProperty) = 0;
-	
-	virtual ~ikeyframer() {}
-};
-
-
 /// Manually set keyframes
 class set_keyframe : public k3d::icommand_node_simple
 {
 public:
 
-	set_keyframe(ikeyframer& Track) : m_track(Track) {}
+	set_keyframe(k3d::ikeyframer& Track) : m_track(Track) {}
 
 	virtual const k3d::icommand_node::result execute_command()
 	{
@@ -66,7 +53,7 @@ public:
 	}
 	
 private:
-	ikeyframer& m_track;
+	k3d::ikeyframer& m_track;
 };
 
 /// Delete keyframes
@@ -74,7 +61,7 @@ class delete_keyframe : public k3d::icommand_node_simple
 {
 public:
 
-	delete_keyframe(ikeyframer& Track, k3d::iproperty* KeyProperty) : m_track(Track), m_key(KeyProperty) {}
+	delete_keyframe(k3d::ikeyframer& Track, k3d::iproperty* KeyProperty) : m_track(Track), m_key(KeyProperty) {}
 
 	virtual const k3d::icommand_node::result execute_command()
 	{
@@ -83,7 +70,7 @@ public:
 	}
 	
 private:
-	ikeyframer& m_track;
+	k3d::ikeyframer& m_track;
 	k3d::iproperty* m_key;
 };
 
@@ -91,7 +78,7 @@ template <typename time_t, typename value_t>
 class animation_track :
 	public k3d::persistent<k3d::node>,
 	public k3d::property_group_collection,
-	public ikeyframer
+	public k3d::ikeyframer
 {
 	typedef k3d::persistent<k3d::node> base;
 	typedef k3d_data(time_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) time_property_t;
@@ -117,6 +104,8 @@ public:
 	
 	value_t on_output_request()
 	{
+		// Interpolate value
+		value_t result;
 		interpolator_t* interpolator = m_interpolator.value();
 		return_val_if_fail(interpolator, m_value_input.value());
 		typename interpolator_t::keyframes_t keyframes;
@@ -125,13 +114,14 @@ public:
 		time_t time = m_time_input.value();
 		try
 		{
-			return interpolator->interpolate(time, keyframes);
+			result =  interpolator->interpolate(time, keyframes);
 		}
 		catch (insufficient_data_exception& e)
 		{
 			k3d::log() << warning << name() << ": Insufficient keyframe data to calculate value at time " << time << std::endl;
-			return m_value_input.value();
+			result =  m_value_input.value();
 		}
+		return result;
 	}
 	
 	/// Create a keyframe from the current time and value inputs
@@ -180,6 +170,11 @@ public:
 		delete value_property;
 		delete time_property;
 		m_output_value.reset();
+	}
+	
+	k3d::iproperty& input_property()
+	{
+		return m_value_input;
 	}
 		
 	/// Make sure the keyframe structures get updated on load
@@ -288,7 +283,7 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<animation_track_double_matrix4>factory(
+		static k3d::document_plugin_factory<animation_track_double_matrix4, k3d::interface_list<k3d::ikeyframer> >factory(
 				k3d::uuid(0x00347e9b, 0x97486a2b, 0xb79e71ab, 0xc719354f),
 				"AnimationTrackDoubleMatrix4",
 				("Stores a series of keyframes for an animation, using 'double' as time type and 'matrix4' as value"),
