@@ -22,6 +22,9 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
+
 #include "about_box.h"
 #include "application_state.h"
 #include "assign_hotkeys_dialog.h"
@@ -72,7 +75,6 @@
 #include <k3dsdk/file_filter.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>
@@ -1223,10 +1225,10 @@ private:
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_file_bug_report))
 			<< set_accelerator_path("<k3d-document>/actions/help/file_bug_report", get_accel_group())));
 
-        menu->items().push_back(*Gtk::manage(
-            new menu_item::control(Parent, "help_log_window", _("Open _Log Window ..."), true)
-            << connect_menu_item(sigc::ptr_fun(create_log_window))
-            << set_accelerator_path("<k3d-document>/actions/help/open_log_window", get_accel_group())));
+		menu->items().push_back(*Gtk::manage(
+		    new menu_item::control(Parent, "help_log_window", _("Open _Log Window ..."), true)
+		    << connect_menu_item(sigc::ptr_fun(create_log_window))
+		    << set_accelerator_path("<k3d-document>/actions/help/open_log_window", get_accel_group())));
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
@@ -1238,9 +1240,16 @@ private:
 			<< set_accelerator_path("<k3d-document>/actions/help/manual", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
+			new menu_item::control(Parent, "help_release_notes", _("_Release Notes"), true)
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_release_notes))
+			<< set_accelerator_path("<k3d-document>/actions/help/release_notes", get_accel_group())));
+
+		menu->items().push_back(*Gtk::manage(
 			new menu_item::control(Parent, "help_online", _("K-3D _Online"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_online))
 			<< set_accelerator_path("<k3d-document>/actions/help/online", get_accel_group())));
+
+		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
 			new menu_item::control(Parent, "help_about", _("_About K-3D ..."), true)
@@ -2350,6 +2359,11 @@ private:
 	void on_help_online()
 	{
 		open_uri("http://www.k-3d.org");
+	}
+
+	void on_help_release_notes()
+	{
+		open_uri("http://www.k-3d.org/wiki/K-3D_" K3D_VERSION "_Release_Notes");
 	}
 
 	void on_help_about()
