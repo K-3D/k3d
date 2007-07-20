@@ -24,6 +24,7 @@
 
 #include "jules_bloomenthal.h"
 
+#include <algorithm>
 #include <iostream>
 
 // Number of iterations (convergence)

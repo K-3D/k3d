@@ -21,6 +21,7 @@
 #include "k3d-platform-config.h"
 #include "result.h"
 
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <vector>

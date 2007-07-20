@@ -26,6 +26,7 @@
 #include "result.h"
 #include "string_modifiers.h"
 
+#include <algorithm>
 #include <cctype>
 
 namespace k3d
