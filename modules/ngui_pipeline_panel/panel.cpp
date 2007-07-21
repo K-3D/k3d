@@ -152,7 +152,7 @@ public:
 	void on_save_png()
 	{
 		const unsigned long width = 512;
-		const unsigned long height = 512;
+		const unsigned long height = static_cast<unsigned long>(width * aspect_ratio());
 
 		libk3dngui::file_chooser_dialog dialog(_("Save PNG Image:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.add_pattern_filter(_("PNG Image (*.png)"), "*.png");
@@ -178,7 +178,7 @@ public:
 	void on_save_pdf()
 	{
 		const double width = 5 * 72.0;
-		const double height = 5 * 72.0;
+		const double height = width * aspect_ratio();
 
 		libk3dngui::file_chooser_dialog dialog(_("Save PDF Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.add_pattern_filter(_("PDF Document (*.pdf)"), "*.pdf");
@@ -202,7 +202,7 @@ public:
 	void on_save_ps()
 	{
 		const double width = 5 * 72.0;
-		const double height = 5 * 72.0;
+		const double height = width * aspect_ratio();
 
 		libk3dngui::file_chooser_dialog dialog(_("Save Postscript Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.add_pattern_filter(_("Postscript Document (*.ps)"), "*.ps");
@@ -226,7 +226,7 @@ public:
 	void on_save_svg()
 	{
 		const double width = 5 * 72.0;
-		const double height = 5 * 72.0;
+		const double height = width * aspect_ratio();
 
 		libk3dngui::file_chooser_dialog dialog(_("Save SVG Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.add_pattern_filter(_("SVG Document (*.svg)"), "*.svg");
@@ -279,6 +279,14 @@ public:
 	{
 		force_directed_layout(get_graph());
 		redraw_panel();
+	}
+
+	const double aspect_ratio()
+	{
+		Gtk::Allocation allocation = m_drawing_area.get_allocation();
+		const double width = allocation.get_width();
+		const double height = allocation.get_height();
+		return height / width;
 	}
 
 	void on_draw_pipeline(GdkEventExpose* event)

@@ -48,7 +48,6 @@
 #include "merge_nodes.h"
 #include "messages.h"
 #include "modifiers.h"
-#include "node_properties.h"
 #include "open_uri.h"
 #include "panel_frame.h"
 #include "render.h"
