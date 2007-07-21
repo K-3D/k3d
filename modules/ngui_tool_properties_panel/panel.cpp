@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -17,41 +17,43 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "angle_axis_control.h"
-#include "aqsis_layer_chooser.h"
-#include "asynchronous_update.h"
-#include "bitmap_preview.h"
-#include "bounding_box.h"
-#include "button.h"
-#include "check_button.h"
-#include "collapsible_frame.h"
-#include "color_chooser.h"
-#include "combo_box.h"
-#include "document_state.h"
-#include "entry.h"
-#include "enumeration_chooser.h"
-#include "file_chooser_dialog.h"
-#include "icons.h"
-#include "messages.h"
-#include "node_chooser.h"
-#include "path_chooser.h"
-#include "point_control.h"
-#include "property_button.h"
-#include "property_label.h"
-#include "render.h"
-#include "scale.h"
-#include "script_button.h"
-#include "selection_button.h"
-#include "spin_button.h"
-#include "tool.h"
-#include "tool_properties.h"
-#include "toolbar.h"
-#include "ui_component.h"
-#include "utility.h"
-#include "widget_manip.h"
-
-#include <k3dsdk/command_tree.h>
 #include <k3d-i18n-config.h>
+
+#include <k3dsdk/ngui/angle_axis_control.h>
+#include <k3dsdk/ngui/aqsis_layer_chooser.h>
+#include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/bitmap_preview.h>
+#include <k3dsdk/ngui/bounding_box.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/check_button.h>
+#include <k3dsdk/ngui/collapsible_frame.h>
+#include <k3dsdk/ngui/color_chooser.h>
+#include <k3dsdk/ngui/combo_box.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/entry.h>
+#include <k3dsdk/ngui/enumeration_chooser.h>
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/node_chooser.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/path_chooser.h>
+#include <k3dsdk/ngui/point_control.h>
+#include <k3dsdk/ngui/property_button.h>
+#include <k3dsdk/ngui/property_label.h>
+#include <k3dsdk/ngui/render.h>
+#include <k3dsdk/ngui/scale.h>
+#include <k3dsdk/ngui/script_button.h>
+#include <k3dsdk/ngui/selection_button.h>
+#include <k3dsdk/ngui/spin_button.h>
+#include <k3dsdk/ngui/tool.h>
+#include <k3dsdk/ngui/toolbar.h>
+#include <k3dsdk/ngui/ui_component.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/widget_manip.h>
+
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/ianimation_render_engine.h>
 #include <k3dsdk/iaqsis.h>
 #include <k3dsdk/icamera.h>
@@ -72,6 +74,7 @@
 #include <k3dsdk/istill_render_engine.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/mesh_selection.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/types_ri.h>
@@ -94,19 +97,26 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/table.h>
 
+#include <boost/assign/list_of.hpp>
 #include <boost/format.hpp>
 
-namespace libk3dngui
+// Temporary hack
+using namespace libk3dngui;
+
+namespace module
 {
 
-namespace tool_properties
+namespace ngui_tool_properties
+{
+
+namespace detail
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// control::implementation
+// implementation
 
-class control::implementation :
-	public asynchronous_update
+class implementation :
+	public libk3dngui::asynchronous_update
 {
 public:
 	implementation(document_state& DocumentState, k3d::icommand_node& Parent) :
@@ -145,7 +155,7 @@ public:
 
 	void reset()
 	{
-		Glib::ListHandle<Widget*> children = m_vbox.get_children();
+		Glib::ListHandle<Gtk::Widget*> children = m_vbox.get_children();
 		std::for_each(children.begin(), children.end(), k3d::delete_object());
 	}
 
@@ -396,43 +406,79 @@ public:
 	sigc::signal<void> m_panel_grab_signal;
 };
 
+} // namespace detail
+
+
 /////////////////////////////////////////////////////////////////////////////
-// control
+// panel
 
-control::control(document_state& DocumentState, k3d::icommand_node& Parent) :
-	ui_component("tool_properties", &Parent),
-	m_implementation(new implementation(DocumentState, *this))
+class panel :
+	public libk3dngui::panel::control,
+	public libk3dngui::ui_component,
+	public k3d::ideletable,
+	public Gtk::VBox
 {
-	m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &control::record_command));
+	typedef Gtk::VBox base;
 
-	m_implementation->m_scrolled_window.signal_button_press_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
-	
-	pack_start(m_implementation->m_label, Gtk::PACK_SHRINK);
-	pack_start(m_implementation->m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
-	show_all();
-}
+public:
+	panel() :
+		ui_component("tool_properties", 0),
+		m_implementation(0)
+	{
+	}
 
-control::~control()
-{
-	delete m_implementation;
-}
+	~panel()
+	{
+		delete m_implementation;
+	}
 
-void control::initialize(document_state& DocumentState, k3d::icommand_node& Parent)
-{
-	assert_not_implemented();
-}
+	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	{
+		ui_component::set_parent("tool_properties", &Parent);
 
-const std::string control::panel_type()
-{
-	return "tool_properties";
-}
+		m_implementation = new detail::implementation(DocumentState, *this);
 
-sigc::connection control::connect_focus_signal(const sigc::slot<void>& Slot)
-{
-	return m_implementation->m_panel_grab_signal.connect(Slot);
-}
+		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
 
-} // namespace tool_properties
+		m_implementation->m_scrolled_window.signal_button_press_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
+		
+		pack_start(m_implementation->m_label, Gtk::PACK_SHRINK);
+		pack_start(m_implementation->m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
+		show_all();
+	}
 
-} // namespace libk3dngui
+	const std::string panel_type()
+	{
+		return "tool_properties";
+	}
+
+	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
+	{
+		return m_implementation->m_panel_grab_signal.connect(Slot);
+	}
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<panel> factory(
+				k3d::uuid(0x2d5c6b09, 0x4b860158, 0x901dc7b6, 0xca8cb11e),
+				"NGUIToolPropertiesPanel",
+				_("Displays tool properties"),
+				"NGUI Panels",
+				k3d::iplugin_factory::EXPERIMENTAL,
+				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "tool_properties")("panel_label", "Tool Properties"));
+
+		return factory;
+	}
+
+private:
+	detail::implementation* m_implementation;
+};
+
+} // namespace ngui_tool_properties
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui_tool_properties::panel::get_factory());
+K3D_MODULE_END
 
