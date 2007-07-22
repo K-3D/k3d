@@ -40,10 +40,10 @@ const contributors_t& contributors()
 		storage.push_back(contributor(ustring::from_utf8("Anders Dahnielson"), "Documentation, script engines, web design")); 
 		storage.push_back(contributor(ustring::from_utf8("Andy Gill"), "Too many plugins and tools to count")); 
 		storage.push_back(contributor(ustring::from_utf8("Bart Janssens"), "Subdivision surfaces, OpenGL hardware support, animation")); 
-		storage.push_back(contributor(ustring::from_utf8("Daniel S. Matthews"), "Win32 build, icons, documentation, samples"));
+		storage.push_back(contributor(ustring::from_utf8("Daniel S. \"Scalable Vector\" Matthews"), "Win32 build, icons, documentation, samples"));
 		storage.push_back(contributor(ustring::from_utf8("David Mart\303\255nez Moreno"), "Debian build, portability enhancements")); 
 		storage.push_back(contributor(ustring::from_utf8("Joaqu\303\255n Duo"), "User interface enhancements, documentation, web design")); 
-		storage.push_back(contributor(ustring::from_utf8("Joe Crawford"), "User interface design")); 
+		storage.push_back(contributor(ustring::from_utf8("Joe \"Incredibly-Super-Critical!\" Crawford"), "User interface design")); 
 		storage.push_back(contributor(ustring::from_utf8("Jotham Ritorze"), "Logo design"));
 		storage.push_back(contributor(ustring::from_utf8("Kirstyn Amanda \"GeekGirl\" Fox"), "Win32 installer")); 
 		storage.push_back(contributor(ustring::from_utf8("Paul Gregory"), "Win32 build, subdivision surfaces, bug fixes"));
