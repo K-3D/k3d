@@ -25,7 +25,6 @@
 #include <k3d-i18n-config.h>
 #include <k3d-version-config.h>
 
-#include "about_box.h"
 #include "application_state.h"
 #include "assign_hotkeys_dialog.h"
 #include "button.h"
@@ -2367,7 +2366,11 @@ private:
 
 	void on_help_about()
 	{
-		create_about_box(*this);
+		Gtk::Window* const window = k3d::create_plugin<Gtk::Window>("NGUIAboutDialog");
+		return_if_fail(window);
+
+		window->set_transient_for(*this);
+		window->show_all();
 	}
 
 	/// Unparents all selected nodes

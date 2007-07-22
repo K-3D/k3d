@@ -79,12 +79,12 @@ splash_box::splash_box(const k3d::filesystem::path& SharePath) :
 		<< center_justify()));
 
 	vbox->pack_start(*Gtk::manage(
-		new Gtk::Label("See the AUTHORS file for contributors.")
+		new Gtk::Label("See \"Help > About\" for contributors.")
 		<< line_wrap()
 		<< center_justify()));
 
 	vbox->pack_start(*Gtk::manage(
-		new Gtk::Label("This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License.  See the COPYING file for details.")
+		new Gtk::Label("This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License.  See \"Help > About\" for details.")
 		<< line_wrap()
 		<< center_justify()));
 

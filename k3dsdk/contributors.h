@@ -1,8 +1,8 @@
-#ifndef NGUI_ABOUT_BOX_H
-#define NGUI_ABOUT_BOX_H
+#ifndef K3DSDK_CONTRIBUTORS_H
+#define K3DSDK_CONTRIBUTORS_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -20,21 +20,25 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/** \file
-		\brief Declares the about_box class, which provides a standardized modal "about" box for K-3D
-		\author Tim Shead (tshead@k-3d.com)
-*/
+#include "ustring.h"
+#include <vector>
 
-// Forward declarations
-namespace Gtk { class Window; }
-
-namespace libk3dngui
+namespace k3d
 {
 
-/// Creates a modal "about" box for K-3D 
-void create_about_box(Gtk::Window& Parent);
+struct contributor
+{
+	contributor(const ustring& Name, const std::string& Description = "");
 
-} // namespace libk3dngui
+	ustring name;
+	std::string description;
+};
 
-#endif // NGUI_ABOUT_BOX_H
+typedef std::vector<contributor> contributors_t;
+
+const contributors_t& contributors();
+
+} // namespace k3d
+
+#endif // K3DSDK_CONTRIBUTORS_H
 
