@@ -171,7 +171,7 @@ void control::mount_panel(panel::control& Panel, const std::string& Type)
 	m_frame.add(dynamic_cast<Gtk::Widget&>(Panel));
 
 	m_panel_type_connection.block();
-	m_panel_type.set_active(m_type_index_map[Type]);
+	m_panel_type.set_active(index(Type));
 	m_panel_type_connection.unblock();
 }
 
@@ -337,13 +337,11 @@ void control::set_choices()
 		add_choice(panel_type, quiet_load_icon(panel_type + "_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), panel_label, sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), panel_type));
 	}
 
-//	m_model->set_sort_column(m_columns.label, Gtk::SORT_ASCENDING);
+	m_model->set_sort_column(m_columns.label, Gtk::SORT_ASCENDING);
 }
 
 void control::add_choice(const std::string& PanelType, const Glib::RefPtr<Gdk::Pixbuf> Icon, const Glib::ustring& Label, sigc::slot<void> Slot)
 {
-	m_type_index_map[PanelType] = m_model->children().size();
-
 	Gtk::TreeRow row = *m_model->append();
 
 	row[m_columns.type] = PanelType;
@@ -369,6 +367,19 @@ void control::on_decorations_changed(k3d::iunknown*)
 		m_decorations.hide();
 }
 
+const unsigned long control::index(const std::string& PanelType)
+{
+	const Gtk::TreeModel::Children children = m_model->children();
+	for(unsigned long i = 0; i != children.size(); ++i)
+	{
+		if(children[i][m_columns.type] == PanelType)
+			return i;
+	}
+
+	assert_not_reached();
+	return 0;
+}
+
 const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
 {
 	if(Command == "float")
@@ -379,7 +390,7 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 
 	if(Command == "mount")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map[Arguments]))));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index(Arguments)))));
 		return RESULT_CONTINUE;
 	}
 
@@ -387,55 +398,55 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 	
 	if(Command == "mount_node_list")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["node_list"]))));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("node_list")))));
 		return RESULT_CONTINUE;
 	}
 	
 	if(Command == "mount_node_history")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["node_history"]))));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("node_history")))));
 		return RESULT_CONTINUE;
 	}
 	
 	if(Command == "mount_node_properties")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["node_properties"]))));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("node_properties")))));
 		return RESULT_CONTINUE;
 	}
 	
 	if(Command == "mount_tool_properties")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["tool_properties"]))));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("tool_properties")))));
 		return RESULT_CONTINUE;
 	}
 	
 	if(Command == "mount_undo_tree")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["undo_tree"]))));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("undo_tree")))));
 		return RESULT_CONTINUE;
 	}
 	
 	if(Command == "mount_timeline")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["timeline"]))));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("timeline")))));
 		return RESULT_CONTINUE;
 	}
 	
 	if(Command == "mount_viewport")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["viewport"]))));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("viewport")))));
 		return RESULT_CONTINUE;
 	}
 	
 	if(Command == "mount_toolbar")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["toolbar"]))));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("toolbar")))));
 		return RESULT_CONTINUE;
 	}
 	
 	if(Command == "mount_pipeline_profiler")
 	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(m_type_index_map["pipeline_profiler"]))));
+		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("pipeline_profiler")))));
 		return RESULT_CONTINUE;
 	}
 

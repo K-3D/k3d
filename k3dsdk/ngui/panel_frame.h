@@ -111,6 +111,8 @@ private:
 	void on_panel_type_changed();
 	void on_decorations_changed(k3d::iunknown*);
 
+	const unsigned long index(const std::string& Type);
+
 	/// Called to update the contents of the combo-box for choosing panels
 	void set_choices();
 	/// Called to add a choice to the combo-box for choosing panels
@@ -138,8 +140,6 @@ private:
 
 	/// Stores a mapping from panel type to external plugin factory
 	std::map<std::string, k3d::iplugin_factory*> m_type_plugin_map;
-	/// Stores a mapping from panel type to combo box index
-	std::map<std::string, unsigned long> m_type_index_map;
 
 	Gtk::HBox m_decorations;
 	/// Provides a combo-box for choosing from available panel types
