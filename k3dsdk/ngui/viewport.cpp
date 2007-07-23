@@ -1268,12 +1268,9 @@ bool control::on_redraw()
 		GLenum err = glewInit(); // needs to be called after context creation
 		if (GLEW_OK != err)
 		{
-  		k3d::log() << error << "GLEW init failed: " << glewGetErrorString(err) << std::endl;
-  		assert_not_reached();
+			k3d::log() << error << "GLEW init failed: " << glewGetErrorString(err) << std::endl;
+			assert_not_reached();
 		}
-		k3d::log() << debug << "glew init successful" << std::endl;
-		if (GLEW_VERSION_1_5)
-			k3d::log() << debug << "OpenGL 1.5 is supported!" << std::endl;
 	}
 	
 	glew_context::instance().set_context(m_implementation->m_glew_context);
