@@ -58,10 +58,10 @@ k3d::xml::element& nags_element()
 	return ngui_element().safe_element("nags");
 }
 
-k3d::xml::element& nag_element(const std::string& Message)
+k3d::xml::element& nag_element(const std::string& Type)
 {
-	const k3d::xml::element match("nag", k3d::xml::attribute("message", Message));
-	const k3d::xml::element prototype("nag", k3d::string_cast(true), k3d::xml::attribute("message", Message));
+	const k3d::xml::element match("nag", k3d::xml::attribute("message", Type));
+	const k3d::xml::element prototype("nag", k3d::string_cast(true), k3d::xml::attribute("message", Type));
 	return nags_element().safe_element(match, prototype);
 }
 
@@ -77,14 +77,14 @@ void set_tutorial_speed(const double Speed)
 	detail::tutorial_speed_element().text = k3d::string_cast(Speed);
 }
 
-const bool nag(const std::string& Message)
+const bool nag(const std::string& Type)
 {
-	return k3d::from_string<bool>(detail::nag_element(Message).text, true);
+	return k3d::from_string<bool>(detail::nag_element(Type).text, true);
 }
 
-void enable_nag(const std::string& Message, const bool Enabled)
+void enable_nag(const std::string& Type, const bool Enabled)
 {
-	detail::nag_element(Message).text = k3d::string_cast(Enabled);
+	detail::nag_element(Type).text = k3d::string_cast(Enabled);
 }
 
 } // namespace options

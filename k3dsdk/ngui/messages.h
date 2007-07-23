@@ -24,6 +24,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/ustring.h>
+
 #include <string>
 #include <vector>
 
@@ -43,9 +45,10 @@ void error_message(const std::string& Message, const std::string& SecondaryMessa
 	 \return one-based index of the option selected by the user, or "0" if a choice was not made (e.g. user clicked WM "close" button)
 */
 unsigned int query_message(const std::string& Message, const unsigned int DefaultOption, const std::vector<std::string>& Options);
+/// Displays an information "nag" message in a modal dialog box
+void nag_message(const std::string& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage = k3d::ustring());
 
 } // namespace libk3dngui
 
 #endif // !NGUI_MESSAGES_H
-
 

@@ -38,14 +38,13 @@ const double tutorial_speed();
 void set_tutorial_speed(const double Speed);
 
 /// Returns true iff the given nag message is enabled
-const bool nag(const std::string& Message);
+const bool nag(const std::string& Type);
 /// Enables / disables the given nag message
-void enable_nag(const std::string& Message, const bool Enabled);
+void enable_nag(const std::string& Type, const bool Enabled);
 
 } // namespace options
 
 } // namespace libk3dngui
 
 #endif // !NGUI_OPTIONS_H
-
 

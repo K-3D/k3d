@@ -21,9 +21,13 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
+
 #include "application_state.h"
+#include "options.h"
 #include "widget_manip.h"
 
+#include <gtkmm/checkbutton.h>
 #include <gtkmm/label.h>
 #include <gtkmm/messagedialog.h>
 
@@ -85,6 +89,28 @@ unsigned int query_message(const std::string& Message, const unsigned int Defaul
 		result = 0;
 
 	return result;
+}
+
+void nag_message(const std::string& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
+{
+	if(application_state::instance().batch_mode())
+		return;
+
+	if(!options::nag(Type))
+		return;
+
+	Gtk::MessageDialog dialog(Message.raw(), false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
+	if(!SecondaryMessage.empty())
+		dialog.set_secondary_text(SecondaryMessage.raw());
+
+	Gtk::CheckButton show_message(_("Display this message again in the future"));
+	show_message.set_active(true);
+	show_message.show();
+	dialog.get_vbox()->pack_start(show_message);
+
+	dialog.run();
+
+	options::enable_nag(Type, show_message.get_active());
 }
 
 } // namespace libk3dngui
