@@ -27,6 +27,7 @@
 #include "options.h"
 #include "widget_manip.h"
 
+#include <gtkmm/alignment.h>
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/label.h>
 #include <gtkmm/messagedialog.h>
@@ -106,7 +107,12 @@ void nag_message(const std::string& Type, const k3d::ustring& Message, const k3d
 	Gtk::CheckButton show_message(_("Display this message again in the future"));
 	show_message.set_active(true);
 	show_message.show();
-	dialog.get_vbox()->pack_start(show_message);
+
+	Gtk::Alignment alignment(0.5, 0.5, 0, 0);
+	alignment.add(show_message);
+	alignment.show();
+
+	dialog.get_vbox()->pack_start(alignment);
 
 	dialog.run();
 

@@ -388,7 +388,7 @@ public:
 
 		const k3d::ustring message = k3d::ustring::from_utf8(k3d::string_cast(boost::format(_("Welcome to K-3D Version %1%")) % K3D_VERSION));
 		const k3d::ustring secondary_message = k3d::ustring::from_utf8(
-			"Note: this unstable preview release is not suitable for production use: "
+			"Note: this unstable preview release is not suitable for production use - "
 			"many features are incomplete or missing, existing documents may not load correctly, "
 			"and newly-saved documents may not be usable in the final release.");
 
