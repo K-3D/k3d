@@ -56,7 +56,10 @@ using namespace libk3dngui;
 namespace module
 {
 
-namespace ngui_node_history
+namespace ngui
+{
+
+namespace node_history
 {
 
 namespace detail
@@ -473,11 +476,13 @@ private:
 	detail::implementation* m_implementation;
 };
 
-} // namespace ngui_node_history
+} // namespace node_history
+
+} // namespace ngui
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::ngui_node_history::panel::get_factory());
+	Registry.register_factory(module::ngui::node_history::panel::get_factory());
 K3D_MODULE_END
 

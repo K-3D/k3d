@@ -58,7 +58,10 @@ using namespace libk3dngui;
 namespace module
 {
 
-namespace ngui_pipeline
+namespace ngui
+{
+
+namespace pipeline
 {
 
 namespace detail
@@ -588,11 +591,13 @@ private:
 	boost::shared_ptr<k3d::graph> m_graph;
 };
 
-} // namespace ngui_pipeline
+} // namespace pipeline
+
+} // namespace ngui
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::ngui_pipeline::panel::get_factory());
+	Registry.register_factory(module::ngui::pipeline::panel::get_factory());
 K3D_MODULE_END
 

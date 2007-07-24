@@ -114,7 +114,10 @@ using namespace libk3dngui;
 namespace module
 {
 
-namespace ngui_node_properties
+namespace ngui
+{
+
+namespace node_properties
 {
 
 namespace detail
@@ -846,11 +849,13 @@ private:
 	detail::implementation* m_implementation;
 };
 
-} // namespace ngui_node_properties
+} // namespace node_properties
+
+} // namespace ngui
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::ngui_node_properties::panel::get_factory());
+	Registry.register_factory(module::ngui::node_properties::panel::get_factory());
 K3D_MODULE_END
 

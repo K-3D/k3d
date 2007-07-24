@@ -47,7 +47,10 @@
 namespace module
 {
 
-namespace ngui_pipeline_profiler
+namespace ngui
+{
+
+namespace pipeline_profiler
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -345,11 +348,13 @@ private:
 	std::vector<new_record> new_records;
 };
 
-} // namespace ngui_pipeline_profiler
+} // namespace pipeline_profiler
+
+} // namespace ngui
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::ngui_pipeline_profiler::panel::get_factory());
+	Registry.register_factory(module::ngui::pipeline_profiler::panel::get_factory());
 K3D_MODULE_END
 

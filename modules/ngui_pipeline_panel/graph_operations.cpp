@@ -40,7 +40,10 @@ using namespace libk3dngui;
 namespace module
 {
 
-namespace ngui_pipeline
+namespace ngui
+{
+
+namespace pipeline
 {
 
 namespace detail
@@ -171,70 +174,6 @@ void random_layout(k3d::graph& Graph)
 	boost::random_graph_layout(topology, position_map, 0.0, 1.0, 0.0, 1.0, rng);
 }
 
-/*
-void icicle_layout(k3d::graph& Graph)
-{
-	return_if_fail(Graph.topology);
-
-	const k3d::graph::topology_t& topology = *Graph.topology;
-	boost::shared_ptr<k3d::graph::points_t> vertex_position(new k3d::graph::points_t(boost::num_vertices(topology)));
-
-	// Begin with a flat collection of vertices ...
-	typedef std::vector<size_t> icicle_t;
-	typedef std::map<size_t, icicle_t> icicles_t;
-	icicles_t icicles;
-
-	const size_t vertex_begin = 0;
-	const size_t vertex_end = boost::num_vertices(topology);
-	for(size_t vertex = vertex_begin; vertex != vertex_end; ++vertex)
-		icicles.insert(std::make_pair(vertex, std::vector<size_t>()));
-
-	// Merge vertices into vertical "icicles" based on connectivity ...
-	for(icicles_t::iterator icicle = icicles.begin(); icicle != icicles.end(); )
-	{
-		if(boost::out_degree(icicle->first, topology))
-		{
-			typedef boost::graph_traits<k3d::graph::topology_t>::out_edge_iterator iter_t;
-			std::pair<iter_t, iter_t> out_edges = boost::out_edges(icicle->first, topology);
-
-			const size_t target = boost::target(*out_edges.first, topology);
-			icicles[target].push_back(icicle->first);
-			icicles[target].insert(icicles[target].end(), icicle->second.begin(), icicle->second.end());
-			icicles.erase(icicle++);
-		}
-		else
-		{
-			++icicle;
-		}
-	}
-
-	// Assign coordinates to each vertex ...
-	const double x_offset = 0.2;
-	const double y_offset = 0.06;
-
-	double x = 0;
-	for(icicles_t::iterator icicle = icicles.begin(); icicle != icicles.end(); ++icicle)
-	{
-		double y = 0;
-
-		for(icicle_t::reverse_iterator vertex = icicle->second.rbegin(); vertex != icicle->second.rend(); ++vertex)
-		{
-			(*vertex_position)[*vertex][0] = x;
-			(*vertex_position)[*vertex][1] = y;
-
-			y += y_offset;
-		}
-
-		(*vertex_position)[icicle->first][0] = x;
-		(*vertex_position)[icicle->first][1] = y;
-
-		x += x_offset;
-	}
-
-	Graph.vertex_data["position"] = vertex_position;
-}
-*/
-
 void force_directed_layout(k3d::graph& Graph)
 {
 	return_if_fail(Graph.topology);
@@ -245,6 +184,8 @@ void force_directed_layout(k3d::graph& Graph)
 	const size_t vertex_begin = 0;
 	const size_t vertex_end = boost::num_vertices(topology);
 
+	double total_energy = 0;
+
 	// Handle repulsion forces ...
 	for(size_t vertex = vertex_begin; vertex != vertex_end; ++vertex)
 	{
@@ -253,7 +194,11 @@ void force_directed_layout(k3d::graph& Graph)
 			if(vertex != other)
 			{
 				const k3d::vector2 difference = vertex_position[vertex] - vertex_position[other];
-				vertex_position[vertex] += k3d::normalize(difference) * (0.0001 / difference.length2());
+				const double energy = 0.0001 / difference.length2();
+
+				vertex_position[vertex] += energy * k3d::normalize(difference);
+
+				total_energy += energy;
 			}
 		}
 	}
@@ -268,15 +213,22 @@ void force_directed_layout(k3d::graph& Graph)
 		if(source != target)
 		{
 			const k3d::vector2 difference = vertex_position[target] - vertex_position[source];
-			const k3d::vector2 force = k3d::normalize(difference) * (0.1 * difference.length2());
+			const double energy = 0.1 * difference.length2();
+			const k3d::vector2 force = energy * k3d::normalize(difference);
 			
 			vertex_position[source] += force;
 			vertex_position[target] -= force;
+
+			total_energy += energy;
 		}
 	}
+
+//	k3d::log() << debug << "energy: " << total_energy << " energy/node: " << total_energy / boost::num_vertices(topology) << std::endl;
 }
 
-} // namespace ngui_pipeline
+} // namespace pipeline
+
+} // namespace ngui
 
 } // namespace module
 

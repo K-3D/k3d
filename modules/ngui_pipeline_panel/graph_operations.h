@@ -29,7 +29,10 @@ namespace libk3dngui { class document_state; }
 namespace module
 {
 
-namespace ngui_pipeline
+namespace ngui
+{
+
+namespace pipeline
 {
 
 enum edge_type
@@ -63,7 +66,9 @@ array_t& get_array(map_t& Map, const std::string& Name, const size_t Count)
 	return *result;
 }
 
-} // namespace ngui_pipeline
+} // namespace pipeline
+
+} // namespace ngui
 
 } // namespace module
 

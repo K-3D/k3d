@@ -60,7 +60,10 @@ using namespace libk3dngui;
 namespace module
 {
 
-namespace ngui_toolbar
+namespace ngui
+{
+
+namespace toolbar
 {
 
 namespace detail
@@ -115,7 +118,7 @@ struct implementation
 		m_document_state(DocumentState),
 		m_toolbox(false, 0)
 	{
-		toolbar::control* const main_toolbar = new toolbar::control(Parent, "main");
+		libk3dngui::toolbar::control* const main_toolbar = new libk3dngui::toolbar::control(Parent, "main");
 		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "select",
 				detail::active_tool_proxy(m_document_state, m_document_state.selection_tool()),
@@ -254,7 +257,7 @@ struct implementation
 			const std::string toolbar_label = k3d::xml::attribute_text(*xml_toolbar, "label");
 			const std::string toolbar_description = k3d::xml::attribute_text(*xml_toolbar, "description");
 
-			toolbar::control* const toolbar_widget = new toolbar::control(Parent, toolbar_name);
+			libk3dngui::toolbar::control* const toolbar_widget = new libk3dngui::toolbar::control(Parent, toolbar_name);
 
 			for(k3d::xml::element::elements_t::const_iterator xml_button = xml_toolbar->children.begin(); xml_button != xml_toolbar->children.end(); ++xml_button)
 			{
@@ -501,11 +504,13 @@ private:
 	detail::implementation* m_implementation;
 };
 
-} // namespace ngui_toolbar
+} // namespace toolbar
+
+} // namespace ngui
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::ngui_toolbar::panel::get_factory());
+	Registry.register_factory(module::ngui::toolbar::panel::get_factory());
 K3D_MODULE_END
 
