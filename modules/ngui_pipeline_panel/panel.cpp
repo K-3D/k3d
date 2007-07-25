@@ -106,7 +106,8 @@ public:
 		m_save_ps("Save PS"),
 		m_save_svg("Save SVG"),
 		m_zoom_factor(1.0),
-		m_document_state(0)
+		m_document_state(0),
+		m_current_node(0)
 	{
 		m_hbox.pack_start(m_save_png, Gtk::PACK_SHRINK);
 		m_hbox.pack_start(m_save_pdf, Gtk::PACK_SHRINK);
@@ -137,7 +138,9 @@ public:
 		m_document_state->document().nodes().remove_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 		m_document_state->document().nodes().rename_node_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 
-		Glib::signal_timeout().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::update_layout), true), 100);
+		m_document_state->view_node_properties_signal().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::selected_node_changed), false));
+
+//		Glib::signal_timeout().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::update_layout), true), 100);
 
 		show_all();
 	}
@@ -265,6 +268,16 @@ public:
 		redraw_panel();
 	}
 
+	void selected_node_changed(k3d::inode* Node)
+	{
+		if(m_current_node != Node)
+		{
+			m_current_node = Node;
+			tree_plus_layout(get_graph(), m_current_node);
+			redraw_panel();
+		}
+	}
+
 	k3d::graph& get_graph()
 	{
 		// Create the visualization graph if it doesn't exist ...
@@ -272,7 +285,8 @@ public:
 		{
 			m_graph.reset(new k3d::graph());
 			create_graph(*m_document_state, *m_graph);
-			random_layout(*m_graph);
+			tree_plus_layout(*m_graph, m_current_node);
+//			random_layout(*m_graph);
 		}
 
 		return *m_graph;
@@ -458,11 +472,13 @@ public:
 		try
 		{
 			return_if_fail(graph.topology);
+			return_if_fail(graph.vertex_data.count("visible"));
 			return_if_fail(graph.vertex_data.count("label"));
 			return_if_fail(graph.vertex_data.count("position"));
 
 			const k3d::graph::topology_t& topology = *graph.topology;
 
+			const k3d::graph::bools_t& vertex_visible = dynamic_cast<k3d::graph::bools_t&>(*graph.vertex_data["visible"].get());
 			const k3d::graph::strings_t& vertex_label = dynamic_cast<k3d::graph::strings_t&>(*graph.vertex_data["label"].get());
 			const k3d::graph::points_t& vertex_position = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["position"].get());
 			k3d::graph::doubles_t& vertex_width = get_array<k3d::graph::doubles_t>(graph.vertex_data, "width", boost::num_vertices(topology));
@@ -474,7 +490,10 @@ public:
 			Context->set_font_size(0.03);
 
 			for(size_t i = 0; i != vertex_label.size(); ++i)
-				draw_centered_text(Context, vertex_position[i], vertex_label[i], vertex_width[i], vertex_height[i]);
+			{
+				if(vertex_visible[i])
+					draw_centered_text(Context, vertex_position[i], vertex_label[i], vertex_width[i], vertex_height[i]);
+			}
 
 			Context->restore();
 		}
@@ -494,6 +513,7 @@ public:
 			return_if_fail(graph.vertex_data.count("position"));
 			return_if_fail(graph.vertex_data.count("width"));
 			return_if_fail(graph.vertex_data.count("height"));
+			return_if_fail(graph.edge_data.count("visible"));
 			return_if_fail(graph.edge_data.count("type"));
 
 			const k3d::graph::topology_t& topology = *graph.topology;
@@ -503,6 +523,7 @@ public:
 			const k3d::graph::doubles_t& vertex_width = dynamic_cast<k3d::graph::doubles_t&>(*graph.vertex_data["width"].get());
 			const k3d::graph::doubles_t& vertex_height = dynamic_cast<k3d::graph::doubles_t&>(*graph.vertex_data["height"].get());
 
+			const k3d::graph::bools_t& edge_visible = dynamic_cast<k3d::graph::bools_t&>(*graph.edge_data["visible"].get());
 			const k3d::graph::indices_t& edge_type = dynamic_cast<k3d::graph::indices_t&>(*graph.edge_data["type"].get());
 			return_if_fail(boost::num_edges(topology) == edge_type.size());
 
@@ -514,6 +535,9 @@ public:
 			typedef boost::graph_traits<k3d::graph::topology_t>::edge_iterator iter_t;
 			for(std::pair<iter_t, iter_t> edges = boost::edges(topology); edges.first != edges.second; ++edge_index, ++edges.first)
 			{
+				if(!edge_visible[edge_index])
+					continue;
+
 				const size_t source = boost::source(*edges.first, topology);
 				const size_t target = boost::target(*edges.first, topology);
 
@@ -589,6 +613,8 @@ private:
 
 	document_state* m_document_state;
 	boost::shared_ptr<k3d::graph> m_graph;
+
+	k3d::inode* m_current_node;
 };
 
 } // namespace pipeline

@@ -24,6 +24,7 @@
 #include <string>
 
 namespace k3d { class graph; }
+namespace k3d { class inode; }
 namespace libk3dngui { class document_state; }
 
 namespace module
@@ -46,6 +47,7 @@ void create_graph(libk3dngui::document_state& DocumentState, k3d::graph& Graph);
 void random_layout(k3d::graph& Graph);
 void circular_layout(k3d::graph& Graph);
 void force_directed_layout(k3d::graph& Graph);
+void tree_plus_layout(k3d::graph& Graph, k3d::inode* Root);
 
 template<typename array_t, typename map_t>
 array_t& get_array(map_t& Map, const std::string& Name, const size_t Count)

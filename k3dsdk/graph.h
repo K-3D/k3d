@@ -40,7 +40,16 @@ public:
 	graph();
 
 	/// Defines storage for a generic graph topology
-	typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS> topology_t;
+	typedef boost::adjacency_list<boost::listS, boost::vecS, boost::bidirectionalS, boost::no_property, boost::no_property, boost::no_property> topology_t;
+	typedef boost::graph_traits<topology_t>::vertex_descriptor vertex_descriptor_t;
+	typedef boost::graph_traits<topology_t>::edge_descriptor edge_descriptor_t;
+	typedef boost::graph_traits<topology_t>::vertex_iterator vertex_iterator_t;
+	typedef boost::graph_traits<topology_t>::edge_iterator edge_iterator_t;
+	typedef boost::graph_traits<topology_t>::out_edge_iterator out_edge_iterator_t;
+	typedef boost::graph_traits<topology_t>::in_edge_iterator in_edge_iterator_t;
+
+	/// Defines storage for a generic collection of bools
+	typedef typed_array<bool> bools_t;
 	/// Defines storage for a generic collection of indices
 	typedef typed_array<size_t> indices_t;
 	/// Defines storage for a generic collection of floating-point values
@@ -49,6 +58,9 @@ public:
 	typedef typed_array<std::string> strings_t;
 	/// Defines storage for a generic collection of two-dimensional points
 	typedef typed_array<k3d::point2> points_t;
+	/// Defines storage for a generic collection of two-dimensional vectors
+	typedef typed_array<k3d::vector2> vectors_t;
+
 	/// Defines a heterogeneous collection of named, shared arrays
 	typedef std::map<std::string, boost::shared_ptr<array> > named_arrays;
 
