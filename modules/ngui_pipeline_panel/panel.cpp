@@ -107,7 +107,12 @@ public:
 		m_save_svg("Save SVG"),
 		m_zoom_factor(1.0),
 		m_document_state(0),
-		m_current_node(0)
+		m_current_node(0),
+		m_column_width(0.4),
+		m_column_offset(0.7),
+		m_row_height(0.09),
+		m_row_offset(0.1),
+		m_arrow_size(0.04)
 	{
 		m_hbox.pack_start(m_save_png, Gtk::PACK_SHRINK);
 		m_hbox.pack_start(m_save_pdf, Gtk::PACK_SHRINK);
@@ -139,8 +144,6 @@ public:
 		m_document_state->document().nodes().rename_node_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 
 		m_document_state->view_node_properties_signal().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::selected_node_changed), false));
-
-//		Glib::signal_timeout().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::update_layout), true), 100);
 
 		show_all();
 	}
@@ -273,8 +276,7 @@ public:
 		if(m_current_node != Node)
 		{
 			m_current_node = Node;
-			tree_plus_layout(get_graph(), m_current_node);
-			redraw_panel();
+			reset_graph();
 		}
 	}
 
@@ -286,16 +288,24 @@ public:
 			m_graph.reset(new k3d::graph());
 			create_graph(*m_document_state, *m_graph);
 			tree_plus_layout(*m_graph, m_current_node);
-//			random_layout(*m_graph);
+			calculate_geometry(*m_graph);
 		}
 
 		return *m_graph;
 	}
 
-	void update_layout()
+	void calculate_geometry(k3d::graph& Graph)
 	{
-		force_directed_layout(get_graph());
-		redraw_panel();
+		return_if_fail(Graph.topology);
+
+		const k3d::graph::topology_t& topology = *Graph.topology;
+		const size_t vertex_count = boost::num_vertices(topology);
+
+		k3d::graph::ints_t& vertex_column = get_array<k3d::graph::ints_t>(Graph.vertex_data, "column", vertex_count);
+		k3d::graph::ints_t& vertex_row = get_array<k3d::graph::ints_t>(Graph.vertex_data, "row", vertex_count);
+		k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(Graph.vertex_data, "position", vertex_count);
+		for(size_t vertex = 0; vertex != vertex_count; ++vertex)
+			vertex_position[vertex] = k3d::point2(m_column_offset * vertex_column[vertex], m_row_offset * vertex_row[vertex]);
 	}
 
 	const double aspect_ratio()
@@ -370,6 +380,15 @@ public:
 		}
 	}
 
+	void draw_box(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& P1, const k3d::point2& P2)
+	{
+		Context->move_to(P1[0], P1[1]);
+		Context->line_to(P2[0], P1[1]);
+		Context->line_to(P2[0], P2[1]);
+		Context->line_to(P1[0], P2[1]);
+		Context->fill();
+	}
+
 	void draw_arrow(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Source, const k3d::point2& Target, const double Size)
 	{
 		if(!k3d::length(Source - Target))
@@ -400,25 +419,37 @@ public:
 		Context->fill();
 	}
 
-	void draw_box_to_box_arrow(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Source, const double SourceWidth, const double SourceHeight, const k3d::point2& Target, const double TargetWidth, const double TargetHeight, const double Size)
+	void draw_curved_arrow(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Source, const k3d::point2& Target, const double Size)
 	{
-		k3d::point2 source(Source);
-		k3d::point2 target(Target);
+		if(!k3d::length(Source - Target))
+			return;
 
-/*
-		if(source[1] < target[1])
-		{
-			source[1] += SourceHeight / 2;
-			target[1] -= TargetHeight / 2;
-		}
-		else
-		{
-			source[1] -= SourceHeight / 2;
-			target[1] += TargetHeight / 2;
-		}
-*/
+		const k3d::vector2 length_vector = k3d::normalize(k3d::vector2(Source[0] - Target[0], 0));
+		const k3d::vector2 width_vector = k3d::perpendicular(length_vector);
 
-		draw_arrow(Context, source, target, Size);
+		const k3d::point2 a = Source;
+		const k3d::point2 b = Target + (Size * length_vector);
+		const k3d::point2 c = Target + (Size * length_vector) + (0.3 * Size * width_vector);
+		const k3d::point2 d = Target;
+		const k3d::point2 e = Target + (Size * length_vector) + (-0.3 * Size * width_vector);
+
+		const k3d::point2 ca = Source + k3d::vector2((Target[0] - Source[0]) * 0.4, 0);
+		const k3d::point2 cb = Target + k3d::vector2((Source[0] - Target[0]) * 0.4, 0);
+
+		Context->set_line_cap(Cairo::LINE_CAP_BUTT);
+		Context->set_line_join(Cairo::LINE_JOIN_MITER);
+
+		// Draw the line ...
+		Context->move_to(a[0], a[1]);
+		Context->curve_to(ca[0], ca[1], cb[0], cb[1], b[0], b[1]);
+		Context->stroke();
+
+		// Draw the arrow ...
+		Context->move_to(c[0], c[1]);
+		Context->line_to(d[0], d[1]);
+		Context->line_to(e[0], e[1]);
+		Context->line_to(c[0], c[1]);
+		Context->fill();
 	}
 
 	void draw_centered_text(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Position, const std::string& Text, double& Width, double& Height)
@@ -492,7 +523,9 @@ public:
 			for(size_t i = 0; i != vertex_label.size(); ++i)
 			{
 				if(vertex_visible[i])
+				{
 					draw_centered_text(Context, vertex_position[i], vertex_label[i], vertex_width[i], vertex_height[i]);
+				}
 			}
 
 			Context->restore();
@@ -558,15 +591,17 @@ public:
 					}
 				}
 
-				draw_box_to_box_arrow(
+				k3d::point2 begin = vertex_position[source];
+				k3d::point2 end = vertex_position[target];
+
+				begin[0] += end[0] > begin[0] ? m_column_width * 0.5 : m_column_width * -0.5;
+				end[0] -= end[0] > begin[0] ? m_column_width * 0.5 : m_column_width * -0.5;
+
+				draw_curved_arrow(
 					Context,
-					vertex_position[source],
-					vertex_width[source],
-					vertex_height[source] * 1.5,
-					vertex_position[target],
-					vertex_width[target],
-					vertex_height[target] * 1.5,
-					0.04);
+					begin,
+					end,
+					m_arrow_size);
 			}
 
 			Context->restore();
@@ -615,6 +650,12 @@ private:
 	boost::shared_ptr<k3d::graph> m_graph;
 
 	k3d::inode* m_current_node;
+
+	double m_column_width;
+	double m_column_offset;
+	double m_row_height;
+	double m_row_offset;
+	double m_arrow_size;
 };
 
 } // namespace pipeline

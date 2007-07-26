@@ -49,6 +49,7 @@ namespace pipeline
 namespace detail
 {
 
+/*
 class position_map
 {
 public:
@@ -93,6 +94,7 @@ void put(property_map_t& Map, typename property_map_t::key_type Key, typename pr
 {
 	Map.storage[Key] = Value;
 }
+*/
 
 } // namespace detail
 
@@ -131,7 +133,6 @@ void create_graph(document_state& DocumentState, k3d::graph& Graph)
 					{
 						boost::add_edge(node_map[referenced_node], node_map[*node], *topology);
 						edge_type->push_back(BEHAVIOR_EDGE);
-//								stream << " [style=dotted,label=\"" << escaped_string((*property)->property_name()) << "\"]\n";
 					}
 				}
 			}
@@ -145,7 +146,6 @@ void create_graph(document_state& DocumentState, k3d::graph& Graph)
 		{
 			boost::add_edge(node_map[dependency->second->property_node()], node_map[dependency->first->property_node()], *topology);
 			edge_type->push_back(DATA_EDGE);
-//					stream << " [headlabel=\"" << escaped_string(dependency->first->property_name()) << "\" taillabel=\"" << escaped_string(dependency->second->property_name()) << "\"]\n";
 		}
 	}
 
@@ -155,104 +155,55 @@ void create_graph(document_state& DocumentState, k3d::graph& Graph)
 	Graph.edge_data["type"] = edge_type;
 }
 
-void circular_layout(k3d::graph& Graph)
+void tree_plus_layout(
+	const k3d::graph::topology_t& Topology,
+	const std::vector<size_t>& Vertices,
+	k3d::graph::bools_t& VertexVisible,
+	k3d::graph::ints_t& VertexColumn,
+	k3d::graph::ints_t& VertexRow,
+	size_t Column
+	)
 {
-	return_if_fail(Graph.topology);
+	std::vector<size_t> new_vertices;
 
-	const k3d::graph::topology_t& topology = *Graph.topology;
-	k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(Graph.vertex_data, "position", boost::num_vertices(topology));
-	k3d::graph::bools_t& vertex_visible = get_array<k3d::graph::bools_t>(Graph.vertex_data, "visible", boost::num_vertices(topology));
-	k3d::graph::bools_t& edge_visible = get_array<k3d::graph::bools_t>(Graph.edge_data, "visible", boost::num_edges(topology));
-
-	detail::position_map position_map(vertex_position);
-	boost::circle_graph_layout(topology, position_map, 0.5);
-
-	std::fill(vertex_visible.begin(), vertex_visible.end(), true);
-	std::fill(edge_visible.begin(), edge_visible.end(), true);
-}
-
-void random_layout(k3d::graph& Graph)
-{
-	return_if_fail(Graph.topology);
-
-	const k3d::graph::topology_t& topology = *Graph.topology;
-	k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(Graph.vertex_data, "position", boost::num_vertices(topology));
-	k3d::graph::bools_t& vertex_visible = get_array<k3d::graph::bools_t>(Graph.vertex_data, "visible", boost::num_vertices(topology));
-	k3d::graph::bools_t& edge_visible = get_array<k3d::graph::bools_t>(Graph.edge_data, "visible", boost::num_edges(topology));
-
-	detail::position_map position_map(vertex_position);
-	boost::mt19937 rng;
-	boost::random_graph_layout(topology, position_map, 0.0, 1.0, 0.0, 1.0, rng);
-
-	std::fill(vertex_visible.begin(), vertex_visible.end(), true);
-	std::fill(edge_visible.begin(), edge_visible.end(), true);
-}
-
-void force_directed_layout(k3d::graph& Graph)
-{
-	return_if_fail(Graph.topology);
-
-	const k3d::graph::topology_t& topology = *Graph.topology;
-	const size_t vertex_count = boost::num_vertices(topology);
-
-	k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(Graph.vertex_data, "position", vertex_count);
-	k3d::graph::bools_t& vertex_visible = get_array<k3d::graph::bools_t>(Graph.vertex_data, "visible", boost::num_vertices(topology));
-	k3d::graph::bools_t& edge_visible = get_array<k3d::graph::bools_t>(Graph.edge_data, "visible", boost::num_edges(topology));
-
-	// Handle repulsion forces ...
-	for(size_t vertex = 0; vertex != vertex_count; ++vertex)
+	size_t row = 0;
+	for(size_t i = 0; i != Vertices.size(); ++i)
 	{
-		for(size_t other = 0; other != vertex_count; ++other)
-		{
-			if(vertex != other)
-			{
-				const k3d::vector2 difference = vertex_position[vertex] - vertex_position[other];
-				const double energy = 0.001 / difference.length2();
-				const k3d::vector2 force = energy * k3d::normalize(difference);
+		const size_t vertex = Vertices[i];
 
-				vertex_position[vertex] += energy * force;
-			}
+		std::pair<k3d::graph::in_edge_iterator_t, k3d::graph::in_edge_iterator_t> in_edges = boost::in_edges(vertex, Topology);
+		for(k3d::graph::in_edge_iterator_t edge = in_edges.first; edge != in_edges.second; ++edge)
+		{
+			const size_t edge_vertex = boost::source(*edge, Topology);
+
+			if(VertexVisible[edge_vertex])
+				continue;
+
+			VertexVisible[edge_vertex] = true;
+			VertexColumn[edge_vertex] = Column;
+			VertexRow[edge_vertex] = row++;
+
+			new_vertices.push_back(edge_vertex);
+		}
+
+		std::pair<k3d::graph::out_edge_iterator_t, k3d::graph::out_edge_iterator_t> out_edges = boost::out_edges(vertex, Topology);
+		for(k3d::graph::out_edge_iterator_t edge = out_edges.first; edge != out_edges.second; ++edge)
+		{
+			const size_t edge_vertex = boost::target(*edge, Topology);
+
+			if(VertexVisible[edge_vertex])
+				continue;
+
+			VertexVisible[edge_vertex] = true;
+			VertexColumn[edge_vertex] = Column;
+			VertexRow[edge_vertex] = row++;
+
+			new_vertices.push_back(edge_vertex);
 		}
 	}
 
-	// Handle attraction forces ...
-	typedef boost::graph_traits<k3d::graph::topology_t>::edge_iterator iter_t;
-	for(std::pair<iter_t, iter_t> edges = boost::edges(topology); edges.first != edges.second; ++edges.first)
-	{
-		const size_t source = boost::source(*edges.first, topology);
-		const size_t target = boost::target(*edges.first, topology);
-
-		if(source != target)
-		{
-			const k3d::vector2 difference = vertex_position[target] - vertex_position[source];
-			const double energy = 0.1 * difference.length2();
-			const k3d::vector2 force = energy * k3d::normalize(difference);
-			
-			vertex_position[source] += force;
-			vertex_position[target] -= force;
-		}
-	}
-
-/*
-	// Handle gravity forces ...
-	k3d::point2 origin;
-	for(size_t vertex = 0; vertex != vertex_count; ++vertex)
-		origin = origin + vertex_position[vertex];
-	if(vertex_count)
-		origin /= vertex_count;
-
-	for(size_t vertex = 0; vertex != vertex_count; ++vertex)
-	{
-		const k3d::vector2 difference = origin - vertex_position[vertex];
-		const double energy =  0.01 *  difference.length2();
-		const k3d::vector2 force = energy * k3d::normalize(difference);
-
-		vertex_position[vertex] += force;
-	}
-*/
-
-	std::fill(vertex_visible.begin(), vertex_visible.end(), true);
-	std::fill(edge_visible.begin(), edge_visible.end(), true);
+	if(!new_vertices.empty())
+		tree_plus_layout(Topology, new_vertices, VertexVisible, VertexColumn, VertexRow, Column + 1);
 }
 
 void tree_plus_layout(k3d::graph& Graph, k3d::inode* Root)
@@ -263,7 +214,8 @@ void tree_plus_layout(k3d::graph& Graph, k3d::inode* Root)
 
 	k3d::typed_array<k3d::inode*>& vertex_node = get_array<k3d::typed_array<k3d::inode*> >(Graph.vertex_data, "node", boost::num_vertices(topology));
 	k3d::graph::bools_t& vertex_visible = get_array<k3d::graph::bools_t>(Graph.vertex_data, "visible", boost::num_vertices(topology));
-	k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(Graph.vertex_data, "position", boost::num_vertices(topology));
+	k3d::graph::ints_t& vertex_column = get_array<k3d::graph::ints_t>(Graph.vertex_data, "column", boost::num_vertices(topology));
+	k3d::graph::ints_t& vertex_row = get_array<k3d::graph::ints_t>(Graph.vertex_data, "row", boost::num_vertices(topology));
 	
 	k3d::graph::bools_t& edge_visible = get_array<k3d::graph::bools_t>(Graph.edge_data, "visible", boost::num_edges(topology));
 
@@ -274,45 +226,24 @@ void tree_plus_layout(k3d::graph& Graph, k3d::inode* Root)
 	const size_t vertex_end = boost::num_vertices(topology);
 	for(size_t vertex = vertex_begin; vertex != vertex_end; ++vertex)
 	{
-		if(vertex_node[vertex] == Root)
+		if(vertex_node[vertex] != Root)
+			continue;
+
+		vertex_visible[vertex] = true;
+		vertex_column[vertex] = 0;
+		vertex_row[vertex] = 0;
+
+		tree_plus_layout(topology, std::vector<size_t>(1, vertex), vertex_visible, vertex_column, vertex_row, 1);
+
+		std::pair<k3d::graph::edge_iterator_t, k3d::graph::edge_iterator_t> edges = boost::edges(topology);
+		size_t edge_index = 0;
+		for(k3d::graph::edge_iterator_t edge = edges.first; edge != edges.second; ++edge, ++edge_index)
 		{
-			vertex_visible[vertex] = true;
-			vertex_position[vertex] = k3d::point2(0, 0);
-
-			std::pair<k3d::graph::out_edge_iterator_t, k3d::graph::out_edge_iterator_t> out_edges = boost::out_edges(vertex, topology);
-			size_t edge_index = 0;
-			for(k3d::graph::out_edge_iterator_t edge = out_edges.first; edge != out_edges.second; ++edge, ++edge_index)
-			{
-				const size_t vertex = boost::target(*edge, topology);
-
-				vertex_visible[vertex] = true;
-				vertex_position[vertex] = k3d::point2(0.4, 0.1 * edge_index);
-
-//				edge_visible[boost::edge(*edge, topology).first] = true;
-			}
-
-			std::pair<k3d::graph::in_edge_iterator_t, k3d::graph::in_edge_iterator_t> in_edges = boost::in_edges(vertex, topology);
-			edge_index = 0;
-			for(k3d::graph::in_edge_iterator_t edge = in_edges.first; edge != in_edges.second; ++edge, ++edge_index)
-			{
-				const size_t vertex = boost::source(*edge, topology);
-
-				vertex_visible[vertex] = true;
-				vertex_position[vertex] = k3d::point2(-0.4, 0.1 * edge_index);
-
-//				edge_visible[boost::edge(*edge, topology).first] = true;
-			}
-
-			std::pair<k3d::graph::edge_iterator_t, k3d::graph::edge_iterator_t> edges = boost::edges(topology);
-			edge_index = 0;
-			for(k3d::graph::edge_iterator_t edge = edges.first; edge != edges.second; ++edge, ++edge_index)
-			{
-				if(boost::source(*edge, topology) == vertex)
-					edge_visible[edge_index] = true;
-				else if(boost::target(*edge, topology) == vertex)
-					edge_visible[edge_index] = true;
-			}
+			if(vertex_visible[boost::source(*edge, topology)] && vertex_visible[boost::target(*edge, topology)])
+				edge_visible[edge_index] = true;
 		}
+
+		break;
 	}
 }
 

@@ -54,6 +54,7 @@ public:
 	typedef typed_array<size_t> indices_t;
 	/// Defines storage for a generic collection of floating-point values
 	typedef typed_array<double> doubles_t;
+	typedef typed_array<int> ints_t;
 	/// Defines storage for a generic collection of strings
 	typedef typed_array<std::string> strings_t;
 	/// Defines storage for a generic collection of two-dimensional points
