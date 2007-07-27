@@ -25,6 +25,7 @@
 
 #include "graph_operations.h"
 
+#include <k3dsdk/ngui/basic_input_model.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/ngui/panel.h>
@@ -127,11 +128,18 @@ public:
 		m_save_ps.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_ps));
 		m_save_svg.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_svg));
 
+		m_input_model.connect_lbutton_double_click(sigc::mem_fun(*this, &panel::on_toggle_node_expansion));
+		m_input_model.connect_mbutton_start_drag(sigc::mem_fun(*this, &panel::on_start_pan));
+		m_input_model.connect_mbutton_drag(sigc::mem_fun(*this, &panel::on_pan));
+		m_input_model.connect_scroll(sigc::mem_fun(*this, &panel::on_scroll_zoom));
+
 		m_drawing_area.add_events(Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK | Gdk::SCROLL_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
 		m_drawing_area.connect_expose_event(sigc::mem_fun(*this, &panel::on_draw_pipeline));
-		m_drawing_area.signal_button_press_event().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::on_button_press), true));
-		m_drawing_area.signal_motion_notify_event().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::on_mouse_motion), true));
-		m_drawing_area.signal_scroll_event().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::on_mouse_scroll), true));
+
+		m_drawing_area.signal_button_press_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &basic_input_model::button_press_event), true));
+		m_drawing_area.signal_button_release_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &basic_input_model::button_release_event), true));
+		m_drawing_area.signal_motion_notify_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &basic_input_model::motion_notify_event), true));
+		m_drawing_area.signal_scroll_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &basic_input_model::scroll_event), true));
 	}
 
 	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent)
@@ -141,7 +149,7 @@ public:
 		
 		m_document_state->document().nodes().add_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 		m_document_state->document().nodes().remove_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
-		m_document_state->document().nodes().rename_node_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
+		m_document_state->document().nodes().rename_node_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::redraw_panel)));
 
 		m_document_state->view_node_properties_signal().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::selected_node_changed), false));
 
@@ -256,6 +264,61 @@ public:
 		draw_pipeline(context, width, height);
 	}
 
+	void on_toggle_node_expansion(const GdkEventButton& Event)
+	{
+k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
+
+/*
+		k3d::graph& graph = get_graph();
+		const k3d::graph::topology_t& topology = *graph.topology;
+		const size_t vertex_count = boost::num_vertices(topology);
+
+		const k3d::graph::bools_t& vertex_expanded = get_array<k3d::graph::bools_t>(graph.vertex_data, "expanded", vertex_count);
+		const k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(graph.vertex_data, "position", vertex_count);
+		k3d::graph::doubles_t& vertex_width = get_array<k3d::graph::doubles_t>(graph.vertex_data, "width", vertex_count);
+		k3d::graph::doubles_t& vertex_height = get_array<k3d::graph::doubles_t>(graph.vertex_data, "height", vertex_count);
+*/
+	}
+
+	void on_start_pan(const GdkEventMotion& Event)
+	{
+		m_last_mouse = k3d::point2(Event.x, Event.y);
+	}
+
+	void on_pan(const GdkEventMotion& Event)
+	{
+		const k3d::point2 current_mouse = k3d::point2(Event.x, Event.y);
+		const k3d::vector2 delta = current_mouse - m_last_mouse;
+
+		Gtk::Allocation allocation = m_drawing_area.get_allocation();
+		const double width = allocation.get_width();
+		const double height = allocation.get_height();
+
+		m_origin += delta * (1.0 / m_zoom_factor) * (1.0 / std::min(width, height));
+		m_last_mouse = current_mouse;
+
+		redraw_panel();
+	}
+
+	void on_scroll_zoom(const GdkEventScroll& Event)
+	{
+		static const double zoom_sensitivity = 1.2;
+
+		switch(Event.direction)
+		{
+			case GDK_SCROLL_UP:
+				m_zoom_factor *= zoom_sensitivity;
+				redraw_panel();
+				break;
+			case GDK_SCROLL_DOWN:
+				m_zoom_factor *= (1.0 / zoom_sensitivity);
+				redraw_panel();
+				break;
+			default:
+				break;
+		}
+	}
+
 	void redraw_panel()
 	{
 		if(Glib::RefPtr<Gdk::Window> window = m_drawing_area.get_window())
@@ -282,13 +345,23 @@ public:
 
 	k3d::graph& get_graph()
 	{
-		// Create the visualization graph if it doesn't exist ...
 		if(!m_graph)
 		{
 			m_graph.reset(new k3d::graph());
 			create_graph(*m_document_state, *m_graph);
-			tree_plus_layout(*m_graph, m_current_node);
-			calculate_geometry(*m_graph);
+
+			const k3d::graph::topology_t& topology = *m_graph->topology;
+			const size_t vertex_count = boost::num_vertices(topology);
+			const nodes_t& vertex_node = get_array<nodes_t>(m_graph->vertex_data, "node", vertex_count);
+			for(size_t vertex = 0; vertex != vertex_count; ++vertex)
+			{
+				if(vertex_node[vertex] != m_current_node)
+					continue;
+			
+				tree_plus_layout(*m_graph, vertex);
+				calculate_geometry(*m_graph);
+				break;
+			}
 		}
 
 		return *m_graph;
@@ -335,48 +408,6 @@ public:
 			}
 
 			draw_pipeline(context, width, height);
-		}
-	}
-
-	void on_button_press(GdkEventButton* Event)
-	{
-		m_last_mouse = k3d::point2(Event->x, Event->y);
-	}
-
-	void on_mouse_motion(GdkEventMotion* Event)
-	{
-//		if(Event->button == 2)
-		{
-			const k3d::point2 current_mouse = k3d::point2(Event->x, Event->y);
-			const k3d::vector2 delta = current_mouse - m_last_mouse;
-
-			Gtk::Allocation allocation = m_drawing_area.get_allocation();
-			const double width = allocation.get_width();
-			const double height = allocation.get_height();
-
-			m_origin += delta * (1.0 / m_zoom_factor) * (1.0 / std::min(width, height));
-			m_last_mouse = current_mouse;
-
-			redraw_panel();
-		}
-	}
-
-	void on_mouse_scroll(GdkEventScroll* Event)
-	{
-		static const double zoom_sensitivity = 1.2;
-
-		switch(Event->direction)
-		{
-			case GDK_SCROLL_UP:
-				m_zoom_factor *= zoom_sensitivity;
-				redraw_panel();
-				break;
-			case GDK_SCROLL_DOWN:
-				m_zoom_factor *= (1.0 / zoom_sensitivity);
-				redraw_panel();
-				break;
-			default:
-				break;
 		}
 	}
 
@@ -503,28 +534,26 @@ public:
 		try
 		{
 			return_if_fail(graph.topology);
-			return_if_fail(graph.vertex_data.count("visible"));
-			return_if_fail(graph.vertex_data.count("label"));
-			return_if_fail(graph.vertex_data.count("position"));
 
 			const k3d::graph::topology_t& topology = *graph.topology;
+			const size_t vertex_count = boost::num_vertices(topology);
 
-			const k3d::graph::bools_t& vertex_visible = dynamic_cast<k3d::graph::bools_t&>(*graph.vertex_data["visible"].get());
-			const k3d::graph::strings_t& vertex_label = dynamic_cast<k3d::graph::strings_t&>(*graph.vertex_data["label"].get());
-			const k3d::graph::points_t& vertex_position = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["position"].get());
-			k3d::graph::doubles_t& vertex_width = get_array<k3d::graph::doubles_t>(graph.vertex_data, "width", boost::num_vertices(topology));
-			k3d::graph::doubles_t& vertex_height = get_array<k3d::graph::doubles_t>(graph.vertex_data, "height", boost::num_vertices(topology));
+			const k3d::graph::bools_t& vertex_visible = get_array<k3d::graph::bools_t>(graph.vertex_data, "visible", vertex_count);
+			const nodes_t& vertex_node = get_array<nodes_t>(graph.vertex_data, "node", vertex_count);
+			const k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(graph.vertex_data, "position", vertex_count);
+			k3d::graph::doubles_t& vertex_width = get_array<k3d::graph::doubles_t>(graph.vertex_data, "width", vertex_count);
+			k3d::graph::doubles_t& vertex_height = get_array<k3d::graph::doubles_t>(graph.vertex_data, "height", vertex_count);
 
 			Context->save();
 
 			Context->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
 			Context->set_font_size(0.03);
 
-			for(size_t i = 0; i != vertex_label.size(); ++i)
+			for(size_t vertex = 0; vertex != vertex_count; ++vertex)
 			{
-				if(vertex_visible[i])
+				if(vertex_visible[vertex])
 				{
-					draw_centered_text(Context, vertex_position[i], vertex_label[i], vertex_width[i], vertex_height[i]);
+					draw_centered_text(Context, vertex_position[vertex], vertex_node[vertex]->name(), vertex_width[vertex], vertex_height[vertex]);
 				}
 			}
 
@@ -543,22 +572,15 @@ public:
 		try
 		{
 			return_if_fail(graph.topology);
-			return_if_fail(graph.vertex_data.count("position"));
-			return_if_fail(graph.vertex_data.count("width"));
-			return_if_fail(graph.vertex_data.count("height"));
-			return_if_fail(graph.edge_data.count("visible"));
-			return_if_fail(graph.edge_data.count("type"));
 
 			const k3d::graph::topology_t& topology = *graph.topology;
+			const size_t vertex_count = boost::num_vertices(topology);
+			const size_t edge_count = boost::num_edges(topology);
 
-			const k3d::graph::points_t& vertex_position = dynamic_cast<k3d::graph::points_t&>(*graph.vertex_data["position"].get());
-			return_if_fail(boost::num_vertices(topology) == vertex_position.size());
-			const k3d::graph::doubles_t& vertex_width = dynamic_cast<k3d::graph::doubles_t&>(*graph.vertex_data["width"].get());
-			const k3d::graph::doubles_t& vertex_height = dynamic_cast<k3d::graph::doubles_t&>(*graph.vertex_data["height"].get());
+			const k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(graph.vertex_data, "position", vertex_count);
 
-			const k3d::graph::bools_t& edge_visible = dynamic_cast<k3d::graph::bools_t&>(*graph.edge_data["visible"].get());
-			const k3d::graph::indices_t& edge_type = dynamic_cast<k3d::graph::indices_t&>(*graph.edge_data["type"].get());
-			return_if_fail(boost::num_edges(topology) == edge_type.size());
+			const k3d::graph::bools_t& edge_visible = get_array<k3d::graph::bools_t>(graph.edge_data, "visible", edge_count);
+			const k3d::graph::indices_t& edge_type = get_array<k3d::graph::indices_t>(graph.edge_data, "type", edge_count);
 
 			Context->save();
 			Context->set_line_width(0.003);
@@ -656,6 +678,8 @@ private:
 	double m_row_height;
 	double m_row_offset;
 	double m_arrow_size;
+
+	basic_input_model m_input_model;
 };
 
 } // namespace pipeline

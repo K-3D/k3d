@@ -48,14 +48,15 @@ public:
 	typedef boost::graph_traits<topology_t>::out_edge_iterator out_edge_iterator_t;
 	typedef boost::graph_traits<topology_t>::in_edge_iterator in_edge_iterator_t;
 
-	/// Defines storage for a generic collection of bools
+	/// Defines storage for a generic collection of boolean values
 	typedef typed_array<bool> bools_t;
-	/// Defines storage for a generic collection of indices
+	/// Defines storage for a generic collection of index values
 	typedef typed_array<size_t> indices_t;
 	/// Defines storage for a generic collection of floating-point values
 	typedef typed_array<double> doubles_t;
+	/// Defines storage for a generic collection of integer values
 	typedef typed_array<int> ints_t;
-	/// Defines storage for a generic collection of strings
+	/// Defines storage for a generic collection of string values
 	typedef typed_array<std::string> strings_t;
 	/// Defines storage for a generic collection of two-dimensional points
 	typedef typed_array<k3d::point2> points_t;

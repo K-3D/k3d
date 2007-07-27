@@ -21,9 +21,9 @@
 	\author Timothy M. Shead
 */
 
+#include <k3dsdk/graph.h>
 #include <string>
 
-namespace k3d { class graph; }
 namespace k3d { class inode; }
 namespace libk3dngui { class document_state; }
 
@@ -44,7 +44,7 @@ enum edge_type
 
 void create_graph(libk3dngui::document_state& DocumentState, k3d::graph& Graph);
 
-void tree_plus_layout(k3d::graph& Graph, k3d::inode* Root);
+void tree_plus_layout(k3d::graph& Graph, const k3d::graph::vertex_descriptor_t Root);
 
 template<typename array_t, typename map_t>
 array_t& get_array(map_t& Map, const std::string& Name, const size_t Count)
@@ -64,6 +64,8 @@ array_t& get_array(map_t& Map, const std::string& Name, const size_t Count)
 
 	return *result;
 }
+
+typedef k3d::typed_array<k3d::inode*> nodes_t;
 
 } // namespace pipeline
 
