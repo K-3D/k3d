@@ -32,6 +32,7 @@
 #include <k3dsdk/ngui/ui_component.h>
 
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/graph.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
@@ -108,7 +109,8 @@ public:
 		m_save_svg("Save SVG"),
 		m_zoom_factor(1.0),
 		m_document_state(0),
-		m_current_node(0),
+		m_root_node(0),
+		m_root_vertex(0),
 		m_column_width(0.4),
 		m_column_offset(0.7),
 		m_row_height(0.09),
@@ -149,7 +151,7 @@ public:
 		
 		m_document_state->document().nodes().add_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 		m_document_state->document().nodes().remove_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
-		m_document_state->document().nodes().rename_node_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::redraw_panel)));
+		m_document_state->document().nodes().rename_node_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::schedule_redraw)));
 
 		m_document_state->view_node_properties_signal().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::selected_node_changed), false));
 
@@ -266,18 +268,29 @@ public:
 
 	void on_toggle_node_expansion(const GdkEventButton& Event)
 	{
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-
-/*
 		k3d::graph& graph = get_graph();
 		const k3d::graph::topology_t& topology = *graph.topology;
 		const size_t vertex_count = boost::num_vertices(topology);
 
-		const k3d::graph::bools_t& vertex_expanded = get_array<k3d::graph::bools_t>(graph.vertex_data, "expanded", vertex_count);
+		k3d::graph::bools_t& vertex_expanded = get_array<k3d::graph::bools_t>(graph.vertex_data, "expanded", vertex_count);
 		const k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(graph.vertex_data, "position", vertex_count);
-		k3d::graph::doubles_t& vertex_width = get_array<k3d::graph::doubles_t>(graph.vertex_data, "width", vertex_count);
-		k3d::graph::doubles_t& vertex_height = get_array<k3d::graph::doubles_t>(graph.vertex_data, "height", vertex_count);
-*/
+		const k3d::graph::doubles_t& vertex_width = get_array<k3d::graph::doubles_t>(graph.vertex_data, "width", vertex_count);
+		const k3d::graph::doubles_t& vertex_height = get_array<k3d::graph::doubles_t>(graph.vertex_data, "height", vertex_count);
+
+		const k3d::point2 mouse = world_to_user(k3d::point2(Event.x, Event.y));
+
+		for(size_t vertex = 0; vertex != vertex_count; ++vertex)
+		{
+			const k3d::rectangle box(vertex_position[vertex], vertex_width[vertex], vertex_height[vertex]);
+			if(box.contains(mouse))
+			{
+				vertex_expanded[vertex] = !vertex_expanded[vertex];
+				tree_plus_layout(graph, m_root_vertex);
+				calculate_geometry(graph);
+				schedule_redraw();
+				return;
+			}
+		}
 	}
 
 	void on_start_pan(const GdkEventMotion& Event)
@@ -297,7 +310,7 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 		m_origin += delta * (1.0 / m_zoom_factor) * (1.0 / std::min(width, height));
 		m_last_mouse = current_mouse;
 
-		redraw_panel();
+		schedule_redraw();
 	}
 
 	void on_scroll_zoom(const GdkEventScroll& Event)
@@ -308,18 +321,18 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 		{
 			case GDK_SCROLL_UP:
 				m_zoom_factor *= zoom_sensitivity;
-				redraw_panel();
+				schedule_redraw();
 				break;
 			case GDK_SCROLL_DOWN:
 				m_zoom_factor *= (1.0 / zoom_sensitivity);
-				redraw_panel();
+				schedule_redraw();
 				break;
 			default:
 				break;
 		}
 	}
 
-	void redraw_panel()
+	void schedule_redraw()
 	{
 		if(Glib::RefPtr<Gdk::Window> window = m_drawing_area.get_window())
 		{
@@ -331,14 +344,14 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 	void reset_graph()
 	{
 		m_graph.reset();
-		redraw_panel();
+		schedule_redraw();
 	}
 
 	void selected_node_changed(k3d::inode* Node)
 	{
-		if(m_current_node != Node)
+		if(m_root_node != Node)
 		{
-			m_current_node = Node;
+			m_root_node = Node;
 			reset_graph();
 		}
 	}
@@ -350,14 +363,17 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 			m_graph.reset(new k3d::graph());
 			create_graph(*m_document_state, *m_graph);
 
+			m_root_vertex = 0;
+
 			const k3d::graph::topology_t& topology = *m_graph->topology;
 			const size_t vertex_count = boost::num_vertices(topology);
 			const nodes_t& vertex_node = get_array<nodes_t>(m_graph->vertex_data, "node", vertex_count);
 			for(size_t vertex = 0; vertex != vertex_count; ++vertex)
 			{
-				if(vertex_node[vertex] != m_current_node)
+				if(vertex_node[vertex] != m_root_node)
 					continue;
-			
+		
+				m_root_vertex = vertex;
 				tree_plus_layout(*m_graph, vertex);
 				calculate_geometry(*m_graph);
 				break;
@@ -387,6 +403,32 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 		const double width = allocation.get_width();
 		const double height = allocation.get_height();
 		return height / width;
+	}
+
+	const k3d::point2 world_to_user(const k3d::point2& Point)
+	{
+		Gtk::Allocation allocation = m_drawing_area.get_allocation();
+		const double width = allocation.get_width();
+		const double height = allocation.get_height();
+
+		k3d::point2 result = Point;
+
+		if(width > height)
+		{
+			result -= k3d::vector2((width - height) / 2, 0);
+			result /= height;
+		}
+		else
+		{
+			result -= k3d::vector2(0, (height - width) / 2);
+			result /= width;
+		}
+
+		result -= k3d::vector2(0.5, 0.5);
+		result /= m_zoom_factor;
+		result -= k3d::vector2(m_origin[0], m_origin[1]);
+
+		return result;
 	}
 
 	void on_draw_pipeline(GdkEventExpose* event)
@@ -671,7 +713,8 @@ private:
 	document_state* m_document_state;
 	boost::shared_ptr<k3d::graph> m_graph;
 
-	k3d::inode* m_current_node;
+	k3d::inode* m_root_node;
+	size_t m_root_vertex;
 
 	double m_column_width;
 	double m_column_offset;
