@@ -44,6 +44,7 @@ class rectangle
 public:
 	rectangle(const double Left, const double Right, const double Top, const double Bottom);
 	rectangle(const point2& TopLeft, const point2& BottomRight);
+	rectangle(const point2& Center, const double Width, const double Height);
 	/// Returns the rectangle width
 	double width() const;
 	/// Returns the rectangle height

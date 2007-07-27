@@ -67,6 +67,14 @@ rectangle::rectangle(const point2& TopLeft, const point2& BottomRight) :
 {
 }
 
+rectangle::rectangle(const point2& Center, const double Width, const double Height) :
+	left(Center[0] - (Width / 2)),
+	right(Center[0] + (Width / 2)),
+	top(Center[1] - (Height / 2)),
+	bottom(Center[1] + (Height / 2))
+{
+}
+
 double rectangle::width() const
 {
 	return std::fabs(right - left);
