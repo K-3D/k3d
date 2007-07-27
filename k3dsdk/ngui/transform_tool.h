@@ -25,7 +25,7 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "basic_input_model.h"
+#include "basic_viewport_input_model.h"
 #include "navigation_input_model.h"
 #include "selection.h"
 #include "tool.h"
@@ -132,7 +132,7 @@ public:
 		return m_navigation_model;
 	}
 
-	basic_input_model& input_model()
+	basic_viewport_input_model& input_model()
 	{
 		return m_input_model;
 	}
@@ -427,7 +427,7 @@ protected:
 	/// Provides interactive navigation behavior
 	navigation_input_model m_navigation_model;
 	/// Dispatches incoming user input events
-	basic_input_model m_input_model;
+	basic_viewport_input_model m_input_model;
 
 	/// Stores manipulators size
 	double m_manipulators_size;

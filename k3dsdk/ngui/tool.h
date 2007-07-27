@@ -38,7 +38,7 @@ namespace libk3dngui
 {
 
 class document_state;
-class iuser_input_model;
+class viewport_input_model;
 namespace viewport { class control; }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ public:
 	/// Returns tool's property collection
 	k3d::iproperty_collection* properties();
 	/// Returns the tool's user input model
-	iuser_input_model& input_model();
+	viewport_input_model& input_model();
 
 	/// Convenience function that schedules a screen update for all viewports
 	void redraw_all();
@@ -88,7 +88,7 @@ private:
 	/// Asks for tool's property collection
 	virtual k3d::iproperty_collection* get_property_collection();
 	/// Returns the tool's user input model
-	virtual iuser_input_model& get_input_model() = 0;
+	virtual viewport_input_model& get_input_model() = 0;
 
 	/// Stores a reference to the owning document
 	document_state& m_document_state;

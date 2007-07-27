@@ -55,7 +55,7 @@ public:
 private:
 	virtual void on_activate();
 	virtual void on_deactivate();
-	virtual iuser_input_model& get_input_model();
+	virtual viewport_input_model& get_input_model();
 
 	struct implementation;
 	implementation* const m_implementation;

@@ -49,7 +49,7 @@ public:
 
 protected:
 	virtual k3d::iproperty_collection* get_property_collection();
-	virtual iuser_input_model& get_input_model();
+	virtual viewport_input_model& get_input_model();
 
 	class implementation;
 	implementation* const m_implementation;

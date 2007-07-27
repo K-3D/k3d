@@ -27,7 +27,7 @@
 #include "document_state.h"
 #include "icons.h"
 #include "keyboard.h"
-#include "null_input_model.h"
+#include "null_viewport_input_model.h"
 #include "plug_tool.h"
 #include "utility.h"
 
@@ -49,7 +49,7 @@ struct plug_tool::implementation
 	/// Stores the current set of selected properties (used to make interactive connections)
 	k3d::iproperty_collection::properties_t m_selected_properties;
 	/// Dispatches user input events
-	null_input_model m_input_model;
+	null_viewport_input_model m_input_model;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -111,7 +111,7 @@ void plug_tool::on_deactivate()
 	m_implementation->m_document_state.clear_cursor_signal().emit();
 }
 
-iuser_input_model& plug_tool::get_input_model()
+viewport_input_model& plug_tool::get_input_model()
 {
 	return m_implementation->m_input_model;
 }

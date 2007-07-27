@@ -1,5 +1,5 @@
-#ifndef NGUI_SNAP_TOOL_H
-#define NGUI_SNAP_TOOL_H
+#ifndef NGUI_INPUT_MODEL_H
+#define NGUI_INPUT_MODEL_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -22,46 +22,41 @@
 
 /** \file
 		\author Tim Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "tool.h"
-
-#include <k3dsdk/property_collection.h>
+#include <gdk/gdkevents.h>
 
 namespace libk3dngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// snap_tool
+// input_model
 
-/// Implementation of tool that implements standard geometry move behavior
-class snap_tool :
-	public tool
+/// Abstract interface for objects that can process user input
+class input_model
 {
-	typedef tool base;
-
 public:
-	snap_tool(document_state& DocumentState, const std::string& Name);
-	~snap_tool();
+	/// Called when a mouse button is pressed
+	virtual void button_press_event(GdkEventButton* Event) = 0;
+	/// Called when a mouse button is released
+	virtual void button_release_event(GdkEventButton* Event) = 0;
+	/// Called during mouse movement
+	virtual void motion_notify_event(GdkEventMotion* Event) = 0;
+	/// Called when the mouse wheel is scrolled
+	virtual void scroll_event(GdkEventScroll* Event) = 0;
+	/// Called when a key is pressed
+	virtual void key_press_event(GdkEventKey* Event) = 0;
+	/// Called when a key is released
+	virtual void key_release_event(GdkEventKey* Event) = 0;
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
-
-private:
-	void on_activate();
-	void on_deactivate();
-	void on_document_selection_changed();
-	void on_redraw(viewport::control& Viewport);
-	void on_select(viewport::control& Viewport);
-	k3d::iproperty_collection* get_property_collection();
-	viewport_input_model& get_input_model();
-
-	struct implementation;
-	implementation* const m_implementation;
+protected:
+	input_model() {}
+	input_model(const input_model&) {}
+	input_model& operator=(const input_model&) { return *this; }
+	virtual ~input_model() {}
 };
 
 } // namespace libk3dngui
 
-#endif // NGUI_SNAP_TOOL_H
-
+#endif // NGUI_INPUT_MODEL_H
 

@@ -78,7 +78,7 @@ k3d::iproperty_collection* tool::properties()
 	return get_property_collection();
 }
 
-iuser_input_model& tool::input_model()
+viewport_input_model& tool::input_model()
 {
 	return get_input_model();
 }

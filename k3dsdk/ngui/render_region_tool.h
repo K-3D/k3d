@@ -45,7 +45,7 @@ public:
 	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
 
 private:
-	virtual iuser_input_model& get_input_model();
+	virtual viewport_input_model& get_input_model();
 
 	struct implementation;
 	implementation* const m_implementation;

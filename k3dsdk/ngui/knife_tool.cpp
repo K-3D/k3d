@@ -24,7 +24,7 @@
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
-#include "basic_input_model.h"
+#include "basic_viewport_input_model.h"
 #include "command_arguments.h"
 #include "document_state.h"
 #include "icons.h"
@@ -553,7 +553,7 @@ struct knife_tool::implementation :
 	/// Provides interactive navigation behavior
 	navigation_input_model m_navigation_model;
 	/// Dispatches incoming user input events
-	basic_input_model m_input_model;
+	basic_viewport_input_model m_input_model;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -590,7 +590,7 @@ void knife_tool::on_redraw(viewport::control& Viewport)
 	m_implementation->on_redraw(Viewport);
 }
 
-iuser_input_model& knife_tool::get_input_model()
+viewport_input_model& knife_tool::get_input_model()
 {
 	return m_implementation->m_input_model;
 }

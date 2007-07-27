@@ -21,7 +21,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "basic_input_model.h"
+#include "basic_viewport_input_model.h"
 
 #include <k3dsdk/log.h>
 #include <k3dsdk/vectors.h>
@@ -32,9 +32,9 @@ namespace libk3dngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// basic_input_model::implementation
+// basic_viewport_input_model::implementation
 
-struct basic_input_model::implementation
+struct basic_viewport_input_model::implementation
 {
 	implementation() :
 		double_click(false),
@@ -95,19 +95,19 @@ struct basic_input_model::implementation
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// basic_input_model
+// basic_viewport_input_model
 
-basic_input_model::basic_input_model() :
+basic_viewport_input_model::basic_viewport_input_model() :
 	m_implementation(new implementation())
 {
 }
 
-basic_input_model::~basic_input_model()
+basic_viewport_input_model::~basic_viewport_input_model()
 {
 	delete m_implementation;
 }
 
-void basic_input_model::button_press_event(viewport::control& Viewport, GdkEventButton* Event)
+void basic_viewport_input_model::button_press_event(viewport::control& Viewport, GdkEventButton* Event)
 {
 	// Maintain button state ...
 	m_implementation->button_state[Event->button] = true;
@@ -174,7 +174,7 @@ void basic_input_model::button_press_event(viewport::control& Viewport, GdkEvent
 	}
 }
 
-void basic_input_model::button_release_event(viewport::control& Viewport, GdkEventButton* Event)
+void basic_viewport_input_model::button_release_event(viewport::control& Viewport, GdkEventButton* Event)
 {
 	// Maintain button state ...
 	m_implementation->button_state[Event->button] = false;
@@ -240,7 +240,7 @@ void basic_input_model::button_release_event(viewport::control& Viewport, GdkEve
 	m_implementation->triple_click = false;
 }
 
-void basic_input_model::motion_notify_event(viewport::control& Viewport, GdkEventMotion* Event)
+void basic_viewport_input_model::motion_notify_event(viewport::control& Viewport, GdkEventMotion* Event)
 {
 	// Always send mouse movement events ...
 	m_implementation->mouse_move.emit(Viewport, *Event);
@@ -297,157 +297,157 @@ void basic_input_model::motion_notify_event(viewport::control& Viewport, GdkEven
 	}
 }
 
-void basic_input_model::scroll_event(viewport::control& Viewport, GdkEventScroll* Event)
+void basic_viewport_input_model::scroll_event(viewport::control& Viewport, GdkEventScroll* Event)
 {
 	m_implementation->scroll.emit(Viewport, *Event);
 }
 
-void basic_input_model::key_press_event(viewport::control& Viewport, GdkEventKey* Event)
+void basic_viewport_input_model::key_press_event(viewport::control& Viewport, GdkEventKey* Event)
 {
 	m_implementation->key_press.emit(Viewport, *Event);
 }
 
-void basic_input_model::key_release_event(viewport::control& Viewport, GdkEventKey* Event)
+void basic_viewport_input_model::key_release_event(viewport::control& Viewport, GdkEventKey* Event)
 {
 	m_implementation->key_release.emit(Viewport, *Event);
 }
 
-sigc::connection basic_input_model::connect_mouse_move(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
+sigc::connection basic_viewport_input_model::connect_mouse_move(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
 {
 	return m_implementation->mouse_move.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_lbutton_down(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_lbutton_down(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->lbutton_down.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_lbutton_up(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_lbutton_up(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->lbutton_up.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_lbutton_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_lbutton_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->lbutton_click.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_lbutton_double_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_lbutton_double_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->lbutton_double_click.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_lbutton_triple_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_lbutton_triple_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->lbutton_triple_click.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_lbutton_start_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
+sigc::connection basic_viewport_input_model::connect_lbutton_start_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
 {
 	return m_implementation->lbutton_start_drag.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_lbutton_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
+sigc::connection basic_viewport_input_model::connect_lbutton_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
 {
 	return m_implementation->lbutton_drag.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_lbutton_end_drag(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_lbutton_end_drag(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->lbutton_end_drag.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_mbutton_down(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_mbutton_down(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->mbutton_down.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_mbutton_up(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_mbutton_up(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->mbutton_up.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_mbutton_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_mbutton_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->mbutton_click.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_mbutton_double_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_mbutton_double_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->mbutton_double_click.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_mbutton_triple_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_mbutton_triple_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->mbutton_triple_click.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_mbutton_start_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
+sigc::connection basic_viewport_input_model::connect_mbutton_start_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
 {
 	return m_implementation->mbutton_start_drag.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_mbutton_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
+sigc::connection basic_viewport_input_model::connect_mbutton_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
 {
 	return m_implementation->mbutton_drag.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_mbutton_end_drag(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_mbutton_end_drag(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->mbutton_end_drag.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_rbutton_down(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_rbutton_down(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->rbutton_down.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_rbutton_up(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_rbutton_up(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->rbutton_up.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_rbutton_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_rbutton_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->rbutton_click.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_rbutton_double_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_rbutton_double_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->rbutton_double_click.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_rbutton_triple_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_rbutton_triple_click(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->rbutton_triple_click.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_rbutton_start_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
+sigc::connection basic_viewport_input_model::connect_rbutton_start_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
 {
 	return m_implementation->rbutton_start_drag.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_rbutton_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
+sigc::connection basic_viewport_input_model::connect_rbutton_drag(const sigc::slot<void, viewport::control&, const GdkEventMotion&>& Slot)
 {
 	return m_implementation->rbutton_drag.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_rbutton_end_drag(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
+sigc::connection basic_viewport_input_model::connect_rbutton_end_drag(const sigc::slot<void, viewport::control&, const GdkEventButton&>& Slot)
 {
 	return m_implementation->rbutton_end_drag.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_scroll(const sigc::slot<void, viewport::control&, const GdkEventScroll&>& Slot)
+sigc::connection basic_viewport_input_model::connect_scroll(const sigc::slot<void, viewport::control&, const GdkEventScroll&>& Slot)
 {
 	return m_implementation->scroll.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_key_press(const sigc::slot<void, viewport::control&, const GdkEventKey&>& Slot)
+sigc::connection basic_viewport_input_model::connect_key_press(const sigc::slot<void, viewport::control&, const GdkEventKey&>& Slot)
 {
 	return m_implementation->key_press.connect(Slot);
 }
 
-sigc::connection basic_input_model::connect_key_release(const sigc::slot<void, viewport::control&, const GdkEventKey&>& Slot)
+sigc::connection basic_viewport_input_model::connect_key_release(const sigc::slot<void, viewport::control&, const GdkEventKey&>& Slot)
 {
 	return m_implementation->key_release.connect(Slot);
 }

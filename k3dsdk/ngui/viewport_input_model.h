@@ -1,5 +1,5 @@
-#ifndef NGUI_IUSER_INPUT_MODEL_H
-#define NGUI_IUSER_INPUT_MODEL_H
+#ifndef NGUI_VIEWPORT_INPUT_MODEL_H
+#define NGUI_VIEWPORT_INPUT_MODEL_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -32,10 +32,10 @@ namespace libk3dngui
 namespace viewport { class control; }
 
 /////////////////////////////////////////////////////////////////////////////
-// iuser_input_model
+// viewport_input_model
 
 /// Abstract interface for objects that can process user input
-class iuser_input_model
+class viewport_input_model
 {
 public:
 	/// Called when a mouse button is pressed
@@ -52,13 +52,13 @@ public:
 	virtual void key_release_event(viewport::control& Viewport, GdkEventKey* Event) = 0;
 
 protected:
-	iuser_input_model() {}
-	iuser_input_model(const iuser_input_model&) {}
-	iuser_input_model& operator=(const iuser_input_model&) { return *this; }
-	virtual ~iuser_input_model() {}
+	viewport_input_model() {}
+	viewport_input_model(const viewport_input_model&) {}
+	viewport_input_model& operator=(const viewport_input_model&) { return *this; }
+	virtual ~viewport_input_model() {}
 };
 
 } // namespace libk3dngui
 
-#endif // NGUI_IUSER_INPUT_MODEL_H
+#endif // NGUI_VIEWPORT_INPUT_MODEL_H
 

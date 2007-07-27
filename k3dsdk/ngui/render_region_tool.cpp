@@ -24,7 +24,7 @@
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
-#include "basic_input_model.h"
+#include "basic_viewport_input_model.h"
 #include "command_arguments.h"
 #include "document_state.h"
 #include "icons.h"
@@ -315,7 +315,7 @@ public:
 	/// Provides interactive navigation behavior
 	navigation_input_model m_navigation_model;
 	/// Dispatches incoming user input events
-	basic_input_model m_input_model;
+	basic_viewport_input_model m_input_model;
 	/// Emitted to record command-node commands
 	sigc::signal<void, const std::string&, const std::string&> m_command_signal;
 
@@ -349,7 +349,7 @@ const k3d::icommand_node::result render_region_tool::execute_command(const std::
 	return RESULT_ERROR;
 }
 
-iuser_input_model& render_region_tool::get_input_model()
+viewport_input_model& render_region_tool::get_input_model()
 {
 	return m_implementation->m_input_model;
 }

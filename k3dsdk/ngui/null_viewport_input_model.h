@@ -1,3 +1,6 @@
+#ifndef NGUI_NULL_VIEWPORT_INPUT_MODEL_H
+#define NGUI_NULL_VIEWPORT_INPUT_MODEL_H
+
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
 //
@@ -21,38 +24,28 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "null_input_model.h"
+#include "viewport_input_model.h"
 
 namespace libk3dngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// null_input_model
+// null_viewport_input_model
 
-void null_input_model::button_press_event(viewport::control& Viewport, GdkEventButton* Event)
+/// Do-nothing implementation of viewport_input_model
+class null_viewport_input_model :
+	public viewport_input_model
 {
-}
-
-void null_input_model::button_release_event(viewport::control& Viewport, GdkEventButton* Event)
-{
-}
-
-void null_input_model::motion_notify_event(viewport::control& Viewport, GdkEventMotion* Event)
-{
-}
-
-void null_input_model::scroll_event(viewport::control& Viewport, GdkEventScroll* Event)
-{
-}
-
-void null_input_model::key_press_event(viewport::control& Viewport, GdkEventKey* Event)
-{
-}
-
-void null_input_model::key_release_event(viewport::control& Viewport, GdkEventKey* Event)
-{
-
-}
+public:
+	virtual void button_press_event(viewport::control& Viewport, GdkEventButton* Event);
+	virtual void button_release_event(viewport::control& Viewport, GdkEventButton* Event);
+	virtual void motion_notify_event(viewport::control& Viewport, GdkEventMotion* Event);
+	virtual void scroll_event(viewport::control& Viewport, GdkEventScroll* Event);
+	virtual void key_press_event(viewport::control& Viewport, GdkEventKey* Event);
+	virtual void key_release_event(viewport::control& Viewport, GdkEventKey* Event);
+};
 
 } // namespace libk3dngui
+
+#endif // NGUI_NULL_VIEWPORT_INPUT_MODEL_H
 

@@ -1,5 +1,5 @@
-#ifndef NGUI_BASIC_INPUT_MODEL_H
-#define NGUI_BASIC_INPUT_MODEL_H
+#ifndef NGUI_BASIC_VIEWPORT_INPUT_MODEL_H
+#define NGUI_BASIC_VIEWPORT_INPUT_MODEL_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -24,22 +24,22 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iuser_input_model.h"
+#include "viewport_input_model.h"
 #include <k3dsdk/signal_system.h>
 
 namespace libk3dngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// basic_input_model
+// basic_viewport_input_model
 
-/// Implementation of iuser_input_model that synthesizes a more useful collection of input events
-class basic_input_model :
-	public iuser_input_model
+/// Implementation of viewport_input_model that synthesizes a more useful collection of input events
+class basic_viewport_input_model :
+	public viewport_input_model
 {
 public:
-	basic_input_model();
-	virtual ~basic_input_model();
+	basic_viewport_input_model();
+	virtual ~basic_viewport_input_model();
 
 	virtual void button_press_event(viewport::control& Viewport, GdkEventButton* Event);
 	virtual void button_release_event(viewport::control& Viewport, GdkEventButton* Event);
@@ -88,6 +88,6 @@ private:
 
 } // namespace libk3dngui
 
-#endif // NGUI_BASIC_INPUT_MODEL_H
+#endif // NGUI_BASIC_VIEWPORT_INPUT_MODEL_H
 
 

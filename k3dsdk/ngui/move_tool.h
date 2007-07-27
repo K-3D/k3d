@@ -57,7 +57,7 @@ private:
 	void on_select(viewport::control& Viewport);
 
 	k3d::iproperty_collection* get_property_collection();
-	iuser_input_model& get_input_model();
+	viewport_input_model& get_input_model();
 
 	// input_model implementation
 	void record_command(viewport::control& Viewport, const GdkEventButton& Event, const bool Move);

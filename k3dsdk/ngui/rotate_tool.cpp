@@ -25,7 +25,6 @@
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
-#include "basic_input_model.h"
 #include "command_arguments.h"
 #include "document_state.h"
 #include "modifiers.h"
@@ -693,7 +692,7 @@ k3d::iproperty_collection* rotate_tool::get_property_collection()
 	return dynamic_cast<k3d::iproperty_collection*>(this);
 }
 
-iuser_input_model& rotate_tool::get_input_model()
+viewport_input_model& rotate_tool::get_input_model()
 {
 	return input_model();
 }

@@ -22,7 +22,7 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "basic_input_model.h"
+#include "basic_viewport_input_model.h"
 #include "document_state.h"
 #include "navigation_input_model.h"
 #include "selection_input_model.h"
@@ -110,7 +110,7 @@ public:
 	/// Provides interactive selection behavior
 	selection_input_model m_selection_model;
 	/// Dispatches incoming user input events
-	basic_input_model m_input_model;
+	basic_viewport_input_model m_input_model;
 
 	/// Stores extended selection toggle
 	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_extended_mode;
@@ -156,7 +156,7 @@ k3d::iproperty_collection* selection_tool::get_property_collection()
 	return m_implementation;
 }
 
-iuser_input_model& selection_tool::get_input_model()
+viewport_input_model& selection_tool::get_input_model()
 {
 	return m_implementation->m_input_model;
 }

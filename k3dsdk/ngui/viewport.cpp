@@ -24,7 +24,7 @@
 #include <gtkmm/widget.h>
 
 #include "document_state.h"
-#include "iuser_input_model.h"
+#include "viewport_input_model.h"
 #include "modifiers.h"
 #include "tool.h"
 #include "utility.h"
