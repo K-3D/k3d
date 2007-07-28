@@ -111,9 +111,9 @@ public:
 		m_document_state(0),
 		m_root_node(0),
 		m_root_vertex(0),
-		m_column_width(0.4),
+		m_node_width(0.4),
 		m_column_offset(0.7),
-		m_row_height(0.09),
+		m_node_height(0.07),
 		m_row_offset(0.1),
 		m_arrow_size(0.04)
 	{
@@ -133,9 +133,11 @@ public:
 		m_input_model.connect_lbutton_double_click(sigc::mem_fun(*this, &panel::on_toggle_node_expansion));
 		m_input_model.connect_mbutton_start_drag(sigc::mem_fun(*this, &panel::on_start_pan));
 		m_input_model.connect_mbutton_drag(sigc::mem_fun(*this, &panel::on_pan));
+		m_input_model.connect_rbutton_start_drag(sigc::mem_fun(*this, &panel::on_start_zoom));
+		m_input_model.connect_rbutton_drag(sigc::mem_fun(*this, &panel::on_zoom));
 		m_input_model.connect_scroll(sigc::mem_fun(*this, &panel::on_scroll_zoom));
 
-		m_drawing_area.add_events(Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK | Gdk::BUTTON3_MOTION_MASK | Gdk::SCROLL_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
+		m_drawing_area.add_events(Gdk::POINTER_MOTION_MASK | Gdk::SCROLL_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK | Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK);
 		m_drawing_area.connect_expose_event(sigc::mem_fun(*this, &panel::on_draw_pipeline));
 
 		m_drawing_area.signal_button_press_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &basic_input_model::button_press_event), true));
@@ -274,17 +276,18 @@ public:
 
 		k3d::graph::bools_t& vertex_expanded = get_array<k3d::graph::bools_t>(graph.vertex_data, "expanded", vertex_count);
 		const k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(graph.vertex_data, "position", vertex_count);
-		const k3d::graph::doubles_t& vertex_width = get_array<k3d::graph::doubles_t>(graph.vertex_data, "width", vertex_count);
-		const k3d::graph::doubles_t& vertex_height = get_array<k3d::graph::doubles_t>(graph.vertex_data, "height", vertex_count);
 
 		const k3d::point2 mouse = world_to_user(k3d::point2(Event.x, Event.y));
 
 		for(size_t vertex = 0; vertex != vertex_count; ++vertex)
 		{
-			const k3d::rectangle box(vertex_position[vertex], vertex_width[vertex], vertex_height[vertex]);
+			const k3d::rectangle box(vertex_position[vertex], m_node_width, m_node_height);
 			if(box.contains(mouse))
 			{
 				vertex_expanded[vertex] = !vertex_expanded[vertex];
+
+k3d::log() << debug << vertex_expanded[vertex] << std::endl;
+
 				tree_plus_layout(graph, m_root_vertex);
 				calculate_geometry(graph);
 				schedule_redraw();
@@ -310,6 +313,24 @@ public:
 		m_origin += delta * (1.0 / m_zoom_factor) * (1.0 / std::min(width, height));
 		m_last_mouse = current_mouse;
 
+		schedule_redraw();
+	}
+
+	void on_start_zoom(const GdkEventMotion& Event)
+	{
+		m_last_mouse = k3d::point2(Event.x, Event.y);
+	}
+
+	void on_zoom(const GdkEventMotion& Event)
+	{
+		const k3d::point2 current_mouse = k3d::point2(Event.x, Event.y);
+		const k3d::vector2 delta = current_mouse - m_last_mouse;
+
+		const double sensitivity = 1.008;
+		const double zoom_factor = delta[1] < 0 ? std::pow(sensitivity, std::abs(delta[1])) : std::pow(1 / sensitivity, std::abs(delta[1]));
+		m_last_mouse = current_mouse;
+
+		m_zoom_factor *= zoom_factor;
 		schedule_redraw();
 	}
 
@@ -453,12 +474,25 @@ public:
 		}
 	}
 
-	void draw_box(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& P1, const k3d::point2& P2)
+	void draw_box(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::rectangle& Box)
 	{
-		Context->move_to(P1[0], P1[1]);
-		Context->line_to(P2[0], P1[1]);
-		Context->line_to(P2[0], P2[1]);
-		Context->line_to(P1[0], P2[1]);
+		Context->move_to(Box.left, Box.top);
+		Context->line_to(Box.right, Box.top);
+		Context->line_to(Box.right, Box.bottom);
+		Context->line_to(Box.left, Box.bottom);
+		Context->close_path();
+
+		Context->stroke();
+	}
+
+	void draw_filled_box(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::rectangle& Box)
+	{
+		Context->move_to(Box.left, Box.top);
+		Context->line_to(Box.right, Box.top);
+		Context->line_to(Box.right, Box.bottom);
+		Context->line_to(Box.left, Box.bottom);
+		Context->close_path();
+
 		Context->fill();
 	}
 
@@ -525,7 +559,7 @@ public:
 		Context->fill();
 	}
 
-	void draw_centered_text(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Position, const std::string& Text, double& Width, double& Height)
+	void draw_centered_text(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Position, const std::string& Text)
 	{
 		Context->save();
 
@@ -537,9 +571,6 @@ public:
 		Context->show_text(Text);
 
 		Context->restore();
-
-		Width = extents.width;
-		Height = extents.height;
 	}
 
 	void draw_pipeline(const Cairo::RefPtr<Cairo::Context>& Context, const double Width, const double Height)
@@ -583,19 +614,22 @@ public:
 			const k3d::graph::bools_t& vertex_visible = get_array<k3d::graph::bools_t>(graph.vertex_data, "visible", vertex_count);
 			const nodes_t& vertex_node = get_array<nodes_t>(graph.vertex_data, "node", vertex_count);
 			const k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(graph.vertex_data, "position", vertex_count);
-			k3d::graph::doubles_t& vertex_width = get_array<k3d::graph::doubles_t>(graph.vertex_data, "width", vertex_count);
-			k3d::graph::doubles_t& vertex_height = get_array<k3d::graph::doubles_t>(graph.vertex_data, "height", vertex_count);
-
 			Context->save();
 
 			Context->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
 			Context->set_font_size(0.03);
+			Context->set_line_width(0.003);
 
 			for(size_t vertex = 0; vertex != vertex_count; ++vertex)
 			{
 				if(vertex_visible[vertex])
 				{
-					draw_centered_text(Context, vertex_position[vertex], vertex_node[vertex]->name(), vertex_width[vertex], vertex_height[vertex]);
+					Context->set_source_rgb(1, 1, 1);
+					draw_filled_box(Context, k3d::rectangle(vertex_position[vertex], m_node_width, m_node_height));
+
+					Context->set_source_rgb(0, 0, 0);
+					draw_box(Context, k3d::rectangle(vertex_position[vertex], m_node_width, m_node_height));
+					draw_centered_text(Context, vertex_position[vertex], vertex_node[vertex]->name());
 				}
 			}
 
@@ -658,8 +692,8 @@ public:
 				k3d::point2 begin = vertex_position[source];
 				k3d::point2 end = vertex_position[target];
 
-				begin[0] += end[0] > begin[0] ? m_column_width * 0.5 : m_column_width * -0.5;
-				end[0] -= end[0] > begin[0] ? m_column_width * 0.5 : m_column_width * -0.5;
+				begin[0] += end[0] > begin[0] ? m_node_width * 0.5 : m_node_width * -0.5;
+				end[0] -= end[0] > begin[0] ? m_node_width * 0.5 : m_node_width * -0.5;
 
 				draw_curved_arrow(
 					Context,
@@ -716,9 +750,9 @@ private:
 	k3d::inode* m_root_node;
 	size_t m_root_vertex;
 
-	double m_column_width;
+	double m_node_width;
 	double m_column_offset;
-	double m_row_height;
+	double m_node_height;
 	double m_row_offset;
 	double m_arrow_size;
 
