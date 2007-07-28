@@ -238,7 +238,7 @@ public:
 		return_val_if_fail(renderman_engine, false);
 
 		// Get render engine name
-		k3d::iproperty* const engine_property = k3d::get_property(*renderman_engine, "render_engine");
+		k3d::iproperty* const engine_property = k3d::property::get(*renderman_engine, "render_engine");
 		return_val_if_fail(engine_property, false);
 		const std::string render_engine = boost::any_cast<std::string>(engine_property->property_value());
 
@@ -269,12 +269,12 @@ public:
 		engine.RiFormat(320, 240, 1);
 
 		// Create RenderMan scene
-		const double left = boost::any_cast<double>(k3d::get_value(document().dag(), m_perspective_projection.left()));
-		const double right = boost::any_cast<double>(k3d::get_value(document().dag(), m_perspective_projection.right()));
-		const double top = boost::any_cast<double>(k3d::get_value(document().dag(), m_perspective_projection.top()));
-		const double bottom = boost::any_cast<double>(k3d::get_value(document().dag(), m_perspective_projection.bottom()));
-		const double near = boost::any_cast<double>(k3d::get_value(document().dag(), m_perspective_projection.near()));
-		const double far = boost::any_cast<double>(k3d::get_value(document().dag(), m_perspective_projection.far()));
+		const double left = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), m_perspective_projection.left()));
+		const double right = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), m_perspective_projection.right()));
+		const double top = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), m_perspective_projection.top()));
+		const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), m_perspective_projection.bottom()));
+		const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), m_perspective_projection.near()));
+		const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), m_perspective_projection.far()));
 		return_val_if_fail(near > 0, false);
 
 		engine.RiProjectionV("perspective");

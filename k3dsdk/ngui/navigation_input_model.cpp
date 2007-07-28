@@ -122,16 +122,16 @@ struct navigation_input_model::implementation
 				double near = 0;
 				if(k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(&Viewport.camera()->projection()))
 				{
-					top = boost::any_cast<double>(k3d::get_value(m_document_state.document().dag(), perspective->top()));
-					bottom = boost::any_cast<double>(k3d::get_value(m_document_state.document().dag(), perspective->bottom()));
-					near = boost::any_cast<double>(k3d::get_value(m_document_state.document().dag(), perspective->near()));
+					top = boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().dag(), perspective->top()));
+					bottom = boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().dag(), perspective->bottom()));
+					near = boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().dag(), perspective->near()));
 
 				}
 				else if(k3d::iorthographic* const orthographic = dynamic_cast<k3d::iorthographic*>(&Viewport.camera()->projection()))
 				{
-					top = boost::any_cast<double>(k3d::get_value(m_document_state.document().dag(), orthographic->top()));
-					bottom = boost::any_cast<double>(k3d::get_value(m_document_state.document().dag(), orthographic->bottom()));
-					near = boost::any_cast<double>(k3d::get_value(m_document_state.document().dag(), orthographic->near()));
+					top = boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().dag(), orthographic->top()));
+					bottom = boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().dag(), orthographic->bottom()));
+					near = boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().dag(), orthographic->near()));
 				}
 
 				if(near > 0)
@@ -352,10 +352,10 @@ struct navigation_input_model::implementation
 			const double top = boost::any_cast<double>(perspective->top().property_value()) * zoom_factor;
 			const double bottom = boost::any_cast<double>(perspective->bottom().property_value()) * zoom_factor;
 
-			k3d::set_value(perspective->left(), left);
-			k3d::set_value(perspective->right(), right);
-			k3d::set_value(perspective->top(), top);
-			k3d::set_value(perspective->bottom(), bottom);
+			k3d::property::set_internal_value(perspective->left(), left);
+			k3d::property::set_internal_value(perspective->right(), right);
+			k3d::property::set_internal_value(perspective->top(), top);
+			k3d::property::set_internal_value(perspective->bottom(), bottom);
 
 			command_arguments arguments;
 			arguments.append_viewport(Viewport);
@@ -379,10 +379,10 @@ struct navigation_input_model::implementation
 			const double top = boost::any_cast<double>(orthographic->top().property_value()) * zoom_factor;
 			const double bottom = boost::any_cast<double>(orthographic->bottom().property_value()) * zoom_factor;
 
-			k3d::set_value(orthographic->left(), left);
-			k3d::set_value(orthographic->right(), right);
-			k3d::set_value(orthographic->top(), top);
-			k3d::set_value(orthographic->bottom(), bottom);
+			k3d::property::set_internal_value(orthographic->left(), left);
+			k3d::property::set_internal_value(orthographic->right(), right);
+			k3d::property::set_internal_value(orthographic->top(), top);
+			k3d::property::set_internal_value(orthographic->bottom(), bottom);
 
 			command_arguments arguments;
 			arguments.append_viewport_coordinates("mouse", Viewport, Event);
@@ -710,10 +710,10 @@ struct navigation_input_model::implementation
 
 				if(k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(projection))
 				{
-					k3d::set_value(perspective->left(), left);
-					k3d::set_value(perspective->right(), right);
-					k3d::set_value(perspective->top(), top);
-					k3d::set_value(perspective->bottom(), bottom);
+					k3d::property::set_internal_value(perspective->left(), left);
+					k3d::property::set_internal_value(perspective->right(), right);
+					k3d::property::set_internal_value(perspective->top(), top);
+					k3d::property::set_internal_value(perspective->bottom(), bottom);
 					k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::SYNCHRONOUS);
 
 					return k3d::icommand_node::RESULT_CONTINUE;
@@ -721,10 +721,10 @@ struct navigation_input_model::implementation
 
 				if(k3d::iorthographic* const orthographic = dynamic_cast<k3d::iorthographic*>(projection))
 				{
-					k3d::set_value(orthographic->left(), left);
-					k3d::set_value(orthographic->right(), right);
-					k3d::set_value(orthographic->top(), top);
-					k3d::set_value(orthographic->bottom(), bottom);
+					k3d::property::set_internal_value(orthographic->left(), left);
+					k3d::property::set_internal_value(orthographic->right(), right);
+					k3d::property::set_internal_value(orthographic->top(), top);
+					k3d::property::set_internal_value(orthographic->bottom(), bottom);
 					k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::SYNCHRONOUS);
 
 					return k3d::icommand_node::RESULT_CONTINUE;

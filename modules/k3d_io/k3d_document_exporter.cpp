@@ -77,8 +77,8 @@ public:
 		return_val_if_fail(filestream.good(), false);
 
 		// Record our new path & title ...
-		return_val_if_fail(k3d::set_value(Document.path(), Path), false);
-		return_val_if_fail(k3d::set_value(Document.title(), Path.leaf()), false);
+		return_val_if_fail(k3d::property::set_internal_value(Document.path(), Path), false);
+		return_val_if_fail(k3d::property::set_internal_value(Document.title(), Path.leaf()), false);
 
 		// Create our output document and dependencies objects ...
 		element xml(

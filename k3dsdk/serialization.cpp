@@ -133,7 +133,7 @@ public:
 
 		const std::string from_property_name = attribute_text(Dependency, "from_property");
 		return_if_fail(from_property_name.size());
-		iproperty* const from_property = get_property(*from_node, from_property_name);
+		iproperty* const from_property = property::get(*from_node, from_property_name);
 		if(!from_property)
 		{
 			log() << error << "Missing dependency source property [" << from_node->name() << "." << from_property_name << "]" << std::endl;
@@ -154,7 +154,7 @@ public:
 
 		const std::string to_property_name = attribute_text(Dependency, "to_property");
 		return_if_fail(to_property_name.size());
-		iproperty* const to_property = get_property(*to_node, to_property_name);
+		iproperty* const to_property = property::get(*to_node, to_property_name);
 		if(!to_property)
 		{
 			log() << error << "Missing dependency target property [" << to_node->name() << "." << to_property_name << "]" << std::endl;

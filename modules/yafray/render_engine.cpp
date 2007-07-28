@@ -181,9 +181,9 @@ public:
 		return_val_if_fail(start_time_property && end_time_property && frame_rate_property && time_property, false);
 
 		// Test the output images filepath to make sure it can hold all the frames we're going to generate ...
-		const double start_time = boost::any_cast<double>(k3d::get_value(document().dag(), *start_time_property));
-		const double end_time = boost::any_cast<double>(k3d::get_value(document().dag(), *end_time_property));
-		const double frame_rate = boost::any_cast<double>(k3d::get_value(document().dag(), *frame_rate_property));
+		const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), *start_time_property));
+		const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), *end_time_property));
+		const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), *frame_rate_property));
 
 		const size_t start_frame = static_cast<size_t>(k3d::round(frame_rate * start_time));
 		const size_t end_frame = static_cast<size_t>(k3d::round(frame_rate * end_time));
@@ -343,7 +343,7 @@ private:
 			if((*node)->factory().class_id() == k3d::classes::Sphere())
 			{
 				const k3d::point3 sphere_center = k3d::node_to_world_matrix(**node) * k3d::point3(0, 0, 0);
-				const boost::any sphere_radius(k3d::get_value(**node, "radius"));
+				const boost::any sphere_radius(k3d::property::pipeline_value(**node, "radius"));
 				if(typeid(double) == sphere_radius.type())
 				{
 					stream << "<object name=\"" << (*node)->name() << "\" shader_name=\"" << shader_name(**node) << "\">" << std::endl;
@@ -372,7 +372,7 @@ private:
 
 				// Check for transformed output mesh
 				k3d::mesh* mesh = 0;
-				k3d::iproperty* property = get_property(**node, "transformed_output_mesh");
+				k3d::iproperty* property = k3d::property::get(**node, "transformed_output_mesh");
 				if(property)
 				{
 					mesh = boost::any_cast<k3d::mesh*>(property->property_value());
@@ -388,11 +388,11 @@ private:
 					continue;
 
 				k3d::legacy::mesh out_mesh;
-				if (get_property(**node, "polyhedron_render_type"))
+				if (k3d::property::get(**node, "polyhedron_render_type"))
 				{
-					const std::string& render_type =  boost::any_cast<std::string>(k3d::get_internal_value(**node, "polyhedron_render_type"));
+					const std::string& render_type =  boost::any_cast<std::string>(k3d::property::internal_value(**node, "polyhedron_render_type"));
 					assert_not_implemented();
-//					sds_filter(*mesh, render_type, out_mesh, boost::any_cast<int>(k3d::get_internal_value(**node, "sds_render_level")));
+//					sds_filter(*mesh, render_type, out_mesh, boost::any_cast<int>(k3d::property::internal_value(**node, "sds_render_level")));
 				}
 
 				k3d::legacy::polyhedron::faces_t new_faces;
@@ -428,16 +428,16 @@ private:
 						if(k3d::yafray::imaterial* const material = begin->first->yafray_material())
 						{
 							material_name = dynamic_cast<k3d::inode*>(material)->name();
-							shadow = boost::any_cast<bool>(k3d::get_internal_value(*material, "shadow"));
-							emit_rad = boost::any_cast<bool>(k3d::get_internal_value(*material, "emit_rad"));
-							recv_rad = boost::any_cast<bool>(k3d::get_internal_value(*material, "recv_rad"));
-							caustics = boost::any_cast<bool>(k3d::get_internal_value(*material, "caustics"));
-							caus_IOR = boost::any_cast<double>(k3d::get_internal_value(*material, "caus_IOR"));
-							caus_rcolor = boost::any_cast<k3d::color>(k3d::get_internal_value(*material, "caus_rcolor"));
-							caus_tcolor = boost::any_cast<k3d::color>(k3d::get_internal_value(*material, "caus_tcolor"));
-							autosmooth = boost::any_cast<bool>(k3d::get_internal_value(*material, "mesh_autosmooth"));
-							autosmooth_value = boost::any_cast<double>(k3d::get_internal_value(*material, "mesh_autosmooth_value"));
-							has_orco = boost::any_cast<bool>(k3d::get_internal_value(*material, "has_orco"));
+							shadow = boost::any_cast<bool>(k3d::property::internal_value(*material, "shadow"));
+							emit_rad = boost::any_cast<bool>(k3d::property::internal_value(*material, "emit_rad"));
+							recv_rad = boost::any_cast<bool>(k3d::property::internal_value(*material, "recv_rad"));
+							caustics = boost::any_cast<bool>(k3d::property::internal_value(*material, "caustics"));
+							caus_IOR = boost::any_cast<double>(k3d::property::internal_value(*material, "caus_IOR"));
+							caus_rcolor = boost::any_cast<k3d::color>(k3d::property::internal_value(*material, "caus_rcolor"));
+							caus_tcolor = boost::any_cast<k3d::color>(k3d::property::internal_value(*material, "caus_tcolor"));
+							autosmooth = boost::any_cast<bool>(k3d::property::internal_value(*material, "mesh_autosmooth"));
+							autosmooth_value = boost::any_cast<double>(k3d::property::internal_value(*material, "mesh_autosmooth_value"));
+							has_orco = boost::any_cast<bool>(k3d::property::internal_value(*material, "has_orco"));
 						}
 					}
 
@@ -541,7 +541,7 @@ private:
 		}
 
 		// Setup the camera ...
-		const k3d::matrix4 camera_matrix = boost::any_cast<k3d::matrix4>(get_value(document().dag(), Camera.transformation().transform_source_output()));
+		const k3d::matrix4 camera_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(document().dag(), Camera.transformation().transform_source_output()));
 		const k3d::point3 camera_position = k3d::position(camera_matrix);
 		const k3d::point3 camera_to_vector = camera_matrix * k3d::point3(0, 0, 1);
 		const k3d::point3 camera_up_vector = camera_matrix * k3d::point3(0, 1, 0);

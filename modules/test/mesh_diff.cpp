@@ -64,7 +64,7 @@ public:
 			{
 				if(first_mesh)
 				{
-					if(const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::get_value(document().dag(), property)))
+					if(const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(document().dag(), property)))
 					{
 						if(!k3d::equal(*first_mesh, *mesh, threshold))
 							return false;
@@ -72,7 +72,7 @@ public:
 				}
 				else
 				{
-					first_mesh = boost::any_cast<k3d::mesh*>(k3d::get_value(document().dag(), property));
+					first_mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(document().dag(), property));
 				}
 			}
 		}

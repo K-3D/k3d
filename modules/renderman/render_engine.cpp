@@ -341,9 +341,9 @@ public:
 		return_val_if_fail(start_time_property && end_time_property && frame_rate_property && time_property, false);
 
 		// Test the output images filepath to make sure it can hold all the frames we're going to generate ...
-		const double start_time = boost::any_cast<double>(k3d::get_value(document().dag(), *start_time_property));
-		const double end_time = boost::any_cast<double>(k3d::get_value(document().dag(), *end_time_property));
-		const double frame_rate = boost::any_cast<double>(k3d::get_value(document().dag(), *frame_rate_property));
+		const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), *start_time_property));
+		const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), *end_time_property));
+		const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), *frame_rate_property));
 
 		const size_t start_frame = static_cast<size_t>(k3d::round(frame_rate * start_time));
 		const size_t end_frame = static_cast<size_t>(k3d::round(frame_rate * end_time));
@@ -422,8 +422,8 @@ private:
 		k3d::iwritable_property* const writable_time_property = dynamic_cast<k3d::iwritable_property*>(time_property);
 		return_val_if_fail(frame_rate_property && time_property && writable_time_property, false);
 
-		const double frame_delta = 1.0 / boost::any_cast<double>(k3d::get_value(document().dag(), *frame_rate_property));
-		const double frame_time = boost::any_cast<double>(k3d::get_value(document().dag(), *time_property));
+		const double frame_delta = 1.0 / boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), *frame_rate_property));
+		const double frame_time = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), *time_property));
 
 		// Start our RIB file ...
 		const std::string ribfilename("world.rib");
@@ -537,10 +537,10 @@ private:
 		engine.RiSides(m_two_sided.value() ? 2 : 1);
 
 		// Crop window ...
-		const double crop_left = boost::any_cast<double>(get_value(document().dag(), Camera.crop_window().crop_left()));
-		const double crop_right = boost::any_cast<double>(get_value(document().dag(), Camera.crop_window().crop_right()));
-		const double crop_top = boost::any_cast<double>(get_value(document().dag(), Camera.crop_window().crop_top()));
-		const double crop_bottom = boost::any_cast<double>(get_value(document().dag(), Camera.crop_window().crop_bottom()));
+		const double crop_left = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), Camera.crop_window().crop_left()));
+		const double crop_right = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), Camera.crop_window().crop_right()));
+		const double crop_top = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), Camera.crop_window().crop_top()));
+		const double crop_bottom = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), Camera.crop_window().crop_bottom()));
 
 		if(crop_left >= crop_right || crop_top >= crop_bottom)
 			k3d::user_interface().message("Current crop window settings will produce an empty image");
@@ -564,7 +564,7 @@ private:
 
 			writable_time_property->property_set_value(sample_time);
 
-			const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(get_value(document().dag(), Camera.transformation().transform_source_output()));
+			const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(document().dag(), Camera.transformation().transform_source_output()));
 			const k3d::angle_axis orientation(k3d::euler_angles(transform_matrix, k3d::euler_angles::ZXYstatic));
 			const k3d::point3 position(k3d::position(transform_matrix));
 
@@ -581,12 +581,12 @@ private:
 
 				if(k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(&Camera.projection()))
 				{
-					const double left = boost::any_cast<double>(k3d::get_value(document().dag(), perspective->left()));
-					const double right = boost::any_cast<double>(k3d::get_value(document().dag(), perspective->right()));
-					const double top = boost::any_cast<double>(k3d::get_value(document().dag(), perspective->top()));
-					const double bottom = boost::any_cast<double>(k3d::get_value(document().dag(), perspective->bottom()));
-					const double near = boost::any_cast<double>(k3d::get_value(document().dag(), perspective->near()));
-					const double far = boost::any_cast<double>(k3d::get_value(document().dag(), perspective->far()));
+					const double left = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->left()));
+					const double right = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->right()));
+					const double top = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->top()));
+					const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->bottom()));
+					const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->near()));
+					const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->far()));
 					return_val_if_fail(near > 0, false);
 
 					engine.RiProjectionV("perspective");
@@ -595,15 +595,15 @@ private:
 				}
 				else if(k3d::iorthographic* const orthographic = dynamic_cast<k3d::iorthographic*>(&Camera.projection()))
 				{
-					const double left = boost::any_cast<double>(k3d::get_value(document().dag(), orthographic->left()));
-					const double right = boost::any_cast<double>(k3d::get_value(document().dag(), orthographic->right()));
-					const double top = boost::any_cast<double>(k3d::get_value(document().dag(), orthographic->top()));
-					const double bottom = boost::any_cast<double>(k3d::get_value(document().dag(), orthographic->bottom()));
-					const double near = boost::any_cast<double>(k3d::get_value(document().dag(), orthographic->near()));
-					const double far = boost::any_cast<double>(k3d::get_value(document().dag(), orthographic->far()));
+					const double left = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->left()));
+					const double right = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->right()));
+					const double top = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->top()));
+					const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->bottom()));
+					const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->near()));
+					const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->far()));
 					return_val_if_fail(near > 0, false);
 
-					const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(get_value(document().dag(), Camera.transformation().transform_source_output()));
+					const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(document().dag(), Camera.transformation().transform_source_output()));
 					const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
 					const k3d::point3 world_target = boost::any_cast<k3d::point3>(Camera.world_target().property_value());
 

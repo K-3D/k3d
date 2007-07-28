@@ -129,7 +129,7 @@ public:
 		return_if_fail(m);
 
 		const unsigned long face_number = m->face_count();
-		k3d::set_value(m_face_number, face_number);
+		k3d::property::set_internal_value(m_face_number, face_number);
 
 		// Init
 		MxQSlim* slim = 0;

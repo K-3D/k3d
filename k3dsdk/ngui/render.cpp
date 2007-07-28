@@ -334,7 +334,7 @@ const std::string renderman_type(k3d::iunknown& Engine)
 	{
 		if(node->factory().class_id() == k3d::classes::RenderManEngine())
 		{
-			return boost::any_cast<std::string>(k3d::get_value(Engine, "render_engine"));
+			return boost::any_cast<std::string>(k3d::property::pipeline_value(Engine, "render_engine"));
 		}
 	}
 
@@ -746,9 +746,9 @@ void render_animation(document_state& DocumentState, k3d::ianimation_render_engi
 	k3d::iproperty* const frame_rate_property = k3d::get_frame_rate(DocumentState.document());
 	return_if_fail(start_time_property && end_time_property && frame_rate_property);
 
-	const double start_time = boost::any_cast<double>(k3d::get_value(DocumentState.document().dag(), *start_time_property));
-	const double end_time = boost::any_cast<double>(k3d::get_value(DocumentState.document().dag(), *end_time_property));
-	const double frame_rate = boost::any_cast<double>(k3d::get_value(DocumentState.document().dag(), *frame_rate_property));
+	const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(DocumentState.document().dag(), *start_time_property));
+	const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(DocumentState.document().dag(), *end_time_property));
+	const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(DocumentState.document().dag(), *frame_rate_property));
 
 	const long start_frame = static_cast<long>(k3d::round(frame_rate * start_time));
 	const long end_frame = static_cast<long>(k3d::round(frame_rate * end_time));
@@ -837,9 +837,9 @@ void render_camera_animation(document_state& DocumentState, k3d::icamera& Camera
 	k3d::iproperty* const frame_rate_property = k3d::get_frame_rate(DocumentState.document());
 	return_if_fail(start_time_property && end_time_property && frame_rate_property);
 
-	const double start_time = boost::any_cast<double>(k3d::get_value(DocumentState.document().dag(), *start_time_property));
-	const double end_time = boost::any_cast<double>(k3d::get_value(DocumentState.document().dag(), *end_time_property));
-	const double frame_rate = boost::any_cast<double>(k3d::get_value(DocumentState.document().dag(), *frame_rate_property));
+	const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(DocumentState.document().dag(), *start_time_property));
+	const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(DocumentState.document().dag(), *end_time_property));
+	const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(DocumentState.document().dag(), *frame_rate_property));
 
 	const long start_frame = static_cast<long>(k3d::round(frame_rate * start_time));
 	const long end_frame = static_cast<long>(k3d::round(frame_rate * end_time));

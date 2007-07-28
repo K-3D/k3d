@@ -529,7 +529,7 @@ const k3d::point3 control::get_target()
 
 void control::set_target(const k3d::point3& Target)
 {
-	k3d::set_value(*camera(), "world_target", Target);
+	k3d::property::set_internal_value(*camera(), "world_target", Target);
 }
 
 const k3d::vector3 control::get_up_axis()
@@ -579,9 +579,9 @@ bool control::render_camera_animation(k3d::icamera& Camera, const k3d::file_rang
 	return_val_if_fail(start_time_property && end_time_property && frame_rate_property && time_property, false);
 
 	// Test the output images filepath to make sure it can hold all the frames we're going to generate ...
-	const double start_time = boost::any_cast<double>(k3d::get_value(m_implementation->m_document_state.document().dag(), *start_time_property));
-	const double end_time = boost::any_cast<double>(k3d::get_value(m_implementation->m_document_state.document().dag(), *end_time_property));
-	const double frame_rate = boost::any_cast<double>(k3d::get_value(m_implementation->m_document_state.document().dag(), *frame_rate_property));
+	const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(m_implementation->m_document_state.document().dag(), *start_time_property));
+	const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(m_implementation->m_document_state.document().dag(), *end_time_property));
+	const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(m_implementation->m_document_state.document().dag(), *frame_rate_property));
 
 	const size_t start_frame = static_cast<size_t>(k3d::round(frame_rate * start_time));
 	const size_t end_frame = static_cast<size_t>(k3d::round(frame_rate * end_time));

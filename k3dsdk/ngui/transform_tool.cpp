@@ -276,7 +276,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 	void transform_tool::transform_target::start_move()
 	{
 		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Move "))
-			assert_warning(k3d::set_value(*modifier, "matrix", k3d::identity3D()));
+			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3D()));
 
 		// Setup matrices
 		set_original_matrix();
@@ -290,13 +290,13 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			start_move();
 
 		const k3d::matrix4 translation = k3d::translation3D(m_system_matrix * Move);
-		assert_warning(k3d::set_value(*modifier, "matrix", m_original_matrix * translation));
+		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * translation));
 	}
 
 	void transform_tool::transform_target::start_rotation()
 	{
 		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Rotate "))
-			assert_warning(k3d::set_value(*modifier, "matrix", k3d::identity3D()));
+			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3D()));
 
 		// Setup matrices
 		set_original_matrix();
@@ -310,13 +310,13 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			start_rotation();
 
 		const k3d::matrix4 current_coordinate_system_rotation = m_system_matrix * RotationMatrix * m_system_matrix_inverse;
-		assert_warning(k3d::set_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_rotation));
+		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_rotation));
 	}
 
 	void transform_tool::transform_target::start_scaling()
 	{
 		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Scale "))
-			assert_warning(k3d::set_value(*modifier, "matrix", k3d::identity3D()));
+			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3D()));
 
 		// Setup matrices
 		set_original_matrix();
@@ -330,7 +330,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			start_scaling();
 
 		const k3d::matrix4 current_coordinate_system_scaling = m_system_matrix * k3d::scaling3D(Scaling) * m_system_matrix_inverse;
-		assert_warning(k3d::set_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_scaling));
+		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_scaling));
 	}
 
 	void transform_tool::transform_target::end_drag_motion()
@@ -398,8 +398,8 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 	void transform_tool::transform_target::set_original_matrix()
 	{
 		return_if_fail(node && modifier);
-		k3d::matrix4 node_input_matrix = boost::any_cast<k3d::matrix4>(k3d::get_value(*node, "input_matrix"));
-		k3d::matrix4 modifier_input_matrix = boost::any_cast<k3d::matrix4>(k3d::get_value(*modifier, "input_matrix"));
+		k3d::matrix4 node_input_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(*node, "input_matrix"));
+		k3d::matrix4 modifier_input_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(*modifier, "input_matrix"));
 		// Calculate the original matrix back from the current node matrix, in case it got changed by i.e. an animation track
 		m_original_matrix = inverse(modifier_input_matrix) * node_input_matrix;
 	}
@@ -464,7 +464,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 	void transform_tool::mesh_target::start_move()
 	{
 		create_mesh_modifier("Move ");
-		assert_warning(k3d::set_value(*modifier, "center", k3d::point3(0.0,0.0,0.0))); // center not needed for translation
+		assert_warning(k3d::property::set_internal_value(*modifier, "center", k3d::point3(0.0,0.0,0.0))); // center not needed for translation
 	}
 
 	void transform_tool::mesh_target::move(const k3d::vector3& Move)
@@ -475,7 +475,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		m_drag_mutex = true;
 		
 		const k3d::matrix4 translation = k3d::translation3D(m_system_matrix * Move);
-		assert_warning(k3d::set_value(*modifier, "matrix", m_original_matrix * translation));
+		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * translation));
 
 		// Update manipulators position
 		component_center = m_system_matrix * Move + m_origin;
@@ -494,8 +494,8 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		m_drag_mutex = true;
 		
 		const k3d::matrix4 current_coordinate_system_rotation = m_system_matrix * RotationMatrix * m_system_matrix_inverse;
-		assert_warning(k3d::set_value(*modifier, "center", WorldCenter)); // set center first, so we can ride on the change signal of the matrix
-		assert_warning(k3d::set_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_rotation));
+		assert_warning(k3d::property::set_internal_value(*modifier, "center", WorldCenter)); // set center first, so we can ride on the change signal of the matrix
+		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_rotation));
 	}
 
 	void transform_tool::mesh_target::start_scaling()
@@ -511,8 +511,8 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		m_drag_mutex = true;
 
 		const k3d::matrix4 current_coordinate_system_scaling = m_system_matrix * k3d::scaling3D(Scaling) * m_system_matrix_inverse;
-		assert_warning(k3d::set_value(*modifier, "center", WorldCenter)); // set center first, so we can ride on the change signal of the matrix
-		assert_warning(k3d::set_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_scaling));
+		assert_warning(k3d::property::set_internal_value(*modifier, "center", WorldCenter)); // set center first, so we can ride on the change signal of the matrix
+		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_scaling));
 	}
 
 	void transform_tool::mesh_target::end_drag_motion()
@@ -550,12 +550,12 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		}
 
 		// Update modifier's selected point list
-		assert_warning(k3d::set_value(*modifier, "selected_points", selected_points));
+		assert_warning(k3d::property::set_internal_value(*modifier, "selected_points", selected_points));
 		
 		m_origin = component_center;
 		
 		// Setup matrices
-		m_original_matrix = boost::any_cast<k3d::matrix4>(k3d::get_value(*modifier, "matrix"));
+		m_original_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(*modifier, "matrix"));
 		set_coordinate_system_change_matrices();
 	}
 

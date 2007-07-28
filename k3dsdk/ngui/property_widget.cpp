@@ -95,7 +95,7 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 			return_val_if_fail(to_node, RESULT_ERROR);
 
 			const std::string property_name = arguments.get_string("property");
-			k3d::iproperty* const to_property = k3d::get_property(*to_node, property_name);
+			k3d::iproperty* const to_property = k3d::property::get(*to_node, property_name);
 			if(!to_property)
 			{
 				k3d::log() << error << "node [" << to_node->name() << "] has no property [" << property_name << "]" << std::endl;

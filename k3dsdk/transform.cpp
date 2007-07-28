@@ -100,7 +100,7 @@ const point3 world_position(iunknown& Node)
 
 const matrix4 node_to_world_matrix(iunknown& Node)
 {
-	iproperty* const property = get_typed_property<matrix4>(Node, "output_matrix");
+	iproperty* const property = property::get<matrix4>(Node, "output_matrix");
 	if(property)
 		return boost::any_cast<matrix4>(property->property_value());
 
@@ -126,7 +126,7 @@ k3d::inode* set_matrix(iunknown& Node, const matrix4& Matrix)
 	if(inode* const modifier = detail::upstream_frozen_transformation(*node))
 	{
 		const k3d::matrix4 upstream_matrix = detail::upstream_matrix(*modifier);
-		set_value(*modifier, "matrix", Matrix * inverse(upstream_matrix));
+		property::set_internal_value(*modifier, "matrix", Matrix * inverse(upstream_matrix));
 		return 0;
 	}
 
@@ -136,7 +136,7 @@ k3d::inode* set_matrix(iunknown& Node, const matrix4& Matrix)
 	inode* const modifier = detail::insert_transform_modifier(*node);
 	return_val_if_fail(modifier, 0);
 
-	set_value(*modifier, "matrix", Matrix * inverse(upstream_matrix));
+	property::set_internal_value(*modifier, "matrix", Matrix * inverse(upstream_matrix));
 
 	return modifier;
 }

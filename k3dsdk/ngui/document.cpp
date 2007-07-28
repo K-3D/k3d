@@ -67,7 +67,7 @@ unsigned long next_document_number()
 void populate_new_document(k3d::idocument& Document)
 {
 	const k3d::ustring new_title = k3d::ustring::from_utf8(k3d::string_cast(boost::format(_("Untitled Document %1%")) % k3d::string_cast(detail::next_document_number())));
-	k3d::set_value(Document.title(), new_title);
+	k3d::property::set_internal_value(Document.title(), new_title);
 
 	// Setup the plugins that no document can live without ...
 	k3d::create_plugin(k3d::classes::Axes(), Document, "Axes");
@@ -87,7 +87,7 @@ void populate_new_document(k3d::idocument& Document)
 		k3d::inode* camera_transformation = k3d::set_matrix(*camera, k3d::view_matrix(look_vector, up_vector, position));
 		return_if_fail(camera_transformation);
 		camera_transformation->set_name("Camera Transformation");
-		k3d::set_value(*camera, "world_target", k3d::point3(0, 0, 0));
+		k3d::property::set_internal_value(*camera, "world_target", k3d::point3(0, 0, 0));
 	}
 
 	// Setup RenderMan painters ...
@@ -124,16 +124,16 @@ void populate_new_document(k3d::idocument& Document)
 	}
 
 	if(surface_shader)
-		k3d::set_value(*surface_shader, "shader_path", k3d::share_path() / k3d::filesystem::generic_path("shaders/surface/k3d_plastic.sl"));
+		k3d::property::set_internal_value(*surface_shader, "shader_path", k3d::share_path() / k3d::filesystem::generic_path("shaders/surface/k3d_plastic.sl"));
 
 	if(material)
-		k3d::set_value(*material, "surface_shader", surface_shader);
+		k3d::property::set_internal_value(*material, "surface_shader", surface_shader);
 
 	if(light_shader)
-		k3d::set_value(*light_shader, "shader_path", k3d::share_path() / k3d::filesystem::generic_path("shaders/light/k3d_pointlight.sl"));
+		k3d::property::set_internal_value(*light_shader, "shader_path", k3d::share_path() / k3d::filesystem::generic_path("shaders/light/k3d_pointlight.sl"));
 
 	if(light)
-		k3d::set_value(*light, "shader", light_shader);
+		k3d::property::set_internal_value(*light, "shader", light_shader);
 }
 
 /// Add document nodes that need an opengl context for extension checking
@@ -202,8 +202,8 @@ void open_document(const k3d::filesystem::path& Path)
 	document_state* const state = new document_state(*document);
 	create_main_document_window(*state);
 
-	k3d::set_value(document->path(), Path);
-	k3d::set_value(document->title(), Path.leaf());
+	k3d::property::set_internal_value(document->path(), Path);
+	k3d::property::set_internal_value(document->title(), Path.leaf());
 }
 
 } // namespace libk3dngui

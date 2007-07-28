@@ -1335,8 +1335,8 @@ private:
 		}
 
 		// Record the new path & title ...
-		//k3d::set_value(document().path(), document_path);
-		//k3d::set_value(document().title(), document_path.leaf());
+		//k3d::property::set_internal_value(document().path(), document_path);
+		//k3d::property::set_internal_value(document().title(), document_path.leaf());
 
 		return true;
 	}
@@ -1380,8 +1380,8 @@ private:
 		document_state* const state = new document_state(*reverted_document);
 		create_main_document_window(*state);
 
-		k3d::set_value(reverted_document->path(), document_path);
-		k3d::set_value(reverted_document->title(), document_path.leaf());
+		k3d::property::set_internal_value(reverted_document->path(), document_path);
+		k3d::property::set_internal_value(reverted_document->title(), document_path.leaf());
 
 		k3d::application().close_document(document());
 	}
@@ -2104,8 +2104,8 @@ private:
 		const k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
 		{
-			k3d::set_value(**node, "viewport_visible", false);
-			k3d::set_value(**node, "render_final", false);
+			k3d::property::set_internal_value(**node, "viewport_visible", false);
+			k3d::property::set_internal_value(**node, "render_final", false);
 		}
 
 		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
@@ -2118,8 +2118,8 @@ private:
 		const k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
 		{
-			k3d::set_value(**node, "viewport_visible", true);
-			k3d::set_value(**node, "render_final", true);
+			k3d::property::set_internal_value(**node, "viewport_visible", true);
+			k3d::property::set_internal_value(**node, "render_final", true);
 		}
 
 		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
@@ -2134,8 +2134,8 @@ private:
 		{
 			if(!m_document_state.is_selected(*node))
 			{
-				k3d::set_value(**node, "viewport_visible", false);
-				k3d::set_value(**node, "render_final", false);
+				k3d::property::set_internal_value(**node, "viewport_visible", false);
+				k3d::property::set_internal_value(**node, "render_final", false);
 			}
 		}
 
@@ -2149,8 +2149,8 @@ private:
 		const k3d::nodes_t& nodes = m_document_state.document().nodes().collection();
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
-			k3d::set_value(**node, "viewport_visible", true);
-			k3d::set_value(**node, "render_final", true);
+			k3d::property::set_internal_value(**node, "viewport_visible", true);
+			k3d::property::set_internal_value(**node, "render_final", true);
 		}
 
 		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
@@ -2192,7 +2192,7 @@ private:
 		return_if_fail(viewport_control);
 
 		k3d::icamera* camera = viewport_control->camera();
-		assert_warning(k3d::set_value(*camera, "orthographic", !boost::any_cast<bool>(k3d::get_value(*camera, "orthographic"))));
+		assert_warning(k3d::property::set_internal_value(*camera, "orthographic", !boost::any_cast<bool>(k3d::property::pipeline_value(*camera, "orthographic"))));
 	}
 
 	void on_view_set_view(const k3d::signed_axis Axis)
@@ -2202,7 +2202,7 @@ private:
 		return_if_fail(viewport_control);
 		k3d::icamera* camera = viewport_control->camera();
 
-		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::get_value(m_document_state.document().dag(), camera->transformation().transform_source_output()));
+		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(m_document_state.document().dag(), camera->transformation().transform_source_output()));
 		const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
 		const k3d::point3 world_target = boost::any_cast<k3d::point3>(camera->world_target().property_value());
 		const double distance = k3d::distance(world_position, world_target);

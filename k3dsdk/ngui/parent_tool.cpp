@@ -127,7 +127,7 @@ struct parent_tool::implementation
 					const transform_modifier modifier = create_transform_modifier(m_document_state.document(), k3d::classes::FrozenTransformation(), "Parent Compensation");
 					if(modifier)
 					{
-						k3d::set_value(*modifier.node, "matrix", parent_compensation);
+						k3d::property::set_internal_value(*modifier.node, "matrix", parent_compensation);
 						dependencies.insert(std::make_pair(&transform_sink->transform_sink_input(), &modifier.source->transform_source_output()));
 						dependencies.insert(std::make_pair(&modifier.sink->transform_sink_input(), &transform_source->transform_source_output()));
 					}

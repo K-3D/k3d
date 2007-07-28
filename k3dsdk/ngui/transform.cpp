@@ -33,6 +33,7 @@
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
+#include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/transform.h>
 
@@ -100,7 +101,7 @@ void unparent(k3d::inode& Node)
 			const transform_modifier modifier = create_transform_modifier(Node.document(), k3d::classes::FrozenTransformation(), "Unparent Compensation");
 			if(modifier)
 			{
-				k3d::set_value(*modifier.node, "matrix", unparent_compensation);
+				k3d::property::set_internal_value(*modifier.node, "matrix", unparent_compensation);
 
 				k3d::idag::dependencies_t dependencies;
 				dependencies.insert(std::make_pair(&transform_sink->transform_sink_input(), &modifier.source->transform_source_output()));

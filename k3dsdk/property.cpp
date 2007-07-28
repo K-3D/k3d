@@ -33,7 +33,10 @@
 namespace k3d
 {
 
-iproperty* get_property(iunknown& Object, const std::string& Name)
+namespace property
+{
+
+iproperty* get(iunknown& Object, const std::string& Name)
 {
 	// If the object doesn't have properties, we're done ...
 	iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(&Object);
@@ -55,30 +58,57 @@ iproperty* get_property(iunknown& Object, const std::string& Name)
 	return 0;
 }
 
-boost::any get_value(idag& DAG, iproperty& Property)
-{
-	return property_lookup(&Property, DAG)->property_value();
-}
-
-boost::any get_value(iunknown& Object, const std::string& Name)
-{
-	if(iproperty* const property = get_property(Object, Name))
-		return property_lookup(property, dynamic_cast<inode*>(&Object)->document().dag())->property_value();
-
-	return boost::any();
-}
-
-boost::any get_internal_value(iunknown& Object, const std::string& Name)
+const boost::any internal_value(iunknown& Object, const std::string& Name)
 {
 	// Look for the property by name ...
-	iproperty* const property = get_property(Object, Name);
+	iproperty* const property = get(Object, Name);
 	if(!property)
 		return boost::any();
 
 	return property->property_value();
 }
 
-bool set_value(iproperty& Property, const boost::any& Value)
+const boost::any pipeline_value(iunknown& Object, const std::string& Name)
+{
+	if(iproperty* const property = get(Object, Name))
+		return property_lookup(property, dynamic_cast<inode*>(&Object)->document().dag())->property_value();
+
+	return boost::any();
+}
+
+const boost::any pipeline_value(idag& Pipeline, iproperty& Property)
+{
+	return property_lookup(&Property, Pipeline)->property_value();
+}
+
+bool set_internal_value(iunknown& Object, const std::string Name, const boost::any& Value)
+{
+	// If the object isn't a property collection, we're done ...
+	iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(&Object);
+	if(!property_collection)
+	{
+		log() << error << k3d_file_reference << " : object has no property collection!" << std::endl;
+		return false;
+	}
+
+	// Look for a property with a matching name ...
+	const iproperty_collection::properties_t properties(property_collection->properties());
+	for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+	{
+		// Name doesn't match, so keep going ...
+		if((*property)->property_name() != Name)
+			continue;
+
+		// Success ...
+		return set_internal_value(**property, Value);
+	}
+
+	// Couldn't find a property by that name!
+	log() << error << k3d_file_reference << " : could not find property [" << Name << "]" << std::endl;
+	return false;
+}
+
+bool set_internal_value(iproperty& Property, const boost::any& Value)
 {
 	// If the property type doesn't match, we're done ...
 	if(Value.type() != Property.property_type())
@@ -98,70 +128,7 @@ bool set_value(iproperty& Property, const boost::any& Value)
 	return writable_property->property_set_value(Value);
 }
 
-bool quiet_set_value(iproperty& Property, const boost::any& Value)
-{
-	// If the property type doesn't match, we're done ...
-	if(Value.type() != Property.property_type())
-		return false;
-
-	// If the property is read-only, we're done ...
-	iwritable_property* const writable_property = dynamic_cast<iwritable_property*>(&Property);
-	if(!writable_property)
-		return false;
-
-	return writable_property->property_set_value(Value);
-}
-
-bool set_value(iunknown& Object, const std::string Name, const boost::any& Value)
-{
-	// If the object isn't a property collection, we're done ...
-	iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(&Object);
-	if(!property_collection)
-	{
-		log() << error << k3d_file_reference << " : object has no property collection!" << std::endl;
-		return false;
-	}
-
-	// Look for a property with a matching name ...
-	const iproperty_collection::properties_t properties(property_collection->properties());
-	for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-	{
-		// Name doesn't match, so keep going ...
-		if((*property)->property_name() != Name)
-			continue;
-
-		// Success ...
-		return set_value(**property, Value);
-	}
-
-	// Couldn't find a property by that name!
-	log() << error << k3d_file_reference << " : could not find property [" << Name << "]" << std::endl;
-	return false;
-}
-
-bool quiet_set_value(iunknown& Object, const std::string Name, const boost::any& Value)
-{
-	// If the object isn't a property collection, we're done ...
-	iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(&Object);
-	if(!property_collection)
-		return false;
-
-	// Look for a property with a matching name ...
-	const iproperty_collection::properties_t properties(property_collection->properties());
-	for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-	{
-		// Name doesn't match, so keep going ...
-		if((*property)->property_name() != Name)
-			continue;
-
-		// Success ...
-		return quiet_set_value(**property, Value);
-	}
-
-	// Couldn't find a property by that name!
-	return false;
-}
+} // namespace property
 
 } // namespace k3d
-
 

@@ -38,25 +38,25 @@ inode* get_time_source(idocument& Document)
 iproperty* get_start_time(idocument& Document)
 {
 	inode* const object = get_time_source(Document);
-	return object ? get_typed_property<double>(*object, "start_time") : 0;
+	return object ? property::get<double>(*object, "start_time") : 0;
 }
 
 iproperty* get_end_time(idocument& Document)
 {
 	inode* const object = get_time_source(Document);
-	return object ? get_typed_property<double>(*object, "end_time") : 0;
+	return object ? property::get<double>(*object, "end_time") : 0;
 }
 
 iproperty* get_frame_rate(idocument& Document)
 {
 	inode* const object = get_time_source(Document);
-	return object ? get_typed_property<double>(*object, "frame_rate") : 0;
+	return object ? property::get<double>(*object, "frame_rate") : 0;
 }
 
 iproperty* get_time(idocument& Document)
 {
 	inode* const object = get_time_source(Document);
-	return object ? get_typed_property<double>(*object, "time") : 0;
+	return object ? property::get<double>(*object, "time") : 0;
 }
 
 } // namespace k3d

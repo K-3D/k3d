@@ -61,7 +61,7 @@ namespace detail
 void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocument& Document)
 {
 	// Check for "input_matrix" property
-	k3d::iproperty* const transformation_property = k3d::get_typed_property<k3d::matrix4>(FromNode, "input_matrix");
+	k3d::iproperty* const transformation_property = k3d::property::get<k3d::matrix4>(FromNode, "input_matrix");
 	if(!transformation_property)
 		return;
 
@@ -87,7 +87,7 @@ void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocum
 
 	// Copy transformation value
 	const k3d::matrix4 transformation = k3d::node_to_world_matrix(FromNode);
-	k3d::set_value(*frozen_transformation, "matrix", transformation);
+	k3d::property::set_internal_value(*frozen_transformation, "matrix", transformation);
 }
 
 /// Instantiates a mesh : creates a new mesh instance connected to the mesh output
@@ -131,7 +131,7 @@ k3d::inode* instantiate_mesh(k3d::idocument& Document, k3d::inode& Node)
 			&& name != "input_mesh"
 			&& name != "output_mesh")
 		{
-			k3d::set_value(*mesh_instance, name, (*property)->property_value());
+			k3d::property::set_internal_value(*mesh_instance, name, (*property)->property_value());
 		}
 	}
 
@@ -192,12 +192,12 @@ k3d::inode* duplicate_mesh(k3d::idocument& Document, k3d::inode& Node)
 			&& name != "input_mesh"
 			&& name != "output_mesh")
 		{
-			k3d::set_value(*mesh_instance, name, (*property)->property_value());
+			k3d::property::set_internal_value(*mesh_instance, name, (*property)->property_value());
 		}
 	}
 
 	// Copy upstream mesh to our new FrozenMesh ...
-	if(k3d::mesh* const upstream_mesh = boost::any_cast<k3d::mesh*>(k3d::get_value(Document.dag(), upstream_mesh_source->mesh_source_output())))
+	if(k3d::mesh* const upstream_mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(Document.dag(), upstream_mesh_source->mesh_source_output())))
 	{
 		if(k3d::imesh_storage* const frozen_mesh_storage = dynamic_cast<k3d::imesh_storage*>(frozen_mesh))
 		{
@@ -236,7 +236,7 @@ k3d::inode* duplicate_node(k3d::idocument& Document, k3d::inode& Node)
 			&& name != "output_mesh"
 			&& !(Node.factory().class_id() == k3d::classes::Camera() && name == "navigation_target")) // Skip Camera's navigation target property
 		{
-			k3d::set_value(*clone, name, (*property)->property_value());
+			k3d::property::set_internal_value(*clone, name, (*property)->property_value());
 		}
 	}
 

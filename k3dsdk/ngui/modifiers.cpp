@@ -175,18 +175,18 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 		{
 			if(SELECT_NODES == DocumentState.selection_mode().value())
 			{
-				k3d::set_value(
+				k3d::property::set_internal_value(
 					modifier_mesh_selection_sink->mesh_selection_sink_input(),
 					k3d::mesh_selection::select_all());
 			}
 			else
 			{
-				k3d::set_value(
+				k3d::property::set_internal_value(
 					modifier_mesh_selection_sink->mesh_selection_sink_input(),
 					downstream_mesh_selection_sink->mesh_selection_sink_input().property_value());
 			}
 	
-			k3d::set_value(
+			k3d::property::set_internal_value(
 				downstream_mesh_selection_sink->mesh_selection_sink_input(),
 				k3d::mesh_selection::select_null());
 		}

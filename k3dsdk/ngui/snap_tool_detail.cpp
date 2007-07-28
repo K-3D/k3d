@@ -107,7 +107,7 @@ void snap_tool_detail::transform_target::reset(k3d::iunknown*)
 void snap_tool_detail::transform_target::start_transform()
 {
 	if(create_transform_modifier("Snap "))
-		assert_warning(k3d::set_value(*modifier, "matrix", k3d::identity3D()));
+		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3D()));
 
 	m_origin = k3d::point3();
 //	m_world_position = k3d::point3();
@@ -236,7 +236,7 @@ void snap_tool_detail::transform_target::transform(k3d::isnappable* const Target
 
 	const k3d::matrix4 snap_matrix = snap(Target, SnapTarget, SnapDistance, SnapOrientation, MatchGroups, Transform);
 
-	assert_warning(k3d::set_value(*modifier, "matrix", k3d::inverse(upstream_matrix(*modifier)) * snap_matrix));
+	assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::inverse(upstream_matrix(*modifier)) * snap_matrix));
 }
 
 bool snap_tool_detail::transform_target::create_transform_modifier(const std::string& Name)
@@ -406,7 +406,7 @@ void snap_tool_detail::mesh_target::create_mesh_modifier(const std::string& Name
 		set_transform_modifier(upstream_node);
 
 		// Init tweaks
-		tweaks = boost::any_cast<tweaks_t>(k3d::get_value(*modifier, "tweaks"));
+		tweaks = boost::any_cast<tweaks_t>(k3d::property::pipeline_value(*modifier, "tweaks"));
 		tweaks.resize(mesh->points.size(), k3d::point3(0, 0, 0));
 
 		return;
@@ -422,7 +422,7 @@ void snap_tool_detail::mesh_target::create_mesh_modifier(const std::string& Name
 	update_mesh_modifier();
 
 	// Connect to change_signal to be acknowledged of external changes such as document Undo/Redo
-	k3d::iproperty* property = get_property(*modifier, "tweaks");
+	k3d::iproperty* property = property::get(*modifier, "tweaks");
 	return_if_fail(property);
 	m_modifier_change_signal = property->property_changed_signal().connect(sigc::mem_fun(*this, &snap_tool_detail::mesh_target::reset));
 */
@@ -431,7 +431,7 @@ void snap_tool_detail::mesh_target::create_mesh_modifier(const std::string& Name
 void snap_tool_detail::mesh_target::update_mesh_modifier()
 {
 	m_tweaks_mutex = true;
-	assert_warning(k3d::set_value(*modifier, "tweaks", tweaks));
+	assert_warning(k3d::property::set_internal_value(*modifier, "tweaks", tweaks));
 	m_tweaks_mutex = false;
 }
 

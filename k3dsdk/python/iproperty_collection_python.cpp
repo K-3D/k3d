@@ -79,7 +79,7 @@ list iproperty_collection::properties()
 
 iproperty iproperty_collection::get_property(const std::string& Name)
 {
-	return iproperty(k3d::get_property(wrapped(), Name));
+	return iproperty(k3d::property::get(wrapped(), Name));
 }
 
 iproperty iproperty_collection::add_user_property(const std::string& Type, const std::string& Name, const std::string& Label, const std::string& Description)
@@ -155,7 +155,7 @@ iproperty iproperty_collection::add_ri_option(const std::string& Type, const std
 
 object iproperty_collection::getattr(const std::string& Name)
 {
-	if(k3d::iproperty* property = k3d::get_property(wrapped(), Name))
+	if(k3d::iproperty* property = k3d::property::get(wrapped(), Name))
 	{
 		k3d::idag* dag = property->property_node() ? &property->property_node()->document().dag() : 0;
 		if(dag)
@@ -171,7 +171,7 @@ object iproperty_collection::getattr(const std::string& Name)
 
 void iproperty_collection::setattr(const std::string& Name, const object& Value)
 {
-	if(k3d::iproperty* const property = k3d::get_property(wrapped(), Name))
+	if(k3d::iproperty* const property = k3d::property::get(wrapped(), Name))
 	{
 		if(k3d::iwritable_property* const writable = dynamic_cast<k3d::iwritable_property*>(property))
 		{

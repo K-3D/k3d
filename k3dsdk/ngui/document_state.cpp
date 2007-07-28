@@ -303,7 +303,7 @@ void select_components(const k3d::selection::records& Selection, const UpdatePol
 		{
 			if(sink && node)
 			{
-				k3d::set_value(sink->mesh_selection_sink_input(), selection);
+				k3d::property::set_internal_value(sink->mesh_selection_sink_input(), selection);
 			}
 
 			node = n->first;
@@ -321,7 +321,7 @@ void select_components(const k3d::selection::records& Selection, const UpdatePol
 
 	if(sink && node)
 	{
-		k3d::set_value(sink->mesh_selection_sink_input(), selection);
+		k3d::property::set_internal_value(sink->mesh_selection_sink_input(), selection);
 	}
 }
 
@@ -351,8 +351,8 @@ void update_component_selection(const k3d::nodes_t& Nodes, const UpdatePolicyT& 
 
 		UpdatePolicy(*mesh, selection);
 
-		k3d::set_value(mesh_selection_sink->mesh_selection_sink_input(), selection);
-		k3d::set_value(**node, "show_component_selection", VisibleSelection);
+		k3d::property::set_internal_value(mesh_selection_sink->mesh_selection_sink_input(), selection);
+		k3d::property::set_internal_value(**node, "show_component_selection", VisibleSelection);
 	}
 }
 
@@ -1427,8 +1427,8 @@ public:
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
 			k3d::selection::select(*node);
-			k3d::quiet_set_value(**node, "viewport_visible", false);
-			k3d::quiet_set_value(**node, "render_final", false);
+			k3d::property::set_internal_value(**node, "viewport_visible", false);
+			k3d::property::set_internal_value(**node, "render_final", false);
 		}
 	}
 
@@ -1437,8 +1437,8 @@ public:
 		const k3d::nodes_t nodes = selected_nodes();
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
-			k3d::quiet_set_value(**node, "viewport_visible", true);
-			k3d::quiet_set_value(**node, "render_final", true);
+			k3d::property::set_internal_value(**node, "viewport_visible", true);
+			k3d::property::set_internal_value(**node, "render_final", true);
 		}
 	}
 
@@ -1448,8 +1448,8 @@ public:
 		{
 			if(!is_selected(*node))
 			{
-				k3d::quiet_set_value(**node, "viewport_visible", false);
-				k3d::quiet_set_value(**node, "render_final", false);
+				k3d::property::set_internal_value(**node, "viewport_visible", false);
+				k3d::property::set_internal_value(**node, "render_final", false);
 			}
 		}
 	}
@@ -1458,8 +1458,8 @@ public:
 	{
 		for(k3d::inode_collection::nodes_t::const_iterator node = m_document.nodes().collection().begin(); node != m_document.nodes().collection().end(); ++node)
 		{
-			k3d::quiet_set_value(**node, "viewport_visible", true);
-			k3d::quiet_set_value(**node, "render_final", true);
+			k3d::property::set_internal_value(**node, "viewport_visible", true);
+			k3d::property::set_internal_value(**node, "render_final", true);
 		}
 	}
 
@@ -1523,8 +1523,8 @@ public:
 			k3d::inode* const mesh_instance = k3d::create_plugin<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), node_name + " Instance"));
 
 			// Assign a default painter ...
-			k3d::set_value(*mesh_instance, "gl_painter", default_gl_painter());
-			k3d::set_value(*mesh_instance, "ri_painter", default_ri_painter());
+			k3d::property::set_internal_value(*mesh_instance, "gl_painter", default_gl_painter());
+			k3d::property::set_internal_value(*mesh_instance, "ri_painter", default_ri_painter());
 
 			// Connect the mesh instance to the source ...
 			k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(mesh_instance);

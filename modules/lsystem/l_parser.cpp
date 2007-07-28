@@ -1546,9 +1546,9 @@ public:
 			return;
 
 		// Set configuration's default recursion values
-		k3d::set_value(m_recursion, recursion);
-		k3d::set_value(m_basic_angle, basic_angle);
-		k3d::set_value(m_thickness, thickness);
+		k3d::property::set_internal_value(m_recursion, recursion);
+		k3d::property::set_internal_value(m_basic_angle, basic_angle);
+		k3d::property::set_internal_value(m_thickness, thickness);
 
 		// Reset bounding box
 		lparser::bounding_box = k3d::bounding_box3();

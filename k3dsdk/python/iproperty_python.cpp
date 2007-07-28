@@ -82,7 +82,7 @@ object iproperty::internal_value()
 object iproperty::value()
 {
 	if(k3d::inode* const node = wrapped().property_node())
-		return any_to_python(k3d::get_value(node->document().dag(), wrapped()));
+		return any_to_python(k3d::property::pipeline_value(node->document().dag(), wrapped()));
 
 	return internal_value();
 }

@@ -83,18 +83,18 @@ public:
 		if(crop_window)
 		{
 			const k3d::rectangle window(
-				boost::any_cast<double>(k3d::get_value(m_document_state.document().dag(), crop_window->crop_left())),
-				boost::any_cast<double>(k3d::get_value(m_document_state.document().dag(), crop_window->crop_right())),
-				boost::any_cast<double>(k3d::get_value(m_document_state.document().dag(), crop_window->crop_top())),
-				boost::any_cast<double>(k3d::get_value(m_document_state.document().dag(), crop_window->crop_bottom())));
+				boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().dag(), crop_window->crop_left())),
+				boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().dag(), crop_window->crop_right())),
+				boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().dag(), crop_window->crop_top())),
+				boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().dag(), crop_window->crop_bottom())));
 
 			if(!window.contains(widget_to_ndc(Viewport, k3d::point2(Event.x, Event.y))))
 			{
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Reset Camera Crop Window"), K3D_CHANGE_SET_CONTEXT);
-				k3d::set_value(crop_window->crop_left(), 0.0);
-				k3d::set_value(crop_window->crop_right(), 1.0);
-				k3d::set_value(crop_window->crop_top(), 0.0);
-				k3d::set_value(crop_window->crop_bottom(), 1.0);
+				k3d::property::set_internal_value(crop_window->crop_left(), 0.0);
+				k3d::property::set_internal_value(crop_window->crop_right(), 1.0);
+				k3d::property::set_internal_value(crop_window->crop_top(), 0.0);
+				k3d::property::set_internal_value(crop_window->crop_bottom(), 1.0);
 
 				command_arguments arguments;
 				arguments.append_viewport_coordinates("mouse", Viewport, Event);
@@ -172,10 +172,10 @@ public:
 		const double top = top_left[1];
 		const double bottom = bottom_right[1];
 
-		k3d::set_value(crop_window->crop_left(), left);
-		k3d::set_value(crop_window->crop_right(), right);
-		k3d::set_value(crop_window->crop_top(), top);
-		k3d::set_value(crop_window->crop_bottom(), bottom);
+		k3d::property::set_internal_value(crop_window->crop_left(), left);
+		k3d::property::set_internal_value(crop_window->crop_right(), right);
+		k3d::property::set_internal_value(crop_window->crop_top(), top);
+		k3d::property::set_internal_value(crop_window->crop_bottom(), bottom);
 
 		command_arguments arguments;
 		arguments.append_viewport_coordinates("mouse", Viewport, Event);
@@ -246,10 +246,10 @@ public:
 		
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Set Camera Crop Window"), K3D_CHANGE_SET_CONTEXT);
 		
-				k3d::set_value(crop_window->crop_left(), left);
-				k3d::set_value(crop_window->crop_right(), right);
-				k3d::set_value(crop_window->crop_top(), top);
-				k3d::set_value(crop_window->crop_bottom(), bottom);
+				k3d::property::set_internal_value(crop_window->crop_left(), left);
+				k3d::property::set_internal_value(crop_window->crop_right(), right);
+				k3d::property::set_internal_value(crop_window->crop_top(), top);
+				k3d::property::set_internal_value(crop_window->crop_bottom(), bottom);
 				
 				return true;
 			}
@@ -292,10 +292,10 @@ public:
 				return_val_if_fail(crop_window, false);
 
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Reset Camera Crop Window"), K3D_CHANGE_SET_CONTEXT);
-				k3d::set_value(crop_window->crop_left(), 0.0);
-				k3d::set_value(crop_window->crop_right(), 1.0);
-				k3d::set_value(crop_window->crop_top(), 0.0);
-				k3d::set_value(crop_window->crop_bottom(), 1.0);
+				k3d::property::set_internal_value(crop_window->crop_left(), 0.0);
+				k3d::property::set_internal_value(crop_window->crop_right(), 1.0);
+				k3d::property::set_internal_value(crop_window->crop_top(), 0.0);
+				k3d::property::set_internal_value(crop_window->crop_bottom(), 1.0);
 
 				return true;
 			}
