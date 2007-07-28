@@ -28,7 +28,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/property.h>
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/tokens.h>

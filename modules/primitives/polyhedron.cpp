@@ -31,7 +31,6 @@
 #include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/property.h>
 
 #include <cctype>
 #include <cmath>

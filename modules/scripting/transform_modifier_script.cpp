@@ -28,7 +28,6 @@
 #include <k3dsdk/itime_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/property.h>
 #include <k3dsdk/scripted_node.h>
 #include <k3dsdk/transformable.h>
 

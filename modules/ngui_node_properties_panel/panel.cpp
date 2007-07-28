@@ -82,7 +82,6 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/property.h>
 #include <k3dsdk/types_ri.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
