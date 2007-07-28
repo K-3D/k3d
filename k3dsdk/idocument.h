@@ -36,7 +36,7 @@
 namespace k3d
 {
 
-class idag;
+class ipipeline;
 class inode_collection;
 class inode_name_map;
 class ipersistent;
@@ -52,7 +52,7 @@ public:
 	/// Returns the collection of K-3D objects within this document
 	virtual inode_collection& nodes() = 0;
 	/// Returns the directed acyclic graph of dependencies between object properties within this document
-	virtual idag& dag() = 0;
+	virtual ipipeline& pipeline() = 0;
 	/// Returns an object that can be used to collect and distribute profiling data for the visualization pipeline
 	virtual ipipeline_profiler& pipeline_profiler() = 0;
 	/// Returns the istate_recorder interface for this document

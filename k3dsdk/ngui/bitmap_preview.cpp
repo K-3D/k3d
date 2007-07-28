@@ -42,7 +42,7 @@ class property_proxy :
 	public idata_proxy
 {
 public:
-	property_proxy(k3d::idag& Graph, k3d::iproperty& Data) :
+	property_proxy(k3d::ipipeline& Graph, k3d::iproperty& Data) :
 		m_graph(Graph),
 		m_readable_data(Data)
 	{
@@ -67,11 +67,11 @@ private:
 	property_proxy(const property_proxy& RHS);
 	property_proxy& operator=(const property_proxy& RHS);
 
-	k3d::idag& m_graph;
+	k3d::ipipeline& m_graph;
 	k3d::iproperty& m_readable_data;
 };
 
-std::auto_ptr<idata_proxy> proxy(k3d::idag& Graph, k3d::iproperty& Data)
+std::auto_ptr<idata_proxy> proxy(k3d::ipipeline& Graph, k3d::iproperty& Data)
 {
 	return std::auto_ptr<idata_proxy>(new property_proxy(Graph, Data));
 }

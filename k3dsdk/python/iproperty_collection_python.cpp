@@ -157,10 +157,10 @@ object iproperty_collection::getattr(const std::string& Name)
 {
 	if(k3d::iproperty* property = k3d::property::get(wrapped(), Name))
 	{
-		k3d::idag* dag = property->property_node() ? &property->property_node()->document().dag() : 0;
-		if(dag)
+		k3d::ipipeline* pipeline = property->property_node() ? &property->property_node()->document().pipeline() : 0;
+		if(pipeline)
 		{
-			for(k3d::iproperty* dependency = dag->dependency(*property); dependency; dependency = dag->dependency(*dependency))
+			for(k3d::iproperty* dependency = pipeline->dependency(*property); dependency; dependency = pipeline->dependency(*dependency))
 				property = dependency;
 		}
 		return any_to_python(property->property_value());

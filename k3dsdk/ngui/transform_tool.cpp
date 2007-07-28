@@ -350,7 +350,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(node);
 		return_val_if_fail(downstream_sink, false);
 		k3d::iproperty& downstream_input = downstream_sink->transform_sink_input();
-		k3d::iproperty* upstream_output = node->document().dag().dependency(downstream_input);
+		k3d::iproperty* upstream_output = node->document().pipeline().dependency(downstream_input);
 
 		// Check upstream object
 		if(upstream_output)
@@ -366,7 +366,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		{
 			k3d::ikeyframer* keyframer = dynamic_cast<k3d::ikeyframer*>(upstream_node);
 			k3d::iproperty& downstream_input2 = keyframer->input_property();
-			upstream_output = node->document().dag().dependency(downstream_input2);
+			upstream_output = node->document().pipeline().dependency(downstream_input2);
 			if(upstream_output)
 				upstream_node = upstream_output->property_node();
 			if(upstream_node && (Class == upstream_node->factory().class_id()))
@@ -380,10 +380,10 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 				modifier = k3d::create_plugin<k3d::inode>(Class, node->document(), modifier_name);
 				return_val_if_fail(modifier, false);
 			
-				k3d::idag::dependencies_t dependencies;
+				k3d::ipipeline::dependencies_t dependencies;
 				dependencies.insert(std::make_pair(&dynamic_cast<k3d::itransform_sink*>(modifier)->transform_sink_input(), upstream_output));
 				dependencies.insert(std::make_pair(&downstream_input2, &dynamic_cast<k3d::itransform_source*>(modifier)->transform_source_output()));
-				node->document().dag().set_dependencies(dependencies);
+				node->document().pipeline().set_dependencies(dependencies);
 			
 				return true;
 			}

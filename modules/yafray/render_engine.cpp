@@ -181,9 +181,9 @@ public:
 		return_val_if_fail(start_time_property && end_time_property && frame_rate_property && time_property, false);
 
 		// Test the output images filepath to make sure it can hold all the frames we're going to generate ...
-		const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), *start_time_property));
-		const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), *end_time_property));
-		const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), *frame_rate_property));
+		const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), *start_time_property));
+		const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), *end_time_property));
+		const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), *frame_rate_property));
 
 		const size_t start_frame = static_cast<size_t>(k3d::round(frame_rate * start_time));
 		const size_t end_frame = static_cast<size_t>(k3d::round(frame_rate * end_time));
@@ -541,7 +541,7 @@ private:
 		}
 
 		// Setup the camera ...
-		const k3d::matrix4 camera_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(document().dag(), Camera.transformation().transform_source_output()));
+		const k3d::matrix4 camera_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(document().pipeline(), Camera.transformation().transform_source_output()));
 		const k3d::point3 camera_position = k3d::position(camera_matrix);
 		const k3d::point3 camera_to_vector = camera_matrix * k3d::point3(0, 0, 1);
 		const k3d::point3 camera_up_vector = camera_matrix * k3d::point3(0, 1, 0);

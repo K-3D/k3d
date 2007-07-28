@@ -48,7 +48,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/ianimation_render_engine.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/idag.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>

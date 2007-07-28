@@ -22,9 +22,9 @@ namespace xml { class element; }
 void upgrade_document(xml::element& XML);
 
 /// Serializes a document DAG to an XML element
-void save_dag(idocument& Document, xml::element& XML, const ipersistent::save_context& Context);
+void save_pipeline(idocument& Document, xml::element& XML, const ipersistent::save_context& Context);
 /// Deserializes document DAG information from an XML element
-void load_dag(idocument& Document, xml::element& XML, const ipersistent::load_context& Context);
+void load_pipeline(idocument& Document, xml::element& XML, const ipersistent::load_context& Context);
 
 /// Serializes a mesh to an XML document
 void save_mesh(const mesh& Mesh, xml::element& Container, const ipersistent::save_context& Context);

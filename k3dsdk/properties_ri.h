@@ -102,7 +102,7 @@ public:
 	const value_t value()
 	{
 		iproperty* source = this;
-		for(iproperty* dependency = m_dag.dependency(*source); dependency; dependency = m_dag.dependency(*dependency))
+		for(iproperty* dependency = m_pipeline.dependency(*source); dependency; dependency = m_pipeline.dependency(*dependency))
 			source = dependency;
 
 		if(source != this)
@@ -175,7 +175,7 @@ protected:
 	template<typename init_t>
 	renderman_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_dag(Init.document().dag()),
+		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description()),
@@ -191,7 +191,7 @@ protected:
 	}
 
 private:
-	idag& m_dag;
+	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;

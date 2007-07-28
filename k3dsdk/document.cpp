@@ -32,7 +32,7 @@
 #include "data.h"
 #include "dependencies.h"
 #include "document.h"
-#include "idag.h"
+#include "ipipeline.h"
 #include "ideletable.h"
 #include "idocument.h"
 #include "idocument_plugin_factory.h"
@@ -412,19 +412,19 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// dag_implementation
+// pipeline_implementation
 
-class dag_implementation :
-	public idag,
+class pipeline_implementation :
+	public ipipeline,
 	public sigc::trackable
 {
 public:
-	dag_implementation(istate_recorder& StateRecorder) :
+	pipeline_implementation(istate_recorder& StateRecorder) :
 		m_state_recorder(StateRecorder)
 	{
 	}
 
-	~dag_implementation()
+	~pipeline_implementation()
 	{
 	}
 
@@ -532,7 +532,7 @@ private:
 		if(result == m_dependencies.end())
 		{
 			result = m_dependencies.insert(std::make_pair(Property, static_cast<iproperty*>(0))).first;
-			m_delete_connections[Property] = Property->property_deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &dag_implementation::on_property_deleted), Property));
+			m_delete_connections[Property] = Property->property_deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &pipeline_implementation::on_property_deleted), Property));
 		}
 
 		return result;
@@ -542,8 +542,8 @@ private:
 		public istate_container
 	{
 	public:
-		set_dependencies_container(idag& Dag, const idag::dependencies_t& Dependencies) :
-			m_dag(Dag),
+		set_dependencies_container(ipipeline& Dag, const ipipeline::dependencies_t& Dependencies) :
+			m_pipeline(Dag),
 			m_dependencies(Dependencies)
 		{
 		}
@@ -554,20 +554,20 @@ private:
 
 		void restore_state()
 		{
-			m_dag.set_dependencies(m_dependencies);
+			m_pipeline.set_dependencies(m_dependencies);
 		}
 
 	private:
-		idag& m_dag;
-		idag::dependencies_t m_dependencies;
+		ipipeline& m_pipeline;
+		ipipeline::dependencies_t m_dependencies;
 	};
 
 	class delete_property_container :
 		public istate_container
 	{
 	public:
-		delete_property_container(dag_implementation& Dag, iproperty* const Property) :
-			m_dag(Dag),
+		delete_property_container(pipeline_implementation& Dag, iproperty* const Property) :
+			m_pipeline(Dag),
 			m_property(Property)
 		{
 		}
@@ -578,11 +578,11 @@ private:
 
 		void restore_state()
 		{
-			m_dag.on_property_deleted(m_property);
+			m_pipeline.on_property_deleted(m_property);
 		}
 
 	private:
-		dag_implementation& m_dag;
+		pipeline_implementation& m_pipeline;
 		iproperty* const m_property;
 	};
 
@@ -612,12 +612,12 @@ class public_document_implementation :
 	public sigc::trackable
 {
 public:
-	public_document_implementation(istate_recorder& StateRecorder, inode_collection& Nodes, idag& Dag) :
+	public_document_implementation(istate_recorder& StateRecorder, inode_collection& Nodes, ipipeline& Dag) :
 		command_node::implementation("document", 0),
 		property_collection(),
 		m_state_recorder(StateRecorder),
 		m_nodes(Nodes),
-		m_dag(Dag),
+		m_pipeline(Dag),
 		m_path(init_owner(*this) + init_name("path") + init_label(_("Document Path")) + init_description(_("Document Path")) + init_value(filesystem::path())),
 		m_title(init_owner(*this) + init_name("title") + init_label(_("Document Title")) + init_description(_("Document Title")) + init_value(k3d::ustring()))
 	{
@@ -640,9 +640,9 @@ public:
 		return m_nodes;
 	}
 
-	idag& dag()
+	ipipeline& pipeline()
 	{
-		return m_dag;
+		return m_pipeline;
 	}
 
 	ipipeline_profiler& pipeline_profiler()
@@ -694,8 +694,8 @@ private:
 	istate_recorder& m_state_recorder;
 	/// Stores document nodes ...
 	inode_collection& m_nodes;
-	/// Stores a reference to an implementation of idag
-	idag& m_dag;
+	/// Stores a reference to an implementation of ipipeline
+	ipipeline& m_pipeline;
 	/// Stores a pipeline profiler object
 	k3d::pipeline_profiler m_pipeline_profiler;
  	/// Stores unique node names
@@ -710,15 +710,15 @@ private:
 	plugin_serialization_handlers_t m_plugin_serialization_handlers;
 };
 
-/// This is a real abortion, but it solves our interdependency problems among state recorder, dag, and property collection implementations
+/// This is a real abortion, but it solves our interdependency problems among state recorder, pipeline, and property collection implementations
 class document_implementation
 {
 public:
 	document_implementation() :
 		m_state_recorder(new state_recorder_implementation()),
 		m_nodes(new node_collection_implementation(*m_state_recorder)),
-		m_dag(new dag_implementation(*m_state_recorder)),
-		m_document(new public_document_implementation(*m_state_recorder, *m_nodes, *m_dag))
+		m_pipeline(new pipeline_implementation(*m_state_recorder)),
+		m_document(new public_document_implementation(*m_state_recorder, *m_nodes, *m_pipeline))
 	{
 	}
 
@@ -726,18 +726,18 @@ public:
 	{
 		m_document->close_signal().emit();
 
-		m_dag->on_close_document();
+		m_pipeline->on_close_document();
 		m_nodes->on_close_document();
 
 		delete m_document;
-		delete m_dag;
+		delete m_pipeline;
 		delete m_nodes;
 		delete m_state_recorder;
 	}
 
 	state_recorder_implementation* const m_state_recorder;
 	node_collection_implementation* const m_nodes;
-	dag_implementation* const m_dag;
+	pipeline_implementation* const m_pipeline;
 	public_document_implementation* const m_document;
 
 private:

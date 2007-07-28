@@ -91,8 +91,8 @@ void create_graph(document_state& DocumentState, k3d::graph& Graph)
 		}
 	}
 
-	const k3d::idag::dependencies_t dependencies = DocumentState.document().dag().dependencies();
-	for(k3d::idag::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
+	const k3d::ipipeline::dependencies_t dependencies = DocumentState.document().pipeline().dependencies();
+	for(k3d::ipipeline::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
 	{
 		if(dependency->first && dependency->first->property_node() && dependency->second && dependency->second->property_node())
 		{

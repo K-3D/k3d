@@ -35,7 +35,7 @@
 #include <k3dsdk/ngui/ui_component.h>
 
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/idag.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iproperty_collection.h>
@@ -329,7 +329,7 @@ public:
 		k3d::iproperty_collection::properties_t all_properties = property_collection->properties();
 		for(k3d::iproperty_collection::properties_t::iterator property = all_properties.begin(); property != all_properties.end(); ++property)
 		{
-			k3d::iproperty* connection = m_document_state.document().dag().dependency(**property);
+			k3d::iproperty* connection = m_document_state.document().pipeline().dependency(**property);
 			if(!connection)
 				continue;
 

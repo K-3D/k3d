@@ -361,7 +361,7 @@ void merge_nodes(k3d::idocument& Document)
 		}
 	}
 
-	k3d::load_dag(Document, *xml_document, context);
+	k3d::load_pipeline(Document, *xml_document, context);
 }
 
 } // namespace merge_nodes

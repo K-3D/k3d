@@ -32,7 +32,7 @@
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/dependencies.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/idag.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
@@ -66,7 +66,7 @@ void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocum
 		return;
 
 	// Check whether it's connected
-	if(!Document.dag().dependency(*transformation_property))
+	if(!Document.pipeline().dependency(*transformation_property))
 		return;
 
 	// Duplicate input matrix into a new FrozenTransformation
@@ -81,9 +81,9 @@ void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocum
 	k3d::itransform_source* const transformation_source = dynamic_cast<k3d::itransform_source*>(frozen_transformation);
 	return_if_fail(transformation_source);
 
-	k3d::idag::dependencies_t dependencies;
+	k3d::ipipeline::dependencies_t dependencies;
 	dependencies.insert(std::make_pair(&transformation_sink->transform_sink_input(), &transformation_source->transform_source_output()));
-	Document.dag().set_dependencies(dependencies);
+	Document.pipeline().set_dependencies(dependencies);
 
 	// Copy transformation value
 	const k3d::matrix4 transformation = k3d::node_to_world_matrix(FromNode);
@@ -102,7 +102,7 @@ k3d::inode* instantiate_mesh(k3d::idocument& Document, k3d::inode& Node)
 
 	k3d::iproperty& downstream_input = downstream_sink->mesh_sink_input();
 
-	k3d::iproperty* const upstream_output = Document.dag().dependency(downstream_input);
+	k3d::iproperty* const upstream_output = Document.pipeline().dependency(downstream_input);
 	return_val_if_fail(upstream_output, 0);
 
 	// Create a mesh instance
@@ -114,9 +114,9 @@ k3d::inode* instantiate_mesh(k3d::idocument& Document, k3d::inode& Node)
 	return_val_if_fail(mesh_instance_sink, 0);
 
 	// Insert the instance into the DAG
-	k3d::idag::dependencies_t dependencies;
+	k3d::ipipeline::dependencies_t dependencies;
 	dependencies.insert(std::make_pair(&mesh_instance_sink->mesh_sink_input(), upstream_output));
-	Document.dag().set_dependencies(dependencies);
+	Document.pipeline().set_dependencies(dependencies);
 
 	// Duplicate transformation, if any
 	freeze_transformation(Node, *mesh_instance, Document);
@@ -150,7 +150,7 @@ k3d::inode* duplicate_mesh(k3d::idocument& Document, k3d::inode& Node)
 
 	k3d::iproperty& downstream_input = downstream_sink->mesh_sink_input();
 
-	k3d::iproperty* const upstream_output = Document.dag().dependency(downstream_input);
+	k3d::iproperty* const upstream_output = Document.pipeline().dependency(downstream_input);
 	return_val_if_fail(upstream_output, 0);
 
 	k3d::imesh_source* const upstream_mesh_source = dynamic_cast<k3d::imesh_source*>(upstream_output->property_node());
@@ -175,9 +175,9 @@ k3d::inode* duplicate_mesh(k3d::idocument& Document, k3d::inode& Node)
 	k3d::imesh_source* const frozen_mesh_source = dynamic_cast<k3d::imesh_source*>(frozen_mesh);
 	return_val_if_fail(frozen_mesh_source, 0);
 
-	k3d::idag::dependencies_t dependencies;
+	k3d::ipipeline::dependencies_t dependencies;
 	dependencies.insert(std::make_pair(&mesh_instance_sink->mesh_sink_input(), &frozen_mesh_source->mesh_source_output()));
-	Document.dag().set_dependencies(dependencies);
+	Document.pipeline().set_dependencies(dependencies);
 
 	// Duplicate transformation, if any
 	freeze_transformation(Node, *mesh_instance, Document);
@@ -197,7 +197,7 @@ k3d::inode* duplicate_mesh(k3d::idocument& Document, k3d::inode& Node)
 	}
 
 	// Copy upstream mesh to our new FrozenMesh ...
-	if(k3d::mesh* const upstream_mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(Document.dag(), upstream_mesh_source->mesh_source_output())))
+	if(k3d::mesh* const upstream_mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(Document.pipeline(), upstream_mesh_source->mesh_source_output())))
 	{
 		if(k3d::imesh_storage* const frozen_mesh_storage = dynamic_cast<k3d::imesh_storage*>(frozen_mesh))
 		{

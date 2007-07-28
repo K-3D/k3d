@@ -203,8 +203,8 @@ private:
 
 		// Show property dependencies ...
 		stream << "\n";
-		const k3d::idag::dependencies_t dependencies = document().dag().dependencies();
-		for(k3d::idag::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
+		const k3d::ipipeline::dependencies_t dependencies = document().pipeline().dependencies();
+		for(k3d::ipipeline::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
 		{
 			if(dependency->first && dependency->second)
 			{

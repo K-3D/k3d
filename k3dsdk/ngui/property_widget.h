@@ -28,7 +28,7 @@
 
 #include "ui_component.h"
 
-#include <k3dsdk/idag.h>
+#include <k3dsdk/ipipeline.h>
 
 namespace Gtk { class Menu; }
 namespace Gtk { class MenuItem; }

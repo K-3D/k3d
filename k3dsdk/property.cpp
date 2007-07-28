@@ -23,7 +23,7 @@
 */
 
 #include "data.h"
-#include "idag.h"
+#include "ipipeline.h"
 #include "idocument.h"
 #include "inode.h"
 
@@ -71,12 +71,12 @@ const boost::any internal_value(iunknown& Object, const std::string& Name)
 const boost::any pipeline_value(iunknown& Object, const std::string& Name)
 {
 	if(iproperty* const property = get(Object, Name))
-		return property_lookup(property, dynamic_cast<inode*>(&Object)->document().dag())->property_value();
+		return property_lookup(property, dynamic_cast<inode*>(&Object)->document().pipeline())->property_value();
 
 	return boost::any();
 }
 
-const boost::any pipeline_value(idag& Pipeline, iproperty& Property)
+const boost::any pipeline_value(ipipeline& Pipeline, iproperty& Property)
 {
 	return property_lookup(&Property, Pipeline)->property_value();
 }

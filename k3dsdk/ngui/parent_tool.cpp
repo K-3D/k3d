@@ -104,7 +104,7 @@ struct parent_tool::implementation
 
 		const k3d::matrix4 parent_compensation = k3d::inverse(k3d::node_to_world_matrix(Parent));
 
-		k3d::idag::dependencies_t dependencies;
+		k3d::ipipeline::dependencies_t dependencies;
 
 		k3d::record_state_change_set changeset(m_document_state.document(), _("Set Parent"), K3D_CHANGE_SET_CONTEXT);
 
@@ -143,7 +143,7 @@ struct parent_tool::implementation
 
 		m_document_state.deselect_all();
 		k3d::selection::select(&Parent);
-		m_document_state.document().dag().set_dependencies(dependencies);
+		m_document_state.document().pipeline().set_dependencies(dependencies);
 	}
 	
 	void on_set_parent(viewport::control& Viewport, const GdkEventButton& Event)

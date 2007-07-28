@@ -121,7 +121,7 @@ public:
 		}
 
 		// Save the DAG ...
-		k3d::save_dag(Document, xml_document, context);
+		k3d::save_pipeline(Document, xml_document, context);
 
 		// Save the XML ...
 		filestream << k3d::xml::declaration() << xml << std::endl;

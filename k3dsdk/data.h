@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "idag.h"
+#include "ipipeline.h"
 #include "idocument.h"
 #include "ienumeration_property.h"
 #include "ilist_property.h"
@@ -211,7 +211,7 @@ private:
 /** \brief Encapsulates the lookup process for connected properties
 	\note In the case of circular dependencies, returns the same value as the input property
 */
-iproperty* property_lookup(iproperty* const Source, idag& DAG);
+iproperty* property_lookup(iproperty* const Source, ipipeline& DAG);
 
 /////////////////////////////////////////////////////////////////////////////
 // no_property
@@ -248,7 +248,7 @@ class read_only_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_dag);
+		iproperty* const source = property_lookup(this, m_pipeline);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -299,7 +299,7 @@ protected:
 	template<typename init_t>
 	read_only_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_dag(Init.document().dag()),
+		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description())
@@ -313,7 +313,7 @@ protected:
 	}
 
 private:
-	idag& m_dag;
+	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
@@ -333,7 +333,7 @@ class writable_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_dag);
+		iproperty* const source = property_lookup(this, m_pipeline);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -394,7 +394,7 @@ protected:
 	template<typename init_t>
 	writable_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_dag(Init.document().dag()),
+		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description())
@@ -408,7 +408,7 @@ protected:
 	}
 
 private:
-	idag& m_dag;
+	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
@@ -428,7 +428,7 @@ class string_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_dag);
+		iproperty* const source = property_lookup(this, m_pipeline);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -505,7 +505,7 @@ protected:
 	template<typename init_t>
 	string_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_dag(Init.document().dag()),
+		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description())
@@ -519,7 +519,7 @@ protected:
 	}
 
 private:
-	idag& m_dag;
+	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
@@ -540,7 +540,7 @@ class path_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_dag);
+		iproperty* const source = property_lookup(this, m_pipeline);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -640,7 +640,7 @@ protected:
 	template<typename init_t>
 	path_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_dag(Init.document().dag()),
+		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description()),
@@ -657,7 +657,7 @@ protected:
 	}
 
 private:
-	idag& m_dag;
+	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
@@ -683,7 +683,7 @@ class script_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_dag);
+		iproperty* const source = property_lookup(this, m_pipeline);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -760,7 +760,7 @@ protected:
 	template<typename init_t>
 	script_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_dag(Init.document().dag()),
+		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description())
@@ -774,7 +774,7 @@ protected:
 	}
 
 private:
-	idag& m_dag;
+	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
@@ -795,7 +795,7 @@ class enumeration_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_dag);
+		iproperty* const source = property_lookup(this, m_pipeline);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -887,7 +887,7 @@ protected:
 	template<typename init_t>
 	enumeration_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_dag(Init.document().dag()),
+		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description()),
@@ -902,7 +902,7 @@ protected:
 	}
 
 private:
-	idag& m_dag;
+	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
@@ -925,7 +925,7 @@ class list_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_dag);
+		iproperty* const source = property_lookup(this, m_pipeline);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -991,7 +991,7 @@ protected:
 	template<typename init_t>
 	list_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_dag(Init.document().dag()),
+		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description()),
@@ -1006,7 +1006,7 @@ protected:
 	}
 
 private:
-	idag& m_dag;
+	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
@@ -1028,7 +1028,7 @@ class node_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_dag);
+		iproperty* const source = property_lookup(this, m_pipeline);
 		if(source != this)
 			return dynamic_cast<value_t>(boost::any_cast<inode*>(source->property_value()));
 
@@ -1104,7 +1104,7 @@ protected:
 	template<typename init_t>
 	node_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_dag(Init.document().dag()),
+		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description())
@@ -1118,7 +1118,7 @@ protected:
 	}
 
 private:
-	idag& m_dag;
+	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
@@ -1139,7 +1139,7 @@ class measurement_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_dag);
+		iproperty* const source = property_lookup(this, m_pipeline);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -1210,7 +1210,7 @@ protected:
 	template<typename init_t>
 	measurement_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_dag(Init.document().dag()),
+		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description()),
@@ -1226,7 +1226,7 @@ protected:
 	}
 
 private:
-	idag& m_dag;
+	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;

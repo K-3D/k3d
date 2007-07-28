@@ -64,7 +64,7 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	add(*manage(m_image));
 
 	data_changed();
-	m_data->document().document().dag().dependency_signal().connect(sigc::mem_fun(*this, &control::on_dependencies_changed));
+	m_data->document().document().pipeline().dependency_signal().connect(sigc::mem_fun(*this, &control::on_dependencies_changed));
 
 	signal_button_press_event().connect(sigc::mem_fun(*this, &base::button_press_event));
 	signal_button_release_event().connect(sigc::mem_fun(*this, &base::button_release_event));
@@ -86,13 +86,13 @@ void control::data_changed()
 	static const Glib::RefPtr<Gdk::Pixbuf> connected = load_icon("connected_plug", Gtk::ICON_SIZE_BUTTON);
 	static const Glib::RefPtr<Gdk::Pixbuf> disconnected = load_icon("plug_tool", Gtk::ICON_SIZE_BUTTON);
 
-	if(m_data->document().document().dag().dependency(m_data->property()))
+	if(m_data->document().document().pipeline().dependency(m_data->property()))
 		m_image->set(connected);
 	else
 		m_image->set(disconnected);
 }
 
-void control::on_dependencies_changed(const k3d::idag::dependencies_t& Dependencies)
+void control::on_dependencies_changed(const k3d::ipipeline::dependencies_t& Dependencies)
 {
 	if(Dependencies.count(&m_data->property()))
 		data_changed();

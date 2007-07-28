@@ -140,7 +140,7 @@ object idocument::get_dependency(iproperty& Property)
 	if(!property)
 		throw std::invalid_argument("property cannot be null");
 
-	k3d::iproperty* const dependency = wrapped().dag().dependency(*property);
+	k3d::iproperty* const dependency = wrapped().pipeline().dependency(*property);
 	return dependency ? object(iproperty(dependency)) : object();
 }
 
@@ -155,9 +155,9 @@ void idocument::set_dependency(iproperty& From, iproperty& To)
 	if(from && to && from->property_type() != to->property_type())
 		throw std::invalid_argument("property types do not match");
 
-	k3d::idag::dependencies_t dependencies;
+	k3d::ipipeline::dependencies_t dependencies;
 	dependencies[from] = to;
-	wrapped().dag().set_dependencies(dependencies);
+	wrapped().pipeline().set_dependencies(dependencies);
 }
 
 void idocument::define_class()

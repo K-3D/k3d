@@ -32,7 +32,7 @@
 #include <gtkmm/buttonbox.h>
 
 namespace Gtk { class Image; }
-namespace k3d { class idag; }
+namespace k3d { class ipipeline; }
 namespace k3d { class iproperty; }
 
 namespace libk3dngui
@@ -127,7 +127,7 @@ std::auto_ptr<idata_proxy> proxy(data_t& Data)
 }
 
 /// Specialization of proxy() for use with properties
-std::auto_ptr<idata_proxy> proxy(k3d::idag& Graph, k3d::iproperty& Data);
+std::auto_ptr<idata_proxy> proxy(k3d::ipipeline& Graph, k3d::iproperty& Data);
 
 } // namespace bitmap_preview
 

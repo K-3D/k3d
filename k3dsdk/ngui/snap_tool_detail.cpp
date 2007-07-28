@@ -133,7 +133,7 @@ const k3d::matrix4 upstream_matrix(k3d::inode& Node)
 {
 	if(k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(&Node))
 	{
-		if(k3d::iproperty* const upstream_output = Node.document().dag().dependency(downstream_sink->transform_sink_input()))
+		if(k3d::iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_sink->transform_sink_input()))
 			return boost::any_cast<k3d::matrix4>(upstream_output->property_value());
 	}
 

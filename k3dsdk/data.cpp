@@ -68,7 +68,7 @@ std::istream& operator>>(std::istream& Stream, ipath_property::reference_t& RHS)
 namespace data
 {
 
-iproperty* property_lookup(iproperty* const Source, idag& DAG)
+iproperty* property_lookup(iproperty* const Source, ipipeline& DAG)
 {
 	iproperty* result = Source;
 

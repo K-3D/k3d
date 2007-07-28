@@ -137,15 +137,15 @@ public:
 	bool value()
 	{
 		// true == bypassed, false == normal
-		return m_document_state.document().dag().dependency(m_output_property) == &m_input_property;
+		return m_document_state.document().pipeline().dependency(m_output_property) == &m_input_property;
 	}
 
 	void set_value(const bool Value)
 	{
 		// true == bypassed, false == normal
-		k3d::idag::dependencies_t dependencies;
+		k3d::ipipeline::dependencies_t dependencies;
 		dependencies.insert(std::make_pair(&m_output_property, Value ? &m_input_property : static_cast<k3d::iproperty*>(0)));
-		m_document_state.document().dag().set_dependencies(dependencies);
+		m_document_state.document().pipeline().set_dependencies(dependencies);
 
 		m_changed_signal.emit(0);
 	}
@@ -510,7 +510,7 @@ public:
 				// Bitmap properties ...
 				else if(property_type == k3d::type_id_k3d_bitmap_ptr())
 				{
-					bitmap_preview::control* const control = new bitmap_preview::control(m_parent, property_name, bitmap_preview::proxy(m_document_state.document().dag(), property));
+					bitmap_preview::control* const control = new bitmap_preview::control(m_parent, property_name, bitmap_preview::proxy(m_document_state.document().pipeline(), property));
 					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);

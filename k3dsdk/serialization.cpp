@@ -22,7 +22,7 @@
 */
 
 #include "classes.h"
-#include "idag.h"
+#include "ipipeline.h"
 #include "idocument.h"
 #include "idocument_importer.h"
 #include "idocument_exporter.h"
@@ -74,7 +74,7 @@ public:
 	{
 	}
 
-	void operator()(const idag::dependency_t& Dependency)
+	void operator()(const ipipeline::dependency_t& Dependency)
 	{
 		// Sanity checks ...
 		iproperty* const from_property = Dependency.second;
@@ -108,7 +108,7 @@ private:
 class load_dependencies
 {
 public:
-	load_dependencies(idag::dependencies_t& Dependencies, const ipersistent::load_context& Context) :
+	load_dependencies(ipipeline::dependencies_t& Dependencies, const ipersistent::load_context& Context) :
 		m_dependencies(Dependencies),
 		m_context(Context)
 	{
@@ -171,7 +171,7 @@ public:
 	}
 
 private:
-	idag::dependencies_t& m_dependencies;
+	ipipeline::dependencies_t& m_dependencies;
 	const ipersistent::load_context& m_context;
 };
 
@@ -323,13 +323,13 @@ void upgrade_property_values(element& XMLDocument)
 	}
 }
 
-void upgrade_dag_element(element& XMLDocument)
+void upgrade_pipeline_element(element& XMLDocument)
 {
-	// Change <dag> to <dependencies> ...
-	if(element* const xml_dag = find_element(XMLDocument, "dag"))
+	// Change <pipeline> to <dependencies> ...
+	if(element* const xml_pipeline = find_element(XMLDocument, "pipeline"))
 	{
-		log() << warning << "Converting obsolete <dag> tag to <dependencies> tag" << std::endl;
-		xml_dag->name = "dependencies";
+		log() << warning << "Converting obsolete <pipeline> tag to <dependencies> tag" << std::endl;
+		xml_pipeline->name = "dependencies";
 	}
 }
 
@@ -1187,7 +1187,7 @@ void upgrade_document(element& XMLDocument)
 	detail::upgrade_variables_elements(XMLDocument);
 	detail::upgrade_variable_elements(XMLDocument);
 	detail::upgrade_property_values(XMLDocument);
-	detail::upgrade_dag_element(XMLDocument);
+	detail::upgrade_pipeline_element(XMLDocument);
 	detail::upgrade_dependency_elements(XMLDocument);
 	detail::upgrade_l_system_parser_nodes(XMLDocument);
 	detail::upgrade_poly_grid_nodes(XMLDocument);
@@ -1200,9 +1200,9 @@ void upgrade_document(element& XMLDocument)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// save_dag
+// save_pipeline
 
-void save_dag(idocument& Document, element& XML, const ipersistent::save_context& Context)
+void save_pipeline(idocument& Document, element& XML, const ipersistent::save_context& Context)
 {
 	// Create a mapping of properties to objects ...
 	detail::save_dependencies::map_t object_map;
@@ -1220,13 +1220,13 @@ void save_dag(idocument& Document, element& XML, const ipersistent::save_context
 
 	// Save all dependencies
 	element& xml_dependencies = XML.append(element("dependencies"));
-	std::for_each(Document.dag().dependencies().begin(), Document.dag().dependencies().end(), detail::save_dependencies(object_map, xml_dependencies, Context));
+	std::for_each(Document.pipeline().dependencies().begin(), Document.pipeline().dependencies().end(), detail::save_dependencies(object_map, xml_dependencies, Context));
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// load_dag
+// load_pipeline
 
-void load_dag(idocument& Document, element& XML, const ipersistent::load_context& Context)
+void load_pipeline(idocument& Document, element& XML, const ipersistent::load_context& Context)
 {
 	// If we don't have any DAG information, we're done ...
 	element* xml_dependencies = find_element(XML, "dependencies");
@@ -1235,9 +1235,9 @@ void load_dag(idocument& Document, element& XML, const ipersistent::load_context
 		return;
 
 	// Load data and update the DAG ...
-	idag::dependencies_t dependencies;
+	ipipeline::dependencies_t dependencies;
 	std::for_each(xml_dependencies->children.begin(), xml_dependencies->children.end(), detail::load_dependencies(dependencies, Context));
-	Document.dag().set_dependencies(dependencies);
+	Document.pipeline().set_dependencies(dependencies);
 }
 
 bool import_file(idocument& Document, idocument_importer& FormatFilter, const filesystem::path& File)

@@ -1513,7 +1513,7 @@ public:
 		k3d::inode* to_be_selected = node;
 
 		// Prepare to make connections to other nodes ...
-		k3d::idag::dependencies_t dependencies;
+		k3d::ipipeline::dependencies_t dependencies;
 
 		// If the new node is a mesh source (but not a MeshInstance!), create a MeshInstance node and attach it so it's immediately visible ...
 		k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(node);
@@ -1540,7 +1540,7 @@ public:
 			dependencies.insert(std::make_pair(&time_sink->time_sink_input(), k3d::get_time(m_document)));
 
 		if(!dependencies.empty())
-			m_document.dag().set_dependencies(dependencies);
+			m_document.pipeline().set_dependencies(dependencies);
 
 		// If the new node is a camera, orient it horizontally
 		if(k3d::classes::Camera() == Factory->class_id())

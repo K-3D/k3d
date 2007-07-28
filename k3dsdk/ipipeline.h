@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IDAG_H
-#define K3DSDK_IDAG_H
+#ifndef K3DSDK_IPIPELINE_H
+#define K3DSDK_IPIPELINE_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -33,11 +33,10 @@
 namespace k3d
 {
 
-// Forward declarations
 class iproperty;
 
-/// Abstract interface for a Directed Acyclic Graph of dependencies between document plugin properties
-class idag :
+/// Abstract interface for maintaining a collection of dependencies among properties ... a "pipeline"
+class ipipeline :
 	public virtual iunknown
 {
 public:
@@ -45,8 +44,6 @@ public:
 	typedef std::pair<iproperty*, iproperty*> dependency_t;
 	/// Defines a set of dependencies between properties - the map key is the dependent property and must not be NULL.  The map value is the property it depends upon, and may be NULL.
 	typedef std::map<iproperty*, iproperty*> dependencies_t;
-	/// Defines a collection of properties
-	typedef std::vector<iproperty*> properties_t;
 
 	/// Updates dependencies between a set of properties
 	virtual void set_dependencies(dependencies_t& Dependencies, iunknown* Hint = 0) = 0;
@@ -62,16 +59,13 @@ public:
 	virtual dependency_signal_t& dependency_signal() = 0;
 
 protected:
-	idag() {}
-	idag(const idag&) {}
-	idag& operator=(const idag&) { return *this; }
-	virtual ~idag() {}
+	ipipeline() {}
+	ipipeline(const ipipeline&) {}
+	ipipeline& operator=(const ipipeline&) { return *this; }
+	virtual ~ipipeline() {}
 };
-
-
 
 } // namespace k3d
 
-#endif // !K3DSDK_IDAG_H
-
+#endif // !K3DSDK_IPIPELINE_H
 

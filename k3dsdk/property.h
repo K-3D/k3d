@@ -30,7 +30,7 @@
 namespace k3d
 {
 
-class idag;
+class ipipeline;
 class iunknown;
 
 namespace property
@@ -54,7 +54,7 @@ const boost::any internal_value(iunknown& Object, const std::string& Name);
 const boost::any pipeline_value(iunknown& Object, const std::string& Name);
 
 /// Returns the "pipeline" value of a property - the value of the property, possibly overridden by pipeline dependencies
-const boost::any pipeline_value(idag& Pipeline, iproperty& Property);
+const boost::any pipeline_value(ipipeline& Pipeline, iproperty& Property);
 
 /** \brief Sets the value of a named property
     \return true, iff the value was set successfully, false otherwise (couldn't find a property with a matching name, it wasn't writable, or the type didn't match)

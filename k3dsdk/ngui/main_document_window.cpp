@@ -2202,7 +2202,7 @@ private:
 		return_if_fail(viewport_control);
 		k3d::icamera* camera = viewport_control->camera();
 
-		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(m_document_state.document().dag(), camera->transformation().transform_source_output()));
+		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(m_document_state.document().pipeline(), camera->transformation().transform_source_output()));
 		const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
 		const k3d::point3 world_target = boost::any_cast<k3d::point3>(camera->world_target().property_value());
 		const double distance = k3d::distance(world_position, world_target);

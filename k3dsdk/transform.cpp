@@ -24,7 +24,7 @@
 #include "classes.h"
 #include "create_plugins.h"
 #include "k3d-i18n-config.h"
-#include "idag.h"
+#include "ipipeline.h"
 #include "idocument.h"
 #include "inode.h"
 #include "iparentable.h"
@@ -48,7 +48,7 @@ const matrix4 upstream_matrix(inode& Node)
 	return_val_if_fail(downstream_sink, k3d::identity3D());
 
 	iproperty& downstream_input = downstream_sink->transform_sink_input();
-	iproperty* const upstream_output = Node.document().dag().dependency(downstream_input);
+	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
 	if(upstream_output)
 		return boost::any_cast<k3d::matrix4>(upstream_output->property_value());
 
@@ -61,7 +61,7 @@ inode* upstream_frozen_transformation(inode& Node)
 	return_val_if_fail(downstream_sink, 0);
 
 	iproperty& downstream_input = downstream_sink->transform_sink_input();
-	iproperty* const upstream_output = Node.document().dag().dependency(downstream_input);
+	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
 
 	if(upstream_output && upstream_output->property_node() && upstream_output->property_node()->factory().class_id() == classes::FrozenTransformation())
 		return upstream_output->property_node();
@@ -75,7 +75,7 @@ inode* insert_transform_modifier(inode& Node)
 	return_val_if_fail(downstream_sink, 0);
 
 	iproperty& downstream_input = downstream_sink->transform_sink_input();
-	iproperty* const upstream_output = Node.document().dag().dependency(downstream_input);
+	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
 
 	inode* const modifier = create_plugin<inode>(classes::FrozenTransformation(), Node.document(), _("Transformation"));
 	return_val_if_fail(modifier, 0);
@@ -83,10 +83,10 @@ inode* insert_transform_modifier(inode& Node)
 	return_val_if_fail(modifier_sink, 0);
 	itransform_source* const modifier_source = dynamic_cast<itransform_source*>(modifier);
 
-	idag::dependencies_t dependencies;
+	ipipeline::dependencies_t dependencies;
 	dependencies.insert(std::make_pair(&modifier_sink->transform_sink_input(), upstream_output));
 	dependencies.insert(std::make_pair(&downstream_input, &modifier_source->transform_source_output()));
-	Node.document().dag().set_dependencies(dependencies);
+	Node.document().pipeline().set_dependencies(dependencies);
 
 	return modifier;
 }

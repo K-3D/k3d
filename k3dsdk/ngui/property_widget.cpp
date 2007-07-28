@@ -154,7 +154,7 @@ void control::show_menu(const bool UserAction)
 	const std::string node_name = m_data->property().property_name();
 
 	// If the property's connected ...
-	k3d::iproperty* const dependency = m_data->document().document().dag().dependency(m_data->property());
+	k3d::iproperty* const dependency = m_data->document().document().pipeline().dependency(m_data->property());
 	if(dependency)
 	{
 		k3d::inode* const node = k3d::find_node(m_data->document().document().nodes(), *dependency);
@@ -261,17 +261,17 @@ void control::connect_to(k3d::iproperty* Property)
 	return_if_fail(Property);
 
 	// If the property's already connected, disconnect it first
-	if(m_data->document().document().dag().dependency(m_data->property()))
+	if(m_data->document().document().pipeline().dependency(m_data->property()))
 	{
-		k3d::idag::dependencies_t dependencies;
+		k3d::ipipeline::dependencies_t dependencies;
 		dependencies.insert(std::make_pair(&m_data->property(), static_cast<k3d::iproperty*>(0)));
-		m_data->document().document().dag().set_dependencies(dependencies);
+		m_data->document().document().pipeline().set_dependencies(dependencies);
 	}
 
 	// Make connection
-	k3d::idag::dependencies_t dependencies;
+	k3d::ipipeline::dependencies_t dependencies;
 	dependencies.insert(std::make_pair(&m_data->property(), Property));
-	m_data->document().document().dag().set_dependencies(dependencies);
+	m_data->document().document().pipeline().set_dependencies(dependencies);
 }
 
 void control::on_disconnect(k3d::inode* Node)
@@ -286,9 +286,9 @@ void control::disconnect(k3d::inode* Node)
 {
 	return_if_fail(Node);
 
-	k3d::idag::dependencies_t dependencies;
+	k3d::ipipeline::dependencies_t dependencies;
 	dependencies.insert(std::make_pair(&m_data->property(), static_cast<k3d::iproperty*>(0)));
-	m_data->document().document().dag().set_dependencies(dependencies);
+	m_data->document().document().pipeline().set_dependencies(dependencies);
 }
 
 } // namespace property_widget

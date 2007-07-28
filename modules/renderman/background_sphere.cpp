@@ -85,15 +85,15 @@ public:
 		double radius = 0;
 		if(perspective)
 		{
-			const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->near()));
-			const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->far()));
+			const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->near()));
+			const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->far()));
 			radius = k3d::mix(near, far, m_distance.value());
 		}
 
 		if(orthographic)
 		{
-			const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->near()));
-			const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->far()));
+			const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->near()));
+			const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->far()));
 			radius = k3d::mix(near, far, m_distance.value());
 		}
 

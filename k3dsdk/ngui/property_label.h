@@ -55,7 +55,7 @@ private:
 	/// Called whenever the state of the underlying data has changed
 	void data_changed();
 	/// Called by the signal system whenever property dependencies change
-	void on_dependencies_changed(const k3d::idag::dependencies_t& Dependencies);
+	void on_dependencies_changed(const k3d::ipipeline::dependencies_t& Dependencies);
 };
 
 } // namespace property_label

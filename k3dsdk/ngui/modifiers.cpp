@@ -26,7 +26,7 @@
 
 #include <k3dsdk/create_plugins.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/idag.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/imesh_selection_sink.h>
@@ -101,7 +101,7 @@ k3d::inode* modify_transformation(k3d::idocument& Document, k3d::inode& Object, 
 
 	k3d::iproperty& downstream_input = downstream_sink->transform_sink_input();
 
-	k3d::iproperty* const upstream_output = Document.dag().dependency(downstream_input);
+	k3d::iproperty* const upstream_output = Document.pipeline().dependency(downstream_input);
 
 	k3d::inode* modifier = 0;
 
@@ -120,11 +120,11 @@ k3d::inode* modify_transformation(k3d::idocument& Document, k3d::inode& Object, 
 		return_val_if_fail(modifier_source, 0);
 
 		// Insert the modifier into the DAG ...
-		k3d::idag::dependencies_t dependencies;
+		k3d::ipipeline::dependencies_t dependencies;
 		if(upstream_output)
 			dependencies.insert(std::make_pair(&modifier_sink->transform_sink_input(), upstream_output));
 		dependencies.insert(std::make_pair(&downstream_input, &modifier_source->transform_source_output()));
-		Document.dag().set_dependencies(dependencies);
+		Document.pipeline().set_dependencies(dependencies);
 	}
 
 	return modifier;
@@ -143,7 +143,7 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 
 	k3d::iproperty& downstream_input = downstream_sink->mesh_sink_input();
 
-	k3d::iproperty* const upstream_output = document.dag().dependency(downstream_input);
+	k3d::iproperty* const upstream_output = document.pipeline().dependency(downstream_input);
 	return_val_if_fail(upstream_output, 0);
 
 	k3d::inode* modifier = 0;
@@ -163,10 +163,10 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 		return_val_if_fail(modifier_source, 0);
 
 		// Insert the modifier into the pipeline ...
-		k3d::idag::dependencies_t dependencies;
+		k3d::ipipeline::dependencies_t dependencies;
 		dependencies.insert(std::make_pair(&modifier_sink->mesh_sink_input(), upstream_output));
 		dependencies.insert(std::make_pair(&downstream_input, &modifier_source->mesh_source_output()));
-		document.dag().set_dependencies(dependencies);
+		document.pipeline().set_dependencies(dependencies);
 
 		// If the modifier is a mesh selection sink, set its selection state ...
 		k3d::imesh_selection_sink* const modifier_mesh_selection_sink = dynamic_cast<k3d::imesh_selection_sink*>(modifier);
@@ -213,15 +213,15 @@ k3d::inode* insert_transform_modifier(k3d::inode& Object, const k3d::uuid& Modif
 	return_val_if_fail(downstream_sink, 0);
 
 	k3d::iproperty& downstream_input = downstream_sink->transform_sink_input();
-	k3d::iproperty* const upstream_output = Object.document().dag().dependency(downstream_input);
+	k3d::iproperty* const upstream_output = Object.document().pipeline().dependency(downstream_input);
 
 	const transform_modifier modifier = create_transform_modifier(Object.document(), ModifierType, ModifierName);
 	return_val_if_fail(!modifier.empty(), 0);
 
-	k3d::idag::dependencies_t dependencies;
+	k3d::ipipeline::dependencies_t dependencies;
 	dependencies.insert(std::make_pair(&modifier.sink->transform_sink_input(), upstream_output));
 	dependencies.insert(std::make_pair(&downstream_input, &modifier.source->transform_source_output()));
-	Object.document().dag().set_dependencies(dependencies);
+	Object.document().pipeline().set_dependencies(dependencies);
 
 	return modifier.node;
 }
@@ -232,7 +232,7 @@ k3d::inode* upstream_transform_modifier(k3d::inode& Object)
 	return_val_if_fail(downstream_sink, 0);
 
 	k3d::iproperty& downstream_input = downstream_sink->transform_sink_input();
-	k3d::iproperty* const upstream_output = Object.document().dag().dependency(downstream_input);
+	k3d::iproperty* const upstream_output = Object.document().pipeline().dependency(downstream_input);
 
 	// Check upstream object
 	if(upstream_output)
@@ -259,15 +259,15 @@ k3d::inode* insert_mesh_modifier(k3d::inode& Object, const k3d::uuid& ModifierTy
 	return_val_if_fail(downstream_sink, 0);
 
 	k3d::iproperty& downstream_input = downstream_sink->mesh_sink_input();
-	k3d::iproperty* const upstream_output = Object.document().dag().dependency(downstream_input);
+	k3d::iproperty* const upstream_output = Object.document().pipeline().dependency(downstream_input);
 
 	const mesh_modifier modifier = create_mesh_modifier(Object.document(), ModifierType, ModifierName);
 	return_val_if_fail(!modifier.empty(), 0);
 
-	k3d::idag::dependencies_t dependencies;
+	k3d::ipipeline::dependencies_t dependencies;
 	dependencies.insert(std::make_pair(&modifier.sink->mesh_sink_input(), upstream_output));
 	dependencies.insert(std::make_pair(&downstream_input, &modifier.source->mesh_source_output()));
-	Object.document().dag().set_dependencies(dependencies, modifier.source->hint());
+	Object.document().pipeline().set_dependencies(dependencies, modifier.source->hint());
 
 	return modifier.node;
 }
@@ -278,7 +278,7 @@ k3d::inode* upstream_mesh_modifier(k3d::inode& Object)
 	return_val_if_fail(downstream_sink, 0);
 
 	k3d::iproperty& downstream_input = downstream_sink->mesh_sink_input();
-	k3d::iproperty* const upstream_output = Object.document().dag().dependency(downstream_input);
+	k3d::iproperty* const upstream_output = Object.document().pipeline().dependency(downstream_input);
 
 	// Check upstream object
 	if(upstream_output)

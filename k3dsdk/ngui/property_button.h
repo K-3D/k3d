@@ -56,7 +56,7 @@ private:
 	/// Called whenever the state of the underlying data has changed
 	void data_changed();
 	/// Called by the signal system whenever property dependencies change
-	void on_dependencies_changed(const k3d::idag::dependencies_t& Dependencies);
+	void on_dependencies_changed(const k3d::ipipeline::dependencies_t& Dependencies);
 
 	/// Displays an image indicating the state of the property (connected / unconnected)
 	Gtk::Image* const m_image;

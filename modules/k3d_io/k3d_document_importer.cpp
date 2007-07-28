@@ -187,7 +187,7 @@ public:
 			}
 
 			// Load the DAG ...
-			k3d::load_dag(Document, *xml_document, context);
+			k3d::load_pipeline(Document, *xml_document, context);
 		}
 
 		// Load per-plugin-type data ....

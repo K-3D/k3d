@@ -80,24 +80,24 @@ public:
 		double left, right, top, bottom, plane;
 		if(perspective)
 		{
-			const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->near()));
-			const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->far()));
+			const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->near()));
+			const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->far()));
 			plane = k3d::mix(near, far, m_distance.value());
-			left = plane * boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->left()));
-			right = plane * boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->right()));
-			top = plane * boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->top()));
-			bottom = plane * boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), perspective->bottom()));
+			left = plane * boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->left()));
+			right = plane * boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->right()));
+			top = plane * boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->top()));
+			bottom = plane * boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->bottom()));
 		}
 
 		if(orthographic)
 		{
-			const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->near()));
-			const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->far()));
+			const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->near()));
+			const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->far()));
 			plane = k3d::mix(near, far, m_distance.value());
-			left = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->left()));
-			right = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->right()));
-			top = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->top()));
-			bottom = boost::any_cast<double>(k3d::property::pipeline_value(document().dag(), orthographic->bottom()));
+			left = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->left()));
+			right = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->right()));
+			top = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->top()));
+			bottom = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->bottom()));
 		}
 		
 		State.engine.RiAttributeBegin();

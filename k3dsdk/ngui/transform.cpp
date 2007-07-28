@@ -26,7 +26,7 @@
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/idag.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iparentable.h>
@@ -56,7 +56,7 @@ const transform_history_t parent_to_node_history(k3d::inode& Object)
 		if(!transform_sink)
 			break;
 
-		k3d::iproperty* const dependency = Object.document().dag().dependency(transform_sink->transform_sink_input());
+		k3d::iproperty* const dependency = Object.document().pipeline().dependency(transform_sink->transform_sink_input());
 		if(!dependency)
 			break;
 
@@ -103,9 +103,9 @@ void unparent(k3d::inode& Node)
 			{
 				k3d::property::set_internal_value(*modifier.node, "matrix", unparent_compensation);
 
-				k3d::idag::dependencies_t dependencies;
+				k3d::ipipeline::dependencies_t dependencies;
 				dependencies.insert(std::make_pair(&transform_sink->transform_sink_input(), &modifier.source->transform_source_output()));
-				Node.document().dag().set_dependencies(dependencies);
+				Node.document().pipeline().set_dependencies(dependencies);
 			}
 		}
 	}

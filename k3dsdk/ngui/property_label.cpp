@@ -72,7 +72,7 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 		set_tip(description);
 
 	data_changed();
-	m_data->document().document().dag().dependency_signal().connect(sigc::mem_fun(*this, &control::on_dependencies_changed));
+	m_data->document().document().pipeline().dependency_signal().connect(sigc::mem_fun(*this, &control::on_dependencies_changed));
 
 	signal_button_press_event().connect(sigc::mem_fun(*this, &control::button_press_event));
 	signal_button_release_event().connect(sigc::mem_fun(*this, &control::button_release_event));
@@ -87,7 +87,7 @@ void control::data_changed()
 {
 }
 
-void control::on_dependencies_changed(const k3d::idag::dependencies_t& Dependencies)
+void control::on_dependencies_changed(const k3d::ipipeline::dependencies_t& Dependencies)
 {
 	if(Dependencies.count(&m_data->property()))
 		data_changed();
