@@ -70,6 +70,7 @@ const contributors_t& contributors()
 		storage.push_back(contributor(ustring::from_utf8("Ed Millard"), "User interface fixes, prototype pipeline viewer")); 
 		storage.push_back(contributor(ustring::from_utf8("Francisco Andrades Grassi"), "Startup script improvements")); 
 		storage.push_back(contributor(ustring::from_utf8("Fred Labrosse"), "RedHat RPM packages")); 
+		storage.push_back(contributor(ustring::from_utf8("Gerhard Reitmayr"), "Reentrant Python scripting")); 
 		storage.push_back(contributor(ustring::from_utf8("German Gomez Garcia"), "Shader cache enhancements")); 
 		storage.push_back(contributor(ustring::from_utf8("Gilles J. Seguin"), "Bugfixes")); 
 		storage.push_back(contributor(ustring::from_utf8("Giuseppe Zompatori"), "RenderMan enhancements")); 
@@ -81,7 +82,7 @@ const contributors_t& contributors()
 		storage.push_back(contributor(ustring::from_utf8("Louis-Dominique Dubeau"), "Bugfixes and enhancements")); 
 		storage.push_back(contributor(ustring::from_utf8("Lukas Schroeder"), "Configuration")); 
 		storage.push_back(contributor(ustring::from_utf8("Manuel Bastioni"), "Authored the first K-3D fan page")); 
-		storage.push_back(contributor(ustring::from_utf8("Marco Amato from Udine"), "Wrote first Italian tutorial")); 
+		storage.push_back(contributor(ustring::from_utf8("Marco Amato from Udine"), "Tutorial localization")); 
 		storage.push_back(contributor(ustring::from_utf8("Patrick Mauritz"), "Plugin build enhancements")); 
 		storage.push_back(contributor(ustring::from_utf8("Peter Balon"), "GCC 3.3 fixes")); 
 		storage.push_back(contributor(ustring::from_utf8("Tom Browder"), "GNU Triangulated Surface support")); 
