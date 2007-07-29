@@ -61,10 +61,10 @@
 #include <k3dsdk/icamera_animation_render_engine.h>
 #include <k3dsdk/icamera_preview_render_engine.h>
 #include <k3dsdk/icamera_still_render_engine.h>
-#include <k3dsdk/icommand_node_simple.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
+#include <k3dsdk/ikeyframer.h>
 #include <k3dsdk/ilist_property.h>
 #include <k3dsdk/imeasurement_property.h>
 #include <k3dsdk/imesh_sink.h>
@@ -382,6 +382,21 @@ public:
 			property_groups.insert(property_groups.end(), k3d::iproperty_group_collection::group(m_node->factory().name(), all_properties));
 			property_groups.insert(property_groups.end(), groups.begin(), groups.end());
 		}
+		
+		// Used to determine if we need to add ikeyframer buttons
+		k3d::ikeyframer* keyframer = dynamic_cast<k3d::ikeyframer*>(m_node);
+		k3d::iproperty* last_time_property;
+		
+		// First add a manual keyframe button
+		if (keyframer)
+		{
+			button::control* const control =
+						new button::control(m_parent, "set_keyframe_button", "Set Keyframe")
+						<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_manual_keyframe), keyframer))
+						<< set_tooltip("Manually set keyframe");
+						
+			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
+		}
 
 		// For each property group ...
 		for(k3d::iproperty_group_collection::groups_t::const_iterator property_group = property_groups.begin(); property_group != property_groups.end(); ++property_group)
@@ -416,18 +431,15 @@ public:
 				const std::string property_name = property.property_name();
 				const std::type_info& property_type = property.property_type();
 				
-				if (property_type != typeid(k3d::icommand_node_simple*)) // skip push buttons, since the label is in the button and connecting makes little sense
-				{
-					// Provide a property button for the property ...
-					table->attach(*Gtk::manage(
-						new property_button::control(m_parent, property_name + "_property", property_widget::proxy(m_document_state,property))),
-						prop_button_begin, prop_button_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
-	
-					// Provide a label for the property ...
-					table->attach(*Gtk::manage(
-						new property_label::control(m_parent, property_name + "_label", property_widget::proxy(m_document_state, property))),
-						prop_label_begin, prop_label_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-				}
+				// Provide a property button for the property ...
+				table->attach(*Gtk::manage(
+					new property_button::control(m_parent, property_name + "_property", property_widget::proxy(m_document_state,property))),
+					prop_button_begin, prop_button_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
+
+				// Provide a label for the property ...
+				table->attach(*Gtk::manage(
+					new property_label::control(m_parent, property_name + "_label", property_widget::proxy(m_document_state, property))),
+					prop_label_begin, prop_label_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 				// Boolean properties ...
 				if(property_type == typeid(bool))
@@ -568,15 +580,6 @@ public:
 					selection_button::control* const control = new selection_button::control(m_parent, property_name, selection_button::proxy(property, state_recorder, property_name));
 					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 				}
-				else if(property_type == typeid(k3d::icommand_node_simple*))
-				{
-					button::control* const control =
-						new button::control(m_parent, property_name, property.property_label())
-						<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_simple_command_execute), &property))
-						<< set_tooltip(property.property_description());
-
-					table->attach(*manage(control), prop_label_begin, prop_label_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
-				}
 				else
 				{
 					k3d::log() << warning << k3d_file_reference << "unknown property type: " << property_type.name() << " name: " << property_name << std::endl;
@@ -591,6 +594,32 @@ public:
 						<< set_tooltip(_("Delete user property (no undo)"));
 
 					table->attach(*manage(control), prop_delete_begin, prop_delete_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
+				}
+				
+				// If we have a keyframer, add a delete button to each keyframe group
+				if (keyframer && property_name.find("key_time_", 0) != std::string::npos)
+				{
+					last_time_property = &property;
+				}
+				if (keyframer && property_name.find("key_value_", 0) != std::string::npos)
+				{
+					if (!last_time_property)
+					{
+						k3d::log() << warning << "No time property registered for " << property_name << std::endl;
+					}
+					else
+					{
+						++row;
+						std::string keynumber = property_name.substr(10, property_name.size() - 9);
+						button::control* const control =
+						new button::control(m_parent, "delete_key_" + keynumber, "Delete Key " + keynumber)
+							<< connect_button(sigc::bind(sigc::bind(sigc::mem_fun(*this, &implementation::on_key_delete), last_time_property), keyframer))
+							<< set_tooltip("Delete Key " + keynumber);
+							
+						table->attach(*manage(control), prop_label_begin, prop_label_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
+						
+						last_time_property = 0;
+					}
 				}
 			}
 
@@ -735,20 +764,15 @@ public:
 		window->show();
 	}
 	
-	void on_simple_command_execute(k3d::iproperty* Property)
+	void on_manual_keyframe(k3d::ikeyframer* Keyframer)
 	{
-		return_if_fail(Property);
-		try
-		{
-			k3d::icommand_node_simple* simple_command_node = boost::any_cast<k3d::icommand_node_simple*>(Property->property_value());
-			simple_command_node->execute_command();
-		}
-		catch (boost::bad_any_cast& e)
-		{
-			assert_not_reached();
-		}
+		Keyframer->keyframe();
 	}
-		  
+	
+	void on_key_delete(k3d::ikeyframer* Keyframer, k3d::iproperty* TimeProperty)
+	{
+		Keyframer->delete_key(TimeProperty);
+	}
 
 	/// Stores a reference to the owning document
 	document_state& m_document_state;

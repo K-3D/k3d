@@ -30,18 +30,25 @@
 namespace k3d
 {
 
-/// Abstract interface for objects that set keyframes. Avoids template hassle with the command nodes 
+/// Abstract interface for objects that set keyframes.
 class ikeyframer
 {
 public:
-	/// Set a keyframe
+	
+	/// List of the available keys
+	typedef std::list<iproperty*> keys_t;
+
+	/// Set a keyframe. Inputs are implementation-dependent, and may come from properties.
 	virtual void keyframe() = 0;
 	
 	/// Delete the keyframe placed at the given time property
 	virtual void delete_key(iproperty* TimeProperty) = 0;
 	
 	/// Get the property that inputs key values
-	virtual k3d::iproperty& input_property() = 0;
+	virtual iproperty& input_property() = 0;
+	
+	/// List with all the properties containing keytimes
+	virtual keys_t get_keys() = 0;
 	
 	virtual ~ikeyframer() {}
 };
