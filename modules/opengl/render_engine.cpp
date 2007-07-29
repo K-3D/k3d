@@ -179,10 +179,10 @@ void gl_draw_2d_widgets(k3d::icamera& Camera, const k3d::rectangle& WindowRect, 
 	// Optionally show the extents of the crop window
 	if(DrawCropWindow)
 	{
-		const double left = boost::any_cast<double>(k3d::property::pipeline_value(Document.pipeline(), Camera.crop_window().crop_left()));
-		const double right = boost::any_cast<double>(k3d::property::pipeline_value(Document.pipeline(), Camera.crop_window().crop_right()));
-		const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(Document.pipeline(), Camera.crop_window().crop_bottom()));
-		const double top = boost::any_cast<double>(k3d::property::pipeline_value(Document.pipeline(), Camera.crop_window().crop_top()));
+		const double left = boost::any_cast<double>(k3d::property::pipeline_value(Camera.crop_window().crop_left()));
+		const double right = boost::any_cast<double>(k3d::property::pipeline_value(Camera.crop_window().crop_right()));
+		const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(Camera.crop_window().crop_bottom()));
+		const double top = boost::any_cast<double>(k3d::property::pipeline_value(Camera.crop_window().crop_top()));
 
 		glColor4d(0, 0, 0.5, 1);
 		glDisable(GL_LIGHTING);
@@ -332,18 +332,18 @@ public:
 		{
 			Orthographic = false;
 
-			CameraRect.left = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->left()));
-			CameraRect.right = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->right()));
+			CameraRect.left = boost::any_cast<double>(k3d::property::pipeline_value(perspective->left()));
+			CameraRect.right = boost::any_cast<double>(k3d::property::pipeline_value(perspective->right()));
 			if(CameraRect.right < CameraRect.left)
 				std::swap(CameraRect.left, CameraRect.right);
 
-			CameraRect.top = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->top()));
-			CameraRect.bottom = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->bottom()));
+			CameraRect.top = boost::any_cast<double>(k3d::property::pipeline_value(perspective->top()));
+			CameraRect.bottom = boost::any_cast<double>(k3d::property::pipeline_value(perspective->bottom()));
 			if(CameraRect.top < CameraRect.bottom)
 				std::swap(CameraRect.top, CameraRect.bottom);
 
-			Near = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->near()));
-			Far = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->far()));
+			Near = boost::any_cast<double>(k3d::property::pipeline_value(perspective->near()));
+			Far = boost::any_cast<double>(k3d::property::pipeline_value(perspective->far()));
 
 			return_if_fail(CameraRect.left != CameraRect.right && CameraRect.top != CameraRect.bottom);
 
@@ -375,18 +375,18 @@ public:
 		{
 			Orthographic = true;
 
-			CameraRect.left = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->left()));
-			CameraRect.right = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->right()));
+			CameraRect.left = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->left()));
+			CameraRect.right = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->right()));
 			if(CameraRect.right < CameraRect.left)
 				std::swap(CameraRect.left, CameraRect.right);
 
-			CameraRect.top = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->top()));
-			CameraRect.bottom = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->bottom()));
+			CameraRect.top = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->top()));
+			CameraRect.bottom = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->bottom()));
 			if(CameraRect.top < CameraRect.bottom)
 				std::swap(CameraRect.top, CameraRect.bottom);
 
-			Near = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->near()));
-			Far = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->far()));
+			Near = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->near()));
+			Far = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->far()));
 
 			return_if_fail(CameraRect.left != CameraRect.right && CameraRect.top != CameraRect.bottom);
 
@@ -556,7 +556,7 @@ private:
 		glLoadIdentity();
 		if(orthographic)
 		{
-			const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(document().pipeline(), Camera.transformation().transform_source_output()));
+			const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(Camera.transformation().transform_source_output()));
 			const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
 			const k3d::point3 world_target = boost::any_cast<k3d::point3>(Camera.world_target().property_value());
 			const double distance = k3d::distance(world_position, world_target);
@@ -653,7 +653,7 @@ private:
 		if(!Select)
 			detail::gl_setup_lights(m_headlight.value());
 
-		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(document().pipeline(), Camera.transformation().transform_source_output()));
+		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(Camera.transformation().transform_source_output()));
 		const k3d::angle_axis orientation(k3d::euler_angles(transform_matrix, k3d::euler_angles::ZXYstatic));
 		const k3d::point3 position(k3d::position(transform_matrix));
 

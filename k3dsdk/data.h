@@ -20,7 +20,6 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "ipipeline.h"
 #include "idocument.h"
 #include "ienumeration_property.h"
 #include "ilist_property.h"
@@ -211,7 +210,7 @@ private:
 /** \brief Encapsulates the lookup process for connected properties
 	\note In the case of circular dependencies, returns the same value as the input property
 */
-iproperty* property_lookup(iproperty* const Source, ipipeline& DAG);
+iproperty* property_lookup(iproperty* const Source);
 
 /////////////////////////////////////////////////////////////////////////////
 // no_property
@@ -248,7 +247,7 @@ class read_only_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_pipeline);
+		iproperty* const source = property_lookup(this);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -295,14 +294,24 @@ public:
 		return m_deleted_signal;
 	}
 
+	iproperty* property_dependency()
+	{
+		return m_dependency;
+	}
+
+	void property_set_dependency(iproperty* Dependency)
+	{
+		m_dependency = Dependency;
+	}
+
 protected:
 	template<typename init_t>
 	read_only_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
-		m_description(Init.description())
+		m_description(Init.description()),
+		m_dependency(0)
 	{
 		Init.property_collection().register_property(*this);
 	}
@@ -313,11 +322,11 @@ protected:
 	}
 
 private:
-	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
 	deleted_signal_t m_deleted_signal;
+	iproperty* m_dependency;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -333,7 +342,7 @@ class writable_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_pipeline);
+		iproperty* const source = property_lookup(this);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -390,14 +399,24 @@ public:
 		return true;
 	}
 
+	iproperty* property_dependency()
+	{
+		return m_dependency;
+	}
+
+	void property_set_dependency(iproperty* Dependency)
+	{
+		m_dependency = Dependency;
+	}
+
 protected:
 	template<typename init_t>
 	writable_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
-		m_description(Init.description())
+		m_description(Init.description()),
+		m_dependency(0)
 	{
 		Init.property_collection().register_property(*this);
 	}
@@ -408,11 +427,11 @@ protected:
 	}
 
 private:
-	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
 	deleted_signal_t m_deleted_signal;
+	iproperty* m_dependency;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -428,7 +447,7 @@ class string_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_pipeline);
+		iproperty* const source = property_lookup(this);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -483,6 +502,16 @@ public:
 		return m_deleted_signal;
 	}
 
+	iproperty* property_dependency()
+	{
+		return m_dependency;
+	}
+
+	void property_set_dependency(iproperty* Dependency)
+	{
+		m_dependency = Dependency;
+	}
+
 	bool property_set_value(const boost::any Value, iunknown* const Hint)
 	{
 		const std::string* const new_value = boost::any_cast<std::string>(&Value);
@@ -505,10 +534,10 @@ protected:
 	template<typename init_t>
 	string_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
-		m_description(Init.description())
+		m_description(Init.description()),
+		m_dependency(0)
 	{
 		Init.property_collection().register_property(*this);
 	}
@@ -519,11 +548,11 @@ protected:
 	}
 
 private:
-	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
 	deleted_signal_t m_deleted_signal;
+	iproperty* m_dependency;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -540,7 +569,7 @@ class path_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_pipeline);
+		iproperty* const source = property_lookup(this);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -585,6 +614,16 @@ public:
 	deleted_signal_t& property_deleted_signal()
 	{
 		return m_deleted_signal;
+	}
+
+	iproperty* property_dependency()
+	{
+		return m_dependency;
+	}
+
+	void property_set_dependency(iproperty* Dependency)
+	{
+		m_dependency = Dependency;
 	}
 
 	bool property_set_value(const boost::any Value, iunknown* const Hint)
@@ -640,13 +679,13 @@ protected:
 	template<typename init_t>
 	path_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description()),
 		m_mode(Init.path_mode()),
 		m_type(Init.path_type()),
-		m_reference(RELATIVE_REFERENCE)
+		m_reference(RELATIVE_REFERENCE),
+		m_dependency(0)
 	{
 		Init.property_collection().register_property(*this);
 	}
@@ -657,7 +696,6 @@ protected:
 	}
 
 private:
-	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
@@ -667,6 +705,7 @@ private:
 	ipath_property::reference_t m_reference;
 	ipath_property::path_reference_changed_signal_t m_reference_changed_signal;
 	ipath_property::pattern_filters_t m_pattern_filters;
+	iproperty* m_dependency;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -683,7 +722,7 @@ class script_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_pipeline);
+		iproperty* const source = property_lookup(this);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -736,6 +775,16 @@ public:
 	deleted_signal_t& property_deleted_signal()
 	{
 		return m_deleted_signal;
+	}
+
+	iproperty* property_dependency()
+	{
+		return m_dependency;
+	}
+
+	void property_set_dependency(iproperty* Dependency)
+	{
+		m_dependency = Dependency;
 	}
 
 	bool property_set_value(const boost::any Value, iunknown* const Hint)
@@ -760,10 +809,10 @@ protected:
 	template<typename init_t>
 	script_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
-		m_description(Init.description())
+		m_description(Init.description()),
+		m_dependency(0)
 	{
 		Init.property_collection().register_property(*this);
 	}
@@ -774,11 +823,11 @@ protected:
 	}
 
 private:
-	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
 	deleted_signal_t m_deleted_signal;
+	iproperty* m_dependency;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -795,7 +844,7 @@ class enumeration_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_pipeline);
+		iproperty* const source = property_lookup(this);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -848,6 +897,16 @@ public:
 	deleted_signal_t& property_deleted_signal()
 	{
 		return m_deleted_signal;
+	}
+
+	iproperty* property_dependency()
+	{
+		return m_dependency;
+	}
+
+	void property_set_dependency(iproperty* Dependency)
+	{
+		m_dependency = Dependency;
 	}
 
 	bool property_set_value(const boost::any Value, iunknown* const Hint)
@@ -887,11 +946,11 @@ protected:
 	template<typename init_t>
 	enumeration_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description()),
-		m_values(Init.values())
+		m_values(Init.values()),
+		m_dependency(0)
 	{
 		Init.property_collection().register_property(*this);
 	}
@@ -902,13 +961,13 @@ protected:
 	}
 
 private:
-	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
 	const ienumeration_property::enumeration_values_t& m_values;
 	sigc::signal<void> m_values_changed_signal;
 	deleted_signal_t m_deleted_signal;
+	iproperty* m_dependency;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -925,7 +984,7 @@ class list_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_pipeline);
+		iproperty* const source = property_lookup(this);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -972,6 +1031,16 @@ public:
 		return m_deleted_signal;
 	}
 
+	iproperty* property_dependency()
+	{
+		return m_dependency;
+	}
+
+	void property_set_dependency(iproperty* Dependency)
+	{
+		m_dependency = Dependency;
+	}
+
 	bool property_set_value(const boost::any Value, iunknown* const Hint)
 	{
 		const value_t* const new_value = boost::any_cast<value_t>(&Value);
@@ -991,11 +1060,11 @@ protected:
 	template<typename init_t>
 	list_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description()),
-		m_values(Init.values())
+		m_values(Init.values()),
+		m_dependency(0)
 	{
 		Init.property_collection().register_property(*this);
 	}
@@ -1006,12 +1075,12 @@ protected:
 	}
 
 private:
-	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
 	const typename ilist_property<value_t>::values_t& m_values;
 	deleted_signal_t m_deleted_signal;
+	iproperty* m_dependency;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1028,7 +1097,7 @@ class node_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_pipeline);
+		iproperty* const source = property_lookup(this);
 		if(source != this)
 			return dynamic_cast<value_t>(boost::any_cast<inode*>(source->property_value()));
 
@@ -1075,6 +1144,16 @@ public:
 		return m_deleted_signal;
 	}
 
+	iproperty* property_dependency()
+	{
+		return m_dependency;
+	}
+
+	void property_set_dependency(iproperty* Dependency)
+	{
+		m_dependency = Dependency;
+	}
+
 	bool property_set_value(const boost::any Value, iunknown* const Hint)
 	{
 		inode* const * new_value = boost::any_cast<inode*>(&Value);
@@ -1104,10 +1183,10 @@ protected:
 	template<typename init_t>
 	node_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
-		m_description(Init.description())
+		m_description(Init.description()),
+		m_dependency(0)
 	{
 		Init.property_collection().register_property(*this);
 	}
@@ -1118,11 +1197,11 @@ protected:
 	}
 
 private:
-	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
 	deleted_signal_t m_deleted_signal;
+	iproperty* m_dependency;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1139,7 +1218,7 @@ class measurement_property :
 public:
 	const value_t value()
 	{
-		iproperty* const source = property_lookup(this, m_pipeline);
+		iproperty* const source = property_lookup(this);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -1186,6 +1265,16 @@ public:
 		return m_deleted_signal;
 	}
 
+	iproperty* property_dependency()
+	{
+		return m_dependency;
+	}
+
+	void property_set_dependency(iproperty* Dependency)
+	{
+		m_dependency = Dependency;
+	}
+
 	bool property_set_value(const boost::any Value, iunknown* const Hint)
 	{
 		const value_t* const new_value = boost::any_cast<value_t>(&Value);
@@ -1210,12 +1299,12 @@ protected:
 	template<typename init_t>
 	measurement_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description()),
 		m_step_increment(Init.step_increment()),
-		m_units(Init.units())
+		m_units(Init.units()),
+		m_dependency(0)
 	{
 		Init.property_collection().register_property(*this);
 	}
@@ -1226,13 +1315,13 @@ protected:
 	}
 
 private:
-	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
 	const double m_step_increment;
 	const std::type_info& m_units;
 	deleted_signal_t m_deleted_signal;
+	iproperty* m_dependency;
 };
 
 /////////////////////////////////////////////////////////////////////////////

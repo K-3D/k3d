@@ -156,15 +156,7 @@ iproperty iproperty_collection::add_ri_option(const std::string& Type, const std
 object iproperty_collection::getattr(const std::string& Name)
 {
 	if(k3d::iproperty* property = k3d::property::get(wrapped(), Name))
-	{
-		k3d::ipipeline* pipeline = property->property_node() ? &property->property_node()->document().pipeline() : 0;
-		if(pipeline)
-		{
-			for(k3d::iproperty* dependency = pipeline->dependency(*property); dependency; dependency = pipeline->dependency(*dependency))
-				property = dependency;
-		}
-		return any_to_python(property->property_value());
-	}
+		return any_to_python(k3d::property::pipeline_value(*property));
 
 	throw std::invalid_argument("unknown property: " + Name);
 }
@@ -202,9 +194,9 @@ void iproperty_collection::define_class()
 		.def("add_ri_option", &iproperty_collection::add_ri_option,
 			"Adds a custom RenderMan option property to the collection.")
 		.def("__getattr__", &iproperty_collection::getattr,
-			"Provides direct retrieval of L{iproperty} values by name.")
+			"Returns the pipeline value of an L{iproperty} by name.")
 		.def("__setattr__", &iproperty_collection::setattr,
-			"Provides direct assignment of L{iproperty} values by name.");
+			"Sets the internal value of an L{iproperty} value by name.");
 }
 
 } // namespace python

@@ -68,22 +68,23 @@ std::istream& operator>>(std::istream& Stream, ipath_property::reference_t& RHS)
 namespace data
 {
 
-iproperty* property_lookup(iproperty* const Source, ipipeline& DAG)
+iproperty* property_lookup(iproperty* const Source)
 {
 	iproperty* result = Source;
 
-    iproperty* slow = Source ? DAG.dependency(*Source) : 0;
-    iproperty* fast = slow ? DAG.dependency(*slow) : 0;
+	// We lookup property dependencies using two pointers so we can detect cycles ...
+	iproperty* slow = Source ? Source->property_dependency() : 0;
+	iproperty* fast = slow ? slow->property_dependency() : 0;
 	while(slow)
 	{
 		if(slow == fast)
-            return Source;
+			return Source;
 
 		result = slow;
 
-        slow = DAG.dependency(*slow);
-        fast = fast ? DAG.dependency(*fast) : 0;
-        fast = fast ? DAG.dependency(*fast) : 0;
+		slow = slow->property_dependency();
+		fast = fast ? fast->property_dependency() : 0;
+		fast = fast ? fast->property_dependency() : 0;
 	}
 
 	return result;

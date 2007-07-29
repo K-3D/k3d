@@ -197,7 +197,7 @@ k3d::inode* duplicate_mesh(k3d::idocument& Document, k3d::inode& Node)
 	}
 
 	// Copy upstream mesh to our new FrozenMesh ...
-	if(k3d::mesh* const upstream_mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(Document.pipeline(), upstream_mesh_source->mesh_source_output())))
+	if(k3d::mesh* const upstream_mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(upstream_mesh_source->mesh_source_output())))
 	{
 		if(k3d::imesh_storage* const frozen_mesh_storage = dynamic_cast<k3d::imesh_storage*>(frozen_mesh))
 		{

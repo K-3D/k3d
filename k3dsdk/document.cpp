@@ -455,6 +455,8 @@ public:
 						signal::make_loop_safe_slot(
 							dependency->first->property_changed_signal()));
 			}
+
+			dependency->first->property_set_dependency(dependency->second);
 		}
 
 		// If we're recording undo/redo data, keep track of the original state ...
@@ -469,9 +471,9 @@ public:
 			dependency->first->property_changed_signal().emit(Hint);
 	}
 
-	iproperty* dependency(iproperty& Target)
+	iproperty* dependency(iproperty& Property)
 	{
-		return get_dependency(&Target)->second;
+		return Property.property_dependency();
 	}
 
 	const dependencies_t& dependencies()
@@ -516,7 +518,10 @@ public:
 		for(dependencies_t::iterator dependency = m_dependencies.begin(); dependency != m_dependencies.end(); ++dependency)
 		{
 			if(dependency->second == Property)
+			{
+				dependency->first->property_set_dependency(0);
 				new_dependencies.insert(std::make_pair(dependency->first, static_cast<iproperty*>(0)));
+			}
 		}
 
 		if(new_dependencies.size())

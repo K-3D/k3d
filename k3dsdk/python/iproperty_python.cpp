@@ -76,15 +76,12 @@ const std::string iproperty::type()
 
 object iproperty::internal_value()
 {
-	return any_to_python(wrapped().property_value());
+	return any_to_python(k3d::property::internal_value(wrapped()));
 }
 
-object iproperty::value()
+object iproperty::pipeline_value()
 {
-	if(k3d::inode* const node = wrapped().property_node())
-		return any_to_python(k3d::property::pipeline_value(node->document().pipeline(), wrapped()));
-
-	return internal_value();
+	return any_to_python(k3d::property::pipeline_value(wrapped()));
 }
 
 object iproperty::node()
@@ -168,9 +165,9 @@ void iproperty::define_class()
 		.def("type", &iproperty::type,
 			"Returns the type of data the property stores as a string.")
 		.def("internal_value", &iproperty::internal_value,
-			"Returns the current value stored in the property.")
-		.def("value", &iproperty::value,
-			"Returns the property value, which may be different from its internal_value, if the property has been connected to another using the Visualization Pipeline.")
+			"Returns the value stored by the property.")
+		.def("pipeline_value", &iproperty::pipeline_value,
+			"Returns the property's 'pipeline' value, which will differ from its internal value if it's connected to another property by the Visualization Pipeline.")
 		.def("node", &iproperty::node,
 			"Returns the node (if any) that owns the property, or None.")
 		.def("is_writable", &iproperty::is_writable,

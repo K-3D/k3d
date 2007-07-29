@@ -61,6 +61,11 @@ public:
 	typedef sigc::signal<void> deleted_signal_t;
 	virtual deleted_signal_t& property_deleted_signal() = 0;
 
+	/// Returns this property's pipeline dependency, if any.  Note: there may be dependency cycles, don't use this to perform lookups directly, use k3d::property_lookup() instead
+	virtual iproperty* property_dependency() = 0;
+	/// Sets this property's pipeline dependency.  Note: never call this directly, use a k3d::pipeline object to manage pipeline dependencies
+	virtual void property_set_dependency(iproperty*) = 0;
+
 protected:
 	iproperty() {}
 	iproperty(const iproperty&) {}
@@ -71,5 +76,4 @@ protected:
 } // namespace k3d
 
 #endif // K3DSDK_IPROPERTY_H
-
 

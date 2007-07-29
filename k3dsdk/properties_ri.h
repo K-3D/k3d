@@ -101,10 +101,7 @@ class renderman_property :
 public:
 	const value_t value()
 	{
-		iproperty* source = this;
-		for(iproperty* dependency = m_pipeline.dependency(*source); dependency; dependency = m_pipeline.dependency(*dependency))
-			source = dependency;
-
+		iproperty* const source = property_lookup(this);
 		if(source != this)
 			return boost::any_cast<value_t>(source->property_value());
 
@@ -161,6 +158,16 @@ public:
 		return m_deleted_signal;
 	}
 
+	iproperty* property_dependency()
+	{
+		return m_dependency;
+	}
+
+	void property_set_dependency(iproperty* Dependency)
+	{
+		m_dependency = Dependency;
+	}
+
 	bool property_set_value(const boost::any Value, iunknown* const Hint)
 	{
 		const value_t* const new_value = boost::any_cast<value_t>(&Value);
@@ -175,12 +182,12 @@ protected:
 	template<typename init_t>
 	renderman_property(const init_t& Init) :
 		name_policy_t(Init),
-		m_pipeline(Init.document().pipeline()),
 		m_node(Init.node()),
 		m_label(Init.label()),
 		m_description(Init.description()),
 		m_parameter_list_type(Init.parameter_list_type()),
-		m_parameter_list_name(Init.parameter_list_name())
+		m_parameter_list_name(Init.parameter_list_name()),
+		m_dependency(0)
 	{
 		Init.property_collection().register_property(*this);
 	}
@@ -191,13 +198,13 @@ protected:
 	}
 
 private:
-	ipipeline& m_pipeline;
 	inode* const m_node;
 	const char* const m_label;
 	const char* const m_description;
 	const irenderman_property::parameter_type_t m_parameter_list_type;
 	const char* const m_parameter_list_name;
 	deleted_signal_t m_deleted_signal;
+	iproperty* m_dependency;
 };
 
 /////////////////////////////////////////////////////////////////////////////

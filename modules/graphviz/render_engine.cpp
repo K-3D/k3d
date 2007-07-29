@@ -21,9 +21,11 @@
 		\author Tim Shead <tshead@k-3d.com>
 */
 
+#include <k3d-i18n-config.h>
+
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
-#include <k3d-i18n-config.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/ipreview_render_engine.h>
 #include <k3dsdk/irender_farm.h>
 #include <k3dsdk/irender_frame.h>

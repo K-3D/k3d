@@ -42,8 +42,7 @@ class property_proxy :
 	public idata_proxy
 {
 public:
-	property_proxy(k3d::ipipeline& Graph, k3d::iproperty& Data) :
-		m_graph(Graph),
+	property_proxy(k3d::iproperty& Data) :
 		m_readable_data(Data)
 	{
 	}
@@ -53,7 +52,7 @@ public:
 		// As a special-case, if the internal property value is NULL, return the connected property (if any)
 		k3d::bitmap* result = boost::any_cast<k3d::bitmap*>(m_readable_data.property_value());
 		if(!result)
-			result = boost::any_cast<k3d::bitmap*>(k3d::property::pipeline_value(m_graph, m_readable_data));
+			result = boost::any_cast<k3d::bitmap*>(k3d::property::pipeline_value(m_readable_data));
 
 		return result;
 	}
@@ -67,13 +66,12 @@ private:
 	property_proxy(const property_proxy& RHS);
 	property_proxy& operator=(const property_proxy& RHS);
 
-	k3d::ipipeline& m_graph;
 	k3d::iproperty& m_readable_data;
 };
 
-std::auto_ptr<idata_proxy> proxy(k3d::ipipeline& Graph, k3d::iproperty& Data)
+std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data)
 {
-	return std::auto_ptr<idata_proxy>(new property_proxy(Graph, Data));
+	return std::auto_ptr<idata_proxy>(new property_proxy(Data));
 }
 
 /////////////////////////////////////////////////////////////////////////////

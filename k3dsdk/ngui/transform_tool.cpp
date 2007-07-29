@@ -25,6 +25,8 @@
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
+#include <k3d-i18n-config.h>
+
 #include "document_state.h"
 #include "modifiers.h"
 #include "icons.h"
@@ -40,11 +42,11 @@
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/geometry.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idrawable_gl.h>
 #include <k3dsdk/ikeyframer.h>
 #include <k3dsdk/imesh_source.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>

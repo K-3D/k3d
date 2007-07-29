@@ -23,7 +23,6 @@
 */
 
 #include "data.h"
-#include "ipipeline.h"
 #include "idocument.h"
 #include "inode.h"
 
@@ -58,27 +57,31 @@ iproperty* get(iunknown& Object, const std::string& Name)
 	return 0;
 }
 
+const boost::any internal_value(iproperty& Property)
+{
+	return Property.property_value();
+}
+
 const boost::any internal_value(iunknown& Object, const std::string& Name)
 {
 	// Look for the property by name ...
-	iproperty* const property = get(Object, Name);
-	if(!property)
-		return boost::any();
+	if(iproperty* const property = get(Object, Name))
+		return internal_value(*property);
 
-	return property->property_value();
+	return boost::any();
+}
+
+const boost::any pipeline_value(iproperty& Property)
+{
+	return property_lookup(&Property)->property_value();
 }
 
 const boost::any pipeline_value(iunknown& Object, const std::string& Name)
 {
 	if(iproperty* const property = get(Object, Name))
-		return property_lookup(property, dynamic_cast<inode*>(&Object)->document().pipeline())->property_value();
+		return pipeline_value(*property);
 
 	return boost::any();
-}
-
-const boost::any pipeline_value(ipipeline& Pipeline, iproperty& Property)
-{
-	return property_lookup(&Property, Pipeline)->property_value();
 }
 
 bool set_internal_value(iunknown& Object, const std::string Name, const boost::any& Value)

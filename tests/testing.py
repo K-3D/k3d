@@ -232,6 +232,9 @@ def mesh_comparison(document, mesh, mesh_name, threshold):
 	mesh_writer.file = output_file
 	document.set_dependency(mesh_writer.get_property("input_mesh"), mesh)
 
+	if not difference.get_property("input_a").pipeline_value() or not difference.get_property("input_b").pipeline_value():
+		raise Exception("missing mesh comparison input")
+
 	if not difference.equal:
 		print """<DartMeasurement name="Mesh Difference" type="text/text">\n"""
 		print k3d.print_diff(mesh.value(), reference.output_mesh, threshold)

@@ -30,6 +30,7 @@
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_exporter.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/state_change_set.h>

@@ -24,6 +24,8 @@
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
+#include <k3d-i18n-config.h>
+
 #include "basic_viewport_input_model.h"
 #include "command_arguments.h"
 #include "document_state.h"
@@ -37,9 +39,9 @@
 #include "viewport.h"
 
 #include <k3dsdk/classes.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iparentable.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>

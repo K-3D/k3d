@@ -269,12 +269,12 @@ public:
 		engine.RiFormat(320, 240, 1);
 
 		// Create RenderMan scene
-		const double left = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), m_perspective_projection.left()));
-		const double right = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), m_perspective_projection.right()));
-		const double top = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), m_perspective_projection.top()));
-		const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), m_perspective_projection.bottom()));
-		const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), m_perspective_projection.near()));
-		const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), m_perspective_projection.far()));
+		const double left = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.left()));
+		const double right = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.right()));
+		const double top = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.top()));
+		const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.bottom()));
+		const double near = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.near()));
+		const double far = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.far()));
 		return_val_if_fail(near > 0, false);
 
 		engine.RiProjectionV("perspective");

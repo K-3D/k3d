@@ -26,14 +26,9 @@
 #include <k3dsdk/ngui/document_state.h>
 
 #include <k3dsdk/graph.h>
+#include <k3dsdk/ipipeline.h>
 
 #include <boost/assign/list_of.hpp>
-#include <boost/graph/circle_layout.hpp>
-#include <boost/graph/connected_components.hpp>
-#include <boost/graph/fruchterman_reingold.hpp>
-#include <boost/graph/gursoy_atun_layout.hpp>
-#include <boost/graph/random_layout.hpp>
-#include <boost/random/mersenne_twister.hpp>
 
 using namespace libk3dngui;
 

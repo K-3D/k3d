@@ -28,6 +28,9 @@
 #include <gtk/gtkgl.h>
 #include <gtk/gtkmain.h>
 
+#include <k3d-i18n-config.h>
+#include <k3d-platform-config.h>
+
 #include "application_state.h"
 #include "context_menu.h"
 #include "document_state.h"
@@ -51,7 +54,6 @@
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/data.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/ianimation_render_engine.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
@@ -59,6 +61,7 @@
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/ipersistent.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/ipreview_render_engine.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/istill_render_engine.h>
@@ -66,7 +69,6 @@
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
-#include <k3d-platform-config.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/time_source.h>

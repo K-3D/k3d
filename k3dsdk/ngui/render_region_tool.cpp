@@ -83,10 +83,10 @@ public:
 		if(crop_window)
 		{
 			const k3d::rectangle window(
-				boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().pipeline(), crop_window->crop_left())),
-				boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().pipeline(), crop_window->crop_right())),
-				boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().pipeline(), crop_window->crop_top())),
-				boost::any_cast<double>(k3d::property::pipeline_value(m_document_state.document().pipeline(), crop_window->crop_bottom())));
+				boost::any_cast<double>(k3d::property::pipeline_value(crop_window->crop_left())),
+				boost::any_cast<double>(k3d::property::pipeline_value(crop_window->crop_right())),
+				boost::any_cast<double>(k3d::property::pipeline_value(crop_window->crop_top())),
+				boost::any_cast<double>(k3d::property::pipeline_value(crop_window->crop_bottom())));
 
 			if(!window.contains(widget_to_ndc(Viewport, k3d::point2(Event.x, Event.y))))
 			{

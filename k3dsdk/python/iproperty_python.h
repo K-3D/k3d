@@ -48,7 +48,7 @@ public:
 	const std::string description();
 	const std::string type();
 	boost::python::object internal_value();
-	boost::python::object value();
+	boost::python::object pipeline_value();
 	boost::python::object node();
 	const bool is_writable();
 	const bool is_enumeration();

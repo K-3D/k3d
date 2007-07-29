@@ -579,9 +579,9 @@ bool control::render_camera_animation(k3d::icamera& Camera, const k3d::file_rang
 	return_val_if_fail(start_time_property && end_time_property && frame_rate_property && time_property, false);
 
 	// Test the output images filepath to make sure it can hold all the frames we're going to generate ...
-	const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(m_implementation->m_document_state.document().pipeline(), *start_time_property));
-	const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(m_implementation->m_document_state.document().pipeline(), *end_time_property));
-	const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(m_implementation->m_document_state.document().pipeline(), *frame_rate_property));
+	const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(*start_time_property));
+	const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(*end_time_property));
+	const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(*frame_rate_property));
 
 	const size_t start_frame = static_cast<size_t>(k3d::round(frame_rate * start_time));
 	const size_t end_frame = static_cast<size_t>(k3d::round(frame_rate * end_time));

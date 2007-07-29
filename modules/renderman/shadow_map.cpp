@@ -117,12 +117,12 @@ public:
 
 		if(k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(&camera->projection()))
 		{
-			const double left = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->left()));
-			const double right = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->right()));
-			const double top = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->top()));
-			const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->bottom()));
-			const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->near()));
-			const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), perspective->far()));
+			const double left = boost::any_cast<double>(k3d::property::pipeline_value(perspective->left()));
+			const double right = boost::any_cast<double>(k3d::property::pipeline_value(perspective->right()));
+			const double top = boost::any_cast<double>(k3d::property::pipeline_value(perspective->top()));
+			const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(perspective->bottom()));
+			const double near = boost::any_cast<double>(k3d::property::pipeline_value(perspective->near()));
+			const double far = boost::any_cast<double>(k3d::property::pipeline_value(perspective->far()));
 			return_if_fail(near > 0);
 
 			Engine.RiProjectionV("perspective");
@@ -131,15 +131,15 @@ public:
 		}
 		else if(k3d::iorthographic* const orthographic = dynamic_cast<k3d::iorthographic*>(&camera->projection()))
 		{
-			const double left = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->left()));
-			const double right = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->right()));
-			const double top = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->top()));
-			const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->bottom()));
-			const double near = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->near()));
-			const double far = boost::any_cast<double>(k3d::property::pipeline_value(document().pipeline(), orthographic->far()));
+			const double left = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->left()));
+			const double right = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->right()));
+			const double top = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->top()));
+			const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->bottom()));
+			const double near = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->near()));
+			const double far = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->far()));
 			return_if_fail(near > 0);
 
-			const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(document().pipeline(), camera->transformation().transform_source_output()));
+			const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().transform_source_output()));
 			const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
 			const k3d::point3 world_target = boost::any_cast<k3d::point3>(camera->world_target().property_value());
 
@@ -157,7 +157,7 @@ public:
 		}
 
 		// Setup the camera viewing transform ...
-		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(document().pipeline(), camera->transformation().transform_source_output()));
+		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().transform_source_output()));
 		Engine.RiTransform(k3d::ri::convert(k3d::inverse(transform_matrix)));
 
 		Engine.RiWorldBegin();
