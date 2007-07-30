@@ -15,7 +15,6 @@ k3dsdk/mesh_painter_gl.h
 k3dsdk/mesh_selection_sink.h
 k3dsdk/mesh_sink.h
 k3dsdk/mesh_source.h
-k3dsdk/ngui/about_box.cpp
 k3dsdk/ngui/angle_axis_control.cpp
 k3dsdk/ngui/assign_hotkeys_dialog.cpp
 k3dsdk/ngui/bounding_box.cpp
@@ -32,13 +31,11 @@ k3dsdk/ngui/log_window.cpp
 k3dsdk/ngui/main_document_window.cpp
 k3dsdk/ngui/menus.cpp
 k3dsdk/ngui/merge_nodes.cpp
+k3dsdk/ngui/messages.cpp
 k3dsdk/ngui/modifiers.cpp
 k3dsdk/ngui/move_tool.cpp
 k3dsdk/ngui/navigation_input_model.cpp
 k3dsdk/ngui/node_chooser.cpp
-k3dsdk/ngui/node_history.cpp
-k3dsdk/ngui/node_list.cpp
-k3dsdk/ngui/node_properties.cpp
 k3dsdk/ngui/panel_frame.cpp
 k3dsdk/ngui/parent_tool.cpp
 k3dsdk/ngui/path_chooser.cpp
@@ -61,9 +58,6 @@ k3dsdk/ngui/snap_tool.cpp
 k3dsdk/ngui/snap_tool_detail.h
 k3dsdk/ngui/spin_button.cpp
 k3dsdk/ngui/test_case_recorder.cpp
-k3dsdk/ngui/timeline.cpp
-k3dsdk/ngui/tool_panel.cpp
-k3dsdk/ngui/tool_properties.cpp
 k3dsdk/ngui/transform_tool.h
 k3dsdk/ngui/tutorial_recorder.cpp
 k3dsdk/ngui/user_property.cpp
@@ -209,8 +203,15 @@ modules/mesh/tag_color.cpp
 modules/mesh/triangulate_faces.cpp
 modules/mesh/weld.cpp
 modules/mesh_instance/mesh_instance.cpp
+modules/ngui_about_dialog/dialog.cpp
+modules/ngui_node_history_panel/panel.cpp
+modules/ngui_node_list_panel/panel.cpp
+modules/ngui_node_properties_panel/panel.cpp
 modules/ngui_pipeline_panel/panel.cpp
 modules/ngui_pipeline_profiler_panel/panel.cpp
+modules/ngui_timeline_panel/panel.cpp
+modules/ngui_tool_properties_panel/panel.cpp
+modules/ngui_toolbar_panel/panel.cpp
 modules/ngui_undo_tree_panel/panel.cpp
 modules/nurbs/nurbs_circle.cpp
 modules/nurbs/nurbs_cone.cpp
@@ -365,4 +366,5 @@ modules/yafray/lights.cpp
 modules/yafray/material.cpp
 modules/yafray/render_engine.cpp
 uimodules/ngui/splash_box.cpp
+uimodules/ngui/user_interface.cpp
 uimodules/qtui/user_interface.cpp

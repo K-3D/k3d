@@ -20,7 +20,7 @@ IF(K3D_BUILD_NLS)
 	SET(K3D_CATALOG_TARGETS
 		)
 
-	ADD_CUSTOM_TARGET(k3d-nls-update-sources
+	ADD_CUSTOM_TARGET(nls-update-sources
 		${K3D_INTLTOOL_UPDATE} -m
 		WORKING_DIRECTORY ${po_SOURCE_DIR}
 		)
@@ -32,7 +32,7 @@ IF(K3D_BUILD_NLS)
 		)
 
 	FOREACH(catalog ${K3D_CATALOGS})
-		ADD_CUSTOM_TARGET(k3d-nls-update-${catalog}.po
+		ADD_CUSTOM_TARGET(nls-update-${catalog}.po
 			${K3D_MSGMERGE} ${catalog} k3d -o ${catalog}.po --no-wrap
 			DEPENDS ${po_SOURCE_DIR}/${catalog}.po
 			WORKING_DIRECTORY ${po_SOURCE_DIR}
@@ -52,7 +52,7 @@ IF(K3D_BUILD_NLS)
 		SET(K3D_CATALOG_TARGETS ${K3D_CATALOG_TARGETS} ${po_BINARY_DIR}/${catalog}/LC_MESSAGES/k3d.mo)
 	ENDFOREACH(catalog)
 
-	ADD_CUSTOM_TARGET(k3d-nls ALL
+	ADD_CUSTOM_TARGET(nls ALL
 		DEPENDS ${po_BINARY_DIR}/k3d.pot ${K3D_CATALOG_TARGETS}
 		)
 
