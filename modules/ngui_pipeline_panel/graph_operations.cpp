@@ -118,8 +118,8 @@ void tree_plus_layout(
 	{
 		const size_t vertex = Vertices[i];
 
-		if(!VertexExpanded[vertex])
-			continue;
+//		if(!VertexExpanded[vertex])
+//			continue;
 
 		std::pair<k3d::graph::in_edge_iterator_t, k3d::graph::in_edge_iterator_t> in_edges = boost::in_edges(vertex, Topology);
 		for(k3d::graph::in_edge_iterator_t edge = in_edges.first; edge != in_edges.second; ++edge)
