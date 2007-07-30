@@ -56,7 +56,7 @@ public:
 		    k3d::mesh::selection_t& edge_selection = *k3d::make_unique(polyhedra.edge_selection);
 			std::fill(edge_selection.begin(), edge_selection.end(), 0.0);
 
-			const unsigned long index = m_index.value();
+			const unsigned long index = m_index.pipeline_value();
 			if(index < edge_selection.size())
 				edge_selection[index] = 1.0;
 		}

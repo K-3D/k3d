@@ -82,45 +82,45 @@ public:
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::replace_selection(m_mesh_selection.value(), Mesh);
+		k3d::replace_selection(m_mesh_selection.pipeline_value(), Mesh);
 	}
 
 	void on_update_mesh(const k3d::legacy::mesh& Source, k3d::legacy::mesh& Target)
 	{
-		const k3d::color new_color = m_new_color.value();
-		const k3d::color default_color = m_default_color.value();
+		const k3d::color new_color = m_new_color.pipeline_value();
+		const k3d::color default_color = m_default_color.pipeline_value();
 
-		if(m_tag_points.value())
+		if(m_tag_points.pipeline_value())
 		{
 			for(k3d::legacy::mesh::points_t::iterator point = Target.points.begin(); point != Target.points.end(); ++point)
 				set_color(**point, new_color, default_color, (*point)->vertex_data);
 		}
 
-		if(m_tag_point_groups.value())
+		if(m_tag_point_groups.pipeline_value())
 		{
 			for(k3d::legacy::mesh::point_groups_t::iterator group = Target.point_groups.begin(); group != Target.point_groups.end(); ++group)
 				set_color(**group, new_color, default_color, (*group)->constant_data);
 		}
 
-		if(m_tag_linear_curve_groups.value())
+		if(m_tag_linear_curve_groups.pipeline_value())
 		{
 			for(k3d::legacy::mesh::linear_curve_groups_t::iterator group = Target.linear_curve_groups.begin(); group != Target.linear_curve_groups.end(); ++group)
 				set_color(**group, new_color, default_color, (*group)->constant_data);
 		}
 
-		if(m_tag_cubic_curve_groups.value())
+		if(m_tag_cubic_curve_groups.pipeline_value())
 		{
 			for(k3d::legacy::mesh::cubic_curve_groups_t::iterator group = Target.cubic_curve_groups.begin(); group != Target.cubic_curve_groups.end(); ++group)
 				set_color(**group, new_color, default_color, (*group)->constant_data);
 		}
 
-		if(m_tag_bilinear_patches.value())
+		if(m_tag_bilinear_patches.pipeline_value())
 		{
 			for(k3d::legacy::mesh::bilinear_patches_t::iterator patch = Target.bilinear_patches.begin(); patch != Target.bilinear_patches.end(); ++patch)
 				set_color(**patch, new_color, default_color, (*patch)->uniform_data);
 		}
 
-		if(m_tag_bicubic_patches.value())
+		if(m_tag_bicubic_patches.pipeline_value())
 		{
 			for(k3d::legacy::mesh::bicubic_patches_t::iterator patch = Target.bicubic_patches.begin(); patch != Target.bicubic_patches.end(); ++patch)
 				set_color(**patch, new_color, default_color, (*patch)->uniform_data);
@@ -128,12 +128,12 @@ public:
 
 		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Target.polyhedra.begin(); polyhedron != Target.polyhedra.end(); ++polyhedron)
 		{
-			if(m_tag_polyhedra.value())
+			if(m_tag_polyhedra.pipeline_value())
 			{
 				set_color(**polyhedron, new_color, default_color, (*polyhedron)->constant_data);
 			}
 
-			if(m_tag_edges.value())
+			if(m_tag_edges.pipeline_value())
 			{
 				for(k3d::legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
 				{
@@ -148,7 +148,7 @@ public:
 				}
 			}
 
-			if(m_tag_faces.value())
+			if(m_tag_faces.pipeline_value())
 			{
 				for(k3d::legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
 					set_color(**face, new_color, default_color, (*face)->uniform_data);

@@ -52,7 +52,7 @@ public:
 
 	std::string get_value()
 	{
-		const time_t time = static_cast<time_t>(m_input.value());
+		const time_t time = static_cast<time_t>(m_input.pipeline_value());
 		tm time_value;
 
 #if defined K3D_API_WIN32
@@ -64,7 +64,7 @@ public:
 		std::string buffer(128, '\0');
 		while(buffer.size() < 2048)
 		{
-			const int buffer_size = strftime(const_cast<char*>(buffer.data()), buffer.size()-1, m_format.value().c_str(), &time_value);
+			const int buffer_size = strftime(const_cast<char*>(buffer.data()), buffer.size()-1, m_format.pipeline_value().c_str(), &time_value);
 			if(buffer_size)
 			{
 				buffer.resize(buffer_size);

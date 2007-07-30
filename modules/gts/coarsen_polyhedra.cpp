@@ -93,22 +93,22 @@ public:
 	{
 		/** \todo process each polyhedron (+ commit_mesh_changes) */
 
-		const double fold = k3d::radians(m_max_fold_angle.value());
+		const double fold = k3d::radians(m_max_fold_angle.pipeline_value());
 
 		GtsSurface* surface = gts_surface(InputMesh);
 
 		// Select the right coarsening process
 		GtsKeyFunc cost_func = 0;
 		gpointer cost_data = 0;
-		switch(m_cost_function.value())
+		switch(m_cost_function.pipeline_value())
 		{
 			case OPTIMIZED:
 				cost_func = (GtsKeyFunc) gts_volume_optimized_cost;
 				cost_data = &volume_params;
 
-				volume_params.volume_weight = static_cast<gdouble>(m_volume_weight.value());
-				volume_params.boundary_weight = static_cast<gdouble>(m_boundary_weight.value());
-				volume_params.shape_weight = static_cast<gdouble>(m_shape_weight.value());
+				volume_params.volume_weight = static_cast<gdouble>(m_volume_weight.pipeline_value());
+				volume_params.boundary_weight = static_cast<gdouble>(m_boundary_weight.pipeline_value());
+				volume_params.shape_weight = static_cast<gdouble>(m_shape_weight.pipeline_value());
 				break;
 			case LENGTH:
 				cost_func = 0;
@@ -122,7 +122,7 @@ public:
 		gpointer coarsen_data = 0;
 		GtsStopFunc stop_func = 0;
 		gpointer stop_data = 0;
-		switch(m_midvertex_function.value())
+		switch(m_midvertex_function.pipeline_value())
 		{
 			case MIDVERTEX:
 				coarsen_func = 0;
@@ -130,15 +130,15 @@ public:
 			case VOLUMEOPTIMIZED:
 				coarsen_func = (GtsCoarsenFunc) gts_volume_optimized_vertex;
 				coarsen_data = &volume_params;
-				volume_params.volume_weight = static_cast<gdouble>(m_volume_weight.value());
-				volume_params.boundary_weight = static_cast<gdouble>(m_boundary_weight.value());
-				volume_params.shape_weight = static_cast<gdouble>(m_shape_weight.value());
+				volume_params.volume_weight = static_cast<gdouble>(m_volume_weight.pipeline_value());
+				volume_params.boundary_weight = static_cast<gdouble>(m_boundary_weight.pipeline_value());
+				volume_params.shape_weight = static_cast<gdouble>(m_shape_weight.pipeline_value());
 				break;
 		}
 
-		guint edge_number = static_cast<guint>(m_edge_number.value());
-		gdouble max_edge_cost = static_cast<gdouble>(m_max_edge_cost.value());
-		switch(m_stop_function.value())
+		guint edge_number = static_cast<guint>(m_edge_number.pipeline_value());
+		gdouble max_edge_cost = static_cast<gdouble>(m_max_edge_cost.pipeline_value());
+		switch(m_stop_function.pipeline_value())
 		{
 			case EDGENUMBER:
 				stop_func = (GtsStopFunc) gts_coarsen_stop_number;

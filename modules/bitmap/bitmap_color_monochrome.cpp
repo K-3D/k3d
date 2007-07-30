@@ -79,7 +79,7 @@ public:
 
 	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
-		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_red_weight.value(), m_green_weight.value(), m_blue_weight.value()));
+		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_red_weight.pipeline_value(), m_green_weight.pipeline_value(), m_blue_weight.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()

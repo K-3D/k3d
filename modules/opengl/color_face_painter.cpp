@@ -95,7 +95,7 @@ public:
 		k3d::typed_array<k3d::color> default_color_array;
 
 		// Get the color array ...
-		const k3d::typed_array<k3d::color>* color_array_p = named_arrays(Mesh.polyhedra->uniform_data).get_array<k3d::typed_array<k3d::color> >(m_color_array.value());
+		const k3d::typed_array<k3d::color>* color_array_p = named_arrays(Mesh.polyhedra->uniform_data).get_array<k3d::typed_array<k3d::color> >(m_color_array.pipeline_value());
 		if(!color_array_p)
 		{
 			default_color_array.resize(face_count, k3d::color(0.9, 0.9, 0.9));

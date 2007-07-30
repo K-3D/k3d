@@ -66,12 +66,12 @@ public:
 			return;
 
 		// If the user hasn't selected a shader, we're done ...
-		k3d::ri::ilight_shader* const shader = m_shader.value();
+		k3d::ri::ilight_shader* const shader = m_shader.pipeline_value();
 		if(!shader)
 			return;
 
 		// If the user hasn't selected some geometry, we're done ...
-		k3d::ri::irenderable* const geometry = m_geometry.value();
+		k3d::ri::irenderable* const geometry = m_geometry.pipeline_value();
 		if(!geometry)
 			return;
 

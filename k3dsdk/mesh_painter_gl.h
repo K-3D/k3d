@@ -53,13 +53,13 @@ public:
 
 	void paint_mesh(const mesh& Mesh, const painter_render_state& RenderState)
 	{
-		if(m_enabled.value())
+		if(m_enabled.pipeline_value())
 			on_paint_mesh(Mesh, RenderState);
 	}
 
 	void select_mesh(const mesh& Mesh, const painter_render_state& RenderState, const painter_selection_state& SelectionState)
 	{
-		if(m_enabled.value())
+		if(m_enabled.pipeline_value())
 			on_select_mesh(Mesh, RenderState, SelectionState);
 	}
 

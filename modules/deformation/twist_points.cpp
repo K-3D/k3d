@@ -55,8 +55,8 @@ public:
 	{
 		const k3d::bounding_box3 bounds = k3d::bounds(InputPoints);
 
-		const k3d::axis axis = m_axis.value();
-		const double angle = m_angle.value();
+		const k3d::axis axis = m_axis.pipeline_value();
+		const double angle = m_angle.pipeline_value();
 
 		double size = 0.0;
 		k3d::point3 angles;

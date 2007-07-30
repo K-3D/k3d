@@ -83,7 +83,7 @@ public:
 
 	unsigned long get_point_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->points)
 				return mesh->points->size();
@@ -94,7 +94,7 @@ public:
 
 	unsigned long get_polyhedron_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->polyhedra && mesh->polyhedra->first_faces)
 				return mesh->polyhedra->first_faces->size();
@@ -105,7 +105,7 @@ public:
 
 	unsigned long get_edge_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->polyhedra && mesh->polyhedra->edge_points)
 				return mesh->polyhedra->edge_points->size();
@@ -116,7 +116,7 @@ public:
 
 	unsigned long get_face_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->polyhedra && mesh->polyhedra->face_first_loops)
 				return mesh->polyhedra->face_first_loops->size();
@@ -127,7 +127,7 @@ public:
 
 	unsigned long get_linear_curve_group_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->linear_curve_groups && mesh->linear_curve_groups->first_curves)
 				return mesh->linear_curve_groups->first_curves->size();
@@ -138,7 +138,7 @@ public:
 
 	unsigned long get_linear_curve_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->linear_curve_groups && mesh->linear_curve_groups->curve_first_points)
 				return mesh->linear_curve_groups->curve_first_points->size();
@@ -149,7 +149,7 @@ public:
 
 	unsigned long get_cubic_curve_group_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->cubic_curve_groups && mesh->cubic_curve_groups->first_curves)
 				return mesh->cubic_curve_groups->first_curves->size();
@@ -160,7 +160,7 @@ public:
 
 	unsigned long get_cubic_curve_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->cubic_curve_groups && mesh->cubic_curve_groups->curve_first_points)
 				return mesh->cubic_curve_groups->curve_first_points->size();
@@ -171,7 +171,7 @@ public:
 
 	unsigned long get_nucurve_group_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->nurbs_curve_groups && mesh->nurbs_curve_groups->first_curves)
 				return mesh->nurbs_curve_groups->first_curves->size();
@@ -182,7 +182,7 @@ public:
 
 	unsigned long get_nucurve_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->nurbs_curve_groups && mesh->nurbs_curve_groups->curve_first_points)
 				return mesh->nurbs_curve_groups->curve_first_points->size();
@@ -193,7 +193,7 @@ public:
 
 	unsigned long get_bilinear_patch_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->bilinear_patches && mesh->bilinear_patches->patch_selection)
 				return mesh->bilinear_patches->patch_selection->size();
@@ -204,7 +204,7 @@ public:
 
 	unsigned long get_bicubic_patch_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->bicubic_patches && mesh->bicubic_patches->patch_selection)
 				return mesh->bicubic_patches->patch_selection->size();
@@ -215,7 +215,7 @@ public:
 
 	unsigned long get_nupatch_count()
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.value())
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
 			if(mesh->nurbs_patches && mesh->nurbs_patches->patch_first_points)
 				return mesh->nurbs_patches->patch_first_points->size();

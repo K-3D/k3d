@@ -62,7 +62,7 @@ public:
 
 	bool surface_target_position(const k3d::point3& Position, k3d::point3& TargetPosition)
 	{
-		TargetPosition = k3d::to_point(k3d::normalize(k3d::to_vector(Position)) * m_radius.value());
+		TargetPosition = k3d::to_point(k3d::normalize(k3d::to_vector(Position)) * m_radius.pipeline_value());
 		return true;
 	}
 
@@ -75,9 +75,9 @@ public:
 
 	const k3d::bounding_box3 extents()
 	{
-		const double radius = m_radius.value();
-		const double zmax = m_zmax.value();
-		const double zmin = m_zmin.value();
+		const double radius = m_radius.pipeline_value();
+		const double zmax = m_zmax.pipeline_value();
+		const double zmin = m_zmin.pipeline_value();
 
 		return k3d::bounding_box3(radius, -radius, radius, -radius, zmax * radius, zmin * radius);
 	}
@@ -92,10 +92,10 @@ public:
 	{
 		if(m_gl_control_points.empty())
 		{
-			const double radius = m_radius.value();
-			const double zmin = m_zmin.value();
-			const double zmax = m_zmax.value();
-			const double thetamax = m_thetamax.value();
+			const double radius = m_radius.pipeline_value();
+			const double zmin = m_zmin.pipeline_value();
+			const double zmax = m_zmax.pipeline_value();
+			const double thetamax = m_thetamax.pipeline_value();
 
 			const double phimin = (zmin > -1) ? asin(zmin) : -k3d::pi_over_2();
 			const double phimax = (zmax < 1) ? asin(zmax) : k3d::pi_over_2();
@@ -134,7 +134,7 @@ public:
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		k3d::gl::setup_material(m_material.value());
+		k3d::gl::setup_material(m_material.pipeline_value());
 
 		const nurbs_renderer_t nurbs = nurbs_renderer(State);
 
@@ -171,12 +171,12 @@ public:
 
 	void on_renderman_render(const k3d::ri::render_state& State)
 	{
-		const double radius = m_radius.value();
-		const double zmin = m_zmin.value();
-		const double zmax = m_zmax.value();
-		const double thetamax = k3d::degrees(m_thetamax.value());
+		const double radius = m_radius.pipeline_value();
+		const double zmin = m_zmin.pipeline_value();
+		const double zmax = m_zmax.pipeline_value();
+		const double thetamax = k3d::degrees(m_thetamax.pipeline_value());
 
-		k3d::ri::setup_material(m_material.value(), State);
+		k3d::ri::setup_material(m_material.pipeline_value(), State);
 		State.engine.RiSphereV(radius, radius * zmin, radius * zmax, thetamax);
 	}
 

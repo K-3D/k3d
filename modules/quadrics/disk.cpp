@@ -60,13 +60,13 @@ public:
 
 	bool surface_target_position(const k3d::point3& Position, k3d::point3& TargetPosition)
 	{
-		const double radius = m_radius.value();
+		const double radius = m_radius.pipeline_value();
 
 		k3d::vector3 direction = k3d::vector3(Position[0], Position[1], 0);
 		if(k3d::length(direction) > radius)
 			direction = k3d::normalize(direction) * radius;
 
-		TargetPosition = k3d::point3(direction[0], direction[1], m_height.value());
+		TargetPosition = k3d::point3(direction[0], direction[1], m_height.pipeline_value());
 		return true;
 	}
 
@@ -83,8 +83,8 @@ public:
 
 	const k3d::bounding_box3 extents()
 	{
-		const double radius = m_radius.value();
-		const double height = m_height.value();
+		const double radius = m_radius.pipeline_value();
+		const double height = m_height.pipeline_value();
 
 		return k3d::bounding_box3(radius, -radius, radius, -radius, height, 0.0);
 	}
@@ -93,9 +93,9 @@ public:
 	{
 		if(m_gl_control_points.empty())
 		{
-			const double radius = m_radius.value();
-			const double height = m_height.value();
-			const double thetamax = m_thetamax.value();
+			const double radius = m_radius.pipeline_value();
+			const double height = m_height.pipeline_value();
+			const double thetamax = m_thetamax.pipeline_value();
 
 			if(thetamax == 0.0)
 				return;
@@ -126,7 +126,7 @@ public:
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		k3d::gl::setup_material(m_material.value());
+		k3d::gl::setup_material(m_material.pipeline_value());
 
 		const nurbs_renderer_t nurbs = nurbs_renderer(State);
 
@@ -163,11 +163,11 @@ public:
 
 	void on_renderman_render(const k3d::ri::render_state& State)
 	{
-		const double radius = m_radius.value();
-		const double height = m_height.value();
-		const double thetamax = k3d::degrees(m_thetamax.value());
+		const double radius = m_radius.pipeline_value();
+		const double height = m_height.pipeline_value();
+		const double thetamax = k3d::degrees(m_thetamax.pipeline_value());
 
-		k3d::ri::setup_material(m_material.value(), State);
+		k3d::ri::setup_material(m_material.pipeline_value(), State);
 		State.engine.RiDiskV(height, radius, thetamax);
 	}
 

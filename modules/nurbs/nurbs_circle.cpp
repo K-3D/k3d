@@ -58,15 +58,15 @@ public:
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
-		const double radius = m_radius.value();
-		const double thetamax = m_thetamax.value();
-		const unsigned long u_segments = m_u_segments.value();
+		const double radius = m_radius.pipeline_value();
+		const double thetamax = m_thetamax.pipeline_value();
+		const unsigned long u_segments = m_u_segments.pipeline_value();
 
 		k3d::legacy::nucurve_group* const nucurve_group = new k3d::legacy::nucurve_group();
 		k3d::legacy::nucurve* const nucurve = new k3d::legacy::nucurve();
 		Mesh.nucurve_groups.push_back(nucurve_group);
 		nucurve_group->curves.push_back(nucurve);
-		nucurve_group->material = m_material.value();
+		nucurve_group->material = m_material.pipeline_value();
 		nucurve->order = 3;
 		
 		std::vector<double> weights;

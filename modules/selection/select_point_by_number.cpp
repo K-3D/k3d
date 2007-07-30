@@ -55,7 +55,7 @@ public:
 			k3d::mesh::selection_t& point_selection = *k3d::make_unique(Output.point_selection);
 			std::fill(point_selection.begin(), point_selection.end(), 0.0);
 
-			const unsigned long index = m_index.value();
+			const unsigned long index = m_index.pipeline_value();
 			if(index < point_selection.size())
 				point_selection[index] = 1.0;
 		}

@@ -61,7 +61,7 @@ public:
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		k3d::gl::color3d(get_selection_weight() ? k3d::color(1, 1, 1) : m_color.value());
+		k3d::gl::color3d(get_selection_weight() ? k3d::color(1, 1, 1) : m_color.pipeline_value());
 		draw(State);
 	}
 
@@ -79,20 +79,20 @@ public:
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 
-		const std::string text = m_text.value();
+		const std::string text = m_text.pipeline_value();
 
 		glRasterPos3d(0, 0, 0);
 		glListBase(State.gl_ascii_font_list_base);
 		glCallLists(text.size(), GL_UNSIGNED_BYTE, text.c_str());
 
-		if(m_leader.value())
+		if(m_leader.pipeline_value())
 		{
 			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
 			k3d::gl::push_matrix(k3d::inverse(matrix()));
 
-			const k3d::point3 a = m_input_matrix.value() * k3d::point3(0, 0, 0);
-			const k3d::point3 c = m_leader_target.value() * k3d::point3(0, 0, 0);
+			const k3d::point3 a = m_input_matrix.pipeline_value() * k3d::point3(0, 0, 0);
+			const k3d::point3 c = m_leader_target.pipeline_value() * k3d::point3(0, 0, 0);
 			const k3d::point3 b = a + (0.05 * (b - a));
 
 			glBegin(GL_LINES);

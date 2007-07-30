@@ -224,11 +224,11 @@ public:
 	{
 		const k3d::bounding_box3 bounds = k3d::bounds(InputPoints);
 
-		const double angle = m_angle.value();
-		const double tightness = m_tightness.value();
-		const double position = m_position.value();
-		const k3d::axis along = m_along.value();
-		const k3d::axis around = m_around.value();
+		const double angle = m_angle.pipeline_value();
+		const double tightness = m_tightness.pipeline_value();
+		const double position = m_position.pipeline_value();
+		const k3d::axis along = m_along.pipeline_value();
+		const k3d::axis around = m_around.pipeline_value();
 
 		bend deformation(k3d::point3(0, 0, 0), k3d::point3(bounds.nx, bounds.ny, bounds.nz), k3d::point3(bounds.px, bounds.py, bounds.pz), along, around, angle, tightness, position);
 

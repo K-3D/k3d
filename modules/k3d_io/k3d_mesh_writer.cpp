@@ -56,8 +56,8 @@ public:
 
 	void on_write_file(k3d::iunknown*)
 	{
-		const k3d::filesystem::path path = m_file.value();
-		k3d::mesh* const mesh = m_input_mesh.value();
+		const k3d::filesystem::path path = m_file.pipeline_value();
+		k3d::mesh* const mesh = m_input_mesh.pipeline_value();
 
 		if(!mesh || path.empty())
 			return;

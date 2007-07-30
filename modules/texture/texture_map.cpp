@@ -83,21 +83,21 @@ public:
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::replace_selection(m_mesh_selection.value(), Mesh);
+		k3d::replace_selection(m_mesh_selection.pipeline_value(), Mesh);
 
-		k3d::i3d_2d_mapping* const mapping = m_mapping.value();
+		k3d::i3d_2d_mapping* const mapping = m_mapping.pipeline_value();
 		if(!mapping)
 			return;
 
-		const double s0 = m_s0.value();
-		const double s1 = m_s1.value();
-		const double t0 = m_t0.value();
-		const double t1 = m_t1.value();
-		const double default_s = m_default_s.value();
-		const double default_t = m_default_t.value();
+		const double s0 = m_s0.pipeline_value();
+		const double s1 = m_s1.pipeline_value();
+		const double t0 = m_t0.pipeline_value();
+		const double t1 = m_t1.pipeline_value();
+		const double default_s = m_default_s.pipeline_value();
+		const double default_t = m_default_t.pipeline_value();
 
 		k3d::matrix4 transformation = k3d::identity3D();
-		switch(m_axis.value())
+		switch(m_axis.pipeline_value())
 		{
 			case k3d::NX:
 				transformation = k3d::rotation3D(k3d::radians(90.0), k3d::vector3(0, 1, 0));
@@ -129,7 +129,7 @@ public:
 
 		// Compute a bounding-box that contains all selected points ...
 		k3d::bounding_box3 bounds;
-		if(m_tag_points.value())
+		if(m_tag_points.pipeline_value())
 		{
 			for(k3d::legacy::mesh::points_t::iterator point = Mesh.points.begin(); point != Mesh.points.end(); ++point)
 				update_bounds(**point, transformation, (*point)->position, bounds);
@@ -137,7 +137,7 @@ public:
 
 		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 		{
-			if(m_tag_edges.value())
+			if(m_tag_edges.pipeline_value())
 			{
 				for(k3d::legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
 				{
@@ -158,7 +158,7 @@ public:
 			return;
 
 		// Calculate s,t coordinates using linear interpolation
-		if(m_tag_points.value())
+		if(m_tag_points.pipeline_value())
 		{
 			for(k3d::legacy::mesh::points_t::iterator point = Mesh.points.begin(); point != Mesh.points.end(); ++point)
 				set_coordinates(**point, *mapping, transformation, (*point)->position, bounds, s0, s1, t0, t1, default_s, default_t, (*point)->vertex_data);
@@ -166,7 +166,7 @@ public:
 
 		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 		{
-			if(m_tag_edges.value())
+			if(m_tag_edges.pipeline_value())
 			{
 				for(k3d::legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
 				{

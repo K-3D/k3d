@@ -57,10 +57,10 @@ public:
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const k3d::axis along = m_along.value();
-		const double amplitude = m_amplitude.value();
-		const double wavelength = m_wavelength.value();
-		const double phase = m_phase.value();
+		const k3d::axis along = m_along.pipeline_value();
+		const double amplitude = m_amplitude.pipeline_value();
+		const double wavelength = m_wavelength.pipeline_value();
+		const double phase = m_phase.pipeline_value();
 
 		// Filter-out infinite frequencies ...
 		if(0 == wavelength)

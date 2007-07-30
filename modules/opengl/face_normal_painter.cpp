@@ -56,8 +56,8 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		const bool draw_selected = m_draw_selected.value() && RenderState.show_component_selection;
-		const bool draw_unselected = m_draw_unselected.value();
+		const bool draw_selected = m_draw_selected.pipeline_value() && RenderState.show_component_selection;
+		const bool draw_unselected = m_draw_unselected.pipeline_value();
 
 		if(!draw_selected && !draw_unselected)
 			return;
@@ -88,7 +88,7 @@ public:
 
 		if(draw_selected)
 		{
-			k3d::gl::color3d(m_selected_color.value());
+			k3d::gl::color3d(m_selected_color.pipeline_value());
 
 			glBegin(GL_LINES);
 			for(size_t face = 0; face != face_count; ++face)
@@ -104,7 +104,7 @@ public:
 
 		if(draw_unselected)
 		{
-			k3d::gl::color3d(m_unselected_color.value());
+			k3d::gl::color3d(m_unselected_color.pipeline_value());
 
 			glBegin(GL_LINES);
 			for(size_t face = 0; face != face_count; ++face)

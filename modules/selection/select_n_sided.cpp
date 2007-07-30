@@ -83,14 +83,14 @@ public:
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::replace_selection(m_mesh_selection.value(), Mesh);
+		k3d::replace_selection(m_mesh_selection.pipeline_value(), Mesh);
 	}
 
 	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
-		const unsigned long sides = m_sides.value();
-		const operator_t op = m_operator.value();
-		const component_t component = m_component.value();
+		const unsigned long sides = m_sides.pipeline_value();
+		const operator_t op = m_operator.pipeline_value();
+		const component_t component = m_component.pipeline_value();
 
 		k3d::legacy::for_each_component(Mesh, k3d::selection::set_weight(0.0));
 

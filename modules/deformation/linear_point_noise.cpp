@@ -78,25 +78,25 @@ public:
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const bool use_x = m_use_x.value();
-		const bool use_y = m_use_y.value();
-		const bool use_z = m_use_z.value();
+		const bool use_x = m_use_x.pipeline_value();
+		const bool use_y = m_use_y.pipeline_value();
+		const bool use_z = m_use_z.pipeline_value();
 
-		const bool move_x = m_move_x.value();
-		const bool move_y = m_move_y.value();
-		const bool move_z = m_move_z.value();
+		const bool move_x = m_move_x.pipeline_value();
+		const bool move_y = m_move_y.pipeline_value();
+		const bool move_z = m_move_z.pipeline_value();
 
-		const double frequency_x = m_frequency_x.value();
-		const double frequency_y = m_frequency_y.value();
-		const double frequency_z = m_frequency_z.value();
+		const double frequency_x = m_frequency_x.pipeline_value();
+		const double frequency_y = m_frequency_y.pipeline_value();
+		const double frequency_z = m_frequency_z.pipeline_value();
 
-		const double offset_x = m_offset_x.value();
-		const double offset_y = m_offset_y.value();
-		const double offset_z = m_offset_z.value();
+		const double offset_x = m_offset_x.pipeline_value();
+		const double offset_y = m_offset_y.pipeline_value();
+		const double offset_z = m_offset_z.pipeline_value();
 
-		const double amplitude_x = m_amplitude_x.value();
-		const double amplitude_y = m_amplitude_y.value();
-		const double amplitude_z = m_amplitude_z.value();
+		const double amplitude_x = m_amplitude_x.pipeline_value();
+		const double amplitude_y = m_amplitude_y.pipeline_value();
+		const double amplitude_z = m_amplitude_z.pipeline_value();
 
 		const size_t point_begin = 0;
 		const size_t point_end = point_begin + OutputPoints.size();

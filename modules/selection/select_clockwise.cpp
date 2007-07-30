@@ -62,7 +62,7 @@ public:
 	{
 		// Create output geometry ...
 		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::replace_selection(m_mesh_selection.value(), Mesh);
+		k3d::replace_selection(m_mesh_selection.pipeline_value(), Mesh);
 
 		// For each polyhedron ...
 		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
@@ -85,7 +85,7 @@ public:
 			{
 				(*it)->selection_weight = 0.0;
 			}
-			unsigned long number = m_number.value();
+			unsigned long number = m_number.pipeline_value();
 			k3d::legacy::split_edge* edge = *(selected_edges.begin());
 			for (unsigned long i = 0; i <= number; ++i)
 				edge = edge->face_clockwise;

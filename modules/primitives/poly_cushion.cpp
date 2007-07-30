@@ -79,7 +79,7 @@ public:
 		edge2->face_clockwise = edge3;
 		edge3->face_clockwise = edge1;
 
-		m_polyhedron->faces.push_back(new k3d::legacy::face(edge1, m_material.value()));
+		m_polyhedron->faces.push_back(new k3d::legacy::face(edge1, m_material.pipeline_value()));
 	}
 
 	void add_face(const unsigned long v1, const unsigned long v2, const unsigned long v3, const unsigned long v4)
@@ -94,7 +94,7 @@ public:
 		edge3->face_clockwise = edge4;
 		edge4->face_clockwise = edge1;
 
-		m_polyhedron->faces.push_back(new k3d::legacy::face(edge1, m_material.value()));
+		m_polyhedron->faces.push_back(new k3d::legacy::face(edge1, m_material.pipeline_value()));
 	}
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
@@ -105,12 +105,12 @@ public:
 		Mesh.polyhedra.push_back(new k3d::legacy::polyhedron());
 		m_polyhedron = Mesh.polyhedra.back();
 
-		const unsigned long length_segments = m_length_segments.value();
-		const unsigned long radial_segments = m_radial_segments.value();
-		const double diameter = m_diameter.value();
-		const double width = m_width.value();
-		const double height = m_height.value();
-		const double depth = m_depth.value();
+		const unsigned long length_segments = m_length_segments.pipeline_value();
+		const unsigned long radial_segments = m_radial_segments.pipeline_value();
+		const double diameter = m_diameter.pipeline_value();
+		const double width = m_width.pipeline_value();
+		const double height = m_height.pipeline_value();
+		const double depth = m_depth.pipeline_value();
 
 		// Build a sphere
 		typedef std::vector<k3d::point3> points_t;

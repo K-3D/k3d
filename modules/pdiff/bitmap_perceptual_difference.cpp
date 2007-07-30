@@ -139,14 +139,14 @@ public:
 		if(m_difference_image)
 			return;
 
-		k3d::bitmap* const bitmap_a = m_bitmap_a.value();
+		k3d::bitmap* const bitmap_a = m_bitmap_a.pipeline_value();
 		if(!bitmap_a)
 		{
 			m_difference_pixels = std::numeric_limits<unsigned long>::max();
 			return;
 		}
 
-		k3d::bitmap* const bitmap_b = m_bitmap_b.value();
+		k3d::bitmap* const bitmap_b = m_bitmap_b.pipeline_value();
 		if(!bitmap_b)
 		{
 			m_difference_pixels = std::numeric_limits<unsigned long>::max();
@@ -164,9 +164,9 @@ public:
 		args.ImgB = convert(*bitmap_b);
 		args.ImgDiff = new RGBAImage(bitmap_a->width(), bitmap_a->height());
 		args.Verbose = false;
-		args.FieldOfView = m_field_of_view.value();
-		args.Gamma = m_gamma.value();
-		args.Luminance = m_luminance.value();
+		args.FieldOfView = m_field_of_view.pipeline_value();
+		args.Gamma = m_gamma.pipeline_value();
+		args.Luminance = m_luminance.pipeline_value();
 		args.ThresholdPixels = 0;
 
 		Yee_Compare(args);

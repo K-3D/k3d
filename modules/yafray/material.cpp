@@ -105,14 +105,14 @@ public:
 
 	void setup_material(std::ostream& Stream)
 	{
-		const k3d::color color = m_color.value();
-		const k3d::color specular_color = m_specular_color.value();
-		const k3d::color reflected_color = m_reflected_color.value();
-		const k3d::color transmitted_color = m_transmitted_color.value();
+		const k3d::color color = m_color.pipeline_value();
+		const k3d::color specular_color = m_specular_color.pipeline_value();
+		const k3d::color reflected_color = m_reflected_color.pipeline_value();
+		const k3d::color transmitted_color = m_transmitted_color.pipeline_value();
 
-		const double hardness = m_hardness.value();
-		const double index_of_refraction = m_index_of_refraction.value();
-		const double minimum_reflection = m_minimum_reflection.value();
+		const double hardness = m_hardness.pipeline_value();
+		const double index_of_refraction = m_index_of_refraction.pipeline_value();
+		const double minimum_reflection = m_minimum_reflection.pipeline_value();
 
 		Stream << "<shader type=\"generic\" name=\"" << name() << "\">" << std::endl;
 		Stream << "	<attributes>" << std::endl;
@@ -123,7 +123,7 @@ public:
 		Stream << "		<hard value=\"" << hardness << "\"/>" << std::endl;
 		Stream << "		<IOR value=\"" << index_of_refraction << "\"/>" << std::endl;
 		Stream << "		<min_refle value=\"" << minimum_reflection << "\"/>" << std::endl;
-		Stream << "		<fast_fresnel value=\"" << (m_fast_fresnel.value() ? "on" : "off") << "\"/>" << std::endl;
+		Stream << "		<fast_fresnel value=\"" << (m_fast_fresnel.pipeline_value() ? "on" : "off") << "\"/>" << std::endl;
 		Stream << "	</attributes>" << std::endl;
 		Stream << "</shader>" << std::endl;
 	}

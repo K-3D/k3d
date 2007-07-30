@@ -314,8 +314,8 @@ public:
 
 	void on_playback_mode_changed(k3d::iunknown*)
 	{
-//k3d::log() << debug << m_playback_mode.value() << std::endl;
-		switch(m_playback_mode.value())
+//k3d::log() << debug << m_playback_mode.pipeline_value() << std::endl;
+		switch(m_playback_mode.internal_value())
 		{
 			case LOOP_REVERSE_PLAY:
 			case REVERSE_PLAY:
@@ -351,7 +351,7 @@ public:
 
 //k3d::log() << debug << start_time << " " << end_time << " " << frame_length << " " << time << std::endl;
 
-		switch(m_playback_mode.value())
+		switch(m_playback_mode.internal_value())
 		{
 			case LOOP_REVERSE_PLAY:
 			{

@@ -50,7 +50,7 @@ public:
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const tweaks_t tweaks = m_tweaks.value();
+		const tweaks_t tweaks = m_tweaks.pipeline_value();
 
 		const size_t point_begin = 0;
 		const size_t point_end = point_begin + std::min(tweaks.size(), OutputPoints.size());
@@ -64,8 +64,8 @@ public:
 
 		k3d::xml::element& tweaks = Element.append(k3d::xml::element("tweaks"));
 
-		// tweak_array -ought- to be a copy, since m_tweaks.value() returns a -temporary- object
-		const tweaks_t tweak_array = m_tweaks.value();
+		// tweak_array -ought- to be a copy, since m_tweaks.pipeline_value() returns a -temporary- object
+		const tweaks_t tweak_array = m_tweaks.pipeline_value();
 		for(tweaks_t::const_iterator tweak_i = tweak_array.begin(); tweak_i != tweak_array.end(); ++tweak_i)
 			tweaks.append(k3d::xml::element("tweak", k3d::xml::attribute("value", *tweak_i)));
 	}

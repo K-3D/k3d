@@ -447,7 +447,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		return_if_fail(mesh);
 
 		// Get selection and save initial position
-		component_center = detail::get_selected_points(m_document_state.selection_mode().value(), *mesh, selected_points);
+		component_center = detail::get_selected_points(m_document_state.selection_mode().internal_value(), *mesh, selected_points);
 
 		m_mesh_changed = false;
 	}
@@ -906,7 +906,7 @@ void transform_tool::mmb_click_toggle_manipulators_visibility()
 	m_tutorial_action = "mmb_click_toggle_manipulators_visibility";
 
 	// Toggle the visible state of the manipulators
-	m_visible_manipulators.set_value(!m_visible_manipulators.value());
+	m_visible_manipulators.set_value(!m_visible_manipulators.internal_value());
 
 	tool_selection::redraw_all();
 }
@@ -926,7 +926,7 @@ void transform_tool::mmb_click_switch_coordinate_system()
 	m_tutorial_action = "mmb_click_switch_coordinate_system";
 
 	// Switch coordinate system between global and local modes
-	switch(m_coordinate_system.value())
+	switch(m_coordinate_system.internal_value())
 	{
 		case GLOBAL:
 			set_coordinate_system(LOCAL);
@@ -1039,7 +1039,7 @@ k3d::point3 transform_tool::world_position()
 {
 	if(target_number())
 	{
-		if(SELECT_NODES == m_document_state.selection_mode().value())
+		if(SELECT_NODES == m_document_state.selection_mode().internal_value())
 		{
 			m_current_target = m_current_target % m_targets.size();
 			itarget* t = m_targets[m_current_target];
@@ -1188,7 +1188,7 @@ void transform_tool::get_current_selection()
 
 	const k3d::nodes_t nodes = m_document_state.selected_nodes();
 
-	if(SELECT_NODES == m_document_state.selection_mode().value())
+	if(SELECT_NODES == m_document_state.selection_mode().internal_value())
 	{
 		// Save transformable nodes as targets
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
@@ -1321,7 +1321,7 @@ void transform_tool::set_coordinate_system(const coordinate_system_t CoordinateS
 /// Updates all targets : tells them what's the new coordinate system
 void transform_tool::update_coordinate_system(k3d::iunknown*)
 {
-	switch(m_coordinate_system.value())
+	switch(m_coordinate_system.internal_value())
 	{
 		case GLOBAL:
 			for(targets_t::iterator target = m_targets.begin(); target != m_targets.end(); ++target)

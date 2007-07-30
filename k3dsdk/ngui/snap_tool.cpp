@@ -179,7 +179,7 @@ struct snap_tool::implementation :
 		m_snap_targets.clear();
 		m_snap_targets.push_back(k3d::ienumeration_property::enumeration_value_t("-- Automatic --", "", "-- Automatic --"));
 
-		if(k3d::isnappable* const snappable = m_target.value())
+		if(k3d::isnappable* const snappable = m_target.internal_value())
 		{
 			const k3d::isnappable::snap_targets_t targets = snappable->snap_targets();
 
@@ -380,7 +380,7 @@ struct snap_tool::implementation :
 		const k3d::matrix4 screen_matrix = k3d::node_to_world_matrix(*Viewport.camera());
 		const k3d::vector3 screen_normal = screen_matrix * k3d::vector3(0, 0, 1);
 
-		const k3d::point3 origin = m_transformation.value() * k3d::point3();
+		const k3d::point3 origin = m_transformation.internal_value() * k3d::point3();
 		const k3d::matrix4 orientation = k3d::identity3D();
 
 		// Update the screen xy constraint so it always aligns with the camera direction vector in world coordinates
@@ -397,7 +397,7 @@ struct snap_tool::implementation :
 		m_yz_constraint.set_plane(k3d::plane(orientation * k3d::vector3(1, 0, 0), origin), 0, 1, 1);
 
 		// Draw manipulators
-		if(!m_visible_manipulators.value() || !target_number())
+		if(!m_visible_manipulators.internal_value() || !target_number())
 			return;
 
 		k3d::gl::store_attributes attributes;
@@ -479,10 +479,10 @@ struct snap_tool::implementation :
 
 	void on_select(viewport::control& Viewport)
 	{
-		if(!m_visible_manipulators.value() || !target_number())
+		if(!m_visible_manipulators.internal_value() || !target_number())
 			return;
 
-		const k3d::point3 origin = m_transformation.value() * k3d::point3();
+		const k3d::point3 origin = m_transformation.internal_value() * k3d::point3();
 		const k3d::matrix4 orientation = k3d::identity3D();
 
 		k3d::gl::store_attributes attributes;
@@ -774,7 +774,7 @@ private:
 
 	virtual void update_constraint(viewport::control& Viewport, const k3d::point2& Coordinates)
 	{
-		const k3d::point3 origin = m_transformation.value() * k3d::point3();
+		const k3d::point3 origin = m_transformation.internal_value() * k3d::point3();
 
 		// Cycle through X - Screen - Y - Screen - Z - Screen - X - etc
 		if(m_current_constraint == &m_x_constraint || m_current_constraint == &m_y_constraint || m_current_constraint == &m_z_constraint)
@@ -995,16 +995,16 @@ private:
 		if(Delta == k3d::vector3(0, 0, 0))
 			return;
 
-		m_transformation.set_value(k3d::translation3D(Delta) * m_transformation.value());
+		m_transformation.set_value(k3d::translation3D(Delta) * m_transformation.internal_value());
 	}
 
 	void on_move(k3d::iunknown*)
 	{
 		k3d::isnap_target* snap_target = 0;
 
-		if(k3d::isnappable* const snappable = m_target.value())
+		if(k3d::isnappable* const snappable = m_target.internal_value())
 		{
-			const std::string snap_target_string = m_snap_target.value();
+			const std::string snap_target_string = m_snap_target.internal_value();
 			if(!snap_target_string.empty())
 			{
 				const unsigned long snap_target_id = k3d::from_string<unsigned long>(snap_target_string, 0);
@@ -1015,7 +1015,7 @@ private:
 			}
 		}
 
-		transform_targets(m_target.value(), snap_target, m_snap_distance.value(), m_snap_orientation.value(), m_match_groups.value(), m_transformation.value());
+		transform_targets(m_target.internal_value(), snap_target, m_snap_distance.internal_value(), m_snap_orientation.internal_value(), m_match_groups.internal_value(), m_transformation.internal_value());
 		redraw_all();
 	}
 

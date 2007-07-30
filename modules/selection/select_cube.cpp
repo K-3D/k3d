@@ -69,12 +69,12 @@ class select_cube :
 	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		const k3d::bounding_box3 cube(
-				m_x1.value(),
-				m_x2.value(),
-				m_y1.value(),
-				m_y2.value(),
-				m_z1.value(),
-				m_z2.value());
+				m_x1.pipeline_value(),
+				m_x2.pipeline_value(),
+				m_y1.pipeline_value(),
+				m_y2.pipeline_value(),
+				m_z1.pipeline_value(),
+				m_z2.pipeline_value());
 
 		k3d::legacy::for_each_component(Mesh, select_volume(cube));
 	}
@@ -84,7 +84,7 @@ class select_cube :
 		glDisable(GL_LIGHTING);
 		glColor3d(1, 0, 0);
 
-		const k3d::bounding_box3 cube(m_x1.value(), m_x2.value(), m_y1.value(), m_y2.value(), m_z1.value(), m_z2.value());
+		const k3d::bounding_box3 cube(m_x1.pipeline_value(), m_x2.pipeline_value(), m_y1.pipeline_value(), m_y2.pipeline_value(), m_z1.pipeline_value(), m_z2.pipeline_value());
 		if(cube.empty())
 			return;
 

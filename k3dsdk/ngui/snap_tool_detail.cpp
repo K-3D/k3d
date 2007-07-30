@@ -292,7 +292,7 @@ k3d::log() << debug << K3D_CHANGE_SET_CONTEXT << std::endl;
 	return_if_fail(mesh);
 
 	// Get selection and save initial position
-	component_center = detail::get_selected_points(m_document_state.selection_mode().value(), *mesh, selected_points);
+	component_center = detail::get_selected_points(m_document_state.selection_mode().internal_value(), *mesh, selected_points);
 }
 
 void snap_tool_detail::mesh_target::reset(k3d::iunknown*)
@@ -779,7 +779,7 @@ void snap_tool_detail::mmb_click_toggle_manipulators_visibility()
 	m_tutorial_action = "mmb_click_toggle_manipulators_visibility";
 
 	// Toggle the visible state of the manipulators
-	m_visible_manipulators.set_value(!m_visible_manipulators.value());
+	m_visible_manipulators.set_value(!m_visible_manipulators.internal_value());
 
 	redraw_all();
 }
@@ -799,7 +799,7 @@ void snap_tool_detail::mmb_click_switch_coordinate_system()
 	m_tutorial_action = "mmb_click_switch_coordinate_system";
 
 	// Switch coordinate system between global and local modes
-	switch(m_coordinate_system.value())
+	switch(m_coordinate_system.internal_value())
 	{
 		case GLOBAL:
 			set_coordinate_system(LOCAL);
@@ -1012,7 +1012,7 @@ void snap_tool_detail::get_current_selection()
 
 	const k3d::nodes_t nodes = m_document_state.selected_nodes();
 
-	if(SELECT_NODES == m_document_state.selection_mode().value())
+	if(SELECT_NODES == m_document_state.selection_mode().internal_value())
 	{
 		// Save transformable nodes as targets
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
@@ -1091,7 +1091,7 @@ void snap_tool_detail::set_coordinate_system(const coordinate_system_t Coordinat
 /// Updates all targets : tells them what's the new coordinate system
 void snap_tool_detail::update_coordinate_system(k3d::iunknown*)
 {
-	switch(m_coordinate_system.value())
+	switch(m_coordinate_system.internal_value())
 	{
 		case GLOBAL:
 			for(targets_t::iterator target = m_targets.begin(); target != m_targets.end(); ++target)

@@ -62,7 +62,7 @@ public:
 protected:
 	virtual matrix4 matrix()
 	{
-		return m_input_matrix.value();
+		return m_input_matrix.pipeline_value();
 	}
 
 	k3d_data(matrix4, data::immutable_name, data::change_signal, data::no_undo, data::local_storage, data::no_constraint, data::writable_property, data::with_serialization) m_input_matrix;

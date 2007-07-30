@@ -293,11 +293,11 @@ public:
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Calculate standard terrain parameters ...
-		const unsigned long iterations = m_iterations.value();
+		const unsigned long iterations = m_iterations.pipeline_value();
 		const unsigned long points = static_cast<unsigned long>(pow(2.0, static_cast<double>(iterations)));
 		const unsigned long segments = points - 1;
 		const double terrain_width = 20.0;
-		k3d::imaterial* const material = m_material.value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 
 		std::auto_ptr<k3d::legacy::mesh> mesh(new k3d::legacy::mesh());
 
@@ -330,7 +330,7 @@ public:
 		// Random seeds for a fractal terrain (built using rules)
 		terrain_seeds_t terrain_seeds;
 
-		srand(m_random_seed.value());
+		srand(m_random_seed.pipeline_value());
 
 		terrain_seeds.resize(points);
 		for(unsigned long i = 0; i < points; i++)
@@ -341,7 +341,7 @@ public:
 		}
 
 		// Calculate surface elevations ...
-		FFT_map* terrain = seeds_to_terrain(points, m_fractal_dimension.value(), terrain_seeds);
+		FFT_map* terrain = seeds_to_terrain(points, m_fractal_dimension.pipeline_value(), terrain_seeds);
 
 		k3d::legacy::mesh::points_t::iterator point = Mesh.points.begin();
 		for(unsigned long z = 0; z < points; z++)
@@ -351,14 +351,14 @@ public:
 				// 5 is an arbitrary constant to keep same y-scale ratio as other terrain algorithms
 				const double elevation = terrain[z]->P[x].real() / 5;
 
-				//const double y = m_sea.value() && elevation < m_sea_level.value() ? m_sea_level.value() : elevation;
+				//const double y = m_sea.pipeline_value() && elevation < m_sea_level.pipeline_value() ? m_sea_level.pipeline_value() : elevation;
 				(*point)->position.n[1] = elevation;
 				point++;
 			}
 		}
 
 		// Set orientation
-		k3d::signed_axis orientation = m_orientation.value();
+		k3d::signed_axis orientation = m_orientation.pipeline_value();
 		for(k3d::legacy::mesh::points_t::iterator point = Mesh.points.begin(); point != Mesh.points.end(); ++point)
 		{
 			// Update orientation

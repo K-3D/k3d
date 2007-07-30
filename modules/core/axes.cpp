@@ -79,7 +79,7 @@ public:
 
 	bool grid_target_position(const k3d::point3& Position, k3d::point3& TargetPosition)
 	{
-		const double grid_size = m_grid_size.value();
+		const double grid_size = m_grid_size.pipeline_value();
 
 		TargetPosition = k3d::point3(
 			k3d::round(Position[0] / grid_size) * grid_size,
@@ -96,18 +96,18 @@ public:
 
 	const k3d::bounding_box3 extents()
 	{
-		const double size = m_grid_size.value() * m_grid_count.value();
+		const double size = m_grid_size.pipeline_value() * m_grid_count.pipeline_value();
 		return k3d::bounding_box3(size, -size, size, -size, size, -size);
 	}
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		const long grid_count = m_grid_count.value();
-		const double grid_size = m_grid_size.value();
-		const k3d::color x_color = m_x_color.value();
-		const k3d::color y_color = m_y_color.value();
-		const k3d::color z_color = m_z_color.value();
-		const k3d::color grid_color = m_grid_color.value();
+		const long grid_count = m_grid_count.pipeline_value();
+		const double grid_size = m_grid_size.pipeline_value();
+		const k3d::color x_color = m_x_color.pipeline_value();
+		const k3d::color y_color = m_y_color.pipeline_value();
+		const k3d::color z_color = m_z_color.pipeline_value();
+		const k3d::color grid_color = m_grid_color.pipeline_value();
 
 		k3d::gl::store_attributes attributes;
 
@@ -125,7 +125,7 @@ public:
 		const double size = grid_count * grid_size;
 
 		// Draw axes and labels
-		if(m_axes.value())
+		if(m_axes.pipeline_value())
 		{
 			// Draw X axis
 			k3d::gl::color3d(x_color);
@@ -174,7 +174,7 @@ public:
 		k3d::gl::color3d(grid_color);
 
 		// Draw XY plane
-		if(m_xy_plane.value())
+		if(m_xy_plane.pipeline_value())
 		{
 			glBegin(GL_LINES);
 			for(long i = -grid_count; i <= grid_count; ++i)
@@ -188,7 +188,7 @@ public:
 		}
 
 		// Draw YZ plane
-		if(m_yz_plane.value())
+		if(m_yz_plane.pipeline_value())
 		{
 			glBegin(GL_LINES);
 			for(long i = -grid_count; i <= grid_count; ++i)
@@ -202,7 +202,7 @@ public:
 		}
 
 		// Draw XZ plane
-		if(m_xz_plane.value())
+		if(m_xz_plane.pipeline_value())
 		{
 			glBegin(GL_LINES);
 			for(long i = -grid_count; i <= grid_count; ++i)
@@ -226,9 +226,9 @@ public:
 		k3d::point3 input_coordinates = k3d::inverse(k3d::node_to_world_matrix(*this)) * InputCoordinates;
 
 		// Snap coordinates ...
-		input_coordinates[0] = k3d::round(input_coordinates[0] / m_grid_size.value()) * m_grid_size.value();
-		input_coordinates[1] = k3d::round(input_coordinates[1] / m_grid_size.value()) * m_grid_size.value();
-		input_coordinates[2] = k3d::round(input_coordinates[2] / m_grid_size.value()) * m_grid_size.value();
+		input_coordinates[0] = k3d::round(input_coordinates[0] / m_grid_size.pipeline_value()) * m_grid_size.pipeline_value();
+		input_coordinates[1] = k3d::round(input_coordinates[1] / m_grid_size.pipeline_value()) * m_grid_size.pipeline_value();
+		input_coordinates[2] = k3d::round(input_coordinates[2] / m_grid_size.pipeline_value()) * m_grid_size.pipeline_value();
 
 		// Convert coordinates back to world frame ...
 		SnapCoordinates = k3d::node_to_world_matrix(*this) * input_coordinates;

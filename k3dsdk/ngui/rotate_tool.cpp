@@ -678,12 +678,12 @@ void rotate_tool::on_redraw(viewport::control& Viewport)
 	update_targets();
 
 	// Redraw manipulators
-	m_manipulators->redraw(Viewport, (m_visible_manipulators.value() && target_number()), world_position(), world_orientation(), m_current_motion, k3d::point3(1.0, 1.0, 1.0));
+	m_manipulators->redraw(Viewport, (m_visible_manipulators.internal_value() && target_number()), world_position(), world_orientation(), m_current_motion, k3d::point3(1.0, 1.0, 1.0));
 }
 
 void rotate_tool::on_select(viewport::control& Viewport)
 {
-	if(m_visible_manipulators.value() && target_number())
+	if(m_visible_manipulators.internal_value() && target_number())
 		m_manipulators->select(Viewport, world_position(), world_orientation());
 }
 
@@ -783,7 +783,7 @@ void rotate_tool::on_rotate(k3d::iunknown*)
 	if(m_mutex)
 		return;
 
-	rotate_targets(k3d::rotation3D(m_rotation.value()));
+	rotate_targets(k3d::rotation3D(m_rotation.internal_value()));
 }
 
 } // namespace libk3dngui

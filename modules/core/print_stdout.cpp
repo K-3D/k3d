@@ -46,7 +46,7 @@ public:
 
 	void on_input_changed(k3d::iunknown*)
 	{
-		std::cout << m_input.value() << std::endl;
+		std::cout << m_input.pipeline_value() << std::endl;
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -111,7 +111,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 			if(k3d::selection::get_node(m_start_selection))
 			{
 				bool extended_mode;
-				switch(m_document_state.selection_mode().value())
+				switch(m_document_state.selection_mode().internal_value())
 				{
 					case SELECT_NODES:
 						// Extended selection
@@ -177,7 +177,7 @@ k3d::log() << debug << m_start_selection << std::endl;
 		if(!m_double_click_mode)
 			return;
 
-		switch(m_document_state.selection_mode().value())
+		switch(m_document_state.selection_mode().internal_value())
 		{
 			case SELECT_NODES:
 			{

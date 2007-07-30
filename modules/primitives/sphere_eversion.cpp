@@ -1194,19 +1194,19 @@ public:
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
-		const double time = m_time.value();
-		const double radius = m_radius.value();
-		const unsigned long latitudinal = m_latitudinal_patches.value();
-		const unsigned long longitudinal = m_longitudinal_patches.value();
-		const unsigned long strip_number = m_strips.value();
-		const unsigned long display_strips_number = m_display_strips.value();
-		const bool half_strips = m_half_strips.value();
-		const bool lower_hemisphere = m_lower_hemisphere.value();
-		const bool cylinder_test = m_cylinder_test.value();
-		const bool polygonal = m_polygonal.value();
+		const double time = m_time.pipeline_value();
+		const double radius = m_radius.pipeline_value();
+		const unsigned long latitudinal = m_latitudinal_patches.pipeline_value();
+		const unsigned long longitudinal = m_longitudinal_patches.pipeline_value();
+		const unsigned long strip_number = m_strips.pipeline_value();
+		const unsigned long display_strips_number = m_display_strips.pipeline_value();
+		const bool half_strips = m_half_strips.pipeline_value();
+		const bool lower_hemisphere = m_lower_hemisphere.pipeline_value();
+		const bool cylinder_test = m_cylinder_test.pipeline_value();
+		const bool polygonal = m_polygonal.pipeline_value();
 
 		k3d::legacy::mesh* const strip_mesh = new k3d::legacy::mesh();
-		detail::current_material = m_material.value();
+		detail::current_material = m_material.pipeline_value();
 		detail::current_radius = radius;
 		detail::geometry_matrix_t sphere_points;
 		detail::generate_strip(strip_mesh, polygonal, sphere_points, time, strip_number,

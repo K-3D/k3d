@@ -92,12 +92,12 @@ void shader::load(xml::element& Element, const ipersistent::load_context& Contex
 
 const path shader::shader_path()
 {
-	return m_shader_path.value();
+	return m_shader_path.pipeline_value();
 }
 
 const std::string shader::shader_name()
 {
-	return m_shader.value().name;
+	return m_shader.internal_value().name;
 }
 
 parameter_list shader::shader_arguments(const render_state& State)
@@ -190,7 +190,7 @@ void shader::load_metafile()
 {
     try
     {
-        const filesystem::path shader_path = m_shader_path.value();
+        const filesystem::path shader_path = m_shader_path.pipeline_value();
         const filesystem::path metafile_path = shader_path + ".slmeta";
         filesystem::ifstream metafile_stream(metafile_path);
 
@@ -218,7 +218,7 @@ void shader::load_metafile()
 
 void shader::create_arguments()
 {
-	const sl::shader shader = m_shader.value();
+	const sl::shader shader = m_shader.internal_value();
 	for(sl::shader::arguments_t::const_iterator argument = shader.arguments.begin(); argument != shader.arguments.end(); ++argument)
 	{
 		if(argument->output)

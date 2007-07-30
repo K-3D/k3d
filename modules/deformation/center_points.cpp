@@ -58,9 +58,9 @@ public:
 		if(bounds.empty())
 			return;
 
-		const bool center_x = m_center_x.value();
-		const bool center_y = m_center_y.value();
-		const bool center_z = m_center_z.value();
+		const bool center_x = m_center_x.pipeline_value();
+		const bool center_y = m_center_y.pipeline_value();
+		const bool center_z = m_center_z.pipeline_value();
 
 		const k3d::point3 offset(
 			center_x ? -0.5 * (bounds.px + bounds.nx) : 0,

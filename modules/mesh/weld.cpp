@@ -142,7 +142,7 @@ public:
 
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
-		const double distance = m_distance.value();
+		const double distance = m_distance.pipeline_value();
 
 		// Begin with a copy of the original mesh ...
 		k3d::legacy::deep_copy(InputMesh, Mesh);

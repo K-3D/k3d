@@ -1540,7 +1540,7 @@ public:
 	void init_lsystem()
 	{
 		// Load configuration file
-		const k3d::filesystem::path file_path = m_file_path.value();
+		const k3d::filesystem::path file_path = m_file_path.pipeline_value();
 		double recursion, basic_angle, thickness;
 		if(!lparser::load_configuration_values(file_path, recursion, basic_angle, thickness))
 			return;
@@ -1563,26 +1563,26 @@ public:
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
-		const double recursion = m_recursion.value();
-		const double basic_angle = m_basic_angle.value();
-		const double thickness = m_thickness.value();
-		const unsigned long random_seed = m_random_seed.value();
-		const double size = m_size.value();
-		const bool closed_form = m_closed_form.value();
-		const unsigned long mutations = m_mutations.value();
-		const unsigned long mutation_seed = m_mutation_seed.value();
-		const unsigned long max_stack_size = m_max_stack_size.value();
-		k3d::imaterial* const material = m_material.value();
+		const double recursion = m_recursion.pipeline_value();
+		const double basic_angle = m_basic_angle.pipeline_value();
+		const double thickness = m_thickness.pipeline_value();
+		const unsigned long random_seed = m_random_seed.pipeline_value();
+		const double size = m_size.pipeline_value();
+		const bool closed_form = m_closed_form.pipeline_value();
+		const unsigned long mutations = m_mutations.pipeline_value();
+		const unsigned long mutation_seed = m_mutation_seed.pipeline_value();
+		const unsigned long max_stack_size = m_max_stack_size.pipeline_value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 
 		// Load configuration file
-		const k3d::filesystem::path file_path = m_file_path.value();
+		const k3d::filesystem::path file_path = m_file_path.pipeline_value();
 		if(!lparser::load_configuration_rules(recursion, basic_angle, thickness, file_path))
 			return;
 
 		// Create geometry ...
 		k3d::legacy::polyhedron* polyhedron = new k3d::legacy::polyhedron();
 		Mesh.polyhedra.push_back(polyhedron);
-		lparser::l_parser(random_seed, closed_form, 0, mutations, mutation_seed, max_stack_size, &Mesh, material, m_orientation.value(), m_flip_normals.value());
+		lparser::l_parser(random_seed, closed_form, 0, mutations, mutation_seed, max_stack_size, &Mesh, material, m_orientation.pipeline_value(), m_flip_normals.pipeline_value());
 
 		// Cache first bounding box to allow growth
 		if(lparser::bbox_x == 0 && lparser::bbox_y == 0 && lparser::bbox_z == 0)

@@ -57,7 +57,7 @@ public:
 
 	k3d::matrix4 matrix()
 	{
-		k3d::matrix4 result = m_input_matrix.value() * m_space.value() * translation3D(k3d::vector3(m_x.value(), m_y.value(), m_z.value())) * k3d::inverse(m_space.value());
+		k3d::matrix4 result = m_input_matrix.pipeline_value() * m_space.pipeline_value() * translation3D(k3d::vector3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value())) * k3d::inverse(m_space.pipeline_value());
 		return result;
 	}
 

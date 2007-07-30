@@ -832,12 +832,12 @@ void move_tool::on_redraw(viewport::control& Viewport)
 	update_targets();
 
 	// Redraw manipulators
-	m_manipulators->redraw(Viewport, (m_visible_manipulators.value() && target_number()), world_position(), world_orientation(), m_current_motion, k3d::point3(1.0, 1.0, 1.0));
+	m_manipulators->redraw(Viewport, (m_visible_manipulators.internal_value() && target_number()), world_position(), world_orientation(), m_current_motion, k3d::point3(1.0, 1.0, 1.0));
 }
 
 void move_tool::on_select(viewport::control& Viewport)
 {
-	if(m_visible_manipulators.value() && target_number())
+	if(m_visible_manipulators.internal_value() && target_number())
 		m_manipulators->select(Viewport, world_position(), world_orientation());
 }
 
@@ -924,7 +924,7 @@ void move_tool::move_selection(const k3d::vector3& Delta)
 	if(Delta == k3d::vector3(0, 0, 0))
 		return;
 
-	const k3d::point3 new_position = m_move.value() + k3d::to_point(Delta);
+	const k3d::point3 new_position = m_move.internal_value() + k3d::to_point(Delta);
 	m_move.set_value(new_position);
 }
 
@@ -933,7 +933,7 @@ void move_tool::on_move(k3d::iunknown*)
 	if(m_mutex)
 		return;
 
-	move_targets(k3d::to_vector(m_move.value()));
+	move_targets(k3d::to_vector(m_move.internal_value()));
 
 	// Update world position
 	m_world_position.reset();

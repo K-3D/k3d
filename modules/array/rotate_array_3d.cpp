@@ -52,9 +52,9 @@ public:
 
 	const k3d::matrix4 on_get_element(unsigned long Index1, unsigned long Count1, unsigned long Index2, unsigned long Count2, unsigned long Index3, unsigned long Count3)
 	{
-		const k3d::angle_axis angle1 = m_angle1.value();
-		const k3d::angle_axis angle2 = m_angle2.value();
-		const k3d::angle_axis angle3 = m_angle3.value();
+		const k3d::angle_axis angle1 = m_angle1.pipeline_value();
+		const k3d::angle_axis angle2 = m_angle2.pipeline_value();
+		const k3d::angle_axis angle3 = m_angle3.pipeline_value();
 
 		return k3d::rotation3D(k3d::angle_axis(angle1.angle * Index1, angle1.axis)) *
 			k3d::rotation3D(k3d::angle_axis(angle2.angle * Index2, angle2.axis)) *

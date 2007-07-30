@@ -67,7 +67,7 @@ protected:
 	bool execute_script(iscript_engine::context_t& Context)
 	{
 		// Examine the script to determine the correct language ...
-		const script::code code(m_script.value());
+		const script::code code(m_script.pipeline_value());
 		const script::language language(code);
 
 		return_val_if_fail(language.factory(), false);

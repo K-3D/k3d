@@ -72,8 +72,8 @@ public:
 		k3d::mesh::blobbies_t::floats_t& floats = *k3d::make_unique(blobbies.floats);
 		k3d::mesh::blobbies_t::operands_t& operands = *k3d::make_unique(blobbies.operands);
 
-		const double radius = m_radius.value();
-		k3d::imaterial* const material = m_material.value();
+		const double radius = m_radius.pipeline_value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 
 		const k3d::matrix4 matrix = k3d::scaling3D(k3d::point3(radius, radius, radius));
 

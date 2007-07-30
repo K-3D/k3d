@@ -117,12 +117,12 @@ public:
 	{
 		// Interpolate value
 		value_t result;
-		interpolator_t* interpolator = m_interpolator.value();
-		return_val_if_fail(interpolator, m_value_input.value());
+		interpolator_t* interpolator = m_interpolator.pipeline_value();
+		return_val_if_fail(interpolator, m_value_input.pipeline_value());
 		typename interpolator_t::keyframes_t keyframes;
 		for (typename keyframes_t::iterator keyframe = m_keyframes.begin(); keyframe != m_keyframes.end(); ++keyframe)
-			keyframes.insert(std::make_pair(keyframe->first->value(), keyframe->second->value()));
-		time_t time = m_time_input.value();
+			keyframes.insert(std::make_pair(keyframe->first->pipeline_value(), keyframe->second->pipeline_value()));
+		time_t time = m_time_input.pipeline_value();
 		try
 		{
 			result =  interpolator->interpolate(time, keyframes);
@@ -130,7 +130,7 @@ public:
 		catch (insufficient_data_exception& e)
 		{
 			k3d::log() << warning << name() << ": Insufficient keyframe data to calculate value at time " << time << std::endl;
-			result =  m_value_input.value();
+			result =  m_value_input.pipeline_value();
 		}
 		return result;
 	}
@@ -138,11 +138,11 @@ public:
 	/// Create a keyframe from the current time and value inputs
 	void keyframe()
 	{
-		time_t time = m_time_input.value();
+		time_t time = m_time_input.pipeline_value();
 		time_property_t* time_property = 0;
 		for (typename keyframes_t::const_iterator keyframe = m_keyframes.begin(); keyframe != m_keyframes.end(); ++keyframe)
 		{
-			if (keyframe->first->value() == time)
+			if (keyframe->first->pipeline_value() == time)
 			{
 				time_property = keyframe->first;
 				break;
@@ -153,12 +153,12 @@ public:
 		if (time_property == 0)
 		{
 			std::string key_number = boost::lexical_cast<std::string>(m_keyframes.size());
-			store_value(time, m_value_input.value(), key_number);
+			store_value(time, m_value_input.pipeline_value(), key_number);
 		}
 		else
 		{
 			value_it = m_keyframes.find(time_property);
-			value_it->second->set_value(m_value_input.value());
+			value_it->second->set_value(m_value_input.pipeline_value());
 		}
 	}
 	
@@ -287,7 +287,7 @@ private:
 	/// Executed when the input value changes
 	void on_value_change(k3d::iunknown* Hint)
 	{
-		if(!m_manual_keyframe.value() && document().state_recorder().current_change_set())
+		if(!m_manual_keyframe.pipeline_value() && document().state_recorder().current_change_set())
 		{
 			keyframe();
 		}
@@ -308,7 +308,7 @@ private:
 		
 		if(document().state_recorder().current_change_set())
 		{
-			document().state_recorder().current_change_set()->record_old_state(new track_undo_delete<time_t, value_t>(*this, time_property->value(), value_property->value(), keynumber));
+			document().state_recorder().current_change_set()->record_old_state(new track_undo_delete<time_t, value_t>(*this, time_property->pipeline_value(), value_property->pipeline_value(), keynumber));
 			document().state_recorder().current_change_set()->record_new_state(new track_redo_delete<time_t, value_t>(*this, keynumber));
 		}
 	}

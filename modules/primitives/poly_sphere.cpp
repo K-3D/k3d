@@ -391,12 +391,12 @@ public:
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
-		const unsigned long u_segments = m_u_segments.value();
-		const unsigned long v_segments = m_v_segments.value();
-		const double radius = m_radius.value();
-		const double u_power = m_u_power.value();
-		const double v_power = m_v_power.value();
-		k3d::imaterial* const material = m_material.value();
+		const unsigned long u_segments = m_u_segments.pipeline_value();
+		const unsigned long v_segments = m_v_segments.pipeline_value();
+		const double radius = m_radius.pipeline_value();
+		const double u_power = m_u_power.pipeline_value();
+		const double v_power = m_v_power.pipeline_value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 
 		const double inv_u_power = u_power ? 1.0 / u_power : 1.0;
 		const double inv_v_power = v_power ? 1.0 / v_power : 1.0;
@@ -404,7 +404,7 @@ public:
 		Mesh.polyhedra.push_back(new k3d::legacy::polyhedron());
 		k3d::legacy::polyhedron& polyhedron = *Mesh.polyhedra.back();
 
-		switch(m_type.value())
+		switch(m_type.pipeline_value())
 		{
 			case SPHERE:
 				detail::sphere(u_segments, v_segments, radius, inv_u_power, inv_v_power, false, material, &Mesh, polyhedron);

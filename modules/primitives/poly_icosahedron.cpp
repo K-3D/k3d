@@ -57,8 +57,8 @@ public:
 
 	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
-		k3d::imaterial* const material = m_material.value();
-		const double radius = m_radius.value();
+		k3d::imaterial* const material = m_material.pipeline_value();
+		const double radius = m_radius.pipeline_value();
 
 		// Create points ...
 		const size_t point_count = 12;

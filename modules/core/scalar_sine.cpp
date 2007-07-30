@@ -47,7 +47,7 @@ public:
 
 	double get_value()
 	{
-		return std::sin(m_input.value());
+		return std::sin(m_input.pipeline_value());
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -73,7 +73,7 @@ public:
 
 	k3d::matrix4 output_value()
 	{
-		return m_input.value() * m_space.value() * scaling3D(k3d::point3(m_x.value(), m_y.value(), m_z.value())) * k3d::inverse(m_space.value());
+		return m_input.pipeline_value() * m_space.pipeline_value() * scaling3D(k3d::point3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value())) * k3d::inverse(m_space.pipeline_value());
 	}
 
 	static k3d::iplugin_factory& get_factory()

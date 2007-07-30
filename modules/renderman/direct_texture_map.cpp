@@ -60,7 +60,7 @@ public:
 
 	const k3d::filesystem::path renderman_texture_path(const k3d::ri::render_state& State)
 	{
-		return m_file.value();
+		return m_file.pipeline_value();
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -33,10 +33,10 @@ class colored_selection_painter :
 	typedef k3d::gl::mesh_painter base;
 public:
 	colored_selection_painter(k3d::iplugin_factory& Factory,
-														k3d::idocument& Document,
-														const k3d::color UnselectedMeshColor = k3d::color(0.0, 0.0, 0.0),
-														const k3d::color SelectedMeshColor = k3d::color(1.0, 1.0, 1.0),
-														const k3d::color SelectedComponentColor = k3d::color(1.0, 0.0, 0.0)) :
+			k3d::idocument& Document,
+			const k3d::color UnselectedMeshColor = k3d::color(0.0, 0.0, 0.0),
+			const k3d::color SelectedMeshColor = k3d::color(1.0, 1.0, 1.0),
+			const k3d::color SelectedComponentColor = k3d::color(1.0, 0.0, 0.0)) :
 		base(Factory, Document),
 		m_unselected_mesh_color(init_owner(*this) + init_name("unselected_mesh_color") + init_label(_("Unselected Mesh Color")) + init_description(_("Color the mesh is drawn in when it is unselected")) + init_value(UnselectedMeshColor)),
 		m_selected_mesh_color(init_owner(*this) + init_name("selected_mesh_color") + init_label(_("Selected Mesh Color")) + init_description(_("Color unselected components are drawn in when their mesh is selected")) + init_value(SelectedMeshColor)),
@@ -51,19 +51,19 @@ protected:
 	/// Return the unselected mesh color
 	const k3d::color unselected_mesh_color()
 	{
-		return m_unselected_mesh_color.value();
+		return m_unselected_mesh_color.pipeline_value();
 	}
 	
 	/// Return the selected mesh color
 	const k3d::color selected_mesh_color()
 	{
-		return m_selected_mesh_color.value();
+		return m_selected_mesh_color.pipeline_value();
 	}
 	
 	/// Return the selected component color
 	const k3d::color selected_component_color()
 	{
-		return m_selected_component_color.value();
+		return m_selected_component_color.pipeline_value();
 	}
 	
 	

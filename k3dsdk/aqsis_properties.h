@@ -69,7 +69,7 @@ class layer_connection_property :
 public:
 	const std::string get_source_variable()
 	{
-		return m_source_variable.value();
+		return m_source_variable.internal_value();
 	}
 
 	void set_source_variable(const std::string& Variable)
@@ -84,7 +84,7 @@ public:
 
 	const std::string get_target_variable()
 	{
-		return m_target_variable.value();
+		return m_target_variable.internal_value();
 	}
 
 	void set_target_variable(const std::string& Variable)

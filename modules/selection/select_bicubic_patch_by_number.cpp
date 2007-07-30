@@ -56,7 +56,7 @@ public:
 		    k3d::mesh::selection_t& patch_selection = *k3d::make_unique(bicubic_patches.patch_selection);
 			std::fill(patch_selection.begin(), patch_selection.end(), 0.0);
 
-			const unsigned long index = m_index.value();
+			const unsigned long index = m_index.pipeline_value();
 			if(index < patch_selection.size())
 				patch_selection[index] = 1.0;
 		}

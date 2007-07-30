@@ -822,18 +822,18 @@ public:
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::replace_selection(m_mesh_selection.value(), Mesh);
+		k3d::replace_selection(m_mesh_selection.pipeline_value(), Mesh);
 
 		// Clear data caches
 		m_new_points.clear();
 		m_selected_faces.clear();
 		m_side_faces.clear();
 
-		const unsigned long segments = m_segments.value();
-		const direction_t direction = m_direction.value();
-		const bool region = m_region.value();
-		const bool group_normals = m_group_normals.value();
-		const bool back_face = m_back_face.value();
+		const unsigned long segments = m_segments.pipeline_value();
+		const direction_t direction = m_direction.pipeline_value();
+		const bool region = m_region.pipeline_value();
+		const bool group_normals = m_group_normals.pipeline_value();
+		const bool back_face = m_back_face.pipeline_value();
 
 		// For each polyhedron ...
 		k3d::legacy::polyhedron::faces_t back_faces;
@@ -865,14 +865,14 @@ public:
 
 	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
-		const double distance = m_distance.value();
-		const double inset = m_inset.value();
+		const double distance = m_distance.pipeline_value();
+		const double inset = m_inset.pipeline_value();
 
 		for(detail::new_points_t::iterator new_point = m_new_points.begin(); new_point != m_new_points.end(); ++new_point)
 			new_point->update(distance, inset);
 
 		// Update new items selection
-		const bool select_side_faces = m_select_side_faces.value();
+		const bool select_side_faces = m_select_side_faces.pipeline_value();
 		const double side_weight = select_side_faces ? 1.0 : 0.0;
 		for(k3d::legacy::polyhedron::faces_t::iterator face = m_side_faces.begin(); face != m_side_faces.end(); ++face)
 			(*face)->selection_weight = side_weight;

@@ -62,16 +62,16 @@ public:
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
-		const double radius = m_radius.value();
-		const double height = m_height.value();
-		const double thetamax = m_thetamax.value();
-		const unsigned long u_segments = m_u_segments.value();
-		const unsigned long v_segments = m_v_segments.value();
+		const double radius = m_radius.pipeline_value();
+		const double height = m_height.pipeline_value();
+		const double thetamax = m_thetamax.pipeline_value();
+		const unsigned long u_segments = m_u_segments.pipeline_value();
+		const unsigned long v_segments = m_v_segments.pipeline_value();
 
 		k3d::legacy::nupatch* const nupatch = new k3d::legacy::nupatch();
 		Mesh.nupatches.push_back(nupatch);
 		
-		nupatch->material = m_material.value();
+		nupatch->material = m_material.pipeline_value();
 		nupatch->u_order = 3;
 		nupatch->v_order = 2;
 

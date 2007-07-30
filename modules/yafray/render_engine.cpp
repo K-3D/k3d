@@ -100,7 +100,7 @@ public:
 
 	void on_resolution_changed(k3d::iunknown*)
 	{
-		const std::string new_resolution = m_resolution.value();
+		const std::string new_resolution = m_resolution.pipeline_value();
 
 		const k3d::resolutions_t& resolutions = k3d::resolutions();
 		for(k3d::resolutions_t::const_iterator resolution = resolutions.begin(); resolution != resolutions.end(); ++resolution)
@@ -546,21 +546,21 @@ private:
 		const k3d::point3 camera_to_vector = camera_matrix * k3d::point3(0, 0, 1);
 		const k3d::point3 camera_up_vector = camera_matrix * k3d::point3(0, 1, 0);
 
-		stream << "<camera name=\"camera\" resx=\"" << m_pixel_width.value() << "\" resy=\"" << m_pixel_height.value() << "\" focal=\"0.7\">" << std::endl;
+		stream << "<camera name=\"camera\" resx=\"" << m_pixel_width.pipeline_value() << "\" resy=\"" << m_pixel_height.pipeline_value() << "\" focal=\"0.7\">" << std::endl;
 		stream << "	<from x=\"" << -camera_position[0] << "\" y=\"" << camera_position[1] << "\" z=\"" << camera_position[2] << "\"/>" << std::endl;
 		stream << "	<to x=\"" << -camera_to_vector[0] << "\" y=\"" << camera_to_vector[1] << "\" z=\"" << camera_to_vector[2] << "\"/>" << std::endl;
 		stream << "	<up x=\"" << -camera_up_vector[0] << "\" y=\"" << camera_up_vector[1] << "\" z=\"" << camera_up_vector[2] << "\"/>" << std::endl;
 		stream << "</camera>" << std::endl;
 
 		// Generate the output file ...
-		const k3d::color fog_color = m_fog_color.value();
+		const k3d::color fog_color = m_fog_color.pipeline_value();
 
-		stream << "<render camera_name=\"camera\" AA_passes=\"" << m_AA_passes.value() << "\"" << " AA_minsamples=\"" << m_AA_minsamples.value() << "\" AA_pixelwidth=\"" << m_AA_pixelwidth.value() << "\" AA_threshold=\"" << m_AA_threshold.value() << "\" raydepth=\"" << m_raydepth.value() << "\" bias=\"" << m_bias.value() << "\">" << std::endl;
+		stream << "<render camera_name=\"camera\" AA_passes=\"" << m_AA_passes.pipeline_value() << "\"" << " AA_minsamples=\"" << m_AA_minsamples.pipeline_value() << "\" AA_pixelwidth=\"" << m_AA_pixelwidth.pipeline_value() << "\" AA_threshold=\"" << m_AA_threshold.pipeline_value() << "\" raydepth=\"" << m_raydepth.pipeline_value() << "\" bias=\"" << m_bias.pipeline_value() << "\">" << std::endl;
 		stream << "	<outfile value=\"" << OutputImagePath.native_filesystem_string() << "\"/>" << std::endl;
-		stream << "	<save_alpha value=\"" << (m_save_alpha.value() ? "on" : "off") << "\"/>" << std::endl;
-		stream << "	<exposure value=\"" << m_exposure.value() << "\"/>" << std::endl;
-		stream << "	<gamma value=\"" << m_gamma.value() << "\"/>" << std::endl;
-		stream << "	<fog_density value=\"" << m_fog_density.value() << "\"/>" << std::endl;
+		stream << "	<save_alpha value=\"" << (m_save_alpha.pipeline_value() ? "on" : "off") << "\"/>" << std::endl;
+		stream << "	<exposure value=\"" << m_exposure.pipeline_value() << "\"/>" << std::endl;
+		stream << "	<gamma value=\"" << m_gamma.pipeline_value() << "\"/>" << std::endl;
+		stream << "	<fog_density value=\"" << m_fog_density.pipeline_value() << "\"/>" << std::endl;
 		stream << "	<fog_color r=\"" << fog_color.red << "\" g=\"" << fog_color.green << "\" b=\"" << fog_color.blue << "\"/>" << std::endl;
 		stream << "</render>" << std::endl;
 
@@ -573,7 +573,7 @@ private:
 	/// Apply SDS if needed
 	void sds_filter(const k3d::legacy::mesh& Input, const std::string& RenderType, k3d::legacy::mesh& Output, int Levels)
 	{
-		if (!m_preview_sds.value() || !(Input.polyhedra.size() > 0 && (RenderType == "catmull-clark")))
+		if (!m_preview_sds.pipeline_value() || !(Input.polyhedra.size() > 0 && (RenderType == "catmull-clark")))
 		{
 			k3d::legacy::deep_copy(Input, Output);
 			return;

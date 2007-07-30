@@ -274,7 +274,7 @@ private:
 
 	void on_edit_recording(k3d::iunknown* = 0)
 	{
-		if(m_recording.value())
+		if(m_recording.internal_value())
 		{
 			m_script_window.hide();
 			m_recording_message.show();
@@ -473,7 +473,7 @@ private:
 		return_if_fail(Command.size());
 
 		// If we aren't recording ...
-		if(!m_recording.value())
+		if(!m_recording.internal_value())
 			return;
 
 		// Skip everything but UI events ...
@@ -530,7 +530,7 @@ private:
 		std::string title = get_script_title();
 		if(m_unsaved_changes)
 			title += _(" [changed]");
-		if(m_recording.value())
+		if(m_recording.internal_value())
 			title += _(" [recording]");
 		if(m_running)
 			title += _(" [running]");

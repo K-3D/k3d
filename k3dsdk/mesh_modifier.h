@@ -82,7 +82,7 @@ protected:
 private:
 	void initialize_mesh(mesh& Output)
 	{
-		if(const mesh* const input = m_input_mesh.value())
+		if(const mesh* const input = m_input_mesh.pipeline_value())
 		{
 			base_t::document().pipeline_profiler().start_execution(*this, "Create Mesh");
 			on_create_mesh(*input, Output);
@@ -96,7 +96,7 @@ private:
 
 	void update_mesh(mesh& Output)
 	{
-		if(const mesh* const input = m_input_mesh.value())
+		if(const mesh* const input = m_input_mesh.pipeline_value())
 		{
 			base_t::document().pipeline_profiler().start_execution(*this, "Update Mesh");
 			on_update_mesh(*input, Output);

@@ -68,10 +68,10 @@ public:
 		m_input_model.connect_rbutton_end_drag(sigc::mem_fun(m_navigation_model, &navigation_input_model::on_button2_end_drag));
 		m_input_model.connect_scroll(sigc::mem_fun(m_navigation_model, &navigation_input_model::on_scroll));
 
-		m_selection_model.set_extended_mode(m_extended_mode.value());
-		m_selection_model.set_extended_component_mode(m_extended_component_mode.value());
-		m_selection_model.set_paint_mode(m_paint_mode.value());
-		m_selection_model.set_double_click_mode(m_double_click_mode.value());
+		m_selection_model.set_extended_mode(m_extended_mode.internal_value());
+		m_selection_model.set_extended_component_mode(m_extended_component_mode.internal_value());
+		m_selection_model.set_paint_mode(m_paint_mode.internal_value());
+		m_selection_model.set_double_click_mode(m_double_click_mode.internal_value());
 
 		m_extended_mode.changed_signal().connect(sigc::mem_fun(*this, &implementation::on_extended_mode_changed));
 		m_extended_component_mode.changed_signal().connect(sigc::mem_fun(*this, &implementation::on_extended_component_mode_changed));
@@ -86,22 +86,22 @@ public:
 
 	void on_extended_mode_changed(k3d::iunknown*)
 	{
-		m_selection_model.set_extended_mode(m_extended_mode.value());
+		m_selection_model.set_extended_mode(m_extended_mode.internal_value());
 	}
 
 	void on_extended_component_mode_changed(k3d::iunknown*)
 	{
-		m_selection_model.set_extended_component_mode(m_extended_component_mode.value());
+		m_selection_model.set_extended_component_mode(m_extended_component_mode.internal_value());
 	}
 
 	void on_paint_mode_changed(k3d::iunknown*)
 	{
-		m_selection_model.set_paint_mode(m_paint_mode.value());
+		m_selection_model.set_paint_mode(m_paint_mode.internal_value());
 	}
 
 	void on_double_click_mode_changed(k3d::iunknown*)
 	{
-		m_selection_model.set_double_click_mode(m_double_click_mode.value());
+		m_selection_model.set_double_click_mode(m_double_click_mode.internal_value());
 	}
 
 	document_state& m_document_state;

@@ -61,7 +61,7 @@ public:
 		}
 
 		m_processing = true;
-		if(k3d::itransform_array_1d* const layout = m_layout.value())
+		if(k3d::itransform_array_1d* const layout = m_layout.pipeline_value())
 			result = result * layout->get_element(Index1, Count1);
 		m_processing = false;
 
@@ -106,7 +106,7 @@ public:
 		}
 
 		m_processing = true;
-		if(k3d::itransform_array_2d* const layout = m_layout.value())
+		if(k3d::itransform_array_2d* const layout = m_layout.pipeline_value())
 			result = result * layout->get_element(Index1, Count1, Index2, Count2);
 		m_processing = false;
 
@@ -151,7 +151,7 @@ public:
 		}
 
 		m_processing = true;
-		if(k3d::itransform_array_3d* const layout = m_layout.value())
+		if(k3d::itransform_array_3d* const layout = m_layout.pipeline_value())
 			result = result * layout->get_element(Index1, Count1, Index2, Count2, Index3, Count3);
 		m_processing = false;
 

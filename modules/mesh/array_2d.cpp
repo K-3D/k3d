@@ -64,10 +64,10 @@ public:
 
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
-		if(k3d::itransform_array_2d* const layout = m_layout.value())
+		if(k3d::itransform_array_2d* const layout = m_layout.pipeline_value())
 		{
-			const unsigned long count1 = m_count1.value();
-			const unsigned long count2 = m_count2.value();
+			const unsigned long count1 = m_count1.pipeline_value();
+			const unsigned long count2 = m_count2.pipeline_value();
 
 			for(unsigned long i = 0; i != count1; ++i)
 			{

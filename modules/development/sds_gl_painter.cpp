@@ -197,7 +197,7 @@ protected:
 		if (!RenderState.node_selection)
 			k3d::gl::color3d(unselected_mesh_color());
 		
-		Cache.draw_faces(m_levels.value(), RenderState.node_selection);
+		Cache.draw_faces(m_levels.pipeline_value(), RenderState.node_selection);
 	}
 	
 	// override to choose selection mode
@@ -205,7 +205,7 @@ protected:
 	{
 		if (!SelectionState.select_faces)
 			return;
-		Cache.select_faces(m_levels.value());
+		Cache.select_faces(m_levels.pipeline_value());
 	}
 	
 private:
@@ -253,14 +253,14 @@ private:
 	{
 		glDisable(GL_LIGHTING);
 		k3d::gl::color3d(unselected_mesh_color());
-		Cache.draw_borders(m_levels.value(), RenderState.node_selection);
+		Cache.draw_borders(m_levels.pipeline_value(), RenderState.node_selection);
 	}
 	
 	virtual void select(k3d::sds::k3d_basic_opengl_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if (!SelectionState.select_edges)
 			return;
-		Cache.select_borders(m_levels.value());
+		Cache.select_borders(m_levels.pipeline_value());
 	}
 };
 
@@ -305,14 +305,14 @@ private:
 	{
 		glDisable(GL_LIGHTING);
 		k3d::gl::color3d(unselected_mesh_color());
-		Cache.draw_corners(m_levels.value(), RenderState.node_selection);
+		Cache.draw_corners(m_levels.pipeline_value(), RenderState.node_selection);
 	}
 	
 	virtual void select(k3d::sds::k3d_basic_opengl_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if (!SelectionState.select_points)
 			return;
-		Cache.select_corners(m_levels.value());
+		Cache.select_corners(m_levels.pipeline_value());
 	}
 };
 

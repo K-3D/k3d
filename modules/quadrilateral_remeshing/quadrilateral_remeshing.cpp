@@ -416,15 +416,15 @@ public:
 		}
 
 		// If there's no parameter value defined, check mesh selections
-		const k3d::legacy::mesh_selection& minima_selection = m_minima_selection.value();
-		const k3d::legacy::mesh_selection& maxima_selection = m_maxima_selection.value();
+		const k3d::legacy::mesh_selection& minima_selection = m_minima_selection.pipeline_value();
+		const k3d::legacy::mesh_selection& maxima_selection = m_maxima_selection.pipeline_value();
 		if(!valid_extrema && minima_selection.points.size() && maxima_selection.points.size())
 		{
 			k3d::legacy::mesh_selection::records_t::const_iterator selection_item;
 			const unsigned long max_point_index = points.size();
 
 			unsigned long minima = 0;
-			const double min_value = m_minima_value.value();
+			const double min_value = m_minima_value.pipeline_value();
 			for(selection_item = minima_selection.points.begin(); selection_item != minima_selection.points.end(); ++selection_item)
 			{
 				const unsigned long selection_index = selection_item->first;
@@ -437,7 +437,7 @@ public:
 			}
 
 			unsigned long maxima = 0;
-			const double max_value = m_maxima_value.value();
+			const double max_value = m_maxima_value.pipeline_value();
 			for(selection_item = maxima_selection.points.begin(); selection_item != maxima_selection.points.end(); ++selection_item)
 			{
 				const unsigned long selection_index = selection_item->first;
@@ -458,15 +458,15 @@ public:
 		if(!valid_extrema)
 		{
 			// Get valid flow start and stop values
-			const unsigned long flow_min = m_min_index.value();
-			const unsigned long flow_max = m_max_index.value();
+			const unsigned long flow_min = m_min_index.pipeline_value();
+			const unsigned long flow_max = m_max_index.pipeline_value();
 
 			// Make sure flow start and stop values are valid
 			if(flow_min == flow_max || flow_min >= input.points.size() || flow_max >= input.points.size())
 				return true;
 
-			const double min_value = m_minima_value.value();
-			const double max_value = m_maxima_value.value();
+			const double min_value = m_minima_value.pipeline_value();
+			const double max_value = m_maxima_value.pipeline_value();
 
 			// Save extremal points
 			m_extrema.insert(std::make_pair(points[flow_min], extremum_t(min_value)));
@@ -1941,7 +1941,7 @@ assert_not_reached();
 		current_flows_values.push_back(first_values);
 
 		// Trace other gradient flow lines using h1 as flow distance ...
-		const double h1 = m_h1.value();
+		const double h1 = m_h1.pipeline_value();
 		m_gradient_distance = h1;
 
 		// Go through every flow we create
@@ -2549,7 +2549,7 @@ assert_not_reached();
 	bool draw_isoparametric_flows(segments_t& iso_flows)
 	{
 		// Get isoparametric spacing
-		const double h2 = m_h2.value();
+		const double h2 = m_h2.pipeline_value();
 		m_isoparametric_distance = h2;
 
 		// Find first seed point
@@ -2894,7 +2894,7 @@ assert_not_reached();
 
 	void connect_polygons(k3d::legacy::mesh& output, k3d::legacy::polyhedron& polyhedron, crossings_t& gradient_crossings, crossings_t& iso_crossings, point_segments_map_t& point_segments)
 	{
-		k3d::imaterial* const material = m_material.value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 
 		for(crossings_t::iterator crossing = gradient_crossings.begin(); crossing != gradient_crossings.end(); ++crossing)
 		{

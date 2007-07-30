@@ -54,9 +54,9 @@ public:
 
 	void on_create_bitmap(k3d::bitmap& Bitmap)
 	{
-		const k3d::pixel_size_t width = m_width.value();
-		const k3d::pixel_size_t height = m_height.value();
-		const k3d::color color = m_color.value();
+		const k3d::pixel_size_t width = m_width.pipeline_value();
+		const k3d::pixel_size_t height = m_height.pipeline_value();
+		const k3d::color color = m_color.pipeline_value();
 
 		Bitmap.recreate(width, height);
 

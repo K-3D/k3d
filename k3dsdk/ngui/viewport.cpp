@@ -456,27 +456,27 @@ k3d::idocument& control::document()
 
 k3d::icamera* const control::camera()
 {
-	return m_implementation->m_camera.value();
+	return m_implementation->m_camera.internal_value();
 }
 
 k3d::gl::irender_engine* const control::gl_engine()
 {
-	return m_implementation->m_gl_engine.value();
+	return m_implementation->m_gl_engine.internal_value();
 }
 
 k3d::icamera_preview_render_engine* const control::camera_preview_engine()
 {
-	return m_implementation->m_preview_engine.value();
+	return m_implementation->m_preview_engine.internal_value();
 }
 
 k3d::icamera_still_render_engine* const control::camera_still_engine()
 {
-	return m_implementation->m_still_engine.value();
+	return m_implementation->m_still_engine.internal_value();
 }
 
 k3d::icamera_animation_render_engine* const control::camera_animation_engine()
 {
-	return m_implementation->m_animation_engine.value();
+	return m_implementation->m_animation_engine.internal_value();
 }
 
 void control::set_camera(k3d::icamera* const Camera)
@@ -619,9 +619,9 @@ bool control::save_frame(k3d::icamera& Camera, const k3d::filesystem::path& Outp
 
 	create_font();
 	glViewport(0, 0, width, height);
-	if(m_implementation->m_gl_engine.value())
+	if(m_implementation->m_gl_engine.internal_value())
 	{
-		m_implementation->m_gl_engine.value()->redraw(Camera, width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, m_implementation->m_gl_viewport);
+		m_implementation->m_gl_engine.internal_value()->redraw(Camera, width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, m_implementation->m_gl_viewport);
 	}
 	else
 	{
@@ -770,7 +770,7 @@ k3d::selection::records control::get_selectable_nodes(const k3d::rectangle& Sele
 
 k3d::selection::records control::get_selectable_objects(const k3d::rectangle& SelectionRegion)
 {
-	switch(m_implementation->m_document_state.selection_mode().value())
+	switch(m_implementation->m_document_state.selection_mode().internal_value())
 	{
 		case SELECT_NODES:
 			return get_selectable_nodes(SelectionRegion);
@@ -1188,7 +1188,7 @@ k3d::selection::record control::pick_node(const k3d::point2& Coordinates, k3d::s
 
 k3d::selection::record control::pick_object(const k3d::point2& Coordinates, k3d::selection::records& Records)
 {
-	switch(m_implementation->m_document_state.selection_mode().value())
+	switch(m_implementation->m_document_state.selection_mode().internal_value())
 	{
 		case SELECT_NODES:
 			return pick_node(Coordinates, Records);
@@ -1277,11 +1277,11 @@ bool control::on_redraw()
 	
 	create_font();
 	glViewport(0, 0, width, height);
-	if(m_implementation->m_gl_engine.value() && m_implementation->m_camera.value())
+	if(m_implementation->m_gl_engine.internal_value() && m_implementation->m_camera.internal_value())
 	{
 		k3d::timer timer;
 
-		m_implementation->m_gl_engine.value()->redraw(*m_implementation->m_camera.value(), width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, m_implementation->m_gl_viewport);
+		m_implementation->m_gl_engine.internal_value()->redraw(*m_implementation->m_camera.internal_value(), width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, m_implementation->m_gl_viewport);
 		if(m_implementation->m_document_state.get_focus_viewport() == this)
 			m_implementation->m_document_state.active_tool().redraw(*this);
 
@@ -1356,14 +1356,14 @@ const GLint control::select(const k3d::gl::selection_state& SelectState, const k
 const GLint control::select(const k3d::gl::selection_state& SelectState, const k3d::rectangle& SelectionRegion, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4])
 {
 	// If we don't have a camera, we're done ...
-	if(!m_implementation->m_camera.value())
+	if(!m_implementation->m_camera.internal_value())
 		return 0;
 
 	if(!is_realized())
 		return 0;
 
 	// Viewport doesn't support selection, so we're done ...
-	k3d::gl::iselection_engine* const selection_engine = dynamic_cast<k3d::gl::iselection_engine*>(m_implementation->m_gl_engine.value());
+	k3d::gl::iselection_engine* const selection_engine = dynamic_cast<k3d::gl::iselection_engine*>(m_implementation->m_gl_engine.internal_value());
 	if(!selection_engine)
 		return 0;
 
@@ -1397,7 +1397,7 @@ const GLint control::select(const k3d::gl::selection_state& SelectState, const k
 		glInitNames();
 
 		GLdouble projection_matrix[16];
-		selection_engine->select(SelectState, *m_implementation->m_camera.value(), width, height, m_implementation->m_font_begin, k3d::normalize(SelectionRegion), m_implementation->m_gl_view_matrix, projection_matrix, m_implementation->m_gl_viewport);
+		selection_engine->select(SelectState, *m_implementation->m_camera.internal_value(), width, height, m_implementation->m_font_begin, k3d::normalize(SelectionRegion), m_implementation->m_gl_view_matrix, projection_matrix, m_implementation->m_gl_viewport);
 		std::copy(m_implementation->m_gl_view_matrix, m_implementation->m_gl_view_matrix + 16, ViewMatrix);
 		std::copy(projection_matrix, projection_matrix + 16, ProjectionMatrix);
 		std::copy(m_implementation->m_gl_viewport, m_implementation->m_gl_viewport + 4, Viewport);

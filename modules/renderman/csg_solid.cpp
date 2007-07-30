@@ -57,7 +57,7 @@ public:
 		if(!k3d::ri::last_sample(State))
 			return;
 
-		k3d::ri::irenderable* const renderable = m_instance.value();
+		k3d::ri::irenderable* const renderable = m_instance.pipeline_value();
 		if(!renderable)
 			return;
 

@@ -69,7 +69,7 @@ public:
 
 	void on_resolution_changed(k3d::iunknown*)
 	{
-		const std::string new_resolution = m_resolution.value();
+		const std::string new_resolution = m_resolution.pipeline_value();
 
 		const k3d::resolutions_t& resolutions = k3d::resolutions();
 		for(k3d::resolutions_t::const_iterator resolution = resolutions.begin(); resolution != resolutions.end(); ++resolution)
@@ -89,10 +89,10 @@ public:
 	{
 		m_shadow_map_path = k3d::filesystem::path();
 
-		if(!m_create_shadow_map.value())
+		if(!m_create_shadow_map.pipeline_value())
 			return;
 
-		k3d::icamera* const camera = m_camera.value();
+		k3d::icamera* const camera = m_camera.pipeline_value();
 		return_if_fail(camera);
 
 		Engine.RiFrameBegin(0);
@@ -101,10 +101,10 @@ public:
 
 		Engine.RiDisplayV(m_shadow_map_path.native_filesystem_string(), "shadow", k3d::ri::RI_Z());
 
-		if(m_view_shadow_map.value())
+		if(m_view_shadow_map.pipeline_value())
 			Engine.RiDisplayV("+" + name(), "zframebuffer", k3d::ri::RI_Z());
 
-		Engine.RiFormat(m_pixel_width.value(), m_pixel_height.value(), 1);
+		Engine.RiFormat(m_pixel_width.pipeline_value(), m_pixel_height.pipeline_value(), 1);
 		Engine.RiPixelSamples(1, 1);
 		Engine.RiPixelFilter(k3d::ri::RI_BOX(), 1, 1);
 

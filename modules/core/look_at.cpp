@@ -66,8 +66,8 @@ public:
 
 	k3d::matrix4 output_value()
 	{
-		const k3d::matrix4 input_matrix = m_input.value();
-		const k3d::matrix4 target_matrix = m_target.value();
+		const k3d::matrix4 input_matrix = m_input.pipeline_value();
+		const k3d::matrix4 target_matrix = m_target.pipeline_value();
 
 		const k3d::point3 from = input_matrix * k3d::point3(0, 0, 0);
 		const k3d::point3 to = target_matrix * k3d::point3(0, 0, 0);

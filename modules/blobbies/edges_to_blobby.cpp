@@ -145,9 +145,9 @@ public:
 		detail::ordered_edges_t edges;
 		k3d::legacy::for_each_edge(const_cast<k3d::legacy::mesh&>(InputMesh), detail::get_edges(InputMesh, Mesh, edges));
 
-		const double radius = m_radius.value();
+		const double radius = m_radius.pipeline_value();
 		k3d::legacy::blobby::variable_operands* new_blobby = 0;
-		switch(m_type.value())
+		switch(m_type.pipeline_value())
 		{
 			case ADD:
 				new_blobby = new k3d::legacy::blobby::add();

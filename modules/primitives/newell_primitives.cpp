@@ -972,11 +972,11 @@ public:
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
-		const double size = m_size.value();
-		k3d::imaterial* const material = m_material.value();
+		const double size = m_size.pipeline_value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 
 		// Creates Newell's primitives using his bezier patches ...
-		switch(m_type.value())
+		switch(m_type.pipeline_value())
 		{
 			case TEAPOT:
 			{

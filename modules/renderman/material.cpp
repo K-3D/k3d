@@ -98,30 +98,30 @@ public:
 
 		// Setup displacement bounds ...
 		k3d::ri::parameter_list displacement_attributes;
-		displacement_attributes.push_back(k3d::ri::parameter("sphere", k3d::ri::UNIFORM, 1, static_cast<k3d::ri::real>(m_DisplacementBounds.value())));
+		displacement_attributes.push_back(k3d::ri::parameter("sphere", k3d::ri::UNIFORM, 1, static_cast<k3d::ri::real>(m_DisplacementBounds.pipeline_value())));
 		displacement_attributes.push_back(k3d::ri::parameter("coordinatesystem", k3d::ri::UNIFORM, 1, k3d::ri::string("world")));
 		State.engine.RiAttributeV("displacementbound", displacement_attributes);
 
 		// Set base color
-		State.engine.RiColor(m_Color.value());
+		State.engine.RiColor(m_Color.pipeline_value());
 
 		// Set opacity
-		State.engine.RiOpacity(m_Opacity.value());
+		State.engine.RiOpacity(m_Opacity.pipeline_value());
 
 		// Set the matte attribute
-		State.engine.RiMatte(m_Matte.value() ? 1 : 0);
+		State.engine.RiMatte(m_Matte.pipeline_value() ? 1 : 0);
 
 		// Setup shaders ...
-		if(m_surface_shader.value())
-			m_surface_shader.value()->setup_renderman_surface_shader(State);
-		if(m_displacement_shader.value())
-			m_displacement_shader.value()->setup_renderman_displacement_shader(State);
-		if(m_atmosphere_shader.value())
-			m_atmosphere_shader.value()->setup_renderman_atmosphere_shader(State);
-		if(m_interior_shader.value())
-			m_interior_shader.value()->setup_renderman_interior_shader(State);
-		if(m_exterior_shader.value())
-			m_exterior_shader.value()->setup_renderman_exterior_shader(State);
+		if(m_surface_shader.pipeline_value())
+			m_surface_shader.pipeline_value()->setup_renderman_surface_shader(State);
+		if(m_displacement_shader.pipeline_value())
+			m_displacement_shader.pipeline_value()->setup_renderman_displacement_shader(State);
+		if(m_atmosphere_shader.pipeline_value())
+			m_atmosphere_shader.pipeline_value()->setup_renderman_atmosphere_shader(State);
+		if(m_interior_shader.pipeline_value())
+			m_interior_shader.pipeline_value()->setup_renderman_interior_shader(State);
+		if(m_exterior_shader.pipeline_value())
+			m_exterior_shader.pipeline_value()->setup_renderman_exterior_shader(State);
 	}
 
 	static k3d::iplugin_factory& get_factory()

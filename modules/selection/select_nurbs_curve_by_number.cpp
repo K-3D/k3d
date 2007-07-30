@@ -56,7 +56,7 @@ public:
 		    k3d::mesh::selection_t& curve_selection = *k3d::make_unique(nurbs_curve_groups.curve_selection);
 			std::fill(curve_selection.begin(), curve_selection.end(), 0.0);
 
-			const unsigned long index = m_index.value();
+			const unsigned long index = m_index.pipeline_value();
 			if(index < curve_selection.size())
 				curve_selection[index] = 1.0;
 		}

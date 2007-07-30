@@ -49,7 +49,7 @@ public:
 
 	void on_deform_mesh(const k3d::mesh& Input, const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const double smoothing = m_smoothing.value();
+		const double smoothing = m_smoothing.pipeline_value();
 
         k3d::mesh::points_t sums(InputPoints.size(), k3d::point3(0, 0, 0));
         std::vector<size_t> counts(InputPoints.size(), 0);

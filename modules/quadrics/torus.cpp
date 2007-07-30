@@ -65,8 +65,8 @@ public:
 
 	const k3d::bounding_box3 extents()
 	{
-		const double majorradius = fabs(m_majorradius.value());
-		const double minorradius = fabs(m_minorradius.value());
+		const double majorradius = fabs(m_majorradius.pipeline_value());
+		const double minorradius = fabs(m_minorradius.pipeline_value());
 
 		return k3d::bounding_box3(majorradius + minorradius, -(majorradius + minorradius), majorradius + minorradius, -(majorradius + minorradius), minorradius, -minorradius);
 	}
@@ -75,11 +75,11 @@ public:
 	{
 		if(m_gl_control_points.empty())
 		{
-			const double majorradius = m_majorradius.value();
-			const double minorradius = m_minorradius.value();
-			const double phimin = m_phimin.value();
-			const double phimax = m_phimax.value();
-			const double thetamax = m_thetamax.value();
+			const double majorradius = m_majorradius.pipeline_value();
+			const double minorradius = m_minorradius.pipeline_value();
+			const double phimin = m_phimin.pipeline_value();
+			const double phimax = m_phimax.pipeline_value();
+			const double thetamax = m_thetamax.pipeline_value();
 
 			if(thetamax == 0.0 || phimin == phimax)
 				return;
@@ -115,7 +115,7 @@ public:
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		k3d::gl::setup_material(m_material.value());
+		k3d::gl::setup_material(m_material.pipeline_value());
 
 		const nurbs_renderer_t nurbs = nurbs_renderer(State);
 
@@ -152,14 +152,14 @@ public:
 
 	void on_renderman_render(const k3d::ri::render_state& State)
 	{
-		const double majorradius = m_majorradius.value();
-		const double minorradius = m_minorradius.value();
-		const double phimin = k3d::degrees(m_phimin.value());
-		const double phimax = k3d::degrees(m_phimax.value());
-		const double thetamax = k3d::degrees(m_thetamax.value());
+		const double majorradius = m_majorradius.pipeline_value();
+		const double minorradius = m_minorradius.pipeline_value();
+		const double phimin = k3d::degrees(m_phimin.pipeline_value());
+		const double phimax = k3d::degrees(m_phimax.pipeline_value());
+		const double thetamax = k3d::degrees(m_thetamax.pipeline_value());
 
 		State.engine.RiTransformBegin();
-		k3d::ri::setup_material(m_material.value(), State);
+		k3d::ri::setup_material(m_material.pipeline_value(), State);
 		State.engine.RiTorusV(majorradius, minorradius, phimin, phimax, thetamax);
 		State.engine.RiTransformEnd();
 	}

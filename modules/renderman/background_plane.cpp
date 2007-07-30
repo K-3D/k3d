@@ -82,7 +82,7 @@ public:
 		{
 			const double near = boost::any_cast<double>(k3d::property::pipeline_value(perspective->near()));
 			const double far = boost::any_cast<double>(k3d::property::pipeline_value(perspective->far()));
-			plane = k3d::mix(near, far, m_distance.value());
+			plane = k3d::mix(near, far, m_distance.pipeline_value());
 			left = plane * boost::any_cast<double>(k3d::property::pipeline_value(perspective->left()));
 			right = plane * boost::any_cast<double>(k3d::property::pipeline_value(perspective->right()));
 			top = plane * boost::any_cast<double>(k3d::property::pipeline_value(perspective->top()));
@@ -93,7 +93,7 @@ public:
 		{
 			const double near = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->near()));
 			const double far = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->far()));
-			plane = k3d::mix(near, far, m_distance.value());
+			plane = k3d::mix(near, far, m_distance.pipeline_value());
 			left = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->left()));
 			right = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->right()));
 			top = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->top()));
@@ -105,7 +105,7 @@ public:
 		State.engine.RiIdentity();
 		State.engine.RiCoordSysTransform(k3d::ri::RI_CAMERA());
 		
-		k3d::ri::setup_material(m_material.value(), State);
+		k3d::ri::setup_material(m_material.pipeline_value(), State);
 
 		// Draw a plane ...
 		k3d::ri::points points;

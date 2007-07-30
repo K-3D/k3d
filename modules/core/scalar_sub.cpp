@@ -47,7 +47,7 @@ public:
 
 	double get_value()
 	{
-		return m_input1.value() - m_input2.value();
+		return m_input1.pipeline_value() - m_input2.pipeline_value();
 	}
 
 	static k3d::iplugin_factory& get_factory()

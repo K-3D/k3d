@@ -73,7 +73,7 @@ public:
 
 		// Create output geometry
 		k3d::legacy::deep_copy(Input, Output);
-		k3d::replace_selection(m_mesh_selection.value(), Output);
+		k3d::replace_selection(m_mesh_selection.pipeline_value(), Output);
 
 		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron_i = Output.polyhedra.begin(); polyhedron_i != Output.polyhedra.end(); ++polyhedron_i)
 		{
@@ -126,9 +126,9 @@ public:
 
 	void on_update_mesh(const k3d::legacy::mesh& Input, k3d::legacy::mesh& Output)
 	{
-		const double offset = m_offset.value();
-		const bool distance = m_distance.value();
-		k3d::imaterial* const material = m_material.value();
+		const double offset = m_offset.pipeline_value();
+		const bool distance = m_distance.pipeline_value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 
 		for(bevel_points_t::iterator bevel_point = m_bevel_points.begin(); bevel_point != m_bevel_points.end(); ++bevel_point)
 			bevel_point->update(offset, distance);

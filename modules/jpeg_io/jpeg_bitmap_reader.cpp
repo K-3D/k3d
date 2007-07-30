@@ -52,7 +52,7 @@ public:
 
 	void on_create_bitmap(k3d::bitmap& Bitmap)
 	{
-		const k3d::filesystem::path file = m_file.value();
+		const k3d::filesystem::path file = m_file.pipeline_value();
 		if(file.empty())
 			return;
 

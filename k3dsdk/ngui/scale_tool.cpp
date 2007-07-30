@@ -840,12 +840,12 @@ void scale_tool::on_redraw(viewport::control& Viewport)
 	update_targets();
 
 	// Redraw manipulators
-	m_manipulators->redraw(Viewport, (m_visible_manipulators.value() && target_number()), world_position(), world_orientation(), m_current_motion, get_scaling());
+	m_manipulators->redraw(Viewport, (m_visible_manipulators.internal_value() && target_number()), world_position(), world_orientation(), m_current_motion, get_scaling());
 }
 
 void scale_tool::on_select(viewport::control& Viewport)
 {
-	if(m_visible_manipulators.value() && target_number())
+	if(m_visible_manipulators.internal_value() && target_number())
 		m_manipulators->select(Viewport, world_position(), world_orientation());
 }
 
@@ -937,12 +937,12 @@ void scale_tool::scale_selection(const k3d::point3& Scaling)
 
 k3d::point3 scale_tool::get_scaling()
 {
-	return m_scaling.value();
+	return m_scaling.internal_value();
 }
 
 void scale_tool::on_scale(k3d::iunknown*)
 {
-	scale_targets(m_scaling.value());
+	scale_targets(m_scaling.internal_value());
 }
 
 k3d::point3 scale_tool::get_center()

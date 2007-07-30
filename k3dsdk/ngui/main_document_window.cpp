@@ -1840,7 +1840,7 @@ private:
 	{
 		return_if_fail(m_focus_panel);
 
-		if(m_maximize_panel.value())
+		if(m_maximize_panel.internal_value())
 		{
 			const panel_frame::controls panel_frames = detail::get_panel_frames(m_panel_frame);
 			for(panel_frame::controls::const_iterator panel_frame = panel_frames.begin(); panel_frame != panel_frames.end(); ++panel_frame)
@@ -1860,7 +1860,7 @@ private:
 		{
 			show_all_panels();
 
-			if(m_hide_unpinned_panels.value())
+			if(m_hide_unpinned_panels.internal_value())
 				hide_unpinned_panels();
 
 			// Update menu entry
@@ -1872,7 +1872,7 @@ private:
 
 	void on_layout_hide_show_unpinned()
 	{
-		if(m_hide_unpinned_panels.value())
+		if(m_hide_unpinned_panels.internal_value())
 		{
 			hide_unpinned_panels();
 
@@ -1894,7 +1894,7 @@ private:
 	{
 		const panel_frame::controls panel_frames = detail::get_panel_frames(m_panel_frame);
 		for(panel_frame::controls::const_iterator panel_frame = panel_frames.begin(); panel_frame != panel_frames.end(); ++panel_frame)
-			if(!(*panel_frame)->pinned.value())
+			if(!(*panel_frame)->pinned.internal_value())
 				(*panel_frame)->hide();
 
 		// Hide panes containing hidden panels (or panes) only
@@ -2333,7 +2333,7 @@ private:
 
 	void on_window_fullscreen(k3d::iunknown*)
 	{
-		if(m_fullscreen.value())
+		if(m_fullscreen.internal_value())
 			fullscreen();
 		else
 			unfullscreen();
@@ -2537,7 +2537,7 @@ private:
 		{
 			set_focus_viewport_panel(Panel);
 
-			const bool decorated = Panel->decorations.value();
+			const bool decorated = Panel->decorations.internal_value();
 			m_layout_decorate_panel->set_sensitive(!decorated);
 			m_layout_undecorate_panel->set_sensitive(decorated);
 		}
@@ -2560,7 +2560,7 @@ private:
 
 			++panel_count;
 
-			if((*panel_frame)->pinned.value())
+			if((*panel_frame)->pinned.internal_value())
 				++pinned_count;
 
 			if((*panel_frame)->is_visible())
@@ -2579,7 +2579,7 @@ private:
 		k3d::xml::element xml_document("ui_layout");
 
 		// Save window's parameters
-		xml_document.append(k3d::xml::attribute("fullscreen", m_fullscreen.value()));
+		xml_document.append(k3d::xml::attribute("fullscreen", m_fullscreen.internal_value()));
 		int width;
 		int height;
 		get_size(width, height);

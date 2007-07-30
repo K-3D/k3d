@@ -79,7 +79,7 @@ public:
 		m_ri_image_path = k3d::filesystem::path();
 		m_ri_texture_path = k3d::filesystem::path();
 
-		const k3d::bitmap* const texture = m_output_bitmap.value();
+		const k3d::bitmap* const texture = m_output_bitmap.pipeline_value();
 		if(!texture)
 			return;
 
@@ -99,7 +99,7 @@ public:
 		}
 
 		k3d::filesystem::copy_file(m_cache_path, m_ri_image_path);
-		Engine.RiMakeTextureV(m_ri_image_path.native_filesystem_string(), m_ri_texture_path.native_filesystem_string(), m_swrap.value(), m_twrap.value(), m_filter.value(), m_swidth.value(), m_twidth.value());
+		Engine.RiMakeTextureV(m_ri_image_path.native_filesystem_string(), m_ri_texture_path.native_filesystem_string(), m_swrap.pipeline_value(), m_twrap.pipeline_value(), m_filter.pipeline_value(), m_swidth.pipeline_value(), m_twidth.pipeline_value());
 	}
 
 	const k3d::filesystem::path renderman_texture_path(const k3d::ri::render_state& State)

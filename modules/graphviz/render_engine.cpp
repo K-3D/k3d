@@ -163,7 +163,7 @@ private:
 		return_val_if_fail(stream.good(), false);
 
 		// Setup the frame for GraphViz rendering ...
-		Frame.add_render_operation("graphviz", m_render_engine.value(), filepath, false);
+		Frame.add_render_operation("graphviz", m_render_engine.pipeline_value(), filepath, false);
 
 		stream << "digraph \"" << boost::any_cast<k3d::ustring>(document().title().property_value()).raw() << "\"\n";
 		stream << "{\n\n";

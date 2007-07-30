@@ -72,7 +72,7 @@ public:
 	{
 		k3d::gl::store_attributes attributes;
 
-		k3d::gl::color3d(get_selection_weight() ? k3d::color(1, 1, 1) : m_color.value());
+		k3d::gl::color3d(get_selection_weight() ? k3d::color(1, 1, 1) : m_color.pipeline_value());
 		draw(State);
 	}
 
@@ -101,9 +101,9 @@ public:
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 
-		const std::string text = m_text.value();
+		const std::string text = m_text.pipeline_value();
 
-		glRasterPos3d(m_x.value(), m_y.value(), 0);
+		glRasterPos3d(m_x.pipeline_value(), m_y.pipeline_value(), 0);
 		glListBase(State.gl_ascii_font_list_base);
 		glCallLists(text.size(), GL_UNSIGNED_BYTE, text.c_str());
 

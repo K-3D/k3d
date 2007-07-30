@@ -57,7 +57,7 @@ public:
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		k3d::gl::color3d(get_selection_weight() ? k3d::color(1, 1, 1) : m_color.value());
+		k3d::gl::color3d(get_selection_weight() ? k3d::color(1, 1, 1) : m_color.pipeline_value());
 		draw(State);
 	}
 
@@ -75,7 +75,7 @@ public:
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 
-		const k3d::vector3 normal = m_normal.value();
+		const k3d::vector3 normal = m_normal.pipeline_value();
 
 		glBegin(GL_LINES);
 		k3d::gl::vertex3d(k3d::point3(0, 0, 0));

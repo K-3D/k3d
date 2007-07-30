@@ -80,15 +80,15 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		const bool draw_selected = m_draw_selected.value();
-		const bool draw_unselected = m_draw_unselected.value();
+		const bool draw_selected = m_draw_selected.pipeline_value();
+		const bool draw_unselected = m_draw_unselected.pipeline_value();
 		if(!draw_selected && !draw_unselected)
 			return;
 
 		if(!k3d::validate_polyhedra(Mesh))
 			return;
 
-		const double offset = m_offset.value();
+		const double offset = m_offset.pipeline_value();
 
 		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
 		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
@@ -111,10 +111,10 @@ public:
 		glDisable(GL_LIGHTING);
 
 		if(draw_selected)
-			draw(centers, normals, m_selected_color.value(), offset, selected_faces(Mesh), RenderState);
+			draw(centers, normals, m_selected_color.pipeline_value(), offset, selected_faces(Mesh), RenderState);
 
 		if(draw_unselected)
-			draw(centers, normals, m_unselected_color.value(), offset, unselected_faces(Mesh), RenderState);
+			draw(centers, normals, m_unselected_color.pipeline_value(), offset, unselected_faces(Mesh), RenderState);
 	}
 	
 	static k3d::iplugin_factory& get_factory()

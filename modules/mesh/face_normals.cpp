@@ -60,8 +60,8 @@ public:
 
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
-		const bool normalize = m_normalize.value();
-		const double scale = m_scale.value();
+		const bool normalize = m_normalize.pipeline_value();
+		const double scale = m_scale.pipeline_value();
 
 		// Create output geometry
 		k3d::legacy::linear_curve_group* const group = new k3d::legacy::linear_curve_group();

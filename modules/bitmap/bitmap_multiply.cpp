@@ -66,7 +66,7 @@ public:
 
 	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
-		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_value.value()));
+		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_value.pipeline_value()));
 	}
 
 	

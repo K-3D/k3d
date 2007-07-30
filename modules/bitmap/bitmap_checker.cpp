@@ -62,12 +62,12 @@ public:
 
 	void on_create_bitmap(k3d::bitmap& Bitmap)
 	{
-		const k3d::pixel_size_t width = m_width.value();
-		const k3d::pixel_size_t height = m_height.value();
-		const k3d::pixel_size_t check_width = m_check_width.value();
-		const k3d::pixel_size_t check_height = m_check_height.value();
-		const k3d::color color1 = m_color1.value();
-		const k3d::color color2 = m_color2.value();
+		const k3d::pixel_size_t width = m_width.pipeline_value();
+		const k3d::pixel_size_t height = m_height.pipeline_value();
+		const k3d::pixel_size_t check_width = m_check_width.pipeline_value();
+		const k3d::pixel_size_t check_height = m_check_height.pipeline_value();
+		const k3d::color color1 = m_color1.pipeline_value();
+		const k3d::color color2 = m_color2.pipeline_value();
 
 		Bitmap.recreate(width, height);
 		k3d::checkerboard_fill(view(Bitmap), check_width, check_height, k3d::pixel(color1.red, color1.green, color1.blue, 1.0), k3d::pixel(color2.red, color2.green, color2.blue, 1.0));

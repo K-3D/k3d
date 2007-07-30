@@ -68,14 +68,14 @@ public:
 		k3d::legacy::nupatch* const patch = new k3d::legacy::nupatch();
 		Mesh.nupatches.push_back(patch);
 
-		patch->material = m_material.value();
+		patch->material = m_material.pipeline_value();
 
-		const unsigned long u_order = m_u_order.value();
-		const unsigned long v_order = m_v_order.value();
-		const unsigned long u_segments = m_u_segments.value();
-		const unsigned long v_segments = m_v_segments.value();
-		const double width = m_width.value();
-		const double height = m_height.value();
+		const unsigned long u_order = m_u_order.pipeline_value();
+		const unsigned long v_order = m_v_order.pipeline_value();
+		const unsigned long u_segments = m_u_segments.pipeline_value();
+		const unsigned long v_segments = m_v_segments.pipeline_value();
+		const double width = m_width.pipeline_value();
+		const double height = m_height.pipeline_value();
 
 		const unsigned long u_degree = u_order - 1;
 		const unsigned long v_degree = v_order - 1;

@@ -211,10 +211,10 @@ void add_user_property::on_add()
 
 	const std::string property_type = m_property_type->get_active()->get_value(m_type_columns.type);
 	const std::string value_type = m_value_type->get_active()->get_value(m_type_columns.type);
-	const std::string parameter_list = m_parameter_list.value();
-	const std::string name = m_name.value();
-	const std::string label = m_label.value();
-	const std::string description = m_description.value();
+	const std::string parameter_list = m_parameter_list.internal_value();
+	const std::string name = m_name.internal_value();
+	const std::string label = m_label.internal_value();
+	const std::string description = m_description.internal_value();
 
 	k3d::record_state_change_set change_set(node().document(), "Add user property " + name, K3D_CHANGE_SET_CONTEXT);
 	

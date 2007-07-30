@@ -48,7 +48,7 @@ public:
 
 	const k3d::matrix4 on_get_element(unsigned long Index1, unsigned long Count1)
 	{
-		const k3d::angle_axis angle = m_angle.value();
+		const k3d::angle_axis angle = m_angle.pipeline_value();
 
 		return k3d::rotation3D(k3d::angle_axis(angle.angle * Index1, angle.axis));
 	}

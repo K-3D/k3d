@@ -72,10 +72,10 @@ public:
 	const k3d::bounding_box3 extents()
 	{
 		k3d::bounding_box3 bbox;
-		bbox.insert(k3d::point3(m_x1.value(), m_y1.value(), m_z1.value()));
-		bbox.insert(k3d::point3(-m_x1.value(), -m_y1.value(), m_z1.value()));
-		bbox.insert(k3d::point3(m_x2.value(), m_y2.value(), m_z2.value()));
-		bbox.insert(k3d::point3(-m_x2.value(), -m_y2.value(), m_z2.value()));
+		bbox.insert(k3d::point3(m_x1.pipeline_value(), m_y1.pipeline_value(), m_z1.pipeline_value()));
+		bbox.insert(k3d::point3(-m_x1.pipeline_value(), -m_y1.pipeline_value(), m_z1.pipeline_value()));
+		bbox.insert(k3d::point3(m_x2.pipeline_value(), m_y2.pipeline_value(), m_z2.pipeline_value()));
+		bbox.insert(k3d::point3(-m_x2.pipeline_value(), -m_y2.pipeline_value(), m_z2.pipeline_value()));
 
 		return bbox;
 	}
@@ -84,13 +84,13 @@ public:
 	{
 		if(m_gl_control_points.empty())
 		{
-			const double x1 = m_x1.value();
-			const double y1 = m_y1.value();
-			const double z1 = m_z1.value();
-			const double x2 = m_x2.value();
-			const double y2 = m_y2.value();
-			const double z2 = m_z2.value();
-			const double thetamax = m_thetamax.value();
+			const double x1 = m_x1.pipeline_value();
+			const double y1 = m_y1.pipeline_value();
+			const double z1 = m_z1.pipeline_value();
+			const double x2 = m_x2.pipeline_value();
+			const double y2 = m_y2.pipeline_value();
+			const double z2 = m_z2.pipeline_value();
+			const double thetamax = m_thetamax.pipeline_value();
 
 			if(thetamax == 0.0)
 				return;
@@ -136,7 +136,7 @@ public:
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		k3d::gl::setup_material(m_material.value());
+		k3d::gl::setup_material(m_material.pipeline_value());
 
 		const nurbs_renderer_t nurbs = nurbs_renderer(State);
 
@@ -173,11 +173,11 @@ public:
 
 	void on_renderman_render(const k3d::ri::render_state& State)
 	{
-		const k3d::ri::point p1(k3d::point3(m_x1.value(), m_y1.value(), m_z1.value()));
-		const k3d::ri::point p2(k3d::point3(m_x2.value(), m_y2.value(), m_z2.value()));
-		const double thetamax = k3d::degrees(m_thetamax.value());
+		const k3d::ri::point p1(k3d::point3(m_x1.pipeline_value(), m_y1.pipeline_value(), m_z1.pipeline_value()));
+		const k3d::ri::point p2(k3d::point3(m_x2.pipeline_value(), m_y2.pipeline_value(), m_z2.pipeline_value()));
+		const double thetamax = k3d::degrees(m_thetamax.pipeline_value());
 
-		k3d::ri::setup_material(m_material.value(), State);
+		k3d::ri::setup_material(m_material.pipeline_value(), State);
 		State.engine.RiHyperboloidV(p1, p2, thetamax);
 	}
 

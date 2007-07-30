@@ -53,7 +53,7 @@ public:
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		const k3d::bounding_box3 bounding_box = m_bounding_box.value();
+		const k3d::bounding_box3 bounding_box = m_bounding_box.pipeline_value();
 
 		glDisable(GL_LIGHTING);
 		glColor3d(1, 1, 0);
@@ -71,11 +71,11 @@ public:
 		if(!k3d::ri::last_sample(State))
 			return;
 
-		const k3d::filesystem::path file = m_file.value();
+		const k3d::filesystem::path file = m_file.pipeline_value();
 		if(!k3d::filesystem::exists(file))
 			return;
 
-		const k3d::bounding_box3 bounding_box = m_bounding_box.value();
+		const k3d::bounding_box3 bounding_box = m_bounding_box.pipeline_value();
 
 		State.engine.RiProcDelayedReadArchive(file, bounding_box);
 	}

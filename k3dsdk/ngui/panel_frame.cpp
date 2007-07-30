@@ -262,10 +262,10 @@ void control::save(k3d::xml::element& Document)
 
 	if(mounted_panel())
 		panel.append(k3d::xml::attribute("type", mounted_panel()->panel_type()));
-	panel.append(k3d::xml::attribute("pinned", pinned.value()));
+	panel.append(k3d::xml::attribute("pinned", pinned.internal_value()));
 	panel.append(k3d::xml::attribute("visible", is_visible()));
-	panel.append(k3d::xml::attribute("automagic", automagic.value()));
-	panel.append(k3d::xml::attribute("decorations", decorations.value()));
+	panel.append(k3d::xml::attribute("automagic", automagic.internal_value()));
+	panel.append(k3d::xml::attribute("decorations", decorations.internal_value()));
 }
 
 void control::load(k3d::xml::element& Element)
@@ -361,7 +361,7 @@ void control::on_panel_type_changed()
 
 void control::on_decorations_changed(k3d::iunknown*)
 {
-	if(decorations.value())
+	if(decorations.internal_value())
 		m_decorations.show();
 	else
 		m_decorations.hide();

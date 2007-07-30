@@ -51,7 +51,7 @@ public:
 	{
 		try
 			{
-				return (boost::format(m_format.value()) % m_input.value()).str();
+				return (boost::format(m_format.pipeline_value()) % m_input.pipeline_value()).str();
 			}
 		catch(std::exception& e)
 			{

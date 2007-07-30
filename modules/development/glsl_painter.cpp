@@ -119,8 +119,8 @@ public:
 	{
 		if(!m_program_object)
 		{
-			const GLhandleARB vertex_shader_object = compile_shader(GL_VERTEX_SHADER_ARB, m_vertex_shader.value());
-			const GLhandleARB fragment_shader_object = compile_shader(GL_FRAGMENT_SHADER_ARB, m_fragment_shader.value());
+			const GLhandleARB vertex_shader_object = compile_shader(GL_VERTEX_SHADER_ARB, m_vertex_shader.pipeline_value());
+			const GLhandleARB fragment_shader_object = compile_shader(GL_FRAGMENT_SHADER_ARB, m_fragment_shader.pipeline_value());
 			m_program_object = link_shader(vertex_shader_object, fragment_shader_object);
 
 			if(fragment_shader_object)

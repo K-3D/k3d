@@ -61,7 +61,7 @@ public:
 	k3d::matrix4 matrix()
 	{		
 		// Create a new output matrix, ready for modification by the script ...
-		const k3d::matrix4 input = m_input_matrix.value();
+		const k3d::matrix4 input = m_input_matrix.pipeline_value();
 		k3d::matrix4 output = input;
 
 		k3d::iscript_engine::context_t context;

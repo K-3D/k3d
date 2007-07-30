@@ -109,11 +109,11 @@ void viewport::initializeGL()
 void viewport::paintGL()
 {
 	glViewport(0, 0, width(), height());
-	if(m_gl_engine.value() && m_camera.value())
+	if(m_gl_engine.internal_value() && m_camera.internal_value())
 	{
 		k3d::timer timer;
 
-		m_gl_engine.value()->redraw(*m_camera.value(), width(), height(), m_font_begin, m_gl_view_matrix, m_gl_projection_matrix, m_gl_viewport);
+		m_gl_engine.internal_value()->redraw(*m_camera.internal_value(), width(), height(), m_font_begin, m_gl_view_matrix, m_gl_projection_matrix, m_gl_viewport);
 
 		const double elapsed = timer.elapsed();
 		if(elapsed)

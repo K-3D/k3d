@@ -109,7 +109,7 @@ public:
 		m_snap_sources.clear();
 		m_snap_sources.push_back(k3d::ienumeration_property::enumeration_value_t("-- None --", "-- None --", "-- None --"));
 
-		if(k3d::isnappable* const snappable = m_source.value())
+		if(k3d::isnappable* const snappable = m_source.pipeline_value())
 		{
 			const k3d::isnappable::snap_sources_t sources = snappable->snap_sources();
 			for(k3d::isnappable::snap_sources_t::const_iterator source = sources.begin(); source != sources.end(); ++source)
@@ -124,7 +124,7 @@ public:
 		m_snap_targets.clear();
 		m_snap_targets.push_back(k3d::ienumeration_property::enumeration_value_t("-- None --", "-- None --", "-- None --"));
 
-		if(k3d::isnappable* const snappable = m_target.value())
+		if(k3d::isnappable* const snappable = m_target.pipeline_value())
 		{
 			const k3d::isnappable::snap_targets_t targets = snappable->snap_targets();
 			for(k3d::isnappable::snap_targets_t::const_iterator target = targets.begin(); target != targets.end(); ++target)
@@ -146,9 +146,9 @@ public:
 
 	k3d::matrix4 output_value()
 	{
-		const k3d::matrix4 input_matrix = m_input_matrix.value();
-		k3d::isnappable* const source_node = m_source.value();
-		k3d::isnappable* const target_node = m_target.value();
+		const k3d::matrix4 input_matrix = m_input_matrix.pipeline_value();
+		k3d::isnappable* const source_node = m_source.pipeline_value();
+		k3d::isnappable* const target_node = m_target.pipeline_value();
 
 		k3d::isnap_source* const source = get_snap_source(source_node);
 		if(!source)
@@ -168,7 +168,7 @@ public:
 			return input_matrix;
 
 /*
-		if(m_snap_orientation.value())
+		if(m_snap_orientation.pipeline_value())
 		{
 			k3d::vector3 source_orientation;
 			if(source->source_orientation(source_orientation))

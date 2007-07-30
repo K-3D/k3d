@@ -332,7 +332,7 @@ public:
 
 		// Create output geometry
 		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::replace_selection(m_mesh_selection.value(), Mesh);
+		k3d::replace_selection(m_mesh_selection.pipeline_value(), Mesh);
 
 		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron_i = Mesh.polyhedra.begin(); polyhedron_i != Mesh.polyhedra.end(); ++polyhedron_i)
 		{
@@ -382,17 +382,17 @@ public:
 
 	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
-		const double offset = m_offset.value();
-		const bool distance = m_distance.value();
+		const double offset = m_offset.pipeline_value();
+		const bool distance = m_distance.pipeline_value();
 
 		for(detail::bevel_edges_t::iterator point = m_bevel_edges.begin(); point != m_bevel_edges.end(); ++point)
 			point->update(offset, distance);
 
-		const double inset = m_inset.value();
+		const double inset = m_inset.pipeline_value();
 		for(detail::face_points_t::iterator face_point = m_face_points.begin(); face_point != m_face_points.end(); ++face_point)
 			face_point->update(inset);
 
-		const double weight = m_select_side_faces.value() ? 1.0 : 0.0;
+		const double weight = m_select_side_faces.pipeline_value() ? 1.0 : 0.0;
 		for(detail::faces_t::iterator face = m_side_faces.begin(); face != m_side_faces.end(); ++face)
 			(*face)->selection_weight = weight;
 	}

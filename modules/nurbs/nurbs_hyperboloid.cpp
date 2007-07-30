@@ -66,13 +66,13 @@ public:
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
-		const double x1 = m_x1.value();
-		const double y1 = m_y1.value();
-		const double z1 = m_z1.value();
-		const double x2 = m_x2.value();
-		const double y2 = m_y2.value();
-		const double z2 = m_z2.value();
-		const double thetamax = m_thetamax.value();
+		const double x1 = m_x1.pipeline_value();
+		const double y1 = m_y1.pipeline_value();
+		const double z1 = m_z1.pipeline_value();
+		const double x2 = m_x2.pipeline_value();
+		const double y2 = m_y2.pipeline_value();
+		const double z2 = m_z2.pipeline_value();
+		const double thetamax = m_thetamax.pipeline_value();
 
 		const double thetamin1 = atan2(y1, x1);
 		const double thetamin2 = atan2(y2, x2);
@@ -86,7 +86,7 @@ public:
 		k3d::legacy::nupatch* const nupatch = new k3d::legacy::nupatch();
 		Mesh.nupatches.push_back(nupatch);
 		
-		nupatch->material = m_material.value();
+		nupatch->material = m_material.pipeline_value();
 		nupatch->u_order = 3;
 		nupatch->v_order = 2;
 

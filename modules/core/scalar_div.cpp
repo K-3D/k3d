@@ -47,8 +47,8 @@ public:
 
 	double get_value()
 	{
-		const double input1 = m_input1.value();
-		const double input2 = m_input2.value();
+		const double input1 = m_input1.pipeline_value();
+		const double input2 = m_input2.pipeline_value();
 
 		return_val_if_fail(input2 != 0, input1);
 

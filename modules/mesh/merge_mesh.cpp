@@ -64,8 +64,8 @@ public:
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
-		const k3d::mesh* const input_mesh1 = m_input_mesh1.value();
-		const k3d::mesh* const input_mesh2 = m_input_mesh2.value();
+		const k3d::mesh* const input_mesh1 = m_input_mesh1.pipeline_value();
+		const k3d::mesh* const input_mesh2 = m_input_mesh2.pipeline_value();
 			
 		k3d::legacy::mesh legacy_input1;
 		k3d::legacy::mesh legacy_input2;
@@ -83,7 +83,7 @@ public:
 			k3d::legacy::deep_copy(legacy_input2, Mesh);
 		}
 
-		while(m_same_polyhedron.value() && Mesh.polyhedra.size() > 1)
+		while(m_same_polyhedron.pipeline_value() && Mesh.polyhedra.size() > 1)
 		{
 			// Merge two first polyhedra
 			k3d::legacy::polyhedron* polyhedron1 = Mesh.polyhedra[0];

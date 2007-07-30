@@ -50,7 +50,7 @@ public:
 
 	void mesh_changed(iunknown* const Hint)
 	{
-		if(const k3d::mesh* const input_mesh = m_input_mesh.value())
+		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
 			std::cout << *input_mesh << std::endl;
 	}
 	

@@ -74,16 +74,16 @@ public:
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
-		const unsigned long u_segments = m_u_segments.value();
-		const unsigned long v_segments = m_v_segments.value();
-		const double radius = m_radius.value();
-		const double zmax = m_zmax.value();
-		const double zmin = m_zmin.value();
-		const double u_power = m_u_power.value();
+		const unsigned long u_segments = m_u_segments.pipeline_value();
+		const unsigned long v_segments = m_v_segments.pipeline_value();
+		const double radius = m_radius.pipeline_value();
+		const double zmax = m_zmax.pipeline_value();
+		const double zmin = m_zmin.pipeline_value();
+		const double u_power = m_u_power.pipeline_value();
 		const double inv_u_power = u_power ? 1.0 / u_power : 1.0;
-		const bool top = m_top.value();
-		const bool bottom = m_bottom.value();
-		k3d::imaterial* const material = m_material.value();
+		const bool top = m_top.pipeline_value();
+		const bool bottom = m_bottom.pipeline_value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 
 		Mesh.polyhedra.push_back(new k3d::legacy::polyhedron());
 		k3d::legacy::polyhedron& polyhedron = *Mesh.polyhedra.back();
@@ -116,7 +116,7 @@ public:
 		// Optionally cap the top of the cylinder ...
 		if(top)
 		{
-			const unsigned long top_segments = m_top_segments.value();
+			const unsigned long top_segments = m_top_segments.pipeline_value();
 
 			if(!top_segments)
 			{
@@ -266,7 +266,7 @@ public:
 		// Optionally cap the bottom of the cylinder ...
 		if(bottom)
 		{
-			const unsigned long bottom_segments = m_bottom_segments.value();
+			const unsigned long bottom_segments = m_bottom_segments.pipeline_value();
 
 			if(!bottom_segments)
 			{

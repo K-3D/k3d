@@ -64,7 +64,7 @@ public:
 
 	void renderman_render(const k3d::ri::render_state& State)
 	{
-		if(!m_render_final.value())
+		if(!m_render_final.pipeline_value())
 			return;
 			
 		// We never generate shadows ...
@@ -87,14 +87,14 @@ public:
 		{
 			const double near = boost::any_cast<double>(k3d::property::pipeline_value(perspective->near()));
 			const double far = boost::any_cast<double>(k3d::property::pipeline_value(perspective->far()));
-			radius = k3d::mix(near, far, m_distance.value());
+			radius = k3d::mix(near, far, m_distance.pipeline_value());
 		}
 
 		if(orthographic)
 		{
 			const double near = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->near()));
 			const double far = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->far()));
-			radius = k3d::mix(near, far, m_distance.value());
+			radius = k3d::mix(near, far, m_distance.pipeline_value());
 		}
 
 		// Get data from the camera ...
@@ -106,7 +106,7 @@ public:
 		State.engine.RiTranslate(camera_coords[0], camera_coords[1], camera_coords[2]);
 		State.engine.RiRotate(90.0, 1.0, 0.0, 0.0);
 
-		k3d::ri::setup_material(m_material.value(), State);
+		k3d::ri::setup_material(m_material.pipeline_value(), State);
 		
 		State.engine.RiSphereV(radius, -radius, radius, 360.0);
 		State.engine.RiAttributeEnd();

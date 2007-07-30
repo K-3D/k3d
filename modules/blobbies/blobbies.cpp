@@ -62,12 +62,12 @@ public:
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
-		k3d::legacy::point* position = new k3d::legacy::point(m_x.value(), m_y.value(), m_z.value());
+		k3d::legacy::point* position = new k3d::legacy::point(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value());
 		Mesh.points.push_back(position);
 
-		k3d::matrix4 transformation = k3d::scaling3D(k3d::point3(m_size_x.value(), m_size_y.value(), m_size_z.value()));
+		k3d::matrix4 transformation = k3d::scaling3D(k3d::point3(m_size_x.pipeline_value(), m_size_y.pipeline_value(), m_size_z.pipeline_value()));
 		k3d::legacy::blobby::ellipsoid* ellipsoid = new k3d::legacy::blobby::ellipsoid(position, transformation);
-		ellipsoid->vertex_data["Cs"] = m_color.value();
+		ellipsoid->vertex_data["Cs"] = m_color.pipeline_value();
 
 		Mesh.blobbies.push_back(new k3d::legacy::blobby(ellipsoid));
 	}
@@ -129,14 +129,14 @@ public:
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
-		k3d::legacy::point* start = new k3d::legacy::point(m_x1.value(), m_y1.value(), m_z1.value());
-		k3d::legacy::point* end = new k3d::legacy::point(m_x2.value(), m_y2.value(), m_z2.value());
+		k3d::legacy::point* start = new k3d::legacy::point(m_x1.pipeline_value(), m_y1.pipeline_value(), m_z1.pipeline_value());
+		k3d::legacy::point* end = new k3d::legacy::point(m_x2.pipeline_value(), m_y2.pipeline_value(), m_z2.pipeline_value());
 		Mesh.points.push_back(start);
 		Mesh.points.push_back(end);
 
 		k3d::matrix4 id = k3d::identity3D();
-		k3d::legacy::blobby::segment* segment = new k3d::legacy::blobby::segment(start, end, m_radius.value(), id);
-		segment->vertex_data["Cs"] = m_color.value();
+		k3d::legacy::blobby::segment* segment = new k3d::legacy::blobby::segment(start, end, m_radius.pipeline_value(), id);
+		segment->vertex_data["Cs"] = m_color.pipeline_value();
 
 		Mesh.blobbies.push_back(new k3d::legacy::blobby(segment));
 	}
@@ -194,8 +194,8 @@ public:
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
-		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();
-		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.value();
+		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.pipeline_value();
+		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.pipeline_value();
 
 		// Create output geometry ...
 		if(input_mesh1)
@@ -259,8 +259,8 @@ public:
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
-		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();
-		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.value();
+		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.pipeline_value();
+		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.pipeline_value();
 
 		// Create output geometry ...
 		if(input_mesh1)
@@ -324,8 +324,8 @@ public:
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
-		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();
-		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.value();
+		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.pipeline_value();
+		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.pipeline_value();
 
 		// Create output geometry ...
 		if(input_mesh1)
@@ -389,8 +389,8 @@ public:
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
-		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();
-		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.value();
+		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.pipeline_value();
+		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.pipeline_value();
 
 		// Create output geometry ...
 		if(input_mesh1)
@@ -455,8 +455,8 @@ public:
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
-		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();
-		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.value();
+		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.pipeline_value();
+		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.pipeline_value();
 
 		// Create output geometry ...
 		if(input_mesh1)
@@ -574,8 +574,8 @@ public:
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
-		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.value();
-		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.value();
+		const k3d::legacy::mesh* const input_mesh1 = m_input_mesh1.pipeline_value();
+		const k3d::legacy::mesh* const input_mesh2 = m_input_mesh2.pipeline_value();
 
 		// Create output geometry ...
 		if(input_mesh1)

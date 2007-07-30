@@ -76,7 +76,7 @@ public:
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		// Find Nth color
-		const unsigned long color_number = m_color_number.value();
+		const unsigned long color_number = m_color_number.pipeline_value();
 		unsigned long current_color = 0;
 		std::map<k3d::color, unsigned long> color_map;
 		bool found = false;

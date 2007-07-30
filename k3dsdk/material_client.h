@@ -55,7 +55,7 @@ public:
 
 	imaterial* material()
 	{
-		return m_material.value();
+		return m_material.pipeline_value();
 	}
 	
 	void set_material(imaterial* const Material)

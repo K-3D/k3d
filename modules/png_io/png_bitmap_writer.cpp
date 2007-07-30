@@ -52,11 +52,11 @@ public:
 	{
 		try
 		{
-			const k3d::filesystem::path file = m_file.value();
+			const k3d::filesystem::path file = m_file.pipeline_value();
 			if(file.empty())
 				return;
 
-			k3d::bitmap* const bitmap = m_input_bitmap.value();
+			k3d::bitmap* const bitmap = m_input_bitmap.pipeline_value();
 			if(!bitmap)
 				return;
 

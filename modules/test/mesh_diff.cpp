@@ -53,7 +53,7 @@ public:
 
 	bool get_equal()
 	{
-		const unsigned long threshold = m_threshold.value();
+		const unsigned long threshold = m_threshold.pipeline_value();
 
 		const k3d::mesh* first_mesh = 0;
 		const k3d::iproperty_collection::properties_t& properties = node::properties();

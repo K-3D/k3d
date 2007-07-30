@@ -65,7 +65,7 @@ public:
 		Output = Input;
 		k3d::make_unique(Output.points);
 		
-		replace_selection(m_mesh_selection.value(), Output);
+		replace_selection(m_mesh_selection.pipeline_value(), Output);
 		
 		return_if_fail(Output.polyhedra);
 		return_if_fail(Output.polyhedra->edge_selection);
@@ -97,7 +97,7 @@ public:
 		return_if_fail(dynamic_cast<sharpness_array_t*>(array_it->second.get()));
 		
 		sharpness_array_t& sharpness_array = *dynamic_cast<sharpness_array_t*>(array_it->second.get());
-		const sharp_edges_t& sharp_edge_list = m_sharp_edges.internal_value();
+		const sharp_edges_t& sharp_edge_list = m_sharp_edges.pipeline_value();
 		size_t sharpcount = sharp_edge_list.size();
 		for (size_t edge = 0; edge != sharpcount; ++edge)
 		{

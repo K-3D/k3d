@@ -111,7 +111,7 @@ protected:
 		// Nullify selection in component mode if the parent node isn't selected
 		if(k3d::inode* node = k3d::selection::get_node(m_mouse_down_selection))
 		{
-			switch(m_document_state.selection_mode().value())
+			switch(m_document_state.selection_mode().internal_value())
 			{
 				case SELECT_POINTS:
 				case SELECT_LINES:

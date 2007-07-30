@@ -63,8 +63,8 @@ public:
 
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
-		const unsigned long voxels = m_voxels.value();
-		k3d::imaterial* const material = m_material.value();
+		const unsigned long voxels = m_voxels.pipeline_value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 
 		// Polygonize each blobby ...
 		for(k3d::legacy::mesh::blobbies_t::const_iterator blobby = InputMesh.blobbies.begin(); blobby != InputMesh.blobbies.end(); blobby++)

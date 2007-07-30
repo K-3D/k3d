@@ -62,11 +62,11 @@ public:
 
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
-		const double radius = m_radius.value();
-		const double height = m_height.value();
-		const unsigned long u_segments = m_u_segments.value();
-		const unsigned long v_segments = m_v_segments.value();
-		k3d::imaterial* const material = m_material.value();
+		const double radius = m_radius.pipeline_value();
+		const double height = m_height.pipeline_value();
+		const unsigned long u_segments = m_u_segments.pipeline_value();
+		const unsigned long v_segments = m_v_segments.pipeline_value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 
 		Mesh.polyhedra.push_back(new k3d::legacy::polyhedron());
 		k3d::legacy::polyhedron& polyhedron = *Mesh.polyhedra.back();

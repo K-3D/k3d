@@ -110,7 +110,7 @@ public:
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		const bool emitting = base_t::m_emit.value();
+		const bool emitting = base_t::m_emit.pipeline_value();
 
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_1D);
@@ -203,13 +203,13 @@ public:
 
 	void setup_light(std::ostream& Stream)
 	{
-		if(!m_emit.value())
+		if(!m_emit.pipeline_value())
 			return;
 
 		const k3d::point3 from = k3d::world_position(*this);
-		const k3d::color color = m_color.value();
+		const k3d::color color = m_color.pipeline_value();
 
-		Stream << "<light type=\"pointlight\" name=\"" << name() << "\" power=\"" << m_power.value() << "\" cast_shadows=\"" << (m_cast_shadows.value() ? "yes" : "no") << "\">" << std::endl;
+		Stream << "<light type=\"pointlight\" name=\"" << name() << "\" power=\"" << m_power.pipeline_value() << "\" cast_shadows=\"" << (m_cast_shadows.pipeline_value() ? "yes" : "no") << "\">" << std::endl;
 		Stream << "	<from x=\"" << std::fixed << -from[0] << "\" y=\"" << std::fixed << from[1] << "\" z=\"" << std::fixed << from[2] << "\"/>" << std::endl;
 		Stream << "	<color r=\"" << color.red << "\" g=\"" << color.green << "\" b=\"" << color.blue << "\"/>" << std::endl;
 		Stream << "</light>" << std::endl;
@@ -289,13 +289,13 @@ public:
 
 	void setup_light(std::ostream& Stream)
 	{
-		if(!m_emit.value())
+		if(!m_emit.pipeline_value())
 			return;
 
 		const k3d::point3 from = k3d::world_position(*this);
-		const k3d::color color = m_color.value();
+		const k3d::color color = m_color.pipeline_value();
 
-		Stream << "<light type=\"sunlight\" name=\"" << name() << "\" power=\"" << m_power.value() << "\" cast_shadows=\"" << (m_cast_shadows.value() ? "yes" : "no") << "\">" << std::endl;
+		Stream << "<light type=\"sunlight\" name=\"" << name() << "\" power=\"" << m_power.pipeline_value() << "\" cast_shadows=\"" << (m_cast_shadows.pipeline_value() ? "yes" : "no") << "\">" << std::endl;
 		Stream << "	<from x=\"" << std::fixed << -from[0] << "\" y=\"" << std::fixed << from[1] << "\" z=\"" << std::fixed << from[2] << "\"/>" << std::endl;
 		Stream << "	<color r=\"" << color.red << "\" g=\"" << color.green << "\" b=\"" << color.blue << "\"/>" << std::endl;
 		Stream << "</light>" << std::endl;
@@ -349,11 +349,11 @@ private:
 	{
 		gluSphere(m_quadric, 0.2, 8, 8);
 
-		const k3d::point3 from = m_input_matrix.value() * k3d::point3(0, 0, 0);
+		const k3d::point3 from = m_input_matrix.pipeline_value() * k3d::point3(0, 0, 0);
 		const k3d::point3 to = k3d::point3(0, 0, 0);
 		const k3d::vector3 spherical = k3d::spherical(k3d::to_vector(to - from));
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::inverse(k3d::extract_rotation(m_input_matrix.value())) * rotation3D(k3d::quaternion(k3d::euler_angles(0, -spherical[2], spherical[1], k3d::euler_angles::ZXYstatic))));
+		k3d::gl::push_matrix(k3d::inverse(k3d::extract_rotation(m_input_matrix.pipeline_value())) * rotation3D(k3d::quaternion(k3d::euler_angles(0, -spherical[2], spherical[1], k3d::euler_angles::ZXYstatic))));
 
 		gluQuadricDrawStyle(m_quadric, GLU_FILL);
 		gluQuadricNormals(m_quadric, GLU_SMOOTH);
@@ -402,13 +402,13 @@ public:
 
 	void setup_light(std::ostream& Stream)
 	{
-		if(!m_emit.value())
+		if(!m_emit.pipeline_value())
 			return;
 
 		const k3d::point3 from = k3d::world_position(*this);
-		const k3d::color color = m_color.value();
+		const k3d::color color = m_color.pipeline_value();
 
-		Stream << "<light type=\"softlight\" name=\"" << name() << "\" power=\"" << m_power.value() << "\" res=\"" << m_resolution.value()  << "\" radius=\"" << m_radius.value() << "\" bias=\"" << m_bias.value() << "\" glow_intensity=\"" << m_glow_intensity.value() << "\" glow_type=\"" << m_glow_type.value() << "\" glow_offset=\"" << m_glow_offset.value() << "\">" << std::endl;
+		Stream << "<light type=\"softlight\" name=\"" << name() << "\" power=\"" << m_power.pipeline_value() << "\" res=\"" << m_resolution.pipeline_value()  << "\" radius=\"" << m_radius.pipeline_value() << "\" bias=\"" << m_bias.pipeline_value() << "\" glow_intensity=\"" << m_glow_intensity.pipeline_value() << "\" glow_type=\"" << m_glow_type.pipeline_value() << "\" glow_offset=\"" << m_glow_offset.pipeline_value() << "\">" << std::endl;
 		Stream << "	<from x=\"" << std::fixed << -from[0] << "\" y=\"" << std::fixed << from[1] << "\" z=\"" << std::fixed << from[2] << "\"/>" << std::endl;
 		Stream << "	<color r=\"" << color.red << "\" g=\"" << color.green << "\" b=\"" << color.blue << "\"/>" << std::endl;
 		Stream << "</light>" << std::endl;
@@ -501,16 +501,16 @@ public:
 
 	void setup_light(std::ostream& Stream)
 	{
-		if(!m_emit.value())
+		if(!m_emit.pipeline_value())
 			return;
 
 		const k3d::point3 from = k3d::world_position(*this);
 		const k3d::point3 to = from + k3d::node_to_world_matrix(*this) * k3d::vector3(0, 0, 1);
-		const k3d::color color = m_color.value();
-		const double power = m_power.value();
-		const double size = k3d::degrees(m_size.value());
-		const double nblend = m_nblend.value();
-		const double beam_falloff = m_beam_falloff.value();
+		const k3d::color color = m_color.pipeline_value();
+		const double power = m_power.pipeline_value();
+		const double size = k3d::degrees(m_size.pipeline_value());
+		const double nblend = m_nblend.pipeline_value();
+		const double beam_falloff = m_beam_falloff.pipeline_value();
 
 		Stream << "<light type=\"spotlight\" name=\"" << name() << "\" power=\"" << power << "\" size=\"" << size << "\" nblend=\"" << nblend << "\" beam_falloff=\"" << beam_falloff << "\">" << std::endl;
 		Stream << "	<from x=\"" << std::fixed << -from[0] << "\" y=\"" << std::fixed << from[1] << "\" z=\"" << std::fixed << from[2] << "\"/>" << std::endl;
@@ -607,12 +607,12 @@ public:
 
 	void setup_light(std::ostream& Stream)
 	{
-		if(!m_emit.value())
+		if(!m_emit.pipeline_value())
 			return;
 
-		const k3d::color color = m_color.value();
+		const k3d::color color = m_color.pipeline_value();
 
-		Stream << "<light type=\"hemilight\" name=\"" << name() << "\" power=\"" << m_power.value() << "\" samples=\"" << m_samples.value() << "\" use_QMC=\"" << (m_use_QMC.value() ? "on" : "off") << "\" maxdistance=\"" << m_maxdistance.value() << "\">" << std::endl;
+		Stream << "<light type=\"hemilight\" name=\"" << name() << "\" power=\"" << m_power.pipeline_value() << "\" samples=\"" << m_samples.pipeline_value() << "\" use_QMC=\"" << (m_use_QMC.pipeline_value() ? "on" : "off") << "\" maxdistance=\"" << m_maxdistance.pipeline_value() << "\">" << std::endl;
 		Stream << "	<color r=\"" << color.red << "\" g=\"" << color.green << "\" b=\"" << color.blue << "\"/>" << std::endl;
 		Stream << "</light>" << std::endl;
 	}
@@ -720,10 +720,10 @@ public:
 
 	void setup_light(std::ostream& Stream)
 	{
-		if(!m_emit.value())
+		if(!m_emit.pipeline_value())
 			return;
 
-		const k3d::color color = m_color.value();
+		const k3d::color color = m_color.pipeline_value();
 
 		const k3d::matrix4 transformation = k3d::node_to_world_matrix(*this);
 		const k3d::point3 a = transformation * k3d::point3(-0.5, 0.5, 0);
@@ -731,7 +731,7 @@ public:
 		const k3d::point3 c = transformation * k3d::point3(0.5, -0.5, 0);
 		const k3d::point3 d = transformation * k3d::point3(-0.5, -0.5, 0);
 
-		Stream << "<light type=\"arealight\" name=\"" << name() << "\" power=\"" << m_power.value() << "\" samples=\"" << m_samples.value() << "\" psamples=\"" << m_psamples.value() << "\" dummy=\"" << (m_dummy.value() ? "on" : "off") << "\">" << std::endl;
+		Stream << "<light type=\"arealight\" name=\"" << name() << "\" power=\"" << m_power.pipeline_value() << "\" samples=\"" << m_samples.pipeline_value() << "\" psamples=\"" << m_psamples.pipeline_value() << "\" dummy=\"" << (m_dummy.pipeline_value() ? "on" : "off") << "\">" << std::endl;
 		Stream << "	<a  x =\"" << -a[0] << "\" y =\"" << a[1] << "\" z =\"" << a[2] << "\"/>" << std::endl;
 		Stream << "	<b  x =\"" << -b[0] << "\" y =\"" << b[1] << "\" z =\"" << b[2] << "\"/>" << std::endl;
 		Stream << "	<c  x =\"" << -c[0] << "\" y =\"" << c[1] << "\" z =\"" << c[2] << "\"/>" << std::endl;
@@ -744,7 +744,7 @@ public:
 	{
 		k3d::gl::store_attributes attributes;
 
-		const bool emitting = m_emit.value();
+		const bool emitting = m_emit.pipeline_value();
 
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_1D);
@@ -851,10 +851,10 @@ public:
 
 	void setup_light(std::ostream& Stream)
 	{
-		if(!m_emit.value())
+		if(!m_emit.pipeline_value())
 			return;
 
-		Stream << "<light type=\"globalphotonlight\" name=\"" << name() << "\" photons=\"" << m_photons.value() << "\" radius=\"" << m_radius.value() << "\" depth=\"" << m_depth.value() << "\" search=\"" << m_search.value() << "\">" << std::endl;
+		Stream << "<light type=\"globalphotonlight\" name=\"" << name() << "\" photons=\"" << m_photons.pipeline_value() << "\" radius=\"" << m_radius.pipeline_value() << "\" depth=\"" << m_depth.pipeline_value() << "\" search=\"" << m_search.pipeline_value() << "\">" << std::endl;
 		Stream << "</light>" << std::endl;
 	}
 
@@ -903,15 +903,15 @@ public:
 
 	void setup_light(std::ostream& Stream)
 	{
-		if(!m_emit.value())
+		if(!m_emit.pipeline_value())
 			return;
 
-		const k3d::color color = m_color.value();
+		const k3d::color color = m_color.pipeline_value();
 
 		const k3d::point3 from = k3d::world_position(*this);
 		const k3d::point3 to = from + k3d::node_to_world_matrix(*this) * k3d::vector3(0, 0, 1);
 
-		Stream << "<light type=\"photonlight\" name=\"" << name() << "\" power=\"" << m_power.value() << "\" photons=\"" << m_photons.value() << "\" depth=\"" << m_depth.value() << "\" mindepth=\"" << m_mindepth.value() << "\" bias=\"" << m_bias.value() << "\" search=\"" << m_search.value() << "\" angle=\"" << m_angle.value() << "\" mode=\"" << (m_mode.value() == DIFFUSE ? "diffuse" : "caustic") << "\" fixedradius=\"" << m_fixedradius.value() << "\" cluster=\"" << m_cluster.value() << "\" use_QMC=\"" << (m_use_QMC.value() ? "on" : "off") << "\">" << std::endl;
+		Stream << "<light type=\"photonlight\" name=\"" << name() << "\" power=\"" << m_power.pipeline_value() << "\" photons=\"" << m_photons.pipeline_value() << "\" depth=\"" << m_depth.pipeline_value() << "\" mindepth=\"" << m_mindepth.pipeline_value() << "\" bias=\"" << m_bias.pipeline_value() << "\" search=\"" << m_search.pipeline_value() << "\" angle=\"" << m_angle.pipeline_value() << "\" mode=\"" << (m_mode.pipeline_value() == DIFFUSE ? "diffuse" : "caustic") << "\" fixedradius=\"" << m_fixedradius.pipeline_value() << "\" cluster=\"" << m_cluster.pipeline_value() << "\" use_QMC=\"" << (m_use_QMC.pipeline_value() ? "on" : "off") << "\">" << std::endl;
 		Stream << "	<from  x =\"" << -from[0] << "\" y =\"" << from[1] << "\" z =\"" << from[2] << "\"/>" << std::endl;
 		Stream << "	<to  x =\"" << -to[0] << "\" y =\"" << to[1] << "\" z =\"" << to[2] << "\"/>" << std::endl;
 		Stream << "	<color r=\"" << color.red << "\" g=\"" << color.green << "\" b=\"" << color.blue << "\"/>" << std::endl;
@@ -922,7 +922,7 @@ public:
 	{
 		k3d::gl::store_attributes attributes;
 
-		const bool emitting = m_emit.value();
+		const bool emitting = m_emit.pipeline_value();
 
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_1D);

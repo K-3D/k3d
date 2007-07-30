@@ -55,9 +55,9 @@ public:
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const k3d::axis direction = m_direction.value();
-		const k3d::axis axis = m_axis.value();
-		const double shear_factor = m_shear_factor.value();
+		const k3d::axis direction = m_direction.pipeline_value();
+		const k3d::axis axis = m_axis.pipeline_value();
+		const double shear_factor = m_shear_factor.pipeline_value();
 
 		const double xy = k3d::X == direction && k3d::Y == axis ? shear_factor : 0;
 		const double xz = k3d::X == direction && k3d::Z == axis ? shear_factor : 0;

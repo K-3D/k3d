@@ -69,7 +69,7 @@ public:
 
 	void gl_draw(const render_state& State)
 	{
-		if(!m_visible.value())
+		if(!m_visible.pipeline_value())
 			return;
 
 		store_attributes attributes;
@@ -81,7 +81,7 @@ public:
 
 	void gl_select(const render_state& State, const selection_state& SelectState)
 	{
-		if(!m_visible.value())
+		if(!m_visible.pipeline_value())
 			return;
 
 		store_attributes attributes;

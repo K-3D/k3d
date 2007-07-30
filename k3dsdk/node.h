@@ -61,7 +61,7 @@ public:
 
 	double get_selection_weight()
 	{
-		return m_selection_weight.value();
+		return m_selection_weight.pipeline_value();
 	}
 
 	void set_selection_weight(const double Weight)

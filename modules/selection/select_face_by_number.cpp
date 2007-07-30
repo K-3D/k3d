@@ -56,7 +56,7 @@ public:
 		    k3d::mesh::selection_t& face_selection = *k3d::make_unique(polyhedra.face_selection);
 			std::fill(face_selection.begin(), face_selection.end(), 0.0);
 
-			const unsigned long index = m_index.value();
+			const unsigned long index = m_index.pipeline_value();
 			if(index < face_selection.size())
 				face_selection[index] = 1.0;
 		}

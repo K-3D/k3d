@@ -113,10 +113,10 @@ public:
 	void renderman_render(const render_state& State)
 	{
 		// If this is a normal pass and we're hidden, we're done ...
-		if(State.render_context == FINAL_FRAME && !m_render_final.value())
+		if(State.render_context == FINAL_FRAME && !m_render_final.pipeline_value())
 			return;
 		// If this is a shadow pass and we don't cast shadows, we're done ...
-		if(State.render_context == SHADOW_MAP && !m_render_shadows.value())
+		if(State.render_context == SHADOW_MAP && !m_render_shadows.pipeline_value())
 			return;
 
 		// If this is the first sample in the frame, reset the sample list ...
@@ -131,7 +131,7 @@ public:
 		{
 			State.engine.RiAttributeBegin();
 
-			if(motion_blur(State) && m_motion_blur.value())
+			if(motion_blur(State) && m_motion_blur.pipeline_value())
 			{
 				State.engine.RiMotionBeginV(State.sample_times);
 

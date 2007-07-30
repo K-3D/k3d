@@ -86,7 +86,7 @@ private:
 
 	void initialize_mesh(k3d::mesh& Output)
 	{
-		if(const k3d::mesh* const input = m_input_mesh.value())
+		if(const k3d::mesh* const input = m_input_mesh.pipeline_value())
 		{
 			m_legacy_output.reset(new legacy::mesh());
 
@@ -111,7 +111,7 @@ private:
 
 	void update_mesh(k3d::mesh& Output)
 	{
-		if(const k3d::mesh* const input = m_input_mesh.value())
+		if(const k3d::mesh* const input = m_input_mesh.pipeline_value())
 		{
 			return_if_fail(m_legacy_output.get());
 

@@ -427,7 +427,7 @@ public:
 			glEnable(GL_POLYGON_OFFSET_FILL);
 		}
 
-		k3d::gl::setup_material(m_material.value());
+		k3d::gl::setup_material(m_material.pipeline_value());
 
 		// Draw solid polygons:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -533,7 +533,7 @@ public:
 
 	void on_renderman_render(const k3d::ri::render_state& State)
 	{
-		k3d::ri::setup_material(m_material.value(), State);
+		k3d::ri::setup_material(m_material.pipeline_value(), State);
 		State.engine.RiGeometryV("teapot");
 	}
 

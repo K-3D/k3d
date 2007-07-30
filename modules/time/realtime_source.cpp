@@ -67,7 +67,7 @@ public:
 	void on_reset_source(k3d::iunknown*)
 	{
 		m_timeout_connection.disconnect();
-		m_timeout_connection = k3d::user_interface().get_timer(m_frame_rate.value(), sigc::bind(m_time.make_reset_slot(), static_cast<k3d::iunknown*>(0)));
+		m_timeout_connection = k3d::user_interface().get_timer(m_frame_rate.pipeline_value(), sigc::bind(m_time.make_reset_slot(), static_cast<k3d::iunknown*>(0)));
 	}
 
 	double get_time()

@@ -438,9 +438,9 @@ public:
 			return;
 
 		// Setup fog ...
-		if(m_fog.value())
+		if(m_fog.pipeline_value())
 		{
-			const k3d::color background_color(m_background_color.value());
+			const k3d::color background_color(m_background_color.pipeline_value());
 
 			GLfloat fogdata[4];
 			fogdata[0] = background_color.red;
@@ -449,8 +449,8 @@ public:
 			fogdata[3] = 1.0f;
 
 			glFogfv(GL_FOG_COLOR, fogdata);
-			glFogf(GL_FOG_START, static_cast<GLfloat>(m_fog_near.value()));
-			glFogf(GL_FOG_END, static_cast<GLfloat>(m_fog_far.value()));
+			glFogf(GL_FOG_START, static_cast<GLfloat>(m_fog_near.pipeline_value()));
+			glFogf(GL_FOG_END, static_cast<GLfloat>(m_fog_far.pipeline_value()));
 			glHint(GL_FOG_HINT, GL_NICEST);
 			glFogi(GL_FOG_MODE, GL_LINEAR);
 			glEnable(GL_FOG);
@@ -460,7 +460,7 @@ public:
 			glDisable(GL_FOG);
 		}
 
-		if(m_show_lights.value())
+		if(m_show_lights.pipeline_value())
 			std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::light_setup());
 
 		std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::draw(state));
@@ -498,7 +498,7 @@ private:
 			return false;
 
 		if(!Select)
-			detail::gl_reset(m_background_color.value(), m_point_size.value());
+			detail::gl_reset(m_background_color.pipeline_value(), m_point_size.pipeline_value());
 
 		// Setup culling ...
 		glFrontFace(GL_CW);
@@ -549,7 +549,7 @@ private:
 		calculate_projection(Camera, PixelWidth, PixelHeight, window_rect, camera_rect, near, far, orthographic);
 
 		if(!Select)
-			detail::gl_draw_2d_widgets(Camera, window_rect, camera_rect, m_draw_frustum.value(), m_draw_crop_window.value(), m_draw_safe_zone.value(), m_draw_aimpoint.value(), document());
+			detail::gl_draw_2d_widgets(Camera, window_rect, camera_rect, m_draw_frustum.pipeline_value(), m_draw_crop_window.pipeline_value(), m_draw_safe_zone.pipeline_value(), m_draw_aimpoint.pipeline_value(), document());
 
 		// Setup projection ...
 		glMatrixMode(GL_PROJECTION);
@@ -566,7 +566,7 @@ private:
 			const double window_size = distance * window_tan_fov;
 
 			RenderState.orthographic = true;
-			RenderState.draw_two_sided = m_draw_two_sided.value();
+			RenderState.draw_two_sided = m_draw_two_sided.pipeline_value();
 			
 			RenderState.gl_window_frustum_left = -window_size * window_aspect;
 			RenderState.gl_window_frustum_right = window_size * window_aspect;
@@ -651,7 +651,7 @@ private:
 		glLoadIdentity();
 
 		if(!Select)
-			detail::gl_setup_lights(m_headlight.value());
+			detail::gl_setup_lights(m_headlight.pipeline_value());
 
 		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(Camera.transformation().transform_source_output()));
 		const k3d::angle_axis orientation(k3d::euler_angles(transform_matrix, k3d::euler_angles::ZXYstatic));

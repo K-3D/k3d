@@ -191,9 +191,9 @@ public:
 	{
 		// explicit delete, notify painter immediately, otherwise the address is lost
 		m_hint_cache.clear();
-		const k3d::mesh* const output_mesh = m_output_mesh.value();
-		if (m_gl_painter.value() && output_mesh)
-			m_gl_painter.value()->mesh_changed(*output_mesh, k3d::hint::mesh_deleted());
+		const k3d::mesh* const output_mesh = m_output_mesh.pipeline_value();
+		if (m_gl_painter.pipeline_value() && output_mesh)
+			m_gl_painter.pipeline_value()->mesh_changed(*output_mesh, k3d::hint::mesh_deleted());
 		// clear connections to prevent crash on document close
 		if(!document().state_recorder().current_change_set()) // no undo recording: this is the end, my friend
 		{
@@ -228,10 +228,10 @@ public:
 	void create_mesh(k3d::mesh& OutputMesh)
 	{
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Copy Input");
-		if(const k3d::mesh* const input_mesh = m_input_mesh.value())
+		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
 		{
 			OutputMesh = *input_mesh;
-			k3d::replace_selection(m_mesh_selection.value(), OutputMesh);
+			k3d::replace_selection(m_mesh_selection.pipeline_value(), OutputMesh);
 		}
 	}
 
@@ -239,7 +239,7 @@ public:
 	{
 		k3d::bounding_box3 results;
 
-		const k3d::mesh* const output_mesh = m_output_mesh.value();
+		const k3d::mesh* const output_mesh = m_output_mesh.pipeline_value();
 		return_val_if_fail(output_mesh, results);
 
 		if(output_mesh->points)
@@ -260,8 +260,8 @@ public:
 	
 	void process_changes()
 	{
-		const k3d::mesh* const input_mesh = m_input_mesh.value(); // Make sure we trigger any updates that were made to the input mesh 
-		const k3d::mesh* output_mesh = m_output_mesh.value();
+		const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value(); // Make sure we trigger any updates that were made to the input mesh 
+		const k3d::mesh* output_mesh = m_output_mesh.pipeline_value();
 
 		if (!input_mesh || !output_mesh)
 			return;
@@ -269,7 +269,7 @@ public:
 		// Process all hints in the order ther were received
 		for (hint_cache::hint_list_t::iterator hint = m_hint_cache.begin(); hint != m_hint_cache.end(); ++hint)
 		{
-			output_mesh = m_output_mesh.value(); // output mesh may have been reset during hint processing
+			output_mesh = m_output_mesh.pipeline_value(); // output mesh may have been reset during hint processing
 			process(*output_mesh, *hint);
 		}
 
@@ -279,31 +279,31 @@ public:
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Draw");
-		if(k3d::gl::imesh_painter* const painter = m_gl_painter.value())
+		if(k3d::gl::imesh_painter* const painter = m_gl_painter.pipeline_value())
 		{
 			process_changes();
-			const k3d::mesh* const output_mesh = m_output_mesh.value();
+			const k3d::mesh* const output_mesh = m_output_mesh.pipeline_value();
 			return_if_fail(output_mesh);
 
-			k3d::gl::painter_render_state render_state(State, matrix(), m_selection_weight.value(), m_show_component_selection.value());
+			k3d::gl::painter_render_state render_state(State, matrix(), m_selection_weight.pipeline_value(), m_show_component_selection.pipeline_value());
 			painter->paint_mesh(*output_mesh, render_state);
 		}
 	}
 
 	void on_gl_select(const k3d::gl::render_state& State, const k3d::gl::selection_state& SelectionState)
 	{
-		const double selection_weight = m_selection_weight.value();
+		const double selection_weight = m_selection_weight.pipeline_value();
 		if(SelectionState.exclude_unselected_nodes && !selection_weight)
 			return;
 
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Select");
-		if(k3d::gl::imesh_painter* const painter = m_gl_painter.value())
+		if(k3d::gl::imesh_painter* const painter = m_gl_painter.pipeline_value())
 		{
 			process_changes();
-			const k3d::mesh* const output_mesh = m_output_mesh.value();
+			const k3d::mesh* const output_mesh = m_output_mesh.pipeline_value();
 			return_if_fail(output_mesh);
 
-			k3d::gl::painter_render_state render_state(State, matrix(), selection_weight, m_show_component_selection.value());
+			k3d::gl::painter_render_state render_state(State, matrix(), selection_weight, m_show_component_selection.pipeline_value());
 			k3d::gl::painter_selection_state selection_state(SelectionState);
 
 			// At the top-level, ID the entire instance ...
@@ -320,9 +320,9 @@ public:
 
 	void on_renderman_render(const k3d::ri::render_state& State)
 	{
-		if(k3d::ri::imesh_painter* const painter = m_ri_painter.value())
+		if(k3d::ri::imesh_painter* const painter = m_ri_painter.pipeline_value())
 		{
-			const k3d::mesh* const input_mesh = m_input_mesh.value();
+			const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value();
 			return_if_fail(input_mesh);
 
 			painter->paint_mesh(*input_mesh, State);
@@ -331,9 +331,9 @@ public:
 
 	void on_renderman_render_complete(const k3d::ri::render_state& State)
 	{
-		if(k3d::ri::imesh_painter* const painter = m_ri_painter.value())
+		if(k3d::ri::imesh_painter* const painter = m_ri_painter.pipeline_value())
 		{
-			const k3d::mesh* const input_mesh = m_input_mesh.value();
+			const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value();
 			return_if_fail(input_mesh);
 
 			painter->paint_complete(*input_mesh, State);
@@ -378,23 +378,23 @@ protected:
 	void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		m_output_mesh.changed_signal().emit(Hint);
-		m_gl_painter.value()->mesh_changed(Mesh, Hint);
+		m_gl_painter.pipeline_value()->mesh_changed(Mesh, Hint);
 	}
 	
 	void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		return_if_fail(k3d::validate_points(Mesh));
-		k3d::replace_selection(m_mesh_selection.value(), const_cast<k3d::mesh&>(Mesh));
+		k3d::replace_selection(m_mesh_selection.pipeline_value(), const_cast<k3d::mesh&>(Mesh));
 		m_output_mesh.changed_signal().emit(Hint);
-		m_gl_painter.value()->mesh_changed(Mesh, Hint);
+		m_gl_painter.pipeline_value()->mesh_changed(Mesh, Hint);
 	}
 	
 	void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		m_gl_painter.value()->mesh_changed(Mesh, k3d::hint::mesh_deleted()); // notify painter it needs to delete the old mesh
+		m_gl_painter.pipeline_value()->mesh_changed(Mesh, k3d::hint::mesh_deleted()); // notify painter it needs to delete the old mesh
 		m_output_mesh.reset(0, Hint);
-		if (const k3d::mesh* const output_mesh = m_output_mesh.value())
-			m_gl_painter.value()->mesh_changed(*output_mesh, Hint);
+		if (const k3d::mesh* const output_mesh = m_output_mesh.pipeline_value())
+			m_gl_painter.pipeline_value()->mesh_changed(*output_mesh, Hint);
 	}
 	
 	void on_address_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
@@ -409,16 +409,16 @@ protected:
 			address_hint->old_face_first_loops_address = Mesh.polyhedra->face_first_loops;
 		}
 		m_output_mesh.reset(0, Hint);
-		if (const k3d::mesh* const output_mesh = m_output_mesh.value())
-			m_gl_painter.value()->mesh_changed(*output_mesh, Hint);
+		if (const k3d::mesh* const output_mesh = m_output_mesh.pipeline_value())
+			m_gl_painter.pipeline_value()->mesh_changed(*output_mesh, Hint);
 	}
 	
 	void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		m_gl_painter.value()->mesh_changed(Mesh, k3d::hint::mesh_deleted()); // notify painter it needs to delete the old mesh
+		m_gl_painter.pipeline_value()->mesh_changed(Mesh, k3d::hint::mesh_deleted()); // notify painter it needs to delete the old mesh
 		m_output_mesh.reset(0, Hint);
-		if (const k3d::mesh* const output_mesh = m_output_mesh.value())
-			m_gl_painter.value()->mesh_changed(*output_mesh, Hint);
+		if (const k3d::mesh* const output_mesh = m_output_mesh.pipeline_value())
+			m_gl_painter.pipeline_value()->mesh_changed(*output_mesh, Hint);
 	}
 	
 private:

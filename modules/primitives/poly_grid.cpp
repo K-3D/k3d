@@ -65,16 +65,16 @@ public:
 
 	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
-		Mesh = k3d::create_grid(m_rows.value(), m_columns.value(), m_material.value());
+		Mesh = k3d::create_grid(m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Mesh)
 	{
-		const unsigned long point_rows = m_rows.value() + 1;
-		const unsigned long point_columns = m_columns.value() + 1;
-		const double width = m_width.value();
-		const double height = m_height.value();
-		const k3d::signed_axis orientation = m_orientation.value();
+		const unsigned long point_rows = m_rows.pipeline_value() + 1;
+		const unsigned long point_columns = m_columns.pipeline_value() + 1;
+		const double width = m_width.pipeline_value();
+		const double height = m_height.pipeline_value();
+		const k3d::signed_axis orientation = m_orientation.pipeline_value();
 
 		k3d::vector3 x, y;
 		switch(orientation)

@@ -60,9 +60,9 @@ public:
 
 	void draw(const k3d::gl::render_state& State)
 	{
-		k3d::ibounded* const bounded = dynamic_cast<k3d::ibounded*>(m_source.value());
-		k3d::itransform_array_1d* const layout = m_layout.value();
-		const unsigned long count = m_count.value();
+		k3d::ibounded* const bounded = dynamic_cast<k3d::ibounded*>(m_source.pipeline_value());
+		k3d::itransform_array_1d* const layout = m_layout.pipeline_value();
+		const unsigned long count = m_count.pipeline_value();
 
 		if(!layout)
 			return;
@@ -108,15 +108,15 @@ public:
 
 	void on_renderman_render(const k3d::ri::render_state& State)
 	{
-		k3d::ri::irenderable* const renderable = m_source.value();
+		k3d::ri::irenderable* const renderable = m_source.pipeline_value();
 		if(!renderable)
 			return;
 
-		k3d::itransform_array_1d* const layout = m_layout.value();
+		k3d::itransform_array_1d* const layout = m_layout.pipeline_value();
 		if(!layout)
 			return;
 
-		const unsigned long count = m_count.value();
+		const unsigned long count = m_count.pipeline_value();
 
 		// Make sure we don't enter an infinite loop trying to render ourself ...
 		if(renderable == this)
@@ -131,7 +131,7 @@ public:
 			renderable->renderman_render(state);
 		State.engine.RiObjectEnd();
 
-		k3d::ri::setup_material(m_material.value(), State);
+		k3d::ri::setup_material(m_material.pipeline_value(), State);
 
 		for(unsigned long i = 0; i != count; ++i)
 		{

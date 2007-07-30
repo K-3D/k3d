@@ -117,7 +117,7 @@ public:
 
 	const std::string value()
 	{
-		return m_data.value();
+		return m_data.internal_value();
 	}
 
 	void set_value(const std::string& Value)

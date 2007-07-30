@@ -1145,7 +1145,7 @@ public:
 
 	const bool is_selected(const k3d::selection::record& Record)
 	{
-		switch(m_selection_mode.value())
+		switch(m_selection_mode.internal_value())
 		{
 			case SELECT_NODES:
 				return detail::is_node_selected(Record);
@@ -1163,7 +1163,7 @@ public:
 	void selection_changed()
 	{
 		// Switch to node selection mode when there's no selected mesh in the document
-		if(SELECT_NODES != m_selection_mode.value())
+		if(SELECT_NODES != m_selection_mode.internal_value())
 		{
 			unsigned long selected_mesh_count = 0;
 
@@ -1228,7 +1228,7 @@ public:
 
 	void select(const k3d::selection::records& Selection)
 	{
-		switch(m_selection_mode.value())
+		switch(m_selection_mode.internal_value())
 		{
 			case SELECT_NODES:
 				select_nodes(Selection);
@@ -1271,7 +1271,7 @@ public:
 
 	void select_all()
 	{
-		switch(m_selection_mode.value())
+		switch(m_selection_mode.internal_value())
 		{
 			case SELECT_NODES:
 				select_all_nodes();
@@ -1316,7 +1316,7 @@ public:
 
 	void deselect(const k3d::selection::records& Selection)
 	{
-		switch(m_selection_mode.value())
+		switch(m_selection_mode.internal_value())
 		{
 			case SELECT_NODES:
 				deselect_nodes(Selection);
@@ -1348,7 +1348,7 @@ public:
 
 	void deselect_all()
 	{
-		switch(m_selection_mode.value())
+		switch(m_selection_mode.internal_value())
 		{
 			case SELECT_NODES:
 				deselect_all_nodes();
@@ -1391,7 +1391,7 @@ public:
 
 	void invert_selection()
 	{
-		switch(m_selection_mode.value())
+		switch(m_selection_mode.internal_value())
 		{
 			case SELECT_NODES:
 				invert_node_selection();
@@ -1502,7 +1502,7 @@ public:
 		return_val_if_fail(Factory, 0);
 
 		// Switch to node selection mode
-		if(SELECT_NODES != m_selection_mode.value())
+		if(SELECT_NODES != m_selection_mode.internal_value())
 			set_selection_mode(SELECT_NODES);
 
 		// Create the requested node ...
@@ -1606,7 +1606,7 @@ public:
 	/// Called by the signal system when the selection mode changes
 	void on_selection_mode_changed(k3d::iunknown*)
 	{
-		switch(m_selection_mode.value())
+		switch(m_selection_mode.internal_value())
 		{
 			case SELECT_NODES:
 				on_set_node_mode();
@@ -1622,7 +1622,7 @@ public:
 				break;
 		}
 
-		m_last_selection_mode = m_selection_mode.value();
+		m_last_selection_mode = m_selection_mode.internal_value();
 
 		selection_changed();
 	}

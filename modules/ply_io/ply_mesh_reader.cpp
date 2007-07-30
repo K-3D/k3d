@@ -52,7 +52,7 @@ public:
 
 	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
-		const k3d::filesystem::path path = m_file.value();
+		const k3d::filesystem::path path = m_file.pipeline_value();
 		if(path.empty())
 			return;
 		

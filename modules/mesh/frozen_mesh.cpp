@@ -61,7 +61,7 @@ public:
 
 	void create_mesh(k3d::mesh& Output)
 	{
-		if(const k3d::mesh* const input = m_input_mesh.value())
+		if(const k3d::mesh* const input = m_input_mesh.pipeline_value())
 			k3d::deep_copy(*input, Output);
 	}
 

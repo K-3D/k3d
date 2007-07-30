@@ -95,7 +95,7 @@ public:
 
 	void gl_draw(const k3d::gl::render_state& State)
 	{
-		if(&State.camera != m_camera.value())
+		if(&State.camera != m_camera.pipeline_value())
 			return;
 
 		k3d::gl::store_attributes attributes;
@@ -111,14 +111,14 @@ public:
 
 	void draw(const k3d::gl::render_state& State)
 	{
-		k3d::bitmap* const bitmap = m_bitmap.value();
+		k3d::bitmap* const bitmap = m_bitmap.pipeline_value();
 		if(!(bitmap && bitmap->width() && bitmap->height()))
 			return;
 
-		const k3d::color color = m_color.value();
-		const double opacity = m_opacity.value();
-		const aspect_ratio_type_t aspect_ratio_type = m_aspect_ratio_type.value();
-		const double aspect_ratio = m_aspect_ratio.value();
+		const k3d::color color = m_color.pipeline_value();
+		const double opacity = m_opacity.pipeline_value();
+		const aspect_ratio_type_t aspect_ratio_type = m_aspect_ratio_type.pipeline_value();
+		const double aspect_ratio = m_aspect_ratio.pipeline_value();
 
 		glColor4d(color.red, color.green, color.blue, opacity);
 

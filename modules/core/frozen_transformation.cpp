@@ -67,7 +67,7 @@ public:
 
 	k3d::matrix4 output_value()
 	{
-		return m_input.value() * m_matrix.value();
+		return m_input.pipeline_value() * m_matrix.pipeline_value();
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -54,7 +54,7 @@ public:
 		if(!k3d::ri::last_sample(State))
 			return;
 
-		const k3d::filesystem::path file = m_file.value();
+		const k3d::filesystem::path file = m_file.pipeline_value();
 		if(!k3d::filesystem::exists(file))
 			return;
 

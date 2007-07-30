@@ -221,11 +221,6 @@ class no_property :
 	public name_policy_t
 {
 public:
-	/// Returns the underlying value of the data
-	const value_t value()
-	{
-		return name_policy_t::internal_value();
-	}
 
 protected:
 	template<typename init_t>
@@ -245,7 +240,7 @@ class read_only_property :
 	public iproperty
 {
 public:
-	const value_t value()
+	const value_t pipeline_value()
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
@@ -340,7 +335,7 @@ class writable_property :
 	public iwritable_property
 {
 public:
-	const value_t value()
+	const value_t pipeline_value()
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
@@ -445,7 +440,7 @@ class string_property :
 	public iwritable_property
 {
 public:
-	const value_t value()
+	const value_t pipeline_value()
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
@@ -567,7 +562,7 @@ class path_property :
 	public ipath_property
 {
 public:
-	const value_t value()
+	const value_t pipeline_value()
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
@@ -720,7 +715,7 @@ class script_property :
 	public iscript_property
 {
 public:
-	const value_t value()
+	const value_t pipeline_value()
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
@@ -842,7 +837,7 @@ class enumeration_property :
 	public ienumeration_property
 {
 public:
-	const value_t value()
+	const value_t pipeline_value()
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
@@ -982,7 +977,7 @@ class list_property :
 	public ilist_property<value_t>
 {
 public:
-	const value_t value()
+	const value_t pipeline_value()
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
@@ -1095,7 +1090,7 @@ class node_property :
 	public inode_property
 {
 public:
-	const value_t value()
+	const value_t pipeline_value()
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
@@ -1216,7 +1211,7 @@ class measurement_property :
 	public imeasurement_property
 {
 public:
-	const value_t value()
+	const value_t pipeline_value()
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)

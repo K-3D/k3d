@@ -48,7 +48,7 @@ public:
 
 	const k3d::matrix4 on_get_element(unsigned long Index1, unsigned long Count1)
 	{
-		return k3d::translation3D((m_offset.value() * Index1));
+		return k3d::translation3D((m_offset.pipeline_value() * Index1));
 	}
 
 	static k3d::iplugin_factory& get_factory()

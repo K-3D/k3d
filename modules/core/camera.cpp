@@ -147,7 +147,7 @@ public:
 
 	k3d::iprojection& projection()
 	{
-		const bool orthographic = m_orthographic.value();
+		const bool orthographic = m_orthographic.pipeline_value();
 
 		if(orthographic)
 			return m_orthographic_projection;
@@ -162,7 +162,7 @@ public:
 
 	k3d::itransform_source& navigation_target()
 	{
-		k3d::itransform_source* target = m_navigation_target.value();
+		k3d::itransform_source* target = m_navigation_target.pipeline_value();
 		if(!target)
 			target = this;
 
@@ -196,7 +196,7 @@ public:
 
 	void on_aspect_ratio_changed(k3d::iunknown*)
 	{
-		const std::string new_ratio = m_aspect_ratio.value();
+		const std::string new_ratio = m_aspect_ratio.pipeline_value();
 
 		const k3d::aspect_ratios_t& ratios = k3d::aspect_ratios();
 		for(k3d::aspect_ratios_t::const_iterator ratio = ratios.begin(); ratio != ratios.end(); ++ratio)
@@ -223,7 +223,7 @@ public:
 	double get_target_distance()
 	{
 		const k3d::point3 position = k3d::node_to_world_matrix(navigation_target()) * k3d::point3(0, 0, 0);
-		return k3d::distance(position, m_world_target.value());
+		return k3d::distance(position, m_world_target.pipeline_value());
 	}
 
 	void on_gl_draw(const k3d::gl::render_state& State)
@@ -238,10 +238,10 @@ public:
 
 		draw();
 
-		if(m_show_projection.value())
+		if(m_show_projection.pipeline_value())
 			draw_projection();
 
-		if(m_show_reference_plane.value())
+		if(m_show_reference_plane.pipeline_value())
 			draw_reference_plane();
 	}
 
@@ -254,16 +254,16 @@ public:
 
 	void draw_projection()
 	{
-		const bool orthographic = m_orthographic.value();
-		const double left = m_left.value();
-		const double right = m_right.value();
-		const double top = m_top.value();
-		const double bottom = m_bottom.value();
-		const double near = m_near.value();
-		const double far = m_far.value();
+		const bool orthographic = m_orthographic.pipeline_value();
+		const double left = m_left.pipeline_value();
+		const double right = m_right.pipeline_value();
+		const double top = m_top.pipeline_value();
+		const double bottom = m_bottom.pipeline_value();
+		const double near = m_near.pipeline_value();
+		const double far = m_far.pipeline_value();
 
-		const double reference_plane = m_reference_plane.value();
-		const k3d::color reference_plane_color = m_reference_plane_color.value();
+		const double reference_plane = m_reference_plane.pipeline_value();
+		const k3d::color reference_plane_color = m_reference_plane_color.pipeline_value();
 
 		if(orthographic)
 		{
@@ -363,15 +363,15 @@ public:
 
 	void draw_reference_plane()
 	{
-		const bool orthographic = m_orthographic.value();
-		const double left = m_left.value();
-		const double right = m_right.value();
-		const double top = m_top.value();
-		const double bottom = m_bottom.value();
-		const double near = m_near.value();
+		const bool orthographic = m_orthographic.pipeline_value();
+		const double left = m_left.pipeline_value();
+		const double right = m_right.pipeline_value();
+		const double top = m_top.pipeline_value();
+		const double bottom = m_bottom.pipeline_value();
+		const double near = m_near.pipeline_value();
 
-		const double reference_plane = m_reference_plane.value();
-		const k3d::color reference_plane_color = m_reference_plane_color.value();
+		const double reference_plane = m_reference_plane.pipeline_value();
+		const k3d::color reference_plane_color = m_reference_plane_color.pipeline_value();
 
 		if(orthographic)
 		{

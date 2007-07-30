@@ -118,11 +118,11 @@ public:
 	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
 	{
 		// Get the input geometry ...
-		const k3d::legacy::mesh* const input1 = m_input1.value();
+		const k3d::legacy::mesh* const input1 = m_input1.pipeline_value();
 		if(!input1)
 			return;
 
-		const k3d::legacy::mesh* const input2 = m_input2.value();
+		const k3d::legacy::mesh* const input2 = m_input2.pipeline_value();
 		if(!input2)
 			return;
 
@@ -168,7 +168,7 @@ public:
 		detail::wrapper<GtsSurface> surface = gts_surface_new(gts_surface_class(), gts_face_class(), gts_edge_class(), gts_vertex_class());
 		return_if_fail(surface);
 
-		switch(m_type.value())
+		switch(m_type.pipeline_value())
 		{
 			case BOOLEAN_INTERSECTION:
 				gts_surface_inter_boolean(si, surface, GTS_1_IN_2);
@@ -198,7 +198,7 @@ public:
 		// Create output geometry ...
 		copy_surface(surface, Mesh);
 
-		k3d::imaterial* const material = m_material.value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 		{
 			for(k3d::legacy::polyhedron::faces_t::iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)

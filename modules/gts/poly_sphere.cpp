@@ -62,20 +62,20 @@ public:
 			gts_face_class(), gts_edge_class(), gts_vertex_class());
 
 		// Generate tessellated sphere
-		gts_surface_generate_sphere(s, m_tessellation_level.value());
+		gts_surface_generate_sphere(s, m_tessellation_level.pipeline_value());
 		return_if_fail(s != NULL);
 
 		// Load sphere into a k3d::legacy::mesh
 		return_if_fail(copy_surface(s, Mesh));
 
 		// Apply radius
-		double radius = m_radius.value();
+		double radius = m_radius.pipeline_value();
 		k3d::legacy::mesh::points_t::iterator mesh_end(Mesh.points.end());
 		for(k3d::legacy::mesh::points_t::iterator p = Mesh.points.begin(); p != mesh_end; ++p)
 			(*p)->position *= radius;
 
 		// Set material
-		k3d::imaterial* const material = m_material.value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 		k3d::legacy::polyhedron& polyhedron = *Mesh.polyhedra.back();
 		for(k3d::legacy::polyhedron::faces_t::iterator face = polyhedron.faces.begin(); face != polyhedron.faces.end(); ++face)
 			(*face)->material = material;

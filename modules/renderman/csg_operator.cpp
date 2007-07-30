@@ -58,8 +58,8 @@ public:
 		if(!k3d::ri::last_sample(State))
 			return;
 
-		k3d::ri::irenderable* const renderable1 = m_instance1.value();
-		k3d::ri::irenderable* const renderable2 = m_instance2.value();
+		k3d::ri::irenderable* const renderable1 = m_instance1.pipeline_value();
+		k3d::ri::irenderable* const renderable2 = m_instance2.pipeline_value();
 		if(!renderable1 || !renderable2)
 			return;
 
@@ -74,7 +74,7 @@ public:
 		k3d::ri::render_state state(State);
 		state.render_context = k3d::ri::CSG_SOLID;
 
-		switch(m_type.value())
+		switch(m_type.pipeline_value())
 		{
 			case BOOLEAN_INTERSECTION:
 				State.engine.RiSolidBegin(k3d::ri::RI_INTERSECTION());

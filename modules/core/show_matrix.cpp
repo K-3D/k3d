@@ -73,7 +73,7 @@ public:
 
 	k3d::matrix4 output_value()
 	{
-		return m_input.value();
+		return m_input.pipeline_value();
 	}
 
 	std::string matrix_line(const k3d::matrix4& Matrix, unsigned long Line, const bool Transpose)
@@ -86,8 +86,8 @@ public:
 
 	void on_reset_matrix(k3d::iunknown*)
 	{
-		const k3d::matrix4 matrix = m_input.value();
-		const bool transpose = m_transpose.value();
+		const k3d::matrix4 matrix = m_input.pipeline_value();
+		const bool transpose = m_transpose.pipeline_value();
 
 		m_line1.set_value(matrix_line(matrix, 0, transpose));
 		m_line2.set_value(matrix_line(matrix, 1, transpose));

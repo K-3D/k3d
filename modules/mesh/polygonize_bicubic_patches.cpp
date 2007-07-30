@@ -59,7 +59,7 @@ public:
 
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
-		const unsigned long subdivisions = m_subdivisions.value();
+		const unsigned long subdivisions = m_subdivisions.pipeline_value();
 
 		// Polygonize each bicubic patch ...
 		for(k3d::legacy::mesh::bicubic_patches_t::const_iterator patch = InputMesh.bicubic_patches.begin(); patch != InputMesh.bicubic_patches.end(); patch++)

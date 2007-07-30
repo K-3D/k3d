@@ -173,7 +173,7 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 		k3d::imesh_selection_sink* const downstream_mesh_selection_sink = dynamic_cast<k3d::imesh_selection_sink*>(&Node);
 		if(modifier_mesh_selection_sink && downstream_mesh_selection_sink)
 		{
-			if(SELECT_NODES == DocumentState.selection_mode().value())
+			if(SELECT_NODES == DocumentState.selection_mode().internal_value())
 			{
 				k3d::property::set_internal_value(
 					modifier_mesh_selection_sink->mesh_selection_sink_input(),

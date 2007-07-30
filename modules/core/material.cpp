@@ -56,17 +56,17 @@ public:
 
 	k3d::gl::imaterial* gl_material()
 	{
-		return m_gl_material.value();
+		return m_gl_material.pipeline_value();
 	}
 
 	k3d::ri::imaterial* ri_material()
 	{
-		return m_ri_material.value();
+		return m_ri_material.pipeline_value();
 	}
 
 	k3d::yafray::imaterial* yafray_material()
 	{
-		return m_yafray_material.value();
+		return m_yafray_material.pipeline_value();
 	}
 
 	static k3d::iplugin_factory& get_factory()

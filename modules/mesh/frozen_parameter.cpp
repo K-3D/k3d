@@ -67,8 +67,8 @@ public:
 
 		size_t point_index = 0;
 
-		const std::string name = m_parameter_name.value();
-		const double value = m_parameter_value.value();
+		const std::string name = m_parameter_name.pipeline_value();
+		const double value = m_parameter_value.pipeline_value();
 		for(k3d::legacy::mesh::points_t::iterator point = Target.points.begin(); point != Target.points.end(); ++point)
 		{
 			while(m_point_parameters.size() <= point_index)
@@ -88,7 +88,7 @@ public:
 		if(!empty())
 			return;
 
-		const std::string name = m_parameter_name.value();
+		const std::string name = m_parameter_name.pipeline_value();
 		for(k3d::legacy::mesh::points_t::const_iterator point = Source.points.begin(); point != Source.points.end(); ++point)
 		{
 			m_point_parameters.push_back(point_record((*point)->selection_weight));

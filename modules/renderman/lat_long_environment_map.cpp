@@ -73,7 +73,7 @@ public:
 		m_ri_texture_path = k3d::filesystem::path();
 
 		// If we don't have an input bitmap, we're done ...
-		const k3d::bitmap* const input = m_input_bitmap.value();
+		const k3d::bitmap* const input = m_input_bitmap.pipeline_value();
 		if(!input)
 			return;
 
@@ -85,10 +85,10 @@ public:
 
 /*
 		// If "render from source" is enabled, just copy the source file to the frame directory ...
-		if(m_render_from_source.value())
+		if(m_render_from_source.pipeline_value())
 		{
 			// Copy the file ...
-			const std::string copycommand = COPY_COMMAND " " + m_image_path.value().native_string() + " " + m_ri_image_path.native_string();
+			const std::string copycommand = COPY_COMMAND " " + m_image_path.pipeline_value().native_string() + " " + m_ri_image_path.native_string();
 			k3d::system::run_process(copycommand);
 
 		}
@@ -101,7 +101,7 @@ public:
 			return_if_fail(filter->write_file(m_ri_image_path, *input));
 		}
 
-		Engine.RiMakeLatLongEnvironmentV(m_ri_image_path.native_filesystem_string(), m_ri_texture_path.native_filesystem_string(), m_filter.value(), m_swidth.value(), m_twidth.value());
+		Engine.RiMakeLatLongEnvironmentV(m_ri_image_path.native_filesystem_string(), m_ri_texture_path.native_filesystem_string(), m_filter.pipeline_value(), m_swidth.pipeline_value(), m_twidth.pipeline_value());
 	}
 
 	const k3d::filesystem::path renderman_texture_path(const k3d::ri::render_state& State)
