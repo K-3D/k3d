@@ -522,7 +522,7 @@ public:
 				// Bitmap properties ...
 				else if(property_type == k3d::type_id_k3d_bitmap_ptr())
 				{
-					bitmap_preview::control* const control = new bitmap_preview::control(m_parent, property_name, bitmap_preview::proxy(m_document_state.document().pipeline(), property));
+					bitmap_preview::control* const control = new bitmap_preview::control(m_parent, property_name, bitmap_preview::proxy(property));
 					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 					entry_list.push_back(control);
