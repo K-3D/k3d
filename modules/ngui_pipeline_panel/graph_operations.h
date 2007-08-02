@@ -44,7 +44,7 @@ enum edge_type
 
 void create_graph(libk3dngui::document_state& DocumentState, k3d::graph& Graph);
 
-void tree_plus_layout(k3d::graph& Graph, const k3d::graph::vertex_descriptor_t Root);
+void tree_plus_layout(k3d::graph& Graph, const k3d::graph::vertex_descriptor_t Root, const double ColumnOffset, const double RowOffset);
 
 template<typename array_t, typename map_t>
 array_t& get_array(map_t& Map, const std::string& Name, const size_t Count)

@@ -131,6 +131,8 @@ public:
 		m_save_svg.signal_clicked().connect(sigc::mem_fun(*this, &panel::on_save_svg));
 
 		m_input_model.connect_lbutton_double_click(sigc::mem_fun(*this, &panel::on_toggle_node_expansion));
+		m_input_model.connect_lbutton_start_drag(sigc::mem_fun(*this, &panel::on_start_pan));
+		m_input_model.connect_lbutton_drag(sigc::mem_fun(*this, &panel::on_pan));
 		m_input_model.connect_mbutton_start_drag(sigc::mem_fun(*this, &panel::on_start_pan));
 		m_input_model.connect_mbutton_drag(sigc::mem_fun(*this, &panel::on_pan));
 		m_input_model.connect_rbutton_start_drag(sigc::mem_fun(*this, &panel::on_start_zoom));
@@ -286,10 +288,8 @@ public:
 			{
 				vertex_expanded[vertex] = !vertex_expanded[vertex];
 
-k3d::log() << debug << vertex_expanded[vertex] << std::endl;
-
-				tree_plus_layout(graph, m_root_vertex);
-				calculate_geometry(graph);
+				tree_plus_layout(graph, m_root_vertex, m_column_offset, m_row_offset);
+//				calculate_geometry(graph);
 				schedule_redraw();
 				return;
 			}
@@ -395,27 +395,13 @@ k3d::log() << debug << vertex_expanded[vertex] << std::endl;
 					continue;
 		
 				m_root_vertex = vertex;
-				tree_plus_layout(*m_graph, vertex);
-				calculate_geometry(*m_graph);
+				tree_plus_layout(*m_graph, vertex, m_column_offset, m_row_offset);
+//				calculate_geometry(*m_graph);
 				break;
 			}
 		}
 
 		return *m_graph;
-	}
-
-	void calculate_geometry(k3d::graph& Graph)
-	{
-		return_if_fail(Graph.topology);
-
-		const k3d::graph::topology_t& topology = *Graph.topology;
-		const size_t vertex_count = boost::num_vertices(topology);
-
-		k3d::graph::ints_t& vertex_column = get_array<k3d::graph::ints_t>(Graph.vertex_data, "column", vertex_count);
-		k3d::graph::ints_t& vertex_row = get_array<k3d::graph::ints_t>(Graph.vertex_data, "row", vertex_count);
-		k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(Graph.vertex_data, "position", vertex_count);
-		for(size_t vertex = 0; vertex != vertex_count; ++vertex)
-			vertex_position[vertex] = k3d::point2(m_column_offset * vertex_column[vertex], m_row_offset * vertex_row[vertex]);
 	}
 
 	const double aspect_ratio()

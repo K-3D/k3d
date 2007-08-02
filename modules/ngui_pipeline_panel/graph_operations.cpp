@@ -41,12 +41,6 @@ namespace ngui
 namespace pipeline
 {
 
-namespace detail
-{
-
-
-} // namespace detail
-
 void create_graph(document_state& DocumentState, k3d::graph& Graph)
 {
 	const k3d::nodes_t nodes = DocumentState.document().nodes().collection();
@@ -106,20 +100,20 @@ void tree_plus_layout(
 	const std::vector<size_t>& Vertices,
 	k3d::graph::bools_t& VertexVisible,
 	const k3d::graph::bools_t& VertexExpanded,
-	k3d::graph::ints_t& VertexColumn,
-	k3d::graph::ints_t& VertexRow,
-	size_t Column
+	k3d::graph::points_t& VertexPosition,
+	const size_t Column,
+	const double ColumnOffset,
+	const double RowOffset
 	)
 {
 	std::vector<size_t> new_vertices;
 
-	size_t row = 0;
 	for(size_t i = 0; i != Vertices.size(); ++i)
 	{
 		const size_t vertex = Vertices[i];
 
-//		if(!VertexExpanded[vertex])
-//			continue;
+		VertexVisible[vertex] = true;
+		VertexPosition[vertex] = k3d::point2(Column * ColumnOffset, i * RowOffset);
 
 		std::pair<k3d::graph::in_edge_iterator_t, k3d::graph::in_edge_iterator_t> in_edges = boost::in_edges(vertex, Topology);
 		for(k3d::graph::in_edge_iterator_t edge = in_edges.first; edge != in_edges.second; ++edge)
@@ -128,10 +122,6 @@ void tree_plus_layout(
 
 			if(VertexVisible[edge_vertex])
 				continue;
-
-			VertexVisible[edge_vertex] = true;
-			VertexColumn[edge_vertex] = Column;
-			VertexRow[edge_vertex] = row++;
 
 			new_vertices.push_back(edge_vertex);
 		}
@@ -144,39 +134,32 @@ void tree_plus_layout(
 			if(VertexVisible[edge_vertex])
 				continue;
 
-			VertexVisible[edge_vertex] = true;
-			VertexColumn[edge_vertex] = Column;
-			VertexRow[edge_vertex] = row++;
-
 			new_vertices.push_back(edge_vertex);
 		}
 	}
 
 	if(!new_vertices.empty())
-		tree_plus_layout(Topology, new_vertices, VertexVisible, VertexExpanded, VertexColumn, VertexRow, Column + 1);
+		tree_plus_layout(Topology, new_vertices, VertexVisible, VertexExpanded, VertexPosition, Column + 1, ColumnOffset, RowOffset);
 }
 
-void tree_plus_layout(k3d::graph& Graph, k3d::graph::vertex_descriptor_t Root)
+void tree_plus_layout(k3d::graph& Graph, k3d::graph::vertex_descriptor_t Root, const double ColumnOffset, const double RowOffset)
 {
 	return_if_fail(Graph.topology);
 
 	const k3d::graph::topology_t& topology = *Graph.topology;
+	const size_t vertex_count = boost::num_vertices(topology);
 
-	k3d::graph::bools_t& vertex_visible = get_array<k3d::graph::bools_t>(Graph.vertex_data, "visible", boost::num_vertices(topology));
-	k3d::graph::bools_t& vertex_expanded = get_array<k3d::graph::bools_t>(Graph.vertex_data, "expanded", boost::num_vertices(topology));
-	k3d::graph::ints_t& vertex_column = get_array<k3d::graph::ints_t>(Graph.vertex_data, "column", boost::num_vertices(topology));
-	k3d::graph::ints_t& vertex_row = get_array<k3d::graph::ints_t>(Graph.vertex_data, "row", boost::num_vertices(topology));
+	k3d::graph::bools_t& vertex_visible = get_array<k3d::graph::bools_t>(Graph.vertex_data, "visible", vertex_count);
+	k3d::graph::bools_t& vertex_expanded = get_array<k3d::graph::bools_t>(Graph.vertex_data, "expanded", vertex_count);
+	k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(Graph.vertex_data, "position", vertex_count);
 	
 	k3d::graph::bools_t& edge_visible = get_array<k3d::graph::bools_t>(Graph.edge_data, "visible", boost::num_edges(topology));
 
 	std::fill(vertex_visible.begin(), vertex_visible.end(), false);
 	std::fill(edge_visible.begin(), edge_visible.end(), false);
 
-	vertex_visible[Root] = true;
-	vertex_column[Root] = 0;
-	vertex_row[Root] = 0;
-
-	tree_plus_layout(topology, std::vector<size_t>(1, Root), vertex_visible, vertex_expanded, vertex_column, vertex_row, 1);
+	std::vector<size_t> vertices(1, Root);
+	tree_plus_layout(topology, vertices, vertex_visible, vertex_expanded, vertex_position, 0, ColumnOffset, RowOffset);
 
 	std::pair<k3d::graph::edge_iterator_t, k3d::graph::edge_iterator_t> edges = boost::edges(topology);
 	size_t edge_index = 0;
