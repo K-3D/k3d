@@ -32,7 +32,6 @@
 #include "data.h"
 #include "dependencies.h"
 #include "document.h"
-#include "ipipeline.h"
 #include "ideletable.h"
 #include "idocument.h"
 #include "idocument_plugin_factory.h"
@@ -43,6 +42,7 @@
 #include "iselectable.h"
 #include "node_name_map.h"
 #include "persistent.h"
+#include "pipeline.h"
 #include "pipeline_profiler.h"
 #include "plugins.h"
 #include "property_collection.h"
@@ -412,201 +412,6 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// pipeline_implementation
-
-class pipeline_implementation :
-	public ipipeline,
-	public sigc::trackable
-{
-public:
-	pipeline_implementation(istate_recorder& StateRecorder) :
-		m_state_recorder(StateRecorder)
-	{
-	}
-
-	~pipeline_implementation()
-	{
-	}
-
-	void set_dependencies(dependencies_t& Dependencies, iunknown* Hint = 0)
-	{
-		// Don't let any NULLs creep in ...
-		if(Dependencies.erase(static_cast<iproperty*>(0)))
-			log() << warning << "Cannot assign a dependency to a NULL property" << std::endl;
-
-		// If we're recording undo/redo data, record the new state ...
-		if(m_state_recorder.current_change_set())
-			m_state_recorder.current_change_set()->record_new_state(new set_dependencies_container(*this, Dependencies));
-
-		// Update our internal graph, keep track of the original state as we go ...
-		dependencies_t old_dependencies;
-		for(dependencies_t::iterator dependency = Dependencies.begin(); dependency != Dependencies.end(); ++dependency)
-		{
-			dependencies_t::iterator old_dependency = get_dependency(dependency->first);
-			old_dependencies.insert(*old_dependency);
-
-			old_dependency->second = dependency->second;
-
-			m_change_connections[dependency->first].disconnect();
-			if(dependency->second)
-			{
-				m_change_connections[dependency->first] =
-					dependency->second->property_changed_signal().connect(
-						signal::make_loop_safe_slot(
-							dependency->first->property_changed_signal()));
-			}
-
-			dependency->first->property_set_dependency(dependency->second);
-		}
-
-		// If we're recording undo/redo data, keep track of the original state ...
-		if(m_state_recorder.current_change_set())
-			m_state_recorder.current_change_set()->record_old_state(new set_dependencies_container(*this, old_dependencies));
-
-		// Notify observers that the DAG as a whole has changed ...
-		m_dependency_signal.emit(Dependencies);
-
-		// Synthesize change notifications for every property whose parent was set ...
-		for(dependencies_t::iterator dependency = Dependencies.begin(); dependency != Dependencies.end(); ++dependency)
-			dependency->first->property_changed_signal().emit(Hint);
-	}
-
-	iproperty* dependency(iproperty& Property)
-	{
-		return Property.property_dependency();
-	}
-
-	const dependencies_t& dependencies()
-	{
-		return m_dependencies;
-	}
-
-	dependency_signal_t& dependency_signal()
-	{
-		return m_dependency_signal;
-	}
-
-	void on_close_document()
-	{
-		// Since the document is closing anyway, close all our connections to avoid pointless thrashing-around ...
-		for(connections_t::iterator connection = m_change_connections.begin(); connection != m_change_connections.end(); ++connection)
-			connection->second.disconnect();
-
-		for(connections_t::iterator connection = m_delete_connections.begin(); connection != m_delete_connections.end(); ++connection)
-			connection->second.disconnect();
-	}
-
-	void on_property_deleted(iproperty* Property)
-	{
-		dependencies_t::iterator dependency = m_dependencies.find(Property);
-		return_if_fail(dependency != m_dependencies.end());
-
-		if(m_state_recorder.current_change_set())
-		{
-			dependencies_t old_dependencies;
-			old_dependencies.insert(*dependency);
-			m_state_recorder.current_change_set()->record_old_state(new set_dependencies_container(*this, old_dependencies));
-			m_state_recorder.current_change_set()->record_new_state(new delete_property_container(*this, Property));
-		}
-
-		m_dependencies.erase(dependency);
-
-		m_delete_connections[Property].disconnect();
-		m_delete_connections.erase(Property);
-
-		dependencies_t new_dependencies;
-		for(dependencies_t::iterator dependency = m_dependencies.begin(); dependency != m_dependencies.end(); ++dependency)
-		{
-			if(dependency->second == Property)
-			{
-				dependency->first->property_set_dependency(0);
-				new_dependencies.insert(std::make_pair(dependency->first, static_cast<iproperty*>(0)));
-			}
-		}
-
-		if(new_dependencies.size())
-			set_dependencies(new_dependencies);
-	}
-
-private:
-	dependencies_t::iterator get_dependency(iproperty* Property)
-	{
-		assert(Property);
-
-		dependencies_t::iterator result = m_dependencies.find(Property);
-		if(result == m_dependencies.end())
-		{
-			result = m_dependencies.insert(std::make_pair(Property, static_cast<iproperty*>(0))).first;
-			m_delete_connections[Property] = Property->property_deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &pipeline_implementation::on_property_deleted), Property));
-		}
-
-		return result;
-	}
-
-	class set_dependencies_container :
-		public istate_container
-	{
-	public:
-		set_dependencies_container(ipipeline& Dag, const ipipeline::dependencies_t& Dependencies) :
-			m_pipeline(Dag),
-			m_dependencies(Dependencies)
-		{
-		}
-
-		~set_dependencies_container()
-		{
-		}
-
-		void restore_state()
-		{
-			m_pipeline.set_dependencies(m_dependencies);
-		}
-
-	private:
-		ipipeline& m_pipeline;
-		ipipeline::dependencies_t m_dependencies;
-	};
-
-	class delete_property_container :
-		public istate_container
-	{
-	public:
-		delete_property_container(pipeline_implementation& Dag, iproperty* const Property) :
-			m_pipeline(Dag),
-			m_property(Property)
-		{
-		}
-
-		~delete_property_container()
-		{
-		}
-
-		void restore_state()
-		{
-			m_pipeline.on_property_deleted(m_property);
-		}
-
-	private:
-		pipeline_implementation& m_pipeline;
-		iproperty* const m_property;
-	};
-
-	istate_recorder& m_state_recorder;
-
-	/// Stores inter-property dependencies
-	dependencies_t m_dependencies;
-
-	/// Defines storage for per-property signal connections
-	typedef std::map<iproperty*, sigc::connection> connections_t;
-	/// Stores connections between property change signals (so a change to a source property is automatically passed-along to its dependent properties)
-	connections_t m_change_connections;
-	/// Stores connections to property delete signals (so we can clean-up when a property goes away)
-	connections_t m_delete_connections;
-	/// Signal that is emitted anytime the dependency graph is modified
-	dependency_signal_t m_dependency_signal;
-};
-
-/////////////////////////////////////////////////////////////////////////////
 // public_document_implementation
 
 /// Encapsulates an open K-3D document
@@ -617,12 +422,12 @@ class public_document_implementation :
 	public sigc::trackable
 {
 public:
-	public_document_implementation(istate_recorder& StateRecorder, inode_collection& Nodes, ipipeline& Dag) :
+	public_document_implementation(istate_recorder& StateRecorder, inode_collection& Nodes, ipipeline& Pipeline) :
 		command_node::implementation("document", 0),
 		property_collection(),
 		m_state_recorder(StateRecorder),
 		m_nodes(Nodes),
-		m_pipeline(Dag),
+		m_pipeline(Pipeline),
 		m_path(init_owner(*this) + init_name("path") + init_label(_("Document Path")) + init_description(_("Document Path")) + init_value(filesystem::path())),
 		m_title(init_owner(*this) + init_name("title") + init_label(_("Document Title")) + init_description(_("Document Title")) + init_value(k3d::ustring()))
 	{
@@ -722,7 +527,7 @@ public:
 	document_implementation() :
 		m_state_recorder(new state_recorder_implementation()),
 		m_nodes(new node_collection_implementation(*m_state_recorder)),
-		m_pipeline(new pipeline_implementation(*m_state_recorder)),
+		m_pipeline(new pipeline(m_state_recorder)),
 		m_document(new public_document_implementation(*m_state_recorder, *m_nodes, *m_pipeline))
 	{
 	}
@@ -731,7 +536,8 @@ public:
 	{
 		m_document->close_signal().emit();
 
-		m_pipeline->on_close_document();
+		// Completely remove all pipeline connections so we don't waste time updating individual properties
+		m_pipeline->clear();
 		m_nodes->on_close_document();
 
 		delete m_document;
@@ -742,7 +548,7 @@ public:
 
 	state_recorder_implementation* const m_state_recorder;
 	node_collection_implementation* const m_nodes;
-	pipeline_implementation* const m_pipeline;
+	pipeline* const m_pipeline;
 	public_document_implementation* const m_document;
 
 private:
