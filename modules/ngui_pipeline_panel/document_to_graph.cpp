@@ -21,16 +21,9 @@
 	\author Timothy M. Shead
 */
 
-#include "graph_operations.h"
+#include "document_to_graph.h"
 
-#include <k3dsdk/ngui/document_state.h>
-
-#include <k3dsdk/graph.h>
 #include <k3dsdk/ipipeline.h>
-
-#include <boost/assign/list_of.hpp>
-
-using namespace libk3dngui;
 
 namespace module
 {
@@ -41,14 +34,18 @@ namespace ngui
 namespace pipeline
 {
 
-/*
-void create_graph(document_state& DocumentState, k3d::graph& Graph)
+document_to_graph::document_to_graph(k3d::idocument& Document) :
+	m_document(Document)
 {
-	const k3d::nodes_t nodes = DocumentState.document().nodes().collection();
+}
+
+void document_to_graph::on_initialize_graph(k3d::graph& Graph)
+{
+	const k3d::nodes_t nodes = m_document.nodes().collection();
 
 	boost::shared_ptr<k3d::graph::topology_t> topology(new k3d::graph::topology_t());
 
-	boost::shared_ptr<nodes_t> vertex_node(new nodes_t());
+	boost::shared_ptr<k3d::graph::nodes_t> vertex_node(new k3d::graph::nodes_t());
 	
 	boost::shared_ptr<k3d::graph::indices_t> edge_type(new k3d::graph::indices_t());
 
@@ -81,7 +78,7 @@ void create_graph(document_state& DocumentState, k3d::graph& Graph)
 		}
 	}
 
-	const k3d::ipipeline::dependencies_t dependencies = DocumentState.document().pipeline().dependencies();
+	const k3d::ipipeline::dependencies_t dependencies = m_document.pipeline().dependencies();
 	for(k3d::ipipeline::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
 	{
 		if(dependency->first && dependency->first->property_node() && dependency->second && dependency->second->property_node())
@@ -96,11 +93,10 @@ void create_graph(document_state& DocumentState, k3d::graph& Graph)
 	Graph.edge_data["type"] = edge_type;
 }
 
-void tree_plus_layout(k3d::graph& Graph, k3d::graph::vertex_descriptor_t Root, const double ColumnOffset, const double RowOffset)
+void document_to_graph::on_update_graph(k3d::graph& Graph)
 {
 }
 
-*/
 } // namespace pipeline
 
 } // namespace ngui

@@ -1,3 +1,6 @@
+#ifndef DOCUMENT_TO_GRAPH_H
+#define DOCUMENT_TO_GRAPH_H
+
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
 //
@@ -14,15 +17,16 @@
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
-// License along with this program; if not, read to the Free Software
+// License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Timothy M. Shead
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/graph.h>
-#include <string>
+#include "graph_source.h"
+
+namespace k3d { class idocument; }
 
 namespace module
 {
@@ -33,28 +37,30 @@ namespace ngui
 namespace pipeline
 {
 
-template<typename array_t, typename map_t>
-array_t& get_array(map_t& Map, const std::string& Name, const size_t Count)
+enum edge_type
 {
-	array_t* result = 0;
-	if(Map.count(Name))
-		result = dynamic_cast<array_t*>(Map[Name].get());
+	DATA_EDGE,
+	BEHAVIOR_EDGE
+};	
 
-	if(!result)
-	{
-		result = new array_t();
-		Map[Name].reset(result);
-	}
+class document_to_graph :
+	public graph_source
+{
+public:
+	document_to_graph(k3d::idocument& Document);
 
-	if(result->size() != Count)
-		result->resize(Count);
+private:
+	void on_initialize_graph(k3d::graph& Graph);
+	void on_update_graph(k3d::graph& Graph);
 
-	return *result;
-}
+	k3d::idocument& m_document;
+};
 
 } // namespace pipeline
 
 } // namespace ngui
 
 } // namespace module
+
+#endif // !DOCUMENT_TO_GRAPH
 

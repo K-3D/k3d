@@ -30,6 +30,8 @@
 namespace k3d
 {
 
+class inode;
+
 ////////////////////////////////////////////////////////////////////////////////
 // graph
 
@@ -62,6 +64,8 @@ public:
 	typedef typed_array<k3d::point2> points_t;
 	/// Defines storage for a generic collection of two-dimensional vectors
 	typedef typed_array<k3d::vector2> vectors_t;
+	/// Defines storage for a generic collection of inode objects
+	typedef k3d::typed_array<inode*> nodes_t;
 
 	/// Defines a heterogeneous collection of named, shared arrays
 	typedef std::map<std::string, boost::shared_ptr<array> > named_arrays;

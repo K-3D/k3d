@@ -23,7 +23,9 @@
 
 #include <k3d-i18n-config.h>
 
+#include "document_to_graph.h"
 #include "graph_operations.h"
+#include "tree_plus_layout.h"
 
 #include <k3dsdk/ngui/basic_input_model.h>
 #include <k3dsdk/ngui/document_state.h>
@@ -37,9 +39,11 @@
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/log.h>
-#include <k3dsdk/options.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/nodes.h>
+#include <k3dsdk/options.h>
+#include <k3dsdk/pipeline.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/vectors.h>
 
@@ -50,6 +54,7 @@
 #include <cairomm/context.h>
 
 #include <boost/assign/list_of.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include <iostream>
 #include <valarray>
@@ -110,11 +115,8 @@ public:
 		m_zoom_factor(1.0),
 		m_document_state(0),
 		m_root_node(0),
-		m_root_vertex(0),
 		m_node_width(0.4),
-		m_column_offset(0.7),
 		m_node_height(0.07),
-		m_row_offset(0.1),
 		m_arrow_size(0.04)
 	{
 		m_hbox.pack_start(m_save_png, Gtk::PACK_SHRINK);
@@ -152,7 +154,19 @@ public:
 	{
 		ui_component::set_parent("pipeline", &Parent);
 		m_document_state = &DocumentState;
+	
+		m_graph_source.reset(new document_to_graph(DocumentState.document()));
+
+		m_graph_layout.reset(new tree_plus_layout());
+		k3d::property::set_internal_value(m_graph_layout->column_offset(), 0.7);
+		k3d::property::set_internal_value(m_graph_layout->row_offset(), 0.1);
 		
+		m_graph_pipeline.reset(new k3d::pipeline());
+
+		m_graph_pipeline->connect(m_graph_source->output(), m_graph_layout->input());
+
+		m_graph_layout->output().property_changed_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::schedule_redraw)));
+
 		m_document_state->document().nodes().add_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 		m_document_state->document().nodes().remove_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 		m_document_state->document().nodes().rename_node_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::schedule_redraw)));
@@ -272,6 +286,7 @@ public:
 
 	void on_toggle_node_expansion(const GdkEventButton& Event)
 	{
+/*
 		k3d::graph& graph = get_graph();
 		const k3d::graph::topology_t& topology = *graph.topology;
 		const size_t vertex_count = boost::num_vertices(topology);
@@ -288,12 +303,12 @@ public:
 			{
 				vertex_expanded[vertex] = !vertex_expanded[vertex];
 
-				tree_plus_layout(graph, m_root_vertex, m_column_offset, m_row_offset);
-//				calculate_geometry(graph);
+//				tree_plus_layout(graph, m_root_vertex, m_column_offset, m_row_offset);
 				schedule_redraw();
 				return;
 			}
 		}
+*/
 	}
 
 	void on_start_pan(const GdkEventMotion& Event)
@@ -364,44 +379,29 @@ public:
 
 	void reset_graph()
 	{
-		m_graph.reset();
-		schedule_redraw();
+		m_graph_source->make_reset_graph_slot()(0);
 	}
 
 	void selected_node_changed(k3d::inode* Node)
 	{
-		if(m_root_node != Node)
+		if(m_root_node == Node)
+			return;
+
+		m_root_node = Node;
+
+		k3d::graph& graph = *k3d::property::pipeline_value<k3d::graph*>(m_graph_source->output());
+		const k3d::graph::topology_t& topology = *graph.topology;
+		const size_t vertex_count = boost::num_vertices(topology);
+
+		const k3d::graph::nodes_t& vertex_node = get_array<k3d::graph::nodes_t>(graph.vertex_data, "node", vertex_count);
+		for(size_t vertex = 0; vertex != vertex_count; ++vertex)
 		{
-			m_root_node = Node;
-			reset_graph();
-		}
-	}
-
-	k3d::graph& get_graph()
-	{
-		if(!m_graph)
-		{
-			m_graph.reset(new k3d::graph());
-			create_graph(*m_document_state, *m_graph);
-
-			m_root_vertex = 0;
-
-			const k3d::graph::topology_t& topology = *m_graph->topology;
-			const size_t vertex_count = boost::num_vertices(topology);
-			const nodes_t& vertex_node = get_array<nodes_t>(m_graph->vertex_data, "node", vertex_count);
-			for(size_t vertex = 0; vertex != vertex_count; ++vertex)
+			if(vertex_node[vertex] == Node)
 			{
-				if(vertex_node[vertex] != m_root_node)
-					continue;
-		
-				m_root_vertex = vertex;
-				tree_plus_layout(*m_graph, vertex, m_column_offset, m_row_offset);
-//				calculate_geometry(*m_graph);
-				break;
+				k3d::property::set_internal_value(*m_graph_layout, "root", vertex);
+				return;
 			}
 		}
-
-		return *m_graph;
 	}
 
 	const double aspect_ratio()
@@ -561,9 +561,7 @@ public:
 
 	void draw_pipeline(const Cairo::RefPtr<Cairo::Context>& Context, const double Width, const double Height)
 	{
-		return_if_fail(m_document_state);
-
-		k3d::graph& graph = get_graph();
+		k3d::graph& graph = *boost::any_cast<k3d::graph*>(k3d::property::pipeline_value(m_graph_layout->output()));
 
 		Context->save();
 
@@ -598,7 +596,7 @@ public:
 			const size_t vertex_count = boost::num_vertices(topology);
 
 			const k3d::graph::bools_t& vertex_visible = get_array<k3d::graph::bools_t>(graph.vertex_data, "visible", vertex_count);
-			const nodes_t& vertex_node = get_array<nodes_t>(graph.vertex_data, "node", vertex_count);
+			const k3d::graph::nodes_t& vertex_node = get_array<k3d::graph::nodes_t>(graph.vertex_data, "node", vertex_count);
 			const k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(graph.vertex_data, "position", vertex_count);
 			Context->save();
 
@@ -731,15 +729,14 @@ private:
 	k3d::point2 m_last_mouse;
 
 	document_state* m_document_state;
-	boost::shared_ptr<k3d::graph> m_graph;
+	boost::scoped_ptr<document_to_graph> m_graph_source;
+	boost::scoped_ptr<tree_plus_layout> m_graph_layout;
+	boost::scoped_ptr<k3d::pipeline> m_graph_pipeline;
 
 	k3d::inode* m_root_node;
-	size_t m_root_vertex;
 
 	double m_node_width;
-	double m_column_offset;
 	double m_node_height;
-	double m_row_offset;
 	double m_arrow_size;
 
 	basic_input_model m_input_model;

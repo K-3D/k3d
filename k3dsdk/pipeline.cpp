@@ -47,6 +47,11 @@ public:
 	{
 	}
 
+	~implementation()
+	{
+		clear();
+	}
+
 	void set_dependencies(dependencies_t& Dependencies, iunknown* Hint = 0)
 	{
 		// Don't let any NULLs creep in ...
@@ -249,6 +254,13 @@ ipipeline::dependency_signal_t& pipeline::dependency_signal()
 void pipeline::clear()
 {
 	m_implementation->clear();
+}
+
+void pipeline::connect(iproperty& From, iproperty& To)
+{
+	dependencies_t dependencies;
+	dependencies.insert(std::make_pair(&To, &From));
+	set_dependencies(dependencies);
 }
 
 } // namespace k3d

@@ -38,7 +38,7 @@ class pipeline :
 {
 public:
 	/// Initialize the pipeline with (optional) undo/redo suppport
-	pipeline(istate_recorder* StateRecorder);
+	pipeline(istate_recorder* StateRecorder = 0);
 	~pipeline();
 
 	// ipipeline methods
@@ -49,6 +49,8 @@ public:
 
 	/// Remove all pipeline connections (not undoable)
 	void clear();
+	/// Makes a connection between two properties
+	void connect(iproperty& From, iproperty& To);
 
 private:
 	class implementation;
