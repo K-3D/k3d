@@ -32,6 +32,7 @@
 #include <k3dsdk/color.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/types.h>
 
@@ -47,6 +48,11 @@ namespace python
 
 namespace detail
 {
+
+bool is_solid(const mesh& Mesh)
+{
+	return k3d::is_solid(Mesh.wrapped());
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // wrap_const_object
@@ -1584,6 +1590,9 @@ void mesh::define_class()
 		.value("negate", k3d::mesh::blobbies_t::NEGATE)
 		.value("identity", k3d::mesh::blobbies_t::IDENTITY)
 		.attr("__module__") = "k3d";
+
+	def("is_solid", detail::is_solid,
+		"Returns true if the given L{const_polyhedra} or L{polyhedra} object contains only solid polyhedra.");
 }
 
 } // namespace python

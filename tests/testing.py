@@ -243,6 +243,10 @@ def mesh_comparison(document, mesh, mesh_name, threshold):
 
 		raise Exception("output mesh differs from reference")
 
+def assert_solid_mesh(mesh):
+	if not k3d.is_solid(mesh.pipeline_value()):
+		raise Exception("output mesh is not solid")
+
 def image_comparison(document, image, image_name, threshold):
 
 	output_file = "@k3d-tests_BINARY_DIR@/" + image_name + ".output.png"

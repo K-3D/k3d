@@ -1,5 +1,5 @@
-#ifndef K3DSDK_MESH_UTILITY_H
-#define K3DSDK_MESH_UTILITY_H
+#ifndef K3DSDK_MESH_OPERATIONS_H
+#define K3DSDK_MESH_OPERATIONS_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -32,7 +32,10 @@ const mesh create_grid(const size_t Rows, const size_t Columns, imaterial* const
 /// Returns a mesh containing a topological "cylinder" of polygons with the given number of polys in each parametric direction
 const mesh create_cylinder(const size_t Rows, const size_t Columns, imaterial* const Material = 0);
 
+/// Returns true iff the given mesh is composed of solid volumes
+const bool is_solid(const mesh& Mesh);
+
 } // namespace k3d
 
-#endif // K3DSDK_MESH_UTILITY_H
+#endif // K3DSDK_MESH_OPERATIONS_H
 

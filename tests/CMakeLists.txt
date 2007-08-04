@@ -135,6 +135,10 @@ K3D_ADD_PYTHON_TEST(bitmap.source.JPEGBitmapReader.py)
 K3D_ADD_PYTHON_TEST(bitmap.source.PNGBitmapReader.py)
 K3D_ADD_PYTHON_TEST(bitmap.source.TIFFBitmapReader.py)
 
+K3D_ADD_PYTHON_TEST(test.mesh.solid.py)
+K3D_ADD_PYTHON_TEST(test.mesh.solid.failure.py)
+SET_TESTS_PROPERTIES(test.mesh.solid.failure.py PROPERTIES WILL_FAIL TRUE)
+
 K3D_ADD_PYTHON_TEST(mesh.source.GTSMeshReader.cube.py)
 K3D_ADD_PYTHON_TEST(mesh.source.GTSMeshReader.gz.cube.py)
 K3D_ADD_PYTHON_TEST(mesh.source.KnotCurve.py)
