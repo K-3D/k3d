@@ -31,21 +31,15 @@ namespace module
 namespace gts
 {
 
-extern k3d::iplugin_factory& boolean_factory();
-extern k3d::iplugin_factory& coarsen_polyhedra_factory();
 extern k3d::iplugin_factory& mesh_area_factory();
 extern k3d::iplugin_factory& mesh_volume_factory();
-extern k3d::iplugin_factory& poly_sphere_tessellation_factory();
 
 } // namespace gts
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::gts::boolean_factory());
-	Registry.register_factory(module::gts::coarsen_polyhedra_factory());
 	Registry.register_factory(module::gts::mesh_area_factory());
 	Registry.register_factory(module::gts::mesh_volume_factory());
-	Registry.register_factory(module::gts::poly_sphere_tessellation_factory());
 K3D_MODULE_END
 
