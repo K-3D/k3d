@@ -1,7 +1,10 @@
+#ifndef GTS_HELPERS_H
+#define GTS_HELPERS_H
+
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 2004-2007, Romain Behar
 //
-// Contact: tshead@k-3d.com
+// Contact: romainbehar@yahoo.com
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -18,34 +21,57 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
+	\brief Defines GTS interface: data types and functions
 	\author Romain Behar (romainbehar@yahoo.com)
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/module.h>
+#include <gts.h>
 
-/// Namespace reserved for the gts plugin module, to protect public symbols from name clashes with other modules
+namespace k3d { class mesh; }
+
 namespace module
 {
 
 namespace gts
 {
 
-extern k3d::iplugin_factory& boolean_factory();
-extern k3d::iplugin_factory& coarsen_polyhedra_factory();
-extern k3d::iplugin_factory& mesh_area_factory();
-extern k3d::iplugin_factory& mesh_volume_factory();
-extern k3d::iplugin_factory& poly_sphere_tessellation_factory();
+/// Converts a K-3D mesh into a GtsSurface
+GtsSurface* convert(const k3d::mesh& Mesh);
+
+/// Smart pointer for holding GTS objects
+template<typename T>
+class gts_ptr
+{
+public:
+	gts_ptr(T* const Object) :
+		m_object(Object)
+	{
+	}
+
+	~gts_ptr()
+	{
+		if(m_object)
+			gts_object_destroy(GTS_OBJECT(m_object));
+	}
+
+	operator T*() const
+	{
+		return m_object;
+	}
+
+	T* operator->() const
+	{
+		return m_object;
+	}
+
+private:
+	T* const m_object;
+};
 
 } // namespace gts
 
 } // namespace module
 
-K3D_MODULE_START(Registry)
-	Registry.register_factory(module::gts::boolean_factory());
-	Registry.register_factory(module::gts::coarsen_polyhedra_factory());
-	Registry.register_factory(module::gts::mesh_area_factory());
-	Registry.register_factory(module::gts::mesh_volume_factory());
-	Registry.register_factory(module::gts::poly_sphere_tessellation_factory());
-K3D_MODULE_END
+#endif // GTS_HELPERS_H
 

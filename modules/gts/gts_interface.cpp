@@ -29,7 +29,10 @@
 #include <set>
 #include <utility>
 
-namespace libk3dgts
+namespace module
+{
+
+namespace gts
 {
 
 namespace detail
@@ -881,5 +884,8 @@ bool copy_polygonal_surface(GtsSurface* Surface, const k3d::legacy::mesh& OldMes
 	return true;
 }
 
-} // namespace libk3dgts
+} // namespace gts
+
+} // namespace module
+
 

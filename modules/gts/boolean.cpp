@@ -35,7 +35,10 @@
 
 #include "gts_interface.h"
 
-namespace libk3dgts
+namespace module
+{
+
+namespace gts
 {
 
 namespace detail
@@ -298,5 +301,8 @@ k3d::iplugin_factory& boolean_factory()
 	return boolean::get_factory();
 }
 
-} // namespace libk3dgts
+} // namespace gts
+
+} // namespace module
+
 

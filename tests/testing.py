@@ -237,11 +237,23 @@ def mesh_comparison(document, mesh, mesh_name, threshold):
 
 	if not difference.equal:
 		print """<DartMeasurement name="Mesh Difference" type="text/text">\n"""
-		print k3d.print_diff(mesh.value(), reference.output_mesh, threshold)
+		print k3d.print_diff(mesh.pipeline_value(), reference.output_mesh, threshold)
 		print """</DartMeasurement>\n"""
 		sys.stdout.flush()
 
 		raise Exception("output mesh differs from reference")
+
+def mesh_area_comparison(calculated_area, expected_area):
+	if calculated_area != expected_area:
+		print """<DartMeasurement name="Calculated Area" type="numeric/float">""" + str(calculated_area) + """</DartMeasurement>"""
+		print """<DartMeasurement name="Expected Area" type="numeric/float">""" + str(expected_area) + """</DartMeasurement>"""
+		raise Exception("incorrect mesh area")
+
+def mesh_volume_comparison(calculated_volume, expected_volume):
+	if calculated_volume != expected_volume:
+		print """<DartMeasurement name="Calculated Volume" type="numeric/float">""" + str(calculated_volume) + """</DartMeasurement>"""
+		print """<DartMeasurement name="Expected Volume" type="numeric/float">""" + str(expected_volume) + """</DartMeasurement>"""
+		raise Exception("incorrect mesh volume")
 
 def assert_solid_mesh(mesh):
 	if not k3d.is_solid(mesh.pipeline_value()):

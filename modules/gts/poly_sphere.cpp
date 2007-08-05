@@ -33,7 +33,10 @@
 
 #include "gts_interface.h"
 
-namespace libk3dgts
+namespace module
+{
+
+namespace gts
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -110,5 +113,8 @@ k3d::iplugin_factory& poly_sphere_tessellation_factory()
 	return poly_sphere_tessellation::get_factory();
 }
 
-} // namespace libk3dgts
+} // namespace gts
+
+} // namespace module
+
 

@@ -29,7 +29,10 @@
 
 #include <gts.h>
 
-namespace libk3dgts
+namespace module
+{
+
+namespace gts
 {
 
 typedef std::vector<unsigned long> edge_t;
@@ -51,7 +54,9 @@ bool copy_polygonal_surface(GtsSurface* Surface, const k3d::legacy::mesh& OldMes
 // polygonal information in overloaded GTS data structures
 GtsSurface* gts_polygonal_surface(const k3d::legacy::mesh& Mesh, unsigned long& PolyhedronIndex);
 
-} // namespace libk3dgts
+} // namespace gts
+
+} // namespace module
 
 #endif // GTS_INTERFACE_H
 

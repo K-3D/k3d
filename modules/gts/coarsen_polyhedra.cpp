@@ -33,7 +33,10 @@
 
 #include "gts_interface.h"
 
-namespace libk3dgts
+namespace module
+{
+
+namespace gts
 {
 
 static gdouble cost_angle(GtsEdge* e)
@@ -165,7 +168,7 @@ public:
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0xdaae61bd, 0xd5b94f9b, 0x90a54f79, 0xf3f78729),
-				"CoarsenPolyhedra",
+				"GTSCoarsenPolyhedra",
 				_("Coarsens polygonal surfaces"),
 				"Polygons",
 				k3d::iplugin_factory::EXPERIMENTAL);
@@ -347,5 +350,8 @@ k3d::iplugin_factory& coarsen_polyhedra_factory()
 	return coarsen_polyhedra::get_factory();
 }
 
-} // namespace libk3dgts
+} // namespace gts
+
+} // namespace module
+
 
