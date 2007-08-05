@@ -39,6 +39,11 @@ namespace gts
 /// Converts a K-3D mesh into a GtsSurface
 GtsSurface* convert(const k3d::mesh& Mesh);
 
+/*
+/// Converts a GtsSurface into a K-3D mesh
+const k3d::mesh convert(GtsSurface* Surface);
+*/
+
 /// Smart pointer for holding GTS objects
 template<typename T>
 class gts_ptr
