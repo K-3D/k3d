@@ -1,7 +1,7 @@
 #python
 
 import k3d
-
+k3d.check_node_environment(locals(), "RenderEngineScript")
 
 graph = """
 digraph G {

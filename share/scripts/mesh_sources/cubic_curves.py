@@ -1,6 +1,8 @@
 #python
 
 import k3d
+k3d.check_node_environment(locals(), "MeshSourceScript")
+
 from random import uniform, seed
 
 seed(1234)

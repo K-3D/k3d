@@ -1,6 +1,8 @@
 #python
 
 import k3d
+k3d.check_node_environment(locals(), "MeshModifierScript")
+
 from math import fmod
 from cgkit.noise import vsnoise
 

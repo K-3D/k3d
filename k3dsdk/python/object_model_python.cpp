@@ -63,6 +63,7 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/inode.h>
+#include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/mesh_diff.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
@@ -169,6 +170,25 @@ iunknown module_create_plugin(const std::string& Type)
 		throw std::invalid_argument("unknown plugin type: " + Type);
 
 	return iunknown(k3d::create_plugin(**plugin_factories.begin()));
+}
+
+void module_check_node_environment(const boost::python::dict& Locals, const std::string& PluginType)
+{
+	if(Locals.has_key("Node"))
+	{
+		boost::python::object object = Locals.get("Node");
+		boost::python::extract<node> node(object);
+		if(node.check())
+		{
+			if(node().inode::wrapped().factory().name() == PluginType)
+			{
+				return;
+			}
+		}
+	}
+
+	k3d::user_interface().error_message(k3d::string_cast(boost::format("This script can only be used from within a %1% plugin.") % PluginType));
+	throw std::runtime_error("script can only be run from " + PluginType);
 }
 
 void module_execute_script_context(const std::string& Script, const boost::python::dict& PythonContext)
@@ -382,6 +402,8 @@ BOOST_PYTHON_MODULE(k3d)
 	node::define_class();
 	ri_render_state::define_class();
 
+	def("check_node_environment", module_check_node_environment,
+		"Checks to see whether the current script is running from within the given node type.");
 	def("close_document", module_close_document,
 		"Closes an open document.");
 	def("command_nodes", module_command_nodes,

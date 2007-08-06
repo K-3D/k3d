@@ -1,6 +1,8 @@
 #python
 
 import k3d
+k3d.check_node_environment(locals(), "MeshModifierScript")
+
 from random import seed, uniform
 
 Output.copy(Input)

@@ -1,6 +1,7 @@
 #python
 
 import k3d
+k3d.check_node_environment(locals(), "MeshSourceScript")
 
 positions = [
 	(-5, -5, 0), (-2, -5, 2), (2, -5, -2), (5, -5, 0),

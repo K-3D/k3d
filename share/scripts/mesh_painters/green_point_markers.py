@@ -1,5 +1,8 @@
 #python
 
+import k3d
+k3d.check_node_environment(locals(), "MeshPainterScript")
+
 from OpenGL.GL import *
 
 points = Mesh.points()

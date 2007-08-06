@@ -1,6 +1,7 @@
 #python
 
 import k3d
+k3d.check_node_environment(locals(), "MeshSourceScript")
 
 ellipsoids = [k3d.point3(-1, 0, 1), k3d.point3(1, 0, 1), k3d.point3(1, 0, -1), k3d.point3(-1, 0, -1)]
 
