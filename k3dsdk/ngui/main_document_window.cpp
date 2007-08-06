@@ -2311,7 +2311,7 @@ private:
 		k3d::filesystem::igzstream file(filepath);
 
 		k3d::iscript_engine::context_t context;
-		context["Document"] = static_cast<k3d::iunknown*>(&document());
+		context["Document"] = &document();
 
 		execute_script(file, filepath.native_utf8_string().raw(), context);
 	}

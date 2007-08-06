@@ -24,6 +24,7 @@
 #include "angle_axis_python.h"
 #include "any_python.h"
 #include "bitmap_python.h"
+#include "idocument_python.h"
 #include "mesh_python.h"
 #include "node_python.h"
 #include "ri_render_state_python.h"
@@ -47,10 +48,15 @@ namespace k3d
 namespace python
 {
 
-/// Converts a boost::any object to a Python value
+namespace detail
+{
+
+
+
+} // namespace detail
+
 const object any_to_python(const boost::any& Value)
 {
-	// We put the likely types up front for efficiency ...
 	const std::type_info& type = Value.type();
 
 	if(type == typeid(bool))
@@ -106,20 +112,26 @@ const object any_to_python(const boost::any& Value)
 
 	if(type == typeid(k3d::mesh*))
 	{
-		k3d::mesh* const k3d_mesh = boost::any_cast<k3d::mesh*>(Value);
-		return k3d_mesh ? object(mesh(k3d_mesh)) : object();
+		k3d::mesh* const value = boost::any_cast<k3d::mesh*>(Value);
+		return value ? object(mesh(value)) : object();
 	}
 
 	if(type == typeid(k3d::bitmap*))
 	{
-		k3d::bitmap* const k3d_bitmap = boost::any_cast<k3d::bitmap*>(Value);
-		return k3d_bitmap ? object(bitmap(k3d_bitmap)) : object();
+		k3d::bitmap* const value = boost::any_cast<k3d::bitmap*>(Value);
+		return value ? object(bitmap(value)) : object();
 	}
 
 	if(type == typeid(k3d::inode*))
 	{
-		k3d::inode* const k3d_node = boost::any_cast<k3d::inode*>(Value);
-		return k3d_node ? object(node(k3d_node)) : object();
+		k3d::inode* const value = boost::any_cast<k3d::inode*>(Value);
+		return value ? object(node(value)) : object();
+	}
+
+	if(type == typeid(k3d::idocument*))
+	{
+		k3d::idocument* const value = boost::any_cast<k3d::idocument*>(Value);
+		return value ? object(idocument(value)) : object();
 	}
 
 	if(type == typeid(const k3d::ri::render_state*))
@@ -130,7 +142,29 @@ const object any_to_python(const boost::any& Value)
 	throw std::invalid_argument("can't convert unrecognized type [" + demangle(type) + "] to boost::python::object");
 }
 
-/// Converts a Python value to a boost::any object, with the target type explicitly specified
+const boost::any python_to_any(const object& Value)
+{
+	PyObject* const value = Value.ptr();
+
+	{
+		extract<idocument> value(Value);
+		if(value.check())
+		{
+			return boost::any(value().wrapped_ptr());
+		}
+	}
+
+	{
+		extract<inode> value(Value);
+		if(value.check())
+		{
+			return boost::any(value().wrapped_ptr());
+		}
+	}
+
+	throw std::invalid_argument("can't convert unrecognized python value");
+}
+
 const boost::any python_to_any(const object& Value, const std::type_info& TargetType)
 {
 	PyObject* const value = Value.ptr();

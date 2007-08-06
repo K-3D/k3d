@@ -32,6 +32,8 @@ namespace python
 
 /// Converts a boost::any object to a Python object
 const boost::python::object any_to_python(const boost::any& Value);
+/// Converts a Python value to a boost::any object
+const boost::any python_to_any(const boost::python::object& Value);
 /// Converts a Python value to a boost::any object, with the target type explicitly specified
 const boost::any python_to_any(const boost::python::object& Value, const std::type_info& TargetType);
 

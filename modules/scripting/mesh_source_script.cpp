@@ -83,8 +83,8 @@ public:
 	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
 		k3d::iscript_engine::context_t context;
-		context["Document"] = static_cast<k3d::iunknown*>(&document());
-		context["Node"] = static_cast<k3d::iunknown*>(this);
+		context["Document"] = &document();
+		context["Node"] = static_cast<k3d::inode*>(this);
 		context["Output"] = &Mesh;
 
 		execute_script(context);

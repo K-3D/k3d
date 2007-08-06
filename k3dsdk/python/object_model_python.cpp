@@ -171,9 +171,23 @@ iunknown module_create_plugin(const std::string& Type)
 	return iunknown(k3d::create_plugin(**plugin_factories.begin()));
 }
 
-void module_execute_script(const std::string& Script)
+void module_execute_script_context(const std::string& Script, const boost::python::dict& PythonContext)
 {
 	k3d::iscript_engine::context_t context;
+
+	boost::python::dict python_context = PythonContext;
+	while(boost::python::len(python_context))
+	{
+		boost::python::tuple python_item = python_context.popitem();
+		boost::python::object python_key = python_item[0];
+		boost::python::object python_value = python_item[1];
+
+		const std::string key = PyString_AsString(python_key.ptr());
+		boost::any value = python_to_any(python_value);
+
+		context.insert(std::make_pair(key, value));
+	}
+
 	bool recognized = false;
 	bool executed = false;
 	k3d::script::execute(k3d::script::code(Script), "Python Text", context, recognized, executed);
@@ -181,6 +195,11 @@ void module_execute_script(const std::string& Script)
 		throw std::invalid_argument("Unrecognized scripting language");
 	if(!executed)
 		throw std::runtime_error("Error executing script");
+}
+
+void module_execute_script(const std::string& Script)
+{
+	module_execute_script_context(Script, boost::python::dict());
 }
 
 const double module_length(const object& Value)
@@ -381,6 +400,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns the difference of two L{mesh} objects as a string.");
 	def("execute_script", module_execute_script,
 		"Executes a script (which does not have to be written in Python).");
+	def("execute_script", module_execute_script_context,
+		"Executes a script (which does not have to be written in Python).");
 	def("exit", module_exit,
 		"Request program exit (may be overridden by user input).");
 	def("get_command_node", module_get_command_node,
@@ -432,23 +453,7 @@ void set_context(const k3d::iscript_engine::context_t& Context, boost::python::d
 	{
 		try
 		{
-			k3d::iunknown* const unknown = context->second.type() == typeid(k3d::iunknown*) ? boost::any_cast<k3d::iunknown*>(context->second) : 0;
-			if(k3d::idocument* const k3d_document = dynamic_cast<k3d::idocument*>(unknown))
-			{
-				Dictionary[context->first] = idocument(k3d_document);
-			}
-			else if(k3d::inode* const k3d_node = dynamic_cast<k3d::inode*>(unknown))
-			{
-				Dictionary[context->first] = node(k3d_node);
-			}
-			else if(context->second.type() == typeid(k3d::mesh*))
-			{
-				Dictionary[context->first] = mesh(boost::any_cast<k3d::mesh*>(context->second));
-			}
-			else
-			{
-				Dictionary[context->first] = any_to_python(context->second);
-			}
+			Dictionary[context->first] = any_to_python(context->second);
 		}
 		catch(std::exception& e)
 		{
@@ -464,19 +469,19 @@ void get_context(boost::python::dict& Dictionary, k3d::iscript_engine::context_t
 {
 	for(k3d::iscript_engine::context_t::iterator context = Context.begin(); context != Context.end(); ++context)
 	{
-		k3d::iunknown* const unknown = context->second.type() == typeid(k3d::iunknown*) ? boost::any_cast<k3d::iunknown*>(context->second) : 0;
+		const std::type_info& type = context->second.type();
 
-		if(dynamic_cast<k3d::idocument*>(unknown))
+		if(type == typeid(k3d::idocument*))
 			continue;
-		else if(dynamic_cast<k3d::inode*>(unknown))
+		else if(type == typeid(k3d::inode*))
 			continue;
-		else if(context->second.type() == typeid(k3d::mesh*))
+		else if(type == typeid(k3d::mesh*))
 			continue;
-		else if(context->second.type() == typeid(const k3d::ri::render_state*))
+		else if(type == typeid(const k3d::ri::render_state*))
 			continue;
 		else
 		{
-			context->second = python_to_any(Dictionary[context->first], context->second.type());
+			context->second = python_to_any(Dictionary[context->first], type);
 		}
 	}
 }

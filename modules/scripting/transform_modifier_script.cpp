@@ -65,8 +65,8 @@ public:
 		k3d::matrix4 output = input;
 
 		k3d::iscript_engine::context_t context;
-		context["Document"] = static_cast<k3d::iunknown*>(&document());
-		context["Node"] = static_cast<k3d::iunknown*>(this);
+		context["Document"] = &document();
+		context["Node"] = static_cast<k3d::inode*>(this);
 		context["Input"] = input;
 		context["Output"] = output;
 

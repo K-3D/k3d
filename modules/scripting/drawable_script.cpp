@@ -65,8 +65,8 @@ public:
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
 		k3d::iscript_engine::context_t context;
-		context["Document"] = static_cast<k3d::iunknown*>(&document());
-		context["Node"] = static_cast<k3d::iunknown*>(this);
+		context["Document"] = &document();
+		context["Node"] = static_cast<k3d::inode*>(this);
 		execute_script(context);
 	}
 
@@ -75,8 +75,8 @@ public:
 		k3d::gl::push_selection_token(this);
 
 		k3d::iscript_engine::context_t context;
-		context["Document"] = static_cast<k3d::iunknown*>(&document());
-		context["Node"] = static_cast<k3d::iunknown*>(this);
+		context["Document"] = &document();
+		context["Node"] = static_cast<k3d::inode*>(this);
 		execute_script(context);
 
 		k3d::gl::pop_selection_token();

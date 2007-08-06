@@ -186,7 +186,7 @@ private:
 		std::istringstream script(m_script.get_buffer()->get_text());
 
 		k3d::iscript_engine::context_t context;
-		context["Document"] = static_cast<k3d::iunknown*>(&document());
+		context["Document"] = &document();
 
 		execute_script(script, get_title(), context);
 
