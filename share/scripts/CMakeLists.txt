@@ -2,8 +2,9 @@ FILE(GLOB PY_FILES *.py)
 INSTALL(FILES ${PY_FILES} DESTINATION share/k3d/scripts)
 
 ADD_SUBDIRECTORY(animation)
-ADD_SUBDIRECTORY(mesh_modifiers)
-ADD_SUBDIRECTORY(mesh_painters)
-ADD_SUBDIRECTORY(mesh_sources)
-ADD_SUBDIRECTORY(renderman)
+ADD_SUBDIRECTORY(MeshModifierScript)
+ADD_SUBDIRECTORY(MeshPainterScript)
+ADD_SUBDIRECTORY(MeshSourceScript)
+ADD_SUBDIRECTORY(RenderEngineScript)
+ADD_SUBDIRECTORY(RenderManScript)
 
