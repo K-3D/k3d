@@ -4,6 +4,8 @@
 # what is either a Tribble or a really bad-hair-day ...
 
 import k3d
+k3d.check_node_environment(locals(), "RenderManScript")
+
 import sys
 import ri
 from ri import *
