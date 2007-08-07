@@ -54,6 +54,11 @@ bool is_solid(const mesh& Mesh)
 	return k3d::is_solid(Mesh.wrapped());
 }
 
+bool is_triangles(const mesh& Mesh)
+{
+	return k3d::is_triangles(Mesh.wrapped());
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // wrap_const_object
 
@@ -1592,7 +1597,9 @@ void mesh::define_class()
 		.attr("__module__") = "k3d";
 
 	def("is_solid", detail::is_solid,
-		"Returns true if the given L{const_polyhedra} or L{polyhedra} object contains only solid polyhedra.");
+		"Returns true if every L{polyhedra} in the given L{mesh} is solid.");
+	def("is_triangles", detail::is_triangles,
+		"Returns true if face in the given L{mesh} is a triangle.");
 }
 
 } // namespace python

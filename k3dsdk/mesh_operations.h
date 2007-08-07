@@ -32,8 +32,10 @@ const mesh create_grid(const size_t Rows, const size_t Columns, imaterial* const
 /// Returns a mesh containing a topological "cylinder" of polygons with the given number of polys in each parametric direction
 const mesh create_cylinder(const size_t Rows, const size_t Columns, imaterial* const Material = 0);
 
-/// Returns true iff the given mesh is composed of solid volumes
+/// Returns true iff every polyhedron in the given mesh is solid volume
 const bool is_solid(const mesh& Mesh);
+/// Returns true iff every face in the given mesh is a triangle
+const bool is_triangles(const mesh& Mesh);
 
 } // namespace k3d
 

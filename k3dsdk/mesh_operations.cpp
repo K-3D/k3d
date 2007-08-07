@@ -205,5 +205,37 @@ const bool is_solid(const mesh& Mesh)
 	return true;
 }
 
+const bool is_triangles(const mesh& Mesh)
+{
+	if(!validate_polyhedra(Mesh))
+		return true;
+	
+	const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+	const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+
+	const size_t face_begin = 0;
+	const size_t face_end = face_begin + face_first_loops.size();
+	for(size_t face = face_begin; face != face_end; ++face)
+	{
+		size_t edge_count = 0;
+		const size_t first_edge = loop_first_edges[face_first_loops[face]];
+		for(size_t edge = first_edge; ; )
+		{
+			++edge_count;
+
+			edge = clockwise_edges[edge];
+			if(edge == first_edge)
+				break;
+		}
+
+		if(edge_count != 3)
+			return false;
+	}
+
+	return true;
+}
+
 } // namespace k3d
 
