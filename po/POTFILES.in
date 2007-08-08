@@ -154,7 +154,6 @@ modules/development/point_array_painter.cpp
 modules/development/sds_gl_painter.cpp
 modules/development/sds_vbo_painter.cpp
 modules/development/sharp_edges.cpp
-modules/development/triangulate_faces.cpp
 modules/development/tweak_points.cpp
 modules/freetype2/poly_text.cpp
 modules/glx/camera_to_bitmap.cpp
