@@ -105,6 +105,7 @@ def setup_mesh_source_test(source_name):
 	result = result_object
 	result.document = doc
 	result.source = source
+	result.output_mesh = source.get_property("output_mesh").pipeline_value()
 
 	return result
 
@@ -255,8 +256,12 @@ def mesh_volume_comparison(calculated_volume, expected_volume):
 		print """<DartMeasurement name="Expected Volume" type="numeric/float">""" + str(expected_volume) + """</DartMeasurement>"""
 		raise Exception("incorrect mesh volume")
 
+def assert_valid_mesh(mesh):
+	if not k3d.validate(mesh):
+		raise Exception("output mesh is not valid")
+
 def assert_solid_mesh(mesh):
-	if not k3d.is_solid(mesh.pipeline_value()):
+	if not k3d.is_solid(mesh):
 		raise Exception("output mesh is not solid")
 
 def image_comparison(document, image, image_name, threshold):

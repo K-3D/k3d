@@ -49,12 +49,17 @@ namespace python
 namespace detail
 {
 
-bool is_solid(const mesh& Mesh)
+const bool validate(mesh& Mesh)
+{
+	return k3d::validate(Mesh.wrapped());
+}
+
+const bool is_solid(const mesh& Mesh)
 {
 	return k3d::is_solid(Mesh.wrapped());
 }
 
-bool is_triangles(const mesh& Mesh)
+const bool is_triangles(const mesh& Mesh)
 {
 	return k3d::is_triangles(Mesh.wrapped());
 }
@@ -1596,6 +1601,8 @@ void mesh::define_class()
 		.value("identity", k3d::mesh::blobbies_t::IDENTITY)
 		.attr("__module__") = "k3d";
 
+	def("validate", detail::validate,
+		"Returns true if the given L{mesh} contains valid data.");
 	def("is_solid", detail::is_solid,
 		"Returns true if every L{polyhedra} in the given L{mesh} is solid.");
 	def("is_triangles", detail::is_triangles,

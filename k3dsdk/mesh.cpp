@@ -1056,7 +1056,11 @@ const bool validate_points(const mesh& Mesh)
 	if(!Mesh.points)
 		return false;
 
+	// If the mesh has points, it must have storage for point selections
 	return_val_if_fail(Mesh.point_selection, false);
+
+	// The point and point selection arrays must be the same length
+	return_val_if_fail(Mesh.points->size() == Mesh.point_selection->size(), false);
 
 	return true;
 }
@@ -1066,8 +1070,7 @@ const bool validate_point_groups(const mesh& Mesh)
 	if(!Mesh.point_groups)
 		return false;
 
-	return_val_if_fail(Mesh.points, false);
-	return_val_if_fail(Mesh.point_selection, false);
+	return_val_if_fail(validate_points(Mesh), false);
 	return_val_if_fail(Mesh.point_groups->first_points, false);
 	return_val_if_fail(Mesh.point_groups->point_counts, false);
 	return_val_if_fail(Mesh.point_groups->points, false);
@@ -1081,8 +1084,7 @@ const bool validate_linear_curve_groups(const mesh& Mesh)
 	if(!Mesh.linear_curve_groups)
 		return false;
 
-	return_val_if_fail(Mesh.points, false);
-	return_val_if_fail(Mesh.point_selection, false);
+	return_val_if_fail(validate_points(Mesh), false);
 	return_val_if_fail(Mesh.linear_curve_groups->first_curves, false);
 	return_val_if_fail(Mesh.linear_curve_groups->curve_counts, false);
 	return_val_if_fail(Mesh.linear_curve_groups->periodic_curves, false);
@@ -1100,8 +1102,7 @@ const bool validate_cubic_curve_groups(const mesh& Mesh)
 	if(!Mesh.cubic_curve_groups)
 		return false;
 
-	return_val_if_fail(Mesh.points, false);
-	return_val_if_fail(Mesh.point_selection, false);
+	return_val_if_fail(validate_points(Mesh), false);
 	return_val_if_fail(Mesh.cubic_curve_groups->first_curves, false);
 	return_val_if_fail(Mesh.cubic_curve_groups->curve_counts, false);
 	return_val_if_fail(Mesh.cubic_curve_groups->periodic_curves, false);
@@ -1119,8 +1120,7 @@ const bool validate_nurbs_curve_groups(const mesh& Mesh)
 	if(!Mesh.nurbs_curve_groups)
 		return false;
 
-	return_val_if_fail(Mesh.points, false);
-	return_val_if_fail(Mesh.point_selection, false);
+	return_val_if_fail(validate_points(Mesh), false);
 	return_val_if_fail(Mesh.nurbs_curve_groups->first_curves, false);
 	return_val_if_fail(Mesh.nurbs_curve_groups->curve_counts, false);
 	return_val_if_fail(Mesh.nurbs_curve_groups->curve_first_points, false);
@@ -1141,8 +1141,7 @@ const bool validate_bilinear_patches(const mesh& Mesh)
 	if(!Mesh.bilinear_patches)
 		return false;
 
-	return_val_if_fail(Mesh.points, false);
-	return_val_if_fail(Mesh.point_selection, false);
+	return_val_if_fail(validate_points(Mesh), false);
 	return_val_if_fail(Mesh.bilinear_patches->patch_points, false);
 	return_val_if_fail(Mesh.bilinear_patches->patch_selection, false);
 	return_val_if_fail(Mesh.bilinear_patches->patch_materials, false);
@@ -1155,8 +1154,7 @@ const bool validate_bicubic_patches(const mesh& Mesh)
 	if(!Mesh.bicubic_patches)
 		return false;
 
-	return_val_if_fail(Mesh.points, false);
-	return_val_if_fail(Mesh.point_selection, false);
+	return_val_if_fail(validate_points(Mesh), false);
 	return_val_if_fail(Mesh.bicubic_patches->patch_points, false);
 	return_val_if_fail(Mesh.bicubic_patches->patch_selection, false);
 	return_val_if_fail(Mesh.bicubic_patches->patch_materials, false);
@@ -1169,8 +1167,7 @@ const bool validate_nurbs_patches(const mesh& Mesh)
 	if(!Mesh.nurbs_patches)
 		return false;
 
-	return_val_if_fail(Mesh.points, false);
-	return_val_if_fail(Mesh.point_selection, false);
+	return_val_if_fail(validate_points(Mesh), false);
 	return_val_if_fail(Mesh.nurbs_patches->patch_first_points, false);
 	return_val_if_fail(Mesh.nurbs_patches->patch_u_point_counts, false);
 	return_val_if_fail(Mesh.nurbs_patches->patch_v_point_counts, false);
@@ -1193,19 +1190,60 @@ const bool validate_polyhedra(const mesh& Mesh)
 	if(!Mesh.polyhedra)
 		return false;
 
-	return_val_if_fail(Mesh.points, false);
-	return_val_if_fail(Mesh.point_selection, false);
+	return_val_if_fail(validate_points(Mesh), false);
 	return_val_if_fail(Mesh.polyhedra->first_faces, false);
 	return_val_if_fail(Mesh.polyhedra->face_counts, false);
 	return_val_if_fail(Mesh.polyhedra->types, false);
 	return_val_if_fail(Mesh.polyhedra->face_first_loops, false);
 	return_val_if_fail(Mesh.polyhedra->face_loop_counts, false);
+	return_val_if_fail(Mesh.polyhedra->face_selection, false);
+	return_val_if_fail(Mesh.polyhedra->face_materials, false);
 	return_val_if_fail(Mesh.polyhedra->loop_first_edges, false);
 	return_val_if_fail(Mesh.polyhedra->edge_points, false);
 	return_val_if_fail(Mesh.polyhedra->clockwise_edges, false);
-	return_val_if_fail(Mesh.polyhedra->face_selection, false);
 	return_val_if_fail(Mesh.polyhedra->edge_selection, false);
-	return_val_if_fail(Mesh.polyhedra->face_materials, false);
+
+	return_val_if_fail(Mesh.polyhedra->first_faces->size() == Mesh.polyhedra->face_counts->size(), false);
+	return_val_if_fail(Mesh.polyhedra->first_faces->size() == Mesh.polyhedra->types->size(), false);
+
+	return_val_if_fail(Mesh.polyhedra->face_first_loops->size() == Mesh.polyhedra->face_loop_counts->size(), false);
+	return_val_if_fail(Mesh.polyhedra->face_first_loops->size() == Mesh.polyhedra->face_selection->size(), false);
+	return_val_if_fail(Mesh.polyhedra->face_first_loops->size() == Mesh.polyhedra->face_materials->size(), false);
+
+	return_val_if_fail(Mesh.polyhedra->edge_points->size() == Mesh.polyhedra->clockwise_edges->size(), false);
+	return_val_if_fail(Mesh.polyhedra->edge_points->size() == Mesh.polyhedra->edge_selection->size(), false);
+
+	// Check for infinite loops
+	const mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+
+	const size_t loop_begin = 0;
+	const size_t loop_end = loop_begin + loop_first_edges.size();
+	for(size_t loop = loop_begin; loop != loop_end; ++loop)
+	{
+		const size_t first_edge = loop_first_edges[loop];
+		size_t edge_slow = first_edge;
+		size_t edge_fast = first_edge;
+		size_t cycle_count = 0;
+		while(true)
+		{
+			edge_slow = clockwise_edges[edge_slow];
+			edge_fast = clockwise_edges[clockwise_edges[edge_fast]];
+
+			if(edge_slow == edge_fast)
+				++cycle_count;
+
+			if(cycle_count > 2)
+			{
+				log() << error << "infinite loop at loop index " << loop << std::endl;
+				return false;
+			}
+
+			if(edge_slow == first_edge)
+				break;
+		}
+	}
 
 	return true;
 }
@@ -1233,11 +1271,13 @@ const bool validate_blobbies(const mesh& Mesh)
 
 const bool is_sds(const mesh& Mesh)
 {
-	return_val_if_fail(validate_polyhedra(Mesh), false);
+	if(!validate_polyhedra(Mesh))
+		return false;
+
 	const mesh::polyhedra_t::types_t& types = *Mesh.polyhedra->types;
-	for (size_t type = 0; type != types.size(); ++type)
+	for(size_t type = 0; type != types.size(); ++type)
 	{
-		if (types[type] ==  mesh::polyhedra_t::CATMULL_CLARK)
+		if(types[type] == mesh::polyhedra_t::CATMULL_CLARK)
 			return true;
 	}
 	return false;
