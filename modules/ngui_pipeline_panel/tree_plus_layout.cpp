@@ -87,9 +87,9 @@ void tree_plus_layout(
 } // namespace detail
 
 tree_plus_layout::tree_plus_layout() :
-	m_root(init_owner(*this) + init_name("root") + init_label(_("")) + init_description(_("")) + init_value(0)),
-	m_column_offset(init_owner(*this) + init_name("column_offset") + init_label(_("")) + init_description(_("")) + init_value(1.0)),
-	m_row_offset(init_owner(*this) + init_name("row_offset") + init_label(_("")) + init_description(_("")) + init_value(1.0))
+	m_root(init_owner(*this) + init_name("root") + init_label("") + init_description("") + init_value(0)),
+	m_column_offset(init_owner(*this) + init_name("column_offset") + init_label("") + init_description("") + init_value(1.0)),
+	m_row_offset(init_owner(*this) + init_name("row_offset") + init_label("") + init_description("") + init_value(1.0))
 {
 	m_root.changed_signal().connect(make_reset_graph_slot());
 	m_column_offset.changed_signal().connect(make_reset_graph_slot());
