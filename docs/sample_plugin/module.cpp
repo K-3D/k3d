@@ -5,27 +5,30 @@
 
 #include <iostream>
 
-namespace sample_module
+namespace module
 {
 
-class sample_plugin :
+namespace sample
+{
+
+class plugin :
 	public k3d::node
 {
 public:
-	sample_plugin(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	plugin(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		k3d::node(Factory, Document)
 	{
 		k3d::log() << debug << "Howdy, World!" << std::endl;
 	}
 
-	~sample_plugin()
+	~plugin()
 	{
 		k3d::log() << debug << "Goodbye, Cruel World!" << std::endl;
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<sample_plugin> factory(
+		static k3d::document_plugin_factory<plugin> factory(
 			k3d::uuid(0x35b34163, 0xa1ee432a, 0x8f8503d2, 0xf09e7ac7),
 			"SamplePlugin",
 			"Sample K-3D document plugin",
@@ -36,9 +39,11 @@ public:
 	}
 };
 
-} // namespace sample_module
+} // namespace sample
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(sample_module::sample_plugin::get_factory());
+	Registry.register_factory(module::sample::plugin::get_factory());
 K3D_MODULE_END
 
