@@ -37,7 +37,10 @@
 
 #include <subdivision_surface/k3d_sds_binding.h>
 
-namespace libk3ddevelopment
+namespace module
+{
+
+namespace development
 {
 
 typedef std::map<size_t, size_t> indexmap_t;
@@ -302,7 +305,8 @@ void get_deformed_faces(const k3d::mesh::polyhedra_t& Polyhedra, const k3d::mesh
 /// Clean VBO state. Call before and after VBO command sequence to ensure OpenGL state consistancy across painters
 void clean_vbo_state();
 
-}
+} // namespace development
 
+} // namespace module
 
 #endif

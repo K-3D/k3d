@@ -24,10 +24,10 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the gts plugin module, to protect public symbols from name clashes with other modules
 namespace module
 {
 
+/// Namespace reserved for the gts plugin module, to protect public symbols from name clashes with other modules
 namespace gts
 {
 

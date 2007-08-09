@@ -29,7 +29,10 @@
 
 #include <map>
 
-namespace libk3ddevelopment
+namespace module
+{
+
+namespace development
 {
 
 ////////
@@ -1070,4 +1073,6 @@ void clean_vbo_state()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-} // namespace libk3ddevelopment
+} // namespace development
+
+} // namespace module

@@ -23,8 +23,11 @@
 
 #include <k3dsdk/module.h>
 
+namespace module
+{
+
 /// Namespace reserved for the development plugin module, to protect public symbols from name clashes with other modules
-namespace libk3ddevelopment
+namespace development
 {
 
 extern k3d::iplugin_factory& edge_array_painter_factory();
@@ -40,24 +43,28 @@ extern k3d::iplugin_factory& sds_edge_painter_factory();
 extern k3d::iplugin_factory& sds_face_painter_factory();
 extern k3d::iplugin_factory& sds_point_painter_factory();
 extern k3d::iplugin_factory& sharp_edges_factory();
+extern k3d::iplugin_factory& triangulate_faces_factory();
 extern k3d::iplugin_factory& tweak_points_factory();
 
-} // namespace libk3ddevelopment
+} // namespace development
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3ddevelopment::edge_array_painter_factory());
-	Registry.register_factory(libk3ddevelopment::face_painter_edge_normals_factory());
-	Registry.register_factory(libk3ddevelopment::face_painter_flat_normals_factory());
-	Registry.register_factory(libk3ddevelopment::face_painter_smooth_normals_factory());
-	Registry.register_factory(libk3ddevelopment::glsl_painter_factory());
-	Registry.register_factory(libk3ddevelopment::point_array_painter_factory());
-	Registry.register_factory(libk3ddevelopment::sds_gl_edge_painter_factory());
-	Registry.register_factory(libk3ddevelopment::sds_gl_face_painter_factory());
-	Registry.register_factory(libk3ddevelopment::sds_gl_point_painter_factory());
-	Registry.register_factory(libk3ddevelopment::sds_edge_painter_factory());
-	Registry.register_factory(libk3ddevelopment::sds_face_painter_factory());
-	Registry.register_factory(libk3ddevelopment::sds_point_painter_factory());
-	Registry.register_factory(libk3ddevelopment::sharp_edges_factory());
-	Registry.register_factory(libk3ddevelopment::tweak_points_factory());
+	Registry.register_factory(module::development::edge_array_painter_factory());
+	Registry.register_factory(module::development::face_painter_edge_normals_factory());
+	Registry.register_factory(module::development::face_painter_flat_normals_factory());
+	Registry.register_factory(module::development::face_painter_smooth_normals_factory());
+	Registry.register_factory(module::development::glsl_painter_factory());
+	Registry.register_factory(module::development::point_array_painter_factory());
+	Registry.register_factory(module::development::sds_gl_edge_painter_factory());
+	Registry.register_factory(module::development::sds_gl_face_painter_factory());
+	Registry.register_factory(module::development::sds_gl_point_painter_factory());
+	Registry.register_factory(module::development::sds_edge_painter_factory());
+	Registry.register_factory(module::development::sds_face_painter_factory());
+	Registry.register_factory(module::development::sds_point_painter_factory());
+	Registry.register_factory(module::development::sharp_edges_factory());
+	Registry.register_factory(module::development::triangulate_faces_factory());
+	Registry.register_factory(module::development::tweak_points_factory());
 K3D_MODULE_END
 

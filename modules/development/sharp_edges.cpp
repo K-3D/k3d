@@ -38,7 +38,10 @@
 
 #include <list>
 
-namespace libk3ddevelopment
+namespace module
+{
+
+namespace development
 {
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -136,4 +139,7 @@ k3d::iplugin_factory& sharp_edges_factory()
 	return sharp_edges::get_factory();
 }
 
-} // namespace libk3ddevelopment
+} // namespace development
+
+} // namespace module
+

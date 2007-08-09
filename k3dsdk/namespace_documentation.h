@@ -24,6 +24,9 @@ namespace Glib {}
 /// Namespace reserved for the gtkmm C++ wrappers for GTK, see http://gtkmm.sourceforge.net
 namespace Gtk {}
 
+/// Namespace reserved for K-3D plugin modules
+namespace module {}
+
 /// Namespace reserved for all public symbols in the K-3D SDK
 namespace k3d
 {

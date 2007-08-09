@@ -24,7 +24,10 @@
 
 #include <k3dsdk/mesh_painter_gl.h>
 
-namespace libk3ddevelopment
+namespace module
+{
+
+namespace development
 {
 
 class colored_selection_painter : 
@@ -79,6 +82,9 @@ private:
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_selected_component_color;
 }; // class colored_selection_painter
 
-} // namespace libk3ddevelopment
+} // namespace development
+
+} // namespace module
 
 #endif /*COLORED_SELECTION_PAINTER_GL_H_*/
+

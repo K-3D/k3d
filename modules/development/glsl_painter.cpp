@@ -30,7 +30,10 @@
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property.h>
 
-namespace libk3ddevelopment
+namespace module
+{
+
+namespace development
 {
 
 GLhandleARB compile_shader(const GLenum ShaderType, const std::string& ShaderSource)
@@ -205,5 +208,8 @@ k3d::iplugin_factory& glsl_painter_factory()
 	return glsl_painter::get_factory();
 }
 
-} // namespace libk3ddevelopment
+} // namespace development
+
+} // namespace module
+
 

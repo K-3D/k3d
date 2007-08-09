@@ -37,7 +37,10 @@
 #include "colored_selection_painter_gl.h"
 #include "vbo.h"
 
-namespace libk3ddevelopment
+namespace module
+{
+
+namespace development
 {
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -229,5 +232,8 @@ private:
 		return edge_array_painter::get_factory();
 	}
 
-} // namespace libk3ddevelopment
+} // namespace development
+
+} // namespace module
+
 

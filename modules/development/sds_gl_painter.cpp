@@ -39,7 +39,10 @@
 #include "vbo.h"
 #include "colored_selection_painter_gl.h"
 
-namespace libk3ddevelopment
+namespace module
+{
+
+namespace development
 {
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -324,5 +327,7 @@ k3d::iplugin_factory& sds_gl_point_painter_factory()
 	return sds_gl_point_painter::get_factory();
 }
 
-} // namespace libk3ddevelopment
+} // namespace development
+
+} // namespace module
 

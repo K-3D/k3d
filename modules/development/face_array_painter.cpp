@@ -38,7 +38,10 @@
 #include "colored_selection_painter_gl.h"
 #include "vbo.h"
 
-namespace libk3ddevelopment
+namespace module
+{
+
+namespace development
 {
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -332,5 +335,8 @@ class face_painter_smooth_normals : public face_array_painter<smooth_face>
 		return face_painter_smooth_normals::get_factory();
 	}
 
-} // namespace libk3ddevelopment
+} // namespace development
+
+} // namespace module
+
 

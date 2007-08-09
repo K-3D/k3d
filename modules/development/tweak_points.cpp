@@ -37,7 +37,10 @@
 
 #include <list>
 
-namespace libk3ddevelopment
+namespace module
+{
+
+namespace development
 {
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -315,4 +318,7 @@ k3d::iplugin_factory& tweak_points_factory()
 	return tweak_points::get_factory();
 }
 
-} // namespace libk3ddevelopment
+} // namespace development
+
+} // namespace module
+
