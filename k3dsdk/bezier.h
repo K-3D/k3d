@@ -28,7 +28,8 @@
 #include "bezier_private.h"
 
 #include <cassert>
-#include <cmath>
+#include <iterator>
+#include <vector>
 
 namespace k3d
 {
@@ -56,13 +57,30 @@ double bezier_function(const iterator_t First, const iterator_t Last, const doub
 			result = bezier<n, value_t, iterator_t>(First, Last, t);
 			Error = X - result[0];
 
-			if(fabs(Error) < MaxError)
+			if(std::abs(Error) < MaxError)
 				return result[1];
 
 			t += 0.4 * Error;
 		}
 
 	return result[1];
+}
+
+/// Returns a Bezier / Bernstein basis for the given order, control point number, and parameter value
+double BernsteinBasis(const unsigned long Order, const unsigned long ControlPoint, const double Parameter);
+
+/// Computes a Bezier curve value with given order,  control points, and parameter value
+template<class Type>
+Type Bezier(const std::vector<Type>& ControlPoints, const double Parameter)
+{
+	// Sanity checks ...
+	assert(ControlPoints.size() > 1);
+
+	Type result = BernsteinBasis(ControlPoints.size(), 0, Parameter) * ControlPoints[0];
+	for(unsigned long i = 1; i < ControlPoints.size(); i++)
+		result += BernsteinBasis(ControlPoints.size(), i, Parameter) * ControlPoints[i];
+
+	return result;
 }
 
 } // namespace k3d

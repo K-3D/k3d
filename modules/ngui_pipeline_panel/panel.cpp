@@ -34,7 +34,6 @@
 #include <k3dsdk/ngui/ui_component.h>
 
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/geometry.h>
 #include <k3dsdk/graph.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
@@ -44,6 +43,7 @@
 #include <k3dsdk/options.h>
 #include <k3dsdk/pipeline.h>
 #include <k3dsdk/property.h>
+#include <k3dsdk/rectangle.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/vectors.h>
 

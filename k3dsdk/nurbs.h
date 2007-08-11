@@ -25,6 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "geometric_operations.h"
 #include "result.h"
 #include "vectors.h"
 
@@ -74,6 +75,59 @@ bool is_valid(const curve3& Curve);
 
 /// Evaluates the given NURBS curve for a specific parameter value
 const point3 evaluate(const curve3& Curve, const double T);
+
+/** Calculates a 3rd-order NURBS curve that creates a circular arc centered at the origin with unit radius
+	\param X Defines the X axis of the plane containing the arc
+	\param Y Defines the Y axis of the plane containing the arc
+	\param StartAngle Start angle of the arc in radians
+	\param EndAngle End angle of the arc in radians
+	\param Segments The number of NURBS segments in the resulting arc
+	\param Knots Output container for the resulting arc knot vector
+	\param Weights Output container for the resulting arc control point weights
+	\param ControlPoints Output container for the resulting arc control point positions
+*/
+template<typename knots_t, typename weights_t, typename control_points_t>
+void circular_arc(const point3& X, const point3& Y, const double StartAngle, const double EndAngle, const unsigned long Segments, knots_t& Knots, weights_t& Weights, control_points_t& ControlPoints)
+{
+	const double start_angle = std::min(StartAngle, EndAngle);
+	const double end_angle = std::max(StartAngle, EndAngle);
+	const double theta = (end_angle - start_angle) / static_cast<double>(Segments);
+	const double weight = std::cos(theta * 0.5);
+
+	Knots.clear();
+	Knots.insert(Knots.end(), 3, 0);
+	for(unsigned long i = 1; i != Segments; ++i)
+		Knots.insert(Knots.end(), 2, i);
+	Knots.insert(Knots.end(), 3, Segments);
+
+	Weights.clear();
+	Weights.push_back(1.0);
+	for(unsigned long i = 0; i != Segments; ++i)
+	{
+		Weights.push_back(weight);
+		Weights.push_back(1);
+	}
+
+	ControlPoints.clear();
+	ControlPoints.push_back(std::cos(start_angle) * X + std::sin(start_angle) * Y);
+	for(unsigned long i = 0; i != Segments; ++i)
+	{
+		const double a0 = start_angle + (theta * (i));
+		const double a2 = start_angle + (theta * (i + 1));
+
+		const point3 p0(std::cos(a0) * X + std::sin(a0) * Y);
+		const point3 p2(std::cos(a2) * X + std::sin(a2) * Y);
+
+		const point3 t0(-std::sin(a0) * X + std::cos(a0) * Y);
+		const point3 t2(-std::sin(a2) * X + std::cos(a2) * Y);
+
+		point3 p1;
+		intersect_lines(p0, to_vector(t0), p2, to_vector(t2), p1);
+
+		ControlPoints.push_back(p1);
+		ControlPoints.push_back(p2);
+	}
+}
 
 } // namespace nurbs
 

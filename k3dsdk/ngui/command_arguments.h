@@ -27,8 +27,9 @@
 #include <gdk/gdkevents.h>
 
 #include <k3dsdk/algebra.h>
-#include <k3dsdk/geometry.h>
 #include <k3dsdk/keyboard.h>
+#include <k3dsdk/point2.h>
+#include <k3dsdk/rectangle.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/vectors.h>
 

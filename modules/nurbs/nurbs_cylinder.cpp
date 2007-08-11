@@ -21,16 +21,16 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/geometry.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
+#include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/material_client.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_source.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/nurbs.h>
+#include <k3dsdk/persistent.h>
 
 namespace libk3dnurbs
 {
@@ -80,7 +80,7 @@ public:
 
 		std::vector<double> weights;
 		std::vector<k3d::point3> control_points;
-		k3d::nurbs_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, thetamax, u_segments, nupatch->u_knots, weights, control_points);
+		k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, thetamax, u_segments, nupatch->u_knots, weights, control_points);
 		return_if_fail(weights.size() == control_points.size());
 
 		nupatch->v_knots.insert(nupatch->v_knots.end(), 2, 0);

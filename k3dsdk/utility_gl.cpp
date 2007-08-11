@@ -24,13 +24,13 @@
 #include "bounding_box.h"
 #include "drawable_gl.h"
 #include "extension_gl.h"
-#include "geometry.h"
 #include "idocument.h"
 #include "imaterial.h"
 #include "imaterial_gl.h"
 #include "inode.h"
 #include "inode_collection.h"
 #include "irender_engine_gl.h"
+#include "plane.h"
 
 #include <algorithm>
 #include <set>

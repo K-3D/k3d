@@ -1,8 +1,8 @@
-#ifndef K3DSDK_ARRAY_H
-#define K3DSDK_ARRAY_H
+#ifndef K3DSDK_NAMED_ARRAYS_H
+#define K3DSDK_NAMED_ARRAYS_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -20,30 +20,19 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <cstddef>
+#include <boost/shared_ptr.hpp>
+#include <map>
+#include <string>
 
 namespace k3d
 {
 
-/// Abstract base class for an array - with it, we can create heterogeneous collections of arrays
-class array
-{
-public:
-	virtual ~array() {}
+class array;
 
-	/// Returns an empty array of the same type as the original (virtual ctor)
-	virtual array* clone_type() const = 0;
-	/// Returns a copy of the original array (virtual ctor)
-	virtual array* clone() const = 0;
-	/// Returns a copy of a half-open range of the original array (virtual ctor)
-	virtual array* clone(size_t Begin, size_t End) const = 0;
-	/// Returns the size of the array
-	virtual const size_t size() const = 0;
-	/// Returns true iff the array is empty
-	virtual const bool empty() const = 0;
-};
+/// Defines a heterogeneous collection of named, shared arrays
+typedef std::map<std::string, boost::shared_ptr<array> > named_arrays;
 
 } // namespace k3d
 
-#endif // K3DSDK_ARRAY_H
+#endif // K3DSDK_NAMED_ARRAYS_H
 

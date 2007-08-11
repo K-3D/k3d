@@ -26,7 +26,7 @@
 
 #include <k3dsdk/bounded.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/geometry.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/drawable_gl.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material_client.h>
@@ -34,6 +34,7 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/node_change_signal.h>
+#include <k3dsdk/nurbs.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>

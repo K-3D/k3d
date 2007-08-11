@@ -1,5 +1,5 @@
-#ifndef K3DSDK_NEW_MESH_H
-#define K3DSDK_NEW_MESH_H
+#ifndef K3DSDK_MESH_H
+#define K3DSDK_MESH_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -20,12 +20,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "array.h"
 #include "bounding_box.h"
+#include "named_arrays.h"
+#include "typed_array.h"
 #include "vectors.h"
-
-#include <boost/shared_ptr.hpp>
-#include <map>
 
 namespace k3d
 {
@@ -61,7 +59,7 @@ public:
 	/// Defines storage for gprim materials
 	typedef typed_array<imaterial*> materials_t;
 	/// Defines a heterogeneous collection of named, shared arrays
-	typedef std::map<std::string, boost::shared_ptr<array> > named_arrays;
+	typedef k3d::named_arrays named_arrays;
 	/// Defines storage for a collection of 3D points
 	typedef typed_array<point3> points_t;
 
@@ -449,5 +447,5 @@ const bool is_sds(const mesh& Mesh);
 
 } // namespace k3d
 
-#endif // K3DSDK_NEW_MESH_H
+#endif // K3DSDK_MESH_H
 

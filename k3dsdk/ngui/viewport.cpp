@@ -30,12 +30,13 @@
 #include "utility.h"
 #include "viewport.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/file_range.h>
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/high_res_timer.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
@@ -45,6 +46,7 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/property.h>
+#include <k3dsdk/rectangle.h>
 #include <k3dsdk/selection_state_gl.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
@@ -53,7 +55,6 @@
 #include <gtk/gtkgl.h>
 #include <gtk/gtkmain.h>
 
-#include <k3dsdk/fstream.h>
 #include <cassert>
 #include <iomanip>
 #include <sstream>

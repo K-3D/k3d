@@ -1,5 +1,5 @@
-#include <k3dsdk/array.h>
 #include <k3dsdk/shared_pointer.h>
+#include <k3dsdk/typed_array.h>
 #include <k3dsdk/vectors.h>
 
 #include <boost/shared_ptr.hpp>

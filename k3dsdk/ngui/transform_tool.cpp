@@ -41,7 +41,6 @@
 #include <k3dsdk/color.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/fstream.h>
-#include <k3dsdk/geometry.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idrawable_gl.h>
 #include <k3dsdk/ikeyframer.h>

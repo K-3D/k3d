@@ -21,16 +21,16 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/geometry.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
+#include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/material_client.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_source.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/nurbs.h>
+#include <k3dsdk/persistent.h>
 
 namespace libk3dnurbs
 {
@@ -83,11 +83,11 @@ public:
 
 		std::vector<double> v_weights;
 		std::vector<k3d::point3> v_arc_points;
-		k3d::nurbs_arc(k3d::point3(0, 1, 0), k3d::point3(0, 0, 1), phimin, phimax, v_segments, nupatch->v_knots, v_weights, v_arc_points);
+		k3d::nurbs::circular_arc(k3d::point3(0, 1, 0), k3d::point3(0, 0, 1), phimin, phimax, v_segments, nupatch->v_knots, v_weights, v_arc_points);
 
 		std::vector<double> u_weights;
 		std::vector<k3d::point3> u_arc_points;
-		k3d::nurbs_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, thetamax, u_segments, nupatch->u_knots, u_weights, u_arc_points);
+		k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, thetamax, u_segments, nupatch->u_knots, u_weights, u_arc_points);
 
 		for(unsigned long v = 0; v != v_arc_points.size(); ++v)
 		{

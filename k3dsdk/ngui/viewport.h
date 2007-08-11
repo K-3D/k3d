@@ -29,11 +29,12 @@
 #include "panel.h"
 #include "ui_component.h"
 
-#include <k3dsdk/geometry.h>
+#include <k3dsdk/algebra.h>
 #include <k3dsdk/icamera_animation_render_engine.h>
 #include <k3dsdk/icamera_preview_render_engine.h>
 #include <k3dsdk/icamera_still_render_engine.h>
 #include <k3dsdk/irender_engine_gl.h>
+#include <k3dsdk/line3.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/signal_system.h>

@@ -20,12 +20,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "array.h"
+#include "named_arrays.h"
+#include "typed_array.h"
 #include "vectors.h"
 
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/shared_ptr.hpp>
-#include <map>
 
 namespace k3d
 {
@@ -68,7 +67,7 @@ public:
 	typedef k3d::typed_array<inode*> nodes_t;
 
 	/// Defines a heterogeneous collection of named, shared arrays
-	typedef std::map<std::string, boost::shared_ptr<array> > named_arrays;
+	typedef k3d::named_arrays named_arrays;
 
 	/// Stores the graph topology
 	boost::shared_ptr<const topology_t> topology;
@@ -91,5 +90,5 @@ const bool validate(graph& Graph);
 
 } // namespace k3d
 
-#endif // K3DSDK_NEW_MESH_H
+#endif // K3DSDK_GRAPH_H
 

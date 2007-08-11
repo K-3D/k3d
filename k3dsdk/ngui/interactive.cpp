@@ -28,11 +28,12 @@
 #include "screen_overlay.h"
 #include "utility.h"
 
+#include <k3d-platform-config.h>
+
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/bezier.h>
-#include <k3dsdk/geometry.h>
 #include <k3dsdk/high_res_timer.h>
-#include <k3d-platform-config.h>
+#include <k3dsdk/rectangle.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/vectors.h>
 

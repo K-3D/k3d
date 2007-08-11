@@ -25,6 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <cmath>
 
 namespace k3d
 {

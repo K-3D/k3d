@@ -27,7 +27,7 @@
 #include <glibmm/refptr.h>
 
 #include <k3dsdk/color.h>
-#include <k3dsdk/geometry.h>
+#include <k3dsdk/rectangle.h>
 
 namespace Gdk { class GC; }
 namespace Gtk { class Widget; }

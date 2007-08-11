@@ -62,17 +62,17 @@ std::istream& operator>>(std::istream& Stream, curve3& RHS)
 
 	curve3::control_point control_point(point3(0, 0, 0), 0);
 	for(unsigned long i = 0; i != control_point_count; ++i)
-		{
-			Stream >> control_point;
-			RHS.control_points.push_back(control_point);
-		}
+	{
+		Stream >> control_point;
+		RHS.control_points.push_back(control_point);
+	}
 	
 	double knot = 0;
 	for(unsigned long i = 0; i != RHS.order + control_point_count; ++i)
-		{
-			Stream >> knot;
-			RHS.knots.push_back(knot);
-		}
+	{
+		Stream >> knot;
+		RHS.knots.push_back(knot);
+	}
 
 	return Stream;
 }
@@ -99,33 +99,33 @@ const double basis(const unsigned long i, const unsigned long k, const double t,
 {
 	double ret = 0;
 	if(k > 0)
-		{
-			double a = 0;
-			double b = 0;
-			double n1 = (t - knots[i]) * basis(i, k - 1, t, knots);
-			double d1 = knots[i + k] - knots[i];
-			double n2 = (knots[i + k + 1] - t) * basis(i + 1, k - 1, t, knots);
-			double d2 = knots[i + k + 1] - knots[i + 1];
-			if(d1 > 0.0001 || d1 < -0.0001)
-				a = n1 / d1;
-			else
-				a = 0;
-			
-			if(d2 > 0.0001 || d2 < -0.0001)
-				b = n2 / d2;
-			else
-				b = 0;
+	{
+		double a = 0;
+		double b = 0;
+		double n1 = (t - knots[i]) * basis(i, k - 1, t, knots);
+		double d1 = knots[i + k] - knots[i];
+		double n2 = (knots[i + k + 1] - t) * basis(i + 1, k - 1, t, knots);
+		double d2 = knots[i + k + 1] - knots[i + 1];
+		if(d1 > 0.0001 || d1 < -0.0001)
+			a = n1 / d1;
+		else
+			a = 0;
+		
+		if(d2 > 0.0001 || d2 < -0.0001)
+			b = n2 / d2;
+		else
+			b = 0;
 
-			ret = a + b;
+		ret = a + b;
 // print "B i = %d, k = %d, ret = %g, a = %g, b = %g\n"%(i,k,ret,a,b)
-		}
+	}
 	else
-		{
-			if(knots[i] <= t && t <= knots[i + 1])
-				ret = 1;
-			else
-				ret = 0;
-		}
+	{
+		if(knots[i] <= t && t <= knots[i + 1])
+			ret = 1;
+		else
+			ret = 0;
+	}
 	return ret;
 }
 
@@ -133,10 +133,10 @@ const point3 evaluate(const curve3& Curve, const double T)
 {
 	point3 c;
 	for(unsigned long i = 0; i != Curve.control_points.size(); ++i)
-		{
-			const curve3::control_point& control_point = Curve.control_points[i];
-			c += control_point.position * control_point.weight * basis(i, Curve.order-1, T, Curve.knots);
-		}
+	{
+		const curve3::control_point& control_point = Curve.control_points[i];
+		c += control_point.position * control_point.weight * basis(i, Curve.order-1, T, Curve.knots);
+	}
 
 	return c;
 }

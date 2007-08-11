@@ -24,7 +24,6 @@
 */
 
 #include "detail.h"
-#include <k3dsdk/document_plugin_factory.h>
 
 namespace
 {
@@ -105,11 +104,11 @@ public:
 
 			std::vector<double> v_weights;
 			std::vector<k3d::point3> v_arc_points;
-			k3d::nurbs_arc(k3d::point3(0, 1, 0), k3d::point3(0, 0, 1), phimin, phimax, 2, m_gl_v_knot_vector, v_weights, v_arc_points);
+			k3d::nurbs::circular_arc(k3d::point3(0, 1, 0), k3d::point3(0, 0, 1), phimin, phimax, 2, m_gl_v_knot_vector, v_weights, v_arc_points);
 
 			std::vector<double> u_weights;
 			std::vector<k3d::point3> u_arc_points;
-			k3d::nurbs_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, thetamax, 4, m_gl_u_knot_vector, u_weights, u_arc_points);
+			k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, thetamax, 4, m_gl_u_knot_vector, u_weights, u_arc_points);
 
 			for(unsigned long v = 0; v != v_arc_points.size(); ++v)
 			{

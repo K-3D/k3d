@@ -36,16 +36,18 @@
 #include "utility.h"
 #include "viewport.h"
 
-#include <k3dsdk/color.h>
-#include <k3dsdk/geometry.h>
 #include <k3d-i18n-config.h>
+
+#include <k3dsdk/color.h>
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/geometric_operations.h>
 #include <k3dsdk/icamera.h>
+#include <k3dsdk/line2.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/plane.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/xml.h>
-
-#include <k3dsdk/fstream.h>
 
 namespace libk3dngui
 {

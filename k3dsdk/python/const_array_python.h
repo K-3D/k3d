@@ -26,7 +26,7 @@
 
 #include "imaterial_python.h"
 
-#include <k3dsdk/array.h>
+#include <k3dsdk/typed_array.h>
 #include <boost/python.hpp>
 
 namespace k3d

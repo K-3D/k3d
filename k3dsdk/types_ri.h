@@ -25,10 +25,10 @@
 */
 
 #include "algebra.h"
-#include "array.h"
 #include "bounding_box.h"
 #include "color.h"
 #include "path.h"
+#include "typed_array.h"
 #include "vectors.h"
 
 #include <boost/any.hpp>

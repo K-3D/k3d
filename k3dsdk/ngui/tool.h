@@ -25,7 +25,6 @@
 */
 
 #include <k3dsdk/command_node.h>
-#include <k3dsdk/geometry.h>
 #include <k3dsdk/vectors.h>
 
 #include <gdk/gdkevents.h>

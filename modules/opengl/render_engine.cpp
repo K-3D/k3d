@@ -22,14 +22,14 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3d-i18n-config.h>
+
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/geometry.h>
 #include <k3dsdk/gl.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icrop_window.h>
 #include <k3dsdk/idrawable_gl.h>
@@ -39,11 +39,12 @@
 #include <k3dsdk/iselection_engine_gl.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/measurement.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/property_group_collection.h>
+#include <k3dsdk/rectangle.h>
 #include <k3dsdk/render_state_gl.h>
 #include <k3dsdk/selection_state_gl.h>
 #include <k3dsdk/time_source.h>

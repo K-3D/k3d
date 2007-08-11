@@ -33,7 +33,6 @@
 #include "utility.h"
 #include "viewport.h"
 
-#include <k3dsdk/geometry.h>
 #include <k3dsdk/gl.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
