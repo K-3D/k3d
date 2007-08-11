@@ -126,7 +126,7 @@ void log_cerr(const time_t Timestamp, const log_level_t Level, const std::string
 				std::cerr << "CRITICAL: ";
 				break;
 			case K3D_LOG_LEVEL_ERROR:
-				std::cerr << "ERROR ";
+				std::cerr << "ERROR: ";
 				break;
 			case K3D_LOG_LEVEL_WARNING:
 				std::cerr << "WARNING: ";
