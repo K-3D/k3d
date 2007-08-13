@@ -24,8 +24,9 @@
 #include <k3d-i18n-config.h>
 
 #include "document_to_graph.h"
-#include "graph_operations.h"
-#include "tree_plus_layout.h"
+#include "edge_indices.h"
+#include "extract_tree.h"
+#include "tree_layout.h"
 
 #include <k3dsdk/ngui/basic_input_model.h>
 #include <k3dsdk/ngui/document_state.h>
@@ -39,6 +40,7 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
+#include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/pipeline.h>
@@ -155,17 +157,22 @@ public:
 		ui_component::set_parent("pipeline", &Parent);
 		m_document_state = &DocumentState;
 	
-		m_graph_source.reset(new document_to_graph(DocumentState.document()));
+		m_create_graph.reset(new document_to_graph(DocumentState.document()));
 
-		m_graph_layout.reset(new tree_plus_layout());
-		k3d::property::set_internal_value(m_graph_layout->column_offset(), 0.7);
-		k3d::property::set_internal_value(m_graph_layout->row_offset(), 0.1);
+		m_edge_indices.reset(new edge_indices());
+		
+		m_extract_tree.reset(new extract_tree());
+
+		m_tree_layout.reset(new tree_layout());
+		k3d::property::set_internal_value(m_tree_layout->column_offset(), 0.7);
+		k3d::property::set_internal_value(m_tree_layout->row_offset(), 0.1);
 		
 		m_graph_pipeline.reset(new k3d::pipeline());
+		m_graph_pipeline->connect(m_create_graph->output(), m_edge_indices->input());
+		m_graph_pipeline->connect(m_edge_indices->output(), m_extract_tree->input());
+		m_graph_pipeline->connect(m_extract_tree->output(), m_tree_layout->input());
 
-		m_graph_pipeline->connect(m_graph_source->output(), m_graph_layout->input());
-
-		m_graph_layout->output().property_changed_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::schedule_redraw)));
+		m_tree_layout->output().property_changed_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::schedule_redraw)));
 
 		m_document_state->document().nodes().add_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 		m_document_state->document().nodes().remove_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
@@ -288,11 +295,11 @@ public:
 	{
 /*
 		k3d::graph& graph = get_graph();
-		const k3d::graph::topology_t& topology = *graph.topology;
+		const k3d::graph::adjacency_list& topology = *graph.topology;
 		const size_t vertex_count = boost::num_vertices(topology);
 
-		k3d::graph::bools_t& vertex_expanded = get_array<k3d::graph::bools_t>(graph.vertex_data, "expanded", vertex_count);
-		const k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(graph.vertex_data, "position", vertex_count);
+		k3d::graph::bools& vertex_expanded = k3d::get_array<k3d::graph::bools>(graph.vertex_data, "expanded", vertex_count);
+		const k3d::graph::points& vertex_position = k3d::get_array<k3d::graph::points>(graph.vertex_data, "position", vertex_count);
 
 		const k3d::point2 mouse = world_to_user(k3d::point2(Event.x, Event.y));
 
@@ -379,7 +386,7 @@ public:
 
 	void reset_graph()
 	{
-		m_graph_source->make_reset_graph_slot()(0);
+		m_create_graph->make_reset_graph_slot()(0);
 	}
 
 	void selected_node_changed(k3d::inode* Node)
@@ -389,16 +396,16 @@ public:
 
 		m_root_node = Node;
 
-		k3d::graph& graph = *k3d::property::pipeline_value<k3d::graph*>(m_graph_source->output());
-		const k3d::graph::topology_t& topology = *graph.topology;
+		k3d::graph& graph = *k3d::property::pipeline_value<k3d::graph*>(m_create_graph->output());
+		const k3d::graph::adjacency_list& topology = *graph.topology;
 		const size_t vertex_count = boost::num_vertices(topology);
 
-		const k3d::graph::nodes_t& vertex_node = get_array<k3d::graph::nodes_t>(graph.vertex_data, "node", vertex_count);
+		const k3d::graph::nodes& vertex_node = k3d::get_array<k3d::graph::nodes>(graph.vertex_data, "node", vertex_count);
 		for(size_t vertex = 0; vertex != vertex_count; ++vertex)
 		{
 			if(vertex_node[vertex] == Node)
 			{
-				k3d::property::set_internal_value(*m_graph_layout, "root", vertex);
+				k3d::property::set_internal_value(*m_extract_tree, "root", vertex);
 				return;
 			}
 		}
@@ -482,36 +489,6 @@ public:
 		Context->fill();
 	}
 
-	void draw_arrow(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Source, const k3d::point2& Target, const double Size)
-	{
-		if(!k3d::length(Source - Target))
-			return;
-
-		const k3d::vector2 length_vector = k3d::normalize(Source - Target);
-		const k3d::vector2 width_vector = k3d::perpendicular(length_vector);
-
-		const k3d::point2 a = Source;
-		const k3d::point2 b = Target + (Size * length_vector);
-		const k3d::point2 c = Target + (Size * length_vector) + (0.3 * Size * width_vector);
-		const k3d::point2 d = Target;
-		const k3d::point2 e = Target + (Size * length_vector) + (-0.3 * Size * width_vector);
-
-		Context->set_line_cap(Cairo::LINE_CAP_BUTT);
-		Context->set_line_join(Cairo::LINE_JOIN_MITER);
-
-		// Draw the line ...
-		Context->move_to(a[0], a[1]);
-		Context->line_to(b[0], b[1]);
-		Context->stroke();
-
-		// Draw the arrow ...
-		Context->move_to(c[0], c[1]);
-		Context->line_to(d[0], d[1]);
-		Context->line_to(e[0], e[1]);
-		Context->line_to(c[0], c[1]);
-		Context->fill();
-	}
-
 	void draw_curved_arrow(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Source, const k3d::point2& Target, const double Size)
 	{
 		if(!k3d::length(Source - Target))
@@ -545,12 +522,18 @@ public:
 		Context->fill();
 	}
 
-	void draw_centered_text(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Position, const std::string& Text)
+	void draw_centered_text(const Cairo::RefPtr<Cairo::Context>& Context, const double FontSize, const k3d::point2& Position, const std::string& Text, const double MaxWidth)
 	{
 		Context->save();
 
 		Cairo::TextExtents extents;
-		Context->get_text_extents(Text, extents);
+		double font_size = FontSize;
+		Context->set_font_size(font_size);
+		for(Context->get_text_extents(Text, extents); extents.width > MaxWidth; Context->get_text_extents(Text, extents))
+		{
+			font_size *= 0.8;
+			Context->set_font_size(font_size);
+		}
 
 		Context->translate(-extents.width / 2, extents.height / 2);
 		Context->move_to(Position[0], Position[1]);
@@ -561,98 +544,58 @@ public:
 
 	void draw_pipeline(const Cairo::RefPtr<Cairo::Context>& Context, const double Width, const double Height)
 	{
-		k3d::graph& graph = *boost::any_cast<k3d::graph*>(k3d::property::pipeline_value(m_graph_layout->output()));
-
 		Context->save();
 
-		// Setup the viewport ...
-		if(Width > Height)
-		{
-			Context->translate((Width - Height) / 2, 0);
-			Context->scale(Height, Height);
-		}
-		else
-		{
-			Context->translate(0, (Height - Width) / 2);
-			Context->scale(Width, Width);
-		}
-
-		Context->translate(0.5, 0.5);
-		Context->scale(m_zoom_factor, m_zoom_factor);
-		Context->translate(m_origin[0], m_origin[1]);
-
-		// Clear the background ...
-		Context->save();
-		Context->set_source_rgb(0.8, 0.8, 0.8);
-		Context->paint();
-		Context->restore();
-
-		// Render the graph vertices ...
 		try
 		{
-			return_if_fail(graph.topology);
-
-			const k3d::graph::topology_t& topology = *graph.topology;
-			const size_t vertex_count = boost::num_vertices(topology);
-
-			const k3d::graph::bools_t& vertex_visible = get_array<k3d::graph::bools_t>(graph.vertex_data, "visible", vertex_count);
-			const k3d::graph::nodes_t& vertex_node = get_array<k3d::graph::nodes_t>(graph.vertex_data, "node", vertex_count);
-			const k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(graph.vertex_data, "position", vertex_count);
-			Context->save();
-
-			Context->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
-			Context->set_font_size(0.03);
-			Context->set_line_width(0.003);
-
-			for(size_t vertex = 0; vertex != vertex_count; ++vertex)
+			// Setup the viewport ...
+			if(Width > Height)
 			{
-				if(vertex_visible[vertex])
-				{
-					Context->set_source_rgb(1, 1, 1);
-					draw_filled_box(Context, k3d::rectangle(vertex_position[vertex], m_node_width, m_node_height));
-
-					Context->set_source_rgb(0, 0, 0);
-					draw_box(Context, k3d::rectangle(vertex_position[vertex], m_node_width, m_node_height));
-					draw_centered_text(Context, vertex_position[vertex], vertex_node[vertex]->name());
-				}
+				Context->translate((Width - Height) / 2, 0);
+				Context->scale(Height, Height);
+			}
+			else
+			{
+				Context->translate(0, (Height - Width) / 2);
+				Context->scale(Width, Width);
 			}
 
+			Context->translate(0.5, 0.5);
+			Context->scale(m_zoom_factor, m_zoom_factor);
+			Context->translate(m_origin[0], m_origin[1]);
+
+			// Clear the background ...
+			Context->save();
+			Context->set_source_rgb(0.8, 0.8, 0.8);
+			Context->paint();
 			Context->restore();
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << error << "caught exception: " << e.what() << std::endl;
-		}
-		catch(...)
-		{
-			k3d::log() << error << "caught unknown exception" << std::endl;
-		}
 
-		// Render the graph edges ...
-		try
-		{
+			// Get the graph to be rendered ...
+			const k3d::graph& graph = *boost::any_cast<k3d::graph*>(k3d::property::pipeline_value(m_tree_layout->output()));
+
+//k3d::log() << debug << "input graph:\n" << graph << std::endl;
+
 			return_if_fail(graph.topology);
+			return_if_fail(graph.vertex_data.count("node"));
+			return_if_fail(graph.vertex_data.count("position"));
+			return_if_fail(graph.edge_data.count("type"));
 
-			const k3d::graph::topology_t& topology = *graph.topology;
+			const k3d::graph::adjacency_list& topology = *graph.topology;
 			const size_t vertex_count = boost::num_vertices(topology);
 			const size_t edge_count = boost::num_edges(topology);
 
-			const k3d::graph::points_t& vertex_position = get_array<k3d::graph::points_t>(graph.vertex_data, "position", vertex_count);
-
-			const k3d::graph::bools_t& edge_visible = get_array<k3d::graph::bools_t>(graph.edge_data, "visible", edge_count);
-			const k3d::graph::indices_t& edge_type = get_array<k3d::graph::indices_t>(graph.edge_data, "type", edge_count);
-
+			const k3d::graph::nodes& vertex_node = *k3d::get_array<k3d::graph::nodes>(graph.vertex_data, "node");
+			const k3d::graph::points& vertex_position = *k3d::get_array<k3d::graph::points>(graph.vertex_data, "position");
+			const k3d::graph::indices& edge_type = *k3d::get_array<k3d::graph::indices>(graph.edge_data, "type");
+			
+			// Render the graph edges ...
 			Context->save();
 			Context->set_line_width(0.003);
 			Context->set_source_rgb(0.0, 0.5, 0.7);
 
 			size_t edge_index = 0;
-			typedef boost::graph_traits<k3d::graph::topology_t>::edge_iterator iter_t;
-			for(std::pair<iter_t, iter_t> edges = boost::edges(topology); edges.first != edges.second; ++edge_index, ++edges.first)
+			for(std::pair<k3d::graph::edge_iterator, k3d::graph::edge_iterator> edges = boost::edges(topology); edges.first != edges.second; ++edge_index, ++edges.first)
 			{
-				if(!edge_visible[edge_index])
-					continue;
-
 				const size_t source = boost::source(*edges.first, topology);
 				const size_t target = boost::target(*edges.first, topology);
 
@@ -687,6 +630,25 @@ public:
 			}
 
 			Context->restore();
+			
+			// Render the graph vertices ...
+			Context->save();
+
+			Context->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
+			Context->set_line_width(0.003);
+
+			for(size_t vertex = 0; vertex != vertex_count; ++vertex)
+			{
+				Context->set_source_rgb(1, 1, 1);
+				draw_filled_box(Context, k3d::rectangle(vertex_position[vertex], m_node_width, m_node_height));
+
+				Context->set_source_rgb(0, 0, 0);
+				draw_box(Context, k3d::rectangle(vertex_position[vertex], m_node_width, m_node_height));
+				draw_centered_text(Context, 0.03, vertex_position[vertex], vertex_node[vertex]->name(), m_node_width);
+			}
+
+			Context->restore();
+
 		}
 		catch(std::exception& e)
 		{
@@ -729,8 +691,10 @@ private:
 	k3d::point2 m_last_mouse;
 
 	document_state* m_document_state;
-	boost::scoped_ptr<document_to_graph> m_graph_source;
-	boost::scoped_ptr<tree_plus_layout> m_graph_layout;
+	boost::scoped_ptr<document_to_graph> m_create_graph;
+	boost::scoped_ptr<edge_indices> m_edge_indices;
+	boost::scoped_ptr<extract_tree> m_extract_tree;
+	boost::scoped_ptr<tree_layout> m_tree_layout;
 	boost::scoped_ptr<k3d::pipeline> m_graph_pipeline;
 
 	k3d::inode* m_root_node;

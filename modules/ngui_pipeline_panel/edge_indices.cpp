@@ -1,6 +1,3 @@
-#ifndef DOCUMENT_TO_GRAPH_H
-#define DOCUMENT_TO_GRAPH_H
-
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
 //
@@ -17,16 +14,16 @@
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
-// License along with this program; if not, write to the Free Software
+// License along with this program; if not, read to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead
 */
 
-#include "graph_source.h"
+#include "edge_indices.h"
 
-namespace k3d { class idocument; }
+#include <k3dsdk/shared_pointer.h>
 
 namespace module
 {
@@ -37,30 +34,28 @@ namespace ngui
 namespace pipeline
 {
 
-enum edge_type
+edge_indices::edge_indices()
 {
-	DATA_EDGE,
-	BEHAVIOR_EDGE
-};	
+}
 
-class document_to_graph :
-	public graph_source
+void edge_indices::on_initialize_graph(const k3d::graph& Input, k3d::graph& Output)
 {
-public:
-	document_to_graph(k3d::idocument& Document);
+	Output = Input;
 
-private:
-	void on_initialize_graph(k3d::graph& Output);
-	void on_update_graph(k3d::graph& Output);
+	k3d::graph::adjacency_list& topology = *k3d::make_unique(Output.topology);
 
-	k3d::idocument& m_document;
-};
+	size_t index = 0;
+	for(std::pair<k3d::graph::edge_iterator, k3d::graph::edge_iterator> edges = boost::edges(topology); edges.first != edges.second; ++index, ++edges.first)
+		topology[*edges.first].index = index;
+}
+
+void edge_indices::on_update_graph(const k3d::graph& Input, k3d::graph& Output)
+{
+}
 
 } // namespace pipeline
 
 } // namespace ngui
 
 } // namespace module
-
-#endif // !DOCUMENT_TO_GRAPH
 

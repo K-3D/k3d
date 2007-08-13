@@ -79,8 +79,8 @@ private:
 		on_update_graph(Output);
 	}
 
-	virtual void on_initialize_graph(k3d::graph& Graph) = 0;
-	virtual void on_update_graph(k3d::graph& Graph) = 0;
+	virtual void on_initialize_graph(k3d::graph& Output) = 0;
+	virtual void on_update_graph(k3d::graph& Output) = 0;
 };
 
 } // namespace pipeline

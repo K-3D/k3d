@@ -1,5 +1,5 @@
-#ifndef TREE_PLUS_LAYOUT_H
-#define TREE_PLUS_LAYOUT_H
+#ifndef EXTRACT_TREE_H
+#define EXTRACT_TREE_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -37,25 +37,15 @@ namespace ngui
 namespace pipeline
 {
 
-class tree_plus_layout :
+class extract_tree :
 	public graph_modifier
 {
 public:
-	tree_plus_layout();
+	extract_tree();
 
 	k3d::iproperty& root()
 	{
 		return m_root;
-	}
-
-	k3d::iproperty& column_offset()
-	{
-		return m_column_offset;
-	}
-
-	k3d::iproperty& row_offset()
-	{
-		return m_row_offset;
 	}
 
 private:
@@ -63,8 +53,6 @@ private:
 	void on_update_graph(const k3d::graph& Input, k3d::graph& Output);
 
 	k3d_data(size_t, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::writable_property, k3d::data::no_serialization) m_root;
-	k3d_data(double, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::writable_property, k3d::data::no_serialization) m_column_offset;
-	k3d_data(double, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::writable_property, k3d::data::no_serialization) m_row_offset;
 };
 
 } // namespace pipeline
@@ -73,5 +61,5 @@ private:
 
 } // namespace module
 
-#endif // !TREE_PLUS_LAYOUT
+#endif // !EXTRACT_TREE
 

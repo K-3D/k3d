@@ -40,53 +40,56 @@ class graph
 public:
 	graph();
 
+	struct vertex
+	{
+	};
+
+	struct edge
+	{
+		edge() : index(0) {}
+		size_t index;
+	};
+
 	/// Defines storage for a generic graph topology
-	typedef boost::adjacency_list<boost::listS, boost::vecS, boost::bidirectionalS, boost::no_property, boost::no_property, boost::no_property> topology_t;
-	typedef boost::graph_traits<topology_t>::vertex_descriptor vertex_descriptor_t;
-	typedef boost::graph_traits<topology_t>::edge_descriptor edge_descriptor_t;
-	typedef boost::graph_traits<topology_t>::vertex_iterator vertex_iterator_t;
-	typedef boost::graph_traits<topology_t>::edge_iterator edge_iterator_t;
-	typedef boost::graph_traits<topology_t>::out_edge_iterator out_edge_iterator_t;
-	typedef boost::graph_traits<topology_t>::in_edge_iterator in_edge_iterator_t;
+	typedef boost::adjacency_list<boost::listS, boost::vecS, boost::undirectedS, vertex, edge> adjacency_list;
+	typedef boost::graph_traits<adjacency_list>::vertex_descriptor vertex_descriptor;
+	typedef boost::graph_traits<adjacency_list>::edge_descriptor edge_descriptor;
+	typedef boost::graph_traits<adjacency_list>::vertex_iterator vertex_iterator;
+	typedef boost::graph_traits<adjacency_list>::edge_iterator edge_iterator;
+	typedef boost::graph_traits<adjacency_list>::out_edge_iterator out_edge_iterator;
+	typedef boost::graph_traits<adjacency_list>::in_edge_iterator in_edge_iterator;
 
 	/// Defines storage for a generic collection of boolean values
-	typedef typed_array<bool> bools_t;
-	/// Defines storage for a generic collection of index values
-	typedef typed_array<size_t> indices_t;
-	/// Defines storage for a generic collection of floating-point values
-	typedef typed_array<double> doubles_t;
+	typedef typed_array<bool> bools;
 	/// Defines storage for a generic collection of integer values
-	typedef typed_array<int> ints_t;
+	typedef typed_array<int> ints;
+	/// Defines storage for a generic collection of index values
+	typedef typed_array<size_t> indices;
+	/// Defines storage for a generic collection of floating-point values
+	typedef typed_array<double> doubles;
 	/// Defines storage for a generic collection of string values
-	typedef typed_array<std::string> strings_t;
+	typedef typed_array<std::string> strings;
 	/// Defines storage for a generic collection of two-dimensional points
-	typedef typed_array<k3d::point2> points_t;
+	typedef typed_array<point2> points;
 	/// Defines storage for a generic collection of two-dimensional vectors
-	typedef typed_array<k3d::vector2> vectors_t;
+	typedef typed_array<vector2> vectors;
 	/// Defines storage for a generic collection of inode objects
-	typedef k3d::typed_array<inode*> nodes_t;
-
+	typedef typed_array<inode*> nodes;
 	/// Defines a heterogeneous collection of named, shared arrays
 	typedef k3d::named_arrays named_arrays;
 
 	/// Stores the graph topology
-	boost::shared_ptr<const topology_t> topology;
-
+	boost::shared_ptr<const adjacency_list> topology;
+	/// Stores user-defined per-graph data
+	named_arrays graph_data;
 	/// Stores user-defined per-vertex data
 	named_arrays vertex_data;
-
 	/// Stores uder-defined per-edge data
 	named_arrays edge_data;
 };
 
 /// Stream serialization
 std::ostream& operator<<(std::ostream& Stream, const graph& RHS);
-
-/// Performs a deep-copy from one graph to another (the new graph doesn't share any memory with the old)
-void deep_copy(const graph& From, graph& To);
-
-/// Performs sanity-checking on a graph, validating all constraints - returns true iff the graph is valid
-const bool validate(graph& Graph);
 
 } // namespace k3d
 

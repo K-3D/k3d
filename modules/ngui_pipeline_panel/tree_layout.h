@@ -1,5 +1,5 @@
-#ifndef DOCUMENT_TO_GRAPH_H
-#define DOCUMENT_TO_GRAPH_H
+#ifndef TREE_LAYOUT_H
+#define TREE_LAYOUT_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -24,9 +24,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "graph_source.h"
-
-namespace k3d { class idocument; }
+#include "graph_modifier.h"
 
 namespace module
 {
@@ -37,23 +35,30 @@ namespace ngui
 namespace pipeline
 {
 
-enum edge_type
-{
-	DATA_EDGE,
-	BEHAVIOR_EDGE
-};	
-
-class document_to_graph :
-	public graph_source
+class tree_layout :
+	public graph_modifier
 {
 public:
-	document_to_graph(k3d::idocument& Document);
+	tree_layout();
+
+	k3d::iproperty& column_offset()
+	{
+		return m_column_offset;
+	}
+
+	k3d::iproperty& row_offset()
+	{
+		return m_row_offset;
+	}
 
 private:
-	void on_initialize_graph(k3d::graph& Output);
-	void on_update_graph(k3d::graph& Output);
+	class coordinate_visitor;
 
-	k3d::idocument& m_document;
+	void on_initialize_graph(const k3d::graph& Input, k3d::graph& Output);
+	void on_update_graph(const k3d::graph& Input, k3d::graph& Output);
+
+	k3d_data(double, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::writable_property, k3d::data::no_serialization) m_column_offset;
+	k3d_data(double, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::writable_property, k3d::data::no_serialization) m_row_offset;
 };
 
 } // namespace pipeline
@@ -62,5 +67,5 @@ private:
 
 } // namespace module
 
-#endif // !DOCUMENT_TO_GRAPH
+#endif // !TREE_LAYOUT
 
