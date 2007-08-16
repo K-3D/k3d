@@ -44,7 +44,7 @@ public:
 	imesh_storage();
 	imesh_storage(k3d::imesh_storage* Node);
 
-	boost::python::object new_mesh();
+	boost::python::object reset_mesh();
 
 	static void define_class();
 };

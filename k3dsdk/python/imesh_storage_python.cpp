@@ -46,7 +46,7 @@ imesh_storage::imesh_storage(k3d::imesh_storage* Node) :
 {
 }
 
-boost::python::object imesh_storage::new_mesh()
+boost::python::object imesh_storage::reset_mesh()
 {
 	k3d::mesh* const mesh = new k3d::mesh();
 	wrapped().reset_mesh(mesh);
@@ -58,7 +58,7 @@ void imesh_storage::define_class()
 {
 	class_<imesh_storage>("imesh_storage",
 		"Abstract interface implemented by nodes that can provide persistent storage of L{mesh} objects.", no_init)
-		.def("new_mesh", &imesh_storage::new_mesh,
+		.def("reset_mesh", &imesh_storage::reset_mesh,
 			"Creates a new L{mesh} object whose lifetime will be managed by the imesh_storage object.\n\n"
 			"@return: Returns a new L{mesh} object.");
 }
