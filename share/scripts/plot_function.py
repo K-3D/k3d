@@ -1,10 +1,11 @@
 #python
 
+import k3d
+
 import pygtk
 pygtk.require('2.0')
 
 import gtk
-import k3d
 import math
 import sys
 
@@ -70,7 +71,12 @@ table.attach(function_entry, 1, 2, 6, 7)
 dialog = gtk.Dialog("Plot Function", None, gtk.DIALOG_MODAL | gtk.DIALOG_NO_SEPARATOR, (gtk.STOCK_OK, gtk.RESPONSE_ACCEPT, gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
 dialog.vbox.pack_start(table)
 dialog.show_all()
-result = dialog.run()
+
+result = gtk.RESPONSE_ACCEPT
+
+if not k3d.ui().batch_mode():
+	result = dialog.run()
+
 dialog.hide()
 
 if result == gtk.RESPONSE_ACCEPT:
@@ -106,3 +112,4 @@ if result == gtk.RESPONSE_ACCEPT:
 
 sys.stdout.flush()
 sys.stderr.flush()
+
