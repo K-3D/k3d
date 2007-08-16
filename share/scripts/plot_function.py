@@ -126,7 +126,8 @@ if result == gtk.RESPONSE_ACCEPT:
 
 		mesh_instance = doc.new_node("MeshInstance")
 		mesh_instance.name = function + " Instance"
-		mesh_instance.gl_painter = doc.new_node("OpenGLPointPainter")
+		mesh_instance.gl_painter = doc.get_node("GL Default Painter")
+		mesh_instance.ri_painter = doc.get_node("RenderMan Default Painter")
 		doc.set_dependency(mesh_instance.get_property("input_mesh"), frozen_mesh.get_property("output_mesh"))
 
 		doc.finish_change_set("Plot " + function)
