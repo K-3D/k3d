@@ -93,16 +93,40 @@ if result == gtk.RESPONSE_ACCEPT:
 		frozen_mesh = doc.new_node("FrozenMesh")
 		frozen_mesh.name = function
 
-		mesh = frozen_mesh.new_mesh()
+		mesh = k3d.dynamic_cast(frozen_mesh, "imesh_storage").reset_mesh()
+		points = mesh.create_points()
+		point_selection = mesh.create_point_selection()
+
 		for xi in range(0, xcount):
 			for yi in range(0, ycount):
 				x = mix(x1, x2, float(xi) / (xcount - 1))
 				y = mix(y1, y2, float(yi) / (ycount - 1))
 				z = eval(function)
-				mesh.new_point([x, y, z])
+				point = k3d.point3(x, y, z)
+				points.append(point)
+				point_selection.append(0.0)
+
+		point_groups = mesh.create_point_groups()
+
+		first_points = point_groups.create_first_points()
+		first_points.append(0)
+
+		point_counts = point_groups.create_point_counts()
+		point_counts.append(len(points))
+
+		materials = point_groups.create_materials()
+		materials.append(None)
+
+		constantwidth = point_groups.writable_constant_data().create_array("constantwidth", "double")
+		constantwidth.append(0.2)
+
+		group_points = point_groups.create_points()
+		for i in range(len(points)):
+		        group_points.append(i)
 
 		mesh_instance = doc.new_node("MeshInstance")
 		mesh_instance.name = function + " Instance"
+		mesh_instance.gl_painter = doc.new_node("OpenGLPointPainter")
 		doc.set_dependency(mesh_instance.get_property("input_mesh"), frozen_mesh.get_property("output_mesh"))
 
 		doc.finish_change_set("Plot " + function)
