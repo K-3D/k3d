@@ -39,6 +39,7 @@ MACRO(K3D_ADD_PYTHON_TEST SCRIPT_NAME)
 				--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
 				--share=${k3d_SOURCE_DIR}/share
 				--ui=${K3D_NUI_BINARY}
+				--batch
 				--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}
 				--setenv "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"
 				--setenv "USE_VBO=True"
@@ -52,6 +53,7 @@ MACRO(K3D_ADD_PYTHON_TEST SCRIPT_NAME)
 				--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
 				--share=${k3d_SOURCE_DIR}/share
 				--ui=${K3D_NUI_BINARY}
+				--batch
 				--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}
 				--setenv "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"
 				${ARGN}
@@ -241,6 +243,8 @@ K3D_ADD_PYTHON_TEST(python.api.angle_axis.py)
 K3D_ADD_PYTHON_TEST(python.api.get_dependency.py)
 K3D_ADD_PYTHON_TEST(python.api.property.value.py)
 K3D_ADD_PYTHON_TEST(python.api.node.selection.py)
+
+K3D_ADD_PYTHON_TEST(share.scripts.py)
 
 IF(K3D_BUILD_NGUI_MODULES)
 	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.startup)
