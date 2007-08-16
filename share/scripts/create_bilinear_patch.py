@@ -1,38 +1,46 @@
 #python
 
+import k3d
+
 doc = Document
 doc.start_change_set()
 try:
 	material = doc.new_node("RenderManMaterial")
 	material.name = "Patch Material"
-	material.color = (1, 1, 1)
+	material.color = k3d.color(1, 1, 1)
 
 	frozen_mesh = doc.new_node("FrozenMesh")
 	frozen_mesh.name = "Bilinear Patch"
 
-	mesh = frozen_mesh.new_mesh()
+	mesh = k3d.dynamic_cast(frozen_mesh, "imesh_storage").reset_mesh()
 
-	points = ((-5, 0, 5), (5, 0, 5), (0, -5, -5), (0, 5, -5))
-	for position in points:
-		mesh.new_point(position)
+	positions = [(-5, 0, 5), (5, 0, 5), (0, -5, -5), (0, 5, -5)]
 
-	patch = mesh.new_bilinear_patch()
-	patch.material = material
-	for i in range(4):
-		patch.control_points[i] = mesh.points[i]
+	points = mesh.create_points()
+	point_selection = mesh.create_point_selection()
 
-#	patch.uniform_data.set_color("Cs", (1, 0, 0))
-#	mesh.points[0].vertex_data.set_color("Cs", (1, 0, 0))
-#	mesh.points[1].vertex_data.set_color("Cs", (0, 1, 0))
-#	mesh.points[2].vertex_data.set_color("Cs", (0, 0, 1))
-#	mesh.points[3].vertex_data.set_color("Cs", (1, 1, 1))
-	patch.varying_data[0].set_color("Cs", (1, 0, 0))
-	patch.varying_data[1].set_color("Cs", (0, 1, 0))
-	patch.varying_data[2].set_color("Cs", (0, 0, 1))
-	patch.varying_data[3].set_color("Cs", (1, 1, 1))
+	for position in positions:
+		points.append(k3d.point3(position[0], position[1], position[2]))
+		point_selection.append(0.0)
+
+	bilinear_patches = mesh.create_bilinear_patches()
+
+	patch_selection = bilinear_patches.create_patch_selection()
+	patch_selection.assign([0])
+
+	patch_materials = bilinear_patches.create_patch_materials()
+	patch_materials.assign([None])
+
+	patch_points = bilinear_patches.create_patch_points()
+	patch_points.assign([0, 1, 2, 3])
+
+	Cs = bilinear_patches.writable_varying_data().create_array("Cs", "k3d::color")
+	Cs.assign([k3d.color(1, 0, 0), k3d.color(0, 1, 0), k3d.color(0, 0, 1), k3d.color(1, 1, 1)])
 
 	mesh_instance = doc.new_node("MeshInstance")
 	mesh_instance.name = "Bilinear Patch Instance"
+	mesh_instance.gl_painter = doc.get_node("GL Default Painter")
+	mesh_instance.ri_painter = doc.get_node("RenderMan Default Painter")
 	doc.set_dependency(mesh_instance.get_property("input_mesh"), frozen_mesh.get_property("output_mesh"))
 
 	doc.finish_change_set("Create Bilinear Patch")

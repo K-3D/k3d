@@ -9,7 +9,7 @@ points = Output.create_points()
 point_selection = Output.create_point_selection()
 
 for position in positions:
-	points.append(k3d.point3(position[0], position[2], -position[1]))
+	points.append(k3d.point3(position[0], position[1], position[2]))
 	point_selection.append(0.0)
 
 bilinear_patches = Output.create_bilinear_patches()
