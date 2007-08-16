@@ -7,6 +7,8 @@ import sys
 
 
 scripts = glob.glob("@share_SOURCE_DIR@/scripts/*.py")
+scripts.sort()
+
 failed_scripts = []
 
 class dummyStream:
