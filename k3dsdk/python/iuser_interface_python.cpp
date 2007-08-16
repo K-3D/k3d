@@ -45,6 +45,11 @@ iuser_interface::iuser_interface(k3d::iuser_interface& UserInterface) :
 {
 }
 
+bool iuser_interface::batch_mode()
+{
+	return wrapped().batch_mode();
+}
+
 void iuser_interface::message(const std::string& Message)
 {
 	wrapped().message(Message);
@@ -86,6 +91,9 @@ void iuser_interface::define_class()
 {
 	class_<iuser_interface>("iuser_interface", 
 		"Provides access to the user interface plugin specified by the user at program startup.", no_init)
+		.def("batch_mode", &iuser_interface::batch_mode,
+			"Returns True if batch (no user intervention) mode is enabled for the user interface.\n"
+			"@note: Well-behaved scripts must not prompt the user for input if batch mode is enabled.")
 		.def("message", &iuser_interface::message,
 			"Displays an information message to the user.\n"
 			"@param message: The message string to be displayed.\n" 

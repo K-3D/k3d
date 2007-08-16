@@ -45,6 +45,7 @@ public:
 	iuser_interface();
 	iuser_interface(k3d::iuser_interface& UserInterface);
 
+	bool batch_mode();
 	void message(const std::string& Message);
 	void warning_message(const std::string& Message);
 	void error_message(const std::string& Message);
