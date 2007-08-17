@@ -13,7 +13,7 @@ dialog = gtk.Dialog("Howdy, World!", None, gtk.DIALOG_MODAL | gtk.DIALOG_NO_SEPA
 dialog.vbox.pack_start(label)
 dialog.show_all();
 
-if not k3d.ui().batch_mode():
+if not k3d.batch_mode():
 	dialog.run()
 
 dialog.hide()

@@ -74,7 +74,7 @@ dialog.show_all()
 
 result = gtk.RESPONSE_ACCEPT
 
-if not k3d.ui().batch_mode():
+if not k3d.batch_mode():
 	result = dialog.run()
 
 dialog.hide()
