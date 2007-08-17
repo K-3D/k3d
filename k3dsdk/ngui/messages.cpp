@@ -27,6 +27,8 @@
 #include "options.h"
 #include "widget_manip.h"
 
+#include <k3dsdk/batch_mode.h>
+
 #include <gtkmm/alignment.h>
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/label.h>
@@ -37,7 +39,7 @@ namespace libk3dngui
 
 void message(const std::string& Message, const std::string& SecondaryMessage)
 {
-	if(application_state::instance().batch_mode())
+	if(k3d::batch_mode())
 		return;
 
 	Gtk::MessageDialog dialog(Message, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
@@ -48,7 +50,7 @@ void message(const std::string& Message, const std::string& SecondaryMessage)
 
 void warning_message(const std::string& Message, const std::string& SecondaryMessage)
 {
-	if(application_state::instance().batch_mode())
+	if(k3d::batch_mode())
 		return;
 
 	Gtk::MessageDialog dialog(Message, false, Gtk::MESSAGE_WARNING, Gtk::BUTTONS_OK, true);
@@ -59,7 +61,7 @@ void warning_message(const std::string& Message, const std::string& SecondaryMes
 
 void error_message(const std::string& Message, const std::string& SecondaryMessage)
 {
-	if(application_state::instance().batch_mode())
+	if(k3d::batch_mode())
 		return;
 
 	Gtk::MessageDialog dialog(Message, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
@@ -70,7 +72,7 @@ void error_message(const std::string& Message, const std::string& SecondaryMessa
 
 unsigned int query_message(const std::string& Message, const unsigned int DefaultOption, const std::vector<std::string>& Options)
 {
-	return_val_if_fail(!application_state::instance().batch_mode(), 0);
+	return_val_if_fail(!k3d::batch_mode(), 0);
 
 	Gtk::MessageDialog dialog(Message, false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_NONE, true);
 
@@ -94,7 +96,7 @@ unsigned int query_message(const std::string& Message, const unsigned int Defaul
 
 void nag_message(const std::string& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
 {
-	if(application_state::instance().batch_mode())
+	if(k3d::batch_mode())
 		return;
 
 	if(!options::nag(Type))

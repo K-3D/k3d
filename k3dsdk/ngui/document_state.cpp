@@ -49,6 +49,7 @@
 #include "viewport.h"
 
 #include <k3dsdk/application.h>
+#include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/command_tree.h>
@@ -1733,7 +1734,7 @@ sigc::connection document_state::connect_safe_close_signal(const sigc::slot<unsa
 
 bool document_state::safe_close(Gtk::Window& Parent)
 {
-	if(application_state::instance().batch_mode())
+	if(k3d::batch_mode())
 	{
 		k3d::application().close_document(document());
 		return true;

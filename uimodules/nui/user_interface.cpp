@@ -73,11 +73,6 @@ public:
 	{
 	}
 
-	bool batch_mode()
-	{
-		return true;
-	}
-
 	void browser_navigate(const std::string& URL)
 	{
 	}

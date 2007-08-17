@@ -12,7 +12,7 @@ try:
 	frozen_mesh = doc.new_node("FrozenMesh")
 	frozen_mesh.name = "Bicubic Patch"
 
-	mesh = k3d.dynamic_cast(frozen_mesh, "imesh_storage").new_mesh()
+	mesh = k3d.dynamic_cast(frozen_mesh, "imesh_storage").reset_mesh()
 
 	positions = [
 		(-5, -5, 0), (-2, -5, 2), (2, -5, -2), (5, -5, 0),

@@ -46,11 +46,6 @@ public:
 	/// Attempts to safely close the application, saving unsaved documents and giving the user a chance to cancel.  Returns true iff the application will close.
 	bool safe_close(Gtk::Window& Parent);
 
-	/// Enables / disables batch (no user intervention) mode
-	void enable_batch_mode(const bool Enabled = true);
-	/// Returns true if batch (no user intervention) mode is enabled
-	const bool batch_mode();
-
 	/// Enables / disables use of user-customized UI layouts
 	void enable_custom_layouts(const bool Enabled = true);
 	/// Returns true if user-customized UI layouts are enabled

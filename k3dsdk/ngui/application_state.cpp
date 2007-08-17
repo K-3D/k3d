@@ -24,8 +24,9 @@
 #include "safe_close_dialog.h"
 #include "unsaved_document.h"
 
-#include <k3dsdk/application.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application.h>
+#include <k3dsdk/batch_mode.h>
 #include <k3dsdk/iapplication.h>
 
 #include <gtkmm/dialog.h>
@@ -43,7 +44,6 @@ class application_state::implementation :
 {
 public:
 	implementation() :
-		m_batch_mode(false),
 		m_custom_layouts(true),
 		m_assign_hotkeys(false)
 	{
@@ -61,8 +61,6 @@ public:
 	typedef sigc::signal<unsaved_document*> safe_close_signal_t;
 	/// Signal that will be emitted prior to safe shutdown to "gather" unsaved documents
 	safe_close_signal_t m_safe_close_signal;
-	/// Stores the batch (no user intervention) mode state
-	bool m_batch_mode;
 	/// Stores the user-customizable UI layouts state
 	bool m_custom_layouts;
 	/// Stores the current global assign hotkeys state
@@ -98,7 +96,7 @@ sigc::connection application_state::connect_safe_close_signal(const sigc::slot<u
 
 bool application_state::safe_close(Gtk::Window& Parent)
 {
-	if(m_implementation->m_batch_mode)
+	if(k3d::batch_mode())
 		return k3d::application().exit();
 	
 	safe_close_dialog::entries_t entries;
@@ -137,16 +135,6 @@ bool application_state::safe_close(Gtk::Window& Parent)
 	}
 	
 	return k3d::application().exit();
-}
-
-void application_state::enable_batch_mode(const bool Enabled)
-{
-	m_implementation->m_batch_mode = Enabled;
-}
-
-const bool application_state::batch_mode()
-{
-	return m_implementation->m_batch_mode;
 }
 
 void application_state::enable_custom_layouts(const bool Enabled)

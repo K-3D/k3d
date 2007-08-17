@@ -246,7 +246,6 @@ public:
 	void get_command_line_arguments(boost::program_options::options_description& Description)
 	{
 		Description.add_options()
-			("batch", "Enable batch (no user intervention) mode.")
 			("new,n", "Create a new document.")
 			("no-custom-layouts", "Disable custom user interface layouts (useful when playing-back recorded tutorials).")
 			("no-splash", "Disables the startup splash screen.")
@@ -326,11 +325,7 @@ public:
 		// For each command-line argument ...
 		for(arguments_t::const_iterator argument = Arguments.begin(); argument != Arguments.end(); ++argument)
 		{
-			if(argument->string_key == "batch")
-			{
-				application_state::instance().enable_batch_mode();
-			}
-			else if(argument->string_key == "no-custom-layouts")
+			if(argument->string_key == "no-custom-layouts")
 			{
 				application_state::instance().enable_custom_layouts(false);
 			}
@@ -446,11 +441,6 @@ public:
 	void stop_event_loop()
 	{
 		m_main->quit();
-	}
-
-	bool batch_mode()
-	{
-		return application_state::instance().batch_mode();
 	}
 
 	void browser_navigate(const std::string& URL)

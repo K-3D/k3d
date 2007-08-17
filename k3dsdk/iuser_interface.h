@@ -42,8 +42,6 @@ class iuser_interface :
 	public virtual iunknown
 {
 public:
-	/// Specifies batch-mode (no user intervention, good for executing scripts)
-	virtual bool batch_mode() = 0;
 	/// Displays a URL in the user's preferred web browser
 	virtual void browser_navigate(const std::string& URL) = 0;
 	/// Displays an informational message

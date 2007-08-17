@@ -23,8 +23,8 @@
 
 #include "log.h"
 #include "result.h"
-#include "user_interface_init.h"
-#include "user_interface.h"
+#include "batch_mode_init.h"
+#include "batch_mode.h"
 
 namespace k3d
 {
@@ -32,21 +32,19 @@ namespace k3d
 namespace detail
 {
 
-/// Stores the global user_interface object
-iuser_interface* g_user_interface = 0;
+/// Stores the global batch (no user intervention) mode state
+bool g_batch_mode = false;
 	
 } // namespace detail
 	
-void set_user_interface(iuser_interface& UserInterface)
+void set_batch_mode(const bool Mode)
 {
-	return_if_fail(!detail::g_user_interface);
-	detail::g_user_interface = &UserInterface;
+	detail::g_batch_mode = Mode;
 }
 
-iuser_interface& user_interface()
+const bool batch_mode()
 {
-	assert_critical(detail::g_user_interface);
-	return *detail::g_user_interface;
+	return detail::g_batch_mode;
 }
 
 } // namespace k3d

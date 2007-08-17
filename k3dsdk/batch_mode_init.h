@@ -1,3 +1,6 @@
+#ifndef K3DSDK_BATCH_MODE_INIT_H
+#define K3DSDK_BATCH_MODE_INIT_H
+
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
 //
@@ -18,36 +21,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
-
-#include "log.h"
-#include "result.h"
-#include "user_interface_init.h"
-#include "user_interface.h"
 
 namespace k3d
 {
 
-namespace detail
-{
-
-/// Stores the global user_interface object
-iuser_interface* g_user_interface = 0;
-	
-} // namespace detail
-	
-void set_user_interface(iuser_interface& UserInterface)
-{
-	return_if_fail(!detail::g_user_interface);
-	detail::g_user_interface = &UserInterface;
-}
-
-iuser_interface& user_interface()
-{
-	assert_critical(detail::g_user_interface);
-	return *detail::g_user_interface;
-}
+/// Sets the global batch (no user intervention) mode state (call once at startup)
+void set_batch_mode(const bool Mode);
 
 } // namespace k3d
+
+#endif // K3DSDK_BATCH_MODE_INIT_H
 

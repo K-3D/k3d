@@ -25,8 +25,9 @@
 #include "safe_close_dialog.h"
 #include "savable_application_window.h"
 
-#include <k3dsdk/iapplication.h>
 #include <k3dsdk/application.h>
+#include <k3dsdk/batch_mode.h>
+#include <k3dsdk/iapplication.h>
 
 #include <gtkmm/dialog.h>
 #include <gdk/gdkkeysyms.h>
@@ -73,7 +74,7 @@ unsaved_document* savable_application_window::on_safe_close()
 
 const bool savable_application_window::save_changes()
 {
-	if(application_state::instance().batch_mode() || !unsaved_changes())
+	if(k3d::batch_mode() || !unsaved_changes())
 		return true;
 
 	switch(safe_close_dialog::run(*this, unsaved_document_title()))
@@ -94,7 +95,7 @@ const bool savable_application_window::save_changes()
 
 void savable_application_window::safe_close()
 {
-	if(application_state::instance().batch_mode() || !unsaved_changes())
+	if(k3d::batch_mode() || !unsaved_changes())
 	{
 		close();
 		return;

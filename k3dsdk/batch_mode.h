@@ -1,5 +1,5 @@
-#ifndef K3DSDK_USER_INTERFACE_DETAIL_H
-#define K3DSDK_USER_INTERFACE_DETAIL_H
+#ifndef K3DSDK_BATCH_MODE_H
+#define K3DSDK_BATCH_MODE_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -27,12 +27,10 @@
 namespace k3d
 {
 
-class iuser_interface;
-
-/// Sets the global singleton user interface object (call once at startup)
-void set_user_interface(iuser_interface& UserInterface);
+/// Returns the current batch (no user intervention) mode state
+const bool batch_mode();
 
 } // namespace k3d
 
-#endif // K3DSDK_USER_INTERFACE_DETAIL_H
+#endif // K3DSDK_BATCH_MODE_H
 

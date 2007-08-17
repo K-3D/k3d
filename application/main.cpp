@@ -25,12 +25,14 @@
 #include <k3d-platform-config.h>
 #include <k3d-version-config.h>
 
-// Standard K-3D interface implementations for embedding
+// Specialized K-3D interfaces for embedding
 #include <k3dsdk/application_detail.h>
+#include <k3dsdk/batch_mode_init.h>
 #include <k3dsdk/plugin_factory_collection.h>
 #include <k3dsdk/render_farm.h>
+#include <k3dsdk/user_interface_init.h>
 
-// Standard K-3D interfaces and helpers
+// Standard K-3D interfaces
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/classes.h>
@@ -57,7 +59,6 @@
 #include <k3dsdk/string_modifiers.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/types.h>
-#include <k3dsdk/user_interface_detail.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/xml.h>
 
@@ -274,7 +275,11 @@ const arguments_t parse_startup_arguments(const arguments_t& Arguments, bool& Qu
 	// For each command-line argument ...
 	for(arguments_t::const_iterator argument = Arguments.begin(); argument != Arguments.end(); ++argument)
 	{
-		if(argument->string_key == "ui")
+		if(argument->string_key == "batch")
+		{
+			k3d::set_batch_mode(true);
+		}
+		else if(argument->string_key == "ui")
 		{
 			if(argument->value[0] == "none")
 				g_user_interface_path = g_default_nui_path;
@@ -591,7 +596,8 @@ int main(int argc, char* argv[])
 		boost::program_options::options_description description("K-3D options");
 		description.add_options()
 			("add-path", boost::program_options::value<std::string>(), "Prepend a path to the PATH environment variable at runtime.")
-			("color", "Color-codes log messages based on their level.")
+			("batch", "Enable batch (no user intervention) mode.")
+			("color", "Color-code log messages based on their level.")
 			("disable-gl-extension", boost::program_options::value<std::string>(), "Disables the given OpenGL extension.")
 			("enable-gl-extension", boost::program_options::value<std::string>(), "Enables the given OpenGL extension.")
 			("exit", "Exits the program (useful after running scripts in batch mode.")

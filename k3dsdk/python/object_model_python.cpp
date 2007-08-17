@@ -56,6 +56,7 @@
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/auto_ptr.h>
+#include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/command_tree.h>
@@ -402,6 +403,9 @@ BOOST_PYTHON_MODULE(k3d)
 	node::define_class();
 	ri_render_state::define_class();
 
+	def("batch_mode", k3d::batch_mode,
+		"Returns True if batch (no user intervention) mode is enabled for the user interface.\n"
+		"@note: Well-behaved scripts should not prompt the user for input if batch mode is enabled.");
 	def("check_node_environment", module_check_node_environment,
 		"Checks to see whether the current script is running from within the given node type.");
 	def("close_document", module_close_document,

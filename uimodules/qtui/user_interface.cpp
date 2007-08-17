@@ -343,11 +343,6 @@ void user_interface::stop_event_loop()
 	m_application->quit();
 }
 
-bool user_interface::batch_mode()
-{
-	return false;
-}
-
 void user_interface::browser_navigate(const std::string& URL)
 {
 }

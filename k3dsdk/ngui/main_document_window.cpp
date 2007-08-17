@@ -68,6 +68,7 @@
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/axis.h>
 #include <k3dsdk/basic_math.h>
+#include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/file_filter.h>
@@ -266,7 +267,7 @@ private:
 		m_continue.gobj()->in_button = true;
 
 		// If we are in batch mode, keep things moving along ...
-		if(application_state::instance().batch_mode())
+		if(k3d::batch_mode())
 		{
 			interactive::activate(m_continue);
 		}
