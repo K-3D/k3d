@@ -32,15 +32,17 @@
 /////////////////////////////////////////////////////////////////////////////
 // K3D_MODULE_EXPORT
 
-#ifdef K3D_API_WIN32
-
-	#define K3D_MODULE_EXPORT __declspec(dllexport)
-
-#else // K3D_API_WIN32
-
+#if defined K3D_SYMBOL_VISIBILITY
+	#if defined K3D_COMPILER_GCC
+		#define K3D_MODULE_EXPORT __attribute__ ((visibility("default")))
+	#elif defined K3D_COMPILER_MSVC
+		#define K3D_MODULE_EXPORT __declspec(dllexport)
+	#else
+		#define K3D_MODULE_EXPORT
+	#endif
+#else
 	#define K3D_MODULE_EXPORT
-
-#endif // !K3D_API_WIN32
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // K3D_MODULE_START

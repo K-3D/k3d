@@ -9,6 +9,8 @@
 #cmakedefine K3D_COMPILER_GCC
 #cmakedefine K3D_COMPILER_MSVC
 
+#cmakedefine K3D_SYMBOL_VISIBILITY
+
 #if defined K3D_COMPILER_GCC
 	#define K3D_COMPILER_NAME __VERSION__
 #elif defined K3D_COMPILER_MSVC
