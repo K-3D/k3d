@@ -87,12 +87,16 @@ int main(int argc, char* argv[])
 				k3d::xml::attribute("quality", (*factory)->quality())));
 
 		if(dynamic_cast<k3d::iapplication_plugin_factory*>(*factory))
+		{
 			xml_plugin.append(k3d::xml::attribute("type", "application"));
+		}
 		else if(dynamic_cast<k3d::idocument_plugin_factory*>(*factory))
+		{
 			xml_plugin.append(k3d::xml::attribute("type", "document"));
+		}
 		else
 		{
-			std::cerr << "Unknown factory type, terminating proxy generation" << std::endl;
+			std::cerr << "Unknown factory type for plugin [" << (*factory)->name() << "] - terminating proxy generation" << std::endl;
 			return 1;
 		}
 
