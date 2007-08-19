@@ -76,9 +76,6 @@ struct selection_input_model::implementation :
 	void on_button_down(viewport::control& Viewport, const GdkEventButton& Event)
 	{
 		m_start_selection = Viewport.pick_object(k3d::point2(Event.x, Event.y));
-
-k3d::log() << debug << m_start_selection << std::endl;
-
 		m_motion_type = MOTION_NONE;
 	}
 
