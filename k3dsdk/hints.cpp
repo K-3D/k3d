@@ -120,23 +120,27 @@ std::ostream& operator<<(std::ostream& Stream, const print& RHS)
 
 void hint_processor::process(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 {
-	if (dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint))
+	if(!Hint)
+	{
+		on_unknown_change(Mesh, Hint);
+	}
+	else if(dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint))
 	{
 		on_geometry_changed(Mesh, Hint);
 	}
-	else if (dynamic_cast<k3d::hint::selection_changed_t*>(Hint))
+	else if(dynamic_cast<k3d::hint::selection_changed_t*>(Hint))
 	{
 		on_selection_changed(Mesh, Hint);
 	}
-	else if (dynamic_cast<k3d::hint::mesh_topology_changed_t*>(Hint))
+	else if(dynamic_cast<k3d::hint::mesh_topology_changed_t*>(Hint))
 	{
 		on_topology_changed(Mesh, Hint);
 	}
-	else if (dynamic_cast<k3d::hint::mesh_deleted_t*>(Hint))
+	else if(dynamic_cast<k3d::hint::mesh_deleted_t*>(Hint))
 	{
 		on_mesh_deleted(Mesh, Hint);
 	}
-	else if (dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint))
+	else if(dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint))
 	{
 		on_address_changed(Mesh, Hint);
 	}
