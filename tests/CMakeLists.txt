@@ -222,6 +222,8 @@ K3D_ADD_PYTHON_TEST(mesh.modifier.TransformPoints.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.TranslatePoints.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.TriangulateFaces.PolyCube.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.TriangulateFaces.PolyGrid.py)
+K3D_ADD_PYTHON_TEST(mesh.modifier.TriangulateFaces.PolyGrid.selection.py)
+K3D_ADD_PYTHON_TEST(mesh.modifier.TriangulateFaces.self_intersection.py)
 K3D_ADD_PYTHON_TEST(mesh.modifier.TwistPoints.py)
 
 K3D_ADD_PYTHON_TEST(mesh.sink.K3DMeshWriter.py)
