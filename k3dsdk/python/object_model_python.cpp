@@ -39,6 +39,7 @@
 #include "iplugin_factory_python.h"
 #include "iproperty_python.h"
 #include "iproperty_collection_python.h"
+#include "isnappable_python.h"
 #include "iunknown_python.h"
 #include "iuser_interface_python.h"
 #include "matrix4_python.h"
@@ -360,11 +361,6 @@ const std::string module_print_diff(const object& A, const object& B, const obje
 	throw std::invalid_argument("cannot diff given objects");
 }
 
-object module_dynamic_cast(const object& Source, const std::string& Target)
-{
-	return do_dynamic_cast(Source, Target);
-}
-
 ////////////////////////////////////////////////////////////////////////////////////
 // k3d module
 
@@ -396,6 +392,7 @@ BOOST_PYTHON_MODULE(k3d)
 	iplugin_factory::define_class();
 	iproperty::define_class();
 	iproperty_collection::define_class();
+	isnappable::define_class();
 	iunknown::define_class();
 	iuser_interface::define_class();
 	mesh::define_class();
@@ -420,7 +417,7 @@ BOOST_PYTHON_MODULE(k3d)
 		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
 	def("deselect_all", k3d::mesh_selection::deselect_all,
 		"Returns a L{mesh_selection} that explicitly deselects every component.");
-	def("dynamic_cast", module_dynamic_cast,
+	def("dynamic_cast", do_dynamic_cast,
 		"Attempts to coerce an object from one type to another.");
 	def("print_diff", module_print_diff,
 		"Returns the difference of two L{mesh} objects as a string.");

@@ -27,6 +27,7 @@
 #include "imesh_storage_python.h"
 #include "inode_python.h"
 #include "iproperty_collection_python.h"
+#include "isnappable_python.h"
 #include "iunknown_python.h"
 #include "node_python.h"
 
@@ -35,6 +36,7 @@
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/isnappable.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -71,6 +73,8 @@ object do_dynamic_cast(k3d::iunknown* const Source, const std::string& Type)
 		return detail::do_dynamic_cast<k3d::inode, k3d::python::inode>(Source);
 	if(Type == "iproperty_collection")
 		return detail::do_dynamic_cast<k3d::iproperty_collection, k3d::python::iproperty_collection>(Source);
+	if(Type == "isnappable")
+		return detail::do_dynamic_cast<k3d::isnappable, k3d::python::isnappable>(Source);
 	if(Type == "iunknown")
 		return detail::do_dynamic_cast<k3d::iunknown, k3d::python::iunknown>(Source);
 
@@ -98,6 +102,10 @@ object do_dynamic_cast(const object& Source, const std::string& Type)
 	extract<k3d::python::iproperty_collection> iproperty_collection(Source);
 	if(iproperty_collection.check())
 		return do_dynamic_cast(iproperty_collection().wrapped_ptr(), Type);
+
+	extract<k3d::python::isnappable> isnappable(Source);
+	if(isnappable.check())
+		return do_dynamic_cast(isnappable().wrapped_ptr(), Type);
 
 	extract<k3d::python::iunknown> iunknown(Source);
 	if(iunknown.check())

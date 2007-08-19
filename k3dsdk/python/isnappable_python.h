@@ -1,5 +1,5 @@
-#ifndef K3DSDK_DYNAMIC_CAST_PYTHON_H
-#define K3DSDK_DYNAMIC_CAST_PYTHON_H
+#ifndef K3DSDK_ISNAPPABLE_PYTHON_H
+#define K3DSDK_ISNAPPABLE_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -24,22 +24,35 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "interface_wrapper_python.h"
 #include <boost/python/object.hpp>
 
 namespace k3d
 {
 
-class iunknown;
-	
+class isnappable;
+class point3;
+
 namespace python
 {
 
-//boost::python::object do_dynamic_cast(k3d::iunknown* Source, const std::string& Type);
-boost::python::object do_dynamic_cast(const boost::python::object& Source, const std::string& Type);
+class isnappable :
+	public interface_wrapper<k3d::isnappable>
+{
+	typedef interface_wrapper<k3d::isnappable> base;
+public:
+	isnappable();
+	isnappable(k3d::isnappable* Node);
+
+	void add_snap_source(const std::string& Label, const k3d::point3& Position);
+	void add_snap_target(const std::string& Label, const k3d::point3& Position);
+
+	static void define_class();
+};
 
 } // namespace python
 
 } // namespace k3d
 
-#endif // K3DSDK_DYNAMIC_CAST_PYTHON_H
+#endif // !K3DSDK_ISNAPPABLE_PYTHON_H
 
