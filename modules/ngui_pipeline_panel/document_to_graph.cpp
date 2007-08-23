@@ -23,6 +23,9 @@
 
 #include "document_to_graph.h"
 
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/imesh_painter_gl.h>
+#include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/ipipeline.h>
 
 namespace module
@@ -35,12 +38,19 @@ namespace pipeline
 {
 
 document_to_graph::document_to_graph(k3d::idocument& Document) :
-	m_document(Document)
+	m_document(Document),
+	m_include_materials(init_owner(*this) + init_name("include_materials") + init_label("") + init_description("") + init_value(false)),
+	m_include_painters(init_owner(*this) + init_name("include_painters") + init_label("") + init_description("") + init_value(false))
 {
+	m_include_materials.changed_signal().connect(make_reset_graph_slot());
+	m_include_painters.changed_signal().connect(make_reset_graph_slot());
 }
 
 void document_to_graph::on_initialize_graph(k3d::graph& Output)
 {
+	const bool include_materials = m_include_materials.pipeline_value();
+	const bool include_painters = m_include_painters.pipeline_value();
+
 	const k3d::nodes_t nodes = m_document.nodes().collection();
 
 	boost::shared_ptr<k3d::graph::adjacency_list> topology(new k3d::graph::adjacency_list());
@@ -51,6 +61,13 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 	std::map<k3d::inode*, k3d::graph::vertex_descriptor> node_map;
 	for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 	{
+		if(!include_materials && dynamic_cast<k3d::imaterial*>(*node))
+			continue;
+		if(!include_painters && dynamic_cast<k3d::gl::imesh_painter*>(*node))
+			continue;
+		if(!include_painters && dynamic_cast<k3d::ri::imesh_painter*>(*node))
+			continue;
+
 		node_map[*node] = boost::add_vertex(*topology);
 		vertex_node->push_back(*node);
 	}
@@ -58,6 +75,9 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 	// Insert edges ...
 	for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 	{
+		if(!node_map.count(*node))
+			continue;
+
 		if(k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(*node))
 		{
 			const k3d::iproperty_collection::properties_t properties = property_collection->properties();
@@ -67,6 +87,9 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 				{
 					if(k3d::inode* const referenced_node = boost::any_cast<k3d::inode*>((*property)->property_value()))
 					{
+						if(!node_map.count(referenced_node))
+							continue;
+
 						boost::add_edge(node_map[referenced_node], node_map[*node], *topology).first;
 						edge_type->push_back(BEHAVIOR_EDGE);
 					}
@@ -80,6 +103,12 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 	{
 		if(dependency->first && dependency->first->property_node() && dependency->second && dependency->second->property_node())
 		{
+			if(!node_map.count(dependency->second->property_node()))
+				continue;
+
+			if(!node_map.count(dependency->first->property_node()))
+				continue;
+
 			boost::add_edge(node_map[dependency->second->property_node()], node_map[dependency->first->property_node()], *topology).first;
 			edge_type->push_back(DATA_EDGE);
 		}

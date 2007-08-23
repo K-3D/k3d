@@ -49,11 +49,19 @@ class document_to_graph :
 public:
 	document_to_graph(k3d::idocument& Document);
 
+	k3d::iproperty& include_materials()
+	{
+		return m_include_materials;
+	}
+
 private:
 	void on_initialize_graph(k3d::graph& Output);
 	void on_update_graph(k3d::graph& Output);
 
 	k3d::idocument& m_document;
+
+	k3d_data(bool, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::writable_property, k3d::data::no_serialization) m_include_materials;
+	k3d_data(bool, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::writable_property, k3d::data::no_serialization) m_include_painters;
 };
 
 } // namespace pipeline
