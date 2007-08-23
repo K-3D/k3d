@@ -63,10 +63,10 @@ public:
             const size_t edge_end = edge_begin + edge_points.size();
             for(size_t edge = edge_begin; edge != edge_end; ++edge)
             {
-                sums[edge_points[edge]] += InputPoints[edge_points[clockwise_edges[edge]]];
+                sums[edge_points[edge]] += k3d::to_vector(InputPoints[edge_points[clockwise_edges[edge]]]);
                 counts[edge_points[edge]] += 1;
 
-                sums[edge_points[clockwise_edges[edge]]] += InputPoints[edge_points[edge]];
+                sums[edge_points[clockwise_edges[edge]]] += k3d::to_vector(InputPoints[edge_points[edge]]);
                 counts[edge_points[clockwise_edges[edge]]] += 1;
             }
         }

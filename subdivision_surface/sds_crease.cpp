@@ -166,11 +166,11 @@ private:
 			return;
 		std::map<double, link*> angle_links;
 
-		k3d::point3 v0 = links[0]->companion->edge->vertex->position - vertex->position;
+		k3d::vector3 v0 = links[0]->companion->edge->vertex->position - vertex->position;
 
 		for (unsigned long i = 0; i < links.size(); ++i)
 		{
-			k3d::point3 v = links[i]->companion->edge->vertex->position - vertex->position;
+			k3d::vector3 v = links[i]->companion->edge->vertex->position - vertex->position;
 			angle_links[angle(v0, v)] = links[i];
 		}
 
@@ -182,16 +182,16 @@ private:
 		}
 	}
 /// Calculate the angle between 2 vectors
-	double angle(k3d::point3& v1, k3d::point3& v2)
+	double angle(k3d::vector3& v1, k3d::vector3& v2)
 	{
 // cosine of the angle:
-		double cos_th = (v1 * v2) / (k3d::to_vector(v1).length() * k3d::to_vector(v2).length());
+		double cos_th = (v1 * v2) / (k3d::length(v1) * k3d::length(v2));
 //sometimes this value is greater than 1
 		if (cos_th > 1.0)
 			cos_th = 1.0;
 		if (cos_th < -1.0)
 			cos_th = -1.0;
-		k3d::vector3 normal = k3d::normalize(k3d::to_vector(v1) ^ k3d::to_vector(v2));
+		k3d::vector3 normal = k3d::normalize(v1 ^ v2);
 		double tol = 0.00001;
 // the angle
 		double th = (normal + m_Normal).length() > tol ? acos(cos_th) : k3d::pi_times_2() - acos(cos_th);
@@ -282,7 +282,7 @@ splitter::splitter(k3d::legacy::polyhedron& Polyhedron, k3d::legacy::mesh::point
 		while(this_edge != Polyhedron.faces[i]->first_edge)
 		{
 			++corners;
-			centroid->position += this_edge->vertex->position;
+			centroid->position += k3d::to_vector(this_edge->vertex->position);
 			has_selected_edge = get_sharpness(*this_edge) > 0.0 ? true : has_selected_edge;
 			if (Use_selection && (this_edge->vertex->selection_weight || this_edge->selection_weight))
 				has_selected_edge = true;

@@ -26,8 +26,8 @@
 
 #include "ui_component.h"
 
+#include <k3dsdk/point3.h>
 #include <k3dsdk/signal_system.h>
-#include <k3dsdk/vectors.h>
 
 #include <gtkmm/table.h>
 

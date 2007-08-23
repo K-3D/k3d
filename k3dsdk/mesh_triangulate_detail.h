@@ -57,7 +57,7 @@ public:
 		sgiTessBeginContour(tessellator);
 		for(split_edge* edge = Face.first_edge; edge && edge->face_clockwise; edge = edge->face_clockwise)
 		{
-			sgiTessVertex(tessellator, edge->vertex->position.data(), edge->vertex);
+			sgiTessVertex(tessellator, edge->vertex->position.n, edge->vertex);
 			if(edge->face_clockwise == Face.first_edge)
 				break;
 		}
@@ -69,7 +69,7 @@ public:
 			sgiTessBeginContour(tessellator);
 			for(split_edge* edge = *hole; edge && edge->face_clockwise; edge = edge->face_clockwise)
 			{
-				sgiTessVertex(tessellator, edge->vertex->position.data(), edge->vertex);
+				sgiTessVertex(tessellator, edge->vertex->position.n, edge->vertex);
 				if(edge->face_clockwise == *hole)
 					break;
 			}

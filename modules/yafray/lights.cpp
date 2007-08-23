@@ -351,7 +351,7 @@ private:
 
 		const k3d::point3 from = m_input_matrix.pipeline_value() * k3d::point3(0, 0, 0);
 		const k3d::point3 to = k3d::point3(0, 0, 0);
-		const k3d::vector3 spherical = k3d::spherical(k3d::to_vector(to - from));
+		const k3d::vector3 spherical = k3d::spherical(to - from);
 		glPushMatrix();
 		k3d::gl::push_matrix(k3d::inverse(k3d::extract_rotation(m_input_matrix.pipeline_value())) * rotation3D(k3d::quaternion(k3d::euler_angles(0, -spherical[2], spherical[1], k3d::euler_angles::ZXYstatic))));
 

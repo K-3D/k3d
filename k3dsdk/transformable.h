@@ -28,7 +28,6 @@
 #include "data.h"
 #include "itransform_sink.h"
 #include "itransform_source.h"
-#include "vectors.h"
 
 namespace k3d
 {

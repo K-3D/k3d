@@ -21,12 +21,13 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/basic_math.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/i3d_2d_mapping.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/vectors.h>
 
 #include <iterator>
 

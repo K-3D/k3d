@@ -164,8 +164,8 @@ void extrude_face(face_t& Face, k3d::legacy::face::holes_t& FaceHoles, k3d::imat
 	const unsigned long edge_count = old_points.size();
 	for(unsigned long i = 0; i != edge_count; ++i)
 	{
-		const k3d::vector3 e1 = k3d::to_vector(source_points[i]->position - source_points[(i+edge_count-1)%edge_count]->position);
-		const k3d::vector3 e2 = k3d::to_vector(source_points[(i+1)%edge_count]->position - source_points[i]->position);
+		const k3d::vector3 e1 = source_points[i]->position - source_points[(i+edge_count-1)%edge_count]->position;
+		const k3d::vector3 e2 = source_points[(i+1)%edge_count]->position - source_points[i]->position;
 		const k3d::vector3 e3 = k3d::normalize(e1 ^ Direction);
 		const k3d::vector3 e4 = k3d::normalize(e2 ^ Direction);
 

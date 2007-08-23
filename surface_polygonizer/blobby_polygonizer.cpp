@@ -22,7 +22,7 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/bounding_box.h>
+#include <k3dsdk/bounding_box3.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/result.h>
 
@@ -35,8 +35,8 @@
 // Point to segment distance
 double distance_to_segment(const k3d::point3& Point, const k3d::point3& S1, const k3d::point3& S2)
 {
-	const k3d::point3 vector = S2 - S1;
-	const k3d::point3 w = Point - S1;
+	const k3d::vector3 vector = S2 - S1;
+	const k3d::vector3 w = Point - S1;
 
 	const double c1 = w * vector;
 	if(c1 <= 0)
@@ -53,8 +53,8 @@ double distance_to_segment(const k3d::point3& Point, const k3d::point3& S1, cons
 
 k3d::point3 nearest_segment_point(const k3d::point3& Point, const k3d::point3& S1, const k3d::point3& S2)
 {
-	const k3d::point3 vector = S2 - S1;
-	const k3d::point3 w = Point - S1;
+	const k3d::vector3 vector = S2 - S1;
+	const k3d::vector3 w = Point - S1;
 
 	const double c1 = w * vector;
 	if(c1 <= 0)

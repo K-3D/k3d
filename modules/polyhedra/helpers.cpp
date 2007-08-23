@@ -125,7 +125,7 @@ k3d::point3 center_point(const k3d::legacy::face& Face)
 	for(k3d::legacy::split_edge* edge = Face.first_edge; edge; edge = edge->face_clockwise)
 	{
 		count++;
-		center += edge->vertex->position;
+		center += k3d::to_vector(edge->vertex->position);
 		if(Face.first_edge == edge->face_clockwise)
 			break;
 	}

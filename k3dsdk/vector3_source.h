@@ -22,7 +22,7 @@
 
 #include "data.h"
 #include "ivector3_source.h"
-#include "vectors.h"
+#include "vector3.h"
 
 namespace k3d
 {

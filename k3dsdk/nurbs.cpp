@@ -135,7 +135,7 @@ const point3 evaluate(const curve3& Curve, const double T)
 	for(unsigned long i = 0; i != Curve.control_points.size(); ++i)
 	{
 		const curve3::control_point& control_point = Curve.control_points[i];
-		c += control_point.position * control_point.weight * basis(i, Curve.order-1, T, Curve.knots);
+		c += to_vector(control_point.position * control_point.weight * basis(i, Curve.order-1, T, Curve.knots));
 	}
 
 	return c;

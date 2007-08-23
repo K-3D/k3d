@@ -43,7 +43,7 @@ plane::plane(const vector3& Normal, const point3& Point) :
 }
 
 plane::plane(const point3& PointA, const point3& PointB, const point3& PointC) :
-	normal(normalize(to_vector(PointA - PointB) ^ to_vector(PointC - PointB))),
+	normal(normalize((PointA - PointB) ^ (PointC - PointB))),
 	distance(-to_vector(PointA) * normal)
 {
 }

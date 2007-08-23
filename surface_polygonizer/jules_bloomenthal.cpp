@@ -98,7 +98,7 @@ vertex_t bloomenthal_polygonizer::location_vertex(const Location& l)
 // Return the nearest location corresponding to the vertex_t
 Location bloomenthal_polygonizer::nearest_location(const vertex_t& point)
 {
-	vertex_t vertex_position = (point - m_GridOrigin) / m_VoxelSize;
+	k3d::vector3 vertex_position = (point - m_GridOrigin) / m_VoxelSize;
 
 	int i = static_cast<int>(vertex_position.n[0]);
 	int j = static_cast<int>(vertex_position.n[1]);

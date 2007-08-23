@@ -22,7 +22,6 @@
 */
 
 #include "snap_source.h"
-#include "vectors.h"
 
 namespace k3d
 {

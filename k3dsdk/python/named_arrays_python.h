@@ -26,7 +26,7 @@
 
 #include "array_python.h"
 
-#include <k3dsdk/mesh.h>
+#include <k3dsdk/named_arrays.h>
 #include <boost/python.hpp>
 
 namespace k3d
@@ -41,7 +41,7 @@ namespace python
 class named_arrays
 {
 public:
-	named_arrays(k3d::mesh::named_arrays& NamedArrays);
+	named_arrays(k3d::named_arrays& NamedArrays);
 
 	boost::python::list array_names();
 	boost::python::object array(const std::string& Name);
@@ -65,7 +65,7 @@ private:
 		return boost::python::object(k3d::python::array<k3d::typed_array<array_type> >(*new_array));
 	}
 
-	k3d::mesh::named_arrays& wrapped;
+	k3d::named_arrays& wrapped;
 };
 
 } // namespace python

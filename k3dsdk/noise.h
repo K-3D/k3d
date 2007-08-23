@@ -26,7 +26,7 @@
 */
 
 #include "color.h"
-#include "vectors.h"
+#include "point3.h"
 
 namespace k3d
 {

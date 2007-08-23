@@ -27,6 +27,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_painter_ri.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_ri.h>
@@ -104,7 +105,9 @@ public:
 			for(size_t point = point_begin; point != point_end; ++point)
 			{
 				ri_points->push_back(k3d::ri::hpoint(
-					patch_point_weights[point] * points[patch_points[point]],
+					patch_point_weights[point] * points[patch_points[point]][0],
+					patch_point_weights[point] * points[patch_points[point]][1],
+					patch_point_weights[point] * points[patch_points[point]][2],
 					patch_point_weights[point]));
 
 				ri_vertex_data.push_back(patch_points[point]);

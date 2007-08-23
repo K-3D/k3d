@@ -189,7 +189,7 @@ inline const bool operator==(const vector2& a, const vector2& b)
 	return a.n[0] == b.n[0] && a.n[1] == b.n[1];
 }
 
-/// Non-equality
+/// Inequality
 inline const bool operator!=(const vector2& a, const vector2& b)
 {
 	return a.n[0] != b.n[0] || a.n[1] != b.n[1];

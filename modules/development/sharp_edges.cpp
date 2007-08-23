@@ -22,15 +22,16 @@
 		\brief Sets the selected edges as "sharp"
  */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/array.h>
 #include <k3dsdk/axis.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/hints.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/shared_pointer.h>
@@ -68,7 +69,7 @@ public:
 		Output = Input;
 		k3d::make_unique(Output.points);
 		
-		replace_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::replace_selection(m_mesh_selection.pipeline_value(), Output);
 		
 		return_if_fail(Output.polyhedra);
 		return_if_fail(Output.polyhedra->edge_selection);

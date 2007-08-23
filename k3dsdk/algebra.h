@@ -99,8 +99,10 @@ public:
 	matrix4(const matrix4& m);
 	/// Assignment of an matrix4
 	matrix4& operator=(const matrix4& m);
+/*
 	/// Assignment of a C/C++ array
 	matrix4& operator=(const double d[4][4]);
+*/
 	/// Assignment of a C/C++ array
 	matrix4& operator=(const double d[16]);
 	/// Addition
@@ -661,7 +663,7 @@ inline const matrix4 extract_rotation(const matrix4& m)
 
 inline point3 operator*(const matrix4& a, const point3& v)
 {
-	const point4 result = a * point4(v, 1);
+	const point4 result = a * point4(v[0], v[1], v[2], 1);
 	return point3(result[0] / result[3], result[1] / result[3], result[2] / result[3]);
 }
 
@@ -744,8 +746,10 @@ inline matrix4& matrix4::operator=(const matrix4& m)
 { v[0] = m.v[0]; v[1] = m.v[1]; v[2] = m.v[2]; v[3] = m.v[3];
 return *this; }
 
+/*
 inline matrix4& matrix4::operator=(const double d[4][4])
 { v[0] = d[0]; v[1] = d[1]; v[2] = d[2]; v[3] = d[3]; return *this; }
+*/
 
 inline matrix4& matrix4::operator=(const double d[16])
 { memcpy(&v[0][0], &d[0], 16 * sizeof(double)); return *this; }

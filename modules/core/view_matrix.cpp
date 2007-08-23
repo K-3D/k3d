@@ -66,8 +66,8 @@ public:
 		const k3d::point3 position = m_position.pipeline_value() * k3d::point3();
 
 		return k3d::view_matrix(
-			k3d::to_vector(look_position - position),
-			k3d::to_vector(up_position - position),
+			look_position - position,
+			up_position - position,
 			position);
 	}
 

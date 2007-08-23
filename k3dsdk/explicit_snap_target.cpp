@@ -23,7 +23,6 @@
 
 #include "explicit_snap_target.h"
 #include "result.h"
-#include "vectors.h"
 
 namespace k3d
 {

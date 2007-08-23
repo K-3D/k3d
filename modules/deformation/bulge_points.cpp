@@ -24,11 +24,12 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/axis.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
 
 namespace libk3ddeformation
@@ -146,7 +147,7 @@ public:
 					coords[2] += offset;
 			}
 
-			return coords - m_origin;
+			return coords - k3d::to_vector(m_origin);
 		}
 
 	private:
@@ -159,7 +160,7 @@ public:
 		const bool m_displace_y;
 		const bool m_displace_z;
 		const double m_bulge_factor;
-		const k3d::point3 m_size;
+		const k3d::vector3 m_size;
 	};
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)

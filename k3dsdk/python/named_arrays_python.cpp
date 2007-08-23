@@ -23,8 +23,13 @@
 
 #include "named_arrays_python.h"
 
+#include <k3dsdk/algebra.h>
 #include <k3dsdk/color.h>
+#include <k3dsdk/normal3.h>
+#include <k3dsdk/point3.h>
+#include <k3dsdk/point4.h>
 #include <k3dsdk/types.h>
+#include <k3dsdk/vector3.h>
 
 using namespace boost::python;
 
@@ -37,7 +42,7 @@ namespace python
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // named_arrays
 
-named_arrays::named_arrays(k3d::mesh::named_arrays& NamedArrays) :
+named_arrays::named_arrays(k3d::named_arrays& NamedArrays) :
 	wrapped(NamedArrays)
 {
 }
@@ -46,7 +51,7 @@ list named_arrays::array_names()
 {
 	list results;
 
-	for(k3d::mesh::named_arrays::const_iterator array = wrapped.begin(); array != wrapped.end(); ++array)
+	for(k3d::named_arrays::const_iterator array = wrapped.begin(); array != wrapped.end(); ++array)
 		results.append(array->first);
 
 	return results;
@@ -93,7 +98,7 @@ object named_arrays::get_item(int item)
 	if(item < 0 || item >= wrapped.size())
 		throw std::out_of_range("index out-of-range");
 
-	k3d::mesh::named_arrays::const_iterator array_iterator = wrapped.begin();
+	k3d::named_arrays::const_iterator array_iterator = wrapped.begin();
 	std::advance(array_iterator, item);
 
 	return wrap_array(array_iterator->second.get());

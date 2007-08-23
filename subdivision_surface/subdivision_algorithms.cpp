@@ -24,8 +24,7 @@
 
 #include "subdivision_algorithms.h"
 
-//#include <k3dsdk/high_res_timer.h>
-
+#include <k3dsdk/vectors.h>
 #include <cmath>
 
 namespace k3d
@@ -50,10 +49,10 @@ void sds_point::update()
 		return;
 	position_t corners_pos(0,0,0);
 	for(sdspoints_t::iterator it = corners.begin(); it != corners.end(); ++it)
-		corners_pos += (*it)->original;
+		corners_pos += k3d::to_vector((*it)->original);
 	position_t faces_pos(0,0,0);
 	for(facevertices_t::iterator it = face_vertices.begin(); it != face_vertices.end(); ++it)
-		faces_pos += (*it)->vertex;
+		faces_pos += k3d::to_vector((*it)->vertex);
 	double nninv = 1/(n*n);
 	vertex = (n-2.0)/n * (original) + nninv * corners_pos + nninv * faces_pos;
 	m_valid = true;
@@ -343,33 +342,33 @@ void sds_mipmap::update_border(patch_border* border)
 	if(border == &m_left)
 	{
 		for(int i = 1; i < m_size-1; i += 2)
-			*m_points[0][i] += *m_points[1][i];
+			*m_points[0][i] += k3d::to_vector(*m_points[1][i]);
 		for(int i = 2; i < m_size-1; i += 2)
-			*m_points[0][i] += *m_parent_points[1][i/2] + *m_points[1][i-1] + *m_points[1][i+1];
+			*m_points[0][i] += k3d::to_vector(*m_parent_points[1][i/2] + *m_points[1][i-1] + *m_points[1][i+1]);
 		return;
 	}
 	if(border == &m_bottom)
 	{
 		for(int i = 1; i < m_size-1; i += 2)
-			*m_points[i][0] += *m_points[i][1];
+			*m_points[i][0] += k3d::to_vector(*m_points[i][1]);
 		for(int i = 2; i < m_size-1; i += 2)
-			*m_points[i][0] += *m_parent_points[i/2][1] + *m_points[i-1][1] + *m_points[i+1][1];
+			*m_points[i][0] += k3d::to_vector(*m_parent_points[i/2][1] + *m_points[i-1][1] + *m_points[i+1][1]);
 		return;
 	}
 	if(border == &m_top)
 	{
 		for(int i = 1; i < m_size-1; i += 2)
-			*m_points[i][m_size-1] += *m_points[i][m_size-2];
+			*m_points[i][m_size-1] += k3d::to_vector(*m_points[i][m_size-2]);
 		for(int i = 2; i < m_size-1; i += 2)
-			*m_points[i][m_size-1] += *m_parent_points[i/2][parsize-1] + *m_points[i-1][m_size-2] + *m_points[i+1][m_size-2];
+			*m_points[i][m_size-1] += k3d::to_vector(*m_parent_points[i/2][parsize-1] + *m_points[i-1][m_size-2] + *m_points[i+1][m_size-2]);
 		return;
 	}
 	if(border == &m_right)
 	{
 		for(int i = 1; i < m_size-1; i += 2)
-			*m_points[m_size-1][i] += *m_points[m_size-2][i];
+			*m_points[m_size-1][i] += k3d::to_vector(*m_points[m_size-2][i]);
 		for(int i = 2; i < m_size-1; i += 2)
-			*m_points[m_size-1][i] += *m_parent_points[parsize-1][i/2] + *m_points[m_size-2][i-1] + *m_points[m_size-2][i+1];
+			*m_points[m_size-1][i] += k3d::to_vector(*m_parent_points[parsize-1][i/2] + *m_points[m_size-2][i-1] + *m_points[m_size-2][i+1]);
 		return;
 	}
 }
@@ -506,7 +505,7 @@ void face_vertex::update(const_positions_t& Points)
 		corners[i]->invalidate();
 		corners[i]->vertex = zero;
 		edge_vertices[i]->invalidate();
-		position += *(Points[i]);
+		position += k3d::to_vector(*(Points[i]));
 	}
 	vertex = position / static_cast<double>(n);
 	for(unsigned long i = 0; i < mipmaps.size(); ++i)
@@ -536,11 +535,11 @@ void patch_corner::update()
 	position_t corners_pos(0,0,0);
 	for(positions_t::iterator it = m_corners.begin(); it != m_corners.end(); ++it)
 	{
-		corners_pos += **it;
+		corners_pos += k3d::to_vector(**it);
 	}
 	position_t faces_pos(0,0,0);
 	for(positions_t::iterator it = m_face_vertices.begin(); it != m_face_vertices.end(); ++it)
-		faces_pos += **it;
+		faces_pos += k3d::to_vector(**it);
 	double nninv = 1/(n*n);
 	*m_point = (n-2.0)/n * m_parent + nninv * corners_pos + nninv * faces_pos;
 	m_valid = true;
@@ -557,7 +556,7 @@ void patch_corner::update_normal()
 	unsigned long n = m_normals.size();
 	for(unsigned long i = 0; i < n; ++i)
 	{
-		edges += *m_normals[i];
+		edges += k3d::to_vector(*m_normals[i]);
 	}
 	m_normal = edges / static_cast<double>(n);
 	m_normal_valid = true;
@@ -586,7 +585,7 @@ void patch_corner::update_nurbs()
 	position_t p(0,0,0);
 	for(unsigned long i = 0; i < n; ++i)
 	{
-		p += 4*(*m_edge_vertices[i]) + *m_face_vertices[i];
+		p += k3d::to_vector(4*(*m_edge_vertices[i]) + *m_face_vertices[i]);
 	}
 	*m_nurbs_position = n * position() / (n+5) + p / ((n+5)*n);
 	m_nurbs_valid = true;
@@ -735,16 +734,16 @@ void patch_border::update(int Level)
 		for(int i = 1; i < m_size-1; i += 2)
 		{
 			int i_p = (i-1)/2;
-			*m_points[i] += *m_parent[i_p] + *m_parent[i_p+1];
+			*m_points[i] += k3d::to_vector(*m_parent[i_p] + *m_parent[i_p+1]);
 			*m_points[i] /= 4.0;
 		}
 		// old points
 		for(int i = 2; i < m_size-1; i += 2)
 		{
 			int i_p = i/2;
-			*m_points[i] += *m_parent[i_p-1] + *m_parent[i_p+1];
+			*m_points[i] += k3d::to_vector(*m_parent[i_p-1] + *m_parent[i_p+1]);
 			*m_points[i] *= n2inv;
-			*m_points[i] += 0.5*(*m_parent[i_p]);
+			*m_points[i] += k3d::to_vector(0.5*(*m_parent[i_p]));
 		}
 		m_top->update();
 		m_bottom->update();
@@ -884,7 +883,7 @@ position_t corner_smoothing::r(const positions_t& Q40)
 	int n = Q40.size();
 	position_t r(0,0,0);
 	for(int i = 0; i < n; ++i)
-		r += powi(i+1) * (*Q40[i]);
+		r += powi(i+1) * k3d::to_vector(*Q40[i]);
 	r /= static_cast<double>(n);
 	return r;
 }
@@ -894,7 +893,7 @@ void corner_smoothing::add_h(position_t r, positions_t & Q40, positions_t & Q41,
 	int n = Q40.size();
 	for(int i = 0; i < n; ++i)
 	{
-		position_t h = -powi(i+1)*r;
+		const k3d::vector3 h = -powi(i+1) * k3d::to_vector(r);
 		*Q40[i] += h;
 		*Q41[i] += h;
 		*Q14[i] -= h;
@@ -909,7 +908,7 @@ void corner_smoothing::q10(positions_t & Q10, const position_t & Q00)
 	{
 		k3d::point3& p1 = *Q10[i];
 //		k3d::log() << debug << "modified " << p1[0] << ", " << p1[1] << ", " << p1[2];
-		*Q10[i] += Q00;
+		*Q10[i] += k3d::to_vector(Q00);
 //		k3d::log() << debug << " to " << p1[0] << ", " << p1[1] << ", " << p1[2] << std::endl;
 	}
 }
@@ -1009,7 +1008,7 @@ void corner_smoothing::mat_mult(matrix & A, positions_t & p)
 	{
 		position_t* element = new position_t(0,0,0);
 		for(int j = 0; j < n; ++j)
-			*element += A[j][i]*(*p[j]);
+			*element += k3d::to_vector(A[j][i]*(*p[j]));
 		result.push_back(element);
 	}
 	for(int i = 0; i < n; ++i)
@@ -1024,7 +1023,7 @@ void corner_smoothing::q12(positions_t& Q21, positions_t& Q12, const positions_t
 	int n = Q21.size();
 	for(int i = 0; i < n; ++i)
 	{
-		position_t diff = *Q20[i] - *Q20_orig[i];
+		k3d::vector3 diff = *Q20[i] - *Q20_orig[i];
 		*Q21[i] += diff;
 		*Q12[(n+i-1)%n] += diff;
 	}

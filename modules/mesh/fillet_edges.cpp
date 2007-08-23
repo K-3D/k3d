@@ -66,7 +66,8 @@ k3d::point3 intersect_line_plane(const k3d::point3& a, const k3d::point3& b, con
 
 k3d::point4 plane_from_two_vectors_and_point(const k3d::vector3& u, const k3d::vector3 v, const k3d::point3& p)
 {
-	k3d::point4 plane(k3d::to_point(k3d::normalize(u ^ v)), 1);
+	const k3d::point3 temp(k3d::to_point(k3d::normalize(u ^ v)));
+	k3d::point4 plane(temp[0], temp[1], temp[2], 1);
 
 	// Plane contains p
 	plane[3] = -(plane[0] * p[0] + plane[1] * p[1] + plane[2] * p[2]);
@@ -292,7 +293,7 @@ void unweld_edges(edge_set_t& Edges, const edge_face_map_t& EdgeFaceMap, const d
 
 				next_edge->vertex = new_point;
 
-				k3d::vector3 direction = k3d::normalize(k3d::to_vector(next_edge->face_clockwise->vertex->position - next_edge->vertex->position));
+				k3d::vector3 direction = k3d::normalize(next_edge->face_clockwise->vertex->position - next_edge->vertex->position);
 				border_point* b_point = new border_point(new_point, direction);
 				BorderPoints.insert(std::make_pair(new_point, b_point));
 
@@ -319,7 +320,7 @@ void unweld_edges(edge_set_t& Edges, const edge_face_map_t& EdgeFaceMap, const d
 
 				next_loop_edge->vertex = new_point2;
 
-				k3d::vector3 direction2 = k3d::normalize(k3d::to_vector(k3d::legacy::face_anticlockwise(next_loop_edge)->vertex->position - next_loop_edge->vertex->position));
+				k3d::vector3 direction2 = k3d::normalize(k3d::legacy::face_anticlockwise(next_loop_edge)->vertex->position - next_loop_edge->vertex->position);
 				border_point* b_point2 = new border_point(new_point2, direction2);
 				BorderPoints.insert(std::make_pair(new_point2, b_point2));
 
@@ -352,8 +353,8 @@ void unweld_edges(edge_set_t& Edges, const edge_face_map_t& EdgeFaceMap, const d
 					// Point moves previous and next edge normals (in their face's plane)
 					next_edge->vertex = new_point;
 
-					k3d::vector3 edge_direction = k3d::to_vector(edge->face_clockwise->vertex->position - edge->vertex->position);
-					k3d::vector3 next_edge_direction = k3d::to_vector(next_edge->face_clockwise->vertex->position - next_edge->vertex->position);
+					k3d::vector3 edge_direction = edge->face_clockwise->vertex->position - edge->vertex->position;
+					k3d::vector3 next_edge_direction = next_edge->face_clockwise->vertex->position - next_edge->vertex->position;
 
 					edge_face_map_t::const_iterator face = EdgeFaceMap.find(edge);
 					return_if_fail(face != EdgeFaceMap.end());
@@ -376,7 +377,7 @@ void unweld_edges(edge_set_t& Edges, const edge_face_map_t& EdgeFaceMap, const d
 					{
 						next_edge->vertex = new_point;
 
-						k3d::vector3 edge_direction = k3d::normalize(k3d::to_vector(next_edge->face_clockwise->vertex->position - next_edge->vertex->position));
+						k3d::vector3 edge_direction = k3d::normalize(next_edge->face_clockwise->vertex->position - next_edge->vertex->position);
 						direction += edge_direction;
 
 						next_edge = next_edge->companion->face_clockwise;
@@ -420,8 +421,8 @@ void unweld_edges(edge_set_t& Edges, const edge_face_map_t& EdgeFaceMap, const d
 		}
 
 		// Detect face flip
-		k3d::vector3 edge1_dir1 = k3d::normalize(k3d::to_vector(face->first_edge->face_clockwise->vertex->position - face->first_edge->vertex->position));
-		k3d::vector3 edge1_dir2 = k3d::normalize(k3d::to_vector(face->first_edge->face_clockwise->vertex->position - face->first_edge->vertex->position));
+		k3d::vector3 edge1_dir1 = k3d::normalize(face->first_edge->face_clockwise->vertex->position - face->first_edge->vertex->position);
+		k3d::vector3 edge1_dir2 = k3d::normalize(face->first_edge->face_clockwise->vertex->position - face->first_edge->vertex->position);
 
 		if(edge1_dir1 * edge1_dir2 < 0)
 		{
@@ -480,12 +481,12 @@ k3d::point3 slerp_points(const unsigned long SegmentNumber, const k3d::point3& V
 	k3d::point3 rotation_center = 0.5 * (intersection1 + intersection2);
 
 	// Get start and end vectors for Slerp
-	k3d::vector3 orientation1 = k3d::to_vector(Vertex1 - rotation_center);
+	k3d::vector3 orientation1 = Vertex1 - rotation_center;
 	const double length1 = orientation1.length();
 	return_val_if_fail(length1 > 0, rotation_center);
 	orientation1 /= length1;
 
-	k3d::vector3 orientation2 = k3d::to_vector(Vertex2 - rotation_center);
+	k3d::vector3 orientation2 = Vertex2 - rotation_center;
 	const double length2 = orientation2.length();
 	return_val_if_fail(length2 > 0, rotation_center);
 	orientation2 /= length2;
@@ -512,7 +513,7 @@ k3d::point3 slerp_points(const unsigned long SegmentNumber, const k3d::point3& V
 
 k3d::point3 lerp_points(const unsigned long SegmentNumber, const k3d::point3& Vertex1, const k3d::vector3& Normal1, const k3d::point3& Vertex2, const k3d::vector3& Normal2, points_t& NewPoints)
 {
-	const k3d::point3 direction = Vertex2 - Vertex1;
+	const k3d::vector3 direction = Vertex2 - Vertex1;
 
 	const double segment_number = static_cast<double>(SegmentNumber);
 	for(unsigned long n = 1; n < SegmentNumber; ++n)
@@ -926,12 +927,12 @@ void fillet_edges(const edge_set_t& Edges, border_points_t& BorderPoints, const 
 
 k3d::point3 slerp_orientations(const k3d::point3& Point1, const k3d::point3& Point2, const k3d::point3& Center, const double t)
 {
-	k3d::vector3 orientation1 = k3d::to_vector(Point1 - Center);
+	k3d::vector3 orientation1 = Point1 - Center;
 	const double length1 = orientation1.length();
 	return_val_if_fail(length1 > 0, k3d::point3(0, 0, 0));
 	orientation1 /= length1;
 
-	k3d::vector3 orientation2 = k3d::to_vector(Point2 - Center);
+	k3d::vector3 orientation2 = Point2 - Center;
 	const double length2 = orientation2.length();
 	return_val_if_fail(length2 > 0, k3d::point3(0, 0, 0));
 	orientation2 /= length2;
@@ -1016,7 +1017,7 @@ void fill_intersections(intersection_edges_t& IntersectionEdges, k3d::imaterial*
 			k3d::point3 flat_center(0, 0, 0);
 			for(detail::points_t::iterator center = flat_points.begin(); center != flat_points.end(); ++center)
 			{
-				flat_center += *center;
+				flat_center += k3d::to_vector(*center);
 			}
 			flat_center /= static_cast<double>(flat_points.size());
 
@@ -1027,7 +1028,7 @@ void fill_intersections(intersection_edges_t& IntersectionEdges, k3d::imaterial*
 			// Get average rotation center
 			for(detail::points_t::iterator center = rotation_points.begin(); center != rotation_points.end(); ++center)
 			{
-				rotation_center += *center;
+				rotation_center += k3d::to_vector(*center);
 			}
 			rotation_center /= static_cast<double>(rotation_points.size());
 
@@ -1038,16 +1039,16 @@ void fill_intersections(intersection_edges_t& IntersectionEdges, k3d::imaterial*
 		bool convex = false;
 		if(!flat)
 		{
-			typedef std::vector<k3d::point3> normals_t;
+			typedef std::vector<k3d::vector3> normals_t;
 			normals_t normals;
-			k3d::point3 average(0, 0, 0);
+			k3d::vector3 average(0, 0, 0);
 			for(unsigned long n = 0; n < border_number; ++n)
 			{
 				border_t& border = borders[n];
 				if(border.flat)
 					continue;
 
-				const k3d::point3 normal = (border.start->position + border.end->position) / 2 - center_position;
+				const k3d::vector3 normal = (border.start->position + border.end->position) / 2 - center_position;
 				normals.push_back(normal);
 				average += normal;
 			}
@@ -1058,7 +1059,7 @@ void fill_intersections(intersection_edges_t& IntersectionEdges, k3d::imaterial*
 				average /= static_cast<double>(normals.size());
 
 				// Check that every normal is on the same side of the plane defined by average normal
-				for(std::vector<k3d::point3>::const_iterator normal = normals.begin(); normal != normals.end(); ++normal)
+				for(normals_t::const_iterator normal = normals.begin(); normal != normals.end(); ++normal)
 				{
 					if(*normal * average < 0)
 					{
@@ -1077,7 +1078,7 @@ void fill_intersections(intersection_edges_t& IntersectionEdges, k3d::imaterial*
 
 			for(unsigned long m = 0; m < border_number; ++m)
 			{
-				const k3d::vector3 vector = k3d::to_vector(borders[m].start->position - rotation_center);
+				const k3d::vector3 vector = borders[m].start->position - rotation_center;
 				average_direction += vector;
 				average_length += vector.length();
 			}

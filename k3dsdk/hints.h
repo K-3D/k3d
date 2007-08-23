@@ -24,6 +24,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "algebra.h"
 #include "iunknown.h"
 #include "mesh_selection.h"
 #include "mesh.h"

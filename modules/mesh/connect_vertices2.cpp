@@ -80,8 +80,8 @@ bool colinear_linked2(k3d::legacy::split_edge* Edge1, k3d::legacy::split_edge* E
 	k3d::legacy::split_edge* edge = Edge1;
 	do
 	{
-		k3d::vector3 vector1 = k3d::to_vector(edge->face_clockwise->vertex->position - edge->vertex->position);
-		k3d::vector3 vector2 = k3d::to_vector(Edge2->vertex->position - edge->vertex->position);
+		k3d::vector3 vector1 = edge->face_clockwise->vertex->position - edge->vertex->position;
+		k3d::vector3 vector2 = Edge2->vertex->position - edge->vertex->position;
 		k3d::vector3 normal = vector1 ^ vector2;
 
 		if(normal.length2() > 1e-6)
@@ -142,8 +142,8 @@ void connect_face_vertices2(k3d::legacy::face* Face, edges_t& NewEdges, faces_t&
 					// When there are 2 selected edges, edge2 might come before edge1
 			{
 				// Make sure vectors are not colinear
-				k3d::vector3 vector1 = k3d::to_vector(edge1->face_clockwise->vertex->position - edge1->vertex->position);
-				k3d::vector3 vector2 = k3d::to_vector(edge2->vertex->position - edge1->vertex->position);
+				k3d::vector3 vector1 = edge1->face_clockwise->vertex->position - edge1->vertex->position;
+				k3d::vector3 vector2 = edge2->vertex->position - edge1->vertex->position;
 				k3d::vector3 normal = vector1 ^ vector2;
 
 				if(normal.length2() > 1e-6)

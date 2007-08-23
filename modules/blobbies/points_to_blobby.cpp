@@ -22,6 +22,7 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/material_client.h>
 #include <k3dsdk/measurement.h>

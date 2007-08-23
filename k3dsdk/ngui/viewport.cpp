@@ -1488,7 +1488,7 @@ const k3d::line3 mouse_to_world(viewport::control& Viewport, const k3d::point2& 
 	k3d::point3 far_plane;
 	gluUnProject(WidgetCoords[0], Viewport.get_height() - WidgetCoords[1], 1.0, gl_view_matrix, gl_projection_matrix, gl_viewport, &far_plane[0], &far_plane[1], &far_plane[2]);
 
-	return k3d::line3(to_vector(far_plane - near_plane), near_plane);
+	return k3d::line3(far_plane - near_plane, near_plane);
 }
 
 } // namespace libk3dngui

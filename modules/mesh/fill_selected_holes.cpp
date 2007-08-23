@@ -161,12 +161,12 @@ public:
 					for(edges_t::iterator shared_edge = edges->second.begin(); shared_edge != edges->second.end(); ++shared_edge)
 					{
 						// Compute angle with previous edge
-						k3d::vector3 vector1 = k3d::to_vector(edge->vertex->position - edge->face_clockwise->vertex->position);
-						k3d::vector3 point2 = k3d::to_vector(next_edge->face_clockwise->vertex->position - next_edge->vertex->position);
+						k3d::vector3 vector1 = edge->vertex->position - edge->face_clockwise->vertex->position;
+						k3d::vector3 point2 = next_edge->face_clockwise->vertex->position - next_edge->vertex->position;
 						const double cos = k3d::normalize(vector1) * k3d::normalize(point2);
 
-						vector1 = k3d::to_vector(edge->face_clockwise->vertex->position - edge->vertex->position);
-						point2 = k3d::to_vector(next_edge->vertex->position - next_edge->vertex->position);
+						vector1 = edge->face_clockwise->vertex->position - edge->vertex->position;
+						point2 = next_edge->vertex->position - next_edge->vertex->position;
 						const k3d::vector3 edges_normal = vector1 ^ point2;
 						const bool first_half = (edges_normal * normal > 0);
 

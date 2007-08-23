@@ -23,12 +23,14 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
+
+#include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3d-version-config.h>
 
 #include <k3dsdk/fstream.h>
 
@@ -83,7 +85,7 @@ public:
 		}
 
 		// Store polyhedra ...
-		if(validate_polyhedra(*mesh))
+		if(k3d::validate_polyhedra(*mesh))
 		{
 			const k3d::mesh::indices_t& first_faces = *mesh->polyhedra->first_faces;
 			const k3d::mesh::counts_t& face_counts = *mesh->polyhedra->face_counts;

@@ -25,13 +25,15 @@
 */
 
 #include "iunknown.h"
-#include "bounding_box.h"
-#include "vectors.h"
+#include "bounding_box3.h"
+#include "point2.h"
 
 namespace k3d
 {
 
-/// Abstract interface for properties that represent filesystem paths (typically used to alter presentation)
+class point3;
+class bounding_box3;
+
 class i3d_2d_mapping :
 	public virtual iunknown
 {

@@ -261,7 +261,7 @@ bool add_geometry(unsigned long Color, k3d::legacy::mesh* mesh, k3d::imaterial* 
 void add_cube(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned long color, k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::signed_axis Orientation)
 {
 	// Check size
-	k3d::vector3 direction = k3d::to_vector(end - start);
+	k3d::vector3 direction = end - start;
 	double length = direction.length();
 	if(length == 0)
 		return;
@@ -310,7 +310,7 @@ void add_cube(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned long
 void add_cylinder(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned long color, k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::signed_axis Orientation)
 {
 	// Check size
-	k3d::vector3 direction = k3d::to_vector(end - start);
+	k3d::vector3 direction = end - start;
 	double length = direction.length();
 	if(length == 0.0)
 		return;
@@ -347,7 +347,7 @@ void add_cylinder(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned 
 
 	if(last_col == color)
 	{
-		direction = k3d::to_vector(start - last);
+		direction = start - last;
 		length = direction.length();
 		double dd = std::numeric_limits<double>::max();
 
@@ -358,7 +358,7 @@ void add_cylinder(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned 
 			unsigned long ii = 0;
 			for(unsigned long i = 0; i < 8; i++)
 			{
-				direction = k3d::to_vector(vertices[0] - last_v[i]);
+				direction = vertices[0] - last_v[i];
 				length = direction.length();
 				if(length < dd)
 				{

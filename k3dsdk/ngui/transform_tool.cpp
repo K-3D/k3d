@@ -115,7 +115,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 				{
 					PointList.push_back(point);
 
-					component_center += points[point];
+					component_center += to_vector(points[point]);
 				}
 			}
 		}
@@ -144,7 +144,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			for (std::set<size_t>::const_iterator point = pointset.begin(); point != pointset.end(); ++ point)
 			{
 				PointList.push_back(*point);
-				component_center += points[*point];
+				component_center += to_vector(points[*point]);
 			}
 		}
 		break;
@@ -182,7 +182,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			for (std::set<size_t>::const_iterator point = pointset.begin(); point != pointset.end(); ++ point)
 			{
 				PointList.push_back(*point);
-				component_center += points[*point];
+				component_center += to_vector(points[*point]);
 			}
 		}
 		break;
@@ -1052,7 +1052,7 @@ k3d::point3 transform_tool::world_position()
 			{
 				if((*target)->target_number())
 				{
-					position += (*target)->world_position();
+					position += to_vector((*target)->world_position());
 					count++;
 				}
 			}
@@ -1272,7 +1272,7 @@ void transform_tool::rotate_targets(const k3d::matrix4& Rotation)
 	// Compute average of all selected components
 	k3d::point3 world_center(0, 0, 0);
 	for(targets_t::iterator target = m_targets.begin(); target != m_targets.end(); ++target)
-		world_center += (*target)->world_position();
+		world_center += k3d::to_vector((*target)->world_position());
 
 	world_center /= static_cast<double>(m_targets.size());
 
@@ -1296,7 +1296,7 @@ void transform_tool::scale_targets(const k3d::point3& Scaling)
 	// Compute average of all selected components
 	k3d::point3 world_center(0, 0, 0);
 	for(targets_t::iterator target = m_targets.begin(); target != m_targets.end(); ++target)
-		world_center += (*target)->world_position();
+		world_center += k3d::to_vector((*target)->world_position());
 
 	world_center /= static_cast<double>(m_targets.size());
 

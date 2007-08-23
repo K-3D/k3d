@@ -564,8 +564,8 @@ private:
 		k3d::point3 c = v2*B2;
 		k3d::point3 d = v3*B3;
 		k3d::point3 res = a+b;
-		res+=c;
-		res+=d;
+		res+=k3d::to_vector(c);
+		res+=k3d::to_vector(d);
 		return res; //errors if done in one line (?)
 	}
 
@@ -600,7 +600,7 @@ private:
 		if(y >= 1-prec)
 			y -= prec;
 		//cross product of two short vectors through the point should be a good approximation of the normal:
-		return k3d::to_vector(teapotPoint(x+prec,y,patch) - teapotPoint(x,y,patch)) ^ k3d::to_vector(teapotPoint(x,y+prec,patch) - teapotPoint(x,y,patch));
+		return (teapotPoint(x+prec,y,patch) - teapotPoint(x,y,patch)) ^ (teapotPoint(x,y+prec,patch) - teapotPoint(x,y,patch));
 	}
 };
 

@@ -91,7 +91,7 @@ public:
 						for(unsigned long m = 0; m < 4; m++)
 						{
 							const k3d::point3 position = (*patch)->control_points[l*4+m]->position;
-							p += position * U[l] * V[m];
+							p += k3d::to_vector(position * U[l] * V[m]);
 						}
 					}
 

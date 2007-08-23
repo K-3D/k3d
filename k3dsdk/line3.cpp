@@ -22,6 +22,7 @@
 */
 
 #include "line3.h"
+#include "vectors.h"
 
 namespace k3d
 {
@@ -36,7 +37,7 @@ line3::line3(const vector3& Direction, const point3& Point) :
 }
 
 line3::line3(const point3& Point1, const point3& Point2) :
-	direction(to_vector(Point2 - Point1)),
+	direction(Point2 - Point1),
 	point(Point1)
 {
 }

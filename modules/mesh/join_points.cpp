@@ -73,7 +73,7 @@ public:
 		{
 			if((*p)->selection_weight)
 			{
-				total_position += (*p)->position;
+				total_position += k3d::to_vector((*p)->position);
 				if(!point)
 					point = *p;
 				else

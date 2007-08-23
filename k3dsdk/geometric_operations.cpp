@@ -80,13 +80,13 @@ bool intersect_lines(const point3& P1, const vector3& T1, const point3& P2, cons
 	vector3 px = T1 ^ to_vector( P1 - T2 );
 	vector3 v = px ^ T1;
 
-	double t = to_vector( P1 - P2 ) * v;
+	double t = (P1 - P2) * v;
 	double vw = v * T2;
 	if ( ( vw * vw ) < 1.0e-07 )
 		return false;
 
 	t /= vw;
-	Result = P2 + ( ( to_vector( P1 - P2 ) * v ) / vw ) * T2 ;
+	Result = P2 + (((P1 - P2) * v) / vw) * T2;
 	return true;
 }
 

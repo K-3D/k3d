@@ -23,11 +23,12 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/axis.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
 
 namespace libk3ddeformation
@@ -190,16 +191,16 @@ public:
 				double factor = m_Radius * length / tan(m_BendAngle * 0.5);
 				k3d::matrix4 rotation = k3d::rotation3D(d * m_BendAngle, axis);
 				offset = offset * factor;
-				coords -= pivot + offset;
+				coords -= k3d::to_vector(pivot + offset);
 				coords = rotation * coords;
-				coords += pivot + offset;
+				coords += k3d::to_vector(pivot + offset);
 			}
 			else if(delta >= m_JointPosition + m_Radius)
 			{
 				k3d::matrix4 rotation = k3d::rotation3D(m_BendAngle, axis);
-				coords -= m_Origin;
+				coords -= k3d::to_vector(m_Origin);
 				coords = rotation * coords;
-				coords += m_Origin;
+				coords += k3d::to_vector(m_Origin);
 			}
 
 			return coords;
@@ -214,7 +215,7 @@ public:
 		const double m_BendAngle;
 		const double m_Tightness;
 		const double m_JointPosition;
-		const k3d::point3 m_Size;
+		const k3d::vector3 m_Size;
 		const k3d::point3 m_Joint;
 		const double m_Radius;
 		const k3d::point3 m_JLower;

@@ -21,14 +21,15 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/vectors.h>
 
 namespace libk3dcore
 {
@@ -71,7 +72,7 @@ public:
 
 		const k3d::point3 from = input_matrix * k3d::point3(0, 0, 0);
 		const k3d::point3 to = target_matrix * k3d::point3(0, 0, 0);
-		const k3d::vector3 spherical = k3d::spherical(k3d::to_vector(to - from));
+		const k3d::vector3 spherical = k3d::spherical(to - from);
 
 		return input_matrix * rotation3D(k3d::quaternion(k3d::euler_angles(0, -spherical[2], spherical[1], k3d::euler_angles::ZXYstatic)));
 	}

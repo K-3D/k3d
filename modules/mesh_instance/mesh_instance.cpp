@@ -21,21 +21,22 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
+
 #include <k3dsdk/bounded.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/drawable_gl.h>
 #include <k3dsdk/hints.h>
-#include <k3dsdk/ipipeline.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/ipipeline_profiler.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>

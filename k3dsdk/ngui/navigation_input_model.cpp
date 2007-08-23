@@ -604,7 +604,7 @@ struct navigation_input_model::implementation
 			const k3d::vector3 right_vector = k3d::right_vector(view_matrix);
 			const k3d::point3 position = k3d::position(view_matrix);
 
-			const k3d::vector3 new_look_vector = k3d::to_vector(new_target - position);
+			const k3d::vector3 new_look_vector = new_target - position;
 			const k3d::vector3 new_right_vector = new_look_vector ^ Viewport.get_up_axis();
 			const k3d::vector3 new_up_vector = new_right_vector ^ new_look_vector;
 

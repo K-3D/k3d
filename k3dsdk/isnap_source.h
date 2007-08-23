@@ -25,13 +25,15 @@
 */
 
 #include "iunknown.h"
-#include "vectors.h"
+#include "point3.h"
 
 #include <string>
 #include <vector>
 
 namespace k3d
 {
+
+class vector3;
 
 /// Abstract interface for a "source" on a snappable object
 class isnap_source :

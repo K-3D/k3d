@@ -80,7 +80,7 @@ void populate_new_document(k3d::idocument& Document)
 		const k3d::vector3 world_up = k3d::vector3(0, 0, 1);
 
 		const k3d::point3 position = k3d::point3(-15, 20, 10);
-		const k3d::vector3 look_vector = k3d::to_vector(origin - position);
+		const k3d::vector3 look_vector = origin - position;
 		const k3d::vector3 right_vector = look_vector ^ world_up;
 		const k3d::vector3 up_vector = right_vector ^ look_vector;
 

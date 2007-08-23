@@ -289,7 +289,7 @@ public:
 						break;
 
 					case CENTER:
-						end->position += start->position;
+						end->position += k3d::to_vector(start->position);
 						end->position /= 2;
 						break;
 
@@ -302,7 +302,7 @@ public:
 				// More than one point were collapsed to the destination, set centroid
 				k3d::point3 sum = end->position;
 				for(point_list_t::const_iterator vertex = list.begin(); vertex != list.end(); ++vertex)
-					sum += (*vertex)->position;
+					sum += k3d::to_vector((*vertex)->position);
 
 				end->position = sum / static_cast<double>((list.size() + 1));
 			}
@@ -582,7 +582,7 @@ public:
 			// More than one point were collapsed to the destination, set centroid
 			k3d::point3 sum = end->position;
 			for(point_list_t::const_iterator vertex = list.begin(); vertex != list.end(); ++vertex)
-				sum += (*vertex)->position;
+				sum += k3d::to_vector((*vertex)->position);
 
 			end->position = sum / static_cast<double>((list.size() + 1));
 		}

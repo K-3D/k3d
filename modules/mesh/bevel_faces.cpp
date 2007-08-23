@@ -142,8 +142,8 @@ bool subdivide_edges(k3d::legacy::face& Face, k3d::legacy::mesh& Mesh, bevel_edg
 		edge = face_edges[i];
 		k3d::legacy::split_edge* previous_edge = face_edges[(i + n-1) % n];
 
-		const k3d::vector3 e1 = k3d::to_vector(edge->vertex->position - previous_edge->vertex->position);
-		const k3d::vector3 e2 = k3d::to_vector(edge->face_clockwise->vertex->position - edge->vertex->position);
+		const k3d::vector3 e1 = edge->vertex->position - previous_edge->vertex->position;
+		const k3d::vector3 e2 = edge->face_clockwise->vertex->position - edge->vertex->position;
 		const k3d::vector3 e3 = k3d::normalize(e1 ^ face_normal);
 		const k3d::vector3 e4 = k3d::normalize(e2 ^ face_normal);
 

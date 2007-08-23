@@ -179,7 +179,7 @@ private:
 
 			new_edges.push_back(Edge);
 
-			const k3d::point3 step = (end_point - start_point) / (subdivisions + 1);
+			const k3d::vector3 step = (end_point - start_point) / (subdivisions + 1);
 
 			k3d::legacy::split_edge* edge = Edge;
 			for(double n = 0; n < subdivisions; ++n)

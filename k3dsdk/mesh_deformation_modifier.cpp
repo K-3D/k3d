@@ -22,6 +22,7 @@
 */
 
 #include "mesh_deformation_modifier.h"
+#include "mesh_operations.h"
 #include "shared_pointer.h"
 
 namespace k3d

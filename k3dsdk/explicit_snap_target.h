@@ -25,7 +25,8 @@
 */
 
 #include "isnap_target.h"
-#include "vectors.h"
+#include "point3.h"
+#include "vector3.h"
 
 #include <memory>
 

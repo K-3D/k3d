@@ -24,12 +24,13 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "vectors.h"
+#include "vector3.h"
 
 namespace k3d
 {
 
 class matrix4;
+class point3;
 
 /// Encapsulates a 3D plane surface
 class plane

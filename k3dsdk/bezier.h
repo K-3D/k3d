@@ -26,6 +26,7 @@
 */
 
 #include "bezier_private.h"
+#include "vectors.h"
 
 #include <cassert>
 #include <iterator>
@@ -78,7 +79,7 @@ Type Bezier(const std::vector<Type>& ControlPoints, const double Parameter)
 
 	Type result = BernsteinBasis(ControlPoints.size(), 0, Parameter) * ControlPoints[0];
 	for(unsigned long i = 1; i < ControlPoints.size(); i++)
-		result += BernsteinBasis(ControlPoints.size(), i, Parameter) * ControlPoints[i];
+		result += to_vector(BernsteinBasis(ControlPoints.size(), i, Parameter) * ControlPoints[i]);
 
 	return result;
 }

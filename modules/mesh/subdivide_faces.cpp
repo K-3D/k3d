@@ -105,7 +105,7 @@ struct center_to_points
 		{
 			removed_edges.push_back(edge);
 
-			face_barycenter += edge->vertex->position;
+			face_barycenter += k3d::to_vector(edge->vertex->position);
 
 			// Create edges
 			k3d::legacy::split_edge* edge0 = new k3d::legacy::split_edge(edge->vertex);
@@ -225,7 +225,7 @@ struct center_to_midpoints
 					companions.push_back(0);
 				}
 
-				face_barycenter += edge->vertex->position;
+				face_barycenter += k3d::to_vector(edge->vertex->position);
 				++original_vertices;
 			}
 			else
@@ -236,7 +236,7 @@ struct center_to_midpoints
 
 				if(is_midpoint == new_midpoints.end())
 				{
-					face_barycenter += edge->vertex->position;
+					face_barycenter += k3d::to_vector(edge->vertex->position);
 					++original_vertices;
 				}
 			}

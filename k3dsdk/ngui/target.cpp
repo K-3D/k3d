@@ -55,10 +55,10 @@ bool selection_position(const k3d::nodes_t& Selection, k3d::point3& NewTarget)
 		if(k3d::ibounded* bounded = dynamic_cast<k3d::ibounded*>(*node))
 		{
 			const k3d::bounding_box3 transformed_bbox = bounded->extents() * k3d::node_to_world_matrix(**node);
-			NewTarget += transformed_bbox.center();
+			NewTarget += k3d::to_vector(transformed_bbox.center());
 		}
 		else
-			NewTarget += k3d::world_position(**node);
+			NewTarget += k3d::to_vector(k3d::world_position(**node));
 	}
 
 	if(!count)
@@ -82,7 +82,7 @@ void aim_selection(document_state& DocumentState, viewport::control& Viewport)
 	const k3d::vector3 right_vector = k3d::right_vector(view_matrix);
 	const k3d::point3 position = k3d::position(view_matrix);
 
-	const k3d::vector3 new_look_vector = k3d::to_vector(target - position);
+	const k3d::vector3 new_look_vector = target - position;
 	const k3d::vector3 new_right_vector = new_look_vector ^ Viewport.get_up_axis();
 	const k3d::vector3 new_up_vector = new_right_vector ^ new_look_vector;
 
@@ -103,7 +103,7 @@ void frame_selection(document_state& DocumentState, viewport::control& Viewport)
 	const k3d::vector3 right_vector = k3d::right_vector(view_matrix);
 	const k3d::point3 position = k3d::position(view_matrix);
 
-	const k3d::vector3 delta = k3d::to_vector(target - Viewport.get_target());
+	const k3d::vector3 delta = target - Viewport.get_target();
 
 	Viewport.set_view_matrix(k3d::view_matrix(look_vector, up_vector, position + delta));
 	Viewport.set_target(target);

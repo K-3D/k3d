@@ -38,7 +38,6 @@
 #include "tokens.h"
 #include "types.h"
 #include "types_ri.h"
-#include "vectors.h"
 
 namespace k3d
 {

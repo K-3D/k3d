@@ -20,12 +20,16 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "bounding_box3.h"
 #include "mesh.h"
+#include "normal3.h"
+#include "point3.h"
 
 namespace k3d
 {
 
 class imaterial;
+class mesh_selection;
 
 /// Returns a mesh containing a topological "grid" of polygons with the given number of polys in each parametric direction
 const mesh create_grid(const size_t Rows, const size_t Columns, imaterial* const Material = 0);
@@ -36,6 +40,50 @@ const mesh create_cylinder(const size_t Rows, const size_t Columns, imaterial* c
 const bool is_solid(const mesh& Mesh);
 /// Returns true iff every face in the given mesh is a triangle
 const bool is_triangles(const mesh& Mesh);
+
+/// Copies the selection state of a mesh into a mesh_selection
+void store_selection(const mesh& Mesh, mesh_selection& Selection);
+/// Copies mesh_selection state over any previous selection state in the given mesh
+void replace_selection(const mesh_selection& Selection, mesh& RHS);
+
+/// Returns a bounding-box containing every point in the given mesh
+const bounding_box3 bounds(const mesh& Mesh);
+/// Returns a bounding-box containing every point in the given collection
+const bounding_box3 bounds(const mesh::points_t& Points);
+/// Calculates the center (average) for an edge loop (returns the origin for degenerate cases)
+const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const size_t EdgeIndex);
+/// Calculates the normal for an edge loop (returns a zero-length normal for degenerate cases)
+const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const size_t EdgeIndex);
+
+/// Performs a deep-copy from one mesh to another (the new mesh doesn't share any memory with the old)
+void deep_copy(const mesh& From, mesh& To);
+
+/// Performs sanity-checking on a mesh, validating all constraints - returns true iff the mesh is valid
+const bool validate(mesh& Mesh);
+
+/// Returns true iff the given mesh contains valid point data (i.e. both point and point_selection arrays are defined)
+const bool validate_points(const mesh& Mesh);
+/// Returns true iff the given mesh contains valid point group data (i.e. every array is defined)
+const bool validate_point_groups(const mesh& Mesh);
+/// Returns true iff the given mesh contains valid linear curve group data (i.e. every array is defined)
+const bool validate_linear_curve_groups(const mesh& Mesh);
+/// Returns true iff the given mesh contains valid cubic curve group data (i.e. every array is defined)
+const bool validate_cubic_curve_groups(const mesh& Mesh);
+/// Returns true iff the given mesh contains valid nurbs curve group data (i.e. every array is defined)
+const bool validate_nurbs_curve_groups(const mesh& Mesh);
+/// Returns true iff the given mesh contains valid bilinear patch data (i.e. every array is defined)
+const bool validate_bilinear_patches(const mesh& Mesh);
+/// Returns true iff the given mesh contains valid bicubic patch data (i.e. every array is defined)
+const bool validate_bicubic_patches(const mesh& Mesh);
+/// Returns true iff the given mesh contains valid nurbs patch data (i.e. every array is defined)
+const bool validate_nurbs_patches(const mesh& Mesh);
+/// Returns true iff the given mesh contains valid polyhedron data (i.e. every array is defined)
+const bool validate_polyhedra(const mesh& Mesh);
+/// Returns true iff the given mesh contains valid blobby data (i.e. every array is defined)
+const bool validate_blobbies(const mesh& Mesh);
+
+/// Returns true iff the given mesh should be rendered as SDS
+const bool is_sds(const mesh& Mesh);
 
 } // namespace k3d
 

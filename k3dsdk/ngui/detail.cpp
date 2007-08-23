@@ -28,10 +28,10 @@
 #include "modifiers.h"
 #include "transform.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/dependencies.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>
@@ -42,8 +42,8 @@
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection.h>
-#include <k3dsdk/mesh.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/result.h>

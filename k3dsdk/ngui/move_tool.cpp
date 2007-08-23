@@ -114,7 +114,7 @@ private:
 			return_val_if_fail(k3d::intersect(m_plane, current_line, current_intersection), k3d::vector3(0, 0, 0));
 
 			// Convert the change into world axis coordinates and constrain them (with sensitivity)
-			const k3d::vector3 delta = k3d::inverse(Orientation) * k3d::to_vector(current_intersection - last_intersection);
+			const k3d::vector3 delta = k3d::inverse(Orientation) * (current_intersection - last_intersection);
 
 			return k3d::vector3(delta[0] * m_x_sensitivity, delta[1] * m_y_sensitivity, delta[2] * m_z_sensitivity);
 		}

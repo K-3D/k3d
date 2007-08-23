@@ -25,6 +25,8 @@
 */
 
 #include "isnap_source.h"
+#include "point3.h"
+#include "vector3.h"
 #include <memory>
 
 namespace k3d

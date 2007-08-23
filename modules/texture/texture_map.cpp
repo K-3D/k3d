@@ -21,17 +21,17 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/i3d_2d_mapping.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/axis.h>
-#include <k3dsdk/bounding_box.h>
+#include <k3dsdk/bounding_box3.h>
 #include <k3dsdk/color.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
+#include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/i3d_2d_mapping.h>
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/persistent.h>
 
 #include <iterator>
 

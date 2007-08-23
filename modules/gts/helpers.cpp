@@ -24,7 +24,7 @@
 
 #include "helpers.h"
 
-#include <k3dsdk/mesh.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/triangulator.h>
 
 #include <vector>

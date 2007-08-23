@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "algebra.h"
-#include "bounding_box.h"
+#include "bounding_box3.h"
 #include "gl.h"
 #include "memory.h"
 #include "selectable.h"

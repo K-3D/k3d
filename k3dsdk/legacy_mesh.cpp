@@ -19,6 +19,7 @@
 
 #include "legacy_mesh.h"
 #include "mesh.h"
+#include "mesh_operations.h"
 #include "result.h"
 #include "utility.h"
 

@@ -171,7 +171,7 @@ public:
 				if(point_map[(*edge2)->vertex] != (*edge2)->vertex)
 					continue;
 
-				const k3d::point3 delta = (*edge2)->vertex->position - (*edge1)->vertex->position;
+				const k3d::vector3 delta = (*edge2)->vertex->position - (*edge1)->vertex->position;
 				if(std::fabs(delta[0]) < distance && std::fabs(delta[1]) < distance && std::fabs(delta[2]) < distance)
 				{
 					point_map[(*edge2)->vertex] = (*edge1)->vertex;

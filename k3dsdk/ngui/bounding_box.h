@@ -27,7 +27,7 @@
 #include "ui_component.h"
 
 #include <k3dsdk/signal_system.h>
-#include <k3dsdk/bounding_box.h>
+#include <k3dsdk/bounding_box3.h>
 
 #include <gtkmm/table.h>
 

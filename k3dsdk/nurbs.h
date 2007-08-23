@@ -26,9 +26,10 @@
 */
 
 #include "geometric_operations.h"
-#include "result.h"
 #include "vectors.h"
+#include "result.h"
 
+#include <cmath>
 #include <iosfwd>
 #include <vector>
 

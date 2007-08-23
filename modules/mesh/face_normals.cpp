@@ -83,7 +83,7 @@ public:
 				k3d::legacy::split_edge* current_edge = first->face_clockwise;
 				while(current_edge)
 				{
-					v_sum += current_edge->vertex->position;
+					v_sum += k3d::to_vector(current_edge->vertex->position);
 					++n_vertices;
 
 					current_edge = current_edge->face_clockwise;

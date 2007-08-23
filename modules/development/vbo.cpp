@@ -22,6 +22,7 @@
 #include "vbo.h"
 
 #include <k3dsdk/hints.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 

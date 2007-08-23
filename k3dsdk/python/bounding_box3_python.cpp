@@ -23,7 +23,7 @@
 
 #include "bounding_box3_python.h"
 
-#include <k3dsdk/bounding_box.h>
+#include <k3dsdk/bounding_box3.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;

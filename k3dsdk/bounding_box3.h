@@ -1,5 +1,5 @@
-#ifndef K3DSDK_BOUNDING_BOX_H
-#define K3DSDK_BOUNDING_BOX_H
+#ifndef K3DSDK_BOUNDING_BOX3_H
+#define K3DSDK_BOUNDING_BOX3_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -21,12 +21,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
-		\author Anders Dahnielson (anders@dahnielson.com)
+	\author Tim Shead (tshead@k-3d.com)
+	\author Anders Dahnielson (anders@dahnielson.com)
 */
 
-#include "algebra.h"
-#include "vectors.h"
+#include "point3.h"
 
 #include <algorithm>
 #include <cassert>
@@ -37,7 +36,9 @@
 namespace k3d
 {
 
-/// Convenience type for storing a bounding-box in three dimensions
+class matrix4;
+
+/// Stores an axis-aligned bounding-box in three space
 class bounding_box3
 {
 public:
@@ -147,5 +148,5 @@ std::istream& operator>>(std::istream& Stream, bounding_box3& RHS);
 
 } // namespace k3d
 
-#endif // !K3DSDK_BOUNDING_BOX_H
+#endif // !K3DSDK_BOUNDING_BOX3_H
 

@@ -21,15 +21,16 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
  */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/axis.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/hints.h>
 #include <k3dsdk/icommand_node.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/shared_pointer.h>
@@ -202,7 +203,7 @@ public:
 			tweaks_t::iterator tweak = tweaks.find(selected_points[i]);
 			if (tweak == tweaks.end())
 				tweak = (tweaks.insert(std::make_pair(selected_points[i], k3d::point3(0.0,0.0,0.0)))).first;
-			tweak->second = output_points[selected_points[i]] - input_points[selected_points[i]];
+			tweak->second = k3d::to_point(output_points[selected_points[i]] - input_points[selected_points[i]]);
 			m_selected_tweaks.push_back(tweak->second);
 		}
 		m_tweaks.set_value(tweaks, update_hint());

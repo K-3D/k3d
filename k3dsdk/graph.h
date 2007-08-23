@@ -21,8 +21,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "named_arrays.h"
+#include "point2.h"
 #include "typed_array.h"
-#include "vectors.h"
+#include "vector2.h"
 
 #include <boost/graph/adjacency_list.hpp>
 

@@ -22,6 +22,7 @@
 */
 
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/point4.h>
 
 namespace libk3dobjio
 {
