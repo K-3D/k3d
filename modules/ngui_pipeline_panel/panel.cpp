@@ -35,6 +35,8 @@
 #include <k3dsdk/ngui/ui_component.h>
 
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/color.h>
+#include <k3dsdk/data.h>
 #include <k3dsdk/graph.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
@@ -117,9 +119,14 @@ public:
 		m_zoom_factor(1.0),
 		m_document_state(0),
 		m_root_node(0),
-		m_node_width(0.4),
-		m_node_height(0.07),
-		m_arrow_size(0.04)
+		m_node_width(k3d::data::init_value(0.4)),
+		m_node_height(k3d::data::init_value(0.07)),
+		m_arrow_size(k3d::data::init_value(0.04)),
+		m_background_color(k3d::data::init_value(k3d::color(1, 1, 1))),
+		m_node_color(k3d::data::init_value(k3d::color(1, 1, 0.2))),
+		m_node_border_color(k3d::data::init_value(k3d::color(0, 0, 0))),
+		m_node_label_color(k3d::data::init_value(k3d::color(0, 0, 0))),
+		m_connection_color(k3d::data::init_value(k3d::color(0, 0, 0.7)))
 	{
 		m_hbox.pack_start(m_save_png, Gtk::PACK_SHRINK);
 		m_hbox.pack_start(m_save_pdf, Gtk::PACK_SHRINK);
@@ -164,7 +171,7 @@ public:
 		m_extract_tree.reset(new extract_tree());
 
 		m_tree_layout.reset(new tree_layout());
-		k3d::property::set_internal_value(m_tree_layout->column_offset(), 0.7);
+		k3d::property::set_internal_value(m_tree_layout->column_offset(), 0.6);
 		k3d::property::set_internal_value(m_tree_layout->row_offset(), 0.1);
 		
 		m_graph_pipeline.reset(new k3d::pipeline());
@@ -544,6 +551,15 @@ public:
 
 	void draw_pipeline(const Cairo::RefPtr<Cairo::Context>& Context, const double Width, const double Height)
 	{
+		const double node_width = m_node_width.internal_value();
+		const double node_height = m_node_height.internal_value();
+		const double arrow_size = m_arrow_size.internal_value();
+		const k3d::color background_color = m_background_color.internal_value();
+		const k3d::color node_color = m_node_color.internal_value();
+		const k3d::color node_border_color = m_node_border_color.internal_value();
+		const k3d::color node_label_color = m_node_label_color.internal_value();
+		const k3d::color connection_color = m_connection_color.internal_value();
+
 		Context->save();
 
 		try
@@ -566,7 +582,7 @@ public:
 
 			// Clear the background ...
 			Context->save();
-			Context->set_source_rgb(0.8, 0.8, 0.8);
+			Context->set_source_rgb(background_color.red, background_color.green, background_color.blue);
 			Context->paint();
 			Context->restore();
 
@@ -591,7 +607,7 @@ public:
 			// Render the graph edges ...
 			Context->save();
 			Context->set_line_width(0.003);
-			Context->set_source_rgb(0.0, 0.5, 0.7);
+			Context->set_source_rgb(connection_color.red, connection_color.green, connection_color.blue);
 
 			size_t edge_index = 0;
 			for(std::pair<k3d::graph::edge_iterator, k3d::graph::edge_iterator> edges = boost::edges(topology); edges.first != edges.second; ++edge_index, ++edges.first)
@@ -619,14 +635,14 @@ public:
 				k3d::point2 begin = vertex_position[source];
 				k3d::point2 end = vertex_position[target];
 
-				begin[0] += end[0] > begin[0] ? m_node_width * 0.5 : m_node_width * -0.5;
-				end[0] -= end[0] > begin[0] ? m_node_width * 0.5 : m_node_width * -0.5;
+				begin[0] += end[0] > begin[0] ? node_width * 0.5 : node_width * -0.5;
+				end[0] -= end[0] > begin[0] ? node_width * 0.5 : node_width * -0.5;
 
 				draw_curved_arrow(
 					Context,
 					begin,
 					end,
-					m_arrow_size);
+					arrow_size);
 			}
 
 			Context->restore();
@@ -639,12 +655,14 @@ public:
 
 			for(size_t vertex = 0; vertex != vertex_count; ++vertex)
 			{
-				Context->set_source_rgb(1, 1, 1);
-				draw_filled_box(Context, k3d::rectangle(vertex_position[vertex], m_node_width, m_node_height));
+				Context->set_source_rgb(node_color.red, node_color.green, node_color.blue);
+				draw_filled_box(Context, k3d::rectangle(vertex_position[vertex], node_width, node_height));
 
-				Context->set_source_rgb(0, 0, 0);
-				draw_box(Context, k3d::rectangle(vertex_position[vertex], m_node_width, m_node_height));
-				draw_centered_text(Context, 0.03, vertex_position[vertex], vertex_node[vertex]->name(), m_node_width);
+				Context->set_source_rgb(node_border_color.red, node_border_color.green, node_border_color.blue);
+				draw_box(Context, k3d::rectangle(vertex_position[vertex], node_width, node_height));
+
+				Context->set_source_rgb(node_label_color.red, node_label_color.green, node_label_color.blue);
+				draw_centered_text(Context, 0.03, vertex_position[vertex], vertex_node[vertex]->name(), node_width);
 			}
 
 			Context->restore();
@@ -699,10 +717,15 @@ private:
 
 	k3d::inode* m_root_node;
 
-	double m_node_width;
-	double m_node_height;
-	double m_arrow_size;
-
+	k3d_data(double, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_node_width;
+	k3d_data(double, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_node_height;
+	k3d_data(double, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_arrow_size;
+	k3d_data(k3d::color, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_background_color;
+	k3d_data(k3d::color, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_node_color;
+	k3d_data(k3d::color, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_node_border_color;
+	k3d_data(k3d::color, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_node_label_color;
+	k3d_data(k3d::color, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_connection_color;
+	
 	basic_input_model m_input_model;
 };
 
