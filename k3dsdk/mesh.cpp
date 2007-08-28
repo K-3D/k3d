@@ -21,6 +21,7 @@
 #include "legacy_mesh.h"
 #include "mesh.h"
 #include "shared_pointer.h"
+#include "types.h"
 
 #include <iterator>
 #include <map>
@@ -70,10 +71,16 @@ void print(std::ostream& Stream, const std::string& Label, const k3d::mesh::name
         Stream << Label << " " << array_iterator->first << " (" << array_iterator->second->size() << "): ";
         if(typed_array<double>* const array = dynamic_cast<typed_array<double>*>(array_iterator->second.get()))
             std::copy(array->begin(), array->end(), std::ostream_iterator<double>(Stream, " "));
-        else if(typed_array<k3d::color>* const array = dynamic_cast<typed_array<k3d::color>*>(array_iterator->second.get()))
-            std::copy(array->begin(), array->end(), std::ostream_iterator<k3d::color>(Stream, " "));
+        else if(typed_array<color>* const array = dynamic_cast<typed_array<color>*>(array_iterator->second.get()))
+            std::copy(array->begin(), array->end(), std::ostream_iterator<color>(Stream, " "));
+        else if(typed_array<point3>* const array = dynamic_cast<typed_array<point3>*>(array_iterator->second.get()))
+            std::copy(array->begin(), array->end(), std::ostream_iterator<point3>(Stream, " "));
+        else if(typed_array<normal3>* const array = dynamic_cast<typed_array<normal3>*>(array_iterator->second.get()))
+            std::copy(array->begin(), array->end(), std::ostream_iterator<normal3>(Stream, " "));
+        else if(typed_array<vector3>* const array = dynamic_cast<typed_array<vector3>*>(array_iterator->second.get()))
+            std::copy(array->begin(), array->end(), std::ostream_iterator<vector3>(Stream, " "));
         else
-            Stream << "<unknown type>" << std::endl;
+            Stream << "unknown type: " << k3d::demangle(typeid(*array_iterator->second.get())) << std::endl;
         Stream << "\n";
     }
 }
