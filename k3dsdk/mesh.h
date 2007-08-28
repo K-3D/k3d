@@ -22,6 +22,8 @@
 
 #include "named_arrays.h"
 #include "point3.h"
+#include "normal3.h"
+#include "vector3.h"
 #include "typed_array.h"
 
 namespace k3d
@@ -61,6 +63,10 @@ public:
 	typedef k3d::named_arrays named_arrays;
 	/// Defines storage for a collection of 3D points
 	typedef typed_array<point3> points_t;
+	/// Defines storage for a collection of 3D normals
+	typedef typed_array<normal3> normals_t;
+	/// Defines storage for a collection of 3D vectors
+	typedef typed_array<vector3> vectors_t;
 
 	/// Defines storage for point groups (particle clouds)
 	class point_groups_t
