@@ -38,7 +38,10 @@ using namespace k3d::xml;
 
 #include <iterator>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh_instance
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -143,5 +146,8 @@ k3d::iplugin_factory& frozen_mesh_factory()
 	return frozen_mesh::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh_instance
+
+} // namespace module
+
 

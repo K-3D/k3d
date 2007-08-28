@@ -51,7 +51,10 @@
 
 #include <list>
 
-namespace libk3dmeshinstance
+namespace module
+{
+
+namespace mesh_instance
 {
 
 // Helper class to store a copy of the hints
@@ -435,5 +438,8 @@ k3d::iplugin_factory& mesh_instance_factory()
 	return mesh_instance::get_factory();
 }
 
-} // namespace libk3dmeshinstance
+} // namespace mesh_instance
+
+} // namespace module
+
 

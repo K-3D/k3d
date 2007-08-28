@@ -24,14 +24,21 @@
 #include <k3dsdk/module.h>
 
 /// Namespace reserved for the mesh instance plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dmeshinstance
+namespace module
 {
 
+namespace mesh_instance
+{
+
+extern k3d::iplugin_factory& frozen_mesh_factory();
 extern k3d::iplugin_factory& mesh_instance_factory();
 
-} // namespace libk3dmeshinstance
+} // namespace mesh_instance
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dmeshinstance::mesh_instance_factory());
+	Registry.register_factory(module::mesh_instance::frozen_mesh_factory());
+	Registry.register_factory(module::mesh_instance::mesh_instance_factory());
 K3D_MODULE_END
 
