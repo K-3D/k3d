@@ -1,0 +1,5 @@
+K3D_BUILD_MODULE(k3d-booleans)
+K3D_CREATE_MODULE_PROXY(k3d-booleans)
+
+TARGET_LINK_LIBRARIES(k3d-booleans -lCGAL)
+
