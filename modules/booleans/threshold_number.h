@@ -30,9 +30,11 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include <CGAL/basic.h>
+#include <CGAL/number_type_basic.h>
+
 #include <utility>
 #include <cmath>
+#include <math.h> // for nextafter
 #include <limits>
 
 CGAL_BEGIN_NAMESPACE
@@ -100,47 +102,125 @@ inline std::ostream& operator<<(std::ostream& Stream, const threshold_number& T)
 // CGAL required functions
 //////////////////////////////////
 
-template<> struct Number_type_traits<threshold_number> {
-  typedef Tag_false  Has_gcd;
-  typedef Tag_true   Has_division;
-  typedef Tag_true   Has_sqrt;
-
-  typedef Tag_false  Has_exact_ring_operations;
-  typedef Tag_false  Has_exact_division;
-  typedef Tag_false  Has_exact_sqrt;
+template<>
+class Is_valid< threshold_number >
+  : public Unary_function< threshold_number, bool > {
+  public :
+    bool operator()( const threshold_number& x ) const {
+      return (x == x);
+    }
 };
 
-inline
-const double &
-to_double(const threshold_number & T)
-{ return T.d; }
+template <> class Algebraic_structure_traits< threshold_number >
+  : public Algebraic_structure_traits_base< threshold_number,
+                                            Field_with_kth_root_tag >  {
+  public:
+    typedef Tag_false            Is_exact;
+    typedef Tag_true             Is_numerical_sensitive;
 
-inline 
-std::pair<double,double>
-to_interval(threshold_number T)
-{ return std::make_pair(T.d,T.d);}
+    class Sqrt
+      : public Unary_function< Type, Type > {
+      public:
+        Type operator()( const Type& x ) const {
+          return CGAL_CLIB_STD::sqrt( x.d );
+        }
+    };
 
-inline
-threshold_number
-sqrt(threshold_number T)
-{ return threshold_number(std::sqrt(T.d)); }
+    class Kth_root
+      : public Binary_function<int, Type, Type> {
+      public:
+        Type operator()( int k,
+                                        const Type& x) const {
+          CGAL_precondition_msg( k > 0, "'k' must be positive for k-th roots");
+          return CGAL_CLIB_STD::pow(x.d, 1.0 / static_cast<double>(k));
+        }
+    };
+    
+    class Gcd
+        : public Binary_function< Type, Type,
+                                Type > {
+    public:
+        Type operator()( const Type& x,
+                const Type& y ) const {
+            return threshold_number(1.0);
 
+        }
+
+        Type operator()( const Type& x,
+                                        const int& y ) const {
+          return threshold_number(1.0);
+        }
+
+        Type operator()( const int& x,
+                                        const Type& y ) const {
+          return threshold_number(1.0);
+        }
+    };
+
+};
+
+template <> class Real_embeddable_traits< threshold_number >
+  : public Real_embeddable_traits_base< threshold_number > {
+public:
+    
+  class Is_finite
+    : public Unary_function< Type, bool > {
+    public :
+      bool operator()( const Type& x ) const {
+        return (x.d != std::numeric_limits<Type>::infinity())
+            && (-x.d != std::numeric_limits<Type>::infinity())
+            && is_valid(x.d);
+    }
+  };
+    
+  class To_double 
+    : public Unary_function< Type, double > {
+    public:      
+      //! the function call.
+      double operator()( const Type& x ) const {
+        return x.d;
+      }
+  };
+    
+  class To_interval 
+    : public Unary_function< Type, std::pair< double, double > > {
+    public:      
+        //! the function call.
+      std::pair<double, double> operator()( const Type& x ) const {
+
+        return std::pair<double,double>( x.d, x.d );
+      }
+  };
+                                                                  
+};
+ 
 inline
 bool
-is_valid(threshold_number T)
-{ return (T == T); }
+is_integer(threshold_number T)
+{
+  return CGAL::is_finite(T.d) && (std::ceil(T.d) == T.d);
+}
 
-inline
-bool
-is_finite(threshold_number T)
-{ return (T.d != std::numeric_limits<double>::infinity()) 
-    && (-T.d != std::numeric_limits<double>::infinity())
-    && is_valid(T); }
+template <>
+class Fraction_traits< threshold_number > {
+public:
+    typedef threshold_number Type;
+    typedef ::CGAL::Tag_false Is_fraction;
+    typedef threshold_number Numerator_type;
+    typedef threshold_number Denominator_type;
+    typedef Algebraic_structure_traits< threshold_number >::Gcd Common_factor;
+    class Decompose {
+    public:
+        typedef threshold_number first_argument_type;
+        typedef threshold_number& second_argument_type;
+        typedef threshold_number& third_argument_type;
+        void operator () (const threshold_number& rat, threshold_number& num,threshold_number& den) {
+          num = threshold_number(rat);
+          den = threshold_number(1.0);
+				}
+    };
+};
 
-inline
-io_Operator
-io_tag(threshold_number)
-{ return io_Operator(); }
 
 CGAL_END_NAMESPACE
 
