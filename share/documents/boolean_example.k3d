@@ -363,6 +363,7 @@
 					<property name="left_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
 					<property name="material">17</property>
 					<property name="right_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="type">difference</property>
 				</properties>
 			</node>
 			<node name="BooleanDifference Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="45">
@@ -385,11 +386,12 @@
 					<property name="matrix">1 0 0 10.123875476334659 0 1 0 9.2390115452218211 0 0 1 1.4670156122654134 0 0 0 1</property>
 				</properties>
 			</node>
-			<node name="BooleanIntersection" class="f7f8c245 5d4e7f4b e1d08585 78852435" id="47">
+			<node name="BooleanIntersection" class="0d88fe28 ea4fdf20 ae858297 487f857b" id="47">
 				<properties>
 					<property name="left_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
 					<property name="material">17</property>
 					<property name="right_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="type">intersection</property>
 				</properties>
 			</node>
 			<node name="BooleanIntersection Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="48">
@@ -412,11 +414,12 @@
 					<property name="matrix">1 0 0 -0.79747272582257622 0 1 0 8.7405768114849138 0 0 1 1.2732885530743614 0 0 0 1</property>
 				</properties>
 			</node>
-			<node name="BooleanUnion" class="4e6fe9fc 4147d863 c5f0229b 4ed9d5fe" id="50">
+			<node name="BooleanUnion" class="0d88fe28 ea4fdf20 ae858297 487f857b" id="50">
 				<properties>
 					<property name="left_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
 					<property name="material">17</property>
 					<property name="right_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="type">union</property>
 				</properties>
 			</node>
 			<node name="BooleanUnion Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="51">
@@ -522,14 +525,14 @@
 			<dependency from_node="42" from_property="output_matrix" to_node="47" to_property="right_matrix"/>
 			<dependency from_node="49" from_property="output_matrix" to_node="48" to_property="input_matrix"/>
 			<dependency from_node="47" from_property="output_mesh" to_node="48" to_property="input_mesh"/>
-			<dependency from_node="56" from_property="output_matrix" to_node="55" to_property="input_matrix"/>
-			<dependency from_node="54" from_property="output_matrix" to_node="53" to_property="input_matrix"/>
 			<dependency from_node="39" from_property="output_mesh" to_node="50" to_property="left"/>
 			<dependency from_node="41" from_property="output_mesh" to_node="50" to_property="right"/>
 			<dependency from_node="40" from_property="output_matrix" to_node="50" to_property="left_matrix"/>
 			<dependency from_node="42" from_property="output_matrix" to_node="50" to_property="right_matrix"/>
 			<dependency from_node="52" from_property="output_matrix" to_node="51" to_property="input_matrix"/>
 			<dependency from_node="50" from_property="output_mesh" to_node="51" to_property="input_mesh"/>
+			<dependency from_node="54" from_property="output_matrix" to_node="53" to_property="input_matrix"/>
+			<dependency from_node="56" from_property="output_matrix" to_node="55" to_property="input_matrix"/>
 			<dependency from_node="58" from_property="output_matrix" to_node="57" to_property="input_matrix"/>
 			<dependency from_node="60" from_property="output_matrix" to_node="59" to_property="input_matrix"/>
 		</dependencies>

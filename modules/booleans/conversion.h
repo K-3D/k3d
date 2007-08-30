@@ -43,6 +43,8 @@
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/to_rational.h>
 
+#include <CGAL/assertions.h>
+
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/mesh.h>
@@ -65,6 +67,10 @@ namespace libk3dbooleans
 	
 	/// Converts a k3d mesh to a Nef polyhedron
 	boost::shared_ptr<Nef_polyhedron> to_nef(const k3d::mesh& Mesh, const k3d::matrix4& Matrix);
+	
+	/// Convert errors to the k3d logging system
+	void k3d_failure_handler(const char *type, const char *expr, const char* file, int line, const char* msg);
+	
 }
 
 #endif /*CONVERSION_H_*/

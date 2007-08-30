@@ -151,7 +151,7 @@ void to_mesh(Nef_polyhedron& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* con
   size_t num_facets = 0;
   for (Nef_polyhedron::Halffacet_const_iterator facet = NefPolyhedron.halffacets_begin(); facet != NefPolyhedron.halffacets_end(); ++facet)
   {
-  	if (facet->incident_volume()->mark()) // Only consider facets that enclose the marked volume
+  	if (&(*facet->incident_volume()) && facet->incident_volume()->mark()) // Only consider facets that enclose the marked volume
   	{
   		facet_map.insert(std::make_pair(&(*facet), num_facets)); 
   		num_facets++;
@@ -265,6 +265,11 @@ boost::shared_ptr<Nef_polyhedron> to_nef(const k3d::mesh& Mesh, const k3d::matri
 	nef->build_external_structure();
 	nef->simplify();
 	return nef;
+}
+
+void k3d_failure_handler(const char *type, const char *expr, const char* file, int line, const char* msg)
+{
+  k3d::log() << error << "CGAL " << type << ": " << expr << " at " << file << ":" << line << ". " << msg << std::endl;
 }
 
 }

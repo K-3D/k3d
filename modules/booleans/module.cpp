@@ -27,15 +27,11 @@
 namespace libk3dbooleans
 {
 
-extern k3d::iplugin_factory& boolean_difference_factory();
-extern k3d::iplugin_factory& boolean_union_factory();
-extern k3d::iplugin_factory& boolean_intersection_factory();
+extern k3d::iplugin_factory& cgal_boolean_factory();
 
 } // namespace libk3dbooleans
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dbooleans::boolean_difference_factory());
-	Registry.register_factory(libk3dbooleans::boolean_union_factory());
-	Registry.register_factory(libk3dbooleans::boolean_intersection_factory());
+	Registry.register_factory(libk3dbooleans::cgal_boolean_factory());
 K3D_MODULE_END
 

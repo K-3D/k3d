@@ -206,7 +206,7 @@
 <command node="/document/window/node_properties/minorradius" command="drag_motion" arguments="&lt;arguments&gt;&lt;timestamp&gt;1.476500988006592&lt;/timestamp&gt;&lt;mouse_delta&gt;0 2&lt;/mouse_delta&gt;&lt;value&gt;0.9999999999999993&lt;/value&gt;&lt;/arguments&gt;"/>
 <command node="/document/window/node_properties/minorradius" command="end_drag" arguments=""/>
 <command node="/ui" command="tutorial_message" arguments="Next, create the boolean operator and connect the inputs to the primitives."/>
-<command node="/document/window/menus/create_BooleanDifference" command="activate" arguments=""/>
+<command node="/document/window/menus/create_CGALBoolean" command="activate" arguments=""/>
 <command node="/document/window/node_list" command="select" arguments="&lt;arguments&gt;&lt;selection&gt;&lt;node&gt;0d88fe28 ea4fdf20 ae858297 487f857b 1&lt;/node&gt;&lt;/selection&gt;&lt;context_menu/&gt;&lt;/arguments&gt;"/>
 <command node="/document/window/node_properties/left_property" command="connect_to" arguments="&lt;arguments&gt;&lt;node&gt;9a5ea45b ebc64e37 a50b287a 89e18b71 1&lt;/node&gt;&lt;property&gt;output_mesh&lt;/property&gt;&lt;/arguments&gt;"/>
 <command node="/document/window/node_properties/left_matrix_property" command="connect_to" arguments="&lt;arguments&gt;&lt;node&gt;2c1d60a6 863541a1 bd649bd1 1ea8ae24 2&lt;/node&gt;&lt;property&gt;output_matrix&lt;/property&gt;&lt;/arguments&gt;"/>

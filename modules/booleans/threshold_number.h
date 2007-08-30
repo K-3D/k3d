@@ -42,8 +42,8 @@ CGAL_BEGIN_NAMESPACE
 class threshold_number
 {
 public:
-	threshold_number() : d(0.0), t(1e-10) {}
-	threshold_number(double D) : d(D), t(1e-10) {}
+	threshold_number() : d(0.0), t(1e-8) {}
+	threshold_number(double D) : d(D), t(1e-8) {}
 	
 	threshold_number& operator=(const double D) {this->d = D; return *this;}
 	threshold_number& operator*=(const double D) {d *= D; return *this;}
