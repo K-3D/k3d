@@ -29,19 +29,25 @@
 #include <k3dsdk/result.h>
 #include <k3dsdk/virtual_document_plugin_factory.h>
 
-namespace libk3dvirtualglpainters
+namespace module
 {
 
-class virtual_sds_point_painter_factory:
+namespace gl
+{
+
+namespace virtual_painters
+{
+
+class virtual_point_painter_factory:
 	public k3d::virtual_document_plugin_factory<k3d::interface_list<k3d::gl::imesh_painter> >
 {
 	typedef k3d::virtual_document_plugin_factory<k3d::interface_list<k3d::gl::imesh_painter> > base;
 
 public:
-	virtual_sds_point_painter_factory() :
-		base(k3d::uuid(0x46db8236, 0xa1408c58, 0xd829ceba, 0xffe78fca),
-			"GLSDSPointPainter",
-			_("Renders mesh subdivision surface points"),
+	virtual_point_painter_factory() :
+		base(k3d::uuid(0x7e376143, 0xb640c3f4, 0x288543a0, 0x57f83514),
+			"GLPointPainter",
+			_("Renders mesh points"),
 			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL),
 		delegate(0)
@@ -56,13 +62,14 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("SDSVBOPointPainter");
+				const k3d::factories_t factories = k3d::plugins("VBOPointPainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}
-			else
+
+			if(!delegate)
 			{
-				const k3d::factories_t factories = k3d::plugins("SDSGLPointPainter");
+				const k3d::factories_t factories = k3d::plugins("OpenGLPointPainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}
@@ -76,11 +83,16 @@ private:
 	k3d::idocument_plugin_factory* delegate;
 };
 
-k3d::iplugin_factory& sds_point_painter_factory()
+k3d::iplugin_factory& point_painter_factory()
 {
-	static virtual_sds_point_painter_factory instance;
+	static virtual_point_painter_factory instance;
 	return instance;
 }
 
-} // namespace libk3dvirtualglpainters
+} // namespace virtual_painters
+
+} // namespace gl
+
+} // namespace module
+
 

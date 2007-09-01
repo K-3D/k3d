@@ -29,19 +29,25 @@
 #include <k3dsdk/result.h>
 #include <k3dsdk/virtual_document_plugin_factory.h>
 
-namespace libk3dvirtualglpainters
+namespace module
 {
 
-class virtual_face_painter_factory:
+namespace gl
+{
+
+namespace virtual_painters
+{
+
+class virtual_sds_face_painter_factory:
 	public k3d::virtual_document_plugin_factory<k3d::interface_list<k3d::gl::imesh_painter> >
 {
 	typedef k3d::virtual_document_plugin_factory<k3d::interface_list<k3d::gl::imesh_painter> > base;
 
 public:
-	virtual_face_painter_factory() :
-		base(k3d::uuid(0x7e6e8354, 0x604f05ae, 0x1d4d658b, 0x96538240),
-			"GLFacePainter",
-			_("Renders mesh faces"),
+	virtual_sds_face_painter_factory() :
+		base(k3d::uuid(0x9d4043c8, 0x864fe71b, 0x38706d85, 0x8b60af0c),
+			"GLSDSFacePainter",
+			_("Renders mesh subdivision surface faces"),
 			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL),
 		delegate(0)
@@ -56,14 +62,13 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("VBOFacePainterFlatNormals");
+				const k3d::factories_t factories = k3d::plugins("SDSVBOFacePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}
-
-			if(!delegate)
+			else
 			{
-				const k3d::factories_t factories = k3d::plugins("OpenGLFacePainter");
+				const k3d::factories_t factories = k3d::plugins("SDSGLFacePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}
@@ -77,11 +82,16 @@ private:
 	k3d::idocument_plugin_factory* delegate;
 };
 
-k3d::iplugin_factory& face_painter_factory()
+k3d::iplugin_factory& sds_face_painter_factory()
 {
-	static virtual_face_painter_factory instance;
+	static virtual_sds_face_painter_factory instance;
 	return instance;
 }
 
-} // namespace libk3dvirtualglpainters
+} // namespace virtual_painters
+
+} // namespace gl
+
+} // namespace module
+
 

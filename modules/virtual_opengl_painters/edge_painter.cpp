@@ -29,7 +29,13 @@
 #include <k3dsdk/result.h>
 #include <k3dsdk/virtual_document_plugin_factory.h>
 
-namespace libk3dvirtualglpainters
+namespace module
+{
+
+namespace gl
+{
+
+namespace virtual_painters
 {
 
 class virtual_edge_painter_factory:
@@ -83,5 +89,10 @@ k3d::iplugin_factory& edge_painter_factory()
 	return instance;
 }
 
-} // namespace libk3dvirtualglpainters
+} // namespace virtual_painters
+
+} // namespace gl
+
+} // namespace module
+
 

@@ -23,7 +23,13 @@
 
 #include <k3dsdk/module.h>
 
-namespace libk3dvirtualglpainters
+namespace module
+{
+
+namespace gl
+{
+
+namespace virtual_painters
 {
 
 extern k3d::iplugin_factory& edge_painter_factory();
@@ -33,14 +39,18 @@ extern k3d::iplugin_factory& sds_edge_painter_factory();
 extern k3d::iplugin_factory& sds_face_painter_factory();
 extern k3d::iplugin_factory& sds_point_painter_factory();
 
-} // namespace libk3dvirtualglpainters
+} // namespace virtual_painters
+
+} // namespace gl
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dvirtualglpainters::edge_painter_factory());
-	Registry.register_factory(libk3dvirtualglpainters::face_painter_factory());
-	Registry.register_factory(libk3dvirtualglpainters::point_painter_factory());
-	Registry.register_factory(libk3dvirtualglpainters::sds_edge_painter_factory());
-	Registry.register_factory(libk3dvirtualglpainters::sds_face_painter_factory());
-	Registry.register_factory(libk3dvirtualglpainters::sds_point_painter_factory());
+	Registry.register_factory(module::gl::virtual_painters::edge_painter_factory());
+	Registry.register_factory(module::gl::virtual_painters::face_painter_factory());
+	Registry.register_factory(module::gl::virtual_painters::point_painter_factory());
+	Registry.register_factory(module::gl::virtual_painters::sds_edge_painter_factory());
+	Registry.register_factory(module::gl::virtual_painters::sds_face_painter_factory());
+	Registry.register_factory(module::gl::virtual_painters::sds_point_painter_factory());
 K3D_MODULE_END
 
