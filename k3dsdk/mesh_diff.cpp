@@ -18,9 +18,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "almost_equal.h"
+#include "color.h"
 #include "imaterial.h"
 #include "mesh_diff.h"
 #include "mesh.h"
+#include "types.h"
 
 #include <boost/format.hpp>
 
@@ -75,6 +77,47 @@ const bool equal(const typed_array<T>& A, const typed_array<T>& B, const boost::
 	return std::equal(A.begin(), A.end(), B.begin(), almost_equal<T>(Threshold));
 }
 
+/// Return true iff two arrays are equivalent (handles mismatched array types and "fuzzy" floating-point comparisons)
+template<typename array_t>
+const bool equal(const array& A, const array& B, const boost::uint64_t Threshold, bool& Result)
+{
+	const array_t* const a = dynamic_cast<const array_t*>(&A);
+	if(!a)
+		return false;
+
+	const array_t* const b = dynamic_cast<const array_t*>(&B);
+	if(!b)
+		return false;
+
+	if(a->size() != b->size())
+	{
+		Result = false;
+		return true;
+	}
+
+	Result = std::equal(a->begin(), a->end(), b->begin(), almost_equal<typename array_t::value_type>(Threshold));
+	return true;
+}
+
+/// Return true iff two arrays are equivalent (handles "fuzzy" floating-point comparisons)
+const bool equal(const array& A, const array& B, const boost::uint64_t Threshold)
+{
+	bool result = false;
+
+	if(equal<typed_array<color> >(A, B, Threshold, result))
+		return result;
+	if(equal<typed_array<point3> >(A, B, Threshold, result))
+		return result;
+	if(equal<typed_array<normal3> >(A, B, Threshold, result))
+		return result;
+	if(equal<typed_array<vector3> >(A, B, Threshold, result))
+		return result;
+
+	k3d::log() << error << k3d_file_reference << ": unknown array type: " << demangle(typeid(A)) << std::endl;
+
+	return false;
+}
+
 /// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons)
 template<typename array_type>
 const bool equal(const boost::shared_ptr<array_type>& A, const boost::shared_ptr<array_type>& B, const boost::uint64_t Threshold)
@@ -88,14 +131,40 @@ const bool equal(const boost::shared_ptr<array_type>& A, const boost::shared_ptr
 	return false;
 }
 
+/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons)
+const bool equal(const boost::shared_ptr<array>& A, const boost::shared_ptr<array>& B, const boost::uint64_t Threshold)
+{
+	if(A.get() == B.get())
+		return true;
+
+	if(A && B)
+		return equal(*A, *B, Threshold);
+
+	return false;
+}
+
 /// Return true iff two groups of named arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons)
-const bool equal(const mesh::named_arrays& A, const mesh::named_arrays& B, const boost::uint64_t Threshold)
+const bool equal(const named_arrays& A, const named_arrays& B, const boost::uint64_t Threshold)
 {
 	if(A.empty() && B.empty())
 		return true;
 
-	assert_not_implemented();
-	return false;
+	named_arrays::const_iterator a = A.begin();
+	named_arrays::const_iterator b = B.begin();
+
+	for(; a != A.end() && b != B.end(); ++a, ++b)
+	{
+		if(a->first != b->first)
+			return false;
+
+		if(!equal(a->second, b->second, Threshold))
+			return false;
+	}
+
+	if(a != A.end() || b != B.end())
+		return false;
+
+	return true;
 }
 
 template<typename pointer_type>
