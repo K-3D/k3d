@@ -33,7 +33,10 @@
 #include <k3dsdk/utility_gl.h>
 #include <k3dsdk/vectors.h>
 
-namespace libk3dopengl
+namespace module
+{
+
+namespace opengl
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -118,4 +121,7 @@ k3d::iplugin_factory& material_factory()
 	return material::get_factory();
 }
 
-} // namespace libk3dopengl
+} // namespace opengl
+
+} // namespace module
+

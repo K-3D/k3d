@@ -60,7 +60,10 @@
 #endif	//far
 #endif	//WIN32
 
-namespace libk3dopengl
+namespace module
+{
+
+namespace opengl
 {
 
 namespace detail
@@ -691,5 +694,7 @@ k3d::iplugin_factory& render_engine_factory()
 	return render_engine::get_factory();
 }
 
-} // namespace libk3dopengl
+} // namespace opengl
+
+} // namespace module
 
