@@ -24,6 +24,7 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "almost_equal.h"
 #include "basic_math.h"
 #include "Half/half.h"
 #include "result.h"
@@ -806,6 +807,22 @@ public:
 
 /// Convenience typedef for our "standard" color type
 typedef basic_rgb<double> color;
+
+/// Specialization of almost_equal that tests two color objects for near-equality
+template<>
+class almost_equal<color>
+{
+	typedef color T;
+public:
+	almost_equal(const boost::uint64_t Threshold) : test(Threshold) { }
+	inline const bool operator()(const T& A, const T& B) const
+	{
+		return test(A.red, B.red) && test(A.green, B.green) && test(A.blue, B.blue);
+	}
+
+private:
+	const almost_equal<double> test;
+};
 
 } // namespace k3d
 
