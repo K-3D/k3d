@@ -156,7 +156,6 @@ void initialize_types()
 	register_type(typeid(k3d::color), "k3d::color");
 	register_type(typeid(k3d::filesystem::path), "k3d::filesystem::path");
 	register_type(typeid(k3d::gl::ilight), "k3d::gl::ilight");
-	register_type(typeid(k3d::ikeyframer), "k3d::ikeyframer");
 	register_type(typeid(k3d::gl::imaterial), "k3d::gl::imaterial");
 	register_type(typeid(k3d::gl::imesh_painter), "k3d::gl::imesh_painter");
 	register_type(typeid(k3d::gl::imesh_painter*), "k3d::gl::imesh_painter*");
@@ -170,9 +169,10 @@ void initialize_types()
 	register_type(typeid(k3d::icamera_preview_render_engine), "k3d::icamera_preview_render_engine");
 	register_type(typeid(k3d::icamera_still_render_engine), "k3d::icamera_still_render_engine");
 	register_type(typeid(k3d::icolor_source), "k3d::icolor_source");
-	register_type(typeid(k3d::idocument_importer), "k3d::idocument_importer");
 	register_type(typeid(k3d::idocument_exporter), "k3d::idocument_exporter");
+	register_type(typeid(k3d::idocument_importer), "k3d::idocument_importer");
 	register_type(typeid(k3d::ifile_format), "k3d::ifile_format");
+	register_type(typeid(k3d::ikeyframer), "k3d::ikeyframer");
 	register_type(typeid(k3d::ilong_source), "k3d::ilong_source");
 	register_type(typeid(k3d::imaterial), "k3d::imaterial");
 	register_type(typeid(k3d::imesh_sink), "k3d::imesh_sink");
@@ -220,6 +220,7 @@ void initialize_types()
 	register_type(typeid(k3d::yafray::ilight), "k3d::yafray::ilight");
 	register_type(typeid(k3d::yafray::imaterial), "k3d::yafray::imaterial");
 	register_type(typeid(long), "long");
+	register_type(typeid(size_t), "size_t");
 	register_type(typeid(std::string), "std::string");
 	register_type(typeid(unsigned long), "unsigned long");
 
