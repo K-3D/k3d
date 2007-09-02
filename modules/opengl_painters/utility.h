@@ -71,6 +71,42 @@ private:
 	const k3d::mesh::selection_t& point_selection;	
 };
 
+/// Functor object that returns "true" for selected edges only
+class selected_edges
+{
+public:
+	selected_edges(const k3d::mesh& Mesh) :
+		edge_selection(*Mesh.polyhedra->edge_selection)
+	{
+	}
+
+	bool operator()(const size_t Edge) const
+	{
+		return edge_selection[Edge];
+	}
+
+private:
+	const k3d::mesh::selection_t& edge_selection;	
+};
+
+/// Functor object that returns "true" for unselected edges only
+class unselected_edges
+{
+public:
+	unselected_edges(const k3d::mesh& Mesh) :
+		edge_selection(*Mesh.polyhedra->edge_selection)
+	{
+	}
+
+	bool operator()(const size_t Edge) const
+	{
+		return !edge_selection[Edge];
+	}
+
+private:
+	const k3d::mesh::selection_t& edge_selection;	
+};
+
 /// Functor object that returns "true" for selected faces only
 class selected_faces
 {
