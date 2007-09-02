@@ -164,18 +164,20 @@ void save_arrays(element& Container, element Storage, const mesh::named_arrays& 
 			continue;
 		}
 
-		if(save_typed_array<ri::integer>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<ri::real>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<ri::string>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<ri::point>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<ri::vector>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<ri::normal>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<ri::color>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<ri::hpoint>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<ri::matrix>(container, name, *abstract_array, Context)) continue;
 		if(save_typed_array<bool>(container, name, *abstract_array, Context)) continue;
+		if(save_typed_array<boost::int32_t>(container, name, *abstract_array, Context)) continue;
+		if(save_typed_array<boost::uint32_t>(container, name, *abstract_array, Context)) continue;
+		if(save_typed_array<double>(container, name, *abstract_array, Context)) continue;
+		if(save_typed_array<k3d::color>(container, name, *abstract_array, Context)) continue;
+		if(save_typed_array<k3d::matrix4>(container, name, *abstract_array, Context)) continue;
+		if(save_typed_array<k3d::normal3>(container, name, *abstract_array, Context)) continue;
+		if(save_typed_array<k3d::point3>(container, name, *abstract_array, Context)) continue;
+		if(save_typed_array<k3d::point4>(container, name, *abstract_array, Context)) continue;
+		if(save_typed_array<k3d::vector3>(container, name, *abstract_array, Context)) continue;
+		if(save_typed_array<size_t>(container, name, *abstract_array, Context)) continue;
+		if(save_typed_array<std::string>(container, name, *abstract_array, Context)) continue;
 
-		k3d::log() << error << "array [" << name << "] unknown type [" << typeid(*abstract_array).name() << "]" << std::endl;
+		k3d::log() << error << k3d_file_reference << ": array [" << name << "] with unknown type [" << demangle(typeid(*abstract_array)) << "] will not be serialized" << std::endl;
 	}
 }
 
