@@ -1,0 +1,114 @@
+  Function parser for C++  v2.8 by Warp.
+  =====================================
+
+=============================================================================
+  Usage license:
+=============================================================================
+
+Copyright © 2003-2005 Juha Nieminen, Joel Yliluoma
+
+  This library is distributed under two distinct usage licenses depending
+on the software ("Software" below) which uses the Function Parser library
+("Library" below).
+  The reason for having two distinct usage licenses is to make the library
+compatible with the GPL license while still being usable in other non-GPL
+(even commercial) software.
+
+A) If the Software using the Library is distributed under the GPL license,
+   then the Library can be used under the GPL license as well.
+
+   The Library will be under the GPL license only when used with the
+   Software. If the Library is separated from the Software and used in
+   another different software under a different license, then the Library
+   will have the B) license below.
+
+   Exception to the above: If the Library is modified for the GPL Software,
+   then the Library cannot be used with the B) license without the express
+   permission of the author of the modifications. A modified library will
+   be under the GPL license by default. That is, only the original,
+   unmodified version of the Library can be taken to another software
+   with the B) license below.
+
+   The author of the Software should provide an URL to the original
+   version of the Library if the one used in the Software has been
+   modified. (http://iki.fi/warp/FunctionParser/)
+
+   This text file must be distributed in its original intact form along
+   with the sources of the Library. (Documentation about possible
+   modifications to the library should be put in a different text file.)
+
+B) If the Software using the Library is not distributed under the GPL
+   license but under any other license, then the following usage license
+   applies to the Library:
+
+  1. This library is free for non-commercial usage. You can do whatever you
+     like with it as long as you don't claim you made it yourself.
+
+  2. It is possible to use this library in a commercial program, but in this
+     case you MUST contact me first (warp@iki.fi) and ask express permission
+     for this. (Read explanation at the end of the file.)
+       If you are making a free program or a shareware program with just a
+     nominal price (5 US dollars or less), you don't have to ask for
+     permission.
+       In any case, I DON'T WANT MONEY for the usage of this library. It is
+     free, period.
+
+  3. You can make any modifications you want to it so that it conforms your
+     needs. If you make modifications to it, you have, of course, credits for
+     the modified parts.
+
+  4. If you use this library in your own program, you don't have to provide
+     the source code if you don't want to (ie. the source code of your program
+     or this library).
+       If you DO include the source code for this library, this text file
+     must be included in its original intact form.
+
+  5. If you distribute a program which uses this library, and specially if you
+     provide the source code, proper credits MUST be included. Trying to
+     obfuscate the fact that this library is not made by you or that it is
+     free is expressly prohibited. When crediting the usage of this library,
+     it's enough to include my name and email address, that is:
+     "Juha Nieminen (warp@iki.fi)". Also a URL to the library download page
+     would be nice, although not required. The official URL is:
+       http://iki.fi/warp/FunctionParser/
+
+  6. And the necessary "lawyer stuff":
+
+     The above copyright notice and this permission notice shall be
+     included in all copies or substantial portions of the Software.
+
+     The software is provided "as is", without warranty of any kind,
+     express or implied, including but not limited to the warranties of
+     merchantability, fitness for a particular purpose and noninfringement.
+     In no event shall the authors or copyright holders be liable for any
+     claim, damages or other liability, whether in an action of contract,
+     tort or otherwise, arising from, out of or in connection with the
+     software or the use or other dealings in the software.
+
+
+---  Explanation of the section 2 of the B) license above:
+
+  The section 2 tries to define "fair use" of the library in commercial
+programs.
+  "Fair use" of the library means that the program is not heavily dependent
+on the library, but the library only provides a minor secondary feature
+to the program.
+  "Heavily dependent" means that the program depends so much on the library
+that without it the functionality of the program would be seriously
+degraded or the program would even become completely non-functional.
+
+  In other words: If the program does not depend heavily on the library,
+that is, the library only provides a minor secondary feature which could
+be removed without the program being degraded in any considerable way,
+then it's OK to use the library in the commercial program.
+  If, however, the program depends so heavily on the library that
+removing it would make the program non-functional or degrade its
+functionality considerably, then it's NOT OK to use the library.
+
+  The ideology behind this is that it's not fair to use a free library
+as a base for a commercial program, but it's fair if the library is
+just a minor, unimportant extra.
+
+  If you are going to ask me for permission to use the library in a
+commercial program, please describe the feature which the library will
+be providing and how important it is to the program.
