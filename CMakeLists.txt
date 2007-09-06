@@ -353,11 +353,5 @@ MARK_AS_ADVANCED(EXECUTABLE_OUTPUT_PATH)
 MARK_AS_ADVANCED(LIBRARY_OUTPUT_PATH)
 
 # Test to ensure that none of our filenames exceed 90 characters in length (causes portability issues with tar)
-FILE(GLOB_RECURSE ALL_SOURCE_FILES RELATIVE ${k3d_SOURCE_DIR} *)
-FOREACH(SOURCE_FILE ${ALL_SOURCE_FILES})
-	STRING(LENGTH ${SOURCE_FILE} FILENAME_LENGTH)
-	IF(FILENAME_LENGTH GREATER 90)
-		MESSAGE("The filename \"${SOURCE_FILE}\" is too long (${FILENAME_LENGTH} characters).\nThis can cause portability issues with some versions of tar.")
-	ENDIF(FILENAME_LENGTH GREATER 90)
-ENDFOREACH(SOURCE_FILE)
+INCLUDE(CheckFilenames)
 
