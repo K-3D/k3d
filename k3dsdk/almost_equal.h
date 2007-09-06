@@ -22,6 +22,7 @@
 
 #include <boost/cstdint.hpp>
 #include <cstddef>
+#include <string>
 
 namespace k3d
 {
@@ -57,6 +58,16 @@ template<>
 class almost_equal<size_t>
 {
 	typedef size_t T;
+public:
+	almost_equal(const boost::uint64_t) { }
+	inline const bool operator()(const T A, const T B) const { return A == B; }
+};
+
+/// Specialization of almost_equal that tests std::string for equality
+template<>
+class almost_equal<std::string>
+{
+	typedef std::string T;
 public:
 	almost_equal(const boost::uint64_t) { }
 	inline const bool operator()(const T A, const T B) const { return A == B; }

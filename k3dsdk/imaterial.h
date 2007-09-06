@@ -21,10 +21,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares k3d::imaterial, an abstract interface implemented by nodes that can act as surface materials
-		\author Tim Shead (tshead@k-3d.com)
+	\brief Declares k3d::imaterial, an abstract interface implemented by nodes that can act as surface materials
+	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "almost_equal.h"
 #include "iunknown.h"
 
 namespace k3d
@@ -50,6 +51,16 @@ protected:
 	virtual ~imaterial() {}
 };
 
+/// Specialization of almost_equal that tests imaterial pointers for equality
+template<>
+class almost_equal<imaterial*>
+{
+public:
+	almost_equal(const boost::uint64_t) { } 
+	inline const bool operator()(imaterial* const A, imaterial* const B) const { return A == B; }
+};
+
 } // namespace k3d
 
 #endif // K3DSDK_IMATERIAL_H
+

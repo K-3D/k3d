@@ -406,6 +406,30 @@ std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::operator_type& 
 /// Stream serialization
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS);
 
+template<>
+class almost_equal<mesh::polyhedra_t::polyhedron_type>
+{
+public:
+	almost_equal(const boost::uint64_t) { } 
+	inline const bool operator()(const mesh::polyhedra_t::polyhedron_type A, const mesh::polyhedra_t::polyhedron_type B) const { return A == B; }
+};
+
+template<>
+class almost_equal<mesh::blobbies_t::primitive_type>
+{
+public:
+	almost_equal(const boost::uint64_t) { } 
+	inline const bool operator()(const mesh::blobbies_t::primitive_type A, const mesh::blobbies_t::primitive_type B) const { return A == B; }
+};
+
+template<>
+class almost_equal<mesh::blobbies_t::operator_type>
+{
+public:
+	almost_equal(const boost::uint64_t) { } 
+	inline const bool operator()(const mesh::blobbies_t::operator_type A, const mesh::blobbies_t::operator_type B) const { return A == B; }
+};
+
 } // namespace k3d
 
 #endif // K3DSDK_MESH_H

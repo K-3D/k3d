@@ -31,108 +31,24 @@
 namespace k3d
 {
 
-/// Specialization of almost_equal that tests imaterial pointers for equality
-template<>
-class almost_equal<imaterial*>
-{
-public:
-	almost_equal(const boost::uint64_t) { } 
-	inline const bool operator()(imaterial* const A, imaterial* const B) const { return A == B; }
-};
-
-template<>
-class almost_equal<mesh::polyhedra_t::polyhedron_type>
-{
-public:
-	almost_equal(const boost::uint64_t) { } 
-	inline const bool operator()(const mesh::polyhedra_t::polyhedron_type A, const mesh::polyhedra_t::polyhedron_type B) const { return A == B; }
-};
-
-template<>
-class almost_equal<mesh::blobbies_t::primitive_type>
-{
-public:
-	almost_equal(const boost::uint64_t) { } 
-	inline const bool operator()(const mesh::blobbies_t::primitive_type A, const mesh::blobbies_t::primitive_type B) const { return A == B; }
-};
-
-template<>
-class almost_equal<mesh::blobbies_t::operator_type>
-{
-public:
-	almost_equal(const boost::uint64_t) { } 
-	inline const bool operator()(const mesh::blobbies_t::operator_type A, const mesh::blobbies_t::operator_type B) const { return A == B; }
-};
-
 namespace detail
 {
 
-/// Return true iff two arrays are equivalent (handles "fuzzy" floating-point comparisons)
+/////////////////////////////////////////////////////////////////////
+// equal
+
+/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
+/// \note: This overload is used to compare concrete arrays.
 template<typename T>
 const bool equal(const typed_array<T>& A, const typed_array<T>& B, const boost::uint64_t Threshold)
 {
-	if(A.size() != B.size())
-		return false;
-
-	return std::equal(A.begin(), A.end(), B.begin(), almost_equal<T>(Threshold));
+	return A.almost_equal(B, Threshold);
 }
 
-/// Return true iff two arrays are equivalent (handles mismatched array types and "fuzzy" floating-point comparisons)
-template<typename array_t>
-const bool equal(const array& A, const array& B, const boost::uint64_t Threshold, bool& Result)
-{
-	const array_t* const a = dynamic_cast<const array_t*>(&A);
-	if(!a)
-		return false;
-
-	const array_t* const b = dynamic_cast<const array_t*>(&B);
-	if(!b)
-		return false;
-
-	if(a->size() != b->size())
-	{
-		Result = false;
-		return true;
-	}
-
-	Result = std::equal(a->begin(), a->end(), b->begin(), almost_equal<typename array_t::value_type>(Threshold));
-	return true;
-}
-
-/// Return true iff two arrays are equivalent (handles "fuzzy" floating-point comparisons)
-const bool equal(const array& A, const array& B, const boost::uint64_t Threshold)
-{
-	bool result = false;
-
-	if(equal<typed_array<color> >(A, B, Threshold, result))
-		return result;
-	if(equal<typed_array<point3> >(A, B, Threshold, result))
-		return result;
-	if(equal<typed_array<normal3> >(A, B, Threshold, result))
-		return result;
-	if(equal<typed_array<vector3> >(A, B, Threshold, result))
-		return result;
-
-	k3d::log() << error << k3d_file_reference << ": unknown array type: " << demangle(typeid(A)) << std::endl;
-
-	return false;
-}
-
-/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons)
+/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
+/// \note: This overload is used to compare arbitrary objects - not just arrays.
 template<typename array_type>
 const bool equal(const boost::shared_ptr<array_type>& A, const boost::shared_ptr<array_type>& B, const boost::uint64_t Threshold)
-{
-	if(A.get() == B.get())
-		return true;
-
-	if(A && B)
-		return equal(*A, *B, Threshold);
-
-	return false;
-}
-
-/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons)
-const bool equal(const boost::shared_ptr<array>& A, const boost::shared_ptr<array>& B, const boost::uint64_t Threshold)
 {
 	if(A.get() == B.get())
 		return true;
@@ -146,26 +62,37 @@ const bool equal(const boost::shared_ptr<array>& A, const boost::shared_ptr<arra
 /// Return true iff two groups of named arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons)
 const bool equal(const named_arrays& A, const named_arrays& B, const boost::uint64_t Threshold)
 {
-	if(A.empty() && B.empty())
-		return true;
+	// If we have differing number of arrays, we aren't equal
+	if(A.size() != B.size())
+		return false;
 
-	named_arrays::const_iterator a = A.begin();
-	named_arrays::const_iterator b = B.begin();
-
-	for(; a != A.end() && b != B.end(); ++a, ++b)
+	for(named_arrays::const_iterator a = A.begin(), b = B.begin(); a != A.end() && b != B.end(); ++a, ++b)
 	{
+		// Each pair of arrays must have equal names
 		if(a->first != b->first)
 			return false;
 
-		if(!equal(a->second, b->second, Threshold))
-			return false;
-	}
+		// If both arrays point to the same memory, they're equal
+		if(a->second.get() == b->second.get())
+			continue;
 
-	if(a != A.end() || b != B.end())
+		// Perform element-wise comparisons of the two arrays
+		if(a->second && b->second)
+		{
+			// The array::almost_equal method correctly handles type-mismatches between arrays
+			if(a->second->almost_equal(*b->second, Threshold))
+				continue;
+		}
+
+		// Either the element-wise comparison failed or one array was NULL and the other wasn't
 		return false;
+	}
 
 	return true;
 }
+
+/////////////////////////////////////////////////////////////////////
+// print_diff
 
 template<typename pointer_type>
 void print_diff(std::ostream& Stream, const std::string& Label, const pointer_type& A, const pointer_type& B)
@@ -235,13 +162,97 @@ void print_diff(std::ostream& Stream, const std::string& Label, const pointer_ty
 	Stream << "\n";
 }
 
-/** \todo Implement comparisons for user arrays */
+template<typename array_t>
+const bool print_diff(std::ostream& Stream, const std::string& Label, const array& A, const array& B, const boost::uint64_t Threshold)
+{
+	const array_t* const a = dynamic_cast<const array_t*>(&A);
+	const array_t* const b = dynamic_cast<const array_t*>(&B);
+
+	if(!a && !b)
+		return false;
+
+	const size_t a_size = a ? a->size() : 0;
+	const size_t b_size = b ? b->size() : 0;
+
+	std::ostringstream a_label_buffer;
+	if(a)
+		a_label_buffer << Label << " (" << a_size << ")";
+
+	std::ostringstream b_label_buffer;
+	if(b)
+		b_label_buffer << Label << " (" << b_size << ")";
+
+	boost::format format("%1% %|10t|%2% %|40t|%3%\n");
+	const std::string divider(28, '-');
+
+	Stream << format % "" % a_label_buffer.str() % b_label_buffer.str();
+	Stream << format % "" % divider % divider;
+
+	k3d::almost_equal<typename array_t::value_type> almost_equal(Threshold);
+
+	for(size_t i = 0; i < a_size || i < b_size; ++i)
+	{
+		const std::string difference_buffer = (a && i < a_size && b && i < b_size && almost_equal(a->at(i), b->at(i))) ? std::string("") : std::string("*****");
+
+		std::ostringstream a_buffer;
+		if(a && i < a_size)
+			a_buffer << a->at(i);
+
+		std::ostringstream b_buffer;
+		if(b && i < b_size)
+			b_buffer << b->at(i);
+
+		Stream << format % difference_buffer % a_buffer.str() % b_buffer.str();
+	}
+
+	Stream << "\n";
+
+	return true;
+}
+
+void print_diff(std::ostream& Stream, const std::string& Label, const array& A, const array& B, const boost::uint64_t Threshold)
+{
+	if(print_diff<typed_array<color> >(Stream, Label, A, B, Threshold))
+		return;
+	if(print_diff<typed_array<normal3> >(Stream, Label, A, B, Threshold))
+		return;
+	if(print_diff<typed_array<point3> >(Stream, Label, A, B, Threshold))
+		return;
+	if(print_diff<typed_array<vector3> >(Stream, Label, A, B, Threshold))
+		return;
+	
+	k3d::log() << error << k3d_file_reference << ": unknown array type: " << demangle(typeid(A)) << std::endl;
+}
+
+void print_diff(std::ostream& Stream, const std::string& Label, const boost::shared_ptr<array>& A, const boost::shared_ptr<array>& B, const boost::uint64_t Threshold)
+{
+	print_diff(Stream, Label, *A, *B, Threshold);
+}
+
 void print_diff(std::ostream& Stream, const std::string& Label, const k3d::mesh::named_arrays& A, const k3d::mesh::named_arrays& B, const boost::uint64_t Threshold)
 {
 	if(A.empty() && B.empty())
 		return;
 
-	assert_not_implemented();
+	named_arrays::const_iterator a = A.begin();
+	named_arrays::const_iterator b = B.begin();
+
+	for(; a != A.end() && b != B.end(); ++a, ++b)
+	{
+		if(a->first != b->first)
+		{
+			Stream << "array names differ: [" << a->first << "] versus [" << b->first << "]\n";
+			continue;
+		}
+
+		print_diff(Stream, Label + " \"" + a->first + "\"", a->second, b->second, Threshold);
+	}
+
+	if(a != A.end() || b != B.end())
+	{
+		Stream << "dangling arrays\n";
+		return;
+	}
 }
 
 } // namespace detail

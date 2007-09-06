@@ -23,6 +23,7 @@
 
 #include "gprim_factory.h"
 
+#include <k3dsdk/imaterial.h>
 #include <k3dsdk/shared_pointer.h>
 
 namespace libk3dobjio

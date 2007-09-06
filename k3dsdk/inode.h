@@ -25,6 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "almost_equal.h"
 #include "iunknown.h"
 #include "signal_system.h"
 
@@ -69,8 +70,16 @@ protected:
 	virtual ~inode() {}
 };
 
+/// Specialization of almost_equal that tests inode pointers for equality
+template<>
+class almost_equal<inode*>
+{
+public:
+	almost_equal(const boost::uint64_t) { } 
+	inline const bool operator()(inode* const A, inode* const B) const { return A == B; }
+};
+
 } // namespace k3d
 
 #endif // !K3DSDK_INODE_H
-
 

@@ -22,7 +22,7 @@
 			<clockwise_edges>1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</clockwise_edges>
 			<edge_selection>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</edge_selection>
 			<face_varying_data>
-				<array name="Nf" type="k3d::normal3">0 0 1 0 0 1 0 0 1 0 0 1 -1 0 0 -1 0 0 -1 0 0 -1 0 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 1 0 0 1 0 0 1 0 0 1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 0 -1 0 0 -1 0 0 -1 0 0 -1</array>
+				<array name="Nf" type="k3d::normal3">-1 -1 1 1 -1 1 1 1 1 -1 1 1 -1 -1 1 -1 1 1 -1 1 -1 -1 -1 -1 1 -1 1 -1 -1 1 -1 -1 -1 1 -1 -1 1 1 1 1 -1 1 1 -1 -1 1 1 -1 -1 1 1 1 1 1 1 1 -1 -1 1 -1 1 -1 -1 -1 -1 -1 -1 1 -1 1 1 -1</array>
 			</face_varying_data>
 		</polyhedra>
 	</mesh_arrays>

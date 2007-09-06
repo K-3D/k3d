@@ -20,9 +20,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <vector>
-
+#include "almost_equal.h"
 #include "array.h"
+
+#include <algorithm>
+#include <vector>
 
 namespace k3d
 {
@@ -44,12 +46,12 @@ public:
 	{
 	}
 
-	explicit typed_array(size_type count) :
+	explicit typed_array(const size_type count) :
 		std::vector<T>(count)
 	{
 	}
 
-	typed_array(size_type count, const T& val) :
+	typed_array(const size_type count, const T& val) :
 		std::vector<T>(count, val)
 	{
 	}
@@ -60,7 +62,7 @@ public:
 	}
 
 	template<class IteratorT>
-	typed_array(IteratorT first, IteratorT last) :
+	typed_array(const IteratorT first, const IteratorT last) :
 		std::vector<T>(first, last)
 	{
 	}
@@ -75,7 +77,7 @@ public:
 	    return new this_type(*this);
 	}
 
-	array* clone(size_t Begin, size_t End) const
+	array* clone(const size_t Begin, const size_t End) const
 	{
 	    return new this_type(this->begin() + Begin, this->begin() + End);
 	}
@@ -88,6 +90,26 @@ public:
 	const bool empty() const
 	{
 		return base_type::empty();
+	}
+
+	const bool almost_equal(const array& Other, const boost::uint64_t Threshold) const
+	{
+		if(base_type::size() != Other.size())
+			return false;
+
+		const this_type* const other = dynamic_cast<const this_type*>(&Other);
+		if(!other)
+			return false;
+
+		return std::equal(base_type::begin(), base_type::end(), other->begin(), k3d::almost_equal<T>(Threshold));
+	}
+
+	const bool almost_equal(const this_type& Other, const boost::uint64_t Threshold) const
+	{
+		if(base_type::size() != Other.size())
+			return false;
+
+		return std::equal(base_type::begin(), base_type::end(), Other.begin(), k3d::almost_equal<T>(Threshold));
 	}
 };
 
