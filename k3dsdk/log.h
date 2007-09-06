@@ -40,9 +40,6 @@ std::ostream& info(std::ostream&);
 /// iostream manipulator that indicates messages used for internal debugging by developers
 std::ostream& debug(std::ostream&);
 
-/// iostream manipulator that inserts a copy of the current backtrace into a stream
-std::ostream& backtrace(std::ostream&);
-
 /// Convenience function that prints a debug message to the log stream ... intended mainly for use with signals
 void print_debug(const std::string& Message);
 	

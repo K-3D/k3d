@@ -366,35 +366,6 @@ std::ostream& debug(std::ostream& Stream)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// backtrace
-
-std::ostream& backtrace(std::ostream& Stream)
-{
-#if defined K3D_API_WIN32
-
-	Stream << "Backtrace unavailable on Win32\n";
-
-#elif defined K3D_API_DARWIN
-
-	Stream << "Backtrace unavailable on Darwin\n";
-
-#else
-
-	void* array[25];
-	int size = ::backtrace(array, 25);
-	char** symbols = ::backtrace_symbols(array, size);
-
-	for(int i = 0; i != size; ++i)
-		Stream << symbols[i] << "\n";
-
-	free(symbols);
-
-#endif
-
-	return Stream;
-}
-
-/////////////////////////////////////////////////////////////////////////////
 // print_debug
 
 void print_debug(const std::string& Message)
