@@ -127,9 +127,15 @@ name_to_type_map_t name_to_type_map;
 
 void register_type(const std::type_info& Info, const std::string& Name)
 {
+	if(type_to_name_map.count(type_info(Info)))
+	{
+		k3d::log() << error << k3d_file_reference << ": attempt to re-register type [" << demangle(Info) << "] with existing name [" << type_to_name_map[type_info(Info)] << "] under new name [" << Name << "]" << std::endl;
+		return;
+	}
+
 	if(type_to_name_map.count(type_info(Info)) || name_to_type_map.count(Name))
 	{
-		k3d::log() << error << k3d_file_reference << ": attempt to register [" << Name << "] twice" << std::endl;
+		k3d::log() << error << k3d_file_reference << ": attempt to register new type [" << demangle(Info) << "] using existing name [" << Name << "]" << std::endl;
 		return;
 	}
 
