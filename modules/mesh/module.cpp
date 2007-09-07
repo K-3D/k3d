@@ -48,7 +48,6 @@ extern k3d::iplugin_factory& filter_faces_by_color_factory();
 extern k3d::iplugin_factory& flip_orientation_factory();
 extern k3d::iplugin_factory& frozen_parameter_factory();
 extern k3d::iplugin_factory& join_points_factory();
-extern k3d::iplugin_factory& make_bilinear_patches_factory();
 extern k3d::iplugin_factory& make_creases_factory();
 extern k3d::iplugin_factory& make_point_group_factory();
 extern k3d::iplugin_factory& make_sds_factory();
@@ -93,7 +92,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(libk3dmesh::flip_orientation_factory());
 	Registry.register_factory(libk3dmesh::frozen_parameter_factory());
 	Registry.register_factory(libk3dmesh::join_points_factory());
-	Registry.register_factory(libk3dmesh::make_bilinear_patches_factory());
 	Registry.register_factory(libk3dmesh::make_creases_factory());
 	Registry.register_factory(libk3dmesh::make_point_group_factory());
 	Registry.register_factory(libk3dmesh::make_sds_factory());

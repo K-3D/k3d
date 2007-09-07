@@ -32,7 +32,10 @@
 
 #include <iterator>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace bilinear_patch
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -131,6 +134,8 @@ k3d::iplugin_factory& make_bilinear_patches_factory()
 	return make_bilinear_patches_implementation::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace bilinear_patch
+
+} // namespace module
 
 
