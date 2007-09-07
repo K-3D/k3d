@@ -28,6 +28,16 @@
 namespace k3d
 {
 
+/// Specialization of almost_equal that tests int for equality
+template<>
+class almost_equal<ri::unsigned_integer>
+{
+	typedef ri::unsigned_integer T;
+public:
+	almost_equal(const boost::uint64_t) { }
+	inline const bool operator()(const T A, const T B) const { return A == B; }
+};
+
 namespace ri
 {
 
