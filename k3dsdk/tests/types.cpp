@@ -8,11 +8,11 @@
 #include <sstream>
 #include <stdexcept>
 
-boost::format format("%1% %|25t|%2% %|50t|%3% %|75t|%4%");
+boost::format format("%1% %|20t|%2% %|45t|%3% %|55t|%4%");
 
 void print_headers()
 {
-	std::cout << format % "type name" % "typeid name" % "expected size" % "actual size" << "\n\n";
+	std::cout << format % "type name" % "typeid name" % "expected" % "actual" << "\n\n";
 }
 
 template<typename T>
@@ -59,10 +59,10 @@ int main(int argc, char* argv[])
 		test_type<boost::int16_t>("boost::int16_t", 2, error);
 		test_type<boost::int32_t>("boost::int32_t", 4, error);
 		test_type<boost::int64_t>("boost::int64_t", 8, error);
-		test_type<boost::uint8_t>("boost::int8_t", 1, error);
-		test_type<boost::uint16_t>("boost::int16_t", 2, error);
-		test_type<boost::uint32_t>("boost::int32_t", 4, error);
-		test_type<boost::uint64_t>("boost::int64_t", 8, error);
+		test_type<boost::uint8_t>("boost::uint8_t", 1, error);
+		test_type<boost::uint16_t>("boost::uint16_t", 2, error);
+		test_type<boost::uint32_t>("boost::uint32_t", 4, error);
+		test_type<boost::uint64_t>("boost::uint64_t", 8, error);
 
 		if(error)
 			throw std::runtime_error("type mismatch");
