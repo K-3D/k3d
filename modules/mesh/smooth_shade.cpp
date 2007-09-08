@@ -136,12 +136,10 @@ public:
 				"SmoothShade",
 				_("Simulates smooth geometry by averaging polygon normals"),
 				"Textures",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
-
-private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
