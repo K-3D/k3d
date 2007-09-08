@@ -29,15 +29,13 @@ boost::format format("%1% %|20t|%2% %|45t|%3% %|55t|%4%");
 
 void print_headers()
 {
-	std::cout << format % "type name" % "typeid name" % "expected" % "actual" << "\n\n";
+	std::cout << format % "K-3D type" % "internal type" % "expected" % "actual" << "\n\n";
 }
 
 template<typename T>
 void test_type(const std::string& TypeName, const size_t ExpectedSize, bool& Error)
 {
 	std::ostringstream typeid_name;
-	if(TypeName != k3d::demangle(typeid(T)))
-		typeid_name << "* ";
 	typeid_name << k3d::demangle(typeid(T));
 
 	std::ostringstream actual_size;
