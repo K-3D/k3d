@@ -31,7 +31,10 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace bicubic_patch
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -159,6 +162,9 @@ k3d::iplugin_factory& polygonize_bicubic_patches_factory()
 	return polygonize_bicubic_patches::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace bicubic_patch
+
+} // namespace module
+
 
 

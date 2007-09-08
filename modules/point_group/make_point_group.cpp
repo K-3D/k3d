@@ -32,7 +32,10 @@
 
 #include <iterator>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace point_group
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -103,5 +106,8 @@ k3d::iplugin_factory& make_point_group_factory()
 	return make_point_group::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace point_group
+
+} // namespace module
+
 
