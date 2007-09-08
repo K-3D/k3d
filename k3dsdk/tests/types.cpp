@@ -8,6 +8,23 @@
 #include <sstream>
 #include <stdexcept>
 
+namespace k3d
+{
+
+typedef bool bool_t;
+typedef float float_t;
+typedef double double_t;
+typedef boost::int8_t int8_t;
+typedef boost::int16_t int16_t;
+typedef boost::int32_t int32_t;
+typedef boost::int64_t int64_t;
+typedef boost::uint8_t uint8_t;
+typedef boost::uint16_t uint16_t;
+typedef boost::uint32_t uint32_t;
+typedef boost::uint64_t uint64_t;
+
+} // namespace k3d
+
 boost::format format("%1% %|20t|%2% %|45t|%3% %|55t|%4%");
 
 void print_headers()
@@ -44,25 +61,18 @@ int main(int argc, char* argv[])
 	{
 		bool error = false;
 
-		test_type<bool>("bool", 1, error);
-		test_type<char>("char", 1, error);
-		test_type<unsigned char>("unsigned char", 1, error);
-		test_type<int>("int", 4, error);
-		test_type<unsigned int>("unsigned int", 4, error);
-		test_type<long>("long", 4, error);
-		test_type<unsigned long>("unsigned long", 4, error);
-		test_type<size_t>("size_t", 4, error);
-		test_type<float>("float", 4, error);
-		test_type<double>("double", 8, error);
+		test_type<k3d::bool_t>("k3d::bool_t", 1, error);
+		test_type<k3d::float_t>("k3d::float_t", 4, error);
+		test_type<k3d::double_t>("k3d::double_t", 8, error);
 
-		test_type<boost::int8_t>("boost::int8_t", 1, error);
-		test_type<boost::int16_t>("boost::int16_t", 2, error);
-		test_type<boost::int32_t>("boost::int32_t", 4, error);
-		test_type<boost::int64_t>("boost::int64_t", 8, error);
-		test_type<boost::uint8_t>("boost::uint8_t", 1, error);
-		test_type<boost::uint16_t>("boost::uint16_t", 2, error);
-		test_type<boost::uint32_t>("boost::uint32_t", 4, error);
-		test_type<boost::uint64_t>("boost::uint64_t", 8, error);
+		test_type<k3d::int8_t>("k3d::int8_t", 1, error);
+		test_type<k3d::int16_t>("k3d::int16_t", 2, error);
+		test_type<k3d::int32_t>("k3d::int32_t", 4, error);
+		test_type<k3d::int64_t>("k3d::int64_t", 8, error);
+		test_type<k3d::uint8_t>("k3d::uint8_t", 1, error);
+		test_type<k3d::uint16_t>("k3d::uint16_t", 2, error);
+		test_type<k3d::uint32_t>("k3d::uint32_t", 4, error);
+		test_type<k3d::uint64_t>("k3d::uint64_t", 8, error);
 
 		if(error)
 			throw std::runtime_error("type mismatch");
