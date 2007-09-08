@@ -1,28 +1,37 @@
 #include <k3dsdk/types.h>
 
+#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
+
+boost::format format("%1% %|25t|%2% %|50t|%3% %|75t|%4%");
 
 void print_headers()
 {
-	boost::format format("%1% %|20t|%2% %|40t|%3% %|60t|%4%\n\n");
-	std::cout << format % "expected name" % "typeid name" % "expected size" % "actual size";
+	std::cout << format % "type name" % "typeid name" % "expected size" % "actual size" << "\n\n";
 }
 
 template<typename T>
-void test_type(const std::string& ExpectedName, const size_t ExpectedSize, bool& Error)
+void test_type(const std::string& TypeName, const size_t ExpectedSize, bool& Error)
 {
-	boost::format format("%1% %|20t|%2% %|40t|%3% %|60t|%4%");
-	std::cout << format % ExpectedName % k3d::demangle(typeid(T)) % ExpectedSize % sizeof(T);
+	std::ostringstream typeid_name;
+	if(TypeName != k3d::demangle(typeid(T)))
+		typeid_name << "* ";
+	typeid_name << k3d::demangle(typeid(T));
 
-	if(ExpectedName != k3d::demangle(typeid(T)) || ExpectedSize != sizeof(T))
-	{
-		std::cout << "********";
+	std::ostringstream actual_size;
+	if(ExpectedSize != sizeof(T))
+		actual_size << "* ";
+	actual_size << sizeof(T);
+
+	std::cout << format % TypeName % typeid_name.str() % ExpectedSize % actual_size.str();
+
+	if(ExpectedSize != sizeof(T))
 		Error = true;
-	}
 
 	std::cout << "\n";
 }
@@ -45,6 +54,15 @@ int main(int argc, char* argv[])
 		test_type<size_t>("size_t", 4, error);
 		test_type<float>("float", 4, error);
 		test_type<double>("double", 8, error);
+
+		test_type<boost::int8_t>("boost::int8_t", 1, error);
+		test_type<boost::int16_t>("boost::int16_t", 2, error);
+		test_type<boost::int32_t>("boost::int32_t", 4, error);
+		test_type<boost::int64_t>("boost::int64_t", 8, error);
+		test_type<boost::uint8_t>("boost::int8_t", 1, error);
+		test_type<boost::uint16_t>("boost::int16_t", 2, error);
+		test_type<boost::uint32_t>("boost::int32_t", 4, error);
+		test_type<boost::uint64_t>("boost::int64_t", 8, error);
 
 		if(error)
 			throw std::runtime_error("type mismatch");
