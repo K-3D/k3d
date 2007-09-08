@@ -131,7 +131,7 @@ public:
 				"FrozenParameter",
 				_("Freezes the defined parameter"),
 				"Mesh",
-				k3d::iplugin_factory::EXPERIMENTAL);
+				k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
