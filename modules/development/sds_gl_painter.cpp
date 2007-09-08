@@ -20,11 +20,11 @@
 /** \file SDS painters
  */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/extension_gl.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/hints.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
@@ -33,8 +33,8 @@
 #include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
+#include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 #include <k3dsdk/utility_gl.h>
-#include <subdivision_surface/k3d_sds_binding.h>
 
 #include "vbo.h"
 #include "colored_selection_painter_gl.h"

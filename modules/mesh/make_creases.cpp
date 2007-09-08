@@ -24,13 +24,12 @@
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
+#include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
-
-#include <subdivision_surface/sds_crease.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/persistent.h>
+#include <k3dsdk/subdivision_surface/sds_crease.h>
 
 #include <iterator>
 

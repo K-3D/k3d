@@ -31,11 +31,10 @@
 #include <k3dsdk/gl.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/iproperty.h>
-#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/painter_cache.h>
-
-#include <subdivision_surface/k3d_sds_binding.h>
+#include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 
 namespace module
 {

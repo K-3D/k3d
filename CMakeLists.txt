@@ -327,13 +327,8 @@ IF(MSVC)
 	ADD_SUBDIRECTORY(gendef)
 ENDIF(MSVC)
 
-
-ADD_SUBDIRECTORY(glew)
-
 ADD_SUBDIRECTORY(k3dsdk)
 
-ADD_SUBDIRECTORY(subdivision_surface)
-ADD_SUBDIRECTORY(surface_polygonizer)
 ADD_SUBDIRECTORY(application)
 ADD_SUBDIRECTORY(bug-buddy)
 ADD_SUBDIRECTORY(make-module-proxy)

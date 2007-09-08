@@ -22,8 +22,7 @@
 		\author Romain Behar <romainbehar@yahoo.com>
 */
 
-#include <subdivision_surface/k3d_sds_binding.h>
-
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>
@@ -31,7 +30,6 @@
 #include <k3dsdk/file_range.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icamera_animation_render_engine.h>
 #include <k3dsdk/icamera_preview_render_engine.h>
@@ -47,13 +45,14 @@
 #include <k3dsdk/irender_job.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/iyafray.h>
-#include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/render_farm.h>
 #include <k3dsdk/resolutions.h>
+#include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/utility_gl.h>

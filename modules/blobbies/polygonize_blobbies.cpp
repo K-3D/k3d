@@ -21,18 +21,17 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/types_ri.h>
+#include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/material_client.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-
-#include <surface_polygonizer/blobby_polygonizer.h>
+#include <k3dsdk/surface_polygonizer/blobby_polygonizer.h>
+#include <k3dsdk/types_ri.h>
 
 namespace libk3dblobbies
 {
