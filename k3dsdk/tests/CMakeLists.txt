@@ -55,6 +55,9 @@ ADD_TEST(k3dsdk.path.relative.003 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "
 ADD_EXECUTABLE(test-shared-arrays shared_arrays.cpp)
 ADD_TEST(k3dsdk.shared-arrays ${EXECUTABLE_OUTPUT_PATH}/test-shared-arrays)
 
+ADD_EXECUTABLE(test-types types.cpp)
+ADD_TEST(k3dsdk.types ${EXECUTABLE_OUTPUT_PATH}/test-types)
+
 ADD_EXECUTABLE(test-xml-sanity-checks xml_sanity_checks.cpp)
 ADD_TEST(k3dsdk.xml-sanity-checks ${EXECUTABLE_OUTPUT_PATH}/test-xml-sanity-checks)
 
