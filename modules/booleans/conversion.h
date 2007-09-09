@@ -36,9 +36,9 @@
 //#include <CGAL/Gmpz.h>
 //#include <CGAL/MP_Float.h>
 #include <CGAL/Cartesian.h>
-//#include <CGAL/Filtered_kernel.h>
+#include <CGAL/Filtered_kernel.h>
 //#include <CGAL/Lazy_exact_nt.h>
-//#include <CGAL/Extended_homogeneous.h>
+//#include <CGAL/Homogeneous.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/to_rational.h>
@@ -53,9 +53,10 @@ namespace libk3dbooleans
 {
 	//typedef CGAL::Lazy_exact_nt<double> NT; // Using an exact number type would probably be a good idea, but fails to compile...
 	typedef CGAL::threshold_number NT;
+	//typedef CGAL::Gmpz NT;
 	typedef CGAL::Cartesian<NT> Kernel;
 	typedef CGAL::Quotient<NT> Rational;
-	typedef CGAL::Nef_polyhedron_3<Kernel> Nef_polyhedron;
+	typedef CGAL::Nef_polyhedron_3<Kernel, CGAL::SNC_indexed_items> Nef_polyhedron;
 	typedef CGAL::Polyhedron_3<Kernel> Polyhedron;
 	typedef CGAL::Point_3<Kernel> Point_3;
 	
@@ -66,7 +67,7 @@ namespace libk3dbooleans
 	void to_mesh(Nef_polyhedron& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* const Material);
 	
 	/// Converts a k3d mesh to a Nef polyhedron
-	boost::shared_ptr<Nef_polyhedron> to_nef(const k3d::mesh& Mesh, const k3d::matrix4& Matrix);
+	boost::shared_ptr<Nef_polyhedron> to_nef(const k3d::mesh& Mesh);
 	
 	/// Convert errors to the k3d logging system
 	void k3d_failure_handler(const char *type, const char *expr, const char* file, int line, const char* msg);

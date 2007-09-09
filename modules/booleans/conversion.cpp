@@ -257,10 +257,10 @@ void to_mesh(Nef_polyhedron& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* con
   Mesh.polyhedra = polyhedra;
 }
 
-boost::shared_ptr<Nef_polyhedron> to_nef(const k3d::mesh& Mesh, const k3d::matrix4& Matrix)
+boost::shared_ptr<Nef_polyhedron> to_nef(const k3d::mesh& Mesh)
 {
 	SNC_structure snc;
-	k3d_to_nef(Mesh, Matrix, snc);
+	k3d_to_nef(Mesh, snc);
 	boost::shared_ptr<Nef_polyhedron> nef(new Nef_polyhedron(snc));
 	nef->build_external_structure();
 	nef->simplify();

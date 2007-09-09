@@ -38,6 +38,8 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/property.h>
+#include <k3dsdk/user_property_changed_signal.h>
 
 namespace libk3dbooleans
 {
@@ -54,70 +56,94 @@ public:
 	cgal_boolean(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_type(init_owner(*this) + init_name("type") + init_label(_("Type")) + init_description(_("Boolean operation (intersection, union, difference, reverse difference)")) + init_value(BOOLEAN_INTERSECTION) + init_enumeration(boolean_values())),
-		m_left(init_owner(*this) + init_name("left") + init_label(_("Left Mesh")) + init_description(_("Left operand mesh for the boolean operation")) + init_value<k3d::mesh*>(0)),
-		m_right(init_owner(*this) + init_name("right") + init_label(_("Right Mesh")) + init_description(_("Right operand mesh for the boolean operation")) + init_value<k3d::mesh*>(0)),
-		m_left_matrix(init_owner(*this) + init_name("left_matrix") + init_label(_("Left Matrix")) + init_description("Transformation matrix to apply to left operand") + init_value(k3d::identity3D())),
-		m_right_matrix(init_owner(*this) + init_name("right_matrix") + init_label(_("Right Matrix")) + init_description("Transformation matrix to apply to right operand") + init_value(k3d::identity3D()))	
+		m_user_property_changed_signal(*this)	
 	{
 		m_type.changed_signal().connect(make_topology_changed_slot());
-		m_left.changed_signal().connect(make_topology_changed_slot());
-		m_right.changed_signal().connect(make_topology_changed_slot());
-		m_left_matrix.changed_signal().connect(make_topology_changed_slot());
-		m_right_matrix.changed_signal().connect(make_topology_changed_slot());
+		m_user_property_changed_signal.connect(make_topology_changed_slot());
 	}
 	
 	virtual ~cgal_boolean() {}
 	
 	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
-		const k3d::mesh* left = m_left.pipeline_value();
-		const k3d::mesh* right = m_right.pipeline_value();
-		
-		if (!left || !right || !k3d::validate_polyhedra(*left) || !k3d::validate_polyhedra(*right))
-			return;
-		
 		CGAL::set_error_handler(k3d_failure_handler);
-		boost::shared_ptr<Nef_polyhedron> left_nef;
-		boost::shared_ptr<Nef_polyhedron> right_nef;
+		
+		Nef_polyhedron result;
+		
+		const k3d::iproperty_collection::properties_t properties = k3d::user_properties(*static_cast<k3d::iproperty_collection*>(this));
 		try
 		{
-			left_nef = to_nef(*left, m_left_matrix.pipeline_value());
-			right_nef = to_nef(*right, m_right_matrix.pipeline_value());
-		}
-		catch (std::exception& e)
-		{
-			k3d::log() << error << "CGALBoolean: error converting input" << std::endl;
-			return;
-		}
-				
-		try
-		{
-			Nef_polyhedron bool_result;
-			switch(m_type.pipeline_value())
+			if (m_type.pipeline_value() == BOOLEAN_REVERSE_DIFFERENCE)
 			{
-				case BOOLEAN_INTERSECTION:
-					bool_result = (*left_nef) * (*right_nef);
-					break;
-	
-				case BOOLEAN_UNION:
-					bool_result = (*left_nef) + (*right_nef);
-					break;
-	
-				case BOOLEAN_DIFFERENCE:
-					bool_result = (*left_nef) - (*right_nef);
-					break;
-	
-				case BOOLEAN_REVERSE_DIFFERENCE:
-					bool_result = (*right_nef) - (*left_nef);
-					break;
+				bool started = false;
+				for(k3d::iproperty_collection::properties_t::const_reverse_iterator prop = properties.rbegin(); prop != properties.rend(); ++prop)
+				{
+					k3d::iproperty& property = **prop;
+					if(property.property_type() == typeid(k3d::mesh*))
+					{
+						const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property));
+						if (!mesh || !k3d::validate_polyhedra(*mesh))
+						{
+							continue;
+						}
+						boost::shared_ptr<Nef_polyhedron> operand = to_nef(*mesh);
+						if (!started)
+						{
+							result = *operand;
+							started = true;
+						}
+						else
+						{
+							result -= *operand;
+						}
+					}
+				}
 			}
-	    
-	    to_mesh(bool_result, Mesh, dynamic_cast<k3d::imaterial*>(k3d::default_material(document())));
+			else
+			{
+				bool started = false;
+				for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
+				{
+					k3d::iproperty& property = **prop;
+					if(property.property_type() == typeid(k3d::mesh*))
+					{
+						const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property));
+						if (!mesh || !k3d::validate_polyhedra(*mesh))
+						{
+							return;
+						}
+						boost::shared_ptr<Nef_polyhedron> operand = to_nef(*mesh);
+						if (!started)
+						{
+							result = *operand;
+							started = true;
+						}
+						else
+						{
+							switch(m_type.pipeline_value())
+							{
+								case BOOLEAN_INTERSECTION:
+									result *= *operand;
+									break;
+					
+								case BOOLEAN_UNION:
+									result += *operand;
+									break;
+					
+								case BOOLEAN_DIFFERENCE:
+									result -= *operand;
+									break;
+							}
+						}
+					}
+				}
+			}
 		}
 		catch (std::exception& e)
 		{
 			k3d::log() << error << "CGALBoolean: error executing boolean operation" << std::endl;
 		}
+    to_mesh(result, Mesh, dynamic_cast<k3d::imaterial*>(k3d::default_material(document())));
 	}
 	
 	void on_update_mesh_geometry(k3d::mesh& Mesh) {}
@@ -199,10 +225,7 @@ private:
 	}
 
 	k3d_data(boolean_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_type;
-	k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_left;
-	k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_right;
-	k3d_data(k3d::matrix4, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, with_serialization) m_left_matrix;
-	k3d_data(k3d::matrix4, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, with_serialization) m_right_matrix;
+	k3d::user_property_changed_signal m_user_property_changed_signal;
 };
 
 k3d::iplugin_factory& cgal_boolean_factory()

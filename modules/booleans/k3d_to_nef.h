@@ -46,7 +46,7 @@ typedef Nef_polyhedron::SNC_structure SNC_structure;
 /// Create a Point_3 from the given k3d::point3
 Point_3 to_cgal_point3(const k3d::point3& Point)
 {
-//	NT common_denominator = 1;
+//	NT common_denominator(1);
 //	Rational x = CGAL::to_rational<Rational>(Point[0]);
 //	common_denominator *= x.denominator();
 //	Rational y = CGAL::to_rational<Rational>(Point[1]);
@@ -84,7 +84,23 @@ struct face_plane {
 			}
 		}
 		
-		Plane plane(m_points[corners[0]], m_points[corners[1]], m_points[corners[2]]);
+		NT x = 0;
+		NT y = 0;
+		NT z = 0;
+		
+		for(size_t point = 0; point != corners.size(); ++point )
+		{
+			const Point_3& i = m_points[corners[point]];
+			const Point_3& j = m_points[corners[(point+1) % corners.size()]];
+	
+			x += (i.hy() + j.hy()) * (j.hz() - i.hz());
+			y += (i.hz() + j.hz()) * (j.hx() - i.hx());
+			z += (i.hx() + j.hx()) * (j.hy() - i.hy());
+		}
+		
+		Vector n(x,y,z);
+		
+		Plane plane(m_points[corners[0]], n.direction());
 		return_val_if_fail(!plane.is_degenerate(), plane);
 		
     return plane;
@@ -94,7 +110,7 @@ struct face_plane {
   points_t& m_points;
 };
 
-void k3d_to_nef(const k3d::mesh& Mesh, const k3d::matrix4& Matrix, SNC_structure& S)
+void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
 {
   typedef SNC_structure::SNC_decorator      SNC_decorator;
   typedef SNC_structure::SM_decorator       SM_decorator;
@@ -105,6 +121,7 @@ void k3d_to_nef(const k3d::mesh& Mesh, const k3d::matrix4& Matrix, SNC_structure
   typedef SNC_structure::Sphere_point       Sphere_point;
   typedef SNC_structure::Sphere_segment     Sphere_segment;
   typedef SNC_structure::Sphere_circle      Sphere_circle;
+  typedef std::vector<SHalfedge_handle> indices_t;
 
   typedef Polyhedron::Halfedge_around_vertex_const_circulator
                                Halfedge_around_vertex_const_circulator;
@@ -118,9 +135,25 @@ void k3d_to_nef(const k3d::mesh& Mesh, const k3d::matrix4& Matrix, SNC_structure
 	const k3d::mesh::points_t& k3d_points = *Mesh.points;
 	points_t points;
 	
-	// Make sure transformations are accounted for, and convert to Point_3 representation
+	// Convert to Point_3 representation
 	for (size_t point = 0; point != k3d_points.size(); ++point)
-		points.push_back(to_cgal_point3(Matrix*k3d_points[point]));
+		points.push_back(to_cgal_point3(k3d_points[point]));
+	
+//	NT dmin(10.0);
+//	for (size_t i = 0; i != points.size(); ++i)
+//	{
+//		for (size_t j = 0; j != points.size(); ++j)
+//		{
+//			if (i != j)
+//			{
+//				NT d(CGAL::squared_distance(points[i], points[j]));
+//				if (d < dmin)
+//				 dmin = d;
+//			} 
+//		}
+//	}
+//	
+//	k3d::log() << debug << "minimal squared distance: " << dmin << std::endl;
 
 	std::vector<Plane> planes(face_first_loops.size());
   
@@ -138,7 +171,12 @@ void k3d_to_nef(const k3d::mesh& Mesh, const k3d::matrix4& Matrix, SNC_structure
 				size_t point = edge_points[edge];
 				if (!planes[face].has_on(points[point]))
 				{
-					k3d::log() << debug << "point " << point << " is off-face!" << std::endl;
+					const Point_3& p = points[point];
+					const Plane& pl = planes[face];
+					Point_3 proj = pl.projection(p);
+					Vector diff(proj, p);
+					k3d::log() << debug << "point " << p << " is off-face! Projection: " << CGAL::to_double(proj.x()) << ", " << CGAL::to_double(proj.y()) << ", " << CGAL::to_double(proj.z()) << ", " << std::endl;
+					k3d::log() << "face: " << CGAL::to_double(pl.a()) << ", " << CGAL::to_double(pl.b()) << ", " << CGAL::to_double(pl.c()) << ", " << (pl.d()) << std::endl; 
 				}
 				
 				edge = clockwise_edges[edge];
@@ -190,6 +228,8 @@ void k3d_to_nef(const k3d::mesh& Mesh, const k3d::matrix4& Matrix, SNC_structure
 			}
 		}
 	}
+	
+	indices_t indices(edge_points.size()); // for indexed items
 
   for (size_t point = 0; point != points.size(); ++point)
   {
@@ -225,6 +265,8 @@ void k3d_to_nef(const k3d::mesh& Mesh, const k3d::matrix4& Matrix, SNC_structure
       e->twin()->circle() = ss_circle.opposite();
       e->mark() = e->twin()->mark() = true;
   
+  		indices[prev_edge] = e;
+  
       sv_prev = sv;
       prev_edge = edge;
       edge = companions[clockwise_edges[edge]];
@@ -238,6 +280,8 @@ void k3d_to_nef(const k3d::mesh& Mesh, const k3d::matrix4& Matrix, SNC_structure
     e->circle() = ss_circle;
     e->twin()->circle() = ss_circle.opposite();
     e->mark() = e->twin()->mark() = true;
+    
+    indices[prev_edge] = e;
 
     // create faces
     SFace_handle fint = SM.new_sface();
@@ -250,6 +294,44 @@ void k3d_to_nef(const k3d::mesh& Mesh, const k3d::matrix4& Matrix, SNC_structure
     fext->mark() = false;
     SM.check_integrity_and_topological_planarity();   
   }
+  
+  // resolve indices
+//  k3d::mesh::indices_t previous_edges(clockwise_edges.size());
+//  for (size_t i = 0; i != clockwise_edges.size(); ++i)
+//  {
+//  	previous_edges[clockwise_edges[i]] = i;
+//  }
+  
+  for (size_t face = 0; face != face_first_loops.size(); ++face)
+	{
+		size_t first_edge = loop_first_edges[face_first_loops[face]];
+		indices[first_edge]->set_index();
+    indices[first_edge]->twin()->set_index();
+    indices[first_edge]->twin()->source()->set_index();
+    int se  = indices[first_edge]->get_index();
+    int set = indices[first_edge]->twin()->get_index();
+    int sv  = indices[first_edge]->twin()->source()->get_index();
+		for (size_t loop = 0; loop != face_loop_counts[face]; ++loop)
+		{
+			first_edge = loop_first_edges[face_first_loops[face] + loop];
+			for(size_t edge = first_edge; ; )
+			{
+				if (loop == 0 && edge == first_edge) // skip first edge, was assigned before loop
+					edge = clockwise_edges[edge];
+				indices[edge]->set_index(se);
+				indices[edge]->twin()->set_index(set);
+				indices[edge]->source()->set_index(sv);
+				indices[edge]->twin()->source()->set_index();
+				sv = indices[edge]->twin()->source()->get_index();				
+
+				edge = clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+		}
+		indices[loop_first_edges[face_first_loops[face]]]->source()->set_index(sv);
+	}
+  
 }
 
 } // end namespace

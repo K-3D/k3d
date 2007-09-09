@@ -147,7 +147,8 @@ public:
 		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")) + init_slot(sigc::mem_fun(*this, &mesh_instance::create_mesh))),
 		m_gl_painter(init_owner(*this) + init_name("gl_painter") + init_label(_("OpenGL Mesh Painter")) + init_description(_("OpenGL Mesh Painter")) + init_value(static_cast<k3d::gl::imesh_painter*>(0))),
 		m_ri_painter(init_owner(*this) + init_name("ri_painter") + init_label(_("RenderMan Mesh Painter")) + init_description(_("RenderMan Mesh Painter")) + init_value(static_cast<k3d::ri::imesh_painter*>(0))),
-		m_show_component_selection(init_owner(*this) + init_name("show_component_selection") + init_label(_("Show Component Selection")) + init_description(_("Show component selection")) + init_value(false))
+		m_show_component_selection(init_owner(*this) + init_name("show_component_selection") + init_label(_("Show Component Selection")) + init_description(_("Show component selection")) + init_value(false)),
+		m_transformed_mesh(init_owner(*this) + init_name("transformed_mesh") + init_label(_("Transformed Mesh")) + init_description(_("Mesh with points transformed by the matrix")) + init_slot(sigc::mem_fun(*this, &mesh_instance::create_transformed_mesh)))
 	{
 		connect();
 		// connect to the redo signal, in case we get deleted because of undo this is our last chance to be saved!
@@ -155,6 +156,7 @@ public:
 		{
 			document().state_recorder().current_change_set()->connect_redo_signal(sigc::mem_fun(*this, &mesh_instance::connect));
 		}
+		m_input_matrix.changed_signal().connect(m_transformed_mesh.make_reset_slot());
 	}
 	
 	/// Make the connections
@@ -236,6 +238,21 @@ public:
 		{
 			OutputMesh = *input_mesh;
 			k3d::replace_selection(m_mesh_selection.pipeline_value(), OutputMesh);
+		}
+	}
+	
+	void create_transformed_mesh(k3d::mesh& OutputMesh)
+	{
+		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Copy Input");
+		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
+		{
+			OutputMesh = *input_mesh;
+			k3d::replace_selection(m_mesh_selection.pipeline_value(), OutputMesh);
+			const k3d::mesh::points_t& input_points = *OutputMesh.points;
+			boost::shared_ptr<k3d::mesh::points_t> transformed_points(new k3d::mesh::points_t());
+			for (size_t point = 0; point != input_points.size(); ++point)
+				transformed_points->push_back(matrix()*input_points[point]);
+			OutputMesh.points = transformed_points;
 		}
 	}
 
@@ -375,6 +392,7 @@ public:
 	k3d_data(k3d::gl::imesh_painter*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_gl_painter;
 	k3d_data(k3d::ri::imesh_painter*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_ri_painter;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_component_selection;
+	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::demand_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_transformed_mesh;
 	
 	
 protected:
@@ -397,6 +415,7 @@ protected:
 	{
 		m_gl_painter.pipeline_value()->mesh_changed(Mesh, k3d::hint::mesh_deleted()); // notify painter it needs to delete the old mesh
 		m_output_mesh.reset(0, Hint);
+		m_transformed_mesh.reset(0, Hint);
 		if (const k3d::mesh* const output_mesh = m_output_mesh.pipeline_value())
 			m_gl_painter.pipeline_value()->mesh_changed(*output_mesh, Hint);
 	}
@@ -413,6 +432,7 @@ protected:
 			address_hint->old_face_first_loops_address = Mesh.polyhedra->face_first_loops;
 		}
 		m_output_mesh.reset(0, Hint);
+		m_transformed_mesh.reset(0, Hint);
 		if (const k3d::mesh* const output_mesh = m_output_mesh.pipeline_value())
 			m_gl_painter.pipeline_value()->mesh_changed(*output_mesh, Hint);
 	}
@@ -421,6 +441,7 @@ protected:
 	{
 		m_gl_painter.pipeline_value()->mesh_changed(Mesh, k3d::hint::mesh_deleted()); // notify painter it needs to delete the old mesh
 		m_output_mesh.reset(0, Hint);
+		m_transformed_mesh.reset(0, Hint);
 		if (const k3d::mesh* const output_mesh = m_output_mesh.pipeline_value())
 			m_gl_painter.pipeline_value()->mesh_changed(*output_mesh, Hint);
 	}

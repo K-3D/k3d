@@ -67,13 +67,13 @@
 					<property name="show_reference_plane">false</property>
 					<property name="top">0.5</property>
 					<property name="viewport_visible">true</property>
-					<property name="world_target">3.8138125377606826 1.9684322069297502 -5.5471607248933701</property>
+					<property name="world_target">1.0208059753319572 -1.2410407732196178 2.125777644596047</property>
 				</properties>
 			</node>
 			<node name="Camera Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="6">
 				<properties>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">0.77727134594210301 -0.47447468258748937 -0.41318643535437233 15.496838894312681 -0.62916552255932756 -0.58616621846989869 -0.51045069257211062 16.401647784116754 -1.3350431871117507e-14 0.65672135636676243 -0.75413331718721988 15.776287160066811 0 0 0 1</property>
+					<property name="matrix">0.73740650418454412 0.29512091888389286 0.60756505069289235 -10.90504327600515 0.67544921910261324 -0.32219163032718767 -0.66329548902489832 11.778737112591157 -5.6898930012039257e-15 0.89949774684778161 -0.43692539799806146 10.702153827957767 0 0 0 1</property>
 				</properties>
 			</node>
 			<node name="RenderMan Default Painter" class="243cba5a 13f342fa 8f1a19cd faf34169" id="7">
@@ -113,11 +113,11 @@
 			</node>
 			<node name="Surface Shader" class="b553a3bd d1044c6e b3f21e07 87132c31" id="18">
 				<properties>
-					<property name="Ka" label="Ambient" description="Ambient Amount" type="double" user_property="vanilla">0.2</property>
+					<property name="Ka" label="Ambient" description="Ambient Amount" type="double" user_property="vanilla">1</property>
 					<property name="Kd" label="Diffuse" description="Diffuse Amount" type="double" user_property="vanilla">0.5</property>
 					<property name="Ks" label="Specular" description="Specular Amount" type="double" user_property="vanilla">0.5</property>
 					<property name="roughness" label="Roughness" description="Surface Roughness (affects specular reflection size)" type="double" user_property="vanilla">0.1</property>
-					<property name="shader_path" reference="relative" relative_path="share/shaders/surface/k3d_plastic.sl"/>
+					<property name="shader_path" reference="relative" relative_path="../../../../3d/samples/share/shaders/surface/k3d_plastic.sl"/>
 					<property name="specularcolor" label="Specular Color" description="Specular Reflection Color" type="k3d::color" user_property="vanilla">1 1 1</property>
 				</properties>
 			</node>
@@ -133,7 +133,7 @@
 					<property name="from" label="" description="" type="k3d::point3" user_property="vanilla">0 0 0</property>
 					<property name="intensity" label="" description="" type="double" user_property="vanilla">3000</property>
 					<property name="lightcolor" label="" description="" type="k3d::color" user_property="vanilla">1 1 1</property>
-					<property name="shader_path" reference="relative" relative_path="share/shaders/light/k3d_pointlight.sl"/>
+					<property name="shader_path" reference="relative" relative_path="../../../../3d/samples/share/shaders/light/k3d_pointlight.sl"/>
 				</properties>
 			</node>
 			<node name="RenderMan Engine" class="0dc5e733 fa684e05 86a3865f 42f7a99d" id="21">
@@ -175,7 +175,7 @@
 			<node name="Light Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="22">
 				<properties>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">1 0 0 3.7017312490184624 0 1 0 14.755819923099157 0 0 1 22.918394542427855 0 0 0 1</property>
+					<property name="matrix">1 0 0 -20 0 1 0 20 0 0 1 30 0 0 0 1</property>
 				</properties>
 			</node>
 			<node name="GL Default Painter" class="6bc7d8a1 bbe7491f a2405d97 8b136c41" id="23">
@@ -302,99 +302,15 @@
 					<property name="unselected_color">0 0.6 0.6</property>
 				</properties>
 			</node>
-			<node name="PolyCube" class="7ec966d1 d78a445c 8806b8a3 5593f241" id="39">
+			<node name="CGALBoolean" class="0d88fe28 ea4fdf20 ae858297 487f857b" id="39">
 				<properties>
-					<property name="columns">1</property>
-					<property name="depth">5</property>
-					<property name="height">5</property>
+					<property name="a" label="a" description="" type="k3d::mesh*" user_property="vanilla">0</property>
+					<property name="bb" label="bb" description="" type="k3d::mesh*" user_property="vanilla">0</property>
 					<property name="material">17</property>
-					<property name="rows">1</property>
-					<property name="slices">1</property>
-					<property name="width">5</property>
-				</properties>
-			</node>
-			<node name="PolyCube Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="40">
-				<properties>
-					<property name="gl_painter">23</property>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="mesh_selection"/>
-					<property name="motion_blur">false</property>
-					<property name="parent">0</property>
-					<property name="render_final">true</property>
-					<property name="render_shadows">true</property>
-					<property name="ri_painter">7</property>
-					<property name="show_component_selection">false</property>
-					<property name="viewport_visible">true</property>
-				</properties>
-			</node>
-			<node name="PolyCube 2" class="7ec966d1 d78a445c 8806b8a3 5593f241" id="41">
-				<properties>
-					<property name="columns">1</property>
-					<property name="depth">5</property>
-					<property name="height">5</property>
-					<property name="material">17</property>
-					<property name="rows">1</property>
-					<property name="slices">1</property>
-					<property name="width">5</property>
-				</properties>
-			</node>
-			<node name="PolyCube 2 Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="42">
-				<properties>
-					<property name="gl_painter">23</property>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="mesh_selection"/>
-					<property name="motion_blur">false</property>
-					<property name="parent">0</property>
-					<property name="render_final">true</property>
-					<property name="render_shadows">true</property>
-					<property name="ri_painter">7</property>
-					<property name="show_component_selection">false</property>
-					<property name="viewport_visible">true</property>
-				</properties>
-			</node>
-			<node name="Move PolyCube 2 Instance" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="43">
-				<properties>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">0.91540190336763461 0.35335318192595533 -0.19282345327712214 -1.6825510940302184 -0.31032125081452899 0.92456654831114038 0.22108238065691727 1.5209016560062643 0.25639827730275022 -0.14254201684705653 0.95600297950861823 2.2218483592193907 0 0 0 1</property>
-				</properties>
-			</node>
-			<node name="BooleanDifference" class="0d88fe28 ea4fdf20 ae858297 487f857b" id="44">
-				<properties>
-					<property name="left_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="material">17</property>
-					<property name="right_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="type">difference</property>
-				</properties>
-			</node>
-			<node name="BooleanDifference Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="45">
-				<properties>
-					<property name="gl_painter">23</property>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="mesh_selection"/>
-					<property name="motion_blur">false</property>
-					<property name="parent">0</property>
-					<property name="render_final">true</property>
-					<property name="render_shadows">true</property>
-					<property name="ri_painter">7</property>
-					<property name="show_component_selection">false</property>
-					<property name="viewport_visible">true</property>
-				</properties>
-			</node>
-			<node name="Move BooleanDifference Instance" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="46">
-				<properties>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">1 0 0 10.123875476334659 0 1 0 9.2390115452218211 0 0 1 1.4670156122654134 0 0 0 1</property>
-				</properties>
-			</node>
-			<node name="BooleanIntersection" class="0d88fe28 ea4fdf20 ae858297 487f857b" id="47">
-				<properties>
-					<property name="left_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="material">17</property>
-					<property name="right_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
 					<property name="type">intersection</property>
 				</properties>
 			</node>
-			<node name="BooleanIntersection Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="48">
+			<node name="CGALBoolean Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="40">
 				<properties>
 					<property name="gl_painter">23</property>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
@@ -408,21 +324,18 @@
 					<property name="viewport_visible">true</property>
 				</properties>
 			</node>
-			<node name="Move BooleanIntersection Instance" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="49">
+			<node name="PolyCube" class="7ec966d1 d78a445c 8806b8a3 5593f241" id="41">
 				<properties>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">1 0 0 -0.79747272582257622 0 1 0 8.7405768114849138 0 0 1 1.2732885530743614 0 0 0 1</property>
-				</properties>
-			</node>
-			<node name="BooleanUnion" class="0d88fe28 ea4fdf20 ae858297 487f857b" id="50">
-				<properties>
-					<property name="left_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
+					<property name="columns">1</property>
+					<property name="depth">5</property>
+					<property name="height">5</property>
 					<property name="material">17</property>
-					<property name="right_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="type">union</property>
+					<property name="rows">1</property>
+					<property name="slices">1</property>
+					<property name="width">5</property>
 				</properties>
 			</node>
-			<node name="BooleanUnion Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="51">
+			<node name="PolyCube Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="42">
 				<properties>
 					<property name="gl_painter">23</property>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
@@ -436,105 +349,47 @@
 					<property name="viewport_visible">true</property>
 				</properties>
 			</node>
-			<node name="Move BooleanUnion Instance" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="52">
+			<node name="PolySphere" class="919c3786 619e4e84 b4ad868f 1e77e67c" id="43">
 				<properties>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">1 0 0 9.8134762758481973 0 1 0 -2.4933760640947238 0 0 1 0 0 0 0 1</property>
+					<property name="material">17</property>
+					<property name="radius">3.017999999999999</property>
+					<property name="type">sphere</property>
+					<property name="u_power">1</property>
+					<property name="u_segments">32</property>
+					<property name="v_power">1</property>
+					<property name="v_segments">16</property>
 				</properties>
 			</node>
-			<node name="Annotation" class="951d3c20 e2f74d6d 8bc90ef8 9a8967b6" id="53">
+			<node name="PolySphere Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="44">
 				<properties>
-					<property name="color">0 0 0</property>
+					<property name="gl_painter">23</property>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="leader">false</property>
-					<property name="leader_target">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="text">Original cubes</property>
+					<property name="mesh_selection"/>
+					<property name="motion_blur">false</property>
+					<property name="parent">0</property>
+					<property name="render_final">true</property>
+					<property name="render_shadows">true</property>
+					<property name="ri_painter">7</property>
+					<property name="show_component_selection">false</property>
 					<property name="viewport_visible">true</property>
 				</properties>
 			</node>
-			<node name="Move Annotation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="54">
+			<node name="Move CGALBoolean Instance" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="45">
 				<properties>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">1 0 0 0.56735233302020127 0 1 0 -0.37269901657480631 0 0 1 5.7929552691577069 0 0 0 1</property>
-				</properties>
-			</node>
-			<node name="Annotation 2" class="951d3c20 e2f74d6d 8bc90ef8 9a8967b6" id="55">
-				<properties>
-					<property name="color">0 0 0</property>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="leader">false</property>
-					<property name="leader_target">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="text">Union</property>
-					<property name="viewport_visible">true</property>
-				</properties>
-			</node>
-			<node name="Move Annotation 2" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="56">
-				<properties>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">1 0 0 13.237214652239967 0 1 0 0 0 0 1 0 0 0 0 1</property>
-				</properties>
-			</node>
-			<node name="Annotation 3" class="951d3c20 e2f74d6d 8bc90ef8 9a8967b6" id="57">
-				<properties>
-					<property name="color">0 0 0</property>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="leader">false</property>
-					<property name="leader_target">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="text">Difference</property>
-					<property name="viewport_visible">true</property>
-				</properties>
-			</node>
-			<node name="Move Annotation 3" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="58">
-				<properties>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">1 0 0 11.5705362370323 0 1 0 -1.5857777588437241 0 0 1 -16.06550687961613 0 0 0 1</property>
-				</properties>
-			</node>
-			<node name="Annotation 4" class="951d3c20 e2f74d6d 8bc90ef8 9a8967b6" id="59">
-				<properties>
-					<property name="color">0 0 0</property>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="leader">false</property>
-					<property name="leader_target">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="text">Intersection</property>
-					<property name="viewport_visible">true</property>
-				</properties>
-			</node>
-			<node name="Move Annotation 4" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="60">
-				<properties>
-					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">1 0 0 0 0 1 0 11.41561948301595 0 0 1 0 0 0 0 1</property>
+					<property name="matrix">1 0 0 0 0 1 0 0 0 0 1 7.5590214170607934 0 0 0 1</property>
 				</properties>
 			</node>
 		</nodes>
 		<dependencies>
-			<dependency from_node="22" from_property="output_matrix" to_node="19" to_property="input_matrix"/>
+			<dependency from_node="42" from_property="transformed_mesh" to_node="39" to_property="bb"/>
+			<dependency from_node="44" from_property="transformed_mesh" to_node="39" to_property="a"/>
 			<dependency from_node="6" from_property="output_matrix" to_node="5" to_property="input_matrix"/>
-			<dependency from_node="39" from_property="output_mesh" to_node="40" to_property="input_mesh"/>
-			<dependency from_node="43" from_property="output_matrix" to_node="42" to_property="input_matrix"/>
+			<dependency from_node="43" from_property="output_mesh" to_node="44" to_property="input_mesh"/>
 			<dependency from_node="41" from_property="output_mesh" to_node="42" to_property="input_mesh"/>
-			<dependency from_node="39" from_property="output_mesh" to_node="44" to_property="left"/>
-			<dependency from_node="41" from_property="output_mesh" to_node="44" to_property="right"/>
-			<dependency from_node="40" from_property="output_matrix" to_node="44" to_property="left_matrix"/>
-			<dependency from_node="42" from_property="output_matrix" to_node="44" to_property="right_matrix"/>
-			<dependency from_node="46" from_property="output_matrix" to_node="45" to_property="input_matrix"/>
-			<dependency from_node="44" from_property="output_mesh" to_node="45" to_property="input_mesh"/>
-			<dependency from_node="39" from_property="output_mesh" to_node="47" to_property="left"/>
-			<dependency from_node="41" from_property="output_mesh" to_node="47" to_property="right"/>
-			<dependency from_node="40" from_property="output_matrix" to_node="47" to_property="left_matrix"/>
-			<dependency from_node="42" from_property="output_matrix" to_node="47" to_property="right_matrix"/>
-			<dependency from_node="49" from_property="output_matrix" to_node="48" to_property="input_matrix"/>
-			<dependency from_node="47" from_property="output_mesh" to_node="48" to_property="input_mesh"/>
-			<dependency from_node="39" from_property="output_mesh" to_node="50" to_property="left"/>
-			<dependency from_node="41" from_property="output_mesh" to_node="50" to_property="right"/>
-			<dependency from_node="40" from_property="output_matrix" to_node="50" to_property="left_matrix"/>
-			<dependency from_node="42" from_property="output_matrix" to_node="50" to_property="right_matrix"/>
-			<dependency from_node="52" from_property="output_matrix" to_node="51" to_property="input_matrix"/>
-			<dependency from_node="50" from_property="output_mesh" to_node="51" to_property="input_mesh"/>
-			<dependency from_node="54" from_property="output_matrix" to_node="53" to_property="input_matrix"/>
-			<dependency from_node="56" from_property="output_matrix" to_node="55" to_property="input_matrix"/>
-			<dependency from_node="58" from_property="output_matrix" to_node="57" to_property="input_matrix"/>
-			<dependency from_node="60" from_property="output_matrix" to_node="59" to_property="input_matrix"/>
+			<dependency from_node="45" from_property="output_matrix" to_node="40" to_property="input_matrix"/>
+			<dependency from_node="39" from_property="output_mesh" to_node="40" to_property="input_mesh"/>
+			<dependency from_node="22" from_property="output_matrix" to_node="19" to_property="input_matrix"/>
 		</dependencies>
 	</document>
 </k3dml>

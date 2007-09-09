@@ -37,48 +37,88 @@
 #include <math.h> // for nextafter
 #include <limits>
 
+#include <CGAL/Gmpq.h>
+
 CGAL_BEGIN_NAMESPACE
+
+typedef Gmpq ET;
 
 class threshold_number
 {
 public:
 	threshold_number() : d(0.0), t(1e-8) {}
 	threshold_number(double D) : d(D), t(1e-8) {}
+	threshold_number(Gmpq D) : d(D), t(1e-8) {}
 	
-	threshold_number& operator=(const double D) {this->d = D; return *this;}
-	threshold_number& operator*=(const double D) {d *= D; return *this;}
-	threshold_number& operator/=(const double D) {d/= D; return *this;}
-	threshold_number& operator+=(const double D) {d+= D; return *this;}
-	threshold_number& operator-=(const double D) {d-= D; return *this;}
-	threshold_number& operator+=(const threshold_number& T) {d += T.d; return *this;}
-	threshold_number& operator-=(const threshold_number& T) {d -= T.d; return *this;}
-	threshold_number& operator*=(const threshold_number& T) {d *= T.d; return *this;}
-	threshold_number& operator/=(const threshold_number& T) {d /= T.d; return *this;}
+	threshold_number& operator+=(const threshold_number& T)
+	{
+		ET x(d);
+		ET y(T.d);
+		d = (x+y);
+		return *this;
+	}
+	threshold_number& operator-=(const threshold_number& T)
+	{
+		ET x(d);
+		ET y(T.d);
+		d = (x-y);
+		return *this;
+	}
+	threshold_number& operator*=(const threshold_number& T)
+	{
+		ET x(d);
+		ET y(T.d);
+		d = (x*y);
+		return *this;
+	}
+	threshold_number& operator/=(const threshold_number& T)
+	{
+		ET x(d);
+		ET y(T.d);
+		d = (x/y);
+		return *this;
+	}
 
-	double d;
-	double t;
+	ET d;
+	ET t;
 };
 
 inline threshold_number operator-(const threshold_number& T)
 { return threshold_number(-T.d); }
 
 inline threshold_number operator-(const threshold_number& T1, const threshold_number& T2)
-{ return threshold_number(T1.d-T2.d); }
+{
+	ET x(T1.d);
+	ET y(T2.d);
+	return threshold_number((x-y));
+}
 
 inline threshold_number operator+(const threshold_number& T1, const threshold_number& T2)
-{ return threshold_number(T1.d+T2.d); }
+{
+	ET x(T1.d);
+	ET y(T2.d);
+	return threshold_number((x+y));
+}
 
 inline threshold_number operator*(const threshold_number& T1, const threshold_number& T2)
-{ return threshold_number(T1.d*T2.d); }
+{
+	ET x(T1.d);
+	ET y(T2.d);
+	return threshold_number((x*y));
+}
 
 inline threshold_number operator/(const threshold_number& T1, const threshold_number& T2)
-{ return threshold_number(T1.d/T2.d); }
+{
+	ET x(T1.d);
+	ET y(T2.d);
+	return threshold_number((x/y));
+}
 
 inline bool operator==(const threshold_number& T1, const threshold_number& T2)
-{ return std::abs(T1.d - T2.d) <= T1.t; }
+{ return abs(T1.d - T2.d) <= T1.t; }
 
 inline bool operator!=(const threshold_number& T1, const threshold_number& T2)
-{ return std::abs(T1.d - T2.d) > T1.t; }
+{ return abs(T1.d - T2.d) > T1.t; }
 
 inline bool operator<(const threshold_number& T1, const threshold_number& T2)
 { return (T1.d - T2.d) < -T1.t; }
@@ -94,7 +134,7 @@ inline bool operator>=(const threshold_number& T1, const threshold_number& T2)
 
 inline std::ostream& operator<<(std::ostream& Stream, const threshold_number& T)
 {
-	Stream << T.d;
+	Stream << to_double(T.d);
 	return Stream;
 }
 
@@ -113,18 +153,18 @@ class Is_valid< threshold_number >
 
 template <> class Algebraic_structure_traits< threshold_number >
   : public Algebraic_structure_traits_base< threshold_number,
-                                            Field_with_kth_root_tag >  {
+                                            Euclidean_ring_tag >  {
   public:
     typedef Tag_false            Is_exact;
     typedef Tag_true             Is_numerical_sensitive;
 
-    class Sqrt
-      : public Unary_function< Type, Type > {
-      public:
-        Type operator()( const Type& x ) const {
-          return CGAL_CLIB_STD::sqrt( x.d );
-        }
-    };
+//    class Sqrt
+//      : public Unary_function< Type, Type > {
+//      public:
+//        Type operator()( const Type& x ) const {
+//          return sqrt( x.d );
+//        }
+//    };
 
     class Kth_root
       : public Binary_function<int, Type, Type> {
@@ -132,7 +172,7 @@ template <> class Algebraic_structure_traits< threshold_number >
         Type operator()( int k,
                                         const Type& x) const {
           CGAL_precondition_msg( k > 0, "'k' must be positive for k-th roots");
-          return CGAL_CLIB_STD::pow(x.d, 1.0 / static_cast<double>(k));
+          return kth_root(k, x);
         }
     };
     
@@ -142,20 +182,58 @@ template <> class Algebraic_structure_traits< threshold_number >
     public:
         Type operator()( const Type& x,
                 const Type& y ) const {
+            if (x == 0 && y == 0)
+            	return Type(0.0);   	
             return threshold_number(1.0);
 
         }
 
         Type operator()( const Type& x,
                                         const int& y ) const {
+          if (x == 0 && y == 0)
+            	return Type(0.0);  
           return threshold_number(1.0);
         }
 
         Type operator()( const int& x,
                                         const Type& y ) const {
+          if (x == 0 && y == 0)
+            	return Type(0.0);
           return threshold_number(1.0);
         }
     };
+
+	class Div_mod { 
+    public:
+      typedef Type    first_argument_type;
+      typedef Type    second_argument_type;
+      typedef Type&   third_argument_type;
+      typedef Type&   fourth_argument_type;
+      typedef Arity_tag< 4 >         Arity;
+      typedef void  result_type;
+      void operator()( const Type& x, 
+              const Type& y, 
+              Type& q, Type& r) const {
+          q.d = x.d/y.d;
+          r.d = 0.0;          
+          return;
+      }
+      
+      template < class NT1, class NT2 >
+      void operator()( 
+              const NT1& x, 
+              const NT2& y,
+              Type& q, 
+              Type& r ) const {
+          typedef Coercion_traits< NT1, NT2 > CT;
+          typedef typename CT::Type Type; 
+          BOOST_STATIC_ASSERT(( 
+            ::boost::is_same<Type , Type >::value));
+          
+          typename Coercion_traits< NT1, NT2 >::Cast cast;
+          operator()( cast(x), cast(y), q, r );          
+      }
+  };
 
 };
 
@@ -167,9 +245,7 @@ public:
     : public Unary_function< Type, bool > {
     public :
       bool operator()( const Type& x ) const {
-        return (x.d != std::numeric_limits<Type>::infinity())
-            && (-x.d != std::numeric_limits<Type>::infinity())
-            && is_valid(x.d);
+        return is_finite(x.d);
     }
   };
     
@@ -178,7 +254,7 @@ public:
     public:      
       //! the function call.
       double operator()( const Type& x ) const {
-        return x.d;
+        return to_double(x.d);
       }
   };
     
@@ -188,7 +264,7 @@ public:
         //! the function call.
       std::pair<double, double> operator()( const Type& x ) const {
 
-        return std::pair<double,double>( x.d, x.d );
+        return to_interval(x.d);
       }
   };
                                                                   
@@ -198,7 +274,7 @@ inline
 bool
 is_integer(threshold_number T)
 {
-  return CGAL::is_finite(T.d) && (std::ceil(T.d) == T.d);
+  return CGAL::is_finite(T.d) && (std::ceil(to_double(T.d)) == to_double(T.d));
 }
 
 template <>
@@ -215,8 +291,14 @@ public:
         typedef threshold_number& second_argument_type;
         typedef threshold_number& third_argument_type;
         void operator () (const threshold_number& rat, threshold_number& num,threshold_number& den) {
-          num = threshold_number(rat);
-          den = threshold_number(1.0);
+          num.d = rat.d;
+				  den.d = 1.0;
+				  while (std::ceil(to_double(num.d)) != to_double(num.d))
+				  {
+				    num.d *= 2.0;
+				    den.d *= 2.0;
+				  }
+				  CGAL_postcondition(rat.d == num.d/den.d);
 				}
     };
 };
