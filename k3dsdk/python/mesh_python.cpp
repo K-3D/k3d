@@ -34,7 +34,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/shared_pointer.h>
-#include <k3dsdk/types.h>
+#include <k3dsdk/type_registry.h>
 
 #include <boost/python.hpp>
 #include <boost/python/detail/api_placeholder.hpp>

@@ -19,7 +19,7 @@
 
 #include "color.h"
 #include "graph.h"
-#include "types.h"
+#include "type_registry.h"
 
 #include <boost/graph/adjacency_list_io.hpp>
 

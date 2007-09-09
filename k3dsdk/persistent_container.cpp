@@ -28,7 +28,7 @@
 #include "properties_ri.h"
 #include "result.h"
 #include "tokens.h"
-#include "types.h"
+#include "type_registry.h"
 #include "user_properties.h"
 #include "utility.h"
 

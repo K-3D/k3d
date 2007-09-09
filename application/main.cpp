@@ -58,7 +58,7 @@
 #include <k3dsdk/share_detail.h>
 #include <k3dsdk/string_modifiers.h>
 #include <k3dsdk/system.h>
-#include <k3dsdk/types.h>
+#include <k3dsdk/type_registry.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/xml.h>
 

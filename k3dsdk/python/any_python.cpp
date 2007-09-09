@@ -36,7 +36,7 @@
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/render_state_ri.h>
-#include <k3dsdk/types.h>
+#include <k3dsdk/type_registry.h>
 #include <k3dsdk/vectors.h>
 
 #include <boost/python.hpp>

@@ -23,7 +23,7 @@
 #include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/plugin_factory_collection.h>
-#include <k3dsdk/types.h>
+#include <k3dsdk/type_registry.h>
 #include <k3dsdk/xml.h>
 
 #include <iostream>

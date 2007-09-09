@@ -36,7 +36,7 @@
 #include "legacy_mesh.h"
 #include "mesh.h"
 #include "tokens.h"
-#include "types.h"
+#include "type_registry.h"
 #include "types_ri.h"
 
 namespace k3d

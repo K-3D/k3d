@@ -29,10 +29,9 @@
 #include "color.h"
 #include "path.h"
 #include "typed_array.h"
+#include "types.h"
 
 #include <boost/any.hpp>
-#include <boost/array.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <list>
@@ -45,11 +44,11 @@ namespace ri
 {
 
 /// RenderMan integer datatype
-typedef boost::int32_t integer;
+typedef k3d::int32_t integer;
 /// RenderMan unsigned integer datatype
-typedef boost::uint32_t unsigned_integer;
+typedef k3d::uint32_t unsigned_integer;
 /// RenderMan real datatype
-typedef double real;
+typedef k3d::double_t real;
 /// RenderMan string datatype
 typedef std::string string;
 /// RenderMan point datatype
@@ -69,9 +68,9 @@ typedef filesystem::path path;
 /// 3D bounding-box datatype
 typedef k3d::bounding_box3 bound;
 /// RenderMan light handle datatype
-typedef boost::uint32_t light_handle;
+typedef k3d::uint32_t light_handle;
 /// RenderMan object handle datatype
-typedef boost::uint32_t object_handle;
+typedef k3d::uint32_t object_handle;
 
 /// RenderMan integer array
 typedef std::vector<integer> integers;

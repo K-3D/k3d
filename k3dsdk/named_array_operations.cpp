@@ -27,7 +27,7 @@
 #include "point2.h"
 #include "result.h"
 #include "typed_array.h"
-#include "types.h"
+#include "type_registry.h"
 #include "vector2.h"
 
 #include <boost/bind.hpp>

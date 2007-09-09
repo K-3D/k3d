@@ -27,6 +27,8 @@
 #include "iunknown.h"
 #include "types_ri.h"
 
+#include <boost/array.hpp>
+
 namespace k3d
 {
 

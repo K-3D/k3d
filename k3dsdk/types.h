@@ -2,7 +2,7 @@
 #define K3DSDK_TYPES_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,43 +24,27 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <string>
-#include <typeinfo>
-#include <vector>
+#include "Half/half.h"
+#include <boost/cstdint.hpp>
 
 namespace k3d
 {
 
-/// Registers a new type with the global type collection
-void register_type(const std::type_info& Info, const std::string& Name);
-/// Registers a new type with the global type collection
-template<typename T>
-void register_type(std::string& Name)
-{
-	register_type(typeid(T), Name);
-}
+typedef bool bool_t;
 
-/// Defines storage for a collection of types
-typedef std::vector<const std::type_info*> types_t;
-/// Returns the set of all registered types
-const types_t registered_types();
+typedef boost::int8_t int8_t;
+typedef boost::int16_t int16_t;
+typedef boost::int32_t int32_t;
+typedef boost::int64_t int64_t;
 
-/// Returns the string representation for a registered type, or empty string
-const std::string type_string(const std::type_info& Info);
-/// Returns the string representation for a registered type, or emtpy string
-template<typename T>
-const std::string type_string()
-{
-	return type_string(typeid(T));
-}
+typedef boost::uint8_t uint8_t;
+typedef boost::uint16_t uint16_t;
+typedef boost::uint32_t uint32_t;
+typedef boost::uint64_t uint64_t;
 
-/// Returns the type_info representation of a registered type, or NULL
-const std::type_info* type_id(const std::string& Name);
-
-const std::type_info& type_id_k3d_bitmap_ptr();
-
-/// Returns the demangled name of a type, or the input string if demangling isn't available
-const std::string demangle(const std::type_info& Type);
+typedef ::half half_t;
+typedef float float_t;
+typedef double double_t;
 
 } // namespace k3d
 

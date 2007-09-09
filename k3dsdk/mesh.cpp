@@ -22,7 +22,7 @@
 #include "legacy_mesh.h"
 #include "mesh.h"
 #include "shared_pointer.h"
-#include "types.h"
+#include "type_registry.h"
 
 #include <iterator>
 #include <map>

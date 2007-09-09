@@ -22,7 +22,7 @@
 #include "imaterial.h"
 #include "mesh_diff.h"
 #include "mesh.h"
-#include "types.h"
+#include "type_registry.h"
 
 #include <boost/format.hpp>
 

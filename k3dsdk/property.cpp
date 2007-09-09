@@ -27,7 +27,7 @@
 #include "inode.h"
 
 #include "property.h"
-#include "types.h"
+#include "type_registry.h"
 
 namespace k3d
 {

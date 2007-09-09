@@ -74,7 +74,7 @@
 #include "log.h"
 #include "mesh.h"
 #include "mesh_selection.h"
-#include "types.h"
+#include "type_registry.h"
 
 #include <map>
 

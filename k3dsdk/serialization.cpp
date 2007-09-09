@@ -46,7 +46,7 @@
 #include "share.h"
 #include "shared_pointer.h"
 #include "string_cast.h"
-#include "types.h"
+#include "type_registry.h"
 #include "xml.h"
 
 using namespace k3d::xml;

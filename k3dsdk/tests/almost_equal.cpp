@@ -1,5 +1,5 @@
 #include <k3dsdk/almost_equal.h>
-#include <k3dsdk/types.h>
+#include <k3dsdk/type_registry.h>
 #include <k3dsdk/vectors.h>
 
 #include <cassert>

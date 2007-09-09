@@ -29,7 +29,7 @@
 #include "mesh_selection.h"
 #include "mesh.h"
 #include "shared_pointer.h"
-#include "types.h"
+#include "type_registry.h"
 #include "types_ri.h"
 #include "xml.h"
 

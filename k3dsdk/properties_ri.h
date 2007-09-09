@@ -29,7 +29,7 @@
 #include "data.h"
 #include "irenderman_property.h"
 #include "tokens.h"
-#include "types.h"
+#include "type_registry.h"
 #include "user_properties.h"
 
 namespace k3d

@@ -28,7 +28,7 @@
 #include <k3dsdk/normal3.h>
 #include <k3dsdk/point3.h>
 #include <k3dsdk/point4.h>
-#include <k3dsdk/types.h>
+#include <k3dsdk/type_registry.h>
 #include <k3dsdk/vector3.h>
 
 using namespace boost::python;

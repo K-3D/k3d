@@ -87,7 +87,7 @@
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/string_modifiers.h>
 #include <k3dsdk/system.h>
-#include <k3dsdk/types.h>
+#include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_properties.h>
 #include <k3dsdk/utility.h>
 

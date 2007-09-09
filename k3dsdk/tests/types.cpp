@@ -1,29 +1,12 @@
 #include <k3dsdk/types.h>
+#include <k3dsdk/type_registry.h>
 
-#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-
-namespace k3d
-{
-
-typedef bool bool_t;
-typedef float float_t;
-typedef double double_t;
-typedef boost::int8_t int8_t;
-typedef boost::int16_t int16_t;
-typedef boost::int32_t int32_t;
-typedef boost::int64_t int64_t;
-typedef boost::uint8_t uint8_t;
-typedef boost::uint16_t uint16_t;
-typedef boost::uint32_t uint32_t;
-typedef boost::uint64_t uint64_t;
-
-} // namespace k3d
 
 boost::format format("%1% %|20t|%2% %|45t|%3% %|55t|%4%");
 

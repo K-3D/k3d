@@ -72,7 +72,7 @@
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/share.h>
-#include <k3dsdk/types.h>
+#include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_interface.h>
 
 #include <boost/python.hpp>

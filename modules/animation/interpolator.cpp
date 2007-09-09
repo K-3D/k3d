@@ -30,7 +30,7 @@
 #include <k3dsdk/vectors.h>
 
 #include "interpolator.h"
-#include <k3dsdk/types.h>
+#include <k3dsdk/type_registry.h>
 
 namespace libk3danimation
 {

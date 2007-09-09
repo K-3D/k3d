@@ -36,7 +36,7 @@
 #include "string_cast.h"
 #include "string_modifiers.h"
 #include "system.h"
-#include "types.h"
+#include "type_registry.h"
 #include "xml.h"
 
 #include <iostream>
