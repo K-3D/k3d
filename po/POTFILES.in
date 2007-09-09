@@ -184,14 +184,10 @@ modules/mesh/catmull_clark_subdivider.cpp
 modules/mesh/collapse_edges.cpp
 modules/mesh/face_normals.cpp
 modules/mesh/fillet_edges.cpp
-modules/mesh/filter_faces_by_color.cpp
 modules/mesh/flip_orientation.cpp
-modules/mesh/frozen_parameter.cpp
-modules/mesh/make_point_group.cpp
 modules/mesh/make_sds.cpp
 modules/mesh/merge_mesh.cpp
 modules/mesh/move_first_edge.cpp
-modules/mesh/polygonize_bicubic_patches.cpp
 modules/mesh/sds_corner.cpp
 modules/mesh/sds_crease.cpp
 modules/mesh/sds_hole.cpp
@@ -351,7 +347,6 @@ modules/test/mesh_diff.cpp
 modules/test/mesh_to_stdout.cpp
 modules/texture/cylinder_map.cpp
 modules/texture/planar_map.cpp
-modules/texture/planar_map2.cpp
 modules/texture/sphere_map.cpp
 modules/texture/texture_map.cpp
 modules/tiff_io/tiff_bitmap_exporter.cpp
