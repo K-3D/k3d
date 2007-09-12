@@ -52,7 +52,7 @@ class tweak_points :
 	public k3d::icommand_node
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > > base;
-	typedef std::map<size_t, k3d::point3> tweaks_t;
+	typedef std::map<size_t, k3d::vector3> tweaks_t;
 public:
 	tweak_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
@@ -122,8 +122,9 @@ public:
 		k3d::point3 center = m_center.pipeline_value();
 		for (size_t i = 0; i != selected_points.size(); ++i)
 		{
+			
 			k3d::point3 position = input_points[selected_points[i]] + m_selected_tweaks[i];
-			output_points[selected_points[i]] = m_hint.transformation_matrix * (position - center) + center;
+			output_points[selected_points[i]] = m_hint.transformation_matrix * k3d::to_point(position - center) + center;
 		}
 	}
 	
@@ -202,8 +203,8 @@ public:
  			return_val_if_fail(selected_points[i] < input_points.size(), RESULT_ERROR);
 			tweaks_t::iterator tweak = tweaks.find(selected_points[i]);
 			if (tweak == tweaks.end())
-				tweak = (tweaks.insert(std::make_pair(selected_points[i], k3d::point3(0.0,0.0,0.0)))).first;
-			tweak->second = k3d::to_point(output_points[selected_points[i]] - input_points[selected_points[i]]);
+				tweak = (tweaks.insert(std::make_pair(selected_points[i], k3d::vector3(0.0,0.0,0.0)))).first;
+			tweak->second = output_points[selected_points[i]] - input_points[selected_points[i]];
 			m_selected_tweaks.push_back(tweak->second);
 		}
 		m_tweaks.set_value(tweaks, update_hint());
@@ -239,8 +240,8 @@ public:
 			if(element->name == "tweak")
 			{
 				size_t index = k3d::xml::attribute_value<size_t>(*element, "index", count);
-				k3d::point3 value = k3d::xml::attribute_value<k3d::point3>(*element, "value", k3d::point3(0, 0, 0));
-				if (value != k3d::point3(0,0,0)) // Skip zeros from old file format
+				k3d::vector3 value = k3d::xml::attribute_value<k3d::vector3>(*element, "value", k3d::vector3(0, 0, 0));
+				if (value != k3d::vector3(0,0,0)) // Skip zeros from old file format
 					loaded_tweaks.insert(std::make_pair(index, value));
 				++count;
 			}
@@ -276,7 +277,7 @@ private:
 	k3d::hint::mesh_geometry_changed_t m_hint;
 	boost::shared_ptr<const k3d::mesh::points_t> m_input_points; // cached for access in on_drag_changed
 	boost::shared_ptr<const k3d::mesh::points_t> m_output_points; // cached for access in on_drag_changed
-	std::vector<k3d::point3> m_selected_tweaks; // Cache for fast access to tweaks needed during drag motion
+	std::vector<k3d::vector3> m_selected_tweaks; // Cache for fast access to tweaks needed during drag motion
 	bool m_selection_copied;
 
 	/// Used to pass along the fact that we are doing an internal update on the tweaks
@@ -304,7 +305,7 @@ private:
 			}
 			else
 			{
-				m_selected_tweaks.push_back(k3d::point3(0.0,0.0,0.0));
+				m_selected_tweaks.push_back(k3d::vector3(0.0,0.0,0.0));
 			}
 		}
 		m_matrix.set_value(k3d::identity3D());
