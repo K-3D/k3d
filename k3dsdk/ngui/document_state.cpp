@@ -74,6 +74,7 @@
 #include <k3dsdk/selection.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
+#include <k3dsdk/user_properties.h>
 
 #include <iterator>
 #include <functional>
@@ -1549,6 +1550,18 @@ public:
 		if(k3d::classes::Camera() == Factory->class_id())
 		{
 			k3d::set_matrix(*node, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
+		}
+		
+		// If the new node is a CGALBoolean node, add two mesh inputs
+		if (Factory->name() == "CGALBoolean")
+		{
+			k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(node);
+			k3d::ipersistent_container* const persistent_container = dynamic_cast<k3d::ipersistent_container*>(node);
+			if(property_collection && persistent_container)
+			{
+				k3d::user::create_property<k3d::user::mesh_property, k3d::mesh*>("input1", "Input 1", "", m_document, *property_collection, *persistent_container, node, 0);
+				k3d::user::create_property<k3d::user::mesh_property, k3d::mesh*>("input2", "Input 2", "", m_document, *property_collection, *persistent_container, node, 0);
+			}
 		}
 
 		// Replace the current selection
