@@ -91,6 +91,7 @@ modules/array/rotate_array_3d.cpp
 modules/array/translate_array_1d.cpp
 modules/array/translate_array_2d.cpp
 modules/array/translate_array_3d.cpp
+modules/bicubic_patch/polygonize_bicubic_patches.cpp
 modules/bilinear_patch/make_bilinear_patches.cpp
 modules/bitmap/bitmap_add.cpp
 modules/bitmap/bitmap_checker.cpp
@@ -253,6 +254,7 @@ modules/ply_io/ply_mesh_reader.cpp
 modules/png_io/png_bitmap_importer.cpp
 modules/png_io/png_bitmap_reader.cpp
 modules/png_io/png_bitmap_writer.cpp
+modules/point_group/make_point_group.cpp
 modules/polyhedra/bevel_points.cpp
 modules/polyhedra/extrude_faces.cpp
 modules/primitives/knot_curve.cpp
