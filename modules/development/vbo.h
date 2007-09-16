@@ -261,12 +261,13 @@ private:
 class sds_vbo_cache : public sds_cache
 {
 public:
-	sds_vbo_cache() : regenerate(true), update(true), update_selection(true) {}
+	sds_vbo_cache() : regenerate(true), update(true), update_selection(true), all(false) {}
 	
 	k3d::sds::k3d_vbo_sds_cache cache;
 	bool regenerate;
 	bool update;
 	bool update_selection;
+	bool all;
 protected:
 	/// Scheduler implementation
 	virtual void on_execute(const k3d::mesh& Mesh);
@@ -279,10 +280,11 @@ private:
 class sds_gl_cache : public sds_cache
 {
 public:
-	sds_gl_cache() : update(true) {}
+	sds_gl_cache() : update(true), all(false) {}
 	
 	k3d::sds::k3d_basic_opengl_sds_cache cache;
 	bool update;
+	bool all;
 protected:
 	/// Scheduler implementation
 	virtual void on_execute(const k3d::mesh& Mesh);

@@ -165,6 +165,9 @@ protected:
 	void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		m_sds_cache.create_data(Mesh.points)->update = true;
+		k3d::hint::mesh_geometry_changed_t* geo_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
+		if (geo_hint)
+			m_sds_cache.create_data(Mesh.points)->all = geo_hint->full_change;
 	}
 	
 	void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)

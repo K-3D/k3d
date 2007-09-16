@@ -864,14 +864,14 @@ public:
 	}
 
 	/// Update the cache.
-	void update()
+	void update(bool All = false)
 	{
 		return_if_fail(m_first_level_cache);
 		if (m_valid)
 		{
 			try
 			{
-				update_detail(false);
+				update_detail(All);
 			}
 			catch (cache_invalid_exception& E)
 			{
