@@ -82,6 +82,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/options.h>
+#include <k3dsdk/time_source.h>
 #include <k3dsdk/types_ri.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
@@ -618,6 +619,13 @@ public:
 							
 						table->attach(*manage(control), prop_label_begin, prop_label_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
 						
+						button::control* const zoomcontrol =
+						new button::control(m_parent, "zoom_key_" + keynumber, "Zoom to Key " + keynumber)
+							<< connect_button(sigc::bind(sigc::bind(sigc::mem_fun(*this, &implementation::on_key_zoom), last_time_property), keyframer))
+							<< set_tooltip("Sets the time to the time associated with " + keynumber);
+							
+						table->attach(*manage(zoomcontrol), prop_control_begin, prop_control_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
+						
 						last_time_property = 0;
 					}
 				}
@@ -772,6 +780,13 @@ public:
 	void on_key_delete(k3d::ikeyframer* Keyframer, k3d::iproperty* TimeProperty)
 	{
 		Keyframer->delete_key(TimeProperty);
+	}
+	
+	void on_key_zoom(k3d::ikeyframer* Keyframer, k3d::iproperty* TimeProperty)
+	{
+		k3d::iwritable_property* timeprop = dynamic_cast<k3d::iwritable_property*>(k3d::get_time(m_document_state.document()));
+		if (timeprop)
+			timeprop->property_set_value(TimeProperty->property_value());
 	}
 
 	/// Stores a reference to the owning document

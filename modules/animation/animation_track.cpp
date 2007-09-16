@@ -39,13 +39,13 @@ namespace libk3danimation
 
 template <typename time_t, typename value_t> class animation_track;
 
-/// Undo state container for the delete_key operation
+/// State container that restores using a "store keyframe" operation
 template <typename time_t, typename value_t>
-class track_undo_delete :
+class store_state_container :
 	public k3d::istate_container
 {
 public:
-	track_undo_delete(animation_track<time_t, value_t>& Track, time_t Time, value_t Value, const std::string& Keynumber) :
+	store_state_container(animation_track<time_t, value_t>& Track, time_t Time, value_t Value, const std::string& Keynumber) :
 		m_track(Track),
 		m_time(Time),
 		m_value(Value),
@@ -58,6 +58,11 @@ public:
 		m_track.reset_output();
 	}
 	
+	void update_value(const value_t& Value)
+	{
+		m_value = Value;
+	}
+	
 private:
 	animation_track<time_t, value_t>& m_track;
 	time_t m_time;
@@ -65,13 +70,13 @@ private:
 	std::string m_keynumber;
 };
 
-/// Redo state container for the delete_key operation
+/// State container that restores using a delete_key operation
 template <typename time_t, typename value_t>
-class track_redo_delete :
+class delete_state_container :
 	public k3d::istate_container
 {
 public:
-	track_redo_delete(animation_track<time_t, value_t>& Track, const std::string& Keynumber) :
+	delete_state_container(animation_track<time_t, value_t>& Track, const std::string& Keynumber) :
 		m_track(Track),
 		m_keynumber(Keynumber)
 	{}
@@ -86,6 +91,29 @@ private:
 	std::string m_keynumber;
 };
 
+/// State container that updates an existing key
+template <typename time_t, typename value_t>
+class update_state_container :
+	public k3d::istate_container
+{
+public:
+	update_state_container(animation_track<time_t, value_t>& Track, const std::string& Label, const value_t& Value) :
+		m_track(Track),
+		m_label(Label),
+		m_value(Value)
+	{}
+	
+	void restore_state()
+	{
+		m_track.update_value(m_label, m_value);
+	}
+	
+private:
+	animation_track<time_t, value_t>& m_track;
+	std::string m_label;
+	value_t m_value;
+};
+
 /// Encapsulates a series of keyframes
 template <typename time_t, typename value_t>
 class animation_track :
@@ -95,7 +123,7 @@ class animation_track :
 {
 	typedef k3d::persistent<k3d::node> base;
 	typedef k3d_data(time_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) time_property_t;
-	typedef k3d_data(value_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) value_property_t;
+	typedef k3d_data(value_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, with_serialization) value_property_t;
 	typedef std::map<time_property_t*, value_property_t*> keyframes_t;
 	typedef interpolator<time_t, value_t> interpolator_t;
 	typedef std::map<time_property_t*, std::string> keygroups_t;
@@ -107,7 +135,8 @@ public:
 		m_output_value(init_owner(*this) + init_name("output_value") + init_label(("Output Value")) + init_description(("Interpolated output value")) + init_slot(sigc::mem_fun(*this, &animation_track::on_output_request))),
 		m_interpolator(init_owner(*this) + init_name("interpolator") + init_label("Interpolator") + init_description("Method used to interpolate keyframes") + init_value(static_cast<interpolator_t*>(0))),
 		m_manual_keyframe(init_owner(*this) + init_name("manual_keyframe") + init_label(("Manual keyframe only")) + init_description(("If checked, keyframes are created only usint the timeline. Otherwise keyframes are created/updated whenever the Value Input changes")) + init_value(false)),
-		m_record(true)
+		m_record(true),
+		m_no_interpolation(false)
 	{
 		m_time_input.changed_signal().connect(m_output_value.make_reset_slot());
 		m_value_input.changed_signal().connect(sigc::mem_fun(*this, &animation_track::on_value_change));
@@ -115,6 +144,12 @@ public:
 	
 	value_t on_output_request()
 	{
+		// If we're not supposed to interpolate, return the input
+		if (m_no_interpolation)
+		{
+			m_no_interpolation = false;
+			return m_value_input.pipeline_value();
+		}
 		// Interpolate value
 		value_t result;
 		interpolator_t* interpolator = m_interpolator.pipeline_value();
@@ -139,6 +174,7 @@ public:
 	void keyframe()
 	{
 		time_t time = m_time_input.pipeline_value();
+		value_t value = m_value_input.pipeline_value();
 		time_property_t* time_property = 0;
 		for (typename keyframes_t::const_iterator keyframe = m_keyframes.begin(); keyframe != m_keyframes.end(); ++keyframe)
 		{
@@ -153,17 +189,44 @@ public:
 		if (time_property == 0)
 		{
 			std::string key_number = boost::lexical_cast<std::string>(m_keyframes.size());
-			store_value(time, m_value_input.pipeline_value(), key_number);
+			store_value(time, value, key_number);
+			// Make keyframe creation undoable
+			if (!document().state_recorder().current_change_set())
+			{
+				k3d::record_state_change_set changeset(document(), "Create keyframe " + key_number, K3D_CHANGE_SET_CONTEXT);
+				record_create(time, value, key_number);
+			}
+			else
+			{
+				record_create(time, value, key_number);
+			}
 		}
 		else
 		{
 			value_it = m_keyframes.find(time_property);
-			value_it->second->set_value(m_value_input.pipeline_value());
+			// record undo/redo
+			if(document().state_recorder().current_change_set())
+			{
+				document().state_recorder().current_change_set()->record_old_state(new update_state_container<time_t, value_t>(*this, value_it->second->property_label(), value_it->second->internal_value()));
+				document().state_recorder().current_change_set()->record_new_state(new update_state_container<time_t, value_t>(*this, value_it->second->property_label(), value));
+			}
+			value_it->second->set_value(value);
+			// Update the stored key creation redo value in case we are creating a key through a drag motion
+			if (m_last_set == document().state_recorder().current_change_set())
+			{
+				m_last_store->update_value(value);
+			}
+			else
+			{
+				m_last_set = 0;
+				m_last_store = 0;
+			}
 		}
 	}
 	
-	void reset_output()
+	void reset_output(bool Interpolate = true)
 	{
+		m_no_interpolation = !Interpolate;
 		m_output_value.reset();
 	}
 	
@@ -182,7 +245,7 @@ public:
 		m_keygroups.erase(time_property);
 		delete value_property;
 		delete time_property;
-		m_output_value.reset();
+		reset_output();
 	}
 	
 	/// Delete key by number (used for redo)
@@ -257,7 +320,7 @@ public:
 		}
 	}
 	
-	/// Stores the given value keyed by the given time property, and handles group and delete button creation
+	/// Stores the given value keyed by the given time property, and handles group creation
 	void store_value(time_t Time, value_t Value, const std::string& KeyNumber)
 	{
 		std::string time_name = "key_time_" + KeyNumber;
@@ -281,17 +344,39 @@ public:
 		key_group.properties.push_back(static_cast<k3d::iproperty*>(value_it->second));
 		register_property_group(key_group);
 	}
+	
+	/// Stores the current value at Time using keynumber
+	void store_current_value(time_t Time, const std::string& KeyNumber)
+	{
+		store_value(Time, m_value_input.pipeline_value(), KeyNumber);
+	}
+	
+	/// Updates the value of the property named by label
+	void update_value(const std::string& Label, const value_t& Value)
+	{
+		for (typename keyframes_t::iterator keyframe = m_keyframes.begin(); keyframe != m_keyframes.end(); ++keyframe)
+		{
+			if (keyframe->second->property_label() == Label)
+			{
+				keyframe->second->set_value(Value);
+				return;
+			}
+		}
+		k3d::log() << warning << "animation_track: Labeled value property not found!" << std::endl;
+	}
+	
 
 private:
 	
 	/// Executed when the input value changes
 	void on_value_change(k3d::iunknown* Hint)
 	{
-		if(!m_manual_keyframe.pipeline_value() && document().state_recorder().current_change_set())
+		bool manual_key = m_manual_keyframe.pipeline_value();
+		if(!manual_key && document().state_recorder().current_change_set())
 		{
 			keyframe();
 		}
-		m_output_value.reset();
+		reset_output(!manual_key);
 	}
 	
 	/// Record delete undo
@@ -308,8 +393,20 @@ private:
 		
 		if(document().state_recorder().current_change_set())
 		{
-			document().state_recorder().current_change_set()->record_old_state(new track_undo_delete<time_t, value_t>(*this, time_property->pipeline_value(), value_property->pipeline_value(), keynumber));
-			document().state_recorder().current_change_set()->record_new_state(new track_redo_delete<time_t, value_t>(*this, keynumber));
+			document().state_recorder().current_change_set()->record_old_state(new store_state_container<time_t, value_t>(*this, time_property->pipeline_value(), value_property->pipeline_value(), keynumber));
+			document().state_recorder().current_change_set()->record_new_state(new delete_state_container<time_t, value_t>(*this, keynumber));
+		}
+	}
+	
+	/// Record key creation undo
+	void record_create(time_t& Time, value_t& Value, const std::string& Keynumber)
+	{
+		if (document().state_recorder().current_change_set())
+		{
+			m_last_store = new store_state_container<time_t, value_t>(*this, Time, Value, Keynumber);
+			m_last_set = document().state_recorder().current_change_set();
+			document().state_recorder().current_change_set()->record_new_state(m_last_store);
+			document().state_recorder().current_change_set()->record_old_state(new delete_state_container<time_t, value_t>(*this, Keynumber));
 		}
 	}
 
@@ -322,6 +419,11 @@ private:
 	keygroups_t m_keygroups;
 	/// True if changes should be recorded for undo/redo
 	bool m_record;
+	/// If true, interpolation is turned off and the input value is passed on as output
+	bool m_no_interpolation;
+	/// Last state change set that was being recorded to
+	k3d::state_change_set* m_last_set; 
+	store_state_container<time_t, value_t>* m_last_store;
 };
 
 /////////////////////////////////////////////////////////////////////////////
