@@ -133,7 +133,8 @@ void k3d_cache_input::update(bool all, facevertices_t& updated_maps)
 	init_counters();
 	const size_t face_count = face_first_loops.size();
 	k3d::timer timer;
-	if (all || (m_modified_faces.size() == face_first_loops.size()))
+	bool noselection = no_selection(); // If nothing is selected, but geometry changed anyway, we assume everything changed
+	if (all || noselection || (m_modified_faces.size() == face_first_loops.size()))
 	{
 		m_modified_faces.clear();
 	}
@@ -142,7 +143,7 @@ void k3d_cache_input::update(bool all, facevertices_t& updated_maps)
 		k3d::timer timer;
 		for(size_t face = 0; face != face_count; ++face)
 		{
-			if(all || selected(face)) // selected(face) is expensive!
+			if(all || noselection || selected(face)) // selected(face) is expensive!
 			{
 				const_positions_t updated_points;
 				const size_t first_edge = loop_first_edges[face_first_loops[face]];
@@ -289,6 +290,31 @@ bool k3d_cache_input::selected(size_t Face, int Recurse)
 	}
 	return false;
 }
+
+bool k3d_cache_input::no_selection()
+{
+	const k3d::mesh::selection_t& point_selection = *m_point_selection;
+	const k3d::mesh::polyhedra_t& polyhedra = *m_input_polyhedra;
+	const k3d::mesh::selection_t& edge_selection = *polyhedra.edge_selection;
+	const k3d::mesh::selection_t& face_selection = *polyhedra.face_selection;
+	for (size_t i = 0; i != point_selection.size(); ++i)
+	{
+		if (point_selection[i])
+			return false;
+	}
+	for (size_t i = 0; i != edge_selection.size(); ++i)
+	{
+		if (edge_selection[i])
+			return false;
+	}
+	for (size_t i = 0; i != face_selection.size(); ++i)
+	{
+		if (face_selection[i])
+			return false;
+	}
+	return true;
+}
+		
 
 ////////
 // k3d_basic_opengl_sds_cache

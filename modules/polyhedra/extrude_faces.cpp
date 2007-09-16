@@ -801,6 +801,7 @@ public:
 		m_select_side_faces(init_owner(*this) + init_name("select_side_faces") + init_label(_("Select side faces")) + init_description(_("Select side faces on output")) + init_value(false))
 	{
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
+		m_input_mesh.changed_signal().connect(sigc::mem_fun(*this, &extrude_faces::reset_mesh));
 
 		m_distance.changed_signal().connect(make_update_mesh_slot());
 		m_segments.changed_signal().connect(make_reset_mesh_slot());
@@ -818,6 +819,8 @@ public:
 		// Force updates to re-allocate our mesh, for simplicity
 		return 0;
 	}
+	
+	
 
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
@@ -893,6 +896,13 @@ public:
 	}
 
 private:
+
+	// Ignore hint, so input geometry changes also result in a complete initialization
+	virtual void reset_mesh(iunknown* const Hint)
+	{
+		m_output_mesh.reset(0, 0);
+	}
+	
 	/// Direction type
 	typedef enum
 	{

@@ -78,6 +78,9 @@ public:
 	// True if the given face or its neighbours contain selected elements
 	bool selected(size_t Face, int Recurse = 4);
 	
+	// True if none of the components in the mesh are selected
+	bool no_selection();
+	
 	/// Return the edge companions for the original mesh
 	const companions_t& companions() const
 	{
