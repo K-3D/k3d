@@ -21,6 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "types.h"
+#include <k3d-platform-config.h>
 #include <string>
 
 namespace k3d
@@ -166,6 +167,21 @@ public:
 	almost_equal(const k3d::uint64_t) { }
 	inline const bool operator()(const T A, const T B) const { return A == B; }
 };
+
+#ifdef K3D_API_DARWIN
+
+/// Specialization of almost_equal for use with unsigned long (required on OSX)
+/// \deprecated New code must use the sized K-3D types instead of unsigned long
+template<>
+class almost_equal<unsigned long>
+{
+	typedef unsigned long T;
+public:
+	almost_equal(const k3d::uint64_t) { }
+	inline const bool operator()(const T A, const T B) const { return A == B; }
+};
+
+#endif // K3D_API_DARWIN
 
 } // namespace k3d
 
