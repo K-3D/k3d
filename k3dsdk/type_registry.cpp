@@ -75,6 +75,7 @@
 #include "mesh.h"
 #include "mesh_selection.h"
 #include "type_registry.h"
+#include "types.h"
 
 #include <map>
 
@@ -149,10 +150,18 @@ void initialize_types()
 	if(initialized)
 		return;
 
-	register_type(typeid(bool), "bool");
-	register_type(typeid(double), "double");
-	register_type(typeid(float), "float");
-	register_type(typeid(int), "int");
+	register_type(typeid(k3d::bool_t), "k3d::bool_t");
+	register_type(typeid(k3d::int8_t), "k3d::int8_t");
+	register_type(typeid(k3d::int16_t), "k3d::int16_t");
+	register_type(typeid(k3d::int32_t), "k3d::int32_t");
+	register_type(typeid(k3d::int64_t), "k3d::int64_t");
+	register_type(typeid(k3d::uint8_t), "k3d::uint8_t");
+	register_type(typeid(k3d::uint16_t), "k3d::uint16_t");
+	register_type(typeid(k3d::uint32_t), "k3d::uint32_t");
+	register_type(typeid(k3d::uint64_t), "k3d::uint64_t");
+	register_type(typeid(k3d::half_t), "k3d::half_t");
+	register_type(typeid(k3d::float_t), "k3d::float_t");
+	register_type(typeid(k3d::double_t), "k3d::double_t");
 	register_type(typeid(k3d::angle_axis), "k3d::angle_axis");
 	register_type(typeid(k3d::aqsis::idisplacement_layer), "k3d::aqsis::idisplacement_layer");
 	register_type(typeid(k3d::aqsis::isurface_layer), "k3d::aqsis::isurface_layer");
@@ -225,10 +234,7 @@ void initialize_types()
 	register_type(typeid(k3d::vector3), "k3d::vector3");
 	register_type(typeid(k3d::yafray::ilight), "k3d::yafray::ilight");
 	register_type(typeid(k3d::yafray::imaterial), "k3d::yafray::imaterial");
-	register_type(typeid(long), "long");
-	register_type(typeid(size_t), "size_t");
 	register_type(typeid(std::string), "std::string");
-	register_type(typeid(unsigned long), "unsigned long");
 
 	/** \todo Come up with a more explicit type for these */
 	register_type(typeid(std::vector<k3d::point3>), "std::vector<k3d::point3>");
