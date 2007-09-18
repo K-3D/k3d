@@ -748,14 +748,16 @@ private:
 	matrices_t m_B;
 };
 
+typedef std::vector<size_t> indices_t;
+
 /// Retains the first level of SDS and the actual input mesh.
 template<typename mesh_type> class cache_input
 {
 public:
 	virtual ~cache_input() {}
 	
-	/// update the first level using the latest input and place all updated face_vertices in updated_maps. If all is true, everything gets updated. First update selected face_vertices using corner point info, then update all edge_vertices and finally all sds_vertices using the update() methods in those classes.
-	virtual void update(bool all, facevertices_t& updated_maps) = 0;
+	/// update the first level using the latest input and place all updated face_vertices in updated_maps. Indices contains the index numbers for the points that changed. First update selected face_vertices using corner point info, then update all edge_vertices and finally all sds_vertices using the update() methods in those classes.
+	virtual void update(const indices_t& Indices, facevertices_t& updated_maps) = 0;
 
 	/// Set the input. This depends on the client of course. Returns false if the new input is incompatible with the cache (i.e. different point or faces count).
 	virtual bool set_input(const mesh_type* Input) = 0;
@@ -822,7 +824,6 @@ private:
 template <typename mesh_type> class catmull_clark_cache
 {
 public:
-
 	catmull_clark_cache() : m_first_level_cache(0), m_higher_level_cache(0), m_levels(2), m_use_nurbs(false), m_valid(false) {}
 
 	virtual ~catmull_clark_cache()
@@ -863,30 +864,31 @@ public:
 		}
 	}
 
-	/// Update the cache.
-	void update(bool All = false)
+	/// Update the cache, assuming point positions with Indices changed. If Indices is empty, everything is updated
+	void update(const indices_t& Indices)
 	{
 		return_if_fail(m_first_level_cache);
 		if (m_valid)
 		{
 			try
 			{
-				update_detail(All);
+				update_detail(Indices);
 			}
 			catch (cache_invalid_exception& E)
 			{
 //				k3d::log() << debug << "Invalidating cache during update" << std::endl;
 				m_valid = false;
 				set_input(m_first_level_cache_mesh);
-				update();
+				update(Indices);
 			}
 		}
 		else // invalid cache
 		{
+			indices_t indices; // blank index list = update all 
 			delete m_higher_level_cache;
 //			k3d::log() << debug << "cache reset" << std::endl;
 			m_higher_level_cache = new higher_level_cache(m_levels, m_use_nurbs, m_first_level_cache->face_vertices());
-			update_detail(true);
+			update_detail(indices);
 			m_valid = true;
 		}
 	}
@@ -923,7 +925,7 @@ protected:
 	bool m_valid;
 private:
 	// update helper
-	void update_detail(bool All)
+	void update_detail(const indices_t& Indices)
 	{
 		// try to retain our sanity:
 		return_if_fail(m_first_level_cache);
@@ -931,7 +933,7 @@ private:
 
 		// update first level:
 		facevertices_t updated_faces;
-		m_first_level_cache->update(All, updated_faces);
+		m_first_level_cache->update(Indices, updated_faces);
 		// and the higher levels:
 		m_higher_level_cache->update(updated_faces);
 	}	

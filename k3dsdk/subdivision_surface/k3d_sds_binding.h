@@ -54,7 +54,7 @@ public:
 	//////
 	bool set_input(const k3d::mesh* Input);
 
-	void update(bool all, facevertices_t& updated_maps);
+	void update(const indices_t& Indices, facevertices_t& updated_maps);
 
 	//////////
 	// Extra K3D specific methods
@@ -76,7 +76,8 @@ public:
 	}
 
 	// True if the given face or its neighbours contain selected elements
-	bool selected(size_t Face, int Recurse = 4);
+	typedef std::set<size_t> indexset_t;
+	bool selected(size_t Face, const indexset_t& Indices, int Recurse = 2);
 	
 	// True if none of the components in the mesh are selected
 	bool no_selection();

@@ -250,6 +250,7 @@ public:
 	void remove_property(k3d::iproperty* LevelProperty);
 	
 	int levels;
+	k3d::mesh::indices_t indices; 
 private:
 	typedef std::set<k3d::iproperty*> levels_t;
 	levels_t m_levels;

@@ -56,13 +56,11 @@ class mesh_geometry_changed_t :
 	public iunknown
 {
 public:
-	mesh_geometry_changed_t() : full_change(false) {}
+	mesh_geometry_changed_t() {}
 	/// Indices of the points affected by the change
 	k3d::mesh::indices_t changed_points;
 	/// Transformation matrix used for the change
 	k3d::matrix4 transformation_matrix;
-	/// True if all geometry changed
-	bool full_change;
 };
 
 /// Convenience function that returns a reference to a static instance of mesh_geometry_changed_t

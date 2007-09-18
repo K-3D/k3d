@@ -79,12 +79,12 @@ public:
 		m_rows.changed_signal().connect(make_topology_changed_slot());
 		m_material.changed_signal().connect(make_topology_changed_slot());
 		
-		m_function.changed_signal().connect(make_full_geometry_changed_slot());
-		m_width.changed_signal().connect(make_full_geometry_changed_slot());
-		m_height.changed_signal().connect(make_full_geometry_changed_slot());
-		m_orientation.changed_signal().connect(make_full_geometry_changed_slot());
+		m_function.changed_signal().connect(make_geometry_changed_slot());
+		m_width.changed_signal().connect(make_geometry_changed_slot());
+		m_height.changed_signal().connect(make_geometry_changed_slot());
+		m_orientation.changed_signal().connect(make_geometry_changed_slot());
 
-		m_user_property_changed_signal.connect(make_full_geometry_changed_slot());
+		m_user_property_changed_signal.connect(make_geometry_changed_slot());
 	}
 
 	void on_create_mesh_topology(k3d::mesh& Mesh)
@@ -206,19 +206,6 @@ private:
 	k3d_data(k3d::signed_axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_orientation;
 
 	k3d::user_property_changed_signal m_user_property_changed_signal;
-	
-	sigc::slot<void, iunknown*> make_full_geometry_changed_slot()
-	{
-		return sigc::mem_fun(*this, &surface_plot::mesh_full_geometry_changed);
-	}
-	
-	/// Indicate all geometry changed, regardless of selection
-	void mesh_full_geometry_changed(iunknown* const Hint)
-	{
-		k3d::hint::mesh_geometry_changed_t hint;
-		hint.full_change = true;
-		m_output_mesh.update(&hint);
-	}
 };
 
 /////////////////////////////////////////////////////////////////////////////

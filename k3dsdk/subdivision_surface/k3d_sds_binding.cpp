@@ -122,7 +122,7 @@ k3d_cache_input::k3d_cache_input(boost::shared_ptr<const k3d::mesh::points_t> Po
 	}
 }
 
-void k3d_cache_input::update(bool all, facevertices_t& updated_maps)
+void k3d_cache_input::update(const indices_t& Indices, facevertices_t& updated_maps)
 {
 	return_if_fail(m_input_points && m_input_polyhedra && m_input_polyhedra->face_first_loops);
 	const k3d::mesh::points_t& points = *m_input_points;
@@ -133,8 +133,10 @@ void k3d_cache_input::update(bool all, facevertices_t& updated_maps)
 	init_counters();
 	const size_t face_count = face_first_loops.size();
 	k3d::timer timer;
-	bool noselection = no_selection(); // If nothing is selected, but geometry changed anyway, we assume everything changed
-	if (all || noselection || (m_modified_faces.size() == face_first_loops.size()))
+	indexset_t indexset;
+	for (size_t i = 0; i != Indices.size(); ++i)
+		indexset.insert(Indices[i]);
+	if (indexset.empty() || (m_modified_faces.size() == face_first_loops.size()))
 	{
 		m_modified_faces.clear();
 	}
@@ -143,7 +145,7 @@ void k3d_cache_input::update(bool all, facevertices_t& updated_maps)
 		k3d::timer timer;
 		for(size_t face = 0; face != face_count; ++face)
 		{
-			if(all || noselection || selected(face)) // selected(face) is expensive!
+			if(indexset.empty() || selected(face, indexset)) // selected(face) is expensive!
 			{
 				const_positions_t updated_points;
 				const size_t first_edge = loop_first_edges[face_first_loops[face]];
@@ -260,7 +262,7 @@ sds_point* k3d_cache_input::get_corner(size_t Point)
 	return corner;
 }
 
-bool k3d_cache_input::selected(size_t Face, int Recurse)
+bool k3d_cache_input::selected(size_t Face, const indexset_t& Indices, int Recurse)
 {
 	const k3d::mesh::indices_t& clockwise_edges = *m_input_polyhedra->clockwise_edges;
 	const k3d::mesh::indices_t& edge_points = *m_input_polyhedra->edge_points;
@@ -277,9 +279,8 @@ bool k3d_cache_input::selected(size_t Face, int Recurse)
 	const size_t first_edge = loop_first_edges[face_first_loops[Face]];
 	for(size_t edge = first_edge; ; )
 	{
-		if(edge_selection[edge] ||
-			point_selection[edge_points[edge]] ||
-			(Recurse > 0 && selected(m_edge_to_face[m_companions[edge]], Recurse-1)))
+		if(Indices.find(edge_points[edge]) != Indices.end() ||
+			(Recurse > 0 && selected(m_edge_to_face[m_companions[edge]], Indices, Recurse-1)))
 		{
 			return true;
 		}
@@ -328,7 +329,7 @@ void k3d_basic_opengl_sds_cache::draw_faces(size_t Level, bool Selected)
 	{
 		k3d::log() << debug << "Setting level to " << Level << std::endl;
 		set_levels(Level);
-		update();
+		update(indices_t());
 	}
 	
 	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
@@ -395,7 +396,7 @@ void k3d_basic_opengl_sds_cache::draw_borders(size_t Level, bool Selected)
 	{
 		k3d::log() << debug << "Setting level to " << Level << std::endl;
 		set_levels(Level);
-		update();
+		update(indices_t());
 	}
 	
 	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
@@ -459,7 +460,7 @@ void k3d_basic_opengl_sds_cache::draw_corners(size_t Level, bool Selected)
 	{
 		k3d::log() << debug << "Setting level to " << Level << std::endl;
 		set_levels(Level);
-		update();
+		update(indices_t());
 	}
 	
 	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;

@@ -942,7 +942,7 @@ void sds_vbo_cache::on_execute(const k3d::mesh& Mesh)
 	cache.set_new_addresses(Mesh);
 	if (update)
 	{
-		cache.update(all);
+		cache.update(indices);
 	}
 	if (regenerate)
 	{
@@ -982,7 +982,7 @@ void sds_gl_cache::on_execute(const k3d::mesh& Mesh)
 	}
 	if (update)
 	{
-		cache.update(all);
+		cache.update(indices);
 		cache.clear_modified_faces();
 	}
 	update = false;
