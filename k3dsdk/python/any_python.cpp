@@ -32,6 +32,7 @@
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/bitmap.h>
 #include <k3dsdk/color.h>
+#include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
