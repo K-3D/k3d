@@ -1,0 +1,4 @@
+K-3D is a complete free-as-in-freedome 3D modeling, animation, and rendering system.
+
+K-3D features a robust plugin architecture and visualization pipeline, designed to scale to the needs of professional artists.  K-3D has been written from the ground up to generate motion picture quality animation using RenderMan render engines.
+

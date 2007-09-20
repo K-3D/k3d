@@ -172,9 +172,22 @@ IF(WIN32)
 	SET(CPACK_STRIP_FILES ${CPACK_SOURCE_STRIP_FILES})
 ENDIF(WIN32)
 
+IF(APPLE)
+	SET(CPACK_GENERATOR "PackageMaker")
+	SET(CPACK_PACKAGE_NAME "K-3D")
+
+	SET(CPACK_RESOURCE_FILE_WELCOME "${k3d_SOURCE_DIR}/distribution/osx/packagemaker/welcome.txt")
+	SET(CPACK_RESOURCE_FILE_README "${k3d_SOURCE_DIR}/distribution/osx/packagemaker/readme.txt")
+
+	# PackageMaker requires suitable file extensions for all resource files ...
+	CONFIGURE_FILE(${k3d_SOURCE_DIR}/COPYING ${k3d_BINARY_DIR}/distribution/COPYING.txt COPYONLY)
+	SET(CPACK_RESOURCE_FILE_LICENSE "${k3d_BINARY_DIR}/distribution/COPYING.txt")
+
+ENDIF(APPLE)
+
 INCLUDE(CPack)
 
-# Setup the "all-in-one" package ...
+# Setup the optional "all-in-one" package for Win32 ...
 IF(WIN32)
 	OPTION(K3D_BUILD_ALL_IN_ONE_PACKAGE "Build the K-3D all-in-one package" OFF)
 
