@@ -173,16 +173,19 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(APPLE)
+	# Setup creation of an installer with PackageMaker
 	SET(CPACK_GENERATOR "PackageMaker")
 	SET(CPACK_PACKAGE_NAME "K-3D")
 
 	SET(CPACK_RESOURCE_FILE_WELCOME "${k3d_SOURCE_DIR}/distribution/osx/packagemaker/welcome.txt")
 	SET(CPACK_RESOURCE_FILE_README "${k3d_SOURCE_DIR}/distribution/osx/packagemaker/readme.txt")
 
-	# PackageMaker requires suitable file extensions for all resource files ...
 	CONFIGURE_FILE(${k3d_SOURCE_DIR}/COPYING ${k3d_BINARY_DIR}/distribution/COPYING.txt COPYONLY)
 	SET(CPACK_RESOURCE_FILE_LICENSE "${k3d_BINARY_DIR}/distribution/COPYING.txt")
 
+	# Setup creation of an application bundle
+	CONFIGURE_FILE(${k3d_SOURCE_DIR}/distribution/osx/application_bundle/create_bundle.sh.in ${k3d_BINARY_DIR}/create_bundle.sh @ONLY)
+	CONFIGURE_FILE(${k3d_SOURCE_DIR}/distribution/osx/application_bundle/clean_bundle.sh.in ${k3d_BINARY_DIR}/clean_bundle.sh @ONLY)
 ENDIF(APPLE)
 
 INCLUDE(CPack)
