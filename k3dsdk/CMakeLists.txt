@@ -62,6 +62,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 ADD_SUBDIRECTORY(Half)
+ADD_SUBDIRECTORY(function_parser)
 ADD_SUBDIRECTORY(glew)
 ADD_SUBDIRECTORY(sgi_tesselator)
 ADD_SUBDIRECTORY(subdivision_surface)

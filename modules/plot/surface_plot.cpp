@@ -25,30 +25,22 @@
 
 #include <k3dsdk/axis.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/function_parser/parser.h>
 #include <k3dsdk/hints.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/iuser_property.h>
+#include <k3dsdk/log.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/material_client.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_property_changed_signal.h>
-
-#include <iterator>
-
-#include <k3dsdk/log.h>
-#include <k3dsdk/module.h>
-
-// { warp function parser
-#include "fpconfig.h"
-#include "fparser.h"
-// } warp function parser
-
 
 namespace module
 {
@@ -116,10 +108,10 @@ public:
 		}
 
 		//Parse function and check if ok (<= -1)
-		FunctionParser function_parser;
-		if(function_parser.Parse(function, variables) > -1)
+		k3d::function::parser function_parser;
+		if(!function_parser.parse(function, variables))
 		{
-			k3d::log() << error << factory().name() << ": function parsing failed: " << function_parser.ErrorMsg() << std::endl;
+			k3d::log() << error << factory().name() << ": function parsing failed: " << function_parser.last_parse_error() << std::endl;
 			return;
 		}
 
@@ -178,7 +170,7 @@ public:
 
 				values[0] = u;
 				values[1] = v;
-				const double w = function_parser.Eval(&values[0]);
+				const double w = function_parser.evaluate(&values[0]);
 
 				*point++ = k3d::to_point((u * i) + (v * j) + (w * k));
 			}
