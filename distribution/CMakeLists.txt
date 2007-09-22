@@ -184,8 +184,8 @@ IF(APPLE)
 	SET(CPACK_RESOURCE_FILE_LICENSE "${k3d_BINARY_DIR}/distribution/COPYING.txt")
 
 	# Setup creation of an application bundle
-	CONFIGURE_FILE(${k3d_SOURCE_DIR}/distribution/osx/application_bundle/create_bundle.sh.in ${k3d_BINARY_DIR}/create_bundle.sh @ONLY)
-	CONFIGURE_FILE(${k3d_SOURCE_DIR}/distribution/osx/application_bundle/clean_bundle.sh.in ${k3d_BINARY_DIR}/clean_bundle.sh @ONLY)
+	CONFIGURE_FILE(${k3d_SOURCE_DIR}/distribution/osx/bundle/create_bundle.sh.in ${k3d_BINARY_DIR}/create_bundle.sh @ONLY)
+	CONFIGURE_FILE(${k3d_SOURCE_DIR}/distribution/osx/bundle/clean_bundle.sh.in ${k3d_BINARY_DIR}/clean_bundle.sh @ONLY)
 ENDIF(APPLE)
 
 INCLUDE(CPack)
