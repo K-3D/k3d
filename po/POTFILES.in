@@ -113,7 +113,6 @@ modules/booleans/cgal_boolean_nodes.cpp
 modules/core/axes.cpp
 modules/core/camera.cpp
 modules/core/color_property.cpp
-modules/core/format_scalar.cpp
 modules/core/format_time.cpp
 modules/core/frozen_transformation.cpp
 modules/core/look_at.cpp
@@ -122,13 +121,6 @@ modules/core/null.cpp
 modules/core/orientation.cpp
 modules/core/position.cpp
 modules/core/print_stdout.cpp
-modules/core/scalar_add.cpp
-modules/core/scalar_div.cpp
-modules/core/scalar_modulo.cpp
-modules/core/scalar_multiply.cpp
-modules/core/scalar_property.cpp
-modules/core/scalar_sine.cpp
-modules/core/scalar_sub.cpp
 modules/core/scale.cpp
 modules/core/show_matrix.cpp
 modules/core/snap.cpp
@@ -313,6 +305,15 @@ modules/renderman_painters/nurbs_patch_painter.cpp
 modules/renderman_painters/point_group_painter.cpp
 modules/renderman_painters/polyhedron_painter.cpp
 modules/renderman_painters/subdivision_surface_painter.cpp
+modules/scalar/format_scalar.cpp
+modules/scalar/scalar_add.cpp
+modules/scalar/scalar_div.cpp
+modules/scalar/scalar_expression.cpp
+modules/scalar/scalar_modulo.cpp
+modules/scalar/scalar_multiply.cpp
+modules/scalar/scalar_property.cpp
+modules/scalar/scalar_sine.cpp
+modules/scalar/scalar_sub.cpp
 modules/scripting/bitmap_modifier_script.cpp
 modules/scripting/bitmap_source_script.cpp
 modules/scripting/color_source_script.cpp
