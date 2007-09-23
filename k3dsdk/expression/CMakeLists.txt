@@ -1,4 +1,4 @@
-PROJECT(k3dsdk-function-parser)
+PROJECT(k3dsdk-expression)
 
 FILE(GLOB HEADERS *.h)
 FILE(GLOB SOURCES *.cpp)
@@ -10,17 +10,17 @@ ENDIF(CMAKE_HAS_SORT)
 
 INCLUDE_DIRECTORIES(${k3d_SOURCE_DIR})
 
-ADD_LIBRARY(k3dsdk-function-parser SHARED ${HEADERS} ${SOURCES})
-K3D_GENERATE_DEF_FILE(k3dsdk-function-parser)
+ADD_LIBRARY(k3dsdk-expression SHARED ${HEADERS} ${SOURCES})
+K3D_GENERATE_DEF_FILE(k3dsdk-expression)
 
-TARGET_LINK_LIBRARIES(k3dsdk-function-parser k3dsdk)
+TARGET_LINK_LIBRARIES(k3dsdk-expression k3dsdk)
 
-INSTALL(TARGETS k3dsdk-function-parser
+INSTALL(TARGETS k3dsdk-expression
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib)
 
-PROJECT(k3dsdk-function-parser)
+PROJECT(k3dsdk-expression)
 
 FILE(GLOB HEADERS *.h)
 FILE(GLOB SOURCES *.cpp)
@@ -32,12 +32,12 @@ ENDIF(CMAKE_HAS_SORT)
 
 INCLUDE_DIRECTORIES(${k3d_SOURCE_DIR})
 
-ADD_LIBRARY(k3dsdk-function-parser SHARED ${HEADERS} ${SOURCES})
-K3D_GENERATE_DEF_FILE(k3dsdk-function-parser)
+ADD_LIBRARY(k3dsdk-expression SHARED ${HEADERS} ${SOURCES})
+K3D_GENERATE_DEF_FILE(k3dsdk-expression)
 
-TARGET_LINK_LIBRARIES(k3dsdk-function-parser k3dsdk)
+TARGET_LINK_LIBRARIES(k3dsdk-expression k3dsdk)
 
-INSTALL(TARGETS k3dsdk-function-parser
+INSTALL(TARGETS k3dsdk-expression
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib)

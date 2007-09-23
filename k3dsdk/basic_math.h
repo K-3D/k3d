@@ -34,7 +34,7 @@ namespace k3d
 /// Pi
 inline double pi()
 {
-	return 3.14159265358979323846;
+	return 3.1415926535897932384626433832795;
 }
 
 /// Pi divided-by two

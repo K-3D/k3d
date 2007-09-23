@@ -25,7 +25,7 @@
 
 #include <k3dsdk/axis.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/function_parser/parser.h>
+#include <k3dsdk/expression/parser.h>
 #include <k3dsdk/hints.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/iuser_property.h>
@@ -107,11 +107,10 @@ public:
 			values.push_back(k3d::property::pipeline_value<double>(**property));
 		}
 
-		//Parse function and check if ok (<= -1)
-		k3d::function::parser function_parser;
-		if(!function_parser.parse(function, variables))
+		k3d::expression::parser parser;
+		if(!parser.parse(function, variables))
 		{
-			k3d::log() << error << factory().name() << ": function parsing failed: " << function_parser.last_parse_error() << std::endl;
+			k3d::log() << error << factory().name() << ": function parsing failed: " << parser.last_parse_error() << std::endl;
 			return;
 		}
 
@@ -170,7 +169,7 @@ public:
 
 				values[0] = u;
 				values[1] = v;
-				const double w = function_parser.evaluate(&values[0]);
+				const double w = parser.evaluate(&values[0]);
 
 				*point++ = k3d::to_point((u * i) + (v * j) + (w * k));
 			}

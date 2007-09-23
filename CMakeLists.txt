@@ -114,6 +114,7 @@ OPTION(K3D_BUILD_QTUI_MODULE "Build the sample Qt graphical user interface plugi
 OPTION(K3D_BUILD_QUADRICS_MODULE "Build the quadrics module" ON)
 OPTION(K3D_BUILD_RENDERMAN_MODULE "Build the RenderMan integration module" ON)
 OPTION(K3D_BUILD_RENDERMAN_PAINTERS_MODULE "Build the RenderMan mesh painters module" ON)
+OPTION(K3D_BUILD_SCALAR_MODULE "Build the scalar plugin module" ON)
 OPTION(K3D_BUILD_SCRIPTING_MODULE "Build the scripting plugin module" ON)
 OPTION(K3D_BUILD_SELECTION_MODULE "Build the selection plugin module" ON)
 OPTION(K3D_BUILD_TEST_MODULE "Build the regression test plugin module" ON)

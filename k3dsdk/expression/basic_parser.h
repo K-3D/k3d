@@ -1,5 +1,5 @@
-#ifndef K3DSDK_FUNCTION_PARSER_PARSER_H
-#define K3DSDK_FUNCTION_PARSER_PARSER_H
+#ifndef K3DSDK_EXPRESSION_BASIC_PARSER_H
+#define K3DSDK_EXPRESSION_BASIC_PARSER_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -25,26 +25,27 @@
 namespace k3d
 {
 
-namespace function
+namespace expression
 {
 
 /// Provides a parser that can execute functions with C-like syntax, returning a double result
-class parser
+/** \note The implementation is provided by http://iki.fi/warp/FunctionParser */
+class basic_parser
 {
 public:
-	parser();
-	~parser();
+	basic_parser();
+	~basic_parser();
 
 	/// Adds a named constant that can be used in expressions
-	void add_constant(const std::string& Name, double Value);
+	void add_constant(const std::string& Name, double_t Value);
 
-	typedef double (*FunctionPtr)(const double*);
+	typedef double_t (*FunctionPtr)(const double_t*);
 	/// Adds a function that can be used in expressions
-	void add_function(const std::string& Name, FunctionPtr Function, k3d::uint8_t ParameterCount);
+	void add_function(const std::string& Name, FunctionPtr Function, uint8_t ParameterCount);
 
 	/// Parse an expression, returning true on success, otherwise false.
 	/// If parsing fails, Error will contain a human-readable string describing the reason.
-	const bool parse(const std::string& Function, const std::string& Variables);
+	const bool_t parse(const std::string& Function, const std::string& Variables);
 	/// Returns a human-readable string describing the most recent parse error
 	const std::string last_parse_error();
 
@@ -52,20 +53,20 @@ public:
 	void optimize();
 
 	/// Evaluate the expression with the given variable values, returning the result
-	double evaluate(const double* Variables);
+	double_t evaluate(const double_t* Variables);
 
 
 private:
-	parser(const parser&);
-	parser& operator=(const parser&);
+	basic_parser(const basic_parser&);
+	basic_parser& operator=(const basic_parser&);
 
 	class implementation;
 	implementation* const m_implementation;
 };
 
-} // namespace function
+} // namespace expression
 
 } // namespace k3d
 
-#endif // !K3DSDK_FUNCTION_PARSER_PARSER-H
+#endif // !K3DSDK_EXPRESSION_BASIC_PARSER-H
 
