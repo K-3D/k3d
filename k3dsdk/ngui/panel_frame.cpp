@@ -225,6 +225,8 @@ void control::unmount()
 	unset_bg_color();
 
 	m_grab_focus_connection.disconnect();
+	
+	m_document_state.set_focus_viewport(0);
 
 	delete m_frame.get_child();
 }
