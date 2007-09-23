@@ -245,6 +245,7 @@ public:
 		m_keygroups.erase(time_property);
 		delete value_property;
 		delete time_property;
+		m_keys_changed_signal.emit();
 		reset_output();
 	}
 	
@@ -343,6 +344,7 @@ public:
 		key_group.properties.push_back(static_cast<k3d::iproperty*>(time_property));
 		key_group.properties.push_back(static_cast<k3d::iproperty*>(value_it->second));
 		register_property_group(key_group);
+		m_keys_changed_signal.emit();
 	}
 	
 	/// Stores the current value at Time using keynumber
@@ -363,6 +365,11 @@ public:
 			}
 		}
 		k3d::log() << warning << "animation_track: Labeled value property not found!" << std::endl;
+	}
+	
+	k3d::ikeyframer::keys_changed_signal_t& keys_changed_signal()
+	{
+		return m_keys_changed_signal;
 	}
 	
 
@@ -424,6 +431,7 @@ private:
 	/// Last state change set that was being recorded to
 	k3d::state_change_set* m_last_set; 
 	store_state_container<time_t, value_t>* m_last_store;
+	k3d::ikeyframer::keys_changed_signal_t m_keys_changed_signal;
 };
 
 /////////////////////////////////////////////////////////////////////////////

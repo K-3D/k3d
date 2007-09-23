@@ -50,6 +50,11 @@ public:
 	/// List with all the properties containing keytimes
 	virtual keys_t get_keys() = 0;
 	
+	typedef sigc::signal<void> keys_changed_signal_t;
+	
+	/// Emitted when the list of keys changed
+	virtual keys_changed_signal_t& keys_changed_signal() = 0; 
+	
 	virtual ~ikeyframer() {}
 };
 
