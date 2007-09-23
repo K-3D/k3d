@@ -172,6 +172,7 @@ K3D_ADD_PYTHON_TEST(mesh.source.PolySphere.py)
 K3D_ADD_PYTHON_TEST(mesh.source.PolyText.py)
 K3D_ADD_PYTHON_TEST(mesh.source.PolyTorus.py)
 K3D_ADD_PYTHON_TEST(mesh.source.Polyhedron.py)
+K3D_ADD_PYTHON_TEST(mesh.source.ScalarExpression.py)
 K3D_ADD_PYTHON_TEST(mesh.source.SphereEversion.py)
 K3D_ADD_PYTHON_TEST(mesh.source.SurfacePlot.py)
 

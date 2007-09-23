@@ -203,6 +203,20 @@ def setup_mesh_modifier_image_test(source_name, modifier_name):
 
 	return result
 
+def setup_scalar_source_test(source_name):
+	doc = k3d.new_document()
+
+	source = doc.new_node(source_name)
+
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = doc
+	result.source = source
+
+	return result
+
 def bitmap_size_comparison(bitmap, width, height):
 
 	print """<DartMeasurement name="Bitmap Width" type="numeric/float">""" + str(bitmap.width()) + """</DartMeasurement>"""
@@ -301,4 +315,10 @@ def image_comparison(document, image, image_name, threshold):
 
 	if difference_measurement > threshold:
 		raise "pixel difference exceeds threshold"
+
+def scalar_comparison(value, expected_value):
+	print """<DartMeasurement name="Value" type="numeric/float">""" + str(value) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Expected Value" type="numeric/float">""" + str(expected_value) + """</DartMeasurement>"""
+	if value != expected_value:
+		raise Exception("value does not match expected value")
 
