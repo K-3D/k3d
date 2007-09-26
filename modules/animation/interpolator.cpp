@@ -45,7 +45,6 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		k3d::register_type(typeid(interpolator<double, k3d::matrix4>), "libk3danimation::interpolator<double, k3d::matrix4>");
 		static k3d::document_plugin_factory<interpolator_double_matrix4_linear, k3d::interface_list<interpolator<double, k3d::matrix4> > >factory(
 				k3d::uuid(0x2df4d81e, 0xc5499561, 0x68c25fa8, 0x34e77dc4),
 				"InterpolatorDoubleMatrix4Linear",
@@ -71,7 +70,6 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		k3d::register_type(typeid(interpolator<double, double>), "libk3danimation::interpolator<double, double>");
 		static k3d::document_plugin_factory<interpolator_double_double_linear, k3d::interface_list<interpolator<double, double> > >factory(
 				k3d::uuid(0x1aca4dea, 0x8c44f5c1, 0x5f21b9b4, 0x6ec0bbce),
 				"InterpolatorDoubleDoubleLinear",

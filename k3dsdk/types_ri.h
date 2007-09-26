@@ -64,7 +64,7 @@ typedef k3d::point4 hpoint;
 /// RenderMan matrix datatype
 typedef k3d::matrix4 matrix;
 /// Filesystem path datatype
-typedef filesystem::path path;
+typedef k3d::filesystem::path path;
 /// 3D bounding-box datatype
 typedef k3d::bounding_box3 bound;
 /// RenderMan light handle datatype

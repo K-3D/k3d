@@ -210,10 +210,12 @@ private:
 
 } // namespace detail
 
-typedef user_property<k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> bool_property;
+typedef user_property<k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> bool_property;
+/*
 typedef user_property<k3d_data(long, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> long_property;
 typedef user_property<k3d_data(unsigned long, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> unsigned_long_property;
-typedef user_property<k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> double_property;
+*/
+typedef user_property<k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> double_property;
 typedef user_property<k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> string_property;
 typedef user_property<k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> point3_property;
 typedef user_property<k3d_data(k3d::vector3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> vector3_property;

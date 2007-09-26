@@ -185,13 +185,15 @@ void persistent_container::load(xml::element& Element, const ipersistent::load_c
 
 			if(user_property == "vanilla")
 			{
-				if(type == type_string<bool>())
+				if(type == type_string<k3d::bool_t>())
 					load_user_property<user::bool_property>(*element->second, Context, *property_collection, *persistent_container, *object, false);
+/*
 				else if(type == type_string<long>())
 					load_user_property<user::long_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
 				else if(type == type_string<unsigned long>())
 					load_user_property<user::unsigned_long_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
-				else if(type == type_string<double>())
+*/
+				else if(type == type_string<k3d::double_t>())
 					load_user_property<user::double_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
 				else if(type == type_string<std::string>())
 					load_user_property<user::string_property>(*element->second, Context, *property_collection, *persistent_container, *object, std::string());

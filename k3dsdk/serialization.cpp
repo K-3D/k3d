@@ -323,6 +323,50 @@ void upgrade_property_values(element& XMLDocument)
 	}
 }
 
+void upgrade_user_property_types(element& XMLDocument)
+{
+	element* const xml_nodes = find_element(XMLDocument, "nodes");
+	if(!xml_nodes)
+		return;
+
+	bool nag_attribute = true;
+
+	for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
+	{
+		if(xml_node->name != "node")
+			continue;
+
+		element* const xml_properties = find_element(*xml_node, "properties");
+		if(!xml_properties)
+			continue;
+
+		for(element::elements_t::iterator xml_property = xml_properties->children.begin(); xml_property != xml_properties->children.end(); ++xml_property)
+		{
+			if(xml_property->name != "property")
+				continue;
+
+			attribute* const xml_user_property = find_attribute(*xml_property, "user_property");
+			if(!xml_user_property)
+				continue;
+
+			attribute* const xml_type = find_attribute(*xml_property, "type");
+			if(!xml_type)
+				continue;
+
+			if(xml_type->value == "double")
+				xml_type->value = "k3d::double_t";
+			else
+				continue;
+
+			if(nag_attribute)
+			{
+				log() << warning << "Upgrading obsolete user property type" << std::endl;
+				nag_attribute = false;
+			}
+		}
+	}
+}
+
 void upgrade_pipeline_element(element& XMLDocument)
 {
 	// Change <pipeline> to <dependencies> ...
@@ -1187,6 +1231,7 @@ void upgrade_document(element& XMLDocument)
 	detail::upgrade_variables_elements(XMLDocument);
 	detail::upgrade_variable_elements(XMLDocument);
 	detail::upgrade_property_values(XMLDocument);
+	detail::upgrade_user_property_types(XMLDocument);
 	detail::upgrade_pipeline_element(XMLDocument);
 	detail::upgrade_dependency_elements(XMLDocument);
 	detail::upgrade_l_system_parser_nodes(XMLDocument);

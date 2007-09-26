@@ -26,6 +26,7 @@
 
 #include "Half/half.h"
 #include <boost/cstdint.hpp>
+#include <string>
 
 namespace k3d
 {
@@ -45,6 +46,8 @@ typedef boost::uint64_t uint64_t;
 typedef ::half half_t;
 typedef float float_t;
 typedef double double_t;
+
+typedef std::string string_t;
 
 } // namespace k3d
 

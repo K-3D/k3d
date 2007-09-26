@@ -116,14 +116,14 @@ struct type_info
 	const std::type_info& info;
 };
 
-/// Defines storage for a mapping of std::type_info objects to their corresponding string representation
+/// Defines storage for a mapping of type_info objects to their corresponding string representation
 typedef std::map<type_info, std::string> type_to_name_map_t;
-/// Stores a mapping of std::type_info objects to their corresponding string representation
+/// Stores a mapping of type_info objects to their corresponding string representation
 type_to_name_map_t type_to_name_map;
 
-/// Defines storage for a mapping of string to the corresponding std::type_info
+/// Defines storage for a mapping of string to the corresponding type_info
 typedef std::map<std::string, type_info> name_to_type_map_t;
-/// Stores a mapping of string to the corresponding std::type_info
+/// Stores a mapping of string to the corresponding type_info
 name_to_type_map_t name_to_type_map;
 
 void register_type(const std::type_info& Info, const std::string& Name)
@@ -150,30 +150,22 @@ void initialize_types()
 	if(initialized)
 		return;
 
-	register_type(typeid(k3d::bool_t), "k3d::bool_t");
-	register_type(typeid(k3d::int8_t), "k3d::int8_t");
-	register_type(typeid(k3d::int16_t), "k3d::int16_t");
-	register_type(typeid(k3d::int32_t), "k3d::int32_t");
-	register_type(typeid(k3d::int64_t), "k3d::int64_t");
-	register_type(typeid(k3d::uint8_t), "k3d::uint8_t");
-	register_type(typeid(k3d::uint16_t), "k3d::uint16_t");
-	register_type(typeid(k3d::uint32_t), "k3d::uint32_t");
-	register_type(typeid(k3d::uint64_t), "k3d::uint64_t");
-	register_type(typeid(k3d::half_t), "k3d::half_t");
-	register_type(typeid(k3d::float_t), "k3d::float_t");
-	register_type(typeid(k3d::double_t), "k3d::double_t");
 	register_type(typeid(k3d::angle_axis), "k3d::angle_axis");
 	register_type(typeid(k3d::aqsis::idisplacement_layer), "k3d::aqsis::idisplacement_layer");
 	register_type(typeid(k3d::aqsis::isurface_layer), "k3d::aqsis::isurface_layer");
 	register_type(typeid(k3d::bitmap), "k3d::bitmap");
 	register_type(typeid(k3d::bitmap*), "k3d::bitmap*");
+	register_type(typeid(k3d::bool_t), "k3d::bool_t");
 	register_type(typeid(k3d::bounding_box3), "k3d::bounding_box3");
 	register_type(typeid(k3d::color), "k3d::color");
+	register_type(typeid(k3d::double_t), "k3d::double_t");
 	register_type(typeid(k3d::filesystem::path), "k3d::filesystem::path");
+	register_type(typeid(k3d::float_t), "k3d::float_t");
 	register_type(typeid(k3d::gl::ilight), "k3d::gl::ilight");
 	register_type(typeid(k3d::gl::imaterial), "k3d::gl::imaterial");
 	register_type(typeid(k3d::gl::imesh_painter), "k3d::gl::imesh_painter");
 	register_type(typeid(k3d::gl::imesh_painter*), "k3d::gl::imesh_painter*");
+	register_type(typeid(k3d::half_t), "k3d::half_t");
 	register_type(typeid(k3d::i3d_2d_mapping), "k3d::i3d_2d_mapping");
 	register_type(typeid(k3d::ibitmap_exporter), "k3d::ibitmap_exporter");
 	register_type(typeid(k3d::ibitmap_importer), "k3d::ibitmap_importer");
@@ -195,6 +187,10 @@ void initialize_types()
 	register_type(typeid(k3d::imesh_storage), "k3d::imesh_storage");
 	register_type(typeid(k3d::inode), "k3d::inode");
 	register_type(typeid(k3d::inode*), "k3d::inode*");
+	register_type(typeid(k3d::int16_t), "k3d::int16_t");
+	register_type(typeid(k3d::int32_t), "k3d::int32_t");
+	register_type(typeid(k3d::int64_t), "k3d::int64_t");
+	register_type(typeid(k3d::int8_t), "k3d::int8_t");
 	register_type(typeid(k3d::ipreview_render_engine), "k3d::ipreview_render_engine");
 	register_type(typeid(k3d::iscalar_source), "k3d::iscalar_source");
 	register_type(typeid(k3d::iscript_engine), "k3d::iscript_engine");
@@ -230,13 +226,17 @@ void initialize_types()
 	register_type(typeid(k3d::ri::itexture), "k3d::ri::itexture");
 	register_type(typeid(k3d::ri::itexture*), "k3d::ri::itexture*");
 	register_type(typeid(k3d::ri::ivolume_shader), "k3d::ri::ivolume_shader");
-	register_type(typeid(k3d::typed_array<unsigned int>), "k3d::typed_array<unsigned int>");
+	register_type(typeid(k3d::string_t), "k3d::string_t");
+	register_type(typeid(k3d::uint16_t), "k3d::uint16_t");
+	register_type(typeid(k3d::uint32_t), "k3d::uint32_t");
+	register_type(typeid(k3d::uint64_t), "k3d::uint64_t");
+	register_type(typeid(k3d::uint8_t), "k3d::uint8_t");
 	register_type(typeid(k3d::vector3), "k3d::vector3");
 	register_type(typeid(k3d::yafray::ilight), "k3d::yafray::ilight");
 	register_type(typeid(k3d::yafray::imaterial), "k3d::yafray::imaterial");
-	register_type(typeid(std::string), "std::string");
 
 	/** \todo Come up with a more explicit type for these */
+	register_type(typeid(k3d::typed_array<unsigned int>), "k3d::typed_array<unsigned int>");
 	register_type(typeid(std::vector<k3d::point3>), "std::vector<k3d::point3>");
 	register_type(typeid(std::vector<unsigned int>), "std::vector<unsigned int>");
 
@@ -263,20 +263,10 @@ const std::string demangle(const std::string& Type)
 
 } // namespace detail
 
-void register_type(const std::type_info& Info, const std::string& Name)
+const bool is_registered(const std::type_info& Info)
 {
 	detail::initialize_types();
-	detail::register_type(Info, Name);
-}
-
-const types_t registered_types()
-{
-	detail::initialize_types();
-
-	types_t results;
-	for(detail::type_to_name_map_t::iterator type = detail::type_to_name_map.begin(); type != detail::type_to_name_map.end(); ++type)
-		results.push_back(&type->first.info);
-	return results;
+	return detail::type_to_name_map.count(detail::type_info(Info)) ? true : false;
 }
 
 const std::string type_string(const std::type_info& Info)

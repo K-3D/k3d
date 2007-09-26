@@ -37,35 +37,33 @@ namespace libk3dngui
 
 typedef enum
 {
-	K3D_bool,
-	K3D_long,
-	K3D_unsigned_long,
-	K3D_double,
-	K3D_string,
-	K3D_point3,
-	K3D_vector3,
-	K3D_normal3,
-	K3D_point4,
-	K3D_matrix4,
-	K3D_color,
-	K3D_mesh,
-	K3D_GL_imesh_painter,
-	K3D_RI_imesh_painter,
-	K3D_aqsis_displacement_layer,
-	K3D_aqsis_surface_layer
+	k3d_bool_t,
+	k3d_double_t,
+	k3d_string_t,
+	k3d_point3,
+	k3d_vector3,
+	k3d_normal3,
+	k3d_point4,
+	k3d_matrix4,
+	k3d_color,
+	k3d_mesh,
+	k3d_gl_imesh_painter,
+	k3d_ri_imesh_painter,
+	k3d_aqsis_idisplacement_layer,
+	k3d_aqsis_isurface_layer
 } user_types_t;
 
 typedef enum
 {
-	RI_integer,
-	RI_real,
-	RI_string,
-	RI_point,
-	RI_vector,
-	RI_normal,
-	RI_hpoint,
-	RI_matrix,
-	RI_color
+	k3d_ri_integer,
+	k3d_ri_real,
+	k3d_ri_string,
+	k3d_ri_point,
+	k3d_ri_vector,
+	k3d_ri_normal,
+	k3d_ri_hpoint,
+	k3d_ri_matrix,
+	k3d_ri_color
 } ri_types_t;
 
 typedef enum
@@ -118,22 +116,20 @@ static const k3d::ienumeration_property::enumeration_values_t& user_types_values
 	static k3d::ienumeration_property::enumeration_values_t values;
 	if(values.empty())
 	{
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("bool", "bool",""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("long", "long", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("unsigned long", "unsigned_long", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("double", "double", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("std::string", "string", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("k3d::point3", "point3", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("k3d::vector3", "vector3", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("k3d::normal3", "normal3", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("k3d::point4", "point4", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("k3d::matrix4", "matrix4", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("k3d::color", "color", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("k3d::mesh", "mesh", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("k3d::gl::imesh_painter", "GL_imesh_painter", "")); 
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("k3d::ri::imesh_painter", "RI_imesh_painter", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("Aqsis displacement layer", "aqsis_displacement_layer", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("Aqsis surface layer", "aqsis_surface_layer", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Boolean", "k3d::bool_t",""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Scalar", "k3d::double_t", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("String", "k3d::string_t", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("3D Point", "k3d::point3", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("3D Vector", "k3d::vector3", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("3D Normal", "k3d::normal3", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("4D Point", "k3d::point4", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("4x4 Matrix", "k3d::matrix4", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Color", "k3d::color", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Mesh", "k3d::mesh", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("OpenGL Mesh Painter", "k3d::gl::imesh_painter", "")); 
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("RenderMan Mesh Painter", "k3d::ri::imesh_painter", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Aqsis Displacement Layer", "k3d::aqsis::idisplacement_layer", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Aqsis Surface Layer", "k3d::aqsis::isurface_layer", ""));
 	}
 
 	return values;
@@ -143,53 +139,55 @@ std::ostream& operator<<(std::ostream& Stream, const user_types_t& Value)
 {
 	switch(Value)
 	{
-		case K3D_bool:
-			Stream << "bool";
+		case k3d_bool_t:
+			Stream << "k3d::bool_t";
 			break;
-		case K3D_long:
+/*
+		case k3d_long:
 			Stream << "long";
 			break;
-		case K3D_unsigned_long:
+		case k3d_unsigned_long:
 			Stream << "unsigned_long";
 			break;
-		case K3D_double:
-			Stream << "double";
+*/
+		case k3d_double_t:
+			Stream << "k3d::double_t";
 			break;
-		case K3D_string:
-			Stream << "string";
+		case k3d_string_t:
+			Stream << "k3d::string_t";
 			break;
-		case K3D_point3:
-			Stream << "point3";
+		case k3d_point3:
+			Stream << "k3d::point3";
 			break;
-		case K3D_vector3:
-			Stream << "vector3";
+		case k3d_vector3:
+			Stream << "k3d::vector3";
 			break;
-		case K3D_normal3:
-			Stream << "normal3";
+		case k3d_normal3:
+			Stream << "k3d::normal3";
 			break;
-		case K3D_point4:
-			Stream << "point4";
+		case k3d_point4:
+			Stream << "k3d::point4";
 			break;
-		case K3D_matrix4:
-			Stream << "matrix4";
+		case k3d_matrix4:
+			Stream << "k3d::matrix4";
 			break;
-		case K3D_color:
-			Stream << "color";
+		case k3d_color:
+			Stream << "k3d::color";
 			break;
-		case K3D_mesh:
-			Stream << "mesh";
+		case k3d_mesh:
+			Stream << "k3d::mesh";
 			break;
-		case K3D_GL_imesh_painter:
-			Stream << "GL_imesh_painter";
+		case k3d_gl_imesh_painter:
+			Stream << "k3d::gl::imesh_painter";
 			break;
-		case K3D_RI_imesh_painter:
-			Stream << "RI_imesh_painter";
+		case k3d_ri_imesh_painter:
+			Stream << "k3d::ri::imesh_painter";
 			break;
-		case K3D_aqsis_displacement_layer:
-			Stream << "aqsis_displacement_layer";
+		case k3d_aqsis_idisplacement_layer:
+			Stream << "k3d::aqsis::idisplacement_layer";
 			break;
-		case K3D_aqsis_surface_layer:
-			Stream << "aqsis_surface_layer";
+		case k3d_aqsis_isurface_layer:
+			Stream << "k3d::aqsis::isurface_layer";
 			break;
 	}
 
@@ -201,38 +199,34 @@ std::istream& operator>>(std::istream& Stream, user_types_t& Value)
 	std::string text;
 	Stream >> text;
 
-	if (text == "bool")
-		Value = K3D_bool;
-	else if (text == "long")	
-		Value = K3D_long;
-	else if (text == "unsigned_long")
-		Value = K3D_unsigned_long;
-	else if (text == "double")
-		Value = K3D_double;
-	else if (text == "string")
-		Value = K3D_string;
-	else if (text == "point3")
-		Value = K3D_point3;
-	else if (text == "vector3")
-		Value = K3D_vector3;
-	else if (text == "normal3")
-		Value = K3D_normal3;
-	else if (text == "point4")
-		Value = K3D_point4;
-	else if (text == "matrix4")
-		Value = K3D_matrix4;
-	else if (text == "color")
-		Value = K3D_color;
-	else if (text == "mesh")
-		Value = K3D_mesh;
-	else if (text == "GL_imesh_painter")
-		Value = K3D_GL_imesh_painter;
-	else if (text == "RI_imesh_painter")
-		Value = K3D_RI_imesh_painter;
-	else if (text == "aqsis_displacement_layer")
-		Value = K3D_aqsis_displacement_layer;
-	else if (text == "aqsis_surface_layer")
-		Value = K3D_aqsis_surface_layer;
+	if (text == "k3d::bool_t")
+		Value = k3d_bool_t;
+	else if (text == "k3d::double_t")
+		Value = k3d_double_t;
+	else if (text == "k3d::string_t")
+		Value = k3d_string_t;
+	else if (text == "k3d::point3")
+		Value = k3d_point3;
+	else if (text == "k3d::vector3")
+		Value = k3d_vector3;
+	else if (text == "k3d::normal3")
+		Value = k3d_normal3;
+	else if (text == "k3d::point4")
+		Value = k3d_point4;
+	else if (text == "k3d::matrix4")
+		Value = k3d_matrix4;
+	else if (text == "k3d::color")
+		Value = k3d_color;
+	else if (text == "k3d::mesh")
+		Value = k3d_mesh;
+	else if (text == "k3d::gl::imesh_painter")
+		Value = k3d_gl_imesh_painter;
+	else if (text == "k3d::ri::imesh_painter")
+		Value = k3d_ri_imesh_painter;
+	else if (text == "k3d::aqsis::idisplacement_layer")
+		Value = k3d_aqsis_idisplacement_layer;
+	else if (text == "k3d::aqsis::isurface_layer")
+		Value = k3d_aqsis_isurface_layer;
 	else
 		k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]"<< std::endl;
 
@@ -244,15 +238,15 @@ static const k3d::ienumeration_property::enumeration_values_t& ri_types_values()
 	static k3d::ienumeration_property::enumeration_values_t values;
 	if(values.empty())
 	{
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("Integer", "integer", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("Real", "real", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("String", "string", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("Point", "point", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("Vector", "vector", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("Normal", "normal", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("HPoint", "hpoint", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("Matrix", "matrix", ""));
-		values.push_back(k3d::ienumeration_property::enumeration_value_t("Color", "color" ,""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Integer", "k3d::ri::integer", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Real", "k3d::ri::real", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("String", "k3d::ri::string", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Point", "k3d::ri::point", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Vector", "k3d::ri::vector", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Normal", "k3d::ri::normal", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("HPoint", "k3d::ri::hpoint", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Matrix", "k3d::ri::matrix", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Color", "k3d::ri::color" ,""));
 	}
 
 	return values;
@@ -262,32 +256,32 @@ std::ostream& operator<<(std::ostream& Stream, const ri_types_t& Value)
 {
 	switch(Value)
 	{
-		case RI_integer:
-			Stream << "integer";
+		case k3d_ri_integer:
+			Stream << "k3d::ri::integer";
 			break;
-		case RI_real:
-			Stream << "real";
+		case k3d_ri_real:
+			Stream << "k3d::ri::real";
 			break;
-		case RI_string:
-			Stream << "string";
+		case k3d_ri_string:
+			Stream << "k3d::ri::string";
 			break;
-		case RI_point:
-			Stream << "point";
+		case k3d_ri_point:
+			Stream << "k3d::ri::point";
 			break;
-		case RI_vector:
-			Stream << "vector";
+		case k3d_ri_vector:
+			Stream << "k3d::ri::vector";
 			break;
-		case RI_normal:
-			Stream << "normal";
+		case k3d_ri_normal:
+			Stream << "k3d::ri::normal";
 			break;
-		case RI_hpoint:
-			Stream << "hpoint";
+		case k3d_ri_hpoint:
+			Stream << "k3d::ri::hpoint";
 			break;
-		case RI_matrix:
-			Stream << "matrix";
+		case k3d_ri_matrix:
+			Stream << "k3d::ri::matrix";
 			break;
-		case RI_color:
-			Stream << "color";
+		case k3d_ri_color:
+			Stream << "k3d::ri::color";
 	}
 
 	return Stream;
@@ -298,24 +292,24 @@ std::istream& operator>>(std::istream& Stream, ri_types_t& Value)
 	std::string text;
 	Stream >> text;
 	
-	if (text =="integer")
-		Value = RI_integer;
-	else if (text =="real")
-		Value = RI_real;
-	else if (text =="string")
-		Value = RI_string;
-	else if (text =="point")
-		Value = RI_point;
-	else if (text =="vector")
-		Value = RI_vector;
-	else if (text =="normal")
-		Value = RI_normal;
-	else if (text =="hpoint")
-		Value = RI_hpoint;
-	else if (text =="matrix")
-		Value = RI_matrix;
-	else if (text =="color")
-		Value = RI_color;
+	if (text =="k3d::ri::integer")
+		Value = k3d_ri_integer;
+	else if (text =="k3d::ri::real")
+		Value = k3d_ri_real;
+	else if (text =="k3d::ri::string")
+		Value = k3d_ri_string;
+	else if (text =="k3d::ri::point")
+		Value = k3d_ri_point;
+	else if (text =="k3d::ri::vector")
+		Value = k3d_ri_vector;
+	else if (text =="k3d::ri::normal")
+		Value = k3d_ri_normal;
+	else if (text =="k3d::ri::hpoint")
+		Value = k3d_ri_hpoint;
+	else if (text =="k3d::ri::matrix")
+		Value = k3d_ri_matrix;
+	else if (text =="k3d::ri::color")
+		Value = k3d_ri_color;
 	else
 		k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]"<< std::endl;
 		

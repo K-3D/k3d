@@ -31,19 +31,14 @@
 namespace k3d
 {
 
-/// Registers a new type with the global type collection
-void register_type(const std::type_info& Info, const std::string& Name);
-/// Registers a new type with the global type collection
+/// Returns true iff the given type is a registered type
+const bool is_registered(const std::type_info& Info);
+/// Returns true iff the given type is a registered type
 template<typename T>
-void register_type(std::string& Name)
+const bool is_registered()
 {
-	register_type(typeid(T), Name);
+	return is_registered(typeid(T));
 }
-
-/// Defines storage for a collection of types
-typedef std::vector<const std::type_info*> types_t;
-/// Returns the set of all registered types
-const types_t registered_types();
 
 /// Returns the string representation for a registered type, or empty string
 const std::string type_string(const std::type_info& Info);
