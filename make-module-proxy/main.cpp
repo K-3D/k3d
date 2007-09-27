@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			std::cerr << "Unknown factory type for plugin [" << (*factory)->name() << "] - terminating proxy generation" << std::endl;
+			std::cerr << "Unknown factory type for plugin [" << (*factory)->name() << "] - proxy cannot be created" << std::endl;
 			return 1;
 		}
 
@@ -110,11 +110,20 @@ int main(int argc, char* argv[])
 		const k3d::iplugin_factory::interfaces_t interfaces = (*factory)->interfaces();
 		for(k3d::iplugin_factory::interfaces_t::const_iterator interface = interfaces.begin(); interface != interfaces.end(); ++interface)
 		{
+			if(!k3d::is_registered(**interface))
+			{
+				std::cerr << "Interface type [" << k3d::demangle(**interface) << "] has not been registered, proxy cannot be created." << std::endl;
+				std::cerr << "Normally, this means you're exposing an interface that isn't part of the SDK." << std::endl;
+				std::cerr << "Either merge your interface into the SDK (and add it to the type registry)," << std::endl;
+				std::cerr << "or skip trying to create a module proxy altogether." << std::endl;
+				return 2;
+			}
+
 			const std::string xml_interface = k3d::type_string(**interface);
 			if(xml_interface.empty())
 			{
-				std::cerr << "Unknown interface type, terminating proxy generation" << std::endl;
-				return 2;
+				std::cerr << "Unknown interface type[" << k3d::demangle(**interface) << "], proxy cannot be created" << std::endl;
+				return 3;
 			}
 
 			xml_interfaces.append(k3d::xml::element("interface", k3d::type_string(**interface)));
