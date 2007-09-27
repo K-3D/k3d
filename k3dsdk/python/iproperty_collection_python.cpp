@@ -92,9 +92,9 @@ iproperty iproperty_collection::add_user_property(const std::string& Type, const
 	if(!persistent_container)
 		throw std::runtime_error("missing persistent container");
 
-	if(Type == k3d::type_string<bool>()) return detail::create_user_property<k3d::user::bool_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, false);
-	else if(Type == k3d::type_string<double>()) return detail::create_user_property<k3d::user::double_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, 0.0);
-	else if(Type == k3d::type_string<std::string>()) return detail::create_user_property<k3d::user::string_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, std::string());
+	if(Type == k3d::type_string<k3d::bool_t>()) return detail::create_user_property<k3d::user::bool_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, false);
+	else if(Type == k3d::type_string<k3d::double_t>()) return detail::create_user_property<k3d::user::double_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, 0.0);
+	else if(Type == k3d::type_string<k3d::string_t>()) return detail::create_user_property<k3d::user::string_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, std::string());
 	else if(Type == k3d::type_string<k3d::point3>()) return detail::create_user_property<k3d::user::point3_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::point3(0, 0, 0));
 	else if(Type == k3d::type_string<k3d::vector3>()) return detail::create_user_property<k3d::user::vector3_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::vector3(0, 0, 0));
 	else if(Type == k3d::type_string<k3d::normal3>()) return detail::create_user_property<k3d::user::normal3_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::normal3(0, 0, 0));

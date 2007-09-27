@@ -6,11 +6,11 @@ try:
 	cone = doc.new_node("Cone")
 	cone.name = "IceCreamCone"
 
-	cone.add_user_property("bool", "bool", "Boolean", "Boolean user property")
+	cone.add_user_property("k3d::bool_t", "bool", "Boolean", "Boolean user property")
 	cone.add_user_property("k3d::color", "color", "Color", "Color user property")
-	cone.add_user_property("double", "double", "Double", "Double user property")	
+	cone.add_user_property("k3d::double_t", "double", "Double", "Double user property")	
 	cone.add_user_property("k3d::matrix4", "matrix4", "Matrix4", "Matrix4 user property")	
-	cone.add_user_property("std::string", "string", "String", "String user property")	
+	cone.add_user_property("k3d::string_t", "string", "String", "String user property")	
 	cone.add_user_property("k3d::point3", "point3", "Point3", "Point user property")
 
 	cone.add_ri_attribute("k3d::ri::integer", "render", "ri_attribute_integer", "RenderMan Integer", "RenderMan Integer Attribute")
