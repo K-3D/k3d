@@ -228,8 +228,8 @@ public:
 
 	void on_save_pdf()
 	{
-		const double width = 5 * 72.0;
-		const double height = width * aspect_ratio();
+		const k3d::double_t width = 5 * 72.0;
+		const k3d::double_t height = width * aspect_ratio();
 
 		libk3dngui::file_chooser_dialog dialog(_("Save PDF Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.add_pattern_filter(_("PDF Document (*.pdf)"), "*.pdf");
@@ -252,8 +252,8 @@ public:
 
 	void on_save_ps()
 	{
-		const double width = 5 * 72.0;
-		const double height = width * aspect_ratio();
+		const k3d::double_t width = 5 * 72.0;
+		const k3d::double_t height = width * aspect_ratio();
 
 		libk3dngui::file_chooser_dialog dialog(_("Save Postscript Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.add_pattern_filter(_("Postscript Document (*.ps)"), "*.ps");
@@ -276,8 +276,8 @@ public:
 
 	void on_save_svg()
 	{
-		const double width = 5 * 72.0;
-		const double height = width * aspect_ratio();
+		const k3d::double_t width = 5 * 72.0;
+		const k3d::double_t height = width * aspect_ratio();
 
 		libk3dngui::file_chooser_dialog dialog(_("Save SVG Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.add_pattern_filter(_("SVG Document (*.svg)"), "*.svg");
@@ -303,14 +303,14 @@ public:
 /*
 		k3d::graph& graph = get_graph();
 		const k3d::graph::adjacency_list& topology = *graph.topology;
-		const size_t vertex_count = boost::num_vertices(topology);
+		const k3d::uint_t vertex_count = boost::num_vertices(topology);
 
 		k3d::graph::bools& vertex_expanded = k3d::get_array<k3d::graph::bools>(graph.vertex_data, "expanded", vertex_count);
 		const k3d::graph::points& vertex_position = k3d::get_array<k3d::graph::points>(graph.vertex_data, "position", vertex_count);
 
 		const k3d::point2 mouse = world_to_user(k3d::point2(Event.x, Event.y));
 
-		for(size_t vertex = 0; vertex != vertex_count; ++vertex)
+		for(k3d::uint_t vertex = 0; vertex != vertex_count; ++vertex)
 		{
 			const k3d::rectangle box(vertex_position[vertex], m_node_width, m_node_height);
 			if(box.contains(mouse))
@@ -336,8 +336,8 @@ public:
 		const k3d::vector2 delta = current_mouse - m_last_mouse;
 
 		Gtk::Allocation allocation = m_drawing_area.get_allocation();
-		const double width = allocation.get_width();
-		const double height = allocation.get_height();
+		const k3d::double_t width = allocation.get_width();
+		const k3d::double_t height = allocation.get_height();
 
 		m_origin += delta * (1.0 / m_zoom_factor) * (1.0 / std::min(width, height));
 		m_last_mouse = current_mouse;
@@ -355,8 +355,8 @@ public:
 		const k3d::point2 current_mouse = k3d::point2(Event.x, Event.y);
 		const k3d::vector2 delta = current_mouse - m_last_mouse;
 
-		const double sensitivity = 1.008;
-		const double zoom_factor = delta[1] < 0 ? std::pow(sensitivity, std::abs(delta[1])) : std::pow(1 / sensitivity, std::abs(delta[1]));
+		const k3d::double_t sensitivity = 1.008;
+		const k3d::double_t zoom_factor = delta[1] < 0 ? std::pow(sensitivity, std::abs(delta[1])) : std::pow(1 / sensitivity, std::abs(delta[1]));
 		m_last_mouse = current_mouse;
 
 		m_zoom_factor *= zoom_factor;
@@ -365,7 +365,7 @@ public:
 
 	void on_scroll_zoom(const GdkEventScroll& Event)
 	{
-		static const double zoom_sensitivity = 1.2;
+		static const k3d::double_t zoom_sensitivity = 1.2;
 
 		switch(Event.direction)
 		{
@@ -405,10 +405,10 @@ public:
 
 		k3d::graph& graph = *k3d::property::pipeline_value<k3d::graph*>(m_create_graph->output());
 		const k3d::graph::adjacency_list& topology = *graph.topology;
-		const size_t vertex_count = boost::num_vertices(topology);
+		const k3d::uint_t vertex_count = boost::num_vertices(topology);
 
 		const k3d::graph::nodes& vertex_node = k3d::get_array<k3d::graph::nodes>(graph.vertex_data, "node", vertex_count);
-		for(size_t vertex = 0; vertex != vertex_count; ++vertex)
+		for(k3d::uint_t vertex = 0; vertex != vertex_count; ++vertex)
 		{
 			if(vertex_node[vertex] == Node)
 			{
@@ -418,19 +418,19 @@ public:
 		}
 	}
 
-	const double aspect_ratio()
+	const k3d::double_t aspect_ratio()
 	{
 		Gtk::Allocation allocation = m_drawing_area.get_allocation();
-		const double width = allocation.get_width();
-		const double height = allocation.get_height();
+		const k3d::double_t width = allocation.get_width();
+		const k3d::double_t height = allocation.get_height();
 		return height / width;
 	}
 
 	const k3d::point2 world_to_user(const k3d::point2& Point)
 	{
 		Gtk::Allocation allocation = m_drawing_area.get_allocation();
-		const double width = allocation.get_width();
-		const double height = allocation.get_height();
+		const k3d::double_t width = allocation.get_width();
+		const k3d::double_t height = allocation.get_height();
 
 		k3d::point2 result = Point;
 
@@ -496,7 +496,7 @@ public:
 		Context->fill();
 	}
 
-	void draw_curved_arrow(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Source, const k3d::point2& Target, const double Size)
+	void draw_curved_arrow(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::point2& Source, const k3d::point2& Target, const k3d::double_t Size)
 	{
 		if(!k3d::length(Source - Target))
 			return;
@@ -529,12 +529,12 @@ public:
 		Context->fill();
 	}
 
-	void draw_centered_text(const Cairo::RefPtr<Cairo::Context>& Context, const double FontSize, const k3d::point2& Position, const std::string& Text, const double MaxWidth)
+	void draw_centered_text(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::double_t FontSize, const k3d::point2& Position, const std::string& Text, const k3d::double_t MaxWidth)
 	{
 		Context->save();
 
 		Cairo::TextExtents extents;
-		double font_size = FontSize;
+		k3d::double_t font_size = FontSize;
 		Context->set_font_size(font_size);
 		for(Context->get_text_extents(Text, extents); extents.width > MaxWidth; Context->get_text_extents(Text, extents))
 		{
@@ -549,11 +549,11 @@ public:
 		Context->restore();
 	}
 
-	void draw_pipeline(const Cairo::RefPtr<Cairo::Context>& Context, const double Width, const double Height)
+	void draw_pipeline(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::double_t Width, const k3d::double_t Height)
 	{
-		const double node_width = m_node_width.internal_value();
-		const double node_height = m_node_height.internal_value();
-		const double arrow_size = m_arrow_size.internal_value();
+		const k3d::double_t node_width = m_node_width.internal_value();
+		const k3d::double_t node_height = m_node_height.internal_value();
+		const k3d::double_t arrow_size = m_arrow_size.internal_value();
 		const k3d::color background_color = m_background_color.internal_value();
 		const k3d::color node_color = m_node_color.internal_value();
 		const k3d::color node_border_color = m_node_border_color.internal_value();
@@ -597,8 +597,8 @@ public:
 			return_if_fail(graph.edge_data.count("type"));
 
 			const k3d::graph::adjacency_list& topology = *graph.topology;
-			const size_t vertex_count = boost::num_vertices(topology);
-			const size_t edge_count = boost::num_edges(topology);
+			const k3d::uint_t vertex_count = boost::num_vertices(topology);
+			const k3d::uint_t edge_count = boost::num_edges(topology);
 
 			const k3d::graph::nodes& vertex_node = *k3d::get_array<k3d::graph::nodes>(graph.vertex_data, "node");
 			const k3d::graph::points& vertex_position = *k3d::get_array<k3d::graph::points>(graph.vertex_data, "position");
@@ -609,24 +609,24 @@ public:
 			Context->set_line_width(0.003);
 			Context->set_source_rgb(connection_color.red, connection_color.green, connection_color.blue);
 
-			size_t edge_index = 0;
+			k3d::uint_t edge_index = 0;
 			for(std::pair<k3d::graph::edge_iterator, k3d::graph::edge_iterator> edges = boost::edges(topology); edges.first != edges.second; ++edge_index, ++edges.first)
 			{
-				const size_t source = boost::source(*edges.first, topology);
-				const size_t target = boost::target(*edges.first, topology);
+				const k3d::uint_t source = boost::source(*edges.first, topology);
+				const k3d::uint_t target = boost::target(*edges.first, topology);
 
 				switch(edge_type[edge_index])
 				{
 					case BEHAVIOR_EDGE:
 					{
-						std::valarray<double> pattern(0.002, 1);
+						std::valarray<k3d::double_t> pattern(0.002, 1);
 						Context->set_dash(pattern, 0.1);
 						break;
 					}
 					case DATA_EDGE:
 					default:
 					{
-						std::valarray<double> pattern;
+						std::valarray<k3d::double_t> pattern;
 						Context->set_dash(pattern, 0.0);
 						break;
 					}
@@ -653,7 +653,7 @@ public:
 			Context->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
 			Context->set_line_width(0.003);
 
-			for(size_t vertex = 0; vertex != vertex_count; ++vertex)
+			for(k3d::uint_t vertex = 0; vertex != vertex_count; ++vertex)
 			{
 				Context->set_source_rgb(node_color.red, node_color.green, node_color.blue);
 				draw_filled_box(Context, k3d::rectangle(vertex_position[vertex], node_width, node_height));
@@ -703,7 +703,7 @@ private:
 	Gtk::Button m_save_svg;
 	detail::drawing_area m_drawing_area;
 
-	double m_zoom_factor;
+	k3d::double_t m_zoom_factor;
 	k3d::point2 m_origin;
 
 	k3d::point2 m_last_mouse;
@@ -717,9 +717,9 @@ private:
 
 	k3d::inode* m_root_node;
 
-	k3d_data(double, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_node_width;
-	k3d_data(double, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_node_height;
-	k3d_data(double, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_arrow_size;
+	k3d_data(k3d::double_t, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_node_width;
+	k3d_data(k3d::double_t, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_node_height;
+	k3d_data(k3d::double_t, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_arrow_size;
 	k3d_data(k3d::color, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_background_color;
 	k3d_data(k3d::color, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_node_color;
 	k3d_data(k3d::color, k3d::data::no_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::no_property, k3d::data::no_serialization) m_node_border_color;

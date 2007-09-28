@@ -48,7 +48,7 @@ public:
 	struct edge
 	{
 		edge() : index(0) {}
-		size_t index;
+		uint_t index;
 	};
 
 	/// Defines storage for a generic graph topology
@@ -61,15 +61,15 @@ public:
 	typedef boost::graph_traits<adjacency_list>::in_edge_iterator in_edge_iterator;
 
 	/// Defines storage for a generic collection of boolean values
-	typedef typed_array<bool> bools;
+	typedef typed_array<bool_t> bools;
 	/// Defines storage for a generic collection of integer values
-	typedef typed_array<int> ints;
+	typedef typed_array<int32_t> ints;
 	/// Defines storage for a generic collection of index values
-	typedef typed_array<size_t> indices;
+	typedef typed_array<uint_t> indices;
 	/// Defines storage for a generic collection of floating-point values
-	typedef typed_array<double> doubles;
+	typedef typed_array<double_t> doubles;
 	/// Defines storage for a generic collection of string values
-	typedef typed_array<std::string> strings;
+	typedef typed_array<string_t> strings;
 	/// Defines storage for a generic collection of two-dimensional points
 	typedef typed_array<point2> points;
 	/// Defines storage for a generic collection of two-dimensional vectors

@@ -79,8 +79,8 @@ void extract_tree::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outp
 {
 	return_if_fail(Input.topology);
 	const k3d::graph::adjacency_list& input_topology = *Input.topology;
-	const size_t vertex_count = boost::num_vertices(input_topology);
-	const size_t edge_count = boost::num_edges(input_topology);
+	const k3d::uint_t vertex_count = boost::num_vertices(input_topology);
+	const k3d::uint_t edge_count = boost::num_edges(input_topology);
 
 	// Use a simple BFS to determine which vertices and edges should appear in the output tree ...
 	k3d::graph::bools extract_vertex(vertex_count, false);
@@ -112,7 +112,7 @@ void extract_tree::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outp
 	for(std::pair<k3d::graph::edge_iterator, k3d::graph::edge_iterator> edges = boost::edges(input_topology); edges.first != edges.second; ++edges.first)
 	{
 		const k3d::graph::edge_descriptor edge = *edges.first;
-		const size_t edge_index = input_topology[edge].index;
+		const k3d::uint_t edge_index = input_topology[edge].index;
 
 		if(extract_edge[edge_index])
 		{

@@ -44,19 +44,19 @@ public:
 	mesh();
 
 	/// Defines storage for a generic collection of indices
-	typedef typed_array<size_t> indices_t;
+	typedef typed_array<uint_t> indices_t;
 	/// Defines storage for a generic collection of counts
-	typedef typed_array<size_t> counts_t;
+	typedef typed_array<uint_t> counts_t;
 	/// Defines storage for a generic collection of orders
-	typedef typed_array<size_t> orders_t;
+	typedef typed_array<uint_t> orders_t;
 	/// Defines storage for a generic collection of booleans
-	typedef typed_array<bool> bools_t;
+	typedef typed_array<bool_t> bools_t;
 	/// Defines storage for a generic collection of weights
-	typedef typed_array<double> weights_t;
+	typedef typed_array<double_t> weights_t;
 	/// Defines storage for a generic collection of knot vectors
-	typedef typed_array<double> knots_t;
+	typedef typed_array<double_t> knots_t;
 	/// Defines storage for gprim selection state
-	typedef typed_array<double> selection_t;
+	typedef typed_array<double_t> selection_t;
 	/// Defines storage for gprim materials
 	typedef typed_array<imaterial*> materials_t;
 	/// Defines a heterogeneous collection of named, shared arrays
@@ -318,9 +318,9 @@ public:
 		/// Defines storage for blobby operators
 		typedef typed_array<operator_type> operators_t;
 		/// Defines storage for primitive floating-point values
-		typedef typed_array<double> floats_t;
+		typedef typed_array<double_t> floats_t;
 		/// Defines storage for operator operands
-		typedef typed_array<size_t> operands_t;
+		typedef typed_array<uint_t> operands_t;
 
 		/// Stores per-blobby primitive offsets
 		boost::shared_ptr<const indices_t> first_primitives;
@@ -411,7 +411,7 @@ class almost_equal<mesh::polyhedra_t::polyhedron_type>
 {
 public:
 	almost_equal(const boost::uint64_t) { } 
-	inline const bool operator()(const mesh::polyhedra_t::polyhedron_type A, const mesh::polyhedra_t::polyhedron_type B) const { return A == B; }
+	inline const bool_t operator()(const mesh::polyhedra_t::polyhedron_type A, const mesh::polyhedra_t::polyhedron_type B) const { return A == B; }
 };
 
 template<>
@@ -419,7 +419,7 @@ class almost_equal<mesh::blobbies_t::primitive_type>
 {
 public:
 	almost_equal(const boost::uint64_t) { } 
-	inline const bool operator()(const mesh::blobbies_t::primitive_type A, const mesh::blobbies_t::primitive_type B) const { return A == B; }
+	inline const bool_t operator()(const mesh::blobbies_t::primitive_type A, const mesh::blobbies_t::primitive_type B) const { return A == B; }
 };
 
 template<>
@@ -427,7 +427,7 @@ class almost_equal<mesh::blobbies_t::operator_type>
 {
 public:
 	almost_equal(const boost::uint64_t) { } 
-	inline const bool operator()(const mesh::blobbies_t::operator_type A, const mesh::blobbies_t::operator_type B) const { return A == B; }
+	inline const bool_t operator()(const mesh::blobbies_t::operator_type A, const mesh::blobbies_t::operator_type B) const { return A == B; }
 };
 
 } // namespace k3d

@@ -44,7 +44,7 @@ void edge_indices::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outp
 
 	k3d::graph::adjacency_list& topology = *k3d::make_unique(Output.topology);
 
-	size_t index = 0;
+	k3d::uint_t index = 0;
 	for(std::pair<k3d::graph::edge_iterator, k3d::graph::edge_iterator> edges = boost::edges(topology); edges.first != edges.second; ++index, ++edges.first)
 		topology[*edges.first].index = index;
 }

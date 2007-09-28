@@ -24,6 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-platform-config.h>
 #include "Half/half.h"
 #include <boost/cstdint.hpp>
 #include <string>
@@ -48,6 +49,14 @@ typedef float float_t;
 typedef double double_t;
 
 typedef std::string string_t;
+
+#if defined K3D_UINT_T_32_BITS
+	typedef uint32_t uint_t;
+#elif defined K3D_UINT_T_64_BITS
+	typedef uint64_t uint_t;
+#else
+	#error "Unknown size for k3d::uint_t"
+#endif
 
 } // namespace k3d
 

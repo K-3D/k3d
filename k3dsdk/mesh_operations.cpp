@@ -36,9 +36,9 @@ void store_selection(const boost::shared_ptr<const mesh::selection_t>& MeshSelec
 
 	const mesh::selection_t& selection_weight = *MeshSelection;
 
-	const size_t selection_begin = 0;
-	const size_t selection_end = selection_begin + selection_weight.size();
-	for(size_t selection = selection_begin; selection != selection_end; ++selection)
+	const uint_t selection_begin = 0;
+	const uint_t selection_end = selection_begin + selection_weight.size();
+	for(uint_t selection = selection_begin; selection != selection_end; ++selection)
 		Records.push_back(mesh_selection::record(selection, selection+1, selection_weight[selection]));
 }
 
@@ -47,7 +47,7 @@ void replace_selection(const mesh_selection::records_t& Records, const gprims_ty
 {
 	return_if_fail(GPrims);
 
-	const size_t gprim_count = GPrims->size();
+	const uint_t gprim_count = GPrims->size();
 
 	if(!Selection || Selection->size() != gprim_count)
 		Selection.reset(new mesh::selection_t(gprim_count));
@@ -67,7 +67,7 @@ void replace_selection(const mesh_selection::records_t& Records, const gprims_ty
 
 } // namespace detail
 
-const mesh create_grid(const size_t Rows, const size_t Columns, imaterial* const Material)
+const mesh create_grid(const uint_t Rows, const uint_t Columns, imaterial* const Material)
 {
 	return_val_if_fail(Rows, mesh());
 	return_val_if_fail(Columns, mesh());
@@ -99,7 +99,7 @@ const mesh create_grid(const size_t Rows, const size_t Columns, imaterial* const
 	mesh::indices_t::iterator edge_point = edge_points->begin();
 	mesh::indices_t::iterator clockwise_edge = clockwise_edges->begin();
 	
-	size_t face_number = 0;
+	uint_t face_number = 0;
 
 	for(unsigned long row = 0; row != rows; ++row)
 	{
@@ -142,7 +142,7 @@ const mesh create_grid(const size_t Rows, const size_t Columns, imaterial* const
 	return result;
 }
 
-const mesh create_cylinder(const size_t Rows, const size_t Columns, imaterial* const Material)
+const mesh create_cylinder(const uint_t Rows, const uint_t Columns, imaterial* const Material)
 {
 	return_val_if_fail(Rows, mesh());
 	return_val_if_fail(Columns > 1, mesh());
@@ -174,7 +174,7 @@ const mesh create_cylinder(const size_t Rows, const size_t Columns, imaterial* c
 	mesh::indices_t::iterator edge_point = edge_points->begin();
 	mesh::indices_t::iterator clockwise_edge = clockwise_edges->begin();
 	
-	size_t face_number = 0;
+	uint_t face_number = 0;
 
 	for(unsigned long row = 0; row != rows; ++row)
 	{
@@ -217,7 +217,7 @@ const mesh create_cylinder(const size_t Rows, const size_t Columns, imaterial* c
 	return result;
 }
 
-const bool is_solid(const mesh& Mesh)
+const bool_t is_solid(const mesh& Mesh)
 {
 	// K-3D uses a split-edge data structure to represent polyhedra.
 	// We test for solidity by counting the number of edges that
@@ -229,15 +229,15 @@ const bool is_solid(const mesh& Mesh)
 	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 
-	typedef std::map<std::pair<size_t, size_t>, size_t> adjacent_edges_t;
+	typedef std::map<std::pair<uint_t, uint_t>, uint_t> adjacent_edges_t;
 	adjacent_edges_t adjacent_edges;
 
-	const size_t edge_begin = 0;
-	const size_t edge_end = edge_begin + edge_points.size();
-	for(size_t edge = edge_begin; edge != edge_end; ++edge)
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + edge_points.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
 	{
-		const size_t vertex1 = std::min(edge_points[edge], edge_points[clockwise_edges[edge]]);
-		const size_t vertex2 = std::max(edge_points[edge], edge_points[clockwise_edges[edge]]);
+		const uint_t vertex1 = std::min(edge_points[edge], edge_points[clockwise_edges[edge]]);
+		const uint_t vertex2 = std::max(edge_points[edge], edge_points[clockwise_edges[edge]]);
 		adjacent_edges[std::make_pair(vertex1, vertex2)] += 1;
 	}
 
@@ -250,7 +250,7 @@ const bool is_solid(const mesh& Mesh)
 	return true;
 }
 
-const bool is_triangles(const mesh& Mesh)
+const bool_t is_triangles(const mesh& Mesh)
 {
 	if(!validate_polyhedra(Mesh))
 		return true;
@@ -260,13 +260,13 @@ const bool is_triangles(const mesh& Mesh)
 	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 
-	const size_t face_begin = 0;
-	const size_t face_end = face_begin + face_first_loops.size();
-	for(size_t face = face_begin; face != face_end; ++face)
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + face_first_loops.size();
+	for(uint_t face = face_begin; face != face_end; ++face)
 	{
-		size_t edge_count = 0;
-		const size_t first_edge = loop_first_edges[face_first_loops[face]];
-		for(size_t edge = first_edge; ; )
+		uint_t edge_count = 0;
+		const uint_t first_edge = loop_first_edges[face_first_loops[face]];
+		for(uint_t edge = first_edge; ; )
 		{
 			++edge_count;
 
@@ -414,9 +414,9 @@ const bounding_box3 bounds(const k3d::mesh::points_t& Points)
 {
 	bounding_box3 results;
 
-    const size_t point_begin = 0;
-    const size_t point_end = point_begin + Points.size();
-    for(size_t point = point_begin; point != point_end; ++point)
+    const uint_t point_begin = 0;
+    const uint_t point_end = point_begin + Points.size();
+    for(uint_t point = point_begin; point != point_end; ++point)
         results.insert(Points[point]);
 
 	return results;
@@ -425,12 +425,12 @@ const bounding_box3 bounds(const k3d::mesh::points_t& Points)
 //////////////////////////////////////////////////////////////////////////////
 // center
 
-const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const size_t EdgeIndex)
+const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
 {
 	point3 result(0, 0, 0);
 
-	size_t count = 0;
-	for(size_t edge = EdgeIndex; ; )
+	uint_t count = 0;
+	for(uint_t edge = EdgeIndex; ; )
 	{
 		result += to_vector(Points[EdgePoints[edge]]);
 		++count;
@@ -449,12 +449,12 @@ const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& Cl
 //////////////////////////////////////////////////////////////////////////////
 // normal
 
-const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const size_t EdgeIndex)
+const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
 {
 	// Calculates the normal for an edge loop using the summation method, which is more robust than the three-point methods (handles zero-length edges)
 	normal3 result(0, 0, 0);
 
-	for(size_t edge = EdgeIndex; ; )
+	for(uint_t edge = EdgeIndex; ; )
 	{
 		const point3& i = Points[EdgePoints[edge]];
 		const point3& j = Points[EdgePoints[ClockwiseEdges[edge]]];
@@ -485,9 +485,9 @@ void deep_copy(const mesh& From, mesh& To)
 // validate
 
 /** \todo Handle all gprim types */
-const bool validate(mesh& Mesh)
+const bool_t validate(mesh& Mesh)
 {
-	bool result = true;
+	bool_t result = true;
 
 	if(Mesh.points && !validate_points(Mesh))
 		result = false;
@@ -522,7 +522,7 @@ const bool validate(mesh& Mesh)
 	return result;
 }
 
-const bool validate_points(const mesh& Mesh)
+const bool_t validate_points(const mesh& Mesh)
 {
 	if(!Mesh.points)
 		return false;
@@ -536,7 +536,7 @@ const bool validate_points(const mesh& Mesh)
 	return true;
 }
 
-const bool validate_point_groups(const mesh& Mesh)
+const bool_t validate_point_groups(const mesh& Mesh)
 {
 	if(!Mesh.point_groups)
 		return false;
@@ -550,7 +550,7 @@ const bool validate_point_groups(const mesh& Mesh)
 	return true;
 }
 
-const bool validate_linear_curve_groups(const mesh& Mesh)
+const bool_t validate_linear_curve_groups(const mesh& Mesh)
 {
 	if(!Mesh.linear_curve_groups)
 		return false;
@@ -568,7 +568,7 @@ const bool validate_linear_curve_groups(const mesh& Mesh)
 	return true;
 }
 
-const bool validate_cubic_curve_groups(const mesh& Mesh)
+const bool_t validate_cubic_curve_groups(const mesh& Mesh)
 {
 	if(!Mesh.cubic_curve_groups)
 		return false;
@@ -586,7 +586,7 @@ const bool validate_cubic_curve_groups(const mesh& Mesh)
 	return true;
 }
 
-const bool validate_nurbs_curve_groups(const mesh& Mesh)
+const bool_t validate_nurbs_curve_groups(const mesh& Mesh)
 {
 	if(!Mesh.nurbs_curve_groups)
 		return false;
@@ -607,7 +607,7 @@ const bool validate_nurbs_curve_groups(const mesh& Mesh)
 	return true;
 }
 
-const bool validate_bilinear_patches(const mesh& Mesh)
+const bool_t validate_bilinear_patches(const mesh& Mesh)
 {
 	if(!Mesh.bilinear_patches)
 		return false;
@@ -620,7 +620,7 @@ const bool validate_bilinear_patches(const mesh& Mesh)
 	return true;
 }
 
-const bool validate_bicubic_patches(const mesh& Mesh)
+const bool_t validate_bicubic_patches(const mesh& Mesh)
 {
 	if(!Mesh.bicubic_patches)
 		return false;
@@ -633,7 +633,7 @@ const bool validate_bicubic_patches(const mesh& Mesh)
 	return true;
 }
 
-const bool validate_nurbs_patches(const mesh& Mesh)
+const bool_t validate_nurbs_patches(const mesh& Mesh)
 {
 	if(!Mesh.nurbs_patches)
 		return false;
@@ -656,7 +656,7 @@ const bool validate_nurbs_patches(const mesh& Mesh)
 	return true;
 }
 
-const bool validate_polyhedra(const mesh& Mesh)
+const bool_t validate_polyhedra(const mesh& Mesh)
 {
 	if(!Mesh.polyhedra)
 		return false;
@@ -689,14 +689,14 @@ const bool validate_polyhedra(const mesh& Mesh)
 	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 
-	const size_t loop_begin = 0;
-	const size_t loop_end = loop_begin + loop_first_edges.size();
-	for(size_t loop = loop_begin; loop != loop_end; ++loop)
+	const uint_t loop_begin = 0;
+	const uint_t loop_end = loop_begin + loop_first_edges.size();
+	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 	{
-		const size_t first_edge = loop_first_edges[loop];
-		size_t edge_slow = first_edge;
-		size_t edge_fast = first_edge;
-		size_t cycle_count = 0;
+		const uint_t first_edge = loop_first_edges[loop];
+		uint_t edge_slow = first_edge;
+		uint_t edge_fast = first_edge;
+		uint_t cycle_count = 0;
 		while(true)
 		{
 			edge_slow = clockwise_edges[edge_slow];
@@ -719,7 +719,7 @@ const bool validate_polyhedra(const mesh& Mesh)
 	return true;
 }
 
-const bool validate_blobbies(const mesh& Mesh)
+const bool_t validate_blobbies(const mesh& Mesh)
 {
 	if(!Mesh.blobbies)
 		return false;
@@ -740,13 +740,13 @@ const bool validate_blobbies(const mesh& Mesh)
 	return true;
 }
 
-const bool is_sds(const mesh& Mesh)
+const bool_t is_sds(const mesh& Mesh)
 {
 	if(!validate_polyhedra(Mesh))
 		return false;
 
 	const mesh::polyhedra_t::types_t& types = *Mesh.polyhedra->types;
-	for(size_t type = 0; type != types.size(); ++type)
+	for(uint_t type = 0; type != types.size(); ++type)
 	{
 		if(types[type] == mesh::polyhedra_t::CATMULL_CLARK)
 			return true;

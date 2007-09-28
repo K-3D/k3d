@@ -102,6 +102,9 @@ int main(int argc, char* argv[])
 	print_type<k3d::uint16_t>("k3d::uint16_t");
 	print_type<k3d::uint32_t>("k3d::uint32_t");
 	print_type<k3d::uint64_t>("k3d::uint64_t");
+	print_divider();
+
+	print_type<k3d::uint_t>("k3d::uint_t");
 
 	return 0;
 }
