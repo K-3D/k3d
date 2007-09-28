@@ -56,10 +56,10 @@ private:
 };
 
 /// Updates mesh components using stored selection data.  Note: if selection data doesn't exist for a given component, leaves it alone
-class replace_selection
+class merge_selection
 {
 public:
-	replace_selection(const mesh_selection::records_t& Records) :
+	merge_selection(const mesh_selection::records_t& Records) :
 		records(Records),
 		current_record(Records.begin()),
 		end_record(Records.end()),
@@ -377,9 +377,9 @@ void store_selection(const legacy::mesh& Mesh, mesh_selection& MeshSelection)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// replace_selection
+// merge_selection
 
-void replace_selection(const mesh_selection& MeshSelection, legacy::mesh& Mesh)
+void merge_selection(const mesh_selection& MeshSelection, legacy::mesh& Mesh)
 {
 	// This is a policy decision that may belong elsewhere ... if the mesh_selection is
 	// empty, don't modify the mesh at all.  This makes it possible for a plugin to have an
@@ -388,9 +388,9 @@ void replace_selection(const mesh_selection& MeshSelection, legacy::mesh& Mesh)
 	if(MeshSelection.empty())
 		return;
 
-	k3d::legacy::for_each_point(Mesh, detail::replace_selection(MeshSelection.points));
+	k3d::legacy::for_each_point(Mesh, detail::merge_selection(MeshSelection.points));
 
-	detail::replace_selection replace_edge_selection(MeshSelection.edges);
+	detail::merge_selection replace_edge_selection(MeshSelection.edges);
 	for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 	{
 		for(legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
@@ -416,13 +416,13 @@ void replace_selection(const mesh_selection& MeshSelection, legacy::mesh& Mesh)
 		}
 	}
 
-	k3d::legacy::for_each_face(Mesh, detail::replace_selection(MeshSelection.faces));
-	k3d::legacy::for_each_linear_curve(Mesh, detail::replace_selection(MeshSelection.linear_curves));
-	k3d::legacy::for_each_cubic_curve(Mesh, detail::replace_selection(MeshSelection.cubic_curves));
-	k3d::legacy::for_each_nucurve(Mesh, detail::replace_selection(MeshSelection.nurbs_curves));
-	k3d::legacy::for_each_bilinear_patch(Mesh, detail::replace_selection(MeshSelection.bilinear_patches));
-	k3d::legacy::for_each_bicubic_patch(Mesh, detail::replace_selection(MeshSelection.bicubic_patches));
-	k3d::legacy::for_each_nupatch(Mesh, detail::replace_selection(MeshSelection.nurbs_patches));
+	k3d::legacy::for_each_face(Mesh, detail::merge_selection(MeshSelection.faces));
+	k3d::legacy::for_each_linear_curve(Mesh, detail::merge_selection(MeshSelection.linear_curves));
+	k3d::legacy::for_each_cubic_curve(Mesh, detail::merge_selection(MeshSelection.cubic_curves));
+	k3d::legacy::for_each_nucurve(Mesh, detail::merge_selection(MeshSelection.nurbs_curves));
+	k3d::legacy::for_each_bilinear_patch(Mesh, detail::merge_selection(MeshSelection.bilinear_patches));
+	k3d::legacy::for_each_bicubic_patch(Mesh, detail::merge_selection(MeshSelection.bicubic_patches));
+	k3d::legacy::for_each_nupatch(Mesh, detail::merge_selection(MeshSelection.nurbs_patches));
 }
 
 } // namespace k3d

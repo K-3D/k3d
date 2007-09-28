@@ -332,7 +332,7 @@ public:
 
 		// Create output geometry
 		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::replace_selection(m_mesh_selection.pipeline_value(), Mesh);
+		k3d::merge_selection(m_mesh_selection.pipeline_value(), Mesh);
 
 		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron_i = Mesh.polyhedra.begin(); polyhedron_i != Mesh.polyhedra.end(); ++polyhedron_i)
 		{

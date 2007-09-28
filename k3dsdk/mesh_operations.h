@@ -43,10 +43,10 @@ const bool_t is_triangles(const mesh& Mesh);
 
 /// Copies the selection state of a mesh into a mesh_selection
 void store_selection(const mesh& Mesh, mesh_selection& Selection);
-/// Copies mesh_selection state over any previous selection state in the given mesh
-void replace_selection(const mesh_selection& Selection, mesh& Mesh);
-/// Copies mesh_selection state over any previous selection state in the given array
-void replace_selection(const mesh_selection::records_t& Selection, mesh::selection_t& Array);
+/// Merges a mesh_selection with the current selection state in the given mesh
+void merge_selection(const mesh_selection& MeshSelection, mesh& Mesh);
+/// Merges a set of mesh_selection records with the current selection state in the given array
+void merge_selection(const mesh_selection::records_t& Records, mesh::selection_t& Selection);
 
 /// Returns a bounding-box containing every point in the given mesh
 const bounding_box3 bounds(const mesh& Mesh);

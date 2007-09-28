@@ -46,7 +46,7 @@ void mesh_deformation_modifier::on_update_mesh(const mesh& Input, mesh& Output)
 		return;
 	return_if_fail(Input.points->size() == Output.points->size());
 
-	replace_selection(m_mesh_selection.pipeline_value(), Output);
+	merge_selection(m_mesh_selection.pipeline_value(), Output);
 	return_if_fail(Output.point_selection);
 	return_if_fail(Output.point_selection->size() == Output.points->size());
 

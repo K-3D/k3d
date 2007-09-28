@@ -42,8 +42,23 @@ void store_selection(const boost::shared_ptr<const mesh::selection_t>& MeshSelec
 		Records.push_back(mesh_selection::record(selection, selection+1, selection_weight[selection]));
 }
 
+void merge_selection(const mesh_selection::records_t& Records, mesh::selection_t& Selection)
+{
+	const uint_t selection_count = Selection.size();
+
+	for(mesh_selection::records_t::const_iterator record = Records.begin(); record != Records.end(); ++record)
+	{
+		if(record->begin >= selection_count)
+			break;
+
+		mesh::selection_t::iterator begin = Selection.begin() + record->begin;
+		mesh::selection_t::iterator end = Selection.begin() + std::min(selection_count, record->end);
+		std::fill(begin, end, record->weight);
+	}
+}
+
 template<typename gprims_type>
-void replace_selection(const mesh_selection::records_t& Records, const gprims_type& GPrims, boost::shared_ptr<const mesh::selection_t>& Selection)
+void merge_selection(const mesh_selection::records_t& Records, const gprims_type& GPrims, boost::shared_ptr<const mesh::selection_t>& Selection)
 {
 	return_if_fail(GPrims);
 
@@ -54,15 +69,7 @@ void replace_selection(const mesh_selection::records_t& Records, const gprims_ty
 
 	mesh::selection_t& selection = *make_unique(Selection);
 
-	for(mesh_selection::records_t::const_iterator record = Records.begin(); record != Records.end(); ++record)
-	{
-		if(record->begin >= gprim_count)
-			break;
-
-		mesh::selection_t::iterator begin = selection.begin() + record->begin;
-		mesh::selection_t::iterator end = selection.begin() + std::min(gprim_count, record->end);
-		std::fill(begin, end, record->weight);
-	}
+	detail::merge_selection(Records, selection);
 }
 
 } // namespace detail
@@ -339,59 +346,64 @@ void store_selection(const mesh& Mesh, mesh_selection& Selection)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// replace_selection
+// merge_selection
 
-void replace_selection(const mesh_selection& MeshSelection, mesh& Mesh)
+void merge_selection(const mesh_selection& MeshSelection, mesh& Mesh)
 {
-	detail::replace_selection(MeshSelection.points, Mesh.points, Mesh.point_selection);
+	detail::merge_selection(MeshSelection.points, Mesh.points, Mesh.point_selection);
 
 	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
 	{
 		k3d::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
-		detail::replace_selection(MeshSelection.edges, polyhedra->edge_points, polyhedra->edge_selection);
+		detail::merge_selection(MeshSelection.edges, polyhedra->edge_points, polyhedra->edge_selection);
 	}
 
 	if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops)
 	{
 		k3d::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
-		detail::replace_selection(MeshSelection.faces, polyhedra->face_first_loops, polyhedra->face_selection);
+		detail::merge_selection(MeshSelection.faces, polyhedra->face_first_loops, polyhedra->face_selection);
 	}
 
 	if(Mesh.linear_curve_groups)
 	{
 		k3d::mesh::linear_curve_groups_t* const linear_curve_groups = make_unique(Mesh.linear_curve_groups);
-		detail::replace_selection(MeshSelection.linear_curves, linear_curve_groups->curve_first_points, linear_curve_groups->curve_selection);
+		detail::merge_selection(MeshSelection.linear_curves, linear_curve_groups->curve_first_points, linear_curve_groups->curve_selection);
 	}
 
 	if(Mesh.cubic_curve_groups)
 	{
 		k3d::mesh::cubic_curve_groups_t* const cubic_curve_groups = make_unique(Mesh.cubic_curve_groups);
-		detail::replace_selection(MeshSelection.cubic_curves, cubic_curve_groups->curve_first_points, cubic_curve_groups->curve_selection);
+		detail::merge_selection(MeshSelection.cubic_curves, cubic_curve_groups->curve_first_points, cubic_curve_groups->curve_selection);
 	}
 
 	if(Mesh.nurbs_curve_groups)
 	{
 		k3d::mesh::nurbs_curve_groups_t* const nurbs_curve_groups = make_unique(Mesh.nurbs_curve_groups);
-		detail::replace_selection(MeshSelection.nurbs_curves, nurbs_curve_groups->curve_first_points, nurbs_curve_groups->curve_selection);
+		detail::merge_selection(MeshSelection.nurbs_curves, nurbs_curve_groups->curve_first_points, nurbs_curve_groups->curve_selection);
 	}
 
 	if(Mesh.bilinear_patches)
 	{
 		k3d::mesh::bilinear_patches_t* const bilinear_patches = make_unique(Mesh.bilinear_patches);
-		detail::replace_selection(MeshSelection.bilinear_patches, bilinear_patches->patch_materials, bilinear_patches->patch_selection);
+		detail::merge_selection(MeshSelection.bilinear_patches, bilinear_patches->patch_materials, bilinear_patches->patch_selection);
 	}
 
 	if(Mesh.bicubic_patches)
 	{
 		k3d::mesh::bicubic_patches_t* const bicubic_patches = make_unique(Mesh.bicubic_patches);
-		detail::replace_selection(MeshSelection.bicubic_patches, bicubic_patches->patch_materials, bicubic_patches->patch_selection);
+		detail::merge_selection(MeshSelection.bicubic_patches, bicubic_patches->patch_materials, bicubic_patches->patch_selection);
 	}
 
 	if(Mesh.nurbs_patches)
 	{
 		k3d::mesh::nurbs_patches_t* const nurbs_patches = make_unique(Mesh.nurbs_patches);
-		detail::replace_selection(MeshSelection.nurbs_patches, nurbs_patches->patch_materials, nurbs_patches->patch_selection);
+		detail::merge_selection(MeshSelection.nurbs_patches, nurbs_patches->patch_materials, nurbs_patches->patch_selection);
 	}
+}
+
+void merge_selection(const mesh_selection::records_t& Records, mesh::selection_t& Selection)
+{
+	detail::merge_selection(Records, Selection);
 }
 
 /////////////////////////////////////////////////////////////////////////////

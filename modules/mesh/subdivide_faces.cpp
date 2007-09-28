@@ -473,7 +473,7 @@ public:
 
 		// Create output geometry ...
 		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::replace_selection(m_mesh_selection.pipeline_value(), Mesh);
+		k3d::merge_selection(m_mesh_selection.pipeline_value(), Mesh);
 
 		const subdivision_t subdivision_type = m_subdivision_type.pipeline_value();
 

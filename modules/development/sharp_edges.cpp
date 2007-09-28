@@ -69,7 +69,7 @@ public:
 		Output = Input;
 		k3d::make_unique(Output.points);
 		
-		k3d::replace_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output);
 		
 		return_if_fail(Output.polyhedra);
 		return_if_fail(Output.polyhedra->edge_selection);

@@ -237,7 +237,7 @@ public:
 		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
 		{
 			OutputMesh = *input_mesh;
-			k3d::replace_selection(m_mesh_selection.pipeline_value(), OutputMesh);
+			k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
 		}
 	}
 	
@@ -247,7 +247,7 @@ public:
 		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
 		{
 			OutputMesh = *input_mesh;
-			k3d::replace_selection(m_mesh_selection.pipeline_value(), OutputMesh);
+			k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
 			const k3d::mesh::points_t& input_points = *OutputMesh.points;
 			boost::shared_ptr<k3d::mesh::points_t> transformed_points(new k3d::mesh::points_t());
 			for (size_t point = 0; point != input_points.size(); ++point)
@@ -406,7 +406,7 @@ protected:
 	void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		return_if_fail(k3d::validate_points(Mesh));
-		k3d::replace_selection(m_mesh_selection.pipeline_value(), const_cast<k3d::mesh&>(Mesh));
+		k3d::merge_selection(m_mesh_selection.pipeline_value(), const_cast<k3d::mesh&>(Mesh));
 		m_output_mesh.changed_signal().emit(Hint);
 		m_gl_painter.pipeline_value()->mesh_changed(Mesh, Hint);
 	}

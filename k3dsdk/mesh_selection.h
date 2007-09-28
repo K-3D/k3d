@@ -127,10 +127,10 @@ std::ostream& operator<<(std::ostream&, const mesh_selection&);
 void store_selection(const legacy::mesh& Mesh, mesh_selection& MeshSelection);
 
 /////////////////////////////////////////////////////////////////////////////
-// replace_selection
+// merge_selection
 
 /// Copies mesh_selection state over any previous selection state in the given mesh
-void replace_selection(const mesh_selection& MeshSelection, legacy::mesh& Mesh);
+void merge_selection(const mesh_selection& MeshSelection, legacy::mesh& Mesh);
 
 /////////////////////////////////////////////////////////////////////////////
 // mesh_selection_serialization

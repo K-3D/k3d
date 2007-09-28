@@ -66,7 +66,7 @@ public:
 
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
-		k3d::replace_selection(m_mesh_selection.pipeline_value(), const_cast<k3d::legacy::mesh&>(InputMesh));
+		k3d::merge_selection(m_mesh_selection.pipeline_value(), const_cast<k3d::legacy::mesh&>(InputMesh));
 		// Set levels -before- input
 //		m_sds_cache.set_levels(m_level.pipeline_value());
 //		m_sds_cache.set_input(&InputMesh);
