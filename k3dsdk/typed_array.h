@@ -39,19 +39,17 @@ class typed_array :
 	typedef typed_array<T> this_type;
 
 public:
-	typedef typename std::vector<T>::size_type size_type;
-
 	typed_array() :
 		std::vector<T>()
 	{
 	}
 
-	explicit typed_array(const size_type count) :
+	explicit typed_array(const uint_t count) :
 		std::vector<T>(count)
 	{
 	}
 
-	typed_array(const size_type count, const T& val) :
+	typed_array(const uint_t count, const T& val) :
 		std::vector<T>(count, val)
 	{
 	}
@@ -77,22 +75,22 @@ public:
 	    return new this_type(*this);
 	}
 
-	array* clone(const size_t Begin, const size_t End) const
+	array* clone(const uint_t Begin, const uint_t End) const
 	{
 	    return new this_type(this->begin() + Begin, this->begin() + End);
 	}
 
-	const size_t size() const
+	const uint_t size() const
 	{
 		return base_type::size();
 	}
 
-	const bool empty() const
+	const bool_t empty() const
 	{
 		return base_type::empty();
 	}
 
-	const bool almost_equal(const array& Other, const boost::uint64_t Threshold) const
+	const bool_t almost_equal(const array& Other, const uint64_t Threshold) const
 	{
 		if(base_type::size() != Other.size())
 			return false;
@@ -104,7 +102,7 @@ public:
 		return std::equal(base_type::begin(), base_type::end(), other->begin(), k3d::almost_equal<T>(Threshold));
 	}
 
-	const bool almost_equal(const this_type& Other, const boost::uint64_t Threshold) const
+	const bool_t almost_equal(const this_type& Other, const uint64_t Threshold) const
 	{
 		if(base_type::size() != Other.size())
 			return false;

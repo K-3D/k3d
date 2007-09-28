@@ -20,8 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <boost/cstdint.hpp>
-#include <cstddef>
+#include "types.h"
 
 namespace k3d
 {
@@ -37,14 +36,14 @@ public:
 	/// Returns a copy of this array (virtual ctor)
 	virtual array* clone() const = 0;
 	/// Returns a copy of a half-open range of this array (a variation on virtual ctor)
-	virtual array* clone(const size_t Begin, const size_t End) const = 0;
+	virtual array* clone(const uint_t Begin, const uint_t End) const = 0;
 	/// Returns the size of this array
-	virtual const size_t size() const = 0;
+	virtual const uint_t size() const = 0;
 	/// Returns true iff this array is empty
-	virtual const bool empty() const = 0;
+	virtual const bool_t empty() const = 0;
 	/// Returns true iff this array is equivalent to the given array, using the imprecise semantics of almost_equal to compare values.
 	/// \note: Returns false if given an array with a different concrete type.
-	virtual const bool almost_equal(const array& Other, const boost::uint64_t Threshold) const = 0;
+	virtual const bool_t almost_equal(const array& Other, const uint64_t Threshold) const = 0;
 };
 
 } // namespace k3d

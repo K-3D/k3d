@@ -125,8 +125,8 @@ void print_diff(std::ostream& Stream, const std::string& Label, const pointer_ty
 	if(!A && !B)
 		return;
 
-	const size_t a_size = A ? A->size() : 0;
-	const size_t b_size = B ? B->size() : 0;
+	const uint_t a_size = A ? A->size() : 0;
+	const uint_t b_size = B ? B->size() : 0;
 
 	std::ostringstream a_label_buffer;
 	if(A)
@@ -144,7 +144,7 @@ void print_diff(std::ostream& Stream, const std::string& Label, const pointer_ty
 
 	k3d::almost_equal<typename pointer_type::value_type::value_type> almost_equal(Threshold);
 
-	for(size_t i = 0; i < a_size || i < b_size; ++i)
+	for(uint_t i = 0; i < a_size || i < b_size; ++i)
 	{
 		const std::string difference_buffer = (A && i < a_size && B && i < b_size && almost_equal(A->at(i), B->at(i))) ? std::string("") : std::string("*****");
 
@@ -171,8 +171,8 @@ const bool print_diff(std::ostream& Stream, const std::string& Label, const arra
 	if(!a && !b)
 		return false;
 
-	const size_t a_size = a ? a->size() : 0;
-	const size_t b_size = b ? b->size() : 0;
+	const uint_t a_size = a ? a->size() : 0;
+	const uint_t b_size = b ? b->size() : 0;
 
 	std::ostringstream a_label_buffer;
 	if(a)
@@ -190,7 +190,7 @@ const bool print_diff(std::ostream& Stream, const std::string& Label, const arra
 
 	k3d::almost_equal<typename array_t::value_type> almost_equal(Threshold);
 
-	for(size_t i = 0; i < a_size || i < b_size; ++i)
+	for(uint_t i = 0; i < a_size || i < b_size; ++i)
 	{
 		const std::string difference_buffer = (a && i < a_size && b && i < b_size && almost_equal(a->at(i), b->at(i))) ? std::string("") : std::string("*****");
 

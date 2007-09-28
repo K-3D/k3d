@@ -52,7 +52,7 @@ public:
 
 private:
 	mesh_selection::records_t& records;
-	size_t index;
+	uint_t index;
 };
 
 /// Updates mesh components using stored selection data.  Note: if selection data doesn't exist for a given component, leaves it alone
@@ -99,7 +99,7 @@ private:
 	const mesh_selection::records_t& records;
 	mesh_selection::records_t::const_iterator current_record;
 	const mesh_selection::records_t::const_iterator end_record;
-	size_t index;
+	uint_t index;
 };
 
 } // namespace detail
@@ -180,7 +180,7 @@ bool mesh_selection::operator!=(const mesh_selection& RHS) const
 const mesh_selection::records_t mesh_selection::component_select_all()
 {
 	mesh_selection::records_t result;
-	result.push_back(record(0, size_t(-1), 1.0));
+	result.push_back(record(0, uint_t(-1), 1.0));
 
 	return result;
 }
@@ -188,7 +188,7 @@ const mesh_selection::records_t mesh_selection::component_select_all()
 const mesh_selection::records_t mesh_selection::component_deselect_all()
 {
 	mesh_selection::records_t result;
-	result.push_back(record(0, size_t(-1), 0.0));
+	result.push_back(record(0, uint_t(-1), 0.0));
 
 	return result;
 }
@@ -203,7 +203,7 @@ void show_selection_list(const mesh_selection::records_t& Selections)
 }
 
 /*
-void mesh_selection::insert(const size_t Begin, const record& Record, records_t& Selections)
+void mesh_selection::insert(const uint_t Begin, const record& Record, records_t& Selections)
 {
 
 	// first element, no checking needed
@@ -278,7 +278,7 @@ void mesh_selection::insert(const size_t Begin, const record& Record, records_t&
 		}
 		else // split up if selection weight differs
 		{
-			size_t old_end = before->second.end;
+			uint_t old_end = before->second.end;
 			before->second.end = Begin;
 			if (old_end > new_record.end)
 			{

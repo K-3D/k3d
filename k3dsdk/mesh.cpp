@@ -125,13 +125,13 @@ mesh::mesh()
 mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 {
 	// Convert points ...
-	std::map<k3d::legacy::point*, size_t> point_map;
+	std::map<k3d::legacy::point*, uint_t> point_map;
 
-	const size_t point_size = RHS.points.size();
+	const uint_t point_size = RHS.points.size();
 	boost::shared_ptr<points_t> points(new points_t(point_size));
 	boost::shared_ptr<selection_t> point_selection(new selection_t(point_size));
 
-	for(size_t i = 0; i != point_size; ++i)
+	for(uint_t i = 0; i != point_size; ++i)
 	{
 		(*points)[i] = RHS.points[i]->position;
 		(*point_selection)[i] = RHS.points[i]->selection_weight;
@@ -428,18 +428,18 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 
 		for(k3d::legacy::mesh::polyhedra_t::const_iterator polyhedron = RHS.polyhedra.begin(); polyhedron != RHS.polyhedra.end(); ++polyhedron)
 		{
-			size_t first_face = face_first_loops->size();
-			size_t face_count = 0;
+			uint_t first_face = face_first_loops->size();
+			uint_t face_count = 0;
 			k3d::mesh::polyhedra_t::polyhedron_type type = (*polyhedron)->type == k3d::legacy::polyhedron::POLYGONS ? k3d::mesh::polyhedra_t::POLYGONS : k3d::mesh::polyhedra_t::CATMULL_CLARK;
 
 			for(k3d::legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
 			{
 				++face_count;
 
-				size_t face_first_loop = loop_first_edges->size();
-				size_t face_loop_count = 1 + (*face)->holes.size();
+				uint_t face_first_loop = loop_first_edges->size();
+				uint_t face_loop_count = 1 + (*face)->holes.size();
 
-				const size_t first_edge = edge_points->size();
+				const uint_t first_edge = edge_points->size();
 
 				loop_first_edges->push_back(first_edge);
 				for(k3d::legacy::split_edge* edge = (*face)->first_edge; edge; edge = edge->face_clockwise)
@@ -460,7 +460,7 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 
 				for(k3d::legacy::face::holes_t::iterator hole = (*face)->holes.begin(); hole != (*face)->holes.end(); ++hole)
 				{
-					const size_t first_edge = edge_points->size();
+					const uint_t first_edge = edge_points->size();
 
 					loop_first_edges->push_back(first_edge);
 					for(k3d::legacy::split_edge* edge = *hole; edge; edge = edge->face_clockwise)

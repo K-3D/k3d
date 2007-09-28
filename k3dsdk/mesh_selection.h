@@ -26,6 +26,7 @@
 
 #include "ipersistent.h"
 #include "serialization.h"
+#include "types.h"
 #include "xml.h"
 
 #include <boost/static_assert.hpp>
@@ -48,18 +49,18 @@ public:
 	/// Stores selection data that will apply to a range of components
 	struct record
 	{
-		size_t begin;
-		size_t end;
+		uint_t begin;
+		uint_t end;
 		double weight;
 
-		record(const size_t Begin, const double Weight) :
+		record(const uint_t Begin, const double Weight) :
 			begin(Begin),
 			end(Begin + 1),
 			weight(Weight)
 		{
 		}
 		
-		record(const size_t Begin, const size_t End, const double Weight) :
+		record(const uint_t Begin, const uint_t End, const double Weight) :
 			begin(Begin),
 			end(End),
 			weight(Weight)

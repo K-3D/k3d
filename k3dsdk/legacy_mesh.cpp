@@ -598,9 +598,9 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		const k3d::mesh::points_t& new_points = *Mesh.points;
 		const k3d::mesh::selection_t& point_selection = *Mesh.point_selection.get();
 
-		const size_t point_begin = 0;
-		const size_t point_end = point_begin + Mesh.points->size();
-		for(size_t point = point_begin; point != point_end; ++point)
+		const uint_t point_begin = 0;
+		const uint_t point_end = point_begin + Mesh.points->size();
+		for(uint_t point = point_begin; point != point_end; ++point)
 		{
 			k3d::legacy::point* const legacy_point = new k3d::legacy::point(new_points[point]);
 			legacy_point->selection_weight = point_selection[point];
@@ -616,18 +616,18 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		const k3d::mesh::materials_t& materials = *Mesh.point_groups->materials;
 		const k3d::mesh::indices_t& group_points = *Mesh.point_groups->points;
 
-		const size_t group_begin = 0;
-		const size_t group_end = group_begin + first_points.size();
-		for(size_t group = group_begin; group != group_end; ++group)
+		const uint_t group_begin = 0;
+		const uint_t group_end = group_begin + first_points.size();
+		for(uint_t group = group_begin; group != group_end; ++group)
 		{
 			legacy::point_group* const legacy_group = new legacy::point_group();
 			point_groups.push_back(legacy_group);
 
 			legacy_group->material = materials[group];
 
-			const size_t point_begin = first_points[group];
-			const size_t point_end = point_begin + point_counts[group];
-			for(size_t point = point_begin; point != point_end; ++point)
+			const uint_t point_begin = first_points[group];
+			const uint_t point_end = point_begin + point_counts[group];
+			for(uint_t point = point_begin; point != point_end; ++point)
 				legacy_group->points.push_back(points[group_points[point]]);
 		}
 	}
@@ -643,9 +643,9 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		const k3d::mesh::selection_t& curve_selection = *Mesh.linear_curve_groups->curve_selection;
 		const k3d::mesh::indices_t& curve_points = *Mesh.linear_curve_groups->curve_points;
 
-		const size_t group_begin = 0;
-		const size_t group_end = group_begin + first_curves.size();
-		for(size_t group = group_begin; group != group_end; ++group)
+		const uint_t group_begin = 0;
+		const uint_t group_end = group_begin + first_curves.size();
+		for(uint_t group = group_begin; group != group_end; ++group)
 		{
 			legacy::linear_curve_group* const legacy_group = new legacy::linear_curve_group();
 			linear_curve_groups.push_back(legacy_group);
@@ -653,18 +653,18 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 			legacy_group->wrap = periodic_curves[group];
 			legacy_group->material = materials[group];
 
-			const size_t curve_begin = first_curves[group];
-			const size_t curve_end = curve_begin + curve_counts[group];
-			for(size_t curve = curve_begin; curve != curve_end; ++curve)
+			const uint_t curve_begin = first_curves[group];
+			const uint_t curve_end = curve_begin + curve_counts[group];
+			for(uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
 				legacy::linear_curve* const legacy_curve = new legacy::linear_curve();
 				legacy_group->curves.push_back(legacy_curve);
 
 				legacy_curve->selection_weight = curve_selection[curve];
 
-				const size_t point_begin = curve_first_points[curve];
-				const size_t point_end = point_begin + curve_point_counts[curve];
-				for(size_t point = point_begin; point != point_end; ++point)
+				const uint_t point_begin = curve_first_points[curve];
+				const uint_t point_end = point_begin + curve_point_counts[curve];
+				for(uint_t point = point_begin; point != point_end; ++point)
 					legacy_curve->control_points.push_back(points[curve_points[point]]);
 			}
 		}
@@ -681,9 +681,9 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		const k3d::mesh::selection_t& curve_selection = *Mesh.cubic_curve_groups->curve_selection;
 		const k3d::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
 
-		const size_t group_begin = 0;
-		const size_t group_end = group_begin + first_curves.size();
-		for(size_t group = group_begin; group != group_end; ++group)
+		const uint_t group_begin = 0;
+		const uint_t group_end = group_begin + first_curves.size();
+		for(uint_t group = group_begin; group != group_end; ++group)
 		{
 			legacy::cubic_curve_group* const legacy_group = new legacy::cubic_curve_group();
 			cubic_curve_groups.push_back(legacy_group);
@@ -691,18 +691,18 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 			legacy_group->wrap = periodic_curves[group];
 			legacy_group->material = materials[group];
 
-			const size_t curve_begin = first_curves[group];
-			const size_t curve_end = curve_begin + curve_counts[group];
-			for(size_t curve = curve_begin; curve != curve_end; ++curve)
+			const uint_t curve_begin = first_curves[group];
+			const uint_t curve_end = curve_begin + curve_counts[group];
+			for(uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
 				legacy::cubic_curve* const legacy_curve = new legacy::cubic_curve();
 				legacy_group->curves.push_back(legacy_curve);
 
 				legacy_curve->selection_weight = curve_selection[curve];
 
-				const size_t point_begin = curve_first_points[curve];
-				const size_t point_end = point_begin + curve_point_counts[curve];
-				for(size_t point = point_begin; point != point_end; ++point)
+				const uint_t point_begin = curve_first_points[curve];
+				const uint_t point_end = point_begin + curve_point_counts[curve];
+				for(uint_t point = point_begin; point != point_end; ++point)
 					legacy_curve->control_points.push_back(points[curve_points[point]]);
 			}
 		}
@@ -722,18 +722,18 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		const k3d::mesh::weights_t& curve_point_weights = *Mesh.nurbs_curve_groups->curve_point_weights;
 		const k3d::mesh::knots_t& curve_knots = *Mesh.nurbs_curve_groups->curve_knots;
 
-		const size_t group_begin = 0;
-		const size_t group_end = group_begin + first_curves.size();
-		for(size_t group = group_begin; group != group_end; ++group)
+		const uint_t group_begin = 0;
+		const uint_t group_end = group_begin + first_curves.size();
+		for(uint_t group = group_begin; group != group_end; ++group)
 		{
 			legacy::nucurve_group* const legacy_group = new legacy::nucurve_group();
 			nucurve_groups.push_back(legacy_group);
 
 			legacy_group->material = materials[group];
 
-			const size_t curve_begin = first_curves[group];
-			const size_t curve_end = curve_begin + curve_counts[group];
-			for(size_t curve = curve_begin; curve != curve_end; ++curve)
+			const uint_t curve_begin = first_curves[group];
+			const uint_t curve_end = curve_begin + curve_counts[group];
+			for(uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
 				legacy::nucurve* const legacy_curve = new legacy::nucurve();
 				legacy_group->curves.push_back(legacy_curve);
@@ -745,9 +745,9 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 					
 				legacy_curve->selection_weight = curve_selection[curve];
 
-				const size_t point_begin = curve_first_points[curve];
-				const size_t point_end = point_begin + curve_point_counts[curve];
-				for(size_t point = point_begin; point != point_end; ++point)
+				const uint_t point_begin = curve_first_points[curve];
+				const uint_t point_end = point_begin + curve_point_counts[curve];
+				for(uint_t point = point_begin; point != point_end; ++point)
 					legacy_curve->control_points.push_back(legacy::nucurve::control_point(points[curve_points[point]], curve_point_weights[point]));
 			}
 		}
@@ -759,9 +759,9 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		const k3d::mesh::materials_t& patch_materials = *Mesh.bilinear_patches->patch_materials;
 		const k3d::mesh::indices_t& patch_points = *Mesh.bilinear_patches->patch_points;
 
-		const size_t patch_begin = 0;
-		const size_t patch_end = patch_begin + (patch_points.size() / 4);
-		for(size_t patch = patch_begin; patch != patch_end; ++patch)
+		const uint_t patch_begin = 0;
+		const uint_t patch_end = patch_begin + (patch_points.size() / 4);
+		for(uint_t patch = patch_begin; patch != patch_end; ++patch)
 		{
 			legacy::bilinear_patch* const legacy_patch = new legacy::bilinear_patch();
 			bilinear_patches.push_back(legacy_patch);
@@ -769,9 +769,9 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 			legacy_patch->selection_weight = patch_selection[patch];
 			legacy_patch->material = patch_materials[patch];
 
-			const size_t point_begin = patch * 4;
-			const size_t point_end = point_begin + 4;
-			for(size_t point = point_begin, legacy_point = 0; point != point_end; ++point, ++legacy_point)
+			const uint_t point_begin = patch * 4;
+			const uint_t point_end = point_begin + 4;
+			for(uint_t point = point_begin, legacy_point = 0; point != point_end; ++point, ++legacy_point)
 				legacy_patch->control_points[legacy_point] = points[patch_points[point]];
 		}
 	}
@@ -782,9 +782,9 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		const k3d::mesh::materials_t& patch_materials = *Mesh.bicubic_patches->patch_materials;
 		const k3d::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
 
-		const size_t patch_begin = 0;
-		const size_t patch_end = patch_begin + (patch_points.size() / 16);
-		for(size_t patch = patch_begin; patch != patch_end; ++patch)
+		const uint_t patch_begin = 0;
+		const uint_t patch_end = patch_begin + (patch_points.size() / 16);
+		for(uint_t patch = patch_begin; patch != patch_end; ++patch)
 		{
 			legacy::bicubic_patch* const legacy_patch = new legacy::bicubic_patch();
 			bicubic_patches.push_back(legacy_patch);
@@ -792,9 +792,9 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 			legacy_patch->selection_weight = patch_selection[patch];
 			legacy_patch->material = patch_materials[patch];
 
-			const size_t point_begin = patch * 16;
-			const size_t point_end = point_begin + 16;
-			for(size_t point = point_begin, legacy_point = 0; point != point_end; ++point, ++legacy_point)
+			const uint_t point_begin = patch * 16;
+			const uint_t point_end = point_begin + 16;
+			for(uint_t point = point_begin, legacy_point = 0; point != point_end; ++point, ++legacy_point)
 				legacy_patch->control_points[legacy_point] = points[patch_points[point]];
 		}
 	}
@@ -815,9 +815,9 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		const k3d::mesh::knots_t& patch_u_knots = *Mesh.nurbs_patches->patch_u_knots;
 		const k3d::mesh::knots_t& patch_v_knots = *Mesh.nurbs_patches->patch_v_knots;
 
-		const size_t patch_begin = 0;
-		const size_t patch_end = patch_begin + patch_first_points.size();
-		for(size_t patch = patch_begin; patch != patch_end; ++patch)
+		const uint_t patch_begin = 0;
+		const uint_t patch_end = patch_begin + patch_first_points.size();
+		for(uint_t patch = patch_begin; patch != patch_end; ++patch)
 		{
 			legacy::nupatch* const legacy_patch = new legacy::nupatch();
 			nupatches.push_back(legacy_patch);
@@ -833,9 +833,9 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 			legacy_patch->selection_weight = patch_selection[patch];
 			legacy_patch->material = patch_materials[patch];
 
-			const size_t point_begin = patch_first_points[patch];
-			const size_t point_end = point_begin + (patch_u_point_counts[patch] * patch_v_point_counts[patch]);
-			for(size_t point = point_begin; point != point_end; ++point)
+			const uint_t point_begin = patch_first_points[patch];
+			const uint_t point_end = point_begin + (patch_u_point_counts[patch] * patch_v_point_counts[patch]);
+			for(uint_t point = point_begin; point != point_end; ++point)
 			{
 				legacy::nupatch::control_point const legacy_point(
 					points[patch_points[point]],
@@ -859,9 +859,9 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 		const k3d::mesh::selection_t& edge_selection = *Mesh.polyhedra->edge_selection.get();
 
-		const size_t polyhedron_begin = 0;
-		const size_t polyhedron_end = polyhedron_begin + first_faces.size();
-		for(size_t polyhedron = polyhedron_begin; polyhedron != polyhedron_end; ++polyhedron)
+		const uint_t polyhedron_begin = 0;
+		const uint_t polyhedron_end = polyhedron_begin + first_faces.size();
+		for(uint_t polyhedron = polyhedron_begin; polyhedron != polyhedron_end; ++polyhedron)
 		{
 			legacy::polyhedron* const legacy_polyhedron = new legacy::polyhedron();
 			polyhedra.push_back(legacy_polyhedron);
@@ -876,17 +876,17 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 					break;
 			}
 
-			const size_t face_begin = first_faces[polyhedron];
-			const size_t face_end = face_begin + face_counts[polyhedron];
-			for(size_t face = face_begin; face != face_end; ++face)
+			const uint_t face_begin = first_faces[polyhedron];
+			const uint_t face_end = face_begin + face_counts[polyhedron];
+			for(uint_t face = face_begin; face != face_end; ++face)
 			{
-				const size_t loop_begin = face_first_loops[face];
-				const size_t loop_end = loop_begin + face_loop_counts[face];
-				for(size_t loop = loop_begin; loop != loop_end; ++loop)
+				const uint_t loop_begin = face_first_loops[face];
+				const uint_t loop_end = loop_begin + face_loop_counts[face];
+				for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 				{
-					const size_t first_edge = loop_first_edges[loop];
+					const uint_t first_edge = loop_first_edges[loop];
 					std::vector<legacy::split_edge*> legacy_loop;
-					for(size_t edge = first_edge; ; )
+					for(uint_t edge = first_edge; ; )
 					{
 						legacy::split_edge* const legacy_edge = new legacy::split_edge(points[edge_points[edge]]);
 						legacy_edge->selection_weight = edge_selection[edge];

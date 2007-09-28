@@ -63,25 +63,25 @@ public:
 		const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 		const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 
-		const size_t face_begin = 0;
-		const size_t face_end = face_begin + face_first_loops.size();
+		const uint_t face_begin = 0;
+		const uint_t face_end = face_begin + face_first_loops.size();
 
-		for(size_t face = face_begin; face != face_end; ++face)
+		for(uint_t face = face_begin; face != face_end; ++face)
 		{
 			sgiTessBeginPolygon(tessellator, this);
 
-			const size_t loop_begin = face_first_loops[face];
-			const size_t loop_end = loop_begin + face_loop_counts[face];
+			const uint_t loop_begin = face_first_loops[face];
+			const uint_t loop_end = loop_begin + face_loop_counts[face];
 
-			for(size_t loop = loop_begin; loop != loop_end; ++loop)
+			for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 			{
 				sgiTessBeginContour(tessellator);
 
-				const size_t first_edge = loop_first_edges[loop];
+				const uint_t first_edge = loop_first_edges[loop];
 
-				for(size_t edge = first_edge; ; )
+				for(uint_t edge = first_edge; ; )
 				{
-					sgiTessVertex(tessellator, const_cast<double*>(points[edge_points[edge]].n), const_cast<void*>(reinterpret_cast<void*>(edge_points[edge])));
+					sgiTessVertex(tessellator, const_cast<double_t*>(points[edge_points[edge]].n), const_cast<void*>(reinterpret_cast<void*>(edge_points[edge])));
 
 					edge = clockwise_edges[edge];
 					if(edge == first_edge)
@@ -107,26 +107,26 @@ public:
 	{
 		const k3d::point3 coordinates(Coords[0], Coords[1], Coords[2]);
 
-		size_t vertices[4];
-		vertices[0] = reinterpret_cast<size_t>(VertexData[0]);
-		vertices[1] = reinterpret_cast<size_t>(VertexData[1]);
-		vertices[2] = reinterpret_cast<size_t>(VertexData[2]);
-		vertices[3] = reinterpret_cast<size_t>(VertexData[3]);
+		uint_t vertices[4];
+		vertices[0] = reinterpret_cast<uint_t>(VertexData[0]);
+		vertices[1] = reinterpret_cast<uint_t>(VertexData[1]);
+		vertices[2] = reinterpret_cast<uint_t>(VertexData[2]);
+		vertices[3] = reinterpret_cast<uint_t>(VertexData[3]);
 
-		double weights[4];
+		double_t weights[4];
 		weights[0] = Weight[0];
 		weights[1] = Weight[1];
 		weights[2] = Weight[2];
 		weights[3] = Weight[3];
 
-		size_t new_vertex;
+		uint_t new_vertex;
 
 		owner.add_vertex(coordinates, vertices, weights, new_vertex);
 	}
 
 	void vertex_callback(void* VertexData)
 	{
-		vertices[current_vertex] = reinterpret_cast<size_t>(VertexData);
+		vertices[current_vertex] = reinterpret_cast<uint_t>(VertexData);
 		current_vertex = (current_vertex + 1) % 3;
 
 		if(0 == current_vertex)
@@ -182,8 +182,8 @@ public:
 	triangulator& owner;
 	SGItesselator* const tessellator;
 
-	size_t current_vertex;
-	size_t vertices[3];
+	uint_t current_vertex;
+	uint_t vertices[3];
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -204,21 +204,21 @@ void triangulator::process(const mesh& Mesh)
 	m_implementation->process(Mesh);
 }
 
-void triangulator::add_vertex(const point3& Coordinates, size_t Vertices[4], double Weights[4], size_t& NewVertex)
+void triangulator::add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex)
 {
 	on_add_vertex(Coordinates, Vertices, Weights, NewVertex);
 }
 
-void triangulator::add_triangle(const size_t Point1, const size_t Point2, const size_t Point3)
+void triangulator::add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3)
 {
 	on_add_triangle(Point1, Point2, Point3);
 }
 
-void triangulator::on_add_vertex(const point3& Coordinates, size_t Vertices[4], double Weights[4], size_t& NewVertex)
+void triangulator::on_add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex)
 {
 }
 
-void triangulator::on_add_triangle(const size_t Point1, const size_t Point2, const size_t Point3)
+void triangulator::on_add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3)
 {
 }
 

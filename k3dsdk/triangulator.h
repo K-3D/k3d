@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <cstddef>
+#include "types.h"
 
 namespace k3d
 {
@@ -37,11 +37,11 @@ public:
 	void process(const mesh& Mesh);
 
 private:
-	void add_vertex(const point3& Coordinates, size_t Vertices[4], double Weights[4], size_t& NewVertex);
-	void add_triangle(const size_t Point1, const size_t Point2, const size_t Point3);
+	void add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex);
+	void add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3);
 
-	virtual void on_add_vertex(const point3& Coordinates, size_t Vertices[4], double Weights[4], size_t& NewVertex);
-	virtual void on_add_triangle(const size_t Point1, const size_t Point2, const size_t Point3);
+	virtual void on_add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex);
+	virtual void on_add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3);
 
 	friend class implementation;
 	class implementation;
