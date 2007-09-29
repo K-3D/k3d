@@ -2,286 +2,265 @@ PROJECT(k3d-tests)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/testing.py ${CMAKE_CURRENT_BINARY_DIR}/testing.py)
 
-SET(K3D_NGUI_BINARY ${k3d_BINARY_DIR}/lib/k3d/uiplugins/k3d-ngui.module)
-SET(K3D_NUI_BINARY ${k3d_BINARY_DIR}/lib/k3d/uiplugins/k3d-nui.module)
-
 MACRO(K3D_ADD_TEST TEST_NAME)
-	ADD_TEST(${TEST_NAME}
-		${k3d_BINARY_DIR}/bin/k3d
-		--log-level=debug
-		--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
-		--share=${k3d_SOURCE_DIR}/share
-		--ui=${K3D_NUI_BINARY}
-		${ARGN}
-		)
+	
+	SET(REQUIREMENTS_MET 1)
+	SET(USER_INTERFACE --ui=${k3d_BINARY_DIR}/lib/k3d/uiplugins/k3d-nui.module)
+	SET(WILL_FAIL 0)
+
+	SET(REQUIRES_KEYWORD 0)
+	SET(TUTORIAL_KEYWORD 0)
+
+	FOREACH(ARGUMENT ${ARGN})
+		SET(KEYWORD 0)
+
+		IF(ARGUMENT STREQUAL "NGUI")
+			IF(NOT K3D_BUILD_NGUI_MODULES)
+				MESSAGE(STATUS "Test \"${TEST_NAME}\" skipped by configuration: K3D_BUILD_NGUI_MODULES")
+				SET(REQUIREMENTS_MET 0)
+			ENDIF(NOT K3D_BUILD_NGUI_MODULES)
+			SET(USER_INTERFACE --ui=${k3d_BINARY_DIR}/lib/k3d/uiplugins/k3d-ngui.module --batch --no-custom-layouts --no-splash)
+			SET(KEYWORD 1)
+		ENDIF(ARGUMENT STREQUAL "NGUI")
+
+		IF(ARGUMENT STREQUAL "SCRIPT")
+			SET(SCRIPT_NAME ${TEST_NAME})
+			SET(SCRIPT "--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}")
+			SET(KEYWORD 1)
+		ENDIF(ARGUMENT STREQUAL "SCRIPT")
+
+		IF(ARGUMENT STREQUAL "K3DSCRIPT")
+			IF(NOT K3D_BUILD_K3DSCRIPT_MODULE)
+				MESSAGE(STATUS "Test \"${TEST_NAME}\" skipped by configuration: K3D_BUILD_K3DSCRIPT_MODULE")
+				SET(REQUIREMENTS_MET 0)
+			ENDIF(NOT K3D_BUILD_K3DSCRIPT_MODULE)
+			SET(SCRIPT_NAME ${TEST_NAME})
+			SET(SCRIPT "--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}")
+			SET(KEYWORD 1)
+		ENDIF(ARGUMENT STREQUAL "K3DSCRIPT")
+
+		IF(ARGUMENT STREQUAL "PYTHON")
+			IF(NOT K3D_BUILD_PYTHON_MODULES)
+				MESSAGE(STATUS "Test \"${TEST_NAME}\" skipped by configuration: K3D_BUILD_PYTHON_MODULES")
+				SET(REQUIREMENTS_MET 0)
+			ENDIF(NOT K3D_BUILD_PYTHON_MODULES)
+			SET(SCRIPT_NAME ${TEST_NAME})
+			SET(SCRIPT "--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}")
+			SET(PYTHONPATH --setenv "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}")
+			SET(KEYWORD 1)
+		ENDIF(ARGUMENT STREQUAL "PYTHON")
+
+		IF(ARGUMENT STREQUAL "XFAIL")
+			SET(WILL_FAIL 1)
+			SET(KEYWORD 1)
+		ENDIF(ARGUMENT STREQUAL "XFAIL")
+
+		IF(ARGUMENT STREQUAL "REQUIRES")
+			SET(REQUIRES_KEYWORD 1)
+			SET(KEYWORD 1)
+		ENDIF(ARGUMENT STREQUAL "REQUIRES")
+
+		IF(ARGUMENT STREQUAL "TUTORIAL")
+			SET(TUTORIAL_KEYWORD 1)
+			SET(KEYWORD 1)
+		ENDIF(ARGUMENT STREQUAL "TUTORIAL")
+
+		IF(NOT KEYWORD)
+			IF(REQUIRES_KEYWORD)
+				SET(REQUIRES_KEYWORD 0)
+				IF(NOT ${ARGUMENT})
+					MESSAGE(STATUS "Test \"${TEST_NAME}\" skipped by configuration: ${ARGUMENT}")
+					SET(REQUIREMENTS_MET 0)
+				ENDIF(NOT ${ARGUMENT})
+			ENDIF(REQUIRES_KEYWORD)
+
+			IF(TUTORIAL_KEYWORD)
+				SET(TUTORIAL_KEYWORD 0)
+				SET(SCRIPT "--script=${k3d_SOURCE_DIR}/share/tutorials/${ARGUMENT}")
+			ENDIF(TUTORIAL_KEYWORD)
+		ENDIF(NOT KEYWORD)
+	ENDFOREACH(ARGUMENT)
+
+	IF(REQUIREMENTS_MET)
+		IF(SCRIPT_NAME)
+			CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME})
+		ENDIF(SCRIPT_NAME)
+
+		ADD_TEST(${TEST_NAME}
+			${k3d_BINARY_DIR}/bin/k3d
+			--log-level=debug
+			--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
+			--share=${k3d_SOURCE_DIR}/share
+			${USER_INTERFACE}
+			${SCRIPT}
+			${PYTHONPATH}
+			--exit
+			)
+
+		IF(WILL_FAIL)
+			SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES WILL_FAIL TRUE)
+		ENDIF(WILL_FAIL)
+	ENDIF(REQUIREMENTS_MET)
 ENDMACRO(K3D_ADD_TEST)
 
-MACRO(K3D_ADD_SCRIPTED_TEST SCRIPT_NAME)
-	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME})
-	ADD_TEST(${SCRIPT_NAME}
-		${k3d_BINARY_DIR}/bin/k3d
-		--log-level=debug
-		--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
-		--share=${k3d_SOURCE_DIR}/share
-		--ui=${K3D_NUI_BINARY}
-		--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}
-		${ARGN}
-		)
-ENDMACRO(K3D_ADD_SCRIPTED_TEST)
+K3D_ADD_TEST(test.startup)
 
-MACRO(K3D_ADD_PYTHON_TEST SCRIPT_NAME)
-	IF(K3D_BUILD_PYTHON_MODULES)
-		IF(K3D_TEST_VBO)
-			CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME})
-			ADD_TEST(${SCRIPT_NAME}
-				${k3d_BINARY_DIR}/bin/k3d
-				--log-level=debug
-				--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
-				--share=${k3d_SOURCE_DIR}/share
-				--ui=${K3D_NUI_BINARY}
-				--batch
-				--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}
-				--setenv "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"
-				--setenv "USE_VBO=True"
-				${ARGN}
-				)
-		ELSE(K3D_TEST_VBO)
-			CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME})
-			ADD_TEST(${SCRIPT_NAME}
-				${k3d_BINARY_DIR}/bin/k3d
-				--log-level=debug
-				--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
-				--share=${k3d_SOURCE_DIR}/share
-				--ui=${K3D_NUI_BINARY}
-				--batch
-				--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}
-				--setenv "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}"
-				${ARGN}
-				)
-		ENDIF(K3D_TEST_VBO)
-	ENDIF(K3D_BUILD_PYTHON_MODULES)
-ENDMACRO(K3D_ADD_PYTHON_TEST)
+K3D_ADD_TEST(test.script.detect.lang.null SCRIPT XFAIL)
+K3D_ADD_TEST(test.script.detect.lang.k3dscript K3DSCRIPT)
+K3D_ADD_TEST(test.script.detect.lang.python.py PYTHON)
+K3D_ADD_TEST(test.script.failure.lang.k3dscript K3DSCRIPT XFAIL)
+K3D_ADD_TEST(test.script.failure.lang.python.py PYTHON XFAIL)
+K3D_ADD_TEST(test.script.failure.lang.python.exception.py PYTHON XFAIL)
 
-MACRO(K3D_ADD_SCRIPTED_NGUI_TEST SCRIPT_NAME)
-	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME})
-	ADD_TEST(${SCRIPT_NAME}
-		${k3d_BINARY_DIR}/bin/k3d
-		--log-level=debug
-		--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
-		--share=${k3d_SOURCE_DIR}/share
-		--ui=${K3D_NGUI_BINARY}
-		--batch
-		--no-custom-layouts
-		--no-splash
-		--script=${CMAKE_CURRENT_BINARY_DIR}/${SCRIPT_NAME}
-		${ARGN}
-		--exit
-		)
-ENDMACRO(K3D_ADD_SCRIPTED_NGUI_TEST)
+K3D_ADD_TEST(test.dart.measurements.py PYTHON)
 
-MACRO(K3D_ADD_NGUI_TUTORIAL_TEST TUTORIAL_NAME TUTORIAL_SCRIPT)
-	ADD_TEST(${TUTORIAL_NAME}
-		${k3d_BINARY_DIR}/bin/k3d
-		--log-level=debug
-		--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
-		--share=${k3d_SOURCE_DIR}/share
-		--ui=${K3D_NGUI_BINARY}
-		--batch
-		--no-custom-layouts
-		--no-splash
-		--script=${k3d_SOURCE_DIR}/share/tutorials/${TUTORIAL_SCRIPT}
-		${ARGN}
-		--exit
-		)
-ENDMACRO(K3D_ADD_NGUI_TUTORIAL_TEST)
+K3D_ADD_TEST(document.create.py PYTHON)
+K3D_ADD_TEST(document.stress.high_node_count.py PYTHON)
+K3D_ADD_TEST(document.stress.all_node_types.py PYTHON)
+#K3D_ADD_TEST(document.stress.read_all_properties.py PYTHON)
 
-K3D_ADD_TEST(test.startup --exit)
+K3D_ADD_TEST(bitmap.source.JPEGBitmapReader.py PYTHON REQUIRES K3D_BUILD_JPEG_IO_MODULE)
+K3D_ADD_TEST(bitmap.source.PNGBitmapReader.py PYTHON REQUIRES K3D_BUILD_PNG_IO_MODULE)
+K3D_ADD_TEST(bitmap.source.TIFFBitmapReader.py PYTHON REQUIRES K3D_BUILD_TIFF_IO_MODULE)
 
-K3D_ADD_PYTHON_TEST(test.dart.measurements.py)
+K3D_ADD_TEST(bitmap.source.BitmapReader.bmp.py PYTHON REQUIRES K3D_BUILD_IMAGEMAGICK_IO_MODULE REQUIRES K3D_BUILD_BITMAP_MODULE)
+K3D_ADD_TEST(bitmap.source.BitmapReader.jpeg.py PYTHON REQUIRES K3D_BUILD_JPEG_IO_MODULE REQUIRES K3D_BUILD_BITMAP_MODULE)
+K3D_ADD_TEST(bitmap.source.BitmapReader.png.py PYTHON REQUIRES K3D_BUILD_PNG_IO_MODULE REQUIRES K3D_BUILD_BITMAP_MODULE)
+K3D_ADD_TEST(bitmap.source.BitmapReader.sun.py PYTHON REQUIRES K3D_BUILD_IMAGEMAGICK_IO_MODULE REQUIRES K3D_BUILD_BITMAP_MODULE)
+K3D_ADD_TEST(bitmap.source.BitmapReader.tiff.py PYTHON REQUIRES K3D_BUILD_TIFF_IO_MODULE REQUIRES K3D_BUILD_BITMAP_MODULE)
 
-K3D_ADD_SCRIPTED_TEST(test.script.detect.lang.null)
-SET_TESTS_PROPERTIES(test.script.detect.lang.null PROPERTIES WILL_FAIL TRUE)
+K3D_ADD_TEST(test.mesh.solid.py PYTHON)
+K3D_ADD_TEST(test.mesh.solid.failure.py PYTHON XFAIL)
 
-K3D_ADD_SCRIPTED_TEST(test.script.detect.lang.k3dscript)
+K3D_ADD_TEST(mesh.source.GTSMeshReader.cube.py PYTHON REQUIRES K3D_BUILD_GTS_IO_MODULE)
+K3D_ADD_TEST(mesh.source.GTSMeshReader.gz.cube.py PYTHON REQUIRES K3D_BUILD_GTS_IO_MODULE)
+K3D_ADD_TEST(mesh.source.KnotCurve.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.LSystemParser.py PYTHON REQUIRES K3D_BUILD_LSYSTEM_MODULE)
+K3D_ADD_TEST(mesh.source.LissajousCurve.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.Newell.teacup.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.Newell.teapot.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.Newell.teaspoon.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.NurbsCircle.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
+K3D_ADD_TEST(mesh.source.NurbsCone.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
+K3D_ADD_TEST(mesh.source.NurbsCylinder.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
+K3D_ADD_TEST(mesh.source.NurbsDisk.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
+K3D_ADD_TEST(mesh.source.NurbsGrid.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
+K3D_ADD_TEST(mesh.source.NurbsHyperboloid.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
+K3D_ADD_TEST(mesh.source.NurbsParaboloid.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
+K3D_ADD_TEST(mesh.source.NurbsPolygon.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
+K3D_ADD_TEST(mesh.source.NurbsSphere.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
+K3D_ADD_TEST(mesh.source.NurbsTorus.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
+K3D_ADD_TEST(mesh.source.OBJMeshReader.nurbs.py PYTHON REQUIRES K3D_BUILD_OBJ_IO_MODULE)
+K3D_ADD_TEST(mesh.source.OBJMeshReader.polyhedron.py PYTHON REQUIRES K3D_BUILD_OBJ_IO_MODULE)
+K3D_ADD_TEST(mesh.source.PolyCone.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.PolyCube.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.PolyCushion.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.PolyCylinder.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.PolyDisk.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.PolyGrid.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.PolyIcosahedron.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.PolySphere.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.PolyText.py PYTHON REQUIRES K3D_BUILD_FREETYPE2_MODULE)
+K3D_ADD_TEST(mesh.source.PolyTorus.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.Polyhedron.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.ScalarExpression.py PYTHON REQUIRES K3D_BUILD_SCALAR_MODULE)
+K3D_ADD_TEST(mesh.source.SphereEversion.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.source.SurfacePlot.py PYTHON REQUIRES K3D_BUILD_PLOT_MODULE)
 
-IF(K3D_BUILD_PYTHON_MODULES)
-	K3D_ADD_SCRIPTED_TEST(test.script.detect.lang.python.py)
-ENDIF(K3D_BUILD_PYTHON_MODULES)
+K3D_ADD_TEST(mesh.diff.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.diff.bevel_points.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.diff.connect_vertices.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.diff.dissolve.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.diff.extrude_faces.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.diff.subdivide_edges.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
 
-K3D_ADD_SCRIPTED_TEST(test.script.failure.lang.k3dscript)
-SET_TESTS_PROPERTIES(test.script.failure.lang.k3dscript PROPERTIES WILL_FAIL TRUE)
+K3D_ADD_TEST(mesh.conversion.point_group.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.conversion.curve.linear.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.conversion.curve.cubic.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.conversion.curve.nurbs.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.conversion.patch.bicubic.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.conversion.patch.bilinear.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.conversion.patch.nurbs.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
+K3D_ADD_TEST(mesh.conversion.polyhedron.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
 
-IF(K3D_BUILD_PYTHON_MODULES)
-	K3D_ADD_SCRIPTED_TEST(test.script.failure.lang.python.py)
-	SET_TESTS_PROPERTIES(test.script.failure.lang.python.py PROPERTIES WILL_FAIL TRUE)
+K3D_ADD_TEST(mesh.selection.null.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.selection.none.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.selection.all.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.selection.points.py PYTHON REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
 
-	K3D_ADD_SCRIPTED_TEST(test.script.failure.lang.python.exception.py)
-	SET_TESTS_PROPERTIES(test.script.failure.lang.python.exception.py PROPERTIES WILL_FAIL TRUE)
-ENDIF(K3D_BUILD_PYTHON_MODULES)
+K3D_ADD_TEST(mesh.metrics.GTSMeshArea.PolyCube.py PYTHON REQUIRES K3D_BUILD_GTS_MODULE REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.metrics.GTSMeshVolume.PolyCube.py PYTHON REQUIRES K3D_BUILD_GTS_MODULE REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
 
-K3D_ADD_PYTHON_TEST(document.create.py)
-K3D_ADD_PYTHON_TEST(document.stress.high_node_count.py)
-K3D_ADD_PYTHON_TEST(document.stress.all_node_types.py)
-#K3D_ADD_PYTHON_TEST(document.stress.read_all_properties.py)
+K3D_ADD_TEST(mesh.modifier.BendPoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.modifier.BevelFaces.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE REQUIRES K3D_BUILD_PRIMITIVES_MODULE)
+K3D_ADD_TEST(mesh.modifier.BevelPoints.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.BulgePoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.CalculateNormals.py PYTHON REQUIRES K3D_BUILD_MESH_ATTRIBUTES_MODULE)
+K3D_ADD_TEST(mesh.modifier.CalculateNormals.2.py PYTHON REQUIRES K3D_BUILD_MESH_ATTRIBUTES_MODULE)
+K3D_ADD_TEST(mesh.modifier.CylindricalWavePoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.ExtrudeFaces.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.LinearPointNoise.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.LinearWavePoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.MergeMesh.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.MeshArray1D.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.MeshArray2D.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.MeshArray3D.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.PGPRemesh.py PYTHON REQUIRES K3D_BUILD_PGP_REMESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.PGPRemesh.high.py PYTHON REQUIRES K3D_BUILD_PGP_REMESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.PGPRemesh.ply.bunny.py PYTHON REQUIRES K3D_BUILD_PGP_REMESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.PGPRemesh.ply.torus.py PYTHON REQUIRES K3D_BUILD_PGP_REMESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.PGPRemesh.triang.py PYTHON REQUIRES K3D_BUILD_PGP_REMESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.PGPRemesh.bun_zipper_res4.py PYTHON REQUIRES K3D_BUILD_PGP_REMESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.RotatePoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.ScalePoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.ShearPoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.SmoothPoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.SphereizePoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.TaperPoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.TransformPoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.TranslatePoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.TriangulateFaces.PolyCube.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.TriangulateFaces.PolyGrid.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.TriangulateFaces.PolyGrid.selection.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.TriangulateFaces.self_intersection.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.TwistPoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
 
-K3D_ADD_PYTHON_TEST(bitmap.source.BitmapReader.jpeg.py)
-K3D_ADD_PYTHON_TEST(bitmap.source.BitmapReader.png.py)
-K3D_ADD_PYTHON_TEST(bitmap.source.BitmapReader.tiff.py)
+K3D_ADD_TEST(mesh.sink.K3DMeshWriter.py PYTHON REQUIRES K3D_BUILD_K3D_IO_MODULE)
+K3D_ADD_TEST(mesh.sink.OBJMeshWriter.py PYTHON REQUIRES K3D_BUILD_OBJ_IO_MODULE)
 
-IF(K3D_BUILD_IMAGEMAGICK_MODULE)
-	K3D_ADD_PYTHON_TEST(bitmap.source.BitmapReader.bmp.py)
-	K3D_ADD_PYTHON_TEST(bitmap.source.BitmapReader.sun.py)
-ENDIF(K3D_BUILD_IMAGEMAGICK_MODULE)
+K3D_ADD_TEST(offscreen.glx.py PYTHON REQUIRES K3D_BUILD_GLX_MODULE)
+K3D_ADD_TEST(offscreen.wgl.py PYTHON REQUIRES K3D_BUILD_WGL_MODULE)
+K3D_ADD_TEST(offscreen.py PYTHON REQUIRES K3D_BUILD_OFFSCREEN_MODULE)
 
-K3D_ADD_PYTHON_TEST(bitmap.source.JPEGBitmapReader.py)
-K3D_ADD_PYTHON_TEST(bitmap.source.PNGBitmapReader.py)
-K3D_ADD_PYTHON_TEST(bitmap.source.TIFFBitmapReader.py)
+K3D_ADD_TEST(python.api.angle_axis.py PYTHON)
+K3D_ADD_TEST(python.api.get_dependency.py PYTHON)
+K3D_ADD_TEST(python.api.property.value.py PYTHON)
+K3D_ADD_TEST(python.api.node.selection.py PYTHON)
 
-K3D_ADD_PYTHON_TEST(test.mesh.solid.py)
-K3D_ADD_PYTHON_TEST(test.mesh.solid.failure.py)
-SET_TESTS_PROPERTIES(test.mesh.solid.failure.py PROPERTIES WILL_FAIL TRUE)
+K3D_ADD_TEST(share.scripts.py PYTHON)
 
-K3D_ADD_PYTHON_TEST(mesh.source.GTSMeshReader.cube.py)
-K3D_ADD_PYTHON_TEST(mesh.source.GTSMeshReader.gz.cube.py)
-K3D_ADD_PYTHON_TEST(mesh.source.KnotCurve.py)
-K3D_ADD_PYTHON_TEST(mesh.source.LSystemParser.py)
-K3D_ADD_PYTHON_TEST(mesh.source.LissajousCurve.py)
-K3D_ADD_PYTHON_TEST(mesh.source.Newell.teacup.py)
-K3D_ADD_PYTHON_TEST(mesh.source.Newell.teapot.py)
-K3D_ADD_PYTHON_TEST(mesh.source.Newell.teaspoon.py)
-K3D_ADD_PYTHON_TEST(mesh.source.NurbsCircle.py)
-K3D_ADD_PYTHON_TEST(mesh.source.NurbsCone.py)
-K3D_ADD_PYTHON_TEST(mesh.source.NurbsCylinder.py)
-K3D_ADD_PYTHON_TEST(mesh.source.NurbsDisk.py)
-K3D_ADD_PYTHON_TEST(mesh.source.NurbsGrid.py)
-K3D_ADD_PYTHON_TEST(mesh.source.NurbsHyperboloid.py)
-K3D_ADD_PYTHON_TEST(mesh.source.NurbsParaboloid.py)
-K3D_ADD_PYTHON_TEST(mesh.source.NurbsPolygon.py)
-K3D_ADD_PYTHON_TEST(mesh.source.NurbsSphere.py)
-K3D_ADD_PYTHON_TEST(mesh.source.NurbsTorus.py)
-K3D_ADD_PYTHON_TEST(mesh.source.OBJMeshReader.nurbs.py)
-K3D_ADD_PYTHON_TEST(mesh.source.OBJMeshReader.polyhedron.py)
-K3D_ADD_PYTHON_TEST(mesh.source.PolyCone.py)
-K3D_ADD_PYTHON_TEST(mesh.source.PolyCube.py)
-K3D_ADD_PYTHON_TEST(mesh.source.PolyCushion.py)
-K3D_ADD_PYTHON_TEST(mesh.source.PolyCylinder.py)
-K3D_ADD_PYTHON_TEST(mesh.source.PolyDisk.py)
-K3D_ADD_PYTHON_TEST(mesh.source.PolyGrid.py)
-K3D_ADD_PYTHON_TEST(mesh.source.PolyIcosahedron.py)
-K3D_ADD_PYTHON_TEST(mesh.source.PolySphere.py)
-K3D_ADD_PYTHON_TEST(mesh.source.PolyText.py)
-K3D_ADD_PYTHON_TEST(mesh.source.PolyTorus.py)
-K3D_ADD_PYTHON_TEST(mesh.source.Polyhedron.py)
-K3D_ADD_PYTHON_TEST(mesh.source.ScalarExpression.py)
-K3D_ADD_PYTHON_TEST(mesh.source.SphereEversion.py)
-K3D_ADD_PYTHON_TEST(mesh.source.SurfacePlot.py)
+K3D_ADD_TEST(ngui.startup K3DSCRIPT NGUI)
+K3D_ADD_TEST(ngui.menu.activate.001 K3DSCRIPT NGUI)
+K3D_ADD_TEST(ngui.menu.activate.002 K3DSCRIPT NGUI)
+K3D_ADD_TEST(ngui.add_viewport K3DSCRIPT NGUI)
+K3D_ADD_TEST(ngui.assign_hotkeys.py PYTHON NGUI)
 
-K3D_ADD_PYTHON_TEST(mesh.diff.py)
-K3D_ADD_PYTHON_TEST(mesh.diff.bevel_points.py)
-K3D_ADD_PYTHON_TEST(mesh.diff.connect_vertices.py)
-K3D_ADD_PYTHON_TEST(mesh.diff.dissolve.py)
-K3D_ADD_PYTHON_TEST(mesh.diff.extrude_faces.py)
-K3D_ADD_PYTHON_TEST(mesh.diff.subdivide_edges.py)
+K3D_ADD_TEST(ngui.bitmap.modifier.BitmapAdd.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.bitmap.modifier.BitmapColorMonochrome.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.bitmap.modifier.BitmapGamma.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.bitmap.modifier.BitmapMatteColorDiff.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.bitmap.modifier.BitmapMultiply.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.bitmap.modifier.BitmapSubtract.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.bitmap.modifier.BitmapThreshold.py PYTHON NGUI)
 
-K3D_ADD_PYTHON_TEST(mesh.conversion.point_group.py)
-K3D_ADD_PYTHON_TEST(mesh.conversion.curve.linear.py)
-K3D_ADD_PYTHON_TEST(mesh.conversion.curve.cubic.py)
-K3D_ADD_PYTHON_TEST(mesh.conversion.curve.nurbs.py)
-K3D_ADD_PYTHON_TEST(mesh.conversion.patch.bicubic.py)
-K3D_ADD_PYTHON_TEST(mesh.conversion.patch.bilinear.py)
-K3D_ADD_PYTHON_TEST(mesh.conversion.patch.nurbs.py)
-K3D_ADD_PYTHON_TEST(mesh.conversion.polyhedron.py)
+K3D_ADD_TEST(ngui.mesh.modifier.BevelPoints.undo.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.shaders.undo_selection.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.tools.unparent K3DSCRIPT NGUI)
+K3D_ADD_TEST(ngui.tools.undo_delete_rotate.py PYTHON NGUI)
 
-K3D_ADD_PYTHON_TEST(mesh.selection.null.py)
-K3D_ADD_PYTHON_TEST(mesh.selection.none.py)
-K3D_ADD_PYTHON_TEST(mesh.selection.all.py)
-K3D_ADD_PYTHON_TEST(mesh.selection.points.py)
-
-IF(K3D_BUILD_GTS_MODULE)
-	K3D_ADD_PYTHON_TEST(mesh.metrics.GTSMeshArea.PolyCube.py)
-	K3D_ADD_PYTHON_TEST(mesh.metrics.GTSMeshVolume.PolyCube.py)
-ENDIF(K3D_BUILD_GTS_MODULE)
-
-K3D_ADD_PYTHON_TEST(mesh.modifier.BendPoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.BevelFaces.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.BevelPoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.BulgePoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.CalculateNormals.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.CalculateNormals.2.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.CylindricalWavePoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.ExtrudeFaces.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.LinearPointNoise.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.LinearWavePoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.MergeMesh.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.MeshArray1D.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.MeshArray2D.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.MeshArray3D.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.PGPRemesh.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.PGPRemesh.high.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.PGPRemesh.ply.bunny.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.PGPRemesh.ply.torus.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.PGPRemesh.triang.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.PGPRemesh.bun_zipper_res4.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.RotatePoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.ScalePoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.ShearPoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.SmoothPoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.SphereizePoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.TaperPoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.TransformPoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.TranslatePoints.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.TriangulateFaces.PolyCube.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.TriangulateFaces.PolyGrid.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.TriangulateFaces.PolyGrid.selection.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.TriangulateFaces.self_intersection.py)
-K3D_ADD_PYTHON_TEST(mesh.modifier.TwistPoints.py)
-
-K3D_ADD_PYTHON_TEST(mesh.sink.K3DMeshWriter.py)
-K3D_ADD_PYTHON_TEST(mesh.sink.OBJMeshWriter.py)
-
-IF(K3D_BUILD_GLX_MODULE)
-	K3D_ADD_PYTHON_TEST(offscreen.glx.py)
-ENDIF(K3D_BUILD_GLX_MODULE)
-
-IF(K3D_BUILD_WGL_MODULE)
-	K3D_ADD_PYTHON_TEST(offscreen.wgl.py)
-ENDIF(K3D_BUILD_WGL_MODULE)
-
-IF(K3D_BUILD_OFFSCREEN_MODULE)
-	K3D_ADD_PYTHON_TEST(offscreen.py)
-ENDIF(K3D_BUILD_OFFSCREEN_MODULE)
-
-K3D_ADD_PYTHON_TEST(python.api.angle_axis.py)
-K3D_ADD_PYTHON_TEST(python.api.get_dependency.py)
-K3D_ADD_PYTHON_TEST(python.api.property.value.py)
-K3D_ADD_PYTHON_TEST(python.api.node.selection.py)
-
-K3D_ADD_PYTHON_TEST(share.scripts.py)
-
-IF(K3D_BUILD_NGUI_MODULES)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.startup)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.menu.activate.001)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.menu.activate.002)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.add_viewport)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.assign_hotkeys.py)
-
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.bitmap.modifier.BitmapAdd.py)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.bitmap.modifier.BitmapColorMonochrome.py)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.bitmap.modifier.BitmapGamma.py)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.bitmap.modifier.BitmapMatteColorDiff.py)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.bitmap.modifier.BitmapMultiply.py)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.bitmap.modifier.BitmapSubtract.py)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.bitmap.modifier.BitmapThreshold.py)
-	
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.mesh.modifier.BevelPoints.undo.py)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.shaders.undo_selection.py)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.tools.unparent)
-	K3D_ADD_SCRIPTED_NGUI_TEST(ngui.tools.undo_delete_rotate.py)
-
-	K3D_ADD_NGUI_TUTORIAL_TEST(ngui.tutorials.getting_started getting_started.k3dscript)
-	K3D_ADD_NGUI_TUTORIAL_TEST(ngui.tutorials.panel_basics panel_basics.k3dscript)
-	K3D_ADD_NGUI_TUTORIAL_TEST(ngui.tutorials.navigation navigation.k3dscript)
-	K3D_ADD_NGUI_TUTORIAL_TEST(ngui.tutorials.basic_selection basic_selection.k3dscript)
-	K3D_ADD_NGUI_TUTORIAL_TEST(ngui.tutorials.mug mug.k3dscript)
-ENDIF(K3D_BUILD_NGUI_MODULES)
+K3D_ADD_TEST(ngui.tutorials.getting_started NGUI TUTORIAL getting_started.k3dscript)
+K3D_ADD_TEST(ngui.tutorials.panel_basics NGUI TUTORIAL panel_basics.k3dscript)
+K3D_ADD_TEST(ngui.tutorials.navigation NGUI TUTORIAL navigation.k3dscript)
+K3D_ADD_TEST(ngui.tutorials.basic_selection NGUI TUTORIAL basic_selection.k3dscript)
+K3D_ADD_TEST(ngui.tutorials.mug NGUI TUTORIAL mug.k3dscript)
 
