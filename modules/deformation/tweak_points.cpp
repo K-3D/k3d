@@ -38,7 +38,7 @@ class tweak_points :
 	public k3d::mesh_simple_deformation_modifier
 {
 	typedef k3d::mesh_simple_deformation_modifier base;
-	typedef std::vector<k3d::point3> tweaks_t;
+	typedef k3d::typed_array<k3d::point3> tweaks_t;
 
 public:
 	tweak_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -52,9 +52,9 @@ public:
 	{
 		const tweaks_t tweaks = m_tweaks.pipeline_value();
 
-		const size_t point_begin = 0;
-		const size_t point_end = point_begin + std::min(tweaks.size(), OutputPoints.size());
-		for(size_t point = point_begin; point != point_end; ++point)
+		const k3d::uint_t point_begin = 0;
+		const k3d::uint_t point_end = point_begin + std::min(tweaks.size(), OutputPoints.size());
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 			OutputPoints[point] = InputPoints[point] + tweaks[point];
 	}
 

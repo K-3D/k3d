@@ -263,12 +263,6 @@ const std::string demangle(const std::string& Type)
 
 } // namespace detail
 
-const bool is_registered(const std::type_info& Info)
-{
-	detail::initialize_types();
-	return detail::type_to_name_map.count(detail::type_info(Info)) ? true : false;
-}
-
 const std::string type_string(const std::type_info& Info)
 {
 	detail::initialize_types();

@@ -748,7 +748,7 @@ private:
 	matrices_t m_B;
 };
 
-typedef std::vector<size_t> indices_t;
+typedef std::vector<uint_t> indices_t;
 
 /// Retains the first level of SDS and the actual input mesh.
 template<typename mesh_type> class cache_input

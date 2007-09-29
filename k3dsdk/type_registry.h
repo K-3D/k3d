@@ -31,15 +31,6 @@
 namespace k3d
 {
 
-/// Returns true iff the given type is a registered type
-const bool is_registered(const std::type_info& Info);
-/// Returns true iff the given type is a registered type
-template<typename T>
-const bool is_registered()
-{
-	return is_registered(typeid(T));
-}
-
 /// Returns the string representation for a registered type, or empty string
 const std::string type_string(const std::type_info& Info);
 /// Returns the string representation for a registered type, or emtpy string
