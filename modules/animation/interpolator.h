@@ -66,7 +66,7 @@ public:
 		time_t t_lower, t_upper;
 		value_t v_lower, v_upper;
 		typename keyframes_t::const_iterator found_key = Keyframes.lower_bound(Time);
-		if (found_key == Keyframes.begin() && found_key->first == Time)
+		if (found_key == Keyframes.begin() && found_key->first == Time && !Keyframes.empty())
 			return found_key->second; // exact match of first key
 		if (found_key == Keyframes.begin() || found_key == Keyframes.end())
 			throw insufficient_data_exception(); // no key before or after Time

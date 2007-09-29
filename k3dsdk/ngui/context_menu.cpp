@@ -43,11 +43,13 @@
 #include "widget_manip.h"
 
 #include <k3dsdk/classes.h>
+#include <k3dsdk/create_plugins.h>
 #include <k3dsdk/dependencies.h>
 #include <k3dsdk/fstream.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/ianimation_render_engine.h>
 #include <k3dsdk/icamera.h>
+#include <k3dsdk/ikeyframer.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>
@@ -69,6 +71,7 @@
 #include <k3dsdk/property.h>
 #include <k3dsdk/serialization.h>
 #include <k3dsdk/state_change_set.h>
+#include <k3dsdk/time_source.h>
 #include <k3dsdk/utility_gl.h>
 
 namespace libk3dngui
@@ -173,6 +176,10 @@ public:
 		m_duplicate_meshes = new menu_item::control(Parent, "duplicate_meshes", _("Duplicate")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_duplicate));
 		items().push_back(*Gtk::manage(m_duplicate_meshes));
+		
+		m_animate_transformation = new menu_item::control(Parent, "animate_transformation", _("Animate Transtormation")) <<
+			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_animate_transformation));
+		items().push_back(*Gtk::manage(m_animate_transformation));
 
 		// Mesh modifiers menu
 		const factories_t& mesh_modifier_factories = mesh_modifiers();
@@ -495,6 +502,79 @@ private:
 	{
 		duplicate_selected_nodes(m_document_state);
 	}
+	
+	/// Easy animation of transformation matrix
+	void on_animate_transformation()
+	{
+		const k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
+		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
+		{
+			k3d::inode* upstream_node = 0;
+			
+			// Check if the selected node can be transformed
+			k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(*node);
+			if (!downstream_sink)
+				continue;
+			k3d::iproperty& downstream_input = downstream_sink->transform_sink_input();
+			k3d::iproperty* upstream_output = (*node)->document().pipeline().dependency(downstream_input);
+	
+			// Check upstream object
+			if(upstream_output)
+				upstream_node = upstream_output->property_node();
+			
+			// Skip nodes that are animated already
+			if (dynamic_cast<k3d::ikeyframer*>(upstream_node))
+				continue;
+			
+			// Create the new track
+			if (k3d::inode* const track = k3d::create_plugin<k3d::inode>("AnimationTrackDoubleMatrix4", m_document_state.document(), (*node)->name() + " Track"))
+			{
+				// Create a default interpolator, if it didn't exist already
+				k3d::inode* interpolator;
+				const k3d::nodes_t nodes = k3d::find_nodes(m_document_state.document().nodes(), "Linear Transformation Interpolator");
+	      if (1 == nodes.size())
+	      {
+	      	interpolator = *nodes.begin();
+	      }
+	      else
+	      {
+	      	interpolator = k3d::create_plugin<k3d::inode>("InterpolatorDoubleMatrix4Linear", m_document_state.document(), "Linear Transformation Interpolator");
+	      }
+	       
+	      // Set the interpolator
+				k3d::property::set_internal_value(*track, "interpolator", interpolator);
+				
+				k3d::ipipeline::dependencies_t dependencies;
+				
+				k3d::iproperty* from = k3d::property::get(**node, "input_matrix");
+				k3d::iproperty* to = k3d::property::get(*track, "output_value");
+				if (from && to) // Connect the transformation matrix of the selected node to the output of the track
+					dependencies.insert(std::make_pair(from, to));
+				
+				k3d::iproperty* track_time = k3d::property::get(*track, "time_input");
+				k3d::iproperty* time = k3d::get_time(m_document_state.document());
+				if (track_time && time) // Connect the time property
+					dependencies.insert(std::make_pair(track_time, time));
+				
+				// We must save the dependencies before the nextstep
+				m_document_state.document().pipeline().set_dependencies(dependencies);
+				
+				// Create a keyframe at the first and last frame
+				k3d::iproperty* start_time = k3d::get_start_time(m_document_state.document());
+				k3d::iproperty* end_time = k3d::get_end_time(m_document_state.document());
+				if (time && start_time && end_time)
+				{
+					k3d::ikeyframer* keyframer = dynamic_cast<k3d::ikeyframer*>(track);
+					boost::any original_time = k3d::property::pipeline_value(*time);
+					k3d::property::set_internal_value(*time, k3d::property::pipeline_value(*start_time));
+					keyframer->keyframe();
+					k3d::property::set_internal_value(*time, k3d::property::pipeline_value(*end_time));
+					keyframer->keyframe();
+					k3d::property::set_internal_value(*time, original_time);
+				}
+			}
+		}
+	}
 
 	/// Modify selected meshes
 	void on_modify_meshes(k3d::iplugin_factory* Modifier)
@@ -569,6 +649,7 @@ private:
 	menu_item::control* m_delete_nodes;
 	menu_item::control* m_instantiate_meshes;
 	menu_item::control* m_duplicate_meshes;
+	menu_item::control* m_animate_transformation;
 	Gtk::Menu* m_mesh_modifiers;
 	Gtk::Menu* m_transform_modifiers;
 

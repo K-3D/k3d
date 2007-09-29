@@ -54,6 +54,7 @@
 #include <gtkmm/scrollbar.h>
 
 #include <gdkmm/colormap.h>
+#include <gdkmm/cursor.h>
 #include <gdkmm/window.h>
 
 #include <boost/assign/list_of.hpp>
@@ -137,6 +138,7 @@ protected:
   Gdk::Color m_red;
   Gdk::Color m_black;
   Gdk::Color m_green;
+  Gdk::Color m_white;
   
   int m_barleft;
   int m_bartop;
@@ -154,6 +156,8 @@ protected:
   bool m_timeline_click;
   std::string m_clicked_key;
   
+  Gdk::Cursor m_active_cursor;
+  
  private:
  	// helper functions
  	int to_w(double Time)
@@ -168,11 +172,22 @@ protected:
  	
  	void redraw();
  	
+ 	/// True if (x,y) is on the timeline
+ 	bool hit_timeline(double x, double y);
+ 	
  	typedef std::map<std::string, double> keys_t;
+ 	
+ 	/// True if a key was hit
+ 	keys_t::iterator hit_key(double x, double y);
+ 	
+ 	/// Set the cursor, based on the given position
+ 	void set_cursor(double x, double y);
+ 	
  	keys_t m_keys; 
 };
 
-timeline::timeline()
+timeline::timeline() :
+	m_active_cursor(Gdk::TCROSS)
 {
 	m_keyheight = 5;
 	
@@ -182,11 +197,13 @@ timeline::timeline()
   m_red = Gdk::Color("red");
   m_black = Gdk::Color("black");
   m_green = Gdk::Color("green");
+  m_white = Gdk::Color("white");
 
   colormap->alloc_color(m_blue);
   colormap->alloc_color(m_red);
   colormap->alloc_color(m_black);
   colormap->alloc_color(m_green);
+  colormap->alloc_color(m_white);
   
   m_timeline_click = false;
   m_clicked_key = "";
@@ -195,6 +212,7 @@ timeline::timeline()
   add_events(Gdk::BUTTON_PRESS_MASK);
   add_events(Gdk::BUTTON_MOTION_MASK);
   add_events(Gdk::BUTTON_RELEASE_MASK);
+  add_events(Gdk::POINTER_MOTION_MASK);
 }
 
 timeline::~timeline()
@@ -280,25 +298,19 @@ bool timeline::on_button_press_event(GdkEventButton* Event)
 	double x = Event->x;
 	double y = Event->y;
 	// If the click happened in the timebar, set the time
-	if (y >= m_bartop && y <= m_bartop + m_barheight)
+	if (hit_timeline(x, y))
 	{
-		if (x >= m_barleft && x <= m_barleft + m_barwidth)
-		{
-			double time = to_time(x);
-			m_time_changed_signal.emit(time);
-			m_timeline_click = true;
-		}
+		double time = to_time(x);
+		m_time_changed_signal.emit(time);
+		m_timeline_click = true;
 	}
-	else if (y >= m_bartop - m_keyheight && y <= m_bartop) // Check if a key was clicked
+	else
 	{
-		double d = m_bartop - y;
-		for (keys_t::iterator key = m_keys.begin(); key != m_keys.end(); ++key)
+		keys_t::iterator key = hit_key(x, y);
+		if (key != m_keys.end())
 		{
-			if (std::abs(x-(m_barleft + to_w(key->second))) <= d)
-			{
-				m_time_changed_signal.emit(key->second);
-				m_clicked_key = key->first;
-			}
+			m_time_changed_signal.emit(key->second);
+			m_clicked_key = key->first;
 		}
 	}	
 	return true;
@@ -308,6 +320,7 @@ bool timeline::on_button_release_event(GdkEventButton* Event)
 {
 	m_timeline_click = false;
 	m_clicked_key = "";
+	set_cursor(Event->x, Event->y);
 }
 
 bool timeline::on_motion_notify_event(GdkEventMotion* event)
@@ -331,6 +344,10 @@ bool timeline::on_motion_notify_event(GdkEventMotion* event)
 				m_time_changed_signal.emit(new_time);
 			}
 		}
+		else
+		{ // No click, but set cursor to indicate key and timeline clickability
+			set_cursor(event->x, event->y);
+		}
 	}
 	return true;
 }
@@ -350,6 +367,12 @@ void timeline::redraw()
 	window->draw_rectangle(m_gc, true, m_barleft, m_bartop, timewidth, m_barheight);
 	m_gc->set_foreground(m_blue);
 	window->draw_rectangle(m_gc, true, m_barleft+timewidth, m_bartop, m_barwidth-timewidth, m_barheight);
+	m_gc->set_foreground(m_black);
+	window->draw_line(m_gc, m_barleft-1, m_bartop, m_barleft-1, m_bartop+m_barheight-1);
+	window->draw_line(m_gc, m_barleft-1, m_bartop-1, m_barleft+m_barwidth, m_bartop-1);
+	m_gc->set_foreground(m_white);
+	window->draw_line(m_gc, m_barleft+m_barwidth, m_bartop, m_barleft+m_barwidth, m_bartop+m_barheight-1);
+	window->draw_line(m_gc, m_barleft-1, m_bartop+m_barheight, m_barleft+m_barwidth, m_bartop+m_barheight);
 	
 	// Show the keys
 	for (keys_t::iterator key = m_keys.begin(); key != m_keys.end(); ++key)
@@ -362,6 +385,47 @@ void timeline::redraw()
 		{
 			draw_key(key->second, m_green, m_green);
 		}
+	}
+}
+
+bool timeline::hit_timeline(double x, double y)
+{
+	if (y >= m_bartop && y <= m_bartop + m_barheight)
+	{
+		if (x >= m_barleft && x <= m_barleft + m_barwidth)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+timeline::keys_t::iterator timeline::hit_key(double x, double y)
+{
+	if (y >= m_bartop - m_keyheight && y <= m_bartop) // Check if a key was clicked
+	{
+		double d = m_bartop - y;
+		for (keys_t::iterator key = m_keys.begin(); key != m_keys.end(); ++key)
+		{
+			if (std::abs(x-(m_barleft + to_w(key->second))) <= d)
+			{
+				return key;
+			}
+		}
+	}
+	return m_keys.end();
+}
+
+void timeline::set_cursor(double x, double y)
+{
+	Glib::RefPtr<Gdk::Window> window = get_window();
+	if (hit_timeline(x, y) || hit_key(x, y) != m_keys.end())
+	{
+		window->set_cursor(m_active_cursor);
+	}
+	else
+	{
+		window->set_cursor();
 	}
 }
 
@@ -418,6 +482,8 @@ public:
 		
 		reset_time_properties();
 		update_track_list();
+		
+		on_time_changed(0);
 		
 		schedule_update();
 	}
