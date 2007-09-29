@@ -822,6 +822,7 @@ void move_tool::on_deactivate()
 void move_tool::on_document_selection_changed()
 {
 	target_list_changed();
+	update_targets();
 	reset();
 
 	// Update world position
@@ -926,7 +927,7 @@ void move_tool::move_selection(const k3d::vector3& Delta)
 	if(Delta == k3d::vector3(0, 0, 0))
 		return;
 
-	const k3d::point3 new_position = m_move.internal_value() + k3d::to_point(Delta);
+	const k3d::point3 new_position = m_move.internal_value() + Delta;
 	m_move.set_value(new_position);
 }
 
