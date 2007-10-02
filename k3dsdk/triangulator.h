@@ -42,6 +42,7 @@ private:
 
 	virtual void on_add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex);
 	virtual void on_add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3);
+	virtual void on_begin();
 
 	friend class implementation;
 	class implementation;

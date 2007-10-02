@@ -43,6 +43,7 @@ extern k3d::iplugin_factory& sds_edge_painter_factory();
 extern k3d::iplugin_factory& sds_face_painter_factory();
 extern k3d::iplugin_factory& sds_point_painter_factory();
 extern k3d::iplugin_factory& sharp_edges_factory();
+extern k3d::iplugin_factory& triangulated_painter_factory();
 extern k3d::iplugin_factory& triangulate_faces_factory();
 extern k3d::iplugin_factory& tweak_points_factory();
 
@@ -64,6 +65,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::development::sds_face_painter_factory());
 	Registry.register_factory(module::development::sds_point_painter_factory());
 	Registry.register_factory(module::development::sharp_edges_factory());
+	Registry.register_factory(module::development::triangulated_painter_factory());
 	Registry.register_factory(module::development::triangulate_faces_factory());
 	Registry.register_factory(module::development::tweak_points_factory());
 K3D_MODULE_END

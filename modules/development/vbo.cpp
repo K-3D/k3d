@@ -22,6 +22,7 @@
 #include "vbo.h"
 
 #include <k3dsdk/hints.h>
+#include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
@@ -120,7 +121,6 @@ void point_vbo::on_execute(const k3d::mesh& Mesh)
 	
 	if (m_indices.empty() || new_vbo)
 	{
-		k3d::log() << debug << "VBO: Creating new point VBO. Empty buffer: " << m_indices.empty() << ", new_vbo: " << new_vbo << std::endl;
 		glBufferData(GL_ARRAY_BUFFER, sizeof(points[0]) * points.size(), &points[0], GL_STATIC_DRAW);
 	}
 	else
@@ -886,9 +886,184 @@ bool edge_face::is_sharp( const size_t Edge, const k3d::mesh::points_t & Points,
 	return sharpness_array[Edge];
 }
 
+///////////////
+// triangle_vbo
+///////////////
+
+void triangle_vbo::on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+{
+	k3d::hint::mesh_geometry_changed_t* geometry_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
+	if (!geometry_hint)
+	{
+		delete m_point_vbo;
+		m_point_vbo = 0;
+		delete m_index_vbo;
+		m_index_vbo = 0;
+		delete m_normal_vbo;
+		m_normal_vbo = 0;
+		m_indices.clear();
+	}
+	else if (m_indices.empty()) // Only set indices once (they are cleared upon execute()
+	{
+		m_indices = geometry_hint->changed_points;
+	}
+}
+
+void triangle_vbo::on_execute(const k3d::mesh& Mesh)
+{
+	return_if_fail(m_triangulation);
+	const k3d::mesh::points_t& points = m_triangulation->points();
+	bool new_vbo = false;
+	
+	if (!m_point_vbo) // OpenGL VBO functions may only be called in the drawing context, i.e. during paint_mesh or select_mesh
+	{
+		m_point_vbo = new vbo();
+		new_vbo = true;
+	}
+	
+	glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+	
+	if (m_indices.empty() || new_vbo)
+	{
+		glBufferData(GL_ARRAY_BUFFER, sizeof(points[0]) * points.size(), &points[0], GL_STATIC_DRAW);
+	}
+	else
+	{
+		cached_triangulation::index_vectors_t& point_links = m_triangulation->point_links();
+		k3d::point3* vertices = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+		for (k3d::uint_t index = 0; index != m_indices.size(); ++index)
+		{
+			k3d::mesh::indices_t triangle_points = point_links[m_indices[index]];
+			for (k3d::uint_t i = 0; i != triangle_points.size(); ++i)
+				vertices[triangle_points[i]] = points[triangle_points[i]];
+		}
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+	}
+	
+	k3d::mesh::indices_t& triangles = m_triangulation->indices();
+	
+	if (!m_index_vbo)
+	{
+		m_index_vbo = new vbo();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * triangles.size(), &triangles[0], GL_STATIC_DRAW);
+	}
+	
+	// Use flat normals from the pipeline, if available
+	const k3d::mesh::normals_t* normals = k3d::get_array<k3d::mesh::normals_t>(Mesh.polyhedra->uniform_data, "N");
+	
+	new_vbo = false;
+	if (!m_normal_vbo)
+	{
+		m_normal_vbo = new vbo();
+		new_vbo = true;
+	}
+	
+	glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
+	
+	std::set<k3d::uint_t> index_set;
+	
+	if (!new_vbo)
+	{
+		for (k3d::uint_t i = 0; i != m_indices.size(); ++i)
+			index_set.insert(m_indices[i]);
+	}
+	
+	glBufferData(GL_ARRAY_BUFFER, sizeof(normals->at(0)) * points.size(), 0, GL_STATIC_DRAW);
+	k3d::normal3* normalbuffer = static_cast<k3d::normal3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+	cached_triangulation::index_vectors_t& face_points = m_triangulation->face_points();
+	if (normals)
+	{
+		for (k3d::uint_t face = 0; face != face_points.size(); ++face)
+		{
+			k3d::mesh::indices_t& corners = face_points[face];
+			for (k3d::uint_t i = 0; i != corners.size(); ++i)
+			{ 
+				normalbuffer[corners[i]] = normals->at(face);
+			}
+		}
+	}
+	else
+	{ // No normals available -> calculate them
+		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+		const k3d::mesh::indices_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+		const k3d::mesh::points_t& mesh_points = *Mesh.points; 
+		for (k3d::uint_t face = 0; face != face_points.size(); ++face)
+		{
+			bool affected = index_set.empty();
+			if (!affected)
+			{
+				const k3d::uint_t loop_begin = face_first_loops[face];
+				const k3d::uint_t loop_end = loop_begin + face_loop_counts[face];
+	
+				for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+				{
+					const k3d::uint_t first_edge = loop_first_edges[loop];
+	
+					for(k3d::uint_t edge = first_edge; ; )
+					{
+						if (index_set.find(edge_points[edge]) != index_set.end())
+						{
+							affected = true;
+							break;
+						}
+	
+						edge = clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
+					if (affected)
+						break;
+				}
+			}
+			if (affected)
+			{
+				k3d::normal3 n = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]);
+				k3d::mesh::indices_t& corners = face_points[face];
+				for (k3d::uint_t i = 0; i != corners.size(); ++i)
+				{ 
+					normalbuffer[corners[i]] = n;
+				}
+			}
+		}
+	}
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	m_indices.clear();
+}
+
+void triangle_vbo::bind()
+{
+	if (!glIsBuffer(*m_point_vbo) || !glIsBuffer(*m_index_vbo))
+		return;
+	glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+	glVertexPointer(3, GL_DOUBLE, 0, 0);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
+	
+	if (glIsBuffer(*m_normal_vbo))
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo); // activate normals VBO
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glNormalPointer(GL_DOUBLE, 0, 0);
+	}
+}
+
+void triangle_vbo::draw_range(k3d::uint_t Start, k3d::uint_t End)
+{
+	k3d::mesh::indices_t& face_starts = m_triangulation->face_starts();
+	k3d::mesh::indices_t& indices = m_triangulation->indices();
+	k3d::uint_t startindex = face_starts[Start];
+	k3d::uint_t endindex = End == (face_starts.size() - 1) ? indices.size() : face_starts[End+1];
+	glDrawElements(GL_TRIANGLES, endindex - startindex, GL_UNSIGNED_INT, static_cast<GLuint*>(0) + startindex);
+}
+
 ////////////
 // sds_cache
-/////////////
+////////////
 
 sds_cache::~sds_cache()
 {

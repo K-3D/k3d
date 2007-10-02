@@ -99,6 +99,8 @@ public:
 	{
 		if(Mode != GL_TRIANGLES)
 			log() << error << k3d_file_reference << ": incorrect tesselation primitive type: " << Mode << std::endl;
+			
+		owner.on_begin();
 
 		current_vertex = 0;
 	}
@@ -219,6 +221,10 @@ void triangulator::on_add_vertex(const point3& Coordinates, uint_t Vertices[4], 
 }
 
 void triangulator::on_add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3)
+{
+}
+
+void triangulator::on_begin()
 {
 }
 

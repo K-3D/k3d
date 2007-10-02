@@ -10,6 +10,8 @@
 namespace k3d
 {
 
+namespace gl {class imesh_painter;}
+
 /// Keep track of cached data for the VBO mesh painters
 template<class key_t, class data_t> class painter_cache
 {

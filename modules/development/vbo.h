@@ -36,6 +36,8 @@
 #include <k3dsdk/painter_cache.h>
 #include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 
+#include "cached_triangulation.h"
+
 namespace module
 {
 
@@ -230,6 +232,34 @@ class edge_face : public face
 {
 private:
 	virtual bool is_sharp(const size_t Edge, const k3d::mesh::points_t& Points, const k3d::mesh::polyhedra_t& Polyhedra);
+};
+
+/// VBOs used to paint a triangulated mesh
+class triangle_vbo : public k3d::scheduler
+{
+public:
+	triangle_vbo() : m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0), m_triangulation(0) {}
+	
+	/// The cached triangulation that contains the triangulation that needs to be stored in VBOs
+	void set_triangle_cache(cached_triangulation* TriangleCache)
+	{
+		m_triangulation = TriangleCache;
+	}
+	
+	/// Bind the buffers for drawing
+	void bind();
+	
+	/// Draw faces with original mesh indices Start through End
+	void draw_range(k3d::uint_t Start, k3d::uint_t End);
+protected:
+	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint);
+	void on_execute(const k3d::mesh& Mesh);
+private:
+	vbo* m_point_vbo;
+	vbo* m_index_vbo;
+	vbo* m_normal_vbo;
+	cached_triangulation* m_triangulation;
+	k3d::mesh::indices_t m_indices;
 };
 
 /// Common SDS cache functionality
