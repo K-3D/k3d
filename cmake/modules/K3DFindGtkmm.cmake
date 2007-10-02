@@ -3,7 +3,7 @@ SET(K3D_GTKMM_FOUND 0)
 ######################################################################
 # Posix specific configuration
 
-INCLUDE(FindPkgConfig)
+INCLUDE(K3DFindPkgConfig)
 PKG_CHECK_MODULES(GTKMM gtkmm-2.4)
 
 IF(GTKMM_FOUND)

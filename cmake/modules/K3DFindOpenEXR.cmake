@@ -4,7 +4,7 @@ SET(K3D_OPENEXR_FOUND 0)
 # Posix specific configuration
 
 IF(UNIX)
-	INCLUDE(FindPkgConfig)
+	INCLUDE(K3DFindPkgConfig)
 	PKG_CHECK_MODULES(OPENEXR OpenEXR)
 
 	IF(OPENEXR_FOUND)

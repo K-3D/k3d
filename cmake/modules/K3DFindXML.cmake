@@ -21,7 +21,7 @@ ENDIF(UNIX)
 # Win32 specific configuration
 
 IF(WIN32)
-	INCLUDE(FindPkgConfig)
+	INCLUDE(K3DFindPkgConfig)
 	PKG_CHECK_MODULES(XML libxml-2.0)
 
 	IF(XML_FOUND)
