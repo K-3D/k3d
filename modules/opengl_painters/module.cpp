@@ -45,6 +45,7 @@ extern k3d::iplugin_factory& face_orientation_painter_factory();
 extern k3d::iplugin_factory& face_painter_factory();
 extern k3d::iplugin_factory& linear_curve_painter_factory();
 extern k3d::iplugin_factory& multi_painter_factory();
+extern k3d::iplugin_factory& normal_array_painter_factory();
 extern k3d::iplugin_factory& nurbs_curve_painter_factory();
 extern k3d::iplugin_factory& nurbs_patch_painter_factory();
 extern k3d::iplugin_factory& point_painter_factory();
@@ -70,6 +71,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::opengl::painters::face_painter_factory());
 	Registry.register_factory(module::opengl::painters::linear_curve_painter_factory());
 	Registry.register_factory(module::opengl::painters::multi_painter_factory());
+	Registry.register_factory(module::opengl::painters::normal_array_painter_factory());
 	Registry.register_factory(module::opengl::painters::nurbs_curve_painter_factory());
 	Registry.register_factory(module::opengl::painters::nurbs_patch_painter_factory());
 	Registry.register_factory(module::opengl::painters::point_painter_factory());
