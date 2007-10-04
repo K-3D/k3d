@@ -33,14 +33,13 @@ class triangulator::implementation
 public:
 	implementation(triangulator& Owner) :
 		owner(Owner),
-		tessellator(sgiNewTess()),
-		current_vertex(0)
+		tessellator(sgiNewTess())
 	{
 		// Note: specifying an edge flag callback ensures that we don't receive triangle fans or triangle strips
 
 		sgiTessCallback(tessellator, GLU_TESS_BEGIN_DATA, reinterpret_cast<callback_t>(&raw_begin_callback));
 		sgiTessCallback(tessellator, GLU_TESS_COMBINE_DATA, reinterpret_cast<callback_t>(&raw_combine_callback));
-		sgiTessCallback(tessellator, GLU_TESS_EDGE_FLAG, reinterpret_cast<callback_t>(&raw_edge_flag_callback));
+//		sgiTessCallback(tessellator, GLU_TESS_EDGE_FLAG, reinterpret_cast<callback_t>(&raw_edge_flag_callback));
 		sgiTessCallback(tessellator, GLU_TESS_VERTEX_DATA, reinterpret_cast<callback_t>(&raw_vertex_callback));
 		sgiTessCallback(tessellator, GLU_TESS_END_DATA, reinterpret_cast<callback_t>(&raw_end_callback));
 		sgiTessCallback(tessellator, GLU_TESS_ERROR_DATA, reinterpret_cast<callback_t>(&raw_error_callback));
@@ -68,6 +67,11 @@ public:
 
 		for(uint_t face = face_begin; face != face_end; ++face)
 		{
+			owner.start_face(face);
+
+//			const normal3 face_normal = normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[current_face]]);
+//			sgiTessNormal(tessellator, face_normal[0], face_normal[1], face_normal[2]);
+
 			sgiTessBeginPolygon(tessellator, this);
 
 			const uint_t loop_begin = face_first_loops[face];
@@ -92,17 +96,16 @@ public:
 			}
 
 			sgiTessEndPolygon(tessellator);
+
+			owner.finish_face(face);
 		}
 	}
 
 	void begin_callback(GLenum Mode)
 	{
-		if(Mode != GL_TRIANGLES)
-			log() << error << k3d_file_reference << ": incorrect tesselation primitive type: " << Mode << std::endl;
-			
-		owner.on_begin();
-
-		current_vertex = 0;
+		mode = Mode;
+		vertex_count = 0;
+		flip_strip = false;
 	}
 
 	void combine_callback(GLdouble Coords[3], void* VertexData[4], GLfloat Weight[4], void** OutputData)
@@ -121,24 +124,44 @@ public:
 		weights[2] = Weight[2];
 		weights[3] = Weight[3];
 
-		uint_t new_vertex;
+		uint_t new_vertex = 0;
 
 		owner.add_vertex(coordinates, vertices, weights, new_vertex);
+
+		*OutputData = reinterpret_cast<void*>(new_vertex);
 	}
 
 	void vertex_callback(void* VertexData)
 	{
-		vertices[current_vertex] = reinterpret_cast<uint_t>(VertexData);
-		current_vertex = (current_vertex + 1) % 3;
+		vertices[std::min(static_cast<uint_t>(2), vertex_count)] = reinterpret_cast<uint_t>(VertexData);
 
-		if(0 == current_vertex)
-			owner.add_triangle(vertices[0], vertices[1], vertices[2]);
+		if(++vertex_count > 2)
+		{
+			switch(mode)
+			{
+				case GL_TRIANGLE_FAN:
+					owner.add_triangle(vertices[0], vertices[1], vertices[2]);
+					vertices[1] = vertices[2];
+					break;
+				case GL_TRIANGLE_STRIP:
+					if(flip_strip)
+						owner.add_triangle(vertices[2], vertices[1], vertices[0]);
+					else
+						owner.add_triangle(vertices[0], vertices[1], vertices[2]);
+					flip_strip = !flip_strip;
+					vertices[0] = vertices[1];
+					vertices[1] = vertices[2];
+					break;
+				case GL_TRIANGLES:
+					owner.add_triangle(vertices[0], vertices[1], vertices[2]);
+					vertex_count = 0;
+					break;
+			}
+		}
 	}
 
 	void end_callback()
 	{
-		if(current_vertex)
-			log() << error << k3d_file_reference << ": too many tesselation vertices" << std::endl;
 	}
 
 	void error_callback(GLenum ErrorNumber)
@@ -184,8 +207,10 @@ public:
 	triangulator& owner;
 	SGItesselator* const tessellator;
 
-	uint_t current_vertex;
+	GLenum mode;
+	uint_t vertex_count;
 	uint_t vertices[3];
+	bool flip_strip;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -201,30 +226,34 @@ triangulator::~triangulator()
 	delete m_implementation;
 }
 
-void triangulator::process(const mesh& Mesh)
+void triangulator::process(const mesh& SourceMesh)
 {
-	m_implementation->process(Mesh);
+	start_processing(SourceMesh);
+	m_implementation->process(SourceMesh);
+	finish_processing(SourceMesh);
+}
+
+void triangulator::start_processing(const mesh& SourceMesh)
+{
+}
+
+void triangulator::start_face(const uint_t Face)
+{
 }
 
 void triangulator::add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex)
 {
-	on_add_vertex(Coordinates, Vertices, Weights, NewVertex);
 }
 
 void triangulator::add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3)
 {
-	on_add_triangle(Point1, Point2, Point3);
 }
 
-void triangulator::on_add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex)
+void triangulator::finish_face(const uint_t Face)
 {
 }
 
-void triangulator::on_add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3)
-{
-}
-
-void triangulator::on_begin()
+void triangulator::finish_processing(const mesh& SourceMesh)
 {
 }
 

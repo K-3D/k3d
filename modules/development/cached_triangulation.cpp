@@ -61,7 +61,19 @@ void cached_triangulation::on_execute(const k3d::mesh& Mesh)
 	m_affected_indices.clear();
 }
 
-void cached_triangulation::on_add_triangle(const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3)
+void cached_triangulation::start_face(const k3d::uint_t Face)
+{
+	m_point_map.clear();
+	m_face_starts.push_back(m_indices.size());
+	m_face_points.push_back(k3d::mesh::indices_t());
+}
+
+void cached_triangulation::add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::double_t Weights[4], k3d::uint_t& NewVertex)
+{
+	k3d::log() << debug << "New vertex in triangulated painter: " << Coordinates << ", " << NewVertex << std::endl;
+}
+
+void cached_triangulation::add_triangle(const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3)
 {
 	typedef std::pair<point_map_t::iterator, bool> result_t;
 	// Create point copies for this face, if they don't exist already
@@ -92,13 +104,6 @@ void cached_triangulation::on_add_triangle(const k3d::uint_t Point1, const k3d::
 	m_indices.push_back(r1.first->second);
 	m_indices.push_back(r2.first->second);
 	m_indices.push_back(r3.first->second);
-}
-
-void cached_triangulation::on_begin()
-{
-	m_point_map.clear();
-	m_face_starts.push_back(m_indices.size());
-	m_face_points.push_back(k3d::mesh::indices_t());
 }
 
 }

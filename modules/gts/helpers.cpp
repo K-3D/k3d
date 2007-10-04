@@ -64,12 +64,13 @@ public:
 	}
 
 private:
-	void on_add_vertex(const k3d::point3& Coordinates, size_t Vertices[4], double Weights[4], size_t& NewVertex)
+	void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], double Weights[4], k3d::uint_t& NewVertex)
 	{
-		assert_not_implemented();
+		NewVertex = gts_vertices.size();
+		gts_vertices.push_back(0);
 	}
 
-	void on_add_triangle(const size_t Vertex1, const size_t Vertex2, const size_t Vertex3)
+	void add_triangle(const k3d::uint_t Vertex1, const k3d::uint_t Vertex2, const k3d::uint_t Vertex3)
 	{
 		GtsVertex* const vertex1 = get_vertex(Vertex1);
 		GtsVertex* const vertex2 = get_vertex(Vertex2);
@@ -84,7 +85,7 @@ private:
 		gts_surface_add_face(gts_surface, face);
 	}
 
-	GtsVertex* get_vertex(const size_t Vertex)
+	GtsVertex* get_vertex(const k3d::uint_t Vertex)
 	{
 		if(!gts_vertices[Vertex])
 		{
@@ -113,7 +114,7 @@ struct vertex_data
 
 	k3d::mesh::points_t& points;
 	k3d::mesh::selection_t& point_selection;
-	std::map<GtsVertex*, size_t> vertex_map;
+	std::map<GtsVertex*, k3d::uint_t> vertex_map;
 };
 
 /// Callback function used to convert GtsVertex objects into K-3D mesh points

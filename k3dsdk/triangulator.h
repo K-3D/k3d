@@ -28,25 +28,35 @@ namespace k3d
 class mesh;
 class point3;
 
+/// Provides a template design pattern object for triangulating polygons.
+/// To generate triangulated data, derive from k3d::triangulator and
+/// override the private virtual methods to process triangles
 class triangulator
 {
 public:
 	triangulator();
 	~triangulator();
 
-	void process(const mesh& Mesh);
+	void process(const mesh& SourceMesh);
 
 private:
-	void add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex);
-	void add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3);
+	/// Called once before processin begins on the given mesh
+	virtual void start_processing(const mesh& SourceMesh);
+	/// Called once before processing begins on the given polygon face
+	virtual void start_face(const uint_t Face);
+	/// Called anytime the triangulation process needs to create a new vertex (e.g: when edges cross within a self-intersecting polygon)
+	virtual void add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex);
+	/// Called once for each triangle generated
+	virtual void add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3);
+	/// Called once after processing for the given face has been completed
+	virtual void finish_face(const uint_t Face);
+	/// Called once after the entire mesh has been processed
+	virtual void finish_processing(const mesh& SourceMesh);
 
-	virtual void on_add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex);
-	virtual void on_add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3);
-	virtual void on_begin();
-
-	friend class implementation;
 	class implementation;
 	implementation* const m_implementation;
+
+	friend class implementation;
 };
 
 } // namespace k3d
