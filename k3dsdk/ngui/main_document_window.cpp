@@ -273,6 +273,17 @@ private:
 		}
 	}
 
+	bool on_key_press_event(GdkEventKey* event)
+	{
+		if(event->keyval == GDK_Page_Down)
+		{
+			tutorial_message::instance().continue_message();
+			return true;
+		}
+
+		return Gtk::HBox::on_key_press_event(event);
+	}
+
 	void on_wait()
 	{
 		m_stop.set_sensitive(true);
