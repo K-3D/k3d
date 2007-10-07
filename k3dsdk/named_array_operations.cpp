@@ -21,14 +21,18 @@
 	\author Timothy M. Shead
 */
 
+#include "algebra.h"
 #include "array.h"
 #include "inode.h"
 #include "named_array_operations.h"
+#include "normal3.h"
 #include "point2.h"
+#include "point3.h"
 #include "result.h"
 #include "typed_array.h"
 #include "type_registry.h"
 #include "vector2.h"
+#include "vector3.h"
 
 #include <boost/bind.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -68,13 +72,27 @@ public:
 				continue;
 			}
 
-			if(create_copier<typed_array<bool> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<int> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<size_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<double> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<std::string> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::bool_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::int8_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::int16_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::int32_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::int64_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::uint8_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::uint16_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::uint32_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::uint64_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::half_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::float_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::double_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::uint_t> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<k3d::string_t> >(source_array, target_array)) continue;
 			if(create_copier<typed_array<point2> >(source_array, target_array)) continue;
 			if(create_copier<typed_array<vector2> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<point3> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<normal3> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<vector3> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<point4> >(source_array, target_array)) continue;
+			if(create_copier<typed_array<matrix4> >(source_array, target_array)) continue;
 			if(create_copier<typed_array<inode*> >(source_array, target_array)) continue;
 
 			log() << error << "unknown array type [" << demangle(typeid(*source_array)) << "] will not be copied" << std::endl;
