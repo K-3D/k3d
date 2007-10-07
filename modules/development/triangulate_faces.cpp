@@ -129,6 +129,11 @@ private:
 		}
 
 	private:
+		void start_face(const k3d::uint_t Face)
+		{
+			m_current_face = Face;
+		}
+
 		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], double Weights[4], k3d::uint_t& NewVertex)
 		{
 			NewVertex = m_points->size();
@@ -137,12 +142,12 @@ private:
 			m_point_selection->push_back(0.0);
 		}
 
-		void add_triangle(const k3d::uint_t CurrentFace, const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3)
+		void add_triangle(const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3)
 		{
 			m_face_first_loops->push_back(m_loop_first_edges->size());
 			m_face_loop_counts->push_back(1);
 			m_face_selection->push_back(1.0);
-			m_face_materials->push_back((*m_input->polyhedra->face_materials)[CurrentFace]);
+			m_face_materials->push_back((*m_input->polyhedra->face_materials)[m_current_face]);
 			m_loop_first_edges->push_back(m_edge_points->size());
 			m_edge_points->push_back(Point1);
 			m_edge_points->push_back(Point2);
@@ -171,6 +176,8 @@ private:
 		boost::shared_ptr<k3d::mesh::selection_t> m_edge_selection;
 		boost::shared_ptr<k3d::mesh::points_t> m_points;
 		boost::shared_ptr<k3d::mesh::selection_t> m_point_selection;
+
+		k3d::uint_t m_current_face;
 	};
 };
 
