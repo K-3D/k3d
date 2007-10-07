@@ -21,31 +21,34 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
+#include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/material_client.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_source.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/persistent.h>
 #include <k3dsdk/vectors.h>
 
-namespace libk3dprimitives
+namespace module
+{
+
+namespace linear_curve
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// knot_curve_implementation
+// knot_curve
 
-class knot_curve_implementation :
+class knot_curve :
 	public k3d::material_client<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
 {
 	typedef k3d::material_client<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
-	knot_curve_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	knot_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_edge_count(init_owner(*this) + init_name("edgecount") + init_label(_("Edge count")) + init_description(_("Number of edges building up the curve")) + init_value(100) + init_constraint(constraint::minimum(3L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_meridian_wraps(init_owner(*this) + init_name("meridianwraps") + init_label(_("Meridian wraps")) + init_description(_("Number of meridian wraps")) + init_value(3) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -108,7 +111,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<knot_curve_implementation > factory(
+		static k3d::document_plugin_factory<knot_curve > factory(
 			k3d::uuid(0xb39c53a3, 0xe2fe0e32, 0x21d09384, 0xc4ed13fe),
 				"KnotCurve",
 				_("Generates a PQ-knot curve"),
@@ -129,9 +132,11 @@ private:
 
 k3d::iplugin_factory& knot_curve_factory()
 {
-	return knot_curve_implementation::get_factory();
+	return knot_curve::get_factory();
 }
 
-} // namespace libk3dprimitives
+} // namespace linear_curve
+
+} // namespace module
 
 

@@ -21,31 +21,34 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/basic_math.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
+#include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/material_client.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_source.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/persistent.h>
 #include <k3dsdk/vectors.h>
 
-namespace libk3dprimitives
+namespace module
+{
+
+namespace linear_curve
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// lissajous_curve_implementation
+// lissajous_curve
 
-class lissajous_curve_implementation :
+class lissajous_curve :
 	public k3d::material_client<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
 {
 	typedef k3d::material_client<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
-	lissajous_curve_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	lissajous_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_edge_count(init_owner(*this) + init_name("edgecount") + init_label(_("Edge Count")) + init_description(_("Edge count")) + init_value(100) + init_constraint(constraint::minimum(3L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_mamp(init_owner(*this) + init_name("mamp") + init_label(_("Modulation Amplitude")) + init_description(_("Modulation amplitude")) + init_value(0.05) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::distance))),
@@ -137,7 +140,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<lissajous_curve_implementation > factory(
+		static k3d::document_plugin_factory<lissajous_curve > factory(
 		k3d::uuid(0x7fdcbdc1, 0xd1c6404e, 0xae15a8eb, 0x45ffc793),
 			"LissajousCurve",
 			_("Generates a lissajous (sine-wave) curve"),
@@ -167,8 +170,10 @@ private:
 
 k3d::iplugin_factory& lissajous_curve_factory()
 {
-	return lissajous_curve_implementation::get_factory();
+	return lissajous_curve::get_factory();
 }
 
-} // namespace libk3dprimitives
+} // namespace linear_curve3
+
+} // namespace module
 
