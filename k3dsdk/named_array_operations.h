@@ -29,8 +29,9 @@
 namespace k3d
 {
 
+/// Retrieves an array with given name, type, and size
 template<typename array_t>
-array_t& get_array(named_arrays& Arrays, const std::string& Name, const size_t Count)
+array_t& get_array(named_arrays& Arrays, const std::string& Name, const uint_t Count)
 {
 	array_t* result = 0;
 	if(Arrays.count(Name))
@@ -48,6 +49,7 @@ array_t& get_array(named_arrays& Arrays, const std::string& Name, const size_t C
 	return *result;
 }
 
+/// Retrieves an array with given name and type, or NULL
 template<typename array_t>
 const array_t* get_array(const named_arrays& Arrays, const std::string& Name)
 {
@@ -58,13 +60,17 @@ const array_t* get_array(const named_arrays& Arrays, const std::string& Name)
 	return result;
 }
 
+/// Handles random-access copying between named arrays
 class named_array_copier
 {
 public:
 	named_array_copier(const named_arrays& Source, named_arrays& Target);
 	~named_array_copier();
 
-	void push_back(const size_t Index);
+	/// Appends the given index value from each source array to each corresponding target array
+	void push_back(const uint_t Index);
+	/// Computes a weighted sum of N values from each source array and appends the result to the corresponding target array
+	void push_back(const uint_t Count, const uint_t* Indices, const double_t* Weights);
 
 private:
 	class implementation;
