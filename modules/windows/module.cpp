@@ -30,13 +30,13 @@ namespace module
 namespace windows
 {
 
-extern k3d::iplugin_factory& open_uri_factory();
+extern k3d::iplugin_factory& uri_handler_factory();
 
 } // namespace windows
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::windows::open_uri_factory());
+	Registry.register_factory(module::windows::uri_handler_factory());
 K3D_MODULE_END
 

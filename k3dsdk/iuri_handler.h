@@ -1,8 +1,8 @@
-#ifndef K3DSDK_IURI_H
-#define K3DSDK_IURI_H
+#ifndef K3DSDK_IURI_HANDLER_H
+#define K3DSDK_IURI_HANDLER_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,8 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares iuri, an abstract interface for manipulating documents referenced by URI
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -32,7 +31,7 @@ namespace k3d
 {
 
 /// Abstract interface for manipulating documents referenced by URI
-class iuri :
+class iuri_handler :
 	public virtual iunknown
 {
 public:
@@ -40,13 +39,13 @@ public:
 	virtual bool open_uri(const std::string& URI) = 0;
 
 protected:
-	iuri() {}
-	iuri(const iuri&) {}
-	iuri& operator=(const iuri&) { return *this; }
-	virtual ~iuri() {}
+	iuri_handler() {}
+	iuri_handler(const iuri_handler&) {}
+	iuri_handler& operator=(const iuri_handler&) { return *this; }
+	virtual ~iuri_handler() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_IURI_H
+#endif // K3DSDK_IURI_HANDLER_H
 

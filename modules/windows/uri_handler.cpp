@@ -21,10 +21,10 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/application_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/ideletable.h>
-#include <k3dsdk/iuri.h>
+#include <k3dsdk/iuri_handler.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/win32.h>
@@ -38,19 +38,19 @@ namespace windows
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// open_uri
+// uri_handler
 
 /// Uses the Win32 API to open a URI in the user's preferred application
-class open_uri :
-	public k3d::iuri,
+class uri_handler :
+	public k3d::iuri_handler,
 	public k3d::ideletable
 {
 public:
-	open_uri()
+	uri_handler()
 	{
 	}
 
-	virtual ~open_uri()
+	virtual ~uri_handler()
 	{
 	}
 
@@ -63,10 +63,10 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<open_uri,
-			k3d::interface_list<k3d::iuri> > factory(
+		static k3d::application_plugin_factory<uri_handler,
+			k3d::interface_list<k3d::iuri_handler> > factory(
 				k3d::uuid(0x35151cfa, 0x104c40df, 0xaef69401, 0xd6bf1754),
-				"WindowsOpenURI",
+				"WindowsURIHandler",
 				_("Opens a URI using the Windows API"),
 				"Desktop",
 				k3d::iplugin_factory::STABLE);
@@ -76,11 +76,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// open_uri_factory
+// uri_handler_factory
 
-k3d::iplugin_factory& open_uri_factory()
+k3d::iplugin_factory& uri_handler_factory()
 {
-	return open_uri::get_factory();
+	return uri_handler::get_factory();
 }
 
 } // namespace windows

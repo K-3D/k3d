@@ -66,7 +66,7 @@
 #include "itransform_array_3d.h"
 #include "itransform_sink.h"
 #include "itransform_source.h"
-#include "iuri.h"
+#include "iuri_handler.h"
 #include "ivector3_source.h"
 #include "ivolume_shader_ri.h"
 #include "iyafray.h"
@@ -204,7 +204,7 @@ void initialize_types()
 	register_type(typeid(k3d::itransform_source), "k3d::itransform_source");
 	register_type(typeid(k3d::iunknown), "k3d::iunknown");
 	register_type(typeid(k3d::iunknown*), "k3d::iunknown*");
-	register_type(typeid(k3d::iuri), "k3d::iuri");
+	register_type(typeid(k3d::iuri_handler), "k3d::iuri_handler");
 	register_type(typeid(k3d::ivector3_source), "k3d::ivector3_source");
 	register_type(typeid(k3d::legacy::mesh), "k3d::legacy::mesh");
 	register_type(typeid(k3d::legacy::mesh*), "k3d::legacy::mesh*");

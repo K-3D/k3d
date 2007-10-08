@@ -21,10 +21,10 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/application_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/ideletable.h>
-#include <k3dsdk/iuri.h>
+#include <k3dsdk/iuri_handler.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/result.h>
 
@@ -40,18 +40,18 @@ namespace gnome
 {
 
 /// Uses the Gnome API to open a URI in the user's preferred application
-class open_uri :
-	public k3d::iuri,
+class uri_handler :
+	public k3d::iuri_handler,
 	public k3d::ideletable
 {
 public:
-	open_uri()
+	uri_handler()
 	{
 		if(!gnome_vfs_initialized())
 			return_if_fail(gnome_vfs_init());
 	}
 
-	virtual ~open_uri()
+	virtual ~uri_handler()
 	{
 	}
 
@@ -76,10 +76,10 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<open_uri,
-			k3d::interface_list<k3d::iuri> > factory(
+		static k3d::application_plugin_factory<uri_handler,
+			k3d::interface_list<k3d::iuri_handler> > factory(
 				k3d::uuid(0xac560e92, 0x1d31478b, 0x9139ace8, 0x1bb0ae31),
-				"GnomeOpenURI",
+				"GnomeURIHandler",
 				_("Opens a URI using the Gnome libraries"),
 				"Desktop",
 				k3d::iplugin_factory::STABLE);
@@ -89,11 +89,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// open_uri_factory
+// uri_handler_factory
 
-k3d::iplugin_factory& open_uri_factory()
+k3d::iplugin_factory& uri_handler_factory()
 {
-	return open_uri::get_factory();
+	return uri_handler::get_factory();
 }
 
 } // namespace gnome

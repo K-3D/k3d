@@ -23,7 +23,7 @@
 
 #include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/create_plugins.h>
-#include <k3dsdk/iuri.h>
+#include <k3dsdk/iuri_handler.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/plugins.h>
@@ -41,13 +41,13 @@ namespace libk3dngui
 bool open_uri(const std::string& URI)
 {
 	// Look for any plugins that could be used ...
-	const k3d::factories_t factories = k3d::plugins<k3d::iuri>();
+	const k3d::factories_t factories = k3d::plugins<k3d::iuri_handler>();
 	for(k3d::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
 		k3d::auto_ptr<k3d::iunknown> plugin(k3d::create_plugin(**factory));
-		if(k3d::iuri* const uri = dynamic_cast<k3d::iuri*>(plugin.get()))
+		if(k3d::iuri_handler* const handler = dynamic_cast<k3d::iuri_handler*>(plugin.get()))
 		{
-			if(uri->open_uri(URI))
+			if(handler->open_uri(URI))
 				return true;
 		}
 	}

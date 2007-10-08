@@ -30,13 +30,13 @@ namespace module
 namespace gnome
 {
 
-extern k3d::iplugin_factory& open_uri_factory();
+extern k3d::iplugin_factory& uri_handler_factory();
 
 } // namespace gnome
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::gnome::open_uri_factory());
+	Registry.register_factory(module::gnome::uri_handler_factory());
 K3D_MODULE_END
 
