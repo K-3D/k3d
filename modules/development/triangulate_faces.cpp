@@ -27,6 +27,7 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/shared_pointer.h>
@@ -86,7 +87,10 @@ private:
 		{
 			if(!k3d::validate_polyhedra(Input))
 				return;
-			
+
+			m_input = &Input;
+
+			// Allocate new data structures for our output ...
 			m_polyhedra.reset(new k3d::mesh::polyhedra_t());
 			m_first_faces.reset(new k3d::mesh::indices_t());
 			m_face_counts.reset(new k3d::mesh::counts_t());
@@ -99,18 +103,10 @@ private:
 			m_edge_points.reset(new k3d::mesh::indices_t());
 			m_clockwise_edges.reset(new k3d::mesh::indices_t());
 			m_edge_selection.reset(new k3d::mesh::selection_t());
-
 			m_points.reset(new k3d::mesh::points_t(*Input.points));
 			m_point_selection.reset(new k3d::mesh::selection_t(*Input.point_selection));
 
-			m_input = &Input;
-			base::process(Input);
-			m_input = 0;
-
-			m_first_faces->push_back(0);
-			m_face_counts->push_back(m_face_first_loops->size());
-			m_types->push_back(k3d::mesh::polyhedra_t::POLYGONS);
-
+			// Hook everything together ...
 			m_polyhedra->first_faces = m_first_faces;
 			m_polyhedra->face_counts = m_face_counts;
 			m_polyhedra->types = m_types;
@@ -123,9 +119,28 @@ private:
 			m_polyhedra->clockwise_edges = m_clockwise_edges;
 			m_polyhedra->edge_selection = m_edge_selection;
 
+			// Setup copying of attribute arrays ...
+			m_polyhedra->constant_data = Input.polyhedra->constant_data;
+
+			m_polyhedra->uniform_data = Input.polyhedra->uniform_data.clone_types();
+			m_uniform_data_copier.reset(new k3d::named_array_copier(Input.polyhedra->uniform_data, m_polyhedra->uniform_data));
+
+//			m_polyhedra->face_varying_data = Input.polyhedra->face_varying_data.clone_types();
+//			m_face_varying_data_copier.reset(new k3d::named_array_copier(Input.polyhedra->face_varying_data, m_polyhedra->face_varying_data));
+
+			Output.vertex_data = Input.vertex_data.clone();
+			m_vertex_data_copier.reset(new k3d::named_array_copier(Input.vertex_data, Output.vertex_data));
+
+			// Setup the output mesh ...
 			Output.polyhedra = m_polyhedra;
 			Output.points = m_points;
 			Output.point_selection = m_point_selection;
+
+			base::process(Input);
+
+			m_first_faces->push_back(0);
+			m_face_counts->push_back(m_face_first_loops->size());
+			m_types->push_back(k3d::mesh::polyhedra_t::POLYGONS);
 		}
 
 	private:
@@ -140,6 +155,8 @@ private:
 
 			m_points->push_back(Coordinates);
 			m_point_selection->push_back(0.0);
+
+			m_vertex_data_copier->push_back(4, Vertices, Weights);
 		}
 
 		void add_triangle(const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3)
@@ -158,6 +175,12 @@ private:
 			m_edge_selection->push_back(0.0);
 			m_edge_selection->push_back(0.0);
 			m_edge_selection->push_back(0.0);
+
+			m_uniform_data_copier->push_back(m_current_face);
+
+//			m_face_varying_data_copier->push_back(Point1);
+//			m_face_varying_data_copier->push_back(Point2);
+//			m_face_varying_data_copier->push_back(Point3);
 		}
 
 		const k3d::mesh* m_input;
@@ -176,6 +199,10 @@ private:
 		boost::shared_ptr<k3d::mesh::selection_t> m_edge_selection;
 		boost::shared_ptr<k3d::mesh::points_t> m_points;
 		boost::shared_ptr<k3d::mesh::selection_t> m_point_selection;
+
+		boost::shared_ptr<k3d::named_array_copier> m_uniform_data_copier;
+//		boost::shared_ptr<k3d::named_array_copier> m_face_varying_data_copier;
+		boost::shared_ptr<k3d::named_array_copier> m_vertex_data_copier;
 
 		k3d::uint_t m_current_face;
 	};
