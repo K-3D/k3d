@@ -23,15 +23,20 @@
 
 #include <k3dsdk/module.h>
 
+namespace module
+{
+
 /// Namespace reserved for the windows plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dwindows
+namespace windows
 {
 
 extern k3d::iplugin_factory& open_uri_factory();
 
-} // namespace libk3dwindows
+} // namespace windows
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dwindows::open_uri_factory());
+	Registry.register_factory(module::windows::open_uri_factory());
 K3D_MODULE_END
 

@@ -31,7 +31,10 @@
 #include <k3dsdk/render_state_ri.h>
 #include <k3dsdk/shader_ri.h>
 
-namespace libk3daqsis
+namespace module
+{
+
+namespace aqsis
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -204,5 +207,8 @@ k3d::iplugin_factory& surface_shader_layer_factory()
 	return surface_shader_layer::get_factory();
 }
 
-} // namespace libk3daqsis
+} // namespace aqsis
+
+} // namespace module
+
 

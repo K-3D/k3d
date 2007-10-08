@@ -24,16 +24,20 @@
 
 #include <k3dsdk/module.h>
 
+namespace module
+{
+
 /// Namespace reserved for the Pixie plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dpixie
+namespace pixie
 {
 
 extern k3d::iplugin_factory& raytrace_map_factory();
 
-} // namespace libk3dpixie
+} // namespace pixie
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dpixie::raytrace_map_factory());
+	Registry.register_factory(module::pixie::raytrace_map_factory());
 K3D_MODULE_END
-
 

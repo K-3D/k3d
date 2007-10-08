@@ -21,18 +21,18 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/irender_engine_ri.h>
 #include <k3dsdk/itexture_ri.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dpixie
+namespace module
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// raytrace_map
+namespace pixie
+{
 
 class raytrace_map :
 	public k3d::persistent<k3d::node>,
@@ -77,5 +77,7 @@ k3d::iplugin_factory& raytrace_map_factory()
 	return raytrace_map::get_factory();
 }
 
-} // namespace libk3dpixie
+} // namespace pixie
+
+} // namespace module
 

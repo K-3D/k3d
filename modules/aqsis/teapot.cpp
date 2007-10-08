@@ -22,10 +22,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/drawable_gl.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material_client.h>
 #include <k3dsdk/node.h>
@@ -34,7 +34,10 @@
 #include <k3dsdk/selection.h>
 #include <k3dsdk/transformable.h>
 
-namespace
+namespace module
+{
+
+namespace aqsis
 {
 
 const double teapot_points[306][3] =
@@ -389,8 +392,6 @@ unsigned int teapot_patches[32][16] =
 	{270,270,270,270,300,305,306,279,297,303,304,275,294,301,302,271}
 };
 
-
-
 /////////////////////////////////////////////////////////////////////////////
 // teapot
 
@@ -604,11 +605,6 @@ private:
 	}
 };
 
-} // namespace
-
-namespace libk3daqsis
-{
-
 /////////////////////////////////////////////////////////////////////////////
 // teapot_factory
 
@@ -617,5 +613,7 @@ k3d::iplugin_factory& teapot_factory()
 	return teapot::get_factory();
 }
 
-} // namespace libk3daqsis
+} // namespace aqsis
+
+} // namespace module
 

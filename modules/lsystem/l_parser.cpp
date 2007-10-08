@@ -21,24 +21,23 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/axis.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/file_helpers.h>
-#include <k3d-i18n-config.h>
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/imaterial.h>
+#include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/material_client.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/string_modifiers.h>
-
-#include <k3dsdk/fstream.h>
 
 #include <cmath>
 #include <fstream>
@@ -47,7 +46,10 @@
 #include <sstream>
 #include <stack>
 
-namespace libk3dlsystem
+namespace module
+{
+
+namespace lsystem
 {
 
 namespace lparser
@@ -1635,9 +1637,11 @@ private:
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_flip_normals;
 };
 
-} // namespace libk3dlsystem
+} // namespace lsystem
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dlsystem::l_parser::get_factory());
+	Registry.register_factory(module::lsystem::l_parser::get_factory());
 K3D_MODULE_END
 

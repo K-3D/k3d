@@ -22,11 +22,11 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/file_helpers.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/module.h>
@@ -34,13 +34,17 @@
 #include <k3dsdk/string_modifiers.h>
 #include <k3dsdk/xml.h>
 
+namespace module
+{
+
 /// Namespace reserved for the K3DScript plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dkscript
+namespace k3dscript
 {
 
 /// Defines a "magic token" for automatic identification of scripts
 const std::string magic_token("#k3dscript");
 
+/// Provides the "K3DScript" scripting engine, primarily designed for recording and playback of tutorials
 class engine :
 	public k3d::iscript_engine,
 	public k3d::ideletable
@@ -186,10 +190,12 @@ private:
 	bool m_halt_request;
 };
 
-} // namespace libk3dkscript
+} // namespace k3dscript
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dkscript::engine::get_factory());
+	Registry.register_factory(module::k3dscript::engine::get_factory());
 K3D_MODULE_END
 
 

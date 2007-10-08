@@ -31,22 +31,26 @@
 
 #include <iostream>
 
-namespace libk3dwindows
+namespace module
+{
+
+namespace windows
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// open_uri_implementation
+// open_uri
 
-class open_uri_implementation :
+/// Uses the Win32 API to open a URI in the user's preferred application
+class open_uri :
 	public k3d::iuri,
 	public k3d::ideletable
 {
 public:
-	open_uri_implementation()
+	open_uri()
 	{
 	}
 
-	virtual ~open_uri_implementation()
+	virtual ~open_uri()
 	{
 	}
 
@@ -59,7 +63,7 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<open_uri_implementation,
+		static k3d::application_plugin_factory<open_uri,
 			k3d::interface_list<k3d::iuri> > factory(
 				k3d::uuid(0x35151cfa, 0x104c40df, 0xaef69401, 0xd6bf1754),
 				"WindowsOpenURI",
@@ -76,8 +80,10 @@ public:
 
 k3d::iplugin_factory& open_uri_factory()
 {
-	return open_uri_implementation::get_factory();
+	return open_uri::get_factory();
 }
 
-} // namespace libk3dwindows
+} // namespace windows
+
+} // namespace module
 

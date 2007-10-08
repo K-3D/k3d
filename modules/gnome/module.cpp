@@ -23,15 +23,20 @@
 
 #include <k3dsdk/module.h>
 
+namespace module
+{
+
 /// Namespace reserved for the gnome plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dgnome
+namespace gnome
 {
 
 extern k3d::iplugin_factory& open_uri_factory();
 
-} // namespace libk3dgnome
+} // namespace gnome
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dgnome::open_uri_factory());
+	Registry.register_factory(module::gnome::open_uri_factory());
 K3D_MODULE_END
 

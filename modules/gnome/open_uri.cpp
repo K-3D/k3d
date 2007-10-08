@@ -33,24 +33,25 @@
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
 
-namespace libk3dgnome
+namespace module
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// open_uri_implementation
+namespace gnome
+{
 
-class open_uri_implementation :
+/// Uses the Gnome API to open a URI in the user's preferred application
+class open_uri :
 	public k3d::iuri,
 	public k3d::ideletable
 {
 public:
-	open_uri_implementation()
+	open_uri()
 	{
 		if(!gnome_vfs_initialized())
 			return_if_fail(gnome_vfs_init());
 	}
 
-	virtual ~open_uri_implementation()
+	virtual ~open_uri()
 	{
 	}
 
@@ -75,7 +76,7 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<open_uri_implementation,
+		static k3d::application_plugin_factory<open_uri,
 			k3d::interface_list<k3d::iuri> > factory(
 				k3d::uuid(0xac560e92, 0x1d31478b, 0x9139ace8, 0x1bb0ae31),
 				"GnomeOpenURI",
@@ -92,8 +93,11 @@ public:
 
 k3d::iplugin_factory& open_uri_factory()
 {
-	return open_uri_implementation::get_factory();
+	return open_uri::get_factory();
 }
 
-} // namespace libk3dgnome
+} // namespace gnome
+
+} // namespace module
+
 

@@ -24,20 +24,25 @@
 
 #include <k3dsdk/module.h>
 
+namespace module
+{
+
 /// Namespace reserved for the Aqsis plugin module, to protect public symbols from name clashes with other modules
-namespace libk3daqsis
+namespace aqsis
 {
 
 extern k3d::iplugin_factory& displacement_shader_layer_factory();
 extern k3d::iplugin_factory& surface_shader_layer_factory();
 extern k3d::iplugin_factory& teapot_factory();
 
-} // namespace libk3daqsis
+} // namespace aqsis
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3daqsis::displacement_shader_layer_factory());
-	Registry.register_factory(libk3daqsis::surface_shader_layer_factory());
-	Registry.register_factory(libk3daqsis::teapot_factory());
+	Registry.register_factory(module::aqsis::displacement_shader_layer_factory());
+	Registry.register_factory(module::aqsis::surface_shader_layer_factory());
+	Registry.register_factory(module::aqsis::teapot_factory());
 K3D_MODULE_END
 
 
