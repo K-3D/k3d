@@ -669,6 +669,7 @@ void rotate_tool::on_deactivate()
 void rotate_tool::on_document_selection_changed()
 {
 	target_list_changed();
+	update_targets();
 	reset();
 
 	//set_center(world_position());

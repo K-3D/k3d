@@ -830,6 +830,7 @@ void scale_tool::on_deactivate()
 void scale_tool::on_document_selection_changed()
 {
 	target_list_changed();
+	update_targets();
 	m_scaling.set_value(k3d::point3(1, 1, 1));
 	//set_center(world_position());
 
