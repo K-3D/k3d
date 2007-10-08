@@ -946,7 +946,14 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh)
 	{
 		m_index_vbo = new vbo();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * triangles.size(), &triangles[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * triangles.size(), 0, GL_STATIC_DRAW);
+		// cast to properly sized GLuint needed on 64 bit systems and harmless on others
+		GLuint* gl_indices = static_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE));
+		for (k3d::uint_t i = 0; i != triangles.size(); ++i)
+		{
+			gl_indices[i] = static_cast<GLuint>(triangles[i]);
+		}
+		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 	}
 	
 	// Use flat normals from the pipeline, if available
@@ -1057,7 +1064,7 @@ void triangle_vbo::draw_range(k3d::uint_t Start, k3d::uint_t End)
 	k3d::mesh::indices_t& face_starts = m_triangulation->face_starts();
 	k3d::mesh::indices_t& indices = m_triangulation->indices();
 	k3d::uint_t startindex = face_starts[Start];
-	k3d::uint_t endindex = End == (face_starts.size() - 1) ? indices.size() : face_starts[End+1];
+	k3d::uint_t endindex = End == (face_starts.size()) ? indices.size() : face_starts[End];
 	glDrawElements(GL_TRIANGLES, endindex - startindex, GL_UNSIGNED_INT, static_cast<GLuint*>(0) + startindex);
 }
 

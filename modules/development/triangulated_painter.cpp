@@ -119,13 +119,13 @@ public:
 				size_t start = record->begin;
 				size_t end = record->end;
 				end = end > face_count ? face_count : end;
-				vbos->draw_range(start, end-1);
+				vbos->draw_range(start, end);
 			}
 		}
 		else
 		{ // empty selection, everything has the same color
 			k3d::gl::color3d(color);
-			vbos->draw_range(0, face_count-1);
+			vbos->draw_range(0, face_count);
 		}
 		
 		clean_vbo_state();
@@ -170,7 +170,7 @@ public:
 		{
 			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
 
-			vbos->draw_range(face, face);
+			vbos->draw_range(face, face+1);
 
 			k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
 		}

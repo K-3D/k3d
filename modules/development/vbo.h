@@ -249,7 +249,7 @@ public:
 	/// Bind the buffers for drawing
 	void bind();
 	
-	/// Draw faces with original mesh indices Start through End
+	/// Draw faces with original mesh indices Start to End
 	void draw_range(k3d::uint_t Start, k3d::uint_t End);
 protected:
 	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint);
