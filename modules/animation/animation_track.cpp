@@ -153,7 +153,8 @@ public:
 		// Interpolate value
 		value_t result;
 		interpolator_t* interpolator = m_interpolator.pipeline_value();
-		return_val_if_fail(interpolator, m_value_input.pipeline_value());
+		if (!interpolator)
+			return m_value_input.pipeline_value();
 		typename interpolator_t::keyframes_t keyframes;
 		for (typename keyframes_t::iterator keyframe = m_keyframes.begin(); keyframe != m_keyframes.end(); ++keyframe)
 			keyframes.insert(std::make_pair(keyframe->first->pipeline_value(), keyframe->second->pipeline_value()));
@@ -437,6 +438,8 @@ private:
 /////////////////////////////////////////////////////////////////////////////
 // specific instances and factories
 
+////////// matrix4 track /////////////////:
+
 class animation_track_double_matrix4 : public animation_track<double, k3d::matrix4>
 {
 	typedef animation_track<double, k3d::matrix4> base;
@@ -459,6 +462,32 @@ public:
 k3d::iplugin_factory& animation_track_double_matrix4_factory()
 {
 	return animation_track_double_matrix4::get_factory();
+}
+
+/////////////// double track ///////////
+
+class animation_track_double_double : public animation_track<double, double>
+{
+	typedef animation_track<double, double> base;
+public:
+	animation_track_double_double(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+		base(Factory, Document, 0.0, 0.0) {}
+	
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::document_plugin_factory<animation_track_double_double, k3d::interface_list<k3d::ikeyframer> >factory(
+				k3d::uuid(0xa0b9d507, 0x20400293, 0x8f13c393, 0x31d908a8),
+				"AnimationTrackDoubleDouble",
+				("Stores a series of keyframes for an animation, using 'double' as time and value"),
+				"Animation",
+				k3d::iplugin_factory::EXPERIMENTAL);
+		return factory;
+	}
+};
+
+k3d::iplugin_factory& animation_track_double_double_factory()
+{
+	return animation_track_double_double::get_factory();
 }
 
 } // namespace libk3danimation

@@ -29,6 +29,7 @@ namespace libk3danimation
 {
 
 extern k3d::iplugin_factory& animation_track_double_matrix4_factory();
+extern k3d::iplugin_factory& animation_track_double_double_factory();
 extern k3d::iplugin_factory& interpolator_double_matrix4_linear_factory();
 extern k3d::iplugin_factory& interpolator_double_double_linear_factory();
 
@@ -36,6 +37,7 @@ extern k3d::iplugin_factory& interpolator_double_double_linear_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(libk3danimation::animation_track_double_matrix4_factory());
+	Registry.register_factory(libk3danimation::animation_track_double_double_factory());
 	Registry.register_factory(libk3danimation::interpolator_double_matrix4_linear_factory());
 	Registry.register_factory(libk3danimation::interpolator_double_double_linear_factory());
 K3D_MODULE_END
