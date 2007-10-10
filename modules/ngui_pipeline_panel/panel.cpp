@@ -123,10 +123,10 @@ public:
 		m_node_height(k3d::data::init_value(0.07)),
 		m_arrow_size(k3d::data::init_value(0.04)),
 		m_background_color(k3d::data::init_value(k3d::color(1, 1, 1))),
-		m_node_color(k3d::data::init_value(k3d::color(1, 1, 0.2))),
+		m_node_color(k3d::data::init_value(k3d::color(1, 1, 1))),
 		m_node_border_color(k3d::data::init_value(k3d::color(0, 0, 0))),
 		m_node_label_color(k3d::data::init_value(k3d::color(0, 0, 0))),
-		m_connection_color(k3d::data::init_value(k3d::color(0, 0, 0.7)))
+		m_connection_color(k3d::data::init_value(k3d::color(0, 0, 0)))
 	{
 		m_hbox.pack_start(m_save_png, Gtk::PACK_SHRINK);
 		m_hbox.pack_start(m_save_pdf, Gtk::PACK_SHRINK);
@@ -404,10 +404,10 @@ public:
 		m_root_node = Node;
 
 		k3d::graph& graph = *k3d::property::pipeline_value<k3d::graph*>(m_create_graph->output());
-		const k3d::graph::adjacency_list& topology = *graph.topology;
+		const k3d::graph::adjacency_list_t& topology = *graph.topology;
 		const k3d::uint_t vertex_count = boost::num_vertices(topology);
 
-		const k3d::graph::nodes& vertex_node = k3d::get_array<k3d::graph::nodes>(graph.vertex_data, "node", vertex_count);
+		const k3d::graph::nodes_t& vertex_node = k3d::get_array<k3d::graph::nodes_t>(graph.vertex_data, "node", vertex_count);
 		for(k3d::uint_t vertex = 0; vertex != vertex_count; ++vertex)
 		{
 			if(vertex_node[vertex] == Node)
@@ -596,13 +596,13 @@ public:
 			return_if_fail(graph.vertex_data.count("position"));
 			return_if_fail(graph.edge_data.count("type"));
 
-			const k3d::graph::adjacency_list& topology = *graph.topology;
+			const k3d::graph::adjacency_list_t& topology = *graph.topology;
 			const k3d::uint_t vertex_count = boost::num_vertices(topology);
 			const k3d::uint_t edge_count = boost::num_edges(topology);
 
-			const k3d::graph::nodes& vertex_node = *k3d::get_array<k3d::graph::nodes>(graph.vertex_data, "node");
-			const k3d::graph::points& vertex_position = *k3d::get_array<k3d::graph::points>(graph.vertex_data, "position");
-			const k3d::graph::indices& edge_type = *k3d::get_array<k3d::graph::indices>(graph.edge_data, "type");
+			const k3d::graph::nodes_t& vertex_node = *k3d::get_array<k3d::graph::nodes_t>(graph.vertex_data, "node");
+			const k3d::graph::points_t& vertex_position = *k3d::get_array<k3d::graph::points_t>(graph.vertex_data, "position");
+			const k3d::graph::indices_t& edge_type = *k3d::get_array<k3d::graph::indices_t>(graph.edge_data, "type");
 			
 			// Render the graph edges ...
 			Context->save();
@@ -610,7 +610,7 @@ public:
 			Context->set_source_rgb(connection_color.red, connection_color.green, connection_color.blue);
 
 			k3d::uint_t edge_index = 0;
-			for(std::pair<k3d::graph::edge_iterator, k3d::graph::edge_iterator> edges = boost::edges(topology); edges.first != edges.second; ++edge_index, ++edges.first)
+			for(std::pair<k3d::graph::edge_iterator_t, k3d::graph::edge_iterator_t> edges = boost::edges(topology); edges.first != edges.second; ++edge_index, ++edges.first)
 			{
 				const k3d::uint_t source = boost::source(*edges.first, topology);
 				const k3d::uint_t target = boost::target(*edges.first, topology);
@@ -619,7 +619,7 @@ public:
 				{
 					case BEHAVIOR_EDGE:
 					{
-						std::valarray<k3d::double_t> pattern(0.002, 1);
+						std::valarray<k3d::double_t> pattern(0.008, 1);
 						Context->set_dash(pattern, 0.1);
 						break;
 					}

@@ -53,12 +53,12 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 
 	const k3d::nodes_t nodes = m_document.nodes().collection();
 
-	boost::shared_ptr<k3d::graph::adjacency_list> topology(new k3d::graph::adjacency_list());
-	boost::shared_ptr<k3d::graph::nodes> vertex_node(new k3d::graph::nodes());
-	boost::shared_ptr<k3d::graph::indices> edge_type(new k3d::graph::indices());
+	boost::shared_ptr<k3d::graph::adjacency_list_t> topology(new k3d::graph::adjacency_list_t());
+	boost::shared_ptr<k3d::graph::nodes_t> vertex_node(new k3d::graph::nodes_t());
+	boost::shared_ptr<k3d::graph::indices_t> edge_type(new k3d::graph::indices_t());
 
 	// Insert nodes ...
-	std::map<k3d::inode*, k3d::graph::vertex_descriptor> node_map;
+	std::map<k3d::inode*, k3d::graph::vertex_descriptor_t> node_map;
 	for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 	{
 		if(!include_materials && dynamic_cast<k3d::imaterial*>(*node))

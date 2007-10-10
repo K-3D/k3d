@@ -41,7 +41,7 @@ class tree_layout::coordinate_visitor :
 	public boost::default_bfs_visitor
 {
 public:
-	coordinate_visitor(k3d::graph::indices& VertexRank, k3d::graph::indices& VertexItem, std::map<k3d::uint_t, k3d::uint_t>& RankCounts) :
+	coordinate_visitor(k3d::graph::indices_t& VertexRank, k3d::graph::indices_t& VertexItem, std::map<k3d::uint_t, k3d::uint_t>& RankCounts) :
 		vertex_rank(VertexRank),
 		vertex_item(VertexItem),
 		rank_counts(RankCounts)
@@ -60,8 +60,8 @@ public:
 	}
 
 private:
-	k3d::graph::indices& vertex_rank;
-	k3d::graph::indices& vertex_item;
+	k3d::graph::indices_t& vertex_rank;
+	k3d::graph::indices_t& vertex_item;
 	std::map<k3d::uint_t, k3d::uint_t>& rank_counts;
 };
 
@@ -76,18 +76,18 @@ tree_layout::tree_layout() :
 void tree_layout::on_initialize_graph(const k3d::graph& Input, k3d::graph& Output)
 {
 	// The input graph must be a tree
-	const k3d::graph::indices* const root_array = k3d::get_array<k3d::graph::indices>(Input.graph_data, "root");
+	const k3d::graph::indices_t* const root_array = k3d::get_array<k3d::graph::indices_t>(Input.graph_data, "root");
 	return_if_fail(root_array);
 	return_if_fail(root_array->size() == 1);
 	const k3d::uint_t root = root_array->at(0);
 
 	return_if_fail(Input.topology);
-	const k3d::graph::adjacency_list& input_topology = *Input.topology;
+	const k3d::graph::adjacency_list_t& input_topology = *Input.topology;
 	const k3d::uint_t vertex_count = boost::num_vertices(input_topology);
 
 	// Use a BFS to calculate each vertex' rank and number (its position within its rank)
-	k3d::graph::indices vertex_rank(vertex_count, 0);
-	k3d::graph::indices vertex_item(vertex_count, 0);
+	k3d::graph::indices_t vertex_rank(vertex_count, 0);
+	k3d::graph::indices_t vertex_item(vertex_count, 0);
 	std::map<k3d::uint_t, k3d::uint_t> rank_counts;
 	boost::breadth_first_search(input_topology, root, visitor(coordinate_visitor(vertex_rank, vertex_item, rank_counts)));
 
@@ -95,7 +95,7 @@ void tree_layout::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outpu
 	const k3d::double_t column_offset = m_column_offset.pipeline_value();
 	const k3d::double_t row_offset = m_row_offset.pipeline_value();
 
-	boost::shared_ptr<k3d::graph::points> vertex_position(new k3d::graph::points(vertex_count));
+	boost::shared_ptr<k3d::graph::points_t> vertex_position(new k3d::graph::points_t(vertex_count));
 	for(k3d::uint_t vertex = 0; vertex != vertex_count; ++vertex)
 	{
 		const k3d::uint_t rank = vertex_rank[vertex];

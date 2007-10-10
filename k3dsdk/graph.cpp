@@ -31,7 +31,7 @@ namespace k3d
 namespace detail
 {
 
-static void print(std::ostream& Stream, const boost::shared_ptr<const graph::adjacency_list>& Topology)
+static void print(std::ostream& Stream, const boost::shared_ptr<const graph::adjacency_list_t>& Topology)
 {
 	if(!Topology)
 		return;
@@ -39,7 +39,7 @@ static void print(std::ostream& Stream, const boost::shared_ptr<const graph::adj
 	Stream << "  vertices: (" << boost::num_vertices(*Topology) << ")\n";
 
 	Stream << "  edges: (" << boost::num_edges(*Topology) << ")\n";
-	for(std::pair<graph::edge_iterator, graph::edge_iterator> edges = boost::edges(*Topology); edges.first != edges.second; ++edges.first)
+	for(std::pair<graph::edge_iterator_t, graph::edge_iterator_t> edges = boost::edges(*Topology); edges.first != edges.second; ++edges.first)
 		Stream << "    index: " << (*Topology)[*edges.first].index << " edge: " << *edges.first << "\n";
 }
 
@@ -61,28 +61,28 @@ static void print(std::ostream& Stream, const std::string& Name, const boost::sh
 	if(Array)
 	{
 		Stream << "(" << Array->size() << ") ";
-		if(print<graph::bools>(Stream, *Array))
+		if(print<graph::bools_t>(Stream, *Array))
 		{
 		}
-		else if(print<graph::indices>(Stream, *Array))
+		else if(print<graph::indices_t>(Stream, *Array))
 		{
 		}
-		else if(print<graph::doubles>(Stream, *Array))
+		else if(print<graph::doubles_t>(Stream, *Array))
 		{
 		}
-		else if(print<graph::ints>(Stream, *Array))
+		else if(print<graph::ints_t>(Stream, *Array))
 		{
 		}
-		else if(print<graph::strings>(Stream, *Array))
+		else if(print<graph::strings_t>(Stream, *Array))
 		{
 		}
-		else if(print<graph::points>(Stream, *Array))
+		else if(print<graph::points_t>(Stream, *Array))
 		{
 		}
-		else if(print<graph::vectors>(Stream, *Array))
+		else if(print<graph::vectors_t>(Stream, *Array))
 		{
 		}
-		else if(print<graph::nodes>(Stream, *Array))
+		else if(print<graph::nodes_t>(Stream, *Array))
 		{
 		}
 		else
@@ -94,9 +94,9 @@ static void print(std::ostream& Stream, const std::string& Name, const boost::sh
 	Stream << "\n";
 }
 
-static void print(std::ostream& Stream, const k3d::graph::named_arrays& Arrays)
+static void print(std::ostream& Stream, const k3d::graph::named_arrays_t& Arrays)
 {
-    for(k3d::graph::named_arrays::const_iterator array = Arrays.begin(); array != Arrays.end(); ++array)
+    for(k3d::graph::named_arrays_t::const_iterator array = Arrays.begin(); array != Arrays.end(); ++array)
     	print(Stream, array->first, array->second);
 }
 

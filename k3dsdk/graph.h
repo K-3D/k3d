@@ -52,41 +52,41 @@ public:
 	};
 
 	/// Defines storage for a generic graph topology
-	typedef boost::adjacency_list<boost::listS, boost::vecS, boost::undirectedS, vertex, edge> adjacency_list;
-	typedef boost::graph_traits<adjacency_list>::vertex_descriptor vertex_descriptor;
-	typedef boost::graph_traits<adjacency_list>::edge_descriptor edge_descriptor;
-	typedef boost::graph_traits<adjacency_list>::vertex_iterator vertex_iterator;
-	typedef boost::graph_traits<adjacency_list>::edge_iterator edge_iterator;
-	typedef boost::graph_traits<adjacency_list>::out_edge_iterator out_edge_iterator;
-	typedef boost::graph_traits<adjacency_list>::in_edge_iterator in_edge_iterator;
+	typedef boost::adjacency_list<boost::listS, boost::vecS, boost::undirectedS, vertex, edge> adjacency_list_t;
+	typedef boost::graph_traits<adjacency_list_t>::vertex_descriptor vertex_descriptor_t;
+	typedef boost::graph_traits<adjacency_list_t>::edge_descriptor edge_descriptor_t;
+	typedef boost::graph_traits<adjacency_list_t>::vertex_iterator vertex_iterator_t;
+	typedef boost::graph_traits<adjacency_list_t>::edge_iterator edge_iterator_t;
+	typedef boost::graph_traits<adjacency_list_t>::out_edge_iterator out_edge_iterator_t;
+	typedef boost::graph_traits<adjacency_list_t>::in_edge_iterator in_edge_iterator_t;
 
 	/// Defines storage for a generic collection of boolean values
-	typedef typed_array<bool_t> bools;
+	typedef typed_array<bool_t> bools_t;
 	/// Defines storage for a generic collection of integer values
-	typedef typed_array<int32_t> ints;
+	typedef typed_array<int32_t> ints_t;
 	/// Defines storage for a generic collection of index values
-	typedef typed_array<uint_t> indices;
+	typedef typed_array<uint_t> indices_t;
 	/// Defines storage for a generic collection of floating-point values
-	typedef typed_array<double_t> doubles;
+	typedef typed_array<double_t> doubles_t;
 	/// Defines storage for a generic collection of string values
-	typedef typed_array<string_t> strings;
+	typedef typed_array<string_t> strings_t;
 	/// Defines storage for a generic collection of two-dimensional points
-	typedef typed_array<point2> points;
+	typedef typed_array<point2> points_t;
 	/// Defines storage for a generic collection of two-dimensional vectors
-	typedef typed_array<vector2> vectors;
+	typedef typed_array<vector2> vectors_t;
 	/// Defines storage for a generic collection of inode objects
-	typedef typed_array<inode*> nodes;
+	typedef typed_array<inode*> nodes_t;
 	/// Defines a heterogeneous collection of named, shared arrays
-	typedef k3d::named_arrays named_arrays;
+	typedef k3d::named_arrays named_arrays_t;
 
 	/// Stores the graph topology
-	boost::shared_ptr<const adjacency_list> topology;
+	boost::shared_ptr<const adjacency_list_t> topology;
 	/// Stores user-defined per-graph data
-	named_arrays graph_data;
+	named_arrays_t graph_data;
 	/// Stores user-defined per-vertex data
-	named_arrays vertex_data;
+	named_arrays_t vertex_data;
 	/// Stores uder-defined per-edge data
-	named_arrays edge_data;
+	named_arrays_t edge_data;
 };
 
 /// Stream serialization
