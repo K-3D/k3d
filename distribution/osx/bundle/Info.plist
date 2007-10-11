@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>k3d</string>
+	<string>K-3D</string>
 	<key>CFBundleIconFile</key>
-	<string>k3d.icns</string>
+	<string>K-3D.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.k-3d.k3d</string>
+	<string>org.k-3d.K-3D</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 </dict>

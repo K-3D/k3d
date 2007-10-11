@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# Build the wrapper executable ...
+cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/ScriptExec" "@k3d_BINARY_DIR@"
+
+unset CC # Build fails if CC happens to be set (to anything other than CompileC)
+cd "@k3d_BINARY_DIR@/ScriptExec"
+xcodebuild -configuration Deployment clean build
+
+# Create the bundle ...
 BUNDLE_DIR="@k3d_BINARY_DIR@/bundle/K-3D.app/Contents"
 
 mkdir -p "${BUNDLE_DIR}/MacOS"
@@ -7,9 +15,16 @@ mkdir -p "${BUNDLE_DIR}/Resources/bin"
 
 cd "${BUNDLE_DIR}"
 
-# Copy binary executables ...
-cp -v "@k3d_BINARY_DIR@/bin/k3d" MacOS
+# Copy wrapper executable ...
+cp -v "@k3d_BINARY_DIR@/ScriptExec/build/Deployment/ScriptExec.app/Contents/MacOS/ScriptExec" MacOS/K-3D
 
+# Copy wrapper resources ...
+cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/MenuBar.nib" Resources
+cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/openDoc" Resources
+cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/script" Resources
+
+# Copy binary executables ...
+cp -v "@k3d_BINARY_DIR@/bin/k3d" Resources/bin
 cp -v "@k3d_BINARY_DIR@/bin/k3d-bug-buddy" Resources/bin
 cp -v "@k3d_BINARY_DIR@/bin/k3d-make-module-proxy" Resources/bin
 cp -v "@k3d_BINARY_DIR@/bin/k3d-renderframe" Resources/bin
@@ -24,17 +39,28 @@ cp -v -r "@k3d_BINARY_DIR@/lib" Resources
 cp -v -r "@k3d_SOURCE_DIR@/share" Resources
 
 # Setup the application icon ...
-cp -v "@k3d_SOURCE_DIR@/share/icons/k3d.icns" Resources/k3d.icns
+cp -v "@k3d_SOURCE_DIR@/share/icons/k3d.icns" Resources/K-3D.icns
 
 # Setup the metadata file ...
-cp -v "@k3d_SOURCE_DIR@/distribution/osx/application_bundle/Info.plist" .
+cp -v "@k3d_SOURCE_DIR@/distribution/osx/bundle/Info.plist" .
 
 # Get rid of those pesky .svn directories ...
 rm -rvf $(find . -name ".svn")
 
 # Update library paths ...
-install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk.dylib ../Resources/lib/libk3dsdk.dylib MacOS/k3d
-install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk-half.dylib ../Resources/lib/libk3dsdk-half.dylib MacOS/k3d
-install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk-sgi-tesselator.dylib ../Resources/lib/libk3dsdk-sgi-tesselator.dylib MacOS/k3d
-install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk-glew.dylib ../Resources/lib/libk3dsdk-glew.dylib MacOS/k3d
+#for binary in MacOS/k3d; do 
+#	echo "Adjusting library paths for $binary ..."
+#	install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk.dylib @executable_path/../Resources/lib/libk3dsdk.dylib $binary
+#	install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk-half.dylib @executable_path/../Resources/lib/libk3dsdk-half.dylib $binary
+#	install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk-sgi-tesselator.dylib @executable_path/../Resources/lib/libk3dsdk-sgi-tesselator.dylib $binary
+#	install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk-glew.dylib @executable_path/../Resources/lib/libk3dsdk-glew.dylib $binary
+#done
+#
+#for binary in Resources/bin/*; do 
+#	echo "Adjusting library paths for $binary ..."
+#	install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk.dylib @executable_path/../lib/libk3dsdk.dylib $binary
+#	install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk-half.dylib @executable_path/../lib/libk3dsdk-half.dylib $binary
+#	install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk-sgi-tesselator.dylib @executable_path/../lib/libk3dsdk-sgi-tesselator.dylib $binary
+#	install_name_tool -change @k3d_BINARY_DIR@/lib/libk3dsdk-glew.dylib @executable_path/../lib/libk3dsdk-glew.dylib $binary
+#done
 
