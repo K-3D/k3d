@@ -1,5 +1,6 @@
 #!/bin/sh
 
+rm -rvf "@k3d_BINARY_DIR@/K-3D.dmg"
 rm -rvf "@k3d_BINARY_DIR@/ScriptExec"
 rm -rvf "@k3d_BINARY_DIR@/bundle"
 

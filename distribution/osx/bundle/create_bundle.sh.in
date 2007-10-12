@@ -7,9 +7,10 @@ cd "@k3d_BINARY_DIR@/ScriptExec"
 xcodebuild -configuration Deployment clean build SYMROOT=build
 
 # Create the bundle ...
-BUNDLE_DIR="@k3d_BINARY_DIR@/bundle/K-3D.app/Contents"
-mkdir -p "${BUNDLE_DIR}"
-cd "${BUNDLE_DIR}"
+IMAGE="@k3d_BINARY_DIR@/K-3D"
+BUNDLE="$IMAGE/K-3D.app"
+mkdir -p "$BUNDLE/Contents"
+cd "$BUNDLE/Contents"
 
 # Setup wrapper executable ...
 mkdir MacOS
@@ -34,8 +35,16 @@ cp -v "@k3d_BINARY_DIR@/bin/k3d-renderjob" Resources/bin
 cp -v "@k3d_BINARY_DIR@/bin/k3d-sl2xml" Resources/bin
 cp -v "@k3d_BINARY_DIR@/bin/k3d-uuidgen" Resources/bin
 
+# Strip binary executables ...
+strip -ur Resources/bin/*
+
 # Copy libraries ...
 cp -v -r "@k3d_BINARY_DIR@/lib" Resources
+
+# Strip libraries ...
+strip -x Resources/lib/*.dylib
+strip -x Resources/lib/plugins/*.module
+strip -x Resources/lib/uiplugins/*.module
 
 # Setup the application icon ...
 cp -v "@k3d_SOURCE_DIR@/share/icons/k3d.icns" Resources/K-3D.icns
@@ -48,4 +57,17 @@ cp -v -r "@k3d_SOURCE_DIR@/share" Resources
 
 # Get rid of those pesky .svn directories ...
 rm -rf $(find . -name ".svn")
+
+# Add a link to /Applications so users can drag-and-drop the bundle into it
+cd "@k3d_BINARY_DIR@"
+ln -sf /Applications "$IMAGE"
+
+# Create a disk image
+echo "Creating disk image ..."
+TEMP_IMAGE=temp.dmg
+hdiutil create -srcfolder "$IMAGE" "$TEMP_IMAGE"
+
+echo "Compressing disk image ..."
+hdiutil convert "$TEMP_IMAGE" -format UDZO -imagekey zlib-level=9 -o K-3D.dmg
+rm -f "$TEMP_IMAGE"
 

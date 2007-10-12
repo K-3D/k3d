@@ -186,6 +186,12 @@ IF(APPLE)
 	# Setup creation of an application bundle
 	CONFIGURE_FILE(${k3d_SOURCE_DIR}/distribution/osx/bundle/create_bundle.sh.in ${k3d_BINARY_DIR}/create_bundle.sh @ONLY)
 	CONFIGURE_FILE(${k3d_SOURCE_DIR}/distribution/osx/bundle/clean_bundle.sh.in ${k3d_BINARY_DIR}/clean_bundle.sh @ONLY)
+
+	ADD_CUSTOM_TARGET(package-bundle
+		COMMAND sh ${k3d_BINARY_DIR}/clean_bundle.sh && sh ${k3d_BINARY_DIR}/create_bundle.sh
+		WORKING_DIRECTORY ${k3d_BINARY_DIR}
+		)
+
 ENDIF(APPLE)
 
 INCLUDE(CPack)
