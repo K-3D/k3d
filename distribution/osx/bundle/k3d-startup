@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# Author: Aaron Voisine <aaron@voisine.org>
+# Inkscape Modifications: Michael Wybrow <mjwybrow@users.sourceforge.net>
+# K-3D Modifications: Timothy M. Shead <tshead@k-3d.com>
+
+echo "running $0 with arguments $@"
+
+CWD="`(cd \"\`dirname \\\"$0\\\"\`\"; echo $PWD)`"
+TOP="`dirname \"$CWD\"`"
+
+export DYLD_LIBRARY_PATH="$TOP/lib"
+#export PATH="$CWD:$PATH"
+
+exec "$CWD/k3d" "$@"
+

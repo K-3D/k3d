@@ -1,9 +1,12 @@
 #!/bin/sh
 #
 # Author: Aaron Voisine <aaron@voisine.org>
+# K-3D Modifications: Timothy M. Shead <tshead@k-3d.com>
+
+echo "running $0 with arguments $@"
 
 export "DISPLAY=`cat /tmp/display.$UID`"
 BASE="`echo "$0" | sed -e 's/\/[A-Za-z]*.app\/Contents\/Resources\/script/\//'`"
 cd "$BASE"
 #exec "$CWD/bin/k3d" "$@"
-exec "$CWD/bin/k3d"
+exec "$CWD/bin/k3d-startup"
