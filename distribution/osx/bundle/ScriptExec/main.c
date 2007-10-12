@@ -21,6 +21,8 @@
 
 */
 
+/* Modified for use with K-3D by Timothy M. Shead <tshead@k-3d.com> */
+
 ///////////////////////////////////////
 // Includes
 ///////////////////////////////////////    
@@ -48,8 +50,8 @@
 #define	kMaxPathLength 1024
 
 // names of files bundled with app
-#define	kScriptFileName "script"
-#define kOpenDocFileName "openDoc"
+#define	kScriptFileName "startup-script"
+#define kOpenDocFileName "open-document-script"
 
 // custom carbon events
 #define kEventClassRedFatalAlert 911

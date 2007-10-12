@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleExecutable</key>
-	<string>K-3D</string>
-	<key>CFBundleIconFile</key>
-	<string>K-3D.icns</string>
-	<key>CFBundleIdentifier</key>
-	<string>org.k-3d.K-3D</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-</dict>
+	<dict>
+		<key>CFBundleExecutable</key>
+		<string>K-3D</string>
+		<key>CFBundleIconFile</key>
+		<string>K-3D</string>
+		<key>CFBundleIdentifier</key>
+		<string>org.k-3d.K-3D</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+	</dict>
 </plist>

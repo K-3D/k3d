@@ -4,7 +4,7 @@
 cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/ScriptExec" "@k3d_BINARY_DIR@"
 unset CC # Build fails if CC happens to be set (to anything other than CompileC)
 cd "@k3d_BINARY_DIR@/ScriptExec"
-xcodebuild -configuration Deployment clean build
+xcodebuild -configuration Deployment clean build SYMROOT=build
 
 # Create the bundle ...
 BUNDLE_DIR="@k3d_BINARY_DIR@/bundle/K-3D.app/Contents"
@@ -17,8 +17,8 @@ cp -v "@k3d_BINARY_DIR@/ScriptExec/build/Deployment/ScriptExec.app/Contents/MacO
 
 mkdir Resources
 cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/ScriptExec/MenuBar.nib" Resources
-cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/openDoc" Resources
-cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/script" Resources
+cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/open-document-script" Resources
+cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/startup-script" Resources
 
 # Copy startup script
 mkdir Resources/bin

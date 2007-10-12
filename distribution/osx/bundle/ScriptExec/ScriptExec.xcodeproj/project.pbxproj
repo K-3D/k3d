@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		664C29F1060ECDC4006EC560 /* openDoc in Resources */ = {isa = PBXBuildFile; fileRef = 664C29F0060ECDC4006EC560 /* openDoc */; };
+		664C29F1060ECDC4006EC560 /* open-document-script in Resources */ = {isa = PBXBuildFile; fileRef = 664C29F0060ECDC4006EC560 /* open-document-script */; };
 		8D0C4E8B0486CD37000505A6 /* ScriptExec_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 32DBCF6D0370B57F00C91783 /* ScriptExec_Prefix.pch */; };
 		8D0C4E8D0486CD37000505A6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0867D6AAFE840B52C02AAC07 /* InfoPlist.strings */; };
 		8D0C4E900486CD37000505A6 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 20286C2BFDCF999611CA2CEA /* main.c */; settings = {ATTRIBUTES = (); }; };
 		8D0C4E920486CD37000505A6 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20286C33FDCF999611CA2CEA /* Carbon.framework */; };
 		8D0C4E930486CD37000505A6 /* libstdc++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0249A66BFF388E3F11CA2CEA /* libstdc++.a */; };
 		B8DCE045056DAC3500C390B0 /* MenuBar.nib in Resources */ = {isa = PBXBuildFile; fileRef = B8DCE042056DAC3500C390B0 /* MenuBar.nib */; };
-		B8DCE049056DAC5000C390B0 /* script in Resources */ = {isa = PBXBuildFile; fileRef = B8DCE048056DAC5000C390B0 /* script */; };
+		B8DCE049056DAC5000C390B0 /* startup-script in Resources */ = {isa = PBXBuildFile; fileRef = B8DCE048056DAC5000C390B0 /* startup-script */; };
 		B8DCE04F056DACAE00C390B0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8DCE04E056DACAE00C390B0 /* Security.framework */; };
 /* End PBXBuildFile section */
 
@@ -26,11 +26,11 @@
 		32DBCF6D0370B57F00C91783 /* ScriptExec_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScriptExec_Prefix.pch; sourceTree = "<group>"; };
 		4A9504C8FFE6A3BC11CA0CBA /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
 		4A9504CAFFE6A41611CA0CBA /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
-		664C29F0060ECDC4006EC560 /* openDoc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = openDoc; sourceTree = "<group>"; };
+		664C29F0060ECDC4006EC560 /* open-document-script */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = "open-document-script"; sourceTree = "<group>"; };
 		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D0C4E970486CD37000505A6 /* ScriptExec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScriptExec.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8DCE042056DAC3500C390B0 /* MenuBar.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MenuBar.nib; sourceTree = "<group>"; };
-		B8DCE048056DAC5000C390B0 /* script */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = script; sourceTree = "<group>"; };
+		B8DCE048056DAC5000C390B0 /* startup-script */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = "startup-script"; sourceTree = "<group>"; };
 		B8DCE04E056DACAE00C390B0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
@@ -79,10 +79,10 @@
 		20286C2CFDCF999611CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				664C29F0060ECDC4006EC560 /* openDoc */,
+				664C29F0060ECDC4006EC560 /* open-document-script */,
 				B8DCE042056DAC3500C390B0 /* MenuBar.nib */,
 				8D0C4E960486CD37000505A6 /* Info.plist */,
-				B8DCE048056DAC5000C390B0 /* script */,
+				B8DCE048056DAC5000C390B0 /* startup-script */,
 				0867D6AAFE840B52C02AAC07 /* InfoPlist.strings */,
 			);
 			name = Resources;
@@ -156,8 +156,8 @@
 			files = (
 				8D0C4E8D0486CD37000505A6 /* InfoPlist.strings in Resources */,
 				B8DCE045056DAC3500C390B0 /* MenuBar.nib in Resources */,
-				B8DCE049056DAC5000C390B0 /* script in Resources */,
-				664C29F1060ECDC4006EC560 /* openDoc in Resources */,
+				B8DCE049056DAC5000C390B0 /* startup-script in Resources */,
+				664C29F1060ECDC4006EC560 /* open-document-script in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
