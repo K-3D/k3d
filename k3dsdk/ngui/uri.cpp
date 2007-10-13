@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -45,7 +45,7 @@ void open(const std::string& URI)
 	const factories_t factories = plugins<iuri_handler>();
 	if(factories.empty())
 	{
-		libk3dngui::error_message(k3d::string_cast(boost::format(_("Couldn't display %1%")) % URI), _("No K-3D URI-handler is available."));
+		libk3dngui::error_message(k3d::string_cast(boost::format(_("Couldn't display %1%")) % URI), _("No plugin is available to open URIs."));
 		return;
 	}
 

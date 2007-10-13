@@ -18,7 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <k3d-i18n-config.h>
-
 #include <k3dsdk/ngui/angle_axis_control.h>
 #include <k3dsdk/ngui/aqsis_layer_chooser.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
@@ -36,7 +35,6 @@
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/node_chooser.h>
-#include <k3dsdk/ngui/open_uri.h>
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/path_chooser.h>
 #include <k3dsdk/ngui/point_control.h>
@@ -50,6 +48,7 @@
 #include <k3dsdk/ngui/toggle_button.h>
 #include <k3dsdk/ngui/toolbar.h>
 #include <k3dsdk/ngui/ui_component.h>
+#include <k3dsdk/ngui/uri.h>
 #include <k3dsdk/ngui/user_property.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/widget_manip.h>
@@ -653,7 +652,7 @@ public:
 	{
 		if(m_node)
 		{
-			open_uri("http://www.k-3d.org/wiki/" + m_node->factory().name());
+			k3d::ngui::uri::open("http://www.k-3d.org/wiki/" + m_node->factory().name());
 		}
 	}
 

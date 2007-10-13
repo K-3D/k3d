@@ -21,11 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3d-i18n-config.h>
-#include <k3d-version-config.h>
-
 #include "splash_box.h"
 
+#include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
 #include <k3dsdk/ngui/application_state.h>
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/button.h>
@@ -35,10 +34,10 @@
 #include <k3dsdk/ngui/learning_menu.h>
 #include <k3dsdk/ngui/main_document_window.h>
 #include <k3dsdk/ngui/messages.h>
-#include <k3dsdk/ngui/open_uri.h>
 #include <k3dsdk/ngui/options.h>
 #include <k3dsdk/ngui/tutorial_message.h>
 #include <k3dsdk/ngui/tutorial_recorder.h>
+#include <k3dsdk/ngui/uri.h>
 #include <k3dsdk/ngui/utility.h>
 
 #include <k3dsdk/application.h>
@@ -445,7 +444,7 @@ public:
 
 	void browser_navigate(const std::string& URL)
 	{
-		return_if_fail(libk3dngui::open_uri(URL));
+		k3d::ngui::uri::open(URL);
 	}
 
 	void message(const std::string& Message)
