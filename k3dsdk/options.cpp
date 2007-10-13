@@ -39,13 +39,11 @@
 #ifdef K3D_API_WIN32
 
 	#define DEFAULT_BITMAP_VIEWER "mspaint \"%1%\""
-	#define DEFAULT_HTML_VIEWER "firefox \"%1%\""
 	#define DEFAULT_TEXT_EDITOR "notepad \"%1%\""
 
 #else // K3D_API_WIN32
 
 	#define DEFAULT_BITMAP_VIEWER "display \"%1%\""
-	#define DEFAULT_HTML_VIEWER "firefox \"%1%\""
 	#define DEFAULT_TEXT_EDITOR "gedit \"%1%\""
 
 #endif // !K3D_API_WIN32
@@ -287,8 +285,6 @@ void set_storage(istorage& Storage)
 	// Default external commands
 	if(get_command(command::bitmap_viewer()).empty())
 		set_command(command::bitmap_viewer(), DEFAULT_BITMAP_VIEWER);
-	if(get_command(command::html_viewer()).empty())
-		set_command(command::html_viewer(), DEFAULT_HTML_VIEWER);
 	if(get_command(command::text_editor()).empty())
 		set_command(command::text_editor(), DEFAULT_TEXT_EDITOR);
 

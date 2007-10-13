@@ -104,7 +104,6 @@ namespace command
 {
 
 inline const std::string bitmap_viewer() { return "bitmap_viewer"; }
-inline const std::string html_viewer() { return "html_viewer"; }
 inline const std::string text_editor() { return "text_editor"; }
 
 } // namespace command
