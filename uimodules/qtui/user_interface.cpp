@@ -343,7 +343,7 @@ void user_interface::stop_event_loop()
 	m_application->quit();
 }
 
-void user_interface::browser_navigate(const std::string& URL)
+void user_interface::open_uri(const std::string& URI)
 {
 }
 

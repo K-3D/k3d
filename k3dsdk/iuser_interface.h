@@ -42,8 +42,8 @@ class iuser_interface :
 	public virtual iunknown
 {
 public:
-	/// Displays a URL in the user's preferred web browser
-	virtual void browser_navigate(const std::string& URL) = 0;
+	/// Displays a URI in the user's preferred application
+	virtual void open_uri(const std::string& URI) = 0;
 	/// Displays an informational message
 	virtual void message(const std::string& Message) = 0;
 	/// Displays a warning message

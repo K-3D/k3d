@@ -442,9 +442,9 @@ public:
 		m_main->quit();
 	}
 
-	void browser_navigate(const std::string& URL)
+	void open_uri(const std::string& URI)
 	{
-		k3d::ngui::uri::open(URL);
+		k3d::ngui::uri::open(URI);
 	}
 
 	void message(const std::string& Message)

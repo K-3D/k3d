@@ -45,6 +45,11 @@ iuser_interface::iuser_interface(k3d::iuser_interface& UserInterface) :
 {
 }
 
+void iuser_interface::open_uri(const std::string& URI)
+{
+	wrapped().open_uri(URI);
+}
+
 void iuser_interface::message(const std::string& Message)
 {
 	wrapped().message(Message);
@@ -86,6 +91,11 @@ void iuser_interface::define_class()
 {
 	class_<iuser_interface>("iuser_interface", 
 		"Provides access to the user interface plugin specified by the user at program startup.", no_init)
+		.def("open_uri", &iuser_interface::open_uri,
+			"Opens a Uniform Resource Identifier (URI) in the user's preferred application.\n"
+			"@param URI: The URI string to be opened.\n"
+			"@note: Depending on the user interface plugin, this might open an application, "
+			"print a message to the console, display a dialog box, or do nothing.")
 		.def("message", &iuser_interface::message,
 			"Displays an information message to the user.\n"
 			"@param message: The message string to be displayed.\n" 

@@ -142,7 +142,7 @@ public:
 	void start_event_loop();
 	void stop_event_loop();
 	bool batch_mode();
-	void browser_navigate(const std::string& URL);
+	void open_uri(const std::string& URI);
 	void message(const std::string& Message);
 	void warning_message(const std::string& Message);
 	void error_message(const std::string& Message);

@@ -73,7 +73,7 @@ public:
 	{
 	}
 
-	void browser_navigate(const std::string& URL)
+	void open_uri(const std::string& URI)
 	{
 	}
 

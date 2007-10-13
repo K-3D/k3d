@@ -100,7 +100,7 @@ public:
 		k3d::log() << debug << k3d_file_reference << std::endl;
 	}
 
-	void browser_navigate(const std::string& URL)
+	void open_uri(const std::string& URI)
 	{
 	}
 
