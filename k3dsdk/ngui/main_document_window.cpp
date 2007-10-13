@@ -22,9 +22,6 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3d-i18n-config.h>
-#include <k3d-version-config.h>
-
 #include "application_state.h"
 #include "assign_hotkeys_dialog.h"
 #include "button.h"
@@ -47,7 +44,6 @@
 #include "merge_nodes.h"
 #include "messages.h"
 #include "modifiers.h"
-#include "open_uri.h"
 #include "panel_frame.h"
 #include "render.h"
 #include "savable_document_window.h"
@@ -61,10 +57,13 @@
 #include "tutorial_message.h"
 #include "tutorial_recorder.h"
 #include "undo_utility.h"
+#include "uri.h"
 #include "utility.h"
 #include "viewport.h"
 #include "widget_manip.h"
 
+#include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/axis.h>
 #include <k3dsdk/basic_math.h>
@@ -76,9 +75,9 @@
 #include <k3dsdk/gzstream.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idocument.h>
-#include <k3dsdk/idocument_plugin_factory.h>
-#include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/idocument_exporter.h>
+#include <k3dsdk/idocument_importer.h>
+#include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/iparentable.h>
@@ -334,7 +333,7 @@ private:
 				Gtk::TextIter end = Begin;
 				end.forward_to_tag_toggle(m_url_tag);
 
-				open_uri(begin.get_text(end));
+				k3d::ngui::uri::open(begin.get_text(end));
 				break;
 			}
 			default:
@@ -2363,17 +2362,17 @@ private:
 
 	void on_help_manual()
 	{
-		open_uri("http://www.k-3d.org/wiki/User_Documentation");
+		k3d::ngui::uri::open("http://www.k-3d.org/wiki/User_Documentation");
 	}
 
 	void on_help_online()
 	{
-		open_uri("http://www.k-3d.org");
+		k3d::ngui::uri::open("http://www.k-3d.org");
 	}
 
 	void on_help_release_notes()
 	{
-		open_uri("http://www.k-3d.org/wiki/K-3D_" K3D_VERSION "_Release_Notes");
+		k3d::ngui::uri::open("http://www.k-3d.org/wiki/K-3D_" K3D_VERSION "_Release_Notes");
 	}
 
 	void on_help_about()

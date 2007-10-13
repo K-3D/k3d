@@ -26,14 +26,23 @@
 
 #include <string>
 
-namespace libk3dngui
+namespace k3d
 {
 
-/// Asynchronously displays a URI in the user's choice of application (presumably controlled by MIME-TYPE)
-bool open_uri(const std::string& URI);
+namespace ngui
+{
 
-} // namespace libk3dngui
+namespace uri
+{
+
+/// Asynchronously displays a URI in the user's choice of application, displays an error message otherwise
+void open(const std::string& URI);
+
+} // namespace uri
+
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !NGUI_OPEN_URI_H
-
 
