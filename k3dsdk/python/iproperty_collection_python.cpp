@@ -153,6 +153,13 @@ iproperty iproperty_collection::add_ri_option(const std::string& Type, const std
 	throw std::invalid_argument("unknown renderman option type: " + Type);
 }
 
+bool iproperty_collection::has_property(const std::string& Name)
+{
+	if (k3d::property::get(wrapped(), Name))
+		return true;
+	return false;
+}
+
 object iproperty_collection::getattr(const std::string& Name)
 {
 	if(k3d::iproperty* property = k3d::property::get(wrapped(), Name))
@@ -196,7 +203,9 @@ void iproperty_collection::define_class()
 		.def("__getattr__", &iproperty_collection::getattr,
 			"Returns the pipeline value of an L{iproperty} by name.")
 		.def("__setattr__", &iproperty_collection::setattr,
-			"Sets the internal value of an L{iproperty} value by name.");
+			"Sets the internal value of an L{iproperty} value by name.")
+		.def("has_property", &iproperty_collection::has_property,
+			"True if the named property is registered");
 }
 
 } // namespace python

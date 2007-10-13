@@ -48,6 +48,7 @@ public:
 	iproperty add_user_property(const std::string& Type, const std::string& Name, const std::string& Label, const std::string& Description);
 	iproperty add_ri_attribute(const std::string& Type, const std::string& List, const std::string& Name, const std::string& Label, const std::string& Description);
 	iproperty add_ri_option(const std::string& Type, const std::string& List, const std::string& Name, const std::string& Label, const std::string& Description);
+	bool has_property(const std::string& Name);
 
 	boost::python::object getattr(const std::string& Name);
 	void setattr(const std::string& Name, const boost::python::object& Value);
