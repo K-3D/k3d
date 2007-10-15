@@ -433,12 +433,12 @@ private:
 	{
 		{
 			file_chooser_dialog dialog(_("Save Tutorial As:"), k3d::options::path::tutorials(), Gtk::FILE_CHOOSER_ACTION_SAVE);
-			if(m_script_engine->factory().class_id() == k3d::classes::K3DScriptEngine())
+			if(m_script_engine->factory().factory_id() == k3d::classes::K3DScriptEngine())
 			{
 				dialog.add_pattern_filter(_("K-3D Script (*.k3dscript)"), "*.k3dscript");
 				dialog.append_extension(".k3dscript");
 			}
-			else if(m_script_engine->factory().class_id() == k3d::classes::PythonEngine())
+			else if(m_script_engine->factory().factory_id() == k3d::classes::PythonEngine())
 			{
 				dialog.add_pattern_filter(_("Python Script (*.py)"), "*.py");
 				dialog.append_extension(".py");

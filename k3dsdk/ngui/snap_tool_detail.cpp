@@ -250,7 +250,7 @@ bool snap_tool_detail::transform_target::create_transform_modifier(const std::st
 	// Check for an existing transform modifier
 	k3d::inode* upstream_node = upstream_transform_modifier(*node);
 	/** \todo check for same name too */
-	if(upstream_node && (k3d::classes::FrozenTransformation() == upstream_node->factory().class_id()))
+	if(upstream_node && (k3d::classes::FrozenTransformation() == upstream_node->factory().factory_id()))
 	{
 		set_transform_modifier(upstream_node);
 		return false;

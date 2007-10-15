@@ -358,7 +358,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			upstream_node = upstream_output->property_node();
 		
 		/** \todo check for same name too */
-		if(upstream_node && (Class == upstream_node->factory().class_id()))
+		if(upstream_node && (Class == upstream_node->factory().factory_id()))
 		{
 			set_transform_modifier(upstream_node);
 			return false;
@@ -370,7 +370,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			upstream_output = node->document().pipeline().dependency(downstream_input2);
 			if(upstream_output)
 				upstream_node = upstream_output->property_node();
-			if(upstream_node && (Class == upstream_node->factory().class_id()))
+			if(upstream_node && (Class == upstream_node->factory().factory_id()))
 			{
 				set_transform_modifier(upstream_node);
 				return false;
@@ -539,7 +539,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 
 			// Check for an existing mesh modifier
 			k3d::inode* upstream_node = upstream_mesh_modifier(*node);
-			if(upstream_node && (transform_points == upstream_node->factory().class_id()))
+			if(upstream_node && (transform_points == upstream_node->factory().factory_id()))
 			{
 				set_transform_modifier(upstream_node);
 			}

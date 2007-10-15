@@ -73,7 +73,7 @@ protected:
 		return_val_if_fail(language.factory(), false);
 
 		// If the current script engine is for the wrong language, lose it ...
-		if(m_script_engine && (m_script_engine->factory().class_id() != language.factory()->class_id()))
+		if(m_script_engine && (m_script_engine->factory().factory_id() != language.factory()->factory_id()))
 		{
 			delete dynamic_cast<ideletable*>(m_script_engine);
 			m_script_engine = 0;
@@ -81,7 +81,7 @@ protected:
 
 		// Create our script engine as-needed ...
 		if(!m_script_engine)
-			m_script_engine = create_plugin<iscript_engine>(language.factory()->class_id());
+			m_script_engine = create_plugin<iscript_engine>(language.factory()->factory_id());
 
 		// No script engine?  We're outta here ...
 		return_val_if_fail(m_script_engine, false);

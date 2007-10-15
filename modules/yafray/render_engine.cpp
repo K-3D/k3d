@@ -339,7 +339,7 @@ private:
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
 			// Render sphere nodes ...
-			if((*node)->factory().class_id() == k3d::classes::Sphere())
+			if((*node)->factory().factory_id() == k3d::classes::Sphere())
 			{
 				const k3d::point3 sphere_center = k3d::node_to_world_matrix(**node) * k3d::point3(0, 0, 0);
 				const boost::any sphere_radius(k3d::property::pipeline_value(**node, "radius"));
@@ -360,7 +360,7 @@ private:
 			}
 
 			// Render mesh nodes ...
-			if((*node)->factory().class_id() == k3d::classes::MeshInstance())
+			if((*node)->factory().factory_id() == k3d::classes::MeshInstance())
 			{
 				if(!dynamic_cast<k3d::gl::idrawable*>(*node))
 					continue;

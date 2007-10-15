@@ -63,7 +63,7 @@ inode* upstream_frozen_transformation(inode& Node)
 	iproperty& downstream_input = downstream_sink->transform_sink_input();
 	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
 
-	if(upstream_output && upstream_output->property_node() && upstream_output->property_node()->factory().class_id() == classes::FrozenTransformation())
+	if(upstream_output && upstream_output->property_node() && upstream_output->property_node()->factory().factory_id() == classes::FrozenTransformation())
 		return upstream_output->property_node();
 
 	return 0;

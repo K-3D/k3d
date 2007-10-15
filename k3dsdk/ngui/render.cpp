@@ -332,7 +332,7 @@ const std::string renderman_type(k3d::iunknown& Engine)
 {
 	if(k3d::inode* const node = dynamic_cast<k3d::inode*>(&Engine))
 	{
-		if(node->factory().class_id() == k3d::classes::RenderManEngine())
+		if(node->factory().factory_id() == k3d::classes::RenderManEngine())
 		{
 			return boost::any_cast<std::string>(k3d::property::pipeline_value(Engine, "render_engine"));
 		}
@@ -431,7 +431,7 @@ void test_yafray_render_engine(k3d::iunknown& Engine)
 	if(!node)
 		return;
 
-	if(node->factory().class_id() != k3d::uuid(0xef38bf93, 0x66654f9f, 0x992ca91b, 0x62bae139))
+	if(node->factory().factory_id() != k3d::uuid(0xef38bf93, 0x66654f9f, 0x992ca91b, 0x62bae139))
 		return;
 
 	test_performed = true;
@@ -807,13 +807,13 @@ void render_camera_frame(k3d::icamera& Camera, k3d::icamera_still_render_engine&
 		}
 		else if(k3d::inode* const node = dynamic_cast<k3d::inode*>(&Engine))
 		{
-			if(node->factory().class_id() == k3d::classes::RenderManEngine())
+			if(node->factory().factory_id() == k3d::classes::RenderManEngine())
 			{
 				dialog.add_pattern_filter(_("TIFF Image (*.tiff)"), "*.tiff");
 				dialog.add_all_files_filter();
 				dialog.append_extension(".tiff");
 			}
-			else if(node->factory().class_id() == k3d::uuid(0xef38bf93, 0x66654f9f, 0x992ca91b, 0x62bae139))
+			else if(node->factory().factory_id() == k3d::uuid(0xef38bf93, 0x66654f9f, 0x992ca91b, 0x62bae139))
 			{
 				dialog.add_pattern_filter(_("Targa Image (*.tga)"), "*.tga");
 				dialog.add_all_files_filter();
@@ -856,11 +856,11 @@ void render_camera_animation(document_state& DocumentState, k3d::icamera& Camera
 	}
 	else if(k3d::inode* const node = dynamic_cast<k3d::inode*>(&Engine))
 	{
-		if(node->factory().class_id() == k3d::classes::RenderManEngine())
+		if(node->factory().factory_id() == k3d::classes::RenderManEngine())
 		{
 			files.after = k3d::ustring::from_utf8(".tiff");
 		}
-		else if(node->factory().class_id() == k3d::uuid(0xef38bf93, 0x66654f9f, 0x992ca91b, 0x62bae139))
+		else if(node->factory().factory_id() == k3d::uuid(0xef38bf93, 0x66654f9f, 0x992ca91b, 0x62bae139))
 		{
 			files.after = k3d::ustring::from_utf8(".tga");
 		}

@@ -32,14 +32,16 @@ namespace k3d
 /////////////////////////////////////////////////////////////////////////////
 // plugin_factory
 
-plugin_factory::plugin_factory(const uuid& ClassID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality, const metadata_t& Metadata) :
-	m_class_id(ClassID),
+plugin_factory::plugin_factory(const uuid& FactoryID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality, const metadata_t& Metadata) :
+	m_factory_id(FactoryID),
+	m_persistent_factory_id(FactoryID),
 	m_name(Name),
 	m_short_description(ShortDescription),
 	m_quality(Quality),
 	m_metadata(Metadata)
 {
-	assert(m_class_id != k3d::uuid::null());
+	assert(m_factory_id != k3d::uuid::null());
+	assert(m_persistent_factory_id != k3d::uuid::null());
 
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer_t;
 	boost::char_separator<char> separator;
@@ -47,9 +49,31 @@ plugin_factory::plugin_factory(const uuid& ClassID, const std::string& Name, con
 	std::copy(tokenizer.begin(), tokenizer.end(), std::back_inserter(m_categories));
 }
 
-const uuid& plugin_factory::class_id()
+plugin_factory::plugin_factory(const uuid& FactoryID, const uuid& PersistentFactoryID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality, const metadata_t& Metadata) :
+	m_factory_id(FactoryID),
+	m_persistent_factory_id(PersistentFactoryID),
+	m_name(Name),
+	m_short_description(ShortDescription),
+	m_quality(Quality),
+	m_metadata(Metadata)
 {
-	return m_class_id;
+	assert(m_factory_id != k3d::uuid::null());
+	assert(m_persistent_factory_id != k3d::uuid::null());
+
+	typedef boost::tokenizer<boost::char_separator<char> > tokenizer_t;
+	boost::char_separator<char> separator;
+	tokenizer_t tokenizer(Categories, separator);
+	std::copy(tokenizer.begin(), tokenizer.end(), std::back_inserter(m_categories));
+}
+
+const uuid& plugin_factory::factory_id()
+{
+	return m_factory_id;
+}
+
+const uuid& plugin_factory::persistent_factory_id()
+{
+	return m_persistent_factory_id;
 }
 
 const std::string plugin_factory::name()

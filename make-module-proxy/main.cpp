@@ -83,7 +83,8 @@ int main(int argc, char* argv[])
 		k3d::xml::element& xml_plugin = xml_plugins.append(
 			k3d::xml::element("plugin",
 				k3d::xml::attribute("name", (*factory)->name()),
-				k3d::xml::attribute("class", (*factory)->class_id()),
+				k3d::xml::attribute("factory_id", (*factory)->factory_id()),
+				k3d::xml::attribute("persistent_factory_id", (*factory)->persistent_factory_id()),
 				k3d::xml::attribute("quality", (*factory)->quality())));
 
 		if(dynamic_cast<k3d::iapplication_plugin_factory*>(*factory))

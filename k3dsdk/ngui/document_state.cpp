@@ -335,7 +335,7 @@ void update_component_selection(const k3d::nodes_t& Nodes, const UpdatePolicyT& 
 {
 	for(k3d::nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
 	{
-		if(k3d::classes::MeshInstance() != (*node)->factory().class_id())
+		if(k3d::classes::MeshInstance() != (*node)->factory().factory_id())
 			continue;
 
 		k3d::imesh_selection_sink* const mesh_selection_sink = dynamic_cast<k3d::imesh_selection_sink*>(*node);
@@ -1521,7 +1521,7 @@ public:
 
 		// If the new node is a mesh source (but not a MeshInstance!), create a MeshInstance node and attach it so it's immediately visible ...
 		k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(node);
-		if(mesh_source && k3d::classes::MeshInstance() != Factory->class_id())
+		if(mesh_source && k3d::classes::MeshInstance() != Factory->factory_id())
 		{
 			// Create a mesh instance ...
 			k3d::inode* const mesh_instance = k3d::create_plugin<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), node_name + " Instance"));
@@ -1547,7 +1547,7 @@ public:
 			m_document.pipeline().set_dependencies(dependencies);
 
 		// If the new node is a camera, orient it horizontally
-		if(k3d::classes::Camera() == Factory->class_id())
+		if(k3d::classes::Camera() == Factory->factory_id())
 		{
 			k3d::set_matrix(*node, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
 		}

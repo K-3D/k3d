@@ -43,10 +43,10 @@ class uuid;
 typedef iplugin_factory_collection::factories_t factories_t;
 
 /// Returns the plugin that implements a specific class_id (could return NULL)
-iplugin_factory* plugin(const uuid& ClassID);
+iplugin_factory* plugin(const uuid& FactoryID);
 
 /// Returns the set of plugins that match the given plugin name (could potentially return more than one result - you should be prepared to handle this)
-const factories_t plugins(const std::string PluginName);
+const factories_t plugins(const std::string FactoryName);
 
 /// Returns the set of plugins that implement a specific interface type
 template<typename interface_t>
@@ -54,8 +54,10 @@ const factories_t plugins()
 {
 	factories_t factories;
 	for(factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	{
 		if((*factory)->implements(typeid(interface_t)))
 			factories.insert(*factory);
+	}
 
 	return factories;
 }

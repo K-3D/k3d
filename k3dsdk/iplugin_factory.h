@@ -21,8 +21,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares iplugin_factory, an abstract factory interface for plugin objects
-		\author Tim Shead (tshead@k-3d.com)
+	\brief Declares iplugin_factory, an abstract factory interface for plugin objects
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -57,8 +57,10 @@ public:
 	/// Defines an arbitrary collection of name-value pair metadata describing the underlying plugin instance
 	typedef std::map<std::string, std::string> metadata_t;
 
-	/// Returns a guaranteed-unique plugin ID
-	virtual const k3d::uuid& class_id() = 0;
+	/// Returns a guaranteed-unique factory ID
+	virtual const k3d::uuid& factory_id() = 0;
+	/// Returns a guaranteed-unique factory ID to be used for serialization (may-or-may-not be the same as factory_id()
+	virtual const k3d::uuid& persistent_factory_id() = 0;
 	/// Returns the internal name for a plugin
 	virtual const std::string name() = 0;
 	/// Returns a short, human-readable description of the plugin

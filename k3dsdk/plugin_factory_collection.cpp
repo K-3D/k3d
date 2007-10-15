@@ -48,23 +48,23 @@ namespace detail
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// same_class_id
+// same_factory_id
 
-class same_class_id
+class same_factory_id
 {
 public:
-	same_class_id(const uuid& ClassID) :
-		m_class_id(ClassID)
+	same_factory_id(const uuid& FactoryID) :
+		m_factory_id(FactoryID)
 	{
 	}
 
 	bool operator()(iplugin_factory* Factory) const
 	{
-		return Factory->class_id() == m_class_id;
+		return Factory->factory_id() == m_factory_id;
 	}
 
 private:
-	const uuid m_class_id;
+	const uuid m_factory_id;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -108,9 +108,9 @@ public:
 		m_message_signal.emit(string_cast(boost::format(_("Loading plugin %1%")) % Factory.name()));
 
 		// Ensure we don't have any duplicate class IDs ...
-		if(std::count_if(m_factories.begin(), m_factories.end(), same_class_id(Factory.class_id())))
+		if(std::count_if(m_factories.begin(), m_factories.end(), same_factory_id(Factory.factory_id())))
 		{
-			log() << error << "Plugin " << Factory.name() << " with duplicate class ID " << Factory.class_id() << " will not be loaded" << std::endl;
+			log() << error << "Plugin " << Factory.name() << " with duplicate class ID " << Factory.factory_id() << " will not be loaded" << std::endl;
 			return;
 		}
 
@@ -132,30 +132,30 @@ std::map<uuid, iplugin_factory*> proxied_factories;
 /// Stores a mapping of plugin class id to plugin module path, so we can load modules that were proxied
 std::map<uuid, filesystem::path> proxied_modules;
 
-iplugin_factory* load_proxied_factory(const uuid& ClassID)
+iplugin_factory* load_proxied_factory(const uuid& FactoryID)
 {
 	// See if this factory has been loaded ...
-	if(proxied_factories.count(ClassID) && proxied_factories[ClassID])
-		return proxied_factories[ClassID];
+	if(proxied_factories.count(FactoryID) && proxied_factories[FactoryID])
+		return proxied_factories[FactoryID];
 
 	// OK, just load the module already!
 	register_plugins_entry_point register_plugins = 0;
-	os_load_module(proxied_modules[ClassID], register_plugins);
+	os_load_module(proxied_modules[FactoryID], register_plugins);
 
 	if(!register_plugins)
 		return 0;
 
 	// It's a K-3D module, all-right - give it a chance to register its plugins
-	log() << info << "Loading plugin module " << proxied_modules[ClassID].native_console_string() << std::endl;
+	log() << info << "Loading plugin module " << proxied_modules[FactoryID].native_console_string() << std::endl;
 
 	message_signal_t message_signal;
 	iplugin_factory_collection::factories_t factories;
 	plugin_registry registry(message_signal, factories);
 	register_plugins(registry);
 	for(iplugin_factory_collection::factories_t::iterator factory = factories.begin(); factory != factories.end(); ++factory)
-		proxied_factories[(*factory)->class_id()] = (*factory);
+		proxied_factories[(*factory)->factory_id()] = (*factory);
 
-	return proxied_factories[ClassID];
+	return proxied_factories[FactoryID];
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -167,10 +167,11 @@ class application_plugin_factory_proxy :
 	public iapplication_plugin_factory
 {
 public:
-	application_plugin_factory_proxy(const uuid& Class, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces, const iplugin_factory::metadata_t& Metadata) :
+	application_plugin_factory_proxy(const uuid& FactoryID, const uuid& PersistentFactoryID, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces, const iplugin_factory::metadata_t& Metadata) :
 		m_factory(0),
 		m_application_factory(0),
-		m_class_id(Class),
+		m_factory_id(FactoryID),
+		m_persistent_factory_id(PersistentFactoryID),
 		m_name(Name),
 		m_short_description(ShortDescription),
 		m_categories(Categories),
@@ -180,9 +181,14 @@ public:
 	{
 	}
 
-	const uuid& class_id()
+	const uuid& factory_id()
 	{
-		return m_class_id;
+		return m_factory_id;
+	}
+
+	const uuid& persistent_factory_id()
+	{
+		return m_persistent_factory_id;
 	}
 
 	const std::string name()
@@ -230,7 +236,7 @@ public:
 	{
 		if(!m_factory)
 		{
-			m_factory = load_proxied_factory(m_class_id);
+			m_factory = load_proxied_factory(m_factory_id);
 			if(!m_factory)
 				k3d::log() << error << "Couldn't load proxied factory for plugin: " << name() << std::endl;
 
@@ -247,7 +253,8 @@ private:
 	iplugin_factory* m_factory;
 	iapplication_plugin_factory* m_application_factory;
 
-	const uuid m_class_id;
+	const uuid m_factory_id;
+	const uuid m_persistent_factory_id;
 	const std::string m_name;
 	const std::string m_short_description;
 	const iplugin_factory::categories_t m_categories;
@@ -265,10 +272,11 @@ class document_plugin_factory_proxy :
 	public idocument_plugin_factory
 {
 public:
-	document_plugin_factory_proxy(const uuid& Class, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces, const iplugin_factory::metadata_t& Metadata) :
+	document_plugin_factory_proxy(const uuid& FactoryID, const uuid& PersistentFactoryID, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces, const iplugin_factory::metadata_t& Metadata) :
 		m_factory(0),
 		m_document_factory(0),
-		m_class_id(Class),
+		m_factory_id(FactoryID),
+		m_persistent_factory_id(FactoryID),
 		m_name(Name),
 		m_short_description(ShortDescription),
 		m_categories(Categories),
@@ -278,9 +286,14 @@ public:
 	{
 	}
 
-	const uuid& class_id()
+	const uuid& factory_id()
 	{
-		return m_class_id;
+		return m_factory_id;
+	}
+
+	const uuid& persistent_factory_id()
+	{
+		return m_persistent_factory_id;
 	}
 
 	const std::string name()
@@ -328,7 +341,7 @@ public:
 	{
 		if(!m_factory)
 		{
-			m_factory = load_proxied_factory(m_class_id);
+			m_factory = load_proxied_factory(m_factory_id);
 			if(!m_factory)
 				k3d::log() << error << "Couldn't load proxied factory for plugin: " << name() << std::endl;
 
@@ -345,7 +358,8 @@ private:
 	iplugin_factory* m_factory;
 	idocument_plugin_factory* m_document_factory;
 
-	const uuid m_class_id;
+	const uuid m_factory_id;
+	const uuid m_persistent_factory_id;
 	const std::string m_name;
 	const std::string m_short_description;
 	const iplugin_factory::categories_t m_categories;
@@ -387,21 +401,33 @@ struct plugin_factory_collection::implementation
 				if(xml_plugin->name != "plugin")
 					continue;
 
-				const std::string plugin_name = xml::attribute_text(*xml_plugin, "name");
-				m_message_signal.emit(string_cast(boost::format(_("Proxying plugin %1%")) % plugin_name));
+				const std::string factory_name = xml::attribute_text(*xml_plugin, "name");
+				m_message_signal.emit(string_cast(boost::format(_("Proxying plugin %1%")) % factory_name));
 
-				const uuid plugin_class = xml::attribute_value<uuid>(*xml_plugin, "class", uuid::null());
-
-				// Ensure we don't have any duplicate class IDs ...
-				if(std::count_if(m_factories.begin(), m_factories.end(), detail::same_class_id(plugin_class)))
+				const uuid plugin_factory_id = xml::attribute_value<uuid>(*xml_plugin, "factory_id", uuid::null());
+				if(plugin_factory_id == uuid::null())
 				{
-					log() << error << "Plugin " << plugin_name << " with duplicate class ID " << plugin_class << " will not be loaded" << std::endl;
+					log() << error << "Plugin " << factory_name << " with missing factory ID will not be loaded" << std::endl;
+					continue;
+				}
+
+				// Ensure we don't have any duplicate factory IDs ...
+				if(std::count_if(m_factories.begin(), m_factories.end(), detail::same_factory_id(plugin_factory_id)))
+				{
+					log() << error << "Plugin " << factory_name << " with duplicate factory ID " << plugin_factory_id << " will not be loaded" << std::endl;
+					continue;
+				}
+
+				const uuid plugin_persistent_factory_id = xml::attribute_value<uuid>(*xml_plugin, "persistent_factory_id", uuid::null());
+				if(plugin_persistent_factory_id == uuid::null())
+				{
+					log() << error << "Plugin " << factory_name << " with missing persistent factory ID will not be loaded" << std::endl;
 					continue;
 				}
 
 				// Warn if we have duplicate names ...
-				if(std::count_if(m_factories.begin(), m_factories.end(), detail::same_name(plugin_name)))
-					log() << warning << "Loading plugin with duplicate name " << plugin_name << std::endl;
+				if(std::count_if(m_factories.begin(), m_factories.end(), detail::same_name(factory_name)))
+					log() << warning << "Loading plugin with duplicate name " << factory_name << std::endl;
 
 				const std::string plugin_short_description = xml::element_text(*xml_plugin, "short_description");
 				const iplugin_factory::quality_t plugin_quality = xml::attribute_value<iplugin_factory::quality_t>(*xml_plugin, "quality", iplugin_factory::EXPERIMENTAL);
@@ -446,11 +472,11 @@ struct plugin_factory_collection::implementation
 
 				if(plugin_type == "application")
 				{
-					m_factories.insert(new detail::application_plugin_factory_proxy(plugin_class, plugin_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces, metadata));
+					m_factories.insert(new detail::application_plugin_factory_proxy(plugin_factory_id, plugin_persistent_factory_id, factory_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces, metadata));
 				}
 				else if(plugin_type == "document")
 				{
-					m_factories.insert(new detail::document_plugin_factory_proxy(plugin_class, plugin_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces, metadata));
+					m_factories.insert(new detail::document_plugin_factory_proxy(plugin_factory_id, plugin_persistent_factory_id, factory_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces, metadata));
 				}
 				else
 				{
@@ -458,8 +484,8 @@ struct plugin_factory_collection::implementation
 					continue;
 				}
 
-				detail::proxied_modules[plugin_class] = Path;
-				detail::proxied_factories[plugin_class] = 0;
+				detail::proxied_modules[plugin_factory_id] = Path;
+				detail::proxied_factories[plugin_factory_id] = 0;
 			}
 
 			return true;

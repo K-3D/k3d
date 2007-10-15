@@ -190,19 +190,45 @@ void upgrade_object_elements(element& XMLDocument)
 	// Change <object> to <node> ...
 	if(element* const xml_nodes = find_element(XMLDocument, "nodes"))
 	{
-		bool nag_object = true;
+		bool nag = true;
 
 		for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
 		{
 			if(xml_node->name == "object")
 			{
-				if(nag_object)
+				if(nag)
 				{
 					log() << warning << "Converting obsolete <object> tags to <node> tags" << std::endl;
-					nag_object = false;
+					nag = false;
 				}
 
 				xml_node->name = "node";
+			}
+		}
+	}
+}
+
+void upgrade_class_properties(element& XMLDocument)
+{
+	// Change "class" to "factory"
+	if(element* const xml_nodes = find_element(XMLDocument, "nodes"))
+	{
+		bool nag = true;
+
+		for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
+		{
+			if(xml_node->name != "node")
+				continue;
+
+			if(attribute* const xml_class = find_attribute(*xml_node, "class"))
+			{
+				xml_class->name = "factory";
+
+				if(nag)
+				{
+					log() << warning << "Converting obsolete \"class\" properties to \"factory\" properties" << std::endl;
+					nag = false;
+				}
 			}
 		}
 	}
@@ -427,8 +453,8 @@ void upgrade_l_system_parser_nodes(element& XMLDocument)
 		if(xml_node->name != "node")
 			continue;
 
-		const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
-		if(node_class_id != uuid(0xa637e99d, 0x707c4342, 0x8c6d4d15, 0x78c9054a))
+		const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+		if(node_factory_id != uuid(0xa637e99d, 0x707c4342, 0x8c6d4d15, 0x78c9054a))
 			continue;
 
 		element* const xml_properties = find_element(*xml_node, "properties");
@@ -470,8 +496,8 @@ void upgrade_poly_grid_nodes(element& XMLDocument)
 		if(xml_node->name != "node")
 			continue;
 
-		const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
-		if(node_class_id != uuid(0xacb3b4f8, 0x5cd6471c, 0xaed72686, 0xc576987c))
+		const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+		if(node_factory_id != uuid(0xacb3b4f8, 0x5cd6471c, 0xaed72686, 0xc576987c))
 			continue;
 
 		element* const xml_properties = find_element(*xml_node, "properties");
@@ -512,8 +538,8 @@ void upgrade_poly_terrain_fft_nodes(element& XMLDocument)
 		if(xml_node->name != "node")
 			continue;
 
-		const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
-		if(node_class_id != uuid(0x7646f5a1, 0x3f3640d6, 0x8d4c70af, 0x91bcb418))
+		const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+		if(node_factory_id != uuid(0x7646f5a1, 0x3f3640d6, 0x8d4c70af, 0x91bcb418))
 			continue;
 
 		element* const xml_properties = find_element(*xml_node, "properties");
@@ -554,8 +580,8 @@ void upgrade_poly_terrain_hfbm_nodes(element& XMLDocument)
 		if(xml_node->name != "node")
 			continue;
 
-		const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
-		if(node_class_id != uuid(0xff22f8f8, 0xa8b540f6, 0xb612a012, 0x8d4e9adb))
+		const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+		if(node_factory_id != uuid(0xff22f8f8, 0xa8b540f6, 0xb612a012, 0x8d4e9adb))
 			continue;
 
 		element* const xml_properties = find_element(*xml_node, "properties");
@@ -596,8 +622,8 @@ void upgrade_poly_text_nodes(element& XMLDocument)
 		if(xml_node->name != "node")
 			continue;
 
-		const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
-		if(node_class_id != uuid(0xd0691ef7, 0x0d6c41c0, 0xa607bea2, 0x09d386f5))
+		const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+		if(node_factory_id != uuid(0xd0691ef7, 0x0d6c41c0, 0xa607bea2, 0x09d386f5))
 			continue;
 
 		element* const xml_properties = find_element(*xml_node, "properties");
@@ -638,8 +664,8 @@ void upgrade_poly_sphere_nodes(element& XMLDocument)
 		if(xml_node->name != "node")
 			continue;
 
-		const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
-		if(node_class_id != uuid(0x919c3786, 0x619e4e84, 0xb4ad868f, 0x1e77e67c))
+		const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+		if(node_factory_id != uuid(0x919c3786, 0x619e4e84, 0xb4ad868f, 0x1e77e67c))
 			continue;
 
 		element* const xml_properties = find_element(*xml_node, "properties");
@@ -734,8 +760,8 @@ void upgrade_transformable_nodes(element& XMLDocument)
 		if(xml_node->name != "node")
 			continue;
 
-		const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
-		iplugin_factory* const node_factory = plugin(node_class_id);
+		const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+		iplugin_factory* const node_factory = plugin(node_factory_id);
 		if(!node_factory)
 			continue;
 
@@ -797,7 +823,7 @@ void upgrade_transformable_nodes(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "Transformation"),
-				attribute("class", classes::FrozenTransformation()),
+				attribute("factory", classes::FrozenTransformation()),
 				attribute("id", next_node_id),
 				element("properties",
 					element("property", string_cast(identity3D()),
@@ -834,8 +860,8 @@ void upgrade_painters(element& XMLDocument)
 		if(xml_node->name != "node")
 			continue;
 
-		const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
-		iplugin_factory* const node_factory = plugin(node_class_id);
+		const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+		iplugin_factory* const node_factory = plugin(node_factory_id);
 		if(!node_factory)
 			continue;
 
@@ -860,7 +886,7 @@ void upgrade_painters(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Default Painter"),
-				attribute("class", (*plugins("OpenGLMultiPainter").begin())->class_id()),
+				attribute("factory", (*plugins("OpenGLMultiPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id),
 				element("properties",
 					element("property", string_cast(next_node_id + 1),
@@ -957,91 +983,91 @@ void upgrade_painters(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Point Painter"),
-				attribute("class", (*plugins("GLPointPainter").begin())->class_id()),
+				attribute("factory", (*plugins("GLPointPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Edge Painter"),
-				attribute("class", (*plugins("GLEdgePainter").begin())->class_id()),
+				attribute("factory", (*plugins("GLEdgePainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Face Painter"),
-				attribute("class", (*plugins("GLFacePainter").begin())->class_id()),
+				attribute("factory", (*plugins("GLFacePainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "SDS Point Painter"),
-				attribute("class", (*plugins("GLSDSPointPainter").begin())->class_id()),
+				attribute("factory", (*plugins("GLSDSPointPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "SDS Edge Painter"),
-				attribute("class", (*plugins("GLSDSEdgePainter").begin())->class_id()),
+				attribute("factory", (*plugins("GLSDSEdgePainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "SDS Face Painter"),
-				attribute("class", (*plugins("GLSDSFacePainter").begin())->class_id()),
+				attribute("factory", (*plugins("GLSDSFacePainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Linear Curve Painter"),
-				attribute("class", (*plugins("OpenGLLinearCurvePainter").begin())->class_id()),
+				attribute("factory", (*plugins("OpenGLLinearCurvePainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Cubic Curve Painter"),
-				attribute("class", (*plugins("OpenGLCubicCurvePainter").begin())->class_id()),
+				attribute("factory", (*plugins("OpenGLCubicCurvePainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL NURBS Curve Painter"),
-				attribute("class", (*plugins("OpenGLNURBSCurvePainter").begin())->class_id()),
+				attribute("factory", (*plugins("OpenGLNURBSCurvePainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Bilinear Patch Painter"),
-				attribute("class", (*plugins("OpenGLBilinearPatchPainter").begin())->class_id()),
+				attribute("factory", (*plugins("OpenGLBilinearPatchPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Bicubic Patch Painter"),
-				attribute("class", (*plugins("OpenGLBicubicPatchPainter").begin())->class_id()),
+				attribute("factory", (*plugins("OpenGLBicubicPatchPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL NURBS Patch Painter"),
-				attribute("class", (*plugins("OpenGLNURBSPatchPainter").begin())->class_id()),
+				attribute("factory", (*plugins("OpenGLNURBSPatchPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Blobby Point Painter"),
-				attribute("class", (*plugins("OpenGLBlobbyPointPainter").begin())->class_id()),
+				attribute("factory", (*plugins("OpenGLBlobbyPointPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Face Normal Painter"),
-				attribute("class", (*plugins("OpenGLFaceNormalPainter").begin())->class_id()),
+				attribute("factory", (*plugins("OpenGLFaceNormalPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Face Orientation Painter"),
-				attribute("class", (*plugins("OpenGLFaceOrientationPainter").begin())->class_id()),
+				attribute("factory", (*plugins("OpenGLFaceOrientationPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 				
 		// Now add painter properties to the MeshInstance nodes
@@ -1050,8 +1076,8 @@ void upgrade_painters(element& XMLDocument)
 			if(xml_node->name != "node")
 				continue;
 	
-			const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
-			if(node_class_id != classes::MeshInstance())
+			const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+			if(node_factory_id != classes::MeshInstance())
 				continue;
 	
 			element* const xml_properties = find_element(*xml_node, "properties");
@@ -1068,7 +1094,7 @@ void upgrade_painters(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "Renderman Default Painter"),
-				attribute("class", (*plugins("RenderManMultiPainter").begin())->class_id()),
+				attribute("factory", (*plugins("RenderManMultiPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id),
 				element("properties",
 					element("property", string_cast(next_node_id + 1),
@@ -1129,55 +1155,55 @@ void upgrade_painters(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Point Group Painter"),
-				attribute("class", (*plugins("RenderManPointGroupPainter").begin())->class_id()),
+				attribute("factory", (*plugins("RenderManPointGroupPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Polyhedron Painter"),
-				attribute("class", (*plugins("RenderManPolyhedronPainter").begin())->class_id()),
+				attribute("factory", (*plugins("RenderManPolyhedronPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Subdivision Surface Painter"),
-				attribute("class", (*plugins("RenderManSubdivisionSurfacePainter").begin())->class_id()),
+				attribute("factory", (*plugins("RenderManSubdivisionSurfacePainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Linear Curve Painter"),
-				attribute("class", (*plugins("RenderManLinearCurvePainter").begin())->class_id()),
+				attribute("factory", (*plugins("RenderManLinearCurvePainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Cubic Curve Painter"),
-				attribute("class", (*plugins("RenderManCubicCurvePainter").begin())->class_id()),
+				attribute("factory", (*plugins("RenderManCubicCurvePainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Bilinear Patch Painter"),
-				attribute("class", (*plugins("RenderManBilinearPatchPainter").begin())->class_id()),
+				attribute("factory", (*plugins("RenderManBilinearPatchPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Bicubic Patch Painter"),
-				attribute("class", (*plugins("RenderManBicubicPatchPainter").begin())->class_id()),
+				attribute("factory", (*plugins("RenderManBicubicPatchPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan NURBS Patch Painter"),
-				attribute("class", (*plugins("RenderManNURBSPatchPainter").begin())->class_id()),
+				attribute("factory", (*plugins("RenderManNURBSPatchPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Blobby Painter"),
-				attribute("class", (*plugins("RenderManBlobbyPainter").begin())->class_id()),
+				attribute("factory", (*plugins("RenderManBlobbyPainter").begin())->persistent_factory_id()),
 				attribute("id", next_node_id)));
 				
 		// Now add painter properties to the MeshInstance nodes
@@ -1186,8 +1212,8 @@ void upgrade_painters(element& XMLDocument)
 			if(xml_node->name != "node")
 				continue;
 	
-			const uuid node_class_id = attribute_value<uuid>(*xml_node, "class", uuid::null());
-			if(node_class_id != classes::MeshInstance())
+			const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+			if(node_factory_id != classes::MeshInstance())
 				continue;
 	
 			element* const xml_properties = find_element(*xml_node, "properties");
@@ -1228,6 +1254,7 @@ void upgrade_document(element& XMLDocument)
 	// Note ... the order that these are called-in matters!
 	detail::upgrade_objects_element(XMLDocument);
 	detail::upgrade_object_elements(XMLDocument);
+	detail::upgrade_class_properties(XMLDocument);
 	detail::upgrade_variables_elements(XMLDocument);
 	detail::upgrade_variable_elements(XMLDocument);
 	detail::upgrade_property_values(XMLDocument);
@@ -1302,7 +1329,7 @@ void save_node(ipersistent& Node, xml::element& XML, const ipersistent::save_con
 
 	xml::element& xml_node = XML.append(element("node",
 		attribute("name", node->name()),
-		attribute("class", node->factory().class_id()),
+		attribute("factory", node->factory().persistent_factory_id()),
 		attribute("id", Context.lookup.lookup_id(node))));
 	Node.save(xml_node, Context);
 }

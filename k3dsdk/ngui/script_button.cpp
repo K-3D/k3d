@@ -188,9 +188,9 @@ void control::on_edit()
 		const k3d::script::code original_value(m_data->value());
 
 		k3d::iplugin_factory* const language = k3d::script::language(original_value).factory();
-		if(language && language->class_id() == k3d::classes::PythonEngine())
+		if(language && language->factory_id() == k3d::classes::PythonEngine())
 			temp_path = temp_path + ".py";
-		else if(language && language->class_id() == k3d::classes::K3DScriptEngine())
+		else if(language && language->factory_id() == k3d::classes::K3DScriptEngine())
 			temp_path = temp_path + ".k3dscript";
 		else
 			k3d::log() << warning << "unknown script language" << std::endl;

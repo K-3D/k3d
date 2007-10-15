@@ -228,7 +228,7 @@ public:
 		const k3d::nodes_t render_engines = k3d::find_nodes<k3d::icamera_preview_render_engine>(document().nodes());
 		for(k3d::nodes_t::const_iterator object = render_engines.begin(); object != render_engines.end(); ++object)
 		{
-			if(k3d::classes::RenderManEngine() == (*object)->factory().class_id())
+			if(k3d::classes::RenderManEngine() == (*object)->factory().factory_id())
 			{
 				renderman_engine = *object;
 				break;

@@ -39,20 +39,20 @@ namespace detail
 {
 
 template<typename functor_t>
-struct class_id_filter_t
+struct factory_id_filter_t
 {
-	explicit class_id_filter_t(const uuid ClassID, functor_t Functor) : class_id(ClassID), functor(Functor) {}
+	explicit factory_id_filter_t(const uuid FactoryID, functor_t Functor) : factory_id(FactoryID), functor(Functor) {}
 
-	void operator()(k3d::inode* Object) { if(Object->factory().class_id() == class_id) functor(Object); }
+	void operator()(k3d::inode* Object) { if(Object->factory().factory_id() == factory_id) functor(Object); }
 
-	const uuid class_id;
+	const uuid factory_id;
 	functor_t functor;
 };
 
 template<typename functor_t>
-class_id_filter_t<functor_t> class_id_filter(const uuid ID, functor_t Functor)
+factory_id_filter_t<functor_t> factory_id_filter(const uuid ID, functor_t Functor)
 {
-	return class_id_filter_t<functor_t>(ID, Functor);
+	return factory_id_filter_t<functor_t>(ID, Functor);
 }
 
 template<typename functor_t>
@@ -106,10 +106,10 @@ inode* find_node(inode_collection& Nodes, iproperty& Property)
 	return 0;
 }
 
-const nodes_t find_nodes(inode_collection& Nodes, const uuid ClassID)
+const nodes_t find_nodes(inode_collection& Nodes, const uuid FactoryID)
 {
 	nodes_t results;
-	std::for_each(Nodes.collection().begin(), Nodes.collection().end(), detail::class_id_filter(ClassID, inserter(results)));
+	std::for_each(Nodes.collection().begin(), Nodes.collection().end(), detail::factory_id_filter(FactoryID, inserter(results)));
 
 	return results;
 }

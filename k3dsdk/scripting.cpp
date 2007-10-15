@@ -142,7 +142,7 @@ language::language(const uuid& Language) :
 	// Look for a factory that matches ...
 	for(factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
-		if((*factory)->class_id() != Language)
+		if((*factory)->factory_id() != Language)
 			continue;
 
 		m_factory = *factory;

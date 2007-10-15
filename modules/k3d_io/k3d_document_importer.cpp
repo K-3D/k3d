@@ -125,10 +125,10 @@ public:
 						continue;
 
 					const std::string name = attribute_text(*xml_node, "name");
-					const k3d::uuid class_id = attribute_value<k3d::uuid>(*xml_node, "class", k3d::uuid::null());
-					if(class_id == k3d::uuid::null())
+					const k3d::uuid factory_id = attribute_value<k3d::uuid>(*xml_node, "factory", k3d::uuid::null());
+					if(factory_id == k3d::uuid::null())
 					{
-						k3d::log() << error << "node [" << name << "] with unspecified class ID will not be loaded" << std::endl;
+						k3d::log() << error << "node [" << name << "] with unspecified factory ID will not be loaded" << std::endl;
 						continue;
 					}
 
@@ -139,10 +139,10 @@ public:
 						continue;
 					}
 
-					k3d::iplugin_factory* const plugin_factory = k3d::plugin(class_id);
+					k3d::iplugin_factory* const plugin_factory = k3d::plugin(factory_id);
 					if(!plugin_factory)
 					{
-						k3d::log() << error << "node [" << name << "] with unknown class ID [" << class_id << "] will not be loaded" << std::endl;
+						k3d::log() << error << "node [" << name << "] with unknown factory ID [" << factory_id << "] will not be loaded" << std::endl;
 						continue;
 					}
 
@@ -203,23 +203,23 @@ public:
 					if(attribute_value<bool>(*xml_plugin, "do_not_load", false))
 						continue;
 
-					const k3d::uuid class_id = attribute_value<k3d::uuid>(*xml_plugin, "class", k3d::uuid::null());
-					if(class_id == k3d::uuid::null())
+					const k3d::uuid factory_id = attribute_value<k3d::uuid>(*xml_plugin, "factory", k3d::uuid::null());
+					if(factory_id == k3d::uuid::null())
 					{
-						k3d::log() << error << "Plugin with unspecified class ID will not be loaded" << std::endl;
+						k3d::log() << error << "Plugin with unspecified factory ID will not be loaded" << std::endl;
 						continue;
 					}
 
-					if(!Document.plugin_serialization_handlers().count(class_id))
+					if(!Document.plugin_serialization_handlers().count(factory_id))
 					{
-						k3d::log() << error << "Unknown plugin type [" << class_id << "] will not be loaded" << std::endl;
+						k3d::log() << error << "Unknown plugin type [" << factory_id << "] will not be loaded" << std::endl;
 						continue;
 					}
 
-					k3d::ipersistent* const handler = Document.plugin_serialization_handlers().find(class_id)->second;
+					k3d::ipersistent* const handler = Document.plugin_serialization_handlers().find(factory_id)->second;
 					if(!handler)
 					{
-						k3d::log() << error << "Invalid serialization handler for plugin type [" << class_id << "] will not be used" << std::endl;
+						k3d::log() << error << "Invalid serialization handler for plugin type [" << factory_id << "] will not be used" << std::endl;
 						continue;
 					}
 

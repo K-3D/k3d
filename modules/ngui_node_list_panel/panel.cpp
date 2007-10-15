@@ -141,18 +141,18 @@ private:
 };
 
 /// Concrete implementation of filter_policy that displays every node that matches given class ID
-class class_id_filter_policy :
+class factory_id_filter_policy :
 	public filter_policy
 {
 public:
-	class_id_filter_policy(k3d::idocument& Document, const k3d::uuid& ClassID);
-	~class_id_filter_policy() {}
+	factory_id_filter_policy(k3d::idocument& Document, const k3d::uuid& FactoryID);
+	~factory_id_filter_policy() {}
 
 	void populate_graph(graph& Graph);
 
 private:
 	k3d::idocument& m_document;
-	const k3d::uuid m_class_id;
+	const k3d::uuid m_factory_id;
 };
 
 /// Abstract interface for nodes that adjust the layout of a graph
@@ -261,19 +261,19 @@ void all_nodes_filter_policy::populate_graph(graph& Graph)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// class_id_filter_policy
+// factory_id_filter_policy
 
-class_id_filter_policy::class_id_filter_policy(k3d::idocument& Document, const k3d::uuid& ClassID) :
+factory_id_filter_policy::factory_id_filter_policy(k3d::idocument& Document, const k3d::uuid& FactoryID) :
 	m_document(Document),
-	m_class_id(ClassID)
+	m_factory_id(FactoryID)
 {
 }
 
-void class_id_filter_policy::populate_graph(graph& Graph)
+void factory_id_filter_policy::populate_graph(graph& Graph)
 {
 	for(k3d::inode_collection::nodes_t::const_iterator n = m_document.nodes().collection().begin(); n != m_document.nodes().collection().end(); ++n)
 	{
-		if((*n)->factory().class_id() != m_class_id)
+		if((*n)->factory().factory_id() != m_factory_id)
 			continue;
 
 		node* const new_node = new node;

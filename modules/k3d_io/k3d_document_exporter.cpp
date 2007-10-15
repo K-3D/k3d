@@ -97,10 +97,10 @@ public:
 		element& xml_plugins = xml_application.append(element("plugins"));
 		for(k3d::idocument::plugin_serialization_handlers_t::const_iterator plugin = Document.plugin_serialization_handlers().begin(); plugin != Document.plugin_serialization_handlers().end(); ++plugin)
 		{
-			const k3d::uuid plugin_class = plugin->first;
+			const k3d::uuid plugin_factory_id = plugin->first;
 			k3d::ipersistent& plugin_handler = *plugin->second;
 
-			plugin_handler.save(xml_plugins.append(element("plugin", attribute("class", plugin_class))), context);
+			plugin_handler.save(xml_plugins.append(element("plugin", attribute("factory", plugin_factory_id))), context);
 		}
 
 		// Save per-document data ...

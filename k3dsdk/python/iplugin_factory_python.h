@@ -47,7 +47,8 @@ public:
 	iplugin_factory(k3d::iplugin_factory* PluginFactory);
 	iplugin_factory(k3d::iplugin_factory& PluginFactory);
 
-	const uuid class_id();
+	const uuid factory_id();
+	const uuid persistent_factory_id();
 	const std::string name();
 	const std::string short_description();
 	const bool is_application_plugin();

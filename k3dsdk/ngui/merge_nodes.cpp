@@ -295,10 +295,10 @@ void merge_nodes(k3d::idocument& Document)
 		if(!user_node->check)
 			continue;
 
-		const k3d::uuid class_id = k3d::xml::attribute_value<k3d::uuid>(*xml_node, "class", k3d::uuid::null());
-		if(class_id == k3d::uuid::null())
+		const k3d::uuid factory_id = k3d::xml::attribute_value<k3d::uuid>(*xml_node, "factory", k3d::uuid::null());
+		if(factory_id == k3d::uuid::null())
 		{
-			k3d::log() << error << "node [" << name << "] with unspecified class ID will not be loaded" << std::endl;
+			k3d::log() << error << "node [" << name << "] with unspecified factory ID will not be loaded" << std::endl;
 			continue;
 		}
 
@@ -309,10 +309,10 @@ void merge_nodes(k3d::idocument& Document)
 			continue;
 		}
 
-		k3d::iplugin_factory* const plugin_factory = k3d::plugin(class_id);
+		k3d::iplugin_factory* const plugin_factory = k3d::plugin(factory_id);
 		if(!plugin_factory)
 		{
-			k3d::log() << error << "node [" << name << "] with unknown class ID [" << class_id << "] will not be loaded" << std::endl;
+			k3d::log() << error << "node [" << name << "] with unknown factory ID [" << factory_id << "] will not be loaded" << std::endl;
 			continue;
 		}
 

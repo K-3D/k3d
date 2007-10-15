@@ -31,22 +31,26 @@
 namespace k3d
 {
 
-iplugin_factory* plugin(const uuid& ClassID)
+iplugin_factory* plugin(const uuid& FactoryID)
 {
 	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = k3d::application().plugins().begin(); factory != k3d::application().plugins().end(); ++factory)
-		if((*factory)->class_id() == ClassID)
+	{
+		if((*factory)->factory_id() == FactoryID)
 			return *factory;
+	}
 
 	return 0;
 }
 
-const iplugin_factory_collection::factories_t plugins(const std::string PluginName)
+const iplugin_factory_collection::factories_t plugins(const std::string FactoryName)
 {
 	iplugin_factory_collection::factories_t factories;
 
 	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = k3d::application().plugins().begin(); factory != k3d::application().plugins().end(); ++factory)
-		if((*factory)->name() == PluginName)
+	{
+		if((*factory)->name() == FactoryName)
 			factories.insert(*factory);
+	}
 
 	return factories;
 }

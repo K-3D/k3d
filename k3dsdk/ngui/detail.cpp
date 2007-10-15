@@ -234,7 +234,7 @@ k3d::inode* duplicate_node(k3d::idocument& Document, k3d::inode& Node)
 			&& name != "name"
 			&& name != "input_mesh"
 			&& name != "output_mesh"
-			&& !(Node.factory().class_id() == k3d::classes::Camera() && name == "navigation_target")) // Skip Camera's navigation target property
+			&& !(Node.factory().factory_id() == k3d::classes::Camera() && name == "navigation_target")) // Skip Camera's navigation target property
 		{
 			k3d::property::set_internal_value(*clone, name, (*property)->property_value());
 		}
@@ -298,7 +298,7 @@ void duplicate_selected_nodes(document_state& DocumentState)
 	for(k3d::nodes_t::const_iterator selected_node = nodes.begin(); selected_node != nodes.end(); ++selected_node)
 	{
 		k3d::inode* new_node = 0;
-		if(k3d::classes::MeshInstance() == (*selected_node)->factory().class_id())
+		if(k3d::classes::MeshInstance() == (*selected_node)->factory().factory_id())
 			new_node = detail::duplicate_mesh(DocumentState.document(), **selected_node);
 		else
 			new_node = detail::duplicate_node(DocumentState.document(), **selected_node);

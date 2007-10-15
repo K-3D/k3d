@@ -40,8 +40,13 @@ class document_plugin_factory :
 	public idocument_plugin_factory
 {
 public:
-	document_plugin_factory(const uuid& ClassID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality = STABLE, const metadata_t& Metadata = metadata_t()) :
-		plugin_factory(ClassID, Name, ShortDescription, Categories, Quality, Metadata)
+	document_plugin_factory(const uuid& FactoryID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality = STABLE, const metadata_t& Metadata = metadata_t()) :
+		plugin_factory(FactoryID, Name, ShortDescription, Categories, Quality, Metadata)
+	{
+	}
+
+	document_plugin_factory(const uuid& FactoryID, const uuid& PersistentFactoryID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality = STABLE, const metadata_t& Metadata = metadata_t()) :
+		plugin_factory(FactoryID, PersistentFactoryID, Name, ShortDescription, Categories, Quality, Metadata)
 	{
 	}
 
