@@ -103,6 +103,7 @@ iproperty iproperty_collection::add_user_property(const std::string& Type, const
 	else if(Type == k3d::type_string<k3d::mesh*>()) return detail::create_user_property<k3d::user::mesh_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::mesh*>(0));
 	else if(Type == k3d::type_string<k3d::gl::imesh_painter*>()) return detail::create_user_property<k3d::user::gl_mesh_painter_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::gl::imesh_painter*>(0));
 	else if(Type == k3d::type_string<k3d::ri::imesh_painter*>()) return detail::create_user_property<k3d::user::ri_mesh_painter_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::ri::imesh_painter*>(0));
+	else if(Type == k3d::type_string<k3d::filesystem::path>()) return detail::create_user_property<k3d::user::path_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::filesystem::path());
 
 	throw std::invalid_argument("unknown user property type: " + Type);
 }

@@ -26,6 +26,8 @@ ADD_LIBRARY(k3dsdk-python-types SHARED
 	matrix4_python.h
 	normal3_python.cpp
 	normal3_python.h
+	path_python.cpp
+	path_python.h
 	point3_python.cpp
 	point3_python.h
 	point4_python.cpp

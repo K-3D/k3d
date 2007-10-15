@@ -50,7 +50,8 @@ typedef enum
 	k3d_gl_imesh_painter,
 	k3d_ri_imesh_painter,
 	k3d_aqsis_idisplacement_layer,
-	k3d_aqsis_isurface_layer
+	k3d_aqsis_isurface_layer,
+	k3d_filesystem_path
 } user_types_t;
 
 typedef enum
@@ -130,6 +131,7 @@ static const k3d::ienumeration_property::enumeration_values_t& user_types_values
 		values.push_back(k3d::ienumeration_property::enumeration_value_t("RenderMan Mesh Painter", "k3d::ri::imesh_painter", ""));
 		values.push_back(k3d::ienumeration_property::enumeration_value_t("Aqsis Displacement Layer", "k3d::aqsis::idisplacement_layer", ""));
 		values.push_back(k3d::ienumeration_property::enumeration_value_t("Aqsis Surface Layer", "k3d::aqsis::isurface_layer", ""));
+		values.push_back(k3d::ienumeration_property::enumeration_value_t("Filesystem Path", "k3d::filesystem::path", ""));
 	}
 
 	return values;
@@ -189,6 +191,9 @@ std::ostream& operator<<(std::ostream& Stream, const user_types_t& Value)
 		case k3d_aqsis_isurface_layer:
 			Stream << "k3d::aqsis::isurface_layer";
 			break;
+		case k3d_filesystem_path:
+			Stream << "k3d::filesystem::path";
+			break;
 	}
 
 	return Stream;
@@ -227,6 +232,8 @@ std::istream& operator>>(std::istream& Stream, user_types_t& Value)
 		Value = k3d_aqsis_idisplacement_layer;
 	else if (text == "k3d::aqsis::isurface_layer")
 		Value = k3d_aqsis_isurface_layer;
+	else if (text == "k3d::filesystem::path")
+		Value = k3d_filesystem_path;
 	else
 		k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]"<< std::endl;
 

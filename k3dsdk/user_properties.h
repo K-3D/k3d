@@ -35,6 +35,7 @@
 #include "iuser_property.h"
 #include "legacy_mesh.h"
 #include "mesh.h"
+#include "path.h"
 #include "tokens.h"
 #include "type_registry.h"
 #include "types_ri.h"
@@ -228,6 +229,7 @@ typedef user_property<k3d_data(k3d::mesh*, immutable_name, change_signal, no_und
 typedef user_property<k3d_data(k3d::gl::imesh_painter*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, detail::node_serialization)> gl_mesh_painter_property;
 typedef user_property<k3d_data(k3d::ri::imesh_painter*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, detail::node_serialization)> ri_mesh_painter_property;
 typedef user_property<k3d_data(k3d::ri::itexture*, immutable_name, change_signal, with_undo, node_storage, no_constraint, k3d::data::node_property, detail::node_serialization)> ri_texture_property;
+typedef user_property<k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization)> path_property;
 
 /// This is an ugly hack, but it allows user properties to be fully constructed before they're added to their property collection
 struct null_property_collection :
@@ -279,6 +281,28 @@ PropertyT* create_property(const std::string& Name, const std::string& Label, co
 
 	return property;
 }
+
+/// Specialization for path properties
+template<>
+inline path_property* create_property(const std::string& Name, const std::string& Label, const std::string& Description, idocument& Document, iproperty_collection& PropertyCollection, ipersistent_container& PersistentContainer, inode* const Object, const k3d::filesystem::path& Value)
+{
+	null_property_collection property_collection;
+
+	path_property* const property =
+			new path_property(
+				init_owner(Document, property_collection, PersistentContainer, Object)
+				+ init_name(make_token(Name.c_str()))
+				+ init_label(make_token(Label.c_str()))
+				+ init_description(make_token(Description.c_str()))
+				+ init_value(Value)
+				+ init_path_mode(k3d::ipath_property::WRITE)
+				+ init_path_type("any"));
+
+		PropertyCollection.register_property(*property);
+
+		return property;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // property_container

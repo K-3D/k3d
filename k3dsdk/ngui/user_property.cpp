@@ -195,6 +195,8 @@ void add_user_property::on_add()
 			k3d::undoable_new(k3d::user::create_property<k3d::aqsis::displacement_layer_connection_property>(name, label, description, node().document(), *property_collection, *persistent_container, &node(), static_cast<k3d::inode*>(0)), node().document());
 		else if(user_type == k3d_aqsis_isurface_layer)
 			k3d::undoable_new(k3d::user::create_property<k3d::aqsis::surface_layer_connection_property>(name, label, description, node().document(), *property_collection, *persistent_container, &node(), static_cast<k3d::inode*>(0)), node().document());
+		else if(user_type == k3d_filesystem_path)
+			k3d::undoable_new(k3d::user::create_property<k3d::user::path_property>(name, label, description, node().document(), *property_collection, *persistent_container, &node(), k3d::filesystem::path()), node().document());
 		else		
 			k3d::log() << error << k3d_file_reference << ": unknown user property value type: [" << user_type << "]" << std::endl;
 	}
