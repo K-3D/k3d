@@ -6,6 +6,7 @@
 #Export input mesh to OGRE XML format
 
 from xml.dom.minidom import getDOMImplementation
+import k3d
 
 #Add the required user properties
 if not Node.has_property("input_mesh"):
@@ -50,16 +51,18 @@ submesh = doc.createElement("submesh")
 faces = doc.createElement("faces")
 faces.setAttribute("count", str(len(face_first_loops)))
 
+#Check if mesh is triangles-only
+if not k3d.is_triangles(Node.__getattr__("input_mesh")):
+	raise Exception, "Mesh has non-triangular faces"
+
 #Loop over all faces, and add them as triangles
 for face in range(len(face_first_loops)):
 	first_edge = loop_first_edges[face_first_loops[face]]
 	edge = first_edge
 	face_element = doc.createElement("face")
-	for n in range(1, 4): #NOTE: we assume an all-triangle mesh, as required by OGRE mesh xml!
+	for n in range(1, 4):
 		face_element.setAttribute("v" + str(n), str(edge_points[edge]))
 		edge = clockwise_edges[edge]
-	if edge != first_edge:
-		raise Exception, "Mesh has non-triangle at face " + str(face)
 	faces.appendChild(face_element)
 
 #append the faces and submesh block to the main document
