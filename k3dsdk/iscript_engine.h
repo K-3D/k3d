@@ -37,7 +37,6 @@ namespace k3d
 
 class icommand_node;
 class iplugin_factory;
-namespace xml {class element;}
 
 /// Abstract interface implemented by objects that can execute scripts written in a specific scripting language
 /** \note: The Script arguments to can_execute() and execute() have bounced back-and-forth between
@@ -100,12 +99,6 @@ public:
 		\note The engine is responsible for ensuring that the appended command does not introduce syntactically-incorrect code, e.g. quoting issues or escaped characters with special meanings.
 	*/
 	virtual void append_command(std::ostream& Script, icommand_node& CommandNode, const std::string& Command, const std::string& Arguments) = 0;
-	
-	/**	\brief Stores script metadata in the given element
-	  \param Script The complete source code of the script
-		\param Element reference to an element that will store the script metadata
-	*/
-	virtual void get_metadata(const std::string& Script, k3d::xml::element& Element) {}
 
 protected:
 	iscript_engine() {}

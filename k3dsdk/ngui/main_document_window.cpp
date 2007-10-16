@@ -93,7 +93,6 @@
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/property_collection.h>
-#include <k3dsdk/scripted_node_collection.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/serialization.h>
 #include <k3dsdk/share.h>
@@ -144,17 +143,6 @@ struct sort_by_name
 	bool operator()(k3d::iplugin_factory* LHS, k3d::iplugin_factory* RHS)
 	{
 		return LHS->name() < RHS->name();
-	}
-};
-
-/////////////////////////////////////////////////////////////////////////////
-// sort_script_by_name
-
-struct sort_script_by_name
-{
-	bool operator()(const k3d::scripted_node_stub* LHS, const k3d::scripted_node_stub* RHS)
-	{
-		return LHS->name < RHS->name;
 	}
 };
 
@@ -362,25 +350,6 @@ private:
 	button::control m_stop;
 	button::control m_continue;
 };
-
-/////////////////////////////////////////////////////////////////////////////
-// create_script_menu_item
-
-image_menu_item::control* create_script_menu_item(k3d::icommand_node& Parent, const std::string& NamePrefix, const k3d::scripted_node_stub& Script)
-{
-	Gtk::Image* const image = new Gtk::Image(quiet_load_icon(Script.name, Gtk::ICON_SIZE_MENU));
-
-	image_menu_item::control* const menu_item =
-		new image_menu_item::control(Parent, NamePrefix + Script.name,
-			*Gtk::manage(image),
-			"",
-			true)
-		<< set_tooltip(Script.name);
-
-	menu_item->get_label()->set_markup(Script.name);
-
-	return menu_item;
-}
 
 } // namespace detail
 
@@ -1246,46 +1215,6 @@ private:
 			new menu_item::control(Parent, "scripting_record_test_case", _("Record _Test Case..."), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_test_case_recorder))
 			<< set_accelerator_path("<k3d-document>/actions/scripting/record_test_case", get_accel_group())));
-		
-		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
-			
-		Gtk::Menu* const scriptmenu = new Gtk::Menu();
-		scriptmenu->set_accel_group(get_accel_group());
-
-		menu->items().push_back(Gtk::Menu_Helpers::MenuElem("Scripted Nodes", *manage(scriptmenu)));
-
-		// Group plugin types by their categories ...
-		typedef std::set<const k3d::scripted_node_stub*, detail::sort_script_by_name> sorted_scripts_t;
-		typedef std::map<std::string, sorted_scripts_t> grouped_scripts_t;
-		grouped_scripts_t grouped_scripts;
-
-		k3d::scripted_node_collection& node_scripts = k3d::scripted_node_collection::instance();
-		node_scripts.load_scripts(k3d::share_path() / k3d::filesystem::generic_path("scripts/scripted_nodes"), true);
-		const k3d::scripted_node_collection::collection_t& script_collection = node_scripts.collection();
-		for(k3d::scripted_node_collection::collection_t::const_iterator s = script_collection.begin(); s != script_collection.end(); ++s)
-		{
-			const k3d::scripted_node_stub& script = *s;
-			grouped_scripts[s->category].insert(&script);
-		}
-
-		for(grouped_scripts_t::const_iterator group = grouped_scripts.begin(); group != grouped_scripts.end(); ++group)
-		{
-			Gtk::Menu* const submenu = new Gtk::Menu();
-			submenu->set_accel_group(get_accel_group());
-
-			scriptmenu->items().push_back(Gtk::Menu_Helpers::MenuElem(group->first, *manage(submenu)));
-
-			const sorted_scripts_t& sorted_scripts = group->second;
-			for(sorted_scripts_t::const_iterator s = sorted_scripts.begin(); s != sorted_scripts.end(); ++s)
-			{
-				const k3d::scripted_node_stub* script = *s;
-
-				submenu->items().push_back(*Gtk::manage(
-					detail::create_script_menu_item(Parent, "create_", *script)
-					<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_create_scriptnode), script))
-					<< set_accelerator_path("<k3d-document>/actions/create/" + script->name, get_accel_group())));
-			}
-		}
 
 		return menu;
 	}
@@ -2340,17 +2269,6 @@ private:
 	void on_create_node(k3d::iplugin_factory* const Factory)
 	{
 		m_document_state.create_node(Factory);
-	}
-	
-	void on_create_scriptnode(const k3d::scripted_node_stub* const Script)
-	{
-		k3d::inode* node = k3d::create_scripted_node(m_document_state.document(), *Script);
-		
-		if(SELECT_NODES != m_document_state.selection_mode().internal_value())
-			m_document_state.set_selection_mode(SELECT_NODES);
-		
-		m_document_state.deselect_all();
-		m_document_state.select(k3d::selection::make_records(node));
 	}
 
 	void on_modify_meshes(k3d::iplugin_factory* Modifier)

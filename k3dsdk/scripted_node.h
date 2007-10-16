@@ -52,12 +52,12 @@ public:
 		delete dynamic_cast<ideletable*>(m_script_engine);
 	}
 
+protected:
 	void set_script(const std::string& Script)
 	{
 		m_script.set_value(Script);
 	}
-	
-protected:
+
 	void connect_script_changed_signal(const sigc::slot<void, iunknown*>& Slot)
 	{
 		m_script.changed_signal().connect(Slot);

@@ -37,7 +37,6 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/string_modifiers.h>
-#include <k3dsdk/xml.h>
 
 #include <k3dsdk/python/object_model_python.h>
 
@@ -177,34 +176,6 @@ public:
 		Script << "\", \"";
 		Script << k3d::replace_all("\"", "\\\"", Arguments); // Make sure arguments are properly escaped
 		Script << "\")\n";
-	}
-	
-	void get_metadata(const std::string& Script, k3d::xml::element& Element)
-	{
-		std::stringstream script(Script);
-		std::string line;
-		std::string name("");
-		std::string category("");
-		for(k3d::getline(script, line); !script.eof(); k3d::getline(script, line))
-		{
-			const std::string nametag("#name:");
-			const std::string categorytag("#category:");
-			if (line.substr(0, nametag.size()) == nametag)
-			{
-				name = k3d::trim(line.substr(nametag.size(), line.size()));
-			}
-			else if (line.substr(0, categorytag.size()) == categorytag)
-			{
-				category = k3d::trim(line.substr(categorytag.size(), line.size()));
-			}
-			
-			// don't drag this on longer than we need to
-			if (!name.empty() && !category.empty())
-				break;
-		}
-		
-		Element.append(k3d::xml::element("name", name));
-		Element.append(k3d::xml::element("category", category));
 	}
 
 private:

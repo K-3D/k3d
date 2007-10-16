@@ -7,5 +7,5 @@ ADD_SUBDIRECTORY(MeshPainterScript)
 ADD_SUBDIRECTORY(MeshSourceScript)
 ADD_SUBDIRECTORY(RenderEngineScript)
 ADD_SUBDIRECTORY(RenderManScript)
-ADD_SUBDIRECTORY(scripted_nodes)
+ADD_SUBDIRECTORY(scripted_plugins)
 

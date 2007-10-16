@@ -96,7 +96,7 @@ private:
 void register_plugins(k3d::iplugin_registry& Registry)
 {
 	// There are very few SDK functions that can be safely called at this point in execution, but k3d::share_path() happens to be one of them ...
-	for(k3d::filesystem::directory_iterator script_path(k3d::share_path() / k3d::filesystem::generic_path("scripts/scripted_nodes")); script_path != k3d::filesystem::directory_iterator(); ++script_path)
+	for(k3d::filesystem::directory_iterator script_path(k3d::share_path() / k3d::filesystem::generic_path("scripts/scripted_plugins")); script_path != k3d::filesystem::directory_iterator(); ++script_path)
 	{
 		if(k3d::filesystem::is_directory(*script_path))
 			continue;
