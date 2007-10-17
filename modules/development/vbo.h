@@ -260,6 +260,8 @@ private:
 	vbo* m_normal_vbo;
 	cached_triangulation* m_triangulation;
 	k3d::mesh::indices_t m_indices;
+	// For each triangle corner, store the face it belongs to (used for flat normal calculation)
+	k3d::mesh::indices_t m_corner_to_face;
 };
 
 /// Common SDS cache functionality

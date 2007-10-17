@@ -902,6 +902,7 @@ void triangle_vbo::on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 		delete m_normal_vbo;
 		m_normal_vbo = 0;
 		m_indices.clear();
+		m_corner_to_face.clear();
 	}
 	else if (m_indices.empty()) // Only set indices once (they are cleared upon execute()
 	{
@@ -941,6 +942,7 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh)
 	}
 	
 	k3d::mesh::indices_t& triangles = m_triangulation->indices();
+	cached_triangulation::index_vectors_t& face_points = m_triangulation->face_points();
 	
 	if (!m_index_vbo)
 	{
@@ -954,11 +956,17 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh)
 			gl_indices[i] = static_cast<GLuint>(triangles[i]);
 		}
 		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+		m_corner_to_face.resize(points.size());
+		for (k3d::uint_t face = 0; face != face_points.size(); ++face)
+		{
+			k3d::mesh::indices_t& corners = face_points[face];
+			for (k3d::uint_t i = 0; i != corners.size(); ++i)
+			{ 
+				m_corner_to_face[corners[i]] = face;
+			}
+		}
 	}
-	
-	// Use flat normals from the pipeline, if available
-	const k3d::mesh::normals_t* normals = k3d::get_array<k3d::mesh::normals_t>(Mesh.polyhedra->uniform_data, "N");
-	
+		
 	new_vbo = false;
 	if (!m_normal_vbo)
 	{
@@ -967,18 +975,10 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh)
 	}
 	
 	glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
-	
-	std::set<k3d::uint_t> index_set;
-	
-	if (!new_vbo)
-	{
-		for (k3d::uint_t i = 0; i != m_indices.size(); ++i)
-			index_set.insert(m_indices[i]);
-	}
-	
-	glBufferData(GL_ARRAY_BUFFER, sizeof(normals->at(0)) * points.size(), 0, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(k3d::normal3) * points.size(), 0, GL_STATIC_DRAW);
 	k3d::normal3* normalbuffer = static_cast<k3d::normal3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-	cached_triangulation::index_vectors_t& face_points = m_triangulation->face_points();
+	// Use flat normals from the pipeline, if available
+	const k3d::mesh::normals_t* normals = k3d::get_array<k3d::mesh::normals_t>(Mesh.polyhedra->uniform_data, "N");
 	if (normals)
 	{
 		for (k3d::uint_t face = 0; face != face_points.size(); ++face)
@@ -997,43 +997,26 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh)
 		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
 		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
 		const k3d::mesh::indices_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-		const k3d::mesh::points_t& mesh_points = *Mesh.points; 
-		for (k3d::uint_t face = 0; face != face_points.size(); ++face)
+		const k3d::mesh::points_t& mesh_points = *Mesh.points;
+		cached_triangulation::index_vectors_t& point_links = m_triangulation->point_links();
+		if (new_vbo)
 		{
-			bool affected = index_set.empty();
-			if (!affected)
+			for (k3d::uint_t face = 0; face != face_points.size(); ++face)
 			{
-				const k3d::uint_t loop_begin = face_first_loops[face];
-				const k3d::uint_t loop_end = loop_begin + face_loop_counts[face];
-	
-				for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-				{
-					const k3d::uint_t first_edge = loop_first_edges[loop];
-	
-					for(k3d::uint_t edge = first_edge; ; )
-					{
-						if (index_set.find(edge_points[edge]) != index_set.end())
-						{
-							affected = true;
-							break;
-						}
-	
-						edge = clockwise_edges[edge];
-						if(edge == first_edge)
-							break;
-					}
-					if (affected)
-						break;
-				}
-			}
-			if (affected)
-			{
-				k3d::normal3 n = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]);
 				k3d::mesh::indices_t& corners = face_points[face];
 				for (k3d::uint_t i = 0; i != corners.size(); ++i)
 				{ 
-					normalbuffer[corners[i]] = n;
+					normalbuffer[corners[i]] = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]);
 				}
+			}
+		}
+		else
+		{
+			for (k3d::uint_t index = 0; index != m_indices.size(); ++index)
+			{
+				k3d::mesh::indices_t triangle_points = point_links[m_indices[index]];
+				for (k3d::uint_t i = 0; i != triangle_points.size(); ++i)
+					normalbuffer[triangle_points[i]] = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[m_corner_to_face[triangle_points[i]]]]);
 			}
 		}
 	}
