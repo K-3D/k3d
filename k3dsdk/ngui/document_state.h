@@ -115,7 +115,7 @@ public:
 	tool& snap_tool();
 
 	/// Defines storage for the current document-wide selection mode
-	typedef k3d_data(selection_mode_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) selection_mode_property_t;
+	typedef k3d_data(selection_mode_t, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, no_property, no_serialization) selection_mode_property_t;
 	/// Returns the current document-wide selection mode
 	selection_mode_property_t& selection_mode();
 	void set_selection_mode(selection_mode_t Mode);
