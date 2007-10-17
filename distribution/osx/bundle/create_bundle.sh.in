@@ -1,73 +1,66 @@
 #!/bin/sh
 
-# Build the wrapper executable ...
-cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/ScriptExec" "@k3d_BINARY_DIR@"
-unset CC # Build fails if CC happens to be set (to anything other than CompileC)
-cd "@k3d_BINARY_DIR@/ScriptExec"
-xcodebuild -configuration Deployment clean build SYMROOT=build
+STAGING="@CMAKE_CURRENT_BINARY_DIR@/staging"
+BUNDLE="$STAGING/K-3D.app"
+CONTENTS="$BUNDLE/Contents"
+DISK_IMAGE="@CMAKE_CURRENT_BINARY_DIR@/K-3D @VERSION@.dmg"
+
+# Cleanup old files
+rm -rvf "$STAGING"
+rm -rvf "$DISK_IMAGE"
 
 # Create the bundle ...
-IMAGE="@k3d_BINARY_DIR@/K-3D"
-BUNDLE="$IMAGE/K-3D.app"
-mkdir -p "$BUNDLE/Contents"
-cd "$BUNDLE/Contents"
 
-# Setup wrapper executable ...
-mkdir MacOS
-cp -v "@k3d_BINARY_DIR@/ScriptExec/build/Deployment/ScriptExec.app/Contents/MacOS/ScriptExec" MacOS/K-3D
-
-mkdir Resources
-cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/ScriptExec/MenuBar.nib" Resources
-cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/open-document-script" Resources
-cp -v -r "@k3d_SOURCE_DIR@/distribution/osx/bundle/startup-script" Resources
-
-# Copy startup script
-mkdir Resources/bin
-cp -v "@k3d_SOURCE_DIR@/distribution/osx/bundle/k3d-startup" Resources/bin
-chmod a+x Resources/bin/k3d-startup
+# Setup wrapper script ...
+mkdir -p "$CONTENTS/MacOS"
+cp -v "@CMAKE_CURRENT_SOURCE_DIR@/k3d-startup" "$CONTENTS/MacOS/K-3D"
+chmod a+x "$CONTENTS/MacOS/K-3D"
 
 # Copy binary executables ...
-cp -v "@k3d_BINARY_DIR@/bin/k3d" Resources/bin
-cp -v "@k3d_BINARY_DIR@/bin/k3d-bug-buddy" Resources/bin
-cp -v "@k3d_BINARY_DIR@/bin/k3d-make-module-proxy" Resources/bin
-cp -v "@k3d_BINARY_DIR@/bin/k3d-renderframe" Resources/bin
-cp -v "@k3d_BINARY_DIR@/bin/k3d-renderjob" Resources/bin
-cp -v "@k3d_BINARY_DIR@/bin/k3d-sl2xml" Resources/bin
-cp -v "@k3d_BINARY_DIR@/bin/k3d-uuidgen" Resources/bin
+mkdir -p "$CONTENTS/Resources/bin"
+cp -v "@k3d_BINARY_DIR@/bin/k3d" "$CONTENTS/Resources/bin"
+cp -v "@k3d_BINARY_DIR@/bin/k3d-bug-buddy" "$CONTENTS/Resources/bin"
+cp -v "@k3d_BINARY_DIR@/bin/k3d-make-module-proxy" "$CONTENTS/Resources/bin"
+cp -v "@k3d_BINARY_DIR@/bin/k3d-renderframe" "$CONTENTS/Resources/bin"
+cp -v "@k3d_BINARY_DIR@/bin/k3d-renderjob" "$CONTENTS/Resources/bin"
+cp -v "@k3d_BINARY_DIR@/bin/k3d-sl2xml" "$CONTENTS/Resources/bin"
+cp -v "@k3d_BINARY_DIR@/bin/k3d-uuidgen" "$CONTENTS/Resources/bin"
 
 # Strip binary executables ...
-strip -ur Resources/bin/*
+strip -ur "$CONTENTS/Resources/bin/*"
 
 # Copy libraries ...
-cp -v -r "@k3d_BINARY_DIR@/lib" Resources
+cp -v -r "@k3d_BINARY_DIR@/lib" "$CONTENTS/Resources"
 
 # Strip libraries ...
-strip -x Resources/lib/*.dylib
-strip -x Resources/lib/plugins/*.module
-strip -x Resources/lib/uiplugins/*.module
+strip -x "$CONTENTS/Resources/lib/*.dylib"
+strip -x "$CONTENTS/Resources/lib/plugins/*.module"
+strip -x "$CONTENTS/Resources/lib/uiplugins/*.module"
 
 # Setup the application icon ...
-cp -v "@k3d_SOURCE_DIR@/share/icons/k3d.icns" Resources/K-3D.icns
+cp -v "@k3d_SOURCE_DIR@/share/icons/k3d.icns" "$CONTENTS/Resources/K-3D.icns"
 
 # Setup the metadata file ...
-cp -v "@k3d_SOURCE_DIR@/distribution/osx/bundle/Info.plist" .
+cp -v "@CMAKE_CURRENT_BINARY_DIR@/Info.plist" "$CONTENTS"
 
 # Copy shared files ...
-cp -v -r "@k3d_SOURCE_DIR@/share" Resources
+cp -v -r "@k3d_SOURCE_DIR@/share" "$CONTENTS/Resources"
 
 # Get rid of those pesky .svn directories ...
-rm -rf $(find . -name ".svn")
+rm -rf $(find "$CONTENTS" -name ".svn")
 
 # Add a link to /Applications so users can drag-and-drop the bundle into it
-cd "@k3d_BINARY_DIR@"
-ln -sf /Applications "$IMAGE"
+ln -sf /Applications "$STAGING"
+
+# Add a custom volume icon ...
+cp -v "@CMAKE_CURRENT_SOURCE_DIR@/volume.icns" "$STAGING/.VolumeIcon.icns"
 
 # Create a disk image
 echo "Creating disk image ..."
 TEMP_IMAGE=temp.dmg
-hdiutil create -srcfolder "$IMAGE" "$TEMP_IMAGE"
+hdiutil create -srcfolder "$STAGING" -volname "K-3D @VERSION@" "$TEMP_IMAGE"
 
 echo "Compressing disk image ..."
-hdiutil convert "$TEMP_IMAGE" -format UDZO -imagekey zlib-level=9 -o K-3D.dmg
+hdiutil convert "$TEMP_IMAGE" -format UDZO -imagekey zlib-level=9 -o "$DISK_IMAGE"
 rm -f "$TEMP_IMAGE"
 
