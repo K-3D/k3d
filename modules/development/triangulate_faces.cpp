@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Bart Janssens (bart.janssens@lid.kviv.be)
+		\author Timothy M. Shead (tshead@k-3d.com)
  */
 
 #include <k3d-i18n-config.h>

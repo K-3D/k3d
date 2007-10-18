@@ -922,6 +922,8 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh)
 		new_vbo = true;
 	}
 	
+	cached_triangulation::index_vectors_t& point_links = m_triangulation->point_links();
+	
 	glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
 	
 	if (m_indices.empty() || new_vbo)
@@ -930,7 +932,6 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh)
 	}
 	else
 	{
-		cached_triangulation::index_vectors_t& point_links = m_triangulation->point_links();
 		k3d::point3* vertices = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 		for (k3d::uint_t index = 0; index != m_indices.size(); ++index)
 		{
@@ -973,7 +974,7 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh)
 		m_normal_vbo = new vbo();
 		new_vbo = true;
 	}
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(k3d::normal3) * points.size(), 0, GL_STATIC_DRAW);
 	k3d::normal3* normalbuffer = static_cast<k3d::normal3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
@@ -998,25 +999,38 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh)
 		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
 		const k3d::mesh::indices_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
 		const k3d::mesh::points_t& mesh_points = *Mesh.points;
-		cached_triangulation::index_vectors_t& point_links = m_triangulation->point_links();
 		if (new_vbo)
 		{
 			for (k3d::uint_t face = 0; face != face_points.size(); ++face)
 			{
+				k3d::normal3 n = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]);
 				k3d::mesh::indices_t& corners = face_points[face];
 				for (k3d::uint_t i = 0; i != corners.size(); ++i)
 				{ 
-					normalbuffer[corners[i]] = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]);
+					normalbuffer[corners[i]] = n; 
 				}
 			}
 		}
 		else
-		{
-			for (k3d::uint_t index = 0; index != m_indices.size(); ++index)
+		{ // Update only the normals of affected faces
+			std::set<k3d::uint_t> visited_faces; // cache of faces that have been updated
+			for (k3d::uint_t index = 0; index != m_indices.size(); ++index) // for all transformed points
 			{
-				k3d::mesh::indices_t triangle_points = point_links[m_indices[index]];
-				for (k3d::uint_t i = 0; i != triangle_points.size(); ++i)
-					normalbuffer[triangle_points[i]] = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[m_corner_to_face[triangle_points[i]]]]);
+				k3d::mesh::indices_t triangle_points = point_links[m_indices[index]]; // get the associated VBO point indices
+				for (k3d::uint_t i = 0; i != triangle_points.size(); ++i) // For all those associated points (one per face)
+				{
+					k3d::uint_t face = m_corner_to_face[triangle_points[i]]; // Get the face this point belongs to
+					if (visited_faces.find(face) == visited_faces.end())
+					{ // Update the normals for all corners if the face was not updated before
+						k3d::normal3 n = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]);
+						k3d::mesh::indices_t& corners = face_points[face];
+						for (k3d::uint_t j = 0; j != corners.size(); ++j)
+						{ 
+							normalbuffer[corners[j]] = n;
+						}
+						visited_faces.insert(face);
+					}
+				}
 			}
 		}
 	}

@@ -30,7 +30,9 @@ void cached_triangulation::on_execute(const k3d::mesh& Mesh)
 	m_input_points = Mesh.points;
 	if (m_points.empty())
 	{
+		m_progress = 0;
 		m_point_links.resize(Mesh.points->size());
+		m_points.resize(Mesh.polyhedra->edge_points->size());
 		k3d::triangulator::process(Mesh);
 	}
 	else
@@ -70,34 +72,40 @@ void cached_triangulation::start_face(const k3d::uint_t Face)
 
 void cached_triangulation::add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::double_t Weights[4], k3d::uint_t& NewVertex)
 {
-	k3d::log() << debug << "New vertex in triangulated painter: " << Coordinates << ", " << NewVertex << std::endl;
+	NewVertex = m_points.size();
+	k3d::log() << debug << "added new vertex: " << NewVertex << std::endl;
+	m_point_map.insert(std::make_pair(m_points.size(), m_points.size()));
+	m_face_points.back().push_back(m_points.size());
+	m_points.push_back(Coordinates);
 }
 
 void cached_triangulation::add_triangle(const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3)
 {
 	typedef std::pair<point_map_t::iterator, bool> result_t;
 	// Create point copies for this face, if they don't exist already
-	result_t r1 = m_point_map.insert(std::make_pair(Point1, m_points.size()));
+	result_t r1 = m_point_map.insert(std::make_pair(Point1, m_progress));
 	if (r1.second)
 	{
-		m_point_links[Point1].push_back(m_points.size());
-		m_face_points.back().push_back(m_points.size());
-		m_points.push_back(m_input_points->at(Point1));
+		m_point_links[Point1].push_back(m_progress);
+		m_face_points.back().push_back(m_progress);
+		m_points[m_progress] = m_input_points->at(Point1);
+		++m_progress;
 	}
-	result_t r2 = m_point_map.insert(std::make_pair(Point2, m_points.size()));
+	result_t r2 = m_point_map.insert(std::make_pair(Point2, m_progress));
 	if (r2.second)
 	{
-		m_point_links[Point2].push_back(m_points.size());
-		m_face_points.back().push_back(m_points.size());
-		m_points.push_back(m_input_points->at(Point2));
+		m_point_links[Point2].push_back(m_progress);
+		m_face_points.back().push_back(m_progress);
+		m_points[m_progress] = m_input_points->at(Point2);
+		++m_progress;
 	}
-	result_t r3 = m_point_map.insert(std::make_pair(Point3, m_points.size()));
+	result_t r3 = m_point_map.insert(std::make_pair(Point3, m_progress));
 	if (r3.second)
 	{
-		m_point_links[Point3].push_back(m_points.size());
-		m_face_points.back().push_back(m_points.size());
-		m_points.push_back(m_input_points->at(Point3));
-		
+		m_point_links[Point3].push_back(m_progress);
+		m_face_points.back().push_back(m_progress);
+		m_points[m_progress] = m_input_points->at(Point3);
+		++m_progress;
 	}
 		
 	// Store corner indices

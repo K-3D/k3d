@@ -85,6 +85,7 @@ private:
 		m_points.clear();
 		m_face_starts.clear();
 		m_point_links.clear();
+		m_progress = 0;
 	}
 
 	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
@@ -120,6 +121,9 @@ private:
 	index_vectors_t m_face_points;
 	
 	k3d::mesh::indices_t m_affected_indices;
+	
+	// Keep track of what point we're at
+	k3d::uint_t m_progress;
 };
 
 }
