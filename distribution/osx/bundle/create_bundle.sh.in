@@ -29,6 +29,10 @@ cp -v "@k3d_BINARY_DIR@/bin/k3d-uuidgen" "$CONTENTS/Resources/bin"
 # Strip binary executables ...
 strip -ur "$CONTENTS/Resources/bin/*"
 
+# Copy our X11-startup helper script ...
+cp -v "@CMAKE_CURRENT_SOURCE_DIR@/getdisplay.sh" "$CONTENTS/Resources/bin"
+chmod a+x "$CONTENTS/Resources/bin/getdisplay.sh"
+
 # Copy libraries ...
 cp -v -r "@k3d_BINARY_DIR@/lib" "$CONTENTS/Resources"
 
@@ -55,12 +59,19 @@ ln -sf /Applications "$STAGING"
 # Add a custom volume icon ...
 cp -v "@CMAKE_CURRENT_SOURCE_DIR@/volume.icns" "$STAGING/.VolumeIcon.icns"
 
-# Create a disk image
+# Create a temporary read-write disk image ...
 echo "Creating disk image ..."
-TEMP_IMAGE=temp.dmg
-hdiutil create -srcfolder "$STAGING" -volname "K-3D @VERSION@" "$TEMP_IMAGE"
+TEMP_IMAGE="@CMAKE_CURRENT_BINARY_DIR@/temp.dmg"
+hdiutil create -ov -srcfolder "$STAGING" -volname "K-3D @VERSION@" -format UDRW "$TEMP_IMAGE"
 
+# Set the custom icon flag on the volume ...
+TEMP_MOUNT="@CMAKE_CURRENT_BINARY_DIR@/mnt"
+mkdir -p "$TEMP_MOUNT"
+hdiutil attach -mountpoint "$TEMP_MOUNT" "$TEMP_IMAGE"
+/Developer/Tools/SetFile -a C "$TEMP_MOUNT"
+hdiutil detach "$TEMP_MOUNT"
+
+# Create the final compressed read-only disk image ...
 echo "Compressing disk image ..."
 hdiutil convert "$TEMP_IMAGE" -format UDZO -imagekey zlib-level=9 -o "$DISK_IMAGE"
-rm -f "$TEMP_IMAGE"
 
