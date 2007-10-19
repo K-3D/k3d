@@ -8,6 +8,11 @@ IF(CMAKE_HAS_SORT)
 	LIST(SORT SOURCES)
 ENDIF(CMAKE_HAS_SORT)
 
+IF(WIN32 AND K3D_COMPILER_GCC)
+	# For some reason, serialization.cpp takes *forever* to build with optimizations enabled
+	SET_SOURCE_FILES_PROPERTIES(serialization.cpp PROPERTIES COMPILE_FLAGS -O0)
+ENDIF(WIN32 AND K3D_COMPILER_GCC)
+
 CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-i18n-config.h.in ${k3dsdk_BINARY_DIR}/k3d-i18n-config.h)
 CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-module-config.h.in ${k3dsdk_BINARY_DIR}/k3d-module-config.h)
 CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-platform-config.h.in ${k3dsdk_BINARY_DIR}/k3d-platform-config.h)
