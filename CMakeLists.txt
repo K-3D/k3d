@@ -153,9 +153,11 @@ OPTION(K3D_BUILD_WINDOWS_MODULE "Build the Windows integration module" ${K3D_WIN
 OPTION(K3D_BUILD_YAFRAY_MODULE "Build the YAFRAY render engine integration module" ON)
 
 OPTION(K3D_NEWTIMELINE "Use the new timeline module" OFF)
+MARK_AS_ADVANCED(K3D_NEWTIMELINE)
 
 OPTION(K3D_SYMBOL_VISIBILITY "Minimize the number of symbols exported from shared libraries" OFF)
 MARK_AS_ADVANCED(K3D_SYMBOL_VISIBILITY)
+
 OPTION(K3D_TEST_VBO "Run tests using VBO painters" OFF)
 MARK_AS_ADVANCED(K3D_TEST_VBO)
 
