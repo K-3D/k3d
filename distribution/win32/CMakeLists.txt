@@ -1,3 +1,8 @@
+
+
+# This is an ugly hack, we should be able to detect this automatically, but I'm feeling lazy ...
+SET(K3D_GTK_DIR "c:/gtk" CACHE PATH "Root directory containing GTK/gtkmm")
+
 # The Win32 install includes its own copies of GTK and Boost, to prevent DLL hell ...
 INSTALL(FILES ${K3D_BOOST_LIB_DIR}/boost_regex-mgw-1_33_1.dll DESTINATION bin)
 INSTALL(FILES ${K3D_BOOST_LIB_DIR}/boost_python-mgw-1_33_1.dll DESTINATION bin)
