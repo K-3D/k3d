@@ -62,7 +62,7 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("TrianulatedFacePainter");
+				const k3d::factories_t factories = k3d::plugins("VBOTriangulatedFacePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}

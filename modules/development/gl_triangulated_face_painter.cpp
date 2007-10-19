@@ -29,6 +29,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
@@ -38,7 +39,6 @@
 
 #include "cached_triangulation.h"
 #include "colored_selection_painter_gl.h"
-#include "vbo.h"
 
 namespace module
 {
@@ -47,34 +47,28 @@ namespace development
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// triangulated_painter
+// gl_triangulated_face_painter
 
-class triangulated_painter :
+class gl_triangulated_face_painter :
 	public colored_selection_painter,
 	public k3d::hint::hint_processor
 {
 	typedef colored_selection_painter base;
 
 public:
-	triangulated_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	gl_triangulated_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6)),
-		m_triangle_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, cached_triangulation>::instance(Document)),
-		m_vbo_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, triangle_vbo>::instance(Document)),
-		m_selection_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_selection>::instance(Document))
+		m_triangle_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, cached_triangulation>::instance(Document))
 	{
 	}
 	
-	~triangulated_painter()
+	~gl_triangulated_face_painter()
 	{
 		m_triangle_cache.remove_painter(this);
-		m_vbo_cache.remove_painter(this);
-		m_selection_cache.remove_painter(this);
 	}
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		return_if_fail(k3d::gl::extension::query_vbo());
-
 		if(!validate_polyhedra(Mesh))
 			return;
 			
@@ -89,52 +83,88 @@ public:
 
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
+		glEnable(GL_COLOR_MATERIAL);
+		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 		
 		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color();
 		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
 		cached_triangulation* triangles = m_triangle_cache.create_data(Mesh.points); 
-		triangles->execute(Mesh);
-		triangle_vbo* vbos = m_vbo_cache.create_data(Mesh.points);
-		vbos->set_triangle_cache(triangles);
-		vbos->execute(Mesh);
-		
-		face_selection* selected_faces = m_selection_cache.create_data(Mesh.polyhedra->face_first_loops);
-		selected_faces->execute(Mesh);
+		triangles->execute(Mesh); 
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
-		const selection_records_t& face_selection_records = selected_faces->records();
 		
 		glEnable(GL_LIGHTING);
 		
-		clean_vbo_state();
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_DOUBLE, 0, &(triangles->points().at(0)));
 		
-		vbos->bind();
-		
-		if (!face_selection_records.empty())
+		k3d::typed_array<k3d::normal3> normals(triangles->points().size(), k3d::normal3(0, 0, 1));
+		cached_triangulation::index_vectors_t& face_points = triangles->face_points();
+		const k3d::mesh::normals_t* calculated_normals = k3d::get_array<k3d::mesh::normals_t>(Mesh.polyhedra->uniform_data, "N");
+		if (calculated_normals)
 		{
-			for (selection_records_t::const_iterator record = face_selection_records.begin(); record != face_selection_records.end() && record->begin < face_count; ++record)
-			{ // color by selection
-				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, record->weight ? selected_color : color);
-				size_t start = record->begin;
-				size_t end = record->end;
-				end = end > face_count ? face_count : end;
-				vbos->draw_range(start, end);
+			for (k3d::uint_t face = 0; face != face_points.size(); ++face)
+			{
+				k3d::mesh::indices_t& corners = face_points[face];
+				for (k3d::uint_t i = 0; i != corners.size(); ++i)
+				{ 
+					normals[corners[i]] = calculated_normals->at(face);
+				}
 			}
 		}
 		else
-		{ // empty selection, everything has the same color
-			k3d::gl::color3d(color);
-			vbos->draw_range(0, face_count);
+		{
+			const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+			const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+			const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+			const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+			const k3d::mesh::indices_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+			const k3d::mesh::points_t& mesh_points = *Mesh.points;
+			for (k3d::uint_t face = 0; face != face_points.size(); ++face)
+			{
+				k3d::normal3 n = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]);
+				k3d::mesh::indices_t& corners = face_points[face];
+				for (k3d::uint_t i = 0; i != corners.size(); ++i)
+				{ 
+					normals[corners[i]] = n; 
+				}
+			}
 		}
 		
-		clean_vbo_state();
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glNormalPointer(GL_DOUBLE, 0, &normals[0]);
+		
+		k3d::typed_array<k3d::color> colors(triangles->points().size(), color);
+		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection; 
+		for (k3d::uint_t face = 0; face != face_points.size(); ++face)
+		{
+			if (!face_selection[face])
+				continue;
+			k3d::mesh::indices_t& corners = face_points[face];
+			for (k3d::uint_t i = 0; i != corners.size(); ++i)
+			{ 
+				colors[corners[i]] = selected_color;
+			}
+		}
+		
+		glEnableClientState(GL_COLOR_ARRAY);
+		glColorPointer(3, GL_DOUBLE, 0, &colors[0]);
+		
+		glDrawElements(GL_TRIANGLES, triangles->indices().size(), GL_UNSIGNED_INT, &(triangles->indices().at(0)));
+		
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+		glDisableClientState(GL_SECONDARY_COLOR_ARRAY);
+		glDisableClientState(GL_INDEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
+		glDisableClientState(GL_FOG_COORDINATE_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_EDGE_FLAG_ARRAY);
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		return_if_fail(k3d::gl::extension::query_vbo());
-
 		if(!validate_polyhedra(Mesh))
 			return;
 			
@@ -157,31 +187,28 @@ public:
 		
 		cached_triangulation* triangles = m_triangle_cache.create_data(Mesh.points); 
 		triangles->execute(Mesh);
-		triangle_vbo* vbos = m_vbo_cache.create_data(Mesh.points);
-		vbos->set_triangle_cache(triangles);
-		vbos->execute(Mesh);
 		
-		clean_vbo_state();
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_DOUBLE, 0, &(triangles->points().at(0)));
 		
-		vbos->bind();
+		k3d::mesh::indices_t& face_starts = triangles->face_starts();
+		k3d::mesh::indices_t& indices = triangles->indices();
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
 		for(size_t face = 0; face != face_count; ++face)
 		{
 			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
 
-			vbos->draw_range(face, face+1);
+			k3d::uint_t startindex = face_starts[face];
+			k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
+			glDrawElements(GL_TRIANGLES, endindex - startindex, GL_UNSIGNED_INT, &indices[startindex]);
 
 			k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
 		}
-		
-		clean_vbo_state();
 	}
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		return_if_fail(k3d::gl::extension::query_vbo());
-
 		if(!k3d::validate_polyhedra(Mesh))
 			return;
 			
@@ -189,17 +216,15 @@ public:
 			return;
 		
 		m_triangle_cache.register_painter(Mesh.points, this);
-		m_vbo_cache.register_painter(Mesh.points, this);
-		m_selection_cache.register_painter(Mesh.polyhedra->face_first_loops, this);
 		
 		process(Mesh, Hint);
 	}
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<triangulated_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
-			k3d::uuid(0x2f953308, 0xc8474bc9, 0x6d58bba7, 0x0355bcfe),
-			"TrianulatedFacePainter",
+		static k3d::document_plugin_factory<gl_triangulated_face_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
+			k3d::uuid(0xd4abf63c, 0x2242c17e, 0x2afcb18d, 0x0a8ebdd5),
+			"GLTriangulatedFacePainter",
 			_("Renders mesh faces, after trianglulating them"),
 			"Development",
 			k3d::iplugin_factory::EXPERIMENTAL);
@@ -217,14 +242,6 @@ protected:
 	{
 		cached_triangulation* triangles = m_triangle_cache.create_data(Mesh.points); 
 		triangles->schedule(Mesh, Hint);
-		triangle_vbo* vbos = m_vbo_cache.create_data(Mesh.points);
-		vbos->set_triangle_cache(triangles);
-		vbos->schedule(Mesh, Hint);
-	}
-	
-	virtual void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_selection_cache.create_data(Mesh.polyhedra->face_first_loops)->schedule(Mesh, Hint);
 	}
 	
 	virtual void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
@@ -237,29 +254,23 @@ protected:
 		k3d::hint::mesh_address_changed_t* address_hint = dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint);
 		return_if_fail(address_hint);
 		m_triangle_cache.switch_key(address_hint->old_points_address, Mesh.points);
-		m_vbo_cache.switch_key(address_hint->old_points_address, Mesh.points);
-		m_selection_cache.switch_key(address_hint->old_face_first_loops_address, Mesh.polyhedra->face_first_loops);
 	}
 	
 	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		m_triangle_cache.remove_data(Mesh.points);
-		m_vbo_cache.remove_data(Mesh.points);
-		m_selection_cache.remove_data(Mesh.polyhedra->face_first_loops);
 	}
 	
 private:
 	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, cached_triangulation>& m_triangle_cache;
-	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, triangle_vbo>& m_vbo_cache;
-	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, face_selection>& m_selection_cache;
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// triangulated_painter_factory
+// gl_triangulated_face_painter_factory
 
-k3d::iplugin_factory& triangulated_painter_factory()
+k3d::iplugin_factory& gl_triangulated_face_painter_factory()
 {
-	return triangulated_painter::get_factory();
+	return gl_triangulated_face_painter::get_factory();
 }
 
 }
