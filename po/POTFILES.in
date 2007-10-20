@@ -60,6 +60,7 @@ k3dsdk/ngui/spin_button.cpp
 k3dsdk/ngui/test_case_recorder.cpp
 k3dsdk/ngui/transform_tool.h
 k3dsdk/ngui/tutorial_recorder.cpp
+k3dsdk/ngui/uri.cpp
 k3dsdk/ngui/user_property.cpp
 k3dsdk/ngui/viewport.cpp
 k3dsdk/node.cpp
@@ -144,6 +145,7 @@ modules/deformation/twist_points.cpp
 modules/development/colored_selection_painter_gl.h
 modules/development/edge_array_painter.cpp
 modules/development/face_array_painter.cpp
+modules/development/gl_triangulated_face_painter.cpp
 modules/development/glsl_painter.cpp
 modules/development/point_array_painter.cpp
 modules/development/sds_gl_painter.cpp
@@ -151,9 +153,10 @@ modules/development/sds_vbo_painter.cpp
 modules/development/sharp_edges.cpp
 modules/development/triangulate_faces.cpp
 modules/development/tweak_points.cpp
+modules/development/vbo_triangulated_face_painter.cpp
 modules/freetype2/poly_text.cpp
 modules/glx/camera_to_bitmap.cpp
-modules/gnome/open_uri.cpp
+modules/gnome/uri_handler.cpp
 modules/graphviz/render_engine.cpp
 modules/gts/mesh_area.cpp
 modules/gts/mesh_volume.cpp
@@ -167,6 +170,8 @@ modules/k3d_io/k3d_document_importer.cpp
 modules/k3d_io/k3d_mesh_reader.cpp
 modules/k3d_io/k3d_mesh_writer.cpp
 modules/k3dscript/engine.cpp
+modules/linear_curve/knot_curve.cpp
+modules/linear_curve/lissajous_curve.cpp
 modules/lsystem/l_parser.cpp
 modules/mesh/array_1d.cpp
 modules/mesh/array_2d.cpp
@@ -195,6 +200,7 @@ modules/mesh_attributes/calculate_normals.cpp
 modules/mesh_instance/frozen_mesh.cpp
 modules/mesh_instance/mesh_instance.cpp
 modules/ngui_about_dialog/dialog.cpp
+modules/ngui_newtimeline_panel/panel.cpp
 modules/ngui_node_history_panel/panel.cpp
 modules/ngui_node_list_panel/panel.cpp
 modules/ngui_node_properties_panel/panel.cpp
@@ -235,11 +241,16 @@ modules/opengl_painters/face_orientation_painter.cpp
 modules/opengl_painters/face_painter.cpp
 modules/opengl_painters/linear_curve_painter.cpp
 modules/opengl_painters/multi_painter.cpp
+modules/opengl_painters/normal_array_painter.cpp
 modules/opengl_painters/nurbs_curve_painter.cpp
 modules/opengl_painters/nurbs_patch_painter.cpp
 modules/opengl_painters/point_numbering_painter.cpp
 modules/opengl_painters/point_painter.cpp
+modules/osx/uri_handler.cpp
 modules/pdiff/bitmap_perceptual_difference.cpp
+modules/pgp_remesh/pgp_face_painter.cpp
+modules/pgp_remesh/point_mean_curv_painter.cpp
+modules/pgp_remesh/remesh.cpp
 modules/pixie/raytrace_map.cpp
 modules/plot/surface_plot.cpp
 modules/ply_io/ply_mesh_reader.cpp
@@ -249,8 +260,6 @@ modules/png_io/png_bitmap_writer.cpp
 modules/point_group/make_point_group.cpp
 modules/polyhedra/bevel_points.cpp
 modules/polyhedra/extrude_faces.cpp
-modules/primitives/knot_curve.cpp
-modules/primitives/lissajous_curve.cpp
 modules/primitives/newell_primitives.cpp
 modules/primitives/poly_cone.cpp
 modules/primitives/poly_cube.cpp
@@ -314,6 +323,7 @@ modules/scalar/scalar_multiply.cpp
 modules/scalar/scalar_property.cpp
 modules/scalar/scalar_sine.cpp
 modules/scalar/scalar_sub.cpp
+modules/scripted_plugins/module.cpp
 modules/scripting/bitmap_modifier_script.cpp
 modules/scripting/bitmap_source_script.cpp
 modules/scripting/color_source_script.cpp
@@ -365,10 +375,11 @@ modules/virtual_opengl_painters/sds_edge_painter.cpp
 modules/virtual_opengl_painters/sds_face_painter.cpp
 modules/virtual_opengl_painters/sds_point_painter.cpp
 modules/wgl/camera_to_bitmap.cpp
-modules/windows/open_uri.cpp
+modules/windows/uri_handler.cpp
 modules/yafray/lights.cpp
 modules/yafray/material.cpp
 modules/yafray/render_engine.cpp
+share/scripts/scripted_plugins/ogre_exporter.py
 uimodules/ngui/splash_box.cpp
 uimodules/ngui/user_interface.cpp
 uimodules/qtui/user_interface.cpp
