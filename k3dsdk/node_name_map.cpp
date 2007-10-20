@@ -61,7 +61,7 @@ void node_name_map::add_nodes(const inode_collection::nodes_t& Nodes)
 
 const std::string node_name_map::name(inode& Node)
 {
-	const uuid node_factory_id = Node.factory().persistent_factory_id();
+	const uuid node_factory_id = Node.factory().factory_id();
 	size_t node_number = 1;
 
 	const size_t begin = 0;
@@ -75,7 +75,7 @@ const std::string node_name_map::name(inode& Node)
 			return buffer.str();
 		}
 
-		if(m_implementation->m_nodes[i]->factory().persistent_factory_id() != node_factory_id)
+		if(m_implementation->m_nodes[i]->factory().factory_id() != node_factory_id)
 			continue;
 
 		++node_number;
@@ -100,7 +100,7 @@ inode* node_name_map::node(const std::string& Name)
 	const size_t end = begin + m_implementation->m_nodes.size();
 	for(size_t i = begin; i != end; ++i)
 	{
-		if(m_implementation->m_nodes[i]->factory().persistent_factory_id() != lookup_node_factory_id)
+		if(m_implementation->m_nodes[i]->factory().factory_id() != lookup_node_factory_id)
 			continue;
 
 		if(node_number == lookup_node_number)

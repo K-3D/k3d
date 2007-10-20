@@ -45,11 +45,6 @@ public:
 	{
 	}
 
-	application_plugin_factory(const uuid& FactoryID, const uuid& PersistentFactoryID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality = STABLE, const metadata_t& Metadata = metadata_t()) :
-		plugin_factory(FactoryID, PersistentFactoryID, Name, ShortDescription, Categories, Quality, Metadata)
-	{
-	}
-
 	iunknown* create_plugin()
 	{
 		return new plugin_t();

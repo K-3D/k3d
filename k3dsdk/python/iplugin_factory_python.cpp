@@ -57,11 +57,6 @@ const k3d::uuid iplugin_factory::factory_id()
 	return wrapped().factory_id();
 }
 
-const k3d::uuid iplugin_factory::persistent_factory_id()
-{
-	return wrapped().persistent_factory_id();
-}
-
 const std::string iplugin_factory::name()
 {
 	return wrapped().name();
@@ -115,8 +110,6 @@ void iplugin_factory::define_class()
 		"Encapsulates a K-3D plugin factory, which stores metadata describing a plugin type.")
 		.def("factory_id", &iplugin_factory::factory_id,
 			"Returns a universally-unique identifier for this factory.")
-		.def("persistent_factory_id", &iplugin_factory::persistent_factory_id,
-			"Returns a universally-unique identifier to be used for serializing objects created with this factory.")
 		.def("name", &iplugin_factory::name,
 			"Returns the human-readable plugin name, which is displayed in the user interface and can be used to instantiate plugins.")
 		.def("short_description", &iplugin_factory::short_description,

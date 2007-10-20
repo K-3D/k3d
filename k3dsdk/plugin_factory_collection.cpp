@@ -167,11 +167,10 @@ class application_plugin_factory_proxy :
 	public iapplication_plugin_factory
 {
 public:
-	application_plugin_factory_proxy(const uuid& FactoryID, const uuid& PersistentFactoryID, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces, const iplugin_factory::metadata_t& Metadata) :
+	application_plugin_factory_proxy(const uuid& FactoryID, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces, const iplugin_factory::metadata_t& Metadata) :
 		m_factory(0),
 		m_application_factory(0),
 		m_factory_id(FactoryID),
-		m_persistent_factory_id(PersistentFactoryID),
 		m_name(Name),
 		m_short_description(ShortDescription),
 		m_categories(Categories),
@@ -184,11 +183,6 @@ public:
 	const uuid& factory_id()
 	{
 		return m_factory_id;
-	}
-
-	const uuid& persistent_factory_id()
-	{
-		return m_persistent_factory_id;
 	}
 
 	const std::string name()
@@ -254,7 +248,6 @@ private:
 	iapplication_plugin_factory* m_application_factory;
 
 	const uuid m_factory_id;
-	const uuid m_persistent_factory_id;
 	const std::string m_name;
 	const std::string m_short_description;
 	const iplugin_factory::categories_t m_categories;
@@ -272,11 +265,10 @@ class document_plugin_factory_proxy :
 	public idocument_plugin_factory
 {
 public:
-	document_plugin_factory_proxy(const uuid& FactoryID, const uuid& PersistentFactoryID, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces, const iplugin_factory::metadata_t& Metadata) :
+	document_plugin_factory_proxy(const uuid& FactoryID, const std::string& Name, const std::string& ShortDescription, const iplugin_factory::categories_t& Categories, const iplugin_factory::quality_t Quality, const iplugin_factory::interfaces_t& Interfaces, const iplugin_factory::metadata_t& Metadata) :
 		m_factory(0),
 		m_document_factory(0),
 		m_factory_id(FactoryID),
-		m_persistent_factory_id(FactoryID),
 		m_name(Name),
 		m_short_description(ShortDescription),
 		m_categories(Categories),
@@ -289,11 +281,6 @@ public:
 	const uuid& factory_id()
 	{
 		return m_factory_id;
-	}
-
-	const uuid& persistent_factory_id()
-	{
-		return m_persistent_factory_id;
 	}
 
 	const std::string name()
@@ -359,7 +346,6 @@ private:
 	idocument_plugin_factory* m_document_factory;
 
 	const uuid m_factory_id;
-	const uuid m_persistent_factory_id;
 	const std::string m_name;
 	const std::string m_short_description;
 	const iplugin_factory::categories_t m_categories;
@@ -418,13 +404,6 @@ struct plugin_factory_collection::implementation
 					continue;
 				}
 
-				const uuid plugin_persistent_factory_id = xml::attribute_value<uuid>(*xml_plugin, "persistent_factory_id", uuid::null());
-				if(plugin_persistent_factory_id == uuid::null())
-				{
-					log() << error << "Plugin " << factory_name << " with missing persistent factory ID will not be loaded" << std::endl;
-					continue;
-				}
-
 				// Warn if we have duplicate names ...
 				if(std::count_if(m_factories.begin(), m_factories.end(), detail::same_name(factory_name)))
 					log() << warning << "Loading plugin with duplicate name " << factory_name << std::endl;
@@ -472,11 +451,11 @@ struct plugin_factory_collection::implementation
 
 				if(plugin_type == "application")
 				{
-					m_factories.insert(new detail::application_plugin_factory_proxy(plugin_factory_id, plugin_persistent_factory_id, factory_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces, metadata));
+					m_factories.insert(new detail::application_plugin_factory_proxy(plugin_factory_id, factory_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces, metadata));
 				}
 				else if(plugin_type == "document")
 				{
-					m_factories.insert(new detail::document_plugin_factory_proxy(plugin_factory_id, plugin_persistent_factory_id, factory_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces, metadata));
+					m_factories.insert(new detail::document_plugin_factory_proxy(plugin_factory_id, factory_name, plugin_short_description, plugin_categories, plugin_quality, plugin_interfaces, metadata));
 				}
 				else
 				{

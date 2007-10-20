@@ -886,7 +886,7 @@ void upgrade_painters(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Default Painter"),
-				attribute("factory", (*plugins("OpenGLMultiPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("OpenGLMultiPainter").begin())->factory_id()),
 				attribute("id", next_node_id),
 				element("properties",
 					element("property", string_cast(next_node_id + 1),
@@ -983,91 +983,91 @@ void upgrade_painters(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Point Painter"),
-				attribute("factory", (*plugins("GLPointPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("GLPointPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Edge Painter"),
-				attribute("factory", (*plugins("GLEdgePainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("GLEdgePainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Face Painter"),
-				attribute("factory", (*plugins("GLFacePainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("GLFacePainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "SDS Point Painter"),
-				attribute("factory", (*plugins("GLSDSPointPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("GLSDSPointPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "SDS Edge Painter"),
-				attribute("factory", (*plugins("GLSDSEdgePainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("GLSDSEdgePainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "SDS Face Painter"),
-				attribute("factory", (*plugins("GLSDSFacePainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("GLSDSFacePainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Linear Curve Painter"),
-				attribute("factory", (*plugins("OpenGLLinearCurvePainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("OpenGLLinearCurvePainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Cubic Curve Painter"),
-				attribute("factory", (*plugins("OpenGLCubicCurvePainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("OpenGLCubicCurvePainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL NURBS Curve Painter"),
-				attribute("factory", (*plugins("OpenGLNURBSCurvePainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("OpenGLNURBSCurvePainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Bilinear Patch Painter"),
-				attribute("factory", (*plugins("OpenGLBilinearPatchPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("OpenGLBilinearPatchPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Bicubic Patch Painter"),
-				attribute("factory", (*plugins("OpenGLBicubicPatchPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("OpenGLBicubicPatchPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL NURBS Patch Painter"),
-				attribute("factory", (*plugins("OpenGLNURBSPatchPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("OpenGLNURBSPatchPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Blobby Point Painter"),
-				attribute("factory", (*plugins("OpenGLBlobbyPointPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("OpenGLBlobbyPointPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Face Normal Painter"),
-				attribute("factory", (*plugins("OpenGLFaceNormalPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("OpenGLFaceNormalPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Face Orientation Painter"),
-				attribute("factory", (*plugins("OpenGLFaceOrientationPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("OpenGLFaceOrientationPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 				
 		// Now add painter properties to the MeshInstance nodes
@@ -1094,7 +1094,7 @@ void upgrade_painters(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "Renderman Default Painter"),
-				attribute("factory", (*plugins("RenderManMultiPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("RenderManMultiPainter").begin())->factory_id()),
 				attribute("id", next_node_id),
 				element("properties",
 					element("property", string_cast(next_node_id + 1),
@@ -1155,55 +1155,55 @@ void upgrade_painters(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Point Group Painter"),
-				attribute("factory", (*plugins("RenderManPointGroupPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("RenderManPointGroupPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Polyhedron Painter"),
-				attribute("factory", (*plugins("RenderManPolyhedronPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("RenderManPolyhedronPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Subdivision Surface Painter"),
-				attribute("factory", (*plugins("RenderManSubdivisionSurfacePainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("RenderManSubdivisionSurfacePainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Linear Curve Painter"),
-				attribute("factory", (*plugins("RenderManLinearCurvePainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("RenderManLinearCurvePainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Cubic Curve Painter"),
-				attribute("factory", (*plugins("RenderManCubicCurvePainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("RenderManCubicCurvePainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Bilinear Patch Painter"),
-				attribute("factory", (*plugins("RenderManBilinearPatchPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("RenderManBilinearPatchPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Bicubic Patch Painter"),
-				attribute("factory", (*plugins("RenderManBicubicPatchPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("RenderManBicubicPatchPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan NURBS Patch Painter"),
-				attribute("factory", (*plugins("RenderManNURBSPatchPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("RenderManNURBSPatchPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Blobby Painter"),
-				attribute("factory", (*plugins("RenderManBlobbyPainter").begin())->persistent_factory_id()),
+				attribute("factory", (*plugins("RenderManBlobbyPainter").begin())->factory_id()),
 				attribute("id", next_node_id)));
 				
 		// Now add painter properties to the MeshInstance nodes
@@ -1329,7 +1329,7 @@ void save_node(ipersistent& Node, xml::element& XML, const ipersistent::save_con
 
 	xml::element& xml_node = XML.append(element("node",
 		attribute("name", node->name()),
-		attribute("factory", node->factory().persistent_factory_id()),
+		attribute("factory", node->factory().factory_id()),
 		attribute("id", Context.lookup.lookup_id(node))));
 	Node.save(xml_node, Context);
 }

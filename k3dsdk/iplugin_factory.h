@@ -59,8 +59,6 @@ public:
 
 	/// Returns a guaranteed-unique factory ID
 	virtual const k3d::uuid& factory_id() = 0;
-	/// Returns a guaranteed-unique factory ID to be used for serialization (may-or-may-not be the same as factory_id()
-	virtual const k3d::uuid& persistent_factory_id() = 0;
 	/// Returns the internal name for a plugin
 	virtual const std::string name() = 0;
 	/// Returns a short, human-readable description of the plugin

@@ -41,10 +41,8 @@ class plugin_factory :
 {
 public:
 	plugin_factory(const uuid& FactoryID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality, const metadata_t& Metadata = metadata_t());
-	plugin_factory(const uuid& FactoryID, const uuid& PersistentFactoryID, const std::string& Name, const std::string& ShortDescription, const std::string& Categories, const quality_t Quality, const metadata_t& Metadata = metadata_t());
 
 	const uuid& factory_id();
-	const uuid& persistent_factory_id();
 	const std::string name();
 	const std::string short_description();
 	const categories_t& categories();
@@ -53,7 +51,6 @@ public:
 
 private:
 	const uuid m_factory_id;
-	const uuid m_persistent_factory_id;
 	const std::string m_name;
 	const std::string m_short_description;
 	categories_t m_categories;

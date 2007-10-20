@@ -1,14 +1,21 @@
 #python
 
-#name: PointCounter
-#category: Demo
+# k3d:plugin-class="document"
+# k3d:plugin-type="NullOutputScript"
+# k3d:plugin-name="PointCounter"
+# k3d:plugin-description="Sample plugin script that counts the points in its input mesh"
 
 #Small demo script to demonstrate scripted node creation
 
 #Add the required user properties
-if not Node.has_property("input_mesh"):
+if not hasattr(Node, "input_mesh"):
 	Node.add_user_property("k3d::mesh*", "input_mesh", "Input Mesh", "The mesh that will have its points counted")
-if not Node.has_property("point_count"):
+if not hasattr(Node, "point_count"):
 	Node.add_user_property("k3d::double_t", "point_count", "Point Count", "Point count for the mesh")
-	
-Node.__setattr__("point_count", len(Node.__getattr__("input_mesh").points()))
+
+mesh = Node.input_mesh
+if mesh:
+	Node.point_count = len(mesh.points())
+else:
+	Node.point_count = 0
+

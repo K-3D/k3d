@@ -1,9 +1,9 @@
 #python
 
-#name: OGREWriter
-#category: MeshWriters
-
-#Export input mesh to OGRE XML format
+# k3d:plugin-class="document"
+# k3d:plugin-type="NullOutputScript"
+# k3d:plugin-name="OGREWriter"
+# k3d:plugin-description="Exports a mesh to OGRE XML format"
 
 from xml.dom.minidom import getDOMImplementation
 import k3d
