@@ -34,5 +34,5 @@ ps -wx -ocommand | grep -e '[X]11' > /dev/null || exit 11
 
 export DYLD_LIBRARY_PATH="$RESOURCES/lib"
 export PATH="$RESOURCES/bin:$PATH"
-exec "$RESOURCES/bin/k3d" "--plugins=$RESOURCES/lib/k3d/plugins" "--share=$RESOURCES/share" "--ui=$RESOURCES/lib/k3d/uiplugins/k3d-ngui.module"
+exec "$RESOURCES/bin/k3d" "--log-level=debug" "--plugins=$RESOURCES/lib/k3d/plugins" "--share=$RESOURCES/share" "--ui=$RESOURCES/lib/k3d/uiplugins/k3d-ngui.module"
 
