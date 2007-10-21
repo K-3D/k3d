@@ -33,9 +33,10 @@ strip -ur "$CONTENTS/Resources/bin/*"
 cp -v "@CMAKE_CURRENT_SOURCE_DIR@/getdisplay.sh" "$CONTENTS/Resources/bin"
 chmod a+x "$CONTENTS/Resources/bin/getdisplay.sh"
 
-# Copy libraries ...
+# Copy K-3D libraries and plugins ...
 cp -v -r "@k3d_BINARY_DIR@/lib" "$CONTENTS/Resources"
 
+# Copy K-3D dependencies ...
 cp -v "/opt/local/lib/libXrender.dylib" "$CONTENTS/Resources/lib"
 cp -v "/opt/local/lib/libatk-1.0.0.dylib" "$CONTENTS/Resources/lib"
 cp -v "/opt/local/lib/libatkmm-1.6.1.dylib" "$CONTENTS/Resources/lib"
@@ -72,15 +73,28 @@ cp -v "/opt/local/lib/libtiff.3.dylib" "$CONTENTS/Resources/lib"
 cp -v "/opt/local/lib/libuuid.15.dylib" "$CONTENTS/Resources/lib"
 cp -v "/opt/local/lib/libz.1.dylib" "$CONTENTS/Resources/lib"
 
+cp -v -r "/opt/local/lib/pango" "$CONTENTS/Resources/lib"
+
 # Strip libraries ...
 strip -x "$CONTENTS/Resources/lib/*.dylib"
 strip -x "$CONTENTS/Resources/lib/plugins/*.module"
 strip -x "$CONTENTS/Resources/lib/uiplugins/*.module"
 
-# Setup the application icon ...
+# Copy configuration files ...
+mkdir -p "$CONTENTS/Resources/etc"
+
+mkdir -p "$CONTENTS/Resources/etc/pango"
+cp -v "/opt/local/etc/pango/pangorc" "$CONTENTS/Resources/etc/pango"
+cp -v "/opt/local/etc/pango/pango.modules" "$CONTENTS/Resources/etc/pango"
+cp -v "/opt/local/etc/pango/pangox.aliases" "$CONTENTS/Resources/etc/pango"
+
+#cp -v "@CMAKE_CURRENT_SOURCE_DIR@/pangorc" "$CONTENTS/Resources/etc/pango"
+#sed -e "s/\/opt\/local/\"\${K3D_RESOURCES}/g" -e "s/\.so/.so\"/g" /opt/local/etc/pango/pango.modules > "$CONTENTS/Resources/etc/pango/pango.modules"
+
+# Setup the bundle icon ...
 cp -v "@k3d_SOURCE_DIR@/share/icons/k3d.icns" "$CONTENTS/Resources/K-3D.icns"
 
-# Setup the metadata file ...
+# Setup the bundle metadata file ...
 cp -v "@CMAKE_CURRENT_BINARY_DIR@/Info.plist" "$CONTENTS"
 
 # Copy shared files ...
@@ -100,7 +114,7 @@ echo "Creating disk image ..."
 TEMP_IMAGE="@CMAKE_CURRENT_BINARY_DIR@/temp.dmg"
 hdiutil create -ov -srcfolder "$STAGING" -volname "K-3D @VERSION@" -format UDRW "$TEMP_IMAGE"
 
-# Set the custom icon flag on the volume ...
+# Set the custom icon flag for the image ...
 TEMP_MOUNT="@CMAKE_CURRENT_BINARY_DIR@/mnt"
 mkdir -p "$TEMP_MOUNT"
 hdiutil attach -mountpoint "$TEMP_MOUNT" "$TEMP_IMAGE"
