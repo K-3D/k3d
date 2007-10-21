@@ -23,15 +23,20 @@
 
 #include <k3dsdk/module.h>
 
+namespace module
+{
+
 /// Namespace reserved for the glx plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dglx
+namespace glx
 {
 
 extern k3d::iplugin_factory& camera_to_bitmap_factory();
 
-} // namespace libk3dglx
+} // namespace glx
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dglx::camera_to_bitmap_factory());
+	Registry.register_factory(module::glx::camera_to_bitmap_factory());
 K3D_MODULE_END
 

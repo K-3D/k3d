@@ -23,15 +23,20 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the offscreen plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dwgl
+namespace module
+{
+
+/// Namespace reserved for wgl plugin module, to protect public symbols from name clashes with other modules
+namespace wgl
 {
 
 extern k3d::iplugin_factory& camera_to_bitmap_factory();
 
-} // namespace libk3dwgl
+} // namespace wgl
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dwgl::camera_to_bitmap_factory());
+	Registry.register_factory(module::wgl::camera_to_bitmap_factory());
 K3D_MODULE_END
 

@@ -21,20 +21,23 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
+#include <k3dsdk/bitmap_source.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/gl.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/irender_engine_gl.h>
-#include <k3dsdk/bitmap_source.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/persistent.h>
 #include <k3dsdk/win32.h>
 
 #include <iterator>
 
-namespace libk3dwgl
+namespace module
+{
+
+namespace wgl
 {
 
 class CGLBitmapContext
@@ -237,4 +240,7 @@ k3d::iplugin_factory& camera_to_bitmap_factory()
 	return camera_to_bitmap::get_factory();
 }
 
-} // namespace libk3dwgl
+} // namespace wgl
+
+} // namespace module
+

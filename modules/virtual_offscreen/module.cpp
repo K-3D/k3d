@@ -23,15 +23,20 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the offscreen plugin module, to protect public symbols from name clashes with other modules
-namespace libk3doffscreen
+namespace module
+{
+
+/// Namespace reserved for the virtual_offscreen plugin module, to protect public symbols from name clashes with other modules
+namespace virtual_offscreen
 {
 
 extern k3d::iplugin_factory& camera_to_bitmap_factory();
 
-} // namespace libk3doffscreen
+} // namespace virtual_offscreen
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3doffscreen::camera_to_bitmap_factory());
+	Registry.register_factory(module::virtual_offscreen::camera_to_bitmap_factory());
 K3D_MODULE_END
 

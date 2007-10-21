@@ -21,9 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3d-module-config.h>
-
 #include <k3d-i18n-config.h>
+#include <k3d-module-config.h>
 #include <k3dsdk/ibitmap_source.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/plugins.h>
@@ -36,7 +35,10 @@
 	static const std::string plugin_name = "WGLCameraToBitmap";
 #endif
 
-namespace libk3doffscreen
+namespace module
+{
+
+namespace virtual_offscreen
 {
 
 class virtual_camera_to_bitmap_factory:
@@ -80,5 +82,7 @@ k3d::iplugin_factory& camera_to_bitmap_factory()
 	return instance;
 }
 
-} // namespace libk3doffscreen
+} // namespace virtual_offscreen
+
+} // namespace module
 
