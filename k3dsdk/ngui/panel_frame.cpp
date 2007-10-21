@@ -314,23 +314,20 @@ void control::set_choices()
 	{
 		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
 
-		if(metadata["NextGenerationUI"] != "true")
+		if(metadata["ngui:component-type"] != "panel")
 			continue;
 
-		if(metadata["component_type"] != "panel")
-			continue;
-
-		const std::string panel_type = metadata["panel_type"];
+		const std::string panel_type = metadata["ngui:panel-type"];
 		if(panel_type.empty())
 		{
-			k3d::log() << error << "Panel plugin without panel_type metadata will be ignored" << std::endl;
+			k3d::log() << error << "Panel plugin without ngui:panel-type metadata will be ignored" << std::endl;
 			continue;
 		}
 
-		const std::string panel_label = metadata["panel_label"];
+		const std::string panel_label = metadata["ngui:panel-label"];
 		if(panel_label.empty())
 		{
-			k3d::log() << error << "Panel plugin [" << panel_type << "] without panel_label metadata will be ignored" << std::endl;
+			k3d::log() << error << "Panel plugin [" << panel_type << "] without ngui:panel-label metadata will be ignored" << std::endl;
 			continue;
 		}
 

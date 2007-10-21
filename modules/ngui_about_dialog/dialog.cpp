@@ -484,12 +484,11 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<dialog> factory(
-				k3d::uuid(0xdf6588d0, 0xb8473152, 0xfe6e839b, 0x484b9694),
-				"NGUIAboutDialog",
-				_("Displays the current K-3D version and credits contributors"),
-				"NGUI Dialogs",
-				k3d::iplugin_factory::EXPERIMENTAL,
-				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "dialog"));
+			k3d::uuid(0xdf6588d0, 0xb8473152, 0xfe6e839b, 0x484b9694),
+			"NGUIAboutDialog",
+			_("Displays the current K-3D version and credits contributors"),
+			"NGUI Dialogs",
+			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}

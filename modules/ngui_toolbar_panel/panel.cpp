@@ -490,12 +490,12 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<panel> factory(
-				k3d::uuid(0xc4d044fe, 0x5043a104, 0xd97f0988, 0x19c053d8),
-				"NGUIToolbarPanel",
-				_("Provides the standard toolbar"),
-				"NGUI Panels",
-				k3d::iplugin_factory::EXPERIMENTAL,
-				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "toolbar")("panel_label", "Toolbar"));
+			k3d::uuid(0xc4d044fe, 0x5043a104, 0xd97f0988, 0x19c053d8),
+			"NGUIToolbarPanel",
+			_("Provides the standard toolbar"),
+			"NGUI Panels",
+			k3d::iplugin_factory::EXPERIMENTAL,
+			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-type", "toolbar")("ngui:panel-label", "Toolbar"));
 
 		return factory;
 	}

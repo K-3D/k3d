@@ -893,12 +893,12 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<panel> factory(
-				k3d::uuid(0xdae07bf6, 0xa64cc64e, 0xce15e798, 0x16f8eb43),
-				"NGUINodeListPanel",
-				_("Displays the document nodes as a flat list"),
-				"NGUI Panels",
-				k3d::iplugin_factory::EXPERIMENTAL,
-				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "node_list")("panel_label", "Node List"));
+			k3d::uuid(0xdae07bf6, 0xa64cc64e, 0xce15e798, 0x16f8eb43),
+			"NGUINodeListPanel",
+			_("Displays the document nodes as a flat list"),
+			"NGUI Panels",
+			k3d::iplugin_factory::EXPERIMENTAL,
+			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-type", "node_list")("ngui:panel-label", "Node List"));
 
 		return factory;
 	}

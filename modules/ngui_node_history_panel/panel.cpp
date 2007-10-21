@@ -462,12 +462,12 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<panel> factory(
-				k3d::uuid(0x680e37df, 0xe5428bb2, 0x5e159d8d, 0x283bf0b6),
-				"NGUINodeHistoryPanel",
-				_("Displays a hierarchical list of node inputs"),
-				"NGUI Panels",
-				k3d::iplugin_factory::EXPERIMENTAL,
-				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "node_history")("panel_label", "Node History"));
+			k3d::uuid(0x680e37df, 0xe5428bb2, 0x5e159d8d, 0x283bf0b6),
+			"NGUINodeHistoryPanel",
+			_("Displays a hierarchical list of node inputs"),
+			"NGUI Panels",
+			k3d::iplugin_factory::EXPERIMENTAL,
+			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-type", "node_history")("ngui:panel-label", "Node History"));
 
 		return factory;
 	}

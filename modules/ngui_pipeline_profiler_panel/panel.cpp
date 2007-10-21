@@ -124,12 +124,12 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<panel> factory(
-				k3d::uuid(0xcaadef85, 0xb848e17d, 0x9f4c8a8b, 0x15ed410f),
-				"NGUIPipelineProfilerPanel",
-				_("Provides a panel for profiling execution of the visualization pipeline"),
-				"NGUI Panels",
-				k3d::iplugin_factory::EXPERIMENTAL,
-				boost::assign::map_list_of("NextGenerationUI", "true")("component_type", "panel")("panel_type", "pipeline_profiler")("panel_label", "Pipeline Profiler"));
+			k3d::uuid(0xcaadef85, 0xb848e17d, 0x9f4c8a8b, 0x15ed410f),
+			"NGUIPipelineProfilerPanel",
+			_("Provides a panel for profiling execution of the visualization pipeline"),
+			"NGUI Panels",
+			k3d::iplugin_factory::EXPERIMENTAL,
+			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-type", "pipeline_profiler")("ngui:panel-label", "Pipeline Profiler"));
 
 		return factory;
 	}
