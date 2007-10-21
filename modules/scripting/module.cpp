@@ -18,8 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements procedures required to export K-3D objects from the module
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/module.h>

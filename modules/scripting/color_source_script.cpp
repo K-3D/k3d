@@ -18,15 +18,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the RenderManScript K-3D object, which can insert scripted data into RenderMan output
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/color_source.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/color_source.h>
 #include <k3dsdk/scripted_node.h>
 
 #define DEFAULT_SCRIPT "#python\n\n\

@@ -21,9 +21,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/drawable_gl.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/scripted_node.h>
