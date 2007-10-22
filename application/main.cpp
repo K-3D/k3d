@@ -33,6 +33,7 @@
 #include <k3dsdk/user_interface_init.h>
 
 // Standard K-3D interfaces
+#include <k3dsdk/application.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/classes.h>
@@ -41,6 +42,7 @@
 #include <k3dsdk/extension_gl.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
+#include <k3dsdk/icommand_node.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
@@ -553,6 +555,10 @@ const arguments_t parse_runtime_arguments(const arguments_t& Arguments, bool& Qu
 	return unused;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// check_unused_arguments
+
+/// Handles any arguments that weren't recognized by either the application or the user interface plugin
 void check_unused_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
 {
 	// If there aren't any leftover arguments, we're done ...
@@ -565,6 +571,58 @@ void check_unused_arguments(const arguments_t& Arguments, bool& Quit, bool& Erro
 
 	Quit = true;
 	Error = true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// create_auto_start_plugins
+
+typedef std::vector<k3d::iunknown*> auto_start_plugins_t;
+
+void create_auto_start_plugins(auto_start_plugins_t& Plugins)
+{
+	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
+	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	{
+		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
+
+		if(!metadata.count("k3d:auto-start"))
+			continue;
+
+		k3d::log() << info << "auto-starting plugin [" << (**factory).name() << "]" << std::endl;
+
+		k3d::iunknown* const plugin = k3d::create_plugin(**factory);
+		if(!plugin)
+		{
+			k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via auto-start" << std::endl;
+			continue;
+		}
+		Plugins.push_back(plugin);
+
+		if(metadata.count("k3d:auto-start-command"))
+		{
+			if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(plugin))
+			{
+				const k3d::string_t command = metadata["k3d:auto-start-command"];
+				const k3d::string_t arguments = metadata["k3d:auto-start-arguments"];
+				command_node->execute_command(command, arguments);
+			}
+			else
+			{
+				k3d::log() << error << "Plugin [" << (**factory).name() << "] is not a command-node" << std::endl;
+			}
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// delete_auto_start_plugins
+
+void delete_auto_start_plugins(auto_start_plugins_t& Plugins)
+{
+	for(auto_start_plugins_t::iterator plugin = Plugins.begin(); plugin != Plugins.end(); ++plugin)
+		delete dynamic_cast<k3d::ideletable*>(*plugin);
+
+	Plugins.clear();
 }
 
 } // namespace
@@ -735,6 +793,10 @@ int main(int argc, char* argv[])
 		startup_message_handler(_("Starting user interface"));
 		g_user_interface->display_user_interface();
 
+		// Instantiate "auto-start" plugins ...
+		auto_start_plugins_t auto_start_plugins;
+		create_auto_start_plugins(auto_start_plugins);
+
 		// Let the UI parse arguments now that startup is complete ...
 		arguments = g_user_interface->parse_runtime_arguments(arguments, quit, error);
 		if(quit)
@@ -745,13 +807,16 @@ int main(int argc, char* argv[])
 		if(quit)
 			return error ? 1 : 0;
 
-		// Check for "unused" command-line arguments
+		// Check for "unused" command-line arguments ...
 		check_unused_arguments(arguments, quit, error);
 		if(quit)
 			return error ? 1 : 0;
 
 		// Main UI event-loop ...
 		g_user_interface->start_event_loop();
+
+		// Cleanup "auto-start" plugins ...
+		delete_auto_start_plugins(auto_start_plugins);
 
 		return 0;
 	}

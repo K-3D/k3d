@@ -34,6 +34,7 @@
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/share.h>
+#include <k3dsdk/system.h>
 
 #include <boost/regex.hpp>
 
@@ -162,16 +163,15 @@ private:
 	k3d::idocument_plugin_factory* delegate_factory;
 };
 
-/// Creates plugin factories at runtime based on the contents of the share/scripts/scripted_nodes directory
-void register_plugins(k3d::iplugin_registry& Registry)
+/// Creates plugin factories at runtime based on the contents of a directory
+void register_plugins(const k3d::filesystem::path& Path, k3d::iplugin_registry& Registry)
 {
-	boost::regex class_expression("k3d:plugin-class=\"([^\"]*)\"");
-	boost::regex type_expression("k3d:plugin-type=\"([^\"]*)\"");
-	boost::regex name_expression("k3d:plugin-name=\"([^\"]*)\"");
-	boost::regex description_expression("k3d:plugin-description=\"([^\"]*)\"");
+	k3d::log() << info << "Loading scripts from " << Path.native_console_string() << std::endl;
+
+	boost::regex metadata_expression("((k3d|ngui):[^=]*)=\"([^\"]*)\"");
 
 	// There are very few SDK functions that can be safely called at this point in execution, but k3d::share_path() happens to be one of them ...
-	for(k3d::filesystem::directory_iterator script_path(k3d::share_path() / k3d::filesystem::generic_path("scripts/scripted_plugins")); script_path != k3d::filesystem::directory_iterator(); ++script_path)
+	for(k3d::filesystem::directory_iterator script_path(Path); script_path != k3d::filesystem::directory_iterator(); ++script_path)
 	{
 		if(k3d::filesystem::is_directory(*script_path))
 			continue;
@@ -180,39 +180,54 @@ void register_plugins(k3d::iplugin_registry& Registry)
 		std::stringstream script_stream;
 		script_stream << script_file.rdbuf();
 		k3d::string_t script = script_stream.str();
-		
-		boost::match_results<k3d::string_t::iterator> class_match;
-		if(!boost::regex_search(script.begin(), script.end(), class_match, class_expression))
+
+		k3d::string_t plugin_class;
+		k3d::string_t plugin_type;
+		k3d::string_t plugin_name;
+		k3d::string_t plugin_description = _("Scripted Plugin.");
+		k3d::iplugin_factory::metadata_t plugin_metadata;
+
+		for(boost::sregex_iterator metadata(script.begin(), script.end(), metadata_expression); metadata != boost::sregex_iterator(); ++metadata)
+		{
+			const k3d::string_t name = (*metadata)[1].str();
+			const k3d::string_t value = (*metadata)[3].str();
+
+			k3d::log() << debug << "metadata: " << name << "=\"" << value << "\"" << std::endl;
+
+			if(name == "k3d:plugin-class")
+				plugin_class = value;
+			else if(name == "k3d:plugin-type")
+				plugin_type = value;
+			else if(name == "k3d:plugin-name")
+				plugin_name = value;
+			else if(name == "k3d:plugin-description")
+				plugin_description = value;
+			else
+				plugin_metadata.insert(std::make_pair(name, value));
+		}
+
+		if(plugin_class.empty())
 		{
 			continue;
 		}
-		const k3d::string_t plugin_class = class_match[1].str();
+
 		if(plugin_class != "application" && plugin_class != "document")
 		{
 			k3d::log() << error << "Script [" << script_path->native_console_string() << "] using unknown plugin class [" << plugin_class << "] will not be loaded" << std::endl;
 			continue;
 		}
 
-		boost::match_results<k3d::string_t::iterator> type_match;
-		if(!boost::regex_search(script.begin(), script.end(), type_match, type_expression))
+		if(plugin_type.empty())
 		{
 			k3d::log() << error << "Script [" << script_path->native_console_string() << "] without k3d:plugin-type property will not be loaded" << std::endl;
 			continue;
 		}
-		const k3d::string_t plugin_type = type_match[1].str();
 
-		boost::match_results<k3d::string_t::iterator> name_match;
-		if(!boost::regex_search(script.begin(), script.end(), name_match, name_expression))
+		if(plugin_name.empty())
 		{
 			k3d::log() << error << "Script [" << script_path->native_console_string() << "] without k3d:plugin-name property will not be loaded" << std::endl;
 			continue;
 		}
-		const k3d::string_t plugin_name = name_match[1].str();
-
-		k3d::string_t plugin_description = _("Scripted plugin");
-		boost::match_results<k3d::string_t::iterator> description_match;
-		if(boost::regex_search(script.begin(), script.end(), description_match, description_expression))
-			plugin_description = description_match[1].str();
 
 		if(plugin_class == "application")
 		{
@@ -222,7 +237,9 @@ void register_plugins(k3d::iplugin_registry& Registry)
 				k3d::uuid::random(),
 				plugin_name,
 				plugin_description,
-				"Scripts");
+				"Scripts",
+				k3d::iplugin_factory::STABLE,
+				plugin_metadata);
 
 			Registry.register_factory(*factory);
 		}
@@ -234,11 +251,20 @@ void register_plugins(k3d::iplugin_registry& Registry)
 				k3d::uuid::random(),
 				plugin_name,
 				plugin_description,
-				"Scripts");
+				"Scripts",
+				k3d::iplugin_factory::STABLE,
+				plugin_metadata);
 
 			Registry.register_factory(*factory);
 		}
 	}
+}
+
+/// Creates plugin factories at runtime
+void register_plugins(k3d::iplugin_registry& Registry)
+{
+	register_plugins(k3d::share_path() / k3d::filesystem::generic_path("scripts/scripted_plugins"), Registry);
+	register_plugins(k3d::system::get_home_directory() / k3d::filesystem::generic_path(".k3d/scripted_plugins"), Registry);
 }
 
 } // namespace scripted_plugins

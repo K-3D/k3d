@@ -206,6 +206,8 @@ public:
 
 	~user_interface()
 	{
+		delete_auto_start_plugins();
+
 		const k3d::filesystem::path hotkey_path = detail::hotkey_path();
 		k3d::filesystem::create_directories(hotkey_path.branch_path());
 		k3d::log() << info << "Saving hotkeys to " << hotkey_path.native_console_string() << std::endl;
@@ -395,6 +397,8 @@ public:
 
 		if(m_record_tutorials)
 			create_tutorial_recorder();
+
+		create_auto_start_plugins();
 	}
 
 	const arguments_t parse_runtime_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
@@ -519,6 +523,50 @@ public:
 	}
 
 private:
+	void create_auto_start_plugins()
+	{
+		const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
+		for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+		{
+			k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
+
+			if(!metadata.count("ngui:auto-start"))
+				continue;
+
+			k3d::log() << info << "auto-starting plugin [" << (**factory).name() << "]" << std::endl;
+
+			k3d::iunknown* const plugin = k3d::create_plugin(**factory);
+			if(!plugin)
+			{
+				k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via auto-start" << std::endl;
+				continue;
+			}
+			m_auto_start_plugins.push_back(plugin);
+
+			if(metadata.count("ngui:auto-start-command"))
+			{
+				if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(plugin))
+				{
+					const k3d::string_t command = metadata["ngui:auto-start-command"];
+					const k3d::string_t arguments = metadata["ngui:auto-start-arguments"];
+					command_node->execute_command(command, arguments);
+				}
+				else
+				{
+					k3d::log() << error << "Plugin [" << (**factory).name() << "] is not a command-node" << std::endl;
+				}
+			}
+		}
+	}
+
+	void delete_auto_start_plugins()
+	{
+		for(auto_start_plugins_t::iterator plugin = m_auto_start_plugins.begin(); plugin != m_auto_start_plugins.end(); ++plugin)
+			delete dynamic_cast<k3d::ideletable*>(*plugin);
+
+		m_auto_start_plugins.clear();
+	}
+
 	/// Set to true iff we should display the tutorial menu at startup
 	bool m_show_learning_menu;
 	/// Set to true iff we should begin recording a tutorial immediately at startup
@@ -529,6 +577,11 @@ private:
 	std::auto_ptr<Gtk::Main> m_main;
 	/// Stores the (optional) splash screen
 	std::auto_ptr<splash_box> m_splash_box;
+
+	/// Stores (optional) auto-start plugins
+	typedef std::vector<k3d::iunknown*> auto_start_plugins_t;
+	/// Stores (optional) auto-start plugins
+	auto_start_plugins_t m_auto_start_plugins;
 };
 
 /////////////////////////////////////////////////////////////////////////////
