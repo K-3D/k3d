@@ -44,7 +44,10 @@ try:\n\
 except:\n\
   print \"Couldn't load OpenGL module\"\n\n"
 
-namespace libk3dscripting
+namespace module
+{
+
+namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -110,5 +113,8 @@ k3d::iplugin_factory& drawable_script_factory()
 	return drawable_script::get_factory();
 }
 
-} // namespace libk3dscripting
+} // namespace scripting
+
+} // namespace module
+
 

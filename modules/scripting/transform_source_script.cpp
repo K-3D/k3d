@@ -32,7 +32,10 @@
 import k3d\n\n\
 Output = k3d.identity3()\n\n"
 
-namespace libk3dscripting
+namespace module
+{
+
+namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -92,5 +95,8 @@ k3d::iplugin_factory& transform_source_script_factory()
 	return transform_source_script::get_factory();
 }
 
-} // namespace libk3dscripting
+} // namespace scripting
+
+} // namespace module
+
 

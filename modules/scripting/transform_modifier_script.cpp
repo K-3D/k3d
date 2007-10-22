@@ -32,7 +32,10 @@
 
 #define DEFAULT_SCRIPT "#python\n\nOutput = Input\n\n"
 
-namespace libk3dscripting
+namespace module
+{
+
+namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -99,5 +102,8 @@ k3d::iplugin_factory& transform_modifier_script_factory()
 	return transform_modifier_script::get_factory();
 }
 
-} // namespace libk3dscripting
+} // namespace scripting
+
+} // namespace module
+
 

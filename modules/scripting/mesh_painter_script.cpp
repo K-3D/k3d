@@ -43,7 +43,10 @@ for point in Mesh.points():\n\
 glEnd()\n\n\
 glPopAttrib()\n\n"
 
-namespace libk3dscripting
+namespace module
+{
+
+namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -119,5 +122,8 @@ k3d::iplugin_factory& mesh_painter_script_factory()
 	return mesh_painter_script::get_factory();
 }
 
-} // namespace libk3dscripting
+} // namespace scripting
+
+} // namespace module
+
 

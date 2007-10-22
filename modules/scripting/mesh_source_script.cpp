@@ -61,7 +61,10 @@ clockwise_edges.assign([1, 2, 3, 0])\n\n\
 edge_selection = polyhedra.create_edge_selection()\n\
 edge_selection.assign([0.0, 0.0, 0.0, 0.0])\n\n"
 
-namespace libk3dscripting
+namespace module
+{
+
+namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -123,5 +126,8 @@ k3d::iplugin_factory& mesh_source_script_factory()
 	return mesh_source_script::get_factory();
 }
 
-} // namespace libk3dscripting
+} // namespace scripting
+
+} // namespace module
+
 

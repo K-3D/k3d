@@ -32,7 +32,10 @@
 import k3d\n\n\
 Output = k3d.color(1, 1, 1)\n\n"
 
-namespace libk3dscripting
+namespace module
+{
+
+namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -92,5 +95,8 @@ k3d::iplugin_factory& color_source_script_factory()
 	return color_source_script::get_factory();
 }
 
-} // namespace libk3dscripting
+} // namespace scripting
+
+} // namespace module
+
 

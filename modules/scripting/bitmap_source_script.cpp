@@ -30,7 +30,10 @@
 
 #define DEFAULT_SCRIPT "#python\n\nimport k3d\n\nOutput.reset(64, 64)\nfor x in range(64):\n\tfor y in range(64):\n\t\tOutput.set_pixel(x, y, k3d.color(1, 0, 0))\n\n"
 
-namespace libk3dscripting
+namespace module
+{
+
+namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -90,5 +93,9 @@ k3d::iplugin_factory& bitmap_source_script_factory()
 	return bitmap_source_script::get_factory();
 }
 
-} // namespace libk3dscripting
+} // namespace scripting
+
+} // namespace module
+
+
 

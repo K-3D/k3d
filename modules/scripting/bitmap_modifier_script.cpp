@@ -30,7 +30,10 @@
 
 #define DEFAULT_SCRIPT "#python\n\nimport k3d\n\nOutput.assign(Input)\n\n"
 
-namespace libk3dscripting
+namespace module
+{
+
+namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -92,5 +95,9 @@ k3d::iplugin_factory& bitmap_modifier_script_factory()
 	return bitmap_modifier_script::get_factory();
 }
 
-} // namespace libk3dscripting
+} // namespace scripting
+
+} // namespace module
+
+
 

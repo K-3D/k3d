@@ -38,7 +38,10 @@ output_points = Output.writable_points()\n\n\
 for i in range(len(output_points)):\n\
 		output_points[i] = input_points[i] * scale\n\n"
 
-namespace libk3dscripting
+namespace module
+{
+
+namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -109,5 +112,8 @@ k3d::iplugin_factory& mesh_modifier_script_factory()
 	return mesh_modifier_script::get_factory();
 }
 
-} // namespace libk3dscripting
+} // namespace scripting
+
+} // namespace module
+
 

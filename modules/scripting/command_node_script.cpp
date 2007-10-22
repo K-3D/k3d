@@ -22,14 +22,15 @@
 */
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/long_source.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
-#include <k3dsdk/scripted_node.h>
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/icommand_node.h>
+#include <k3dsdk/property_collection.h>
+#include <k3dsdk/scripted_plugin.h>
 
 #define DEFAULT_SCRIPT "#python\n\n\
-Output = 0\n\n"
+print \"command: \" + Command\n\
+print \"arguments: \" + Arguments\n\
+\n\n"
 
 namespace module
 {
@@ -38,51 +39,35 @@ namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// long_source_script
+// command_node_script
 
-class long_source_script :
-	public k3d::scripted_node<k3d::long_source<k3d::persistent<k3d::node> > >
+class command_node_script :
+	public k3d::scripted_plugin<k3d::property_collection>,
+	public k3d::icommand_node
 {
-	typedef k3d::scripted_node<k3d::long_source<k3d::persistent<k3d::node> > > base;
-
 public:
-	long_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document)
+	command_node_script()
 	{
 		set_script(DEFAULT_SCRIPT);
-
-		connect_script_changed_signal(make_reset_long_slot());
 	}
 
-	long on_create_long()
+	const result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 	{
 		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = 0;
-
+		context["Command"] = Command;
+		context["Arguments"] = Arguments;
+		
 		execute_script(context);
 
-		if(context["Output"].type() == typeid(int))
-			return boost::any_cast<int>(context["Output"]);
-
-		if(context["Output"].type() == typeid(long))
-			return boost::any_cast<long>(context["Output"]);
-
-		return 0;
-	}
-
-	k3d::iplugin_factory& factory()
-	{
-		return get_factory();
+		return RESULT_CONTINUE;
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<long_source_script, k3d::interface_list<k3d::ilong_source> > factory(
-			k3d::uuid(0x024b737a, 0xdf144dca, 0xb29e32b4, 0x319e5466),
-			"LongSourceScript",
-			_("Long source that uses a script to create the output value"),
+		static k3d::application_plugin_factory<command_node_script > factory(
+			k3d::uuid(0xb754daf5, 0x3a401b87, 0xdd144ba2, 0x00395dde),
+			"CommandNodeScript",
+			_("Script node that executes a script in response to command-node commands"),
 			"Scripting",
 			k3d::iplugin_factory::STABLE);
 
@@ -91,11 +76,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// long_source_script_factory
+// command_node_script_factory
 
-k3d::iplugin_factory& long_source_script_factory()
+k3d::iplugin_factory& command_node_script_factory()
 {
-	return long_source_script::get_factory();
+	return command_node_script::get_factory();
 }
 
 } // namespace scripting

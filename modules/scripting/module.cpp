@@ -23,13 +23,17 @@
 
 #include <k3dsdk/module.h>
 
+namespace module
+{
+
 /// Namespace reserved for the scripting plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dscripting
+namespace scripting
 {
 
 extern k3d::iplugin_factory& bitmap_modifier_script_factory();
 extern k3d::iplugin_factory& bitmap_source_script_factory();
 extern k3d::iplugin_factory& color_source_script_factory();
+extern k3d::iplugin_factory& command_node_script_factory();
 extern k3d::iplugin_factory& drawable_script_factory();
 extern k3d::iplugin_factory& long_source_script_factory();
 extern k3d::iplugin_factory& mesh_modifier_script_factory();
@@ -43,23 +47,26 @@ extern k3d::iplugin_factory& transform_modifier_script_factory();
 extern k3d::iplugin_factory& transform_source_script_factory();
 extern k3d::iplugin_factory& vector3_source_script_factory();
 
-} // namespace libk3dscripting
+} // namespace scripting
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dscripting::bitmap_modifier_script_factory());
-	Registry.register_factory(libk3dscripting::bitmap_source_script_factory());
-	Registry.register_factory(libk3dscripting::color_source_script_factory());
-	Registry.register_factory(libk3dscripting::drawable_script_factory());
-	Registry.register_factory(libk3dscripting::long_source_script_factory());
-	Registry.register_factory(libk3dscripting::mesh_modifier_script_factory());
-	Registry.register_factory(libk3dscripting::mesh_painter_script_factory());
-	Registry.register_factory(libk3dscripting::mesh_source_script_factory());
-	Registry.register_factory(libk3dscripting::null_output_script_factory());
-	Registry.register_factory(libk3dscripting::render_engine_script_factory());
-	Registry.register_factory(libk3dscripting::scalar_source_script_factory());
-	Registry.register_factory(libk3dscripting::string_source_script_factory());
-	Registry.register_factory(libk3dscripting::transform_modifier_script_factory());
-	Registry.register_factory(libk3dscripting::transform_source_script_factory());
-	Registry.register_factory(libk3dscripting::vector3_source_script_factory());
+	Registry.register_factory(module::scripting::bitmap_modifier_script_factory());
+	Registry.register_factory(module::scripting::bitmap_source_script_factory());
+	Registry.register_factory(module::scripting::color_source_script_factory());
+	Registry.register_factory(module::scripting::command_node_script_factory());
+	Registry.register_factory(module::scripting::drawable_script_factory());
+	Registry.register_factory(module::scripting::long_source_script_factory());
+	Registry.register_factory(module::scripting::mesh_modifier_script_factory());
+	Registry.register_factory(module::scripting::mesh_painter_script_factory());
+	Registry.register_factory(module::scripting::mesh_source_script_factory());
+	Registry.register_factory(module::scripting::null_output_script_factory());
+	Registry.register_factory(module::scripting::render_engine_script_factory());
+	Registry.register_factory(module::scripting::scalar_source_script_factory());
+	Registry.register_factory(module::scripting::string_source_script_factory());
+	Registry.register_factory(module::scripting::transform_modifier_script_factory());
+	Registry.register_factory(module::scripting::transform_source_script_factory());
+	Registry.register_factory(module::scripting::vector3_source_script_factory());
 K3D_MODULE_END
 

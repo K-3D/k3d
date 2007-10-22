@@ -30,7 +30,10 @@
 #define DEFAULT_SCRIPT "#python\n\n\
 \n\n"
 
-namespace libk3dscripting
+namespace module
+{
+
+namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -85,5 +88,8 @@ k3d::iplugin_factory& null_output_script_factory()
 	return null_output_script::get_factory();
 }
 
-} // namespace libk3dscripting
+} // namespace scripting
+
+} // namespace module
+
 
