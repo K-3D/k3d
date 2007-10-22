@@ -47,7 +47,6 @@ namespace scripted_plugins
 {
 
 /// k3d::iapplication_plugin_factory implementation that creates a scripted plugin instance
-template<typename interface_list = k3d::null_interface>
 class application_factory :
 	public k3d::plugin_factory,
 	public k3d::iapplication_plugin_factory
@@ -87,13 +86,12 @@ public:
 
 	bool implements(const std::type_info& InterfaceType)
 	{
-		return k3d::implements_interface<interface_list>()(InterfaceType);
+		return false;
 	}
 
 	const interfaces_t interfaces()
 	{
 		interfaces_t results;
-		k3d::get_interfaces<interface_list>()(results);
 		return results;
 	}
 
@@ -104,7 +102,6 @@ private:
 };
 
 /// k3d::idocument_plugin_factory implementation that creates a scripted document node
-template<typename interface_list = k3d::null_interface>
 class document_factory :
 	public k3d::plugin_factory,
 	public k3d::idocument_plugin_factory
@@ -150,13 +147,12 @@ public:
 
 	bool implements(const std::type_info& InterfaceType)
 	{
-		return k3d::implements_interface<interface_list>()(InterfaceType);
+		return false;
 	}
 
 	const interfaces_t interfaces()
 	{
 		interfaces_t results;
-		k3d::get_interfaces<interface_list>()(results);
 		return results;
 	}
 
@@ -220,7 +216,7 @@ void register_plugins(k3d::iplugin_registry& Registry)
 
 		if(plugin_class == "application")
 		{
-			k3d::iplugin_factory* const factory = new application_factory<>(
+			k3d::iplugin_factory* const factory = new application_factory(
 				*script_path,
 				plugin_type,
 				k3d::uuid::random(),
@@ -232,7 +228,7 @@ void register_plugins(k3d::iplugin_registry& Registry)
 		}
 		else if(plugin_class == "document")
 		{
-			k3d::iplugin_factory* const factory = new document_factory<>(
+			k3d::iplugin_factory* const factory = new document_factory(
 				*script_path,
 				plugin_type,
 				k3d::uuid::random(),
