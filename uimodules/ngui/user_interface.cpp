@@ -530,37 +530,32 @@ private:
 		{
 			k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
 
-			if(!metadata.count("ngui:auto-start"))
+			if(!metadata.count("ngui:application-start"))
 				continue;
 
-			k3d::log() << info << "auto-starting plugin [" << (**factory).name() << "]" << std::endl;
+			k3d::log() << info << "Creating plugin [" << (**factory).name() << "] via ngui:application-start" << std::endl;
 
 			k3d::iunknown* const plugin = k3d::create_plugin(**factory);
 			if(!plugin)
 			{
-				k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via auto-start" << std::endl;
+				k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via ngui:application-start" << std::endl;
 				continue;
 			}
 			m_auto_start_plugins.push_back(plugin);
 
-			if(metadata.count("ngui:auto-start-command"))
-			{
-				if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(plugin))
-				{
-					const k3d::string_t command = metadata["ngui:auto-start-command"];
-					const k3d::string_t arguments = metadata["ngui:auto-start-arguments"];
-					command_node->execute_command(command, arguments);
-				}
-				else
-				{
-					k3d::log() << error << "Plugin [" << (**factory).name() << "] is not a command-node" << std::endl;
-				}
-			}
+			if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(plugin))
+				command_node->execute_command("ngui:application-start", "startup");
 		}
 	}
 
 	void delete_auto_start_plugins()
 	{
+		for(auto_start_plugins_t::iterator plugin = m_auto_start_plugins.begin(); plugin != m_auto_start_plugins.end(); ++plugin)
+		{
+			if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(*plugin))
+				command_node->execute_command("ngui:application-start", "shutdown");
+		}
+
 		for(auto_start_plugins_t::iterator plugin = m_auto_start_plugins.begin(); plugin != m_auto_start_plugins.end(); ++plugin)
 			delete dynamic_cast<k3d::ideletable*>(*plugin);
 

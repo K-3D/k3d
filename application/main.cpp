@@ -585,32 +585,21 @@ void create_auto_start_plugins(auto_start_plugins_t& Plugins)
 	{
 		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
 
-		if(!metadata.count("k3d:auto-start"))
+		if(!metadata.count("k3d:application-start"))
 			continue;
 
-		k3d::log() << info << "auto-starting plugin [" << (**factory).name() << "]" << std::endl;
+		k3d::log() << info << "Creating plugin [" << (**factory).name() << "] via k3d:application-start" << std::endl;
 
 		k3d::iunknown* const plugin = k3d::create_plugin(**factory);
 		if(!plugin)
 		{
-			k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via auto-start" << std::endl;
+			k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via k3d:application-start" << std::endl;
 			continue;
 		}
 		Plugins.push_back(plugin);
 
-		if(metadata.count("k3d:auto-start-command"))
-		{
-			if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(plugin))
-			{
-				const k3d::string_t command = metadata["k3d:auto-start-command"];
-				const k3d::string_t arguments = metadata["k3d:auto-start-arguments"];
-				command_node->execute_command(command, arguments);
-			}
-			else
-			{
-				k3d::log() << error << "Plugin [" << (**factory).name() << "] is not a command-node" << std::endl;
-			}
-		}
+		if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(plugin))
+			command_node->execute_command("k3d:application-start", "startup");
 	}
 }
 
@@ -619,6 +608,12 @@ void create_auto_start_plugins(auto_start_plugins_t& Plugins)
 
 void delete_auto_start_plugins(auto_start_plugins_t& Plugins)
 {
+	for(auto_start_plugins_t::iterator plugin = Plugins.begin(); plugin != Plugins.end(); ++plugin)
+	{
+		if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(*plugin))
+			command_node->execute_command("k3d:application-start", "shutdown");
+	}
+
 	for(auto_start_plugins_t::iterator plugin = Plugins.begin(); plugin != Plugins.end(); ++plugin)
 		delete dynamic_cast<k3d::ideletable*>(*plugin);
 
