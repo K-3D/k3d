@@ -52,7 +52,7 @@ private:
 	void on_initialize_graph(const k3d::graph& Input, k3d::graph& Output);
 	void on_update_graph(const k3d::graph& Input, k3d::graph& Output);
 
-	k3d_data(size_t, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::writable_property, k3d::data::no_serialization) m_root;
+	k3d_data(k3d::uint_t, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::writable_property, k3d::data::no_serialization) m_root;
 };
 
 } // namespace pipeline
