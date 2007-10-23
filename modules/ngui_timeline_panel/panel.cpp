@@ -527,7 +527,7 @@ public:
 		show_all();
 	}
 
-	const std::string ngui:panel-type()
+	const std::string panel_type()
 	{
 		return "timeline";
 	}
