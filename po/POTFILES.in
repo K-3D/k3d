@@ -69,6 +69,7 @@ k3dsdk/plugin_factory_collection.cpp
 k3dsdk/renderable_ri.h
 k3dsdk/scalar_source.h
 k3dsdk/scripted_node.h
+k3dsdk/scripted_plugin.h
 k3dsdk/shader_ri.cpp
 k3dsdk/string_source.h
 k3dsdk/transform.cpp
@@ -200,7 +201,7 @@ modules/mesh_attributes/calculate_normals.cpp
 modules/mesh_instance/frozen_mesh.cpp
 modules/mesh_instance/mesh_instance.cpp
 modules/ngui_about_dialog/dialog.cpp
-modules/ngui_newtimeline_panel/panel.cpp
+modules/ngui_animation_timeline_panel/panel.cpp
 modules/ngui_node_history_panel/panel.cpp
 modules/ngui_node_list_panel/panel.cpp
 modules/ngui_node_properties_panel/panel.cpp
@@ -224,7 +225,6 @@ modules/nurbs/nurbs_sphere.cpp
 modules/nurbs/nurbs_torus.cpp
 modules/obj_io/obj_mesh_reader.cpp
 modules/obj_io/obj_mesh_writer.cpp
-modules/offscreen/camera_to_bitmap.cpp
 modules/openexr_io/exr_bitmap_importer.cpp
 modules/opengl/material.cpp
 modules/opengl/render_engine.cpp
@@ -327,6 +327,7 @@ modules/scripted_plugins/module.cpp
 modules/scripting/bitmap_modifier_script.cpp
 modules/scripting/bitmap_source_script.cpp
 modules/scripting/color_source_script.cpp
+modules/scripting/command_node_script.cpp
 modules/scripting/drawable_script.cpp
 modules/scripting/long_source_script.cpp
 modules/scripting/mesh_modifier_script.cpp
@@ -368,6 +369,7 @@ modules/tiff_io/tiff_bitmap_reader.cpp
 modules/tiff_io/tiff_bitmap_writer.cpp
 modules/time/realtime_source.cpp
 modules/time/time_source.cpp
+modules/virtual_offscreen/camera_to_bitmap.cpp
 modules/virtual_opengl_painters/edge_painter.cpp
 modules/virtual_opengl_painters/face_painter.cpp
 modules/virtual_opengl_painters/point_painter.cpp
