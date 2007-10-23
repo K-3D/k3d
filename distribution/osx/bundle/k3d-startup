@@ -45,6 +45,7 @@ sed -e 's|/opt/local|\"'"$K3D_RESOURCES|g" -e "s/\.so/.so\"/g" "$K3D_RESOURCES/e
 cp -f "$K3D_RESOURCES/etc/pango/pangox.aliases" "$K3D_ETC/pango/pangox.aliases"
 
 export "DYLD_LIBRARY_PATH=$K3D_RESOURCES/lib"
+export "FONTCONFIG_PATH=$K3D_RESOURCES/etc/fonts"
 export "PANGO_RC_FILE=$K3D_PANGO_RC_FILE"
 export "PATH=$K3D_RESOURCES/bin:$PATH"
 
