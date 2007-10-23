@@ -8,6 +8,6 @@ TARGET_LINK_LIBRARIES(k3d-ngui-animation-timeline-panel k3dsdk-ngui)
 
 IF(K3D_BUILD_NLS)
 	INCLUDE_DIRECTORIES(${K3D_INTL_INCLUDE_DIRS})
-	TARGET_LINK_LIBRARIES(k3d-animation-ngui-timeline-panel ${K3D_INTL_LIBS})
+	TARGET_LINK_LIBRARIES(k3d-ngui-animation-timeline-panel ${K3D_INTL_LIBS})
 ENDIF(K3D_BUILD_NLS)
 
