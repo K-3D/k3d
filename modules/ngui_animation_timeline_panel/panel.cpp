@@ -68,7 +68,7 @@ namespace module
 namespace ngui
 {
 
-namespace timeline
+namespace animation_timeline
 {
 
 namespace detail
@@ -940,12 +940,12 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<panel> factory(
-			k3d::uuid(0xc8cab7fd, 0xa14a55af, 0x79779fa5, 0x1b516756),
-			"NGUITimelinePanel",
-			_("Provides a panel for manipulating the current time"),
+			k3d::uuid(0xd6ddc369, 0x674697b8, 0xb7e6fd81, 0xd42aed12),
+			"NGUIAnimationTimelinePanel",
+			_("Provides a panel for manipulating the current animation time"),
 			"NGUI Panels",
 			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-type", "timeline")("ngui:panel-label", "Timeline"));
+			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-type", "animation_timeline")("ngui:panel-label", "Animation Timeline"));
 
 		return factory;
 	}
@@ -953,13 +953,13 @@ private:
 	detail::implementation* m_implementation;
 };
 
-} // namespace timeline
+} // namespace animation_timeline
 
 } // namespace ngui
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::ngui::timeline::panel::get_factory());
+	Registry.register_factory(module::ngui::animation_timeline::panel::get_factory());
 K3D_MODULE_END
 

@@ -152,9 +152,6 @@ OPTION(K3D_BUILD_WGL_MODULE "Build the Windows offscreen rendering module" ${K3D
 OPTION(K3D_BUILD_WINDOWS_MODULE "Build the Windows integration module" ${K3D_BUILD_WINDOWS_MODULE_DEFAULT})
 OPTION(K3D_BUILD_YAFRAY_MODULE "Build the YAFRAY render engine integration module" ON)
 
-OPTION(K3D_NEWTIMELINE "Use the new timeline module" OFF)
-MARK_AS_ADVANCED(K3D_NEWTIMELINE)
-
 OPTION(K3D_SYMBOL_VISIBILITY "Minimize the number of symbols exported from shared libraries" OFF)
 MARK_AS_ADVANCED(K3D_SYMBOL_VISIBILITY)
 
