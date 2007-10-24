@@ -23,12 +23,14 @@
 */
 
 #include "application_detail.h"
+#include "create_plugins.h"
 #include "data.h"
 #include "document.h"
 #include "iapplication_plugin_factory.h"
 #include "ideletable.h"
 #include "idocument.h"
 #include "iscript_engine.h"
+#include "iscripted_action.h"
 #include "plugins.h"
 #include "result.h"
 #include "signal_accumulators.h"
@@ -36,6 +38,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <map>
 
 #ifdef	interface
 #undef	interface
@@ -64,7 +67,7 @@ public:
 		m_close_signal.emit();
 
 		// Delete any remaining documents ...
-		for(document_list_t::iterator document = m_documents.begin(); document != m_documents.end(); document = m_documents.begin())
+		for(document_collection_t::iterator document = m_documents.begin(); document != m_documents.end(); document = m_documents.begin())
 			close_document(**document);
 	}
 
@@ -75,29 +78,67 @@ public:
 
 	k3d::idocument* create_document()
 	{
-		// Create a new doc ...
+		// Create the new document ...
 		k3d::idocument* const document = k3d::create_document();
 		return_val_if_fail(document, 0);
-
-		// Add it to the doc list ...
 		m_documents.push_back(document);
+
+		// Create any auto-start plugins ...
+		const iplugin_factory_collection::factories_t& factories = plugins();
+		for(iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+		{
+			iplugin_factory::metadata_t metadata = (**factory).metadata();
+
+			if(!metadata.count("k3d:document-start"))
+				continue;
+
+			log() << info << "Creating plugin [" << (**factory).name() << "] via k3d:document-start" << std::endl;
+
+			iunknown* const plugin = create_plugin(**factory);
+			if(!plugin)
+			{
+				log() << error << "Error creating plugin [" << (**factory).name() << "] via k3d:document-start" << std::endl;
+				continue;
+			}
+			m_auto_start_plugins.insert(std::make_pair(document, plugin));
+
+			if(iscripted_action* const scripted_action = dynamic_cast<iscripted_action*>(plugin))
+			{
+				iscript_engine::context_t context;
+				context["Command"] = string_t("startup");
+				context["Document"] = document;
+				scripted_action->execute(context);
+			}
+		}
 
 		return document;
 	}
 
 	void close_document(k3d::idocument& Document)
 	{
-		// Find the document iterator ...
-		const document_list_t::iterator document = std::find(m_documents.begin(), m_documents.end(), &Document);
-
-		// Sanity checks ...
-		return_if_fail(document != m_documents.end());
-
 		// Notify observers that the document will be closed
 		m_close_document_signal.emit(Document);
 
+		// Shut-down any auto-start plugins associated with this document ...
+		const auto_start_plugins_t::iterator plugin_begin = m_auto_start_plugins.lower_bound(&Document);
+		const auto_start_plugins_t::iterator plugin_end = m_auto_start_plugins.upper_bound(&Document);
+		for(auto_start_plugins_t::iterator plugin = plugin_begin; plugin != plugin_end; ++plugin)
+		{
+			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin->second))
+			{
+				k3d::iscript_engine::context_t context;
+				context["Command"] = k3d::string_t("shutdown");
+				scripted_action->execute(context);
+			}
+		}
+
+		for(auto_start_plugins_t::iterator plugin = plugin_begin; plugin != plugin_end; ++plugin)
+			delete dynamic_cast<k3d::ideletable*>(plugin->second);
+
+		m_auto_start_plugins.erase(&Document);
+
 		// Remove it from the document list ...
-		m_documents.erase(document);
+		m_documents.erase(std::remove(m_documents.begin(), m_documents.end(), &Document), m_documents.end());
 
 		// Delete the document ...
 		k3d::close_document(Document);
@@ -105,10 +146,7 @@ public:
 
 	const k3d::iapplication::document_collection_t documents()
 	{
-		document_collection_t results;
-		std::copy(m_documents.begin(), m_documents.end(), std::back_inserter(results));
-
-		return results;
+		return m_documents;
 	}
 
 	k3d::iapplication::startup_message_signal_t& startup_message_signal()
@@ -133,10 +171,12 @@ public:
 
 	/// Stores a reference to the collection of available plugin factories
 	k3d::iplugin_factory_collection& m_plugins;
-	/// Stores a collection of open documents
-	typedef std::list<k3d::idocument*> document_list_t;
 	/// Stores the collection of open documents
-	document_list_t m_documents;
+	document_collection_t m_documents;
+	/// Stores any per-document auto-start plugins
+	typedef std::multimap<k3d::idocument*, k3d::iunknown*> auto_start_plugins_t;
+	/// Stores any per-document auto-start plugins
+	auto_start_plugins_t m_auto_start_plugins;
 	/// Signal emitted to display progress during application startup
 	startup_message_signal_t m_startup_message_signal;
 	/// Signal emitted when the application is closing
