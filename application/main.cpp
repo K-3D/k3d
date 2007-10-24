@@ -33,8 +33,8 @@
 #include <k3dsdk/user_interface_init.h>
 
 // Standard K-3D interfaces
-#include <k3dsdk/application.h>
 #include <k3dsdk/algebra.h>
+#include <k3dsdk/application.h>
 #include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/create_plugins.h>
@@ -42,10 +42,10 @@
 #include <k3dsdk/extension_gl.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
-#include <k3dsdk/icommand_node.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
+#include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/iuser_interface_plugin.h>
 #include <k3dsdk/log.h>
@@ -598,8 +598,12 @@ void create_auto_start_plugins(auto_start_plugins_t& Plugins)
 		}
 		Plugins.push_back(plugin);
 
-		if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(plugin))
-			command_node->execute_command("k3d:application-start", "startup");
+		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
+		{
+			k3d::iscript_engine::context_t context;
+			context["Command"] = k3d::string_t("startup");
+			scripted_action->execute(context);
+		}
 	}
 }
 
@@ -610,8 +614,12 @@ void delete_auto_start_plugins(auto_start_plugins_t& Plugins)
 {
 	for(auto_start_plugins_t::iterator plugin = Plugins.begin(); plugin != Plugins.end(); ++plugin)
 	{
-		if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(*plugin))
-			command_node->execute_command("k3d:application-start", "shutdown");
+		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(*plugin))
+		{
+			k3d::iscript_engine::context_t context;
+			context["Command"] = k3d::string_t("shutdown");
+			scripted_action->execute(context);
+		}
 	}
 
 	for(auto_start_plugins_t::iterator plugin = Plugins.begin(); plugin != Plugins.end(); ++plugin)

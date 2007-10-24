@@ -30,6 +30,7 @@ namespace module
 namespace scripting
 {
 
+extern k3d::iplugin_factory& action_script_factory();
 extern k3d::iplugin_factory& bitmap_modifier_script_factory();
 extern k3d::iplugin_factory& bitmap_source_script_factory();
 extern k3d::iplugin_factory& color_source_script_factory();
@@ -52,6 +53,7 @@ extern k3d::iplugin_factory& vector3_source_script_factory();
 } // namespace module
 
 K3D_MODULE_START(Registry)
+	Registry.register_factory(module::scripting::action_script_factory());
 	Registry.register_factory(module::scripting::bitmap_modifier_script_factory());
 	Registry.register_factory(module::scripting::bitmap_source_script_factory());
 	Registry.register_factory(module::scripting::color_source_script_factory());

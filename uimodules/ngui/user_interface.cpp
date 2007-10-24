@@ -53,6 +53,7 @@
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/iscript_engine.h>
+#include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/iuser_interface_plugin.h>
 #include <k3dsdk/log.h>
@@ -543,8 +544,12 @@ private:
 			}
 			m_auto_start_plugins.push_back(plugin);
 
-			if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(plugin))
-				command_node->execute_command("ngui:application-start", "startup");
+			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
+			{
+				k3d::iscript_engine::context_t context;
+				context["Command"] = k3d::string_t("startup");
+				scripted_action->execute(context);
+			}
 		}
 	}
 
@@ -552,8 +557,12 @@ private:
 	{
 		for(auto_start_plugins_t::iterator plugin = m_auto_start_plugins.begin(); plugin != m_auto_start_plugins.end(); ++plugin)
 		{
-			if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(*plugin))
-				command_node->execute_command("ngui:application-start", "shutdown");
+			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(*plugin))
+			{
+				k3d::iscript_engine::context_t context;
+				context["Command"] = k3d::string_t("shutdown");
+				scripted_action->execute(context);
+			}
 		}
 
 		for(auto_start_plugins_t::iterator plugin = m_auto_start_plugins.begin(); plugin != m_auto_start_plugins.end(); ++plugin)
