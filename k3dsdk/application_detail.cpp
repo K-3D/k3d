@@ -128,6 +128,7 @@ public:
 			{
 				k3d::iscript_engine::context_t context;
 				context["Command"] = k3d::string_t("shutdown");
+				context["Document"] = &Document;
 				scripted_action->execute(context);
 			}
 		}

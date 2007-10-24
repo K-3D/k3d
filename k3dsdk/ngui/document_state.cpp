@@ -64,12 +64,14 @@
 #include <k3dsdk/ipersistent.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/ipreview_render_engine.h>
+#include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/istill_render_engine.h>
 #include <k3dsdk/itime_sink.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/time_source.h>
@@ -1697,6 +1699,11 @@ public:
 	typedef sigc::signal<unsaved_document*> safe_close_signal_t;
 	/// Signal that will be emitted prior to safe shutdown to "gather" unsaved documents
 	safe_close_signal_t m_safe_close_signal;
+
+	/// Stores auto-start plugins
+	typedef std::vector<k3d::iunknown*> auto_start_plugins_t;
+	/// Stores auto-start plugins
+	auto_start_plugins_t m_auto_start_plugins;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1706,6 +1713,34 @@ document_state::document_state(k3d::idocument& Document) :
 	m_implementation(new implementation(Document)),
 	m_focus_viewport(0)
 {
+	// Create auto-start plugins for this document ...
+	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
+	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	{
+		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
+
+		if(!metadata.count("ngui:document-start"))
+			continue;
+
+		k3d::log() << info << "Creating plugin [" << (**factory).name() << "] via ngui:document-start" << std::endl;
+
+		k3d::iunknown* const plugin = k3d::create_plugin(**factory);
+		if(!plugin)
+		{
+			k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via ngui:document-start" << std::endl;
+			continue;
+		}
+		m_implementation->m_auto_start_plugins.push_back(plugin);
+
+		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
+		{
+			k3d::iscript_engine::context_t context;
+			context["Command"] = k3d::string_t("startup");
+			context["Document"] = &Document;
+			scripted_action->execute(context);
+		}
+	}
+
 	Document.close_signal().connect(sigc::mem_fun(*this, &document_state::on_document_close));
 
 	m_implementation->m_selection_tool = new libk3dngui::selection_tool(*this, "selection_tool");
@@ -1727,6 +1762,18 @@ document_state::document_state(k3d::idocument& Document) :
 
 document_state::~document_state()
 {
+	// Shut-down any auto-start plugins associated with this document ...
+	for(implementation::auto_start_plugins_t::iterator plugin = m_implementation->m_auto_start_plugins.begin(); plugin != m_implementation->m_auto_start_plugins.end(); ++plugin)
+	{
+		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(*plugin))
+		{
+			k3d::iscript_engine::context_t context;
+			context["Command"] = k3d::string_t("shutdown");
+			context["Document"] = &document();
+			scripted_action->execute(context);
+		}
+	}
+
 	delete m_implementation;
 }
 
