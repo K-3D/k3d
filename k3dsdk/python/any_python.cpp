@@ -60,14 +60,17 @@ const object any_to_python(const boost::any& Value)
 {
 	const std::type_info& type = Value.type();
 
-	if(type == typeid(bool))
-		return object(boost::any_cast<bool>(Value));
+	if(type == typeid(k3d::bool_t))
+		return object(boost::any_cast<k3d::bool_t>(Value));
 
-	if(type == typeid(double))
-		return object(boost::any_cast<double>(Value));
+	if(type == typeid(k3d::double_t))
+		return object(boost::any_cast<k3d::double_t>(Value));
 
-	if(type == typeid(std::string))
-		return object(boost::any_cast<std::string>(Value));
+	if(type == typeid(k3d::string_t))
+		return object(boost::any_cast<k3d::string_t>(Value));
+
+	if(type == typeid(k3d::ustring))
+		return object(boost::any_cast<k3d::ustring>(Value).raw());
 
 	if(type == typeid(filesystem::path))
 		return object(boost::any_cast<filesystem::path>(Value));
