@@ -192,7 +192,7 @@ void register_plugins(const k3d::filesystem::path& Path, k3d::iplugin_registry& 
 			const k3d::string_t name = (*metadata)[1].str();
 			const k3d::string_t value = (*metadata)[3].str();
 
-			k3d::log() << debug << "metadata: " << name << "=\"" << value << "\"" << std::endl;
+//			k3d::log() << debug << "metadata: " << name << "=\"" << value << "\"" << std::endl;
 
 			if(name == "k3d:plugin-class")
 				plugin_class = value;
