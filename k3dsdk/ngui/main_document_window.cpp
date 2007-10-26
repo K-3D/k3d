@@ -83,6 +83,7 @@
 #include <k3dsdk/iparentable.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/ipreview_render_engine.h>
+#include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itime_sink.h>
 #include <k3dsdk/itransform_sink.h>
@@ -1216,6 +1217,30 @@ private:
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_test_case_recorder))
 			<< set_accelerator_path("<k3d-document>/actions/scripting/record_test_case", get_accel_group())));
 
+		// Create menu items for (optional) scripted actions ...
+		Gtk::Menu* actions_menu = 0;
+
+		const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
+		for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+		{
+			k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
+
+			if(!metadata.count("ngui:action"))
+				continue;
+
+			if(!actions_menu)
+			{
+				actions_menu = new Gtk::Menu();
+				actions_menu->set_accel_group(get_accel_group());
+				menu->items().push_back(Gtk::Menu_Helpers::MenuElem(_("Actions"), *manage(actions_menu)));
+			}
+
+			actions_menu->items().push_back(*Gtk::manage(
+				create_menu_item(Parent, "scripting_action_", **factory)
+				<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_scripting_action), *factory))
+				<< set_accelerator_path("<k3d-document>/actions/scripting/action/" + (**factory).name(), get_accel_group())));
+		}
+
 		return menu;
 	}
 
@@ -2340,6 +2365,26 @@ private:
 	void on_scripting_test_case_recorder()
 	{
 		create_test_case_recorder();
+	}
+
+	void on_scripting_action(k3d::iplugin_factory* Factory)
+	{
+		k3d::iunknown* const plugin = k3d::create_plugin(*Factory);
+		if(!plugin)
+		{
+			k3d::log() << error << "Error creating plugin [" << (*Factory).name() << "]" << std::endl;
+			return;
+		}
+
+		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
+		{
+			k3d::iscript_engine::context_t context;
+			context["Command"] = k3d::string_t("action");
+			context["Document"] = &document();
+			scripted_action->execute(context);
+		}
+
+		delete dynamic_cast<k3d::ideletable*>(plugin);
 	}
 
 	void on_window_fullscreen(k3d::iunknown*)
