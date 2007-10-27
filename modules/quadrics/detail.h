@@ -27,7 +27,6 @@
 #include <k3dsdk/bounded.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/drawable_gl.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material_client.h>
 #include <k3dsdk/measurement.h>
@@ -36,11 +35,12 @@
 #include <k3dsdk/node_change_signal.h>
 #include <k3dsdk/nurbs.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>
-#include <k3dsdk/snappable.h>
 #include <k3dsdk/snap_source.h>
 #include <k3dsdk/snap_target.h>
+#include <k3dsdk/snappable.h>
 #include <k3dsdk/transformable.h>
 
 namespace libk3dconics
@@ -50,9 +50,9 @@ namespace libk3dconics
 // conic
 
 class conic :
-	public k3d::snappable<k3d::gl::drawable<k3d::ri::renderable<k3d::material_client<k3d::bounded<k3d::transformable<k3d::persistent<k3d::node_change_signal<k3d::node> > > > > > > >
+	public k3d::snappable<k3d::gl::renderable<k3d::ri::renderable<k3d::material_client<k3d::bounded<k3d::transformable<k3d::persistent<k3d::node_change_signal<k3d::node> > > > > > > >
 {
-	typedef k3d::snappable<k3d::gl::drawable<k3d::ri::renderable<k3d::material_client<k3d::bounded<k3d::transformable<k3d::persistent<k3d::node_change_signal<k3d::node> > > > > > > > base;
+	typedef k3d::snappable<k3d::gl::renderable<k3d::ri::renderable<k3d::material_client<k3d::bounded<k3d::transformable<k3d::persistent<k3d::node_change_signal<k3d::node> > > > > > > > base;
 
 public:
 	conic(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

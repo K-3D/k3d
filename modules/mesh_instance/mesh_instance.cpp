@@ -22,11 +22,9 @@
 */
 
 #include <k3d-i18n-config.h>
-
 #include <k3dsdk/bounded.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/drawable_gl.h>
 #include <k3dsdk/hints.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/imesh_painter_ri.h>
@@ -42,6 +40,7 @@
 #include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/parentable.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/snappable.h>
@@ -134,12 +133,12 @@ private:
 // mesh_instance
 
 class mesh_instance :
-	public k3d::snappable<k3d::bounded<k3d::gl::drawable<k3d::ri::renderable<k3d::mesh_selection_sink<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > > > > > >,
+	public k3d::snappable<k3d::bounded<k3d::gl::renderable<k3d::ri::renderable<k3d::mesh_selection_sink<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > > > > > >,
 	public k3d::imesh_sink,
 	public k3d::imesh_source,
 	public k3d::hint::hint_processor
 {
-	typedef k3d::snappable<k3d::bounded<k3d::gl::drawable<k3d::ri::renderable<k3d::mesh_selection_sink<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > > > > > > base;
+	typedef k3d::snappable<k3d::bounded<k3d::gl::renderable<k3d::ri::renderable<k3d::mesh_selection_sink<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > > > > > > base;
 public:
 	mesh_instance(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),

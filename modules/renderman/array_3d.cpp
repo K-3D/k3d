@@ -21,9 +21,8 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/drawable_gl.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/ibounded.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/itransform_array_3d.h>
@@ -31,6 +30,7 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/transformable.h>
@@ -42,9 +42,9 @@ namespace libk3drenderman
 // array_3d
 
 class array_3d :
-	public k3d::material_client<k3d::gl::drawable<k3d::ri::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > >
+	public k3d::material_client<k3d::gl::renderable<k3d::ri::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > >
 {
-	typedef k3d::material_client<k3d::gl::drawable<k3d::ri::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
+	typedef k3d::material_client<k3d::gl::renderable<k3d::ri::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
 
 public:
 	array_3d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

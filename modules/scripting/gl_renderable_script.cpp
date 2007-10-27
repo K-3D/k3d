@@ -23,9 +23,9 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/drawable_gl.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/scripted_node.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/transformable.h>
@@ -51,15 +51,15 @@ namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// drawable_script
+// gl_renderable_script
 
-class drawable_script :
-	public k3d::scripted_node<k3d::gl::drawable<k3d::transformable<k3d::persistent<k3d::node> > > >
+class gl_renderable_script :
+	public k3d::scripted_node<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > >
 {
-	typedef k3d::scripted_node<k3d::gl::drawable<k3d::transformable<k3d::persistent<k3d::node> > > > base;
+	typedef k3d::scripted_node<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > base;
 
 public:
-	drawable_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	gl_renderable_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 		set_script(DEFAULT_SCRIPT);
@@ -92,11 +92,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<drawable_script,
+		static k3d::document_plugin_factory<gl_renderable_script,
 			k3d::interface_list<k3d::itransform_source,
 			k3d::interface_list<k3d::itransform_sink > > > factory(
 			k3d::uuid(0xd57c84cc, 0xa9474b12, 0xa344763c, 0x8f4e7c8e),
-			"DrawableScript",
+			"GLRenderableScript",
 			_("Scripted OpenGL Drawable"),
 			"OpenGL Scripting",
 			k3d::iplugin_factory::STABLE);
@@ -106,11 +106,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// drawable_script_factory
+// gl_renderable_script_factory
 
-k3d::iplugin_factory& drawable_script_factory()
+k3d::iplugin_factory& gl_renderable_script_factory()
 {
-	return drawable_script::get_factory();
+	return gl_renderable_script::get_factory();
 }
 
 } // namespace scripting

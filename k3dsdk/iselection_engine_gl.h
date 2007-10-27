@@ -24,7 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "idrawable_gl.h"
 #include "iunknown.h"
 
 namespace k3d

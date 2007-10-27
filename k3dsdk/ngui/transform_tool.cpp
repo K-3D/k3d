@@ -42,7 +42,7 @@
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/idrawable_gl.h>
+#include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/ikeyframer.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/ipipeline.h>
@@ -1192,7 +1192,7 @@ void transform_tool::get_current_selection()
 		// Save transformable nodes as targets
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
-			if(!dynamic_cast<k3d::gl::idrawable*>(*node))
+			if(!dynamic_cast<k3d::gl::irenderable*>(*node))
 				continue;
 			if(!dynamic_cast<k3d::itransform_sink*>(*node))
 				continue;
@@ -1206,7 +1206,7 @@ void transform_tool::get_current_selection()
 		// Component mode : save mesh nodes as targets
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
-			if(!dynamic_cast<k3d::gl::idrawable*>(*node))
+			if(!dynamic_cast<k3d::gl::irenderable*>(*node))
 				continue;
 
 			// Get node's mesh

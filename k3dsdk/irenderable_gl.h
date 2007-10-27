@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IDRAWABLE_GL_H
-#define K3DSDK_IDRAWABLE_GL_H
+#ifndef K3DSDK_IRENDERABLE_GL_H
+#define K3DSDK_IRENDERABLE_GL_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -37,8 +37,8 @@ namespace gl
 class render_state;
 class selection_state;
 	
-/// Abstract interface implemented by objects that can draw themselves using OpenGL
-class idrawable :
+/// Abstract interface implemented by objects that can render themselves using the OpenGL API
+class irenderable :
 	public virtual iunknown
 {
 public:
@@ -46,14 +46,14 @@ public:
 	virtual void gl_select(const render_state& State, const selection_state& SelectState) = 0;
 
 protected:
-	idrawable() {}
-	idrawable(const idrawable&) {}
-	idrawable& operator=(const idrawable&) { return *this; }
-	virtual ~idrawable() {}
+	irenderable() {}
+	irenderable(const irenderable&) {}
+	irenderable& operator=(const irenderable&) { return *this; }
+	virtual ~irenderable() {}
 };
 } // namespace gl
 
 } // namespace k3d
 
-#endif // K3DSDK_IDRAWABLE_GL_H
+#endif // K3DSDK_IRENDERABLE_GL_H
 

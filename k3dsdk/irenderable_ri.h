@@ -21,8 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares interfaces for rendering within the Pixar RenderMan specification
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -35,7 +34,7 @@ namespace ri
 
 class render_state;
 	
-/// Abstract interface for objects that can render themselves as RenderMan graphics
+/// Abstract interface for objects that can render themselves using the RenderMan API
 class irenderable :
 	public virtual iunknown
 {

@@ -23,7 +23,6 @@
 */
 
 #include <k3d-i18n-config.h>
-
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>
@@ -32,10 +31,10 @@
 #include <k3dsdk/gl.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icrop_window.h>
-#include <k3dsdk/idrawable_gl.h>
 #include <k3dsdk/ilight_gl.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irender_engine_gl.h>
+#include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/iselection_engine_gl.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/iuser_interface.h>
@@ -100,9 +99,9 @@ public:
 
 	void operator()(k3d::inode* const Object)
 	{
-		k3d::gl::idrawable* const drawable = dynamic_cast<k3d::gl::idrawable*>(Object);
-		if(drawable)
-			drawable->gl_draw(m_state);
+		k3d::gl::irenderable* const renderable = dynamic_cast<k3d::gl::irenderable*>(Object);
+		if(renderable)
+			renderable->gl_draw(m_state);
 	}
 
 private:
@@ -120,9 +119,9 @@ public:
 
 	void operator()(k3d::inode* const Object)
 	{
-		k3d::gl::idrawable* const drawable = dynamic_cast<k3d::gl::idrawable*>(Object);
-		if(drawable)
-			drawable->gl_select(m_state, m_selection_state);
+		k3d::gl::irenderable* const renderable = dynamic_cast<k3d::gl::irenderable*>(Object);
+		if(renderable)
+			renderable->gl_select(m_state, m_selection_state);
 	}
 
 private:

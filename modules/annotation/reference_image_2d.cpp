@@ -21,13 +21,13 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/bitmap.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/gl.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/idrawable_gl.h>
 #include <k3dsdk/iprojection.h>
+#include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
@@ -42,7 +42,7 @@ namespace libk3dannotation
 
 class reference_image_2d :
 	public k3d::persistent<k3d::node>,
-	public k3d::gl::idrawable
+	public k3d::gl::irenderable
 {
 	typedef k3d::persistent<k3d::node> base;
 

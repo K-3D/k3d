@@ -35,7 +35,7 @@ extern k3d::iplugin_factory& bitmap_modifier_script_factory();
 extern k3d::iplugin_factory& bitmap_source_script_factory();
 extern k3d::iplugin_factory& color_source_script_factory();
 extern k3d::iplugin_factory& command_node_script_factory();
-extern k3d::iplugin_factory& drawable_script_factory();
+extern k3d::iplugin_factory& gl_renderable_script_factory();
 extern k3d::iplugin_factory& long_source_script_factory();
 extern k3d::iplugin_factory& mesh_modifier_script_factory();
 extern k3d::iplugin_factory& mesh_painter_script_factory();
@@ -58,7 +58,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::scripting::bitmap_source_script_factory());
 	Registry.register_factory(module::scripting::color_source_script_factory());
 	Registry.register_factory(module::scripting::command_node_script_factory());
-	Registry.register_factory(module::scripting::drawable_script_factory());
+	Registry.register_factory(module::scripting::gl_renderable_script_factory());
 	Registry.register_factory(module::scripting::long_source_script_factory());
 	Registry.register_factory(module::scripting::mesh_modifier_script_factory());
 	Registry.register_factory(module::scripting::mesh_painter_script_factory());

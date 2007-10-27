@@ -22,13 +22,13 @@
 		\author Romain Behar <romainbehar@yahoo.com>
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/drawable_gl.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/iyafray.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/transformable.h>
@@ -93,16 +93,16 @@ protected:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// drawable_light
+// renderable_light
 
 template<typename base_t>
-class drawable_light :
-	public k3d::gl::drawable<base_t>
+class renderable_light :
+	public k3d::gl::renderable<base_t>
 {
-	typedef k3d::gl::drawable<base_t> base;
+	typedef k3d::gl::renderable<base_t> base;
 
 public:
-	drawable_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	renderable_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 		base::m_selection_weight.changed_signal().connect(base::make_async_redraw_slot());
@@ -183,9 +183,9 @@ protected:
 // point_light
 
 class point_light :
-	public drawable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > >
+	public renderable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > >
 {
-	typedef drawable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > > base;
+	typedef renderable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > > base;
 
 public:
 	point_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -269,9 +269,9 @@ private:
 // sun_light
 
 class sun_light :
-	public drawable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > >
+	public renderable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > >
 {
-	typedef drawable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > > base;
+	typedef renderable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > > base;
 
 public:
 	sun_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -376,9 +376,9 @@ private:
 // soft_light
 
 class soft_light :
-	public drawable_light<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > >
+	public renderable_light<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > >
 {
-	typedef drawable_light<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
+	typedef renderable_light<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
 
 public:
 	soft_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -479,9 +479,9 @@ private:
 // spot_light
 
 class spot_light :
-	public colored_light<light<k3d::gl::drawable<k3d::transformable<k3d::persistent<k3d::node> > > > >
+	public colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > >
 {
-	typedef colored_light<light<k3d::gl::drawable<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
+	typedef colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
 
 public:
 	spot_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -583,9 +583,9 @@ private:
 // hemi_light
 
 class hemi_light :
-	public drawable_light<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > >
+	public renderable_light<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > >
 {
-	typedef drawable_light<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
+	typedef renderable_light<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
 
 public:
 	hemi_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -697,9 +697,9 @@ private:
 // area_light
 
 class area_light :
-	public colored_light<light<k3d::gl::drawable<k3d::transformable<k3d::persistent<k3d::node> > > > >
+	public colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > >
 {
-	typedef colored_light<light<k3d::gl::drawable<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
+	typedef colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
 
 public:
 	area_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -883,9 +883,9 @@ private:
 // photon_light
 
 class photon_light :
-	public colored_light<photons<light<k3d::gl::drawable<k3d::transformable<k3d::persistent<k3d::node> > > > > >
+	public colored_light<photons<light<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > > >
 {
-	typedef colored_light<photons<light<k3d::gl::drawable<k3d::transformable<k3d::persistent<k3d::node> > > > > > base;
+	typedef colored_light<photons<light<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > > > base;
 
 public:
 	photon_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

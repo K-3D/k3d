@@ -34,7 +34,6 @@
 #include <k3dsdk/icamera_animation_render_engine.h>
 #include <k3dsdk/icamera_preview_render_engine.h>
 #include <k3dsdk/icamera_still_render_engine.h>
-#include <k3dsdk/idrawable_gl.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_client.h>
 #include <k3dsdk/imesh_sink.h>
@@ -43,6 +42,7 @@
 #include <k3dsdk/irender_farm.h>
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/irender_job.h>
+#include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/iyafray.h>
 #include <k3dsdk/legacy_mesh.h>
@@ -362,7 +362,7 @@ private:
 			// Render mesh nodes ...
 			if((*node)->factory().factory_id() == k3d::classes::MeshInstance())
 			{
-				if(!dynamic_cast<k3d::gl::idrawable*>(*node))
+				if(!dynamic_cast<k3d::gl::irenderable*>(*node))
 					continue;
 
 				k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(*node);

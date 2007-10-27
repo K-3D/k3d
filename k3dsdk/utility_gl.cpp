@@ -21,8 +21,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "algebra.h"
 #include "bounding_box3.h"
-#include "drawable_gl.h"
 #include "extension_gl.h"
 #include "idocument.h"
 #include "imaterial.h"
@@ -31,6 +31,7 @@
 #include "inode_collection.h"
 #include "irender_engine_gl.h"
 #include "plane.h"
+#include "utility_gl.h"
 
 #include <algorithm>
 #include <set>

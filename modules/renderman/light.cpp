@@ -18,22 +18,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the Light K-3D object, which encapsulates a light source within the 3D workspace
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/classes.h>
-#include <k3dsdk/drawable_gl.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/classes.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/ilight_gl.h>
 #include <k3dsdk/ilight_ri.h>
 #include <k3dsdk/ilight_shader_ri.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property.h>
-#include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/render_state_ri.h>
+#include <k3dsdk/renderable_gl.h>
+#include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/transformable.h>
 #include <k3dsdk/vectors.h>
@@ -45,11 +44,11 @@ namespace libk3drenderman
 // light
 
 class light :
-	public k3d::gl::drawable<k3d::transformable<k3d::persistent<k3d::node> > >,
+	public k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > >,
 	public k3d::gl::ilight,
 	public k3d::ri::ilight
 {
-	typedef k3d::gl::drawable<k3d::transformable<k3d::persistent<k3d::node> > > base;
+	typedef k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > base;
 
 public:
 	light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -22,13 +22,13 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/drawable_gl.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/irender_farm.h>
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/scripted_node.h>
 #include <k3dsdk/selection.h>
@@ -52,9 +52,9 @@ namespace
 // renderman_script
 
 class renderman_script :
-	public k3d::scripted_node<k3d::gl::drawable<k3d::ri::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > >
+	public k3d::scripted_node<k3d::gl::renderable<k3d::ri::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > >
 {
-	typedef k3d::scripted_node<k3d::gl::drawable<k3d::ri::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
+	typedef k3d::scripted_node<k3d::gl::renderable<k3d::ri::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
 
 public:
 	renderman_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

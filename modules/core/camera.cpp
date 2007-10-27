@@ -21,11 +21,10 @@
 		\author Tim Shead <tshead@k-3d.com>
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/aspect_ratios.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/drawable_gl.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icrop_window.h>
 #include <k3dsdk/iprojection.h>
@@ -34,6 +33,7 @@
 #include <k3dsdk/parentable.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property_group_collection.h>
+#include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/transformable.h>
@@ -54,12 +54,12 @@ namespace libk3dcore
 // camera
 
 class camera :
-	public k3d::gl::drawable<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > >,
+	public k3d::gl::renderable<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > >,
 	public k3d::icamera,
 	public k3d::icrop_window,
 	public k3d::property_group_collection
 {
-	typedef k3d::gl::drawable<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > > base;
+	typedef k3d::gl::renderable<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > > base;
 
 public:
 	camera(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

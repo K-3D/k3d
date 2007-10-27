@@ -30,7 +30,7 @@
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/ibounded.h>
-#include <k3dsdk/idrawable_gl.h>
+#include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/transform.h>
 
 namespace libk3dngui
@@ -47,7 +47,7 @@ bool selection_position(const k3d::nodes_t& Selection, k3d::point3& NewTarget)
 	NewTarget = k3d::point3(0, 0, 0);
 	for(k3d::nodes_t::const_iterator node = Selection.begin(); node != Selection.end(); ++node)
 	{
-		if(!dynamic_cast<k3d::gl::idrawable*>(*node))
+		if(!dynamic_cast<k3d::gl::irenderable*>(*node))
 			continue;
 
 		++count;

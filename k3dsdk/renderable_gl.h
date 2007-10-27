@@ -1,5 +1,5 @@
-#ifndef K3DSDK_DRAWABLE_GL_H
-#define K3DSDK_DRAWABLE_GL_H
+#ifndef K3DSDK_RENDERABLE_GL_H
+#define K3DSDK_RENDERABLE_GL_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -26,9 +26,9 @@
 
 #include "data.h"
 #include "gl.h"
-#include "k3d-i18n-config.h"
-#include "idrawable_gl.h"
+#include "irenderable_gl.h"
 #include "irender_engine_gl.h"
+#include "k3d-i18n-config.h"
 #include "render_state_gl.h"
 #include "utility_gl.h"
 
@@ -44,16 +44,16 @@ namespace gl
 
 class selection_state;
 	
-/**	\brief Provides a boilerplate implementation of k3d::gl::idrawable
+/**	\brief Provides a boilerplate implementation of k3d::gl::irenderable
 	\param base_t Must derive from k3d::transformable
 */
 template<typename base_t>
-class drawable :
+class renderable :
 	public base_t,
-	public idrawable
+	public irenderable
 {
 public:
-	drawable(iplugin_factory& Factory, idocument& Document) :
+	renderable(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
 		m_visible(init_owner(*this) + init_name("viewport_visible") + init_label(_("Viewport Visible")) + init_description(_("Controls whether this node will be visibile in the viewport.")) + init_value(true)),
 		m_nurbs_renderer(0)
@@ -61,7 +61,7 @@ public:
 		m_visible.changed_signal().connect(make_async_redraw_slot());
 	}
 
-	~drawable()
+	~renderable()
 	{
 		if(m_nurbs_renderer)
 			gluDeleteNurbsRenderer(m_nurbs_renderer);
@@ -94,7 +94,7 @@ public:
 protected:
 	sigc::slot<void, iunknown*> make_async_redraw_slot()
 	{
-		return sigc::mem_fun(*this, &drawable<base_t>::async_redraw);
+		return sigc::mem_fun(*this, &renderable<base_t>::async_redraw);
 	}
 
 	void async_redraw(iunknown*)
@@ -150,5 +150,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_DRAWABLE_GL_H
+#endif // K3DSDK_RENDERABLE_GL_H
 
