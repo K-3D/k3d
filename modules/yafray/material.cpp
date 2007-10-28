@@ -18,15 +18,15 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead <tshead@k-3d.com>
-		\author Romain Behar <romainbehar@yahoo.com>
+	\author Tim Shead <tshead@k-3d.com>
+	\author Romain Behar <romainbehar@yahoo.com>
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/iyafray.h>
+#include <k3dsdk/imaterial_yafray.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property_group_collection.h>

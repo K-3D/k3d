@@ -34,8 +34,10 @@
 #include <k3dsdk/icamera_animation_render_engine.h>
 #include <k3dsdk/icamera_preview_render_engine.h>
 #include <k3dsdk/icamera_still_render_engine.h>
+#include <k3dsdk/ilight_yafray.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_client.h>
+#include <k3dsdk/imaterial_yafray.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/iprojection.h>
@@ -44,7 +46,6 @@
 #include <k3dsdk/irender_job.h>
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/itransform_source.h>
-#include <k3dsdk/iyafray.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>

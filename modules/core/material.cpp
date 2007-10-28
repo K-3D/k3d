@@ -21,13 +21,13 @@
 		\author Tim Shead <tshead@k-3d.com>
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_gl.h>
 #include <k3dsdk/imaterial_ri.h>
-#include <k3dsdk/iyafray.h>
+#include <k3dsdk/imaterial_yafray.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/node_change_signal.h>
 #include <k3dsdk/persistent.h>

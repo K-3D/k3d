@@ -25,7 +25,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/iyafray.h>
+#include <k3dsdk/ilight_yafray.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_gl.h>

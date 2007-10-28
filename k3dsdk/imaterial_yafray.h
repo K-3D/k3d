@@ -1,8 +1,8 @@
-#ifndef K3DSDK_IYAFRAY_H
-#define K3DSDK_IYAFRAY_H
+#ifndef K3DSDK_IMATERIAL_YAFRAY_H
+#define K3DSDK_IMATERIAL_YAFRAY_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead <tshead@k-3d.com>
+	\author Tim Shead <tshead@k-3d.com>
 */
 
 #include "iunknown.h"
@@ -32,20 +32,6 @@ namespace k3d
 
 namespace yafray
 {
-
-/// Abstract interface for YafRay light objects
-class ilight :
-	public virtual k3d::iunknown
-{
-public:
-	virtual void setup_light(std::ostream& Stream) = 0;
-
-protected:
-	ilight() {}
-	ilight(const ilight& ) {}
-	ilight& operator=(const ilight& ) { return *this; }
-	virtual ~ilight() {}
-};
 
 /// Abstract interface for Yafray material objects
 class imaterial :
@@ -65,4 +51,5 @@ protected:
 
 } // namespace k3d
 
-#endif // !K3DSDK_IYAFRAY_H
+#endif // !K3DSDK_IMATERIAL_YAFRAY_H
+
