@@ -22,11 +22,11 @@
 */
 
 #include "fstream.h"
-#include "irender_frame.h"
-#include "irender_job.h"
+#include "inetwork_render_frame.h"
+#include "inetwork_render_job.h"
+#include "network_render_farm.h"
+#include "network_render_farm_detail.h"
 #include "options.h"
-#include "render_farm.h"
-#include "render_farm_detail.h"
 #include "result.h"
 #include "shader_cache.h"
 #include "share.h"
@@ -47,7 +47,7 @@ namespace detail
 {
 
 /// Stores a reference to the global render farm instance
-irender_farm* g_render_farm = 0;
+inetwork_render_farm* g_render_farm = 0;
 
 } // namespace detail
 
@@ -55,7 +55,7 @@ irender_farm* g_render_farm = 0;
 // render_frame_implementation
 
 class render_frame_implementation :
-	public irender_frame
+	public inetwork_render_frame
 {
 public:
 	render_frame_implementation(const filesystem::path& JobPath, const std::string& Name) :
@@ -229,7 +229,7 @@ private:
 // render_job_implementation
 
 class render_job_implementation :
-	public irender_job
+	public inetwork_render_job
 {
 public:
 	render_job_implementation(const filesystem::path Path, const std::string JobName) :
@@ -245,7 +245,7 @@ public:
 		}
 	}
 
-	irender_frame& create_frame(const std::string& FrameName)
+	inetwork_render_frame& create_frame(const std::string& FrameName)
 	{
 		m_frames.push_back(render_frame_implementation(m_Path, FrameName));
 		return m_frames.back();
@@ -295,9 +295,9 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// render_farm_implementation::implementation
+// network_render_farm_implementation::implementation
 
-class render_farm_implementation::implementation
+class network_render_farm_implementation::implementation
 {
 public:
 	implementation(const filesystem::path& OptionsPath) :
@@ -305,7 +305,7 @@ public:
 	{
 	}
 
-	irender_job& create_job(const std::string& JobName)
+	inetwork_render_job& create_job(const std::string& JobName)
 	{
 		// Sanity checks ...
 		assert_warning(JobName.size());
@@ -323,7 +323,7 @@ public:
 		return m_jobs.back();
 	}
 
-	void start_job(irender_job& Job)
+	void start_job(inetwork_render_job& Job)
 	{
 		// Make sure it's one of ours ...
 		render_job_implementation* const job = dynamic_cast<render_job_implementation*>(&Job);
@@ -367,30 +367,30 @@ private:
 /////////////////////////////////////////////////////////////////////////////
 // render_farm_implementation
 
-render_farm_implementation::render_farm_implementation(const filesystem::path& OptionsPath) :
+network_render_farm_implementation::network_render_farm_implementation(const filesystem::path& OptionsPath) :
 	m_implementation(new implementation(OptionsPath))
 {
 }
 
-render_farm_implementation::~render_farm_implementation()
+network_render_farm_implementation::~network_render_farm_implementation()
 {
 	delete m_implementation;
 }
 
-irender_job& render_farm_implementation::create_job(const std::string& JobName)
+inetwork_render_job& network_render_farm_implementation::create_job(const std::string& JobName)
 {
 	return m_implementation->create_job(JobName);
 }
 
-void render_farm_implementation::start_job(irender_job& Job)
+void network_render_farm_implementation::start_job(inetwork_render_job& Job)
 {
 	m_implementation->start_job(Job);
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// set_render_farm
+// set_network_render_farm
 
-void set_render_farm(irender_farm& RenderFarm)
+void set_network_render_farm(inetwork_render_farm& RenderFarm)
 {
 	return_if_fail(!detail::g_render_farm);
 	detail::g_render_farm = &RenderFarm;
@@ -399,7 +399,7 @@ void set_render_farm(irender_farm& RenderFarm)
 /////////////////////////////////////////////////////////////////////////////
 // render_farm
 
-irender_farm& render_farm()
+inetwork_render_farm& network_render_farm()
 {
 	assert_critical(detail::g_render_farm);
 	return *detail::g_render_farm;

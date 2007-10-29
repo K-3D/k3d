@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IRENDER_FRAME_H
-#define K3DSDK_IRENDER_FRAME_H
+#ifndef K3DSDK_INETWORK_RENDER_FRAME_H
+#define K3DSDK_INETWORK_RENDER_FRAME_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -33,7 +33,7 @@ namespace k3d
 namespace filesystem { class path; }
 
 /// Abstract interface encapsulating a single frame to be rendered
-class irender_frame :
+class inetwork_render_frame :
 	public virtual iunknown
 {
 public:
@@ -49,13 +49,13 @@ public:
 	virtual void add_view_operation(const filesystem::path& FilePath) = 0;
 
 protected:
-	irender_frame() {}
-	irender_frame(const irender_frame&) {}
-	irender_frame& operator=(const irender_frame&) { return *this; }
-	virtual ~irender_frame() {}
+	inetwork_render_frame() {}
+	inetwork_render_frame(const inetwork_render_frame&) {}
+	inetwork_render_frame& operator=(const inetwork_render_frame&) { return *this; }
+	virtual ~inetwork_render_frame() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_IRENDER_FRAME_H
+#endif // K3DSDK_INETWORK_RENDER_FRAME_H
 

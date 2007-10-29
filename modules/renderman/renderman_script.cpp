@@ -24,8 +24,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/irender_farm.h>
-#include <k3dsdk/irender_frame.h>
+#include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_gl.h>

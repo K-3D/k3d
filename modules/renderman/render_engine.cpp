@@ -21,12 +21,13 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
+#include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/file_range.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icamera_animation_render_engine.h>
 #include <k3dsdk/icamera_preview_render_engine.h>
@@ -34,35 +35,34 @@
 #include <k3dsdk/icrop_window.h>
 #include <k3dsdk/iimager_shader_ri.h>
 #include <k3dsdk/ilight_ri.h>
+#include <k3dsdk/inetwork_render_farm.h>
+#include <k3dsdk/inetwork_render_frame.h>
+#include <k3dsdk/inetwork_render_job.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irender_engine_ri.h>
-#include <k3dsdk/irender_farm.h>
-#include <k3dsdk/irender_frame.h>
-#include <k3dsdk/irender_job.h>
 #include <k3dsdk/irenderable_ri.h>
 #include <k3dsdk/itexture_ri.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/ivolume_shader_ri.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/shader_collection_ri.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/property_group_collection.h>
-#include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/render_engine_ri.h>
-#include <k3dsdk/render_farm.h>
-#include <k3dsdk/types_ri.h>
+#include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/shader_cache.h>
+#include <k3dsdk/shader_collection_ri.h>
 #include <k3dsdk/shaders.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/time_source.h>
+#include <k3dsdk/types_ri.h>
 #include <k3dsdk/user_interface.h>
 #include <k3dsdk/utility_gl.h>
-#include <k3d-version-config.h>
 
 #include <iomanip>
 
@@ -102,7 +102,7 @@ private:
 class setup_texture
 {
 public:
-	explicit setup_texture(k3d::irender_frame& Frame, k3d::ri::irender_engine& Engine, k3d::ri::ishader_collection& Shaders) :
+	explicit setup_texture(k3d::inetwork_render_frame& Frame, k3d::ri::irender_engine& Engine, k3d::ri::ishader_collection& Shaders) :
 		frame(Frame),
 		engine(Engine),
 		shaders(Shaders)
@@ -116,7 +116,7 @@ public:
 	}
 
 private:
-	k3d::irender_frame& frame;
+	k3d::inetwork_render_frame& frame;
 	k3d::ri::irender_engine& engine;
 	k3d::ri::ishader_collection& shaders;
 };
@@ -270,10 +270,10 @@ public:
 	bool render_camera_preview(k3d::icamera& Camera)
 	{
 		// Start a new render job ...
-		k3d::irender_job& job = k3d::render_farm().create_job("k3d-preview");
+		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-preview");
 
 		// Add a single render frame to the job ...
-		k3d::irender_frame& frame = job.create_frame("frame");
+		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
 		const k3d::filesystem::path outputimagepath = frame.add_output_file("outputimage");
@@ -289,7 +289,7 @@ public:
 		synchronize_shaders(shaders);
 
 		// Start the job running ...
-		k3d::render_farm().start_job(job);
+		k3d::network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -300,10 +300,10 @@ public:
 		return_val_if_fail(!OutputImage.empty(), false);
 
 		// Start a new render job ...
-		k3d::irender_job& job = k3d::render_farm().create_job("k3d-render-frame");
+		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-render-frame");
 
 		// Add a single render frame to the job ...
-		k3d::irender_frame& frame = job.create_frame("frame");
+		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
 		const k3d::filesystem::path outputimagepath = frame.add_output_file("outputimage");
@@ -326,7 +326,7 @@ public:
 		synchronize_shaders(shaders);
 
 		// Start the job running ...
-		k3d::render_farm().start_job(job);
+		k3d::network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -351,7 +351,7 @@ public:
 		return_val_if_fail(Files.max_file_count() > end_frame, false);
 
 		// Start a new render job ...
-		k3d::irender_job& job = k3d::render_farm().create_job("k3d-render-animation");
+		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-render-animation");
 
 		// Keep track of shaders used over the course of the animation ...
 		k3d::ri::shader_collection shaders;
@@ -368,7 +368,7 @@ public:
 			// Add a render frame to the job ...
 			std::stringstream buffer;
 			buffer << "frame-" << std::setw(Files.digits) << std::setfill('0') << view_frame;
-			k3d::irender_frame& frame = job.create_frame(buffer.str());
+			k3d::inetwork_render_frame& frame = job.create_frame(buffer.str());
 
 			// Create an output image path ...
 			const k3d::filesystem::path outputimagepath = frame.add_output_file("outputimage");
@@ -390,7 +390,7 @@ public:
 		synchronize_shaders(shaders);
 
 		// Start the job running ...
-		k3d::render_farm().start_job(job);
+		k3d::network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -411,7 +411,7 @@ public:
 	}
 
 private:
-	bool render(k3d::icamera& Camera, k3d::irender_frame& Frame, const k3d::filesystem::path& OutputImagePath, const bool VisibleRender, k3d::ri::shader_collection& Shaders)
+	bool render(k3d::icamera& Camera, k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath, const bool VisibleRender, k3d::ri::shader_collection& Shaders)
 	{
 		// Sanity checks ...
 		return_val_if_fail(!OutputImagePath.empty(), false);

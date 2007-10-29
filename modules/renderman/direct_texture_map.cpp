@@ -22,9 +22,9 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/classes.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/classes.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/irender_engine_ri.h>
 #include <k3dsdk/itexture_ri.h>
 #include <k3dsdk/node.h>
@@ -54,7 +54,7 @@ public:
 	{
 	}
 
-	void setup_renderman_texture(k3d::irender_frame& Frame, k3d::ri::irender_engine& Engine, k3d::ri::ishader_collection& Shaders)
+	void setup_renderman_texture(k3d::inetwork_render_frame& Frame, k3d::ri::irender_engine& Engine, k3d::ri::ishader_collection& Shaders)
 	{
 	}
 

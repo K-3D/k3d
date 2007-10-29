@@ -22,20 +22,19 @@
 */
 
 #include <k3d-i18n-config.h>
-
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
+#include <k3dsdk/inetwork_render_farm.h>
+#include <k3dsdk/inetwork_render_frame.h>
+#include <k3dsdk/inetwork_render_job.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/ipreview_render_engine.h>
-#include <k3dsdk/irender_farm.h>
-#include <k3dsdk/irender_frame.h>
-#include <k3dsdk/irender_job.h>
 #include <k3dsdk/istill_render_engine.h>
 #include <k3dsdk/module.h>
+#include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/render_farm.h>
 
 #include <iomanip>
 #include <iterator>
@@ -63,10 +62,10 @@ public:
 	bool render_preview()
 	{
 		// Start a new render job ...
-		k3d::irender_job& job = k3d::render_farm().create_job("k3d-preview");
+		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-preview");
 
 		// Add a single render frame to the job ...
-		k3d::irender_frame& frame = job.create_frame("frame");
+		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
 		const k3d::filesystem::path outputimagepath = frame.add_output_file("world.ps");
@@ -79,7 +78,7 @@ public:
 		return_val_if_fail(render(frame, outputimagepath), false);
 
 		// Start the job running ...
-		k3d::render_farm().start_job(job);
+		k3d::network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -90,10 +89,10 @@ public:
 		return_val_if_fail(!OutputImage.empty(), false);
 
 		// Start a new render job ...
-		k3d::irender_job& job = k3d::render_farm().create_job("k3d-render-frame");
+		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-render-frame");
 
 		// Add a single render frame to the job ...
-		k3d::irender_frame& frame = job.create_frame("frame");
+		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
 		const k3d::filesystem::path outputimagepath = frame.add_output_file("world.ps");
@@ -110,7 +109,7 @@ public:
 		return_val_if_fail(render(frame, outputimagepath), false);
 
 		// Start the job running ...
-		k3d::render_farm().start_job(job);
+		k3d::network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -149,7 +148,7 @@ private:
 		return result;
 	}
 
-	bool render(k3d::irender_frame& Frame, const k3d::filesystem::path& OutputImagePath)
+	bool render(k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath)
 	{
 		// Sanity checks ...
 		return_val_if_fail(!OutputImagePath.empty(), false);

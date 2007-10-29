@@ -21,33 +21,33 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera_preview_render_engine.h>
 #include <k3dsdk/idisplacement_shader_ri.h>
 #include <k3dsdk/iimager_shader_ri.h>
 #include <k3dsdk/ilight_shader_ri.h>
-#include <k3dsdk/ishader_collection_ri.h>
+#include <k3dsdk/inetwork_render_farm.h>
+#include <k3dsdk/inetwork_render_frame.h>
+#include <k3dsdk/inetwork_render_job.h>
 #include <k3dsdk/ipreview_render_engine.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irender_engine_ri.h>
-#include <k3dsdk/irender_farm.h>
-#include <k3dsdk/irender_frame.h>
-#include <k3dsdk/irender_job.h>
+#include <k3dsdk/ishader_collection_ri.h>
 #include <k3dsdk/isurface_shader_ri.h>
 #include <k3dsdk/ivolume_shader_ri.h>
-#include <k3dsdk/shader_collection_ri.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/property_group_collection.h>
-#include <k3dsdk/shader_ri.h>
-#include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/render_engine_ri.h>
-#include <k3dsdk/render_farm.h>
 #include <k3dsdk/render_state_ri.h>
+#include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/shader_cache.h>
+#include <k3dsdk/shader_collection_ri.h>
+#include <k3dsdk/shader_ri.h>
 #include <k3dsdk/shaders.h>
 #include <k3dsdk/share.h>
 
@@ -211,10 +211,10 @@ public:
 	bool render_preview()
 	{
 		// Start a new render job
-		k3d::irender_job& job = k3d::render_farm().create_job("k3d-shader-preview");
+		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-shader-preview");
 
 		// Add a single frame to the job
-		k3d::irender_frame& frame = job.create_frame("frame");
+		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Start our RIB file
 		const std::string ribfilename("world.rib");
@@ -311,7 +311,7 @@ public:
 			k3d::log() << error << k3d::string_cast(boost::format(_("Error compiling shader %1%")) % shader_path().native_utf8_string().raw()) << std::endl;
 
 		// Run the job
-		k3d::render_farm().start_job(job);
+		k3d::network_render_farm().start_job(job);
 
 		return true;
 	}

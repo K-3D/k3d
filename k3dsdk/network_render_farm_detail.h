@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IRENDER_FARM_H
-#define K3DSDK_IRENDER_FARM_H
+#ifndef K3DSDK_NETWORK_RENDER_FARM_DETAIL_H
+#define K3DSDK_NETWORK_RENDER_FARM_DETAIL_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -24,32 +24,33 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
-#include <string>
+#include "inetwork_render_farm.h"
 
 namespace k3d
 {
 
-class irender_job;
-	
-/// Abstract interface that encapsulates a "render farm" capable of executing render jobs
-class irender_farm :
-	public virtual iunknown
+/////////////////////////////////////////////////////////////////////////////
+// network_render_farm_implementation
+
+class network_render_farm_implementation :
+	public inetwork_render_farm
 {
 public:
-	/// Creates a new job, in a "waiting" state
-	virtual irender_job& create_job(const std::string& JobName) = 0;
-	/// Tells the render farm to begin executing the given job
-	virtual void start_job(irender_job& Job) = 0;
+	network_render_farm_implementation(const filesystem::path& OptionsPath);
+	~network_render_farm_implementation();
 
-protected:
-	irender_farm() {}
-	irender_farm(const irender_farm&) {}
-	irender_farm& operator=(const irender_farm&) { return *this; }
-	virtual ~irender_farm() {}
+	inetwork_render_job& create_job(const std::string& JobName);
+	void start_job(inetwork_render_job& Job);
+
+private:
+	class implementation;
+	implementation* const m_implementation;
 };
+
+/// Call this once at startup to register the global singleton render farm implementation - note: does not take control of the given object's lifetime.
+void set_network_render_farm(inetwork_render_farm& RenderFarm);
 
 } // namespace k3d
 
-#endif // K3DSDK_IRENDER_FARM_H
+#endif // K3DSDK_NETWORK_RENDER_FARM_DETAIL_H
 

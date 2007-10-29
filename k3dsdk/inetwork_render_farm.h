@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IRENDER_JOB_H
-#define K3DSDK_IRENDER_JOB_H
+#ifndef K3DSDK_INETWORK_RENDER_FARM_H
+#define K3DSDK_INETWORK_RENDER_FARM_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -30,24 +30,26 @@
 namespace k3d
 {
 
-class irender_frame;
+class inetwork_render_job;
 	
-/// Abstract interface encapsulating a render job containing zero-to-many frames to be rendered
-class irender_job :
+/// Abstract interface that encapsulates a "render farm" capable of executing render jobs
+class inetwork_render_farm :
 	public virtual iunknown
 {
 public:
-	/// Adds a new "frame" to the job, to be rendered when the job is run
-	virtual irender_frame& create_frame(const std::string& FrameName) = 0;
+	/// Creates a new job, in a "waiting" state
+	virtual inetwork_render_job& create_job(const std::string& JobName) = 0;
+	/// Tells the render farm to begin executing the given job
+	virtual void start_job(inetwork_render_job& Job) = 0;
 
 protected:
-	irender_job() {}
-	irender_job(const irender_job&) {}
-	irender_job& operator=(const irender_job&) { return *this; }
-	virtual ~irender_job() {}
+	inetwork_render_farm() {}
+	inetwork_render_farm(const inetwork_render_farm&) {}
+	inetwork_render_farm& operator=(const inetwork_render_farm&) { return *this; }
+	virtual ~inetwork_render_farm() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_IRENDER_JOB_H
+#endif // K3DSDK_INETWORK_RENDER_FARM_H
 

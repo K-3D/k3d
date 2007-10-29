@@ -31,7 +31,7 @@ namespace k3d
 {
 
 class iprojection;
-class irender_frame;
+class inetwork_render_frame;
 class matrix4;
 	
 namespace ri
@@ -44,7 +44,7 @@ class ishader_collection;
 class render_state
 {
 public:
-	render_state(irender_frame& Frame, irender_engine& Engine, ishader_collection& Shaders, iprojection& Projection, const render_context_t RenderContext, const sample_times_t& SampleTimes, const unsigned_integer SampleIndex, const matrix4& CameraMatrix) :
+	render_state(inetwork_render_frame& Frame, irender_engine& Engine, ishader_collection& Shaders, iprojection& Projection, const render_context_t RenderContext, const sample_times_t& SampleTimes, const unsigned_integer SampleIndex, const matrix4& CameraMatrix) :
 		frame(Frame),
 		engine(Engine),
 		shaders(Shaders),
@@ -56,7 +56,7 @@ public:
 	{
 	}
 
-	irender_frame& frame;
+	inetwork_render_frame& frame;
 	irender_engine& engine;
 	ishader_collection& shaders;
 	iprojection& projection;

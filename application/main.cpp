@@ -29,7 +29,8 @@
 #include <k3dsdk/application_detail.h>
 #include <k3dsdk/batch_mode_init.h>
 #include <k3dsdk/plugin_factory_collection.h>
-#include <k3dsdk/render_farm.h>
+#include <k3dsdk/network_render_farm.h>
+#include <k3dsdk/network_render_farm_detail.h>
 #include <k3dsdk/user_interface_init.h>
 
 // Standard K-3D interfaces
@@ -54,7 +55,6 @@
 #include <k3dsdk/options_policy.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/register_application.h>
-#include <k3dsdk/render_farm_detail.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/shader_cache_detail.h>
 #include <k3dsdk/share_detail.h>
@@ -780,8 +780,8 @@ int main(int argc, char* argv[])
 			return error ? 1 : 0;
 
 		// Setup a render farm ...
-		k3d::render_farm_implementation render_farm(g_options_path);
-		k3d::set_render_farm(render_farm);
+		k3d::network_render_farm_implementation render_farm(g_options_path);
+		k3d::set_network_render_farm(render_farm);
 
 		// Create the main application object ...
 		k3d::application_implementation application(plugins);

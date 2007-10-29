@@ -40,18 +40,18 @@
 #include <k3dsdk/imaterial_yafray.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
+#include <k3dsdk/inetwork_render_farm.h>
+#include <k3dsdk/inetwork_render_frame.h>
+#include <k3dsdk/inetwork_render_job.h>
 #include <k3dsdk/iprojection.h>
-#include <k3dsdk/irender_farm.h>
-#include <k3dsdk/irender_frame.h>
-#include <k3dsdk/irender_job.h>
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property.h>
-#include <k3dsdk/render_farm.h>
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 #include <k3dsdk/time_source.h>
@@ -119,10 +119,10 @@ public:
 	bool render_camera_preview(k3d::icamera& Camera)
 	{
 		// Start a new render job ...
-		k3d::irender_job& job = k3d::render_farm().create_job("k3d-preview");
+		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-preview");
 
 		// Add a single render frame to the job ...
-		k3d::irender_frame& frame = job.create_frame("frame");
+		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
 		const k3d::filesystem::path outputimagepath = frame.add_output_file("salida.tga");
@@ -135,7 +135,7 @@ public:
 		return_val_if_fail(render(Camera, frame, outputimagepath, true), false);
 
 		// Start the job running ...
-		k3d::render_farm().start_job(job);
+		k3d::network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -146,10 +146,10 @@ public:
 		return_val_if_fail(!OutputImage.empty(), false);
 
 		// Start a new render job ...
-		k3d::irender_job& job = k3d::render_farm().create_job("k3d-render-frame");
+		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-render-frame");
 
 		// Add a single render frame to the job ...
-		k3d::irender_frame& frame = job.create_frame("frame");
+		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
 		const k3d::filesystem::path outputimagepath = frame.add_output_file("salida.tga");
@@ -166,7 +166,7 @@ public:
 		return_val_if_fail(render(Camera, frame, outputimagepath, false), false);
 
 		// Start the job running ...
-		k3d::render_farm().start_job(job);
+		k3d::network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -191,7 +191,7 @@ public:
 		return_val_if_fail(Files.max_file_count() > end_frame, false);
 
 		// Start a new render job ...
-		k3d::irender_job& job = k3d::render_farm().create_job("k3d-render-animation");
+		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-render-animation");
 
 		// For each frame to be rendered ...
 		for(size_t view_frame = start_frame; view_frame < end_frame; ++view_frame)
@@ -205,7 +205,7 @@ public:
 			// Add a render frame to the job ...
 			std::stringstream buffer;
 			buffer << "frame-" << std::setw(Files.digits) << std::setfill('0') << view_frame;
-			k3d::irender_frame& frame = job.create_frame(buffer.str());
+			k3d::inetwork_render_frame& frame = job.create_frame(buffer.str());
 
 			// Create an output image path ...
 			const k3d::filesystem::path outputimagepath = frame.add_output_file("salida.tga");
@@ -224,7 +224,7 @@ public:
 		}
 
 		// Start the job running ...
-		k3d::render_farm().start_job(job);
+		k3d::network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -270,7 +270,7 @@ private:
 		return "default_shader";
 	}
 
-	bool render(k3d::icamera& Camera, k3d::irender_frame& Frame, const k3d::filesystem::path& OutputImagePath, const bool VisibleRender)
+	bool render(k3d::icamera& Camera, k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath, const bool VisibleRender)
 	{
 		// Sanity checks ...
 		return_val_if_fail(!OutputImagePath.empty(), false);

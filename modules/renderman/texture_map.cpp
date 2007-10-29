@@ -22,16 +22,15 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/axis.h>
 #include <k3dsdk/bitmap_modifier.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/file_filter.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/ibitmap_exporter.h>
+#include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/irender_engine_ri.h>
-#include <k3dsdk/irender_farm.h>
-#include <k3dsdk/irender_frame.h>
 #include <k3dsdk/itexture_ri.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
@@ -72,7 +71,7 @@ public:
 			k3d::filesystem::remove(m_cache_path);
 	}
 
-	void setup_renderman_texture(k3d::irender_frame& Frame, k3d::ri::irender_engine& Engine, k3d::ri::ishader_collection& Shaders)
+	void setup_renderman_texture(k3d::inetwork_render_frame& Frame, k3d::ri::irender_engine& Engine, k3d::ri::ishader_collection& Shaders)
 	{
 		return_if_fail(!m_cache_path.empty());
 

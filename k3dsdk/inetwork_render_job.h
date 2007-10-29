@@ -1,5 +1,5 @@
-#ifndef K3DSDK_RENDER_FARM_H
-#define K3DSDK_RENDER_FARM_H
+#ifndef K3DSDK_INETWORK_RENDER_JOB_H
+#define K3DSDK_INETWORK_RENDER_JOB_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -24,15 +24,30 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "iunknown.h"
+#include <string>
+
 namespace k3d
 {
 
-class irender_farm;
+class inetwork_render_frame;
+	
+/// Abstract interface encapsulating a render job containing zero-to-many frames to be rendered
+class inetwork_render_job :
+	public virtual iunknown
+{
+public:
+	/// Adds a new "frame" to the job, to be rendered when the job is run
+	virtual inetwork_render_frame& create_frame(const std::string& FrameName) = 0;
 
-/// Returns a reference to the global singleton render farm object
-irender_farm& render_farm();
+protected:
+	inetwork_render_job() {}
+	inetwork_render_job(const inetwork_render_job&) {}
+	inetwork_render_job& operator=(const inetwork_render_job&) { return *this; }
+	virtual ~inetwork_render_job() {}
+};
 
 } // namespace k3d
 
-#endif // K3DSDK_RENDER_FARM_H
+#endif // K3DSDK_INETWORK_RENDER_JOB_H
 
