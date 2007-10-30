@@ -42,9 +42,9 @@ namespace detail
 {
 
 /// Returns the set of available extensions reported by OpenGL
-std::set<std::string>& extensions()
+std::set<k3d::string_t>& extensions()
 {
-	static std::set<std::string> results;
+	static std::set<k3d::string_t> results;
 	static bool initialized = false;
 
 	if(!initialized)
@@ -57,7 +57,7 @@ std::set<std::string>& extensions()
 			return results;
 		}
 		
-		const std::string extension_string = extension_c_string;
+		const k3d::string_t extension_string = extension_c_string;
 		
 		initialized = true;
 
@@ -70,9 +70,9 @@ std::set<std::string>& extensions()
 }
 
 /// Returns the set of explicitly-disabled extensions
-std::set<std::string>& disabled()
+std::set<k3d::string_t>& disabled()
 {
-	static std::set<std::string> results;
+	static std::set<k3d::string_t> results;
 	static bool initialized = false;
 
 	if(!initialized)
@@ -86,27 +86,32 @@ std::set<std::string>& disabled()
 }
 
 /// Returns the set of explicitly-enabled extensions
-std::set<std::string>& enabled()
+std::set<k3d::string_t>& enabled()
 {
-	static std::set<std::string> results;
+	static std::set<k3d::string_t> results;
 	return results;
 }
 
 } // namespace detail
 
-void disable(const std::string& Extension)
+const std::set<k3d::string_t> list()
+{
+	return detail::extensions();
+}
+
+void disable(const k3d::string_t& Extension)
 {
 	detail::disabled().insert(Extension);
 	detail::enabled().erase(Extension);
 }
 
-void enable(const std::string& Extension)
+void enable(const k3d::string_t& Extension)
 {
 	detail::disabled().erase(Extension);
 	detail::enabled().insert(Extension);
 }
 
-const bool query(const std::string& Extension)
+const bool query(const k3d::string_t& Extension)
 { 
 	bool result = (detail::enabled().count(Extension) || detail::extensions().count(Extension)) && !detail::disabled().count(Extension);
 	// extra glew check for glew, to be sure the function pointer is initialised

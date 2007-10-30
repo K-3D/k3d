@@ -24,7 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <string>
+#include "types.h"
+#include <set>
 
 namespace k3d
 {
@@ -36,12 +37,14 @@ namespace extension
 {
 
 /// "Disables" an OpenGL extension, so that query() will always return false (regardless of the underlying hardware)
-void disable(const std::string& Extension);
+void disable(const k3d::string_t& Extension);
 /// "Enables" an OpenGL extension, so that query() will always return true (regardless of the underlying hardware)
-void enable(const std::string& Extension);
+void enable(const k3d::string_t& Extension);
+/// Returns the list of OpenGL extensions supported by underlying hardware
+const std::set<k3d::string_t> list();
 
 /// Returns true iff the requested OpenGL extension is available
-const bool query(const std::string& Extension);
+const bool query(const k3d::string_t& Extension);
 
 /// Convenience function that returns true iff the VBO extension is supported
 bool query_vbo();

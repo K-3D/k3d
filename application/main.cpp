@@ -42,6 +42,7 @@
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/extension_gl.h>
 #include <k3dsdk/fstream.h>
+#include <k3dsdk/gl.h>
 #include <k3dsdk/gzstream.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
@@ -541,6 +542,15 @@ const arguments_t parse_runtime_arguments(const arguments_t& Arguments, bool& Qu
 				return arguments_t();
 			}
 		}
+		else if(argument->string_key == "list-gl-extensions")
+		{
+			const std::set<k3d::string_t> extensions = k3d::gl::extension::list();
+			for(std::set<k3d::string_t>::const_iterator extension = extensions.begin(); extension != extensions.end(); ++extension)
+				std::cout << *extension << "\n";
+
+			Quit = true;
+			return arguments_t();
+		}
 		else if(argument->string_key == "exit")
 		{
 			Quit = true;
@@ -663,6 +673,7 @@ int main(int argc, char* argv[])
 			("enable-gl-extension", boost::program_options::value<std::string>(), "Enables the given OpenGL extension.")
 			("exit", "Exits the program (useful after running scripts in batch mode.")
 			("help,h", "Prints this help message and exits.")
+			("list-gl-extensions", "List available OpenGL extensions and exit.")
 #ifdef K3D_BUILD_NLS
 			("locale", boost::program_options::value<std::string>(), "Overrides the path for loading locales")
 #endif // K3D_BUILD_NLS
