@@ -74,11 +74,13 @@ public:
 		if(!k3d::validate_polyhedra(Mesh))
 			return;
 		
-		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color();
-		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
+		
+		enable_blending();
 		
 		clean_vbo_state();
 		
@@ -100,7 +102,7 @@ public:
 		{
 			for (selection_records_t::const_iterator record = edge_selection_records.begin(); record != edge_selection_records.end(); ++record)
 			{
-				k3d::gl::color3d(record->weight ? selected_color : color);
+				color4d(record->weight ? selected_color : color);
 				size_t start = record->begin * 2;
 				size_t end = record->end;
 				end = end > edge_count ? edge_count : end;
@@ -111,11 +113,12 @@ public:
 		}
 		else
 		{
-			k3d::gl::color3d(color);
+			color4d(color);
 			glDrawElements(GL_LINES, Mesh.polyhedra->edge_points->size() * 2, GL_UNSIGNED_INT, 0);
 		}
 		
 		clean_vbo_state();
+		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)

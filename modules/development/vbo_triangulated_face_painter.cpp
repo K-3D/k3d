@@ -90,8 +90,10 @@ public:
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 		
-		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color();
-		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+		enable_blending();
+		
+		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
 		cached_triangulation* triangles = m_triangle_cache.create_data(Mesh.points); 
 		triangles->execute(Mesh);
@@ -115,7 +117,8 @@ public:
 		{
 			for (selection_records_t::const_iterator record = face_selection_records.begin(); record != face_selection_records.end() && record->begin < face_count; ++record)
 			{ // color by selection
-				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, record->weight ? selected_color : color);
+				const color_t& face_color = record->weight ? selected_color : color;
+				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
 				size_t start = record->begin;
 				size_t end = record->end;
 				end = end > face_count ? face_count : end;
@@ -124,11 +127,12 @@ public:
 		}
 		else
 		{ // empty selection, everything has the same color
-			k3d::gl::color3d(color);
+			color4d(color);
 			vbos->draw_range(0, face_count);
 		}
 		
 		clean_vbo_state();
+		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)

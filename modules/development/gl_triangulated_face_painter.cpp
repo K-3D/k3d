@@ -86,8 +86,8 @@ public:
 		glEnable(GL_COLOR_MATERIAL);
 		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 		
-		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color();
-		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
 		cached_triangulation* triangles = m_triangle_cache.create_data(Mesh.points); 
 		triangles->execute(Mesh); 
@@ -135,7 +135,7 @@ public:
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glNormalPointer(GL_DOUBLE, 0, &normals[0]);
 		
-		k3d::typed_array<k3d::color> colors(triangles->points().size(), color);
+		std::vector<color_t> colors(triangles->points().size(), color);
 		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection; 
 		for (k3d::uint_t face = 0; face != face_points.size(); ++face)
 		{
@@ -149,7 +149,7 @@ public:
 		}
 		
 		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(3, GL_DOUBLE, 0, &colors[0]);
+		glColorPointer(4, GL_DOUBLE, 0, &colors[0]);
 		
 		glDrawElements(GL_TRIANGLES, triangles->indices().size(), GL_UNSIGNED_INT, &(triangles->indices().at(0)));
 		

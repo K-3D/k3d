@@ -89,8 +89,8 @@ public:
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 		
-		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color();
-		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
 		point_vbo* const point_buffer = m_points_cache.create_data(Mesh.points);
 		face* faces = m_faces_cache.create_data(Mesh.polyhedra->face_first_loops);
@@ -127,7 +127,7 @@ public:
 		}
 		else
 		{ // empty selection, everything has the same color
-			k3d::gl::color3d(color);
+			color4d(color);
 			faces->draw_smooth_range(0, face_count-1);
 		}
 
@@ -147,7 +147,7 @@ public:
 			}
 			else
 			{ // empty selection, everything has the same color
-				k3d::gl::color3d(color);
+				color4d(color);
 				faces->draw_flat_range(0, face_count-1);
 			}
 		}

@@ -40,6 +40,7 @@
 #include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/parentable.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>
@@ -304,8 +305,11 @@ public:
 			process_changes();
 			const k3d::mesh* const output_mesh = m_output_mesh.pipeline_value();
 			return_if_fail(output_mesh);
+			
+			k3d::node* parent = dynamic_cast<k3d::node*>(k3d::property::pipeline_value<k3d::inode*>(this->parent()));
+			double parent_selection = parent ? parent->get_selection_weight() : 0.0;
 
-			k3d::gl::painter_render_state render_state(State, matrix(), m_selection_weight.pipeline_value(), m_show_component_selection.pipeline_value());
+			k3d::gl::painter_render_state render_state(State, matrix(), m_selection_weight.pipeline_value(), m_show_component_selection.pipeline_value(), parent_selection);
 			painter->paint_mesh(*output_mesh, render_state);
 		}
 	}

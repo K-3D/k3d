@@ -37,6 +37,7 @@
 #include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 
 #include "cached_triangulation.h"
+#include "selection_cache.h"
 
 namespace module
 {
@@ -61,60 +62,6 @@ private:
 	vbo& operator=(const vbo&);
 
 	GLuint m_name;
-};
-
-/// Storage for selection data
-typedef std::vector<k3d::mesh_selection::record> selection_records_t;
-
-/// Keep track of component selections
-class component_selection : public k3d::scheduler
-{
-public:
-	/// Provide access to the stored selection records
-	const selection_records_t& records() const
-	{
-		return m_selection_records;
-	}
-protected:
-	/// Executes the selection update based on the mesh array selection
-	virtual void on_execute(const k3d::mesh& Mesh);
-
-	selection_records_t m_selection_records;
-	boost::shared_ptr<const k3d::mesh::selection_t> m_selection_array;
-};
-
-/// Implement component_selection::on_schedule for a point selection
-class point_selection : public component_selection
-{
-protected:
-	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_selection_records.clear();
-		m_selection_array=Mesh.point_selection;
-	}
-};
-
-/// Implement component_selection::on_schedule for an edge selection
-class edge_selection : public component_selection
-{
-protected:
-	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_selection_records.clear();
-		m_selection_array=Mesh.polyhedra->edge_selection;
-	}
-};
-
-
-/// Implement component_selection::on_schedule for a face selection
-class face_selection : public component_selection
-{
-protected:
-	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_selection_records.clear();
-		m_selection_array=Mesh.polyhedra->face_selection;
-	}
 };
 
 /// Keep track of point position data in a VBO
@@ -239,6 +186,12 @@ class triangle_vbo : public k3d::scheduler
 {
 public:
 	triangle_vbo() : m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0), m_triangulation(0) {}
+	~triangle_vbo()
+	{
+		delete m_point_vbo;
+		delete m_normal_vbo;
+		delete m_index_vbo;
+	}
 	
 	/// The cached triangulation that contains the triangulation that needs to be stored in VBOs
 	void set_triangle_cache(cached_triangulation* TriangleCache)
@@ -264,74 +217,96 @@ private:
 	k3d::mesh::indices_t m_corner_to_face;
 };
 
-/// Common SDS cache functionality
-class sds_cache : public k3d::scheduler
+class sds_cache;
+
+/// Cache SDS face VBOs
+class sds_face_vbo
 {
 public:
-	sds_cache() : levels(2) {}
+	sds_face_vbo() : need_update(true), m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0) {}
+	~sds_face_vbo()
+	{
+		delete m_point_vbo;
+		delete m_normal_vbo;
+		delete m_index_vbo;
+	}
 	
-	~sds_cache();
+	/// Update the cache using the supplied sds cache
+	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache);
 	
-	/// Notify the cache that one of the registered painters changed level
-	void level_changed();
+	/// Bind the VBOs
+	void bind();
 	
-	/// Register a level property
-	void register_property(k3d::iproperty* LevelProperty);
+	/// Start indices for the faces
+	k3d::mesh::indices_t face_starts;
 	
-	/// Remove a level property
-	void remove_property(k3d::iproperty* LevelProperty);
+	/// Length of the index buffer
+	k3d::uint_t index_size;
 	
-	int levels;
-	k3d::mesh::indices_t indices; 
+	/// Set to true if an update is needed
+	bool need_update;
 private:
-	typedef std::set<k3d::iproperty*> levels_t;
-	levels_t m_levels;
-	// store connections for safe deletion of cache
-	std::vector<sigc::connection> m_connections;
+	vbo* m_point_vbo;
+	vbo* m_index_vbo;
+	vbo* m_normal_vbo;
 };
 
-/// Encapsulates a VBO SDS cache in a k3d::scheduler
-class sds_vbo_cache : public sds_cache
+/// Cache SDS edge VBOs
+class sds_edge_vbo
 {
 public:
-	sds_vbo_cache() : regenerate(true), update(true), update_selection(true), all(false) {}
+	sds_edge_vbo() : need_update(true), m_point_vbo(0) {}
+	~sds_edge_vbo()
+	{
+		delete m_point_vbo;
+	}
 	
-	k3d::sds::k3d_vbo_sds_cache cache;
-	bool regenerate;
-	bool update;
-	bool update_selection;
-	bool all;
-protected:
-	/// Scheduler implementation
-	virtual void on_execute(const k3d::mesh& Mesh);
+	/// Update the cache using the supplied sds cache
+	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache);
+	
+	/// Bind the VBOs
+	void bind();
+	
+	/// Start indices for the edges
+	k3d::mesh::indices_t edge_starts;
+	
+	/// Length of the index buffer
+	k3d::uint_t index_size;
+	
+	/// Set to true if an update is needed
+	bool need_update;
 private:
-	typedef std::set<k3d::iproperty*> levels_t;
-	levels_t m_levels;
+	vbo* m_point_vbo;
 };
 
-/// Encapsulates a basic SDS cache in a k3d::scheduler
-class sds_gl_cache : public sds_cache
+/// Cache SDS point VBOs
+class sds_point_vbo
 {
 public:
-	sds_gl_cache() : update(true), all(false) {}
+	sds_point_vbo() : need_update(true), m_point_vbo(0) {}
+	~sds_point_vbo()
+	{
+		delete m_point_vbo;
+	}
 	
-	k3d::sds::k3d_basic_opengl_sds_cache cache;
-	bool update;
-	bool all;
-protected:
-	/// Scheduler implementation
-	virtual void on_execute(const k3d::mesh& Mesh);
+	/// Update the cache using the supplied sds cache
+	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache);
+	
+	/// Bind the VBOs
+	void bind();
+	
+	/// Length of the index buffer
+	k3d::uint_t index_size;
+	
+	/// Set to true if an update is needed
+	bool need_update;
 private:
-	typedef std::set<k3d::iproperty*> levels_t;
-	levels_t m_levels;
+	vbo* m_point_vbo;
 };
 
 //////////////
 // Convenience functions  and types for functionality used by several mesh painters
 /////////////
-
-/// Convert the array selection in SelectionArray to continuous blocks of maximal size in Selection
-void array_to_selection(const k3d::mesh::selection_t& SelectionArray, selection_records_t& Selection);
 
 /// Derives deformed or transformed faces and their neighbours from the points listed in Points and puts them in DeformedFaces. All points belonging to a transformed or deformed face are placed into AffectedPoints.
 void get_deformed_faces(const k3d::mesh::polyhedra_t& Polyhedra, const k3d::mesh::indices_t& Points, std::list<size_t>& AffectedFaces, std::set<size_t>& AffectedPoints);

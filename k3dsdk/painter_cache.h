@@ -3,6 +3,7 @@
 
 #include "idocument.h"
 #include "log.h"
+#include "type_registry.h"
 
 #include <map>
 #include <set>
@@ -37,7 +38,7 @@ template<class key_t, class data_t> class painter_cache
 		~painter_cache()
 		{
 			if (!m_data.empty())
-				k3d::log() << warning << "cache for <" << typeid(key_t).name() << ", " << typeid(data_t).name() << "> still has " << m_data.size() << " entries." << std::endl;
+				k3d::log() << warning << "cache for <" << demangle(typeid(key_t)) << ", " << demangle(typeid(data_t)) << "> still has " << m_data.size() << " entries." << std::endl;
 		}
 
 		/// Get the data associated with Key, or NULL if there is none.
@@ -56,7 +57,6 @@ template<class key_t, class data_t> class painter_cache
 			if (data == m_data.end())
 			{
 				data = m_data.insert(std::make_pair(Key, new data_t())).first;
-				k3d::log() << debug << "cache for <" << typeid(&Key).name() << ", " << typeid(data->second).name() << "> now has " << m_data.size() << " entries. Last key: " << Key << std::endl;
 			}
 			return data->second;
 		}

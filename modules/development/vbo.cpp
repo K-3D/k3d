@@ -20,6 +20,7 @@
 
 
 #include "vbo.h"
+#include "sds_cache.h"
 
 #include <k3dsdk/hints.h>
 #include <k3dsdk/named_array_operations.h>
@@ -54,28 +55,6 @@ vbo::~ vbo( )
 vbo::operator GLuint( ) const
 {
 	return m_name;
-}
-
-////////
-// class component_selection
-///////
-
-void component_selection::on_execute(const k3d::mesh& Mesh)
-{
-	if (!m_selection_array)
-		on_schedule(Mesh, 0);
-	const k3d::mesh::selection_t& selection_array = *m_selection_array;
-	for (size_t i = 0; i < selection_array.size();)
-	{
-		size_t start = i;
-		k3d::mesh_selection::record record(start, i+1, selection_array[i]);
-		while (i < selection_array.size() && record.weight == selection_array[i])
-		{
-			record.end = i+1;
-			++i;
-		}
-		m_selection_records.push_back(record);
-	}
 }
 
 ///////////
@@ -1065,129 +1044,267 @@ void triangle_vbo::draw_range(k3d::uint_t Start, k3d::uint_t End)
 	glDrawElements(GL_TRIANGLES, endindex - startindex, GL_UNSIGNED_INT, static_cast<GLuint*>(0) + startindex);
 }
 
-////////////
-// sds_cache
-////////////
 
-sds_cache::~sds_cache()
-{
-	// disconnect these, so they no longer point into freed memory
-	for (size_t i = 0; i != m_connections.size(); ++i)
-		m_connections[i].disconnect();
-}
-
-void sds_cache::level_changed()
-{
-	// search the highest level requested by the clients
-	levels = 0;
-	for (sds_cache::levels_t::iterator level_it = m_levels.begin(); level_it != m_levels.end(); ++level_it)
-	{
-		const long new_level = boost::any_cast<const long>((*level_it)->property_value());
-		levels = new_level > levels ? new_level : levels;
-	}
-	k3d::log() << debug << "New maximum level: " << levels << std::endl;
-	m_scheduled = true;
-}
-
-void sds_cache::register_property(k3d::iproperty* LevelProperty)
-{
-	if (m_levels.insert(LevelProperty).second)
-	{
-		m_connections.push_back(LevelProperty->property_deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &sds_cache::remove_property), LevelProperty)));
-		level_changed();
-	}
-}
-
-void sds_cache::remove_property(k3d::iproperty* LevelProperty)
-{
-	m_levels.erase(LevelProperty);
-}
 
 ////////////
-// sds_vbo_cache
+// sds_face_vbo
 /////////////
 
-void sds_vbo_cache::on_execute(const k3d::mesh& Mesh)
+/// Helper clas to update the point VBO
+class update_face_vbo_visitor : public k3d::sds::sds_visitor
 {
-	if (levels > 0 || regenerate)
+public:
+	update_face_vbo_visitor(const k3d::mesh::indices_t& FaceStarts, const GLuint* Indices, k3d::point3* Points) :
+		m_face_starts(FaceStarts),
+		m_indices(Indices),
+		m_points(Points),
+		m_index(0) 
+	{}
+	virtual void on_point(const k3d::sds::position_t& Point, const k3d::sds::position_t& Normal = k3d::sds::position_t(0,0,1))
 	{
-		k3d::log() << debug << "SDS: Setting new level to " << levels << std::endl;
-		cache.set_input(&Mesh);
-		cache.set_levels(levels);
-		update = true;
-		update_selection = true;
-		regenerate = true;
+		modified_indices.push_back(m_index);
+		m_points[m_index++] = Point;
+		normals.push_back(Normal); // Unfortunately, we need temp storage for the normals, since we can't map two buffers at once
 	}
-	cache.set_new_addresses(Mesh);
-	if (update)
+	virtual void on_face(k3d::uint_t Face)
 	{
-		cache.update(indices);
+		m_index = m_indices[m_face_starts[Face]];
 	}
-	if (regenerate)
+	k3d::mesh::indices_t modified_indices;
+	std::vector<k3d::sds::position_t> normals;
+private:
+	const k3d::mesh::indices_t& m_face_starts;
+	const GLuint* m_indices;
+	k3d::point3* m_points;
+	k3d::uint_t m_index;
+};
+
+void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache)
+{
+	if (!need_update)
+		return;
+	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
 	{
-		cache.regenerate_vbos();
+		face_visitor visitor;
+		Cache.visit_faces(visitor, Level, false);
+		
+		m_point_vbo = new vbo();
+		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.points_array[0]) * visitor.points_array.size(), &visitor.points_array[0], GL_STATIC_DRAW);
+		
+		m_normal_vbo = new vbo();
+		glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.normals_array[0]) * visitor.normals_array.size(), &visitor.normals_array[0], GL_STATIC_DRAW);
+		
+		m_index_vbo = new vbo();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(visitor.indices[0]) * visitor.indices.size(), &visitor.indices[0], GL_STATIC_DRAW);
+		
+		face_starts = visitor.face_starts;
+		index_size = visitor.indices.size();
 	}
-	if (update)
+	else // Only update the point VBO with new positions
 	{
-		cache.update_vbo_positions();
+		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+		k3d::point3* points = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
+		GLuint* indices = static_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY));
+		
+		update_face_vbo_visitor visitor(face_starts, indices, points);
+		Cache.visit_faces(visitor, Level, true);
+		
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+		
+		glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
+		k3d::point3* normals = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+		for (k3d::uint_t i = 0; i != visitor.modified_indices.size(); ++i)
+			normals[visitor.modified_indices[i]] = visitor.normals[i];
+		glUnmapBuffer(GL_ARRAY_BUFFER);
 	}
-	if (update_selection)
-	{
-		cache.update_selection();
-		if (!update)
-			cache.clear_modified_faces();
-	}
+	need_update = false;
+}
+
+void sds_face_vbo::bind()
+{
+	if (!glIsBuffer(*m_point_vbo) || !glIsBuffer(*m_index_vbo))
+		return;
+	glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+	glVertexPointer(3, GL_DOUBLE, 0, 0);
+	glEnableClientState(GL_VERTEX_ARRAY);
 	
-	regenerate = false;
-	update = false;
-	update_selection = false;
-	levels = 0;
-	all = false;
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
+	
+	if (glIsBuffer(*m_normal_vbo))
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo); // activate normals VBO
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glNormalPointer(GL_DOUBLE, 0, 0);
+	}
 }
 
-////////////
-// sds_gl_cache
+/////////////
+// sds_edge_vbo
 /////////////
 
-void sds_gl_cache::on_execute(const k3d::mesh& Mesh)
+/// Helper clas to update the point VBO
+class update_edge_vbo_visitor : public k3d::sds::sds_visitor
 {
-	cache.set_new_addresses(Mesh);
-	if (levels > 0)
+public:
+	update_edge_vbo_visitor(const k3d::mesh::indices_t& EdgeStarts,
+			k3d::point3* Points,
+			const k3d::mesh::indices_t& ClockwiseEdges,
+			const k3d::mesh::indices_t& LoopFirstEdges,
+			const k3d::mesh::indices_t& FaceFirstLoops) :
+		m_edge_starts(EdgeStarts),
+		m_points(Points),
+		m_index(0),
+		m_clockwise_edges(ClockwiseEdges),
+		m_loop_first_edges(LoopFirstEdges),
+		m_face_first_loops(FaceFirstLoops)
+	{}
+	virtual void on_point(const k3d::sds::position_t& Point, const k3d::sds::position_t& Normal = k3d::sds::position_t(0,0,1))
 	{
-		k3d::log() << debug << "SDS: Setting new level to " << levels << std::endl;
-		cache.set_input(&Mesh);
-		cache.set_levels(levels);
-		update = true;
+		m_points[m_index++] = Point;
 	}
-	if (update)
+	virtual void on_face(k3d::uint_t Face)
 	{
-		cache.update(indices);
-		cache.clear_modified_faces();
+		m_edge = m_loop_first_edges[m_face_first_loops[Face]];
 	}
-	update = false;
-	levels = 0;
-	all = false;
+	virtual void on_edge()
+	{
+		m_index = m_edge_starts[m_edge];
+		m_edge = m_clockwise_edges[m_edge];
+	}
+private:
+	const k3d::mesh::indices_t& m_edge_starts;
+	k3d::point3* m_points;
+	k3d::uint_t m_index;
+	const k3d::mesh::indices_t& m_clockwise_edges;
+	const k3d::mesh::indices_t& m_loop_first_edges;
+	const k3d::mesh::indices_t& m_face_first_loops;
+	k3d::uint_t m_edge;
+};
+
+void sds_edge_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache)
+{
+	if (!need_update)
+		return;
+	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
+	{
+		edge_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops);
+		Cache.visit_borders(visitor, Level, false);
+		
+		m_point_vbo = new vbo();
+		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.points_array[0]) * visitor.points_array.size(), &visitor.points_array[0], GL_STATIC_DRAW);
+		
+		edge_starts = visitor.edge_starts;
+		index_size = visitor.points_array.size();
+	}
+	else // Only update the point VBO with new positions
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+		k3d::point3* points = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+		
+		update_edge_vbo_visitor visitor(edge_starts, points, *Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops);
+		Cache.visit_borders(visitor, Level, true);
+		
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+	}
+	need_update = false;
+}
+
+void sds_edge_vbo::bind()
+{
+	if (!glIsBuffer(*m_point_vbo))
+		return;
+	glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+	glVertexPointer(3, GL_DOUBLE, 0, 0);
+	glEnableClientState(GL_VERTEX_ARRAY);
+}
+
+/////////////
+// sds_point_vbo
+/////////////
+
+/// Helper clas to update the point VBO
+class update_point_vbo_visitor : public k3d::sds::sds_visitor
+{
+public:
+	update_point_vbo_visitor(k3d::point3* Points,
+			const k3d::mesh::indices_t& ClockwiseEdges,
+			const k3d::mesh::indices_t& LoopFirstEdges,
+			const k3d::mesh::indices_t& FaceFirstLoops,
+			const k3d::mesh::indices_t& EdgePoints) :
+		m_points(Points),
+		m_clockwise_edges(ClockwiseEdges),
+		m_loop_first_edges(LoopFirstEdges),
+		m_face_first_loops(FaceFirstLoops),
+		m_edge_points(EdgePoints)
+	{}
+	virtual void on_point(const k3d::sds::position_t& Point, const k3d::sds::position_t& Normal = k3d::sds::position_t(0,0,1))
+	{
+		m_points[m_edge_points[m_edge]] = Point;
+	}
+	virtual void on_face(k3d::uint_t Face)
+	{
+		m_edge = m_loop_first_edges[m_face_first_loops[Face]];
+	}
+	virtual void on_edge()
+	{
+		m_edge = m_clockwise_edges[m_edge];
+	}
+private:
+	k3d::point3* m_points;
+	const k3d::mesh::indices_t& m_clockwise_edges;
+	const k3d::mesh::indices_t& m_loop_first_edges;
+	const k3d::mesh::indices_t& m_face_first_loops;
+	const k3d::mesh::indices_t& m_edge_points;
+	k3d::uint_t m_edge;
+};
+
+void sds_point_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache)
+{
+	if (!need_update)
+		return;
+	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
+	{
+		point_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->edge_points, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops, Mesh.points->size());
+		Cache.visit_corners(visitor, Level, false);
+		
+		m_point_vbo = new vbo();
+		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.points_array[0]) * visitor.points_array.size(), &visitor.points_array[0], GL_STATIC_DRAW);
+		
+		index_size = visitor.points_array.size();
+	}
+	else // Only update the point VBO with new positions
+	{
+		k3d::log() << debug << "updating corner buffer" << std::endl;
+		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+		k3d::point3* points = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+		
+		update_point_vbo_visitor visitor(points, *Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops, *Mesh.polyhedra->edge_points);
+		Cache.visit_corners(visitor, Level, true);
+		
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+	}
+	need_update = false;
+}
+
+void sds_point_vbo::bind()
+{
+	if (!glIsBuffer(*m_point_vbo))
+		return;
+	glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+	glVertexPointer(3, GL_DOUBLE, 0, 0);
+	glEnableClientState(GL_VERTEX_ARRAY);
 }
 
 ///////////////
 // Convenience functions
 //////////////
-
-void array_to_selection( const k3d::mesh::selection_t & SelectionArray, selection_records_t& Selection )
-{
-	Selection.clear();
-	for (size_t i = 0; i < SelectionArray.size();)
-	{
-		size_t start = i;
-		k3d::mesh_selection::record record(start, i+1, SelectionArray[i]);
-		while (record.weight == SelectionArray[i] && i < SelectionArray.size())
-		{
-			record.end = i+1;
-			++i;
-		}
-		Selection.push_back(record);
-	}
-}
 
 void get_deformed_faces(const k3d::mesh::polyhedra_t& Polyhedra, const k3d::mesh::indices_t& Points, indexlist_t& AffectedFaces, std::set<size_t>& AffectedPoints)
 {

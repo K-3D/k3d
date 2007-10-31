@@ -81,11 +81,13 @@ public:
 		
 		m_selection_cache.create_data(Mesh.points)->execute(Mesh);
 		
-		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color();
-		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
+		
+		enable_blending();
 		
 		size_t point_count = Mesh.points->size();
 		const selection_records_t& point_selection = m_selection_cache.get_data(Mesh.points)->records(); // obtain selection data
@@ -94,7 +96,7 @@ public:
 		{
 			for (selection_records_t::const_iterator record = point_selection.begin(); record != point_selection.end(); ++record)
 			{ // color by selection
-				k3d::gl::color3d(record->weight ? selected_color : color);
+				color4d(record->weight ? selected_color : color);
 				size_t start = record->begin;
 				size_t end = record->end;
 				end = end > point_count ? point_count : end;
@@ -104,11 +106,12 @@ public:
 		}
 		else
 		{ // empty selection, everything has the same color
-			k3d::gl::color3d(color);
+			color4d(color);
 			glDrawArrays(GL_POINTS, 0, Mesh.points->size());
 		}
 		
 		clean_vbo_state();
+		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
