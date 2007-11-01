@@ -414,7 +414,7 @@ struct implementation
 		viewport_control->set_camera(camera);
 		viewport_control->set_camera_preview_engine(render_engine);
 
-		render_camera_preview(*camera, *render_engine);
+		render(*camera, *render_engine);
 	}
 
 	void on_run_inline_script(const std::string Script)

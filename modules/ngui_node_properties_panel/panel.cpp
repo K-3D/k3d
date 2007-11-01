@@ -670,7 +670,7 @@ public:
 		if(!render_engine)
 			return;
 
-		render_camera_preview(*camera, *render_engine);
+		render(*camera, *render_engine);
 	}
 
 	void on_render_camera_frame()
@@ -687,7 +687,7 @@ public:
 		if(!render_engine)
 			return;
 
-		render_camera_frame(*camera, *render_engine);
+		render(*camera, *render_engine);
 	}
 
 	void on_render_camera_animation()
@@ -704,7 +704,7 @@ public:
 		if(!render_engine)
 			return;
 
-		render_camera_animation(m_document_state, *camera, *render_engine);
+		render(m_document_state, *camera, *render_engine);
 	}
 
 	void on_render_preview()
@@ -712,7 +712,7 @@ public:
 		k3d::irender_preview* render_engine = dynamic_cast<k3d::irender_preview*>(m_node);
 		return_if_fail(render_engine);
 
-		render_preview(*render_engine);
+		render(*render_engine);
 	}
 
 	void on_render_frame()
@@ -720,7 +720,7 @@ public:
 		k3d::irender_frame* render_engine = dynamic_cast<k3d::irender_frame*>(m_node);
 		return_if_fail(render_engine);
 
-		render_frame(*render_engine);
+		render(*render_engine);
 	}
 
 	void on_render_animation()
@@ -728,7 +728,7 @@ public:
 		k3d::irender_animation* render_engine = dynamic_cast<k3d::irender_animation*>(m_node);
 		return_if_fail(render_engine);
 
-		render_animation(m_document_state, *render_engine);
+		render(m_document_state, *render_engine);
 	}
 
 	void on_reset_mesh()
