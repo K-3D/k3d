@@ -157,10 +157,10 @@ public:
 		const double phimax = k3d::degrees(m_phimax.pipeline_value());
 		const double thetamax = k3d::degrees(m_thetamax.pipeline_value());
 
-		State.engine.RiTransformBegin();
+		State.stream.RiTransformBegin();
 		k3d::ri::setup_material(m_material.pipeline_value(), State);
-		State.engine.RiTorusV(majorradius, minorradius, phimin, phimax, thetamax);
-		State.engine.RiTransformEnd();
+		State.stream.RiTorusV(majorradius, minorradius, phimin, phimax, thetamax);
+		State.stream.RiTransformEnd();
 	}
 
 	static k3d::iplugin_factory& get_factory()

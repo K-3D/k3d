@@ -47,7 +47,7 @@ namespace ri
 void motion_begin(const render_state& State)
 {
 	if(motion_blur(State))
-		State.engine.RiMotionBeginV(State.sample_times);
+		State.stream.RiMotionBeginV(State.sample_times);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ void motion_begin(const render_state& State)
 void motion_end(const render_state& State)
 {
 	if(motion_blur(State))
-		State.engine.RiMotionEnd();
+		State.stream.RiMotionEnd();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -111,20 +111,20 @@ void setup_material(iunknown* const Material, const render_state& State)
 		if(!last_sample(State))
 			return;
 
-		State.engine.RiColor(k3d::color(1, 1, 1));
-		State.engine.RiOpacity(k3d::color(1, 1, 1));
-		State.engine.RiSurfaceV(path(), "null");
-		State.engine.RiDisplacementV(path(), "null");
-		State.engine.RiAtmosphereV(path(), "null");
-		State.engine.RiInteriorV(path(), "null");
-		State.engine.RiExteriorV(path(), "null");
+		State.stream.RiColor(k3d::color(1, 1, 1));
+		State.stream.RiOpacity(k3d::color(1, 1, 1));
+		State.stream.RiSurfaceV(path(), "null");
+		State.stream.RiDisplacementV(path(), "null");
+		State.stream.RiAtmosphereV(path(), "null");
+		State.stream.RiInteriorV(path(), "null");
+		State.stream.RiExteriorV(path(), "null");
 	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // set_attributes
 
-void set_attributes(iproperty_collection& Properties, irender_engine& Engine)
+void set_attributes(iproperty_collection& Properties, istream& Stream)
 {
 	const iproperty_collection::properties_t& properties = Properties.properties();
 
@@ -146,14 +146,14 @@ void set_attributes(iproperty_collection& Properties, irender_engine& Engine)
 	}
 
 	for(parameter_lists_t::iterator parameter_list = parameter_lists.begin(); parameter_list != parameter_lists.end(); ++parameter_list)
-		Engine.RiAttributeV(parameter_list->first, parameter_list->second);
+		Stream.RiAttributeV(parameter_list->first, parameter_list->second);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // set_options
 
 /// Extracts RenderMan data from a property collection, generating corresponding calls to RiOption()
-void set_options(iproperty_collection& Properties, irender_engine& Engine)
+void set_options(iproperty_collection& Properties, istream& Stream)
 {
 	const iproperty_collection::properties_t& properties = Properties.properties();
 
@@ -175,7 +175,7 @@ void set_options(iproperty_collection& Properties, irender_engine& Engine)
 	}
 
 	for(parameter_lists_t::iterator parameter_list = parameter_lists.begin(); parameter_list != parameter_lists.end(); ++parameter_list)
-		Engine.RiOptionV(parameter_list->first, parameter_list->second);
+		Stream.RiOptionV(parameter_list->first, parameter_list->second);
 }
 
 } // namespace ri

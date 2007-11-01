@@ -535,7 +535,7 @@ public:
 	void on_renderman_render(const k3d::ri::render_state& State)
 	{
 		k3d::ri::setup_material(m_material.pipeline_value(), State);
-		State.engine.RiGeometryV("teapot");
+		State.stream.RiGeometryV("teapot");
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -26,7 +26,7 @@
 #include <k3dsdk/iaqsis.h>
 #include <k3dsdk/ishader_collection_ri.h>
 #include <k3dsdk/idisplacement_shader_ri.h>
-#include <k3dsdk/irender_engine_ri.h>
+#include <k3dsdk/istream_ri.h>
 #include <k3dsdk/isurface_shader_ri.h>
 #include <k3dsdk/render_state_ri.h>
 #include <k3dsdk/shader_ri.h>
@@ -106,7 +106,7 @@ protected:
 			const std::string target_name = name();
 			const std::string target_variable = layer_property->get_target_variable();
 
-			State.engine.RiConnectShaderLayers(Type, source_name, source_variable, target_name, target_variable);
+			State.stream.RiConnectShaderLayers(Type, source_name, source_variable, target_name, target_variable);
 		}
 	}
 };
@@ -131,7 +131,7 @@ public:
 	{
 		setup_connected_layers<k3d::aqsis::idisplacement_layer, k3d::ri::idisplacement_shader>(State, &k3d::ri::idisplacement_shader::setup_renderman_displacement_shader);
 		State.shaders.use_shader(shader_path());
-		State.engine.RiShaderLayerV("displacement", shader_path(), shader_name(), name(), shader_arguments(State));
+		State.stream.RiShaderLayerV("displacement", shader_path(), shader_name(), name(), shader_arguments(State));
 		setup_connections<k3d::aqsis::idisplacement_layer>("displacement", State);
 	}
 
@@ -170,7 +170,7 @@ public:
 	{
 		setup_connected_layers<k3d::aqsis::isurface_layer, k3d::ri::isurface_shader>(State, &k3d::ri::isurface_shader::setup_renderman_surface_shader);
 		State.shaders.use_shader(shader_path());
-		State.engine.RiShaderLayerV("surface", shader_path(), shader_name(), name(), shader_arguments(State));
+		State.stream.RiShaderLayerV("surface", shader_path(), shader_name(), name(), shader_arguments(State));
 		setup_connections<k3d::aqsis::isurface_layer>("surface", State);
 	}
 

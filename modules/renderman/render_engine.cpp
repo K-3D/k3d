@@ -39,7 +39,7 @@
 #include <k3dsdk/irender_camera_animation.h>
 #include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/irender_camera_preview.h>
-#include <k3dsdk/irender_engine_ri.h>
+#include <k3dsdk/istream_ri.h>
 #include <k3dsdk/irenderable_ri.h>
 #include <k3dsdk/itexture_ri.h>
 #include <k3dsdk/itransform_source.h>
@@ -52,7 +52,7 @@
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/property_group_collection.h>
-#include <k3dsdk/render_engine_ri.h>
+#include <k3dsdk/stream_ri.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/shader_cache.h>
@@ -102,9 +102,9 @@ private:
 class setup_texture
 {
 public:
-	explicit setup_texture(k3d::inetwork_render_frame& Frame, k3d::ri::irender_engine& Engine, k3d::ri::ishader_collection& Shaders) :
+	explicit setup_texture(k3d::inetwork_render_frame& Frame, k3d::ri::istream& Stream, k3d::ri::ishader_collection& Shaders) :
 		frame(Frame),
-		engine(Engine),
+		stream(Stream),
 		shaders(Shaders)
 	{
 	}
@@ -112,12 +112,12 @@ public:
 	void operator()(k3d::inode* const Node)
 	{
 		if(k3d::ri::itexture* const texture = dynamic_cast<k3d::ri::itexture*>(Node))
-			texture->setup_renderman_texture(frame, engine, shaders);
+			texture->setup_renderman_texture(frame, stream, shaders);
 	}
 
 private:
 	k3d::inetwork_render_frame& frame;
-	k3d::ri::irender_engine& engine;
+	k3d::ri::istream& stream;
 	k3d::ri::ishader_collection& shaders;
 };
 
@@ -438,15 +438,15 @@ private:
 		Frame.add_render_operation("ri", m_render_engine.pipeline_value(), k3d::filesystem::native_path(k3d::ustring::from_utf8(ribfilename)), VisibleRender);
 
 		// Create the Ri render engine object ...
-		k3d::ri::render_engine engine(ribfile);
+		k3d::ri::stream stream(ribfile);
 
 		// Administrivia ...
-		engine.RiNewline();
-		engine.RiComment("Created with K-3D Version " K3D_VERSION ", http://www.k-3d.org");
+		stream.RiNewline();
+		stream.RiComment("Created with K-3D Version " K3D_VERSION ", http://www.k-3d.org");
 
 		// Set path options ...
-		engine.RiNewline();
-		engine.RiComment("Setup file search paths");
+		stream.RiNewline();
+		stream.RiComment("Setup file search paths");
 
 		k3d::ri::parameter_list searchpath_options;
 		searchpath_options.push_back(
@@ -455,22 +455,22 @@ private:
 				k3d::ri::UNIFORM,
 				1,
 				k3d::ri::string(k3d::shader_cache_path().native_filesystem_string() + ":&")));
-		engine.RiOptionV("searchpath", searchpath_options);
+		stream.RiOptionV("searchpath", searchpath_options);
 
 		// Perform frame-start operations for textures
-		std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::setup_texture(Frame, engine, Shaders));
+		std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::setup_texture(Frame, stream, Shaders));
 
 		// Start the (final output) frame ...
-		engine.RiNewline();
-		engine.RiFrameBegin(1);
+		stream.RiNewline();
+		stream.RiFrameBegin(1);
 
 		const std::string hider = m_hider.pipeline_value();
 		if(!hider.empty())
-		    engine.RiHiderV(hider);
+		    stream.RiHiderV(hider);
 
 		// Set limits options
-		engine.RiNewline();
-		engine.RiComment("Setup options");
+		stream.RiNewline();
+		stream.RiComment("Setup options");
 
 		k3d::typed_array<k3d::ri::integer>* const bucketsize = new k3d::typed_array<k3d::ri::integer>();
 		bucketsize->push_back(m_bucket_width.pipeline_value());
@@ -481,60 +481,60 @@ private:
 		limits.push_back(k3d::ri::parameter("bucketsize", k3d::ri::UNIFORM, 2, bucketsize));
 		limits.push_back(k3d::ri::parameter("eyesplits", k3d::ri::UNIFORM, 1, static_cast<k3d::ri::integer>(m_eye_splits.pipeline_value())));
 		limits.push_back(k3d::ri::parameter("texturememory", k3d::ri::UNIFORM, 1, static_cast<k3d::ri::integer>(m_texture_memory.pipeline_value())));
-		engine.RiOptionV("limits", limits);
+		stream.RiOptionV("limits", limits);
 
 		// Setup custom options ...
-		engine.RiNewline();
-		engine.RiComment("Setup user options");
-		k3d::ri::set_options(*this, engine);
+		stream.RiNewline();
+		stream.RiComment("Setup user options");
+		k3d::ri::set_options(*this, stream);
 
 		// Set the display type ...
-		engine.RiNewline();
-		engine.RiComment("Setup Display");
+		stream.RiNewline();
+		stream.RiComment("Setup Display");
 
 		k3d::filesystem::path outputimage(OutputImagePath);
 
 		if(VisibleRender)
-			engine.RiDisplayV(outputimage.leaf().raw(), k3d::ri::RI_FRAMEBUFFER(), k3d::ri::RI_RGB());
+			stream.RiDisplayV(outputimage.leaf().raw(), k3d::ri::RI_FRAMEBUFFER(), k3d::ri::RI_RGB());
 		else
 		{
 			if(m_render_alpha.pipeline_value())
-				engine.RiDisplayV(outputimage.leaf().raw(), k3d::ri::RI_FILE(), k3d::ri::RI_RGBA());
+				stream.RiDisplayV(outputimage.leaf().raw(), k3d::ri::RI_FILE(), k3d::ri::RI_RGBA());
 			else
-				engine.RiDisplayV(outputimage.leaf().raw(), k3d::ri::RI_FILE(), k3d::ri::RI_RGB());
+				stream.RiDisplayV(outputimage.leaf().raw(), k3d::ri::RI_FILE(), k3d::ri::RI_RGB());
 		}
 
 		const k3d::ri::unsigned_integer pixel_width = m_pixel_width.pipeline_value();
 		const k3d::ri::unsigned_integer pixel_height = m_pixel_height.pipeline_value();
 		const k3d::ri::real pixel_aspect_ratio = m_pixel_aspect_ratio.pipeline_value();
 
-		engine.RiFormat(pixel_width, pixel_height, pixel_aspect_ratio);
+		stream.RiFormat(pixel_width, pixel_height, pixel_aspect_ratio);
 
 		// Set pixel sampling rates ...
-		engine.RiPixelSamples(m_pixel_xsamples.pipeline_value(), m_pixel_ysamples.pipeline_value());
-		engine.RiPixelFilter(m_pixel_filter.pipeline_value(), m_pixel_filter_width.pipeline_value(), m_pixel_filter_height.pipeline_value());
+		stream.RiPixelSamples(m_pixel_xsamples.pipeline_value(), m_pixel_ysamples.pipeline_value());
+		stream.RiPixelFilter(m_pixel_filter.pipeline_value(), m_pixel_filter_width.pipeline_value(), m_pixel_filter_height.pipeline_value());
 
 		// Set gain & gamma ...
-		engine.RiExposure(m_exposure.pipeline_value(), m_gamma.pipeline_value());
+		stream.RiExposure(m_exposure.pipeline_value(), m_gamma.pipeline_value());
 
 		// Set depth-of-field options ...
 		if(m_dof.pipeline_value())
-			engine.RiDepthOfField(
+			stream.RiDepthOfField(
 				m_fstop.pipeline_value(),
 				m_focal_length.pipeline_value(),
 				m_focus_plane.pipeline_value());
 
 		// Set global shading rate ...
-		engine.RiShadingRate(m_shading_rate.pipeline_value());
+		stream.RiShadingRate(m_shading_rate.pipeline_value());
 
 		// Set global shading interpolation ...
-		engine.RiShadingInterpolation(m_shading_interpolation.pipeline_value());
+		stream.RiShadingInterpolation(m_shading_interpolation.pipeline_value());
 
 		// We use LH orientation, the way Our Lord Who Art In Heaven wants us to ...
-		engine.RiOrientation(k3d::ri::RI_LH());
+		stream.RiOrientation(k3d::ri::RI_LH());
 
 		// Double-sided surfaces ...
-		engine.RiSides(m_two_sided.pipeline_value() ? 2 : 1);
+		stream.RiSides(m_two_sided.pipeline_value() ? 2 : 1);
 
 		// Crop window ...
 		const double crop_left = boost::any_cast<double>(k3d::property::pipeline_value(Camera.crop_window().crop_left()));
@@ -545,7 +545,7 @@ private:
 		if(crop_left >= crop_right || crop_top >= crop_bottom)
 			k3d::user_interface().message("Current crop window settings will produce an empty image");
 
-		engine.RiCropWindow(crop_left, crop_right, crop_top, crop_bottom);
+		stream.RiCropWindow(crop_left, crop_right, crop_top, crop_bottom);
 
 		// Setup our motion-blur sampling loop ...
 		k3d::ri::sample_times_t samples(1, 0.0);
@@ -572,12 +572,12 @@ private:
 			motion_blur_camera_orientation_samples.push_back(orientation);
 
 			// Setup render state ...
-			k3d::ri::render_state state(Frame, engine, Shaders, Camera.projection(), k3d::ri::FINAL_FRAME, samples, sample_index, transform_matrix);
+			k3d::ri::render_state state(Frame, stream, Shaders, Camera.projection(), k3d::ri::FINAL_FRAME, samples, sample_index, transform_matrix);
 
 			if(k3d::ri::last_sample(state))
 			{
-				engine.RiNewline();
-				engine.RiComment("Setup viewing transformation");
+				stream.RiNewline();
+				stream.RiComment("Setup viewing transformation");
 
 				if(k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(&Camera.projection()))
 				{
@@ -589,9 +589,9 @@ private:
 					const double far = boost::any_cast<double>(k3d::property::pipeline_value(perspective->far()));
 					return_val_if_fail(near > 0, false);
 
-					engine.RiProjectionV("perspective");
-					engine.RiScreenWindow(left / near, right / near, bottom / near, top / near);
-					engine.RiClipping(near, far);
+					stream.RiProjectionV("perspective");
+					stream.RiScreenWindow(left / near, right / near, bottom / near, top / near);
+					stream.RiClipping(near, far);
 				}
 				else if(k3d::iorthographic* const orthographic = dynamic_cast<k3d::iorthographic*>(&Camera.projection()))
 				{
@@ -615,60 +615,60 @@ private:
 					const double tan_fov = height * 0.5 / near;
 					const double size = distance * tan_fov;
 
-					engine.RiProjectionV("orthographic");
-					engine.RiScreenWindow(-size * aspect, size * aspect, -size, size);
-					engine.RiClipping(near, far);
+					stream.RiProjectionV("orthographic");
+					stream.RiScreenWindow(-size * aspect, size * aspect, -size, size);
+					stream.RiClipping(near, far);
 				}
 
 				if(k3d::ri::motion_blur(state) && motion_blur_camera)
 				{
-					engine.RiMotionBeginV(state.sample_times);
+					stream.RiMotionBeginV(state.sample_times);
 					for(unsigned int i = 0; i < motion_blur_camera_orientation_samples.size(); ++i)
 					{
 						k3d::quaternion q(motion_blur_camera_orientation_samples[i]);
 						k3d::euler_angles a(q, k3d::euler_angles::ZXYstatic);
-						engine.RiRotate(-k3d::degrees(a[0]), 0.0f, 0.0f, 1.0f);
+						stream.RiRotate(-k3d::degrees(a[0]), 0.0f, 0.0f, 1.0f);
 					}
-					engine.RiMotionEnd();
+					stream.RiMotionEnd();
 
-					engine.RiMotionBeginV(state.sample_times);
+					stream.RiMotionBeginV(state.sample_times);
 					for(unsigned int i = 0; i < motion_blur_camera_orientation_samples.size(); ++i)
 					{
 						k3d::quaternion q(motion_blur_camera_orientation_samples[i]);
 						k3d::euler_angles a(q, k3d::euler_angles::ZXYstatic);
-						engine.RiRotate(-k3d::degrees(a[1]), 1.0f, 0.0f, 0.0f);
+						stream.RiRotate(-k3d::degrees(a[1]), 1.0f, 0.0f, 0.0f);
 					}
-					engine.RiMotionEnd();
+					stream.RiMotionEnd();
 
-					engine.RiMotionBeginV(state.sample_times);
+					stream.RiMotionBeginV(state.sample_times);
 					for(unsigned int i = 0; i < motion_blur_camera_orientation_samples.size(); ++i)
 					{
 						k3d::quaternion q(motion_blur_camera_orientation_samples[i]);
 						k3d::euler_angles a(q, k3d::euler_angles::ZXYstatic);
-						engine.RiRotate(-k3d::degrees(a[2]), 0.0f, 1.0f, 0.0f);
+						stream.RiRotate(-k3d::degrees(a[2]), 0.0f, 1.0f, 0.0f);
 					}
-					engine.RiMotionEnd();
+					stream.RiMotionEnd();
 
-					engine.RiMotionBeginV(state.sample_times);
+					stream.RiMotionBeginV(state.sample_times);
 					for(unsigned int i = 0; i < motion_blur_camera_position_samples.size(); ++i)
-						engine.RiTranslate(-motion_blur_camera_position_samples[i][0], -motion_blur_camera_position_samples[i][1], -motion_blur_camera_position_samples[i][2]);
-					engine.RiMotionEnd();
+						stream.RiTranslate(-motion_blur_camera_position_samples[i][0], -motion_blur_camera_position_samples[i][1], -motion_blur_camera_position_samples[i][2]);
+					stream.RiMotionEnd();
 				}
 				else
 				{
 					k3d::quaternion q(motion_blur_camera_orientation_samples[0]);
 					k3d::euler_angles a(q, k3d::euler_angles::ZXYstatic);
-					engine.RiRotate(-k3d::degrees(a[0]), 0.0f, 0.0f, 1.0f);
+					stream.RiRotate(-k3d::degrees(a[0]), 0.0f, 0.0f, 1.0f);
 
 					q = k3d::quaternion(motion_blur_camera_orientation_samples[0]);
 					a = k3d::euler_angles(q, k3d::euler_angles::ZXYstatic);
-					engine.RiRotate(-k3d::degrees(a[1]), 1.0f, 0.0f, 0.0f);
+					stream.RiRotate(-k3d::degrees(a[1]), 1.0f, 0.0f, 0.0f);
 
 					q = k3d::quaternion(motion_blur_camera_orientation_samples[0]);
 					a = k3d::euler_angles(q, k3d::euler_angles::ZXYstatic);
-					engine.RiRotate(-k3d::degrees(a[2]), 0.0f, 1.0f, 0.0f);
+					stream.RiRotate(-k3d::degrees(a[2]), 0.0f, 1.0f, 0.0f);
 
-					engine.RiTranslate(-motion_blur_camera_position_samples[0][0], -motion_blur_camera_position_samples[0][1], -motion_blur_camera_position_samples[0][2]);
+					stream.RiTranslate(-motion_blur_camera_position_samples[0][0], -motion_blur_camera_position_samples[0][1], -motion_blur_camera_position_samples[0][2]);
 				}
 
 				// Default shaders ...
@@ -682,8 +682,8 @@ private:
 					m_imager_shader.pipeline_value()->setup_renderman_imager_shader(state);
 
 				// Begin the world ...
-				engine.RiNewline();
-				engine.RiWorldBegin();
+				stream.RiNewline();
+				stream.RiWorldBegin();
 			}
 
 			// Setup lights ...
@@ -698,12 +698,12 @@ private:
 			if(k3d::ri::last_sample(state))
 			{
 				// Finish the world ...
-				engine.RiWorldEnd();
+				stream.RiWorldEnd();
 			}
 		}
 
 		// Finish the frame ...
-		engine.RiFrameEnd();
+		stream.RiFrameEnd();
 
 		// Reset the time back to the beginning of the frame ...
 		writable_time_property->property_set_value(frame_time);

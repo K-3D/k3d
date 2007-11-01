@@ -26,7 +26,7 @@
 
 #include "data.h"
 #include "k3d-i18n-config.h"
-#include "irender_engine_ri.h"
+#include "istream_ri.h"
 #include "irenderable_ri.h"
 #include "render_state_ri.h"
 
@@ -84,13 +84,13 @@ void setup_material(iunknown* const Material, const render_state& State);
 // set_attributes
 
 /// Extracts RenderMan data from a property collection, generating corresponding calls to RiAttribute()
-void set_attributes(iproperty_collection& Properties, irender_engine& Engine);
+void set_attributes(iproperty_collection& Properties, istream& Engine);
 
 /////////////////////////////////////////////////////////////////////////////
 // set_options
 
 /// Extracts RenderMan data from a property collection, generating corresponding calls to RiOption()
-void set_options(iproperty_collection& Properties, irender_engine& Engine);
+void set_options(iproperty_collection& Properties, istream& Engine);
 
 /////////////////////////////////////////////////////////////////////////////
 // renderable
@@ -129,26 +129,26 @@ public:
 		// Only generate RIB on the last sample ...
 		if(last_sample(State))
 		{
-			State.engine.RiAttributeBegin();
+			State.stream.RiAttributeBegin();
 
 			if(motion_blur(State) && m_motion_blur.pipeline_value())
 			{
-				State.engine.RiMotionBeginV(State.sample_times);
+				State.stream.RiMotionBeginV(State.sample_times);
 
 				for(unsigned int i = 0; i < m_motion_blur_samples.size(); ++i)
-					State.engine.RiConcatTransform(convert(m_motion_blur_samples[i]));
+					State.stream.RiConcatTransform(convert(m_motion_blur_samples[i]));
 
-				State.engine.RiMotionEnd();
+				State.stream.RiMotionEnd();
 			}
 			else
 			{
-				State.engine.RiConcatTransform(convert(m_motion_blur_samples.front()));
+				State.stream.RiConcatTransform(convert(m_motion_blur_samples.front()));
 			}
 
-			set_attributes(*this, State.engine);
+			set_attributes(*this, State.stream);
 			on_renderman_render(State);
 
-			State.engine.RiAttributeEnd();
+			State.stream.RiAttributeEnd();
 		}
 	}
 

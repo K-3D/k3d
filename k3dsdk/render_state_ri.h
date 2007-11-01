@@ -37,16 +37,16 @@ class matrix4;
 namespace ri
 {
 
-class irender_engine;
+class istream;
 class ishader_collection;
 	
-/// Used to pass (potentially) useful rendering state from the engine to the object being rendered
+/// Used to pass (potentially) useful rendering state from the renderer to the object being rendered
 class render_state
 {
 public:
-	render_state(inetwork_render_frame& Frame, irender_engine& Engine, ishader_collection& Shaders, iprojection& Projection, const render_context_t RenderContext, const sample_times_t& SampleTimes, const unsigned_integer SampleIndex, const matrix4& CameraMatrix) :
+	render_state(inetwork_render_frame& Frame, istream& Stream, ishader_collection& Shaders, iprojection& Projection, const render_context_t RenderContext, const sample_times_t& SampleTimes, const unsigned_integer SampleIndex, const matrix4& CameraMatrix) :
 		frame(Frame),
-		engine(Engine),
+		stream(Stream),
 		shaders(Shaders),
 		projection(Projection),
 		render_context(RenderContext),
@@ -57,7 +57,7 @@ public:
 	}
 
 	inetwork_render_frame& frame;
-	irender_engine& engine;
+	istream& stream;
 	ishader_collection& shaders;
 	iprojection& projection;
 	render_context_t render_context;

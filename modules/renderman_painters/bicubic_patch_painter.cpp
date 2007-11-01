@@ -100,8 +100,8 @@ public:
 			k3d::ri::setup_material(patch_materials[patch], RenderState);
 
 			// At the moment, we force all bicubic patches to be Bezier ...
-			RenderState.engine.RiBasis("bezier", 3, "bezier", 3);
-			RenderState.engine.RiPatchV("bicubic", ri_parameters);
+			RenderState.stream.RiBasis("bezier", 3, "bezier", 3);
+			RenderState.stream.RiPatchV("bicubic", ri_parameters);
 		}
 	}
 

@@ -100,16 +100,16 @@ public:
 		k3d::ri::parameter_list displacement_attributes;
 		displacement_attributes.push_back(k3d::ri::parameter("sphere", k3d::ri::UNIFORM, 1, static_cast<k3d::ri::real>(m_DisplacementBounds.pipeline_value())));
 		displacement_attributes.push_back(k3d::ri::parameter("coordinatesystem", k3d::ri::UNIFORM, 1, k3d::ri::string("world")));
-		State.engine.RiAttributeV("displacementbound", displacement_attributes);
+		State.stream.RiAttributeV("displacementbound", displacement_attributes);
 
 		// Set base color
-		State.engine.RiColor(m_Color.pipeline_value());
+		State.stream.RiColor(m_Color.pipeline_value());
 
 		// Set opacity
-		State.engine.RiOpacity(m_Opacity.pipeline_value());
+		State.stream.RiOpacity(m_Opacity.pipeline_value());
 
 		// Set the matte attribute
-		State.engine.RiMatte(m_Matte.pipeline_value() ? 1 : 0);
+		State.stream.RiMatte(m_Matte.pipeline_value() ? 1 : 0);
 
 		// Setup shaders ...
 		if(m_surface_shader.pipeline_value())

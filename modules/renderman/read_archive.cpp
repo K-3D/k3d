@@ -58,7 +58,7 @@ public:
 		if(!k3d::filesystem::exists(file))
 			return;
 
-		State.engine.RiReadArchive(file);
+		State.stream.RiReadArchive(file);
 	}
 
 	void renderman_render_complete(const k3d::ri::render_state& State)

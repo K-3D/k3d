@@ -1,5 +1,5 @@
-#ifndef K3DSDK_RENDER_ENGINE_RI_H
-#define K3DSDK_RENDER_ENGINE_RI_H
+#ifndef K3DSDK_STREAM_RI_H
+#define K3DSDK_STREAM_RI_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "irender_engine_ri.h"
+#include "istream_ri.h"
 #include <set>
 
 namespace k3d
@@ -34,15 +34,15 @@ namespace ri
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// render_engine
+// stream
 
-/// Provides a boilerplate implementation of k3d::ri::irender_engine that writes RIB to a stream
-class render_engine :
-	public irender_engine
+/// Provides a boilerplate implementation of k3d::ri::istream that writes RIB to a stream
+class stream :
+	public istream
 {
 public:
-	render_engine(std::ostream& Stream);
-	~render_engine();
+	stream(std::ostream& Stream);
+	~stream();
 
 	bool set_inline_types(const bool Inline);
 	void use_shader(const path& Path);
@@ -161,5 +161,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_RENDER_ENGINE_RI_H
+#endif // K3DSDK_STREAM_RI_H
 

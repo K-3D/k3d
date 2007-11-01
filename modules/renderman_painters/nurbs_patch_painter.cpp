@@ -125,7 +125,7 @@ public:
 			ri_parameters.push_back(k3d::ri::parameter(k3d::ri::RI_PW(), k3d::ri::VERTEX, 1, ri_points));
 
 			k3d::ri::setup_material(patch_materials[patch], RenderState);
-			RenderState.engine.RiNuPatchV(
+			RenderState.stream.RiNuPatchV(
 				patch_u_point_counts[patch],
 				patch_u_orders[patch],
 				u_knots,

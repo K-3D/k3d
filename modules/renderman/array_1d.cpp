@@ -125,20 +125,20 @@ public:
 			return;
 		}
 
-		const k3d::ri::object_handle handle = State.engine.RiObjectBegin();
+		const k3d::ri::object_handle handle = State.stream.RiObjectBegin();
 			k3d::ri::render_state state(State);
 			state.render_context = k3d::ri::OBJECT_INSTANCE;
 			renderable->renderman_render(state);
-		State.engine.RiObjectEnd();
+		State.stream.RiObjectEnd();
 
 		k3d::ri::setup_material(m_material.pipeline_value(), State);
 
 		for(unsigned long i = 0; i != count; ++i)
 		{
-			State.engine.RiAttributeBegin();
-			State.engine.RiConcatTransform(k3d::ri::convert(layout->get_element(i, count)));
-			State.engine.RiObjectInstance(handle);
-			State.engine.RiAttributeEnd();
+			State.stream.RiAttributeBegin();
+			State.stream.RiConcatTransform(k3d::ri::convert(layout->get_element(i, count)));
+			State.stream.RiObjectInstance(handle);
+			State.stream.RiAttributeEnd();
 		}
 	}
 

@@ -164,11 +164,11 @@ public:
 			return;
 
 		// Make it happen ...
-		State.engine.RiTransformBegin();
-		State.engine.RiTransform(k3d::ri::convert(matrix()));
-		k3d::ri::set_attributes(*this, State.engine);
+		State.stream.RiTransformBegin();
+		State.stream.RiTransform(k3d::ri::convert(matrix()));
+		k3d::ri::set_attributes(*this, State.stream);
 		shader->setup_renderman_light_shader(State);
-		State.engine.RiTransformEnd();
+		State.stream.RiTransformEnd();
 	}
 
 	static k3d::iplugin_factory& get_factory()

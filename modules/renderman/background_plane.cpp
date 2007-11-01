@@ -100,10 +100,10 @@ public:
 			bottom = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->bottom()));
 		}
 		
-		State.engine.RiAttributeBegin();
-		State.engine.RiAttributeV("identifier", k3d::ri::parameter_list(1, k3d::ri::parameter("name", k3d::ri::UNIFORM, 1, k3d::ri::string(name()))));
-		State.engine.RiIdentity();
-		State.engine.RiCoordSysTransform(k3d::ri::RI_CAMERA());
+		State.stream.RiAttributeBegin();
+		State.stream.RiAttributeV("identifier", k3d::ri::parameter_list(1, k3d::ri::parameter("name", k3d::ri::UNIFORM, 1, k3d::ri::string(name()))));
+		State.stream.RiIdentity();
+		State.stream.RiCoordSysTransform(k3d::ri::RI_CAMERA());
 		
 		k3d::ri::setup_material(m_material.pipeline_value(), State);
 
@@ -113,9 +113,9 @@ public:
 		points.push_back(k3d::ri::point(k3d::point3(right, top, plane)));
 		points.push_back(k3d::ri::point(k3d::point3(left, bottom, plane)));
 		points.push_back(k3d::ri::point(k3d::point3(right, bottom, plane)));
-		State.engine.RiPatchV("bilinear", k3d::ri::parameter_list(1, k3d::ri::parameter(k3d::ri::RI_P(), k3d::ri::VERTEX, 1, points)));
+		State.stream.RiPatchV("bilinear", k3d::ri::parameter_list(1, k3d::ri::parameter(k3d::ri::RI_P(), k3d::ri::VERTEX, 1, points)));
 
-		State.engine.RiAttributeEnd();
+		State.stream.RiAttributeEnd();
 	}
 
 	void renderman_render_complete(const k3d::ri::render_state& State)

@@ -34,7 +34,7 @@ class inetwork_render_frame;
 namespace ri
 {
 
-class irender_engine;
+class istream;
 class ishader_collection;
 class render_state;
 	
@@ -43,7 +43,7 @@ class itexture :
 	public virtual iunknown
 {
 public:
-	virtual void setup_renderman_texture(inetwork_render_frame& Frame, irender_engine& Engine, ishader_collection& Shaders) = 0;
+	virtual void setup_renderman_texture(inetwork_render_frame& Frame, istream& Stream, ishader_collection& Shaders) = 0;
 	virtual const filesystem::path renderman_texture_path(const render_state& State) = 0;
 
 protected:

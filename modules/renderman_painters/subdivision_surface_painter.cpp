@@ -123,7 +123,7 @@ public:
 				parameters.push_back(k3d::ri::parameter(k3d::ri::RI_P(), k3d::ri::VERTEX, 1, ri_points));
 
 				k3d::ri::setup_material(material, RenderState);
-				RenderState.engine.RiSubdivisionMeshV("catmull-clark", vertex_counts, vertex_ids, tags, tag_counts, tag_integers, tag_reals, parameters);
+				RenderState.stream.RiSubdivisionMeshV("catmull-clark", vertex_counts, vertex_ids, tags, tag_counts, tag_integers, tag_reals, parameters);
 			}
 		}
 	}

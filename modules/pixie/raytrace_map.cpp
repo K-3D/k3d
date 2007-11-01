@@ -23,7 +23,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/irender_engine_ri.h>
+#include <k3dsdk/istream_ri.h>
 #include <k3dsdk/itexture_ri.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
@@ -46,7 +46,7 @@ public:
 	{
 	}
 
-	void setup_renderman_texture(k3d::inetwork_render_frame& Frame, k3d::ri::irender_engine& Engine, k3d::ri::ishader_collection& Shaders)
+	void setup_renderman_texture(k3d::inetwork_render_frame& Frame, k3d::ri::istream& Stream, k3d::ri::ishader_collection& Shaders)
 	{
 	}
 

@@ -182,7 +182,7 @@ public:
 		const double thetamax = k3d::degrees(m_thetamax.pipeline_value());
 
 		k3d::ri::setup_material(m_material.pipeline_value(), State);
-		State.engine.RiParaboloidV(radius, zmin, zmax, thetamax);
+		State.stream.RiParaboloidV(radius, zmin, zmax, thetamax);
 	}
 
 	static k3d::iplugin_factory& get_factory()

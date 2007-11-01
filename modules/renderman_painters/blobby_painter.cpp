@@ -133,7 +133,7 @@ public:
 			ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
 
 			k3d::ri::setup_material(materials[blobby], RenderState);
-			RenderState.engine.RiBlobbyV(ri_nleaf, ri_codes, ri_floats, ri_strings, ri_parameters);
+			RenderState.stream.RiBlobbyV(ri_nleaf, ri_codes, ri_floats, ri_strings, ri_parameters);
 		}
 	}
 

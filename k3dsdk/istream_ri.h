@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IRENDER_ENGINE_RI_H
-#define K3DSDK_IRENDER_ENGINE_RI_H
+#ifndef K3DSDK_ISTREAM_RI_H
+#define K3DSDK_ISTREAM_RI_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -36,7 +36,7 @@ namespace ri
 {
 
 /// Abstract binding to the Pixar RenderMan interface
-class irender_engine :
+class istream :
 	public virtual iunknown
 {
 public:
@@ -153,10 +153,10 @@ public:
 
 
 protected:
-	irender_engine() {}
-	irender_engine(const irender_engine& ) {}
-	irender_engine& operator=(const irender_engine& ) { return *this; }
-	virtual ~irender_engine() {}
+	istream() {}
+	istream(const istream& ) {}
+	istream& operator=(const istream& ) { return *this; }
+	virtual ~istream() {}
 };
 
 /// Provide definitions for the "standard" RenderMan tokens
@@ -260,5 +260,5 @@ inline const std::string RI_Z() { return "z"; }
 
 } // namespace k3d
 
-#endif // K3DSDK_IRENDER_ENGINE_RI_H
+#endif // K3DSDK_ISTREAM_RI_H
 

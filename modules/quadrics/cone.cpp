@@ -162,7 +162,7 @@ public:
 		const double thetamax = k3d::degrees(m_thetamax.pipeline_value());
 
 		k3d::ri::setup_material(m_material.pipeline_value(), State);
-		State.engine.RiConeV(height, radius, thetamax);
+		State.stream.RiConeV(height, radius, thetamax);
 	}
 
 	static k3d::iplugin_factory& get_factory()

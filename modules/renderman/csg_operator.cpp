@@ -77,31 +77,31 @@ public:
 		switch(m_type.pipeline_value())
 		{
 			case BOOLEAN_INTERSECTION:
-				State.engine.RiSolidBegin(k3d::ri::RI_INTERSECTION());
+				State.stream.RiSolidBegin(k3d::ri::RI_INTERSECTION());
 				renderable1->renderman_render(state);
 				renderable2->renderman_render(state);
 				break;
 
 			case BOOLEAN_UNION:
-				State.engine.RiSolidBegin(k3d::ri::RI_UNION());
+				State.stream.RiSolidBegin(k3d::ri::RI_UNION());
 				renderable1->renderman_render(state);
 				renderable2->renderman_render(state);
 				break;
 
 			case BOOLEAN_DIFFERENCE:
-				State.engine.RiSolidBegin(k3d::ri::RI_DIFFERENCE());
+				State.stream.RiSolidBegin(k3d::ri::RI_DIFFERENCE());
 				renderable1->renderman_render(state);
 				renderable2->renderman_render(state);
 				break;
 
 			case BOOLEAN_REVERSE_DIFFERENCE:
-				State.engine.RiSolidBegin(k3d::ri::RI_DIFFERENCE());
+				State.stream.RiSolidBegin(k3d::ri::RI_DIFFERENCE());
 				renderable2->renderman_render(state);
 				renderable1->renderman_render(state);
 				break;
 		}
 
-		State.engine.RiSolidEnd();
+		State.stream.RiSolidEnd();
 	}
 
 	void renderman_render_complete(const k3d::ri::render_state& State)

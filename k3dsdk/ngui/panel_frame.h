@@ -39,7 +39,6 @@
 
 namespace k3d { class icamera; }
 namespace k3d { class iplugin_factory; }
-namespace k3d { namespace gl { class irender_engine; } }
 namespace k3d { namespace xml { class element; } }
 
 namespace libk3dngui

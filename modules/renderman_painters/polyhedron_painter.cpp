@@ -157,7 +157,7 @@ public:
 				ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
 
 				k3d::ri::setup_material(material, RenderState);
-				RenderState.engine.RiPointsGeneralPolygonsV(loop_counts, vertex_counts, vertex_ids, ri_parameters);
+				RenderState.stream.RiPointsGeneralPolygonsV(loop_counts, vertex_counts, vertex_ids, ri_parameters);
 			}
 		}
 	}

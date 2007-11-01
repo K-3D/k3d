@@ -177,7 +177,7 @@ public:
 		const double thetamax = k3d::degrees(m_thetamax.pipeline_value());
 
 		k3d::ri::setup_material(m_material.pipeline_value(), State);
-		State.engine.RiHyperboloidV(p1, p2, thetamax);
+		State.stream.RiHyperboloidV(p1, p2, thetamax);
 	}
 
 	static k3d::iplugin_factory& get_factory()

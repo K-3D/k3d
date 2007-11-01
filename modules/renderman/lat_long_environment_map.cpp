@@ -31,7 +31,7 @@
 #include <k3dsdk/file_filter.h>
 #include <k3dsdk/ibitmap_exporter.h>
 #include <k3dsdk/inetwork_render_frame.h>
-#include <k3dsdk/irender_engine_ri.h>
+#include <k3dsdk/istream_ri.h>
 #include <k3dsdk/itexture_ri.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
@@ -67,7 +67,7 @@ public:
 	{
 	}
 	
-	void setup_renderman_texture(k3d::inetwork_render_frame& Frame, k3d::ri::irender_engine& Engine, k3d::ri::ishader_collection& Shaders)
+	void setup_renderman_texture(k3d::inetwork_render_frame& Frame, k3d::ri::istream& Stream, k3d::ri::ishader_collection& Shaders)
 	{
 		m_ri_image_path = k3d::filesystem::path();
 		m_ri_texture_path = k3d::filesystem::path();
@@ -101,7 +101,7 @@ public:
 			return_if_fail(filter->write_file(m_ri_image_path, *input));
 		}
 
-		Engine.RiMakeLatLongEnvironmentV(m_ri_image_path.native_filesystem_string(), m_ri_texture_path.native_filesystem_string(), m_filter.pipeline_value(), m_swidth.pipeline_value(), m_twidth.pipeline_value());
+		Stream.RiMakeLatLongEnvironmentV(m_ri_image_path.native_filesystem_string(), m_ri_texture_path.native_filesystem_string(), m_filter.pipeline_value(), m_swidth.pipeline_value(), m_twidth.pipeline_value());
 	}
 
 	const k3d::filesystem::path renderman_texture_path(const k3d::ri::render_state& State)

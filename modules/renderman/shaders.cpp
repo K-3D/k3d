@@ -33,7 +33,7 @@
 #include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/inetwork_render_job.h>
 #include <k3dsdk/iprojection.h>
-#include <k3dsdk/irender_engine_ri.h>
+#include <k3dsdk/istream_ri.h>
 #include <k3dsdk/irender_preview.h>
 #include <k3dsdk/ishader_collection_ri.h>
 #include <k3dsdk/isurface_shader_ri.h>
@@ -42,7 +42,7 @@
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/property_group_collection.h>
-#include <k3dsdk/render_engine_ri.h>
+#include <k3dsdk/stream_ri.h>
 #include <k3dsdk/render_state_ri.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/shader_cache.h>
@@ -73,7 +73,7 @@ public:
 	void setup_renderman_displacement_shader(const k3d::ri::render_state& State)
 	{
 		State.shaders.use_shader(shader_path());
-		State.engine.RiDisplacementV(shader_path(), shader_name(), shader_arguments(State));
+		State.stream.RiDisplacementV(shader_path(), shader_name(), shader_arguments(State));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -109,7 +109,7 @@ public:
 	void setup_renderman_imager_shader(const k3d::ri::render_state& State)
 	{
 		State.shaders.use_shader(shader_path());
-		State.engine.RiImagerV(shader_path(), shader_name(), shader_arguments(State));
+		State.stream.RiImagerV(shader_path(), shader_name(), shader_arguments(State));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -145,13 +145,13 @@ public:
 	void setup_renderman_light_shader(const k3d::ri::render_state& State)
 	{
 		State.shaders.use_shader(shader_path());
-		State.engine.RiLightSourceV(shader_path(), shader_name(), shader_arguments(State));
+		State.stream.RiLightSourceV(shader_path(), shader_name(), shader_arguments(State));
 	}
 
 	void setup_renderman_area_light_shader(const k3d::ri::render_state& State)
 	{
 		State.shaders.use_shader(shader_path());
-		State.engine.RiAreaLightSourceV(shader_path(), shader_name(), shader_arguments(State));
+		State.stream.RiAreaLightSourceV(shader_path(), shader_name(), shader_arguments(State));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -205,7 +205,7 @@ public:
 	void setup_renderman_surface_shader(const k3d::ri::render_state& State)
 	{
 		State.shaders.use_shader(shader_path());
-		State.engine.RiSurfaceV(shader_path(), shader_name(), shader_arguments(State));
+		State.stream.RiSurfaceV(shader_path(), shader_name(), shader_arguments(State));
 	}
 
 	bool render_preview()
@@ -243,7 +243,7 @@ public:
 		const std::string render_engine = boost::any_cast<std::string>(engine_property->property_value());
 
 		// Create the RenderMan render engine object
-		k3d::ri::render_engine engine(ribfile);
+		k3d::ri::stream stream(ribfile);
 
 		// Setup frame
 		frame.add_render_operation("ri", render_engine, k3d::filesystem::native_path(k3d::ustring::from_utf8(ribfilename)), true);
@@ -253,7 +253,7 @@ public:
 		// Create the render state object
 		k3d::ri::sample_times_t samples(1, 0.0);
 		const k3d::matrix4 transform_matrix = k3d::translation3D(k3d::point3(-20, 20, -20)) * k3d::rotation3D(k3d::point3(35, 45, 0));
-		k3d::ri::render_state state(frame, engine, unused, m_perspective_projection, k3d::ri::FINAL_FRAME, samples, 0, transform_matrix);
+		k3d::ri::render_state state(frame, stream, unused, m_perspective_projection, k3d::ri::FINAL_FRAME, samples, 0, transform_matrix);
 
 		// Setup options
 		k3d::ri::parameter_list searchpath_options;
@@ -263,10 +263,10 @@ public:
 				k3d::ri::UNIFORM,
 				1,
 				k3d::ri::string(k3d::shader_cache_path().native_filesystem_string() + ":&")));
-		engine.RiOptionV("searchpath", searchpath_options);
+		stream.RiOptionV("searchpath", searchpath_options);
 
-		engine.RiDisplayV("outputimage", k3d::ri::RI_FRAMEBUFFER(), k3d::ri::RI_RGB());
-		engine.RiFormat(320, 240, 1);
+		stream.RiDisplayV("outputimage", k3d::ri::RI_FRAMEBUFFER(), k3d::ri::RI_RGB());
+		stream.RiFormat(320, 240, 1);
 
 		// Create RenderMan scene
 		const double left = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.left()));
@@ -277,33 +277,33 @@ public:
 		const double far = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.far()));
 		return_val_if_fail(near > 0, false);
 
-		engine.RiProjectionV("perspective");
-		engine.RiScreenWindow(left / near, right / near, bottom / near, top / near);
-		engine.RiClipping(near, far);
+		stream.RiProjectionV("perspective");
+		stream.RiScreenWindow(left / near, right / near, bottom / near, top / near);
+		stream.RiClipping(near, far);
 
-		engine.RiRotate(0, 0, 0, 1);
-		engine.RiRotate(-35, 1, 0, 0);
-		engine.RiRotate(-90, 0, 1, 0);
-		engine.RiTranslate(10, -7, 0);
+		stream.RiRotate(0, 0, 0, 1);
+		stream.RiRotate(-35, 1, 0, 0);
+		stream.RiRotate(-90, 0, 1, 0);
+		stream.RiTranslate(10, -7, 0);
 
-		engine.RiWorldBegin();
+		stream.RiWorldBegin();
 
 		// Setup a light
-		engine.RiTransformBegin();
-		engine.RiTransform(k3d::ri::convert(k3d::translation3D(k3d::point3(-20, 20, -25))));
+		stream.RiTransformBegin();
+		stream.RiTransform(k3d::ri::convert(k3d::translation3D(k3d::point3(-20, 20, -25))));
 		k3d::ri::parameter_list parameters;
 		parameters.push_back(k3d::ri::parameter(std::string("intensity"), k3d::ri::CONSTANT, 1, (k3d::ri::real)3000.0));
 		parameters.push_back(k3d::ri::parameter(std::string("lightcolor"), k3d::ri::CONSTANT, 1, (k3d::ri::color)k3d::color(1, 1, 1)));
-		engine.RiLightSourceV(k3d::share_path() / k3d::filesystem::generic_path("shaders/k3d_pointlight.sl"), "k3d_pointlight", parameters);
-		engine.RiTransformEnd();
+		stream.RiLightSourceV(k3d::share_path() / k3d::filesystem::generic_path("shaders/k3d_pointlight.sl"), "k3d_pointlight", parameters);
+		stream.RiTransformEnd();
 
 		// Setup shader
 		setup_renderman_surface_shader(state);
 
 		// Default object
-		engine.RiCylinderV(5.0, -5.0, 5.0, 360.0);
+		stream.RiCylinderV(5.0, -5.0, 5.0, 360.0);
 
-		engine.RiWorldEnd();
+		stream.RiWorldEnd();
 
 
 		// Synchronize shader
@@ -411,19 +411,19 @@ public:
 	void setup_renderman_atmosphere_shader(const k3d::ri::render_state& State)
 	{
 		State.shaders.use_shader(shader_path());
-		State.engine.RiAtmosphereV(shader_path(), shader_name(), shader_arguments(State));
+		State.stream.RiAtmosphereV(shader_path(), shader_name(), shader_arguments(State));
 	}
 
 	void setup_renderman_interior_shader(const k3d::ri::render_state& State)
 	{
 		State.shaders.use_shader(shader_path());
-		State.engine.RiInteriorV(shader_path(), shader_name(), shader_arguments(State));
+		State.stream.RiInteriorV(shader_path(), shader_name(), shader_arguments(State));
 	}
 
 	void setup_renderman_exterior_shader(const k3d::ri::render_state& State)
 	{
 		State.shaders.use_shader(shader_path());
-		State.engine.RiExteriorV(shader_path(), shader_name(), shader_arguments(State));
+		State.stream.RiExteriorV(shader_path(), shader_name(), shader_arguments(State));
 	}
 
 	static k3d::iplugin_factory& get_factory()

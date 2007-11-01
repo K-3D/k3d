@@ -106,7 +106,7 @@ public:
 			ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
 
 			k3d::ri::setup_material(materials[group], RenderState);
-			RenderState.engine.RiCurvesV("cubic", ri_point_counts, periodic_curves[group] ? "periodic" : "nonperiodic", ri_parameters);
+			RenderState.stream.RiCurvesV("cubic", ri_point_counts, periodic_curves[group] ? "periodic" : "nonperiodic", ri_parameters);
 		}
 	}
 

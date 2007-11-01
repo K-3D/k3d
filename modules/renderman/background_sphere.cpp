@@ -100,16 +100,16 @@ public:
 		// Get data from the camera ...
 		const k3d::point3 camera_coords = State.camera_matrix * k3d::point3(0, 0, 0);
 
-		State.engine.RiAttributeBegin();
-		State.engine.RiAttributeV("identifier", k3d::ri::parameter_list(1, k3d::ri::parameter("name", k3d::ri::UNIFORM, 1, k3d::ri::string(name()))));
-		State.engine.RiIdentity();
-		State.engine.RiTranslate(camera_coords[0], camera_coords[1], camera_coords[2]);
-		State.engine.RiRotate(90.0, 1.0, 0.0, 0.0);
+		State.stream.RiAttributeBegin();
+		State.stream.RiAttributeV("identifier", k3d::ri::parameter_list(1, k3d::ri::parameter("name", k3d::ri::UNIFORM, 1, k3d::ri::string(name()))));
+		State.stream.RiIdentity();
+		State.stream.RiTranslate(camera_coords[0], camera_coords[1], camera_coords[2]);
+		State.stream.RiRotate(90.0, 1.0, 0.0, 0.0);
 
 		k3d::ri::setup_material(m_material.pipeline_value(), State);
 		
-		State.engine.RiSphereV(radius, -radius, radius, 360.0);
-		State.engine.RiAttributeEnd();
+		State.stream.RiSphereV(radius, -radius, radius, 360.0);
+		State.stream.RiAttributeEnd();
 	}
 
 	void renderman_render_complete(const k3d::ri::render_state& State)

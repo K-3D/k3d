@@ -76,10 +76,10 @@ public:
 			return;
 
 		// Make it happen ...
-		k3d::ri::set_attributes(*this, State.engine);
+		k3d::ri::set_attributes(*this, State.stream);
 		shader->setup_renderman_area_light_shader(State);
 		geometry->renderman_render(State);
-		State.engine.RiAreaLightSourceV(k3d::ri::path(), "null");
+		State.stream.RiAreaLightSourceV(k3d::ri::path(), "null");
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -176,7 +176,7 @@ public:
 		const double thetamax = k3d::degrees(m_thetamax.pipeline_value());
 
 		k3d::ri::setup_material(m_material.pipeline_value(), State);
-		State.engine.RiSphereV(radius, radius * zmin, radius * zmax, thetamax);
+		State.stream.RiSphereV(radius, radius * zmin, radius * zmax, thetamax);
 	}
 
 	static k3d::iplugin_factory& get_factory()

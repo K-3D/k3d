@@ -68,11 +68,11 @@ public:
 				return;
 			}
 
-		State.engine.RiSolidBegin(k3d::ri::RI_PRIMITIVE());
+		State.stream.RiSolidBegin(k3d::ri::RI_PRIMITIVE());
 			k3d::ri::render_state state(State);
 			state.render_context = k3d::ri::CSG_SOLID;
 			renderable->renderman_render(state);
-		State.engine.RiSolidEnd();
+		State.stream.RiSolidEnd();
 	}
 
 	void renderman_render_complete(const k3d::ri::render_state& State)

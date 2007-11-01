@@ -94,7 +94,7 @@ public:
 			ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
 
 			k3d::ri::setup_material(materials[point_group], RenderState);
-			RenderState.engine.RiPointsV(point_counts[point_group], ri_parameters);
+			RenderState.stream.RiPointsV(point_counts[point_group], ri_parameters);
 		}
 	}
 

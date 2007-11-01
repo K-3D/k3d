@@ -77,7 +77,7 @@ public:
 
 		const k3d::bounding_box3 bounding_box = m_bounding_box.pipeline_value();
 
-		State.engine.RiProcDelayedReadArchive(file, bounding_box);
+		State.stream.RiProcDelayedReadArchive(file, bounding_box);
 	}
 
 	static k3d::iplugin_factory& get_factory()

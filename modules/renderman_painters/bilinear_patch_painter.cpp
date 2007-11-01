@@ -98,7 +98,7 @@ public:
 			ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
 
 			k3d::ri::setup_material(patch_materials[patch], RenderState);
-			RenderState.engine.RiPatchV("bilinear", ri_parameters);
+			RenderState.stream.RiPatchV("bilinear", ri_parameters);
 		}
 	}
 

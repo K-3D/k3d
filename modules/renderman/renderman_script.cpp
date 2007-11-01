@@ -96,7 +96,7 @@ public:
 
 		return_if_fail(execute_script(context));
 
-		State.engine.RiReadArchive(archive_path);
+		State.stream.RiReadArchive(archive_path);
 	}
 
 	static k3d::iplugin_factory& get_factory()

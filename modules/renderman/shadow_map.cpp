@@ -27,7 +27,7 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/iprojection.h>
-#include <k3dsdk/irender_engine_ri.h>
+#include <k3dsdk/istream_ri.h>
 #include <k3dsdk/itexture_ri.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/measurement.h>
@@ -84,7 +84,7 @@ public:
 		assert_not_reached();
 	}
 
-	void setup_renderman_texture(k3d::inetwork_render_frame& Frame, k3d::ri::irender_engine& Engine, k3d::ri::ishader_collection& Shaders)
+	void setup_renderman_texture(k3d::inetwork_render_frame& Frame, k3d::ri::istream& Stream, k3d::ri::ishader_collection& Shaders)
 	{
 		m_shadow_map_path = k3d::filesystem::path();
 
@@ -94,25 +94,25 @@ public:
 		k3d::icamera* const camera = m_camera.pipeline_value();
 		return_if_fail(camera);
 
-		Engine.RiFrameBegin(0);
+		Stream.RiFrameBegin(0);
 
 		m_shadow_map_path = Frame.add_output_file("shadowmap.z");
 
-		Engine.RiDisplayV(m_shadow_map_path.native_filesystem_string(), "shadow", k3d::ri::RI_Z());
+		Stream.RiDisplayV(m_shadow_map_path.native_filesystem_string(), "shadow", k3d::ri::RI_Z());
 
 		if(m_view_shadow_map.pipeline_value())
-			Engine.RiDisplayV("+" + name(), "zframebuffer", k3d::ri::RI_Z());
+			Stream.RiDisplayV("+" + name(), "zframebuffer", k3d::ri::RI_Z());
 
-		Engine.RiFormat(m_pixel_width.pipeline_value(), m_pixel_height.pipeline_value(), 1);
-		Engine.RiPixelSamples(1, 1);
-		Engine.RiPixelFilter(k3d::ri::RI_BOX(), 1, 1);
+		Stream.RiFormat(m_pixel_width.pipeline_value(), m_pixel_height.pipeline_value(), 1);
+		Stream.RiPixelSamples(1, 1);
+		Stream.RiPixelFilter(k3d::ri::RI_BOX(), 1, 1);
 
 		k3d::ri::parameter_list hider_parameters;
 		hider_parameters.push_back(k3d::ri::parameter("depthfilter", k3d::ri::UNIFORM, 1, k3d::ri::string("midpoint")));
-		Engine.RiHiderV("hidden", hider_parameters);
+		Stream.RiHiderV("hidden", hider_parameters);
 
 		// Setup up viewing transformations
-		Engine.RiComment("Setup shadowmap viewing transformations");
+		Stream.RiComment("Setup shadowmap viewing transformations");
 
 		if(k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(&camera->projection()))
 		{
@@ -124,9 +124,9 @@ public:
 			const double far = boost::any_cast<double>(k3d::property::pipeline_value(perspective->far()));
 			return_if_fail(near > 0);
 
-			Engine.RiProjectionV("perspective");
-			Engine.RiScreenWindow(left / near, right / near, bottom / near, top / near);
-			Engine.RiClipping(near, far);
+			Stream.RiProjectionV("perspective");
+			Stream.RiScreenWindow(left / near, right / near, bottom / near, top / near);
+			Stream.RiClipping(near, far);
 		}
 		else if(k3d::iorthographic* const orthographic = dynamic_cast<k3d::iorthographic*>(&camera->projection()))
 		{
@@ -150,27 +150,27 @@ public:
 			const double tan_fov = height * 0.5 / near;
 			const double size = distance * tan_fov;
 
-			Engine.RiProjectionV("orthographic");
-			Engine.RiScreenWindow(-size * aspect, size * aspect, -size, size);
-			Engine.RiClipping(near, far);
+			Stream.RiProjectionV("orthographic");
+			Stream.RiScreenWindow(-size * aspect, size * aspect, -size, size);
+			Stream.RiClipping(near, far);
 		}
 
 		// Setup the camera viewing transform ...
 		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().transform_source_output()));
-		Engine.RiTransform(k3d::ri::convert(k3d::inverse(transform_matrix)));
+		Stream.RiTransform(k3d::ri::convert(k3d::inverse(transform_matrix)));
 
-		Engine.RiWorldBegin();
+		Stream.RiWorldBegin();
 
 		// Render objects ...
-		k3d::ri::render_state state(Frame, Engine, Shaders, camera->projection(), k3d::ri::SHADOW_MAP, k3d::ri::sample_times_t(1, 0.0), 0, transform_matrix);
+		k3d::ri::render_state state(Frame, Stream, Shaders, camera->projection(), k3d::ri::SHADOW_MAP, k3d::ri::sample_times_t(1, 0.0), 0, transform_matrix);
 		for(k3d::nodes_t::const_iterator node = document().nodes().collection().begin(); node != document().nodes().collection().end(); ++node)
 		{
 			if(k3d::ri::irenderable* const renderable = dynamic_cast<k3d::ri::irenderable*>(*node))
 				renderable->renderman_render(state);
 		}
 
-		Engine.RiWorldEnd();
-		Engine.RiFrameEnd();
+		Stream.RiWorldEnd();
+		Stream.RiFrameEnd();
 	}
 
 	const k3d::filesystem::path renderman_texture_path(const k3d::ri::render_state& State)
