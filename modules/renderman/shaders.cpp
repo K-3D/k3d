@@ -25,16 +25,16 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
-#include <k3dsdk/icamera_preview_render_engine.h>
+#include <k3dsdk/irender_camera_preview.h>
 #include <k3dsdk/idisplacement_shader_ri.h>
 #include <k3dsdk/iimager_shader_ri.h>
 #include <k3dsdk/ilight_shader_ri.h>
 #include <k3dsdk/inetwork_render_farm.h>
 #include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/inetwork_render_job.h>
-#include <k3dsdk/ipreview_render_engine.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irender_engine_ri.h>
+#include <k3dsdk/irender_preview.h>
 #include <k3dsdk/ishader_collection_ri.h>
 #include <k3dsdk/isurface_shader_ri.h>
 #include <k3dsdk/ivolume_shader_ri.h>
@@ -175,7 +175,7 @@ public:
 class surface_shader :
 	public k3d::ri::shader,
 	public k3d::ri::isurface_shader,
-	public k3d::ipreview_render_engine,
+	public k3d::irender_preview,
 	public k3d::property_group_collection
 {
 	typedef k3d::ri::shader base;
@@ -225,7 +225,7 @@ public:
 
 		// Setup RenderMan engine
 		k3d::inode* renderman_engine = 0;
-		const k3d::nodes_t render_engines = k3d::find_nodes<k3d::icamera_preview_render_engine>(document().nodes());
+		const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_camera_preview>(document().nodes());
 		for(k3d::nodes_t::const_iterator object = render_engines.begin(); object != render_engines.end(); ++object)
 		{
 			if(k3d::classes::RenderManEngine() == (*object)->factory().factory_id())

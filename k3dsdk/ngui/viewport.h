@@ -30,9 +30,9 @@
 #include "ui_component.h"
 
 #include <k3dsdk/algebra.h>
-#include <k3dsdk/icamera_animation_render_engine.h>
-#include <k3dsdk/icamera_preview_render_engine.h>
-#include <k3dsdk/icamera_still_render_engine.h>
+#include <k3dsdk/irender_camera_animation.h>
+#include <k3dsdk/irender_camera_preview.h>
+#include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/irender_engine_gl.h>
 #include <k3dsdk/line3.h>
 #include <k3dsdk/property_collection.h>
@@ -56,8 +56,8 @@ class control :
         public Gtk::DrawingArea,
 	public ui_component,
 	public k3d::property_collection,
-	public k3d::icamera_still_render_engine,
-	public k3d::icamera_animation_render_engine,
+	public k3d::irender_camera_frame,
+	public k3d::irender_camera_animation,
 	public panel::control
 {
 	typedef Gtk::DrawingArea base;
@@ -76,22 +76,22 @@ public:
 	/// Returns the OpenGL render engine for this viewport
 	k3d::gl::irender_engine* const gl_engine();
 	/// Returns the preview render engine for this viewport
-	k3d::icamera_preview_render_engine* const camera_preview_engine();
+	k3d::irender_camera_preview* const camera_preview_engine();
 	/// Returns the still render engine for this viewport
-	k3d::icamera_still_render_engine* const camera_still_engine();
+	k3d::irender_camera_frame* const camera_still_engine();
 	/// Returns the animation render engine for this viewport
-	k3d::icamera_animation_render_engine* const camera_animation_engine();
+	k3d::irender_camera_animation* const camera_animation_engine();
 
 	/// Sets the camera for this viewport
 	void set_camera(k3d::icamera* const Camera);
 	/// Sets the OpenGL render engine for this viewport
 	void set_gl_engine(k3d::gl::irender_engine* const Engine);
 	/// Sets the current preview render engine for this viewport
-	void set_camera_preview_engine(k3d::icamera_preview_render_engine* const Engine);
+	void set_camera_preview_engine(k3d::irender_camera_preview* const Engine);
 	/// Sets the current still render engine for this viewport
-	void set_camera_still_engine(k3d::icamera_still_render_engine* const Engine);
+	void set_camera_still_engine(k3d::irender_camera_frame* const Engine);
 	/// Sets the current animation render engine for this viewport
-	void set_camera_animation_engine(k3d::icamera_animation_render_engine* const Engine);
+	void set_camera_animation_engine(k3d::irender_camera_animation* const Engine);
 
 	/// Returns the viewport view matrix
 	const k3d::matrix4 get_view_matrix();

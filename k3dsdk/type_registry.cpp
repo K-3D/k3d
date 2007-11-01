@@ -30,9 +30,6 @@
 #include "ibitmap_sink.h"
 #include "ibitmap_source.h"
 #include "icamera.h"
-#include "icamera_animation_render_engine.h"
-#include "icamera_preview_render_engine.h"
-#include "icamera_still_render_engine.h"
 #include "icolor_source.h"
 #include "idisplacement_shader_ri.h"
 #include "idocument_exporter.h"
@@ -55,10 +52,14 @@
 #include "imesh_source.h"
 #include "imesh_storage.h"
 #include "inode.h"
-#include "ipreview_render_engine.h"
+#include "irender_animation.h"
+#include "irender_camera_animation.h"
+#include "irender_camera_frame.h"
+#include "irender_camera_preview.h"
+#include "irender_frame.h"
+#include "irender_preview.h"
 #include "iscalar_source.h"
 #include "iscript_engine.h"
-#include "istill_render_engine.h"
 #include "istring_source.h"
 #include "isurface_shader_ri.h"
 #include "itexture_ri.h"
@@ -173,9 +174,6 @@ void initialize_types()
 	register_type(typeid(k3d::ibitmap_sink), "k3d::ibitmap_sink");
 	register_type(typeid(k3d::ibitmap_source), "k3d::ibitmap_source");
 	register_type(typeid(k3d::icamera), "k3d::icamera");
-	register_type(typeid(k3d::icamera_animation_render_engine), "k3d::icamera_animation_render_engine");
-	register_type(typeid(k3d::icamera_preview_render_engine), "k3d::icamera_preview_render_engine");
-	register_type(typeid(k3d::icamera_still_render_engine), "k3d::icamera_still_render_engine");
 	register_type(typeid(k3d::icolor_source), "k3d::icolor_source");
 	register_type(typeid(k3d::idocument_exporter), "k3d::idocument_exporter");
 	register_type(typeid(k3d::idocument_importer), "k3d::idocument_importer");
@@ -192,10 +190,14 @@ void initialize_types()
 	register_type(typeid(k3d::int32_t), "k3d::int32_t");
 	register_type(typeid(k3d::int64_t), "k3d::int64_t");
 	register_type(typeid(k3d::int8_t), "k3d::int8_t");
-	register_type(typeid(k3d::ipreview_render_engine), "k3d::ipreview_render_engine");
+	register_type(typeid(k3d::irender_camera_animation), "k3d::irender_camera_animation");
+	register_type(typeid(k3d::irender_camera_frame), "k3d::irender_camera_frame");
+	register_type(typeid(k3d::irender_camera_preview), "k3d::irender_camera_preview");
+	register_type(typeid(k3d::irender_animation), "k3d::irender_animation");
+	register_type(typeid(k3d::irender_frame), "k3d::irender_frame");
+	register_type(typeid(k3d::irender_preview), "k3d::irender_preview");
 	register_type(typeid(k3d::iscalar_source), "k3d::iscalar_source");
 	register_type(typeid(k3d::iscript_engine), "k3d::iscript_engine");
-	register_type(typeid(k3d::istill_render_engine), "k3d::istill_render_engine");
 	register_type(typeid(k3d::istring_source), "k3d::istring_source");
 	register_type(typeid(k3d::itime_sink), "k3d::itime_sink");
 	register_type(typeid(k3d::itransform_array_1d), "k3d::itransform_array_1d");

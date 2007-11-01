@@ -55,7 +55,6 @@
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/create_plugins.h>
 #include <k3dsdk/data.h>
-#include <k3dsdk/ianimation_render_engine.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
 #include <k3dsdk/imesh_selection_sink.h>
@@ -63,10 +62,8 @@
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/ipersistent.h>
 #include <k3dsdk/ipipeline.h>
-#include <k3dsdk/ipreview_render_engine.h>
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/istill_render_engine.h>
 #include <k3dsdk/itime_sink.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_selection.h>

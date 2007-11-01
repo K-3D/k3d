@@ -31,9 +31,6 @@
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/icamera_animation_render_engine.h>
-#include <k3dsdk/icamera_preview_render_engine.h>
-#include <k3dsdk/icamera_still_render_engine.h>
 #include <k3dsdk/ilight_yafray.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_client.h>
@@ -44,6 +41,9 @@
 #include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/inetwork_render_job.h>
 #include <k3dsdk/iprojection.h>
+#include <k3dsdk/irender_camera_animation.h>
+#include <k3dsdk/irender_camera_frame.h>
+#include <k3dsdk/irender_camera_preview.h>
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
@@ -70,9 +70,9 @@ namespace libk3dyafray
 
 class render_engine :
 	public k3d::persistent<k3d::node>,
-	public k3d::icamera_preview_render_engine,
-	public k3d::icamera_still_render_engine,
-	public k3d::icamera_animation_render_engine
+	public k3d::irender_camera_preview,
+	public k3d::irender_camera_frame,
+	public k3d::irender_camera_animation
 {
 	typedef k3d::persistent<k3d::node> base;
 
@@ -232,9 +232,9 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<render_engine,
-			k3d::interface_list<k3d::icamera_animation_render_engine,
-			k3d::interface_list<k3d::icamera_still_render_engine,
-			k3d::interface_list<k3d::icamera_preview_render_engine> > > > factory(
+			k3d::interface_list<k3d::irender_camera_animation,
+			k3d::interface_list<k3d::irender_camera_frame,
+			k3d::interface_list<k3d::irender_camera_preview> > > > factory(
 				k3d::uuid(0xef38bf93, 0x66654f9f, 0x992ca91b, 0x62bae139),
 				"YafrayEngine",
 				_("Yafray Render Engine"),

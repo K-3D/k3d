@@ -54,12 +54,8 @@
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/command_tree.h>
-#include <k3dsdk/ianimation_render_engine.h>
 #include <k3dsdk/iaqsis.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/icamera_animation_render_engine.h>
-#include <k3dsdk/icamera_preview_render_engine.h>
-#include <k3dsdk/icamera_still_render_engine.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
@@ -67,11 +63,9 @@
 #include <k3dsdk/imeasurement_property.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iplugin_factory.h>
-#include <k3dsdk/ipreview_render_engine.h>
 #include <k3dsdk/iproperty_group_collection.h>
 #include <k3dsdk/iscript_property.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/istill_render_engine.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/module.h>

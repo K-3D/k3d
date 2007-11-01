@@ -23,7 +23,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/istill_render_engine.h>
+#include <k3dsdk/irender_frame.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/scripted_node.h>
@@ -42,7 +42,7 @@ namespace scripting
 
 class render_engine_script :
 	public k3d::scripted_node<k3d::persistent<k3d::node> >,
-	public k3d::istill_render_engine
+	public k3d::irender_frame
 {
 	typedef k3d::scripted_node<k3d::persistent<k3d::node> > base;
 

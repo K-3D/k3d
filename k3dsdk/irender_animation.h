@@ -1,5 +1,5 @@
-#ifndef K3DSDK_ICAMERA_ANIMATION_RENDER_ENGINE_H
-#define K3DSDK_ICAMERA_ANIMATION_RENDER_ENGINE_H
+#ifndef K3DSDK_IRENDER_ANIMATION_H
+#define K3DSDK_IRENDER_ANIMATION_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -29,24 +29,23 @@
 namespace k3d
 {
 
-class icamera;
 class file_range;
-	
-/// Abstract interface implemented by objects that can render a sequence of still images using a camera
-class icamera_animation_render_engine :
+
+/// Abstract interface implemented by objects that can render a sequence of still images
+class irender_animation :
 	public virtual iunknown
 {
 public:
-	virtual bool render_camera_animation(icamera& Camera, const file_range& OutputImages, const bool ViewCompletedImages) = 0;
+	virtual bool render_animation(const file_range& OutputImages, const bool ViewCompletedImages) = 0;
 
 protected:
-	icamera_animation_render_engine() {}
-	icamera_animation_render_engine(const icamera_animation_render_engine&) {}
-	icamera_animation_render_engine& operator = (const icamera_animation_render_engine&) { return *this; }
-	virtual ~icamera_animation_render_engine() {}
+	irender_animation() {}
+	irender_animation(const irender_animation&) {}
+	irender_animation& operator = (const irender_animation&) { return *this; }
+	virtual ~irender_animation() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_ICAMERA_ANIMATION_RENDER_ENGINE_H
+#endif // K3DSDK_IRENDER_ANIMATION_H
 

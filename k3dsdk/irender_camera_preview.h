@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IPREVIEW_RENDER_ENGINE_H
-#define K3DSDK_IPREVIEW_RENDER_ENGINE_H
+#ifndef K3DSDK_IRENDER_CAMERA_PREVIEW_H
+#define K3DSDK_IRENDER_CAMERA_PREVIEW_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -29,21 +29,23 @@
 namespace k3d
 {
 
-/// Abstract interface implemented by objects that can create a "preview" render of a scene
-class ipreview_render_engine :
+class icamera;
+	
+/// Abstract interface implemented by objects that can create a "preview" render of a scene using a camera
+class irender_camera_preview :
 	public virtual iunknown
 {
 public:
-	virtual bool render_preview() = 0;
+	virtual bool render_camera_preview(icamera& Camera) = 0;
 
 protected:
-	ipreview_render_engine() {}
-	ipreview_render_engine(const ipreview_render_engine&) {}
-	ipreview_render_engine& operator = (const ipreview_render_engine&) { return *this; }
-	virtual ~ipreview_render_engine() {}
+	irender_camera_preview() {}
+	irender_camera_preview(const irender_camera_preview&) {}
+	irender_camera_preview& operator = (const irender_camera_preview&) { return *this; }
+	virtual ~irender_camera_preview() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_IPREVIEW_RENDER_ENGINE_H
+#endif // K3DSDK_IRENDER_CAMERA_PREVIEW_H
 

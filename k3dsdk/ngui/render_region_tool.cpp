@@ -37,12 +37,12 @@
 #include "utility.h"
 #include "viewport.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/high_res_timer.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icrop_window.h>
-#include <k3dsdk/ipreview_render_engine.h>
+#include <k3dsdk/irender_camera_preview.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/state_change_set.h>
 
@@ -110,7 +110,7 @@ public:
 		if(!camera)
 			return;
 
-		k3d::icamera_preview_render_engine* render_engine = Viewport.camera_preview_engine();
+		k3d::irender_camera_preview* render_engine = Viewport.camera_preview_engine();
 		if(!render_engine)
 			render_engine = pick_camera_preview_render_engine(m_document_state);
 		if(!render_engine)
@@ -119,7 +119,7 @@ public:
 		Viewport.set_camera(camera);
 		Viewport.set_camera_preview_engine(render_engine);
 
-		render_camera_preview(*camera, *render_engine);
+		render(*camera, *render_engine);
 		
 		command_arguments arguments;
 		arguments.append_viewport_coordinates("mouse", Viewport, Event);
@@ -266,7 +266,7 @@ public:
 				if(!camera)
 					return false;
 
-				k3d::icamera_preview_render_engine* render_engine = viewport.camera_preview_engine();
+				k3d::irender_camera_preview* render_engine = viewport.camera_preview_engine();
 				if(!render_engine)
 					render_engine = pick_camera_preview_render_engine(m_document_state);
 				if(!render_engine)
@@ -276,7 +276,7 @@ public:
 				viewport.set_camera(camera);
 				viewport.set_camera_preview_engine(render_engine);
 
-				render_camera_preview(*camera, *render_engine);
+				render(*camera, *render_engine);
 				return true;
 			}
 			else if(Command == "reset_region")

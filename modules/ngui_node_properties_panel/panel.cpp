@@ -54,12 +54,9 @@
 #include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/ianimation_render_engine.h>
+#include <k3dsdk/irender_animation.h>
 #include <k3dsdk/iaqsis.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/icamera_animation_render_engine.h>
-#include <k3dsdk/icamera_preview_render_engine.h>
-#include <k3dsdk/icamera_still_render_engine.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
@@ -71,23 +68,26 @@
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iplugin_factory.h>
-#include <k3dsdk/ipreview_render_engine.h>
 #include <k3dsdk/iproperty_group_collection.h>
+#include <k3dsdk/irender_camera_animation.h>
+#include <k3dsdk/irender_camera_frame.h>
+#include <k3dsdk/irender_camera_preview.h>
+#include <k3dsdk/irender_frame.h>
+#include <k3dsdk/irender_preview.h>
 #include <k3dsdk/iscript_property.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/istill_render_engine.h>
 #include <k3dsdk/iuser_property.h>
-#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/time_source.h>
-#include <k3dsdk/types_ri.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/string_modifiers.h>
 #include <k3dsdk/system.h>
+#include <k3dsdk/time_source.h>
 #include <k3dsdk/type_registry.h>
+#include <k3dsdk/types_ri.h>
 #include <k3dsdk/user_properties.h>
 #include <k3dsdk/utility.h>
 
@@ -275,7 +275,7 @@ public:
 		k3d::istate_recorder* const state_recorder = &m_document_state.document().state_recorder();
 
 		// Add controls for cameras and camera render engines ...
-		if(dynamic_cast<k3d::icamera*>(m_node) || dynamic_cast<k3d::icamera_preview_render_engine*>(m_node))
+		if(dynamic_cast<k3d::icamera*>(m_node) || dynamic_cast<k3d::irender_camera_preview*>(m_node))
 		{
 			button::control* const control =
 				new button::control(m_parent, "render_camera_preview", *Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_BUTTON))))
@@ -285,7 +285,7 @@ public:
 			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
 		}
 
-		if(dynamic_cast<k3d::icamera*>(m_node) || dynamic_cast<k3d::icamera_still_render_engine*>(m_node))
+		if(dynamic_cast<k3d::icamera*>(m_node) || dynamic_cast<k3d::irender_camera_frame*>(m_node))
 		{
 			button::control* const control =
 				new button::control(m_parent, "render_camera_frame", *Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_BUTTON))))
@@ -295,7 +295,7 @@ public:
 			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
 		}
 
-		if(dynamic_cast<k3d::icamera*>(m_node) || dynamic_cast<k3d::icamera_animation_render_engine*>(m_node))
+		if(dynamic_cast<k3d::icamera*>(m_node) || dynamic_cast<k3d::irender_camera_animation*>(m_node))
 		{
 			button::control* const control =
 				new button::control(m_parent, "render_camera_animation", *Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_BUTTON))))
@@ -306,7 +306,7 @@ public:
 		}
 
 		// Add controls for render engines
-		if(dynamic_cast<k3d::ipreview_render_engine*>(m_node))
+		if(dynamic_cast<k3d::irender_preview*>(m_node))
 		{
 			button::control* const control =
 				new button::control(m_parent, "render_preview", *Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_BUTTON))))
@@ -316,7 +316,7 @@ public:
 			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
 		}
 
-		if(dynamic_cast<k3d::istill_render_engine*>(m_node))
+		if(dynamic_cast<k3d::irender_frame*>(m_node))
 		{
 			button::control* const control =
 				new button::control(m_parent, "render_frame", *Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_BUTTON))))
@@ -326,7 +326,7 @@ public:
 			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
 		}
 
-		if(dynamic_cast<k3d::ianimation_render_engine*>(m_node))
+		if(dynamic_cast<k3d::irender_animation*>(m_node))
 		{
 			button::control* const control =
 				new button::control(m_parent, "render_animation", *Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_BUTTON))))
@@ -664,7 +664,7 @@ public:
 		if(!camera)
 			return;
 
-		k3d::icamera_preview_render_engine* render_engine = dynamic_cast<k3d::icamera_preview_render_engine*>(m_node);
+		k3d::irender_camera_preview* render_engine = dynamic_cast<k3d::irender_camera_preview*>(m_node);
 		if(!render_engine)
 			render_engine = pick_camera_preview_render_engine(m_document_state);
 		if(!render_engine)
@@ -681,7 +681,7 @@ public:
 		if(!camera)
 			return;
 
-		k3d::icamera_still_render_engine* render_engine = dynamic_cast<k3d::icamera_still_render_engine*>(m_node);
+		k3d::irender_camera_frame* render_engine = dynamic_cast<k3d::irender_camera_frame*>(m_node);
 		if(!render_engine)
 			render_engine = pick_camera_still_render_engine(m_document_state);
 		if(!render_engine)
@@ -698,7 +698,7 @@ public:
 		if(!camera)
 			return;
 
-		k3d::icamera_animation_render_engine* render_engine = dynamic_cast<k3d::icamera_animation_render_engine*>(m_node);
+		k3d::irender_camera_animation* render_engine = dynamic_cast<k3d::irender_camera_animation*>(m_node);
 		if(!render_engine)
 			render_engine = pick_camera_animation_render_engine(m_document_state);
 		if(!render_engine)
@@ -709,7 +709,7 @@ public:
 
 	void on_render_preview()
 	{
-		k3d::ipreview_render_engine* render_engine = dynamic_cast<k3d::ipreview_render_engine*>(m_node);
+		k3d::irender_preview* render_engine = dynamic_cast<k3d::irender_preview*>(m_node);
 		return_if_fail(render_engine);
 
 		render_preview(*render_engine);
@@ -717,7 +717,7 @@ public:
 
 	void on_render_frame()
 	{
-		k3d::istill_render_engine* render_engine = dynamic_cast<k3d::istill_render_engine*>(m_node);
+		k3d::irender_frame* render_engine = dynamic_cast<k3d::irender_frame*>(m_node);
 		return_if_fail(render_engine);
 
 		render_frame(*render_engine);
@@ -725,7 +725,7 @@ public:
 
 	void on_render_animation()
 	{
-		k3d::ianimation_render_engine* render_engine = dynamic_cast<k3d::ianimation_render_engine*>(m_node);
+		k3d::irender_animation* render_engine = dynamic_cast<k3d::irender_animation*>(m_node);
 		return_if_fail(render_engine);
 
 		render_animation(m_document_state, *render_engine);

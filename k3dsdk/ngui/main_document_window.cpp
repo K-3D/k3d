@@ -82,7 +82,6 @@
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/iparentable.h>
 #include <k3dsdk/iplugin_factory.h>
-#include <k3dsdk/ipreview_render_engine.h>
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itime_sink.h>
@@ -2453,7 +2452,7 @@ private:
 		k3d::icamera* camera = viewport_control->camera();
 		return_if_fail(camera);
 
-		k3d::icamera_preview_render_engine* render_engine = viewport_control->camera_preview_engine();
+		k3d::irender_camera_preview* render_engine = viewport_control->camera_preview_engine();
 		if(!render_engine)
 			render_engine = pick_camera_preview_render_engine(m_document_state);
 		if(!render_engine)
@@ -2462,7 +2461,7 @@ private:
 		viewport_control->set_camera(camera);
 		viewport_control->set_camera_preview_engine(render_engine);
 
-		render_camera_preview(*camera, *render_engine);
+		render(*camera, *render_engine);
 	}
 
 	void on_render_frame()
@@ -2473,7 +2472,7 @@ private:
 		k3d::icamera* const camera = viewport_control->camera();
 		return_if_fail(camera);
 
-		k3d::icamera_still_render_engine* render_engine = viewport_control->camera_still_engine();
+		k3d::irender_camera_frame* render_engine = viewport_control->camera_still_engine();
 		if(!render_engine)
 			render_engine = pick_camera_still_render_engine(m_document_state);
 		if(!render_engine)
@@ -2482,7 +2481,7 @@ private:
 		viewport_control->set_camera(camera);
 		viewport_control->set_camera_still_engine(render_engine);
 
-		render_camera_frame(*camera, *render_engine);
+		render(*camera, *render_engine);
 	}
 
 	void on_render_animation()
@@ -2493,7 +2492,7 @@ private:
 		k3d::icamera* const camera = viewport_control->camera();
 		return_if_fail(camera);
 
-		k3d::icamera_animation_render_engine* render_engine = viewport_control->camera_animation_engine();
+		k3d::irender_camera_animation* render_engine = viewport_control->camera_animation_engine();
 		if(!render_engine)
 			render_engine = pick_camera_animation_render_engine(m_document_state);
 		if(!render_engine)
@@ -2502,7 +2501,7 @@ private:
 		viewport_control->set_camera(camera);
 		viewport_control->set_camera_animation_engine(render_engine);
 
-		render_camera_animation(m_document_state, *camera, *render_engine);
+		render(m_document_state, *camera, *render_engine);
 	}
 
 	void on_render_viewport_frame()
@@ -2510,7 +2509,7 @@ private:
 		viewport::control* const viewport_control = m_document_state.get_focus_viewport();
 		return_if_fail(viewport_control);
 
-		k3d::icamera_still_render_engine* render_engine = dynamic_cast<k3d::icamera_still_render_engine*>(viewport_control);
+		k3d::irender_camera_frame* render_engine = dynamic_cast<k3d::irender_camera_frame*>(viewport_control);
 		return_if_fail(render_engine);
 
 		k3d::icamera* camera = viewport_control->camera();
@@ -2520,7 +2519,7 @@ private:
 			return;
 
 		viewport_control->set_camera(camera);
-		render_camera_frame(*camera, *render_engine);
+		render(*camera, *render_engine);
 	}
 
 	void on_render_viewport_animation()
@@ -2528,7 +2527,7 @@ private:
 		viewport::control* const viewport_control = m_document_state.get_focus_viewport();
 		return_if_fail(viewport_control);
 
-		k3d::icamera_animation_render_engine* render_engine = dynamic_cast<k3d::icamera_animation_render_engine*>(viewport_control);
+		k3d::irender_camera_animation* render_engine = dynamic_cast<k3d::irender_camera_animation*>(viewport_control);
 		return_if_fail(render_engine);
 
 		k3d::icamera* camera = viewport_control->camera();
@@ -2538,7 +2537,7 @@ private:
 			return;
 
 		viewport_control->set_camera(camera);
-		render_camera_animation(m_document_state, *camera, *render_engine);
+		render(m_document_state, *camera, *render_engine);
 	}
 
 	void on_render_set_viewport_preview_engine()
@@ -2546,7 +2545,7 @@ private:
 		viewport::control* const viewport_control = m_document_state.get_focus_viewport();
 		return_if_fail(viewport_control);
 
-		k3d::icamera_preview_render_engine* const engine = pick_camera_preview_render_engine(m_document_state);
+		k3d::irender_camera_preview* const engine = pick_camera_preview_render_engine(m_document_state);
 		if(!engine)
 			return;
 
@@ -2558,7 +2557,7 @@ private:
 		viewport::control* const viewport_control = m_document_state.get_focus_viewport();
 		return_if_fail(viewport_control);
 
-		k3d::icamera_still_render_engine* const engine = pick_camera_still_render_engine(m_document_state);
+		k3d::irender_camera_frame* const engine = pick_camera_still_render_engine(m_document_state);
 		if(!engine)
 			return;
 
@@ -2570,7 +2569,7 @@ private:
 		viewport::control* const viewport_control = m_document_state.get_focus_viewport();
 		return_if_fail(viewport_control);
 
-		k3d::icamera_animation_render_engine* const engine = pick_camera_animation_render_engine(m_document_state);
+		k3d::irender_camera_animation* const engine = pick_camera_animation_render_engine(m_document_state);
 		if(!engine)
 			return;
 

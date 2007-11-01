@@ -28,8 +28,8 @@
 #include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/inetwork_render_job.h>
 #include <k3dsdk/ipipeline.h>
-#include <k3dsdk/ipreview_render_engine.h>
-#include <k3dsdk/istill_render_engine.h>
+#include <k3dsdk/irender_frame.h>
+#include <k3dsdk/irender_preview.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
@@ -47,8 +47,8 @@ namespace libk3dgraphviz
 
 class render_engine :
 	public k3d::persistent<k3d::node>,
-	public k3d::ipreview_render_engine,
-	public k3d::istill_render_engine
+	public k3d::irender_preview,
+	public k3d::irender_frame
 {
 	typedef k3d::persistent<k3d::node> base;
 
@@ -117,8 +117,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<render_engine,
-			k3d::interface_list<k3d::istill_render_engine,
-			k3d::interface_list<k3d::ipreview_render_engine> > > factory(
+			k3d::interface_list<k3d::irender_frame,
+			k3d::interface_list<k3d::irender_preview> > > factory(
 				k3d::uuid(0xbe72cb50, 0x011f41d8, 0x90449ae0, 0x4c24ace5),
 				"GraphVizEngine",
 				_("GraphViz Render Engine"),

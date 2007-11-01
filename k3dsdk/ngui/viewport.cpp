@@ -361,9 +361,9 @@ public:
 		m_document_state(DocumentState),
 		m_camera(init_value<k3d::icamera*>(0)),
 		m_gl_engine(init_value<k3d::gl::irender_engine*>(0)),
-		m_preview_engine(init_value<k3d::icamera_preview_render_engine*>(0)),
-		m_still_engine(init_value<k3d::icamera_still_render_engine*>(0)),
-		m_animation_engine(init_value<k3d::icamera_animation_render_engine*>(0)),
+		m_preview_engine(init_value<k3d::irender_camera_preview*>(0)),
+		m_still_engine(init_value<k3d::irender_camera_frame*>(0)),
+		m_animation_engine(init_value<k3d::irender_camera_animation*>(0)),
 		m_font_begin(0),
 		m_font_end(0),
 		m_glew_context(0)
@@ -377,11 +377,11 @@ public:
 	/// Stores a reference to the current OpenGL render engine
 	k3d_data(k3d::gl::irender_engine*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_gl_engine;
 	/// Stores a reference to the current preview render engine
-	k3d_data(k3d::icamera_preview_render_engine*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_preview_engine;
+	k3d_data(k3d::irender_camera_preview*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_preview_engine;
 	/// Stores a reference to the current still render engine
-	k3d_data(k3d::icamera_still_render_engine*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_still_engine;
+	k3d_data(k3d::irender_camera_frame*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_still_engine;
 	/// Stores a reference to the current animation render engine
-	k3d_data(k3d::icamera_animation_render_engine*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_animation_engine;
+	k3d_data(k3d::irender_camera_animation*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_animation_engine;
 
 	/// Stores the current set of OpenGL font glyphs (generated from Pango by gtkglext)
 	unsigned long m_font_begin;
@@ -465,17 +465,17 @@ k3d::gl::irender_engine* const control::gl_engine()
 	return m_implementation->m_gl_engine.internal_value();
 }
 
-k3d::icamera_preview_render_engine* const control::camera_preview_engine()
+k3d::irender_camera_preview* const control::camera_preview_engine()
 {
 	return m_implementation->m_preview_engine.internal_value();
 }
 
-k3d::icamera_still_render_engine* const control::camera_still_engine()
+k3d::irender_camera_frame* const control::camera_still_engine()
 {
 	return m_implementation->m_still_engine.internal_value();
 }
 
-k3d::icamera_animation_render_engine* const control::camera_animation_engine()
+k3d::irender_camera_animation* const control::camera_animation_engine()
 {
 	return m_implementation->m_animation_engine.internal_value();
 }
@@ -496,17 +496,17 @@ void control::set_gl_engine(k3d::gl::irender_engine* const Engine)
 	on_redraw_request(k3d::gl::irender_engine::SYNCHRONOUS);
 }
 
-void control::set_camera_preview_engine(k3d::icamera_preview_render_engine* const Engine)
+void control::set_camera_preview_engine(k3d::irender_camera_preview* const Engine)
 {
 	m_implementation->m_preview_engine.set_value(Engine);
 }
 
-void control::set_camera_still_engine(k3d::icamera_still_render_engine* const Engine)
+void control::set_camera_still_engine(k3d::irender_camera_frame* const Engine)
 {
 	m_implementation->m_still_engine.set_value(Engine);
 }
 
-void control::set_camera_animation_engine(k3d::icamera_animation_render_engine* const Engine)
+void control::set_camera_animation_engine(k3d::irender_camera_animation* const Engine)
 {
 	m_implementation->m_animation_engine.set_value(Engine);
 }

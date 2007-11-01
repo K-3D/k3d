@@ -1,5 +1,5 @@
-#ifndef K3DSDK_ICAMERA_STILL_RENDER_ENGINE_H
-#define K3DSDK_ICAMERA_STILL_RENDER_ENGINE_H
+#ifndef K3DSDK_IRENDER_FRAME_H
+#define K3DSDK_IRENDER_FRAME_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -29,24 +29,23 @@
 namespace k3d
 {
 
-class icamera;
 namespace filesystem { class path; }
-	
-/// Abstract interface implemented by objects that can render a still image using a camera
-class icamera_still_render_engine :
+
+/// Abstract interface implemented by objects that can render a still image
+class irender_frame :
 	public virtual k3d::iunknown
 {
 public:
-	virtual bool render_camera_frame(icamera& Camera, const filesystem::path& OutputImage, const bool ViewCompletedImage) = 0;
+	virtual bool render_frame(const filesystem::path& OutputImage, const bool ViewCompletedImage) = 0;
 
 protected:
-	icamera_still_render_engine() {}
-	icamera_still_render_engine(const icamera_still_render_engine&) {}
-	icamera_still_render_engine& operator = (const icamera_still_render_engine&) { return *this; }
-	virtual ~icamera_still_render_engine() {}
+	irender_frame() {}
+	irender_frame(const irender_frame&) {}
+	irender_frame& operator = (const irender_frame&) { return *this; }
+	virtual ~irender_frame() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_ICAMERA_STILL_RENDER_ENGINE_H
+#endif // K3DSDK_IRENDER_FRAME_H
 

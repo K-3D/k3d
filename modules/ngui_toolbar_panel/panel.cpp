@@ -405,7 +405,7 @@ struct implementation
 		if(!camera)
 			return;
 
-		k3d::icamera_preview_render_engine* render_engine = viewport_control->camera_preview_engine();
+		k3d::irender_camera_preview* render_engine = viewport_control->camera_preview_engine();
 		if(!render_engine)
 			render_engine = pick_camera_preview_render_engine(m_document_state);
 		if(!render_engine)

@@ -1,8 +1,8 @@
-#ifndef K3DSDK_IANIMATION_RENDER_ENGINE_H
-#define K3DSDK_IANIMATION_RENDER_ENGINE_H
+#ifndef K3DSDK_IRENDER_PREVIEW_H
+#define K3DSDK_IRENDER_PREVIEW_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2004, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Tim Shead (tshead@k-3d.com)
+		\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -29,23 +29,21 @@
 namespace k3d
 {
 
-class file_range;
-
-/// Abstract interface implemented by objects that can render a sequence of still images
-class ianimation_render_engine :
+/// Abstract interface implemented by objects that can render a "preview" image
+class irender_preview :
 	public virtual iunknown
 {
 public:
-	virtual bool render_animation(const file_range& OutputImages, const bool ViewCompletedImages) = 0;
+	virtual bool render_preview() = 0;
 
 protected:
-	ianimation_render_engine() {}
-	ianimation_render_engine(const ianimation_render_engine&) {}
-	ianimation_render_engine& operator = (const ianimation_render_engine&) { return *this; }
-	virtual ~ianimation_render_engine() {}
+	irender_preview() {}
+	irender_preview(const irender_preview&) {}
+	irender_preview& operator = (const irender_preview&) { return *this; }
+	virtual ~irender_preview() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_IANIMATION_RENDER_ENGINE_H
+#endif // K3DSDK_IRENDER_PREVIEW_H
 

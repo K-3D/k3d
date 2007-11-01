@@ -1,8 +1,8 @@
-#ifndef K3DSDK_ISTILL_RENDER_ENGINE_H
-#define K3DSDK_ISTILL_RENDER_ENGINE_H
+#ifndef K3DSDK_IRENDER_CAMERA_ANIMATION_H
+#define K3DSDK_IRENDER_CAMERA_ANIMATION_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -29,23 +29,24 @@
 namespace k3d
 {
 
-namespace filesystem { class path; }
-
-/// Abstract interface implemented by objects that can render a still image
-class istill_render_engine :
-	public virtual k3d::iunknown
+class icamera;
+class file_range;
+	
+/// Abstract interface implemented by objects that can render a sequence of still images using a camera
+class irender_camera_animation :
+	public virtual iunknown
 {
 public:
-	virtual bool render_frame(const filesystem::path& OutputImage, const bool ViewCompletedImage) = 0;
+	virtual bool render_camera_animation(icamera& Camera, const file_range& OutputImages, const bool ViewCompletedImages) = 0;
 
 protected:
-	istill_render_engine() {}
-	istill_render_engine(const istill_render_engine&) {}
-	istill_render_engine& operator = (const istill_render_engine&) { return *this; }
-	virtual ~istill_render_engine() {}
+	irender_camera_animation() {}
+	irender_camera_animation(const irender_camera_animation&) {}
+	irender_camera_animation& operator = (const irender_camera_animation&) { return *this; }
+	virtual ~irender_camera_animation() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_ISTILL_RENDER_ENGINE_H
+#endif // K3DSDK_IRENDER_CAMERA_ANIMATION_H
 
