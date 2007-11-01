@@ -289,13 +289,13 @@ struct knife_tool::implementation :
 		m_previous_edge = 0;
 
 		m_document_state.set_cursor_signal().emit(load_icon("knife_cursor", Gtk::ICON_SIZE_BUTTON));
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_deactivate()
 	{
 		m_document_state.clear_cursor_signal().emit();
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_lbutton_down(viewport::control& Viewport, const GdkEventButton& Event)
@@ -502,7 +502,7 @@ struct knife_tool::implementation :
 	{
 		// Reset selection
 		m_previous_edge = 0;
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_redraw(viewport::control& Viewport)

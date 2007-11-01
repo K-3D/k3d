@@ -515,8 +515,8 @@ public:
 		// Viewport on node list's right
 		panel_frame::control* const panel_frame4 = split_panel(*panel_frame2, *Gtk::manage(new Gtk::HPaned), 200);
 
-		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_engine>(document().nodes());
-		k3d::gl::irender_engine* const glengine1 = gl_engines.size() > 0 ? dynamic_cast<k3d::gl::irender_engine*>(*(gl_engines.begin())) : 0;
+		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_viewport>(document().nodes());
+		k3d::gl::irender_viewport* const glengine1 = gl_engines.size() > 0 ? dynamic_cast<k3d::gl::irender_viewport*>(*(gl_engines.begin())) : 0;
 
 		const k3d::nodes_t cameras = k3d::find_nodes<k3d::icamera>(document().nodes());
 		k3d::icamera* const camera1 = cameras.size() > 0 ? dynamic_cast<k3d::icamera*>(*(cameras.begin())) : 0;
@@ -1526,7 +1526,7 @@ private:
 			return;
 		}
 
-		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_file_export()
@@ -1625,7 +1625,7 @@ private:
 			document().state_recorder().set_current_node(previous_node->parent);
 		}
 
-		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_edit_redo(const bool All)
@@ -1650,7 +1650,7 @@ private:
 			document().state_recorder().set_current_node(next_node);
 		}
 
-		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_selection_tool()
@@ -1710,7 +1710,7 @@ private:
 		k3d::nodes_t nodes = m_document_state.selected_nodes();
 		k3d::delete_nodes(m_document_state.document(), nodes);
 
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_render_region_tool()
@@ -2143,7 +2143,7 @@ private:
 			k3d::property::set_internal_value(**node, "render_final", false);
 		}
 
-		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_view_show_selection()
@@ -2157,7 +2157,7 @@ private:
 			k3d::property::set_internal_value(**node, "render_final", true);
 		}
 
-		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_view_hide_unselected()
@@ -2174,7 +2174,7 @@ private:
 			}
 		}
 
-		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_view_show_all()
@@ -2188,7 +2188,7 @@ private:
 			k3d::property::set_internal_value(**node, "render_final", true);
 		}
 
-		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_view_aim_selection()
@@ -2310,7 +2310,7 @@ private:
 		if(selected_nodes.size() == 1)
 			m_document_state.view_node_properties_signal().emit(new_modifier);
 
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_modify_transformations(k3d::iplugin_factory* Modifier)
@@ -2328,7 +2328,7 @@ private:
 		if(selected_nodes.size() == 1)
 			m_document_state.view_node_properties_signal().emit(new_modifier);
 
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_scripting_play()
@@ -2441,7 +2441,7 @@ private:
 			libk3dngui::unparent(**node);
 
 		m_document_state.deselect_all();
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_render_preview()

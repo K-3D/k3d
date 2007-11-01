@@ -74,7 +74,7 @@ public:
 
 private slots:
 	void on_camera_changed(k3d::icamera* const Camera);
-	void on_render_engine_changed(k3d::gl::irender_engine* const Engine);
+	void on_render_engine_changed(k3d::gl::irender_viewport* const Engine);
 	
 private:
 	void createFont();
@@ -84,7 +84,7 @@ private:
 	/// Stores the document camera for drawing
 	k3d_data(k3d::icamera*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_camera;
 	/// Stores the document OpenGL render engine for drawing
-	k3d_data(k3d::gl::irender_engine*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_gl_engine;
+	k3d_data(k3d::gl::irender_viewport*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_gl_engine;
 	/// Stores the current set of OpenGL font glyphs
 	unsigned long m_font_begin;
 	/// Stores the current set of OpenGL font glyphs
@@ -108,7 +108,7 @@ public:
 
 signals:
 	void camera_changed(k3d::icamera* const);
-	void render_engine_changed(k3d::gl::irender_engine* const);
+	void render_engine_changed(k3d::gl::irender_viewport* const);
 	
 private slots:
 	void on_file_open();

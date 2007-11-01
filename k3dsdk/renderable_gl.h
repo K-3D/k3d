@@ -26,8 +26,8 @@
 
 #include "data.h"
 #include "gl.h"
+#include "irender_viewport_gl.h"
 #include "irenderable_gl.h"
-#include "irender_engine_gl.h"
 #include "k3d-i18n-config.h"
 #include "render_state_gl.h"
 #include "utility_gl.h"
@@ -99,7 +99,7 @@ protected:
 
 	void async_redraw(iunknown*)
 	{
-		redraw_all(base_t::document(), irender_engine::ASYNCHRONOUS);
+		redraw_all(base_t::document(), irender_viewport::ASYNCHRONOUS);
 	}
 
 	typedef GLUnurbsObj* nurbs_renderer_t;

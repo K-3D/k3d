@@ -139,7 +139,7 @@ public:
 
 		current_node->change_set->undo();
 		m_document_state.document().state_recorder().set_current_node(current_node->parent);
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	/// Called by the signal system when the user clicks the redo button
@@ -150,7 +150,7 @@ public:
 
 		redo_node->change_set->redo();
 		m_document_state.document().state_recorder().set_current_node(redo_node);
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	/// Called by the signal system anytime a node is added to the hierarchical undo tree
@@ -403,7 +403,7 @@ public:
 		for(parent_nodes_t::const_iterator redo = redos.begin(); redo != redos.end(); ++redo)
 			(*redo)->change_set->redo();
 
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	/// Stores a reference to the owning document

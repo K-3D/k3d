@@ -670,7 +670,7 @@ struct navigation_input_model::implementation
 
 				viewport.set_view_matrix(new_view_matrix);
 				viewport.set_target(new_target);
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::SYNCHRONOUS);
+				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -714,7 +714,7 @@ struct navigation_input_model::implementation
 					k3d::property::set_internal_value(perspective->right(), right);
 					k3d::property::set_internal_value(perspective->top(), top);
 					k3d::property::set_internal_value(perspective->bottom(), bottom);
-					k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::SYNCHRONOUS);
+					k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
 
 					return k3d::icommand_node::RESULT_CONTINUE;
 				}
@@ -725,7 +725,7 @@ struct navigation_input_model::implementation
 					k3d::property::set_internal_value(orthographic->right(), right);
 					k3d::property::set_internal_value(orthographic->top(), top);
 					k3d::property::set_internal_value(orthographic->bottom(), bottom);
-					k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::SYNCHRONOUS);
+					k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
 
 					return k3d::icommand_node::RESULT_CONTINUE;
 				}
@@ -764,7 +764,7 @@ struct navigation_input_model::implementation
 
 				viewport.set_view_matrix(new_view_matrix);
 				viewport.set_target(new_target);
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::SYNCHRONOUS);
+				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -797,7 +797,7 @@ struct navigation_input_model::implementation
 				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
 
 				viewport.set_view_matrix(new_view_matrix);
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::SYNCHRONOUS);
+				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -830,7 +830,7 @@ struct navigation_input_model::implementation
 				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
 
 				viewport.set_view_matrix(new_view_matrix);
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::SYNCHRONOUS);
+				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -863,7 +863,7 @@ struct navigation_input_model::implementation
 				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
 
 				viewport.set_view_matrix(new_view_matrix);
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::SYNCHRONOUS);
+				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
 
 				return k3d::icommand_node::RESULT_CONTINUE;
 			}
@@ -932,7 +932,7 @@ struct navigation_input_model::implementation
 				k3d::record_state_change_set change_set(m_document_state.document(), change_set_label, K3D_CHANGE_SET_CONTEXT);
 				viewport.set_view_matrix(new_view_matrix);
 
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::SYNCHRONOUS);
+				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
 
 				non_blocking_sleep(0.2);
 

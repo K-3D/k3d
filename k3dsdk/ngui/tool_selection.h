@@ -65,7 +65,7 @@ public:
 
 	void redraw_all(k3d::iunknown* const Hint = 0)
 	{
-		k3d::gl::redraw_all(m_document, k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	/// Enumerates motions

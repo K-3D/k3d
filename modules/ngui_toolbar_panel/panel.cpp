@@ -391,7 +391,7 @@ struct implementation
 			libk3dngui::unparent(**node);
 
 		m_document_state.deselect_all();
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_render_preview()

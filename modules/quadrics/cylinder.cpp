@@ -74,7 +74,7 @@ public:
 	void reset_geometry(k3d::iunknown*)
 	{
 		m_gl_control_points.clear();
-		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	const k3d::bounding_box3 extents()

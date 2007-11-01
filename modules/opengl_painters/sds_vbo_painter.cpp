@@ -94,7 +94,7 @@ public:
 		}
 		m_vbo_cache.remove_painter(this);
 		m_old_level = m_levels.pipeline_value();
-		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 	
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)

@@ -33,7 +33,7 @@
 #include <k3dsdk/irender_camera_animation.h>
 #include <k3dsdk/irender_camera_preview.h>
 #include <k3dsdk/irender_camera_frame.h>
-#include <k3dsdk/irender_engine_gl.h>
+#include <k3dsdk/irender_viewport_gl.h>
 #include <k3dsdk/line3.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/selection.h>
@@ -74,7 +74,7 @@ public:
 	/// Returns the camera for this viewport
 	k3d::icamera* const camera();
 	/// Returns the OpenGL render engine for this viewport
-	k3d::gl::irender_engine* const gl_engine();
+	k3d::gl::irender_viewport* const gl_engine();
 	/// Returns the preview render engine for this viewport
 	k3d::irender_camera_preview* const camera_preview_engine();
 	/// Returns the still render engine for this viewport
@@ -85,7 +85,7 @@ public:
 	/// Sets the camera for this viewport
 	void set_camera(k3d::icamera* const Camera);
 	/// Sets the OpenGL render engine for this viewport
-	void set_gl_engine(k3d::gl::irender_engine* const Engine);
+	void set_gl_engine(k3d::gl::irender_viewport* const Engine);
 	/// Sets the current preview render engine for this viewport
 	void set_camera_preview_engine(k3d::irender_camera_preview* const Engine);
 	/// Sets the current still render engine for this viewport
@@ -149,7 +149,7 @@ private:
 	void on_camera_changed(k3d::iunknown*);
 	void on_gl_engine_changed(k3d::iunknown*);
 
-	void on_redraw_request(k3d::gl::irender_engine::redraw_type_t RedrawType);
+	void on_redraw_request(k3d::gl::irender_viewport::redraw_type_t RedrawType);
 	void on_style_changed(const Glib::RefPtr<Gtk::Style>& previous_style);
 	bool on_redraw();
 	const GLint select(const k3d::gl::selection_state& SelectState, const k3d::rectangle& SelectionRegion);

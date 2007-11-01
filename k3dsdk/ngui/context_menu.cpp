@@ -323,7 +323,7 @@ private:
 	{
 		return_if_fail(m_viewport);
 
-		k3d::gl::irender_engine* const engine = pick_gl_render_engine(m_document_state);
+		k3d::gl::irender_viewport* const engine = pick_gl_render_engine(m_document_state);
 		if(!engine)
 			return;
 
@@ -485,7 +485,7 @@ private:
 		k3d::nodes_t nodes = m_document_state.selected_nodes();
 
 		k3d::delete_nodes(m_document_state.document(), nodes);
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	/// Instantiates selected meshes
@@ -591,7 +591,7 @@ private:
 		if(selected_nodes.size() == 1)
 			m_document_state.view_node_properties_signal().emit(new_modifier);
 
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	/// Modify selected transforms
@@ -612,7 +612,7 @@ private:
 		if(selected_nodes.size() == 1)
 			m_document_state.view_node_properties_signal().emit(new_modifier);
 
-		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_hide_selection()

@@ -583,7 +583,7 @@ const k3d::icommand_node::result rotate_tool::execute_command(const std::string&
 		else if(Command == "lmb_drag_move")
 		{
 			rotate_selection(arguments.get_angle_axis("rotation"));
-			k3d::gl::redraw_all(m_document, k3d::gl::irender_engine::SYNCHRONOUS);
+			k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::SYNCHRONOUS);
 		}
 		else if(Command == "lmb_drag_box_select")
 		{
@@ -626,7 +626,7 @@ const k3d::icommand_node::result rotate_tool::execute_command(const std::string&
 		else if(Command == "mouse_drag_move")
 		{
 			rotate_selection(arguments.get_angle_axis("rotation"));
-			k3d::gl::redraw_all(m_document, k3d::gl::irender_engine::SYNCHRONOUS);
+			k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::SYNCHRONOUS);
 		}
 		else
 		{

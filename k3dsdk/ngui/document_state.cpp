@@ -1570,7 +1570,7 @@ public:
 		// Make the newly-created node properties visible ...
 		view_node_properties_signal().emit(node);
 
-		k3d::gl::redraw_all(m_document, k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::ASYNCHRONOUS);
 
 		return node;
 	}

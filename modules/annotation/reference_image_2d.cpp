@@ -90,7 +90,7 @@ public:
 
 	void async_redraw(iunknown*)
 	{
-		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void gl_draw(const k3d::gl::render_state& State)

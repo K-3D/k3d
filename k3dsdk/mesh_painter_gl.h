@@ -79,7 +79,7 @@ protected:
 	/// Schedules an asynchronous screen update
 	void async_redraw(iunknown*)
 	{
-		redraw_all(document(), irender_engine::ASYNCHRONOUS);
+		redraw_all(document(), irender_viewport::ASYNCHRONOUS);
 	}
 
 	/// Implement this in derived classes to draw mesh components

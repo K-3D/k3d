@@ -642,10 +642,10 @@ k3d::irender_camera_animation* default_camera_animation_render_engine(document_s
 	return render_engines.size() == 1 ? dynamic_cast<k3d::irender_camera_animation*>(*render_engines.begin()) : 0;
 }
 
-k3d::gl::irender_engine* default_gl_render_engine(document_state& DocumentState)
+k3d::gl::irender_viewport* default_gl_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::gl::irender_engine>(DocumentState.document().nodes());
-	return render_engines.size() == 1 ? dynamic_cast<k3d::gl::irender_engine*>(*render_engines.begin()) : 0;
+	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::gl::irender_viewport>(DocumentState.document().nodes());
+	return render_engines.size() == 1 ? dynamic_cast<k3d::gl::irender_viewport*>(*render_engines.begin()) : 0;
 }
 
 k3d::icamera* pick_camera(document_state& DocumentState, const k3d::icamera* CurrentCamera)
@@ -704,12 +704,12 @@ k3d::irender_camera_animation* pick_camera_animation_render_engine(document_stat
 	return detail::pick_render_engine<k3d::irender_camera_animation>(DocumentState, render_engines, factories, _("Pick Animation Render Engine:"), _("Choose a render engine to be used for animation rendering"));
 }
 
-k3d::gl::irender_engine* pick_gl_render_engine(document_state& DocumentState)
+k3d::gl::irender_viewport* pick_gl_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::gl::irender_engine>(DocumentState.document().nodes());
-	const k3d::factories_t factories = k3d::plugins<k3d::gl::irender_engine>();
+	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::gl::irender_viewport>(DocumentState.document().nodes());
+	const k3d::factories_t factories = k3d::plugins<k3d::gl::irender_viewport>();
 
-	return detail::pick_render_engine<k3d::gl::irender_engine>(DocumentState, render_engines, factories, _("Pick OpenGL Render Engine:"), _("Choose an OpenGL render engine to be used for drawing"));
+	return detail::pick_render_engine<k3d::gl::irender_viewport>(DocumentState, render_engines, factories, _("Pick OpenGL Render Engine:"), _("Choose an OpenGL render engine to be used for drawing"));
 }
 
 void test_render_engine(k3d::iunknown& Engine)

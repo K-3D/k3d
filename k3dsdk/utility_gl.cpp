@@ -29,7 +29,7 @@
 #include "imaterial_gl.h"
 #include "inode.h"
 #include "inode_collection.h"
-#include "irender_engine_gl.h"
+#include "irender_viewport_gl.h"
 #include "plane.h"
 #include "utility_gl.h"
 
@@ -48,19 +48,19 @@ namespace detail
 class redraw
 {
 public:
-	redraw(const irender_engine::redraw_type_t RedrawType) :
+	redraw(const irender_viewport::redraw_type_t RedrawType) :
 		m_redraw_type(RedrawType)
 	{
 	}
 
 	void operator()(inode* const Object)
 	{
-		if(irender_engine* const render_engine = dynamic_cast<irender_engine*>(Object))
+		if(irender_viewport* const render_engine = dynamic_cast<irender_viewport*>(Object))
 			render_engine->redraw_request_signal().emit(m_redraw_type);
 	}
 
 protected:
-	const irender_engine::redraw_type_t m_redraw_type;
+	const irender_viewport::redraw_type_t m_redraw_type;
 };
 
 const GLubyte g_stipple_halftone[] = {
@@ -229,7 +229,7 @@ void draw_bounding_box(const bounding_box3& Box)
 	glEnd();
 }
 
-void redraw_all(idocument& Document, const irender_engine::redraw_type_t RedrawType)
+void redraw_all(idocument& Document, const irender_viewport::redraw_type_t RedrawType)
 {
 	std::for_each(Document.nodes().collection().begin(), Document.nodes().collection().end(), detail::redraw(RedrawType));
 }

@@ -42,7 +42,6 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/iselection_engine_gl.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/property.h>
@@ -360,7 +359,7 @@ public:
 	implementation(document_state& DocumentState) :
 		m_document_state(DocumentState),
 		m_camera(init_value<k3d::icamera*>(0)),
-		m_gl_engine(init_value<k3d::gl::irender_engine*>(0)),
+		m_gl_engine(init_value<k3d::gl::irender_viewport*>(0)),
 		m_preview_engine(init_value<k3d::irender_camera_preview*>(0)),
 		m_still_engine(init_value<k3d::irender_camera_frame*>(0)),
 		m_animation_engine(init_value<k3d::irender_camera_animation*>(0)),
@@ -375,7 +374,7 @@ public:
 	/// Stores a reference to the current camera
 	k3d_data(k3d::icamera*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_camera;
 	/// Stores a reference to the current OpenGL render engine
-	k3d_data(k3d::gl::irender_engine*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_gl_engine;
+	k3d_data(k3d::gl::irender_viewport*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_gl_engine;
 	/// Stores a reference to the current preview render engine
 	k3d_data(k3d::irender_camera_preview*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_preview_engine;
 	/// Stores a reference to the current still render engine
@@ -460,7 +459,7 @@ k3d::icamera* const control::camera()
 	return m_implementation->m_camera.internal_value();
 }
 
-k3d::gl::irender_engine* const control::gl_engine()
+k3d::gl::irender_viewport* const control::gl_engine()
 {
 	return m_implementation->m_gl_engine.internal_value();
 }
@@ -485,7 +484,7 @@ void control::set_camera(k3d::icamera* const Camera)
 	m_implementation->m_camera.set_value(Camera);
 }
 
-void control::set_gl_engine(k3d::gl::irender_engine* const Engine)
+void control::set_gl_engine(k3d::gl::irender_viewport* const Engine)
 {
 	m_implementation->m_gl_engine_redraw_request_connection.disconnect();
 	if(Engine)
@@ -493,7 +492,7 @@ void control::set_gl_engine(k3d::gl::irender_engine* const Engine)
 
 	m_implementation->m_gl_engine.set_value(Engine);
 
-	on_redraw_request(k3d::gl::irender_engine::SYNCHRONOUS);
+	on_redraw_request(k3d::gl::irender_viewport::SYNCHRONOUS);
 }
 
 void control::set_camera_preview_engine(k3d::irender_camera_preview* const Engine)
@@ -622,7 +621,7 @@ bool control::save_frame(k3d::icamera& Camera, const k3d::filesystem::path& Outp
 	glViewport(0, 0, width, height);
 	if(m_implementation->m_gl_engine.internal_value())
 	{
-		m_implementation->m_gl_engine.internal_value()->redraw(Camera, width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, m_implementation->m_gl_viewport);
+		m_implementation->m_gl_engine.internal_value()->render_viewport(Camera, width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, m_implementation->m_gl_viewport);
 	}
 	else
 	{
@@ -666,17 +665,17 @@ bool control::save_frame(k3d::icamera& Camera, const k3d::filesystem::path& Outp
 
 void control::on_camera_changed(k3d::iunknown*)
 {
-	on_redraw_request(k3d::gl::irender_engine::SYNCHRONOUS);
+	on_redraw_request(k3d::gl::irender_viewport::SYNCHRONOUS);
 }
 
 void control::on_gl_engine_changed(k3d::iunknown*)
 {
-	on_redraw_request(k3d::gl::irender_engine::SYNCHRONOUS);
+	on_redraw_request(k3d::gl::irender_viewport::SYNCHRONOUS);
 }
 
-void control::on_redraw_request(k3d::gl::irender_engine::redraw_type_t RedrawType)
+void control::on_redraw_request(k3d::gl::irender_viewport::redraw_type_t RedrawType)
 {
-	if(k3d::gl::irender_engine::ASYNCHRONOUS == RedrawType)
+	if(k3d::gl::irender_viewport::ASYNCHRONOUS == RedrawType)
 	{
 		queue_draw();
 		return;
@@ -1280,7 +1279,7 @@ bool control::on_redraw()
 	{
 		k3d::timer timer;
 
-		m_implementation->m_gl_engine.internal_value()->redraw(*m_implementation->m_camera.internal_value(), width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, m_implementation->m_gl_viewport);
+		m_implementation->m_gl_engine.internal_value()->render_viewport(*m_implementation->m_camera.internal_value(), width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, m_implementation->m_gl_viewport);
 		if(m_implementation->m_document_state.get_focus_viewport() == this)
 			m_implementation->m_document_state.active_tool().redraw(*this);
 
@@ -1361,11 +1360,6 @@ const GLint control::select(const k3d::gl::selection_state& SelectState, const k
 	if(!is_realized())
 		return 0;
 
-	// Viewport doesn't support selection, so we're done ...
-	k3d::gl::iselection_engine* const selection_engine = dynamic_cast<k3d::gl::iselection_engine*>(m_implementation->m_gl_engine.internal_value());
-	if(!selection_engine)
-		return 0;
-
 	// If we're minimized, we're done ...
 	const unsigned long width = get_width();
 	const unsigned long height = get_height();
@@ -1396,7 +1390,7 @@ const GLint control::select(const k3d::gl::selection_state& SelectState, const k
 		glInitNames();
 
 		GLdouble projection_matrix[16];
-		selection_engine->select(SelectState, *m_implementation->m_camera.internal_value(), width, height, m_implementation->m_font_begin, k3d::normalize(SelectionRegion), m_implementation->m_gl_view_matrix, projection_matrix, m_implementation->m_gl_viewport);
+		m_implementation->m_gl_engine.internal_value()->render_viewport_selection(SelectState, *m_implementation->m_camera.internal_value(), width, height, m_implementation->m_font_begin, k3d::normalize(SelectionRegion), m_implementation->m_gl_view_matrix, projection_matrix, m_implementation->m_gl_viewport);
 		std::copy(m_implementation->m_gl_view_matrix, m_implementation->m_gl_view_matrix + 16, ViewMatrix);
 		std::copy(projection_matrix, projection_matrix + 16, ProjectionMatrix);
 		std::copy(m_implementation->m_gl_viewport, m_implementation->m_gl_viewport + 4, Viewport);

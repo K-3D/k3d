@@ -179,8 +179,8 @@ void control::mount_panel(const std::string& Type)
 {
 	if("viewport" == Type)
 	{
-		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_engine>(m_document_state.document().nodes());
-		k3d::gl::irender_engine* const glengine1 = gl_engines.size() > 0 ? dynamic_cast<k3d::gl::irender_engine*>(*(gl_engines.begin())) : 0;
+		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_viewport>(m_document_state.document().nodes());
+		k3d::gl::irender_viewport* const glengine1 = gl_engines.size() > 0 ? dynamic_cast<k3d::gl::irender_viewport*>(*(gl_engines.begin())) : 0;
 
 		const k3d::nodes_t cameras = k3d::find_nodes<k3d::icamera>(m_document_state.document().nodes());
 		k3d::icamera* const camera1 = cameras.size() > 0 ? dynamic_cast<k3d::icamera*>(*(cameras.begin())) : 0;

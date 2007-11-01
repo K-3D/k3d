@@ -33,9 +33,8 @@
 #include <k3dsdk/icrop_window.h>
 #include <k3dsdk/ilight_gl.h>
 #include <k3dsdk/iprojection.h>
-#include <k3dsdk/irender_engine_gl.h>
+#include <k3dsdk/irender_viewport_gl.h>
 #include <k3dsdk/irenderable_gl.h>
-#include <k3dsdk/iselection_engine_gl.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/measurement.h>
@@ -265,8 +264,7 @@ void gl_setup_lights(const bool Headlight)
 
 class render_engine :
 	public k3d::persistent<k3d::node>,
-	public k3d::gl::irender_engine,
-	public k3d::gl::iselection_engine,
+	public k3d::gl::irender_viewport,
 	public k3d::property_group_collection
 {
 	typedef k3d::persistent<k3d::node> base;
@@ -312,7 +310,7 @@ public:
 
 	void on_redraw(k3d::iunknown*)
 	{
-		m_redraw_request_signal.emit(k3d::gl::irender_engine::ASYNCHRONOUS);
+		m_redraw_request_signal.emit(k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -433,7 +431,7 @@ public:
 		return true;
 	}
 
-	void redraw(k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4])
+	void render_viewport(k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4])
 	{
 		k3d::gl::render_state state(Camera);
 		k3d::rectangle unused(0, 0, 0, 0);
@@ -474,12 +472,7 @@ public:
 */
 	}
 
-	redraw_request_signal_t& redraw_request_signal()
-	{
-		return m_redraw_request_signal;
-	}
-
-	void select(const k3d::gl::selection_state& SelectState, k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, const k3d::rectangle& Region, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4])
+	void render_viewport_selection(const k3d::gl::selection_state& SelectState, k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, const k3d::rectangle& Region, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4])
 	{
 		k3d::gl::render_state state(Camera);
 		if(!draw_scene(Camera, PixelWidth, PixelHeight, FontListBase, ViewMatrix, ProjectionMatrix, Viewport, true, Region, state))
@@ -491,6 +484,11 @@ public:
 		glDisable(GL_LIGHTING);
 
 		std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::draw_selection(state, SelectState));
+	}
+
+	redraw_request_signal_t& redraw_request_signal()
+	{
+		return m_redraw_request_signal;
 	}
 
 private:

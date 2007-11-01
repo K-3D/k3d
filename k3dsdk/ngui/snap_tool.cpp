@@ -618,7 +618,7 @@ struct snap_tool::implementation :
 			else if(Command == "lmb_drag_move")
 			{
 				move_selection(arguments.get_vector3("move"));
-				k3d::gl::redraw_all(m_document, k3d::gl::irender_engine::SYNCHRONOUS);
+				k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::SYNCHRONOUS);
 			}
 			else if(Command == "lmb_drag_box_select")
 			{
@@ -661,7 +661,7 @@ struct snap_tool::implementation :
 			else if(Command == "mouse_drag_move")
 			{
 				move_selection(arguments.get_vector3("move"));
-				k3d::gl::redraw_all(m_document, k3d::gl::irender_engine::SYNCHRONOUS);
+				k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::SYNCHRONOUS);
 			}
 			else
 			{

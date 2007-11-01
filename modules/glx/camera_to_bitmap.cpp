@@ -26,7 +26,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/irender_engine_gl.h>
+#include <k3dsdk/irender_viewport_gl.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
@@ -52,7 +52,7 @@ public:
 	camera_to_bitmap(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_camera(init_owner(*this) + init_name("camera") + init_label(_("Camera")) + init_description(_("Camera")) + init_value<k3d::icamera*>(0)),
-		m_render_engine(init_owner(*this) + init_name("render_engine") + init_label(_("Render Engine")) + init_description(_("Render Engine")) + init_value<k3d::gl::irender_engine*>(0)),
+		m_render_engine(init_owner(*this) + init_name("render_engine") + init_label(_("Render Engine")) + init_description(_("Render Engine")) + init_value<k3d::gl::irender_viewport*>(0)),
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Bitmap width")) + init_value(256L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Bitmap height")) + init_value(256L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L)))
 	{
@@ -72,7 +72,7 @@ public:
 	void on_update_bitmap(k3d::bitmap& Bitmap)
 	{
 		k3d::icamera* const camera = m_camera.pipeline_value();
-		k3d::gl::irender_engine* const render_engine = m_render_engine.pipeline_value();
+		k3d::gl::irender_viewport* const render_engine = m_render_engine.pipeline_value();
 		const k3d::pixel_size_t width = m_width.pipeline_value();
 		const k3d::pixel_size_t height = m_height.pipeline_value();
 
@@ -103,7 +103,7 @@ public:
 			GLdouble gl_projection_matrix[16];
 			GLint gl_viewport[4];
 
-			render_engine->redraw(*camera, width, height, font_begin, gl_view_matrix, gl_projection_matrix, gl_viewport);
+			render_engine->render_viewport(*camera, width, height, font_begin, gl_view_matrix, gl_projection_matrix, gl_viewport);
 			glFlush();
 
 			boost::gil::image<boost::gil::rgba8_pixel_t, false> buffer(width, height);
@@ -142,7 +142,7 @@ public:
 
 private:
 	k3d_data(k3d::icamera*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_camera;
-	k3d_data(k3d::gl::irender_engine*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_render_engine;
+	k3d_data(k3d::gl::irender_viewport*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_render_engine;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_width;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_height;
 };

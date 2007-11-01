@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IMATERIAL_GL_H
-#define K3DSDK_IMATERIAL_GL_H
+#ifndef K3DSDK_IRENDER_VIEWPORT_GL_H
+#define K3DSDK_IRENDER_VIEWPORT_GL_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -24,7 +24,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "gl.h"
 #include "iunknown.h"
+#include "signal_system.h"
 
 namespace k3d
 {
@@ -36,12 +38,19 @@ namespace gl
 {
 
 class selection_state;
-	
-/// Abstract interface for returning selection data
-class iselection_engine :
+
+/// Abstract interface for objects that can render using OpenGL
+class irender_viewport :
 	public virtual iunknown
 {
 public:
+	/// Returns the normalized device coordinates for the viewport, allowing for mismatches between the aspect ratio of the window and the camera
+	virtual bool get_ndc(icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, rectangle& CameraRect, rectangle& WindowRect) = 0;
+
+	/** \brief Redraws the document
+	    \note The caller must setup an OpenGL render context before calling this method, and must call glFlush() after it returns */
+	virtual void render_viewport(icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4]) = 0;
+
 	/**
 	  \brief Draws the document in OpenGL selection mode, so selection "hits" can be extracted
 	  \param SelectionState The geometry components to be drawn
@@ -54,18 +63,29 @@ public:
 	  \param Viewport Returns the OpenGL viewport used for drawing
 	  \note The caller must setup the OpenGL render context, allocate the selection buffer, put OpenGL in selection mode, and call glFlush() when done
 	*/
-	virtual void select(const selection_state& SelectionState, icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, const rectangle& Rectangle, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4]) = 0;
+	virtual void render_viewport_selection(const selection_state& SelectionState, icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, const rectangle& Rectangle, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4]) = 0;
+
+	/// Enumerates redraw request types
+	typedef enum
+	{
+		SYNCHRONOUS,
+		ASYNCHRONOUS
+	} redraw_type_t;
+
+	/// Used to signal any connected user interface components that a redraw is requested
+	typedef sigc::signal<void, redraw_type_t> redraw_request_signal_t;
+	virtual redraw_request_signal_t& redraw_request_signal() = 0;
 
 protected:
-	iselection_engine() {}
-	iselection_engine(const iselection_engine&) {}
-	iselection_engine& operator=(const iselection_engine&) { return *this; }
-	virtual ~iselection_engine() {}
+	irender_viewport() {}
+	irender_viewport(const irender_viewport&) {}
+	irender_viewport& operator=(const irender_viewport&) { return *this; }
+	virtual ~irender_viewport() {}
 };
 
 } // namespace gl
 
 } // namespace k3d
 
-#endif // K3DSDK_IMATERIAL_GL_H
+#endif // K3DSDK_IRENDER_VIEWPORT_GL_H
 

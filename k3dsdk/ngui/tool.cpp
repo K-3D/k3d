@@ -85,7 +85,7 @@ viewport_input_model& tool::input_model()
 
 void tool::redraw_all()
 {
-	k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+	k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 }
 
 void tool::record_command(const std::string& Command, const std::string& Arguments)

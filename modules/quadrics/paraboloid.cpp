@@ -61,7 +61,7 @@ public:
 	{
 		m_gl_control_points.clear();
 		m_gl_u_knot_vector.clear();
-		k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	const k3d::bounding_box3 extents()

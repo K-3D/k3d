@@ -135,7 +135,7 @@ public:
 	void set_selection_weight(const double Weight)
 	{
 		if(Weight != get_selection_weight())
-			k3d::gl::redraw_all(document(), k3d::gl::irender_engine::ASYNCHRONOUS);
+			k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 
 		base::set_selection_weight(Weight);
 	}

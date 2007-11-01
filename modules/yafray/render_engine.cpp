@@ -200,7 +200,7 @@ public:
 			time_property->property_set_value(view_frame / frame_rate);
 
 			// Redraw everything ...
-			k3d::gl::redraw_all(document(), k3d::gl::irender_engine::SYNCHRONOUS);
+			k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::SYNCHRONOUS);
 
 			// Add a render frame to the job ...
 			std::stringstream buffer;

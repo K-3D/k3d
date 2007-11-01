@@ -31,7 +31,7 @@ namespace k3d { class irender_animation; }
 namespace k3d { class irender_camera_preview; }
 namespace k3d { class irender_camera_frame; }
 namespace k3d { class irender_camera_animation; }
-namespace k3d { namespace gl { class irender_engine; } }
+namespace k3d { namespace gl { class irender_viewport; } }
 
 namespace libk3dngui
 {
@@ -53,7 +53,7 @@ k3d::irender_camera_frame* default_camera_still_render_engine(document_state& Do
 /// Returns a default animation render engine, or 0
 k3d::irender_camera_animation* default_camera_animation_render_engine(document_state& DocumentState);
 /// Returns a default OpenGL render engine, or 0
-k3d::gl::irender_engine* default_gl_render_engine(document_state& DocumentState);
+k3d::gl::irender_viewport* default_gl_render_engine(document_state& DocumentState);
 
 /// Prompts the user to choose a camera, returns 0 on cancellation
 k3d::icamera* pick_camera(document_state& DocumentState, const k3d::icamera* CurrentCamera = 0);
@@ -70,7 +70,7 @@ k3d::irender_camera_frame* pick_camera_still_render_engine(document_state& Docum
 /// Prompts the user to choose an animation render engine, returns 0 on cancellation
 k3d::irender_camera_animation* pick_camera_animation_render_engine(document_state& DocumentState);
 /// Prompts the user to choose an OpenGL render engine, returns 0 on cancellation
-k3d::gl::irender_engine* pick_gl_render_engine(document_state& DocumentState);
+k3d::gl::irender_viewport* pick_gl_render_engine(document_state& DocumentState);
 
 void test_render_engine(k3d::iunknown& Engine);
 

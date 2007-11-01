@@ -70,7 +70,7 @@ void timer_helper::on_timer()
 viewport::viewport(QWidget* parent) :
 	QGLWidget(parent),
 	m_camera(init_value<k3d::icamera*>(0)),
-	m_gl_engine(init_value<k3d::gl::irender_engine*>(0)),
+	m_gl_engine(init_value<k3d::gl::irender_viewport*>(0)),
 	m_font_begin(0),
 	m_font_end(0)
 {
@@ -83,7 +83,7 @@ void viewport::on_camera_changed(k3d::icamera* const Camera)
 	update();
 }
 
-void viewport::on_render_engine_changed(k3d::gl::irender_engine* const Engine)
+void viewport::on_render_engine_changed(k3d::gl::irender_viewport* const Engine)
 {
 	m_gl_engine.set_value(Engine);
 	update();
@@ -195,7 +195,7 @@ main_window::main_window(QApplication& Application) :
 
 	m_viewport = new viewport(this);
 	connect(this, SIGNAL(camera_changed(k3d::icamera* const)), m_viewport, SLOT(on_camera_changed(k3d::icamera* const)));
-	connect(this, SIGNAL(render_engine_changed(k3d::gl::irender_engine* const)), m_viewport, SLOT(on_render_engine_changed(k3d::gl::irender_engine* const)));
+	connect(this, SIGNAL(render_engine_changed(k3d::gl::irender_viewport* const)), m_viewport, SLOT(on_render_engine_changed(k3d::gl::irender_viewport* const)));
 
 	setCentralWidget(m_viewport);
 }
@@ -234,7 +234,7 @@ void main_window::on_file_open()
 	statusBar()->showMessage(("Loaded document " + document_path.leaf().raw()).c_str(), 0);
 
 	m_cameras = k3d::find_nodes<k3d::icamera>(m_document->nodes());
-	m_render_engines = k3d::find_nodes<k3d::gl::irender_engine>(m_document->nodes());
+	m_render_engines = k3d::find_nodes<k3d::gl::irender_viewport>(m_document->nodes());
 
 	m_camera_combo->clear();
 	m_camera_combo->setEnabled(m_cameras.size());
@@ -249,7 +249,7 @@ void main_window::on_file_open()
 	m_render_engine_combo->adjustSize();
 	
 	emit camera_changed(m_cameras.size() ? dynamic_cast<k3d::icamera*>(*m_cameras.begin()) : 0);
-	emit render_engine_changed(m_render_engines.size() ? dynamic_cast<k3d::gl::irender_engine*>(*m_render_engines.begin()) : 0);
+	emit render_engine_changed(m_render_engines.size() ? dynamic_cast<k3d::gl::irender_viewport*>(*m_render_engines.begin()) : 0);
 }
 
 void main_window::on_camera_changed(int Index)
@@ -263,7 +263,7 @@ void main_window::on_render_engine_changed(int Index)
 {
 	k3d::nodes_t::iterator it = m_render_engines.begin();
 	std::advance(it, Index);
-	emit render_engine_changed(dynamic_cast<k3d::gl::irender_engine*>(*it));
+	emit render_engine_changed(dynamic_cast<k3d::gl::irender_viewport*>(*it));
 }
 	
 /////////////////////////////////////////////////////////////////////////////

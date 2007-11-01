@@ -86,7 +86,7 @@ void idocument::finish_change_set(const std::string& Label)
 
 void idocument::redraw_all()
 {
-	k3d::gl::redraw_all(wrapped(), k3d::gl::irender_engine::ASYNCHRONOUS);
+	k3d::gl::redraw_all(wrapped(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 }
 
 const list idocument::nodes()

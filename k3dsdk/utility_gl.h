@@ -28,7 +28,7 @@
 #include "bitmap.h"
 #include "color.h"
 #include "gl.h"
-#include "irender_engine_gl.h"
+#include "irender_viewport_gl.h"
 
 namespace k3d
 {
@@ -111,7 +111,7 @@ struct store_attributes
 };
 
 /// Convenience function for refreshing all OpenGL render engines
-void redraw_all(idocument& Document, const irender_engine::redraw_type_t RedrawType);
+void redraw_all(idocument& Document, const irender_viewport::redraw_type_t RedrawType);
 /// Convenience function for setting-up materials
 void setup_material(iunknown* const Material);
 /// Draws a 1x1 plane
