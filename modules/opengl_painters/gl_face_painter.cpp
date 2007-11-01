@@ -43,26 +43,29 @@
 namespace module
 {
 
-namespace development
+namespace opengl
+{
+
+namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// gl_triangulated_face_painter
+// gl_face_painter
 
-class gl_triangulated_face_painter :
+class gl_face_painter :
 	public colored_selection_painter,
 	public k3d::hint::hint_processor
 {
 	typedef colored_selection_painter base;
 
 public:
-	gl_triangulated_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	gl_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6)),
 		m_triangle_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, cached_triangulation>::instance(Document))
 	{
 	}
 	
-	~gl_triangulated_face_painter()
+	~gl_face_painter()
 	{
 		m_triangle_cache.remove_painter(this);
 	}
@@ -85,6 +88,8 @@ public:
 		glPolygonOffset(1.0, 1.0);
 		glEnable(GL_COLOR_MATERIAL);
 		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+		
+		enable_blending();
 		
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
@@ -161,6 +166,8 @@ public:
 		glDisableClientState(GL_FOG_COORDINATE_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_EDGE_FLAG_ARRAY);
+		
+		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
@@ -192,7 +199,7 @@ public:
 		glVertexPointer(3, GL_DOUBLE, 0, &(triangles->points().at(0)));
 		
 		k3d::mesh::indices_t& face_starts = triangles->face_starts();
-		k3d::mesh::indices_t& indices = triangles->indices();
+		cached_triangulation::indices_t& indices = triangles->indices();
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
 		for(size_t face = 0; face != face_count; ++face)
@@ -222,10 +229,10 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<gl_triangulated_face_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
+		static k3d::document_plugin_factory<gl_face_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 			k3d::uuid(0xd4abf63c, 0x2242c17e, 0x2afcb18d, 0x0a8ebdd5),
-			"GLTriangulatedFacePainter",
-			_("Renders mesh faces, after trianglulating them"),
+			"OpenGLFacePainter",
+			_("Renders mesh faces, after trianglulating them (OpenGL 1.1)"),
 			"Development",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -266,13 +273,15 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// gl_triangulated_face_painter_factory
+// gl_face_painter_factory
 
-k3d::iplugin_factory& gl_triangulated_face_painter_factory()
+k3d::iplugin_factory& gl_face_painter_factory()
 {
-	return gl_triangulated_face_painter::get_factory();
+	return gl_face_painter::get_factory();
 }
 
-}
+} // namespace opengl
 
-}
+} // namespace painters
+
+} // namespace module

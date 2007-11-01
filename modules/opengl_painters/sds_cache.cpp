@@ -22,7 +22,10 @@
 namespace module
 {
 
-namespace development
+namespace opengl
+{
+
+namespace painters
 {
 
 ////////////
@@ -81,6 +84,8 @@ void sds_cache::on_execute(const k3d::mesh& Mesh)
 	levels = 0;
 }
 
-}
+} // namespace opengl
 
-}
+} // namespace painters
+
+} // namespace module

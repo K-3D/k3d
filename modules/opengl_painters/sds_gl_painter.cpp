@@ -44,7 +44,10 @@
 namespace module
 {
 
-namespace development
+namespace opengl
+{
+
+namespace painters
 {
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -111,7 +114,9 @@ public:
 		
 		k3d::gl::store_attributes attributes;
 		
+		enable_blending();
 		draw(Mesh, cache->cache, *selection, RenderState);
+		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
@@ -159,7 +164,6 @@ public:
 protected:
 	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, sds_cache>& m_sds_cache;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_levels;
-	bool m_do_update;
 	
 	/// Hint processor implementation
 	void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
@@ -518,7 +522,9 @@ k3d::iplugin_factory& sds_gl_point_painter_factory()
 	return sds_gl_point_painter::get_factory();
 }
 
-} // namespace development
+} // namespace opengl
+
+} // namespace painters
 
 } // namespace module
 

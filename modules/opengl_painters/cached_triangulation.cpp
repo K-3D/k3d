@@ -22,7 +22,10 @@
 namespace module
 {
 
-namespace development
+namespace opengl
+{
+
+namespace painters
 {
 
 void cached_triangulation::on_execute(const k3d::mesh& Mesh)
@@ -114,6 +117,8 @@ void cached_triangulation::add_triangle(const k3d::uint_t Point1, const k3d::uin
 	m_indices.push_back(r3.first->second);
 }
 
-}
+} // namespace opengl
 
-}
+} // namespace painters
+
+} // namespace module

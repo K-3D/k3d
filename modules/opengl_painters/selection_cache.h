@@ -27,7 +27,10 @@
 namespace module
 {
 
-namespace development
+namespace opengl
+{
+
+namespace painters
 {
 
 /// Storage for selection data
@@ -99,8 +102,10 @@ protected:
 	}
 };
 
-}
+} // namespace painters
 
-}
+} // namespace opengl
+
+} // namespace module
 
 #endif /*SELECTION_CACHE_H_*/

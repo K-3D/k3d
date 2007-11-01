@@ -30,6 +30,8 @@
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
 
+#include "colored_selection_painter_gl.h"
+
 namespace module
 {
 
@@ -40,15 +42,14 @@ namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// edge_painter
+// gl_edge_painter
 
-class edge_painter :
-	public k3d::gl::mesh_painter
+class gl_edge_painter :
+	public colored_selection_painter
 {
-	typedef k3d::gl::mesh_painter base;
-
+	typedef colored_selection_painter base;
 public:
-	edge_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	gl_edge_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
@@ -66,18 +67,22 @@ public:
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
-		const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0);
-		const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
-
+		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+		
+		enable_blending();
+		
 		glBegin(GL_LINES);
 		const size_t edge_count = edge_points.size();
 		for(size_t edge = 0; edge != edge_count; ++edge)
 		{
-			k3d::gl::color3d(edge_selection[edge] ? selected_color : color);
+			color4d(edge_selection[edge] ? selected_color : color);
 			k3d::gl::vertex3d(points[edge_points[edge]]);
 			k3d::gl::vertex3d(points[edge_points[clockwise_edges[edge]]]);
 		}
 		glEnd();
+		
+		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
@@ -111,10 +116,10 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<edge_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
+		static k3d::document_plugin_factory<gl_edge_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 			k3d::uuid(0xb1260f93, 0xe16e4ab2, 0xbd6a7cbd, 0x85ddca8b),
 			"OpenGLEdgePainter",
-			_("Renders mesh edges"),
+			_("Renders mesh edges (OpenGL 1.1)"),
 			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -123,11 +128,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// edge_painter_factory
+// gl_edge_painter_factory
 
-k3d::iplugin_factory& edge_painter_factory()
+k3d::iplugin_factory& gl_edge_painter_factory()
 {
-	return edge_painter::get_factory();
+	return gl_edge_painter::get_factory();
 }
 
 } // namespace painters

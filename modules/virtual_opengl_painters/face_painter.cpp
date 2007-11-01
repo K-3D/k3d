@@ -62,13 +62,14 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("VBOTriangulatedFacePainter");
+				const k3d::factories_t factories = k3d::plugins("VBOFacePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}
 
 			if(!delegate)
 			{
+				k3d::log() << info << this->name() << ": Creating legacy OpenGL 1.1 painter" << std::endl;
 				const k3d::factories_t factories = k3d::plugins("OpenGLFacePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());

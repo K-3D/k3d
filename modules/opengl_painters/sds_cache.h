@@ -32,7 +32,10 @@
 namespace module
 {
 
-namespace development
+namespace opengl
+{
+
+namespace painters
 {
 
 /// Color with alpha channel support
@@ -170,7 +173,9 @@ private:
 	k3d::uint_t m_edge;
 };
 
-} // namespace development
+} // namespace opengl
+
+} // namespace painters
 
 } // namespace module
 

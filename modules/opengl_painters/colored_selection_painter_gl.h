@@ -28,7 +28,10 @@
 namespace module
 {
 
-namespace development
+namespace opengl
+{
+
+namespace painters
 {
 
 class colored_selection_painter : 
@@ -127,7 +130,9 @@ inline void color4d(const colored_selection_painter::color_t& Color)
 	glColor4d(Color.red, Color.green, Color.blue, Color.alpha);
 }
 
-} // namespace development
+} // namespace opengl
+
+} // namespace painters
 
 } // namespace module
 

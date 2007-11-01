@@ -31,7 +31,10 @@
 namespace module
 {
 
-namespace development
+namespace opengl
+{
+
+namespace painters
 {
 
 class cached_triangulation :
@@ -42,13 +45,15 @@ class cached_triangulation :
 public:
 	/// Links a single index to a list of indices
 	typedef std::vector<k3d::mesh::indices_t> index_vectors_t;
+	// 32 bit so arrays can be passed directly to OpenGL on 64bit platforms
+	typedef std::vector<k3d::uint32_t> indices_t;
 
 	k3d::mesh::points_t& points()
 	{
 		return m_points;
 	}
 	
-	k3d::mesh::indices_t& indices()
+	indices_t& indices()
 	{
 		return m_indices;
 	}
@@ -109,7 +114,7 @@ private:
 	k3d::mesh::points_t m_points;
 	
 	// indices into m_points for the triangle corners
-	k3d::mesh::indices_t m_indices;
+	indices_t m_indices;
 	
 	// First triangle corner (index into m_indices) for each original face
 	k3d::mesh::indices_t m_face_starts;
@@ -126,8 +131,10 @@ private:
 	k3d::uint_t m_progress;
 };
 
-}
+} // namespace opengl
 
-}
+} // namespace painters
+
+} // namespace module
 
 #endif /*CACHED_TRIANGULATION_H_*/

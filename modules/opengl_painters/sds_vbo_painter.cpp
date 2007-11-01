@@ -45,7 +45,10 @@
 namespace module
 {
 
-namespace development
+namespace opengl
+{
+
+namespace painters
 {
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -121,10 +124,12 @@ public:
 		
 		k3d::gl::store_attributes attributes;
 		
+		enable_blending();
 		clean_vbo_state();
 		vbo_cache->bind();
 		draw(*vbo_cache, *selection, RenderState);
 		clean_vbo_state();
+		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
@@ -501,7 +506,9 @@ k3d::iplugin_factory& sds_vbo_point_painter_factory()
 	return sds_vbo_point_painter::get_factory();
 }
 
-} // namespace development
+} // namespace opengl
+
+} // namespace painters
 
 } // namespace module
 

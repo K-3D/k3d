@@ -43,20 +43,23 @@
 namespace module
 {
 
-namespace development
+namespace opengl
+{
+
+namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// vbo_triangulated_face_painter
+// vbo_face_painter
 
-class vbo_triangulated_face_painter :
+class vbo_face_painter :
 	public colored_selection_painter,
 	public k3d::hint::hint_processor
 {
 	typedef colored_selection_painter base;
 
 public:
-	vbo_triangulated_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	vbo_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6)),
 		m_triangle_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, cached_triangulation>::instance(Document)),
 		m_vbo_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, triangle_vbo>::instance(Document)),
@@ -64,7 +67,7 @@ public:
 	{
 	}
 	
-	~vbo_triangulated_face_painter()
+	~vbo_face_painter()
 	{
 		m_triangle_cache.remove_painter(this);
 		m_vbo_cache.remove_painter(this);
@@ -201,10 +204,10 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<vbo_triangulated_face_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
+		static k3d::document_plugin_factory<vbo_face_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 			k3d::uuid(0x2f953308, 0xc8474bc9, 0x6d58bba7, 0x0355bcfe),
-			"VBOTriangulatedFacePainter",
-			_("Renders mesh faces, after trianglulating them"),
+			"VBOFacePainter",
+			_("Renders mesh faces, after trianglulating them (OpenGL VBOs)"),
 			"Development",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -259,13 +262,15 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// vbo_triangulated_face_painter_factory
+// vbo_face_painter_factory
 
-k3d::iplugin_factory& vbo_triangulated_face_painter_factory()
+k3d::iplugin_factory& vbo_face_painter_factory()
 {
-	return vbo_triangulated_face_painter::get_factory();
+	return vbo_face_painter::get_factory();
 }
 
-}
+} // namespace painters
 
-}
+} // namespace opengl
+
+} // namespace module

@@ -31,6 +31,8 @@
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
 
+#include "colored_selection_painter_gl.h"
+
 namespace module
 {
 
@@ -41,15 +43,15 @@ namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// point_painter
+// gl_point_painter
 
-class point_painter :
-	public k3d::gl::mesh_painter
+class gl_point_painter :
+	public colored_selection_painter
 {
-	typedef k3d::gl::mesh_painter base;
+	typedef colored_selection_painter base;
 
 public:
-	point_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	gl_point_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
@@ -70,18 +72,22 @@ public:
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
-		const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0);
-		const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
+		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 	
+		enable_blending();
+		
 		glBegin(GL_POINTS);
 		const size_t point_begin = 0;
 		const size_t point_end = points.size();
 		for(size_t point = point_begin; point != point_end; ++point)
 		{
-			k3d::gl::color3d(point_selection[point] ? selected_color : color);
+			color4d(point_selection[point] ? selected_color : color);
 			glArrayElement(point);
 		}
 		glEnd();
+		
+		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
@@ -116,7 +122,7 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<point_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
+		static k3d::document_plugin_factory<gl_point_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 			k3d::uuid(0xad24a631, 0xacbd4af1, 0xbd6d6362, 0x75c3d5d7),
 			"OpenGLPointPainter",
 			_("Renders mesh points"),
@@ -128,11 +134,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// point_painter_factory
+// gl_point_painter_factory
 
-k3d::iplugin_factory& point_painter_factory()
+k3d::iplugin_factory& gl_point_painter_factory()
 {
-	return point_painter::get_factory();
+	return gl_point_painter::get_factory();
 }
 
 } // namespace painters

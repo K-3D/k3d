@@ -69,6 +69,7 @@ public:
 
 			if(!delegate)
 			{
+				k3d::log() << info << this->name() << ": Creating legacy OpenGL 1.1 painter" << std::endl;
 				const k3d::factories_t factories = k3d::plugins("OpenGLPointPainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
