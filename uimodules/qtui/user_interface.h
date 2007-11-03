@@ -27,6 +27,7 @@
 #include <k3dsdk/data.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/ideletable.h>
+#include <k3dsdk/irender_viewport_gl.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/iuser_interface_plugin.h>
 
