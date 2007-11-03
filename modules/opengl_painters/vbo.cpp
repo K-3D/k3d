@@ -315,6 +315,8 @@ void triangle_vbo::bind()
 void triangle_vbo::draw_range(k3d::uint_t Start, k3d::uint_t End)
 {
 	k3d::mesh::indices_t& face_starts = m_triangulation->face_starts();
+	if (face_starts.empty())
+		return;
 	cached_triangulation::indices_t& indices = m_triangulation->indices();
 	k3d::uint_t startindex = face_starts[Start];
 	k3d::uint_t endindex = End == (face_starts.size()) ? indices.size() : face_starts[End];

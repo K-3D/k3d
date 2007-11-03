@@ -199,6 +199,8 @@ public:
 		glVertexPointer(3, GL_DOUBLE, 0, &(triangles->points().at(0)));
 		
 		k3d::mesh::indices_t& face_starts = triangles->face_starts();
+		if (face_starts.empty())
+			return;
 		cached_triangulation::indices_t& indices = triangles->indices();
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
