@@ -34,7 +34,10 @@
 
 #include <iostream>
 
-namespace libk3dpyui
+namespace module
+{
+
+namespace pyui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -162,9 +165,11 @@ public:
 	}
 };
 
-} // namespace libk3dpyui
+} // namespace pyui
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dpyui::user_interface::get_factory());
+	Registry.register_factory(module::pyui::user_interface::get_factory());
 K3D_MODULE_END
 

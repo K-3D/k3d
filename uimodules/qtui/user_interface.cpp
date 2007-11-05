@@ -46,7 +46,10 @@
 
 #include <iomanip>
 
-namespace libk3dqtui
+namespace module
+{
+
+namespace qtui
 {
 
 /////////////////////////////////////////////////////////////////////////
@@ -408,9 +411,11 @@ k3d::iplugin_factory& user_interface::get_factory()
 	return factory;
 }
 
-} // namespace libk3dqtui
+} // namespace qtui
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dqtui::user_interface::get_factory());
+	Registry.register_factory(module::qtui::user_interface::get_factory());
 K3D_MODULE_END
 

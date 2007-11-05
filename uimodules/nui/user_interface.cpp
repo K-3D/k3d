@@ -30,7 +30,10 @@
 
 #include <iostream>
 
-namespace libk3dnui
+namespace module
+{
+
+namespace nui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -132,10 +135,12 @@ public:
 	}
 };
 
-} // namespace libk3dnui
+} // namespace nui
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dnui::user_interface::get_factory());
+	Registry.register_factory(module::nui::user_interface::get_factory());
 K3D_MODULE_END
 
 

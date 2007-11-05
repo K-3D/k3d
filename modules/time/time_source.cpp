@@ -21,16 +21,19 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
 #include <limits>
 
-namespace libk3dtime
+namespace module
+{
+
+namespace time
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -78,5 +81,7 @@ k3d::iplugin_factory& time_source_factory()
 	return time_source::get_factory();
 }
 
-} // namespace libk3dtime
+} // namespace time
+
+} // namespace module
 

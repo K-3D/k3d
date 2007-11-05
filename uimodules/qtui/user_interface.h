@@ -37,7 +37,10 @@
 #include <QSplashScreen>
 #include <QTimer>
 
-namespace libk3dqtui
+namespace module
+{
+
+namespace qtui
 {
 
 /////////////////////////////////////////////////////////////////////////
@@ -160,7 +163,9 @@ private:
 	std::auto_ptr<QWidget> m_window;
 };
 
-} // namespace libk3dqtui
+} // namespace qtui
+
+} // namespace module
 
 #endif // !QTUI_USER_INTERFACE_H
 

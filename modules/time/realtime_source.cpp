@@ -20,13 +20,13 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3d-platform-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3d-platform-config.h>
 #include <k3dsdk/user_interface.h>
 
 #include <limits>
@@ -38,7 +38,10 @@
 #include <sys/time.h>
 #endif // !K3D_API_WIN32
 
-namespace libk3dtime
+namespace module
+{
+
+namespace time
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -110,5 +113,7 @@ k3d::iplugin_factory& realtime_source_factory()
 	return realtime_source::get_factory();
 }
 
-} // namespace libk3dtime
+} // namespace time
+
+} // namespace module
 
