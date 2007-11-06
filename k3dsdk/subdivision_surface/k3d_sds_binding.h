@@ -164,6 +164,11 @@ public:
 	/// Reset mesh addresses
 	void set_new_addresses(const k3d::mesh& Mesh)
 	{
+		if (!m_first_level_cache)
+		{
+			set_input(&Mesh);
+			return;
+		}
 		m_first_level_cache_mesh = &Mesh;
 		dynamic_cast<k3d_cache_input*>(m_first_level_cache)->set_new_addresses(Mesh);
 	}
@@ -171,7 +176,8 @@ public:
 	/// Clear the list of modified faces to force recalculation of the geometry affected by a change
 	void clear_modified_faces()
 	{
-		dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_modified_faces().clear();
+		if (m_first_level_cache)
+			dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_modified_faces().clear();
 	}
 	
 	/// Currently set number of levels
