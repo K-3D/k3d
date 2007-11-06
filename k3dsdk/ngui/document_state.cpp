@@ -484,6 +484,13 @@ struct convert_to_points
 	{
 		if(!(Mesh.points && Mesh.point_selection))
 			return;
+		
+		// Sync with existing point selections
+		for (k3d::uint_t point = 0; point != Mesh.point_selection->size(); ++point)
+		{
+			if (Mesh.point_selection->at(point))
+				Selection.points.push_back(k3d::mesh_selection::record(point, 1.0));
+		}
 
 		// Convert edge selections to point selections ...
 		if(Mesh.polyhedra && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges)
@@ -502,47 +509,47 @@ struct convert_to_points
 		// Convert face selections to point selections ...
 		if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops && Mesh.polyhedra->face_loop_counts && Mesh.polyhedra->face_selection && Mesh.polyhedra->loop_first_edges && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges)
 		{
-		    const size_t face_begin = 0;
-		    const size_t face_end = face_begin + Mesh.polyhedra->face_first_loops->size();
-		    for(size_t face = face_begin; face != face_end; ++face)
-		    {
-			if(!(*Mesh.polyhedra->face_selection)[face])
-			    continue;
-
-			const size_t face_loop_begin = (*Mesh.polyhedra->face_first_loops)[face];
-			const size_t face_loop_end = face_loop_begin + (*Mesh.polyhedra->face_loop_counts)[face];
-			for(size_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
-			{
-			    const size_t first_edge = (*Mesh.polyhedra->loop_first_edges)[face_loop];
-			    for(size_t edge = first_edge; ; )
-			    {
-				Selection.points.push_back(k3d::mesh_selection::record((*Mesh.polyhedra->edge_points)[edge], 1.0));
-
-				edge = (*Mesh.polyhedra->clockwise_edges)[edge];
-				if(edge == first_edge)
-				    break;
-			    }
-			}
-		    }
+	    const size_t face_begin = 0;
+	    const size_t face_end = face_begin + Mesh.polyhedra->face_first_loops->size();
+	    for(size_t face = face_begin; face != face_end; ++face)
+	    {
+				if(!(*Mesh.polyhedra->face_selection)[face])
+				    continue;
+	
+				const size_t face_loop_begin = (*Mesh.polyhedra->face_first_loops)[face];
+				const size_t face_loop_end = face_loop_begin + (*Mesh.polyhedra->face_loop_counts)[face];
+				for(size_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
+				{
+				    const size_t first_edge = (*Mesh.polyhedra->loop_first_edges)[face_loop];
+				    for(size_t edge = first_edge; ; )
+				    {
+					Selection.points.push_back(k3d::mesh_selection::record((*Mesh.polyhedra->edge_points)[edge], 1.0));
+	
+					edge = (*Mesh.polyhedra->clockwise_edges)[edge];
+					if(edge == first_edge)
+					    break;
+				    }
+				}
+	    } 
 		}
 
 		// Convert linear curve selections to point selections ...
 		if(Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_first_points && Mesh.linear_curve_groups->curve_point_counts && Mesh.linear_curve_groups->curve_selection && Mesh.linear_curve_groups->curve_points)
 		{
-		    const size_t curve_begin = 0;
-		    const size_t curve_end = curve_begin + Mesh.linear_curve_groups->curve_first_points->size();
-		    for(size_t curve = curve_begin; curve != curve_end; ++curve)
-		    {
-			if(!(*Mesh.linear_curve_groups->curve_selection)[curve])
-			    continue;
-
-			const size_t curve_point_begin = (*Mesh.linear_curve_groups->curve_first_points)[curve];
-			const size_t curve_point_end = curve_point_begin + (*Mesh.linear_curve_groups->curve_point_counts)[curve];
-			for(size_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
-			{
-			    Selection.points.push_back(k3d::mesh_selection::record((*Mesh.linear_curve_groups->curve_points)[curve_point], 1.0));
-			}
-		    }
+	    const size_t curve_begin = 0;
+	    const size_t curve_end = curve_begin + Mesh.linear_curve_groups->curve_first_points->size();
+	    for(size_t curve = curve_begin; curve != curve_end; ++curve)
+	    {
+				if(!(*Mesh.linear_curve_groups->curve_selection)[curve])
+				    continue;
+	
+				const size_t curve_point_begin = (*Mesh.linear_curve_groups->curve_first_points)[curve];
+				const size_t curve_point_end = curve_point_begin + (*Mesh.linear_curve_groups->curve_point_counts)[curve];
+				for(size_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+				{
+				    Selection.points.push_back(k3d::mesh_selection::record((*Mesh.linear_curve_groups->curve_points)[curve_point], 1.0));
+				}
+	    }
 		}
 
 		// Convert cubic curve selections to point selections ...
