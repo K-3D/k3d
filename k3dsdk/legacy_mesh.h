@@ -23,7 +23,6 @@
 #include "algebra.h"
 #include "bounding_box3.h"
 #include "gl.h"
-#include "memory.h"
 #include "selectable.h"
 #include "utility.h"
 
@@ -56,8 +55,7 @@ typedef std::map<std::string, boost::any> parameters_t;
 
 /// Encapsulates a point in 3D space
 class point :
-	public selectable,
-	public memory::cache<point>
+	public selectable
 {
 public:
 	point(const point3& Position);
@@ -76,8 +74,7 @@ public:
 
 /// Encapsulates a group of rendered points
 class point_group :
-	public selectable,
-	public memory::cache<point_group>
+	public selectable
 {
 public:
 	point_group();
@@ -96,8 +93,7 @@ public:
 
 /// Encapsulates a split-edge data structure for representing topology information in a polygon mesh
 class split_edge :
-	public selectable,
-	public memory::cache<split_edge>
+	public selectable
 {
 public:
 	split_edge(point* Vertex, split_edge* FaceClockwise = 0, split_edge* Companion = 0) :
@@ -161,8 +157,7 @@ inline split_edge* face_anticlockwise(split_edge* Edge)
 
 /// Encapsulates a polygonal face
 class face :
-	public selectable,
-	public memory::cache<face>
+	public selectable
 {
 public:
 	face(split_edge* FirstEdge, imaterial* Material);
@@ -192,8 +187,7 @@ normal3 normal(const face& Face);
 
 /// Encapsulates a manifold polyhedron composed of polygon faces
 class polyhedron :
-	public selectable,
-	public memory::cache<polyhedron>
+	public selectable
 {
 public:
 	polyhedron();
@@ -227,8 +221,7 @@ void set_companions(polyhedron& Polyhedron);
 
 /// Encapsulates a linear curve
 class linear_curve :
-	public selectable,
-	public memory::cache<linear_curve>
+	public selectable
 {
 public:
 	/// Defines storage for the set of curve control points
@@ -248,8 +241,7 @@ public:
 
 /// Encapsulates a collection of linear curves
 class linear_curve_group :
-	public selectable,
-	public memory::cache<linear_curve_group>
+	public selectable
 {
 public:
 	linear_curve_group();
@@ -272,8 +264,7 @@ public:
 
 /// Encapsulates a cubic curve
 class cubic_curve :
-	public selectable,
-	public memory::cache<cubic_curve>
+	public selectable
 {
 public:
 	/// Defines storage for the set of curve control points
@@ -293,8 +284,7 @@ public:
 
 /// Encapsulates a collection of cubic curves
 class cubic_curve_group :
-	public selectable,
-	public memory::cache<cubic_curve_group>
+	public selectable
 {
 public:
 	cubic_curve_group();
@@ -317,8 +307,7 @@ public:
 
 /// Encapsulates a NURBS curve - note: there is no equivalent RenderMan primitive, so these can't be rendered - take a look at cubic_curve, instead.
 class nucurve :
-	public selectable,
-	public memory::cache<nucurve>
+	public selectable
 {
 public:
 	nucurve();
@@ -346,8 +335,7 @@ public:
 
 /// Encapsulates a collection of NURBS curves - note: there is no equivalent RenderMan primitive, so these can't be rendered - take a look at cubic_curve_group, instead
 class nucurve_group :
-	public selectable,
-	public memory::cache<nucurve_group>
+	public selectable
 {
 public:
 	nucurve_group();
@@ -366,8 +354,7 @@ public:
 
 /// Encapsulates a bilinear patch
 class bilinear_patch :
-	public selectable,
-	public memory::cache<bilinear_patch>
+	public selectable
 {
 public:
 	bilinear_patch();
@@ -392,8 +379,7 @@ public:
 
 /// Encapsulates a bicubic patch
 class bicubic_patch :
-	public selectable,
-	public memory::cache<bicubic_patch>
+	public selectable
 {
 public:
 	bicubic_patch();
@@ -417,8 +403,7 @@ public:
 
 /// Encapsulates a NURBS patch
 class nupatch :
-	public selectable,
-	public memory::cache<nupatch>
+	public selectable
 {
 public:
 	nupatch();
@@ -455,8 +440,7 @@ public:
 // blobby
 
 /// Encapsulates a RenderMan blobby (implicit surface) primitive as a tree
-class blobby :
-	public memory::cache<blobby>
+class blobby
 {
 public:
 	// Forward declarations
@@ -647,8 +631,7 @@ public:
 
 /// Encapsulates a collection of geometry
 class mesh :
-	public selectable,
-	public memory::cache<mesh>
+	public selectable
 {
 public:
 	mesh();

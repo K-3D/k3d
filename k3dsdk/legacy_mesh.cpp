@@ -28,23 +28,6 @@
 namespace k3d
 {
 
-k3d_instantiate_memory_cache(legacy::point);
-k3d_instantiate_memory_cache(legacy::point_group);
-k3d_instantiate_memory_cache(legacy::split_edge);
-k3d_instantiate_memory_cache(legacy::face);
-k3d_instantiate_memory_cache(legacy::polyhedron);
-k3d_instantiate_memory_cache(legacy::linear_curve);
-k3d_instantiate_memory_cache(legacy::linear_curve_group);
-k3d_instantiate_memory_cache(legacy::cubic_curve);
-k3d_instantiate_memory_cache(legacy::cubic_curve_group);
-k3d_instantiate_memory_cache(legacy::nucurve);
-k3d_instantiate_memory_cache(legacy::nucurve_group);
-k3d_instantiate_memory_cache(legacy::bilinear_patch);
-k3d_instantiate_memory_cache(legacy::bicubic_patch);
-k3d_instantiate_memory_cache(legacy::nupatch);
-k3d_instantiate_memory_cache(legacy::blobby);
-k3d_instantiate_memory_cache(legacy::mesh);
-
 namespace legacy
 {
 	
