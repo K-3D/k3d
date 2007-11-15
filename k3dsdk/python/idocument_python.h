@@ -59,7 +59,7 @@ public:
 	void delete_node(boost::python::object& Node);
 
 	boost::python::object get_dependency(iproperty& Property);
-	void set_dependency(iproperty& LHS, iproperty& RHS);
+	void set_dependency(iproperty& LHS, boost::python::object& RHS);
 
 	static void define_class();
 };

@@ -145,11 +145,25 @@ object idocument::get_dependency(iproperty& Property)
 	return dependency ? object(iproperty(dependency)) : object();
 }
 
-void idocument::set_dependency(iproperty& From, iproperty& To)
+void idocument::set_dependency(iproperty& From, boost::python::object& To)
 {
-	k3d::iproperty* const from = From.wrapped_ptr();
-	k3d::iproperty* const to = To.wrapped_ptr();
+	k3d::iproperty* to = 0;
 
+	extract<iproperty> iproperty_value(To);
+	if(iproperty_value.check())
+	{
+		to = iproperty_value().wrapped_ptr();
+	}
+	else if(To.ptr() == boost::python::object().ptr())
+	{
+		to = 0;
+	}
+	else
+	{
+		throw std::invalid_argument("to property must be an iproperty instance or None");
+	}
+
+	k3d::iproperty* const from = From.wrapped_ptr();
 	if(!from)
 		throw std::invalid_argument("from property cannot be null");
 
