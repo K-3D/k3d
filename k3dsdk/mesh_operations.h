@@ -87,6 +87,73 @@ const bool_t validate_blobbies(const mesh& Mesh);
 /// Returns true iff the given mesh should be rendered as SDS
 const bool_t is_sds(const mesh& Mesh);
 
+/// Traverse selected mesh points
+template<typename visitor_t>
+void traverse_selected_points(const mesh& Mesh, visitor_t& Visitor)
+{
+	return_if_fail(validate_points(Mesh));
+	for (uint_t point = 0; point != Mesh.points->size(); ++point)
+	{
+		if (Mesh.point_selection->at(point))
+		{
+			Visitor(point, Mesh.points->at(point));
+		}
+	}
+}
+
+/// For each selected edge, visit the start and end point (multiple visits per point possible!)
+template<typename visitor_t>
+void traverse_selected_edge_points(const mesh& Mesh, visitor_t& Visitor)
+{
+	return_if_fail(validate_polyhedra(Mesh));
+	const mesh::points_t& points = *Mesh.points;
+	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+	const mesh::selection_t& edge_selection = *Mesh.polyhedra->edge_selection;
+	for (uint_t edge = 0; edge != edge_points.size(); ++edge)
+	{
+		if (edge_selection[edge])
+		{
+			Visitor(edge_points[edge], points[edge_points[edge]]);
+			Visitor(edge_points[clockwise_edges[edge]], points[edge_points[clockwise_edges[edge]]]);
+		}
+	}
+}
+
+// For each selected face, visit all of its points (multiple visits per point possible!)
+template<typename visitor_t>
+void traverse_selected_face_points(const mesh& Mesh, visitor_t& Visitor)
+{
+	return_if_fail(validate_polyhedra(Mesh));
+	const mesh::points_t& points = *Mesh.points;
+	const mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+	const mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+	const mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+	const mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
+	for(uint_t face = 0; face != face_first_loops.size(); ++face)
+	{
+		if (!face_selection[face])
+			continue;
+		
+		const uint_t loop_begin = face_first_loops[face];
+		const uint_t loop_end = loop_begin + face_loop_counts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			const uint_t first_edge = loop_first_edges[loop];
+			for(uint_t edge = first_edge; ; )
+			{
+				Visitor(edge_points[edge], points[edge_points[edge]]);
+
+				edge = clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+		}
+	}
+}
+
 } // namespace k3d
 
 #endif // K3DSDK_MESH_OPERATIONS_H

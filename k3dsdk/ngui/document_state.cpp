@@ -679,7 +679,10 @@ struct convert_to_lines
 			for(size_t edge = edge_begin; edge != edge_end; ++edge)
 			{
 				if(edge_selection[edge])
+				{
+					Selection.edges.push_back(k3d::mesh_selection::record(edge, 1.0));
 					continue;
+				}
 
 				if(point_selection[edge_points[edge]] || point_selection[edge_points[clockwise_edges[edge]]])
 					Selection.edges.push_back(k3d::mesh_selection::record(edge, 1.0));
@@ -821,7 +824,10 @@ struct convert_to_faces
 			for(size_t face = face_begin; face != face_end; ++face)
 			{
 				if((*Mesh.polyhedra->face_selection)[face])
+				{
+					Selection.faces.push_back(k3d::mesh_selection::record(face, 1.0));
 					continue;
+				}
 
 				const size_t face_loop_begin = (*Mesh.polyhedra->face_first_loops)[face];
 				const size_t face_loop_end = face_loop_begin + (*Mesh.polyhedra->face_loop_counts)[face];

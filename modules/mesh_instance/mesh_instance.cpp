@@ -157,6 +157,19 @@ public:
 			document().state_recorder().current_change_set()->connect_redo_signal(sigc::mem_fun(*this, &mesh_instance::connect));
 		}
 		m_input_matrix.changed_signal().connect(m_transformed_mesh.make_reset_slot());
+		Document.close_signal().connect(sigc::mem_fun(*this, &mesh_instance::disconnect));
+	}
+	
+	void disconnect()
+	{
+		for (size_t i = 0; i != m_connections.size(); ++i)
+			m_connections[i].disconnect();
+		m_connections.clear();
+	}
+	
+	~mesh_instance()
+	{
+		disconnect();
 	}
 	
 	/// Make the connections
@@ -203,9 +216,7 @@ public:
 		// clear connections to prevent crash on document close
 		if(!document().state_recorder().current_change_set()) // no undo recording: this is the end, my friend
 		{
-			for (size_t i = 0; i != m_connections.size(); ++i)
-				m_connections[i].disconnect();
-			m_connections.clear();
+			disconnect();
 		}
 	}
 	
@@ -229,6 +240,7 @@ public:
 	void selection_changed(iunknown* const Hint)
 	{
 		append_hint(k3d::hint::selection_changed());
+		m_transformed_mesh.reset(0, Hint);
 	}
 
 	void create_mesh(k3d::mesh& OutputMesh)
