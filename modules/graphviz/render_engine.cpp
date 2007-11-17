@@ -27,6 +27,8 @@
 #include <k3dsdk/inetwork_render_farm.h>
 #include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/inetwork_render_job.h>
+#include <k3dsdk/inode_collection_property.h>
+#include <k3dsdk/inode_visibility.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/irender_preview.h>
@@ -39,7 +41,68 @@
 #include <iomanip>
 #include <iterator>
 
-namespace libk3dgraphviz
+namespace k3d
+{
+
+namespace data
+{
+
+/////////////////////////////////////////////////////////////////////////////
+// node_collection_serialization
+
+/// Serialization policy for data containers that can be serialized as XML
+template<typename value_t, class property_policy_t>
+class node_collection_serialization :
+	public property_policy_t,
+	public ipersistent
+{
+public:
+	void save(xml::element& Element, const ipersistent::save_context& Context)
+	{
+		std::stringstream buffer;
+
+		const inode_collection_property::nodes_t& nodes = property_policy_t::internal_value();
+		for(inode_collection_property::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+		{
+			if(*node)
+				buffer << " " << string_cast(Context.lookup.lookup_id(*node));
+			else
+				buffer << " 0";
+		}
+
+		Element.append(xml::element("property", buffer.str(), xml::attribute("name", property_policy_t::name())));
+	}
+
+	void load(xml::element& Element, const ipersistent::load_context& Context)
+	{
+		inode_collection_property::nodes_t nodes;
+
+		std::stringstream buffer(Element.text);
+		std::string node;
+		while(buffer >> node)
+			nodes.push_back(dynamic_cast<inode*>(Context.lookup.lookup_object(from_string(node, static_cast<ipersistent_lookup::id_type>(0)))));
+		nodes.erase(std::remove(nodes.begin(), nodes.end(), static_cast<inode*>(0)), nodes.end());
+
+		property_policy_t::set_value(nodes);
+	}
+
+protected:
+	template<typename init_t>
+	node_collection_serialization(const init_t& Init) :
+		property_policy_t(Init)
+	{
+		Init.persistent_container().enable_serialization(Init.name(), *this);
+	}
+};
+
+} // namespace data
+
+} // namespace k3d
+
+namespace module
+{
+
+namespace graphviz
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -47,6 +110,7 @@ namespace libk3dgraphviz
 
 class render_engine :
 	public k3d::persistent<k3d::node>,
+	public k3d::inode_visibility,
 	public k3d::irender_preview,
 	public k3d::irender_frame
 {
@@ -55,8 +119,14 @@ class render_engine :
 public:
 	render_engine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_render_engine(init_owner(*this) + init_name("render_engine") + init_label(_("Render engine")) + init_description(_("Render engine name")) + init_value(std::string("dot")) + init_values(render_engine_values()))
+		m_visible_nodes(init_owner(*this) + init_name("visible_nodes") + init_label(_("Visible Nodes")) + init_description(_("Visible Nodes")) + init_value(std::vector<k3d::inode*>())),
+		m_render_engine(init_owner(*this) + init_name("render_engine") + init_label(_("Render engine")) + init_description(_("Render engine name")) + init_value(k3d::string_t("dot")) + init_values(render_engine_values()))
 	{
+	}
+
+	k3d::iproperty& visible_nodes()
+	{
+		return m_visible_nodes;
 	}
 
 	bool render_preview()
@@ -130,19 +200,21 @@ public:
 
 private:
 	template<typename T>
-	static unsigned long to_integer(const T RHS)
+	static const k3d::string_t pointer_id(const T RHS)
 	{
 		// If this fails, it means that a pointer can't fit in a long int on your platform - you need to adjust the return type of this function
-		BOOST_STATIC_ASSERT(sizeof(T) <= sizeof(unsigned long));
+		BOOST_STATIC_ASSERT(sizeof(T) <= sizeof(k3d::uint64_t));
 
-		return reinterpret_cast<unsigned long>(RHS);
+		std::stringstream buffer;
+		buffer << reinterpret_cast<k3d::uint64_t>(RHS);
+		return buffer.str();
 	}
 
-	static const std::string escaped_string(const std::string& Source)
+	static const k3d::string_t escaped_string(const k3d::string_t& Source)
 	{
-		std::string result(Source);
+		k3d::string_t result(Source);
 
-		for(std::string::size_type i = result.find('\"'); i != std::string::npos; i = result.find('\"', i+2))
+		for(k3d::string_t::size_type i = result.find('\"'); i != k3d::string_t::npos; i = result.find('\"', i+2))
 			result.replace(i, 1, "\\\"");
 
 		return result;
@@ -171,46 +243,51 @@ private:
 
 		stream << "node [shape=box,style=filled,width=0,height=0]\n\n";
 
-		// Make a mapping of properties-to-objects as we go ...
-		std::map<k3d::iproperty*, k3d::inode*> object_map;
 
-		// Create nodes for every document object ...
-		const k3d::nodes_t objects = document().nodes().collection();
-		for(k3d::nodes_t::const_iterator object = objects.begin(); object != objects.end(); ++object)
+		// Create a mapping of properties-to-nodes as we go ...
+		typedef std::map<k3d::iproperty*, k3d::inode*> property_node_map_t;
+		property_node_map_t property_node_map;
+
+		// Draw a vertex for every visible node ...
+		const k3d::inode_collection_property::nodes_t visible_nodes = boost::any_cast<k3d::inode_collection_property::nodes_t>(m_visible_nodes.property_value());
+		for(k3d::inode_collection_property::nodes_t::const_iterator node = visible_nodes.begin(); node != visible_nodes.end(); ++node)
 		{
-			stream << to_integer(*object) << " [label=\"" << escaped_string((*object)->name()) << "\"]\n";
+			stream << pointer_id(*node) << " [label=\"" << escaped_string((*node)->name()) << "\"]\n";
 
-			k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(*object);
-			if(property_collection)
+			if(k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(*node))
 			{
 				const k3d::iproperty_collection::properties_t properties = property_collection->properties();
 				for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-				{
-					object_map.insert(std::make_pair(*property, *object));
-
-					// Show references between objects ...
-					if(typeid(k3d::inode*) == (*property)->property_type())
-					{
-						k3d::inode* const referenced_object = boost::any_cast<k3d::inode*>((*property)->property_value());
-						if(referenced_object)
-						{
-							stream << to_integer(referenced_object) << " -> " << to_integer(*object);
-							stream << " [style=dotted,label=\"" << escaped_string((*property)->property_name()) << "\"]\n";
-						}
-					}
-				}
+					property_node_map.insert(std::make_pair(*property, *node));
 			}
 		}
 
-		// Show property dependencies ...
+		// Draw an edge for every property dependency between visible nodes ...
 		stream << "\n";
 		const k3d::ipipeline::dependencies_t dependencies = document().pipeline().dependencies();
 		for(k3d::ipipeline::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
 		{
-			if(dependency->first && dependency->second)
+			if(property_node_map.count(dependency->first) && property_node_map.count(dependency->second))
 			{
-				stream << to_integer(object_map[dependency->second]) << " -> " << to_integer(object_map[dependency->first]);
+				stream << pointer_id(property_node_map[dependency->second]) << " -> " << pointer_id(property_node_map[dependency->first]);
 				stream << " [headlabel=\"" << escaped_string(dependency->first->property_name()) << "\" taillabel=\"" << escaped_string(dependency->second->property_name()) << "\"]\n";
+			}
+		}
+
+		// Draw an edge for every property whose value is another property ...
+		stream << "\n";
+		for(property_node_map_t::const_iterator property = property_node_map.begin(); property != property_node_map.end(); ++property)
+		{
+			if(typeid(k3d::inode*) == property->first->property_type())
+			{
+				if(k3d::inode* const referenced_node = boost::any_cast<k3d::inode*>(property->first->property_value()))
+				{
+					if(std::count(visible_nodes.begin(), visible_nodes.end(), referenced_node))
+					{
+						stream << pointer_id(referenced_node) << " -> " << pointer_id(property->second);
+						stream << " [style=dotted,label=\"" << escaped_string(property->first->property_name()) << "\"]\n";
+					}
+				}
 			}
 		}
 
@@ -219,11 +296,12 @@ private:
 		return true;
 	}
 
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_render_engine;
+	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, node_collection_serialization) m_visible_nodes;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_render_engine;
 
-	const k3d::ilist_property<std::string>::values_t& render_engine_values()
+	const k3d::ilist_property<k3d::string_t>::values_t& render_engine_values()
 	{
-		static k3d::ilist_property<std::string>::values_t values;
+		static k3d::ilist_property<k3d::string_t>::values_t values;
 		if(values.empty())
 		{
 			const k3d::options::render_engines_t engines = k3d::options::render_engines();
@@ -237,9 +315,11 @@ private:
 	}
 };
 
-} // namespace libk3dgraphviz
+} // namespace graphviz
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dgraphviz::render_engine::get_factory());
+	Registry.register_factory(module::graphviz::render_engine::get_factory());
 K3D_MODULE_END
 

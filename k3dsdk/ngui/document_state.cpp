@@ -60,6 +60,7 @@
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
+#include <k3dsdk/inode_visibility.h>
 #include <k3dsdk/ipersistent.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iscripted_action.h>
@@ -1560,12 +1561,10 @@ public:
 
 		// If the new node is a camera, orient it horizontally
 		if(k3d::classes::Camera() == Factory->factory_id())
-		{
 			k3d::set_matrix(*node, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
-		}
 		
 		// If the new node is a CGALBoolean node, add two mesh inputs
-		if (Factory->name() == "CGALBoolean")
+		if(Factory->name() == "CGALBoolean")
 		{
 			k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(node);
 			k3d::ipersistent_container* const persistent_container = dynamic_cast<k3d::ipersistent_container*>(node);
@@ -1575,6 +1574,10 @@ public:
 				k3d::user::create_property<k3d::user::mesh_property, k3d::mesh*>("input2", "Input 2", "", m_document, *property_collection, *persistent_container, node, 0);
 			}
 		}
+
+		// If the new node is a render-engine, make every node in the document visible ...
+		if(k3d::inode_visibility* const node_visibility = dynamic_cast<k3d::inode_visibility*>(node))
+			k3d::property::set_internal_value(node_visibility->visible_nodes(), document().nodes().collection());	
 
 		// Replace the current selection
 		deselect_all();

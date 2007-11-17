@@ -242,6 +242,7 @@ void initialize_types()
 	register_type(typeid(k3d::typed_array<unsigned int>), "k3d::typed_array<unsigned int>");
 	register_type(typeid(std::vector<k3d::point3>), "std::vector<k3d::point3>");
 	register_type(typeid(std::vector<unsigned int>), "std::vector<unsigned int>");
+	register_type(typeid(std::vector<k3d::inode*>), "std::vector<k3d::inode*>");
 
 	initialized = true;
 }

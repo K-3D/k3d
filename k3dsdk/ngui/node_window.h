@@ -1,5 +1,5 @@
-#ifndef NGUI_OBJECT_WINDOW_H
-#define NGUI_OBJECT_WINDOW_H
+#ifndef NGUI_NODE_WINDOW_H
+#define NGUI_NODE_WINDOW_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -44,7 +44,7 @@ class node_window :
 	typedef Gtk::Window base;
 
 public:
-	node_window(k3d::inode& Object, k3d::icommand_node& Parent, const std::string& Name);
+	node_window(k3d::inode& Node, k3d::icommand_node& Parent, const std::string& Name);
 	virtual ~node_window();
 
 	k3d::inode& node();
@@ -73,5 +73,5 @@ private:
 
 } // namespace libk3dngui
 
-#endif // NGUI_OBJECT_WINDOW_H
+#endif // NGUI_NODE_WINDOW_H
 

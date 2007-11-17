@@ -35,6 +35,7 @@
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/node_chooser.h>
+#include <k3dsdk/ngui/node_collection_chooser.h>
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/path_chooser.h>
 #include <k3dsdk/ngui/point_control.h>
@@ -67,6 +68,7 @@
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/inode.h>
+#include <k3dsdk/inode_collection_property.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/iproperty_group_collection.h>
 #include <k3dsdk/irender_camera_animation.h>
@@ -517,6 +519,12 @@ public:
 					node_chooser::control* const control = new node_chooser::control(m_parent, property_name, node_chooser::proxy(m_document_state, property, state_recorder, property_name), node_chooser::filter(property));
 					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
+					entry_list.push_back(control);
+				}
+				else if(property_type == typeid(k3d::inode_collection_property::nodes_t))
+				{
+					node_collection_chooser::control* const control = new node_collection_chooser::control(m_parent, property_name, node_collection_chooser::model(property), state_recorder);
+					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 					entry_list.push_back(control);
 				}
 				// Bitmap properties ...

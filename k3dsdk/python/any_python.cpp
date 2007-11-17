@@ -41,6 +41,7 @@
 #include <k3dsdk/vectors.h>
 
 #include <boost/python.hpp>
+#include <boost/python/detail/api_placeholder.hpp>
 using namespace boost::python;
 
 namespace k3d
@@ -141,6 +142,17 @@ const object any_to_python(const boost::any& Value)
 	if(type == typeid(const k3d::ri::render_state*))
 	{
 		return object(ri_render_state(boost::any_cast<const k3d::ri::render_state*>(Value)));
+	}
+
+	if(type == typeid(std::vector<k3d::inode*>))
+	{
+		std::vector<k3d::inode*> nodes = boost::any_cast<std::vector<k3d::inode*> >(Value);
+
+		boost::python::list results;
+		for(size_t i = 0; i != nodes.size(); ++i)
+			results.append(inode(nodes[i]));
+
+		return results;
 	}
 
 	throw std::invalid_argument("can't convert unrecognized type [" + demangle(type) + "] to boost::python::object");
@@ -269,6 +281,19 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 	if(TargetType == typeid(k3d::bitmap*))
 	{
 		return boost::any(extract<bitmap>(Value)().wrapped_ptr());
+	}
+
+	if(TargetType == typeid(std::vector<k3d::inode*>))
+	{
+		std::vector<k3d::inode*> results;
+
+		boost::python::list nodes = extract<boost::python::list>(Value);
+		const size_t count = boost::python::len(nodes);
+		results.resize(count);
+		for(size_t i = 0; i != count; ++i)
+			results[i] = extract<inode>(nodes[i])().wrapped_ptr();
+
+		return boost::any(results);
 	}
 
 	throw std::invalid_argument("can't convert python value to unrecognized type [" + demangle(TargetType) + "]");
