@@ -20,17 +20,25 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "types.h"
 #include <k3d-platform-config.h>
-#include <string>
+#include "types.h"
+#include <boost/static_assert.hpp>
 
 namespace k3d
 {
 
-/// Functor for testing objects for equality - based on "Comparing floating point numbers" by Bruce Dawson
+/// Functor for testing objects for "loose" equality - specializations for exact types including integers and strings test for exact equality, while specializations for floating-point types test for equality within a caller-specified tolerance
 template<typename T>
 class almost_equal
 {
+public:
+	almost_equal(const k3d::uint64_t) { }
+	inline const bool operator()(const T A, const T B) const
+	{
+		// This will be triggered if this template is ever instantiated
+		BOOST_STATIC_ASSERT((sizeof(T) == 0));
+		return false;
+	}
 };
 
 /// Specialization of almost_equal that tests k3d::bool_t for equality
@@ -123,11 +131,11 @@ public:
 	inline const bool operator()(const T A, const T B) const { return A == B; }
 };
 
-/// Specialization of almost_equal that tests two double values for near-equality
+/// Specialization of almost_equal that tests two k3d::double_t values for near-equality - based on "Comparing floating point numbers" by Bruce Dawson
 template<>
-class almost_equal<double>
+class almost_equal<k3d::double_t>
 {
-	typedef double T;
+	typedef k3d::double_t T;
 
 public:
 	almost_equal(const k3d::uint64_t Threshold) :
@@ -142,15 +150,15 @@ public:
 	}
 
 private:
-	/// Convert a double to a lexicographically-ordered twos-complement integer
-	inline static const k3d::int64_t to_integer(const double Value)
+	/// Convert a k3d::double_t to a lexicographically-ordered twos-complement integer
+	inline static const k3d::int64_t to_integer(const k3d::double_t Value)
 	{
 		const k3d::int64_t value = *(k3d::int64_t*)&Value;
 		return value < 0 ? 0x8000000000000000LL - value : value;
 	}
 
-	/// Given two doubles, returns their difference expressed as the number of uniquely-representable floating-point values that separate them
-	inline static const k3d::int64_t representable_difference(const double A, const double B)
+	/// Given two k3d::double_t, returns their difference expressed as the number of uniquely-representable floating-point values that separate them
+	inline static const k3d::int64_t representable_difference(const k3d::double_t A, const k3d::double_t B)
 	{
 		return to_integer(B) - to_integer(A);
 	}
@@ -158,11 +166,11 @@ private:
 	const k3d::uint64_t threshold;
 };
 
-/// Specialization of almost_equal that tests std::string for equality
+/// Specialization of almost_equal that tests k3d::string_t for equality
 template<>
-class almost_equal<std::string>
+class almost_equal<k3d::string_t>
 {
-	typedef std::string T;
+	typedef k3d::string_t T;
 public:
 	almost_equal(const k3d::uint64_t) { }
 	inline const bool operator()(const T A, const T B) const { return A == B; }
