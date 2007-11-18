@@ -1518,7 +1518,7 @@ private:
 		// If the user didn't select a specific filter, try automatic detection ...
 		// Make this an undoable operation ...
 		k3d::record_state_change_set change_set(document(), k3d::string_cast(boost::format(_("Import %1%")) % filepath.native_utf8_string().raw()), K3D_CHANGE_SET_CONTEXT);
-		if(!k3d::import_file(document(), *filter, filepath))
+		if(!filter->read_file(document(), filepath))
 		{
 			error_message(
 				"Error importing file.  If you chose \"Automatic\" as the filter type,\n"
@@ -1582,7 +1582,7 @@ private:
 			return_if_fail(filter.get());
 		}
 
-		if(!k3d::export_file(document(), *filter, filepath))
+		if(!filter->write_file(document(), filepath))
 			error_message(_("Error exporting document"));
 	}
 

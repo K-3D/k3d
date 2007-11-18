@@ -1312,16 +1312,6 @@ void load_pipeline(idocument& Document, element& XML, const ipersistent::load_co
 	Document.pipeline().set_dependencies(dependencies);
 }
 
-bool import_file(idocument& Document, idocument_importer& FormatFilter, const filesystem::path& File)
-{
-	return FormatFilter.read_file(Document, File);
-}
-
-bool export_file(idocument& Document, idocument_exporter& FormatFilter, const filesystem::path& File)
-{
-	return FormatFilter.write_file(Document, File);
-}
-
 void save_node(ipersistent& Node, xml::element& XML, const ipersistent::save_context& Context)
 {
 	inode* const node = dynamic_cast<inode*>(&Node);

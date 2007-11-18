@@ -7,8 +7,6 @@ namespace k3d
 {
 
 class idocument;
-class idocument_importer;
-class idocument_exporter;
 class imaterial;
 class ipersistent;
 class ipersistent::load_context;
@@ -32,11 +30,6 @@ void save_mesh(const mesh& Mesh, xml::element& Container, const ipersistent::sav
 void load_mesh(mesh& Mesh, xml::element& Container, const ipersistent::load_context& Context);
 /// Deserializes a legacy mesh from an XML document. Needed to parse documents with old FrozenMesh nodes.
 void load_legacy_mesh(legacy::mesh& Mesh, xml::element& XML, const ipersistent::load_context& Context);
-
-/// Imports data into a document from a file
-bool import_file(idocument& Document, idocument_importer& FormatFilter, const filesystem::path& FilePath);
-/// Exports document data to a file
-bool export_file(idocument& Document, idocument_exporter& FormatFilter, const filesystem::path& FilePath);
 
 /// Serializes a document node to an XML document
 void save_node(k3d::ipersistent& Node, xml::element& XML, const ipersistent::save_context& Context);
