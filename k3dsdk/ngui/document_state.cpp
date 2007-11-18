@@ -958,10 +958,6 @@ public:
 		m_context_menu_node("context_menu", dynamic_cast<k3d::icommand_node*>(&Document)),
 		m_context_menu(0)
 	{
-		/** \todo Restore UI serialization */
-/*
-		m_document.enable_plugin_serialization(get_class_id(), *this);
-*/
 		m_selection_mode.connect_explicit_change_signal(sigc::mem_fun(*this, &implementation::on_selection_mode_changed));
 
 		// Process remove_nodes_signal

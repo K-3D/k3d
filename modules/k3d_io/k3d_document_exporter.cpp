@@ -92,17 +92,6 @@ public:
 		k3d::persistent_lookup lookup;
 		k3d::ipersistent::save_context context(root_path, dependencies, lookup);
 
-		// Save per-plugin data ...
-		element& xml_application = xml.append(element("application"));
-		element& xml_plugins = xml_application.append(element("plugins"));
-		for(k3d::idocument::plugin_serialization_handlers_t::const_iterator plugin = Document.plugin_serialization_handlers().begin(); plugin != Document.plugin_serialization_handlers().end(); ++plugin)
-		{
-			const k3d::uuid plugin_factory_id = plugin->first;
-			k3d::ipersistent& plugin_handler = *plugin->second;
-
-			plugin_handler.save(xml_plugins.append(element("plugin", attribute("factory", plugin_factory_id))), context);
-		}
-
 		// Save per-document data ...
 		element& xml_document = xml.append(element("document"));
 		element& xml_nodes = xml_document.append(element("nodes"));

@@ -39,7 +39,6 @@ namespace k3d
 class ipipeline;
 class inode_collection;
 class inode_name_map;
-class ipersistent;
 class ipipeline_profiler;
 class iproperty;
 class istate_recorder;
@@ -65,12 +64,6 @@ public:
 	virtual iproperty& path() = 0;
 	/// Returns a property that will store the document title (could be empty string)
 	virtual iproperty& title() = 0;
-
-	/// Registers a handler to be used for serializing per-plugin-type data in a document
-	virtual void enable_plugin_serialization(const uuid& ClassID, ipersistent& Handler) = 0;
-	/// Defines a collection of plugin serialization handlers
-	typedef std::map<uuid, ipersistent*> plugin_serialization_handlers_t;
-	virtual const plugin_serialization_handlers_t& plugin_serialization_handlers() = 0;
 
 	/// Defines a signal emitted when the document closes
 	typedef sigc::signal<void> close_signal_t;

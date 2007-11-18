@@ -480,17 +480,6 @@ public:
 		return m_title;
 	}
 
-	void enable_plugin_serialization(const uuid& ClassID, ipersistent& Handler)
-	{
-		return_if_fail(ClassID != uuid::null());
-		m_plugin_serialization_handlers.insert(std::make_pair(ClassID, &Handler));
-	}
-
-	const idocument::plugin_serialization_handlers_t& plugin_serialization_handlers()
-	{
-		return m_plugin_serialization_handlers;
-	}
-
 	idocument::close_signal_t& close_signal()
 	{
 		return m_close_signal;
@@ -515,9 +504,6 @@ private:
 	k3d_data(filesystem::path, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_path;
 	/// Stores the document title (if any)
 	k3d_data(ustring, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_title;
-
-	/// Stores a collection of per-plugin-type serialization handlers
-	plugin_serialization_handlers_t m_plugin_serialization_handlers;
 };
 
 /// This is a real abortion, but it solves our interdependency problems among state recorder, pipeline, and property collection implementations

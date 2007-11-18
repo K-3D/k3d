@@ -190,44 +190,6 @@ public:
 			k3d::load_pipeline(Document, *xml_document, context);
 		}
 
-		// Load per-plugin-type data ....
-		if(element* const xml_application = find_element(xml, "application"))
-		{
-			if(element* const xml_plugins = find_element(*xml_application, "plugins"))
-			{
-				for(element::elements_t::iterator xml_plugin = xml_plugins->children.begin(); xml_plugin != xml_plugins->children.end(); ++xml_plugin)
-				{
-					if(xml_plugin->name != "plugin")
-						continue;
-
-					if(attribute_value<bool>(*xml_plugin, "do_not_load", false))
-						continue;
-
-					const k3d::uuid factory_id = attribute_value<k3d::uuid>(*xml_plugin, "factory", k3d::uuid::null());
-					if(factory_id == k3d::uuid::null())
-					{
-						k3d::log() << error << "Plugin with unspecified factory ID will not be loaded" << std::endl;
-						continue;
-					}
-
-					if(!Document.plugin_serialization_handlers().count(factory_id))
-					{
-						k3d::log() << error << "Unknown plugin type [" << factory_id << "] will not be loaded" << std::endl;
-						continue;
-					}
-
-					k3d::ipersistent* const handler = Document.plugin_serialization_handlers().find(factory_id)->second;
-					if(!handler)
-					{
-						k3d::log() << error << "Invalid serialization handler for plugin type [" << factory_id << "] will not be used" << std::endl;
-						continue;
-					}
-
-					handler->load(*xml_plugin, context);
-				}
-			}
-		}
-
 		return true;
 	}
 
