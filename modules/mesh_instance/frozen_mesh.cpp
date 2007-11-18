@@ -32,9 +32,7 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/serialization.h>
-
-using namespace k3d::xml;
+#include <k3dsdk/serialization_xml.h>
 
 #include <iterator>
 
@@ -84,18 +82,18 @@ public:
 		m_output_mesh.reset(Mesh);
 	}
 
-	void save(element& Element, const k3d::ipersistent::save_context& Context)
+	void save(k3d::xml::element& Element, const k3d::ipersistent::save_context& Context)
 	{
 		base::save(Element, Context);
 
 		if(k3d::mesh* const mesh = m_output_mesh.internal_value())
 		{
-			element& xml_mesh = Element.append(element("mesh_arrays"));
-			k3d::save_mesh(*mesh, xml_mesh, Context);
+			k3d::xml::element& xml_mesh = Element.append(k3d::xml::element("mesh_arrays"));
+			k3d::xml::save(*mesh, xml_mesh, Context);
 		}
 	}
 
-	void load(element& Element, const k3d::ipersistent::load_context& Context)
+	void load(k3d::xml::element& Element, const k3d::ipersistent::load_context& Context)
 	{
 		base::load(Element, Context);
 
@@ -104,18 +102,18 @@ public:
 		m_output_mesh.reset(mesh);
 
 		// Load the stored mesh data ...
-		element* xml_mesh = find_element(Element, "mesh_arrays");
+		k3d::xml::element* xml_mesh = k3d::xml::find_element(Element, "mesh_arrays");
 		if(xml_mesh)
 		{
-			k3d::load_mesh(*mesh, *xml_mesh, Context);
+			k3d::xml::load(*mesh, *xml_mesh, Context);
 		}
 		else
 		{ // try the legacy mesh loader
-			xml_mesh = find_element(Element, "mesh");
+			xml_mesh = k3d::xml::find_element(Element, "mesh");
 			if(!xml_mesh)
 				return;
 			k3d::legacy::mesh legacy_mesh;
-			load_legacy_mesh(legacy_mesh, *xml_mesh, Context);
+			k3d::xml::load(legacy_mesh, *xml_mesh, Context);
 			*mesh = legacy_mesh;
 		}
 	}

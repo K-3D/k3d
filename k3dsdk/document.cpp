@@ -46,7 +46,6 @@
 #include "pipeline_profiler.h"
 #include "plugins.h"
 #include "property_collection.h"
-#include "serialization.h"
 #include "signal_slots.h"
 #include "string_cast.h"
 #include "string_modifiers.h"

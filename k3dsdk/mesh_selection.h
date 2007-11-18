@@ -25,7 +25,7 @@
 */
 
 #include "ipersistent.h"
-#include "serialization.h"
+#include "serialization_xml.h"
 #include "types.h"
 #include "xml.h"
 
@@ -148,12 +148,12 @@ public:
 	void save(xml::element& Element, const ipersistent::save_context& Context)
 	{
 		xml::element& xml_property = Element.append(xml::element("property", xml::attribute("name", property_policy_t::name())));
-		save_mesh_selection(property_policy_t::internal_value(), xml_property, Context);
+		xml::save(property_policy_t::internal_value(), xml_property, Context);
 	}
 
 	void load(xml::element& Element, const ipersistent::load_context& Context)
 	{
-		load_mesh_selection(property_policy_t::internal_value(), Element, Context);
+		xml::load(property_policy_t::internal_value(), Element, Context);
 	}
 
 protected:

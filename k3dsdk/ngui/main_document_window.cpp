@@ -94,7 +94,6 @@
 #include <k3dsdk/property.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/selection.h>
-#include <k3dsdk/serialization.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>

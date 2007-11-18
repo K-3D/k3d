@@ -23,7 +23,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3d-version-config.h>
-
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/dependencies.h>
@@ -39,11 +38,9 @@
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/result.h>
-#include <k3dsdk/serialization.h>
+#include <k3dsdk/serialization_xml.h>
 #include <k3dsdk/string_modifiers.h>
 #include <k3dsdk/xml.h>
-
-using namespace k3d::xml;
 
 namespace libk3dk3dio
 {
@@ -81,11 +78,11 @@ public:
 		return_val_if_fail(k3d::property::set_internal_value(Document.title(), Path.leaf()), false);
 
 		// Create our output document and dependencies objects ...
-		element xml(
+		k3d::xml::element xml(
 			"k3dml",
-			attribute("package", K3D_PACKAGE),
-			attribute("version", K3D_VERSION),
-			attribute("host", K3D_HOST));
+			k3d::xml::attribute("package", K3D_PACKAGE),
+			k3d::xml::attribute("version", K3D_VERSION),
+			k3d::xml::attribute("host", K3D_HOST));
 
 		const k3d::filesystem::path root_path = Path.branch_path();
 		k3d::dependencies dependencies;
@@ -93,24 +90,17 @@ public:
 		k3d::ipersistent::save_context context(root_path, dependencies, lookup);
 
 		// Save per-document data ...
-		element& xml_document = xml.append(element("document"));
-		element& xml_nodes = xml_document.append(element("nodes"));
+		k3d::xml::element& xml_document = xml.append(k3d::xml::element("document"));
+		k3d::xml::element& xml_nodes = xml_document.append(k3d::xml::element("nodes"));
 
 		// Sort objects by ID before saving them ...
 		const k3d::inode_collection::nodes_t nodes = Document.nodes().collection();
 
 		for(k3d::inode_collection::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-		{
-			// Save the object if it supports persistence ...
-			k3d::ipersistent* const persistent = dynamic_cast<k3d::ipersistent*>(*node);
-			if(!persistent)
-				continue;
-
-			k3d::save_node(*persistent, xml_nodes, context);
-		}
+			k3d::xml::save(**node, xml_nodes, context);
 
 		// Save the DAG ...
-		k3d::save_pipeline(Document, xml_document, context);
+		k3d::xml::save_pipeline(Document, xml_document, context);
 
 		// Save the XML ...
 		filestream << k3d::xml::declaration() << xml << std::endl;

@@ -21,18 +21,17 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
 #include <k3dsdk/dependencies.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/file_helpers.h>
-#include <k3d-i18n-config.h>
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/mesh_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/serialization.h>
-#include <k3d-version-config.h>
-
-#include <k3dsdk/fstream.h>
+#include <k3dsdk/serialization_xml.h>
 
 namespace libk3dk3dio
 {
@@ -78,7 +77,7 @@ public:
 
 		k3d::xml::element xml("k3dml");
 		k3d::xml::element& xml_mesh = xml.append(k3d::xml::element("mesh_arrays"));
-		k3d::save_mesh(*mesh, xml_mesh, context);
+		k3d::xml::save(*mesh, xml_mesh, context);
 
 		file << k3d::xml::declaration() <<  xml;
 	}

@@ -23,9 +23,10 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/file_helpers.h>
-#include <k3d-i18n-config.h>
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/material.h>
@@ -33,11 +34,7 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/serialization.h>
-
-using namespace k3d::xml;
-
-#include <k3dsdk/fstream.h>
+#include <k3dsdk/serialization_xml.h>
 
 namespace libk3dk3dio
 {
@@ -86,7 +83,7 @@ public:
 		k3d::ipersistent::load_context context(root_path, lookup);
 
 		if(k3d::xml::element* const xml_mesh_arrays = k3d::xml::find_element(xml_document, "mesh_arrays"))
-			k3d::load_mesh(Mesh, *xml_mesh_arrays, context);
+			k3d::xml::load(Mesh, *xml_mesh_arrays, context);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Mesh)

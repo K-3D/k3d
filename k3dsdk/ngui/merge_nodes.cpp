@@ -24,8 +24,9 @@
 
 #include "file_chooser_dialog.h"
 
-#include <k3dsdk/data.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>
@@ -36,10 +37,8 @@
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/result.h>
-#include <k3dsdk/serialization.h>
+#include <k3dsdk/serialization_xml.h>
 #include <k3dsdk/xml.h>
-
-#include <k3dsdk/fstream.h>
 
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
@@ -228,7 +227,7 @@ void merge_nodes(k3d::idocument& Document)
 	return_if_fail(xml.name == "k3dml");
 
 	// Synchronize older documents
-	k3d::upgrade_document(xml);
+	k3d::xml::upgrade_document(xml);
 
 	// Setup context
 	const k3d::filesystem::path root_path = document_path.branch_path();
@@ -361,7 +360,7 @@ void merge_nodes(k3d::idocument& Document)
 		}
 	}
 
-	k3d::load_pipeline(Document, *xml_document, context);
+	k3d::xml::load_pipeline(Document, *xml_document, context);
 }
 
 } // namespace merge_nodes
