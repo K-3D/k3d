@@ -850,6 +850,16 @@ private:
 			new menu_item::control(Parent, "select_faces", _("_Faces"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_faces))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_faces", get_accel_group())));
+		
+		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
+		
+		menu->items().push_back(*Gtk::manage(
+			new check_menu_item::control(Parent, "convert_selection", check_menu_item::proxy(m_document_state.convert_selection()), _("_Convert Selection"), true)
+			<< set_accelerator_path("<k3d-document>/actions/select/convert_selection", get_accel_group())));
+		
+		menu->items().push_back(*Gtk::manage(
+			new check_menu_item::control(Parent, "keep_selection", check_menu_item::proxy(m_document_state.keep_selection()), _("_Keep Selection"), true)
+			<< set_accelerator_path("<k3d-document>/actions/select/keep_selection", get_accel_group())));
 
 		return menu;
 	}

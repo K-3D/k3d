@@ -118,6 +118,12 @@ public:
 	typedef k3d_data(selection_mode_t, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, no_property, no_serialization) selection_mode_property_t;
 	/// Returns the current document-wide selection mode
 	selection_mode_property_t& selection_mode();
+	/// Defines storage for the selection mode conversion selection keeping flags
+	typedef k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, no_property, no_serialization) selection_flag_property_t;
+	/// True if the selection is to be converted
+	selection_flag_property_t& convert_selection();
+	/// True if the old selection has to be kept when switching selection
+	selection_flag_property_t& keep_selection();
 	void set_selection_mode(selection_mode_t Mode);
 
 	const bool is_selected(k3d::inode* Node);

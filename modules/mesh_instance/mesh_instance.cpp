@@ -144,7 +144,7 @@ public:
 	mesh_instance(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::mesh*>(0)),
-		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")) + init_slot(sigc::mem_fun(*this, &mesh_instance::create_mesh))),
+		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh"))),
 		m_gl_painter(init_owner(*this) + init_name("gl_painter") + init_label(_("OpenGL Mesh Painter")) + init_description(_("OpenGL Mesh Painter")) + init_value(static_cast<k3d::gl::imesh_painter*>(0))),
 		m_ri_painter(init_owner(*this) + init_name("ri_painter") + init_label(_("RenderMan Mesh Painter")) + init_description(_("RenderMan Mesh Painter")) + init_value(static_cast<k3d::ri::imesh_painter*>(0))),
 		m_show_component_selection(init_owner(*this) + init_name("show_component_selection") + init_label(_("Show Component Selection")) + init_description(_("Show component selection")) + init_value(false)),
@@ -158,6 +158,11 @@ public:
 		}
 		m_input_matrix.changed_signal().connect(m_transformed_mesh.make_reset_slot());
 		Document.close_signal().connect(sigc::mem_fun(*this, &mesh_instance::disconnect));
+		
+		m_output_mesh.set_initialize_slot(sigc::mem_fun(*this, &mesh_instance::create_mesh));
+		m_output_mesh.set_update_slot(sigc::mem_fun(*this, &mesh_instance::update_mesh));
+		m_transformed_mesh.set_initialize_slot(sigc::mem_fun(*this, &mesh_instance::create_transformed_mesh));
+		m_transformed_mesh.set_update_slot(sigc::mem_fun(*this, &mesh_instance::update_transformed_mesh));
 	}
 	
 	void disconnect()
@@ -240,7 +245,8 @@ public:
 	void selection_changed(iunknown* const Hint)
 	{
 		append_hint(k3d::hint::selection_changed());
-		m_transformed_mesh.reset(0, Hint);
+		m_output_mesh.update(Hint);
+		m_transformed_mesh.update(Hint);
 	}
 
 	void create_mesh(k3d::mesh& OutputMesh)
@@ -249,8 +255,14 @@ public:
 		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
 		{
 			OutputMesh = *input_mesh;
-			k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
+			update_mesh(OutputMesh);
 		}
+	}
+	
+	void update_mesh(k3d::mesh& OutputMesh)
+	{
+		k3d::clear_component_selection(OutputMesh);
+		k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
 	}
 	
 	void create_transformed_mesh(k3d::mesh& OutputMesh)
@@ -259,13 +271,19 @@ public:
 		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
 		{
 			OutputMesh = *input_mesh;
-			k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
-			const k3d::mesh::points_t& input_points = *OutputMesh.points;
-			boost::shared_ptr<k3d::mesh::points_t> transformed_points(new k3d::mesh::points_t());
-			for (size_t point = 0; point != input_points.size(); ++point)
-				transformed_points->push_back(matrix()*input_points[point]);
-			OutputMesh.points = transformed_points;
+			update_transformed_mesh(OutputMesh);
 		}
+	}
+	
+	void update_transformed_mesh(k3d::mesh& OutputMesh)
+	{
+		k3d::clear_component_selection(OutputMesh);
+		k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
+		const k3d::mesh::points_t& input_points = *OutputMesh.points;
+		boost::shared_ptr<k3d::mesh::points_t> transformed_points(new k3d::mesh::points_t());
+		for (size_t point = 0; point != input_points.size(); ++point)
+			transformed_points->push_back(matrix()*input_points[point]);
+		OutputMesh.points = transformed_points;
 	}
 
 	const k3d::bounding_box3 extents()
@@ -403,11 +421,11 @@ public:
 	}
 
 	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input_mesh;
-	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::demand_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output_mesh;
+	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::pointer_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output_mesh;
 	k3d_data(k3d::gl::imesh_painter*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_gl_painter;
 	k3d_data(k3d::ri::imesh_painter*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_ri_painter;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_component_selection;
-	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::demand_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_transformed_mesh;
+	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::pointer_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_transformed_mesh;
 	
 	
 protected:
@@ -415,13 +433,12 @@ protected:
 	void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		m_output_mesh.changed_signal().emit(Hint);
+		m_transformed_mesh.update(Hint);
 		m_gl_painter.pipeline_value()->mesh_changed(Mesh, Hint);
 	}
 	
 	void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		return_if_fail(k3d::validate_points(Mesh));
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), const_cast<k3d::mesh&>(Mesh));
 		m_output_mesh.changed_signal().emit(Hint);
 		m_gl_painter.pipeline_value()->mesh_changed(Mesh, Hint);
 	}
@@ -477,5 +494,3 @@ k3d::iplugin_factory& mesh_instance_factory()
 } // namespace mesh_instance
 
 } // namespace module
-
-

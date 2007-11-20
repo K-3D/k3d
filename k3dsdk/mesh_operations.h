@@ -47,6 +47,8 @@ void store_selection(const mesh& Mesh, mesh_selection& Selection);
 void merge_selection(const mesh_selection& MeshSelection, mesh& Mesh);
 /// Merges a set of mesh_selection records with the current selection state in the given array
 void merge_selection(const mesh_selection::records_t& Records, mesh::selection_t& Selection);
+/// Clears the selection of mesh components (all array elements to 0.0)
+void clear_component_selection(mesh& Mesh);
 
 /// Returns a bounding-box containing every point in the given mesh
 const bounding_box3 bounds(const mesh& Mesh);
