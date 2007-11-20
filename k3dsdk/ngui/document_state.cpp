@@ -1629,6 +1629,10 @@ public:
 		{
 			detail::update_component_selection(selected_nodes(), detail::deselect_all(), true);
 		}
+		else
+		{
+			detail::update_component_selection(selected_nodes(), detail::select_null(), true);
+		}
 	}
 
 	/// Sets the current selection when point selection mode is chosen

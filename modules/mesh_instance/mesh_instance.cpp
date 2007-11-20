@@ -261,7 +261,6 @@ public:
 	
 	void update_mesh(k3d::mesh& OutputMesh)
 	{
-		k3d::clear_component_selection(OutputMesh);
 		k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
 	}
 	
@@ -277,7 +276,6 @@ public:
 	
 	void update_transformed_mesh(k3d::mesh& OutputMesh)
 	{
-		k3d::clear_component_selection(OutputMesh);
 		k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
 		const k3d::mesh::points_t& input_points = *OutputMesh.points;
 		boost::shared_ptr<k3d::mesh::points_t> transformed_points(new k3d::mesh::points_t());
