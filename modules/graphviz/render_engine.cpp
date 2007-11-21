@@ -41,64 +41,6 @@
 #include <iomanip>
 #include <iterator>
 
-namespace k3d
-{
-
-namespace data
-{
-
-/////////////////////////////////////////////////////////////////////////////
-// node_collection_serialization
-
-/// Serialization policy for data containers that can be serialized as XML
-template<typename value_t, class property_policy_t>
-class node_collection_serialization :
-	public property_policy_t,
-	public ipersistent
-{
-public:
-	void save(xml::element& Element, const ipersistent::save_context& Context)
-	{
-		std::stringstream buffer;
-
-		const inode_collection_property::nodes_t& nodes = property_policy_t::internal_value();
-		for(inode_collection_property::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-		{
-			if(*node)
-				buffer << " " << string_cast(Context.lookup.lookup_id(*node));
-			else
-				buffer << " 0";
-		}
-
-		Element.append(xml::element("property", buffer.str(), xml::attribute("name", property_policy_t::name())));
-	}
-
-	void load(xml::element& Element, const ipersistent::load_context& Context)
-	{
-		inode_collection_property::nodes_t nodes;
-
-		std::stringstream buffer(Element.text);
-		std::string node;
-		while(buffer >> node)
-			nodes.push_back(dynamic_cast<inode*>(Context.lookup.lookup_object(from_string(node, static_cast<ipersistent_lookup::id_type>(0)))));
-		nodes.erase(std::remove(nodes.begin(), nodes.end(), static_cast<inode*>(0)), nodes.end());
-
-		property_policy_t::set_value(nodes);
-	}
-
-protected:
-	template<typename init_t>
-	node_collection_serialization(const init_t& Init) :
-		property_policy_t(Init)
-	{
-		Init.persistent_container().enable_serialization(Init.name(), *this);
-	}
-};
-
-} // namespace data
-
-} // namespace k3d
-
 namespace module
 {
 
