@@ -41,7 +41,6 @@
 #include "iplugin_factory.h"
 #include "iselectable.h"
 #include "node_name_map.h"
-#include "persistent.h"
 #include "pipeline.h"
 #include "pipeline_profiler.h"
 #include "plugins.h"
