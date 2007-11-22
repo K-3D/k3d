@@ -217,7 +217,7 @@ protected:
 /** \todo standardize set_motion in selection tool and transform tools */
 	void set_motion(const motion_t Motion);
 
-	k3d::point3 world_position();
+	virtual k3d::point3 world_position();
 	k3d::matrix4 world_orientation();
 
 	/// Manipulators scale to adjust to viewport size

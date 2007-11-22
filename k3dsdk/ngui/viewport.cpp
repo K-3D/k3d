@@ -1280,8 +1280,7 @@ bool control::on_redraw()
 		k3d::timer timer;
 
 		m_implementation->m_gl_engine.internal_value()->render_viewport(*m_implementation->m_camera.internal_value(), width, height, m_implementation->m_font_begin, m_implementation->m_gl_view_matrix, m_implementation->m_gl_projection_matrix, m_implementation->m_gl_viewport);
-		if(m_implementation->m_document_state.get_focus_viewport() == this)
-			m_implementation->m_document_state.active_tool().redraw(*this);
+		m_implementation->m_document_state.active_tool().redraw(*this);
 
 		const double elapsed = timer.elapsed();
 		if(elapsed)
@@ -1395,8 +1394,7 @@ const GLint control::select(const k3d::gl::selection_state& SelectState, const k
 		std::copy(projection_matrix, projection_matrix + 16, ProjectionMatrix);
 		std::copy(m_implementation->m_gl_viewport, m_implementation->m_gl_viewport + 4, Viewport);
 
-		if(m_implementation->m_document_state.get_focus_viewport() == this)
-			m_implementation->m_document_state.active_tool().select(*this);
+		m_implementation->m_document_state.active_tool().select(*this);
 		const GLint hits = glRenderMode(GL_RENDER);
 		glFlush();
 

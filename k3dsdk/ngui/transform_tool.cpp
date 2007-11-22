@@ -309,8 +309,10 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 	{
 		if(!modifier)
 			start_rotation();
-
-		const k3d::matrix4 current_coordinate_system_rotation = m_system_matrix * RotationMatrix * m_system_matrix_inverse;
+		
+		k3d::vector3 translation = WorldCenter - m_original_matrix * k3d::point3(0,0,0);
+		
+		const k3d::matrix4 current_coordinate_system_rotation = m_system_matrix * k3d::translation3D(translation) * RotationMatrix * k3d::translation3D(-translation) * m_system_matrix_inverse;
 		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_rotation));
 	}
 
@@ -329,8 +331,10 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 	{
 		if(!modifier)
 			start_scaling();
+		
+		k3d::vector3 translation = WorldCenter - m_original_matrix * k3d::point3(0,0,0);
 
-		const k3d::matrix4 current_coordinate_system_scaling = m_system_matrix * k3d::scaling3D(Scaling) * m_system_matrix_inverse;
+		const k3d::matrix4 current_coordinate_system_scaling = m_system_matrix * k3d::translation3D(translation) * k3d::scaling3D(Scaling) * k3d::translation3D(-translation) * m_system_matrix_inverse;
 		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_scaling));
 	}
 
@@ -1269,15 +1273,8 @@ void transform_tool::rotate_targets(const k3d::matrix4& Rotation)
 	if(!m_targets.size())
 		return;
 
-	// Compute average of all selected components
-	k3d::point3 world_center(0, 0, 0);
 	for(targets_t::iterator target = m_targets.begin(); target != m_targets.end(); ++target)
-		world_center += k3d::to_vector((*target)->world_position());
-
-	world_center /= static_cast<double>(m_targets.size());
-
-	for(targets_t::iterator target = m_targets.begin(); target != m_targets.end(); ++target)
-		(*target)->rotate(Rotation, world_center);
+		(*target)->rotate(Rotation, world_position());
 
 	tool_selection::redraw_all();
 }
@@ -1293,15 +1290,8 @@ void transform_tool::scale_targets(const k3d::point3& Scaling)
 	if(!m_targets.size())
 		return;
 
-	// Compute average of all selected components
-	k3d::point3 world_center(0, 0, 0);
 	for(targets_t::iterator target = m_targets.begin(); target != m_targets.end(); ++target)
-		world_center += k3d::to_vector((*target)->world_position());
-
-	world_center /= static_cast<double>(m_targets.size());
-
-	for(targets_t::iterator target = m_targets.begin(); target != m_targets.end(); ++target)
-		(*target)->scale(Scaling, world_center);
+		(*target)->scale(Scaling, world_position());
 
 	tool_selection::redraw_all();
 }

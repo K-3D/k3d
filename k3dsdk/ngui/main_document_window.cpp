@@ -526,6 +526,7 @@ public:
 			control->set_camera(camera1);
 			control->set_gl_engine(glengine1);
 			panel_frame4->mount_panel(*Gtk::manage(control), "viewport");
+			set_focus_viewport_panel(panel_frame4);
 		}
 
 		// Node history below node list

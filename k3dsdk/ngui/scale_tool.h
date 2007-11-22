@@ -48,6 +48,9 @@ public:
 	~scale_tool();
 
 	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
+	
+protected:
+	k3d::point3 world_position();
 
 private:
 	void on_activate();
@@ -219,6 +222,7 @@ private:
 	k3d_data(k3d::point3, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_scaling;
 	// Scaling center
 	k3d_data(k3d::point3, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_center;
+	k3d_data(bool, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_auto_center;
 };
 
 } // namespace libk3dngui

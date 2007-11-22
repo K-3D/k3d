@@ -649,10 +649,13 @@ private:
 scale_tool::scale_tool(document_state& DocumentState, const std::string& Name) :
 	transform_tool_base(DocumentState.document(), DocumentState, Name),
 	m_scaling(init_owner(*this) + init_name("scaling") + init_label(_("Scaling")) + init_description(_("Scaling")) + init_value(k3d::point3(1, 1, 1))),
-	m_center(init_owner(*this) + init_name("center") + init_label(_("Center")) + init_description(_("Center")) + init_value(k3d::point3(0, 0, 0)))
+	m_center(init_owner(*this) + init_name("center") + init_label(_("Center")) + init_description(_("Center")) + init_value(k3d::point3(0, 0, 0))),
+	m_auto_center(init_owner(*this) + init_name("auto_center") + init_label(_("Auto Center")) + init_description(_("Center")) + init_value(true))
 {
 	//navigation_model().connect_command_signal(sigc::mem_fun(*this, &scale_tool::record_command));
 	m_scaling.connect_explicit_change_signal(sigc::mem_fun(*this, &scale_tool::on_scale));
+	m_center.connect_explicit_change_signal(sigc::mem_fun(*this, &scale_tool::on_scale));
+	m_auto_center.connect_explicit_change_signal(sigc::mem_fun(*this, &scale_tool::on_scale));
 
 	m_input_model.connect_lbutton_down(sigc::mem_fun(*this, &scale_tool::on_lbutton_down));
 	m_input_model.connect_lbutton_click(sigc::mem_fun(*this, &scale_tool::on_lbutton_click));
@@ -936,6 +939,14 @@ void scale_tool::scale_selection(const k3d::point3& Scaling)
 		return;
 
 	m_scaling.set_value(Scaling);
+}
+
+k3d::point3 scale_tool::world_position()
+{
+	if (m_auto_center.pipeline_value())
+		return transform_tool_base::world_position();
+	else
+		return m_center.pipeline_value();
 }
 
 k3d::point3 scale_tool::get_scaling()

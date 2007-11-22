@@ -47,6 +47,9 @@ public:
 	~rotate_tool();
 
 	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
+	
+protected:
+	k3d::point3 world_position();
 
 private:
 	virtual void on_activate();
@@ -204,7 +207,6 @@ private:
 	k3d::angle_axis lbutton_drag(viewport::control& Viewport, const k3d::point2& Coordinates);
 	k3d::angle_axis mouse_move_action(viewport::control& Viewport, const k3d::point2& Coordinates);
 	void rotate_selection(const k3d::angle_axis& Rotation);
-	k3d::point3 get_center();
 	void on_rotate(k3d::iunknown*);
 
 	/// Stores manipulators
@@ -215,6 +217,7 @@ private:
 	k3d_data(k3d::angle_axis, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_rotation;
 	// Rotation center
 	k3d_data(k3d::point3, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_center;
+	k3d_data(bool, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_auto_center;
 };
 
 } // namespace libk3dngui

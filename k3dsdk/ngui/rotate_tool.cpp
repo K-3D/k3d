@@ -488,10 +488,13 @@ rotate_tool::rotate_tool(document_state& DocumentState, const std::string& Name)
 	transform_tool_base(DocumentState.document(), DocumentState, Name),
 	m_mutex(false),
 	m_rotation(init_owner(*this) + init_name("rotation") + init_label(_("Rotation")) + init_description(_("Rotation")) + init_value(k3d::angle_axis(0, 1, 0, 0))),
-	m_center(init_owner(*this) + init_name("center") + init_label(_("Center")) + init_description(_("Center")) + init_value(k3d::point3(0, 0, 0)))
+	m_center(init_owner(*this) + init_name("center") + init_label(_("Center")) + init_description(_("Center")) + init_value(k3d::point3(0, 0, 0))),
+	m_auto_center(init_owner(*this) + init_name("auto_center") + init_label(_("Auto Center")) + init_description(_("Center")) + init_value(true))
 {
 	//m_implementation->navigation_model().connect_command_signal(sigc::mem_fun(*this, &rotate_tool::record_command));
 	m_rotation.connect_explicit_change_signal(sigc::mem_fun(*this, &rotate_tool::on_rotate));
+	m_center.connect_explicit_change_signal(sigc::mem_fun(*this, &rotate_tool::on_rotate));
+	m_auto_center.connect_explicit_change_signal(sigc::mem_fun(*this, &rotate_tool::on_rotate));
 
 	m_input_model.connect_lbutton_down(sigc::mem_fun(*this, &rotate_tool::on_lbutton_down));
 	m_input_model.connect_lbutton_click(sigc::mem_fun(*this, &rotate_tool::on_lbutton_click));
@@ -776,9 +779,12 @@ void rotate_tool::rotate_selection(const k3d::angle_axis& Rotation)
 	m_rotation.set_value(Rotation);
 }
 
-k3d::point3 rotate_tool::get_center()
+k3d::point3 rotate_tool::world_position()
 {
-	return world_position();
+	if (m_auto_center.pipeline_value())
+		return transform_tool_base::world_position();
+	else
+		return m_center.pipeline_value();
 }
 
 void rotate_tool::on_rotate(k3d::iunknown*)
