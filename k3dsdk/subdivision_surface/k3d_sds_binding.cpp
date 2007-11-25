@@ -322,7 +322,7 @@ bool k3d_cache_input::no_selection()
 
 void k3d_sds_cache::visit_faces(sds_visitor& Visitor, const k3d::uint_t Level, const bool ModifiedOnly)
 {
-	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
+	k3d::uint_t size = static_cast<k3d::uint_t>(pow(2.0, static_cast<double>(Level-1)))+1;
 	facevertices_map& modified_faces = ModifiedOnly ? dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_modified_faces() : dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
 	k3d::uint_t mipmap_start = 0;
 	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
@@ -333,16 +333,16 @@ void k3d_sds_cache::visit_faces(sds_visitor& Visitor, const k3d::uint_t Level, c
 		{
 			const point_array& points = (*mipmap)->points(Level-1);
 			const point_array& normals = (*mipmap)->normals(Level-1);
-			for(int i = 0; i < size; ++i)
+			for(k3d::uint_t i = 0; i < size; ++i)
 			{
-				for(int j = 0; j < size; ++j)
+				for(k3d::uint_t j = 0; j < size; ++j)
 				{
 					Visitor.on_point(*(points[i][j]), *(normals[i][j]));
 				}
 			}
-			for(int i = 0; i < size-1; ++i)
+			for(k3d::uint_t i = 0; i < size-1; ++i)
 			{
-				for(int j = 0; j < size-1; ++j)
+				for(k3d::uint_t j = 0; j < size-1; ++j)
 				{
 					Visitor.on_subfacet(
 							mipmap_start + i * size + j,
@@ -358,7 +358,7 @@ void k3d_sds_cache::visit_faces(sds_visitor& Visitor, const k3d::uint_t Level, c
 
 void k3d_sds_cache::visit_borders(sds_visitor& Visitor, const k3d::uint_t Level, const bool ModifiedOnly)
 {
-	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
+	k3d::uint_t size = static_cast<k3d::uint_t>(pow(2.0, static_cast<double>(Level-1)))+1;
 	facevertices_map& modified_faces = ModifiedOnly ? dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_modified_faces() : dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
 	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
 	{
@@ -372,7 +372,7 @@ void k3d_sds_cache::visit_borders(sds_visitor& Visitor, const k3d::uint_t Level,
 			const point_array& points = (*mipmap)->points(Level-1);
 			++next_mipmap;
 			const point_array& next_points = next_mipmap == f.mipmaps.end() ? (*f.mipmaps.begin())->points(Level-1) : (*next_mipmap)->points(Level-1);
-			for(int i = 0; i < size-1; ++i)
+			for(k3d::uint_t i = 0; i < size-1; ++i)
 			{
 				Visitor.on_point(*(points[i][size-1]));
 				Visitor.on_point(*(points[i+1][size-1]));
@@ -385,7 +385,7 @@ void k3d_sds_cache::visit_borders(sds_visitor& Visitor, const k3d::uint_t Level,
 
 void k3d_sds_cache::visit_corners(sds_visitor& Visitor, const k3d::uint_t Level, const bool ModifiedOnly)
 {
-	size_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
+	k3d::uint_t size = static_cast<size_t>(pow(2.0, static_cast<double>(Level-1)))+1;
 	facevertices_map& modified_faces = ModifiedOnly ? dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_modified_faces() : dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_all_faces();
 	for (facevertices_map::iterator face_vertex_iterator = modified_faces.begin(); face_vertex_iterator != modified_faces.end(); ++face_vertex_iterator)
 	{

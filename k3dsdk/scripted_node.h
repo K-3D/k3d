@@ -43,7 +43,8 @@ public:
 		base_t(Factory, Document),
 		m_script(init_owner(*this) + init_name("script") + init_label(_("Script")) + init_description(_("Script source code")) + init_value<std::string>("")),
 		m_script_engine(0),
-		m_user_property_changed_signal(*this)
+		m_user_property_changed_signal(*this),
+		m_executing(false)
 	{
 	}
 
@@ -66,6 +67,9 @@ protected:
 
 	bool execute_script(iscript_engine::context_t& Context)
 	{
+		if (m_executing) // prevent recursion when writing properties in the script (infinite loop!)
+			return true;
+		m_executing = true;
 		// Examine the script to determine the correct language ...
 		const script::code code(m_script.pipeline_value());
 		const script::language language(code);
@@ -87,13 +91,16 @@ protected:
 		return_val_if_fail(m_script_engine, false);
 
 		// Execute that bad-boy!
-		return m_script_engine->execute(base_t::name() + "Script", code.source(), Context);
+		bool result = m_script_engine->execute(base_t::name() + "Script", code.source(), Context);
+		m_executing = false;
+		return result;
 	}
 
 private:
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, script_property, with_serialization) m_script;
 	iscript_engine* m_script_engine;
 	user_property_changed_signal m_user_property_changed_signal;
+	bool m_executing;
 };
 
 } // namespace k3d

@@ -265,3 +265,4 @@ K3D_ADD_TEST(ngui.tutorials.navigation NGUI TUTORIAL navigation.k3dscript)
 K3D_ADD_TEST(ngui.tutorials.basic_selection NGUI TUTORIAL basic_selection.k3dscript)
 K3D_ADD_TEST(ngui.tutorials.mug NGUI TUTORIAL mug.k3dscript)
 
+K3D_ADD_TEST(performance.sds.polycube.py PYTHON NGUI)

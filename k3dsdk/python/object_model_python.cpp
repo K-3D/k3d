@@ -315,6 +315,11 @@ idocument module_new_document()
 	return idocument(k3d::application().create_document());
 }
 
+idocument module_first_document()
+{
+	return idocument(k3d::application().documents()[0]);
+}
+
 void module_close_document(idocument& Document)
 {
 	k3d::application().close_document(Document.wrapped());
@@ -445,6 +450,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Sends a warning message to the K-3D log.");
 	def("new_document", module_new_document,
 		"Returns a new (completely empty) document.");
+	def("first_document", module_first_document,
+		"Returns the first open document.");
 	def("open_document", module_open_document,
 		"Opens an existing document stored on disk.");
 	def("plugins", module_plugins,

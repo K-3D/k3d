@@ -29,9 +29,11 @@
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/gl.h>
+#include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icrop_window.h>
 #include <k3dsdk/ilight_gl.h>
+#include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irender_viewport_gl.h>
 #include <k3dsdk/irenderable_gl.h>
@@ -283,7 +285,8 @@ public:
 		m_draw_safe_zone(init_owner(*this) + init_name("draw_safe_zone") + init_label(_("Draw Safe Zone")) + init_description(_("Draw Safe Zone")) + init_value(false)),
 		m_draw_aimpoint(init_owner(*this) + init_name("draw_aimpoint") + init_label(_("Draw Aim Point")) + init_description(_("Draw center screen cross")) + init_value(true)),
 		m_draw_crop_window(init_owner(*this) + init_name("draw_crop_window") + init_label(_("Draw Crop Window")) + init_description(_("Draw bounding rectangle for output rendering")) + init_value(true)),
-		m_draw_frustum(init_owner(*this) + init_name("draw_frustum") + init_label(_("Draw Frustum")) + init_description(_("Draw Camera Frustum")) + init_value(true))
+		m_draw_frustum(init_owner(*this) + init_name("draw_frustum") + init_label(_("Draw Frustum")) + init_description(_("Draw Camera Frustum")) + init_value(true)),
+		m_frame_time(init_owner(*this) + init_name("frame_time") + init_label(_("Frame Time")) + init_description(_("Render time of last frame rendered")) + init_value(0.0))
 	{
 		k3d::iproperty_group_collection::group visibility_group("Visibility");
 		visibility_group.properties.push_back(&static_cast<k3d::iproperty&>(m_draw_two_sided));
@@ -293,6 +296,10 @@ public:
 		visibility_group.properties.push_back(&static_cast<k3d::iproperty&>(m_draw_frustum));
 
 		register_property_group(visibility_group);
+		
+		k3d::iproperty_group_collection::group statistics_group("Statistics");
+		statistics_group.properties.push_back(&static_cast<k3d::iproperty&>(m_frame_time));
+		register_property_group(statistics_group);
 
 		m_point_size.changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_redraw));
 		m_background_color.changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_redraw));
@@ -433,6 +440,8 @@ public:
 
 	void render_viewport(k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4])
 	{
+		k3d::timer timer;
+		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Render Viewport");
 		k3d::gl::render_state state(Camera);
 		k3d::rectangle unused(0, 0, 0, 0);
 		if(!draw_scene(Camera, PixelWidth, PixelHeight, FontListBase, ViewMatrix, ProjectionMatrix, Viewport, false, unused, state))
@@ -470,6 +479,7 @@ public:
 		for(GLenum gl_error = glGetError(); gl_error != GL_NO_ERROR; gl_error = glGetError())
 			k3d::log() << error << "OpenGL error: " << reinterpret_cast<const char*>(gluErrorString(gl_error)) << std::endl;
 */
+		m_frame_time.set_value(timer.elapsed());  
 	}
 
 	void render_viewport_selection(const k3d::gl::selection_state& SelectState, k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, const k3d::rectangle& Region, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4])
@@ -681,6 +691,7 @@ private:
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_aimpoint;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_crop_window;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_frustum;
+	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_frame_time;
 };
 
 /////////////////////////////////////////////////////////////////////////////
