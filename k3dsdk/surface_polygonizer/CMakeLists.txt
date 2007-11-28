@@ -14,7 +14,7 @@ LINK_DIRECTORIES(${K3D_GLIBMM_LIB_DIRS})
 LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
 
 ADD_LIBRARY(k3dsdk-surface-polygonizer SHARED ${HEADERS} ${SOURCES})
-K3D_GENERATE_DEF_FILE(K3dsdk-surface-polygonizer)
+K3D_GENERATE_DEF_FILE(k3dsdk-surface-polygonizer)
 TARGET_LINK_LIBRARIES(k3dsdk-surface-polygonizer k3dsdk)
  
 INSTALL(TARGETS k3dsdk-surface-polygonizer

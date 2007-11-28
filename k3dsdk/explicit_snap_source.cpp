@@ -21,6 +21,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <algorithm>
+
 #include "explicit_snap_source.h"
 #include "result.h"
 

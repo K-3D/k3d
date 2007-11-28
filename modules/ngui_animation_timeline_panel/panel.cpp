@@ -321,6 +321,7 @@ bool timeline::on_button_release_event(GdkEventButton* Event)
 	m_timeline_click = false;
 	m_clicked_key = "";
 	set_cursor(Event->x, Event->y);
+	return true;
 }
 
 bool timeline::on_motion_notify_event(GdkEventMotion* event)
