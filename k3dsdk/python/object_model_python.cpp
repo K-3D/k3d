@@ -315,9 +315,15 @@ idocument module_new_document()
 	return idocument(k3d::application().create_document());
 }
 
-idocument module_first_document()
+boost::python::list module_documents()
 {
-	return idocument(k3d::application().documents()[0]);
+	boost::python::list results;
+
+	const k3d::iapplication::document_collection_t documents = k3d::application().documents();
+	for(k3d::iapplication::document_collection_t::const_iterator document = documents.begin(); document != documents.end(); ++document)
+		results.append(idocument(*document));
+
+	return results;
 }
 
 void module_close_document(idocument& Document)
@@ -422,6 +428,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
 	def("deselect_all", k3d::mesh_selection::deselect_all,
 		"Returns a L{mesh_selection} that explicitly deselects every component.");
+	def("documents", module_documents,
+		"Returns a list containing all open documents.");
 	def("dynamic_cast", do_dynamic_cast,
 		"Attempts to coerce an object from one type to another.");
 	def("print_diff", module_print_diff,
@@ -450,8 +458,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Sends a warning message to the K-3D log.");
 	def("new_document", module_new_document,
 		"Returns a new (completely empty) document.");
-	def("first_document", module_first_document,
-		"Returns the first open document.");
 	def("open_document", module_open_document,
 		"Opens an existing document stored on disk.");
 	def("plugins", module_plugins,
