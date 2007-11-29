@@ -3,6 +3,22 @@
 import k3d
 import os
 import sys
+import time
+
+class timer:
+	def __init__(self):
+		if sys.platform == "win32":
+			self.current_time = time.clock
+		else:
+			self.current_time = time.time
+
+		self.start_time = self.current_time()
+
+	def restart(self):
+		self.start_time = self.current_time()
+
+	def elapsed(self):
+		return self.current_time() - self.start_time
 
 def create_camera(document):
 	
