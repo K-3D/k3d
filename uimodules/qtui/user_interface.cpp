@@ -385,6 +385,11 @@ bool user_interface::show(iunknown& Object)
 	return false;
 }
 
+void user_interface::synchronize()
+{
+	assert_not_implemented();
+}
+
 sigc::connection user_interface::get_timer(const double FrameRate, sigc::slot<void> Slot)
 {
 	return_val_if_fail(FrameRate != 0.0, sigc::connection());

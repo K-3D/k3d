@@ -153,6 +153,7 @@ public:
 	bool tutorial_message(const std::string& Message);
 	bool get_file_path(const k3d::ipath_property::mode_t Mode, const std::string& Type, const std::string& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result);
 	bool show(iunknown& Object);
+	void synchronize();
 	sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot);
 	k3d::iplugin_factory& factory();
 	static k3d::iplugin_factory& get_factory();

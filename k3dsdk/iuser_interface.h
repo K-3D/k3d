@@ -77,6 +77,9 @@ public:
 	/// Displays the given object using a graphical user interface
 	virtual bool show(iunknown& Object) = 0;
 
+	/// Runs the user interface loop (if any) until it is synchronized with the current document state
+	virtual void synchronize() = 0;
+
 	/// Returns a connection to a signal that will be emitted at the requested frame rate (could return an empty connection, if the UI doesn't support timers)
 	virtual sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot) = 0;
 

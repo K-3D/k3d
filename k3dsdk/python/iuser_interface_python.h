@@ -51,6 +51,7 @@ public:
 	void error_message(const std::string& Message);
 	unsigned long query_message(const std::string& Message, const boost::python::list& Buttons);
 	const filesystem::path get_file_path(const std::string& Direction, const std::string& Type, const std::string& Message, const std::string& StartPath);
+	void synchronize();
 
 	static void define_class();
 };

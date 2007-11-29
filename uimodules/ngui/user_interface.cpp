@@ -490,6 +490,11 @@ public:
 		return false;
 	}
 
+	void synchronize()
+	{
+		libk3dngui::handle_pending_events();
+	}
+
 	sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot)
 	{
 		return_val_if_fail(FrameRate != 0.0, sigc::connection());

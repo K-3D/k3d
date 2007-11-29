@@ -87,6 +87,11 @@ const filesystem::path iuser_interface::get_file_path(const std::string& Directi
 	return new_path;
 }
 
+void iuser_interface::synchronize()
+{
+	wrapped().synchronize();
+}
+
 void iuser_interface::define_class()
 {
 	class_<iuser_interface>("iuser_interface", 
@@ -127,7 +132,9 @@ void iuser_interface::define_class()
 			"@param start: The initial path to be displayed to the user.\n"
 			"@return: Returns the path chosen by the as a string, empty string if the user cancels.\n"
 			"@note: Depending on the user interface plugin, this might print a message "
-			"to the console, display a dialog box, or do nothing.");
+			"to the console, display a dialog box, or do nothing.")
+		.def("synchronize", &iuser_interface::synchronize,
+			"Gives the user interface a chance to synchronize itself with the current application state.");
 }
 
 } // namespace python

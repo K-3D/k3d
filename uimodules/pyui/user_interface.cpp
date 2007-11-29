@@ -142,6 +142,10 @@ public:
 		return false;
 	}
 
+	void synchronize()
+	{
+	}
+
 	sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot)
 	{
 		return sigc::connection();
