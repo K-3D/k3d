@@ -215,7 +215,7 @@ public:
 	{
 		// explicit delete, notify painter immediately, otherwise the address is lost
 		m_hint_cache.clear();
-		const k3d::mesh* const output_mesh = k3d::property::pipeline_value<const k3d::mesh* const>(m_output_mesh);
+		const k3d::mesh* const output_mesh = k3d::property::pipeline_value<k3d::mesh*>(m_output_mesh);
 		if (m_gl_painter.pipeline_value() && output_mesh)
 			m_gl_painter.pipeline_value()->mesh_changed(*output_mesh, k3d::hint::mesh_deleted());
 		// clear connections to prevent crash on document close
@@ -288,7 +288,7 @@ public:
 	{
 		k3d::bounding_box3 results;
 
-		const k3d::mesh* const output_mesh = k3d::property::pipeline_value<const k3d::mesh* const>(m_output_mesh);
+		const k3d::mesh* const output_mesh = k3d::property::pipeline_value<k3d::mesh*>(m_output_mesh);
 		return_val_if_fail(output_mesh, results);
 
 		if(output_mesh->points)
@@ -310,7 +310,7 @@ public:
 	void process_changes()
 	{
 		const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value(); // Make sure we trigger any updates that were made to the input mesh 
-		const k3d::mesh* output_mesh = k3d::property::pipeline_value<const k3d::mesh*>(m_output_mesh);
+		const k3d::mesh* output_mesh = k3d::property::pipeline_value<k3d::mesh*>(m_output_mesh);
 
 		if (!input_mesh || !output_mesh)
 			return;
@@ -318,7 +318,7 @@ public:
 		// Process all hints in the order ther were received
 		for (hint_cache::hint_list_t::iterator hint = m_hint_cache.begin(); hint != m_hint_cache.end(); ++hint)
 		{
-			output_mesh = k3d::property::pipeline_value<const k3d::mesh*>(m_output_mesh);; // output mesh may have been reset during hint processing
+			output_mesh = k3d::property::pipeline_value<k3d::mesh*>(m_output_mesh); // output mesh may have been reset during hint processing
 			process(*output_mesh, *hint);
 		}
 
@@ -331,7 +331,7 @@ public:
 		if(k3d::gl::imesh_painter* const painter = m_gl_painter.pipeline_value())
 		{
 			process_changes();
-			const k3d::mesh* const output_mesh = k3d::property::pipeline_value<const k3d::mesh* const>(m_output_mesh);
+			const k3d::mesh* const output_mesh = k3d::property::pipeline_value<k3d::mesh*>(m_output_mesh);
 			return_if_fail(output_mesh);
 			
 			k3d::node* parent = dynamic_cast<k3d::node*>(k3d::property::pipeline_value<k3d::inode*>(this->parent()));
@@ -352,7 +352,7 @@ public:
 		if(k3d::gl::imesh_painter* const painter = m_gl_painter.pipeline_value())
 		{
 			process_changes();
-			const k3d::mesh* const output_mesh = k3d::property::pipeline_value<const k3d::mesh* const>(m_output_mesh);
+			const k3d::mesh* const output_mesh = k3d::property::pipeline_value<k3d::mesh*>(m_output_mesh);
 			return_if_fail(output_mesh);
 
 			k3d::gl::painter_render_state render_state(State, matrix(), selection_weight, m_show_component_selection.pipeline_value());
@@ -446,7 +446,7 @@ protected:
 		m_gl_painter.pipeline_value()->mesh_changed(Mesh, k3d::hint::mesh_deleted()); // notify painter it needs to delete the old mesh
 		m_output_mesh.reset(0, Hint);
 		m_transformed_mesh.reset(0, Hint);
-		if (const k3d::mesh* const output_mesh = k3d::property::pipeline_value<const k3d::mesh* const>(m_output_mesh))
+		if (const k3d::mesh* const output_mesh = k3d::property::pipeline_value<k3d::mesh*>(m_output_mesh))
 			m_gl_painter.pipeline_value()->mesh_changed(*output_mesh, Hint);
 	}
 	
@@ -463,7 +463,7 @@ protected:
 		}
 		m_output_mesh.reset(0, Hint);
 		m_transformed_mesh.reset(0, Hint);
-		if (const k3d::mesh* const output_mesh = k3d::property::pipeline_value<const k3d::mesh* const>(m_output_mesh))
+		if (const k3d::mesh* const output_mesh = k3d::property::pipeline_value<k3d::mesh*>(m_output_mesh))
 			m_gl_painter.pipeline_value()->mesh_changed(*output_mesh, Hint);
 	}
 	
@@ -472,7 +472,7 @@ protected:
 		m_gl_painter.pipeline_value()->mesh_changed(Mesh, k3d::hint::mesh_deleted()); // notify painter it needs to delete the old mesh
 		m_output_mesh.reset(0, Hint);
 		m_transformed_mesh.reset(0, Hint);
-		if (const k3d::mesh* const output_mesh = k3d::property::pipeline_value<const k3d::mesh* const>(m_output_mesh))
+		if (const k3d::mesh* const output_mesh = k3d::property::pipeline_value<k3d::mesh*>(m_output_mesh))
 			m_gl_painter.pipeline_value()->mesh_changed(*output_mesh, Hint);
 	}
 	
