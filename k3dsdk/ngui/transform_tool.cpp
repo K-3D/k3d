@@ -104,90 +104,66 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 	const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
 	const size_t point_count = points.size();
 
-	switch(SelectionMode)
+	// Get selected points
+	for (size_t point = 0; point != point_count; ++point)
 	{
-		case SELECT_POINTS:
+		if (point_selection[point])
 		{
-			// Get selected points
-			for (size_t point = 0; point != point_count; ++point)
-			{
-				if (point_selection[point])
-				{
-					PointList.push_back(point);
+			PointList.push_back(point);
 
-					component_center += to_vector(points[point]);
-				}
-			}
+			component_center += to_vector(points[point]);
 		}
-		break;
-		case SELECT_LINES:
+	}
+	
+	// Get selected lines
+	return_val_if_fail(Mesh.polyhedra, component_center);
+	const k3d::mesh::polyhedra_t& polyhedra = *Mesh.polyhedra;
+	return_val_if_fail(polyhedra.clockwise_edges, component_center);
+	return_val_if_fail(polyhedra.edge_points, component_center);
+	return_val_if_fail(polyhedra.edge_selection, component_center);
+	const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+	const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
+	const k3d::mesh::selection_t& edge_selection = *polyhedra.edge_selection;
+	
+	const size_t edge_count = edge_points.size();
+	std::set<size_t> pointset; //ensure each point gets added only once
+	for (size_t edge = 0; edge < edge_count; ++edge)
+	{
+		if (edge_selection[edge])
 		{
-			return_val_if_fail(Mesh.polyhedra, component_center);
-			const k3d::mesh::polyhedra_t& polyhedra = *Mesh.polyhedra;
-			return_val_if_fail(polyhedra.clockwise_edges, component_center);
-			return_val_if_fail(polyhedra.edge_points, component_center);
-			return_val_if_fail(polyhedra.edge_selection, component_center);
-			const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-			const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
-			const k3d::mesh::selection_t& edge_selection = *polyhedra.edge_selection;
-			
-			const size_t edge_count = edge_points.size();
-			std::set<size_t> pointset; //ensure each point gets added only once
-			for (size_t edge = 0; edge < edge_count; ++edge)
-			{
-				if (edge_selection[edge])
-				{
-					pointset.insert(edge_points[edge]);
-					pointset.insert(edge_points[clockwise_edges[edge]]);
-				}
-			}
-			for (std::set<size_t>::const_iterator point = pointset.begin(); point != pointset.end(); ++ point)
-			{
-				PointList.push_back(*point);
-				component_center += to_vector(points[*point]);
-			}
+			pointset.insert(edge_points[edge]);
+			pointset.insert(edge_points[clockwise_edges[edge]]);
 		}
-		break;
-		case SELECT_FACES:
-		{
-			return_val_if_fail(Mesh.polyhedra, component_center);
-			const k3d::mesh::polyhedra_t& polyhedra = *Mesh.polyhedra;
-			return_val_if_fail(polyhedra.clockwise_edges, component_center);
-			return_val_if_fail(polyhedra.edge_points, component_center);
-			return_val_if_fail(polyhedra.face_first_loops, component_center);
-			return_val_if_fail(polyhedra.loop_first_edges, component_center);
-			return_val_if_fail(polyhedra.face_selection, component_center);
-			const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-			const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
-			const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
-			const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
-			const k3d::mesh::selection_t& face_selection = *polyhedra.face_selection;
+	}
+	
+	// Selected faces ..
+	return_val_if_fail(Mesh.polyhedra, component_center);
+	return_val_if_fail(polyhedra.face_first_loops, component_center);
+	return_val_if_fail(polyhedra.loop_first_edges, component_center);
+	return_val_if_fail(polyhedra.face_selection, component_center);
+	const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+	const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+	const k3d::mesh::selection_t& face_selection = *polyhedra.face_selection;
 
-			std::set<size_t> pointset; //ensure each point gets added only once
-				const size_t face_count = face_first_loops.size();
-			for(size_t face = 0; face != face_count; ++face)
+	const size_t face_count = face_first_loops.size();
+	for(size_t face = 0; face != face_count; ++face)
+	{
+		if (face_selection[face])
+		{
+			const size_t first_edge = loop_first_edges[face_first_loops[face]];
+			for(size_t edge = first_edge; ; )
 			{
-				if (face_selection[face])
-				{
-					const size_t first_edge = loop_first_edges[face_first_loops[face]];
-					for(size_t edge = first_edge; ; )
-					{
-						pointset.insert(edge_points[edge]);
-						edge = clockwise_edges[edge];
-						if(edge == first_edge)
-							break;
-					}
-				}
-			}
-			for (std::set<size_t>::const_iterator point = pointset.begin(); point != pointset.end(); ++ point)
-			{
-				PointList.push_back(*point);
-				component_center += to_vector(points[*point]);
+				pointset.insert(edge_points[edge]);
+				edge = clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
 			}
 		}
-		break;
-		default:
-			assert_not_reached();
+	}
+	for (std::set<size_t>::const_iterator point = pointset.begin(); point != pointset.end(); ++ point)
+	{
+		PointList.push_back(*point);
+		component_center += to_vector(points[*point]);
 	}
 
 	// Compute average position
@@ -499,7 +475,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		m_drag_mutex = true;
 		
 		const k3d::matrix4 current_coordinate_system_rotation = m_system_matrix * RotationMatrix * m_system_matrix_inverse;
-		assert_warning(k3d::property::set_internal_value(*modifier, "center", WorldCenter)); // set center first, so we can ride on the change signal of the matrix
+		assert_warning(k3d::property::set_internal_value(*modifier, "center", k3d::inverse(k3d::node_to_world_matrix(*node)) * WorldCenter)); // set center first, so we can ride on the change signal of the matrix
 		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_rotation));
 	}
 
@@ -516,7 +492,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		m_drag_mutex = true;
 
 		const k3d::matrix4 current_coordinate_system_scaling = m_system_matrix * k3d::scaling3D(Scaling) * m_system_matrix_inverse;
-		assert_warning(k3d::property::set_internal_value(*modifier, "center", WorldCenter)); // set center first, so we can ride on the change signal of the matrix
+		assert_warning(k3d::property::set_internal_value(*modifier, "center", k3d::inverse(k3d::node_to_world_matrix(*node))*WorldCenter)); // set center first, so we can ride on the change signal of the matrix
 		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_scaling));
 	}
 

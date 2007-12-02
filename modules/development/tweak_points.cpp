@@ -122,8 +122,7 @@ public:
 		k3d::point3 center = m_center.pipeline_value();
 		for (size_t i = 0; i != selected_points.size(); ++i)
 		{
-			
-			k3d::point3 position = input_points[selected_points[i]] + m_selected_tweaks[i];
+			k3d::point3 position = (input_points[selected_points[i]] + m_selected_tweaks[i]);
 			output_points[selected_points[i]] = m_hint.transformation_matrix * k3d::to_point(position - center) + center;
 		}
 	}
