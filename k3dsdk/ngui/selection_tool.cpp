@@ -49,7 +49,9 @@ public:
 		m_extended_mode(init_owner(*this) + init_name("extended_mode") + init_label(_("Extended Selection Mode")) + init_description(_("Extended mode adds newly clicked geometry instead of replacing selection")) + init_value(false)),
 		m_extended_component_mode(init_owner(*this) + init_name("extended_component_mode") + init_label(_("Extended Component Selection Mode")) + init_description(_("Extended mode adds newly clicked components instead of replacing selection")) + init_value(false)),
 		m_paint_mode(init_owner(*this) + init_name("component_paint_mode") + init_label(_("Component Paint Mode")) + init_description(_("Use mouse pointer to paint-select geometry components")) + init_value(true)),
-		m_double_click_mode(init_owner(*this) + init_name("double_click_mode") + init_label(_("Double Click Mode")) + init_description(_("Double click switches back to object selection mode when clicking on nothing")) + init_value(true))
+		m_double_click_mode(init_owner(*this) + init_name("double_click_mode") + init_label(_("Double Click Mode")) + init_description(_("Double click switches back to object selection mode when clicking on nothing")) + init_value(true)),
+		m_convert_selection(init_owner(*this) + init_name("convert_selection") + init_label(_("Convert Selection")) + init_description(_("Convert selection when switching between modes")) + init_value(true)),
+		m_keep_selection(init_owner(*this) + init_name("keep_selection") + init_label(_("Keep Selection")) + init_description(_("Keep selection from the old modes when switching between modes")) + init_value(false))
 	{
 		m_input_model.connect_lbutton_down(sigc::mem_fun(m_selection_model, &selection_input_model::on_button_down));
 		m_input_model.connect_lbutton_click(sigc::mem_fun(m_selection_model, &selection_input_model::on_button_click));
@@ -120,6 +122,10 @@ public:
 	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_paint_mode;
 	/// Enables double-click actions
 	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_double_click_mode;
+	/// Convert selection when switching selection modes
+	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_convert_selection;
+	/// Keep selection when switching selection modes
+	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_keep_selection;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -149,6 +155,16 @@ const k3d::icommand_node::result selection_tool::execute_command(const std::stri
 		return result;
 
 	return RESULT_UNKNOWN_COMMAND;
+}
+
+bool selection_tool::convert_selection()
+{
+	return m_implementation->m_convert_selection.pipeline_value();
+}
+
+bool selection_tool::keep_selection()
+{
+	return m_implementation->m_keep_selection.pipeline_value();
 }
 
 k3d::iproperty_collection* selection_tool::get_property_collection()

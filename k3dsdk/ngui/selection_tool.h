@@ -46,6 +46,12 @@ public:
 	~selection_tool();
 
 	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
+	
+	/// True if the selection is converted when switching modes
+	bool convert_selection();
+	
+	/// True if the selection is kept when switching modes
+	bool keep_selection();
 
 protected:
 	virtual k3d::iproperty_collection* get_property_collection();

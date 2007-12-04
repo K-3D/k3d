@@ -960,8 +960,6 @@ public:
 		m_document(Document),
 		m_gdkgl_share_list(0),
 		m_selection_mode(init_owner(*this) + init_name("selection_mode") + init_label(_("Selection Type")) + init_description(_("Sets selection mode (nodes, faces, edges, points, etc)")) + init_value(SELECT_NODES) + init_values(detail::selection_mode_values())),
-		m_convert_selection(init_owner(*this) + init_name("convert_selection") + init_label(_("Convert Selection")) + init_description(_("True if the selection gets converted when switching modes")) + init_value(true)),
-		m_keep_selection(init_owner(*this) + init_name("keep_selection") + init_label(_("Keep Selection")) + init_description(_("True if the old selection is kept when switching modes")) + init_value(false)),
 		m_last_selection_mode(SELECT_NODES),
 		m_active_tool(0),
 		m_selection_tool(0),
@@ -1144,16 +1142,6 @@ public:
 	selection_mode_property_t& selection_mode()
 	{
 		return m_selection_mode;
-	}
-	
-	selection_flag_property_t& convert_selection()
-	{
-		return m_convert_selection;
-	}
-	
-	selection_flag_property_t& keep_selection()
-	{
-		return m_keep_selection;
 	}
 
 	void set_selection_mode(selection_mode_t Mode)
@@ -1625,7 +1613,7 @@ public:
 	/// Sets the current selection when node selection mode is chosen
 	void on_set_node_mode()
 	{
-		if (!m_keep_selection.internal_value())
+		if (!m_selection_tool->keep_selection())
 		{
 			detail::update_component_selection(selected_nodes(), detail::deselect_all(), true);
 		}
@@ -1638,8 +1626,8 @@ public:
 	/// Sets the current selection when point selection mode is chosen
 	void on_set_point_mode()
 	{
-		if (m_convert_selection.internal_value())
-			detail::update_component_selection(selected_nodes(), detail::convert_to_points(m_keep_selection.internal_value()), true);
+		if (m_selection_tool->convert_selection())
+			detail::update_component_selection(selected_nodes(), detail::convert_to_points(m_selection_tool->keep_selection()), true);
 		else
 			detail::update_component_selection(selected_nodes(), detail::select_null(), true);
 	}
@@ -1647,8 +1635,8 @@ public:
 	/// Sets the current selection when line selection mode is chosen
 	void on_set_line_mode()
 	{
-		if (m_convert_selection.internal_value())
-			detail::update_component_selection(selected_nodes(), detail::convert_to_lines(m_keep_selection.internal_value()), true);
+		if (m_selection_tool->convert_selection())
+			detail::update_component_selection(selected_nodes(), detail::convert_to_lines(m_selection_tool->keep_selection()), true);
 		else
 			detail::update_component_selection(selected_nodes(), detail::select_null(), true);
 	}
@@ -1656,8 +1644,8 @@ public:
 	/// Sets the current selection when face selection mode is chosen
 	void on_set_face_mode()
 	{
-		if (m_convert_selection.internal_value())
-			detail::update_component_selection(selected_nodes(), detail::convert_to_faces(m_keep_selection.internal_value()), true);
+		if (m_selection_tool->convert_selection())
+			detail::update_component_selection(selected_nodes(), detail::convert_to_faces(m_selection_tool->keep_selection()), true);
 		else
 			detail::update_component_selection(selected_nodes(), detail::select_null(), true);
 	}
@@ -1665,7 +1653,7 @@ public:
 	/// Called by the signal system when the selection mode changes
 	void on_selection_mode_changed(k3d::iunknown*)
 	{
-		if (!m_keep_selection.internal_value() && !m_convert_selection.internal_value())
+		if (!m_selection_tool->keep_selection() && !m_selection_tool->convert_selection())
 		{
 			detail::update_component_selection(selected_nodes(), detail::deselect_all(), true);
 		}
@@ -1709,10 +1697,6 @@ public:
 	active_tool_changed_signal_t m_active_tool_changed_signal;
 	/// Stores the current document-wide selection mode
 	selection_mode_property_t m_selection_mode;
-	/// True if the selection has to be converted
-	selection_flag_property_t m_convert_selection;
-	/// True if the old selection has to be kept when switching modes
-	selection_flag_property_t m_keep_selection;
 	/// Stores the last document-wide selection mode
 	selection_mode_t m_last_selection_mode;
 
@@ -1723,7 +1707,7 @@ public:
 
 	/// Store a reference to the current active tool
 	tool* m_active_tool;
-	tool* m_selection_tool;
+	libk3dngui::selection_tool* m_selection_tool;
 	tool* m_move_tool;
 	tool* m_rotate_tool;
 	tool* m_scale_tool;
@@ -1978,16 +1962,6 @@ tool& document_state::snap_tool()
 document_state::selection_mode_property_t& document_state::selection_mode()
 {
 	return m_implementation->selection_mode();
-}
-
-document_state::selection_flag_property_t& document_state::convert_selection()
-{
-	return m_implementation->convert_selection();
-}
-
-document_state::selection_flag_property_t& document_state::keep_selection()
-{
-	return m_implementation->keep_selection();
 }
 
 void document_state::set_selection_mode(selection_mode_t Mode)
