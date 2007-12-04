@@ -714,6 +714,7 @@ void control::create_font()
 
 bool control::on_button_press_event(GdkEventButton* Event)
 {
+	m_implementation->m_document_state.set_focus_viewport(this);
 	m_implementation->m_document_state.active_tool().input_model().button_press_event(*this, Event);
 	return true;
 }
