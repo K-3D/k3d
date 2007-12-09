@@ -710,7 +710,10 @@ struct convert_to_lines
 			for(size_t curve = curve_begin; curve != curve_end; ++curve)
 			{
 				if(curve_selection[curve])
+				{
+					Selection.linear_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
 					continue;
+				}
 
 				const size_t point_begin = curve_first_points[curve];
 				const size_t point_end = point_begin + curve_point_counts[curve];
@@ -736,7 +739,10 @@ struct convert_to_lines
 			for(size_t curve = curve_begin; curve != curve_end; ++curve)
 			{
 				if(curve_selection[curve])
+				{
+					Selection.cubic_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
 					continue;
+				}
 
 				const size_t point_begin = curve_first_points[curve];
 				const size_t point_end = point_begin + curve_point_counts[curve];
@@ -762,7 +768,10 @@ struct convert_to_lines
 			for(size_t curve = curve_begin; curve != curve_end; ++curve)
 			{
 				if(curve_selection[curve])
+				{
+					Selection.nurbs_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
 					continue;
+				}
 
 				const size_t point_begin = curve_first_points[curve];
 				const size_t point_end = point_begin + curve_point_counts[curve];
@@ -870,7 +879,10 @@ struct convert_to_faces
 			for(size_t patch = patch_begin; patch != patch_end; ++patch)
 			{
 				if((*Mesh.bilinear_patches->patch_selection)[patch])
+				{
+					Selection.bilinear_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
 					continue;
+				}
 
 				const size_t patch_point_begin = patch * 4;
 				const size_t patch_point_end = patch_point_begin + 4;
@@ -893,7 +905,10 @@ struct convert_to_faces
 			for(size_t patch = patch_begin; patch != patch_end; ++patch)
 			{
 				if((*Mesh.bicubic_patches->patch_selection)[patch])
+				{
+					Selection.bicubic_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
 					continue;
+				}
 
 				const size_t patch_point_begin = patch * 16;
 				const size_t patch_point_end = patch_point_begin + 16;
@@ -916,7 +931,10 @@ struct convert_to_faces
 			for(size_t patch = patch_begin; patch != patch_end; ++patch)
 			{
 				if((*Mesh.nurbs_patches->patch_selection)[patch])
+				{
+					Selection.nurbs_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
 					continue;
+				}
 
 				const size_t patch_point_begin = (*Mesh.nurbs_patches->patch_first_points)[patch];
 				const size_t patch_point_end = patch_point_begin + ((*Mesh.nurbs_patches->patch_u_point_counts)[patch] * (*Mesh.nurbs_patches->patch_v_point_counts)[patch]);
@@ -944,6 +962,94 @@ struct convert_to_faces
 		deselect_gaps(Selection);
 	}
 	bool m_keep_selection;
+};
+
+/// Keeps the existing components explicitely selected
+struct keep_selection
+{
+	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
+	{
+		if(Mesh.points && Mesh.point_selection)
+		{
+			for (k3d::uint_t point = 0; point != Mesh.point_selection->size(); ++point)
+			{
+				if (Mesh.point_selection->at(point))
+					Selection.points.push_back(k3d::mesh_selection::record(point, 1.0));
+			}
+		}
+		
+		if (Mesh.polyhedra && Mesh.polyhedra->edge_selection)
+		{
+			for (k3d::uint_t edge = 0; edge != Mesh.polyhedra->edge_selection->size(); ++edge)
+			{
+				if (Mesh.polyhedra->edge_selection->at(edge))
+					Selection.edges.push_back(k3d::mesh_selection::record(edge, 1.0));
+			}
+		}
+		
+		if (Mesh.polyhedra && Mesh.polyhedra->face_selection)
+		{
+			for (k3d::uint_t face = 0; face != Mesh.polyhedra->face_selection->size(); ++face)
+			{
+				if (Mesh.polyhedra->face_selection->at(face))
+					Selection.faces.push_back(k3d::mesh_selection::record(face, 1.0));
+			}
+		}
+		
+		if (Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_selection)
+		{
+			for (k3d::uint_t curve = 0; curve != Mesh.linear_curve_groups->curve_selection->size(); ++curve)
+			{
+				if (Mesh.linear_curve_groups->curve_selection->at(curve))
+					Selection.linear_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
+			}
+		}
+		
+		if (Mesh.cubic_curve_groups && Mesh.cubic_curve_groups->curve_selection)
+		{
+			for (k3d::uint_t curve = 0; curve != Mesh.cubic_curve_groups->curve_selection->size(); ++curve)
+			{
+				if (Mesh.cubic_curve_groups->curve_selection->at(curve))
+					Selection.cubic_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
+			}
+		}
+		
+		if (Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_selection)
+		{
+			for (k3d::uint_t curve = 0; curve != Mesh.nurbs_curve_groups->curve_selection->size(); ++curve)
+			{
+				if (Mesh.nurbs_curve_groups->curve_selection->at(curve))
+					Selection.nurbs_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
+			}
+		}
+		
+		if (Mesh.bilinear_patches && Mesh.bilinear_patches->patch_selection)
+		{
+			for (k3d::uint_t patch = 0; patch != Mesh.bilinear_patches->patch_selection->size(); ++patch)
+			{
+				if (Mesh.bilinear_patches->patch_selection->at(patch))
+					Selection.bilinear_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
+			}
+		}
+		
+		if (Mesh.bicubic_patches && Mesh.bicubic_patches->patch_selection)
+		{
+			for (k3d::uint_t patch = 0; patch != Mesh.bicubic_patches->patch_selection->size(); ++patch)
+			{
+				if (Mesh.bicubic_patches->patch_selection->at(patch))
+					Selection.bicubic_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
+			}
+		}
+		
+		if (Mesh.nurbs_patches && Mesh.nurbs_patches->patch_selection)
+		{
+			for (k3d::uint_t patch = 0; patch != Mesh.nurbs_patches->patch_selection->size(); ++patch)
+			{
+				if (Mesh.nurbs_patches->patch_selection->at(patch))
+					Selection.nurbs_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
+			}
+		}
+	}
 };
 
 } // namespace detail
@@ -1619,7 +1725,7 @@ public:
 		}
 		else
 		{
-			detail::update_component_selection(selected_nodes(), detail::select_null(), true);
+			detail::update_component_selection(selected_nodes(), detail::keep_selection(), true);
 		}
 	}
 
@@ -1629,7 +1735,7 @@ public:
 		if (m_selection_tool->convert_selection())
 			detail::update_component_selection(selected_nodes(), detail::convert_to_points(m_selection_tool->keep_selection()), true);
 		else
-			detail::update_component_selection(selected_nodes(), detail::select_null(), true);
+			detail::update_component_selection(selected_nodes(), detail::keep_selection(), true);
 	}
 
 	/// Sets the current selection when line selection mode is chosen
@@ -1638,7 +1744,7 @@ public:
 		if (m_selection_tool->convert_selection())
 			detail::update_component_selection(selected_nodes(), detail::convert_to_lines(m_selection_tool->keep_selection()), true);
 		else
-			detail::update_component_selection(selected_nodes(), detail::select_null(), true);
+			detail::update_component_selection(selected_nodes(), detail::keep_selection(), true);
 	}
 
 	/// Sets the current selection when face selection mode is chosen
@@ -1647,7 +1753,7 @@ public:
 		if (m_selection_tool->convert_selection())
 			detail::update_component_selection(selected_nodes(), detail::convert_to_faces(m_selection_tool->keep_selection()), true);
 		else
-			detail::update_component_selection(selected_nodes(), detail::select_null(), true);
+			detail::update_component_selection(selected_nodes(), detail::keep_selection(), true);
 	}
 
 	/// Called by the signal system when the selection mode changes
