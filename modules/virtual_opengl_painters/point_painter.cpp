@@ -46,7 +46,7 @@ class virtual_point_painter_factory:
 public:
 	virtual_point_painter_factory() :
 		base(k3d::uuid(0x7e376143, 0xb640c3f4, 0x288543a0, 0x57f83514),
-			"GLPointPainter",
+			"VirtualOpenGLPointPainter",
 			_("Renders mesh points"),
 			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL),
@@ -62,7 +62,7 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("VBOPointPainter");
+				const k3d::factories_t factories = k3d::plugins("OpenGLVBOPointPainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}

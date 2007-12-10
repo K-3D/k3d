@@ -46,7 +46,7 @@ class virtual_sds_point_painter_factory:
 public:
 	virtual_sds_point_painter_factory() :
 		base(k3d::uuid(0x46db8236, 0xa1408c58, 0xd829ceba, 0xffe78fca),
-			"GLSDSPointPainter",
+			"VirtualOpenGLSDSPointPainter",
 			_("Renders mesh subdivision surface points"),
 			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL),
@@ -62,14 +62,14 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("SDSVBOPointPainter");
+				const k3d::factories_t factories = k3d::plugins("OpenGLVBOSDSPointPainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}
 			else
 			{
 				k3d::log() << info << this->name() << ": Creating legacy OpenGL 1.1 painter" << std::endl;
-				const k3d::factories_t factories = k3d::plugins("SDSGLPointPainter");
+				const k3d::factories_t factories = k3d::plugins("OpenGLSDSPointPainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}

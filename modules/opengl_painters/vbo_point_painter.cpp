@@ -168,7 +168,7 @@ public:
 	{
 		static k3d::document_plugin_factory<vbo_point_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 				k3d::uuid(0xe2495ce1, 0x0c4c42eb, 0x81142404, 0x3c25889e),
-		"VBOPointPainter",
+		"OpenGLVBOPointPainter",
 		_("Renders mesh points (OpenGL VBOs)"),
 		"Development",
 		k3d::iplugin_factory::EXPERIMENTAL);

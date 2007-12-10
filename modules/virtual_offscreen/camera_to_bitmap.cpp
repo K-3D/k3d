@@ -49,7 +49,7 @@ class virtual_camera_to_bitmap_factory:
 public:
 	virtual_camera_to_bitmap_factory() :
 		base(k3d::uuid(0xc9a3d742, 0x4646dd3a, 0x95c49480, 0x428e7641),
-			"CameraToBitmap",
+			"VirtualCameraToBitmap",
 			_("Renders the scene to a bitmap using OpenGL"),
 			"Bitmap Test",
 			k3d::iplugin_factory::EXPERIMENTAL),

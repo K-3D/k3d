@@ -46,7 +46,7 @@ class virtual_edge_painter_factory:
 public:
 	virtual_edge_painter_factory() :
 		base(k3d::uuid(0x172c1208, 0xd24430f5, 0x63f70388, 0x1945866e),
-			"GLEdgePainter",
+			"VirtualOpenGLEdgePainter",
 			_("Renders mesh edges"),
 			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL),
@@ -62,7 +62,7 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("VBOEdgePainter");
+				const k3d::factories_t factories = k3d::plugins("OpenGLVBOEdgePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}

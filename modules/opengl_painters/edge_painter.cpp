@@ -42,14 +42,14 @@ namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// gl_edge_painter
+// edge_painter
 
-class gl_edge_painter :
+class edge_painter :
 	public colored_selection_painter
 {
 	typedef colored_selection_painter base;
 public:
-	gl_edge_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	edge_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
@@ -116,7 +116,7 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<gl_edge_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
+		static k3d::document_plugin_factory<edge_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 			k3d::uuid(0xb1260f93, 0xe16e4ab2, 0xbd6a7cbd, 0x85ddca8b),
 			"OpenGLEdgePainter",
 			_("Renders mesh edges (OpenGL 1.1)"),
@@ -128,11 +128,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// gl_edge_painter_factory
+// edge_painter_factory
 
-k3d::iplugin_factory& gl_edge_painter_factory()
+k3d::iplugin_factory& edge_painter_factory()
 {
-	return gl_edge_painter::get_factory();
+	return edge_painter::get_factory();
 }
 
 } // namespace painters

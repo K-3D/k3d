@@ -50,22 +50,22 @@ namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// gl_face_painter
+// face_painter
 
-class gl_face_painter :
+class face_painter :
 	public colored_selection_painter,
 	public k3d::hint::hint_processor
 {
 	typedef colored_selection_painter base;
 
 public:
-	gl_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6)),
 		m_triangle_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, cached_triangulation>::instance(Document))
 	{
 	}
 	
-	~gl_face_painter()
+	~face_painter()
 	{
 		m_triangle_cache.remove_painter(this);
 	}
@@ -231,7 +231,7 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<gl_face_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
+		static k3d::document_plugin_factory<face_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 			k3d::uuid(0xd4abf63c, 0x2242c17e, 0x2afcb18d, 0x0a8ebdd5),
 			"OpenGLFacePainter",
 			_("Renders mesh faces, after trianglulating them (OpenGL 1.1)"),
@@ -275,11 +275,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// gl_face_painter_factory
+// face_painter_factory
 
-k3d::iplugin_factory& gl_face_painter_factory()
+k3d::iplugin_factory& face_painter_factory()
 {
-	return gl_face_painter::get_factory();
+	return face_painter::get_factory();
 }
 
 } // namespace opengl

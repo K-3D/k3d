@@ -142,7 +142,7 @@ def setup_mesh_source_image_test(source_name):
 	camera = create_camera(doc)
 	render_engine = create_opengl_engine(doc)
 
-	camera_to_bitmap = doc.new_node("CameraToBitmap")
+	camera_to_bitmap = doc.new_node("VirtualCameraToBitmap")
 	camera_to_bitmap.camera = camera
 	camera_to_bitmap.render_engine = render_engine
 

@@ -179,7 +179,7 @@ public:
 	{
 		static k3d::document_plugin_factory<vbo_edge_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 				k3d::uuid(0x7fca3f65, 0x531b4db6, 0xa11dac8a, 0x0b9f17b1),
-		"VBOEdgePainter",
+		"OpenGLVBOEdgePainter",
 		_("Renders mesh edges (OpenGL VBOs)"),
 		"Development",
 		k3d::iplugin_factory::EXPERIMENTAL);

@@ -186,7 +186,7 @@ public:
 	{
 		static k3d::document_plugin_factory<glsl_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 			k3d::uuid(0x24d4d987, 0x62f849ea, 0xad1907fe, 0xe2a0a728),
-			"GLSLPainter",
+			"OpenGLSLPainter",
 			_("Applies an OpenGL shader to downstream painters"),
 			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL);

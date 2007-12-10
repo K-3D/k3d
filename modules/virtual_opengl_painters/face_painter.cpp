@@ -46,7 +46,7 @@ class virtual_face_painter_factory:
 public:
 	virtual_face_painter_factory() :
 		base(k3d::uuid(0x7e6e8354, 0x604f05ae, 0x1d4d658b, 0x96538240),
-			"GLFacePainter",
+			"VirtualOpenGLFacePainter",
 			_("Renders mesh faces"),
 			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL),
@@ -62,7 +62,7 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("VBOFacePainter");
+				const k3d::factories_t factories = k3d::plugins("OpenGLVBOFacePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}

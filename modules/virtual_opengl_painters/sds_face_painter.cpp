@@ -46,7 +46,7 @@ class virtual_sds_face_painter_factory:
 public:
 	virtual_sds_face_painter_factory() :
 		base(k3d::uuid(0x9d4043c8, 0x864fe71b, 0x38706d85, 0x8b60af0c),
-			"GLSDSFacePainter",
+			"VirtualOpenGLSDSFacePainter",
 			_("Renders mesh subdivision surface faces"),
 			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL),
@@ -62,14 +62,14 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("SDSVBOFacePainter");
+				const k3d::factories_t factories = k3d::plugins("OpenGLVBOSDSFacePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}
 			else
 			{
 				k3d::log() << info << this->name() << ": Creating legacy OpenGL 1.1 painter" << std::endl;
-				const k3d::factories_t factories = k3d::plugins("SDSGLFacePainter");
+				const k3d::factories_t factories = k3d::plugins("OpenGLSDSFacePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}

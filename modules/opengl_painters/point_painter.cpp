@@ -43,15 +43,15 @@ namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// gl_point_painter
+// point_painter
 
-class gl_point_painter :
+class point_painter :
 	public colored_selection_painter
 {
 	typedef colored_selection_painter base;
 
 public:
-	gl_point_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	point_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
@@ -122,7 +122,7 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<gl_point_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
+		static k3d::document_plugin_factory<point_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 			k3d::uuid(0xad24a631, 0xacbd4af1, 0xbd6d6362, 0x75c3d5d7),
 			"OpenGLPointPainter",
 			_("Renders mesh points"),
@@ -134,11 +134,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// gl_point_painter_factory
+// point_painter_factory
 
-k3d::iplugin_factory& gl_point_painter_factory()
+k3d::iplugin_factory& point_painter_factory()
 {
-	return gl_point_painter::get_factory();
+	return point_painter::get_factory();
 }
 
 } // namespace painters

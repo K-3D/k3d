@@ -46,7 +46,7 @@ class virtual_sds_edge_painter_factory:
 public:
 	virtual_sds_edge_painter_factory() :
 		base(k3d::uuid(0x6c827fec, 0xd74ffc1c, 0x79ba768f, 0xfc8fa4d5),
-			"GLSDSEdgePainter",
+			"VirtualOpenGLSDSEdgePainter",
 			_("Renders mesh subdivision surface edges"),
 			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL),
@@ -62,14 +62,14 @@ public:
 		{
 			if(k3d::gl::extension::query_vbo())
 			{
-				const k3d::factories_t factories = k3d::plugins("SDSVBOEdgePainter");
+				const k3d::factories_t factories = k3d::plugins("OpenGLVBOSDSEdgePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}
 			else
 			{
 				k3d::log() << info << this->name() << ": Creating legacy OpenGL 1.1 painter" << std::endl;
-				const k3d::factories_t factories = k3d::plugins("SDSGLEdgePainter");
+				const k3d::factories_t factories = k3d::plugins("OpenGLSDSEdgePainter");
 				if(1 == factories.size())
 					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
 			}

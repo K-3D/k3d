@@ -206,7 +206,7 @@ public:
 	{
 		static k3d::document_plugin_factory<vbo_face_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
 			k3d::uuid(0x2f953308, 0xc8474bc9, 0x6d58bba7, 0x0355bcfe),
-			"VBOFacePainter",
+			"OpenGLVBOFacePainter",
 			_("Renders mesh faces, after trianglulating them (OpenGL VBOs)"),
 			"Development",
 			k3d::iplugin_factory::EXPERIMENTAL);
