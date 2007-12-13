@@ -114,40 +114,40 @@ parameter_list shader::shader_arguments(const render_state& State)
 
 			if(property_type == typeid(ri::real))
 			{
-				results.push_back(parameter(property.property_name(), CONSTANT, 1, boost::any_cast<ri::real>(property::pipeline_value(property))));
+				results.push_back(parameter(property.property_name(), CONSTANT, 1, property::pipeline_value<ri::real>(property)));
 			}
 			else if(property_type == typeid(ri::string))
 			{
-				results.push_back(parameter(property.property_name(), CONSTANT, 1, boost::any_cast<ri::string>(property::pipeline_value(property))));
+				results.push_back(parameter(property.property_name(), CONSTANT, 1, property::pipeline_value<ri::string>(property)));
 			}
 			else if(property_type == typeid(k3d::inode*)) // Node properties always are of type "inode*", so we have to query for the interface type we really want
 			{
-				if(k3d::ri::itexture* const texture = dynamic_cast<k3d::ri::itexture*>(boost::any_cast<k3d::inode*>(property::pipeline_value(property))))
+				if(k3d::ri::itexture* const texture = dynamic_cast<k3d::ri::itexture*>(property::pipeline_value<inode*>(property)))
 					results.push_back(parameter(property.property_name(), CONSTANT, 1, static_cast<k3d::ri::string>(texture->renderman_texture_path(State).native_filesystem_string())));
 			}
 			else if(property_type == typeid(ri::point))
 			{
-				results.push_back(parameter(property.property_name(), CONSTANT, 1, boost::any_cast<ri::point>(property::pipeline_value(property))));
+				results.push_back(parameter(property.property_name(), CONSTANT, 1, property::pipeline_value<ri::point>(property)));
 			}
 			else if(property_type == typeid(ri::vector))
 			{
-				results.push_back(parameter(property.property_name(), CONSTANT, 1, boost::any_cast<ri::vector>(property::pipeline_value(property))));
+				results.push_back(parameter(property.property_name(), CONSTANT, 1, property::pipeline_value<ri::vector>(property)));
 			}
 			else if(property_type == typeid(ri::normal))
 			{
-				results.push_back(parameter(property.property_name(), CONSTANT, 1, boost::any_cast<ri::normal>(property::pipeline_value(property))));
+				results.push_back(parameter(property.property_name(), CONSTANT, 1, property::pipeline_value<ri::normal>(property)));
 			}
 			else if(property_type == typeid(ri::hpoint))
 			{
-				results.push_back(parameter(property.property_name(), CONSTANT, 1, boost::any_cast<ri::hpoint>(property::pipeline_value(property))));
+				results.push_back(parameter(property.property_name(), CONSTANT, 1, property::pipeline_value<ri::hpoint>(property)));
 			}
 			else if(property_type == typeid(ri::matrix))
 			{
-				results.push_back(parameter(property.property_name(), CONSTANT, 1, boost::any_cast<ri::matrix>(property::pipeline_value(property))));
+				results.push_back(parameter(property.property_name(), CONSTANT, 1, property::pipeline_value<ri::matrix>(property)));
 			}
 			else if(property_type == typeid(ri::color))
 			{
-				results.push_back(parameter(property.property_name(), CONSTANT, 1, boost::any_cast<ri::color>(property::pipeline_value(property))));
+				results.push_back(parameter(property.property_name(), CONSTANT, 1, property::pipeline_value<ri::color>(property)));
 			}
 			else
 			{
