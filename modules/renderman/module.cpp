@@ -33,7 +33,6 @@ extern k3d::iplugin_factory& array_1d_factory();
 extern k3d::iplugin_factory& array_2d_factory();
 extern k3d::iplugin_factory& array_3d_factory();
 extern k3d::iplugin_factory& background_plane_factory();
-extern k3d::iplugin_factory& background_sphere_factory();
 extern k3d::iplugin_factory& csg_operator_factory();
 extern k3d::iplugin_factory& csg_solid_factory();
 extern k3d::iplugin_factory& delayed_read_archive_factory();
@@ -60,7 +59,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(libk3drenderman::array_2d_factory());
 	Registry.register_factory(libk3drenderman::array_3d_factory());
 	Registry.register_factory(libk3drenderman::background_plane_factory());
-	Registry.register_factory(libk3drenderman::background_sphere_factory());
 	Registry.register_factory(libk3drenderman::csg_operator_factory());
 	Registry.register_factory(libk3drenderman::csg_solid_factory());
 	Registry.register_factory(libk3drenderman::delayed_read_archive_factory());
