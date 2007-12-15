@@ -52,7 +52,7 @@ public:
 		// As a special-case, if the internal property value is NULL, return the connected property (if any)
 		k3d::bitmap* result = boost::any_cast<k3d::bitmap*>(m_readable_data.property_value());
 		if(!result)
-			result = boost::any_cast<k3d::bitmap*>(k3d::property::pipeline_value(m_readable_data));
+			result = k3d::property::pipeline_value<k3d::bitmap*>(m_readable_data);
 
 		return result;
 	}

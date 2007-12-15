@@ -122,16 +122,16 @@ struct navigation_input_model::implementation
 				double near = 0;
 				if(k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(&Viewport.camera()->projection()))
 				{
-					top = boost::any_cast<double>(k3d::property::pipeline_value(perspective->top()));
-					bottom = boost::any_cast<double>(k3d::property::pipeline_value(perspective->bottom()));
-					near = boost::any_cast<double>(k3d::property::pipeline_value(perspective->near()));
+					top = k3d::property::pipeline_value<double>(perspective->top());
+					bottom = k3d::property::pipeline_value<double>(perspective->bottom());
+					near = k3d::property::pipeline_value<double>(perspective->near());
 
 				}
 				else if(k3d::iorthographic* const orthographic = dynamic_cast<k3d::iorthographic*>(&Viewport.camera()->projection()))
 				{
-					top = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->top()));
-					bottom = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->bottom()));
-					near = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->near()));
+					top = k3d::property::pipeline_value<double>(orthographic->top());
+					bottom = k3d::property::pipeline_value<double>(orthographic->bottom());
+					near = k3d::property::pipeline_value<double>(orthographic->near());
 				}
 
 				if(near > 0)
