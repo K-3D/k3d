@@ -11,17 +11,19 @@
 namespace k3d
 {
 
+class mesh;
+
 namespace gl {class imesh_painter;}
 
 /// Keep track of cached data for the VBO mesh painters
-template<class key_t, class data_t> class painter_cache
+template<class data_t, class key_t=const k3d::mesh*> class painter_cache
 {
 	/// Collection of data associated with different meshes
-	typedef std::map<const key_t, data_t*> data_collection_t;
-	typedef std::map<const k3d::idocument*, painter_cache<key_t, data_t> > instances_t;
+	typedef std::map<key_t, data_t*> data_collection_t;
+	typedef std::map<const k3d::idocument*, painter_cache<data_t, key_t> > instances_t;
 	/// Mesh <-> painter bindings
 	typedef std::set<const k3d::gl::imesh_painter*> painter_set_t;
-	typedef std::map<const key_t, painter_set_t> painters_t;
+	typedef std::map<key_t, painter_set_t> painters_t;
 
 	public:
 
@@ -30,19 +32,12 @@ template<class key_t, class data_t> class painter_cache
 		{
 			typename instances_t::iterator instance = m_instances.find(&Document);
 			if (instance == m_instances.end())
-				instance = (m_instances.insert(std::make_pair(&Document, painter_cache()))).first;
+				instance = (m_instances.insert(std::make_pair(&Document, painter_cache(Document)))).first;
 			return instance->second;
 		}
 		
-		/// Debug output in destructor
-		~painter_cache()
-		{
-			if (!m_data.empty())
-				k3d::log() << warning << "cache for <" << demangle(typeid(key_t)) << ", " << demangle(typeid(data_t)) << "> still has " << m_data.size() << " entries." << std::endl;
-		}
-
 		/// Get the data associated with Key, or NULL if there is none.
-		data_t* get_data(const key_t& Key)
+		data_t* get_data(key_t Key)
 		{
 			typename data_collection_t::iterator data = m_data.find(Key);
 			if (data != m_data.end())
@@ -51,18 +46,18 @@ template<class key_t, class data_t> class painter_cache
 		}
 
 		/// Create new data for the given key if it doesn't already exist
-		data_t* create_data(const key_t& Key)
+		data_t* create_data(key_t Key)
 		{
 			typename data_collection_t::iterator data = m_data.find(Key);
 			if (data == m_data.end())
 			{
-				data = m_data.insert(std::make_pair(Key, new data_t())).first;
+				data = m_data.insert(std::make_pair(Key, new data_t(m_document))).first;
 			}
 			return data->second;
 		}
 
 		/// Free the data if any for the given key
-		void remove_data(const key_t& Key)
+		void remove_data(key_t Key)
 		{
 			typename data_collection_t::iterator data = m_data.find(Key);
 			if (data != m_data.end())
@@ -71,21 +66,9 @@ template<class key_t, class data_t> class painter_cache
 				m_data.erase(data);
 			}
 		}
-		
-		/// Change the key of a data item, keeping the data
-		void switch_key(const key_t& OldKey, const key_t& NewKey)
-		{
-			typename data_collection_t::iterator data = m_data.find(OldKey);
-			if (data != m_data.end())
-			{
-				data_t* const value = data->second;
-				m_data.erase(data);
-				m_data.insert(std::make_pair(NewKey, value));
-			}
-		}
 
 		/// Register a painter as being associated with Key
-		void register_painter(const key_t Key, const k3d::gl::imesh_painter* Painter)
+		void register_painter(key_t Key, const k3d::gl::imesh_painter* Painter)
 		{
 			typename painters_t::iterator painters = m_painters.find(Key);
 			if (painters == m_painters.end())
@@ -110,8 +93,9 @@ template<class key_t, class data_t> class painter_cache
 		data_collection_t m_data;
 		/// The painters associated with the keys
 		painters_t m_painters;
-
-		painter_cache() {}
+		/// The document this cache is associated with
+		const k3d::idocument& m_document;
+		painter_cache(const k3d::idocument& Document) : m_document(Document) {}
 		static instances_t m_instances;
 };
 

@@ -36,69 +36,87 @@ namespace painters
 /// Storage for selection data
 typedef std::vector<k3d::mesh_selection::record> selection_records_t;
 
+namespace detail
+{
+
+inline void copy_selection(const k3d::mesh::selection_t& Selection, selection_records_t& Records)
+{
+	for (k3d::uint_t i = 0; i < Selection.size();)
+	{
+		k3d::uint_t start = i;
+		k3d::mesh_selection::record record(start, i+1, Selection[i]);
+		while (i < Selection.size() && record.weight == Selection[i])
+		{
+			record.end = i+1;
+			++i;
+		}
+		Records.push_back(record);
+	}
+}
+
+} // namespace detail
+
 /// Keep track of component selections
 class component_selection : public k3d::scheduler
 {
 public:
+	component_selection(const k3d::idocument& Document) : m_document(Document) {}
 	/// Provide access to the stored selection records
 	const selection_records_t& records() const
 	{
 		return m_selection_records;
 	}
-protected:
-	/// Executes the selection update based on the mesh array selection
-	void on_execute(const k3d::mesh& Mesh)
-	{
-		if (!m_selection_array)
-			on_schedule(Mesh, 0);
-		const k3d::mesh::selection_t& selection_array = *m_selection_array;
-		for (size_t i = 0; i < selection_array.size();)
-		{
-			size_t start = i;
-			k3d::mesh_selection::record record(start, i+1, selection_array[i]);
-			while (i < selection_array.size() && record.weight == selection_array[i])
-			{
-				record.end = i+1;
-				++i;
-			}
-			m_selection_records.push_back(record);
-		}
-	}
 
+protected:
 	selection_records_t m_selection_records;
-	boost::shared_ptr<const k3d::mesh::selection_t> m_selection_array;
+	const k3d::idocument& m_document;
 };
 
 /// Implement component_selection::on_schedule for a point selection
 class point_selection : public component_selection
 {
+public:
+	point_selection(const k3d::idocument& Document) : component_selection(Document) {}
 protected:
 	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		m_selection_records.clear();
-		m_selection_array=Mesh.point_selection;
+	}
+	void on_execute(const k3d::mesh& Mesh)
+	{
+		detail::copy_selection(*Mesh.point_selection, m_selection_records);
 	}
 };
 
 /// Implement component_selection::on_schedule for an edge selection
 class edge_selection : public component_selection
 {
+public:
+	edge_selection(const k3d::idocument& Document) : component_selection(Document) {}
 protected:
 	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		m_selection_records.clear();
-		m_selection_array=Mesh.polyhedra->edge_selection;
+	}
+	void on_execute(const k3d::mesh& Mesh)
+	{
+		detail::copy_selection(*Mesh.polyhedra->edge_selection, m_selection_records);
 	}
 };
 
 /// Implement component_selection::on_schedule for a face selection
 class face_selection : public component_selection
 {
+public:
+	face_selection(const k3d::idocument& Document) : component_selection(Document) {}
 protected:
 	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		m_selection_records.clear();
-		m_selection_array=Mesh.polyhedra->face_selection;
+	}
+	void on_execute(const k3d::mesh& Mesh)
+	{
+		detail::copy_selection(*Mesh.polyhedra->face_selection, m_selection_records);
 	}
 };
 

@@ -61,7 +61,7 @@ class face_painter :
 public:
 	face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6)),
-		m_triangle_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, cached_triangulation>::instance(Document))
+		m_triangle_cache(k3d::painter_cache<cached_triangulation>::instance(Document))
 	{
 	}
 	
@@ -94,7 +94,7 @@ public:
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
-		cached_triangulation* triangles = m_triangle_cache.create_data(Mesh.points); 
+		cached_triangulation* triangles = m_triangle_cache.create_data(&Mesh); 
 		triangles->execute(Mesh); 
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
@@ -192,7 +192,7 @@ public:
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 		
-		cached_triangulation* triangles = m_triangle_cache.create_data(Mesh.points); 
+		cached_triangulation* triangles = m_triangle_cache.create_data(&Mesh); 
 		triangles->execute(Mesh);
 		
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -224,7 +224,7 @@ public:
 		if (k3d::is_sds(Mesh))
 			return;
 		
-		m_triangle_cache.register_painter(Mesh.points, this);
+		m_triangle_cache.register_painter(&Mesh, this);
 		
 		process(Mesh, Hint);
 	}
@@ -249,7 +249,7 @@ protected:
 	
 	virtual void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		cached_triangulation* triangles = m_triangle_cache.create_data(Mesh.points); 
+		cached_triangulation* triangles = m_triangle_cache.create_data(&Mesh); 
 		triangles->schedule(Mesh, Hint);
 	}
 	
@@ -258,20 +258,13 @@ protected:
 		on_mesh_deleted(Mesh, Hint);
 	}
 	
-	virtual void on_address_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		k3d::hint::mesh_address_changed_t* address_hint = dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint);
-		return_if_fail(address_hint);
-		m_triangle_cache.switch_key(address_hint->old_points_address, Mesh.points);
-	}
-	
 	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		m_triangle_cache.remove_data(Mesh.points);
+		m_triangle_cache.remove_data(&Mesh);
 	}
 	
 private:
-	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, cached_triangulation>& m_triangle_cache;
+	k3d::painter_cache<cached_triangulation>& m_triangle_cache;
 };
 
 /////////////////////////////////////////////////////////////////////////////

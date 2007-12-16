@@ -57,9 +57,9 @@ class vbo_edge_painter :
 public:
 	vbo_edge_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_points_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, point_vbo>::instance(Document)),
-		m_edges_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, edge_vbo>::instance(Document)),
-		m_selection_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, edge_selection>::instance(Document))
+		m_points_cache(k3d::painter_cache<point_vbo>::instance(Document)),
+		m_edges_cache(k3d::painter_cache<edge_vbo>::instance(Document)),
+		m_selection_cache(k3d::painter_cache<edge_selection>::instance(Document))
 	{
 	}
 	
@@ -87,8 +87,8 @@ public:
 		
 		clean_vbo_state();
 		
-		point_vbo* const point_buffer = m_points_cache.create_data(Mesh.points);
-		edge_vbo* const edge_buffer = m_edges_cache.create_data(Mesh.polyhedra->edge_points);
+		point_vbo* const point_buffer = m_points_cache.create_data(&Mesh);
+		edge_vbo* const edge_buffer = m_edges_cache.create_data(&Mesh);
 		
 		point_buffer->execute(Mesh);
 		point_buffer->bind();
@@ -96,7 +96,7 @@ public:
 		edge_buffer->execute(Mesh);
 		edge_buffer->bind();
 		
-		edge_selection* selected_edges = m_selection_cache.create_data(Mesh.polyhedra->edge_points);
+		edge_selection* selected_edges = m_selection_cache.create_data(&Mesh);
 		selected_edges->execute(Mesh);
 		
 		size_t edge_count = Mesh.polyhedra->edge_points->size();
@@ -139,8 +139,8 @@ public:
 
 		clean_vbo_state();
 		
-		point_vbo* const point_buffer = m_points_cache.create_data(Mesh.points);
-		edge_vbo* const edge_buffer = m_edges_cache.create_data(Mesh.polyhedra->edge_points);
+		point_vbo* const point_buffer = m_points_cache.create_data(&Mesh);
+		edge_vbo* const edge_buffer = m_edges_cache.create_data(&Mesh);
 		
 		point_buffer->execute(Mesh);
 		point_buffer->bind();
@@ -168,9 +168,9 @@ public:
 		if (!k3d::validate_polyhedra(Mesh))
 			return;
 		
-		m_points_cache.register_painter(Mesh.points, this);
-		m_edges_cache.register_painter(Mesh.polyhedra->edge_points, this);
-		m_selection_cache.register_painter(Mesh.polyhedra->edge_points, this);
+		m_points_cache.register_painter(&Mesh, this);
+		m_edges_cache.register_painter(&Mesh, this);
+		m_selection_cache.register_painter(&Mesh, this);
 		
 		process(Mesh, Hint);
 	}
@@ -195,12 +195,12 @@ protected:
 	
 	virtual void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		m_points_cache.create_data(Mesh.points)->schedule(Mesh, Hint);
+		m_points_cache.create_data(&Mesh)->schedule(Mesh, Hint);
 	}
 	
 	virtual void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		m_selection_cache.create_data(Mesh.polyhedra->edge_points)->schedule(Mesh, Hint);
+		m_selection_cache.create_data(&Mesh)->schedule(Mesh, Hint);
 	}
 	
 	virtual void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
@@ -208,26 +208,17 @@ protected:
 		on_mesh_deleted(Mesh, Hint);
 	}
 	
-	virtual void on_address_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		k3d::hint::mesh_address_changed_t* address_hint = dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint);
-		return_if_fail(address_hint);
-		m_points_cache.switch_key(address_hint->old_points_address, Mesh.points);
-		m_edges_cache.switch_key(address_hint->old_edge_points_address, Mesh.polyhedra->edge_points);
-		m_selection_cache.switch_key(address_hint->old_edge_points_address, Mesh.polyhedra->edge_points);
-	}
-	
 	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		m_points_cache.remove_data(Mesh.points);
-		m_edges_cache.remove_data(Mesh.polyhedra->edge_points);
-		m_selection_cache.remove_data(Mesh.polyhedra->edge_points);
+		m_points_cache.remove_data(&Mesh);
+		m_edges_cache.remove_data(&Mesh);
+		m_selection_cache.remove_data(&Mesh);
 	}
 	
 private:
-	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, point_vbo>& m_points_cache;
-	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, edge_vbo>& m_edges_cache;
-	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, edge_selection>& m_selection_cache;
+	k3d::painter_cache<point_vbo>& m_points_cache;
+	k3d::painter_cache<edge_vbo>& m_edges_cache;
+	k3d::painter_cache<edge_selection>& m_selection_cache;
 };
 
 	/////////////////////////////////////////////////////////////////////////////

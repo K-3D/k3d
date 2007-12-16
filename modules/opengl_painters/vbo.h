@@ -71,7 +71,7 @@ private:
 class point_vbo : public k3d::scheduler
 {
 public:
-	point_vbo() : m_vbo(0) {}
+	point_vbo(const k3d::idocument& Document) : m_vbo(0), m_document(Document) {}
 	/// Bind the internal VBO for usage by the array drawing commands
 	void bind();
 protected:
@@ -86,13 +86,14 @@ private:
 	
 	/// Stores the modified point indices provided by the hint
 	k3d::mesh::indices_t m_indices;
+	const k3d::idocument& m_document;
 };
 
 /// Keep track of edge indices in a VBO
 class edge_vbo : public k3d::scheduler
 {
 public:
-	edge_vbo() : m_vbo(0) {}
+	edge_vbo(const k3d::idocument& Document) : m_vbo(0), m_document(Document) {}
 	/// Bind the internal VBO for usage by the array drawing commands
 	void bind();
 protected:
@@ -101,13 +102,14 @@ protected:
 private:
 	/// Stores the data itself
 	vbo* m_vbo;
+	const k3d::idocument& m_document;
 };
 
 /// VBOs used to paint a triangulated mesh
 class triangle_vbo : public k3d::scheduler
 {
 public:
-	triangle_vbo() : m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0), m_triangulation(0) {}
+	triangle_vbo(const k3d::idocument& Document) : m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0), m_triangulation(0), m_document(Document) {}
 	~triangle_vbo()
 	{
 		delete m_point_vbo;
@@ -137,6 +139,7 @@ private:
 	k3d::mesh::indices_t m_indices;
 	// For each triangle corner, store the face it belongs to (used for flat normal calculation)
 	k3d::mesh::indices_t m_corner_to_face;
+	const k3d::idocument& m_document;
 };
 
 class sds_cache;
@@ -145,7 +148,7 @@ class sds_cache;
 class sds_face_vbo
 {
 public:
-	sds_face_vbo() : need_update(true), m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0) {}
+	sds_face_vbo(const k3d::idocument& Document) : need_update(true), m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0), m_document(Document) {}
 	~sds_face_vbo()
 	{
 		delete m_point_vbo;
@@ -171,13 +174,14 @@ private:
 	vbo* m_point_vbo;
 	vbo* m_index_vbo;
 	vbo* m_normal_vbo;
+	const k3d::idocument& m_document;
 };
 
 /// Cache SDS edge VBOs
 class sds_edge_vbo
 {
 public:
-	sds_edge_vbo() : need_update(true), m_point_vbo(0) {}
+	sds_edge_vbo(const k3d::idocument& Document) : need_update(true), m_point_vbo(0), m_document(Document) {}
 	~sds_edge_vbo()
 	{
 		delete m_point_vbo;
@@ -199,13 +203,14 @@ public:
 	bool need_update;
 private:
 	vbo* m_point_vbo;
+	const k3d::idocument& m_document;
 };
 
 /// Cache SDS point VBOs
 class sds_point_vbo
 {
 public:
-	sds_point_vbo() : need_update(true), m_point_vbo(0) {}
+	sds_point_vbo(const k3d::idocument& Document) : need_update(true), m_point_vbo(0), m_document(Document) {}
 	~sds_point_vbo()
 	{
 		delete m_point_vbo;
@@ -224,6 +229,7 @@ public:
 	bool need_update;
 private:
 	vbo* m_point_vbo;
+	const k3d::idocument& m_document;
 };
 
 //////////////

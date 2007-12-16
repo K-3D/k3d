@@ -75,19 +75,6 @@ class mesh_topology_changed_t :
 /// Convenience function that returns a reference to a static instance of mesh_topology_changed_t
 mesh_topology_changed_t* mesh_topology_changed();
 
-/// Hint object that indicates that only the mesh's address has changed and provides access to the old addresses
-class mesh_address_changed_t :
-	public iunknown
-{
-public:
-	boost::shared_ptr<const k3d::mesh::points_t> old_points_address;
-	boost::shared_ptr<const k3d::mesh::indices_t> old_edge_points_address;
-	boost::shared_ptr<const k3d::mesh::indices_t> old_face_first_loops_address;
-};
-
-/// Convenience function that returns a reference to a static instance of mesh_address_changed_t
-mesh_address_changed_t* mesh_address_changed();
-
 /// Hint object that indicates a mesh was deleted
 class mesh_deleted_t :
 	public iunknown
@@ -117,7 +104,7 @@ public:
 	virtual void process(const k3d::mesh& Mesh, k3d::iunknown* Hint);
 	
 	/// Process the given hint (stored as boost::any), calling the required on_... method
-	virtual void process(const k3d::mesh& Mesh, boost::any& Hint);
+	//virtual void process(const k3d::mesh& Mesh, boost::any& Hint);
 
 protected:
 	/// Called when only the geometry changed
@@ -128,9 +115,6 @@ protected:
 	
 	/// Called when the mesh topology changed
 	virtual void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint) {}
-	
-	/// Called when the mesh address changed
-	virtual void on_address_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint) {}
 	
 	/// Called when the mesh is deleted
 	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint) {}

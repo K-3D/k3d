@@ -43,6 +43,7 @@ class cached_triangulation :
 	public k3d::scheduler
 {
 public:
+	cached_triangulation(const k3d::idocument& Document) : m_document(Document) {}
 	/// Links a single index to a list of indices
 	typedef std::vector<k3d::mesh::indices_t> index_vectors_t;
 	// 32 bit so arrays can be passed directly to OpenGL on 64bit platforms
@@ -129,6 +130,8 @@ private:
 	
 	// Keep track of what point we're at
 	k3d::uint_t m_progress;
+	
+	const k3d::idocument& m_document;
 };
 
 } // namespace opengl

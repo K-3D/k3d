@@ -45,7 +45,7 @@ typedef k3d::basic_rgba<double, k3d::color_traits<double> > color_t;
 class sds_cache : public k3d::scheduler
 {
 public:
-	sds_cache() : levels(2), update(true) {}
+	sds_cache(const k3d::idocument& Document) : levels(2), update(true), m_document(Document) {}
 	
 	~sds_cache();
 	
@@ -73,6 +73,7 @@ private:
 	levels_t m_levels;
 	// store connections for safe deletion of cache
 	std::vector<sigc::connection> m_connections;
+	const k3d::idocument& m_document;
 };
 
 /// Stores SDS face data in OpenGL-compatible arrays

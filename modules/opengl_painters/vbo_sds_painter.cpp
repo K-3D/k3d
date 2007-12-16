@@ -61,17 +61,17 @@ class vbo_sds_painter :
 {
 	typedef colored_selection_painter base;
 	/// Defines the set of sds caches associated with this painter
-	typedef std::set<boost::shared_ptr<const k3d::mesh::points_t> > sds_cache_set_t;
+	typedef std::set<const k3d::mesh*> sds_cache_set_t;
 	/// Cache key type that makes the number of levels part of the key
-	typedef std::pair<k3d::uint_t, boost::shared_ptr<const k3d::mesh::points_t> > key_t;
+	typedef std::pair<k3d::uint_t, const k3d::mesh*> key_t;
 
 public:
 	vbo_sds_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document, const k3d::color Unselected = k3d::color(0.2,0.2,0.2), const k3d::color Selected = k3d::color(0.6,0.6,0.6)) :
 		base(Factory, Document, Unselected, Selected),
-		m_sds_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, sds_cache>::instance(Document)),
+		m_sds_cache(k3d::painter_cache<sds_cache>::instance(Document)),
 		m_levels(init_owner(*this) + init_name("levels") + init_label(_("Levels")) + init_description(_("Number of SDS levels")) + init_value(2) + init_constraint(constraint::minimum(2L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_selection_cache(k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, selection_t>::instance(Document)),
-		m_vbo_cache(k3d::painter_cache<key_t, vbo_t>::instance(Document))
+		m_selection_cache(k3d::painter_cache<selection_t>::instance(Document)),
+		m_vbo_cache(k3d::painter_cache<vbo_t, key_t>::instance(Document))
 	{
 		m_levels.changed_signal().connect(sigc::mem_fun(*this, &vbo_sds_painter<selection_t, vbo_t>::on_levels_changed));
 		m_old_level = m_levels.pipeline_value();
@@ -86,11 +86,11 @@ public:
 	
 	void on_levels_changed(k3d::iunknown* Hint)
 	{
-		for (sds_cache_set_t::iterator points = m_sds_cache_set.begin(); points != m_sds_cache_set.end(); ++points) {
-			sds_cache* cache = m_sds_cache.get_data(*points);
+		for (sds_cache_set_t::iterator mesh = m_sds_cache_set.begin(); mesh != m_sds_cache_set.end(); ++mesh) {
+			sds_cache* cache = m_sds_cache.get_data(*mesh);
 			if (cache)
 				cache->level_changed();
-			m_vbo_cache.remove_data(std::make_pair(m_old_level, *points));
+			m_vbo_cache.remove_data(std::make_pair(m_old_level, *mesh));
 		}
 		m_vbo_cache.remove_painter(this);
 		m_old_level = m_levels.pipeline_value();
@@ -105,21 +105,21 @@ public:
 		if (!k3d::is_sds(Mesh))
 			return;
 		
-		sds_cache* cache = m_sds_cache.get_data(Mesh.points);
+		sds_cache* cache = m_sds_cache.get_data(&Mesh);
 		if (!cache)
 		{
-			cache = m_sds_cache.create_data(Mesh.points);
+			cache = m_sds_cache.create_data(&Mesh);
 			cache->cache.set_input(&Mesh);
 		}
 		
-		m_sds_cache_set.insert(Mesh.points);
+		m_sds_cache_set.insert(&Mesh);
 		cache->register_property(&m_levels);
 		cache->execute(Mesh);
 		
-		selection_t* selection = m_selection_cache.create_data(Mesh.polyhedra->face_first_loops);
+		selection_t* selection = m_selection_cache.create_data(&Mesh);
 		selection->execute(Mesh);
 		
-		vbo_t* vbo_cache = m_vbo_cache.create_data(std::make_pair(m_levels.pipeline_value(), Mesh.points));
+		vbo_t* vbo_cache = m_vbo_cache.create_data(std::make_pair(m_levels.pipeline_value(), &Mesh));
 		vbo_cache->update(Mesh, m_levels.pipeline_value(), cache->cache);
 		
 		k3d::gl::store_attributes attributes;
@@ -140,18 +140,18 @@ public:
 		if (!k3d::is_sds(Mesh))
 			return;
 		
-		sds_cache* cache = m_sds_cache.get_data(Mesh.points);
+		sds_cache* cache = m_sds_cache.get_data(&Mesh);
 		if (!cache)
 		{
-			cache = m_sds_cache.create_data(Mesh.points);
+			cache = m_sds_cache.create_data(&Mesh);
 			cache->cache.set_input(&Mesh);
 		}
 		
-		m_sds_cache_set.insert(Mesh.points);
+		m_sds_cache_set.insert(&Mesh);
 		cache->register_property(&m_levels);
 		cache->execute(Mesh);
 		
-		vbo_t* vbo_cache = m_vbo_cache.create_data(std::make_pair(m_levels.pipeline_value(), Mesh.points));
+		vbo_t* vbo_cache = m_vbo_cache.create_data(std::make_pair(m_levels.pipeline_value(), &Mesh));
 		vbo_cache->update(Mesh, m_levels.pipeline_value(), cache->cache);
 		
 		k3d::gl::store_attributes attributes;
@@ -172,33 +172,33 @@ public:
 
 		process(Mesh, Hint);
 		
-		sds_cache* cache = m_sds_cache.get_data(Mesh.points);
+		sds_cache* cache = m_sds_cache.get_data(&Mesh);
 		if (cache)
 			cache->schedule(Mesh, Hint);
 		
-		m_sds_cache.register_painter(Mesh.points, this);
-		m_selection_cache.register_painter(Mesh.polyhedra->face_first_loops, this);
-		m_vbo_cache.register_painter(std::make_pair(m_levels.pipeline_value(), Mesh.points), this);
+		m_sds_cache.register_painter(&Mesh, this);
+		m_selection_cache.register_painter(&Mesh, this);
+		m_vbo_cache.register_painter(std::make_pair(m_levels.pipeline_value(), &Mesh), this);
 	}
 
 protected:
-	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::points_t>, sds_cache>& m_sds_cache;
+	k3d::painter_cache<sds_cache>& m_sds_cache;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_levels;
 	
 	/// Hint processor implementation
 	void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		m_sds_cache.create_data(Mesh.points)->update = true;
+		m_sds_cache.create_data(&Mesh)->update = true;
 		k3d::hint::mesh_geometry_changed_t* geo_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
 		if (geo_hint)
-			m_sds_cache.create_data(Mesh.points)->indices = geo_hint->changed_points;
-		m_vbo_cache.create_data(std::make_pair(m_levels.pipeline_value(), Mesh.points))->need_update = true;
+			m_sds_cache.create_data(&Mesh)->indices = geo_hint->changed_points;
+		m_vbo_cache.create_data(std::make_pair(m_levels.pipeline_value(), &Mesh))->need_update = true;
 	}
 	
 	void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		m_selection_cache.create_data(Mesh.polyhedra->face_first_loops)->schedule(Mesh, Hint);
-		m_sds_cache.create_data(Mesh.points)->cache.clear_modified_faces();
+		m_selection_cache.create_data(&Mesh)->schedule(Mesh, Hint);
+		m_sds_cache.create_data(&Mesh)->cache.clear_modified_faces();
 	}
 	
 	void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
@@ -206,23 +206,12 @@ protected:
 		on_mesh_deleted(Mesh, Hint);
 	}
 	
-	void on_address_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		k3d::hint::mesh_address_changed_t* address_hint = dynamic_cast<k3d::hint::mesh_address_changed_t*>(Hint);
-		return_if_fail(address_hint);
-		m_sds_cache.switch_key(address_hint->old_points_address, Mesh.points);
-		m_sds_cache_set.erase(address_hint->old_points_address);
-		m_selection_cache.switch_key(address_hint->old_face_first_loops_address, Mesh.polyhedra->face_first_loops);
-		k3d::uint_t levels = m_levels.pipeline_value();
-		m_vbo_cache.switch_key(std::make_pair(levels,address_hint->old_points_address), std::make_pair(levels, Mesh.points));
-	}
-	
 	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
-		m_sds_cache_set.erase(Mesh.points);
-		m_sds_cache.remove_data(Mesh.points);
-		m_selection_cache.remove_data(Mesh.polyhedra->face_first_loops);
-		m_vbo_cache.remove_data(std::make_pair(m_levels.pipeline_value(), Mesh.points));
+		m_sds_cache_set.erase(&Mesh);
+		m_sds_cache.remove_data(&Mesh);
+		m_selection_cache.remove_data(&Mesh);
+		m_vbo_cache.remove_data(std::make_pair(m_levels.pipeline_value(), &Mesh));
 	}
 	
 	// override to choose drawing mode
@@ -233,8 +222,8 @@ protected:
 	
 private:
 	sds_cache_set_t m_sds_cache_set;
-	k3d::painter_cache<boost::shared_ptr<const k3d::mesh::indices_t>, selection_t>& m_selection_cache;
-	k3d::painter_cache<key_t, vbo_t>& m_vbo_cache;
+	k3d::painter_cache<selection_t>& m_selection_cache;
+	k3d::painter_cache<vbo_t, key_t>& m_vbo_cache;
 	k3d::uint_t m_old_level;
 };
 

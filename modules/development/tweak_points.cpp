@@ -129,7 +129,7 @@ public:
 	
 	virtual iunknown* hint() const
 	{
-		return k3d::hint::mesh_address_changed();
+		return k3d::hint::mesh_geometry_changed();
 	}
 	
 	/// Update affected mesh components in the hint. This needs to be done only when the selection changed
