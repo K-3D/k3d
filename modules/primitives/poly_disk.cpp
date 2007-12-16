@@ -26,7 +26,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material.h>
-#include <k3dsdk/material_client.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/node.h>
@@ -41,9 +41,9 @@ namespace libk3dprimitives
 // poly_disk_implementation
 
 class poly_disk_implementation :
-	public k3d::material_client<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
 {
-	typedef k3d::material_client<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
 	poly_disk_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

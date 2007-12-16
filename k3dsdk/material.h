@@ -21,18 +21,25 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 namespace k3d
 {
 
-// Forward declarations
-class idocument;
-class inode;
+class iunknown;
 
-/// Returns the default material for application to new objects (could return NULL!)
-inode* default_material(k3d::idocument& Document);
+namespace material
+{
+
+/// Given a generic material object, return a specific material type (could return NULL)
+template<typename InterfaceT>
+InterfaceT* lookup(iunknown* const Material)
+{
+	return dynamic_cast<InterfaceT*>(Material);
+}
+
+} // namespace material
 
 } // namespace k3d
 

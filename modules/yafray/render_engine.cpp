@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,11 +18,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead <tshead@k-3d.com>
-		\author Romain Behar <romainbehar@yahoo.com>
+	\author Tim Shead <tshead@k-3d.com>
+	\author Romain Behar <romainbehar@yahoo.com>
 */
 
 #include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>
@@ -33,7 +34,6 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/ilight_yafray.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/imaterial_client.h>
 #include <k3dsdk/imaterial_yafray.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
@@ -47,7 +47,9 @@
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/material.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
@@ -56,13 +58,17 @@
 #include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
+#include <k3dsdk/triangulator.h>
 #include <k3dsdk/utility_gl.h>
 
 #include <iomanip>
 #include <iterator>
 #include <map>
 
-namespace libk3dyafray
+namespace module
+{
+
+namespace yafray
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -181,9 +187,9 @@ public:
 		return_val_if_fail(start_time_property && end_time_property && frame_rate_property && time_property, false);
 
 		// Test the output images filepath to make sure it can hold all the frames we're going to generate ...
-		const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(*start_time_property));
-		const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(*end_time_property));
-		const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(*frame_rate_property));
+		const double start_time = k3d::property::pipeline_value<double>(*start_time_property);
+		const double end_time = k3d::property::pipeline_value<double>(*end_time_property);
+		const double frame_rate = k3d::property::pipeline_value<double>(*frame_rate_property);
 
 		const size_t start_frame = static_cast<size_t>(k3d::round(frame_rate * start_time));
 		const size_t end_frame = static_cast<size_t>(k3d::round(frame_rate * end_time));
@@ -245,331 +251,278 @@ public:
 	}
 
 private:
-	const std::string shader_name(k3d::inode& Node)
-	{
-		if(k3d::imaterial_client* const material_client = dynamic_cast<k3d::imaterial_client*>(&Node))
-		{
-			if(k3d::imaterial* const material = material_client->material())
-			{
-				if(k3d::yafray::imaterial* const yafray_material = material->yafray_material())
-					return dynamic_cast<k3d::inode*>(yafray_material)->name();
-			}
-		}
+	typedef std::map<k3d::yafray::imaterial*, k3d::string_t> shader_names_t;
 
-		return "default_shader";
+	void render_sphere(const shader_names_t& ShaderNames, const k3d::string_t& Name, const k3d::inode& Sphere, std::ostream& Stream)
+	{
+		// This stopped working somewhere between yafray 0.0.7 - 0.0.9 !?
+		assert_not_implemented();
+
+/*
+		const k3d::point3 sphere_center = k3d::node_to_world_matrix(Sphere) * k3d::point3(0, 0, 0);
+		const double sphere_radius = k3d::property::pipeline_value<double>(Sphere, "radius");
+	
+		Stream << "<!-- K-3D plugin: " << Sphere.factory().name() << " name: " << Sphere.name() << " -->\n";
+		Stream << "<object name=\"" << Sphere.name() << "\" shader_name=\"" << shader_name(ShaderNames, Sphere) << "\">\n";
+		Stream << "	<attributes>\n";
+		Stream << "	</attributes>\n";
+		Stream << "	<sphere radius=\"" << sphere_radius << "\">\n";
+		Stream << "		<center x=\"" << std::fixed << -sphere_center[0] << "\" y=\"" << std::fixed << sphere_center[1] << "\" z=\"" << std::fixed << sphere_center[2] << "\"/>\n";
+		Stream << "	</sphere>\n";
+		Stream << "</object>\n";
+*/
 	}
 
-	const std::string shader_name(k3d::imaterial* Material)
+	/// Helper class used to triangulate faces for Yafray
+	class create_triangles :
+		public k3d::triangulator
 	{
-		if(Material)
+		typedef k3d::triangulator base;
+
+	public:
+		create_triangles(const k3d::mesh::materials_t& OriginalMaterials, k3d::mesh::points_t& Points, k3d::mesh::indices_t& APoints, k3d::mesh::indices_t& BPoints, k3d::mesh::indices_t& CPoints, k3d::mesh::materials_t& Materials) :
+			m_original_materials(OriginalMaterials),
+			m_points(Points),
+			m_a_points(APoints),
+			m_b_points(BPoints),
+			m_c_points(CPoints),
+			m_materials(Materials)
 		{
-			if(k3d::yafray::imaterial* const yafray_material = Material->yafray_material())
-				return dynamic_cast<k3d::inode*>(yafray_material)->name();
 		}
 
-		return "default_shader";
+	private:
+		void start_face(const k3d::uint_t Face)
+		{
+			m_current_face = Face;
+		}
+
+		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], double Weights[4], k3d::uint_t& NewVertex)
+		{
+			NewVertex = m_points.size();
+			m_points.push_back(Coordinates);
+		}
+
+		void add_triangle(const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3)
+		{
+			m_a_points.push_back(Point1);
+			m_b_points.push_back(Point2);
+			m_c_points.push_back(Point3);
+			m_materials.push_back(m_original_materials[m_current_face]);
+		}
+
+		const k3d::mesh::materials_t& m_original_materials;
+		k3d::mesh::points_t& m_points;
+		k3d::mesh::indices_t& m_a_points;
+		k3d::mesh::indices_t& m_b_points;
+		k3d::mesh::indices_t& m_c_points;
+		k3d::mesh::materials_t& m_materials;
+
+		k3d::uint_t m_current_face;
+	};
+
+	void render_mesh_instance(const shader_names_t& ShaderNames, const k3d::string_t& Name, k3d::inode& MeshInstance, std::ostream& Stream)
+	{
+		k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(MeshInstance, "transformed_mesh");
+		if(!mesh)
+			return;
+		if(!k3d::validate_polyhedra(*mesh))
+			return;
+
+		// Triangulate the mesh faces ...
+		k3d::mesh::points_t points(*(mesh->points));
+		k3d::mesh::indices_t a_points;
+		k3d::mesh::indices_t b_points;
+		k3d::mesh::indices_t c_points;
+		k3d::mesh::materials_t materials;
+		create_triangles(*mesh->polyhedra->face_materials, points, a_points, b_points, c_points, materials).process(*mesh);
+
+		// Sort faces by material ...
+		typedef std::vector<k3d::uint_t> faces_t;
+		typedef std::map<k3d::imaterial*, faces_t> sorted_faces_t;
+		sorted_faces_t sorted_faces;
+		for(k3d::uint_t i = 0; i != a_points.size(); ++i)
+			sorted_faces[materials[i]].push_back(i);
+
+		Stream << "<!-- K-3D plugin: " << MeshInstance.factory().name() << " name: " << MeshInstance.name() << " -->\n";
+
+		// Write out each group of faces that shares the same material ...
+		k3d::uint_t index = 0;
+		for(sorted_faces_t::const_iterator i = sorted_faces.begin(); i != sorted_faces.end(); ++i, ++index)
+		{
+			const k3d::string_t object_name = Name + "_" + k3d::string_cast(index);
+
+			k3d::imaterial* const material = i->first;
+			const faces_t& faces = i->second;
+
+			k3d::string_t shader_name = "shader_0";
+			bool shadow = true;
+			bool emit_rad = true;
+			bool recv_rad = true;
+			bool caustics = true;
+			double caus_IOR = 1.0;
+			k3d::color caus_rcolor(0, 0, 0);
+			k3d::color caus_tcolor(0, 0, 0);
+			double autosmooth_value = 89.9;
+			bool has_orco = false;
+
+			if(k3d::yafray::imaterial* const yafray_material = k3d::material::lookup<k3d::yafray::imaterial>(material))
+			{
+				shader_name = ShaderNames.count(yafray_material) ? ShaderNames.find(yafray_material)->second : "shader_0";
+
+				shadow = k3d::property::pipeline_value<bool>(*yafray_material, "shadow");
+				emit_rad = k3d::property::pipeline_value<bool>(*yafray_material, "emit_rad");
+				recv_rad = k3d::property::pipeline_value<bool>(*yafray_material, "recv_rad");
+				caustics = k3d::property::pipeline_value<bool>(*yafray_material, "caustics");
+				caus_IOR = k3d::property::pipeline_value<double>(*yafray_material, "caus_IOR");
+				caus_rcolor = k3d::property::pipeline_value<k3d::color>(*yafray_material, "caus_rcolor");
+				caus_tcolor = k3d::property::pipeline_value<k3d::color>(*yafray_material, "caus_tcolor");
+				autosmooth_value = k3d::property::pipeline_value<double>(*yafray_material, "mesh_autosmooth_value");
+				has_orco = k3d::property::pipeline_value<bool>(*yafray_material, "has_orco");
+			}
+
+
+			Stream << "<object name=\"" << object_name << "\"";
+			Stream << " shader_name=\"" << shader_name << "\"";
+			Stream << " shadow=\"" << (shadow ? "on" : "off") << "\"";
+			Stream << " emit_rad=\"" << (emit_rad ? "on" : "off") << "\"";
+			Stream << " recv_rad=\"" << (recv_rad ? "on" : "off") << "\"";
+			Stream << " caustics=\"" << (caustics ? "on" : "off") << "\"";
+			Stream << " caus_IOR=\"" << caus_IOR << "\"";
+			Stream << ">\n";
+			Stream << "	<attributes>\n";
+			Stream << "		<caus_rcolor r=\"" << caus_rcolor.red << "\" g=\"" << caus_rcolor.green << "\" b=\"" << caus_rcolor.blue << "\"/>\n";
+			Stream << "		<caus_tcolor r=\"" << caus_tcolor.red << "\" g=\"" << caus_tcolor.green << "\" b=\"" << caus_tcolor.blue << "\"/>\n";
+			Stream << "	</attributes>\n";
+			Stream << "	<mesh autosmooth=\"" << autosmooth_value << "\">\n";
+			Stream << "		<points>\n";
+			// Note: we write out every point here, to keep things simple
+			for(k3d::uint_t i = 0; i != points.size(); ++i)
+				Stream << "			<p x=\"" << points[i][0] << "\" y=\"" << points[i][1] << "\" z=\"" << points[i][2] << "\"/>\n";
+			Stream << "		</points>\n";
+			Stream << "		<faces>\n";
+			for(faces_t::const_iterator face = faces.begin(); face != faces.end(); ++face)
+				Stream << "			<f a=\"" << a_points[*face] << "\" b=\"" << b_points[*face] << "\" c=\"" << c_points[*face] << "\"/>\n";
+			Stream << "		</faces>\n";
+			Stream << "	</mesh>\n";
+			Stream << "</object>\n";
+		}
 	}
 
 	bool render(k3d::icamera& Camera, k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath, const bool VisibleRender)
 	{
-		// Sanity checks ...
-		return_val_if_fail(!OutputImagePath.empty(), false);
-
-		// Start our YafRay XML file ...
-		const k3d::filesystem::path filepath = Frame.add_input_file("world.xml");
-		return_val_if_fail(!filepath.empty(), false);
-
-		// Open the RIB file stream ...
-		k3d::filesystem::ofstream stream(filepath);
-		return_val_if_fail(stream.good(), false);
-
-		// Setup the frame for YafRay rendering ...
-		Frame.add_render_operation("yafray", "yafray", filepath, VisibleRender);
-
-		// Setup a YafRay scene description ...
-		stream << "<scene>" << std::endl;
-
-		// YafRay segfaults when a scene doesn't contain at least one shader, one object and one light, so keep track of what we create as we go ...
-		bool found_object = false;
-		bool found_light = false;
-
-		// Get the document contents ...
-		const k3d::nodes_t nodes(document().nodes().collection());
-
-		// Setup shaders ...
-		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+		try
 		{
-			if(k3d::yafray::imaterial* const material = dynamic_cast<k3d::yafray::imaterial*>(*node))
-				material->setup_material(stream);
-		}
+			// Sanity checks ...
+			return_val_if_fail(!OutputImagePath.empty(), false);
 
-		// Add a default shader ...
-		stream << "<shader type=\"generic\" name=\"default_shader\">" << std::endl;
-		stream << "	<attributes>" << std::endl;
-		stream << "		<color r=\"1.0\" g=\"1.0\" b=\"1.0\"/>" << std::endl;
-		stream << "		<specular r=\"1.0\" g=\"1.0\" b=\"1.0\"/>" << std::endl;
-		stream << "		<reflected r=\"1.0\" g=\"1.0\" b=\"1.0\"/>" << std::endl;
-		stream << "		<transmitted r=\"0.0\" g=\"0.0\" b=\"0.0\"/>" << std::endl;
-		stream << "		<hard value=\"128.0\"/>" << std::endl;
-		stream << "		<IOR value=\"1.0\"/>" << std::endl;
-		stream << "		<min_refle value=\"0\"/>" << std::endl;
-		stream << "		<fast_fresnel value=\"off\"/>" << std::endl;
-		stream << "	</attributes>" << std::endl;
-		stream << "</shader>" << std::endl;
+			// Start our YafRay XML file ...
+			const k3d::filesystem::path filepath = Frame.add_input_file("world.xml");
+			return_val_if_fail(!filepath.empty(), false);
 
-		// Setup lights ...
-		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-		{
-			if(k3d::yafray::ilight* const light = dynamic_cast<k3d::yafray::ilight*>(*node))
+			// Open the RIB file stream ...
+			k3d::filesystem::ofstream stream(filepath);
+			return_val_if_fail(stream.good(), false);
+
+			// Setup the frame for YafRay rendering ...
+			Frame.add_render_operation("yafray", "yafray", filepath, VisibleRender);
+
+			// Setup a YafRay scene description ...
+			stream << "<!-- Yafray scene generated by K-3D Version " K3D_VERSION ", http://www.k-3d.org -->\n";
+			stream << "<scene>\n";
+
+			// Get the document contents ...
+			const k3d::nodes_t nodes(document().nodes().collection());
+
+			// Setup Yafray shaders, keeping-track of names as-we-go ...
+			shader_names_t shader_names;
+			for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 			{
-				found_light = true;
-				light->setup_light(stream);
-			}
-		}
-
-		// YafRay segfaults if there isn't at least one light, so create something to keep it happy ...
-		if(!found_light)
-		{
-			stream << "<light type=\"pointlight\" name=\"k3d_null_light\" power=\"0\">" << std::endl;
-			stream << "	<from x=\"0\" y=\"0\" z=\"0\"/>" << std::endl;
-			stream << "	<color r=\"1\" g=\"1\" b=\"1\"/>" << std::endl;
-			stream << "</light>" << std::endl;
-		}
-
-		// Setup geometry
-		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-		{
-			// Render sphere nodes ...
-			if((*node)->factory().factory_id() == k3d::classes::Sphere())
-			{
-				const k3d::point3 sphere_center = k3d::node_to_world_matrix(**node) * k3d::point3(0, 0, 0);
-				const boost::any sphere_radius(k3d::property::pipeline_value(**node, "radius"));
-				if(typeid(double) == sphere_radius.type())
+				if(k3d::yafray::imaterial* const material = dynamic_cast<k3d::yafray::imaterial*>(*node))
 				{
-					stream << "<object name=\"" << (*node)->name() << "\" shader_name=\"" << shader_name(**node) << "\">" << std::endl;
-					stream << "	<attributes>" << std::endl;
-					stream << "	</attributes>" << std::endl;
-					stream << "	<sphere radius=\"" << boost::any_cast<double>(sphere_radius) << "\">" << std::endl;
-					stream << "		<center x=\"" << std::fixed << -sphere_center[0] << "\" y=\"" << std::fixed << sphere_center[1] << "\" z=\"" << std::fixed << sphere_center[2] << "\"/>" << std::endl;
-					stream << "	</sphere>" << std::endl;
-					stream << "</object>" << std::endl;
-
-					found_object = true;
+					const k3d::string_t shader_name = "shader_" + k3d::string_cast(shader_names.size());
+					shader_names.insert(std::make_pair(material, shader_name));
+					material->setup_material(shader_name, stream);
 				}
-
-				continue;
 			}
 
-			// Render mesh nodes ...
-			if((*node)->factory().factory_id() == k3d::classes::MeshInstance())
+			// Render geometry, keeping-track of names as we go ...
+			std::map<k3d::inode*, k3d::string_t> object_names;
+			for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 			{
-				if(!dynamic_cast<k3d::gl::irenderable*>(*node))
-					continue;
-
-				k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(*node);
-				if(!mesh_source)
-					continue;
-
-				// Check for transformed output mesh
-				k3d::mesh* mesh = 0;
-				k3d::iproperty* property = k3d::property::get(**node, "transformed_output_mesh");
-				if(property)
+				if((**node).factory().factory_id() == k3d::classes::Sphere())
 				{
-					mesh = boost::any_cast<k3d::mesh*>(property->property_value());
+					const k3d::string_t object_name = "object_" + k3d::string_cast(object_names.size());
+					object_names.insert(std::make_pair(*node, object_name));
+					render_sphere(shader_names, object_name, **node, stream);
 				}
-				else
+				else if((*node)->factory().factory_id() == k3d::classes::MeshInstance())
 				{
-					// Fall back to mesh source
-					k3d::iproperty& property = mesh_source->mesh_source_output();
-					mesh = boost::any_cast<k3d::mesh*>(property.property_value());
+					const k3d::string_t object_name = "object_" + k3d::string_cast(object_names.size());
+					object_names.insert(std::make_pair(*node, object_name));
+					render_mesh_instance(shader_names, object_name, **node, stream);
 				}
-
-				if(!mesh)
-					continue;
-
-				k3d::legacy::mesh out_mesh;
-				if (k3d::property::get(**node, "polyhedron_render_type"))
-				{
-					const std::string& render_type =  boost::any_cast<std::string>(k3d::property::internal_value(**node, "polyhedron_render_type"));
-					assert_not_implemented();
-//					sds_filter(*mesh, render_type, out_mesh, boost::any_cast<int>(k3d::property::internal_value(**node, "sds_render_level")));
-				}
-
-				k3d::legacy::polyhedron::faces_t new_faces;
-				k3d::legacy::mesh::points_t new_points;
-
-				for(k3d::legacy::mesh::polyhedra_t::const_iterator polyhedron = out_mesh.polyhedra.begin(); polyhedron != out_mesh.polyhedra.end(); ++polyhedron)
-					k3d::legacy::triangulate((*polyhedron)->faces, new_faces, new_points);
-
-				typedef std::multimap<k3d::imaterial*, k3d::legacy::face*> sorted_faces_t;
-				sorted_faces_t sorted_faces;
-				for(k3d::legacy::polyhedron::faces_t::iterator face = new_faces.begin(); face != new_faces.end(); ++face)
-					sorted_faces.insert(std::make_pair((*face)->material, *face));
-
-				unsigned long unique_id = 0;
-				for(sorted_faces_t::iterator begin = sorted_faces.begin(); begin != sorted_faces.end(); begin = sorted_faces.upper_bound(begin->first))
-				{
-					const sorted_faces_t::iterator end = sorted_faces.upper_bound(begin->first);
-
-					std::string material_name = "default_shader";
-					bool shadow = true;
-					bool emit_rad = true;
-					bool recv_rad = true;
-					bool caustics = true;
-					double caus_IOR = 1.0;
-					k3d::color caus_rcolor(0, 0, 0);
-					k3d::color caus_tcolor(0, 0, 0);
-					bool autosmooth = true;
-					double autosmooth_value = 90;
-					bool has_orco = false;
-
-					if(begin->first)
-					{
-						if(k3d::yafray::imaterial* const material = begin->first->yafray_material())
-						{
-							material_name = dynamic_cast<k3d::inode*>(material)->name();
-							shadow = boost::any_cast<bool>(k3d::property::internal_value(*material, "shadow"));
-							emit_rad = boost::any_cast<bool>(k3d::property::internal_value(*material, "emit_rad"));
-							recv_rad = boost::any_cast<bool>(k3d::property::internal_value(*material, "recv_rad"));
-							caustics = boost::any_cast<bool>(k3d::property::internal_value(*material, "caustics"));
-							caus_IOR = boost::any_cast<double>(k3d::property::internal_value(*material, "caus_IOR"));
-							caus_rcolor = boost::any_cast<k3d::color>(k3d::property::internal_value(*material, "caus_rcolor"));
-							caus_tcolor = boost::any_cast<k3d::color>(k3d::property::internal_value(*material, "caus_tcolor"));
-							autosmooth = boost::any_cast<bool>(k3d::property::internal_value(*material, "mesh_autosmooth"));
-							autosmooth_value = boost::any_cast<double>(k3d::property::internal_value(*material, "mesh_autosmooth_value"));
-							has_orco = boost::any_cast<bool>(k3d::property::internal_value(*material, "has_orco"));
-						}
-					}
-
-					stream
-						<< "<object name=\"" << (*node)->name() << k3d::string_cast(++unique_id)
-						<< "\" shader_name=\"" << shader_name(begin->first)
-						<< "\" shadow=\"" << (shadow ? "on" : "off")
-						<< "\" emit_rad=\"" << (emit_rad ? "on" : "off")
-						<< "\" recv_rad=\"" << (recv_rad ? "on" : "off")
-						<< "\" caustics=\"" << (caustics ? "on" : "off")
-						<< "\" caus_IOR=\"" << caus_IOR << "\">" << std::endl;
-
-					stream
-						<< "	<attributes>" << std::endl;
-
-					stream
-						<< "		<caus_rcolor r=\"" << caus_rcolor.red
-						<< "\" g=\"" << caus_rcolor.green
-						<< "\" b=\"" << caus_rcolor.blue << "\"/>" << std::endl;
-
-					stream
-						<< "		<caus_tcolor r=\"" << caus_tcolor.red
-						<< "\" g=\"" << caus_tcolor.green
-						<< "\" b=\"" << caus_tcolor.blue << "\"/>" << std::endl;
-
-					stream << "	</attributes>" << std::endl;
-					if(!autosmooth)
-						stream << "	<mesh>" << std::endl;
-					else
-						stream << "	<mesh autosmooth=\"" << autosmooth_value << "\">" << std::endl;
-
-					typedef std::set<k3d::legacy::point*> points_t;
-					points_t points;
-					for(sorted_faces_t::const_iterator face = begin; face != end; ++face)
-					{
-						k3d::legacy::split_edge* const e0 = face->second->first_edge;
-						k3d::legacy::split_edge* const e1 = e0 ? e0->face_clockwise : 0;
-						k3d::legacy::split_edge* const e2 = e1 ? e1->face_clockwise : 0;
-
-						if(e0->vertex)
-							points.insert(e0->vertex);
-						if(e1->vertex)
-							points.insert(e1->vertex);
-						if(e2->vertex)
-							points.insert(e2->vertex);
-					}
-
-					stream << "		<points>" << std::endl;
-
-					std::map<k3d::legacy::point*, unsigned long> point_indices;
-					for(points_t::const_iterator point = points.begin(); point != points.end(); ++point)
-					{
-						point_indices.insert(std::make_pair(*point, point_indices.size()));
-						stream
-							<< "			<p x=\"" << std::fixed << -(*point)->position[0]
-							<< "\" y=\"" << std::fixed << (*point)->position[1]
-							<< "\" z=\"" << std::fixed << (*point)->position[2] << "\"/>" << std::endl;
-					}
-					stream << "		</points>" << std::endl;
-
-					stream << "		<faces>" << std::endl;
-					for(sorted_faces_t::const_iterator face = begin; face != end; ++face)
-					{
-						k3d::legacy::split_edge* const e0 = face->second->first_edge;
-						k3d::legacy::split_edge* const e1 = e0 ? e0->face_clockwise : 0;
-						k3d::legacy::split_edge* const e2 = e1 ? e1->face_clockwise : 0;
-
-						if(!e0 || !e1 || !e2 || !e0->vertex || !e1->vertex || !e2->vertex)
-							continue;
-
-						stream
-							<< "			<f a=\"" << point_indices[e0->vertex]
-							<< "\" b=\"" << point_indices[e1->vertex]
-							<< "\" c=\""<< point_indices[e2->vertex] << "\"/>" << std::endl;
-					}
-					stream << "		</faces>" << std::endl;
-
-					stream << "	</mesh>" << std::endl;
-					stream << "</object>" << std::endl;
-
-					found_object = true;
-				}
-
-				std::for_each(new_faces.begin(), new_faces.end(), k3d::delete_object());
-				std::for_each(new_points.begin(), new_points.end(), k3d::delete_object());
-
-				continue;
 			}
-		}
 
-		// YafRay segfaults if there isn't at least one object, so create something invisible to keep it happy ...
-		if(!found_object)
+			// Setup lights, keeping-track of names as we go ...
+			std::map<k3d::yafray::ilight*, k3d::string_t> light_names;
+			for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+			{
+				if(k3d::yafray::ilight* const light = dynamic_cast<k3d::yafray::ilight*>(*node))
+				{
+					const k3d::string_t light_name = "light_" + k3d::string_cast(light_names.size());
+					light_names.insert(std::make_pair(light, light_name));
+					light->setup_light(light_name, stream);
+				}
+			}
+
+			// Setup the camera ...
+			k3d::inode* const camera_node = dynamic_cast<k3d::inode*>(&Camera);
+			if(!camera_node)
+				throw std::runtime_error("camera not a node");
+
+			const k3d::matrix4 camera_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output());
+			const k3d::point3 camera_position = k3d::position(camera_matrix);
+			const k3d::point3 camera_to_vector = camera_matrix * k3d::point3(0, 0, 1);
+			const k3d::point3 camera_up_vector = camera_matrix * k3d::point3(0, 1, 0);
+
+			stream << "<!-- K-3D plugin: " << camera_node->factory().name() << " name: " << camera_node->name() << " -->\n";
+			stream << "<camera name=\"camera_0\" resx=\"" << m_pixel_width.pipeline_value() << "\" resy=\"" << m_pixel_height.pipeline_value() << "\" focal=\"0.7\">\n";
+			stream << "	<from x=\"" << -camera_position[0] << "\" y=\"" << camera_position[1] << "\" z=\"" << camera_position[2] << "\"/>\n";
+			stream << "	<to x=\"" << -camera_to_vector[0] << "\" y=\"" << camera_to_vector[1] << "\" z=\"" << camera_to_vector[2] << "\"/>\n";
+			stream << "	<up x=\"" << -camera_up_vector[0] << "\" y=\"" << camera_up_vector[1] << "\" z=\"" << camera_up_vector[2] << "\"/>\n";
+			stream << "</camera>\n";
+
+			// Generate the output file ...
+			const k3d::color fog_color = m_fog_color.pipeline_value();
+
+			stream << "<!-- K-3D plugin: " << factory().name() << " name: " << name() << " -->\n";
+			stream << "<render camera_name=\"camera_0\" AA_passes=\"" << m_AA_passes.pipeline_value() << "\"" << " AA_minsamples=\"" << m_AA_minsamples.pipeline_value() << "\" AA_pixelwidth=\"" << m_AA_pixelwidth.pipeline_value() << "\" AA_threshold=\"" << m_AA_threshold.pipeline_value() << "\" raydepth=\"" << m_raydepth.pipeline_value() << "\" bias=\"" << m_bias.pipeline_value() << "\">\n";
+			stream << "	<outfile value=\"" << OutputImagePath.native_filesystem_string() << "\"/>\n";
+			stream << "	<save_alpha value=\"" << (m_save_alpha.pipeline_value() ? "on" : "off") << "\"/>\n";
+			stream << "	<exposure value=\"" << m_exposure.pipeline_value() << "\"/>\n";
+			stream << "	<gamma value=\"" << m_gamma.pipeline_value() << "\"/>\n";
+			stream << "	<fog_density value=\"" << m_fog_density.pipeline_value() << "\"/>\n";
+			stream << "	<fog_color r=\"" << fog_color.red << "\" g=\"" << fog_color.green << "\" b=\"" << fog_color.blue << "\"/>\n";
+			stream << "</render>\n";
+
+			// Finish the scene ...
+			stream << "</scene>\n";
+		}
+		catch(std::exception& e)
 		{
-			stream << "<object name=\"default_object\" shader_name=\"default_shader\">" << std::endl;
-			stream << "	<attributes>" << std::endl;
-			stream << "	</attributes>" << std::endl;
-			stream << "	<sphere radius=\"0.0\">" << std::endl;
-			stream << "		<center x=\"0\" y=\"0\" z=\"0\"/>" << std::endl;
-			stream << "	</sphere>" << std::endl;
-			stream << "</object>" << std::endl;
+			k3d::log() << error << "exception: " << e.what() << std::endl;
+			return false;
 		}
-
-		// Setup the camera ...
-		const k3d::matrix4 camera_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(Camera.transformation().transform_source_output()));
-		const k3d::point3 camera_position = k3d::position(camera_matrix);
-		const k3d::point3 camera_to_vector = camera_matrix * k3d::point3(0, 0, 1);
-		const k3d::point3 camera_up_vector = camera_matrix * k3d::point3(0, 1, 0);
-
-		stream << "<camera name=\"camera\" resx=\"" << m_pixel_width.pipeline_value() << "\" resy=\"" << m_pixel_height.pipeline_value() << "\" focal=\"0.7\">" << std::endl;
-		stream << "	<from x=\"" << -camera_position[0] << "\" y=\"" << camera_position[1] << "\" z=\"" << camera_position[2] << "\"/>" << std::endl;
-		stream << "	<to x=\"" << -camera_to_vector[0] << "\" y=\"" << camera_to_vector[1] << "\" z=\"" << camera_to_vector[2] << "\"/>" << std::endl;
-		stream << "	<up x=\"" << -camera_up_vector[0] << "\" y=\"" << camera_up_vector[1] << "\" z=\"" << camera_up_vector[2] << "\"/>" << std::endl;
-		stream << "</camera>" << std::endl;
-
-		// Generate the output file ...
-		const k3d::color fog_color = m_fog_color.pipeline_value();
-
-		stream << "<render camera_name=\"camera\" AA_passes=\"" << m_AA_passes.pipeline_value() << "\"" << " AA_minsamples=\"" << m_AA_minsamples.pipeline_value() << "\" AA_pixelwidth=\"" << m_AA_pixelwidth.pipeline_value() << "\" AA_threshold=\"" << m_AA_threshold.pipeline_value() << "\" raydepth=\"" << m_raydepth.pipeline_value() << "\" bias=\"" << m_bias.pipeline_value() << "\">" << std::endl;
-		stream << "	<outfile value=\"" << OutputImagePath.native_filesystem_string() << "\"/>" << std::endl;
-		stream << "	<save_alpha value=\"" << (m_save_alpha.pipeline_value() ? "on" : "off") << "\"/>" << std::endl;
-		stream << "	<exposure value=\"" << m_exposure.pipeline_value() << "\"/>" << std::endl;
-		stream << "	<gamma value=\"" << m_gamma.pipeline_value() << "\"/>" << std::endl;
-		stream << "	<fog_density value=\"" << m_fog_density.pipeline_value() << "\"/>" << std::endl;
-		stream << "	<fog_color r=\"" << fog_color.red << "\" g=\"" << fog_color.green << "\" b=\"" << fog_color.blue << "\"/>" << std::endl;
-		stream << "</render>" << std::endl;
-
-		// Finish the scene ...
-		stream << "</scene>" << std::endl;
+		catch(...)
+		{
+			k3d::log() << error << "unknown exception" << std::endl;
+			return false;
+		}
 
 		return true;
 	}
 
+/*
 	/// Apply SDS if needed
 	void sds_filter(const k3d::legacy::mesh& Input, const std::string& RenderType, k3d::legacy::mesh& Output, int Levels)
 	{
@@ -578,14 +531,15 @@ private:
 			k3d::legacy::deep_copy(Input, Output);
 			return;
 		}
-//		k3d::sds::k3d_mesh_sds_cache sds_cache;
-//
-//		// Set levels -before- input
-//		sds_cache.set_levels(Levels);
-//		sds_cache.set_input(&Input);
-//		sds_cache.update();
-//		sds_cache.output(&Output);
+		k3d::sds::k3d_mesh_sds_cache sds_cache;
+
+		// Set levels -before- input
+		sds_cache.set_levels(Levels);
+		sds_cache.set_input(&Input);
+		sds_cache.update();
+		sds_cache.output(&Output);
 	}
+*/
 
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
@@ -602,7 +556,6 @@ private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_gamma;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_fog_density;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_fog_color;
-	// SDS options
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_preview_sds;
 };
 
@@ -611,5 +564,7 @@ k3d::iplugin_factory& render_engine_factory()
 	return render_engine::get_factory();
 }
 
-} // namespace libk3dyafray
+} // namespace yafray
+
+} // namespace module
 

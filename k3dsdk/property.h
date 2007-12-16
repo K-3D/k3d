@@ -54,7 +54,12 @@ const boost::any internal_value(iproperty& Property);
 
 /// Returns the "pipeline" value of a property - the value of the property, possibly overridden by pipeline dependencies
 const boost::any pipeline_value(iunknown& Object, const std::string& Name);
-
+/// Returns the "pipeline" value of a property - the value of the property, possibly overridden by pipeline dependencies
+template<typename value_t>
+const value_t pipeline_value(iunknown& Object, const std::string& Name)
+{
+	return boost::any_cast<value_t>(pipeline_value(Object, Name));
+}
 /// Returns the "pipeline" value of a property - the value of the property, possibly overridden by pipeline dependencies
 const boost::any pipeline_value(iproperty& Property);
 /// Returns the "pipeline" value of a property - the value of the property, possibly overridden by pipeline dependencies

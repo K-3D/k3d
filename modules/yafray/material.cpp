@@ -32,7 +32,10 @@
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/vectors.h>
 
-namespace libk3dyafray
+namespace module
+{
+
+namespace yafray
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -88,22 +91,7 @@ public:
 		register_property_group(mesh_attributes);
 	}
 
-	k3d::gl::imaterial* gl_material()
-	{
-		return 0;
-	}
-
-	k3d::ri::imaterial* ri_material()
-	{
-		return 0;
-	}
-
-	k3d::yafray::imaterial* yafray_material()
-	{
-		return this;
-	}
-
-	void setup_material(std::ostream& Stream)
+	void setup_material(const k3d::string_t& Name, std::ostream& Stream)
 	{
 		const k3d::color color = m_color.pipeline_value();
 		const k3d::color specular_color = m_specular_color.pipeline_value();
@@ -114,18 +102,19 @@ public:
 		const double index_of_refraction = m_index_of_refraction.pipeline_value();
 		const double minimum_reflection = m_minimum_reflection.pipeline_value();
 
-		Stream << "<shader type=\"generic\" name=\"" << name() << "\">" << std::endl;
-		Stream << "	<attributes>" << std::endl;
-		Stream << "		<color r=\"" << color.red << "\" g=\"" << color.green << "\" b=\"" << color.blue << "\"/>" << std::endl;
-		Stream << "		<specular r=\"" << specular_color.red << "\" g=\"" << specular_color.green << "\" b=\"" << specular_color.blue << "\"/>" << std::endl;
-		Stream << "		<reflected r=\"" << reflected_color.red << "\" g=\"" << reflected_color.green << "\" b=\"" << reflected_color.blue << "\"/>" << std::endl;
-		Stream << "		<transmitted r=\"" << transmitted_color.red << "\" g=\"" << transmitted_color.green << "\" b=\"" << transmitted_color.blue << "\"/>" << std::endl;
-		Stream << "		<hard value=\"" << hardness << "\"/>" << std::endl;
-		Stream << "		<IOR value=\"" << index_of_refraction << "\"/>" << std::endl;
-		Stream << "		<min_refle value=\"" << minimum_reflection << "\"/>" << std::endl;
-		Stream << "		<fast_fresnel value=\"" << (m_fast_fresnel.pipeline_value() ? "on" : "off") << "\"/>" << std::endl;
-		Stream << "	</attributes>" << std::endl;
-		Stream << "</shader>" << std::endl;
+		Stream << "<!-- K-3D plugin: " << factory().name() << " name: " << name() << " -->\n";
+		Stream << "<shader type=\"generic\" name=\"" << Name << "\">\n";
+		Stream << "	<attributes>\n";
+		Stream << "		<color r=\"" << color.red << "\" g=\"" << color.green << "\" b=\"" << color.blue << "\"/>\n";
+		Stream << "		<specular r=\"" << specular_color.red << "\" g=\"" << specular_color.green << "\" b=\"" << specular_color.blue << "\"/>\n";
+		Stream << "		<reflected r=\"" << reflected_color.red << "\" g=\"" << reflected_color.green << "\" b=\"" << reflected_color.blue << "\"/>\n";
+		Stream << "		<transmitted r=\"" << transmitted_color.red << "\" g=\"" << transmitted_color.green << "\" b=\"" << transmitted_color.blue << "\"/>\n";
+		Stream << "		<hard value=\"" << hardness << "\"/>\n";
+		Stream << "		<IOR value=\"" << index_of_refraction << "\"/>\n";
+		Stream << "		<min_refle value=\"" << minimum_reflection << "\"/>\n";
+		Stream << "		<fast_fresnel value=\"" << (m_fast_fresnel.pipeline_value() ? "on" : "off") << "\"/>\n";
+		Stream << "	</attributes>\n";
+		Stream << "</shader>\n";
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -171,6 +160,7 @@ k3d::iplugin_factory& material_factory()
 	return material::get_factory();
 }
 
-} // namespace libk3dyafray
+} // namespace yafray
 
+} // namespace module
 

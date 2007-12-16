@@ -27,7 +27,7 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/material.h>
-#include <k3dsdk/material_client.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
@@ -43,14 +43,13 @@ namespace libk3dmesh
 // catmull_clark_subdivider
 
 class catmull_clark_subdivider :
-		public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > >
 {
 	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > base;
 
 public:
 	catmull_clark_subdivider(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_material(dynamic_cast<k3d::imaterial*>(k3d::default_material(Document))),
 		m_level(init_owner(*this) + init_name("level") + init_label(_("Level")) + init_description(_("Subdivision level")) + init_constraint(constraint::minimum(1L)) + init_value(1) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
@@ -94,7 +93,6 @@ public:
 	}
 
 private:
-	k3d::imaterial* m_material;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_level;
 
 	//k3d::sds::k3d_mesh_sds_cache m_sds_cache;

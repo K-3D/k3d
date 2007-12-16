@@ -38,7 +38,7 @@ class ilight :
 	public virtual k3d::iunknown
 {
 public:
-	virtual void setup_light(std::ostream& Stream) = 0;
+	virtual void setup_light(const k3d::string_t& Name, std::ostream& Stream) = 0;
 
 protected:
 	ilight() {}

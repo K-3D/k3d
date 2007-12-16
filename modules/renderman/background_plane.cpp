@@ -26,7 +26,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/iprojection.h>
-#include <k3dsdk/material_client.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property.h>
@@ -48,10 +48,10 @@ namespace
 // background_plane
 
 class background_plane :
-	public k3d::material_client<k3d::persistent<k3d::node> >,
+	public k3d::material_sink<k3d::persistent<k3d::node> >,
 	public k3d::ri::irenderable
 {
-	typedef k3d::material_client<k3d::persistent<k3d::node> > base;
+	typedef k3d::material_sink<k3d::persistent<k3d::node> > base;
 
 public:
 	background_plane(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

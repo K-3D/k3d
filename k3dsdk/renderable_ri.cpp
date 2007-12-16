@@ -23,9 +23,9 @@
 */
 
 #include "algebra.h"
-#include "imaterial.h"
 #include "imaterial_ri.h"
 #include "irenderman_property.h"
+#include "material.h"
 #include "renderable_ri.h"
 #include "render_state_ri.h"
 #include "vectors.h"
@@ -96,29 +96,26 @@ const matrix convert(const k3d::matrix4& Matrix)
 
 void setup_material(iunknown* const Material, const render_state& State)
 {
-	k3d::ri::imaterial* ri_material = 0;
-
-	if(k3d::imaterial* const material = dynamic_cast<k3d::imaterial*>(Material))
-		ri_material = material->ri_material();
-
-	if(ri_material)
+	// If we can find a RenderMan material, let it do the work ...
+	if(k3d::ri::imaterial* const ri_material = k3d::material::lookup<k3d::ri::imaterial>(Material))
 	{
 		ri_material->setup_renderman_material(State);
+		return;
 	}
-	else
-	{
-		// We only generate RIB on the final sample ...
-		if(!last_sample(State))
-			return;
 
-		State.stream.RiColor(k3d::color(1, 1, 1));
-		State.stream.RiOpacity(k3d::color(1, 1, 1));
-		State.stream.RiSurfaceV(path(), "null");
-		State.stream.RiDisplacementV(path(), "null");
-		State.stream.RiAtmosphereV(path(), "null");
-		State.stream.RiInteriorV(path(), "null");
-		State.stream.RiExteriorV(path(), "null");
-	}
+	// Otherwise, we generate a default "null" material ...
+
+	// We only generate RIB on the final sample ...
+	if(!last_sample(State))
+		return;
+
+	State.stream.RiColor(k3d::color(1, 1, 1));
+	State.stream.RiOpacity(k3d::color(1, 1, 1));
+	State.stream.RiSurfaceV(path(), "null");
+	State.stream.RiDisplacementV(path(), "null");
+	State.stream.RiAtmosphereV(path(), "null");
+	State.stream.RiInteriorV(path(), "null");
+	State.stream.RiExteriorV(path(), "null");
 }
 
 /////////////////////////////////////////////////////////////////////////////

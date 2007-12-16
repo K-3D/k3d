@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,13 +18,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the Material K-3D object, which controls the surface appearance of rendered geometry
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_gl.h>
 #include <k3dsdk/node.h>
@@ -63,21 +62,6 @@ public:
 		m_specular_color.changed_signal().connect(make_node_change_slot());
 		m_emission_color.changed_signal().connect(make_node_change_slot());
 		m_shininess.changed_signal().connect(make_node_change_slot());
-	}
-
-	k3d::gl::imaterial* gl_material()
-	{
-		return this;
-	}
-
-	k3d::ri::imaterial* ri_material()
-	{
-		return 0;
-	}
-
-	k3d::yafray::imaterial* yafray_material()
-	{
-		return 0;
 	}
 
 	void setup_gl_material()

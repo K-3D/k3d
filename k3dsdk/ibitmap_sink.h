@@ -30,7 +30,6 @@
 namespace k3d
 {
 
-// Forward declarations
 class iproperty;
 
 /// Abstract interface for objects that can consume bitmap data
@@ -50,5 +49,4 @@ protected:
 } // namespace k3d
 
 #endif // K3DSDK_IBITMAP_SINK_H
-
 

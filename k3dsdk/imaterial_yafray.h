@@ -38,7 +38,7 @@ class imaterial :
 	public virtual k3d::iunknown
 {
 public:
-	virtual void setup_material(std::ostream& Stream) = 0;
+	virtual void setup_material(const k3d::string_t& Name, std::ostream& Stream) = 0;
 
 protected:
 	imaterial() {}

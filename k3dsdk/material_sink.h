@@ -27,40 +27,29 @@
 #include "data.h"
 #include "k3d-i18n-config.h"
 #include "imaterial.h"
-#include "imaterial_client.h"
-#include "material.h"
-
-#ifdef	interface
-#undef	interface
-#endif	// interface
+#include "imaterial_sink.h"
 
 namespace k3d
 {
 
-// Forward declarations
 class idocument;
 
-/// Adds a boilerplate implementation of k3d::imaterial_client to a base class, using the parameterized-inheritance idiom
+/// Adds a boilerplate implementation of k3d::imaterial_sink to a base class, using the parameterized-inheritance idiom
 template<typename base_t>
-class material_client :
+class material_sink :
 	public base_t,
-	public imaterial_client
+	public imaterial_sink
 {
 public:
-	material_client(iplugin_factory& Factory, idocument& Document) :
+	material_sink(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
-		m_material(init_owner(*this) + init_name("material") + init_label(_("Surface Material")) + init_description(_("Surface material")) + init_value(k3d::default_material(Document)))
+		m_material(init_owner(*this) + init_name("material") + init_label(_("Surface Material")) + init_description(_("Surface material")) + init_value(static_cast<imaterial*>(0)))
 	{
 	}
 
-	imaterial* material()
+	iproperty& material_sink_input()
 	{
-		return m_material.pipeline_value();
-	}
-	
-	void set_material(imaterial* const Material)
-	{
-		m_material.set_value(Material);
+		return m_material;
 	}
 
 protected:

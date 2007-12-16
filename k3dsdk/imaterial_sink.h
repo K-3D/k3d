@@ -1,8 +1,8 @@
-#ifndef K3DSDK_IMATERIAL_CLIENT_H
-#define K3DSDK_IMATERIAL_CLIENT_H
+#ifndef K3DSDK_IMATERIAL_SINK_H
+#define K3DSDK_IMATERIAL_SINK_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,8 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares k3d::imaterial_client, an abstract interface for nodes that reference a surface material
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -30,27 +29,23 @@
 namespace k3d
 {
 
-// Forward class references ...
-class imaterial;
+class iproperty;
 
-/// Abstract interface for clients of k3d::imaterial objects
-class imaterial_client :
+/// Abstract interface for objects that can "consume" an imaterial
+class imaterial_sink :
 	public virtual iunknown
 {
 public:
-	/// Returns the assigned material (could return NULL if none assigned)
-	virtual imaterial* material() = 0;
-	/// Sets the assigned material (NULL is allowed, for none assigned)
-	virtual void set_material(imaterial* const Material) = 0;
+	virtual iproperty& material_sink_input() = 0;
 
 protected:
-	imaterial_client() {}
-	imaterial_client(const imaterial_client& RHS) {}
-	imaterial_client& operator=(const imaterial_client& RHS) { return *this; }
-	virtual ~imaterial_client() {}
+	imaterial_sink() {}
+	imaterial_sink(const imaterial_sink&) {}
+	imaterial_sink& operator=(const imaterial_sink&) { return *this; }
+	virtual ~imaterial_sink() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_IMATERIAL_CLIENT_H
+#endif // K3DSDK_IMATERIAL_SINK_H
 

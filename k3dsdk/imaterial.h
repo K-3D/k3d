@@ -21,7 +21,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\brief Declares k3d::imaterial, an abstract interface implemented by nodes that can act as surface materials
 	\author Tim Shead (tshead@k-3d.com)
 */
 
@@ -31,19 +30,10 @@
 namespace k3d
 {
 
-namespace gl { class imaterial; }
-namespace ri { class imaterial; }
-namespace yafray { class imaterial; }
-
 /// Abstract interface implemented by objects that can act as geometric surface materials
 class imaterial :
 	public virtual k3d::iunknown
 {
-public:
-	virtual gl::imaterial* gl_material() = 0;
-	virtual ri::imaterial* ri_material() = 0;
-	virtual yafray::imaterial* yafray_material() = 0;
-
 protected:
 	imaterial() {}
 	imaterial(const imaterial& RHS) {}

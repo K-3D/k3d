@@ -28,7 +28,7 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/material_client.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
@@ -42,9 +42,9 @@ namespace libk3dmesh
 // set_material_implementation
 
 class set_material_implementation :
-	public k3d::material_client<k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > >
+	public k3d::material_sink<k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > >
 {
-	typedef k3d::material_client<k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > > base;
+	typedef k3d::material_sink<k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > > base;
 
 public:
 	set_material_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -32,7 +32,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material.h>
-#include <k3dsdk/material_client.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
@@ -48,9 +48,9 @@ namespace libk3dbooleans
 // cgal_boolean
 
 class cgal_boolean :
-	public k3d::material_client<k3d::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > >
 {
-	typedef k3d::material_client<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
 	cgal_boolean(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -143,7 +143,8 @@ public:
 		{
 			k3d::log() << error << "CGALBoolean: error executing boolean operation" << std::endl;
 		}
-    to_mesh(result, Mesh, dynamic_cast<k3d::imaterial*>(k3d::default_material(document())));
+
+		to_mesh(result, Mesh, static_cast<k3d::imaterial*>(0));
 	}
 	
 	void on_update_mesh_geometry(k3d::mesh& Mesh) {}

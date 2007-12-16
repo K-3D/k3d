@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,17 +22,17 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/classes.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/classes.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/idisplacement_shader_ri.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_ri.h>
 #include <k3dsdk/isurface_shader_ri.h>
 #include <k3dsdk/ivolume_shader_ri.h>
+#include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/measurement.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/types_ri.h>
 #include <k3dsdk/vectors.h>
@@ -73,21 +73,6 @@ public:
 
 	void on_deleted()
 	{
-	}
-
-	k3d::gl::imaterial* gl_material()
-	{
-		return 0;
-	}
-
-	k3d::ri::imaterial* ri_material()
-	{
-		return this;
-	}
-
-	k3d::yafray::imaterial* yafray_material()
-	{
-		return 0;
 	}
 
 	void setup_renderman_material(const k3d::ri::render_state& State)

@@ -57,6 +57,8 @@
 #include <k3dsdk/data.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/imaterial_sink.h>
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
@@ -1667,6 +1669,14 @@ public:
 
 			// In this case, we want to select the mesh instance instead of the mesh source ...
 			to_be_selected = mesh_instance;
+		}
+
+		// If the new node is a material sink, assign a default material ...
+		if(k3d::imaterial_sink* const material_sink = dynamic_cast<k3d::imaterial_sink*>(node))
+		{
+			const k3d::nodes_t materials = k3d::find_nodes<k3d::imaterial>(m_document.nodes());
+			if(materials.size())
+				k3d::property::set_internal_value(material_sink->material_sink_input(), dynamic_cast<k3d::inode*>(*materials.rbegin()));
 		}
 
 		// If the new node is a time sink, connect it to the document time source ...

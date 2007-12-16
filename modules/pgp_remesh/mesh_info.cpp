@@ -25,7 +25,7 @@
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/material_client.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>

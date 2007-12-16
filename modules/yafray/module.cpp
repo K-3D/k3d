@@ -18,14 +18,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the register_k3d_plugins entry-point required of all K-3D modules
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/module.h>
 
+namespace module
+{
+
 /// Namespace reserved for the yafray plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dyafray
+namespace yafray
 {
 
 extern k3d::iplugin_factory& area_light_factory();
@@ -39,17 +41,20 @@ extern k3d::iplugin_factory& soft_light_factory();
 extern k3d::iplugin_factory& spot_light_factory();
 extern k3d::iplugin_factory& sun_light_factory();
 
-} // namespace libk3dyafray
+} // namespace yafray
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dyafray::area_light_factory());
-	Registry.register_factory(libk3dyafray::global_photon_light_factory());
-	Registry.register_factory(libk3dyafray::hemi_light_factory());
-	Registry.register_factory(libk3dyafray::material_factory());
-	Registry.register_factory(libk3dyafray::photon_light_factory());
-	Registry.register_factory(libk3dyafray::point_light_factory());
-	Registry.register_factory(libk3dyafray::render_engine_factory());
-	Registry.register_factory(libk3dyafray::soft_light_factory());
-	Registry.register_factory(libk3dyafray::spot_light_factory());
-	Registry.register_factory(libk3dyafray::sun_light_factory());
+	Registry.register_factory(module::yafray::area_light_factory());
+	Registry.register_factory(module::yafray::global_photon_light_factory());
+	Registry.register_factory(module::yafray::hemi_light_factory());
+	Registry.register_factory(module::yafray::material_factory());
+	Registry.register_factory(module::yafray::photon_light_factory());
+	Registry.register_factory(module::yafray::point_light_factory());
+	Registry.register_factory(module::yafray::render_engine_factory());
+	Registry.register_factory(module::yafray::soft_light_factory());
+	Registry.register_factory(module::yafray::spot_light_factory());
+	Registry.register_factory(module::yafray::sun_light_factory());
 K3D_MODULE_END
+

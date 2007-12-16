@@ -30,6 +30,7 @@
 #include "inode.h"
 #include "inode_collection.h"
 #include "irender_viewport_gl.h"
+#include "material.h"
 #include "plane.h"
 #include "utility_gl.h"
 
@@ -241,15 +242,8 @@ void setup_material(iunknown* const Material)
 	if(Material)
 		result = &detail::g_default_material;
 
-	if(k3d::gl::imaterial* const material = dynamic_cast<k3d::gl::imaterial*>(Material))
-	{
+	if(k3d::gl::imaterial* const material = k3d::material::lookup<k3d::gl::imaterial>(Material))
 		result = material;
-	}
-	else if(k3d::imaterial* const material = dynamic_cast<k3d::imaterial*>(Material))
-	{
-		if(k3d::gl::imaterial* const gl_material = material->gl_material())
-			result = gl_material;
-	}
 
 	result->setup_gl_material();
 }

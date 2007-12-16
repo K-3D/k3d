@@ -31,7 +31,7 @@
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/material.h>
-#include <k3dsdk/material_client.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
@@ -52,9 +52,9 @@ namespace plot
 // surface_plot
 
 class surface_plot :
-	public k3d::material_client<k3d::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > >
 {
-	typedef k3d::material_client<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
 	surface_plot(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
