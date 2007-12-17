@@ -25,7 +25,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/legacy_mesh_modifier.h>
-#include <k3dsdk/material.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>

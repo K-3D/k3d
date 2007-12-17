@@ -24,7 +24,6 @@
 
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/material.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh_modifier.h>

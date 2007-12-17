@@ -2,7 +2,7 @@
 #define K3DSDK_USER_PROPERTIES_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -29,6 +29,7 @@
 #include "color.h"
 #include "data.h"
 #include "ideletable.h"
+#include "imaterial.h"
 #include "imesh_painter_gl.h"
 #include "imesh_painter_ri.h"
 #include "itexture_ri.h"
@@ -211,25 +212,22 @@ private:
 
 } // namespace detail
 
-typedef user_property<k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> bool_property;
-/*
-typedef user_property<k3d_data(long, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> long_property;
-typedef user_property<k3d_data(unsigned long, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> unsigned_long_property;
-*/
-typedef user_property<k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> double_property;
-typedef user_property<k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> string_property;
-typedef user_property<k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> point3_property;
-typedef user_property<k3d_data(k3d::vector3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> vector3_property;
-typedef user_property<k3d_data(k3d::normal3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> normal3_property;
-typedef user_property<k3d_data(k3d::point4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> point4_property;
-typedef user_property<k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> matrix4_property;
-typedef user_property<k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> color_property;
+typedef user_property<k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_bool_t_property;
+typedef user_property<k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_double_t_property;
+typedef user_property<k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_string_t_property;
+typedef user_property<k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_point3_property;
+typedef user_property<k3d_data(k3d::vector3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_vector3_property;
+typedef user_property<k3d_data(k3d::normal3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_normal3_property;
+typedef user_property<k3d_data(k3d::point4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_point4_property;
+typedef user_property<k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_matrix4_property;
+typedef user_property<k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_color_property;
 typedef user_property<k3d_data(k3d::legacy::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, detail::mesh_serialization)> legacy_mesh_property;
-typedef user_property<k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, detail::mesh_serialization)> mesh_property;
-typedef user_property<k3d_data(k3d::gl::imesh_painter*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, detail::node_serialization)> gl_mesh_painter_property;
-typedef user_property<k3d_data(k3d::ri::imesh_painter*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, detail::node_serialization)> ri_mesh_painter_property;
-typedef user_property<k3d_data(k3d::ri::itexture*, immutable_name, change_signal, with_undo, node_storage, no_constraint, k3d::data::node_property, detail::node_serialization)> ri_texture_property;
-typedef user_property<k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization)> path_property;
+typedef user_property<k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, detail::mesh_serialization)> k3d_mesh_property;
+typedef user_property<k3d_data(k3d::gl::imesh_painter*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, detail::node_serialization)> k3d_gl_imesh_painter_property;
+typedef user_property<k3d_data(k3d::ri::imesh_painter*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, detail::node_serialization)> k3d_ri_imesh_painter_property;
+typedef user_property<k3d_data(k3d::ri::itexture*, immutable_name, change_signal, with_undo, node_storage, no_constraint, k3d::data::node_property, detail::node_serialization)> k3d_ri_itexture_property;
+typedef user_property<k3d_data(k3d::imaterial*, immutable_name, change_signal, with_undo, node_storage, no_constraint, k3d::data::node_property, detail::node_serialization)> k3d_imaterial_property;
+typedef user_property<k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization)> k3d_filesystem_path_property;
 
 /// This is an ugly hack, but it allows user properties to be fully constructed before they're added to their property collection
 struct null_property_collection :
@@ -284,12 +282,12 @@ PropertyT* create_property(const std::string& Name, const std::string& Label, co
 
 /// Specialization for path properties
 template<>
-inline path_property* create_property(const std::string& Name, const std::string& Label, const std::string& Description, idocument& Document, iproperty_collection& PropertyCollection, ipersistent_container& PersistentContainer, inode* const Object, const k3d::filesystem::path& Value)
+inline k3d_filesystem_path_property* create_property(const std::string& Name, const std::string& Label, const std::string& Description, idocument& Document, iproperty_collection& PropertyCollection, ipersistent_container& PersistentContainer, inode* const Object, const k3d::filesystem::path& Value)
 {
 	null_property_collection property_collection;
 
-	path_property* const property =
-			new path_property(
+	k3d_filesystem_path_property* const property =
+			new k3d_filesystem_path_property(
 				init_owner(Document, property_collection, PersistentContainer, Object)
 				+ init_name(make_token(Name.c_str()))
 				+ init_label(make_token(Label.c_str()))

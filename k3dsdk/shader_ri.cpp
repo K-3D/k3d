@@ -237,7 +237,7 @@ void shader::create_arguments()
 			case sl::argument::EX_PRESSURE:
 			{
 				undoable_new(
-					new user::double_property(
+					new user::k3d_double_t_property(
 						init_owner(*this)
 						+ init_name(make_token(argument->name.c_str()))
 						+ init_label(make_token(argument->label.c_str()))
@@ -250,7 +250,7 @@ void shader::create_arguments()
 			case sl::argument::EX_SPACE:
 			{
 				undoable_new(
-					new user::string_property(
+					new user::k3d_string_t_property(
 						init_owner(*this)
 						+ init_name(make_token(argument->name.c_str()))
 						+ init_label(make_token(argument->label.c_str()))
@@ -262,7 +262,7 @@ void shader::create_arguments()
 			case sl::argument::EX_TEXTURE:
 			{
 				undoable_new(
-					new user::ri_texture_property(
+					new user::k3d_ri_itexture_property(
 						init_owner(*this)
 						+ init_name(make_token(argument->name.c_str()))
 						+ init_label(make_token(argument->label.c_str()))
@@ -274,7 +274,7 @@ void shader::create_arguments()
 			case sl::argument::EX_POINT:
 			{
 				undoable_new(
-					new user::point3_property(
+					new user::k3d_point3_property(
 						init_owner(*this)
 						+ init_name(make_token(argument->name.c_str()))
 						+ init_label(make_token(argument->label.c_str()))
@@ -286,7 +286,7 @@ void shader::create_arguments()
 			case sl::argument::EX_VECTOR:
 			{
 				undoable_new(
-					new user::vector3_property(
+					new user::k3d_vector3_property(
 						init_owner(*this)
 						+ init_name(make_token(argument->name.c_str()))
 						+ init_label(make_token(argument->label.c_str()))
@@ -298,7 +298,7 @@ void shader::create_arguments()
 			case sl::argument::EX_NORMAL:
 			{
 				undoable_new(
-					new user::normal3_property(
+					new user::k3d_normal3_property(
 						init_owner(*this)
 						+ init_name(make_token(argument->name.c_str()))
 						+ init_label(make_token(argument->label.c_str()))
@@ -310,7 +310,7 @@ void shader::create_arguments()
 			case sl::argument::EX_HPOINT:
 			{
 				undoable_new(
-					new user::point4_property(
+					new user::k3d_point4_property(
 						init_owner(*this)
 						+ init_name(make_token(argument->name.c_str()))
 						+ init_label(make_token(argument->label.c_str()))
@@ -322,7 +322,7 @@ void shader::create_arguments()
 			case sl::argument::EX_MATRIX:
 			{
 				undoable_new(
-					new user::matrix4_property(
+					new user::k3d_matrix4_property(
 						init_owner(*this)
 						+ init_name(make_token(argument->name.c_str()))
 						+ init_label(make_token(argument->label.c_str()))
@@ -334,7 +334,7 @@ void shader::create_arguments()
 			case sl::argument::EX_COLOR:
 			{
 				undoable_new(
-					new user::color_property(
+					new user::k3d_color_property(
 						init_owner(*this)
 						+ init_name(make_token(argument->name.c_str()))
 						+ init_label(make_token(argument->label.c_str()))

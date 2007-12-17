@@ -30,7 +30,6 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/log.h>
-#include <k3dsdk/material.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>

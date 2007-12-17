@@ -186,39 +186,35 @@ void persistent_container::load(xml::element& Element, const ipersistent::load_c
 			if(user_property == "vanilla")
 			{
 				if(type == type_string<k3d::bool_t>())
-					load_user_property<user::bool_property>(*element->second, Context, *property_collection, *persistent_container, *object, false);
-/*
-				else if(type == type_string<long>())
-					load_user_property<user::long_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
-				else if(type == type_string<unsigned long>())
-					load_user_property<user::unsigned_long_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
-*/
+					load_user_property<user::k3d_bool_t_property>(*element->second, Context, *property_collection, *persistent_container, *object, false);
 				else if(type == type_string<k3d::double_t>())
-					load_user_property<user::double_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
-				else if(type == type_string<std::string>())
-					load_user_property<user::string_property>(*element->second, Context, *property_collection, *persistent_container, *object, std::string());
+					load_user_property<user::k3d_double_t_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
+				else if(type == type_string<k3d::string_t>())
+					load_user_property<user::k3d_string_t_property>(*element->second, Context, *property_collection, *persistent_container, *object, std::string());
 				else if(type == type_string<k3d::ri::itexture*>())
-					load_user_property<user::ri_texture_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::ri::itexture*>(0));
+					load_user_property<user::k3d_ri_itexture_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::ri::itexture*>(0));
 				else if(type == type_string<k3d::point3>() || type == "k3d::ri::point")
-					load_user_property<user::point3_property>(*element->second, Context, *property_collection, *persistent_container, *object, point3(0, 0, 0));
+					load_user_property<user::k3d_point3_property>(*element->second, Context, *property_collection, *persistent_container, *object, point3(0, 0, 0));
 				else if(type == type_string<k3d::vector3>() || type == "k3d::ri::vector")
-					load_user_property<user::vector3_property>(*element->second, Context, *property_collection, *persistent_container, *object, vector3(0, 0, 0));
+					load_user_property<user::k3d_vector3_property>(*element->second, Context, *property_collection, *persistent_container, *object, vector3(0, 0, 0));
 				else if(type == type_string<k3d::normal3>() || type == "k3d::ri::normal")
-					load_user_property<user::normal3_property>(*element->second, Context, *property_collection, *persistent_container, *object, normal3(0, 0, 0));
+					load_user_property<user::k3d_normal3_property>(*element->second, Context, *property_collection, *persistent_container, *object, normal3(0, 0, 0));
 				else if(type == type_string<k3d::point4>() || type == "k3d::ri::hpoint")
-					load_user_property<user::point4_property>(*element->second, Context, *property_collection, *persistent_container, *object, point4(0, 0, 0, 0));
+					load_user_property<user::k3d_point4_property>(*element->second, Context, *property_collection, *persistent_container, *object, point4(0, 0, 0, 0));
 				else if(type == type_string<k3d::matrix4>())
-					load_user_property<user::matrix4_property>(*element->second, Context, *property_collection, *persistent_container, *object, identity3D());
+					load_user_property<user::k3d_matrix4_property>(*element->second, Context, *property_collection, *persistent_container, *object, identity3D());
 				else if(type == type_string<k3d::color>() || type == "k3d::ri::color")
-					load_user_property<user::color_property>(*element->second, Context, *property_collection, *persistent_container, *object, color(1, 1, 1));
+					load_user_property<user::k3d_color_property>(*element->second, Context, *property_collection, *persistent_container, *object, color(1, 1, 1));
 				else if(type == type_string<k3d::legacy::mesh*>())
 					load_user_property<user::legacy_mesh_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::legacy::mesh*>(0));
 				else if(type == type_string<k3d::mesh*>())
-					load_user_property<user::mesh_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::mesh*>(0));
+					load_user_property<user::k3d_mesh_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::mesh*>(0));
 				else if(type == type_string<k3d::gl::imesh_painter*>())
-					load_user_property<user::gl_mesh_painter_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::gl::imesh_painter*>(0));
+					load_user_property<user::k3d_gl_imesh_painter_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::gl::imesh_painter*>(0));
 				else if(type == type_string<k3d::ri::imesh_painter*>())
-					load_user_property<user::ri_mesh_painter_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::ri::imesh_painter*>(0));
+					load_user_property<user::k3d_ri_imesh_painter_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::ri::imesh_painter*>(0));
+				else if(type == type_string<k3d::imaterial*>())
+					load_user_property<user::k3d_imaterial_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::imaterial*>(0));
 				else
 				{
 					log() << warning << k3d_file_reference << ": ignoring unknown user property type [" << type << "]" << std::endl;

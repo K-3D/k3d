@@ -2,7 +2,7 @@
 #define K3DSDK_MATERIAL_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,6 +24,12 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "classes.h"
+#include "inode.h"
+#include "iplugin_factory.h"
+#include "iproperty_collection.h"
+#include "property.h"
+
 namespace k3d
 {
 
@@ -32,11 +38,33 @@ class iunknown;
 namespace material
 {
 
-/// Given a generic material object, return a specific material type (could return NULL)
+/// Given a generic material object, return a specific material type (could return NULL).
 template<typename InterfaceT>
 InterfaceT* lookup(iunknown* const Material)
 {
-	return dynamic_cast<InterfaceT*>(Material);
+	if(InterfaceT* const interface = dynamic_cast<InterfaceT*>(Material))
+		return interface;
+
+	if(inode* const node = dynamic_cast<inode*>(Material))
+	{
+		if(node->factory().factory_id() == classes::MultiMaterial())
+		{
+			if(iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(Material))
+			{
+				const iproperty_collection::properties_t& properties = property_collection->properties();
+				for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+				{
+					if((**property).property_type() == typeid(inode*))
+					{
+						if(InterfaceT* const interface = dynamic_cast<InterfaceT*>(k3d::property::pipeline_value<inode*>(**property)))
+							return interface;
+					}
+				}
+			}
+		}
+	}
+
+	return 0;
 }
 
 } // namespace material

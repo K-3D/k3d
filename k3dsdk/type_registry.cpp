@@ -181,6 +181,7 @@ void initialize_types()
 	register_type(typeid(k3d::ikeyframer), "k3d::ikeyframer");
 	register_type(typeid(k3d::ilong_source), "k3d::ilong_source");
 	register_type(typeid(k3d::imaterial), "k3d::imaterial");
+	register_type(typeid(k3d::imaterial*), "k3d::imaterial*");
 	register_type(typeid(k3d::imesh_sink), "k3d::imesh_sink");
 	register_type(typeid(k3d::imesh_source), "k3d::imesh_source");
 	register_type(typeid(k3d::imesh_storage), "k3d::imesh_storage");

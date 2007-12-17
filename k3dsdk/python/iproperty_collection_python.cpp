@@ -92,18 +92,19 @@ iproperty iproperty_collection::add_user_property(const std::string& Type, const
 	if(!persistent_container)
 		throw std::runtime_error("missing persistent container");
 
-	if(Type == k3d::type_string<k3d::bool_t>()) return detail::create_user_property<k3d::user::bool_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, false);
-	else if(Type == k3d::type_string<k3d::double_t>()) return detail::create_user_property<k3d::user::double_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, 0.0);
-	else if(Type == k3d::type_string<k3d::string_t>()) return detail::create_user_property<k3d::user::string_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, std::string());
-	else if(Type == k3d::type_string<k3d::point3>()) return detail::create_user_property<k3d::user::point3_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::point3(0, 0, 0));
-	else if(Type == k3d::type_string<k3d::vector3>()) return detail::create_user_property<k3d::user::vector3_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::vector3(0, 0, 0));
-	else if(Type == k3d::type_string<k3d::normal3>()) return detail::create_user_property<k3d::user::normal3_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::normal3(0, 0, 0));
-	else if(Type == k3d::type_string<k3d::matrix4>()) return detail::create_user_property<k3d::user::matrix4_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::identity3D());
-	else if(Type == k3d::type_string<k3d::color>()) return detail::create_user_property<k3d::user::color_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::color(1, 1, 1));
-	else if(Type == k3d::type_string<k3d::mesh*>()) return detail::create_user_property<k3d::user::mesh_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::mesh*>(0));
-	else if(Type == k3d::type_string<k3d::gl::imesh_painter*>()) return detail::create_user_property<k3d::user::gl_mesh_painter_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::gl::imesh_painter*>(0));
-	else if(Type == k3d::type_string<k3d::ri::imesh_painter*>()) return detail::create_user_property<k3d::user::ri_mesh_painter_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::ri::imesh_painter*>(0));
-	else if(Type == k3d::type_string<k3d::filesystem::path>()) return detail::create_user_property<k3d::user::path_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::filesystem::path());
+	if(Type == k3d::type_string<k3d::bool_t>()) return detail::create_user_property<k3d::user::k3d_bool_t_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, false);
+	else if(Type == k3d::type_string<k3d::double_t>()) return detail::create_user_property<k3d::user::k3d_double_t_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, 0.0);
+	else if(Type == k3d::type_string<k3d::string_t>()) return detail::create_user_property<k3d::user::k3d_string_t_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, std::string());
+	else if(Type == k3d::type_string<k3d::point3>()) return detail::create_user_property<k3d::user::k3d_point3_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::point3(0, 0, 0));
+	else if(Type == k3d::type_string<k3d::vector3>()) return detail::create_user_property<k3d::user::k3d_vector3_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::vector3(0, 0, 0));
+	else if(Type == k3d::type_string<k3d::normal3>()) return detail::create_user_property<k3d::user::k3d_normal3_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::normal3(0, 0, 0));
+	else if(Type == k3d::type_string<k3d::matrix4>()) return detail::create_user_property<k3d::user::k3d_matrix4_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::identity3D());
+	else if(Type == k3d::type_string<k3d::color>()) return detail::create_user_property<k3d::user::k3d_color_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::color(1, 1, 1));
+	else if(Type == k3d::type_string<k3d::mesh*>()) return detail::create_user_property<k3d::user::k3d_mesh_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::mesh*>(0));
+	else if(Type == k3d::type_string<k3d::gl::imesh_painter*>()) return detail::create_user_property<k3d::user::k3d_gl_imesh_painter_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::gl::imesh_painter*>(0));
+	else if(Type == k3d::type_string<k3d::ri::imesh_painter*>()) return detail::create_user_property<k3d::user::k3d_ri_imesh_painter_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::ri::imesh_painter*>(0));
+	else if(Type == k3d::type_string<k3d::imaterial*>()) return detail::create_user_property<k3d::user::k3d_imaterial_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, static_cast<k3d::imaterial*>(0));
+	else if(Type == k3d::type_string<k3d::filesystem::path>()) return detail::create_user_property<k3d::user::k3d_filesystem_path_property>(Name, Label, Description, node->document(), wrapped(), *persistent_container, node, k3d::filesystem::path());
 
 	throw std::invalid_argument("unknown user property type: " + Type);
 }

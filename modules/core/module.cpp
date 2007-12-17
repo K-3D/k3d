@@ -34,7 +34,7 @@ extern k3d::iplugin_factory& color_property_factory();
 extern k3d::iplugin_factory& format_time_factory();
 extern k3d::iplugin_factory& frozen_transformation_factory();
 extern k3d::iplugin_factory& look_at_factory();
-extern k3d::iplugin_factory& material_factory();
+extern k3d::iplugin_factory& multi_material_factory();
 extern k3d::iplugin_factory& null_factory();
 extern k3d::iplugin_factory& orientation_factory();
 extern k3d::iplugin_factory& position_factory();
@@ -53,7 +53,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(libk3dcore::format_time_factory());
 	Registry.register_factory(libk3dcore::frozen_transformation_factory());
 	Registry.register_factory(libk3dcore::look_at_factory());
-	Registry.register_factory(libk3dcore::material_factory());
+	Registry.register_factory(libk3dcore::multi_material_factory());
 	Registry.register_factory(libk3dcore::null_factory());
 	Registry.register_factory(libk3dcore::orientation_factory());
 	Registry.register_factory(libk3dcore::position_factory());

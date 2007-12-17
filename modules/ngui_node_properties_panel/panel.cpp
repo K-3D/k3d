@@ -775,8 +775,7 @@ public:
 	void on_add_user_property()
 	{
 		return_if_fail(m_node);
-		add_user_property* const window = new add_user_property(*m_node, m_parent);
-		window->show();
+		add_user_property_dialog(*m_node, m_parent);
 	}
 	
 	void on_manual_keyframe(k3d::ikeyframer* Keyframer)
