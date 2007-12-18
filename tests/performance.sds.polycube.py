@@ -6,10 +6,10 @@ import testing
 
 document = k3d.documents()[0]
 
-edge_painter = document.new_node("GLEdgePainter")
+edge_painter = document.new_node("VirtualOpenGLSDSEdgePainter")
 edge_painter.name = "Test edge painter"
 
-face_painter = document.new_node("GLFacePainter")
+face_painter = document.new_node("VirtualOpenGLSDSFacePainter")
 face_painter.name = "Test face painter"
 
 painter = document.new_node("OpenGLMultiPainter")
@@ -23,12 +23,14 @@ mesh_instance = document.new_node("MeshInstance")
 mesh_instance.name = "Test mesh instance"
 mesh_instance.gl_painter = painter
 
-source = document.new_node("PolyCube");
+source = document.new_node("PolyCube")
 source.name = "Test source"
 source.rows = 25
 source.columns = 25
 source.slices = 25
-document.set_dependency(mesh_instance.get_property("input_mesh"), source.get_property("output_mesh"))
+sds = document.new_node("MakeSDS")
+document.set_dependency(sds.get_property("input_mesh"), source.get_property("output_mesh"))
+document.set_dependency(mesh_instance.get_property("input_mesh"), sds.get_property("output_mesh"))
 
 orientation = document.new_node("Orientation")
 orientation.name = "Test orientation"
