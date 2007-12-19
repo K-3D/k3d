@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,21 +18,29 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements procedures required to export K-3D objects from the libk3dbitmap module
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the imagemagick plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dimagemagickio
+namespace module
 {
 
-extern k3d::iplugin_factory& imagemagick_bitmap_importer_factory();
+namespace imagemagick
+{
 
-} // namespace libk3dimagemagickio
+namespace io
+{
+
+extern k3d::iplugin_factory& bitmap_importer_factory();
+
+} // namespace io
+
+} // namespace imagemagick
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dimagemagickio::imagemagick_bitmap_importer_factory());
+	Registry.register_factory(module::imagemagick::io::bitmap_importer_factory());
 K3D_MODULE_END
 

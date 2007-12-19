@@ -21,27 +21,33 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/bitmap_sink.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
 #include <boost/gil/extension/io/tiff_io.hpp>
 
-namespace libk3dtiffio
+namespace module
+{
+
+namespace tiff
+{
+
+namespace io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// tiff_bitmap_writer
+// bitmap_writer
 
-class tiff_bitmap_writer :
+class bitmap_writer :
 	public k3d::bitmap_sink<k3d::persistent<k3d::node> >
 {
 	typedef k3d::bitmap_sink<k3d::persistent<k3d::node> > base;
 
 public:
-	tiff_bitmap_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	bitmap_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Output file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::WRITE) + init_path_type("tiff_files"))
 	{
@@ -86,7 +92,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<tiff_bitmap_writer,
+		static k3d::document_plugin_factory<bitmap_writer,
 			k3d::interface_list<k3d::ibitmap_sink > > factory(
 				k3d::uuid(0x70e8b804, 0x8f4fac44, 0x0a7002a3, 0x4dbc8ee7),
 				"TIFFBitmapWriter",
@@ -101,10 +107,14 @@ private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
 };
 
-k3d::iplugin_factory& tiff_bitmap_writer_factory()
+k3d::iplugin_factory& bitmap_writer_factory()
 {
-	return tiff_bitmap_writer::get_factory();
+	return bitmap_writer::get_factory();
 }
 
-} // namespace libk3dtiffio
+} // namespace io
+
+} // namespace tiff
+
+} // namespace module
 

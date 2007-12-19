@@ -23,21 +23,30 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the tiff plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dtiffio
+namespace module
 {
 
-extern k3d::iplugin_factory& tiff_bitmap_exporter_factory();
-extern k3d::iplugin_factory& tiff_bitmap_importer_factory();
-extern k3d::iplugin_factory& tiff_bitmap_reader_factory();
-extern k3d::iplugin_factory& tiff_bitmap_writer_factory();
+namespace tiff
+{
 
-} // namespace libk3dtiffio
+namespace io
+{
+
+extern k3d::iplugin_factory& bitmap_exporter_factory();
+extern k3d::iplugin_factory& bitmap_importer_factory();
+extern k3d::iplugin_factory& bitmap_reader_factory();
+extern k3d::iplugin_factory& bitmap_writer_factory();
+
+} // namespace io
+
+} // namespace tiff
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dtiffio::tiff_bitmap_exporter_factory());
-	Registry.register_factory(libk3dtiffio::tiff_bitmap_importer_factory());
-	Registry.register_factory(libk3dtiffio::tiff_bitmap_reader_factory());
-	Registry.register_factory(libk3dtiffio::tiff_bitmap_writer_factory());
+	Registry.register_factory(module::tiff::io::bitmap_exporter_factory());
+	Registry.register_factory(module::tiff::io::bitmap_importer_factory());
+	Registry.register_factory(module::tiff::io::bitmap_reader_factory());
+	Registry.register_factory(module::tiff::io::bitmap_writer_factory());
 K3D_MODULE_END
 

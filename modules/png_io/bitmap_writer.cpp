@@ -21,27 +21,33 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/bitmap_sink.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
 #include <boost/gil/extension/io/png_io.hpp>
 
-namespace libk3dpngio
+namespace module
+{
+
+namespace png
+{
+
+namespace io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// png_bitmap_writer
+// bitmap_writer
 
-class png_bitmap_writer :
+class bitmap_writer :
 	public k3d::bitmap_sink<k3d::persistent<k3d::node> >
 {
 	typedef k3d::bitmap_sink<k3d::persistent<k3d::node> > base;
 
 public:
-	png_bitmap_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	bitmap_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Output file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::WRITE) + init_path_type("png_files"))
 	{
@@ -81,7 +87,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<png_bitmap_writer,
+		static k3d::document_plugin_factory<bitmap_writer,
 			k3d::interface_list<k3d::ibitmap_sink > > factory(
 				k3d::uuid(0x3bf6aa31, 0xb944432c, 0xca32a681, 0x8c6e07e8),
 				"PNGBitmapWriter",
@@ -96,10 +102,15 @@ private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
 };
 
-k3d::iplugin_factory& png_bitmap_writer_factory()
+k3d::iplugin_factory& bitmap_writer_factory()
 {
-	return png_bitmap_writer::get_factory();
+	return bitmap_writer::get_factory();
 }
 
-} // namespace libk3dpngio
+} // namespace io
+
+} // namespace png
+
+} // namespace module
+
 

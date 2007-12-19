@@ -22,8 +22,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/application_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/ibitmap_importer.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/ifile_format.h>
@@ -31,20 +31,26 @@
 
 #include <Magick++.h>
 
-namespace libk3dimagemagickio
+namespace module
+{
+
+namespace imagemagick
+{
+
+namespace io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// imagemagick_bitmap_importer
+// bitmap_importer
 
-/// Reads and writes a large number of image file formats, using the ImageMagick Magick++ API
-class imagemagick_bitmap_importer :
+/// Reads a wide variety of image file formats using the ImageMagick C++ bindings
+class bitmap_importer :
 	public k3d::ifile_format,
 	public k3d::ibitmap_importer,
 	public k3d::ideletable
 {
 public:
-	imagemagick_bitmap_importer()
+	bitmap_importer()
 	{
 	}
 
@@ -124,7 +130,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<imagemagick_bitmap_importer, 
+		static k3d::application_plugin_factory<bitmap_importer, 
 			k3d::interface_list<k3d::ibitmap_importer> > factory(
 				k3d::uuid(0x4eb70e35, 0x4e654a53, 0xa8e4b07c, 0x4219d946),
 				"ImageMagickBitmapImporter",
@@ -136,12 +142,17 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// imagemagick_bitmap_importer_factory
+// bitmap_importer_factory
 
-k3d::iplugin_factory& imagemagick_bitmap_importer_factory()
+k3d::iplugin_factory& bitmap_importer_factory()
 {
-	return imagemagick_bitmap_importer::get_factory();
+	return bitmap_importer::get_factory();
 }
 
-} // namespace libk3dimagemagickio
+} // namespace io
+
+} // namespace imagemagick
+
+} // namespace module
+
 

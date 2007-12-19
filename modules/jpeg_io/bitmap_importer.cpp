@@ -21,28 +21,35 @@
 	\author Timothy M. Shead
 */
 
-#include <k3dsdk/application_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/ibitmap_importer.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/ifile_format.h>
 #include <k3dsdk/path.h>
+#include <k3dsdk/string_modifiers.h>
 
-#include <boost/gil/extension/io/png_io.hpp>
+#include <boost/gil/extension/io/jpeg_io.hpp>
 
-namespace libk3dpngio
+namespace module
+{
+
+namespace jpeg
+{
+
+namespace io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// png_bitmap_importer
+// bitmap_importer
 
-class png_bitmap_importer :
+class bitmap_importer :
 	public k3d::ifile_format,
 	public k3d::ibitmap_importer,
 	public k3d::ideletable
 {
 public:
-	png_bitmap_importer()
+	bitmap_importer()
 	{
 	}
 
@@ -51,17 +58,17 @@ public:
 		return 128;
 	}
 
-	bool query_can_handle(const k3d::filesystem::path& File)
+	bool query_can_handle(const k3d::filesystem::path& Path)
 	{
-		return k3d::filesystem::extension(File).lowercase().raw() == ".png";
+		return k3d::filesystem::extension(Path).lowercase().raw() == ".jpeg" || k3d::filesystem::extension(Path).lowercase().raw() == ".jpg";
 	}
 
-	bool read_file(const k3d::filesystem::path& File, k3d::bitmap& Bitmap)
+	bool read_file(const k3d::filesystem::path& Path, k3d::bitmap& Bitmap)
 	{
 		try
 		{
-			k3d::log() << info << "Reading " << File.native_console_string() << " using " << get_factory().name() << std::endl;
-			boost::gil::png_read_and_convert_image(File.native_filesystem_string(), Bitmap);
+			k3d::log() << info << "Reading " << Path.native_console_string() << " using " << get_factory().name() << std::endl;
+			boost::gil::jpeg_read_and_convert_image(Path.native_filesystem_string(), Bitmap);
 			return true;
 		}
 		catch(std::exception& e)
@@ -78,11 +85,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<png_bitmap_importer,
+		static k3d::application_plugin_factory<bitmap_importer,
 			k3d::interface_list<k3d::ibitmap_importer> > factory(
-				k3d::uuid(0xac17627d, 0xaa8848fd, 0xb621bd81, 0x4ba02136),
-				"PNGBitmapImporter",
-				_("PNG (*.png)"),
+				k3d::uuid(0xfb924031, 0x25c242af, 0xa2e1398e, 0x35000e3c),
+				"JPEGBitmapImporter",
+				_("JPEG (*.jpeg)"),
 				"Bitmap BitmapImporter");
 
 		return factory;
@@ -90,12 +97,16 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// png_bitmap_importer_factory
+// bitmap_importer_factory
 
-k3d::iplugin_factory& png_bitmap_importer_factory()
+k3d::iplugin_factory& bitmap_importer_factory()
 {
-	return png_bitmap_importer::get_factory();
+	return bitmap_importer::get_factory();
 }
 
-} // namespace libk3dpngio
+} // namespace io
+
+} // namespace jpeg
+
+} // namespace module
 

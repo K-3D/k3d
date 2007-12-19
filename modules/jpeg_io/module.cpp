@@ -23,19 +23,28 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the jpeg plugin module, to protect public symbols from name clashes with other modules
-namespace libk3djpegio
+namespace module
 {
 
-extern k3d::iplugin_factory& jpeg_bitmap_importer_factory();
-extern k3d::iplugin_factory& jpeg_bitmap_reader_factory();
-extern k3d::iplugin_factory& jpeg_bitmap_writer_factory();
+namespace jpeg
+{
 
-} // namespace libk3djpegio
+namespace io
+{
+
+extern k3d::iplugin_factory& bitmap_importer_factory();
+extern k3d::iplugin_factory& bitmap_reader_factory();
+extern k3d::iplugin_factory& bitmap_writer_factory();
+
+} // namespace io
+
+} // namespace jpeg
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3djpegio::jpeg_bitmap_importer_factory());
-	Registry.register_factory(libk3djpegio::jpeg_bitmap_reader_factory());
-	Registry.register_factory(libk3djpegio::jpeg_bitmap_writer_factory());
+	Registry.register_factory(module::jpeg::io::bitmap_importer_factory());
+	Registry.register_factory(module::jpeg::io::bitmap_reader_factory());
+	Registry.register_factory(module::jpeg::io::bitmap_writer_factory());
 K3D_MODULE_END
 

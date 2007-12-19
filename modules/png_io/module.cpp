@@ -18,25 +18,33 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements procedures required to export K-3D objects from the png module
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the png plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dpngio
+namespace module
 {
 
-extern k3d::iplugin_factory& png_bitmap_importer_factory();
-extern k3d::iplugin_factory& png_bitmap_reader_factory();
-extern k3d::iplugin_factory& png_bitmap_writer_factory();
+namespace png
+{
 
-} // namespace libk3dpngio
+namespace io
+{
+
+extern k3d::iplugin_factory& bitmap_importer_factory();
+extern k3d::iplugin_factory& bitmap_reader_factory();
+extern k3d::iplugin_factory& bitmap_writer_factory();
+
+} // namespace io
+
+} // namespace png
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dpngio::png_bitmap_importer_factory());
-	Registry.register_factory(libk3dpngio::png_bitmap_reader_factory());
-	Registry.register_factory(libk3dpngio::png_bitmap_writer_factory());
+	Registry.register_factory(module::png::io::bitmap_importer_factory());
+	Registry.register_factory(module::png::io::bitmap_reader_factory());
+	Registry.register_factory(module::png::io::bitmap_writer_factory());
 K3D_MODULE_END
 

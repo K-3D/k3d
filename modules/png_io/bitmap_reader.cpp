@@ -21,9 +21,9 @@
 	\author Timothy M. Shead
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/bitmap_source.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
@@ -31,19 +31,25 @@
 
 #include <boost/gil/extension/io/png_io.hpp>
 
-namespace libk3dpngio
+namespace module
+{
+
+namespace png
+{
+
+namespace io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// png_bitmap_reader
+// bitmap_reader
 
-class png_bitmap_reader :
+class bitmap_reader :
 	public k3d::bitmap_source<k3d::persistent<k3d::node> >
 {
 	typedef k3d::bitmap_source<k3d::persistent<k3d::node> > base;
 
 public:
-	png_bitmap_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	bitmap_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Browse for an input bitmap")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type(k3d::options::path::bitmaps()))
 	{
@@ -77,7 +83,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<png_bitmap_reader,
+		static k3d::document_plugin_factory<bitmap_reader,
 			k3d::interface_list<k3d::ibitmap_source> > factory(
 				k3d::uuid(0x20fb9aae, 0x1e4fb977, 0xc4dbcfad, 0x9d66568e),
 				"PNGBitmapReader",
@@ -93,12 +99,17 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// png_bitmap_reader_factory
+// bitmap_reader_factory
 
-k3d::iplugin_factory& png_bitmap_reader_factory()
+k3d::iplugin_factory& bitmap_reader_factory()
 {
-	return png_bitmap_reader::get_factory();
+	return bitmap_reader::get_factory();
 }
 
-} // namespace libk3dpngio
+} // namespace io
+
+} // namespace png
+
+} // namespace module
+
 
