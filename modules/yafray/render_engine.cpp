@@ -40,6 +40,7 @@
 #include <k3dsdk/inetwork_render_farm.h>
 #include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/inetwork_render_job.h>
+#include <k3dsdk/inode_visibility.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irender_camera_animation.h>
 #include <k3dsdk/irender_camera_frame.h>
@@ -76,6 +77,7 @@ namespace yafray
 
 class render_engine :
 	public k3d::persistent<k3d::node>,
+	public k3d::inode_visibility,
 	public k3d::irender_camera_preview,
 	public k3d::irender_camera_frame,
 	public k3d::irender_camera_animation
@@ -85,6 +87,7 @@ class render_engine :
 public:
 	render_engine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
+		m_visible_nodes(init_owner(*this) + init_name("visible_nodes") + init_label(_("Visible Nodes")) + init_description(_("Visible Nodes")) + init_value(std::vector<k3d::inode*>())),
 		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("Resolution")) + init_description(_("Choose a predefined image resolution")) + init_enumeration(k3d::resolution_values()) + init_value(std::string(""))),
 		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("pixel_width")) + init_description(_("Output pixel width")) + init_value(320) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
 		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("pixel_height")) + init_description(_("Output pixel height")) + init_value(240) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
@@ -102,6 +105,11 @@ public:
 		m_preview_sds(init_owner(*this) + init_name("preview_sds") + init_label(_("Preview SDS")) + init_description(_("Show SDS Surfaces")) + init_value(true))
 	{
 		m_resolution.changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_resolution_changed));
+	}
+
+	k3d::iproperty& visible_nodes()
+	{
+		return m_visible_nodes;
 	}
 
 	void on_resolution_changed(k3d::iunknown*)
@@ -447,20 +455,16 @@ private:
 
 			// Render geometry, keeping-track of names as we go ...
 			std::map<k3d::inode*, k3d::string_t> object_names;
-			for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+			const k3d::inode_collection_property::nodes_t visible_nodes = /*boost::any_cast<k3d::inode_collection_property::nodes_t>*/(m_visible_nodes.pipeline_value());
+			for(k3d::inode_collection_property::nodes_t::const_iterator node = visible_nodes.begin(); node != visible_nodes.end(); ++node)
 			{
+				const k3d::string_t object_name = "object_" + k3d::string_cast(object_names.size());
+				object_names.insert(std::make_pair(*node, object_name));
+
 				if((**node).factory().factory_id() == k3d::classes::Sphere())
-				{
-					const k3d::string_t object_name = "object_" + k3d::string_cast(object_names.size());
-					object_names.insert(std::make_pair(*node, object_name));
 					render_sphere(shader_names, object_name, **node, stream);
-				}
 				else if((*node)->factory().factory_id() == k3d::classes::MeshInstance())
-				{
-					const k3d::string_t object_name = "object_" + k3d::string_cast(object_names.size());
-					object_names.insert(std::make_pair(*node, object_name));
 					render_mesh_instance(shader_names, object_name, **node, stream);
-				}
 			}
 
 			// Setup lights, keeping-track of names as we go ...
@@ -541,6 +545,7 @@ private:
 	}
 */
 
+	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, node_collection_serialization) m_visible_nodes;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;
