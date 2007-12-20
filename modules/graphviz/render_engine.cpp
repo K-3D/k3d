@@ -191,7 +191,7 @@ private:
 		property_node_map_t property_node_map;
 
 		// Draw a vertex for every visible node ...
-		const k3d::inode_collection_property::nodes_t visible_nodes = boost::any_cast<k3d::inode_collection_property::nodes_t>(m_visible_nodes.property_value());
+		const k3d::inode_collection_property::nodes_t visible_nodes = m_visible_nodes.pipeline_value();
 		for(k3d::inode_collection_property::nodes_t::const_iterator node = visible_nodes.begin(); node != visible_nodes.end(); ++node)
 		{
 			stream << pointer_id(*node);
