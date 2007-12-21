@@ -31,14 +31,12 @@ namespace k3d
 {
 
 class inode;
-class iplugin_factory;
 
 /// Provides domain-specific methods for a property that stores a collection of nodes as its value
 class inode_collection_property :
 	public virtual iunknown
 {
 public:
-	virtual bool property_allow(iplugin_factory& Factory) = 0;
 	virtual bool property_allow(inode& Object) = 0;
 
 	typedef std::vector<inode*> nodes_t;

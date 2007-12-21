@@ -62,7 +62,7 @@
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
-#include <k3dsdk/inode_visibility.h>
+#include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/ipersistent.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iscripted_action.h>
@@ -1703,8 +1703,12 @@ public:
 		}
 
 		// If the new node is a render-engine, make every node in the document visible ...
-		if(k3d::inode_visibility* const node_visibility = dynamic_cast<k3d::inode_visibility*>(node))
-			k3d::property::set_internal_value(node_visibility->visible_nodes(), document().nodes().collection());	
+		if(k3d::inode_collection_sink* const node_collection_sink = dynamic_cast<k3d::inode_collection_sink*>(node))
+		{
+			const k3d::inode_collection_sink::properties_t properties = node_collection_sink->node_collection_properties();
+			for(k3d::inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+				k3d::property::set_internal_value(**property, document().nodes().collection());
+		}
 
 		// Replace the current selection
 		deselect_all();

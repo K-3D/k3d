@@ -40,7 +40,7 @@
 #include <k3dsdk/inetwork_render_farm.h>
 #include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/inetwork_render_job.h>
-#include <k3dsdk/inode_visibility.h>
+#include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irender_camera_animation.h>
 #include <k3dsdk/irender_camera_frame.h>
@@ -77,7 +77,7 @@ namespace yafray
 
 class render_engine :
 	public k3d::persistent<k3d::node>,
-	public k3d::inode_visibility,
+	public k3d::inode_collection_sink,
 	public k3d::irender_camera_preview,
 	public k3d::irender_camera_frame,
 	public k3d::irender_camera_animation
@@ -87,10 +87,11 @@ class render_engine :
 public:
 	render_engine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_visible_nodes(init_owner(*this) + init_name("visible_nodes") + init_label(_("Visible Nodes")) + init_description(_("Visible Nodes")) + init_value(std::vector<k3d::inode*>())),
+		m_visible_nodes(init_owner(*this) + init_name("visible_nodes") + init_label(_("Visible Nodes")) + init_description(_("A list of nodes that will be visible in the rendered output.")) + init_value(std::vector<k3d::inode*>())),
+		m_enabled_lights(init_owner(*this) + init_name("enabled_lights") + init_label(_("Enabled Lights")) + init_description(_("A list of light sources that will contribute to the rendered output.")) + init_value(std::vector<k3d::inode*>())),
 		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("Resolution")) + init_description(_("Choose a predefined image resolution")) + init_enumeration(k3d::resolution_values()) + init_value(std::string(""))),
-		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("pixel_width")) + init_description(_("Output pixel width")) + init_value(320) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
-		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("pixel_height")) + init_description(_("Output pixel height")) + init_value(240) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
+		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("pixel_width")) + init_description(_("The horizontal size in pixels of the rendered output image.")) + init_value(320) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
+		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("pixel_height")) + init_description(_("The vertical size in pixels of the rendered output image.")) + init_value(240) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
 		m_AA_passes(init_owner(*this) + init_name("AA_passes") + init_label(_("AA_passes")) + init_description(_("AA passes")) + init_value(3) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0L))),
 		m_AA_minsamples(init_owner(*this) + init_name("AA_minsamples") + init_label(_("AA_minsamples")) + init_description(_("AA min samples")) + init_value(2) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0L))),
 		m_AA_pixelwidth(init_owner(*this) + init_name("AA_pixelwidth") + init_label(_("AA_pixelwidth")) + init_description(_("AA pixelwidth")) + init_value(1.5)),
@@ -107,9 +108,13 @@ public:
 		m_resolution.changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_resolution_changed));
 	}
 
-	k3d::iproperty& visible_nodes()
+	const k3d::inode_collection_sink::properties_t node_collection_properties()
 	{
-		return m_visible_nodes;
+		k3d::inode_collection_sink::properties_t results;
+		results.push_back(&m_visible_nodes);
+		results.push_back(&m_enabled_lights);
+
+		return results;
 	}
 
 	void on_resolution_changed(k3d::iunknown*)
@@ -455,7 +460,8 @@ private:
 
 			// Render geometry, keeping-track of names as we go ...
 			std::map<k3d::inode*, k3d::string_t> object_names;
-			const k3d::inode_collection_property::nodes_t visible_nodes = /*boost::any_cast<k3d::inode_collection_property::nodes_t>*/(m_visible_nodes.pipeline_value());
+
+			const k3d::inode_collection_property::nodes_t visible_nodes = m_visible_nodes.pipeline_value();
 			for(k3d::inode_collection_property::nodes_t::const_iterator node = visible_nodes.begin(); node != visible_nodes.end(); ++node)
 			{
 				const k3d::string_t object_name = "object_" + k3d::string_cast(object_names.size());
@@ -469,7 +475,9 @@ private:
 
 			// Setup lights, keeping-track of names as we go ...
 			std::map<k3d::yafray::ilight*, k3d::string_t> light_names;
-			for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+
+			const k3d::inode_collection_property::nodes_t enabled_lights = m_enabled_lights.pipeline_value();
+			for(k3d::inode_collection_property::nodes_t::const_iterator node = enabled_lights.begin(); node != enabled_lights.end(); ++node)
 			{
 				if(k3d::yafray::ilight* const light = dynamic_cast<k3d::yafray::ilight*>(*node))
 				{
@@ -553,11 +561,6 @@ private:
 		typedef k3d::data::writable_property<value_t, name_policy_t> base;
 
 	public:
-		bool property_allow(k3d::iplugin_factory&)
-		{
-			return false;
-		}
-
 		bool property_allow(k3d::inode& Node)
 		{
 			return Node.factory().factory_id() == k3d::classes::MeshInstance();
@@ -571,7 +574,29 @@ private:
 		}
 	};
 
+	template<typename value_t, class name_policy_t>
+	class yafray_enabled_lights_property :
+		public k3d::data::writable_property<value_t, name_policy_t>,
+		public k3d::inode_collection_property
+	{
+		typedef k3d::data::writable_property<value_t, name_policy_t> base;
+
+	public:
+		bool property_allow(k3d::inode& Node)
+		{
+			return dynamic_cast<k3d::yafray::ilight*>(&Node) ? true : false;
+		}
+
+	protected:
+		template<typename init_t>
+		yafray_enabled_lights_property(const init_t& Init) :
+			base(Init)
+		{
+		}
+	};
+
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, yafray_visible_nodes_property, node_collection_serialization) m_visible_nodes;
+	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, yafray_enabled_lights_property, node_collection_serialization) m_enabled_lights;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;

@@ -28,7 +28,7 @@
 #include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/inetwork_render_job.h>
 #include <k3dsdk/inode_collection_property.h>
-#include <k3dsdk/inode_visibility.h>
+#include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/irender_preview.h>
@@ -52,7 +52,7 @@ namespace graphviz
 
 class render_engine :
 	public k3d::persistent<k3d::node>,
-	public k3d::inode_visibility,
+	public k3d::inode_collection_sink,
 	public k3d::irender_preview,
 	public k3d::irender_frame
 {
@@ -67,9 +67,9 @@ public:
 	{
 	}
 
-	k3d::iproperty& visible_nodes()
+	const k3d::inode_collection_sink::properties_t node_collection_properties()
 	{
-		return m_visible_nodes;
+		return k3d::inode_collection_sink::properties_t(1, &m_visible_nodes);
 	}
 
 	bool render_preview()

@@ -1,5 +1,5 @@
-#ifndef K3DSDK_INODE_VISIBILITY_H
-#define K3DSDK_INODE_VISIBILITY_H
+#ifndef K3DSDK_INODE_COLLECTION_SINK_H
+#define K3DSDK_INODE_COLLECTION_SINK_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -31,22 +31,28 @@ namespace k3d
 
 class iproperty;
 
-/// Abstract interface for "render engine" objects that maintain an explicit list of visible nodes
-class inode_visibility :
+/// Abstract interface for objects that have one-or-more inode_collection_property properties.
+///
+/// Typically, inode_collection_sink is implemented by "render engine" objects that maintain
+/// explicit lists of "visible" nodes, "enabled" lights, etc.
+class inode_collection_sink :
 	public virtual iunknown
 {
 public:
-	/// Returns the property that will be used to store the list of visible nodes
-	virtual iproperty& visible_nodes() = 0;
+	/// Defines a collection of properties
+	typedef std::vector<iproperty*> properties_t;
+
+	/// Returns a set of inode_collection_property properties
+	virtual const properties_t node_collection_properties() = 0;
 
 protected:
-	inode_visibility() {}
-	inode_visibility(const inode_visibility&) {}
-	inode_visibility& operator=(const inode_visibility&) { return *this; }
-	virtual ~inode_visibility() {}
+	inode_collection_sink() {}
+	inode_collection_sink(const inode_collection_sink&) {}
+	inode_collection_sink& operator=(const inode_collection_sink&) { return *this; }
+	virtual ~inode_collection_sink() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_INODE_VISIBILITY_H
+#endif // K3DSDK_INODE_COLLECTION_SINK_H
 
