@@ -2,7 +2,7 @@
 #define K3DSDK_PROPERTY_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -48,9 +48,21 @@ iproperty* get(iunknown& Object, const std::string& Name)
 
 /// Returns the "internal" value of a property - the value of the property itself, regardless of any pipeline dependencies
 const boost::any internal_value(iunknown& Object, const std::string& Name);
+/// Returns the "internal" value of a property - the value of the property itself, regardless of any pipeline dependencies
+template<typename value_t>
+const value_t internal_value(iunknown& Object, const std::string& Name)
+{
+	return boost::any_cast<value_t>(internal_value(Object, Name));
+}
 
 /// Returns the "internal" value of a property - the value of the property itself, regardless of any pipeline dependencies
 const boost::any internal_value(iproperty& Property);
+/// Returns the "internal" value of a property - the value of the property itself, regardless of any pipeline dependencies
+template<typename value_t>
+const value_t internal_value(iproperty& Property)
+{
+	return boost::any_cast<value_t>(internal_value(Property));
+}
 
 /// Returns the "pipeline" value of a property - the value of the property, possibly overridden by pipeline dependencies
 const boost::any pipeline_value(iunknown& Object, const std::string& Name);
