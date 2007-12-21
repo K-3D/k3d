@@ -545,7 +545,33 @@ private:
 	}
 */
 
-	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, node_collection_serialization) m_visible_nodes;
+	template<typename value_t, class name_policy_t>
+	class yafray_visible_nodes_property :
+		public k3d::data::writable_property<value_t, name_policy_t>,
+		public k3d::inode_collection_property
+	{
+		typedef k3d::data::writable_property<value_t, name_policy_t> base;
+
+	public:
+		bool property_allow(k3d::iplugin_factory&)
+		{
+			return false;
+		}
+
+		bool property_allow(k3d::inode& Node)
+		{
+			return Node.factory().factory_id() == k3d::classes::MeshInstance();
+		}
+
+	protected:
+		template<typename init_t>
+		yafray_visible_nodes_property(const init_t& Init) :
+			base(Init)
+		{
+		}
+	};
+
+	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, yafray_visible_nodes_property, node_collection_serialization) m_visible_nodes;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
 	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;
