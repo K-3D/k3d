@@ -47,9 +47,9 @@ class poly_cube_implementation :
 public:
 	poly_cube_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_columns(init_owner(*this) + init_name("columns") + init_label(_("Columns")) + init_description(_("Column number (X axis)")) + init_value(1) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_rows(init_owner(*this) + init_name("rows") + init_label(_("Rows")) + init_description(_("Row number (Y axis)")) + init_value(1) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_slices(init_owner(*this) + init_name("slices") + init_label(_("Slices")) + init_description(_("Slice number (Z axis)")) + init_value(1) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_columns(init_owner(*this) + init_name("columns") + init_label(_("Columns")) + init_description(_("Column number (X axis)")) + init_value(1) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_rows(init_owner(*this) + init_name("rows") + init_label(_("Rows")) + init_description(_("Row number (Y axis)")) + init_value(1) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_slices(init_owner(*this) + init_name("slices") + init_label(_("Slices")) + init_description(_("Slice number (Z axis)")) + init_value(1) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Cube width")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Cube height")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_depth(init_owner(*this) + init_name("depth") + init_label(_("Depth")) + init_description(_("Cube depth")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
@@ -294,9 +294,9 @@ public:
 	}
 
 private:
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_columns;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_rows;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_slices;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_columns;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_rows;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_slices;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_width;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_depth;

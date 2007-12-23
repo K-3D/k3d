@@ -95,7 +95,7 @@ class quadric_decimation :
 public:
 	quadric_decimation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_face_number(init_owner(*this) + init_name("face_number") + init_label(_("Face number")) + init_description(_("Target face number")) + init_value(100) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_face_number(init_owner(*this) + init_name("face_number") + init_label(_("Face number")) + init_description(_("Target face number")) + init_value(100) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_contraction_type(init_owner(*this) + init_name("contraction_type") + init_label(_("Contraction type")) + init_description(_("Stop function")) + init_value(EDGE) + init_enumeration(contraction_values())),
 		m_placement_policy(init_owner(*this) + init_name("placement_policy") + init_label(_("Placement policy")) + init_description(_("Placement policy (optimal, line, endpoint or midpoint, endpoints)")) + init_value(OPTIMAL) + init_enumeration(placement_values())),
 		m_quadric_weighting(init_owner(*this) + init_name("quadric_weighting") + init_label(_("Quadric weighting")) + init_description(_("Quadric weighting policy (uniform, area, angle)")) + init_value(AREA) + init_enumeration(quadric_weighting_values())),
@@ -418,7 +418,7 @@ private:
 		return values;
 	}
 
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_face_number;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_face_number;
 	k3d_data(contraction_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_contraction_type;
 	k3d_data(placement_policy_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_placement_policy;
 	k3d_data(quadric_weighting_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_quadric_weighting;

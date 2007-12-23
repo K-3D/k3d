@@ -42,7 +42,7 @@ class select_edge_by_number :
 public:
 	select_edge_by_number(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_index(init_owner(*this) + init_name("index") + init_label(_("Edge Index")) + init_description(_("Edge Index")) + init_value(0L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0L)))
+		m_index(init_owner(*this) + init_name("index") + init_label(_("Edge Index")) + init_description(_("Edge Index")) + init_value(0L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0)))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_index.changed_signal().connect(make_update_mesh_slot());
@@ -77,7 +77,7 @@ public:
 	}
 
 private:
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_index;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_index;
 };
 
 /////////////////////////////////////////////////////////////////////////////

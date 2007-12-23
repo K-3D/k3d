@@ -56,7 +56,7 @@ public:
 		m_yz_plane(init_owner(*this) + init_name("yzplane") + init_label(_("YZ Plane")) + init_description(_("Display YZ plane as a grid")) + init_value(false)),
 		m_xz_plane(init_owner(*this) + init_name("xzplane") + init_label(_("XZ Plane")) + init_description(_("Display XZ plane as a grid")) + init_value(false)),
 		m_grid_size(init_owner(*this) + init_name("gridsize") + init_label(_("Grid Size")) + init_description(_("The size of each grid square")) + init_value(2.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_grid_count(init_owner(*this) + init_name("gridcount") + init_label(_("Grid Count")) + init_description(_("Number of squares along each grid")) + init_value(5) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
+		m_grid_count(init_owner(*this) + init_name("gridcount") + init_label(_("Grid Count")) + init_description(_("Number of squares along each grid")) + init_value(5) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
 		m_x_color(init_owner(*this) + init_name("xcolor") + init_label(_("X Color")) + init_description(_("X axis color")) + init_value(k3d::color(1, 0, 0))),
 		m_y_color(init_owner(*this) + init_name("ycolor") + init_label(_("Y Color")) + init_description(_("Y axis color")) + init_value(k3d::color(0, 0.7, 0))),
 		m_z_color(init_owner(*this) + init_name("zcolor") + init_label(_("Z Color")) + init_description(_("Z axis color")) + init_value(k3d::color(0, 0, 0.7))),
@@ -255,7 +255,7 @@ private:
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_yz_plane;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_xz_plane;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_grid_size;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_grid_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_grid_count;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_x_color;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_y_color;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_z_color;

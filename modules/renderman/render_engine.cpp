@@ -177,18 +177,18 @@ public:
 		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("Resolution")) + init_description(_("Choose a predefined image resolution")) + init_enumeration(k3d::resolution_values()) + init_value(std::string(""))),
 		m_render_engine(init_owner(*this) + init_name("render_engine") + init_label(_("Render Engine")) + init_description(_("Render Engine")) + init_value(k3d::options::default_render_engine("ri")) + init_values(render_engine_values())),
 		m_hider(init_owner(*this) + init_name("hider") + init_label(_("Hider")) + init_description(_("Hider Algorithm")) + init_value(std::string())),
-		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("Pixel Width")) + init_description(_("Output pixel width")) + init_value(320) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("Pixel Height")) + init_description(_("Output pixel height")) + init_value(240) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("Pixel Width")) + init_description(_("Output pixel width")) + init_value(320) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("Pixel Height")) + init_description(_("Output pixel height")) + init_value(240) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_pixel_aspect_ratio(init_owner(*this) + init_name("pixel_aspect_ratio") + init_label(_("Pixel Aspect Ratio")) + init_description(_("Output pixel aspect ratio")) + init_value(1.0) + init_constraint(constraint::minimum(std::numeric_limits<double>::epsilon())) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
 		m_default_atmosphere_shader(init_owner(*this) + init_name("default_atmosphere_shader") + init_label(_("Default Atmosphere Shader")) + init_description(_("Default atmosphere shader")) + init_value<k3d::ri::ivolume_shader*>(0)),
 		m_default_interior_shader(init_owner(*this) + init_name("default_interior_shader") + init_label(_("Default Interior Shader")) + init_description(_("Default interior shader")) + init_value<k3d::ri::ivolume_shader*>(0)),
 		m_default_exterior_shader(init_owner(*this) + init_name("default_exterior_shader") + init_label(_("Default Exterior Shader")) + init_description(_("Default exterior shader")) + init_value<k3d::ri::ivolume_shader*>(0)),
 		m_imager_shader(init_owner(*this) + init_name("imager_shader") + init_label(_("Imager Shader")) + init_description(_("Imager shader")) + init_value<k3d::ri::iimager_shader*>(0)),
-		m_bucket_width(init_owner(*this) + init_name("bucket_width") + init_label(_("Bucket Width")) + init_description(_("Bucket Width")) + init_value(16) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_bucket_height(init_owner(*this) + init_name("bucket_height") + init_label(_("Bucket Height")) + init_description(_("Bucket Height")) + init_value(16) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_grid_size(init_owner(*this) + init_name("grid_size") + init_label(_("Grid Size")) + init_description(_("Grid Size")) + init_value(256) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_eye_splits(init_owner(*this) + init_name("eye_splits") + init_label(_("Eye Splits")) + init_description(_("Eye Splits")) + init_value(10) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_texture_memory(init_owner(*this) + init_name("texture_memory") + init_label(_("Texture Memory")) + init_description(_("Texture Memory")) + init_value(1024) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_bucket_width(init_owner(*this) + init_name("bucket_width") + init_label(_("Bucket Width")) + init_description(_("Bucket Width")) + init_value(16) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_bucket_height(init_owner(*this) + init_name("bucket_height") + init_label(_("Bucket Height")) + init_description(_("Bucket Height")) + init_value(16) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_grid_size(init_owner(*this) + init_name("grid_size") + init_label(_("Grid Size")) + init_description(_("Grid Size")) + init_value(256) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_eye_splits(init_owner(*this) + init_name("eye_splits") + init_label(_("Eye Splits")) + init_description(_("Eye Splits")) + init_value(10) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_texture_memory(init_owner(*this) + init_name("texture_memory") + init_label(_("Texture Memory")) + init_description(_("Texture Memory")) + init_value(1024) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_render_alpha(init_owner(*this) + init_name("render_alpha") + init_label(_("Render Alpha")) + init_description(_("Render Alpha")) + init_value(false)),
 		m_pixel_xsamples(init_owner(*this) + init_name("pixel_xsamples") + init_label(_("Pixel X Samples")) + init_description(_("The smaller the faster, the higher the better (anti-aliasing)")) + init_value(3.0) + init_constraint(constraint::minimum(1.0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
 		m_pixel_ysamples(init_owner(*this) + init_name("pixel_ysamples") + init_label(_("Pixel Y Samples")) + init_description(_("The smaller the faster, the higher the better (anti-aliasing)")) + init_value(3.0) + init_constraint(constraint::minimum(1.0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
@@ -726,18 +726,18 @@ private:
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_render_engine;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_hider;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_aspect_ratio;
 	k3d_data(k3d::ri::ivolume_shader*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_default_atmosphere_shader;
 	k3d_data(k3d::ri::ivolume_shader*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_default_interior_shader;
 	k3d_data(k3d::ri::ivolume_shader*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_default_exterior_shader;
 	k3d_data(k3d::ri::iimager_shader*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_imager_shader;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_bucket_width;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_bucket_height;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_grid_size;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_eye_splits;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_texture_memory;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_bucket_width;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_bucket_height;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_grid_size;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_eye_splits;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_texture_memory;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_render_alpha;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_xsamples;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_ysamples;

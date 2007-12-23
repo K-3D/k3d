@@ -347,7 +347,7 @@ public:
 		base(Factory, Document),
 		m_font_path(init_owner(*this) + init_name("font") + init_label(_("Font")) + init_description(_("Font path")) + init_value(detail::default_font()) + init_path_mode(k3d::ipath_property::READ) + init_path_type(k3d::options::path::fonts())),
 		m_text(init_owner(*this) + init_name("text") + init_label(_("Text")) + init_description(_("Text")) + init_value<std::string>("Text!")),
-		m_curve_divisions(init_owner(*this) + init_name("curve_divisions") + init_label(_("Curve subdivisions")) + init_description(_("Bezier curves subdivision number")) + init_value(3) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_curve_divisions(init_owner(*this) + init_name("curve_divisions") + init_label(_("Curve subdivisions")) + init_description(_("Bezier curves subdivision number")) + init_value(3) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Font height")) + init_value(10.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::distance))),
 		m_orientation(init_owner(*this) + init_name("orientation") + init_label(_("Orientation")) + init_description(_("Orientation type (forward or backward along X, Y or Z axis)")) + init_value(k3d::PY) + init_enumeration(k3d::signed_axis_values()))
 	{
@@ -469,7 +469,7 @@ public:
 private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_font_path;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_text;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_curve_divisions;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_curve_divisions;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
 	k3d_data(k3d::signed_axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_orientation;
 };

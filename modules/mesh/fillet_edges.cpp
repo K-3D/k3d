@@ -1374,7 +1374,7 @@ class fillet_edges_implementation :
 public:
 	fillet_edges_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_segments(init_owner(*this) + init_name("segments") + init_label(_("Segments")) + init_description(_("Segment number")) + init_value(4L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
+		m_segments(init_owner(*this) + init_name("segments") + init_label(_("Segments")) + init_description(_("Segment number")) + init_value(4L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Fillet radius")) + init_value(0.3) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
 		m_segments.changed_signal().connect(make_reset_mesh_slot());
@@ -1457,7 +1457,7 @@ public:
 private:
 	detail::border_points_t m_border_points;
 
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_segments;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_segments;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
 };
 

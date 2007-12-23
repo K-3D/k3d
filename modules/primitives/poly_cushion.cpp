@@ -47,8 +47,8 @@ class poly_cushion_implementation :
 public:
 	poly_cushion_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_length_segments(init_owner(*this) + init_name("length_segments") + init_label(_("Length segments")) + init_description(_("Length segments")) + init_value(5) + init_constraint(constraint::minimum(1L)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
-		m_radial_segments(init_owner(*this) + init_name("radial_segments") + init_label(_("Radial segments")) + init_description(_("Radial segments")) + init_value(5) + init_constraint(constraint::minimum(1L)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
+		m_length_segments(init_owner(*this) + init_name("length_segments") + init_label(_("Length segments")) + init_description(_("Length segments")) + init_value(5) + init_constraint(constraint::minimum(1)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
+		m_radial_segments(init_owner(*this) + init_name("radial_segments") + init_label(_("Radial segments")) + init_description(_("Radial segments")) + init_value(5) + init_constraint(constraint::minimum(1)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
 		m_diameter(init_owner(*this) + init_name("diameter") + init_label(_("Diameter")) + init_description(_("Rounded parts diameter")) + init_value(4.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::distance))),
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Original cube width")) + init_value(8.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Original cube height")) + init_value(8.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
@@ -265,8 +265,8 @@ public:
 	}
 
 private:
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_length_segments;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_radial_segments;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_length_segments;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_radial_segments;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_diameter;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_width;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;

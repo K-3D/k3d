@@ -233,10 +233,10 @@ namespace detail
 	private:
 		k3d_data(bool,   immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_smooth;
 		//k3d_data(bool,   immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_symmetry;
-		k3d_data(int,    immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_steps;
+		k3d_data(k3d::int32_t,    immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_steps;
 		k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_h;
 		k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_omega;
-		k3d_data(int,    immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_divides;
+		k3d_data(k3d::int32_t,    immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_divides;
 		k3d_data(bool,   immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_triang;
 		int prev_steps;
 		bool smoothed;

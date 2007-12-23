@@ -69,7 +69,7 @@ class select_n_sided :
 public:
 	select_n_sided(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_sides(init_owner(*this) + init_name("sides") + init_label(_("Side number")) + init_description(_("Gives chosen side number")) + init_value(5L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
+		m_sides(init_owner(*this) + init_name("sides") + init_label(_("Side number")) + init_description(_("Gives chosen side number")) + init_value(5L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
 		m_operator(init_owner(*this) + init_name("operator") + init_label(_("Operator")) + init_description(_("Selection operator comparing with side number")) + init_value(EQUAL) + init_enumeration(operator_values())),
 		m_component(init_owner(*this) + init_name("component") + init_label(_("Component type")) + init_description(_("Components to be selected (faces or edges)")) + init_value(FACES) + init_enumeration(component_values()))
 	{
@@ -273,7 +273,7 @@ private:
 		return values;
 	}
 
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_sides;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_sides;
 	k3d_data(operator_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_operator;
 	k3d_data(component_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_component;
 };

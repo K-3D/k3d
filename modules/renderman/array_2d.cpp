@@ -51,8 +51,8 @@ public:
 		base(Factory, Document),
 		m_source(init_owner(*this) + init_name("source") + init_label(_("Source")) + init_description(_("Source")) + init_value<k3d::ri::irenderable*>(0)),
 		m_layout(init_owner(*this) + init_name("layout") + init_label(_("Layout")) + init_description(_("Layout")) + init_value<k3d::itransform_array_2d*>(0)),
-		m_count1(init_owner(*this) + init_name("count1") + init_label(_("Count 1")) + init_description(_("Dimension 1 Count")) + init_value(5) + init_constraint(constraint::minimum(0L)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
-		m_count2(init_owner(*this) + init_name("count2") + init_label(_("Count 2")) + init_description(_("Dimension 2 Count")) + init_value(5) + init_constraint(constraint::minimum(0L)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar)))
+		m_count1(init_owner(*this) + init_name("count1") + init_label(_("Count 1")) + init_description(_("Dimension 1 Count")) + init_value(5) + init_constraint(constraint::minimum(0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
+		m_count2(init_owner(*this) + init_name("count2") + init_label(_("Count 2")) + init_description(_("Dimension 2 Count")) + init_value(5) + init_constraint(constraint::minimum(0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_source.changed_signal().connect(make_async_redraw_slot());
 		m_layout.changed_signal().connect(make_async_redraw_slot());
@@ -170,8 +170,8 @@ public:
 private:
 	k3d_data(k3d::ri::irenderable*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_source;
 	k3d_data(k3d::itransform_array_2d*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_layout;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_count1;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_count2;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_count1;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_count2;
 };
 
 /////////////////////////////////////////////////////////////////////////////

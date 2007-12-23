@@ -43,8 +43,8 @@ public:
 		base(Factory, Document),
 		m_quadric(gluNewQuadric()),
 		m_power(init_owner(*this) + init_name("power") + init_label(_("power")) + init_description(_("Power")) + init_value(20.0)),
-		m_samples(init_owner(*this) + init_name("samples") + init_label(_("samples")) + init_description(_("Samples")) + init_value(256) + init_constraint(k3d::data::constraint::minimum(0L, k3d::data::constraint::maximum(1024L)))),
-		m_psamples(init_owner(*this) + init_name("psamples") + init_label(_("psamples")) + init_description(_("PSamples")) + init_value(256) + init_constraint(k3d::data::constraint::minimum(0L, k3d::data::constraint::maximum(1024L)))),
+		m_samples(init_owner(*this) + init_name("samples") + init_label(_("samples")) + init_description(_("Samples")) + init_value(256) + init_constraint(k3d::data::constraint::minimum(0, k3d::data::constraint::maximum(1024)))),
+		m_psamples(init_owner(*this) + init_name("psamples") + init_label(_("psamples")) + init_description(_("PSamples")) + init_value(256) + init_constraint(k3d::data::constraint::minimum(0, k3d::data::constraint::maximum(1024)))),
 		m_dummy(init_owner(*this) + init_name("dummy") + init_label(_("dummy")) + init_description(_("Dummy (global photon)")) + init_value(false))
 	{
 		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
@@ -167,8 +167,8 @@ private:
 	GLUquadricObj* const m_quadric;
 
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_power;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_samples;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_psamples;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_samples;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_psamples;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_dummy;
 };
 

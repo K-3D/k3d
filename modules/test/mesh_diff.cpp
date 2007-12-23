@@ -44,7 +44,7 @@ public:
 	mesh_diff(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_equal(init_owner(*this) + init_name("equal") + init_label(_("Equal")) + init_description(_("True iff all input meshes are completely equivalent")) + init_slot(sigc::mem_fun(*this, &mesh_diff::get_equal))),
-		m_threshold(init_owner(*this) + init_name("threshold") + init_label(_("Threshold")) + init_description(_("Sets the maximum allowable difference between floating-point numbers")) + init_value(0UL)),
+		m_threshold(init_owner(*this) + init_name("threshold") + init_label(_("Threshold")) + init_description(_("Sets the maximum allowable difference between floating-point numbers")) + init_value(0) + init_constraint(constraint::minimum(0))),
 		m_user_property_changed_signal(*this)
 	{
 		m_threshold.changed_signal().connect(m_equal.make_reset_slot());
@@ -53,7 +53,7 @@ public:
 
 	bool get_equal()
 	{
-		const unsigned long threshold = m_threshold.pipeline_value();
+		const k3d::int32_t threshold = m_threshold.pipeline_value();
 
 		const k3d::mesh* first_mesh = 0;
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
@@ -94,7 +94,7 @@ public:
 	}
 
 	k3d_data(bool, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_equal;
-	k3d_data(unsigned long, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_threshold;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_threshold;
 
 	k3d::user_property_changed_signal m_user_property_changed_signal;
 };

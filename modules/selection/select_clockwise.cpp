@@ -52,7 +52,7 @@ class select_clockwise :
 public:
 	select_clockwise(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_number(init_owner(*this) + init_name("number") + init_label(_("number")) + init_description(_("Edge number")) + init_constraint(constraint::minimum(0L)) + init_value(0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+		m_number(init_owner(*this) + init_name("number") + init_label(_("number")) + init_description(_("Edge number")) + init_constraint(constraint::minimum(0)) + init_value(0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
 		m_number.changed_signal().connect(make_reset_mesh_slot());
@@ -111,7 +111,7 @@ public:
 		return factory;
 	}
 private:
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_number;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_number;
 };
 
 /////////////////////////////////////////////////////////////////////////////

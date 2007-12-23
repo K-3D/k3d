@@ -1626,12 +1626,12 @@ private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_recursion;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_basic_angle;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_thickness;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_random_seed;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_random_seed;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_size;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_closed_form;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_mutations;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_mutation_seed;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_max_stack_size;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_mutations;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_mutation_seed;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_max_stack_size;
 	k3d_data(k3d::signed_axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_orientation;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_flip_normals;
 };

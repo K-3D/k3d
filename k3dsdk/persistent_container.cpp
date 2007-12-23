@@ -187,6 +187,8 @@ void persistent_container::load(xml::element& Element, const ipersistent::load_c
 			{
 				if(type == type_string<k3d::bool_t>())
 					load_user_property<user::k3d_bool_t_property>(*element->second, Context, *property_collection, *persistent_container, *object, false);
+				else if(type == type_string<k3d::int32_t>())
+					load_user_property<user::k3d_int32_t_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
 				else if(type == type_string<k3d::double_t>())
 					load_user_property<user::k3d_double_t_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
 				else if(type == type_string<k3d::string_t>())

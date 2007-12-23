@@ -81,7 +81,7 @@ public:
 	{
 	}
 
-	unsigned long get_point_count()
+	k3d::int32_t get_point_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -92,7 +92,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_polyhedron_count()
+	k3d::int32_t get_polyhedron_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -103,7 +103,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_edge_count()
+	k3d::int32_t get_edge_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -114,7 +114,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_face_count()
+	k3d::int32_t get_face_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -125,7 +125,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_linear_curve_group_count()
+	k3d::int32_t get_linear_curve_group_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -136,7 +136,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_linear_curve_count()
+	k3d::int32_t get_linear_curve_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -147,7 +147,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_cubic_curve_group_count()
+	k3d::int32_t get_cubic_curve_group_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -158,7 +158,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_cubic_curve_count()
+	k3d::int32_t get_cubic_curve_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -169,7 +169,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_nucurve_group_count()
+	k3d::int32_t get_nucurve_group_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -180,7 +180,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_nucurve_count()
+	k3d::int32_t get_nucurve_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -191,7 +191,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_bilinear_patch_count()
+	k3d::int32_t get_bilinear_patch_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -202,7 +202,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_bicubic_patch_count()
+	k3d::int32_t get_bicubic_patch_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -213,7 +213,7 @@ public:
 		return 0;
 	}
 
-	unsigned long get_nupatch_count()
+	k3d::int32_t get_nupatch_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
 		{
@@ -239,19 +239,19 @@ public:
 	}
 
 private:
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_point_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_polyhedron_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_edge_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_face_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_linear_curve_group_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_linear_curve_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_cubic_curve_group_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_cubic_curve_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_nucurve_group_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_nucurve_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_bilinear_patch_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_bicubic_patch_count;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_nupatch_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_point_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_polyhedron_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_edge_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_face_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_linear_curve_group_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_linear_curve_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_cubic_curve_group_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_cubic_curve_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_nucurve_group_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_nucurve_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_bilinear_patch_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_bicubic_patch_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_nupatch_count;
 };
 
 /////////////////////////////////////////////////////////////////////////////

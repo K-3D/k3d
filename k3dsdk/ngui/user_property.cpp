@@ -183,6 +183,8 @@ private:
 		{
 			if(user_type == k3d_bool_t)
 				k3d::undoable_new(k3d::user::create_property<k3d::user::k3d_bool_t_property>(name, label, description, node().document(), *property_collection, *persistent_container, &node(), false), node().document());
+			else if(user_type == k3d_int32_t)
+				k3d::undoable_new(k3d::user::create_property<k3d::user::k3d_int32_t_property>(name, label, description, node().document(), *property_collection, *persistent_container, &node(), 0), node().document());
 			else if(user_type == k3d_double_t)
 				k3d::undoable_new(k3d::user::create_property<k3d::user::k3d_double_t_property>(name, label, description, node().document(), *property_collection, *persistent_container, &node(), 0.0), node().document());
 			else if(user_type == k3d_string_t)
@@ -313,6 +315,7 @@ private:
 	typedef enum
 	{
 		k3d_bool_t,
+		k3d_int32_t,
 		k3d_double_t,
 		k3d_string_t,
 		k3d_point3,
@@ -336,6 +339,7 @@ private:
 		if(values.empty())
 		{
 			values.push_back(k3d::ienumeration_property::enumeration_value_t("Boolean", "k3d::bool_t",""));
+			values.push_back(k3d::ienumeration_property::enumeration_value_t("Integer", "k3d::int32_t",""));
 			values.push_back(k3d::ienumeration_property::enumeration_value_t("Scalar", "k3d::double_t", ""));
 			values.push_back(k3d::ienumeration_property::enumeration_value_t("String", "k3d::string_t", ""));
 			values.push_back(k3d::ienumeration_property::enumeration_value_t("3D Point", "k3d::point3", ""));
@@ -362,6 +366,9 @@ private:
 		{
 			case k3d_bool_t:
 				Stream << "k3d::bool_t";
+				break;
+			case k3d_int32_t:
+				Stream << "k3d::int32_t";
 				break;
 			case k3d_double_t:
 				Stream << "k3d::double_t";
@@ -420,6 +427,8 @@ private:
 
 		if (text == "k3d::bool_t")
 			Value = k3d_bool_t;
+		else if (text == "k3d::int32_t")
+			Value = k3d_int32_t;
 		else if (text == "k3d::double_t")
 			Value = k3d_double_t;
 		else if (text == "k3d::string_t")

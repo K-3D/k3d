@@ -56,7 +56,7 @@ private:
 
 	virtual long on_create_long() = 0;
 
-	k3d_data(long, data::immutable_name, data::change_signal, data::no_undo, data::computed_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_long;
+	k3d_data(k3d::int32_t, data::immutable_name, data::change_signal, data::no_undo, data::computed_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_long;
 };
 
 } // namespace k3d

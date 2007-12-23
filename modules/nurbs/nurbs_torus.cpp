@@ -50,8 +50,8 @@ public:
 		m_phimin(init_owner(*this) + init_name("phimin") + init_label(_("phimin")) + init_description(_("Phi Minimum")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
 		m_phimax(init_owner(*this) + init_name("phimax") + init_label(_("phimax")) + init_description(_("Phi Maximum")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
 		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("thetamax")) + init_description(_("Theta Maximum")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
-		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("U Segments")) + init_value(4) + init_constraint(constraint::minimum(3L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("v_segments")) + init_description(_("V Segments")) + init_value(4) + init_constraint(constraint::minimum(3L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("U Segments")) + init_value(4) + init_constraint(constraint::minimum(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("v_segments")) + init_description(_("V Segments")) + init_value(4) + init_constraint(constraint::minimum(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_material.changed_signal().connect(make_reset_mesh_slot());
 		m_majorradius.changed_signal().connect(make_reset_mesh_slot());
@@ -126,8 +126,8 @@ private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_phimin;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_phimax;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_thetamax;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_segments;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_v_segments;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_segments;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_v_segments;
 };
 
 /////////////////////////////////////////////////////////////////////////////

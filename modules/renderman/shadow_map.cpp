@@ -59,8 +59,8 @@ public:
 		m_create_shadow_map(init_owner(*this) + init_name("create") + init_label(_("create")) + init_description(_("Create shadow map during rendering")) + init_value(true)),
 		m_view_shadow_map(init_owner(*this) + init_name("view") + init_label(_("view")) + init_description(_("View shadow map creation during rendering")) + init_value(true)),
 		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("Resolution")) + init_description(_("Choose a predefined image resolution")) + init_enumeration(k3d::resolution_values()) + init_value(std::string(""))),
-		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("pixel_width")) + init_description(_("Output pixel width")) + init_value(256) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("pixel_height")) + init_description(_("Output pixel height")) + init_value(256) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("pixel_width")) + init_description(_("Output pixel width")) + init_value(256) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("pixel_height")) + init_description(_("Output pixel height")) + init_value(256) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_pixel_aspect_ratio(init_owner(*this) + init_name("pixel_aspect_ratio") + init_label(_("pixel_aspect_ratio")) + init_description(_("Output pixel aspect ratio")) + init_value(1.0) + init_constraint(constraint::minimum(std::numeric_limits<double>::epsilon())) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_resolution.changed_signal().connect(sigc::mem_fun(*this, &shadow_map::on_resolution_changed));
@@ -196,8 +196,8 @@ private:
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_create_shadow_map;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_view_shadow_map;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_aspect_ratio;
 
 	k3d::filesystem::path m_shadow_map_path;

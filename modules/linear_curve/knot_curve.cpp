@@ -49,9 +49,9 @@ class knot_curve :
 public:
 	knot_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_edge_count(init_owner(*this) + init_name("edgecount") + init_label(_("Edge count")) + init_description(_("Number of edges building up the curve")) + init_value(100) + init_constraint(constraint::minimum(3L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_meridian_wraps(init_owner(*this) + init_name("meridianwraps") + init_label(_("Meridian wraps")) + init_description(_("Number of meridian wraps")) + init_value(3) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_longitudinal_wraps(init_owner(*this) + init_name("longitudinalwraps") + init_label(_("Longitudinal wraps")) + init_description(_("Number of longitudinal wraps")) + init_value(4) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_edge_count(init_owner(*this) + init_name("edgecount") + init_label(_("Edge count")) + init_description(_("Number of edges building up the curve")) + init_value(100) + init_constraint(constraint::minimum(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_meridian_wraps(init_owner(*this) + init_name("meridianwraps") + init_label(_("Meridian wraps")) + init_description(_("Number of meridian wraps")) + init_value(3) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_longitudinal_wraps(init_owner(*this) + init_name("longitudinalwraps") + init_label(_("Longitudinal wraps")) + init_description(_("Number of longitudinal wraps")) + init_value(4) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_scale(init_owner(*this) + init_name("scale") + init_label(_("Scale")) + init_description(_("Knot scale")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Curve width")) + init_value(0.1) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_wrap(init_owner(*this) + init_name("closed") + init_label(_("Closed")) + init_description(_("Closed curve (loop)")) + init_value(true))
@@ -121,9 +121,9 @@ public:
 	}
 
 private:
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_edge_count;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_meridian_wraps;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_longitudinal_wraps;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_edge_count;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_meridian_wraps;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_longitudinal_wraps;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_scale;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_width;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_wrap;

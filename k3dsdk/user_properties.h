@@ -213,6 +213,7 @@ private:
 } // namespace detail
 
 typedef user_property<k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_bool_t_property;
+typedef user_property<k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_int32_t_property;
 typedef user_property<k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_double_t_property;
 typedef user_property<k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_string_t_property;
 typedef user_property<k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, detail::with_serialization)> k3d_point3_property;

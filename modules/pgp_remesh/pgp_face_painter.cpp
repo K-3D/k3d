@@ -336,7 +336,7 @@ private:
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_phi;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_iso;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_check;
-	k3d_data(int, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_tex_scale;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_tex_scale;
 
 };
 

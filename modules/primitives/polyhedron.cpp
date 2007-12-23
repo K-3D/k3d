@@ -1437,7 +1437,7 @@ public:
 	polyhedron_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_document(Document),
-		m_number(init_owner(*this) + init_name("number") + init_label(_("Number")) + init_description(_("Polyhedron Number")) + init_value(1) + init_constraint(constraint::minimum(1L, constraint::maximum(80L))) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_number(init_owner(*this) + init_name("number") + init_label(_("Number")) + init_description(_("Polyhedron Number")) + init_value(1) + init_constraint(constraint::minimum(1, constraint::maximum(80))) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_dual(init_owner(*this) + init_name("dual") + init_label(_("Dual")) + init_description(_("Polyhedron's dual")) + init_value(false)),
 		m_size(init_owner(*this) + init_name("size") + init_label(_("Size")) + init_description(_("Polyhedron size (scale)")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar)))
 	{
@@ -1511,7 +1511,7 @@ public:
 
 private:
 	k3d::idocument& m_document;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_number;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_number;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_dual;
 
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_size;

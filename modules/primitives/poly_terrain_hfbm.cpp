@@ -116,7 +116,7 @@ class poly_terrain_hfbm_implementation :
 public:
 	poly_terrain_hfbm_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_iterations(init_owner(*this) + init_name("iterations") + init_label(_("Iterations")) + init_description(_("Iterations")) + init_value(4) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_iterations(init_owner(*this) + init_name("iterations") + init_label(_("Iterations")) + init_description(_("Iterations")) + init_value(4) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_fractal_dimension(init_owner(*this) + init_name("dimension") + init_label(_("Dimension")) + init_description(_("Fractal dimension")) + init_value(0.5) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_lacunarity(init_owner(*this) + init_name("lacunarity") + init_label(_("Lacunarity")) + init_description(_("Lacunarity")) + init_value(0.6) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_octaves(init_owner(*this) + init_name("octaves") + init_label(_("Octaves")) + init_description(_("Octaves")) + init_value(4.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
@@ -246,7 +246,7 @@ public:
 	}
 
 private:
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_iterations;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_iterations;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_fractal_dimension;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_lacunarity;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_octaves;

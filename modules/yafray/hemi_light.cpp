@@ -43,7 +43,7 @@ public:
 		base(Factory, Document),
 		m_quadric(gluNewQuadric()),
 		m_power(init_owner(*this) + init_name("power") + init_label(_("power")) + init_description(_("Power")) + init_value(2.0)),
-		m_samples(init_owner(*this) + init_name("samples") + init_label(_("samples")) + init_description(_("Samples")) + init_value(256) + init_constraint(k3d::data::constraint::minimum(0L, k3d::data::constraint::maximum(1024L)))),
+		m_samples(init_owner(*this) + init_name("samples") + init_label(_("samples")) + init_description(_("Samples")) + init_value(256) + init_constraint(k3d::data::constraint::minimum(0, k3d::data::constraint::maximum(1024)))),
 		m_use_QMC(init_owner(*this) + init_name("use_QMC") + init_label(_("use_QMC")) + init_description(_("Use QMC")) + init_value(false)),
 		m_maxdistance(init_owner(*this) + init_name("maxdistance") + init_label(_("maxdistance")) + init_description(_("Max. distance")) + init_value(-1.0))
 	{
@@ -140,7 +140,7 @@ private:
 	GLUquadricObj* const m_quadric;
 
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_power;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_samples;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_samples;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_use_QMC;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_maxdistance;
 };

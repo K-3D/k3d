@@ -331,8 +331,8 @@ public:
 		base(Factory, Document),
 		m_minima_selection(init_owner(*this) + init_name("minima_selection") + init_label(_("Minima selection")) + init_description(_("Minima Selection")) + init_value(k3d::legacy::mesh_selection())),
 		m_maxima_selection(init_owner(*this) + init_name("maxima_selection") + init_label(_("Maxima selection")) + init_description(_("Maxima Selection")) + init_value(k3d::legacy::mesh_selection())),
-		m_min_index(init_owner(*this) + init_name("min_index") + init_label(_("Min index")) + init_description(_("Min index")) + init_value(0) + init_constraint(constraint::minimum(0L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_max_index(init_owner(*this) + init_name("max_index") + init_label(_("Max index")) + init_description(_("Max index")) + init_value(0) + init_constraint(constraint::minimum(0L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_min_index(init_owner(*this) + init_name("min_index") + init_label(_("Min index")) + init_description(_("Min index")) + init_value(0) + init_constraint(constraint::minimum(0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_max_index(init_owner(*this) + init_name("max_index") + init_label(_("Max index")) + init_description(_("Max index")) + init_value(0) + init_constraint(constraint::minimum(0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_h1(init_owner(*this) + init_name("gradient_spacing") + init_label(_("Gradient spacing")) + init_description(_("Gradient spacing")) + init_value(0.4) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
 		m_h2(init_owner(*this) + init_name("iso_spacing") + init_label(_("Iso spacing")) + init_description(_("Iso spacing")) + init_value(0.4) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
 		m_minima_value(init_owner(*this) + init_name("minima_value") + init_label(_("Minima value")) + init_description(_("Minima value")) + init_value(-1000) + init_step_increment(10) + init_units(typeid(k3d::measurement::scalar))),
@@ -3263,8 +3263,8 @@ if(crossing)
 	// User defined values
 	k3d_data(k3d::legacy::mesh_selection, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, k3d::legacy::mesh_selection_serialization) m_minima_selection;
 	k3d_data(k3d::legacy::mesh_selection, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, k3d::legacy::mesh_selection_serialization) m_maxima_selection;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_min_index;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_max_index;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_min_index;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_max_index;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_h1;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_h2;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_minima_value;

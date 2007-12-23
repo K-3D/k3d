@@ -69,7 +69,7 @@ public:
 	vbo_sds_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document, const k3d::color Unselected = k3d::color(0.2,0.2,0.2), const k3d::color Selected = k3d::color(0.6,0.6,0.6)) :
 		base(Factory, Document, Unselected, Selected),
 		m_sds_cache(k3d::painter_cache<sds_cache>::instance(Document)),
-		m_levels(init_owner(*this) + init_name("levels") + init_label(_("Levels")) + init_description(_("Number of SDS levels")) + init_value(2) + init_constraint(constraint::minimum(2L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_levels(init_owner(*this) + init_name("levels") + init_label(_("Levels")) + init_description(_("Number of SDS levels")) + init_value(2) + init_constraint(constraint::minimum(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_selection_cache(k3d::painter_cache<selection_t>::instance(Document)),
 		m_vbo_cache(k3d::painter_cache<vbo_t, key_t>::instance(Document))
 	{
@@ -183,7 +183,7 @@ public:
 
 protected:
 	k3d::painter_cache<sds_cache>& m_sds_cache;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_levels;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_levels;
 	
 	/// Hint processor implementation
 	void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)

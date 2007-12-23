@@ -49,7 +49,7 @@ class catmull_clark_subdivider :
 public:
 	catmull_clark_subdivider(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_level(init_owner(*this) + init_name("level") + init_label(_("Level")) + init_description(_("Subdivision level")) + init_constraint(constraint::minimum(1L)) + init_value(1) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+		m_level(init_owner(*this) + init_name("level") + init_label(_("Level")) + init_description(_("Subdivision level")) + init_constraint(constraint::minimum(1)) + init_value(1) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
 		m_level.changed_signal().connect(make_reset_mesh_slot());
@@ -92,7 +92,7 @@ public:
 	}
 
 private:
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_level;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_level;
 
 	//k3d::sds::k3d_mesh_sds_cache m_sds_cache;
 };

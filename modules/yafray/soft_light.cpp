@@ -44,7 +44,7 @@ public:
 		m_quadric(gluNewQuadric()),
 		m_power(init_owner(*this) + init_name("power") + init_label(_("power")) + init_description(_("Power")) + init_value(400.0)),
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Softness")) + init_value(5.0)),
-		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("resolution")) + init_description(_("Shadowmap resolution")) + init_value(256) + init_constraint(k3d::data::constraint::minimum(0L, k3d::data::constraint::maximum(4096L)))),
+		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("resolution")) + init_description(_("Shadowmap resolution")) + init_value(256) + init_constraint(k3d::data::constraint::minimum(0, k3d::data::constraint::maximum(4096)))),
 		m_bias(init_owner(*this) + init_name("bias") + init_label(_("bias")) + init_description(_("Shadowmap bias")) + init_value(0.01)),
 		m_glow_intensity(init_owner(*this) + init_name("glow_intensity") + init_label(_("glow_intensity")) + init_description(_("Glow intensity")) + init_value(0)),
 		m_glow_type(init_owner(*this) + init_name("glow_type") + init_label(_("glow_type")) + init_description(_("Glow type")) + init_value(0)),
@@ -127,10 +127,10 @@ private:
 
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_power;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_radius;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_resolution;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_resolution;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_bias;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_glow_intensity;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_glow_type;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_glow_type;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_glow_offset;
 };
 

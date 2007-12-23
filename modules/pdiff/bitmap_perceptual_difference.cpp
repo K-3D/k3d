@@ -211,7 +211,7 @@ private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_field_of_view;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_gamma;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_luminance;
-	k3d_data(unsigned long, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_difference;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_difference;
 	k3d_data(k3d::bitmap*, immutable_name, change_signal, no_undo, demand_storage, no_constraint, read_only_property, no_serialization) m_bitmap_o;
 
 	unsigned long m_difference_pixels;

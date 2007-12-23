@@ -47,9 +47,9 @@ public:
 	array_3d_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_layout(init_owner(*this) + init_name("layout") + init_label(_("Layout")) + init_description(_("Layout")) + init_value<k3d::itransform_array_3d*>(0)),
-		m_count1(init_owner(*this) + init_name("count1") + init_label(_("Count 1")) + init_description(_("Number of mesh copies")) + init_value(5) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0L))),
-		m_count2(init_owner(*this) + init_name("count2") + init_label(_("Count 2")) + init_description(_("Number of mesh copies")) + init_value(5) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0L))),
-		m_count3(init_owner(*this) + init_name("count3") + init_label(_("Count 3")) + init_description(_("Number of mesh copies")) + init_value(5) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0L)))
+		m_count1(init_owner(*this) + init_name("count1") + init_label(_("Count 1")) + init_description(_("Number of mesh copies")) + init_value(5) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0))),
+		m_count2(init_owner(*this) + init_name("count2") + init_label(_("Count 2")) + init_description(_("Number of mesh copies")) + init_value(5) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0))),
+		m_count3(init_owner(*this) + init_name("count3") + init_label(_("Count 3")) + init_description(_("Number of mesh copies")) + init_value(5) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0)))
 	{
 		m_layout.changed_signal().connect(make_reset_mesh_slot());
 		m_count1.changed_signal().connect(make_reset_mesh_slot());
@@ -112,9 +112,9 @@ public:
 
 private:
 	k3d_data(k3d::itransform_array_3d*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_layout;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_count1;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_count2;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_count3;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_count1;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_count2;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_count3;
 };
 
 /////////////////////////////////////////////////////////////////////////////

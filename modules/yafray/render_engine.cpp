@@ -90,13 +90,13 @@ public:
 		m_visible_nodes(init_owner(*this) + init_name("visible_nodes") + init_label(_("Visible Nodes")) + init_description(_("A list of nodes that will be visible in the rendered output.")) + init_value(std::vector<k3d::inode*>())),
 		m_enabled_lights(init_owner(*this) + init_name("enabled_lights") + init_label(_("Enabled Lights")) + init_description(_("A list of light sources that will contribute to the rendered output.")) + init_value(std::vector<k3d::inode*>())),
 		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("Resolution")) + init_description(_("Choose a predefined image resolution")) + init_enumeration(k3d::resolution_values()) + init_value(std::string(""))),
-		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("pixel_width")) + init_description(_("The horizontal size in pixels of the rendered output image.")) + init_value(320) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
-		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("pixel_height")) + init_description(_("The vertical size in pixels of the rendered output image.")) + init_value(240) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1L))),
-		m_AA_passes(init_owner(*this) + init_name("AA_passes") + init_label(_("AA_passes")) + init_description(_("AA passes")) + init_value(3) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0L))),
-		m_AA_minsamples(init_owner(*this) + init_name("AA_minsamples") + init_label(_("AA_minsamples")) + init_description(_("AA min samples")) + init_value(2) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0L))),
+		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("pixel_width")) + init_description(_("The horizontal size in pixels of the rendered output image.")) + init_value(320) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
+		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("pixel_height")) + init_description(_("The vertical size in pixels of the rendered output image.")) + init_value(240) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
+		m_AA_passes(init_owner(*this) + init_name("AA_passes") + init_label(_("AA_passes")) + init_description(_("AA passes")) + init_value(3) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0))),
+		m_AA_minsamples(init_owner(*this) + init_name("AA_minsamples") + init_label(_("AA_minsamples")) + init_description(_("AA min samples")) + init_value(2) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0))),
 		m_AA_pixelwidth(init_owner(*this) + init_name("AA_pixelwidth") + init_label(_("AA_pixelwidth")) + init_description(_("AA pixelwidth")) + init_value(1.5)),
 		m_AA_threshold(init_owner(*this) + init_name("AA_threshold") + init_label(_("AA_threshold")) + init_description(_("AA threshold")) + init_value(0.05)),
-		m_raydepth(init_owner(*this) + init_name("raydepth") + init_label(_("raydepth")) + init_description(_("raydepth")) + init_value(3) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0L))),
+		m_raydepth(init_owner(*this) + init_name("raydepth") + init_label(_("raydepth")) + init_description(_("raydepth")) + init_value(3) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0))),
 		m_bias(init_owner(*this) + init_name("bias") + init_label(_("bias")) + init_description(_("bias")) + init_value(0.1)),
 		m_save_alpha(init_owner(*this) + init_name("save_alpha") + init_label(_("save_alpha")) + init_description(_("Save alpha")) + init_value(false)),
 		m_exposure(init_owner(*this) + init_name("exposure") + init_label(_("exposure")) + init_description(_("exposure")) + init_value(0.0)),
@@ -598,14 +598,14 @@ private:
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, yafray_visible_nodes_property, node_collection_serialization) m_visible_nodes;
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, yafray_enabled_lights_property, node_collection_serialization) m_enabled_lights;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;
 
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_AA_passes;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_AA_minsamples;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_AA_passes;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_AA_minsamples;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_AA_pixelwidth;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_AA_threshold;
-	k3d_data(long, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_raydepth;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_raydepth;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_bias;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_save_alpha;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_exposure;
