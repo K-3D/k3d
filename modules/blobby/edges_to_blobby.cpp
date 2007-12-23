@@ -31,7 +31,10 @@
 #include <iterator>
 #include <set>
 
-namespace libk3dblobbies
+namespace module
+{
+
+namespace blobby
 {
 
 namespace detail
@@ -262,6 +265,7 @@ k3d::iplugin_factory& edges_to_blobby_factory()
 	return edges_to_blobby_implementation::get_factory();
 }
 
-} // namespace libk3dblobbies
+} // namespace blobby
 
+} // namespace module
 

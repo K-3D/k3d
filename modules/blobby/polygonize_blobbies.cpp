@@ -32,7 +32,10 @@
 #include <k3dsdk/surface_polygonizer/blobby_polygonizer.h>
 #include <k3dsdk/types_ri.h>
 
-namespace libk3dblobbies
+namespace module
+{
+
+namespace blobby
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -139,5 +142,7 @@ k3d::iplugin_factory& polygonize_blobbies_factory()
 	return polygonize_blobbies_implementation::get_factory();
 }
 
-} // namespace libk3dblobbies
+} // namespace blobby
+
+} // namespace module
 

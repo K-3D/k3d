@@ -30,7 +30,10 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dblobbies
+namespace module
+{
+
+namespace blobby
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -714,6 +717,7 @@ k3d::iplugin_factory& blobby_div_operator_factory()
 	return blobby_div_operator::get_factory();
 }
 
-} // namespace libk3dblobbies
+} // namespace blobby
 
+} // namespace module
 

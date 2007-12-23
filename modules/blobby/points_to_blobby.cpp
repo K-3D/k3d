@@ -31,7 +31,10 @@
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/shared_pointer.h>
 
-namespace libk3dblobbies
+namespace module
+{
+
+namespace blobby
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -134,5 +137,7 @@ k3d::iplugin_factory& points_to_blobby_factory()
 	return points_to_blobby_implementation::get_factory();
 }
 
-} // namespace libk3dblobbies
+} // namespace blobby
+
+} // namespace module
 
