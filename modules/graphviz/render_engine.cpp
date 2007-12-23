@@ -62,7 +62,8 @@ public:
 	render_engine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_visible_nodes(init_owner(*this) + init_name("visible_nodes") + init_label(_("Visible Nodes")) + init_description(_("Visible Nodes")) + init_value(std::vector<k3d::inode*>())),
-		m_property_labels(init_owner(*this) + init_name("property_labels") + init_label(_("Show Property Labels")) + init_description(_("Display property labels in the rendered image.")) + init_value(true)),
+		m_show_property_labels(init_owner(*this) + init_name("show_property_labels") + init_label(_("Show Property Labels")) + init_description(_("Display property labels in the rendered image.")) + init_value(true)),
+		m_show_property_loops(init_owner(*this) + init_name("show_property_loops") + init_label(_("Show Property Loops")) + init_description(_("Display property connections that originate and terminate on the same node.")) + init_value(true)),
 		m_render_engine(init_owner(*this) + init_name("render_engine") + init_label(_("Render engine")) + init_description(_("Render engine name")) + init_value(k3d::string_t("dot")) + init_values(render_engine_values()))
 	{
 	}
@@ -176,14 +177,15 @@ private:
 		k3d::filesystem::ofstream stream(filepath);
 		return_val_if_fail(stream.good(), false);
 
-		const bool property_labels = m_property_labels.pipeline_value();
+		const k3d::bool_t show_property_labels = m_show_property_labels.pipeline_value();
+		const k3d::bool_t show_property_loops = m_show_property_loops.pipeline_value();
 
 		// Setup the frame for GraphViz rendering ...
 		Frame.add_render_operation("graphviz", m_render_engine.pipeline_value(), filepath, false);
 
 		stream << "digraph \"" << boost::any_cast<k3d::ustring>(document().title().property_value()).raw() << "\"\n";
 		stream << "{\n\n";
-		stream << "rankdir=TD\n\n";
+		stream << "rankdir=LR\n\n";
 		stream << "node [shape=box,style=filled,width=0,height=0]\n\n";
 
 		// Create a mapping of properties-to-nodes as we go ...
@@ -212,15 +214,24 @@ private:
 		const k3d::ipipeline::dependencies_t dependencies = document().pipeline().dependencies();
 		for(k3d::ipipeline::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
 		{
-			if(property_node_map.count(dependency->first) && property_node_map.count(dependency->second))
+			k3d::iproperty* const source_property = dependency->second;
+			k3d::iproperty* const target_property = dependency->first;
+
+			if(property_node_map.count(source_property) && property_node_map.count(target_property))
 			{
-				stream << pointer_id(property_node_map[dependency->second]) << " -> " << pointer_id(property_node_map[dependency->first]);
+				k3d::inode* const source_node = property_node_map[source_property];
+				k3d::inode* const target_node = property_node_map[target_property];
+
+				if((source_node == target_node) && !show_property_loops)
+					continue;
+
+				stream << pointer_id(source_node) << " -> " << pointer_id(target_node);
 				stream << " [";
 
-				if(property_labels)
+				if(show_property_labels)
 				{
-					stream << " headlabel=\"" << escaped_string(dependency->first->property_name()) << "\"";
-					stream << " taillabel=\"" << escaped_string(dependency->second->property_name()) << "\"";
+					stream << " headlabel=\"" << escaped_string(target_property->property_name()) << "\"";
+					stream << " taillabel=\"" << escaped_string(source_property->property_name()) << "\"";
 				}
 
 				stream << " ]\n";
@@ -240,7 +251,7 @@ private:
 						stream << pointer_id(referenced_node) << " -> " << pointer_id(property->second);
 						stream << " [";
 
-						if(property_labels)
+						if(show_property_labels)
 						{
 							stream << " style=dotted,label=\"" << escaped_string(property->first->property_name()) << "\"";
 						}
@@ -257,7 +268,8 @@ private:
 	}
 
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, node_collection_serialization) m_visible_nodes;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_property_labels;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_property_labels;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_property_loops;
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_render_engine;
 
 	const k3d::ilist_property<k3d::string_t>::values_t& render_engine_values()
