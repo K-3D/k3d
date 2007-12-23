@@ -24,6 +24,7 @@
 #include "button.h"
 #include "entry.h"
 #include "enumeration_chooser.h"
+#include "messages.h"
 #include "node_window.h"
 #include "user_property.h"
 #include "widget_manip.h"
@@ -67,10 +68,15 @@ class add_user_property :
 public:
 	add_user_property(k3d::inode& Object, k3d::icommand_node& Parent) :
 		base(Object, Parent, "add_user_property"),
+		m_ignore_name_change(false),
+		m_ignore_label_change(false),
+		m_label_tracks_name(true),
 		m_parameter_list_label(new Gtk::Label(_("Parameter List"))),
 		m_user_type_label(new Gtk::Label(_("User Type"))),
 		m_ri_type_label(new Gtk::Label(_("Renderman Type"))),
 		m_property_type_label(new Gtk::Label(_("Property Type"))),
+		m_name_control(0),
+		m_label_control(0),
 		m_parameter_list_control(0),
 		m_parameter_list(init_value(std::string(""))),
 		m_name(init_value(std::string(""))),
@@ -80,6 +86,12 @@ public:
 		m_ri_type(init_owner(*this) + init_name("ri_type") + init_label("") + init_description("") + init_value(k3d_ri_integer) + init_enumeration(ri_types_values())),
 		m_property_type(init_owner(*this) + init_name("property_type") + init_label("") + init_description("") + init_value(USER) + init_enumeration(property_types_values()))
 	{
+		m_name_control = new entry::control(*this, "name", entry::proxy(m_name));
+		m_name_control->signal_changed().connect(sigc::mem_fun(*this, &add_user_property::on_name_changed));
+
+		m_label_control = new entry::control(*this, "label", entry::proxy(m_label));
+		m_label_control->signal_changed().connect(sigc::mem_fun(*this, &add_user_property::on_label_changed));
+
 		m_parameter_list_control = new entry::control(*this, "list", entry::proxy(m_parameter_list));
 		m_user_type_control = new enumeration_chooser::control(*this, "user_type", enumeration_chooser::proxy(static_cast<k3d::iproperty&>(m_user_type)));
 		m_ri_type_control = new enumeration_chooser::control(*this, "ri_type", enumeration_chooser::proxy(static_cast<k3d::iproperty&>(m_ri_type)));
@@ -105,10 +117,10 @@ public:
 		table->attach(*Gtk::manage(m_parameter_list_control), 1, 2, 2, 3);
 
 		table->attach(*Gtk::manage(new Gtk::Label(_("Name"))), 0, 1, 3, 4, Gtk::SHRINK, Gtk::SHRINK);
-		table->attach(*Gtk::manage(new entry::control(*this, "name", entry::proxy(m_name))), 1, 2, 3, 4);
+		table->attach(*Gtk::manage(m_name_control), 1, 2, 3, 4);
 
 		table->attach(*Gtk::manage(new Gtk::Label(_("Label"))), 0, 1, 4, 5, Gtk::SHRINK, Gtk::SHRINK);
-		table->attach(*Gtk::manage(new entry::control(*this, "label", entry::proxy(m_label))), 1, 2, 4, 5);
+		table->attach(*Gtk::manage(m_label_control), 1, 2, 4, 5);
 
 		table->attach(*Gtk::manage(new Gtk::Label(_("Description"))), 0, 1, 5, 6, Gtk::SHRINK, Gtk::SHRINK);
 		table->attach(*Gtk::manage(new entry::control(*this, "description", entry::proxy(m_description))), 1, 2, 5, 6);
@@ -134,6 +146,54 @@ public:
 	}
 
 private:
+	void on_name_changed()
+	{
+		if(m_ignore_name_change)
+			return;
+
+		m_ignore_name_change = true;
+
+		std::string name_text = m_name_control->get_text();
+		std::replace(name_text.begin(), name_text.end(), ' ', '_');
+		m_name_control->set_text(name_text);
+
+		m_ignore_name_change = false;
+
+		if(m_label_tracks_name)
+		{
+			m_ignore_label_change = true;
+
+			std::string label_text = name_text;
+
+			bool capitalize = true;
+			for(k3d::uint_t i = 0; i != label_text.size(); ++i)
+			{
+				if(capitalize)
+				{
+					label_text[i] = std::toupper(label_text[i]);
+					capitalize = false;
+				}
+
+				if(label_text[i] == '_')
+				{
+					label_text[i] = ' ';
+					capitalize = true;
+				}
+			}
+			m_label_control->set_text(label_text);
+
+			m_ignore_label_change = false;
+		}
+	}
+
+	void on_label_changed()
+	{
+		if(m_ignore_label_change)
+			return;
+
+		m_label_tracks_name = false;
+	}
+
 	void on_property_type_changed(k3d::iunknown* Hint)
 	{
 		switch(m_property_type.internal_value())
@@ -173,6 +233,18 @@ private:
 		const std::string name = m_name.internal_value();
 		const std::string label = m_label.internal_value();
 		const std::string description = m_description.internal_value();
+
+		if(name.empty())
+		{
+			error_message(_("You must supply a Name to create a user property."));
+			return;
+		}
+
+		if(label.empty())
+		{
+			error_message(_("You must supply a Label to create a user property."));
+			return;
+		}
 
 		k3d::record_state_change_set change_set(node().document(), "Add user property " + name, K3D_CHANGE_SET_CONTEXT);
 		
@@ -562,10 +634,17 @@ private:
 		return Stream;
 	}
 
+	k3d::bool_t m_ignore_name_change;
+	k3d::bool_t m_ignore_label_change;
+	k3d::bool_t m_label_tracks_name;
+
 	Gtk::Label* const m_parameter_list_label;
 	Gtk::Label* const m_user_type_label;
 	Gtk::Label* const m_ri_type_label;
 	Gtk::Label* const m_property_type_label;
+
+	entry::control* m_name_control;
+	entry::control* m_label_control;
 	entry::control* m_parameter_list_control;
 
 	k3d_data(std::string, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) m_parameter_list;
