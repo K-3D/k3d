@@ -33,10 +33,12 @@
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_selection.h>
-#include <k3dsdk/painter_cache.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 
 #include "cached_triangulation.h"
+#include "painter_cache.h"
+#include "sds_cache.h"
 #include "selection_cache.h"
 
 namespace module
@@ -68,48 +70,48 @@ private:
 };
 
 /// Keep track of point position data in a VBO
-class point_vbo : public k3d::scheduler
+class point_vbo : public scheduler
 {
 public:
-	point_vbo(const k3d::idocument& Document) : m_vbo(0), m_document(Document) {}
+	point_vbo(const k3d::mesh* const Mesh) : m_vbo(0) {}
 	/// Bind the internal VBO for usage by the array drawing commands
 	void bind();
 protected:
 	/// Implements the scheduling phase of a point position update
-	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint);
+	void on_schedule(k3d::inode* Painter);
+	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter);
 	
 	/// Executes the point position update
-	virtual void on_execute(const k3d::mesh& Mesh);
+	virtual void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
 private:
 	/// Stores the data itself
 	vbo* m_vbo;
 	
 	/// Stores the modified point indices provided by the hint
 	k3d::mesh::indices_t m_indices;
-	const k3d::idocument& m_document;
 };
 
 /// Keep track of edge indices in a VBO
-class edge_vbo : public k3d::scheduler
+class edge_vbo : public scheduler
 {
 public:
-	edge_vbo(const k3d::idocument& Document) : m_vbo(0), m_document(Document) {}
+	edge_vbo(const k3d::mesh* const Mesh) : m_vbo(0) {}
 	/// Bind the internal VBO for usage by the array drawing commands
 	void bind();
 protected:
+	void on_schedule(k3d::inode* Painter);
 	/// Creates the edge vbo
-	virtual void on_execute(const k3d::mesh& Mesh);
+	virtual void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
 private:
 	/// Stores the data itself
 	vbo* m_vbo;
-	const k3d::idocument& m_document;
 };
 
 /// VBOs used to paint a triangulated mesh
-class triangle_vbo : public k3d::scheduler
+class triangle_vbo : public scheduler
 {
 public:
-	triangle_vbo(const k3d::idocument& Document) : m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0), m_triangulation(0), m_document(Document) {}
+	triangle_vbo(const k3d::mesh* const Mesh) : m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0), m_mesh(Mesh) {}
 	~triangle_vbo()
 	{
 		delete m_point_vbo;
@@ -117,38 +119,127 @@ public:
 		delete m_index_vbo;
 	}
 	
-	/// The cached triangulation that contains the triangulation that needs to be stored in VBOs
-	void set_triangle_cache(cached_triangulation* TriangleCache)
-	{
-		m_triangulation = TriangleCache;
-	}
-	
 	/// Bind the buffers for drawing
 	void bind();
 	
 	/// Draw faces with original mesh indices Start to End
-	void draw_range(k3d::uint_t Start, k3d::uint_t End);
+	void draw_range(k3d::uint_t Start, k3d::uint_t End, k3d::inode* Painter);
 protected:
-	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint);
-	void on_execute(const k3d::mesh& Mesh);
+	void on_schedule(k3d::inode* Painter);
+	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter);
+	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
 private:
 	vbo* m_point_vbo;
 	vbo* m_index_vbo;
 	vbo* m_normal_vbo;
-	cached_triangulation* m_triangulation;
 	k3d::mesh::indices_t m_indices;
 	// For each triangle corner, store the face it belongs to (used for flat normal calculation)
 	k3d::mesh::indices_t m_corner_to_face;
-	const k3d::idocument& m_document;
+	const k3d::mesh* const m_mesh;
 };
 
-class sds_cache;
+/// Keep track of the SDS VBOs per level
+template<class component_t> class sds_vbo : public scheduler
+{
+public:
+	sds_vbo(const k3d::mesh* const Mesh) : m_mesh(Mesh) {}
+	
+	~sds_vbo()
+	{
+		for (typename connections_t::iterator connection = m_changed_connections.begin(); connection != m_changed_connections.end(); ++connection)
+		{
+			connection->second.disconnect();
+			m_deleted_connections[connection->first].disconnect();
+		}
+		m_changed_connections.clear();
+		m_deleted_connections.clear();
+	}
+	
+	/// Binds the vbo's at the given level
+	void bind(k3d::uint_t Level, k3d::inode* Painter)
+	{
+		cache(Level, Painter).bind();
+	}
+	
+	/// Get the cache at the requested level
+	component_t& cache(k3d::uint_t Level, k3d::inode* Painter)
+	{
+		std::pair<typename caches_t::iterator, bool> result = m_caches.insert(std::make_pair(Level, component_t()));
+		if (result.second)
+			result.first->second.update(*m_mesh, Level, get_data<sds_cache>(m_mesh, Painter).cache());
+		return m_caches[Level];
+	}
+	
+protected:
+	
+	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
+	{
+		return_if_fail(Painter);
+		k3d::int32_t level = k3d::property::pipeline_value<k3d::int32_t>(*Painter, "levels");
+		m_caches.insert(std::make_pair(level, component_t())).first->second.update(Mesh, level, get_data<sds_cache>(&Mesh, Painter).cache());
+	}
+	
+	void on_schedule(k3d::inode* Painter) 
+	{
+		clear();
+		register_painter(Painter);
+		schedule_data<sds_cache>(m_mesh, 0, Painter);
+	}
+	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+	{
+		register_painter(Painter);
+		schedule_data<sds_cache>(m_mesh, Hint, Painter);
+	}
+	void on_schedule(k3d::hint::selection_changed_t* Hint, k3d::inode* Painter)
+	{
+		register_painter(Painter);
+		schedule_data<sds_cache>(m_mesh, Hint, Painter);
+	}
+private:
+	void clear(k3d::iunknown* Hint = 0)
+	{
+		m_caches.clear();
+	}
+	
+	void register_painter(k3d::inode* Painter)
+	{
+		k3d::iproperty* property = k3d::property::get(*Painter, "levels");
+		if (property)
+		{
+			if (m_changed_connections.find(Painter) == m_changed_connections.end())
+				m_changed_connections[Painter] = property->property_changed_signal().connect(sigc::mem_fun(*this, &sds_vbo::clear));
+			if (m_deleted_connections.find(Painter) == m_deleted_connections.end())
+				m_deleted_connections[Painter] = Painter->deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &sds_vbo::remove_painter), Painter));
+		}
+		else
+		{
+			k3d::log() << error << "sds_cache: failed to register property \"levels\"" << std::endl;
+		}
+	}
+	
+	void remove_painter(k3d::inode* Painter)
+	{
+		m_changed_connections[Painter].disconnect();
+		m_deleted_connections[Painter].disconnect();
+		m_changed_connections.erase(Painter);
+		m_deleted_connections.erase(Painter);
+		clear();
+	}
+	
+	// store connections for safe deletion of cache
+	typedef std::map<k3d::inode*, sigc::connection> connections_t;
+	connections_t m_changed_connections; // connections to changed_signals
+	connections_t m_deleted_connections; // connections to deleted_signals
+	typedef std::map<k3d::uint_t, component_t> caches_t;
+	caches_t m_caches; // stores an sds_vbo cache per level
+	const k3d::mesh* const m_mesh;
+};
 
 /// Cache SDS face VBOs
 class sds_face_vbo
 {
 public:
-	sds_face_vbo(const k3d::idocument& Document) : need_update(true), m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0), m_document(Document) {}
+	sds_face_vbo() : m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0) {}
 	~sds_face_vbo()
 	{
 		delete m_point_vbo;
@@ -168,20 +259,17 @@ public:
 	/// Length of the index buffer
 	k3d::uint_t index_size;
 	
-	/// Set to true if an update is needed
-	bool need_update;
 private:
 	vbo* m_point_vbo;
 	vbo* m_index_vbo;
 	vbo* m_normal_vbo;
-	const k3d::idocument& m_document;
 };
 
 /// Cache SDS edge VBOs
 class sds_edge_vbo
 {
 public:
-	sds_edge_vbo(const k3d::idocument& Document) : need_update(true), m_point_vbo(0), m_document(Document) {}
+	sds_edge_vbo() : m_point_vbo(0) {}
 	~sds_edge_vbo()
 	{
 		delete m_point_vbo;
@@ -199,18 +287,15 @@ public:
 	/// Length of the index buffer
 	k3d::uint_t index_size;
 	
-	/// Set to true if an update is needed
-	bool need_update;
 private:
 	vbo* m_point_vbo;
-	const k3d::idocument& m_document;
 };
 
 /// Cache SDS point VBOs
 class sds_point_vbo
 {
 public:
-	sds_point_vbo(const k3d::idocument& Document) : need_update(true), m_point_vbo(0), m_document(Document) {}
+	sds_point_vbo() : m_point_vbo(0) {}
 	~sds_point_vbo()
 	{
 		delete m_point_vbo;
@@ -225,11 +310,8 @@ public:
 	/// Length of the index buffer
 	k3d::uint_t index_size;
 	
-	/// Set to true if an update is needed
-	bool need_update;
 private:
 	vbo* m_point_vbo;
-	const k3d::idocument& m_document;
 };
 
 //////////////

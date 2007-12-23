@@ -53,22 +53,14 @@ namespace painters
 // face_painter
 
 class face_painter :
-	public colored_selection_painter,
-	public k3d::hint::hint_processor
+	public colored_selection_painter
 {
 	typedef colored_selection_painter base;
 
 public:
 	face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6)),
-		m_triangle_cache(k3d::painter_cache<cached_triangulation>::instance(Document))
-	{
-	}
-	
-	~face_painter()
-	{
-		m_triangle_cache.remove_painter(this);
-	}
+		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6))
+	{}
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
@@ -94,18 +86,17 @@ public:
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
-		cached_triangulation* triangles = m_triangle_cache.create_data(&Mesh); 
-		triangles->execute(Mesh); 
+		cached_triangulation& triangles = get_data<cached_triangulation>(&Mesh, this); 
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
 		
 		glEnable(GL_LIGHTING);
 		
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &(triangles->points().at(0)));
+		glVertexPointer(3, GL_DOUBLE, 0, &(triangles.points().at(0)));
 		
-		k3d::typed_array<k3d::normal3> normals(triangles->points().size(), k3d::normal3(0, 0, 1));
-		cached_triangulation::index_vectors_t& face_points = triangles->face_points();
+		k3d::typed_array<k3d::normal3> normals(triangles.points().size(), k3d::normal3(0, 0, 1));
+		cached_triangulation::index_vectors_t& face_points = triangles.face_points();
 		const k3d::mesh::normals_t* calculated_normals = k3d::get_array<k3d::mesh::normals_t>(Mesh.polyhedra->uniform_data, "N");
 		if (calculated_normals)
 		{
@@ -140,7 +131,7 @@ public:
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glNormalPointer(GL_DOUBLE, 0, &normals[0]);
 		
-		std::vector<color_t> colors(triangles->points().size(), color);
+		std::vector<color_t> colors(triangles.points().size(), color);
 		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection; 
 		for (k3d::uint_t face = 0; face != face_points.size(); ++face)
 		{
@@ -156,7 +147,7 @@ public:
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(4, GL_DOUBLE, 0, &colors[0]);
 		
-		glDrawElements(GL_TRIANGLES, triangles->indices().size(), GL_UNSIGNED_INT, &(triangles->indices().at(0)));
+		glDrawElements(GL_TRIANGLES, triangles.indices().size(), GL_UNSIGNED_INT, &(triangles.indices().at(0)));
 		
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_COLOR_ARRAY);
@@ -192,16 +183,15 @@ public:
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 		
-		cached_triangulation* triangles = m_triangle_cache.create_data(&Mesh); 
-		triangles->execute(Mesh);
+		cached_triangulation& triangles = get_data<cached_triangulation>(&Mesh, this); 
 		
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &(triangles->points().at(0)));
+		glVertexPointer(3, GL_DOUBLE, 0, &(triangles.points().at(0)));
 		
-		k3d::mesh::indices_t& face_starts = triangles->face_starts();
+		k3d::mesh::indices_t& face_starts = triangles.face_starts();
 		if (face_starts.empty())
 			return;
-		cached_triangulation::indices_t& indices = triangles->indices();
+		cached_triangulation::indices_t& indices = triangles.indices();
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
 		for(size_t face = 0; face != face_count; ++face)
@@ -224,9 +214,7 @@ public:
 		if (k3d::is_sds(Mesh))
 			return;
 		
-		m_triangle_cache.register_painter(&Mesh, this);
-		
-		process(Mesh, Hint);
+		schedule_data<cached_triangulation>(&Mesh, Hint, this);
 	}
 	
 	static k3d::iplugin_factory& get_factory()
@@ -240,31 +228,6 @@ public:
 
 		return factory;
 	}
-	
-protected:
-
-	///////
-	// hint processor implementation
-	///////
-	
-	virtual void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		cached_triangulation* triangles = m_triangle_cache.create_data(&Mesh); 
-		triangles->schedule(Mesh, Hint);
-	}
-	
-	virtual void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		on_mesh_deleted(Mesh, Hint);
-	}
-	
-	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_triangle_cache.remove_data(&Mesh);
-	}
-	
-private:
-	k3d::painter_cache<cached_triangulation>& m_triangle_cache;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -26,8 +26,10 @@
 
 
 #include <k3dsdk/iproperty.h>
-#include <k3dsdk/painter_cache.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
+
+#include "painter_cache.h"
 
 namespace module
 {
@@ -42,38 +44,53 @@ namespace painters
 typedef k3d::basic_rgba<double, k3d::color_traits<double> > color_t;
 
 /// Common SDS cache functionality
-class sds_cache : public k3d::scheduler
+class sds_cache : public scheduler
 {
 public:
-	sds_cache(const k3d::idocument& Document) : levels(2), update(true), m_document(Document) {}
+	sds_cache(const k3d::mesh* const Mesh) : m_levels(2), m_cache(0), m_mesh(Mesh), m_selection_changed(false) {}
 	
 	~sds_cache();
 	
-	/// Notify the cache that one of the registered painters changed level
-	void level_changed();
-	
-	/// Register a level property
-	void register_property(k3d::iproperty* LevelProperty);
-	
-	/// Remove a level property
-	void remove_property(k3d::iproperty* LevelProperty);
-	
-	int levels;
-	k3d::mesh::indices_t indices;
-
-	bool update;
-	
 	/// The explorable subdivided geometry
-	k3d::sds::k3d_sds_cache cache;
+	k3d::sds::k3d_sds_cache& cache()
+	{
+		if (!m_cache)
+		{
+			k3d::log() << error << "No valid SDS cache!" << std::endl;
+			m_cache = new k3d::sds::k3d_sds_cache();
+		}
+		return *m_cache;
+	}
+	
 protected:
 	/// Scheduler implementation
-	virtual void on_execute(const k3d::mesh& Mesh);
+	void on_schedule(k3d::inode* Painter);
+	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter);
+	void on_schedule(k3d::hint::selection_changed_t* Hint, k3d::inode* Painter);
+	void on_schedule(k3d::hint::mesh_topology_changed_t* Hint, k3d::inode* Painter) { on_schedule(Painter); }
+	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
 private:
+	
+	/// Executed when a level has changed 
+	void level_changed(k3d::iunknown* Hint);
+	
+	/// Register a level property
+	void register_painter(k3d::inode* Painter);
+	
+	/// Remove a level property
+	void remove_painter(k3d::inode* Painter);
+	
+	k3d::uint_t m_levels;
+	k3d::mesh::indices_t m_indices;
 	typedef std::set<k3d::iproperty*> levels_t;
-	levels_t m_levels;
+	levels_t m_level_properties;
 	// store connections for safe deletion of cache
-	std::vector<sigc::connection> m_connections;
-	const k3d::idocument& m_document;
+	typedef std::map<const k3d::inode*, sigc::connection> connections_t;
+	connections_t m_changed_connections; // connections to changed_signals
+	connections_t m_deleted_connections; // connections to deleted_signals
+	k3d::sds::k3d_sds_cache* m_cache;
+	const k3d::mesh* const m_mesh;
+	bool m_selection_changed;
 };
 
 /// Stores SDS face data in OpenGL-compatible arrays

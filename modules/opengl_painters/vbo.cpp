@@ -66,28 +66,29 @@ vbo::operator GLuint( ) const
 
 void point_vbo::bind()
 {
+	return_if_fail(m_vbo);
 	return_if_fail(glIsBuffer(*m_vbo));
 	glBindBuffer(GL_ARRAY_BUFFER, *m_vbo);	
 	glVertexPointer(3, GL_DOUBLE, 0, 0);
 	glEnableClientState(GL_VERTEX_ARRAY);
 }
 
-void point_vbo::on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+void point_vbo::on_schedule(k3d::inode* Painter)
 {
-	k3d::hint::mesh_geometry_changed_t* geometry_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
-	if (!geometry_hint)
+	delete m_vbo;
+	m_vbo = 0;
+	m_indices.clear();
+}
+
+void point_vbo::on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+{
+	if (m_indices.empty()) // Only set indices once (they are cleared upon execute()
 	{
-		delete m_vbo;
-		m_vbo = 0;
-		m_indices.clear();
-	}
-	else if (m_indices.empty()) // Only set indices once (they are cleared upon execute()
-	{
-		m_indices = geometry_hint->changed_points;
+		m_indices = Hint->changed_points;
 	}
 }
 
-void point_vbo::on_execute(const k3d::mesh& Mesh)
+void point_vbo::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 {
 	return_if_fail(k3d::validate_points(Mesh));
 	const k3d::mesh::points_t& points = *(Mesh.points);
@@ -128,10 +129,18 @@ void edge_vbo::bind()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_vbo);
 }
 
-void edge_vbo::on_execute(const k3d::mesh& Mesh)
+void edge_vbo::on_schedule(k3d::inode* Painter)
+{
+	delete m_vbo;
+	m_vbo = 0;
+}
+
+void edge_vbo::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 {
 	return_if_fail(k3d::validate_polyhedra(Mesh));
-	delete m_vbo;
+	if (m_vbo)
+		return;
+	
 	m_vbo = new vbo();
 	
 	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
@@ -153,30 +162,32 @@ void edge_vbo::on_execute(const k3d::mesh& Mesh)
 // triangle_vbo
 ///////////////
 
-void triangle_vbo::on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+void triangle_vbo::on_schedule(k3d::inode* Painter)
 {
-	k3d::hint::mesh_geometry_changed_t* geometry_hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
-	if (!geometry_hint)
-	{
-		delete m_point_vbo;
-		m_point_vbo = 0;
-		delete m_index_vbo;
-		m_index_vbo = 0;
-		delete m_normal_vbo;
-		m_normal_vbo = 0;
-		m_indices.clear();
-		m_corner_to_face.clear();
-	}
-	else if (m_indices.empty()) // Only set indices once (they are cleared upon execute()
-	{
-		m_indices = geometry_hint->changed_points;
-	}
+	delete m_point_vbo;
+	m_point_vbo = 0;
+	delete m_index_vbo;
+	m_index_vbo = 0;
+	delete m_normal_vbo;
+	m_normal_vbo = 0;
+	m_indices.clear();
+	m_corner_to_face.clear();
+	schedule_data<cached_triangulation>(m_mesh, 0, Painter);
 }
 
-void triangle_vbo::on_execute(const k3d::mesh& Mesh)
+void triangle_vbo::on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
 {
-	return_if_fail(m_triangulation);
-	const k3d::mesh::points_t& points = m_triangulation->points();
+	if (m_indices.empty()) // Only set indices once (they are cleared upon execute()
+	{
+		m_indices = Hint->changed_points;
+	}
+	schedule_data<cached_triangulation>(m_mesh, Hint, Painter);
+}
+
+void triangle_vbo::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
+{
+	cached_triangulation& triangle_cache = get_data<cached_triangulation>(&Mesh, Painter);
+	const k3d::mesh::points_t& points = triangle_cache.points();
 	bool new_vbo = false;
 	
 	if (!m_point_vbo) // OpenGL VBO functions may only be called in the drawing context, i.e. during paint_mesh or select_mesh
@@ -185,7 +196,7 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh)
 		new_vbo = true;
 	}
 	
-	cached_triangulation::index_vectors_t& point_links = m_triangulation->point_links();
+	cached_triangulation::index_vectors_t& point_links = triangle_cache.point_links();
 	
 	glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
 	
@@ -205,8 +216,8 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh)
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 	}
 	
-	cached_triangulation::indices_t& triangles = m_triangulation->indices();
-	cached_triangulation::index_vectors_t& face_points = m_triangulation->face_points();
+	cached_triangulation::indices_t& triangles = triangle_cache.indices();
+	cached_triangulation::index_vectors_t& face_points = triangle_cache.face_points();
 	
 	if (!m_index_vbo)
 	{
@@ -312,12 +323,13 @@ void triangle_vbo::bind()
 	}
 }
 
-void triangle_vbo::draw_range(k3d::uint_t Start, k3d::uint_t End)
+void triangle_vbo::draw_range(k3d::uint_t Start, k3d::uint_t End, k3d::inode* Painter)
 {
-	k3d::mesh::indices_t& face_starts = m_triangulation->face_starts();
+	cached_triangulation& triangle_cache = get_data<cached_triangulation>(m_mesh, Painter);
+	k3d::mesh::indices_t& face_starts = triangle_cache.face_starts();
 	if (face_starts.empty())
 		return;
-	cached_triangulation::indices_t& indices = m_triangulation->indices();
+	cached_triangulation::indices_t& indices = triangle_cache.indices();
 	k3d::uint_t startindex = face_starts[Start];
 	k3d::uint_t endindex = End == (face_starts.size()) ? indices.size() : face_starts[End];
 	glDrawElements(GL_TRIANGLES, endindex - startindex, GL_UNSIGNED_INT, static_cast<GLuint*>(0) + startindex);
@@ -327,7 +339,7 @@ void triangle_vbo::draw_range(k3d::uint_t Start, k3d::uint_t End)
 // sds_face_vbo
 /////////////
 
-/// Helper clas to update the point VBO
+/// Helper class to update the point VBO
 class update_face_vbo_visitor : public k3d::sds::sds_visitor
 {
 public:
@@ -358,8 +370,6 @@ private:
 
 void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache)
 {
-	if (!need_update)
-		return;
 	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
 	{
 		face_visitor visitor;
@@ -399,7 +409,6 @@ void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::s
 			normals[visitor.modified_indices[i]] = visitor.normals[i];
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 	}
-	need_update = false;
 }
 
 void sds_face_vbo::bind()
@@ -465,8 +474,6 @@ private:
 
 void sds_edge_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache)
 {
-	if (!need_update)
-		return;
 	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
 	{
 		edge_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops);
@@ -489,7 +496,6 @@ void sds_edge_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::s
 		
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 	}
-	need_update = false;
 }
 
 void sds_edge_vbo::bind()
@@ -543,8 +549,6 @@ private:
 
 void sds_point_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache)
 {
-	if (!need_update)
-		return;
 	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
 	{
 		point_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->edge_points, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops, Mesh.points->size());
@@ -566,7 +570,6 @@ void sds_point_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::
 		
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 	}
-	need_update = false;
 }
 
 void sds_point_vbo::bind()

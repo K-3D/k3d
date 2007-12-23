@@ -75,7 +75,8 @@ public:
 		m_ri_painter(init_owner(*this) + init_name("ri_painter") + init_label(_("RenderMan Mesh Painter")) + init_description(_("RenderMan Mesh Painter")) + init_value(static_cast<k3d::ri::imesh_painter*>(0))),
 		m_show_component_selection(init_owner(*this) + init_name("show_component_selection") + init_label(_("Show Component Selection")) + init_description(_("Show component selection")) + init_value(false)),
 		m_transformed_mesh(init_owner(*this) + init_name("transformed_mesh") + init_label(_("Transformed Mesh")) + init_description(_("Mesh with points transformed by the matrix")) + init_slot(sigc::mem_fun(*this, &mesh_instance::create_transformed_mesh))),
-		m_output_mesh_pointer(0)
+		m_output_mesh_pointer(0),
+		m_document_closed(false)
 	{
 		m_input_mesh.changed_signal().connect(make_mesh_changed_slot());
 		m_mesh_selection.changed_signal().connect(make_selection_changed_slot());
@@ -106,15 +107,18 @@ public:
 		return sigc::mem_fun(*this, &mesh_instance::selection_changed);
 	}
 	
-	/// Disconnect the delete signal to prevent signal propagation to deleted nodes during document close
+	/// Disconnect the delete signal to prevent signal propagation to deleted nodes during document close, and stop drawing
 	void disconnect()
 	{
 		m_delete_connection.disconnect();
+		m_document_closed = true;
 	}
 	
 	/// Executed when the input mesh changed
 	void mesh_changed(k3d::iunknown* Hint)
 	{
+		if (m_document_closed)
+			return;
 		// Use stored pointer as key for the mesh painters, avoiding pipeline execution here...
 		if(m_output_mesh_pointer)
 		{
@@ -199,6 +203,8 @@ public:
 	
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
+		if (m_document_closed)
+			return;
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Draw");
 		if(k3d::gl::imesh_painter* const painter = m_gl_painter.pipeline_value())
 		{
@@ -215,6 +221,8 @@ public:
 
 	void on_gl_select(const k3d::gl::render_state& State, const k3d::gl::selection_state& SelectionState)
 	{
+		if (m_document_closed)
+			return;
 		const double selection_weight = m_selection_weight.pipeline_value();
 		if(SelectionState.exclude_unselected_nodes && !selection_weight)
 			return;
@@ -298,6 +306,7 @@ private:
 	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::pointer_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_transformed_mesh;
 	const k3d::mesh* m_output_mesh_pointer;
 	sigc::connection m_delete_connection;
+	bool m_document_closed;
 };
 
 /////////////////////////////////////////////////////////////////////////////

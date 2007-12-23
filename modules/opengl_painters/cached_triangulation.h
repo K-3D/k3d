@@ -25,8 +25,9 @@
  */
 
 #include <k3dsdk/hints.h>
-#include <k3dsdk/painter_cache.h>
 #include <k3dsdk/triangulator.h>
+
+#include "painter_cache.h"
 
 namespace module
 {
@@ -38,12 +39,11 @@ namespace painters
 {
 
 class cached_triangulation :
-	public k3d::hint::hint_processor,
 	public k3d::triangulator,
-	public k3d::scheduler
+	public scheduler
 {
 public:
-	cached_triangulation(const k3d::idocument& Document) : m_document(Document) {}
+	cached_triangulation(const k3d::mesh* const Mesh) : m_mesh(Mesh) {}
 	/// Links a single index to a list of indices
 	typedef std::vector<k3d::mesh::indices_t> index_vectors_t;
 	// 32 bit so arrays can be passed directly to OpenGL on 64bit platforms
@@ -76,30 +76,27 @@ public:
 	
 private:
 
-	void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
 	{
 		if (m_affected_indices.empty())
 		{
-			k3d::hint::mesh_geometry_changed_t* geohint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint);
-			m_affected_indices = geohint->changed_points;
+			m_affected_indices = Hint->changed_points;
 		}
 	}
 
-	void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	void on_schedule(k3d::inode* Painter)
 	{
 		m_indices.clear();
+		m_point_map.clear();
 		m_points.clear();
 		m_face_starts.clear();
 		m_point_links.clear();
 		m_progress = 0;
-	}
-
-	void on_schedule(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		k3d::hint::hint_processor::process(Mesh, Hint);
+		m_face_points.clear();
+		m_affected_indices.clear();
 	}
 	
-	void on_execute(const k3d::mesh& Mesh);
+	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
 
 	virtual void start_face(const k3d::uint_t Face);
 	virtual void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::double_t Weights[4], k3d::uint_t& NewVertex);
@@ -131,7 +128,7 @@ private:
 	// Keep track of what point we're at
 	k3d::uint_t m_progress;
 	
-	const k3d::idocument& m_document;
+	const k3d::mesh* const m_mesh;
 };
 
 } // namespace opengl

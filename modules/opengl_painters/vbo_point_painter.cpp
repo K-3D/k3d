@@ -50,23 +50,14 @@ namespace painters
 // vbo_point_painter
 
 class vbo_point_painter :
-	public colored_selection_painter,
-	public k3d::hint::hint_processor
+	public colored_selection_painter
 {
 	typedef colored_selection_painter base;
 
 public:
 	vbo_point_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_points_cache(k3d::painter_cache<point_vbo>::instance(Document)),
-		m_selection_cache(k3d::painter_cache<point_selection>::instance(Document))
+		base(Factory, Document)
 	{
-	}
-	
-	~vbo_point_painter()
-	{
-		m_points_cache.remove_painter(this);
-		m_selection_cache.remove_painter(this);
 	}
 		
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
@@ -78,11 +69,8 @@ public:
 			
 		clean_vbo_state();
 		
-		point_vbo* point_buffer = m_points_cache.create_data(&Mesh);
-		point_buffer->execute(Mesh);
-		point_buffer->bind();
-		
-		m_selection_cache.create_data(&Mesh)->execute(Mesh);
+		point_vbo& vbo = get_data<point_vbo>(&Mesh, this);
+		vbo.bind();
 		
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
@@ -93,11 +81,11 @@ public:
 		enable_blending();
 		
 		size_t point_count = Mesh.points->size();
-		const selection_records_t& point_selection = m_selection_cache.get_data(&Mesh)->records(); // obtain selection data
+		const selection_records_t& pselection = get_data<point_selection>(&Mesh, this).records(); // obtain selection data
 		
-		if (!point_selection.empty())
+		if (!pselection.empty())
 		{
-			for (selection_records_t::const_iterator record = point_selection.begin(); record != point_selection.end(); ++record)
+			for (selection_records_t::const_iterator record = pselection.begin(); record != pselection.end(); ++record)
 			{ // color by selection
 				color4d(record->weight ? selected_color : color);
 				size_t start = record->begin;
@@ -129,9 +117,7 @@ public:
 		
 		clean_vbo_state();
 
-		point_vbo* const point_buffer = m_points_cache.create_data(&Mesh);
-		point_buffer->execute(Mesh);
-		point_buffer->bind();
+		get_data<point_vbo>(&Mesh, this).bind();
 		
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
@@ -154,14 +140,12 @@ public:
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
-
-		if(!Mesh.points || Mesh.points->empty())
+		
+		if (!Mesh.points || Mesh.points->empty())
 			return;
 		
-		m_points_cache.register_painter(&Mesh, this);
-		m_selection_cache.register_painter(&Mesh, this);
-				
-		process(Mesh, Hint);
+		schedule_data<point_vbo>(&Mesh, Hint, this);
+		schedule_data<point_selection>(&Mesh, Hint, this);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -175,37 +159,6 @@ public:
 
 		return factory;
 	}
-
-protected:
-
-	///////
-	// hint processor implementation
-	///////
-	
-	virtual void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_points_cache.create_data(&Mesh)->schedule(Mesh, Hint);
-	}
-	
-	virtual void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_selection_cache.create_data(&Mesh)->schedule(Mesh, Hint);
-	}
-	
-	virtual void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		on_mesh_deleted(Mesh, Hint);
-	}
-	
-	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_points_cache.remove_data(&Mesh);
-		m_selection_cache.remove_data(&Mesh);
-	}
-	
-private:
-	k3d::painter_cache<point_vbo>& m_points_cache;
-	k3d::painter_cache<point_selection>& m_selection_cache;
 };
 
 	/////////////////////////////////////////////////////////////////////////////

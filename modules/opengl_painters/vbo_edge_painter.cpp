@@ -50,24 +50,13 @@ namespace painters
 // vbo_edge_painter
 
 class vbo_edge_painter :
-	public colored_selection_painter,
-	public k3d::hint::hint_processor
+	public colored_selection_painter
 {
 	typedef colored_selection_painter base;
 public:
 	vbo_edge_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_points_cache(k3d::painter_cache<point_vbo>::instance(Document)),
-		m_edges_cache(k3d::painter_cache<edge_vbo>::instance(Document)),
-		m_selection_cache(k3d::painter_cache<edge_selection>::instance(Document))
+		base(Factory, Document)
 	{
-	}
-	
-	~vbo_edge_painter()
-	{
-		m_points_cache.remove_painter(this);
-		m_edges_cache.remove_painter(this);
-		m_selection_cache.remove_painter(this);
 	}
 	
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
@@ -87,20 +76,13 @@ public:
 		
 		clean_vbo_state();
 		
-		point_vbo* const point_buffer = m_points_cache.create_data(&Mesh);
-		edge_vbo* const edge_buffer = m_edges_cache.create_data(&Mesh);
+		edge_selection& selected_edges = get_data<edge_selection>(&Mesh, this);
 		
-		point_buffer->execute(Mesh);
-		point_buffer->bind();
-		
-		edge_buffer->execute(Mesh);
-		edge_buffer->bind();
-		
-		edge_selection* selected_edges = m_selection_cache.create_data(&Mesh);
-		selected_edges->execute(Mesh);
+		get_data<point_vbo>(&Mesh, this).bind();
+		get_data<edge_vbo>(&Mesh, this).bind();
 		
 		size_t edge_count = Mesh.polyhedra->edge_points->size();
-		const selection_records_t& edge_selection_records = selected_edges->records();
+		const selection_records_t& edge_selection_records = selected_edges.records();
 		if (!edge_selection_records.empty())
 		{
 			for (selection_records_t::const_iterator record = edge_selection_records.begin(); record != edge_selection_records.end(); ++record)
@@ -139,14 +121,8 @@ public:
 
 		clean_vbo_state();
 		
-		point_vbo* const point_buffer = m_points_cache.create_data(&Mesh);
-		edge_vbo* const edge_buffer = m_edges_cache.create_data(&Mesh);
-		
-		point_buffer->execute(Mesh);
-		point_buffer->bind();
-		
-		edge_buffer->execute(Mesh);
-		edge_buffer->bind();
+		get_data<point_vbo>(&Mesh, this).bind();
+		get_data<edge_vbo>(&Mesh, this).bind();
 		
 		const size_t edge_count = Mesh.polyhedra->edge_points->size();
 		for(size_t edge = 0; edge < edge_count; ++edge)
@@ -164,15 +140,13 @@ public:
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
-
-		if (!k3d::validate_polyhedra(Mesh))
+		
+		if(!k3d::validate_polyhedra(Mesh))
 			return;
 		
-		m_points_cache.register_painter(&Mesh, this);
-		m_edges_cache.register_painter(&Mesh, this);
-		m_selection_cache.register_painter(&Mesh, this);
-		
-		process(Mesh, Hint);
+		schedule_data<point_vbo>(&Mesh, Hint, this);
+		schedule_data<edge_vbo>(&Mesh, Hint, this);
+		schedule_data<edge_selection>(&Mesh, Hint, this);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -186,39 +160,6 @@ public:
 
 		return factory;
 	}
-	
-protected:
-
-	///////
-	// hint processor implementation
-	///////
-	
-	virtual void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_points_cache.create_data(&Mesh)->schedule(Mesh, Hint);
-	}
-	
-	virtual void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_selection_cache.create_data(&Mesh)->schedule(Mesh, Hint);
-	}
-	
-	virtual void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		on_mesh_deleted(Mesh, Hint);
-	}
-	
-	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_points_cache.remove_data(&Mesh);
-		m_edges_cache.remove_data(&Mesh);
-		m_selection_cache.remove_data(&Mesh);
-	}
-	
-private:
-	k3d::painter_cache<point_vbo>& m_points_cache;
-	k3d::painter_cache<edge_vbo>& m_edges_cache;
-	k3d::painter_cache<edge_selection>& m_selection_cache;
 };
 
 	/////////////////////////////////////////////////////////////////////////////

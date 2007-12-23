@@ -34,54 +34,102 @@ namespace painters
 
 sds_cache::~sds_cache()
 {
-	// disconnect these, so they no longer point into freed memory
-	for (size_t i = 0; i != m_connections.size(); ++i)
-		m_connections[i].disconnect();
+	for (connections_t::iterator connection = m_changed_connections.begin(); connection != m_changed_connections.end(); ++connection)
+	{
+		connection->second.disconnect();
+		m_deleted_connections[connection->first].disconnect();
+	}
+	m_changed_connections.clear();
+	m_deleted_connections.clear();
+	delete m_cache;
 }
 
-void sds_cache::level_changed()
+void sds_cache::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
+{
+	if (m_cache && m_selection_changed)
+	{
+		m_selection_changed = false;
+		return;
+	}
+	if (!m_cache)
+	{
+		k3d::log() << debug << "SDS: Creating new SDS cache with " << m_levels << " levels" << std::endl;
+		m_cache = new k3d::sds::k3d_sds_cache();
+		m_cache->set_input(&Mesh);
+		m_cache->set_levels(m_levels);
+	}
+	m_cache->set_new_addresses(Mesh);
+	m_cache->update(m_indices);
+}
+
+void sds_cache::on_schedule(k3d::inode* Painter) 
+{
+	register_painter(Painter);
+	delete m_cache;
+	m_cache = 0;
+	m_selection_changed = false;
+}
+void sds_cache::on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+{
+	register_painter(Painter);
+	m_indices = Hint->changed_points;
+}
+void sds_cache::on_schedule(k3d::hint::selection_changed_t* Hint, k3d::inode* Painter)
+{
+	register_painter(Painter);
+	if (m_cache)
+	{
+		m_cache->clear_modified_faces();
+	}
+	m_indices.clear();
+	m_selection_changed = true;
+}
+
+void sds_cache::level_changed(k3d::iunknown* Hint)
 {
 	// search the highest level requested by the clients
-	levels = 0;
-	for (sds_cache::levels_t::iterator level_it = m_levels.begin(); level_it != m_levels.end(); ++level_it)
+	m_levels = 0;
+	k3d::iproperty* highest = 0;
+	for (sds_cache::levels_t::iterator level_it = m_level_properties.begin(); level_it != m_level_properties.end(); ++level_it)
 	{
-		const long new_level = boost::any_cast<const long>((*level_it)->property_value());
-		levels = new_level > levels ? new_level : levels;
+		const k3d::int32_t new_level = boost::any_cast<const k3d::int32_t>((*level_it)->property_value());
+		if (new_level > m_levels)
+		{
+			m_levels = new_level;
+			highest = *level_it;
+		}
 	}
-	m_scheduled = true;
+	if (!m_cache || m_cache->levels() != m_levels)
+		schedule(highest->property_node());
 }
 
-void sds_cache::register_property(k3d::iproperty* LevelProperty)
+void sds_cache::register_painter(k3d::inode* Painter)
 {
-	return_if_fail(LevelProperty);
-	if (m_levels.insert(LevelProperty).second)
+	k3d::iproperty* property = k3d::property::get(*Painter, "levels");
+	if (property)
 	{
-		m_connections.push_back(LevelProperty->property_deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &sds_cache::remove_property), LevelProperty)));
-		level_changed();
+		if (m_changed_connections.find(Painter) == m_changed_connections.end())
+			m_changed_connections[Painter] = property->property_changed_signal().connect(sigc::mem_fun(*this, &sds_cache::level_changed));
+		if (m_deleted_connections.find(Painter) == m_deleted_connections.end())
+			m_deleted_connections[Painter] = Painter->deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &sds_cache::remove_painter), Painter));
+		if (m_level_properties.insert(property).second)
+		{
+			level_changed(0);
+		}
+	}
+	else
+	{
+		k3d::log() << error << "sds_cache: failed to register property \"levels\"" << std::endl;
 	}
 }
 
-void sds_cache::remove_property(k3d::iproperty* LevelProperty)
+void sds_cache::remove_painter(k3d::inode* Painter)
 {
-	m_levels.erase(LevelProperty);
-}
-
-void sds_cache::on_execute(const k3d::mesh& Mesh)
-{
-	cache.set_new_addresses(Mesh);
-	if (levels > 0 && levels != cache.levels())
-	{
-		k3d::log() << debug << "SDS: Setting new level to " << levels << std::endl;
-		cache.set_input(&Mesh);
-		cache.set_levels(levels);
-		update = true;
-	}
-	if (update)
-	{
-		cache.update(indices);
-	}
-	update = false;
-	levels = 0;
+	m_level_properties.erase(k3d::property::get(*Painter, "levels"));
+	m_changed_connections[Painter].disconnect();
+	m_deleted_connections[Painter].disconnect();
+	m_changed_connections.erase(Painter);
+	m_deleted_connections.erase(Painter);
 }
 
 } // namespace opengl

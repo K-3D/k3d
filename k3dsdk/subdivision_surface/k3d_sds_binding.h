@@ -177,7 +177,9 @@ public:
 	void clear_modified_faces()
 	{
 		if (m_first_level_cache)
+		{
 			dynamic_cast<k3d_cache_input*>(m_first_level_cache)->get_modified_faces().clear();
+		}
 	}
 	
 	/// Currently set number of levels

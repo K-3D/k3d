@@ -28,7 +28,7 @@ namespace opengl
 namespace painters
 {
 
-void cached_triangulation::on_execute(const k3d::mesh& Mesh)
+void cached_triangulation::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 {
 	m_input_points = Mesh.points;
 	if (m_points.empty())

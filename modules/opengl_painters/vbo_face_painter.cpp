@@ -53,25 +53,14 @@ namespace painters
 // vbo_face_painter
 
 class vbo_face_painter :
-	public colored_selection_painter,
-	public k3d::hint::hint_processor
+	public colored_selection_painter
 {
 	typedef colored_selection_painter base;
 
 public:
 	vbo_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6)),
-		m_triangle_cache(k3d::painter_cache<cached_triangulation>::instance(Document)),
-		m_vbo_cache(k3d::painter_cache<triangle_vbo>::instance(Document)),
-		m_selection_cache(k3d::painter_cache<face_selection>::instance(Document))
+		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6))
 	{
-	}
-	
-	~vbo_face_painter()
-	{
-		m_triangle_cache.remove_painter(this);
-		m_vbo_cache.remove_painter(this);
-		m_selection_cache.remove_painter(this);
 	}
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
@@ -98,23 +87,17 @@ public:
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
-		cached_triangulation* triangles = m_triangle_cache.create_data(&Mesh); 
-		triangles->execute(Mesh);
-		triangle_vbo* vbos = m_vbo_cache.create_data(&Mesh);
-		vbos->set_triangle_cache(triangles);
-		vbos->execute(Mesh);
-		
-		face_selection* selected_faces = m_selection_cache.create_data(&Mesh);
-		selected_faces->execute(Mesh);
+		triangle_vbo& vbos = get_data<triangle_vbo>(&Mesh, this);
+		face_selection& selected_faces = get_data<face_selection>(&Mesh, this);
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
-		const selection_records_t& face_selection_records = selected_faces->records();
+		const selection_records_t& face_selection_records = selected_faces.records();
 		
 		glEnable(GL_LIGHTING);
 		
 		clean_vbo_state();
 		
-		vbos->bind();
+		vbos.bind();
 		
 		if (!face_selection_records.empty())
 		{
@@ -125,13 +108,13 @@ public:
 				size_t start = record->begin;
 				size_t end = record->end;
 				end = end > face_count ? face_count : end;
-				vbos->draw_range(start, end);
+				vbos.draw_range(start, end, this);
 			}
 		}
 		else
 		{ // empty selection, everything has the same color
 			color4d(color);
-			vbos->draw_range(0, face_count);
+			vbos.draw_range(0, face_count, this);
 		}
 		
 		clean_vbo_state();
@@ -162,22 +145,18 @@ public:
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 		
-		cached_triangulation* triangles = m_triangle_cache.create_data(&Mesh); 
-		triangles->execute(Mesh);
-		triangle_vbo* vbos = m_vbo_cache.create_data(&Mesh);
-		vbos->set_triangle_cache(triangles);
-		vbos->execute(Mesh);
+		triangle_vbo& vbos = get_data<triangle_vbo>(&Mesh, this);
 		
 		clean_vbo_state();
 		
-		vbos->bind();
+		vbos.bind();
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
 		for(size_t face = 0; face != face_count; ++face)
 		{
 			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
 
-			vbos->draw_range(face, face+1);
+			vbos.draw_range(face, face+1, this);
 
 			k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
 		}
@@ -188,18 +167,15 @@ public:
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
-
+		
 		if(!k3d::validate_polyhedra(Mesh))
 			return;
-			
+		
 		if (k3d::is_sds(Mesh))
 			return;
 		
-		m_triangle_cache.register_painter(&Mesh, this);
-		m_vbo_cache.register_painter(&Mesh, this);
-		m_selection_cache.register_painter(&Mesh, this);
-		
-		process(Mesh, Hint);
+		schedule_data<triangle_vbo>(&Mesh, Hint, this);
+		schedule_data<face_selection>(&Mesh, Hint, this);
 	}
 	
 	static k3d::iplugin_factory& get_factory()
@@ -213,43 +189,6 @@ public:
 
 		return factory;
 	}
-	
-protected:
-
-	///////
-	// hint processor implementation
-	///////
-	
-	virtual void on_geometry_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		cached_triangulation* triangles = m_triangle_cache.create_data(&Mesh); 
-		triangles->schedule(Mesh, Hint);
-		triangle_vbo* vbos = m_vbo_cache.create_data(&Mesh);
-		vbos->set_triangle_cache(triangles);
-		vbos->schedule(Mesh, Hint);
-	}
-	
-	virtual void on_selection_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_selection_cache.create_data(&Mesh)->schedule(Mesh, Hint);
-	}
-	
-	virtual void on_topology_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		on_mesh_deleted(Mesh, Hint);
-	}
-	
-	virtual void on_mesh_deleted(const k3d::mesh& Mesh, k3d::iunknown* Hint)
-	{
-		m_triangle_cache.remove_data(&Mesh);
-		m_vbo_cache.remove_data(&Mesh);
-		m_selection_cache.remove_data(&Mesh);
-	}
-	
-private:
-	k3d::painter_cache<cached_triangulation>& m_triangle_cache;
-	k3d::painter_cache<triangle_vbo>& m_vbo_cache;
-	k3d::painter_cache<face_selection>& m_selection_cache;
 };
 
 /////////////////////////////////////////////////////////////////////////////

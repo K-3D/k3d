@@ -273,9 +273,6 @@ bool k3d_cache_input::selected(size_t Face, const indexset_t& Indices, int Recur
 	const k3d::mesh::selection_t& edge_selection = *polyhedra.edge_selection;
 	const k3d::mesh::selection_t& face_selection = *polyhedra.face_selection;
 	
-	if (face_selection[Face])
-		return true;
-	
 	const size_t first_edge = loop_first_edges[face_first_loops[Face]];
 	for(size_t edge = first_edge; ; )
 	{
