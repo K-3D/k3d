@@ -87,11 +87,7 @@ public:
 		m_property_type(init_owner(*this) + init_name("property_type") + init_label("") + init_description("") + init_value(USER) + init_enumeration(property_types_values()))
 	{
 		m_name_control = new entry::control(*this, "name", entry::proxy(m_name));
-		m_name_control->signal_changed().connect(sigc::mem_fun(*this, &add_user_property::on_name_changed));
-
 		m_label_control = new entry::control(*this, "label", entry::proxy(m_label));
-		m_label_control->signal_changed().connect(sigc::mem_fun(*this, &add_user_property::on_label_changed));
-
 		m_parameter_list_control = new entry::control(*this, "list", entry::proxy(m_parameter_list));
 		m_user_type_control = new enumeration_chooser::control(*this, "user_type", enumeration_chooser::proxy(static_cast<k3d::iproperty&>(m_user_type)));
 		m_ri_type_control = new enumeration_chooser::control(*this, "ri_type", enumeration_chooser::proxy(static_cast<k3d::iproperty&>(m_ri_type)));
@@ -141,8 +137,11 @@ public:
 		
 		show_all();
 
-		m_property_type.changed_signal().connect(sigc::mem_fun(*this, &add_user_property::on_property_type_changed));
-		on_property_type_changed(0);
+		m_name_control->signal_changed().connect(sigc::mem_fun(*this, &add_user_property::on_name_changed));
+		m_label_control->signal_changed().connect(sigc::mem_fun(*this, &add_user_property::on_label_changed));
+		m_property_type.changed_signal().connect(sigc::hide(sigc::mem_fun(*this, &add_user_property::on_property_type_changed)));
+
+		on_property_type_changed();
 	}
 
 private:
@@ -155,7 +154,7 @@ private:
 
 		std::string name_text = m_name_control->get_text();
 		std::replace(name_text.begin(), name_text.end(), ' ', '_');
-		m_name_control->set_text(name_text);
+		m_name.set_value(name_text);
 
 		m_ignore_name_change = false;
 
@@ -180,7 +179,7 @@ private:
 					capitalize = true;
 				}
 			}
-			m_label_control->set_text(label_text);
+			m_label.set_value(label_text);
 
 			m_ignore_label_change = false;
 		}
@@ -194,7 +193,7 @@ private:
 		m_label_tracks_name = false;
 	}
 
-	void on_property_type_changed(k3d::iunknown* Hint)
+	void on_property_type_changed()
 	{
 		switch(m_property_type.internal_value())
 		{
