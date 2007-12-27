@@ -36,8 +36,11 @@
 #include "spin_button.h"
 #include "tutorial_message.h"
 
-#include <k3dsdk/basic_math.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/high_res_timer.h>
+#include <k3dsdk/imeasurement_property.h>
+#include <k3dsdk/inode.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/iwritable_property.h>
@@ -46,6 +49,8 @@
 #include <k3dsdk/result.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <iomanip>
 #include <sstream>
@@ -58,46 +63,47 @@ namespace libk3dngui
 namespace spin_button
 {
 
-namespace detail
-{
-
 /////////////////////////////////////////////////////////////////////////////
-// data_proxy
+// property_model
 
-/// Specialization of k3d::spin_button::data_proxy for use with k3d::iproperty objects
-class property_proxy :
-	public idata_proxy
+/// Implementation of spin_button::imodel for use with k3d::iproperty objects
+class property_model :
+	public imodel
 {
 public:
-	typedef k3d::iproperty data_t;
-
-	explicit property_proxy(data_t& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
-		idata_proxy(StateRecorder, ChangeMessage),
+	property_model(k3d::iproperty& Data) :
 		m_readable_data(Data),
 		m_writable_data(dynamic_cast<k3d::iwritable_property*>(&Data))
 	{
 	}
 
-	bool writable()
+	const Glib::ustring label()
+	{
+		Glib::ustring result = m_readable_data.property_label();
+
+		if(m_readable_data.property_node())
+			result = m_readable_data.property_node()->name() + " " + result;
+
+		return result;
+	}
+
+	const k3d::bool_t writable()
 	{
 		return m_writable_data ? true : false;
 	}
 
-	double value()
+	const k3d::double_t value()
 	{
 		const std::type_info& type = m_readable_data.property_type();
-		if(type == typeid(double))
-			return boost::any_cast<double>(m_readable_data.property_value());
-		else if(type == typeid(float))
-			return boost::any_cast<float>(m_readable_data.property_value());
-		else if(type == typeid(long))
-			return boost::any_cast<long>(m_readable_data.property_value());
-		else if(type == typeid(unsigned long))
-			return boost::any_cast<unsigned long>(m_readable_data.property_value());
-		else if(type == typeid(int))
-			return boost::any_cast<int>(m_readable_data.property_value());
-		else if(type == typeid(unsigned int))
-			return boost::any_cast<unsigned int>(m_readable_data.property_value());
+
+		if(type == typeid(k3d::int32_t))
+			return boost::any_cast<k3d::int32_t>(m_readable_data.property_value());
+		else if(type == typeid(k3d::uint32_t))
+			return boost::any_cast<k3d::uint32_t>(m_readable_data.property_value());
+		else if(type == typeid(k3d::float_t))
+			return boost::any_cast<k3d::float_t>(m_readable_data.property_value());
+		else if(type == typeid(k3d::double_t))
+			return boost::any_cast<k3d::double_t>(m_readable_data.property_value());
 		else
 			k3d::log() << error << k3d_file_reference << ": unknown property type: " << type.name() << std::endl;
 
@@ -109,107 +115,176 @@ public:
 		return_if_fail(m_writable_data);
 
 		const std::type_info& type = m_readable_data.property_type();
-		if(type == typeid(double))
-			m_writable_data->property_set_value(Value);
-		else if(type == typeid(float))
-			m_writable_data->property_set_value(static_cast<float>(Value));
-		else if(type == typeid(long))
-			m_writable_data->property_set_value(static_cast<long>(k3d::round(Value)));
-		else if(type == typeid(unsigned long))
-			m_writable_data->property_set_value(static_cast<unsigned long>(k3d::round(Value)));
-		else if(type == typeid(int))
-			m_writable_data->property_set_value(static_cast<int>(k3d::round(Value)));
-		else if(type == typeid(unsigned int))
-			m_writable_data->property_set_value(static_cast<unsigned int>(k3d::round(Value)));
+
+		if(type == typeid(k3d::int32_t))
+			m_writable_data->property_set_value(static_cast<k3d::int32_t>(k3d::round(Value)));
+		else if(type == typeid(k3d::uint32_t))
+			m_writable_data->property_set_value(static_cast<k3d::uint32_t>(k3d::round(Value)));
+		else if(type == typeid(k3d::float_t))
+			m_writable_data->property_set_value(static_cast<k3d::float_t>(Value));
+		else if(type == typeid(k3d::double_t))
+			m_writable_data->property_set_value(static_cast<k3d::double_t>(Value));
 		else
 			k3d::log() << error << k3d_file_reference << ": unknown property type: " << type.name() << std::endl;
 	}
 
-	changed_signal_t& changed_signal()
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
 	{
-		return m_readable_data.property_changed_signal();
+		return m_readable_data.property_changed_signal().connect(sigc::hide(Slot));
+	}
+
+	const k3d::double_t step_increment()
+	{
+		if(k3d::imeasurement_property* const measurement_property = dynamic_cast<k3d::imeasurement_property*>(&m_readable_data))
+			return measurement_property->property_step_increment();
+
+		return 1.0;
+	}
+
+	const std::type_info& units()
+	{
+		if(k3d::imeasurement_property* const measurement_property = dynamic_cast<k3d::imeasurement_property*>(&m_readable_data))
+			return measurement_property->property_units();
+
+		return typeid(k3d::measurement::scalar);
 	}
 
 private:
-	property_proxy(const property_proxy& RHS);
-	property_proxy& operator=(const property_proxy& RHS);
-	~property_proxy() {}
+	property_model(const property_model& RHS);
+	property_model& operator=(const property_model& RHS);
+	~property_model() {}
 
-	data_t& m_readable_data;
+	k3d::iproperty& m_readable_data;
 	k3d::iwritable_property* const m_writable_data;
 };
 
-} // namespace detail
+/////////////////////////////////////////////////////////////////////////////
+// model
 
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
+imodel* const model(k3d::iproperty& Property)
 {
-	return std::auto_ptr<idata_proxy>(new detail::property_proxy(Data, StateRecorder, ChangeMessage));
+	return new property_model(Property);
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// control::implementation
+
+class control::implementation
+{
+public:
+	implementation(imodel* const Model, k3d::istate_recorder* const StateRecorder) :
+		m_model(Model),
+		m_state_recorder(StateRecorder),
+		m_step_increment(Model->step_increment()),
+		m_units(&Model->units()),
+		m_entry(new hotkey_entry()),
+		m_up_button(new Gtk::Button()),
+		m_down_button(new Gtk::Button()),
+		m_dragging(false),
+		m_up_button_pressed(false),
+		m_drag_increment(0),
+		m_drag_first_timeout(false),
+		m_tap_started(false)
+	{
+		assert(m_model.get());
+	}
+
+	/// Stores a reference to the underlying data object
+	const boost::scoped_ptr<imodel> m_model;
+	/// Stores a reference to the (optional) object for recording undo/redo data
+	k3d::istate_recorder* const m_state_recorder;
+
+	/// Stores the increment used to modify the button's value using the spin controls
+	double m_step_increment;
+	/// Stores the type of type of real-world-units to use for formatting & parsing
+	const std::type_info* m_units;
+
+	/// Entry control for display and manual input
+	hotkey_entry* const m_entry;
+	/// Button control for incremental input
+	Gtk::Button* const m_up_button;
+	/// Button control for incremental input
+	Gtk::Button* const m_down_button;
+
+	/// Set to true during dragging
+	bool m_dragging;
+	/// Stores whether the 'up' button was pressed
+	bool m_up_button_pressed;
+	/// Stores the increment used to modify data during dragging
+	double m_drag_increment;
+	
+	/// Stores the most recent mouse position in screen coordinates during dragging
+	k3d::point2 m_last_mouse;
+	/// Stores the drag timeout connection
+	sigc::connection m_drag_timeout;
+	/// Stores whether this is the first drag timeout
+	bool m_drag_first_timeout;
+	/// Prevents keyboard auto-repeat from sending drag-sensitivity through the roof
+	bool m_tap_started;
+	k3d::timer m_timer;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
+control::control(k3d::icommand_node& Parent, const std::string& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
 	base(2, 8, true),
 	ui_component(Name, &Parent),
-	m_entry(new hotkey_entry()),
-	m_up_button(new Gtk::Button()),
-	m_down_button(new Gtk::Button()),
-	m_data(Data),
-	m_step_increment(0.01),
-	m_units(&typeid(scalar)),
-	m_dragging(false),
-	m_tap_started(false)
+	m_implementation(new implementation(Model, StateRecorder))
 {
 	set_name("k3d-spin-button");
 
-	m_entry->set_name("entry");
-	m_entry->set_width_chars(8);
-	m_entry->signal_focus_out_event().connect(sigc::mem_fun(*this, &control::on_entry_focus_out_event));
-	m_entry->signal_activate().connect(sigc::mem_fun(*this, &control::on_entry_activated));
-	attach(*manage(m_entry), 0, 6, 0, 2);
+	m_implementation->m_entry->set_name("entry");
+	m_implementation->m_entry->set_width_chars(8);
+	m_implementation->m_entry->signal_focus_out_event().connect(sigc::mem_fun(*this, &control::on_entry_focus_out_event));
+	m_implementation->m_entry->signal_activate().connect(sigc::mem_fun(*this, &control::on_entry_activated));
+	attach(*manage(m_implementation->m_entry), 0, 6, 0, 2);
 
-	if(m_data.get() && m_data->writable())
+	if(m_implementation->m_model->writable())
 	{
 		// Setup up and down buttons
-		setup_arrow_button(m_up_button, Gtk::ARROW_UP, true);
-		setup_arrow_button(m_down_button, Gtk::ARROW_DOWN, false);
+		setup_arrow_button(m_implementation->m_up_button, Gtk::ARROW_UP, true);
+		setup_arrow_button(m_implementation->m_down_button, Gtk::ARROW_DOWN, false);
 
 		// Setup VBox containing arrows
-		attach(*manage(m_up_button), 6, 7, 0, 1);
-		attach(*manage(m_down_button), 6, 7, 1, 2);
+		attach(*manage(m_implementation->m_up_button), 6, 7, 0, 1);
+		attach(*manage(m_implementation->m_down_button), 6, 7, 1, 2);
 
-		tooltips().set_tip(*m_entry, _("Enter a new value.  Real-world units and simple math expressions are allowed."));
-		tooltips().set_tip(*m_up_button, _("LMB-Drag to modify, LMB-Click to step, Tap Shift and Control while dragging to change sensitivity."));
-		tooltips().set_tip(*m_down_button, _("LMB-Drag to modify, LMB-Click to step, Tap Shift and Control while dragging to change sensitivity."));
+		tooltips().set_tip(*m_implementation->m_entry, _("Enter a new value.  Real-world units and simple math expressions are allowed."));
+		tooltips().set_tip(*m_implementation->m_up_button, _("LMB-Drag to modify, LMB-Click to step, Tap Shift and Control while dragging to change sensitivity."));
+		tooltips().set_tip(*m_implementation->m_down_button, _("LMB-Drag to modify, LMB-Click to step, Tap Shift and Control while dragging to change sensitivity."));
 
 		// Make sure buttons can't get the focus (makes tabbing difficult)
-		m_up_button->unset_flags(Gtk::CAN_FOCUS);
-		m_down_button->unset_flags(Gtk::CAN_FOCUS);
+		m_implementation->m_up_button->unset_flags(Gtk::CAN_FOCUS);
+		m_implementation->m_down_button->unset_flags(Gtk::CAN_FOCUS);
 	}
 	else
 	{
-		m_entry->set_editable(false);
+		m_implementation->m_entry->set_editable(false);
 	}
 
 	// Synchronize the view with the data source ...
-	on_data_changed(0);
+	on_data_changed();
 
 	// We want to be notified if the data source changes ...
-	if(m_data.get())
-		m_data->changed_signal().connect(sigc::mem_fun(*this, &control::on_data_changed));
+	m_implementation->m_model->connect_changed_signal(sigc::mem_fun(*this, &control::on_data_changed));
+}
+
+control::~control()
+{
+	delete m_implementation;
 }
 
 void control::set_step_increment(const double StepIncrement)
 {
-	m_step_increment = StepIncrement;
-	on_data_changed(0);
+	m_implementation->m_step_increment = StepIncrement;
+	on_data_changed();
 }
 
 void control::set_units(const std::type_info& Units)
 {
-	m_units = &Units;
-	on_data_changed(0);
+	m_implementation->m_units = &Units;
+	on_data_changed();
 }
 
 const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
@@ -218,66 +293,58 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 	{
 		if(Command == "set_value")
 		{
-			interactive::set_text(*m_entry, Arguments);
+			interactive::set_text(*m_implementation->m_entry, Arguments);
 			return RESULT_CONTINUE;
 		}
 		else if(Command == "increment_value")
 		{
-			return_val_if_fail(m_data.get(), RESULT_ERROR);
-
-			const double current_value = m_data->value();
+			const double current_value = m_implementation->m_model->value();
 			const double new_value = k3d::from_string<double>(Arguments, 0.0);
-			const double old_step_increment = m_step_increment;
-			m_step_increment = new_value - current_value;
-			interactive::activate(*m_up_button);
-			m_step_increment = old_step_increment;
+			const double old_step_increment = m_implementation->m_step_increment;
+			m_implementation->m_step_increment = new_value - current_value;
+			interactive::activate(*m_implementation->m_up_button);
+			m_implementation->m_step_increment = old_step_increment;
 
 			return RESULT_CONTINUE;
 		}
 		else if(Command == "decrement_value")
 		{
-			return_val_if_fail(m_data.get(), RESULT_ERROR);
-
-			const double current_value = m_data->value();
+			const double current_value = m_implementation->m_model->value();
 			const double new_value = k3d::from_string<double>(Arguments, 0.0);
-			const double old_step_increment = m_step_increment;
-			m_step_increment = current_value - new_value;
-			interactive::activate(*m_down_button);
-			m_step_increment = old_step_increment;
+			const double old_step_increment = m_implementation->m_step_increment;
+			m_implementation->m_step_increment = current_value - new_value;
+			interactive::activate(*m_implementation->m_down_button);
+			m_implementation->m_step_increment = old_step_increment;
 
 			return RESULT_CONTINUE;
 		}
 		else if(Command == "start_drag")
 		{
-			return_val_if_fail(m_data.get(), RESULT_ERROR);
-
 			if(Arguments == "down")
 			{
-				interactive::move_pointer(*m_down_button);
+				interactive::move_pointer(*m_implementation->m_down_button);
 			}
 			else
 			{
-				interactive::move_pointer(*m_up_button);
+				interactive::move_pointer(*m_implementation->m_up_button);
 			}
 
-			if(m_data->state_recorder)
-				m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
+			if(m_implementation->m_state_recorder)
+				m_implementation->m_state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
-			m_timer.restart();
+			m_implementation->m_timer.restart();
 
 			return RESULT_CONTINUE;
 		}
 		else if(Command == "drag_motion")
 		{
-			return_val_if_fail(m_data.get(), RESULT_ERROR);
-
 			command_arguments arguments(Arguments);
 			const double timestamp = arguments.get_double("timestamp");
 			const k3d::vector2 mouse_delta = arguments.get_vector2("mouse_delta");
 			const double value = arguments.get_double("value");
 
-			interactive::warp_pointer(interactive::get_pointer() + mouse_delta, timestamp, m_timer);
-			m_data->set_value(value);
+			interactive::warp_pointer(interactive::get_pointer() + mouse_delta, timestamp, m_implementation->m_timer);
+			m_implementation->m_model->set_value(value);
 
 			return RESULT_CONTINUE;
 		}
@@ -291,14 +358,8 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 		}
 		else if(Command == "end_drag")
 		{
-			return_val_if_fail(m_data.get(), RESULT_ERROR);
-
-			if(m_data->state_recorder)
-			{
-				std::stringstream buffer;
-				buffer << std::setprecision(3) << m_data->value();
-				m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_data->change_message + ' ' + buffer.str(), K3D_CHANGE_SET_CONTEXT);
-			}
+			if(m_implementation->m_state_recorder)
+				m_implementation->m_state_recorder->commit_change_set(m_implementation->m_state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), change_message(m_implementation->m_model->value()), K3D_CHANGE_SET_CONTEXT);
 
 			return RESULT_CONTINUE;
 		}
@@ -314,7 +375,7 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 
 void control::setup_arrow_button(Gtk::Button* Button, const Gtk::ArrowType ArrowType, const bool Up)
 {
-    Gtk::Arrow* const arrow = Gtk::manage(new Gtk::Arrow(ArrowType, Gtk::SHADOW_NONE));
+	Gtk::Arrow* const arrow = Gtk::manage(new Gtk::Arrow(ArrowType, Gtk::SHADOW_NONE));
 	arrow->set_size_request(0, 0);
 
 	Button->set_size_request(0, 0);
@@ -329,38 +390,37 @@ void control::setup_arrow_button(Gtk::Button* Button, const Gtk::ArrowType Arrow
 	Button->signal_key_release_event().connect(sigc::mem_fun(*this, &control::on_drag_key_release_event));
 }
 
-void control::on_data_changed(k3d::iunknown*)
+void control::on_data_changed()
 {
-	return_if_fail(m_data.get());
-	display_value(m_data->value());
+	display_value(m_implementation->m_model->value());
 }
 
 void control::display_value(const double Value)
 {
 	std::ostringstream buffer;
 
-	if(*m_units == typeid(k3d::measurement::angle)) // Display angles in degrees, even though the internal unit is radians
+	if(*m_implementation->m_units == typeid(k3d::measurement::angle)) // Display angles in degrees, even though the internal unit is radians
 		buffer << k3d::string_cast(boost::format("%g") % k3d::measurement::convert(k3d::measurement::quantity<k3d::measurement::angle>(Value, k3d::measurement::angle_units("rad")), k3d::measurement::angle_units("deg")).value()) << " deg";
-	else if(*m_units == typeid(k3d::measurement::area))
+	else if(*m_implementation->m_units == typeid(k3d::measurement::area))
 		buffer << k3d::string_cast(boost::format("%g") % Value) << " m^2";
-	else if(*m_units == typeid(k3d::measurement::distance))
+	else if(*m_implementation->m_units == typeid(k3d::measurement::distance))
 		buffer << k3d::string_cast(boost::format("%g") % Value) << " m";
-	else if(*m_units == typeid(k3d::measurement::force))
+	else if(*m_implementation->m_units == typeid(k3d::measurement::force))
 		buffer << k3d::string_cast(boost::format("%g") % Value) << " N";
-	else if(*m_units == typeid(k3d::measurement::mass))
+	else if(*m_implementation->m_units == typeid(k3d::measurement::mass))
 		buffer << k3d::string_cast(boost::format("%g") % Value) << " Kg";
-	else if(*m_units == typeid(k3d::measurement::pressure))
+	else if(*m_implementation->m_units == typeid(k3d::measurement::pressure))
 		buffer << k3d::string_cast(boost::format("%g") % Value) << " Pa";
-	else if(*m_units == typeid(k3d::measurement::time))
+	else if(*m_implementation->m_units == typeid(k3d::measurement::time))
 		buffer << k3d::string_cast(boost::format("%g") % Value) << " s";
-	else if(*m_units == typeid(k3d::measurement::volume))
+	else if(*m_implementation->m_units == typeid(k3d::measurement::volume))
 		buffer << k3d::string_cast(boost::format("%g") % Value) << " m^3";
-	else if(*m_units == typeid(scalar))
+	else if(*m_implementation->m_units == typeid(scalar))
 		buffer << k3d::string_cast(boost::format("%g") % Value);
 	else
-		k3d::log() << error << "Unknown physical unit - " << m_units->name() << std::endl;
+		k3d::log() << error << "Unknown physical unit - " << m_implementation->m_units->name() << std::endl;
 
-	m_entry->set_text(buffer.str());
+	m_implementation->m_entry->set_text(buffer.str());
 }
 
 bool control::on_entry_focus_out_event(GdkEventFocus* Event)
@@ -375,24 +435,22 @@ void control::on_entry_activated()
 
 	/** \todo What the heck is this? */
 	// Set focus to the arrows such as hotkeys work again
-	m_down_button->set_flags(Gtk::CAN_FOCUS);
-	m_down_button->grab_focus();
-	m_down_button->unset_flags(Gtk::CAN_FOCUS);
+	m_implementation->m_down_button->set_flags(Gtk::CAN_FOCUS);
+	m_implementation->m_down_button->grab_focus();
+	m_implementation->m_down_button->unset_flags(Gtk::CAN_FOCUS);
 }
 
 void control::on_manual_value()
 {
-	return_if_fail(m_data.get());
-
-	m_entry->select_region(0, 0);
-	const std::string new_text = m_entry->get_text();
+	m_implementation->m_entry->select_region(0, 0);
+	const std::string new_text = m_implementation->m_entry->get_text();
 
 	// Default our results to the current value, in case it doesn't parse ...
-	const double original_value = m_data->value();
+	const double original_value = m_implementation->m_model->value();
 	double new_value = original_value;
 
 	// Parse the input expression into value converting it to SI units automatically (it can do mathematical expressions, too, for fun)
-	if(!k3d::measurement::parse(new_text, new_value, m_units))
+	if(!k3d::measurement::parse(new_text, new_value, m_implementation->m_units))
 	{
 		k3d::log() << error << "Couldn't parse expression: " << new_text << " restoring original value" << std::endl;
 		display_value(original_value);
@@ -406,14 +464,14 @@ void control::on_manual_value()
 		record_command("set_value", new_text);
 
 		// Turn this into an undo/redo -able event ...
-		if(m_data->state_recorder)
-			m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
+		if(m_implementation->m_state_recorder)
+			m_implementation->m_state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
-		m_data->set_value(new_value);
+		m_implementation->m_model->set_value(new_value);
 
 		// Turn this into an undo/redo -able event ...
-		if(m_data->state_recorder)
-			m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_data->change_message + ' ' + new_text, K3D_CHANGE_SET_CONTEXT);
+		if(m_implementation->m_state_recorder)
+			m_implementation->m_state_recorder->commit_change_set(m_implementation->m_state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), change_message(m_implementation->m_model->value()), K3D_CHANGE_SET_CONTEXT);
 	}
 	else
 	{
@@ -423,101 +481,97 @@ void control::on_manual_value()
 
 void control::on_drag_pressed(const bool Up)
 {
-	return_if_fail(m_data.get());
-
 	// Save which button was pressed
-	m_up_button_pressed = Up;
+	m_implementation->m_up_button_pressed = Up;
 
-	m_up_button->set_flags(Gtk::CAN_FOCUS);
-	m_down_button->set_flags(Gtk::CAN_FOCUS);
-	m_up_button->grab_focus();
-	m_down_button->grab_focus();
+	m_implementation->m_up_button->set_flags(Gtk::CAN_FOCUS);
+	m_implementation->m_down_button->set_flags(Gtk::CAN_FOCUS);
+	m_implementation->m_up_button->grab_focus();
+	m_implementation->m_down_button->grab_focus();
 
 	// Get the current mouse coordinates ...
-	m_last_mouse = interactive::get_pointer();
+	m_implementation->m_last_mouse = interactive::get_pointer();
 
 	// Calculate the increment we should use while dragging ...
-	m_drag_increment = std::abs(m_step_increment) * 0.2;
-	if(!m_drag_increment)
-		m_drag_increment = 0.002;
+	m_implementation->m_drag_increment = std::abs(m_implementation->m_step_increment) * 0.2;
+	if(!m_implementation->m_drag_increment)
+		m_implementation->m_drag_increment = 0.002;
 
 	// Connect idle timeout handler, called every 200ms
-	m_drag_timeout = Glib::signal_timeout().connect(sigc::mem_fun(*this, &control::on_drag_timeout), 200);
-	m_drag_first_timeout = true;
+	m_implementation->m_drag_timeout = Glib::signal_timeout().connect(sigc::mem_fun(*this, &control::on_drag_timeout), 200);
+	m_implementation->m_drag_first_timeout = true;
 
 	// Turn this into an undo/redo -able event ...
-	if(m_data->state_recorder)
-		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
+	if(m_implementation->m_state_recorder)
+		m_implementation->m_state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 }
 
 bool control::on_drag_motion_notify_event(GdkEventMotion* Event)
 {
-	return_val_if_fail(m_data.get(), false);
-
 	// Get new mouse coordinates
 	const k3d::point2 mouse = interactive::get_pointer();
 
 	// Don't switch to drag mode until the mouse really moved
-	if(!m_dragging)
+	if(!m_implementation->m_dragging)
 	{
-		if(k3d::distance(mouse, m_last_mouse) < 10)
+		if(k3d::distance(mouse, m_implementation->m_last_mouse) < 10)
 			return false;
 
-		m_dragging = true;
-		m_timer.restart();
+		m_implementation->m_dragging = true;
+		m_implementation->m_timer.restart();
 
-		record_command("start_drag", m_up_button_pressed ? "up" : "down");
+		record_command("start_drag", m_implementation->m_up_button_pressed ? "up" : "down");
 	}
 
 	// Update everything ...
-	const double horizontal_length = m_last_mouse[0] - mouse[0];
-	const double vertical_length = m_last_mouse[1] - mouse[1];
-	double new_value = m_data->value();
+	const double horizontal_length = m_implementation->m_last_mouse[0] - mouse[0];
+	const double vertical_length = m_implementation->m_last_mouse[1] - mouse[1];
+	double new_value = m_implementation->m_model->value();
 	if(std::abs(horizontal_length) > std::abs(vertical_length))
 	{
 		// Dragging mostly horizontally : 1/10th unit increase
-		new_value += m_drag_increment * 0.1 * (mouse[0] - m_last_mouse[0]);
+		new_value += m_implementation->m_drag_increment * 0.1 * (mouse[0] - m_implementation->m_last_mouse[0]);
 	}
 	else
 	{
 		// Dragging mostly vertically : one unit increase
-		new_value += m_drag_increment * (m_last_mouse[1] - mouse[1]);
+		new_value += m_implementation->m_drag_increment * (m_implementation->m_last_mouse[1] - mouse[1]);
 	}
 
 	command_arguments arguments;
-	arguments.append("timestamp", m_timer.elapsed());
-	arguments.append("mouse_delta", mouse - m_last_mouse);
+	arguments.append("timestamp", m_implementation->m_timer.elapsed());
+	arguments.append("mouse_delta", mouse - m_implementation->m_last_mouse);
 	arguments.append("value", new_value);
 	record_command("drag_motion", arguments);
 
-	m_data->set_value(new_value);
-	m_last_mouse = mouse;
+	m_implementation->m_model->set_value(new_value);
+	m_implementation->m_last_mouse = mouse;
 
 	// Wrap the mouse if it goes off the top-or-bottom of the screen ...
 	const int screen_height = Gdk::Display::get_default()->get_default_screen()->get_height();
 	const int border = 5;
 	if(mouse[1] < border)
 	{
-		m_last_mouse = k3d::point2(mouse[0], screen_height - (border + 1));
-		interactive::warp_pointer(m_last_mouse);
+		m_implementation->m_last_mouse = k3d::point2(mouse[0], screen_height - (border + 1));
+		interactive::warp_pointer(m_implementation->m_last_mouse);
 	}
 	else if(screen_height - mouse[1] < border)
 	{
-		m_last_mouse = k3d::point2(mouse[0], (border + 1));
-		interactive::warp_pointer(m_last_mouse);
+		m_implementation->m_last_mouse = k3d::point2(mouse[0], (border + 1));
+		interactive::warp_pointer(m_implementation->m_last_mouse);
 	}
 
 	// Wrap the mouse if it goes off the left-or-right of the screen ...
 	const int screen_width = Gdk::Display::get_default()->get_default_screen()->get_width();
 	if(mouse[0] < border)
 	{
-		m_last_mouse = k3d::point2(screen_width - (border + 1), mouse[1]);
-		interactive::warp_pointer(m_last_mouse);
+		m_implementation->m_last_mouse = k3d::point2(screen_width - (border + 1), mouse[1]);
+		interactive::warp_pointer(m_implementation->m_last_mouse);
 	}
 	else if(screen_width - mouse[0] < border)
 	{
-		m_last_mouse = k3d::point2((border + 1), mouse[1]);
-		interactive::warp_pointer(m_last_mouse);
+		m_implementation->m_last_mouse = k3d::point2((border + 1), mouse[1]);
+		interactive::warp_pointer(m_implementation->m_last_mouse);
 	}
 
 	return false;
@@ -525,17 +579,17 @@ bool control::on_drag_motion_notify_event(GdkEventMotion* Event)
 
 bool control::on_drag_key_press_event(GdkEventKey* Event)
 {
-	if(!m_tap_started && Event->keyval == GDK_Shift_L || Event->keyval == GDK_Shift_R)
+	if(!m_implementation->m_tap_started && Event->keyval == GDK_Shift_L || Event->keyval == GDK_Shift_R)
 	{
-		m_tap_started = true;
-		m_drag_increment *= 10.0;
+		m_implementation->m_tap_started = true;
+		m_implementation->m_drag_increment *= 10.0;
 		record_command("increase_sensitivity");
 		return true;
 	}
-	else if(!m_tap_started && Event->keyval == GDK_Control_L || Event->keyval == GDK_Control_R)
+	else if(!m_implementation->m_tap_started && Event->keyval == GDK_Control_L || Event->keyval == GDK_Control_R)
 	{
-		m_tap_started = true;
-		m_drag_increment *= 0.1;
+		m_implementation->m_tap_started = true;
+		m_implementation->m_drag_increment *= 0.1;
 		record_command("decrease_sensitivity");
 		return true;
 	}
@@ -545,26 +599,30 @@ bool control::on_drag_key_press_event(GdkEventKey* Event)
 
 bool control::on_drag_key_release_event(GdkEventKey* Event)
 {
-	m_tap_started = false;
+	m_implementation->m_tap_started = false;
 	return false;
 }
 
 bool control::on_drag_timeout()
 {
 	// Step increment if the user doesn't move
-	if(!m_dragging)
+	if(!m_implementation->m_dragging)
 	{
-		if(m_drag_first_timeout)
+		if(m_implementation->m_drag_first_timeout)
 		{
 			// Don't change value on first timeout
-			m_drag_first_timeout = false;
+			m_implementation->m_drag_first_timeout = false;
 			return true;
 		}
 
-		if(m_up_button_pressed)
+		if(m_implementation->m_up_button_pressed)
+		{
 			increment();
+		}
 		else
+		{
 			decrement();
+		}
 	}
 
 	return true;
@@ -572,58 +630,57 @@ bool control::on_drag_timeout()
 
 void control::on_drag_released()
 {
-	return_if_fail(m_data.get());
-
 	// If the user really didn't drag anywhere and value wasn't changed yet
-	if(m_dragging)
+	if(m_implementation->m_dragging)
 	{
 		record_command("end_drag");
 	}
-	else if(!m_dragging && m_drag_first_timeout)
+	else if(!m_implementation->m_dragging && m_implementation->m_drag_first_timeout)
 	{
-		if(m_up_button_pressed)
+		if(m_implementation->m_up_button_pressed)
 		{
 			increment();
-			record_command("increment_value", k3d::string_cast(m_data->value()));
+			record_command("increment_value", k3d::string_cast(m_implementation->m_model->value()));
 		}
 		else
 		{
 			decrement();
-			record_command("decrement_value", k3d::string_cast(m_data->value()));
+			record_command("decrement_value", k3d::string_cast(m_implementation->m_model->value()));
 		}
 	}
 	else
 	{
-		record_command("set_value", k3d::string_cast(m_data->value()));
+		record_command("set_value", k3d::string_cast(m_implementation->m_model->value()));
 	}
 
 	// Disconnect idle timeout
-	m_drag_timeout.disconnect();
+	m_implementation->m_drag_timeout.disconnect();
 
 	// Turn this into an undo/redo -able event ...
-	if(m_data->state_recorder)
-	{
-		// Format a limited-precision version of the new value, so we we don't create unreadably-long undo-node labels ...
-		std::stringstream buffer;
-		buffer << std::setprecision(3) << m_data->value();
-		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_data->change_message + ' ' + buffer.str(), K3D_CHANGE_SET_CONTEXT);
-	}
+	if(m_implementation->m_state_recorder)
+		m_implementation->m_state_recorder->commit_change_set(m_implementation->m_state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), change_message(m_implementation->m_model->value()), K3D_CHANGE_SET_CONTEXT);
 
-	m_up_button->unset_flags(Gtk::CAN_FOCUS);
-	m_down_button->unset_flags(Gtk::CAN_FOCUS);
-	m_dragging = false;
+	m_implementation->m_up_button->unset_flags(Gtk::CAN_FOCUS);
+	m_implementation->m_down_button->unset_flags(Gtk::CAN_FOCUS);
+	m_implementation->m_dragging = false;
 }
 
 void control::increment()
 {
-	return_if_fail(m_data.get());
-	m_data->set_value(m_data->value() + m_step_increment);
+	m_implementation->m_model->set_value(m_implementation->m_model->value() + m_implementation->m_step_increment);
 }
 
 void control::decrement()
 {
-	return_if_fail(m_data.get());
-	m_data->set_value(m_data->value() - m_step_increment);
+	m_implementation->m_model->set_value(m_implementation->m_model->value() - m_implementation->m_step_increment);
+}
+
+const k3d::string_t control::change_message(const double Value)
+{
+	std::stringstream value_buffer;
+	value_buffer << std::setprecision(3) << Value;
+
+	return k3d::string_cast(boost::format(_("Change %1% to %2%")) % m_implementation->m_model->label().raw() % value_buffer.str());
 }
 
 } // namespace spin_button

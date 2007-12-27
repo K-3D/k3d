@@ -79,26 +79,31 @@ private:
 	k3d::iproperty& m_property;
 };
 
+} // namespace detail
+
 /// Adapts a spin button to control a single angle_axis coordinate (indentified by index)
-class spin_button_proxy_t :
-	public spin_button::idata_proxy
+class spin_button_model :
+	public spin_button::imodel
 {
 public:
-	spin_button_proxy_t(angle_axis::idata_proxy& Data, const unsigned int Index) :
-		spin_button::idata_proxy(Data.state_recorder, Data.change_message),
+	spin_button_model(angle_axis::idata_proxy& Data, const unsigned int Index) :
 		m_data(Data),
 		m_index(Index)
 	{
-		// Sanity checks ...
 		assert_warning(m_index < 3);
 	}
 
-	bool writable()
+	const Glib::ustring label()
+	{
+		return "";
+	}
+
+	const k3d::bool_t writable()
 	{
 		return true;
 	}
 
-	double value()
+	const k3d::double_t value()
 	{
 		k3d::quaternion quat(m_data.value());
 		return k3d::euler_angles(quat, k3d::euler_angles::XYZstatic)[m_index];
@@ -112,23 +117,25 @@ public:
 		m_data.set_value(k3d::angle_axis(k3d::quaternion(eulerangles)));
 	}
 
-	changed_signal_t& changed_signal()
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
 	{
-		return m_data.changed_signal();
+		return m_data.changed_signal().connect(sigc::hide(Slot));
+	}
+
+	const k3d::double_t step_increment()
+	{
+		return k3d::radians(1.0);
+	}
+
+	const std::type_info& units()
+	{
+		return typeid(k3d::measurement::angle);
 	}
 
 private:
 	angle_axis::idata_proxy& m_data;
 	const unsigned int m_index;
 };
-
-/// Convenience factory method for creating spin_button_proxy_t objects
-std::auto_ptr<spin_button::idata_proxy> spin_button_proxy(angle_axis::idata_proxy& Data, const unsigned int Index)
-{
-	return std::auto_ptr<spin_button::idata_proxy>(new spin_button_proxy_t(Data, Index));
-}
-
-} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // control
@@ -139,17 +146,9 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	m_data(Data),
 	m_reset_button(new Gtk::Button(_("Reset")))
 {
-	spin_button::control* const x = new spin_button::control(*this, "x", detail::spin_button_proxy(*m_data, 0));
-	spin_button::control* const y = new spin_button::control(*this, "y", detail::spin_button_proxy(*m_data, 1));
-	spin_button::control* const z = new spin_button::control(*this, "z", detail::spin_button_proxy(*m_data, 2));
-
-	x->set_units(typeid(k3d::measurement::angle));
-	y->set_units(typeid(k3d::measurement::angle));
-	z->set_units(typeid(k3d::measurement::angle));
-
-	x->set_step_increment(k3d::radians(1.0));
-	y->set_step_increment(k3d::radians(1.0));
-	z->set_step_increment(k3d::radians(1.0));
+	spin_button::control* const x = new spin_button::control(*this, "x", new spin_button_model(*m_data, 0), m_data->state_recorder);
+	spin_button::control* const y = new spin_button::control(*this, "y", new spin_button_model(*m_data, 1), m_data->state_recorder);
+	spin_button::control* const z = new spin_button::control(*this, "z", new spin_button_model(*m_data, 2), m_data->state_recorder);
 
 	attach(*Gtk::manage(new Gtk::Label(_("X"))), 0, 1, 0, 1);
 	attach(*Gtk::manage(x), 1, 2, 0, 1);

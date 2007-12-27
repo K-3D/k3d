@@ -78,24 +78,30 @@ private:
 	k3d::iproperty& m_property;
 };
 
+} // namespace detail
+
 /// Adapts a spin button to control a single bounding_box coordinate
-class spin_button_proxy_t :
-	public spin_button::idata_proxy
+class spin_button_model :
+	public spin_button::imodel
 {
 public:
-	spin_button_proxy_t(bounding_box::idata_proxy& Data, double k3d::bounding_box3::* Value) :
-		spin_button::idata_proxy(Data.state_recorder, Data.change_message),
+	spin_button_model(bounding_box::idata_proxy& Data, double k3d::bounding_box3::* Value) :
 		m_data(Data),
 		m_value(Value)
 	{
 	}
 
-	bool writable()
+	const Glib::ustring label()
+	{
+		return "";
+	}
+
+	const k3d::bool_t writable()
 	{
 		return true;
 	}
 
-	double value()
+	const k3d::double_t value()
 	{
 		return m_data.value().*m_value;
 	}
@@ -107,23 +113,25 @@ public:
 		m_data.set_value(box);
 	}
 
-	changed_signal_t& changed_signal()
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
 	{
-		return m_data.changed_signal();
+		return m_data.changed_signal().connect(sigc::hide(Slot));
+	}
+
+	const k3d::double_t step_increment()
+	{
+		return 0.1;
+	}
+
+	const std::type_info& units()
+	{
+		return typeid(k3d::measurement::distance);
 	}
 
 private:
 	bounding_box::idata_proxy& m_data;
 	double k3d::bounding_box3::* m_value;
 };
-
-/// Convenience factory method for creating spin_button_proxy_t objects
-std::auto_ptr<spin_button::idata_proxy> spin_button_proxy(bounding_box::idata_proxy& Data, double k3d::bounding_box3::* Value)
-{
-	return std::auto_ptr<spin_button::idata_proxy>(new spin_button_proxy_t(Data, Value));
-}
-
-} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // control
@@ -133,26 +141,12 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	ui_component(Name, &Parent),
 	m_data(Data)
 {
-	spin_button::control* const nx = new spin_button::control(*this, "nx", detail::spin_button_proxy(*m_data, &k3d::bounding_box3::nx));
-	spin_button::control* const px = new spin_button::control(*this, "px", detail::spin_button_proxy(*m_data, &k3d::bounding_box3::px));
-	spin_button::control* const ny = new spin_button::control(*this, "ny", detail::spin_button_proxy(*m_data, &k3d::bounding_box3::ny));
-	spin_button::control* const py = new spin_button::control(*this, "py", detail::spin_button_proxy(*m_data, &k3d::bounding_box3::py));
-	spin_button::control* const nz = new spin_button::control(*this, "nz", detail::spin_button_proxy(*m_data, &k3d::bounding_box3::nz));
-	spin_button::control* const pz = new spin_button::control(*this, "pz", detail::spin_button_proxy(*m_data, &k3d::bounding_box3::pz));
-
-	nx->set_units(typeid(k3d::measurement::distance));
-	px->set_units(typeid(k3d::measurement::distance));
-	ny->set_units(typeid(k3d::measurement::distance));
-	py->set_units(typeid(k3d::measurement::distance));
-	nz->set_units(typeid(k3d::measurement::distance));
-	pz->set_units(typeid(k3d::measurement::distance));
-
-	nx->set_step_increment(0.1);
-	px->set_step_increment(0.1);
-	ny->set_step_increment(0.1);
-	py->set_step_increment(0.1);
-	nz->set_step_increment(0.1);
-	pz->set_step_increment(0.1);
+	spin_button::control* const nx = new spin_button::control(*this, "nx", new spin_button_model(*m_data, &k3d::bounding_box3::nx), m_data->state_recorder);
+	spin_button::control* const px = new spin_button::control(*this, "px", new spin_button_model(*m_data, &k3d::bounding_box3::px), m_data->state_recorder);
+	spin_button::control* const ny = new spin_button::control(*this, "ny", new spin_button_model(*m_data, &k3d::bounding_box3::ny), m_data->state_recorder);
+	spin_button::control* const py = new spin_button::control(*this, "py", new spin_button_model(*m_data, &k3d::bounding_box3::py), m_data->state_recorder);
+	spin_button::control* const nz = new spin_button::control(*this, "nz", new spin_button_model(*m_data, &k3d::bounding_box3::nz), m_data->state_recorder);
+	spin_button::control* const pz = new spin_button::control(*this, "pz", new spin_button_model(*m_data, &k3d::bounding_box3::pz), m_data->state_recorder);
 
 	attach(*Gtk::manage(new Gtk::Label(_("X"))), 0, 1, 0, 1);
 	attach(*Gtk::manage(nx), 0, 1, 1, 2);

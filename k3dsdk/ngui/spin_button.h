@@ -27,61 +27,49 @@
 */
 
 #include "ui_component.h"
-
-#include <k3dsdk/high_res_timer.h>
-#include <k3dsdk/vectors.h>
-
-#include <gtkmm/button.h>
 #include <gtkmm/table.h>
 
-namespace Gtk { class Button; }
 namespace k3d { class iproperty; }
 namespace k3d { class istate_recorder; }
 
 namespace libk3dngui
 {
 
-class hotkey_entry;
-
 namespace spin_button
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// idata_proxy
+// imodel
 
-/// Abstract interface for an object that proxies a data source for a spin-button control (i.e. the "model" in model-view-controller)
-class idata_proxy
+/// Abstract data model for a spin_button::control
+class imodel
 {
 public:
-	virtual ~idata_proxy() {}
+	virtual ~imodel() {}
 
+	/// Returns a human-readable label for the underlying data
+	virtual const Glib::ustring label() = 0;
 	/// Returns true iff the underlying data source is writable
-	virtual bool writable() = 0;
+	virtual const k3d::bool_t writable() = 0;
 	/// Called to return the underlying data value
-	virtual double value() = 0;
+	virtual const k3d::double_t value() = 0;
 	/// Called to set a new data value
-	virtual void set_value(const double Value) = 0;
-	/// Signal emitted if the underlying data changes
-	typedef sigc::signal<void, k3d::iunknown*> changed_signal_t;
-	/// Signal emitted if the underlying data changes
-	virtual changed_signal_t& changed_signal() = 0;
-
-	/// Stores an optional state recorder for recording undo/redo data
-	k3d::istate_recorder* const state_recorder;
-	/// Stores an optional message for labelling undo/redo state changes
-	const Glib::ustring change_message;
+	virtual void set_value(const k3d::double_t Value) = 0;
+	/// Connects a slot to a signal that will be emitted if the underlying data changes
+	virtual sigc::connection connect_changed_signal(const sigc::slot<void>& Slot) = 0;
+	virtual const k3d::double_t step_increment() = 0;
+	virtual const std::type_info& units() = 0;
 
 protected:
-	idata_proxy(k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
-		state_recorder(StateRecorder),
-		change_message(ChangeMessage)
-	{
-	}
+	imodel() {}
 
 private:
-	idata_proxy(const idata_proxy& RHS);
-	idata_proxy& operator=(const idata_proxy& RHS);
+	imodel(const imodel& RHS);
+	imodel& operator=(const imodel& RHS);
 };
+
+/// Factory method for creating an imodel object given a suitably-typed property
+imodel* const model(k3d::iproperty& Property);
 
 /////////////////////////////////////////////////////////////////////////////
 // control
@@ -94,7 +82,8 @@ class control :
 	typedef Gtk::Table base;
 
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data);
+	control(k3d::icommand_node& Parent, const std::string& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder);
+	~control();
 
 	/// Sets the step increment between values when the user clicks on the up or down arrows
 	void set_step_increment(const double StepIncrement);
@@ -108,7 +97,7 @@ private:
 	void setup_arrow_button(Gtk::Button* Button, const Gtk::ArrowType ArrowType, const bool Up);
 
 	/// Called whenever the underlying data changes
-	void on_data_changed(k3d::iunknown*);
+	void on_data_changed();
 	/// Formats a value and displays it in the entry
 	void display_value(const double Value);
 
@@ -137,90 +126,11 @@ private:
 	/// Called to decrement the current value
 	void decrement();
 
-	/// Entry control for display and manual input
-	hotkey_entry* const m_entry;
-	/// Button controls for interactive input
-	Gtk::Button* const m_up_button;
-	Gtk::Button* const m_down_button;
-	/// Stores a reference to the underlying data object
-	std::auto_ptr<idata_proxy> m_data;
+	const k3d::string_t change_message(const double Value);
 
-	/// Stores whether the 'up' button was pressed
-	bool m_up_button_pressed;
-	/// Stores the increment used to modify the button's value using the spin controls
-	double m_step_increment;
-	/// Stores the type of type of real-world-units to use for formatting & parsing
-	const std::type_info* m_units;
-
-	/// Stores the most recent mouse position in screen coordinates during dragging
-	k3d::point2 m_last_mouse;
-	/// Stores the increment used to modify data during dragging
-	double m_drag_increment;
-	/// Set to true during dragging
-	bool m_dragging;
-	/// Stores the drag timeout connection
-	sigc::connection m_drag_timeout;
-	/// Stores whether this is the first drag timeout
-	bool m_drag_first_timeout;
-	/// Prevents keyboard auto-repeat from sending drag-sensitivity through the roof
-	bool m_tap_started;
-	k3d::timer m_timer;
+	class implementation;
+	implementation* const m_implementation;
 };
-
-/////////////////////////////////////////////////////////////////////////////
-// data_proxy
-
-/// Provides an implementation of k3d::spin_button::idata_proxy that supports any data source that supports the value(), set_value(), and changed_signal() concepts
-template<typename data_t>
-class data_proxy :
-	public idata_proxy
-{
-public:
-	data_proxy(data_t& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
-		idata_proxy(StateRecorder, ChangeMessage),
-		m_data(Data)
-	{
-	}
-
-	bool writable()
-	{
-		return true;
-	}
-
-	double value()
-	{
-		return m_data.value();
-	}
-
-	void set_value(const double Value)
-	{
-		m_data.set_value(static_cast<typename data_t::value_t>(Value));
-	}
-
-	changed_signal_t& changed_signal()
-	{
-		return m_data.changed_signal();
-	}
-
-private:
-	data_proxy(const data_proxy& RHS);
-	data_proxy& operator=(const data_proxy& RHS);
-
-	data_t& m_data;
-};
-
-/////////////////////////////////////////////////////////////////////////////
-// proxy
-
-/// Convenience factory function for creating k3d::spin_button::idata_proxy objects
-template<typename data_t>
-std::auto_ptr<idata_proxy> proxy(data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = "")
-{
-	return std::auto_ptr<idata_proxy>(new data_proxy<data_t>(Data, StateRecorder, ChangeMessage));
-}
-
-/// Convenience factory function for creating k3d::spin_button::idata_proxy objects, specialized for k3d::iproperty
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = "");
 
 } // namespace spin_button
 

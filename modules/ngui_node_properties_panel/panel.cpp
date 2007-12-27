@@ -42,7 +42,7 @@
 #include <k3dsdk/ngui/property_button.h>
 #include <k3dsdk/ngui/property_label.h>
 #include <k3dsdk/ngui/render.h>
-#include <k3dsdk/ngui/scale.h>
+#include <k3dsdk/ngui/scale_control.h>
 #include <k3dsdk/ngui/script_button.h>
 #include <k3dsdk/ngui/selection_button.h>
 #include <k3dsdk/ngui/spin_button.h>
@@ -444,7 +444,7 @@ public:
 					prop_label_begin, prop_label_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 				// Boolean properties ...
-				if(property_type == typeid(bool))
+				if(property_type == typeid(k3d::bool_t))
 				{
 					check_button::control* const control = new check_button::control(m_parent, property_name, check_button::proxy(property, state_recorder, property_name));
 					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
@@ -452,16 +452,10 @@ public:
 					entry_list.push_back(control);
 				}
 				// Scalar properties ...
-				else if(property_type == typeid(double) || property_type == typeid(float) || property_type == typeid(long) || property_type == typeid(unsigned long) || property_type == typeid(int) || property_type == typeid(unsigned int))
+				else if(property_type == typeid(k3d::int32_t) || property_type == typeid(k3d::uint32_t) || property_type == typeid(k3d::float_t) || property_type == typeid(k3d::double_t))
 				{
-					spin_button::control* const control = new spin_button::control(m_parent, property_name, spin_button::proxy(property, state_recorder, property_name));
-					if(k3d::imeasurement_property* const measurement_property = dynamic_cast<k3d::imeasurement_property*>(&property))
-					{
-						control->set_step_increment(measurement_property->property_step_increment());
-						control->set_units(measurement_property->property_units());
-					}
+					spin_button::control* const control = new spin_button::control(m_parent, property_name, spin_button::model(property), state_recorder);
 					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
 					entry_list.push_back(control);
 				}
 				// Color properties ...
