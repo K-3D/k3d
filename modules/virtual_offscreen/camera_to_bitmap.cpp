@@ -66,6 +66,8 @@ public:
 			const k3d::factories_t factories = k3d::plugins(plugin_name);
 			if(1 == factories.size())
 				delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
+
+			k3d::log() << info << this->name() << " delegating to " << dynamic_cast<k3d::iplugin_factory*>(delegate)->name() << std::endl;
 		}
 
 		return_val_if_fail(delegate, 0);
