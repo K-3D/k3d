@@ -31,7 +31,10 @@
 
 #include <sstream>
 
-namespace libk3dtest
+namespace module
+{
+
+namespace test
 {
 
 class memory_pools :
@@ -111,5 +114,7 @@ k3d::iplugin_factory& memory_pools_factory()
 	return memory_pools::get_factory();
 }
 
-} // namespace libk3dtest
+} // namespace test
+
+} // namespace module
 

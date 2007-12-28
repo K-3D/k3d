@@ -24,29 +24,34 @@
 #include "gprim_factory.h"
 #include "obj_parser.h"
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-#include <k3dsdk/fstream.h>
+namespace module
+{
 
-namespace libk3dobjio
+namespace obj
+{
+
+namespace io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// obj_mesh_reader_implementation
+// mesh_reader_implementation
 
-class obj_mesh_reader_implementation :
+class mesh_reader_implementation :
 	public k3d::mesh_source<k3d::persistent<k3d::node> >,
 	public k3d::imesh_storage
 {
 	typedef k3d::mesh_source<k3d::persistent<k3d::node> > base;
 
 public:
-	obj_mesh_reader_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	mesh_reader_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("obj_files")),
 		m_texture_u(init_owner(*this) + init_name("texture_u") + init_label(_("Texture U")) + init_description(_("Texture U")) + init_value(std::string("s"))),
@@ -88,7 +93,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<obj_mesh_reader_implementation,
+		static k3d::document_plugin_factory<mesh_reader_implementation,
                 k3d::interface_list<k3d::imesh_source,
                 k3d::interface_list<k3d::imesh_storage> > > factory(
 			k3d::uuid(0x650f96b9, 0xe1c145d5, 0x9eda410d, 0x13f4e98f),
@@ -217,10 +222,14 @@ private:
 	};
 };
 
-k3d::iplugin_factory& obj_mesh_reader_factory()
+k3d::iplugin_factory& mesh_reader_factory()
 {
-	return obj_mesh_reader_implementation::get_factory();
+	return mesh_reader_implementation::get_factory();
 }
 
-} // namespace libk3dobjio
+} // namespace io
+
+} // namespace obj
+
+} // namespace module
 

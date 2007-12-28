@@ -29,7 +29,10 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dtest
+namespace module
+{
+
+namespace test
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -87,5 +90,7 @@ k3d::iplugin_factory& legacy_mesh_conversion_factory()
 	return legacy_mesh_conversion::get_factory();
 }
 
-} // namespace libk3dtest
+} // namespace test
+
+} // namespace module
 

@@ -23,8 +23,10 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the test plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dtest
+namespace module
+{
+
+namespace test
 {
 
 extern k3d::iplugin_factory& legacy_mesh_conversion_factory();
@@ -32,14 +34,16 @@ extern k3d::iplugin_factory& memory_pools_factory();
 extern k3d::iplugin_factory& mesh_diff_factory();
 extern k3d::iplugin_factory& mesh_to_stdout_factory();
 
-} // namespace libk3dtest
+} // namespace test
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
 
-	Registry.register_factory(libk3dtest::legacy_mesh_conversion_factory());
-	Registry.register_factory(libk3dtest::memory_pools_factory());
-	Registry.register_factory(libk3dtest::mesh_diff_factory());
-	Registry.register_factory(libk3dtest::mesh_to_stdout_factory());
+	Registry.register_factory(module::test::legacy_mesh_conversion_factory());
+	Registry.register_factory(module::test::memory_pools_factory());
+	Registry.register_factory(module::test::mesh_diff_factory());
+	Registry.register_factory(module::test::mesh_to_stdout_factory());
 
 K3D_MODULE_END
 

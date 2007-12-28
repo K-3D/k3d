@@ -25,15 +25,18 @@
 #include "Metric.h"
 #include "RGBAImage.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/bitmap.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/ibitmap_sink.h>
 #include <k3dsdk/ibitmap_source.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dpdiff
+namespace module
+{
+
+namespace pdiff
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -226,5 +229,7 @@ k3d::iplugin_factory& bitmap_perceptual_difference_factory()
 	return bitmap_perceptual_difference::get_factory();
 }
 
-} // namespace libk3dpdiff
+} // namespace pdiff
+
+} // namespace module
 

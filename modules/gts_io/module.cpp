@@ -23,16 +23,25 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the GTS IO plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dgtsio
+namespace module
 {
 
-extern k3d::iplugin_factory& gts_mesh_reader_factory();
+namespace gts
+{
 
-} // libk3dgtsio
+namespace io
+{
+
+extern k3d::iplugin_factory& mesh_reader_factory();
+
+} // namespace io
+
+} // namespace gts
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dgtsio::gts_mesh_reader_factory());
+	Registry.register_factory(module::gts::io::mesh_reader_factory());
 K3D_MODULE_END
 
 

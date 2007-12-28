@@ -25,33 +25,37 @@
 
 #include <k3d-i18n-config.h>
 #include <k3d-version-config.h>
-
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-#include <k3dsdk/fstream.h>
+namespace module
+{
 
-namespace libk3dobjio
+namespace obj
+{
+
+namespace io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// obj_mesh_writerio
+// mesh_writerio
 
-class obj_mesh_writer :
+class mesh_writer :
 	public k3d::mesh_sink<k3d::persistent<k3d::node> >
 {
 	typedef k3d::mesh_sink<k3d::persistent<k3d::node> > base;
 
 public:
-	obj_mesh_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	mesh_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Output file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::WRITE) + init_path_type("obj_files"))
 	{
-		m_file.changed_signal().connect(sigc::mem_fun(*this, &obj_mesh_writer::on_write_file));
-		m_input_mesh.changed_signal().connect(sigc::mem_fun(*this, &obj_mesh_writer::on_write_file));
+		m_file.changed_signal().connect(sigc::mem_fun(*this, &mesh_writer::on_write_file));
+		m_input_mesh.changed_signal().connect(sigc::mem_fun(*this, &mesh_writer::on_write_file));
 	}
 
 	void on_write_file(k3d::iunknown*)
@@ -135,7 +139,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<obj_mesh_writer, k3d::interface_list<k3d::imesh_sink > > factory(
+		static k3d::document_plugin_factory<mesh_writer, k3d::interface_list<k3d::imesh_sink > > factory(
 			k3d::uuid(0x32120889, 0x85964fd3, 0x8dac7deb, 0xe3fc9676),
 			"OBJMeshWriter",
 			_("Mesh writer that saves external Wavefront (.obj) files"),
@@ -149,10 +153,14 @@ private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
 };
 
-k3d::iplugin_factory& obj_mesh_writer_factory()
+k3d::iplugin_factory& mesh_writer_factory()
 {
-	return obj_mesh_writer::get_factory();
+	return mesh_writer::get_factory();
 }
 
-} // namespace libk3dobjioio
+} // namespace io
+
+} // namespace obj
+
+} // namespace module
 

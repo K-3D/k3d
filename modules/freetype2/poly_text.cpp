@@ -22,14 +22,13 @@
 */
 
 #include <k3d-i18n-config.h>
-
 #include <k3dsdk/axis.h>
 #include <k3dsdk/bezier.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
+#include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
@@ -42,7 +41,10 @@
 #include FT_FREETYPE_H
 #include FT_OUTLINE_H
 
-namespace libk3dfreetype2
+namespace module
+{
+
+namespace freetype2
 {
 
 namespace detail
@@ -474,9 +476,11 @@ private:
 	k3d_data(k3d::signed_axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_orientation;
 };
 
-} // namespace libk3dfreetype2
+} // namespace freetype2
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dfreetype2::poly_text::get_factory());
+	Registry.register_factory(module::freetype2::poly_text::get_factory());
 K3D_MODULE_END
 

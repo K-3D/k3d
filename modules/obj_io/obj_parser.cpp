@@ -34,7 +34,13 @@
 #include <iterator>
 #include <stdexcept>
 
-namespace libk3dobjio
+namespace module
+{
+
+namespace obj
+{
+
+namespace io
 {
 
 namespace detail
@@ -437,5 +443,9 @@ void print_obj::on_vertex_coordinates(const k3d::point4& Vertex)
 	k3d::log() << debug << "on_vertex_coordinates " << Vertex << std::endl;
 }
 
-} // namespace libk3dobjio
+} // namespace io
+
+} // namespace obj
+
+} // namespace module
 

@@ -21,14 +21,17 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dtest
+namespace module
+{
+
+namespace test
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -83,5 +86,7 @@ k3d::iplugin_factory& mesh_to_stdout_factory()
 	return mesh_to_stdout::get_factory();
 }
 
-} // namespace libk3dtest
+} // namespace test
+
+} // namespace module
 

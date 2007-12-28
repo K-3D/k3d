@@ -23,15 +23,24 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the ply plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dplyio
+namespace module
 {
 
-extern k3d::iplugin_factory& ply_mesh_reader_factory();
+namespace ply
+{
 
-} // libk3dplyio
+namespace io
+{
+
+extern k3d::iplugin_factory& mesh_reader_factory();
+
+} // namespace io
+
+} // namespace ply
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dplyio::ply_mesh_reader_factory());
+	Registry.register_factory(module::ply::io::mesh_reader_factory());
 K3D_MODULE_END
 

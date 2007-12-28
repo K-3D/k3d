@@ -21,29 +21,35 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/file_helpers.h>
 #include <k3dsdk/fstream.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dplyio
+namespace module
+{
+
+namespace ply
+{
+
+namespace io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// ply_mesh_reader
+// mesh_reader
 
-class ply_mesh_reader :
+class mesh_reader :
 	public k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
-	ply_mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("ply_files"))
 	{
@@ -235,7 +241,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<ply_mesh_reader, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<mesh_reader, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0x6b0ac805, 0xc3094636, 0x972b80aa, 0x61437211),
 			"PLYMeshReader",
 			_("Mesh source that reads external Stanford PLY (.ply) files"),
@@ -248,10 +254,14 @@ private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
 };
 
-k3d::iplugin_factory& ply_mesh_reader_factory()
+k3d::iplugin_factory& mesh_reader_factory()
 {
-	return ply_mesh_reader::get_factory();
+	return mesh_reader::get_factory();
 }
 
-} // namespace libk3dplyio
+} // namespace io
+
+} // namespace ply
+
+} // namespace module
 

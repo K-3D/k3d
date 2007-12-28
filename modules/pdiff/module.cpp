@@ -23,15 +23,19 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the pdiff plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dpdiff
+namespace module
+{
+
+namespace pdiff
 {
 
 extern k3d::iplugin_factory& bitmap_perceptual_difference_factory();
 
-} // namespace libk3dpdiff
+} // namespace pdiff
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dpdiff::bitmap_perceptual_difference_factory());
+	Registry.register_factory(module::pdiff::bitmap_perceptual_difference_factory());
 K3D_MODULE_END
 

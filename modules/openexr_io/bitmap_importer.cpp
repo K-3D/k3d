@@ -21,8 +21,8 @@
 	\author Anders Dahnielson (anders@dahnielson.com)
 */
 
-#include <k3dsdk/application_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/ibitmap_importer.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/ifile_format.h>
@@ -30,19 +30,25 @@
 
 #include <ImfInputFile.h>
 
-namespace libk3dopenexrio
+namespace module
+{
+
+namespace openexr
+{
+
+namespace io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// exr_bitmap_importer
+// bitmap_importer
 
-class exr_bitmap_importer :
+class bitmap_importer :
 	public k3d::ifile_format,
 	public k3d::ibitmap_importer,
 	public k3d::ideletable
 {
 public:
-	exr_bitmap_importer()
+	bitmap_importer()
 	{
 	}
 
@@ -132,7 +138,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<exr_bitmap_importer,
+		static k3d::application_plugin_factory<bitmap_importer,
 			k3d::interface_list<k3d::ibitmap_importer> > factory(
 				k3d::uuid(0xdb5255b7, 0xb9c243a4, 0x81eb2645, 0x1d80ecac),
 				"EXRBitmapImporter",
@@ -144,12 +150,16 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// exr_bitmap_importer_factory
+// bitmap_importer_factory
 
-k3d::iplugin_factory& exr_bitmap_importer_factory()
+k3d::iplugin_factory& bitmap_importer_factory()
 {
-	return exr_bitmap_importer::get_factory();
+	return bitmap_importer::get_factory();
 }
 
-} // namespace libk3dopenexrio
+} // namespace io
+
+} // namespace openexr
+
+} // namespace module
 

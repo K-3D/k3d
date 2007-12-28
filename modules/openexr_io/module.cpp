@@ -23,15 +23,24 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the openexr plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dopenexrio
+namespace module
 {
 
-extern k3d::iplugin_factory& exr_bitmap_importer_factory();
+namespace openexr
+{
 
-} // namespace libk3dopenexrio
+namespace io
+{
+
+extern k3d::iplugin_factory& bitmap_importer_factory();
+
+} // namespace io
+
+} // namespace openexr
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dopenexrio::exr_bitmap_importer_factory());
+	Registry.register_factory(module::openexr::io::bitmap_importer_factory());
 K3D_MODULE_END
 

@@ -21,12 +21,12 @@
  * 	\author Bart Janssens (bart.janssens@lid.kviv.be)
  */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/array.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/extension_gl.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/hints.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/named_array_operations.h>
@@ -60,14 +60,15 @@ class face_painter :
 public:
 	face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, k3d::color(0.2,0.2,0.2), k3d::color(0.6,0.6,0.6))
-	{}
+	{
+	}
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
 		if(!validate_polyhedra(Mesh))
 			return;
 			
-		if (k3d::is_sds(Mesh))
+		if(k3d::is_sds(Mesh))
 			return;
 
 		k3d::gl::store_attributes attributes;
@@ -243,3 +244,4 @@ k3d::iplugin_factory& face_painter_factory()
 } // namespace painters
 
 } // namespace module
+

@@ -29,7 +29,13 @@
 namespace k3d { class normal3; }
 namespace k3d { class point4; }
 
-namespace libk3dobjio
+namespace module
+{
+
+namespace obj
+{
+
+namespace io
 {
 
 /// Template design pattern class for parsing Wavefront (.obj) files
@@ -86,5 +92,9 @@ private:
 	void on_vertex_coordinates(const k3d::point4& Vertex);
 };
 
-} // namespace libk3dobjio
+} // namespace io
+
+} // namespace obj
+
+} // namespace module
 

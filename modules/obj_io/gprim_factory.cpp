@@ -26,7 +26,13 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/shared_pointer.h>
 
-namespace libk3dobjio
+namespace module
+{
+
+namespace obj
+{
+
+namespace io
 {
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -231,5 +237,9 @@ void gprim_factory::add_nurbs_patch(const size_t UOrder, const size_t VOrder, co
 	m_implementation->nurbs_patch_v_knots->insert(m_implementation->nurbs_patch_v_knots->end(), VKnots.begin(), VKnots.end());
 }
 
-} // namespace libk3dobjio
+} // namespace io
+
+} // namespace obj
+
+} // namespace module
 

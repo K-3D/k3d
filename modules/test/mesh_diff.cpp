@@ -21,15 +21,18 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_diff.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
-namespace libk3dtest
+namespace module
+{
+
+namespace test
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -107,5 +110,7 @@ k3d::iplugin_factory& mesh_diff_factory()
 	return mesh_diff::get_factory();
 }
 
-} // namespace libk3dtest
+} // namespace test
+
+} // namespace module
 

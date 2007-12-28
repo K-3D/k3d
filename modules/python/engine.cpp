@@ -26,24 +26,24 @@
 */
 
 #include <k3d-i18n-config.h>
-
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/fstream.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/file_helpers.h>
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/module.h>
+#include <k3dsdk/python/object_model_python.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/string_modifiers.h>
 
-#include <k3dsdk/python/object_model_python.h>
-
 #include <boost/python/dict.hpp>
 
-/// Namespace reserved for the Python scripting engine module, to protect public symbols from name clashes with other modules
-namespace libk3dpython
+namespace module
+{
+
+namespace python
 {
 
 /// Magic token used to identify Python scripts
@@ -183,9 +183,11 @@ private:
 	boost::python::dict m_local_dict;
 };
 
-} // namespace libk3dpython
+} // namespace python
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dpython::engine::get_factory());
+	Registry.register_factory(module::python::engine::get_factory());
 K3D_MODULE_END
 

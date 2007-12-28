@@ -24,7 +24,13 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/point4.h>
 
-namespace libk3dobjio
+namespace module
+{
+
+namespace obj
+{
+
+namespace io
 {
 
 /// Provides a simplified interface for adding geometric primitives to a mesh
@@ -45,5 +51,9 @@ private:
 	implementation* const m_implementation;
 };
 
-} // namespace libk3dobjio
+} // namespace io
+
+} // namespace obj
+
+} // namespace module
 
