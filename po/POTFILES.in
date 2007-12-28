@@ -46,7 +46,7 @@ k3dsdk/ngui/render.cpp
 k3dsdk/ngui/render_region_tool.cpp
 k3dsdk/ngui/rotate_tool.cpp
 k3dsdk/ngui/safe_close_dialog.cpp
-k3dsdk/ngui/scale.cpp
+k3dsdk/ngui/scale_control.cpp
 k3dsdk/ngui/scale_tool.cpp
 k3dsdk/ngui/script_button.cpp
 k3dsdk/ngui/script_editor.cpp
@@ -108,10 +108,10 @@ modules/bitmap/bitmap_reader.cpp
 modules/bitmap/bitmap_solid.cpp
 modules/bitmap/bitmap_sub.cpp
 modules/bitmap/bitmap_threshold.cpp
-modules/blobbies/blobbies.cpp
-modules/blobbies/edges_to_blobby.cpp
-modules/blobbies/points_to_blobby.cpp
-modules/blobbies/polygonize_blobbies.cpp
+modules/blobby/blobbies.cpp
+modules/blobby/edges_to_blobby.cpp
+modules/blobby/points_to_blobby.cpp
+modules/blobby/polygonize_blobbies.cpp
 modules/booleans/cgal_boolean_nodes.cpp
 modules/core/axes.cpp
 modules/core/camera.cpp
@@ -154,7 +154,7 @@ modules/gnome/uri_handler.cpp
 modules/graphviz/render_engine.cpp
 modules/gts/mesh_area.cpp
 modules/gts/mesh_volume.cpp
-modules/gts_io/gts_mesh_reader.cpp
+modules/gts_io/mesh_reader.cpp
 modules/imagemagick_io/bitmap_importer.cpp
 modules/jpeg_io/bitmap_importer.cpp
 modules/jpeg_io/bitmap_reader.cpp
@@ -216,9 +216,9 @@ modules/nurbs/nurbs_paraboloid.cpp
 modules/nurbs/nurbs_polygon.cpp
 modules/nurbs/nurbs_sphere.cpp
 modules/nurbs/nurbs_torus.cpp
-modules/obj_io/obj_mesh_reader.cpp
-modules/obj_io/obj_mesh_writer.cpp
-modules/openexr_io/exr_bitmap_importer.cpp
+modules/obj_io/mesh_reader.cpp
+modules/obj_io/mesh_writer.cpp
+modules/openexr_io/bitmap_importer.cpp
 modules/opengl/material.cpp
 modules/opengl/render_engine.cpp
 modules/opengl_painters/bicubic_patch_painter.cpp
@@ -260,7 +260,7 @@ modules/pgp_remesh/point_mean_curv_painter.cpp
 modules/pgp_remesh/remesh.cpp
 modules/pixie/raytrace_map.cpp
 modules/plot/surface_plot.cpp
-modules/ply_io/ply_mesh_reader.cpp
+modules/ply_io/mesh_reader.cpp
 modules/png_io/bitmap_importer.cpp
 modules/png_io/bitmap_reader.cpp
 modules/png_io/bitmap_writer.cpp
