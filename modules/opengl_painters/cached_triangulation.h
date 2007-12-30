@@ -49,26 +49,31 @@ public:
 	// 32 bit so arrays can be passed directly to OpenGL on 64bit platforms
 	typedef std::vector<k3d::uint32_t> indices_t;
 
+	/// The points that form the corners of the triangles. Duplicated per face to allow per-face normals
 	k3d::mesh::points_t& points()
 	{
 		return m_points;
 	}
 	
+	/// The indices into points() for the triangles
 	indices_t& indices()
 	{
 		return m_indices;
 	}
 	
+	/// First triangle corner (index into indices()) for each original face
 	k3d::mesh::indices_t& face_starts()
 	{
 		return m_face_starts;
 	}
 	
+	/// Link between original mesh point indices and the indices into points() of its copies
 	index_vectors_t& point_links()
 	{
 		return m_point_links;
 	}
 	
+	/// Link between a face index in the original mesh and its corner indices into points()
 	index_vectors_t& face_points()
 	{
 		return m_face_points;

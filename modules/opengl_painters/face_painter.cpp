@@ -79,85 +79,41 @@ public:
 
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
-		glEnable(GL_COLOR_MATERIAL);
-		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
-		
-		enable_blending();
 		
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
-		cached_triangulation& triangles = get_data<cached_triangulation>(&Mesh, this); 
-		
-		size_t face_count = Mesh.polyhedra->face_first_loops->size();
+		cached_triangulation& triangles = get_data<cached_triangulation>(&Mesh, this);
+		const k3d::mesh::indices_t& face_starts = triangles.face_starts();
+		if (face_starts.empty())
+			return;
+		const k3d::mesh::points_t& points = triangles.points();
+		const cached_triangulation::indices_t& indices = triangles.indices();
 		
 		glEnable(GL_LIGHTING);
+		enable_blending();
 		
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &(triangles.points().at(0)));
-		
-		k3d::typed_array<k3d::normal3> normals(triangles.points().size(), k3d::normal3(0, 0, 1));
-		cached_triangulation::index_vectors_t& face_points = triangles.face_points();
-		const k3d::mesh::normals_t* calculated_normals = k3d::get_array<k3d::mesh::normals_t>(Mesh.polyhedra->uniform_data, "N");
-		if (calculated_normals)
+		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+		const k3d::mesh::indices_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+		const k3d::mesh::points_t& mesh_points = *Mesh.points;
+		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
+
+		glBegin(GL_TRIANGLES);
+		for (k3d::uint_t face = 0; face != face_starts.size(); ++face)
 		{
-			for (k3d::uint_t face = 0; face != face_points.size(); ++face)
-			{
-				k3d::mesh::indices_t& corners = face_points[face];
-				for (k3d::uint_t i = 0; i != corners.size(); ++i)
-				{ 
-					normals[corners[i]] = calculated_normals->at(face);
-				}
-			}
+			k3d::uint_t startindex = face_starts[face];
+			k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
+			const color_t& face_color = face_selection[face] ? selected_color : color;
+			
+			k3d::gl::normal3d(k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]));
+			k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
+			for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
+				k3d::gl::vertex3d(points[indices[corner]]);
 		}
-		else
-		{
-			const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-			const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-			const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-			const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-			const k3d::mesh::indices_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-			const k3d::mesh::points_t& mesh_points = *Mesh.points;
-			for (k3d::uint_t face = 0; face != face_points.size(); ++face)
-			{
-				k3d::normal3 n = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]);
-				k3d::mesh::indices_t& corners = face_points[face];
-				for (k3d::uint_t i = 0; i != corners.size(); ++i)
-				{ 
-					normals[corners[i]] = n; 
-				}
-			}
-		}
-		
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_DOUBLE, 0, &normals[0]);
-		
-		std::vector<color_t> colors(triangles.points().size(), color);
-		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection; 
-		for (k3d::uint_t face = 0; face != face_points.size(); ++face)
-		{
-			if (!face_selection[face])
-				continue;
-			k3d::mesh::indices_t& corners = face_points[face];
-			for (k3d::uint_t i = 0; i != corners.size(); ++i)
-			{ 
-				colors[corners[i]] = selected_color;
-			}
-		}
-		
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_DOUBLE, 0, &colors[0]);
-		
-		glDrawElements(GL_TRIANGLES, triangles.indices().size(), GL_UNSIGNED_INT, &(triangles.indices().at(0)));
-		
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_COLOR_ARRAY);
-		glDisableClientState(GL_SECONDARY_COLOR_ARRAY);
-		glDisableClientState(GL_INDEX_ARRAY);
-		glDisableClientState(GL_NORMAL_ARRAY);
-		glDisableClientState(GL_FOG_COORDINATE_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		glDisableClientState(GL_EDGE_FLAG_ARRAY);
+		glEnd();
 		
 		disable_blending();
 	}
@@ -189,10 +145,11 @@ public:
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_DOUBLE, 0, &(triangles.points().at(0)));
 		
-		k3d::mesh::indices_t& face_starts = triangles.face_starts();
+		const k3d::mesh::indices_t& face_starts = triangles.face_starts();
 		if (face_starts.empty())
 			return;
-		cached_triangulation::indices_t& indices = triangles.indices();
+		const k3d::mesh::points_t& points = triangles.points();
+		const cached_triangulation::indices_t& indices = triangles.indices();
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
 		for(size_t face = 0; face != face_count; ++face)
@@ -201,7 +158,10 @@ public:
 
 			k3d::uint_t startindex = face_starts[face];
 			k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
-			glDrawElements(GL_TRIANGLES, endindex - startindex, GL_UNSIGNED_INT, &indices[startindex]);
+			glBegin(GL_TRIANGLES);
+			for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
+				k3d::gl::vertex3d(points[indices[corner]]);
+			glEnd();
 
 			k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
 		}
