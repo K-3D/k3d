@@ -34,7 +34,10 @@
 #include <k3dsdk/utility_gl.h>
 #include <k3dsdk/vectors.h>
 
-namespace libk3dannotation
+namespace module
+{
+
+namespace annotation
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -144,5 +147,7 @@ k3d::iplugin_factory& annotation_2d_factory()
 	return annotation_2d::get_factory();
 }
 
-} // namespace libk3dannotation
+} // namespace annotation
+
+} // namespace module
 

@@ -34,7 +34,10 @@
 
 #include "interpolator.h"
 
-namespace libk3danimation
+namespace module
+{
+
+namespace animation
 {
 
 template <typename time_t, typename value_t> class animation_track;
@@ -490,4 +493,6 @@ k3d::iplugin_factory& animation_track_double_double_factory()
 	return animation_track_double_double::get_factory();
 }
 
-} // namespace libk3danimation
+} // namespace animation
+
+} // namespace module

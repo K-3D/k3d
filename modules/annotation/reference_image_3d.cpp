@@ -31,7 +31,10 @@
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/transformable.h>
 
-namespace libk3dannotation
+namespace module
+{
+
+namespace annotation
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -271,5 +274,7 @@ k3d::iplugin_factory& reference_image_3d_factory()
 	return reference_image_3d::get_factory();
 }
 
-} // namespace libk3dannotation
+} // namespace annotation
+
+} // namespace module
 

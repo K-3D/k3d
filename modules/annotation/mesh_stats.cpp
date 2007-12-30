@@ -22,14 +22,17 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dannotation
+namespace module
+{
+
+namespace annotation
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -262,5 +265,7 @@ k3d::iplugin_factory& mesh_stats_factory()
 	return mesh_stats::get_factory();
 }
 
-} // namespace libk3dannotation
+} // namespace annotation
+
+} // namespace module
 

@@ -24,8 +24,10 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the core plugin module, to protect public symbols from name clashes with other modules
-namespace libk3danimation
+namespace module
+{
+
+namespace animation
 {
 
 extern k3d::iplugin_factory& animation_track_double_matrix4_factory();
@@ -33,12 +35,14 @@ extern k3d::iplugin_factory& animation_track_double_double_factory();
 extern k3d::iplugin_factory& interpolator_double_matrix4_linear_factory();
 extern k3d::iplugin_factory& interpolator_double_double_linear_factory();
 
-} // namespace libk3danimation
+} // namespace animation
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3danimation::animation_track_double_matrix4_factory());
-	Registry.register_factory(libk3danimation::animation_track_double_double_factory());
-	Registry.register_factory(libk3danimation::interpolator_double_matrix4_linear_factory());
-	Registry.register_factory(libk3danimation::interpolator_double_double_linear_factory());
+	Registry.register_factory(module::animation::animation_track_double_matrix4_factory());
+	Registry.register_factory(module::animation::animation_track_double_double_factory());
+	Registry.register_factory(module::animation::interpolator_double_matrix4_linear_factory());
+	Registry.register_factory(module::animation::interpolator_double_double_linear_factory());
 K3D_MODULE_END
 

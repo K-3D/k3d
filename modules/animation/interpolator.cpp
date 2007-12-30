@@ -32,7 +32,10 @@
 #include "interpolator.h"
 #include <k3dsdk/type_registry.h>
 
-namespace libk3danimation
+namespace module
+{
+
+namespace animation
 {
 
 class interpolator_double_matrix4_linear :
@@ -85,4 +88,7 @@ k3d::iplugin_factory& interpolator_double_double_linear_factory()
 	return interpolator_double_double_linear::get_factory();
 }
 
-}
+} // namespace animation
+
+} // namespace module
+

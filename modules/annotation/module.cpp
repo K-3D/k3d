@@ -24,8 +24,10 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the core plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dannotation
+namespace module
+{
+
+namespace annotation
 {
 
 extern k3d::iplugin_factory& annotation_factory();
@@ -35,14 +37,16 @@ extern k3d::iplugin_factory& mesh_stats_factory();
 extern k3d::iplugin_factory& reference_image_2d_factory();
 extern k3d::iplugin_factory& reference_image_3d_factory();
 
-} // namespace libk3dannotation
+} // namespace annotation
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dannotation::annotation_factory());
-	Registry.register_factory(libk3dannotation::annotation_2d_factory());
-	Registry.register_factory(libk3dannotation::annotate_normal_factory());
-	Registry.register_factory(libk3dannotation::mesh_stats_factory());
-	Registry.register_factory(libk3dannotation::reference_image_2d_factory());
-	Registry.register_factory(libk3dannotation::reference_image_3d_factory());
+	Registry.register_factory(module::annotation::annotation_factory());
+	Registry.register_factory(module::annotation::annotation_2d_factory());
+	Registry.register_factory(module::annotation::annotate_normal_factory());
+	Registry.register_factory(module::annotation::mesh_stats_factory());
+	Registry.register_factory(module::annotation::reference_image_2d_factory());
+	Registry.register_factory(module::annotation::reference_image_3d_factory());
 K3D_MODULE_END
 

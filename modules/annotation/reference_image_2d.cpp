@@ -34,7 +34,10 @@
 #include <k3dsdk/render_state_gl.h>
 #include <k3dsdk/utility_gl.h>
 
-namespace libk3dannotation
+namespace module
+{
+
+namespace annotation
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -313,5 +316,7 @@ k3d::iplugin_factory& reference_image_2d_factory()
 	return reference_image_2d::get_factory();
 }
 
-} // namespace libk3dannotation
+} // namespace annotation
+
+} // namespace module
 

@@ -32,7 +32,10 @@
 #include <k3dsdk/transformable.h>
 #include <k3dsdk/vectors.h>
 
-namespace libk3dannotation
+namespace module
+{
+
+namespace annotation
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -133,5 +136,7 @@ k3d::iplugin_factory& annotation_factory()
 	return annotation::get_factory();
 }
 
-} // namespace libk3dannotation
+} // namespace annotation
+
+} // namespace module
 

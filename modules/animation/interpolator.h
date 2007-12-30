@@ -29,7 +29,10 @@
 
 #include <k3dsdk/algebra.h>
 
-namespace libk3danimation
+namespace module
+{
+
+namespace animation
 {
 
 /// Thrown when the interpolator does not have enough key data to give an interpolation
@@ -135,6 +138,9 @@ protected:
 	}
 };
 
-}
+} // namespace animation
+
+} // namespace module
 
 #endif /*INTERPOLATOR_H_*/
+
