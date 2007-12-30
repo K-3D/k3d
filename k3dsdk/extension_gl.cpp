@@ -112,18 +112,18 @@ void enable(const k3d::string_t& Extension)
 }
 
 const bool query(const k3d::string_t& Extension)
-{ 
-	bool result = (detail::enabled().count(Extension) || detail::extensions().count(Extension)) && !detail::disabled().count(Extension);
-	// extra glew check for glew, to be sure the function pointer is initialised
-	if (glewGetContext()) 
-		return_val_if_fail(glewIsSupported(Extension.c_str()), false);
-	return result;
+{
+	if(detail::disabled().count(Extension))
+		return false;
+	
+	if(detail::enabled().count(Extension))
+		return true;
+
+	return detail::extensions().count(Extension) ? true : false;
 }
 
 bool query_vbo()
 {
-	if (glewGetContext())
-		return GLEW_VERSION_1_5 || query("GL_ARB_vertex_buffer_object");
 	return query("GL_ARB_vertex_buffer_object");
 }
 
