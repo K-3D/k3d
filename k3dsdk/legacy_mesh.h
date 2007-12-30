@@ -22,7 +22,6 @@
 
 #include "algebra.h"
 #include "bounding_box3.h"
-#include "gl.h"
 #include "selectable.h"
 #include "utility.h"
 
