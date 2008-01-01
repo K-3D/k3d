@@ -173,7 +173,7 @@ public:
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_duplicate));
 		items().push_back(*Gtk::manage(m_duplicate_meshes));
 		
-		m_animate_transformation = new menu_item::control(Parent, "animate_transformation", _("Animate Transtormation")) <<
+		m_animate_transformation = new menu_item::control(Parent, "animate_transformation", _("Animate Transformation")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_animate_transformation));
 		items().push_back(*Gtk::manage(m_animate_transformation));
 
