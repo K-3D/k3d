@@ -26,6 +26,7 @@
 #include "k3d-i18n-config.h"
 #include "ipipeline.h"
 #include "idocument.h"
+#include "ikeyframer.h"
 #include "inode.h"
 #include "iparentable.h"
 #include "itransform_sink.h"
@@ -51,7 +52,7 @@ const matrix4 upstream_matrix(inode& Node)
 	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
 	if(upstream_output)
 		return boost::any_cast<k3d::matrix4>(upstream_output->property_value());
-
+		
 	return k3d::identity3D();
 }
 
@@ -61,10 +62,23 @@ inode* upstream_frozen_transformation(inode& Node)
 	return_val_if_fail(downstream_sink, 0);
 
 	iproperty& downstream_input = downstream_sink->transform_sink_input();
-	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
-
+	iproperty* upstream_output = Node.document().pipeline().dependency(downstream_input);
+	
+	// Return the directly connected transformation matrix, if there is one
 	if(upstream_output && upstream_output->property_node() && upstream_output->property_node()->factory().factory_id() == classes::FrozenTransformation())
 		return upstream_output->property_node();
+	
+	// Otherwise check if an animation track was inserted before the modifier
+	if (upstream_output && upstream_output->property_node())
+	{
+		k3d::ikeyframer* keyframer = dynamic_cast<k3d::ikeyframer*>(upstream_output->property_node()); 
+		if(keyframer)
+		{
+			upstream_output = Node.document().pipeline().dependency(keyframer->input_property());
+			if(upstream_output && upstream_output->property_node() && upstream_output->property_node()->factory().factory_id() == classes::FrozenTransformation())
+				return upstream_output->property_node();
+		}
+	}
 
 	return 0;
 }

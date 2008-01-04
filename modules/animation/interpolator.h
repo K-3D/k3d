@@ -131,10 +131,10 @@ protected:
 		k3d::matrix4 norotation = norotation_l + (norotation_u - norotation_l)*(Time - t_lower)/(t_upper - t_lower);
 		k3d::euler_angles angles_l(rotation_l, k3d::euler_angles::XYZstatic);
 		k3d::euler_angles angles_u(rotation_u, k3d::euler_angles::XYZstatic);
-		k3d::point3 angle_vector_l(angles_l[0], angles_l[1], angles_l[2]);
-		k3d::point3 angle_vector_u(angles_u[0], angles_u[1], angles_u[2]);
-		k3d::point3 angle_vector = angle_vector_l + (angle_vector_u - angle_vector_l)*(Time - t_lower)/(t_upper - t_lower);
-		return k3d::matrix4(norotation * k3d::rotation3D(angle_vector));
+		k3d::quaternion q_l(angles_l);
+		k3d::quaternion q_u(angles_u);
+		k3d::quaternion q_i = k3d::Slerp(q_l, q_u, (Time - t_lower)/(t_upper - t_lower));
+		return k3d::matrix4(norotation * k3d::rotation3D(q_i));
 	}
 };
 
