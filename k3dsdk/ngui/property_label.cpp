@@ -44,7 +44,6 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/nodes.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/state_change_set.h>
 
 namespace libk3dngui

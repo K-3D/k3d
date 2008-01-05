@@ -24,7 +24,7 @@
 #include "messages.h"
 #include "scripting.h"
 
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/result.h>
@@ -83,7 +83,7 @@ bool execute_script(const k3d::script::code& Script, const std::string& ScriptNa
 	}
 
 	// Get the requested scripting engine ...
-	k3d::iscript_engine* const engine = k3d::create_plugin<k3d::iscript_engine>(*Language.factory());
+	k3d::iscript_engine* const engine = k3d::plugin::create<k3d::iscript_engine>(*Language.factory());
 	return_val_if_fail(engine, false);
 
 	// Intercept global key events ...

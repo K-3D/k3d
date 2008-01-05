@@ -24,21 +24,21 @@
 #include "document_state.h"
 #include "modifiers.h"
 
-#include <k3dsdk/create_plugins.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/idocument.h>
-#include <k3dsdk/inode.h>
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/nodes.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/state_change_set.h>
@@ -60,14 +60,13 @@ struct sort_by_name
 
 } // namespace detail
 
-/// Returns a collection of mesh modifier plugin factories, sorted by name
 const factories_t& mesh_modifiers()
 {
 	static factories_t modifiers;
 	if(modifiers.empty())
 	{
-		const k3d::factories_t data_source_modifiers = k3d::plugins<k3d::imesh_source>();
-		const k3d::factories_t data_sink_modifiers = k3d::plugins<k3d::imesh_sink>();
+		const k3d::plugin::factory::collection_t data_source_modifiers = k3d::plugin::factory::lookup<k3d::imesh_source>();
+		const k3d::plugin::factory::collection_t data_sink_modifiers = k3d::plugin::factory::lookup<k3d::imesh_sink>();
 		std::set_intersection(data_source_modifiers.begin(), data_source_modifiers.end(), data_sink_modifiers.begin(), data_sink_modifiers.end(), std::inserter(modifiers, modifiers.end()));
 		std::sort(modifiers.begin(), modifiers.end(), detail::sort_by_name());
 	}
@@ -75,14 +74,13 @@ const factories_t& mesh_modifiers()
 	return modifiers;
 }
 
-/// Returns a collection of transform modifier plugin factories, sorted by name
 const factories_t& transform_modifiers()
 {
 	static factories_t modifiers;
 	if(modifiers.empty())
 	{
-		const k3d::factories_t data_source_modifiers = k3d::plugins<k3d::itransform_source>();
-		const k3d::factories_t data_sink_modifiers = k3d::plugins<k3d::itransform_sink>();
+		const k3d::plugin::factory::collection_t data_source_modifiers = k3d::plugin::factory::lookup<k3d::itransform_source>();
+		const k3d::plugin::factory::collection_t data_sink_modifiers = k3d::plugin::factory::lookup<k3d::itransform_sink>();
 		std::set_intersection(data_source_modifiers.begin(), data_source_modifiers.end(), data_sink_modifiers.begin(), data_sink_modifiers.end(), std::inserter(modifiers, modifiers.end()));
 		std::sort(modifiers.begin(), modifiers.end(), detail::sort_by_name());
 	}
@@ -110,7 +108,7 @@ k3d::inode* modify_transformation(k3d::idocument& Document, k3d::inode& Object, 
 		k3d::record_state_change_set changeset(Document, k3d::string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), K3D_CHANGE_SET_CONTEXT);
 
 		// Create our modifier object ...
-		modifier = k3d::create_plugin<k3d::inode>(*Modifier, Document, k3d::unique_name(Document.nodes(), Modifier->name()));
+		modifier = k3d::plugin::create<k3d::inode>(*Modifier, Document, k3d::unique_name(Document.nodes(), Modifier->name()));
 		return_val_if_fail(modifier, 0);
 
 		// Get its input and output properties ...
@@ -153,7 +151,7 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 		k3d::record_state_change_set changeset(document, k3d::string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), K3D_CHANGE_SET_CONTEXT);
 
 		// Create our modifier object ...
-		modifier = k3d::create_plugin<k3d::inode>(*Modifier, document, k3d::unique_name(document.nodes(), Modifier->name()));
+		modifier = k3d::plugin::create<k3d::inode>(*Modifier, document, k3d::unique_name(document.nodes(), Modifier->name()));
 		return_val_if_fail(modifier, 0);
 
 		// Get its input and output properties ...
@@ -197,7 +195,7 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 
 const transform_modifier create_transform_modifier(k3d::idocument& Document, const k3d::uuid& ModifierType, const std::string& ModifierName)
 {
-	k3d::inode* const object = k3d::create_plugin<k3d::inode>(ModifierType, Document, ModifierName);
+	k3d::inode* const object = k3d::plugin::create<k3d::inode>(ModifierType, Document, ModifierName);
 	return_val_if_fail(object, transform_modifier());
 	k3d::itransform_sink* const sink = dynamic_cast<k3d::itransform_sink*>(object);
 	return_val_if_fail(sink, transform_modifier());
@@ -243,7 +241,7 @@ k3d::inode* upstream_transform_modifier(k3d::inode& Object)
 
 const mesh_modifier create_mesh_modifier(k3d::idocument& Document, const k3d::uuid& ModifierType, const std::string& ModifierName)
 {
-	k3d::inode* const object = k3d::create_plugin<k3d::inode>(ModifierType, Document, ModifierName);
+	k3d::inode* const object = k3d::plugin::create<k3d::inode>(ModifierType, Document, ModifierName);
 	return_val_if_fail(object, mesh_modifier());
 	k3d::imesh_sink* const sink = dynamic_cast<k3d::imesh_sink*>(object);
 	return_val_if_fail(sink, mesh_modifier());

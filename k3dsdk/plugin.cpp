@@ -21,32 +21,35 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "create_plugins.h"
+#include "application.h"
+#include "iapplication.h"
 #include "iapplication_plugin_factory.h"
 #include "idocument_plugin_factory.h"
-#include "plugins.h"
+#include "iplugin_factory.h"
+#include "iplugin_factory_collection.h"
+#include "log.h"
+#include "plugin.h"
 #include "utility.h"
 
 namespace k3d
 {
 
+namespace plugin
+{
+
 namespace detail
 {
 
-iunknown* create_application_plugin(const std::string& Plugin)
+iunknown* create_application_plugin(const k3d::string_t& Plugin)
 {
-	const factories_t factories = plugins(Plugin);
-	if(factories.size() == 0)
+	iplugin_factory* const plugin_factory = plugin::factory::lookup(Plugin);
+	if(!plugin_factory)
 	{
 		log() << error << "No plugin factory named: " << Plugin << std::endl;
 	}
-	else if(factories.size() > 1)
-	{
-		log() << error << "More than one factory named: " << Plugin << std::endl;
-	}
 	else
 	{
-		return detail::create_application_plugin(**factories.begin());
+		return detail::create_application_plugin(*plugin_factory);
 	}
 
 	return 0;
@@ -75,9 +78,9 @@ iunknown* create_application_plugin(iplugin_factory& Factory)
 
 iunknown* create_application_plugin(const uuid& ClassID)
 {
-	if(iplugin_factory* const factory = plugin(ClassID))
+	if(iplugin_factory* const plugin_factory = plugin::factory::lookup(ClassID))
 	{
-		return detail::create_application_plugin(*factory);
+		return create_application_plugin(*plugin_factory);
 	}
 	else
 	{
@@ -87,26 +90,22 @@ iunknown* create_application_plugin(const uuid& ClassID)
 	return 0;
 }
 
-inode* create_document_plugin(const std::string& Plugin, idocument& Document, const std::string& Name)
+inode* create_document_plugin(const k3d::string_t& Plugin, idocument& Document, const k3d::string_t& Name)
 {
-	const factories_t factories = plugins(Plugin);
-	if(factories.size() == 0)
+	k3d::iplugin_factory* const plugin_factory = plugin::factory::lookup(Plugin);
+	if(!plugin_factory)
 	{
 		log() << error << "No plugin factory named: " << Plugin << std::endl;
 	}
-	else if(factories.size() > 1)
-	{
-		log() << error << "More than one factory named: " << Plugin << std::endl;
-	}
 	else
 	{
-		return detail::create_document_plugin(**factories.begin(), Document, Name);
+		return create_document_plugin(*plugin_factory, Document, Name);
 	}
 
 	return 0;
 }
 
-inode* create_document_plugin(iplugin_factory& Factory, idocument& Document, const std::string& Name)
+inode* create_document_plugin(iplugin_factory& Factory, idocument& Document, const k3d::string_t& Name)
 {
 	if(idocument_plugin_factory* const document_plugin_factory = dynamic_cast<idocument_plugin_factory*>(&Factory))
 	{
@@ -127,11 +126,11 @@ inode* create_document_plugin(iplugin_factory& Factory, idocument& Document, con
 	return 0;
 }
 
-inode* create_document_plugin(const uuid& ClassID, idocument& Document, const std::string& Name)
+inode* create_document_plugin(const uuid& ClassID, idocument& Document, const k3d::string_t& Name)
 {
-	if(iplugin_factory* const factory = plugin(ClassID))
+	if(iplugin_factory* const plugin_factory = plugin::factory::lookup(ClassID))
 	{
-		return create_document_plugin(*factory, Document, Name);
+		return create_document_plugin(*plugin_factory, Document, Name);
 	}
 	else
 	{
@@ -142,6 +141,57 @@ inode* create_document_plugin(const uuid& ClassID, idocument& Document, const st
 }
 	
 } // namespace detail
+
+namespace factory
+{
+
+iplugin_factory* lookup(const uuid& ID)
+{
+	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	{
+		if((*factory)->factory_id() == ID)
+			return *factory;
+	}
+
+	return 0;
+}
+
+iplugin_factory* lookup(const k3d::string_t& Name)
+{
+	collection_t results;
+	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	{
+		if((*factory)->name() == Name)
+			results.insert(*factory);
+	}
+
+	switch(results.size())
+	{
+		case 0:
+			return 0;
+		case 1:
+			return *results.begin();
+		default:
+			k3d::log() << error << "multiple plugin factories with name [" << Name << "]" << std::endl;
+			return 0;
+	}
+}
+
+const collection_t lookup(const std::type_info& Interface)
+{
+	collection_t results;
+	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	{
+		if((*factory)->implements(Interface))
+			results.insert(*factory);
+	}
+
+	return results;
+}
+
+} // namespace factory
+
+} // namespace plugin
 
 } // namespace k3d
 

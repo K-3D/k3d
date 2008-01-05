@@ -22,7 +22,8 @@
 */
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/iapplication_plugin_factory.h>
 #include <k3dsdk/idocument_plugin_factory.h>
@@ -31,7 +32,6 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/plugin_factory.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/system.h>
@@ -64,12 +64,7 @@ public:
 	k3d::iunknown* create_plugin()
 	{
 		if(!delegate_factory)
-		{
-			const k3d::factories_t factories = k3d::plugins(delegate_factory_name);
-			return_val_if_fail(1 == factories.size(), 0);
-
-			delegate_factory = dynamic_cast<k3d::iapplication_plugin_factory*>(*factories.begin());
-		}
+			delegate_factory = dynamic_cast<k3d::iapplication_plugin_factory*>(k3d::plugin::factory::lookup(delegate_factory_name));
 
 		return_val_if_fail(delegate_factory, 0);
 
@@ -125,12 +120,7 @@ public:
 		}
 
 		if(!delegate_factory)
-		{
-			const k3d::factories_t factories = k3d::plugins(delegate_factory_name);
-			return_val_if_fail(1 == factories.size(), 0);
-
-			delegate_factory = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
-		}
+			delegate_factory = dynamic_cast<k3d::idocument_plugin_factory*>(k3d::plugin::factory::lookup(delegate_factory_name));
 
 		return_val_if_fail(delegate_factory, 0);
 

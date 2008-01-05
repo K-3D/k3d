@@ -46,7 +46,7 @@
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
@@ -541,7 +541,7 @@ private:
 
 			k3d::log() << info << "Creating plugin [" << (**factory).name() << "] via ngui:application-start" << std::endl;
 
-			k3d::iunknown* const plugin = k3d::create_plugin(**factory);
+			k3d::iunknown* const plugin = k3d::plugin::create(**factory);
 			if(!plugin)
 			{
 				k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via ngui:application-start" << std::endl;

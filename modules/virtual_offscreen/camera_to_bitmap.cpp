@@ -23,9 +23,9 @@
 
 #include <k3d-i18n-config.h>
 #include <k3d-module-config.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/ibitmap_source.h>
 #include <k3dsdk/log.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/virtual_document_plugin_factory.h>
 
@@ -62,13 +62,10 @@ public:
 	k3d::inode* create_plugin(k3d::iplugin_factory& Factory, k3d::idocument& Document)
 	{
 		if(!delegate)
-		{
-			const k3d::factories_t factories = k3d::plugins(plugin_name);
-			if(1 == factories.size())
-				delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
+			delegate = dynamic_cast<k3d::idocument_plugin_factory*>(k3d::plugin::factory::lookup(plugin_name));
 
+		if(delegate)
 			k3d::log() << info << this->name() << " delegating to " << dynamic_cast<k3d::iplugin_factory*>(delegate)->name() << std::endl;
-		}
 
 		return_val_if_fail(delegate, 0);
 		return delegate->create_plugin(*this, Document);

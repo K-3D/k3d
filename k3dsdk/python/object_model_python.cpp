@@ -56,20 +56,22 @@
 #include "vector3_python.h"
 
 #include <k3dsdk/algebra.h>
+#include <k3dsdk/application.h>
 #include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/command_tree.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/inode.h>
+#include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/mesh_diff.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/type_registry.h>
@@ -167,11 +169,11 @@ const list module_command_nodes()
 
 iunknown module_create_plugin(const std::string& Type)
 {
-	const k3d::factories_t plugin_factories = k3d::plugins(Type);
-	if(1 != plugin_factories.size())
+	k3d::iplugin_factory* const plugin_factory = k3d::plugin::factory::lookup(Type);
+	if(!plugin_factory)
 		throw std::invalid_argument("unknown plugin type: " + Type);
 
-	return iunknown(k3d::create_plugin(**plugin_factories.begin()));
+	return iunknown(k3d::plugin::create(*plugin_factory));
 }
 
 void module_check_node_environment(const boost::python::dict& Locals, const std::string& PluginType)
@@ -343,7 +345,7 @@ idocument module_open_document(const std::string& Path)
 {
 	const filesystem::path document_path = filesystem::native_path(ustring::from_utf8(Path));
 
-	k3d::auto_ptr<k3d::idocument_importer> filter(k3d::create_plugin<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
+	k3d::auto_ptr<k3d::idocument_importer> filter(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
 	if(!filter.get())
 		throw std::runtime_error("no importer plugin available");
 

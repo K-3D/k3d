@@ -37,12 +37,12 @@
 #include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/ipath_property.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/utility_gl.h>
@@ -264,19 +264,18 @@ struct implementation
 				if(xml_button->name == "node")
 				{
 					const std::string name = k3d::xml::attribute_text(*xml_button, "name");
-					const k3d::factories_t factories = k3d::plugins(name);
-					if(1 != factories.size())
+					k3d::iplugin_factory* const plugin_factory = k3d::plugin::factory::lookup(name);
+					if(!plugin_factory)
 						continue;
 
-					k3d::iplugin_factory& factory = **factories.begin();
-					const std::string node_name = "create_" + factory.name();
-					Gtk::Image* const image = new Gtk::Image(load_icon(factory.name(), Gtk::ICON_SIZE_SMALL_TOOLBAR));
+					const std::string node_name = "create_" + plugin_factory->name();
+					Gtk::Image* const image = new Gtk::Image(load_icon(plugin_factory->name(), Gtk::ICON_SIZE_SMALL_TOOLBAR));
 
 					button::control* const button =
 						new button::control(*toolbar_widget, node_name, *manage(image))
-						<< set_tooltip(factory.short_description())
+						<< set_tooltip(plugin_factory->short_description())
 						<< make_toolbar_button()
-						<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_create_node), &factory))
+						<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_create_node), plugin_factory))
 						<< enable_dynamic_accelerators();
 
 					toolbar_widget->row(0).pack_start(*Gtk::manage(button), Gtk::PACK_SHRINK);

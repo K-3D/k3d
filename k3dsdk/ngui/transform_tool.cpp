@@ -39,7 +39,7 @@
 
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/irenderable_gl.h>
@@ -358,7 +358,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			else
 			{
 				const std::string modifier_name = Name + node->name();
-				modifier = k3d::create_plugin<k3d::inode>(Class, node->document(), modifier_name);
+				modifier = k3d::plugin::create<k3d::inode>(Class, node->document(), modifier_name);
 				return_val_if_fail(modifier, false);
 			
 				k3d::ipipeline::dependencies_t dependencies;

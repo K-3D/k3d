@@ -24,9 +24,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "create_plugins.h"
 #include "data.h"
 #include "k3d-i18n-config.h"
+#include "plugin.h"
 #include "scripting.h"
 #include "user_property_changed_signal.h"
 
@@ -85,7 +85,7 @@ protected:
 
 		// Create our script engine as-needed ...
 		if(!m_script_engine)
-			m_script_engine = create_plugin<iscript_engine>(language.factory()->factory_id());
+			m_script_engine = plugin::create<iscript_engine>(language.factory()->factory_id());
 
 		// No script engine?  We're outta here ...
 		return_val_if_fail(m_script_engine, false);

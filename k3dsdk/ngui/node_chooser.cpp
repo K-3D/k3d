@@ -35,16 +35,17 @@
 #include "node_chooser.h"
 #include "utility.h"
 
-#include <k3dsdk/create_plugins.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/application.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/inode_property.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/nodes.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
 
@@ -268,7 +269,7 @@ void control::on_create_node(k3d::iplugin_factory* const Factory)
 	if(m_data->state_recorder)
 		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
-	k3d::inode* const node = k3d::create_plugin<k3d::inode>(*Factory, m_data->document().document(), k3d::unique_name(m_data->document().document().nodes(), Factory->name()));
+	k3d::inode* const node = k3d::plugin::create<k3d::inode>(*Factory, m_data->document().document(), k3d::unique_name(m_data->document().document().nodes(), Factory->name()));
 	assert_warning(node);
 
 	m_data->set_node(node);

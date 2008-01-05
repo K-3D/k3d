@@ -55,11 +55,12 @@
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/nodes.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/utility.h>
 
 #include <boost/assign/list_of.hpp>
+
+#include <set>
 
 // Temporary hack
 using namespace libk3dngui;

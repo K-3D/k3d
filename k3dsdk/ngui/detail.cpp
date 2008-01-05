@@ -30,7 +30,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/dependencies.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/imesh_selection_sink.h>
@@ -70,7 +70,7 @@ void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocum
 		return;
 
 	// Duplicate input matrix into a new FrozenTransformation
-	k3d::inode* frozen_transformation = k3d::create_plugin<k3d::inode>(k3d::classes::FrozenTransformation(), Document);
+	k3d::inode* frozen_transformation = k3d::plugin::create<k3d::inode>(k3d::classes::FrozenTransformation(), Document);
 	return_if_fail(frozen_transformation);
 
 	frozen_transformation->set_name(k3d::unique_name(Document.nodes(), ToNode.name() + " Transformation"));
@@ -106,7 +106,7 @@ k3d::inode* instantiate_mesh(k3d::idocument& Document, k3d::inode& Node)
 	return_val_if_fail(upstream_output, 0);
 
 	// Create a mesh instance
-	k3d::inode* mesh_instance = k3d::create_plugin<k3d::inode>(k3d::classes::MeshInstance(), Document, k3d::unique_name(Document.nodes(), Node.name()));
+	k3d::inode* mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), Document, k3d::unique_name(Document.nodes(), Node.name()));
 	return_val_if_fail(mesh_instance, 0);
 
 	// Get its input property
@@ -157,13 +157,13 @@ k3d::inode* duplicate_mesh(k3d::idocument& Document, k3d::inode& Node)
 	return_val_if_fail(upstream_mesh_source, 0);
 
 	// Create a new FrozenMesh and a copy of upstream mesh instance ...
-	k3d::inode* frozen_mesh = k3d::create_plugin<k3d::inode>(k3d::classes::FrozenMesh(), Document);
+	k3d::inode* frozen_mesh = k3d::plugin::create<k3d::inode>(k3d::classes::FrozenMesh(), Document);
 	return_val_if_fail(frozen_mesh, 0);
 
 	const std::string frozen_mesh_name = k3d::unique_name(Document.nodes(), upstream_output->property_node()->name());
 	frozen_mesh->set_name(frozen_mesh_name);
 
-	k3d::inode* mesh_instance = k3d::create_plugin<k3d::inode>(k3d::classes::MeshInstance(), Document);
+	k3d::inode* mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), Document);
 	return_val_if_fail(mesh_instance, 0);
 
 	mesh_instance->set_name(k3d::unique_name(Document.nodes(), frozen_mesh_name + " Instance"));
@@ -217,7 +217,7 @@ k3d::inode* duplicate_node(k3d::idocument& Document, k3d::inode& Node)
 	return_val_if_fail(property_collection, 0);
 
 	// Clone the node
-	k3d::inode* clone = k3d::create_plugin<k3d::inode>(Node.factory(), Document);
+	k3d::inode* clone = k3d::plugin::create<k3d::inode>(Node.factory(), Document);
 	return_val_if_fail(clone, 0);
 
 	clone->set_name(k3d::unique_name(Document.nodes(), Node.name()));

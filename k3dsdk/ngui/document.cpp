@@ -31,7 +31,7 @@
 #include <k3dsdk/application.h>
 #include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
@@ -70,11 +70,11 @@ void populate_new_document(k3d::idocument& Document)
 	k3d::property::set_internal_value(Document.title(), new_title);
 
 	// Setup the plugins that no document can live without ...
-	k3d::create_plugin(k3d::classes::Axes(), Document, "Axes");
-	k3d::create_plugin(k3d::classes::OpenGLEngine(), Document, "GL Engine");
-	k3d::create_plugin(k3d::classes::TimeSource(), Document, "TimeSource");
+	k3d::plugin::create(k3d::classes::Axes(), Document, "Axes");
+	k3d::plugin::create(k3d::classes::OpenGLEngine(), Document, "GL Engine");
+	k3d::plugin::create(k3d::classes::TimeSource(), Document, "TimeSource");
 
-	if(k3d::inode* const camera = k3d::create_plugin<k3d::inode>(k3d::classes::Camera(), Document, "Camera"))
+	if(k3d::inode* const camera = k3d::plugin::create<k3d::inode>(k3d::classes::Camera(), Document, "Camera"))
 	{
 		const k3d::point3 origin = k3d::point3(0, 0, 0);
 		const k3d::vector3 world_up = k3d::vector3(0, 0, 1);
@@ -91,30 +91,30 @@ void populate_new_document(k3d::idocument& Document)
 	}
 
 	// Setup RenderMan painters ...
-	if(k3d::inode* const ri_multi_painter = k3d::create_plugin<k3d::inode>("RenderManMultiPainter", Document, "RenderMan Default Painter"))
+	if(k3d::inode* const ri_multi_painter = k3d::plugin::create<k3d::inode>("RenderManMultiPainter", Document, "RenderMan Default Painter"))
 	{
 		k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(ri_multi_painter);
 		k3d::ipersistent_container* const persistent_container = dynamic_cast<k3d::ipersistent_container*>(ri_multi_painter);
 		if(property_collection && persistent_container)
 		{
-			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("point_groups", "Point Groups", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::create_plugin<k3d::ri::imesh_painter>("RenderManPointGroupPainter", Document, "RenderMan Point Group Painter"));
-			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("polyhedra", "Polyhedra", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::create_plugin<k3d::ri::imesh_painter>("RenderManPolyhedronPainter", Document, "RenderMan Polyhedron Painter"));
-			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("subdivision_surfaces", "Subdivision Surfaces", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::create_plugin<k3d::ri::imesh_painter>("RenderManSubdivisionSurfacePainter", Document, "RenderMan Subdivision Surface Painter"));
-			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("linear_curves", "Linear Curves", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::create_plugin<k3d::ri::imesh_painter>("RenderManLinearCurvePainter", Document, "RenderMan Linear Curve Painter"));
-			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("cubic_curves", "Cubic Curves", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::create_plugin<k3d::ri::imesh_painter>("RenderManCubicCurvePainter", Document, "RenderMan Cubic Curve Painter"));
-			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("bilinear_patches", "Bilinear Patches", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::create_plugin<k3d::ri::imesh_painter>("RenderManBilinearPatchPainter", Document, "RenderMan Bilinear Patch Painter"));
-			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("bicubic_patches", "Bicubic Patches", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::create_plugin<k3d::ri::imesh_painter>("RenderManBicubicPatchPainter", Document, "RenderMan Bicubic Patch Painter"));
-			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("nurbs_patches", "NURBS Patches", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::create_plugin<k3d::ri::imesh_painter>("RenderManNURBSPatchPainter", Document, "RenderMan NURBS Patch Painter"));
-			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("blobbies", "Blobbies", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::create_plugin<k3d::ri::imesh_painter>("RenderManBlobbyPainter", Document, "RenderMan Blobby Painter"));
+			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("point_groups", "Point Groups", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::plugin::create<k3d::ri::imesh_painter>("RenderManPointGroupPainter", Document, "RenderMan Point Group Painter"));
+			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("polyhedra", "Polyhedra", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::plugin::create<k3d::ri::imesh_painter>("RenderManPolyhedronPainter", Document, "RenderMan Polyhedron Painter"));
+			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("subdivision_surfaces", "Subdivision Surfaces", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::plugin::create<k3d::ri::imesh_painter>("RenderManSubdivisionSurfacePainter", Document, "RenderMan Subdivision Surface Painter"));
+			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("linear_curves", "Linear Curves", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::plugin::create<k3d::ri::imesh_painter>("RenderManLinearCurvePainter", Document, "RenderMan Linear Curve Painter"));
+			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("cubic_curves", "Cubic Curves", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::plugin::create<k3d::ri::imesh_painter>("RenderManCubicCurvePainter", Document, "RenderMan Cubic Curve Painter"));
+			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("bilinear_patches", "Bilinear Patches", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::plugin::create<k3d::ri::imesh_painter>("RenderManBilinearPatchPainter", Document, "RenderMan Bilinear Patch Painter"));
+			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("bicubic_patches", "Bicubic Patches", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::plugin::create<k3d::ri::imesh_painter>("RenderManBicubicPatchPainter", Document, "RenderMan Bicubic Patch Painter"));
+			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("nurbs_patches", "NURBS Patches", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::plugin::create<k3d::ri::imesh_painter>("RenderManNURBSPatchPainter", Document, "RenderMan NURBS Patch Painter"));
+			k3d::user::create_property<k3d::user::k3d_ri_imesh_painter_property>("blobbies", "Blobbies", "", Document, *property_collection, *persistent_container, ri_multi_painter, k3d::plugin::create<k3d::ri::imesh_painter>("RenderManBlobbyPainter", Document, "RenderMan Blobby Painter"));
 		}
 	}
 
 	// Setup a default RenderMan shading model ...
-	k3d::iunknown* const renderman_material = k3d::create_plugin(k3d::classes::RenderManMaterial(), Document, "RenderManMaterial");
-	k3d::inode* const surface_shader = k3d::create_plugin<k3d::inode>(k3d::classes::RenderManSurfaceShader(), Document, "Surface Shader");
-	k3d::inode* const light = k3d::create_plugin<k3d::inode>(k3d::classes::RenderManLight(), Document, "Light");
-	k3d::inode* const light_shader = k3d::create_plugin<k3d::inode>(k3d::classes::RenderManLightShader(), Document, "Light Shader");
-	k3d::create_plugin(k3d::classes::RenderManEngine(), Document, "RenderMan Engine");
+	k3d::iunknown* const renderman_material = k3d::plugin::create(k3d::classes::RenderManMaterial(), Document, "RenderManMaterial");
+	k3d::inode* const surface_shader = k3d::plugin::create<k3d::inode>(k3d::classes::RenderManSurfaceShader(), Document, "Surface Shader");
+	k3d::inode* const light = k3d::plugin::create<k3d::inode>(k3d::classes::RenderManLight(), Document, "Light");
+	k3d::inode* const light_shader = k3d::plugin::create<k3d::inode>(k3d::classes::RenderManLightShader(), Document, "Light Shader");
+	k3d::plugin::create(k3d::classes::RenderManEngine(), Document, "RenderMan Engine");
 
 	if(light)
 	{
@@ -136,7 +136,7 @@ void populate_new_document(k3d::idocument& Document)
 		k3d::property::set_internal_value(*light, "shader", light_shader);
 
 	// Setup a default material ...
-	if(k3d::inode* const default_material = k3d::create_plugin<k3d::inode>(k3d::classes::MultiMaterial(), Document, "Material"))
+	if(k3d::inode* const default_material = k3d::plugin::create<k3d::inode>(k3d::classes::MultiMaterial(), Document, "Material"))
 	{
 		k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(default_material);
 		k3d::ipersistent_container* const persistent_container = dynamic_cast<k3d::ipersistent_container*>(default_material);
@@ -151,29 +151,29 @@ void populate_new_document(k3d::idocument& Document)
 void opengl_populate_new_document(k3d::idocument& Document)
 {
 	// Setup OpenGL painters ...
-	if(k3d::inode* const gl_multi_painter = k3d::create_plugin<k3d::inode>("OpenGLMultiPainter", Document, "GL Default Painter"))
+	if(k3d::inode* const gl_multi_painter = k3d::plugin::create<k3d::inode>("OpenGLMultiPainter", Document, "GL Default Painter"))
 	{
 		k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(gl_multi_painter);
 		k3d::ipersistent_container* const persistent_container = dynamic_cast<k3d::ipersistent_container*>(gl_multi_painter);
 		if(property_collection && persistent_container)
 		{
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("points", "Points", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("VirtualOpenGLPointPainter", Document, "GL Point Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("edges", "Edges", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("VirtualOpenGLEdgePainter", Document, "GL Edge Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("faces", "Faces", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("VirtualOpenGLFacePainter", Document, "GL Face Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("points", "Points", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("VirtualOpenGLPointPainter", Document, "GL Point Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("edges", "Edges", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("VirtualOpenGLEdgePainter", Document, "GL Edge Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("faces", "Faces", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("VirtualOpenGLFacePainter", Document, "GL Face Painter"));
 
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("sds_points", "SDS Points", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("VirtualOpenGLSDSPointPainter", Document, "SDS Point Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("sds_edges", "SDS Edges", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("VirtualOpenGLSDSEdgePainter", Document, "SDS Edge Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("sds_faces", "SDS Faces", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("VirtualOpenGLSDSFacePainter", Document, "SDS Face Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("sds_points", "SDS Points", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("VirtualOpenGLSDSPointPainter", Document, "SDS Point Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("sds_edges", "SDS Edges", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("VirtualOpenGLSDSEdgePainter", Document, "SDS Edge Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("sds_faces", "SDS Faces", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("VirtualOpenGLSDSFacePainter", Document, "SDS Face Painter"));
 
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("linear_curves", "Linear Curves", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("OpenGLLinearCurvePainter", Document, "GL Linear Curve Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("cubic_curves", "Cubic Curves", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("OpenGLCubicCurvePainter", Document, "GL Cubic Curve Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("nurbs_curves", "NURBS Curves", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("OpenGLNURBSCurvePainter", Document, "GL NURBS Curve Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("bilinear_patches", "Bilinear Patches", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("OpenGLBilinearPatchPainter", Document, "GL Bilinear Patch Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("bicubic_patches", "Bicubic Patches", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("OpenGLBicubicPatchPainter", Document, "GL Bicubic Patch Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("nurbs_patches", "NURBS Patches", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("OpenGLNURBSPatchPainter", Document, "GL NURBS Patch Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("blobbies", "Blobbies", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("OpenGLBlobbyPointPainter", Document, "GL Blobby Point Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("face_normals", "Face Normals", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("OpenGLFaceNormalPainter", Document, "GL Face Normal Painter"));
-			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("face_orientation", "Face Orientation", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::create_plugin<k3d::gl::imesh_painter>("OpenGLFaceOrientationPainter", Document, "GL Face Orientation Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("linear_curves", "Linear Curves", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLLinearCurvePainter", Document, "GL Linear Curve Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("cubic_curves", "Cubic Curves", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLCubicCurvePainter", Document, "GL Cubic Curve Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("nurbs_curves", "NURBS Curves", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLNURBSCurvePainter", Document, "GL NURBS Curve Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("bilinear_patches", "Bilinear Patches", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLBilinearPatchPainter", Document, "GL Bilinear Patch Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("bicubic_patches", "Bicubic Patches", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLBicubicPatchPainter", Document, "GL Bicubic Patch Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("nurbs_patches", "NURBS Patches", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLNURBSPatchPainter", Document, "GL NURBS Patch Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("blobbies", "Blobbies", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLBlobbyPointPainter", Document, "GL Blobby Point Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("face_normals", "Face Normals", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLFaceNormalPainter", Document, "GL Face Normal Painter"));
+			k3d::user::create_property<k3d::user::k3d_gl_imesh_painter_property>("face_orientation", "Face Orientation", "", Document, *property_collection, *persistent_container, gl_multi_painter, k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLFaceOrientationPainter", Document, "GL Face Orientation Painter"));
 		}
 	}
 }
@@ -194,7 +194,7 @@ void create_document()
 
 void open_document(const k3d::filesystem::path& Path)
 {
-	k3d::auto_ptr<k3d::idocument_importer> filter(k3d::create_plugin<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
+	k3d::auto_ptr<k3d::idocument_importer> filter(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
 	if(!filter.get())
 	{
 		error_message(_("Document importer plugin not installed."));

@@ -22,7 +22,7 @@
 */
 
 #include "classes.h"
-#include "create_plugins.h"
+#include "plugin.h"
 #include "k3d-i18n-config.h"
 #include "ipipeline.h"
 #include "idocument.h"
@@ -91,7 +91,7 @@ inode* insert_transform_modifier(inode& Node)
 	iproperty& downstream_input = downstream_sink->transform_sink_input();
 	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
 
-	inode* const modifier = create_plugin<inode>(classes::FrozenTransformation(), Node.document(), _("Transformation"));
+	inode* const modifier = plugin::create<inode>(classes::FrozenTransformation(), Node.document(), _("Transformation"));
 	return_val_if_fail(modifier, 0);
 	itransform_sink* const modifier_sink = dynamic_cast<itransform_sink*>(modifier);
 	return_val_if_fail(modifier_sink, 0);

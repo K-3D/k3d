@@ -25,9 +25,9 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/auto_ptr.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/iuri_handler.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/string_cast.h>
 
 namespace k3d
@@ -42,16 +42,16 @@ namespace uri
 void open(const std::string& URI)
 {
 	// Look for any plugins that could be used ...
-	const factories_t factories = plugins<iuri_handler>();
+	const plugin::factory::collection_t factories = plugin::factory::lookup<iuri_handler>();
 	if(factories.empty())
 	{
 		libk3dngui::error_message(k3d::string_cast(boost::format(_("Couldn't display %1%")) % URI), _("No plugin is available to open URIs."));
 		return;
 	}
 
-	for(factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
-		k3d::auto_ptr<iunknown> plugin(create_plugin(**factory));
+		k3d::auto_ptr<iunknown> plugin(k3d::plugin::create(**factory));
 		if(iuri_handler* const handler = dynamic_cast<iuri_handler*>(plugin.get()))
 		{
 			if(handler->open_uri(URI))

@@ -1,8 +1,8 @@
-#ifndef K3DSDK_CREATE_PLUGINS_H
-#define K3DSDK_CREATE_PLUGINS_H
+#ifndef K3DSDK_PLUGIN_H
+#define K3DSDK_PLUGIN_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,32 +21,48 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "ideletable.h"
-#include "idocument.h"
-#include "inode_collection.h"
-#include "iplugin_factory.h"
+#include "plugin_detail.h"
+#include "types.h"
+
+#include <set>
+#include <typeinfo>
+
 
 namespace k3d
 {
 
-namespace detail
+class iplugin_factory;
+class uuid;
+
+namespace plugin
 {
 
-iunknown* create_application_plugin(const std::string& FactoryName);
-iunknown* create_application_plugin(iplugin_factory& Factory);
-iunknown* create_application_plugin(const uuid& FactoryID);
-inode* create_document_plugin(const std::string& FactoryName, idocument& Document, const std::string& Name);
-inode* create_document_plugin(iplugin_factory& Factory, idocument& Document, const std::string& Name);
-inode* create_document_plugin(const uuid& FactoryID, idocument& Document, const std::string& Name);
+namespace factory
+{
 
-} // namespace detail
+/// Defines storage for a collection of plugin factories
+typedef std::set<iplugin_factory*> collection_t;
+
+/// Returns the plugin factory that implements a specific factory ID, or NULL.
+iplugin_factory* lookup(const uuid& ID);
+/// Returns the plugin factory that matches the given name, or NULL.  Note: returns NULL if more than one factory matches Name.
+iplugin_factory* lookup(const k3d::string_t& Name);
+/// Returns the set of plugin factories that implement the given interface.
+const collection_t lookup(const std::type_info& Interface);
+/// Returns the set of plugin factories that implement the given interface.
+template<typename interface_t>
+const collection_t lookup()
+{
+	return lookup(typeid(interface_t));
+}
+
+} // namespace factory
 
 /// Creates an application plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-template<typename interface_t> interface_t* create_plugin(const std::string& FactoryName)
+template<typename interface_t> interface_t* create(const k3d::string_t& FactoryName)
 {
 	if(iunknown* const unknown = detail::create_application_plugin(FactoryName))
 	{
@@ -66,7 +82,7 @@ template<typename interface_t> interface_t* create_plugin(const std::string& Fac
 }
 
 /// Creates an application plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-template<typename interface_t> interface_t* create_plugin(iplugin_factory& Factory)
+template<typename interface_t> interface_t* create(iplugin_factory& Factory)
 {
 	if(iunknown* const unknown = detail::create_application_plugin(Factory))
 	{
@@ -86,7 +102,7 @@ template<typename interface_t> interface_t* create_plugin(iplugin_factory& Facto
 }
 
 /// Creates an application plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-template<typename interface_t> interface_t* create_plugin(const uuid& FactoryID)
+template<typename interface_t> interface_t* create(const uuid& FactoryID)
 {
 	if(iunknown* const unknown = detail::create_application_plugin(FactoryID))
 	{
@@ -106,25 +122,25 @@ template<typename interface_t> interface_t* create_plugin(const uuid& FactoryID)
 }
 
 /// Creates an application plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-inline iunknown* create_plugin(const std::string& FactoryName)
+inline iunknown* create(const k3d::string_t& FactoryName)
 {
 	return detail::create_application_plugin(FactoryName);
 }
 
 /// Creates an application plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-inline iunknown* create_plugin(iplugin_factory& Factory)
+inline iunknown* create(iplugin_factory& Factory)
 {
 	return detail::create_application_plugin(Factory);
 }
 
 /// Creates an application plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-inline iunknown* create_plugin(const uuid& FactoryID)
+inline iunknown* create(const uuid& FactoryID)
 {
 	return detail::create_application_plugin(FactoryID);
 }
 
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-template<typename interface_t> interface_t* create_plugin(const std::string& FactoryName, idocument& Document, const std::string& Name = std::string())
+template<typename interface_t> interface_t* create(const k3d::string_t& FactoryName, idocument& Document, const k3d::string_t& Name = k3d::string_t())
 {
 	if(inode* const object = detail::create_document_plugin(FactoryName, Document, Name))
 	{
@@ -148,7 +164,7 @@ template<typename interface_t> interface_t* create_plugin(const std::string& Fac
 }
 
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-template<typename interface_t> interface_t* create_plugin(iplugin_factory& Factory, idocument& Document, const std::string& Name = std::string())
+template<typename interface_t> interface_t* create(iplugin_factory& Factory, idocument& Document, const k3d::string_t& Name = k3d::string_t())
 {
 	if(inode* const object = detail::create_document_plugin(Factory, Document, Name))
 	{
@@ -172,7 +188,7 @@ template<typename interface_t> interface_t* create_plugin(iplugin_factory& Facto
 }
 
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-template<typename interface_t> interface_t* create_plugin(const uuid& FactoryID, idocument& Document, const std::string& Name = std::string())
+template<typename interface_t> interface_t* create(const uuid& FactoryID, idocument& Document, const k3d::string_t& Name = k3d::string_t())
 {
 	if(inode* const object = detail::create_document_plugin(FactoryID, Document, Name))
 	{
@@ -196,7 +212,7 @@ template<typename interface_t> interface_t* create_plugin(const uuid& FactoryID,
 }
 
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-inline iunknown* create_plugin(const std::string& FactoryName, idocument& Document, const std::string& Name = std::string())
+inline iunknown* create(const k3d::string_t& FactoryName, idocument& Document, const k3d::string_t& Name = k3d::string_t())
 {
 	if(inode* const object = detail::create_document_plugin(FactoryName, Document, Name))
 	{
@@ -211,7 +227,7 @@ inline iunknown* create_plugin(const std::string& FactoryName, idocument& Docume
 }
 
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-inline iunknown* create_plugin(iplugin_factory& Factory, idocument& Document, const std::string& Name = std::string())
+inline iunknown* create(iplugin_factory& Factory, idocument& Document, const k3d::string_t& Name = k3d::string_t())
 {
 	if(inode* const object = detail::create_document_plugin(Factory, Document, Name))
 	{
@@ -226,7 +242,7 @@ inline iunknown* create_plugin(iplugin_factory& Factory, idocument& Document, co
 }
 
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
-inline iunknown* create_plugin(const uuid& FactoryID, idocument& Document, const std::string& Name = std::string())
+inline iunknown* create(const uuid& FactoryID, idocument& Document, const k3d::string_t& Name = k3d::string_t())
 {
 	if(inode* const object = detail::create_document_plugin(FactoryID, Document, Name))
 	{
@@ -240,7 +256,9 @@ inline iunknown* create_plugin(const uuid& FactoryID, idocument& Document, const
 	return 0;
 }
 
+} // namespace plugin
+
 } // namespace k3d
 
-#endif // !K3DSDK_CREATE_PLUGINS_H
+#endif // !K3DSDK_PLUGIN_H
 

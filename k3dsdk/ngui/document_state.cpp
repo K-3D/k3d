@@ -53,7 +53,7 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/command_tree.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
@@ -71,7 +71,6 @@
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/time_source.h>
@@ -1642,7 +1641,7 @@ public:
 		// Create the requested node ...
 		k3d::record_state_change_set changeset(m_document, k3d::string_cast(boost::format(_("Create %1%")) % Factory->name()), K3D_CHANGE_SET_CONTEXT);
 		const std::string node_name = k3d::unique_name(m_document.nodes(), Factory->name());
-		k3d::inode* const node = k3d::create_plugin<k3d::inode>(*Factory, m_document, node_name);
+		k3d::inode* const node = k3d::plugin::create<k3d::inode>(*Factory, m_document, node_name);
 		return_val_if_fail(node, 0);
 
 		// We will select the new node right away ...
@@ -1656,7 +1655,7 @@ public:
 		if(mesh_source && k3d::classes::MeshInstance() != Factory->factory_id())
 		{
 			// Create a mesh instance ...
-			k3d::inode* const mesh_instance = k3d::create_plugin<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), node_name + " Instance"));
+			k3d::inode* const mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), node_name + " Instance"));
 
 			// Assign a default painter ...
 			k3d::property::set_internal_value(*mesh_instance, "gl_painter", default_gl_painter());
@@ -1879,7 +1878,7 @@ document_state::document_state(k3d::idocument& Document) :
 
 		k3d::log() << info << "Creating plugin [" << (**factory).name() << "] via ngui:document-start" << std::endl;
 
-		k3d::iunknown* const plugin = k3d::create_plugin(**factory);
+		k3d::iunknown* const plugin = k3d::plugin::create(**factory);
 		if(!plugin)
 		{
 			k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via ngui:document-start" << std::endl;

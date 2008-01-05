@@ -22,12 +22,11 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "create_plugins.h"
 #include "iapplication_plugin_factory.h"
 #include "ideletable.h"
 #include "iplugin_factory.h"
 #include "iscript_engine.h"
-#include "plugins.h"
+#include "plugin.h"
 #include "result.h"
 #include "scripting.h"
 #include "uuid.h"
@@ -45,11 +44,11 @@ namespace detail
 {
 
 /// Returns the set of all available scripting languages (cached)
-const factories_t& script_engine_factories()
+const plugin::factory::collection_t& script_engine_factories()
 {
-	static factories_t factories;
+	static plugin::factory::collection_t factories;
 	if(factories.empty())
-		factories = plugins<iscript_engine>();
+		factories = plugin::factory::lookup<iscript_engine>();
 
 	return factories;
 }
@@ -61,7 +60,7 @@ bool execute_script(const code& Script, const std::string& ScriptName, iscript_e
 	return_val_if_fail(Language.factory(), false);
 
 	// Get the requested scripting engine ...
-	iscript_engine* const engine = dynamic_cast<iscript_engine*>(create_plugin(*Language.factory()));
+	iscript_engine* const engine = dynamic_cast<iscript_engine*>(plugin::create(*Language.factory()));
 	return_val_if_fail(engine, false);
 
 	// Run that bad-boy ...
@@ -113,12 +112,12 @@ language::language(const code& Script) :
 	m_factory(0)
 {
 	// Get the set of all script engine factories ...
-	const factories_t& factories(detail::script_engine_factories());
+	const plugin::factory::collection_t& factories = detail::script_engine_factories();
 
 	// Look for a scripting engine that can execute the script ...
-	for(factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
-		iscript_engine* const script_engine = dynamic_cast<iscript_engine*>(create_plugin(**factory));
+		iscript_engine* const script_engine = dynamic_cast<iscript_engine*>(plugin::create(**factory));
 		if(!script_engine)
 			continue;
 
@@ -137,10 +136,10 @@ language::language(const uuid& Language) :
 	m_factory(0)
 {
 	// Get the set of all script engine factories ...
-	const factories_t& factories(detail::script_engine_factories());
+	const plugin::factory::collection_t& factories = detail::script_engine_factories();
 
 	// Look for a factory that matches ...
-	for(factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
 		if((*factory)->factory_id() != Language)
 			continue;

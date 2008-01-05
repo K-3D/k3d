@@ -21,11 +21,11 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/extension_gl.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/extension_gl.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/log.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/virtual_document_plugin_factory.h>
 
@@ -61,17 +61,10 @@ public:
 		if(!delegate)
 		{
 			if(k3d::gl::extension::query_vbo())
-			{
-				const k3d::factories_t factories = k3d::plugins("OpenGLVBOSDSPointPainter");
-				if(1 == factories.size())
-					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
-			}
-			else
-			{
-				const k3d::factories_t factories = k3d::plugins("OpenGLSDSPointPainter");
-				if(1 == factories.size())
-					delegate = dynamic_cast<k3d::idocument_plugin_factory*>(*factories.begin());
-			}
+				delegate = dynamic_cast<k3d::idocument_plugin_factory*>(k3d::plugin::factory::lookup("OpenGLVBOSDSPointPainter"));
+
+			if(!delegate)
+				delegate = dynamic_cast<k3d::idocument_plugin_factory*>(k3d::plugin::factory::lookup("OpenGLSDSPointPainter"));
 
 			if(delegate)
 				k3d::log() << info << this->name() << " delegating to " << dynamic_cast<k3d::iplugin_factory*>(delegate)->name() << std::endl;

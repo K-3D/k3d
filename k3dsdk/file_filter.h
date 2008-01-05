@@ -26,9 +26,8 @@
 */
 
 #include "auto_ptr.h"
-#include "create_plugins.h"
 #include "ifile_format.h"
-#include "plugins.h"
+#include "plugin.h"
 #include "result.h"
 
 #include <map>
@@ -48,7 +47,7 @@ class iplugin_factory;
 template<typename interface_t>
 interface_t* file_filter(iplugin_factory& Factory)
 {
-	k3d::auto_ptr<iunknown> filter(create_plugin(Factory));
+	k3d::auto_ptr<iunknown> filter(plugin::create(Factory));
 	return_val_if_fail(filter.get(), 0);
 
 	interface_t* const interface = dynamic_cast<interface_t*>(filter.get());
@@ -62,7 +61,7 @@ interface_t* file_filter(iplugin_factory& Factory)
 template<typename interface_t>
 interface_t* file_filter(const uuid& ClassID)
 {
-	k3d::auto_ptr<iunknown> filter(create_plugin(ClassID));
+	k3d::auto_ptr<iunknown> filter(plugin::create(ClassID));
 	return_val_if_fail(filter.get(), 0);
 
 	interface_t* const interface = dynamic_cast<interface_t*>(filter.get());
@@ -81,45 +80,45 @@ interface_t* auto_file_filter(const filesystem::path& File)
 	sorted_filters_t sorted_filters;
 
 	// Get the set of objects that support the requested interface, and test them against the actual file ...
-	iplugin_factory_collection::factories_t factories(plugins<interface_t>());
-	for(iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	plugin::factory::collection_t factories = plugin::factory::lookup<interface_t>();
+	for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	{
+		// Create a file filter object ...
+		iunknown* filter = plugin::create(**factory);
+		if(!filter)
 		{
-			// Create a file filter object ...
-			iunknown* filter = create_plugin(**factory);
-			if(!filter)
-				{
-					log() << error << (**factory).name() << " couldn't create plugin!" << std::endl;
-					continue;
-				}
-
-			// If the object doesn't support ifile_format, we're done ...
-			ifile_format* const file_format = dynamic_cast<ifile_format*>(filter);
-			if(!file_format)
-				{
-					log() << error << (**factory).name() << " doesn't support k3d::ifile_format!" << std::endl;
-					delete dynamic_cast<ideletable*>(filter);
-					continue;
-				}
-
-			// If the object doesn't support this file, we're done ...
-			if(!file_format->query_can_handle(File))
-				{
-					delete dynamic_cast<ideletable*>(filter);
-					continue;
-				}
-
-			// If the object doesn't support the requested interface, we're done ...
-			interface_t* const interface = dynamic_cast<interface_t*>(filter);
-			if(!interface)
-				{
-					log() << error << (**factory).name() << " doesn't support promised interface!" << std::endl;
-					delete dynamic_cast<ideletable*>(filter);
-					continue;
-				}
-
-			// Insert this format into the sorted collection ...
-			sorted_filters.insert(std::make_pair(file_format->priority(), interface));
+			log() << error << (**factory).name() << " couldn't create plugin!" << std::endl;
+			continue;
 		}
+
+		// If the object doesn't support ifile_format, we're done ...
+		ifile_format* const file_format = dynamic_cast<ifile_format*>(filter);
+		if(!file_format)
+		{
+			log() << error << (**factory).name() << " doesn't support k3d::ifile_format!" << std::endl;
+			delete dynamic_cast<ideletable*>(filter);
+			continue;
+		}
+
+		// If the object doesn't support this file, we're done ...
+		if(!file_format->query_can_handle(File))
+		{
+			delete dynamic_cast<ideletable*>(filter);
+			continue;
+		}
+
+		// If the object doesn't support the requested interface, we're done ...
+		interface_t* const interface = dynamic_cast<interface_t*>(filter);
+		if(!interface)
+		{
+			log() << error << (**factory).name() << " doesn't support promised interface!" << std::endl;
+			delete dynamic_cast<ideletable*>(filter);
+			continue;
+		}
+
+		// Insert this format into the sorted collection ...
+		sorted_filters.insert(std::make_pair(file_format->priority(), interface));
+	}
 
 	// Couldn't find a filter to fit this filetype ...
 	if(sorted_filters.empty())

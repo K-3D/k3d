@@ -40,7 +40,7 @@
 #include "widget_manip.h"
 
 #include <k3dsdk/application.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/inode_collection.h>
@@ -201,7 +201,7 @@ void control::mount_panel(const std::string& Type)
 		k3d::iplugin_factory* const plugin = m_type_plugin_map[Type];
 		return_if_fail(plugin);
 
-		panel::control* const panel = k3d::create_plugin<panel::control>(*plugin);
+		panel::control* const panel = k3d::plugin::create<panel::control>(*plugin);
 		return_if_fail(panel);
 
 		panel->initialize(m_document_state, m_parent);

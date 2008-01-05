@@ -44,7 +44,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/dependencies.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/icamera.h>
@@ -64,7 +64,6 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/time_source.h>
@@ -523,7 +522,7 @@ private:
 				continue;
 			
 			// Create the new track
-			if (k3d::inode* const track = k3d::create_plugin<k3d::inode>("AnimationTrackDoubleMatrix4", m_document_state.document(), (*node)->name() + " Track"))
+			if (k3d::inode* const track = k3d::plugin::create<k3d::inode>("AnimationTrackDoubleMatrix4", m_document_state.document(), (*node)->name() + " Track"))
 			{
 				// Create a default interpolator, if it didn't exist already
 				k3d::inode* interpolator;
@@ -534,7 +533,7 @@ private:
 	      }
 	      else
 	      {
-	      	interpolator = k3d::create_plugin<k3d::inode>("InterpolatorDoubleMatrix4Linear", m_document_state.document(), "Linear Transformation Interpolator");
+	      	interpolator = k3d::plugin::create<k3d::inode>("InterpolatorDoubleMatrix4Linear", m_document_state.document(), "Linear Transformation Interpolator");
 	      }
 	       
 	      // Set the interpolator

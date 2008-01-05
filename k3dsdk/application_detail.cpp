@@ -23,15 +23,15 @@
 */
 
 #include "application_detail.h"
-#include "create_plugins.h"
+#include "plugin.h"
 #include "data.h"
 #include "document.h"
+#include "iapplication.h"
 #include "iapplication_plugin_factory.h"
 #include "ideletable.h"
 #include "idocument.h"
 #include "iscript_engine.h"
 #include "iscripted_action.h"
-#include "plugins.h"
 #include "result.h"
 #include "signal_accumulators.h"
 #include "state_change_set.h"
@@ -94,7 +94,7 @@ public:
 
 			log() << info << "Creating plugin [" << (**factory).name() << "] via k3d:document-start" << std::endl;
 
-			iunknown* const plugin = create_plugin(**factory);
+			iunknown* const plugin = plugin::create(**factory);
 			if(!plugin)
 			{
 				log() << error << "Error creating plugin [" << (**factory).name() << "] via k3d:document-start" << std::endl;

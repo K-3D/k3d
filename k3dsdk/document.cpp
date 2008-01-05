@@ -43,7 +43,6 @@
 #include "node_name_map.h"
 #include "pipeline.h"
 #include "pipeline_profiler.h"
-#include "plugins.h"
 #include "property_collection.h"
 #include "signal_slots.h"
 #include "string_cast.h"

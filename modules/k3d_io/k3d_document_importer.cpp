@@ -27,6 +27,7 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/data.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/gzstream.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
@@ -37,7 +38,6 @@
 #include <k3dsdk/ipersistent.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/serialization_xml.h>
 #include <k3dsdk/string_modifiers.h>
 #include <k3dsdk/vectors.h>
@@ -136,7 +136,7 @@ public:
 						continue;
 					}
 
-					k3d::iplugin_factory* const plugin_factory = k3d::plugin(factory_id);
+					k3d::iplugin_factory* const plugin_factory = k3d::plugin::factory::lookup(factory_id);
 					if(!plugin_factory)
 					{
 						k3d::log() << error << "node [" << name << "] with unknown factory ID [" << factory_id << "] will not be loaded" << std::endl;

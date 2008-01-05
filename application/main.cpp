@@ -38,8 +38,7 @@
 #include <k3dsdk/application.h>
 #include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/create_plugins.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/extension_gl.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
@@ -451,7 +450,7 @@ void create_user_interface(k3d::plugin_factory_collection& Plugins, bool& Quit, 
 		return;
 	}
 
-	k3d::iunknown* const ui_plugin = k3d::create_plugin(**Plugins.factories().begin());
+	k3d::iunknown* const ui_plugin = k3d::plugin::create(**Plugins.factories().begin());
 	if(!ui_plugin)
 	{
 		handle_error("UI plugin module [" + module_name + "] failed to instantiate a K-3D plugin", Quit, Error);
@@ -600,7 +599,7 @@ void create_auto_start_plugins(auto_start_plugins_t& Plugins)
 
 		k3d::log() << info << "Creating plugin [" << (**factory).name() << "] via k3d:application-start" << std::endl;
 
-		k3d::iunknown* const plugin = k3d::create_plugin(**factory);
+		k3d::iunknown* const plugin = k3d::plugin::create(**factory);
 		if(!plugin)
 		{
 			k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via k3d:application-start" << std::endl;

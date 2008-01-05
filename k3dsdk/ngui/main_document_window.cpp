@@ -65,19 +65,22 @@
 #include <k3d-i18n-config.h>
 #include <k3d-version-config.h>
 #include <k3dsdk/algebra.h>
+#include <k3dsdk/application.h>
 #include <k3dsdk/axis.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/file_filter.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
+#include <k3dsdk/iapplication.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/idocument_plugin_factory.h>
+#include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/iparentable.h>
@@ -1336,7 +1339,7 @@ private:
 		if(document_path.empty())
 			return on_file_save_as();
 
-		k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::create_plugin<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
+		k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::plugin::create<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
 		return_val_if_fail(filter.get(), false);
 
 		if(!filter->write_file(document(), document_path))
@@ -1362,7 +1365,7 @@ private:
 				return false;
 		}
 
-		k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::create_plugin<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
+		k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::plugin::create<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
 		return_val_if_fail(filter.get(), false);
 
 		if(!filter->write_file(document(), document_path))
@@ -1396,7 +1399,7 @@ private:
 
 	void file_revert()
 	{
-		k3d::auto_ptr<k3d::idocument_importer> filter(k3d::create_plugin<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
+		k3d::auto_ptr<k3d::idocument_importer> filter(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
 		if(!filter.get())
 		{
 			error_message(_("Document reader plugin not installed."));
@@ -1448,7 +1451,7 @@ private:
 	void on_file_import()
 	{
 		// Make sure we have some file formats to choose from ...
-		const k3d::factories_t factories = k3d::plugins<k3d::idocument_importer>();
+		const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::idocument_importer>();
 		if(factories.empty())
 		{
 			error_message(_("No import file filters available"));
@@ -1462,7 +1465,7 @@ private:
 		row[columns.factory] = 0;
 		row[columns.label] = _("Automatic file detection");
 
-		for(k3d::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+		for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 		{
 			Gtk::TreeRow row = *model->append();
 			row[columns.factory] = *factory;
@@ -1534,7 +1537,7 @@ private:
 	void on_file_export()
 	{
 		// Make sure we have some file formats to choose from ...
-		const k3d::factories_t factories = k3d::plugins<k3d::idocument_exporter>();
+		const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::idocument_exporter>();
 		if(factories.empty())
 		{
 			error_message(_("No export file filters available"));
@@ -1543,7 +1546,7 @@ private:
 
 		import_export_columns columns;
 		Glib::RefPtr<Gtk::ListStore> model = Gtk::ListStore::create(columns);
-		for(k3d::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+		for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 		{
 			Gtk::TreeRow row = *model->append();
 			row[columns.factory] = *factory;
@@ -2370,7 +2373,7 @@ private:
 
 	void on_scripting_action(k3d::iplugin_factory* Factory)
 	{
-		k3d::iunknown* const plugin = k3d::create_plugin(*Factory);
+		k3d::iunknown* const plugin = k3d::plugin::create(*Factory);
 		if(!plugin)
 		{
 			k3d::log() << error << "Error creating plugin [" << (*Factory).name() << "]" << std::endl;
@@ -2423,7 +2426,7 @@ private:
 
 	void on_help_about()
 	{
-		Gtk::Window* const window = k3d::create_plugin<Gtk::Window>("NGUIAboutDialog");
+		Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUIAboutDialog");
 		return_if_fail(window);
 
 		window->set_transient_for(*this);

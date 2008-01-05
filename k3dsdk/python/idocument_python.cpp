@@ -27,12 +27,12 @@
 #include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iplugin_factory_collection.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/utility_gl.h>
 
@@ -62,7 +62,7 @@ idocument::idocument(k3d::idocument& Document) :
 
 const bool idocument::save(const std::string& Path)
 {
-	k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::create_plugin<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
+	k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::plugin::create<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
 	if(!filter.get())
 		throw std::runtime_error("no exporter plugin available");
 
@@ -105,17 +105,17 @@ const object idocument::new_node(const object& Type)
 	extract<std::string> plugin_name(Type);
 	if(plugin_name.check())
 	{
-		const k3d::iplugin_factory_collection::factories_t factories = k3d::plugins(plugin_name());
-		if(1 != factories.size())
+		k3d::iplugin_factory* const plugin_factory = k3d::plugin::factory::lookup(plugin_name());
+		if(!plugin_factory)
 			throw std::runtime_error("no factory for plugin type " + plugin_name());
 
-		return object(node(k3d::create_plugin<k3d::iunknown>(**factories.begin(), wrapped())));
+		return object(node(k3d::plugin::create<k3d::iunknown>(*plugin_factory, wrapped())));
 	}
 
 	extract<iplugin_factory> plugin_factory(Type);
 	if(plugin_factory.check())
 	{
-		return object(node(k3d::create_plugin<k3d::iunknown>(plugin_factory().wrapped(), wrapped())));
+		return object(node(k3d::plugin::create<k3d::iunknown>(plugin_factory().wrapped(), wrapped())));
 	}
 
 	throw std::invalid_argument("can't create new node from given argument");

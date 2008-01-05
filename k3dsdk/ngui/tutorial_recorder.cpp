@@ -43,18 +43,18 @@
 #include "utility.h"
 #include "widget_manip.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_tree.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/data.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/ideletable.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/user_interface.h>
@@ -79,7 +79,7 @@ class tutorial_recorder :
 public:
 	tutorial_recorder() :
 		base("tutorial_recorder", 0),
-		m_script_engine(k3d::create_plugin<k3d::iscript_engine>(k3d::classes::K3DScriptEngine())),
+		m_script_engine(k3d::plugin::create<k3d::iscript_engine>(k3d::classes::K3DScriptEngine())),
 		m_compression(true),
 		m_unsaved_changes(false),
 		m_recording(init_name("recording") + init_label(_("Recording")) + init_description(_("Tells whether the tutorial recorder records user actions")) + init_value(true)),
@@ -124,8 +124,8 @@ public:
 
 		Gtk::Menu* const language_menu = Gtk::manage(new Gtk::Menu());
 
-		const k3d::factories_t factories = k3d::plugins<k3d::iscript_engine>();
-		for(k3d::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+		const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::iscript_engine>();
+		for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 		{
 			language_menu->items().push_back(*Gtk::manage(
 				new menu_item::control(*menubar, "script_engine_" + (*factory)->name(), (*factory)->name())
@@ -359,7 +359,7 @@ private:
 			return;
 
 		delete dynamic_cast<k3d::ideletable*>(m_script_engine);
-		m_script_engine = k3d::create_plugin<k3d::iscript_engine>(*Factory);
+		m_script_engine = k3d::plugin::create<k3d::iscript_engine>(*Factory);
 
 		file_new();
 	}

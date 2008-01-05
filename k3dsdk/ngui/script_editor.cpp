@@ -49,7 +49,6 @@
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/string_cast.h>
 
 #include <gtkmm/box.h>

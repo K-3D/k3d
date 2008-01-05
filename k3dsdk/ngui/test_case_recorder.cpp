@@ -26,7 +26,7 @@
 
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_tree.h>
-#include <k3dsdk/create_plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/iscript_engine.h>
@@ -49,7 +49,7 @@ class test_case_recorder :
 public:
 	test_case_recorder(const k3d::filesystem::path& Path) :
 		base("test_case_recorder", 0),
-		m_script_engine(k3d::create_plugin<k3d::iscript_engine>(k3d::classes::PythonEngine())),
+		m_script_engine(k3d::plugin::create<k3d::iscript_engine>(k3d::classes::PythonEngine())),
 		m_stream(Path)
 	{
 		assert_warning(m_script_engine);
