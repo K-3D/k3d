@@ -21,14 +21,13 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "k3d-i18n-config.h"
-
 #include "fstream.h"
 #include "iapplication_plugin_factory.h"
 #include "idocument_plugin_factory.h"
 #include "iplugin_factory.h"
 #include "iplugin_registry.h"
 #include "iscript_engine.h"
+#include "k3d-i18n-config.h"
 #include "log.h"
 #include "os_load_module.h"
 #include "plugin_factory_collection.h"
@@ -110,13 +109,16 @@ public:
 		// Ensure we don't have any duplicate class IDs ...
 		if(std::count_if(m_factories.begin(), m_factories.end(), same_factory_id(Factory.factory_id())))
 		{
-			log() << error << "Plugin " << Factory.name() << " with duplicate class ID " << Factory.factory_id() << " will not be loaded" << std::endl;
+			log() << error << "Plugin factory [" << Factory.name() << "] with duplicate factory ID [" << Factory.factory_id() << "] will not be registered." << std::endl;
 			return;
 		}
 
 		// Warn if we have duplicate names ...
 		if(std::count_if(m_factories.begin(), m_factories.end(), same_name(Factory.name())))
-			log() << warning << "Loading plugin with duplicate name " << Factory.name() << std::endl;
+		{
+			log() << error << "Plugin factory [" << Factory.factory_id() << "] with duplicate name [" << Factory.name() << "] will not be registered." << std::endl;
+			return;
+		}
 
 		// Stash that baby!
 		m_factories.insert(&Factory);
