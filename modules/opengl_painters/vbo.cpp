@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-
+#include "normal_cache.h"
 #include "vbo.h"
 #include "sds_cache.h"
 
@@ -173,6 +173,7 @@ void triangle_vbo::on_schedule(k3d::inode* Painter)
 	m_indices.clear();
 	m_corner_to_face.clear();
 	schedule_data<cached_triangulation>(m_mesh, 0, Painter);
+	schedule_data<normal_cache>(m_mesh, 0, Painter);
 }
 
 void triangle_vbo::on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
@@ -182,25 +183,25 @@ void triangle_vbo::on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::in
 		m_indices = Hint->changed_points;
 	}
 	schedule_data<cached_triangulation>(m_mesh, Hint, Painter);
+	schedule_data<normal_cache>(m_mesh, Hint, Painter);
 }
 
 void triangle_vbo::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 {
 	cached_triangulation& triangle_cache = get_data<cached_triangulation>(&Mesh, Painter);
 	const k3d::mesh::points_t& points = triangle_cache.points();
-	bool new_vbo = false;
 	
 	if (!m_point_vbo) // OpenGL VBO functions may only be called in the drawing context, i.e. during paint_mesh or select_mesh
 	{
 		m_point_vbo = new vbo();
-		new_vbo = true;
+		m_indices.clear();
 	}
 	
 	cached_triangulation::index_vectors_t& point_links = triangle_cache.point_links();
 	
 	glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
 	
-	if (m_indices.empty() || new_vbo)
+	if (m_indices.empty())
 	{
 		glBufferData(GL_ARRAY_BUFFER, sizeof(points[0]) * points.size(), &points[0], GL_STATIC_DRAW);
 	}
@@ -235,72 +236,47 @@ void triangle_vbo::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 		}
 	}
 		
-	new_vbo = false;
 	if (!m_normal_vbo)
 	{
 		m_normal_vbo = new vbo();
-		new_vbo = true;
+		m_indices.clear();
 	}
-
+	
+	normal_cache& n_cache = get_data<normal_cache>(&Mesh, Painter);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(k3d::normal3) * points.size(), 0, GL_STATIC_DRAW);
 	k3d::normal3* normalbuffer = static_cast<k3d::normal3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-	// Use flat normals from the pipeline, if available
-	const k3d::mesh::normals_t* normals = k3d::get_array<k3d::mesh::normals_t>(Mesh.polyhedra->uniform_data, "N");
-	if (normals)
+	
+	if (m_indices.empty())
 	{
 		for (k3d::uint_t face = 0; face != face_points.size(); ++face)
 		{
 			k3d::mesh::indices_t& corners = face_points[face];
 			for (k3d::uint_t i = 0; i != corners.size(); ++i)
 			{ 
-				normalbuffer[corners[i]] = normals->at(face);
+				normalbuffer[corners[i]] = n_cache.face_normals(Painter).at(face);
 			}
 		}
 	}
 	else
-	{ // No normals available -> calculate them
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::mesh::indices_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-		const k3d::mesh::points_t& mesh_points = *Mesh.points;
-		if (new_vbo)
+	{
+		for (k3d::uint_t index = 0; index != m_indices.size(); ++index) // for all transformed points
 		{
-			for (k3d::uint_t face = 0; face != face_points.size(); ++face)
+			k3d::mesh::indices_t triangle_points = point_links[m_indices[index]]; // get the associated VBO point indices
+			for (k3d::uint_t i = 0; i != triangle_points.size(); ++i) // For all those associated points (one per face)
 			{
-				k3d::normal3 n = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]);
+				k3d::uint_t face = m_corner_to_face[triangle_points[i]]; // Get the face this point belongs to
+				const k3d::normal3& n = n_cache.face_normals(Painter).at(face);
 				k3d::mesh::indices_t& corners = face_points[face];
-				for (k3d::uint_t i = 0; i != corners.size(); ++i)
+				for (k3d::uint_t j = 0; j != corners.size(); ++j)
 				{ 
-					normalbuffer[corners[i]] = n; 
-				}
-			}
-		}
-		else
-		{ // Update only the normals of affected faces
-			std::set<k3d::uint_t> visited_faces; // cache of faces that have been updated
-			for (k3d::uint_t index = 0; index != m_indices.size(); ++index) // for all transformed points
-			{
-				k3d::mesh::indices_t triangle_points = point_links[m_indices[index]]; // get the associated VBO point indices
-				for (k3d::uint_t i = 0; i != triangle_points.size(); ++i) // For all those associated points (one per face)
-				{
-					k3d::uint_t face = m_corner_to_face[triangle_points[i]]; // Get the face this point belongs to
-					if (visited_faces.find(face) == visited_faces.end())
-					{ // Update the normals for all corners if the face was not updated before
-						k3d::normal3 n = k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]);
-						k3d::mesh::indices_t& corners = face_points[face];
-						for (k3d::uint_t j = 0; j != corners.size(); ++j)
-						{ 
-							normalbuffer[corners[j]] = n;
-						}
-						visited_faces.insert(face);
-					}
+					normalbuffer[corners[j]] = n;
 				}
 			}
 		}
 	}
+
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	m_indices.clear();
 }

@@ -1,0 +1,235 @@
+// K-3D
+// Copyright (c) 1995-2007, Timothy M. Shead
+//
+// Contact: tshead@k-3d.com
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public
+// License as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public
+// License along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#include <k3dsdk/hints.h>
+#include <k3dsdk/mesh_operations.h>
+
+#include "normal_cache.h"
+
+namespace module
+{
+
+namespace opengl
+{
+
+namespace painters
+{
+
+namespace detail
+{
+
+class face_normals : public scheduler 
+{
+public:
+	face_normals(const k3d::mesh* const Mesh) : m_normal(0,0,0)
+	{
+	}
+	
+	void on_face_start(const k3d::uint_t Face)
+	{
+		m_face = Face;
+	}
+	
+	void on_face_end(const k3d::uint_t Face)
+	{
+		f_normals[Face] = k3d::normalize(m_normal); 
+		m_normal = k3d::normal3(0,0,0);
+	}
+	
+	void on_loop(const k3d::uint_t Loop) {}
+	
+	void on_edge(const k3d::uint_t Edge, const k3d::uint_t StartPointIndex, const k3d::uint_t EndPointIndex, const k3d::point3& StartPoint, const k3d::point3& EndPoint)
+	{
+		m_normal[0] += (StartPoint[1] + EndPoint[1]) * (EndPoint[2] - StartPoint[2]);
+		m_normal[1] += (StartPoint[2] + EndPoint[2]) * (EndPoint[0] - StartPoint[0]);
+		m_normal[2] += (StartPoint[0] + EndPoint[0]) * (EndPoint[1] - StartPoint[1]);
+		point_to_faces[StartPointIndex].push_back(m_face);
+	}
+	
+	/// Per face normals
+	k3d::mesh::normals_t f_normals;
+	/// For each point, the faces it belongs to
+	std::vector<k3d::mesh::indices_t> point_to_faces;
+	/// Indices of modified points
+	k3d::mesh::indices_t indices;
+	
+protected:
+	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+	{	
+		if (indices.empty()) // Only set indices once (they are cleared upon execute()
+		{
+			indices = Hint->changed_points;
+		}
+	}
+	
+	void on_schedule(k3d::inode* Painter)
+	{
+		f_normals.clear();
+		point_to_faces.clear();
+		indices.clear();
+	}
+	
+	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
+	{
+		// Resize arrays and initialize normals if the topology changed
+		if (f_normals.empty())
+		{
+			f_normals.resize(Mesh.polyhedra->face_first_loops->size());
+			point_to_faces.resize(Mesh.points->size());
+			k3d::traverse_polyhedra(Mesh, *this);
+		}
+		for (k3d::uint_t i = 0; i != indices.size(); ++i)
+		{
+			const k3d::mesh::indices_t& faces = point_to_faces[indices[i]];
+			for (k3d::uint_t j = 0; j != faces.size(); ++j)
+			{
+				f_normals[faces[j]] = k3d::normal(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, *Mesh.points, Mesh.polyhedra->loop_first_edges->at(Mesh.polyhedra->face_first_loops->at(faces[j])));
+			}
+		}
+		indices.clear();
+	}
+	
+private:
+	k3d::normal3 m_normal;
+	k3d::uint_t m_face;
+};
+
+class point_normals : public scheduler
+{
+public:
+	point_normals(const k3d::mesh* const Mesh) {}
+	
+	k3d::mesh::normals_t p_normals;
+	k3d::mesh::indices_t indices;
+	
+protected:
+	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+	{	
+		if (indices.empty()) // Only set indices once (they are cleared upon execute()
+		{
+			indices = Hint->changed_points;
+		}
+	}
+	
+	void on_schedule(k3d::inode* Painter)
+	{
+		p_normals.clear();
+		indices.clear();
+	}
+	
+	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
+	{
+		return_if_fail(validate_polyhedra(Mesh));
+		face_normals& f_normals = get_data<face_normals>(&Mesh, Painter);
+		// Resize arrays and initialize normals if the topology changed
+		if (p_normals.empty())
+		{
+			k3d::uint_t point_count = Mesh.points->size();
+			p_normals.resize(point_count, k3d::normal3(0.0,0.0,0.0));
+			for (k3d::uint_t i = 0; i != point_count; ++i)
+			{
+				const k3d::mesh::indices_t& faces = f_normals.point_to_faces[i];
+				for (k3d::uint_t j = 0; j != faces.size(); ++j)
+					p_normals[i] += f_normals.f_normals[faces[j]];
+				p_normals[i] /= faces.size();
+			}
+		}
+		
+		const k3d::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+		const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+		
+		// not only the moved points, but all points belonging to deformed faces need to be updated
+		std::set<k3d::uint_t> affected_points;
+		for (k3d::uint_t i = 0; i != indices.size(); ++i)
+		{
+			const k3d::mesh::indices_t& faces = f_normals.point_to_faces[indices[i]];
+			for (k3d::uint_t j = 0; j != faces.size(); ++j)
+			{
+				k3d::uint_t face = faces[j];
+				const k3d::uint_t loop_begin = face_first_loops[face];
+				const k3d::uint_t loop_end = loop_begin + face_loop_counts[face];
+				for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+				{
+					const k3d::uint_t first_edge = loop_first_edges[loop];
+					for(k3d::uint_t edge = first_edge; ; )
+					{
+						affected_points.insert(edge_points[edge]);
+						edge = clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
+				}
+			}
+		}
+		for (std::set<k3d::uint_t>::iterator point = affected_points.begin(); point != affected_points.end(); ++point)
+		{
+			p_normals[*point] = k3d::normal3(0,0,0);
+			const k3d::mesh::indices_t& faces = f_normals.point_to_faces[*point];
+			for (k3d::uint_t j = 0; j != faces.size(); ++j)
+			{
+				p_normals[*point] += f_normals.f_normals[faces[j]];
+			}
+			p_normals[*point] = k3d::normalize(p_normals[*point]);
+		}
+		indices.clear();
+	}
+};
+
+} // namespace detail
+
+////////////////////
+// normal_cache
+////////////////////
+
+const k3d::mesh::normals_t& normal_cache::point_normals(k3d::inode* Painter)
+{
+	return get_data<detail::point_normals>(m_mesh, Painter).p_normals;
+}
+
+const k3d::mesh::normals_t& normal_cache::face_normals(k3d::inode* Painter)
+{
+	return get_data<detail::face_normals>(m_mesh, Painter).f_normals;
+}
+
+void normal_cache::on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+{
+	schedule_data<detail::face_normals>(m_mesh, Hint, Painter);
+	schedule_data<detail::point_normals>(m_mesh, Hint, Painter);
+}
+
+void normal_cache::on_schedule(k3d::inode* Painter)
+{
+	schedule_data<detail::face_normals>(m_mesh, 0, Painter);
+	schedule_data<detail::point_normals>(m_mesh, 0, Painter);
+}
+
+void normal_cache::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
+{
+	// nothing needed here, everything gets executed when the normals are requested
+}
+
+} // namespace painters
+
+} // namespace opengl
+
+} // namespace module

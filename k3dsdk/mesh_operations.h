@@ -89,6 +89,42 @@ const bool_t validate_blobbies(const mesh& Mesh);
 /// Returns true iff the given mesh should be rendered as SDS
 const bool_t is_sds(const mesh& Mesh);
 
+/// Traverse polygonal mesh, visiting faces, loops, and points
+template<typename visitor_t>
+void traverse_polyhedra(const mesh& Mesh, visitor_t& Visitor)
+{
+	return_if_fail(validate_polyhedra(Mesh));
+	const mesh::points_t& points = *Mesh.points;
+	const mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+	const mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+	const mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+	
+	const uint_t face_count = face_first_loops.size();
+	for(uint_t face = 0; face != face_count; ++face)
+	{
+		Visitor.on_face_start(face);
+		const uint_t loop_begin = face_first_loops[face];
+		const uint_t loop_end = loop_begin + face_loop_counts[face];
+
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			Visitor.on_loop(loop);
+			const uint_t first_edge = loop_first_edges[loop];
+
+			for(uint_t edge = first_edge; ; )
+			{
+				Visitor.on_edge(edge, edge_points[edge], edge_points[clockwise_edges[edge]], points[edge_points[edge]], points[edge_points[clockwise_edges[edge]]]);
+				edge = clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+		}
+		Visitor.on_face_end(face);
+	}
+}
+
 /// Traverse selected mesh points
 template<typename visitor_t>
 void traverse_selected_points(const mesh& Mesh, visitor_t& Visitor)

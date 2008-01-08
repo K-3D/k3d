@@ -39,6 +39,7 @@
 
 #include "cached_triangulation.h"
 #include "colored_selection_painter_gl.h"
+#include "normal_cache.h"
 
 namespace module
 {
@@ -100,6 +101,7 @@ public:
 		const k3d::mesh::indices_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
 		const k3d::mesh::points_t& mesh_points = *Mesh.points;
 		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
+		normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
 
 		glBegin(GL_TRIANGLES);
 		for (k3d::uint_t face = 0; face != face_starts.size(); ++face)
@@ -107,8 +109,7 @@ public:
 			k3d::uint_t startindex = face_starts[face];
 			k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
 			const color_t& face_color = face_selection[face] ? selected_color : color;
-			
-			k3d::gl::normal3d(k3d::normal(edge_points, clockwise_edges, mesh_points, loop_first_edges[face_first_loops[face]]));
+			k3d::gl::normal3d(n_cache.face_normals(this).at(face));
 			k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
 			for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
 				k3d::gl::vertex3d(points[indices[corner]]);
@@ -176,6 +177,7 @@ public:
 			return;
 		
 		schedule_data<cached_triangulation>(&Mesh, Hint, this);
+		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 	
 	static k3d::iplugin_factory& get_factory()

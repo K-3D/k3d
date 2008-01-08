@@ -41,15 +41,15 @@ namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// face_normal_painter
+// point_normal_painter
 
-class face_normal_painter :
+class point_normal_painter :
 	public k3d::gl::mesh_painter
 {
 	typedef k3d::gl::mesh_painter base;
 
 public:
-	face_normal_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	point_normal_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_draw_selected(init_owner(*this) + init_name("draw_selected") + init_label(_("Draw Selected")) + init_description(_("Draw normals for selected polygons")) + init_value(true)),
 		m_draw_unselected(init_owner(*this) + init_name("draw_unselected") + init_label(_("Draw Unselected")) + init_description(_("Draw normals for unselected polygons")) + init_value(false)),
@@ -73,14 +73,10 @@ public:
 		if(!k3d::validate_polyhedra(Mesh))
 			return;
 
-		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
-		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+		const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
 		const k3d::mesh::points_t& points = *Mesh.points;
 
-		const k3d::uint_t face_count = face_first_loops.size();
+		const k3d::uint_t point_count = points.size();
 		
 		normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
 
@@ -92,13 +88,12 @@ public:
 			k3d::gl::color3d(m_selected_color.pipeline_value());
 
 			glBegin(GL_LINES);
-			for(k3d::uint_t face = 0; face != face_count; ++face)
+			for(k3d::uint_t point = 0; point != point_count; ++point)
 			{
-				if(face_selection[face])
+				if(point_selection[point])
 				{
-					k3d::point3 center = k3d::center(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
-					k3d::gl::vertex3d(center);
-					k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face)));
+					k3d::gl::vertex3d(points[point]);
+					k3d::gl::vertex3d(points[point] + k3d::to_point(n_cache.point_normals(this).at(point)));
 				}
 			}
 			glEnd();
@@ -109,13 +104,12 @@ public:
 			k3d::gl::color3d(m_unselected_color.pipeline_value());
 
 			glBegin(GL_LINES);
-			for(k3d::uint_t face = 0; face != face_count; ++face)
+			for(k3d::uint_t point = 0; point != point_count; ++point)
 			{
-				if(!face_selection[face])
+				if(!point_selection[point])
 				{
-					k3d::point3 center = k3d::center(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
-					k3d::gl::vertex3d(center);
-					k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face)));
+					k3d::gl::vertex3d(points[point]);
+					k3d::gl::vertex3d(points[point] + k3d::to_point(n_cache.point_normals(this).at(point)));
 				}
 			}
 			glEnd();
@@ -132,10 +126,10 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<face_normal_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
-			k3d::uuid(0x02d092ca, 0x84405ff6, 0x4fe806a9, 0xab886cb1),
-			"OpenGLFaceNormalPainter",
-			_("Renders polyhedron face normal vectors"),
+		static k3d::document_plugin_factory<point_normal_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
+			k3d::uuid(0x2285917f, 0xfe40cc4f, 0xb462449f, 0xf5172d0a),
+			"OpenGLPointNormalPainter",
+			_("Renders polyhedron point normal vectors"),
 			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -152,11 +146,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// face_normal_painter_factory
+// point_normal_painter_factory
 
-k3d::iplugin_factory& face_normal_painter_factory()
+k3d::iplugin_factory& point_normal_painter_factory()
 {
-	return face_normal_painter::get_factory();
+	return point_normal_painter::get_factory();
 }
 
 } // namespace painters
@@ -164,5 +158,3 @@ k3d::iplugin_factory& face_normal_painter_factory()
 } // namespace opengl
 
 } // namespace module
-
-
