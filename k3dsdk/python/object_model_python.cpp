@@ -277,7 +277,7 @@ const k3d::matrix4 module_rotate3(const object& Value)
 	if(angle_axis_value.check())
 		return k3d::rotation3D(angle_axis_value());
 
-	extract<k3d::euler_angles> euler_angles_value(Value);
+	extract<euler_angles> euler_angles_value(Value);
 	if(euler_angles_value.check())
 		return k3d::rotation3D(k3d::quaternion(euler_angles_value()));
 
