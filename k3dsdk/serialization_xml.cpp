@@ -885,6 +885,23 @@ void upgrade_painters(element& XMLDocument)
 	// if ri or gl painters are not found, a default version is constructed:
 	if (!has_gl_painter)
 	{
+		return_if_fail(plugin::factory::lookup("OpenGLMultiPainter"));
+		return_if_fail(plugin::factory::lookup("VirtualOpenGLPointPainter"));
+		return_if_fail(plugin::factory::lookup("VirtualOpenGLEdgePainter"));
+		return_if_fail(plugin::factory::lookup("VirtualOpenGLFacePainter"));
+		return_if_fail(plugin::factory::lookup("VirtualOpenGLSDSPointPainter"));
+		return_if_fail(plugin::factory::lookup("VirtualOpenGLSDSEdgePainter"));
+		return_if_fail(plugin::factory::lookup("VirtualOpenGLSDSFacePainter"));
+		return_if_fail(plugin::factory::lookup("OpenGLLinearCurvePainter"));
+		return_if_fail(plugin::factory::lookup("OpenGLCubicCurvePainter"));
+		return_if_fail(plugin::factory::lookup("OpenGLNURBSCurvePainter"));
+		return_if_fail(plugin::factory::lookup("OpenGLBilinearPatchPainter"));
+		return_if_fail(plugin::factory::lookup("OpenGLBicubicPatchPainter"));
+		return_if_fail(plugin::factory::lookup("OpenGLNURBSPatchPainter"));
+		return_if_fail(plugin::factory::lookup("OpenGLBlobbyPointPainter"));
+		return_if_fail(plugin::factory::lookup("OpenGLFaceNormalPainter"));
+		return_if_fail(plugin::factory::lookup("OpenGLFaceOrientationPainter"));
+
 		ipersistent_lookup::id_type gl_painter_id = next_node_id;
 		new_nodes.push_back(
 			element("node",
@@ -986,37 +1003,37 @@ void upgrade_painters(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Point Painter"),
-				attribute("factory", plugin::factory::lookup("GLPointPainter")->factory_id()),
+				attribute("factory", plugin::factory::lookup("OpenGLPointPainter")->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Edge Painter"),
-				attribute("factory", plugin::factory::lookup("GLEdgePainter")->factory_id()),
+				attribute("factory", plugin::factory::lookup("VirtualOpenGLEdgePainter")->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "GL Face Painter"),
-				attribute("factory", plugin::factory::lookup("GLFacePainter")->factory_id()),
+				attribute("factory", plugin::factory::lookup("VirtualOpenGLFacePainter")->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "SDS Point Painter"),
-				attribute("factory", plugin::factory::lookup("GLSDSPointPainter")->factory_id()),
+				attribute("factory", plugin::factory::lookup("VirtualOpenGLSDSPointPainter")->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "SDS Edge Painter"),
-				attribute("factory", plugin::factory::lookup("GLSDSEdgePainter")->factory_id()),
+				attribute("factory", plugin::factory::lookup("VirtualOpenGLSDSEdgePainter")->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "SDS Face Painter"),
-				attribute("factory", plugin::factory::lookup("GLSDSFacePainter")->factory_id()),
+				attribute("factory", plugin::factory::lookup("VirtualOpenGLSDSFacePainter")->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(
@@ -1092,6 +1109,17 @@ void upgrade_painters(element& XMLDocument)
 	}
 	if (!has_ri_painter)
 	{
+		return_if_fail(plugin::factory::lookup("RenderManMultiPainter"));
+		return_if_fail(plugin::factory::lookup("RenderManPointGroupPainter"));
+		return_if_fail(plugin::factory::lookup("RenderManPolyhedronPainter"));
+		return_if_fail(plugin::factory::lookup("RenderManSubdivisionSurfacePainter"));
+		return_if_fail(plugin::factory::lookup("RenderManLinearCurvePainter"));
+		return_if_fail(plugin::factory::lookup("RenderManCubicCurvePainter"));
+		return_if_fail(plugin::factory::lookup("RenderManBilinearPatchPainter"));
+		return_if_fail(plugin::factory::lookup("RenderManBicubicPatchPainter"));
+		return_if_fail(plugin::factory::lookup("RenderManNURBSPatchPainter"));
+		return_if_fail(plugin::factory::lookup("RenderManBlobbyPainter"));
+
 		++next_node_id;
 		ipersistent_lookup::id_type ri_painter_id = next_node_id;
 		new_nodes.push_back(
