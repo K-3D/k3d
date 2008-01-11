@@ -1,11 +1,8 @@
 <?xml version="1.0" ?>
-<k3dml package="k3d" version="0.7.0.0" host="Linux-2.6.19-gentoo-r5;AMD Sempron(tm)   2600+">
-	<application>
-		<plugins/>
-	</application>
+<k3dml package="k3d" version="0.7.0.1" host="Linux-2.6.19-gentoo-r5;AMD Sempron(tm) 2600+">
 	<document>
 		<nodes>
-			<node name="Axes" class="00000001 00000000 00000000 00000001" id="2">
+			<node name="Axes" factory="00000001 00000000 00000000 00000001" id="2">
 				<properties>
 					<property name="axes">true</property>
 					<property name="gridcolor">0.4 0.4 0.4</property>
@@ -21,7 +18,7 @@
 					<property name="zcolor">0 0 0.7</property>
 				</properties>
 			</node>
-			<node name="OpenGL Engine" class="0059ba47 7bf740f3 93fb523d 5899f22c" id="3">
+			<node name="OpenGL Engine" factory="0059ba47 7bf740f3 93fb523d 5899f22c" id="3">
 				<properties>
 					<property name="background_color">0.8 0.8 0.8</property>
 					<property name="draw_aimpoint">true</property>
@@ -37,15 +34,15 @@
 					<property name="show_lights">false</property>
 				</properties>
 			</node>
-			<node name="TimeSource" class="1978f1f7 4a864c99 8caf7cfc d2591baf" id="4">
+			<node name="TimeSource" factory="1978f1f7 4a864c99 8caf7cfc d2591baf" id="4">
 				<properties>
 					<property name="end_time">30</property>
 					<property name="frame_rate">30</property>
 					<property name="start_time">0</property>
-					<property name="time">8.099999999999982</property>
+					<property name="time">0</property>
 				</properties>
 			</node>
-			<node name="Camera" class="45ce1872 af184b6d b391e136 0dcfe8b5" id="5">
+			<node name="Camera" factory="45ce1872 af184b6d b391e136 0dcfe8b5" id="5">
 				<properties>
 					<property name="aspect_ratio"/>
 					<property name="bottom">-0.5</property>
@@ -70,13 +67,13 @@
 					<property name="world_target">0 0 0</property>
 				</properties>
 			</node>
-			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="6">
+			<node name="Transformation" factory="6ea85710 90da4d35 acec30ee a6aacb9d" id="6">
 				<properties>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
-					<property name="matrix">0.958526 0.168264 0.230034 -8.40293 0.285006 -0.565901 -0.773646 28.2606 1.92624e-14 0.80712 -0.590387 21.5663 0 0 0 1</property>
+					<property name="matrix">0.95852599999999999 0.168264 0.23003399999999999 -8.4029299999999996 0.28500599999999998 -0.56590099999999999 -0.77364599999999994 28.2606 1.9262400000000002e-14 0.80711999999999995 -0.590387 21.566299999999998 0 0 0 1</property>
 				</properties>
 			</node>
-			<node name="Material" class="00000001 00000000 00000000 00000024" id="7">
+			<node name="Material" factory="00000001 00000000 00000000 00000024" id="7">
 				<properties>
 					<property name="atmosphere_shader">0</property>
 					<property name="color">1 1 1</property>
@@ -89,36 +86,36 @@
 					<property name="surface_shader">8</property>
 				</properties>
 			</node>
-			<node name="Surface Shader" class="b553a3bd d1044c6e b3f21e07 87132c31" id="8">
+			<node name="Surface Shader" factory="b553a3bd d1044c6e b3f21e07 87132c31" id="8">
 				<properties>
-					<property name="Ka" label="Ambient" description="Ambient Amount" type="double" user_property="vanilla">1</property>
-					<property name="Kd" label="Diffuse" description="Diffuse Amount" type="double" user_property="vanilla">0.5</property>
-					<property name="Ks" label="Specular" description="Specular Amount" type="double" user_property="vanilla">0.5</property>
-					<property name="roughness" label="Roughness" description="Surface Roughness (affects specular reflection size)" type="double" user_property="vanilla">0.1</property>
+					<property name="Ka" label="Ambient" description="Ambient Amount" type="k3d::double_t" user_property="vanilla">1</property>
+					<property name="Kd" label="Diffuse" description="Diffuse Amount" type="k3d::double_t" user_property="vanilla">0.5</property>
+					<property name="Ks" label="Specular" description="Specular Amount" type="k3d::double_t" user_property="vanilla">0.5</property>
+					<property name="roughness" label="Roughness" description="Surface Roughness (affects specular reflection size)" type="k3d::double_t" user_property="vanilla">0.1</property>
 					<property name="shader_path" reference="relative" relative_path="shaders/surface/k3d_plastic.sl">
 						<root>$K3D_SHARE_PATH</root>
 					</property>
 					<property name="specularcolor" label="Specular Color" description="Specular Reflection Color" type="k3d::color" user_property="vanilla">1 1 1</property>
 				</properties>
 			</node>
-			<node name="Light" class="00000001 00000000 00000000 0000001d" id="9">
+			<node name="Light" factory="00000001 00000000 00000000 0000001d" id="9">
 				<properties>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
 					<property name="shader">10</property>
 					<property name="viewport_visible">true</property>
 				</properties>
 			</node>
-			<node name="Light Shader" class="830e867b 7bc94c6c 8d5087ee 8aa35db2" id="10">
+			<node name="Light Shader" factory="830e867b 7bc94c6c 8d5087ee 8aa35db2" id="10">
 				<properties>
 					<property name="from" label="" description="" type="k3d::point3" user_property="vanilla">0 0 0</property>
-					<property name="intensity" label="" description="" type="double" user_property="vanilla">3000</property>
+					<property name="intensity" label="" description="" type="k3d::double_t" user_property="vanilla">3000</property>
 					<property name="lightcolor" label="" description="" type="k3d::color" user_property="vanilla">1 1 1</property>
 					<property name="shader_path" reference="relative" relative_path="shaders/light/k3d_pointlight.sl">
 						<root>$K3D_SHARE_PATH</root>
 					</property>
 				</properties>
 			</node>
-			<node name="RenderMan Engine" class="0dc5e733 fa684e05 86a3865f 42f7a99d" id="11">
+			<node name="RenderMan Engine" factory="0dc5e733 fa684e05 86a3865f 42f7a99d" id="11">
 				<properties>
 					<property name="bucket_height">16</property>
 					<property name="bucket_width">16</property>
@@ -154,31 +151,31 @@
 					<property name="two_sided">true</property>
 				</properties>
 			</node>
-			<node name="Transformation" class="6ea85710 90da4d35 acec30ee a6aacb9d" id="12">
+			<node name="Transformation" factory="6ea85710 90da4d35 acec30ee a6aacb9d" id="12">
 				<properties>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
 					<property name="matrix">1 0 0 -20 0 1 0 20 0 0 1 30 0 0 0 1</property>
 				</properties>
 			</node>
-			<node name="ScalarSine_X" class="b00248d6 9d6843d5 ab5a24bc 852519e5" id="13">
+			<node name="ScalarSine_X" factory="b00248d6 9d6843d5 ab5a24bc 852519e5" id="13">
 				<properties>
 					<property name="input">0</property>
 				</properties>
 			</node>
-			<node name="ScalarMultiply_X" class="d5d068d2 b4f2470d b99280ae 1b092e59" id="14">
+			<node name="ScalarMultiply_X" factory="d5d068d2 b4f2470d b99280ae 1b092e59" id="14">
 				<properties>
 					<property name="input1">0</property>
 					<property name="input2">1</property>
 				</properties>
 			</node>
-			<node name="PolyCube" class="7ec966d1 d78a445c 8806b8a3 5593f241" id="15">
+			<node name="PolyCube" factory="7ec966d1 d78a445c 8806b8a3 5593f241" id="15">
 				<properties>
-					<property name="Phase_X" label="Phase_X" description="Phase_X" type="double" user_property="vanilla">1.5</property>
-					<property name="Phase_Y" label="Phase_Y" description="Phase_Y" type="double" user_property="vanilla">0</property>
-					<property name="Phase_Z" label="Phase_Z" description="Phase_Z" type="double" user_property="vanilla">2</property>
-					<property name="Scale_X" label="Scale_X" description="Scale_X" type="double" user_property="vanilla">3</property>
-					<property name="Scale_Y" label="Scale_Y" description="Scale_Y" type="double" user_property="vanilla">6</property>
-					<property name="Scale_Z" label="Scale_Z" description="Scale_Z" type="double" user_property="vanilla">4</property>
+					<property name="Phase_X" label="Phase_X" description="Phase_X" type="k3d::double_t" user_property="vanilla">1.5</property>
+					<property name="Phase_Y" label="Phase_Y" description="Phase_Y" type="k3d::double_t" user_property="vanilla">0</property>
+					<property name="Phase_Z" label="Phase_Z" description="Phase_Z" type="k3d::double_t" user_property="vanilla">2</property>
+					<property name="Scale_X" label="Scale_X" description="Scale_X" type="k3d::double_t" user_property="vanilla">3</property>
+					<property name="Scale_Y" label="Scale_Y" description="Scale_Y" type="k3d::double_t" user_property="vanilla">6</property>
+					<property name="Scale_Z" label="Scale_Z" description="Scale_Z" type="k3d::double_t" user_property="vanilla">4</property>
 					<property name="columns">1</property>
 					<property name="depth">1</property>
 					<property name="height">1</property>
@@ -188,7 +185,7 @@
 					<property name="width">1</property>
 				</properties>
 			</node>
-			<node name="PolyCube Instance" class="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="16">
+			<node name="PolyCube Instance" factory="2c1d60a6 863541a1 bd649bd1 1ea8ae24" id="16">
 				<properties>
 					<property name="gl_painter">17</property>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
@@ -197,12 +194,12 @@
 					<property name="parent">0</property>
 					<property name="render_final">true</property>
 					<property name="render_shadows">true</property>
-					<property name="ri_painter">0</property>
+					<property name="ri_painter">18</property>
 					<property name="show_component_selection">false</property>
 					<property name="viewport_visible">true</property>
 				</properties>
 			</node>
-			<node name="Position" class="e2edd795 08f9416a 84139876 9c25a60a" id="18">
+			<node name="Position" factory="e2edd795 08f9416a 84139876 9c25a60a" id="19">
 				<properties>
 					<property name="input_matrix">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
 					<property name="space">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</property>
@@ -211,80 +208,236 @@
 					<property name="z">0</property>
 				</properties>
 			</node>
-			<node name="ScalarMultiply_Y" class="d5d068d2 b4f2470d b99280ae 1b092e59" id="19">
+			<node name="ScalarMultiply_Y" factory="d5d068d2 b4f2470d b99280ae 1b092e59" id="20">
 				<properties>
 					<property name="input1">0</property>
 					<property name="input2">1</property>
 				</properties>
 			</node>
-			<node name="ScalarMultiply_Z" class="d5d068d2 b4f2470d b99280ae 1b092e59" id="20">
+			<node name="ScalarMultiply_Z" factory="d5d068d2 b4f2470d b99280ae 1b092e59" id="21">
 				<properties>
 					<property name="input1">0</property>
 					<property name="input2">1</property>
 				</properties>
 			</node>
-			<node name="ScalarAdd_Phase_X" class="e2d5e227 98a6424f ae607c8c c4e99bec" id="21">
+			<node name="ScalarAdd_Phase_X" factory="e2d5e227 98a6424f ae607c8c c4e99bec" id="22">
 				<properties>
 					<property name="input1">0</property>
 					<property name="input2">0</property>
 				</properties>
 			</node>
-			<node name="ScalarAdd_Phase_Y" class="e2d5e227 98a6424f ae607c8c c4e99bec" id="22">
+			<node name="ScalarAdd_Phase_Y" factory="e2d5e227 98a6424f ae607c8c c4e99bec" id="23">
 				<properties>
 					<property name="input1">0</property>
 					<property name="input2">0</property>
 				</properties>
 			</node>
-			<node name="ScalarAdd_Phase_Z" class="e2d5e227 98a6424f ae607c8c c4e99bec" id="23">
+			<node name="ScalarAdd_Phase_Z" factory="e2d5e227 98a6424f ae607c8c c4e99bec" id="24">
 				<properties>
 					<property name="input1">0</property>
 					<property name="input2">0</property>
 				</properties>
 			</node>
-			<node name="GraphVizEngine" class="be72cb50 011f41d8 90449ae0 4c24ace5" id="24">
+			<node name="GraphVizEngine" factory="be72cb50 011f41d8 90449ae0 4c24ace5" id="25">
 				<properties>
 					<property name="render_engine">.dot to SVG</property>
+					<property name="show_property_labels">true</property>
+					<property name="show_property_loops">true</property>
+					<property name="visible_nodes"/>
 				</properties>
 			</node>
-			<node name="ScalarSine_Y" class="b00248d6 9d6843d5 ab5a24bc 852519e5" id="25">
+			<node name="ScalarSine_Y" factory="b00248d6 9d6843d5 ab5a24bc 852519e5" id="26">
 				<properties>
 					<property name="input">0</property>
 				</properties>
 			</node>
-			<node name="ScalarSine_Z" class="b00248d6 9d6843d5 ab5a24bc 852519e5" id="26">
+			<node name="ScalarSine_Z" factory="b00248d6 9d6843d5 ab5a24bc 852519e5" id="27">
 				<properties>
 					<property name="input">0</property>
 				</properties>
 			</node>
-			<node name="OpenGLFacePainter" class="a8f9e6e8 59b14fa4 8dde0fad 89cea90d" id="17">
+			<node name="GL Default Painter" factory="6bc7d8a1 bbe7491f a2405d97 8b136c41" id="17">
+				<properties>
+					<property name="bicubic_patches" label="Bicubic Patches" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">28</property>
+					<property name="bilinear_patches" label="Bilinear Patches" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">29</property>
+					<property name="blobbies" label="Blobbies" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">30</property>
+					<property name="cubic_curves" label="Cubic Curves" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">31</property>
+					<property name="edges" label="Edges" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">32</property>
+					<property name="enabled">true</property>
+					<property name="face_normals" label="Face Normals" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">33</property>
+					<property name="face_orientation" label="Face Orientation" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">34</property>
+					<property name="faces" label="Faces" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">35</property>
+					<property name="linear_curves" label="Linear Curves" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">36</property>
+					<property name="nurbs_curves" label="NURBS Curves" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">37</property>
+					<property name="nurbs_patches" label="NURBS Patches" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">38</property>
+					<property name="points" label="Points" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">39</property>
+					<property name="sds_edges" label="SDS Edges" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">40</property>
+					<property name="sds_faces" label="SDS Faces" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">41</property>
+					<property name="sds_points" label="SDS Points" description="" type="k3d::gl::imesh_painter*" user_property="vanilla">42</property>
+				</properties>
+			</node>
+			<node name="GL Point Painter" factory="ad24a631 acbd4af1 bd6d6362 75c3d5d7" id="39">
+				<properties>
+					<property name="alpha">1</property>
+					<property name="child_mesh_color">0.5 0.5 0.5</property>
+					<property name="enabled">true</property>
+					<property name="selected_component_color">1 0 0</property>
+					<property name="selected_mesh_color">1 1 1</property>
+					<property name="unselected_mesh_color">0 0 0</property>
+				</properties>
+			</node>
+			<node name="GL Edge Painter" factory="172c1208 d24430f5 63f70388 1945866e" id="32">
+				<properties>
+					<property name="alpha">1</property>
+					<property name="child_mesh_color">0.5 0.5 0.5</property>
+					<property name="enabled">true</property>
+					<property name="selected_component_color">1 0 0</property>
+					<property name="selected_mesh_color">1 1 1</property>
+					<property name="unselected_mesh_color">0 0 0</property>
+				</properties>
+			</node>
+			<node name="GL Face Painter" factory="7e6e8354 604f05ae 1d4d658b 96538240" id="35">
+				<properties>
+					<property name="alpha">1</property>
+					<property name="child_mesh_color">0.5 0.5 0.5</property>
+					<property name="enabled">true</property>
+					<property name="selected_component_color">1 0 0</property>
+					<property name="selected_mesh_color">0.6 0.6 0.6</property>
+					<property name="unselected_mesh_color">0.2 0.2 0.2</property>
+				</properties>
+			</node>
+			<node name="SDS Point Painter" factory="44621bcb 404a76ea 1a256ebd b119ad07" id="42">
+				<properties>
+					<property name="alpha">1</property>
+					<property name="child_mesh_color">0.5 0.5 0.5</property>
+					<property name="enabled">true</property>
+					<property name="levels">2</property>
+					<property name="selected_component_color">1 0 0</property>
+					<property name="selected_mesh_color">1 1 1</property>
+					<property name="unselected_mesh_color">0 0 0</property>
+				</properties>
+			</node>
+			<node name="SDS Edge Painter" factory="4282a7b2 b34a138f cda9df91 a9c9c8ab" id="40">
+				<properties>
+					<property name="alpha">1</property>
+					<property name="child_mesh_color">0.5 0.5 0.5</property>
+					<property name="enabled">true</property>
+					<property name="levels">2</property>
+					<property name="selected_component_color">1 0 0</property>
+					<property name="selected_mesh_color">1 1 1</property>
+					<property name="unselected_mesh_color">0 0 0</property>
+				</properties>
+			</node>
+			<node name="SDS Face Painter" factory="9d4043c8 864fe71b 38706d85 8b60af0c" id="41">
+				<properties>
+					<property name="alpha">1</property>
+					<property name="child_mesh_color">0.5 0.5 0.5</property>
+					<property name="enabled">true</property>
+					<property name="levels">2</property>
+					<property name="selected_component_color">1 0 0</property>
+					<property name="selected_mesh_color">0.6 0.6 0.6</property>
+					<property name="unselected_mesh_color">0.2 0.2 0.2</property>
+				</properties>
+			</node>
+			<node name="GL Linear Curve Painter" factory="6acd1d8e 954f4b3a bce4c296 523ebacd" id="36">
 				<properties>
 					<property name="enabled">true</property>
 				</properties>
 			</node>
+			<node name="GL Cubic Curve Painter" factory="cb30d291 47e146a3 b5167d0f 6f56bd61" id="31">
+				<properties>
+					<property name="enabled">true</property>
+				</properties>
+			</node>
+			<node name="GL NURBS Curve Painter" factory="86705b44 ef534dc4 86d9fc7a 8709ec59" id="37">
+				<properties>
+					<property name="enabled">true</property>
+				</properties>
+			</node>
+			<node name="GL Bilinear Patch Painter" factory="f172b866 fce74aa8 a9e792ff 630653f3" id="29">
+				<properties>
+					<property name="enabled">true</property>
+				</properties>
+			</node>
+			<node name="GL Bicubic Patch Painter" factory="e058ab07 44384acd ba321d58 cdb3ef25" id="28">
+				<properties>
+					<property name="enabled">true</property>
+				</properties>
+			</node>
+			<node name="GL NURBS Patch Painter" factory="8881a190 9d1c4e6f 8b8c0523 2dc43fda" id="38">
+				<properties>
+					<property name="enabled">true</property>
+				</properties>
+			</node>
+			<node name="GL Blobby Point Painter" factory="06148329 b2264760 84b25aab f8401c63" id="30">
+				<properties>
+					<property name="enabled">true</property>
+				</properties>
+			</node>
+			<node name="GL Face Normal Painter" factory="02d092ca 84405ff6 4fe806a9 ab886cb1" id="33">
+				<properties>
+					<property name="draw_selected">true</property>
+					<property name="draw_unselected">false</property>
+					<property name="enabled">true</property>
+					<property name="selected_color">0 1 1</property>
+					<property name="unselected_color">0 0.6 0.6</property>
+				</properties>
+			</node>
+			<node name="GL Face Orientation Painter" factory="7bc1ee5f 45802906 323984bf cbe858d6" id="34">
+				<properties>
+					<property name="draw_selected">true</property>
+					<property name="draw_unselected">false</property>
+					<property name="enabled">true</property>
+					<property name="selected_color">0 1 1</property>
+					<property name="unselected_color">0 0.6 0.6</property>
+				</properties>
+			</node>
+			<node name="Renderman Default Painter" factory="243cba5a 13f342fa 8f1a19cd faf34169" id="18">
+				<properties>
+					<property name="bicubic_patches" label="Bicubic Patches" description="" type="k3d::ri::imesh_painter*" user_property="vanilla">43</property>
+					<property name="bilinear_patches" label="Bilinear Patches" description="" type="k3d::ri::imesh_painter*" user_property="vanilla">44</property>
+					<property name="blobbies" label="Blobbies" description="" type="k3d::ri::imesh_painter*" user_property="vanilla">45</property>
+					<property name="cubic_curves" label="Cubic Curves" description="" type="k3d::ri::imesh_painter*" user_property="vanilla">46</property>
+					<property name="linear_curves" label="Linear Curves" description="" type="k3d::ri::imesh_painter*" user_property="vanilla">47</property>
+					<property name="nurbs_patches" label="NURBS Patches" description="" type="k3d::ri::imesh_painter*" user_property="vanilla">48</property>
+					<property name="point_groups" label="Point Groups" description="" type="k3d::ri::imesh_painter*" user_property="vanilla">49</property>
+					<property name="polyhedra" label="Polyhedra" description="" type="k3d::ri::imesh_painter*" user_property="vanilla">50</property>
+					<property name="subdivision_surfaces" label="Subdivision Surfaces" description="" type="k3d::ri::imesh_painter*" user_property="vanilla">51</property>
+				</properties>
+			</node>
+			<node name="RenderMan Point Group Painter" factory="06fab90b 2f034d69 b4a1cb9f b9864144" id="49"/>
+			<node name="RenderMan Polyhedron Painter" factory="0771ea79 6c8c4c6d 8bab8c83 42fc73e9" id="50"/>
+			<node name="RenderMan Subdivision Surface Painter" factory="4d6fae39 723e4ed3 bc5735c5 3b75edc0" id="51"/>
+			<node name="RenderMan Linear Curve Painter" factory="f8b19206 a0ae4bd1 b3548a15 1209469e" id="47"/>
+			<node name="RenderMan Cubic Curve Painter" factory="8c5be7c4 0e8d43c5 a1daace4 a79275d7" id="46"/>
+			<node name="RenderMan Bilinear Patch Painter" factory="3f51b275 5a664903 96ed9168 503e30f0" id="44"/>
+			<node name="RenderMan Bicubic Patch Painter" factory="64dfefde eedc4047 b59fc8f6 972a9b86" id="43"/>
+			<node name="RenderMan NURBS Patch Painter" factory="120d87f0 fe05419f ae2d14ce ea9c32b4" id="48"/>
+			<node name="RenderMan Blobby Painter" factory="0221462c c3d44a12 97b39425 29774d3f" id="45"/>
 		</nodes>
 		<dependencies>
-			<dependency from_node="6" from_property="output_matrix" to_node="5" to_property="input_matrix"/>
-			<dependency from_node="12" from_property="output_matrix" to_node="9" to_property="input_matrix"/>
-			<dependency from_node="21" from_property="output" to_node="13" to_property="input"/>
+			<dependency from_node="24" from_property="output" to_node="27" to_property="input"/>
 			<dependency from_node="13" from_property="output" to_node="14" to_property="input1"/>
 			<dependency from_node="15" from_property="Scale_X" to_node="14" to_property="input2"/>
-			<dependency from_node="18" from_property="output_matrix" to_node="16" to_property="input_matrix"/>
+			<dependency from_node="19" from_property="output_matrix" to_node="16" to_property="input_matrix"/>
 			<dependency from_node="15" from_property="output_mesh" to_node="16" to_property="input_mesh"/>
-			<dependency from_node="14" from_property="output" to_node="18" to_property="x"/>
-			<dependency from_node="19" from_property="output" to_node="18" to_property="y"/>
-			<dependency from_node="20" from_property="output" to_node="18" to_property="z"/>
-			<dependency from_node="25" from_property="output" to_node="19" to_property="input1"/>
-			<dependency from_node="15" from_property="Scale_Y" to_node="19" to_property="input2"/>
+			<dependency from_node="6" from_property="output_matrix" to_node="5" to_property="input_matrix"/>
+			<dependency from_node="12" from_property="output_matrix" to_node="9" to_property="input_matrix"/>
+			<dependency from_node="22" from_property="output" to_node="13" to_property="input"/>
 			<dependency from_node="26" from_property="output" to_node="20" to_property="input1"/>
-			<dependency from_node="15" from_property="Scale_Z" to_node="20" to_property="input2"/>
-			<dependency from_node="4" from_property="time" to_node="21" to_property="input1"/>
-			<dependency from_node="15" from_property="Phase_X" to_node="21" to_property="input2"/>
-			<dependency from_node="4" from_property="time" to_node="22" to_property="input1"/>
-			<dependency from_node="15" from_property="Phase_Y" to_node="22" to_property="input2"/>
+			<dependency from_node="15" from_property="Scale_Y" to_node="20" to_property="input2"/>
+			<dependency from_node="27" from_property="output" to_node="21" to_property="input1"/>
+			<dependency from_node="15" from_property="Scale_Z" to_node="21" to_property="input2"/>
 			<dependency from_node="4" from_property="time" to_node="23" to_property="input1"/>
-			<dependency from_node="15" from_property="Phase_Z" to_node="23" to_property="input2"/>
-			<dependency from_node="22" from_property="output" to_node="25" to_property="input"/>
+			<dependency from_node="15" from_property="Phase_Y" to_node="23" to_property="input2"/>
+			<dependency from_node="4" from_property="time" to_node="22" to_property="input1"/>
+			<dependency from_node="15" from_property="Phase_X" to_node="22" to_property="input2"/>
+			<dependency from_node="14" from_property="output" to_node="19" to_property="x"/>
+			<dependency from_node="20" from_property="output" to_node="19" to_property="y"/>
+			<dependency from_node="21" from_property="output" to_node="19" to_property="z"/>
 			<dependency from_node="23" from_property="output" to_node="26" to_property="input"/>
+			<dependency from_node="4" from_property="time" to_node="24" to_property="input1"/>
+			<dependency from_node="15" from_property="Phase_Z" to_node="24" to_property="input2"/>
 		</dependencies>
 	</document>
 </k3dml>
