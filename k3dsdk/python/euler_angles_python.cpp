@@ -34,6 +34,11 @@ namespace k3d
 namespace python
 {
 
+euler_angles::euler_angles(const k3d::euler_angles& EulerAngles) :
+	base(EulerAngles)
+{
+}
+
 euler_angles::euler_angles(const euler_angles::AngleOrder Order, const double A, const double B, const double C) :
 	base(radians(A), radians(B), radians(C), Order)
 {
@@ -153,12 +158,12 @@ const euler_angles operator+(const euler_angles& LHS, const euler_angles& RHS)
 		throw std::invalid_argument("argument order must match");
 
 
-	return euler_angles(LHS.order, LHS[0] + RHS[0], LHS[1] + RHS[1], LHS[2] + RHS[2]);
+	return k3d::euler_angles(LHS[0] + RHS[0], LHS[1] + RHS[1], LHS[2] + RHS[2], LHS.order);
 }
 
 const euler_angles operator*(const euler_angles& LHS, const double RHS)
 {
-	return euler_angles(LHS.order, LHS[0] * RHS, LHS[1] * RHS, LHS[2] * RHS);
+	return k3d::euler_angles(LHS[0] * RHS, LHS[1] * RHS, LHS[2] * RHS, LHS.order);
 }
 
 const euler_angles operator*(const double LHS, const euler_angles& RHS)

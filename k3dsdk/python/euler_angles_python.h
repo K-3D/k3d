@@ -37,6 +37,7 @@ class euler_angles :
 {
 	typedef k3d::euler_angles base;
 public:
+	euler_angles(const k3d::euler_angles& EulerAngles);
 	euler_angles(const AngleOrder Order, const double A, const double B, const double C);
 
 	const int len() const;
