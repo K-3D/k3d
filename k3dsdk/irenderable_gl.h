@@ -29,8 +29,6 @@
 namespace k3d
 {
 
-class icamera;
-
 namespace gl
 {
 
