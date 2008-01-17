@@ -98,6 +98,7 @@ OPTION(K3D_BUILD_BOOLEANS_MODULE "Build the booleans plugin module" ${K3D_BUILD_
 OPTION(K3D_BUILD_CORE_MODULE "Build the core plugin module" ON)
 OPTION(K3D_BUILD_DEFORMATION_MODULE "Build the mesh deformation plugin module" ON)
 OPTION(K3D_BUILD_DEVELOPMENT_MODULE "Build the development plugin module" ON)
+OPTION(K3D_BUILD_FILE_EXTENSION_MODULE "Build the file-extension MIME Type plugin module" ON)
 OPTION(K3D_BUILD_FREETYPE2_MODULE "Build the freetype2 plugin module" ON)
 OPTION(K3D_BUILD_GLX_MODULE "Build the GLX offscreen rendering module" ${K3D_BUILD_GLX_MODULE_DEFAULT})
 OPTION(K3D_BUILD_GNOME_MODULE "Build the GNOME integration plugin module" ${K3D_BUILD_GNOME_MODULE_DEFAULT})

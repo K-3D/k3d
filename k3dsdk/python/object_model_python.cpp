@@ -72,6 +72,7 @@
 #include <k3dsdk/mesh_diff.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/mime_types.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/type_registry.h>
@@ -374,6 +375,11 @@ const std::string module_print_diff(const object& A, const object& B, const obje
 	throw std::invalid_argument("cannot diff given objects");
 }
 
+const string_t module_mime_type(const string_t& File)
+{
+	return k3d::mime::type(filesystem::native_path(ustring::from_utf8(File)));
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // k3d module
 
@@ -458,6 +464,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Sends an informational message to the K-3D log.");
 	def("log_warning", module_log_warning,
 		"Sends a warning message to the K-3D log.");
+	def("mime_type", module_mime_type,
+		"Returns the MIME type of a file.");
 	def("new_document", module_new_document,
 		"Returns a new (completely empty) document.");
 	def("open_document", module_open_document,

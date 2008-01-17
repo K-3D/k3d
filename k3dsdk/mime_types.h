@@ -1,5 +1,8 @@
+#ifndef K3DSDK_MIME_TYPES_H
+#define K3DSDK_MIME_TYPES_H
+
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,27 +21,25 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/module.h>
+#include "types.h"
 
-namespace module
+namespace k3d
 {
 
-/// Namespace reserved for the gnome plugin module, to protect public symbols from name clashes with other modules
-namespace gnome
+namespace filesystem { class path; }
+
+namespace mime
 {
 
-extern k3d::iplugin_factory& mime_type_handler_factory();
-extern k3d::iplugin_factory& uri_handler_factory();
+/// Returns the MIME type of a file, or empty string if the type cannot be deduced
+const k3d::string_t type(const filesystem::path& File);
 
-} // namespace gnome
+} // namespace mime
 
-} // namespace module
+} // namespace k3d
 
-K3D_MODULE_START(Registry)
-	Registry.register_factory(module::gnome::mime_type_handler_factory());
-	Registry.register_factory(module::gnome::uri_handler_factory());
-K3D_MODULE_END
+#endif // K3DSDK_MIME_TYPES_H
 
