@@ -72,6 +72,11 @@ public:
 		k3d::log() << info << "Identified " << File.native_console_string() << " as " << FileType << " using " << get_factory().name() << std::endl;
 		return true;
 	}
+
+	const bool identify_mime_type(const k3d::string_t& Data, k3d::string_t& DataType)
+	{
+		return false;
+	}
 	
 	static k3d::iplugin_factory& get_factory()
 	{

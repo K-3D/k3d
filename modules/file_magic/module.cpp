@@ -26,16 +26,21 @@
 namespace module
 {
 
-namespace file_extension
+namespace file
+{
+
+namespace magic
 {
 
 extern k3d::iplugin_factory& mime_type_handler_factory();
 
-} // namespace file_extension
+} // namespace magic
+
+} // namespace file
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::file_extension::mime_type_handler_factory());
+	Registry.register_factory(module::file::magic::mime_type_handler_factory());
 K3D_MODULE_END
 

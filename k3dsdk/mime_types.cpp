@@ -33,10 +33,15 @@ namespace k3d
 namespace mime
 {
 
-const k3d::string_t type(const filesystem::path& File)
+namespace detail
+{
+
+/// Storage for an ordered collection of MIME-type handlers
+typedef std::multimap<k3d::uint8_t, imime_type_handler*> handlers_t;
+
+const handlers_t& get_handlers()
 {
 	// Cache a collection of MIME-type handlers ...
-	typedef std::multimap<k3d::uint8_t, imime_type_handler*> handlers_t;
 	static handlers_t handlers;
 	static bool initialized = false;
 
@@ -52,14 +57,35 @@ const k3d::string_t type(const filesystem::path& File)
 		}
 	}
 
-	// Try to identify the correct MIME-type ...
-	k3d::string_t file_type;
-	for(handlers_t::const_iterator handler = handlers.begin(); handler != handlers.end(); ++handler)
+	return handlers;
+}
+
+} // namespace detail
+
+const string_t type(const filesystem::path& File)
+{
+	static const detail::handlers_t& handlers = detail::get_handlers();
+
+	string_t file_type;
+	for(detail::handlers_t::const_iterator handler = handlers.begin(); handler != handlers.end(); ++handler)
 	{
-		if((*handler->second).identify_mime_type(File, file_type))
+		if(handler->second->identify_mime_type(File, file_type))
 			break;
 	}
 	return file_type;
+}
+
+const string_t type(const string_t& Data)
+{
+	static const detail::handlers_t& handlers = detail::get_handlers();
+
+	string_t data_type;
+	for(detail::handlers_t::const_iterator handler = handlers.begin(); handler != handlers.end(); ++handler)
+	{
+		if(handler->second->identify_mime_type(Data, data_type))
+			break;
+	}
+	return data_type;
 }
 
 } // namespace mime

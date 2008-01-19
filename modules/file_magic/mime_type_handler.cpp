@@ -34,7 +34,10 @@
 namespace module
 {
 
-namespace file_extension
+namespace file
+{
+
+namespace magic
 {
 
 /// Uses the Gnome API to open a URI in the user's preferred application
@@ -73,7 +76,7 @@ public:
 		if(test_type(".jpe", "image/jpeg", File, FileType)) return true;
 		if(test_type(".jpg", "image/jpeg", File, FileType)) return true;
 		if(test_type(".jpeg", "image/jpeg", File, FileType)) return true;
-		if(test_type(".k3dscript", "text/x-script.k3dscript", File, FileType)) return true;
+		if(test_type(".k3dscript", "text/x-k3dscript", File, FileType)) return true;
 		if(test_type(".png", "image/png", File, FileType)) return true;
 		if(test_type(".pnm", "image/x-portable-anymap", File, FileType)) return true;
 		if(test_type(".py", "text/x-python", File, FileType)) return true;
@@ -84,13 +87,32 @@ public:
 
 		return false;
 	}
-	
+
+	const bool test_type(const k3d::string_t& TestToken, const k3d::string_t& TestType, const k3d::string_t& Data, k3d::string_t& DataType)
+	{
+		if(Data.substr(0, TestToken.size()) != TestToken)
+			return false;
+
+		DataType = TestType;
+
+		k3d::log() << info << "Identified data as " << DataType << " using " << get_factory().name() << std::endl;
+		return true;
+	}
+
+	const bool identify_mime_type(const k3d::string_t& Data, k3d::string_t& DataType)
+	{
+		if(test_type("#python", "text/x-python", Data, DataType)) return true;
+		if(test_type("#k3dscript", "text/x-k3dscript", Data, DataType)) return true;
+
+		return false;
+	}
+
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<mime_type_handler,
 			k3d::interface_list<k3d::imime_type_handler> > factory(
 				k3d::uuid(0xc51f66a9, 0x104bd99e, 0x19fbadab, 0x1c84a1b3),
-				"FileExtensionMIMETypeHandler",
+				"FileMagicMIMETypeHandler",
 				_("Identifies a file's MIME Type based on filename extensions"),
 				"Desktop",
 				k3d::iplugin_factory::STABLE);
@@ -107,7 +129,9 @@ k3d::iplugin_factory& mime_type_handler_factory()
 	return mime_type_handler::get_factory();
 }
 
-} // namespace file_extension
+} // namespace magic
+
+} // namespace file
 
 } // namespace module
 

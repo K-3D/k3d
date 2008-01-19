@@ -35,7 +35,9 @@ namespace mime
 {
 
 /// Returns the MIME type of a file, or empty string if the type cannot be deduced
-const k3d::string_t type(const filesystem::path& File);
+const string_t type(const filesystem::path& File);
+/// Returns the MIME type of a data stream, or empty string if the type cannot be deduced
+const string_t type(const string_t& Data);
 
 } // namespace mime
 
