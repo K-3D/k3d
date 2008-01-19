@@ -49,6 +49,7 @@
 #include "node_python.h"
 #include "normal3_python.h"
 #include "object_model_python.h"
+#include "path_python.h"
 #include "point3_python.h"
 #include "point4_python.h"
 #include "ri_render_state_python.h"
@@ -117,15 +118,6 @@ struct python_wrap<double>
 	static PyObject* convert(const double Value)
 	{
 		return Py_BuildValue("d", Value);
-	}
-};
-
-template<>
-struct python_wrap<filesystem::path>
-{
-	static PyObject* convert(const filesystem::path& Value)
-	{
-		return Py_BuildValue("s", const_cast<char*>(Value.native_filesystem_string().c_str()));
 	}
 };
 
@@ -375,9 +367,14 @@ const std::string module_print_diff(const object& A, const object& B, const obje
 	throw std::invalid_argument("cannot diff given objects");
 }
 
-const string_t module_mime_type(const string_t& File)
+const k3d::string_t module_path_mime_type(const k3d::filesystem::path& File)
 {
-	return k3d::mime::type(filesystem::native_path(ustring::from_utf8(File)));
+	return k3d::mime::type(File);
+}
+
+const k3d::string_t module_data_mime_type(const k3d::string_t& Data)
+{
+	return k3d::mime::type(Data);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -385,7 +382,6 @@ const string_t module_mime_type(const string_t& File)
 
 BOOST_PYTHON_MODULE(k3d)
 {
-	to_python_converter<k3d::filesystem::path, python_wrap<k3d::filesystem::path> >();
 	to_python_converter<k3d::mesh_selection::records_t, python_wrap<k3d::mesh_selection::records_t> >();
 
 	angle_axis::define_class();
@@ -399,6 +395,7 @@ BOOST_PYTHON_MODULE(k3d)
 	export_matrix4();
 	export_mesh_selection();
 	export_normal3();
+	export_path();
 	export_point3();
 	export_point4();
 	export_uuid();
@@ -464,8 +461,10 @@ BOOST_PYTHON_MODULE(k3d)
 		"Sends an informational message to the K-3D log.");
 	def("log_warning", module_log_warning,
 		"Sends a warning message to the K-3D log.");
-	def("mime_type", module_mime_type,
+	def("mime_type", module_path_mime_type,
 		"Returns the MIME type of a file.");
+	def("mime_type", module_data_mime_type,
+		"Returns the MIME type of a chunk of data.");
 	def("new_document", module_new_document,
 		"Returns a new (completely empty) document.");
 	def("open_document", module_open_document,

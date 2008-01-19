@@ -20,6 +20,7 @@
 #include "path_python.h"
 
 #include <k3dsdk/path.h>
+#include <k3dsdk/types.h>
 
 #include <boost/python.hpp>
 #include <boost/python/detail/api_placeholder.hpp>
@@ -31,7 +32,32 @@ namespace k3d
 namespace python
 {
 
-std::string path_string(const k3d::filesystem::path& Path)
+const k3d::string_t root_name(const k3d::filesystem::path& Path)
+{
+	return Path.root_name().raw();
+}
+
+const k3d::string_t root_directory(const k3d::filesystem::path& Path)
+{
+	return Path.root_directory().raw();
+}
+
+const k3d::string_t leaf(const k3d::filesystem::path& Path)
+{
+	return Path.leaf().raw();
+}
+
+const k3d::filesystem::path generic_path(const k3d::string_t& GenericPath)
+{
+	return k3d::filesystem::generic_path(GenericPath);
+}
+
+const k3d::filesystem::path native_path(const k3d::string_t& NativePath)
+{
+	return k3d::filesystem::native_path(k3d::ustring::from_utf8(NativePath));
+}
+
+const k3d::string_t path_string(const k3d::filesystem::path& Path)
 {
 	return Path.native_filesystem_string();
 }
@@ -39,10 +65,21 @@ std::string path_string(const k3d::filesystem::path& Path)
 void export_path()
 {
 	class_<k3d::filesystem::path>("path",
-		"Stores a filesystem path", no_init)
+		"Stores a filesystem path")
+		.def("root_path", &k3d::filesystem::path::root_path)
+		.def("root_name", root_name)
+		.def("root_directory", root_directory)
+		.def("leaf", leaf)
+		.def("branch_path", &k3d::filesystem::path::branch_path)
+		.def("empty", &k3d::filesystem::path::empty)
+		.def("is_complete", &k3d::filesystem::path::is_complete)
 		.def("__str__", path_string);
+
+	def("generic_path", generic_path);
+	def("native_path", native_path);
 }
 
 } // namespace python
 
 } // namespace k3d
+
