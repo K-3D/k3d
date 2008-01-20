@@ -42,7 +42,6 @@
 
 #include <k3dsdk/application.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/classes.h>

@@ -29,6 +29,7 @@
 #include <k3dsdk/path.h>
 #include <k3dsdk/string_modifiers.h>
 
+#include <boost/assign/list_of.hpp>
 #include <boost/gil/extension/io/jpeg_io.hpp>
 
 namespace module
@@ -51,16 +52,6 @@ class bitmap_importer :
 public:
 	bitmap_importer()
 	{
-	}
-
-	unsigned long priority()
-	{
-		return 128;
-	}
-
-	bool query_can_handle(const k3d::filesystem::path& Path)
-	{
-		return k3d::filesystem::extension(Path).lowercase().raw() == ".jpeg" || k3d::filesystem::extension(Path).lowercase().raw() == ".jpg";
 	}
 
 	bool read_file(const k3d::filesystem::path& Path, k3d::bitmap& Bitmap)
@@ -90,7 +81,9 @@ public:
 				k3d::uuid(0xfb924031, 0x25c242af, 0xa2e1398e, 0x35000e3c),
 				"JPEGBitmapImporter",
 				_("JPEG (*.jpeg)"),
-				"Bitmap BitmapImporter");
+				"Bitmap BitmapImporter",
+				k3d::iplugin_factory::STABLE,
+				boost::assign::map_list_of("k3d:load-order", "8")("k3d:mime-types", "image/jpeg"));
 
 		return factory;
 	}

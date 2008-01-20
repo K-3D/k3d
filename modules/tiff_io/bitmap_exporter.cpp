@@ -54,16 +54,6 @@ public:
 	{
 	}
 
-	unsigned long priority()
-	{
-		return 128;
-	}
-
-	bool query_can_handle(const k3d::filesystem::path& Path)
-	{
-		return k3d::filesystem::extension(Path).lowercase().raw() == ".tiff" || k3d::filesystem::extension(Path).lowercase().raw() == ".tif";
-	}
-
 	bool write_file(const k3d::filesystem::path& Path, const k3d::bitmap& Bitmap)
 	{
 		try

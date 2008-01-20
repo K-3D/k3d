@@ -2,7 +2,7 @@
 #define K3DSDK_IDOCUMENT_EXPORTER_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -36,13 +36,14 @@ class idocument_exporter :
 	public virtual iunknown
 {
 public:
+	virtual ~idocument_exporter() {}
+
 	virtual bool write_file(idocument& Document, const filesystem::path& File) = 0;
 
 protected:
 	idocument_exporter() {}
 	idocument_exporter(const idocument_exporter&) {}
 	idocument_exporter& operator = (const idocument_exporter&) { return *this; }
-	virtual ~idocument_exporter() {}
 };
 
 } //namespace k3d

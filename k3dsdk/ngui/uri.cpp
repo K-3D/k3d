@@ -24,11 +24,12 @@
 #include "messages.h"
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/iuri_handler.h>
 #include <k3dsdk/string_cast.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace k3d
 {
@@ -51,8 +52,8 @@ void open(const std::string& URI)
 
 	for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
-		k3d::auto_ptr<iunknown> plugin(k3d::plugin::create(**factory));
-		if(iuri_handler* const handler = dynamic_cast<iuri_handler*>(plugin.get()))
+		boost::scoped_ptr<iuri_handler> handler(k3d::plugin::create<iuri_handler>(**factory));
+		if(handler)
 		{
 			if(handler->open_uri(URI))
 				return;

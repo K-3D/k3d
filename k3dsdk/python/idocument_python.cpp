@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,7 +24,6 @@
 #include "idocument_python.h"
 #include "node_python.h"
 
-#include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/plugin.h>
@@ -38,6 +37,8 @@
 
 #include <boost/python.hpp>
 using namespace boost::python;
+
+#include <boost/scoped_ptr.hpp>
 
 namespace k3d
 {
@@ -62,11 +63,11 @@ idocument::idocument(k3d::idocument& Document) :
 
 const bool idocument::save(const std::string& Path)
 {
-	k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::plugin::create<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
-	if(!filter.get())
+	boost::scoped_ptr<k3d::idocument_exporter> exporter(k3d::plugin::create<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
+	if(!exporter)
 		throw std::runtime_error("no exporter plugin available");
 
-	return filter->write_file(wrapped(), filesystem::native_path(ustring::from_utf8(Path)));
+	return exporter->write_file(wrapped(), filesystem::native_path(ustring::from_utf8(Path)));
 }
 
 void idocument::start_change_set()

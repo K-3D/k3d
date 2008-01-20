@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -31,6 +31,8 @@
 
 #include <Magick++.h>
 
+#include <boost/assign/list_of.hpp>
+
 namespace module
 {
 
@@ -52,25 +54,6 @@ class bitmap_importer :
 public:
 	bitmap_importer()
 	{
-	}
-
-	unsigned long priority()
-	{
-		return 64;
-	}
-
-	bool query_can_handle(const k3d::filesystem::path& File)
-	{
-		try
-		{
-			Magick::Image image;
-			image.read(File.native_filesystem_string());
-			return true;
-		}
-		catch(Magick::Exception& e)
-		{
-			return false;
-		}
 	}
 
 	bool read_file(const k3d::filesystem::path& File, k3d::bitmap& Bitmap)
@@ -135,7 +118,9 @@ public:
 				k3d::uuid(0x4eb70e35, 0x4e654a53, 0xa8e4b07c, 0x4219d946),
 				"ImageMagickBitmapImporter",
 				_("ImageMagick Formats ( many )"),
-				"Bitmap BitmapImporter");
+				"Bitmap BitmapImporter",
+				k3d::iplugin_factory::STABLE,
+				boost::assign::map_list_of("k3d:load-order", "128")("k3d:mime-types", "image/bmp image/x-sun-raster"));
  
 		return factory;
 	}

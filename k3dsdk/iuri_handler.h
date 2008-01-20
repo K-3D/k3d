@@ -25,7 +25,7 @@
 */
 
 #include "iunknown.h"
-#include <string>
+#include "types.h"
 
 namespace k3d
 {
@@ -35,14 +35,15 @@ class iuri_handler :
 	public virtual iunknown
 {
 public:
+	virtual ~iuri_handler() {}
+
 	/// Called to display a document in an application (presumably controlled by MIME-TYPE)
-	virtual bool open_uri(const std::string& URI) = 0;
+	virtual bool open_uri(const string_t& URI) = 0;
 
 protected:
 	iuri_handler() {}
 	iuri_handler(const iuri_handler&) {}
 	iuri_handler& operator=(const iuri_handler&) { return *this; }
-	virtual ~iuri_handler() {}
 };
 
 } // namespace k3d

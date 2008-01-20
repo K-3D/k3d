@@ -73,6 +73,7 @@ public:
 		if(test_type(".jpe", "image/jpeg", File, FileType)) return true;
 		if(test_type(".jpg", "image/jpeg", File, FileType)) return true;
 		if(test_type(".jpeg", "image/jpeg", File, FileType)) return true;
+		if(test_type(".k3d", "application/x-k3d", File, FileType)) return true;
 		if(test_type(".k3dscript", "text/x-k3dscript", File, FileType)) return true;
 		if(test_type(".png", "image/png", File, FileType)) return true;
 		if(test_type(".pnm", "image/x-portable-anymap", File, FileType)) return true;

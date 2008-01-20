@@ -37,13 +37,14 @@ class idocument_importer :
 	public virtual iunknown
 {
 public:
+	virtual ~idocument_importer() {}
+
 	virtual bool read_file(idocument& Document, const filesystem::path& File) = 0;
 
 protected:
 	idocument_importer() {}
 	idocument_importer(const idocument_importer&) {}
 	idocument_importer& operator = (const idocument_importer&) { return *this; }
-	virtual ~idocument_importer() {}
 };
 
 } // namespace k3d

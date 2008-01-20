@@ -29,7 +29,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
-#include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/iapplication.h>
@@ -43,6 +42,7 @@
 #include <k3dsdk/user_properties.h>
 
 #include <boost/format.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace libk3dngui
 {
@@ -194,8 +194,8 @@ void create_document()
 
 void open_document(const k3d::filesystem::path& Path)
 {
-	k3d::auto_ptr<k3d::idocument_importer> filter(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
-	if(!filter.get())
+	boost::scoped_ptr<k3d::idocument_importer> importer(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
+	if(!importer)
 	{
 		error_message(_("Document importer plugin not installed."));
 		return;
@@ -204,7 +204,7 @@ void open_document(const k3d::filesystem::path& Path)
 	k3d::idocument* const document = k3d::application().create_document();
 	return_if_fail(document);
 
-	if(!filter->read_file(*document, Path))
+	if(!importer->read_file(*document, Path))
 	{
 		error_message(k3d::string_cast(boost::format(_("Error reading document %1%")) % Path.native_filesystem_string()));
 		return;

@@ -29,6 +29,7 @@
 #include <k3dsdk/path.h>
 #include <k3dsdk/string_modifiers.h>
 
+#include <boost/assign/list_of.hpp>
 #include <boost/gil/extension/io/tiff_io.hpp>
 
 namespace module
@@ -51,16 +52,6 @@ class bitmap_importer :
 public:
 	bitmap_importer()
 	{
-	}
-
-	unsigned long priority()
-	{
-		return 128;
-	}
-
-	bool query_can_handle(const k3d::filesystem::path& Path)
-	{
-		return k3d::filesystem::extension(Path).lowercase().raw() == ".tiff" || k3d::filesystem::extension(Path).lowercase().raw() == ".tif";
 	}
 
 	bool read_file(const k3d::filesystem::path& Path, k3d::bitmap& Bitmap)
@@ -90,7 +81,9 @@ public:
 				k3d::uuid(0x3cfedd91, 0xd5764d3a, 0x91b15d47, 0xdcdcf962),
 				"TIFFBitmapImporter",
 				_("TIFF (*.tiff)"),
-				"Bitmap BitmapImporter");
+				"Bitmap BitmapImporter",
+				k3d::iplugin_factory::STABLE,
+				boost::assign::map_list_of("k3d:load-order", "8")("k3d:mime-types", "image/tiff"));
 
 		return factory;
 	}

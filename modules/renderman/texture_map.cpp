@@ -27,7 +27,6 @@
 #include <k3dsdk/bitmap_modifier.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/file_filter.h>
 #include <k3dsdk/ibitmap_exporter.h>
 #include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/istream_ri.h>
@@ -35,8 +34,11 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/types_ri.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <iterator>
 
@@ -92,9 +94,9 @@ public:
 		{
 			m_refresh_cache = false;
 
-			k3d::ibitmap_exporter* const filter = k3d::file_filter<k3d::ibitmap_exporter>(k3d::classes::TIFFBitmapExporter());
-			return_if_fail(filter);
-			return_if_fail(filter->write_file(m_cache_path, *texture));
+			boost::scoped_ptr<k3d::ibitmap_exporter> exporter(k3d::plugin::create<k3d::ibitmap_exporter>(k3d::classes::TIFFBitmapExporter()));
+			return_if_fail(exporter);
+			return_if_fail(exporter->write_file(m_cache_path, *texture));
 		}
 
 		k3d::filesystem::copy_file(m_cache_path, m_ri_image_path);

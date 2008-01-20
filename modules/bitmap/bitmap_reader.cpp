@@ -21,20 +21,20 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/auto_ptr.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/bitmap_source.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/file_filter.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/ibitmap_importer.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/mime_types.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/plugin.h>
 
-using namespace k3d::xml;
+#include <boost/scoped_ptr.hpp>
 
 #include <iterator>
 
@@ -63,10 +63,34 @@ public:
 		if(!k3d::filesystem::exists(file))
 			return;
 
-		k3d::auto_ptr<k3d::ibitmap_importer> filter(k3d::auto_file_filter<k3d::ibitmap_importer>(file));
-		return_if_fail(filter.get());
+		const k3d::string_t mime_type = k3d::mime::type(file);
+		if(mime_type.empty())
+		{
+			k3d::log() << error << "couldn't identify MIME type for file [" << file.native_console_string() << "]" << std::endl;
+			return;
+		}
 
-		filter->read_file(file, Bitmap);
+		const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::ibitmap_importer>(mime_type);
+		if(factories.empty())
+		{
+			k3d::log() << error << "no plugins available to load MIME type [" << mime_type << "]" << std::endl;
+			return;
+		}
+
+		for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+		{
+			boost::scoped_ptr<k3d::ibitmap_importer> importer(k3d::plugin::create<k3d::ibitmap_importer>(**factory));
+			if(!importer)
+				continue;
+
+			if(!importer->read_file(file, Bitmap))
+			{
+				k3d::log() << error << "factory [" << (**factory).name() << "] couldn't load file [" << file.native_console_string() << "]" << std::endl;
+				continue;
+			}
+
+			return;
+		}
 	}
 
 	void on_update_bitmap(k3d::bitmap& Bitmap)

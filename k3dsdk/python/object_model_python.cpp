@@ -58,7 +58,6 @@
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/application.h>
-#include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
@@ -81,6 +80,8 @@
 
 #include <boost/python.hpp>
 using namespace boost::python;
+
+#include <boost/scoped_ptr.hpp>
 
 namespace k3d
 {
@@ -338,15 +339,15 @@ idocument module_open_document(const std::string& Path)
 {
 	const filesystem::path document_path = filesystem::native_path(ustring::from_utf8(Path));
 
-	k3d::auto_ptr<k3d::idocument_importer> filter(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
-	if(!filter.get())
+	boost::scoped_ptr<k3d::idocument_importer> importer(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
+	if(!importer)
 		throw std::runtime_error("no importer plugin available");
 
 	k3d::idocument* const document = k3d::application().create_document();
 	if(!document)
 		throw std::runtime_error("couldn't create empty document");
 
-	if(!filter->read_file(*document, document_path))
+	if(!importer->read_file(*document, document_path))
 		throw std::runtime_error("error loading document");
 
 	return idocument(document);

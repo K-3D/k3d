@@ -43,6 +43,8 @@
 #include <k3dsdk/vectors.h>
 #include <k3dsdk/xml.h>
 
+#include <boost/assign/list_of.hpp>
+
 #include <iostream>
 
 namespace libk3dk3dio
@@ -57,16 +59,6 @@ class k3d_document_importer :
 	public k3d::ideletable
 {
 public:
-	unsigned long priority()
-	{
-		return 128;
-	}
-
-	bool query_can_handle(const k3d::filesystem::path& FilePath)
-	{
-		return k3d::filesystem::extension(FilePath).lowercase().raw() == ".k3d";
-	}
-
 	bool read_file(k3d::idocument& Document, const k3d::filesystem::path& FilePath)
 	{
 		k3d::log() << info << "Reading " << FilePath.native_console_string() << " using " << get_factory().name() << std::endl;
@@ -196,7 +188,9 @@ public:
 			k3d::classes::DocumentImporter(),
 			"K3DDocumentImporter",
 			_("K-3D Native ( .k3d )"),
-			"");
+			"",
+			k3d::iplugin_factory::STABLE,
+			boost::assign::map_list_of("k3d:mime-types", "application/x-k3d"));
 
 		return factory;
 	}

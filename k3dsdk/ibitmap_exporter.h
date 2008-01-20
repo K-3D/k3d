@@ -2,7 +2,7 @@
 #define K3DSDK_IBITMAP_EXPORTER_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -37,15 +37,17 @@ class ibitmap_exporter :
 	public virtual k3d::iunknown
 {
 public:
+	virtual ~ibitmap_exporter() {}
+
 	virtual bool write_file(const filesystem::path& File, const bitmap& Bitmap) = 0;
 
 protected:
 	ibitmap_exporter() {}
 	ibitmap_exporter(const ibitmap_exporter&) {}
 	ibitmap_exporter& operator = (const ibitmap_exporter&) { return *this; }
-	virtual ~ibitmap_exporter() {}
 };
 
 } // namespace k3d
 
 #endif // K3DSDK_IBITMAP_EXPORTER_H
+

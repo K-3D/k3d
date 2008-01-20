@@ -28,6 +28,7 @@
 #include <k3dsdk/ifile_format.h>
 #include <k3dsdk/path.h>
 
+#include <boost/assign/list_of.hpp>
 #include <boost/gil/extension/io/png_io.hpp>
 
 namespace module
@@ -50,16 +51,6 @@ class bitmap_importer :
 public:
 	bitmap_importer()
 	{
-	}
-
-	unsigned long priority()
-	{
-		return 128;
-	}
-
-	bool query_can_handle(const k3d::filesystem::path& File)
-	{
-		return k3d::filesystem::extension(File).lowercase().raw() == ".png";
 	}
 
 	bool read_file(const k3d::filesystem::path& File, k3d::bitmap& Bitmap)
@@ -89,7 +80,9 @@ public:
 				k3d::uuid(0xac17627d, 0xaa8848fd, 0xb621bd81, 0x4ba02136),
 				"PNGBitmapImporter",
 				_("PNG (*.png)"),
-				"Bitmap BitmapImporter");
+				"Bitmap BitmapImporter",
+				k3d::iplugin_factory::STABLE,
+				boost::assign::map_list_of("k3d:load-order", "8")("k3d:mime-types", "image/png"));
 
 		return factory;
 	}

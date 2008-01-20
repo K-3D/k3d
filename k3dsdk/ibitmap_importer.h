@@ -2,7 +2,7 @@
 #define K3DSDK_IBITMAP_IMPORTER_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -37,13 +37,14 @@ class ibitmap_importer :
 	public virtual iunknown
 {
 public:
+	virtual ~ibitmap_importer() {}
+
 	virtual bool read_file(const filesystem::path& File, bitmap& Bitmap) = 0;
 
 protected:
 	ibitmap_importer() {}
 	ibitmap_importer(const ibitmap_importer&) {}
 	ibitmap_importer& operator=(const ibitmap_importer&) { return *this; }
-	virtual ~ibitmap_importer() {}
 };
 
 } // namespace k3d

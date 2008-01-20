@@ -71,7 +71,6 @@
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/plugin.h>
-#include <k3dsdk/file_filter.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
 #include <k3dsdk/iapplication.h>
@@ -91,6 +90,7 @@
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/mime_types.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
@@ -1339,10 +1339,10 @@ private:
 		if(document_path.empty())
 			return on_file_save_as();
 
-		k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::plugin::create<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
-		return_val_if_fail(filter.get(), false);
+		boost::scoped_ptr<k3d::idocument_exporter> exporter(k3d::plugin::create<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
+		return_val_if_fail(exporter, false);
 
-		if(!filter->write_file(document(), document_path))
+		if(!exporter->write_file(document(), document_path))
 		{
 			error_message(_("File could not be saved"));
 			return false;
@@ -1365,10 +1365,10 @@ private:
 				return false;
 		}
 
-		k3d::auto_ptr<k3d::idocument_exporter> filter(k3d::plugin::create<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
-		return_val_if_fail(filter.get(), false);
+		boost::scoped_ptr<k3d::idocument_exporter> exporter(k3d::plugin::create<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
+		return_val_if_fail(exporter.get(), false);
 
-		if(!filter->write_file(document(), document_path))
+		if(!exporter->write_file(document(), document_path))
 		{
 			error_message(_("File could not be saved"));
 			return false;
@@ -1399,8 +1399,8 @@ private:
 
 	void file_revert()
 	{
-		k3d::auto_ptr<k3d::idocument_importer> filter(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
-		if(!filter.get())
+		boost::scoped_ptr<k3d::idocument_importer> importer(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
+		if(!importer)
 		{
 			error_message(_("Document reader plugin not installed."));
 			return;
@@ -1411,7 +1411,7 @@ private:
 		k3d::idocument* const reverted_document = k3d::application().create_document();
 		return_if_fail(reverted_document);
 
-		if(!filter->read_file(*reverted_document, document_path))
+		if(!importer->read_file(*reverted_document, document_path))
 		{
 			error_message(_("Error reading document.  The document could not be reverted."));
 			return;
@@ -1475,7 +1475,7 @@ private:
 
 		// Prompt the user for a file to import ...
 		k3d::filesystem::path filepath;
-		k3d::auto_ptr<k3d::idocument_importer> filter;
+		boost::scoped_ptr<k3d::idocument_importer> importer;
 
 		{
 			file_chooser_dialog dialog(_("Import Document:"), k3d::options::path::documents(), Gtk::FILE_CHOOSER_ACTION_OPEN);
@@ -1499,31 +1499,40 @@ private:
 
 			return_if_fail(import_combo.get_active() != model->children().end());
 
-			k3d::iplugin_factory* factory = import_combo.get_active()->get_value(columns.factory);
-			if(factory)
+			if(k3d::iplugin_factory* factory = import_combo.get_active()->get_value(columns.factory))
 			{
-				filter.reset(k3d::file_filter<k3d::idocument_importer>(*factory));
+				importer.reset(k3d::plugin::create<k3d::idocument_importer>(*factory));
 			}
 			else
 			{
-				k3d::log() << info << "Using automatic filetype detection" << std::endl;
-
-				filter.reset(k3d::auto_file_filter<k3d::idocument_importer>(filepath));
-				if(!filter.get())
+				const k3d::string_t mime_type = k3d::mime::type(filepath);
+				if(mime_type.empty())
 				{
 					error_message(
 						_("Could not detect filetype automatically.\n"
 						"Try choosing a specific filter that matches the file to be imported"));
 					return;
 				}
+
+				const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::idocument_importer>(mime_type);
+				if(factories.size() != 1)
+				{
+					error_message(k3d::string_cast(boost::format(_("No plugin installed that can import documents of type %1%.")) % mime_type));
+					return;
+				}
+
+				importer.reset(k3d::plugin::create<k3d::idocument_importer>(**factories.begin()));
 			}
-			return_if_fail(filter.get());
+
+			if(!importer)
+			{
+				error_message(_("Error creating a plugin to load the document."));
+			}
 		}
 
-		// If the user didn't select a specific filter, try automatic detection ...
 		// Make this an undoable operation ...
 		k3d::record_state_change_set change_set(document(), k3d::string_cast(boost::format(_("Import %1%")) % filepath.native_utf8_string().raw()), K3D_CHANGE_SET_CONTEXT);
-		if(!filter->read_file(document(), filepath))
+		if(!importer->read_file(document(), filepath))
 		{
 			error_message(
 				"Error importing file.  If you chose \"Automatic\" as the filter type,\n"
@@ -1556,7 +1565,7 @@ private:
 
 		// Prompt the user for a file to export ...
 		k3d::filesystem::path filepath;
-		k3d::auto_ptr<k3d::idocument_exporter> filter;
+		boost::scoped_ptr<k3d::idocument_exporter> exporter;
 
 		{
 			file_chooser_dialog dialog(_("Export Document:"), k3d::options::path::documents(), Gtk::FILE_CHOOSER_ACTION_SAVE);
@@ -1579,15 +1588,15 @@ private:
 				return;
 
 			return_if_fail(export_combo.get_active() != model->children().end());
-			k3d::iplugin_factory* factory = export_combo.get_active()->get_value(columns.factory);
-			if(factory)
+			if(k3d::iplugin_factory* factory = export_combo.get_active()->get_value(columns.factory))
 			{
-				filter.reset(k3d::file_filter<k3d::idocument_exporter>(*factory));
+				exporter.reset(k3d::plugin::create<k3d::idocument_exporter>(*factory));
 			}
-			return_if_fail(filter.get());
+
+			return_if_fail(exporter.get());
 		}
 
-		if(!filter->write_file(document(), filepath))
+		if(!exporter->write_file(document(), filepath))
 			error_message(_("Error exporting document"));
 	}
 

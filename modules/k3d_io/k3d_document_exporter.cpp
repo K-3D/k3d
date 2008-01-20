@@ -55,16 +55,6 @@ class k3d_document_exporter :
 	public k3d::ideletable
 {
 public:
-	unsigned long priority()
-	{
-		return 128;
-	}
-
-	bool query_can_handle(const k3d::filesystem::path& Path)
-	{
-		return k3d::filesystem::extension(Path).lowercase().raw() == ".k3d";
-	}
-
 	bool write_file(k3d::idocument& Document, const k3d::filesystem::path& Path)
 	{
 		k3d::log() << info << "Writing " << Path.native_console_string() << " using " << get_factory().name() << std::endl;

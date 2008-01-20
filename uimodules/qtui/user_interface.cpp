@@ -26,7 +26,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/auto_ptr.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/iapplication.h>
@@ -43,6 +42,8 @@
 #include <QMessageBox>
 #include <QStatusBar>
 #include <QToolBar>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <iomanip>
 
@@ -205,8 +206,8 @@ main_window::main_window(QApplication& Application) :
 
 void main_window::on_file_open()
 {
-	k3d::auto_ptr<k3d::idocument_importer> filter(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
-	if(!filter.get())
+	boost::scoped_ptr<k3d::idocument_importer> importer(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
+	if(!importer.get())
 	{
 		QMessageBox::warning(this, _("Open K-3D Document:"), _("Document reader plugin not installed."), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
 		return;
@@ -227,7 +228,7 @@ void main_window::on_file_open()
 	m_document = k3d::application().create_document();
 	return_if_fail(m_document);
 
-	if(!filter->read_file(*m_document, document_path))
+	if(!importer->read_file(*m_document, document_path))
 	{
 		QMessageBox::warning(this, _("Open K-3D Document:"), _("Error reading document."), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
 		return;

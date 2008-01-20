@@ -52,26 +52,6 @@ public:
 	{
 	}
 
-	unsigned long priority()
-	{
-		return 128;
-	}
-
-	bool query_can_handle(const k3d::filesystem::path& File)
-	{
-		// See if we can read it ...
-		try
-		{
-			Imf::InputFile file(File.native_filesystem_string().c_str());
-		}
-		catch(const std::exception& e)
-		{
-			return false;
-		}
-
-		return true;
-	}
-
 	bool read_file(const k3d::filesystem::path& File, k3d::bitmap& Bitmap)
 	{
 		try 
