@@ -31,6 +31,8 @@
 #include "plugin.h"
 #include "utility.h"
 
+#include <boost/tokenizer.hpp>
+
 namespace k3d
 {
 
@@ -182,8 +184,40 @@ const collection_t lookup(const std::type_info& Interface)
 	collection_t results;
 	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
 	{
-		if((*factory)->implements(Interface))
-			results.insert(*factory);
+		if((*factory)->implements(Interface) == false)
+			continue;
+
+		results.insert(*factory);
+	}
+
+	return results;
+}
+
+const collection_t lookup(const std::type_info& Interface, const string_t& MIMEType)
+{
+	collection_t results;
+	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	{
+		if((*factory)->implements(Interface) == false)
+			continue;
+
+		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
+		const string_t mime_types = metadata["k3d:mime-types"];
+
+		typedef boost::char_separator<char> separator_t;
+		separator_t separator(" ");
+
+		typedef boost::tokenizer<separator_t> tokenizer_t; 
+		tokenizer_t tokenizer(mime_types, separator);
+
+		for(tokenizer_t::const_iterator mime_type = tokenizer.begin(); mime_type != tokenizer.end(); ++mime_type)
+		{
+			if(*mime_type == MIMEType)
+			{
+				results.insert(*factory);
+				break;
+			}
+		}
 	}
 
 	return results;

@@ -2,7 +2,7 @@
 #define K3DSDK_SCRIPTING_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,14 +21,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares convenience functions for working with scripts
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iscript_engine.h"
+#include "types.h"
 
 #include <iosfwd>
-#include <string>
 
 namespace k3d
 {
@@ -44,7 +43,7 @@ class code
 {
 public:
 	/// Script code is stored as a string
-	code(const std::string& Source);
+	code(const string_t& Source);
 	/// Script code is stored as an input stream
 	code(std::istream& Source);
 	/// Script code is stored in a string stream
@@ -53,10 +52,10 @@ public:
 	code(std::stringstream& Source);
 
 	/// Returns the stored script source code
-	const std::string& source() const;
+	const string_t& source() const;
 
 private:
-	std::string m_buffer;
+	string_t m_buffer;
 };
 
 /// Helper class that converts various forms of input into an identifiable script language
@@ -68,7 +67,7 @@ public:
 	/// Specify the scripting language directly
 	language(const uuid& Language);
 	/// Specify the scripting language directly
-	language(iplugin_factory* Language);
+	language(iplugin_factory& Language);
 
 	/// Returns the plugin factory that corresponds with the given scripting language
 	iplugin_factory* factory() const;
@@ -77,10 +76,10 @@ private:
 	iplugin_factory* m_factory;
 };
 
-/// Executes a script using a specific language
-bool execute(const code& Script, const std::string& ScriptName, iscript_engine::context_t& Context, const language& Language);
+/// Executes a script using an explicitly-specified language
+bool execute(const code& Script, const string_t& ScriptName, iscript_engine::context_t& Context, const language& Language);
 /// Executes a script, attempting to automatically recognize the language
-void execute(const code& Script, const std::string& ScriptName, iscript_engine::context_t& Context, bool& Recognized, bool& Executed);
+void execute(const code& Script, const string_t& ScriptName, iscript_engine::context_t& Context, bool& Recognized, bool& Executed);
 
 } // namespace script
 

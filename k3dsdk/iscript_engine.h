@@ -2,7 +2,7 @@
 #define K3DSDK_ISCRIPT_ENGINE_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,8 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares iscript_engine, an abstract interface implemented by objects that can execute scripts written in a specific scripting language
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -39,13 +38,13 @@ class icommand_node;
 class iplugin_factory;
 
 /// Abstract interface implemented by objects that can execute scripts written in a specific scripting language
-/** \note: The Script arguments to can_execute() and execute() have bounced back-and-forth between
+/** \note: The Script arguments to execute() have bounced back-and-forth between
  * string and stream representations several times.  The original rationale for making them streams was
  * to avoid having to buffer the source code to a script in memory; the new rationale for making them strings
  * is that in practice you always end-up having to buffer the source code anyway, for one of two reasons:
- * first, only the k3dscript engine can use an input stream efficiently, the Python engine doesn't understand
- * C++ streams, so we had to buffer the source before passing it to the interpreter anyway; second, calling
- * can_execute() and execute() in sequence (the most common use-case) requires random access to the source stream,
+ * first, very few script APIs are likely to support C++ streams
+ * C++ streams, so we will likely have to buffer the source before using it anyway; second, determining
+ * the MIME type of a script and calling execute() in sequence (the most common use-case) requires random access to the source stream,
  * which isn't available for compressed streams or socket-based streams.
 */
 
@@ -58,12 +57,6 @@ public:
 	/**	\brief Returns the human-readable name of the scripting language this engine implements
 	*/
 	virtual const std::string language() = 0;
-
-	/**	\brief Tests to see if the supplied script is written in the scripting language implemented by this engine
-		\param Script The complete source code of the script to be tested
-		\return true, iff the supplied script can be executed by the engine
-	*/
-	virtual bool can_execute(const std::string& Script) = 0;
 
 	/// Defines a collection of named objects to pass to a script that define its context (its execution environment) - how they are used is implementation-dependent (note that the names are merely suggestions, and may be changed or ignored at the whim of the implementation)
 	typedef std::map<std::string, boost::any> context_t;

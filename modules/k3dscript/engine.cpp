@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,8 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the "kscript" engine, a minimal, "dumb" implementation of k3d::iscript_engine for use recording tutorials
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -34,6 +33,8 @@
 #include <k3dsdk/string_modifiers.h>
 #include <k3dsdk/xml.h>
 
+#include <boost/assign/list_of.hpp>
+
 namespace module
 {
 
@@ -44,7 +45,7 @@ namespace k3dscript
 /// Defines a "magic token" for automatic identification of scripts
 const std::string magic_token("#k3dscript");
 
-/// Provides the "K3DScript" scripting engine, primarily designed for recording and playback of tutorials
+/// Provides an implementation of k3d::iscript_engine primarily designed for recording and playback of tutorials
 class engine :
 	public k3d::iscript_engine,
 	public k3d::ideletable
@@ -70,7 +71,9 @@ public:
 			k3d::classes::K3DScriptEngine(),
 			"K3DScript",
 			_("K3DScript scripting engine"),
-			"ScriptEngine");
+			"ScriptEngine",
+			k3d::iplugin_factory::STABLE,
+			boost::assign::map_list_of("k3d:mime-types", "text/x-k3dscript"));
 
 		return factory;
 	}
@@ -78,11 +81,6 @@ public:
 	const std::string language()
 	{
 		return "K3DScript";
-	}
-
-	bool can_execute(const std::string& Script)
-	{
-		return Script.substr(0, magic_token.size()) == magic_token;
 	}
 
 	bool execute(const std::string& ScriptName, const std::string& Script, context_t& Context)

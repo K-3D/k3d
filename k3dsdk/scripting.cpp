@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,14 +18,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements convenience methods for working with scripts
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iapplication_plugin_factory.h"
 #include "ideletable.h"
 #include "iplugin_factory.h"
 #include "iscript_engine.h"
+#include "mime_types.h"
 #include "plugin.h"
 #include "result.h"
 #include "scripting.h"
@@ -43,24 +43,14 @@ namespace script
 namespace detail
 {
 
-/// Returns the set of all available scripting languages (cached)
-const plugin::factory::collection_t& script_engine_factories()
-{
-	static plugin::factory::collection_t factories;
-	if(factories.empty())
-		factories = plugin::factory::lookup<iscript_engine>();
-
-	return factories;
-}
-
 /// Executes a script using the given plugin factory to create the script engine
-bool execute_script(const code& Script, const std::string& ScriptName, iscript_engine::context_t& Context, const language& Language)
+bool execute_script(const code& Script, const string_t& ScriptName, iscript_engine::context_t& Context, const language& Language)
 {
 	return_val_if_fail(ScriptName.size(), false);
 	return_val_if_fail(Language.factory(), false);
 
 	// Get the requested scripting engine ...
-	iscript_engine* const engine = dynamic_cast<iscript_engine*>(plugin::create(*Language.factory()));
+	iscript_engine* const engine = plugin::create<iscript_engine>(*Language.factory());
 	return_val_if_fail(engine, false);
 
 	// Run that bad-boy ...
@@ -77,7 +67,7 @@ bool execute_script(const code& Script, const std::string& ScriptName, iscript_e
 /////////////////////////////////////////////////////////////////////////////////
 // code
 
-code::code(const std::string& Source) :
+code::code(const string_t& Source) :
 	m_buffer(Source)
 {
 }
@@ -100,7 +90,7 @@ code::code(std::stringstream& Source) :
 {
 }
 
-const std::string& code::source() const
+const string_t& code::source() const
 {
 	return m_buffer;
 }
@@ -111,46 +101,26 @@ const std::string& code::source() const
 language::language(const code& Script) :
 	m_factory(0)
 {
-	// Get the set of all script engine factories ...
-	const plugin::factory::collection_t& factories = detail::script_engine_factories();
+	// Get the MIME type of the code ...
+	const string_t mime_type = mime::type(Script.source());
+	if(mime_type.empty())
+		return;
 
-	// Look for a scripting engine that can execute the script ...
-	for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
-	{
-		iscript_engine* const script_engine = dynamic_cast<iscript_engine*>(plugin::create(**factory));
-		if(!script_engine)
-			continue;
+	// Get the set of script engine factories that handle this MIME type ...
+	const plugin::factory::collection_t factories = plugin::factory::lookup<iscript_engine>(mime_type);
+	if(factories.size() != 1)
+		return;
 
-		const bool can_execute = script_engine->can_execute(Script.source());
-		delete dynamic_cast<ideletable*>(script_engine);
-	
-		if(can_execute)
-		{
-			m_factory = *factory;
-			break;
-		}
-	}
+	m_factory = *factories.begin();
 }
 
 language::language(const uuid& Language) :
-	m_factory(0)
+	m_factory(plugin::factory::lookup(Language))
 {
-	// Get the set of all script engine factories ...
-	const plugin::factory::collection_t& factories = detail::script_engine_factories();
-
-	// Look for a factory that matches ...
-	for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
-	{
-		if((*factory)->factory_id() != Language)
-			continue;
-
-		m_factory = *factory;
-		break;
-	}
 }
 
-language::language(iplugin_factory* Language) :
-	m_factory(Language)
+language::language(iplugin_factory& Language) :
+	m_factory(&Language)
 {
 }
 
@@ -159,12 +129,18 @@ iplugin_factory* language::factory() const
 	return m_factory;
 }
 
-bool execute(const code& Script, const std::string& ScriptName, iscript_engine::context_t& Context, const language& Language)
+///////////////////////////////////////////////////////////////////////////////
+// execute
+
+bool execute(const code& Script, const string_t& ScriptName, iscript_engine::context_t& Context, const language& Language)
 {
 	return detail::execute_script(Script, ScriptName, Context, Language);
 }
 
-void execute(const code& Script, const std::string& ScriptName, iscript_engine::context_t& Context, bool& Recognized, bool& Executed)
+///////////////////////////////////////////////////////////////////////////////
+// execute
+
+void execute(const code& Script, const string_t& ScriptName, iscript_engine::context_t& Context, bool& Recognized, bool& Executed)
 {
 	// Starting state ...
 	Recognized = false;

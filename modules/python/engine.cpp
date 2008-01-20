@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -38,6 +38,7 @@
 #include <k3dsdk/result.h>
 #include <k3dsdk/string_modifiers.h>
 
+#include <boost/assign/list_of.hpp>
 #include <boost/python/dict.hpp>
 
 namespace module
@@ -91,7 +92,9 @@ public:
 			k3d::classes::PythonEngine(),
 			"Python",
 			_("Python scripting engine"),
-			"ScriptEngine");
+			"ScriptEngine",
+			k3d::iplugin_factory::STABLE,
+			boost::assign::map_list_of("k3d:mime-types", "text/x-python"));
 
 		return factory;
 	}
@@ -99,11 +102,6 @@ public:
 	const std::string language()
 	{
 		return "Python";
-	}
-
-	bool can_execute(const std::string& Script)
-	{
-		return Script.substr(0, magic_token.size()) == magic_token;
 	}
 
 	bool execute(const std::string& ScriptName, const std::string& Script, context_t& Context)
