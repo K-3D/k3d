@@ -37,8 +37,6 @@ class imime_type_handler :
 	public virtual iunknown
 {
 public:
-	/// Returns the handler order - handlers are invoked in order, so lower values correspond to higher priority.
-	virtual const k3d::uint8_t order() = 0;
 	/// Called to identify the MIME Type of a file.  Returns true iff the MIME Type was successfully identified.
 	virtual const bool identify_mime_type(const filesystem::path& File, k3d::string_t& FileType) = 0;
 	/// Called to identify the MIME Type of a data stream.  Returns true iff the MIME Type was successfully identified.

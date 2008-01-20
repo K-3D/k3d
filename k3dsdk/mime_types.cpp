@@ -36,8 +36,34 @@ namespace mime
 namespace detail
 {
 
+/// Storage for an application plugin that gets created on-demand
+template<typename interface_t>
+class on_demand_instance
+{
+public:
+	on_demand_instance(iplugin_factory& Factory) :
+		m_factory(&Factory),
+		m_instance(0)
+	{
+	}
+
+	interface_t* operator->() const
+//	interface_t* instance() const
+	{
+		if(!m_instance)
+			m_instance = plugin::create<interface_t>(*m_factory);
+
+		return m_instance;
+	}
+
+private:
+	iplugin_factory* m_factory;
+	mutable interface_t* m_instance;
+};
+
+typedef on_demand_instance<imime_type_handler> handler_t;
 /// Storage for an ordered collection of MIME-type handlers
-typedef std::multimap<k3d::uint8_t, imime_type_handler*> handlers_t;
+typedef std::multimap<k3d::uint32_t, handler_t> handlers_t;
 
 const handlers_t& get_handlers()
 {
@@ -52,8 +78,17 @@ const handlers_t& get_handlers()
 		const plugin::factory::collection_t factories = plugin::factory::lookup<imime_type_handler>();
 		for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 		{
-			if(imime_type_handler* const handler = plugin::create<imime_type_handler>(**factory))
-				handlers.insert(std::make_pair(handler->order(), handler));
+			iplugin_factory::metadata_t metadata = (**factory).metadata();
+			
+			if(!metadata.count("k3d:load-order"))
+			{
+				k3d::log() << error << "MIME Type Handler [" << (**factory).name() << "] without k3d:load-order metadata will not be used" << std::endl;
+				continue;
+			}
+
+			const k3d::uint32_t load_order = k3d::from_string<k3d::uint32_t>(metadata["k3d:load-order"], 255);
+
+			handlers.insert(std::make_pair(load_order, handler_t(**factory)));
 		}
 	}
 

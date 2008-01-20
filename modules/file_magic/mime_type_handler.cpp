@@ -29,6 +29,8 @@
 #include <k3dsdk/log.h>
 #include <k3dsdk/result.h>
 
+#include <boost/assign/list_of.hpp>
+
 #include <iostream>
 
 namespace module
@@ -52,11 +54,6 @@ public:
 
 	~mime_type_handler()
 	{
-	}
-
-	const k3d::uint8_t order()
-	{
-		return 128;
 	}
 
 	const bool test_type(const k3d::string_t& TestExtension, const k3d::string_t& TestType, const k3d::filesystem::path& File, k3d::string_t& FileType)
@@ -115,7 +112,8 @@ public:
 				"FileMagicMIMETypeHandler",
 				_("Identifies a file's MIME Type based on filename extensions"),
 				"Desktop",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::STABLE,
+				boost::assign::map_list_of("k3d:load-order", "128"));
 
 		return factory;
 	}

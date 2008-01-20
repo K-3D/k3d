@@ -29,6 +29,8 @@
 #include <k3dsdk/log.h>
 #include <k3dsdk/result.h>
 
+#include <boost/assign/list_of.hpp>
+
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
 
@@ -52,11 +54,6 @@ public:
 
 	~mime_type_handler()
 	{
-	}
-
-	const k3d::uint8_t order()
-	{
-		return 16;
 	}
 
 	const bool identify_mime_type(const k3d::filesystem::path& File, k3d::string_t& FileType)
@@ -86,7 +83,8 @@ public:
 				"GnomeMIMETypeHandler",
 				_("Identifies a file's MIME Type using the Gnome API"),
 				"Desktop",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::STABLE,
+				boost::assign::map_list_of("k3d:load-order", "8"));
 
 		return factory;
 	}
