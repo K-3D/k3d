@@ -28,7 +28,6 @@
 #include "algebra.h"
 #include "color.h"
 #include "data.h"
-#include "ideletable.h"
 #include "imaterial.h"
 #include "imesh_painter_gl.h"
 #include "imesh_painter_ri.h"
@@ -48,8 +47,7 @@ namespace k3d
 template<typename property_t>
 class user_property :
 	public property_t,
-	public iuser_property,
-	public ideletable
+	public iuser_property
 {
 public:
 	template<typename init_t>

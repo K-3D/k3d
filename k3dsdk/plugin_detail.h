@@ -25,7 +25,6 @@
 */
 
 #include "data.h"
-#include "ideletable.h"
 #include "idocument.h"
 #include "inode_collection.h"
 #include "iplugin_factory.h"

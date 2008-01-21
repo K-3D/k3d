@@ -31,7 +31,6 @@
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/file_helpers.h>
 #include <k3dsdk/fstream.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/python/object_model_python.h>
@@ -77,8 +76,7 @@ public:
 };
 
 class engine :
-	public k3d::iscript_engine,
-	public k3d::ideletable
+	public k3d::iscript_engine
 {
 public:
 	k3d::iplugin_factory& factory()

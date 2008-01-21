@@ -52,6 +52,8 @@ class iscript_engine :
 	public virtual iunknown
 {
 public:
+	virtual ~iscript_engine() {}
+
 	/// Returns a reference to the factory that created this object
 	virtual iplugin_factory& factory() = 0;
 	/**	\brief Returns the human-readable name of the scripting language this engine implements
@@ -97,7 +99,6 @@ protected:
 	iscript_engine() {}
 	iscript_engine(const iscript_engine& RHS) {}
 	iscript_engine& operator = (const iscript_engine& RHS) { return *this; }
-	virtual ~iscript_engine() {}
 };
 
 } // namespace k3d

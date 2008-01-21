@@ -26,7 +26,6 @@
 */
 
 #include "data.h"
-#include "ideletable.h"
 #include "idocument.h"
 #include "inode.h"
 #include "iselectable.h"
@@ -41,7 +40,6 @@ class iplugin_factory;
 /// A default implementation of the k3d::inode interface, for use as a base class for document plugins
 class node :
 	public inode,
-	public ideletable,
 	public iselectable,
 	public property_collection,
 	public sigc::trackable

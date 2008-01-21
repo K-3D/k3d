@@ -31,7 +31,7 @@ namespace k3d
 /// Interface from which all other K-3D interfaces derive
 class iunknown
 {
-protected:
+public:
 	virtual ~iunknown() {}
 };
 

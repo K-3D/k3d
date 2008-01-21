@@ -83,7 +83,7 @@ template<typename interface_t> interface_t* create(const string_t& FactoryName)
 			log() << error << "Plugin doesn't implement interface: " << FactoryName << std::endl;
 		}
 
-		delete dynamic_cast<ideletable*>(unknown);
+		delete unknown;
 	}
 
 	return 0;
@@ -103,7 +103,7 @@ template<typename interface_t> interface_t* create(iplugin_factory& Factory)
 			log() << error << "Plugin doesn't implement interface: " << Factory.name() << std::endl;
 		}
 
-		delete dynamic_cast<ideletable*>(unknown);
+		delete unknown;
 	}
 
 	return 0;
@@ -123,7 +123,7 @@ template<typename interface_t> interface_t* create(const uuid& FactoryID)
 			log() << error << "Plugin doesn't implement interface: " << FactoryID << std::endl;
 		}
 
-		delete dynamic_cast<ideletable*>(unknown);
+		delete unknown;
 	}
 
 	return 0;
@@ -150,13 +150,13 @@ inline iunknown* create(const uuid& FactoryID)
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
 template<typename interface_t> interface_t* create(const string_t& FactoryName, idocument& Document, const string_t& Name = string_t())
 {
-	if(inode* const object = detail::create_document_plugin(FactoryName, Document, Name))
+	if(inode* const node = detail::create_document_plugin(FactoryName, Document, Name))
 	{
-		if(interface_t* const result = dynamic_cast<interface_t*>(object))
+		if(interface_t* const result = dynamic_cast<interface_t*>(node))
 		{
-			object->set_name(Name);
-			undoable_new(dynamic_cast<ideletable*>(object), Document);
-			Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(object));
+			node->set_name(Name);
+			undoable_new(node, Document);
+			Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(node));
 
 			return result;
 		}
@@ -165,7 +165,7 @@ template<typename interface_t> interface_t* create(const string_t& FactoryName, 
 			log() << error << "Plugin doesn't implement interface: " << FactoryName << std::endl;
 		}
 
-		delete dynamic_cast<ideletable*>(object);
+		delete node;
 	}
 
 	return 0;
@@ -174,13 +174,13 @@ template<typename interface_t> interface_t* create(const string_t& FactoryName, 
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
 template<typename interface_t> interface_t* create(iplugin_factory& Factory, idocument& Document, const string_t& Name = string_t())
 {
-	if(inode* const object = detail::create_document_plugin(Factory, Document, Name))
+	if(inode* const node = detail::create_document_plugin(Factory, Document, Name))
 	{
-		if(interface_t* const result = dynamic_cast<interface_t*>(object))
+		if(interface_t* const result = dynamic_cast<interface_t*>(node))
 		{
-			object->set_name(Name);
-			undoable_new(dynamic_cast<ideletable*>(object), Document);
-			Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(object));
+			node->set_name(Name);
+			undoable_new(node, Document);
+			Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(node));
 
 			return result;
 		}
@@ -189,7 +189,7 @@ template<typename interface_t> interface_t* create(iplugin_factory& Factory, ido
 			log() << error << "Plugin doesn't implement interface: " << Factory.name() << std::endl;
 		}
 
-		delete dynamic_cast<ideletable*>(object);
+		delete node;
 	}
 
 	return 0;
@@ -198,13 +198,13 @@ template<typename interface_t> interface_t* create(iplugin_factory& Factory, ido
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
 template<typename interface_t> interface_t* create(const uuid& FactoryID, idocument& Document, const string_t& Name = string_t())
 {
-	if(inode* const object = detail::create_document_plugin(FactoryID, Document, Name))
+	if(inode* const node = detail::create_document_plugin(FactoryID, Document, Name))
 	{
-		if(interface_t* const result = dynamic_cast<interface_t*>(object))
+		if(interface_t* const result = dynamic_cast<interface_t*>(node))
 		{
-			object->set_name(Name);
-			undoable_new(dynamic_cast<ideletable*>(object), Document);
-			Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(object));
+			node->set_name(Name);
+			undoable_new(node, Document);
+			Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(node));
 
 			return result;
 		}
@@ -213,7 +213,7 @@ template<typename interface_t> interface_t* create(const uuid& FactoryID, idocum
 			log() << error << "Plugin doesn't implement interface: " << FactoryID << std::endl;
 		}
 
-		delete dynamic_cast<ideletable*>(object);
+		delete node;
 	}
 
 	return 0;
@@ -222,13 +222,13 @@ template<typename interface_t> interface_t* create(const uuid& FactoryID, idocum
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
 inline iunknown* create(const string_t& FactoryName, idocument& Document, const string_t& Name = string_t())
 {
-	if(inode* const object = detail::create_document_plugin(FactoryName, Document, Name))
+	if(inode* const node = detail::create_document_plugin(FactoryName, Document, Name))
 	{
-		object->set_name(Name);
-		undoable_new(dynamic_cast<ideletable*>(object), Document);
-		Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(object));
+		node->set_name(Name);
+		undoable_new(node, Document);
+		Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(node));
 
-		return object;
+		return node;
 	}
 
 	return 0;
@@ -237,13 +237,13 @@ inline iunknown* create(const string_t& FactoryName, idocument& Document, const 
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
 inline iunknown* create(iplugin_factory& Factory, idocument& Document, const string_t& Name = string_t())
 {
-	if(inode* const object = detail::create_document_plugin(Factory, Document, Name))
+	if(inode* const node = detail::create_document_plugin(Factory, Document, Name))
 	{
-		object->set_name(Name);
-		undoable_new(dynamic_cast<ideletable*>(object), Document);
-		Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(object));
+		node->set_name(Name);
+		undoable_new(node, Document);
+		Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(node));
 
-		return object;
+		return node;
 	}
 
 	return 0;
@@ -252,13 +252,13 @@ inline iunknown* create(iplugin_factory& Factory, idocument& Document, const str
 /// Creates a document plugin, returning the requested interface if implemented, otherwise NULL (cleans-up on failure)
 inline iunknown* create(const uuid& FactoryID, idocument& Document, const string_t& Name = string_t())
 {
-	if(inode* const object = detail::create_document_plugin(FactoryID, Document, Name))
+	if(inode* const node = detail::create_document_plugin(FactoryID, Document, Name))
 	{
-		object->set_name(Name);
-		undoable_new(dynamic_cast<ideletable*>(object), Document);
-		Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(object));
+		node->set_name(Name);
+		undoable_new(node, Document);
+		Document.nodes().add_nodes(make_collection<inode_collection::nodes_t>(node));
 
-		return object;
+		return node;
 	}
 
 	return 0;

@@ -45,6 +45,8 @@ class inode :
 	public virtual iunknown
 {
 public:
+	virtual ~inode() {}
+
 	/// Sets the node name (could fail or be overridden)
 	virtual void set_name(const std::string Name) = 0;
 	/// Returns the node name
@@ -67,7 +69,6 @@ protected:
 	inode() {}
 	inode(const inode&) {}
 	inode& operator=(const inode&) { return *this; }
-	virtual ~inode() {}
 };
 
 /// Specialization of almost_equal that tests inode pointers for equality

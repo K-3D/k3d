@@ -24,7 +24,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/ibitmap_importer.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/ifile_format.h>
 #include <k3dsdk/path.h>
 
@@ -45,8 +44,7 @@ namespace io
 
 class bitmap_importer :
 	public k3d::ifile_format,
-	public k3d::ibitmap_importer,
-	public k3d::ideletable
+	public k3d::ibitmap_importer
 {
 public:
 	bitmap_importer()

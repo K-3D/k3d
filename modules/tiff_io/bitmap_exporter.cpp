@@ -25,7 +25,6 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/ibitmap_exporter.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/ifile_format.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/string_modifiers.h>
@@ -46,8 +45,7 @@ namespace io
 
 class bitmap_exporter :
 	public k3d::ifile_format,
-	public k3d::ibitmap_exporter,
-	public k3d::ideletable
+	public k3d::ibitmap_exporter
 {
 public:
 	bitmap_exporter()

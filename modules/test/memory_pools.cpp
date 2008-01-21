@@ -24,7 +24,6 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/icommand_node.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/result.h>
@@ -38,8 +37,7 @@ namespace test
 {
 
 class memory_pools :
-	public k3d::icommand_node,
-	public k3d::ideletable
+	public k3d::icommand_node
 {
 public:
 	memory_pools()

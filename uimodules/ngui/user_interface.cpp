@@ -49,7 +49,6 @@
 #include <k3dsdk/data.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iscripted_action.h>
@@ -177,7 +176,6 @@ class user_interface :
 	public k3d::command_node::implementation,
 	public k3d::iuser_interface,
 	public k3d::iuser_interface_plugin,
-	public k3d::ideletable,
 	public sigc::trackable
 {
 	typedef k3d::command_node::implementation base;
@@ -570,7 +568,7 @@ private:
 		}
 
 		for(auto_start_plugins_t::iterator plugin = m_auto_start_plugins.begin(); plugin != m_auto_start_plugins.end(); ++plugin)
-			delete dynamic_cast<k3d::ideletable*>(*plugin);
+			delete *plugin;
 
 		m_auto_start_plugins.clear();
 	}

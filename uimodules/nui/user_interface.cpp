@@ -22,7 +22,6 @@
 */
 
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/iuser_interface_plugin.h>
 #include <k3dsdk/log.h>
@@ -42,8 +41,7 @@ namespace nui
 /// Provides the Null User Interface, a do-nothing user interface plugin useful for executing scripts and as a starting-point for user interface authors
 class user_interface :
 	public k3d::iuser_interface_plugin,
-	public k3d::iuser_interface,
-	public k3d::ideletable
+	public k3d::iuser_interface
 {
 public:
 	void get_command_line_arguments(boost::program_options::options_description& Description)

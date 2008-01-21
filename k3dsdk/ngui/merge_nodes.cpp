@@ -28,7 +28,6 @@
 #include <k3dsdk/data.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/inode.h>
@@ -334,11 +333,11 @@ void merge_nodes(k3d::idocument& Document)
 		{
 			k3d::log() << error << "node [" << name << "] does not support persistence" << std::endl;
 
-			delete dynamic_cast<k3d::ideletable*>(node);
+			delete node;
 			continue;
 		}
 
-		k3d::undoable_new(dynamic_cast<k3d::ideletable*>(node), Document);
+		k3d::undoable_new(node, Document);
 
 		nodes.push_back(node);
 		persistent_nodes.push_back(persistent);

@@ -37,7 +37,6 @@
 #include <k3dsdk/ngui/ui_component.h>
 
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/module.h>
@@ -60,7 +59,6 @@ class panel :
 	public libk3dngui::panel::control,
 	public libk3dngui::ui_component,
 	public libk3dngui::asynchronous_update,
-	public k3d::ideletable,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;

@@ -42,6 +42,8 @@ class iuser_interface_plugin :
 	public virtual iunknown
 {
 public:
+	virtual ~iuser_interface_plugin() {}
+
 	/// Called by the host application to retrieve descriptions of command-line arguments for this plugin
 	virtual void get_command_line_arguments(boost::program_options::options_description& Description) = 0;
 	/// Defines storage for parsed command-line arguments
@@ -63,7 +65,6 @@ protected:
 	iuser_interface_plugin() {}
 	iuser_interface_plugin(const iuser_interface_plugin&) {}
 	iuser_interface_plugin& operator = (const iuser_interface_plugin&) { return *this; }
-	virtual ~iuser_interface_plugin() {}
 };
 
 } // namespace k3d

@@ -28,7 +28,6 @@
 #include "document.h"
 #include "iapplication.h"
 #include "iapplication_plugin_factory.h"
-#include "ideletable.h"
 #include "idocument.h"
 #include "iscript_engine.h"
 #include "iscripted_action.h"
@@ -52,8 +51,7 @@ namespace k3d
 
 /// Encapsulates the running K-3D server application
 class application_implementation::implementation :
-	public k3d::iapplication,
-	public k3d::ideletable
+	public k3d::iapplication
 {
 public:
 	implementation(k3d::iplugin_factory_collection& Plugins) :
@@ -134,7 +132,7 @@ public:
 		}
 
 		for(auto_start_plugins_t::iterator plugin = plugin_begin; plugin != plugin_end; ++plugin)
-			delete dynamic_cast<k3d::ideletable*>(plugin->second);
+			delete plugin->second;
 
 		m_auto_start_plugins.erase(&Document);
 

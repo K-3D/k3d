@@ -39,7 +39,6 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/ipath_property.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/module.h>
@@ -448,7 +447,6 @@ struct implementation
 class panel :
 	public libk3dngui::panel::control,
 	public libk3dngui::ui_component,
-	public k3d::ideletable,
         public Gtk::VBox
 {
 	typedef Gtk::VBox base;

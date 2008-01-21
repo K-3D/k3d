@@ -26,8 +26,8 @@
 
 #include "iunknown.h"
 #include "point3.h"
+#include "types.h"
 
-#include <string>
 #include <vector>
 
 namespace k3d
@@ -40,11 +40,13 @@ class isnap_source :
 	public virtual iunknown
 {
 public:
+	virtual ~isnap_source() {}
+
 	/// Defines a collection of "snap groups"
-	typedef std::vector<std::string> groups_t;
+	typedef std::vector<string_t> groups_t;
 	
 	/// Returns a human-readable label that describes this source
-	virtual const std::string label() = 0;
+	virtual const string_t label() = 0;
 	/// Returns a collection of groups that this source is a member of
 	virtual const groups_t groups() = 0;
 	/// Returns the position of this source in local coordinates
@@ -56,7 +58,6 @@ protected:
 	isnap_source() {}
 	isnap_source(const isnap_source&) {}
 	isnap_source& operator=(const isnap_source&) { return *this; }
-	virtual ~isnap_source() {}
 };
 
 } // namespace k3d

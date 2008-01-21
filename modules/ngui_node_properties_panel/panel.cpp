@@ -58,7 +58,6 @@
 #include <k3dsdk/irender_animation.h>
 #include <k3dsdk/iaqsis.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
 #include <k3dsdk/ikeyframer.h>
@@ -759,8 +758,7 @@ public:
 				persistent_container->disable_serialization(*persistent);
 		}
 
-		if(k3d::ideletable* const deletable = dynamic_cast<k3d::ideletable*>(Property))
-			undoable_delete(deletable, m_document_state.document());
+		undoable_delete(Property, m_document_state.document());
 
 		if(m_document_state.document().state_recorder().current_change_set())
 			m_document_state.document().state_recorder().current_change_set()->record_new_state(new k3d::user::property_container(*Collection));
@@ -825,7 +823,6 @@ public:
 class panel :
 	public libk3dngui::panel::control,
 	public libk3dngui::ui_component,
-	public k3d::ideletable,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;

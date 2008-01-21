@@ -42,6 +42,8 @@ class iproperty :
 	public virtual iunknown
 {
 public:
+	virtual ~iproperty() {}
+
 	/// Returns the property name, which will be used as a unique identifier for programmatic access to the property (i.e. through scripting)
 	virtual const std::string property_name() = 0;
 	/// Returns a human-readable lable for the property, which should be localized for display in UI code
@@ -70,7 +72,6 @@ protected:
 	iproperty() {}
 	iproperty(const iproperty&) {}
 	iproperty& operator = (const iproperty&) { return *this; }
-	virtual ~iproperty() {}
 };
 
 } // namespace k3d

@@ -51,7 +51,6 @@
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/options.h>
@@ -220,7 +219,7 @@ private:
 	~tutorial_recorder()
 	{
 		--m_recording_count;
-		delete dynamic_cast<k3d::ideletable*>(m_script_engine);
+		delete m_script_engine;
 	}
 
 	void on_file_new()
@@ -358,7 +357,7 @@ private:
 		if(!save_changes())
 			return;
 
-		delete dynamic_cast<k3d::ideletable*>(m_script_engine);
+		delete m_script_engine;
 		m_script_engine = k3d::plugin::create<k3d::iscript_engine>(*Factory);
 
 		file_new();

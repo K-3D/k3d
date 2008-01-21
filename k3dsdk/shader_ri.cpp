@@ -180,10 +180,7 @@ void shader::delete_arguments()
 	disable_serialization(k3d::user_properties(*static_cast<ipersistent_container*>(this)));
 
 	for(iproperty_collection::properties_t::const_iterator property = user_properties.begin(); property != user_properties.end(); ++property)
-	{
-		if(ideletable* const deletable = dynamic_cast<ideletable*>(*property))
-			undoable_delete(deletable, document());
-	}
+		undoable_delete(*property, document());
 }
 
 void shader::load_metafile()

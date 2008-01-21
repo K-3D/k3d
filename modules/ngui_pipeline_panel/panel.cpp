@@ -38,7 +38,6 @@
 #include <k3dsdk/color.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/graph.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
@@ -106,7 +105,6 @@ private:
 class panel :
 	public libk3dngui::panel::control,
 	public libk3dngui::ui_component,
-	public k3d::ideletable,
 	public Gtk::VBox
 {
 public:

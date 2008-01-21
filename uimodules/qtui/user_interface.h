@@ -26,7 +26,6 @@
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/irender_viewport_gl.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/iuser_interface_plugin.h>
@@ -133,8 +132,7 @@ private:
 /// Implements the Qt User Interface plugin
 class user_interface :
 	public k3d::iuser_interface_plugin,
-	public k3d::iuser_interface,
-	public k3d::ideletable
+	public k3d::iuser_interface
 {
 public:
 	void get_command_line_arguments(boost::program_options::options_description& Description);

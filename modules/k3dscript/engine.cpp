@@ -26,7 +26,6 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/file_helpers.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/result.h>
@@ -47,8 +46,7 @@ const std::string magic_token("#k3dscript");
 
 /// Provides an implementation of k3d::iscript_engine primarily designed for recording and playback of tutorials
 class engine :
-	public k3d::iscript_engine,
-	public k3d::ideletable
+	public k3d::iscript_engine
 {
 public:
 	engine() :

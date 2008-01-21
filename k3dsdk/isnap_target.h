@@ -25,7 +25,8 @@
 */
 
 #include "iunknown.h"
-#include <string>
+#include "types.h"
+
 #include <vector>
 
 namespace k3d
@@ -39,11 +40,13 @@ class isnap_target :
 	public virtual iunknown
 {
 public:
+	virtual ~isnap_target() {}
+
 	/// Defines a collection of "snap groups"
-	typedef std::vector<std::string> groups_t;
+	typedef std::vector<string_t> groups_t;
 	
 	/// Returns a human-readable label that describes this target
-	virtual const std::string label() = 0;
+	virtual const string_t label() = 0;
 	/// Returns a collection of groups that this target is a member of
 	virtual const groups_t groups() = 0;
 	/// Given a set of local coordinates, returns the (optional, could return false) corresponding target position in local coordiantes
@@ -55,7 +58,6 @@ protected:
 	isnap_target() {}
 	isnap_target(const isnap_target&) {}
 	isnap_target& operator=(const isnap_target&) { return *this; }
-	virtual ~isnap_target() {}
 };
 
 } // namespace k3d

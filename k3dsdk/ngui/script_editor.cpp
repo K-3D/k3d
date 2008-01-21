@@ -45,7 +45,6 @@
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/options.h>

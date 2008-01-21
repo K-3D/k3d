@@ -22,7 +22,6 @@
 */
 
 #include "iapplication_plugin_factory.h"
-#include "ideletable.h"
 #include "iplugin_factory.h"
 #include "iscript_engine.h"
 #include "mime_types.h"
@@ -30,6 +29,8 @@
 #include "result.h"
 #include "scripting.h"
 #include "uuid.h"
+
+#include <boost/scoped_ptr.hpp>
 
 #include <sstream>
 #include <typeinfo>
@@ -50,14 +51,11 @@ bool execute_script(const code& Script, const string_t& ScriptName, iscript_engi
 	return_val_if_fail(Language.factory(), false);
 
 	// Get the requested scripting engine ...
-	iscript_engine* const engine = plugin::create<iscript_engine>(*Language.factory());
+	boost::scoped_ptr<iscript_engine> engine(plugin::create<iscript_engine>(*Language.factory()));
 	return_val_if_fail(engine, false);
 
 	// Run that bad-boy ...
 	const bool result = engine->execute(ScriptName, Script.source(), Context);
-
-	// Done with the engine ...
-	delete dynamic_cast<ideletable*>(engine);
 
 	return result;
 }

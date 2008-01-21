@@ -24,16 +24,18 @@
 #include "application_window.h"
 #include "file_chooser_dialog.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_tree.h>
-#include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/options.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/string_cast.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <gtkmm/label.h>
 #include <gtk/gtk.h>
@@ -69,11 +71,6 @@ public:
 	}
 
 private:
-	~test_case_recorder()
-	{
-		delete dynamic_cast<k3d::ideletable*>(m_script_engine);
-	}
-
 	void on_command(k3d::icommand_node& Node, const k3d::icommand_node::type Type, const std::string& Command, const std::string& Arguments)
 	{
 		// Sanity checks ...
@@ -89,7 +86,7 @@ private:
 	}
 
 	/// Script engine for the script being recorded
-	k3d::iscript_engine* m_script_engine;
+	boost::scoped_ptr<k3d::iscript_engine> m_script_engine;
 	/// Stores the output file stream
 	k3d::filesystem::ofstream m_stream;
 };

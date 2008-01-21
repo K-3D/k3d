@@ -127,6 +127,8 @@
 
 #include <sigc++/retype_return.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #include <sstream>
 
 #include <gtk/gtkbutton.h>
@@ -2382,22 +2384,20 @@ private:
 
 	void on_scripting_action(k3d::iplugin_factory* Factory)
 	{
-		k3d::iunknown* const plugin = k3d::plugin::create(*Factory);
+		boost::scoped_ptr<k3d::iunknown> plugin(k3d::plugin::create(*Factory));
 		if(!plugin)
 		{
 			k3d::log() << error << "Error creating plugin [" << (*Factory).name() << "]" << std::endl;
 			return;
 		}
 
-		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
+		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin.get()))
 		{
 			k3d::iscript_engine::context_t context;
 			context["Command"] = k3d::string_t("action");
 			context["Document"] = &document();
 			scripted_action->execute(context);
 		}
-
-		delete dynamic_cast<k3d::ideletable*>(plugin);
 	}
 
 	void on_window_fullscreen(k3d::iunknown*)

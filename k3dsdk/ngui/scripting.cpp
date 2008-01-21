@@ -31,6 +31,7 @@
 #include <k3dsdk/string_cast.h>
 
 #include <boost/format.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include <gtkmm/main.h>
 #include <gdk/gdkkeysyms.h>
@@ -83,11 +84,11 @@ bool execute_script(const k3d::script::code& Script, const std::string& ScriptNa
 	}
 
 	// Get the requested scripting engine ...
-	k3d::iscript_engine* const engine = k3d::plugin::create<k3d::iscript_engine>(*Language.factory());
+	boost::scoped_ptr<k3d::iscript_engine> engine(k3d::plugin::create<k3d::iscript_engine>(*Language.factory()));
 	return_val_if_fail(engine, false);
 
 	// Intercept global key events ...
-	script_engine_stack.push(engine);
+	script_engine_stack.push(engine.get());
 	sigc::connection script_escape_handler_connection = Gtk::Main::signal_key_snooper().connect(sigc::ptr_fun(script_escape_handler));
 
 	// Run that bad-boy ...
@@ -95,9 +96,6 @@ bool execute_script(const k3d::script::code& Script, const std::string& ScriptNa
 
 	script_escape_handler_connection.disconnect();
 	script_engine_stack.pop();
-
-	// Done with the engine ...
-	delete dynamic_cast<k3d::ideletable*>(engine);
 
 	if(!result)
 	{

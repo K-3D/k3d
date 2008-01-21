@@ -22,7 +22,6 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ideletable.h"
 #include "iuser_property.h"
 #include "property_collection.h"
 #include "result.h"
@@ -42,7 +41,7 @@ property_collection::~property_collection()
 	for(properties_t::iterator property = m_properties.begin(); property != m_properties.end(); ++property)
 	{
 		if(dynamic_cast<iuser_property*>(*property))
-			delete dynamic_cast<ideletable*>(*property);
+			delete *property;
 	}
 }
 

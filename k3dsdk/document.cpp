@@ -32,7 +32,6 @@
 #include "data.h"
 #include "dependencies.h"
 #include "document.h"
-#include "ideletable.h"
 #include "idocument.h"
 #include "idocument_plugin_factory.h"
 #include "imaterial.h"
@@ -344,7 +343,7 @@ public:
 
 		// Zap nodes ...
 		for(inode_collection::nodes_t::iterator node = m_nodes.begin(); node != m_nodes.end(); ++node)
-			delete dynamic_cast<ideletable*>(*node);
+			delete *node;
 	}
 
 private:

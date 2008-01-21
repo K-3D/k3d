@@ -39,6 +39,8 @@ class isnappable :
 	public virtual iunknown
 {
 public:
+	virtual ~isnappable() {}
+
 	/// Defines a collection of "snap sources" that describe what parts of this object can be snapped
 	typedef std::vector<isnap_source*> snap_sources_t;
 	virtual const snap_sources_t snap_sources() = 0;
@@ -56,7 +58,6 @@ protected:
 	isnappable() {}
 	isnappable(const isnappable&) {}
 	isnappable& operator=(const isnappable&) { return *this; }
-	virtual ~isnappable() {}
 };
 
 } // namespace k3d

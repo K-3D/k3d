@@ -24,7 +24,6 @@
 #include <Python.h>
 
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/iuser_interface_plugin.h>
 #include <k3dsdk/log.h>
@@ -46,8 +45,7 @@ namespace pyui
 /// Provides an interactive python shell user interface to K-3D, useful for prototyping and executing scripts when a graphical UI isn't needed
 class user_interface :
 	public k3d::iuser_interface_plugin,
-	public k3d::iuser_interface,
-	public k3d::ideletable
+	public k3d::iuser_interface
 {
 public:
 	void get_command_line_arguments(boost::program_options::options_description& Description)

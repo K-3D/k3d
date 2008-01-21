@@ -56,7 +56,6 @@
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/iaqsis.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
 #include <k3dsdk/ilist_property.h>
@@ -403,7 +402,6 @@ public:
 class panel :
 	public libk3dngui::panel::control,
 	public libk3dngui::ui_component,
-	public k3d::ideletable,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;

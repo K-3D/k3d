@@ -24,7 +24,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/path.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/imime_type_handler.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/result.h>
@@ -44,8 +43,7 @@ namespace magic
 
 /// Uses the Gnome API to open a URI in the user's preferred application
 class mime_type_handler :
-	public k3d::imime_type_handler,
-	public k3d::ideletable
+	public k3d::imime_type_handler
 {
 public:
 	mime_type_handler()

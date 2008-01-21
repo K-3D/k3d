@@ -36,7 +36,6 @@
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/ipipeline.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/module.h>
@@ -408,7 +407,6 @@ public:
 class panel :
 	public libk3dngui::panel::control,
 	public libk3dngui::ui_component,
-	public k3d::ideletable,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;

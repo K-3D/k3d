@@ -29,7 +29,6 @@
 #include <k3dsdk/data.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/gzstream.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/idocument_plugin_factory.h>
@@ -55,8 +54,7 @@ namespace libk3dk3dio
 
 class k3d_document_importer :
 	public k3d::ifile_format,
-	public k3d::idocument_importer,
-	public k3d::ideletable
+	public k3d::idocument_importer
 {
 public:
 	bool read_file(k3d::idocument& Document, const k3d::filesystem::path& FilePath)
@@ -154,11 +152,11 @@ public:
 					{
 						k3d::log() << error << "node [" << name << "] does not support persistence" << std::endl;
 
-						delete dynamic_cast<k3d::ideletable*>(node);
+						delete node;
 						continue;
 					}
 
-					k3d::undoable_new(dynamic_cast<k3d::ideletable*>(node), Document);
+					k3d::undoable_new(node, Document);
 
 					nodes.push_back(node);
 					persistent_nodes.push_back(persistent);

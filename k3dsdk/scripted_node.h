@@ -30,6 +30,8 @@
 #include "scripting.h"
 #include "user_property_changed_signal.h"
 
+#include <boost/scoped_ptr.hpp>
+
 namespace k3d
 {
 
@@ -41,20 +43,14 @@ class scripted_node :
 public:
 	scripted_node(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
-		m_script(init_owner(*this) + init_name("script") + init_label(_("Script")) + init_description(_("Script source code")) + init_value<std::string>("")),
-		m_script_engine(0),
+		m_script(init_owner(*this) + init_name("script") + init_label(_("Script")) + init_description(_("Script source code")) + init_value<string_t>("")),
 		m_user_property_changed_signal(*this),
 		m_executing(false)
 	{
 	}
 
-	~scripted_node()
-	{
-		delete dynamic_cast<ideletable*>(m_script_engine);
-	}
-
 protected:
-	void set_script(const std::string& Script)
+	void set_script(const string_t& Script)
 	{
 		m_script.set_value(Script);
 	}
@@ -78,14 +74,11 @@ protected:
 
 		// If the current script engine is for the wrong language, lose it ...
 		if(m_script_engine && (m_script_engine->factory().factory_id() != language.factory()->factory_id()))
-		{
-			delete dynamic_cast<ideletable*>(m_script_engine);
-			m_script_engine = 0;
-		}
+			m_script_engine.reset();
 
 		// Create our script engine as-needed ...
 		if(!m_script_engine)
-			m_script_engine = plugin::create<iscript_engine>(language.factory()->factory_id());
+			m_script_engine.reset(plugin::create<iscript_engine>(language.factory()->factory_id()));
 
 		// No script engine?  We're outta here ...
 		return_val_if_fail(m_script_engine, false);
@@ -97,8 +90,8 @@ protected:
 	}
 
 private:
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, script_property, with_serialization) m_script;
-	iscript_engine* m_script_engine;
+	k3d_data(string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, script_property, with_serialization) m_script;
+	boost::scoped_ptr<iscript_engine> m_script_engine;
 	user_property_changed_signal m_user_property_changed_signal;
 	bool m_executing;
 };

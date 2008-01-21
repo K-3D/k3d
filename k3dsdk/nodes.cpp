@@ -22,7 +22,6 @@
 */
 
 #include "data.h"
-#include "ideletable.h"
 #include "idocument.h"
 #include "iplugin_factory.h"
 #include "iproperty_collection.h"
@@ -171,7 +170,7 @@ void delete_nodes(idocument& Document, const nodes_t& Nodes)
 
 	// Make sure the node gets cleaned-up properly after a redo ...
 	for(nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
-		k3d::undoable_delete(dynamic_cast<k3d::ideletable*>(*node), Document);
+		k3d::undoable_delete(*node, Document);
 }
 
 } // namespace k3d

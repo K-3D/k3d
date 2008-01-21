@@ -24,7 +24,6 @@
 
 #include "explicit_snap_source.h"
 #include "explicit_snap_target.h"
-#include "ideletable.h"
 #include "isnap_source.h"
 #include "isnap_target.h"
 #include "result.h"
@@ -41,12 +40,12 @@ struct delete_snap_object
 {
 	void operator()(isnap_source* Object)
 	{
-		delete dynamic_cast<ideletable*>(Object);
+		delete Object;
 	}
 
 	void operator()(isnap_target* Object)
 	{
-		delete dynamic_cast<ideletable*>(Object);
+		delete Object;
 	}
 };
 

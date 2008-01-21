@@ -42,7 +42,6 @@
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/gzstream.h>
-#include <k3dsdk/ideletable.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/iscripted_action.h>
@@ -62,6 +61,8 @@
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/xml.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <iomanip>
 #include <iterator>
@@ -94,21 +95,21 @@ k3d::filesystem::path g_default_shader_cache_path;
 k3d::filesystem::path g_default_share_path;
 k3d::filesystem::path g_default_tutorials_path;
 k3d::filesystem::path g_default_user_interface_path;
-std::string g_default_plugin_paths;
+k3d::string_t g_default_plugin_paths;
 
 k3d::filesystem::path g_override_locale_path;
 k3d::filesystem::path g_options_path;
 k3d::filesystem::path g_shader_cache_path;
 k3d::filesystem::path g_share_path;
 k3d::filesystem::path g_user_interface_path;
-std::string g_plugin_paths;
+k3d::string_t g_plugin_paths;
 
-k3d::iuser_interface_plugin* g_user_interface = 0;
+boost::scoped_ptr<k3d::iuser_interface_plugin> g_user_interface;
 
 /////////////////////////////////////////////////////////////////////////////
 // handle_error
 
-void handle_error(const std::string& Message, bool& Quit, bool& Error)
+void handle_error(const k3d::string_t& Message, bool& Quit, bool& Error)
 {
 	Quit = true;
 	Error = true;
@@ -120,7 +121,7 @@ void handle_error(const std::string& Message, bool& Quit, bool& Error)
 // startup_message_handler
 
 /// Called during application startup to display progress to the user
-void startup_message_handler(const std::string& Message)
+void startup_message_handler(const k3d::string_t& Message)
 {
 	k3d::log() << info << Message << std::endl;
 
@@ -154,7 +155,7 @@ void set_default_options(bool& Quit, bool& Error)
 #ifdef K3D_API_WIN32
 
 	// Get the path where this module is executing ...
-	std::string executable(256, '\0');
+	k3d::string_t executable(256, '\0');
 	GetModuleFileName(0, const_cast<char*>(executable.data()), executable.size());
 	executable.resize(strlen(executable.c_str()));
 	const k3d::filesystem::path executable_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(executable)).branch_path();
@@ -211,7 +212,7 @@ void set_default_options(bool& Quit, bool& Error)
 // parse_log_arguments
 
 /// Looks for command-line arguments that apply to logging (so we can set them up right away)
-const arguments_t parse_log_arguments(const std::string& ProcessName, const arguments_t& Arguments, bool& Quit, bool& Error)
+const arguments_t parse_log_arguments(const k3d::string_t& ProcessName, const arguments_t& Arguments, bool& Quit, bool& Error)
 {
 	// Keep track of "unused" options ...
 	arguments_t unused;
@@ -255,7 +256,7 @@ const arguments_t parse_log_arguments(const std::string& ProcessName, const argu
 	}
 
 	k3d::log_show_timestamps(g_show_timestamps);
-	k3d::log_set_tag(g_show_process ? "[" + ProcessName + "]" : std::string());
+	k3d::log_set_tag(g_show_process ? "[" + ProcessName + "]" : k3d::string_t());
 	k3d::log_color_level(g_color_level);
 	k3d::log_show_level(true);
 	k3d::log_syslog(g_syslog);
@@ -430,7 +431,7 @@ void check_dependencies(bool& Quit, bool& Error)
 /// Instantiates the (optional) user interface plugin
 void create_user_interface(k3d::plugin_factory_collection& Plugins, bool& Quit, bool& Error)
 {
-	const std::string module_name = g_user_interface_path.native_console_string();
+	const k3d::string_t module_name = g_user_interface_path.native_console_string();
 	if(!g_user_interface_path.empty() && !k3d::filesystem::exists(g_user_interface_path))
 	{
 		handle_error("UI plugin module [" + module_name + "] does not exist", Quit, Error);
@@ -449,25 +450,16 @@ void create_user_interface(k3d::plugin_factory_collection& Plugins, bool& Quit, 
 		return;
 	}
 
-	k3d::iunknown* const ui_plugin = k3d::plugin::create(**Plugins.factories().begin());
-	if(!ui_plugin)
-	{
-		handle_error("UI plugin module [" + module_name + "] failed to instantiate a K-3D plugin", Quit, Error);
-		return;
-	}
-
-	g_user_interface = dynamic_cast<k3d::iuser_interface_plugin*>(ui_plugin);
+	g_user_interface.reset(k3d::plugin::create<k3d::iuser_interface_plugin>(**Plugins.factories().begin()));
 	if(!g_user_interface)
 	{
-		delete dynamic_cast<k3d::ideletable*>(ui_plugin);
 		handle_error("UI plugin module [" + module_name + "] does not contain a user interface plugin", Quit, Error);
 		return;
 	}
 
-	if(!dynamic_cast<k3d::iuser_interface*>(ui_plugin))
+	if(!dynamic_cast<k3d::iuser_interface*>(g_user_interface.get()))
 	{
-		g_user_interface = 0;
-		delete dynamic_cast<k3d::ideletable*>(ui_plugin);
+		g_user_interface.reset();
 		handle_error("UI plugin module [" + module_name + "] does not implement required interfaces", Quit, Error);
 		return;
 	}
@@ -498,7 +490,7 @@ const arguments_t parse_runtime_arguments(const arguments_t& Arguments, bool& Qu
 		{
 			bool recognized = false;
 			bool executed = false;
-			std::string script_name(argument->value[0]);
+			k3d::string_t script_name(argument->value[0]);
 
 			if(script_name == "-")
 			{
@@ -631,7 +623,7 @@ void delete_auto_start_plugins(auto_start_plugins_t& Plugins)
 	}
 
 	for(auto_start_plugins_t::iterator plugin = Plugins.begin(); plugin != Plugins.end(); ++plugin)
-		delete dynamic_cast<k3d::ideletable*>(*plugin);
+		delete *plugin;
 
 	Plugins.clear();
 }
@@ -640,16 +632,16 @@ void delete_auto_start_plugins(auto_start_plugins_t& Plugins)
 
 int main(int argc, char* argv[])
 {
-	const std::string program_name = k3d::filesystem::native_path(k3d::ustring::from_utf8(argv[0])).leaf().raw();
+	const k3d::string_t program_name = k3d::filesystem::native_path(k3d::ustring::from_utf8(argv[0])).leaf().raw();
 
 	// Convert argc and argv into an easier form to work with ...
-	std::vector<std::string> raw_arguments(argv, argv + argc);
+	std::vector<k3d::string_t> raw_arguments(argv, argv + argc);
 	if(raw_arguments.size())
 		raw_arguments.erase(raw_arguments.begin());
 
 	// Append extra options from the environment ...
 	std::istringstream buffer(k3d::system::getenv("K3D_EXTRA_OPTIONS"));
-	std::copy(std::istream_iterator<std::string>(buffer), std::istream_iterator<std::string>(), std::back_inserter(raw_arguments));
+	std::copy(std::istream_iterator<k3d::string_t>(buffer), std::istream_iterator<k3d::string_t>(), std::back_inserter(raw_arguments));
 	
 	try
 	{
@@ -664,28 +656,28 @@ int main(int argc, char* argv[])
 		// Parse command-line options ...
 		boost::program_options::options_description description("K-3D options");
 		description.add_options()
-			("add-path", boost::program_options::value<std::string>(), "Prepend a path to the PATH environment variable at runtime.")
+			("add-path", boost::program_options::value<k3d::string_t>(), "Prepend a path to the PATH environment variable at runtime.")
 			("batch", "Enable batch (no user intervention) mode.")
 			("color", "Color-code log messages based on their level.")
-			("disable-gl-extension", boost::program_options::value<std::string>(), "Disables the given OpenGL extension.")
-			("enable-gl-extension", boost::program_options::value<std::string>(), "Enables the given OpenGL extension.")
+			("disable-gl-extension", boost::program_options::value<k3d::string_t>(), "Disables the given OpenGL extension.")
+			("enable-gl-extension", boost::program_options::value<k3d::string_t>(), "Enables the given OpenGL extension.")
 			("exit", "Exits the program (useful after running scripts in batch mode.")
 			("help,h", "Prints this help message and exits.")
 			("list-gl-extensions", "List available OpenGL extensions and exit.")
 #ifdef K3D_BUILD_NLS
-			("locale", boost::program_options::value<std::string>(), "Overrides the path for loading locales")
+			("locale", boost::program_options::value<k3d::string_t>(), "Overrides the path for loading locales")
 #endif // K3D_BUILD_NLS
-			("log-level", boost::program_options::value<std::string>(), "Specifies the minimum message priority to log - valid values are \"warning\", \"information\", \"debug\" [default: warning].")
-			("options", boost::program_options::value<std::string>(), "Overrides the filepath for storing user options [default: /home/tshead/.k3d/options.k3d].")
-			("plugins", boost::program_options::value<std::string>(), "Overrides the path(s) for loading plugin libraries [default: /usr/local/k3d/lib/k3d].")
-			("script", boost::program_options::value<std::string>(), "Play the given script after startup (use - for stdin).")
-			("setenv", boost::program_options::value<std::string>(), "Set an environment variable using name=value syntax.")
-			("shadercache", boost::program_options::value<std::string>(), "Overrides the path for storing compiled shaders [default: /home/tshead/.k3d/shadercache].")
-			("share", boost::program_options::value<std::string>(), "Overrides the path for loading shared data files [default: /usr/local/k3d/share/k3d].")
+			("log-level", boost::program_options::value<k3d::string_t>(), "Specifies the minimum message priority to log - valid values are \"warning\", \"information\", \"debug\" [default: warning].")
+			("options", boost::program_options::value<k3d::string_t>(), "Overrides the filepath for storing user options [default: /home/tshead/.k3d/options.k3d].")
+			("plugins", boost::program_options::value<k3d::string_t>(), "Overrides the path(s) for loading plugin libraries [default: /usr/local/k3d/lib/k3d].")
+			("script", boost::program_options::value<k3d::string_t>(), "Play the given script after startup (use - for stdin).")
+			("setenv", boost::program_options::value<k3d::string_t>(), "Set an environment variable using name=value syntax.")
+			("shadercache", boost::program_options::value<k3d::string_t>(), "Overrides the path for storing compiled shaders [default: /home/tshead/.k3d/shadercache].")
+			("share", boost::program_options::value<k3d::string_t>(), "Overrides the path for loading shared data files [default: /usr/local/k3d/share/k3d].")
 			("show-process", "Prints the process name next to log messages.")
 			("show-timestamps", "Prints timestamps next to log messages.")
 			("syslog", "Logs messages to syslog.")
-			("ui,u", boost::program_options::value<std::string>(), "Specifies the user interface plugin to use - valid values are a plugin path, \"nui\", \"ngui\", \"qtui\", or \"pyui\" [default: ngui].")
+			("ui,u", boost::program_options::value<k3d::string_t>(), "Specifies the user interface plugin to use - valid values are a plugin path, \"nui\", \"ngui\", \"qtui\", or \"pyui\" [default: ngui].")
 			("user-interface-help,H", "Prints user interface help message and exits.")
 			("version", "Prints program version information and exits.")
 			;
@@ -773,10 +765,7 @@ int main(int argc, char* argv[])
 		}
 
 		// Register our user interface ...
-		k3d::set_user_interface(*dynamic_cast<k3d::iuser_interface*>(g_user_interface));
-
-		// Make sure the UI gets cleaned-up properly ...
-		std::auto_ptr<k3d::ideletable> user_interface_storage(dynamic_cast<k3d::ideletable*>(g_user_interface));
+		k3d::set_user_interface(*dynamic_cast<k3d::iuser_interface*>(g_user_interface.get()));
 
 		// Give the UI a chance to handle command-line arguments ...
 		arguments = g_user_interface->parse_startup_arguments(arguments, quit, error);
@@ -834,7 +823,7 @@ int main(int argc, char* argv[])
 	}
 	catch(std::exception& e)
 	{
-		std::string message = "Caught exception [";
+		k3d::string_t message = "Caught exception [";
 			message += k3d::demangle(typeid(e));
 			message += "] - ";
 			message += e.what();
@@ -849,7 +838,7 @@ int main(int argc, char* argv[])
 	}
 	catch(...)
 	{
-		const std::string message = "Caught unknown exception.";
+		const k3d::string_t message = "Caught unknown exception.";
 
 		k3d::log() << critical << message << std::endl;
 
@@ -859,4 +848,7 @@ int main(int argc, char* argv[])
 
 		return 1;
 	}
+
+	g_user_interface.reset();
 }
+
