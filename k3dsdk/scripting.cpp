@@ -96,6 +96,22 @@ const string_t& code::source() const
 ///////////////////////////////////////////////////////////////////////////////
 // language
 
+language::language(const filesystem::path& Script) :
+	m_factory(0)
+{
+	// Get the MIME type of the code ...
+	const mime::type mime_type = mime::type::lookup(Script);
+	if(mime_type.empty())
+		return;
+
+	// Get the set of script engine factories that handle this MIME type ...
+	const plugin::factory::collection_t factories = plugin::factory::lookup<iscript_engine>(mime_type);
+	if(factories.size() != 1)
+		return;
+
+	m_factory = *factories.begin();
+}
+
 language::language(const code& Script) :
 	m_factory(0)
 {
@@ -106,6 +122,16 @@ language::language(const code& Script) :
 
 	// Get the set of script engine factories that handle this MIME type ...
 	const plugin::factory::collection_t factories = plugin::factory::lookup<iscript_engine>(mime_type);
+	if(factories.size() != 1)
+		return;
+
+	m_factory = *factories.begin();
+}
+
+language::language(const mime::type& Type)
+{
+	// Get the set of script engine factories that handle this MIME type ...
+	const plugin::factory::collection_t factories = plugin::factory::lookup<iscript_engine>(Type);
 	if(factories.size() != 1)
 		return;
 

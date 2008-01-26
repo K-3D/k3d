@@ -35,6 +35,9 @@ namespace k3d
 class iplugin_factory;
 class uuid;
 
+namespace filesystem { class path; }
+namespace mime { class type; }
+
 namespace script
 {
 
@@ -62,8 +65,12 @@ private:
 class language
 {
 public:
-	/// Determine the scripting language from a script source
+	/// Determine scripting language from a filesystem path
+	language(const filesystem::path& Script);
+	/// Determine the scripting language from the script sources
 	language(const code& Script);
+	/// Determine the scripting language from a MIME type
+	language(const mime::type& Type);
 	/// Specify the scripting language directly
 	language(const uuid& Language);
 	/// Specify the scripting language directly

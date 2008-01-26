@@ -48,6 +48,8 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/treeview.h>
 
+#include <boost/scoped_ptr.hpp>
+
 using namespace libk3dngui;
 
 namespace module
@@ -121,7 +123,8 @@ public:
 		show_all();
 	}
 
-	void load_resources(Glib::RefPtr<Gtk::ListStore>& ResourceModel, const k3d::filesystem::path& ResourcePath, const k3d::string_t& ContainerTag, const k3d::string_t& ResourceTag)
+	template<class PredicateT>
+	void load_resources(Glib::RefPtr<Gtk::ListStore>& ResourceModel, const k3d::filesystem::path& ResourcePath, const k3d::string_t& ContainerTag, const k3d::string_t& ResourceTag, PredicateT Predicate)
 	{
 		ResourceModel = Gtk::ListStore::create(m_columns);
 
@@ -176,20 +179,9 @@ public:
 				continue;
 			}
 
-			const k3d::mime::type mime_type = k3d::mime::type::lookup(resource_path);
-			if(mime_type.empty())
-			{
-				k3d::log() << error << "Learning resource [" << resource_path.native_console_string() << "] does not match a known MIME type" << std::endl;
+			if(!Predicate(resource_path))
 				continue;
-			}
-
-			const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup(mime_type);
-			if(factories.empty())
-			{
-				k3d::log() << error << "No plugins available to process resource [" << resource_path.native_console_string() << "] with MIME type [" << mime_type.str() << "]" << std::endl;
-				continue;
-			}
-
+			
 			const k3d::string_t label = k3d::string_cast(++resource_number) + ". " + xml_title;
 
 			Gtk::TreeRow row = *ResourceModel->append();
@@ -200,14 +192,67 @@ public:
 		}
 	}
 
+	class test_tutorials
+	{
+	public:
+		const bool operator()(const k3d::filesystem::path& Path) const
+		{
+			const k3d::mime::type mime_type = k3d::mime::type::lookup(Path);
+			if(mime_type.empty())
+			{
+				k3d::log() << error << "Tutorial [" << Path.native_console_string() << "] does not match a known MIME type" << std::endl;
+				return false;
+			}
+
+			k3d::script::language language(mime_type);
+			if(!language.factory())
+			{
+				k3d::log() << error << "No script engine available for tutorial [" << Path.native_console_string() << "] with MIME type [" << mime_type.str() << "]" << std::endl;
+				return false;
+			}
+
+			boost::scoped_ptr<k3d::iscript_engine> engine(k3d::plugin::create<k3d::iscript_engine>(*language.factory()));
+			if(!engine)
+			{
+				k3d::log() << error << "Error creating script engine for tutorial [" << Path.native_console_string() << "] with MIME type [" << mime_type.str() << "]" << std::endl;
+				return false;
+			}
+
+			return true;
+		}
+	};
+
+	class test_examples
+	{
+	public:
+		const bool operator()(const k3d::filesystem::path& Path) const
+		{
+			const k3d::mime::type mime_type = k3d::mime::type::lookup(Path);
+			if(mime_type.empty())
+			{
+				k3d::log() << error << "Example [" << Path.native_console_string() << "] does not match a known MIME type" << std::endl;
+				return false;
+			}
+
+			const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup(mime_type);
+			if(factories.empty())
+			{
+				k3d::log() << error << "No plugins available to process example [" << Path.native_console_string() << "] with MIME type [" << mime_type.str() << "]" << std::endl;
+				return false;
+			}
+
+			return true;
+		}
+	};
+
 	void load_tutorials()
 	{
-		load_resources(m_tutorial_store, k3d::share_path() / k3d::filesystem::generic_path("tutorials"), "tutorials", "tutorial");
+		load_resources(m_tutorial_store, k3d::share_path() / k3d::filesystem::generic_path("tutorials"), "tutorials", "tutorial", test_tutorials());
 	}
 
 	void load_examples()
 	{
-		load_resources(m_example_store, k3d::share_path() / k3d::filesystem::generic_path("documents"), "examples", "example");
+		load_resources(m_example_store, k3d::share_path() / k3d::filesystem::generic_path("documents"), "examples", "example", test_examples());
 	}
 
 	void on_play_tutorial(const Gtk::TreePath& Path, Gtk::TreeViewColumn* Column)
@@ -218,26 +263,18 @@ public:
 		// Look-up the path to the actual tutorial implementation ...
 		const k3d::filesystem::path tutorial_path = row[m_columns.path];
 
-		// Make sure it exists!
-		if(!k3d::filesystem::exists(tutorial_path))
-		{
-			error_message(
-				_("Could not find the tutorial implementation file.  This may be caused by a partial- or incorrect-installation.\n"
-				"If you built the application from source, make sure you re-run CMake after every update."));
-			return;
-		}
-
-		k3d::filesystem::igzstream file(tutorial_path);
+		const k3d::string_t tutorial_name = tutorial_path.native_utf8_string().raw();
+		k3d::filesystem::igzstream tutorial_file(tutorial_path);
+		k3d::script::code tutorial_code(tutorial_file);
+		k3d::script::language tutorial_language(tutorial_path);
+		k3d::iscript_engine::context_t tutorial_context;
 
 		hide();
 		close();
 		handle_pending_events();
 
 		k3d::ngui::tutorial::started();
-
-		k3d::iscript_engine::context_t context;
-		execute_script(file, tutorial_path.native_utf8_string().raw(), context);
-
+		execute_script(tutorial_code, tutorial_name, tutorial_context, tutorial_language);
 		k3d::ngui::tutorial::finished();
 
 		tutorial_message::instance().hide_messages();
@@ -252,13 +289,6 @@ public:
 		const Glib::ustring title = row[m_columns.title];
 		const Glib::ustring description = row[m_columns.description];
 		const k3d::filesystem::path path = row[m_columns.path];
-
-		// Make sure it exists!
-		if(!k3d::filesystem::exists(path))
-		{
-			error_message(_("Could not find the example document.  This may be caused by a partial- or incorrect-installation."));
-			return;
-		}
 
 		// (Optionally) display a description of the document ...
 		if(!description.empty())

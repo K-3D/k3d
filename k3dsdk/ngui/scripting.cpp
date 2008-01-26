@@ -85,7 +85,13 @@ bool execute_script(const k3d::script::code& Script, const std::string& ScriptNa
 
 	// Get the requested scripting engine ...
 	boost::scoped_ptr<k3d::iscript_engine> engine(k3d::plugin::create<k3d::iscript_engine>(*Language.factory()));
-	return_val_if_fail(engine, false);
+	if(!engine)
+	{
+		error_message(
+			_("Error creating the scripting engine to run this script.  Usually this means that your system is missing appropriate libraries "
+			"or that there was an error in installation."));
+		return false;
+	}
 
 	// Intercept global key events ...
 	script_engine_stack.push(engine.get());
