@@ -34,10 +34,31 @@ namespace filesystem { class path; }
 namespace mime
 {
 
-/// Returns the MIME type of a file, or empty string if the type cannot be deduced
-const string_t type(const filesystem::path& File);
-/// Returns the MIME type of a data stream, or empty string if the type cannot be deduced
-const string_t type(const string_t& Data);
+/// Defines storage for a MIME type (RFC 2046)
+class type
+{
+public:
+	type();
+
+	/// Returns the MIME type of a file (could return an empty value if the file cannot be identified)
+	static const type lookup(const filesystem::path& File);
+	/// Returns the MIME type of a data stream (could return an empty value if the data cannot be identified)
+	static const type lookup(const string_t& Data);
+
+	const bool operator==(const string_t&) const;
+	const bool operator==(const type&) const;
+	const bool operator!=(const type&) const;
+
+	const string_t str() const;
+
+	const bool empty() const;
+	operator bool() const;
+
+private:
+	string_t value;
+};
+
+const bool operator==(const string_t&, const type&);
 
 } // namespace mime
 

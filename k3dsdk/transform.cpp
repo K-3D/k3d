@@ -22,7 +22,7 @@
 */
 
 #include "classes.h"
-#include "plugin.h"
+#include "plugins.h"
 #include "k3d-i18n-config.h"
 #include "ipipeline.h"
 #include "idocument.h"

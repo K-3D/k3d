@@ -23,7 +23,7 @@
 */
 
 #include "application_detail.h"
-#include "plugin.h"
+#include "plugins.h"
 #include "data.h"
 #include "document.h"
 #include "iapplication.h"

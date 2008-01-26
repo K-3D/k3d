@@ -27,7 +27,7 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/data.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/gzstream.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>

@@ -70,7 +70,7 @@
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
 #include <k3dsdk/iapplication.h>
@@ -1513,7 +1513,7 @@ private:
 			}
 			else
 			{
-				const k3d::string_t mime_type = k3d::mime::type(filepath);
+				const k3d::mime::type mime_type = k3d::mime::type::lookup(filepath);
 				if(mime_type.empty())
 				{
 					error_message(

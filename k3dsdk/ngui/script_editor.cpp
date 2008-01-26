@@ -180,7 +180,7 @@ private:
 	void on_edit_play()
 	{
 		const k3d::script::code code(m_script.get_buffer()->get_text());
-		const k3d::string_t mime_type = k3d::mime::type(code.source());
+		const k3d::mime::type mime_type = k3d::mime::type::lookup(code.source());
 
 		if(mime_type.empty())
 		{
@@ -192,7 +192,7 @@ private:
 			return;
 		}
 
-k3d::log() << debug << mime_type << std::endl;
+k3d::log() << debug << mime_type.str() << std::endl;
 		
 		const k3d::string_t name = get_title();
 

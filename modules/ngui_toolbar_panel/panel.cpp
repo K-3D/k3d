@@ -37,7 +37,7 @@
 #include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/ipath_property.h>
 #include <k3dsdk/iselectable.h>

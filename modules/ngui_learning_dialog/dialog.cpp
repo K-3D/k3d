@@ -21,6 +21,7 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
+#include <k3dsdk/mime_types.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/button.h>
@@ -33,6 +34,7 @@
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/options.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/xml.h>
 
@@ -119,7 +121,7 @@ public:
 		show_all();
 	}
 
-	void load_resources(Glib::RefPtr<Gtk::ListStore>& ResourceModel, const k3d::filesystem::path& ResourcePath, const std::string& ContainerTag, const std::string& ResourceTag)
+	void load_resources(Glib::RefPtr<Gtk::ListStore>& ResourceModel, const k3d::filesystem::path& ResourcePath, const k3d::string_t& ContainerTag, const k3d::string_t& ResourceTag)
 	{
 		ResourceModel = Gtk::ListStore::create(m_columns);
 
@@ -151,14 +153,14 @@ public:
 			if(xml_resource->name != ResourceTag)
 				continue;
 
-			const std::string xml_title = k3d::xml::attribute_text(*xml_resource, "title");
+			const k3d::string_t xml_title = k3d::xml::attribute_text(*xml_resource, "title");
 			if(xml_title.empty())
 			{
 				k3d::log() << error << "Learning resource without title attribute will be ignored" << std::endl;
 				continue;
 			}
 
-			const std::string xml_path = k3d::xml::attribute_text(*xml_resource, "path");
+			const k3d::string_t xml_path = k3d::xml::attribute_text(*xml_resource, "path");
 			if(xml_path.empty())
 			{
 				k3d::log() << error << "Learning resource without path attribute will be ignored" << std::endl;
@@ -174,11 +176,25 @@ public:
 				continue;
 			}
 
-			const std::string label = k3d::string_cast(++resource_number) + ". " + xml_title;
+			const k3d::mime::type mime_type = k3d::mime::type::lookup(resource_path);
+			if(mime_type.empty())
+			{
+				k3d::log() << error << "Learning resource [" << resource_path.native_console_string() << "] does not match a known MIME type" << std::endl;
+				continue;
+			}
+
+			const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup(mime_type);
+			if(factories.empty())
+			{
+				k3d::log() << error << "No plugins available to process resource [" << resource_path.native_console_string() << "] with MIME type [" << mime_type.str() << "]" << std::endl;
+				continue;
+			}
+
+			const k3d::string_t label = k3d::string_cast(++resource_number) + ". " + xml_title;
 
 			Gtk::TreeRow row = *ResourceModel->append();
 			row[m_columns.title] = xml_title;
-			row[m_columns.description] = xml_description ? xml_description->text : std::string();
+			row[m_columns.description] = xml_description ? xml_description->text : k3d::string_t();
 			row[m_columns.path] = resource_path;
 			row[m_columns.label] = label;
 		}
@@ -247,7 +263,7 @@ public:
 		// (Optionally) display a description of the document ...
 		if(!description.empty())
 		{
-			const std::string message = k3d::string_cast(boost::format(_("Open example document \"%1%\"?")) % title);
+			const k3d::string_t message = k3d::string_cast(boost::format(_("Open example document \"%1%\"?")) % title);
 
 			Gtk::MessageDialog dialog(*this, "", false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_YES_NO);
 			dialog.set_message(message);

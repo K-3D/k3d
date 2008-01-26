@@ -34,7 +34,7 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/types_ri.h>
 

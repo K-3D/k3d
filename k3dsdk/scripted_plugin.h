@@ -26,7 +26,7 @@
 
 #include "data.h"
 #include "k3d-i18n-config.h"
-#include "plugin.h"
+#include "plugins.h"
 #include "scripting.h"
 
 #include <boost/scoped_ptr.hpp>

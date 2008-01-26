@@ -32,7 +32,7 @@
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -63,7 +63,7 @@ public:
 		if(!k3d::filesystem::exists(file))
 			return;
 
-		const k3d::string_t mime_type = k3d::mime::type(file);
+		const k3d::mime::type mime_type = k3d::mime::type::lookup(file);
 		if(mime_type.empty())
 		{
 			k3d::log() << error << "couldn't identify MIME type for file [" << file.native_console_string() << "]" << std::endl;
@@ -73,7 +73,7 @@ public:
 		const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::ibitmap_importer>(mime_type);
 		if(factories.empty())
 		{
-			k3d::log() << error << "no plugins available to load MIME type [" << mime_type << "]" << std::endl;
+			k3d::log() << error << "no plugins available to load MIME type [" << mime_type.str() << "]" << std::endl;
 			return;
 		}
 

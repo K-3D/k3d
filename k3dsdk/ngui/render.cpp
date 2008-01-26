@@ -40,8 +40,8 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugin.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/file_range.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/irender_animation.h>

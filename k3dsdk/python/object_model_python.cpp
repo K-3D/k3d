@@ -62,7 +62,7 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/command_tree.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
@@ -370,12 +370,12 @@ const std::string module_print_diff(const object& A, const object& B, const obje
 
 const k3d::string_t module_path_mime_type(const k3d::filesystem::path& File)
 {
-	return k3d::mime::type(File);
+	return k3d::mime::type::lookup(File).str();
 }
 
 const k3d::string_t module_data_mime_type(const k3d::string_t& Data)
 {
-	return k3d::mime::type(Data);
+	return k3d::mime::type::lookup(Data).str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

@@ -40,7 +40,7 @@
 #include "widget_manip.h"
 
 #include <k3dsdk/application.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/inode_collection.h>

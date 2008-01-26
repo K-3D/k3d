@@ -25,8 +25,8 @@
 #include "modifiers.h"
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/plugin.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>

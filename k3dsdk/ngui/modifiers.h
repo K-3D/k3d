@@ -24,7 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
 #include <string>
 #include <vector>
 

@@ -23,7 +23,7 @@
 
 #include "imime_type_handler.h"
 #include "mime_types.h"
-#include "plugin.h"
+#include "plugins.h"
 
 #include <map>
 
@@ -97,30 +97,72 @@ const handlers_t& get_handlers()
 
 } // namespace detail
 
-const string_t type(const filesystem::path& File)
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// type
+
+type::type()
+{
+}
+
+const type type::lookup(const filesystem::path& File)
 {
 	static const detail::handlers_t& handlers = detail::get_handlers();
 
-	string_t file_type;
+	type file_type;
 	for(detail::handlers_t::const_iterator handler = handlers.begin(); handler != handlers.end(); ++handler)
 	{
-		if(handler->second->identify_mime_type(File, file_type))
+		if(handler->second->identify_mime_type(File, file_type.value))
 			break;
 	}
 	return file_type;
 }
 
-const string_t type(const string_t& Data)
+const type type::lookup(const string_t& Data)
 {
 	static const detail::handlers_t& handlers = detail::get_handlers();
 
-	string_t data_type;
+	type data_type;
 	for(detail::handlers_t::const_iterator handler = handlers.begin(); handler != handlers.end(); ++handler)
 	{
-		if(handler->second->identify_mime_type(Data, data_type))
+		if(handler->second->identify_mime_type(Data, data_type.value))
 			break;
 	}
 	return data_type;
+}
+
+const bool type::operator==(const string_t& RHS) const
+{
+	return value == RHS;
+}
+
+const bool type::operator==(const type& RHS) const
+{
+	return value == RHS.value;
+}
+
+const bool type::operator!=(const type& RHS) const
+{
+	return value != RHS.value;
+}
+
+const string_t type::str() const
+{
+	return value;
+}
+
+const bool type::empty() const
+{
+	return value.empty();
+}
+
+type::operator bool() const
+{
+	return value.empty();
+}
+
+const bool operator==(const string_t& LHS, const type& RHS)
+{
+	return RHS == LHS;
 }
 
 } // namespace mime

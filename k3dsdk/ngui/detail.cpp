@@ -30,7 +30,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/dependencies.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/imesh_selection_sink.h>

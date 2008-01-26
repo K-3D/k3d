@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "application.h"
@@ -28,7 +28,8 @@
 #include "iplugin_factory.h"
 #include "iplugin_factory_collection.h"
 #include "log.h"
-#include "plugin.h"
+#include "mime_types.h"
+#include "plugins.h"
 #include "utility.h"
 
 #include <boost/tokenizer.hpp>
@@ -193,7 +194,34 @@ const collection_t lookup(const std::type_info& Interface)
 	return results;
 }
 
-const collection_t lookup(const std::type_info& Interface, const string_t& MIMEType)
+const collection_t lookup(const mime::type& Type)
+{
+	collection_t results;
+	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	{
+		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
+		const string_t mime_types = metadata["k3d:mime-types"];
+
+		typedef boost::char_separator<char> separator_t;
+		separator_t separator(" ");
+
+		typedef boost::tokenizer<separator_t> tokenizer_t; 
+		tokenizer_t tokenizer(mime_types, separator);
+
+		for(tokenizer_t::const_iterator mime_type = tokenizer.begin(); mime_type != tokenizer.end(); ++mime_type)
+		{
+			if(Type == *mime_type)
+			{
+				results.insert(*factory);
+				break;
+			}
+		}
+	}
+
+	return results;
+}
+
+const collection_t lookup(const std::type_info& Interface, const mime::type& Type)
 {
 	collection_t results;
 	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
@@ -212,7 +240,7 @@ const collection_t lookup(const std::type_info& Interface, const string_t& MIMET
 
 		for(tokenizer_t::const_iterator mime_type = tokenizer.begin(); mime_type != tokenizer.end(); ++mime_type)
 		{
-			if(*mime_type == MIMEType)
+			if(Type == *mime_type)
 			{
 				results.insert(*factory);
 				break;

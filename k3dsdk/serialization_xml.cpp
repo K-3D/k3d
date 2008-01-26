@@ -40,7 +40,7 @@
 #include "legacy_mesh.h"
 #include "mesh.h"
 #include "mesh_selection.h"
-#include "plugin.h"
+#include "plugins.h"
 #include "property.h"
 #include "result.h"
 #include "serialization_xml.h"

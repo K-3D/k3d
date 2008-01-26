@@ -31,7 +31,7 @@
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/share.h>
 
 #include <QAction>

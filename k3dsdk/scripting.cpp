@@ -25,7 +25,7 @@
 #include "iplugin_factory.h"
 #include "iscript_engine.h"
 #include "mime_types.h"
-#include "plugin.h"
+#include "plugins.h"
 #include "result.h"
 #include "scripting.h"
 #include "uuid.h"
@@ -100,7 +100,7 @@ language::language(const code& Script) :
 	m_factory(0)
 {
 	// Get the MIME type of the code ...
-	const string_t mime_type = mime::type(Script.source());
+	const mime::type mime_type = mime::type::lookup(Script.source());
 	if(mime_type.empty())
 		return;
 

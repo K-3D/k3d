@@ -23,7 +23,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/extension_gl.h>
-#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/result.h>

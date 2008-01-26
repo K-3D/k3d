@@ -2,7 +2,7 @@
 #define K3DSDK_PLUGIN_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "plugin_detail.h"
+#include "plugins_detail.h"
 #include "types.h"
 
 #include <set>
@@ -36,6 +36,8 @@ namespace k3d
 
 class iplugin_factory;
 class uuid;
+
+namespace mime { class type; }
 
 namespace plugin
 {
@@ -50,21 +52,23 @@ typedef std::set<iplugin_factory*> collection_t;
 iplugin_factory* lookup(const uuid& ID);
 /// Returns the plugin factory that matches the given name, or NULL.  Note: returns NULL if more than one factory matches Name.
 iplugin_factory* lookup(const string_t& Name);
-/// Returns the set of plugin factories that implement a given interface.
+/// Returns the set of plugin factories that implement a specific interface.
 const collection_t lookup(const std::type_info& Interface);
-/// Returns the set of plugin factories that implement a given interface and match a MIME type.
-const collection_t lookup(const std::type_info& Interface, const string_t& MIMEType);
-/// Returns the set of plugin factories that implement a given interface.
+/// Returns the set of plugin factories that implement a specific interface.
 template<typename interface_t>
 const collection_t lookup()
 {
 	return lookup(typeid(interface_t));
 }
-/// Returns the set of plugin factories that implement a given interface and match a MIME type.
+/// Returns the set of plugin factories that match a MIME type.
+const collection_t lookup(const mime::type& Type);
+/// Returns the set of plugin factories that implement a specific interface and match a MIME type.
+const collection_t lookup(const std::type_info& Interface, const mime::type& Type);
+/// Returns the set of plugin factories that implement a specific interface and match a MIME type.
 template<typename interface_t>
-const collection_t lookup(const string_t& MIMEType)
+const collection_t lookup(const mime::type& Type)
 {
-	return lookup(typeid(interface_t), MIMEType);
+	return lookup(typeid(interface_t), Type);
 }
 
 } // namespace factory
