@@ -31,7 +31,6 @@
 #include <k3dsdk/ngui/document.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
-#include <k3dsdk/ngui/learning_menu.h>
 #include <k3dsdk/ngui/main_document_window.h>
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/options.h>
@@ -391,7 +390,11 @@ public:
 	        create_document();
 
 		if(m_show_learning_menu)
-			create_learning_menu();
+		{
+			Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUILearningDialog");
+			if(!window)
+				k3d::log() << error << "Error creating learning dialog at startup" << std::endl;
+		}
 
 		if(m_record_tutorials)
 			create_tutorial_recorder();

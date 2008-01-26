@@ -35,7 +35,6 @@
 #include "image_toggle_button.h"
 #include "interactive.h"
 #include "knife_tool.h"
-#include "learning_menu.h"
 #include "log_window.h"
 #include "main_document_window.h"
 #include "menu_item.h"
@@ -54,6 +53,7 @@
 #include "test_case_recorder.h"
 #include "toolbar.h"
 #include "transform.h"
+#include "tutorials.h"
 #include "tutorial_message.h"
 #include "tutorial_recorder.h"
 #include "undo_utility.h"
@@ -1255,10 +1255,13 @@ private:
 		Gtk::Menu* const menu = new Gtk::Menu();
 		menu->set_accel_group(get_accel_group());
 
-		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "help_tutorials", _("_Tutorials and Examples ..."), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_learning_menu))
-			<< set_accelerator_path("<k3d-document>/actions/help/learning_menu", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUILearningDialog"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new menu_item::control(Parent, "help_tutorials", _("_Tutorials and Examples ..."), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_learning_menu))
+				<< set_accelerator_path("<k3d-document>/actions/help/learning_menu", get_accel_group())));
+		}
 
 		menu->items().push_back(*Gtk::manage(
 			new menu_item::control(Parent, "help_file_bug_report", _("File _Bug Report ..."), true)
@@ -1291,10 +1294,13 @@ private:
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
-		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "help_about", _("_About K-3D ..."), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_about))
-			<< set_accelerator_path("<k3d-document>/actions/help/about", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUIAboutDialog"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new menu_item::control(Parent, "help_about", _("_About K-3D ..."), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_about))
+				<< set_accelerator_path("<k3d-document>/actions/help/about", get_accel_group())));
+		}
 
 		return menu;
 	}
@@ -2410,7 +2416,8 @@ private:
 
 	void on_help_learning_menu()
 	{
-		create_learning_menu();
+		Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUILearningDialog");
+		return_if_fail(window);
 	}
 
 	void on_help_file_bug_report()
@@ -2673,7 +2680,7 @@ private:
 
 	bool load_ui_layout()
 	{
-		if(!application_state::instance().custom_layouts() || tutorial_recording() || tutorial_playing())
+		if(!application_state::instance().custom_layouts() || tutorial_recording() || k3d::ngui::tutorial::playing())
 			return false;
 
 		const k3d::filesystem::path layout_path = detail::ui_layout_path();

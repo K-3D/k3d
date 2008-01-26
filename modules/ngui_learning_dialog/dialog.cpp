@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2007, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -17,25 +17,21 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/** \file
-		\brief Implements the tutorial menu dialog
-		\author Tim Shead (tshead@k-3d.com)
-*/
-
-#include "application_window.h"
-#include "button.h"
-#include "document.h"
-#include "messages.h"
-#include "options.h"
-#include "scripting.h"
-#include "learning_menu.h"
-#include "tutorial_message.h"
-#include "utility.h"
-#include "widget_manip.h"
-
+#include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
-#include <k3d-i18n-config.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/application_window.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/document.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/options.h>
+#include <k3dsdk/ngui/scripting.h>
+#include <k3dsdk/ngui/tutorial_message.h>
+#include <k3dsdk/ngui/tutorials.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/xml.h>
@@ -50,20 +46,28 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/treeview.h>
 
-namespace libk3dngui
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
+{
+
+namespace learning
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// learning_menu
+// dialog
 
-/// Implements a menu of available tutorials
-class learning_menu :
-	public application_window
+/// Provides a menu of interactive tutorials and demonstration documents
+class dialog :
+	public libk3dngui::application_window
 {
-	typedef application_window base;
+	typedef libk3dngui::application_window base;
 
 public:
-	learning_menu() :
+	dialog() :
 		base("learning_menu", 0),
 		m_show_at_startup(_("Show tutorials and examples at startup"))
 	{
@@ -79,12 +83,12 @@ public:
 		Gtk::HButtonBox* const box2 = Gtk::manage(new Gtk::HButtonBox(Gtk::BUTTONBOX_END));
 		box2->pack_start(*Gtk::manage(
 			new button::control(*this, "close", Gtk::Stock::CLOSE) <<
-			connect_button(sigc::mem_fun(*this, &learning_menu::close))));
+			connect_button(sigc::mem_fun(*this, &dialog::close))));
 
 		Gtk::TreeView* const tutorial_list = Gtk::manage(new Gtk::TreeView(m_tutorial_store));
 		tutorial_list->set_headers_visible(false);
 		tutorial_list->append_column("Interactive Tutorials", m_columns.label);
-		tutorial_list->signal_row_activated().connect(sigc::mem_fun(*this, &learning_menu::on_play_tutorial));
+		tutorial_list->signal_row_activated().connect(sigc::mem_fun(*this, &dialog::on_play_tutorial));
 		Gtk::ScrolledWindow* const tutorial_window = Gtk::manage(new Gtk::ScrolledWindow());
 		tutorial_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 		tutorial_window->add(*tutorial_list);
@@ -92,13 +96,13 @@ public:
 		Gtk::TreeView* const example_list = Gtk::manage(new Gtk::TreeView(m_example_store));
 		example_list->set_headers_visible(false);
 		example_list->append_column("Example Documents", m_columns.label);
-		example_list->signal_row_activated().connect(sigc::mem_fun(*this, &learning_menu::on_open_example));
+		example_list->signal_row_activated().connect(sigc::mem_fun(*this, &dialog::on_open_example));
 		Gtk::ScrolledWindow* const example_window = Gtk::manage(new Gtk::ScrolledWindow());
 		example_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 		example_window->add(*example_list);
 
 		m_show_at_startup.set_active(options::nag("show_learning_menu"));
-		m_show_at_startup.signal_toggled().connect(sigc::mem_fun(*this, &learning_menu::on_show_at_startup));
+		m_show_at_startup.signal_toggled().connect(sigc::mem_fun(*this, &dialog::on_show_at_startup));
 
 		Gtk::VBox* const box1 = Gtk::manage(new Gtk::VBox(false, 10));
 		box1->pack_start(*Gtk::manage(new Gtk::Label() << set_markup(_("<big><b>Welcome to K-3D!</b></big>"))), Gtk::PACK_SHRINK);
@@ -115,10 +119,6 @@ public:
 		show_all();
 	}
 
-	/// Set to true while a tutorial is playing
-	static bool m_tutorial_playing;
-
-private:
 	void load_resources(Glib::RefPtr<Gtk::ListStore>& ResourceModel, const k3d::filesystem::path& ResourcePath, const std::string& ContainerTag, const std::string& ResourceTag)
 	{
 		ResourceModel = Gtk::ListStore::create(m_columns);
@@ -127,7 +127,7 @@ private:
 
 		if(!k3d::filesystem::exists(index_path))
 		{
-			k3d::log() << error << "Couldn't find resource index file [" << index_path.native_console_string() << "]" << std::endl;
+			k3d::log() << error << "Learning resource index file [" << index_path.native_console_string() << "] does not exist" << std::endl;
 			return;
 		}
 
@@ -154,14 +154,14 @@ private:
 			const std::string xml_title = k3d::xml::attribute_text(*xml_resource, "title");
 			if(xml_title.empty())
 			{
-				k3d::log() << error << "Resource without title attribute will be ignored" << std::endl;
+				k3d::log() << error << "Learning resource without title attribute will be ignored" << std::endl;
 				continue;
 			}
 
 			const std::string xml_path = k3d::xml::attribute_text(*xml_resource, "path");
 			if(xml_path.empty())
 			{
-				k3d::log() << error << "Resource without path attribute will be ignored" << std::endl;
+				k3d::log() << error << "Learning resource without path attribute will be ignored" << std::endl;
 				continue;
 			}
 
@@ -170,7 +170,7 @@ private:
 			const k3d::filesystem::path resource_path = ResourcePath / k3d::filesystem::native_path(k3d::ustring::from_utf8(xml_path));
 			if(!k3d::filesystem::exists(resource_path))
 			{
-				k3d::log() << error << "Couldn't locate resource [" << resource_path.native_console_string() << "]" << std::endl;
+				k3d::log() << error << "Learning resource [" << resource_path.native_console_string() << "] does not exist" << std::endl;
 				continue;
 			}
 
@@ -207,7 +207,7 @@ private:
 		{
 			error_message(
 				_("Could not find the tutorial implementation file.  This may be caused by a partial- or incorrect-installation.\n"
-				"If you built the application from CVS source, make sure you re-run bootstrap and configure after every update."));
+				"If you built the application from source, make sure you re-run CMake after every update."));
 			return;
 		}
 
@@ -217,13 +217,12 @@ private:
 		close();
 		handle_pending_events();
 
-		const bool tutorial_playing = m_tutorial_playing;
-		m_tutorial_playing = true;
+		k3d::ngui::tutorial::started();
 
 		k3d::iscript_engine::context_t context;
 		execute_script(file, tutorial_path.native_utf8_string().raw(), context);
 
-		m_tutorial_playing = tutorial_playing;
+		k3d::ngui::tutorial::finished();
 
 		tutorial_message::instance().hide_messages();
 	}
@@ -295,20 +294,27 @@ private:
 	Glib::RefPtr<Gtk::ListStore> m_tutorial_store;
 	Glib::RefPtr<Gtk::ListStore> m_example_store;
 	Gtk::CheckButton m_show_at_startup;
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<dialog> factory(
+			k3d::uuid(0xd7d79750, 0x344aa731, 0xbeb2a198, 0x739e0cfe),
+			"NGUILearningDialog",
+			_("Displays a menu containing interactive tutorials and sample documents"),
+			"NGUI Dialogs",
+			k3d::iplugin_factory::EXPERIMENTAL);
+
+		return factory;
+	}
 };
 
-bool learning_menu::m_tutorial_playing = false;
+} // namespace learning
 
+} // namespace ngui
 
-void create_learning_menu()
-{
-	new learning_menu();
-}
+} // namespace module
 
-const bool tutorial_playing()
-{
-	return learning_menu::m_tutorial_playing;
-}
-
-} // namespace libk3dngui
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::learning::dialog::get_factory());
+K3D_MODULE_END
 

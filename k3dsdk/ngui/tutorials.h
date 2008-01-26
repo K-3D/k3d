@@ -1,8 +1,8 @@
-#ifndef NGUI_LEARNING_MENU_H
-#define NGUI_LEARNING_MENU_H
+#ifndef NGUI_TUTORIALS_H
+#define NGUI_TUTORIALS_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,16 +24,31 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-namespace libk3dngui
+namespace k3d
 {
 
-/// Displays a "learning" menu dialog with interactive tutorials and sample documents
-void create_learning_menu();
+namespace ngui
+{
 
-/// Returns true iff tutorial playback is in progress
-const bool tutorial_playing();
+namespace tutorial
+{
 
-} // namespace libk3dngui
+/// Call this to indicate that a tutorial has been started.
+/// Note that the tutorial playback state is maintained using a stack - each call to started() must receive a matching call to finished()
+void started();
 
-#endif // NGUI_LEARNING_MENU_H
+/// Returns true if tutorial is currently playing
+const bool playing();
+
+/// Call this to indicate that a tutorial has finished.
+/// Note that the tutorial playback state is maintained using a stack - each call to finished() must match a corresponding call to started()
+void finished();
+
+} // namespace tutorial
+
+} // namespace ngui
+
+} // namespace k3d
+
+#endif // NGUI_TUTORIALS_H
 

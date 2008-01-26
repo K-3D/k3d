@@ -40,13 +40,14 @@
 #include "utility.h"
 #include "widget_manip.h"
 
-#include <k3dsdk/data.h>
+#include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
+#include <k3dsdk/data.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/mime_types.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/string_cast.h>
 
@@ -178,15 +179,30 @@ private:
 
 	void on_edit_play()
 	{
-		m_running = true;
-		update_title();
+		const k3d::script::code code(m_script.get_buffer()->get_text());
+		const k3d::string_t mime_type = k3d::mime::type(code.source());
 
-		std::istringstream script(m_script.get_buffer()->get_text());
+		if(mime_type.empty())
+		{
+			error_message(
+				_("Could not identify the MIME-type for this script.  K-3D supports multiple scripting languages, and the MIME-type is used to "
+				"match a script to the correct script engine. You can add a \"magic token\" at the beginning of a script to  "
+				"in the first 12 characters of a script for K-3D's built-in K3DScript engine.  If you are writing a K-3D script, check the documentation "
+				"for the scripting language you're writing in to see how to make it recognizable."));
+			return;
+		}
+
+k3d::log() << debug << mime_type << std::endl;
+		
+		const k3d::string_t name = get_title();
 
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
 
-		execute_script(script, get_title(), context);
+		m_running = true;
+		update_title();
+
+		execute_script(code, name, context);
 
 		m_running = false;
 		update_title();
