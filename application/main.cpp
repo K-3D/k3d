@@ -104,7 +104,7 @@ k3d::filesystem::path g_share_path;
 k3d::filesystem::path g_user_interface_path;
 k3d::string_t g_plugin_paths;
 
-boost::scoped_ptr<k3d::iuser_interface_plugin> g_user_interface;
+k3d::iuser_interface_plugin* g_user_interface = 0;
 
 /////////////////////////////////////////////////////////////////////////////
 // handle_error
@@ -450,17 +450,18 @@ void create_user_interface(k3d::plugin_factory_collection& Plugins, bool& Quit, 
 		return;
 	}
 
-	g_user_interface.reset(k3d::plugin::create<k3d::iuser_interface_plugin>(**Plugins.factories().begin()));
+	g_user_interface = k3d::plugin::create<k3d::iuser_interface_plugin>(**Plugins.factories().begin());
 	if(!g_user_interface)
 	{
 		handle_error("UI plugin module [" + module_name + "] does not contain a user interface plugin", Quit, Error);
 		return;
 	}
 
-	if(!dynamic_cast<k3d::iuser_interface*>(g_user_interface.get()))
+	if(!dynamic_cast<k3d::iuser_interface*>(g_user_interface))
 	{
-		g_user_interface.reset();
-		handle_error("UI plugin module [" + module_name + "] does not implement required interfaces", Quit, Error);
+		delete g_user_interface;
+		g_user_interface = 0;
+		handle_error("UI plugin module [" + module_name + "] does not implement k3d::iuser_interface", Quit, Error);
 		return;
 	}
 }
@@ -765,7 +766,10 @@ int main(int argc, char* argv[])
 		}
 
 		// Register our user interface ...
-		k3d::set_user_interface(*dynamic_cast<k3d::iuser_interface*>(g_user_interface.get()));
+		k3d::set_user_interface(*dynamic_cast<k3d::iuser_interface*>(g_user_interface));
+
+		// Ensure the user interface gets cleaned-up ...
+		boost::scoped_ptr<k3d::iuser_interface_plugin> ui_cleanup(g_user_interface);
 
 		// Give the UI a chance to handle command-line arguments ...
 		arguments = g_user_interface->parse_startup_arguments(arguments, quit, error);
@@ -819,6 +823,8 @@ int main(int argc, char* argv[])
 		// Cleanup "auto-start" plugins ...
 		delete_auto_start_plugins(auto_start_plugins);
 
+		//g_user_interface.reset();
+
 		return 0;
 	}
 	catch(std::exception& e)
@@ -848,7 +854,5 @@ int main(int argc, char* argv[])
 
 		return 1;
 	}
-
-	g_user_interface.reset();
 }
 
