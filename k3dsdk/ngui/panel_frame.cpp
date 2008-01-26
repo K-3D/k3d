@@ -182,16 +182,16 @@ void control::mount_panel(const std::string& Type)
 		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_viewport>(m_document_state.document().nodes());
 		k3d::gl::irender_viewport* const glengine1 = gl_engines.size() > 0 ? dynamic_cast<k3d::gl::irender_viewport*>(*(gl_engines.begin())) : 0;
 
-		const k3d::nodes_t cameras = k3d::find_nodes<k3d::icamera>(m_document_state.document().nodes());
-		k3d::icamera* const camera1 = cameras.size() > 0 ? dynamic_cast<k3d::icamera*>(*(cameras.begin())) : 0;
+		k3d::icamera* camera = pick_camera(m_document_state);
 
-		if(glengine1 && camera1)
+		if(glengine1 && camera)
 		{
 			viewport::control* const control = new viewport::control(m_document_state, m_parent);
-			control->set_camera(camera1);
+			control->set_camera(camera);
 			control->set_gl_engine(glengine1);
 
 			mount_panel(*Gtk::manage(control), Type);
+			m_document_state.set_focus_viewport(control);
 		}
 		return;
 	}
