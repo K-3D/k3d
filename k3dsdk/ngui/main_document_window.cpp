@@ -531,7 +531,6 @@ public:
 			control->set_camera(camera1);
 			control->set_gl_engine(glengine1);
 			panel_frame4->mount_panel(*Gtk::manage(control), "viewport");
-			set_focus_viewport_panel(panel_frame4);
 		}
 
 		// Node history below node list
@@ -540,6 +539,8 @@ public:
 		// Node properties below node history
 		panel_frame::control* const panel_frame6 = split_panel(*panel_frame5, *Gtk::manage(new Gtk::VPaned), -1);
 		panel_frame6->mount_panel("node_properties");
+		
+		set_focus_viewport_panel(panel_frame4);
 	}
 
 private:
