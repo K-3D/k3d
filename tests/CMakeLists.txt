@@ -255,6 +255,7 @@ K3D_ADD_TEST(ngui.bitmap.modifier.BitmapSubtract.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.bitmap.modifier.BitmapThreshold.py PYTHON NGUI)
 
 K3D_ADD_TEST(ngui.mesh.modifier.BevelPoints.undo.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.primitives.transform.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.shaders.undo_selection.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.tools.unparent K3DSCRIPT NGUI)
 K3D_ADD_TEST(ngui.tools.undo_delete_rotate.py PYTHON NGUI)
