@@ -26,6 +26,7 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_ri.h>
@@ -45,7 +46,7 @@ class subdivision_surface_painter :
 	public k3d::ri::imesh_painter
 {
 	typedef k3d::persistent<k3d::node> base;
-
+	typedef k3d::typed_array<std::string> tags_t;
 public:
 	subdivision_surface_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
@@ -66,6 +67,8 @@ public:
 		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 		const k3d::mesh::points_t& points = *Mesh.points;
+		
+		const tags_t* const interpolateboundary_tags = k3d::get_array<tags_t>(Mesh.polyhedra->constant_data, "interpolateboundary");
 
 		const size_t polyhedron_begin = 0;
 		const size_t polyhedron_end = polyhedron_begin + types.size();
@@ -118,6 +121,13 @@ public:
 				k3d::ri::unsigned_integers tag_counts;
 				k3d::ri::integers tag_integers;
 				k3d::ri::reals tag_reals;
+				
+				if (interpolateboundary_tags)
+				{
+					tags.push_back(interpolateboundary_tags->at(polyhedron));
+					tag_counts.push_back(0);
+					tag_counts.push_back(0);
+				}
 
 				k3d::ri::parameter_list parameters;
 				parameters.push_back(k3d::ri::parameter(k3d::ri::RI_P(), k3d::ri::VERTEX, 1, ri_points));

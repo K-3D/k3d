@@ -26,6 +26,7 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/shared_pointer.h>
 
 #include <iterator>
@@ -40,6 +41,7 @@ class make_sds_implementation :
 	public k3d::mesh_modifier<k3d::persistent<k3d::node> >
 {
 	typedef k3d::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::typed_array<std::string> tags_t;
 
 public:
 	make_sds_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -60,8 +62,13 @@ public:
 			k3d::mesh::polyhedra_t* const polyhedra = k3d::make_unique(Output.polyhedra);
 			k3d::mesh::polyhedra_t::types_t* const types = k3d::make_unique(polyhedra->types);
 			std::fill(types->begin(), types->end(), k3d::mesh::polyhedra_t::CATMULL_CLARK);
-
-//			(*polyhedron)->tags["interpolateboundary"] = interpolateboundary;
+			
+			if (interpolateboundary)
+			{
+				boost::shared_ptr<tags_t> tags(new tags_t(types->size()));
+				std::fill(tags->begin(), tags->end(), "interpolateboundary");
+				polyhedra->constant_data["interpolateboundary"] = tags;
+			}
 		}
 	}
 
