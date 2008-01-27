@@ -175,14 +175,23 @@ void control::mount_panel(panel::control& Panel, const std::string& Type)
 	m_panel_type_connection.unblock();
 }
 
-void control::mount_panel(const std::string& Type)
+void control::mount_panel(const std::string& Type, bool RequestCamera)
 {
 	if("viewport" == Type)
 	{
 		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_viewport>(m_document_state.document().nodes());
 		k3d::gl::irender_viewport* const glengine1 = gl_engines.size() > 0 ? dynamic_cast<k3d::gl::irender_viewport*>(*(gl_engines.begin())) : 0;
 
-		k3d::icamera* camera = pick_camera(m_document_state);
+		k3d::icamera* camera = 0;
+		if (RequestCamera)
+		{
+			camera = pick_camera(m_document_state);
+		}
+		else
+		{
+			const k3d::nodes_t cameras = k3d::find_nodes<k3d::icamera>(m_document_state.document().nodes());
+			camera = cameras.size() > 0 ? dynamic_cast<k3d::icamera*>(*(cameras.begin())) : 0;
+		}
 
 		if(glengine1 && camera)
 		{

@@ -187,10 +187,10 @@ protected:
 	void lmb_down_selected();
 	void lmb_down_deselected();
 	void lmb_down_nothing();
-	void lbutton_click(const viewport::control& Viewport, const k3d::point2& Coordinates);
-	void lmb_click_add();
-	void lmb_click_subtract();
-	void lmb_click_replace();
+	void lbutton_click(viewport::control& Viewport, const k3d::point2& Coordinates);
+	void lmb_click_add(viewport::control& Viewport, const k3d::point2& Coordinates);
+	void lmb_click_subtract(viewport::control& Viewport, const k3d::point2& Coordinates);
+	void lmb_click_replace(viewport::control& Viewport, const k3d::point2& Coordinates);
 	void lmb_click_start_motion(const k3d::point2& Coordinates);
 	void lmb_click_stop_motion();
 	void lmb_click_deselect_all();

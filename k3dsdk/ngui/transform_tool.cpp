@@ -660,7 +660,7 @@ void transform_tool::lmb_down_nothing()
 	m_mouse_down_content = NOTHING;
 }
 
-void transform_tool::lbutton_click(const viewport::control& Viewport, const k3d::point2& Coordinates)
+void transform_tool::lbutton_click(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
 	if(MOTION_CLICK_DRAG == m_current_motion)
 	{
@@ -672,16 +672,16 @@ void transform_tool::lbutton_click(const viewport::control& Viewport, const k3d:
 	switch(m_mouse_down_content)
 	{
 		case SELECTION_ADD:
-			lmb_click_add();
+			lmb_click_add(Viewport, Coordinates);
 		break;
 		case SELECTION_SUBTRACT:
-			lmb_click_subtract();
+			lmb_click_subtract(Viewport, Coordinates);
 		break;
 		case SELECTED_OBJECT:
 			lmb_click_start_motion(Coordinates);
 		break;
 		case DESELECTED_OBJECT:
-			lmb_click_replace();
+			lmb_click_replace(Viewport, Coordinates);
 		break;
 		case NOTHING:
 			lmb_click_deselect_all();
@@ -692,40 +692,38 @@ void transform_tool::lbutton_click(const viewport::control& Viewport, const k3d:
 }
 
 // LMB click actions
-void transform_tool::lmb_click_add()
+void transform_tool::lmb_click_add(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
 	m_tutorial_action = "lmb_click_add";
 
 	// Shift key modifier always adds to the selection
-	if(k3d::selection::get_node(m_mouse_down_selection))
-		m_document_state.select(m_mouse_down_selection);
+	interactive::move_pointer(Viewport, Coordinates);
+	m_document_state.select(Viewport.pick_object(Coordinates));
 
 	k3d::finish_state_change_set(m_document, "Selection add", K3D_CHANGE_SET_CONTEXT);
 
 	tool_selection::redraw_all();
 }
 
-void transform_tool::lmb_click_subtract()
+void transform_tool::lmb_click_subtract(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
 	m_tutorial_action = "lmb_click_subtract";
 
 	// Control key modifier always adds to the selection
-	if(k3d::selection::get_node(m_mouse_down_selection))
-		m_document_state.deselect(m_mouse_down_selection);
+	interactive::move_pointer(Viewport, Coordinates);
+	m_document_state.deselect(Viewport.pick_object(Coordinates));
 
 	k3d::finish_state_change_set(m_document, "Selection subtract", K3D_CHANGE_SET_CONTEXT);
 
 	tool_selection::redraw_all();
 }
 
-void transform_tool::lmb_click_replace()
+void transform_tool::lmb_click_replace(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
 	m_tutorial_action = "lmb_click_replace";
 
-	// Replace selection
-	m_document_state.deselect_all();
-	if(k3d::selection::get_node(m_mouse_down_selection))
-		m_document_state.select(m_mouse_down_selection);
+	interactive::move_pointer(Viewport, Coordinates);
+	m_document_state.select(Viewport.pick_object(Coordinates));
 
 	k3d::finish_state_change_set(m_document, "Selection replace", K3D_CHANGE_SET_CONTEXT);
 

@@ -557,11 +557,15 @@ const k3d::icommand_node::result rotate_tool::execute_command(const std::string&
 		}
 		else if(Command == "lmb_click_add")
 		{
-			lmb_click_add();
+			lmb_click_add(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
+		}
+		else if(Command == "lmb_click_replace")
+		{
+			lmb_click_replace(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
 		}
 		else if(Command == "lmb_click_subtract")
 		{
-			lmb_click_subtract();
+			lmb_click_subtract(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
 		}
 		else if(Command == "lmb_click_start_motion")
 		{

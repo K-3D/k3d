@@ -71,7 +71,7 @@ public:
 	/// Mounts a panel to the frame (note: mainly for hacking purposes, prefer mount_panel(const std::string& Type) instead)
 	void mount_panel(panel::control& Panel, const std::string& Type);
 	/// Mounts a panel based on type
-	void mount_panel(const std::string& Type);
+	void mount_panel(const std::string& Type, bool RequestCamera = false);
 	/// Unmounts a mounted panel
 	void unmount();
 	/// Unmounts a mounted panel, placing it in a floating window

@@ -2097,7 +2097,7 @@ private:
 		const std::string panel_type = m_focus_panel->mounted_panel()->panel_type();
 		panel_frame::control* new_panel = split_panel(*m_focus_panel, *manage(new Gtk::VPaned), m_focus_panel->get_height() / 2);
 
-		new_panel->mount_panel(panel_type);
+		new_panel->mount_panel(panel_type, true);
 		set_focus_viewport_panel(new_panel);
 	}
 
@@ -2108,7 +2108,7 @@ private:
 		const std::string panel_type = m_focus_panel->mounted_panel()->panel_type();
 		panel_frame::control* new_panel = split_panel(*m_focus_panel, *manage(new Gtk::HPaned), m_focus_panel->get_width() / 2);
 
-		new_panel->mount_panel(panel_type);
+		new_panel->mount_panel(panel_type, true);
 		set_focus_viewport_panel(new_panel);
 	}
 
