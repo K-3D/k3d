@@ -138,7 +138,7 @@ void set_attributes(iproperty_collection& Properties, istream& Stream)
 			const std::string parameter_list_name = renderman_property->property_parameter_list_name();
 			const std::string parameter_name = (*property)->property_name();
 
-			parameter_lists[parameter_list_name].push_back(parameter(parameter_name, UNIFORM, 1, (*property)->property_value()));
+			parameter_lists[parameter_list_name].push_back(parameter(parameter_name, UNIFORM, 1, (*property)->property_pipeline_value()));
 		}
 	}
 
@@ -167,7 +167,7 @@ void set_options(iproperty_collection& Properties, istream& Stream)
 			const std::string parameter_list_name = renderman_property->property_parameter_list_name();
 			const std::string parameter_name = (*property)->property_name();
 
-			parameter_lists[parameter_list_name].push_back(parameter(parameter_name, UNIFORM, 1, (*property)->property_value()));
+			parameter_lists[parameter_list_name].push_back(parameter(parameter_name, UNIFORM, 1, (*property)->property_pipeline_value()));
 		}
 	}
 

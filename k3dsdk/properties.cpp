@@ -58,7 +58,7 @@ iproperty* get(iunknown& Object, const std::string& Name)
 
 const boost::any internal_value(iproperty& Property)
 {
-	return Property.property_value();
+	return Property.property_internal_value();
 }
 
 const boost::any internal_value(iunknown& Object, const std::string& Name)
@@ -72,7 +72,7 @@ const boost::any internal_value(iunknown& Object, const std::string& Name)
 
 const boost::any pipeline_value(iproperty& Property)
 {
-	return property_lookup(&Property)->property_value();
+	return Property.property_pipeline_value();
 }
 
 const boost::any pipeline_value(iunknown& Object, const std::string& Name)

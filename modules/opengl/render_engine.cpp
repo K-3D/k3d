@@ -569,7 +569,7 @@ private:
 		{
 			const k3d::matrix4 transform_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output());
 			const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
-			const k3d::point3 world_target = boost::any_cast<k3d::point3>(Camera.world_target().property_value());
+			const k3d::point3 world_target = boost::any_cast<k3d::point3>(Camera.world_target().property_internal_value());
 			const double distance = k3d::distance(world_position, world_target);
 
 			const double window_aspect = (window_rect.right - window_rect.left) / (window_rect.top - window_rect.bottom);

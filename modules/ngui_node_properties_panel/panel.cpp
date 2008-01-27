@@ -784,7 +784,7 @@ public:
 	{
 		k3d::iwritable_property* timeprop = dynamic_cast<k3d::iwritable_property*>(k3d::get_time(m_document_state.document()));
 		if (timeprop)
-			timeprop->property_set_value(TimeProperty->property_value());
+			timeprop->property_set_value(TimeProperty->property_internal_value());
 	}
 
 	/// Stores a reference to the owning document

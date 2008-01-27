@@ -524,7 +524,7 @@ void control::set_view_matrix(const k3d::matrix4& Matrix)
 
 const k3d::point3 control::get_target()
 {
-	return boost::any_cast<k3d::point3>(camera()->world_target().property_value());
+	return boost::any_cast<k3d::point3>(camera()->world_target().property_internal_value());
 }
 
 void control::set_target(const k3d::point3& Target)

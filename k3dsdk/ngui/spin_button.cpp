@@ -97,13 +97,13 @@ public:
 		const std::type_info& type = m_readable_data.property_type();
 
 		if(type == typeid(k3d::int32_t))
-			return boost::any_cast<k3d::int32_t>(m_readable_data.property_value());
+			return boost::any_cast<k3d::int32_t>(m_readable_data.property_internal_value());
 		else if(type == typeid(k3d::uint32_t))
-			return boost::any_cast<k3d::uint32_t>(m_readable_data.property_value());
+			return boost::any_cast<k3d::uint32_t>(m_readable_data.property_internal_value());
 		else if(type == typeid(k3d::float_t))
-			return boost::any_cast<k3d::float_t>(m_readable_data.property_value());
+			return boost::any_cast<k3d::float_t>(m_readable_data.property_internal_value());
 		else if(type == typeid(k3d::double_t))
-			return boost::any_cast<k3d::double_t>(m_readable_data.property_value());
+			return boost::any_cast<k3d::double_t>(m_readable_data.property_internal_value());
 		else
 			k3d::log() << error << k3d_file_reference << ": unknown property type: " << type.name() << std::endl;
 

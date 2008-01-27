@@ -59,7 +59,7 @@ public:
 
 	const k3d::angle_axis value()
 	{
-		return boost::any_cast<k3d::angle_axis>(m_property.property_value());
+		return boost::any_cast<k3d::angle_axis>(m_property.property_internal_value());
 	}
 
 	void set_value(const k3d::angle_axis& Value)

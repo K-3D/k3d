@@ -58,7 +58,7 @@ public:
 
 	k3d::mesh_selection value()
 	{
-		return boost::any_cast<k3d::mesh_selection>(m_readable_data.property_value());
+		return boost::any_cast<k3d::mesh_selection>(m_readable_data.property_internal_value());
 	}
 
 	void set_value(const k3d::mesh_selection& Value)

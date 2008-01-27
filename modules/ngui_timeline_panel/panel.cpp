@@ -199,10 +199,10 @@ public:
 	{
 		return_if_fail(m_start_time && m_end_time && m_frame_rate && m_time);
 
-		const double start_time = boost::any_cast<double>(m_start_time->property_value());
-		const double end_time = boost::any_cast<double>(m_end_time->property_value());
-		const double frame_rate = boost::any_cast<double>(m_frame_rate->property_value());
-		const double time = boost::any_cast<double>(m_time->property_value());
+		const double start_time = boost::any_cast<double>(m_start_time->property_internal_value());
+		const double end_time = boost::any_cast<double>(m_end_time->property_internal_value());
+		const double frame_rate = boost::any_cast<double>(m_frame_rate->property_internal_value());
+		const double time = boost::any_cast<double>(m_time->property_internal_value());
 
 		return_if_fail(frame_rate);
 		const double frame_length = 1.0 / frame_rate;
@@ -244,8 +244,8 @@ public:
 	void on_time_changed(k3d::iunknown*)
 	{
 		return_if_fail(m_time && m_frame_rate);
-		const double frame_rate = boost::any_cast<double>(m_frame_rate->property_value());
-		const double time = boost::any_cast<double>(m_time->property_value());
+		const double frame_rate = boost::any_cast<double>(m_frame_rate->property_internal_value());
+		const double time = boost::any_cast<double>(m_time->property_internal_value());
 
 		m_frame_label.set_text(k3d::string_cast(k3d::round(time * frame_rate)));
 //		m_time_label.set_text(k3d::string_cast(time));
@@ -267,7 +267,7 @@ public:
 		m_playback_mode.set_value(STOP);
 
 		return_if_fail(m_start_time && m_writable_time);
-		const double start_time = boost::any_cast<double>(m_start_time->property_value());
+		const double start_time = boost::any_cast<double>(m_start_time->property_internal_value());
 
 		m_writable_time->property_set_value(start_time);
 	}
@@ -303,8 +303,8 @@ public:
 
 		return_if_fail(m_frame_rate && m_end_time && m_writable_time);
 
-		const double end_time = boost::any_cast<double>(m_end_time->property_value());
-		const double frame_rate = boost::any_cast<double>(m_frame_rate->property_value());
+		const double end_time = boost::any_cast<double>(m_end_time->property_internal_value());
+		const double frame_rate = boost::any_cast<double>(m_frame_rate->property_internal_value());
 		return_if_fail(frame_rate);
 		const double frame_length = 1.0 / frame_rate;
 
@@ -340,10 +340,10 @@ public:
 		k3d::iwritable_property* const writable_time = dynamic_cast<k3d::iwritable_property*>(m_time);
 		return_if_fail(m_start_time && m_end_time && m_frame_rate && m_time && writable_time);
 
-		const double start_time = boost::any_cast<double>(m_start_time->property_value());
-		const double end_time = boost::any_cast<double>(m_end_time->property_value());
-		const double frame_rate = boost::any_cast<double>(m_frame_rate->property_value());
-		const double time = boost::any_cast<double>(m_time->property_value());
+		const double start_time = boost::any_cast<double>(m_start_time->property_internal_value());
+		const double end_time = boost::any_cast<double>(m_end_time->property_internal_value());
+		const double frame_rate = boost::any_cast<double>(m_frame_rate->property_internal_value());
+		const double time = boost::any_cast<double>(m_time->property_internal_value());
 
 		return_if_fail(frame_rate != 0.0);
 		const double frame_length = 1.0 / frame_rate;

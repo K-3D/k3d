@@ -92,7 +92,7 @@ void sds_cache::level_changed(k3d::iunknown* Hint)
 	k3d::iproperty* highest = 0;
 	for (sds_cache::levels_t::iterator level_it = m_level_properties.begin(); level_it != m_level_properties.end(); ++level_it)
 	{
-		const k3d::int32_t new_level = boost::any_cast<const k3d::int32_t>((*level_it)->property_value());
+		const k3d::int32_t new_level = boost::any_cast<const k3d::int32_t>((*level_it)->property_internal_value());
 		if (new_level > m_levels)
 		{
 			m_levels = new_level;

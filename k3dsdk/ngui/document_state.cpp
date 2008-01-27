@@ -315,7 +315,7 @@ void select_components(const k3d::selection::records& Selection, const UpdatePol
 			selection = k3d::mesh_selection::select_null();
 			sink = dynamic_cast<k3d::imesh_selection_sink*>(node);
 			if(sink)
-				selection = boost::any_cast<k3d::mesh_selection>(sink->mesh_selection_sink_input().property_value());
+				selection = boost::any_cast<k3d::mesh_selection>(sink->mesh_selection_sink_input().property_internal_value());
 		}
 
 		if(!sink)
@@ -347,12 +347,12 @@ void update_component_selection(const k3d::nodes_t& Nodes, const UpdatePolicyT& 
 		if(!mesh_source)
             continue;
 
-		const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_value());
+		const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_internal_value());
 		if(!mesh)
             continue;
 
 		k3d::mesh_selection selection =
-			boost::any_cast<k3d::mesh_selection>(mesh_selection_sink->mesh_selection_sink_input().property_value());
+			boost::any_cast<k3d::mesh_selection>(mesh_selection_sink->mesh_selection_sink_input().property_internal_value());
 
 		UpdatePolicy(*mesh, selection);
 

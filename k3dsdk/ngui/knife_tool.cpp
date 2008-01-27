@@ -403,7 +403,7 @@ struct knife_tool::implementation :
 		k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(frozen_mesh);
 		return_if_fail(mesh_source);
 
-		k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_value());
+		k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_internal_value());
 
 		// Process picked edge or face
 		if(SELECT_FACES == m_pick_mode)

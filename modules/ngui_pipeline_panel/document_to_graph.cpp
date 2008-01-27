@@ -85,7 +85,7 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 			{
 				if(typeid(k3d::inode*) == (*property)->property_type())
 				{
-					if(k3d::inode* const referenced_node = boost::any_cast<k3d::inode*>((*property)->property_value()))
+					if(k3d::inode* const referenced_node = boost::any_cast<k3d::inode*>((*property)->property_internal_value()))
 					{
 						if(!node_map.count(referenced_node))
 							continue;

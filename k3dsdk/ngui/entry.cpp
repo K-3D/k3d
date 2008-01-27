@@ -59,11 +59,11 @@ public:
 
 		if(type == typeid(std::string))
 		{
-			return boost::any_cast<std::string>(m_readable_data.property_value());
+			return boost::any_cast<std::string>(m_readable_data.property_internal_value());
 		}
 		else if(type == typeid(k3d::ri::string))
 		{
-			return boost::any_cast<k3d::ri::string>(m_readable_data.property_value());
+			return boost::any_cast<k3d::ri::string>(m_readable_data.property_internal_value());
 		}
 		else
 		{

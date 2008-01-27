@@ -240,7 +240,7 @@ public:
 		// Get render engine name
 		k3d::iproperty* const engine_property = k3d::property::get(*renderman_engine, "render_engine");
 		return_val_if_fail(engine_property, false);
-		const std::string render_engine = boost::any_cast<std::string>(engine_property->property_value());
+		const std::string render_engine = boost::any_cast<std::string>(engine_property->property_internal_value());
 
 		// Create the RenderMan render engine object
 		k3d::ri::stream stream(ribfile);

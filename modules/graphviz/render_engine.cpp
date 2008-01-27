@@ -183,7 +183,7 @@ private:
 		// Setup the frame for GraphViz rendering ...
 		Frame.add_render_operation("graphviz", m_render_engine.pipeline_value(), filepath, false);
 
-		stream << "digraph \"" << boost::any_cast<k3d::ustring>(document().title().property_value()).raw() << "\"\n";
+		stream << "digraph \"" << boost::any_cast<k3d::ustring>(document().title().property_internal_value()).raw() << "\"\n";
 		stream << "{\n\n";
 		stream << "rankdir=LR\n\n";
 		stream << "node [shape=box,style=filled,width=0,height=0]\n\n";
@@ -244,7 +244,7 @@ private:
 		{
 			if(typeid(k3d::inode*) == property->first->property_type())
 			{
-				if(k3d::inode* const referenced_node = boost::any_cast<k3d::inode*>(property->first->property_value()))
+				if(k3d::inode* const referenced_node = boost::any_cast<k3d::inode*>(property->first->property_internal_value()))
 				{
 					if(std::count(visible_nodes.begin(), visible_nodes.end(), referenced_node))
 					{

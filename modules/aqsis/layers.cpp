@@ -69,7 +69,7 @@ protected:
 				continue;
 			}
 
-			ShaderT* shader = dynamic_cast<ShaderT*>(dynamic_cast<LayerT*>(boost::any_cast<k3d::inode*>((*property)->property_value())));
+			ShaderT* shader = dynamic_cast<ShaderT*>(dynamic_cast<LayerT*>(boost::any_cast<k3d::inode*>((*property)->property_internal_value())));
 			if(!shader)
 				continue;
 
@@ -94,7 +94,7 @@ protected:
 			}
 
 
-			k3d::inode* const node = boost::any_cast<k3d::inode*>((*property)->property_value());
+			k3d::inode* const node = boost::any_cast<k3d::inode*>((*property)->property_internal_value());
 			if(!node)
 				continue;
 

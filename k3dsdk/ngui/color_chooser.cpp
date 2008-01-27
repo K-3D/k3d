@@ -157,9 +157,9 @@ public:
 	{
 		const std::type_info& type = m_readable_data.property_type();
 		if(type == typeid(k3d::color))
-			return boost::any_cast<k3d::color>(m_readable_data.property_value());
+			return boost::any_cast<k3d::color>(m_readable_data.property_internal_value());
 		else if(type == typeid(k3d::ri::color))
-			return boost::any_cast<k3d::ri::color>(m_readable_data.property_value());
+			return boost::any_cast<k3d::ri::color>(m_readable_data.property_internal_value());
 		else
 			k3d::log() << error << "unknown property type: " << type.name() << std::endl;
 

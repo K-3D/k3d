@@ -99,11 +99,11 @@ class renderman_property :
 	public irenderman_property
 {
 public:
-	const value_t value()
+	const value_t pipeline_value()
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return boost::any_cast<value_t>(source->property_value());
+			return boost::any_cast<value_t>(source->property_internal_value());
 
 		return name_policy_t::internal_value();
 	}
@@ -128,9 +128,14 @@ public:
 		return typeid(value_t);
 	}
 
-	const boost::any property_value()
+	const boost::any property_internal_value()
 	{
 		return name_policy_t::internal_value();
+	}
+
+	const boost::any property_pipeline_value()
+	{
+		return pipeline_value();
 	}
 
 	const irenderman_property::parameter_type_t property_parameter_list_type()

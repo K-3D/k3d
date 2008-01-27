@@ -91,7 +91,7 @@ public:
 
 	const k3d::filesystem::path value()
 	{
-		return boost::any_cast<k3d::filesystem::path>(m_readable_data.property_value());
+		return boost::any_cast<k3d::filesystem::path>(m_readable_data.property_internal_value());
 	}
 
 	void set_value(const k3d::filesystem::path& Value)

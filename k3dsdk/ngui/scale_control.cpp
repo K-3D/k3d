@@ -59,7 +59,7 @@ public:
 
 	const k3d::point3 value()
 	{
-		return boost::any_cast<k3d::point3>(m_property.property_value());
+		return boost::any_cast<k3d::point3>(m_property.property_internal_value());
 	}
 
 	void set_value(const k3d::point3& Value)

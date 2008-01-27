@@ -422,7 +422,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		if(m_drag_mutex)
 			return;
 		
-		k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
+		k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_internal_value());
 		return_if_fail(mesh);
 
 		// Get selection and save initial position
@@ -511,7 +511,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			return_if_fail(node);
 
 			// Get mesh to tweak
-			k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
+			k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_internal_value());
 			return_if_fail(mesh);
 
 			// Modify with TransformPoints

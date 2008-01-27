@@ -131,7 +131,7 @@ k3d::inode* instantiate_mesh(k3d::idocument& Document, k3d::inode& Node)
 			&& name != "input_mesh"
 			&& name != "output_mesh")
 		{
-			k3d::property::set_internal_value(*mesh_instance, name, (*property)->property_value());
+			k3d::property::set_internal_value(*mesh_instance, name, (*property)->property_internal_value());
 		}
 	}
 
@@ -192,7 +192,7 @@ k3d::inode* duplicate_mesh(k3d::idocument& Document, k3d::inode& Node)
 			&& name != "input_mesh"
 			&& name != "output_mesh")
 		{
-			k3d::property::set_internal_value(*mesh_instance, name, (*property)->property_value());
+			k3d::property::set_internal_value(*mesh_instance, name, (*property)->property_internal_value());
 		}
 	}
 
@@ -236,7 +236,7 @@ k3d::inode* duplicate_node(k3d::idocument& Document, k3d::inode& Node)
 			&& name != "output_mesh"
 			&& !(Node.factory().factory_id() == k3d::classes::Camera() && name == "navigation_target")) // Skip Camera's navigation target property
 		{
-			k3d::property::set_internal_value(*clone, name, (*property)->property_value());
+			k3d::property::set_internal_value(*clone, name, (*property)->property_internal_value());
 		}
 	}
 

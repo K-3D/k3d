@@ -63,7 +63,7 @@ public:
 
 	const std::string value()
 	{
-		return boost::any_cast<std::string>(m_readable_data.property_value());
+		return boost::any_cast<std::string>(m_readable_data.property_internal_value());
 	}
 
 	void set_value(const std::string& Value)

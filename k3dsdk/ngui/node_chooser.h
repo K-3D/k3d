@@ -218,7 +218,7 @@ public:
 
 	k3d::inode* node()
 	{
-		return boost::any_cast<k3d::inode*>(m_readable_data.property_value());
+		return boost::any_cast<k3d::inode*>(m_readable_data.property_internal_value());
 	}
 
 	void set_node(k3d::inode* Object)

@@ -1343,7 +1343,7 @@ private:
 
 	bool on_file_save()
 	{
-		const k3d::filesystem::path document_path = boost::any_cast<k3d::filesystem::path>(document().path().property_value());
+		const k3d::filesystem::path document_path = boost::any_cast<k3d::filesystem::path>(document().path().property_internal_value());
 
 		if(document_path.empty())
 			return on_file_save_as();
@@ -1415,7 +1415,7 @@ private:
 			return;
 		}
 
-		const k3d::filesystem::path document_path = boost::any_cast<k3d::filesystem::path>(document().path().property_value());
+		const k3d::filesystem::path document_path = boost::any_cast<k3d::filesystem::path>(document().path().property_internal_value());
 
 		k3d::idocument* const reverted_document = k3d::application().create_document();
 		return_if_fail(reverted_document);
@@ -1437,7 +1437,7 @@ private:
 
 	void on_file_revert()
 	{
-		const k3d::ustring document_title = boost::any_cast<k3d::ustring>(document().title().property_value());
+		const k3d::ustring document_title = boost::any_cast<k3d::ustring>(document().title().property_internal_value());
 
 		std::vector<std::string> buttons;
 		buttons.push_back(_("Revert"));
@@ -1773,7 +1773,7 @@ private:
 
 			// Skip non-parentable nodes
 			if(k3d::iparentable* const parentable = dynamic_cast<k3d::iparentable*>(*node))
-				parents.insert(boost::any_cast<k3d::inode*>(parentable->parent().property_value()));
+				parents.insert(boost::any_cast<k3d::inode*>(parentable->parent().property_internal_value()));
 		}
 
 		// Don't let NULL creep in ...
@@ -1800,7 +1800,7 @@ private:
 				continue;
 
 			// Get parent
-			k3d::inode* const parent = boost::any_cast<k3d::inode*>(parentable->parent().property_value());
+			k3d::inode* const parent = boost::any_cast<k3d::inode*>(parentable->parent().property_internal_value());
 			if(!parent)
 				continue;
 
@@ -1833,7 +1833,7 @@ private:
 				continue;
 
 			// Get parent
-			k3d::inode* const parent = boost::any_cast<k3d::inode*>(parentable->parent().property_value());
+			k3d::inode* const parent = boost::any_cast<k3d::inode*>(parentable->parent().property_internal_value());
 			if(!parent)
 				continue;
 
@@ -1854,7 +1854,7 @@ private:
 				continue;
 
 			// Get parent
-			k3d::inode* const parent = boost::any_cast<k3d::inode*>(parentable->parent().property_value());
+			k3d::inode* const parent = boost::any_cast<k3d::inode*>(parentable->parent().property_internal_value());
 			if(!parent)
 				continue;
 
@@ -2262,7 +2262,7 @@ private:
 
 		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().transform_source_output()));
 		const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
-		const k3d::point3 world_target = boost::any_cast<k3d::point3>(camera->world_target().property_value());
+		const k3d::point3 world_target = boost::any_cast<k3d::point3>(camera->world_target().property_internal_value());
 		const double distance = k3d::distance(world_position, world_target);
 
 		k3d::point3 position;
@@ -2600,7 +2600,7 @@ private:
 
 	void on_document_title_changed(k3d::iunknown*)
 	{
-		set_title(boost::any_cast<k3d::ustring>(document().title().property_value()).raw() + " - K-3D");
+		set_title(boost::any_cast<k3d::ustring>(document().title().property_internal_value()).raw() + " - K-3D");
 	}
 
 	void on_panel_focus_changed(panel_frame::control* Panel)
@@ -2905,7 +2905,7 @@ private:
 
 	const std::string unsaved_document_title()
 	{
-		return boost::any_cast<k3d::ustring>(document().title().property_value()).raw();
+		return boost::any_cast<k3d::ustring>(document().title().property_internal_value()).raw();
 	}
 
 	const bool save_unsaved_changes()

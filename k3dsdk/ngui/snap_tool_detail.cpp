@@ -135,7 +135,7 @@ const k3d::matrix4 upstream_matrix(k3d::inode& Node)
 	if(k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(&Node))
 	{
 		if(k3d::iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_sink->transform_sink_input()))
-			return boost::any_cast<k3d::matrix4>(upstream_output->property_value());
+			return boost::any_cast<k3d::matrix4>(upstream_output->property_internal_value());
 	}
 
 	return k3d::identity3D();
@@ -287,7 +287,7 @@ unsigned long snap_tool_detail::mesh_target::target_number()
 void snap_tool_detail::mesh_target::reset_selection()
 {
 k3d::log() << debug << K3D_CHANGE_SET_CONTEXT << std::endl;
-	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
+	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_internal_value());
 	return_if_fail(mesh);
 
 	// Get selection and save initial position
@@ -310,7 +310,7 @@ void snap_tool_detail::mesh_target::init_transformation()
 	assert_not_implemented();
 /*
 	// Save initial positions
-	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
+	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_internal_value());
 	return_if_fail(mesh);
 	for(detail::component_points_t::iterator point = selected_points.begin(); point != selected_points.end(); ++point)
 	{
@@ -394,7 +394,7 @@ void snap_tool_detail::mesh_target::create_mesh_modifier(const std::string& Name
 	return_if_fail(node);
 
 	// Get mesh to tweak
-	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_value());
+	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_internal_value());
 	return_if_fail(mesh);
 
 	// Modify with TweakPoints

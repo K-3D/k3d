@@ -92,7 +92,7 @@ public:
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
 		context["Node"] = static_cast<k3d::inode*>(this);
-		context["VisibleNodes"] = m_visible_nodes.property_value();
+		context["VisibleNodes"] = m_visible_nodes.property_internal_value();
 		context["OutputImage"] = OutputImage;
 		context["ViewImage"] = ViewImage;
 

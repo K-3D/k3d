@@ -51,7 +51,7 @@ const matrix4 upstream_matrix(inode& Node)
 	iproperty& downstream_input = downstream_sink->transform_sink_input();
 	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
 	if(upstream_output)
-		return boost::any_cast<k3d::matrix4>(upstream_output->property_value());
+		return boost::any_cast<k3d::matrix4>(upstream_output->property_internal_value());
 		
 	return k3d::identity3D();
 }
@@ -116,7 +116,7 @@ const matrix4 node_to_world_matrix(iunknown& Node)
 {
 	iproperty* const property = property::get<matrix4>(Node, "output_matrix");
 	if(property)
-		return boost::any_cast<matrix4>(property->property_value());
+		return boost::any_cast<matrix4>(property->property_internal_value());
 
 	return identity3D();
 }
@@ -124,7 +124,7 @@ const matrix4 node_to_world_matrix(iunknown& Node)
 const matrix4 parent_to_world_matrix(iunknown& Node)
 {
 	iparentable* const parentable = dynamic_cast<iparentable*>(&Node);
-	inode* const parent = parentable ? boost::any_cast<inode*>(parentable->parent().property_value()) : 0;
+	inode* const parent = parentable ? boost::any_cast<inode*>(parentable->parent().property_internal_value()) : 0;
 	if(parent)
 		return node_to_world_matrix(*parent);
 

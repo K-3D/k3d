@@ -2,7 +2,7 @@
 #define K3DSDK_IPROPERTY_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,8 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares iproperty, an abstract interface for a name-value pair with fixed type
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -52,8 +51,10 @@ public:
 	virtual const std::string property_description() = 0;
 	/// Returns the property type
 	virtual const std::type_info& property_type() = 0;
-	/// Returns the property value
-	virtual const boost::any property_value() = 0;
+	/// Returns the value stored internally by the property.  Note that most code that uses properties should retrieve the pipeline value instead.
+	virtual const boost::any property_internal_value() = 0;
+	/// Returns the property value, accounting for any connections in the pipeline.  The result may-or-may-not be the same as the internal value.
+	virtual const boost::any property_pipeline_value() = 0;
 	/// Returns a reference to the object that owns the property (if any)
 	virtual inode* property_node() = 0;
 	/// Defines a signal that will be emitted if the property value changes.  The signal includes a pointer to an optional "hint" object that may provide additional information about what changed.

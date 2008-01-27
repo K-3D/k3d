@@ -54,7 +54,7 @@ public:
 
 	bool value()
 	{
-		return boost::any_cast<bool>(m_readable_data.property_value());
+		return boost::any_cast<bool>(m_readable_data.property_internal_value());
 	}
 
 	void set_value(const bool Value)

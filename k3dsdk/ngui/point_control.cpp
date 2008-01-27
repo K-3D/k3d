@@ -68,11 +68,11 @@ public:
 	{
 		const std::type_info& type = m_readable_data.property_type();
 		if(type == typeid(k3d::point3))
-			return boost::any_cast<k3d::point3>(m_readable_data.property_value());
+			return boost::any_cast<k3d::point3>(m_readable_data.property_internal_value());
 		else if(type == typeid(k3d::vector3))
-			return k3d::to_point(boost::any_cast<k3d::vector3>(m_readable_data.property_value()));
+			return k3d::to_point(boost::any_cast<k3d::vector3>(m_readable_data.property_internal_value()));
 		else if(type == typeid(k3d::normal3))
-			return k3d::to_point(boost::any_cast<k3d::normal3>(m_readable_data.property_value()));
+			return k3d::to_point(boost::any_cast<k3d::normal3>(m_readable_data.property_internal_value()));
 		else
 			k3d::log() << error << k3d_file_reference << "unknown property type: " << type.name() << std::endl;
 

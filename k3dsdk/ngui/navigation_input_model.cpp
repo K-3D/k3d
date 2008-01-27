@@ -347,10 +347,10 @@ struct navigation_input_model::implementation
 
 		if(k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(projection))
 		{
-			const double left = boost::any_cast<double>(perspective->left().property_value()) * zoom_factor;
-			const double right = boost::any_cast<double>(perspective->right().property_value()) * zoom_factor;
-			const double top = boost::any_cast<double>(perspective->top().property_value()) * zoom_factor;
-			const double bottom = boost::any_cast<double>(perspective->bottom().property_value()) * zoom_factor;
+			const double left = boost::any_cast<double>(perspective->left().property_internal_value()) * zoom_factor;
+			const double right = boost::any_cast<double>(perspective->right().property_internal_value()) * zoom_factor;
+			const double top = boost::any_cast<double>(perspective->top().property_internal_value()) * zoom_factor;
+			const double bottom = boost::any_cast<double>(perspective->bottom().property_internal_value()) * zoom_factor;
 
 			k3d::property::set_internal_value(perspective->left(), left);
 			k3d::property::set_internal_value(perspective->right(), right);
@@ -374,10 +374,10 @@ struct navigation_input_model::implementation
 
 		if(k3d::iorthographic* const orthographic = dynamic_cast<k3d::iorthographic*>(projection))
 		{
-			const double left = boost::any_cast<double>(orthographic->left().property_value()) * zoom_factor;
-			const double right = boost::any_cast<double>(orthographic->right().property_value()) * zoom_factor;
-			const double top = boost::any_cast<double>(orthographic->top().property_value()) * zoom_factor;
-			const double bottom = boost::any_cast<double>(orthographic->bottom().property_value()) * zoom_factor;
+			const double left = boost::any_cast<double>(orthographic->left().property_internal_value()) * zoom_factor;
+			const double right = boost::any_cast<double>(orthographic->right().property_internal_value()) * zoom_factor;
+			const double top = boost::any_cast<double>(orthographic->top().property_internal_value()) * zoom_factor;
+			const double bottom = boost::any_cast<double>(orthographic->bottom().property_internal_value()) * zoom_factor;
 
 			k3d::property::set_internal_value(orthographic->left(), left);
 			k3d::property::set_internal_value(orthographic->right(), right);

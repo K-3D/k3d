@@ -293,7 +293,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_internal_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -318,9 +318,14 @@ public:
 		return typeid(value_t);
 	}
 
-	const boost::any property_value()
+	const boost::any property_internal_value()
 	{
 		return name_policy_t::internal_value();
+	}
+
+	const boost::any property_pipeline_value()
+	{
+		return pipeline_value();
 	}
 
 	inode* property_node()
@@ -388,7 +393,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_internal_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -413,9 +418,14 @@ public:
 		return typeid(value_t);
 	}
 
-	const boost::any property_value()
+	const boost::any property_internal_value()
 	{
 		return name_policy_t::internal_value();
+	}
+	
+	const boost::any property_pipeline_value()
+	{
+		return pipeline_value();
 	}
 
 	inode* property_node()
@@ -493,7 +503,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_internal_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -518,7 +528,7 @@ public:
 		return typeid(std::string);
 	}
 
-	const boost::any property_value()
+	const boost::any property_internal_value()
 	{
 		try
 		{
@@ -529,6 +539,11 @@ public:
 		}
 
 		return boost::any();
+	}
+
+	const boost::any property_pipeline_value()
+	{
+		return pipeline_value();
 	}
 
 	inode* property_node()
@@ -615,7 +630,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_internal_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -640,9 +655,14 @@ public:
 		return typeid(value_t);
 	}
 
-	const boost::any property_value()
+	const boost::any property_internal_value()
 	{
 		return name_policy_t::internal_value();
+	}
+
+	const boost::any property_pipeline_value()
+	{
+		return pipeline_value();
 	}
 
 	inode* property_node()
@@ -768,7 +788,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_internal_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -793,7 +813,7 @@ public:
 		return typeid(std::string);
 	}
 
-	const boost::any property_value()
+	const boost::any property_internal_value()
 	{
 		try
 		{
@@ -804,6 +824,11 @@ public:
 		}
 
 		return boost::any();
+	}
+
+	const boost::any property_pipeline_value()
+	{
+		return pipeline_value();
 	}
 
 	inode* property_node()
@@ -890,7 +915,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_internal_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -915,7 +940,7 @@ public:
 		return typeid(std::string);
 	}
 
-	const boost::any property_value()
+	const boost::any property_internal_value()
 	{
 		try
 		{
@@ -926,6 +951,11 @@ public:
 		}
 
 		return boost::any();
+	}
+
+	const boost::any property_pipeline_value()
+	{
+		return pipeline_value();
 	}
 
 	inode* property_node()
@@ -1030,7 +1060,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_internal_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -1055,9 +1085,14 @@ public:
 		return typeid(value_t);
 	}
 
-	const boost::any property_value()
+	const boost::any property_internal_value()
 	{
 		return boost::any(name_policy_t::internal_value());
+	}
+
+	const boost::any property_pipeline_value()
+	{
+		return pipeline_value();
 	}
 
 	inode* property_node()
@@ -1143,7 +1178,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return name_policy_t::constrain_value(dynamic_cast<value_t>(boost::any_cast<inode*>(source->property_value())));
+			return name_policy_t::constrain_value(dynamic_cast<value_t>(boost::any_cast<inode*>(source->property_internal_value())));
 
 		return name_policy_t::internal_value();
 	}
@@ -1168,9 +1203,14 @@ public:
 		return typeid(inode*);
 	}
 
-	const boost::any property_value()
+	const boost::any property_internal_value()
 	{
 		return boost::any(name_policy_t::internal_node());
+	}
+
+	const boost::any property_pipeline_value()
+	{
+		return pipeline_value();
 	}
 
 	inode* property_node()
@@ -1264,7 +1304,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_internal_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -1289,9 +1329,14 @@ public:
 		return typeid(value_t);
 	}
 
-	const boost::any property_value()
+	const boost::any property_internal_value()
 	{
 		return boost::any(name_policy_t::internal_value());
+	}
+
+	const boost::any property_pipeline_value()
+	{
+		return pipeline_value();
 	}
 
 	inode* property_node()

@@ -45,7 +45,7 @@ namespace libk3dngui
 const transform_history_t parent_to_node_history(k3d::inode& Object)
 {
 	k3d::iparentable* const parentable = dynamic_cast<k3d::iparentable*>(&Object);
-	k3d::inode* const parent = parentable ? boost::any_cast<k3d::inode*>(parentable->parent().property_value()) : 0;
+	k3d::inode* const parent = parentable ? boost::any_cast<k3d::inode*>(parentable->parent().property_internal_value()) : 0;
 
 	transform_history_t results;
 	for(k3d::inode* object = &Object; object; )
@@ -87,7 +87,7 @@ void unparent(k3d::inode& Node)
 	k3d::iparentable* const parentable = dynamic_cast<k3d::iparentable*>(&Node);
 	return_if_fail(parentable);
 
-	k3d::inode* const parent = boost::any_cast<k3d::inode*>(parentable->parent().property_value());
+	k3d::inode* const parent = boost::any_cast<k3d::inode*>(parentable->parent().property_internal_value());
 	if(!parent)
 		return;
 
