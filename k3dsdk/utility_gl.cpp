@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "algebra.h"
@@ -33,6 +33,9 @@
 #include "material.h"
 #include "plane.h"
 #include "utility_gl.h"
+
+#include <boost/gil/extension/numeric/resample.hpp>
+#include <boost/gil/extension/numeric/sampler.hpp>
 
 #include <algorithm>
 #include <set>
@@ -248,68 +251,57 @@ void setup_material(iunknown* const Material)
 	result->setup_gl_material();
 }
 
-void tex_image_2d(const bitmap& Bitmap)
+void tex_image_2d(const bitmap& Source)
 {
-	assert_not_implemented();
-/*
-	k3d::basic_bitmap<k3d::basic_rgba<uint8_t> > buffer;
-	
-	if(extension::query("GL_ARB_texture_non_power_of_two"))
+	// Compute power-of-two dimensions ...
+	unsigned long width = Source.width();
+	unsigned long height = Source.height();
+
+	if(width & (width - 1))
 	{
-		buffer = Bitmap;
+		width |= (width >> 1);
+		width |= (width >> 2);
+		width |= (width >> 4);
+		width |= (width >> 8);
+		width |= (width >> 16);
+		width += 1;
+		width /= 2;
+	}
+	
+	if(height & (height - 1))
+	{
+		height |= (height >> 1);
+		height |= (height >> 2);
+		height |= (height >> 4);
+		height |= (height >> 8);
+		height |= (height >> 16);
+		height += 1;
+		height /= 2;
+	}
+
+	boost::gil::rgba8_image_t target(0, 0);
+	if(extension::query("GL_ARB_texture_non_power_of_two") || (width == Source.width() && height == Source.height()))
+	{
+		target.recreate(Source.width(), Source.height());
+		boost::gil::copy_and_convert_pixels(boost::gil::const_view(Source), boost::gil::view(target));
 	}
 	else
 	{
-		unsigned long width = Bitmap.width();
-		unsigned long height = Bitmap.height();
-
-		if(width & (width - 1))
-		{
-			width |= (width >> 1);
-			width |= (width >> 2);
-			width |= (width >> 4);
-			width |= (width >> 8);
-			width |= (width >> 16);
-			width += 1;
-			width /= 2;
-		}
-		
-		if(height & (height - 1))
-		{
-			height |= (height >> 1);
-			height |= (height >> 2);
-			height |= (height >> 4);
-			height |= (height >> 8);
-			height |= (height >> 16);
-			height += 1;
-			height /= 2;
-		}
-		
-		if(width != Bitmap.width() || height != Bitmap.height())
-		{
-			k3d::log() << debug << "Forcing power-of-two texture" << std::endl;
-			buffer.reset(width, height);
-			scale_bitmap(Bitmap, buffer);
-		}
-		else
-		{
-			buffer = Bitmap;
-		}
+		target.recreate(width, height);
+		boost::gil::resize_view(boost::gil::color_converted_view<boost::gil::rgba8_pixel_t>(boost::gil::const_view(Source)), boost::gil::view(target), boost::gil::bilinear_sampler());
 	}
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
 		GL_RGBA,
-		buffer.width(),
-		buffer.height(),
+		target.width(),
+		target.height(),
 		0,
 		GL_RGBA,
 		GL_UNSIGNED_BYTE,
-		buffer.data());
-*/
+		&boost::gil::view(target)[0]);
 }
 
 } // namespace gl
