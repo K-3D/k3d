@@ -28,7 +28,7 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ipersistent_container.h>
 #include <k3dsdk/irenderman_property.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/properties_ri.h>
 #include <k3dsdk/user_properties.h>
 

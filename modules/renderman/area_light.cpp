@@ -26,7 +26,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/ilight_ri.h>
 #include <k3dsdk/ilight_shader_ri.h>
 #include <k3dsdk/renderable_ri.h>

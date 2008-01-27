@@ -26,7 +26,7 @@
 #include "istate_container.h"
 #include "iuser_property.h"
 #include "options.h"
-#include "property.h"
+#include "properties.h"
 #include "shader_ri.h"
 #include "user_properties.h"
 

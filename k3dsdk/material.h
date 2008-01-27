@@ -28,7 +28,7 @@
 #include "inode.h"
 #include "iplugin_factory.h"
 #include "iproperty_collection.h"
-#include "property.h"
+#include "properties.h"
 
 namespace k3d
 {

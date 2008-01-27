@@ -35,7 +35,7 @@
 #include <k3dsdk/ipersistent.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/serialization_xml.h>
 #include <k3dsdk/string_modifiers.h>

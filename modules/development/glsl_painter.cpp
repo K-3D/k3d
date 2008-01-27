@@ -28,7 +28,7 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 
 namespace module
 {

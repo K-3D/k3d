@@ -1,8 +1,8 @@
-#ifndef K3DSDK_PROPERTY_H
-#define K3DSDK_PROPERTY_H
+#ifndef K3DSDK_PROPERTIES_H
+#define K3DSDK_PROPERTIES_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -95,5 +95,5 @@ bool set_internal_value(iproperty& Property, const boost::any& Value);
 
 } // namespace k3d
 
-#endif // !K3DSDK_PROPERTY_H
+#endif // !K3DSDK_PROPERTIES_H
 

@@ -64,7 +64,7 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/utility_gl.h>

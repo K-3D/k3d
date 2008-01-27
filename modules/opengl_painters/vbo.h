@@ -33,7 +33,7 @@
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_selection.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 
 #include "cached_triangulation.h"

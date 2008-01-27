@@ -32,7 +32,7 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/plugin_factory.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/system.h>
 

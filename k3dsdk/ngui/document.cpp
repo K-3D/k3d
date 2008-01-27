@@ -36,7 +36,7 @@
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/imesh_painter_ri.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/user_properties.h>

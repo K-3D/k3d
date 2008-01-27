@@ -23,7 +23,7 @@
 
 #include "idocument.h"
 #include "nodes.h"
-#include "property.h"
+#include "properties.h"
 #include "time_source.h"
 
 namespace k3d

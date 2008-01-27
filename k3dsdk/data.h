@@ -293,7 +293,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return boost::any_cast<value_t>(source->property_value());
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -388,7 +388,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return boost::any_cast<value_t>(source->property_value());
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -493,7 +493,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return boost::any_cast<value_t>(source->property_value());
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -615,7 +615,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return boost::any_cast<value_t>(source->property_value());
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -768,7 +768,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return boost::any_cast<value_t>(source->property_value());
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -890,7 +890,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return boost::any_cast<value_t>(source->property_value());
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -1030,7 +1030,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return boost::any_cast<value_t>(source->property_value());
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -1143,7 +1143,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return dynamic_cast<value_t>(boost::any_cast<inode*>(source->property_value()));
+			return name_policy_t::constrain_value(dynamic_cast<value_t>(boost::any_cast<inode*>(source->property_value())));
 
 		return name_policy_t::internal_value();
 	}
@@ -1264,7 +1264,7 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return boost::any_cast<value_t>(source->property_value());
+			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_value()));
 
 		return name_policy_t::internal_value();
 	}
@@ -1427,6 +1427,11 @@ public:
 			undo_policy_t::set_value(Value, Hint);
 	}
 
+	const value_t constrain_value(const value_t Value)
+	{
+		return Value;
+	}
+
 protected:
 	template<typename init_t>
 	no_constraint(const init_t& Init) :
@@ -1561,6 +1566,12 @@ public:
 
 		if(Value != undo_policy_t::internal_value())
 			undo_policy_t::set_value(Value, Hint);
+	}
+
+	const value_t constrain_value(value_t Value)
+	{
+		m_constraint->constrain(Value);
+		return Value;
 	}
 
 protected:

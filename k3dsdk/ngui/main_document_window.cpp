@@ -94,7 +94,7 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/share.h>

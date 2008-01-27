@@ -43,7 +43,7 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/system.h>
 

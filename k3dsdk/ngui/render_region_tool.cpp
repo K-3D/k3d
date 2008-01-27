@@ -43,7 +43,7 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icrop_window.h>
 #include <k3dsdk/irender_camera_preview.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/state_change_set.h>
 
 namespace libk3dngui

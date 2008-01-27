@@ -51,7 +51,7 @@
 #include <k3dsdk/log_control.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options_policy.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/register_application.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/shader_cache_detail.h>

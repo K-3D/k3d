@@ -36,7 +36,7 @@
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/utility_gl.h>

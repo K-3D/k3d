@@ -50,7 +50,7 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/stream_ri.h>
 #include <k3dsdk/renderable_ri.h>

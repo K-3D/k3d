@@ -45,7 +45,7 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/nodes.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>

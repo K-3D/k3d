@@ -23,7 +23,7 @@
 
 #include "bitmap_preview.h"
 
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 
 #include <gdkmm/pixbuf.h>
 #include <gtkmm/image.h>

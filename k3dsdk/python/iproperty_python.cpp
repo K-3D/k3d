@@ -32,7 +32,7 @@
 #include <k3dsdk/imeasurement_property.h>
 #include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/type_registry.h>
 
 #include <boost/python.hpp>

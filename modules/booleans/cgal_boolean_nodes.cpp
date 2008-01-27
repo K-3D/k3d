@@ -37,7 +37,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
 namespace libk3dbooleans

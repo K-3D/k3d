@@ -42,7 +42,7 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/render_state_gl.h>

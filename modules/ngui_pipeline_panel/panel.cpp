@@ -45,7 +45,7 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/pipeline.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/vectors.h>

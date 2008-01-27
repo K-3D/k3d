@@ -40,7 +40,7 @@
 #include <k3dsdk/ivolume_shader_ri.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/network_render_farm.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/stream_ri.h>
 #include <k3dsdk/render_state_ri.h>

@@ -29,7 +29,7 @@
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/vectors.h>
 

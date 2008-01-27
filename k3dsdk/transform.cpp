@@ -31,7 +31,7 @@
 #include "iparentable.h"
 #include "itransform_sink.h"
 #include "itransform_source.h"
-#include "property.h"
+#include "properties.h"
 #include "result.h"
 #include "transform.h"
 

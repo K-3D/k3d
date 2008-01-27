@@ -41,7 +41,7 @@
 #include "mesh.h"
 #include "mesh_selection.h"
 #include "plugins.h"
-#include "property.h"
+#include "properties.h"
 #include "result.h"
 #include "serialization_xml.h"
 #include "share.h"

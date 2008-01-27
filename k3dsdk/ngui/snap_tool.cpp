@@ -46,7 +46,7 @@
 #include <k3dsdk/line2.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/plane.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/xml.h>
 

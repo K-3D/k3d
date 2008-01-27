@@ -30,7 +30,7 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/utility.h>
 
 #include "MxQSlim.h"

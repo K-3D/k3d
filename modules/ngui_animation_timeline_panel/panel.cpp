@@ -39,7 +39,7 @@
 #include <k3dsdk/data.h>
 #include <k3dsdk/ikeyframer.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/time_source.h>

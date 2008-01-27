@@ -44,7 +44,7 @@
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/property.h>
+#include <k3dsdk/properties.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/selection_state_gl.h>
 #include <k3dsdk/time_source.h>
