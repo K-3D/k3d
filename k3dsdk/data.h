@@ -1210,7 +1210,7 @@ public:
 
 	const boost::any property_pipeline_value()
 	{
-		return pipeline_value();
+		return dynamic_cast<inode*>(pipeline_value());
 	}
 
 	inode* property_node()
