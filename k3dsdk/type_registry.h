@@ -24,29 +24,28 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <string>
+#include "types.h"
 #include <typeinfo>
-#include <vector>
 
 namespace k3d
 {
 
 /// Returns the string representation for a registered type, or empty string
-const std::string type_string(const std::type_info& Info);
+const string_t type_string(const std::type_info& Info);
 /// Returns the string representation for a registered type, or emtpy string
 template<typename T>
-const std::string type_string()
+const string_t type_string()
 {
 	return type_string(typeid(T));
 }
 
 /// Returns the type_info representation of a registered type, or NULL
-const std::type_info* type_id(const std::string& Name);
+const std::type_info* type_id(const string_t& Name);
 
 const std::type_info& type_id_k3d_bitmap_ptr();
 
 /// Returns the demangled name of a type, or the input string if demangling isn't available
-const std::string demangle(const std::type_info& Type);
+const string_t demangle(const std::type_info& Type);
 
 } // namespace k3d
 

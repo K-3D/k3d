@@ -120,16 +120,16 @@ struct type_info
 };
 
 /// Defines storage for a mapping of type_info objects to their corresponding string representation
-typedef std::map<type_info, std::string> type_to_name_map_t;
+typedef std::map<type_info, string_t> type_to_name_map_t;
 /// Stores a mapping of type_info objects to their corresponding string representation
 type_to_name_map_t type_to_name_map;
 
 /// Defines storage for a mapping of string to the corresponding type_info
-typedef std::map<std::string, type_info> name_to_type_map_t;
+typedef std::map<string_t, type_info> name_to_type_map_t;
 /// Stores a mapping of string to the corresponding type_info
 name_to_type_map_t name_to_type_map;
 
-void register_type(const std::type_info& Info, const std::string& Name)
+void register_type(const std::type_info& Info, const string_t& Name)
 {
 	if(type_to_name_map.count(type_info(Info)))
 	{
@@ -250,9 +250,9 @@ void initialize_types()
 	initialized = true;
 }
 
-const std::string demangle(const std::string& Type)
+const string_t demangle(const string_t& Type)
 {
-	std::string result = Type;
+	string_t result = Type;
 
 #ifdef K3D_HAVE_GCC_DEMANGLE
 
@@ -270,7 +270,7 @@ const std::string demangle(const std::string& Type)
 
 } // namespace detail
 
-const std::string type_string(const std::type_info& Info)
+const string_t type_string(const std::type_info& Info)
 {
 	detail::initialize_types();
 
@@ -282,7 +282,7 @@ const std::string type_string(const std::type_info& Info)
 	return "";
 }
 
-const std::type_info* type_id(const std::string& Name)
+const std::type_info* type_id(const string_t& Name)
 {
 	detail::initialize_types();
 
@@ -299,7 +299,7 @@ const std::type_info& type_id_k3d_bitmap_ptr()
     return typeid(k3d::bitmap*);
 }
 
-const std::string demangle(const std::type_info& Type)
+const string_t demangle(const std::type_info& Type)
 {
 	return detail::demangle(Type.name());
 }
