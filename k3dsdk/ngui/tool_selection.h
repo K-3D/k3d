@@ -106,8 +106,11 @@ protected:
 
 	void pick_selectables(k3d::selection::records& PickedSelectables, viewport::control& Viewport, const k3d::point2& Coordinates)
 	{
+		// Check if we need to pick backfacing items
+		bool pick_backfacing = m_document_state.pick_backfacing();
+		
 		// Find what's under the mouse pointer
-		m_mouse_down_selection = Viewport.pick_object(Coordinates, PickedSelectables);
+		m_mouse_down_selection = Viewport.pick_object(Coordinates, PickedSelectables, pick_backfacing);
 
 		// Nullify selection in component mode if the parent node isn't selected
 		if(k3d::inode* node = k3d::selection::get_node(m_mouse_down_selection))
@@ -177,7 +180,8 @@ protected:
 
 	void on_box_select_objects(viewport::control& Viewport, const k3d::point2& Coordinates, const k3d::rectangle& SelectionRegion)
 	{
-		const k3d::selection::records selection = Viewport.get_selectable_objects(normalize(SelectionRegion));
+		bool rubber_band_backfacing = m_document_state.rubber_band_backfacing();
+		const k3d::selection::records selection = Viewport.get_selectable_objects(normalize(SelectionRegion), rubber_band_backfacing);
 
 		switch(m_mouse_down_content)
 		{

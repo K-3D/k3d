@@ -361,14 +361,14 @@ struct knife_tool::implementation :
 		{
 			// Shift key adds a point within the clicked face
 			m_start_selection = k3d::selection::record();
-			m_start_selection = Viewport.pick_face(NDC);
+			m_start_selection = Viewport.pick_face(NDC, m_document_state.pick_backfacing());
 			m_pick_mode = SELECT_FACES;
 		}
 		else
 		{
 			// Find an edge under the mouse cursor
 			m_start_selection = k3d::selection::record();
-			m_start_selection = Viewport.pick_line(NDC);
+			m_start_selection = Viewport.pick_line(NDC, m_document_state.pick_backfacing());
 			m_pick_mode = SELECT_LINES;
 		}
 	}

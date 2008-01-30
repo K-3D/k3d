@@ -35,6 +35,7 @@
 #include <k3dsdk/utility_gl.h>
 
 #include "colored_selection_painter_gl.h"
+#include "normal_cache.h"
 #include "vbo.h"
 
 namespace module
@@ -124,14 +125,24 @@ public:
 		get_data<point_vbo>(&Mesh, this).bind();
 		get_data<edge_vbo>(&Mesh, this).bind();
 		
+		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+		const k3d::mesh::points_t& points = *Mesh.points;
+		
 		const size_t edge_count = Mesh.polyhedra->edge_points->size();
 		for(size_t edge = 0; edge < edge_count; ++edge)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
-
-			glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, static_cast<GLuint*>(0) + 2*edge);
-
-			k3d::gl::pop_selection_token();
+			if (SelectionState.select_backfacing || 
+					(!SelectionState.select_backfacing && 
+							!backfacing(points[edge_points[edge]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(edge_points[edge]))
+							&& !backfacing(points[edge_points[clockwise_edges[edge]]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(edge_points[clockwise_edges[edge]]))))
+			{
+				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
+	
+				glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, static_cast<GLuint*>(0) + 2*edge);
+	
+				k3d::gl::pop_selection_token();
+			}
 		}
 		
 		clean_vbo_state();
@@ -147,6 +158,7 @@ public:
 		schedule_data<point_vbo>(&Mesh, Hint, this);
 		schedule_data<edge_vbo>(&Mesh, Hint, this);
 		schedule_data<edge_selection>(&Mesh, Hint, this);
+		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 
 	static k3d::iplugin_factory& get_factory()

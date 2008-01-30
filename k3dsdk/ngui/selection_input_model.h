@@ -45,6 +45,9 @@ public:
 	void set_extended_component_mode(const bool Enabled);
 	void set_paint_mode(const bool Enabled);
 	void set_double_click_mode(const bool Enabled);
+	void set_pick_backfacing(const bool Enabled);
+	void set_paint_backfacing(const bool Enabled);
+	void set_rubber_band_backfacing(const bool Enabled);
 
 	void on_button_down(viewport::control& Viewport, const GdkEventButton& Event);
 	void on_button_click(viewport::control& Viewport, const GdkEventButton& Event);

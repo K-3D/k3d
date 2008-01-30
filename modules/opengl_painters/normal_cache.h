@@ -27,6 +27,8 @@
 #include <k3dsdk/mesh.h>
 #include "painter_cache.h"
 
+namespace k3d { class icamera; }
+
 namespace module
 {
 
@@ -52,6 +54,9 @@ protected:
 private:
 	const k3d::mesh* const m_mesh;
 };
+
+/// Returns true if Point is on a backfacing component
+bool backfacing(const k3d::point3& Point, k3d::icamera& Camera, const k3d::normal3& Normal);
 
 } // namespace painters
 

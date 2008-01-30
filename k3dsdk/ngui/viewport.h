@@ -113,37 +113,37 @@ public:
 	bool render_camera_animation(k3d::icamera& Camera, const k3d::file_range& Files, const bool ViewCompletedImages);
 
 	/// Returns all points contained in the given rectangle in widget coordinates
-	k3d::selection::records get_selectable_points(const k3d::rectangle& SelectionRegion);
+	k3d::selection::records get_selectable_points(const k3d::rectangle& SelectionRegion, bool Backfacing);
 	/// Returns all lines that intersect the given rectangle in widget coordinates
-	k3d::selection::records get_selectable_lines(const k3d::rectangle& SelectionRegion);
+	k3d::selection::records get_selectable_lines(const k3d::rectangle& SelectionRegion, bool Backfacing);
 	/// Returns all faces that intersect the given rectangle in widget coordinates
-	k3d::selection::records get_selectable_faces(const k3d::rectangle& SelectionRegion);
+	k3d::selection::records get_selectable_faces(const k3d::rectangle& SelectionRegion, bool Backfacing);
 	/// Returns all nodes that intersect the given rectangle in widget coordinates
 	k3d::selection::records get_selectable_nodes(const k3d::rectangle& SelectionRegion);
 	/// Returns all objects (points, lines, faces, or nodes, depending on selection mode) that intersect the given rectangle in widget coordinates
-	k3d::selection::records get_selectable_objects(const k3d::rectangle& SelectionRegion);
+	k3d::selection::records get_selectable_objects(const k3d::rectangle& SelectionRegion, bool Backfacing);
 
 	/// Returns the closest point at the given widget coordinates (may return an empty record)
-	k3d::selection::record pick_point(const k3d::point2& Coordinates);
+	k3d::selection::record pick_point(const k3d::point2& Coordinates, bool Backfacing);
 	/// Returns the closest line at the given widget coordinates (may return an empty record)
-	k3d::selection::record pick_line(const k3d::point2& Coordinates);
+	k3d::selection::record pick_line(const k3d::point2& Coordinates, bool Backfacing);
 	/// Returns the closest face at the given widget coordinates (may return an empty record)
-	k3d::selection::record pick_face(const k3d::point2& Coordinates);
+	k3d::selection::record pick_face(const k3d::point2& Coordinates, bool Backfacing);
 	/// Returns the closest node at the given widget coordinates (may return an empty record)
 	k3d::selection::record pick_node(const k3d::point2& Coordinates);
 	/// Returns the closest object (point, line, face, or node, depending on selection mode) at the given coordinates (may return an empty record)
-	k3d::selection::record pick_object(const k3d::point2& Coordinates);
+	k3d::selection::record pick_object(const k3d::point2& Coordinates, bool Backfacing);
 
 	/// Returns the closest point at the given widget coordinates (may return an empty record)
-	k3d::selection::record pick_point(const k3d::point2& Coordinates, k3d::selection::records& Records);
+	k3d::selection::record pick_point(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing);
 	/// Returns the closest line at the given widget coordinates (may return an empty record)
-	k3d::selection::record pick_line(const k3d::point2& Coordinates, k3d::selection::records& Records);
+	k3d::selection::record pick_line(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing);
 	/// Returns the closest face at the given widget coordinates (may return an empty record)
-	k3d::selection::record pick_face(const k3d::point2& Coordinates, k3d::selection::records& Records);
+	k3d::selection::record pick_face(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing);
 	/// Returns the closest node at the given widget coordinates (may return an empty record)
 	k3d::selection::record pick_node(const k3d::point2& Coordinates, k3d::selection::records& Records);
 	/// Returns the closest object (point, line, face, or node, depending on selection mode) at the given coordinates (may return an empty record)
-	k3d::selection::record pick_object(const k3d::point2& Coordinates, k3d::selection::records& Records);
+	k3d::selection::record pick_object(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing);
 
 private:
 	void on_camera_changed(k3d::iunknown*);

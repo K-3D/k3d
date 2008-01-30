@@ -64,7 +64,10 @@ struct selection_input_model::implementation :
 		m_extended_mode(true),
 		m_extended_component_mode(true),
 		m_paint_mode(true),
-		m_double_click_mode(true)
+		m_double_click_mode(true),
+		m_pick_backfacing(false),
+		m_paint_backfacing(false),
+		m_rubber_band_backfacing(true)
 	{
 	}
 
@@ -75,7 +78,7 @@ struct selection_input_model::implementation :
 
 	void on_button_down(viewport::control& Viewport, const GdkEventButton& Event)
 	{
-		m_start_selection = Viewport.pick_object(k3d::point2(Event.x, Event.y));
+		m_start_selection = Viewport.pick_object(k3d::point2(Event.x, Event.y), m_pick_backfacing);
 		m_motion_type = MOTION_NONE;
 	}
 
@@ -318,7 +321,7 @@ struct selection_input_model::implementation :
 
 			case MOTION_PAINT_SELECT:
 			{
-				const k3d::selection::record selection = Viewport.pick_object(coordinates);
+				const k3d::selection::record selection = Viewport.pick_object(coordinates, m_paint_backfacing);
 				if(!m_document_state.is_selected(selection))
 				{
 					command_arguments arguments;
@@ -341,7 +344,7 @@ struct selection_input_model::implementation :
 
 			case MOTION_PAINT_DESELECT:
 			{
-				const k3d::selection::record selection = Viewport.pick_object(coordinates);
+				const k3d::selection::record selection = Viewport.pick_object(coordinates, m_paint_backfacing);
 				if(m_document_state.is_selected(selection))
 				{
 					command_arguments arguments;
@@ -408,7 +411,7 @@ struct selection_input_model::implementation :
 
 			case MOTION_RUBBER_BAND_REPLACE:
 			{
-				const k3d::selection::records selection = Viewport.get_selectable_objects(m_rubber_band.box);
+				const k3d::selection::records selection = Viewport.get_selectable_objects(m_rubber_band.box, m_rubber_band_backfacing);
 
 				command_arguments arguments;
 				arguments.append_viewport_coordinates("mouse", Viewport, Event);
@@ -425,7 +428,7 @@ struct selection_input_model::implementation :
 
 			case MOTION_RUBBER_BAND_SELECT:
 			{
-				const k3d::selection::records selection = Viewport.get_selectable_objects(m_rubber_band.box);
+				const k3d::selection::records selection = Viewport.get_selectable_objects(m_rubber_band.box, m_rubber_band_backfacing);
 
 				command_arguments arguments;
 				arguments.append_viewport_coordinates("mouse", Viewport, Event);
@@ -441,7 +444,7 @@ struct selection_input_model::implementation :
 
 			case MOTION_RUBBER_BAND_DESELECT:
 			{
-				const k3d::selection::records selection = Viewport.get_selectable_objects(m_rubber_band.box);
+				const k3d::selection::records selection = Viewport.get_selectable_objects(m_rubber_band.box, m_rubber_band_backfacing);
 
 				command_arguments arguments;
 				arguments.append_viewport_coordinates("mouse", Viewport, Event);
@@ -782,6 +785,9 @@ struct selection_input_model::implementation :
 	bool m_extended_component_mode;
 	bool m_paint_mode;
 	bool m_double_click_mode;
+	bool m_pick_backfacing;
+	bool m_paint_backfacing;
+	bool m_rubber_band_backfacing;
 
 	k3d::timer m_timer;
 };
@@ -817,6 +823,21 @@ void selection_input_model::set_paint_mode(const bool Enabled)
 void selection_input_model::set_double_click_mode(const bool Enabled)
 {
 	m_implementation->m_double_click_mode = Enabled;
+}
+
+void selection_input_model::set_pick_backfacing(const bool Enabled)
+{
+	m_implementation->m_pick_backfacing = Enabled;
+}
+
+void selection_input_model::set_paint_backfacing(const bool Enabled)
+{
+	m_implementation->m_paint_backfacing = Enabled;
+}
+
+void selection_input_model::set_rubber_band_backfacing(const bool Enabled)
+{
+	m_implementation->m_rubber_band_backfacing = Enabled;
 }
 
 void selection_input_model::on_button_down(viewport::control& Viewport, const GdkEventButton& Event)

@@ -17,8 +17,14 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+
 #include <k3dsdk/hints.h>
+#include <k3dsdk/icamera.h>
+#include <k3dsdk/iprojection.h>
+#include <k3dsdk/itransform_source.h>
 #include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/transform.h>
 
 #include "normal_cache.h"
 
@@ -226,6 +232,21 @@ void normal_cache::on_schedule(k3d::inode* Painter)
 void normal_cache::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 {
 	// nothing needed here, everything gets executed when the normals are requested
+}
+
+bool backfacing(const k3d::point3& Point, k3d::icamera& Camera, const k3d::normal3& Normal)
+{
+	k3d::point3 eye = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output()) * k3d::point3(0,0,0);
+	try
+	{
+		k3d::iperspective& perspective = dynamic_cast<k3d::iperspective&>(Camera.projection());
+		return ((Point - eye) * Normal) > -1e-8; // 1e-8 avoids non-deterministic behaviour
+	}
+	catch (std::bad_cast)
+	{
+		k3d::point3 target = k3d::property::pipeline_value<k3d::point3>(Camera.world_target());
+		return ((target - eye) * Normal) > 1e-8;
+	}
 }
 
 } // namespace painters

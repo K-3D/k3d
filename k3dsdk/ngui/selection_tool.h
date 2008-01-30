@@ -52,6 +52,15 @@ public:
 	
 	/// True if the selection is kept when switching modes
 	bool keep_selection();
+	
+	/// True if backfacing components are to be picked
+	bool pick_backfacing();
+	
+	/// True if backfacing components are to be paint-selected
+	bool paint_backfacing();
+	
+	/// True if backfacing components are to be rubber-band selected
+	bool rubber_band_backfacing();
 
 protected:
 	virtual k3d::iproperty_collection* get_property_collection();

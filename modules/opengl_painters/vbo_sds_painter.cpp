@@ -202,6 +202,7 @@ protected:
 		glDisable(GL_LIGHTING);
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		k3d::gl::set(GL_CULL_FACE, !SelectionState.select_backfacing);
 
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);

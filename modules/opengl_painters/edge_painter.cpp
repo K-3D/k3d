@@ -31,6 +31,7 @@
 #include <k3dsdk/selection.h>
 
 #include "colored_selection_painter_gl.h"
+#include "normal_cache.h"
 
 namespace module
 {
@@ -103,15 +104,26 @@ public:
 		const size_t edge_count = edge_points.size();
 		for(size_t edge = 0; edge != edge_count; ++edge)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
-
-			glBegin(GL_LINES);
-			k3d::gl::vertex3d(points[edge_points[edge]]);
-			k3d::gl::vertex3d(points[edge_points[clockwise_edges[edge]]]);
-			glEnd();
-
-			k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
+			if (SelectionState.select_backfacing || 
+								(!SelectionState.select_backfacing && 
+										!backfacing(points[edge_points[edge]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(edge_points[edge]))
+										&& !backfacing(points[edge_points[clockwise_edges[edge]]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(edge_points[clockwise_edges[edge]]))))
+			{
+				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
+	
+				glBegin(GL_LINES);
+				k3d::gl::vertex3d(points[edge_points[edge]]);
+				k3d::gl::vertex3d(points[edge_points[clockwise_edges[edge]]]);
+				glEnd();
+	
+				k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
+			}
 		}
+	}
+	
+	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 	
 	static k3d::iplugin_factory& get_factory()

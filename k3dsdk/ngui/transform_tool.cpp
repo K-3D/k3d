@@ -698,7 +698,7 @@ void transform_tool::lmb_click_add(viewport::control& Viewport, const k3d::point
 
 	// Shift key modifier always adds to the selection
 	interactive::move_pointer(Viewport, Coordinates);
-	m_document_state.select(Viewport.pick_object(Coordinates));
+	m_document_state.select(Viewport.pick_object(Coordinates, m_document_state.pick_backfacing()));
 
 	k3d::finish_state_change_set(m_document, "Selection add", K3D_CHANGE_SET_CONTEXT);
 
@@ -711,7 +711,7 @@ void transform_tool::lmb_click_subtract(viewport::control& Viewport, const k3d::
 
 	// Control key modifier always adds to the selection
 	interactive::move_pointer(Viewport, Coordinates);
-	m_document_state.deselect(Viewport.pick_object(Coordinates));
+	m_document_state.deselect(Viewport.pick_object(Coordinates, m_document_state.pick_backfacing()));
 
 	k3d::finish_state_change_set(m_document, "Selection subtract", K3D_CHANGE_SET_CONTEXT);
 
@@ -723,7 +723,7 @@ void transform_tool::lmb_click_replace(viewport::control& Viewport, const k3d::p
 	m_tutorial_action = "lmb_click_replace";
 
 	interactive::move_pointer(Viewport, Coordinates);
-	m_document_state.select(Viewport.pick_object(Coordinates));
+	m_document_state.select(Viewport.pick_object(Coordinates, m_document_state.pick_backfacing()));
 
 	k3d::finish_state_change_set(m_document, "Selection replace", K3D_CHANGE_SET_CONTEXT);
 

@@ -35,6 +35,7 @@
 #include <k3dsdk/utility_gl.h>
 
 #include "colored_selection_painter_gl.h"
+#include "normal_cache.h"
 #include "vbo.h"
 
 namespace module
@@ -125,13 +126,18 @@ public:
 		const size_t point_count = Mesh.points->size();
 		for(size_t point = 0; point != point_count; ++point)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, point);
-
-			glBegin(GL_POINTS);
-			glArrayElement(point);
-			glEnd();
-
-			k3d::gl::pop_selection_token();
+			if (SelectionState.select_backfacing || 
+					(!SelectionState.select_backfacing && 
+							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
+			{
+				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, point);
+	
+				glBegin(GL_POINTS);
+				glArrayElement(point);
+				glEnd();
+	
+				k3d::gl::pop_selection_token();
+			}
 		}
 
 		clean_vbo_state();
@@ -146,6 +152,7 @@ public:
 		
 		schedule_data<point_vbo>(&Mesh, Hint, this);
 		schedule_data<point_selection>(&Mesh, Hint, this);
+		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 
 	static k3d::iplugin_factory& get_factory()

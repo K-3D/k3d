@@ -123,6 +123,15 @@ public:
 
 	const bool is_selected(k3d::inode* Node);
 	const bool is_selected(const k3d::selection::record&);
+	
+	/// True if backfacing components are to be picked
+	bool pick_backfacing();
+	
+	/// True if backfacing components are to be paint-selected
+	bool paint_backfacing();
+	
+	/// True if backfacing components are to be rubber-band selected
+	bool rubber_band_backfacing();
 
 	/// Selects a collection of components
 	void select(const k3d::selection::record& Selection);

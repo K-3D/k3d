@@ -2108,6 +2108,21 @@ const bool document_state::is_selected(const k3d::selection::record& Selection)
 	return m_implementation->is_selected(Selection);
 }
 
+bool document_state::pick_backfacing()
+{
+	return m_implementation->m_selection_tool->pick_backfacing();
+}
+
+bool document_state::paint_backfacing()
+{
+	return m_implementation->m_selection_tool->paint_backfacing();
+}
+
+bool document_state::rubber_band_backfacing()
+{
+	return m_implementation->m_selection_tool->rubber_band_backfacing();
+}
+
 void document_state::select_all()
 {
 	m_implementation->select_all();

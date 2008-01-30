@@ -46,7 +46,8 @@ public:
 		select_bilinear_patches(false),
 		select_bicubic_patches(false),
 		select_nurbs_patches(false),
-		select_blobbies(false)
+		select_blobbies(false),
+		select_backfacing(false)
 	{
 	}
 
@@ -62,6 +63,7 @@ public:
 	bool select_bicubic_patches;
 	bool select_nurbs_patches;
 	bool select_blobbies;
+	bool select_backfacing;
 };
 
 } // namespace gl

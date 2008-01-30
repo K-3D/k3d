@@ -32,6 +32,7 @@
 #include <k3dsdk/selection.h>
 
 #include "colored_selection_painter_gl.h"
+#include "normal_cache.h"
 
 namespace module
 {
@@ -110,14 +111,24 @@ public:
 		const size_t point_end = points.size();
 		for(size_t point = point_begin; point != point_end; ++point)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, point);
-
-			glBegin(GL_POINTS);
-			glArrayElement(point);
-			glEnd();
-
-			k3d::gl::pop_selection_token(); // ABSOLUTE_POINT
+			if (SelectionState.select_backfacing || 
+					(!SelectionState.select_backfacing && 
+							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
+			{
+				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, point);
+	
+				glBegin(GL_POINTS);
+				glArrayElement(point);
+				glEnd();
+	
+				k3d::gl::pop_selection_token(); // ABSOLUTE_POINT
+			}
 		}
+	}
+	
+	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	{
+		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 	
 	static k3d::iplugin_factory& get_factory()
