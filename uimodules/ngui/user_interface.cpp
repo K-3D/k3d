@@ -35,7 +35,6 @@
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/options.h>
 #include <k3dsdk/ngui/tutorial_message.h>
-#include <k3dsdk/ngui/tutorial_recorder.h>
 #include <k3dsdk/ngui/uri.h>
 #include <k3dsdk/ngui/utility.h>
 
@@ -397,7 +396,11 @@ public:
 		}
 
 		if(m_record_tutorials)
-			create_tutorial_recorder();
+		{
+			Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUITutorialRecorderDialog");
+			if(!window)
+				k3d::log() << error << "Error creating tutorial recorder dialog at startup" << std::endl;
+		}
 
 		create_auto_start_plugins();
 	}

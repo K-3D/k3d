@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,42 +18,42 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Provides a UI for recording interactive tutorials
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_state.h"
-#include "asynchronous_update.h"
-#include "button.h"
-#include "check_menu_item.h"
-#include "command_node_inspector.h"
-#include "event_recorder.h"
-#include "file_chooser_dialog.h"
-#include "icons.h"
-#include "image_menu_item.h"
-#include "image_toggle_button.h"
-#include "menubar.h"
-#include "menu_item.h"
-#include "messages.h"
-#include "safe_close_dialog.h"
-#include "savable_application_window.h"
-#include "scripting.h"
-#include "tutorial_recorder.h"
-#include "toolbar.h"
-#include "utility.h"
-#include "widget_manip.h"
-
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_tree.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/data.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/check_menu_item.h>
+#include <k3dsdk/ngui/command_node_inspector.h>
+#include <k3dsdk/ngui/event_recorder.h>
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/image_menu_item.h>
+#include <k3dsdk/ngui/image_toggle_button.h>
+#include <k3dsdk/ngui/menu_item.h>
+#include <k3dsdk/ngui/menubar.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/safe_close_dialog.h>
+#include <k3dsdk/ngui/savable_application_window.h>
+#include <k3dsdk/ngui/scripting.h>
+#include <k3dsdk/ngui/toolbar.h>
+#include <k3dsdk/ngui/tutorials.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/options.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/user_interface.h>
@@ -66,17 +66,26 @@
 
 #include <sstream>
 
-namespace libk3dngui
+using namespace libk3dngui;
+
+namespace module
 {
 
-class tutorial_recorder :
+namespace ngui
+{
+
+namespace tutorial_recorder
+{
+
+/// Provides a UI for recording interactive tutorials
+class dialog :
 	public savable_application_window,
 	public asynchronous_update
 {
 	typedef savable_application_window base;
 
 public:
-	tutorial_recorder() :
+	dialog() :
 		base("tutorial_recorder", 0),
 		m_script_engine(k3d::plugin::create<k3d::iscript_engine>(k3d::classes::K3DScriptEngine())),
 		m_compression(true),
@@ -84,42 +93,42 @@ public:
 		m_recording(init_name("recording") + init_label(_("Recording")) + init_description(_("Tells whether the tutorial recorder records user actions")) + init_value(true)),
 		m_running(false)
 	{
-		++m_recording_count;
+		k3d::ngui::tutorial::recording_started();
 
 		assert_warning(m_script_engine);
 
-		k3d::command_tree().command_signal().connect(sigc::mem_fun(*this, &tutorial_recorder::on_command));
-		m_recording.changed_signal().connect(sigc::mem_fun(*this, &tutorial_recorder::on_edit_recording));
+		k3d::command_tree().command_signal().connect(sigc::mem_fun(*this, &dialog::on_command));
+		m_recording.changed_signal().connect(sigc::mem_fun(*this, &dialog::on_edit_recording));
 
 		menubar::control* const menubar = new menubar::control(*this, "menus");
 
 		Gtk::Menu* const file_menu = Gtk::manage(new Gtk::Menu());
 
-		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_new", Gtk::Stock::NEW), sigc::mem_fun(*this, &tutorial_recorder::on_file_new))));
-		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_open", Gtk::Stock::OPEN), sigc::mem_fun(*this, &tutorial_recorder::on_file_open))));
+		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_new", Gtk::Stock::NEW), sigc::mem_fun(*this, &dialog::on_file_new))));
+		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_open", Gtk::Stock::OPEN), sigc::mem_fun(*this, &dialog::on_file_open))));
 		file_menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
-		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_save", Gtk::Stock::SAVE), sigc::mem_fun(*this, &tutorial_recorder::on_file_save))));
-		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_save_as", Gtk::Stock::SAVE_AS), sigc::mem_fun(*this, &tutorial_recorder::on_file_save_as))));
-		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_revert", Gtk::Stock::REVERT_TO_SAVED), sigc::mem_fun(*this, &tutorial_recorder::on_file_revert))));
+		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_save", Gtk::Stock::SAVE), sigc::mem_fun(*this, &dialog::on_file_save))));
+		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_save_as", Gtk::Stock::SAVE_AS), sigc::mem_fun(*this, &dialog::on_file_save_as))));
+		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_revert", Gtk::Stock::REVERT_TO_SAVED), sigc::mem_fun(*this, &dialog::on_file_revert))));
 		file_menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
-		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_close", Gtk::Stock::CLOSE), sigc::mem_fun(*this, &tutorial_recorder::safe_close))));
+		file_menu->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_close", Gtk::Stock::CLOSE), sigc::mem_fun(*this, &dialog::safe_close))));
 
 		Gtk::Menu* const edit_menu = Gtk::manage(new Gtk::Menu());
 
 		edit_menu->items().push_back(*Gtk::manage(new check_menu_item::control(*menubar, "edit_recording", check_menu_item::proxy(m_recording), _("Recording"))));
 		edit_menu->items().push_back(*Gtk::manage(
 			new menu_item::control(*menubar, "edit_record_message", _("Record Message")) <<
-			connect_menu_item(sigc::mem_fun(*this, &tutorial_recorder::on_edit_record_message))));
+			connect_menu_item(sigc::mem_fun(*this, &dialog::on_edit_record_message))));
 		edit_menu->items().push_back(*Gtk::manage(
 			new menu_item::control(*menubar, "edit_stop_recording", _("Stop Recording")) <<
-			connect_menu_item(sigc::mem_fun(*this, &tutorial_recorder::on_edit_stop_recording))));
+			connect_menu_item(sigc::mem_fun(*this, &dialog::on_edit_stop_recording))));
 		edit_menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 		edit_menu->items().push_back(*Gtk::manage(
 			new menu_item::control(*menubar, "edit_play", _("Play")) <<
-			connect_menu_item(sigc::mem_fun(*this, &tutorial_recorder::on_edit_play))));
+			connect_menu_item(sigc::mem_fun(*this, &dialog::on_edit_play))));
 		edit_menu->items().push_back(*Gtk::manage(
 			new menu_item::control(*menubar, "edit_play_from_cursor", _("Play From Cursor")) <<
-			connect_menu_item(sigc::mem_fun(*this, &tutorial_recorder::on_edit_play_from_cursor))));
+			connect_menu_item(sigc::mem_fun(*this, &dialog::on_edit_play_from_cursor))));
 
 		Gtk::Menu* const language_menu = Gtk::manage(new Gtk::Menu());
 
@@ -128,17 +137,17 @@ public:
 		{
 			language_menu->items().push_back(*Gtk::manage(
 				new menu_item::control(*menubar, "script_engine_" + (*factory)->name(), (*factory)->name())
-				<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &tutorial_recorder::on_tools_language), (*factory)))));
+				<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &dialog::on_tools_language), (*factory)))));
 		}
 
 		Gtk::Menu* const tools_menu = Gtk::manage(new Gtk::Menu());
 
 		tools_menu->items().push_back(*Gtk::manage(
 			new menu_item::control(*menubar, "tools_command_node_inspector", _("Command Node Inspector ...")) <<
-			connect_menu_item(sigc::mem_fun(*this, &tutorial_recorder::on_tools_command_node_inspector))));
+			connect_menu_item(sigc::mem_fun(*this, &dialog::on_tools_command_node_inspector))));
 		tools_menu->items().push_back(*Gtk::manage(
 			new menu_item::control(*menubar, "tools_event_recorder", _("Event Recorder ...")) <<
-			connect_menu_item(sigc::mem_fun(*this, &tutorial_recorder::on_tools_event_recorder))));
+			connect_menu_item(sigc::mem_fun(*this, &dialog::on_tools_event_recorder))));
 		tools_menu->items().push_back(Gtk::Menu_Helpers::MenuElem(_("Script Language"), *language_menu));
 
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_File"), *file_menu));
@@ -156,24 +165,24 @@ public:
 		toolbar->row(0).pack_start(*Gtk::manage(
 			new button::control(*toolbar, "stop_recording",
 				*Gtk::manage(new Gtk::Image(load_icon("stop", Gtk::ICON_SIZE_BUTTON)))) <<
-			connect_button(sigc::mem_fun(*this, &tutorial_recorder::on_edit_stop_recording)) <<
+			connect_button(sigc::mem_fun(*this, &dialog::on_edit_stop_recording)) <<
 			make_toolbar_button()), Gtk::PACK_SHRINK);
 
 		toolbar->row(0).pack_start(*Gtk::manage(
 			new button::control(*toolbar, "play",
 				*Gtk::manage(new Gtk::Image(load_icon("play", Gtk::ICON_SIZE_BUTTON)))) <<
-			connect_button(sigc::mem_fun(*this, &tutorial_recorder::on_edit_play)) <<
+			connect_button(sigc::mem_fun(*this, &dialog::on_edit_play)) <<
 			make_toolbar_button()), Gtk::PACK_SHRINK);
 
 		toolbar->row(0).pack_start(*Gtk::manage(
 			new button::control(*toolbar, "play_from_cursor",
 				*Gtk::manage(new Gtk::Image(load_icon("play_from_cursor", Gtk::ICON_SIZE_BUTTON)))) <<
-			connect_button(sigc::mem_fun(*this, &tutorial_recorder::on_edit_play_from_cursor)) <<
+			connect_button(sigc::mem_fun(*this, &dialog::on_edit_play_from_cursor)) <<
 			make_toolbar_button()), Gtk::PACK_SHRINK);
 
 		toolbar->row(0).pack_start(*Gtk::manage(
 			new button::control(*toolbar, "record_message", _("Record Message")) <<
-			connect_button(sigc::mem_fun(*this, &tutorial_recorder::on_edit_record_message)) <<
+			connect_button(sigc::mem_fun(*this, &dialog::on_edit_record_message)) <<
 			make_toolbar_button()), Gtk::PACK_SHRINK);
 
 		Gtk::HBox* const hbox1 = new Gtk::HBox(false);
@@ -208,17 +217,14 @@ public:
 		file_new();
 		show_all();
 
-		m_script.get_buffer()->signal_changed().connect(sigc::mem_fun(*this, &tutorial_recorder::on_script_changed));
+		m_script.get_buffer()->signal_changed().connect(sigc::mem_fun(*this, &dialog::on_script_changed));
 
 		on_edit_recording();
 	}
 
-	static unsigned long m_recording_count;
-
-private:
-	~tutorial_recorder()
+	~dialog()
 	{
-		--m_recording_count;
+		k3d::ngui::tutorial::recording_finished();
 		delete m_script_engine;
 	}
 
@@ -558,20 +564,27 @@ private:
 	Gtk::Label m_recording_message;
 	/// Buffers incoming command text so we can maintain responsiveness while recording
 	std::string m_buffer;
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<dialog> factory(
+			k3d::uuid(0xb5ba9aa0, 0xb2428a8c, 0xb4a7e181, 0xaeca9126),
+			"NGUITutorialRecorderDialog",
+			_(""),
+			"NGUI Dialogs",
+			k3d::iplugin_factory::EXPERIMENTAL);
+
+		return factory;
+	}
 };
 
-unsigned long tutorial_recorder::m_recording_count = 0;
+} // namespace tutorial_recorder
 
-void create_tutorial_recorder()
-{
-	new tutorial_recorder();
-}
+} // namespace ngui
 
-const bool tutorial_recording()
-{
-	return tutorial_recorder::m_recording_count ? true : false;
-}
+} // namespace module
 
-} // namespace libk3dngui
-
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::tutorial_recorder::dialog::get_factory());
+K3D_MODULE_END
 

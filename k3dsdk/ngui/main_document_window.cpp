@@ -50,12 +50,10 @@
 #include "scripting.h"
 #include "statusbar.h"
 #include "target.h"
-#include "test_case_recorder.h"
 #include "toolbar.h"
 #include "transform.h"
 #include "tutorials.h"
 #include "tutorial_message.h"
-#include "tutorial_recorder.h"
 #include "undo_utility.h"
 #include "uri.h"
 #include "utility.h"
@@ -1214,15 +1212,21 @@ private:
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
-		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "scripting_record_tutorial", _("_Record Tutorial..."), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_tutorial_recorder))
-			<< set_accelerator_path("<k3d-document>/actions/scripting/record_tutorial", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUITutorialRecorderDialog"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new menu_item::control(Parent, "scripting_record_tutorial", _("_Record Tutorial..."), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_tutorial_recorder))
+				<< set_accelerator_path("<k3d-document>/actions/scripting/record_tutorial", get_accel_group())));
+		}
 
-		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "scripting_record_test_case", _("Record _Test Case..."), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_test_case_recorder))
-			<< set_accelerator_path("<k3d-document>/actions/scripting/record_test_case", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUITestCaseRecorderDialog"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new menu_item::control(Parent, "scripting_record_test_case", _("Record _Test Case..."), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_test_case_recorder))
+				<< set_accelerator_path("<k3d-document>/actions/scripting/record_test_case", get_accel_group())));
+		}
 
 		// Create menu items for (optional) scripted actions ...
 		Gtk::Menu* actions_menu = 0;
@@ -2381,12 +2385,17 @@ private:
 
 	void on_scripting_tutorial_recorder()
 	{
-		create_tutorial_recorder();
+		Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUITutorialRecorderDialog");
+		return_if_fail(window);
+
+		window->set_transient_for(*this);
 	}
 
 	void on_scripting_test_case_recorder()
 	{
-		create_test_case_recorder();
+		// Plugin creation may return NULL if the user cancels the operation, so this isn't an error
+		if(Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUITestCaseRecorderDialog"))
+			window->set_transient_for(*this);
 	}
 
 	void on_scripting_action(k3d::iplugin_factory* Factory)
@@ -2419,6 +2428,8 @@ private:
 	{
 		Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUILearningDialog");
 		return_if_fail(window);
+
+		window->set_transient_for(*this);
 	}
 
 	void on_help_file_bug_report()
@@ -2447,7 +2458,6 @@ private:
 		return_if_fail(window);
 
 		window->set_transient_for(*this);
-		window->show_all();
 	}
 
 	/// Unparents all selected nodes
@@ -2681,7 +2691,7 @@ private:
 
 	bool load_ui_layout()
 	{
-		if(!application_state::instance().custom_layouts() || tutorial_recording() || k3d::ngui::tutorial::playing())
+		if(!application_state::instance().custom_layouts() || k3d::ngui::tutorial::recording() || k3d::ngui::tutorial::playing())
 			return false;
 
 		const k3d::filesystem::path layout_path = detail::ui_layout_path();

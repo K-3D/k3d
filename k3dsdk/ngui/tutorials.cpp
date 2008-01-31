@@ -36,23 +36,39 @@ namespace tutorial
 namespace detail
 {
 
-static int count = 0;
+static int recording_count = 0;
+static int playback_count = 0;
 
 } // namespace detail
 
-void started()
+void recording_started()
 {
-	++detail::count;
+	++detail::recording_count;
+}
+
+const bool recording()
+{
+	return detail::recording_count > 0;
+}
+
+void recording_finished()
+{
+	detail::recording_count = std::max(0, detail::recording_count - 1);
+}
+
+void playback_started()
+{
+	++detail::playback_count;
 }
 
 const bool playing()
 {
-	return detail::count > 0;
+	return detail::playback_count > 0;
 }
 
-void finished()
+void playback_finished()
 {
-	detail::count = std::max(0, detail::count - 1);
+	detail::playback_count = std::max(0, detail::playback_count - 1);
 }
 
 } // namespace tutorial

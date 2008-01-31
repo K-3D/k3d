@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -273,9 +273,9 @@ public:
 		close();
 		handle_pending_events();
 
-		k3d::ngui::tutorial::started();
+		k3d::ngui::tutorial::playback_started();
 		execute_script(tutorial_code, tutorial_name, tutorial_context, tutorial_language);
-		k3d::ngui::tutorial::finished();
+		k3d::ngui::tutorial::playback_finished();
 
 		tutorial_message::instance().hide_messages();
 	}

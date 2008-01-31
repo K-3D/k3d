@@ -33,16 +33,19 @@ namespace ngui
 namespace tutorial
 {
 
-/// Call this to indicate that a tutorial has been started.
-/// Note that the tutorial playback state is maintained using a stack - each call to started() must receive a matching call to finished()
-void started();
+/// Call this to indicate that tutorial recording has been started.
+void recording_started();
+/// Returns true if a tutorial is currently being recorded
+const bool recording();
+/// Call this to indicate that tutorial recording has finished.
+void recording_finished();
 
-/// Returns true if tutorial is currently playing
+/// Call this to indicate that tutorial playback has been started.
+void playback_started();
+/// Returns true if a tutorial is currently playing
 const bool playing();
-
-/// Call this to indicate that a tutorial has finished.
-/// Note that the tutorial playback state is maintained using a stack - each call to finished() must match a corresponding call to started()
-void finished();
+/// Call this to indicate that tutorial playback has finished.
+void playback_finished();
 
 } // namespace tutorial
 

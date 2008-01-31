@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,18 +18,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_window.h"
-#include "file_chooser_dialog.h"
-
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/log.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/result.h>
@@ -40,16 +41,24 @@
 #include <gtkmm/label.h>
 #include <gtk/gtk.h>
 
-namespace libk3dngui
+using namespace libk3dngui;
+
+namespace module
 {
 
-class test_case_recorder :
+namespace ngui
+{
+
+namespace test_case_recorder
+{
+
+class dialog :
 	public application_window
 {
 	typedef application_window base;
 
 public:
-	test_case_recorder(const k3d::filesystem::path& Path) :
+	dialog(const k3d::filesystem::path& Path) :
 		base("test_case_recorder", 0),
 		m_script_engine(k3d::plugin::create<k3d::iscript_engine>(k3d::classes::PythonEngine())),
 		m_stream(Path)
@@ -67,10 +76,9 @@ public:
 		set_role("test_case_recorder");
 		show_all();
 
-		k3d::command_tree().command_signal().connect(sigc::mem_fun(*this, &test_case_recorder::on_command));
+		k3d::command_tree().command_signal().connect(sigc::mem_fun(*this, &dialog::on_command));
 	}
 
-private:
 	void on_command(k3d::icommand_node& Node, const k3d::icommand_node::type Type, const std::string& Command, const std::string& Arguments)
 	{
 		// Sanity checks ...
@@ -89,23 +97,63 @@ private:
 	boost::scoped_ptr<k3d::iscript_engine> m_script_engine;
 	/// Stores the output file stream
 	k3d::filesystem::ofstream m_stream;
+
+	/// Provides a custom plugin factory for creating test_case_recorder::dialog instances
+	class plugin_factory :
+		public k3d::plugin_factory,
+		public k3d::iapplication_plugin_factory
+	{
+	public:
+		plugin_factory() :
+			k3d::plugin_factory(k3d::uuid(0x35c7678c, 0x4b4a32cc, 0x552223be, 0x593772b9),
+				"NGUITestCaseRecorderDialog",
+				_(""),
+				"NGUI Dialogs",
+				k3d::iplugin_factory::EXPERIMENTAL)
+		{
+		}
+
+		virtual k3d::iunknown* create_plugin()
+		{
+			k3d::filesystem::path path;
+			{
+				file_chooser_dialog dialog(_("Save Test Case As:"), k3d::options::path::test_cases(), Gtk::FILE_CHOOSER_ACTION_SAVE);
+				dialog.add_pattern_filter(_("Python Script (*.py)"), "*.py");
+				dialog.append_extension(".py");
+				dialog.add_all_files_filter();
+
+				if(!dialog.get_file_path(path))
+					return 0;
+			}
+
+			return new dialog(path);
+		}
+
+		bool implements(const std::type_info& InterfaceType)
+		{
+			return false;
+		}
+
+		const interfaces_t interfaces()
+		{
+			return interfaces_t();
+		}
+	};
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static dialog::plugin_factory factory;
+		return factory;
+	}
 };
 
-void create_test_case_recorder()
-{
-	k3d::filesystem::path path;
-	{
-		file_chooser_dialog dialog(_("Save Test Case As:"), k3d::options::path::test_cases(), Gtk::FILE_CHOOSER_ACTION_SAVE);
-		dialog.add_pattern_filter(_("Python Script (*.py)"), "*.py");
-		dialog.append_extension(".py");
-		dialog.add_all_files_filter();
+} // namespace test_case_recorder
 
-		if(!dialog.get_file_path(path))
-			return;
-	}
+} // namespace ngui
 
-	new test_case_recorder(path);
-}
+} // namespace module
 
-} // namespace libk3dngui
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::test_case_recorder::dialog::get_factory());
+K3D_MODULE_END
 

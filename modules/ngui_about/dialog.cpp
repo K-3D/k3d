@@ -19,15 +19,13 @@
 
 #include <k3d-i18n-config.h>
 #include <k3d-version-config.h>
-
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/contributors.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/button.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/widget_manip.h>
-
-#include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/contributors.h>
-#include <k3dsdk/module.h>
 #include <k3dsdk/path.h>
 
 #include <gtkmm/box.h>
@@ -58,7 +56,7 @@ namespace about
 /////////////////////////////////////////////////////////////////////////////
 // dialog
 
-/// Creates a modal "about" box that displays program version and copyright
+/// Creates an "about" box that displays program version and copyright
 class dialog :
 	public libk3dngui::application_window
 {
@@ -479,6 +477,8 @@ public:
 		box->pack_start(*Gtk::manage(button_box));
 
 		add(*Gtk::manage(box));
+
+		show_all();
 	}
 
 	static k3d::iplugin_factory& get_factory()
