@@ -35,7 +35,6 @@
 #include "image_toggle_button.h"
 #include "interactive.h"
 #include "knife_tool.h"
-#include "log_window.h"
 #include "main_document_window.h"
 #include "menu_item.h"
 #include "menubar.h"
@@ -1273,10 +1272,13 @@ private:
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_file_bug_report))
 			<< set_accelerator_path("<k3d-document>/actions/help/file_bug_report", get_accel_group())));
 
-		menu->items().push_back(*Gtk::manage(
-		    new menu_item::control(Parent, "help_log_window", _("Open _Log Window ..."), true)
-		    << connect_menu_item(sigc::ptr_fun(create_log_window))
-		    << set_accelerator_path("<k3d-document>/actions/help/open_log_window", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUILogDialog"))
+		{
+			menu->items().push_back(*Gtk::manage(
+			    new menu_item::control(Parent, "help_log_window", _("Open _Log Window ..."), true)
+			    << connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_open_log_window))
+			    << set_accelerator_path("<k3d-document>/actions/help/open_log_window", get_accel_group())));
+		}
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
@@ -2435,6 +2437,14 @@ private:
 	void on_help_file_bug_report()
 	{
 		assert_error(k3d::system::spawn_async("k3d-bug-buddy"));
+	}
+
+	void on_help_open_log_window()
+	{
+		Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUILogDialog");
+		return_if_fail(window);
+
+		window->set_transient_for(*this);
 	}
 
 	void on_help_manual()

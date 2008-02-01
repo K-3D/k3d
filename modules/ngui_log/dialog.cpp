@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,30 +21,39 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_window.h"
-#include "console.h"
-
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/log_control.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/application_window.h>
+#include <k3dsdk/ngui/console.h>
 
 #include <gtkmm/texttag.h>
 
 #include <sstream>
 
-namespace libk3dngui
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
+{
+
+namespace log
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// log_window
+// dialog
 
-/// Implements a menu of available tutorials
-class log_window :
+/// Provides a window for viewing the contents of the K-3D log
+class dialog :
 	public application_window
 {
 	typedef application_window base;
 
 public:
-	log_window() :
+	dialog() :
 		base("log_window", 0),
 		console(Gtk::manage(new console::control(*this, "console")))
 	{
@@ -69,13 +78,12 @@ public:
 
 		add(*console);
 
-		k3d::get_log_cache(sigc::mem_fun(*this, &log_window::on_log_message));
-		k3d::connect_log_message(sigc::mem_fun(*this, &log_window::on_log_message));
+		k3d::get_log_cache(sigc::mem_fun(*this, &dialog::on_log_message));
+		k3d::connect_log_message(sigc::mem_fun(*this, &dialog::on_log_message));
 
 		show_all();
 	}
 
-private:
 	void on_log_message(const time_t Timestamp, const k3d::log_level_t Level, const std::string& Message)
 	{
 		std::string timestamp(256, '\0');
@@ -133,12 +141,27 @@ private:
 	Glib::RefPtr<Gtk::TextTag> warning_tag;
 	Glib::RefPtr<Gtk::TextTag> debug_tag;
 	Glib::RefPtr<Gtk::TextTag> default_tag;
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<dialog> factory(
+			k3d::uuid(0xe552df91, 0x264b17ad, 0x6e65cd9d, 0x208bdfe7),
+			"NGUILogDialog",
+			_("Displays the contents of the K-3D log"),
+			"NGUI Dialogs",
+			k3d::iplugin_factory::EXPERIMENTAL);
+
+		return factory;
+	}
 };
 
-void create_log_window()
-{
-	new log_window();
-}
+} // namespace log
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::log::dialog::get_factory());
+K3D_MODULE_END
 
