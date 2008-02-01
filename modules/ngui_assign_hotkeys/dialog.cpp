@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,16 +18,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_state.h"
-#include "application_window.h"
-#include "assign_hotkeys_dialog.h"
-#include "button.h"
-#include "widget_manip.h"
-
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/application_window.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/widget_manip.h>
+#include <k3dsdk/module.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/buttonbox.h>
@@ -35,18 +35,26 @@
 #include <gtkmm/settings.h>
 #include <gtkmm/stock.h>
 
-namespace libk3dngui
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
+{
+
+namespace assign_hotkeys
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// assign_hotkeys_dialog
+// dialog
 
-class assign_hotkeys_dialog :
+class dialog :
 	public application_window
 {
 	typedef application_window base;
 public:
-	assign_hotkeys_dialog() :
+	dialog() :
 		base("assign_hotkeys", 0)
 	{
 		is_open = true;
@@ -58,7 +66,7 @@ public:
 		Gtk::HButtonBox* const box2 = new Gtk::HButtonBox(Gtk::BUTTONBOX_END);
 		box2->pack_start(*Gtk::manage(
 			new button::control(*this, "close", Gtk::Stock::CLOSE)
-			<< connect_button(sigc::mem_fun(*this, &assign_hotkeys_dialog::close))
+			<< connect_button(sigc::mem_fun(*this, &dialog::close))
 			), Gtk::PACK_SHRINK);
 
 		Gtk::VBox* const box1 = new Gtk::VBox(false, 10);
@@ -76,7 +84,7 @@ public:
 		Gtk::Settings::get_default()->property_gtk_can_change_accels() = true;
 	}
 
-	~assign_hotkeys_dialog()
+	~dialog()
 	{
 		Gtk::Settings::get_default()->property_gtk_can_change_accels() = false;
 
@@ -85,17 +93,57 @@ public:
 	}
 
 	static bool is_open;
+
+	/// Provides a custom plugin factory for creating assign_hotkeys::dialog instances
+	class plugin_factory :
+		public k3d::plugin_factory,
+		public k3d::iapplication_plugin_factory
+	{
+	public:
+		plugin_factory() :
+			k3d::plugin_factory(k3d::uuid(0x5924a92d, 0x664e6000, 0xaa69218f, 0x6cbc7e5c),
+				"NGUIAssignHotkeysDialog",
+				_(""),
+				"NGUI Dialogs",
+				k3d::iplugin_factory::EXPERIMENTAL)
+		{
+		}
+
+		virtual k3d::iunknown* create_plugin()
+		{
+			if(dialog::is_open)
+				return 0;
+
+			return new dialog();
+		}
+
+		bool implements(const std::type_info& InterfaceType)
+		{
+			return false;
+		}
+
+		const interfaces_t interfaces()
+		{
+			return interfaces_t();
+		}
+	};
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static dialog::plugin_factory factory;
+		return factory;
+	}
 };
 
-bool assign_hotkeys_dialog::is_open = false;
+bool dialog::is_open = false;
 
-void assign_hotkeys()
-{
-	if(assign_hotkeys_dialog::is_open)
-		return;
+} // namespace assign_hotkeys
 
-	new assign_hotkeys_dialog();
-}
+} // namespace ngui
 
-} // namespace libk3dngui
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::assign_hotkeys::dialog::get_factory());
+K3D_MODULE_END
 

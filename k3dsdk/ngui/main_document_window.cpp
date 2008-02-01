@@ -23,7 +23,6 @@
 */
 
 #include "application_state.h"
-#include "assign_hotkeys_dialog.h"
 #include "button.h"
 #include "check_menu_item.h"
 #include "detail.h"
@@ -788,10 +787,13 @@ private:
 			<< set_accelerator_path("<k3d-document>/actions/edit/preferences", get_accel_group())));
 */
 
-		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "assign_hotkeys", _("Assign _Hotkeys"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_assign_hotkeys))
-			<< set_accelerator_path("<k3d-document>/actions/view/assign_hotkeys", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUIAssignHotkeysDialog"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new menu_item::control(Parent, "assign_hotkeys", _("Assign _Hotkeys"), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_assign_hotkeys))
+				<< set_accelerator_path("<k3d-document>/actions/view/assign_hotkeys", get_accel_group())));
+		}
 
 		return menu;
 	}
@@ -1320,7 +1322,9 @@ private:
 
 	void on_assign_hotkeys()
 	{
-		assign_hotkeys();
+		// Note: the plugin will only open one dialog at-a-time, so it isn't an error if we don't get one back ...
+		if(Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUIAssignHotkeysDialog"))
+			window->set_transient_for(*this);
 	}
 
 	void on_file_new()
