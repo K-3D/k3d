@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,14 +18,15 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_window.h"
-
-#include <k3dsdk/command_tree.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/log.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/string_cast.h>
 
@@ -34,7 +35,15 @@
 
 #include <ostream>
 
-namespace libk3dngui
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
+{
+
+namespace event_recorder
 {
 
 std::ostream& operator<<(std::ostream& Stream, const GdkEventButton& RHS)
@@ -55,13 +64,13 @@ std::ostream& operator<<(std::ostream& Stream, const GdkEventKey& RHS)
 	return Stream;
 }
 
-class event_recorder :
+class dialog :
 	public application_window
 {
 	typedef application_window base;
 
 public:
-	event_recorder() :
+	dialog() :
 		base("event_recorder", 0),
 		m_stream(k3d::log())
 	{
@@ -73,12 +82,11 @@ public:
 		set_role("event_recorder");
 		show_all();
 
-		k3d::command_tree().command_signal().connect(sigc::mem_fun(*this, &event_recorder::on_command));
+		k3d::command_tree().command_signal().connect(sigc::mem_fun(*this, &dialog::on_command));
 		gdk_event_handler_set(raw_on_gdk_event, this, NULL);
 	}
 
-private:
-	~event_recorder()
+	~dialog()
 	{
 		gdk_event_handler_set(GdkEventFunc(gtk_main_do_event), NULL, NULL);
 	}
@@ -209,18 +217,34 @@ private:
 	static void raw_on_gdk_event(GdkEvent* Event, gpointer Data)
 	{
 		if(Event && Data)
-			reinterpret_cast<event_recorder*>(Data)->on_gdk_event(*Event);
+			reinterpret_cast<dialog*>(Data)->on_gdk_event(*Event);
 
 		gtk_main_do_event(Event);
 	}
 
 	/// Stores the output file stream
 	std::ostream& m_stream;
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<dialog> factory(
+			k3d::uuid(0xbabb3819, 0x244163c5, 0xdec79daa, 0xf579ab3e),
+			"NGUIEventRecorderDialog",
+			_("Sends a stream of user interface events to stderr, primarily intended for troubleshooting"),
+			"NGUI Dialogs",
+			k3d::iplugin_factory::EXPERIMENTAL);
+
+		return factory;
+	}
 };
 
-void create_event_recorder()
-{
-	new event_recorder();
-}
+} // namespace event_recorder
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::event_recorder::dialog::get_factory());
+K3D_MODULE_END
+

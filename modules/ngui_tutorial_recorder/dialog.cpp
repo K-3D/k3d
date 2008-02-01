@@ -35,7 +35,6 @@
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/button.h>
 #include <k3dsdk/ngui/check_menu_item.h>
-#include <k3dsdk/ngui/event_recorder.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/image_menu_item.h>
@@ -148,9 +147,13 @@ public:
 				connect_menu_item(sigc::mem_fun(*this, &dialog::on_tools_command_node_inspector))));
 		}
 
-		tools_menu->items().push_back(*Gtk::manage(
-			new menu_item::control(*menubar, "tools_event_recorder", _("Event Recorder ...")) <<
-			connect_menu_item(sigc::mem_fun(*this, &dialog::on_tools_event_recorder))));
+		if(k3d::plugin::factory::lookup("NGUIEventRecorderDialog"))
+		{
+			tools_menu->items().push_back(*Gtk::manage(
+				new menu_item::control(*menubar, "tools_event_recorder", _("Event Recorder ...")) <<
+				connect_menu_item(sigc::mem_fun(*this, &dialog::on_tools_event_recorder))));
+		}
+
 		tools_menu->items().push_back(Gtk::Menu_Helpers::MenuElem(_("Script Language"), *language_menu));
 
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_File"), *file_menu));
@@ -382,7 +385,10 @@ public:
 
 	void on_tools_event_recorder()
 	{
-		create_event_recorder();
+		Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUIEventRecorderDialog");
+		return_if_fail(window);
+
+		window->set_transient_for(*this);
 	}
 
 	void on_script_changed()
