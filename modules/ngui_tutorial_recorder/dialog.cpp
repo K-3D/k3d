@@ -35,7 +35,6 @@
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/button.h>
 #include <k3dsdk/ngui/check_menu_item.h>
-#include <k3dsdk/ngui/command_node_inspector.h>
 #include <k3dsdk/ngui/event_recorder.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/ngui/icons.h>
@@ -142,9 +141,13 @@ public:
 
 		Gtk::Menu* const tools_menu = Gtk::manage(new Gtk::Menu());
 
-		tools_menu->items().push_back(*Gtk::manage(
-			new menu_item::control(*menubar, "tools_command_node_inspector", _("Command Node Inspector ...")) <<
-			connect_menu_item(sigc::mem_fun(*this, &dialog::on_tools_command_node_inspector))));
+		if(k3d::plugin::factory::lookup("NGUICommandNodeInspectorDialog"))
+		{
+			tools_menu->items().push_back(*Gtk::manage(
+				new menu_item::control(*menubar, "tools_command_node_inspector", _("Command Node Inspector ...")) <<
+				connect_menu_item(sigc::mem_fun(*this, &dialog::on_tools_command_node_inspector))));
+		}
+
 		tools_menu->items().push_back(*Gtk::manage(
 			new menu_item::control(*menubar, "tools_event_recorder", _("Event Recorder ...")) <<
 			connect_menu_item(sigc::mem_fun(*this, &dialog::on_tools_event_recorder))));
@@ -371,7 +374,10 @@ public:
 	
 	void on_tools_command_node_inspector()
 	{
-		create_command_node_inspector();
+		Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUICommandNodeInspectorDialog");
+		return_if_fail(window);
+
+		window->set_transient_for(*this);
 	}
 
 	void on_tools_event_recorder()

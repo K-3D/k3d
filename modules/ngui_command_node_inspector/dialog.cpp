@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,24 +18,23 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the command_node_inspector class
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_window.h"
-#include "asynchronous_update.h"
-#include "button.h"
-#include "command_node_inspector.h"
-#include "panel.h"
-#include "panel_frame.h"
-#include "widget_manip.h"
-
-#include <k3dsdk/command_tree.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/icommand_node.h>
 #include <k3dsdk/icommand_tree.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/application_window.h>
+#include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/panel_frame.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <glibmm/main.h>
 #include <gtkmm/buttonbox.h>
@@ -44,21 +43,29 @@
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 
-namespace libk3dngui
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
+{
+
+namespace command_node_inspector
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// command_node_inspector
+// dialog
 
 /// Provides an interactive UI for working with the k3d::icommand_tree hierarchy of k3d::icommand_node objects
-class command_node_inspector :
+class dialog :
 	public application_window,
 	public asynchronous_update
 {
 	typedef application_window base;
 
 public:
-	command_node_inspector() :
+	dialog() :
 		base("command_node_inspector", 0)
 	{
 		m_node_store = Gtk::TreeStore::create(m_node_columns);
@@ -72,7 +79,7 @@ public:
 		Gtk::TreeView* const tree = new Gtk::TreeView(m_node_store);
 		tree->set_headers_visible(true);
 		tree->append_column(_("Node"), m_node_columns.m_node_name);
-		tree->signal_row_activated().connect(sigc::mem_fun(*this, &command_node_inspector::on_select_row));
+		tree->signal_row_activated().connect(sigc::mem_fun(*this, &dialog::on_select_row));
 
 		Gtk::ScrolledWindow* const scrolled_window = new Gtk::ScrolledWindow();
 		scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
@@ -82,7 +89,7 @@ public:
 		box2->pack_start(*Gtk::manage(
 			new button::control(*this, "close", Gtk::Stock::CLOSE)
 			<< disable_recording()
-			<< connect_button(sigc::mem_fun(*this, &command_node_inspector::close))));
+			<< connect_button(sigc::mem_fun(*this, &dialog::close))));
 
 		Gtk::VBox* const box1 = new Gtk::VBox(false, 10);
 		box1->pack_start(*manage(scrolled_window), Gtk::PACK_EXPAND_WIDGET);
@@ -90,12 +97,11 @@ public:
 
 		add(*manage(box1));
 
-		k3d::command_tree().connect_changed_signal(sigc::mem_fun(*this, &command_node_inspector::on_command_tree_changed));
+		k3d::command_tree().connect_changed_signal(sigc::mem_fun(*this, &dialog::on_command_tree_changed));
 		schedule_update();
 		show_all();
 	}
 
-private:
 	/// Called by the signal system when the command tree is modified
 	void on_command_tree_changed()
 	{
@@ -171,12 +177,27 @@ private:
 
 	columns m_node_columns;
 	Glib::RefPtr<Gtk::TreeStore> m_node_store;
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<dialog> factory(
+			k3d::uuid(0x73080084, 0x084b4f76, 0x1a3b5a9f, 0x6f683d7b),
+			"NGUICommandNodeInspectorDialog",
+			_("Provides a graphical view of the command-node hierarchy"),
+			"NGUI Dialogs",
+			k3d::iplugin_factory::EXPERIMENTAL);
+
+		return factory;
+	}
 };
 
-void create_command_node_inspector()
-{
-	new command_node_inspector();
-}
+} // namespace command_node_inspector
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::command_node_inspector::dialog::get_factory());
+K3D_MODULE_END
 
