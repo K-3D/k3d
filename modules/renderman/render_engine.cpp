@@ -35,6 +35,7 @@
 #include <k3dsdk/inetwork_render_farm.h>
 #include <k3dsdk/inetwork_render_frame.h>
 #include <k3dsdk/inetwork_render_job.h>
+#include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irender_camera_animation.h>
 #include <k3dsdk/irender_camera_frame.h>
@@ -81,24 +82,6 @@ namespace libk3drenderman
 namespace detail
 {
 
-class setup_light
-{
-public:
-	explicit setup_light(const k3d::ri::render_state& State) :
-		state(State)
-	{
-	}
-
-	void operator()(k3d::inode* const Node)
-	{
-		if(k3d::ri::ilight* const light = dynamic_cast<k3d::ri::ilight*>(Node))
-			light->setup_renderman_light(state);
-	}
-
-private:
-	const k3d::ri::render_state& state;
-};
-
 class setup_texture
 {
 public:
@@ -121,42 +104,6 @@ private:
 	k3d::ri::ishader_collection& shaders;
 };
 
-class render
-{
-public:
-	explicit render(const k3d::ri::render_state& State) :
-		state(State)
-	{
-	}
-
-	void operator()(k3d::inode* const Node)
-	{
-		if(k3d::ri::irenderable* const renderable = dynamic_cast<k3d::ri::irenderable*>(Node))
-			renderable->renderman_render(state);
-	}
-
-private:
-	const k3d::ri::render_state& state;
-};
-
-class render_complete
-{
-public:
-	explicit render_complete(const k3d::ri::render_state& State) :
-		state(State)
-	{
-	}
-
-	void operator()(k3d::inode* const Node)
-	{
-		if(k3d::ri::irenderable* const renderable = dynamic_cast<k3d::ri::irenderable*>(Node))
-			renderable->renderman_render_complete(state);
-	}
-
-private:
-	const k3d::ri::render_state& state;
-};
-
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
@@ -164,6 +111,7 @@ private:
 
 class render_engine :
 	public k3d::persistent<k3d::node>,
+	public k3d::inode_collection_sink,
 	public k3d::irender_camera_preview,
 	public k3d::irender_camera_frame,
 	public k3d::irender_camera_animation,
@@ -174,6 +122,8 @@ class render_engine :
 public:
 	render_engine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
+		m_visible_nodes(init_owner(*this) + init_name("visible_nodes") + init_label(_("Visible Nodes")) + init_description(_("A list of nodes that will be visible in the rendered output.")) + init_value(std::vector<k3d::inode*>())),
+		m_enabled_lights(init_owner(*this) + init_name("enabled_lights") + init_label(_("Enabled Lights")) + init_description(_("A list of light sources that will contribute to the rendered output.")) + init_value(std::vector<k3d::inode*>())),
 		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("Resolution")) + init_description(_("Choose a predefined image resolution")) + init_enumeration(k3d::resolution_values()) + init_value(std::string(""))),
 		m_render_engine(init_owner(*this) + init_name("render_engine") + init_label(_("Render Engine")) + init_description(_("Render Engine")) + init_value(k3d::options::default_render_engine("ri")) + init_values(render_engine_values())),
 		m_hider(init_owner(*this) + init_name("hider") + init_label(_("Hider")) + init_description(_("Hider Algorithm")) + init_value(std::string())),
@@ -247,6 +197,15 @@ public:
 		register_property_group(lens_group);
 
 		m_resolution.changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_resolution_changed));
+	}
+
+	const k3d::inode_collection_sink::properties_t node_collection_properties()
+	{
+		k3d::inode_collection_sink::properties_t results;
+		results.push_back(&m_visible_nodes);
+		results.push_back(&m_enabled_lights);
+
+		return results;
 	}
 
 	void on_resolution_changed(k3d::iunknown*)
@@ -687,13 +646,27 @@ private:
 			}
 
 			// Setup lights ...
-			std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::setup_light(state));
+			const k3d::inode_collection_property::nodes_t enabled_lights = m_enabled_lights.pipeline_value();
+			for(k3d::inode_collection_property::nodes_t::const_iterator node = enabled_lights.begin(); node != enabled_lights.end(); ++node)
+			{
+				if(k3d::ri::ilight* const light = dynamic_cast<k3d::ri::ilight*>(*node))
+					light->setup_renderman_light(state);
+			}
 
-			// Render objects ...
-			std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::render(state));
+			// Render nodes ...
+			const k3d::inode_collection_property::nodes_t visible_nodes = m_visible_nodes.pipeline_value();
+			for(k3d::inode_collection_property::nodes_t::const_iterator node = visible_nodes.begin(); node != visible_nodes.end(); ++node)
+			{
+				if(k3d::ri::irenderable* const renderable = dynamic_cast<k3d::ri::irenderable*>(*node))
+					renderable->renderman_render(state);
+			}
 
 			// Give nodes a chance to cleanup ...
-			std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::render_complete(state));
+			for(k3d::inode_collection_property::nodes_t::const_iterator node = visible_nodes.begin(); node != visible_nodes.end(); ++node)
+			{
+				if(k3d::ri::irenderable* const renderable = dynamic_cast<k3d::ri::irenderable*>(*node))
+					renderable->renderman_render_complete(state);
+			}
 
 			if(k3d::ri::last_sample(state))
 			{
@@ -723,6 +696,52 @@ private:
 		}
 	}
 
+	/// Helper class that limits the list of visible nodes to those that implement k3d::ri::irenderable
+	template<typename value_t, class name_policy_t>
+	class renderman_visible_nodes_property :
+		public k3d::data::writable_property<value_t, name_policy_t>,
+		public k3d::inode_collection_property
+	{
+		typedef k3d::data::writable_property<value_t, name_policy_t> base;
+
+	public:
+		bool property_allow(k3d::inode& Node)
+		{
+			return dynamic_cast<k3d::ri::irenderable*>(&Node) ? true : false;
+		}
+
+	protected:
+		template<typename init_t>
+		renderman_visible_nodes_property(const init_t& Init) :
+			base(Init)
+		{
+		}
+	};
+
+	/// Helper class that limits the list of enabled lights to those the implement k3d::ri::ilight
+	template<typename value_t, class name_policy_t>
+	class renderman_enabled_lights_property :
+		public k3d::data::writable_property<value_t, name_policy_t>,
+		public k3d::inode_collection_property
+	{
+		typedef k3d::data::writable_property<value_t, name_policy_t> base;
+
+	public:
+		bool property_allow(k3d::inode& Node)
+		{
+			return dynamic_cast<k3d::ri::ilight*>(&Node) ? true : false;
+		}
+
+	protected:
+		template<typename init_t>
+		renderman_enabled_lights_property(const init_t& Init) :
+			base(Init)
+		{
+		}
+	};
+
+	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, renderman_visible_nodes_property, node_collection_serialization) m_visible_nodes;
+	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, renderman_enabled_lights_property, node_collection_serialization) m_enabled_lights;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_render_engine;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_hider;
