@@ -24,7 +24,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/ibitmap_importer.h>
-#include <k3dsdk/ifile_format.h>
 #include <k3dsdk/path.h>
 
 #include <boost/assign/list_of.hpp>
@@ -43,7 +42,6 @@ namespace io
 // bitmap_importer
 
 class bitmap_importer :
-	public k3d::ifile_format,
 	public k3d::ibitmap_importer
 {
 public:

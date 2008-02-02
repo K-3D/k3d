@@ -29,7 +29,6 @@
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_exporter.h>
-#include <k3dsdk/ifile_format.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/ipersistent.h>
@@ -49,7 +48,6 @@ namespace libk3dk3dio
 
 /// Serializes a K-3D document using the native K-3D XML format
 class k3d_document_exporter :
-	public k3d::ifile_format,
 	public k3d::idocument_exporter
 {
 public:

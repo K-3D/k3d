@@ -34,7 +34,6 @@
 #include "idisplacement_shader_ri.h"
 #include "idocument_exporter.h"
 #include "idocument_importer.h"
-#include "ifile_format.h"
 #include "iimager_shader_ri.h"
 #include "ikeyframer.h"
 #include "ilight_gl.h"
@@ -178,7 +177,6 @@ void initialize_types()
 	register_type(typeid(k3d::icolor_source), "k3d::icolor_source");
 	register_type(typeid(k3d::idocument_exporter), "k3d::idocument_exporter");
 	register_type(typeid(k3d::idocument_importer), "k3d::idocument_importer");
-	register_type(typeid(k3d::ifile_format), "k3d::ifile_format");
 	register_type(typeid(k3d::ikeyframer), "k3d::ikeyframer");
 	register_type(typeid(k3d::ilong_source), "k3d::ilong_source");
 	register_type(typeid(k3d::imaterial), "k3d::imaterial");
