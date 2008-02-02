@@ -553,6 +553,7 @@ private:
 	}
 */
 
+	/// Helper class that limits the list of visible nodes to those that we can render
 	template<typename value_t, class name_policy_t>
 	class yafray_visible_nodes_property :
 		public k3d::data::writable_property<value_t, name_policy_t>,
@@ -574,6 +575,7 @@ private:
 		}
 	};
 
+	/// Helper class that limits the list of enabled lights to those the implement k3d::yafray::ilight
 	template<typename value_t, class name_policy_t>
 	class yafray_enabled_lights_property :
 		public k3d::data::writable_property<value_t, name_policy_t>,
