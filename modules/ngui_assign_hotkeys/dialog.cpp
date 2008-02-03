@@ -103,7 +103,7 @@ public:
 		plugin_factory() :
 			k3d::plugin_factory(k3d::uuid(0x5924a92d, 0x664e6000, 0xaa69218f, 0x6cbc7e5c),
 				"NGUIAssignHotkeysDialog",
-				_(""),
+				_("Provides a user-interface for assigning menu hotkeys."),
 				"NGUI Dialogs",
 				k3d::iplugin_factory::EXPERIMENTAL)
 		{

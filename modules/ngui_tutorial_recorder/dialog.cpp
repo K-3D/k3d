@@ -582,7 +582,7 @@ public:
 		static k3d::application_plugin_factory<dialog> factory(
 			k3d::uuid(0xb5ba9aa0, 0xb2428a8c, 0xb4a7e181, 0xaeca9126),
 			"NGUITutorialRecorderDialog",
-			_(""),
+			_("Provides a user interface for recording interactive tutorials."),
 			"NGUI Dialogs",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
