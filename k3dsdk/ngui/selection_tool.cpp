@@ -32,8 +32,25 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/property_collection.h>
 
+
 namespace libk3dngui
 {
+
+typedef k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) bool_property_t;
+
+namespace detail
+{
+
+/// Toggles the value of the given boolean property
+void toggle_property(bool_property_t& Property)
+{
+	if (Property.internal_value())
+		Property.set_value(false);
+	else
+		Property.set_value(true);
+}
+
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // selection_tool::implementation
@@ -136,23 +153,23 @@ public:
 	basic_viewport_input_model m_input_model;
 
 	/// Stores extended selection toggle
-	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_extended_mode;
+	bool_property_t m_extended_mode;
 	/// Stores extended component selection toggle
-	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_extended_component_mode;
+	bool_property_t m_extended_component_mode;
 	/// Store box selection / paint mode toggle
-	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_paint_mode;
+	bool_property_t m_paint_mode;
 	/// Enables double-click actions
-	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_double_click_mode;
+	bool_property_t m_double_click_mode;
 	/// Convert selection when switching selection modes
-	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_convert_selection;
+	bool_property_t m_convert_selection;
 	/// Keep selection when switching selection modes
-	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_keep_selection;
+	bool_property_t m_keep_selection;
 	/// Pick backfacing elements
-	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_pick_backfacing;
+	bool_property_t m_pick_backfacing;
 	/// Paint-select backfacing elements
-	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_paint_backfacing;
+	bool_property_t m_paint_backfacing;
 	/// Rubber-band select backfacing elements
-	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_rubber_band_backfacing;
+	bool_property_t m_rubber_band_backfacing;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -180,7 +197,24 @@ const k3d::icommand_node::result selection_tool::execute_command(const std::stri
 	result = m_implementation->m_navigation_model.execute_command(Command, Arguments);
 	if(result != RESULT_UNKNOWN_COMMAND)
 		return result;
-
+	
+	// Allow access to selection options
+	if (Command == "toggle_pick_backfacing")
+	{
+		detail::toggle_property(m_implementation->m_pick_backfacing);
+		return RESULT_CONTINUE;
+	}
+	if (Command == "toggle_paint_backfacing")
+	{
+		detail::toggle_property(m_implementation->m_paint_backfacing);
+		return RESULT_CONTINUE;
+	}
+	if (Command == "toggle_rubber_band_backfacing")
+	{
+		detail::toggle_property(m_implementation->m_rubber_band_backfacing);
+		return RESULT_CONTINUE;
+	}
+	
 	return RESULT_UNKNOWN_COMMAND;
 }
 
