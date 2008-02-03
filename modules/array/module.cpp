@@ -24,8 +24,10 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the array plugin module, to protect public symbols from name clashes with other modules
-namespace libk3darray
+namespace module
+{
+
+namespace array
 {
 
 //extern k3d::iplugin_factory& cube_face_environment_map_factory();
@@ -39,16 +41,18 @@ extern k3d::iplugin_factory& translate_array_1d_factory();
 extern k3d::iplugin_factory& translate_array_2d_factory();
 extern k3d::iplugin_factory& translate_array_3d_factory();
 
-} // namespace libk3darray
+} // namespace array
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3darray::alternate_array_1d_factory());
-	Registry.register_factory(libk3darray::alternate_array_2d_factory());
-	Registry.register_factory(libk3darray::alternate_array_3d_factory());
-	Registry.register_factory(libk3darray::rotate_array_1d_factory());
-	Registry.register_factory(libk3darray::rotate_array_2d_factory());
-	Registry.register_factory(libk3darray::rotate_array_3d_factory());
-	Registry.register_factory(libk3darray::translate_array_1d_factory());
-	Registry.register_factory(libk3darray::translate_array_2d_factory());
-	Registry.register_factory(libk3darray::translate_array_3d_factory());
+	Registry.register_factory(module::array::alternate_array_1d_factory());
+	Registry.register_factory(module::array::alternate_array_2d_factory());
+	Registry.register_factory(module::array::alternate_array_3d_factory());
+	Registry.register_factory(module::array::rotate_array_1d_factory());
+	Registry.register_factory(module::array::rotate_array_2d_factory());
+	Registry.register_factory(module::array::rotate_array_3d_factory());
+	Registry.register_factory(module::array::translate_array_1d_factory());
+	Registry.register_factory(module::array::translate_array_2d_factory());
+	Registry.register_factory(module::array::translate_array_3d_factory());
 K3D_MODULE_END

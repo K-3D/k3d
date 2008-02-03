@@ -27,7 +27,10 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3darray
+namespace module
+{
+
+namespace array
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -73,5 +76,7 @@ k3d::iplugin_factory& translate_array_1d_factory()
 	return translate_array_1d::get_factory();
 }
 
-} // namespace libk3darray
+} // namespace array
+
+} // namespace module
 

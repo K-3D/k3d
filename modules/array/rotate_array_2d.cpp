@@ -27,7 +27,10 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3darray
+namespace module
+{
+
+namespace array
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -80,5 +83,7 @@ k3d::iplugin_factory& rotate_array_2d_factory()
 	return rotate_array_2d::get_factory();
 }
 
-} // namespace libk3darray
+} // namespace array
+
+} // namespace module
 

@@ -20,15 +20,18 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <k3dsdk/data.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
 #include <k3dsdk/itransform_array_1d.h>
 #include <k3dsdk/itransform_array_2d.h>
 #include <k3dsdk/itransform_array_3d.h>
 #include <k3dsdk/node_change_signal.h>
 #include <k3dsdk/signal_slots.h>
 
-namespace libk3darray
+namespace module
+{
+
+namespace array
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -166,7 +169,9 @@ private:
 	bool m_processing;
 };
 
-} // namespace libk3darray
+} // namespace namespace array
+
+} // namespace module
 
 #endif // !DETAIL_H
 
