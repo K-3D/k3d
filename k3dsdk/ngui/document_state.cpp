@@ -1630,7 +1630,7 @@ public:
 	        return (1 == nodes.size()) ? *nodes.begin() : 0;
 	}
 
-	k3d::inode* create_node(k3d::iplugin_factory* const Factory)
+	k3d::inode* create_node(k3d::iplugin_factory* Factory)
 	{
 		return_val_if_fail(Factory, 0);
 
@@ -1644,8 +1644,12 @@ public:
 		k3d::inode* const node = k3d::plugin::create<k3d::inode>(*Factory, m_document, node_name);
 		return_val_if_fail(node, 0);
 
-		// We will select the new node right away ...
+		// Keep track of the node to be selected ...
 		k3d::inode* to_be_selected = node;
+
+		// Keep track of every new node created ...
+		std::vector<k3d::inode*> new_nodes;
+		new_nodes.push_back(node);
 
 		// Prepare to make connections to other nodes ...
 		k3d::ipipeline::dependencies_t dependencies;
@@ -1656,6 +1660,8 @@ public:
 		{
 			// Create a mesh instance ...
 			k3d::inode* const mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), node_name + " Instance"));
+
+			new_nodes.push_back(mesh_instance);
 
 			// Assign a default painter ...
 			k3d::property::set_internal_value(*mesh_instance, "gl_painter", default_gl_painter());
@@ -1701,12 +1707,35 @@ public:
 			}
 		}
 
-		// If the new node is a render-engine, make every node in the document visible ...
+		// If the new node is a render-engine, default to making every node in the document visible ...
 		if(k3d::inode_collection_sink* const node_collection_sink = dynamic_cast<k3d::inode_collection_sink*>(node))
 		{
 			const k3d::inode_collection_sink::properties_t properties = node_collection_sink->node_collection_properties();
 			for(k3d::inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
 				k3d::property::set_internal_value(**property, document().nodes().collection());
+		}
+
+		// By default, make the new node visible in any node collection sinks that already exist ...
+		const k3d::inode_collection::nodes_t::const_iterator doc_node_end = document().nodes().collection().end();
+		for(k3d::inode_collection::nodes_t::const_iterator doc_node = document().nodes().collection().begin(); doc_node != doc_node_end; ++doc_node)
+		{
+			if(k3d::inode_collection_sink* const node_collection_sink = dynamic_cast<k3d::inode_collection_sink*>(*doc_node))
+			{
+				const k3d::inode_collection_sink::properties_t properties = node_collection_sink->node_collection_properties();
+				for(k3d::inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+				{
+					if(k3d::inode_collection_property* const node_collection_property = dynamic_cast<k3d::inode_collection_property*>(*property))
+					{
+						k3d::inode_collection_property::nodes_t nodes = k3d::property::internal_value<k3d::inode_collection_property::nodes_t>(**property);
+						for(k3d::uint_t i = 0; i != new_nodes.size(); ++i)
+						{
+							if(node_collection_property->property_allow(*new_nodes[i]))
+								nodes.push_back(new_nodes[i]);
+						}
+						k3d::property::set_internal_value(**property, nodes);
+					}
+				}
+			}
 		}
 
 		// Replace the current selection
@@ -2193,7 +2222,7 @@ document_state::pop_status_message_signal_t& document_state::pop_status_message_
 	return m_implementation->pop_status_message_signal();
 }
 
-k3d::inode* document_state::create_node(k3d::iplugin_factory* const Factory)
+k3d::inode* document_state::create_node(k3d::iplugin_factory* Factory)
 {
 	return m_implementation->create_node(Factory);
 }
