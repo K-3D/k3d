@@ -217,6 +217,7 @@ void initialize_types()
 	register_type(typeid(k3d::mesh*), "k3d::mesh*");
 	register_type(typeid(k3d::mesh_selection), "k3d::mesh_selection");
 	register_type(typeid(k3d::normal3), "k3d::normal3");
+	register_type(typeid(k3d::point2), "k3d::point");
 	register_type(typeid(k3d::point3), "k3d::point3");
 	register_type(typeid(k3d::point4), "k3d::point4");
 	register_type(typeid(k3d::ri::idisplacement_shader), "k3d::ri::idisplacement_shader");
@@ -235,6 +236,7 @@ void initialize_types()
 	register_type(typeid(k3d::uint32_t), "k3d::uint32_t");
 	register_type(typeid(k3d::uint64_t), "k3d::uint64_t");
 	register_type(typeid(k3d::uint8_t), "k3d::uint8_t");
+	register_type(typeid(k3d::vector2), "k3d::vector2");
 	register_type(typeid(k3d::vector3), "k3d::vector3");
 	register_type(typeid(k3d::yafray::ilight), "k3d::yafray::ilight");
 	register_type(typeid(k3d::yafray::imaterial), "k3d::yafray::imaterial");
