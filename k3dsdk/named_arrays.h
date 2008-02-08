@@ -29,7 +29,8 @@ namespace k3d
 
 class array;
 
-/// Defines a heterogeneous collection of named, shared arrays
+/// Defines a heterogeneous collection of named, shared arrays.
+/// For a concrete list of the datatypes that can be stored using named_arrays, see k3d::named_array_types.
 class named_arrays :
 	public std::map<std::string, boost::shared_ptr<array> >
 {

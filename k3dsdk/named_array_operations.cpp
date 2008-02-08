@@ -21,20 +21,15 @@
 	\author Timothy M. Shead
 */
 
-#include "algebra.h"
 #include "array.h"
-#include "inode.h"
 #include "named_array_operations.h"
-#include "normal3.h"
-#include "point2.h"
-#include "point3.h"
+#include "named_array_types.h"
 #include "result.h"
 #include "typed_array.h"
 #include "type_registry.h"
-#include "vector2.h"
-#include "vector3.h"
 
 #include <boost/bind.hpp>
+#include <boost/mpl/for_each.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/static_assert.hpp>
 
@@ -253,30 +248,8 @@ public:
 				continue;
 			}
 
-			if(create_copier<typed_array<k3d::bool_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::int8_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::int16_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::int32_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::int64_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::uint8_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::uint16_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::uint32_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::uint64_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::half_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::float_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::double_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::uint_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<k3d::string_t> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<point2> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<vector2> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<normal3> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<point3> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<vector3> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<point4> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<matrix4> >(source_array, target_array)) continue;
-			if(create_copier<typed_array<inode*> >(source_array, target_array)) continue;
-
-			log() << error << "unknown array type [" << demangle(typeid(*source_array)) << "] will not be copied" << std::endl;
+			if(!copier_factory::create_copier(source_array, target_array, copiers))
+				log() << error << "array [" << source_name << "] with unknown type [" << demangle(typeid(*source_array)) << "] will not be copied" << std::endl;
 		}
 
 		for(; source != source_end; ++source)
@@ -307,50 +280,80 @@ private:
 		virtual void push_back(const uint_t Count, const uint_t* Indices, const double_t* Weights) = 0;
 	};
 
-	/// array_copier implementation for value types that can be interpolated
-	template<typename array_t>
-	class typed_array_copier :
-		public array_copier
+	/// Defines storage for a collection of array copiers
+	typedef boost::ptr_vector<array_copier> copiers_t;
+
+	/// Helper class that instantiates array_copier objects based on the runtime type of source and target arrays
+	class copier_factory
 	{
 	public:
-		typed_array_copier(const array_t& Source, array_t& Target) :
-			source(Source),
-			target(Target)
+		static const bool create_copier(const array* Source, array* Target, copiers_t& Copiers)
 		{
+			bool result = false;
+			boost::mpl::for_each<named_array_types>(copier_factory(Source, Target, Copiers, result));
+			return result;
 		}
 
-		void push_back(const uint_t Index)
+		template<typename T>
+		void operator()(T)
 		{
-			target.push_back(source[Index]);
-		}
+			if(created)
+				return;
 
-		void push_back(const uint_t Count, const uint_t* Indices, const double_t* Weights)
-		{
-			target.push_back(weighted_sum(source, Count, Indices, Weights));
-		}
-
-	private:
-		const array_t& source;
-		array_t& target;
-	};
-
-	template<typename array_t>
-	bool create_copier(const array* Source, array* Target)
-	{
-		if(const array_t* const source = dynamic_cast<const array_t*>(Source))
-		{
-			if(array_t* const target = dynamic_cast<array_t*>(Target))
+			if(const typed_array<T>* const typed_source = dynamic_cast<const typed_array<T>* >(source))
 			{
-				copiers.push_back(new typed_array_copier<array_t>(*source, *target));
-				return true;
+				if(typed_array<T>* const typed_target = dynamic_cast<typed_array<T>* >(target))
+				{
+					copiers.push_back(new typed_array_copier<typed_array<T> >(*typed_source, *typed_target));
+					created = true;
+				}
 			}
 		}
 
-		return false;
-	}
+	private:
+		copier_factory(const array* Source, array* Target, copiers_t& Copiers, bool& Created) :
+			source(Source),
+			target(Target),
+			copiers(Copiers),
+			created(Created)
+		{
+		}
+
+		/// Concrete array_copier implementation that is templated on the array type
+		template<typename array_t>
+		class typed_array_copier :
+			public array_copier
+		{
+		public:
+			typed_array_copier(const array_t& Source, array_t& Target) :
+				source(Source),
+				target(Target)
+			{
+			}
+
+			void push_back(const uint_t Index)
+			{
+				target.push_back(source[Index]);
+			}
+
+			void push_back(const uint_t Count, const uint_t* Indices, const double_t* Weights)
+			{
+				target.push_back(weighted_sum(source, Count, Indices, Weights));
+			}
+
+		private:
+			const array_t& source;
+			array_t& target;
+		};
+
+		const array* const source;
+		array* const target;
+		copiers_t& copiers;
+		bool& created;
+	};
 
 	/// Stores a collection of array_copier objects that handle copying between each source/target pair of arrays
-	boost::ptr_vector<array_copier> copiers;
+	copiers_t copiers;
 };
 
 ////////////////////////////////////////////////////////////////////////////
