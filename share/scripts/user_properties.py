@@ -8,7 +8,8 @@ try:
 
 	cone.add_user_property("k3d::bool_t", "bool", "Boolean", "Boolean user property")
 	cone.add_user_property("k3d::color", "color", "Color", "Color user property")
-	cone.add_user_property("k3d::double_t", "double", "Double", "Double user property")	
+	cone.add_user_property("k3d::double_t", "double", "Double", "Double user property")
+	cone.add_user_property("k3d::int32_t", "integer", "Integer", "Integer user property")	
 	cone.add_user_property("k3d::matrix4", "matrix4", "Matrix4", "Matrix4 user property")	
 	cone.add_user_property("k3d::string_t", "string", "String", "String user property")	
 	cone.add_user_property("k3d::point3", "point3", "Point3", "Point user property")
