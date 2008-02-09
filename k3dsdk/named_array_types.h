@@ -21,6 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "algebra.h"
+#include "color.h"
 #include "inode.h"
 #include "normal3.h"
 #include "point2.h"
@@ -30,36 +31,34 @@
 #include "vector2.h"
 #include "vector3.h"
 
-#include <boost/mpl/vector/vector30.hpp>
+#include <boost/mpl/vector/vector20.hpp>
 
 namespace k3d
 {
 
 /// Enumerates all of the data types that can be stored using k3d::named_arrays.
 /// If you create a named array that stores a type not in this list, some operations will fail with runtime errors.
-typedef boost::mpl::vector22<
+typedef boost::mpl::vector20<
 	bool_t,
-	int8_t,
+	color,
+	double_t,
+	inode*,
 	int16_t,
 	int32_t,
 	int64_t,
-	uint8_t,
+	int8_t,
+	matrix4,
+	normal3,
+	point2,
+	point3,
+	point4,
+	string_t,
 	uint16_t,
 	uint32_t,
 	uint64_t,
-	uint_t,
-	half_t,
-	float_t,
-	double_t,
-	string_t,
-	point2,
+	uint8_t,
 	vector2,
-	normal3,
-	point3,
-	vector3,
-	point4,
-	matrix4,
-	inode*
+	vector3
 	> named_array_types;
 
 } // namespace k3d

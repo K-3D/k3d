@@ -25,6 +25,7 @@
 */
 
 #include "imaterial_python.h"
+#include "inode_python.h"
 
 #include <k3dsdk/typed_array.h>
 #include <boost/python.hpp>
@@ -187,6 +188,103 @@ public:
 			else
 			{
 				storage[i] = static_cast<k3d::imaterial*>(0);
+			}
+		}
+	}
+
+private:
+	array_type& wrapped()
+	{
+		if(!m_wrapped)
+			throw std::runtime_error("wrapped array is null");
+
+		return *m_wrapped;
+	}
+
+	array_type* const m_wrapped;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////
+// array
+
+template<>
+class array<typed_array<k3d::inode*> >
+{
+public:
+	typedef typed_array<k3d::inode*> array_type;
+
+	array() :
+		m_wrapped(0)
+	{
+	}
+
+	array(array_type& Array) :
+		m_wrapped(&Array)
+	{
+	}
+
+	int len()
+	{
+		return wrapped().size();
+	}
+
+	boost::python::object get_item(int item)
+	{
+		if(item < 0 || item >= wrapped().size())
+			throw std::out_of_range("index out-of-range");
+
+		k3d::inode* const result = wrapped().at(item);
+		return result ? boost::python::object(k3d::python::inode(result)) : boost::python::object();
+	}
+
+	void set_item(int item, const boost::python::object& value)
+	{
+		if(item < 0)
+			throw std::out_of_range("index out-of-range");
+
+		if(static_cast<size_t>(item) >= wrapped().size())
+			wrapped().resize(item + 1);
+
+		if(value)
+		{
+			k3d::python::inode node = boost::python::extract<k3d::python::inode>(value);
+			wrapped()[item] = &node.wrapped();
+		}
+		else
+		{
+			wrapped()[item] = static_cast<k3d::inode*>(0);
+		}
+	}
+
+	void append(const boost::python::object& Value)
+	{
+		if(Value)
+		{
+			k3d::python::inode node = boost::python::extract<k3d::python::inode>(Value);
+			wrapped().push_back(&node.wrapped());
+		}
+		else
+		{
+			wrapped().push_back(static_cast<k3d::inode*>(0));
+		}
+	}
+
+	void assign(const boost::python::list& Value)
+	{
+		array_type& storage = wrapped();
+
+		const size_t count = boost::python::len(Value);
+		storage.resize(count);
+		for(size_t i = 0; i != count; ++i)
+		{
+			if(Value[i])
+			{
+				k3d::python::inode node = boost::python::extract<k3d::python::inode>(Value[i]);
+				storage[i] = &node.wrapped();
+			}
+			else
+			{
+				storage[i] = static_cast<k3d::inode*>(0);
 			}
 		}
 	}

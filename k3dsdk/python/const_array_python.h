@@ -25,6 +25,7 @@
 */
 
 #include "imaterial_python.h"
+#include "inode_python.h"
 
 #include <k3dsdk/typed_array.h>
 #include <boost/python.hpp>
@@ -110,6 +111,51 @@ public:
 
 		k3d::imaterial* const result = wrapped().at(item);
 		return result ? boost::python::object(k3d::python::imaterial(result)) : boost::python::object();
+	}
+
+private:
+	array_type& wrapped()
+	{
+		if(!m_wrapped)
+			throw std::runtime_error("wrapped array is null");
+
+		return *m_wrapped;
+	}
+
+	array_type* const m_wrapped;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// const_array
+
+template<>
+class const_array<const typed_array<k3d::inode*> >
+{
+public:
+	typedef const typed_array<k3d::inode*> array_type;
+
+	const_array() :
+		m_wrapped(0)
+	{
+	}
+
+	const_array(array_type& Array) :
+		m_wrapped(&Array)
+	{
+	}
+
+	int len()
+	{
+		return wrapped().size();
+	}
+
+	boost::python::object get_item(int item)
+	{
+		if(item < 0 || item >= wrapped().size())
+			throw std::out_of_range("index out-of-range");
+
+		k3d::inode* const result = wrapped().at(item);
+		return result ? boost::python::object(k3d::python::inode(result)) : boost::python::object();
 	}
 
 private:

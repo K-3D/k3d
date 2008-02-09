@@ -57,14 +57,7 @@ public:
 private:
 	boost::python::object wrap_array(const k3d::array* const Array);
 
-	template<typename array_type>
-	boost::python::object create_typed_array(const std::string& Name)
-	{
-		k3d::typed_array<array_type>* const new_array = new k3d::typed_array<array_type>();
-		wrapped[Name].reset(new_array);
-		return boost::python::object(k3d::python::array<k3d::typed_array<array_type> >(*new_array));
-	}
-
+	class array_factory;
 	k3d::named_arrays& wrapped;
 };
 

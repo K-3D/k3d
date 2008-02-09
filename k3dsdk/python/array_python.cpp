@@ -26,7 +26,12 @@
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/vectors.h>
+#include <k3dsdk/normal3.h>
+#include <k3dsdk/point2.h>
+#include <k3dsdk/point3.h>
+#include <k3dsdk/point4.h>
+#include <k3dsdk/vector2.h>
+#include <k3dsdk/vector3.h>
 
 namespace k3d
 {
@@ -40,8 +45,14 @@ void export_arrays()
 		"Stores a mutable (read-write) collection of boolean values.");
 	export_array<k3d::typed_array<k3d::double_t> >("k3d_double_t_array",
 		"Stores a mutable (read-write) collection of floating-point values.");
-	export_array<k3d::typed_array<k3d::uint_t> >("k3d_uint_t_array",
-		"Stores a mutable (read-write) collection of unsigned integer values.");
+	export_array<k3d::typed_array<k3d::int8_t> >("k3d_int8_t_array",
+		"Stores a mutable (read-write) collection of 8-bit integer values.");
+	export_array<k3d::typed_array<k3d::int16_t> >("k3d_int16_t_array",
+		"Stores a mutable (read-write) collection of 16-bit integer values.");
+	export_array<k3d::typed_array<k3d::int32_t> >("k3d_int32_t_array",
+		"Stores a mutable (read-write) collection of 32-bit integer values.");
+	export_array<k3d::typed_array<k3d::int64_t> >("k3d_int64_t_array",
+		"Stores a mutable (read-write) collection of 64-bit integer values.");
 	export_array<k3d::typed_array<k3d::mesh::polyhedra_t::polyhedron_type> >("k3d_mesh_polyheda_t_polyhedron_type_array",
 		"Stores a mutable (read-write) collection of polyhedron type values.");
 	export_array<k3d::typed_array<k3d::mesh::blobbies_t::operator_type> >("k3d_mesh_blobbies_t_operator_type_array",
@@ -50,16 +61,32 @@ void export_arrays()
 		"Stores a mutable (read-write) collection of blobby primitive type values.");
 	export_array<k3d::typed_array<k3d::imaterial*> >("k3d_imaterial_array",
 		"Stores a mutable (read-write) collection of L{imaterial} objects.");
+	export_array<k3d::typed_array<k3d::inode*> >("k3d_inode_array",
+		"Stores a mutable (read-write) collection of L{inode} objects.");
 	export_array<k3d::typed_array<k3d::color> >("k3d_color_array",
 		"Stores a mutable (read-write) collection of L{color} values.");
 	export_array<k3d::typed_array<k3d::matrix4> >("k3d_matrix4_array",
 		"Stores a mutable (read-write) collection of L{matrix4} values.");
 	export_array<k3d::typed_array<k3d::normal3> >("k3d_normal3_array",
 		"Stores a mutable (read-write) collection of L{normal3} values.");
+	export_array<k3d::typed_array<k3d::point2> >("k3d_point2_array",
+		"Stores a mutable (read-write) collection of L{point2} values.");
 	export_array<k3d::typed_array<k3d::point3> >("k3d_point3_array",
 		"Stores a mutable (read-write) collection of L{point3} values.");
 	export_array<k3d::typed_array<k3d::point4> >("k3d_point4_array",
 		"Stores a mutable (read-write) collection of L{point4} values.");
+	export_array<k3d::typed_array<k3d::string_t> >("k3d_string_t_array",
+		"Stores a mutable (read-write) collection of string values.");
+	export_array<k3d::typed_array<k3d::uint8_t> >("k3d_uint8_t_array",
+		"Stores a mutable (read-write) collection of unsigned 8-bit integer values.");
+	export_array<k3d::typed_array<k3d::uint16_t> >("k3d_uint16_t_array",
+		"Stores a mutable (read-write) collection of unsigned 16-bit integer values.");
+	export_array<k3d::typed_array<k3d::uint32_t> >("k3d_uint32_t_array",
+		"Stores a mutable (read-write) collection of unsigned 32-bit integer values.");
+	export_array<k3d::typed_array<k3d::uint64_t> >("k3d_uint64_t_array",
+		"Stores a mutable (read-write) collection of unsigned 64-bit integer values.");
+	export_array<k3d::typed_array<k3d::vector2> >("k3d_vector2_array",
+		"Stores a mutable (read-write) collection of L{vector2} values.");
 	export_array<k3d::typed_array<k3d::vector3> >("k3d_vector3_array",
 		"Stores a mutable (read-write) collection of L{vector3} values.");
 }

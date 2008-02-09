@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -23,13 +23,8 @@
 
 #include "named_arrays_python.h"
 
-#include <k3dsdk/algebra.h>
-#include <k3dsdk/color.h>
-#include <k3dsdk/normal3.h>
-#include <k3dsdk/point3.h>
-#include <k3dsdk/point4.h>
+#include <k3dsdk/named_array_types.h>
 #include <k3dsdk/type_registry.h>
-#include <k3dsdk/vector3.h>
 
 using namespace boost::python;
 
@@ -38,6 +33,41 @@ namespace k3d
 
 namespace python
 {
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// named_arrays::array_factory
+
+class named_arrays::array_factory
+{
+public:
+	array_factory(const k3d::string_t& Name, const k3d::string_t& Type, boost::python::object& Array, k3d::named_arrays& Arrays) :
+		name(Name),
+		type(Type),
+		array(Array),
+		arrays(Arrays)
+	{
+	}
+
+	template<typename T>
+	void operator()(T) const
+	{
+		if(array != boost::python::object())
+			return;
+
+		if(type != k3d::type_string<T>())
+			return;
+
+		k3d::typed_array<T>* const new_array = new k3d::typed_array<T>();
+		arrays[name].reset(new_array);
+		array = boost::python::object(k3d::python::array<k3d::typed_array<T> >(*new_array));
+	}
+
+private:
+	k3d::string_t name;
+	k3d::string_t type;
+	boost::python::object& array;
+	k3d::named_arrays& arrays;
+};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // named_arrays
@@ -57,7 +87,7 @@ list named_arrays::array_names()
 	return results;
 }
 
-object named_arrays::array(const std::string& Name)
+object named_arrays::array(const k3d::string_t& Name)
 {
 	if(!wrapped.count(Name))
 		throw std::runtime_error("Unknown array name: " + Name);
@@ -65,27 +95,17 @@ object named_arrays::array(const std::string& Name)
 	return wrap_array(wrapped.find(Name)->second.get());
 }
 
-object named_arrays::create_array(const std::string& Name, const std::string& Type)
+object named_arrays::create_array(const k3d::string_t& Name, const k3d::string_t& Type)
 {
 	if(Name.empty())
 		throw std::runtime_error("Empty array name");
 
-	if(Type == k3d::type_string<double>())
-		return create_typed_array<double>(Name);
-	else if(Type == k3d::type_string<k3d::color>())
-		return create_typed_array<k3d::color>(Name);
-	else if(Type == k3d::type_string<k3d::point3>())
-		return create_typed_array<k3d::point3>(Name);
-	else if(Type == k3d::type_string<k3d::vector3>())
-		return create_typed_array<k3d::vector3>(Name);
-	else if(Type == k3d::type_string<k3d::normal3>())
-		return create_typed_array<k3d::normal3>(Name);
-	else if(Type == k3d::type_string<k3d::matrix4>())
-		return create_typed_array<k3d::matrix4>(Name);
-	else if(Type == k3d::type_string<k3d::point4>())
-		return create_typed_array<k3d::point4>(Name);
+	boost::python::object result;
+	boost::mpl::for_each<k3d::named_array_types>(array_factory(Name, Type, result, wrapped));
+	if(result == boost::python::object())
+		throw std::runtime_error("Cannot create array [" + Name + "] with unknown type [" + Name + "]");
 
-	throw std::runtime_error("Unknown type[" + Type + "] for array [" + Name + "]");
+	return result;
 }
 
 int named_arrays::len()

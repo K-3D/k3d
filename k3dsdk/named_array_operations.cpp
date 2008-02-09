@@ -150,6 +150,15 @@ string_t weighted_sum(const typed_array<string_t>& Source, const uint_t Count, c
 }
 
 /// Returns the weighted sum of a random-access subset of array values
+color weighted_sum(const typed_array<color>& Source, const uint_t Count, const uint_t* Indices, const double_t* Weights)
+{
+	color result;
+	for(uint_t i = 0; i != Count; ++i)
+		result = result + (Source[Indices[i]] * Weights[i]);
+	return result;
+}
+
+/// Returns the weighted sum of a random-access subset of array values
 point2 weighted_sum(const typed_array<point2>& Source, const uint_t Count, const uint_t* Indices, const double_t* Weights)
 {
 	point2 result;

@@ -236,6 +236,7 @@ K3D_ADD_TEST(offscreen.py PYTHON REQUIRES K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE)
 K3D_ADD_TEST(python.api.angle_axis.py PYTHON)
 K3D_ADD_TEST(python.api.get_dependency.py PYTHON)
 K3D_ADD_TEST(python.api.property.value.py PYTHON)
+K3D_ADD_TEST(python.api.named_arrays.py PYTHON)
 K3D_ADD_TEST(python.api.node.selection.py PYTHON)
 
 K3D_ADD_TEST(share.scripts.py PYTHON)
