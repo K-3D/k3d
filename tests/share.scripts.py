@@ -5,8 +5,7 @@ import k3d
 import glob
 import sys
 
-
-scripts = glob.glob("@share_SOURCE_DIR@/scripts/*.py")
+scripts = glob.glob(str(k3d.share_path()) + "/scripts/*.py")
 scripts.sort()
 
 failed_scripts = []

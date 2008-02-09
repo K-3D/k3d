@@ -20,6 +20,12 @@ class timer:
 	def elapsed(self):
 		return self.current_time() - self.start_time
 
+def source_path():
+	return os.environ["K3D_TEST_SOURCE_PATH"]
+
+def binary_path():
+	return os.environ["K3D_TEST_BINARY_PATH"]
+
 def create_camera(document):
 	
 	camera_view = document.new_node("ViewMatrix")
@@ -85,7 +91,7 @@ def create_default_painter(document):
 def setup_bitmap_reader_test(reader_name, source_file):
 	doc = k3d.new_document()
 	reader = doc.new_node(reader_name)
-	reader.file = "@CMAKE_CURRENT_SOURCE_DIR@/bitmaps/" + source_file
+	reader.file = source_path() + "/bitmaps/" + source_file
 
 	class result_object:
 		pass
@@ -99,7 +105,7 @@ def setup_bitmap_reader_test(reader_name, source_file):
 def setup_mesh_reader_test(reader_name, source_file):
 	doc = k3d.new_document()
 	reader = doc.new_node(reader_name)
-	reader.file = "@CMAKE_CURRENT_SOURCE_DIR@/meshes/" + source_file
+	reader.file = source_path() + "/meshes/" + source_file
 
 	class result_object:
 		pass
@@ -246,8 +252,8 @@ def bitmap_size_comparison(bitmap, width, height):
 
 def mesh_comparison(document, mesh, mesh_name, threshold):
 	
-	output_file = "@k3d-tests_BINARY_DIR@/" + mesh_name + ".output.k3d"
-	reference_file = "@k3d-tests_SOURCE_DIR@/meshes/" + mesh_name + ".reference.k3d"
+	output_file = binary_path() + "/" + mesh_name + ".output.k3d"
+	reference_file = source_path() + "/meshes/" + mesh_name + ".reference.k3d"
 	
 	reference = document.new_node("K3DMeshReader")
 	reference.file = reference_file
@@ -296,9 +302,9 @@ def assert_solid_mesh(mesh):
 
 def image_comparison(document, image, image_name, threshold):
 
-	output_file = "@k3d-tests_BINARY_DIR@/" + image_name + ".output.png"
-	reference_file = "@k3d-tests_SOURCE_DIR@/bitmaps/" + image_name + ".reference.png"
-	difference_file = "@k3d-tests_BINARY_DIR@/" + image_name + ".difference.png"
+	output_file = binary_path() + "/" + image_name + ".output.png"
+	reference_file = source_path() + "/bitmaps/" + image_name + ".reference.png"
+	difference_file = binary_path() + "/" + image_name + ".difference.png"
 
 	reference = document.new_node("PNGBitmapReader")
 	reference.file = reference_file

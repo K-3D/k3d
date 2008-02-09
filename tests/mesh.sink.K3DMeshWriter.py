@@ -1,11 +1,12 @@
 #python
 
 import k3d
+import testing
 
 doc = k3d.new_document()
 
 # We will be writing a temporary file ...
-file = "@k3d-tests_BINARY_DIR@/mesh.sink.K3DMeshWriter.k3d"
+file = testing.binary_path() + "/mesh.sink.K3DMeshWriter.k3d"
 
 # Create a simple polyhedron source ...
 source = doc.new_node("PolyCube")

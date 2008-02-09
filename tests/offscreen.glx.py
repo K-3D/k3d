@@ -1,8 +1,5 @@
 #python
 
-import sys
-sys.path.append("@k3d-tests_BINARY_DIR@")
-
 import k3d
 import testing
 

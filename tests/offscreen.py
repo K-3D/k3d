@@ -1,8 +1,5 @@
 #python
 
-import sys
-sys.path.append("@k3d-tests_BINARY_DIR@")
-
 import k3d
 import testing
 
@@ -19,7 +16,7 @@ torus.material = material
 camera = testing.create_camera(doc)
 render_engine = testing.create_opengl_engine(doc)
 
-camera_to_bitmap = doc.new_node("CameraToBitmap")
+camera_to_bitmap = doc.new_node("VirtualCameraToBitmap")
 camera_to_bitmap.camera = camera
 camera_to_bitmap.render_engine = render_engine
 

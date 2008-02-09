@@ -6,7 +6,7 @@ import testing
 document = k3d.new_document()
 
 reader = document.new_node("PLYMeshReader")
-reader.file = "@CMAKE_CURRENT_SOURCE_DIR@/meshes/bun_zipper_res4.ply"
+reader.file = testing.source_path() + "/meshes/bun_zipper_res4.ply"
 
 modifier = document.new_node("PGPRemesh")
 #modifier.use_smooth = True

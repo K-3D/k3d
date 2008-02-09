@@ -1,6 +1,7 @@
 #python
 
 import k3d
+import testing
 
 doc = k3d.new_document()
 
@@ -44,7 +45,7 @@ camera_to_bitmap.camera = camera
 camera_to_bitmap.render_engine = render_engine
 
 bitmap_writer = doc.new_node("PNGBitmapWriter")
-bitmap_writer.file = "@k3d-tests_BINARY_DIR@/offscreen.wgl.png"
+bitmap_writer.file = testing.binary_path() + "/offscreen.wgl.png"
 
 doc.set_dependency(bitmap_writer.get_property("input_bitmap"), camera_to_bitmap.get_property("output_bitmap"));
 
