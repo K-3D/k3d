@@ -1447,17 +1447,38 @@ void save_array(element& Container, element Storage, const boost::shared_ptr<con
 /////////////////////////////////////////////////////////////////////////////
 // save_typed_array
 
-template<typename value_type>
-bool save_typed_array(element& Container, const k3d::string_t& Name, array& Array, const ipersistent::save_context& Context)
+class save_typed_array
 {
-	if(typed_array<value_type>* const array = dynamic_cast<typed_array<value_type>*>(&Array))
+public:
+	save_typed_array(element& Container, const k3d::string_t& Name, array& AbstractArray, const ipersistent::save_context& Context, bool_t& Saved) :
+		container(Container),
+		name(Name),
+		abstract_array(AbstractArray),
+		context(Context),
+		saved(Saved)
 	{
-		save_array(Container, element("array", attribute("name", Name), attribute("type", type_string<value_type>())), *array, Context);
-		return true;
 	}
 
-	return false;
-}
+	template<typename T>
+	void operator()(T) const
+	{
+		if(saved)
+			return;
+
+		if(typed_array<T>* const concrete_array = dynamic_cast<typed_array<T>*>(&abstract_array))
+		{
+			save_array(container, element("array", attribute("name", name), attribute("type", type_string<T>())), *concrete_array, context);
+			saved = true;
+		}
+	}
+
+private:
+	element& container;
+	const k3d::string_t& name;
+	array& abstract_array;
+	const ipersistent::save_context& context;
+	k3d::bool_t& saved;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 // save_arrays
@@ -1485,20 +1506,10 @@ void save_arrays(element& Container, element Storage, const mesh::named_arrays& 
 			continue;
 		}
 
-		if(save_typed_array<bool>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<boost::int32_t>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<boost::uint32_t>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<double>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<k3d::color>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<k3d::matrix4>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<k3d::normal3>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<k3d::point3>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<k3d::point4>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<k3d::vector3>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<size_t>(container, name, *abstract_array, Context)) continue;
-		if(save_typed_array<k3d::string_t>(container, name, *abstract_array, Context)) continue;
-
-		k3d::log() << error << k3d_file_reference << ": array [" << name << "] with unknown type [" << demangle(typeid(*abstract_array)) << "] will not be serialized" << std::endl;
+		k3d::bool_t saved = false;
+		boost::mpl::for_each<named_array_types>(save_typed_array(container, name, *abstract_array, Context, saved));
+		if(!saved)
+			k3d::log() << error << k3d_file_reference << ": array [" << name << "] with unknown type [" << demangle(typeid(*abstract_array)) << "] will not be serialized" << std::endl;
 	}
 }
 
