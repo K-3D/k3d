@@ -23,7 +23,7 @@
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/iuser_interface.h>
-#include <k3dsdk/iuser_interface_plugin.h>
+#include <k3dsdk/ievent_loop.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
 
@@ -40,7 +40,7 @@ namespace nui
 
 /// Provides the Null User Interface, a do-nothing user interface plugin useful for executing scripts and as a starting-point for user interface authors
 class user_interface :
-	public k3d::iuser_interface_plugin,
+	public k3d::ievent_loop,
 	public k3d::iuser_interface
 {
 public:
@@ -127,7 +127,7 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<user_interface,
-			k3d::interface_list<k3d::iuser_interface_plugin> > factory(
+			k3d::interface_list<k3d::ievent_loop> > factory(
 			k3d::uuid(0x787f0380, 0x4aae4185, 0xb1611140, 0xaa1f5d79),
 			"NullUI",
 			"Null User Interface (NUI)",

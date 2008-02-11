@@ -280,7 +280,7 @@ void user_interface::get_command_line_arguments(boost::program_options::options_
 		;
 }
 
-const k3d::iuser_interface_plugin::arguments_t user_interface::parse_startup_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
+const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
 {
 	// Keep track of whether to display a splash screen or not ...
 	bool show_splash = true;
@@ -332,7 +332,7 @@ void user_interface::display_user_interface()
 	m_splash_box.reset();
 }
 
-const k3d::iuser_interface_plugin::arguments_t user_interface::parse_runtime_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
+const k3d::ievent_loop::arguments_t user_interface::parse_runtime_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
 {
 	return Arguments;
 }
@@ -408,7 +408,7 @@ k3d::iplugin_factory& user_interface::factory()
 k3d::iplugin_factory& user_interface::get_factory()
 {
 	static k3d::application_plugin_factory<user_interface,
-		k3d::interface_list<k3d::iuser_interface_plugin> > factory(
+		k3d::interface_list<k3d::ievent_loop> > factory(
 		k3d::uuid(0xc7c652c7, 0xfb4349fe, 0x9c7d52c4, 0x9f9e9d3f),
 		"QtUI",
 		"Qt User Interface (QTUI)",

@@ -51,7 +51,7 @@
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iuser_interface.h>
-#include <k3dsdk/iuser_interface_plugin.h>
+#include <k3dsdk/ievent_loop.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/properties.h>
@@ -173,7 +173,7 @@ void setup_default_hotkeys()
 class user_interface :
 	public k3d::command_node::implementation,
 	public k3d::iuser_interface,
-	public k3d::iuser_interface_plugin,
+	public k3d::ievent_loop,
 	public sigc::trackable
 {
 	typedef k3d::command_node::implementation base;
@@ -522,7 +522,7 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<user_interface,
-			k3d::interface_list<k3d::iuser_interface_plugin> > factory(
+			k3d::interface_list<k3d::ievent_loop> > factory(
 				k3d::uuid(0x444fbabf, 0x08164c85, 0x879751e7, 0x2d6d05b5),
 				"NextGenerationUI",
 				"Next Generation User Interface (NGUI)",

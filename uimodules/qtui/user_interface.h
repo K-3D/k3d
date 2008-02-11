@@ -28,7 +28,7 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/irender_viewport_gl.h>
 #include <k3dsdk/iuser_interface.h>
-#include <k3dsdk/iuser_interface_plugin.h>
+#include <k3dsdk/ievent_loop.h>
 
 #include <QComboBox>
 #include <QGLWidget>
@@ -131,7 +131,7 @@ private:
 
 /// Implements the Qt User Interface plugin
 class user_interface :
-	public k3d::iuser_interface_plugin,
+	public k3d::ievent_loop,
 	public k3d::iuser_interface
 {
 public:

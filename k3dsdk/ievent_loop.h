@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IUSER_INTERFACE_PLUGIN_H
-#define K3DSDK_IUSER_INTERFACE_PLUGIN_H
+#ifndef K3DSDK_IEVENT_LOOP_H
+#define K3DSDK_IEVENT_LOOP_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -37,12 +37,12 @@ namespace boost { namespace program_options { class options_description; } }
 namespace k3d
 {
 
-/// Abstract interface for user interface plugins
-class iuser_interface_plugin :
+/// Abstract interface for event loop (user interface) plugins
+class ievent_loop :
 	public virtual iunknown
 {
 public:
-	virtual ~iuser_interface_plugin() {}
+	virtual ~ievent_loop() {}
 
 	/// Called by the host application to retrieve descriptions of command-line arguments for this plugin
 	virtual void get_command_line_arguments(boost::program_options::options_description& Description) = 0;
@@ -62,12 +62,12 @@ public:
 	virtual void stop_event_loop() = 0;
 
 protected:
-	iuser_interface_plugin() {}
-	iuser_interface_plugin(const iuser_interface_plugin&) {}
-	iuser_interface_plugin& operator = (const iuser_interface_plugin&) { return *this; }
+	ievent_loop() {}
+	ievent_loop(const ievent_loop&) {}
+	ievent_loop& operator = (const ievent_loop&) { return *this; }
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_IUSER_INTERFACE_PLUGIN_H
+#endif // K3DSDK_IEVENT_LOOP_H
 

@@ -46,7 +46,7 @@
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iuser_interface.h>
-#include <k3dsdk/iuser_interface_plugin.h>
+#include <k3dsdk/ievent_loop.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/log_control.h>
 #include <k3dsdk/nodes.h>
@@ -104,7 +104,7 @@ k3d::filesystem::path g_share_path;
 k3d::filesystem::path g_user_interface_path;
 k3d::string_t g_plugin_paths;
 
-k3d::iuser_interface_plugin* g_user_interface = 0;
+k3d::ievent_loop* g_user_interface = 0;
 
 /////////////////////////////////////////////////////////////////////////////
 // handle_error
@@ -450,7 +450,7 @@ void create_user_interface(k3d::plugin_factory_collection& Plugins, bool& Quit, 
 		return;
 	}
 
-	g_user_interface = k3d::plugin::create<k3d::iuser_interface_plugin>(**Plugins.factories().begin());
+	g_user_interface = k3d::plugin::create<k3d::ievent_loop>(**Plugins.factories().begin());
 	if(!g_user_interface)
 	{
 		handle_error("UI plugin module [" + module_name + "] does not contain a user interface plugin", Quit, Error);
@@ -769,7 +769,7 @@ int main(int argc, char* argv[])
 		k3d::set_user_interface(*dynamic_cast<k3d::iuser_interface*>(g_user_interface));
 
 		// Ensure the user interface gets cleaned-up ...
-		boost::scoped_ptr<k3d::iuser_interface_plugin> ui_cleanup(g_user_interface);
+		boost::scoped_ptr<k3d::ievent_loop> ui_cleanup(g_user_interface);
 
 		// Give the UI a chance to handle command-line arguments ...
 		arguments = g_user_interface->parse_startup_arguments(arguments, quit, error);
