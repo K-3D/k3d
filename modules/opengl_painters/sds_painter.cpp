@@ -101,9 +101,6 @@ public:
 	{
 		if(!k3d::validate_polyhedra(Mesh))
 			return;
-			
-		if (!k3d::is_sds(Mesh))
-			return;
 
 		schedule_data<selection_t>(&Mesh, Hint, this);
 		schedule_data<sds_cache>(&Mesh, Hint, this);
@@ -158,13 +155,9 @@ protected:
 		face_visitor visitor;
 		Cache.visit_faces(visitor, m_levels.pipeline_value(), false);
 		
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &visitor.points_array[0]);
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_DOUBLE, 0, &visitor.normals_array[0]);
-		
 		k3d::uint_t face_count = visitor.face_starts.size();
 		const selection_records_t& face_selection_records = Selection.records();
+		glBegin(GL_QUADS);
 		if (!face_selection_records.empty())
 		{
 			for (selection_records_t::const_iterator record = face_selection_records.begin(); record != face_selection_records.end() && record->begin < face_count; ++record)
@@ -176,17 +169,23 @@ protected:
 				end = end > face_count ? face_count : end;
 				k3d::uint_t start_index = visitor.face_starts[start];
 				k3d::uint_t end_index = end == face_count ? visitor.indices.size() : visitor.face_starts[end];
-				glDrawElements(GL_QUADS, end_index-start_index, GL_UNSIGNED_INT, &visitor.indices[start_index]);
+				for (k3d::uint_t i = start_index; i != end_index; ++i)
+				{
+					k3d::gl::normal3d(k3d::to_vector(visitor.normals_array[visitor.indices[i]]));
+					k3d::gl::vertex3d(visitor.points_array[visitor.indices[i]]);
+				}
 			}
 		}
 		else
 		{ // empty selection, everything has the same color
-			color4d(color);
-			glDrawElements(GL_QUADS, visitor.indices.size(), GL_UNSIGNED_INT, &visitor.indices[0]);
+			k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(color.red, color.green, color.blue), color.alpha);
+			for (k3d::uint_t i = 0; i != visitor.indices.size(); ++i)
+			{
+				k3d::gl::normal3d(k3d::to_vector(visitor.normals_array[visitor.indices[i]]));
+				k3d::gl::vertex3d(visitor.points_array[visitor.indices[i]]);
+			}
 		}
-		
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_NORMAL_ARRAY);
+		glEnd();
 	}
 	virtual void select(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
@@ -206,17 +205,18 @@ protected:
 		face_visitor visitor;
 		Cache.visit_faces(visitor, m_levels.pipeline_value(), false);
 		
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &visitor.points_array[0]);
-		
 		for (k3d::uint_t face = 0; face != visitor.face_starts.size(); ++face)
 		{
 			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
-			
+			glBegin(GL_QUADS);
 			k3d::uint_t start_index = visitor.face_starts[face];
 			k3d::uint_t end_index = face == (visitor.face_starts.size()-1) ? visitor.indices.size() : visitor.face_starts[face+1]; 
-			glDrawElements(GL_QUADS, end_index-start_index, GL_UNSIGNED_INT, &visitor.indices[start_index]);
-			
+			for (k3d::uint_t i = start_index; i != end_index; ++i)
+			{
+				k3d::gl::normal3d(k3d::to_vector(visitor.normals_array[visitor.indices[i]]));
+				k3d::gl::vertex3d(visitor.points_array[visitor.indices[i]]);
+			}
+			glEnd();
 			k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
 		}
 	}
@@ -272,6 +272,7 @@ private:
 		
 		k3d::uint_t edge_count = visitor.edge_starts.size();
 		
+		glBegin(GL_LINES);
 		const selection_records_t& edge_selection_records = Selection.records();
 		if (!edge_selection_records.empty())
 		{
@@ -283,16 +284,21 @@ private:
 				end = end > edge_count ? edge_count : end;
 				k3d::uint_t start_index = visitor.edge_starts[start];
 				k3d::uint_t end_index = end == edge_count ? visitor.points_array.size() : visitor.edge_starts[end];
-				glDrawArrays(GL_LINES, start_index, end_index-start_index);
+				for (k3d::uint_t i = start_index; i != end_index; ++i)
+				{
+					k3d::gl::vertex3d(visitor.points_array[i]);
+				}
 			}
 		}
 		else
 		{ // empty selection, everything has the same color
 			color4d(color);
-			glDrawArrays(GL_LINES, 0, edge_count);
+			for (k3d::uint_t i = 0; i != edge_count; ++i)
+			{
+				k3d::gl::vertex3d(visitor.points_array[i]);
+			}
 		}
-		
-		glDisableClientState(GL_VERTEX_ARRAY);
+		glEnd();
 	}
 	
 	virtual void select(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
@@ -304,9 +310,6 @@ private:
 		edge_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops);
 		Cache.visit_borders(visitor, m_levels.pipeline_value(), false);
 		
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &visitor.points_array[0]);
-		
 		k3d::uint_t edge_count = visitor.edge_starts.size();
 		
 		for (k3d::uint_t edge = 0; edge != visitor.edge_starts.size(); ++edge)
@@ -315,12 +318,15 @@ private:
 			
 			k3d::uint_t start_index = visitor.edge_starts[edge];
 			k3d::uint_t end_index = edge == (edge_count-1) ? visitor.points_array.size() : visitor.edge_starts[edge+1];
-			glDrawArrays(GL_LINES, start_index, end_index-start_index);
+			glBegin(GL_LINES);
+			for (k3d::uint_t i = start_index; i != end_index; ++i)
+			{
+				k3d::gl::vertex3d(visitor.points_array[i]);
+			}
+			glEnd();
 			
 			k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
 		}
-		
-		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 };
 
@@ -374,9 +380,7 @@ private:
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &visitor.points_array[0]);
-		
+		glBegin(GL_POINTS);
 		const selection_records_t& point_selection_records = Selection.records();
 		if (!point_selection_records.empty())
 		{
@@ -386,16 +390,21 @@ private:
 				k3d::uint_t start = record->begin;
 				k3d::uint_t end = record->end;
 				end = end > point_count ? point_count : end;
-				glDrawArrays(GL_POINTS, start, end-start);
+				for (k3d::uint_t i = start; i != end; ++i)
+				{
+					k3d::gl::vertex3d(visitor.points_array[i]);
+				}
 			}
 		}
 		else
 		{ // empty selection, everything has the same color
 			color4d(color);
-			glDrawArrays(GL_POINTS, 0, point_count);
+			for (k3d::uint_t i = 0; i != point_count; ++i)
+			{
+				k3d::gl::vertex3d(visitor.points_array[i]);
+			}
 		}
-		
-		glDisableClientState(GL_VERTEX_ARRAY);
+		glEnd();
 	}
 	
 	virtual void select(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
@@ -414,11 +423,11 @@ private:
 		for (k3d::uint_t point = 0; point != point_count; ++point)
 		{
 			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, point);
-			glDrawArrays(GL_POINTS, point, 1);
+			glBegin(GL_POINTS);
+			k3d::gl::vertex3d(visitor.points_array[point]);
+			glEnd();
 			k3d::gl::pop_selection_token();
 		}
-		
-		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 };
 
