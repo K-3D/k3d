@@ -227,7 +227,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
+control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
 	base(2, 8, true),
 	ui_component(Name, &Parent),
 	m_implementation(new implementation(Model, StateRecorder))
@@ -287,7 +287,7 @@ void control::set_units(const std::type_info& Units)
 	on_data_changed();
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
+const k3d::icommand_node::result control::execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 {
 	try
 	{
@@ -443,7 +443,7 @@ void control::on_entry_activated()
 void control::on_manual_value()
 {
 	m_implementation->m_entry->select_region(0, 0);
-	const std::string new_text = m_implementation->m_entry->get_text();
+	const k3d::string_t new_text = m_implementation->m_entry->get_text();
 
 	// Default our results to the current value, in case it doesn't parse ...
 	const double original_value = m_implementation->m_model->value();

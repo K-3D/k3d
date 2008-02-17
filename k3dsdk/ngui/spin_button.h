@@ -27,6 +27,7 @@
 */
 
 #include "ui_component.h"
+#include <k3dsdk/types.h>
 #include <gtkmm/table.h>
 
 namespace k3d { class iproperty; }
@@ -64,8 +65,8 @@ protected:
 	imodel() {}
 
 private:
-	imodel(const imodel& RHS);
-	imodel& operator=(const imodel& RHS);
+	imodel(const imodel&);
+	imodel& operator=(const imodel&);
 };
 
 /// Factory method for creating an imodel object given a suitably-typed property
@@ -82,7 +83,7 @@ class control :
 	typedef Gtk::Table base;
 
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder);
+	control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder);
 	~control();
 
 	/// Sets the step increment between values when the user clicks on the up or down arrows
@@ -90,7 +91,7 @@ public:
 	/// Sets the physical unit-of-measure that should be used to display values
 	void set_units(const std::type_info& Units);
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
+	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments);
 
 private:
 	/// Creates up or down button
