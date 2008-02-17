@@ -21,24 +21,27 @@
 	\author Anders Dahnielson (anders@dahnielson.com)
 */
 
-#include "simple_bitmap_modifier.h"
+#include "simple_modifier.h"
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 
-namespace libk3dbitmap
+namespace module
+{
+
+namespace bitmap
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_gamma
+// gamma
 
-class bitmap_gamma :
-	public simple_bitmap_modifier
+class gamma :
+	public simple_modifier
 {
-	typedef simple_bitmap_modifier base;
+	typedef simple_modifier base;
 
 public:
-	bitmap_gamma(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	gamma(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_value(init_owner(*this) + init_name("value") + init_label(_("Gamma value")) + init_description(_("Apply gamma value to each pixel")) + init_value(1.0))
 	{
@@ -71,7 +74,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bitmap_gamma,
+		static k3d::document_plugin_factory<gamma,
 			k3d::interface_list<k3d::ibitmap_source,
 			k3d::interface_list<k3d::ibitmap_sink> > > factory(
 				k3d::uuid(0xa2ff08c9, 0x96e54063, 0x907ad507, 0xec36dd1c),
@@ -88,12 +91,14 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_gamma_factory
+// gamma_factory
 
-k3d::iplugin_factory& bitmap_gamma_factory()
+k3d::iplugin_factory& gamma_factory()
 {
-	return bitmap_gamma::get_factory();
+	return gamma::get_factory();
 }
 
-} // namespace libk3dbitmap
+} // namespace bitmap
+
+} // namespace module
 

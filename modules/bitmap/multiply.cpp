@@ -21,26 +21,29 @@
 		\author Anders Dahnielson (anders@dahnielson.com)
 */
 
-#include "simple_bitmap_modifier.h"
+#include "simple_modifier.h"
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 
-namespace libk3dbitmap
+namespace module
+{
+
+namespace bitmap
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_sub
+// multiply
 
-class bitmap_sub :
-	public simple_bitmap_modifier
+class multiply :
+	public simple_modifier
 {
-	typedef simple_bitmap_modifier base;
+	typedef simple_modifier base;
 
 public:
-	bitmap_sub(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	multiply(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_value(init_owner(*this) + init_name("value") + init_label(_("Subtract value")) + init_description(_("Subtract value to each pixel color component")) + init_value(0.0))
+		m_value(init_owner(*this) + init_name("value") + init_label(_("Multiplicand")) + init_description(_("Multiply each pixel component with this value")) + init_value(1.0))
 	{
 		m_value.changed_signal().connect(make_update_bitmap_slot());
 	}
@@ -55,9 +58,9 @@ public:
 		k3d::pixel operator()(const k3d::pixel& Input) const
 		{
 			return k3d::pixel(
-				boost::gil::get_color(Input, boost::gil::red_t()) - value,
-				boost::gil::get_color(Input, boost::gil::green_t()) - value,
-				boost::gil::get_color(Input, boost::gil::blue_t()) - value,
+				boost::gil::get_color(Input, boost::gil::red_t()) * value,
+				boost::gil::get_color(Input, boost::gil::green_t()) * value,
+				boost::gil::get_color(Input, boost::gil::blue_t()) * value,
 				boost::gil::get_color(Input, boost::gil::alpha_t()));
 		}
 
@@ -69,15 +72,15 @@ public:
 		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_value.pipeline_value()));
 	}
 
-
+	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bitmap_sub,
+		static k3d::document_plugin_factory<multiply,
 			k3d::interface_list<k3d::ibitmap_source,
 			k3d::interface_list<k3d::ibitmap_sink> > > factory(
-				k3d::uuid(0x51c8f52f, 0x53834926, 0x865e3592, 0xf0d09510),
-				"BitmapSubtract",
-				_("Subtract value from each pixel"),
+				k3d::uuid(0x03d2ac85, 0x37af4255, 0x956c0def, 0x82c3c753),
+				"BitmapMultiply",
+				_("Multiply value of each pixel"),
 				"Bitmap",
 				k3d::iplugin_factory::STABLE);
 
@@ -86,17 +89,18 @@ public:
 
 private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_value;
-	double m_value_cache;
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_sub_factory
+// multiply_factory
 
-k3d::iplugin_factory& bitmap_sub_factory()
+k3d::iplugin_factory& multiply_factory()
 {
-	return bitmap_sub::get_factory();
+	return multiply::get_factory();
 }
 
-} // namespace libk3dbitmap
+} // namespace bitmap
+
+} // namespace module
 
 

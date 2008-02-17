@@ -22,24 +22,27 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "simple_bitmap_modifier.h"
+#include "simple_modifier.h"
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 
-namespace libk3dbitmap
+namespace module
+{
+
+namespace bitmap
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_matte_invert
+// matte_invert
 
-class bitmap_matte_invert :
-	public simple_bitmap_modifier
+class matte_invert :
+	public simple_modifier
 {
-	typedef simple_bitmap_modifier base;
+	typedef simple_modifier base;
 
 public:
-	bitmap_matte_invert(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	matte_invert(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
@@ -63,7 +66,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bitmap_matte_invert,
+		static k3d::document_plugin_factory<matte_invert,
 			k3d::interface_list<k3d::ibitmap_source,
 			k3d::interface_list<k3d::ibitmap_sink> > > factory(
 				k3d::uuid(0x6856b0e9, 0x36b645d9, 0xb324d58b, 0x624072e9),
@@ -77,12 +80,14 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_matte_invert_factory
+// matte_invert_factory
 
-k3d::iplugin_factory& bitmap_matte_invert_factory()
+k3d::iplugin_factory& matte_invert_factory()
 {
-	return bitmap_matte_invert::get_factory();
+	return matte_invert::get_factory();
 }
 
-} // namespace libk3dbitmap
+} // namespace bitmap
+
+} // namespace module
 

@@ -21,24 +21,27 @@
 	\author Anders Dahnielson (anders@dahnielson.com)
 */
 
-#include "simple_bitmap_modifier.h"
+#include "simple_modifier.h"
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 
-namespace libk3dbitmap
+namespace module
+{
+
+namespace bitmap
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_add
+// add
 
-class bitmap_add :
-	public simple_bitmap_modifier
+class add :
+	public simple_modifier
 {
-	typedef simple_bitmap_modifier base;
+	typedef simple_modifier base;
 
 public:
-	bitmap_add(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	add(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_value(init_owner(*this) + init_name("value") + init_label(_("Add value")) + init_description(_("Add value to each pixel's Red, Green and Blue component")) + init_value(0.0))
 	{
@@ -71,7 +74,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bitmap_add,
+		static k3d::document_plugin_factory<add,
 			k3d::interface_list<k3d::ibitmap_source,
 			k3d::interface_list<k3d::ibitmap_sink> > > factory(
 				k3d::uuid(0x30d648f9, 0x74844196, 0x801a34f9, 0x6ff15920),
@@ -88,13 +91,14 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_add_factory
+// add
 
-k3d::iplugin_factory& bitmap_add_factory()
+k3d::iplugin_factory& add_factory()
 {
-	return bitmap_add::get_factory();
+	return add::get_factory();
 }
 
-} // namespace libk3dbitmap
+} // namespace bitmap
 
+} // namespace module
 

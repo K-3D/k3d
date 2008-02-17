@@ -2,7 +2,7 @@
 #define LIBK3DBITMAP_SIMPLE_BITMAP_MODIFIER_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,16 +24,19 @@
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/node.h>
 
-namespace libk3dbitmap
+namespace module
 {
 
-class simple_bitmap_modifier :
+namespace bitmap
+{
+
+class simple_modifier :
 	public k3d::bitmap_modifier<k3d::persistent<k3d::node> > 
 {
 	typedef k3d::bitmap_modifier<k3d::persistent<k3d::node> > base;
 
 public:
-	simple_bitmap_modifier(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	simple_modifier(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
@@ -45,7 +48,9 @@ private:
 	}
 };
 
-} // namespace libk3dbitmap
+} // namespace bitmap
+
+} // namespace module
 
 #endif // !LIBK3DBITMAP_SIMPLE_BITMAP_MODIFIER_H
 

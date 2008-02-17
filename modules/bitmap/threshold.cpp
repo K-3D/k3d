@@ -21,24 +21,27 @@
 		\author Anders Dahnielson (anders@dahnielson.com)
 */
 
-#include "simple_bitmap_modifier.h"
+#include "simple_modifier.h"
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 
-namespace libk3dbitmap
+namespace module
+{
+
+namespace bitmap
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_threshold
+// threshold
 
-class bitmap_threshold :
-	public simple_bitmap_modifier
+class threshold :
+	public simple_modifier
 {
-	typedef simple_bitmap_modifier base;
+	typedef simple_modifier base;
 
 public:
-	bitmap_threshold(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	threshold(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_red_threshold(init_owner(*this) + init_name("red_threshold") + init_label(_("Red threshold")) + init_description(_("Clamp Red channel to threshold")) + init_value(0.0)),
 		m_green_threshold(init_owner(*this) + init_name("geen_threshold") + init_label(_("Green threshold")) + init_description(_("Clamp Green channel to threshold")) + init_value(0.0)),
@@ -84,7 +87,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bitmap_threshold,
+		static k3d::document_plugin_factory<threshold,
 			k3d::interface_list<k3d::ibitmap_source,
 			k3d::interface_list<k3d::ibitmap_sink> > > factory(
 				k3d::uuid(0xcc8d625b, 0x970d4293, 0xa304d906, 0x81201d28),
@@ -104,12 +107,14 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_threshold_factory
+// threshold_factory
 
-k3d::iplugin_factory& bitmap_threshold_factory()
+k3d::iplugin_factory& threshold_factory()
 {
-	return bitmap_threshold::get_factory();
+	return threshold::get_factory();
 }
 
-} // namespace libk3dbitmap
+} // namespace bitmap
+
+} // namespace module
 

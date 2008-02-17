@@ -31,19 +31,22 @@
 
 #include <iterator>
 
-namespace libk3dbitmap
+namespace module
+{
+
+namespace bitmap
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_checker
+// checker
 
-class bitmap_checker :
+class checker :
 	public k3d::bitmap_source<k3d::persistent<k3d::node> >
 {
 	typedef k3d::bitmap_source<k3d::persistent<k3d::node> > base;
 
 public:
-	bitmap_checker(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	checker(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Bitmap width")) + init_value(64L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Bitmap height")) + init_value(64L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
@@ -79,7 +82,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bitmap_checker,
+		static k3d::document_plugin_factory<checker,
 			k3d::interface_list<k3d::ibitmap_source> > factory(
 				k3d::uuid(0x8d65a65f, 0x853e4460, 0xbc2ecbad, 0xce65b404),
 				"BitmapChecker",
@@ -100,12 +103,14 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_checker_factory
+// checker_factory
 
-k3d::iplugin_factory& bitmap_checker_factory()
+k3d::iplugin_factory& checker_factory()
 {
-	return bitmap_checker::get_factory();
+	return checker::get_factory();
 }
 
-} // namespace libk3dbitmap
+} // namespace bitmap
+
+} // namespace module
 

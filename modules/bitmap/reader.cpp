@@ -38,19 +38,22 @@
 
 #include <iterator>
 
-namespace libk3dbitmap
+namespace module
+{
+
+namespace bitmap
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_reader
+// reader
 
-class bitmap_reader :
+class reader :
 	public k3d::bitmap_source<k3d::persistent<k3d::node> >
 {
 	typedef k3d::bitmap_source<k3d::persistent<k3d::node> > base;
 
 public:
-	bitmap_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Browse for an input bitmap")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type(k3d::options::path::bitmaps()))
 	{
@@ -99,7 +102,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bitmap_reader,
+		static k3d::document_plugin_factory<reader,
 			k3d::interface_list<k3d::ibitmap_source> > factory(
 				k3d::classes::FileBitmap(),
 				"BitmapReader",
@@ -115,12 +118,14 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_reader_factory
+// reader_factory
 
-k3d::iplugin_factory& bitmap_reader_factory()
+k3d::iplugin_factory& reader_factory()
 {
-	return bitmap_reader::get_factory();
+	return reader::get_factory();
 }
 
-} // namespace libk3dbitmap
+} // namespace bitmap
+
+} // namespace module
 

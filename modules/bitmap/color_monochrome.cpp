@@ -21,24 +21,27 @@
 	\author Anders Dahnielson (anders@dahnielson.com)
 */
 
-#include "simple_bitmap_modifier.h"
+#include "simple_modifier.h"
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 
-namespace libk3dbitmap
+namespace module
+{
+
+namespace bitmap
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_color_monochrome
+// color_monochrome
 
-class bitmap_color_monochrome :
-	public simple_bitmap_modifier
+class color_monochrome :
+	public simple_modifier
 {
-	typedef simple_bitmap_modifier base;
+	typedef simple_modifier base;
 
 public:
-	bitmap_color_monochrome(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	color_monochrome(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_red_weight(init_owner(*this) + init_name("red_weight") + init_label(_("Red weight")) + init_description(_("Scale Red componnt value")) + init_value(0.3)),
 		m_green_weight(init_owner(*this) + init_name("green_weight") + init_label(_("Green weight")) + init_description(_("Scale Green component value")) + init_value(0.59)),
@@ -84,7 +87,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bitmap_color_monochrome,
+		static k3d::document_plugin_factory<color_monochrome,
 			k3d::interface_list<k3d::ibitmap_source,
 			k3d::interface_list<k3d::ibitmap_sink> > > factory(
 				k3d::uuid(0x73cd5356, 0x4d3d4eaf, 0xacda0d76, 0x8070a016),
@@ -103,13 +106,15 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_color_monochrome_factory
+// color_monochrome_factory
 
-k3d::iplugin_factory& bitmap_color_monochrome_factory()
+k3d::iplugin_factory& color_monochrome_factory()
 {
-	return bitmap_color_monochrome::get_factory();
+	return color_monochrome::get_factory();
 }
 
-} // namespace libk3dbitmap
+} // namespace bitmap
+
+} // namespace module
 
 

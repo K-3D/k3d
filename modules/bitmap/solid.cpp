@@ -29,19 +29,22 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 
-namespace libk3dbitmap
+namespace module
+{
+
+namespace bitmap
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_solid
+// solid
 
-class bitmap_solid :
+class solid :
 	public k3d::bitmap_source<k3d::persistent<k3d::node> >
 {
 	typedef k3d::bitmap_source<k3d::persistent<k3d::node> > base;
 
 public:
-	bitmap_solid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	solid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Bitmap width")) + init_value(64L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Bitmap height")) + init_value(64L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
@@ -70,7 +73,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bitmap_solid,
+		static k3d::document_plugin_factory<solid,
 			k3d::interface_list<k3d::ibitmap_source> > factory(
 				k3d::uuid(0x3e3b43f0, 0xcd21465c, 0x9c099aba, 0x8dc117d8),
 				"BitmapSolid",
@@ -88,11 +91,13 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_solid_factory
+// solid_factory
 
-k3d::iplugin_factory& bitmap_solid_factory()
+k3d::iplugin_factory& solid_factory()
 {
-	return bitmap_solid::get_factory();
+	return solid::get_factory();
 }
 
-} // namespace libk3dbitmap
+} // namespace bitmap
+
+} // namespace module
