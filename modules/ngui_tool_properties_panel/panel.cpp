@@ -20,7 +20,6 @@
 #include <k3d-i18n-config.h>
 
 #include <k3dsdk/ngui/angle_axis_control.h>
-#include <k3dsdk/ngui/aqsis_layer_chooser.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/bitmap_preview.h>
 #include <k3dsdk/ngui/bounding_box.h>
@@ -54,7 +53,6 @@
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/command_tree.h>
-#include <k3dsdk/iaqsis.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
@@ -258,7 +256,7 @@ public:
 				{
 					if(dynamic_cast<k3d::ienumeration_property*>(&property))
 					{
-						enumeration_chooser::control* const control = new enumeration_chooser::control(m_parent, property_name, enumeration_chooser::proxy(property, state_recorder, property_name));
+						enumeration_chooser::control* const control = new enumeration_chooser::control(m_parent, property_name, enumeration_chooser::model(property), state_recorder);
 						table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 						entry_list.push_back(control);
@@ -285,14 +283,6 @@ public:
 
 						entry_list.push_back(control);
 					}
-				}
-				// k3d::aqsis::ilayer_connection* properties
-				else if(k3d::aqsis::ilayer_connection_property* const layer_connection_property = dynamic_cast<k3d::aqsis::ilayer_connection_property*>(&property))
-				{
-					aqsis_layer_chooser::control* const control = new aqsis_layer_chooser::control(m_document_state, *layer_connection_property, m_parent, property_name, state_recorder);
-					table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-					entry_list.push_back(control);
 				}
 				// k3d::inode* properties ...
 				else if(property_type == typeid(k3d::inode*))

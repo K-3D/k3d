@@ -26,10 +26,9 @@
 
 #include "iunknown.h"
 #include "signal_system.h"
+#include "types.h"
 
 #include <boost/any.hpp>
-
-#include <string>
 
 namespace k3d
 {
@@ -44,11 +43,11 @@ public:
 	virtual ~iproperty() {}
 
 	/// Returns the property name, which will be used as a unique identifier for programmatic access to the property (i.e. through scripting)
-	virtual const std::string property_name() = 0;
+	virtual const string_t property_name() = 0;
 	/// Returns a human-readable lable for the property, which should be localized for display in UI code
-	virtual const std::string property_label() = 0;
+	virtual const string_t property_label() = 0;
 	/// Returns a human-readable "one-liner" description of the property, which should be localized for display in the UI (e.g. as a tooltip)
-	virtual const std::string property_description() = 0;
+	virtual const string_t property_description() = 0;
 	/// Returns the property type
 	virtual const std::type_info& property_type() = 0;
 	/// Returns the value stored internally by the property.  Note that most code that uses properties should retrieve the pipeline value instead.

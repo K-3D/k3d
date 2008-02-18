@@ -1698,13 +1698,8 @@ public:
 		// If the new node is a CGALBoolean node, add two mesh inputs
 		if(Factory->name() == "CGALBoolean")
 		{
-			k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(node);
-			k3d::ipersistent_container* const persistent_container = dynamic_cast<k3d::ipersistent_container*>(node);
-			if(property_collection && persistent_container)
-			{
-				k3d::user::create_property<k3d::user::k3d_mesh_property, k3d::mesh*>("input1", "Input 1", "", m_document, *property_collection, *persistent_container, node, 0);
-				k3d::user::create_property<k3d::user::k3d_mesh_property, k3d::mesh*>("input2", "Input 2", "", m_document, *property_collection, *persistent_container, node, 0);
-			}
+			k3d::property::create<k3d::mesh*>(*node, "input1", "Input 1", "", static_cast<k3d::mesh*>(0));
+			k3d::property::create<k3d::mesh*>(*node, "input2", "Input 2", "", static_cast<k3d::mesh*>(0));
 		}
 
 		// If the new node is a render-engine, default to making every node in the document visible ...

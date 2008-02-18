@@ -25,6 +25,8 @@
 */
 
 #include "iproperty_python.h"
+
+#include <k3dsdk/types.h>
 #include <boost/python/list.hpp>
 
 namespace k3d
@@ -44,14 +46,14 @@ public:
 	iproperty_collection(k3d::iproperty_collection* CommandNode);
 
 	boost::python::list properties();
-	iproperty get_property(const std::string& Name);
-	iproperty add_user_property(const std::string& Type, const std::string& Name, const std::string& Label, const std::string& Description);
-	iproperty add_ri_attribute(const std::string& Type, const std::string& List, const std::string& Name, const std::string& Label, const std::string& Description);
-	iproperty add_ri_option(const std::string& Type, const std::string& List, const std::string& Name, const std::string& Label, const std::string& Description);
-	bool has_property(const std::string& Name);
+	iproperty get_property(const string_t& Name);
+	iproperty create_property(const string_t& Type, const string_t& Name, const string_t& Label, const string_t& Description);
+	iproperty create_renderman_attribute(const string_t& Type, const string_t& List, const string_t& Name, const string_t& Label, const string_t& Description);
+	iproperty create_renderman_option(const string_t& Type, const string_t& List, const string_t& Name, const string_t& Label, const string_t& Description);
+	bool has_property(const string_t& Name);
 
-	boost::python::object getattr(const std::string& Name);
-	void setattr(const std::string& Name, const boost::python::object& Value);
+	boost::python::object getattr(const string_t& Name);
+	void setattr(const string_t& Name, const boost::python::object& Value);
 
 	static void define_class();
 };

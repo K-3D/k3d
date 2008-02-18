@@ -23,8 +23,9 @@
 */
 
 #include "algebra.h"
+#include "iattribute_property_ri.h"
 #include "imaterial_ri.h"
-#include "irenderman_property.h"
+#include "ioption_property_ri.h"
 #include "material.h"
 #include "renderable_ri.h"
 #include "render_state_ri.h"
@@ -125,20 +126,17 @@ void set_attributes(iproperty_collection& Properties, istream& Stream)
 {
 	const iproperty_collection::properties_t& properties = Properties.properties();
 
-	typedef std::map<std::string, parameter_list> parameter_lists_t;
+	typedef std::map<string_t, parameter_list> parameter_lists_t;
 	parameter_lists_t parameter_lists;
 
 	for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
 	{
-		if(irenderman_property* const renderman_property = dynamic_cast<irenderman_property*>(*property))
+		if(ri::iattribute_property* const attribute_property = dynamic_cast<ri::iattribute_property*>(*property))
 		{
-			if(renderman_property->property_parameter_list_type() != irenderman_property::ATTRIBUTE)
-				continue;
+			const string_t attribute_name = attribute_property->property_attribute_name();
+			const string_t parameter_name = (*property)->property_name();
 
-			const std::string parameter_list_name = renderman_property->property_parameter_list_name();
-			const std::string parameter_name = (*property)->property_name();
-
-			parameter_lists[parameter_list_name].push_back(parameter(parameter_name, UNIFORM, 1, (*property)->property_pipeline_value()));
+			parameter_lists[attribute_name].push_back(parameter(parameter_name, UNIFORM, 1, (*property)->property_pipeline_value()));
 		}
 	}
 
@@ -154,20 +152,17 @@ void set_options(iproperty_collection& Properties, istream& Stream)
 {
 	const iproperty_collection::properties_t& properties = Properties.properties();
 
-	typedef std::map<std::string, parameter_list> parameter_lists_t;
+	typedef std::map<string_t, parameter_list> parameter_lists_t;
 	parameter_lists_t parameter_lists;
 
 	for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
 	{
-		if(irenderman_property* const renderman_property = dynamic_cast<irenderman_property*>(*property))
+		if(ri::ioption_property* const option_property = dynamic_cast<ri::ioption_property*>(*property))
 		{
-			if(renderman_property->property_parameter_list_type() != irenderman_property::OPTION)
-				continue;
+			const string_t option_name = option_property->property_option_name();
+			const string_t parameter_name = (*property)->property_name();
 
-			const std::string parameter_list_name = renderman_property->property_parameter_list_name();
-			const std::string parameter_name = (*property)->property_name();
-
-			parameter_lists[parameter_list_name].push_back(parameter(parameter_name, UNIFORM, 1, (*property)->property_pipeline_value()));
+			parameter_lists[option_name].push_back(parameter(parameter_name, UNIFORM, 1, (*property)->property_pipeline_value()));
 		}
 	}
 

@@ -1,8 +1,8 @@
-#ifndef NGUI_USER_PROPERTY_H
-#define NGUI_USER_PROPERTY_H
+#ifndef NGUI_PROPERTIES_H
+#define NGUI_PROPERTIES_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,16 +24,26 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-namespace k3d { class icommand_node; }
-namespace k3d { class inode; }
-
-namespace libk3dngui
+namespace k3d
 {
 
-/// Displays a dialog for adding a new user property to a node
-void add_user_property_dialog(k3d::inode& Node, k3d::icommand_node& Parent);
+class icommand_node;
+class inode;
 
-} // namespace libk3dngui
+namespace ngui
+{
 
-#endif // NGUI_USER_PROPERTY_H
+namespace property
+{
+
+/// Displays a dialog for adding new properties to a node
+void create(inode& Node, icommand_node& Parent);
+
+} // namespace property
+
+} // namespace ngui
+
+} // namespace k3d
+
+#endif // NGUI_PROPERTIES_H
 

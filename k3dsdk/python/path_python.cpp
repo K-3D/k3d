@@ -66,6 +66,8 @@ void export_path()
 {
 	class_<k3d::filesystem::path>("path",
 		"Stores a filesystem path")
+		.def(self == self)
+		.def(self != self)
 		.def("root_path", &k3d::filesystem::path::root_path)
 		.def("root_name", root_name)
 		.def("root_directory", root_directory)

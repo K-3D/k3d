@@ -24,6 +24,7 @@
 #include "fstream.h"
 #include "k3d-i18n-config.h"
 #include "istate_container.h"
+#include "itexture_ri.h"
 #include "iuser_property.h"
 #include "options.h"
 #include "properties.h"
@@ -221,6 +222,11 @@ void shader::create_arguments()
 		if(argument->output)
 			continue;
 
+		const string_t& name = argument->name;
+		const string_t& label = argument->label;
+		const string_t& description = argument->description;
+		const string_t& default_value = argument->default_value;
+
 		switch(argument->extended_type)
 		{
 			case sl::argument::EX_FLOAT:
@@ -233,111 +239,48 @@ void shader::create_arguments()
 			case sl::argument::EX_FORCE:
 			case sl::argument::EX_PRESSURE:
 			{
-				undoable_new(
-					new user::k3d_double_t_property(
-						init_owner(*this)
-						+ init_name(make_token(argument->name.c_str()))
-						+ init_label(make_token(argument->label.c_str()))
-						+ init_description(make_token(argument->description.c_str()))
-						+ init_value(from_string<double>(argument->default_value, 0.0))),
-					document());
+				undoable_new(property::create<double_t>(*this, name, label, description, from_string<double>(default_value, 0.0)), document());
 				break;
 			}
 			case sl::argument::EX_STRING:
 			case sl::argument::EX_SPACE:
 			{
-				undoable_new(
-					new user::k3d_string_t_property(
-						init_owner(*this)
-						+ init_name(make_token(argument->name.c_str()))
-						+ init_label(make_token(argument->label.c_str()))
-						+ init_description(make_token(argument->description.c_str()))
-						+ init_value(argument->default_value)),
-					document());
+				undoable_new(property::create<string_t>(*this, name, label, description, default_value), document());
 				break;
 			}
 			case sl::argument::EX_TEXTURE:
 			{
-				undoable_new(
-					new user::k3d_ri_itexture_property(
-						init_owner(*this)
-						+ init_name(make_token(argument->name.c_str()))
-						+ init_label(make_token(argument->label.c_str()))
-						+ init_description(make_token(argument->description.c_str()))
-						+ init_value(static_cast<k3d::ri::itexture*>(0))),
-					document());
+				undoable_new(property::create<ri::itexture*>(*this, name, label, description, static_cast<k3d::ri::itexture*>(0)), document());
 				break;
 			}
 			case sl::argument::EX_POINT:
 			{
-				undoable_new(
-					new user::k3d_point3_property(
-						init_owner(*this)
-						+ init_name(make_token(argument->name.c_str()))
-						+ init_label(make_token(argument->label.c_str()))
-						+ init_description(make_token(argument->description.c_str()))
-						+ init_value(from_string<point3>(argument->default_value, point3(0, 0, 0)))),
-					document());
+				undoable_new(property::create<point3>(*this, name, label, description, from_string<point3>(default_value, point3(0, 0, 0))), document());
 				break;
 			}
 			case sl::argument::EX_VECTOR:
 			{
-				undoable_new(
-					new user::k3d_vector3_property(
-						init_owner(*this)
-						+ init_name(make_token(argument->name.c_str()))
-						+ init_label(make_token(argument->label.c_str()))
-						+ init_description(make_token(argument->description.c_str()))
-						+ init_value(from_string<vector3>(argument->default_value, vector3(0, 0, 0)))),
-					document());
+				undoable_new(property::create<vector3>(*this, name, label, description, from_string<vector3>(default_value, vector3(0, 0, 0))), document());
 				break;
 			}
 			case sl::argument::EX_NORMAL:
 			{
-				undoable_new(
-					new user::k3d_normal3_property(
-						init_owner(*this)
-						+ init_name(make_token(argument->name.c_str()))
-						+ init_label(make_token(argument->label.c_str()))
-						+ init_description(make_token(argument->description.c_str()))
-						+ init_value(from_string<normal3>(argument->default_value, normal3(0, 0, 0)))),
-					document());
+				undoable_new(property::create<normal3>(*this, name, label, description, from_string<normal3>(default_value, normal3(0, 0, 0))), document());
 				break;
 			}
 			case sl::argument::EX_HPOINT:
 			{
-				undoable_new(
-					new user::k3d_point4_property(
-						init_owner(*this)
-						+ init_name(make_token(argument->name.c_str()))
-						+ init_label(make_token(argument->label.c_str()))
-						+ init_description(make_token(argument->description.c_str()))
-						+ init_value(from_string<point4>(argument->default_value, point4(0, 0, 0, 0)))),
-					document());
+				undoable_new(property::create<point4>(*this, name, label, description, from_string<point4>(default_value, point4(0, 0, 0, 0))), document());
 				break;
 			}
 			case sl::argument::EX_MATRIX:
 			{
-				undoable_new(
-					new user::k3d_matrix4_property(
-						init_owner(*this)
-						+ init_name(make_token(argument->name.c_str()))
-						+ init_label(make_token(argument->label.c_str()))
-						+ init_description(make_token(argument->description.c_str()))
-						+ init_value(from_string<matrix4>(argument->default_value, matrix4()))),
-					document());
+				undoable_new(property::create<matrix4>(*this, name, label, description, from_string<matrix4>(default_value, matrix4())), document());
 				break;
 			}
 			case sl::argument::EX_COLOR:
 			{
-				undoable_new(
-					new user::k3d_color_property(
-						init_owner(*this)
-						+ init_name(make_token(argument->name.c_str()))
-						+ init_label(make_token(argument->label.c_str()))
-						+ init_description(make_token(argument->description.c_str()))
-						+ init_value(from_string<color>(argument->default_value, color(1, 1, 1)))),
-					document());
+				undoable_new(property::create<color>(*this, name, label, description, from_string<color>(default_value, color(1, 1, 1))), document());
 				break;
 			}
 			default:

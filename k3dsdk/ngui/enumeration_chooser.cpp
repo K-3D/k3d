@@ -27,11 +27,15 @@
 #include "options.h"
 #include "utility.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/command_tree.h>
+#include <k3dsdk/inode.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/state_change_set.h>
 
 #include <gtkmm/entry.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace libk3dngui
 {
@@ -39,20 +43,29 @@ namespace libk3dngui
 namespace enumeration_chooser
 {
 
-/// Specialization of k3d::enumeration_chooser::data_proxy for use with k3d::iproperty objects
-template<>
-class data_proxy<k3d::iproperty> :
-	public idata_proxy
+/////////////////////////////////////////////////////////////////////////////
+// property_model
+
+/// Implementation of enumeration_chooser::imodel for use with k3d::iproperty objects
+class property_model :
+	public imodel
 {
 public:
-	typedef k3d::iproperty data_t;
-
-	data_proxy(data_t& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
-		idata_proxy(StateRecorder, ChangeMessage),
+	property_model(k3d::iproperty& Data) :
 		m_readable_data(Data),
 		m_enumeration_data(dynamic_cast<k3d::ienumeration_property*>(&Data)),
 		m_writable_data(dynamic_cast<k3d::iwritable_property*>(&Data))
 	{
+	}
+
+	const Glib::ustring label()
+	{
+		Glib::ustring result = m_readable_data.property_label();
+
+		if(m_readable_data.property_node())
+			result = m_readable_data.property_node()->name() + " " + result;
+
+		return result;
 	}
 
 	const k3d::ienumeration_property::enumeration_values_t enumeration_values()
@@ -61,12 +74,12 @@ public:
 		return m_enumeration_data->enumeration_values();
 	}
 
-	const std::string value()
+	const k3d::string_t value()
 	{
-		return boost::any_cast<std::string>(m_readable_data.property_internal_value());
+		return boost::any_cast<k3d::string_t>(m_readable_data.property_internal_value());
 	}
 
-	void set_value(const std::string& Value)
+	void set_value(const k3d::string_t& Value)
 	{
 		return_if_fail(m_writable_data);
 		return_if_fail(m_writable_data->property_set_value(Value));
@@ -84,38 +97,83 @@ public:
 	}
 
 private:
-	data_proxy(const data_proxy& RHS);
-	data_proxy& operator=(const data_proxy& RHS);
+	property_model(const property_model&);
+	property_model& operator=(const property_model&);
 
-	data_t& m_readable_data;
+	k3d::iproperty& m_readable_data;
 	k3d::ienumeration_property* const m_enumeration_data;
 	k3d::iwritable_property* const m_writable_data;
 };
 
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
+/////////////////////////////////////////////////////////////////////////////
+// model
+
+imodel* const model(k3d::iproperty& Property)
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<k3d::iproperty>(Data, StateRecorder, ChangeMessage));
+	return new property_model(Property);
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// control::implementation
+
+class control::implementation
+{
+public:
+	implementation(imodel* const Model, k3d::istate_recorder* const StateRecorder) :
+		m_model(Model),
+		m_state_recorder(StateRecorder)
+	{
+		assert(m_model.get());
+
+		m_list_model = Gtk::ListStore::create(m_columns);
+	}
+
+	/// Stores the underlying data object
+	boost::scoped_ptr<imodel> m_model;
+	/// Stores a referenence to the (optional) object for recording undo/redo data
+	k3d::istate_recorder* const m_state_recorder;
+
+	/// Defines a data model for the underlying combo box widget
+	class columns :
+		public Gtk::TreeModelColumnRecord
+	{
+	public:
+		columns()
+		{
+			add(label);
+			add(value);
+			add(description);
+		}
+
+		Gtk::TreeModelColumn<Glib::ustring> label;
+		Gtk::TreeModelColumn<k3d::string_t> value;
+		Gtk::TreeModelColumn<Glib::ustring> description;
+	};
+
+	/// Defines a data model for the underlying combo box widget
+	columns m_columns;
+	/// Stores data for the underlying combo box widget
+	Glib::RefPtr<Gtk::ListStore> m_list_model;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
+control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
 	ui_component(Name, &Parent),
-	m_data(Data)
+	m_implementation(new implementation(Model, StateRecorder))
 {
-	if(m_data.get())
+	if(Model)
 	{
-		m_data->connect_changed(sigc::mem_fun(*this, &control::on_data_changed));
-		m_data->connect_enumeration_values_changed(sigc::mem_fun(*this, &control::on_enumeration_values_changed));
+		Model->connect_changed(sigc::mem_fun(*this, &control::on_data_changed));
+		Model->connect_enumeration_values_changed(sigc::mem_fun(*this, &control::on_enumeration_values_changed));
 	}
 
-	m_model = Gtk::ListStore::create(m_columns);
-	set_model(m_model);
+	set_model(m_implementation->m_list_model);
 
 	Gtk::CellRendererText* const cell_renderer = new Gtk::CellRendererText();
 	pack_start(*manage(cell_renderer), true);
-	add_attribute(cell_renderer->property_text(), m_columns.label);
+	add_attribute(cell_renderer->property_text(), m_implementation->m_columns.label);
 
 	on_enumeration_values_changed();
 	on_data_changed(0);
@@ -123,7 +181,7 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	signal_changed().connect(sigc::mem_fun(*this, &control::on_list_changed));
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
+const k3d::icommand_node::result control::execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 {
 	/** \todo Improve the tutorial interactivity of this thing */
 	if(Command == "value")
@@ -136,10 +194,10 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 
 		popup();
 
-		const Gtk::TreeNodeChildren children = m_model->children();
+		const Gtk::TreeNodeChildren children = m_implementation->m_list_model->children();
 		for(Gtk::TreeNodeChildren::const_iterator child = children.begin(); child != children.end(); ++child)
 		{
-			const std::string child_value = (*child)[m_columns.value];
+			const k3d::string_t child_value = (*child)[m_implementation->m_columns.value];
 
 			if(Arguments == child_value)
 			{
@@ -159,16 +217,21 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 	return ui_component::execute_command(Command, Arguments);
 }
 
+control::~control()
+{
+	delete m_implementation;
+}
+
 void control::on_data_changed(k3d::iunknown*)
 {
-	return_if_fail(m_data.get());
+	return_if_fail(m_implementation->m_model.get());
 
-	const std::string value = m_data->value();
+	const k3d::string_t value = m_implementation->m_model->value();
 
-	const Gtk::TreeNodeChildren children = m_model->children();
+	const Gtk::TreeNodeChildren children = m_implementation->m_list_model->children();
 	for(Gtk::TreeNodeChildren::const_iterator child = children.begin(); child != children.end(); ++child)
 	{
-		const std::string child_value = (*child)[m_columns.value];
+		const k3d::string_t child_value = (*child)[m_implementation->m_columns.value];
 
 		if(value == child_value)
 		{
@@ -182,17 +245,17 @@ void control::on_data_changed(k3d::iunknown*)
 
 void control::on_enumeration_values_changed()
 {
-	return_if_fail(m_data.get());
+	return_if_fail(m_implementation->m_model.get());
 
-	m_model->clear();
+	m_implementation->m_list_model->clear();
 
-	const k3d::ienumeration_property::enumeration_values_t values = m_data->enumeration_values();
+	const k3d::ienumeration_property::enumeration_values_t values = m_implementation->m_model->enumeration_values();
 	for(k3d::ienumeration_property::enumeration_values_t::const_iterator choice = values.begin(); choice != values.end(); ++choice)
 	{
-		Gtk::TreeRow row = *m_model->append();
-		row[m_columns.label] = choice->label;
-		row[m_columns.value] = choice->value;
-		row[m_columns.description] = choice->description;
+		Gtk::TreeRow row = *m_implementation->m_list_model->append();
+		row[m_implementation->m_columns.label] = choice->label;
+		row[m_implementation->m_columns.value] = choice->value;
+		row[m_implementation->m_columns.description] = choice->description;
 	}
 
 	set_active(0);
@@ -201,28 +264,28 @@ void control::on_enumeration_values_changed()
 void control::on_list_changed()
 {
 	Gtk::TreeIter active = get_active();
-	return_if_fail(active != m_model->children().end());
+	return_if_fail(active != m_implementation->m_list_model->children().end());
 
 	Gtk::TreeRow row = *active;
-	const std::string value = row[m_columns.value];
+	const k3d::string_t value = row[m_implementation->m_columns.value];
 
 	k3d::command_tree().command_signal().emit(*this, k3d::icommand_node::COMMAND_INTERACTIVE, "value", value);
 
-	return_if_fail(m_data.get());
+	return_if_fail(m_implementation->m_model.get());
 
-	if(value == m_data->value())
+	if(value == m_implementation->m_model->value())
 		return;
 
-	k3d::istate_recorder* const state_recorder = m_data->state_recorder;
-	const Glib::ustring change_message = m_data->change_message;
+	if(m_implementation->m_state_recorder)
+		m_implementation->m_state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
-	if(state_recorder)
-		state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
+	m_implementation->m_model->set_value(value);
 
-	m_data->set_value(value);
-
-	if(state_recorder)
-		state_recorder->commit_change_set(state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), change_message + " " + value, K3D_CHANGE_SET_CONTEXT);
+	if(m_implementation->m_state_recorder)
+	{
+		const k3d::string_t change_message = k3d::string_cast(boost::format(_("Change %1% to %2%")) % m_implementation->m_model->label().raw() % value);
+		m_implementation->m_state_recorder->commit_change_set(m_implementation->m_state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), change_message, K3D_CHANGE_SET_CONTEXT);
+	}
 }
 
 } // namespace enumeration_chooser

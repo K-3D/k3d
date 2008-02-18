@@ -2,7 +2,7 @@
 #define K3DSDK_PERSISTENT_CONTAINER_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,12 +21,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares k3d::persistence::container and related classes used to automate serialization of data objects
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "ipersistent.h"
 #include "ipersistent_container.h"
+#include "types.h"
 
 #include <map>
 
@@ -45,7 +45,7 @@ class persistent_container :
 	public ipersistent_container
 {
 public:
-	void enable_serialization(const std::string& Name, ipersistent& Child);
+	void enable_serialization(const string_t& Name, ipersistent& Child);
 	void enable_serialization(const named_children_t& Children);
 	
 	void disable_serialization(ipersistent& Child);

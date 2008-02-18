@@ -51,6 +51,7 @@ public:
 	boost::python::object pipeline_value();
 	boost::python::object node();
 	const bool is_writable();
+	void set_value(const boost::python::object& Value);
 	const bool is_enumeration();
 	boost::python::list enumeration_values();
 	const std::string units();

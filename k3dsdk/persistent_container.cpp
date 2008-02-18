@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,18 +18,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the k3d::persistent_container class, which automatically serializes / deserializes a group of data objects
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "aqsis_properties.h"
+#include "inode.h"
 #include "iproperty_collection.h"
+#include "iuser_property.h"
 #include "persistent.h"
-#include "properties_ri.h"
+#include "properties.h"
 #include "result.h"
 #include "tokens.h"
 #include "type_registry.h"
-#include "user_properties.h"
 #include "utility.h"
 
 #include <iostream>
@@ -49,7 +48,7 @@ persistent_container::~persistent_container()
 {
 }
 
-void persistent_container::enable_serialization(const std::string& Name, ipersistent& Child)
+void persistent_container::enable_serialization(const string_t& Name, ipersistent& Child)
 {
 	if(m_children.count(Name))
 	{
@@ -89,12 +88,13 @@ const ipersistent_container::named_children_t& persistent_container::persistent_
 	return m_children;
 }
 
+/*
 template<typename PropertyT, typename ValueT>
 void load_user_property(xml::element& Element, const ipersistent::load_context& Context, iproperty_collection& PropertyCollection, ipersistent_container& PersistentContainer, inode& Object, const ValueT& Value)
 {
-	const std::string name = xml::attribute_text(Element, "name");
-	const std::string label = xml::attribute_text(Element, "label");
-	const std::string description = xml::attribute_text(Element, "description");
+	const string_t name = xml::attribute_text(Element, "name");
+	const string_t label = xml::attribute_text(Element, "label");
+	const string_t description = xml::attribute_text(Element, "description");
 
 	PropertyT* const property = user::create_property<PropertyT, ValueT>(name, label, description, Object.document(), PropertyCollection, PersistentContainer, &Object, Value);
 	property->load(Element, Context);
@@ -103,15 +103,16 @@ void load_user_property(xml::element& Element, const ipersistent::load_context& 
 template<typename PropertyT, typename ValueT>
 void load_renderman_property(xml::element& Element, const ipersistent::load_context& Context, iproperty_collection& PropertyCollection, ipersistent_container& PersistentContainer, inode& Object, const ValueT& Value)
 {
-	const std::string name = xml::attribute_text(Element, "name");
-	const std::string label = xml::attribute_text(Element, "label");
-	const std::string description = xml::attribute_text(Element, "description");
+	const string_t name = xml::attribute_text(Element, "name");
+	const string_t label = xml::attribute_text(Element, "label");
+	const string_t description = xml::attribute_text(Element, "description");
 	const irenderman_property::parameter_type_t parameter_type = xml::attribute_value<irenderman_property::parameter_type_t>(Element, "parameter_type", irenderman_property::ATTRIBUTE);
-	const std::string parameter_name = xml::attribute_text(Element, "parameter_name");
+	const string_t parameter_name = xml::attribute_text(Element, "parameter_name");
 
 	PropertyT* const property = ri::create_property<PropertyT, ValueT>(parameter_type, parameter_name, name, label, description, Object.document(), PropertyCollection, PersistentContainer, &Object, Value);
 	property->load(Element, Context);
 }
+*/
 
 void persistent_container::save(xml::element& Element, const ipersistent::save_context& Context)
 {
@@ -130,7 +131,7 @@ void persistent_container::save(xml::element& Element, const ipersistent::save_c
 void persistent_container::load(xml::element& Element, const ipersistent::load_context& Context)
 {
 	// Create a mapping of elements to choose from ...
-	typedef std::map<std::string, xml::element*> element_map_t;
+	typedef std::map<string_t, xml::element*> element_map_t;
 	element_map_t element_map;
 
 	// Insert <property> tags ... look for a container called <properties> first ...
@@ -143,7 +144,7 @@ void persistent_container::load(xml::element& Element, const ipersistent::load_c
 		if(xml_property->name != "property")
 			continue;
 
-		const std::string name = xml::attribute_text(*xml_property, "name");
+		const string_t name = xml::attribute_text(*xml_property, "name");
 		if(name.empty())
 			continue;
 
@@ -172,94 +173,55 @@ void persistent_container::load(xml::element& Element, const ipersistent::load_c
 	if(element_map.empty())
 		return;
 
-	k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(this);
-	k3d::ipersistent_container* const persistent_container = dynamic_cast<k3d::ipersistent_container*>(this);
-	k3d::inode* const object = dynamic_cast<k3d::inode*>(this);
-
-	if(property_collection && persistent_container && object)
+	if(k3d::inode* const node = dynamic_cast<k3d::inode*>(this))
 	{
 		for(element_map_t::iterator element = element_map.begin(); element != element_map.end(); ++element)
 		{
-			const std::string user_property = xml::attribute_text(*element->second, "user_property");
-			const std::string type = xml::attribute_text(*element->second, "type");
-
-			if(user_property == "vanilla")
+			const string_t user_property = xml::attribute_text(*element->second, "user_property");
+			if(user_property == "generic" || user_property == "vanilla" /* for backwards compatibility */)
 			{
-				if(type == type_string<k3d::bool_t>())
-					load_user_property<user::k3d_bool_t_property>(*element->second, Context, *property_collection, *persistent_container, *object, false);
-				else if(type == type_string<k3d::int32_t>())
-					load_user_property<user::k3d_int32_t_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
-				else if(type == type_string<k3d::double_t>())
-					load_user_property<user::k3d_double_t_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
-				else if(type == type_string<k3d::string_t>())
-					load_user_property<user::k3d_string_t_property>(*element->second, Context, *property_collection, *persistent_container, *object, std::string());
-				else if(type == type_string<k3d::ri::itexture*>())
-					load_user_property<user::k3d_ri_itexture_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::ri::itexture*>(0));
-				else if(type == type_string<k3d::point3>() || type == "k3d::ri::point")
-					load_user_property<user::k3d_point3_property>(*element->second, Context, *property_collection, *persistent_container, *object, point3(0, 0, 0));
-				else if(type == type_string<k3d::vector3>() || type == "k3d::ri::vector")
-					load_user_property<user::k3d_vector3_property>(*element->second, Context, *property_collection, *persistent_container, *object, vector3(0, 0, 0));
-				else if(type == type_string<k3d::normal3>() || type == "k3d::ri::normal")
-					load_user_property<user::k3d_normal3_property>(*element->second, Context, *property_collection, *persistent_container, *object, normal3(0, 0, 0));
-				else if(type == type_string<k3d::point4>() || type == "k3d::ri::hpoint")
-					load_user_property<user::k3d_point4_property>(*element->second, Context, *property_collection, *persistent_container, *object, point4(0, 0, 0, 0));
-				else if(type == type_string<k3d::matrix4>())
-					load_user_property<user::k3d_matrix4_property>(*element->second, Context, *property_collection, *persistent_container, *object, identity3D());
-				else if(type == type_string<k3d::color>() || type == "k3d::ri::color")
-					load_user_property<user::k3d_color_property>(*element->second, Context, *property_collection, *persistent_container, *object, color(1, 1, 1));
-				else if(type == type_string<k3d::legacy::mesh*>())
-					load_user_property<user::legacy_mesh_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::legacy::mesh*>(0));
-				else if(type == type_string<k3d::mesh*>())
-					load_user_property<user::k3d_mesh_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::mesh*>(0));
-				else if(type == type_string<k3d::gl::imesh_painter*>())
-					load_user_property<user::k3d_gl_imesh_painter_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::gl::imesh_painter*>(0));
-				else if(type == type_string<k3d::ri::imesh_painter*>())
-					load_user_property<user::k3d_ri_imesh_painter_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::ri::imesh_painter*>(0));
-				else if(type == type_string<k3d::imaterial*>())
-					load_user_property<user::k3d_imaterial_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::imaterial*>(0));
-				else
+				xml::element& xml_property = *element->second;
+
+				const string_t type = xml::attribute_text(xml_property, "type");
+				const string_t name = xml::attribute_text(xml_property, "name");
+				const string_t label = xml::attribute_text(xml_property, "label");
+				const string_t description = xml::attribute_text(xml_property, "description");
+
+				k3d::iproperty* const new_property = property::create(*node, type, name, label, description);
+				if(!new_property)
 				{
-					log() << warning << k3d_file_reference << ": ignoring unknown user property type [" << type << "]" << std::endl;
+					log() << error << k3d_file_reference << ": error creating property [" << name << "] with type [" << type << "]" << std::endl;
 					continue;
 				}
+
+				if(k3d::ipersistent* const persistent = dynamic_cast<k3d::ipersistent*>(new_property))
+					persistent->load(xml_property, Context);
 			}
 			else if(user_property == "renderman")
 			{
-				if(type == type_string<ri::integer>())
-					load_renderman_property<ri::integer_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0);
-				else if(type == type_string<ri::real>())
-					load_renderman_property<ri::real_property>(*element->second, Context, *property_collection, *persistent_container, *object, 0.0);
-				else if(type == type_string<ri::string>())
-					load_renderman_property<ri::string_property>(*element->second, Context, *property_collection, *persistent_container, *object, std::string());
-				else if(type == type_string<ri::point>())
-					load_renderman_property<ri::point_property>(*element->second, Context, *property_collection, *persistent_container, *object, ri::point(0, 0, 0));
-				else if(type == type_string<ri::vector>())
-					load_renderman_property<ri::vector_property>(*element->second, Context, *property_collection, *persistent_container, *object, ri::vector(0, 0, 0));
-				else if(type == type_string<ri::normal>())
-					load_renderman_property<ri::normal_property>(*element->second, Context, *property_collection, *persistent_container, *object, ri::normal(0, 0, 0));
-				else if(type == type_string<ri::hpoint>())
-					load_renderman_property<ri::hpoint_property>(*element->second, Context, *property_collection, *persistent_container, *object, ri::hpoint(0, 0, 0, 0));
-				else if(type == type_string<ri::matrix>())
-					load_renderman_property<ri::matrix_property>(*element->second, Context, *property_collection, *persistent_container, *object, identity3D());
-				else if(type == type_string<ri::color>())
-					load_renderman_property<ri::color_property>(*element->second, Context, *property_collection, *persistent_container, *object, ri::color(0, 0, 0));
-				else
+				xml::element& xml_property = *element->second;
+
+				const string_t type = xml::attribute_text(xml_property, "type");
+				const string_t parameter_type = xml::attribute_text(xml_property, "parameter_type");
+				const string_t parameter_name = xml::attribute_text(xml_property, "parameter_name");
+				const string_t name = xml::attribute_text(xml_property, "name");
+				const string_t label = xml::attribute_text(xml_property, "label");
+				const string_t description = xml::attribute_text(xml_property, "description");
+
+				k3d::iproperty* new_property = 0;
+				if(parameter_type == "attribute")
+					new_property = property::ri::create_attribute(*node, type, parameter_name, name, label, description);
+				else if(parameter_type == "option")
+					new_property = property::ri::create_option(*node, type, parameter_name, name, label, description);
+					
+				if(!new_property)
 				{
-					log() << warning << k3d_file_reference << ": ignoring unknown renderman property type [" << type << "]" << std::endl;
+					log() << error << k3d_file_reference << ": error creating property [" << name << "] with type [" << type << "]" << std::endl;
 					continue;
 				}
-			}
-			else if(user_property == "aqsis")
-			{
-				if(type == "displacement_layer_connection")
-					load_user_property<aqsis::displacement_layer_connection_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::inode*>(0));
-				else if(type == "surface_layer_connection")
-					load_user_property<aqsis::surface_layer_connection_property>(*element->second, Context, *property_collection, *persistent_container, *object, static_cast<k3d::inode*>(0));
-				else
-				{
-					log() << warning << k3d_file_reference <<  ": ignoring unknown aqsis property type [" << type << "]" << std::endl;
-					continue;
-				}
+
+				if(k3d::ipersistent* const persistent = dynamic_cast<k3d::ipersistent*>(new_property))
+					persistent->load(xml_property, Context);
 			}
 		}
 	}

@@ -26,6 +26,7 @@
 */
 
 #include "persistent_container.h"
+#include "xml.h"
 
 namespace k3d
 {

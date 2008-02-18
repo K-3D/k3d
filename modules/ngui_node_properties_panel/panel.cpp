@@ -19,7 +19,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/ngui/angle_axis_control.h>
-#include <k3dsdk/ngui/aqsis_layer_chooser.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/bitmap_preview.h>
 #include <k3dsdk/ngui/bounding_box.h>
@@ -39,6 +38,7 @@
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/path_chooser.h>
 #include <k3dsdk/ngui/point_control.h>
+#include <k3dsdk/ngui/properties.h>
 #include <k3dsdk/ngui/property_button.h>
 #include <k3dsdk/ngui/property_label.h>
 #include <k3dsdk/ngui/render.h>
@@ -50,13 +50,11 @@
 #include <k3dsdk/ngui/toolbar.h>
 #include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/ngui/uri.h>
-#include <k3dsdk/ngui/user_property.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/irender_animation.h>
-#include <k3dsdk/iaqsis.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
@@ -470,7 +468,7 @@ public:
 				{
 					if(dynamic_cast<k3d::ienumeration_property*>(&property))
 					{
-						enumeration_chooser::control* const control = new enumeration_chooser::control(m_parent, property_name, enumeration_chooser::proxy(property, state_recorder, property_name));
+						enumeration_chooser::control* const control = new enumeration_chooser::control(m_parent, property_name, enumeration_chooser::model(property), state_recorder);
 						table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 						entry_list.push_back(control);
@@ -497,14 +495,6 @@ public:
 
 						entry_list.push_back(control);
 					}
-				}
-				// k3d::aqsis::ilayer_connection* properties
-				else if(k3d::aqsis::ilayer_connection_property* const layer_connection_property = dynamic_cast<k3d::aqsis::ilayer_connection_property*>(&property))
-				{
-					aqsis_layer_chooser::control* const control = new aqsis_layer_chooser::control(m_document_state, *layer_connection_property, m_parent, property_name, state_recorder);
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-					entry_list.push_back(control);
 				}
 				// k3d::inode* properties ...
 				else if(property_type == typeid(k3d::inode*))
@@ -767,7 +757,7 @@ public:
 	void on_add_user_property()
 	{
 		return_if_fail(m_node);
-		add_user_property_dialog(*m_node, m_parent);
+		k3d::ngui::property::create(*m_node, m_parent);
 	}
 	
 	void on_manual_keyframe(k3d::ikeyframer* Keyframer)

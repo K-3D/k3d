@@ -94,6 +94,17 @@ const bool iproperty::is_writable()
 	return dynamic_cast<k3d::iwritable_property*>(wrapped_ptr()) ? true : false;
 }
 
+void iproperty::set_value(const boost::python::object& Value)
+{
+	if(k3d::iwritable_property* const writable = dynamic_cast<k3d::iwritable_property*>(wrapped_ptr()))
+	{
+		writable->property_set_value(python_to_any(Value, wrapped_ptr()->property_type()));
+		return;
+	}
+
+	throw std::runtime_error("property " + wrapped().property_name() + " is a read-only property");
+}
+
 const bool iproperty::is_enumeration()
 {
 	return dynamic_cast<k3d::ienumeration_property*>(wrapped_ptr()) ? true : false;
@@ -172,6 +183,8 @@ void iproperty::define_class()
 			"Returns the node (if any) that owns the property, or None.")
 		.def("is_writable", &iproperty::is_writable,
 			"Returns true if the property's internal value can be modified.")
+		.def("set_value", &iproperty::set_value,
+			"Sets the property's internal value.")
 		.def("is_enumeration", &iproperty::is_enumeration,
 			"Returns true if the property datatype is an enumeration.")
 		.def("enumeration_values", &iproperty::enumeration_values,

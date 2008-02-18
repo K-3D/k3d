@@ -1,5 +1,5 @@
-#ifndef K3DSDK_USER_PROPERTIES_H
-#define K3DSDK_USER_PROPERTIES_H
+#ifndef K3DSDK_PROPERTY_TYPES_RI_H
+#define K3DSDK_PROPERTY_TYPES_RI_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -24,38 +24,50 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ipersistent_container.h"
-#include "iproperty_collection.h"
-#include "istate_container.h"
-#include "types.h"
+#include "types_ri.h"
+
+#include <boost/mpl/vector.hpp>
 
 namespace k3d
 {
 
-namespace user
+namespace property
 {
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// property_container
-
-/// istate_container implementation that handles undo/redo for the set of user properties within a property collection
-class property_container :
-	public istate_container
+namespace ri
 {
-public:
-	property_container(iunknown& Owner);
-	void restore_state();
 
-private:
-	iproperty_collection* const m_property_collection;
-	ipersistent_container* const m_persistent_container;
-	iproperty_collection::properties_t m_user_properties;
-	ipersistent_container::named_children_t m_persistent_properties;
-};
+/// Enumerates all of the types that can be stored using RenderMan attributes.
+typedef boost::mpl::vector<
+	k3d::ri::color,
+	k3d::ri::hpoint,
+	k3d::ri::integer,
+	k3d::ri::matrix,
+	k3d::ri::normal,
+	k3d::ri::point,
+	k3d::ri::real,
+	k3d::ri::string,
+	k3d::ri::vector
+	> attribute_types;
 
-} // namespace user
+/// Enumerates all of the types that can be stored using RenderMan options.
+typedef boost::mpl::vector<
+	k3d::ri::color,
+	k3d::ri::hpoint,
+	k3d::ri::integer,
+	k3d::ri::matrix,
+	k3d::ri::normal,
+	k3d::ri::point,
+	k3d::ri::real,
+	k3d::ri::string,
+	k3d::ri::vector
+	> option_types;
+
+} // namespace ri
+
+} // namespace property
 
 } // namespace k3d
 
-#endif // K3DSDK_USER_PROPERTIES_H
+#endif // K3DSDK_PROPERTY_TYPES_RI_H
 

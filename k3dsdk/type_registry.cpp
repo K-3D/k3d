@@ -24,7 +24,6 @@
 #include "bitmap.h"
 #include "color.h"
 #include "i3d_2d_mapping.h"
-#include "iaqsis.h"
 #include "ibitmap_exporter.h"
 #include "ibitmap_importer.h"
 #include "ibitmap_sink.h"
@@ -153,8 +152,6 @@ void initialize_types()
 		return;
 
 	register_type(typeid(k3d::angle_axis), "k3d::angle_axis");
-	register_type(typeid(k3d::aqsis::idisplacement_layer), "k3d::aqsis::idisplacement_layer");
-	register_type(typeid(k3d::aqsis::isurface_layer), "k3d::aqsis::isurface_layer");
 	register_type(typeid(k3d::bitmap), "k3d::bitmap");
 	register_type(typeid(k3d::bitmap*), "k3d::bitmap*");
 	register_type(typeid(k3d::bool_t), "k3d::bool_t");

@@ -24,7 +24,6 @@
 
 #include "algebra.h"
 #include "imaterial.h"
-#include "irenderman_property.h"
 #include "legacy_mesh.h"
 #include "stream_ri.h"
 #include "stream_io_ri.h"

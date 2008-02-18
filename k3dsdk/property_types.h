@@ -1,5 +1,5 @@
-#ifndef K3DSDK_USER_PROPERTIES_H
-#define K3DSDK_USER_PROPERTIES_H
+#ifndef K3DSDK_PROPERTY_TYPES_H
+#define K3DSDK_PROPERTY_TYPES_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -24,38 +24,50 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ipersistent_container.h"
-#include "iproperty_collection.h"
-#include "istate_container.h"
+#include "color.h"
+#include "imaterial.h"
+#include "imesh_painter_gl.h"
+#include "imesh_painter_ri.h"
+#include "inode.h"
+#include "itexture_ri.h"
+#include "legacy_mesh.h"
+#include "mesh.h"
+#include "path.h"
 #include "types.h"
+
+#include <boost/mpl/vector/vector20.hpp>
 
 namespace k3d
 {
 
-namespace user
+namespace property
 {
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// property_container
+/// Enumerates all of the types that can be stored using user properties.
+typedef boost::mpl::vector18<
+	k3d::bool_t,
+	k3d::color,
+	k3d::double_t,
+	k3d::filesystem::path,
+	k3d::gl::imesh_painter*,
+	k3d::imaterial*,
+	k3d::inode*,
+	k3d::int32_t,
+	k3d::legacy::mesh*,
+	k3d::matrix4,
+	k3d::mesh*,
+	k3d::normal3,
+	k3d::point3,
+	k3d::point4,
+	k3d::ri::imesh_painter*,
+	k3d::ri::itexture*,
+	k3d::string_t,
+	k3d::vector3
+	> types;
 
-/// istate_container implementation that handles undo/redo for the set of user properties within a property collection
-class property_container :
-	public istate_container
-{
-public:
-	property_container(iunknown& Owner);
-	void restore_state();
-
-private:
-	iproperty_collection* const m_property_collection;
-	ipersistent_container* const m_persistent_container;
-	iproperty_collection::properties_t m_user_properties;
-	ipersistent_container::named_children_t m_persistent_properties;
-};
-
-} // namespace user
+} // namespace property
 
 } // namespace k3d
 
-#endif // K3DSDK_USER_PROPERTIES_H
+#endif // K3DSDK_PROPERTY_TYPES_H
 

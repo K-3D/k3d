@@ -108,6 +108,25 @@ T* operator<<(T* LHS, const connect_menu_item& RHS)
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// connect_signal_changed
+
+/// Convenience object for connecting a menu item to a slot inline
+struct connect_signal_changed
+{
+	typedef sigc::slot<void> slot_t;
+	connect_signal_changed(const slot_t& Slot) : slot(Slot) { }
+	slot_t slot;
+};
+
+template<typename T>
+T* operator<<(T* LHS, const connect_signal_changed& RHS)
+{
+	return_val_if_fail(LHS, LHS);
+	LHS->signal_changed().connect(RHS.slot);
+	return LHS;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // line_wrap
 
 struct line_wrap

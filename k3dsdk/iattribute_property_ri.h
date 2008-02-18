@@ -1,5 +1,8 @@
+#ifndef K3DSDK_IATTRIBUTE_PROPERTY_RI_H
+#define K3DSDK_IATTRIBUTE_PROPERTY_RI_H
+
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,44 +21,35 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "properties_ri.h"
+#include "iunknown.h"
+#include "types.h"
 
 namespace k3d
 {
 
-std::ostream& operator<<(std::ostream& Stream, const irenderman_property::parameter_type_t Value)
+namespace ri
 {
-	switch(Value)
-		{
-			case irenderman_property::ATTRIBUTE:
-				Stream << "attribute";
-				break;
-			case irenderman_property::OPTION:
-				Stream << "option";
-				break;
-		}
 
-	return Stream;
-}
-
-std::istream& operator>>(std::istream& Stream, irenderman_property::parameter_type_t Value)
+/// Abstract interface for discovering information about a RenderMan attribute property
+class iattribute_property :
+	public virtual iunknown
 {
-	std::string s;
-	Stream >> s;
+public:
+	virtual const string_t property_attribute_name() = 0;
 
-	if("attribute" == s)
-		Value = irenderman_property::ATTRIBUTE;
-	else if("option" == s)
-		Value = irenderman_property::OPTION;
-	else
-		log() << error << "Could not extract value [" << s << "]" << std::endl;
+protected:
+	iattribute_property() {}
+	iattribute_property(const iattribute_property&) {}
+	iattribute_property& operator = (const iattribute_property&) { return *this; }
+	virtual ~iattribute_property() {}
+};
 
-	return Stream;
-}
+} // namespace ri
 
 } // namespace k3d
 
+#endif // K3DSDK_IATTRIBUTE_PROPERTY_RI_H
 

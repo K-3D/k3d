@@ -30,6 +30,7 @@ namespace k3d
 {
 
 class inetwork_render_frame;
+namespace filesystem { class path; }
 	
 namespace ri
 {

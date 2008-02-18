@@ -50,13 +50,6 @@ namespace k3d
 namespace python
 {
 
-namespace detail
-{
-
-
-
-} // namespace detail
-
 const object any_to_python(const boost::any& Value)
 {
 	const std::type_info& type = Value.type();
@@ -84,6 +77,9 @@ const object any_to_python(const boost::any& Value)
 
 	if(type == typeid(k3d::point3))
 		return object(boost::any_cast<k3d::point3>(Value));
+
+	if(type == typeid(k3d::normal3))
+		return object(boost::any_cast<k3d::normal3>(Value));
 
 	if(type == typeid(k3d::vector3))
 		return object(boost::any_cast<k3d::vector3>(Value));
@@ -234,8 +230,7 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 
 	if(TargetType == typeid(filesystem::path))
 	{
-		return_val_if_fail(PyString_Check(value), boost::any());
-		return boost::any(filesystem::native_path(ustring::from_utf8(PyString_AsString(value))));
+		return boost::any(extract<k3d::filesystem::path>(Value)());
 	}
 
 	if(TargetType == typeid(k3d::color))
@@ -246,6 +241,16 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 	if(TargetType == typeid(k3d::point3))
 	{
 		return boost::any(extract<k3d::point3>(Value)());
+	}
+
+	if(TargetType == typeid(k3d::point4))
+	{
+		return boost::any(extract<k3d::point4>(Value)());
+	}
+
+	if(TargetType == typeid(k3d::normal3))
+	{
+		return boost::any(extract<k3d::normal3>(Value)());
 	}
 
 	if(TargetType == typeid(k3d::vector3))
@@ -275,6 +280,9 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 
 	if(TargetType == typeid(k3d::inode*))
 	{
+		if(Value == boost::python::object())
+			return boost::any(static_cast<k3d::inode*>(0));
+
 		return boost::any(static_cast<const inode&>(extract<node>(Value)()).wrapped_ptr());
 	}
 

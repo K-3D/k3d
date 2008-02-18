@@ -115,6 +115,8 @@ K3D_ADD_TEST(document.stress.high_node_count.py PYTHON)
 K3D_ADD_TEST(document.stress.all_node_types.py PYTHON)
 #K3D_ADD_TEST(document.stress.read_all_properties.py PYTHON)
 
+K3D_ADD_TEST(document.serialization.properties.py PYTHON)
+
 K3D_ADD_TEST(bitmap.source.JPEGBitmapReader.py PYTHON REQUIRES K3D_BUILD_JPEG_IO_MODULE)
 K3D_ADD_TEST(bitmap.source.PNGBitmapReader.py PYTHON REQUIRES K3D_BUILD_PNG_IO_MODULE)
 K3D_ADD_TEST(bitmap.source.TIFFBitmapReader.py PYTHON REQUIRES K3D_BUILD_TIFF_IO_MODULE)
@@ -231,9 +233,12 @@ K3D_ADD_TEST(offscreen.py PYTHON REQUIRES K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE)
 
 K3D_ADD_TEST(python.api.angle_axis.py PYTHON)
 K3D_ADD_TEST(python.api.get_dependency.py PYTHON)
-K3D_ADD_TEST(python.api.property.value.py PYTHON)
 K3D_ADD_TEST(python.api.named_arrays.py PYTHON)
 K3D_ADD_TEST(python.api.node.selection.py PYTHON)
+K3D_ADD_TEST(python.api.property.value.py PYTHON)
+K3D_ADD_TEST(python.api.renderman.attributes.py PYTHON)
+K3D_ADD_TEST(python.api.renderman.options.py PYTHON)
+K3D_ADD_TEST(python.api.user_properties.py PYTHON)
 
 K3D_ADD_TEST(share.scripts.py PYTHON)
 

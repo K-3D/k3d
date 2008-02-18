@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IRENDERMAN_PROPERTY_H
-#define K3DSDK_IRENDERMAN_PROPERTY_H
+#ifndef K3DSDK_IOPTION_PROPERTY_RI_H
+#define K3DSDK_IOPTION_PROPERTY_RI_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -25,36 +25,31 @@
 */
 
 #include "iunknown.h"
-
-#include <iosfwd>
-#include <string>
-#include <vector>
+#include "types.h"
 
 namespace k3d
 {
 
-/// Abstract interface for discovering information about a RenderMan property (one that has an attribute or option name)
-class irenderman_property :
+namespace ri
+{
+
+/// Abstract interface for discovering information about a RenderMan option property 
+class ioption_property :
 	public virtual iunknown
 {
 public:
-	typedef enum
-	{
-		ATTRIBUTE,
-		OPTION
-	} parameter_type_t;
-
-	virtual const parameter_type_t property_parameter_list_type() = 0;
-	virtual const std::string property_parameter_list_name() = 0;
+	virtual const string_t property_option_name() = 0;
 
 protected:
-	irenderman_property() {}
-	irenderman_property(const irenderman_property&) {}
-	irenderman_property& operator = (const irenderman_property&) { return *this; }
-	virtual ~irenderman_property() {}
+	ioption_property() {}
+	ioption_property(const ioption_property&) {}
+	ioption_property& operator = (const ioption_property&) { return *this; }
+	virtual ~ioption_property() {}
 };
+
+} // namespace ri
 
 } // namespace k3d
 
-#endif // K3DSDK_IRENDERMAN_PROPERTY_H
+#endif // K3DSDK_IOPTION_PROPERTY_RI_H
 
