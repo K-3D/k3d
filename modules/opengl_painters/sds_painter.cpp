@@ -28,6 +28,8 @@
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/mesh_topology_data.h>
+#include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
@@ -123,6 +125,7 @@ class sds_face_painter : public sds_painter<face_selection>
 {
 	typedef sds_painter<face_selection> base;
 	typedef face_selection selection_t;
+	typedef k3d::typed_array<std::string> tags_t;
 public:
 	sds_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, k3d::color(0.2,0.2,0.2),k3d::color(0.6,0.6,0.6))
@@ -152,37 +155,68 @@ protected:
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
+		bool interpolateboundary = (k3d::get_array<tags_t>(Mesh.polyhedra->constant_data, "interpolateboundary") != 0);
+		k3d::mesh::indices_t companions;
+		k3d::mesh::bools_t boundary_edges;
+		k3d::mesh::bools_t boundary_faces;
+		if (!interpolateboundary)
+		{
+			k3d::create_edge_adjacency_lookup(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, boundary_edges, companions);
+			k3d::create_boundary_face_lookup(*Mesh.polyhedra->face_first_loops, *Mesh.polyhedra->face_loop_counts, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->clockwise_edges, boundary_edges, companions, boundary_faces);
+		}
+		
 		face_visitor visitor;
 		Cache.visit_faces(visitor, m_levels.pipeline_value(), false);
 		
 		k3d::uint_t face_count = visitor.face_starts.size();
 		const selection_records_t& face_selection_records = Selection.records();
 		glBegin(GL_QUADS);
-		if (!face_selection_records.empty())
+		if (interpolateboundary)
 		{
-			for (selection_records_t::const_iterator record = face_selection_records.begin(); record != face_selection_records.end() && record->begin < face_count; ++record)
-			{ // color by selection
-				const color_t& face_color = record->weight ? selected_color : color;
-				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
-				k3d::uint_t start = record->begin;
-				k3d::uint_t end = record->end;
-				end = end > face_count ? face_count : end;
-				k3d::uint_t start_index = visitor.face_starts[start];
-				k3d::uint_t end_index = end == face_count ? visitor.indices.size() : visitor.face_starts[end];
-				for (k3d::uint_t i = start_index; i != end_index; ++i)
+			if (!face_selection_records.empty())
+			{
+				for (selection_records_t::const_iterator record = face_selection_records.begin(); record != face_selection_records.end() && record->begin < face_count; ++record)
+				{ // color by selection
+					const color_t& face_color = record->weight ? selected_color : color;
+					k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
+					k3d::uint_t start = record->begin;
+					k3d::uint_t end = record->end;
+					end = end > face_count ? face_count : end;
+					k3d::uint_t start_index = visitor.face_starts[start];
+					k3d::uint_t end_index = end == face_count ? visitor.indices.size() : visitor.face_starts[end];
+					for (k3d::uint_t i = start_index; i != end_index; ++i)
+					{
+						k3d::gl::normal3d(k3d::to_vector(visitor.normals_array[visitor.indices[i]]));
+						k3d::gl::vertex3d(visitor.points_array[visitor.indices[i]]);
+					}
+				}
+			}
+			else
+			{ // empty selection, everything has the same color
+				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(color.red, color.green, color.blue), color.alpha);
+				for (k3d::uint_t i = 0; i != visitor.indices.size(); ++i)
 				{
 					k3d::gl::normal3d(k3d::to_vector(visitor.normals_array[visitor.indices[i]]));
 					k3d::gl::vertex3d(visitor.points_array[visitor.indices[i]]);
 				}
 			}
 		}
-		else
-		{ // empty selection, everything has the same color
-			k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(color.red, color.green, color.blue), color.alpha);
-			for (k3d::uint_t i = 0; i != visitor.indices.size(); ++i)
+		else // no boundary interpolation requires us not to render the faces of the mesh boundary
+		{
+			for (k3d::uint_t face = 0; face != visitor.face_starts.size(); ++face)
 			{
-				k3d::gl::normal3d(k3d::to_vector(visitor.normals_array[visitor.indices[i]]));
-				k3d::gl::vertex3d(visitor.points_array[visitor.indices[i]]);
+				if (boundary_faces[face])
+					continue;
+				const color_t& face_color = Mesh.polyhedra->face_selection->at(face) ? selected_color : color;
+				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
+				k3d::uint_t start_index = visitor.face_starts[face];
+				k3d::uint_t end_index = face == (visitor.face_starts.size()-1) ? visitor.indices.size() : visitor.face_starts[face+1]; 
+				for (k3d::uint_t i = start_index; i != end_index; ++i)
+				{
+					k3d::gl::normal3d(k3d::to_vector(visitor.normals_array[visitor.indices[i]]));
+					k3d::gl::vertex3d(visitor.points_array[visitor.indices[i]]);
+				}
+				
 			}
 		}
 		glEnd();

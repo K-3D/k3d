@@ -44,6 +44,12 @@ void sds_point::update()
 {
 	if(m_valid)
 		return;
+	if (corners.empty()) // Make mesh corners sharp for interpolateboundary
+	{
+		vertex = original;
+		m_valid = true;
+		return;
+	}
 	double n = static_cast<double>(corners.size());
 	if(n != face_vertices.size()) // corner lies on edge. Position is updated from edge_vertex.
 		return;
@@ -525,7 +531,14 @@ void patch_corner::update()
 	{
 		if(m_boundary_left && m_boundary_right)
 		{
-			*m_point = 0.5*m_parent + 0.25*(*m_boundary_left + *m_boundary_right);
+			if (m_corners.size() == 2) // Make mesh corners sharp for interpolateboundary
+			{
+				*m_point = m_parent;
+			}
+			else
+			{
+				*m_point = 0.5*m_parent + 0.25*(*m_boundary_left + *m_boundary_right);
+			}
 			m_normal_valid = false;
 		}
 		return;

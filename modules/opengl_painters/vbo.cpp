@@ -25,6 +25,7 @@
 #include <k3dsdk/hints.h>
 #include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
@@ -344,27 +345,127 @@ private:
 	k3d::uint_t m_index;
 };
 
+// Create face arrays in case interpolateboundary is not set
+class face_visitor_no_boundary : public k3d::sds::sds_visitor
+{
+public:
+	face_visitor_no_boundary(const k3d::mesh::bools_t& BoundaryFaces) : m_boundary_faces(BoundaryFaces), m_ignore_face(false)
+	{
+	}
+	virtual void on_point(const k3d::sds::position_t& Point, const k3d::sds::position_t& Normal = k3d::sds::position_t(0,0,1))
+	{
+		points_array.push_back(Point);
+		normals_array.push_back(Normal);
+	}
+	virtual void on_subfacet(const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3, const k3d::uint_t Point4)
+	{
+		if (m_ignore_face)
+			return;
+		indices.push_back(Point1);
+		indices.push_back(Point2);
+		indices.push_back(Point3);
+		indices.push_back(Point4);
+	}
+	virtual void on_face(k3d::uint_t Face)
+	{
+		m_ignore_face = m_boundary_faces[Face];
+		face_starts.push_back(indices.size());
+	}
+	std::vector<k3d::sds::position_t> points_array;
+	std::vector<k3d::sds::position_t> normals_array;
+	std::vector<GLuint> indices;
+	k3d::mesh::indices_t face_starts;
+	const k3d::mesh::bools_t& m_boundary_faces;
+	bool m_ignore_face;
+};
+
+/// Helper class to update the point VBO when interpolateboundary is not set
+class update_face_vbo_visitor_no_boundary : public k3d::sds::sds_visitor
+{
+public:
+	update_face_vbo_visitor_no_boundary(const k3d::mesh::indices_t& FaceStarts, const GLuint* Indices, k3d::point3* Points, const k3d::mesh::bools_t& BoundaryFaces) :
+		m_face_starts(FaceStarts),
+		m_indices(Indices),
+		m_points(Points),
+		m_index(0),
+		m_boundary_faces(BoundaryFaces),
+		m_ignore_face(false)
+	{}
+	virtual void on_point(const k3d::sds::position_t& Point, const k3d::sds::position_t& Normal = k3d::sds::position_t(0,0,1))
+	{
+		if (m_ignore_face)
+			return;
+		modified_indices.push_back(m_index);
+		m_points[m_index++] = Point;
+		normals.push_back(Normal); // Unfortunately, we need temp storage for the normals, since we can't map two buffers at once
+	}
+	virtual void on_face(k3d::uint_t Face)
+	{
+		m_ignore_face = m_boundary_faces[Face];
+		if (m_ignore_face)
+			return;
+		m_index = m_indices[m_face_starts[Face]];
+	}
+	k3d::mesh::indices_t modified_indices;
+	std::vector<k3d::sds::position_t> normals;
+private:
+	const k3d::mesh::indices_t& m_face_starts;
+	const GLuint* m_indices;
+	k3d::point3* m_points;
+	k3d::uint_t m_index;
+	const k3d::mesh::bools_t& m_boundary_faces;
+	bool m_ignore_face;
+};
+
+typedef k3d::typed_array<std::string> tags_t;
+
 void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache)
 {
 	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
 	{
-		face_visitor visitor;
-		Cache.visit_faces(visitor, Level, false);
-		
-		m_point_vbo = new vbo();
-		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.points_array[0]) * visitor.points_array.size(), &visitor.points_array[0], GL_STATIC_DRAW);
-		
-		m_normal_vbo = new vbo();
-		glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.normals_array[0]) * visitor.normals_array.size(), &visitor.normals_array[0], GL_STATIC_DRAW);
-		
-		m_index_vbo = new vbo();
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(visitor.indices[0]) * visitor.indices.size(), &visitor.indices[0], GL_STATIC_DRAW);
-		
-		face_starts = visitor.face_starts;
-		index_size = visitor.indices.size();
+		if (k3d::get_array<tags_t>(Mesh.polyhedra->constant_data, "interpolateboundary") != 0)
+		{
+			face_visitor visitor;
+			Cache.visit_faces(visitor, Level, false);
+			
+			m_point_vbo = new vbo();
+			glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.points_array[0]) * visitor.points_array.size(), &visitor.points_array[0], GL_STATIC_DRAW);
+			
+			m_normal_vbo = new vbo();
+			glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.normals_array[0]) * visitor.normals_array.size(), &visitor.normals_array[0], GL_STATIC_DRAW);
+			
+			m_index_vbo = new vbo();
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(visitor.indices[0]) * visitor.indices.size(), &visitor.indices[0], GL_STATIC_DRAW);
+			
+			face_starts = visitor.face_starts;
+			index_size = visitor.indices.size();
+		}
+		else // interpolateboundary not set
+		{
+			k3d::create_edge_adjacency_lookup(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, m_boundary_edges, m_companions);
+			k3d::create_boundary_face_lookup(*Mesh.polyhedra->face_first_loops, *Mesh.polyhedra->face_loop_counts, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->clockwise_edges, m_boundary_edges, m_companions, boundary_faces);
+			
+			face_visitor_no_boundary visitor(boundary_faces);
+			Cache.visit_faces(visitor, Level, false);
+			
+			m_point_vbo = new vbo();
+			glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.points_array[0]) * visitor.points_array.size(), &visitor.points_array[0], GL_STATIC_DRAW);
+			
+			m_normal_vbo = new vbo();
+			glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.normals_array[0]) * visitor.normals_array.size(), &visitor.normals_array[0], GL_STATIC_DRAW);
+			
+			m_index_vbo = new vbo();
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(visitor.indices[0]) * visitor.indices.size(), &visitor.indices[0], GL_STATIC_DRAW);
+			
+			face_starts = visitor.face_starts;
+			index_size = visitor.indices.size();
+		}
 	}
 	else // Only update the point VBO with new positions
 	{
@@ -373,16 +474,32 @@ void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::s
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
 		GLuint* indices = static_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY));
 		
-		update_face_vbo_visitor visitor(face_starts, indices, points);
-		Cache.visit_faces(visitor, Level, true);
-		
-		glUnmapBuffer(GL_ARRAY_BUFFER);
-		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-		
-		glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
-		k3d::point3* normals = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-		for (k3d::uint_t i = 0; i != visitor.modified_indices.size(); ++i)
-			normals[visitor.modified_indices[i]] = visitor.normals[i];
+		if (k3d::get_array<tags_t>(Mesh.polyhedra->constant_data, "interpolateboundary") != 0)
+		{
+			update_face_vbo_visitor visitor(face_starts, indices, points);
+			Cache.visit_faces(visitor, Level, true);
+			
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
+			k3d::point3* normals = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+			for (k3d::uint_t i = 0; i != visitor.modified_indices.size(); ++i)
+				normals[visitor.modified_indices[i]] = visitor.normals[i];
+		}
+		else // interpolateboundary not set
+		{
+			update_face_vbo_visitor_no_boundary visitor(face_starts, indices, points, boundary_faces);
+			Cache.visit_faces(visitor, Level, true);
+			
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
+			k3d::point3* normals = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+			for (k3d::uint_t i = 0; i != visitor.modified_indices.size(); ++i)
+				normals[visitor.modified_indices[i]] = visitor.normals[i];
+		}
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 	}
 }

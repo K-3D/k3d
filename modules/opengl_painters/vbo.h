@@ -259,10 +259,15 @@ public:
 	/// Length of the index buffer
 	k3d::uint_t index_size;
 	
+	/// Indicates if a face is on the boundary
+	k3d::mesh::bools_t boundary_faces;
+	
 private:
 	vbo* m_point_vbo;
 	vbo* m_index_vbo;
 	vbo* m_normal_vbo;
+	k3d::mesh::indices_t m_companions;
+	k3d::mesh::bools_t m_boundary_edges;
 };
 
 /// Cache SDS edge VBOs
