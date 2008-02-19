@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -35,8 +35,6 @@
 #include <k3dsdk/shared_pointer.h>
 
 #include <iterator>
-
-
 
 namespace module
 {
