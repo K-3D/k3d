@@ -22,138 +22,41 @@
 */
 
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/hints.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
-#include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
-
-#include <map>
-#include <set>
+#include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/mesh_selection_modifier.h>
+#include <k3dsdk/mesh_topology_data.h>
+#include <k3dsdk/shared_pointer.h>
 
 namespace libk3dselection
 {
-
-namespace detail
-{
-
-const unsigned long vertex_valency1(k3d::legacy::split_edge* Edge)
-{
-	// Cycle through edges around vertex
-	unsigned long valency = 0;
-	k3d::legacy::split_edge* current_edge = Edge;
-	do
-	{
-		// Return 0 if a surface boundary is found
-		if(!current_edge->companion)
-			return 0;
-
-		++valency;
-
-		current_edge = current_edge->companion->face_clockwise;
-	}
-	while(current_edge != Edge);
-
-	return valency;
-}
-
-void select_edgering(k3d::legacy::split_edge* Edge, const bool Extended, const bool VisibleSelection)
-{
-	const unsigned long valency1 = vertex_valency1(Edge);
-	const unsigned long valency2 = vertex_valency1(Edge->face_clockwise);
-	return_if_fail(valency1 == valency2);
-
-	k3d::legacy::split_edge* current_edge = Edge;
-	do
-	{
-		k3d::legacy::split_edge* next_edge = current_edge->face_clockwise->face_clockwise;
-
-		if(!Extended)
-		{
-			// Make sure next edge endpoints have a valency of 4
-			if(vertex_valency1(next_edge) != 4)
-				return;
-
-			if(vertex_valency1(next_edge->face_clockwise) != 4)
-				return;
-		}
-
-		// Make sure current face forms a quad
-		if(next_edge->face_clockwise->face_clockwise != current_edge)
-			return;
-
-		next_edge->selection_weight = 1.0;
-
-		current_edge = next_edge->companion;
-	}
-	while(current_edge && current_edge != Edge);
-}
-
-} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // select_edge_rings
 
 class select_edge_rings :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::mesh_selection_modifier
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > base;
-
+	typedef k3d::mesh_selection_modifier base;
 public:
 	select_edge_rings(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_extended(init_owner(*this) + init_name("extended") + init_label(_("Extended mode")) + init_description(_("Extended mode follows quads instead of edgeloops")) + init_value(true))
+		base(Factory, Document)
 	{
-		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
-		m_extended.changed_signal().connect(make_reset_mesh_slot());
+		mesh_sink_input().property_changed_signal().connect(sigc::mem_fun(*this, &select_edge_rings::mesh_changed));
 	}
-
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	
+	/// Clears cached valencies and companions if the mesh topology is changed
+	void mesh_changed(k3d::iunknown* Hint)
 	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Mesh);
-
-		const bool extended = m_extended.pipeline_value();
-
-		// Make a list of selected edges
-		typedef std::list<k3d::legacy::split_edge*> edges_t;
-		edges_t edges;
-		for(k3d::legacy::mesh::polyhedra_t::iterator p = Mesh.polyhedra.begin(); p != Mesh.polyhedra.end(); ++p)
+		if (!Hint || dynamic_cast<k3d::hint::mesh_topology_changed_t*>(Hint))
 		{
-			k3d::legacy::polyhedron& polyhedron = **p;
-			for(k3d::legacy::polyhedron::faces_t::iterator face = polyhedron.faces.begin(); face != polyhedron.faces.end(); ++face)
-			{
-				k3d::legacy::split_edge* edge = (*face)->first_edge;
-				do
-				{
-					if(edge->selection_weight)
-						edges.push_back(edge);
-
-					edge = edge->face_clockwise;
-				}
-				while(edge != (*face)->first_edge);
-			}
-		}
-
-		// For each selected edge, select edgering
-		for(edges_t::iterator edge = edges.begin(); edge != edges.end(); ++edge)
-		{
-			detail::select_edgering(*edge, extended, true);
-
-			if((*edge)->companion)
-				detail::select_edgering((*edge)->companion, extended, true);
-
-			// Reset selection
-			(*edge)->selection_weight = 1.0;
+			m_companions.clear();
+			m_valences.clear();
+			m_boundary_edges.clear();
 		}
 	}
-
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-	}
-
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<select_edge_rings,
@@ -168,8 +71,57 @@ public:
 		return factory;
 	}
 
-private:
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_extended;
+private:	
+	void on_select_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	{
+		if (!k3d::validate_polyhedra(Input))
+			return;
+		
+		if (m_companions.empty() || m_valences.empty() || m_boundary_edges.empty())
+		{
+			k3d::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, m_boundary_edges, m_companions);
+			k3d::create_vertex_valence_lookup(Input.points->size(), *Input.polyhedra->edge_points, m_valences);
+		}
+		
+		// Make sure the Output selection arrays contain the correct selection
+		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		
+		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
+		const k3d::mesh::selection_t edge_selection = *Output.polyhedra->edge_selection;
+		const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
+		const k3d::uint_t edge_count = edge_selection.size();
+		k3d::mesh::polyhedra_t* target_polyhedra = k3d::make_unique(Output.polyhedra);
+		k3d::mesh::selection_t& target_selection = *k3d::make_unique(target_polyhedra->edge_selection);
+		for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
+		{
+			double selection_weight = edge_selection[edge];
+			if (selection_weight)
+			{
+				for (k3d::uint_t ringedge = edge; ; )
+				{
+					target_selection[ringedge] = selection_weight;
+					
+					if (clockwise_edges[clockwise_edges[clockwise_edges[clockwise_edges[ringedge]]]] != ringedge) // Not a quad
+						break;
+					
+					k3d::uint_t transverse_edge = clockwise_edges[clockwise_edges[ringedge]];
+					target_selection[transverse_edge] = selection_weight;
+					
+					if (m_boundary_edges[transverse_edge]) // No companion
+						break;
+					
+					ringedge = m_companions[transverse_edge];
+					
+					if (ringedge == edge) // loop complete
+						break;
+				}
+			}
+		}
+	}
+	
+	k3d::mesh::indices_t m_companions;
+	k3d::mesh::bools_t m_boundary_edges;
+	k3d::mesh::counts_t m_valences;
 };
 
 /////////////////////////////////////////////////////////////////////////////

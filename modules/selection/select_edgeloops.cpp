@@ -44,9 +44,13 @@ class select_edge_loops :
 
 public:
 	select_edge_loops(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document)
+		base(Factory, Document),
+		m_ring_side_a(init_owner(*this) + init_name("ring_side_a") + init_label(_("Ring Side A")) + init_description(_("Find loop using the edgering on one side of the selected edge(s)")) + init_value(false)),
+		m_ring_side_b(init_owner(*this) + init_name("ring_side_b") + init_label(_("Ring Side B")) + init_description(_("Find loop using the edgering on the other side of the selected edge(s)")) + init_value(false))
 	{
 		mesh_sink_input().property_changed_signal().connect(sigc::mem_fun(*this, &select_edge_loops::mesh_changed));
+		m_ring_side_a.property_changed_signal().connect(make_update_mesh_slot());
+		m_ring_side_b.property_changed_signal().connect(make_update_mesh_slot());
 	}
 	
 	/// Clears cached valencies and companions if the mesh topology is changed
@@ -66,10 +70,10 @@ public:
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink> > > factory(
 				k3d::uuid(0x6f42e16a, 0x99804f99, 0xa00528d3, 0x702f015c),
-				"SelectEdgeLoopsNew",
+				"SelectEdgeLoops",
 				_("Selects edge loops containing selected egdes"),
 				"Development",
-				k3d::iplugin_factory::EXPERIMENTAL);
+				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
@@ -96,32 +100,83 @@ private:
 		const k3d::uint_t edge_count = edge_selection.size();
 		k3d::mesh::polyhedra_t* target_polyhedra = k3d::make_unique(Output.polyhedra);
 		k3d::mesh::selection_t& target_selection = *k3d::make_unique(target_polyhedra->edge_selection);
-		for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
+		
+		bool a_side = m_ring_side_a.pipeline_value();
+		bool b_side = m_ring_side_b.pipeline_value();
+		
+		if (!a_side && !b_side) // Use the classical algorithm
 		{
-			double selection_weight = edge_selection[edge];
-			if (selection_weight)
+			for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
 			{
-				for (k3d::uint_t loopedge = edge; ; )
+				double selection_weight = edge_selection[edge];
+				if (selection_weight)
 				{
-					target_selection[loopedge] = selection_weight;
-					
-					if (m_valences[edge_points[clockwise_edges[loopedge]]] != 4) // Next edge in loop is ambiguous
-						break;
-					
-					if (m_boundary_edges[clockwise_edges[loopedge]]) // No companion
-						break;
-					
-					loopedge = clockwise_edges[m_companions[clockwise_edges[loopedge]]];
-					if (loopedge == edge) // loop complete
-						break;
+					for (k3d::uint_t loopedge = edge; ; )
+					{
+						target_selection[loopedge] = selection_weight;
+						
+						if (m_valences[edge_points[clockwise_edges[loopedge]]] != 4) // Next edge in loop is ambiguous
+							break;
+						
+						if (m_boundary_edges[clockwise_edges[loopedge]]) // No companion
+							break;
+						
+						loopedge = clockwise_edges[m_companions[clockwise_edges[loopedge]]];
+						if (loopedge == edge) // loop complete
+							break;
+					}
 				}
 			}
+		}
+		else // Use the edgerings on either side of the edge
+		{
+			for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
+			{
+				double selection_weight = edge_selection[edge];
+				if (selection_weight)
+				{
+					if (!m_boundary_edges[edge] && edge_selection[m_companions[edge]] && m_companions[edge] > edge)
+						continue; // we'll catch this one when we reach its companion
+					if (a_side)
+						select_with_edgering(selection_weight, clockwise_edges[edge], clockwise_edges, target_selection);
+					if (b_side && !m_boundary_edges[edge])
+						select_with_edgering(selection_weight, clockwise_edges[m_companions[edge]], clockwise_edges, target_selection);
+				}
+			}
+		}
+	}
+	
+	// Select an edge loop at the side of an edgering starting at Edge
+	void select_with_edgering(const double SelectionWeight, const k3d::uint_t Edge, const k3d::mesh::indices_t& ClockwiseEdges, k3d::mesh::selection_t& TargetSelection)
+	{
+		for (k3d::uint_t ringedge = Edge; ; )
+		{
+			
+			if (ClockwiseEdges[ClockwiseEdges[ClockwiseEdges[ClockwiseEdges[ringedge]]]] != ringedge) // Not a quad
+				break;
+			
+			k3d::uint_t transverse_edge = ClockwiseEdges[ClockwiseEdges[ringedge]];
+			k3d::uint_t loopedge = ClockwiseEdges[transverse_edge];
+			TargetSelection[loopedge] = SelectionWeight;
+			if (!m_boundary_edges[loopedge])
+				TargetSelection[m_companions[loopedge]] = SelectionWeight;
+			
+			if (m_boundary_edges[transverse_edge]) // No companion
+				break;
+			
+			ringedge = m_companions[transverse_edge];
+			
+			if (ringedge == Edge) // loop complete
+				break;
 		}
 	}
 	
 	k3d::mesh::indices_t m_companions;
 	k3d::mesh::bools_t m_boundary_edges;
 	k3d::mesh::counts_t m_valences;
+	
+	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_ring_side_a;
+	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_ring_side_b;
 };
 
 /////////////////////////////////////////////////////////////////////////////
