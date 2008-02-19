@@ -576,18 +576,61 @@ private:
 	{
 		return_if_fail(Modifier);
 
-		k3d::inode* new_modifier = 0;
+		k3d::nodes_t new_modifiers;
 
 		const k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
+		k3d::nodes_t::const_iterator node = selected_nodes.begin();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
 		{
-			new_modifier = modify_mesh(m_document_state, **node, Modifier);
-			assert_warning(new_modifier);
+			new_modifiers.push_back(modify_mesh(m_document_state, **node, Modifier));
+			assert_warning(new_modifiers.back());
 		}
 
 		// Show the new modifier properties if only one was processed
 		if(selected_nodes.size() == 1)
-			m_document_state.view_node_properties_signal().emit(new_modifier);
+		{
+			m_document_state.view_node_properties_signal().emit(new_modifiers.front());
+		}
+		else // otherwise connect all parameter properties to the first node and show that one
+		{
+			k3d::iproperty_collection* first_property_collection = dynamic_cast<k3d::iproperty_collection*>(new_modifiers.front());
+			if (first_property_collection)
+			{
+				// Get the in-and output property names, to exclude them from the connections
+				k3d::imesh_sink* const modifier_sink = dynamic_cast<k3d::imesh_sink*>(new_modifiers.front());
+				return_if_fail(modifier_sink);
+				k3d::imesh_source* const modifier_source = dynamic_cast<k3d::imesh_source*>(new_modifiers.front());
+				return_if_fail(modifier_source);
+				const std::string sink_name = modifier_sink->mesh_sink_input().property_name();
+				const std::string source_name = modifier_source->mesh_source_output().property_name();
+				
+				k3d::ipipeline::dependencies_t dependencies;
+				const k3d::iproperty_collection::properties_t& first_properties = first_property_collection->properties();
+				k3d::nodes_t::iterator modifier = new_modifiers.begin();
+				++modifier;
+				for (modifier; modifier != new_modifiers.end(); ++modifier)
+				{
+					k3d::iproperty_collection* property_collection = dynamic_cast<k3d::iproperty_collection*>(*modifier);
+					return_if_fail(property_collection);
+					const k3d::iproperty_collection::properties_t& properties = property_collection->properties();
+					k3d::iproperty_collection::properties_t::const_iterator property = properties.begin();
+					for (k3d::iproperty_collection::properties_t::const_iterator first_property = first_properties.begin(); first_property != first_properties.end(); ++first_property)
+					{
+						return_if_fail(property != properties.end());
+						return_if_fail((*property)->property_name() == (*first_property)->property_name());
+						if ((*property)->property_name() == sink_name || (*property)->property_name() == source_name || (*property)->property_name() == "name")
+						{
+							++property;
+							continue;
+						}
+						dependencies.insert(std::make_pair(*property, *first_property));
+						++property;
+					}
+				}
+				m_document_state.document().pipeline().set_dependencies(dependencies);
+				m_document_state.view_node_properties_signal().emit(new_modifiers.front());
+			}
+		}
 
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
