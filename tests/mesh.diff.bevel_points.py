@@ -19,7 +19,7 @@ for i in range(100):
 	selection.points = [(0, 4, 1), (4, 1000, 0)]
 	bevel_points.mesh_selection = selection;
 
-	diff_input = diff.add_user_property("k3d::mesh*", "input_" + str(i), "Input " + str(i), "Input mesh " + str(i))
+	diff_input = diff.create_property("k3d::mesh*", "input_" + str(i), "Input " + str(i), "Input mesh " + str(i))
 
 	doc.set_dependency(bevel_points.get_property("input_mesh"), cube.get_property("output_mesh"));
 	doc.set_dependency(diff_input, bevel_points.get_property("output_mesh"));

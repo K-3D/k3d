@@ -19,7 +19,7 @@ for i in range(100):
 	selection.edges = [(0, 4, 1), (4, 1000, 0)]
 	subdivide_edges.mesh_selection = selection
 
-	diff_input = diff.add_user_property("k3d::mesh*", "input_" + str(i), "Input " + str(i), "Input mesh " + str(i))
+	diff_input = diff.create_property("k3d::mesh*", "input_" + str(i), "Input " + str(i), "Input mesh " + str(i))
 
 	doc.set_dependency(subdivide_edges.get_property("input_mesh"), cube.get_property("output_mesh"));
 	doc.set_dependency(diff_input, subdivide_edges.get_property("output_mesh"));

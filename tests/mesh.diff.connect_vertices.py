@@ -19,7 +19,7 @@ for i in range(100):
 	selection.points = [(0, 1, 1), (1, 2, 0), (2, 3, 1), (3, 1000, 0)]
 	connect_vertices.mesh_selection = selection
 
-	diff_input = diff.add_user_property("k3d::mesh*", "input_" + str(i), "Input " + str(i), "Input mesh " + str(i))
+	diff_input = diff.create_property("k3d::mesh*", "input_" + str(i), "Input " + str(i), "Input mesh " + str(i))
 
 	doc.set_dependency(connect_vertices.get_property("input_mesh"), cube.get_property("output_mesh"));
 	doc.set_dependency(diff_input, connect_vertices.get_property("output_mesh"));

@@ -76,10 +76,10 @@ def create_default_painter(document):
 
 	painter = document.new_node("OpenGLMultiPainter")
 
-	painter.add_user_property("k3d::gl::imesh_painter*", "edges", "Edges", "Edge Painter")
-	painter.add_user_property("k3d::gl::imesh_painter*", "faces", "Faces", "Face Painter")
-	painter.add_user_property("k3d::gl::imesh_painter*", "nurbs_curves", "NURBS Curves", "NURBS Curve Painter")
-	painter.add_user_property("k3d::gl::imesh_painter*", "nurbs_patches", "NURBS Patches", "NURBS Patche Painter")
+	painter.create_property("k3d::gl::imesh_painter*", "edges", "Edges", "Edge Painter")
+	painter.create_property("k3d::gl::imesh_painter*", "faces", "Faces", "Face Painter")
+	painter.create_property("k3d::gl::imesh_painter*", "nurbs_curves", "NURBS Curves", "NURBS Curve Painter")
+	painter.create_property("k3d::gl::imesh_painter*", "nurbs_patches", "NURBS Patches", "NURBS Patche Painter")
 	
 	painter.edges = edge_painter
 	painter.faces = face_painter
@@ -91,7 +91,7 @@ def create_default_painter(document):
 def setup_bitmap_reader_test(reader_name, source_file):
 	doc = k3d.new_document()
 	reader = doc.new_node(reader_name)
-	reader.file = source_path() + "/bitmaps/" + source_file
+	reader.file = k3d.generic_path(source_path() + "/bitmaps/" + source_file)
 
 	class result_object:
 		pass
@@ -105,7 +105,7 @@ def setup_bitmap_reader_test(reader_name, source_file):
 def setup_mesh_reader_test(reader_name, source_file):
 	doc = k3d.new_document()
 	reader = doc.new_node(reader_name)
-	reader.file = source_path() + "/meshes/" + source_file
+	reader.file = k3d.generic_path(source_path() + "/meshes/" + source_file)
 
 	class result_object:
 		pass
@@ -252,16 +252,16 @@ def bitmap_size_comparison(bitmap, width, height):
 
 def mesh_comparison(document, mesh, mesh_name, threshold):
 	
-	output_file = binary_path() + "/" + mesh_name + ".output.k3d"
-	reference_file = source_path() + "/meshes/" + mesh_name + ".reference.k3d"
+	output_file = k3d.generic_path(binary_path() + "/" + mesh_name + ".output.k3d")
+	reference_file = k3d.generic_path(source_path() + "/meshes/" + mesh_name + ".reference.k3d")
 	
 	reference = document.new_node("K3DMeshReader")
 	reference.file = reference_file
 
 	difference = document.new_node("MeshDiff")
 	difference.threshold = threshold
-	difference.add_user_property("k3d::mesh*", "input_a", "InputA", "First input mesh")
-	difference.add_user_property("k3d::mesh*", "input_b", "InputB", "Second input mesh")
+	difference.create_property("k3d::mesh*", "input_a", "InputA", "First input mesh")
+	difference.create_property("k3d::mesh*", "input_b", "InputB", "Second input mesh")
 	document.set_dependency(difference.get_property("input_a"), mesh)
 	document.set_dependency(difference.get_property("input_b"), reference.get_property("output_mesh"))
 
@@ -302,9 +302,9 @@ def assert_solid_mesh(mesh):
 
 def image_comparison(document, image, image_name, threshold):
 
-	output_file = binary_path() + "/" + image_name + ".output.png"
-	reference_file = source_path() + "/bitmaps/" + image_name + ".reference.png"
-	difference_file = binary_path() + "/" + image_name + ".difference.png"
+	output_file = k3d.generic_path(binary_path() + "/" + image_name + ".output.png")
+	reference_file = k3d.generic_path(source_path() + "/bitmaps/" + image_name + ".reference.png")
+	difference_file = k3d.generic_path(binary_path() + "/" + image_name + ".difference.png")
 
 	reference = document.new_node("PNGBitmapReader")
 	reference.file = reference_file
@@ -330,9 +330,9 @@ def image_comparison(document, image, image_name, threshold):
 	print """<DartMeasurement name="Pixel Count" type="numeric/float">""" + str(pixel_count) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Difference" type="numeric/float">""" + str(difference_measurement) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Threshold" type="numeric/float">""" + str(threshold) + """</DartMeasurement>"""
-	print """<DartMeasurementFile name="Output Image" type="image/png">""" + output_file + """</DartMeasurementFile>"""
-	print """<DartMeasurementFile name="Reference Image" type="image/png">""" + reference_file + """</DartMeasurementFile>"""
-	print """<DartMeasurementFile name="Difference Image" type="image/png">""" + difference_file + """</DartMeasurementFile>"""
+	print """<DartMeasurementFile name="Output Image" type="image/png">""" + str(output_file) + """</DartMeasurementFile>"""
+	print """<DartMeasurementFile name="Reference Image" type="image/png">""" + str(reference_file) + """</DartMeasurementFile>"""
+	print """<DartMeasurementFile name="Difference Image" type="image/png">""" + str(difference_file) + """</DartMeasurementFile>"""
 	sys.stdout.flush()
 
 	if difference_measurement > threshold:

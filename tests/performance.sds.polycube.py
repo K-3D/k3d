@@ -14,8 +14,8 @@ face_painter.name = "Test face painter"
 
 painter = document.new_node("OpenGLMultiPainter")
 painter.name = "Test painter"
-painter.add_user_property("k3d::gl::imesh_painter*", "edges", "Edges", "Edge Painter")
-painter.add_user_property("k3d::gl::imesh_painter*", "faces", "Faces", "Face Painter")
+painter.create_property("k3d::gl::imesh_painter*", "edges", "Edges", "Edge Painter")
+painter.create_property("k3d::gl::imesh_painter*", "faces", "Faces", "Face Painter")
 painter.edges = edge_painter
 painter.faces = face_painter
 

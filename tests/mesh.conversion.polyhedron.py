@@ -26,8 +26,8 @@ doc.set_dependency(convert.get_property("input_mesh"), select_point.get_property
 
 # Compare the original to the conversion ...
 diff = doc.new_node("MeshDiff")
-diff.add_user_property("k3d::mesh*", "input_a", "InputA", "First input mesh")
-diff.add_user_property("k3d::mesh*", "input_b", "InputB", "Second input mesh")
+diff.create_property("k3d::mesh*", "input_a", "InputA", "First input mesh")
+diff.create_property("k3d::mesh*", "input_b", "InputB", "Second input mesh")
 
 doc.set_dependency(diff.get_property("input_a"), select_point.get_property("output_mesh"))
 doc.set_dependency(diff.get_property("input_b"), convert.get_property("output_mesh"))
