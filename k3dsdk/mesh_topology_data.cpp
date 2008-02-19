@@ -122,15 +122,15 @@ void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh
 	}
 }
 
-void create_vertex_valence_lookup(const k3d::uint_t PointCount, const k3d::mesh::indices_t& EdgePoints, k3d::mesh::counts_t& Valences)
+void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& EdgePoints, mesh::counts_t& Valences)
 {
 	// Default to 0 for all points
 	Valences.clear();
 	Valences.resize(PointCount, 0);
 		
 	// Add 1 for each edge that starts at a point
-	k3d::uint_t edge_count = EdgePoints.size();
-	for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
+	uint_t edge_count = EdgePoints.size();
+	for (uint_t edge = 0; edge != edge_count; ++edge)
 	{
 		++Valences[EdgePoints[edge]];
 	}
