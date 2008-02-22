@@ -32,6 +32,9 @@
 #include <tbb/parallel_for.h>
 #include <tbb/task.h>
 #include <tbb/task_scheduler_init.h>
+#include <tbb/tick_count.h>
+
+#include <pthread.h>
 
 namespace module
 {
@@ -78,7 +81,7 @@ public:
 
 		void operator()(const ::tbb::blocked_range<k3d::uint_t>& range) const
 		{
-k3d::log() << debug << __PRETTY_FUNCTION__ << " [" << range.begin() << ", " << range.end() << ") " << ::tbb::task::self().owner << std::endl;
+k3d::log() << debug << __PRETTY_FUNCTION__ << " [" << range.begin() << ", " << range.end() << ") thread: " << pthread_self() << std::endl;
 
 			const k3d::uint_t point_begin = range.begin();
 			const k3d::uint_t point_end = range.end();
@@ -101,6 +104,8 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 		const k3d::int32_t thread_count = m_thread_count.pipeline_value();
 		const k3d::int32_t grain_size = m_grain_size.pipeline_value();
 
+		::tbb::tick_count t0 = ::tbb::tick_count::now();
+
 		m_scheduler.initialize(thread_count);
 
 		::tbb::parallel_for(
@@ -108,6 +113,10 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 			worker(InputPoints, PointSelection, OutputPoints, matrix));
 
 		m_scheduler.terminate();
+
+		::tbb::tick_count t1 = ::tbb::tick_count::now();
+
+k3d::log() << debug << (t1 - t0).seconds() << " seconds" << std::endl;
 	}
 
 	static k3d::iplugin_factory& get_factory()
