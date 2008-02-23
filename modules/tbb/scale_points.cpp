@@ -81,8 +81,7 @@ public:
 
 		void operator()(const ::tbb::blocked_range<k3d::uint_t>& range) const
 		{
-k3d::log() << debug << __PRETTY_FUNCTION__ << " [" << range.begin() << ", " << range.end() << ") thread: " << pthread_self() << std::endl;
-
+//k3d::log() << debug << "[" << range.begin() << ", " << range.end() << ")" << std::endl;
 			const k3d::uint_t point_begin = range.begin();
 			const k3d::uint_t point_end = range.end();
 			for(k3d::uint_t point = point_begin; point != point_end; ++point)
@@ -98,11 +97,10 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << " [" << range.begin() << ", " << r
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-
 		const k3d::matrix4 matrix = k3d::scaling3D(k3d::point3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value()));
 		const k3d::int32_t thread_count = m_thread_count.pipeline_value();
 		const k3d::int32_t grain_size = m_grain_size.pipeline_value();
+		const k3d::uint_t point_count = InputPoints.size();
 
 		::tbb::tick_count t0 = ::tbb::tick_count::now();
 
@@ -116,7 +114,7 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 
 		::tbb::tick_count t1 = ::tbb::tick_count::now();
 
-k3d::log() << debug << (t1 - t0).seconds() << " seconds" << std::endl;
+std::cout << point_count << "," << thread_count << "," << grain_size << "," << (t1 - t0).seconds() << "\n";
 	}
 
 	static k3d::iplugin_factory& get_factory()
