@@ -8,12 +8,10 @@ doc = k3d.new_document()
 axes = doc.new_node("Axes")
 axes.xyplane = False
 
-painter = testing.create_default_painter(doc)
+material = doc.new_node("RenderManMaterial")
 
-cylinder = doc.new_node("PolyCylinder")
-cylinder_instance = doc.new_node("MeshInstance")
-cylinder_instance.gl_painter = painter
-doc.set_dependency(cylinder_instance.get_property("input_mesh"), cylinder.get_property("output_mesh"))
+torus = doc.new_node("Torus")
+torus.material = material
 
 camera = testing.create_camera(doc)
 render_engine = testing.create_opengl_engine(doc)
