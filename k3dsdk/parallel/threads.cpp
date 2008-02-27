@@ -47,7 +47,7 @@ void set_thread_count(int32_t Count)
 
 #else // K3D_BUILD_PARALLEL
 
-void set_thread_count(uint32_t Count)
+void set_thread_count(int32_t Count)
 {
 }
 
