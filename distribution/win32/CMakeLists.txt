@@ -1,57 +1,107 @@
+OPTION(K3D_BUILD_INSTALLER "Build K-3D installer" OFF)
 
+IF(K3D_BUILD_INSTALLER)
+	OPTION(K3D_INSTALL_AQSIS "Include Aqsis and dependencies in K-3D intallers" ON)
+	OPTION(K3D_INSTALL_BOOST "Include Boost dependencies in K-3D intallers" ON)
+	OPTION(K3D_INSTALL_GTKMM "Include GTKMM and dependencies in K-3D intallers" ON)
+	OPTION(K3D_INSTALL_PYTHON "Include Python and dependencies in K-3D intallers" ON)
 
-# This is an ugly hack, we should be able to detect this automatically, but I'm feeling lazy ...
-SET(K3D_GTK_DIR "c:/gtk" CACHE PATH "Root directory containing GTK/gtkmm")
-MARK_AS_ADVANCED(K3D_GTK_DIR)
+	IF(K3D_INSTALL_AQSIS)
+		FIND_PATH(K3D_AQSIS_BIN_PATH aqsis.exe
+			DOC "Path to an installed Aqsis executable"
+			)
+		MARK_AS_ADVANCED(K3D_AQSIS_BIN_PATH)
 
-# The Win32 install includes its own copies of GTK and Boost, to prevent DLL hell ...
-INSTALL(FILES ${K3D_BOOST_LIB_DIR}/boost_regex-mgw-1_33_1.dll DESTINATION bin)
-INSTALL(FILES ${K3D_BOOST_LIB_DIR}/boost_python-mgw-1_33_1.dll DESTINATION bin)
+		IF(NOT K3D_AQSIS_BIN_PATH)
+			MESSAGE(SEND_ERROR "Could not locate installed Aqsis executable.")
+		ENDIF(NOT K3D_AQSIS_BIN_PATH)
 
-INSTALL(DIRECTORY ${K3D_GTK_DIR}/bin/ DESTINATION bin
-	USE_SOURCE_PERMISSIONS
-	PATTERN *.pdb EXCLUDE
-	PATTERN *-config EXCLUDE
-	PATTERN *glade* EXCLUDE
-	PATTERN *xml++* EXCLUDE
-	PATTERN atkmm-1.6d.dll EXCLUDE
-	PATTERN gdkmm-2.4d.dll EXCLUDE
-	PATTERN gettext.sh EXCLUDE
-	PATTERN glib-gettextize EXCLUDE
-	PATTERN glib-mkenums EXCLUDE
-	PATTERN glibmm-2.4d.dll EXCLUDE
-	PATTERN gtkaio.sh EXCLUDE
-	PATTERN gtkautogen EXCLUDE
-	PATTERN gtkconfigure EXCLUDE
-	PATTERN gtkmm-2.4d.dll EXCLUDE
-	PATTERN msg*.exe EXCLUDE
-	PATTERN pangomm-1.4d.dll EXCLUDE
-	PATTERN sigc-2.0d.dll EXCLUDE
-	)
+		INSTALL(DIRECTORY ${K3D_AQSIS_BIN_PATH}/ DESTINATION bin
+			USE_SOURCE_PERMISSIONS
+			)
+		
+	ENDIF(K3D_INSTALL_AQSIS)
 
-INSTALL(DIRECTORY ${K3D_GTK_DIR}/etc/ DESTINATION etc
-	USE_SOURCE_PERMISSIONS
-	)
+	IF(K3D_INSTALL_BOOST)
+		INSTALL(FILES ${K3D_BOOST_LIB_DIR}/boost_regex-mgw-1_33_1.dll DESTINATION bin)
+		INSTALL(FILES ${K3D_BOOST_LIB_DIR}/boost_python-mgw-1_33_1.dll DESTINATION bin)
+	ENDIF(K3D_INSTALL_BOOST)
 
-INSTALL(DIRECTORY ${K3D_GTK_DIR}/lib/ DESTINATION lib
-	USE_SOURCE_PERMISSIONS
-	PATTERN *.a EXCLUDE
-	PATTERN *.lib EXCLUDE
-	PATTERN *.pdb EXCLUDE
-	PATTERN *glade* EXCLUDE
-	PATTERN gdkmm-2.4 EXCLUDE
-	PATTERN glib-2.0 EXCLUDE
-	PATTERN glibmm-2.4 EXCLUDE
-	PATTERN gtkglext-1.0 EXCLUDE
-	PATTERN gtkmm-2.4 EXCLUDE
-	PATTERN include EXCLUDE
-	PATTERN libxml++-2.6 EXCLUDE
-	PATTERN pkgconfig EXCLUDE
-	PATTERN sigc++-2.0 EXCLUDE
-	)
+	IF(K3D_INSTALL_GTKMM)
+		# This is an ugly hack, we should be able to detect this automatically, but I'm feeling lazy ...
+		SET(K3D_GTK_DIR "c:/gtk" CACHE PATH "Root directory containing GTK/gtkmm")
+		MARK_AS_ADVANCED(K3D_GTK_DIR)
 
-# Override the default gtkrc file with our own
-INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gtkrc DESTINATION etc/gtk-2.0)
+		INSTALL(DIRECTORY ${K3D_GTK_DIR}/bin/ DESTINATION bin
+			USE_SOURCE_PERMISSIONS
+			PATTERN *.pdb EXCLUDE
+			PATTERN *-config EXCLUDE
+			PATTERN *glade* EXCLUDE
+			PATTERN *xml++* EXCLUDE
+			PATTERN atkmm-1.6d.dll EXCLUDE
+			PATTERN gdkmm-2.4d.dll EXCLUDE
+			PATTERN gettext.sh EXCLUDE
+			PATTERN glib-gettextize EXCLUDE
+			PATTERN glib-mkenums EXCLUDE
+			PATTERN glibmm-2.4d.dll EXCLUDE
+			PATTERN gtkaio.sh EXCLUDE
+			PATTERN gtkautogen EXCLUDE
+			PATTERN gtkconfigure EXCLUDE
+			PATTERN gtkmm-2.4d.dll EXCLUDE
+			PATTERN msg*.exe EXCLUDE
+			PATTERN pangomm-1.4d.dll EXCLUDE
+			PATTERN sigc-2.0d.dll EXCLUDE
+			)
 
-ADD_SUBDIRECTORY(nsis)
+		INSTALL(DIRECTORY ${K3D_GTK_DIR}/etc/ DESTINATION etc
+			USE_SOURCE_PERMISSIONS
+			)
+
+		INSTALL(DIRECTORY ${K3D_GTK_DIR}/lib/ DESTINATION lib
+			USE_SOURCE_PERMISSIONS
+			PATTERN *.a EXCLUDE
+			PATTERN *.lib EXCLUDE
+			PATTERN *.pdb EXCLUDE
+			PATTERN *glade* EXCLUDE
+			PATTERN gdkmm-2.4 EXCLUDE
+			PATTERN glib-2.0 EXCLUDE
+			PATTERN glibmm-2.4 EXCLUDE
+			PATTERN gtkglext-1.0 EXCLUDE
+			PATTERN gtkmm-2.4 EXCLUDE
+			PATTERN include EXCLUDE
+			PATTERN libxml++-2.6 EXCLUDE
+			PATTERN pkgconfig EXCLUDE
+			PATTERN sigc++-2.0 EXCLUDE
+			)
+
+		# Override the default gtkrc file with our own
+		INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gtkrc DESTINATION etc/gtk-2.0)
+	ENDIF(K3D_INSTALL_GTKMM)
+
+	IF(K3D_INSTALL_PYTHON)
+		FIND_PATH(K3D_PYTHON_BIN_PATH python.exe
+			DOC "Path to an installed Python executable"
+			)
+		MARK_AS_ADVANCED(K3D_PYTHON_BIN_PATH)
+
+		IF(NOT K3D_PYTHON_BIN_PATH)
+			MESSAGE(SEND_ERROR "Could not locate installed Python executable.")
+		ENDIF(NOT K3D_PYTHON_BIN_PATH)
+
+		INSTALL(PROGRAMS
+			${K3D_PYTHON_BIN_PATH}/python.exe
+			${K3D_PYTHON_BIN_PATH}/pythonw.exe
+			DESTINATION bin
+			)
+	
+		INSTALL(DIRECTORY ${K3D_PYTHON_BIN_PATH}/Lib/
+			DESTINATION lib
+			USE_SOURCE_PERMISSIONS
+			)
+		
+	ENDIF(K3D_INSTALL_PYTHON)
+
+	ADD_SUBDIRECTORY(nsis)
+
+ENDIF(K3D_BUILD_INSTALLER)
 
