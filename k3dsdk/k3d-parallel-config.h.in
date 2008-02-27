@@ -1,0 +1,9 @@
+#ifndef K3DSDK_PARALLEL_CONFIG_H
+#define K3DSDK_PARALLEL_CONFIG_H
+
+// Generated file, do not edit!  Make changes to k3d-parallel-config.h.in instead.
+
+#cmakedefine K3D_BUILD_PARALLEL 
+
+#endif // !K3DSDK_PARALLEL_CONFIG_H
+

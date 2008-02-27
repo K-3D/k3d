@@ -172,6 +172,9 @@ OPTION(K3D_BUILD_WGL_MODULE "Build the Windows offscreen rendering module" ${K3D
 OPTION(K3D_BUILD_WINDOWS_MODULE "Build the Windows integration module" ${K3D_BUILD_WINDOWS_MODULE_DEFAULT})
 OPTION(K3D_BUILD_YAFRAY_MODULE "Build the YAFRAY render engine integration module" ON)
 
+OPTION(K3D_BUILD_PARALLEL "Enable parallel computation using the Threaded Building Blocks library" OFF)
+MARK_AS_ADVANCED(K3D_BUILD_PARALLEL)
+
 OPTION(K3D_SYMBOL_VISIBILITY "Minimize the number of symbols exported from shared libraries" OFF)
 MARK_AS_ADVANCED(K3D_SYMBOL_VISIBILITY)
 
@@ -334,10 +337,10 @@ IF(K3D_BUILD_QTUI_MODULE)
 	MARK_AS_ADVANCED(QT_X11_m_LIBRARY)
 ENDIF(K3D_BUILD_QTUI_MODULE)
 
-IF(K3D_BUILD_TBB_MODULE)
+IF(K3D_BUILD_PARALLEL)
 	INCLUDE(K3DFindTBB)
-	K3D_CHECK_OPTIONAL_DEPENDENCY(K3D_TBB_FOUND "Threading Building Blocks (http://threadingbuildingblocks.org)" "K3D_BUILD_TBB_MODULE")
-ENDIF(K3D_BUILD_TBB_MODULE)
+	K3D_CHECK_OPTIONAL_DEPENDENCY(K3D_TBB_FOUND "Threading Building Blocks (http://threadingbuildingblocks.org)" "K3D_BUILD_PARALLEL")
+ENDIF(K3D_BUILD_PARALLEL)
 
 IF(K3D_BUILD_TIFF_IO_MODULE)
 	INCLUDE(K3DFindTIFF)

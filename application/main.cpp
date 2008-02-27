@@ -51,6 +51,7 @@
 #include <k3dsdk/log_control.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options_policy.h>
+#include <k3dsdk/parallel/threads.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/register_application.h>
 #include <k3dsdk/scripting.h>
@@ -720,6 +721,9 @@ int main(int argc, char* argv[])
 		check_dependencies(quit, error);
 		if(quit)
 			return error ? 1 : 0;
+
+		// Initialize parallel processing ...
+		k3d::parallel::set_thread_count(k3d::parallel::automatic);
 
 		// Set the shader cache path ...
 		k3d::set_shader_cache_path(g_shader_cache_path);

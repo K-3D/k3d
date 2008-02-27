@@ -27,14 +27,9 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
-
-#include <tbb/blocked_range.h>
-#include <tbb/parallel_for.h>
-#include <tbb/task.h>
-#include <tbb/task_scheduler_init.h>
-#include <tbb/tick_count.h>
-
-#include <pthread.h>
+#include <k3dsdk/parallel/blocked_range.h>
+#include <k3dsdk/parallel/parallel_for.h>
+#include <k3dsdk/parallel/threads.h>
 
 namespace module
 {
@@ -57,8 +52,7 @@ public:
 		m_y(init_owner(*this) + init_name("y") + init_label(_("Y")) + init_description(_("Y scale")) + init_value(1.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
 		m_z(init_owner(*this) + init_name("z") + init_label(_("Z")) + init_description(_("Z scale")) + init_value(1.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
 		m_thread_count(init_owner(*this) + init_name("thread_count") + init_label(_("Thread Count")) + init_description(_("Number of threads to use for computation.")) + init_value(1) + init_constraint(constraint::minimum(0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_grain_size(init_owner(*this) + init_name("grain_size") + init_label(_("Grain Size")) + init_description(_("Minimum number of computations to assign to a thread.")) + init_value(1) + init_constraint(constraint::minimum(0)) + init_step_increment(1000) + init_units(typeid(k3d::measurement::scalar))),
-		m_scheduler(::tbb::task_scheduler_init::deferred)
+		m_grain_size(init_owner(*this) + init_name("grain_size") + init_label(_("Grain Size")) + init_description(_("Minimum number of computations to assign to a thread.")) + init_value(1) + init_constraint(constraint::minimum(0)) + init_step_increment(1000) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_x.changed_signal().connect(make_update_mesh_slot());
@@ -79,9 +73,8 @@ public:
 		{
 		}
 
-		void operator()(const ::tbb::blocked_range<k3d::uint_t>& range) const
+		void operator()(const k3d::parallel::blocked_range<k3d::uint_t>& range) const
 		{
-//k3d::log() << debug << "[" << range.begin() << ", " << range.end() << ")" << std::endl;
 			const k3d::uint_t point_begin = range.begin();
 			const k3d::uint_t point_end = range.end();
 			for(k3d::uint_t point = point_begin; point != point_end; ++point)
@@ -102,19 +95,13 @@ public:
 		const k3d::int32_t grain_size = m_grain_size.pipeline_value();
 		const k3d::uint_t point_count = InputPoints.size();
 
-		::tbb::tick_count t0 = ::tbb::tick_count::now();
+		k3d::parallel::set_thread_count(thread_count);
 
-		m_scheduler.initialize(thread_count);
-
-		::tbb::parallel_for(
-			::tbb::blocked_range<k3d::uint_t>(0, OutputPoints.size(), grain_size),
+		k3d::parallel::parallel_for(
+			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), grain_size),
 			worker(InputPoints, PointSelection, OutputPoints, matrix));
 
-		m_scheduler.terminate();
-
-		::tbb::tick_count t1 = ::tbb::tick_count::now();
-
-std::cout << point_count << "," << thread_count << "," << grain_size << "," << (t1 - t0).seconds() << "\n";
+		k3d::parallel::set_thread_count(k3d::parallel::automatic);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -138,8 +125,6 @@ private:
 
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_thread_count;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_grain_size;
-
-	::tbb::task_scheduler_init m_scheduler;
 };
 
 /////////////////////////////////////////////////////////////////////////////
