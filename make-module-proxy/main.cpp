@@ -19,6 +19,7 @@
 
 #include <k3d-version-config.h>
 
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/iapplication_plugin_factory.h>
 #include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/iplugin_factory.h>
@@ -42,7 +43,7 @@ void plugin_message_handler(const std::string& Message)
 /// Prints usage info
 void usage(std::ostream& Stream)
 {
-	Stream << "usage: k3d-make-module-proxy [Module]" << std::endl;
+	Stream << "usage: k3d-make-module-proxy [Module] [OutputFile]" << std::endl;
 	Stream << std::endl;
 }
 
@@ -51,13 +52,14 @@ void usage(std::ostream& Stream)
 
 int main(int argc, char* argv[])
 {
-	if(argc != 2)
+	if(argc != 3)
 	{
 		usage(std::cerr);
 		return 1;
 	}
 
-	k3d::filesystem::path module_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(argv[1]));
+	const k3d::filesystem::path module_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(argv[1]));
+	const k3d::filesystem::path output_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(argv[2]));
 
 	k3d::plugin_factory_collection plugins;
 	plugins.connect_message_signal(sigc::ptr_fun(plugin_message_handler));
@@ -129,7 +131,8 @@ int main(int argc, char* argv[])
 			xml_metadata.append(k3d::xml::element("pair", k3d::xml::attribute("name", pair->first), k3d::xml::attribute("value", pair->second)));
 	}
 
-	std::cout << k3d::xml::declaration() << xml_proxy;
+	k3d::filesystem::ofstream output(output_path);
+	output << k3d::xml::declaration() << xml_proxy;
 
 	return 0;
 }
