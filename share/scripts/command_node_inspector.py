@@ -6,9 +6,9 @@ class inspector:
 	def print_node(self, Node, Level):
 		message = ""
 		for j in range(Level):
-			message += " "
+			message += "    "
 
-		message += "node: " + Node.command_node_name()
+		message += "command-node: " + Node.command_node_name()
 
 		k3d.log_debug(message)
 
