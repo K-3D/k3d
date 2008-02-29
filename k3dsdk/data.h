@@ -915,7 +915,11 @@ public:
 	{
 		iproperty* const source = property_lookup(this);
 		if(source != this)
-			return name_policy_t::constrain_value(boost::any_cast<value_t>(source->property_internal_value()));
+		{
+			enumeration_property<value_t, name_policy_t>* enum_source = dynamic_cast<enumeration_property<value_t, name_policy_t>*>(source);
+			if (enum_source)
+				return name_policy_t::constrain_value(enum_source->internal_value());
+		}
 
 		return name_policy_t::internal_value();
 	}
