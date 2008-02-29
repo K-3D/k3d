@@ -1,14 +1,16 @@
 #python
 
 import k3d
-import sys
 
 class inspector:
 	def print_node(self, Node, Level):
+		message = ""
 		for j in range(Level):
-			print " ",
+			message += " "
 
-		print "node: " + Node.command_node_name()
+		message += "node: " + Node.command_node_name()
+
+		k3d.log_debug(message)
 
 		for child in Node.children():
 			self.print_node(child, Level + 1)
@@ -16,7 +18,5 @@ class inspector:
 for node in k3d.command_nodes():
 	inspector().print_node(node, 0)
 
-sys.stdout.flush()
-
-k3d.ui().message("Output sent to console")
+k3d.ui().message("Output sent to the K-3D log window.")
 
