@@ -27,8 +27,8 @@
 
 #include "iunknown.h"
 #include "signal_system.h"
+#include "types.h"
 
-#include <string>
 #include <vector>
 
 namespace k3d
@@ -42,16 +42,16 @@ public:
 	/// Stores information about an individual enumeration value
 	struct enumeration_value_t
 	{
-		enumeration_value_t(const std::string& Label, const std::string& Value, const std::string& Description) :
+		enumeration_value_t(const k3d::string_t& Label, const k3d::string_t& Value, const k3d::string_t& Description) :
 			label(Label),
 			value(Value),
 			description(Description)
 		{
 		}
 		
-		std::string label;
-		std::string value;
-		std::string description;
+		k3d::string_t label;
+		k3d::string_t value;
+		k3d::string_t description;
 	};
 	
 	/// Defines a collection of enumeration values

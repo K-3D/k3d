@@ -110,6 +110,8 @@ K3D_ADD_TEST(test.script.failure.lang.python.exception.py PYTHON XFAIL)
 
 K3D_ADD_TEST(test.dart.measurements.py PYTHON)
 
+K3D_ADD_TEST(property.linking.enumeration.py PYTHON)
+
 K3D_ADD_TEST(document.create.py PYTHON)
 K3D_ADD_TEST(document.stress.high_node_count.py PYTHON)
 K3D_ADD_TEST(document.stress.all_node_types.py PYTHON)

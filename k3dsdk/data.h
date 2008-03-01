@@ -916,39 +916,46 @@ public:
 		iproperty* const source = property_lookup(this);
 		if(source != this)
 		{
-			enumeration_property<value_t, name_policy_t>* enum_source = dynamic_cast<enumeration_property<value_t, name_policy_t>*>(source);
-			if (enum_source)
-				return name_policy_t::constrain_value(enum_source->internal_value());
+			try
+			{
+				// Because enumeration properties all have type "string", we have to convert the source property into our internal type (which
+				// could fail) before applying any constraints.
+				return name_policy_t::constrain_value(boost::lexical_cast<value_t>(boost::any_cast<string_t>(source->property_internal_value())));
+			}
+			catch(...)
+			{
+				return name_policy_t::internal_value();
+			}
 		}
 
 		return name_policy_t::internal_value();
 	}
 
-	const std::string property_name()
+	const string_t property_name()
 	{
 		return name_policy_t::name();
 	}
 
-	const std::string property_label()
+	const string_t property_label()
 	{
 		return m_label;
 	}
 
-	const std::string property_description()
+	const string_t property_description()
 	{
 		return m_description;
 	}
 
 	const std::type_info& property_type()
 	{
-		return typeid(std::string);
+		return typeid(string_t);
 	}
 
 	const boost::any property_internal_value()
 	{
 		try
 		{
-			return boost::any(boost::lexical_cast<std::string>(name_policy_t::internal_value()));
+			return boost::any(boost::lexical_cast<string_t>(name_policy_t::internal_value()));
 		}
 		catch(...)
 		{
@@ -959,7 +966,15 @@ public:
 
 	const boost::any property_pipeline_value()
 	{
-		return pipeline_value();
+		try
+		{
+			return boost::any(boost::lexical_cast<string_t>(pipeline_value()));
+		}
+		catch(...)
+		{
+		}
+
+		return boost::any();
 	}
 
 	inode* property_node()
@@ -989,7 +1004,7 @@ public:
 
 	bool property_set_value(const boost::any Value, iunknown* const Hint)
 	{
-		const std::string* const new_value = boost::any_cast<std::string>(&Value);
+		const string_t* const new_value = boost::any_cast<string_t>(&Value);
 		if(!new_value)
 			return false;
 
