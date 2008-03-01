@@ -106,6 +106,7 @@ OPTION(K3D_BUILD_GRAPHVIZ_MODULE "Build the GraphViz integration plugin module" 
 OPTION(K3D_BUILD_GTS_IO_MODULE "Build the GNU Triangulated Surfaces file format module" ON)
 OPTION(K3D_BUILD_GTS_MODULE "Build the GNU Triangulated Surfaces plugin module" OFF)
 OPTION(K3D_BUILD_IMAGEMAGICK_IO_MODULE "Build the ImageMagick file format module" ${K3D_BUILD_IMAGEMAGICK_IO_MODULE_DEFAULT})
+OPTION(K3D_BUILD_INSTALLER "Build K-3D installer" OFF)
 OPTION(K3D_BUILD_JPEG_IO_MODULE "Build the jpeg file format module" ON)
 OPTION(K3D_BUILD_K3DSCRIPT_MODULE "Build the k3dscript scripting language module" ON)
 OPTION(K3D_BUILD_K3D_IO_MODULE "Build the K-3D file format module" ON)
