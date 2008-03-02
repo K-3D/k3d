@@ -522,19 +522,20 @@ void get_context(boost::python::dict& Dictionary, k3d::iscript_engine::context_t
 {
 	for(k3d::iscript_engine::context_t::iterator context = Context.begin(); context != Context.end(); ++context)
 	{
-		const std::type_info& type = context->second.type();
-
-		if(type == typeid(k3d::idocument*))
+		// note: demangling is used as workaround for mingw build, which segfaults on the std::type_info operator== 
+		const k3d::string_t type = k3d::demangle(context->second.type());
+		
+		if(type == "k3d::idocument*")
 			continue;
-		else if(type == typeid(k3d::inode*))
+		else if(type == "k3d::inode*")
 			continue;
-		else if(type == typeid(k3d::mesh*))
+		else if(type == "k3d::mesh*")
 			continue;
-		else if(type == typeid(const k3d::ri::render_state*))
+		else if(type == "const k3d::ri::render_state*")
 			continue;
 		else
 		{
-			context->second = python_to_any(Dictionary[context->first], type);
+			context->second = python_to_any(Dictionary[context->first], context->second.type());
 		}
 	}
 }
