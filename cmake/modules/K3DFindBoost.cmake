@@ -49,7 +49,7 @@ ENDIF(UNIX AND APPLE)
 
 IF(WIN32)
 	FIND_PATH(K3D_BOOST_INCLUDE_DIR boost
-		c:/boost/include/boost-1_33_1
+		c:/boost/include/boost_1_34_1
 		DOC "Directory where the boost header files are located"
 		)
 	MARK_AS_ADVANCED(K3D_BOOST_INCLUDE_DIR)
@@ -60,21 +60,21 @@ IF(WIN32)
         IF(MSVC)
                 SET(K3D_BOOST_PROGRAM_OPTIONS_LIB optimized libboost_program_options-vc80-mt debug libboost_program_options-vc80-mt-gd CACHE STRING "")
         ELSE(MSVC)
-                SET(K3D_BOOST_PROGRAM_OPTIONS_LIB libboost_program_options-mgw CACHE STRING "")
+                SET(K3D_BOOST_PROGRAM_OPTIONS_LIB boost_program_options-mgw34-1_34_1 CACHE STRING "")
         ENDIF(MSVC)
 	MARK_AS_ADVANCED(K3D_BOOST_PROGRAM_OPTIONS_LIB)
 
         IF(MSVC)
                 SET(K3D_BOOST_PYTHON_LIB optimized boost_python-vc80-mt debug boost_python-vc80-mt-gd CACHE STRING "")
         ELSE(MSVC)
-                SET(K3D_BOOST_PYTHON_LIB boost_python-mgw CACHE STRING "")
+                SET(K3D_BOOST_PYTHON_LIB boost_python-mgw34-1_34_1 CACHE STRING "")
         ENDIF(MSVC)
 	MARK_AS_ADVANCED(K3D_BOOST_PYTHON_LIB)
 
         IF(MSVC)
                 SET(K3D_BOOST_REGEX_LIB optimized boost_regex-vc80-mt debug boost_regex-vc80-mt-gd CACHE STRING "")
         ELSE(MSVC)
-                SET(K3D_BOOST_REGEX_LIB boost_regex-mgw CACHE STRING "")
+                SET(K3D_BOOST_REGEX_LIB boost_regex-mgw34-1_34_1 CACHE STRING "")
         ENDIF(MSVC)
 	MARK_AS_ADVANCED(K3D_BOOST_REGEX_LIB)
 
