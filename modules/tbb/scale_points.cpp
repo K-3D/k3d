@@ -50,16 +50,12 @@ public:
 		base(Factory, Document),
 		m_x(init_owner(*this) + init_name("x") + init_label(_("X")) + init_description(_("X scale")) + init_value(1.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
 		m_y(init_owner(*this) + init_name("y") + init_label(_("Y")) + init_description(_("Y scale")) + init_value(1.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_z(init_owner(*this) + init_name("z") + init_label(_("Z")) + init_description(_("Z scale")) + init_value(1.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_thread_count(init_owner(*this) + init_name("thread_count") + init_label(_("Thread Count")) + init_description(_("Number of threads to use for computation.")) + init_value(1) + init_constraint(constraint::minimum(0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_grain_size(init_owner(*this) + init_name("grain_size") + init_label(_("Grain Size")) + init_description(_("Minimum number of computations to assign to a thread.")) + init_value(1) + init_constraint(constraint::minimum(0)) + init_step_increment(1000) + init_units(typeid(k3d::measurement::scalar)))
+		m_z(init_owner(*this) + init_name("z") + init_label(_("Z")) + init_description(_("Z scale")) + init_value(1.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_x.changed_signal().connect(make_update_mesh_slot());
 		m_y.changed_signal().connect(make_update_mesh_slot());
 		m_z.changed_signal().connect(make_update_mesh_slot());
-		m_thread_count.changed_signal().connect(make_update_mesh_slot());
-		m_grain_size.changed_signal().connect(make_update_mesh_slot());
 	}
 
 	class worker
@@ -91,17 +87,10 @@ public:
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
 		const k3d::matrix4 matrix = k3d::scaling3D(k3d::point3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value()));
-		const k3d::int32_t thread_count = m_thread_count.pipeline_value();
-		const k3d::int32_t grain_size = m_grain_size.pipeline_value();
-		const k3d::uint_t point_count = InputPoints.size();
-
-		k3d::parallel::set_thread_count(thread_count);
 
 		k3d::parallel::parallel_for(
-			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), grain_size),
+			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), k3d::parallel::grain_size()),
 			worker(InputPoints, PointSelection, OutputPoints, matrix));
-
-		k3d::parallel::set_thread_count(k3d::parallel::automatic);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -122,9 +111,6 @@ private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z;
-
-	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_thread_count;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_grain_size;
 };
 
 /////////////////////////////////////////////////////////////////////////////

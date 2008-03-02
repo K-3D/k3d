@@ -73,6 +73,7 @@
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mime_types.h>
+#include <k3dsdk/parallel/threads.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/type_registry.h>
@@ -448,6 +449,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Request program exit (may be overridden by user input).");
 	def("get_command_node", module_get_command_node,
 		"Returns a command node by path.");
+	def("parallel_grain_size", k3d::parallel::grain_size,
+		"Returns the global grain size to be used for parallel computation.");
 	def("identity3", k3d::identity3D,
 		"Returns a L{matrix4} containing a three-dimensional identity matrix.");
 	def("length", module_length,
@@ -480,6 +483,10 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns a L{mesh_selection} that explicitly selects every component.");
 	def("select_null", k3d::mesh_selection::select_null,
 		"Returns a L{mesh_selection} that does not select or deselect any components.");
+	def("set_parallel_grain_size", k3d::parallel::set_grain_size,
+		"Sets the global grain size to be used for parallel computation.");
+	def("set_parallel_thread_count", k3d::parallel::set_thread_count,
+		"Sets the number of threads to be used for parallel computation (quietly ignored if parallel computation wasn't enabled in the build.");
 	def("share_path", k3d::share_path,
 		"Returns the runtime path to shared data.");
 	def("translate3", module_translate3,
