@@ -22,6 +22,7 @@
 */
 
 #include <k3d-i18n-config.h>
+#include <k3d-path-config.h>
 #include <k3d-platform-config.h>
 #include <k3d-version-config.h>
 

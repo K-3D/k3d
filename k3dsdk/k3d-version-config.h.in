@@ -3,16 +3,10 @@
 
 // Generated file, do not edit!  Make changes to k3d-version-config.h.in instead.
 
-#define K3D_PACKAGE "@PACKAGE@"
-#define K3D_COPYRIGHT "@COPYRIGHT@"
-#define K3D_VERSION "@VERSION@"
-#define K3D_HOST "@host@"
-
-#define K3D_PREFIX "@prefix@"
-#define K3D_DATADIR "@prefix@/share"
-#define K3D_LIBDIR "@prefix@/lib"
-#define K3D_PKGDATADIR "@prefix@/share/@PACKAGE@"
-#define K3D_PKGLIBDIR "@prefix@/lib/@PACKAGE@"
+#define K3D_PACKAGE "@K3D_PACKAGE@"
+#define K3D_COPYRIGHT "@K3D_COPYRIGHT@"
+#define K3D_VERSION "@K3D_VERSION@"
+#define K3D_HOST "@K3D_HOST@"
 
 #endif // !K3DSDK_VERSION_CONFIG_H
 
