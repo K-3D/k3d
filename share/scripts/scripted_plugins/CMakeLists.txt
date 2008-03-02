@@ -1,3 +1,3 @@
 FILE(GLOB PY_FILES *.py)
-INSTALL(FILES ${PY_FILES} DESTINATION share/k3d/scripts/scripted_nodes)
+INSTALL(FILES ${PY_FILES} DESTINATION share/k3d/scripts/scripted_plugins)
 
