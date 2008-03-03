@@ -1,3 +1,5 @@
+PROJECT(share)
+
 INSTALL(FILES
 	aspect_ratios.k3d
 	resolutions.k3d
