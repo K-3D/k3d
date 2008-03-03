@@ -1,5 +1,7 @@
-# Setup packaging ...
-SET(CPACK_GENERATOR "STGZ")
+OPTION(K3D_CREATE_STGZ "Create a self-extracting tarball" OFF)
 
-INCLUDE(CPack)
+IF(K3D_CREATE_STGZ)
+	SET(CPACK_GENERATOR "STGZ")
+	INCLUDE(CPack)
+ENDIF(K3D_CREATE_STGZ)
 
