@@ -32,6 +32,7 @@
 #include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iplugin_factory_collection.h>
+#include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/utility_gl.h>
 
@@ -110,7 +111,7 @@ const object idocument::new_node(const object& Type)
 		if(!plugin_factory)
 			throw std::runtime_error("no factory for plugin type " + plugin_name());
 
-		return object(node(k3d::plugin::create<k3d::iunknown>(*plugin_factory, wrapped())));
+		return object(node(k3d::plugin::create<k3d::iunknown>(*plugin_factory, wrapped(), k3d::unique_name(wrapped().nodes(), plugin_name()))));
 	}
 
 	extract<iplugin_factory> plugin_factory(Type);
