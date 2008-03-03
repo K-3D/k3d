@@ -1,3 +1,8 @@
+# The CPack PackageMaker generator ignores CMAKE_INSTALL_PREFIX and places everything in /usr, complain if there is a mismatch
+IF(NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr")
+	MESSAGE(SEND_ERROR "CMAKE_INSTALL_PREFIX must be set to \"/usr\" when generating a PackageMaker install.")
+ENDIF(NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr")
+
 # Setup creation of an installer with PackageMaker
 SET(CPACK_GENERATOR "PackageMaker")
 SET(CPACK_PACKAGE_NAME "K-3D")
