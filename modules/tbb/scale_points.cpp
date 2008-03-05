@@ -75,7 +75,7 @@ public:
 			const k3d::uint_t point_end = range.end();
 			for(k3d::uint_t point = point_begin; point != point_end; ++point)
 			{
-				for (double i = 1; i != 2; i += 0.0001)
+				for (double i = 1; i < 2; i += 0.001)
 					output_points[point] = k3d::mix(input_points[point], matrix * input_points[point], point_selection[point])/cos(sqrt(std::abs(output_points[point][0])+0.5/sqrt(i)));
 			}
 		}
@@ -94,7 +94,6 @@ public:
 		k3d::parallel::parallel_for(
 			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), k3d::parallel::grain_size()),
 			worker(InputPoints, PointSelection, OutputPoints, matrix));
-		k3d::log() << debug << "done scaling" << std::endl;
 	}
 
 	static k3d::iplugin_factory& get_factory()
