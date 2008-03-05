@@ -11,7 +11,6 @@ setup.source.columns = 300
 selection = k3d.deselect_all()
 selection.points = k3d.component_select_all()
 setup.modifier.mesh_selection = selection
-setup.modifier.x = 2.0
 
 # Force an update of the mesh source output, so it doesn't interfere with our timing
 mesh = setup.source.output_mesh
