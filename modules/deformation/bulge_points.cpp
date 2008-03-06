@@ -31,6 +31,9 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
+#include <k3dsdk/parallel/blocked_range.h>
+#include <k3dsdk/parallel/parallel_for.h>
+#include <k3dsdk/parallel/threads.h>
 
 namespace module
 {
@@ -65,10 +68,13 @@ public:
 		m_type.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	class bulge
+	class worker
 	{
 	public:
-		bulge(const k3d::point3& Origin, const k3d::point3& Min, const k3d::point3& Max, const k3d::axis Axis, const bool Radial, const bool displace_x, const bool displace_y, const bool displace_z, const double bulge_factor) :
+		worker(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints, const k3d::point3& Origin, const k3d::point3& Min, const k3d::point3& Max, const k3d::axis Axis, const bool Radial, const bool displace_x, const bool displace_y, const bool displace_z, const double bulge_factor) :
+			input_points(InputPoints),
+			point_selection(PointSelection),
+			output_points(OutputPoints),
 			m_origin(Origin),
 			m_min(Min),
 			m_max(Max),
@@ -82,78 +88,73 @@ public:
 		{
 		}
 
-		const k3d::point3 operator()(const k3d::point3& Coords)
+		void operator()(const k3d::parallel::blocked_range<k3d::uint_t>& range) const
 		{
-			k3d::point3 coords = Coords + m_origin;
-
-			int index = 0;
-			switch(m_axis)
+			const k3d::uint_t point_begin = range.begin();
+			const k3d::uint_t point_end = range.end();
+			for(k3d::uint_t point = point_begin; point != point_end; ++point)
 			{
-				case k3d::X:
-					index = 0;
-				break;
-				case k3d::Y:
-					index = 1;
-				break;
-				case k3d::Z:
-					index = 2;
-				break;
-				default:
-					assert_not_reached();
+				const k3d::point3& Coords = input_points[point];
 
-			}
+				k3d::point3 coords = Coords + m_origin;
 
-			double delta = 0;
-			double length = m_size[index];
-			if(length != 0)
-			{
-				double min = m_min[index];
-				double max = m_max[index];
-				double value = coords[index];
+				double delta = 0;
+				double length = m_size[m_axis];
+				if(length != 0)
+				{
+					double min = m_min[m_axis];
+					double max = m_max[m_axis];
+					double value = coords[m_axis];
 
-				double down = value - min;
-				double up = max - value;
+					double down = value - min;
+					double up = max - value;
 
-				delta = 2 * down * up / (length*length);
-			}
+					delta = 2 * down * up / (length*length);
+				}
 
-			double bulge_amount = delta;
-			if(m_radial)
-			{
-				double distance = k3d::to_vector(coords).length();
-				double scale;
-				if(0 == distance)
-					scale = 1.0;
+				double bulge_amount = delta;
+				if(m_radial)
+				{
+					double distance = k3d::to_vector(coords).length();
+					double scale;
+					if(0 == distance)
+						scale = 1.0;
+					else
+						scale = (distance + m_bulge_factor * bulge_amount) / distance;
+
+					if(m_displace_x && (k3d::X != m_axis))
+						coords[0] *= scale;
+
+					if(m_displace_y && (k3d::Y != m_axis))
+						coords[1] *= scale;
+
+					if(m_displace_z && (k3d::Z != m_axis))
+						coords[2] *= scale;
+				}
 				else
-					scale = (distance + m_bulge_factor * bulge_amount) / distance;
+				{
+					double offset = m_bulge_factor * bulge_amount;
 
-				if(m_displace_x && (k3d::X != m_axis))
-					coords[0] *= scale;
+					if(m_displace_x && (k3d::X != m_axis))
+						coords[0] += offset;
 
-				if(m_displace_y && (k3d::Y != m_axis))
-					coords[1] *= scale;
+					if(m_displace_y && (k3d::Y != m_axis))
+						coords[1] += offset;
 
-				if(m_displace_z && (k3d::Z != m_axis))
-					coords[2] *= scale;
+					if(m_displace_z && (k3d::Z != m_axis))
+						coords[2] += offset;
+				}
+
+				coords = coords - k3d::to_vector(m_origin);
+
+				output_points[point] = k3d::mix(input_points[point], coords, point_selection[point]);
 			}
-			else
-			{
-				double offset = m_bulge_factor * bulge_amount;
-
-				if(m_displace_x && (k3d::X != m_axis))
-					coords[0] += offset;
-
-				if(m_displace_y && (k3d::Y != m_axis))
-					coords[1] += offset;
-
-				if(m_displace_z && (k3d::Z != m_axis))
-					coords[2] += offset;
-			}
-
-			return coords - k3d::to_vector(m_origin);
 		}
 
 	private:
+		const k3d::mesh::points_t& input_points;
+		const k3d::mesh::selection_t& point_selection;
+		k3d::mesh::points_t& output_points;
 		const k3d::point3 m_origin;
 		const k3d::point3 m_min;
 		const k3d::point3 m_max;
@@ -176,22 +177,14 @@ public:
 		const double displace_z = m_displace_z.pipeline_value();
 		const k3d::axis axis = m_axis.pipeline_value();
 
-		bulge deformation(
-			k3d::point3(0, 0, 0),
-			k3d::point3(bounds.nx, bounds.ny, bounds.nz),
-			k3d::point3(bounds.px, bounds.py, bounds.pz),
-			axis,
-			m_type.pipeline_value() == RADIAL,
-			displace_x,
-			displace_y,
-			displace_z,
-			bulge_factor
-			);
+		const k3d::point3 origin(0, 0, 0);
+		const k3d::point3 min(bounds.nx, bounds.ny, bounds.nz);
+		const k3d::point3 max(bounds.px, bounds.py, bounds.pz);
+		const bool radial = m_type.pipeline_value() == RADIAL;
 
-		const size_t point_begin = 0;
-		const size_t point_end = point_begin + OutputPoints.size();
-		for(size_t point = point_begin; point != point_end; ++point)
-			OutputPoints[point] = k3d::mix(InputPoints[point], deformation(InputPoints[point]), PointSelection[point]);
+		k3d::parallel::parallel_for(
+			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), k3d::parallel::grain_size()),
+			worker(InputPoints, PointSelection, OutputPoints, origin, min, max, axis, radial, displace_x, displace_y, displace_z, bulge_factor));
 	}
 
 	static k3d::iplugin_factory& get_factory()
