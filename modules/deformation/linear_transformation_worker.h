@@ -34,7 +34,7 @@ namespace deformation
 {
 
 /// Helper class that can apply a linear transformation to a collection of points.
-/// Automatically supports parallel computation when enabled as part of the build.
+/// Designed for compatibility with k3d::parallel::parallel_for().
 class linear_transformation_worker
 {
 public:
