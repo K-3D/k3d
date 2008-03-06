@@ -23,8 +23,10 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the deformation plugin module, to protect public symbols from name clashes with other modules
-namespace libk3ddeformation
+namespace module
+{
+
+namespace deformation
 {
 
 extern k3d::iplugin_factory& bend_points_factory();
@@ -44,25 +46,26 @@ extern k3d::iplugin_factory& translate_points_factory();
 extern k3d::iplugin_factory& tweak_points_factory();
 extern k3d::iplugin_factory& twist_points_factory();
 
-} // namespace libk3ddeformation
+} // namespace deformation
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3ddeformation::bend_points_factory());
-	Registry.register_factory(libk3ddeformation::bulge_points_factory());
-	Registry.register_factory(libk3ddeformation::center_points_factory());
-	Registry.register_factory(libk3ddeformation::cylindrical_wave_points_factory());
-	Registry.register_factory(libk3ddeformation::linear_point_noise_factory());
-	Registry.register_factory(libk3ddeformation::linear_wave_points_factory());
-	Registry.register_factory(libk3ddeformation::rotate_points_factory());
-	Registry.register_factory(libk3ddeformation::scale_points_factory());
-	Registry.register_factory(libk3ddeformation::shear_points_factory());
-	Registry.register_factory(libk3ddeformation::smooth_points_factory());
-	Registry.register_factory(libk3ddeformation::sphereize_points_factory());
-	Registry.register_factory(libk3ddeformation::taper_points_factory());
-	Registry.register_factory(libk3ddeformation::transform_points_factory());
-	Registry.register_factory(libk3ddeformation::translate_points_factory());
-	Registry.register_factory(libk3ddeformation::tweak_points_factory());
-	Registry.register_factory(libk3ddeformation::twist_points_factory());
+	Registry.register_factory(module::deformation::bend_points_factory());
+	Registry.register_factory(module::deformation::bulge_points_factory());
+	Registry.register_factory(module::deformation::center_points_factory());
+	Registry.register_factory(module::deformation::cylindrical_wave_points_factory());
+	Registry.register_factory(module::deformation::linear_point_noise_factory());
+	Registry.register_factory(module::deformation::linear_wave_points_factory());
+	Registry.register_factory(module::deformation::rotate_points_factory());
+	Registry.register_factory(module::deformation::scale_points_factory());
+	Registry.register_factory(module::deformation::shear_points_factory());
+	Registry.register_factory(module::deformation::smooth_points_factory());
+	Registry.register_factory(module::deformation::sphereize_points_factory());
+	Registry.register_factory(module::deformation::taper_points_factory());
+	Registry.register_factory(module::deformation::transform_points_factory());
+	Registry.register_factory(module::deformation::translate_points_factory());
+	Registry.register_factory(module::deformation::tweak_points_factory());
+	Registry.register_factory(module::deformation::twist_points_factory());
 K3D_MODULE_END
-
 

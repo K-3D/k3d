@@ -28,7 +28,10 @@
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
 #include <k3dsdk/noise.h>
 
-namespace libk3ddeformation
+namespace module
+{
+
+namespace deformation
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -164,5 +167,8 @@ k3d::iplugin_factory& linear_point_noise_factory()
 	return linear_point_noise::get_factory();
 }
 
-} // namespace libk3ddeformation
+} // namespace deformation
+
+} // namespace module
+
 

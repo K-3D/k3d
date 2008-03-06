@@ -31,13 +31,11 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
 
-namespace libk3ddeformation
+namespace module
 {
 
-namespace detail
+namespace deformation
 {
-
-} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // bend_points
@@ -269,5 +267,8 @@ k3d::iplugin_factory& bend_points_factory()
 	return bend_points::get_factory();
 }
 
-} // namespace libk3ddeformation
+} // namespace deformation
+
+} // namespace module
+
 

@@ -27,7 +27,10 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_deformation_modifier.h>
 
-namespace libk3ddeformation
+namespace module
+{
+
+namespace deformation
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -112,4 +115,7 @@ k3d::iplugin_factory& smooth_points_factory()
 	return smooth_points::get_factory();
 }
 
-} // namespace libk3ddeformation
+} // namespace deformation
+
+} // namespace module
+

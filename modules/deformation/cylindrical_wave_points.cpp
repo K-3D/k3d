@@ -29,7 +29,10 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
 
-namespace libk3ddeformation
+namespace module
+{
+
+namespace deformation
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -113,5 +116,8 @@ k3d::iplugin_factory& cylindrical_wave_points_factory()
 	return cylindrical_wave_points::get_factory();
 }
 
-} // namespace libk3ddeformation
+} // namespace deformation
+
+} // namespace module
+
 

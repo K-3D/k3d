@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,18 +18,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include "linear_transformation_worker.h"
+
 #include <k3d-i18n-config.h>
-#include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
 
-namespace libk3ddeformation
+namespace module
+{
+
+namespace deformation
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -63,15 +67,14 @@ public:
 		const bool center_y = m_center_y.pipeline_value();
 		const bool center_z = m_center_z.pipeline_value();
 
-		const k3d::point3 offset(
+		const k3d::matrix4 transformation = k3d::translation3D(k3d::vector3(
 			center_x ? -0.5 * (bounds.px + bounds.nx) : 0,
 			center_y ? -0.5 * (bounds.py + bounds.ny) : 0,
-			center_z ? -0.5 * (bounds.pz + bounds.nz) : 0);
+			center_z ? -0.5 * (bounds.pz + bounds.nz) : 0));
 
-		const size_t point_begin = 0;
-		const size_t point_end = point_begin + OutputPoints.size();
-		for(size_t point = point_begin; point != point_end; ++point)
-			OutputPoints[point] = k3d::mix(InputPoints[point], InputPoints[point] + offset, PointSelection[point]);
+		k3d::parallel::parallel_for(
+			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), k3d::parallel::grain_size()),
+			linear_transformation_worker(InputPoints, PointSelection, OutputPoints, transformation));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -102,5 +105,7 @@ k3d::iplugin_factory& center_points_factory()
 	return center_points::get_factory();
 }
 
-} // namespace libk3ddeformation
+} // namespace deformation
+
+} // namespace module
 
