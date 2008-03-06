@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,8 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -29,6 +29,9 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
+#include <k3dsdk/parallel/blocked_range.h>
+#include <k3dsdk/parallel/parallel_for.h>
+#include <k3dsdk/parallel/threads.h>
 
 namespace module
 {
@@ -61,9 +64,56 @@ public:
 		m_displace_z.changed_signal().connect(make_update_mesh_slot());
 	}
 
+	class worker
+	{
+	public:
+		worker(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints, const k3d::axis Axis, const double Size, const bool DisplaceX, const bool DisplaceY, const bool DisplaceZ, const double TaperFactor) :
+			input_points(InputPoints),
+			point_selection(PointSelection),
+			output_points(OutputPoints),
+			axis(Axis),
+			size(Size),
+			displace_x(DisplaceX),
+			displace_y(DisplaceY),
+			displace_z(DisplaceZ),
+			taper_factor(TaperFactor)
+		{
+		}
+
+		void operator()(const k3d::parallel::blocked_range<k3d::uint_t>& range) const
+		{
+			const k3d::uint_t point_begin = range.begin();
+			const k3d::uint_t point_end = range.end();
+			for(k3d::uint_t point = point_begin; point != point_end; ++point)
+			{
+				const double scale = k3d::mix(1.0, 1.0 - taper_factor, std::abs(input_points[point][axis] / size));
+
+				k3d::point3 position(input_points[point]);
+				if(displace_x)
+					position[0] *= scale;
+				if(displace_y)
+					position[1] *= scale;
+				if(displace_z)
+					position[2] *= scale;
+
+				output_points[point] = k3d::mix(input_points[point], position, point_selection[point]);
+			}
+		}
+
+	private:
+		const k3d::mesh::points_t& input_points;
+		const k3d::mesh::selection_t& point_selection;
+		k3d::mesh::points_t& output_points;
+		const k3d::axis axis;
+		const double size;
+		const bool displace_x;
+		const bool displace_y;
+		const bool displace_z;
+		const double taper_factor;
+	};
+
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const k3d::bounding_box3 bounds = k3d::bounds(InputPoints);
 
 		const k3d::axis axis = m_axis.pipeline_value();
 		const double taper_factor = m_taper_factor.pipeline_value();
@@ -71,6 +121,7 @@ public:
 		const bool displace_y = m_displace_y.pipeline_value();
 		const bool displace_z = m_displace_z.pipeline_value();
 
+		const k3d::bounding_box3 bounds = k3d::bounds(InputPoints);
 		double size = 0.0;
 		switch(axis)
 		{
@@ -89,22 +140,9 @@ public:
 		if(0.0 == size)
 			return;
 
-		const size_t point_begin = 0;
-		const size_t point_end = point_begin + OutputPoints.size();
-		for(size_t point = point_begin; point != point_end; ++point)
-		{
-			const double scale = k3d::mix(1.0, 1.0 - taper_factor, std::abs(InputPoints[point][axis] / size));
-
-			k3d::point3 position(InputPoints[point]);
-			if(displace_x)
-				position[0] *= scale;
-			if(displace_y)
-				position[1] *= scale;
-			if(displace_z)
-				position[2] *= scale;
-
-			OutputPoints[point] = k3d::mix(InputPoints[point], position, PointSelection[point]);
-		}
+		k3d::parallel::parallel_for(
+			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), k3d::parallel::grain_size()),
+			worker(InputPoints, PointSelection, OutputPoints, axis, size, displace_x, displace_y, displace_z, taper_factor));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -140,6 +178,4 @@ k3d::iplugin_factory& taper_points_factory()
 } // namespace deformation
 
 } // namespace module
-
-
 
