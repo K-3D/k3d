@@ -185,6 +185,28 @@ def setup_mesh_modifier_test(source_name, modifier_name):
 
 	return result
 
+def setup_mesh_modifier_test2(source_name, modifier1_name, modifier2_name):
+	doc = k3d.new_document()
+
+	source = doc.new_node(source_name)
+
+	modifier1 = doc.new_node(modifier1_name)
+	doc.set_dependency(modifier1.get_property("input_mesh"), source.get_property("output_mesh"))
+
+	modifier2 = doc.new_node(modifier2_name)
+	doc.set_dependency(modifier2.get_property("input_mesh"), modifier1.get_property("output_mesh"))
+
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = doc
+	result.source = source
+	result.modifier1 = modifier1
+	result.modifier2 = modifier2
+
+	return result
+
 def setup_mesh_modifier_image_test(source_name, modifier_name):
 	doc = k3d.new_document()
 
