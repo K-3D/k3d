@@ -28,10 +28,10 @@ for plugin_name in sorted_plugins:
 	elif plugin.quality() == "deprecated":
 		plugin_quality = "Deprecated"
 
-	overview = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/" + plugin_name + ".wiki", "w")
-	overview.write("{{Plugin/" + plugin_name + "}}\n")
+	overview = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/" + plugin_name, "w")
+	overview.write("<plugin>" + plugin_name + "</plugin>\n")
 
-	detail = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/Template:Plugin/" + plugin_name + ".wiki", "w")
+	detail = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/reference/" + plugin_name, "w")
 	detail.write("<!-- Machine-generated file, do not edit by hand! -->\n")
 
 	detail.write("== Description == " + "\n")
@@ -39,7 +39,7 @@ for plugin_name in sorted_plugins:
 	detail.write("{| border=\"0\" cellpadding=\"5\" cellspacing=\"0\"\n")
 	detail.write("|-\n")
 
-	if os.path.exists("share/ngui/rasterized/" + plugin_name + ".png"):
+	if os.path.exists("@share_SOURCE_DIR@/ngui/rasterized/" + plugin_name + ".png"):
 		detail.write("|[[Image:" + plugin_name + ".png]]\n")
 	
 	detail.write("|" + plugin_description + "\n")
