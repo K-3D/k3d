@@ -16,7 +16,7 @@ sorted_plugins.sort()
 for plugin_name in sorted_plugins:
 	plugin = plugins[plugin_name]
 
-	class_id = plugin.class_id()
+	factory_id = plugin.factory_id()
 	plugin_name = plugin.name()
 	plugin_description = plugin.short_description()
 	
