@@ -29,7 +29,7 @@ for plugin_name in sorted_plugins:
 		plugin_quality = "Deprecated"
 
 	overview = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/" + plugin_name, "w")
-	overview.write("<plugin>" + plugin_name + "</plugin>\n")
+	overview.write("<plugin>{{PAGENAME}}</plugin>\n")
 
 	detail = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/reference/" + plugin_name, "w")
 	detail.write("<!-- Machine-generated file, do not edit by hand! -->\n")
