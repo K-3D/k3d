@@ -125,6 +125,74 @@ public:
 			ri_parameters.push_back(k3d::ri::parameter(k3d::ri::RI_PW(), k3d::ri::VERTEX, 1, ri_points));
 
 			k3d::ri::setup_material(patch_materials[patch], RenderState);
+			
+			if (Mesh.nurbs_patches->patch_trim_curve_loop_counts && Mesh.nurbs_patches->trim_points)
+			{
+				const k3d::mesh::counts_t& patch_trim_curve_loop_counts = *Mesh.nurbs_patches->patch_trim_curve_loop_counts;
+				const k3d::mesh::indices_t& patch_first_trim_curve_loops = *Mesh.nurbs_patches->patch_first_trim_curve_loops;
+				const k3d::mesh::indices_t& trim_curve_loops = *Mesh.nurbs_patches->trim_curve_loops;
+				
+				const k3d::mesh::points_2d_t& trim_points = *Mesh.nurbs_patches->trim_points;
+				const k3d::mesh::indices_t& first_trim_curves = *Mesh.nurbs_patches->first_trim_curves;
+				const k3d::mesh::counts_t& trim_curve_counts = *Mesh.nurbs_patches->trim_curve_counts;
+				const k3d::mesh::indices_t& trim_curve_first_points = *Mesh.nurbs_patches->trim_curve_first_points;
+				const k3d::mesh::counts_t& trim_curve_point_counts = *Mesh.nurbs_patches->trim_curve_point_counts;
+				const k3d::mesh::orders_t& trim_curve_orders = *Mesh.nurbs_patches->trim_curve_orders;
+				const k3d::mesh::indices_t& trim_curve_first_knots = *Mesh.nurbs_patches->trim_curve_first_knots;
+				const k3d::mesh::selection_t& trim_curve_selection = *Mesh.nurbs_patches->trim_curve_selection;
+				const k3d::mesh::indices_t& trim_curve_points = *Mesh.nurbs_patches->trim_curve_points;
+				const k3d::mesh::weights_t& trim_curve_point_weights = *Mesh.nurbs_patches->trim_curve_point_weights;
+				const k3d::mesh::knots_t& trim_curve_knots = *Mesh.nurbs_patches->trim_curve_knots;
+				
+				k3d::ri::unsigned_integers ri_curve_counts;
+				k3d::ri::unsigned_integers ri_trim_orders;
+				k3d::ri::reals ri_trim_knots;
+				k3d::ri::reals ri_trim_mins;
+				k3d::ri::reals ri_trim_maxs;
+				k3d::ri::unsigned_integers ri_trim_point_counts;
+				k3d::ri::reals ri_trim_u;
+				k3d::ri::reals ri_trim_v;
+				k3d::ri::reals ri_trim_w;
+				
+				k3d::uint_t loops_start = patch_first_trim_curve_loops[patch];
+				k3d::uint_t loops_end = loops_start + patch_trim_curve_loop_counts[patch];
+				for (k3d::uint_t loop_index = loops_start; loop_index != loops_end; ++loop_index)
+				{
+					k3d::uint_t curves_start = first_trim_curves[trim_curve_loops[loop_index]];
+					k3d::uint_t curves_end = curves_start + trim_curve_counts[trim_curve_loops[loop_index]];
+					ri_curve_counts.push_back(trim_curve_counts[trim_curve_loops[loop_index]]);
+					for (k3d::uint_t curve = curves_start; curve != curves_end; ++curve)
+					{
+						ri_trim_orders.push_back(trim_curve_orders[curve]);
+						ri_trim_knots.insert(ri_trim_knots.end(), trim_curve_knots.begin() + trim_curve_first_knots[curve], trim_curve_knots.begin() + trim_curve_first_knots[curve] + trim_curve_point_counts[curve] + trim_curve_orders[curve]);
+						ri_trim_mins.push_back(trim_curve_knots[trim_curve_orders[curve] - 1]);
+						ri_trim_maxs.push_back(trim_curve_knots[trim_curve_point_counts[curve]]);
+						ri_trim_point_counts.push_back(trim_curve_point_counts[curve]);
+						k3d::uint_t points_start = trim_curve_first_points[curve];
+						k3d::uint_t points_end = points_start + trim_curve_point_counts[curve];
+						for (k3d::uint_t point = points_start; point != points_end; ++point)
+						{
+							k3d::point2 control_point = trim_points[trim_curve_points[point]];
+							double weight = trim_curve_point_weights[point];
+							ri_trim_u.push_back(static_cast<k3d::ri::real>(control_point[0] * weight));
+							ri_trim_v.push_back(static_cast<k3d::ri::real>(control_point[1] * weight));
+							ri_trim_w.push_back(static_cast<k3d::ri::real>(weight));
+						}
+					}
+				}
+				RenderState.stream.RiTrimCurve(
+					ri_curve_counts,
+					ri_trim_orders,
+					ri_trim_knots,
+					ri_trim_mins,
+					ri_trim_maxs,
+					ri_trim_point_counts,
+					ri_trim_u,
+					ri_trim_v,
+					ri_trim_w
+				);
+			}
+			
 			RenderState.stream.RiNuPatchV(
 				patch_u_point_counts[patch],
 				patch_u_orders[patch],

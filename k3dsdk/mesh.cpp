@@ -734,6 +734,22 @@ std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 		detail::print(Stream, "    patch u knots", RHS.nurbs_patches->patch_u_knots);
 		detail::print(Stream, "    patch v knots", RHS.nurbs_patches->patch_v_knots);
 		detail::print(Stream, "    varying data", RHS.nurbs_patches->varying_data);
+		detail::print(Stream, "    patch_trim_curve_loop_counts", RHS.nurbs_patches->patch_trim_curve_loop_counts);
+		detail::print(Stream, "    patch_first_trim_curve_loops", RHS.nurbs_patches->patch_first_trim_curve_loops);
+		detail::print(Stream, "    trim_curve_loops", RHS.nurbs_patches->trim_curve_loops);
+		detail::print(Stream, "    trim_points", RHS.nurbs_patches->trim_points);
+		detail::print(Stream, "    trim_point_selection", RHS.nurbs_patches->trim_point_selection);
+		detail::print(Stream, "    first_trim_curves", RHS.nurbs_patches->first_trim_curves);
+		detail::print(Stream, "    trim_curve_counts", RHS.nurbs_patches->trim_curve_counts);
+		detail::print(Stream, "    trim_curve_loop_selection", RHS.nurbs_patches->trim_curve_loop_selection);
+		detail::print(Stream, "    trim_curve_first_points", RHS.nurbs_patches->trim_curve_first_points);
+		detail::print(Stream, "    trim_curve_point_counts", RHS.nurbs_patches->trim_curve_point_counts);
+		detail::print(Stream, "    trim_curve_orders", RHS.nurbs_patches->trim_curve_orders);
+		detail::print(Stream, "    trim_curve_first_knots", RHS.nurbs_patches->trim_curve_first_knots);
+		detail::print(Stream, "    trim_curve_selection", RHS.nurbs_patches->trim_curve_selection);
+		detail::print(Stream, "    trim_curve_points", RHS.nurbs_patches->trim_curve_points);
+		detail::print(Stream, "    trim_curve_point_weights", RHS.nurbs_patches->trim_curve_point_weights);
+		detail::print(Stream, "    trim_curve_knots", RHS.nurbs_patches->trim_curve_knots);
 	}
 
 	if(RHS.polyhedra)

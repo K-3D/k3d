@@ -1816,6 +1816,25 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 		detail::save_array(container, element("patch_u_knots"), Mesh.nurbs_patches->patch_u_knots, Context);
 		detail::save_array(container, element("patch_v_knots"), Mesh.nurbs_patches->patch_v_knots, Context);
 		detail::save_arrays(container, element("varying_data"), Mesh.nurbs_patches->varying_data, Context);
+		if (Mesh.nurbs_patches->patch_trim_curve_loop_counts) // Check if there are trim curves
+		{
+			detail::save_array(container, element("patch_trim_curve_loop_counts"), Mesh.nurbs_patches->patch_trim_curve_loop_counts, Context);
+			detail::save_array(container, element("patch_first_trim_curve_loops"), Mesh.nurbs_patches->patch_first_trim_curve_loops, Context);
+			detail::save_array(container, element("trim_curve_loops"), Mesh.nurbs_patches->trim_curve_loops, Context);
+			detail::save_array(container, element("trim_points"), Mesh.nurbs_patches->trim_points, Context);
+			detail::save_array(container, element("trim_point_selection"), Mesh.nurbs_patches->trim_point_selection, Context);
+			detail::save_array(container, element("first_trim_curves"), Mesh.nurbs_patches->first_trim_curves, Context);
+			detail::save_array(container, element("trim_curve_counts"), Mesh.nurbs_patches->trim_curve_counts, Context);
+			detail::save_array(container, element("trim_curve_loop_selection"), Mesh.nurbs_patches->trim_curve_loop_selection, Context);
+			detail::save_array(container, element("trim_curve_first_points"), Mesh.nurbs_patches->trim_curve_first_points, Context);
+			detail::save_array(container, element("trim_curve_point_counts"), Mesh.nurbs_patches->trim_curve_point_counts, Context);
+			detail::save_array(container, element("trim_curve_orders"), Mesh.nurbs_patches->trim_curve_orders, Context);
+			detail::save_array(container, element("trim_curve_first_knots"), Mesh.nurbs_patches->trim_curve_first_knots, Context);
+			detail::save_array(container, element("trim_curve_selection"), Mesh.nurbs_patches->trim_curve_selection, Context);
+			detail::save_array(container, element("trim_curve_points"), Mesh.nurbs_patches->trim_curve_points, Context);
+			detail::save_array(container, element("trim_curve_point_weights"), Mesh.nurbs_patches->trim_curve_point_weights, Context);
+			detail::save_array(container, element("trim_curve_knots"), Mesh.nurbs_patches->trim_curve_knots, Context);
+		}
 	}
 
 	if(Mesh.polyhedra)
@@ -1947,6 +1966,22 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_array(*container, "patch_u_knots", nurbs_patches->patch_u_knots, Context);
 		detail::load_array(*container, "patch_v_knots", nurbs_patches->patch_v_knots, Context);
 		detail::load_arrays(*container, "varying_data", nurbs_patches->varying_data, Context);
+		detail::load_array(*container, "patch_trim_curve_loop_counts", nurbs_patches->patch_trim_curve_loop_counts, Context);
+		detail::load_array(*container, "patch_first_trim_curve_loops", nurbs_patches->patch_first_trim_curve_loops, Context);
+		detail::load_array(*container, "trim_curve_loops", nurbs_patches->trim_curve_loops, Context);
+		detail::load_array(*container, "trim_points", nurbs_patches->trim_points, Context);
+		detail::load_array(*container, "trim_point_selection", nurbs_patches->trim_point_selection, Context);
+		detail::load_array(*container, "first_trim_curves", nurbs_patches->first_trim_curves, Context);
+		detail::load_array(*container, "trim_curve_counts", nurbs_patches->trim_curve_counts, Context);
+		detail::load_array(*container, "trim_curve_loop_selection", nurbs_patches->trim_curve_loop_selection, Context);
+		detail::load_array(*container, "trim_curve_first_points", nurbs_patches->trim_curve_first_points, Context);
+		detail::load_array(*container, "trim_curve_point_counts", nurbs_patches->trim_curve_point_counts, Context);
+		detail::load_array(*container, "trim_curve_orders", nurbs_patches->trim_curve_orders, Context);
+		detail::load_array(*container, "trim_curve_first_knots", nurbs_patches->trim_curve_first_knots, Context);
+		detail::load_array(*container, "trim_curve_selection", nurbs_patches->trim_curve_selection, Context);
+		detail::load_array(*container, "trim_curve_points", nurbs_patches->trim_curve_points, Context);
+		detail::load_array(*container, "trim_curve_point_weights", nurbs_patches->trim_curve_point_weights, Context);
+		detail::load_array(*container, "trim_curve_knots", nurbs_patches->trim_curve_knots, Context);
 	}
 
 	if(element* const container = find_element(Container, "polyhedra"))

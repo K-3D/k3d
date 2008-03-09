@@ -116,7 +116,8 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 	}
 	
 	// Get selected lines
-	return_val_if_fail(Mesh.polyhedra, component_center);
+	if(!Mesh.polyhedra)
+		return component_center;
 	const k3d::mesh::polyhedra_t& polyhedra = *Mesh.polyhedra;
 	return_val_if_fail(polyhedra.clockwise_edges, component_center);
 	return_val_if_fail(polyhedra.edge_points, component_center);

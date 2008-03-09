@@ -21,6 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "named_arrays.h"
+#include "point2.h"
 #include "point3.h"
 #include "normal3.h"
 #include "vector3.h"
@@ -67,6 +68,8 @@ public:
 	typedef typed_array<normal3> normals_t;
 	/// Defines storage for a collection of 3D vectors
 	typedef typed_array<vector3> vectors_t;
+	/// Defines storage for a collection of 2D points
+	typedef typed_array<point2> points_2d_t;
 
 	/// Defines storage for point groups (particle clouds)
 	class point_groups_t
@@ -242,6 +245,38 @@ public:
 		boost::shared_ptr<const knots_t> patch_v_knots;
 		/// Stores user-defined per-parametric-corner data (maps to RenderMan varying data)
 		named_arrays varying_data;
+		/// Stores the number of trim curve loops for each patch
+		boost::shared_ptr<const counts_t> patch_trim_curve_loop_counts;
+		/// Stores the first trim curve loop index into trim_curve_loops for each patch
+		boost::shared_ptr<const indices_t> patch_first_trim_curve_loops;
+		/// Trim curve loop indices (indexes into first_trim_curves)
+		boost::shared_ptr<const indices_t> trim_curve_loops;
+		/// Stores the trim curve control points, expressed in parameter space
+		boost::shared_ptr<const points_2d_t> trim_points;
+		/// Stores the trim curve control point selection
+		boost::shared_ptr<const selection_t> trim_point_selection;
+		/// Stores the set of per-curve-loop first curves (index into trim_curve_first_points)
+		boost::shared_ptr<const indices_t> first_trim_curves;
+		/// Stores the set of per-curve-loop curve counts
+		boost::shared_ptr<const counts_t> trim_curve_counts;
+		/// Stores per-curve-loop selection
+		boost::shared_ptr<const selection_t> trim_curve_loop_selection;
+		/// Stores the set of per-curve first points
+		boost::shared_ptr<const indices_t> trim_curve_first_points;
+		/// Stores the set of per-curve point counts
+		boost::shared_ptr<const counts_t> trim_curve_point_counts;
+		/// Stores the set of per-curve orders
+		boost::shared_ptr<const orders_t> trim_curve_orders;
+		/// Stores the set of per-curve first knots
+		boost::shared_ptr<const indices_t> trim_curve_first_knots;
+		/// Stores per-curve selection state
+		boost::shared_ptr<const selection_t> trim_curve_selection;
+		/// Stores per-curve control points
+		boost::shared_ptr<const indices_t> trim_curve_points;
+		/// Stores per-curve control point weights
+		boost::shared_ptr<const weights_t> trim_curve_point_weights;
+		/// Stores per-curve knot vectors
+		boost::shared_ptr<const knots_t> trim_curve_knots;
 	};
 
 	/// Defines storage for polyhedra (polygons and subdivision surfaces)

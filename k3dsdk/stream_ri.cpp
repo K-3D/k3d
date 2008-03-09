@@ -557,9 +557,9 @@ void stream::RiNuPatchV(const unsigned_integer UCount, const unsigned_integer UO
 	m_implementation->m_stream << detail::indentation << "NuPatch " << UCount << " " << UOrder << " " << format_array(UKnot.begin(), UKnot.end()) << " " << UMin << " " << UMax << " " << VCount << " " << VOrder << " " << format_array(VKnot.begin(), VKnot.end()) << " " << VMin << " " << VMax << " " << Parameters << "\n";
 }
 
-void stream::RiTrimCurve(const unsigned_integer LoopCount, const unsigned_integers& CurveCounts, const unsigned_integers& Orders, const reals& Knots, const reals& Minimums, const reals& Maximums, const unsigned_integers& KnotCounts, const reals& U, const reals& V, const reals& W)
+void stream::RiTrimCurve(const unsigned_integers& CurveCounts, const unsigned_integers& Orders, const reals& Knots, const reals& Minimums, const reals& Maximums, const unsigned_integers& PointCounts, const reals& U, const reals& V, const reals& W)
 {
-	m_implementation->m_stream << detail::indentation << "TrimCurve " << LoopCount << " " << format_array(CurveCounts.begin(), CurveCounts.end()) << " " << format_array(Orders.begin(), Orders.end()) << " " << format_array(Knots.begin(), Knots.end()) << " " << format_array(Minimums.begin(), Minimums.end()) << " " << format_array(Maximums.begin(), Maximums.end()) << " " << format_array(KnotCounts.begin(), KnotCounts.end()) << " " << format_array(U.begin(), U.end()) << " " << format_array(V.begin(), V.end()) << " " << format_array(W.begin(), W.end()) << "\n";
+	m_implementation->m_stream << detail::indentation << "TrimCurve " << " " << format_array(CurveCounts.begin(), CurveCounts.end()) << " " << format_array(Orders.begin(), Orders.end()) << " " << format_array(Knots.begin(), Knots.end()) << " " << format_array(Minimums.begin(), Minimums.end()) << " " << format_array(Maximums.begin(), Maximums.end()) << " " << format_array(PointCounts.begin(), PointCounts.end()) << " " << format_array(U.begin(), U.end()) << " " << format_array(V.begin(), V.end()) << " " << format_array(W.begin(), W.end()) << "\n";
 }
 
 void stream::RiSphereV(real Radius, real ZMin, real ZMax, real ThetaMax, const parameter_list& Parameters)

@@ -340,7 +340,7 @@ const bool equal(const mesh::bicubic_patches_t& A, const mesh::bicubic_patches_t
 
 const bool equal(const mesh::nurbs_patches_t& A, const mesh::nurbs_patches_t& B, const boost::uint64_t Threshold)
 {
-	return
+	bool patches_equal =
 		detail::equal(A.patch_first_points, B.patch_first_points, Threshold) &&
 		detail::equal(A.patch_u_point_counts, B.patch_u_point_counts, Threshold) &&
 		detail::equal(A.patch_v_point_counts, B.patch_v_point_counts, Threshold) &&
@@ -357,6 +357,28 @@ const bool equal(const mesh::nurbs_patches_t& A, const mesh::nurbs_patches_t& B,
 		detail::equal(A.patch_u_knots, B.patch_u_knots, Threshold) &&
 		detail::equal(A.patch_v_knots, B.patch_v_knots, Threshold) &&
 		detail::equal(A.varying_data, B.varying_data, Threshold);
+	bool trim_curves_equal = true;
+		if (A.patch_trim_curve_loop_counts && B.patch_trim_curve_loop_counts)
+		{
+			trim_curves_equal =
+				detail::equal(A.patch_trim_curve_loop_counts, B.patch_trim_curve_loop_counts, Threshold) &&
+				detail::equal(A.patch_first_trim_curve_loops, B.patch_first_trim_curve_loops, Threshold) &&
+				detail::equal(A.trim_curve_loops, B.trim_curve_loops, Threshold) &&
+				detail::equal(A.trim_points, B.trim_points, Threshold) &&
+				detail::equal(A.trim_point_selection, B.trim_point_selection, Threshold) &&
+				detail::equal(A.first_trim_curves, B.first_trim_curves, Threshold) &&
+				detail::equal(A.trim_curve_counts, B.trim_curve_counts, Threshold) &&
+				detail::equal(A.trim_curve_loop_selection, B.trim_curve_loop_selection, Threshold) &&
+				detail::equal(A.trim_curve_first_points, B.trim_curve_first_points, Threshold) &&
+				detail::equal(A.trim_curve_point_counts, B.trim_curve_point_counts, Threshold) &&
+				detail::equal(A.trim_curve_orders, B.trim_curve_orders, Threshold) &&
+				detail::equal(A.trim_curve_first_knots, B.trim_curve_first_knots, Threshold) &&
+				detail::equal(A.trim_curve_selection, B.trim_curve_selection, Threshold) &&
+				detail::equal(A.trim_curve_points, B.trim_curve_points, Threshold) &&
+				detail::equal(A.trim_curve_point_weights, B.trim_curve_point_weights, Threshold) &&
+				detail::equal(A.trim_curve_knots, B.trim_curve_knots, Threshold);
+		}
+	return patches_equal && trim_curves_equal;
 }
 
 const bool equal(const mesh::polyhedra_t& A, const mesh::polyhedra_t& B, const boost::uint64_t Threshold)
@@ -516,6 +538,25 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B, const boost:
 		detail::print_diff(Stream, "patch u knots", A.nurbs_patches->patch_u_knots, B.nurbs_patches->patch_u_knots, Threshold);
 		detail::print_diff(Stream, "patch v knots", A.nurbs_patches->patch_v_knots, B.nurbs_patches->patch_v_knots, Threshold);
 		detail::print_diff(Stream, "varying data", A.nurbs_patches->varying_data, B.nurbs_patches->varying_data, Threshold);
+		if (A.nurbs_patches->patch_trim_curve_loop_counts && B.nurbs_patches->patch_trim_curve_loop_counts)
+		{
+			detail::print_diff(Stream, "patch_trim_curve_loop_counts", A.nurbs_patches->patch_trim_curve_loop_counts, B.nurbs_patches->patch_trim_curve_loop_counts, Threshold);
+			detail::print_diff(Stream, "patch_first_trim_curve_loops", A.nurbs_patches->patch_first_trim_curve_loops, B.nurbs_patches->patch_first_trim_curve_loops, Threshold);
+			detail::print_diff(Stream, "trim_curve_loops", A.nurbs_patches->trim_curve_loops, B.nurbs_patches->trim_curve_loops, Threshold);
+			detail::print_diff(Stream, "trim_points", A.nurbs_patches->trim_points, B.nurbs_patches->trim_points, Threshold);
+			detail::print_diff(Stream, "trim_point_selection", A.nurbs_patches->trim_point_selection, B.nurbs_patches->trim_point_selection, Threshold);
+			detail::print_diff(Stream, "first_trim_curves", A.nurbs_patches->first_trim_curves, B.nurbs_patches->first_trim_curves, Threshold);
+			detail::print_diff(Stream, "trim_curve_counts", A.nurbs_patches->trim_curve_counts, B.nurbs_patches->trim_curve_counts, Threshold);
+			detail::print_diff(Stream, "trim_curve_loop_selection", A.nurbs_patches->trim_curve_loop_selection, B.nurbs_patches->trim_curve_loop_selection, Threshold);
+			detail::print_diff(Stream, "trim_curve_first_points", A.nurbs_patches->trim_curve_first_points, B.nurbs_patches->trim_curve_first_points, Threshold);
+			detail::print_diff(Stream, "trim_curve_point_counts", A.nurbs_patches->trim_curve_point_counts, B.nurbs_patches->trim_curve_point_counts, Threshold);
+			detail::print_diff(Stream, "trim_curve_orders", A.nurbs_patches->trim_curve_orders, B.nurbs_patches->trim_curve_orders, Threshold);
+			detail::print_diff(Stream, "trim_curve_first_knots", A.nurbs_patches->trim_curve_first_knots, B.nurbs_patches->trim_curve_first_knots, Threshold);
+			detail::print_diff(Stream, "trim_curve_selection", A.nurbs_patches->trim_curve_selection, B.nurbs_patches->trim_curve_selection, Threshold);
+			detail::print_diff(Stream, "trim_curve_points", A.nurbs_patches->trim_curve_points, B.nurbs_patches->trim_curve_points, Threshold);
+			detail::print_diff(Stream, "trim_curve_point_weights", A.nurbs_patches->trim_curve_point_weights, B.nurbs_patches->trim_curve_point_weights, Threshold);
+			detail::print_diff(Stream, "trim_curve_knots", A.nurbs_patches->trim_curve_knots, B.nurbs_patches->trim_curve_knots, Threshold);
+		}
 	}
 
 	detail::print_diff(Stream, "polyhedra", A.polyhedra, B.polyhedra);

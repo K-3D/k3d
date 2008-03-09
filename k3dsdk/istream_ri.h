@@ -140,7 +140,7 @@ public:
 	virtual void RiTransformBegin() = 0;
 	virtual void RiTransformEnd() = 0;
 	virtual void RiTranslate(const real DX, const real DY, const real DZ) = 0;
-	virtual void RiTrimCurve(const unsigned_integer LoopCount, const unsigned_integers& CurveCounts, const unsigned_integers& Orders, const reals& Knots, const reals& Minimums, const reals& Maximums, const unsigned_integers& KnotCounts, const reals& U, const reals& V, const reals& W) = 0;
+	virtual void RiTrimCurve(const unsigned_integers& CurveCounts, const unsigned_integers& Orders, const reals& Knots, const reals& Minimums, const reals& Maximums, const unsigned_integers& PointCounts, const reals& U, const reals& V, const reals& W) = 0;
 	virtual void RiWorldBegin() = 0;
 	virtual void RiWorldEnd() = 0;
 

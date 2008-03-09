@@ -111,7 +111,7 @@ public:
 		const size_t point_end = points.size();
 		for(size_t point = point_begin; point != point_end; ++point)
 		{
-			if (SelectionState.select_backfacing || 
+			if (!k3d::validate_polyhedra(Mesh) || SelectionState.select_backfacing || 
 					(!SelectionState.select_backfacing && 
 							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
 			{

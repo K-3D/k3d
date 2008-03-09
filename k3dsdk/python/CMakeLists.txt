@@ -28,6 +28,8 @@ ADD_LIBRARY(k3dsdk-python-types SHARED
 	normal3_python.h
 	path_python.cpp
 	path_python.h
+	point2_python.cpp
+	point2_python.h
 	point3_python.cpp
 	point3_python.h
 	point4_python.cpp

@@ -50,6 +50,7 @@
 #include "normal3_python.h"
 #include "object_model_python.h"
 #include "path_python.h"
+#include "point2_python.h"
 #include "point3_python.h"
 #include "point4_python.h"
 #include "ri_render_state_python.h"
@@ -63,6 +64,7 @@
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/plugins.h>
+#include <k3dsdk/geometric_operations.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
@@ -379,6 +381,11 @@ const k3d::string_t module_data_mime_type(const k3d::string_t& Data)
 	return k3d::mime::type::lookup(Data).str();
 }
 
+const k3d::vector3 module_to_vector3(const k3d::point3& v)
+{
+	return k3d::to_vector(v);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // k3d module
 
@@ -398,6 +405,7 @@ BOOST_PYTHON_MODULE(k3d)
 	export_mesh_selection();
 	export_normal3();
 	export_path();
+	export_point2();
 	export_point3();
 	export_point4();
 	export_uuid();
@@ -449,6 +457,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Request program exit (may be overridden by user input).");
 	def("get_command_node", module_get_command_node,
 		"Returns a command node by path.");
+	def("intersect_lines", k3d::intersect_lines,
+		"Find the point at which two infinite lines intersect.");
 	def("parallel_grain_size", k3d::parallel::grain_size,
 		"Returns the global grain size to be used for parallel computation.");
 	def("identity3", k3d::identity3D,
@@ -489,6 +499,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Sets the number of threads to be used for parallel computation (quietly ignored if parallel computation wasn't enabled in the build.");
 	def("share_path", k3d::share_path,
 		"Returns the runtime path to shared data.");
+	def("to_vector3", module_to_vector3,
+		"Explicit conversion from point3 to vector3");
 	def("translate3", module_translate3,
 		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
 	def("ui", module_ui,

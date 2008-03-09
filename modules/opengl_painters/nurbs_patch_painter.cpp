@@ -131,6 +131,51 @@ public:
 
 			gluBeginSurface(nurbs_renderer);
 			gluNurbsSurface(nurbs_renderer, gl_u_knot_vector.size(), &gl_u_knot_vector[0], gl_v_knot_vector.size(), &gl_v_knot_vector[0], gl_u_stride, gl_v_stride, &gl_control_points[0], patch_u_order, patch_v_order, GL_MAP2_VERTEX_4);
+			
+			if (Mesh.nurbs_patches->patch_trim_curve_loop_counts && Mesh.nurbs_patches->trim_points)
+			{
+				const k3d::mesh::counts_t& patch_trim_curve_loop_counts = *Mesh.nurbs_patches->patch_trim_curve_loop_counts;
+				const k3d::mesh::indices_t& patch_first_trim_curve_loops = *Mesh.nurbs_patches->patch_first_trim_curve_loops;
+				const k3d::mesh::indices_t& trim_curve_loops = *Mesh.nurbs_patches->trim_curve_loops;
+				
+				const k3d::mesh::points_2d_t& trim_points = *Mesh.nurbs_patches->trim_points;
+				const k3d::mesh::indices_t& first_trim_curves = *Mesh.nurbs_patches->first_trim_curves;
+				const k3d::mesh::counts_t& trim_curve_counts = *Mesh.nurbs_patches->trim_curve_counts;
+				const k3d::mesh::indices_t& trim_curve_first_points = *Mesh.nurbs_patches->trim_curve_first_points;
+				const k3d::mesh::counts_t& trim_curve_point_counts = *Mesh.nurbs_patches->trim_curve_point_counts;
+				const k3d::mesh::orders_t& trim_curve_orders = *Mesh.nurbs_patches->trim_curve_orders;
+				const k3d::mesh::indices_t& trim_curve_first_knots = *Mesh.nurbs_patches->trim_curve_first_knots;
+				const k3d::mesh::selection_t& trim_curve_selection = *Mesh.nurbs_patches->trim_curve_selection;
+				const k3d::mesh::indices_t& trim_curve_points = *Mesh.nurbs_patches->trim_curve_points;
+				const k3d::mesh::weights_t& trim_curve_point_weights = *Mesh.nurbs_patches->trim_curve_point_weights;
+				const k3d::mesh::knots_t& trim_curve_knots = *Mesh.nurbs_patches->trim_curve_knots;
+				
+				k3d::uint_t loops_start = patch_first_trim_curve_loops[patch];
+				k3d::uint_t loops_end = loops_start + patch_trim_curve_loop_counts[patch];
+				for (k3d::uint_t loop_index = loops_start; loop_index != loops_end; ++loop_index)
+				{
+					gluBeginTrim(nurbs_renderer);
+					k3d::uint_t curves_start = first_trim_curves[trim_curve_loops[loop_index]];
+					k3d::uint_t curves_end = curves_start + trim_curve_counts[trim_curve_loops[loop_index]];
+					for (k3d::uint_t curve = curves_start; curve != curves_end; ++curve)
+					{
+						std::vector<GLfloat> gl_trim_knot_vector(&trim_curve_knots[trim_curve_first_knots[curve]], &trim_curve_knots[trim_curve_first_knots[curve] + trim_curve_point_counts[curve] + trim_curve_orders[curve]]);
+						std::vector<GLfloat> gl_trim_control_points;
+						k3d::uint_t points_start = trim_curve_first_points[curve];
+						k3d::uint_t points_end = points_start + trim_curve_point_counts[curve];
+						for (k3d::uint_t point = points_start; point != points_end; ++point)
+						{
+							k3d::point2 control_point = trim_points[trim_curve_points[point]];
+							double weight = trim_curve_point_weights[point];
+							gl_trim_control_points.push_back(static_cast<GLfloat>(control_point[0] * weight));
+							gl_trim_control_points.push_back(static_cast<GLfloat>(control_point[1] * weight));
+							gl_trim_control_points.push_back(static_cast<GLfloat>(weight));
+						}
+						gluNurbsCurve(nurbs_renderer, gl_trim_knot_vector.size(), &gl_trim_knot_vector[0], 3, &gl_trim_control_points[0], static_cast<GLint>(trim_curve_orders[curve]), GLU_MAP1_TRIM_3);
+					}
+					gluEndTrim(nurbs_renderer);
+				}
+			}
 			gluEndSurface(nurbs_renderer);
 		}
 	}
@@ -201,6 +246,51 @@ public:
 
 			gluBeginSurface(nurbs_renderer);
 			gluNurbsSurface(nurbs_renderer, gl_u_knot_vector.size(), &gl_u_knot_vector[0], gl_v_knot_vector.size(), &gl_v_knot_vector[0], gl_u_stride, gl_v_stride, &gl_control_points[0], patch_u_order, patch_v_order, GL_MAP2_VERTEX_4);
+			
+			if (Mesh.nurbs_patches->patch_trim_curve_loop_counts && Mesh.nurbs_patches->trim_points)
+			{
+				const k3d::mesh::counts_t& patch_trim_curve_loop_counts = *Mesh.nurbs_patches->patch_trim_curve_loop_counts;
+				const k3d::mesh::indices_t& patch_first_trim_curve_loops = *Mesh.nurbs_patches->patch_first_trim_curve_loops;
+				const k3d::mesh::indices_t& trim_curve_loops = *Mesh.nurbs_patches->trim_curve_loops;
+				
+				const k3d::mesh::points_2d_t& trim_points = *Mesh.nurbs_patches->trim_points;
+				const k3d::mesh::indices_t& first_trim_curves = *Mesh.nurbs_patches->first_trim_curves;
+				const k3d::mesh::counts_t& trim_curve_counts = *Mesh.nurbs_patches->trim_curve_counts;
+				const k3d::mesh::indices_t& trim_curve_first_points = *Mesh.nurbs_patches->trim_curve_first_points;
+				const k3d::mesh::counts_t& trim_curve_point_counts = *Mesh.nurbs_patches->trim_curve_point_counts;
+				const k3d::mesh::orders_t& trim_curve_orders = *Mesh.nurbs_patches->trim_curve_orders;
+				const k3d::mesh::indices_t& trim_curve_first_knots = *Mesh.nurbs_patches->trim_curve_first_knots;
+				const k3d::mesh::selection_t& trim_curve_selection = *Mesh.nurbs_patches->trim_curve_selection;
+				const k3d::mesh::indices_t& trim_curve_points = *Mesh.nurbs_patches->trim_curve_points;
+				const k3d::mesh::weights_t& trim_curve_point_weights = *Mesh.nurbs_patches->trim_curve_point_weights;
+				const k3d::mesh::knots_t& trim_curve_knots = *Mesh.nurbs_patches->trim_curve_knots;
+				
+				k3d::uint_t loops_start = patch_first_trim_curve_loops[patch];
+				k3d::uint_t loops_end = loops_start + patch_trim_curve_loop_counts[patch];
+				for (k3d::uint_t loop_index = loops_start; loop_index != loops_end; ++loop_index)
+				{
+					gluBeginTrim(nurbs_renderer);
+					k3d::uint_t curves_start = first_trim_curves[trim_curve_loops[loop_index]];
+					k3d::uint_t curves_end = curves_start + trim_curve_counts[trim_curve_loops[loop_index]];
+					for (k3d::uint_t curve = curves_start; curve != curves_end; ++curve)
+					{
+						std::vector<GLfloat> gl_trim_knot_vector(&trim_curve_knots[trim_curve_first_knots[curve]], &trim_curve_knots[trim_curve_first_knots[curve] + trim_curve_point_counts[curve] + trim_curve_orders[curve]]);
+						std::vector<GLfloat> gl_trim_control_points;
+						k3d::uint_t points_start = trim_curve_first_points[curve];
+						k3d::uint_t points_end = points_start + trim_curve_point_counts[curve];
+						for (k3d::uint_t point = points_start; point != points_end; ++point)
+						{
+							k3d::point2 control_point = trim_points[trim_curve_points[point]];
+							double weight = trim_curve_point_weights[point];
+							gl_trim_control_points.push_back(static_cast<GLfloat>(control_point[0] * weight));
+							gl_trim_control_points.push_back(static_cast<GLfloat>(control_point[1] * weight));
+							gl_trim_control_points.push_back(static_cast<GLfloat>(weight));
+						}
+						gluNurbsCurve(nurbs_renderer, gl_trim_knot_vector.size(), &gl_trim_knot_vector[0], 3, &gl_trim_control_points[0], static_cast<GLint>(trim_curve_orders[curve]), GLU_MAP1_TRIM_3);
+					}
+					gluEndTrim(nurbs_renderer);
+				}
+			}
 			gluEndSurface(nurbs_renderer);
 
 			k3d::gl::pop_selection_token(); // ABSOLUTE_NURBS_PATCH

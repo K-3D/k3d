@@ -145,7 +145,7 @@ public:
 	void RiTransformBegin();
 	void RiTransformEnd();
 	void RiTranslate(const real DX, const real DY, const real DZ);
-	void RiTrimCurve(const unsigned_integer LoopCount, const unsigned_integers& CurveCounts, const unsigned_integers& Orders, const reals& Knots, const reals& Minimums, const reals& Maximums, const unsigned_integers& KnotCounts, const reals& U, const reals& V, const reals& W);
+	void RiTrimCurve(const unsigned_integers& CurveCounts, const unsigned_integers& Orders, const reals& Knots, const reals& Minimums, const reals& Maximums, const unsigned_integers& PointCounts, const reals& U, const reals& V, const reals& W);
 	void RiWorldBegin();
 	void RiWorldEnd();
 
