@@ -23,6 +23,7 @@
 */
 
 #include <k3dsdk/basic_math.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
@@ -37,7 +38,10 @@
 #include <map>
 #include <stack>
 
-namespace libk3dquadrilateralremeshing
+namespace module
+{
+
+namespace quadrilateral_remeshing
 {
 
 namespace detail
@@ -45,7 +49,29 @@ namespace detail
 
 extern "C"
 {
-#include "superlu/dsp_defs.h"
+#include <superlu/slu_ddefs.h>
+}
+
+const k3d::normal3 normal(k3d::legacy::split_edge* Edge)
+{
+	// Calculates the normal for an edge loop using the summation method, which is more robust than the three-point methods (handles zero-length edges)
+	k3d::normal3 result(0, 0, 0);
+
+	for(k3d::legacy::split_edge* edge = Edge; ; )
+	{
+		const k3d::point3& i = edge->vertex->position;
+		const k3d::point3& j = edge->face_clockwise->vertex->position;
+
+		result[0] += (i[1] + j[1]) * (j[2] - i[2]);
+		result[1] += (i[2] + j[2]) * (j[0] - i[0]);
+		result[2] += (i[0] + j[0]) * (j[1] - i[1]);
+
+		edge = edge->face_clockwise;
+		if(edge == Edge)
+			break;
+	}
+
+	return 0.5 * result;
 }
 
 double cotangent(const double cosine)
@@ -197,7 +223,7 @@ bool segment_intersection(const double s1x1, const double s1y1, const double s1x
 bool segment_intersection(const k3d::point3& A, const k3d::point3& B, const k3d::point3& C, const k3d::point3& D, double& r, double& s)
 {
 	// Cross product
-	k3d::vector3 dot = k3d::normalize(k3d::to_vector(B - A) ^ k3d::to_vector(D - C));
+	k3d::vector3 dot = k3d::normalize((B - A) ^ (D - C));
 
 	// Find best axis projection
 	double x = std::fabs(dot * k3d::vector3(1, 0, 0));
@@ -270,8 +296,8 @@ bool is_point_inside_triangle(const k3d::point3& point, const k3d::point3& p1, c
 // Point to segment distance
 double distance_to_segment(const k3d::point3& Point, const k3d::point3& S1, const k3d::point3& S2)
 {
-	const k3d::point3 vector = S2 - S1;
-	const k3d::point3 w = Point - S1;
+	const k3d::vector3 vector = S2 - S1;
+	const k3d::vector3 w = Point - S1;
 
 	const double c1 = w * vector;
 	if(c1 <= 0)
@@ -287,20 +313,20 @@ double distance_to_segment(const k3d::point3& Point, const k3d::point3& S1, cons
 }
 double distance2_to_segment(const k3d::point3& Point, const k3d::point3& S1, const k3d::point3& S2)
 {
-	const k3d::point3 vector = S2 - S1;
-	const k3d::point3 w = Point - S1;
+	const k3d::vector3 vector = S2 - S1;
+	const k3d::vector3 w = Point - S1;
 
 	const double c1 = w * vector;
 	if(c1 <= 0)
-		return k3d::to_vector(Point - S1).length2();
+		return (Point - S1).length2();
 
 	const double c2 = vector * vector;
 	if(c2 <= c1)
-		return k3d::to_vector(Point - S2).length2();
+		return (Point - S2).length2();
 
 	const double b = c1 / c2;
 	const k3d::point3 middlepoint = S1 + b * vector;
-	return k3d::to_vector(Point - middlepoint).length2();
+	return (Point - middlepoint).length2();
 }
 
 /// Robust vector comparison
@@ -329,8 +355,8 @@ class quadrilateral_remeshing :
 public:
 	quadrilateral_remeshing(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_minima_selection(init_owner(*this) + init_name("minima_selection") + init_label(_("Minima selection")) + init_description(_("Minima Selection")) + init_value(k3d::legacy::mesh_selection())),
-		m_maxima_selection(init_owner(*this) + init_name("maxima_selection") + init_label(_("Maxima selection")) + init_description(_("Maxima Selection")) + init_value(k3d::legacy::mesh_selection())),
+		m_minima_selection(init_owner(*this) + init_name("minima_selection") + init_label(_("Minima selection")) + init_description(_("Minima Selection")) + init_value(k3d::mesh_selection())),
+		m_maxima_selection(init_owner(*this) + init_name("maxima_selection") + init_label(_("Maxima selection")) + init_description(_("Maxima Selection")) + init_value(k3d::mesh_selection())),
 		m_min_index(init_owner(*this) + init_name("min_index") + init_label(_("Min index")) + init_description(_("Min index")) + init_value(0) + init_constraint(constraint::minimum(0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_max_index(init_owner(*this) + init_name("max_index") + init_label(_("Max index")) + init_description(_("Max index")) + init_value(0) + init_constraint(constraint::minimum(0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_h1(init_owner(*this) + init_name("gradient_spacing") + init_label(_("Gradient spacing")) + init_description(_("Gradient spacing")) + init_value(0.4) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
@@ -344,8 +370,8 @@ public:
 		m_maxima_selection.changed_signal().connect(sigc::mem_fun(*this, &quadrilateral_remeshing::on_reset_all));
 		m_min_index.changed_signal().connect(sigc::mem_fun(*this, &quadrilateral_remeshing::on_reset_all));
 		m_max_index.changed_signal().connect(sigc::mem_fun(*this, &quadrilateral_remeshing::on_reset_all));
-		m_h1.changed_signal().connect(make_reset_mesh_slot());
-		m_h2.changed_signal().connect(make_reset_mesh_slot());
+		m_h1.changed_signal().connect(sigc::mem_fun(*this, &quadrilateral_remeshing::on_reset_all));
+		m_h2.changed_signal().connect(sigc::mem_fun(*this, &quadrilateral_remeshing::on_reset_all));
 		//m_curvature_sensibility.changed_signal().connect(make_reset_mesh_slot());
 
 		m_material.changed_signal().connect(make_reset_mesh_slot());
@@ -387,7 +413,7 @@ public:
 			point_map[*point] = index;
 
 			// Get flow start and end point values
-			k3d::parameters_t::const_iterator value = (*point)->vertex_data.find("field_value");
+			k3d::legacy::parameters_t::const_iterator value = (*point)->vertex_data.find("field_value");
 			if(value != (*point)->vertex_data.end())
 			{
 				const double u = boost::any_cast<double>(value->second);
@@ -415,20 +441,21 @@ public:
 		}
 
 		// If there's no parameter value defined, check mesh selections
-		const k3d::legacy::mesh_selection& minima_selection = m_minima_selection.pipeline_value();
-		const k3d::legacy::mesh_selection& maxima_selection = m_maxima_selection.pipeline_value();
+		const k3d::mesh_selection& minima_selection = m_minima_selection.pipeline_value();
+		const k3d::mesh_selection& maxima_selection = m_maxima_selection.pipeline_value();
 		if(!valid_extrema && minima_selection.points.size() && maxima_selection.points.size())
 		{
-			k3d::legacy::mesh_selection::records_t::const_iterator selection_item;
+			k3d::mesh_selection::records_t::const_iterator selection_item;
 			const unsigned long max_point_index = points.size();
 
 			unsigned long minima = 0;
 			const double min_value = m_minima_value.pipeline_value();
 			for(selection_item = minima_selection.points.begin(); selection_item != minima_selection.points.end(); ++selection_item)
 			{
-				const unsigned long selection_index = selection_item->first;
-				if(selection_index < max_point_index && selection_item->second.weight != 0)
+				const unsigned long selection_index = selection_item->begin;
+				if(selection_index < max_point_index && selection_item->weight != 0)
 				{
+					k3d::log() << debug << "Adding minimum " << selection_index << std::endl;
 					m_extrema.insert(std::make_pair(points[selection_index], extremum_t(min_value)));
 
 					++minima;
@@ -439,9 +466,10 @@ public:
 			const double max_value = m_maxima_value.pipeline_value();
 			for(selection_item = maxima_selection.points.begin(); selection_item != maxima_selection.points.end(); ++selection_item)
 			{
-				const unsigned long selection_index = selection_item->first;
-				if(selection_index < max_point_index && selection_item->second.weight != 0)
+				const unsigned long selection_index = selection_item->begin;
+				if(selection_index < max_point_index && selection_item->weight != 0)
 				{
+					k3d::log() << debug << "Adding maximum " << selection_index << std::endl;
 					m_extrema.insert(std::make_pair(points[selection_index], extremum_t(max_value)));
 
 					++maxima;
@@ -509,19 +537,19 @@ public:
 			return_val_if_fail(coords.size() == 3, false);
 
 			// Compute discrete harmonic weights for edges
-			k3d::vector3 v21 = k3d::normalize(k3d::to_vector(coords[1] - coords[2]));
-			k3d::vector3 v20 = k3d::normalize(k3d::to_vector(coords[0] - coords[2]));
+			k3d::vector3 v21 = k3d::normalize((coords[1] - coords[2]));
+			k3d::vector3 v20 = k3d::normalize((coords[0] - coords[2]));
 			const double cot12 = detail::cotangent(v21 * v20);
 
-			k3d::vector3 v02 = k3d::normalize(k3d::to_vector(coords[2] - coords[0]));
-			k3d::vector3 v01 = k3d::normalize(k3d::to_vector(coords[1] - coords[0]));
+			k3d::vector3 v02 = k3d::normalize((coords[2] - coords[0]));
+			k3d::vector3 v01 = k3d::normalize((coords[1] - coords[0]));
 			const double cot23 = detail::cotangent(v02 * v01);
 
-			k3d::vector3 v10 = k3d::normalize(k3d::to_vector(coords[0] - coords[1]));
-			k3d::vector3 v12 = k3d::normalize(k3d::to_vector(coords[2] - coords[1]));
+			k3d::vector3 v10 = k3d::normalize((coords[0] - coords[1]));
+			k3d::vector3 v12 = k3d::normalize((coords[2] - coords[1]));
 			const double cot31 = detail::cotangent(v10 * v12);
 
-			k3d::normal3 normal = k3d::normalize(k3d::normal((*face)->first_edge));
+			k3d::normal3 normal = k3d::normalize(detail::normal((*face)->first_edge));
 
 			k3d::legacy::split_edge* e1 = first;
 			k3d::legacy::split_edge* e2 = first->face_clockwise;
@@ -822,7 +850,7 @@ public:
 		return 0;
 	}
 
-	void on_create_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		// Check for new mesh
 		if(m_input_changed)
@@ -967,8 +995,8 @@ for(unsigned long t = 0; t < iso_flows.size(); ++t)
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::plugin_factory<
-			k3d::document_plugin<quadrilateral_remeshing>,
+		static k3d::document_plugin_factory<
+			quadrilateral_remeshing,
 			k3d::interface_list<k3d::imesh_source,
 				k3d::interface_list<k3d::imesh_sink > > > factory(
 					k3d::uuid(0xde6494ab, 0x1c4d448d, 0xa6a2657e, 0x1751fc93),
@@ -1479,7 +1507,7 @@ assert_not_reached();
 		{
 			k3d::point3 p2 = m_current_triangle->e2->vertex->position;
 			k3d::point3 p3 = m_current_triangle->e3->vertex->position;
-			const double dot_product = k3d::to_vector(p3 - p2) * m_direction;
+			const double dot_product = (p3 - p2) * m_direction;
 			if(dot_product > 0)
 			{
 				m_intersection = p3;
@@ -1504,7 +1532,7 @@ assert_not_reached();
 		{
 			k3d::point3 p3 = m_current_triangle->e3->vertex->position;
 			k3d::point3 p1 = m_current_triangle->e1->vertex->position;
-			const double dot_product = k3d::to_vector(p1 - p3) * m_direction;
+			const double dot_product = (p1 - p3) * m_direction;
 			if(dot_product > 0)
 			{
 				m_intersection = p1;
@@ -1529,7 +1557,7 @@ assert_not_reached();
 		{
 			k3d::point3 p1 = m_current_triangle->e1->vertex->position;
 			k3d::point3 p2 = m_current_triangle->e2->vertex->position;
-			const double dot_product = k3d::to_vector(p2 - p1) * m_direction;
+			const double dot_product = (p2 - p1) * m_direction;
 			if(dot_product > 0)
 			{
 				m_intersection = p2;
@@ -1674,7 +1702,7 @@ assert_not_reached();
 			intersection_type = POINT;
 			if(edge_index == 0)
 			{
-				if(k3d::to_vector(p2 - p1) * m_direction > 0)
+				if((p2 - p1) * m_direction > 0)
 				{
 					m_intersection = p2;
 					return triangle->e2;
@@ -1688,7 +1716,7 @@ assert_not_reached();
 			}
 			if(edge_index == 1)
 			{
-				if(k3d::to_vector(p3 - p2) * m_direction > 0)
+				if((p3 - p2) * m_direction > 0)
 				{
 					m_intersection = p3;
 					return triangle->e3;
@@ -1702,7 +1730,7 @@ assert_not_reached();
 			}
 			if(edge_index == 2)
 			{
-				if(k3d::to_vector(p1 - p3) * m_direction > 0)
+				if((p1 - p3) * m_direction > 0)
 				{
 					m_intersection = p1;
 					return triangle->e1;
@@ -1761,9 +1789,9 @@ assert_not_reached();
 			const k3d::point3 p2 = t->e2->vertex->position;
 			const k3d::point3 p3 = t->e3->vertex->position;
 
-			const bool d1 = k3d::to_vector(intersection - p1).length2() < square_distance;
-			const bool d2 = k3d::to_vector(intersection - p2).length2() < square_distance;
-			const bool d3 = k3d::to_vector(intersection - p3).length2() < square_distance;
+			const bool d1 = (intersection - p1).length2() < square_distance;
+			const bool d2 = (intersection - p2).length2() < square_distance;
+			const bool d3 = (intersection - p3).length2() < square_distance;
 
 			if(d1 || d2)
 			{
@@ -2124,7 +2152,7 @@ assert_not_reached();
 			{
 				const double coef = (u - u1) / (u2 - u1);
 				const k3d::point3 candidate = p1 + (p2 - p1) * coef;
-				k3d::vector3 cdir = k3d::to_vector(candidate - m_intersection);
+				k3d::vector3 cdir = (candidate - m_intersection);
 
 				// Normalize
 				const double clen = cdir.length();
@@ -2177,7 +2205,7 @@ assert_not_reached();
 			{
 				const double coef = (u - u2) / (u3 - u2);
 				const k3d::point3 candidate = p2 + (p3 - p2) * coef;
-				k3d::vector3 cdir = k3d::to_vector(candidate - m_intersection);
+				k3d::vector3 cdir = (candidate - m_intersection);
 
 				// Normalize
 				const double clen = cdir.length();
@@ -2230,7 +2258,7 @@ assert_not_reached();
 			{
 				const double coef = (u - u3) / (u1 - u3);
 				const k3d::point3 candidate = p3 + (p1 - p3) * coef;
-				k3d::vector3 cdir = k3d::to_vector(candidate - m_intersection);
+				k3d::vector3 cdir = (candidate - m_intersection);
 
 				// Normalize
 				const double clen = cdir.length();
@@ -2334,7 +2362,7 @@ assert_not_reached();
 					const k3d::point3 p2 = m_current_triangle->e2->vertex->position;
 					const k3d::point3 p3 = m_current_triangle->e3->vertex->position;
 					const k3d::point3 candidate = p2 + (p3 - p2) * (u - u2) / (u3 - u2);
-					if(k3d::to_vector(candidate - m_intersection) * m_direction > 0)
+					if((candidate - m_intersection) * m_direction > 0)
 					{
 						intersection_type = EDGE;
 						m_intersection = candidate;
@@ -2362,7 +2390,7 @@ assert_not_reached();
 					const k3d::point3 p3 = m_current_triangle->e3->vertex->position;
 					const k3d::point3 p1 = m_current_triangle->e1->vertex->position;
 					const k3d::point3 candidate = p3 + (p1 - p3) * (u - u3) / (u1 - u3);
-					if(k3d::to_vector(candidate - m_intersection) * m_direction > 0)
+					if((candidate - m_intersection) * m_direction > 0)
 					{
 						intersection_type = EDGE;
 						m_intersection = candidate;
@@ -2390,7 +2418,7 @@ assert_not_reached();
 					const k3d::point3 p1 = m_current_triangle->e1->vertex->position;
 					const k3d::point3 p2 = m_current_triangle->e2->vertex->position;
 					const k3d::point3 candidate = p1 + (p2 - p1) * (u - u1) / (u2 - u1);
-					if(k3d::to_vector(candidate - m_intersection) * m_direction > 0)
+					if((candidate - m_intersection) * m_direction > 0)
 					{
 						intersection_type = EDGE;
 						m_intersection = candidate;
@@ -3261,8 +3289,8 @@ if(crossing)
 	double m_isoparametric_distance;
 
 	// User defined values
-	k3d_data(k3d::legacy::mesh_selection, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, k3d::legacy::mesh_selection_serialization) m_minima_selection;
-	k3d_data(k3d::legacy::mesh_selection, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, k3d::legacy::mesh_selection_serialization) m_maxima_selection;
+	k3d_data(k3d::mesh_selection, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, k3d::mesh_selection_serialization) m_minima_selection;
+	k3d_data(k3d::mesh_selection, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, k3d::mesh_selection_serialization) m_maxima_selection;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_min_index;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_max_index;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_h1;
@@ -3281,9 +3309,6 @@ k3d::iplugin_factory& quadrilateral_remeshing_factory()
 	return quadrilateral_remeshing::get_factory();
 }
 
-} // namespace libk3dquadrilateralremeshing
+} // namespace quadrilateral_remeshing
 
-K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dquadrilateralremeshing::quadrilateral_remeshing::get_factory());
-K3D_MODULE_END
-
+} // namespace module
