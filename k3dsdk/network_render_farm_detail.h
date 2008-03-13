@@ -2,7 +2,7 @@
 #define K3DSDK_NETWORK_RENDER_FARM_DETAIL_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "inetwork_render_farm.h"
@@ -30,16 +30,16 @@ namespace k3d
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// network_render_farm_implementation
+// network_render_farm
 
-class network_render_farm_implementation :
+class network_render_farm :
 	public inetwork_render_farm
 {
 public:
-	network_render_farm_implementation(const filesystem::path& OptionsPath);
-	~network_render_farm_implementation();
+	network_render_farm(const filesystem::path& OptionsPath);
+	~network_render_farm();
 
-	inetwork_render_job& create_job(const std::string& JobName);
+	inetwork_render_job& create_job(const string_t& JobName);
 	void start_job(inetwork_render_job& Job);
 
 private:

@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -327,6 +327,7 @@ interface_t* pick_render_engine(document_state& DocumentState, const k3d::nodes_
 	return 0;
 }
 
+/*
 /// Returns the specific RenderMan implementation (if any) to be used by a render engine, or an empty string
 const std::string renderman_type(k3d::iunknown& Engine)
 {
@@ -340,6 +341,7 @@ const std::string renderman_type(k3d::iunknown& Engine)
 
 	return std::string();
 }
+*/
 
 /// Returns the path to a binary executable by searching the contents of the PATH environment variable, or an empty path
 const k3d::filesystem::path find_executable(const std::string& Executable)
@@ -365,6 +367,7 @@ const k3d::filesystem::path find_executable(const std::string& Executable)
 /// Performs sanity checks to see if Aqsis is installed and usable
 void test_aqsis_render_engine(k3d::iunknown& Engine)
 {
+/*
 	static bool test_performed = false;
 	if(test_performed)
 		return;
@@ -389,11 +392,13 @@ void test_aqsis_render_engine(k3d::iunknown& Engine)
 			_("Without it, shaders cannot be compiled.  Check to ensure that you have Aqsis installed, and that the PATH envrionment variable points to the Aqsis binary installation directory."));
 		return;
 	}
+*/
 }
 
 /// Performs sanity checks to see if Pixie is installed and usable
 void test_pixie_render_engine(k3d::iunknown& Engine)
 {
+/*
 	static bool test_performed = false;
 	if(test_performed)
 		return;
@@ -418,6 +423,7 @@ void test_pixie_render_engine(k3d::iunknown& Engine)
 			_("Without it, shaders cannot be compiled.  Check to ensure that you have Pixie installed, and that the PATH environment variable points to the Pixie binary installation directory."));
 		return;
 	}
+*/
 }
 
 /// Performs sanity checks to see if Yafray is installed and usable

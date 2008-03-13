@@ -40,6 +40,7 @@
 #include <k3dsdk/irender_camera_animation.h>
 #include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/irender_camera_preview.h>
+#include <k3dsdk/irender_engine_ri.h>
 #include <k3dsdk/istream_ri.h>
 #include <k3dsdk/irenderable_ri.h>
 #include <k3dsdk/itexture_ri.h>
@@ -51,6 +52,7 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/stream_ri.h>
@@ -58,7 +60,6 @@
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/shader_cache.h>
 #include <k3dsdk/shader_collection_ri.h>
-#include <k3dsdk/shaders.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/types_ri.h>
@@ -66,6 +67,8 @@
 #include <k3dsdk/utility_gl.h>
 
 #include <iomanip>
+
+#include <boost/scoped_ptr.hpp>
 
 #ifdef	WIN32
 #ifdef	near
@@ -124,8 +127,8 @@ public:
 		base(Factory, Document),
 		m_visible_nodes(init_owner(*this) + init_name("visible_nodes") + init_label(_("Visible Nodes")) + init_description(_("A list of nodes that will be visible in the rendered output.")) + init_value(std::vector<k3d::inode*>())),
 		m_enabled_lights(init_owner(*this) + init_name("enabled_lights") + init_label(_("Enabled Lights")) + init_description(_("A list of light sources that will contribute to the rendered output.")) + init_value(std::vector<k3d::inode*>())),
+		m_render_engine(init_owner(*this) + init_name("render_engine") + init_label(_("Render Engine")) + init_description(_("Choose an installed RenderMan engine to be used for rendering.")) + init_value<k3d::ri::irender_engine*>(0)),
 		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("Resolution")) + init_description(_("Choose a predefined image resolution")) + init_enumeration(k3d::resolution_values()) + init_value(std::string(""))),
-		m_render_engine(init_owner(*this) + init_name("render_engine") + init_label(_("Render Engine")) + init_description(_("Render Engine")) + init_value(k3d::options::default_render_engine("ri")) + init_values(render_engine_values())),
 		m_hider(init_owner(*this) + init_name("hider") + init_label(_("Hider")) + init_description(_("Hider Algorithm")) + init_value(std::string())),
 		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("Pixel Width")) + init_description(_("Output pixel width")) + init_value(320) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("Pixel Height")) + init_description(_("Output pixel height")) + init_value(240) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -159,7 +162,6 @@ public:
 	{
 		k3d::iproperty_group_collection::group output_group("Output");
 		output_group.properties.push_back(&static_cast<k3d::iproperty&>(m_resolution));
-		output_group.properties.push_back(&static_cast<k3d::iproperty&>(m_render_engine));
 		output_group.properties.push_back(&static_cast<k3d::iproperty&>(m_hider));
 		output_group.properties.push_back(&static_cast<k3d::iproperty&>(m_pixel_width));
 		output_group.properties.push_back(&static_cast<k3d::iproperty&>(m_pixel_height));
@@ -228,70 +230,52 @@ public:
 
 	bool render_camera_preview(k3d::icamera& Camera)
 	{
-		// Start a new render job ...
-		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-preview");
+		k3d::ri::irender_engine* const render_engine = m_render_engine.pipeline_value();
+		return_val_if_fail(render_engine, false);
+		return_val_if_fail(render_engine->installed(), false);
 
-		// Add a single render frame to the job ...
+		k3d::inetwork_render_job& job = k3d::get_network_render_farm().create_job("k3d-renderman-preview");
 		k3d::inetwork_render_frame& frame = job.create_frame("frame");
+		const k3d::filesystem::path output_image = frame.add_file("output_image");
 
-		// Create an output image path ...
-		const k3d::filesystem::path outputimagepath = frame.add_output_file("outputimage");
-		return_val_if_fail(!outputimagepath.empty(), false);
-
-		// Keep track of shaders used during the preview ...
 		k3d::ri::shader_collection shaders;
+		return_val_if_fail(render(Camera, frame, *render_engine, output_image, true, shaders), false);
+		synchronize_shaders(shaders, *render_engine);
 
-		// Create the preview (visible rendering) ...
-		return_val_if_fail(render(Camera, frame, outputimagepath, true, shaders), false);
-
-		// Ensure shaders are up-to-date ...
-		synchronize_shaders(shaders);
-
-		// Start the job running ...
-		k3d::network_render_farm().start_job(job);
+		k3d::get_network_render_farm().start_job(job);
 
 		return true;
 	}
 
 	bool render_camera_frame(k3d::icamera& Camera, const k3d::filesystem::path& OutputImage, const bool ViewImage)
 	{
-		// Sanity checks ...
-		return_val_if_fail(!OutputImage.empty(), false);
+		k3d::ri::irender_engine* const render_engine = m_render_engine.pipeline_value();
+		return_val_if_fail(render_engine, false);
+		return_val_if_fail(render_engine->installed(), false);
 
-		// Start a new render job ...
-		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-render-frame");
-
-		// Add a single render frame to the job ...
+		k3d::inetwork_render_job& job = k3d::get_network_render_farm().create_job("k3d-renderman-render-frame");
 		k3d::inetwork_render_frame& frame = job.create_frame("frame");
+		const k3d::filesystem::path output_image = frame.add_file("output_image");
 
-		// Create an output image path ...
-		const k3d::filesystem::path outputimagepath = frame.add_output_file("outputimage");
-		return_val_if_fail(!outputimagepath.empty(), false);
-
-		// Copy the output image to its requested destination ...
-		frame.add_copy_operation(outputimagepath, OutputImage);
-
-		// View the output image when it's done ...
-		if(ViewImage)
-			frame.add_view_operation(OutputImage);
-
-		// Keep track of shaders used during the render ...
 		k3d::ri::shader_collection shaders;
+		return_val_if_fail(render(Camera, frame, *render_engine, output_image, false, shaders), false);
+		synchronize_shaders(shaders, *render_engine);
 
-		// Create the render (hidden rendering) ...
-		return_val_if_fail(render(Camera, frame, outputimagepath, false, shaders), false);
+		frame.add_copy_command(output_image, OutputImage);
+		if(ViewImage)
+			frame.add_view_command(OutputImage);
 
-		// Ensure shaders are up-to-date ...
-		synchronize_shaders(shaders);
-
-		// Start the job running ...
-		k3d::network_render_farm().start_job(job);
+		k3d::get_network_render_farm().start_job(job);
 
 		return true;
 	}
 
 	bool render_camera_animation(k3d::icamera& Camera, const k3d::file_range& Files, const bool ViewCompletedImages)
 	{
+		k3d::ri::irender_engine* const render_engine = m_render_engine.pipeline_value();
+		return_val_if_fail(render_engine, false);
+		return_val_if_fail(render_engine->installed(), false);
+
 		// Ensure that the document has animation capabilities, first ...
 		k3d::iproperty* const start_time_property = k3d::get_start_time(document());
 		k3d::iproperty* const end_time_property = k3d::get_end_time(document());
@@ -309,11 +293,8 @@ public:
 
 		return_val_if_fail(Files.max_file_count() > end_frame, false);
 
-		// Start a new render job ...
-		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-render-animation");
-
-		// Keep track of shaders used over the course of the animation ...
 		k3d::ri::shader_collection shaders;
+		k3d::inetwork_render_job& job = k3d::get_network_render_farm().create_job("k3d-renderman-render-animation");
 
 		// For each frame to be rendered ...
 		for(size_t view_frame = start_frame; view_frame < end_frame; ++view_frame)
@@ -330,26 +311,25 @@ public:
 			k3d::inetwork_render_frame& frame = job.create_frame(buffer.str());
 
 			// Create an output image path ...
-			const k3d::filesystem::path outputimagepath = frame.add_output_file("outputimage");
-			return_val_if_fail(!outputimagepath.empty(), false);
+			const k3d::filesystem::path output_image = frame.add_file("output_image");
+
+			// Render it (hidden rendering) ...
+			return_val_if_fail(render(Camera, frame, *render_engine, output_image, false, shaders), false);
 
 			// Copy the output image to its requested destination ...
 			const k3d::filesystem::path destination = Files.file(view_frame);
-			frame.add_copy_operation(outputimagepath, destination);
+			frame.add_copy_command(output_image, destination);
 
 			// View the output image when it's done ...
 			if(ViewCompletedImages)
-				frame.add_view_operation(destination);
-
-			// Render it (hidden rendering) ...
-			return_val_if_fail(render(Camera, frame, outputimagepath, false, shaders), false);
+				frame.add_view_command(destination);
 		}
 
 		// Ensure shaders are up-to-date ...
-		synchronize_shaders(shaders);
+		synchronize_shaders(shaders, *render_engine);
 
 		// Start the job running ...
-		k3d::network_render_farm().start_job(job);
+		k3d::get_network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -370,7 +350,7 @@ public:
 	}
 
 private:
-	bool render(k3d::icamera& Camera, k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath, const bool VisibleRender, k3d::ri::shader_collection& Shaders)
+	bool render(k3d::icamera& Camera, k3d::inetwork_render_frame& Frame, k3d::ri::irender_engine& RenderEngine, const k3d::filesystem::path& OutputImagePath, const bool VisibleRender, k3d::ri::shader_collection& Shaders)
 	{
 		// Sanity checks ...
 		return_val_if_fail(!OutputImagePath.empty(), false);
@@ -386,15 +366,14 @@ private:
 
 		// Start our RIB file ...
 		const std::string ribfilename("world.rib");
-		const k3d::filesystem::path ribfilepath = Frame.add_input_file(ribfilename);
-		return_val_if_fail(!ribfilepath.empty(), false);
+		const k3d::filesystem::path ribfilepath = Frame.add_file(ribfilename);
 
 		// Open the RIB file stream ...
 		k3d::filesystem::ofstream ribfile(ribfilepath);
 		return_val_if_fail(ribfile.good(), false);
 
 		// Setup the frame for RI rendering with the user's preferred engine ...
-		Frame.add_render_operation("ri", m_render_engine.pipeline_value(), k3d::filesystem::native_path(k3d::ustring::from_utf8(ribfilename)), VisibleRender);
+		return_val_if_fail(RenderEngine.render(Frame, ribfilepath), false);
 
 		// Create the Ri render engine object ...
 		k3d::ri::stream stream(ribfile);
@@ -684,14 +663,13 @@ private:
 		return true;
 	}
 
-	void synchronize_shaders(const k3d::ri::shader_collection& Shaders)
+	void synchronize_shaders(const k3d::ri::shader_collection& Shaders, k3d::ri::irender_engine& RenderEngine)
 	{
-		// For each shader in the collection ...
+		// Compile each shader in the given collection ...
 		const k3d::ri::shader_collection::shaders_t& shaders = Shaders.shaders();
 		for(k3d::ri::shader_collection::shaders_t::const_iterator shader = shaders.begin(); shader != shaders.end(); ++shader)
 		{
-			// Compile that bad-boy!
-			if(!k3d::compile_shader(*shader, "ri", m_render_engine.pipeline_value()))
+			if(!RenderEngine.compile_shader(*shader))
 				k3d::log() << error << k3d::string_cast(boost::format(_("Error compiling shader %1%")) % shader->native_utf8_string().raw()) << std::endl;
 		}
 	}
@@ -742,8 +720,8 @@ private:
 
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, renderman_visible_nodes_property, node_collection_serialization) m_visible_nodes;
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, renderman_enabled_lights_property, node_collection_serialization) m_enabled_lights;
+	k3d_data(k3d::ri::irender_engine*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_render_engine;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_render_engine;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_hider;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;
@@ -774,21 +752,6 @@ private:
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_two_sided;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_motion_blur;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_render_motion_blur;
-
-	const k3d::ilist_property<std::string>::values_t& render_engine_values()
-	{
-		static k3d::ilist_property<std::string>::values_t values;
-		if(values.empty())
-		{
-			const k3d::options::render_engines_t engines = k3d::options::render_engines();
-			for(k3d::options::render_engines_t::const_iterator engine = engines.begin(); engine != engines.end(); ++engine)
-			{
-				if(engine->type == "ri")
-					values.push_back(engine->name);
-			}
-		}
-		return values;
-	}
 
 	const k3d::ilist_property<std::string>::values_t& pixel_filter_values()
 	{

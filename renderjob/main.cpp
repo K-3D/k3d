@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,9 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the renderjob application, which runs jobs scheduled with the virtual render farm
-		\author Tim Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Tim Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
 #include <k3d-platform-config.h>
@@ -50,15 +49,9 @@ k3d::log_level_t g_minimum_log_level = k3d::K3D_LOG_LEVEL_DEBUG;
 /////////////////////////////////////////////////////////////////////////////
 // render_job
 
-bool render_job(const k3d::filesystem::path& GlobalOptionsPath, const k3d::filesystem::path& JobDirectory)
+bool render_job(const k3d::filesystem::path& JobDirectory)
 {
 	// Sanity checks ...
-	if(!k3d::filesystem::exists(GlobalOptionsPath))
-	{
-		k3d::log() << error << "Options file " << GlobalOptionsPath.native_console_string() << " does not exist" << std::endl;
-		return false;
-	}
-
 	if(!k3d::filesystem::exists(JobDirectory))
 	{
 		k3d::log() << error << "Job directory " << JobDirectory.native_console_string() << " does not exist" << std::endl;
@@ -102,7 +95,7 @@ bool render_job(const k3d::filesystem::path& GlobalOptionsPath, const k3d::files
 		if(!k3d::filesystem::is_directory(*frame))
 			continue;
 
-		const std::string commandline("k3d-renderframe \"" + GlobalOptionsPath.native_filesystem_string() + "\" \"" + frame->native_filesystem_string() + "\"");
+		const std::string commandline("k3d-renderframe \"" + frame->native_filesystem_string() + "\"");
 		k3d::system::spawn_sync(commandline);
 	}
 
@@ -122,7 +115,7 @@ bool render_job(const k3d::filesystem::path& GlobalOptionsPath, const k3d::files
 void usage(const std::string& Name, std::ostream& Stream)
 {
 	Stream << "usage: " << Name << " [options]" << std::endl;
-	Stream << "       " << Name << " [optionspath] [directory ...]" << std::endl;
+	Stream << "       " << Name << " [directory ...]" << std::endl;
 	Stream << std::endl;
 	Stream << "  -h, --help               prints this help information and exits" << std::endl;
 	Stream << "      --version            prints program version information and exits" << std::endl;
@@ -189,8 +182,8 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	// Otherwise we should have a minimum of two arguments ...
-	if(options.size() < 2)
+	// Otherwise we should have a minimum of one argument ...
+	if(options.size() < 1)
 	{
 		usage(program_name, k3d::log());
 		return 1;
@@ -201,10 +194,9 @@ int main(int argc, char* argv[])
 
 	// Each remaining argument should be a job path to render ...
 	int result = 0;
-	for(unsigned long j = 1; j < options.size(); j++)
+	for(unsigned long j = 0; j < options.size(); j++)
 	{
 		if(!render_job(
-			k3d::filesystem::native_path(k3d::ustring::from_utf8(options[0])),
 			k3d::filesystem::native_path(k3d::ustring::from_utf8(options[j]))))
 			result = 1;
 	}

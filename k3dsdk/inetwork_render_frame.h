@@ -2,7 +2,7 @@
 #define K3DSDK_INETWORK_RENDER_FRAME_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,32 +21,68 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
-#include <string>
+#include "types.h"
 
 namespace k3d
 {
 
 namespace filesystem { class path; }
 
-/// Abstract interface encapsulating a single frame to be rendered
+/// Abstract interface that encapsulates all of the work required to render a "frame".
+/// All of the steps ("commands") required to render the frame will be executed in the
+/// order that they were added using add_exec_command(), add_copy_command(), and add_view_command().
 class inetwork_render_frame :
 	public virtual iunknown
 {
 public:
-	/// Returns a unique filepath that can be used as an input file for this frame
-	virtual const filesystem::path add_input_file(const std::string& Name) = 0;
-	/// Returns a unique filepath that can be used as an output file for this frame
-	virtual const filesystem::path add_output_file(const std::string& Name) = 0;
-	/// Sets-up a render operation for transforming input files to outputfiles (the render engine will be matched against choices in the user options file)
-	virtual void add_render_operation(const std::string& Type, const std::string& Name, const filesystem::path& File, const bool VisibleRender) = 0;
-	/// Sets-up a copy operation that will be executed once rendering is complete
-	virtual void add_copy_operation(const filesystem::path& SourceFile, const filesystem::path& TargetFile) = 0;
-	/// Sets-up a file view operation once copying is complete
-	virtual void add_view_operation(const filesystem::path& FilePath) = 0;
+	class variable
+	{
+	public:
+		variable()
+		{
+		}
+
+		variable(const string_t& Name, const string_t& Value) :
+			name(Name),
+			value(Value)
+		{
+		}
+
+		string_t name;
+		string_t value;
+	};
+
+	typedef std::vector<variable> environment;
+
+	class argument
+	{
+	public:
+		argument()
+		{
+		}
+
+		argument(const string_t& Value) :
+			value(Value)
+		{
+		}
+
+		string_t value;
+	};
+
+	typedef std::vector<argument> arguments;
+
+	/// Returns a unique filepath that can be used as an input/output file for this frame
+	virtual const filesystem::path add_file(const string_t& Name) = 0;
+	/// Sets-up an arbitrary command to be executed
+	virtual void add_exec_command(const string_t& Binary, const environment& Environment, const arguments& Arguments) = 0;
+	/// Sets-up a copy operation from one filesystem location to another
+	virtual void add_copy_command(const filesystem::path& Source, const filesystem::path& Target) = 0;
+	/// Sets-up an view operation that will display a file to the user
+	virtual void add_view_command(const filesystem::path& File) = 0;
 
 protected:
 	inetwork_render_frame() {}

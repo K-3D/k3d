@@ -1,5 +1,5 @@
 // K-3D
-// Copyright © 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "fstream.h"
@@ -37,8 +37,9 @@ using namespace k3d::xml;
 
 #include <list>
 #include <iostream>
+#include <vector>
 
-#include <errno.h>
+//#include <errno.h>
 
 namespace k3d
 {
@@ -52,73 +53,61 @@ inetwork_render_farm* g_render_farm = 0;
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
-// render_frame_implementation
+// network_render_frame
 
-class render_frame_implementation :
+class network_render_frame :
 	public inetwork_render_frame
 {
 public:
-	render_frame_implementation(const filesystem::path& JobPath, const std::string& Name) :
+	network_render_frame(const filesystem::path& JobPath, const string_t& Name) :
 		m_Path(JobPath / filesystem::native_path(ustring::from_utf8(Name)))
 	{
 		if(!filesystem::create_directory(m_Path))
 			log() << error << "Error creating frame directory [" << m_Path.native_console_string() << "]" << std::endl;
 	}
 
-	const filesystem::path add_input_file(const std::string& Name)
+	~network_render_frame()
+	{
+		for(commands_t::const_iterator command = m_commands.begin(); command != m_commands.end(); ++command)
+			delete *command;
+	}
+
+	const filesystem::path add_file(const string_t& Name)
 	{
 		// Sanity checks ...
 		assert_warning(Name.size());
 
 		// Make sure the filepath is unique ...
 		unsigned long index = 0;
-		std::string name(Name);
-		while(std::find(m_input_files.begin(), m_input_files.end(), name) != m_input_files.end())
+		string_t name = Name;
+		while(std::count(m_files.begin(), m_files.end(), name))
 			name = Name + '-' + string_cast(++index);
 
-		m_input_files.push_back(name);
+		m_files.push_back(name);
 
 		return m_Path / filesystem::generic_path(name);
 	}
 
-	const filesystem::path add_output_file(const std::string& Name)
+	void add_exec_command(const string_t& Binary, const environment& Environment, const arguments& Arguments)
 	{
 		// Sanity checks ...
-		assert_warning(Name.size());
+		assert_warning(!Binary.empty());
 
-		// Make sure the filepath is unique ...
-		unsigned long index = 0;
-		std::string name(Name);
-		while(std::find(m_output_files.begin(), m_output_files.end(), name) != m_output_files.end())
-			name = Name + '-' + string_cast(++index);
-
-		m_output_files.push_back(name);
-
-		return m_Path / filesystem::generic_path(name);
+		m_commands.push_back(new exec_command(Binary, Environment, Arguments));
 	}
 
-	void add_render_operation(const std::string& Type, const std::string& Name, const filesystem::path& SourceFilePath, const bool VisibleRender)
+	void add_copy_command(const filesystem::path& Source, const filesystem::path& Target)
 	{
 		// Sanity checks ...
-		assert_warning(!Type.empty());
-		assert_warning(!Name.empty());
-		assert_warning(!SourceFilePath.empty());
+		assert_warning(!Source.empty());
+		assert_warning(!Target.empty());
 
-		m_render_operations.push_back(render_operation(Type, Name, SourceFilePath, VisibleRender));
+		m_commands.push_back(new copy_command(Source, Target));
 	}
 
-	void add_copy_operation(const filesystem::path& SourceFilePath, const filesystem::path& TargetFilePath)
+	void add_view_command(const filesystem::path& File)
 	{
-		// Sanity checks ...
-		assert_warning(!SourceFilePath.empty());
-		assert_warning(!TargetFilePath.empty());
-
-		m_copy_operations.push_back(copy_operation(SourceFilePath, TargetFilePath));
-	}
-
-	void add_view_operation(const filesystem::path& FilePath)
-	{
-		m_view_files.push_back(FilePath);
+		m_commands.push_back(new view_command(File));
 	}
 
 	void write_control_file()
@@ -127,47 +116,53 @@ public:
 		filesystem::ofstream file(m_Path / filesystem::generic_path("control.k3d"));
 
 		// Create the XML document ...
-		element document("k3dml");
-		element& frame = document.append(element("frame"));
+		element xml_document("k3dml");
+		element& xml_frame = xml_document.append(element("frame"));
 
-		// Specify which files will be used as input for rendering the frame ...
-		for(input_files_t::const_iterator inputfile = m_input_files.begin(); inputfile != m_input_files.end(); ++inputfile)
+		for(commands_t::const_iterator command = m_commands.begin(); command != m_commands.end(); ++command)
 		{
-			frame.append(element("inputfile", attribute("path", *inputfile)));
-		}
+			if(exec_command* const exec = dynamic_cast<exec_command*>(*command))
+			{
+				element& xml_command = xml_frame.append(element("command"));
+				element& xml_exec = xml_command.append(element("exec",
+					attribute("binary", exec->m_binary)));
 
-		// Specify which files will be generated during the render process ...
-		for(output_files_t::const_iterator outputfile = m_output_files.begin(); outputfile != m_output_files.end(); ++outputfile)
-		{
-			frame.append(element("outputfile", attribute("path", *outputfile)));
-		}
+				element& xml_environment = xml_exec.append(element("environment"));
+				for(environment::const_iterator variable = exec->m_environment.begin(); variable != exec->m_environment.end(); ++variable)
+				{
+					xml_environment.append(element("variable",
+						attribute("name", variable->name),
+						attribute("value", variable->value)));
+				}
 
-		// Specify the steps necessary to render ...
-		for(render_operations_t::const_iterator renderop = m_render_operations.begin(); renderop != m_render_operations.end(); ++renderop)
-		{
-			frame.append(element("renderoperation",
-				attribute("type", renderop->type),
-				attribute("name", renderop->name),
-				attribute("sourcepath", renderop->source_path.native_utf8_string().raw()),
-				attribute("shaderspath", shader_cache_path().native_utf8_string().raw()),
-				attribute("sharepath", share_path().native_utf8_string().raw()),
-				attribute("visiblerender", renderop->visible_render)));
+				element& xml_arguments = xml_exec.append(element("arguments"));
+				for(arguments::const_iterator argument = exec->m_arguments.begin(); argument != exec->m_arguments.end(); ++argument)
+				{
+					xml_arguments.append(element("argument",
+						attribute("value", argument->value)));
+				}
+			}
+			else if(copy_command* const copy = dynamic_cast<copy_command*>(*command))
+			{
+				xml_frame.append(element("command",
+					element("copy",
+						attribute("source", copy->m_source.native_utf8_string().raw()),
+						attribute("target", copy->m_target.native_utf8_string().raw()))));
+			}
+			else if(view_command* const view = dynamic_cast<view_command*>(*command))
+			{
+				xml_frame.append(element("command",
+					element("view",
+						attribute("file", view->m_file.native_utf8_string().raw()))));
+			}
+			else
+			{
+				assert_not_reached();
+			}
 		}
-
-		// Specify any copy operations to be performed after the render ...
-		for(copy_operations_t::const_iterator copyop = m_copy_operations.begin(); copyop != m_copy_operations.end(); ++copyop)
-		{
-			frame.append(element("copyoperation",
-				attribute("from", copyop->from.native_utf8_string().raw()),
-				attribute("to", copyop->to.native_utf8_string().raw())));
-		}
-
-		// Specify any viewing operations to be performed after the render ...
-		for(view_files_t::const_iterator viewop = m_view_files.begin(); viewop != m_view_files.end(); ++viewop)
-			frame.append(element("viewoperation", attribute("path", viewop->native_utf8_string().raw())));
 
 		// Write the document ...
-		file << document << std::endl;
+		file << xml_document << std::endl;
 	}
 
 	void mark_ready()
@@ -183,56 +178,75 @@ private:
 	/// Stores the filesystem path for this job
 	const filesystem::path m_Path;
 	/// Stores the set of input files used during rendering
-	typedef std::vector<std::string> input_files_t;
-	input_files_t m_input_files;
-	/// Stores the set of output files generated by rendering
-	typedef std::vector<std::string> output_files_t;
-	output_files_t m_output_files;
-	/// Defines a render operation to be performed
-	struct render_operation
+	typedef std::vector<string_t> files_t;
+	files_t m_files;
+
+	/// Defines a command to be executed
+	class command
 	{
-		explicit render_operation(const std::string& Type, const std::string& Name, const filesystem::path& SourcePath, const bool VisibleRender) :
-			type(Type),
-			name(Name),
-			source_path(SourcePath),
-			visible_render(VisibleRender)
+	public:
+		virtual ~command() {}
+
+	protected:
+		command() {}
+		command(const command&) {}
+		command& operator=(const command&) { return *this; }
+	};
+
+	class exec_command :
+		public command
+	{
+	public:
+		exec_command(const string_t& Binary, const environment& Environment, const arguments& Arguments) :
+			m_binary(Binary),
+			m_environment(Environment),
+			m_arguments(Arguments)
 		{
 		}
 
-		const std::string type;
-		const std::string name;
-		const filesystem::path source_path;
-		const bool visible_render;
+		const string_t m_binary;
+		const environment m_environment;
+		const arguments m_arguments;
 	};
-	typedef std::list<render_operation> render_operations_t;
-	render_operations_t m_render_operations;
-	/// Defines a post-render copy operation
-	struct copy_operation
+	
+	class copy_command :
+		public command
 	{
-		explicit copy_operation(const filesystem::path& From, const filesystem::path& To) :
-			from(From),
-			to(To)
+	public:
+		copy_command(const filesystem::path& Source, const filesystem::path& Target) :
+			m_source(Source),
+			m_target(Target)
 		{
 		}
 
-		const filesystem::path from;
-		const filesystem::path to;
+		const filesystem::path m_source;
+		const filesystem::path m_target;
 	};
-	typedef std::list<copy_operation> copy_operations_t;
-	copy_operations_t m_copy_operations;
-	/// Stores an array of files to view once rendering is complete
-	typedef std::vector<filesystem::path> view_files_t;
-	view_files_t m_view_files;
+
+	class view_command :
+		public command
+	{
+	public:
+		view_command(const filesystem::path& File) :
+			m_file(File)
+		{
+		}
+
+		const filesystem::path m_file;
+	};
+
+	typedef std::vector<command*> commands_t;
+	commands_t m_commands;
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// render_job_implementation
+// network_render_job
 
-class render_job_implementation :
+class network_render_job :
 	public inetwork_render_job
 {
 public:
-	render_job_implementation(const filesystem::path Path, const std::string JobName) :
+	network_render_job(const filesystem::path Path, const string_t JobName) :
 		m_Path(Path / filesystem::generic_path(JobName))
 	{
 		try
@@ -245,16 +259,16 @@ public:
 		}
 	}
 
-	inetwork_render_frame& create_frame(const std::string& FrameName)
+	inetwork_render_frame& create_frame(const string_t& FrameName)
 	{
-		m_frames.push_back(render_frame_implementation(m_Path, FrameName));
+		m_frames.push_back(network_render_frame(m_Path, FrameName));
 		return m_frames.back();
 	}
 
 	bool write_control_files()
 	{
 		// Create a control file for each frame ...
-		std::for_each(m_frames.begin(), m_frames.end(), std::mem_fun_ref(&render_frame_implementation::write_control_file));
+		std::for_each(m_frames.begin(), m_frames.end(), std::mem_fun_ref(&network_render_frame::write_control_file));
 
 		// Create the control file ...
 		filesystem::ofstream file(m_Path / filesystem::generic_path("control.k3d"));
@@ -271,7 +285,7 @@ public:
 	bool mark_ready()
 	{
 		// Mark each frame as "ready" ...
-		std::for_each(m_frames.begin(), m_frames.end(), std::mem_fun_ref(&render_frame_implementation::mark_ready));
+		std::for_each(m_frames.begin(), m_frames.end(), std::mem_fun_ref(&network_render_frame::mark_ready));
 
 		// Create the "ready" status file ...
 		filesystem::ofstream file(m_Path / filesystem::generic_path("ready"));
@@ -282,7 +296,7 @@ public:
 		return true;
 	}
 
-	const std::string path()
+	const string_t path()
 	{
 		return m_Path.native_utf8_string().raw();
 	}
@@ -290,14 +304,14 @@ public:
 private:
 	const filesystem::path m_Path;
 
-	typedef std::list<render_frame_implementation> frames_t;
+	typedef std::list<network_render_frame> frames_t;
 	frames_t m_frames;
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// network_render_farm_implementation::implementation
+// network_render_farm::implementation
 
-class network_render_farm_implementation::implementation
+class network_render_farm::implementation
 {
 public:
 	implementation(const filesystem::path& OptionsPath) :
@@ -305,7 +319,7 @@ public:
 	{
 	}
 
-	inetwork_render_job& create_job(const std::string& JobName)
+	inetwork_render_job& create_job(const string_t& JobName)
 	{
 		// Sanity checks ...
 		assert_warning(JobName.size());
@@ -315,19 +329,19 @@ public:
 
 		// Ensure that the job gets a unique name ...
 		unsigned long index = 0;
-		std::string job_name(JobName);
+		string_t job_name(JobName);
 		while(filesystem::exists(job_path / filesystem::generic_path(job_name)))
 			job_name = JobName + '-' + string_cast(index++);
 
-		m_jobs.push_back(render_job_implementation(job_path, job_name));
+		m_jobs.push_back(network_render_job(job_path, job_name));
 		return m_jobs.back();
 	}
 
 	void start_job(inetwork_render_job& Job)
 	{
 		// Make sure it's one of ours ...
-		render_job_implementation* const job = dynamic_cast<render_job_implementation*>(&Job);
-		assert_warning(job);
+		network_render_job* const job = dynamic_cast<network_render_job*>(&Job);
+		return_if_fail(job);
 
 		// Update control files for the job and all its frames ...
 		if(!job->write_control_files())
@@ -344,9 +358,7 @@ public:
 		}
 
 		// Start the local rendering process ...
-		std::string commandline = "k3d-renderjob \"";
-		commandline += m_options_path.native_filesystem_string();
-		commandline += "\" \"";
+		string_t commandline = "k3d-renderjob \"";
 		commandline += job->path();
 		commandline += "\"";
 
@@ -359,30 +371,30 @@ public:
 
 private:
 	const filesystem::path m_options_path;
-	typedef std::list<render_job_implementation> jobs_t;
+	typedef std::list<network_render_job> jobs_t;
 	jobs_t m_jobs;
 };
 
 
 /////////////////////////////////////////////////////////////////////////////
-// render_farm_implementation
+// network_render_farm
 
-network_render_farm_implementation::network_render_farm_implementation(const filesystem::path& OptionsPath) :
+network_render_farm::network_render_farm(const filesystem::path& OptionsPath) :
 	m_implementation(new implementation(OptionsPath))
 {
 }
 
-network_render_farm_implementation::~network_render_farm_implementation()
+network_render_farm::~network_render_farm()
 {
 	delete m_implementation;
 }
 
-inetwork_render_job& network_render_farm_implementation::create_job(const std::string& JobName)
+inetwork_render_job& network_render_farm::create_job(const string_t& JobName)
 {
 	return m_implementation->create_job(JobName);
 }
 
-void network_render_farm_implementation::start_job(inetwork_render_job& Job)
+void network_render_farm::start_job(inetwork_render_job& Job)
 {
 	m_implementation->start_job(Job);
 }
@@ -399,7 +411,7 @@ void set_network_render_farm(inetwork_render_farm& RenderFarm)
 /////////////////////////////////////////////////////////////////////////////
 // render_farm
 
-inetwork_render_farm& network_render_farm()
+inetwork_render_farm& get_network_render_farm()
 {
 	assert_critical(detail::g_render_farm);
 	return *detail::g_render_farm;

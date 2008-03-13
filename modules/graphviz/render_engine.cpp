@@ -64,7 +64,7 @@ public:
 		m_visible_nodes(init_owner(*this) + init_name("visible_nodes") + init_label(_("Visible Nodes")) + init_description(_("Visible Nodes")) + init_value(std::vector<k3d::inode*>())),
 		m_show_property_labels(init_owner(*this) + init_name("show_property_labels") + init_label(_("Show Property Labels")) + init_description(_("Display property labels in the rendered image.")) + init_value(true)),
 		m_show_property_loops(init_owner(*this) + init_name("show_property_loops") + init_label(_("Show Property Loops")) + init_description(_("Display property connections that originate and terminate on the same node.")) + init_value(true)),
-		m_render_engine(init_owner(*this) + init_name("render_engine") + init_label(_("Render engine")) + init_description(_("Render engine name")) + init_value(k3d::string_t("dot")) + init_values(render_engine_values()))
+		m_render_command(init_owner(*this) + init_name("render_command") + init_label(_("Render Command")) + init_description(_("Specify the GraphViz command to use for rendering.")) + init_value(k3d::string_t("dot")) + init_values(render_command_values()))
 	{
 	}
 
@@ -76,23 +76,22 @@ public:
 	bool render_preview()
 	{
 		// Start a new render job ...
-		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-preview");
+		k3d::inetwork_render_job& job = k3d::get_network_render_farm().create_job("k3d-graphviz-preview");
 
 		// Add a single render frame to the job ...
 		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
-		const k3d::filesystem::path outputimagepath = frame.add_output_file("world.ps");
-		return_val_if_fail(!outputimagepath.empty(), false);
-
-		// View the output image when it's done ...
-		frame.add_view_operation(outputimagepath);
+		const k3d::filesystem::path output_image_path = frame.add_file("world.ps");
 
 		// Render it ...
-		return_val_if_fail(render(frame, outputimagepath), false);
+		return_val_if_fail(render(frame, output_image_path), false);
+
+		// View the output image when it's done ...
+		frame.add_view_command(output_image_path);
 
 		// Start the job running ...
-		k3d::network_render_farm().start_job(job);
+		k3d::get_network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -103,27 +102,26 @@ public:
 		return_val_if_fail(!OutputImage.empty(), false);
 
 		// Start a new render job ...
-		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-render-frame");
+		k3d::inetwork_render_job& job = k3d::get_network_render_farm().create_job("k3d-graphviz-render");
 
 		// Add a single render frame to the job ...
 		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
-		const k3d::filesystem::path outputimagepath = frame.add_output_file("world.ps");
-		return_val_if_fail(!outputimagepath.empty(), false);
+		const k3d::filesystem::path output_image_path = frame.add_file("world.ps");
+
+		// Render it ...
+		return_val_if_fail(render(frame, output_image_path), false);
 
 		// Copy the output image to its requested destination ...
-		frame.add_copy_operation(outputimagepath, OutputImage);
+		frame.add_copy_command(output_image_path, OutputImage);
 
 		// View the output image when it's done ...
 		if(ViewImage)
-			frame.add_view_operation(OutputImage);
-
-		// Render it ...
-		return_val_if_fail(render(frame, outputimagepath), false);
+			frame.add_view_command(OutputImage);
 
 		// Start the job running ...
-		k3d::network_render_farm().start_job(job);
+		k3d::get_network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -166,22 +164,26 @@ private:
 
 	bool render(k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath)
 	{
-		// Sanity checks ...
-		return_val_if_fail(!OutputImagePath.empty(), false);
-
 		// Start our GraphViz DOT file ...
-		const k3d::filesystem::path filepath = Frame.add_input_file("world.dot");
-		return_val_if_fail(!filepath.empty(), false);
+		const k3d::filesystem::path dot_file = Frame.add_file("world.dot");
 
 		// Open the DOT file stream ...
-		k3d::filesystem::ofstream stream(filepath);
+		k3d::filesystem::ofstream stream(dot_file);
 		return_val_if_fail(stream.good(), false);
 
 		const k3d::bool_t show_property_labels = m_show_property_labels.pipeline_value();
 		const k3d::bool_t show_property_loops = m_show_property_loops.pipeline_value();
 
 		// Setup the frame for GraphViz rendering ...
-		Frame.add_render_operation("graphviz", m_render_engine.pipeline_value(), filepath, false);
+		k3d::inetwork_render_frame::environment environment;
+
+		k3d::inetwork_render_frame::arguments arguments;
+		arguments.push_back(k3d::inetwork_render_frame::argument("-Tps"));
+		arguments.push_back(k3d::inetwork_render_frame::argument(dot_file.native_filesystem_string()));
+		arguments.push_back(k3d::inetwork_render_frame::argument("-o"));
+		arguments.push_back(k3d::inetwork_render_frame::argument("world.ps"));
+
+		Frame.add_exec_command(m_render_command.pipeline_value(), environment, arguments);
 
 		stream << "digraph \"" << boost::any_cast<k3d::ustring>(document().title().property_internal_value()).raw() << "\"\n";
 		stream << "{\n\n";
@@ -270,19 +272,16 @@ private:
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, node_collection_serialization) m_visible_nodes;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_property_labels;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_property_loops;
-	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_render_engine;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_render_command;
 
-	const k3d::ilist_property<k3d::string_t>::values_t& render_engine_values()
+	const k3d::ilist_property<k3d::string_t>::values_t& render_command_values()
 	{
 		static k3d::ilist_property<k3d::string_t>::values_t values;
 		if(values.empty())
 		{
-			const k3d::options::render_engines_t engines = k3d::options::render_engines();
-			for(k3d::options::render_engines_t::const_iterator engine = engines.begin(); engine != engines.end(); ++engine)
-			{
-				if(engine->type == "graphviz")
-					values.push_back(engine->name);
-			}
+			values.push_back("dot");
+			values.push_back("neato");
+			values.push_back("twopi");
 		}
 		return values;
 	}

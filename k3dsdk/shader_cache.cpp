@@ -46,12 +46,12 @@ void set_shader_cache_path(const filesystem::path& ShaderCachePath)
 
 const filesystem::path shader_cache_path()
 {
-	static bool nag = true;
-	if(detail::g_shader_cache_path.empty() && nag)
-	{
+	if(detail::g_shader_cache_path.empty())
 		k3d::log() << error << "shader cache path must be set before use!" << std::endl;
-		nag = false;
-	}
+
+	k3d::filesystem::create_directories(detail::g_shader_cache_path);
+	if(!k3d::filesystem::exists(detail::g_shader_cache_path))
+		k3d::log() << error << "shader cache does not exist" << std::endl;
 
 	return detail::g_shader_cache_path;
 }

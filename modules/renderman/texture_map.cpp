@@ -84,10 +84,10 @@ public:
 		if(!texture)
 			return;
 
-		m_ri_image_path = Frame.add_input_file("texture");
+		m_ri_image_path = Frame.add_file("texture");
 		return_if_fail(!m_ri_image_path.empty());
 
-		m_ri_texture_path = Frame.add_input_file("texture");
+		m_ri_texture_path = Frame.add_file("texture");
 		return_if_fail(!m_ri_texture_path.empty());
 
 		if(m_refresh_cache || !k3d::filesystem::exists(m_cache_path))

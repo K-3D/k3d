@@ -2,7 +2,7 @@
 #define K3DSDK_NETWORK_RENDER_FARM_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 namespace k3d
@@ -30,7 +30,7 @@ namespace k3d
 class inetwork_render_farm;
 
 /// Returns a reference to the global singleton render farm object
-inetwork_render_farm& network_render_farm();
+inetwork_render_farm& get_network_render_farm();
 
 } // namespace k3d
 

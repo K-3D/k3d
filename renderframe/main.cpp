@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,8 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the renderframe application, which renders frames scheduled as part of a job with the virtual render farm
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3d-platform-config.h>
@@ -28,10 +27,9 @@
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/log_control.h>
-#include <k3dsdk/options.h>
-#include <k3dsdk/options_policy.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/system.h>
+#include <k3dsdk/types.h>
 #include <k3dsdk/utility.h>
 
 #include <k3dsdk/xml.h>
@@ -45,7 +43,11 @@ using namespace k3d::xml;
 
 #endif // K3D_API_WIN32
 
+#include <glibmm/spawn.h>
+
+#include <boost/algorithm/string/replace.hpp>
 #include <boost/format.hpp>
+#include <boost/regex.hpp>
 
 #include <cassert>
 #include <ctime>
@@ -55,7 +57,7 @@ using namespace k3d::xml;
 namespace
 {
 
-typedef std::vector<std::string> string_array;
+typedef std::vector<k3d::string_t> string_array;
 
 bool g_show_timestamps = false;
 bool g_show_process = true;
@@ -64,95 +66,109 @@ bool g_color_level = true;
 k3d::log_level_t g_minimum_log_level = k3d::K3D_LOG_LEVEL_DEBUG;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// input_file
+// expand
 
-bool input_file(const element& XMLOperation)
+const k3d::string_t expand(const k3d::string_t& Value)
 {
-	// Sanity checks ...
-	assert(XMLOperation.name == "inputfile");
+	static boost::regex variable_regex("[$]([^$].*)[$]");
+	static std::map<k3d::string_t, k3d::string_t> builtin_variables;
 
-	return true;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// output_file
-
-bool output_file(const element& XMLOperation)
-{
-	// Sanity checks ...
-	assert(XMLOperation.name == "outputfile");
-
-	return true;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// render_operation
-
-bool render_operation(const element& XMLOperation)
-{
-	// Sanity checks ...
-	assert(XMLOperation.name == "renderoperation");
-
-	// Load paths for use during rendering ...
-
-
-	// Load render data ...
-	const std::string type = attribute_text(XMLOperation, "type");
-	const std::string name = attribute_text(XMLOperation, "name");
-	const std::string sourcepath = attribute_text(XMLOperation, "sourcepath");
-	const std::string shaderspath = attribute_text(XMLOperation, "shaderspath");
-	const std::string sharepath = attribute_text(XMLOperation, "sharepath");
-
-	// Poke through global options and look for a render engine that matches ...
-	std::string command_line;
-	const k3d::options::render_engines_t render_engines = k3d::options::render_engines();
-	for(k3d::options::render_engines_t::const_iterator render_engine = render_engines.begin(); render_engine != render_engines.end(); ++render_engine)
+	k3d::string_t value = Value;
+	for(boost::sregex_iterator variable(value.begin(), value.end(), variable_regex); variable != boost::sregex_iterator(); ++variable)
 	{
-		if(type != render_engine->type)
-			continue;
+		const k3d::string_t variable_expression = (*variable)[0].str();
+		const k3d::string_t variable_name = (*variable)[1].str();
 
-		if(name != render_engine->name)
-			continue;
+		k3d::string_t variable_value;
+		if(builtin_variables.count(variable_name))
+		{
+			variable_value = builtin_variables[variable_name];
+		}
+		else
+		{
+			variable_value = k3d::system::getenv(variable_name);
+		}
 
-		command_line = render_engine->render_command;
-		break;
+		boost::algorithm::replace_first(value, variable_expression, variable_value);
+	}
+	return value;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// exec_command
+
+bool exec_command(const element& XMLCommand, const k3d::filesystem::path& FrameDirectory)
+{
+	k3d::string_t working_directory = FrameDirectory.native_filesystem_string();
+	std::vector<k3d::string_t> arguments;
+	std::vector<k3d::string_t> environment;
+	k3d::string_t standard_output;
+	k3d::string_t standard_error;
+	int exit_status = 0;
+
+	arguments.push_back(attribute_text(XMLCommand, "binary"));
+	if(const element* const xml_arguments = find_element(XMLCommand, "arguments"))
+	{
+		for(element::elements_t::const_iterator xml_argument = xml_arguments->children.begin(); xml_argument != xml_arguments->children.end(); ++xml_argument)
+		{
+			k3d::string_t value = expand(attribute_text(*xml_argument, "value"));
+			arguments.push_back(value);
+		}
 	}
 
-	if(command_line.empty())
+	if(const element* const xml_environment = find_element(XMLCommand, "environment"))
 	{
-		k3d::log() << error << "Could not find requested render engine [" << type << "] [" << name << "]" << std::endl;
-		return false;
+		for(element::elements_t::const_iterator xml_variable = xml_environment->children.begin(); xml_variable != xml_environment->children.end(); ++xml_variable)
+		{
+			k3d::string_t name = attribute_text(*xml_variable, "name");
+			k3d::string_t value = expand(attribute_text(*xml_variable, "value"));
+
+			environment.push_back(name + "=" + value);
+		}
 	}
-
-	// Substitute the input source file, shaders, and share paths ...
-	boost::format command_line2(command_line);
-	command_line2.exceptions(boost::io::all_error_bits ^ boost::io::too_many_args_bit);
-
-	command_line2 % sourcepath;
-	command_line2 % shaderspath;
-	command_line2 % sharepath;
-
-	// Execute the command ...
-	k3d::system::spawn_sync(command_line2.str());
-
-	return true;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// copy_operation
-
-bool copy_operation(const element& XMLOperation)
-{
-	// Sanity checks ...
-	assert(XMLOperation.name == "copyoperation");
 
 	try
 	{
-		const k3d::filesystem::path from = k3d::filesystem::native_path(k3d::ustring::from_utf8(attribute_text(XMLOperation, "from")));
-		const k3d::filesystem::path to = k3d::filesystem::native_path(k3d::ustring::from_utf8(attribute_text(XMLOperation, "to")));
+		k3d::log() << info;
+		std::copy(environment.begin(), environment.end(), std::ostream_iterator<k3d::string_t>(k3d::log(), " "));
+		std::copy(arguments.begin(), arguments.end(), std::ostream_iterator<k3d::string_t>(k3d::log(), " "));
+		k3d::log() << std::endl;
 
-		k3d::filesystem::remove(to);
-		k3d::filesystem::copy_file(from, to);
+		Glib::spawn_sync(working_directory, arguments, environment, Glib::SPAWN_SEARCH_PATH, sigc::slot<void>(), &standard_output, &standard_error, &exit_status);
+
+		if(!standard_output.empty())
+			k3d::log() << info << "stdout: " << standard_output << std::endl;
+
+		if(!standard_error.empty())
+			k3d::log() << error << "stderr: " << standard_error << std::endl;
+
+		return true;
+	}
+	catch(Glib::SpawnError& e)
+	{
+		k3d::log() << error << e.what().raw() << std::endl;
+	}
+	catch(...)
+	{
+		k3d::log() << error << "caught unknown exception spawning process" << std::endl;
+	}
+
+	return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// copy_command
+
+bool copy_command(const element& XMLCommand, const k3d::filesystem::path& FrameDirectory)
+{
+	try
+	{
+		const k3d::filesystem::path source = k3d::filesystem::native_path(k3d::ustring::from_utf8(attribute_text(XMLCommand, "source")));
+		const k3d::filesystem::path target = k3d::filesystem::native_path(k3d::ustring::from_utf8(attribute_text(XMLCommand, "target")));
+
+		k3d::filesystem::remove(target);
+		k3d::filesystem::copy_file(source, target);
+
 		return true;
 	}
 	catch(std::exception& e)
@@ -164,27 +180,26 @@ bool copy_operation(const element& XMLOperation)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// view_operation
+// view_command
 
-bool view_operation(const element& XMLOperation)
+bool view_command(const element& XMLCommand, const k3d::filesystem::path& FrameDirectory)
 {
-	// Sanity checks ...
-	assert(XMLOperation.name == "viewoperation");
-
-	const std::string path = attribute_text(XMLOperation, "path");
+	const k3d::string_t path = attribute_text(XMLCommand, "file");
 
 #ifndef K3D_API_WIN32
 
+/*
 	// View the image ...
 	boost::format command_line(k3d::options::get_command(k3d::options::command::bitmap_viewer()));
 	command_line % path;
 
 	// Execute the command ...
 	k3d::system::spawn_async(command_line.str());
+*/
 
 #else // !K3D_API_WIN32
 
-	ShellExecute(0, "open", path.c_str(), 0, 0, SW_SHOWDEFAULT);
+	ShellExecute(0, "open", file.c_str(), 0, 0, SW_SHOWDEFAULT);
 
 #endif // K3D_API_WIN32
 
@@ -192,24 +207,20 @@ bool view_operation(const element& XMLOperation)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// frame_operation
+// execute_command
 
-/// Handles a single operation during processing for the frame ...
-bool frame_operation(const element& XMLOperation)
+/// Handles a single command during processing for the frame ...
+bool execute_command(const element& XMLCommand, const k3d::filesystem::path& FrameDirectory)
 {
-	// Sanity checks ...
-	const std::string operation = XMLOperation.name;
-
-	if(operation == "inputfile")
-		return input_file(XMLOperation);
-	else if(operation == "outputfile")
-		return output_file(XMLOperation);
-	else if(operation == "renderoperation")
-		return render_operation(XMLOperation);
-	else if(operation == "copyoperation")
-		return copy_operation(XMLOperation);
-	else if(operation == "viewoperation")
-		return view_operation(XMLOperation);
+	for(element::elements_t::const_iterator xml_command = XMLCommand.children.begin(); xml_command != XMLCommand.children.end(); ++xml_command)
+	{
+		if(xml_command->name == "exec")
+			return exec_command(*xml_command, FrameDirectory);
+		else if(xml_command->name == "copy")
+			return copy_command(*xml_command, FrameDirectory);
+		else if(xml_command->name == "view")
+			return view_command(*xml_command, FrameDirectory);
+	}
 
 	return false;
 }
@@ -283,8 +294,8 @@ bool render_frame(const k3d::filesystem::path& FrameDirectory)
 	// Setup our execution environment ...
 	chdir(FrameDirectory.native_filesystem_string().c_str());
 
-	for(element::elements_t::iterator xml_operation = xml_frame->children.begin(); xml_operation != xml_frame->children.end(); ++xml_operation)
-		frame_operation(*xml_operation);
+	for(element::elements_t::iterator xml_command = xml_frame->children.begin(); xml_command != xml_frame->children.end(); ++xml_command)
+		execute_command(*xml_command, FrameDirectory);
 
 	// Switch the frame status to complete ...
 	k3d::filesystem::rename(FrameDirectory / k3d::filesystem::generic_path("running"), FrameDirectory / k3d::filesystem::generic_path("complete"));
@@ -299,10 +310,10 @@ bool render_frame(const k3d::filesystem::path& FrameDirectory)
 // usage
 
 /// Prints usage info
-void usage(const std::string& Name, std::ostream& Stream)
+void usage(const k3d::string_t& Name, std::ostream& Stream)
 {
 	Stream << "usage: " << Name << " [options]" << std::endl;
-	Stream << "       " << Name << " [optionspath] [directory ...]" << std::endl;
+	Stream << "       " << Name << " [directory ...]" << std::endl;
 	Stream << std::endl;
 	Stream << "  -h, --help               prints this help information and exits" << std::endl;
 	Stream << "      --version            prints program version information and exits" << std::endl;
@@ -326,10 +337,10 @@ void print_version(std::ostream& Stream)
 // setup_logging
 
 /// Sets-up options for logging our output
-void setup_logging(const std::string& ProcessName)
+void setup_logging(const k3d::string_t& ProcessName)
 {
 	k3d::log_show_timestamps(g_show_timestamps);
-	k3d::log_set_tag(g_show_process ? "[" + ProcessName + "]" : std::string());
+	k3d::log_set_tag(g_show_process ? "[" + ProcessName + "]" : k3d::string_t());
 	k3d::log_color_level(g_color_level);
 	k3d::log_show_level(true);
 	k3d::log_syslog(g_syslog);
@@ -344,7 +355,7 @@ void setup_logging(const std::string& ProcessName)
 /// Program main
 int main(int argc, char* argv[])
 {
-	const std::string program_name = k3d::filesystem::native_path(k3d::ustring::from_utf8(std::string(argv[0]))).leaf().raw();
+	const k3d::string_t program_name = k3d::filesystem::native_path(k3d::ustring::from_utf8(k3d::string_t(argv[0]))).leaf().raw();
 
 	// Put our arguments in a more useable form ...
 	string_array options(&argv[1], &argv[argc]);
@@ -364,7 +375,7 @@ int main(int argc, char* argv[])
 	}
 
 	// Otherwise we should have a minimum of two arguments ...
-	if(options.size() < 2)
+	if(options.size() < 1)
 	{
 		usage(program_name, k3d::log());
 		return 1;
@@ -373,20 +384,9 @@ int main(int argc, char* argv[])
 	// Setup logging right away ...
 	setup_logging(program_name);
 
-	// Open the global options file ...
-	const k3d::filesystem::path options_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(options[0]));
-	if(!k3d::filesystem::exists(options_path))
-	{
-		k3d::log() << error << "User options file [" << options_path.native_console_string() << "] does not exist" << std::endl;
-		return 1;
-	}
-
-	k3d::options::file_storage user_options(options_path);
-	k3d::options::set_storage(user_options);
-
 	// Each remaining argument should be a frame path to render ...
 	int result = 0;
-	for(unsigned long j = 1; j < options.size(); j++)
+	for(unsigned long j = 0; j < options.size(); j++)
 	{
 		if(!render_frame(k3d::filesystem::native_path(k3d::ustring::from_utf8(options[j]))))
 		    result = 1;

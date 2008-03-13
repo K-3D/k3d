@@ -12,6 +12,7 @@ LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
 
 ADD_EXECUTABLE(k3d-renderframe main.cpp)
 TARGET_LINK_LIBRARIES(k3d-renderframe k3dsdk)
+TARGET_LINK_LIBRARIES(k3d-renderframe ${K3D_BOOST_REGEX_LIBS})
 
 INSTALL(TARGETS k3d-renderframe DESTINATION bin)
 

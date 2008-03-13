@@ -1,5 +1,5 @@
-#ifndef K3DSDK_INETWORK_RENDER_JOB_H
-#define K3DSDK_INETWORK_RENDER_JOB_H
+#ifndef K3DSDK_IRENDER_ENGINE_RI_H
+#define K3DSDK_IRENDER_ENGINE_RI_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -30,24 +30,34 @@
 namespace k3d
 {
 
+namespace filesystem { class path; }
 class inetwork_render_frame;
-	
-/// Abstract interface encapsulating a render job containing zero-to-many frames to be rendered
-class inetwork_render_job :
+
+namespace ri
+{
+
+/// Abstract interface for objects that provide an interface to specific RenderMan implementations
+class irender_engine :
 	public virtual iunknown
 {
 public:
-	/// Adds a new "frame" to the job, to be rendered when the job is run
-	virtual inetwork_render_frame& create_frame(const string_t& FrameName) = 0;
+	virtual ~irender_engine() {}
+
+	/// Returns true iff the underlying RenderMan engine is installed and usable
+	virtual const bool_t installed() = 0;
+	/// Compiles the given shader source code, placing the results into the global shader cache
+	virtual const bool_t compile_shader(const filesystem::path& Shader) = 0;
+	/// Renders the given RIB file
+	virtual const bool_t render(inetwork_render_frame& Frame, const filesystem::path& RIB) = 0;
 
 protected:
-	inetwork_render_job() {}
-	inetwork_render_job(const inetwork_render_job&) {}
-	inetwork_render_job& operator=(const inetwork_render_job&) { return *this; }
-	virtual ~inetwork_render_job() {}
+	irender_engine() {}
+	irender_engine(const irender_engine& ) {}
+	irender_engine& operator=(const irender_engine& ) { return *this; }
 };
+} // namespace ri
 
 } // namespace k3d
 
-#endif // K3DSDK_INETWORK_RENDER_JOB_H
+#endif // K3DSDK_IRENDER_ENGINE_RI_H
 

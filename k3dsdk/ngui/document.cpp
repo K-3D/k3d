@@ -37,6 +37,7 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/imesh_painter_ri.h>
+#include <k3dsdk/irender_engine_ri.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/transform.h>
@@ -143,13 +144,25 @@ void setup_renderman_document(k3d::idocument& Document)
 	return_if_fail(light_transformation);
 	light_transformation->set_name("Light Transformation");
 
-	k3d::iunknown* const render_engine = k3d::plugin::create("RenderManEngine", Document, "RenderMan Engine");
-	k3d::property::set_internal_value(*render_engine, "enabled_lights", k3d::inode_collection_property::nodes_t(1, light));
-
 	k3d::inode* const default_material = k3d::plugin::create<k3d::inode>(k3d::classes::MultiMaterial(), Document, "Material");
 	return_if_fail(default_material);
 
 	k3d::property::create<k3d::imaterial*>(*default_material, "renderman_material", "RenderMan Material", "", renderman_material);
+
+	// Setup a default choice of external render engine ...
+	k3d::ri::irender_engine* const aqsis = k3d::plugin::create<k3d::ri::irender_engine>("AqsisRenderManEngine", Document, "Aqsis");
+	k3d::ri::irender_engine* const pixie = k3d::plugin::create<k3d::ri::irender_engine>("PixieRenderManEngine", Document, "Pixie");
+
+	k3d::ri::irender_engine* default_render_engine = 0;
+	if(!default_render_engine && aqsis && aqsis->installed())
+		default_render_engine = aqsis;
+	if(!default_render_engine && pixie && pixie->installed())
+		default_render_engine = pixie;
+
+	// Setup a render engine ...
+	k3d::iunknown* const render_engine = k3d::plugin::create("RenderManEngine", Document, "RenderMan Engine");
+	k3d::property::set_internal_value(*render_engine, "enabled_lights", k3d::inode_collection_property::nodes_t(1, light));
+	k3d::property::set_internal_value(*render_engine, "render_engine", dynamic_cast<k3d::inode*>(default_render_engine));
 }
 
 /////////////////////////////////////////////////////////////////////////////

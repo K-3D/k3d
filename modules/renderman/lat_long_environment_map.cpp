@@ -79,11 +79,9 @@ public:
 		if(!input)
 			return;
 
-		m_ri_image_path = Frame.add_input_file("texture");
-		return_if_fail(!m_ri_image_path.empty());
+		m_ri_image_path = Frame.add_file("texture");
 		
-		m_ri_texture_path = Frame.add_input_file("texture");
-		return_if_fail(!m_ri_texture_path.empty());
+		m_ri_texture_path = Frame.add_file("texture");
 
 /*
 		// If "render from source" is enabled, just copy the source file to the frame directory ...

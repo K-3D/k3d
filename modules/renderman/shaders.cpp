@@ -48,7 +48,6 @@
 #include <k3dsdk/shader_cache.h>
 #include <k3dsdk/shader_collection_ri.h>
 #include <k3dsdk/shader_ri.h>
-#include <k3dsdk/shaders.h>
 #include <k3dsdk/share.h>
 
 namespace libk3drenderman
@@ -175,31 +174,14 @@ public:
 class surface_shader :
 	public k3d::ri::shader,
 	public k3d::ri::isurface_shader,
-	public k3d::irender_preview,
 	public k3d::property_group_collection
 {
 	typedef k3d::ri::shader base;
 
 public:
 	surface_shader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document, k3d::sl::shader::SURFACE),
-		m_left(init_owner(*this) + init_name("left") + init_label(_("Left")) + init_description(_("Left")) + init_value(-2.0/3.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_right(init_owner(*this) + init_name("right") + init_label(_("Right")) + init_description(_("Right")) + init_value(2.0/3.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_top(init_owner(*this) + init_name("top") + init_label(_("Top")) + init_description(_("Top")) + init_value(0.5) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_bottom(init_owner(*this) + init_name("bottom") + init_label(_("Bottom")) + init_description(_("Bottom")) + init_value(-0.5) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_near(init_owner(*this) + init_name("near") + init_label(_("Near")) + init_description(_("Near Plane Distance")) + init_value(1.0) + init_constraint(constraint::minimum(0.0)) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_far(init_owner(*this) + init_name("far") + init_label(_("Far")) + init_description(_("Far Plane Distance")) + init_value(1000.0) + init_constraint(constraint::minimum(0.0)) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_perspective_projection(m_left, m_right, m_top, m_bottom, m_near, m_far)
+		base(Factory, Document, k3d::sl::shader::SURFACE)
 	{
-		k3d::iproperty_group_collection::group preview_group("Preview");
-		preview_group.properties.push_back(&static_cast<k3d::iproperty&>(m_left));
-		preview_group.properties.push_back(&static_cast<k3d::iproperty&>(m_right));
-		preview_group.properties.push_back(&static_cast<k3d::iproperty&>(m_top));
-		preview_group.properties.push_back(&static_cast<k3d::iproperty&>(m_bottom));
-		preview_group.properties.push_back(&static_cast<k3d::iproperty&>(m_near));
-		preview_group.properties.push_back(&static_cast<k3d::iproperty&>(m_far));
-
-		register_property_group(preview_group);
 	}
 
 	void setup_renderman_surface_shader(const k3d::ri::render_state& State)
@@ -208,118 +190,9 @@ public:
 		State.stream.RiSurfaceV(shader_path(), shader_name(), shader_arguments(State));
 	}
 
-	bool render_preview()
-	{
-		// Start a new render job
-		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-shader-preview");
-
-		// Add a single frame to the job
-		k3d::inetwork_render_frame& frame = job.create_frame("frame");
-
-		// Start our RIB file
-		const std::string ribfilename("world.rib");
-		const k3d::filesystem::path ribfilepath = frame.add_input_file(ribfilename);
-
-		// Open the RIB file stream
-		k3d::filesystem::ofstream ribfile(ribfilepath);
-
-		// Setup RenderMan engine
-		k3d::inode* renderman_engine = 0;
-		const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_camera_preview>(document().nodes());
-		for(k3d::nodes_t::const_iterator object = render_engines.begin(); object != render_engines.end(); ++object)
-		{
-			if(k3d::classes::RenderManEngine() == (*object)->factory().factory_id())
-			{
-				renderman_engine = *object;
-				break;
-			}
-		}
-
-		return_val_if_fail(renderman_engine, false);
-
-		// Get render engine name
-		k3d::iproperty* const engine_property = k3d::property::get(*renderman_engine, "render_engine");
-		return_val_if_fail(engine_property, false);
-		const std::string render_engine = boost::any_cast<std::string>(engine_property->property_internal_value());
-
-		// Create the RenderMan render engine object
-		k3d::ri::stream stream(ribfile);
-
-		// Setup frame
-		frame.add_render_operation("ri", render_engine, k3d::filesystem::native_path(k3d::ustring::from_utf8(ribfilename)), true);
-
-		k3d::ri::shader_collection unused;
-
-		// Create the render state object
-		k3d::ri::sample_times_t samples(1, 0.0);
-		const k3d::matrix4 transform_matrix = k3d::translation3D(k3d::point3(-20, 20, -20)) * k3d::rotation3D(k3d::point3(35, 45, 0));
-		k3d::ri::render_state state(frame, stream, unused, m_perspective_projection, k3d::ri::FINAL_FRAME, samples, 0, transform_matrix);
-
-		// Setup options
-		k3d::ri::parameter_list searchpath_options;
-		searchpath_options.push_back(
-			k3d::ri::parameter(
-				"shader",
-				k3d::ri::UNIFORM,
-				1,
-				k3d::ri::string(k3d::shader_cache_path().native_filesystem_string() + ":&")));
-		stream.RiOptionV("searchpath", searchpath_options);
-
-		stream.RiDisplayV("outputimage", k3d::ri::RI_FRAMEBUFFER(), k3d::ri::RI_RGB());
-		stream.RiFormat(320, 240, 1);
-
-		// Create RenderMan scene
-		const double left = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.left()));
-		const double right = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.right()));
-		const double top = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.top()));
-		const double bottom = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.bottom()));
-		const double near = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.near()));
-		const double far = boost::any_cast<double>(k3d::property::pipeline_value(m_perspective_projection.far()));
-		return_val_if_fail(near > 0, false);
-
-		stream.RiProjectionV("perspective");
-		stream.RiScreenWindow(left / near, right / near, bottom / near, top / near);
-		stream.RiClipping(near, far);
-
-		stream.RiRotate(0, 0, 0, 1);
-		stream.RiRotate(-35, 1, 0, 0);
-		stream.RiRotate(-90, 0, 1, 0);
-		stream.RiTranslate(10, -7, 0);
-
-		stream.RiWorldBegin();
-
-		// Setup a light
-		stream.RiTransformBegin();
-		stream.RiTransform(k3d::ri::convert(k3d::translation3D(k3d::point3(-20, 20, -25))));
-		k3d::ri::parameter_list parameters;
-		parameters.push_back(k3d::ri::parameter(std::string("intensity"), k3d::ri::CONSTANT, 1, (k3d::ri::real)3000.0));
-		parameters.push_back(k3d::ri::parameter(std::string("lightcolor"), k3d::ri::CONSTANT, 1, (k3d::ri::color)k3d::color(1, 1, 1)));
-		stream.RiLightSourceV(k3d::share_path() / k3d::filesystem::generic_path("shaders/k3d_pointlight.sl"), "k3d_pointlight", parameters);
-		stream.RiTransformEnd();
-
-		// Setup shader
-		setup_renderman_surface_shader(state);
-
-		// Default object
-		stream.RiCylinderV(5.0, -5.0, 5.0, 360.0);
-
-		stream.RiWorldEnd();
-
-
-		// Synchronize shader
-		if(!k3d::compile_shader(shader_path(), "ri", render_engine))
-			k3d::log() << error << k3d::string_cast(boost::format(_("Error compiling shader %1%")) % shader_path().native_utf8_string().raw()) << std::endl;
-
-		// Run the job
-		k3d::network_render_farm().start_job(job);
-
-		return true;
-	}
-
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<surface_shader,
-				k3d::interface_list<k3d::ri::isurface_shader> > factory(
+		static k3d::document_plugin_factory<surface_shader, k3d::interface_list<k3d::ri::isurface_shader> > factory(
 			k3d::classes::RenderManSurfaceShader(),
 			"RenderManSurfaceShader",
 			"Encapsulates a RenderMan surface shader instance",
@@ -328,68 +201,6 @@ public:
 
 		return factory;
 	}
-
-	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, measurement_property, no_serialization) m_left;
-	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, measurement_property, no_serialization) m_right;
-	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, measurement_property, no_serialization) m_top;
-	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, measurement_property, no_serialization) m_bottom;
-	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, with_constraint, measurement_property, no_serialization) m_near;
-	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, with_constraint, measurement_property, no_serialization) m_far;
-
-	class perspective_projection :
-		public k3d::iperspective
-	{
-	public:
-		perspective_projection(k3d::iproperty& Left, k3d::iproperty& Right, k3d::iproperty& Top, k3d::iproperty& Bottom, k3d::iproperty& Near, k3d::iproperty& Far) :
-			m_left(Left),
-			m_right(Right),
-			m_top(Top),
-			m_bottom(Bottom),
-			m_near(Near),
-			m_far(Far)
-		{
-		}
-
-		k3d::iproperty& left()
-		{
-			return m_left;
-		}
-
-		k3d::iproperty& right()
-		{
-			return m_right;
-		}
-
-		k3d::iproperty& top()
-		{
-			return m_top;
-		}
-
-		k3d::iproperty& bottom()
-		{
-			return m_bottom;
-		}
-
-		k3d::iproperty& near()
-		{
-			return m_near;
-		}
-
-		k3d::iproperty& far()
-		{
-			return m_far;
-		}
-
-	private:
-		k3d::iproperty& m_left;
-		k3d::iproperty& m_right;
-		k3d::iproperty& m_top;
-		k3d::iproperty& m_bottom;
-		k3d::iproperty& m_near;
-		k3d::iproperty& m_far;
-	};
-
-	perspective_projection m_perspective_projection;
 };
 
 /////////////////////////////////////////////////////////////////////////////

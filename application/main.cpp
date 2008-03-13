@@ -787,7 +787,7 @@ int main(int argc, char* argv[])
 			return error ? 1 : 0;
 
 		// Setup a render farm ...
-		k3d::network_render_farm_implementation render_farm(g_options_path);
+		k3d::network_render_farm render_farm(g_options_path);
 		k3d::set_network_render_farm(render_farm);
 
 		// Create the main application object ...

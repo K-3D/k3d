@@ -138,23 +138,22 @@ public:
 	bool render_camera_preview(k3d::icamera& Camera)
 	{
 		// Start a new render job ...
-		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-preview");
+		k3d::inetwork_render_job& job = k3d::get_network_render_farm().create_job("k3d-yafray-preview");
 
 		// Add a single render frame to the job ...
 		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
-		const k3d::filesystem::path outputimagepath = frame.add_output_file("salida.tga");
-		return_val_if_fail(!outputimagepath.empty(), false);
+		const k3d::filesystem::path output_image = frame.add_file("salida.tga");
 
-		// View the output image when it's done ...
-		frame.add_view_operation(outputimagepath);
+		// Render it ...
+		return_val_if_fail(render(Camera, frame, output_image, true), false);
 
-		// Render it (visible rendering) ...
-		return_val_if_fail(render(Camera, frame, outputimagepath, true), false);
+		// View the output when it's done ...
+		frame.add_view_command(output_image);
 
 		// Start the job running ...
-		k3d::network_render_farm().start_job(job);
+		k3d::get_network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -165,27 +164,26 @@ public:
 		return_val_if_fail(!OutputImage.empty(), false);
 
 		// Start a new render job ...
-		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-render-frame");
+		k3d::inetwork_render_job& job = k3d::get_network_render_farm().create_job("k3d-yafray-render-frame");
 
 		// Add a single render frame to the job ...
 		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
-		const k3d::filesystem::path outputimagepath = frame.add_output_file("salida.tga");
-		return_val_if_fail(!outputimagepath.empty(), false);
+		const k3d::filesystem::path output_image = frame.add_file("salida.tga");
+
+		// Render it ...
+		return_val_if_fail(render(Camera, frame, output_image, false), false);
 
 		// Copy the output image to its requested destination ...
-		frame.add_copy_operation(outputimagepath, OutputImage);
+		frame.add_copy_command(output_image, OutputImage);
 
 		// View the output image when it's done ...
 		if(ViewImage)
-			frame.add_view_operation(OutputImage);
-
-		// Render it (hidden rendering) ...
-		return_val_if_fail(render(Camera, frame, outputimagepath, false), false);
+			frame.add_view_command(OutputImage);
 
 		// Start the job running ...
-		k3d::network_render_farm().start_job(job);
+		k3d::get_network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -210,7 +208,7 @@ public:
 		return_val_if_fail(Files.max_file_count() > end_frame, false);
 
 		// Start a new render job ...
-		k3d::inetwork_render_job& job = k3d::network_render_farm().create_job("k3d-render-animation");
+		k3d::inetwork_render_job& job = k3d::get_network_render_farm().create_job("k3d-yafray-render-animation");
 
 		// For each frame to be rendered ...
 		for(size_t view_frame = start_frame; view_frame < end_frame; ++view_frame)
@@ -227,23 +225,22 @@ public:
 			k3d::inetwork_render_frame& frame = job.create_frame(buffer.str());
 
 			// Create an output image path ...
-			const k3d::filesystem::path outputimagepath = frame.add_output_file("salida.tga");
-			return_val_if_fail(!outputimagepath.empty(), false);
+			const k3d::filesystem::path output_image = frame.add_file("salida.tga");
+
+			// Render it (hidden rendering) ...
+			return_val_if_fail(render(Camera, frame, output_image, false), false);
 
 			// Copy the output image to its requested destination ...
 			const k3d::filesystem::path destination = Files.file(view_frame);
-			frame.add_copy_operation(outputimagepath, destination);
+			frame.add_copy_command(output_image, destination);
 
 			// View the output image when it's done ...
 			if(ViewCompletedImages)
-				frame.add_view_operation(destination);
-
-			// Render it (hidden rendering) ...
-			return_val_if_fail(render(Camera, frame, outputimagepath, false), false);
+				frame.add_view_command(destination);
 		}
 
 		// Start the job running ...
-		k3d::network_render_farm().start_job(job);
+		k3d::get_network_render_farm().start_job(job);
 
 		return true;
 	}
@@ -429,15 +426,19 @@ private:
 			return_val_if_fail(!OutputImagePath.empty(), false);
 
 			// Start our YafRay XML file ...
-			const k3d::filesystem::path filepath = Frame.add_input_file("world.xml");
-			return_val_if_fail(!filepath.empty(), false);
+			const k3d::filesystem::path filepath = Frame.add_file("world.xml");
 
 			// Open the RIB file stream ...
 			k3d::filesystem::ofstream stream(filepath);
 			return_val_if_fail(stream.good(), false);
 
 			// Setup the frame for YafRay rendering ...
-			Frame.add_render_operation("yafray", "yafray", filepath, VisibleRender);
+			k3d::inetwork_render_frame::environment environment;
+
+			k3d::inetwork_render_frame::arguments arguments;
+			arguments.push_back(k3d::inetwork_render_frame::argument(filepath.native_filesystem_string()));
+
+			Frame.add_exec_command("yafray", environment, arguments);
 
 			// Setup a YafRay scene description ...
 			stream << "<!-- Yafray scene generated by K-3D Version " K3D_VERSION ", http://www.k-3d.org -->\n";

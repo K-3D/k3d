@@ -22,6 +22,7 @@
 #include "path.h"
 #include "k3d-platform-config.h"
 #include "result.h"
+#include "system.h"
 
 #include <glibmm/convert.h>
 
@@ -80,7 +81,7 @@ ustring::size_type leaf_pos( const ustring& str, ustring::size_type end_pos )
 	       : pos + 1; // or starts after delimiter
 }
 
-bool is_absolute_root(const ustring& s, ustring::size_type len)
+bool_t is_absolute_root(const ustring& s, ustring::size_type len)
 {
 	return
 	    len && s[len-1] == '/'
@@ -187,7 +188,7 @@ public:
 		return storage->substr(begin[index], end[index] - begin[index]);
 	}
 
-	bool equal(const implementation& rhs) const
+	bool_t equal(const implementation& rhs) const
 	{
 		return storage == rhs.storage && index == rhs.index;
 	}
@@ -233,12 +234,12 @@ ustring path::iterator::operator*()
 	return m_implementation->dereference();
 }
 
-bool path::iterator::operator==(const iterator& rhs)
+bool_t path::iterator::operator==(const iterator& rhs)
 {
 	return m_implementation->equal(*rhs.m_implementation);
 }
 
-bool path::iterator::operator!=(const iterator& rhs)
+bool_t path::iterator::operator!=(const iterator& rhs)
 {
 	return !m_implementation->equal(*rhs.m_implementation);
 }
@@ -266,7 +267,7 @@ path generic_path(const ustring& GenericPath)
 	return path(GenericPath);
 }
 
-path generic_path(const std::string& GenericPath)
+path generic_path(const string_t& GenericPath)
 {
 	return path(ustring::from_utf8(GenericPath));
 }
@@ -314,7 +315,7 @@ path path::operator+(const ustring& rhs) const
 	return path(storage + rhs);
 }
 
-path path::operator+(const std::string& rhs) const
+path path::operator+(const string_t& rhs) const
 {
 	return path(storage + ustring::from_utf8(rhs));
 }
@@ -333,12 +334,12 @@ ustring path::native_utf8_string() const
 	return native_string;
 }
 
-std::string path::native_console_string() const
+string_t path::native_console_string() const
 {
 	return native_utf8_string().raw();
 }
 
-std::string path::native_filesystem_string() const
+string_t path::native_filesystem_string() const
 {
 #ifdef K3D_API_WIN32
 
@@ -403,12 +404,12 @@ path path::branch_path() const
 	return path(storage.substr(0, end_pos));
 }
 
-bool path::empty() const
+bool_t path::empty() const
 {
 	return storage.empty();
 }
 
-bool path::is_complete() const
+bool_t path::is_complete() const
 {
 	// Win32 cases ...
 	if(storage.size() > 2 && storage[1] == ':' && storage[2] == '/') // "c:/"
@@ -435,32 +436,32 @@ path::iterator path::end() const
 	return iterator();
 }
 
-bool path::operator==(const path& that) const
+bool_t path::operator==(const path& that) const
 {
 	return !(*this < that) && !(that < *this);
 }
 
-bool path::operator!=(const path& that) const
+bool_t path::operator!=(const path& that) const
 {
 	return !(*this == that);
 }
 
-bool path::operator<(const path& that) const
+bool_t path::operator<(const path& that) const
 {
 	return storage < that.storage;
 }
 
-bool path::operator<=(const path& that) const
+bool_t path::operator<=(const path& that) const
 {
 	return !(that < *this);
 }
 
-bool path::operator>(const path& that) const
+bool_t path::operator>(const path& that) const
 {
 	return that < *this;
 }
 
-bool path::operator>=(const path& that) const
+bool_t path::operator>=(const path& that) const
 {
 	return !(*this < that);
 }
@@ -468,7 +469,7 @@ bool path::operator>=(const path& that) const
 //////////////////////////////////////////////////////////////////////////////////
 // exists
 
-bool exists(const path& Path)
+bool_t exists(const path& Path)
 {
 #ifdef K3D_API_WIN32
 
@@ -483,8 +484,8 @@ bool exists(const path& Path)
 }
 
 const ustring extension(const path& Path);
-bool create_directory(const path& Path);
-bool create_directories(const path& Path);
+bool_t create_directory(const path& Path);
+bool_t create_directories(const path& Path);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // make_relative_path
@@ -534,9 +535,19 @@ const ustring extension(const path& Path)
 }
 
 //////////////////////////////////////////////////////////////////////////////////
+// replace_extension
+
+const path replace_extension(const path& Path, const string_t& NewExtension)
+{
+	ustring temp = Path.generic_utf8_string(); 
+
+	return generic_path(temp.substr(0, temp.rfind('.')) + ustring::from_utf8(NewExtension));
+}
+
+//////////////////////////////////////////////////////////////////////////////////
 // create_directory
 
-bool create_directory(const path& Path)
+bool_t create_directory(const path& Path)
 {
 	return_val_if_fail(!Path.empty(), false);
 
@@ -564,7 +575,7 @@ bool create_directory(const path& Path)
 //////////////////////////////////////////////////////////////////////////////////
 // create_directories
 
-bool create_directories(const path& Path)
+bool_t create_directories(const path& Path)
 {
 	return_val_if_fail(!Path.empty(), false);
 
@@ -588,7 +599,7 @@ bool create_directories(const path& Path)
 //////////////////////////////////////////////////////////////////////////////////
 // is_directory
 
-bool is_directory(const path& Path)
+bool_t is_directory(const path& Path)
 {
 #ifdef K3D_API_WIN32
 
@@ -609,7 +620,7 @@ bool is_directory(const path& Path)
 //////////////////////////////////////////////////////////////////////////////////
 // remove
 
-bool remove(const path& Path)
+bool_t remove(const path& Path)
 {
 #ifdef K3D_API_WIN32
 
@@ -631,7 +642,7 @@ bool remove(const path& Path)
 //////////////////////////////////////////////////////////////////////////////////
 // rename
 
-bool rename(const path& Source, const path& Target)
+bool_t rename(const path& Source, const path& Target)
 {
 #ifdef K3D_API_WIN32
 
@@ -647,7 +658,7 @@ bool rename(const path& Source, const path& Target)
 //////////////////////////////////////////////////////////////////////////////////
 // copy_file
 
-bool copy_file(const path& Source, const path& Target)
+bool_t copy_file(const path& Source, const path& Target)
 {
 #ifdef K3D_API_WIN32
 
@@ -670,7 +681,7 @@ bool copy_file(const path& Source, const path& Target)
 		return false;
 	}
 
-	bool result = true;
+	bool_t result = true;
 
 	const std::size_t buffer_size = 32768;
 	boost::scoped_array<char> buffer(new char[buffer_size]);
@@ -693,6 +704,22 @@ bool copy_file(const path& Source, const path& Target)
 	return result;
 
 #endif // !K3D_API_WIN32
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// up_to_date
+
+const bool_t up_to_date(const path& Source, const path& Target)
+{
+	// Get the last modification time of the source ...
+	time_t source_modified = 0;
+	return_val_if_fail(system::file_modification_time(Source, source_modified), false);
+
+	// Get the last modification time of the target (if it exists) ...
+	time_t target_modified = 0;
+	system::file_modification_time(Target, target_modified);
+
+	return source_modified <= target_modified;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -761,7 +788,7 @@ public:
 			full_path = branch_path / generic_path(ustring::from_utf8(data.cFileName));
 	}
 
-	bool equal(const implementation& rhs) const
+	bool_t equal(const implementation& rhs) const
 	{
 		return handle == rhs.handle;
 	}
@@ -833,7 +860,7 @@ public:
 			full_path = branch_path / generic_path(current->d_name);
 	}
 
-	bool equal(const implementation& rhs)
+	bool_t equal(const implementation& rhs)
 	{
 		return current == rhs.current;
 	}
@@ -894,7 +921,7 @@ void directory_iterator::increment()
 	m_implementation->increment();
 }
 
-bool directory_iterator::equal(const directory_iterator& rhs) const
+bool_t directory_iterator::equal(const directory_iterator& rhs) const
 {
 	return m_implementation->equal(*rhs.m_implementation);
 }

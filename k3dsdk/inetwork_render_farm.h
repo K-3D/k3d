@@ -2,7 +2,7 @@
 #define K3DSDK_INETWORK_RENDER_FARM_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,11 +21,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
-#include <string>
+#include "types.h"
 
 namespace k3d
 {
@@ -38,7 +38,7 @@ class inetwork_render_farm :
 {
 public:
 	/// Creates a new job, in a "waiting" state
-	virtual inetwork_render_job& create_job(const std::string& JobName) = 0;
+	virtual inetwork_render_job& create_job(const string_t& JobName) = 0;
 	/// Tells the render farm to begin executing the given job
 	virtual void start_job(inetwork_render_job& Job) = 0;
 

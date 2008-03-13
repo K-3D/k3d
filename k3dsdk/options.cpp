@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,15 +18,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares k3d::ioptions, an abstract interface for global user options
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "fstream.h"
+#include "k3d-platform-config.h"
 #include "log.h"
 #include "options.h"
 #include "options_policy.h"
-#include "k3d-platform-config.h"
 #include "result.h"
 #include "share.h"
 #include "system.h"
@@ -67,7 +66,7 @@ xml::element& paths_element()
 	return tree().safe_element("paths");
 }
 
-xml::element& path_element(const std::string PathType)
+xml::element& path_element(const string_t PathType)
 {
 	const xml::element match("path", xml::attribute("type", PathType));
 	const xml::element prototype("path", xml::attribute("type", PathType));
@@ -79,76 +78,11 @@ xml::element& commands_element()
 	return tree().safe_element("commands");
 }
 
-xml::element& command_element(const std::string CommandType)
+xml::element& command_element(const string_t CommandType)
 {
 	const xml::element match("command", xml::attribute("type", CommandType));
 	const xml::element prototype("command", xml::attribute("type", CommandType));
 	return commands_element().safe_element(match, prototype);
-}
-
-xml::element& default_render_engines_element()
-{
-	return tree().safe_element("default_render_engines");
-}
-
-xml::element& default_render_engine_element(const std::string& Type)
-{
-	const xml::element match("default_render_engine", xml::attribute("type", Type));
-	const xml::element prototype("default_render_engine", xml::attribute("type", Type));
-	return default_render_engines_element().safe_element(match, prototype);
-}
-
-xml::element& render_engines_element()
-{
-	return tree().safe_element("render_engines");
-}
-
-xml::element& render_engine_element(const std::string& Type, const std::string& Name)
-{
-	const xml::element match("render_engine", xml::attribute("type", Type), xml::attribute("name", Name));
-	const xml::element prototype("render_engine", xml::attribute("type", Type), xml::attribute("name", Name));
-	return render_engines_element().safe_element(match, prototype);
-}
-
-xml::element& render_engine_commands_element(const std::string& Type, const std::string& Name)
-{
-	return render_engine_element(Type, Name).safe_element("commands");
-}
-
-xml::element& render_engine_command_element(const std::string& Type, const std::string& Name, const std::string& CommandType)
-{
-	const xml::element match("command", xml::attribute("type", CommandType));
-	const xml::element prototype("command", xml::attribute("type", CommandType));
-	return render_engine_commands_element(Type, Name).safe_element(match, prototype);
-}
-
-void create_render_engine(
-	const std::string& Type,
-	const std::string& Name,
-	const std::string& Label,
-	const std::string& RenderCommand,
-	const std::string& ShaderBinary = "",
-	const std::string& ShaderCompileCommand = "")
-{
-	return_if_fail(!Type.empty());
-	return_if_fail(!Name.empty());
-	return_if_fail(!Label.empty());
-	return_if_fail(!RenderCommand.empty());
-
-	xml::element& engine = render_engine_element(Type, Name);
-	if(xml::attribute_text(engine, "label").empty())
-		xml::set_attribute(engine, xml::attribute("label", Label));
-
-	xml::element& render_command = render_engine_command_element(Type, Name, "render");
-	if(render_command.text.empty())
-		render_command.text = RenderCommand;
-
-	xml::element& shader_compile_command = render_engine_command_element(Type, Name, "compile_shader");
-	if(!ShaderBinary.empty() && !ShaderCompileCommand.empty() && shader_compile_command.text.empty())
-	{
-		xml::set_attribute(shader_compile_command, xml::attribute("binary", ShaderBinary));
-		shader_compile_command.text = ShaderCompileCommand;
-	}
 }
 
 } // namespace detail
@@ -287,127 +221,24 @@ void set_storage(istorage& Storage)
 		set_command(command::bitmap_viewer(), DEFAULT_BITMAP_VIEWER);
 	if(get_command(command::text_editor()).empty())
 		set_command(command::text_editor(), DEFAULT_TEXT_EDITOR);
-
-	// Default RenderMan engine types ...
-	detail::create_render_engine("ri", "aqsis", "Aqsis", "aqsis -shaders=\"%2%\" \"%1%\"", "%1%.slx", "aqsl -I\"%4%\" -I\"%5%\" -o \"%2%\" \"%1%\"");
-	detail::create_render_engine("ri", "pixie", "Pixie", "rndr \"%1%\"", "%1%.sdr", "sdrc -I\"%4%\" -I\"%5%\" -o \"%2%\" \"%1%\"");
-	detail::create_render_engine("ri", "bmrt", "BMRT", "rendrib \"%1%\"", "%1%.slc", "slc \"%1%\" -o \"%2%\"");
-	detail::create_render_engine("ri", "prman", "PRman", "prman -progress \"%1%\"", "%1%.slo", "slcomp \"%1%\"");
-	detail::create_render_engine("ri", "netprman", "NETPRman", "netrender -progress -f \"%1%\"", "%1%.slo", "slcomp \"%1%\"");
-	detail::create_render_engine("ri", "3delight", "3Delight", "renderdl \"%1%\"", "%1%.sdl", "shaderdl -d \"%3%\" --dont-keep-cpp-file --dont-keep-c++-file \"%1%\"");
-	detail::create_render_engine("ri", "rdc", "Render Dot C", "renderdc \"%1%\"", "%1%.so", "shaderdc \"%1%\"");
-	detail::create_render_engine("ri", "air", "AIR", "air \"%1%\"", "%1%.slb", "shaded \"%1%\"");
-	detail::create_render_engine("ri", "povman", "POVMan", "povman \"%1%\"", "%1%.slp", "povslc -o \"%2%\" \"%1%\"");
-	detail::create_render_engine("ri", "editrib", "Edit RIB File", "gvim \"%1%\"");
-	detail::create_render_engine("ri", "saverib", "Save RIB File", "file=`Xdialog --stdout --title \"Save RIB File As:\" --fselect ~/world.rib 0 0`; if [ -n \"$file\" ]; then cp \"%1%\" $file; fi");
-
-	// Default YAFRAY engine type ...
-	detail::create_render_engine("yafray", "yafray", "YafRay", "yafray \"%1%\"");
-
-	// Default GraphViz engine types ...
-	detail::create_render_engine("graphviz", "dot", "Dot", "dot -Tps \"%1%\" -o world.ps");
-	detail::create_render_engine("graphviz", "neato", "Neato", "neato -Tps \"%1%\" -o world.ps");
-	detail::create_render_engine("graphviz", "twopi", "TwoPI", "twopi -Tps \"%1%\" -o world.ps");
-
-	// Default POV engine types ...
-	detail::create_render_engine("pov", "povray", "POV-Ray", "povray \"%1%\"");
-
-	if(default_render_engine("ri").empty())
-		set_default_render_engine("ri", "aqsis");
-	if(default_render_engine("yafray").empty())
-		set_default_render_engine("yafray", "yafray");
-	if(default_render_engine("graphviz").empty())
-		set_default_render_engine("graphviz", "dot");
-	if(default_render_engine("pov").empty())
-		set_default_render_engine("pov", "povray");
 }
 
-const render_engines_t render_engines()
-{
-	render_engines_t results;
-
-	xml::element& engines = detail::render_engines_element();
-	for(xml::element::elements_t::iterator engine = engines.children.begin(); engine != engines.children.end(); ++engine)
-	{
-		if(engine->name != "render_engine")
-			continue;
-
-		const std::string type = xml::attribute_text(*engine, "type");
-		if(type.empty())
-		{
-			log() << warning << "empty render engine type!" << std::endl;
-			continue;
-		}
-
-		const std::string name = xml::attribute_text(*engine, "name");
-		if(name.empty())
-		{
-			log() << warning << "Empty render engine name!" << std::endl;
-			continue;
-		}
-
-		const std::string label = attribute_text(*engine, "label");
-		if(label.empty())
-		{
-			log() << warning << "Empty render engine label!" << std::endl;
-			continue;
-		}
-
-		std::string render_command;
-		std::string shader_binary;
-		std::string shader_compile_command;
-
-		xml::element& commands = engine->safe_element("commands");
-		for(xml::element::elements_t::iterator command = commands.children.begin(); command != commands.children.end(); ++command)
-		{
-			if(command->name != "command")
-				continue;
-
-			const std::string command_type = xml::attribute_text(*command, "type");
-			if(command_type == "render")
-			{
-				render_command = command->text;
-			}
-			else if(command_type == "compile_shader")
-			{
-				shader_binary = xml::attribute_text(*command, "binary");
-				shader_compile_command = command->text;
-			}
-		}
-
-		results.push_back(render_engine(type, name, label, render_command, shader_binary, shader_compile_command));
-	}
-
-	return results;
-}
-
-const std::string default_render_engine(const std::string& Type)
-{
-	return detail::default_render_engine_element(Type).text;
-}
-
-void set_default_render_engine(const std::string& Type, const std::string& Name)
-{
-	return_if_fail(!Name.empty());
-	detail::default_render_engine_element(Type).text = Name;
-}
-
-const filesystem::path get_path(const std::string& PathType)
+const filesystem::path get_path(const string_t& PathType)
 {
 	return filesystem::native_path(ustring::from_utf8(detail::path_element(PathType).text));
 }
 
-void set_path(const std::string& PathType, const filesystem::path& Path)
+void set_path(const string_t& PathType, const filesystem::path& Path)
 {
 	detail::path_element(PathType).text = Path.native_utf8_string().raw();
 }
 
-const std::string get_command(const std::string& CommandType)
+const string_t get_command(const string_t& CommandType)
 {
 	return detail::command_element(CommandType).text;
 }
 
-void set_command(const std::string& CommandType, const std::string& Command)
+void set_command(const string_t& CommandType, const string_t& Command)
 {
 	detail::command_element(CommandType).text = Command;
 }

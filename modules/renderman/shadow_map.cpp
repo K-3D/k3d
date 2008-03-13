@@ -96,7 +96,7 @@ public:
 
 		Stream.RiFrameBegin(0);
 
-		m_shadow_map_path = Frame.add_output_file("shadowmap.z");
+		m_shadow_map_path = Frame.add_file("shadowmap.z");
 
 		Stream.RiDisplayV(m_shadow_map_path.native_filesystem_string(), "shadow", k3d::ri::RI_Z());
 

@@ -55,6 +55,7 @@
 #include "irender_camera_animation.h"
 #include "irender_camera_frame.h"
 #include "irender_camera_preview.h"
+#include "irender_engine_ri.h"
 #include "irender_frame.h"
 #include "irender_preview.h"
 #include "iscalar_source.h"
@@ -188,10 +189,10 @@ void initialize_types()
 	register_type(typeid(k3d::int32_t), "k3d::int32_t");
 	register_type(typeid(k3d::int64_t), "k3d::int64_t");
 	register_type(typeid(k3d::int8_t), "k3d::int8_t");
+	register_type(typeid(k3d::irender_animation), "k3d::irender_animation");
 	register_type(typeid(k3d::irender_camera_animation), "k3d::irender_camera_animation");
 	register_type(typeid(k3d::irender_camera_frame), "k3d::irender_camera_frame");
 	register_type(typeid(k3d::irender_camera_preview), "k3d::irender_camera_preview");
-	register_type(typeid(k3d::irender_animation), "k3d::irender_animation");
 	register_type(typeid(k3d::irender_frame), "k3d::irender_frame");
 	register_type(typeid(k3d::irender_preview), "k3d::irender_preview");
 	register_type(typeid(k3d::iscalar_source), "k3d::iscalar_source");
@@ -224,6 +225,8 @@ void initialize_types()
 	register_type(typeid(k3d::ri::imaterial), "k3d::ri::imaterial");
 	register_type(typeid(k3d::ri::imesh_painter), "k3d::ri::imesh_painter");
 	register_type(typeid(k3d::ri::imesh_painter*), "k3d::ri::imesh_painter*");
+	register_type(typeid(k3d::ri::irender_engine), "k3d::ri::irender_engine");
+	register_type(typeid(k3d::ri::irender_engine*), "k3d::ri::irender_engine*");
 	register_type(typeid(k3d::ri::isurface_shader), "k3d::ri::isurface_shader");
 	register_type(typeid(k3d::ri::itexture), "k3d::ri::itexture");
 	register_type(typeid(k3d::ri::itexture*), "k3d::ri::itexture*");
