@@ -10,6 +10,11 @@ LINK_DIRECTORIES(${K3D_BOOST_LIB_DIRS})
 LINK_DIRECTORIES(${K3D_GLIBMM_LIB_DIRS})
 LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
 
+IF(WIN32 AND K3D_COMPILER_GCC)
+	# For some reason, building with optimizations enabled causes link problems with boost::regex and auto-import
+	SET_SOURCE_FILES_PROPERTIES(main.cpp PROPERTIES COMPILE_FLAGS -O0)
+ENDIF(WIN32 AND K3D_COMPILER_GCC)
+
 ADD_EXECUTABLE(k3d-renderframe main.cpp)
 TARGET_LINK_LIBRARIES(k3d-renderframe k3dsdk)
 TARGET_LINK_LIBRARIES(k3d-renderframe ${K3D_BOOST_REGEX_LIBS})

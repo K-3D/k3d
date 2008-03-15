@@ -24,6 +24,7 @@
 
 #include <errno.h>
 #include "path.h"
+#include "k3d-path-config.h"
 #include "k3d-platform-config.h"
 #include "result.h"
 #include "string_modifiers.h"
@@ -152,6 +153,27 @@ const filesystem::path get_temp_directory()
 	}
 
 	return temp_directory;
+}
+
+const filesystem::path install_path()
+{
+	static filesystem::path install_path;
+	if(install_path.empty())
+	{
+		install_path = filesystem::native_path(ustring::from_utf8(K3D_INSTALL_PREFIX));
+
+#ifdef K3D_API_WIN32
+		// Get the path where this module is executing ...
+		k3d::string_t executable(1024, '\0');
+		GetModuleFileName(0, const_cast<char*>(executable.data()), executable.size());
+		executable.resize(strlen(executable.c_str()));
+		install_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(executable)).branch_path().branch_path();
+#endif // K3D_API_WIN32
+
+		log() << info << "install path: " << install_path.native_console_string() << std::endl;
+	}
+
+	return install_path;
 }
 
 const filesystem::path find_executable(const string_t& Executable)

@@ -199,7 +199,7 @@ bool view_command(const element& XMLCommand, const k3d::filesystem::path& FrameD
 
 #else // !K3D_API_WIN32
 
-	ShellExecute(0, "open", file.c_str(), 0, 0, SW_SHOWDEFAULT);
+	ShellExecute(0, "open", path.c_str(), 0, 0, SW_SHOWDEFAULT);
 
 #endif // K3D_API_WIN32
 

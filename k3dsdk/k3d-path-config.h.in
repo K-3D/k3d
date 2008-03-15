@@ -3,6 +3,7 @@
 
 // Generated file, do not edit!  Make changes to k3d-path-config.h.in instead.
 
+#define K3D_INSTALL_PREFIX "@K3D_INSTALL_PREFIX@"
 #define K3D_PKGDATADIR "@K3D_INSTALL_PREFIX@/share/@K3D_PACKAGE@"
 #define K3D_PKGLIBDIR "@K3D_INSTALL_PREFIX@/lib/@K3D_PACKAGE@"
 

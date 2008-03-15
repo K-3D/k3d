@@ -150,10 +150,13 @@ void setup_renderman_document(k3d::idocument& Document)
 	k3d::property::create<k3d::imaterial*>(*default_material, "renderman_material", "RenderMan Material", "", renderman_material);
 
 	// Setup a default choice of external render engine ...
+	k3d::ri::irender_engine* const bundled_aqsis = k3d::plugin::create<k3d::ri::irender_engine>("BundledAqsisRenderManEngine", Document, "BundledAqsis");
 	k3d::ri::irender_engine* const aqsis = k3d::plugin::create<k3d::ri::irender_engine>("AqsisRenderManEngine", Document, "Aqsis");
 	k3d::ri::irender_engine* const pixie = k3d::plugin::create<k3d::ri::irender_engine>("PixieRenderManEngine", Document, "Pixie");
 
 	k3d::ri::irender_engine* default_render_engine = 0;
+	if(!default_render_engine && bundled_aqsis && bundled_aqsis->installed())
+		default_render_engine = bundled_aqsis;
 	if(!default_render_engine && aqsis && aqsis->installed())
 		default_render_engine = aqsis;
 	if(!default_render_engine && pixie && pixie->installed())

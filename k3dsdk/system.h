@@ -49,6 +49,8 @@ const filesystem::path get_home_directory();
 const filesystem::path get_temp_directory();
 /// Returns a unique temporary file path
 const filesystem::path generate_temp_file();
+/// Returns the installation path.  On Posix systems this is the equivalent of CMAKE_INSTALL_PREFIX.  On Win32 and OSX it is the parent of the directory that contains the K-3D binary
+const filesystem::path install_path();
 
 /// Returns the path to a binary executable by searching the contents of the PATH environment variable, or an empty path
 const k3d::filesystem::path find_executable(const string_t& Executable);
