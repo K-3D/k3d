@@ -63,15 +63,15 @@ namespace k3d
 namespace system
 {
 
-const std::string getenv(const std::string& Variable)
+const string_t getenv(const string_t& Variable)
 {
 	if(const char* variable = ::getenv(Variable.c_str()))
-		return std::string(variable);
+		return string_t(variable);
 
-	return std::string();
+	return string_t();
 }
 
-void setenv(const std::string& Name, const std::string& Value)
+void setenv(const string_t& Name, const string_t& Value)
 {
 #ifdef K3D_API_WIN32
 
@@ -86,7 +86,7 @@ void setenv(const std::string& Name, const std::string& Value)
 #endif // !K3D_API_WIN32
 }
 
-void setenv(const std::string& Variable)
+void setenv(const string_t& Variable)
 {
 #ifdef K3D_API_WIN32
 
@@ -154,11 +154,31 @@ const filesystem::path get_temp_directory()
 	return temp_directory;
 }
 
+const filesystem::path find_executable(const string_t& Executable)
+{
+	const string_t executable_name = k3d::system::executable_name(Executable);
+
+	filesystem::path result;
+
+	const filesystem::path_list paths = filesystem::split_native_paths(ustring::from_utf8(system::getenv("PATH")));
+	for(filesystem::path_list::const_iterator path = paths.begin(); path != paths.end(); ++path)
+	{
+		const filesystem::path test_path = (*path) / filesystem::generic_path(ustring::from_utf8(executable_name));
+		if(filesystem::exists(test_path))
+		{
+			result = test_path;
+			break;
+		}
+	}
+
+	return result;
+}
+
 const filesystem::path generate_temp_file()
 {
 #ifdef K3D_API_WIN32
 
-	std::string buffer(MAX_PATH, '\0');
+	string_t buffer(MAX_PATH, '\0');
 	return_val_if_fail(GetTempFileName(get_temp_directory().native_filesystem_string().c_str(), "k3d", 0, const_cast<char*>(buffer.c_str())), filesystem::path());
 	buffer.resize(strlen(buffer.c_str()));
 
@@ -166,7 +186,7 @@ const filesystem::path generate_temp_file()
 
 #else // K3D_API_WIN32
 
-	std::string buffer = (get_temp_directory() / filesystem::generic_path("k3d-XXXXXX")).native_filesystem_string();
+	string_t buffer = (get_temp_directory() / filesystem::generic_path("k3d-XXXXXX")).native_filesystem_string();
 	int fd = mkstemp(const_cast<char*>(buffer.c_str()));
 	return_val_if_fail(fd, filesystem::path());
 	close(fd);
@@ -187,7 +207,7 @@ bool file_modification_time(const filesystem::path& File, time_t& ModificationTi
 	return true;
 }
 
-bool spawn_async(const std::string& CommandLine)
+bool spawn_async(const string_t& CommandLine)
 {
 	return_val_if_fail(!CommandLine.empty(), false);
 
@@ -201,12 +221,12 @@ bool spawn_async(const std::string& CommandLine)
 	}
 	catch(Glib::Exception& e)
 	{
-		k3d::log() << error << e.what() << std::endl;
+		log() << error << e.what() << std::endl;
 		return false;
 	}
 }
 
-bool spawn_sync(const std::string& CommandLine)
+bool spawn_sync(const string_t& CommandLine)
 {
 	return_val_if_fail(!CommandLine.empty(), false);
 
@@ -220,12 +240,12 @@ bool spawn_sync(const std::string& CommandLine)
 	}
 	catch(Glib::Exception& e)
 	{
-		k3d::log() << error << e.what() << std::endl;
+		log() << error << e.what() << std::endl;
 		return false;
 	}
 }
 
-const paths_t decompose_path_list(const std::string Input)
+const paths_t decompose_path_list(const string_t Input)
 {
 	paths_t results;
 
@@ -235,7 +255,7 @@ const paths_t decompose_path_list(const std::string Input)
 
 	for(tokenizer::iterator path = input.begin(); path != input.end(); ++path)
 	{
-		const std::string path_string = k3d::trim(*path);
+		const string_t path_string = k3d::trim(*path);
 		if(!path_string.empty())
 			results.push_back(filesystem::native_path(ustring::from_utf8(path_string)));
 	}
@@ -245,14 +265,14 @@ const paths_t decompose_path_list(const std::string Input)
 
 #ifdef K3D_API_WIN32
 
-const std::string executable_name(const std::string& Executable)
+const string_t executable_name(const string_t& Executable)
 {
 	return Executable + ".exe";
 }
 
 #else // K3D_API_WIN32
 
-const std::string executable_name(const std::string& Executable)
+const string_t executable_name(const string_t& Executable)
 {
 	return Executable;
 }

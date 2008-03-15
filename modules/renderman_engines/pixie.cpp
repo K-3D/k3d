@@ -59,6 +59,12 @@ public:
 
 	const k3d::bool_t installed()
 	{
+		if(k3d::system::find_executable("rndr").empty())
+			return false;
+
+		if(k3d::system::find_executable("sdrc").empty())
+			return false;
+
 		return true;
 	}
 

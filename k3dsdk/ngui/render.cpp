@@ -40,19 +40,20 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/file_range.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/irender_animation.h>
 #include <k3dsdk/irender_camera_animation.h>
 #include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/irender_camera_preview.h>
+#include <k3dsdk/irender_engine_ri.h>
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/irender_preview.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/share.h>
@@ -327,103 +328,39 @@ interface_t* pick_render_engine(document_state& DocumentState, const k3d::nodes_
 	return 0;
 }
 
-/*
-/// Returns the specific RenderMan implementation (if any) to be used by a render engine, or an empty string
-const std::string renderman_type(k3d::iunknown& Engine)
+/// Performs sanity checks to see if a RenderMan render engine is installed and usable
+void test_renderman_render_engine(k3d::iunknown& Engine)
 {
-	if(k3d::inode* const node = dynamic_cast<k3d::inode*>(&Engine))
+	k3d::inode* const node = dynamic_cast<k3d::inode*>(&Engine);
+	if(!node)
+		return;
+
+	if(node->factory().factory_id() != k3d::classes::RenderManEngine())
+		return;
+
+	try
 	{
-		if(node->factory().factory_id() == k3d::classes::RenderManEngine())
+		k3d::ri::irender_engine* const render_engine = dynamic_cast<k3d::ri::irender_engine*>(boost::any_cast<k3d::inode*>(k3d::property::pipeline_value(Engine, "render_engine")));
+		if(!render_engine)
 		{
-			return boost::any_cast<std::string>(k3d::property::pipeline_value(Engine, "render_engine"));
+			error_message(
+				_("Choose RenderMan Implementation"),
+				_("You must choose the specific RenderMan implementation to use with this render engine."));
+			return;
+		}
+
+		if(!render_engine->installed())
+		{
+			error_message(
+				_("RenderMan Implementation Unavailable"),
+				_("The requested RenderMan implementation could not be found.  Check to ensure that you have it installed and your PATH is up-to-date."));
+			return;
 		}
 	}
-
-	return std::string();
-}
-*/
-
-/// Returns the path to a binary executable by searching the contents of the PATH environment variable, or an empty path
-const k3d::filesystem::path find_executable(const std::string& Executable)
-{
-	const std::string executable_name = k3d::system::executable_name(Executable);
-
-	k3d::filesystem::path result;
-
-	const k3d::filesystem::path_list paths = k3d::filesystem::split_native_paths(k3d::ustring::from_utf8(k3d::system::getenv("PATH")));
-	for(k3d::filesystem::path_list::const_iterator path = paths.begin(); path != paths.end(); ++path)
+	catch(...)
 	{
-		const k3d::filesystem::path test_path = (*path) / k3d::filesystem::generic_path(k3d::ustring::from_utf8(executable_name));
-		if(k3d::filesystem::exists(test_path))
-		{
-			result = test_path;
-			break;
-		}
+		k3d::log() << error << "uncaught exception" << std::endl;
 	}
-
-	return result;
-}
-
-/// Performs sanity checks to see if Aqsis is installed and usable
-void test_aqsis_render_engine(k3d::iunknown& Engine)
-{
-/*
-	static bool test_performed = false;
-	if(test_performed)
-		return;
-
-	if(renderman_type(Engine) != "aqsis")
-		return;
-
-	test_performed = true;
-
-	if(find_executable("aqsis").empty())
-	{
-		error_message(
-			_("Could not locate the aqsis executable."),
-			_("Without it, RIB files cannot be rendered.  Check to ensure that you have Aqsis installed, and that the PATH envrionment variable points to the Aqsis binary installation directory."));
-		return;
-	}
-
-	if(find_executable("aqsl").empty())
-	{
-		error_message(
-			_("Could not locate the aqsl executable."),
-			_("Without it, shaders cannot be compiled.  Check to ensure that you have Aqsis installed, and that the PATH envrionment variable points to the Aqsis binary installation directory."));
-		return;
-	}
-*/
-}
-
-/// Performs sanity checks to see if Pixie is installed and usable
-void test_pixie_render_engine(k3d::iunknown& Engine)
-{
-/*
-	static bool test_performed = false;
-	if(test_performed)
-		return;
-
-	if(renderman_type(Engine) != "pixie")
-		return;
-
-	test_performed = true;
-
-	if(find_executable("rndr").empty())
-	{
-		error_message(
-			_("Could not locate the rndr executable."),
-			_("Without it, RIB files cannot be rendered.  Check to ensure that you have Pixie installed, and that the PATH environment variable points to the Pixie binary installation directory."));
-		return;
-	}
-
-	if(find_executable("sdrc").empty())
-	{
-		error_message(
-			_("Could not locate the sdrc executable."),
-			_("Without it, shaders cannot be compiled.  Check to ensure that you have Pixie installed, and that the PATH environment variable points to the Pixie binary installation directory."));
-		return;
-	}
-*/
 }
 
 /// Performs sanity checks to see if Yafray is installed and usable
@@ -442,7 +379,7 @@ void test_yafray_render_engine(k3d::iunknown& Engine)
 
 	test_performed = true;
 
-	if(find_executable("yafray").empty())
+	if(k3d::system::find_executable("yafray").empty())
 	{
 		error_message(
 			_("Could not locate the yafray executable."),
@@ -720,8 +657,7 @@ k3d::gl::irender_viewport* pick_gl_render_engine(document_state& DocumentState)
 
 void test_render_engine(k3d::iunknown& Engine)
 {
-	detail::test_aqsis_render_engine(Engine);
-	detail::test_pixie_render_engine(Engine);
+	detail::test_renderman_render_engine(Engine);
 	detail::test_yafray_render_engine(Engine);
 }
 
