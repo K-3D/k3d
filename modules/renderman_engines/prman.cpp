@@ -89,8 +89,6 @@ public:
 	const k3d::bool_t render(k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& RIB)
 	{
 		k3d::inetwork_render_frame::environment environment;
-		environment.push_back(k3d::inetwork_render_frame::variable("DISPLAY", "$DISPLAY$"));
-		environment.push_back(k3d::inetwork_render_frame::variable("XAUTHORITY", "$XAUTHORITY$"));
 
 		k3d::inetwork_render_frame::arguments arguments;
 		arguments.push_back(k3d::inetwork_render_frame::argument("-progress"));

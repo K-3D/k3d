@@ -106,15 +106,13 @@ public:
 		const k3d::filesystem::path shaders = k3d::shader_cache_path();
 
 		k3d::inetwork_render_frame::environment environment;
-		environment.push_back(k3d::inetwork_render_frame::variable("DISPLAY", "$DISPLAY$"));
-		environment.push_back(k3d::inetwork_render_frame::variable("XAUTHORITY", "$XAUTHORITY$"));
 
 		k3d::inetwork_render_frame::arguments arguments;
 		arguments.push_back(k3d::inetwork_render_frame::argument("-displays=" + displays.native_filesystem_string()));
 		arguments.push_back(k3d::inetwork_render_frame::argument("-procedurals=" + procedurals.native_filesystem_string()));
 		arguments.push_back(k3d::inetwork_render_frame::argument("-plugins=" + plugins.native_filesystem_string()));
 		arguments.push_back(k3d::inetwork_render_frame::argument("-shaders=" + shaders.native_filesystem_string()));
-		arguments.push_back(RIB.native_filesystem_string());
+		arguments.push_back(k3d::inetwork_render_frame::argument(RIB.native_filesystem_string()));
 
 		Frame.add_exec_command(aqsis.native_filesystem_string(), environment, arguments);
 

@@ -39,6 +39,7 @@ class inetwork_render_frame :
 	public virtual iunknown
 {
 public:
+	/// Defines storage for an environment variable
 	class variable
 	{
 	public:
@@ -56,8 +57,10 @@ public:
 		string_t value;
 	};
 
+	/// Defines storage for a collection of environment variables
 	typedef std::vector<variable> environment;
 
+	/// Defines storage for a command-line argument
 	class argument
 	{
 	public:
@@ -73,11 +76,12 @@ public:
 		string_t value;
 	};
 
+	/// Defines storage for a collection of command-line arguments
 	typedef std::vector<argument> arguments;
 
 	/// Returns a unique filepath that can be used as an input/output file for this frame
 	virtual const filesystem::path add_file(const string_t& Name) = 0;
-	/// Sets-up an arbitrary command to be executed
+	/// Sets-up an arbitrary command to be executed.  Supplied environment variables will supplement the application environment.
 	virtual void add_exec_command(const string_t& Binary, const environment& Environment, const arguments& Arguments) = 0;
 	/// Sets-up a copy operation from one filesystem location to another
 	virtual void add_copy_command(const filesystem::path& Source, const filesystem::path& Target) = 0;

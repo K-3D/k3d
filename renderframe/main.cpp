@@ -54,6 +54,8 @@ using namespace k3d::xml;
 #include <iostream>
 #include <vector>
 
+extern char** environ;
+
 namespace
 {
 
@@ -106,6 +108,7 @@ bool exec_command(const element& XMLCommand, const k3d::filesystem::path& FrameD
 	k3d::string_t standard_error;
 	int exit_status = 0;
 
+	// Setup program arguments ...
 	arguments.push_back(attribute_text(XMLCommand, "binary"));
 	if(const element* const xml_arguments = find_element(XMLCommand, "arguments"))
 	{
@@ -116,12 +119,26 @@ bool exec_command(const element& XMLCommand, const k3d::filesystem::path& FrameD
 		}
 	}
 
+	// Setup the application environment ...
+	for(int i = 0; environ[i]; ++i)
+		environment.push_back(environ[i]);
+
 	if(const element* const xml_environment = find_element(XMLCommand, "environment"))
 	{
 		for(element::elements_t::const_iterator xml_variable = xml_environment->children.begin(); xml_variable != xml_environment->children.end(); ++xml_variable)
 		{
 			k3d::string_t name = attribute_text(*xml_variable, "name");
 			k3d::string_t value = expand(attribute_text(*xml_variable, "value"));
+
+			// Ensure that duplicates don't creep in ...
+			for(int i = 0; i != environment.size(); ++i)
+			{
+				if(0 == environment[i].find(name + "="))
+				{
+					environment.erase(environment.begin() + i);
+					break;
+				}
+			}
 
 			environment.push_back(name + "=" + value);
 		}
