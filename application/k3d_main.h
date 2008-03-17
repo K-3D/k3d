@@ -1,3 +1,6 @@
+#ifndef APPLICATION_K3D_MAIN_H
+#define APPLICATION_K3D_MAIN_H
+
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -21,14 +24,11 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "k3d_main.h"
+#include <k3dsdk/types.h>
+#include <vector>
 
-int main(int argc, char* argv[])
-{
-	std::vector<k3d::string_t> arguments(argv, argv + argc);
-	if(arguments.size())
-		arguments.erase(arguments.begin());
+/// Main entry-point for the application ... callers should pass all command-line arguments *except for* the program name (i.e. argv[0])
+int k3d_main(std::vector<k3d::string_t> arguments);
 
-	return k3d_main(arguments);
-}
+#endif // !APPLICATION_K3D_MAIN_H
 

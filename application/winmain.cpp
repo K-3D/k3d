@@ -22,10 +22,11 @@
 */
 
 #include "k3d_main.h"
+#include <k3dsdk/win32.h>
 
-int main(int argc, char* argv[])
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	std::vector<k3d::string_t> arguments(argv, argv + argc);
+	std::vector<k3d::string_t> arguments(__argv, __argv + __argc);
 	if(arguments.size())
 		arguments.erase(arguments.begin());
 
