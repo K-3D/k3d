@@ -137,19 +137,19 @@ class user_interface :
 public:
 	void get_command_line_arguments(boost::program_options::options_description& Description);
 	const arguments_t parse_startup_arguments(const arguments_t& Arguments, bool& Quit, bool& Error);
-	void startup_message_handler(const std::string& Message);
+	void startup_message_handler(const k3d::string_t& Message);
 	void display_user_interface();
 	const arguments_t parse_runtime_arguments(const arguments_t& Arguments, bool& Quit, bool& Error);
 	void start_event_loop();
 	void stop_event_loop();
 	bool batch_mode();
-	void open_uri(const std::string& URI);
-	void message(const std::string& Message);
-	void warning_message(const std::string& Message);
-	void error_message(const std::string& Message);
-	unsigned int query_message(const std::string& Message, const unsigned int DefaultOption, const std::vector<std::string>& Options);
-	bool tutorial_message(const std::string& Message);
-	bool get_file_path(const k3d::ipath_property::mode_t Mode, const std::string& Type, const std::string& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result);
+	void open_uri(const k3d::string_t& URI);
+	void message(const k3d::string_t& Message);
+	void warning_message(const k3d::string_t& Message);
+	void error_message(const k3d::string_t& Message);
+	unsigned int query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options);
+	bool tutorial_message(const k3d::string_t& Message);
+	bool get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result);
 	bool show(iunknown& Object);
 	void synchronize();
 	sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot);

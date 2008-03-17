@@ -89,7 +89,7 @@ namespace ngui
 namespace detail
 {
 
-void handle_error(const std::string& Message, bool& Quit, bool& Error)
+void handle_error(const k3d::string_t& Message, bool& Quit, bool& Error)
 {
 	k3d::log() << error << Message << std::endl;
 
@@ -212,30 +212,31 @@ public:
 
 	static void log_handler(const gchar* LogDomain, GLogLevelFlags LogLevel, const gchar* Message, gpointer UserData)
 	{
-		std::string message(Message ? Message : "");
+		const k3d::string_t domain = LogDomain ? LogDomain : "";
+		k3d::string_t message(Message ? Message : "");
 		std::replace(message.begin(), message.end(), '\n', ' ');
 		std::replace(message.begin(), message.end(), '\r', ' ');
 
 		switch(LogLevel)
 		{
 			case G_LOG_LEVEL_ERROR:
-				k3d::log() << critical << LogDomain << ": " << message << std::endl;
+				k3d::log() << critical << domain << ": " << message << std::endl;
 				break;
 			case G_LOG_LEVEL_CRITICAL:
-				k3d::log() << error << LogDomain << ": " << message << std::endl;
+				k3d::log() << error << domain << ": " << message << std::endl;
 				break;
 			case G_LOG_LEVEL_WARNING:
-				k3d::log() << warning << LogDomain << ": " << message << std::endl;
+				k3d::log() << warning << domain << ": " << message << std::endl;
 				break;
 			case G_LOG_LEVEL_MESSAGE:
 			case G_LOG_LEVEL_INFO:
-				k3d::log() << info << LogDomain << ": " << message << std::endl;
+				k3d::log() << info << domain << ": " << message << std::endl;
 				break;
 			case G_LOG_LEVEL_DEBUG:
-				k3d::log() << debug << LogDomain << ": " << message << std::endl;
+				k3d::log() << debug << domain << ": " << message << std::endl;
 				break;
 			default:
-				k3d::log() << LogDomain << ": " << message << std::endl;
+				k3d::log() << domain << ": " << message << std::endl;
 				break;
 		}
 	}
@@ -246,10 +247,10 @@ public:
 			("new,n", "Create a new document.")
 			("no-custom-layouts", "Disable custom user interface layouts (useful when playing-back recorded tutorials).")
 			("no-splash", "Disables the startup splash screen.")
-			("open,o", boost::program_options::value<std::string>(), "Open an existing document.")
+			("open,o", boost::program_options::value<k3d::string_t>(), "Open an existing document.")
 			("record-tutorials", "Immediately opens the tutorial recorder following startup.")
 			("show-tutorials", "Immediately opens the tutorial menu following startup.")
-			("tutorials", boost::program_options::value<std::string>(), "Overrides the path for loading interactive tutorials.")
+			("tutorials", boost::program_options::value<k3d::string_t>(), "Overrides the path for loading interactive tutorials.")
 			;
 	}
 
@@ -362,7 +363,7 @@ public:
 		return unused;
 	}
 
-	void startup_message_handler(const std::string& Message)
+	void startup_message_handler(const k3d::string_t& Message)
 	{
 		if(m_splash_box.get())
 			m_splash_box->on_startup_message(Message);
@@ -450,38 +451,38 @@ public:
 		m_main->quit();
 	}
 
-	void open_uri(const std::string& URI)
+	void open_uri(const k3d::string_t& URI)
 	{
 		k3d::ngui::uri::open(URI);
 	}
 
-	void message(const std::string& Message)
+	void message(const k3d::string_t& Message)
 	{
 		libk3dngui::message(Message);
 	}
 
-	void warning_message(const std::string& Message)
+	void warning_message(const k3d::string_t& Message)
 	{
 		libk3dngui::warning_message(Message);
 	}
 
-	void error_message(const std::string& Message)
+	void error_message(const k3d::string_t& Message)
 	{
 		libk3dngui::error_message(Message);
 	}
 
-	unsigned int query_message(const std::string& Message, const unsigned int DefaultOption, const std::vector<std::string>& Options)
+	unsigned int query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options)
 	{
 		return libk3dngui::query_message(Message, DefaultOption, Options);
 	}
 
-	bool tutorial_message(const std::string& Message)
+	bool tutorial_message(const k3d::string_t& Message)
 	{
 		k3d::command_tree().command_signal().emit(*this, k3d::icommand_node::COMMAND_INTERACTIVE, "tutorial_message", Message);
 		return tutorial_message::instance().show_message(Message);
 	}
 
-	bool get_file_path(const k3d::ipath_property::mode_t Mode, const std::string& Type, const std::string& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
+	bool get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
 	{
 		file_chooser_dialog dialog(Prompt, Type, Mode);
 		return dialog.get_file_path(Result);
@@ -506,7 +507,7 @@ public:
 		return Glib::signal_timeout().connect(sigc::bind_return(Slot, true), interval);
 	}
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
+	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 	{
 		if(Command == "tutorial_message")
 			return tutorial_message(Arguments) ? RESULT_CONTINUE : RESULT_STOP;

@@ -319,7 +319,7 @@ const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(cons
 	return unused;
 }
 
-void user_interface::startup_message_handler(const std::string& Message)
+void user_interface::startup_message_handler(const k3d::string_t& Message)
 {
 	if(m_splash_box.get())
 		m_splash_box->showMessage(Message.c_str());
@@ -347,36 +347,36 @@ void user_interface::stop_event_loop()
 	m_application->quit();
 }
 
-void user_interface::open_uri(const std::string& URI)
+void user_interface::open_uri(const k3d::string_t& URI)
 {
 }
 
-void user_interface::message(const std::string& Message)
+void user_interface::message(const k3d::string_t& Message)
 {
 	QMessageBox::information(0, _("Information"), Message.c_str());
 }
 
-void user_interface::warning_message(const std::string& Message)
+void user_interface::warning_message(const k3d::string_t& Message)
 {
 	QMessageBox::warning(0, _("Warning"), Message.c_str());
 }
 
-void user_interface::error_message(const std::string& Message)
+void user_interface::error_message(const k3d::string_t& Message)
 {
 	QMessageBox::critical(0, _("Error"), Message.c_str());
 }
 
-unsigned int user_interface::query_message(const std::string& Message, const unsigned int DefaultOption, const std::vector<std::string>& Options)
+unsigned int user_interface::query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options)
 {
 	return 0;
 }
 
-bool user_interface::tutorial_message(const std::string& Message)
+bool user_interface::tutorial_message(const k3d::string_t& Message)
 {
 	return false;
 }
 
-bool user_interface::get_file_path(const k3d::ipath_property::mode_t Mode, const std::string& Type, const std::string& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
+bool user_interface::get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
 {
 	return false;
 }

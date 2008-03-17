@@ -62,7 +62,7 @@ public:
 		return Arguments;
 	}
 
-	void startup_message_handler(const std::string& Message)
+	void startup_message_handler(const k3d::string_t& Message)
 	{
 	}
 
@@ -101,36 +101,36 @@ public:
 		k3d::log() << debug << k3d_file_reference << std::endl;
 	}
 
-	void open_uri(const std::string& URI)
+	void open_uri(const k3d::string_t& URI)
 	{
 	}
 
-	void message(const std::string& Message)
+	void message(const k3d::string_t& Message)
 	{
 		std::cout << "message: " << Message << std::endl;
 	}
 
-	void warning_message(const std::string& Message)
+	void warning_message(const k3d::string_t& Message)
 	{
 		std::cout << "warning: " << Message << std::endl;
 	}
 
-	void error_message(const std::string& Message)
+	void error_message(const k3d::string_t& Message)
 	{
 		std::cout << "error: " << Message << std::endl;
 	}
 
-	unsigned int query_message(const std::string& Message, const unsigned int DefaultOption, const std::vector<std::string>& Options)
+	unsigned int query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options)
 	{
 		return 0;
 	}
 
-	bool tutorial_message(const std::string& Message)
+	bool tutorial_message(const k3d::string_t& Message)
 	{
 		return false;
 	}
 
-	bool get_file_path(const k3d::ipath_property::mode_t Mode, const std::string& Type, const std::string& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
+	bool get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
 	{
 		return false;
 	}

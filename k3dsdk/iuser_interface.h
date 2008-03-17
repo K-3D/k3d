@@ -28,8 +28,8 @@
 #include "iunknown.h"
 #include "keyboard.h"
 #include "signal_system.h"
+#include "types.h"
 
-#include <string>
 #include <vector>
 
 namespace k3d
@@ -43,27 +43,27 @@ class iuser_interface :
 {
 public:
 	/// Displays a URI in the user's preferred application
-	virtual void open_uri(const std::string& URI) = 0;
+	virtual void open_uri(const string_t& URI) = 0;
 	/// Displays an informational message
-	virtual void message(const std::string& Message) = 0;
+	virtual void message(const string_t& Message) = 0;
 	/// Displays a warning message
-	virtual void warning_message(const std::string& Message) = 0;
+	virtual void warning_message(const string_t& Message) = 0;
 	/// Displays an error message
-	virtual void error_message(const std::string& Message) = 0;
+	virtual void error_message(const string_t& Message) = 0;
 	/**
 		 \brief Prompts the user to choose one of several options
 		 \param Message text to be displayed
 		 \param DefaultOption one-based index of the option that is selected by default.  If DefaultOption is 0, no option is selected by default.
 		 \return one-based index of the option selected by the user, or "0" if a choice was not made (e.g. user clicked WM "close" button)
 	*/
-	virtual unsigned int query_message(const std::string& Message, const unsigned int DefaultOption, const std::vector<std::string>& Options) = 0;
+	virtual unsigned int query_message(const string_t& Message, const unsigned int DefaultOption, const std::vector<string_t>& Options) = 0;
 
 	/**
 		\brief Displays a message (for tutorial purposes) in a dialog box
 		\param Message the text to display in the dialog box
 		\return true iff the user wants to continue the tutorial, false to quit
 	*/
-	virtual bool tutorial_message(const std::string& Message) = 0;
+	virtual bool tutorial_message(const string_t& Message) = 0;
 
 	/**
 		\brief Prompts the user for a filepath, checking for old choices, and storing the current choice for reuse
@@ -72,7 +72,7 @@ public:
 		\param Result returns the chosen file path
 		\return true iff the user confirms the file path choice, false if they wish to cancel the pending operation
 	*/
-	virtual bool get_file_path(const ipath_property::mode_t Mode, const std::string& Type, const std::string& Prompt, const filesystem::path& OldPath, filesystem::path& Result) = 0;
+	virtual bool get_file_path(const ipath_property::mode_t Mode, const string_t& Type, const string_t& Prompt, const filesystem::path& OldPath, filesystem::path& Result) = 0;
 
 	/// Displays the given object using a graphical user interface
 	virtual bool show(iunknown& Object) = 0;
