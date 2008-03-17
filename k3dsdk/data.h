@@ -2040,18 +2040,18 @@ class pointer_storage :
 	BOOST_STATIC_ASSERT((boost::is_pointer<pointer_t>::value));
 
 public:
-	typedef typename boost::remove_pointer<pointer_t>::type value_t;
+	typedef typename boost::remove_pointer<pointer_t>::type non_pointer_t;
 	typedef pointer_storage<pointer_t, signal_policy_t> this_t;
 
 	/// Set a slot that will be called to initialize the value when first created
-	void set_initialize_slot(const sigc::slot<void, value_t&>& Slot)
+	void set_initialize_slot(const sigc::slot<void, non_pointer_t&>& Slot)
 	{
 		m_initialize_slot = Slot;
 		reset();
 	}
 
 	/// Set the slot that will be called to update the value whenever it changes
-	void set_update_slot(const sigc::slot<void, value_t&>& Slot)
+	void set_update_slot(const sigc::slot<void, non_pointer_t&>& Slot)
 	{
 		m_update_slot = Slot;
 		update();
@@ -2103,7 +2103,7 @@ public:
 
 			// Note: we create the value and update its state in two steps
 			// because m_data_slot() may cause this method to be executed in a loop
-			m_value.reset(new value_t());
+			m_value.reset(new non_pointer_t());
 			m_initialize_slot(*m_value);
 
 			m_executing = false;
@@ -2133,13 +2133,13 @@ protected:
 
 private:
 	/// Storage for this policy's value
-	std::auto_ptr<value_t> m_value;
+	std::auto_ptr<non_pointer_t> m_value;
 	/// Set to true if this policy's value is stale and needs to be updated
 	bool m_update;
 	/// Stores a slot that will be executed to initialize this policy's value
-	sigc::slot<void, value_t&> m_initialize_slot;
+	sigc::slot<void, non_pointer_t&> m_initialize_slot;
 	/// Stores a slot that will be executed to update this policy's value
-	sigc::slot<void, value_t&> m_update_slot;
+	sigc::slot<void, non_pointer_t&> m_update_slot;
 	/// Set to true during initialization / update of the policy value, to prevent problems with recursion
 	bool m_executing;
 };
