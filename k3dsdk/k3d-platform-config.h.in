@@ -17,7 +17,7 @@
 #if defined K3D_COMPILER_GCC
 	#define K3D_COMPILER_NAME __VERSION__
 #elif defined K3D_COMPILER_MSVC
-	#define K3D_COMPILER_NAME "Visual Studio " _MSC_VER
+	#define K3D_COMPILER_NAME "Visual Studio " #_MSC_VER
 #else
 	#error("Unknown compiler")
 #endif
