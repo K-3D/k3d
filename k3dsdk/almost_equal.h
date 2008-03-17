@@ -36,7 +36,7 @@ public:
 	inline const bool operator()(const T A, const T B) const
 	{
 		// This will be triggered if this template is ever instantiated
-		BOOST_STATIC_ASSERT((sizeof(T) == 0));
+		BOOST_STATIC_ASSERT(sizeof(T) == 0);
 		return false;
 	}
 };
