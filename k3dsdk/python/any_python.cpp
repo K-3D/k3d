@@ -37,6 +37,7 @@
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/render_state_ri.h>
+#include <k3dsdk/texture3.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/vectors.h>
 
@@ -80,6 +81,9 @@ const object any_to_python(const boost::any& Value)
 
 	if(type == typeid(k3d::normal3))
 		return object(boost::any_cast<k3d::normal3>(Value));
+
+	if(type == typeid(k3d::texture3))
+		return object(boost::any_cast<k3d::texture3>(Value));
 
 	if(type == typeid(k3d::vector3))
 		return object(boost::any_cast<k3d::vector3>(Value));
@@ -182,9 +186,7 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 	PyObject* const value = Value.ptr();
 
 	if(TargetType == typeid(bool))
-	{
 		return boost::any(PyObject_IsTrue(value) ? true : false);
-	}
 
 	if(TargetType == typeid(int))
 	{
@@ -204,9 +206,7 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 	}
 
 	if(TargetType == typeid(unsigned long))
-	{
 		return boost::any(extract<unsigned long>(Value)());
-	}
 
 	if(TargetType == typeid(double))
 	{
@@ -229,54 +229,37 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 	}
 
 	if(TargetType == typeid(filesystem::path))
-	{
 		return boost::any(extract<k3d::filesystem::path>(Value)());
-	}
 
 	if(TargetType == typeid(k3d::color))
-	{
 		return boost::any(extract<k3d::color>(Value)());
-	}
 
 	if(TargetType == typeid(k3d::point3))
-	{
 		return boost::any(extract<k3d::point3>(Value)());
-	}
 
 	if(TargetType == typeid(k3d::point4))
-	{
 		return boost::any(extract<k3d::point4>(Value)());
-	}
 
 	if(TargetType == typeid(k3d::normal3))
-	{
 		return boost::any(extract<k3d::normal3>(Value)());
-	}
 
 	if(TargetType == typeid(k3d::vector3))
-	{
 		return boost::any(extract<k3d::vector3>(Value)());
-	}
+
+	if(TargetType == typeid(k3d::texture3))
+		return boost::any(extract<k3d::texture3>(Value)());
 
 	if(TargetType == typeid(k3d::matrix4))
-	{
 		return boost::any(extract<k3d::matrix4>(Value)());
-	}
 
 	if(TargetType == typeid(k3d::angle_axis))
-	{
 		return boost::any(extract<angle_axis>(Value)());
-	}
 
 	if(TargetType == typeid(k3d::mesh_selection))
-	{
 		return boost::any(extract<k3d::mesh_selection>(Value)());
-	}
 
 	if(TargetType == typeid(k3d::bounding_box3))
-	{
 		return boost::any(extract<k3d::bounding_box3>(Value)());
-	}
 
 	if(TargetType == typeid(k3d::inode*))
 	{
@@ -287,9 +270,7 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 	}
 
 	if(TargetType == typeid(k3d::bitmap*))
-	{
 		return boost::any(extract<bitmap>(Value)().wrapped_ptr());
-	}
 
 	if(TargetType == typeid(std::vector<k3d::inode*>))
 	{

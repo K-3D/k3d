@@ -76,6 +76,7 @@
 #include "log.h"
 #include "mesh.h"
 #include "mesh_selection.h"
+#include "texture3.h"
 #include "type_registry.h"
 #include "types.h"
 
@@ -232,6 +233,7 @@ void initialize_types()
 	register_type(typeid(k3d::ri::itexture*), "k3d::ri::itexture*");
 	register_type(typeid(k3d::ri::ivolume_shader), "k3d::ri::ivolume_shader");
 	register_type(typeid(k3d::string_t), "k3d::string_t");
+	register_type(typeid(k3d::texture3), "k3d::texture3");
 	register_type(typeid(k3d::uint16_t), "k3d::uint16_t");
 	register_type(typeid(k3d::uint32_t), "k3d::uint32_t");
 	register_type(typeid(k3d::uint64_t), "k3d::uint64_t");

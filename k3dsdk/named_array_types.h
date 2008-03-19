@@ -27,18 +27,19 @@
 #include "point2.h"
 #include "point3.h"
 #include "point4.h"
+#include "texture3.h"
 #include "types.h"
 #include "vector2.h"
 #include "vector3.h"
 
-#include <boost/mpl/vector/vector20.hpp>
+#include <boost/mpl/vector/vector30.hpp>
 
 namespace k3d
 {
 
 /// Enumerates all of the data types that can be stored using k3d::named_arrays.
 /// If you create a named array that stores a type not in this list, some operations will fail with runtime errors.
-typedef boost::mpl::vector20<
+typedef boost::mpl::vector21<
 	bool_t,
 	color,
 	double_t,
@@ -53,6 +54,7 @@ typedef boost::mpl::vector20<
 	point3,
 	point4,
 	string_t,
+	texture3,
 	uint16_t,
 	uint32_t,
 	uint64_t,

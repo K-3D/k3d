@@ -30,6 +30,7 @@
 #include <k3dsdk/point2.h>
 #include <k3dsdk/point3.h>
 #include <k3dsdk/point4.h>
+#include <k3dsdk/texture3.h>
 #include <k3dsdk/vector2.h>
 #include <k3dsdk/vector3.h>
 
@@ -77,6 +78,8 @@ void export_arrays()
 		"Stores a mutable (read-write) collection of L{point4} values.");
 	export_array<k3d::typed_array<k3d::string_t> >("k3d_string_t_array",
 		"Stores a mutable (read-write) collection of string values.");
+	export_array<k3d::typed_array<k3d::texture3> >("k3d_texture3_array",
+		"Stores a mutable (read-write) collection of L{texture} values.");
 	export_array<k3d::typed_array<k3d::uint8_t> >("k3d_uint8_t_array",
 		"Stores a mutable (read-write) collection of unsigned 8-bit integer values.");
 	export_array<k3d::typed_array<k3d::uint16_t> >("k3d_uint16_t_array",

@@ -54,6 +54,7 @@
 #include "point3_python.h"
 #include "point4_python.h"
 #include "ri_render_state_python.h"
+#include "texture3_python.h"
 #include "uuid_python.h"
 #include "vector3_python.h"
 
@@ -408,6 +409,7 @@ BOOST_PYTHON_MODULE(k3d)
 	export_point2();
 	export_point3();
 	export_point4();
+	export_texture3();
 	export_uuid();
 	export_vector3();
 	icommand_node::define_class();

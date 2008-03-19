@@ -41,7 +41,19 @@ namespace k3d
 /// Returns the weighted sum of a random-access subset of array values
 bool_t weighted_sum(const typed_array<bool_t>& Source, const uint_t Count, const uint_t* Indices, const double_t* Weights)
 {
-	return Source[Indices[0]];
+	// We return whichever value has the highest weight ...
+	double_t weight = -std::numeric_limits<double_t>::max();
+
+	bool_t result = false;
+	for(uint_t i = 0; i != Count; ++i)
+	{
+		if(Weights[i] >= weight)
+		{
+			weight = Weights[i];
+			result = Source[Indices[i]];
+		}
+	}
+	return result;
 }
 
 /// Returns the weighted sum of a random-access subset of array values
@@ -146,7 +158,19 @@ double_t weighted_sum(const typed_array<double_t>& Source, const uint_t Count, c
 /// Returns the weighted sum of a random-access subset of array values
 string_t weighted_sum(const typed_array<string_t>& Source, const uint_t Count, const uint_t* Indices, const double_t* Weights)
 {
-	return Source[Indices[0]];
+	// We return whichever value has the highest weight ...
+	double_t weight = -std::numeric_limits<double_t>::max();
+
+	string_t result;
+	for(uint_t i = 0; i != Count; ++i)
+	{
+		if(Weights[i] >= weight)
+		{
+			weight = Weights[i];
+			result = Source[Indices[i]];
+		}
+	}
+	return result;
 }
 
 /// Returns the weighted sum of a random-access subset of array values
@@ -195,6 +219,15 @@ point3 weighted_sum(const typed_array<point3>& Source, const uint_t Count, const
 }
 
 /// Returns the weighted sum of a random-access subset of array values
+texture3 weighted_sum(const typed_array<texture3>& Source, const uint_t Count, const uint_t* Indices, const double_t* Weights)
+{
+	texture3 result;
+	for(uint_t i = 0; i != Count; ++i)
+		result += Source[Indices[i]] * Weights[i];
+	return result;
+}
+
+/// Returns the weighted sum of a random-access subset of array values
 vector3 weighted_sum(const typed_array<vector3>& Source, const uint_t Count, const uint_t* Indices, const double_t* Weights)
 {
 	vector3 result;
@@ -224,7 +257,19 @@ matrix4 weighted_sum(const typed_array<matrix4>& Source, const uint_t Count, con
 /// Returns the weighted sum of a random-access subset of array values
 inode* weighted_sum(const typed_array<inode*>& Source, const uint_t Count, const uint_t* Indices, const double_t* Weights)
 {
-	return Source[Indices[0]];
+	// We return whichever value has the highest weight ...
+	double_t weight = -std::numeric_limits<double_t>::max();
+
+	inode* result = 0;
+	for(uint_t i = 0; i != Count; ++i)
+	{
+		if(Weights[i] >= weight)
+		{
+			weight = Weights[i];
+			result = Source[Indices[i]];
+		}
+	}
+	return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////

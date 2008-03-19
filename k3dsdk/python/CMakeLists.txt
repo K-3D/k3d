@@ -36,6 +36,8 @@ ADD_LIBRARY(k3dsdk-python-types SHARED
 	point4_python.h
 	ri_render_state_python.cpp
 	ri_render_state_python.h
+	texture3_python.cpp
+	texture3_python.h
 	uuid_python.cpp
 	uuid_python.h
 	vector3_python.cpp
