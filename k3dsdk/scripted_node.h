@@ -47,6 +47,7 @@ public:
 		m_user_property_changed_signal(*this),
 		m_executing(false)
 	{
+		m_script.changed_signal().connect(sigc::mem_fun(*this, &scripted_node::on_script_changed));
 	}
 
 protected:
@@ -63,33 +64,49 @@ protected:
 
 	bool execute_script(iscript_engine::context_t& Context)
 	{
-		if (m_executing) // prevent recursion when writing properties in the script (infinite loop!)
+		if(m_executing) // prevent recursion when writing properties in the script (infinite loop!)
 			return true;
-		m_executing = true;
-		// Examine the script to determine the correct language ...
+
+		execute_lock lock(m_executing);
+
 		const script::code code(m_script.pipeline_value());
-		const script::language language(code);
-
-		return_val_if_fail(language.factory(), false);
-
-		// If the current script engine is for the wrong language, lose it ...
-		if(m_script_engine && (m_script_engine->factory().factory_id() != language.factory()->factory_id()))
-			m_script_engine.reset();
-
-		// Create our script engine as-needed ...
 		if(!m_script_engine)
+		{
+			const script::language language(code);
+			return_val_if_fail(language.factory(), false);
+
 			m_script_engine.reset(plugin::create<iscript_engine>(language.factory()->factory_id()));
+			return_val_if_fail(m_script_engine, false);
+		}
 
-		// No script engine?  We're outta here ...
-		return_val_if_fail(m_script_engine, false);
-
-		// Execute that bad-boy!
-		bool result = m_script_engine->execute(base_t::name() + "Script", code.source(), Context);
-		m_executing = false;
-		return result;
+		return m_script_engine->execute(base_t::name() + "Script", code.source(), Context);
 	}
 
 private:
+	/// RAII helper class that keeps track of whether we're executing, so we can avoid recursive loops.
+	class execute_lock
+	{
+	public:
+		execute_lock(bool_t& Executing) :
+			executing(Executing)
+		{
+			executing = true;
+		}
+
+		~execute_lock()
+		{
+			executing = false;
+		}
+
+	private:
+		bool_t& executing;
+	};
+
+	void on_script_changed(iunknown* hint)
+	{
+		m_script_engine.reset();
+	}
+
 	k3d_data(string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, script_property, with_serialization) m_script;
 	boost::scoped_ptr<iscript_engine> m_script_engine;
 	user_property_changed_signal m_user_property_changed_signal;

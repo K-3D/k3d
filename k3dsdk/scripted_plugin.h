@@ -2,7 +2,7 @@
 #define K3DSDK_SCRIPTED_PLUGIN_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -43,6 +43,7 @@ public:
 	scripted_plugin() :
 		m_script(init_owner(*this) + init_name("script") + init_label(_("Script")) + init_description(_("Script source code")) + init_value<string_t>(""))
 	{
+		m_script.changed_signal().connect(sigc::mem_fun(*this, &scripted_plugin::on_script_changed));
 	}
 
 protected:
@@ -53,28 +54,32 @@ protected:
 
 	bool execute_script(iscript_engine::context_t& Context)
 	{
-		// Examine the script to determine the correct language ...
 		const script::code code(m_script.pipeline_value());
-		const script::language language(code);
 
-		return_val_if_fail(language.factory(), false);
-
-		// If the current script engine is for the wrong language, lose it ...
-		if(m_script_engine && (m_script_engine->factory().factory_id() != language.factory()->factory_id()))
-			m_script_engine.reset();
-
-		// Create our script engine as-needed ...
 		if(!m_script_engine)
+		{
+			// Examine the script to determine the correct language ...
+			const script::language language(code);
+
+			return_val_if_fail(language.factory(), false);
+
+			// Create our script engine as-needed ...
 			m_script_engine.reset(plugin::create<iscript_engine>(language.factory()->factory_id()));
 
-		// No script engine?  We're outta here ...
-		return_val_if_fail(m_script_engine, false);
+			// No script engine?  We're outta here ...
+			return_val_if_fail(m_script_engine, false);
+		}
 
 		// Execute that bad-boy!
 		return m_script_engine->execute("Script", code.source(), Context);
 	}
 
 private:
+	void on_script_changed(iunknown* hint)
+	{
+		m_script_engine.reset();
+	}
+
 	k3d_data(string_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, script_property, no_serialization) m_script;
 	boost::scoped_ptr<iscript_engine> m_script_engine;
 };
