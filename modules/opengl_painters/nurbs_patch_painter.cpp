@@ -39,6 +39,11 @@ namespace opengl
 namespace painters
 {
 
+static void on_nurbs_error(GLenum ErrorCode)
+{
+		k3d::log() << debug << "NURBS error: " << gluErrorString(ErrorCode) << std::endl;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // nurbs_patch_painter
 
@@ -56,6 +61,8 @@ public:
 		gluNurbsProperty(nurbs_renderer, GLU_AUTO_LOAD_MATRIX, GL_FALSE);
 		gluNurbsProperty(nurbs_renderer, GLU_CULLING, GL_TRUE);
 		gluNurbsProperty(nurbs_renderer, GLU_DISPLAY_MODE, GLU_FILL);
+		gluNurbsProperty(nurbs_renderer, GLU_SAMPLING_TOLERANCE, 50);
+		gluNurbsCallback(nurbs_renderer, GLU_ERROR, (void(*)())on_nurbs_error);
 	}
 
 	~nurbs_patch_painter()
@@ -130,6 +137,7 @@ public:
 			}
 
 			gluBeginSurface(nurbs_renderer);
+			//k3d::log() << debug << "Painting patch with knot sizes: " << gl_u_knot_vector.size() << ", " << gl_v_knot_vector.size() << " and orders " << patch_u_order << ", " << patch_v_order  << " with " << gl_control_points.size() << " control points. " << std::endl;
 			gluNurbsSurface(nurbs_renderer, gl_u_knot_vector.size(), &gl_u_knot_vector[0], gl_v_knot_vector.size(), &gl_v_knot_vector[0], gl_u_stride, gl_v_stride, &gl_control_points[0], patch_u_order, patch_v_order, GL_MAP2_VERTEX_4);
 			
 			if (Mesh.nurbs_patches->patch_trim_curve_loop_counts && Mesh.nurbs_patches->trim_points)
@@ -154,19 +162,28 @@ public:
 				k3d::uint_t loops_end = loops_start + patch_trim_curve_loop_counts[patch];
 				for (k3d::uint_t loop_index = loops_start; loop_index != loops_end; ++loop_index)
 				{
+					//k3d::log() << debug << "  drawing loop " << loop_index << std::endl;
 					gluBeginTrim(nurbs_renderer);
 					k3d::uint_t curves_start = first_trim_curves[trim_curve_loops[loop_index]];
 					k3d::uint_t curves_end = curves_start + trim_curve_counts[trim_curve_loops[loop_index]];
 					for (k3d::uint_t curve = curves_start; curve != curves_end; ++curve)
 					{
-						std::vector<GLfloat> gl_trim_knot_vector(&trim_curve_knots[trim_curve_first_knots[curve]], &trim_curve_knots[trim_curve_first_knots[curve] + trim_curve_point_counts[curve] + trim_curve_orders[curve]]);
+						//k3d::log() << debug << "    drawing curve " << curve << std::endl;
+						k3d::uint_t knots_end = trim_curve_first_knots[curve] + trim_curve_point_counts[curve] + trim_curve_orders[curve];
+						return_if_fail(knots_end <= trim_curve_knots.size());
+						std::vector<GLfloat> gl_trim_knot_vector(&trim_curve_knots[trim_curve_first_knots[curve]], &trim_curve_knots[knots_end]);
+						//k3d::log() << debug << "      knot vector:" << std::endl;
+						//for (k3d::uint_t knot = 0; knot != gl_trim_knot_vector.size(); ++knot)
+							//k3d::log() << debug << "                   " << gl_trim_knot_vector[knot] << std::endl;
 						std::vector<GLfloat> gl_trim_control_points;
 						k3d::uint_t points_start = trim_curve_first_points[curve];
 						k3d::uint_t points_end = points_start + trim_curve_point_counts[curve];
+						return_if_fail(points_end <= trim_curve_points.size());
 						for (k3d::uint_t point = points_start; point != points_end; ++point)
 						{
 							k3d::point2 control_point = trim_points[trim_curve_points[point]];
 							double weight = trim_curve_point_weights[point];
+							//k3d::log() << debug << "        drawing point " << control_point << " with weight " << weight << std::endl;
 							gl_trim_control_points.push_back(static_cast<GLfloat>(control_point[0] * weight));
 							gl_trim_control_points.push_back(static_cast<GLfloat>(control_point[1] * weight));
 							gl_trim_control_points.push_back(static_cast<GLfloat>(weight));
