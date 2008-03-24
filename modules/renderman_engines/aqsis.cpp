@@ -98,7 +98,6 @@ public:
 
 		k3d::inetwork_render_frame::arguments arguments;
 		arguments.push_back(k3d::inetwork_render_frame::argument("-shaders=" + k3d::shader_cache_path().native_filesystem_string()));
-		arguments.push_back(k3d::inetwork_render_frame::argument("-displays=" + k3d::system::find_executable("aqsis").branch_path().native_filesystem_string()));
 		arguments.push_back(k3d::inetwork_render_frame::argument(RIB.native_filesystem_string()));
 		
 		Frame.add_exec_command("aqsis", environment, arguments);
