@@ -13,23 +13,36 @@ K3D_PANGO_RC_FILE="$K3D_ETC/pango/pangorc"
 echo "running $0"
 echo "K3D_BUNDLE: $K3D_BUNDLE"
 
-# If X11 isn't running, fire it up!
-ps -wx -ocommand | grep -e '[X]11' > /dev/null
+# Start X11 ...
+ps -wx -ocommand | grep -e '[X]11.app' > /dev/null
 if [ "$?" != "0" -a ! -f ~/.xinitrc ]; then
     echo "rm -f ~/.xinitrc" > ~/.xinitrc
     sed 's/xterm/# xterm/' /usr/X11R6/lib/X11/xinit/xinitrc >> ~/.xinitrc
 fi
 
-cp -f "$K3D_RESOURCES/bin/getdisplay.sh" /tmp/
-rm -f /tmp/display.$UID
-open-x11 /tmp/getdisplay.sh || \
-open -a XDarwin /tmp/getdisplay.sh || \
-echo ":0" > /tmp/display.$UID
+mkdir -p $K3D_TEMP
+cat << __END_OF_GETDISPLAY_SCRIPT__ > "$K3D_TEMP/getdisplay.sh"
+#!/bin/sh
+mkdir -p "$K3D_TEMP"
 
-while [ "$?" == "0" -a ! -f /tmp/display.$UID ]; do
-    sleep 1
+if [ "\$DISPLAY"x == "x" ]; then
+    echo :0 > "$K3D_TEMP/display"
+else
+    echo \$DISPLAY > "$K3D_TEMP/display"
+fi
+__END_OF_GETDISPLAY_SCRIPT__
+chmod +x "$K3D_TEMP/getdisplay.sh"
+rm -f $K3D_TEMP/display
+open-x11 $K3D_TEMP/getdisplay.sh || \
+open -a XDarwin $K3D_TEMP/getdisplay.sh || \
+echo ":0" > $K3D_TEMP/display
+
+while [ "$?" == "0" -a ! -f $K3D_TEMP/display ];
+do
+  #echo "Waiting for display $K3D_TEMP/display"
+  sleep 1;
 done
-export DISPLAY="`cat /tmp/display.$UID`"
+export "DISPLAY=`cat $K3D_TEMP/display`"
 
 ps -wx -ocommand | grep -e '[X]11' > /dev/null || exit 11
 
@@ -49,6 +62,6 @@ export "FONTCONFIG_PATH=$K3D_RESOURCES/etc/fonts"
 export "PANGO_RC_FILE=$K3D_PANGO_RC_FILE"
 export "PATH=$K3D_RESOURCES/bin:$PATH"
 
-export
-exec "$K3D_RESOURCES/bin/k3d" "--log-level=debug" "--plugins=$K3D_RESOURCES/lib/k3d/plugins" "--share=$K3D_RESOURCES/share" "--ui=$K3D_RESOURCES/lib/k3d/uiplugins/k3d-ngui.module"
+#export
+exec "$K3D_RESOURCES/bin/k3d" "--log-level=debug" "--plugins=$K3D_RESOURCES/lib/k3d/plugins" "--share=$K3D_RESOURCES/share/k3d" "--ui=$K3D_RESOURCES/lib/k3d/uiplugins/k3d-ngui.module"
 
