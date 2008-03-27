@@ -11,9 +11,6 @@
 <command node="/document/window/node_list" command="select" arguments="&lt;arguments&gt;&lt;selection&gt;&lt;node&gt;00000001 00000000 00000000 00000001 1&lt;/node&gt;&lt;/selection&gt;&lt;context_menu/&gt;&lt;/arguments&gt;"/>
 <command node="/document/window/node_list" command="select" arguments="&lt;arguments&gt;&lt;selection&gt;&lt;node&gt;e058ab07 44384acd ba321d58 cdb3ef25 1&lt;/node&gt;&lt;/selection&gt;&lt;context_menu/&gt;&lt;/arguments&gt;"/>
 <command node="/document/window/node_list" command="select" arguments="&lt;arguments&gt;&lt;selection&gt;&lt;node&gt;0dc5e733 fa684e05 86a3865f 42f7a99d 1&lt;/node&gt;&lt;/selection&gt;&lt;context_menu/&gt;&lt;/arguments&gt;"/>
-<command node="/document/window/node_properties/render_engine" command="value" arguments="aqsis"/>
-<command node="/document/window/node_properties/pixel_filter" command="value" arguments="gaussian"/>
-<command node="/document/window/node_properties/shading_interpolation" command="value" arguments="constant"/>
 <command node="/ui" command="tutorial_message" arguments="Next, let&apos;s look at the Node Properties Panel ..."/>
 <command node="/document/window/node_properties" command="highlight" arguments=""/>
 <command node="/ui" command="tutorial_message" arguments="Each K-3D Node contains a collection of Properties that you can modify - the available Properties are specific to the type of Node, and control its behavior."/>
