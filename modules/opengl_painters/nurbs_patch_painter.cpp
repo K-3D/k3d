@@ -21,14 +21,21 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/mesh_painter_gl.h>
+#include <k3d-platform-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
+
+#ifdef K3D_API_DARWIN
+	#define GLU_NURBS_CALLBACK GLvoid(*)(...)
+#else // K3D_API_DARWIN
+	#define GLU_NURBS_CALLBACK void(*)()
+#endif // !K3D_API_DARWIN
 
 namespace module
 {
@@ -62,7 +69,7 @@ public:
 		gluNurbsProperty(nurbs_renderer, GLU_CULLING, GL_TRUE);
 		gluNurbsProperty(nurbs_renderer, GLU_DISPLAY_MODE, GLU_FILL);
 		gluNurbsProperty(nurbs_renderer, GLU_SAMPLING_TOLERANCE, 50);
-		gluNurbsCallback(nurbs_renderer, GLU_ERROR, (void(*)())on_nurbs_error);
+		gluNurbsCallback(nurbs_renderer, GLU_ERROR, (GLU_NURBS_CALLBACK)on_nurbs_error);
 	}
 
 	~nurbs_patch_painter()
