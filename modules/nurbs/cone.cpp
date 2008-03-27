@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -31,19 +31,22 @@
 #include <k3dsdk/nurbs.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dnurbs
+namespace module
+{
+
+namespace nurbs
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_cone
+// cone
 
-class nurbs_cone :
+class cone :
 	public k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
 {
 	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
-	nurbs_cone(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	cone(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_height(init_owner(*this) + init_name("height") + init_label(_("height")) + init_description(_("Height")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
@@ -105,7 +108,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<nurbs_cone, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<cone, k3d::interface_list<k3d::imesh_source > > factory(
 		k3d::uuid(0x5c7b8a12, 0xbbb5477f, 0xb1428844, 0x894f550b),
 			"NurbsCone",
 			_("Generates a NURBS cone"),
@@ -124,13 +127,16 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_cone_factory
+// cone_factory
 
-k3d::iplugin_factory& nurbs_cone_factory()
+k3d::iplugin_factory& cone_factory()
 {
-	return nurbs_cone::get_factory();
+	return cone::get_factory();
 }
 
-} // namespace libk3dnurbs
+} // namespace nurbs
+
+} // namespace module
+
 
 

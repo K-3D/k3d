@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -31,19 +31,22 @@
 #include <k3dsdk/nurbs.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dnurbs
+namespace module
+{
+
+namespace nurbs
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_hyperboloid
+// hyperboloid
 
-class nurbs_hyperboloid :
+class hyperboloid :
 	public k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
 {
 	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
-	nurbs_hyperboloid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	hyperboloid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_x1(init_owner(*this) + init_name("x1") + init_label(_("x1")) + init_description(_("x1")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_y1(init_owner(*this) + init_name("y1") + init_label(_("y1")) + init_description(_("y1")) + init_value(-5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
@@ -121,7 +124,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<nurbs_hyperboloid, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<hyperboloid, k3d::interface_list<k3d::imesh_source > > factory(
 		k3d::uuid(0xb653277c, 0x7bba4505, 0xbabcd65d, 0x591ecedf),
 			"NurbsHyperboloid",
 			_("Generates a NURBS hyperboloid"),
@@ -142,12 +145,15 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_hyperboloid_factory
+// hyperboloid_factory
 
-k3d::iplugin_factory& nurbs_hyperboloid_factory()
+k3d::iplugin_factory& hyperboloid_factory()
 {
-	return nurbs_hyperboloid::get_factory();
+	return hyperboloid::get_factory();
 }
 
-} // namespace libk3dnurbs
+} // namespace nurbs
+
+} // namespace module
+
 

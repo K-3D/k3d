@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -30,19 +30,22 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh_source.h>
 
-namespace libk3dnurbs
+namespace module
+{
+
+namespace nurbs
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_polygon
+// polygon
 
-class nurbs_polygon :
+class polygon :
 	public k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
 {
 	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
-	nurbs_polygon(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	polygon(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Sides")) + init_value(4) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
@@ -95,7 +98,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<nurbs_polygon, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<polygon, k3d::interface_list<k3d::imesh_source > > factory(
 		k3d::uuid(0x49796f52, 0x2e29f346, 0xbd47e3c9, 0xfb899a81),
 			"NurbsPolygon",
 			_("Generates a NURBS polygon"),
@@ -111,12 +114,15 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_polygon_factory
+// polygon_factory
 
-k3d::iplugin_factory& nurbs_polygon_factory()
+k3d::iplugin_factory& polygon_factory()
 {
-	return nurbs_polygon::get_factory();
+	return polygon::get_factory();
 }
 
-} // namespace libk3dnurbs
+} // namespace nurbs
+
+} // namespace module
+
 

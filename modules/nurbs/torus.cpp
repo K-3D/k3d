@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -31,19 +31,22 @@
 #include <k3dsdk/nurbs.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dnurbs
+namespace module
+{
+
+namespace nurbs
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_torus
+// torus
 
-class nurbs_torus :
+class torus :
 	public k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
 {
 	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
-	nurbs_torus(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	torus(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_majorradius(init_owner(*this) + init_name("majorradius") + init_label(_("majorradius")) + init_description(_("Major Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_minorradius(init_owner(*this) + init_name("minorradius") + init_label(_("minorradius")) + init_description(_("Minor Radius")) + init_value(2.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
@@ -110,7 +113,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<nurbs_torus, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<torus, k3d::interface_list<k3d::imesh_source > > factory(
 		k3d::uuid(0xc6cb880c, 0x4e4d4028, 0x8c77305f, 0x4b8f05a2),
 			"NurbsTorus",
 			_("Generates a NURBS torus"),
@@ -131,12 +134,15 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_torus_factory
+// torus_factory
 
-k3d::iplugin_factory& nurbs_torus_factory()
+k3d::iplugin_factory& torus_factory()
 {
-	return nurbs_torus::get_factory();
+	return torus::get_factory();
 }
 
-} // namespace libk3dnurbs
+} // namespace nurbs
+
+} // namespace module
+
 

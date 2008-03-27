@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -31,19 +31,22 @@
 #include <k3dsdk/nurbs.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dnurbs
+namespace module
+{
+
+namespace nurbs
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_sphere
+// sphere
 
-class nurbs_sphere :
+class sphere :
 	public k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
 {
 	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
-	nurbs_sphere(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	sphere(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_zmax(init_owner(*this) + init_name("zmax") + init_label(_("zmax")) + init_description(_("ZMax")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
@@ -110,7 +113,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<nurbs_sphere, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<sphere, k3d::interface_list<k3d::imesh_source > > factory(
 		k3d::uuid(0x082eeef0, 0x837f4277, 0xa7c21ff1, 0x839b286e),
 			"NurbsSphere",
 			_("Generates a NURBS sphere"),
@@ -130,13 +133,16 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_sphere_factory
+// sphere_factory
 
-k3d::iplugin_factory& nurbs_sphere_factory()
+k3d::iplugin_factory& sphere_factory()
 {
-	return nurbs_sphere::get_factory();
+	return sphere::get_factory();
 }
 
-} // namespace libk3dnurbs
+} // namespace nurbs
+
+} // namespace module
+
 
 

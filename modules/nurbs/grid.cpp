@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -32,19 +32,22 @@
 
 #include <iterator>
 
-namespace libk3dnurbs
+namespace module
+{
+
+namespace nurbs
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_grid
+// grid
 
-class nurbs_grid :
+class grid :
 	public k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
 {
 	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
 
 public:
-	nurbs_grid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	grid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_u_order(init_owner(*this) + init_name("u_order") + init_label(_("u_order")) + init_description(_("U Order")) + init_value(4) + init_constraint(constraint::minimum(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_v_order(init_owner(*this) + init_name("v_order") + init_label(_("v_order")) + init_description(_("V Order")) + init_value(4) + init_constraint(constraint::minimum(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -119,7 +122,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<nurbs_grid, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<grid, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0x5aac4e72, 0xf9b04b61, 0xf8b1bdbc, 0x851cf62e),
 			"NurbsGrid",
 			_("Generates a NURBS grid"),
@@ -139,12 +142,15 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// nurbs_grid_factory
+// grid_factory
 
-k3d::iplugin_factory& nurbs_grid_factory()
+k3d::iplugin_factory& grid_factory()
 {
-	return nurbs_grid::get_factory();
+	return grid::get_factory();
 }
 
-} // namespace libk3dnurbs
+} // namespace nurbs
+
+} // namespace module
+
 
