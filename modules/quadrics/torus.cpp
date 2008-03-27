@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,23 +18,25 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the Torus K-3D object, which renders a RenderMan torus primitive
-		\author Tim Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Tim Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
 #include "detail.h"
 
-namespace
+namespace module
+{
+
+namespace quadrics
 {
 
 /////////////////////////////////////////////////////////////////////////////
 // torus
 
 class torus :
-	public libk3dconics::conic
+	public quadric
 {
-	typedef libk3dconics::conic base;
+	typedef quadric base;
 
 public:
 	torus(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -189,11 +191,6 @@ private:
 	std::vector<GLfloat> m_gl_control_points;
 };
 
-} // namespace
-
-namespace libk3dconics
-{
-
 /////////////////////////////////////////////////////////////////////////////
 // torus_factory
 
@@ -202,5 +199,7 @@ k3d::iplugin_factory& torus_factory()
 	return torus::get_factory();
 }
 
-} // namespace libk3dconics
+} // namespace quadrics
+
+} // namespace module
 

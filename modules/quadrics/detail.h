@@ -1,8 +1,8 @@
-#ifndef CONICS_DETAIL_H
-#define CONICS_DETAIL_H
+#ifndef QUADRICS_DETAIL_H
+#define QUADRICS_DETAIL_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/bounded.h>
@@ -43,23 +43,26 @@
 #include <k3dsdk/snappable.h>
 #include <k3dsdk/transformable.h>
 
-namespace libk3dconics
+namespace module
+{
+
+namespace quadrics
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// conic
+// quadric
 
-class conic :
+class quadric :
 	public k3d::snappable<k3d::gl::renderable<k3d::ri::renderable<k3d::material_sink<k3d::bounded<k3d::transformable<k3d::persistent<k3d::node_change_signal<k3d::node> > > > > > > >
 {
 	typedef k3d::snappable<k3d::gl::renderable<k3d::ri::renderable<k3d::material_sink<k3d::bounded<k3d::transformable<k3d::persistent<k3d::node_change_signal<k3d::node> > > > > > > > base;
 
 public:
-	conic(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	quadric(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		add_snap_source(new k3d::snap_source(_("Center"), sigc::mem_fun(*this, &conic::center_source_position), sigc::mem_fun(*this, &conic::center_source_orientation)));
-		add_snap_target(new k3d::snap_target(_("Center"), sigc::mem_fun(*this, &conic::center_target_position), sigc::mem_fun(*this, &conic::center_target_orientation)));
+		add_snap_source(new k3d::snap_source(_("Center"), sigc::mem_fun(*this, &quadric::center_source_position), sigc::mem_fun(*this, &quadric::center_source_orientation)));
+		add_snap_target(new k3d::snap_target(_("Center"), sigc::mem_fun(*this, &quadric::center_target_position), sigc::mem_fun(*this, &quadric::center_target_orientation)));
 	}
 
 private:
@@ -87,6 +90,9 @@ private:
 	}
 };
 
-} // namespace libk3dconics
+} // namespace quadrics
 
-#endif // CONICS_DETAIL_H
+} // namespace module
+
+#endif // QUADRICS_DETAIL_H
+

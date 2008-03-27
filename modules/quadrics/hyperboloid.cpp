@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,22 +18,24 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the Hyperboloid K-3D object, which renders a RenderMan hyperboloid primitive
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
 #include "detail.h"
 
-namespace
+namespace module
+{
+
+namespace quadrics
 {
 
 /////////////////////////////////////////////////////////////////////////////
 // hyperboloid
 
 class hyperboloid :
-	public libk3dconics::conic
+	public quadric
 {
-	typedef libk3dconics::conic base;
+	typedef quadric base;
 
 public:
 	hyperboloid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -208,11 +210,6 @@ private:
 	std::vector<GLfloat> m_gl_control_points;
 };
 
-} // namespace
-
-namespace libk3dconics
-{
-
 /////////////////////////////////////////////////////////////////////////////
 // hyperboloid_factory
 
@@ -221,5 +218,7 @@ k3d::iplugin_factory& hyperboloid_factory()
 	return hyperboloid::get_factory();
 }
 
-} // namespace libk3dconics
+} // namespace quadrics
+
+} // namespace module
 
