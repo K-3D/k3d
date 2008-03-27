@@ -248,8 +248,6 @@ K3D_ADD_TEST(python.api.renderman.attributes.py PYTHON)
 K3D_ADD_TEST(python.api.renderman.options.py PYTHON)
 K3D_ADD_TEST(python.api.user_properties.py PYTHON)
 
-K3D_ADD_TEST(share.scripts.py PYTHON)
-
 K3D_ADD_TEST(ngui.startup K3DSCRIPT NGUI)
 K3D_ADD_TEST(ngui.menu.activate.001 K3DSCRIPT NGUI)
 K3D_ADD_TEST(ngui.menu.activate.002 K3DSCRIPT NGUI)
