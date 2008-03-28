@@ -32,6 +32,8 @@
 
 #include <gtkmm/box.h>
 
+#include <memory>
+
 namespace Gtk { class Button; }
 namespace Gtk { class ComboBox; }
 namespace k3d { class istate_recorder; }

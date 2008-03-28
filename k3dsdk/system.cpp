@@ -35,6 +35,7 @@
 #include <boost/tokenizer.hpp>
 
 #include <cmath>
+#include <cstring>
 
 #include <sys/stat.h>
 

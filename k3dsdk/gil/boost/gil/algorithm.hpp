@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <typeinfo>
 #include <algorithm>
 #include <iterator>
 #include <memory>

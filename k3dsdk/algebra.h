@@ -30,6 +30,7 @@
 #include "vectors.h"
 
 #include <cfloat>
+#include <cstring>
 
 /****************************************************************
 *

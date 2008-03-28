@@ -32,6 +32,8 @@
 
 #include <gtkmm/button.h>
 
+#include <memory>
+
 namespace Gtk { class DrawingArea; }
 namespace k3d { class istate_recorder; }
 

@@ -26,6 +26,8 @@
 #include "socket.h"
 #include "string_cast.h"
 
+#include <cstring>
+
 #ifdef K3D_API_WIN32
 
 	#include "winsock2.h"

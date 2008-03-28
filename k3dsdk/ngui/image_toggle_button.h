@@ -27,6 +27,8 @@
 
 #include "toggle_button.h"
 
+#include <memory>
+
 // Forward declarations
 namespace Gtk { class Image; }
 namespace Gdk { class Pixbuf; }

@@ -33,6 +33,8 @@
 #include <gtkmm/comboboxentry.h>
 #include <gtkmm/liststore.h>
 
+#include <memory>
+
 // Forward declarations
 namespace k3d { class istate_recorder; }
 

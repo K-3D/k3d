@@ -35,6 +35,8 @@
 #include <iomanip>
 #include <iostream>
 
+#include <cstring>
+
 namespace k3d
 {
 

@@ -31,6 +31,8 @@
 
 #include <gtkmm/table.h>
 
+#include <memory>
+
 // Forward declarations
 namespace Gtk { class Button; }
 namespace k3d { class iproperty; }

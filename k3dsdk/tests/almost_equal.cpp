@@ -7,6 +7,8 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <limits>
+
 template<typename T>
 void test_almost_equal(const T& A, const T& B, const boost::uint64_t Threshold)
 {

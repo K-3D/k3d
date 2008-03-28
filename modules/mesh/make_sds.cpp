@@ -66,7 +66,7 @@ public:
 			if (interpolateboundary)
 			{
 				boost::shared_ptr<tags_t> tags(new tags_t(types->size()));
-				std::fill(tags->begin(), tags->end(), "interpolateboundary");
+				std::fill(tags->begin(), tags->end(), std::string("interpolateboundary"));
 				polyhedra->constant_data["interpolateboundary"] = tags;
 			}
 		}

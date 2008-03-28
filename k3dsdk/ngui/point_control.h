@@ -31,6 +31,8 @@
 
 #include <gtkmm/table.h>
 
+#include <memory>
+
 namespace Gtk { class Button; }
 namespace k3d { class iproperty; }
 namespace k3d { class istate_recorder; }

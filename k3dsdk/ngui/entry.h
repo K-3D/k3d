@@ -31,6 +31,8 @@
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iwritable_property.h>
 
+#include <memory>
+
 namespace k3d { class istate_recorder; }
 
 namespace libk3dngui

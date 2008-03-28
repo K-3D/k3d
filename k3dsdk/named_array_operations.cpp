@@ -35,6 +35,8 @@
 
 #include <functional>
 
+#include <limits>
+
 namespace k3d
 {
 
