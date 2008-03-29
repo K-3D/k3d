@@ -87,21 +87,7 @@ void edge_vertex::update()
 // sds_mipmap
 ///////
 
-sds_mipmap::sds_mipmap(patch_border & Top, patch_border & Right, patch_border & Bottom, patch_border & Left, const point_array & ParentPoints, int Level, int Size) :
-	m_top(Top),
-	m_right(Right),
-	m_bottom(Bottom),
-	m_left(Left),
-	m_parent_points(ParentPoints),
-	m_level(Level),
-	m_size(Size),
-	m_valid(false),
-	m_normals_valid(false),
-	m_nurbs_valid(false),
-	m_points(k3d::multi_array::extents<2>(Size, Size)),
-	m_normals(k3d::multi_array::extents<2>(Size, Size)),
-	m_nurbs(k3d::multi_array::extents<2>(Size + 4, Size + 4)),
-	m_next_level(0)
+sds_mipmap::sds_mipmap(patch_border & Top, patch_border & Right, patch_border & Bottom, patch_border & Left, const point_array & ParentPoints, int Level, int Size) : m_top(Top), m_right(Right), m_bottom(Bottom), m_left(Left), m_parent_points(ParentPoints), m_level(Level), m_size(Size), m_valid(false), m_normals_valid(false), m_nurbs_valid(false), m_points(boost::extents[Size][Size]), m_normals(boost::extents[Size][Size]), m_nurbs(boost::extents[Size+4][Size+4]), m_next_level(0)
 {
 	// initialise interior points and normals
 	for(int i = 1; i < m_size-1; ++i)
@@ -965,7 +951,7 @@ void corner_smoothing::A(unsigned long n, positions_t & Q10)
 	{
 		double a = static_cast<double>(2/n);
 		double b = 2.0*pi/static_cast<double>(n);
-		A = new matrix(k3d::multi_array::extents<2>(n, n));
+		A = new matrix(boost::extents[n][n]);
 		m_A[n-1] = A;
 		for(unsigned long i = 0; i < n; ++i)
 		{
@@ -997,7 +983,7 @@ void corner_smoothing::B(unsigned long n, positions_t & Q)
 	matrix* B;
 	if(m_B[n-1] == 0)
 	{
-		B = new matrix(k3d::multi_array::extents<2>(n, n));
+		B = new matrix(boost::extents[n][n]);
 		m_B[n-1] = B;
 		if((n % 2) != 0)
 		{
@@ -1138,7 +1124,7 @@ void higher_level_cache::generate(const int level, facevertices_t& Faces)
 		int n = (*face)->corners.size();
 		for(int i = 0; i < n; ++i)
 		{
-			point_array& parent = *(new point_array(k3d::multi_array::extents<2>(2, 2)));
+			point_array& parent = *(new point_array(boost::extents[2][2]));
 			parent[0][0] = &((*face)->edge_vertices[(n+i-1)%n]->vertex);
 			parent[0][1] = &((*face)->corners[i]->vertex);
 			parent[1][1] = &((*face)->edge_vertices[i]->vertex);
