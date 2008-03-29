@@ -31,10 +31,12 @@
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
 
-#ifdef K3D_API_DARWIN
-	#define GLU_NURBS_CALLBACK GLvoid(*)(...)
-#else // K3D_API_DARWIN
-	#define GLU_NURBS_CALLBACK void(*)()
+#if defined K3D_API_DARWIN
+	#define GLU_NURBS_CALLBACK(callback) (GLvoid(*)(...))callback
+#elif defined K3D_API_WIN32
+	#define GLU_NURBS_CALLBACK(callback) (_GLUfuncptr)callback
+#else
+	#define GLU_NURBS_CALLBACK(callback) (void(*)())callback
 #endif // !K3D_API_DARWIN
 
 namespace module
@@ -69,7 +71,7 @@ public:
 		gluNurbsProperty(nurbs_renderer, GLU_CULLING, GL_TRUE);
 		gluNurbsProperty(nurbs_renderer, GLU_DISPLAY_MODE, GLU_FILL);
 		gluNurbsProperty(nurbs_renderer, GLU_SAMPLING_TOLERANCE, 50);
-		gluNurbsCallback(nurbs_renderer, GLU_ERROR, (GLU_NURBS_CALLBACK)on_nurbs_error);
+		gluNurbsCallback(nurbs_renderer, GLU_ERROR, GLU_NURBS_CALLBACK(on_nurbs_error));
 	}
 
 	~nurbs_patch_painter()
