@@ -18,18 +18,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/itransform_array_2d.h>
+#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
 
-#include <boost/multi_array.hpp>
 #include <iterator>
 
 namespace libk3dmesh

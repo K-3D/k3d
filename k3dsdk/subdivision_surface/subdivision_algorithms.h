@@ -25,8 +25,7 @@
 */
 
 #include <k3dsdk/mesh.h>
-
-#include <boost/multi_array.hpp>
+#include <k3dsdk/multi_array.h>
 
 #include <cmath>
 #include <map>

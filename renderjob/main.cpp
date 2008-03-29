@@ -35,7 +35,7 @@
 #include <iostream>
 #include <vector>
 
-namespace
+namespace detail
 {
 
 typedef std::vector<std::string> string_array;
@@ -149,7 +149,7 @@ void setup_logging(const std::string& ProcessName)
 	k3d::log_minimum_level(g_minimum_log_level);
 }
 
-} // namespace
+} // namespace detail
 
 /// Program main
 int main(int argc, char* argv[])
@@ -166,38 +166,37 @@ int main(int argc, char* argv[])
 	const std::string program_name = k3d::filesystem::native_path(k3d::ustring::from_utf8(std::string(argv[0]))).leaf().raw();
 
 	// Put our command-line arguments in a more useable form ...
-	string_array options(&argv[1], &argv[argc]);
+	detail::string_array options(&argv[1], &argv[argc]);
 
 	// Print a "help" message ...
 	if(std::count(options.begin(), options.end(), "-h") || std::count(options.begin(), options.end(), "--help"))
 	{
-		usage(program_name, std::cout);
+		detail::usage(program_name, std::cout);
 		return 0;
 	}
 
 	// Print version data ...
 	if(std::count(options.begin(), options.end(), "--version"))
 	{
-		print_version(std::cout);
+		detail::print_version(std::cout);
 		return 0;
 	}
 
 	// Otherwise we should have a minimum of one argument ...
 	if(options.size() < 1)
 	{
-		usage(program_name, k3d::log());
+		detail::usage(program_name, k3d::log());
 		return 1;
 	}
 
 	// Setup logging right away ...
-	setup_logging(program_name);
+	detail::setup_logging(program_name);
 
 	// Each remaining argument should be a job path to render ...
 	int result = 0;
 	for(unsigned long j = 0; j < options.size(); j++)
 	{
-		if(!render_job(
-			k3d::filesystem::native_path(k3d::ustring::from_utf8(options[j]))))
+		if(!detail::render_job(k3d::filesystem::native_path(k3d::ustring::from_utf8(options[j]))))
 			result = 1;
 	}
 

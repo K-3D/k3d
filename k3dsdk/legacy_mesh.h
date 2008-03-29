@@ -22,12 +22,12 @@
 
 #include "algebra.h"
 #include "bounding_box3.h"
+#include "multi_array.h"
 #include "selectable.h"
 #include "utility.h"
 
 #include <boost/any.hpp>
 #include <boost/array.hpp>
-#include <boost/multi_array.hpp>
 #include <boost/tuple/tuple.hpp>
 
 #include <map>

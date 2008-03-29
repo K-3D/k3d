@@ -80,8 +80,10 @@ public:
 		unsigned long point_rows = rows + 1;
 		unsigned long point_columns = cols + 1;
 
+		boost::multi_array_types::extent_gen extents;
+
 		// Create points ...
-		boost::multi_array<k3d::legacy::point*, 2> points(boost::extents[point_rows][point_columns]);
+		boost::multi_array<k3d::legacy::point*, 2> points(extents[point_rows][point_columns]);
 		for(unsigned long column = 0; column <= cols; ++column)
 			for(unsigned long row = 0; row <= rows; ++row)
 			{
@@ -94,7 +96,7 @@ public:
 			}
 
 		// Create edges ...
-		boost::multi_array<k3d::legacy::split_edge*, 3> edges(boost::extents[rows][cols][4]);
+		boost::multi_array<k3d::legacy::split_edge*, 3> edges(extents[rows][cols][4]);
 		for(unsigned long row = 0; row != rows; ++row)
 			for(unsigned long column = 0; column != cols; ++column)
 			{
@@ -200,7 +202,7 @@ public:
 
 		// Last plane
 		// Create points ...
-		boost::multi_array<k3d::legacy::point*, 2> last_points(boost::extents[point_rows][point_columns]);
+		boost::multi_array<k3d::legacy::point*, 2> last_points(extents[point_rows][point_columns]);
 		for(unsigned long column = 1; column <= cols-1; ++column)
 			for(unsigned long row = 1; row <= rows-1; ++row)
 			{
@@ -230,7 +232,7 @@ public:
 			last_points[rows-row][0] = boundary_edges[2*cols+rows+row]->vertex;
 
 		// Create edges ...
-		boost::multi_array<k3d::legacy::split_edge*, 3> last_edges(boost::extents[rows][cols][4]);
+		boost::multi_array<k3d::legacy::split_edge*, 3> last_edges(extents[rows][cols][4]);
 		for(unsigned long row = 0; row != rows; ++row)
 			for(unsigned long column = 0; column != cols; ++column)
 			{

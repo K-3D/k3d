@@ -32,8 +32,6 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/utility.h>
 
-#include <boost/multi_array.hpp>
-
 #include <iomanip>
 #include <iterator>
 #include <set>

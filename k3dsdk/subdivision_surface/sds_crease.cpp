@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Bart Janssens <bart.janssens@lid.kviv.be>
+	\author Bart Janssens <bart.janssens@lid.kviv.be>
 */
 
 #include "sds_crease.h"
@@ -26,8 +26,6 @@
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/types_ri.h>
 #include <k3dsdk/result.h>
-
-#include <boost/multi_array.hpp>
 
 #include <cmath>
 #include <map>

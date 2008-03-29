@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -33,7 +33,13 @@ using namespace k3d::xml;
 #include <cassert>
 #include <iostream>
 
-namespace
+namespace k3d
+{
+
+namespace sl
+{
+
+namespace detail
 {
 
 // Define some character constants for parsing ...
@@ -501,13 +507,7 @@ k3d::sl::shaders_t parse_shaders(token_collection_t& InputTokens, const k3d::fil
 	return results;
 }
 
-} // namespace
-
-namespace k3d
-{
-
-namespace sl
-{
+} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // argument
@@ -827,10 +827,10 @@ std::istream& operator>>(std::istream& Stream, shader::type_t& Value)
 
 shaders_t parse_source(std::istream& Stream, const filesystem::path& SourcePath)
 {
-	token_collection_t tokens;
-	parse_stream(Stream, tokens);
+	detail::token_collection_t tokens;
+	detail::parse_stream(Stream, tokens);
 
-	return parse_shaders(tokens, SourcePath);
+	return detail::parse_shaders(tokens, SourcePath);
 }
 
 shaders_t parse_metafile(std::istream& Stream, const filesystem::path& SourcePath, const filesystem::path& MetafilePath)

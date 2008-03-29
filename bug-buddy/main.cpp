@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,8 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Provides the k3d-bug-buddy application, which helps users format and send useful bug reports
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -59,7 +58,7 @@
 #include <sstream>
 #include <vector>
 
-namespace
+namespace detail
 {
 
 typedef std::vector<std::string> string_array;
@@ -324,7 +323,7 @@ void setup_logging(const std::string& ProcessName)
 	k3d::log_minimum_level(g_minimum_log_level);
 }
 
-} // namespace
+} // namespace detail
 
 /// Program main
 int main(int argc, char* argv[])
@@ -343,26 +342,26 @@ int main(int argc, char* argv[])
         Gtk::Main main(&argc, &argv);
 
         // Put our command-line arguments in a more useable form ...
-        string_array options(&argv[1], &argv[argc]);
+        detail::string_array options(&argv[1], &argv[argc]);
 
         // Print a "help" message ...
         if(std::count(options.begin(), options.end(), "-h") || std::count(options.begin(), options.end(), "--help"))
         {
-            usage(program_name, std::cout);
+            detail::usage(program_name, std::cout);
             return 0;
         }
 
         // Print version data ...
         if(std::count(options.begin(), options.end(), "--version"))
         {
-            print_version(std::cout);
+            detail::print_version(std::cout);
             return 0;
         }
 
         // Setup logging right away ...
-        setup_logging(program_name);
+        detail::setup_logging(program_name);
 
-        main_window window;
+        detail::main_window window;
         main.run(window);
 
         return 0;

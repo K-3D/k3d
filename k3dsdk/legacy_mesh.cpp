@@ -934,7 +934,7 @@ void triangulate(const polyhedron::faces_t& Faces, polyhedron::faces_t& NewFaces
 void add_unit_cube(mesh& Mesh, polyhedron& Polyhedron, imaterial* const Material)
 {
 	// Create points ...
-	boost::multi_array<point*, 3> points(boost::extents[2][2][2]);
+	boost::multi_array<point*, 3> points(k3d::multi_array::extents<3>(2, 2, 2));
 	points[0][0][0] = new point(-0.5, -0.5, -0.5);
 	points[1][0][0] = new point(0.5, -0.5, -0.5);
 	points[1][1][0] = new point(0.5, 0.5, -0.5);
@@ -950,7 +950,7 @@ void add_unit_cube(mesh& Mesh, polyhedron& Polyhedron, imaterial* const Material
 				Mesh.points.push_back(points[i][j][k]);
 
 	// Create edges ...
-	boost::multi_array<split_edge*, 2> edges(boost::extents[6][4]);
+	boost::multi_array<split_edge*, 2> edges(k3d::multi_array::extents<2>(6, 4));
 	edges[0][0] = new split_edge(points[0][1][0]);
 	edges[0][1] = new split_edge(points[1][1][0]);
 	edges[0][2] = new split_edge(points[1][0][0]);
@@ -1038,7 +1038,7 @@ grid_results_t add_grid(mesh& Mesh, polyhedron& Polyhedron, const unsigned long 
 	unsigned long point_columns = face_columns + (StitchSide ? 0 : 1);
 
 	// Create points ...
-	boost::multi_array<point*, 2> points(boost::extents[point_rows][point_columns]);
+	boost::multi_array<point*, 2> points(k3d::multi_array::extents<2>(point_rows, point_columns));
 	for(unsigned long row = 0; row != point_rows; ++row)
 	{
 		for(unsigned long column = 0; column != point_columns; ++column)
@@ -1049,7 +1049,7 @@ grid_results_t add_grid(mesh& Mesh, polyhedron& Polyhedron, const unsigned long 
 	}
 
 	// Create edges ...
-	boost::multi_array<split_edge*, 3> edges(boost::extents[face_rows][face_columns][4]);
+	boost::multi_array<split_edge*, 3> edges(k3d::multi_array::extents<2>(face_rows, face_columns));
 	for(unsigned long row = 0; row != face_rows; ++row)
 	{
 		for(unsigned long column = 0; column != face_columns; ++column)
@@ -1081,7 +1081,7 @@ grid_results_t add_grid(mesh& Mesh, polyhedron& Polyhedron, const unsigned long 
 	}
 
 	// Create faces ...
-	boost::multi_array<face*, 2> faces(boost::extents[face_rows][face_columns]);
+	boost::multi_array<face*, 2> faces(k3d::multi_array::extents<2>(face_rows, face_columns));
 	for(unsigned long row = 0; row != face_rows; ++row)
 	{
 		for(unsigned long column = 0; column != face_columns; ++column)

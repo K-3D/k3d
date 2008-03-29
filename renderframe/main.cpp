@@ -56,7 +56,7 @@ using namespace k3d::xml;
 
 extern char** environ;
 
-namespace
+namespace detail
 {
 
 typedef std::vector<k3d::string_t> string_array;
@@ -364,7 +364,7 @@ void setup_logging(const k3d::string_t& ProcessName)
 	k3d::log_minimum_level(g_minimum_log_level);
 }
 
-} // namespace
+} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // main
@@ -375,37 +375,37 @@ int main(int argc, char* argv[])
 	const k3d::string_t program_name = k3d::filesystem::native_path(k3d::ustring::from_utf8(k3d::string_t(argv[0]))).leaf().raw();
 
 	// Put our arguments in a more useable form ...
-	string_array options(&argv[1], &argv[argc]);
+	detail::string_array options(&argv[1], &argv[argc]);
 
 	// Print a "help" message ...
 	if(std::count(options.begin(), options.end(), "-h") || std::count(options.begin(), options.end(), "--help"))
 	{
-		usage(program_name, std::cout);
+		detail::usage(program_name, std::cout);
 		return 0;
 	}
 
 	// Print version data ...
 	if(options.end() != std::find(options.begin(), options.end(), "--version"))
 	{
-		print_version(std::cout);
+		detail::print_version(std::cout);
 		return 0;
 	}
 
 	// Otherwise we should have a minimum of two arguments ...
 	if(options.size() < 1)
 	{
-		usage(program_name, k3d::log());
+		detail::usage(program_name, k3d::log());
 		return 1;
 	}
 
 	// Setup logging right away ...
-	setup_logging(program_name);
+	detail::setup_logging(program_name);
 
 	// Each remaining argument should be a frame path to render ...
 	int result = 0;
 	for(unsigned long j = 0; j < options.size(); j++)
 	{
-		if(!render_frame(k3d::filesystem::native_path(k3d::ustring::from_utf8(options[j]))))
+		if(!detail::render_frame(k3d::filesystem::native_path(k3d::ustring::from_utf8(options[j]))))
 		    result = 1;
 	}
 
