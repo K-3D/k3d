@@ -9,9 +9,9 @@
 
 #Add the required user properties
 if not hasattr(Node, "input_mesh"):
-	Node.add_user_property("k3d::mesh*", "input_mesh", "Input Mesh", "The mesh that will have its points counted")
+	Node.create_property("k3d::mesh*", "input_mesh", "Input Mesh", "The mesh that will have its points counted")
 if not hasattr(Node, "point_count"):
-	Node.add_user_property("k3d::double_t", "point_count", "Point Count", "Point count for the mesh")
+	Node.create_property("k3d::double_t", "point_count", "Point Count", "Point count for the mesh")
 
 mesh = Node.input_mesh
 if mesh:
