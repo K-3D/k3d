@@ -263,6 +263,12 @@ def setup_scalar_source_test(source_name):
 
 def bitmap_size_comparison(bitmap, width, height):
 
+	# As a temporary measure, print results to stdout until CDash fully supports <DartMeasurement>
+	print """Bitmap Width: """ + str(bitmap.width())
+	print """Bitmap Height: """ + str(bitmap.height())
+	print """Target Width: """ + str(width)
+	print """Target Height: """ + str(height)
+
 	print """<DartMeasurement name="Bitmap Width" type="numeric/float">""" + str(bitmap.width()) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Bitmap Height" type="numeric/float">""" + str(bitmap.height()) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Target Width" type="numeric/float">""" + str(width) + """</DartMeasurement>"""
@@ -295,6 +301,9 @@ def mesh_comparison(document, mesh, mesh_name, threshold):
 		raise Exception("missing mesh comparison input")
 
 	if not difference.equal:
+		# As a temporary measure, print results to stdout until CDash fully supports <DartMeasurement>
+		print k3d.print_diff(mesh.pipeline_value(), reference.output_mesh, threshold)
+
 		print """<DartMeasurement name="Mesh Difference" type="text/text">\n"""
 		print k3d.print_diff(mesh.pipeline_value(), reference.output_mesh, threshold)
 		print """</DartMeasurement>\n"""
@@ -304,12 +313,20 @@ def mesh_comparison(document, mesh, mesh_name, threshold):
 
 def mesh_area_comparison(calculated_area, expected_area):
 	if calculated_area != expected_area:
+		# As a temporary measure, print results to stdout until CDash fully supports <DartMeasurement>
+		print """Calculated Area: """ + str(calculated_area)
+		print """Expected Area: """ + str(expected_area)
+
 		print """<DartMeasurement name="Calculated Area" type="numeric/float">""" + str(calculated_area) + """</DartMeasurement>"""
 		print """<DartMeasurement name="Expected Area" type="numeric/float">""" + str(expected_area) + """</DartMeasurement>"""
 		raise Exception("incorrect mesh area")
 
 def mesh_volume_comparison(calculated_volume, expected_volume):
 	if calculated_volume != expected_volume:
+		# As a temporary measure, print results to stdout until CDash fully supports <DartMeasurement>
+		print """Calculated Volume: """ + str(calculated_volume)
+		print """Expected Volume: """ + str(expected_volume)
+
 		print """<DartMeasurement name="Calculated Volume" type="numeric/float">""" + str(calculated_volume) + """</DartMeasurement>"""
 		print """<DartMeasurement name="Expected Volume" type="numeric/float">""" + str(expected_volume) + """</DartMeasurement>"""
 		raise Exception("incorrect mesh volume")
@@ -348,6 +365,12 @@ def image_comparison(document, image, image_name, threshold):
 	pixel_difference = difference.difference
 	difference_measurement = float(pixel_difference) / float(pixel_count)
 
+	# As a temporary measure, print results to stdout until CDash fully supports <DartMeasurement>
+	print """Pixel Difference: """ + str(pixel_difference)
+	print """Pixel Count: """ + str(pixel_count)
+	print """Difference: """ + str(difference_measurement)
+	print """Threshold: """ + str(threshold)
+
 	print """<DartMeasurement name="Pixel Difference" type="numeric/float">""" + str(pixel_difference) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Pixel Count" type="numeric/float">""" + str(pixel_count) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Difference" type="numeric/float">""" + str(difference_measurement) + """</DartMeasurement>"""
@@ -361,6 +384,10 @@ def image_comparison(document, image, image_name, threshold):
 		raise "pixel difference exceeds threshold"
 
 def scalar_comparison(value, expected_value):
+	# As a temporary measure, print results to stdout until CDash fully supports <DartMeasurement>
+	print """Value: """ + str(value)
+	print """Expected Value: """ + str(expected_value)
+
 	print """<DartMeasurement name="Value" type="numeric/float">""" + str(value) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Expected Value" type="numeric/float">""" + str(expected_value) + """</DartMeasurement>"""
 	if value != expected_value:
