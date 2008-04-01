@@ -30,6 +30,14 @@
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
 
+#if defined K3D_API_DARWIN
+	#define GLU_NURBS_CALLBACK(callback) (GLvoid(*)(...))callback
+#elif defined K3D_API_WIN32
+	#define GLU_NURBS_CALLBACK(callback) (_GLUfuncptr)callback
+#else
+	#define GLU_NURBS_CALLBACK(callback) (void(*)())callback
+#endif // !K3D_API_DARWIN
+
 namespace module
 {
 
@@ -38,6 +46,11 @@ namespace opengl
 
 namespace painters
 {
+
+static void on_nurbs_error(GLenum ErrorCode)
+{
+		k3d::log() << debug << "NURBS error: " << gluErrorString(ErrorCode) << std::endl;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // nurbs_curve_painter
@@ -55,6 +68,7 @@ public:
 		// Important!  We load our own matrices for efficiency (saves round-trips to the server) and to prevent problems with selection
 		gluNurbsProperty(nurbs_renderer, GLU_AUTO_LOAD_MATRIX, GL_FALSE);
 		gluNurbsProperty(nurbs_renderer, GLU_CULLING, GL_TRUE);
+		gluNurbsCallback(nurbs_renderer, GLU_ERROR, GLU_NURBS_CALLBACK(on_nurbs_error));
 	}
 
 	~nurbs_curve_painter()
