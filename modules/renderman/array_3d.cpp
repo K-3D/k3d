@@ -51,9 +51,9 @@ public:
 		base(Factory, Document),
 		m_source(init_owner(*this) + init_name("source") + init_label(_("Source")) + init_description(_("Source")) + init_value<k3d::ri::irenderable*>(0)),
 		m_layout(init_owner(*this) + init_name("layout") + init_label(_("Layout")) + init_description(_("Layout")) + init_value<k3d::itransform_array_3d*>(0)),
-		m_count1(init_owner(*this) + init_name("count1") + init_label(_("Count 1")) + init_description(_("Dimension 1 Count")) + init_value(5) + init_constraint(constraint::minimum(0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
-		m_count2(init_owner(*this) + init_name("count2") + init_label(_("Count 2")) + init_description(_("Dimension 2 Count")) + init_value(5) + init_constraint(constraint::minimum(0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
-		m_count3(init_owner(*this) + init_name("count3") + init_label(_("Count 3")) + init_description(_("Dimension 3 Count")) + init_value(5) + init_constraint(constraint::minimum(0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar)))
+		m_count1(init_owner(*this) + init_name("count1") + init_label(_("Count 1")) + init_description(_("Dimension 1 Count")) + init_value(5) + init_constraint(constraint::minimum<k3d::int32_t>(0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
+		m_count2(init_owner(*this) + init_name("count2") + init_label(_("Count 2")) + init_description(_("Dimension 2 Count")) + init_value(5) + init_constraint(constraint::minimum<k3d::int32_t>(0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
+		m_count3(init_owner(*this) + init_name("count3") + init_label(_("Count 3")) + init_description(_("Dimension 3 Count")) + init_value(5) + init_constraint(constraint::minimum<k3d::int32_t>(0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_source.changed_signal().connect(make_async_redraw_slot());
 		m_layout.changed_signal().connect(make_async_redraw_slot());

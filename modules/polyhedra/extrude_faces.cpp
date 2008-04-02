@@ -792,7 +792,7 @@ public:
 	extrude_faces(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_distance(init_owner(*this) + init_name("distance") + init_label(_("Distance")) + init_description(_("Distance between original and new faces")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_segments(init_owner(*this) + init_name("segments") + init_label(_("Segments")) + init_description(_("Segment number between original and new faces")) + init_value(1) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_segments(init_owner(*this) + init_name("segments") + init_label(_("Segments")) + init_description(_("Segment number between original and new faces")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_inset(init_owner(*this) + init_name("inset") + init_label(_("Inset")) + init_description(_("Inset value for the new faces")) + init_value(0.0) + init_step_increment(0.02) + init_units(typeid(k3d::measurement::distance))),
 		m_direction(init_owner(*this) + init_name("direction") + init_label(_("Direction")) + init_description(_("Extrusion direction : inside / outside")) + init_value(INSIDE) + init_enumeration(direction_values())),
 		m_region(init_owner(*this) + init_name("region") + init_label(_("Region")) + init_description(_("Extrude neighbour faces as a single one (named a region)")) + init_value(true)),

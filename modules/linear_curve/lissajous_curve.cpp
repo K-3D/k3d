@@ -49,7 +49,7 @@ class lissajous_curve :
 public:
 	lissajous_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_edge_count(init_owner(*this) + init_name("edgecount") + init_label(_("Edge Count")) + init_description(_("Edge count")) + init_value(100) + init_constraint(constraint::minimum(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_edge_count(init_owner(*this) + init_name("edgecount") + init_label(_("Edge Count")) + init_description(_("Edge count")) + init_value(100) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_mamp(init_owner(*this) + init_name("mamp") + init_label(_("Modulation Amplitude")) + init_description(_("Modulation amplitude")) + init_value(0.05) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::distance))),
 		m_mfreq(init_owner(*this) + init_name("mfreq") + init_label(_("Modulation Frequency")) + init_description(_("Modulation frequency")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
 		m_mphase(init_owner(*this) + init_name("mphase") + init_label(_("Modulation Phase")) + init_description(_("Modulation phase")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),

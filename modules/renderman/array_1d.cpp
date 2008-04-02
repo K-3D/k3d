@@ -51,7 +51,7 @@ public:
 		base(Factory, Document),
 		m_source(init_owner(*this) + init_name("source") + init_label(_("Source")) + init_description(_("Source")) + init_value<k3d::ri::irenderable*>(0)),
 		m_layout(init_owner(*this) + init_name("layout") + init_label(_("Layout")) + init_description(_("Layout")) + init_value<k3d::itransform_array_1d*>(0)),
-		m_count(init_owner(*this) + init_name("count") + init_label(_("count")) + init_description(_("Count")) + init_value(5) + init_constraint(constraint::minimum(0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar)))
+		m_count(init_owner(*this) + init_name("count") + init_label(_("count")) + init_description(_("Count")) + init_value(5) + init_constraint(constraint::minimum<k3d::int32_t>(0)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_source.changed_signal().connect(make_async_redraw_slot());
 		m_layout.changed_signal().connect(make_async_redraw_slot());

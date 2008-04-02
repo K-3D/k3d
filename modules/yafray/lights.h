@@ -173,9 +173,9 @@ class photons :
 public:
 	photons(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base_t(Factory, Document),
-		m_photons(init_owner(*this) + init_name("photons") + init_label(_("photons")) + init_description(_("Photons")) + init_value(2000) + init_constraint(k3d::data::constraint::minimum(0))),
-		m_depth(init_owner(*this) + init_name("depth") + init_label(_("depth")) + init_description(_("Depth")) + init_value(1) + init_constraint(k3d::data::constraint::minimum(0))),
-		m_search(init_owner(*this) + init_name("search") + init_label(_("search")) + init_description(_("Search")) + init_value(100) + init_constraint(k3d::data::constraint::minimum(0)))
+		m_photons(init_owner(*this) + init_name("photons") + init_label(_("photons")) + init_description(_("Photons")) + init_value(2000) + init_constraint(k3d::data::constraint::minimum<k3d::int32_t>(0))),
+		m_depth(init_owner(*this) + init_name("depth") + init_label(_("depth")) + init_description(_("Depth")) + init_value(1) + init_constraint(k3d::data::constraint::minimum<k3d::int32_t>(0))),
+		m_search(init_owner(*this) + init_name("search") + init_label(_("search")) + init_description(_("Search")) + init_value(100) + init_constraint(k3d::data::constraint::minimum<k3d::int32_t>(0)))
 	{
 	}
 

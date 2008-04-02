@@ -48,10 +48,10 @@ class checker :
 public:
 	checker(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Bitmap width")) + init_value(64L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
-		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Bitmap height")) + init_value(64L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
-		m_check_width(init_owner(*this) + init_name("check_width") + init_label(_("Check width")) + init_description(_("Check (rectangle) width")) + init_value(8L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
-		m_check_height(init_owner(*this) + init_name("check_height") + init_label(_("Check height")) + init_description(_("Check (rectangle) height")) + init_value(8L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
+		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Bitmap width")) + init_value(64L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
+		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Bitmap height")) + init_value(64L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
+		m_check_width(init_owner(*this) + init_name("check_width") + init_label(_("Check width")) + init_description(_("Check (rectangle) width")) + init_value(8L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
+		m_check_height(init_owner(*this) + init_name("check_height") + init_label(_("Check height")) + init_description(_("Check (rectangle) height")) + init_value(8L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
 		m_color1(init_owner(*this) + init_name("color1") + init_label(_("Color 1")) + init_description(_("First check color")) + init_value(k3d::color(1, 1, 1))),
 		m_color2(init_owner(*this) + init_name("color2") + init_label(_("Color 2")) + init_description(_("Second check color")) + init_value(k3d::color(0, 0, 0)))
 	{

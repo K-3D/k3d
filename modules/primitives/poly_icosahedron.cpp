@@ -46,7 +46,7 @@ class poly_icosahedron :
 public:
 	poly_icosahedron(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-//		m_tessellation_level(init_owner(*this) + init_name("tessellation_level") + init_label(_("Tessellation level")) + init_description(_("Tessellation Level")) + init_value(3) + init_constraint(constraint::minimum(1L)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+//		m_tessellation_level(init_owner(*this) + init_name("tessellation_level") + init_label(_("Tessellation level")) + init_description(_("Tessellation Level")) + init_value(3) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Sphere radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
 //		m_tessellation_level.changed_signal().connect(make_topology_changed_slot());

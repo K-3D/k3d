@@ -46,7 +46,7 @@ class weld :
 public:
 	weld(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_distance(init_owner(*this) + init_name("distance") + init_label(_("Distance")) + init_description(_("Maximum distance between points")) + init_value(0.001) + init_step_increment(0.0001) + init_units(typeid(k3d::measurement::distance)) + init_constraint(constraint::minimum(0.0)))
+		m_distance(init_owner(*this) + init_name("distance") + init_label(_("Distance")) + init_description(_("Maximum distance between points")) + init_value(0.001) + init_step_increment(0.0001) + init_units(typeid(k3d::measurement::distance)) + init_constraint(constraint::minimum<double>(0.0)))
 	{
 		m_distance.changed_signal().connect(make_reset_mesh_slot());
 	}

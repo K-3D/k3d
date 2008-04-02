@@ -55,7 +55,7 @@ public:
 		m_diffuse_color(init_owner(*this) + init_name("diffuse_color") + init_label(_("Diffuse Color")) + init_description(_("Diffuse Color")) + init_value(k3d::color(1, 1, 1))),
 		m_specular_color(init_owner(*this) + init_name("specular_color") + init_label(_("Specular Color")) + init_description(_("Specular Color")) + init_value(k3d::color(0, 0, 0))),
 		m_emission_color(init_owner(*this) + init_name("emission_color") + init_label(_("Emission Color")) + init_description(_("Emission Color")) + init_value(k3d::color(0, 0, 0))),
-		m_shininess(init_owner(*this) + init_name("shininess") + init_label(_("Shininess")) + init_description(_("Shininess")) + init_value(64.0) + init_constraint(constraint::minimum(0.0, constraint::maximum(128.0))))
+		m_shininess(init_owner(*this) + init_name("shininess") + init_label(_("Shininess")) + init_description(_("Shininess")) + init_value(64.0) + init_constraint(constraint::minimum<double>(0.0, constraint::maximum<double>(128.0))))
 	{
 		m_ambient_color.changed_signal().connect(make_node_change_slot());
 		m_diffuse_color.changed_signal().connect(make_node_change_slot());

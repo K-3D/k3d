@@ -116,7 +116,7 @@ class poly_terrain_hfbm_implementation :
 public:
 	poly_terrain_hfbm_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_iterations(init_owner(*this) + init_name("iterations") + init_label(_("Iterations")) + init_description(_("Iterations")) + init_value(4) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_iterations(init_owner(*this) + init_name("iterations") + init_label(_("Iterations")) + init_description(_("Iterations")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_fractal_dimension(init_owner(*this) + init_name("dimension") + init_label(_("Dimension")) + init_description(_("Fractal dimension")) + init_value(0.5) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_lacunarity(init_owner(*this) + init_name("lacunarity") + init_label(_("Lacunarity")) + init_description(_("Lacunarity")) + init_value(0.6) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_octaves(init_owner(*this) + init_name("octaves") + init_label(_("Octaves")) + init_description(_("Octaves")) + init_value(4.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),

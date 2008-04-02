@@ -1437,7 +1437,7 @@ public:
 	polyhedron_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_document(Document),
-		m_number(init_owner(*this) + init_name("number") + init_label(_("Number")) + init_description(_("Polyhedron Number")) + init_value(1) + init_constraint(constraint::minimum(1, constraint::maximum(80))) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_number(init_owner(*this) + init_name("number") + init_label(_("Number")) + init_description(_("Polyhedron Number")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1, constraint::maximum<k3d::int32_t>(80))) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_dual(init_owner(*this) + init_name("dual") + init_label(_("Dual")) + init_description(_("Polyhedron's dual")) + init_value(false)),
 		m_size(init_owner(*this) + init_name("size") + init_label(_("Size")) + init_description(_("Polyhedron size (scale)")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar)))
 	{

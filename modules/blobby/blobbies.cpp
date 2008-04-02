@@ -50,9 +50,9 @@ public:
 		m_x(init_owner(*this) + init_name("x") + init_label(_("X Position")) + init_description(_("Position on X axis")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_y(init_owner(*this) + init_name("y") + init_label(_("Y Position")) + init_description(_("Position on Y axis")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_z(init_owner(*this) + init_name("z") + init_label(_("Z Position")) + init_description(_("Position on Z axis")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_size_x(init_owner(*this) + init_name("size_x") + init_label(_("X Size")) + init_description(_("Size on X axis")) + init_value(1.0) + init_step_increment(0.1) + init_constraint(constraint::minimum(0.1)) + init_units(typeid(k3d::measurement::distance))),
-		m_size_y(init_owner(*this) + init_name("size_y") + init_label(_("Y Size")) + init_description(_("Size on Y axis")) + init_value(1.0) + init_step_increment(0.1) + init_constraint(constraint::minimum(0.1)) + init_units(typeid(k3d::measurement::distance))),
-		m_size_z(init_owner(*this) + init_name("size_z") + init_label(_("Z Size")) + init_description(_("Size on Z axis")) + init_value(1.0) + init_step_increment(0.1) + init_constraint(constraint::minimum(0.1)) + init_units(typeid(k3d::measurement::distance))),
+		m_size_x(init_owner(*this) + init_name("size_x") + init_label(_("X Size")) + init_description(_("Size on X axis")) + init_value(1.0) + init_step_increment(0.1) + init_constraint(constraint::minimum<double>(0.1)) + init_units(typeid(k3d::measurement::distance))),
+		m_size_y(init_owner(*this) + init_name("size_y") + init_label(_("Y Size")) + init_description(_("Size on Y axis")) + init_value(1.0) + init_step_increment(0.1) + init_constraint(constraint::minimum<double>(0.1)) + init_units(typeid(k3d::measurement::distance))),
+		m_size_z(init_owner(*this) + init_name("size_z") + init_label(_("Z Size")) + init_description(_("Size on Z axis")) + init_value(1.0) + init_step_increment(0.1) + init_constraint(constraint::minimum<double>(0.1)) + init_units(typeid(k3d::measurement::distance))),
 		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Ellipsoid color")) + init_value(k3d::color(1, 1, 1)))
 	{
 		m_x.changed_signal().connect(make_reset_mesh_slot());

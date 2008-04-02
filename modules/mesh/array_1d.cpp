@@ -46,7 +46,7 @@ public:
 	array_1d_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_layout(init_owner(*this) + init_name("layout") + init_label(_("Layout")) + init_description(_("Layout")) + init_value<k3d::itransform_array_1d*>(0)),
-		m_count(init_owner(*this) + init_name("count") + init_label(_("Count")) + init_description(_("Number of mesh copies")) + init_value(5) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0)))
+		m_count(init_owner(*this) + init_name("count") + init_label(_("Count")) + init_description(_("Number of mesh copies")) + init_value(5) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0)))
 	{
 		m_layout.changed_signal().connect(make_reset_mesh_slot());
 		m_count.changed_signal().connect(make_reset_mesh_slot());

@@ -69,7 +69,7 @@ class select_n_sided :
 public:
 	select_n_sided(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_sides(init_owner(*this) + init_name("sides") + init_label(_("Side number")) + init_description(_("Gives chosen side number")) + init_value(5L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(1))),
+		m_sides(init_owner(*this) + init_name("sides") + init_label(_("Side number")) + init_description(_("Gives chosen side number")) + init_value(5L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
 		m_operator(init_owner(*this) + init_name("operator") + init_label(_("Operator")) + init_description(_("Selection operator comparing with side number")) + init_value(EQUAL) + init_enumeration(operator_values())),
 		m_component(init_owner(*this) + init_name("component") + init_label(_("Component type")) + init_description(_("Components to be selected (faces or edges)")) + init_value(FACES) + init_enumeration(component_values()))
 	{

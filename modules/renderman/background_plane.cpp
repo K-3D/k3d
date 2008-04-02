@@ -56,7 +56,7 @@ class background_plane :
 public:
 	background_plane(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_distance(init_owner(*this) + init_name("distance") + init_label(_("distance")) + init_description(_("Distance")) + init_value(1.0) + init_constraint(k3d::data::constraint::minimum(0.0, k3d::data::constraint::maximum(1.0))))
+		m_distance(init_owner(*this) + init_name("distance") + init_label(_("distance")) + init_description(_("Distance")) + init_value(1.0) + init_constraint(k3d::data::constraint::minimum<double>(0.0, k3d::data::constraint::maximum<double>(1.0))))
 	{
 	}
 

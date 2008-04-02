@@ -52,7 +52,7 @@ public:
 		m_parent_selected_mesh_color(init_owner(*this) + init_name("child_mesh_color") + init_label(_("Child Mesh Color")) + init_description(_("Color the mesh is drawn in when its parent is selected")) + init_value(SelectedParentMeshColor)),
 		m_selected_mesh_color(init_owner(*this) + init_name("selected_mesh_color") + init_label(_("Selected Mesh Color")) + init_description(_("Color unselected components are drawn in when their mesh is selected")) + init_value(SelectedMeshColor)),
 		m_selected_component_color(init_owner(*this) + init_name("selected_component_color") + init_label(_("Selected Component Color")) + init_description(_("Color selected components are drawn in")) + init_value(SelectedComponentColor)),
-		m_alpha(init_owner(*this) + init_name("alpha") + init_label(_("Alpha")) + init_description(_("Set the transparency (0 is transparent)")) + init_value(1.0) + init_constraint(k3d::data::constraint::minimum(0.0, k3d::data::constraint::maximum(1.0))) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar)))
+		m_alpha(init_owner(*this) + init_name("alpha") + init_label(_("Alpha")) + init_description(_("Set the transparency (0 is transparent)")) + init_value(1.0) + init_constraint(k3d::data::constraint::minimum(0.0, k3d::data::constraint::maximum<double>(1.0))) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_unselected_mesh_color.changed_signal().connect(make_async_redraw_slot());
 		m_parent_selected_mesh_color.changed_signal().connect(make_async_redraw_slot());

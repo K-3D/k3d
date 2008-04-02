@@ -43,7 +43,7 @@ public:
 		base(Factory, Document),
 		m_quadric(gluNewQuadric()),
 		m_power(init_owner(*this) + init_name("power") + init_label(_("power")) + init_description(_("Power")) + init_value(2.0)),
-		m_samples(init_owner(*this) + init_name("samples") + init_label(_("samples")) + init_description(_("Samples")) + init_value(256) + init_constraint(k3d::data::constraint::minimum(0, k3d::data::constraint::maximum(1024)))),
+		m_samples(init_owner(*this) + init_name("samples") + init_label(_("samples")) + init_description(_("Samples")) + init_value(256) + init_constraint(k3d::data::constraint::minimum<k3d::int32_t>(0, k3d::data::constraint::maximum<k3d::int32_t>(1024)))),
 		m_use_QMC(init_owner(*this) + init_name("use_QMC") + init_label(_("use_QMC")) + init_description(_("Use QMC")) + init_value(false)),
 		m_maxdistance(init_owner(*this) + init_name("maxdistance") + init_label(_("maxdistance")) + init_description(_("Max. distance")) + init_value(-1.0))
 	{

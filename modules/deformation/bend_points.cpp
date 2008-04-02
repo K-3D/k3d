@@ -49,8 +49,8 @@ public:
 	bend_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_angle(init_owner(*this) + init_name("angle") + init_label(_("Angle")) + init_description(_("Bend angle")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
-		m_tightness(init_owner(*this) + init_name("tightness") + init_label(_("Tightness")) + init_description(_("Bend tightness")) + init_value(0.6) + init_constraint(constraint::minimum(0.0, constraint::maximum(1.0))) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_position(init_owner(*this) + init_name("position") + init_label(_("Position")) + init_description(_("Bend position")) + init_value(0.5) + init_constraint(constraint::minimum(0.0, constraint::maximum(1.0))) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
+		m_tightness(init_owner(*this) + init_name("tightness") + init_label(_("Tightness")) + init_description(_("Bend tightness")) + init_value(0.6) + init_constraint(constraint::minimum<double>(0.0, constraint::maximum(1.0))) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
+		m_position(init_owner(*this) + init_name("position") + init_label(_("Position")) + init_description(_("Bend position")) + init_value(0.5) + init_constraint(constraint::minimum<double>(0.0, constraint::maximum(1.0))) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
 		m_along(init_owner(*this) + init_name("along") + init_label(_("Along")) + init_description(_("Axis to bend along")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values())),
 		m_around(init_owner(*this) + init_name("around") + init_label(_("Around")) + init_description(_("Axis to bend around")) + init_value(k3d::X) + init_enumeration(k3d::axis_values()))
 	{

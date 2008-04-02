@@ -274,11 +274,11 @@ class render_engine :
 public:
 	render_engine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_point_size(init_owner(*this) + init_name("point_size") + init_label(_("Point Size")) + init_description(_("OpengGL point size")) + init_value(4) + init_constraint(constraint::minimum(0.0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_point_size(init_owner(*this) + init_name("point_size") + init_label(_("Point Size")) + init_description(_("OpengGL point size")) + init_value(4) + init_constraint(constraint::minimum<double>(0.0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_background_color(init_owner(*this) + init_name("background_color") + init_label(_("Background Color")) + init_description(_("Background color")) + init_value(k3d::color(0.8, 0.8, 0.8))),
 		m_fog(init_owner(*this) + init_name("fog") + init_label(_("Fog")) + init_description(_("Fog")) + init_value(false)),
-		m_fog_near(init_owner(*this) + init_name("fog_near") + init_label(_("Fog Near")) + init_description(_("Fog near distance")) + init_value(0.0) + init_constraint(constraint::minimum(0.0)) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_fog_far(init_owner(*this) + init_name("fog_far") + init_label(_("Fog Far")) + init_description(_("Fog far distance")) + init_value(100.0) + init_constraint(constraint::minimum(0.0)) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_fog_near(init_owner(*this) + init_name("fog_near") + init_label(_("Fog Near")) + init_description(_("Fog near distance")) + init_value(0.0) + init_constraint(constraint::minimum<double>(0.0)) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_fog_far(init_owner(*this) + init_name("fog_far") + init_label(_("Fog Far")) + init_description(_("Fog far distance")) + init_value(100.0) + init_constraint(constraint::minimum<double>(0.0)) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_headlight(init_owner(*this) + init_name("headlight") + init_label(_("Headlight")) + init_description(_("Headlight")) + init_value(true)),
 		m_show_lights(init_owner(*this) + init_name("show_lights") + init_label(_("Show Lights")) + init_description(_("Show lights (on/off)")) + init_value(false)),
 		m_draw_two_sided(init_owner(*this) + init_name("draw_two_sided") + init_label(_("Draw Two Sided")) + init_description(_("Draw two sided")) + init_value(true)),

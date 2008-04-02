@@ -49,7 +49,7 @@ class polygonize_blobbies_implementation :
 public:
 	polygonize_blobbies_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_voxels(init_owner(*this) + init_name("voxels") + init_label(_("Voxels")) + init_description(_("Voxel subdivisions along blobby's bounding-box width, height and depth ")) + init_value(30) + init_step_increment(1) + init_constraint(constraint::minimum(1)) + init_units(typeid(k3d::measurement::scalar)))
+		m_voxels(init_owner(*this) + init_name("voxels") + init_label(_("Voxels")) + init_description(_("Voxel subdivisions along blobby's bounding-box width, height and depth ")) + init_value(30) + init_step_increment(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_material.changed_signal().connect(make_reset_mesh_slot());
 		m_voxels.changed_signal().connect(make_reset_mesh_slot());

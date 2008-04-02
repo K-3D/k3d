@@ -349,7 +349,7 @@ public:
 		base(Factory, Document),
 		m_font_path(init_owner(*this) + init_name("font") + init_label(_("Font")) + init_description(_("Font path")) + init_value(detail::default_font()) + init_path_mode(k3d::ipath_property::READ) + init_path_type(k3d::options::path::fonts())),
 		m_text(init_owner(*this) + init_name("text") + init_label(_("Text")) + init_description(_("Text")) + init_value<std::string>("Text!")),
-		m_curve_divisions(init_owner(*this) + init_name("curve_divisions") + init_label(_("Curve subdivisions")) + init_description(_("Bezier curves subdivision number")) + init_value(3) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_curve_divisions(init_owner(*this) + init_name("curve_divisions") + init_label(_("Curve subdivisions")) + init_description(_("Bezier curves subdivision number")) + init_value(3) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Font height")) + init_value(10.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::distance))),
 		m_orientation(init_owner(*this) + init_name("orientation") + init_label(_("Orientation")) + init_description(_("Orientation type (forward or backward along X, Y or Z axis)")) + init_value(k3d::PY) + init_enumeration(k3d::signed_axis_values()))
 	{

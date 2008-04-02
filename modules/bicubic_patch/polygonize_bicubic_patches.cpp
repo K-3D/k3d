@@ -47,7 +47,7 @@ class polygonize_bicubic_patches :
 public:
 	polygonize_bicubic_patches(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_subdivisions(init_owner(*this) + init_name("subdivisions") + init_label(_("Subdivisions")) + init_description(_("Patch subdivision number")) + init_value(3) + init_step_increment(1) + init_constraint(constraint::minimum(1)) + init_units(typeid(k3d::measurement::scalar)))
+		m_subdivisions(init_owner(*this) + init_name("subdivisions") + init_label(_("Subdivisions")) + init_description(_("Patch subdivision number")) + init_value(3) + init_step_increment(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_subdivisions.changed_signal().connect(make_reset_mesh_slot());
 	}

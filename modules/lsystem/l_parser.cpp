@@ -1507,7 +1507,7 @@ public:
 	l_parser(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file_path(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("File path for lsystem description")) + init_value(k3d::filesystem::path(k3d::share_path() / k3d::filesystem::generic_path("lsystem/abop-nested-polygon-leaves.ls"))) + init_path_mode(k3d::ipath_property::READ) + init_path_type("lsystems")),
-		m_recursion(init_owner(*this) + init_name("growth") + init_label(_("Growth")) + init_description(_("Growth value")) + init_value(5.0) + init_step_increment(0.1) + init_constraint(constraint::minimum(1.0)) + init_units(typeid(k3d::measurement::scalar))),
+		m_recursion(init_owner(*this) + init_name("growth") + init_label(_("Growth")) + init_description(_("Growth value")) + init_value(5.0) + init_step_increment(0.1) + init_constraint(constraint::minimum<double>(1.0)) + init_units(typeid(k3d::measurement::scalar))),
 		m_basic_angle(init_owner(*this) + init_name("basic_angle") + init_label(_("Basic angle")) + init_description(_("Basic angle")) + init_value(10.0) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
 		m_thickness(init_owner(*this) + init_name("thickness") + init_label(_("Thickness")) + init_description(_("Thickness")) + init_value(50.0) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
 		m_random_seed(init_owner(*this) + init_name("random_seed") + init_label(_("Random seed")) + init_description(_("Random seed")) + init_value(0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),

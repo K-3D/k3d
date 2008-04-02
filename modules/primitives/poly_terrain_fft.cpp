@@ -277,9 +277,9 @@ class poly_terrain_fft_implementation :
 public:
 	poly_terrain_fft_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_iterations(init_owner(*this) + init_name("iterations") + init_label(_("Iterations")) + init_description(_("Subdivision iterations")) + init_value(4) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_iterations(init_owner(*this) + init_name("iterations") + init_label(_("Iterations")) + init_description(_("Subdivision iterations")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_fractal_dimension(init_owner(*this) + init_name("dimension") + init_label(_("Dimension")) + init_description(_("Fractal dimension")) + init_value(0.5) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_random_seed(init_owner(*this) + init_name("randomseed") + init_label(_("Random seed")) + init_description(_("Random seed")) + init_value(123) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_random_seed(init_owner(*this) + init_name("randomseed") + init_label(_("Random seed")) + init_description(_("Random seed")) + init_value(123) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_orientation(init_owner(*this) + init_name("orientation") + init_label(_("Orientation")) + init_description(_("Orientation type (forward or backward along X, Y or Z axis)")) + init_value(k3d::PZ) + init_enumeration(k3d::signed_axis_values()))
 	{
 		m_material.changed_signal().connect(make_reset_mesh_slot());
