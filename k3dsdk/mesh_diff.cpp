@@ -35,6 +35,62 @@ namespace detail
 {
 
 /////////////////////////////////////////////////////////////////////
+// representable_difference
+
+class representable_difference
+{
+public:
+	template<typename T>
+	const k3d::uint64_t operator()(const T& A, const T& B)
+	{
+		return B - A;
+	}
+
+	const k3d::uint64_t operator()(const double_t& A, const double_t& B)
+	{
+		return difference(A, B);
+	}
+
+	const k3d::uint64_t operator()(const color& A, const color& B)
+	{
+		return std::max(difference(A.red, B.red), std::max(difference(A.green, B.green), difference(A.blue, B.blue)));
+	}
+
+	const k3d::uint64_t operator()(const normal3& A, const normal3& B)
+	{
+		return std::max(difference(A[0], B[0]), std::max(difference(A[1], B[1]), difference(A[2], B[2])));
+	}
+
+	const k3d::uint64_t operator()(const point3& A, const point3& B)
+	{
+		return std::max(difference(A[0], B[0]), std::max(difference(A[1], B[1]), difference(A[2], B[2])));
+	}
+
+	const k3d::uint64_t operator()(const vector3& A, const vector3& B)
+	{
+		return std::max(difference(A[0], B[0]), std::max(difference(A[1], B[1]), difference(A[2], B[2])));
+	}
+
+	const k3d::uint64_t operator()(const point2& A, const point2& B)
+	{
+		return std::max(difference(A[0], B[0]), difference(A[1], B[1]));
+	}
+
+private:
+	inline const k3d::uint64_t difference(const k3d::double_t& A, const k3d::double_t& B)
+	{
+		return std::abs(to_integer(A) - to_integer(B));
+	}
+
+	/// Convert a k3d::double_t to a lexicographically-ordered twos-complement integer
+	inline const k3d::int64_t to_integer(const k3d::double_t Value)
+	{
+		const k3d::int64_t value = *(k3d::int64_t*)&Value;
+		return value < 0 ? 0x8000000000000000LL - value : value;
+	}
+};
+
+/////////////////////////////////////////////////////////////////////
 // equal
 
 /// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
@@ -146,17 +202,21 @@ void print_diff(std::ostream& Stream, const std::string& Label, const pointer_ty
 
 	for(uint_t i = 0; i < a_size || i < b_size; ++i)
 	{
-		const std::string difference_buffer = (A && i < a_size && B && i < b_size && almost_equal(A->at(i), B->at(i))) ? std::string("") : std::string("*****");
+		if(!(A && i < a_size && B && i < b_size && almost_equal(A->at(i), B->at(i))))
+		{
+			std::ostringstream a_buffer;
+			if(A && i < a_size)
+				a_buffer << A->at(i);
 
-		std::ostringstream a_buffer;
-		if(A && i < a_size)
-			a_buffer << A->at(i);
+			std::ostringstream b_buffer;
+			if(B && i < b_size)
+				b_buffer << B->at(i);
 
-		std::ostringstream b_buffer;
-		if(B && i < b_size)
-			b_buffer << B->at(i);
+			Stream << format % i % a_buffer.str() % b_buffer.str();
+		}
 
-		Stream << format % difference_buffer % a_buffer.str() % b_buffer.str();
+		if(A && i < a_size && B && i < b_size && !almost_equal(A->at(i), B->at(i)))
+			Stream << format % i % representable_difference()(A->at(i), B->at(i)) % "";
 	}
 
 	Stream << "\n";
@@ -192,17 +252,21 @@ const bool print_diff(std::ostream& Stream, const std::string& Label, const arra
 
 	for(uint_t i = 0; i < a_size || i < b_size; ++i)
 	{
-		const std::string difference_buffer = (a && i < a_size && b && i < b_size && almost_equal(a->at(i), b->at(i))) ? std::string("") : std::string("*****");
+		if(!(a && i < a_size && b && i < b_size && almost_equal(a->at(i), b->at(i))))
+		{
+			std::ostringstream a_buffer;
+			if(a && i < a_size)
+				a_buffer << a->at(i);
 
-		std::ostringstream a_buffer;
-		if(a && i < a_size)
-			a_buffer << a->at(i);
+			std::ostringstream b_buffer;
+			if(b && i < b_size)
+				b_buffer << b->at(i);
 
-		std::ostringstream b_buffer;
-		if(b && i < b_size)
-			b_buffer << b->at(i);
+			Stream << format % i % a_buffer.str() % b_buffer.str();
+		}
 
-		Stream << format % difference_buffer % a_buffer.str() % b_buffer.str();
+		if(a && i < a_size && b && i < b_size && !almost_equal(a->at(i), b->at(i)))
+			Stream << format % i % representable_difference()(a->at(i), b->at(i)) % "";
 	}
 
 	Stream << "\n";
