@@ -49,7 +49,7 @@ namespace detail
 
 extern "C"
 {
-#include <superlu/slu_ddefs.h>
+#include <superlu/dsp_defs.h>
 }
 
 const k3d::normal3 normal(k3d::legacy::split_edge* Edge)
