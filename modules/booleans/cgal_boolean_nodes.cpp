@@ -81,11 +81,12 @@ public:
 					if(property.property_type() == typeid(k3d::mesh*))
 					{
 						const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property));
-						if (!mesh || !k3d::validate_polyhedra(*mesh))
-						{
-							continue;
-						}
+						return_if_fail(mesh);
+						return_if_fail(k3d::validate_polyhedra(*mesh));
+						return_if_fail(k3d::is_solid(*mesh));
+						
 						boost::shared_ptr<Nef_polyhedron> operand = to_nef(*mesh);
+						return_if_fail(operand.get());
 						if (!started)
 						{
 							result = *operand;
@@ -107,11 +108,12 @@ public:
 					if(property.property_type() == typeid(k3d::mesh*))
 					{
 						const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property));
-						if (!mesh || !k3d::validate_polyhedra(*mesh))
-						{
-							return;
-						}
+						return_if_fail(mesh);
+						return_if_fail(k3d::validate_polyhedra(*mesh));
+						return_if_fail(k3d::is_solid(*mesh));
+						
 						boost::shared_ptr<Nef_polyhedron> operand = to_nef(*mesh);
+						return_if_fail(operand.get());
 						if (!started)
 						{
 							result = *operand;
@@ -138,7 +140,7 @@ public:
 				}
 			}
 		}
-		catch (std::exception& e)
+		catch (...)
 		{
 			k3d::log() << error << "CGALBoolean: error executing boolean operation" << std::endl;
 		}

@@ -142,8 +142,6 @@ void to_mesh(Nef_polyhedron& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* con
   
   types->push_back(k3d::mesh::polyhedra_t::POLYGONS);
   
-  k3d::log() << debug << "Looping over " << NefPolyhedron.number_of_halfedges() << " halfedges" << std::endl;
-  
   vertices_t vertices;
   facet_map_t facet_map;
   
@@ -157,8 +155,6 @@ void to_mesh(Nef_polyhedron& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* con
   		num_facets++;
   	}
   }
-  
-  k3d::log() << debug << "Detected " << num_facets << " facets" << std::endl;
   
   edges_per_facet_t edges_per_facet(num_facets);
   
@@ -184,9 +180,6 @@ void to_mesh(Nef_polyhedron& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* con
   for (size_t facet = 0; facet != edges_per_facet.size(); ++facet)
   {
   	edges_t edges = edges_per_facet[facet];
-//  	k3d::log() << "cycles for facet " << facet << std::endl;
-//  	for (edges_t::iterator edge = edges.begin(); edge != edges.end(); ++edge)
-//  		k3d::log() << debug << "    " << edge->first << "-" << edge->second << std::endl;
 
 		// First, we need to sort the un-ordered edge list that is stored for each facet so we get the actual edge loops
   	std::vector<edges_t> cycles;
@@ -260,7 +253,15 @@ void to_mesh(Nef_polyhedron& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* con
 boost::shared_ptr<Nef_polyhedron> to_nef(const k3d::mesh& Mesh)
 {
 	SNC_structure snc;
-	k3d_to_nef(Mesh, snc);
+	try
+	{
+		k3d_to_nef(Mesh, snc);
+	}
+	catch(...)
+	{
+		k3d::log() << error << "Failed to convert to Nef" << std::endl;
+		return boost::shared_ptr<Nef_polyhedron>();
+	}
 	boost::shared_ptr<Nef_polyhedron> nef(new Nef_polyhedron(snc));
 	nef->build_external_structure();
 	nef->simplify();

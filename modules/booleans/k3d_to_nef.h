@@ -33,6 +33,7 @@
 #include "conversion.h"
 
 #include <CGAL/Nef_3/SNC_structure.h>
+#include <CGAL/normal_vector_newell_3.h>
 
 namespace libk3dbooleans
 {
@@ -62,7 +63,7 @@ Point_3 to_cgal_point3(const k3d::point3& Point)
 struct face_plane {
 	face_plane(const k3d::mesh& Mesh, points_t& Points) : m_mesh(Mesh), m_points(Points) {}
 	
-  Plane operator()(size_t face) {     
+  Plane operator()(size_t FirstLoop) {     
     const k3d::mesh::indices_t& face_first_loops = *m_mesh.polyhedra->face_first_loops;
 		const k3d::mesh::counts_t& face_loop_counts = *m_mesh.polyhedra->face_loop_counts;
 		const k3d::mesh::indices_t& loop_first_edges = *m_mesh.polyhedra->loop_first_edges;
@@ -70,38 +71,28 @@ struct face_plane {
 		const k3d::mesh::indices_t& clockwise_edges = *m_mesh.polyhedra->clockwise_edges;
 		
 		std::vector<size_t> corners;
-    for (size_t loop = 0; loop != face_loop_counts[face]; ++loop)
+		std::vector<Point_3> corner_points;
+		size_t first_edge = loop_first_edges[FirstLoop];
+		for(size_t edge = first_edge; ; )
 		{
-			size_t first_edge = loop_first_edges[face_first_loops[face] + loop];
-			for(size_t edge = first_edge; ; )
-			{
-				size_t point = edge_points[edge];
-				corners.push_back(point);
-				
-				edge = clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
-			}
+			size_t point = edge_points[edge];
+			corner_points.push_back(m_points[point]);
+			
+			edge = clockwise_edges[edge];
+			if(edge == first_edge)
+				break;
 		}
 		
-		NT x = 0;
-		NT y = 0;
-		NT z = 0;
+		if (corner_points.size() < 3)
+			throw 1; // Using throw here, since there really is no usable default if this fails
 		
-		for(size_t point = 0; point != corners.size(); ++point )
-		{
-			const Point_3& i = m_points[corners[point]];
-			const Point_3& j = m_points[corners[(point+1) % corners.size()]];
-	
-			x += (i.hy() + j.hy()) * (j.hz() - i.hz());
-			y += (i.hz() + j.hz()) * (j.hx() - i.hx());
-			z += (i.hx() + j.hx()) * (j.hy() - i.hy());
-		}
+		Vector n;
 		
-		Vector n(x,y,z);
+		CGAL::normal_vector_newell_3(corner_points.begin(), corner_points.end(), n);
 		
-		Plane plane(m_points[corners[0]], n.direction());
-		return_val_if_fail(!plane.is_degenerate(), plane);
+		Plane plane(corner_points[0], n);
+		if(plane.is_degenerate())
+			throw 2;
 		
     return plane;
   }
@@ -139,26 +130,11 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
 	for (size_t point = 0; point != k3d_points.size(); ++point)
 		points.push_back(to_cgal_point3(k3d_points[point]));
 	
-//	NT dmin(10.0);
-//	for (size_t i = 0; i != points.size(); ++i)
-//	{
-//		for (size_t j = 0; j != points.size(); ++j)
-//		{
-//			if (i != j)
-//			{
-//				NT d(CGAL::squared_distance(points[i], points[j]));
-//				if (d < dmin)
-//				 dmin = d;
-//			} 
-//		}
-//	}
-//	
-//	k3d::log() << debug << "minimal squared distance: " << dmin << std::endl;
-
 	std::vector<Plane> planes(face_first_loops.size());
   
-  std::transform(face_first_loops.begin(), face_first_loops.end(),
-		  planes.begin(), face_plane(Mesh, points));
+	std::transform(face_first_loops.begin(), face_first_loops.end(),
+		planes.begin(), face_plane(Mesh, points));
+
 		  	
 	// check coplanarity
   for (size_t face = 0; face != face_first_loops.size(); ++face)
@@ -175,8 +151,10 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
 					const Plane& pl = planes[face];
 					Point_3 proj = pl.projection(p);
 					Vector diff(proj, p);
-					k3d::log() << debug << "point " << p << " is off-face! Projection: " << CGAL::to_double(proj.x()) << ", " << CGAL::to_double(proj.y()) << ", " << CGAL::to_double(proj.z()) << ", " << std::endl;
-					k3d::log() << "face: " << CGAL::to_double(pl.a()) << ", " << CGAL::to_double(pl.b()) << ", " << CGAL::to_double(pl.c()) << ", " << (pl.d()) << std::endl; 
+					k3d::log() << debug << "point " << p << " is not on face " << face << "! Projection: " << CGAL::to_double(proj.x()) << ", " << CGAL::to_double(proj.y()) << ", " << CGAL::to_double(proj.z()) << ", " << std::endl;
+					k3d::log() << "face: " << CGAL::to_double(pl.a()) << ", " << CGAL::to_double(pl.b()) << ", " << CGAL::to_double(pl.c()) << ", " << (pl.d()) << std::endl;
+					k3d::log() << error << "k3d_to_nef: Non planar faces in input" << std::endl;
+					throw 3;
 				}
 				
 				edge = clockwise_edges[edge];
@@ -304,20 +282,26 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
   
   for (size_t face = 0; face != face_first_loops.size(); ++face)
 	{
-		size_t first_edge = loop_first_edges[face_first_loops[face]];
-		indices[first_edge]->set_index();
-    indices[first_edge]->twin()->set_index();
-    indices[first_edge]->twin()->source()->set_index();
-    int se  = indices[first_edge]->get_index();
-    int set = indices[first_edge]->twin()->get_index();
-    int sv  = indices[first_edge]->twin()->source()->get_index();
+  	int se, set;
 		for (size_t loop = 0; loop != face_loop_counts[face]; ++loop)
 		{
-			first_edge = loop_first_edges[face_first_loops[face] + loop];
-			for(size_t edge = first_edge; ; )
+			size_t first_edge = loop_first_edges[face_first_loops[face] + loop];
+			if (loop == 0)
 			{
-				if (loop == 0 && edge == first_edge) // skip first edge, was assigned before loop
-					edge = clockwise_edges[edge];
+				indices[first_edge]->set_index();
+		    indices[first_edge]->twin()->set_index();
+		    se  = indices[first_edge]->get_index();
+		    set = indices[first_edge]->twin()->get_index();
+			}
+			else
+			{
+				indices[first_edge]->set_index(se);
+		    indices[first_edge]->twin()->set_index(set);
+			}
+	    indices[first_edge]->twin()->source()->set_index();
+	    int sv  = indices[first_edge]->twin()->source()->get_index();
+			for(size_t edge = clockwise_edges[first_edge]; ; )
+			{
 				indices[edge]->set_index(se);
 				indices[edge]->twin()->set_index(set);
 				indices[edge]->source()->set_index(sv);
@@ -328,8 +312,8 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
 				if(edge == first_edge)
 					break;
 			}
+			indices[first_edge]->source()->set_index(sv);
 		}
-		indices[loop_first_edges[face_first_loops[face]]]->source()->set_index(sv);
 	}
   
 }
