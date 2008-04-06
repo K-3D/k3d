@@ -2,7 +2,7 @@
 #define K3DSDK_IRENDER_CAMERA_ANIMATION_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,20 +24,21 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "frames.h"
 #include "iunknown.h"
 
 namespace k3d
 {
 
 class icamera;
-class file_range;
+class iproperty;
 	
 /// Abstract interface implemented by objects that can render a sequence of still images using a camera
 class irender_camera_animation :
 	public virtual iunknown
 {
 public:
-	virtual bool render_camera_animation(icamera& Camera, const file_range& OutputImages, const bool ViewCompletedImages) = 0;
+	virtual bool render_camera_animation(icamera& Camera, iproperty& Time, const frames& Frames, const bool ViewCompletedImages) = 0;
 
 protected:
 	irender_camera_animation() {}

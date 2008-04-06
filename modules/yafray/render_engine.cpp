@@ -188,55 +188,38 @@ public:
 		return true;
 	}
 
-	bool render_camera_animation(k3d::icamera& Camera, const k3d::file_range& Files, const bool ViewCompletedImages)
+	bool render_camera_animation(k3d::icamera& Camera, k3d::iproperty& Time, const k3d::frames& Frames, const bool ViewCompletedImages)
 	{
-		// Ensure that the document has animation capabilities, first ...
-		k3d::iproperty* const start_time_property = k3d::get_start_time(document());
-		k3d::iproperty* const end_time_property = k3d::get_end_time(document());
-		k3d::iproperty* const frame_rate_property = k3d::get_frame_rate(document());
-		k3d::iwritable_property* const time_property = dynamic_cast<k3d::iwritable_property*>(k3d::get_time(document()));
-		return_val_if_fail(start_time_property && end_time_property && frame_rate_property && time_property, false);
-
-		// Test the output images filepath to make sure it can hold all the frames we're going to generate ...
-		const double start_time = k3d::property::pipeline_value<double>(*start_time_property);
-		const double end_time = k3d::property::pipeline_value<double>(*end_time_property);
-		const double frame_rate = k3d::property::pipeline_value<double>(*frame_rate_property);
-
-		const size_t start_frame = static_cast<size_t>(k3d::round(frame_rate * start_time));
-		const size_t end_frame = static_cast<size_t>(k3d::round(frame_rate * end_time));
-
-		return_val_if_fail(Files.max_file_count() > end_frame, false);
-
 		// Start a new render job ...
 		k3d::inetwork_render_job& job = k3d::get_network_render_farm().create_job("k3d-yafray-render-animation");
 
 		// For each frame to be rendered ...
-		for(size_t view_frame = start_frame; view_frame < end_frame; ++view_frame)
+		k3d::uint_t frame_index = 0;
+		for(k3d::frames::const_iterator frame = Frames.begin(); frame != Frames.end(); ++frame, ++frame_index)
 		{
 			// Set the frame time ...
-			time_property->property_set_value(view_frame / frame_rate);
+			k3d::property::set_internal_value(Time, frame->begin_time);
 
 			// Redraw everything ...
 			k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::SYNCHRONOUS);
 
 			// Add a render frame to the job ...
 			std::stringstream buffer;
-			buffer << "frame-" << std::setw(Files.digits) << std::setfill('0') << view_frame;
-			k3d::inetwork_render_frame& frame = job.create_frame(buffer.str());
+			buffer << "frame-" << frame_index;
+			k3d::inetwork_render_frame& render_frame = job.create_frame(buffer.str());
 
 			// Create an output image path ...
-			const k3d::filesystem::path output_image = frame.add_file("salida.tga");
+			const k3d::filesystem::path output_image = render_frame.add_file("salida.tga");
 
 			// Render it (hidden rendering) ...
-			return_val_if_fail(render(Camera, frame, output_image, false), false);
+			return_val_if_fail(render(Camera, render_frame, output_image, false), false);
 
 			// Copy the output image to its requested destination ...
-			const k3d::filesystem::path destination = Files.file(view_frame);
-			frame.add_copy_command(output_image, destination);
+			render_frame.add_copy_command(output_image, frame->destination);
 
 			// View the output image when it's done ...
 			if(ViewCompletedImages)
-				frame.add_view_command(destination);
+				render_frame.add_view_command(frame->destination);
 		}
 
 		// Start the job running ...

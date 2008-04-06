@@ -2,7 +2,7 @@
 #define K3DSDK_IRENDER_ANIMATION_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,19 +24,20 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "frames.h"
 #include "iunknown.h"
 
 namespace k3d
 {
 
-class file_range;
+class iproperty;
 
 /// Abstract interface implemented by objects that can render a sequence of still images
 class irender_animation :
 	public virtual iunknown
 {
 public:
-	virtual bool render_animation(const file_range& OutputImages, const bool ViewCompletedImages) = 0;
+	virtual bool render_animation(iproperty& Time, const frames& Frames, const bool ViewCompletedImages) = 0;
 
 protected:
 	irender_animation() {}

@@ -110,7 +110,7 @@ public:
 	const k3d::point2 project(const k3d::point3& WorldCoords);
 
 	bool render_camera_frame(k3d::icamera& Camera, const k3d::filesystem::path& OutputImage, const bool ViewCompletedImage);
-	bool render_camera_animation(k3d::icamera& Camera, const k3d::file_range& Files, const bool ViewCompletedImages);
+	bool render_camera_animation(k3d::icamera& Camera, k3d::iproperty& Time, const k3d::frames& Frames, const bool ViewCompletedImages);
 
 	/// Returns all points contained in the given rectangle in widget coordinates
 	k3d::selection::records get_selectable_points(const k3d::rectangle& SelectionRegion, bool Backfacing);

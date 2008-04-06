@@ -108,7 +108,7 @@ private:
 };
 
 /// Prompt the user to choose an existing camera from within a document, or create a new one
-k3d::icamera* pick_camera(document_state& DocumentState, const k3d::nodes_t& RenderEngines, const k3d::plugin::factory::collection_t& Factories, const k3d::icamera* CurrentCamera, const std::string& Title, const std::string& Message)
+k3d::icamera* pick_camera(document_state& DocumentState, const k3d::nodes_t& RenderEngines, const k3d::plugin::factory::collection_t& Factories, const k3d::icamera* CurrentCamera, const k3d::string_t& Title, const k3d::string_t& Message)
 {
 	camera_columns columns;
 	Glib::RefPtr<Gtk::ListStore> model = Gtk::ListStore::create(columns);
@@ -140,7 +140,7 @@ k3d::icamera* pick_camera(document_state& DocumentState, const k3d::nodes_t& Ren
 
 	for(k3d::plugin::factory::collection_t::const_iterator factory = Factories.begin(); factory != Factories.end(); ++factory)
 	{
-		std::string markup;
+		k3d::string_t markup;
 		if(k3d::iplugin_factory::EXPERIMENTAL == (*factory)->quality())
 		{
 			markup = k3d::string_cast(boost::format(_("<span color=\"blue\">Create %1% (Experimental)</span>")) % (*factory)->name());
@@ -239,7 +239,7 @@ private:
 
 /// Prompt the user to choose an existing render engine from within a document, or create a new one
 template<typename interface_t>
-interface_t* pick_render_engine(document_state& DocumentState, const k3d::nodes_t& RenderEngines, const k3d::plugin::factory::collection_t& Factories, const std::string& Title, const std::string& Message)
+interface_t* pick_render_engine(document_state& DocumentState, const k3d::nodes_t& RenderEngines, const k3d::plugin::factory::collection_t& Factories, const k3d::string_t& Title, const k3d::string_t& Message)
 {
 	render_engine_columns columns;
 	Glib::RefPtr<Gtk::ListStore> model = Gtk::ListStore::create(columns);
@@ -264,7 +264,7 @@ interface_t* pick_render_engine(document_state& DocumentState, const k3d::nodes_
 
 	for(k3d::plugin::factory::collection_t::const_iterator factory = Factories.begin(); factory != Factories.end(); ++factory)
 	{
-		std::string markup;
+		k3d::string_t markup;
 		if(k3d::iplugin_factory::EXPERIMENTAL == (*factory)->quality())
 		{
 			markup = k3d::string_cast(boost::format(_("<span color=\"blue\">Create %1% (Experimental)</span>")) % (*factory)->name());
@@ -541,6 +541,83 @@ private:
 	const Glib::RefPtr<Gtk::ListStore> model;
 };
 
+const bool generate_frames(document_state& DocumentState, k3d::frames& Frames)
+{
+	// Ensure that the document has animation capabilities, first ...
+	k3d::iproperty* const start_time_property = k3d::get_start_time(DocumentState.document());
+	k3d::iproperty* const end_time_property = k3d::get_end_time(DocumentState.document());
+	k3d::iproperty* const frame_rate_property = k3d::get_frame_rate(DocumentState.document());
+	if(!(start_time_property && end_time_property && frame_rate_property))
+	{
+		error_message(_("Document does not contain a TimeSource, cannot render animation."));
+		return false;
+	}
+
+	// Generate a uniform sampling of "frames" within time-range of the animation ...
+	const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(*start_time_property));
+	const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(*end_time_property));
+	const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(*frame_rate_property));
+
+	if(start_time > end_time)
+	{
+		error_message(_("Animation start time must be less-than end time."));
+		return false;
+	}
+
+	if(0 == frame_rate)
+	{
+		error_message(_("Cannot render animation with zero frame rate."));
+		return false;
+	}
+
+	const double frame_delta = 1.0 / frame_rate;
+
+	for(k3d::uint_t frame = 0, next_frame = 1; start_time + (next_frame * frame_delta) < end_time; ++frame, ++next_frame)
+		Frames.push_back(k3d::frame(start_time + (frame * frame_delta), start_time + (next_frame * frame_delta)));
+
+	return true;
+}
+
+const bool assign_destinations(k3d::iunknown& Engine, k3d::frames& Frames)
+{
+	k3d::file_range files;
+	files.before = k3d::ustring::from_utf8("output");
+	files.begin = 0;
+	files.end = Frames.size();
+
+	// Try to infer the correct file extension behavior ...
+	if(dynamic_cast<viewport::control*>(&Engine))
+	{
+		files.after = k3d::ustring::from_utf8(".pnm");
+	}
+	else if(k3d::inode* const node = dynamic_cast<k3d::inode*>(&Engine))
+	{
+		if(node->factory().factory_id() == k3d::classes::RenderManEngine())
+		{
+			files.after = k3d::ustring::from_utf8(".tiff");
+		}
+		else if(node->factory().factory_id() == k3d::uuid(0xef38bf93, 0x66654f9f, 0x992ca91b, 0x62bae139))
+		{
+			files.after = k3d::ustring::from_utf8(".tga");
+		}
+	}
+
+	// Make sure the supplied filepath has enough digits to render the entire animation ...
+	while(files.max_file_count() < Frames.size())
+		files.digits += 1;
+
+	// Prompt the user for destination details ...
+	detail::animation_chooser_dialog dialog;
+	if(!dialog.get_files(files))
+		return false;
+
+	k3d::uint_t frame_index = 0;
+	for(k3d::frames::iterator frame = Frames.begin(); frame != Frames.end(); ++frame, ++frame_index)
+		frame->destination = files.file(frame_index);
+
+	return true;
+}
+
 } // namespace detail
 
 k3d::icamera* default_camera(document_state& DocumentState)
@@ -682,38 +759,17 @@ void render(k3d::irender_frame& Engine)
 
 void render(document_state& DocumentState, k3d::irender_animation& Engine)
 {
-	// Ensure that the document has animation capabilities, first ...
-	k3d::iproperty* const start_time_property = k3d::get_start_time(DocumentState.document());
-	k3d::iproperty* const end_time_property = k3d::get_end_time(DocumentState.document());
-	k3d::iproperty* const frame_rate_property = k3d::get_frame_rate(DocumentState.document());
-	return_if_fail(start_time_property && end_time_property && frame_rate_property);
+	test_render_engine(Engine);
 
-	const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(*start_time_property));
-	const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(*end_time_property));
-	const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(*frame_rate_property));
+	k3d::frames frames;
+	if(!detail::generate_frames(DocumentState, frames))
+		return;
 
-	const long start_frame = static_cast<long>(k3d::round(frame_rate * start_time));
-	const long end_frame = static_cast<long>(k3d::round(frame_rate * end_time));
-
-	k3d::file_range files;
-	files.before = k3d::ustring::from_utf8("output");
-	files.begin = start_frame;
-	files.end = end_frame + 1;
-
-	// Make sure the supplied filepath has enough digits to render the entire animation ...
-	while(files.max_file_count() <= end_frame)
-		files.digits += 1;
-
-	{
-		// Prompt the user for a base filename ...
-		detail::animation_chooser_dialog dialog;
-
-		if(!dialog.get_files(files))
-			return;
-	}
+	if(!detail::assign_destinations(Engine, frames))
+		return;
 
 	// See if the user wants to view frames as they're completed ...
-	std::vector<std::string> buttons;
+	std::vector<k3d::string_t> buttons;
 	buttons.push_back("Yes");
 	buttons.push_back("No");
 	buttons.push_back("Cancel");
@@ -724,8 +780,7 @@ void render(document_state& DocumentState, k3d::irender_animation& Engine)
 
 	const bool viewcompleted = (1 == result);
 
-	test_render_engine(Engine);
-	assert_warning(Engine.render_animation(files, viewcompleted));
+	assert_warning(Engine.render_animation(*k3d::get_time(DocumentState.document()), frames, viewcompleted));
 }
 
 void render(k3d::icamera& Camera, k3d::irender_camera_preview& Engine)
@@ -773,54 +828,17 @@ void render(k3d::icamera& Camera, k3d::irender_camera_frame& Engine)
 
 void render(document_state& DocumentState, k3d::icamera& Camera, k3d::irender_camera_animation& Engine)
 {
-	// Ensure that the document has animation capabilities, first ...
-	k3d::iproperty* const start_time_property = k3d::get_start_time(DocumentState.document());
-	k3d::iproperty* const end_time_property = k3d::get_end_time(DocumentState.document());
-	k3d::iproperty* const frame_rate_property = k3d::get_frame_rate(DocumentState.document());
-	return_if_fail(start_time_property && end_time_property && frame_rate_property);
+	test_render_engine(Engine);
 
-	const double start_time = boost::any_cast<double>(k3d::property::pipeline_value(*start_time_property));
-	const double end_time = boost::any_cast<double>(k3d::property::pipeline_value(*end_time_property));
-	const double frame_rate = boost::any_cast<double>(k3d::property::pipeline_value(*frame_rate_property));
+	k3d::frames frames;
+	if(!detail::generate_frames(DocumentState, frames))
+		return;
 
-	const long start_frame = static_cast<long>(k3d::round(frame_rate * start_time));
-	const long end_frame = static_cast<long>(k3d::round(frame_rate * end_time));
-
-	k3d::file_range files;
-	files.before = k3d::ustring::from_utf8("output");
-	files.begin = start_frame;
-	files.end = end_frame + 1;
-
-	// Try to infer the correct file extension behavior ...
-	if(dynamic_cast<viewport::control*>(&Engine))
-	{
-		files.after = k3d::ustring::from_utf8(".pnm");
-	}
-	else if(k3d::inode* const node = dynamic_cast<k3d::inode*>(&Engine))
-	{
-		if(node->factory().factory_id() == k3d::classes::RenderManEngine())
-		{
-			files.after = k3d::ustring::from_utf8(".tiff");
-		}
-		else if(node->factory().factory_id() == k3d::uuid(0xef38bf93, 0x66654f9f, 0x992ca91b, 0x62bae139))
-		{
-			files.after = k3d::ustring::from_utf8(".tga");
-		}
-	}
-
-	// Make sure the supplied filepath has enough digits to render the entire animation ...
-	while(files.max_file_count() <= end_frame)
-		files.digits += 1;
-
-	{
-		// Prompt the user for a base filename ...
-		detail::animation_chooser_dialog dialog;
-		if(!dialog.get_files(files))
-			return;
-	}
+	if(!detail::assign_destinations(Engine, frames))
+		return;
 
 	// See if the user wants to view frames as they're completed ...
-	std::vector<std::string> buttons;
+	std::vector<k3d::string_t> buttons;
 	buttons.push_back("Yes");
 	buttons.push_back("No");
 	buttons.push_back("Cancel");
@@ -831,8 +849,8 @@ void render(document_state& DocumentState, k3d::icamera& Camera, k3d::irender_ca
 
 	const bool viewcompleted = (1 == result);
 
-	test_render_engine(Engine);
-	assert_warning(Engine.render_camera_animation(Camera, files, viewcompleted));
+	assert_warning(Engine.render_camera_animation(Camera, *k3d::get_time(DocumentState.document()),  frames, viewcompleted));
 }
 
 } // namespace libk3dngui
+
