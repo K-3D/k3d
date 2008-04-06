@@ -21,30 +21,29 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/mesh.h>
-#include <k3dsdk/point4.h>
+#include "mesh.h"
+#include "point4.h"
 
-namespace module
-{
-
-namespace opencascade
+namespace k3d
 {
 
 /// Provides a simplified interface for adding geometric primitives to a mesh
-/** \todo Move this into the sdk once it matures for awhile */
 class gprim_factory
 {
 public:
 	/// Construct with a reference to the mesh to which the primitives will be added.
-	gprim_factory(k3d::mesh& Mesh);
+	gprim_factory(mesh& Mesh);
 	~gprim_factory();
 
 	/// Adds a new point to the Mesh.points array
-	void add_point(const k3d::point3& Point);
-	void add_point(const k3d::point4& Point);
+	void add_point(const point3& Point);
+	void add_point(const point4& Point);
 	
 	/// Creates a polygon, given the corner indices
-	void add_polygon(const k3d::mesh::indices_t& Points);
+	void add_polygon(const mesh::indices_t& Points);
+	
+	/// Adds a hole to the last face, given the corner indices
+	void add_hole(const mesh::indices_t& Points);
 	
 	/// Adds a new NURBS patch. Returns true if successful
 	/**
@@ -55,28 +54,29 @@ public:
 	 * \param VKnots V knot vector
 	 * \param Weights Weigts associated with each control point
 	 */
-	bool add_nurbs_patch(const size_t UOrder, const size_t VOrder, const k3d::mesh::indices_t& Points, const k3d::mesh::knots_t& UKnots, const k3d::mesh::knots_t VKnots, const k3d::mesh::weights_t& Weights);
+	bool add_nurbs_patch(const size_t UOrder, const size_t VOrder, const mesh::indices_t& Points, const mesh::knots_t& UKnots, const mesh::knots_t VKnots, const mesh::weights_t& Weights);
 	/// Adds a new trim curve to the last loop of the last patch. Returns true if succesful.
 	/**
 	 *  Note: Trim curves need to be added in the order they will appear in the trim curve loop
 	 *  \param Order The order of the NURBS curve
-	 *  \param Points The control points of the curve, added as a vector of k3d::point2. When the next curve is added or the loop is closed,
-	 *  the last k3d::point2 added is removed and linked to the next one
+	 *  \param Points The control points of the curve, added as a vector of point2. When the next curve is added or the loop is closed,
+	 *  the last point2 added is removed and linked to the next one
 	 *  \param Knots the knot vector, repeating knots that have multiplicity > 1
 	 *  \param Weights the weights associated with the control points 
 	 */
-	bool add_trim_curve(const k3d::uint_t Order, const k3d::mesh::points_2d_t& Points, const k3d::mesh::knots_t& Knots, const k3d::mesh::weights_t& Weights);
-	/// Closes the last trim curve loop, removing the last k3d::point2 added and linking back to the start of the loop.
+	bool add_trim_curve(const uint_t Order, const mesh::points_2d_t& Points, const mesh::knots_t& Knots, const mesh::weights_t& Weights);
+	/// Closes the last trim curve loop, removing the last point2 added and linking back to the start of the loop.
 	void close_trim_loop();
 	/// Adds a new NURBS curve to the mesh. Parameters similar to add_nurbs_patch.
-	void add_nurbs_curve(const k3d::uint_t Order, const k3d::mesh::indices_t& Points, const k3d::mesh::knots_t& Knots, const k3d::mesh::weights_t& Weights);
+	void add_nurbs_curve(const uint_t Order, const mesh::indices_t& Points, const mesh::knots_t& Knots, const mesh::weights_t& Weights);
 
+	/// Const reference to the mesh being built
+	const mesh& target_mesh() const;
+	
 private:
 	class implementation;
 	implementation* const m_implementation;
 };
 
-} // opencascade
-
-} // module
+} // k3d
 

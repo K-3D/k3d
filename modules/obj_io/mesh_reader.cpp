@@ -21,12 +21,12 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "gprim_factory.h"
 #include "obj_parser.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
+#include <k3dsdk/gprim_factory.h>
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
@@ -127,7 +127,7 @@ private:
 		}
 
 	private:
-		gprim_factory factory;
+		k3d::gprim_factory factory;
 
 		std::string curve_surface_type;
 		size_t u_order;
@@ -199,7 +199,7 @@ private:
 				if(expected_vertex_count != vertex_coordinates.size())
 					throw std::runtime_error("invalid vertex count for bspline surface");
 
-				factory.add_nurbs_patch(u_order, v_order, vertex_coordinates, u_knots, v_knots);
+				factory.add_nurbs_patch(u_order, v_order, vertex_coordinates, u_knots, v_knots, k3d::mesh::weights_t(expected_vertex_count, 1));
 			}
 			else
 			{
