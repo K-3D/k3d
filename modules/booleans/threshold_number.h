@@ -37,18 +37,18 @@
 #include <math.h> // for nextafter
 #include <limits>
 
-#include <CGAL/Gmpq.h>
+//#include <CGAL/Gmpq.h>
 
 CGAL_BEGIN_NAMESPACE
 
-typedef Gmpq ET;
+typedef double ET;
 
 class threshold_number
 {
 public:
 	threshold_number() : d(0.0), t(1e-8) {}
 	threshold_number(double D) : d(D), t(1e-8) {}
-	threshold_number(Gmpq D) : d(D), t(1e-8) {}
+	//threshold_number(Gmpq D) : d(D), t(1e-8) {}
 	
 	threshold_number& operator+=(const threshold_number& T)
 	{
