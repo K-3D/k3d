@@ -58,6 +58,30 @@ const object any_to_python(const boost::any& Value)
 	if(type == typeid(k3d::bool_t))
 		return object(boost::any_cast<k3d::bool_t>(Value));
 
+	if(type == typeid(k3d::int8_t))
+		return object(boost::any_cast<k3d::int8_t>(Value));
+
+	if(type == typeid(k3d::int16_t))
+		return object(boost::any_cast<k3d::int16_t>(Value));
+
+	if(type == typeid(k3d::int32_t))
+		return object(boost::any_cast<k3d::int32_t>(Value));
+
+	if(type == typeid(k3d::int64_t))
+		return object(boost::any_cast<k3d::int64_t>(Value));
+
+	if(type == typeid(k3d::uint8_t))
+		return object(boost::any_cast<k3d::uint8_t>(Value));
+
+	if(type == typeid(k3d::uint16_t))
+		return object(boost::any_cast<k3d::uint16_t>(Value));
+
+	if(type == typeid(k3d::uint32_t))
+		return object(boost::any_cast<k3d::uint32_t>(Value));
+
+	if(type == typeid(k3d::uint64_t))
+		return object(boost::any_cast<k3d::uint64_t>(Value));
+
 	if(type == typeid(k3d::double_t))
 		return object(boost::any_cast<k3d::double_t>(Value));
 
@@ -105,15 +129,6 @@ const object any_to_python(const boost::any& Value)
 
 	if(type == typeid(k3d::bounding_box3))
 		return object(boost::any_cast<k3d::bounding_box3>(Value));
-
-	if(type == typeid(int))
-		return object(boost::any_cast<int>(Value));
-
-	if(type == typeid(long))
-		return object(boost::any_cast<long>(Value));
-
-	if(type == typeid(unsigned long))
-		return object(boost::any_cast<unsigned long>(Value));
 
 	if(type == typeid(k3d::mesh*))
 	{
