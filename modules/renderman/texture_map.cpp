@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,8 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -49,10 +49,11 @@ namespace libk3drenderman
 // texture_map
 
 class texture_map :
-	public k3d::bitmap_modifier<k3d::persistent<k3d::node> >,
+	public k3d::persistent<k3d::node>,
+	public k3d::bitmap_modifier<texture_map>,
 	public k3d::ri::itexture
 {
-	typedef k3d::bitmap_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::persistent<k3d::node> base;
 
 public:
 	texture_map(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

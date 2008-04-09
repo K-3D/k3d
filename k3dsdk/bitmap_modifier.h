@@ -20,30 +20,21 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "bitmap.h"
 #include "data.h"
-#include "k3d-i18n-config.h"
 #include "ibitmap_sink.h"
 #include "ibitmap_source.h"
-#include "bitmap.h"
+#include "k3d-i18n-config.h"
 
 namespace k3d
 {
 
-template<typename base_t>
+template<typename derived_t>
 class bitmap_modifier :
-	public base_t,
 	public ibitmap_source,
 	public ibitmap_sink
 {
 public:
-	bitmap_modifier(iplugin_factory& Factory, idocument& Document) :
-		base_t(Factory, Document),
-		m_input_bitmap(init_owner(*this) + init_name("input_bitmap") + init_label(_("Input Bitmap")) + init_description(_("Input bitmap")) + init_value<bitmap*>(0)),
-		m_output_bitmap(init_owner(*this) + init_name("output_bitmap") + init_label(_("Output Bitmap")) + init_description(_("Output bitmap")) + init_slot(sigc::mem_fun(*this, &bitmap_modifier<base_t>::create_bitmap)))
-	{
-		m_input_bitmap.changed_signal().connect(make_reset_bitmap_slot());
-	}
-
 	iproperty& bitmap_source_output()
 	{
 		return m_output_bitmap;
@@ -61,10 +52,27 @@ public:
 
 	sigc::slot<void, iunknown*> make_update_bitmap_slot()
 	{
-		return sigc::mem_fun(*this, &bitmap_modifier<base_t>::update_bitmap);
+		return sigc::mem_fun(*this, &bitmap_modifier<derived_t>::update_bitmap);
 	}
 
 protected:
+	bitmap_modifier() :
+		m_input_bitmap(
+			init_owner(*static_cast<derived_t*>(this))
+			+ init_name("input_bitmap")
+			+ init_label(_("Input Bitmap"))
+			+ init_description(_("Input bitmap"))
+			+ init_value<bitmap*>(0)),
+		m_output_bitmap(
+			init_owner(*static_cast<derived_t*>(this))
+			+ init_name("output_bitmap")
+			+ init_label(_("Output Bitmap"))
+			+ init_description(_("Output bitmap"))
+			+ init_slot(sigc::mem_fun(*this, &bitmap_modifier<derived_t>::create_bitmap)))
+	{
+		m_input_bitmap.changed_signal().connect(make_reset_bitmap_slot());
+	}
+
 	k3d_data(bitmap*, data::immutable_name, data::change_signal, data::no_undo, data::local_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_input_bitmap;
 	k3d_data(bitmap*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_bitmap;
 

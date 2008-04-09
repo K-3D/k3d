@@ -31,9 +31,10 @@ namespace bitmap
 {
 
 class simple_modifier :
-	public k3d::bitmap_modifier<k3d::persistent<k3d::node> > 
+	public k3d::persistent<k3d::node>,
+	public k3d::bitmap_modifier<simple_modifier>
 {
-	typedef k3d::bitmap_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::persistent<k3d::node> base;
 
 public:
 	simple_modifier(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

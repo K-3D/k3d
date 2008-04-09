@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -41,9 +41,10 @@ namespace bitmap
 // checker
 
 class checker :
-	public k3d::bitmap_source<k3d::persistent<k3d::node> >
+	public k3d::persistent<k3d::node>,
+	public k3d::bitmap_source<checker>
 {
-	typedef k3d::bitmap_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::persistent<k3d::node> base;
 
 public:
 	checker(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

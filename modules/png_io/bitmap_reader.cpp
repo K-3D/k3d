@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -44,9 +44,10 @@ namespace io
 // bitmap_reader
 
 class bitmap_reader :
-	public k3d::bitmap_source<k3d::persistent<k3d::node> >
+	public k3d::persistent<k3d::node>,
+	public k3d::bitmap_source<bitmap_reader>
 {
-	typedef k3d::bitmap_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::persistent<k3d::node> base;
 
 public:
 	bitmap_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -40,9 +40,10 @@ namespace scripting
 // bitmap_modifier_script
 
 class bitmap_modifier_script :
-	public k3d::scripted_node<k3d::bitmap_modifier<k3d::persistent<k3d::node> > >
+	public k3d::scripted_node<k3d::persistent<k3d::node> >,
+	public k3d::bitmap_modifier<bitmap_modifier_script>
 {
-	typedef k3d::scripted_node<k3d::bitmap_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::scripted_node<k3d::persistent<k3d::node> > base;
 
 public:
 	bitmap_modifier_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

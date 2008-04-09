@@ -40,9 +40,10 @@ namespace scripting
 // bitmap_source_script
 
 class bitmap_source_script :
-	public k3d::scripted_node<k3d::bitmap_source<k3d::persistent<k3d::node> > >
+	public k3d::scripted_node<k3d::persistent<k3d::node> >,
+	public k3d::bitmap_source<bitmap_source_script>
 {
-	typedef k3d::scripted_node<k3d::bitmap_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::scripted_node<k3d::persistent<k3d::node> > base;
 
 public:
 	bitmap_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

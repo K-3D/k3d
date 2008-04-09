@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -44,9 +44,10 @@ namespace glx
 // camera_to_bitmap
 
 class camera_to_bitmap :
-	public k3d::bitmap_source<k3d::persistent<k3d::node> >
+	public k3d::persistent<k3d::node>,
+	public k3d::bitmap_source<camera_to_bitmap>
 {
-	typedef k3d::bitmap_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::persistent<k3d::node> base;
 
 public:
 	camera_to_bitmap(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

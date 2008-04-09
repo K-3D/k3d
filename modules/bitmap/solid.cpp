@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/color.h>
@@ -39,9 +39,10 @@ namespace bitmap
 // solid
 
 class solid :
-	public k3d::bitmap_source<k3d::persistent<k3d::node> >
+	public k3d::persistent<k3d::node>,
+	public k3d::bitmap_source<solid>
 {
-	typedef k3d::bitmap_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::persistent<k3d::node> base;
 
 public:
 	solid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
