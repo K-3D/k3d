@@ -350,6 +350,7 @@ def image_comparison(document, image, image_name, threshold):
 
 	difference = document.new_node("BitmapPerceptualDifference")
 	difference.field_of_view = 10.0
+	difference.luminance = 100
 	document.set_dependency(difference.get_property("input_a"), image)
 	document.set_dependency(difference.get_property("input_b"), reference.get_property("output_bitmap"))
 
