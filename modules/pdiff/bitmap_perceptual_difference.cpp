@@ -59,7 +59,7 @@ public:
 		m_luminance(init_owner(*this) + init_name("luminance") + init_label(_("Luminance")) + init_description(_("Display Luminance (candela per square meter)")) + init_value(100.0) + init_step_increment(1.0)),
 		m_difference(init_owner(*this) + init_name("difference") + init_label(_("Difference")) + init_description(_("The count of perceivably-different pixels")) + init_slot(sigc::mem_fun(*this, &bitmap_perceptual_difference::get_difference_pixels))),
 		m_bitmap_o(init_owner(*this) + init_name("output") + init_label(_("Output Bitmap")) + init_description(_("Output bitmap")) + init_slot(sigc::mem_fun(*this, &bitmap_perceptual_difference::get_difference_image))),
-		m_difference_pixels(std::numeric_limits<unsigned long>::max()),
+		m_difference_pixels(std::numeric_limits<k3d::uint32_t>::max()),
 		m_difference_image(0)
 	{
 		m_bitmap_a.changed_signal().connect(make_reset_output_slot());
@@ -86,7 +86,7 @@ public:
 
 	void reset_output(k3d::iunknown* Hint)
 	{
-		m_difference_pixels = std::numeric_limits<unsigned long>::max();
+		m_difference_pixels = std::numeric_limits<k3d::uint32_t>::max();
 
 		delete m_difference_image;
 		m_difference_image = 0;
@@ -145,20 +145,20 @@ public:
 		k3d::bitmap* const bitmap_a = m_bitmap_a.pipeline_value();
 		if(!bitmap_a)
 		{
-			m_difference_pixels = std::numeric_limits<unsigned long>::max();
+			m_difference_pixels = std::numeric_limits<k3d::uint32_t>::max();
 			return;
 		}
 
 		k3d::bitmap* const bitmap_b = m_bitmap_b.pipeline_value();
 		if(!bitmap_b)
 		{
-			m_difference_pixels = std::numeric_limits<unsigned long>::max();
+			m_difference_pixels = std::numeric_limits<k3d::uint32_t>::max();
 			return;
 		}
 
 		if(bitmap_a->width() != bitmap_b->width() || bitmap_a->height() != bitmap_b->height())
 		{
-			m_difference_pixels = std::numeric_limits<unsigned long>::max();
+			m_difference_pixels = std::numeric_limits<k3d::uint32_t>::max();
 			return;
 		}
 
@@ -173,14 +173,14 @@ public:
 		args.ThresholdPixels = 0;
 
 		Yee_Compare(args);
-		
+	
 		m_difference_pixels = args.FailedPixels;
 		m_difference_image = args.ImgDiff;
 
 		args.ImgDiff = 0;
 	}
 
-	unsigned long get_difference_pixels()
+	k3d::uint32_t get_difference_pixels()
 	{
 		update_output();
 		return m_difference_pixels;
@@ -214,10 +214,10 @@ private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_field_of_view;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_gamma;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_luminance;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_difference;
+	k3d_data(k3d::uint32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_difference;
 	k3d_data(k3d::bitmap*, immutable_name, change_signal, no_undo, demand_storage, no_constraint, read_only_property, no_serialization) m_bitmap_o;
 
-	unsigned long m_difference_pixels;
+	k3d::uint32_t m_difference_pixels;
 	RGBAImage* m_difference_image;
 };
 
