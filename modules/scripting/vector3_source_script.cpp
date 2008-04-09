@@ -30,7 +30,7 @@
 
 #define DEFAULT_SCRIPT "#python\n\n\
 import k3d\n\n\
-Output = k3d.vector3()\n\n"
+Output = k3d.vector3(1, 2, 3)\n\n"
 
 namespace module
 {
@@ -42,9 +42,10 @@ namespace scripting
 // vector3_source_script
 
 class vector3_source_script :
-	public k3d::scripted_node<k3d::vector3_source<k3d::persistent<k3d::node> > >
+	public k3d::scripted_node<k3d::persistent<k3d::node> >,
+	public k3d::vector3_source<vector3_source_script>
 {
-	typedef k3d::scripted_node<k3d::vector3_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::scripted_node<k3d::persistent<k3d::node> > base;
 
 public:
 	vector3_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

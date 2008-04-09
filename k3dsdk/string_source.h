@@ -2,7 +2,7 @@
 #define K3DSDK_STRING_SOURCE_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -26,18 +26,11 @@
 namespace k3d
 {
 
-template<typename base_t>
+template<typename derived_t>
 class string_source :
-	public base_t,
 	public istring_source
 {
 public:
-	string_source(iplugin_factory& Factory, idocument& Document) :
-		base_t(Factory, Document),
-		m_output_string(init_owner(*this) + init_name("output_string") + init_label(_("Output String")) + init_description("Output string") + init_slot(sigc::mem_fun(*this, &string_source<base_t>::create_string)))
-	{
-	}
-
 	iproperty& string_source_output()
 	{
 		return m_output_string;
@@ -46,6 +39,17 @@ public:
 	sigc::slot<void, iunknown*> make_reset_string_slot()
 	{
 		return m_output_string.make_reset_slot();
+	}
+
+protected:
+	string_source() :
+		m_output_string(
+			init_owner(*static_cast<derived_t*>(this))
+			+ init_name("output_string")
+			+ init_label(_("Output String"))
+			+ init_description("Output string")
+			+ init_slot(sigc::mem_fun(*this, &string_source<derived_t>::create_string)))
+	{
 	}
 
 private:

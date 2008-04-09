@@ -2,7 +2,7 @@
 #define K3DSDK_COLOR_SOURCE_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -27,18 +27,11 @@
 namespace k3d
 {
 
-template<typename base_t>
+template<typename derived_t>
 class color_source :
-	public base_t,
 	public icolor_source
 {
 public:
-	color_source(iplugin_factory& Factory, idocument& Document) :
-		base_t(Factory, Document),
-		m_output_color(init_owner(*this) + init_name("output_color") + init_label(_("Output Color")) + init_description(_("Output color")) + init_slot(sigc::mem_fun(*this, &color_source<base_t>::create_color)))
-	{
-	}
-
 	iproperty& color_source_output()
 	{
 		return m_output_color;
@@ -47,6 +40,17 @@ public:
 	sigc::slot<void, iunknown*> make_reset_color_slot()
 	{
 		return m_output_color.make_reset_slot();
+	}
+
+protected:
+	color_source() :
+		m_output_color(
+			init_owner(*static_cast<derived_t*>(this))
+			+ init_name("output_color")
+			+ init_label(_("Output Color"))
+			+ init_description(_("Output color"))
+			+ init_slot(sigc::mem_fun(*this, &color_source<derived_t>::create_color)))
+	{
 	}
 
 private:

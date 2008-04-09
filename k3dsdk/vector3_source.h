@@ -2,7 +2,7 @@
 #define K3DSDK_VECTOR3_SOURCE_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -30,18 +30,11 @@ namespace k3d
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vector3_source
 
-template<typename base_t>
+template<typename derived_t>
 class vector3_source :
-	public base_t,
 	public ivector3_source
 {
 public:
-	vector3_source(iplugin_factory& Factory, idocument& Document) :
-		base_t(Factory, Document),
-		m_output_vector3(init_owner(*this) + init_name("output_vector3") + init_label(_("Output Vector3")) + init_description("Output vector3") + init_slot(sigc::mem_fun(*this, &vector3_source<base_t>::create_vector3)))
-	{
-	}
-
 	iproperty& vector3_source_output()
 	{
 		return m_output_vector3;
@@ -51,6 +44,18 @@ public:
 	{
 		return m_output_vector3.make_reset_slot();
 	}
+
+protected:
+	vector3_source() :
+		m_output_vector3(
+			init_owner(*static_cast<derived_t*>(this))
+			+ init_name("output_vector")
+			+ init_label(_("Output Vector"))
+			+ init_description("Output vector")
+			+ init_slot(sigc::mem_fun(*this, &vector3_source<derived_t>::create_vector3)))
+	{
+	}
+
 
 private:
 	vector3 create_vector3()

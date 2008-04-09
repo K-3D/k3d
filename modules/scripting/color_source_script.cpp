@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -30,7 +30,7 @@
 
 #define DEFAULT_SCRIPT "#python\n\n\
 import k3d\n\n\
-Output = k3d.color(1, 1, 1)\n\n"
+Output = k3d.color(1, 0.5, 0.25)\n\n"
 
 namespace module
 {
@@ -42,9 +42,10 @@ namespace scripting
 // color_source_script
 
 class color_source_script :
-	public k3d::scripted_node<k3d::color_source<k3d::persistent<k3d::node> > >
+	public k3d::scripted_node<k3d::persistent<k3d::node> >,
+	public k3d::color_source<color_source_script>
 {
-	typedef k3d::scripted_node<k3d::color_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::scripted_node<k3d::persistent<k3d::node> > base;
 
 public:
 	color_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -98,5 +99,4 @@ k3d::iplugin_factory& color_source_script_factory()
 } // namespace scripting
 
 } // namespace module
-
 

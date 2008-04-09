@@ -119,6 +119,10 @@ K3D_ADD_TEST(document.stress.all_node_types.py PYTHON)
 
 K3D_ADD_TEST(document.serialization.properties.py PYTHON)
 
+K3D_ADD_TEST(color.source.ColorSourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
+K3D_ADD_TEST(string.source.StringSourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
+K3D_ADD_TEST(vector3.source.Vector3SourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
+
 K3D_ADD_TEST(bitmap.source.JPEGBitmapReader.py PYTHON REQUIRES K3D_BUILD_JPEG_IO_MODULE)
 K3D_ADD_TEST(bitmap.source.PNGBitmapReader.py PYTHON REQUIRES K3D_BUILD_PNG_IO_MODULE)
 K3D_ADD_TEST(bitmap.source.TIFFBitmapReader.py PYTHON REQUIRES K3D_BUILD_TIFF_IO_MODULE)
