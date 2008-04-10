@@ -29,7 +29,7 @@
 #include <k3dsdk/scripted_node.h>
 
 #define DEFAULT_SCRIPT "#python\n\n\
-Output = 0.0\n\n"
+Output = 1.0\n\n"
 
 namespace module
 {
