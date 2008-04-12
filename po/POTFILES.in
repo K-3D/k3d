@@ -6,6 +6,7 @@ k3dsdk/bitmap_sink.h
 k3dsdk/bitmap_source.h
 k3dsdk/color_source.h
 k3dsdk/document.cpp
+k3dsdk/double_source.h
 k3dsdk/legacy_mesh_modifier.h
 k3dsdk/legacy_mesh_source.h
 k3dsdk/long_source.h
@@ -63,7 +64,6 @@ k3dsdk/parentable.h
 k3dsdk/plugin_factory_collection.cpp
 k3dsdk/renderable_gl.h
 k3dsdk/renderable_ri.h
-k3dsdk/scalar_source.h
 k3dsdk/scripted_node.h
 k3dsdk/scripted_plugin.h
 k3dsdk/shader_ri.cpp
@@ -351,6 +351,7 @@ modules/scripting/bitmap_modifier_script.cpp
 modules/scripting/bitmap_source_script.cpp
 modules/scripting/color_source_script.cpp
 modules/scripting/command_node_script.cpp
+modules/scripting/double_source_script.cpp
 modules/scripting/gl_renderable_script.cpp
 modules/scripting/long_source_script.cpp
 modules/scripting/mesh_modifier_script.cpp
@@ -358,7 +359,6 @@ modules/scripting/mesh_painter_script.cpp
 modules/scripting/mesh_source_script.cpp
 modules/scripting/null_output_script.cpp
 modules/scripting/render_engine_script.cpp
-modules/scripting/scalar_source_script.cpp
 modules/scripting/string_source_script.cpp
 modules/scripting/transform_modifier_script.cpp
 modules/scripting/transform_source_script.cpp
@@ -378,7 +378,6 @@ modules/selection/select_n_sided.cpp
 modules/selection/select_nurbs_curve_by_number.cpp
 modules/selection/select_nurbs_patch_by_number.cpp
 modules/selection/select_point_by_number.cpp
-modules/tbb/scale_points.cpp
 modules/test/legacy_mesh_conversion.cpp
 modules/test/memory_pools.cpp
 modules/test/mesh_diff.cpp
