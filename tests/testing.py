@@ -279,12 +279,12 @@ def bitmap_size_comparison(bitmap, width, height):
 		raise "bitmap dimensions incorrect"
 
 def mesh_comparison(document, mesh, mesh_name, threshold):
-	
-	output_file = k3d.generic_path(binary_path() + "/" + mesh_name + ".output.k3d")
-	reference_file = k3d.generic_path(source_path() + "/meshes/" + mesh_name + ".reference.k3d")
-	
+
+	mesh_writer = document.new_node("K3DMeshWriter")
+	mesh_writer.file = k3d.generic_path(binary_path() + "/" + mesh_name + ".output.k3d")
+	document.set_dependency(mesh_writer.get_property("input_mesh"), mesh)
+
 	reference = document.new_node("K3DMeshReader")
-	reference.file = reference_file
 
 	difference = document.new_node("MeshDiff")
 	difference.threshold = threshold
@@ -293,23 +293,32 @@ def mesh_comparison(document, mesh, mesh_name, threshold):
 	document.set_dependency(difference.get_property("input_a"), mesh)
 	document.set_dependency(difference.get_property("input_b"), reference.get_property("output_mesh"))
 
-	mesh_writer = document.new_node("K3DMeshWriter")
-	mesh_writer.file = output_file
-	document.set_dependency(mesh_writer.get_property("input_mesh"), mesh)
+	for index in range(1, 100):
+		reference_file = k3d.generic_path(source_path() + "/meshes/" + mesh_name + ".reference." + str(index) + ".k3d")
 
-	if not difference.get_property("input_a").pipeline_value() or not difference.get_property("input_b").pipeline_value():
-		raise Exception("missing mesh comparison input")
+		if not os.path.exists(str(reference_file)):
+			if index == 1:
+				raise Exception("missing reference file: " + str(reference_file))
+			else:
+				break
 
-	if not difference.equal:
-		# As a temporary measure, print results to stdout until CDash fully supports <DartMeasurement>
-		print k3d.print_diff(mesh.pipeline_value(), reference.output_mesh, threshold)
+		reference.file = reference_file
 
-		print """<DartMeasurement name="Mesh Difference" type="text/text">\n"""
-		print k3d.print_diff(mesh.pipeline_value(), reference.output_mesh, threshold)
-		print """</DartMeasurement>\n"""
-		sys.stdout.flush()
+		if not difference.get_property("input_a").pipeline_value() or not difference.get_property("input_b").pipeline_value():
+			raise Exception("missing mesh comparison input")
 
-		raise Exception("output mesh differs from reference")
+		if difference.equal:
+			return
+
+	# As a temporary measure, print results to stdout until CDash fully supports <DartMeasurement>
+	print k3d.print_diff(mesh.pipeline_value(), reference.output_mesh, threshold)
+
+	print """<DartMeasurement name="Mesh Difference" type="text/text">\n"""
+	print k3d.print_diff(mesh.pipeline_value(), reference.output_mesh, threshold)
+	print """</DartMeasurement>\n"""
+	sys.stdout.flush()
+
+	raise Exception("output mesh differs from reference")
 
 def mesh_area_comparison(calculated_area, expected_area):
 	if calculated_area != expected_area:
