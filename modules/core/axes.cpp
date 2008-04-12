@@ -24,9 +24,9 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
-#include <k3dsdk/bounded.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/ibounded.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
@@ -44,9 +44,10 @@ namespace libk3dcore
 // axes
 
 class axes :
-	public k3d::snappable<k3d::bounded<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > >
+	public k3d::snappable<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > >,
+	public k3d::ibounded
 {
-	typedef k3d::snappable<k3d::bounded<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
+	typedef k3d::snappable<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > base;
 
 public:
 	axes(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
