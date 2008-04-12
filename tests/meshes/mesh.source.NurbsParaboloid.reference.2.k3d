@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2.5 0 0 2.5 2.5000000000127587 0 -1.2758529918142406e-11 2.5 0 -2.5000000000255169 2.4999999999872409 0 -2.5 -2.5517059836284813e-11 0 -2.4999999999744831 -2.5000000000382756 0 3.8275589754427217e-11 -2.5 0 2.5000000000510343 -2.4999999999617244 0 2.5 5.1034119672569625e-11 0 5 0 10 5 5.0000000000255174 10 -2.5517059836284813e-11 5 10 -5.0000000000510338 4.9999999999744817 10 -5 -5.1034119672569625e-11 10 -4.9999999999489662 -5.0000000000765512 10 7.6551179508854434e-11 -5 10 5.0000000001020686 -4.9999999999234488 10 5 1.0206823934513925e-10 10</points>
+		<point_selection>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</point_selection>
+		<nurbs_patches>
+			<patch_first_points>0</patch_first_points>
+			<patch_u_point_counts>9</patch_u_point_counts>
+			<patch_v_point_counts>3</patch_v_point_counts>
+			<patch_u_orders>3</patch_u_orders>
+			<patch_v_orders>3</patch_v_orders>
+			<patch_u_first_knots>0</patch_u_first_knots>
+			<patch_v_first_knots>0</patch_v_first_knots>
+			<patch_selection>0</patch_selection>
+			<patch_materials>0</patch_materials>
+			<patch_points>0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26</patch_points>
+			<patch_point_weights>1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1</patch_point_weights>
+			<patch_u_knots>0 0 0 1 1 2 2 3 3 4 4 4</patch_u_knots>
+			<patch_v_knots>0 0 0 1 1 1</patch_v_knots>
+		</nurbs_patches>
+	</mesh_arrays>
+</k3dml>
