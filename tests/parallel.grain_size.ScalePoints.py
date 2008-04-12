@@ -4,7 +4,7 @@ import k3d
 import testing
 
 # Create a mesh source and our test modifier ...
-setup = testing.setup_mesh_modifier_test("PolyGrid", "TBBScalePoints")
+setup = testing.setup_mesh_modifier_test("PolyGrid", "ScalePoints")
 setup.source.rows = 300
 setup.source.columns = 300
 
