@@ -25,7 +25,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
-#include <k3dsdk/scalar_source.h>
+#include <k3dsdk/double_source.h>
 #include <k3dsdk/scripted_node.h>
 
 #define DEFAULT_SCRIPT "#python\n\n\
@@ -38,23 +38,24 @@ namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// scalar_source_script
+// double_source_script
 
-class scalar_source_script :
-	public k3d::scripted_node<k3d::scalar_source<k3d::persistent<k3d::node> > >
+class double_source_script :
+	public k3d::scripted_node<k3d::persistent<k3d::node> >,
+	public k3d::double_source<double_source_script>
 {
-	typedef k3d::scripted_node<k3d::scalar_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::scripted_node<k3d::persistent<k3d::node> > base;
 
 public:
-	scalar_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	double_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 		set_script(DEFAULT_SCRIPT);
 
-		connect_script_changed_signal(make_reset_scalar_slot());
+		connect_script_changed_signal(make_reset_double_slot());
 	}
 
-	double on_create_scalar()
+	k3d::double_t on_create_double()
 	{
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
@@ -63,9 +64,9 @@ public:
 
 		execute_script(context);
 
-		return_val_if_fail(context["Output"].type() == typeid(double), 0.0);
+		return_val_if_fail(context["Output"].type() == typeid(k3d::double_t), 0.0);
 
-		return boost::any_cast<double>(context["Output"]);
+		return boost::any_cast<k3d::double_t>(context["Output"]);
 	}
 
 	k3d::iplugin_factory& factory()
@@ -75,10 +76,10 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<scalar_source_script, k3d::interface_list<k3d::iscalar_source> > factory(
+		static k3d::document_plugin_factory<double_source_script, k3d::interface_list<k3d::idouble_source> > factory(
 			k3d::uuid(0xed110740, 0x7c2e4215, 0xbc8a4c1a, 0x3c1736ba),
-			"ScalarSourceScript",
-			_("Scalar source that uses a script to create the output value"),
+			"DoubleSourceScript",
+			_("Data source that uses a script to create a k3d::double_t output value"),
 			"Scripting Scalar",
 			k3d::iplugin_factory::STABLE);
 
@@ -87,15 +88,14 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// scalar_source_script_factory
+// double_source_script_factory
 
-k3d::iplugin_factory& scalar_source_script_factory()
+k3d::iplugin_factory& double_source_script_factory()
 {
-	return scalar_source_script::get_factory();
+	return double_source_script::get_factory();
 }
 
 } // namespace scripting
 
 } // namespace module
-
 

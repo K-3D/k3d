@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "bitmap.h"
@@ -33,6 +33,7 @@
 #include "idisplacement_shader_ri.h"
 #include "idocument_exporter.h"
 #include "idocument_importer.h"
+#include "idouble_source.h"
 #include "iimager_shader_ri.h"
 #include "ikeyframer.h"
 #include "ilight_gl.h"
@@ -58,7 +59,6 @@
 #include "irender_engine_ri.h"
 #include "irender_frame.h"
 #include "irender_preview.h"
-#include "iscalar_source.h"
 #include "iscript_engine.h"
 #include "istring_source.h"
 #include "isurface_shader_ri.h"
@@ -176,6 +176,7 @@ void initialize_types()
 	register_type(typeid(k3d::icolor_source), "k3d::icolor_source");
 	register_type(typeid(k3d::idocument_exporter), "k3d::idocument_exporter");
 	register_type(typeid(k3d::idocument_importer), "k3d::idocument_importer");
+	register_type(typeid(k3d::idouble_source), "k3d::idouble_source");
 	register_type(typeid(k3d::ikeyframer), "k3d::ikeyframer");
 	register_type(typeid(k3d::ilong_source), "k3d::ilong_source");
 	register_type(typeid(k3d::imaterial), "k3d::imaterial");
@@ -196,7 +197,6 @@ void initialize_types()
 	register_type(typeid(k3d::irender_camera_preview), "k3d::irender_camera_preview");
 	register_type(typeid(k3d::irender_frame), "k3d::irender_frame");
 	register_type(typeid(k3d::irender_preview), "k3d::irender_preview");
-	register_type(typeid(k3d::iscalar_source), "k3d::iscalar_source");
 	register_type(typeid(k3d::iscript_engine), "k3d::iscript_engine");
 	register_type(typeid(k3d::istring_source), "k3d::istring_source");
 	register_type(typeid(k3d::itime_sink), "k3d::itime_sink");

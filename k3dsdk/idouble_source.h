@@ -1,8 +1,8 @@
-#ifndef K3DSDK_ISCALAR_SOURCE_H
-#define K3DSDK_ISCALAR_SOURCE_H
+#ifndef K3DSDK_IDOUBLE_SOURCE_H
+#define K3DSDK_IDOUBLE_SOURCE_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,8 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares iscalar_source, an interface for objects that can act as a source of scalar values
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -32,21 +31,21 @@ namespace k3d
 
 class iproperty;
 
-/// Abstract interface for objects that can act as a source of scalar values
-class iscalar_source :
+/// Abstract interface for objects that can act as a source of k3d::double_t values
+class idouble_source :
 	public virtual iunknown
 {
 public:
-	virtual iproperty& scalar_source_output() = 0;
+	virtual iproperty& double_source_output() = 0;
 
 protected:
-	iscalar_source() {}
-	iscalar_source(const iscalar_source&) {}
-	iscalar_source& operator=(const iscalar_source&) { return *this; }
-	virtual ~iscalar_source() {}
+	idouble_source() {}
+	idouble_source(const idouble_source&) {}
+	idouble_source& operator=(const idouble_source&) { return *this; }
+	virtual ~idouble_source() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_ISCALAR_SOURCE_H
+#endif // K3DSDK_IDOUBLE_SOURCE_H
 
