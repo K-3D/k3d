@@ -35,12 +35,12 @@
 #include "idocument_importer.h"
 #include "idouble_source.h"
 #include "iimager_shader_ri.h"
+#include "iint32_source.h"
 #include "ikeyframer.h"
 #include "ilight_gl.h"
 #include "ilight_ri.h"
 #include "ilight_shader_ri.h"
 #include "ilight_yafray.h"
-#include "ilong_source.h"
 #include "imaterial.h"
 #include "imaterial_gl.h"
 #include "imaterial_ri.h"
@@ -177,8 +177,8 @@ void initialize_types()
 	register_type(typeid(k3d::idocument_exporter), "k3d::idocument_exporter");
 	register_type(typeid(k3d::idocument_importer), "k3d::idocument_importer");
 	register_type(typeid(k3d::idouble_source), "k3d::idouble_source");
+	register_type(typeid(k3d::iint32_source), "k3d::iint32_source");
 	register_type(typeid(k3d::ikeyframer), "k3d::ikeyframer");
-	register_type(typeid(k3d::ilong_source), "k3d::ilong_source");
 	register_type(typeid(k3d::imaterial), "k3d::imaterial");
 	register_type(typeid(k3d::imaterial*), "k3d::imaterial*");
 	register_type(typeid(k3d::imesh_sink), "k3d::imesh_sink");

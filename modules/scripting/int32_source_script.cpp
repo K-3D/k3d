@@ -23,13 +23,14 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/long_source.h>
+#include <k3dsdk/int32_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/scripted_node.h>
+#include <k3dsdk/type_registry.h>
 
 #define DEFAULT_SCRIPT "#python\n\n\
-Output = 0\n\n"
+Output = 1\n\n"
 
 namespace module
 {
@@ -38,23 +39,24 @@ namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// long_source_script
+// int32_source_script
 
-class long_source_script :
-	public k3d::scripted_node<k3d::long_source<k3d::persistent<k3d::node> > >
+class int32_source_script :
+	public k3d::scripted_node<k3d::persistent<k3d::node> >,
+	public k3d::int32_source<int32_source_script>
 {
-	typedef k3d::scripted_node<k3d::long_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::scripted_node<k3d::persistent<k3d::node> > base;
 
 public:
-	long_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	int32_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 		set_script(DEFAULT_SCRIPT);
 
-		connect_script_changed_signal(make_reset_long_slot());
+		connect_script_changed_signal(make_reset_int32_slot());
 	}
 
-	long on_create_long()
+	k3d::int32_t on_create_int32()
 	{
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
@@ -63,11 +65,10 @@ public:
 
 		execute_script(context);
 
-		if(context["Output"].type() == typeid(int))
-			return boost::any_cast<int>(context["Output"]);
+		if(context["Output"].type() == typeid(k3d::int32_t))
+			return boost::any_cast<k3d::int32_t>(context["Output"]);
 
-		if(context["Output"].type() == typeid(long))
-			return boost::any_cast<long>(context["Output"]);
+		k3d::log() << error << "unsupported output type: " << k3d::demangle(context["Output"].type()) << std::endl;
 
 		return 0;
 	}
@@ -79,10 +80,10 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<long_source_script, k3d::interface_list<k3d::ilong_source> > factory(
+		static k3d::document_plugin_factory<int32_source_script, k3d::interface_list<k3d::iint32_source> > factory(
 			k3d::uuid(0x024b737a, 0xdf144dca, 0xb29e32b4, 0x319e5466),
-			"LongSourceScript",
-			_("Long source that uses a script to create the output value"),
+			"Int32SourceScript",
+			_("Uses a script to generate an output k3d::int32_t value."),
 			"Scripting",
 			k3d::iplugin_factory::STABLE);
 
@@ -91,15 +92,14 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// long_source_script_factory
+// int32_source_script_factory
 
-k3d::iplugin_factory& long_source_script_factory()
+k3d::iplugin_factory& int32_source_script_factory()
 {
-	return long_source_script::get_factory();
+	return int32_source_script::get_factory();
 }
 
 } // namespace scripting
 
 } // namespace module
-
 

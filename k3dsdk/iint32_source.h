@@ -1,8 +1,8 @@
-#ifndef K3DSDK_ILONG_SOURCE_H
-#define K3DSDK_ILONG_SOURCE_H
+#ifndef K3DSDK_IINT32_SOURCE_H
+#define K3DSDK_IINT32_SOURCE_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -17,12 +17,11 @@
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
-// License along with this program; if not, write to the Free Software
+// License aint32 with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares ilong_source, an interface for objects that can act as a source of long values
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -32,21 +31,21 @@ namespace k3d
 
 class iproperty;
 
-/// Abstract interface for objects that can act as a source of long values
-class ilong_source :
+/// Abstract interface for objects that can act as a source of k3d::int32_t values
+class iint32_source :
 	public virtual iunknown
 {
 public:
-	virtual iproperty& long_source_output() = 0;
+	virtual iproperty& int32_source_output() = 0;
 
 protected:
-	ilong_source() {}
-	ilong_source(const ilong_source&) {}
-	ilong_source& operator=(const ilong_source&) { return *this; }
-	virtual ~ilong_source() {}
+	iint32_source() {}
+	iint32_source(const iint32_source&) {}
+	iint32_source& operator=(const iint32_source&) { return *this; }
+	virtual ~iint32_source() {}
 };
 
 } // namespace k3d
 
-#endif // K3DSDK_ILONG_SOURCE_H
+#endif // K3DSDK_IINT32_SOURCE_H
 

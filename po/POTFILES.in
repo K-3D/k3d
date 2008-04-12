@@ -7,9 +7,9 @@ k3dsdk/bitmap_source.h
 k3dsdk/color_source.h
 k3dsdk/document.cpp
 k3dsdk/double_source.h
+k3dsdk/int32_source.h
 k3dsdk/legacy_mesh_modifier.h
 k3dsdk/legacy_mesh_source.h
-k3dsdk/long_source.h
 k3dsdk/material_sink.h
 k3dsdk/mesh_modifier.h
 k3dsdk/mesh_painter_gl.h
@@ -353,7 +353,7 @@ modules/scripting/color_source_script.cpp
 modules/scripting/command_node_script.cpp
 modules/scripting/double_source_script.cpp
 modules/scripting/gl_renderable_script.cpp
-modules/scripting/long_source_script.cpp
+modules/scripting/int32_source_script.cpp
 modules/scripting/mesh_modifier_script.cpp
 modules/scripting/mesh_painter_script.cpp
 modules/scripting/mesh_source_script.cpp
