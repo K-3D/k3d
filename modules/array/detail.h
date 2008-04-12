@@ -1,8 +1,8 @@
-#ifndef DETAIL_H
-#define DETAIL_H
+#ifndef MODULE_ARRAY_DETAIL_H
+#define MODULE_ARRAY_DETAIL_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -25,6 +25,8 @@
 #include <k3dsdk/itransform_array_1d.h>
 #include <k3dsdk/itransform_array_2d.h>
 #include <k3dsdk/itransform_array_3d.h>
+#include <k3dsdk/persistent.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/node_change_signal.h>
 #include <k3dsdk/signal_slots.h>
 
@@ -38,14 +40,16 @@ namespace array
 // transform_array_1d
 
 /// Boilerplate implementation of k3d::itransform_array_1d
-template<typename base_t>
 class transform_array_1d :
-	public k3d::node_change_signal<base_t>,
+	public k3d::persistent<k3d::node>,
+	public k3d::node_change_signal<transform_array_1d>,
 	public k3d::itransform_array_1d
 {
+	typedef k3d::persistent<k3d::node> base;
+
 public:
 	transform_array_1d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		k3d::node_change_signal<base_t>(Factory, Document),
+		base(Factory, Document),
 		m_layout(init_owner(*this) + init_name("layout") + init_label(_("Layout")) + init_description(_("Layout")) + init_value<k3d::itransform_array_1d*>(0)),
 		m_processing(false)
 	{
@@ -83,14 +87,16 @@ private:
 // transform_array_2d
 
 /// Boilerplate implementation of k3d::itransform_array_1d
-template<typename base_t>
 class transform_array_2d :
-	public k3d::node_change_signal<base_t>,
+	public k3d::persistent<k3d::node>,
+	public k3d::node_change_signal<transform_array_2d>,
 	public k3d::itransform_array_2d
 {
+	typedef k3d::persistent<k3d::node> base;
+
 public:
 	transform_array_2d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		k3d::node_change_signal<base_t>(Factory, Document),
+		base(Factory, Document),
 		m_layout(init_owner(*this) + init_name("layout") + init_label(_("Layout")) + init_description(_("Layout")) + init_value<k3d::itransform_array_2d*>(0)),
 		m_processing(false)
 	{
@@ -128,14 +134,16 @@ private:
 // transform_array_3d
 
 /// Boilerplate implementation of k3d::itransform_array_1d
-template<typename base_t>
 class transform_array_3d :
-	public k3d::node_change_signal<base_t>,
+	public k3d::persistent<k3d::node>,
+	public k3d::node_change_signal<transform_array_3d>,
 	public k3d::itransform_array_3d
 {
+	typedef k3d::persistent<k3d::node> base;
+
 public:
 	transform_array_3d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		k3d::node_change_signal<base_t>(Factory, Document),
+		base(Factory, Document),
 		m_layout(init_owner(*this) + init_name("layout") + init_label(_("Layout")) + init_description(_("Layout")) + init_value<k3d::itransform_array_3d*>(0)),
 		m_processing(false)
 	{
@@ -173,5 +181,5 @@ private:
 
 } // namespace module
 
-#endif // !DETAIL_H
+#endif // !MODULE_ARRAY_DETAIL_H
 

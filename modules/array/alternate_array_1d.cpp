@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -25,8 +25,6 @@
 
 #include <k3dsdk/axis.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace module
 {
@@ -38,9 +36,9 @@ namespace array
 // alternate_array_1d
 
 class alternate_array_1d :
-	public transform_array_1d<k3d::persistent<k3d::node> >
+	public transform_array_1d
 {
-	typedef transform_array_1d<k3d::persistent<k3d::node> > base;
+	typedef transform_array_1d base;
 
 public:
 	alternate_array_1d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

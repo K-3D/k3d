@@ -53,9 +53,10 @@ namespace quadrics
 // quadric
 
 class quadric :
-	public k3d::snappable<k3d::gl::renderable<k3d::ri::renderable<k3d::material_sink<k3d::bounded<k3d::transformable<k3d::persistent<k3d::node_change_signal<k3d::node> > > > > > > >
+	public k3d::snappable<k3d::gl::renderable<k3d::ri::renderable<k3d::material_sink<k3d::bounded<k3d::transformable<k3d::persistent<k3d::node> > > > > > >,
+	public k3d::node_change_signal<quadric>
 {
-	typedef k3d::snappable<k3d::gl::renderable<k3d::ri::renderable<k3d::material_sink<k3d::bounded<k3d::transformable<k3d::persistent<k3d::node_change_signal<k3d::node> > > > > > > > base;
+	typedef k3d::snappable<k3d::gl::renderable<k3d::ri::renderable<k3d::material_sink<k3d::bounded<k3d::transformable<k3d::persistent<k3d::node> > > > > > > base;
 
 public:
 	quadric(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,8 +24,6 @@
 #include "detail.h"
 
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace module
 {
@@ -37,9 +35,9 @@ namespace array
 // rotate_array_2d
 
 class rotate_array_2d :
-	public transform_array_2d<k3d::persistent<k3d::node> >
+	public transform_array_2d
 {
-	typedef transform_array_2d<k3d::persistent<k3d::node> > base;
+	typedef transform_array_2d base;
 
 public:
 	rotate_array_2d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
