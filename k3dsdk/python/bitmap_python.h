@@ -27,6 +27,8 @@
 #include "interface_wrapper_python.h"
 #include <k3dsdk/bitmap.h>
 
+#include <boost/python/tuple.hpp>
+
 namespace k3d
 {
 
@@ -44,10 +46,11 @@ public:
 
 	void assign(const bitmap& Bitmap);
 	void reset(const unsigned long Width, const unsigned long Height);
-//	const k3d::color get_pixel(const unsigned long X, const unsigned long Y);
-//	void set_pixel(const unsigned long X, const unsigned long Y, const k3d::color& Color);
 	const unsigned long width();
 	const unsigned long height();
+
+	boost::python::tuple get_pixel(const unsigned long X, const unsigned long Y);
+	void set_pixel(const unsigned long X, const unsigned long Y, const boost::python::tuple& Pixel);
 };
 
 void export_bitmap();

@@ -58,27 +58,41 @@ void bitmap::reset(const unsigned long Width, const unsigned long Height)
 	wrapped().swap(temp);
 }
 
-/*
-const k3d::color bitmap::get_pixel(const unsigned long X, const unsigned long Y)
+tuple bitmap::get_pixel(const unsigned long X, const unsigned long Y)
 {
 	if(X >= wrapped().width())
-		throw std::invalid_argument("x value out-of-range");
+		throw std::invalid_argument("X value out-of-range");
 	if(Y >= wrapped().height())
-		throw std::invalid_argument("y value out-of-range");
+		throw std::invalid_argument("Y value out-of-range");
 
-	return *(wrapped().begin() + (wrapped().width() * Y) + X);
+	const k3d::bitmap::view_t& bitmap = boost::gil::view(wrapped());
+	k3d::pixel& pixel = bitmap(X, Y);
+
+	return boost::python::make_tuple(
+		boost::gil::get_color(pixel, boost::gil::red_t()),
+		boost::gil::get_color(pixel, boost::gil::green_t()),
+		boost::gil::get_color(pixel, boost::gil::blue_t()),
+		boost::gil::get_color(pixel, boost::gil::alpha_t()));
 }
 
-void bitmap::set_pixel(const unsigned long X, const unsigned long Y, const k3d::color& Color)
+void bitmap::set_pixel(const unsigned long X, const unsigned long Y, const tuple& Pixel)
 {
 	if(X >= wrapped().width())
-		throw std::invalid_argument("x value out-of-range");
+		throw std::invalid_argument("X value out-of-range");
 	if(Y >= wrapped().height())
-		throw std::invalid_argument("y value out-of-range");
+		throw std::invalid_argument("Y value out-of-range");
+	if(len(Pixel) != 4)
+		throw std::invalid_argument("Pixel argument must be a 4-tuple");
 
-	*(wrapped().begin() + (wrapped().width() * Y) + X) = Color;
+	const k3d::bitmap::view_t& bitmap = boost::gil::view(wrapped());
+	k3d::pixel& pixel = bitmap(X, Y);
+
+	pixel = k3d::pixel(
+		boost::python::extract<double>(Pixel[0])(),
+		boost::python::extract<double>(Pixel[1])(),
+		boost::python::extract<double>(Pixel[2])(),
+		boost::python::extract<double>(Pixel[3])());
 }
-*/
 
 const unsigned long bitmap::width()
 {
@@ -100,12 +114,12 @@ void export_bitmap()
 		.def("reset", &bitmap::reset,
 			"Replaces the current contents with an uninitialized bitmap with the given dimensions.\n\n"
 			">>> mybitmap.reset(640, 480)\n\n")
-//		.def("get_pixel", &bitmap::get_pixel)
-//		.def("set_pixel", &bitmap::set_pixel)
 		.def("width", &bitmap::width,
 			"Returns the width of the image in pixels.")
 		.def("height", &bitmap::height,
 			"Returns the height of the image in pixels.")
+		.def("get_pixel", &bitmap::get_pixel)
+		.def("set_pixel", &bitmap::set_pixel)
 		;
 }
 
