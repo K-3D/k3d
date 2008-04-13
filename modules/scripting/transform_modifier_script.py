@@ -1,0 +1,4 @@
+#python
+
+Output = Input
+

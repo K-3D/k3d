@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -27,16 +27,8 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
-
-#define DEFAULT_SCRIPT "#python\n\n\
-import k3d\n\n\
-Output.copy(Input)\n\n\
-scale = 1.5\n\n\
-input_points = Input.points()\n\
-output_points = Output.writable_points()\n\n\
-for i in range(len(output_points)):\n\
-		output_points[i] = input_points[i] * scale\n\n"
 
 namespace module
 {
@@ -56,7 +48,7 @@ public:
 	mesh_modifier_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		set_script(DEFAULT_SCRIPT);
+		set_script(k3d::resource::get_string("/module/scripting/mesh_modifier_script.py"));
 
 		connect_script_changed_signal(make_reset_mesh_slot());
 	}

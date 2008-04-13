@@ -25,11 +25,9 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
 #include <k3dsdk/string_source.h>
-
-#define DEFAULT_SCRIPT "#python\n\n\
-Output = \"K-3D\"\n\n"
 
 namespace module
 {
@@ -50,7 +48,7 @@ public:
 	string_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		set_script(DEFAULT_SCRIPT);
+		set_script(k3d::resource::get_string("/module/scripting/string_source_script.py"));
 
 		connect_script_changed_signal(make_reset_string_slot());
 	}

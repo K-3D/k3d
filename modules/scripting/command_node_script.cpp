@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -25,12 +25,8 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/icommand_node.h>
 #include <k3dsdk/property_collection.h>
+#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_plugin.h>
-
-#define DEFAULT_SCRIPT "#python\n\n\
-print \"command: \" + Command\n\
-print \"arguments: \" + Arguments\n\
-\n\n"
 
 namespace module
 {
@@ -48,7 +44,7 @@ class command_node_script :
 public:
 	command_node_script()
 	{
-		set_script(DEFAULT_SCRIPT);
+		set_script(k3d::resource::get_string("/module/scripting/command_node_script.py"));
 	}
 
 	const result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)

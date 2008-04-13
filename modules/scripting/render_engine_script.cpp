@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -27,36 +27,8 @@
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
-
-#define DEFAULT_SCRIPT "#python\n\n\
-# Sample RenderEngineScript input\n\
-#\n\
-# Use the following context variables for rendering:\n\
-#\n\
-# \"Document\" - a reference to the owning document.\n\
-# \"Node\" - a reference to the owning node.\n\
-# \"VisibleNodes\" - the collection of nodes that should be\n\
-#                  rendered, if possible.\n\
-# \"OutputImage\" - string path to the user-selected output file.\n\
-# \"ViewImage\" - boolean indicating whether the output should\n\
-#               be displayed after rendering is complete.\n\
-\n\
-# This trivial example \"renders\" the document by writing\n\
-# the name of each visible node to a text file.  The set of\n\
-# visible nodes is chosen by the user at runtime via the\n\
-# \"Visible Nodes\" property.\n\
-\n\
-import k3d\n\
-k3d.check_node_environment(locals(), \"RenderEngineScript\")\n\
-\n\
-output = open(OutputImage, \"w\")\n\
-\n\
-for node in VisibleNodes:\n\
-	output.write(k3d.dynamic_cast(node, \"iproperty_collection\").name + \"\\n\")\n\
-\n\
-output.close()\n\
-\n\n"
 
 namespace module
 {
@@ -79,7 +51,7 @@ public:
 		base(Factory, Document),
 		m_visible_nodes(init_owner(*this) + init_name("visible_nodes") + init_label(_("Visible Nodes")) + init_description(_("Visible Nodes")) + init_value(std::vector<k3d::inode*>()))
 	{
-		set_script(DEFAULT_SCRIPT);
+		set_script(k3d::resource::get_string("/module/scripting/render_engine_script.py"));
 	}
 
 	const k3d::inode_collection_sink::properties_t node_collection_properties()

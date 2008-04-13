@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -28,20 +28,9 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
 #include <k3dsdk/selection.h>
-
-#define DEFAULT_SCRIPT "#python\n\n\
-from OpenGL.GL import *\n\n\
-glPushAttrib(GL_ALL_ATTRIB_BITS)\n\
-glDisable(GL_LIGHTING)\n\
-glPointSize(5)\n\
-glColor3d(0, 0, 1)\n\n\
-glBegin(GL_POINTS)\n\
-for point in Mesh.points():\n\
-	glVertex3d(point[0], point[1], point[2])\n\
-glEnd()\n\n\
-glPopAttrib()\n\n"
 
 namespace module
 {
@@ -62,7 +51,7 @@ public:
 	mesh_painter_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		set_script(DEFAULT_SCRIPT);
+		set_script(k3d::resource::get_string("/module/scripting/mesh_painter_script.py"));
 	}
 
 	void paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)

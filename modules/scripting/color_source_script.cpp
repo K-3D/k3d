@@ -26,11 +26,8 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
-
-#define DEFAULT_SCRIPT "#python\n\n\
-import k3d\n\n\
-Output = k3d.color(1, 0.5, 0.25)\n\n"
 
 namespace module
 {
@@ -51,7 +48,7 @@ public:
 	color_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		set_script(DEFAULT_SCRIPT);
+		set_script(k3d::resource::get_string("/module/scripting/color_source_script.py"));
 
 		connect_script_changed_signal(make_reset_color_slot());
 	}

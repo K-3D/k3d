@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -26,23 +26,10 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_gl.h>
+#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/transformable.h>
-
-#define DEFAULT_SCRIPT "#python\n\n\
-try:\n\
-  from OpenGL.GL import *\n\n\
-  glDisable(GL_LIGHTING)\n\
-  glColor3f(1, 1, 0)\n\n\
-  glBegin(GL_POLYGON)\n\
-  glVertex3f(-1, -1, 0)\n\
-  glVertex3f(1, -1, 0)\n\
-  glVertex3f(1, 1, 0)\n\
-  glVertex3f(-1, 1, 0)\n\
-  glEnd()\n\n\
-except:\n\
-  print \"Couldn't load OpenGL module\"\n\n"
 
 namespace module
 {
@@ -62,7 +49,7 @@ public:
 	gl_renderable_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		set_script(DEFAULT_SCRIPT);
+		set_script(k3d::resource::get_string("/module/scripting/gl_renderable_script.py"));
 	}
 
 	void on_gl_draw(const k3d::gl::render_state& State)

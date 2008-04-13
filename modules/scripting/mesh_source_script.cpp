@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -27,39 +27,8 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
-
-#define DEFAULT_SCRIPT "#python\n\n\
-import k3d\n\n\
-positions = [(-5, -5, 0), (5, -5, 0), (5, 5, 0), (-5, 5, 0)]\n\n\
-points = Output.create_points()\n\
-point_selection = Output.create_point_selection()\n\
-for position in positions:\n\
-	points.append(k3d.point3(position[0], position[1], position[2]))\n\n\
-	point_selection.append(0.0)\n\
-polyhedra = Output.create_polyhedra()\n\n\
-first_faces = polyhedra.create_first_faces()\n\
-first_faces.assign([0])\n\n\
-face_counts = polyhedra.create_face_counts()\n\
-face_counts.assign([1])\n\n\
-types = polyhedra.create_types()\n\
-types.assign([k3d.polyhedron_type.polygons])\n\n\
-face_first_loops = polyhedra.create_face_first_loops()\n\
-face_first_loops.assign([0])\n\n\
-face_loop_counts = polyhedra.create_face_loop_counts()\n\
-face_loop_counts.assign([1])\n\n\
-face_materials = polyhedra.create_face_materials()\n\
-face_materials.assign([None])\n\n\
-face_selection = polyhedra.create_face_selection()\n\
-face_selection.assign([0.0])\n\n\
-loop_first_edges = polyhedra.create_loop_first_edges()\n\
-loop_first_edges.assign([0])\n\n\
-edge_points = polyhedra.create_edge_points()\n\
-edge_points.assign([0, 1, 2, 3])\n\n\
-clockwise_edges = polyhedra.create_clockwise_edges()\n\
-clockwise_edges.assign([1, 2, 3, 0])\n\n\
-edge_selection = polyhedra.create_edge_selection()\n\
-edge_selection.assign([0.0, 0.0, 0.0, 0.0])\n\n"
 
 namespace module
 {
@@ -79,7 +48,7 @@ public:
 	mesh_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		set_script(DEFAULT_SCRIPT);
+		set_script(k3d::resource::get_string("/module/scripting/mesh_source_script.py"));
 
 		connect_script_changed_signal(make_topology_changed_slot());
 	}

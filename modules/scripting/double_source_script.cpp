@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -26,10 +26,8 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/double_source.h>
+#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
-
-#define DEFAULT_SCRIPT "#python\n\n\
-Output = 1.0\n\n"
 
 namespace module
 {
@@ -50,7 +48,7 @@ public:
 	double_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		set_script(DEFAULT_SCRIPT);
+		set_script(k3d::resource::get_string("/module/scripting/double_source_script.py"));
 
 		connect_script_changed_signal(make_reset_double_slot());
 	}
