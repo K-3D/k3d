@@ -16,9 +16,9 @@ torus.material = material
 camera = testing.create_camera(doc)
 render_engine = testing.create_opengl_engine(doc)
 
-camera_to_bitmap = doc.new_node("GLXCameraToBitmap")
+camera_to_bitmap = doc.new_node("WGLCameraToBitmap")
 camera_to_bitmap.camera = camera
 camera_to_bitmap.render_engine = render_engine
 
-testing.image_comparison(doc, camera_to_bitmap.get_property("output_bitmap"), "offscreen.glx", 0.013)
+testing.image_comparison(doc, camera_to_bitmap.get_property("output_bitmap"), "offscreen.glx", 0.009)
 
