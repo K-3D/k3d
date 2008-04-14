@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,18 +22,11 @@
 */
 
 #include <k3d-i18n-config.h>
-#include <k3d-module-config.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/ibitmap_source.h>
 #include <k3dsdk/log.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/virtual_document_plugin_factory.h>
-
-#if defined K3D_BUILD_GLX_MODULE
-	static const std::string plugin_name = "GLXCameraToBitmap";
-#elif defined K3D_BUILD_WGL_MODULE
-	static const std::string plugin_name = "WGLCameraToBitmap";
-#endif
 
 namespace module
 {
@@ -62,7 +55,10 @@ public:
 	k3d::inode* create_plugin(k3d::iplugin_factory& Factory, k3d::idocument& Document)
 	{
 		if(!delegate)
-			delegate = dynamic_cast<k3d::idocument_plugin_factory*>(k3d::plugin::factory::lookup(plugin_name));
+			delegate = dynamic_cast<k3d::idocument_plugin_factory*>(k3d::plugin::factory::lookup("GLXCameraToBitmap"));
+
+		if(!delegate)
+			delegate = dynamic_cast<k3d::idocument_plugin_factory*>(k3d::plugin::factory::lookup("WGLCameraToBitmap"));
 
 		if(delegate)
 			k3d::log() << info << this->name() << " delegating to " << dynamic_cast<k3d::iplugin_factory*>(delegate)->name() << std::endl;
