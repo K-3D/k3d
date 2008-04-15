@@ -128,6 +128,13 @@ const object idocument::get_node(const std::string& Name)
 	return object(node(k3d::find_node(wrapped().nodes(), Name)));
 }
 
+const bool idocument::has_node(const std::string& Name)
+{
+	if (k3d::find_node(wrapped().nodes(), Name) != 0)
+		return true;
+	return false;
+}
+
 void idocument::delete_node(object& Node)
 {
 	extract<node> node(Node);
@@ -188,6 +195,7 @@ void idocument::define_class()
 		.def("nodes", &idocument::nodes)
 		.def("new_node", &idocument::new_node)
 		.def("get_node", &idocument::get_node)
+		.def("has_node", &idocument::has_node)
 		.def("delete_node", &idocument::delete_node)
 		.def("get_dependency", &idocument::get_dependency)
 		.def("set_dependency", &idocument::set_dependency);

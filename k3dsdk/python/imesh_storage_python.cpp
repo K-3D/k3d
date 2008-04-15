@@ -54,13 +54,20 @@ boost::python::object imesh_storage::reset_mesh()
 	return boost::python::object(k3d::python::mesh(mesh));
 }
 
+void imesh_storage::clear_mesh()
+{
+	wrapped().reset_mesh(0);
+}
+
 void imesh_storage::define_class()
 {
 	class_<imesh_storage>("imesh_storage",
 		"Abstract interface implemented by nodes that can provide persistent storage of L{mesh} objects.", no_init)
 		.def("reset_mesh", &imesh_storage::reset_mesh,
 			"Creates a new L{mesh} object whose lifetime will be managed by the imesh_storage object.\n\n"
-			"@return: Returns a new L{mesh} object.");
+			"@return: Returns a new L{mesh} object.")
+		.def("clear_mesh", &imesh_storage::clear_mesh,
+			"Deletes the stored mesh and resets the storage to a null mesh.");
 }
 
 } // namespace python

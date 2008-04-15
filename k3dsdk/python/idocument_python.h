@@ -56,6 +56,7 @@ public:
 	const boost::python::list nodes();
 	const boost::python::object new_node(const boost::python::object& Type);
 	const boost::python::object get_node(const std::string& Name);
+	const bool has_node(const std::string& Name);
 	void delete_node(boost::python::object& Node);
 
 	boost::python::object get_dependency(iproperty& Property);
