@@ -299,6 +299,32 @@ const bool_t is_triangles(const mesh& Mesh)
 	return true;
 }
 
+const bool_t is_uninitialized(const mesh& Mesh)
+{
+	if (Mesh.points)
+		return false;
+	if (Mesh.bicubic_patches)
+		return false;
+	if (Mesh.bilinear_patches)
+		return false;
+	if (Mesh.blobbies)
+		return false;
+	if (Mesh.cubic_curve_groups)
+		return false;
+	if (Mesh.linear_curve_groups)
+		return false;
+	if (Mesh.nurbs_curve_groups)
+		return false;
+	if (Mesh.nurbs_patches)
+		return false;
+	if (Mesh.point_groups)
+		return false;
+	if (Mesh.polyhedra)
+		return false;
+	if (Mesh.point_selection)
+		return false;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // store_selection
 

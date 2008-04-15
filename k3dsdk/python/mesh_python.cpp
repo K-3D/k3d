@@ -64,6 +64,11 @@ const bool is_triangles(const mesh& Mesh)
 	return k3d::is_triangles(Mesh.wrapped());
 }
 
+const bool is_uninitialized(const mesh& Mesh)
+{
+	return k3d::is_uninitialized(Mesh.wrapped());
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // wrap_const_object
 
@@ -1734,7 +1739,9 @@ void mesh::define_class()
 	def("is_solid", detail::is_solid,
 		"Returns true if every L{polyhedra} in the given L{mesh} is solid.");
 	def("is_triangles", detail::is_triangles,
-		"Returns true if face in the given L{mesh} is a triangle.");
+		"Returns true if every face in the given L{mesh} is a triangle.");
+	def("is_uninitialized", detail::is_uninitialized,
+		"Returns true if all arrays and primitives are uninitialized (null).");
 }
 
 } // namespace python

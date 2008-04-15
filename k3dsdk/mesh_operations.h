@@ -40,6 +40,8 @@ const mesh create_cylinder(const uint_t Rows, const uint_t Columns, imaterial* c
 const bool_t is_solid(const mesh& Mesh);
 /// Returns true iff every face in the given mesh is a triangle
 const bool_t is_triangles(const mesh& Mesh);
+/// Returns true iff every array and primitive shared pointer in the mesh is unitinialized
+const bool_t is_uninitialized(const mesh& Mesh);
 
 /// Copies the selection state of a mesh into a mesh_selection
 void store_selection(const mesh& Mesh, mesh_selection& Selection);
