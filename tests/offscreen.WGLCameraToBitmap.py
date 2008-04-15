@@ -20,5 +20,5 @@ camera_to_bitmap = doc.new_node("WGLCameraToBitmap")
 camera_to_bitmap.camera = camera
 camera_to_bitmap.render_engine = render_engine
 
-testing.image_comparison(doc, camera_to_bitmap.get_property("output_bitmap"), "offscreen.glx", 0.009)
+testing.image_comparison(doc, camera_to_bitmap.get_property("output_bitmap"), "offscreen.WGLCameraToBitmap", 0.009)
 

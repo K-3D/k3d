@@ -20,5 +20,5 @@ camera_to_bitmap = doc.new_node("VirtualCameraToBitmap")
 camera_to_bitmap.camera = camera
 camera_to_bitmap.render_engine = render_engine
 
-testing.image_comparison(doc, camera_to_bitmap.get_property("output_bitmap"), "offscreen", 0.009)
+testing.image_comparison(doc, camera_to_bitmap.get_property("output_bitmap"), "offscreen.VirtualCameraToBitmap", 0.009)
 
