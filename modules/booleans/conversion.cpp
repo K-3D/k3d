@@ -29,7 +29,10 @@
 
 #include <map>
 
-namespace libk3dbooleans
+namespace module
+{
+
+namespace booleans
 {
 
 typedef std::map<const Polyhedron::Vertex*, size_t> point_map_t;
@@ -215,4 +218,6 @@ void k3d_failure_handler(const char *type, const char *expr, const char* file, i
   k3d::log() << error << "CGAL " << type << ": " << expr << " at " << file << ":" << line << ". " << msg << std::endl;
 }
 
-}
+} // namespace booleans
+
+} // namespace module

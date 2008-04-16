@@ -23,7 +23,7 @@
 // software in the executable aside from CGAL.
 
 /** \file
-		\brief Nodes to perform 3D boolean operations using CGAL
+		\brief Plugin to perform 3D boolean operations using CGAL
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
@@ -31,6 +31,7 @@
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
+#include <k3dsdk/imulti_mesh_sink.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
@@ -40,13 +41,17 @@
 #include <k3dsdk/properties.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
-namespace libk3dbooleans
+namespace module
+{
+
+namespace booleans
 {
 
 /////////////////////////////////////////////////////////////////////////////
 // cgal_boolean
 
 class cgal_boolean :
+	public k3d::imulti_mesh_sink,
 	public k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
@@ -152,7 +157,7 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<cgal_boolean, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<cgal_boolean, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imulti_mesh_sink> > > factory(
 			k3d::uuid(0x0d88fe28, 0xea4fdf20, 0xae858297, 0x487f857b),
 			"CGALBoolean",
 			_("3D mesh boolean operations"),
@@ -235,4 +240,6 @@ k3d::iplugin_factory& cgal_boolean_factory()
 	return cgal_boolean::get_factory();
 }
 
-}
+} // namespace booleans
+
+} // namespace module

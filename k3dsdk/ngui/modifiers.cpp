@@ -25,12 +25,14 @@
 #include "modifiers.h"
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/classes.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
+#include <k3dsdk/imulti_mesh_sink.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iproperty.h>
@@ -43,6 +45,8 @@
 #include <k3dsdk/result.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
+
+#include <sstream>
 
 namespace libk3dngui
 {
@@ -67,7 +71,9 @@ const factories_t& mesh_modifiers()
 	{
 		const k3d::plugin::factory::collection_t data_source_modifiers = k3d::plugin::factory::lookup<k3d::imesh_source>();
 		const k3d::plugin::factory::collection_t data_sink_modifiers = k3d::plugin::factory::lookup<k3d::imesh_sink>();
+		const k3d::plugin::factory::collection_t multi_sink_modifiers = k3d::plugin::factory::lookup<k3d::imulti_mesh_sink>();
 		std::set_intersection(data_source_modifiers.begin(), data_source_modifiers.end(), data_sink_modifiers.begin(), data_sink_modifiers.end(), std::inserter(modifiers, modifiers.end()));
+		modifiers.insert(modifiers.end(), multi_sink_modifiers.begin(), multi_sink_modifiers.end());
 		std::sort(modifiers.begin(), modifiers.end(), detail::sort_by_name());
 	}
 
@@ -191,6 +197,104 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 	}
 
 	return modifier;
+}
+
+void modify_selected_meshes(document_state& DocumentState, k3d::iplugin_factory* Modifier)
+{
+	return_if_fail(Modifier);
+	
+	if (Modifier->implements(typeid(k3d::imulti_mesh_sink)))
+	{ // Mesh modifier taking multiple inputs
+		k3d::uint_t count = 0;
+		k3d::ipipeline::dependencies_t dependencies;
+		const k3d::nodes_t selected_nodes = DocumentState.selected_nodes();
+		// Create the node
+		k3d::inode* multi_sink = DocumentState.create_node(Modifier);
+		k3d::record_state_change_set changeset(DocumentState.document(), k3d::string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), K3D_CHANGE_SET_CONTEXT);
+		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
+		{
+			// Check to see if the selected node is a mesh instance
+			if ((*node)->factory().factory_id() != k3d::classes::MeshInstance())
+				continue;
+			++count;
+			// Create a new user property
+			std::stringstream name, label;
+			name << "input" << count;
+			label << "Input " << count;
+			k3d::iproperty* sink = k3d::property::get(*multi_sink, name.str());
+			if (!sink)
+				sink = k3d::property::create<k3d::mesh*>(*multi_sink, name.str(), label.str(), "", static_cast<k3d::mesh*>(0));
+			// Get the source property
+			k3d::iproperty* source = k3d::property::get(**node, "transformed_mesh");
+			assert_warning(source);
+			// Store the connection
+			dependencies.insert(std::make_pair(sink, source));
+			// Make the input invisible
+			k3d::property::set_internal_value(**node, "viewport_visible", false);
+			k3d::property::set_internal_value(**node, "render_final", false);
+			k3d::property::set_internal_value(**node, "render_shadows", false);
+			k3d::property::set_internal_value(**node, "motion_blur", false);
+		}
+		DocumentState.document().pipeline().set_dependencies(dependencies);
+		DocumentState.view_node_properties_signal().emit(multi_sink);
+	}
+	else
+	{ // Normal mesh modifier
+		k3d::nodes_t new_modifiers;
+	
+		const k3d::nodes_t selected_nodes = DocumentState.selected_nodes();
+		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
+		{
+			new_modifiers.push_back(modify_mesh(DocumentState, **node, Modifier));
+			assert_warning(new_modifiers.back());
+		}
+	
+		// Show the new modifier properties if only one was processed
+		if(selected_nodes.size() == 1)
+		{
+			DocumentState.view_node_properties_signal().emit(new_modifiers.front());
+		}
+		else // otherwise connect all parameter properties to the first node and show that one
+		{
+			k3d::iproperty_collection* first_property_collection = dynamic_cast<k3d::iproperty_collection*>(new_modifiers.front());
+			if (first_property_collection)
+			{
+				// Get the in-and output property names, to exclude them from the connections
+				k3d::imesh_sink* const modifier_sink = dynamic_cast<k3d::imesh_sink*>(new_modifiers.front());
+				return_if_fail(modifier_sink);
+				k3d::imesh_source* const modifier_source = dynamic_cast<k3d::imesh_source*>(new_modifiers.front());
+				return_if_fail(modifier_source);
+				const std::string sink_name = modifier_sink->mesh_sink_input().property_name();
+				const std::string source_name = modifier_source->mesh_source_output().property_name();
+				
+				k3d::ipipeline::dependencies_t dependencies;
+				const k3d::iproperty_collection::properties_t& first_properties = first_property_collection->properties();
+				k3d::nodes_t::iterator modifier = new_modifiers.begin();
+				++modifier;
+				for (modifier; modifier != new_modifiers.end(); ++modifier)
+				{
+					k3d::iproperty_collection* property_collection = dynamic_cast<k3d::iproperty_collection*>(*modifier);
+					return_if_fail(property_collection);
+					const k3d::iproperty_collection::properties_t& properties = property_collection->properties();
+					k3d::iproperty_collection::properties_t::const_iterator property = properties.begin();
+					for (k3d::iproperty_collection::properties_t::const_iterator first_property = first_properties.begin(); first_property != first_properties.end(); ++first_property)
+					{
+						return_if_fail(property != properties.end());
+						return_if_fail((*property)->property_name() == (*first_property)->property_name());
+						if ((*property)->property_name() == sink_name || (*property)->property_name() == source_name || (*property)->property_name() == "name")
+						{
+							++property;
+							continue;
+						}
+						dependencies.insert(std::make_pair(*property, *first_property));
+						++property;
+					}
+				}
+				DocumentState.document().pipeline().set_dependencies(dependencies);
+				DocumentState.view_node_properties_signal().emit(new_modifiers.front());
+			}
+		}
+	}
 }
 
 const transform_modifier create_transform_modifier(k3d::idocument& Document, const k3d::uuid& ModifierType, const std::string& ModifierName)

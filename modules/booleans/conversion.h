@@ -49,7 +49,10 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/mesh.h>
 
-namespace libk3dbooleans
+namespace module
+{
+
+namespace booleans
 {
 	//typedef CGAL::Lazy_exact_nt<double> NT; // Using an exact number type would probably be a good idea, but fails to compile...
 	typedef CGAL::threshold_number NT;
@@ -72,6 +75,8 @@ namespace libk3dbooleans
 	/// Convert errors to the k3d logging system
 	void k3d_failure_handler(const char *type, const char *expr, const char* file, int line, const char* msg);
 	
-}
+} // namespace booleans
+
+} // namespace module
 
 #endif /*CONVERSION_H_*/

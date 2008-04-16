@@ -62,6 +62,7 @@
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
+#include <k3dsdk/imulti_mesh_sink.h>
 #include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/ipersistent.h>
 #include <k3dsdk/ipipeline.h>
@@ -1695,8 +1696,8 @@ public:
 		if(k3d::classes::Camera() == Factory->factory_id())
 			k3d::set_matrix(*node, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
 		
-		// If the new node is a CGALBoolean node, add two mesh inputs
-		if(Factory->name() == "CGALBoolean")
+		// If the new node is a multiple mesh sink, add two mesh inputs
+		if(Factory->implements(typeid(k3d::imulti_mesh_sink)))
 		{
 			k3d::property::create<k3d::mesh*>(*node, "input1", "Input 1", "", static_cast<k3d::mesh*>(0));
 			k3d::property::create<k3d::mesh*>(*node, "input2", "Input 2", "", static_cast<k3d::mesh*>(0));

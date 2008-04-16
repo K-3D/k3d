@@ -35,7 +35,10 @@
 #include <CGAL/Nef_3/SNC_structure.h>
 #include <CGAL/normal_vector_newell_3.h>
 
-namespace libk3dbooleans
+namespace module
+{
+
+namespace booleans
 {
 
 typedef CGAL::Plane_3<Kernel> Plane;
@@ -318,6 +321,8 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
   
 }
 
-} // end namespace
+} // namespace booleans
+
+} // namespace module
 
 #endif /*K3D_TO_NEF_H_*/

@@ -57,6 +57,8 @@ const factories_t& mesh_modifiers();
 k3d::inode* modify_transformation(k3d::idocument& Document, k3d::inode& Object, k3d::iplugin_factory* Modifier);
 /// Modify mesh object
 k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Object, k3d::iplugin_factory* Modifier);
+/// Modify all selected meshes
+void modify_selected_meshes(document_state& DocumentState, k3d::iplugin_factory* Modifier);
 
 struct transform_modifier;
 const transform_modifier create_transform_modifier(k3d::idocument& Document, const k3d::uuid& ModifierType, const std::string& ModifierName);

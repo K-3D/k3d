@@ -1,5 +1,8 @@
+#ifndef IMULTI_MESH_SINK_H_
+#define IMULTI_MESH_SINK_H_
+
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,25 +21,27 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+		\brief Declares imulti_mesh_sink, an interface for objects that can consume multiple meshes
+		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/module.h>
+#include "iunknown.h"
 
-/// Namespace reserved for the primitives plugin module, to protect public symbols from name clashes with other modules
-namespace module
+namespace k3d
 {
 
-namespace booleans
+/// Abstract interface for objects that can consume multiple meshes
+class imulti_mesh_sink :
+	public virtual iunknown
 {
 
-extern k3d::iplugin_factory& cgal_boolean_factory();
+protected:
+	imulti_mesh_sink() {}
+	imulti_mesh_sink(const imulti_mesh_sink&) {}
+	imulti_mesh_sink& operator=(const imulti_mesh_sink&) { return *this; }
+	virtual ~imulti_mesh_sink() {}
+};
 
-} // namespace booleans
+} // namespace k3d
 
-} // namespace module
-
-K3D_MODULE_START(Registry)
-	Registry.register_factory(module::booleans::cgal_boolean_factory());
-K3D_MODULE_END
-
+#endif /*IMULTI_MESH_SINK_H_*/

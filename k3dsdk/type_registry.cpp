@@ -51,6 +51,7 @@
 #include "imesh_source.h"
 #include "imesh_storage.h"
 #include "imime_type_handler.h"
+#include "imulti_mesh_sink.h"
 #include "inode.h"
 #include "irender_animation.h"
 #include "irender_camera_animation.h"
@@ -185,6 +186,7 @@ void initialize_types()
 	register_type(typeid(k3d::imesh_source), "k3d::imesh_source");
 	register_type(typeid(k3d::imesh_storage), "k3d::imesh_storage");
 	register_type(typeid(k3d::imime_type_handler), "k3d::imime_type_handler");
+	register_type(typeid(k3d::imulti_mesh_sink), "k3d::imulti_mesh_sink");
 	register_type(typeid(k3d::inode), "k3d::inode");
 	register_type(typeid(k3d::inode*), "k3d::inode*");
 	register_type(typeid(k3d::int16_t), "k3d::int16_t");
