@@ -24,6 +24,7 @@
 #include "bitmap_python.h"
 
 #include <boost/python.hpp>
+#include <boost/python/detail/api_placeholder.hpp>
 using namespace boost::python;
 
 namespace k3d
