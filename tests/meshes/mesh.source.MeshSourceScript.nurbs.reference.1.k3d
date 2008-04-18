@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>-5 5 5 5 5 5 5 5 10 -5 -5 5 5 -5 5 5 -5 10 -5 5 -5 5 5 -5 5 5 0 -5 -5 -5 5 -5 -5 5 -5 0</points>
+		<point_selection>0 0 0 0 0 0 0 0 0 0 0 0</point_selection>
+		<nurbs_patches>
+			<patch_first_points>0 6</patch_first_points>
+			<patch_u_point_counts>3 3</patch_u_point_counts>
+			<patch_v_point_counts>2 2</patch_v_point_counts>
+			<patch_u_orders>3 3</patch_u_orders>
+			<patch_v_orders>2 2</patch_v_orders>
+			<patch_u_first_knots>0 6</patch_u_first_knots>
+			<patch_v_first_knots>0 4</patch_v_first_knots>
+			<patch_selection>0 0</patch_selection>
+			<patch_materials>0 0</patch_materials>
+			<patch_points>0 1 2 3 4 5 6 7 8 9 10 11</patch_points>
+			<patch_point_weights>1 10 1 1 0.5 1 1 10 1 1 0.5 1</patch_point_weights>
+			<patch_u_knots>1 1 1 2 2 2 1 1 1 2 2 2</patch_u_knots>
+			<patch_v_knots>1 1 2 2 1 1 2 2</patch_v_knots>
+			<varying_data>
+				<array name="Cs" type="k3d::color">1 0 0 0 1 0 0 0 1 1 1 1 1 0 0 0 1 0 0 0 1 1 1 1</array>
+			</varying_data>
+		</nurbs_patches>
+	</mesh_arrays>
+</k3dml>
