@@ -3,11 +3,11 @@
 import k3d
 k3d.check_node_environment(locals(), "MeshSourceScript")
 
-# Perform required one-time setup to store geometric points in the mesh.
+# Perform required one-time setup to store geometric points in the mesh ...
 points = Output.create_points()
 point_selection = Output.create_point_selection()
 
-# Perform required one-time setup to store NURBS patches in the mesh.
+# Perform required one-time setup to store NURBS patches in the mesh ...
 nurbs_patches = Output.create_nurbs_patches()
 patch_first_points = nurbs_patches.create_patch_first_points()
 patch_u_point_counts = nurbs_patches.create_patch_u_point_counts()
@@ -24,10 +24,10 @@ patch_u_knots = nurbs_patches.create_patch_u_knots()
 patch_v_knots = nurbs_patches.create_patch_v_knots()
 
 # Create an (optional) array to hold color values at the parametric
-# corners of each patch.
+# corners of each patch ...
 Cs = nurbs_patches.writable_varying_data().create_array("Cs", "k3d::color")
 
-# We will create two identical NURBS patches.
+# We will create two identical NURBS patches ...
 for i in range(2):
 	patch_first_points.append(len(patch_points))
 	patch_u_point_counts.append(3)

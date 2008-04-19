@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>-5 0 5 5 0 5 0 -5 -5 0 5 -5 7 0 5 17 0 5 12 -5 -5 12 5 -5</points>
+		<point_selection>0 0 0 0 0 0 0 0</point_selection>
+		<bilinear_patches>
+			<patch_selection>0 0</patch_selection>
+			<patch_materials>0 0</patch_materials>
+			<patch_points>0 1 2 3 4 5 6 7</patch_points>
+			<varying_data>
+				<array name="Cs" type="k3d::color">1 0 0 0 1 0 0 0 1 1 1 1 1 0 0 0 1 0 0 0 1 1 1 1</array>
+			</varying_data>
+		</bilinear_patches>
+	</mesh_arrays>
+</k3dml>
