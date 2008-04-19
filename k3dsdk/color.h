@@ -2,7 +2,7 @@
 #define K3DSDK_COLOR_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include "almost_equal.h"
@@ -32,10 +32,13 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
 #include <boost/cstdint.hpp>
+#include <boost/io/ios_state.hpp>
+
 
 namespace k3d
 {
@@ -290,45 +293,46 @@ public:
 		saturation = maxcomponent ? difference / maxcomponent : sample_traits::minimum();
 
 		if(saturation != sample_traits::minimum())
+		{
+			const sample_type reddistance = (maxcomponent - red) / difference;
+			const sample_type greendistance = (maxcomponent - green) / difference;
+			const sample_type bluedistance = (maxcomponent - blue) / difference;
+
+			if(red == maxcomponent)
 			{
-				const sample_type reddistance = (maxcomponent - red) / difference;
-				const sample_type greendistance = (maxcomponent - green) / difference;
-				const sample_type bluedistance = (maxcomponent - blue) / difference;
-
-				if(red == maxcomponent)
-					{
-						hue = bluedistance - greendistance;
-					}
-				else if(green == maxcomponent)
-					{
-						hue = 2 + reddistance - bluedistance;
-					}
-				else
-					{
-						hue = 4 + greendistance - reddistance;
-					}
-
-				hue *= 60;
-				while(hue < 0)
-					hue += 360;
-				while(hue >= 360)
-					hue -= 360;
+				hue = bluedistance - greendistance;
 			}
+			else if(green == maxcomponent)
+			{
+				hue = 2 + reddistance - bluedistance;
+			}
+			else
+			{
+				hue = 4 + greendistance - reddistance;
+			}
+
+			hue *= 60;
+			while(hue < 0)
+				hue += 360;
+			while(hue >= 360)
+				hue -= 360;
+		}
 		else
-			{
-				hue = sample_traits::minimum();
-			}
+		{
+			hue = sample_traits::minimum();
+		}
 	}
 
 	/// Serialization
-	friend std::ostream& operator << (std::ostream& Stream, const basic_hsv& RHS)
+	friend std::ostream& operator<<(std::ostream& Stream, const basic_hsv& RHS)
 	{
-		Stream << RHS.hue << " " << RHS.saturation << " " << RHS.value;
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.hue << " " << RHS.saturation << " " << RHS.value;
 		return Stream;
 	}
 
 	/// Deserialization
-	friend std::istream& operator >> (std::istream& Stream, basic_hsv& RHS)
+	friend std::istream& operator>>(std::istream& Stream, basic_hsv& RHS)
 	{
 		Stream >> RHS.hue >> RHS.saturation >> RHS.value;
 		return Stream;
@@ -387,14 +391,15 @@ public:
 	}
 
 	/// Serialization
-	friend std::ostream& operator << (std::ostream& Stream, const basic_alpha<sample_type, sample_traits>& RHS)
+	friend std::ostream& operator<<(std::ostream& Stream, const basic_alpha<sample_type, sample_traits>& RHS)
 	{
-		Stream << RHS.alpha;
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.alpha;
 		return Stream;
 	}
 
 	/// Deserialization
-	friend std::istream& operator >> (std::istream& Stream, basic_alpha<sample_type, sample_traits>& RHS)
+	friend std::istream& operator>>(std::istream& Stream, basic_alpha<sample_type, sample_traits>& RHS)
 	{
 		Stream >> RHS.alpha;
 		return Stream;
@@ -451,14 +456,15 @@ public:
 	}
 
 	/// Serialization
-	friend std::ostream& operator << (std::ostream& Stream, const basic_luma<sample_type, sample_traits>& RHS)
-	{
-		Stream << RHS.luma;
+	friend std::ostream& operator<<(std::ostream& Stream, const basic_luma<sample_type, sample_traits>& RHS)
+	{ 
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.luma;
 		return Stream;
 	}
 
 	/// Deserialization
-	friend std::istream& operator >> (std::istream& Stream, basic_luma<sample_type, sample_traits>& RHS)
+	friend std::istream& operator>>(std::istream& Stream, basic_luma<sample_type, sample_traits>& RHS)
 	{
 		Stream >> RHS.luma;
 		return Stream;
@@ -527,14 +533,15 @@ public:
 	}
 
 	/// Serialization
-	friend std::ostream& operator << (std::ostream& Stream, const basic_luma_alpha<sample_type, sample_traits>& RHS)
+	friend std::ostream& operator<<(std::ostream& Stream, const basic_luma_alpha<sample_type, sample_traits>& RHS)
 	{
-		Stream << RHS.luma << RHS.alpha;
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.luma << RHS.alpha;
 		return Stream;
 	}
 
 	/// Deserialization
-	friend std::istream& operator >> (std::istream& Stream, basic_luma_alpha<sample_type, sample_traits>& RHS)
+	friend std::istream& operator>>(std::istream& Stream, basic_luma_alpha<sample_type, sample_traits>& RHS)
 	{
 		Stream >> RHS.luma >> RHS.alpha;
 		return Stream;
@@ -608,10 +615,10 @@ public:
 	{
 		// Easiest case - saturation is zero
 		if(0 == RHS.saturation)
-			{
-				red = green = blue = sample_traits::convert(RHS.value);
-				return;
-			}
+		{
+			red = green = blue = sample_traits::convert(RHS.value);
+			return;
+		}
 
 		const double h = RHS.hue / 60;
 		const double i = floor(h);
@@ -621,41 +628,41 @@ public:
 		const double t = RHS.value * (1 - (RHS.saturation * (1 - f)));
 
 		if(0.0 == i)
-			{
-				red = sample_traits::convert(RHS.value);
-				green = sample_traits::convert(t);
-				blue = sample_traits::convert(p);
-			}
+		{
+			red = sample_traits::convert(RHS.value);
+			green = sample_traits::convert(t);
+			blue = sample_traits::convert(p);
+		}
 		else if(1.0 == i)
-			{
-				red = sample_traits::convert(q);
-				green = sample_traits::convert(RHS.value);
-				blue = sample_traits::convert(p);
-			}
+		{
+			red = sample_traits::convert(q);
+			green = sample_traits::convert(RHS.value);
+			blue = sample_traits::convert(p);
+		}
 		else if(2.0 == i)
-			{
-				red = sample_traits::convert(p);
-				green = sample_traits::convert(RHS.value);
-				blue = sample_traits::convert(t);
-			}
+		{
+			red = sample_traits::convert(p);
+			green = sample_traits::convert(RHS.value);
+			blue = sample_traits::convert(t);
+		}
 		else if(3.0 == i)
-			{
-				red = sample_traits::convert(p);
-				green = sample_traits::convert(q);
-				blue = sample_traits::convert(RHS.value);
-			}
+		{
+			red = sample_traits::convert(p);
+			green = sample_traits::convert(q);
+			blue = sample_traits::convert(RHS.value);
+		}
 		else if(4.0 == i)
-			{
-				red = sample_traits::convert(t);
-				green = sample_traits::convert(p);
-				blue = sample_traits::convert(RHS.value);
-			}
+		{
+			red = sample_traits::convert(t);
+			green = sample_traits::convert(p);
+			blue = sample_traits::convert(RHS.value);
+		}
 		else if(5.0 == i)
-			{
-				red = sample_traits::convert(RHS.value);
-				green = sample_traits::convert(p);
-				blue = sample_traits::convert(q);
-			}
+		{
+			red = sample_traits::convert(RHS.value);
+			green = sample_traits::convert(p);
+			blue = sample_traits::convert(q);
+		}
 	}
 
 	const double* data() const
@@ -695,7 +702,8 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& Stream, const basic_rgb<sample_type, sample_traits>& RHS)
 	{
-		Stream << RHS.red << " " << RHS.green << " " << RHS.blue;
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.red << " " << RHS.green << " " << RHS.blue;
 		return Stream;
 	}
 
@@ -786,14 +794,15 @@ public:
 	}
 
 	/// Serialization
-	friend std::ostream& operator << (std::ostream& Stream, const basic_rgba<sample_type, sample_traits>& RHS)
+	friend std::ostream& operator<<(std::ostream& Stream, const basic_rgba<sample_type, sample_traits>& RHS)
 	{
-		Stream << RHS.red << " " << RHS.green << " " << RHS.blue << " " << RHS.alpha;
+		boost::io::ios_flags_saver stream_state(Stream);
+		Stream << std::setprecision(17) << RHS.red << " " << RHS.green << " " << RHS.blue << " " << RHS.alpha;
 		return Stream;
 	}
 
 	/// Deserialization
-	friend std::istream& operator >> (std::istream& Stream, basic_rgba<sample_type, sample_traits>& RHS)
+	friend std::istream& operator>>(std::istream& Stream, basic_rgba<sample_type, sample_traits>& RHS)
 	{
 		Stream >> RHS.red >> RHS.green >> RHS.blue >> RHS.alpha;
 		return Stream;
