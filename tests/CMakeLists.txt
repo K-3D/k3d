@@ -125,8 +125,11 @@ K3D_ADD_TEST(double.source.DoubleSourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIP
 K3D_ADD_TEST(int32.source.Int32SourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.bicubic.patches.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.bilinear.patches.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
+K3D_ADD_TEST(mesh.source.MeshSourceScript.cubic.curves.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
+K3D_ADD_TEST(mesh.source.MeshSourceScript.linear.curves.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.nurbs.curves.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.nurbs.patches.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
+K3D_ADD_TEST(mesh.source.MeshSourceScript.points.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(string.source.StringSourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(vector3.source.Vector3SourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 
