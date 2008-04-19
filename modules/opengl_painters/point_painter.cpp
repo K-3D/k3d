@@ -100,6 +100,8 @@ public:
 			return;
 
 		const k3d::mesh::points_t& points = *Mesh.points;
+		
+		bool valid_polyhedra = k3d::validate_polyhedra(Mesh);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_DOUBLE, 0, &points[0]);
@@ -111,7 +113,7 @@ public:
 		const size_t point_end = points.size();
 		for(size_t point = point_begin; point != point_end; ++point)
 		{
-			if (!k3d::validate_polyhedra(Mesh) || SelectionState.select_backfacing || 
+			if (!valid_polyhedra || SelectionState.select_backfacing || 
 					(!SelectionState.select_backfacing && 
 							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
 			{

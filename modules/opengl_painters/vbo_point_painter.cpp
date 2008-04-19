@@ -116,6 +116,8 @@ public:
 		if (!SelectionState.select_points)
 			return;
 		
+		bool valid_polyhedra = k3d::validate_polyhedra(Mesh);
+		
 		clean_vbo_state();
 
 		get_data<point_vbo>(&Mesh, this).bind();
@@ -126,7 +128,7 @@ public:
 		const size_t point_count = Mesh.points->size();
 		for(size_t point = 0; point != point_count; ++point)
 		{
-			if (!k3d::validate_polyhedra(Mesh) || SelectionState.select_backfacing || 
+			if (!valid_polyhedra || SelectionState.select_backfacing || 
 					(!SelectionState.select_backfacing && 
 							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
 			{
