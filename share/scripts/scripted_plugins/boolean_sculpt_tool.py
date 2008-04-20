@@ -22,29 +22,28 @@ if not Node.has_property("sculpt_tool"):
 modifier = doc.get_node("CGALBoolean")
 frozen_mesh_1 = doc.get_node("FrozenMesh")
 frozen_mesh_2 = doc.get_node("FrozenMesh 2")
-if not doc.has_node("CGALBoolean"):
-  modifier = doc.new_node("CGALBoolean")
-  modifier.create_property("k3d::mesh*", "input_1", "Input 1", "")
-  modifier.create_property("k3d::mesh*", "input_2", "Input 2", "")
-  modifier.type = "difference"
+if not doc.has_node("CGALBoolean"): 
+  if k3d.is_solid(Node.sculpted_mesh) and k3d.is_solid(Node.sculpt_tool):
+    modifier = doc.new_node("CGALBoolean")
+    modifier.create_property("k3d::mesh*", "input_1", "Input 1", "")
+    modifier.create_property("k3d::mesh*", "input_2", "Input 2", "")
+    modifier.type = "difference"
+    
+    frozen_mesh_1 = doc.new_node("FrozenMesh")
+    frozen_mesh_2 = doc.new_node("FrozenMesh")
+    
+    doc.set_dependency(frozen_mesh_2.get_property("input_mesh"), modifier.get_property("output_mesh"))
+    doc.set_dependency(modifier.get_property("input_1"), frozen_mesh_1.get_property("output_mesh"))
+    
+    doc.set_dependency(modifier.get_property("input_2"), Node.get_property("sculpt_tool"))
+    instance = Document.new_node("MeshInstance")
+    doc.set_dependency(instance.get_property("input_mesh"), modifier.get_property("output_mesh"))
+    instance.gl_painter = doc.get_node("GL Default Painter")
+    
+    doc.set_dependency(frozen_mesh_1.get_property("input_mesh"), Node.get_property("sculpted_mesh"))
+    reset_mesh(frozen_mesh_1)
+    doc.set_dependency(frozen_mesh_1.get_property("input_mesh"), frozen_mesh_2.get_property("output_mesh"))
   
-  frozen_mesh_1 = doc.new_node("FrozenMesh")
-  frozen_mesh_2 = doc.new_node("FrozenMesh")
-  
-  doc.set_dependency(frozen_mesh_2.get_property("input_mesh"), modifier.get_property("output_mesh"))
-  doc.set_dependency(modifier.get_property("input_1"), frozen_mesh_1.get_property("output_mesh"))
-  
-  doc.set_dependency(modifier.get_property("input_2"), Node.get_property("sculpt_tool"))
-  instance = Document.new_node("MeshInstance")
-  doc.set_dependency(instance.get_property("input_mesh"), modifier.get_property("output_mesh"))
-  instance.gl_painter = doc.get_node("GL Default Painter")
-
-# init frozen mesh 1 to the sculpted node
-if k3d.is_uninitialized(frozen_mesh_1.output_mesh):
-  doc.set_dependency(frozen_mesh_1.get_property("input_mesh"), Node.get_property("sculpted_mesh"))
-  reset_mesh(frozen_mesh_1)
-  doc.set_dependency(frozen_mesh_1.get_property("input_mesh"), frozen_mesh_2.get_property("output_mesh"))
-
 doc.set_dependency(modifier.get_property("input_2"), Node.get_property("sculpt_tool"))
 
 if not k3d.is_uninitialized(modifier.output_mesh):
