@@ -1,7 +1,10 @@
 INCLUDE_DIRECTORIES(${K3D_CGAL_INCLUDE_DIR})
 
+# Make sure the CGAL assertions stay in
+SET_SOURCE_FILES_PROPERTIES(cgal_boolean_nodes.cpp conversion.cpp module.cpp 
+    PROPERTIES COMPILE_FLAGS "-UNDEBUG")
+
 K3D_BUILD_MODULE(k3d-booleans)
 K3D_CREATE_MODULE_PROXY(k3d-booleans)
 
 TARGET_LINK_LIBRARIES(k3d-booleans ${K3D_CGAL_LIBRARY} ${K3D_MPFR_LIBRARY} ${K3D_GMP_LIBRARY})
-
