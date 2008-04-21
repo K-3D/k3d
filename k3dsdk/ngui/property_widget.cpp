@@ -34,7 +34,6 @@
 #include "icons.h"
 #include "interactive.h"
 #include "messages.h"
-#include "plug_tool.h"
 #include "property_widget.h"
 #include "utility.h"
 #include "widget_manip.h"

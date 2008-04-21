@@ -213,13 +213,6 @@ struct implementation
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
-			new image_toggle_button::control(*main_toolbar, "plug",
-				new detail::active_tool_proxy(m_document_state, m_document_state.plug_tool()), 0,
-				load_icon("plug_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
-			<< set_tooltip(_("Plug"))
-			<< make_toolbar_button()), Gtk::PACK_SHRINK);
-
-		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "render_region",
 				new detail::active_tool_proxy(m_document_state, m_document_state.render_region_tool()), 0,
 				load_icon("render_region_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))

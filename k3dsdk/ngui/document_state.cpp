@@ -36,7 +36,6 @@
 #include "document_state.h"
 #include "knife_tool.h"
 #include "move_tool.h"
-#include "plug_tool.h"
 #include "render_region_tool.h"
 #include "rotate_tool.h"
 #include "safe_close_dialog.h"
@@ -1073,7 +1072,6 @@ public:
 		m_move_tool(0),
 		m_rotate_tool(0),
 		m_scale_tool(0),
-		m_plug_tool(0),
 		m_render_region_tool(0),
 		m_knife_tool(0),
 		m_context_menu_node("context_menu", dynamic_cast<k3d::icommand_node*>(&Document)),
@@ -1096,7 +1094,6 @@ public:
 		delete m_context_menu;
 		delete m_knife_tool;
 		delete m_render_region_tool;
-		delete m_plug_tool;
 		delete m_scale_tool;
 		delete m_rotate_tool;
 		delete m_move_tool;
@@ -1860,7 +1857,6 @@ public:
 	tool* m_move_tool;
 	tool* m_rotate_tool;
 	tool* m_scale_tool;
-	tool* m_plug_tool;
 	tool* m_render_region_tool;
 	tool* m_knife_tool;
 	tool* m_snap_tool;
@@ -1933,7 +1929,6 @@ document_state::document_state(k3d::idocument& Document) :
 	m_implementation->m_move_tool = new libk3dngui::move_tool(*this, "move_tool");
 	m_implementation->m_rotate_tool = new libk3dngui::rotate_tool(*this, "rotate_tool");
 	m_implementation->m_scale_tool = new libk3dngui::scale_tool(*this, "scale_tool");
-	m_implementation->m_plug_tool = new libk3dngui::plug_tool(*this, "plug_tool");
 	m_implementation->m_render_region_tool = new libk3dngui::render_region_tool(*this, "render_region_tool");
 	m_implementation->m_knife_tool = new libk3dngui::knife_tool(*this, "knife_tool");
 	m_implementation->m_snap_tool = new libk3dngui::snap_tool(*this, "snap_tool");
@@ -2103,11 +2098,6 @@ tool& document_state::rotate_tool()
 tool& document_state::scale_tool()
 {
 	return *m_implementation->m_scale_tool;
-}
-
-tool& document_state::plug_tool()
-{
-	return *m_implementation->m_plug_tool;
 }
 
 tool& document_state::render_region_tool()

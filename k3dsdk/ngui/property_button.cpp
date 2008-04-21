@@ -33,7 +33,6 @@
 #include "interactive.h"
 #include "menu_item.h"
 #include "messages.h"
-#include "plug_tool.h"
 #include "property_button.h"
 #include "utility.h"
 #include "widget_manip.h"

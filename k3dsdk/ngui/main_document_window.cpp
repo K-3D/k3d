@@ -695,11 +695,6 @@ private:
 			<< set_accelerator_path("<k3d-document>/actions/edit/tools/unparent", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "plug_tool", _("P_lug"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_plug_tool))
-			<< set_accelerator_path("<k3d-document>/actions/edit/tools/plug_tool", get_accel_group())));
-
-		menu->items().push_back(*Gtk::manage(
 			new menu_item::control(Parent, "render_region_tool", _("Render R_egion"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_region_tool))
 			<< set_accelerator_path("<k3d-document>/actions/edit/tools/render_region_tool", get_accel_group())));
@@ -1715,11 +1710,6 @@ private:
 		return_if_fail(parent_tool);
 
 		m_document_state.set_active_tool(*parent_tool);
-	}
-
-	void on_plug_tool()
-	{
-		m_document_state.set_active_tool(m_document_state.plug_tool());
 	}
 
 	void on_knife_tool()
