@@ -681,10 +681,13 @@ private:
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scale_tool))
 			<< set_accelerator_path("<k3d-document>/actions/edit/tools/scale_tool", get_accel_group())));
 
-		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "parent_tool", _("_Parent"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_parent_tool))
-			<< set_accelerator_path("<k3d-document>/actions/edit/tools/parent_tool", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUIParentTool"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new menu_item::control(Parent, "parent_tool", _("_Parent"), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_parent_tool))
+				<< set_accelerator_path("<k3d-document>/actions/edit/tools/parent_tool", get_accel_group())));
+		}
 
 		menu->items().push_back(*Gtk::manage(
 			new menu_item::control(Parent, "unparent", _("_Unparent"), true)
@@ -1708,7 +1711,10 @@ private:
 
 	void on_parent_tool()
 	{
-		m_document_state.set_active_tool(m_document_state.parent_tool());
+		tool* const parent_tool = m_document_state.get_tool("NGUIParentTool");
+		return_if_fail(parent_tool);
+
+		m_document_state.set_active_tool(*parent_tool);
 	}
 
 	void on_plug_tool()

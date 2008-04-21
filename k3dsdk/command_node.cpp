@@ -191,6 +191,10 @@ bool is_descendant(icommand_node* const Parent, icommand_node* const Descendant)
 /////////////////////////////////////////////////////////////////////////////
 // implementation
 
+implementation::implementation()
+{
+}
+
 implementation::implementation(const std::string& Name, icommand_node* const Parent)
 {
 	k3d::command_tree().add(*this, Name, Parent);

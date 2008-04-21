@@ -36,7 +36,6 @@
 #include "document_state.h"
 #include "knife_tool.h"
 #include "move_tool.h"
-#include "parent_tool.h"
 #include "plug_tool.h"
 #include "render_region_tool.h"
 #include "rotate_tool.h"
@@ -1074,7 +1073,6 @@ public:
 		m_move_tool(0),
 		m_rotate_tool(0),
 		m_scale_tool(0),
-		m_parent_tool(0),
 		m_plug_tool(0),
 		m_render_region_tool(0),
 		m_knife_tool(0),
@@ -1089,11 +1087,16 @@ public:
 
 	~implementation()
 	{
+		while(!m_tools.empty())
+		{
+			delete m_tools.begin()->second;
+			m_tools.erase(m_tools.begin());
+		}
+
 		delete m_context_menu;
 		delete m_knife_tool;
 		delete m_render_region_tool;
 		delete m_plug_tool;
-		delete m_parent_tool;
 		delete m_scale_tool;
 		delete m_rotate_tool;
 		delete m_move_tool;
@@ -1851,15 +1854,19 @@ public:
 
 	/// Store a reference to the current active tool
 	tool* m_active_tool;
+
+	/// Store builtin tools (deprecated)
 	libk3dngui::selection_tool* m_selection_tool;
 	tool* m_move_tool;
 	tool* m_rotate_tool;
 	tool* m_scale_tool;
-	tool* m_parent_tool;
 	tool* m_plug_tool;
 	tool* m_render_region_tool;
 	tool* m_knife_tool;
 	tool* m_snap_tool;
+
+	/// Store plugin tools
+	std::map<k3d::string_t, tool*> m_tools;
 
 	/// Placeholder that "groups" context menu command nodes together
 	k3d::command_node::implementation m_context_menu_node;
@@ -1926,7 +1933,6 @@ document_state::document_state(k3d::idocument& Document) :
 	m_implementation->m_move_tool = new libk3dngui::move_tool(*this, "move_tool");
 	m_implementation->m_rotate_tool = new libk3dngui::rotate_tool(*this, "rotate_tool");
 	m_implementation->m_scale_tool = new libk3dngui::scale_tool(*this, "scale_tool");
-	m_implementation->m_parent_tool = new libk3dngui::parent_tool(*this, "parent_tool");
 	m_implementation->m_plug_tool = new libk3dngui::plug_tool(*this, "plug_tool");
 	m_implementation->m_render_region_tool = new libk3dngui::render_region_tool(*this, "render_region_tool");
 	m_implementation->m_knife_tool = new libk3dngui::knife_tool(*this, "knife_tool");
@@ -2058,6 +2064,27 @@ document_state::active_tool_changed_signal_t& document_state::active_tool_change
 	return m_implementation->active_tool_changed_signal();
 }
 
+
+tool* document_state::get_tool(const k3d::string_t& Name)
+{
+	if(!m_implementation->m_tools.count(Name))
+	{
+		tool* const new_tool = k3d::plugin::create<tool>(Name);
+		return_val_if_fail(new_tool, new_tool);
+
+		new_tool->initialize(*this);
+
+		if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(new_tool))
+			k3d::command_tree().add(*command_node, Name, dynamic_cast<k3d::icommand_node*>(&document()));
+
+		m_implementation->m_tools.insert(std::make_pair(Name, new_tool));
+
+		return new_tool;
+	}
+
+	return m_implementation->m_tools[Name];
+}
+
 tool& document_state::selection_tool()
 {
 	return *m_implementation->m_selection_tool;
@@ -2076,11 +2103,6 @@ tool& document_state::rotate_tool()
 tool& document_state::scale_tool()
 {
 	return *m_implementation->m_scale_tool;
-}
-
-tool& document_state::parent_tool()
-{
-	return *m_implementation->m_parent_tool;
 }
 
 tool& document_state::plug_tool()

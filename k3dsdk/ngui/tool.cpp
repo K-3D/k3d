@@ -38,14 +38,27 @@ namespace libk3dngui
 /////////////////////////////////////////////////////////////////////////////
 // tool
 
-tool::tool(document_state& DocumentState, const std::string& Name) :
+tool::tool() :
+	m_document_state(0)
+{
+}
+
+tool::tool(document_state& DocumentState, const k3d::string_t& Name) :
 	base(Name, dynamic_cast<k3d::icommand_node*>(&DocumentState.document())),
-	m_document_state(DocumentState)
+	m_document_state(&DocumentState)
 {
 }
 
 tool::~tool()
 {
+}
+
+void tool::initialize(document_state& DocumentState)
+{
+	// This should never be called more-than-once ...
+	assert(!m_document_state);
+	m_document_state = &DocumentState;
+	on_initialize(DocumentState);
 }
 
 void tool::activate()
@@ -85,13 +98,17 @@ viewport_input_model& tool::input_model()
 
 void tool::redraw_all()
 {
-	k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
+	k3d::gl::redraw_all(m_document_state->document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 }
 
-void tool::record_command(const std::string& Command, const std::string& Arguments)
+void tool::record_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 {
 	return_if_fail(Command.size());
 	k3d::command_tree().command_signal().emit(*this, k3d::icommand_node::COMMAND_INTERACTIVE, Command, Arguments);
+}
+
+void tool::on_initialize(document_state&)
+{
 }
 
 void tool::on_activate()

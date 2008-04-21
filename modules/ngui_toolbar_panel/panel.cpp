@@ -68,45 +68,80 @@ namespace toolbar
 namespace detail
 {
 
-/// Provides an implementation of k3d::toggle_button::idata_proxy for visualizing the active tool
-class active_tool_proxy_t :
-	public image_toggle_button::idata_proxy
+/// \deprecated Provides an implementation of k3d::toggle_button::imodel for visualizing the active tool
+class active_tool_proxy :
+	public image_toggle_button::imodel
 {
 public:
-	active_tool_proxy_t(document_state& DocumentState, tool& Choice, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
-		idata_proxy(StateRecorder, ChangeMessage),
+	active_tool_proxy(document_state& DocumentState, tool& Choice) :
 		m_document_state(DocumentState),
 		m_choice(Choice)
 	{
 	}
 
-	bool value()
+	const Glib::ustring label()
+	{
+		return _("Active Tool");
+	}
+
+	const k3d::bool_t value()
 	{
 		return &m_document_state.active_tool() == &m_choice;
 	}
 
-	void set_value(const bool Value)
+	void set_value(const k3d::bool_t Value)
 	{
 		m_document_state.set_active_tool(m_choice);
 	}
 
-	changed_signal_t& changed_signal()
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
 	{
-		return m_document_state.active_tool_changed_signal();
+		return m_document_state.active_tool_changed_signal().connect(sigc::hide(Slot));
 	}
 
 private:
-	active_tool_proxy_t(const active_tool_proxy_t& RHS);
-	active_tool_proxy_t& operator=(const active_tool_proxy_t& RHS);
-
 	document_state& m_document_state;
 	tool& m_choice;
 };
 
-std::auto_ptr<image_toggle_button::idata_proxy> active_tool_proxy(document_state& DocumentState, tool& Choice, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring())
+/// Provides an implementation of k3d::toggle_button::imodel for visualizing the active tool
+class plugin_tool_proxy :
+	public image_toggle_button::imodel
 {
-	return std::auto_ptr<image_toggle_button::idata_proxy>(new active_tool_proxy_t(DocumentState, Choice, StateRecorder, ChangeMessage));
-}
+public:
+	plugin_tool_proxy(document_state& DocumentState, const k3d::string_t& Tool) :
+		m_document_state(DocumentState),
+		m_tool(Tool)
+	{
+	}
+
+	const Glib::ustring label()
+	{
+		return _("Active Tool");
+	}
+
+	const k3d::bool_t value()
+	{
+		return m_document_state.active_tool().tool_type() == m_tool;
+	}
+
+	void set_value(const k3d::bool_t Value)
+	{
+		libk3dngui::tool* const tool = m_document_state.get_tool(m_tool);
+		return_if_fail(tool);
+
+		m_document_state.set_active_tool(*tool);
+	}
+
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
+	{
+		return m_document_state.active_tool_changed_signal().connect(sigc::hide(Slot));
+	}
+
+private:
+	document_state& m_document_state;
+	const k3d::string_t m_tool;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 // implementation
@@ -120,7 +155,7 @@ struct implementation
 		libk3dngui::toolbar::control* const main_toolbar = new libk3dngui::toolbar::control(Parent, "main");
 		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "select",
-				detail::active_tool_proxy(m_document_state, m_document_state.selection_tool()),
+				new detail::active_tool_proxy(m_document_state, m_document_state.selection_tool()), 0,
 				load_icon("select_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select"))
 			<< make_toolbar_button()
@@ -128,7 +163,7 @@ struct implementation
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "move",
-				detail::active_tool_proxy(m_document_state, m_document_state.move_tool()),
+				new detail::active_tool_proxy(m_document_state, m_document_state.move_tool()), 0,
 				load_icon("move_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Move"))
 			<< make_toolbar_button()
@@ -136,7 +171,7 @@ struct implementation
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "rotate",
-				detail::active_tool_proxy(m_document_state, m_document_state.rotate_tool()),
+				new detail::active_tool_proxy(m_document_state, m_document_state.rotate_tool()), 0,
 				load_icon("rotate_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Rotate"))
 			<< make_toolbar_button()
@@ -144,7 +179,7 @@ struct implementation
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "scale",
-				detail::active_tool_proxy(m_document_state, m_document_state.scale_tool()),
+				new detail::active_tool_proxy(m_document_state, m_document_state.scale_tool()), 0,
 				load_icon("scale_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Scale"))
 			<< make_toolbar_button()
@@ -152,19 +187,22 @@ struct implementation
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "snap",
-				detail::active_tool_proxy(m_document_state, m_document_state.snap_tool()),
+				new detail::active_tool_proxy(m_document_state, m_document_state.snap_tool()), 0,
 				load_icon("snap_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Snap"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
 
-		main_toolbar->row(0).pack_start(*Gtk::manage(
-			new image_toggle_button::control(*main_toolbar, "parent",
-				detail::active_tool_proxy(m_document_state, m_document_state.parent_tool()),
-				load_icon("parent_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
-			<< set_tooltip(_("Parent"))
-			<< make_toolbar_button()
-			), Gtk::PACK_SHRINK);
+		if(k3d::plugin::factory::lookup("NGUIParentTool"))
+		{
+			main_toolbar->row(0).pack_start(*Gtk::manage(
+				new image_toggle_button::control(*main_toolbar, "parent",
+					new detail::plugin_tool_proxy(m_document_state, "NGUIParentTool"), 0,
+					load_icon("parent_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+				<< set_tooltip(_("Parent"))
+				<< make_toolbar_button()
+				), Gtk::PACK_SHRINK);
+		}
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new button::control(*main_toolbar, "unparent",
@@ -176,14 +214,14 @@ struct implementation
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "plug",
-				detail::active_tool_proxy(m_document_state, m_document_state.plug_tool()),
+				new detail::active_tool_proxy(m_document_state, m_document_state.plug_tool()), 0,
 				load_icon("plug_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Plug"))
 			<< make_toolbar_button()), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "render_region",
-				detail::active_tool_proxy(m_document_state, m_document_state.render_region_tool()),
+				new detail::active_tool_proxy(m_document_state, m_document_state.render_region_tool()), 0,
 				load_icon("render_region_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Render Region"))
 			<< make_toolbar_button()), Gtk::PACK_SHRINK);
@@ -197,7 +235,8 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "select_nodes",
-				toggle_button::radio_proxy(m_document_state.selection_mode(), SELECT_NODES, &m_document_state.document().state_recorder(), "Select Nodes mode"),
+				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_NODES, _("Select Nodes mode")),
+				&m_document_state.document().state_recorder(),
 				load_icon("node", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Objects"))
 			<< make_toolbar_button()
@@ -205,7 +244,8 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "select_points",
-				toggle_button::radio_proxy(m_document_state.selection_mode(), SELECT_POINTS, &m_document_state.document().state_recorder(), "Select Points mode"),
+				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_POINTS, _("Select Points mode")),
+				&m_document_state.document().state_recorder(),
 				load_icon("vertex", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Points"))
 			<< make_toolbar_button()
@@ -213,7 +253,8 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "select_edges",
-				toggle_button::radio_proxy(m_document_state.selection_mode(), SELECT_LINES, &m_document_state.document().state_recorder(), "Select Lines mode"),
+				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_LINES, _("Select Lines mode")),
+				&m_document_state.document().state_recorder(),
 				load_icon("edge", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Lines"))
 			<< make_toolbar_button()
@@ -221,7 +262,8 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "select_faces",
-				toggle_button::radio_proxy(m_document_state.selection_mode(), SELECT_FACES, &m_document_state.document().state_recorder(), "Select Faces mode"),
+				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_FACES, _("Select Faces mode")),
+				&m_document_state.document().state_recorder(),
 				load_icon("face", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Faces"))
 			<< make_toolbar_button()

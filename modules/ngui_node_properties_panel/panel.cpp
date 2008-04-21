@@ -122,36 +122,40 @@ namespace detail
 {
 
 class bypass_property_proxy :
-	public toggle_button::idata_proxy
+	public toggle_button::imodel
 {
 public:
-	bypass_property_proxy(document_state& DocumentState, k3d::iproperty& InputProperty, k3d::iproperty& OutputProperty, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
-		idata_proxy(StateRecorder, ChangeMessage),
+	bypass_property_proxy(document_state& DocumentState, k3d::iproperty& InputProperty, k3d::iproperty& OutputProperty) :
 		m_document_state(DocumentState),
 		m_input_property(InputProperty),
 		m_output_property(OutputProperty)
 	{
 	}
 
-	bool value()
+	const Glib::ustring label()
+	{
+		return _("Bypass modifier");
+	}
+
+	const k3d::bool_t value()
 	{
 		// true == bypassed, false == normal
 		return m_document_state.document().pipeline().dependency(m_output_property) == &m_input_property;
 	}
 
-	void set_value(const bool Value)
+	void set_value(const k3d::bool_t Value)
 	{
 		// true == bypassed, false == normal
 		k3d::ipipeline::dependencies_t dependencies;
 		dependencies.insert(std::make_pair(&m_output_property, Value ? &m_input_property : static_cast<k3d::iproperty*>(0)));
 		m_document_state.document().pipeline().set_dependencies(dependencies);
 
-		m_changed_signal.emit(0);
+		m_changed_signal.emit();
 	}
 
-	changed_signal_t& changed_signal()
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
 	{
-		return m_changed_signal;
+		return m_changed_signal.connect(Slot);
 	}
 
 private:
@@ -162,7 +166,7 @@ private:
 	k3d::iproperty& m_input_property;
 	k3d::iproperty& m_output_property;
 
-	changed_signal_t m_changed_signal;
+	sigc::signal<void> m_changed_signal;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -352,7 +356,12 @@ public:
 			if(k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(m_node))
 			{
 				toggle_button::control* const control =
-					new toggle_button::control(m_parent, "disable_mesh_modifier", std::auto_ptr<toggle_button::idata_proxy>(new detail::bypass_property_proxy(m_document_state, mesh_sink->mesh_sink_input(), mesh_source->mesh_source_output(), state_recorder, Glib::ustring("Disable mesh modifier"))), _("Disable"))
+					new toggle_button::control(
+						m_parent,
+						"disable_mesh_modifier",
+						new detail::bypass_property_proxy(m_document_state, mesh_sink->mesh_sink_input(), mesh_source->mesh_source_output()),
+						state_recorder,
+						_("Disable"))
 						<< set_tooltip(_("Disable / bypass mesh modifier"));
 
 				toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);

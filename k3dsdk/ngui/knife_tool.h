@@ -41,6 +41,8 @@ public:
 	knife_tool(document_state& DocumentState, const std::string& Name);
 	~knife_tool();
 
+	const k3d::string_t tool_type() { return "knife_tool"; }
+
 	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
 
 private:

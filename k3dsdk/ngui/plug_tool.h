@@ -42,6 +42,8 @@ public:
 	plug_tool(document_state& DocumentState, const std::string& Name);
 	~plug_tool();
 
+	const k3d::string_t tool_type() { return "plug_tool"; }
+
 	/// Sets the current property selection (used for interactive connections between properties)
 	void set_selected_properties(const k3d::iproperty_collection::properties_t& Properties);
 	/// Gets the current property selection (used for interactive connections between properties)

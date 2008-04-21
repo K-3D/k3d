@@ -95,6 +95,9 @@ public:
 	/// Returns a signal that will be emitted whenever the active tool changes
 	active_tool_changed_signal_t& active_tool_changed_signal();
 
+	/// Returns an instance of a tool plugin by name (could return NULL).
+	tool* get_tool(const k3d::string_t& Name);
+
 	/// Returns a reference to the builtin Selection Tool that can be passed to set_active_tool()
 	tool& selection_tool();
 	/// Returns a reference to the builtin Move Tool that can be passed to set_active_tool()
@@ -103,8 +106,6 @@ public:
 	tool& rotate_tool();
 	/// Returns a reference to the builtin Scale Tool that can be passed to set_active_tool()
 	tool& scale_tool();
-	/// Returns a reference to the builtin Parent Tool that can be passed to set_active_tool()
-	tool& parent_tool();
 	/// Returns a reference to the builtin Plug Tool that can be passed to set_active_tool()
 	tool& plug_tool();
 	/// Returns a reference to the builtin Render Region Tool that can be passed to set_active_tool()

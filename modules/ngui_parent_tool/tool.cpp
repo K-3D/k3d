@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,26 +18,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
 #include <k3d-i18n-config.h>
-
-#include "basic_viewport_input_model.h"
-#include "command_arguments.h"
-#include "document_state.h"
-#include "modifiers.h"
-#include "icons.h"
-#include "interactive.h"
-#include "navigation_input_model.h"
-#include "parent_tool.h"
-#include "transform.h"
-#include "tutorial_message.h"
-#include "viewport.h"
-
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iparentable.h>
@@ -47,17 +35,39 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/log.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/basic_viewport_input_model.h>
+#include <k3dsdk/ngui/command_arguments.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/navigation_input_model.h>
+#include <k3dsdk/ngui/tool.h>
+#include <k3dsdk/ngui/transform.h>
+#include <k3dsdk/ngui/tutorial_message.h>
+#include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/transform.h>
 
-namespace libk3dngui
+#include <boost/assign/list_of.hpp>
+
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
+{
+
+namespace parent
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// parent_tool::implementation
+// implementation
 
-struct parent_tool::implementation
+struct implementation
 {
 	implementation(document_state& DocumentState) :
 		m_document_state(DocumentState),
@@ -212,7 +222,7 @@ struct parent_tool::implementation
 				m_document_state.clear_cursor_signal().emit();
 				m_document_state.set_active_tool(m_document_state.selection_tool());
 
-				return RESULT_CONTINUE;
+				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 
 			if(Command == "select_node")
@@ -226,7 +236,7 @@ struct parent_tool::implementation
 
 				m_document_state.select(selection);
 
-				return RESULT_CONTINUE;
+				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 
 			if(Command == "child_selection_complete")
@@ -241,7 +251,7 @@ struct parent_tool::implementation
 
 				m_document_state.set_cursor_signal().emit(load_icon("parent_cursor", Gtk::ICON_SIZE_BUTTON));
 
-				return RESULT_CONTINUE;
+				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 
 			if(Command == "set_parent")
@@ -252,22 +262,22 @@ struct parent_tool::implementation
 				const k3d::selection::record selection = arguments.get_selection_record(m_document_state.document(), "selection");
 			
 				k3d::inode* const node = k3d::selection::get_node(selection);
-				return_val_if_fail(node, RESULT_ERROR);
+				return_val_if_fail(node, k3d::icommand_node::RESULT_ERROR);
 
 				interactive::move_pointer(viewport, mouse);
 				
 				set_parent(viewport, *node);
 
-				return RESULT_CONTINUE;
+				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 		}
 		catch(std::exception& e)
 		{
 			k3d::log() << error << k3d_file_reference << ": caught exception: " << e.what() << std::endl;
-			return RESULT_ERROR;
+			return k3d::icommand_node::RESULT_ERROR;
 		}
 
-		return RESULT_UNKNOWN_COMMAND;
+		return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
 	}
 
 	/// Stores a reference to the owning document
@@ -283,35 +293,74 @@ struct parent_tool::implementation
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// parent_tool
+// tool
 
-parent_tool::parent_tool(document_state& DocumentState, const std::string& Name) :
-	base(DocumentState, Name),
-	m_implementation(new implementation(DocumentState))
+/// User-interface tool that provides interactive node parenting
+class tool :
+	public libk3dngui::tool
 {
-	m_implementation->m_navigation_model.connect_command_signal(sigc::mem_fun(*this, &parent_tool::record_command));
-	m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &parent_tool::record_command));
-}
+public:
+	tool() :
+		m_implementation(0)
+	{
+	}
 
-parent_tool::~parent_tool()
-{
-	delete m_implementation;
-}
+	~tool()
+	{
+		delete m_implementation;
+	}
 
-const k3d::icommand_node::result parent_tool::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	return m_implementation->execute_command(Command, Arguments);
-}
+	const k3d::string_t tool_type()
+	{
+		return get_factory().name();
+	}
 
-void parent_tool::on_deactivate()
-{
-	m_implementation->m_document_state.clear_cursor_signal().emit();
-}
+	virtual const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
+	{
+		return m_implementation->execute_command(Command, Arguments);
+	}
 
-viewport_input_model& parent_tool::get_input_model()
-{
-	return m_implementation->m_input_model;
-}
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<tool> factory(
+			k3d::uuid(0x07371997, 0x1040b5a8, 0x2cf245be, 0xf1bbb199),
+			"NGUIParentTool",
+			_("Provides interactive controls for reparenting nodes."),
+			"NGUI Tools",
+			k3d::iplugin_factory::EXPERIMENTAL,
+			boost::assign::map_list_of("ngui:component-type", "tool"));
 
-} // namespace libk3dngui
+		return factory;
+	}
+
+private:
+	virtual void on_initialize(document_state& DocumentState)
+	{
+		m_implementation = new parent::implementation(DocumentState);
+		m_implementation->m_navigation_model.connect_command_signal(sigc::mem_fun(*this, &tool::record_command));
+		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &tool::record_command));
+	}
+
+	virtual void on_deactivate()
+	{
+		m_implementation->m_document_state.clear_cursor_signal().emit();
+	}
+
+	virtual viewport_input_model& get_input_model()
+	{
+		return m_implementation->m_input_model;
+	}
+
+	parent::implementation* m_implementation;
+};
+
+} // namespace parent
+
+} // namespace ngui
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::parent::tool::get_factory());
+K3D_MODULE_END
 

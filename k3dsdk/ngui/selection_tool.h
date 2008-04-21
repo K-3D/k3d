@@ -45,6 +45,8 @@ public:
 	selection_tool(document_state& DocumentState, const std::string& Name);
 	~selection_tool();
 
+	const k3d::string_t tool_type() { return "selection_tool"; }
+
 	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
 	
 	/// True if the selection is converted when switching modes

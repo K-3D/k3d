@@ -99,7 +99,7 @@ control::control(document_state& DocumentState, k3d::icommand_node& Parent, pane
 
 	image_toggle_button::control* const pinned_control =
 		new image_toggle_button::control(*this, "pinned",
-			image_toggle_button::proxy(pinned), load_icon("pinned", Gtk::ICON_SIZE_BUTTON),
+			image_toggle_button::model(pinned), 0, load_icon("pinned", Gtk::ICON_SIZE_BUTTON),
 			load_icon("unpinned", Gtk::ICON_SIZE_BUTTON)) <<
 		set_tooltip(_("Pin Panel"));
 

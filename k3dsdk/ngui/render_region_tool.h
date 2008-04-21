@@ -42,6 +42,8 @@ public:
 	render_region_tool(document_state& DocumentState, const std::string& Name);
 	~render_region_tool();
 
+	const k3d::string_t tool_type() { return "render_region_tool"; }
+
 	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
 
 private:

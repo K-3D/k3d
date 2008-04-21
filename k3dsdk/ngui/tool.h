@@ -2,7 +2,7 @@
 #define NGUI_TOOL_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/command_node.h>
@@ -50,9 +50,12 @@ class tool :
 	typedef k3d::command_node::implementation base;
 
 public:
-	tool(document_state& DocumentState, const std::string& Name);
 	virtual ~tool();
 
+	/// Set the document for this tool - this is ugly, but application plugins don't take ctor arguments
+	void initialize(document_state& DocumentState);
+	/// Returns a unique string identifying the tool type
+	virtual const k3d::string_t tool_type() = 0;
 	/// Called to activate the tool
 	void activate();
 	/// Called to deactivate the tool
@@ -71,9 +74,16 @@ public:
 	/// Convenience function that schedules a screen update for all viewports
 	void redraw_all();
 	/// Records an interactive tutorial event
-	void record_command(const std::string& Command, const std::string& Arguments = "");
+	void record_command(const k3d::string_t& Command, const k3d::string_t& Arguments = "");
+
+protected:
+	tool();
+	tool(document_state& DocumentState, const k3d::string_t& Name);
 
 private:
+	/// Called when the tool is initialized
+	virtual void on_initialize(document_state& DocumentState);
+
 	/// Called when the tool is activated - override in derived classes to implement custom behavior
 	virtual void on_activate();
 	/// Called when the tool is deactivated - override in derived classes to implement custom behavior
@@ -90,7 +100,7 @@ private:
 	virtual viewport_input_model& get_input_model() = 0;
 
 	/// Stores a reference to the owning document
-	document_state& m_document_state;
+	document_state* m_document_state;
 };
 
 } // namespace libk3dngui

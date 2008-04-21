@@ -37,6 +37,7 @@ namespace libk3dngui
 namespace toggle_button
 {
 
+/*
 /// Specialization of k3d::toggle_button::data_proxy for use with k3d::iproperty objects
 template<>
 class data_proxy<k3d::iproperty> :
@@ -80,32 +81,35 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 {
 	return std::auto_ptr<idata_proxy>(new data_proxy<k3d::iproperty>(Data, StateRecorder, ChangeMessage));
 }
+*/
 
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
+control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
 	ui_component(Name, &Parent),
-	m_data(Data)
+	m_model(Model),
+	m_state_recorder(StateRecorder)
 {
 	set_name("k3d-toggle-button");
 	attach();
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data, const Glib::ustring& label, bool mnemonic) :
+control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder, const Glib::ustring& label, bool mnemonic) :
 	base(label, mnemonic),
 	ui_component(Name, &Parent),
-	m_data(Data)
+	m_model(Model),
+	m_state_recorder(StateRecorder)
 {
 	set_name("k3d-toggle-button");
 	attach();
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
+const k3d::icommand_node::result control::execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 {
 	if(Command == "value")
 	{
-		const bool new_value = Arguments == "true" ? true : false;
+		const k3d::bool_t new_value = Arguments == "true" ? true : false;
 		if(new_value != get_active())
 			interactive::activate(*this);
 
@@ -118,22 +122,22 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 void control::attach()
 {
 	// Update the display ...
-	update(0);
+	update();
 
 	// We want to be notified if the data source changes ...
-	if(m_data.get())
-		m_data->changed_signal().connect(sigc::mem_fun(*this, &control::update));
+	if(m_model)
+		m_model->connect_changed_signal(sigc::mem_fun(*this, &control::update));
 }
 
 void control::on_update()
 {
 }
 
-void control::update(k3d::iunknown*)
+void control::update()
 {
-	if(m_data.get())
+	if(m_model)
 	{
-		const bool new_value = m_data->value();
+		const k3d::bool_t new_value = m_model->value();
 		if(new_value != get_active())
 			set_active(new_value);
 	}
@@ -143,37 +147,37 @@ void control::update(k3d::iunknown*)
 
 void control::on_toggled()
 {
-	if(m_data.get())
+	if(m_model)
 	{
 		// Get the control value ...
 		const bool new_value = get_active();
 
 		// If the value hasn't changed, we're done ...
-		if(new_value != m_data->value())
+		if(new_value != m_model->value())
 		{
 			// Record the command for posterity (tutorials) ...
 			record_command("value", new_value ? "true" : "false");
 
 			// Turn this into an undo/redo -able event ...
-			if(m_data->state_recorder)
-				m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
+			if(m_state_recorder)
+				m_state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 			// Update everything with the new value ...
-			m_data->set_value(new_value);
+			m_model->set_value(new_value);
 
 			// Turn this into an undo/redo -able event ...
-			if(m_data->state_recorder)
-				m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), new_value ? m_data->change_message + " \"On\"" : m_data->change_message + " \"Off\"", K3D_CHANGE_SET_CONTEXT);
+			if(m_state_recorder)
+				m_state_recorder->commit_change_set(m_state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), new_value ? m_model->label() + " \"On\"" : m_model->label() + " \"Off\"", K3D_CHANGE_SET_CONTEXT);
 		}
 	}
 	else
 	{
-		update(0);
+		update();
 	}
 
 	base::on_toggled();
 
-	update(0);
+	update();
 }
 
 } // namespace toggle_button

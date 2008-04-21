@@ -62,6 +62,7 @@ class implementation :
 	public icommand_node
 {
 public:
+	implementation();
 	implementation(const std::string& Name, icommand_node* Parent);
 	virtual ~implementation();
 

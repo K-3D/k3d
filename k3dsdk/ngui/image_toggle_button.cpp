@@ -18,8 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements k3d::image_toggle_button, which provides a MVC UI for boolean data sources
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "image_toggle_button.h"
@@ -35,8 +34,8 @@ namespace image_toggle_button
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data, Glib::RefPtr<Gdk::Pixbuf> Image) :
-	base(Parent, Name, Data),
+control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder, Glib::RefPtr<Gdk::Pixbuf> Image) :
+	base(Parent, Name, Model, StateRecorder),
 	m_image(new Gtk::Image()),
 	m_active_image(Image),
 	m_inactive_image(Image)
@@ -45,8 +44,8 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	on_update();
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data, Glib::RefPtr<Gdk::Pixbuf> ActiveImage, Glib::RefPtr<Gdk::Pixbuf> InactiveImage) :
-	base(Parent, Name, Data),
+control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder, Glib::RefPtr<Gdk::Pixbuf> ActiveImage, Glib::RefPtr<Gdk::Pixbuf> InactiveImage) :
+	base(Parent, Name, Model, StateRecorder),
 	m_image(new Gtk::Image()),
 	m_active_image(ActiveImage),
 	m_inactive_image(InactiveImage)
@@ -63,5 +62,4 @@ void control::on_update()
 } // namespace image_toggle_button
 
 } // namespace libk3dngui
-
 

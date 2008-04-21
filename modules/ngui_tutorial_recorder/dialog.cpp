@@ -163,7 +163,7 @@ public:
 		toolbar::control* const toolbar = new toolbar::control(*this, "toolbar");
 		toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*toolbar, "record",
-				image_toggle_button::proxy(m_recording),
+				image_toggle_button::model(m_recording), 0,
 				load_icon("record", Gtk::ICON_SIZE_BUTTON),
 				load_icon("record", Gtk::ICON_SIZE_BUTTON)) <<
 			make_toolbar_button()), Gtk::PACK_SHRINK);
