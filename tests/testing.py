@@ -348,6 +348,32 @@ def assert_solid_mesh(mesh):
 	if not k3d.is_solid(mesh):
 		raise Exception("output mesh is not solid")
 
+def bitmap_perceptual_difference(document, input_image1, input_image2, threshold):
+	difference = document.new_node("BitmapPerceptualDifference")
+	difference.field_of_view = 10.0
+	difference.luminance = 100
+	document.set_dependency(difference.get_property("input_a"), input_image1)
+	document.set_dependency(difference.get_property("input_b"), input_image2)
+	
+	pixel_count = input_image1.internal_value().width() * input_image1.internal_value().height()
+	pixel_difference = difference.difference
+	difference_measurement = float(pixel_difference) / float(pixel_count)
+	
+		# As a temporary measure, print results to stdout until CDash fully supports <DartMeasurement>
+	print """Pixel Difference: """ + str(pixel_difference)
+	print """Pixel Count: """ + str(pixel_count)
+	print """Difference: """ + str(difference_measurement)
+	print """Threshold: """ + str(threshold)
+
+	print """<DartMeasurement name="Pixel Difference" type="numeric/float">""" + str(pixel_difference) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Pixel Count" type="numeric/float">""" + str(pixel_count) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Difference" type="numeric/float">""" + str(difference_measurement) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Threshold" type="numeric/float">""" + str(threshold) + """</DartMeasurement>"""
+	sys.stdout.flush()
+
+	if difference_measurement > threshold:
+		raise "pixel difference exceeds threshold"
+	
 def image_comparison(document, image, image_name, threshold):
 
 	output_file = k3d.generic_path(binary_path() + "/" + image_name + ".output.png")

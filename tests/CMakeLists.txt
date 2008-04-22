@@ -293,3 +293,6 @@ K3D_ADD_TEST(ngui.tutorials.basic_selection NGUI TUTORIAL basic_selection.k3dscr
 K3D_ADD_TEST(ngui.tutorials.mug NGUI TUTORIAL mug.k3dscript)
 
 K3D_ADD_TEST(ngui.performance.sds.polycube.py PYTHON NGUI)
+
+
+K3D_ADD_TEST(cudabitmap.modifier.add.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE REQUIRES K3D_BUILD_CUDA_BITMAP_MODULE)
