@@ -35,7 +35,6 @@ k3dsdk/ngui/navigation_input_model.cpp
 k3dsdk/ngui/node_chooser.cpp
 k3dsdk/ngui/node_collection_chooser.cpp
 k3dsdk/ngui/panel_frame.cpp
-k3dsdk/ngui/parent_tool.cpp
 k3dsdk/ngui/path_chooser.cpp
 k3dsdk/ngui/point_control.cpp
 k3dsdk/ngui/properties.cpp
