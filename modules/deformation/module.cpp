@@ -35,6 +35,7 @@ extern k3d::iplugin_factory& center_points_factory();
 extern k3d::iplugin_factory& cylindrical_wave_points_factory();
 extern k3d::iplugin_factory& linear_point_noise_factory();
 extern k3d::iplugin_factory& linear_wave_points_factory();
+extern k3d::iplugin_factory& morph_points_factory();
 extern k3d::iplugin_factory& rotate_points_factory();
 extern k3d::iplugin_factory& scale_points_factory();
 extern k3d::iplugin_factory& shear_points_factory();
@@ -57,6 +58,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::deformation::cylindrical_wave_points_factory());
 	Registry.register_factory(module::deformation::linear_point_noise_factory());
 	Registry.register_factory(module::deformation::linear_wave_points_factory());
+	Registry.register_factory(module::deformation::morph_points_factory());
 	Registry.register_factory(module::deformation::rotate_points_factory());
 	Registry.register_factory(module::deformation::scale_points_factory());
 	Registry.register_factory(module::deformation::shear_points_factory());
