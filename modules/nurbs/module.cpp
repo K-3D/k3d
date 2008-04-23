@@ -40,7 +40,6 @@ extern k3d::iplugin_factory& polygon_factory();
 extern k3d::iplugin_factory& sphere_factory();
 extern k3d::iplugin_factory& torus_factory();
 extern k3d::iplugin_factory& create_curve_factory();
-extern k3d::iplugin_factory& connect_curves_factory();
 
 } // namespace nurbs
 
@@ -59,6 +58,5 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::nurbs::sphere_factory());
 	Registry.register_factory(module::nurbs::torus_factory());
         Registry.register_factory(module::nurbs::create_curve_factory());
-        Registry.register_factory(module::nurbs::connect_curves_factory());
 K3D_MODULE_END
 
