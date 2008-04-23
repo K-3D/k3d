@@ -35,7 +35,10 @@
 
 #include <iterator>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -102,8 +105,10 @@ private:
 
 k3d::iplugin_factory& catmull_clark_subdivision_factory()
 {
-	return libk3dmesh::catmull_clark_subdivider::get_factory();
+	return module::mesh::catmull_clark_subdivider::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 

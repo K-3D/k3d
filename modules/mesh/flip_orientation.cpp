@@ -31,7 +31,10 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -132,6 +135,8 @@ k3d::iplugin_factory& flip_orientation_factory()
 	return flip_orientation_implementation::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 
 

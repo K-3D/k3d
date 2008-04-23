@@ -35,7 +35,10 @@
 
 #include <iterator>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -117,5 +120,7 @@ k3d::iplugin_factory& set_material_factory()
 	return set_material_implementation::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 

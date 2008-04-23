@@ -34,7 +34,10 @@
 
 #include <iterator>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 namespace detail
@@ -154,5 +157,7 @@ k3d::iplugin_factory& triangulate_faces_factory()
 	return triangulate_faces_implementation::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 

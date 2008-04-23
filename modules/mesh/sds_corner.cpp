@@ -34,7 +34,10 @@
 
 #include <iterator>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -106,6 +109,8 @@ k3d::iplugin_factory& sds_corner_factory()
 	return sds_corner_implementation::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 
 

@@ -30,7 +30,10 @@
 
 #include <set>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -264,5 +267,7 @@ k3d::iplugin_factory& join_points_factory()
 	return join_points_implementation::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 

@@ -24,7 +24,10 @@
 #include <k3dsdk/module.h>
 
 /// Namespace reserved for the mesh plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 extern k3d::iplugin_factory& array_1d_factory();
@@ -62,39 +65,41 @@ extern k3d::iplugin_factory& tag_color_factory();
 extern k3d::iplugin_factory& triangulate_faces_factory();
 extern k3d::iplugin_factory& weld_factory();
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dmesh::array_1d_factory());
-	Registry.register_factory(libk3dmesh::array_2d_factory());
-	Registry.register_factory(libk3dmesh::array_3d_factory());
-	Registry.register_factory(libk3dmesh::bevel_faces_factory());
-	Registry.register_factory(libk3dmesh::bridge_edges_factory());
-	Registry.register_factory(libk3dmesh::bridge_faces_factory());
-	Registry.register_factory(libk3dmesh::cap_hole_factory());
-	Registry.register_factory(libk3dmesh::catmull_clark_subdivision_factory());
-	Registry.register_factory(libk3dmesh::collapse_edges_factory());
-	Registry.register_factory(libk3dmesh::collapse_faces_factory());
-	Registry.register_factory(libk3dmesh::connect_vertices_factory());
-	Registry.register_factory(libk3dmesh::delete_components_factory());
-	Registry.register_factory(libk3dmesh::dissolve_components_factory());
-	Registry.register_factory(libk3dmesh::face_normals_factory());
-	Registry.register_factory(libk3dmesh::fillet_edges_factory());
-	Registry.register_factory(libk3dmesh::flip_orientation_factory());
-	Registry.register_factory(libk3dmesh::join_points_factory());
-	Registry.register_factory(libk3dmesh::make_creases_factory());
-	Registry.register_factory(libk3dmesh::make_sds_factory());
-	Registry.register_factory(libk3dmesh::merge_mesh_factory());
-	Registry.register_factory(libk3dmesh::move_first_edge_factory());
-	Registry.register_factory(libk3dmesh::sds_corner_factory());
-	Registry.register_factory(libk3dmesh::sds_crease_factory());
-	Registry.register_factory(libk3dmesh::sds_hole_factory());
-	Registry.register_factory(libk3dmesh::set_material_factory());
-	Registry.register_factory(libk3dmesh::smooth_shade_factory());
-	Registry.register_factory(libk3dmesh::subdivide_edges_factory());
-	Registry.register_factory(libk3dmesh::subdivide_faces_factory());
-	Registry.register_factory(libk3dmesh::tag_color_factory());
-	Registry.register_factory(libk3dmesh::triangulate_faces_factory());
-	Registry.register_factory(libk3dmesh::weld_factory());
+	Registry.register_factory(module::mesh::array_1d_factory());
+	Registry.register_factory(module::mesh::array_2d_factory());
+	Registry.register_factory(module::mesh::array_3d_factory());
+	Registry.register_factory(module::mesh::bevel_faces_factory());
+	Registry.register_factory(module::mesh::bridge_edges_factory());
+	Registry.register_factory(module::mesh::bridge_faces_factory());
+	Registry.register_factory(module::mesh::cap_hole_factory());
+	Registry.register_factory(module::mesh::catmull_clark_subdivision_factory());
+	Registry.register_factory(module::mesh::collapse_edges_factory());
+	Registry.register_factory(module::mesh::collapse_faces_factory());
+	Registry.register_factory(module::mesh::connect_vertices_factory());
+	Registry.register_factory(module::mesh::delete_components_factory());
+	Registry.register_factory(module::mesh::dissolve_components_factory());
+	Registry.register_factory(module::mesh::face_normals_factory());
+	Registry.register_factory(module::mesh::fillet_edges_factory());
+	Registry.register_factory(module::mesh::flip_orientation_factory());
+	Registry.register_factory(module::mesh::join_points_factory());
+	Registry.register_factory(module::mesh::make_creases_factory());
+	Registry.register_factory(module::mesh::make_sds_factory());
+	Registry.register_factory(module::mesh::merge_mesh_factory());
+	Registry.register_factory(module::mesh::move_first_edge_factory());
+	Registry.register_factory(module::mesh::sds_corner_factory());
+	Registry.register_factory(module::mesh::sds_crease_factory());
+	Registry.register_factory(module::mesh::sds_hole_factory());
+	Registry.register_factory(module::mesh::set_material_factory());
+	Registry.register_factory(module::mesh::smooth_shade_factory());
+	Registry.register_factory(module::mesh::subdivide_edges_factory());
+	Registry.register_factory(module::mesh::subdivide_faces_factory());
+	Registry.register_factory(module::mesh::tag_color_factory());
+	Registry.register_factory(module::mesh::triangulate_faces_factory());
+	Registry.register_factory(module::mesh::weld_factory());
 K3D_MODULE_END
 

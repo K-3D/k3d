@@ -31,7 +31,10 @@
 
 #include <set>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 namespace detail
@@ -268,5 +271,7 @@ k3d::iplugin_factory& bridge_faces_factory()
 	return bridge_faces_implementation::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 

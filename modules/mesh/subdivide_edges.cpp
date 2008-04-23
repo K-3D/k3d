@@ -33,7 +33,10 @@
 
 #include <set>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -247,5 +250,7 @@ k3d::iplugin_factory& subdivide_edges_factory()
 	return subdivide_edges::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 

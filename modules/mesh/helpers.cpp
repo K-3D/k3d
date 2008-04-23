@@ -29,7 +29,10 @@
 #include <set>
 #include <utility>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 namespace helpers
@@ -137,5 +140,7 @@ k3d::point3 center_point(const k3d::legacy::face& Face)
 
 } // namespace helpers
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 

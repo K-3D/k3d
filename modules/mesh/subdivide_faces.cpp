@@ -36,7 +36,10 @@
 
 #include <set>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 namespace detail
@@ -605,5 +608,7 @@ k3d::iplugin_factory& subdivide_faces_factory()
 	return subdivide_faces::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 

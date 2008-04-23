@@ -32,7 +32,10 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/utility.h>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -248,5 +251,7 @@ k3d::iplugin_factory& weld_factory()
 	return weld::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 

@@ -30,7 +30,10 @@
 
 #include <map>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 namespace helpers
@@ -82,7 +85,9 @@ inline k3d::legacy::face* fill_hole(ReverseIteratorType RBegin, ReverseIteratorT
 
 } // namespace helpers
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 
 #endif // MESH_HELPERS_H
 

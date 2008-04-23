@@ -35,7 +35,10 @@
 
 #include <set>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 namespace detail
@@ -734,5 +737,7 @@ k3d::iplugin_factory& collapse_faces_factory()
 	return collapse_faces::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 

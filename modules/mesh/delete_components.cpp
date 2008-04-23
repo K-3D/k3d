@@ -31,7 +31,10 @@
 #include <list>
 #include <set>
 
-namespace libk3dmesh
+namespace module
+{
+
+namespace mesh
 {
 
 namespace detail
@@ -432,5 +435,7 @@ k3d::iplugin_factory& delete_components_factory()
 	return delete_components::get_factory();
 }
 
-} // namespace libk3dmesh
+} // namespace mesh
+
+} // namespace module
 

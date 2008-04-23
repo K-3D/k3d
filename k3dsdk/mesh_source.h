@@ -66,7 +66,6 @@ public:
 protected:
 	k3d_data(mesh*, data::immutable_name, data::change_signal, data::no_undo, data::pointer_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
 
-private:
 	void mesh_topology_changed(iunknown* const Hint)
 	{
 		m_output_mesh.reset(0, hint::mesh_topology_changed());
@@ -77,6 +76,7 @@ private:
 		m_output_mesh.update(hint::mesh_geometry_changed());
 	}
 
+private:
 	void initialize_mesh(mesh& Output)
 	{
 		base_t::document().pipeline_profiler().start_execution(*this, "Create Mesh");
