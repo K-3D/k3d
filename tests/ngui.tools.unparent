@@ -45,8 +45,8 @@
 <command node="/document/move_tool" command="lmb_end_drag_stop_motion" arguments="&lt;arguments&gt;&lt;viewport&gt;/document/window/viewport&lt;/viewport&gt;&lt;mouse&gt;0.489665 0.0590551&lt;/mouse&gt;&lt;/arguments&gt;"/>
 <command node="/document/window/menus/select_tool" command="activate" arguments=""/>
 <command node="/document/window/toolbar/create/create_Cone" command="activate" arguments=""/>
-<command node="/document/window/toolbar/main/parent" command="value" arguments="true"/>
-<command node="/document/parent_tool" command="child_selection_complete" arguments="&lt;arguments&gt;&lt;viewport&gt;/document/window/viewport&lt;/viewport&gt;&lt;mouse&gt;0.526575 0.470472&lt;/mouse&gt;&lt;/arguments&gt;"/>
-<command node="/document/parent_tool" command="set_parent" arguments="&lt;arguments&gt;&lt;viewport&gt;/document/window/viewport&lt;/viewport&gt;&lt;mouse&gt;0.554626 0.234252&lt;/mouse&gt;&lt;selection node=&quot;PolyCube Instance&quot;&gt;4106819928 4109423192 5 1 2 2 0 6 0 7 4 8 4&lt;/selection&gt;&lt;/arguments&gt;"/>
+<command node="/document/window/toolbar/main/NGUIParentTool" command="value" arguments="true"/>
+<command node="/document/NGUIParentTool" command="child_selection_complete" arguments="&lt;arguments&gt;&lt;viewport&gt;/document/window/viewport&lt;/viewport&gt;&lt;mouse&gt;0.526575 0.470472&lt;/mouse&gt;&lt;/arguments&gt;"/>
+<command node="/document/NGUIParentTool" command="set_parent" arguments="&lt;arguments&gt;&lt;viewport&gt;/document/window/viewport&lt;/viewport&gt;&lt;mouse&gt;0.554626 0.234252&lt;/mouse&gt;&lt;selection node=&quot;PolyCube Instance&quot;&gt;4106819928 4109423192 5 1 2 2 0 6 0 7 4 8 4&lt;/selection&gt;&lt;/arguments&gt;"/>
 <command node="/document/window/toolbar/main/unparent" command="activate" arguments=""/>
 
