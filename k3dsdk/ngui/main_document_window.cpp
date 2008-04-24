@@ -1137,11 +1137,14 @@ private:
 		Gtk::Menu* const menu = new Gtk::Menu();
 		menu->set_accel_group(get_accel_group());
 
-		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(Parent, "render_render_region",
-				*Gtk::manage(new Gtk::Image(load_icon("render_region_tool", Gtk::ICON_SIZE_MENU))), _("_Region"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_region_tool))
-			<< set_accelerator_path("<k3d-document>/actions/render/render_region", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUIRenderRegionTool"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new image_menu_item::control(Parent, "render_render_region",
+					*Gtk::manage(new Gtk::Image(load_icon("NGUIRenderRegionTool", Gtk::ICON_SIZE_MENU))), _("_Region"), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_region_tool))
+				<< set_accelerator_path("<k3d-document>/actions/render/render_region", get_accel_group())));
+		}
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
