@@ -41,7 +41,6 @@ k3dsdk/ngui/properties.cpp
 k3dsdk/ngui/property_button.cpp
 k3dsdk/ngui/property_widget.cpp
 k3dsdk/ngui/render.cpp
-k3dsdk/ngui/render_region_tool.cpp
 k3dsdk/ngui/rotate_tool.cpp
 k3dsdk/ngui/safe_close_dialog.cpp
 k3dsdk/ngui/scale_control.cpp
@@ -108,6 +107,7 @@ modules/blobby/points_to_blobby.cpp
 modules/blobby/polygonize_blobbies.cpp
 modules/booleans/cgal_boolean_nodes.cpp
 modules/bundled_renderman_engines/aqsis.cpp
+modules/cloth/module.cpp
 modules/core/axes.cpp
 modules/core/camera.cpp
 modules/core/color_property.cpp
@@ -123,6 +123,7 @@ modules/core/scale.cpp
 modules/core/show_matrix.cpp
 modules/core/snap.cpp
 modules/core/view_matrix.cpp
+modules/cuda_bitmap/cuda_add.cpp
 modules/deformation/bend_points.cpp
 modules/deformation/bulge_points.cpp
 modules/deformation/center_points.cpp
@@ -197,13 +198,16 @@ modules/ngui_command_node_inspector/dialog.cpp
 modules/ngui_event_recorder/dialog.cpp
 modules/ngui_learning/dialog.cpp
 modules/ngui_log/dialog.cpp
+modules/ngui_node_graph_panel/nodeGraph.cpp
 modules/ngui_node_history_panel/panel.cpp
 modules/ngui_node_list_panel/panel.cpp
 modules/ngui_node_properties_panel/panel.cpp
+modules/ngui_parent_tool/tool.cpp
 modules/ngui_pipeline_panel/graph_modifier.h
 modules/ngui_pipeline_panel/graph_source.h
 modules/ngui_pipeline_panel/panel.cpp
 modules/ngui_pipeline_profiler_panel/panel.cpp
+modules/ngui_render_region_tool/tool.cpp
 modules/ngui_test_case_recorder/dialog.cpp
 modules/ngui_timeline_panel/panel.cpp
 modules/ngui_tool_properties_panel/panel.cpp
@@ -212,6 +216,7 @@ modules/ngui_tutorial_recorder/dialog.cpp
 modules/ngui_undo_tree_panel/panel.cpp
 modules/nurbs/circle.cpp
 modules/nurbs/cone.cpp
+modules/nurbs/curve.cpp
 modules/nurbs/cylinder.cpp
 modules/nurbs/disk.cpp
 modules/nurbs/grid.cpp
@@ -226,6 +231,7 @@ modules/opencascade/step_mesh_reader.cpp
 modules/openexr_io/bitmap_importer.cpp
 modules/opengl/material.cpp
 modules/opengl/render_engine.cpp
+modules/opengl_framebuffer/camera_to_bitmap.cpp
 modules/opengl_painters/bicubic_patch_painter.cpp
 modules/opengl_painters/bilinear_patch_painter.cpp
 modules/opengl_painters/blobby_point_painter.cpp

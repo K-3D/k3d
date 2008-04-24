@@ -684,9 +684,9 @@ private:
 		if(k3d::plugin::factory::lookup("NGUIParentTool"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(Parent, "parent_tool", _("_Parent"), true)
+				new menu_item::control(Parent, "NGUIParentTool", _("_Parent"), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_parent_tool))
-				<< set_accelerator_path("<k3d-document>/actions/edit/tools/parent_tool", get_accel_group())));
+				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIParentTool", get_accel_group())));
 		}
 
 		menu->items().push_back(*Gtk::manage(
@@ -694,10 +694,13 @@ private:
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_unparent))
 			<< set_accelerator_path("<k3d-document>/actions/edit/tools/unparent", get_accel_group())));
 
-		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "render_region_tool", _("Render R_egion"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_region_tool))
-			<< set_accelerator_path("<k3d-document>/actions/edit/tools/render_region_tool", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUIRenderRegionTool"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new menu_item::control(Parent, "NGUIRenderRegionTool", _("Render R_egion"), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_region_tool))
+				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIRenderRegionTool", get_accel_group())));
+		}
 
 		menu->items().push_back(*Gtk::manage(
 			new menu_item::control(Parent, "knife_tool", _("_Knife Tool"), true)
@@ -1744,7 +1747,10 @@ private:
 
 	void on_render_region_tool()
 	{
-		m_document_state.set_active_tool(m_document_state.render_region_tool());
+		tool* const render_region_tool = m_document_state.get_tool("NGUIRenderRegionTool");
+		return_if_fail(render_region_tool);
+
+		m_document_state.set_active_tool(*render_region_tool);
 	}
 
 	void on_select_all()

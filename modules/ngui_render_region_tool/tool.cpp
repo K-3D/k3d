@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,41 +18,52 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
-#include "basic_viewport_input_model.h"
-#include "command_arguments.h"
-#include "document_state.h"
-#include "icons.h"
-#include "interactive.h"
-#include "keyboard.h"
-#include "navigation_input_model.h"
-#include "render.h"
-#include "render_region_tool.h"
-#include "rubber_band.h"
-#include "utility.h"
-#include "viewport.h"
-
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icrop_window.h>
 #include <k3dsdk/irender_camera_preview.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/basic_viewport_input_model.h>
+#include <k3dsdk/ngui/command_arguments.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/keyboard.h>
+#include <k3dsdk/ngui/navigation_input_model.h>
+#include <k3dsdk/ngui/render.h>
+#include <k3dsdk/ngui/rubber_band.h>
+#include <k3dsdk/ngui/tool.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/state_change_set.h>
 
-namespace libk3dngui
+#include <boost/assign/list_of.hpp>
+
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
+{
+
+namespace render_region
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// render_region_tool::implementation
+// implementation
 
-struct render_region_tool::implementation
+struct implementation
 {
 public:
 	implementation(document_state& DocumentState) :
@@ -323,37 +334,75 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// render_region_tool
+// tool
 
-render_region_tool::render_region_tool(document_state& DocumentState, const std::string& Name) :
-	base(DocumentState, Name),
-	m_implementation(new implementation(DocumentState))
+/// User-interface tool that provides interactive controls for cropped rendering
+class tool :
+	public libk3dngui::tool
 {
-	m_implementation->m_navigation_model.connect_command_signal(sigc::mem_fun(*this, &render_region_tool::record_command));
-	m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &render_region_tool::record_command));
-}
+public:
+	tool() :
+		m_implementation(0)
+	{
+	}
 
-render_region_tool::~render_region_tool()
-{
-	delete m_implementation;
-}
+	~tool()
+	{
+		delete m_implementation;
+	}
 
-const k3d::icommand_node::result render_region_tool::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(m_implementation->execute_command(Command, Arguments))
-		return RESULT_CONTINUE;
+	const k3d::string_t tool_type()
+	{
+		return get_factory().name();
+	}
 
-	if(m_implementation->m_navigation_model.execute_command(Command, Arguments))
-		return RESULT_CONTINUE;
+	virtual const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
+	{
+		if(m_implementation->execute_command(Command, Arguments))
+			return RESULT_CONTINUE;
 
-	return RESULT_ERROR;
-}
+		if(m_implementation->m_navigation_model.execute_command(Command, Arguments))
+			return RESULT_CONTINUE;
 
-viewport_input_model& render_region_tool::get_input_model()
-{
-	return m_implementation->m_input_model;
-}
+		return RESULT_ERROR;
+	}
 
-} // namespace libk3dngui
+	virtual libk3dngui::viewport_input_model& get_input_model()
+	{
+		return m_implementation->m_input_model;
+	}
 
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<tool> factory(
+			k3d::uuid(0x96a0445e, 0x85412ced, 0xfa1b9ca5, 0xd74e4922),
+			"NGUIRenderRegionTool",
+			_("Provides interactive controls for cropped rendering."),
+			"NGUI Tools",
+			k3d::iplugin_factory::EXPERIMENTAL,
+			boost::assign::map_list_of("ngui:component-type", "tool"));
+
+		return factory;
+	}
+
+private:
+	virtual void on_initialize(document_state& DocumentState)
+	{
+		m_implementation = new render_region::implementation(DocumentState);
+		m_implementation->m_navigation_model.connect_command_signal(sigc::mem_fun(*this, &tool::record_command));
+		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &tool::record_command));
+	}
+
+	render_region::implementation* m_implementation;
+};
+
+} // namespace render_region
+
+} // namespace ngui
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::render_region::tool::get_factory());
+K3D_MODULE_END
 
