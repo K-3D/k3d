@@ -33,7 +33,6 @@
 #include "image_menu_item.h"
 #include "image_toggle_button.h"
 #include "interactive.h"
-#include "knife_tool.h"
 #include "main_document_window.h"
 #include "menu_item.h"
 #include "menubar.h"
@@ -702,10 +701,13 @@ private:
 				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIRenderRegionTool", get_accel_group())));
 		}
 
-		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "knife_tool", _("_Knife Tool"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_knife_tool))
-			<< set_accelerator_path("<k3d-document>/actions/edit/tools/knife_tool", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUIKnifeTool"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new menu_item::control(Parent, "NGUIKnifeTool", _("_Knife Tool"), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_knife_tool))
+				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIKnifeTool", get_accel_group())));
+		}
 
 		menu->items().push_back(*Gtk::manage(
 			new menu_item::control(Parent, "snap_tool", _("S_nap Tool"), true)
@@ -1720,7 +1722,10 @@ private:
 
 	void on_knife_tool()
 	{
-		m_document_state.set_active_tool(m_document_state.knife_tool());
+		tool* const knife_tool = m_document_state.get_tool("NGUIKnifeTool");
+		return_if_fail(knife_tool);
+
+		m_document_state.set_active_tool(*knife_tool);
 	}
 
 	void on_snap_tool()

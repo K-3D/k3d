@@ -106,8 +106,6 @@ public:
 	tool& rotate_tool();
 	/// Returns a reference to the builtin Scale Tool that can be passed to set_active_tool()
 	tool& scale_tool();
-	/// Returns a reference to the builtin Knife Tool that can be passed to set_active_tool()
-	tool& knife_tool();
 	/// Returns a reference to the builtin Snap Tool that can be passed to set_active_tool()
 	tool& snap_tool();
 

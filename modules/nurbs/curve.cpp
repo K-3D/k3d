@@ -96,7 +96,7 @@ namespace module
 				curve_orders->push_back(m_order.pipeline_value());
 				curve_first_knots->push_back(0);
 
-				uint surr_knots = curve_orders->back(); //order is at least 2!
+				k3d::uint_t surr_knots = curve_orders->back(); //order is at least 2!
 
 				if(surr_knots % 2 != 0)
 				{
@@ -104,12 +104,12 @@ namespace module
 					curve_knots->push_back(0);
 				}
 
-				for(uint prefix_knots = 0; prefix_knots < static_cast<uint>(surr_knots * 0.5); prefix_knots++)
+				for(k3d::uint_t prefix_knots = 0; prefix_knots < static_cast<k3d::uint_t>(surr_knots * 0.5); prefix_knots++)
 				{
 					curve_knots->push_back(0);
 				}
 
-				for(uint point = 0; point < control_points; point++ )
+				for(k3d::uint_t point = 0; point < control_points; point++ )
 				{
 					curve_points->push_back(point); //store the index of the point
 					points->push_back(k3d::point3(static_cast<double>(point) * m_point_spacing.pipeline_value(), 0.0, 0.0) );//store the point (a straight line along x-axis)
@@ -119,7 +119,7 @@ namespace module
 					curve_selection->push_back(0.0);
 				}
 
-				for(uint suffix_knots = 0; suffix_knots < static_cast<uint>(surr_knots * 0.5); suffix_knots++)
+				for(k3d::uint_t suffix_knots = 0; suffix_knots < static_cast<k3d::uint_t>(surr_knots * 0.5); suffix_knots++)
 				{
 					curve_knots->push_back(curve_knots->back());
 				}

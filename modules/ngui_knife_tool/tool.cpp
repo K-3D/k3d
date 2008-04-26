@@ -18,39 +18,51 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
-#include "basic_viewport_input_model.h"
-#include "command_arguments.h"
-#include "document_state.h"
-#include "icons.h"
-#include "interactive.h"
-#include "keyboard.h"
-#include "knife_tool.h"
-#include "modifiers.h"
-#include "navigation_input_model.h"
-#include "selection.h"
-#include "utility.h"
-#include "viewport.h"
-
+#include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
-#include "k3dsdk/mesh_selection.h"
+#include <k3dsdk/mesh_selection.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/basic_viewport_input_model.h>
+#include <k3dsdk/ngui/command_arguments.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/keyboard.h>
+#include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/navigation_input_model.h>
+#include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/tool.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/utility_gl.h>
 
 #include <set>
 
-namespace libk3dngui
+#include <boost/assign/list_of.hpp>
+
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
+{
+
+namespace knife
 {
 
 namespace detail
@@ -232,9 +244,9 @@ k3d::point3 center_point(const k3d::legacy::face& Face)
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
-// knife_tool::implementation
+// implementation
 
-struct knife_tool::implementation :
+struct implementation :
 	public k3d::property_collection
 {
 	struct split_edge_t
@@ -258,16 +270,16 @@ struct knife_tool::implementation :
 		bool subdivided;
 	};
 
-	implementation(document_state& DocumentState, knife_tool& Tool) :
+	implementation(document_state& DocumentState, tool& Tool) :
 		m_document_state(DocumentState),
 		m_tool(Tool),
 		m_navigation_model(DocumentState)
 	{
 		m_previous_edge = 0;
 
-		m_input_model.connect_lbutton_down(sigc::mem_fun(*this, &knife_tool::implementation::on_lbutton_down));
-		m_input_model.connect_lbutton_click(sigc::mem_fun(*this, &knife_tool::implementation::on_lbutton_click));
-		m_input_model.connect_rbutton_click(sigc::mem_fun(*this, &knife_tool::implementation::on_rbutton_click));
+		m_input_model.connect_lbutton_down(sigc::mem_fun(*this, &implementation::on_lbutton_down));
+		m_input_model.connect_lbutton_click(sigc::mem_fun(*this, &implementation::on_lbutton_click));
+		m_input_model.connect_rbutton_click(sigc::mem_fun(*this, &implementation::on_rbutton_click));
 
 		m_input_model.connect_mbutton_start_drag(sigc::mem_fun(m_navigation_model, &navigation_input_model::on_button1_start_drag));
 		m_input_model.connect_mbutton_drag(sigc::mem_fun(m_navigation_model, &navigation_input_model::on_button1_drag));
@@ -339,7 +351,7 @@ struct knife_tool::implementation :
 				//lbutton_down(arguments.get_viewport(), arguments.get_viewport_point2("mouse"), arguments.key_modifiers());
 				//lbutton_click(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
 
-				return RESULT_CONTINUE;
+				return k3d::icommand_node::RESULT_CONTINUE;
 			}
 		}
 		catch(std::exception& e)
@@ -347,7 +359,7 @@ struct knife_tool::implementation :
 			k3d::log() << k3d_file_reference << ": caught exception: " << e.what() << std::endl;
 		}
 
-		return RESULT_ERROR;
+		return k3d::icommand_node::RESULT_ERROR;
 	}
 
 	k3d::iunknown* interactive_target(viewport::control& Viewport)
@@ -542,7 +554,7 @@ struct knife_tool::implementation :
 	/// Stores a reference to the owning document
 	document_state& m_document_state;
 	/// Stores a reference to the owning base tool
-	knife_tool& m_tool;
+	tool& m_tool;
 	/// Stores the selection under the pointer when selection started
 	k3d::selection::record m_start_selection;
 	/// Stores the FrozenMeshes being cut
@@ -556,43 +568,76 @@ struct knife_tool::implementation :
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// knife_tool
+// tool
 
-knife_tool::knife_tool(document_state& DocumentState, const std::string& Name) :
-	base(DocumentState, Name),
-	m_implementation(new implementation(DocumentState, *this))
+class tool :
+	public libk3dngui::tool
 {
-}
+public:
+	tool() :
+		m_implementation(0)
+	{
+	}
 
-knife_tool::~knife_tool()
-{
-	delete m_implementation;
-}
+	~tool()
+	{
+		delete m_implementation;
+	}
 
-void knife_tool::on_activate()
-{
-	m_implementation->on_activate();
-}
+	const k3d::string_t tool_type()
+	{
+		return get_factory().name();
+	}
 
-void knife_tool::on_deactivate()
-{
-	m_implementation->on_deactivate();
-}
+	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
+	{
+		return m_implementation->execute_command(Command, Arguments);
+	}
 
-const k3d::icommand_node::result knife_tool::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	return m_implementation->execute_command(Command, Arguments);
-}
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<tool> factory(
+			k3d::uuid(0xf8f24a97, 0x4db2f704, 0x3e5d4e88, 0x59c77d02),
+			"NGUIKnifeTool",
+			_("Provides interactive controls for splitting faces."),
+			"NGUI Tools",
+			k3d::iplugin_factory::EXPERIMENTAL,
+			boost::assign::map_list_of("ngui:component-type", "tool"));
 
-void knife_tool::on_redraw(viewport::control& Viewport)
-{
-	m_implementation->on_redraw(Viewport);
-}
+		return factory;
+	}
 
-viewport_input_model& knife_tool::get_input_model()
-{
-	return m_implementation->m_input_model;
-}
+private:
+	void on_activate()
+	{
+		m_implementation->on_activate();
+	}
 
-} // namespace libk3dngui
+	void on_deactivate()
+	{
+		m_implementation->on_deactivate();
+	}
+
+	void on_redraw(viewport::control& Viewport)
+	{
+		m_implementation->on_redraw(Viewport);
+	}
+
+	viewport_input_model& get_input_model()
+	{
+		return m_implementation->m_input_model;
+	}
+
+	knife::implementation* m_implementation;
+};
+
+} // namespace knife
+
+} // namespace ngui
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::knife::tool::get_factory());
+K3D_MODULE_END
 
