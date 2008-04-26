@@ -709,10 +709,13 @@ private:
 				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIKnifeTool", get_accel_group())));
 		}
 
-		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "snap_tool", _("S_nap Tool"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_snap_tool))
-			<< set_accelerator_path("<k3d-document>/actions/edit/tools/snap_tool", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUISnapTool"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new menu_item::control(Parent, "NGUISnapTool", _("S_nap Tool"), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_snap_tool))
+				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUISnapTool", get_accel_group())));
+		}
 
 		return menu;
 	}
@@ -1730,7 +1733,10 @@ private:
 
 	void on_snap_tool()
 	{
-		m_document_state.set_active_tool(m_document_state.snap_tool());
+		tool* const snap_tool = m_document_state.get_tool("NGUISnapTool");
+		return_if_fail(snap_tool);
+
+		m_document_state.set_active_tool(*snap_tool);
 	}
 
 	void on_instantiate()

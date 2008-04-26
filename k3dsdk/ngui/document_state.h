@@ -106,8 +106,6 @@ public:
 	tool& rotate_tool();
 	/// Returns a reference to the builtin Scale Tool that can be passed to set_active_tool()
 	tool& scale_tool();
-	/// Returns a reference to the builtin Snap Tool that can be passed to set_active_tool()
-	tool& snap_tool();
 
 	/// Defines storage for the current document-wide selection mode
 	typedef k3d_data(selection_mode_t, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, no_property, no_serialization) selection_mode_property_t;

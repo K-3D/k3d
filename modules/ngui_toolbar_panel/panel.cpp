@@ -185,13 +185,16 @@ struct implementation
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
 
-		main_toolbar->row(0).pack_start(*Gtk::manage(
-			new image_toggle_button::control(*main_toolbar, "snap",
-				new detail::active_tool_proxy(m_document_state, m_document_state.snap_tool()), 0,
-				load_icon("snap_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
-			<< set_tooltip(_("Snap"))
-			<< make_toolbar_button()
-			), Gtk::PACK_SHRINK);
+		if(k3d::plugin::factory::lookup("NGUISnapTool"))
+		{
+			main_toolbar->row(0).pack_start(*Gtk::manage(
+				new image_toggle_button::control(*main_toolbar, "NGUISnapTool",
+					new detail::plugin_tool_proxy(m_document_state, "NGUISnapTool"), 0,
+					load_icon("NGUISnapTool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+				<< set_tooltip(_("Snap"))
+				<< make_toolbar_button()
+				), Gtk::PACK_SHRINK);
+		}
 
 		if(k3d::plugin::factory::lookup("NGUIParentTool"))
 		{

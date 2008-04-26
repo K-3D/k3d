@@ -38,6 +38,7 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/iselectable.h>
+#include <k3dsdk/keyboard.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/transform.h>

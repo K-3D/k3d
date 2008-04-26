@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,44 +18,51 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Tim Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
+
+#include "snap_tool_detail.h"
 
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
 #include <k3d-i18n-config.h>
-
-#include "document_state.h"
-#include "modifiers.h"
-#include "icons.h"
-#include "interactive.h"
-#include "keyboard.h"
-#include "snap_tool_detail.h"
-#include "tutorial_message.h"
-#include "utility.h"
-#include "viewport.h"
-
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iprojection.h>
+#include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/isnap_source.h>
 #include <k3dsdk/isnap_target.h>
 #include <k3dsdk/isnappable.h>
 #include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/keyboard.h>
+#include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/tutorial_message.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/xml.h>
 
-namespace libk3dngui
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
+{
+
+namespace snap
 {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -291,7 +298,7 @@ k3d::log() << debug << K3D_CHANGE_SET_CONTEXT << std::endl;
 	return_if_fail(mesh);
 
 	// Get selection and save initial position
-	component_center = detail::get_selected_points(m_document_state.selection_mode().internal_value(), *mesh, selected_points);
+	component_center = libk3dngui::detail::get_selected_points(m_document_state.selection_mode().internal_value(), *mesh, selected_points);
 }
 
 void snap_tool_detail::mesh_target::reset(k3d::iunknown*)
@@ -1111,5 +1118,10 @@ void snap_tool_detail::update_coordinate_system(k3d::iunknown*)
 	redraw_all();
 }
 
-} // namespace libk3dngui
+} // namespace snap
+
+} // namespace ngui
+
+} // namespace module
+
 

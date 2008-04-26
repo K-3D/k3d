@@ -39,7 +39,6 @@
 #include "safe_close_dialog.h"
 #include "scale_tool.h"
 #include "selection_tool.h"
-#include "snap_tool.h"
 #include "unsaved_document.h"
 #include "utility.h"
 #include "viewport.h"
@@ -1851,7 +1850,6 @@ public:
 	tool* m_move_tool;
 	tool* m_rotate_tool;
 	tool* m_scale_tool;
-	tool* m_snap_tool;
 
 	/// Store plugin tools
 	std::map<k3d::string_t, tool*> m_tools;
@@ -1921,7 +1919,6 @@ document_state::document_state(k3d::idocument& Document) :
 	m_implementation->m_move_tool = new libk3dngui::move_tool(*this, "move_tool");
 	m_implementation->m_rotate_tool = new libk3dngui::rotate_tool(*this, "rotate_tool");
 	m_implementation->m_scale_tool = new libk3dngui::scale_tool(*this, "scale_tool");
-	m_implementation->m_snap_tool = new libk3dngui::snap_tool(*this, "snap_tool");
 
 	m_implementation->m_active_tool = m_implementation->m_selection_tool;
 	m_implementation->m_active_tool->activate();
@@ -2088,11 +2085,6 @@ tool& document_state::rotate_tool()
 tool& document_state::scale_tool()
 {
 	return *m_implementation->m_scale_tool;
-}
-
-tool& document_state::snap_tool()
-{
-	return *m_implementation->m_snap_tool;
 }
 
 document_state::selection_mode_property_t& document_state::selection_mode()

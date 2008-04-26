@@ -25,6 +25,7 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include "document_state.h"
 #include "selection.h"
 #include "utility.h"
 #include "viewport.h"

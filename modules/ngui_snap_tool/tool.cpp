@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,47 +18,87 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Tim Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
+
+#include "snap_tool_detail.h"
 
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
-#include "command_arguments.h"
-#include "document_state.h"
-#include "modifiers.h"
-#include "icons.h"
-#include "interactive.h"
-#include "keyboard.h"
-#include "snap_tool.h"
-#include "snap_tool_detail.h"
-#include "viewport.h"
-
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/color.h>
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/geometric_operations.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/isnappable.h>
 #include <k3dsdk/isnap_source.h>
 #include <k3dsdk/isnap_target.h>
+#include <k3dsdk/isnappable.h>
 #include <k3dsdk/line2.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/command_arguments.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/keyboard.h>
+#include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/tool.h>
+#include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/plane.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/xml.h>
 
-#include <k3dsdk/fstream.h>
+#include <boost/assign/list_of.hpp>
 
-namespace libk3dngui
+using namespace libk3dngui;
+
+namespace module
+{
+
+namespace ngui
+{
+
+namespace snap
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// snap_tool::implementation
+// tool
 
-struct snap_tool::implementation :
+/// Interactive tool that provides "snappable" transformations for objects
+class tool :
+	public libk3dngui::tool
+{
+public:
+	tool();
+	~tool();
+
+	const k3d::string_t tool_type();
+	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
+	k3d::iproperty_collection* get_property_collection();
+	viewport_input_model& get_input_model();
+	static k3d::iplugin_factory& get_factory();
+
+private:
+	virtual void on_initialize(document_state& DocumentState);
+	void on_activate();
+	void on_deactivate();
+	void on_document_selection_changed();
+	void on_redraw(viewport::control& Viewport);
+	void on_select(viewport::control& Viewport);
+
+	class implementation;
+	implementation* m_implementation;
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// tool::implementation
+
+struct tool::implementation :
 	public detail::abstract_tool,
 	public snap_tool_detail
 {
@@ -137,9 +177,9 @@ struct snap_tool::implementation :
 		k3d::point2 m_last_mouse;
 	};
 
-	implementation(k3d::idocument& Document, document_state& DocumentState, snap_tool& MoveTool) :
+	implementation(k3d::idocument& Document, document_state& DocumentState, snap::tool& SnapTool) :
 		base(Document, DocumentState, *this),
-		m_snap_tool(MoveTool),
+		m_snap_tool(SnapTool),
 		m_quadric(gluNewQuadric()),
 		m_current_constraint(&m_screen_xy_constraint),
 		m_screen_xy_constraint(_("Move Screen XY"), load_icon("move_cursor_screen_xy", Gtk::ICON_SIZE_BUTTON), k3d::selection::token(k3d::selection::USER1, 0)),
@@ -665,18 +705,18 @@ struct snap_tool::implementation :
 			}
 			else
 			{
-				return RESULT_UNKNOWN_COMMAND;
+				return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
 			}
 
-			return RESULT_CONTINUE;
+			return k3d::icommand_node::RESULT_CONTINUE;
 		}
 		catch(std::exception& e)
 		{
 			k3d::log() << k3d_file_reference << ": caught exception: " << e.what() << std::endl;
-			return RESULT_ERROR;
+			return k3d::icommand_node::RESULT_ERROR;
 		}
 
-		return RESULT_UNKNOWN_COMMAND;
+		return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
 	}
 
 private:
@@ -1022,7 +1062,7 @@ private:
 	}
 
 	/// Stores a back-pointer to our parent
-	snap_tool& m_snap_tool;
+	snap::tool& m_snap_tool;
 	/// Stores a GLU quadric object for drawing the manipulators
 	GLUquadricObj* const m_quadric;
 
@@ -1070,36 +1110,24 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// snap_tool
+// tool
 
-snap_tool::snap_tool(document_state& DocumentState, const std::string& Name) :
-	base(DocumentState, Name),
-	m_implementation(new implementation(DocumentState.document(), DocumentState, *this))
+tool::tool() :
+	m_implementation(0)
 {
-	m_implementation->navigation_model().connect_command_signal(sigc::mem_fun(*this, &snap_tool::record_command));
 }
 
-snap_tool::~snap_tool()
+tool::~tool()
 {
 	delete m_implementation;
 }
 
-void snap_tool::on_activate()
+const k3d::string_t tool::tool_type()
 {
-	m_implementation->on_activate();
+	return get_factory().name();
 }
 
-void snap_tool::on_deactivate()
-{
-	m_implementation->on_deactivate();
-}
-
-void snap_tool::on_document_selection_changed()
-{
-	m_implementation->on_document_selection_changed();
-}
-
-const k3d::icommand_node::result snap_tool::execute_command(const std::string& Command, const std::string& Arguments)
+const k3d::icommand_node::result tool::execute_command(const std::string& Command, const std::string& Arguments)
 {
 	k3d::icommand_node::result result = m_implementation->navigation_model().execute_command(Command, Arguments);
 	if(result != RESULT_UNKNOWN_COMMAND)
@@ -1109,28 +1137,70 @@ const k3d::icommand_node::result snap_tool::execute_command(const std::string& C
 	if(result != RESULT_UNKNOWN_COMMAND)
 		return result;
 
-	return base::execute_command(Command, Arguments);
+	return libk3dngui::tool::execute_command(Command, Arguments);
 }
 
-void snap_tool::on_redraw(viewport::control& Viewport)
-{
-	m_implementation->on_redraw(Viewport);
-}
-
-void snap_tool::on_select(viewport::control& Viewport)
-{
-	m_implementation->on_select(Viewport);
-}
-
-k3d::iproperty_collection* snap_tool::get_property_collection()
+k3d::iproperty_collection* tool::get_property_collection()
 {
 	return dynamic_cast<k3d::iproperty_collection*>(m_implementation);
 }
 
-viewport_input_model& snap_tool::get_input_model()
+viewport_input_model& tool::get_input_model()
 {
 	return m_implementation->input_model();
 }
 
-} // namespace libk3dngui
+k3d::iplugin_factory& tool::get_factory()
+{
+	static k3d::application_plugin_factory<tool> factory(
+		k3d::uuid(0xba57d873, 0xa34fe142, 0xf9cb54b6, 0xffa15af4),
+		"NGUISnapTool",
+		_("Provides interactive controls for 'snapping' nodes."),
+		"NGUI Tools",
+		k3d::iplugin_factory::EXPERIMENTAL,
+		boost::assign::map_list_of("ngui:component-type", "tool"));
+
+	return factory;
+}
+
+void tool::on_initialize(document_state& DocumentState)
+{
+	m_implementation = new implementation(DocumentState.document(), DocumentState, *this);
+	m_implementation->navigation_model().connect_command_signal(sigc::mem_fun(*this, &tool::record_command));
+}
+
+void tool::on_activate()
+{
+	m_implementation->on_activate();
+}
+
+void tool::on_deactivate()
+{
+	m_implementation->on_deactivate();
+}
+
+void tool::on_document_selection_changed()
+{
+	m_implementation->on_document_selection_changed();
+}
+
+void tool::on_redraw(viewport::control& Viewport)
+{
+	m_implementation->on_redraw(Viewport);
+}
+
+void tool::on_select(viewport::control& Viewport)
+{
+	m_implementation->on_select(Viewport);
+}
+
+} // namespace snap
+
+} // namespace ngui
+
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::snap::tool::get_factory());
+K3D_MODULE_END
 

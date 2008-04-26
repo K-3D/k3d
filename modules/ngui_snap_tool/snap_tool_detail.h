@@ -2,7 +2,7 @@
 #define NGUI_SNAP_TOOL_DETAIL_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,32 +21,39 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Tim Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "basic_viewport_input_model.h"
-#include "navigation_input_model.h"
-#include "selection.h"
-#include "tool_selection.h"
-#include "transform_tool.h"
-#include "utility.h"
-#include "viewport.h"
-
-#include <k3dsdk/gl.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/gl.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/ngui/basic_viewport_input_model.h>
+#include <k3dsdk/ngui/navigation_input_model.h>
+#include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/tool_selection.h>
+#include <k3dsdk/ngui/transform_tool.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/transform.h>
+
+using namespace libk3dngui;
 
 namespace k3d { class isnap_source; }
 namespace k3d { class isnap_target; }
 namespace k3d { class isnappable; }
 
-namespace libk3dngui
+namespace module
+{
+
+namespace ngui
+{
+
+namespace snap
 {
 
 namespace detail
@@ -350,7 +357,7 @@ private:
 		/// Stores the average component position
 		k3d::point3 component_center;
 		/// Stores the list of selected points with their index
-		detail::component_points_t selected_points;
+		libk3dngui::detail::component_points_t selected_points;
 		/// Stores the tweak array when moving components
 		typedef std::vector<k3d::point3> tweaks_t;
 		tweaks_t tweaks;
@@ -450,7 +457,11 @@ protected:
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_visible_manipulators;
 };
 
-} // namespace libk3dngui
+} // namespace snap
+
+} // namespace ngui
+
+} // namespace module
 
 #endif // !NGUI_SNAP_TOOL_DETAIL_H
 
