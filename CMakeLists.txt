@@ -187,7 +187,7 @@ OPTION(K3D_BUILD_VIRTUAL_OPENGL_PAINTERS_MODULE "Build virtual OpenGL painters m
 OPTION(K3D_BUILD_WGL_MODULE "Build the Windows offscreen rendering module" ${K3D_BUILD_WGL_MODULE_DEFAULT})
 OPTION(K3D_BUILD_WINDOWS_MODULE "Build the Windows integration module" ${K3D_BUILD_WINDOWS_MODULE_DEFAULT})
 OPTION(K3D_BUILD_YAFRAY_MODULE "Build the YAFRAY render engine integration module" ON)
-
+OPTION(K3D_BUILD_COLLADA_MODULE "Build the COLLADA plugin module" ON)
 OPTION(K3D_BUILD_PARALLEL "Enable parallel computation using the Threaded Building Blocks library" OFF)
 MARK_AS_ADVANCED(K3D_BUILD_PARALLEL)
 
@@ -202,6 +202,12 @@ INCLUDE(K3DFindBoost)
 IF(NOT K3D_BOOST_FOUND)
 	MESSAGE(SEND_ERROR "Couldn't find the boost library")
 ENDIF(NOT K3D_BOOST_FOUND)
+
+INCLUDE(FindCollada)
+IF(NOT COLLADA_FOUND)
+	MESSAGE(SEND_ERROR "Couldn't find the COLLADA library")
+ENDIF(NOT COLLADA_FOUND)
+
 
 INCLUDE(K3DFindGlibmm)
 IF(NOT K3D_GLIBMM_FOUND)
