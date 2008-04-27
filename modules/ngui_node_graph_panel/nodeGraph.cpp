@@ -462,7 +462,7 @@ public:
 	static k3d::iplugin_factory& get_factory(){
 		static k3d::application_plugin_factory<panel> factory(
 			k3d::uuid(0xfb11a3d8, 0x8c42e4d8, 0x2162d48e, 0x5e236a4b),
-			"nodeGraph",
+			"NGUINodeGraphPanel",
 			_("Visual Graphing Of K3D Nodes"),
 			"NGUI Panels",
 			k3d::iplugin_factory::EXPERIMENTAL,
