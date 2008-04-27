@@ -35,7 +35,7 @@ using namespace std;
 namespace module
 {
 
-namespace dae
+namespace collada
 {
 
 namespace io

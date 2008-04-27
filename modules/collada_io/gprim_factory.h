@@ -18,51 +18,42 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Barbiero Mattia
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#ifndef __intGeometry_h__
-#define __intGeometry_h__
-
-
 #include <k3dsdk/mesh.h>
-#include <dom/domGeometry.h>
-
-
-//typedef daeSmartRef<intGeometry> intGeometryRef;
-//typedef daeTArray<intGeometryRef> intGeometryArray;
-
-/**
- * Geometry describes the visual shape and appearance of an object in the
- * scene. The geometry element categorizes the declaration of geometric information.
- * Geometry is a  branch of mathematics that deals with the measurement, properties,
- * and relationships of  points, lines, angles, surfaces, and solids.
- */
+#include <k3dsdk/point4.h>
 
 namespace module
 {
 
-namespace dae
+namespace collada
 {
 
 namespace io
 {
 
-class intGeometry
+/// Provides a simplified interface for adding geometric primitives to a mesh
+/** \todo Move this into the sdk once it matures for awhile */
+class gprim_factory
 {
-private:
+public:
+	gprim_factory(k3d::mesh& Mesh);
+	~gprim_factory();
 
-    k3d::mesh Mesh;
-public: // Constuctor and Destructor
-	/**
-	 * Default Constructor.
-	 */
-	intGeometry(domGeometry&);
-	k3d::mesh getMesh(){return Mesh;}
-	/**
-	 * Default Destructor.
-	 */
-	~intGeometry(){}
+	void add_point(const k3d::point3& Point);
+	void add_point(const k3d::point4& Point);
+	void add_polygon(const k3d::mesh::indices_t& Points);
+	void add_nurbs_patch(const size_t UOrder, const size_t VOrder, const k3d::mesh::indices_t& Points, const k3d::mesh::knots_t& UKnots, const k3d::mesh::knots_t VKnots);
+
+private:
+	class implementation;
+	implementation* const m_implementation;
 };
-}}}
-#endif
+
+} // namespace io
+
+} // namespace collada
+
+} // namespace module
+

@@ -38,7 +38,7 @@
 namespace module
 {
 
-namespace dae
+namespace collada
 {
 
 namespace io
@@ -47,16 +47,16 @@ namespace io
 
 
 /////////////////////////////////////////////////////////////////////////////
-// mesh_reader_implementation
+// mesh_reader
 
-class mesh_reader_implementation :
+class mesh_reader :
 	public k3d::mesh_source<k3d::persistent<k3d::node> >,
 	public k3d::imesh_storage
 {
 	typedef k3d::mesh_source<k3d::persistent<k3d::node> > base;
 
 public:
-	mesh_reader_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) : base(Factory, Document),
+	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) : base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("dae_files")),
 		m_texture_u(init_owner(*this) + init_name("texture_u") + init_label(_("Texture U")) + init_description(_("Texture U")) + init_value(std::string("s"))),
 		m_texture_v(init_owner(*this) + init_name("texture_v") + init_label(_("Texture V")) + init_description(_("Texture V")) + init_value(std::string("t"))),
@@ -104,9 +104,9 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<mesh_reader_implementation,k3d::interface_list<k3d::imesh_source,k3d::interface_list<k3d::imesh_storage> > > factory(
+		static k3d::document_plugin_factory<mesh_reader,k3d::interface_list<k3d::imesh_source,k3d::interface_list<k3d::imesh_storage> > > factory(
 			k3d::uuid(0xf8bbd8fb, 0x7d47911e, 0xbf64f3a3, 0x25652955),
-			"DAEMeshReader",
+			"ColladaMeshReader",
 			_("Mesh reader that loads external COLLADA (.dae) files into the document by reference"),
 			"MeshReader");
 
@@ -122,12 +122,12 @@ private:
 
 k3d::iplugin_factory& mesh_reader_factory()
 {
-	return mesh_reader_implementation::get_factory();
+	return mesh_reader::get_factory();
 }
 
 } // namespace io
 
-} // namespace dae
+} // namespace collada
 
 } // namespace module
 

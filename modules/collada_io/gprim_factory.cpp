@@ -32,7 +32,7 @@ using namespace std;
 namespace module
 {
 
-namespace dae
+namespace collada
 {
 
 namespace io
@@ -240,7 +240,7 @@ void gprim_factory::add_nurbs_patch(const size_t UOrder, const size_t VOrder, co
 
 } // namespace io
 
-} // namespace obj
+} // namespace collada
 
 } // namespace module
 

@@ -26,7 +26,7 @@
 namespace module
 {
 
-namespace dae
+namespace collada
 {
 
 namespace io
@@ -37,12 +37,12 @@ extern k3d::iplugin_factory& mesh_reader_factory();
 
 } // namespace io
 
-} // namespace dae
+} // namespace collada
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::dae::io::mesh_reader_factory());
+	Registry.register_factory(module::collada::io::mesh_reader_factory());
 	//Registry.register_factory(module::dae::io::mesh_writer_factory());
 K3D_MODULE_END
 

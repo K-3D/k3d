@@ -30,7 +30,7 @@ using namespace std;
 namespace module
 {
 
-namespace dae
+namespace collada
 {
 
 namespace io
@@ -44,7 +44,7 @@ namespace io
 
         domMesh *meshElement = geomElement.getMesh();        
 
-        module::dae::io::gprim_factory *local = new module::dae::io::gprim_factory(Mesh);
+        module::collada::io::gprim_factory *local = new module::collada::io::gprim_factory(Mesh);
         
 	// Get a pointer to the domPolygons in this domMesh. To simplify this example,
         // we will handle only a domMesh that has a single domPolygons.
