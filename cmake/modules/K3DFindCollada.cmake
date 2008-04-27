@@ -48,19 +48,19 @@ ENDIF(UNIX AND APPLE)
 #Windows configuration
 IF(WIN32)
 	FIND_PATH(K3D_COLLADA_DAE_INCLUDE_PATH dae.h
-		C:\Program Files\domcollada\include
+		C:/Program Files/domcollada/include
 		DOC "Directory where the ColladaDOM dae.h file is located"
 		)
 
 	FIND_PATH(K3D_COLLADA_DOM_INCLUDE_PATH dom/
-		C:\Program Files\domcollada\include\1.4
+		C:/Program Files/domcollada/include/1.4
 		DOC "Directory where the ColladaDOM 1.4 header files are located"
 		)
 	
 	FIND_LIBRARY(K3D_COLLADA_LIBRARY
 		NAMES Collada14Dom
 		PATHS
-		C:\Program Files\domcollada\build\vc8-1.4
+		C:/Program Files/domcollada/build/vc8-1.4
 		DOC "The ColladaDOM 1.4 library"
 		)
 ENDIF(WIN32)
