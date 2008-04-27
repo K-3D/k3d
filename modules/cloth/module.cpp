@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Carlos Andres Dominguez Caballero (carlosadc at gmail dot com)
+	\author Carlos Andres Dominguez Caballero (carlosadc at gmail dot com)
 */
 
 
@@ -36,7 +36,10 @@
 #include "d_Vec3f.h"
 #include "cloth_solver.h"
 
-namespace cloth_module
+namespace module
+{
+
+namespace cloth
 {
 
 class cloth_plugin :
@@ -108,10 +111,13 @@ public:
 	cloth_solver *solver;
 	bool first_time;
 };
-}
+
+} // namespace cloth
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-        Registry.register_factory(cloth_module::cloth_plugin::get_factory());
+        Registry.register_factory(module::cloth::cloth_plugin::get_factory());
 K3D_MODULE_END
 
 
