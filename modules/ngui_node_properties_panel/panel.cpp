@@ -18,6 +18,23 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/icamera.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/ienumeration_property.h>
+#include <k3dsdk/ikeyframer.h>
+#include <k3dsdk/ilist_property.h>
+#include <k3dsdk/imeasurement_property.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/inode_collection_property.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/iproperty_group_collection.h>
+#include <k3dsdk/iscript_property.h>
+#include <k3dsdk/iselectable.h>
+#include <k3dsdk/iuser_property.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/mesh_selection.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/ngui/angle_axis_control.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/bitmap_preview.h>
@@ -35,6 +52,7 @@
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/node_chooser.h>
 #include <k3dsdk/ngui/node_collection_chooser.h>
+#include <k3dsdk/ngui/node_toolbar.h>
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/path_chooser.h>
 #include <k3dsdk/ngui/point_control.h>
@@ -52,33 +70,6 @@
 #include <k3dsdk/ngui/uri.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/widget_manip.h>
-
-#include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/irender_animation.h>
-#include <k3dsdk/icamera.h>
-#include <k3dsdk/idocument.h>
-#include <k3dsdk/ienumeration_property.h>
-#include <k3dsdk/ikeyframer.h>
-#include <k3dsdk/ilist_property.h>
-#include <k3dsdk/imeasurement_property.h>
-#include <k3dsdk/imesh_sink.h>
-#include <k3dsdk/imesh_source.h>
-#include <k3dsdk/imesh_storage.h>
-#include <k3dsdk/inode.h>
-#include <k3dsdk/inode_collection_property.h>
-#include <k3dsdk/iplugin_factory.h>
-#include <k3dsdk/iproperty_group_collection.h>
-#include <k3dsdk/irender_camera_animation.h>
-#include <k3dsdk/irender_camera_frame.h>
-#include <k3dsdk/irender_camera_preview.h>
-#include <k3dsdk/irender_frame.h>
-#include <k3dsdk/irender_preview.h>
-#include <k3dsdk/iscript_property.h>
-#include <k3dsdk/iselectable.h>
-#include <k3dsdk/iuser_property.h>
-#include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_selection.h>
-#include <k3dsdk/module.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
@@ -121,54 +112,6 @@ namespace node_properties
 namespace detail
 {
 
-class bypass_property_proxy :
-	public toggle_button::imodel
-{
-public:
-	bypass_property_proxy(document_state& DocumentState, k3d::iproperty& InputProperty, k3d::iproperty& OutputProperty) :
-		m_document_state(DocumentState),
-		m_input_property(InputProperty),
-		m_output_property(OutputProperty)
-	{
-	}
-
-	const Glib::ustring label()
-	{
-		return _("Bypass modifier");
-	}
-
-	const k3d::bool_t value()
-	{
-		// true == bypassed, false == normal
-		return m_document_state.document().pipeline().dependency(m_output_property) == &m_input_property;
-	}
-
-	void set_value(const k3d::bool_t Value)
-	{
-		// true == bypassed, false == normal
-		k3d::ipipeline::dependencies_t dependencies;
-		dependencies.insert(std::make_pair(&m_output_property, Value ? &m_input_property : static_cast<k3d::iproperty*>(0)));
-		m_document_state.document().pipeline().set_dependencies(dependencies);
-
-		m_changed_signal.emit();
-	}
-
-	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
-	{
-		return m_changed_signal.connect(Slot);
-	}
-
-private:
-	bypass_property_proxy(const bypass_property_proxy&);
-	bypass_property_proxy& operator=(const bypass_property_proxy&);
-
-	document_state& m_document_state;
-	k3d::iproperty& m_input_property;
-	k3d::iproperty& m_output_property;
-
-	sigc::signal<void> m_changed_signal;
-};
-
 /////////////////////////////////////////////////////////////////////////////
 // implementation
 
@@ -180,12 +123,16 @@ public:
 		m_document_state(DocumentState),
 		m_node(0),
 		m_parent(Parent),
-		m_help_button(m_parent, "onlin_help", Gtk::Stock::HELP)
+		m_help_button(m_parent, "online_help", Gtk::Stock::HELP),
+		m_node_toolbar(DocumentState, Parent, "toolbar")
 	{
 		m_label.set_alignment(Gtk::ALIGN_LEFT);
 		m_label.set_padding(5, 5);
 
 		&m_help_button << connect_button(sigc::mem_fun(*this, &implementation::on_online_help));
+
+		m_vbox.pack_start(m_node_toolbar.get_widget(), Gtk::PACK_SHRINK);
+		m_vbox.pack_start(m_property_vbox, Gtk::PACK_SHRINK);
 
 		m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 		m_scrolled_window.add(m_vbox);
@@ -259,114 +206,16 @@ public:
 		}
 	}
 
-	void reset()
-	{
-		Glib::ListHandle<Gtk::Widget*> children = m_vbox.get_children();
-		std::for_each(children.begin(), children.end(), k3d::delete_object());
-	}
-
 	void on_update()
 	{
 		update_label();
 
-		reset();
+		m_node_toolbar.set_object(m_node);
 
-		// Create a toolbar ...
-		toolbar::control* const toolbar_control = new toolbar::control(m_parent, "toolbar");
-		m_vbox.pack_start(*manage(toolbar_control), Gtk::PACK_SHRINK);
+		Glib::ListHandle<Gtk::Widget*> children = m_property_vbox.get_children();
+		std::for_each(children.begin(), children.end(), k3d::delete_object());
 
 		k3d::istate_recorder* const state_recorder = &m_document_state.document().state_recorder();
-
-		// Add controls for cameras and camera render engines ...
-		if(dynamic_cast<k3d::icamera*>(m_node) || dynamic_cast<k3d::irender_camera_preview*>(m_node))
-		{
-			button::control* const control =
-				new button::control(m_parent, "render_camera_preview", *Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_BUTTON))))
-					<< connect_button(sigc::mem_fun(*this, &implementation::on_render_camera_preview))
-					<< set_tooltip(_("Render Preview"));
-
-			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
-		}
-
-		if(dynamic_cast<k3d::icamera*>(m_node) || dynamic_cast<k3d::irender_camera_frame*>(m_node))
-		{
-			button::control* const control =
-				new button::control(m_parent, "render_camera_frame", *Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_BUTTON))))
-					<< connect_button(sigc::mem_fun(*this, &implementation::on_render_camera_frame))
-					<< set_tooltip(_("Render Frame"));
-
-			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
-		}
-
-		if(dynamic_cast<k3d::icamera*>(m_node) || dynamic_cast<k3d::irender_camera_animation*>(m_node))
-		{
-			button::control* const control =
-				new button::control(m_parent, "render_camera_animation", *Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_BUTTON))))
-					<< connect_button(sigc::mem_fun(*this, &implementation::on_render_camera_animation))
-					<< set_tooltip(_("Render Animation"));
-
-			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
-		}
-
-		// Add controls for render engines
-		if(dynamic_cast<k3d::irender_preview*>(m_node))
-		{
-			button::control* const control =
-				new button::control(m_parent, "render_preview", *Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_BUTTON))))
-					<< connect_button(sigc::mem_fun(*this, &implementation::on_render_preview))
-					<< set_tooltip(_("Render Preview"));
-
-			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
-		}
-
-		if(dynamic_cast<k3d::irender_frame*>(m_node))
-		{
-			button::control* const control =
-				new button::control(m_parent, "render_frame", *Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_BUTTON))))
-					<< connect_button(sigc::mem_fun(*this, &implementation::on_render_frame))
-					<< set_tooltip(_("Render Frame"));
-
-			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
-		}
-
-		if(dynamic_cast<k3d::irender_animation*>(m_node))
-		{
-			button::control* const control =
-				new button::control(m_parent, "render_animation", *Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_BUTTON))))
-					<< connect_button(sigc::mem_fun(*this, &implementation::on_render_animation))
-					<< set_tooltip(_("Render Animation"));
-
-			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
-		}
-
-		// Add a "reset" button for nodes that implement k3d::imesh_storage (FrozenMesh, external file readers, etc) ...
-		if(dynamic_cast<k3d::imesh_storage*>(m_node))
-		{
-			button::control* const control =
-				new button::control(m_parent, "reset_mesh", _("Reset Mesh"))
-					<< connect_button(sigc::mem_fun(*this, &implementation::on_reset_mesh))
-					<< set_tooltip(_("Reset / Reload Mesh"));
-
-			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
-		}
-
-		// Add a "disable" button for mesh modifiers ...
-		if(k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(m_node))
-		{
-			if(k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(m_node))
-			{
-				toggle_button::control* const control =
-					new toggle_button::control(
-						m_parent,
-						"disable_mesh_modifier",
-						new detail::bypass_property_proxy(m_document_state, mesh_sink->mesh_sink_input(), mesh_source->mesh_source_output()),
-						state_recorder,
-						_("Disable"))
-						<< set_tooltip(_("Disable / bypass mesh modifier"));
-
-				toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
-			}
-		}
 
 		// Get the node properties, grouped together ...
 		k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(m_node);
@@ -390,7 +239,8 @@ public:
 			property_groups.insert(property_groups.end(), k3d::iproperty_group_collection::group(m_node->factory().name(), all_properties));
 			property_groups.insert(property_groups.end(), groups.begin(), groups.end());
 		}
-		
+
+/*
 		// Used to determine if we need to add ikeyframer buttons
 		k3d::ikeyframer* keyframer = dynamic_cast<k3d::ikeyframer*>(m_node);
 		k3d::iproperty* last_time_property;
@@ -405,6 +255,7 @@ public:
 						
 			toolbar_control->row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
 		}
+*/
 
 		// For each property group ...
 		for(k3d::iproperty_group_collection::groups_t::const_iterator property_group = property_groups.begin(); property_group != property_groups.end(); ++property_group)
@@ -413,7 +264,7 @@ public:
 				continue;
 
 			collapsible_frame::control* const frame = new collapsible_frame::control(property_group->name, m_collapsible_frame_group);
-			m_vbox.pack_start(*manage(frame), Gtk::PACK_SHRINK);
+			m_property_vbox.pack_start(*manage(frame), Gtk::PACK_SHRINK);
 
 			Gtk::Table* const table = new Gtk::Table(property_group->properties.size(), 5, false);
 			frame->add(*manage(table));
@@ -595,7 +446,8 @@ public:
 
 					table->attach(*manage(control), prop_delete_begin, prop_delete_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
 				}
-				
+
+/*
 				// If we have a keyframer, add a delete button to each keyframe group
 				if (keyframer && property_name.find("key_time_", 0) != std::string::npos)
 				{
@@ -628,6 +480,7 @@ public:
 						last_time_property = 0;
 					}
 				}
+*/
 			}
 
 			// Add controls for managing user properties ...
@@ -654,89 +507,6 @@ public:
 		{
 			k3d::ngui::uri::open("http://www.k-3d.org/wiki/" + m_node->factory().name());
 		}
-	}
-
-	void on_render_camera_preview()
-	{
-		k3d::icamera* camera = dynamic_cast<k3d::icamera*>(m_node);
-		if(!camera)
-			camera = pick_camera(m_document_state);
-		if(!camera)
-			return;
-
-		k3d::irender_camera_preview* render_engine = dynamic_cast<k3d::irender_camera_preview*>(m_node);
-		if(!render_engine)
-			render_engine = pick_camera_preview_render_engine(m_document_state);
-		if(!render_engine)
-			return;
-
-		render(*camera, *render_engine);
-	}
-
-	void on_render_camera_frame()
-	{
-		k3d::icamera* camera = dynamic_cast<k3d::icamera*>(m_node);
-		if(!camera)
-			camera = pick_camera(m_document_state);
-		if(!camera)
-			return;
-
-		k3d::irender_camera_frame* render_engine = dynamic_cast<k3d::irender_camera_frame*>(m_node);
-		if(!render_engine)
-			render_engine = pick_camera_still_render_engine(m_document_state);
-		if(!render_engine)
-			return;
-
-		render(*camera, *render_engine);
-	}
-
-	void on_render_camera_animation()
-	{
-		k3d::icamera* camera = dynamic_cast<k3d::icamera*>(m_node);
-		if(!camera)
-			camera = pick_camera(m_document_state);
-		if(!camera)
-			return;
-
-		k3d::irender_camera_animation* render_engine = dynamic_cast<k3d::irender_camera_animation*>(m_node);
-		if(!render_engine)
-			render_engine = pick_camera_animation_render_engine(m_document_state);
-		if(!render_engine)
-			return;
-
-		render(m_document_state, *camera, *render_engine);
-	}
-
-	void on_render_preview()
-	{
-		k3d::irender_preview* render_engine = dynamic_cast<k3d::irender_preview*>(m_node);
-		return_if_fail(render_engine);
-
-		render(*render_engine);
-	}
-
-	void on_render_frame()
-	{
-		k3d::irender_frame* render_engine = dynamic_cast<k3d::irender_frame*>(m_node);
-		return_if_fail(render_engine);
-
-		render(*render_engine);
-	}
-
-	void on_render_animation()
-	{
-		k3d::irender_animation* render_engine = dynamic_cast<k3d::irender_animation*>(m_node);
-		return_if_fail(render_engine);
-
-		render(m_document_state, *render_engine);
-	}
-
-	void on_reset_mesh()
-	{
-		k3d::imesh_storage* const mesh_storage = dynamic_cast<k3d::imesh_storage*>(m_node);
-		return_if_fail(mesh_storage);
-
-		mesh_storage->reset_mesh(0);
 	}
 
 	void on_delete_user_property(k3d::iproperty_collection* Collection, k3d::iproperty* Property)
@@ -805,6 +575,10 @@ public:
 	Gtk::ScrolledWindow m_scrolled_window;
 	/// Parent widget for the rest of the implementation
 	Gtk::VBox m_vbox;
+	/// Provides a node-specific toolbar
+	k3d::ngui::node_toolbar::control m_node_toolbar;
+	/// Widget for storing property controls
+	Gtk::VBox m_property_vbox;
 	/// Groups collapsible frames together
 	collapsible_frame::group m_collapsible_frame_group;
 
