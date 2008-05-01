@@ -51,8 +51,6 @@ k3dsdk/ngui/scripting.cpp
 k3dsdk/ngui/selection_button.cpp
 k3dsdk/ngui/selection_input_model.cpp
 k3dsdk/ngui/selection_tool.cpp
-k3dsdk/ngui/snap_tool.cpp
-k3dsdk/ngui/snap_tool_detail.h
 k3dsdk/ngui/spin_button.cpp
 k3dsdk/ngui/transform_tool.h
 k3dsdk/ngui/uri.cpp
