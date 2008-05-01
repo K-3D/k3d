@@ -133,6 +133,7 @@ OPTION(K3D_BUILD_NGUI_KNIFE_TOOL_MODULE "Build the user interface 'knife tool' p
 OPTION(K3D_BUILD_NGUI_LEARNING_MODULE "Build the user interface learning (tutorial) dialog plugin module" ON)
 OPTION(K3D_BUILD_NGUI_LOG_MODULE "Build the user interface log window plugin module" ON)
 OPTION(K3D_BUILD_NGUI_MODULE "Build the standard graphical user interface plugin module" ON)
+OPTION(K3D_BUILD_NGUI_NODE_GRAPH_PANEL_MODULE "Build the node graph module" ON)
 OPTION(K3D_BUILD_NGUI_NODE_HISTORY_PANEL_MODULE "Build the user interface node history panel plugin module" ON)
 OPTION(K3D_BUILD_NGUI_NODE_LIST_PANEL_MODULE "Build the user interface node list panel plugin module" ON)
 OPTION(K3D_BUILD_NGUI_PARENT_TOOL_MODULE "Build the user interface 'parent tool' plugin module" ON)
