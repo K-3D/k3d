@@ -31,6 +31,7 @@ namespace windows
 {
 
 extern k3d::iplugin_factory& uri_handler_factory();
+extern k3d::iplugin_factory& disable_desktop_composition_factory();
 
 } // namespace windows
 
@@ -38,5 +39,6 @@ extern k3d::iplugin_factory& uri_handler_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::windows::uri_handler_factory());
+	Registry.register_factory(module::windows::disable_desktop_composition_factory());
 K3D_MODULE_END
 

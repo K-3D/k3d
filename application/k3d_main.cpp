@@ -636,25 +636,6 @@ void delete_auto_start_plugins(auto_start_plugins_t& Plugins)
 
 int k3d_main(std::vector<k3d::string_t> raw_arguments)
 {
-#ifdef K3D_API_WIN32
-	// Fix problems on Vista.
-	// Thanks to Yaroukh from the forum and someone with nick "Wojta" for pointing out "Desktop Composition" was the problem.
-	typedef HRESULT (*DwmEnableComposition_t)(k3d::uint_t);
-	HINSTANCE library = ::LoadLibrary("dwmapi.dll");
-	if (library != 0)
-	{
-		DwmEnableComposition_t DwmEnableComposition = DwmEnableComposition_t(::GetProcAddress(library, "DwmEnableComposition"));
-		if (DwmEnableComposition != 0)
-		{
-			DwmEnableComposition(0);
-		}
-		else 
-		{
-			k3d::log() << error << "Failed to disable Vista Desktop Composition" << std::endl; 
-		}
-		::FreeLibrary(library);
-	}
-#endif
 	// Append extra options from the environment ...
 	std::istringstream buffer(k3d::system::getenv("K3D_EXTRA_OPTIONS"));
 	std::copy(std::istream_iterator<k3d::string_t>(buffer), std::istream_iterator<k3d::string_t>(), std::back_inserter(raw_arguments));
