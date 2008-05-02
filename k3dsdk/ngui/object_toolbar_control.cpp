@@ -24,10 +24,12 @@
 #include "button.h"
 #include "document_state.h"
 #include "icons.h"
-#include "node_toolbar.h"
+#include "object_toolbar_control.h"
+#include "properties.h"
 #include "render.h"
 #include "toggle_button.h"
 #include "toolbar.h"
+#include "uri.h"
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
@@ -45,6 +47,7 @@
 #include <k3dsdk/utility.h>
 
 #include <gtkmm/image.h>
+#include <gtkmm/stock.h>
 
 using namespace libk3dngui;
 
@@ -54,9 +57,10 @@ namespace k3d
 namespace ngui
 {
 
-namespace node_toolbar
+namespace object_toolbar
 {
 
+/// toggle_button model that turns a property-bypass into a togglable action
 class bypass_property_proxy :
 	public toggle_button::imodel
 {
@@ -122,6 +126,30 @@ public:
 		// Delete existing icons ...
 		Glib::ListHandle<Gtk::Widget*> children = m_toolbar.get_children();
 		std::for_each(children.begin(), children.end(), delete_object());
+
+		// Add a help button ...
+		if(inode* const node = dynamic_cast<inode*>(Object))
+		{
+			const string_t uri = "http://www.k-3d.org/wiki/" + node->factory().name();
+
+			button::control* const control =
+				new button::control(m_toolbar, "online_help", Gtk::Stock::HELP)
+					<< connect_button(sigc::bind(sigc::ptr_fun(&k3d::ngui::uri::open), uri))
+					<< set_tooltip(_("Display online help."));
+
+			m_toolbar.row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
+		}
+
+		// Add controls for managing user properties ...
+		if(inode* const node = dynamic_cast<inode*>(Object))
+		{
+			button::control* const control =
+				new button::control(m_toolbar, "add_user_property", *Gtk::manage(new Gtk::Image(Gtk::Stock::ADD, Gtk::ICON_SIZE_BUTTON)))
+					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_add_user_property), node))
+					<< set_tooltip(_("Add a user property."));
+
+			m_toolbar.row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
+		}
 
 		// Add controls for cameras
 		if(icamera* const camera = dynamic_cast<icamera*>(Object))
@@ -236,8 +264,15 @@ public:
 				m_toolbar.row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
 			}
 		}
+
+		m_toolbar.show_all();
 	}
 
+	void on_add_user_property(inode* Node)
+	{
+		k3d::ngui::property::create(*Node, m_toolbar);
+	}
+	
 	void on_render_camera_camera_preview(icamera* Camera)
 	{
 	       irender_camera_preview* const render_camera_preview = pick_camera_preview_render_engine(m_document_state);
@@ -339,7 +374,7 @@ Gtk::Widget& control::get_widget()
 	return m_implementation->m_toolbar;
 }
 
-} // namespace node_toolbar
+} // namespace object_toolbar
 
 } // namespace ngui
 

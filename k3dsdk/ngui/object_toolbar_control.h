@@ -1,5 +1,5 @@
-#ifndef NGUI_NODE_TOOLBAR_H
-#define NGUI_NODE_TOOLBAR_H
+#ifndef NGUI_OBJECT_TOOLBAR_CONTROL_H
+#define NGUI_OBJECT_TOOLBAR_CONTROL_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -32,10 +32,12 @@ namespace libk3dngui { class document_state; }
 namespace k3d
 {
 
+class icommand_node;
+
 namespace ngui
 {
 
-namespace node_toolbar
+namespace object_toolbar
 {
 
 /// Provides a toolbar with an auto-generated collection of icons based on an object's capabilities / type.
@@ -56,11 +58,11 @@ private:
 	implementation* const m_implementation;
 };
 
-} // namespace node_toolbar
+} // namespace object_toolbar
 
 } // namespace ngui
 
 } // namespace k3d
 
-#endif // NGUI_NODE_TOOLBAR_H
+#endif // NGUI_OBJECT_TOOLBAR_CONTROL_H
 
