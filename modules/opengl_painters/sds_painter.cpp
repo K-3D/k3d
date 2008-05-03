@@ -137,7 +137,7 @@ public:
 				k3d::uuid(0xf8578aba, 0x674bbc2d, 0x40622ea4, 0x9167eaf9),
 		"OpenGLSDSFacePainter",
 		_("Renders mesh as SDS faces using OpenGL 1.1"),
-		"Development",
+		"OpenGL Painters",
 		k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

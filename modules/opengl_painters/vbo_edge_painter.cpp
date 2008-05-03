@@ -167,7 +167,7 @@ public:
 				k3d::uuid(0x7fca3f65, 0x531b4db6, 0xa11dac8a, 0x0b9f17b1),
 		"OpenGLVBOEdgePainter",
 		_("Renders mesh edges (OpenGL VBOs)"),
-		"Development",
+		"OpenGL Painters",
 		k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

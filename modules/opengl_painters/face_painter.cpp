@@ -186,7 +186,7 @@ public:
 			k3d::uuid(0xd4abf63c, 0x2242c17e, 0x2afcb18d, 0x0a8ebdd5),
 			"OpenGLFacePainter",
 			_("Renders mesh faces, after trianglulating them (OpenGL 1.1)"),
-			"Development",
+			"OpenGL Painters",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
