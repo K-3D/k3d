@@ -1692,8 +1692,8 @@ public:
 		// If the new node is a multiple mesh sink, add two mesh inputs
 		if(Factory->implements(typeid(k3d::imulti_mesh_sink)))
 		{
-			k3d::property::create<k3d::mesh*>(*node, "input1", "Input 1", "", static_cast<k3d::mesh*>(0));
-			k3d::property::create<k3d::mesh*>(*node, "input2", "Input 2", "", static_cast<k3d::mesh*>(0));
+			k3d::property::create<k3d::mesh*>(*node, "input_mesh1", "Input Mesh 1", "", static_cast<k3d::mesh*>(0));
+			k3d::property::create<k3d::mesh*>(*node, "input_mesh2", "Input Mesh 2", "", static_cast<k3d::mesh*>(0));
 		}
 
 		// If the new node is a render-engine, default to making every node in the document visible ...

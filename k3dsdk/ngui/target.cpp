@@ -29,9 +29,9 @@
 #include "viewport.h"
 
 #include <k3dsdk/algebra.h>
-#include <k3dsdk/classes.h>
 #include <k3dsdk/ibounded.h>
 #include <k3dsdk/icamera.h>
+#include <k3dsdk/imesh_source.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/mesh.h>
@@ -51,30 +51,26 @@ namespace detail
 class point_visitor
 {
 public:
-	point_visitor(k3d::bounding_box3& BBox, k3d::mesh::points_t& Points) : m_bbox(BBox), m_points(Points) {}
+	point_visitor(k3d::bounding_box3& BBox, k3d::mesh::points_t& Points, const k3d::matrix4& Matrix) : m_bbox(BBox), m_points(Points), m_matrix(Matrix) {}
 	void operator()(k3d::uint_t PointIndex, const k3d::point3& Point)
 	{
-		m_bbox.insert(Point);
+		const k3d::point3 transformed_point = Point * m_matrix;
+		m_bbox.insert(transformed_point);
 		if (m_inserted_points.insert(PointIndex).second)
 		{
-			m_points.push_back(Point);
+			m_points.push_back(transformed_point);
 		}
-	}
-	void clear_history()
-	{
-		m_inserted_points.clear();
 	}
 private:
 	k3d::bounding_box3& m_bbox;
 	k3d::mesh::points_t& m_points;
+	const k3d::matrix4& m_matrix;
 	std::set<k3d::uint_t> m_inserted_points;
 };
 
 /// Computes the average position of selected nodes, returns false when no selected node was found.
 bool selection_position(const selection_mode_t& SelectionMode, const k3d::nodes_t& Selection, k3d::bounding_box3& BoundingBox, k3d::mesh::points_t& Points)
 {
-	point_visitor visitor(BoundingBox, Points);
-	
 	if (Selection.empty())
 		k3d::log() << debug << "Empty node selection!" << std::endl;
 	
@@ -83,30 +79,31 @@ bool selection_position(const selection_mode_t& SelectionMode, const k3d::nodes_
 	{
 		if(!dynamic_cast<k3d::gl::irenderable*>(*node))
 			continue;
+		
+		const k3d::matrix4 transformation = k3d::node_to_world_matrix(**node);
+		point_visitor visitor(BoundingBox, Points, transformation);
 
 		if (SelectionMode == SELECT_NODES)
 		{
 			if(k3d::ibounded* bounded = dynamic_cast<k3d::ibounded*>(*node))
 			{
-				BoundingBox.insert(bounded->extents() * k3d::node_to_world_matrix(**node));
+				BoundingBox.insert(bounded->extents() * transformation);
 			}
 			else
 			{
 				BoundingBox.insert(k3d::world_position(**node));
 			}
 		}
-		if ((*node)->factory().factory_id() != k3d::classes::MeshInstance())
+		if (!(*node)->factory().implements(typeid(k3d::imesh_source)))
 			continue;
-		const k3d::mesh* mesh = 0;
-		if (k3d::iproperty* prop = k3d::property::get(**node, "transformed_mesh"))
-			mesh = k3d::property::pipeline_value<k3d::mesh*>(*prop);
+		const k3d::mesh* mesh = k3d::property::pipeline_value<k3d::mesh*>(dynamic_cast<k3d::imesh_source*>(*node)->mesh_source_output());
 		if (!mesh)
 			continue;
 		if (SelectionMode == SELECT_NODES)
 		{
 			const k3d::mesh::points_t& points = *mesh->points;
 			for (k3d::uint_t point = 0; point != points.size(); ++point)
-				Points.push_back(points[point]);
+				Points.push_back(points[point] * transformation);
 		}
 		if (SelectionMode == SELECT_POINTS)
 		{
@@ -120,7 +117,6 @@ bool selection_position(const selection_mode_t& SelectionMode, const k3d::nodes_
 		{
 			k3d::traverse_selected_face_points(*mesh, visitor);
 		}
-		visitor.clear_history();
 	}
 	
 	// Nothing was selected...

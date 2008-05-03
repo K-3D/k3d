@@ -202,7 +202,7 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 void modify_selected_meshes(document_state& DocumentState, k3d::iplugin_factory* Modifier)
 {
 	return_if_fail(Modifier);
-	
+	k3d::idocument& document = DocumentState.document();
 	if (Modifier->implements(typeid(k3d::imulti_mesh_sink)))
 	{ // Mesh modifier taking multiple inputs
 		k3d::uint_t count = 0;
@@ -210,32 +210,55 @@ void modify_selected_meshes(document_state& DocumentState, k3d::iplugin_factory*
 		const k3d::nodes_t selected_nodes = DocumentState.selected_nodes();
 		// Create the node
 		k3d::inode* multi_sink = DocumentState.create_node(Modifier);
-		k3d::record_state_change_set changeset(DocumentState.document(), k3d::string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), K3D_CHANGE_SET_CONTEXT);
+		k3d::record_state_change_set changeset(document, k3d::string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), K3D_CHANGE_SET_CONTEXT);
+		k3d::nodes_t nodes_to_delete;
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
 		{
-			// Check to see if the selected node is a mesh instance
-			if ((*node)->factory().factory_id() != k3d::classes::MeshInstance())
+			k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(*node);
+			if(!mesh_sink)
 				continue;
+			k3d::itransform_sink* const transform_sink = dynamic_cast<k3d::itransform_sink*>(*node);
+
+			k3d::iproperty* source_mesh = document.pipeline().dependency(mesh_sink->mesh_sink_input());
+			if (!source_mesh)
+				continue;
+			
+			if (transform_sink) // Insert a transform node
+			{
+				k3d::iproperty* const source_transformation = document.pipeline().dependency(transform_sink->transform_sink_input());
+				if (source_transformation)
+				{
+					k3d::inode* transform_points = k3d::plugin::create<k3d::inode>("TransformPoints", document, k3d::unique_name(document.nodes(), "TransformPoints"));
+					return_if_fail(transform_points);
+					k3d::itransform_sink* transform_points_transform_sink = dynamic_cast<k3d::itransform_sink*>(transform_points);
+					return_if_fail(transform_points_transform_sink);
+					k3d::imesh_sink* transform_points_mesh_sink = dynamic_cast<k3d::imesh_sink*>(transform_points);
+					return_if_fail(transform_points_mesh_sink);
+					dependencies.insert(std::make_pair(&transform_points_transform_sink->transform_sink_input(), source_transformation));
+					dependencies.insert(std::make_pair(&transform_points_mesh_sink->mesh_sink_input(), source_mesh));
+					k3d::imesh_source* transform_points_mesh_source = dynamic_cast<k3d::imesh_source*>(transform_points);
+					return_if_fail(transform_points_mesh_source);
+					source_mesh = &transform_points_mesh_source->mesh_source_output();
+					k3d::imesh_selection_sink* selection_sink = dynamic_cast<k3d::imesh_selection_sink*>(transform_points);
+					return_if_fail(selection_sink);
+					k3d::property::set_internal_value(selection_sink->mesh_selection_sink_input(), k3d::mesh_selection::select_all());
+				}
+			}
 			++count;
 			// Create a new user property
 			std::stringstream name, label;
-			name << "input" << count;
-			label << "Input " << count;
+			name << "input_mesh" << count;
+			label << "Input Mesh " << count;
 			k3d::iproperty* sink = k3d::property::get(*multi_sink, name.str());
 			if (!sink)
 				sink = k3d::property::create<k3d::mesh*>(*multi_sink, name.str(), label.str(), "", static_cast<k3d::mesh*>(0));
-			// Get the source property
-			k3d::iproperty* source = k3d::property::get(**node, "transformed_mesh");
-			assert_warning(source);
 			// Store the connection
-			dependencies.insert(std::make_pair(sink, source));
-			// Make the input invisible
-			k3d::property::set_internal_value(**node, "viewport_visible", false);
-			k3d::property::set_internal_value(**node, "render_final", false);
-			k3d::property::set_internal_value(**node, "render_shadows", false);
-			k3d::property::set_internal_value(**node, "motion_blur", false);
+			dependencies.insert(std::make_pair(sink, source_mesh));
+			// Delete the input node
+			nodes_to_delete.push_back(*node);
 		}
-		DocumentState.document().pipeline().set_dependencies(dependencies);
+		document.pipeline().set_dependencies(dependencies);
+		k3d::delete_nodes(document, nodes_to_delete);
 		DocumentState.view_node_properties_signal().emit(multi_sink);
 	}
 	else
@@ -290,7 +313,7 @@ void modify_selected_meshes(document_state& DocumentState, k3d::iplugin_factory*
 						++property;
 					}
 				}
-				DocumentState.document().pipeline().set_dependencies(dependencies);
+				document.pipeline().set_dependencies(dependencies);
 				DocumentState.view_node_properties_signal().emit(new_modifiers.front());
 			}
 		}

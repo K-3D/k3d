@@ -172,6 +172,11 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		PointList.push_back(*point);
 		component_center += to_vector(points[*point]);
 	}
+	
+	// Compute average position
+	const double point_number2 = static_cast<double>(PointList.size());
+	if(point_number2)
+		component_center /= point_number2;
 
 	return component_center;
 }

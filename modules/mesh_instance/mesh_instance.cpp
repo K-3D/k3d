@@ -75,7 +75,6 @@ public:
 		m_gl_painter(init_owner(*this) + init_name("gl_painter") + init_label(_("OpenGL Mesh Painter")) + init_description(_("OpenGL Mesh Painter")) + init_value(static_cast<k3d::gl::imesh_painter*>(0))),
 		m_ri_painter(init_owner(*this) + init_name("ri_painter") + init_label(_("RenderMan Mesh Painter")) + init_description(_("RenderMan Mesh Painter")) + init_value(static_cast<k3d::ri::imesh_painter*>(0))),
 		m_show_component_selection(init_owner(*this) + init_name("show_component_selection") + init_label(_("Show Component Selection")) + init_description(_("Show component selection")) + init_value(false)),
-		m_transformed_mesh(init_owner(*this) + init_name("transformed_mesh") + init_label(_("Transformed Mesh")) + init_description(_("Mesh with points transformed by the matrix")) + init_slot(sigc::mem_fun(*this, &mesh_instance::create_transformed_mesh))),
 		m_output_mesh_pointer(0),
 		m_document_closed(false)
 	{
@@ -87,12 +86,8 @@ public:
 		m_gl_painter.changed_signal().connect(make_async_redraw_slot());
 		m_show_component_selection.changed_signal().connect(make_async_redraw_slot());
 		
-		m_input_matrix.changed_signal().connect(m_transformed_mesh.make_reset_slot());
-		
 		m_output_mesh.set_initialize_slot(sigc::mem_fun(*this, &mesh_instance::create_mesh));
 		m_output_mesh.set_update_slot(sigc::mem_fun(*this, &mesh_instance::update_mesh));
-		m_transformed_mesh.set_initialize_slot(sigc::mem_fun(*this, &mesh_instance::create_transformed_mesh));
-		m_transformed_mesh.set_update_slot(sigc::mem_fun(*this, &mesh_instance::update_transformed_mesh));
 		
 		m_delete_connection = deleted_signal().connect(sigc::mem_fun(*this, &mesh_instance::on_instance_delete));
 		document().close_signal().connect(sigc::mem_fun(*this, &mesh_instance::disconnect));
@@ -127,7 +122,6 @@ public:
 				painter->mesh_changed(*m_output_mesh_pointer, Hint);
 		}
 		m_output_mesh.update(Hint);
-		m_transformed_mesh.update(Hint);
 		async_redraw(0);
 	}
 	
@@ -156,26 +150,6 @@ public:
 		{
 			OutputMesh = *input_mesh;
 			k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
-		}
-	}
-	
-	void create_transformed_mesh(k3d::mesh& OutputMesh)
-	{
-		update_transformed_mesh(OutputMesh);
-	}
-	
-	void update_transformed_mesh(k3d::mesh& OutputMesh)
-	{
-		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Update transformed mesh");
-		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
-		{
-			OutputMesh = *input_mesh;
-			k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
-			const k3d::mesh::points_t& input_points = *OutputMesh.points;
-			boost::shared_ptr<k3d::mesh::points_t> transformed_points(new k3d::mesh::points_t());
-			for (size_t point = 0; point != input_points.size(); ++point)
-				transformed_points->push_back(matrix()*input_points[point]);
-			OutputMesh.points = transformed_points;
 		}
 	}
 
@@ -291,7 +265,7 @@ public:
 				k3d::classes::MeshInstance(),
 				"MeshInstance",
 				_("Renders an instance of a geometric mesh"),
-				"Development",
+				"Mesh",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
@@ -304,7 +278,6 @@ private:
 	k3d_data(k3d::gl::imesh_painter*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_gl_painter;
 	k3d_data(k3d::ri::imesh_painter*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_ri_painter;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_component_selection;
-	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::pointer_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_transformed_mesh;
 	const k3d::mesh* m_output_mesh_pointer;
 	sigc::connection m_delete_connection;
 	bool m_document_closed;

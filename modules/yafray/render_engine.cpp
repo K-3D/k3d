@@ -315,7 +315,7 @@ private:
 
 	void render_mesh_instance(const shader_names_t& ShaderNames, const k3d::string_t& Name, k3d::inode& MeshInstance, std::ostream& Stream)
 	{
-		k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(MeshInstance, "transformed_mesh");
+		k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(MeshInstance, "output_mesh");
 		if(!mesh)
 			return;
 		if(!k3d::validate_polyhedra(*mesh))
@@ -323,6 +323,9 @@ private:
 
 		// Triangulate the mesh faces ...
 		k3d::mesh::points_t points(*(mesh->points));
+		const k3d::matrix4 transformation = k3d::node_to_world_matrix(MeshInstance); 
+		for (k3d::uint_t point = 0; point != points.size(); ++point)
+			points[point] = points[point] * transformation;
 		k3d::mesh::indices_t a_points;
 		k3d::mesh::indices_t b_points;
 		k3d::mesh::indices_t c_points;
