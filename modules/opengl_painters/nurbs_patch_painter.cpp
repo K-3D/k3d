@@ -152,9 +152,7 @@ public:
 			if (Mesh.nurbs_patches->patch_trim_curve_loop_counts && Mesh.nurbs_patches->trim_points)
 			{
 				const k3d::mesh::counts_t& patch_trim_curve_loop_counts = *Mesh.nurbs_patches->patch_trim_curve_loop_counts;
-				const k3d::mesh::indices_t& patch_first_trim_curve_loops = *Mesh.nurbs_patches->patch_first_trim_curve_loops;
-				const k3d::mesh::indices_t& trim_curve_loops = *Mesh.nurbs_patches->trim_curve_loops;
-				
+				const k3d::mesh::indices_t& patch_first_trim_curve_loops = *Mesh.nurbs_patches->patch_first_trim_curve_loops;	
 				const k3d::mesh::points_2d_t& trim_points = *Mesh.nurbs_patches->trim_points;
 				const k3d::mesh::indices_t& first_trim_curves = *Mesh.nurbs_patches->first_trim_curves;
 				const k3d::mesh::counts_t& trim_curve_counts = *Mesh.nurbs_patches->trim_curve_counts;
@@ -173,8 +171,8 @@ public:
 				{
 					//k3d::log() << debug << "  drawing loop " << loop_index << std::endl;
 					gluBeginTrim(nurbs_renderer);
-					k3d::uint_t curves_start = first_trim_curves[trim_curve_loops[loop_index]];
-					k3d::uint_t curves_end = curves_start + trim_curve_counts[trim_curve_loops[loop_index]];
+					k3d::uint_t curves_start = first_trim_curves[loop_index];
+					k3d::uint_t curves_end = curves_start + trim_curve_counts[loop_index];
 					for (k3d::uint_t curve = curves_start; curve != curves_end; ++curve)
 					{
 						//k3d::log() << debug << "    drawing curve " << curve << std::endl;
@@ -277,8 +275,6 @@ public:
 			{
 				const k3d::mesh::counts_t& patch_trim_curve_loop_counts = *Mesh.nurbs_patches->patch_trim_curve_loop_counts;
 				const k3d::mesh::indices_t& patch_first_trim_curve_loops = *Mesh.nurbs_patches->patch_first_trim_curve_loops;
-				const k3d::mesh::indices_t& trim_curve_loops = *Mesh.nurbs_patches->trim_curve_loops;
-				
 				const k3d::mesh::points_2d_t& trim_points = *Mesh.nurbs_patches->trim_points;
 				const k3d::mesh::indices_t& first_trim_curves = *Mesh.nurbs_patches->first_trim_curves;
 				const k3d::mesh::counts_t& trim_curve_counts = *Mesh.nurbs_patches->trim_curve_counts;
@@ -296,8 +292,8 @@ public:
 				for (k3d::uint_t loop_index = loops_start; loop_index != loops_end; ++loop_index)
 				{
 					gluBeginTrim(nurbs_renderer);
-					k3d::uint_t curves_start = first_trim_curves[trim_curve_loops[loop_index]];
-					k3d::uint_t curves_end = curves_start + trim_curve_counts[trim_curve_loops[loop_index]];
+					k3d::uint_t curves_start = first_trim_curves[loop_index];
+					k3d::uint_t curves_end = curves_start + trim_curve_counts[loop_index];
 					for (k3d::uint_t curve = curves_start; curve != curves_end; ++curve)
 					{
 						std::vector<GLfloat> gl_trim_knot_vector(&trim_curve_knots[trim_curve_first_knots[curve]], &trim_curve_knots[trim_curve_first_knots[curve] + trim_curve_point_counts[curve] + trim_curve_orders[curve]]);

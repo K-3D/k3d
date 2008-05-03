@@ -427,7 +427,6 @@ const bool equal(const mesh::nurbs_patches_t& A, const mesh::nurbs_patches_t& B,
 			trim_curves_equal =
 				detail::equal(A.patch_trim_curve_loop_counts, B.patch_trim_curve_loop_counts, Threshold) &&
 				detail::equal(A.patch_first_trim_curve_loops, B.patch_first_trim_curve_loops, Threshold) &&
-				detail::equal(A.trim_curve_loops, B.trim_curve_loops, Threshold) &&
 				detail::equal(A.trim_points, B.trim_points, Threshold) &&
 				detail::equal(A.trim_point_selection, B.trim_point_selection, Threshold) &&
 				detail::equal(A.first_trim_curves, B.first_trim_curves, Threshold) &&
@@ -606,7 +605,6 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B, const boost:
 		{
 			detail::print_diff(Stream, "patch_trim_curve_loop_counts", A.nurbs_patches->patch_trim_curve_loop_counts, B.nurbs_patches->patch_trim_curve_loop_counts, Threshold);
 			detail::print_diff(Stream, "patch_first_trim_curve_loops", A.nurbs_patches->patch_first_trim_curve_loops, B.nurbs_patches->patch_first_trim_curve_loops, Threshold);
-			detail::print_diff(Stream, "trim_curve_loops", A.nurbs_patches->trim_curve_loops, B.nurbs_patches->trim_curve_loops, Threshold);
 			detail::print_diff(Stream, "trim_points", A.nurbs_patches->trim_points, B.nurbs_patches->trim_points, Threshold);
 			detail::print_diff(Stream, "trim_point_selection", A.nurbs_patches->trim_point_selection, B.nurbs_patches->trim_point_selection, Threshold);
 			detail::print_diff(Stream, "first_trim_curves", A.nurbs_patches->first_trim_curves, B.nurbs_patches->first_trim_curves, Threshold);

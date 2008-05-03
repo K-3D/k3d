@@ -119,7 +119,6 @@ public:
 		
 		patch_trim_curve_loop_counts(0),
 		patch_first_trim_curve_loops(0),
-		trim_curve_loops(0),
 		trim_points(0),
 		trim_point_selection(0),
 		first_trim_curves(0),
@@ -193,7 +192,6 @@ public:
 	
 	mesh::counts_t* patch_trim_curve_loop_counts;
 	mesh::indices_t* patch_first_trim_curve_loops;
-	mesh::indices_t* trim_curve_loops;
 	mesh::points_2d_t* trim_points;
 	mesh::selection_t* trim_point_selection;
 	mesh::indices_t* first_trim_curves;
@@ -405,7 +403,6 @@ bool gprim_factory::add_trim_curve(const uint_t Order, const mesh::points_2d_t& 
 		m_implementation->patch_first_trim_curve_loops = make_unique(nurbs_patches->patch_first_trim_curve_loops);
 		m_implementation->patch_trim_curve_loop_counts->resize(m_implementation->nurbs_patch_first_points->size(), 0);
 		m_implementation->patch_first_trim_curve_loops->resize(m_implementation->nurbs_patch_first_points->size(), 0);
-		m_implementation->trim_curve_loops = make_unique(nurbs_patches->trim_curve_loops);
 		m_implementation->trim_points = make_unique(nurbs_patches->trim_points);
 		m_implementation->trim_point_selection = make_unique(nurbs_patches->trim_point_selection);
 		m_implementation->first_trim_curves = make_unique(nurbs_patches->first_trim_curves);
@@ -439,13 +436,12 @@ bool gprim_factory::add_trim_curve(const uint_t Order, const mesh::points_2d_t& 
 	mesh::counts_t& trim_curve_counts = *m_implementation->trim_curve_counts;
 	if (patch_trim_curve_loop_counts[patch] == 0) // First curve loop for this patch
 	{
-		patch_first_trim_curve_loops[patch] = m_implementation->trim_curve_loops->size();
+		patch_first_trim_curve_loops[patch] = m_implementation->first_trim_curves->size();
 	}
 	bool newloop = m_implementation->trim_curve_closed;
 	if (newloop) // Start of a new curve loop
 	{
 		++patch_trim_curve_loop_counts[patch];
-		m_implementation->trim_curve_loops->push_back(m_implementation->first_trim_curves->size());
 		m_implementation->trim_curve_loop_selection->push_back(0.0);
 		m_implementation->first_trim_curves->push_back(m_implementation->trim_curve_first_points->size());
 		trim_curve_counts.push_back(0);

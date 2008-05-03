@@ -736,7 +736,6 @@ std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 		detail::print(Stream, "    varying data", RHS.nurbs_patches->varying_data);
 		detail::print(Stream, "    patch_trim_curve_loop_counts", RHS.nurbs_patches->patch_trim_curve_loop_counts);
 		detail::print(Stream, "    patch_first_trim_curve_loops", RHS.nurbs_patches->patch_first_trim_curve_loops);
-		detail::print(Stream, "    trim_curve_loops", RHS.nurbs_patches->trim_curve_loops);
 		detail::print(Stream, "    trim_points", RHS.nurbs_patches->trim_points);
 		detail::print(Stream, "    trim_point_selection", RHS.nurbs_patches->trim_point_selection);
 		detail::print(Stream, "    first_trim_curves", RHS.nurbs_patches->first_trim_curves);

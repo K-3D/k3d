@@ -702,7 +702,6 @@ public:
 	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
 	object patch_trim_curve_loop_counts() { return wrap_const_array(wrapped().patch_trim_curve_loop_counts); }
 	object patch_first_trim_curve_loops() { return wrap_const_array(wrapped().patch_first_trim_curve_loops); }
-	object trim_curve_loops() { return wrap_const_array(wrapped().trim_curve_loops); }
 	object trim_points() { return wrap_const_array(wrapped().trim_points); }
 	object trim_point_selection() { return wrap_const_array(wrapped().trim_point_selection); }
 	object first_trim_curves() { return wrap_const_array(wrapped().first_trim_curves); }
@@ -759,7 +758,6 @@ public:
 	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
 	object patch_trim_curve_loop_counts() { return wrap_const_array(wrapped().patch_trim_curve_loop_counts); }
 	object patch_first_trim_curve_loops() { return wrap_const_array(wrapped().patch_first_trim_curve_loops); }
-	object trim_curve_loops() { return wrap_const_array(wrapped().trim_curve_loops); }
 	object trim_points() { return wrap_const_array(wrapped().trim_points); }
 	object trim_point_selection() { return wrap_const_array(wrapped().trim_point_selection); }
 	object first_trim_curves() { return wrap_const_array(wrapped().first_trim_curves); }
@@ -792,7 +790,6 @@ public:
 	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
 	object writable_patch_trim_curve_loop_counts() { return wrap_non_const_array(wrapped().patch_trim_curve_loop_counts); }
 	object writable_patch_first_trim_curve_loops() { return wrap_non_const_array(wrapped().patch_first_trim_curve_loops); }
-	object writable_trim_curve_loops() { return wrap_non_const_array(wrapped().trim_curve_loops); }
 	object writable_trim_points() { return wrap_non_const_array(wrapped().trim_points); }
 	object writable_trim_point_selection() { return wrap_non_const_array(wrapped().trim_point_selection); }
 	object writable_first_trim_curves() { return wrap_non_const_array(wrapped().first_trim_curves); }
@@ -822,7 +819,6 @@ public:
 	object create_patch_v_knots() { return create_array(wrapped().patch_v_knots); }
 	object create_patch_trim_curve_loop_counts() { return create_array(wrapped().patch_trim_curve_loop_counts); }
 	object create_patch_first_trim_curve_loops() { return create_array(wrapped().patch_first_trim_curve_loops); }
-	object create_trim_curve_loops() { return create_array(wrapped().trim_curve_loops); }
 	object create_trim_points() { return create_array(wrapped().trim_points); }
 	object create_trim_point_selection() { return create_array(wrapped().trim_point_selection); }
 	object create_first_trim_curves() { return create_array(wrapped().first_trim_curves); }
@@ -1466,7 +1462,6 @@ void mesh::define_class()
 		.def("varying_data", &detail::const_nurbs_patches::varying_data)
 		.def("patch_trim_curve_loop_counts", &detail::const_nurbs_patches::patch_trim_curve_loop_counts)
 		.def("patch_first_trim_curve_loops", &detail::const_nurbs_patches::patch_first_trim_curve_loops)
-		.def("trim_curve_loops", &detail::const_nurbs_patches::trim_curve_loops)
 		.def("trim_points", &detail::const_nurbs_patches::trim_points)
 		.def("trim_point_selection", &detail::const_nurbs_patches::trim_point_selection)
 		.def("first_trim_curves", &detail::const_nurbs_patches::first_trim_curves)
@@ -1501,7 +1496,6 @@ void mesh::define_class()
 		.def("varying_data", &detail::nurbs_patches::varying_data)
 		.def("patch_trim_curve_loop_counts", &detail::nurbs_patches::patch_trim_curve_loop_counts)
 		.def("patch_first_trim_curve_loops", &detail::nurbs_patches::patch_first_trim_curve_loops)
-		.def("trim_curve_loops", &detail::nurbs_patches::trim_curve_loops)
 		.def("trim_points", &detail::nurbs_patches::trim_points)
 		.def("trim_point_selection", &detail::nurbs_patches::trim_point_selection)
 		.def("first_trim_curves", &detail::nurbs_patches::first_trim_curves)
@@ -1534,7 +1528,6 @@ void mesh::define_class()
 		.def("writable_varying_data", &detail::nurbs_patches::writable_varying_data)
 		.def("writable_patch_trim_curve_loop_counts", &detail::nurbs_patches::writable_patch_trim_curve_loop_counts)
 		.def("writable_patch_first_trim_curve_loops", &detail::nurbs_patches::writable_patch_first_trim_curve_loops)
-		.def("writable_trim_curve_loops", &detail::nurbs_patches::writable_trim_curve_loops)
 		.def("writable_trim_points", &detail::nurbs_patches::writable_trim_points)
 		.def("writable_trim_point_selection", &detail::nurbs_patches::writable_trim_point_selection)
 		.def("writable_first_trim_curves", &detail::nurbs_patches::writable_first_trim_curves)
@@ -1564,7 +1557,6 @@ void mesh::define_class()
 		.def("create_patch_v_knots", &detail::nurbs_patches::create_patch_v_knots)
 		.def("create_patch_trim_curve_loop_counts", &detail::nurbs_patches::create_patch_trim_curve_loop_counts)
 		.def("create_patch_first_trim_curve_loops", &detail::nurbs_patches::create_patch_first_trim_curve_loops)
-		.def("create_trim_curve_loops", &detail::nurbs_patches::create_trim_curve_loops)
 		.def("create_trim_points", &detail::nurbs_patches::create_trim_points)
 		.def("create_trim_point_selection", &detail::nurbs_patches::create_trim_point_selection)
 		.def("create_first_trim_curves", &detail::nurbs_patches::create_first_trim_curves)

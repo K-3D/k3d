@@ -1820,7 +1820,6 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 		{
 			detail::save_array(container, element("patch_trim_curve_loop_counts"), Mesh.nurbs_patches->patch_trim_curve_loop_counts, Context);
 			detail::save_array(container, element("patch_first_trim_curve_loops"), Mesh.nurbs_patches->patch_first_trim_curve_loops, Context);
-			detail::save_array(container, element("trim_curve_loops"), Mesh.nurbs_patches->trim_curve_loops, Context);
 			detail::save_array(container, element("trim_points"), Mesh.nurbs_patches->trim_points, Context);
 			detail::save_array(container, element("trim_point_selection"), Mesh.nurbs_patches->trim_point_selection, Context);
 			detail::save_array(container, element("first_trim_curves"), Mesh.nurbs_patches->first_trim_curves, Context);
@@ -1968,7 +1967,6 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_arrays(*container, "varying_data", nurbs_patches->varying_data, Context);
 		detail::load_array(*container, "patch_trim_curve_loop_counts", nurbs_patches->patch_trim_curve_loop_counts, Context);
 		detail::load_array(*container, "patch_first_trim_curve_loops", nurbs_patches->patch_first_trim_curve_loops, Context);
-		detail::load_array(*container, "trim_curve_loops", nurbs_patches->trim_curve_loops, Context);
 		detail::load_array(*container, "trim_points", nurbs_patches->trim_points, Context);
 		detail::load_array(*container, "trim_point_selection", nurbs_patches->trim_point_selection, Context);
 		detail::load_array(*container, "first_trim_curves", nurbs_patches->first_trim_curves, Context);

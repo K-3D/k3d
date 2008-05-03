@@ -247,10 +247,8 @@ public:
 		named_arrays varying_data;
 		/// Stores the number of trim curve loops for each patch
 		boost::shared_ptr<const counts_t> patch_trim_curve_loop_counts;
-		/// Stores the first trim curve loop index into trim_curve_loops for each patch
+		/// Stores the first trim curve loop (index into first_trim_curves) for each patch
 		boost::shared_ptr<const indices_t> patch_first_trim_curve_loops;
-		/// Trim curve loop indices (indexes into first_trim_curves)
-		boost::shared_ptr<const indices_t> trim_curve_loops;
 		/// Stores the trim curve control points, expressed in parameter space
 		boost::shared_ptr<const points_2d_t> trim_points;
 		/// Stores the trim curve control point selection
