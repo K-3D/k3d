@@ -15,7 +15,6 @@ nurbs_patches = Output.writable_nurbs_patches()
 #create the output arrays
 patch_trim_curve_loop_counts = nurbs_patches.create_patch_trim_curve_loop_counts()
 patch_first_trim_curve_loops = nurbs_patches.create_patch_first_trim_curve_loops()
-trim_curve_loops = nurbs_patches.create_trim_curve_loops()
 trim_points = nurbs_patches.create_trim_points()
 trim_point_selection = nurbs_patches.create_trim_point_selection()
 first_trim_curves = nurbs_patches.create_first_trim_curves()
@@ -60,7 +59,7 @@ trim_curve_point_weights.append(1)
 for i in range(segments):
   trim_curve_point_weights.append(weight)
   trim_curve_point_weights.append(1)
-trim_curve_point_weights.append(weight)
+#trim_curve_point_weights.append(weight)
 
 #control points
 X = k3d.point3(1, 0, 0)
@@ -92,4 +91,3 @@ trim_curve_points.append(0)
 
 patch_trim_curve_loop_counts.append(1)
 patch_first_trim_curve_loops.append(0)
-trim_curve_loops.append(0)
