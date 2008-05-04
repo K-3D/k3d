@@ -110,7 +110,7 @@ namespace module
 
 			static k3d::iplugin_factory& get_factory()
 			{
-				static k3d::document_plugin_factory<set_weight, k3d::interface_list<k3d::imesh_source > > factory(
+				static k3d::document_plugin_factory<set_weight, k3d::interface_list<k3d::imesh_source , k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x6e08996d, 0xde494dd8, 0xb80bc3b0, 0x4d029bad),
 					"NurbsSetWeight",
 					_("Sets the weight of the selected Control Points"),
