@@ -54,6 +54,7 @@
 
 // Not strictly required to compile, but this #include ensures that we have a std::typeinfo for legacy::mesh that matches the SDK (i.e. we don't break the ODR)
 #include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/mesh.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/image.h>
