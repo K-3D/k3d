@@ -75,8 +75,8 @@ public:
 		m_vbox.pack_start(m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
 
 		m_document_state.document().close_signal().connect(sigc::mem_fun(*this, &implementation::on_document_closed));
-		m_document_state.document_selection_change_signal().connect(sigc::mem_fun(*this, &implementation::on_selection_change));
-
+		m_document_state.view_node_properties_signal().connect(sigc::mem_fun(*this, &implementation::on_view_node_properties));
+//		m_document_state.document_selection_change_signal().connect(sigc::mem_fun(*this, &implementation::on_selection_change));
 		on_selection_change();
 	}
 
@@ -97,6 +97,17 @@ public:
 			if(k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(*node))
 				m_node_connections.push_back(property_collection->connect_properties_changed_signal(sigc::hide(sigc::mem_fun(*this, &implementation::on_node_properties_changed))));
 		}
+	}
+
+	bool on_view_node_properties(k3d::inode* const Node)
+	{
+		m_nodes = k3d::nodes_t(1, Node);
+		update_connections();
+		
+		m_vbox.hide();
+		schedule_update();
+
+		return false;
 	}
 
 	void on_selection_change()
