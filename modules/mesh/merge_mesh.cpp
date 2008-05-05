@@ -229,6 +229,7 @@ void merge_linear_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
   {
   	output_linear_curve_groups.constant_data = input_linear_curve_groups.constant_data;
   	output_linear_curve_groups.uniform_data = input_linear_curve_groups.uniform_data;
+  	output_linear_curve_groups.varying_data = input_linear_curve_groups.varying_data;
   }
 	
 	extend_array(input_first_curves, output_first_curves, output_curve_first_points.size());
@@ -243,10 +244,13 @@ void merge_linear_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 	// Named arrays
 	k3d::named_array_copier constant_data_copier(input_linear_curve_groups.constant_data, output_linear_curve_groups.constant_data);
 	k3d::named_array_copier uniform_data_copier(input_linear_curve_groups.uniform_data, output_linear_curve_groups.uniform_data);
+	k3d::named_array_copier varying_data_copier(input_linear_curve_groups.varying_data, output_linear_curve_groups.varying_data);
 	for (k3d::uint_t curve_group = 0; curve_group != input_first_curves.size(); ++curve_group)
   	constant_data_copier.push_back(curve_group);
-	for (k3d::uint_t curve = 0; curve != input_curve_points.size(); ++curve)
+	for (k3d::uint_t curve = 0; curve != input_curve_first_points.size(); ++curve)
 		uniform_data_copier.push_back(curve);
+	for (k3d::uint_t point = 0; point != input_curve_points.size(); ++point)
+		varying_data_copier.push_back(point);
 }
 
 void merge_cubic_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
@@ -277,6 +281,7 @@ void merge_cubic_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
   {
   	output_cubic_curve_groups.constant_data = input_cubic_curve_groups.constant_data;
   	output_cubic_curve_groups.uniform_data = input_cubic_curve_groups.uniform_data;
+  	output_cubic_curve_groups.varying_data = input_cubic_curve_groups.varying_data;
   }
 	
 	extend_array(input_first_curves, output_first_curves, output_curve_first_points.size());
@@ -291,10 +296,13 @@ void merge_cubic_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 	// Named arrays
 	k3d::named_array_copier constant_data_copier(input_cubic_curve_groups.constant_data, output_cubic_curve_groups.constant_data);
 	k3d::named_array_copier uniform_data_copier(input_cubic_curve_groups.uniform_data, output_cubic_curve_groups.uniform_data);
+	k3d::named_array_copier varying_data_copier(input_cubic_curve_groups.varying_data, output_cubic_curve_groups.varying_data);
 	for (k3d::uint_t curve_group = 0; curve_group != input_first_curves.size(); ++curve_group)
   	constant_data_copier.push_back(curve_group);
-	for (k3d::uint_t curve = 0; curve != input_curve_points.size(); ++curve)
+	for (k3d::uint_t curve = 0; curve != input_curve_first_points.size(); ++curve)
 		uniform_data_copier.push_back(curve);
+	for (k3d::uint_t point = 0; point != input_curve_points.size(); ++point)
+		varying_data_copier.push_back(point);
 }
 
 void merge_nurbs_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
@@ -332,6 +340,7 @@ void merge_nurbs_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
   {
   	output_nurbs_curve_groups.constant_data = input_nurbs_curve_groups.constant_data;
   	output_nurbs_curve_groups.uniform_data = input_nurbs_curve_groups.uniform_data;
+  	output_nurbs_curve_groups.varying_data = input_nurbs_curve_groups.varying_data;
   }
 	
 	extend_array(input_first_curves, output_first_curves, output_curve_first_points.size());
@@ -349,10 +358,13 @@ void merge_nurbs_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 	// Named arrays
 	k3d::named_array_copier constant_data_copier(input_nurbs_curve_groups.constant_data, output_nurbs_curve_groups.constant_data);
 	k3d::named_array_copier uniform_data_copier(input_nurbs_curve_groups.uniform_data, output_nurbs_curve_groups.uniform_data);
+	k3d::named_array_copier varying_data_copier(input_nurbs_curve_groups.varying_data, output_nurbs_curve_groups.varying_data);
 	for (k3d::uint_t curve_group = 0; curve_group != input_first_curves.size(); ++curve_group)
   	constant_data_copier.push_back(curve_group);
-	for (k3d::uint_t curve = 0; curve != input_curve_points.size(); ++curve)
+	for (k3d::uint_t curve = 0; curve != input_curve_first_points.size(); ++curve)
 		uniform_data_copier.push_back(curve);
+	for (k3d::uint_t point = 0; point != input_curve_points.size(); ++point)
+		varying_data_copier.push_back(point);
 }
 
 void merge_bilinear_patches(k3d::mesh& Output, const k3d::mesh& Input)

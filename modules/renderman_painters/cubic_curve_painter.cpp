@@ -65,6 +65,7 @@ public:
 		const k3d::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
 		const k3d::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
 		const k3d::mesh::named_arrays& uniform_data = Mesh.cubic_curve_groups->uniform_data;
+		const k3d::mesh::named_arrays& varying_data = Mesh.cubic_curve_groups->varying_data;
 		const k3d::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
 		const k3d::mesh::points_t& points = *Mesh.points;
 		const k3d::mesh::named_arrays& vertex_data = Mesh.vertex_data;
@@ -80,6 +81,9 @@ public:
 
 			array_copier ri_uniform_data;
 			ri_uniform_data.add_arrays(uniform_data);
+			
+			array_copier ri_varying_data;
+			ri_varying_data.add_arrays(varying_data);
 
 			array_copier ri_vertex_data;
 			ri_vertex_data.add_arrays(vertex_data);
@@ -95,6 +99,7 @@ public:
 					ri_vertex_data.push_back(curve_points[curve_point]);
 
 				ri_point_counts.push_back(curve_point_counts[curve]);
+				ri_varying_data.insert(curve_points_begin, curve_points_end);
 			}
 
 			ri_constant_data.push_back(group);
@@ -103,6 +108,7 @@ public:
 			k3d::ri::parameter_list ri_parameters;
 			ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
 			ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
+			ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
 			ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
 
 			k3d::ri::setup_material(materials[group], RenderState);

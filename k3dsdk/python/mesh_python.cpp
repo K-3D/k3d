@@ -266,6 +266,7 @@ public:
 	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
 	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
+	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,6 +302,7 @@ public:
 	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
 	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
+	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
 
 	object writable_first_curves() { return wrap_non_const_array(wrapped().first_curves); }
 	object writable_curve_counts() { return wrap_non_const_array(wrapped().curve_counts); }
@@ -312,6 +314,7 @@ public:
 	object writable_curve_selection() { return wrap_non_const_array(wrapped().curve_selection); }
 	object writable_uniform_data() { return wrap_non_const_named_arrays(wrapped().uniform_data); }
 	object writable_curve_points() { return wrap_non_const_array(wrapped().curve_points); }
+	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
 
 	object create_first_curves() { return create_array(wrapped().first_curves); }
 	object create_curve_counts() { return create_array(wrapped().curve_counts); }
@@ -356,6 +359,7 @@ public:
 	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
 	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
+	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -391,6 +395,7 @@ public:
 	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
 	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
+	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
 
 	object writable_first_curves() { return wrap_non_const_array(wrapped().first_curves); }
 	object writable_curve_counts() { return wrap_non_const_array(wrapped().curve_counts); }
@@ -402,6 +407,7 @@ public:
 	object writable_curve_selection() { return wrap_non_const_array(wrapped().curve_selection); }
 	object writable_uniform_data() { return wrap_non_const_named_arrays(wrapped().uniform_data); }
 	object writable_curve_points() { return wrap_non_const_array(wrapped().curve_points); }
+	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
 
 	object create_first_curves() { return create_array(wrapped().first_curves); }
 	object create_curve_counts() { return create_array(wrapped().curve_counts); }
@@ -449,6 +455,7 @@ public:
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
 	object curve_point_weights() { return wrap_const_array(wrapped().curve_point_weights); }
 	object curve_knots() { return wrap_const_array(wrapped().curve_knots); }
+	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -487,6 +494,7 @@ public:
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
 	object curve_point_weights() { return wrap_const_array(wrapped().curve_point_weights); }
 	object curve_knots() { return wrap_const_array(wrapped().curve_knots); }
+	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
 
 	object writable_first_curves() { return wrap_non_const_array(wrapped().first_curves); }
 	object writable_curve_counts() { return wrap_non_const_array(wrapped().curve_counts); }
@@ -501,6 +509,7 @@ public:
 	object writable_curve_points() { return wrap_non_const_array(wrapped().curve_points); }
 	object writable_curve_point_weights() { return wrap_non_const_array(wrapped().curve_point_weights); }
 	object writable_curve_knots() { return wrap_non_const_array(wrapped().curve_knots); }
+	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
 
 	object create_first_curves() { return create_array(wrapped().first_curves); }
 	object create_curve_counts() { return create_array(wrapped().curve_counts); }
@@ -1245,6 +1254,7 @@ void mesh::define_class()
 		.def("curve_point_counts", &detail::const_linear_curve_groups::curve_point_counts)
 		.def("curve_selection", &detail::const_linear_curve_groups::curve_selection)
 		.def("uniform_data", &detail::const_linear_curve_groups::uniform_data)
+		.def("varying_data", &detail::const_linear_curve_groups::varying_data)
 		.def("curve_points", &detail::const_linear_curve_groups::curve_points);
 
 	class_<detail::linear_curve_groups>("linear_curve_groups",
@@ -1258,6 +1268,7 @@ void mesh::define_class()
 		.def("curve_point_counts", &detail::linear_curve_groups::curve_point_counts)
 		.def("curve_selection", &detail::linear_curve_groups::curve_selection)
 		.def("uniform_data", &detail::linear_curve_groups::uniform_data)
+		.def("varying_data", &detail::const_linear_curve_groups::varying_data)
 		.def("curve_points", &detail::linear_curve_groups::curve_points)
 
 		.def("writable_first_curves", &detail::linear_curve_groups::writable_first_curves)
@@ -1269,6 +1280,7 @@ void mesh::define_class()
 		.def("writable_curve_point_counts", &detail::linear_curve_groups::writable_curve_point_counts)
 		.def("writable_curve_selection", &detail::linear_curve_groups::writable_curve_selection)
 		.def("writable_uniform_data", &detail::linear_curve_groups::writable_uniform_data)
+		.def("writable_varying_data", &detail::linear_curve_groups::writable_varying_data)
 		.def("writable_curve_points", &detail::linear_curve_groups::writable_curve_points)
 
 		.def("create_first_curves", &detail::linear_curve_groups::create_first_curves)
@@ -1291,6 +1303,7 @@ void mesh::define_class()
 		.def("curve_point_counts", &detail::const_cubic_curve_groups::curve_point_counts)
 		.def("curve_selection", &detail::const_cubic_curve_groups::curve_selection)
 		.def("uniform_data", &detail::const_cubic_curve_groups::uniform_data)
+		.def("varying_data", &detail::const_cubic_curve_groups::varying_data)
 		.def("curve_points", &detail::const_cubic_curve_groups::curve_points);
 
 	class_<detail::cubic_curve_groups>("cubic_curve_groups",
@@ -1304,6 +1317,7 @@ void mesh::define_class()
 		.def("curve_point_counts", &detail::cubic_curve_groups::curve_point_counts)
 		.def("curve_selection", &detail::cubic_curve_groups::curve_selection)
 		.def("uniform_data", &detail::cubic_curve_groups::uniform_data)
+		.def("varying_data", &detail::cubic_curve_groups::varying_data)
 		.def("curve_points", &detail::cubic_curve_groups::curve_points)
 
 		.def("writable_first_curves", &detail::cubic_curve_groups::writable_first_curves)
@@ -1315,6 +1329,7 @@ void mesh::define_class()
 		.def("writable_curve_point_counts", &detail::cubic_curve_groups::writable_curve_point_counts)
 		.def("writable_curve_selection", &detail::cubic_curve_groups::writable_curve_selection)
 		.def("writable_uniform_data", &detail::cubic_curve_groups::writable_uniform_data)
+		.def("writable_varying_data", &detail::cubic_curve_groups::writable_varying_data)
 		.def("writable_curve_points", &detail::cubic_curve_groups::writable_curve_points)
 
 		.def("create_first_curves", &detail::cubic_curve_groups::create_first_curves)
@@ -1338,6 +1353,7 @@ void mesh::define_class()
 		.def("curve_first_knots", &detail::const_nurbs_curve_groups::curve_first_knots)
 		.def("curve_selection", &detail::const_nurbs_curve_groups::curve_selection)
 		.def("uniform_data", &detail::const_nurbs_curve_groups::uniform_data)
+		.def("varying_data", &detail::const_nurbs_curve_groups::varying_data)
 		.def("curve_points", &detail::const_nurbs_curve_groups::curve_points)
 		.def("curve_point_weights", &detail::const_nurbs_curve_groups::curve_point_weights)
 		.def("curve_knots", &detail::const_nurbs_curve_groups::curve_knots);
@@ -1354,6 +1370,7 @@ void mesh::define_class()
 		.def("curve_first_knots", &detail::nurbs_curve_groups::curve_first_knots)
 		.def("curve_selection", &detail::nurbs_curve_groups::curve_selection)
 		.def("uniform_data", &detail::nurbs_curve_groups::uniform_data)
+		.def("varying_data", &detail::nurbs_curve_groups::varying_data)
 		.def("curve_points", &detail::nurbs_curve_groups::curve_points)
 		.def("curve_point_weights", &detail::nurbs_curve_groups::curve_point_weights)
 		.def("curve_knots", &detail::nurbs_curve_groups::curve_knots)
@@ -1368,6 +1385,7 @@ void mesh::define_class()
 		.def("writable_curve_first_knots", &detail::nurbs_curve_groups::writable_curve_first_knots)
 		.def("writable_curve_selection", &detail::nurbs_curve_groups::writable_curve_selection)
 		.def("writable_uniform_data", &detail::nurbs_curve_groups::writable_uniform_data)
+		.def("writable_varying_data", &detail::nurbs_curve_groups::writable_varying_data)
 		.def("writable_curve_points", &detail::nurbs_curve_groups::writable_curve_points)
 		.def("writable_curve_point_weights", &detail::nurbs_curve_groups::writable_curve_point_weights)
 		.def("writable_curve_knots", &detail::nurbs_curve_groups::writable_curve_knots)

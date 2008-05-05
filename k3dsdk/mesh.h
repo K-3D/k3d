@@ -113,6 +113,8 @@ public:
 		named_arrays uniform_data;
 		/// Stores per-curve point lists
 		boost::shared_ptr<const indices_t> curve_points;
+		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
+		named_arrays varying_data;
 	};
 
 	/// Defines storage for cubic curve groups
@@ -139,6 +141,8 @@ public:
 		named_arrays uniform_data;
 		/// Stores per-curve point lists
 		boost::shared_ptr<const indices_t> curve_points;
+		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
+		named_arrays varying_data;
 	};
 
 	/// Defines storage for NURBS curve groups
@@ -167,6 +171,8 @@ public:
 		named_arrays uniform_data;
 		/// Stores per-curve control points
 		boost::shared_ptr<const indices_t> curve_points;
+		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
+		named_arrays varying_data;
 		/// Stores per-curve control point weights
 		boost::shared_ptr<const weights_t> curve_point_weights;
 		/// Stores per-curve knot vectors
