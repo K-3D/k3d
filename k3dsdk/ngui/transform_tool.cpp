@@ -115,68 +115,64 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		}
 	}
 	
+	if(Mesh.polyhedra)
+	{
+		// Get selected lines
+		const k3d::mesh::polyhedra_t& polyhedra = *Mesh.polyhedra;
+		return_val_if_fail(polyhedra.clockwise_edges, component_center);
+		return_val_if_fail(polyhedra.edge_points, component_center);
+		return_val_if_fail(polyhedra.edge_selection, component_center);
+		const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
+		const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
+		const k3d::mesh::selection_t& edge_selection = *polyhedra.edge_selection;
+		
+		const size_t edge_count = edge_points.size();
+		std::set<size_t> pointset; //ensure each point gets added only once
+		for (size_t edge = 0; edge < edge_count; ++edge)
+		{
+			if (edge_selection[edge])
+			{
+				pointset.insert(edge_points[edge]);
+				pointset.insert(edge_points[clockwise_edges[edge]]);
+			}
+		}
+		
+		// Selected faces ..
+		return_val_if_fail(Mesh.polyhedra, component_center);
+		return_val_if_fail(polyhedra.face_first_loops, component_center);
+		return_val_if_fail(polyhedra.loop_first_edges, component_center);
+		return_val_if_fail(polyhedra.face_selection, component_center);
+		const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
+		const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
+		const k3d::mesh::selection_t& face_selection = *polyhedra.face_selection;
+	
+		const size_t face_count = face_first_loops.size();
+		for(size_t face = 0; face != face_count; ++face)
+		{
+			if (face_selection[face])
+			{
+				const size_t first_edge = loop_first_edges[face_first_loops[face]];
+				for(size_t edge = first_edge; ; )
+				{
+					pointset.insert(edge_points[edge]);
+					edge = clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
+				}
+			}
+		}
+		
+		for (std::set<size_t>::const_iterator point = pointset.begin(); point != pointset.end(); ++ point)
+		{
+			PointList.push_back(*point);
+			component_center += to_vector(points[*point]);
+		}
+	}
+	
 	// Compute average position
 	const double point_number = static_cast<double>(PointList.size());
 	if(point_number)
 		component_center /= point_number;
-	
-	if(!Mesh.polyhedra)
-		return component_center;
-	
-	// Get selected lines
-	const k3d::mesh::polyhedra_t& polyhedra = *Mesh.polyhedra;
-	return_val_if_fail(polyhedra.clockwise_edges, component_center);
-	return_val_if_fail(polyhedra.edge_points, component_center);
-	return_val_if_fail(polyhedra.edge_selection, component_center);
-	const k3d::mesh::indices_t& clockwise_edges = *polyhedra.clockwise_edges;
-	const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
-	const k3d::mesh::selection_t& edge_selection = *polyhedra.edge_selection;
-	
-	const size_t edge_count = edge_points.size();
-	std::set<size_t> pointset; //ensure each point gets added only once
-	for (size_t edge = 0; edge < edge_count; ++edge)
-	{
-		if (edge_selection[edge])
-		{
-			pointset.insert(edge_points[edge]);
-			pointset.insert(edge_points[clockwise_edges[edge]]);
-		}
-	}
-	
-	// Selected faces ..
-	return_val_if_fail(Mesh.polyhedra, component_center);
-	return_val_if_fail(polyhedra.face_first_loops, component_center);
-	return_val_if_fail(polyhedra.loop_first_edges, component_center);
-	return_val_if_fail(polyhedra.face_selection, component_center);
-	const k3d::mesh::indices_t& face_first_loops = *polyhedra.face_first_loops;
-	const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
-	const k3d::mesh::selection_t& face_selection = *polyhedra.face_selection;
-
-	const size_t face_count = face_first_loops.size();
-	for(size_t face = 0; face != face_count; ++face)
-	{
-		if (face_selection[face])
-		{
-			const size_t first_edge = loop_first_edges[face_first_loops[face]];
-			for(size_t edge = first_edge; ; )
-			{
-				pointset.insert(edge_points[edge]);
-				edge = clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
-			}
-		}
-	}
-	for (std::set<size_t>::const_iterator point = pointset.begin(); point != pointset.end(); ++ point)
-	{
-		PointList.push_back(*point);
-		component_center += to_vector(points[*point]);
-	}
-	
-	// Compute average position
-	const double point_number2 = static_cast<double>(PointList.size());
-	if(point_number2)
-		component_center /= point_number2;
 
 	return component_center;
 }

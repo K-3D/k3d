@@ -54,7 +54,7 @@ public:
 	point_visitor(k3d::bounding_box3& BBox, k3d::mesh::points_t& Points, const k3d::matrix4& Matrix) : m_bbox(BBox), m_points(Points), m_matrix(Matrix) {}
 	void operator()(k3d::uint_t PointIndex, const k3d::point3& Point)
 	{
-		const k3d::point3 transformed_point = Point * m_matrix;
+		const k3d::point3 transformed_point = m_matrix * Point;
 		m_bbox.insert(transformed_point);
 		if (m_inserted_points.insert(PointIndex).second)
 		{
@@ -87,7 +87,7 @@ bool selection_position(const selection_mode_t& SelectionMode, const k3d::nodes_
 		{
 			if(k3d::ibounded* bounded = dynamic_cast<k3d::ibounded*>(*node))
 			{
-				BoundingBox.insert(bounded->extents() * transformation);
+				BoundingBox.insert(transformation * bounded->extents());
 			}
 			else
 			{
@@ -103,7 +103,7 @@ bool selection_position(const selection_mode_t& SelectionMode, const k3d::nodes_
 		{
 			const k3d::mesh::points_t& points = *mesh->points;
 			for (k3d::uint_t point = 0; point != points.size(); ++point)
-				Points.push_back(points[point] * transformation);
+				Points.push_back(transformation * points[point]);
 		}
 		if (SelectionMode == SELECT_POINTS)
 		{
