@@ -22,6 +22,9 @@
 */
 
 #include "simple_modifier.h"
+// timing for CUDA comparison
+#include <k3dsdk/log.h>
+#include <k3dsdk/high_res_timer.h>
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
@@ -69,7 +72,11 @@ public:
 
 	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
+		k3d::log() << info << "Starting BitmapAdd" << std::endl;
+		k3d::timer timer;
 		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_value.pipeline_value()));
+		double bitmapAddTime = timer.elapsed();
+		k3d::log() << info << "Bitmap timing : " << bitmapAddTime << std::endl;
 	}
 
 	static k3d::iplugin_factory& get_factory()

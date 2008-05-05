@@ -22,11 +22,15 @@
 */
 
 #include "simple_modifier.h"
+#include <k3dsdk/log.h>
+#include <k3dsdk/high_res_timer.h>
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 
-extern "C" void bitmap_add_entry(const unsigned short *input, unsigned short *output, int width, int height, float value);
+// include the entry points as external definitions
+#include "cuda_entry_points.h"
+#include <stdio.h>
 
 namespace module
 {
@@ -52,10 +56,31 @@ public:
 
 	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
+		k3d::timer timer;
 		const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
 		unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));
 		
-		bitmap_add_entry(inputPixels, outputPixels, Input.width(), Input.height(), (float)(m_value.pipeline_value()));
+		k3d::log() << info << "Starting CUDA BitmapAdd" << std::endl;
+		// intialize CUDA - should check for errors etc
+		CUDA_initialize_device();
+		
+		timer.restart();
+		// copy the data to the device
+		bitmap_copy_data_from_host_to_device(inputPixels, Input.width(), Input.height());
+		double host_to_device = timer.elapsed();
+		timer.restart();
+		// perform the calculation
+		bitmap_add_entry(Input.width(), Input.height(), (float)(m_value.pipeline_value()));
+		double execution = timer.elapsed();
+		timer.restart();
+		// copy the data from the device
+		bitmap_copy_data_from_device_to_host(outputPixels, Input.width(), Input.height());
+		double device_to_host = timer.elapsed();
+		// cleanup the memory allocated on the device
+		CUDA_cleanup();
+		
+		k3d::log() << info << "CUDA timing : " << host_to_device << " | " << execution << " | " << device_to_host << " || " << host_to_device + execution + device_to_host << std::endl;
+		
 	}
 
 	static k3d::iplugin_factory& get_factory()
