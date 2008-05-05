@@ -23,10 +23,12 @@
 
 #include "data.h"
 #include "idocument.h"
+#include "inode_collection_sink.h"
 #include "iplugin_factory.h"
 #include "iproperty_collection.h"
 #include "istate_recorder.h"
 #include "nodes.h"
+#include "properties.h"
 #include "string_cast.h"
 #include "string_modifiers.h"
 #include "utility.h"
@@ -167,6 +169,34 @@ void delete_nodes(idocument& Document, const nodes_t& Nodes)
 
 	// Remove them from the document node collection ...
 	Document.nodes().remove_nodes(Nodes);
+	
+	// Remove them from node collection sinks
+	const k3d::inode_collection::nodes_t::const_iterator doc_node_end = Document.nodes().collection().end();
+	for(k3d::inode_collection::nodes_t::const_iterator doc_node = Document.nodes().collection().begin(); doc_node != doc_node_end; ++doc_node)
+	{
+		if(k3d::inode_collection_sink* const node_collection_sink = dynamic_cast<k3d::inode_collection_sink*>(*doc_node))
+		{
+			const k3d::inode_collection_sink::properties_t properties = node_collection_sink->node_collection_properties();
+			for(k3d::inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+			{
+				if(k3d::inode_collection_property* const node_collection_property = dynamic_cast<k3d::inode_collection_property*>(*property))
+				{
+					k3d::inode_collection_property::nodes_t nodes = k3d::property::internal_value<k3d::inode_collection_property::nodes_t>(**property);
+					for(nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
+					{
+						for (k3d::inode_collection_property::nodes_t::iterator visible_node = nodes.begin(); visible_node != nodes.end(); )
+						{
+							if (*visible_node == *node)
+								visible_node = nodes.erase(visible_node);
+							else
+								++visible_node;
+						}
+					}
+					k3d::property::set_internal_value(**property, nodes);
+				}
+			}
+		}
+	}
 
 	// Make sure the node gets cleaned-up properly after a redo ...
 	for(nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
