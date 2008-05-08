@@ -288,7 +288,6 @@ public:
 		m_implementation->m_scrolled_window.signal_button_press_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
 
 		pack_start(m_implementation->m_vbox, Gtk::PACK_EXPAND_WIDGET);
-
 		show_all();
 	}
 

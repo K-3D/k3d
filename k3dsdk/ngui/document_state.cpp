@@ -1207,12 +1207,6 @@ public:
 		return m_view_node_properties_signal;
 	}
 
-	/// Returns a signal that can be emitted to request display of the properties for a tool
-	view_tool_properties_signal_t& view_tool_properties_signal()
-	{
-		return m_view_tool_properties_signal;
-	}
-
 	/// Returns a signal that can be emitted to acknowledge of a document selection change
 	document_selection_change_signal_t& document_selection_change_signal()
 	{
@@ -1231,12 +1225,7 @@ public:
 		m_active_tool->deactivate();
 		m_active_tool = &ActiveTool;
 		m_active_tool->activate();
-		m_active_tool_changed_signal.emit(0);
-	}
-
-	active_tool_changed_signal_t& active_tool_changed_signal()
-	{
-		return m_active_tool_changed_signal;
+		m_active_tool_changed_signal.emit();
 	}
 
 	/// Returns the current document-wide selection mode
@@ -1826,12 +1815,10 @@ public:
 	view_node_history_signal_t m_view_node_history_signal;
 	/// A signal that can be emitted to request display of the properties for an node
 	view_node_properties_signal_t m_view_node_properties_signal;
-	/// A signal that can be emitted to request display of the properties for a tool
-	view_tool_properties_signal_t m_view_tool_properties_signal;
 	/// A signal that can be emitted to acknowledge of a document selection change
 	document_selection_change_signal_t m_document_selection_change_signal;
 	/// A signal that will be emitted whenever the active tool changes
-	active_tool_changed_signal_t m_active_tool_changed_signal;
+	sigc::signal<void> m_active_tool_changed_signal;
 	/// Stores the current document-wide selection mode
 	selection_mode_property_t m_selection_mode;
 	/// Stores the last document-wide selection mode
@@ -2021,11 +2008,6 @@ document_state::view_node_properties_signal_t& document_state::view_node_propert
 	return m_implementation->view_node_properties_signal();
 }
 
-document_state::view_tool_properties_signal_t& document_state::view_tool_properties_signal()
-{
-	return m_implementation->view_tool_properties_signal();
-}
-
 document_state::document_selection_change_signal_t& document_state::document_selection_change_signal()
 {
 	return m_implementation->document_selection_change_signal();
@@ -2041,11 +2023,10 @@ void document_state::set_active_tool(tool& ActiveTool)
 	m_implementation->set_active_tool(ActiveTool);
 }
 
-document_state::active_tool_changed_signal_t& document_state::active_tool_changed_signal()
+sigc::connection document_state::connect_active_tool_changed_signal(const sigc::slot<void>& Slot)
 {
-	return m_implementation->active_tool_changed_signal();
+	return m_implementation->m_active_tool_changed_signal.connect(Slot);
 }
-
 
 tool* document_state::get_tool(const k3d::string_t& Name)
 {

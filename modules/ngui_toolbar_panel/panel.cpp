@@ -96,7 +96,7 @@ public:
 
 	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
 	{
-		return m_document_state.active_tool_changed_signal().connect(sigc::hide(Slot));
+		return m_document_state.connect_active_tool_changed_signal(Slot);
 	}
 
 private:
@@ -135,7 +135,7 @@ public:
 
 	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
 	{
-		return m_document_state.active_tool_changed_signal().connect(sigc::hide(Slot));
+		return m_document_state.connect_active_tool_changed_signal(Slot);
 	}
 
 private:

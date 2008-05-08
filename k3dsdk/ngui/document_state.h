@@ -77,10 +77,6 @@ public:
 	typedef sigc::signal1<bool, k3d::inode*, k3d::signal::consumable> view_node_properties_signal_t;
 	/// Returns a signal that can be emitted to request display of the properties for an node
 	view_node_properties_signal_t& view_node_properties_signal();
-	/// Defines a signal that can be emitted to request display of the properties for a tool
-	typedef sigc::signal1<bool, k3d::iproperty_collection*, k3d::signal::consumable> view_tool_properties_signal_t;
-	/// Returns a signal that can be emitted to request display of the properties for a tool
-	view_tool_properties_signal_t& view_tool_properties_signal();
 	/// Defines a signal that can be emitted to acknowledge of a document selection change
 	typedef sigc::signal<void> document_selection_change_signal_t;
 	/// Returns a signal that can be emitted to acknowledge of a document selection change
@@ -90,10 +86,8 @@ public:
 	tool& active_tool();
 	/// Sets the active tool for the document
 	void set_active_tool(tool& ActiveTool);
-	/// Defines a signal that will be emitted whenever the active tool changes
-	typedef sigc::signal<void, k3d::iunknown*> active_tool_changed_signal_t;
-	/// Returns a signal that will be emitted whenever the active tool changes
-	active_tool_changed_signal_t& active_tool_changed_signal();
+	/// Connects a slot to a signal that will be emitted when the active tool changes
+	sigc::connection connect_active_tool_changed_signal(const sigc::slot<void>& Slot);
 
 	/// Returns an instance of a tool plugin by name (could return NULL).
 	tool* get_tool(const k3d::string_t& Name);
