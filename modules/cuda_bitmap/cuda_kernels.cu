@@ -73,7 +73,7 @@ __device__ float halfToFloat (unsigned short halfIn)
 		val = (s << 31) | (e << 23) | m;
 	}
 	
-	return *((float*)&val);
+	return __int_as_float (val);
 		
 }
 
@@ -90,7 +90,7 @@ __device__ unsigned short floatToHalf( float floatIn )
     // of float and half (127 versus 15).
     //
 	
-	int floatBits = *(int*)(&floatIn);
+	int floatBits = __float_as_int( floatIn );
 	
     int s =  ((floatBits >> 16) & 0x00008000);
     int e = ((floatBits >> 23) & 0x000000ff) - (127 - 15);

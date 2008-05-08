@@ -1,7 +1,7 @@
 // cuda includes
+#include <stdio.h>
 #include <cutil.h>
 #include <vector_types.h>
-#include <stdio.h>
 //include the kernels
 #include "cuda_kernels.cu"
 
@@ -28,7 +28,7 @@ extern "C" void bitmap_copy_data_from_host_to_device(const unsigned short *input
 {
 	// width and height is the number of pixels - each pixel is 4*16bits = 8bytes
 	input_size = 8 * width * height;
-    
+      
     // allocate the memory on the device    
     CUDA_SAFE_CALL(cudaMalloc((void**)&d_image, input_size));
 
