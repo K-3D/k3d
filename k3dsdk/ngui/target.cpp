@@ -99,6 +99,8 @@ bool selection_position(const selection_mode_t& SelectionMode, const k3d::nodes_
 		const k3d::mesh* mesh = k3d::property::pipeline_value<k3d::mesh*>(dynamic_cast<k3d::imesh_source*>(*node)->mesh_source_output());
 		if (!mesh)
 			continue;
+		if (!mesh->points)
+			continue;
 		if (SelectionMode == SELECT_NODES)
 		{
 			const k3d::mesh::points_t& points = *mesh->points;
