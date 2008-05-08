@@ -101,7 +101,7 @@ public:
 
 		const k3d::mesh::points_t& points = *Mesh.points;
 		
-		bool valid_polyhedra = k3d::validate_polyhedra(Mesh);
+		bool valid_polyhedra = k3d::validate_polyhedra(Mesh) && !Mesh.polyhedra->face_first_loops->empty();
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_DOUBLE, 0, &points[0]);

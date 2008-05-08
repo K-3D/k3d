@@ -117,6 +117,9 @@ public:
 		if (!SelectionState.select_edges)
 			return;
 		
+		if(Mesh.polyhedra->edge_points->empty())
+			return;
+		
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 

@@ -93,6 +93,9 @@ public:
 
 		if(!k3d::validate_polyhedra(Mesh))
 			return;
+		
+		if(Mesh.polyhedra->edge_points->empty())
+			return;
 
 		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;

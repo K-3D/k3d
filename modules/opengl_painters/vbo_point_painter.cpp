@@ -116,7 +116,7 @@ public:
 		if (!SelectionState.select_points)
 			return;
 		
-		bool valid_polyhedra = k3d::validate_polyhedra(Mesh);
+		bool valid_polyhedra = k3d::validate_polyhedra(Mesh) && !Mesh.polyhedra->face_first_loops->empty();
 		
 		clean_vbo_state();
 

@@ -76,7 +76,8 @@ public:
 		m_ri_painter(init_owner(*this) + init_name("ri_painter") + init_label(_("RenderMan Mesh Painter")) + init_description(_("RenderMan Mesh Painter")) + init_value(static_cast<k3d::ri::imesh_painter*>(0))),
 		m_show_component_selection(init_owner(*this) + init_name("show_component_selection") + init_label(_("Show Component Selection")) + init_description(_("Show component selection")) + init_value(false)),
 		m_output_mesh_pointer(0),
-		m_document_closed(false)
+		m_document_closed(false),
+		m_updating(false)
 	{
 		m_input_mesh.changed_signal().connect(make_mesh_changed_slot());
 		m_mesh_selection.changed_signal().connect(make_selection_changed_slot());
@@ -143,6 +144,7 @@ public:
 	
 	void update_mesh(k3d::mesh& OutputMesh)
 	{
+		m_updating = true;
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Update mesh");
 		// we store this to avoid executing the pipeline in mesh_changed
 		m_output_mesh_pointer = &OutputMesh;
@@ -151,6 +153,7 @@ public:
 			OutputMesh = *input_mesh;
 			k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
 		}
+		m_updating = false;
 	}
 
 	const k3d::bounding_box3 extents()
@@ -178,6 +181,8 @@ public:
 	
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
+		if (m_updating)
+			return;
 		if (m_document_closed)
 			return;
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Draw");
@@ -196,6 +201,8 @@ public:
 
 	void on_gl_select(const k3d::gl::render_state& State, const k3d::gl::selection_state& SelectionState)
 	{
+		if (m_updating)
+			return;
 		if (m_document_closed)
 			return;
 		const double selection_weight = m_selection_weight.pipeline_value();
@@ -281,6 +288,7 @@ private:
 	const k3d::mesh* m_output_mesh_pointer;
 	sigc::connection m_delete_connection;
 	bool m_document_closed;
+	bool m_updating;
 };
 
 /////////////////////////////////////////////////////////////////////////////

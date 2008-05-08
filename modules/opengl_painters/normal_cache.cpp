@@ -93,6 +93,10 @@ protected:
 	
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 	{
+		if (!k3d::validate_polyhedra(Mesh))
+			return;
+		if (Mesh.polyhedra->face_first_loops->empty())
+			return;
 		// Resize arrays and initialize normals if the topology changed
 		if (f_normals.empty())
 		{
@@ -142,6 +146,8 @@ protected:
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 	{
 		return_if_fail(validate_polyhedra(Mesh));
+		if (Mesh.polyhedra->face_first_loops->empty())
+			return;
 		face_normals& f_normals = get_data<face_normals>(&Mesh, Painter);
 		// Resize arrays and initialize normals if the topology changed
 		if (p_normals.empty())

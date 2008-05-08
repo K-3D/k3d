@@ -71,7 +71,7 @@ public:
 			
 		if(k3d::is_sds(Mesh))
 			return;
-
+		
 		k3d::gl::store_attributes attributes;
 
 		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
@@ -142,9 +142,6 @@ public:
 		glPolygonOffset(1.0, 1.0);
 		
 		cached_triangulation& triangles = get_data<cached_triangulation>(&Mesh, this); 
-		
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &(triangles.points().at(0)));
 		
 		const k3d::mesh::indices_t& face_starts = triangles.face_starts();
 		if (face_starts.empty())
