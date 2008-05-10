@@ -21,7 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "angle_axis_control.h"
+#include "angle_axis.h"
+#include "auto_property_page.h"
 #include "bitmap_preview.h"
 #include "bounding_box.h"
 #include "button.h"
@@ -35,9 +36,8 @@
 #include "node_chooser.h"
 #include "node_collection_chooser.h"
 #include "path_chooser.h"
-#include "point_control.h"
+#include "point3.h"
 #include "property_button.h"
-#include "property_collection_control.h"
 #include "property_label.h"
 #include "script_button.h"
 #include "selection_button.h"
@@ -69,7 +69,7 @@ namespace k3d
 namespace ngui
 {
 
-namespace property_collection
+namespace auto_property_page
 {
 
 ///////////////////////////////////////////////////////////////////////////
@@ -425,7 +425,7 @@ Gtk::Widget& control::get_widget()
 	return m_implementation->m_vbox;
 }
 
-} // namespace property_collection
+} // namespace auto_property_page
 
 } // namespace ngui
 

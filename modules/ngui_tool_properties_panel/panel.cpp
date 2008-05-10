@@ -22,12 +22,12 @@
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/auto_property_page.h>
 #include <k3dsdk/ngui/bitmap_preview.h>
 #include <k3dsdk/ngui/bounding_box.h>
 #include <k3dsdk/ngui/button.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/property_collection_control.h>
 #include <k3dsdk/ngui/tool.h>
 #include <k3dsdk/ngui/widget_manip.h>
 
@@ -110,7 +110,7 @@ public:
 	/// Contains the set of tool properties
 	Gtk::ScrolledWindow m_scrolled_window;
 	/// Provides a collection of property controls
-	k3d::ngui::property_collection::control m_object_properties;
+	k3d::ngui::auto_property_page::control m_object_properties;
 
 	sigc::signal<void, const std::string&, const std::string&> m_command_signal;
 

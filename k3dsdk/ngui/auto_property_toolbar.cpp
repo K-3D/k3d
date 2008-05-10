@@ -21,10 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "auto_property_toolbar.h"
 #include "button.h"
 #include "document_state.h"
 #include "icons.h"
-#include "object_toolbar_control.h"
 #include "properties.h"
 #include "render.h"
 #include "toggle_button.h"
@@ -57,7 +57,7 @@ namespace k3d
 namespace ngui
 {
 
-namespace object_toolbar
+namespace auto_property_toolbar
 {
 
 /// toggle_button model that turns a property-bypass into a togglable action
@@ -374,7 +374,7 @@ Gtk::Widget& control::get_widget()
 	return m_implementation->m_toolbar;
 }
 
-} // namespace object_toolbar
+} // namespace auto_property_toolbar
 
 } // namespace ngui
 

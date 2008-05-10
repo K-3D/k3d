@@ -1,5 +1,5 @@
-#ifndef NGUI_OBJECT_TOOLBAR_CONTROL_H
-#define NGUI_OBJECT_TOOLBAR_CONTROL_H
+#ifndef NGUI_AUTO_PROPERTY_PAGE_H
+#define NGUI_AUTO_PROPERTY_PAGE_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -24,7 +24,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/iproperty_group_collection.h>
 #include <k3dsdk/types.h>
+#include <vector>
 
 namespace Gtk { class Widget; }
 namespace libk3dngui { class document_state; }
@@ -33,36 +35,49 @@ namespace k3d
 {
 
 class icommand_node;
+class iproperty;
+class iunknown;
 
 namespace ngui
 {
 
-namespace object_toolbar
+namespace auto_property_page
 {
 
-/// Provides a toolbar with an auto-generated collection of icons based on an object's capabilities / type.
+/// Provides a widget that auto-generates controls for a collection of properties
 class control
 {
 public:
-	control(libk3dngui::document_state& DocumentState, icommand_node& Parent, const string_t& Name);
+	control(libk3dngui::document_state& DocumentState, icommand_node& Parent);
 	~control();
 
-	/// Called to set the toolbar contents based on the given object
-	void set_object(iunknown* Object);
+	/// Auto-generate controls for a single object of arbitrary type.
+	void set_properties(iunknown* Object);
+	/// Auto-generate controls for a collection of objects of arbitrary type.
+	template<typename iterator_t>
+	void set_properties(const iterator_t& Begin, const iterator_t& End)
+	{
+		set_properties(objects_t(Begin, End));
+	}
+	/// Auto-generate controls for a collection of properties organized into arbitrary groups.
+	void set_properties(const iproperty_group_collection::groups_t& PropertyGroups);
 
 	/// Called to get the toolbar widget for display
 	Gtk::Widget& get_widget();
 
 private:
+	typedef std::vector<iunknown*> objects_t;
+	void set_properties(const objects_t& Objects);
+
 	class implementation;
 	implementation* const m_implementation;
 };
 
-} // namespace object_toolbar
+} // namespace auto_property_page
 
 } // namespace ngui
 
 } // namespace k3d
 
-#endif // NGUI_OBJECT_TOOLBAR_CONTROL_H
+#endif // NGUI_AUTO_PROPERTY_PAGE_H
 
