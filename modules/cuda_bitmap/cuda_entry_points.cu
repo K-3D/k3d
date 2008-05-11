@@ -40,10 +40,16 @@ extern "C" void bitmap_copy_data_from_host_to_device(const unsigned short *input
 /// entry point for the CUDA version of the BitmapAdd plugin
 extern "C" void bitmap_kernel_entry(int operation, int width, int height, float value)
 {
+	// Make sure timing this function works
+	cudaEvent_t start, stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+	cudaEventRecord(start, 0);
+	
     // allocate the blocks and threads
     dim3 threads_per_block(8, 8);
     dim3 blocks_per_grid( iDivUp(width, 8), iDivUp(height,8));
-	
+
 	switch ( operation )
 	{
     	case CUDA_BITMAP_ADD:
@@ -62,9 +68,13 @@ extern "C" void bitmap_kernel_entry(int operation, int width, int height, float 
     	default:
     		// unknown operation
     		;
-	}	
+	}
+		
     // check if the kernel executed correctly
     CUT_CHECK_ERROR("Add Kernel execution failed");
+    
+    cudaEventRecord(stop, 0);
+		cudaEventSynchronize(stop);
 }
 
 
