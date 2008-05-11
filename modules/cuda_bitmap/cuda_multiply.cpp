@@ -37,17 +37,17 @@ namespace cuda_bitmap
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// cuda_add
+// cuda_multiply
 
-class cuda_add :
+class cuda_multiply :
 	public simple_modifier
 {
 	typedef simple_modifier base;
 
 public:
-	cuda_add(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	cuda_multiply(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_value(init_owner(*this) + init_name("value") + init_label(_("Add value")) + init_description(_("Add value to each pixel's Red, Green and Blue component")) + init_value(0.0)),
+		m_value(init_owner(*this) + init_name("value") + init_label(_("Multiplicand")) + init_description(_("Multiply each pixel component with this value")) + init_value(1.0)),
 		m_host_to_device_time(init_owner(*this) + init_name("host_to_device_time") + init_label(_("Host to device time")) + init_description(_("Timer for measuring host to device transfer time")) + init_value(0.0)),
 		m_kernel_time(init_owner(*this) + init_name("kernel_time") + init_label(_("Kernel time")) + init_description(_("Timer for measuring kernel execution time")) + init_value(0.0)),
 		m_device_to_host_time(init_owner(*this) + init_name("device_to_host_time") + init_label(_("Device to host time")) + init_description(_("Timer for measuring device to host transfer time")) + init_value(0.0))
@@ -72,7 +72,7 @@ public:
 		
 		timer.restart();
 		// perform the calculation
-		bitmap_kernel_entry(CUDA_BITMAP_ADD, Input.width(), Input.height(), (float)(m_value.pipeline_value()));
+		bitmap_kernel_entry(CUDA_BITMAP_MULTIPLY, Input.width(), Input.height(), (float)(m_value.pipeline_value()));
 		m_kernel_time.set_value(timer.elapsed());
 		
 		timer.restart();
@@ -85,12 +85,12 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<cuda_add,
+		static k3d::document_plugin_factory<cuda_multiply,
 			k3d::interface_list<k3d::ibitmap_source,
 			k3d::interface_list<k3d::ibitmap_sink> > > factory(
-				k3d::uuid(0x86ddee78, 0x074d46f7, 0x13bf758a, 0x8893b6c2),
-				"CUDABitmapAdd",
-				_("Add value to each pixel color component using the CUDA API"),
+				k3d::uuid(0xf2b5cdd6, 0x574d0d53, 0x8053ff81, 0x8612d328),
+				"CUDABitmapMultiply",
+				_("Multiply each each pixel color component by a specified value using the CUDA API"),
 				"CUDABitmap",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -106,11 +106,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// cuda_add
+// cuda_multiply
 
-k3d::iplugin_factory& cuda_add_factory()
+k3d::iplugin_factory& cuda_multiply_factory()
 {
-	return cuda_add::get_factory();
+	return cuda_multiply::get_factory();
 }
 
 } // namespace cuda_bitmap

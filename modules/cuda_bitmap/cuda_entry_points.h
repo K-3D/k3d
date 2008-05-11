@@ -24,11 +24,18 @@
 	\author Evan Lezar (evanlezar@gmail.com)
 */
 
+
+// define the types of kernels supported
+#define CUDA_BITMAP_ADD 0x00
+#define CUDA_BITMAP_MULTIPLY 0x01
+#define CUDA_BITMAP_SUBTRACT 0x02
+
+
 // forward declaration of the entry functions
 // split the entry functions for timing reasons
 extern "C" void CUDA_initialize_device();
 extern "C" void bitmap_copy_data_from_host_to_device(const unsigned short *input, int width, int height);
-extern "C" void bitmap_add_entry(int width, int height, float value);
+extern "C" void bitmap_kernel_entry(int operation, int width, int height, float value);
 extern "C" void bitmap_copy_data_from_device_to_host(unsigned short *output, int width, int height);
 extern "C" void CUDA_cleanup();
 

@@ -35,8 +35,6 @@ for i in range(len(widths)):
     document.set_dependency(referenceAdd.get_property("input_bitmap"), initialBitmap.get_property("output_bitmap"))
     # calculate the difference between the CUDA and reference implementation
     testing.bitmap_perceptual_difference(document, cudaAdd.get_property("output_bitmap"), referenceAdd.get_property("output_bitmap"), threshold)    
-    ## calculate the difference between the CUDA and reference implementation
-    ##testing.bitmap_perceptual_difference(document, initialBitmap.get_property("output_bitmap"), referenceAdd.get_property("output_bitmap"), 1e8)    
     # read the timing info
     DataLine = [widths[i], heights[i], referenceAdd.timer, cudaAdd.host_to_device_time, cudaAdd.kernel_time, cudaAdd.device_to_host_time]    
     timing_data[i] = DataLine

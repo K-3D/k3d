@@ -222,5 +222,27 @@ __global__ void add_kernel (ushort4 *image_RGBA, int width, int height, float va
 	__syncthreads();
 } 
 
+__global__ void multiply_kernel (ushort4 *image_RGBA, int width, int height, float value)
+{
+	const int ix = blockDim.x * blockIdx.x + threadIdx.x;
+    const int iy = blockDim.y * blockIdx.y + threadIdx.y;
+    
+    if(ix < width && iy < height)
+    {
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        const int idx = width * iy + ix;
+        
+        float4 pixelFloat;
+        
+        pixelFloat.x = halfToFloat((unsigned short)image_RGBA[idx].x) * value;
+        pixelFloat.y = halfToFloat((unsigned short)image_RGBA[idx].y) * value;
+        pixelFloat.z = halfToFloat((unsigned short)image_RGBA[idx].z) * value;
+        
+        image_RGBA[idx].x = floatToHalf(pixelFloat.x);
+        image_RGBA[idx].y = floatToHalf(pixelFloat.y);
+        image_RGBA[idx].z = floatToHalf(pixelFloat.z);
+    }
+	__syncthreads();
+}
 
 #endif // #ifndef _CUDA_KERNELS_H_
