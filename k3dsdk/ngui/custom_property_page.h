@@ -25,10 +25,15 @@
 */
 
 #include <k3dsdk/iunknown.h>
-//#include <k3dsdk/signal_system.h>
+
+namespace libk3dngui { class document_state; }
+namespace Gtk { class Widget; }
 
 namespace k3d
 {
+
+class icommand_node;
+class inode;
 
 namespace ngui
 {
@@ -37,24 +42,17 @@ namespace custom_property_page
 {
 
 /// Abstract interface for a custom "property page", a UI component that can be displayed in-place-of the normal "auto-generated" property page for a specific plugin.
-class control :
-	public iunknown
+class control
 {
 public:
-/*
-	/// Set the document and parent command node for this panel - this is ugly, but application plugins don't take ctor arguments
-	virtual void initialize(document_state& DocumentState, k3d::icommand_node& Parent) = 0;
-	/// Returns a unique string identifying the panel type - panel frames use this to coordinate tutorial recording / layout serialization
-	virtual const std::string panel_type() = 0;
-	/// Connects a slot to a signel that should be emitted whenever the panel receives the keyboard focus
-	virtual sigc::connection connect_focus_signal(const sigc::slot<void>& Slot) = 0;
-*/
+	virtual ~control() {}
+
+	virtual Gtk::Widget& get_widget(libk3dngui::document_state& DocumentState, icommand_node& Parent, inode& Node) = 0;
 
 protected:
 	control() {}
 	control(const control&) {}
 	control& operator=(const control&) { return *this; }
-	virtual ~control() {}
 };
 
 } // namespace custom_property_page

@@ -18,18 +18,23 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application.h>
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/iapplication.h>
 #include <k3dsdk/inode.h>
+#include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/auto_property_page.h>
 #include <k3dsdk/ngui/auto_property_toolbar.h>
 #include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/custom_property_page.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/uri.h>
 #include <k3dsdk/ngui/widget_manip.h>
+#include <k3dsdk/plugins.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/label.h>
@@ -37,6 +42,7 @@
 #include <gtkmm/stock.h>
 
 #include <boost/assign/list_of.hpp>
+#include <boost/scoped_ptr.hpp>
 
 using namespace libk3dngui;
 
@@ -61,23 +67,46 @@ class implementation :
 public:
 	implementation(document_state& DocumentState, k3d::icommand_node& Parent) :
 		m_document_state(DocumentState),
-		m_object_toolbar(DocumentState, Parent, "toolbar"),
-		m_object_properties(DocumentState, Parent)
+		m_parent(Parent),
+		m_auto_toolbar(DocumentState, Parent, "toolbar"),
+		m_auto_properties(DocumentState, Parent)
 	{
+		// Setup the panel label (always visible) ...
 		m_label.set_alignment(Gtk::ALIGN_LEFT);
 		m_label.set_padding(5, 5);
 
-		m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-		m_scrolled_window.add(m_object_properties.get_widget());
+		// Setup the auto-generated page (usually visible, unless a custom page is available) ...
+		Gtk::ScrolledWindow* const scrolled_window = new Gtk::ScrolledWindow();
+		scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+		scrolled_window->add(m_auto_properties.get_widget());
+		scrolled_window->signal_button_press_event().connect(sigc::bind_return(sigc::hide(m_panel_grab_signal.make_slot()), false), false);
 
-		m_vbox.pack_start(m_label, Gtk::PACK_SHRINK);
-		m_vbox.pack_start(m_object_toolbar.get_widget(), Gtk::PACK_SHRINK);
-		m_vbox.pack_start(m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
+		m_auto_page.pack_start(m_auto_toolbar.get_widget(), Gtk::PACK_SHRINK);
+		m_auto_page.pack_start(*Gtk::manage(scrolled_window), Gtk::PACK_EXPAND_WIDGET);
 
-		m_document_state.document().close_signal().connect(sigc::mem_fun(*this, &implementation::on_document_closed));
+		// Setup the main top-level widget ...
+		m_main_widget.pack_start(m_label, Gtk::PACK_SHRINK);
+		m_main_widget.pack_start(m_auto_page, Gtk::PACK_EXPAND_WIDGET);
+
 		m_document_state.view_node_properties_signal().connect(sigc::mem_fun(*this, &implementation::on_view_node_properties));
-//		m_document_state.document_selection_change_signal().connect(sigc::mem_fun(*this, &implementation::on_selection_change));
-		on_selection_change();
+		m_document_state.document().close_signal().connect(sigc::mem_fun(*this, &implementation::on_document_closed));
+
+		// Initial update ...
+		m_nodes = m_document_state.selected_nodes();
+		if(m_nodes.size() > 1)
+			m_nodes.resize(1);
+		update_connections();
+		schedule_update();
+	}
+
+	bool on_view_node_properties(k3d::inode* const Node)
+	{
+		m_nodes = k3d::nodes_t(1, Node);
+		update_connections();
+		
+		schedule_update();
+
+		return false;
 	}
 
 	void on_document_closed()
@@ -99,29 +128,8 @@ public:
 		}
 	}
 
-	bool on_view_node_properties(k3d::inode* const Node)
-	{
-		m_nodes = k3d::nodes_t(1, Node);
-		update_connections();
-		
-		m_vbox.hide();
-		schedule_update();
-
-		return false;
-	}
-
-	void on_selection_change()
-	{
-		m_nodes = m_document_state.selected_nodes();
-		update_connections();
-
-		m_vbox.hide();
-		schedule_update();
-	}
-
 	void on_node_properties_changed()
 	{
-		m_vbox.hide();
 		schedule_update();
 	}
 
@@ -130,7 +138,6 @@ public:
 		m_nodes.erase(std::remove(m_nodes.begin(), m_nodes.end(), Node), m_nodes.end());
 		update_connections();
 
-		m_vbox.hide();
 		schedule_update();
 	}
 
@@ -152,12 +159,52 @@ public:
 
 	void on_update()
 	{
+		// Cache the set of available custom property page plugins ...
+		static std::map<k3d::string_t, k3d::iplugin_factory*> custom_pages;
+		if(custom_pages.empty())
+		{
+			const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
+			for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+			{
+				k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
+
+				if(metadata["ngui:component-type"] != "property-page")
+					continue;
+
+				const k3d::string_t plugin_type = metadata["ngui:plugin-type"];
+				if(plugin_type.empty())
+				{
+					k3d::log() << error << "Property page plugin without ngui:plugin-type metadata will be ignored" << std::endl;
+					continue;
+				}
+
+				custom_pages[plugin_type] = *factory;
+			}
+		}
+
 		update_label();
 
-		m_object_toolbar.set_object(m_nodes.size() == 1 ? m_nodes[0] : 0);
-		m_object_properties.set_properties(m_nodes.begin(), m_nodes.end());
+		m_main_widget.hide();
 
-		m_vbox.show();
+		if(m_nodes.size() == 1 && custom_pages.count(m_nodes[0]->factory().name()))
+		{
+			m_custom_page.reset(k3d::plugin::create<k3d::ngui::custom_property_page::control>(*custom_pages[m_nodes[0]->factory().name()]));
+			if(m_custom_page)
+			{
+				m_auto_page.hide();
+				m_main_widget.pack_start(m_custom_page->get_widget(m_document_state, m_parent, *m_nodes[0]), Gtk::PACK_EXPAND_WIDGET);
+				m_main_widget.show();
+				return;
+			}
+		}
+
+		m_custom_page.reset();
+
+		m_auto_toolbar.set_object(m_nodes.size() == 1 ? m_nodes[0] : 0);
+		m_auto_properties.set_properties(m_nodes.begin(), m_nodes.end());
+		m_auto_page.show();
+
+		m_main_widget.show();
 
 /*
 		// Used to determine if we need to add ikeyframer buttons
@@ -232,23 +279,26 @@ public:
 
 	/// Stores a reference to the owning document
 	document_state& m_document_state;
+	k3d::icommand_node& m_parent;
 	/// Stores the current set of nodes to be displayed (if any)
 	k3d::nodes_t m_nodes;
 	/// Stores the current set of connections to node signals (if any)
 	std::vector<sigc::connection> m_node_connections;
-	
+
 	/// Contains the other widgets
-	Gtk::VBox m_vbox;
+	Gtk::VBox m_main_widget;
 	/// Displays the current node name
 	Gtk::Label m_label;
-	/// Contains the set of node properties
-	Gtk::ScrolledWindow m_scrolled_window;
-	/// Provides a toolbar
-	k3d::ngui::auto_property_toolbar::control m_object_toolbar;
-	/// Provides a collection of property controls
-	k3d::ngui::auto_property_page::control m_object_properties;
-	
-	sigc::signal<void, const std::string&, const std::string&> m_command_signal;
+
+	/// Contains the standard auto-generated UI
+	Gtk::VBox m_auto_page;
+	/// Provides the standard auto-generated toolbar
+	k3d::ngui::auto_property_toolbar::control m_auto_toolbar;
+	/// Provides the standard auto-generated property controls
+	k3d::ngui::auto_property_page::control m_auto_properties;
+
+	/// Stores the (optional) custom UI
+	boost::scoped_ptr<k3d::ngui::custom_property_page::control> m_custom_page;
 
 	/// Signal that will be emitted whenever this control should grab the panel focus
 	sigc::signal<void> m_panel_grab_signal;
@@ -284,10 +334,7 @@ public:
 
 		m_implementation = new detail::implementation(DocumentState, *this);
 
-		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
-		m_implementation->m_scrolled_window.signal_button_press_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
-
-		pack_start(m_implementation->m_vbox, Gtk::PACK_EXPAND_WIDGET);
+		pack_start(m_implementation->m_main_widget, Gtk::PACK_EXPAND_WIDGET);
 		show_all();
 	}
 
