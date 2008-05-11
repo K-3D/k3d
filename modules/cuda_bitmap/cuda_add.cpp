@@ -22,7 +22,6 @@
 */
 
 #include "simple_modifier.h"
-#include <k3dsdk/log.h>
 #include <k3dsdk/high_res_timer.h>
 
 #include <k3dsdk/document_plugin_factory.h>
@@ -49,10 +48,14 @@ class cuda_add :
 public:
 	cuda_add(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_value(init_owner(*this) + init_name("value") + init_label(_("Add value")) + init_description(_("Add value to each pixel's Red, Green and Blue component")) + init_value(0.0))
+		m_value(init_owner(*this) + init_name("value") + init_label(_("Add value")) + init_description(_("Add value to each pixel's Red, Green and Blue component")) + init_value(0.0)),
+		m_host_to_device_time(init_owner(*this) + init_name("host_to_device_time") + init_label(_("Host to device time")) + init_description(_("Timer for measuring host to device transfer time")) + init_value(0.0)),
+		m_kernel_time(init_owner(*this) + init_name("kernel_time") + init_label(_("Kernel time")) + init_description(_("Timer for measuring kernel execution time")) + init_value(0.0)),
+		m_device_to_host_time(init_owner(*this) + init_name("device_to_host_time") + init_label(_("Device to host time")) + init_description(_("Timer for measuring device to host transfer time")) + init_value(0.0))
 	{
 		m_value.changed_signal().connect(make_update_bitmap_slot());
 	}
+
 
 	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
@@ -60,27 +63,25 @@ public:
 		const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
 		unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));
 		
-		k3d::log() << info << "Starting CUDA BitmapAdd" << std::endl;
 		// intialize CUDA - should check for errors etc
 		CUDA_initialize_device();
 		
 		timer.restart();
 		// copy the data to the device
 		bitmap_copy_data_from_host_to_device(inputPixels, Input.width(), Input.height());
-		double host_to_device = timer.elapsed();
+		m_host_to_device_time.set_value(timer.elapsed());
+		
 		timer.restart();
 		// perform the calculation
 		bitmap_add_entry(Input.width(), Input.height(), (float)(m_value.pipeline_value()));
-		double execution = timer.elapsed();
+		m_kernel_time.set_value(timer.elapsed());
+		
 		timer.restart();
 		// copy the data from the device
 		bitmap_copy_data_from_device_to_host(outputPixels, Input.width(), Input.height());
-		double device_to_host = timer.elapsed();
+		m_device_to_host_time.set_value(timer.elapsed());
 		// cleanup the memory allocated on the device
 		CUDA_cleanup();
-		
-		k3d::log() << info << "CUDA timing : " << host_to_device << " | " << execution << " | " << device_to_host << " || " << host_to_device + execution + device_to_host << std::endl;
-		
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -99,6 +100,10 @@ public:
 
 private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_value;
+	// private member containers for timing measurements
+	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, script_property, with_serialization) m_host_to_device_time;
+	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, script_property, with_serialization) m_kernel_time;
+	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, script_property, with_serialization) m_device_to_host_time;
 };
 
 /////////////////////////////////////////////////////////////////////////////

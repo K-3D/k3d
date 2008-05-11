@@ -219,7 +219,7 @@ __global__ void add_kernel (ushort4 *image_RGBA, int width, int height, float va
         image_RGBA[idx].y = floatToHalf(pixelFloat.y);
         image_RGBA[idx].z = floatToHalf(pixelFloat.z);
     }
-		
+	__syncthreads();
 } 
 
 
