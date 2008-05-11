@@ -5,13 +5,15 @@ IF(NOT WIN32)
 
 	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/make-wiki-docs.py ${CMAKE_CURRENT_BINARY_DIR}/make-wiki-docs.py)
 	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext)
-	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins)
+	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/articles)
+	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/categories)
 	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/reference)
 
 	ADD_CUSTOM_TARGET(docs-wiki
 		COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/articles
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/categories
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/reference
 		COMMAND ${k3d_BINARY_DIR}/bin/k3d --log-level=debug --color
 		--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins

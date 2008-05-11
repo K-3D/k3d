@@ -6,20 +6,80 @@ import os
 
 doc = k3d.new_document()
 
-plugins = {}
+# Generate a mapping of categories to plugins ...
+categories = { "All" : [], "Stable" : [], "Experimental" : [], "Deprecated" : [] }
+
 for plugin in k3d.plugins():
-	plugins[plugin.name] = plugin
+	categories["All"].append(plugin)
 
-sorted_plugins = plugins.keys()
-sorted_plugins.sort()
+	if plugin.quality() == "stable":
+		categories["Stable"].append(plugin)
+	elif plugin.quality() == "experimental":
+		categories["Experimental"].append(plugin)
+	elif plugin.quality() == "deprecated":
+		categories["Deprecated"].append(plugin)
 
-for plugin_name in sorted_plugins:
-	plugin = plugins[plugin_name]
+	for category in plugin.categories():
+		if category not in categories:
+			categories[category] = []
+		categories[category].append(plugin)
 
-	factory_id = plugin.factory_id()
-	plugin_name = plugin.name()
-	plugin_description = plugin.short_description()
+# Create the main article for each plugin ...
+for plugin in k3d.plugins():
+	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/articles/" + plugin.name(), "w")
+	article.write("<plugin>{{PAGENAME}}</plugin>\n")
+
+# Create an article listing every plugin category ...
+article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/categories/Plugin Categories", "w")
+article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
+
+article.write("""<table border="1" cellpadding="5" cellspacing="0">\n""")
+article.write("""<tr><th>Plugin Categories</th></tr>\n""")
+
+for category in sorted(categories.keys()):
+	article.write("""<tr><td>[[""" + category + " Plugins]]</td></tr>\n""")
+
+article.write("""<table>\n""")
+
+article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
+
+# Create an article for each plugin category ...
+for category in categories.keys():
+	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/categories/" + category + " Plugins", "w")
+	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
+
+	def plugin_sort(lhs, rhs):
+		if lhs.name() < rhs.name():
+			return -1
+		elif lhs.name() == rhs.name():
+			return 0
+		return 1
+
+	article.write("""<table border="0" cellpadding="5" cellspacing="0">\n""")
+	article.write("""<tr><td><b>Category:</b></td><td>""" + category + """</td></tr>\n""")
+	article.write("""<tr><td><b>Plugins:</b></td><td>""" + str(len(categories[category])) + """</td></tr>\n""")
+	article.write("""</table>\n""")
+
+	article.write("""<table border="1" cellpadding="5" cellspacing="0">\n""")
+	article.write("""<tr><th>Icon</th><th>Plugin</th><th>Description</th></tr>\n""")
+
+	for plugin in sorted(categories[category], plugin_sort):
+		article.write("""<tr>""")
+
+		if os.path.exists("@share_SOURCE_DIR@/ngui/rasterized/" + plugin.name() + ".png"):
+			article.write("""<td>[[Image:""" + plugin.name() + """.png]]</td>""")
+		else:
+			article.write("""<td>&nbsp;</td>""")
 	
+		article.write("""<td>[[""" + plugin.name() + """]]</td><td>""" + plugin.short_description() + """</td></tr>\n""")
+
+	article.write("""</table>\n""")
+
+	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
+
+# Create the reference documentation for each plugin ...
+for plugin in k3d.plugins():
+
 	plugin_quality = ""
 	if plugin.quality() == "stable":
 		plugin_quality = "Stable"
@@ -28,56 +88,57 @@ for plugin_name in sorted_plugins:
 	elif plugin.quality() == "deprecated":
 		plugin_quality = "Deprecated"
 
-	overview = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/" + plugin_name, "w")
-	overview.write("<plugin>{{PAGENAME}}</plugin>\n")
+	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/reference/" + plugin.name(), "w")
+	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
 
-	detail = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/reference/" + plugin_name, "w")
-	detail.write("<!-- Machine-generated file, do not edit by hand! -->\n")
+	article.write("== Description == " + "\n")
+	
+	article.write("{| border=\"0\" cellpadding=\"5\" cellspacing=\"0\"\n")
+	article.write("|-\n")
 
-	detail.write("== Description == " + "\n")
+	if os.path.exists("@share_SOURCE_DIR@/ngui/rasterized/" + plugin.name() + ".png"):
+		article.write("|[[Image:" + plugin.name() + ".png]]\n")
 	
-	detail.write("{| border=\"0\" cellpadding=\"5\" cellspacing=\"0\"\n")
-	detail.write("|-\n")
+	article.write("|" + plugin.short_description() + "\n")
+	article.write("|}\n")
+	
+	article.write("""<table border="0" cellpadding="5" cellspacing="0">\n""")
+	article.write("""<tr><td><b>Plugin Status:</b></td><td>[[Plugin Status|""" + plugin_quality + """]]</td></tr>\n""")
 
-	if os.path.exists("@share_SOURCE_DIR@/ngui/rasterized/" + plugin_name + ".png"):
-		detail.write("|[[Image:" + plugin_name + ".png]]\n")
-	
-	detail.write("|" + plugin_description + "\n")
-	detail.write("|}\n")
-	
-	detail.write("== Status == " + "\n")
-	detail.write("[[Plugin Status|" + plugin_quality + "]]\n")
+	article.write("""<tr><td><b>Categories:</b></td><td>""")
+	article.write("""[[All Plugins]]""")
+	article.write(""", [[""" + plugin_quality + " Plugins]]""")
+	for category in plugin.categories():
+		article.write(""", [[""" + category + " Plugins]]""")
+	article.write("""</td></tr>\n""")
+
+	article.write("""</table>\n""")
 
 	if plugin.is_document_plugin():
-		node = doc.new_node(plugin_name)
+		node = doc.new_node(plugin.name())
 
-		detail.write("== Properties == " + "\n")
+		article.write("== Properties == " + "\n")
 
-		detail.write("{| border=\"1\" cellpadding=\"5\" cellspacing=\"0\"\n")
-		detail.write("! Label\n")
-		detail.write("! Description\n")
-		detail.write("! Type\n")
-		detail.write("! Script Name\n")
+		article.write("{| border=\"1\" cellpadding=\"5\" cellspacing=\"0\"\n")
+		article.write("! Label\n")
+		article.write("! Description\n")
+		article.write("! Type\n")
+		article.write("! Script Name\n")
 
 		for property in node.properties():
 			# Skip the "name" property, which is a special-case ...
 			if property.name() == "name":
 				continue
 
-			detail.write("|-\n")
-			detail.write("|'''" + property.label() + "'''\n")
-			detail.write("|" + property.description() + "\n")
-			detail.write("|[[Property Types#" + property.type() + "|" + property.type() + "]]\n")
-			detail.write("|" + property.name() + "\n")
+			article.write("|-\n")
+			article.write("|'''" + property.label() + "'''\n")
+			article.write("|" + property.description() + "\n")
+			article.write("|[[Property Types#" + property.type() + "|" + property.type() + "]]\n")
+			article.write("|" + property.name() + "\n")
 
-		detail.write("|}\n")
+		article.write("|}\n")
 
-	detail.write("[[Category:Plugins]]\n")
-	detail.write("[[Category:" + plugin_quality + "]]\n")
-	for category in plugin.categories():
-		detail.write("[[Category:" + category + "]]\n")
-
-	detail.write("<!-- Machine-generated file, do not edit by hand! -->\n")
+	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
 
 k3d.close_document(doc)
 
