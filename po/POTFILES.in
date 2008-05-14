@@ -16,7 +16,9 @@ k3dsdk/mesh_painter_gl.h
 k3dsdk/mesh_selection_sink.h
 k3dsdk/mesh_sink.h
 k3dsdk/mesh_source.h
-k3dsdk/ngui/angle_axis_control.cpp
+k3dsdk/ngui/angle_axis.cpp
+k3dsdk/ngui/auto_property_page.cpp
+k3dsdk/ngui/auto_property_toolbar.cpp
 k3dsdk/ngui/bounding_box.cpp
 k3dsdk/ngui/collapsible_frame.cpp
 k3dsdk/ngui/context_menu.cpp
@@ -36,14 +38,13 @@ k3dsdk/ngui/node_chooser.cpp
 k3dsdk/ngui/node_collection_chooser.cpp
 k3dsdk/ngui/panel_frame.cpp
 k3dsdk/ngui/path_chooser.cpp
-k3dsdk/ngui/point_control.cpp
+k3dsdk/ngui/point3.cpp
 k3dsdk/ngui/properties.cpp
 k3dsdk/ngui/property_button.cpp
 k3dsdk/ngui/property_widget.cpp
 k3dsdk/ngui/render.cpp
 k3dsdk/ngui/rotate_tool.cpp
 k3dsdk/ngui/safe_close_dialog.cpp
-k3dsdk/ngui/scale_control.cpp
 k3dsdk/ngui/scale_tool.cpp
 k3dsdk/ngui/script_button.cpp
 k3dsdk/ngui/script_editor.cpp
@@ -106,6 +107,7 @@ modules/blobby/polygonize_blobbies.cpp
 modules/booleans/cgal_boolean_nodes.cpp
 modules/bundled_renderman_engines/aqsis.cpp
 modules/cloth/module.cpp
+modules/collada_io/mesh_reader.cpp
 modules/core/axes.cpp
 modules/core/camera.cpp
 modules/core/color_property.cpp
@@ -122,12 +124,15 @@ modules/core/show_matrix.cpp
 modules/core/snap.cpp
 modules/core/view_matrix.cpp
 modules/cuda_bitmap/cuda_add.cpp
+modules/cuda_bitmap/cuda_multiply.cpp
+modules/cuda_bitmap/cuda_subtract.cpp
 modules/deformation/bend_points.cpp
 modules/deformation/bulge_points.cpp
 modules/deformation/center_points.cpp
 modules/deformation/cylindrical_wave_points.cpp
 modules/deformation/linear_point_noise.cpp
 modules/deformation/linear_wave_points.cpp
+modules/deformation/morph_points.cpp
 modules/deformation/rotate_points.cpp
 modules/deformation/scale_points.cpp
 modules/deformation/shear_points.cpp
@@ -194,8 +199,10 @@ modules/ngui_animation_timeline_panel/panel.cpp
 modules/ngui_assign_hotkeys/dialog.cpp
 modules/ngui_command_node_inspector/dialog.cpp
 modules/ngui_event_recorder/dialog.cpp
+modules/ngui_knife_tool/tool.cpp
 modules/ngui_learning/dialog.cpp
 modules/ngui_log/dialog.cpp
+modules/ngui_morph_points_page/page.cpp
 modules/ngui_node_graph_panel/nodeGraph.cpp
 modules/ngui_node_history_panel/panel.cpp
 modules/ngui_node_list_panel/panel.cpp
@@ -206,6 +213,8 @@ modules/ngui_pipeline_panel/graph_source.h
 modules/ngui_pipeline_panel/panel.cpp
 modules/ngui_pipeline_profiler_panel/panel.cpp
 modules/ngui_render_region_tool/tool.cpp
+modules/ngui_snap_tool/snap_tool_detail.h
+modules/ngui_snap_tool/tool.cpp
 modules/ngui_test_case_recorder/dialog.cpp
 modules/ngui_timeline_panel/panel.cpp
 modules/ngui_tool_properties_panel/panel.cpp
@@ -214,6 +223,7 @@ modules/ngui_tutorial_recorder/dialog.cpp
 modules/ngui_undo_tree_panel/panel.cpp
 modules/nurbs/circle.cpp
 modules/nurbs/cone.cpp
+modules/nurbs/connect_curves.cpp
 modules/nurbs/curve.cpp
 modules/nurbs/cylinder.cpp
 modules/nurbs/disk.cpp
@@ -221,6 +231,7 @@ modules/nurbs/grid.cpp
 modules/nurbs/hyperboloid.cpp
 modules/nurbs/paraboloid.cpp
 modules/nurbs/polygon.cpp
+modules/nurbs/set_weight.cpp
 modules/nurbs/sphere.cpp
 modules/nurbs/torus.cpp
 modules/obj_io/mesh_reader.cpp
@@ -403,6 +414,7 @@ modules/virtual_opengl_painters/sds_edge_painter.cpp
 modules/virtual_opengl_painters/sds_face_painter.cpp
 modules/virtual_opengl_painters/sds_point_painter.cpp
 modules/wgl/camera_to_bitmap.cpp
+modules/windows/disable_desktop_composition.cpp
 modules/windows/uri_handler.cpp
 modules/yafray/area_light.cpp
 modules/yafray/global_photon_light.cpp
