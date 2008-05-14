@@ -80,6 +80,14 @@ public:
 		if(test_type(".sun", "image/x-sun-raster", File, FileType)) return true;
 		if(test_type(".tif", "image/tiff", File, FileType)) return true;
 		if(test_type(".tiff", "image/tiff", File, FileType)) return true;
+		
+		// OpenCascade types
+		if(test_type(".rle", "application/x-brep", File, FileType)) return true;
+		if(test_type(".brep", "application/x-brep", File, FileType)) return true;
+		if(test_type(".igs", "application/x-iges", File, FileType)) return true;
+		if(test_type(".iges", "application/x-iges", File, FileType)) return true;
+		if(test_type(".step", "application/x-step", File, FileType)) return true;
+		if(test_type(".stp", "application/x-step", File, FileType)) return true;
 
 		return false;
 	}

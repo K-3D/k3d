@@ -29,13 +29,15 @@ namespace module
 namespace opencascade
 {
 
-extern k3d::iplugin_factory& step_mesh_reader_factory();
+extern k3d::iplugin_factory& opencascade_document_importer_factory();
+extern k3d::iplugin_factory& opencascade_mesh_reader_factory();
 
 } // opencascade
 
 } // module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::opencascade::step_mesh_reader_factory());
+	Registry.register_factory(module::opencascade::opencascade_document_importer_factory());
+	Registry.register_factory(module::opencascade::opencascade_mesh_reader_factory());
 K3D_MODULE_END
 

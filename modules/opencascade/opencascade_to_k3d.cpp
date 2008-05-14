@@ -27,10 +27,15 @@
 #include <k3dsdk/gprim_factory.h>
 #include <k3dsdk/path.h>
 
+#include <BRep_Builder.hxx>
+#include <BRepBuilderAPI_Sewing.hxx>
 #include <BRep_Tool.hxx>
+#include <BRepTools.hxx>
 #include <BRepTools_WireExplorer.hxx>
+#include <Geom2d_BezierCurve.hxx>
 #include <Geom2d_BSplineCurve.hxx>
 #include <Geom2d_Curve.hxx>
+#include <Geom2d_TrimmedCurve.hxx>
 #include <GeomAbs_Shape.hxx>
 #include <GeomConvert.hxx>
 #include <Geom_BSplineCurve.hxx>
@@ -39,14 +44,23 @@
 #include <Geom_RectangularTrimmedSurface.hxx>
 #include <Geom_Surface.hxx>
 #include <gp_Pnt2d.hxx>
+#include <IGESCAFControl_Reader.hxx>
 #include <ShapeAnalysis_Surface.hxx>
+#include <ShapeConstruct_CompBezierCurves2dToBSplineCurve2d.hxx>
 #include <ShapeCustom.hxx>
 #include <ShapeCustom_RestrictionParameters.hxx>
+#include <ShapeFix_Shape.hxx>
+#include <ShapeUpgrade_ConvertCurve2dToBezier.hxx>
 #include <ShapeUpgrade_ShapeDivideAngle.hxx>
 #include <ShapeUpgrade_ShapeConvertToBezier.hxx>
 #include <Standard_Failure.hxx>
 #include <STEPCAFControl_Reader.hxx>
+#include <TColgp_Array1OfPnt2d.hxx>
+#include <TColStd_Array1OfReal.hxx>
+#include <TColStd_Array1OfInteger.hxx>
+#include <TColGeom2d_HArray1OfCurve.hxx>
 #include <TDataStd_Name.hxx>
+#include <TDataStd_Shape.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_Label.hxx>
 #include <TDF_LabelSequence.hxx>
@@ -59,7 +73,6 @@
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Wire.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
-#include <XCAFDoc_ShapeTool.hxx>
 
 #include "opencascade_to_k3d.h"
 
@@ -147,6 +160,8 @@ void on_nurbs_curve(const Handle(Geom_BSplineCurve)& Curve, k3d::gprim_factory& 
 
 void on_trim_curve(const Handle(Geom2d_BSplineCurve)& Curve, const Handle(Geom_Surface)& Surface, const Handle(Geom_Surface)& NurbsSurface, const double Precision, k3d::gprim_factory& Factory)
 {
+	if (Curve.IsNull())
+		return;
 	k3d::int32_t n_poles = Curve->NbPoles();
 	k3d::mesh::points_2d_t points;
 	k3d::mesh::weights_t weights;
@@ -202,9 +217,142 @@ void on_trim_curve(const Handle(Geom2d_BSplineCurve)& Curve, const Handle(Geom_S
 	Factory.add_trim_curve(order, points, knots, weights);
 }
 
-// process surface components
+
+// process a face
+void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const double Precision)
+{
+	const double maxsize = 1000; // Maximum size of the bbox in any direction 
+	const TopoDS_Face& face = Face;
+	Handle(Geom_Surface) surface = BRep_Tool::Surface(face);
+	TopExp_Explorer wire_explorer;
+	Handle(Geom_BSplineSurface) nurbs_surface = Handle(Geom_BSplineSurface)::DownCast(surface);
+	if (nurbs_surface.IsNull()) // Entered when somehow the global NURBS conversion yielded a non-NURBS face
+	{
+		k3d::log() << debug << "Performing explicit conversion to NURBS" << std::endl; 
+		double umin, umax, vmin, vmax;
+		surface->Bounds(umin, umax, vmin, vmax);
+		// Make sure we are within our predefined maximum size
+		if (umin < -maxsize) umin = -maxsize;
+		if (vmin < -maxsize) vmin = -maxsize;
+		if (umax > maxsize) umax = maxsize;
+		if (vmax > maxsize) vmax = maxsize;
+		try
+		{
+			Handle(Geom_Surface) bounded_surface = new Geom_RectangularTrimmedSurface(surface, umin, umax, vmin, vmax);
+			nurbs_surface = GeomConvert::SurfaceToBSplineSurface(bounded_surface);
+		}
+		catch(Standard_Failure& Exception)
+		{
+			k3d::log() << warning << "Conversion to NURBS failed: " << Exception.GetMessageString() << ". Skipping face." << std::endl;
+			return;
+		}
+	}
+	if (!on_bspline_surface(nurbs_surface, Factory))
+	{
+		return;
+	}
+	// Visit trim curves in their connected order, and add them to the mesh
+	for (wire_explorer.Init(face, TopAbs_WIRE); wire_explorer.More(); wire_explorer.Next()) // wires (trim curve loops)
+	{
+		TopAbs_Orientation wire_orientation = wire_explorer.Current().Orientation();
+		if (wire_orientation != TopAbs_FORWARD && wire_orientation != TopAbs_REVERSED) // not a trim curve loop
+			continue;
+		
+		BRepTools_WireExplorer trim_explorer;
+		// Stores curves in the order they need to be processed, reversing curves if needed
+		typedef std::deque<Handle(Geom2d_BSplineCurve)> curves_t;
+		curves_t curves;
+		for (trim_explorer.Init(TopoDS::Wire(wire_explorer.Current()), face); trim_explorer.More(); trim_explorer.Next())
+		{
+			TopAbs_Orientation edge_orientation = trim_explorer.Current().Orientation();
+			if (edge_orientation != TopAbs_FORWARD && edge_orientation != TopAbs_REVERSED)
+				k3d::log() << warning << "Invalid trim curve orientation" << std::endl;
+			double first = 0.0;
+			double last = 0.0;
+			Handle(Geom2d_Curve) curve = BRep_Tool::CurveOnSurface(TopoDS::Edge(trim_explorer.Current()), face, first, last);
+			if (curve.IsNull())
+			{
+				k3d::log() << warning << "Skipping null trim curve" << std::endl;
+				continue;
+			}
+			if (first < -maxsize) first = -maxsize;
+			if (last > maxsize) last = maxsize;
+			Handle(Geom2d_BSplineCurve) nurbs_trim = Handle(Geom2d_BSplineCurve)::DownCast(curve);
+			if (nurbs_trim.IsNull()) // Encountered a non-NURBS trim curve, do explicit conversion
+			{
+				// Trim the curve, so the converter knows the endpoints
+				Handle(Geom2d_TrimmedCurve) trimmed_curve = new Geom2d_TrimmedCurve(curve, first, last);
+				try
+				{
+					ShapeUpgrade_ConvertCurve2dToBezier trim_to_bezier;
+					trim_to_bezier.Init(trimmed_curve);
+					trim_to_bezier.Perform(true);
+					const Handle(TColGeom2d_HArray1OfCurve)& bezier_curves = trim_to_bezier.GetCurves();
+					ShapeConstruct_CompBezierCurves2dToBSplineCurve2d bezier_to_bspline;
+					for (k3d::int32_t i = bezier_curves->Lower(); i <= bezier_curves->Upper(); ++i)
+					{
+						const Handle(Geom2d_Curve)& collected_curve = bezier_curves->Value(i);
+						Handle(Geom2d_BezierCurve) bezier_curve = Handle(Geom2d_BezierCurve)::DownCast(collected_curve);
+						return_if_fail(!bezier_curve.IsNull());
+						TColgp_Array1OfPnt2d poles(1, bezier_curve->NbPoles());
+						bezier_curve->Poles(poles);
+						bezier_to_bspline.AddCurve(poles);
+					}
+					bezier_to_bspline.Perform();
+					TColgp_Array1OfPnt2d poles(1, bezier_to_bspline.NbPoles());
+					TColStd_Array1OfReal knots(1, bezier_to_bspline.NbKnots());
+					TColStd_Array1OfInteger multiplicities(1, bezier_to_bspline.NbKnots());
+					bezier_to_bspline.Poles(poles);
+					bezier_to_bspline.KnotsAndMults(knots, multiplicities);
+					nurbs_trim = new Geom2d_BSplineCurve(poles, knots, multiplicities, bezier_to_bspline.Degree());
+					return_if_fail(!nurbs_trim.IsNull());
+				}
+				catch(...)
+				{
+					k3d::log() << warning << "Failed converting trim curve to NURBS" << std::endl;
+					return;
+				}
+			}
+			
+			Handle(Geom_Curve) curve_3d = BRep_Tool::Curve(TopoDS::Edge(trim_explorer.Current()), first, last);
+			if (!curve_3d.IsNull())
+			{
+				Handle(Geom_BSplineCurve) nurbs_curve_3d = Handle(Geom_BSplineCurve)::DownCast(curve_3d);
+				if (!nurbs_curve_3d.IsNull()) // Ignore 3D curves that were skipped in the conversion to NURBS
+					on_nurbs_curve(nurbs_curve_3d, Factory);
+			}
+			
+			if (edge_orientation != wire_orientation)
+				nurbs_trim->Reverse();
+			if (wire_orientation == TopAbs_FORWARD)
+			{
+				curves.push_back(nurbs_trim);
+			}
+			else
+			{
+				curves.push_front(nurbs_trim);
+			}
+		}
+		for (curves_t::iterator curve = curves.begin(); curve != curves.end(); ++curve)
+		{
+			on_trim_curve(*curve, surface, nurbs_surface, Precision, Factory);
+		}
+		if (!curves.empty())
+			Factory.close_trim_loop();
+	}
+}
+
+// process surface components (Shape should at least be a Shell)
 void process_surface(const TopoDS_Shape& Shape, k3d::gprim_factory& Factory)
 {
+	// Attempt some global shape fixing, as suggested by Matthias Teich on the OpenCascade forum.
+	ShapeFix_Shape fixer(Shape);
+	fixer.Perform();
+	BRepBuilderAPI_Sewing sew;
+	sew.Add(fixer.Shape());
+	sew.Perform();
+	const TopoDS_Shape& sewed_shape = sew.SewedShape();
+	return_if_fail(!sewed_shape.IsNull());
 	// Global precision for the conversion to NURBS
 	const double precision = 1e-4;
 	// Split up conversion by shell, to conserve memory
@@ -267,87 +415,7 @@ void process_surface(const TopoDS_Shape& Shape, k3d::gprim_factory& Factory)
 			TopExp_Explorer face_explorer;
 			for (face_explorer.Init(nurbs_shape,TopAbs_FACE); face_explorer.More(); face_explorer.Next())
 			{
-				const double maxsize = 1000; // Maximum size of the bbox in any direction 
-				const TopoDS_Face& face = TopoDS::Face(face_explorer.Current());
-				Handle(Geom_Surface) surface = BRep_Tool::Surface(face);
-				TopExp_Explorer wire_explorer;
-				Handle(Geom_BSplineSurface) nurbs_surface = Handle(Geom_BSplineSurface)::DownCast(surface);
-				if (nurbs_surface.IsNull()) // Entered when somehow the global NURBS conversion yielded a non-NURBS face
-				{
-					k3d::log() << debug << "Performing explicit conversion to NURBS" << std::endl; 
-					double umin, umax, vmin, vmax;
-					surface->Bounds(umin, umax, vmin, vmax);
-					// Make sure we are within our predefined maximum size
-					if (umin < -maxsize) umin = -maxsize;
-					if (vmin < -maxsize) vmin = -maxsize;
-					if (umax > maxsize) umax = maxsize;
-					if (vmax > maxsize) vmax = maxsize;
-					try
-					{
-						Handle(Geom_Surface) bounded_surface = new Geom_RectangularTrimmedSurface(surface, umin, umax, vmin, vmax);
-						nurbs_surface = GeomConvert::SurfaceToBSplineSurface(bounded_surface);
-					}
-					catch(Standard_Failure& Exception)
-					{
-						k3d::log() << warning << "Conversion to NURBS failed: " << Exception.GetMessageString() << ". Skipping face." << std::endl;
-						continue;
-					}
-				}
-				if (!on_bspline_surface(nurbs_surface, Factory))
-					continue;
-				// Visit trim curves in their connected order, and add them to the mesh
-				k3d::uint_t loop = 0;
-				for (wire_explorer.Init(face_explorer.Current(),TopAbs_WIRE); wire_explorer.More(); wire_explorer.Next()) // wires (trim curve loops)
-				{
-					TopAbs_Orientation wire_orientation = wire_explorer.Current().Orientation();
-					if (wire_orientation != TopAbs_FORWARD && wire_orientation != TopAbs_REVERSED) // not a trim curve loop
-						continue;
-					
-					BRepTools_WireExplorer trim_explorer;
-					// Stores curves in the order they need to be processed, reversing curves if needed
-					typedef std::deque<Handle(Geom2d_BSplineCurve)> curves_t;
-					curves_t curves;
-					for (trim_explorer.Init(TopoDS::Wire(wire_explorer.Current()), face); trim_explorer.More(); trim_explorer.Next())
-					{
-						TopAbs_Orientation edge_orientation = trim_explorer.Current().Orientation();
-						if (edge_orientation != TopAbs_FORWARD && edge_orientation != TopAbs_REVERSED)
-							k3d::log() << warning << "Invalid trim curve orientation" << std::endl;
-						double first = 0.0;
-						double last = 0.0;
-						Handle(Geom2d_Curve) curve = BRep_Tool::CurveOnSurface(TopoDS::Edge(trim_explorer.Current()), face, first, last);
-						if (first < -maxsize) first = -maxsize;
-						if (last > maxsize) last = maxsize;
-						Handle(Geom2d_BSplineCurve) nurbs_trim = Handle(Geom2d_BSplineCurve)::DownCast(curve);
-						if (nurbs_trim.IsNull())
-							k3d::log() << warning << "Non-NURBS trim curve!" << std::endl;
-						
-						Handle(Geom_Curve) curve_3d = BRep_Tool::Curve(TopoDS::Edge(trim_explorer.Current()), first, last);
-						if (!curve_3d.IsNull())
-						{
-							Handle(Geom_BSplineCurve) nurbs_curve_3d = Handle(Geom_BSplineCurve)::DownCast(curve_3d);
-							if (nurbs_curve_3d.IsNull())
-								k3d::log() << warning << "Non-NURBS 3d curve!" << std::endl;
-							on_nurbs_curve(nurbs_curve_3d, Factory);
-						}
-						
-						if (edge_orientation != wire_orientation)
-							nurbs_trim->Reverse();
-						if (wire_orientation == TopAbs_FORWARD)
-						{
-							curves.push_back(nurbs_trim);
-						}
-						else
-						{
-							curves.push_front(nurbs_trim);
-						}
-					}
-					for (curves_t::iterator curve = curves.begin(); curve != curves.end(); ++curve)
-					{
-						on_trim_curve(*curve, surface, nurbs_surface, precision, Factory);
-					}
-					Factory.close_trim_loop();
-					++loop;
-				}
+				process_face(TopoDS::Face(face_explorer.Current()), Factory, precision);
 			}
 		}
 		catch(Standard_Failure& Exception)
@@ -359,6 +427,51 @@ void process_surface(const TopoDS_Shape& Shape, k3d::gprim_factory& Factory)
 			k3d::log() << warning << "Unknown error converting shell" << std::endl;
 		}
 	}
+	// Explore all faces not part of a shell
+	
+	for (TopExp_Explorer lost_face_explorer(Shape, TopAbs_FACE, TopAbs_SHELL); lost_face_explorer.More(); lost_face_explorer.Next())
+	{
+		try
+		{
+			process_face(TopoDS::Face(lost_face_explorer.Current()), Factory, precision);
+		}
+		catch(Standard_Failure& Exception)
+		{
+			k3d::log() << warning << "Error converting lost face: " << Exception.GetMessageString() << std::endl; 
+		}
+		catch(...)
+		{
+			k3d::log() << warning << "Unknown error converting a lost face" << std::endl;
+		}
+	}
+}
+
+template<typename ReaderT> void load_file(const k3d::filesystem::path& FilePath, const TCollection_ExtendedString& TypeName, implementation* Implementation)
+{
+	ReaderT reader; // create a CAF reader, which supports reading attributes like shape names, colors, ...
+	reader.SetNameMode(true); // Make sure we read names
+	IFSelect_ReturnStatus status = reader.ReadFile(const_cast<char*>(FilePath.native_filesystem_string().c_str())); // Read the file
+	if(status != IFSelect_RetDone)
+	{
+		k3d::log() << error << k3d_file_reference << ": error opening [" << FilePath.native_console_string() << "]" << std::endl;
+		throw std::exception();
+	}
+	
+	Implementation->xde_doc = new TDocStd_Document(TypeName); // initialise an empty document
+	if (!reader.Transfer(Implementation->xde_doc)) // attempt to transfer the STEP file contents to the document
+	{
+		k3d::log() << error << "Failed to transfer OpenCascade file" << std::endl;
+		throw std::exception();
+	}
+	
+	if(!XCAFDoc_DocumentTool::IsXCAFDocument(Implementation->xde_doc)) // sanity check
+	{
+		k3d::log() << error << "Invalid document" << std::endl;
+		throw std::exception();
+	}
+	
+	TDF_Label shaperoot = XCAFDoc_DocumentTool::ShapesLabel(Implementation->xde_doc->Main()); // get the root node for the geometric shapes
+	Implementation->shapes.push(TDF_ChildIterator(shaperoot));
 }
 
 } // namespace detail
@@ -366,38 +479,33 @@ void process_surface(const TopoDS_Shape& Shape, k3d::gprim_factory& Factory)
 opencascade_document_processor::opencascade_document_processor(const k3d::filesystem::path& FilePath)
 {
 	m_implementation = new detail::implementation;
-	const std::string extension = k3d::filesystem::extension(FilePath).raw();
+	std::string extension = k3d::filesystem::extension(FilePath).lowercase().raw();
 	k3d::log() << debug << "Loading file with extension " << extension << std::endl;
 	if (extension == ".stp" || extension == ".step")
 	{
-		STEPCAFControl_Reader step_reader; // create a STEPCAF reader, which supports reading attributes like shape names, colors, ...
-		step_reader.SetNameMode(true); // Make sure we read names
-		IFSelect_ReturnStatus status = step_reader.ReadFile(const_cast<char*>(FilePath.native_filesystem_string().c_str())); // Read the file
-		if(status != IFSelect_RetDone)
-		{
-			k3d::log() << error << k3d_file_reference << ": error opening [" << FilePath.native_console_string() << "]" << std::endl;
-			throw std::exception();
-		}
-		
-		m_implementation->xde_doc = new TDocStd_Document("STEP"); // initialise an empty document
-		if (!step_reader.Transfer(m_implementation->xde_doc)) // attempt to transfer the STEP file contents to the document
-		{
-			k3d::log() << error << "Failed to transfer STEP file" << std::endl;
-			throw std::exception();
-		}
-		if(!XCAFDoc_DocumentTool::IsXCAFDocument(m_implementation->xde_doc)) // sanity check
-		{
-			k3d::log() << error << "Invalid document" << std::endl;
-			throw std::exception();
-		}
+		detail::load_file<STEPCAFControl_Reader>(FilePath, "STEP", m_implementation);
+	}
+	else if (extension == ".igs" || extension == ".iges")
+	{
+		detail::load_file<IGESCAFControl_Reader>(FilePath, "IGES", m_implementation);
+	}
+	else if (extension == ".brep" || extension == ".rle")
+	{
+		m_implementation->xde_doc = new TDocStd_Document("BREP");
+		TDF_Label shaperoot = m_implementation->xde_doc->Main().FindChild(1);
+		TopoDS_Shape shape;
+		BRep_Builder brep_builder;
+		if(BRepTools::Read(shape, const_cast<char*>(FilePath.native_filesystem_string().c_str()), brep_builder))
+			TDataStd_Shape::Set(shaperoot.NewChild(), shape);
+		else
+			k3d::log() << debug << "failed to find any shapes in BREP file" << std::endl;
+		m_implementation->shapes.push(TDF_ChildIterator(shaperoot));
 	}
 	else
 	{
 		k3d::log() << error << "File format not supported by OpenCascade importer" << std::endl;
 		throw std::exception();
 	}
-	TDF_Label shaperoot = XCAFDoc_DocumentTool::ShapesLabel(m_implementation->xde_doc->Main()); // get the root node for the geometric shapes
-	m_implementation->shapes.push(TDF_ChildIterator(shaperoot));
 }
 
 opencascade_document_processor::~opencascade_document_processor()
@@ -405,21 +513,22 @@ opencascade_document_processor::~opencascade_document_processor()
 	delete m_implementation;
 }
 
-void opencascade_document_processor::process_current(k3d::gprim_factory& Factory) const
+void opencascade_document_processor::process_current(k3d::gprim_factory& Factory, std::string& Name) const
 {
 	return_if_fail(!m_implementation->shapes.empty());
 	const TDF_Label label = m_implementation->shapes.top().Value();
 	return_if_fail(!label.IsNull());
 	Handle(TDataStd_Name) N;
-	std::string shape_name = "Unnamed shape";
+	std::stringstream string_stream;
 	if (label.FindAttribute(TDataStd_Name::GetID(),N))
 	{
-		std::stringstream string_stream;
 	  string_stream << N->Get();
-	  string_stream.str(shape_name);
 	}
+  Name = string_stream.str();
+  if (Name.empty())
+  	Name = "OpenCascade shape";
 	
-	TopoDS_Shape shape = XCAFDoc_ShapeTool::GetShape(label);
+	TopoDS_Shape shape = TDataStd_Shape::Get(label);
 	if (!shape.IsNull())
 	{
 		try
@@ -438,30 +547,26 @@ void opencascade_document_processor::process_current(k3d::gprim_factory& Factory
 			case TopAbs_SHELL:
 				detail::process_surface(shape, Factory);
 				break;
-			case TopAbs_FACE: // Note: all shapes below here should only be part of the shapes above here
-				k3d::log() << debug << "Found a TopAbs_FACE" << std::endl;
+			case TopAbs_FACE:
+				detail::process_face(TopoDS::Face(shape), Factory, 1e-4);
 				break;
-			case TopAbs_WIRE:
-				k3d::log() << debug << "Found a TopAbs_WIRE" << std::endl;
+			case TopAbs_WIRE:  // Note: all shapes below here should only be part of the shapes above here
 				break;
 			case TopAbs_EDGE:
-				k3d::log() << debug << "Found a TopAbs_EDGE" << std::endl;
 				break;
 			case TopAbs_VERTEX:
-				k3d::log() << debug << "Found a TopAbs_VERTEX" << std::endl;
 				break;
 			case TopAbs_SHAPE:
-				k3d::log() << debug << "Found a TopAbs_SHAPE" << std::endl;
 				break;
 			}
 		}
 		catch(Standard_Failure& Exception)
 		{
-			k3d::log() << warning << "Error converting shape " << shape_name << ": " << Exception.GetMessageString() << std::endl; 
+			k3d::log() << warning << "Error converting shape " << Name << ": " << Exception.GetMessageString() << std::endl; 
 		}
 		catch(...)
 		{
-			k3d::log() << warning << "Unknown error converting shape " << shape_name << std::endl;
+			k3d::log() << warning << "Unknown error converting shape " << Name << std::endl;
 		}
 	}
 	else

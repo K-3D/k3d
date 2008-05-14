@@ -47,8 +47,8 @@ public:
 	/// Initialise with path to OpenCascade-readable file.
 	opencascade_document_processor(const k3d::filesystem::path& FilePath);
 	~opencascade_document_processor();
-	/// Process the current node in the document using the supplied gprim_factory
-	void process_current(k3d::gprim_factory& Factory) const;
+	/// Process the current node in the document using the supplied gprim_factory. Name will contain the name of the node
+	void process_current(k3d::gprim_factory& Factory, std::string& Name) const;
 	/// True if the current node has children
 	bool has_children() const;
 	/// Increase the level, to explore the children of the current node. Silently fails if the level can not be increased

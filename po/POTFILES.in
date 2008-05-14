@@ -236,7 +236,7 @@ modules/nurbs/sphere.cpp
 modules/nurbs/torus.cpp
 modules/obj_io/mesh_reader.cpp
 modules/obj_io/mesh_writer.cpp
-modules/opencascade/step_mesh_reader.cpp
+modules/opencascade/opencascade_mesh_reader.cpp
 modules/openexr_io/bitmap_importer.cpp
 modules/opengl/material.cpp
 modules/opengl/render_engine.cpp

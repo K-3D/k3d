@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -45,7 +45,8 @@ namespace detail
 	{
 		for (; Document.more(); Document.next())
 		{
-			Document.process_current(Factory);
+			std::string name;
+			Document.process_current(Factory, name);
 			if (Document.has_children())
 			{
 				Document.increase_level();
@@ -56,14 +57,14 @@ namespace detail
 	}
 }
 
-class step_mesh_reader_implementation :
+class opencascade_mesh_reader_implementation :
 	public k3d::mesh_source<k3d::persistent<k3d::node> >,
 	public k3d::imesh_storage
 {
 	typedef k3d::mesh_source<k3d::persistent<k3d::node> > base;
 
 public:
-	step_mesh_reader_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	opencascade_mesh_reader_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("dxf_files"))
 	{
@@ -104,11 +105,11 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<step_mesh_reader_implementation,
+		static k3d::document_plugin_factory<opencascade_mesh_reader_implementation,
 	              k3d::interface_list<k3d::imesh_source,
 	              k3d::interface_list<k3d::imesh_storage> > > factory(
 			k3d::uuid(0x8e9c8376, 0x9f44e539, 0x90f9f7b7, 0x02ab8a1f),
-			"STEPMeshReader",
+			"OpenCascadeMeshReader",
 			_("Mesh reader that loads external STEP (.stp, .step) files into the document by reference"),
 			"MeshReader");
 	
@@ -120,9 +121,9 @@ private:
 		
 };
 
-k3d::iplugin_factory& step_mesh_reader_factory()
+k3d::iplugin_factory& opencascade_mesh_reader_factory()
 {
-	return step_mesh_reader_implementation::get_factory();
+	return opencascade_mesh_reader_implementation::get_factory();
 }
 
 } // opencascade
