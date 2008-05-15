@@ -1,11 +1,7 @@
-SET(CPACK_GENERATOR "NSIS")
-
-SET(CPACK_NSIS_HELP_LINK "http://www.k-3d.org/wiki/Support")
-SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\k3d.exe")
-SET(CPACK_NSIS_MENU_LINKS "http://www.k-3d.org/wiki/Support" "K-3D Help")
-SET(CPACK_NSIS_MUI_ICON "${share_SOURCE_DIR}/icons\\\\k3d.ico")
-SET(CPACK_PACKAGE_EXECUTABLES "k3d" "K-3D ${K3D_VERSION}")
-SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}\\\\headerimage.bmp")
-
-INCLUDE(CPack)
+# Generate NSIS installer
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/package-binary-nsis.cpack.in ${CMAKE_CURRENT_BINARY_DIR}/package-binary-nsis.cpack)
+ADD_CUSTOM_TARGET(package-binary-nsis
+	${CMAKE_CPACK_COMMAND}
+	--config ${CMAKE_CURRENT_BINARY_DIR}/package-binary-nsis.cpack
+	)
 
