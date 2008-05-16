@@ -33,22 +33,8 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
+#include <k3dsdk/xml.h>
 #include "gprim_factory.h"
-
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/log.h>
-#include <k3dsdk/module.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_source.h>
-#include <k3dsdk/material_sink.h>
-#include <k3dsdk/persistent.h>
-#include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/nurbs.h>
-#include <k3dsdk/measurement.h>
-#include <k3dsdk/selection.h>
-#include <k3dsdk/data.h>
-#include <k3dsdk/point3.h>
 
 namespace module
 {
@@ -84,51 +70,36 @@ public:
 
 	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
-		const k3d::filesystem::path path = m_file.pipeline_value();
-		if(path.empty())
+		const k3d::filesystem::path svg_path = m_file.pipeline_value();
+		if(svg_path.empty())
 			return;
 
-		k3d::log() << info << "Loading .svg file: " << path.native_console_string() << std::endl;
-		k3d::filesystem::ifstream file(path);
-		if(!file)
+		k3d::xml::element xml_svg;
+
+		try
 		{
-			k3d::log() << error << k3d_file_reference << ": error opening [" << path.native_console_string() << "]" << std::endl;
-			return;
+			k3d::log() << info << "Reading SVG file from " << svg_path.native_console_string() << std::endl;
+			k3d::filesystem::ifstream svg_stream(svg_path);
+			svg_stream >> xml_svg;
+			assert_warning(xml_svg.name == "svg");
 		}
-
-		LIBXML_TEST_VERSION
-		xmlDocPtr doc = NULL; 
-		xmlNodePtr root_element = NULL;
-		xmlNodePtr current = NULL;
-
-		doc = xmlParseFile("/home/karma/drawing.svg");
-		if (doc == NULL) {
-		    k3d::log() << error << "Failed to parse" << std::endl;
-		return;
+		catch(...)
+		{
+			k3d::log() << error << "Error reading SVG file from " << svg_path.native_console_string() << std::endl;
 		}
-		else
-			k3d::log() << debug << "SVG file parsed succesfully" << std::endl;
 
 		factory = new gprim_factory(Mesh);
+		k3d::xml::element& xml_g = xml_svg.safe_element("g");
 
-		root_element = xmlDocGetRootElement(doc);
-
-
-		current = xmlDocGetRootElement(doc);
-		current = current->xmlChildrenNode;
-		while(current!=NULL)
+		for(k3d::xml::element::elements_t::const_iterator xml_obj = xml_g.children.begin(); xml_obj != xml_g.children.end(); ++xml_obj)
 		{
-			if(!xmlStrcmp(current->name, (const xmlChar *)"g"))
-				parse_graphics(doc, current);
-			current = current->next;
+			if(xml_obj->name == "path")
+				parse_path(*xml_obj);
+			if(xml_obj->name == "rect")
+				parse_rect(*xml_obj);
+			k3d::log() << debug << "Va uno "<< xml_obj->name << std::endl;
 		}
-
-		xmlFreeDoc(doc);
-
-		xmlCleanupParser();
-
-		xmlMemoryDump();
-
+		
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Mesh)
@@ -153,35 +124,21 @@ private:
 	gprim_factory *factory;
 	int count;
 
-
-	void parse_graphics(xmlDocPtr doc, xmlNodePtr current)
-	{
-		current = current->xmlChildrenNode;
-		while(current!=NULL)
-		{
-			if(!xmlStrcmp(current->name, (const xmlChar *)"path"))
-				parse_path(doc, current);
-			if(!xmlStrcmp(current->name, (const xmlChar *)"rect"))
-				parse_rect(doc, current);
-			current = current->next;
-		}
-	}
-
-	void parse_rect(xmlDocPtr doc, xmlNodePtr current)
-	{
-		xmlChar *xx, *yy, *width, *height;
+	void parse_rect(k3d::xml::element xml_obj)
+	{	
 		double x, y, w, h;
 		k3d::mesh::indices_t rect;
+		const std::string xx = k3d::xml::attribute_text(xml_obj, "x");
+		const std::string yy = k3d::xml::attribute_text(xml_obj, "y");
+		const std::string width = k3d::xml::attribute_text(xml_obj, "width");
+		const std::string height = k3d::xml::attribute_text(xml_obj, "height");
 
-		xx = xmlGetProp(current, (const xmlChar *)"x");
-		yy = xmlGetProp(current, (const xmlChar *)"y");
-		width = xmlGetProp(current, (const xmlChar *)"width");
-		height = xmlGetProp(current, (const xmlChar *)"height");
-		
-		x = atof((const char *)xx);
-		y = atof((const char *)yy);
-		w = atof((const char *)width);
-		h = atof((const char *)height);
+		x = atof(xx.c_str());
+		y = atof(yy.c_str());
+		w = atof(width.c_str());
+		h = atof(height.c_str());
+
+		k3d::log() << debug << "parse_rect function not implemented yet! " << x << " " << y << " " << w << " " << h << std::endl;
 
 		rect.push_back(factory->add_point(k3d::point4(x,y,0,1))-1);
 		rect.push_back(factory->add_point(k3d::point4(x+w,y,0,1))-1);
@@ -194,22 +151,15 @@ private:
 	
 	}
 
-	void parse_path(xmlDocPtr doc, xmlNodePtr current)
+	void parse_path(k3d::xml::element xml_obj)
 	{
-		xmlChar *id;
-		xmlChar *curve;
-		k3d::mesh::indices_t path;
-		k3d::mesh::indices_t path2;
-		k3d::mesh::indices_t path3;
+		//k3d::mesh::indices_t path;
+		//k3d::mesh::indices_t path2;
+		//k3d::mesh::indices_t path3;
+		k3d::log() << debug << "parse_path function not implemented yet! " << std::endl;
+		//for(int i=0; i<4; i++)
+		//	path.push_back(i);
 
-		id = xmlGetProp(current, (const xmlChar *)"id");
-		curve = xmlGetProp(current, (const xmlChar *)"d");
-
-		for(int i=0; i<4; i++)
-			path.push_back(i);
-
-		//xmlFree(id);
-		//xmlFree(curve);
 	}
 
 };
