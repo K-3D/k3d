@@ -31,6 +31,7 @@ namespace cuda_bitmap
 extern k3d::iplugin_factory& cuda_add_factory();
 extern k3d::iplugin_factory& cuda_multiply_factory();
 extern k3d::iplugin_factory& cuda_subtract_factory();
+extern k3d::iplugin_factory& cuda_color_monochrome_factory();
 
 } // namespace cuda_bitmap
 
@@ -40,5 +41,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::cuda_bitmap::cuda_add_factory());
 	Registry.register_factory(module::cuda_bitmap::cuda_multiply_factory());
 	Registry.register_factory(module::cuda_bitmap::cuda_subtract_factory());
+	Registry.register_factory(module::cuda_bitmap::cuda_color_monochrome_factory());
 K3D_MODULE_END 
 

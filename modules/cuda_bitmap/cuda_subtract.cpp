@@ -100,7 +100,7 @@ public:
 private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_value;
 	// private member containers for timing measurements
-	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, script_property, with_serialization) m_host_to_device_time;
+	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, with_serialization) m_host_to_device_time;
 	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, script_property, with_serialization) m_kernel_time;
 	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, script_property, with_serialization) m_device_to_host_time;
 };

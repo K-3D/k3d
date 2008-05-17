@@ -245,4 +245,29 @@ __global__ void multiply_kernel (ushort4 *image_RGBA, int width, int height, flo
 	__syncthreads();
 }
 
+__global__ void color_monochrome_kernel ( ushort4 *image_RGBA, int width, int height, float redWeight, float greenWeight, float blueWeight)
+{
+	const int ix = blockDim.x * blockIdx.x + threadIdx.x;
+    const int iy = blockDim.y * blockIdx.y + threadIdx.y;
+    
+    if(ix < width && iy < height)
+    {
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        const int idx = width * iy + ix;
+        
+        float monoValue;
+        
+        monoValue = halfToFloat(image_RGBA[idx].x) * redWeight 
+        		  + halfToFloat(image_RGBA[idx].y) * greenWeight 
+        		  + halfToFloat(image_RGBA[idx].z) * blueWeight;  
+        
+        image_RGBA[idx].x = floatToHalf(monoValue);
+        image_RGBA[idx].y = floatToHalf(monoValue);
+        image_RGBA[idx].z = floatToHalf(monoValue);
+    }
+	__syncthreads();
+	
+	
+}
+ 
 #endif // #ifndef _CUDA_KERNELS_H_

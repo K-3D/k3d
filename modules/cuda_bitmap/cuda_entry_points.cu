@@ -70,6 +70,18 @@ extern "C" void bitmap_kernel_entry(int operation, int width, int height, float 
     cudaThreadSynchronize();
 }
 
+extern "C" void bitmap_color_monochrome_kernel_entry(int operation, int width, int height, float redWeight, float greenWeight, float blueWeight)
+{
+	// allocate the blocks and threads
+    dim3 threads_per_block(8, 8);
+    dim3 blocks_per_grid( iDivUp(width, 8), iDivUp(height,8));
+	
+	color_monochrome_kernel<<< blocks_per_grid, threads_per_block >>> (d_image, width, height, redWeight, greenWeight, blueWeight);
+    	
+    // check if the kernel executed correctly
+    CUT_CHECK_ERROR("Add Kernel execution failed");
+	
+}
 
 
 extern "C" void bitmap_copy_data_from_device_to_host(unsigned short *output, int width, int height)

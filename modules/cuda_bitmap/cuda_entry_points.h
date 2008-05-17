@@ -29,13 +29,14 @@
 #define CUDA_BITMAP_ADD 0x00
 #define CUDA_BITMAP_MULTIPLY 0x01
 #define CUDA_BITMAP_SUBTRACT 0x02
-
+#define CUDA_BITMAP_COLOR_MONOCHROME 0x03
 
 // forward declaration of the entry functions
 // split the entry functions for timing reasons
 extern "C" void CUDA_initialize_device();
 extern "C" void bitmap_copy_data_from_host_to_device(const unsigned short *input, int width, int height);
 extern "C" void bitmap_kernel_entry(int operation, int width, int height, float value);
+extern "C" void bitmap_color_monochrome_kernel_entry(int operation, int width, int height, float redWeight, float greenWeight, float blueWeight);
 extern "C" void bitmap_copy_data_from_device_to_host(unsigned short *output, int width, int height);
 extern "C" void CUDA_cleanup();
 
