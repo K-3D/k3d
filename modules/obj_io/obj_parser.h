@@ -28,6 +28,7 @@
 
 namespace k3d { class normal3; }
 namespace k3d { class point4; }
+namespace k3d { class texture3; }
 
 namespace module
 {
@@ -52,19 +53,19 @@ private:
 	/// \note All indices are zero-based, regardless of the contents of the OBJ file
 
 	virtual void on_curve_surface_end();
-	virtual void on_curve_surface_type(const std::string& Type);
-	virtual void on_degree(const size_t& UDegree, const size_t& VDegree);
+	virtual void on_curve_surface_type(const k3d::string_t& Type);
+	virtual void on_degree(const k3d::uint_t& UDegree, const k3d::uint_t& VDegree);
 	virtual void on_face(const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates, const k3d::mesh::indices_t& NormalCoordinates);
-	virtual void on_group(const std::string& Name);
+	virtual void on_group(const k3d::string_t& Name);
 	virtual void on_line(const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates);
-	virtual void on_material_library(const std::string& Name);
+	virtual void on_material_library(const k3d::string_t& Name);
 	virtual void on_normal_coordinates(const k3d::normal3& Normal);
-	virtual void on_object(const std::string& Name);
-	virtual void on_parameter(const std::string& Direction, const k3d::mesh::knots_t& Knots);
+	virtual void on_object(const k3d::string_t& Name);
+	virtual void on_parameter(const k3d::string_t& Direction, const k3d::mesh::knots_t& Knots);
 	virtual void on_points(const k3d::mesh::indices_t& VertexCoordinates);
-	virtual void on_surface(const double& S0, const double& S1, const double& T0, const double& T1, const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates, const k3d::mesh::indices_t& NormalCoordinates);
-	virtual void on_texture_coordinates(const k3d::point3& Texture);
-	virtual void on_use_material(const std::string& Name);
+	virtual void on_surface(const k3d::double_t& S0, const k3d::double_t& S1, const k3d::double_t& T0, const k3d::double_t& T1, const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates, const k3d::mesh::indices_t& NormalCoordinates);
+	virtual void on_texture_coordinates(const k3d::texture3& Texture);
+	virtual void on_use_material(const k3d::string_t& Name);
 	virtual void on_vertex_coordinates(const k3d::point4& Vertex);
 
 	/// @}
@@ -76,19 +77,19 @@ class print_obj :
 {
 private:
 	void on_curve_surface_end();
-	void on_curve_surface_type(const std::string& Type);
-	void on_degree(const size_t& UDegree, const size_t& VDegree);
+	void on_curve_surface_type(const k3d::string_t& Type);
+	void on_degree(const k3d::uint_t& UDegree, const k3d::uint_t& VDegree);
 	void on_face(const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates, const k3d::mesh::indices_t& NormalCoordinates);
-	void on_group(const std::string& Name);
+	void on_group(const k3d::string_t& Name);
 	void on_line(const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates);
-	void on_material_library(const std::string& Name);
+	void on_material_library(const k3d::string_t& Name);
 	void on_normal_coordinates(const k3d::normal3& Normal);
-	void on_object(const std::string& Name);
-	void on_parameter(const std::string& Direction, const k3d::mesh::knots_t& Knots);
+	void on_object(const k3d::string_t& Name);
+	void on_parameter(const k3d::string_t& Direction, const k3d::mesh::knots_t& Knots);
 	void on_points(const k3d::mesh::indices_t& VertexCoordinates);
-	void on_surface(const double& S0, const double& S1, const double& T0, const double& T1, const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates, const k3d::mesh::indices_t& NormalCoordinates);
-	void on_texture_coordinates(const k3d::point3& Texture);
-	void on_use_material(const std::string& Name);
+	void on_surface(const k3d::double_t& S0, const k3d::double_t& S1, const k3d::double_t& T0, const k3d::double_t& T1, const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates, const k3d::mesh::indices_t& NormalCoordinates);
+	void on_texture_coordinates(const k3d::texture3& Texture);
+	void on_use_material(const k3d::string_t& Name);
 	void on_vertex_coordinates(const k3d::point4& Vertex);
 };
 
