@@ -21,9 +21,7 @@
 	\author Carlos Andres Dominguez Caballero (carlos@gmail.com)
 */
 
-
-#include <libxml/parser.h>
-#include <libxml/tree.h>
+#include "gprim_factory.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -34,7 +32,6 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/xml.h>
-#include "gprim_factory.h"
 
 namespace module
 {
