@@ -83,7 +83,7 @@ private:
 	}
 
 	/// Stores profiling events
-	typedef std::map<k3d::inode*, std::map<k3d::string_t, double_t> > records_t;
+	typedef std::map<k3d::inode*, std::map<k3d::string_t, k3d::double_t> > records_t;
 	k3d_data(records_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_records;
 };
 
