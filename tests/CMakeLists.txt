@@ -109,6 +109,7 @@ K3D_ADD_TEST(test.script.failure.lang.python.py PYTHON XFAIL)
 K3D_ADD_TEST(test.script.failure.lang.python.exception.py PYTHON XFAIL)
 
 K3D_ADD_TEST(test.measurements.py PYTHON)
+K3D_ADD_TEST(test.PipelineProfiler.py PYTHON)
 
 K3D_ADD_TEST(property.linking.enumeration.py PYTHON)
 
@@ -294,7 +295,6 @@ K3D_ADD_TEST(ngui.tutorials.basic_selection NGUI TUTORIAL basic_selection.k3dscr
 K3D_ADD_TEST(ngui.tutorials.mug NGUI TUTORIAL mug.k3dscript)
 
 K3D_ADD_TEST(ngui.performance.sds.polycube.py PYTHON NGUI)
-
 
 K3D_ADD_TEST(bitmap.modifier.CUDABitmapAdd.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE REQUIRES K3D_BUILD_CUDA_BITMAP_MODULE)
 K3D_ADD_TEST(bitmap.modifier.CUDABitmapMultiply.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE REQUIRES K3D_BUILD_CUDA_BITMAP_MODULE)
