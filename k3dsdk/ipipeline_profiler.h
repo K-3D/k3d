@@ -2,7 +2,7 @@
 #define K3DSDK_IPIPELINE_PROFILER_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,12 +21,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
 #include "signal_system.h"
-#include <string>
+#include "types.h"
 
 namespace k3d
 {
@@ -39,17 +39,18 @@ class ipipeline_profiler :
 {
 public:
 	/// Called by a node to indicate that it has begun processing the given task.  Note: it is critical that every call to start_execution() is balanced with a call to finish_execution().
-	virtual void start_execution(inode& Node, const std::string& Task) = 0;
+	virtual void start_execution(inode& Node, const string_t& Task) = 0;
 	/// Called by a node to indicate that it has finished processing the given task.  Note: it is critical that every call to finish_execution() matches a call to start_execution().
-	virtual void finish_execution(inode& Node, const std::string& Task) = 0;
+	virtual void finish_execution(inode& Node, const string_t& Task) = 0;
+
 	/// Connects a slot that will be called to report the time in seconds that a node spent processing a given task
-	virtual sigc::connection connect_node_execution_signal(const sigc::slot<void, inode&, const std::string&, double>& Slot) = 0;
+	virtual sigc::connection connect_node_execution_signal(const sigc::slot<void, inode&, const string_t&, double>& Slot) = 0;
 
 	/// RAII helper class that records profile information for the current scope with return- and exception-safety
 	class profile
 	{
 	public:
-		profile(ipipeline_profiler& Profiler, inode& Node, const std::string& Task) :
+		profile(ipipeline_profiler& Profiler, inode& Node, const string_t& Task) :
 			profiler(Profiler),
 			node(Node),
 			task(Task)
@@ -68,7 +69,7 @@ public:
 		
 		ipipeline_profiler& profiler;
 		inode& node;
-		const std::string task;
+		const string_t task;
 	};
 
 protected:

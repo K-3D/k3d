@@ -2,7 +2,7 @@
 #define K3DSDK_PIPELINE_PROFILER_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "ipipeline_profiler.h"
@@ -37,9 +37,9 @@ public:
 	pipeline_profiler();
 	~pipeline_profiler();
 	
-	void start_execution(inode& Node, const std::string& Task);
-	void finish_execution(inode& Node, const std::string& Task);
-	sigc::connection connect_node_execution_signal(const sigc::slot<void, inode&, const std::string&, double>& Slot);
+	void start_execution(inode& Node, const string_t& Task);
+	void finish_execution(inode& Node, const string_t& Task);
+	sigc::connection connect_node_execution_signal(const sigc::slot<void, inode&, const string_t&, double>& Slot);
 
 private:
 	class implementation;

@@ -37,7 +37,7 @@ namespace k3d
 class pipeline_profiler::implementation
 {
 public:
-	sigc::signal<void, inode&, const std::string&, double> node_execution_signal;
+	sigc::signal<void, inode&, const string_t&, double> node_execution_signal;
 	std::stack<timer> timers;
 	std::stack<double> adjustments;
 };
@@ -55,13 +55,13 @@ pipeline_profiler::~pipeline_profiler()
 	delete m_implementation;
 }
 
-void pipeline_profiler::start_execution(inode& Node, const std::string& Task)
+void pipeline_profiler::start_execution(inode& Node, const string_t& Task)
 {
 	m_implementation->timers.push(timer());
 	m_implementation->adjustments.push(0.0);
 }
 
-void pipeline_profiler::finish_execution(inode& Node, const std::string& Task)
+void pipeline_profiler::finish_execution(inode& Node, const string_t& Task)
 {
 	return_if_fail(m_implementation->timers.size());
 
@@ -76,7 +76,7 @@ void pipeline_profiler::finish_execution(inode& Node, const std::string& Task)
 		m_implementation->adjustments.top() += elapsed;
 }
 
-sigc::connection pipeline_profiler::connect_node_execution_signal(const sigc::slot<void, inode&, const std::string&, double>& Slot)
+sigc::connection pipeline_profiler::connect_node_execution_signal(const sigc::slot<void, inode&, const string_t&, double>& Slot)
 {
 	return m_implementation->node_execution_signal.connect(Slot);
 }
