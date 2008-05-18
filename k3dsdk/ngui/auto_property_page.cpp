@@ -327,6 +327,10 @@ public:
 				else if(property_type == typeid(point4))
 				{
 				}
+				// Pipeline-profiler records ...
+				else if(property_type == typeid(std::map<inode*, std::map<string_t, double_t> >))
+				{
+				}
 				// Mesh Selection properties ...
 				else if(property_type == typeid(mesh_selection))
 				{

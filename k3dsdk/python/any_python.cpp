@@ -170,6 +170,28 @@ const object any_to_python(const boost::any& Value)
 		return results;
 	}
 
+	typedef std::map<k3d::string_t, k3d::double_t> profiler_task_records_t;
+	typedef std::map<k3d::inode*, profiler_task_records_t> profiler_node_records_t;
+	if(type == typeid(profiler_node_records_t))
+	{
+		boost::python::dict python_node_records;
+
+		profiler_node_records_t node_records = boost::any_cast<profiler_node_records_t>(Value);
+		for(profiler_node_records_t::const_iterator node_record = node_records.begin(); node_record != node_records.end(); ++node_record)
+		{
+			boost::python::dict python_task_records;
+
+			k3d::inode* const node = node_record->first;
+			profiler_task_records_t task_records = node_record->second;
+			for(profiler_task_records_t::const_iterator task_record = task_records.begin(); task_record != task_records.end(); ++task_record)
+				python_task_records[task_record->first] = task_record->second;
+
+			python_node_records[k3d::python::node(node)] = python_task_records;
+		}
+
+		return python_node_records;
+	}
+
 	throw std::invalid_argument("can't convert unrecognized type [" + demangle(type) + "] to boost::python::object");
 }
 

@@ -46,7 +46,8 @@ class pipeline_profiler :
 
 public:
 	pipeline_profiler(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document)
+		base(Factory, Document),
+		m_records(init_owner(*this) + init_name("records") + init_label(_("Records")) + init_description(_("Contains records storing the execution time for individual node tasks.")) + init_value(records_t()))
 	{
 		Document.pipeline_profiler().connect_node_execution_signal(sigc::mem_fun(*this, &pipeline_profiler::on_node_execution));
 		Document.nodes().rename_node_signal().connect(sigc::mem_fun(*this, &pipeline_profiler::on_node_renamed));
@@ -69,8 +70,11 @@ private:
 	/// Called by the signal system when profile data arrives
 	void on_node_execution(k3d::inode& Node, const k3d::string_t& Task, double Time)
 	{
-k3d::log() << debug << Node.name() << "." << Task << ": " << Time << std::endl;
+		records_t& records = m_records.internal_value();
 		records[&Node][Task] = Time;
+
+		// Because we're modifying the internal state of the property by-reference, we have to call the "changed" signal explicitly ...
+		m_records.changed_signal().emit(0);
 	}
 	
 	/// Called by the signal system anytime a node is renamed
@@ -78,8 +82,9 @@ k3d::log() << debug << Node.name() << "." << Task << ": " << Time << std::endl;
 	{
 	}
 
-	/// Defines storage for profile events
-	std::map<k3d::inode*, std::map<k3d::string_t, double> > records;
+	/// Stores profiling events
+	typedef std::map<k3d::inode*, std::map<k3d::string_t, double_t> > records_t;
+	k3d_data(records_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_records;
 };
 
 /////////////////////////////////////////////////////////////////////////////
