@@ -26,6 +26,7 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/ibitmap_importer.h>
+#include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/node.h>
@@ -63,7 +64,8 @@ public:
 
 	void on_create_bitmap(k3d::bitmap& Bitmap)
 	{
-		const k3d::filesystem::path file = m_file.pipeline_value();
+		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Create Bitmap");
+        const k3d::filesystem::path file = m_file.pipeline_value();
 		if(!k3d::filesystem::exists(file))
 			return;
 

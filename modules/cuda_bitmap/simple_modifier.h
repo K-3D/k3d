@@ -23,6 +23,8 @@
 #include <k3dsdk/bitmap_modifier.h>
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/ipipeline_profiler.h>
+
 
 namespace module
 {
@@ -42,11 +44,22 @@ public:
 	{
 	}
 
+protected:
+    void start_profile_step()
+    {
+        document().pipeline_profiler().start_execution(*this, "");
+    }    
+    void stop_profile_step(const std::string& Task)
+    {
+        document().pipeline_profiler().finish_execution(*this, Task);
+    }
+
 private:
 	virtual void on_create_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
 		Output.recreate(Input.width(), Input.height());
 	}
+
 };
 
 } // namespace cuda_bitmap

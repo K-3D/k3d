@@ -37,8 +37,8 @@ extern "C" void bitmap_copy_data_from_host_to_device(const unsigned short *input
 	
 }
 
-/// entry point for the CUDA version of the BitmapAdd plugin
-extern "C" void bitmap_kernel_entry(int operation, int width, int height, float value)
+/// entry point for the CUDA version of the BitmapAdd BitmapSubtract and BitmapMultiply plugin
+extern "C" void bitmap_arithmetic_kernel_entry(int operation, int width, int height, float value)
 {
     // allocate the blocks and threads
     dim3 threads_per_block(8, 8);
@@ -70,7 +70,7 @@ extern "C" void bitmap_kernel_entry(int operation, int width, int height, float 
     cudaThreadSynchronize();
 }
 
-extern "C" void bitmap_color_monochrome_kernel_entry(int operation, int width, int height, float redWeight, float greenWeight, float blueWeight)
+extern "C" void bitmap_color_monochrome_kernel_entry(int width, int height, float redWeight, float greenWeight, float blueWeight)
 {
 	// allocate the blocks and threads
     dim3 threads_per_block(8, 8);
@@ -82,7 +82,6 @@ extern "C" void bitmap_color_monochrome_kernel_entry(int operation, int width, i
     CUT_CHECK_ERROR("Add Kernel execution failed");
 	
 }
-
 
 extern "C" void bitmap_copy_data_from_device_to_host(unsigned short *output, int width, int height)
 {

@@ -28,6 +28,8 @@
 #include <k3dsdk/persistent.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/ipipeline_profiler.h>
+
 
 namespace module
 {
@@ -58,7 +60,8 @@ public:
 
 	void on_create_bitmap(k3d::bitmap& Bitmap)
 	{
-		const k3d::pixel_size_t width = m_width.pipeline_value();
+		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Create Bitmap");
+        const k3d::pixel_size_t width = m_width.pipeline_value();
 		const k3d::pixel_size_t height = m_height.pipeline_value();
 		const k3d::color color = m_color.pipeline_value();
 

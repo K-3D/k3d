@@ -31,12 +31,17 @@
 #define CUDA_BITMAP_SUBTRACT 0x02
 #define CUDA_BITMAP_COLOR_MONOCHROME 0x03
 
+// define the profiling strings
+#define PROFILE_STRING_HOST_TO_DEVICE "Copy from Host to Device"
+#define PROFILE_STRING_EXECUTE_KERNEL "Execute Kernel"
+#define PROFILE_STRING_DEVICE_TO_HOST "Copy from Device to Host"
+
 // forward declaration of the entry functions
 // split the entry functions for timing reasons
 extern "C" void CUDA_initialize_device();
 extern "C" void bitmap_copy_data_from_host_to_device(const unsigned short *input, int width, int height);
-extern "C" void bitmap_kernel_entry(int operation, int width, int height, float value);
-extern "C" void bitmap_color_monochrome_kernel_entry(int operation, int width, int height, float redWeight, float greenWeight, float blueWeight);
+extern "C" void bitmap_arithmetic_kernel_entry(int operation, int width, int height, float value);
+extern "C" void bitmap_color_monochrome_kernel_entry(int width, int height, float redWeight, float greenWeight, float blueWeight);
 extern "C" void bitmap_copy_data_from_device_to_host(unsigned short *output, int width, int height);
 extern "C" void CUDA_cleanup();
 

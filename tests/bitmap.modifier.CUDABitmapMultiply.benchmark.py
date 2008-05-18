@@ -16,7 +16,7 @@ initialBitmap = document.new_node("BitmapSolid")
 cudaMultiply = document.new_node("CUDABitmapMultiply")
 referenceMultiply = document.new_node("BitmapMultiply")
 
-widths = [8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
+widths = [8, 16, 32, 64, 128, 256, 512, 1024]
 heights = widths
 
 MultiplyValue = 3.465;

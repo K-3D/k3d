@@ -25,6 +25,7 @@
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent.h>
@@ -66,7 +67,8 @@ public:
 
 	void on_create_bitmap(k3d::bitmap& Bitmap)
 	{
-		const k3d::pixel_size_t width = m_width.pipeline_value();
+		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Create Bitmap");
+        const k3d::pixel_size_t width = m_width.pipeline_value();
 		const k3d::pixel_size_t height = m_height.pipeline_value();
 		const k3d::pixel_size_t check_width = m_check_width.pipeline_value();
 		const k3d::pixel_size_t check_height = m_check_height.pipeline_value();

@@ -11,12 +11,14 @@ document = k3d.new_document()
 
 # create the reference image
 initialBitmap = document.new_node("BitmapSolid")
+#profiler = document.new_node("PipelineProfiler")
 
 # create nodes for the regular as well as the CUDA bitmap add implementation
 cudaAdd = document.new_node("CUDABitmapAdd")
 referenceAdd = document.new_node("BitmapAdd")
 
-widths = [8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
+widths = [8, 16, 32, 64, 128, 256, 512, 1024]
+#widths = [128]
 heights = widths
 
 addValue = 3.465;

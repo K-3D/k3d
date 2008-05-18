@@ -16,7 +16,7 @@ initialBitmap = document.new_node("BitmapSolid")
 cudaSubtract = document.new_node("CUDABitmapSubtract")
 referenceSubtract = document.new_node("BitmapSubtract")
 
-widths = [8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
+widths = [8, 16, 32, 64, 128, 256, 512, 1024]
 heights = widths
 
 SubtractValue = 3.465;
