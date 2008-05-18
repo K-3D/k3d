@@ -171,7 +171,7 @@ int gprim_factory::add_point(const k3d::point3& Point)
 	m_implementation->points->push_back(Point);
 	m_implementation->point_selection->push_back(0.0);
 	m_implementation->point_weights->push_back(1.0);
-	return m_implementation->points->size();
+	return m_implementation->points->size()-1;
 }
 
 int gprim_factory::add_point(const k3d::point4& Point)
@@ -186,7 +186,7 @@ int gprim_factory::add_point(const k3d::point4& Point)
 	m_implementation->points->push_back(k3d::point3(Point[0], Point[1], Point[2]));
 	m_implementation->point_selection->push_back(0.0);
 	m_implementation->point_weights->push_back(Point[3]);
-	return m_implementation->points->size();
+	return m_implementation->points->size()-1;
 }
 
 void gprim_factory::add_polygon(const k3d::mesh::indices_t& Points)
@@ -258,7 +258,6 @@ void gprim_factory::add_curve(const k3d::mesh::indices_t& Points, int order)
 	m_implementation->curve_materials->push_back(static_cast<k3d::imaterial*>(0));
 	m_implementation->curve_first_points->push_back(m_implementation->curve_points->size());
 	m_implementation->curve_point_counts->push_back(Points.size());
-	//m_implementation->curve_orders->push_back(3);
 	m_implementation->curve_orders->push_back(order);
 	m_implementation->curve_first_knots->push_back(m_implementation->curve_knots->size());
 
@@ -270,8 +269,7 @@ void gprim_factory::add_curve(const k3d::mesh::indices_t& Points, int order)
 		surr_knots--;
 		m_implementation->curve_knots->push_back(0);
 	}
-	for(int prefix_knots = 0; prefix_knots <= (int)(surr_knots * 0.5); prefix_knots++)
-	//for(int i=0; i<2; i++)
+	for(int prefix_knots = 0; prefix_knots < (int)(surr_knots * 0.5); prefix_knots++)
 	{
 		m_implementation->curve_knots->push_back(0);
 	}
@@ -283,19 +281,61 @@ void gprim_factory::add_curve(const k3d::mesh::indices_t& Points, int order)
 		m_implementation->curve_selection->push_back(0.0);
 		m_implementation->curve_knots->push_back(m_implementation->curve_knots->back()+1);
 	}
-	//for(int i=0; i<3; i++)
-		//m_implementation->curve_knots->push_back(m_implementation->curve_knots->back()+1);
 
 	
 	for(k3d::uint_t suffix_knots = 0; suffix_knots < static_cast<k3d::uint_t>(surr_knots * 0.5); suffix_knots++)
-	//for(int i=0; i<2; i++)
 	{
 		m_implementation->curve_knots->push_back(m_implementation->curve_knots->back());
-		//m_implementation->curve_knots->push_back(3);
+	}
+	
+}
+
+void gprim_factory::add_bezier(const k3d::mesh::indices_t& Points, int order)
+{
+	return_if_fail(Points.size());
+	if(!m_implementation->first_curves)
+	{
+		k3d::mesh::nurbs_curve_groups_t* const nurbs_curve_groups = k3d::make_unique(m_implementation->target_mesh.nurbs_curve_groups);
+		m_implementation->first_curves = k3d::make_unique(nurbs_curve_groups->first_curves);
+		m_implementation->curve_counts = k3d::make_unique(nurbs_curve_groups->curve_counts);
+		m_implementation->curve_materials = k3d::make_unique(nurbs_curve_groups->materials);
+		m_implementation->curve_first_points = k3d::make_unique(nurbs_curve_groups->curve_first_points);
+		m_implementation->curve_point_counts = k3d::make_unique(nurbs_curve_groups->curve_point_counts);
+		m_implementation->curve_orders = k3d::make_unique(nurbs_curve_groups->curve_orders);
+		m_implementation->curve_first_knots = k3d::make_unique(nurbs_curve_groups->curve_first_knots);
+		m_implementation->curve_selection = k3d::make_unique(nurbs_curve_groups->curve_selection);
+		m_implementation->curve_points = k3d::make_unique(nurbs_curve_groups->curve_points);
+		m_implementation->curve_point_weights = k3d::make_unique(nurbs_curve_groups->curve_point_weights);
+		m_implementation->curve_knots = k3d::make_unique(nurbs_curve_groups->curve_knots);
+		
+		m_implementation->curve_counts->push_back(1);
+		m_implementation->first_curves->push_back(0);		
+	}
+	else
+		m_implementation->curve_counts->back() = m_implementation->curve_counts->back()+1;
+
+	m_implementation->curve_materials->push_back(static_cast<k3d::imaterial*>(0));
+	m_implementation->curve_first_points->push_back(m_implementation->curve_points->size());
+	m_implementation->curve_point_counts->push_back(Points.size());
+	m_implementation->curve_orders->push_back(order);
+	m_implementation->curve_first_knots->push_back(m_implementation->curve_knots->size());
+
+	
+	k3d::uint_t surr_knots = m_implementation->curve_orders->back(); 
+
+	for(k3d::uint_t point = 0; point < Points.size(); point++ )
+	{
+		m_implementation->curve_points->push_back(Points[point]);
+		m_implementation->curve_point_weights->push_back(1.0);
+		m_implementation->curve_selection->push_back(0.0);
 	}
 
-	//for(int i=0; i<m_implementation->curve_knots->size(); i++)
-		//k3d::log() << debug << "Curve_knot " << i << ": " << m_implementation->curve_knots->at(i) << std::endl;
+	for(int i=0; i<order; i++)
+		m_implementation->curve_knots->push_back(0);
+	for(int i=1; i<Points.size()-1; i++)
+		m_implementation->curve_knots->push_back(i);
+	for(int i=0; i<order-1; i++)
+		m_implementation->curve_knots->push_back(m_implementation->curve_knots->back());
 	
 }
 

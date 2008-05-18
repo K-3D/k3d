@@ -22,7 +22,6 @@
 */
 
 #include "gprim_factory.h"
-
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
@@ -86,16 +85,8 @@ public:
 		}
 
 		factory = new gprim_factory(Mesh);
-		k3d::xml::element& xml_g = xml_svg.safe_element("g");
 
-		for(k3d::xml::element::elements_t::const_iterator xml_obj = xml_g.children.begin(); xml_obj != xml_g.children.end(); ++xml_obj)
-		{
-			if(xml_obj->name == "path")
-				parse_path(*xml_obj);
-			if(xml_obj->name == "rect")
-				parse_rect(*xml_obj);
-			k3d::log() << debug << "Va uno "<< xml_obj->name << std::endl;
-		}
+		parse_graphics(xml_svg);
 		
 	}
 
@@ -121,7 +112,20 @@ private:
 	gprim_factory *factory;
 	int count;
 
-	void parse_rect(k3d::xml::element xml_obj)
+	void parse_graphics(const k3d::xml::element& xml_root)
+	{
+		for(k3d::xml::element::elements_t::const_iterator xml_obj = xml_root.children.begin(); xml_obj != xml_root.children.end(); ++xml_obj)
+		{
+			if(xml_obj->name == "path")
+				parse_path(*xml_obj);
+			if(xml_obj->name == "rect")
+				parse_rect(*xml_obj);
+			if(xml_obj->name == "g")
+				parse_graphics(*xml_obj);
+		}
+	}
+
+	void parse_rect(const k3d::xml::element& xml_obj)
 	{	
 		double x, y, w, h;
 		k3d::mesh::indices_t rect;
@@ -135,12 +139,10 @@ private:
 		w = atof(width.c_str());
 		h = atof(height.c_str());
 
-		k3d::log() << debug << "parse_rect function not implemented yet! " << x << " " << y << " " << w << " " << h << std::endl;
-
-		rect.push_back(factory->add_point(k3d::point4(x,y,0,1))-1);
-		rect.push_back(factory->add_point(k3d::point4(x+w,y,0,1))-1);
-		rect.push_back(factory->add_point(k3d::point4(x+w,y+h,0,1))-1);
-		rect.push_back(factory->add_point(k3d::point4(x,y+h,0,1))-1);
+		rect.push_back(factory->add_point(k3d::point4(x,y,0,1)));
+		rect.push_back(factory->add_point(k3d::point4(x+w,y,0,1)));
+		rect.push_back(factory->add_point(k3d::point4(x+w,y+h,0,1)));
+		rect.push_back(factory->add_point(k3d::point4(x,y+h,0,1)));
 		rect.push_back(rect.front());
 		
 		factory->add_curve(rect,2);
@@ -148,14 +150,59 @@ private:
 	
 	}
 
-	void parse_path(k3d::xml::element xml_obj)
+	void parse_path(const k3d::xml::element& xml_obj)
 	{
-		//k3d::mesh::indices_t path;
-		//k3d::mesh::indices_t path2;
-		//k3d::mesh::indices_t path3;
-		k3d::log() << debug << "parse_path function not implemented yet! " << std::endl;
-		//for(int i=0; i<4; i++)
-		//	path.push_back(i);
+		const std::string def_path = k3d::xml::attribute_text(xml_obj, "d");
+		char token;
+		std::string arg;
+		float x, y;
+		int last;
+
+		std::istringstream def_stream(def_path);
+
+		def_stream >> token;
+
+		if(token != 'M')
+			k3d::log() << error << "Error parsing path " << k3d::xml::attribute_text(xml_obj, "id") << " missing start point." << std::endl;
+
+		def_stream >> arg;
+		sscanf(arg.c_str(), "%f,%f", &x, &y);
+
+		last = factory->add_point(k3d::point4(x,y,0,1));
+
+		while(!def_stream.eof())
+		{
+			k3d::mesh::indices_t path;
+			path.push_back(last);
+			def_stream >> token;
+			switch(token)
+			{
+			case 'C':
+				for(int i=0; i<3; i++)
+				{
+					def_stream >> arg;
+					sscanf(arg.c_str(), "%f,%f", &x, &y);
+					path.push_back(factory->add_point(k3d::point4(x,y,0,1)));
+				}
+				last = path.back();
+				factory->add_bezier(path,3);
+				break;
+			case 'c':
+				for(int i=0; i<3; i++)
+				{
+					int tx, ty;
+					def_stream >> arg;
+					sscanf(arg.c_str(), "%f,%f", &tx, &ty);
+					x += tx;
+					y += ty;
+					path.push_back(factory->add_point(k3d::point4(x,y,0,1)));
+				}
+				last = path.back();
+				factory->add_bezier(path,3);
+				break;
+			}
+
+		}
 
 	}
 

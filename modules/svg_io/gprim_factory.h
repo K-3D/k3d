@@ -46,6 +46,7 @@ public:
 	void add_polygon(const k3d::mesh::indices_t& Points);
 
 	void add_curve(const k3d::mesh::indices_t& Points, int order);
+	void add_bezier(const k3d::mesh::indices_t& Points, int order);
 
 private:
 	class implementation;
