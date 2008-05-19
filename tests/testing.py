@@ -334,7 +334,7 @@ def assert_solid_mesh(mesh):
 	if not k3d.is_solid(mesh):
 		raise Exception("output mesh is not solid")
 
-def bitmap_perceptual_difference(document, input_image1, input_image2, threshold):
+def bitmap_perceptual_difference(document, input_image1, input_image2, threshold=1e-8):
 	difference = document.new_node("BitmapPerceptualDifference")
 	difference.field_of_view = 10.0
 	difference.luminance = 100
@@ -353,7 +353,115 @@ def bitmap_perceptual_difference(document, input_image1, input_image2, threshold
 
 	if difference_measurement > threshold:
 		raise "pixel difference exceeds threshold"
-	
+
+# compare the results of two different bitmap plugins applied to the k-3d test image
+def bitmap_compare_plugin_outputs(referenceName, pluginToTest, pluginPropertyValues = {}):
+    # load the reference image
+    inputBitmap = setup_bitmap_reader_test("BitmapReader", "test_rgb_8.bmp")
+    document = inputBitmap.document
+    
+    referenceNode = document.new_node(referenceName)
+    testNode = document.new_node(pluginToTest)
+    
+    for (property, value) in pluginPropertyValues.items():
+        referenceNode.get_property(property).set_value(value)
+        testNode.get_property(property).set_value(value)
+    
+    # set the dependency to the input bitmap so that the errors can be measured
+    document.set_dependency(referenceNode.get_property("input_bitmap"), inputBitmap.reader.get_property("output_bitmap"))
+    document.set_dependency(testNode.get_property("input_bitmap"), inputBitmap.reader.get_property("output_bitmap"))
+    
+    print """<DartMeasurement name="Description" type="text/string"> Compare """ + pluginToTest + " to " + referenceName + """</DartMeasurement>"""
+    if len(pluginPropertyValues) > 0:
+        print """<DartMeasurement name="Parameters" type="text/string"> """ + str(pluginPropertyValues) + """</DartMeasurement>"""
+
+    # calculate the perceptual difference
+    bitmap_perceptual_difference(document, referenceNode.get_property("output_bitmap"), testNode.get_property("output_bitmap"))
+    
+# Benchmark the performance of the Bitmap plugins using a solid as input 
+def bitmap_benchmark(BitmapNodeName, imageDimensions, numberOfRuns = 1):
+    document = k3d.new_document()
+        
+    profiler = document.new_node("PipelineProfiler")
+    inputSolid = document.new_node("BitmapSolid")
+    inputSolid.width = imageDimensions[0];
+    inputSolid.height = imageDimensions[1];
+    
+    benchmarkNode = document.new_node(BitmapNodeName)
+    results = {}
+    results['Total'] = []
+    for n in range(numberOfRuns):
+        document.set_dependency(benchmarkNode.get_property("input_bitmap"), inputSolid.get_property("output_bitmap"))
+        benchmarkNode.output_bitmap
+        for (node, timing) in profiler.records.items():
+            if node.name == BitmapNodeName:
+                total = 0.0
+                for t in timing:
+                    total += timing[t]
+                    if t in results:
+                        results[t] += [timing[t],]
+                    else:
+                        results[t] = [timing[t],]
+                
+                results['Total'] += [total,]
+    
+    dartTable("%s Benchmark : %d x %d" % (BitmapNodeName, imageDimensions[0], imageDimensions[1]), results)
+
+def dartTable(description, results):
+    
+    print """<DartMeasurement name="Description" type="text/string">""" + description + """</DartMeasurement>"""
+    
+    tmpString = """""";
+    headingOrder = []
+    averages = []
+    maximums = []
+    
+    for heading in results:
+        if heading != "Total":
+            tmpString += heading + """ : """
+            headingOrder += [heading,]
+        averages += [0.0,]
+        maximums += [0.0,]
+            
+    tmpString += "Total"
+    headingOrder += ['Total',]
+    
+    print """<DartMeasurement name="HEADING" type="text/string">""" + tmpString + """</DartMeasurement>"""
+    
+    
+    # get the number of results
+    numResults = len(results['Total'])
+    numColumns = len(headingOrder)
+    for row in range(numResults):
+        tmpString = """"""
+        for col_index in range(numColumns):
+            col = headingOrder[col_index]
+            # update the averages and the maximums
+            averages[col_index] += results[col][row]
+            if results[col][row] > maximums[col_index]:
+                maximums[col_index] = results[col][row]
+            
+            tmpString += str(results[col][row])
+            if col != "Total":
+                tmpString += """ : """
+
+        print """<DartMeasurement name="run""" + str(row) + """" type="text/string">""" + tmpString + """</DartMeasurement>"""
+        
+    # now handle the averages and the maximums
+    tmpString = ""
+    tmpStringMax = ""
+    for col_index in range(numColumns):
+        tmpString += str(averages[col_index]/numResults)
+        tmpStringMax += str(maximums[col_index])
+        if col_index < ( numColumns - 1 ):
+            tmpString += " : "
+            tmpStringMax += " : "
+    
+    print """<DartMeasurement name="Average" type="text/string">""" + tmpString + """</DartMeasurement>"""
+    print """<DartMeasurement name="Maximums" type="text/string">""" + tmpStringMax + """</DartMeasurement>"""
+    
+    
+
 def image_comparison(document, image, image_name, threshold):
 
 	output_file = k3d.generic_path(binary_path() + "/" + image_name + ".output.png")
