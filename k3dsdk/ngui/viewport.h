@@ -66,7 +66,7 @@ public:
 	control(document_state& DocumentState, k3d::icommand_node& Parent);
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent);
-	const std::string panel_type();
+	const k3d::string_t panel_type();
 	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot);
 
 	/// Returns the owning document

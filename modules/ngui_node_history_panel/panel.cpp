@@ -438,9 +438,9 @@ public:
 		show_all();
 	}
 
-	const std::string panel_type()
+	const k3d::string_t panel_type()
 	{
-		return "node_history";
+		return get_factory().name();
 	}
 
 	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
@@ -465,7 +465,7 @@ public:
 			_("Displays a hierarchical list of node inputs"),
 			"NGUI Panels",
 			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-type", "node_history")("ngui:panel-label", "Node History"));
+			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Node History"));
 
 		return factory;
 	}

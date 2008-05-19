@@ -449,8 +449,9 @@ public:
 		show_all();
 	}
 
-	const std::string panel_type(){
-		return "node_graph";
+	const k3d::string_t panel_type()
+	{
+		return get_factory().name();
 	}
 
 	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot){
@@ -466,8 +467,7 @@ public:
 			_("Visual Graphing Of K3D Nodes"),
 			"NGUI Panels",
 			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-type",
-			"node_graph")("ngui:panel-label", "Material List"));
+			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Material List"));
 
 		return factory;
 	}

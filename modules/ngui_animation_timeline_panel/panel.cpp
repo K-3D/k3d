@@ -917,9 +917,9 @@ public:
 		show_all();
 	}
 
-	const std::string panel_type()
+	const k3d::string_t panel_type()
 	{
-		return "timeline";
+		return get_factory().name();
 	}
 
 	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
@@ -944,7 +944,7 @@ public:
 			_("Provides a panel for manipulating the current animation time"),
 			"NGUI Panels",
 			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-type", "animation_timeline")("ngui:panel-label", "Animation Timeline"));
+			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Animation Timeline"));
 
 		return factory;
 	}

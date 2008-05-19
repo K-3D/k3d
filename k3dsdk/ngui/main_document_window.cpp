@@ -499,16 +499,16 @@ public:
 		m_panel_frame.add(*Gtk::manage(panel_frame1));
 
 		// First panel is the toolbar
-		panel_frame1->mount_panel("toolbar");
+		panel_frame1->mount_panel("NGUIToolbarPanel");
 		panel_frame1->decorations.set_value(false);
 
 		// Node list in the middle
 		panel_frame::control* const panel_frame2 = split_panel(*panel_frame1, *Gtk::manage(new Gtk::VPaned), -1);
-		panel_frame2->mount_panel("node_list");
+		panel_frame2->mount_panel("NGUINodeListPanel");
 
 		// Timeline at the bottom
 		panel_frame::control* const panel_frame3 = split_panel(*panel_frame2, *Gtk::manage(new Gtk::VPaned), -1, Gtk::SHRINK);
-		panel_frame3->mount_panel("timeline");
+		panel_frame3->mount_panel("NGUITimelinePanel");
 		panel_frame3->decorations.set_value(false);
 
 		// Viewport on node list's right
@@ -530,10 +530,10 @@ public:
 
 		// Node history below node list
 		panel_frame::control* const panel_frame5 = split_panel(*panel_frame2, *Gtk::manage(new Gtk::VPaned), -1);
-		panel_frame5->mount_panel("node_history");
+		panel_frame5->mount_panel("NGUINodeHistoryPanel");
 		// Node properties below node history
 		panel_frame::control* const panel_frame6 = split_panel(*panel_frame5, *Gtk::manage(new Gtk::VPaned), -1);
-		panel_frame6->mount_panel("node_properties");
+		panel_frame6->mount_panel("NGUINodePropertiesPanel");
 		
 		set_focus_viewport_panel(panel_frame4);
 	}

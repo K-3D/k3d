@@ -860,9 +860,9 @@ public:
 		show_all();
 	}
 
-	const std::string panel_type()
+	const k3d::string_t panel_type()
 	{
-		return "node_list";
+		return get_factory().name();
 	}
 
 	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
@@ -897,7 +897,7 @@ public:
 			_("Displays the document nodes as a flat list"),
 			"NGUI Panels",
 			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-type", "node_list")("ngui:panel-label", "Node List"));
+			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Node List"));
 
 		return factory;
 	}

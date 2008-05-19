@@ -177,7 +177,7 @@ void control::mount_panel(panel::control& Panel, const std::string& Type)
 
 void control::mount_panel(const std::string& Type, bool RequestCamera)
 {
-	if("viewport" == Type)
+	if("NGUIViewportPanel" == Type)
 	{
 		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_viewport>(m_document_state.document().nodes());
 		k3d::gl::irender_viewport* const glengine1 = gl_engines.size() > 0 ? dynamic_cast<k3d::gl::irender_viewport*>(*(gl_engines.begin())) : 0;
@@ -318,7 +318,7 @@ void control::set_choices()
 {
 	m_model->clear();
 
-	add_choice("viewport", quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "viewport"));
+	add_choice("NGUIViewportPanel", quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "NGUIViewportPanel"));
 
 	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
 	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
@@ -328,12 +328,7 @@ void control::set_choices()
 		if(metadata["ngui:component-type"] != "panel")
 			continue;
 
-		const std::string panel_type = metadata["ngui:panel-type"];
-		if(panel_type.empty())
-		{
-			k3d::log() << error << "Panel plugin without ngui:panel-type metadata will be ignored" << std::endl;
-			continue;
-		}
+		const std::string panel_type = (**factory).name();
 
 		const std::string panel_label = metadata["ngui:panel-label"];
 		if(panel_label.empty())
@@ -401,62 +396,6 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 	if(Command == "mount")
 	{
 		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index(Arguments)))));
-		return RESULT_CONTINUE;
-	}
-
-	// We leave the following commands in for backwards-compatibility ...
-	
-	if(Command == "mount_node_list")
-	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("node_list")))));
-		return RESULT_CONTINUE;
-	}
-	
-	if(Command == "mount_node_history")
-	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("node_history")))));
-		return RESULT_CONTINUE;
-	}
-	
-	if(Command == "mount_node_properties")
-	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("node_properties")))));
-		return RESULT_CONTINUE;
-	}
-	
-	if(Command == "mount_tool_properties")
-	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("tool_properties")))));
-		return RESULT_CONTINUE;
-	}
-	
-	if(Command == "mount_undo_tree")
-	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("undo_tree")))));
-		return RESULT_CONTINUE;
-	}
-	
-	if(Command == "mount_timeline")
-	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("timeline")))));
-		return RESULT_CONTINUE;
-	}
-	
-	if(Command == "mount_viewport")
-	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("viewport")))));
-		return RESULT_CONTINUE;
-	}
-	
-	if(Command == "mount_toolbar")
-	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("toolbar")))));
-		return RESULT_CONTINUE;
-	}
-	
-	if(Command == "mount_pipeline_profiler")
-	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index("pipeline_profiler")))));
 		return RESULT_CONTINUE;
 	}
 

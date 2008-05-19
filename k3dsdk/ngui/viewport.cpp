@@ -443,9 +443,9 @@ void control::initialize(document_state& DocumentState, k3d::icommand_node& Pare
 	assert_not_implemented();
 }
 
-const std::string control::panel_type()
+const k3d::string_t control::panel_type()
 {
-	return "viewport";
+	return "NGUIViewportPanel";
 }
 
 sigc::connection control::connect_focus_signal(const sigc::slot<void>& Slot)
