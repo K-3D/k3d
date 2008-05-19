@@ -47,7 +47,7 @@ namespace module
 
 	namespace nurbs
 	{
-		void connectAtPoints(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2);
+		void connectAtPoints(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2, bool continuous);
 
 
 		class connect_curves :
@@ -56,9 +56,11 @@ namespace module
 			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > > base;
 		public:
 			connect_curves(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-				base(Factory, Document)
+				base(Factory, Document),
+				m_make_continuous(init_owner(*this) + init_name("make_continuous") + init_label(_("make_continuous")) + init_description(_("Connect Continuous? Resets the Knot-Vector!")) + init_value(false) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+				m_make_continuous.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output) 
@@ -90,7 +92,8 @@ namespace module
 					}
 				}*/
 
-				Output=Input;
+				Output = Input;
+				k3d::bool_t make_continuous = m_make_continuous.internal_value();
 				
 				if(!k3d::validate_nurbs_curve_groups(Output))
 					return;
@@ -131,14 +134,14 @@ namespace module
 					k3d::log() << error << "You need to select exactly 2 points!\n"<<"Selected: "<<points.size()<<" points on "<<curves.size()<<" curves" << std::endl;
 				}
 
-				connectAtPoints(Output, curves[0], curves[1], points[0], points[1]);
+				connectAtPoints(Output, curves[0], curves[1], points[0], points[1], make_continuous);
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
-				assert_warning(k3d::validate(Output));
 			}
 
 			void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 			{
+				on_create_mesh(Input,Output);
 			}
 
 			static k3d::iplugin_factory& get_factory()
@@ -152,6 +155,9 @@ namespace module
 
 				return factory;
 			}
+			
+		private:
+			k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_make_continuous;
 		};
 
 		//Create connect_curve factory
@@ -160,12 +166,12 @@ namespace module
 			return connect_curves::get_factory();
 		}
 		
-		void connectAtPoints(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2)
+		void connectAtPoints(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2, bool continuous)
 		{
-			k3d::log() << debug << "Connecting.." <<std::endl;
 						
 			//Add the new point
 			k3d::mesh::points_t& mesh_points = *k3d::make_unique(Mesh.points);
+			k3d::mesh::selection_t& point_selection = *k3d::make_unique(Mesh.point_selection);
 
 			//merge the 2 points into one
 			k3d::point3 p1 = mesh_points[point1];
@@ -176,14 +182,15 @@ namespace module
 			
 			size_t newIndex = mesh_points.size();
 			mesh_points.push_back(new_point);
+			point_selection.push_back(0.0);
 			
-			//ToDo: remove one of the points if no longer used
+			//ToDo: remove the points if no longer used
 			
 			//loop through curve point indices to find the given ones and change them so they point to "new"
-			//change multiplicity if "deriveable" is selected
 			k3d::mesh::nurbs_curve_groups_t& groups = *k3d::make_unique(Mesh.nurbs_curve_groups);
 			
 			k3d::mesh::indices_t& indices = *k3d::make_unique(groups.curve_points);
+			k3d::mesh::knots_t& knots = *k3d::make_unique(groups.curve_knots);
 			
 			//curve1 - point 1
 			const size_t curve_point_begin = (*groups.curve_first_points)[curve1];
@@ -195,6 +202,29 @@ namespace module
 				{
 					//we found the index pointing to point1
 					indices[points] = newIndex;
+					if(continuous)
+					{
+						const size_t curve_knots_begin = (*groups.curve_first_knots)[curve1];
+						const size_t curve_knots_end = curve_knots_begin + curve_point_end - curve_point_begin + (*groups.curve_orders)[curve1];
+					
+						size_t knots_to_insert = (*groups.curve_orders)[curve1];
+						const size_t order = knots_to_insert;
+						const size_t half_order = static_cast<unsigned int> (floor(0.5 * knots_to_insert));
+						const size_t pos = half_order + (points - curve_point_begin) + curve_point_begin;
+						float x=0.0;
+						k3d::log() << debug << "Pos: " << pos << " Order: " << order << " KnotVector: ";
+						for(size_t i = curve_knots_begin; i < curve_knots_end; ++i)
+						{
+							if( abs(pos - i) < half_order || i < order || curve_knots_end - i < order)// || knots_to_insert >= curve_point_end - curve_point_begin - i || (pos <= 2 * order && i <= order) )
+							{
+								knots_to_insert --;
+								knots[i] = x;
+							}
+							else knots[i] = x++;
+							k3d::log() << x;
+						}
+						k3d::log() << std::endl;
+					}
 				}
 			}
 			

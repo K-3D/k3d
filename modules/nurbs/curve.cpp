@@ -73,7 +73,6 @@ namespace module
 		
 				const int control_points=m_control_points.pipeline_value();
 		
-				//k3d::mesh::indices_t first_curves(1);
 				boost::shared_ptr<k3d::mesh::indices_t> first_curves( new k3d::mesh::indices_t() );
 				boost::shared_ptr<k3d::mesh::counts_t> curve_counts( new k3d::mesh::counts_t() );
 				boost::shared_ptr<k3d::mesh::materials_t> materials( new k3d::mesh::materials_t() );
@@ -92,21 +91,48 @@ namespace module
 				curve_counts->push_back(1);
 				materials->push_back(m_material.pipeline_value());
 				curve_first_points->push_back(0);
+				curve_first_knots->push_back(0);
 				curve_point_counts->push_back(control_points);
 				curve_orders->push_back(m_order.pipeline_value());
-				curve_first_knots->push_back(0);
-
-				k3d::uint_t surr_knots = curve_orders->back(); //order is at least 2!
-
-				if(surr_knots % 2 != 0)
+				curve_selection->push_back(0.0);
+				
+				
+				//we need at least as much control points as the order is
+				assert_warning(curve_orders->back() < control_points);
+				
+				if(control_points >= 2*curve_orders->back())
 				{
-					surr_knots--;
-					curve_knots->push_back(0);
+					for(size_t i = 0; i < curve_orders->back(); ++i) //first point order times
+						curve_knots->push_back(0);
+					
+					for(size_t i = 0; i < control_points - curve_orders->back() + 1; ++i)
+						curve_knots->push_back(curve_knots->back()+1); //curve_knots is not empty!
+					
+					for(size_t i = 0; i < curve_orders->back() - 1; ++i) //last point order times
+						curve_knots->push_back(curve_knots->back());
 				}
-
-				for(k3d::uint_t prefix_knots = 0; prefix_knots < static_cast<k3d::uint_t>(surr_knots * 0.5); prefix_knots++)
+				else
 				{
-					curve_knots->push_back(0);
+					k3d::uint_t surr_knots = curve_orders->back(); //order is at least 2!
+
+					if(surr_knots % 2 != 0)
+					{
+						surr_knots--;
+						curve_knots->push_back(0);
+					}
+
+					for(k3d::uint_t prefix_knots = 0; prefix_knots < static_cast<k3d::uint_t>(surr_knots * 0.5); prefix_knots++)
+					{
+						curve_knots->push_back(0);
+					}
+				
+					for(k3d::uint_t point = 0; point < control_points; point++ )
+						curve_knots->push_back(curve_knots->back()+1); //curve_knots is not empty!
+				
+					for(k3d::uint_t suffix_knots = 0; suffix_knots < static_cast<k3d::uint_t>(surr_knots * 0.5); suffix_knots++)
+					{
+						curve_knots->push_back(curve_knots->back());
+					}
 				}
 
 				for(k3d::uint_t point = 0; point < control_points; point++ )
@@ -114,15 +140,10 @@ namespace module
 					curve_points->push_back(point); //store the index of the point
 					points->push_back(k3d::point3(static_cast<double>(point) * m_point_spacing.pipeline_value(), 0.0, 0.0) );//store the point (a straight line along x-axis)
 					curve_point_weights->push_back(1.0);
-					curve_knots->push_back(curve_knots->back()+1); //curve_knots is not empty!
+					
 					point_selection->push_back(0.0);
-					curve_selection->push_back(0.0);
 				}
-
-				for(k3d::uint_t suffix_knots = 0; suffix_knots < static_cast<k3d::uint_t>(surr_knots * 0.5); suffix_knots++)
-				{
-					curve_knots->push_back(curve_knots->back());
-				}
+				
 		
 				curve_group->first_curves = first_curves;
 				curve_group->curve_counts = curve_counts;

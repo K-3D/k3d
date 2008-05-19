@@ -42,6 +42,7 @@ extern k3d::iplugin_factory& torus_factory();
 extern k3d::iplugin_factory& create_curve_factory();
 extern k3d::iplugin_factory& set_weight_factory();
 extern k3d::iplugin_factory& connect_curves_factory();
+extern k3d::iplugin_factory& edit_knot_vector_factory();
 
 } // namespace nurbs
 
@@ -62,5 +63,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::nurbs::create_curve_factory());
 	Registry.register_factory(module::nurbs::set_weight_factory());
 	Registry.register_factory(module::nurbs::connect_curves_factory());
+	Registry.register_factory(module::nurbs::edit_knot_vector_factory());
 K3D_MODULE_END
 
