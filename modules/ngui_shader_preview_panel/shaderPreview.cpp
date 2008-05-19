@@ -50,6 +50,11 @@
 #include <k3dsdk/irender_camera_preview.h>
 #include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/properties.h>
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/iuser_property.h>
+#include <k3dsdk/user_property_changed_signal.h>
+#include <k3dsdk/signal_system.h>
 
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/iunknown.h>
@@ -84,6 +89,7 @@ namespace module{
         typedef k3d::inode /*k3d::itransform_sink*/ geo_t;
 
 	const k3d::string_t shaderImgFile = "k3d_shader_preview.tiff";
+	typedef std::vector<sigc::connection> connections_t;
 
         // [sPreviewModel]*********************************************************************************
 
@@ -111,7 +117,7 @@ namespace module{
           geo_t* getPreviewGeo(){return currentGeo;}
           light_t* getPreviewLight(){return currentLight;}
           lightShader_t* getPreviewLShader(){return currentLShader;}
-
+	 
         private:
           //Preview Dimensions
           k3d::uint_t pSize; 
@@ -129,6 +135,11 @@ namespace module{
 
           //File_io
           k3d::filesystem::path previewImagePath;
+
+	public:
+	  //Property Signal connections
+	  connections_t propertyConnections;
+	  sigc::signal<void, k3d::iunknown*> m_changed_signal;
 
         };//sPreviewModel
         
@@ -252,7 +263,8 @@ namespace module{
 	    // << Will Delete when panel closed
 	    Glib::signal_timeout().connect(sigc::mem_fun(*this, &implementation::on_preview_update),
 					   piIntervalUpdate);
-                                
+
+	    m_model->m_changed_signal.connect(sigc::mem_fun(*this, &implementation::propertySignalRender));
 
             schedule_update();
           }
@@ -263,6 +275,11 @@ namespace module{
             if(previewArea)
               delete previewArea;
           }
+
+	  //Property Signal Change -> Render Init Wrapper
+	  void propertySignalRender(k3d::iunknown* t){
+	    this->renderPreview();
+	  }
 
           /// Updates the contents of the control
           void on_update();
@@ -506,9 +523,24 @@ namespace module{
 	    k3d::property::set_internal_value(*(m_model->getPreviewGeo()), 
 					      "material", Node);
 
+	    //Clear Property Connections 
+	    for(connections_t::iterator cIter = m_model->propertyConnections.begin(); cIter != m_model->propertyConnections.end(); cIter++)
+	      cIter->disconnect();
+
+	    //Create New Signal Connections
+	    if(k3d::iproperty_collection* const m_collection = dynamic_cast<k3d::iproperty_collection*>(Node)){
+      
+	      const k3d::iproperty_collection::properties_t& properties = m_collection->properties();
+	      k3d::iproperty_collection::properties_t::const_iterator property = properties.begin();
+
+	      for(property; property != properties.end(); ++property)
+		  m_model->propertyConnections.push_back((*property)->property_changed_signal().connect(m_model->m_changed_signal.make_slot()));
+
+	    }//if
 
 	    //Render A Preview Image
-	    renderPreview();
+	    // renderPreview();
+
 	  }//if
 
 	  return false;
@@ -526,7 +558,7 @@ namespace module{
 
 	}//renderPreview
 
-	bool  implementation::on_preview_update()
+	bool implementation::on_preview_update()
 	{
 	  //Update The Drawing Area Image
 	  previewArea->queue_resize();
