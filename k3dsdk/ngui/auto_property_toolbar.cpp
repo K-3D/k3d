@@ -37,6 +37,7 @@
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/imesh_storage.h>
+#include <k3dsdk/imulti_mesh_sink.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/irender_animation.h>
 #include <k3dsdk/irender_camera_animation.h>
@@ -44,6 +45,7 @@
 #include <k3dsdk/irender_camera_preview.h>
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/irender_preview.h>
+#include <k3dsdk/iuser_property.h>
 #include <k3dsdk/utility.h>
 
 #include <gtkmm/image.h>
@@ -250,18 +252,58 @@ public:
 		// Add a "disable" button for mesh modifiers ...
 		if(imesh_source* const mesh_source = dynamic_cast<imesh_source*>(Object))
 		{
+			// Modifiers that take a single mesh input ...
 			if(imesh_sink* const mesh_sink = dynamic_cast<imesh_sink*>(Object))
 			{
+				iproperty& bypass_input = mesh_sink->mesh_sink_input();
+				iproperty& bypass_output = mesh_source->mesh_source_output();
+
 				toggle_button::control* const control =
 					new toggle_button::control(
 						m_toolbar,
 						"disable_mesh_modifier",
-						new bypass_property_proxy(m_document_state, mesh_sink->mesh_sink_input(), mesh_source->mesh_source_output()),
+						new bypass_property_proxy(m_document_state, bypass_input, bypass_output),
 						&m_document_state.document().state_recorder(),
 						_("Disable"))
 						<< set_tooltip(_("Disable / bypass mesh modifier"));
 
 				m_toolbar.row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
+			}
+			// Modifiers that take multiple mesh inputs ...
+			else if(imulti_mesh_sink* const mesh_sink = dynamic_cast<imulti_mesh_sink*>(Object))
+			{
+				iproperty* bypass_input = 0;
+				if(iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(Object))
+				{
+					const iproperty_collection::properties_t properties = property_collection->properties();
+					for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+					{
+						if(!dynamic_cast<iuser_property*>(*property))
+							continue;
+
+						if((**property).property_type() != typeid(mesh*))
+							continue;
+
+						bypass_input = *property;
+						break;
+					}
+				}
+
+				iproperty& bypass_output = mesh_source->mesh_source_output();
+
+				if(bypass_input)
+				{
+					toggle_button::control* const control =
+						new toggle_button::control(
+							m_toolbar,
+							"disable_mesh_modifier",
+							new bypass_property_proxy(m_document_state, *bypass_input, bypass_output),
+							&m_document_state.document().state_recorder(),
+							_("Disable"))
+							<< set_tooltip(_("Disable / bypass mesh modifier"));
+
+					m_toolbar.row(0).pack_start(*Gtk::manage(control), Gtk::PACK_SHRINK);
+				}
 			}
 		}
 
