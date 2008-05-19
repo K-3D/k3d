@@ -307,3 +307,7 @@ K3D_ADD_TEST(bitmap.modifier.CUDABitmapMultiply.benchmark.py PYTHON REQUIRES K3D
 K3D_ADD_TEST(bitmap.modifier.CUDABitmapSubtract.benchmark.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE REQUIRES K3D_BUILD_CUDA_BITMAP_MODULE)
 K3D_ADD_TEST(bitmap.modifier.CUDABitmapColorMonochrome.benchmark.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE REQUIRES K3D_BUILD_CUDA_BITMAP_MODULE)
 
+K3D_ADD_TEST(bitmap.modifier.BitmapAdd.benchmark.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE)
+K3D_ADD_TEST(bitmap.modifier.BitmapMultiply.benchmark.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE)
+K3D_ADD_TEST(bitmap.modifier.BitmapSubtract.benchmark.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE)
+K3D_ADD_TEST(bitmap.modifier.BitmapColorMonochrome.benchmark.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE)
