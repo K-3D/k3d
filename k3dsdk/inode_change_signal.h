@@ -37,9 +37,8 @@ class inode_change_signal :
 	public virtual iunknown
 {
 public:
-	/// Defines a signal that will be emitted whenever the object state is modified, including an optional "hint" that describes the change.
-	typedef sigc::signal<void, iunknown*> node_changed_signal_t;
-	virtual node_changed_signal_t& node_changed_signal() = 0;
+	/// Connects a slot to a signal that will be emitted whenever the node state is modified, including an optional "hint" that describes the change.
+	virtual sigc::connection connect_node_changed_signal(const sigc::slot<void, iunknown*>& Slot) = 0;
 
 protected:
 	inode_change_signal() {}

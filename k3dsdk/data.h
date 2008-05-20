@@ -1870,7 +1870,7 @@ protected:
 		{
 			m_node_deleted_connection = m_node->deleted_signal().connect(sigc::mem_fun(*this, &node_storage::on_node_deleted));
 			if(inode_change_signal* const node_change_signal = dynamic_cast<inode_change_signal*>(m_node))
-				m_node_changed_connection = node_change_signal->node_changed_signal().connect(signal_policy_t::changed_signal().make_slot());
+				m_node_changed_connection = node_change_signal->connect_node_changed_signal(signal_policy_t::changed_signal().make_slot());
 		}
 	}
 
@@ -1905,7 +1905,7 @@ protected:
 		{
 			m_node_deleted_connection = m_node->deleted_signal().connect(sigc::mem_fun(*this, &node_storage::on_node_deleted));
 			if(inode_change_signal* const node_change_signal = dynamic_cast<inode_change_signal*>(m_node))
-				m_node_changed_connection = node_change_signal->node_changed_signal().connect(signal_policy_t::changed_signal().make_slot());
+				m_node_changed_connection = node_change_signal->connect_node_changed_signal(signal_policy_t::changed_signal().make_slot());
 		}
 
 		signal_policy_t::set_value(Hint);
