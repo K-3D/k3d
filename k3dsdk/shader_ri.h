@@ -2,7 +2,7 @@
 #define K3DSDK_SHADER_RI_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -25,9 +25,11 @@
 */
 
 #include "node.h"
+#include "node_change_signal.h"
 #include "persistent.h"
-#include "types_ri.h"
 #include "sl.h"
+#include "types_ri.h"
+#include "user_property_changed_signal.h"
 
 namespace k3d
 {
@@ -42,7 +44,8 @@ class render_state;
 
 /// Abstract base class that provides most of the boilerplate for a RenderMan shader instance
 class shader :
-	public persistent<node>
+	public persistent<node>,
+	public node_change_signal<shader>
 {
 	typedef persistent<node> base;
 
@@ -68,6 +71,8 @@ private:
 	k3d_data(sl::shader, no_name, no_signal, with_undo, local_storage, no_constraint, no_property, no_serialization) m_shader;
 
 	sigc::connection m_shader_connection;
+
+	user_property_changed_signal m_user_property_changed_signal;
 };
 
 } // namespace ri

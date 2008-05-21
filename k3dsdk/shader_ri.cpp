@@ -71,10 +71,13 @@ shader::shader(iplugin_factory& Factory, idocument& Document, k3d::sl::shader::t
 	base(Factory, Document),
 	m_shader_type(ShaderType),
 	m_shader_path(init_owner(*this) + init_name("shader_path") + init_label(_("Shader Path")) + init_description(_("Shader Path")) + init_value(filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type(detail::shader_type_path(ShaderType))),
-	m_shader(init_owner(*this) + init_value(sl::shader(ShaderType)))
+	m_shader(init_owner(*this) + init_value(sl::shader(ShaderType))),
+	m_user_property_changed_signal(*this)
 {
 	m_shader_path.add_pattern_filter(ipath_property::pattern_filter(_("RenderMan shader (*.sl)"), "*.sl"));
 	m_shader_connection = m_shader_path.connect_explicit_change_signal(sigc::mem_fun(*this, &shader::on_shader_changed));
+
+	m_user_property_changed_signal.connect(make_node_change_slot());
 }
 
 shader::~shader()
@@ -168,6 +171,8 @@ void shader::on_shader_changed(iunknown*)
 	delete_arguments();
 	load_metafile();
 	create_arguments();
+
+	make_node_change_slot()(0);
 
 	if(document().state_recorder().current_change_set())
 		document().state_recorder().current_change_set()->record_new_state(new user::property_container(*this));
