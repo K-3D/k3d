@@ -27,7 +27,6 @@
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
 #include <k3dsdk/selection.h>
@@ -42,10 +41,10 @@ namespace scripting
 // mesh_painter_script
 
 class mesh_painter_script :
-	public k3d::scripted_node<k3d::persistent<k3d::node> >,
+	public k3d::scripted_node<k3d::node >,
 	public k3d::gl::imesh_painter
 {
-	typedef k3d::scripted_node<k3d::persistent<k3d::node> > base;
+	typedef k3d::scripted_node<k3d::node > base;
 
 public:
 	mesh_painter_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

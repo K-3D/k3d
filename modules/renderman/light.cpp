@@ -28,7 +28,6 @@
 #include <k3dsdk/ilight_ri.h>
 #include <k3dsdk/ilight_shader_ri.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/render_state_ri.h>
 #include <k3dsdk/renderable_gl.h>
@@ -44,11 +43,11 @@ namespace libk3drenderman
 // light
 
 class light :
-	public k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > >,
+	public k3d::gl::renderable<k3d::transformable<k3d::node > >,
 	public k3d::gl::ilight,
 	public k3d::ri::ilight
 {
-	typedef k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > base;
+	typedef k3d::gl::renderable<k3d::transformable<k3d::node > > base;
 
 public:
 	light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -29,7 +29,6 @@
 #include "imesh_painter_ri.h"
 #include "inode.h"
 #include "inode_collection.h"
-#include "ipersistent.h"
 #include "ipersistent_lookup.h"
 #include "ipipeline.h"
 #include "iplugin_factory.h"

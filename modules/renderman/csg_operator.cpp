@@ -25,7 +25,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_ri.h>
 
 #include <iostream>
@@ -38,10 +37,10 @@ namespace libk3drenderman
 
 /// Allows geometry to be rendered with boolean effects
 class csg_operator :
-	public k3d::persistent<k3d::node> ,
+	public k3d::node ,
 	public k3d::ri::irenderable
 {
-	typedef k3d::persistent<k3d::node>  base;
+	typedef k3d::node  base;
 
 public:
 	csg_operator(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

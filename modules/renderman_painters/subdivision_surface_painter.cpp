@@ -28,7 +28,6 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
@@ -42,10 +41,10 @@ namespace libk3drendermanpainters
 // subdivision_surface_painter
 
 class subdivision_surface_painter :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::ri::imesh_painter
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 	typedef k3d::typed_array<std::string> tags_t;
 public:
 	subdivision_surface_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

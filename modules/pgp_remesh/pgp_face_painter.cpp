@@ -28,7 +28,6 @@
 #include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
 
 #include <utility>

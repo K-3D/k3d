@@ -27,7 +27,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace module
 {
@@ -39,9 +38,9 @@ namespace annotation
 // mesh_stats
 
 class mesh_stats :
-	public k3d::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::mesh_modifier<k3d::node >
 {
-	typedef k3d::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_modifier<k3d::node > base;
 
 public:
 	mesh_stats(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

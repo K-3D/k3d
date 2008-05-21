@@ -26,7 +26,6 @@
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 
 namespace libk3drendermanpainters
@@ -36,10 +35,10 @@ namespace libk3drendermanpainters
 // multi_painter
 
 class multi_painter :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::ri::imesh_painter
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	multi_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

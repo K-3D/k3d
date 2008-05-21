@@ -34,9 +34,9 @@ namespace yafray
 // sun_light
 
 class sun_light :
-	public renderable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > >
+	public renderable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::node > > > > >
 {
-	typedef renderable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > > base;
+	typedef renderable_light<optional_shadows<colored_light<light<k3d::transformable<k3d::node > > > > > base;
 
 public:
 	sun_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

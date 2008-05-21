@@ -29,7 +29,6 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace libk3dcore
 {
@@ -38,11 +37,11 @@ namespace libk3dcore
 // frozen_transformation
 
 class frozen_transformation :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::itransform_source,
 	public k3d::itransform_sink
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	frozen_transformation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -25,7 +25,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 #include <boost/format.hpp>
 
@@ -33,9 +32,9 @@ namespace libk3dcore
 {
 
 class format_scalar :
-	public k3d::persistent<k3d::node>
+	public k3d::node
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 public:
 	format_scalar(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),

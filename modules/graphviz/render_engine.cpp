@@ -36,7 +36,6 @@
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/persistent.h>
 
 #include <iomanip>
 #include <iterator>
@@ -51,12 +50,12 @@ namespace graphviz
 // render_engine
 
 class render_engine :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::inode_collection_sink,
 	public k3d::irender_preview,
 	public k3d::irender_frame
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	render_engine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

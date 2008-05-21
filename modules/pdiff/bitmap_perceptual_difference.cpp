@@ -31,7 +31,6 @@
 #include <k3dsdk/ibitmap_sink.h>
 #include <k3dsdk/ibitmap_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace module
 {
@@ -43,11 +42,11 @@ namespace pdiff
 // bitmap_perceptual_difference
 
 class bitmap_perceptual_difference :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::ibitmap_source,
 	public k3d::ibitmap_sink
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	bitmap_perceptual_difference(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

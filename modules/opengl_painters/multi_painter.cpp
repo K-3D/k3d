@@ -25,7 +25,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 
 namespace module

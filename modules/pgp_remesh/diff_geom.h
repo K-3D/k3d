@@ -33,7 +33,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/utility.h>
 #include <iostream>
 #include <map>

@@ -25,7 +25,6 @@
 #include <k3dsdk/bitmap_source.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
 
@@ -39,10 +38,10 @@ namespace scripting
 // bitmap_source_script
 
 class bitmap_source_script :
-	public k3d::scripted_node<k3d::persistent<k3d::node> >,
+	public k3d::scripted_node<k3d::node >,
 	public k3d::bitmap_source<bitmap_source_script>
 {
-	typedef k3d::scripted_node<k3d::persistent<k3d::node> > base;
+	typedef k3d::scripted_node<k3d::node > base;
 
 public:
 	bitmap_source_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -31,7 +31,6 @@
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/serialization_xml.h>
 
@@ -42,10 +41,10 @@ namespace libk3dk3dio
 // k3d_mesh_reader
 
 class k3d_mesh_reader :
-	public k3d::mesh_source<k3d::persistent<k3d::node> >,
+	public k3d::mesh_source<k3d::node >,
 	public k3d::imesh_storage
 {
-	typedef k3d::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_source<k3d::node > base;
 
 public:
 	k3d_mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

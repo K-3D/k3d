@@ -24,7 +24,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/shared_pointer.h>
@@ -41,9 +40,9 @@ namespace mesh
 // make_sds_implementation
 
 class make_sds_implementation :
-	public k3d::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::mesh_modifier<k3d::node >
 {
-	typedef k3d::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_modifier<k3d::node > base;
 	typedef k3d::typed_array<std::string> tags_t;
 
 public:

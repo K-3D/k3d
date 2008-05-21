@@ -26,7 +26,6 @@
 
 #include "node.h"
 #include "node_change_signal.h"
-#include "persistent.h"
 #include "sl.h"
 #include "types_ri.h"
 #include "user_property_changed_signal.h"
@@ -44,10 +43,10 @@ class render_state;
 
 /// Abstract base class that provides most of the boilerplate for a RenderMan shader instance
 class shader :
-	public persistent<node>,
+	public node,
 	public node_change_signal<shader>
 {
-	typedef persistent<node> base;
+	typedef node base;
 
 public:
 	void load(xml::element& Element, const ipersistent::load_context& Context);

@@ -31,7 +31,6 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 #include <k3dsdk/utility_gl.h>

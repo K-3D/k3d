@@ -29,7 +29,6 @@
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/mesh_sink.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/serialization_xml.h>
 
@@ -40,9 +39,9 @@ namespace libk3dk3dio
 // k3d_mesh_writer
 
 class k3d_mesh_writer :
-	public k3d::mesh_sink<k3d::persistent<k3d::node> >
+	public k3d::mesh_sink<k3d::node >
 {
-	typedef k3d::mesh_sink<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_sink<k3d::node > base;
 
 public:
 	k3d_mesh_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

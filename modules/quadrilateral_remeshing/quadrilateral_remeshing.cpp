@@ -30,7 +30,6 @@
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/utility.h>
 
 #include <set>
@@ -346,9 +345,9 @@ bool equal_vectors(const k3d::point3& v1, const k3d::point3& v2)
 // quadrilateral_remeshing
 
 class quadrilateral_remeshing :
-	public k3d::material_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::legacy::mesh_modifier<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
 
 	typedef unsigned long index_t;
 

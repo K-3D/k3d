@@ -25,7 +25,6 @@
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/tokens.h>
 #include <k3dsdk/vectors.h>
 

@@ -27,7 +27,6 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
-#include <k3dsdk/persistent.h>
 
 #include <boost/gil/extension/io/tiff_io.hpp>
 
@@ -44,10 +43,10 @@ namespace io
 // bitmap_reader
 
 class bitmap_reader :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::bitmap_source<bitmap_reader>
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	bitmap_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

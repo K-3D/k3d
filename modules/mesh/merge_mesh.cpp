@@ -33,7 +33,6 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/user_property_changed_signal.h>
@@ -636,9 +635,9 @@ void merge_points(k3d::mesh& Output, const k3d::mesh& Input)
 
 class merge_mesh_implementation :
 	public k3d::imulti_mesh_sink,
-	public k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	merge_mesh_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

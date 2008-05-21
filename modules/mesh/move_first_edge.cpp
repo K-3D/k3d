@@ -29,7 +29,6 @@
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace module
 {
@@ -59,9 +58,9 @@ long mymod(const long a, const long b)
 // move_first_edge_implementation
 
 class move_first_edge_implementation :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
 
 public:
 	move_first_edge_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

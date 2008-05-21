@@ -31,7 +31,6 @@
 #include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/inode_collection.h>
-#include <k3dsdk/ipersistent.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/properties.h>

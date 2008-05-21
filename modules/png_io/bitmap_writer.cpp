@@ -25,7 +25,6 @@
 #include <k3dsdk/bitmap_sink.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 #include <boost/gil/extension/io/png_io.hpp>
 
@@ -42,10 +41,10 @@ namespace io
 // bitmap_writer
 
 class bitmap_writer :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::bitmap_sink<bitmap_writer>
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	bitmap_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

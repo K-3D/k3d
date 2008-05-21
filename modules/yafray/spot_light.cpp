@@ -34,9 +34,9 @@ namespace yafray
 // spot_light
 
 class spot_light :
-	public colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > >
+	public colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::node > > > >
 {
-	typedef colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
+	typedef colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::node > > > > base;
 
 public:
 	spot_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

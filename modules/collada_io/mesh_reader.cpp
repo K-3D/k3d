@@ -31,7 +31,6 @@
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include "intGeometry.h"
 #include "integration.h"
 
@@ -50,10 +49,10 @@ namespace io
 // mesh_reader
 
 class mesh_reader :
-	public k3d::mesh_source<k3d::persistent<k3d::node> >,
+	public k3d::mesh_source<k3d::node >,
 	public k3d::imesh_storage
 {
-	typedef k3d::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_source<k3d::node > base;
 
 public:
 	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) : base(Factory, Document),

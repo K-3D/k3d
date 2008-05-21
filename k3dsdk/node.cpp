@@ -1,5 +1,5 @@
  // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,8 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements node, a default implementation of the inode interface for use as a base class for document nodes
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "k3d-i18n-config.h"
@@ -86,6 +85,30 @@ inode::deleted_signal_t& node::deleted_signal()
 inode::name_changed_signal_t& node::name_changed_signal()
 {
 	return m_name_changed_signal;
+}
+
+void node::save(xml::element& Element, const ipersistent::save_context& Context)
+{
+	persistent_container::save(Element, Context);
+}
+
+void node::load(xml::element& Element, const ipersistent::load_context& Context)
+{
+	// Load object name ...
+	set_name(xml::attribute_text(Element, "name"));
+
+	// Load Variables
+	persistent_container::load(Element, Context);
+}
+
+double node::get_selection_weight()
+{
+	return m_selection_weight.pipeline_value();
+}
+
+void node::set_selection_weight(const double Weight)
+{
+	m_selection_weight.set_value(Weight);
 }
 
 } // namespace k3d

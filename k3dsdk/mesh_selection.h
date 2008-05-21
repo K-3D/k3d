@@ -24,7 +24,6 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "ipersistent.h"
 #include "serialization_xml.h"
 #include "types.h"
 #include "xml.h"

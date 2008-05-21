@@ -26,7 +26,6 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
 
@@ -40,9 +39,9 @@ namespace scripting
 // mesh_modifier_script
 
 class mesh_modifier_script :
-	public k3d::scripted_node<k3d::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::scripted_node<k3d::mesh_modifier<k3d::node > >
 {
-	typedef k3d::scripted_node<k3d::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::scripted_node<k3d::mesh_modifier<k3d::node > > base;
 
 public:
 	mesh_modifier_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

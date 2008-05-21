@@ -27,7 +27,6 @@
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 #include <iterator>
 
@@ -41,9 +40,9 @@ namespace mesh
 // array_3d_implementation
 
 class array_3d_implementation :
-	public k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_modifier<k3d::node >
 {
-	typedef k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_modifier<k3d::node > base;
 
 public:
 	array_3d_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

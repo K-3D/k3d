@@ -27,7 +27,6 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/mesh_modifier.h>
 
 #include <iterator>
@@ -42,9 +41,9 @@ namespace point_group
 // make_point_group
 
 class make_point_group :
-	public k3d::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::mesh_modifier<k3d::node >
 {
-	typedef k3d::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_modifier<k3d::node > base;
 
 public:
 	make_point_group(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

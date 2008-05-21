@@ -29,7 +29,6 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/triangulator.h>
 
@@ -40,9 +39,9 @@ namespace development
 {
 
 class triangulate_faces :
-	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
 	triangulate_faces(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

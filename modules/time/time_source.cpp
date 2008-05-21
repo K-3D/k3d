@@ -26,7 +26,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 #include <limits>
 
@@ -40,9 +39,9 @@ namespace time
 // time_source
 
 class time_source :
-	public k3d::persistent<k3d::node>
+	public k3d::node
 {
-	typedef k3d::persistent<k3d::node>  base;
+	typedef k3d::node  base;
 
 public:
 	time_source(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

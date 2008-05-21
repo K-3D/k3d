@@ -28,7 +28,6 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/nurbs.h>
 #include <k3dsdk/measurement.h>
@@ -49,9 +48,9 @@ namespace module
 	namespace nurbs
 	{
 		class edit_knot_vector :
-			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > >
+			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 		{
-			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > > base;
+			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 		public:
 			edit_knot_vector(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),

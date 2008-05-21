@@ -34,9 +34,9 @@ namespace yafray
 // global_photon_light
 
 class global_photon_light :
-	public photons<light<k3d::persistent<k3d::node> > >
+	public photons<light<k3d::node > >
 {
-	typedef photons<light<k3d::persistent<k3d::node> > > base;
+	typedef photons<light<k3d::node > > base;
 
 public:
 	global_photon_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

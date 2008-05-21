@@ -25,7 +25,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_diff.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
@@ -39,9 +38,9 @@ namespace test
 // mesh_diff
 
 class mesh_diff :
-	public k3d::persistent<k3d::node>
+	public k3d::node
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	mesh_diff(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

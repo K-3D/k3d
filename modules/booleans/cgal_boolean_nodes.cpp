@@ -37,7 +37,6 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
@@ -52,9 +51,9 @@ namespace booleans
 
 class cgal_boolean :
 	public k3d::imulti_mesh_sink,
-	public k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	cgal_boolean(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

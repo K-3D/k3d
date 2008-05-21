@@ -31,7 +31,6 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/shared_pointer.h>
 
 #include <iterator>
@@ -46,9 +45,9 @@ namespace mesh_attributes
 // calculate_normals
 
 class calculate_normals :
-	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
 	calculate_normals(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

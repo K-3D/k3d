@@ -32,7 +32,6 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/resolutions.h>
@@ -47,10 +46,10 @@ namespace libk3drenderman
 // shadow_map
 
 class shadow_map :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::ri::itexture
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	shadow_map(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

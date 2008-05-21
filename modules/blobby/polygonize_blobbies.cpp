@@ -28,7 +28,6 @@
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/surface_polygonizer/blobby_polygonizer.h>
 #include <k3dsdk/types_ri.h>
 
@@ -42,9 +41,9 @@ namespace blobby
 // polygonize_blobbies_implementation
 
 class polygonize_blobbies_implementation :
-	public k3d::material_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::legacy::mesh_modifier<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
 
 public:
 	polygonize_blobbies_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

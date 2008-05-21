@@ -21,7 +21,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <k3dsdk/bitmap_modifier.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/node.h>
 
 namespace module
@@ -31,10 +30,10 @@ namespace bitmap
 {
 
 class simple_modifier :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::bitmap_modifier<simple_modifier>
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	simple_modifier(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

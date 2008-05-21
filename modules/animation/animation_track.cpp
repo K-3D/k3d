@@ -26,7 +26,6 @@
 #include <k3dsdk/ikeyframer.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/tokens.h>
@@ -120,11 +119,11 @@ private:
 /// Encapsulates a series of keyframes
 template <typename time_t, typename value_t>
 class animation_track :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::property_group_collection,
 	public k3d::ikeyframer
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 	typedef k3d_data(time_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) time_property_t;
 	typedef k3d_data(value_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, with_serialization) value_property_t;
 	typedef std::map<time_property_t*, value_property_t*> keyframes_t;

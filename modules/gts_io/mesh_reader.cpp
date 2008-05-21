@@ -30,7 +30,6 @@
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/string_modifiers.h>
 
 namespace module
@@ -61,9 +60,9 @@ void gts_line(std::istream& Stream, std::string& Buffer)
 // mesh_reader
 
 class mesh_reader :
-	public k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

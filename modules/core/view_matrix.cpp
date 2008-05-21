@@ -27,7 +27,6 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace libk3dcore
 {
@@ -36,10 +35,10 @@ namespace libk3dcore
 // view_matrix
 
 class view_matrix :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::itransform_source
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	view_matrix(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

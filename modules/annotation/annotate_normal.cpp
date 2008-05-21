@@ -26,7 +26,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/transformable.h>
@@ -42,9 +41,9 @@ namespace annotation
 // annotate_normal
 
 class annotate_normal :
-	public k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > >
+	public k3d::gl::renderable<k3d::transformable<k3d::node > >
 {
-	typedef k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > base;
+	typedef k3d::gl::renderable<k3d::transformable<k3d::node > > base;
 
 public:
 	annotate_normal(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

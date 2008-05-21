@@ -44,9 +44,9 @@ public:
 
 /// Base class for interpolation methods for keyframed animations
 template<typename time_t, typename value_t>
-class interpolator : public k3d::persistent<k3d::node>
+class interpolator : public k3d::node
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 public:
 	/// Stores the keyframe data
 	typedef std::map<time_t, value_t> keyframes_t;

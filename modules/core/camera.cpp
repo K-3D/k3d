@@ -31,7 +31,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/parentable.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/selection.h>
@@ -54,12 +53,12 @@ namespace libk3dcore
 // camera
 
 class camera :
-	public k3d::gl::renderable<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > >,
+	public k3d::gl::renderable<k3d::parentable<k3d::transformable<k3d::node > > >,
 	public k3d::icamera,
 	public k3d::icrop_window,
 	public k3d::property_group_collection
 {
-	typedef k3d::gl::renderable<k3d::parentable<k3d::transformable<k3d::persistent<k3d::node> > > > base;
+	typedef k3d::gl::renderable<k3d::parentable<k3d::transformable<k3d::node > > > base;
 
 public:
 	camera(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

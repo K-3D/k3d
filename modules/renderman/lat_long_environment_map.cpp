@@ -34,7 +34,6 @@
 #include <k3dsdk/itexture_ri.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/types_ri.h>
 
@@ -55,11 +54,11 @@ namespace libk3drenderman
 // lat_long_environment_map
 
 class lat_long_environment_map :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::bitmap_modifier<lat_long_environment_map>,
 	public k3d::ri::itexture
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	lat_long_environment_map(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

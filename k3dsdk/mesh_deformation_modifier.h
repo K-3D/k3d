@@ -27,16 +27,15 @@
 #include "mesh_selection_sink.h"
 #include "mesh_modifier.h"
 #include "node.h"
-#include "persistent.h"
 
 namespace k3d
 {
 
 /// Mesh modifier implementation for use in plugins that deform a mesh (modify its points) without altering topology.  To create a plugin, derive from mesh_deformation_modifier and implement the on_deform_mesh() method.
 class mesh_deformation_modifier :
-	public mesh_selection_sink<mesh_modifier<persistent<node> > >
+	public mesh_selection_sink<mesh_modifier<node > >
 {
-	typedef mesh_selection_sink<mesh_modifier<persistent<node> > > base;
+	typedef mesh_selection_sink<mesh_modifier<node > > base;
 
 public:
 	mesh_deformation_modifier(iplugin_factory& Factory, idocument& Document);

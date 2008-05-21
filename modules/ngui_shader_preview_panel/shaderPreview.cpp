@@ -526,17 +526,10 @@ namespace module{
 	    //Clear Property Connections 
 	    for(connections_t::iterator cIter = m_model->propertyConnections.begin(); cIter != m_model->propertyConnections.end(); cIter++)
 	      cIter->disconnect();
+	    m_model->propertyConnections.clear();
 
-	    //Create New Signal Connections
-	    if(k3d::iproperty_collection* const m_collection = dynamic_cast<k3d::iproperty_collection*>(Node)){
-      
-	      const k3d::iproperty_collection::properties_t& properties = m_collection->properties();
-	      k3d::iproperty_collection::properties_t::const_iterator property = properties.begin();
-
-	      for(property; property != properties.end(); ++property)
-		  m_model->propertyConnections.push_back((*property)->property_changed_signal().connect(m_model->m_changed_signal.make_slot()));
-
-	    }//if
+	if(k3d::inode_change_signal* const node_change_signal = dynamic_cast<k3d::inode_change_signal*>(Node))
+		m_model->propertyConnections.push_back(node_change_signal->connect_node_changed_signal(m_model->m_changed_signal.make_slot()));		
 
 	    //Render A Preview Image
 	    // renderPreview();

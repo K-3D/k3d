@@ -31,7 +31,6 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/transform.h>
 
 namespace libk3dcore
@@ -73,11 +72,11 @@ k3d::isnap_target* get_snap_target(k3d::iunknown* Snappable)
 // snap
 
 class snap :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::itransform_source,
 	public k3d::itransform_sink
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	snap(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

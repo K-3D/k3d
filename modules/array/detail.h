@@ -25,7 +25,6 @@
 #include <k3dsdk/itransform_array_1d.h>
 #include <k3dsdk/itransform_array_2d.h>
 #include <k3dsdk/itransform_array_3d.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/node_change_signal.h>
 #include <k3dsdk/signal_slots.h>
@@ -41,11 +40,11 @@ namespace array
 
 /// Boilerplate implementation of k3d::itransform_array_1d
 class transform_array_1d :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::node_change_signal<transform_array_1d>,
 	public k3d::itransform_array_1d
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	transform_array_1d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -88,11 +87,11 @@ private:
 
 /// Boilerplate implementation of k3d::itransform_array_1d
 class transform_array_2d :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::node_change_signal<transform_array_2d>,
 	public k3d::itransform_array_2d
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	transform_array_2d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -135,11 +134,11 @@ private:
 
 /// Boilerplate implementation of k3d::itransform_array_1d
 class transform_array_3d :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::node_change_signal<transform_array_3d>,
 	public k3d::itransform_array_3d
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	transform_array_3d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

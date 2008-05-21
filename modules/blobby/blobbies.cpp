@@ -28,7 +28,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace module
 {
@@ -40,9 +39,9 @@ namespace blobby
 // blobby_ellipsoid
 
 class blobby_ellipsoid :
-	public k3d::legacy::mesh_source<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_source<k3d::node >
 {
-	typedef k3d::legacy::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_source<k3d::node > base;
 
 public:
 	blobby_ellipsoid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -105,9 +104,9 @@ private:
 // blobby_segment
 
 class blobby_segment :
-	public k3d::legacy::mesh_source<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_source<k3d::node >
 {
-	typedef k3d::legacy::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_source<k3d::node > base;
 
 public:
 	blobby_segment(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -180,9 +179,9 @@ private:
 // blobby_add_operator
 
 class blobby_add_operator :
-	public k3d::legacy::mesh_source<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_source<k3d::node >
 {
-	typedef k3d::legacy::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_source<k3d::node > base;
 
 public:
 	blobby_add_operator(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -245,9 +244,9 @@ private:
 // blobby_mult_operator
 
 class blobby_mult_operator :
-	public k3d::legacy::mesh_source<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_source<k3d::node >
 {
-	typedef k3d::legacy::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_source<k3d::node > base;
 
 public:
 	blobby_mult_operator(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -310,9 +309,9 @@ private:
 // blobby_max_operator
 
 class blobby_max_operator :
-	public k3d::legacy::mesh_source<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_source<k3d::node >
 {
-	typedef k3d::legacy::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_source<k3d::node > base;
 
 public:
 	blobby_max_operator(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -375,9 +374,9 @@ private:
 // blobby_min_operator
 
 class blobby_min_operator :
-	public k3d::legacy::mesh_source<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_source<k3d::node >
 {
-	typedef k3d::legacy::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_source<k3d::node > base;
 
 public:
 	blobby_min_operator(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -440,9 +439,9 @@ private:
 // blobby_sub_operator
 
 class blobby_sub_operator :
-	public k3d::legacy::mesh_source<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_source<k3d::node >
 {
-	typedef k3d::legacy::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_source<k3d::node > base;
 
 public:
 	blobby_sub_operator(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -559,9 +558,9 @@ private:
 // blobby_div_operator
 
 class blobby_div_operator :
-	public k3d::legacy::mesh_source<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_source<k3d::node >
 {
-	typedef k3d::legacy::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_source<k3d::node > base;
 
 public:
 	blobby_div_operator(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

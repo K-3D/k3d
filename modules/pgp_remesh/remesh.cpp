@@ -31,7 +31,6 @@
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/utility.h>
 #include <iostream>
 #include <map>
@@ -65,9 +64,9 @@ namespace detail
 } // namespace detail
 
 	class pgp_remesh :
-		public k3d::mesh_modifier<k3d::persistent<k3d::node> > 
+		public k3d::mesh_modifier<k3d::node > 
 	{
-		typedef  k3d::mesh_modifier<k3d::persistent<k3d::node> >  base_t;
+		typedef  k3d::mesh_modifier<k3d::node >  base_t;
 	public:
 		pgp_remesh(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 			base_t(Factory, Document),

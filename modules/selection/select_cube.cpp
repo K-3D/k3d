@@ -28,7 +28,6 @@
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/transformable.h>
 
@@ -39,9 +38,9 @@ namespace libk3dselection
 // select_cube
 
 class select_cube :
-	public k3d::gl::renderable<k3d::transformable<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > >
+	public k3d::gl::renderable<k3d::transformable<k3d::legacy::mesh_modifier<k3d::node > > >
 {
-	typedef k3d::gl::renderable<k3d::transformable<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > > base;
+	typedef k3d::gl::renderable<k3d::transformable<k3d::legacy::mesh_modifier<k3d::node > > > base;
 
 	public:
 	select_cube(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

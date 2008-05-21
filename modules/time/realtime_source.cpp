@@ -26,7 +26,6 @@
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/user_interface.h>
 
 #include <limits>
@@ -48,9 +47,9 @@ namespace time
 // realtime_source
 
 class realtime_source :
-	public k3d::persistent<k3d::node>
+	public k3d::node
 {
-	typedef k3d::persistent<k3d::node>  base;
+	typedef k3d::node  base;
 
 public:
 	realtime_source(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

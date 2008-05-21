@@ -27,16 +27,15 @@
 #include "mesh_selection_sink.h"
 #include "mesh_modifier.h"
 #include "node.h"
-#include "persistent.h"
 
 namespace k3d
 {
 
 /// Mesh modifier implementation for use in plugins that alter the selection state of a mesh without altering its topology or geometry.  To create a plugin, derive from mesh_selection_modifier and implement the on_select_mesh() method.
 class mesh_selection_modifier :
-	public mesh_selection_sink<mesh_modifier<persistent<node> > >
+	public mesh_selection_sink<mesh_modifier<node > >
 {
-	typedef mesh_selection_sink<mesh_modifier<persistent<node> > > base;
+	typedef mesh_selection_sink<mesh_modifier<node > > base;
 
 public:
 	mesh_selection_modifier(iplugin_factory& Factory, idocument& Document);

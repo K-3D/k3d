@@ -26,7 +26,6 @@
 #include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
 
@@ -40,11 +39,11 @@ namespace scripting
 // render_engine_script\n\
 
 class render_engine_script :
-	public k3d::scripted_node<k3d::persistent<k3d::node> >,
+	public k3d::scripted_node<k3d::node >,
 	public k3d::inode_collection_sink,
 	public k3d::irender_frame
 {
-	typedef k3d::scripted_node<k3d::persistent<k3d::node> > base;
+	typedef k3d::scripted_node<k3d::node > base;
 
 public:
 	render_engine_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

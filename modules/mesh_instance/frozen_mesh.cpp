@@ -31,7 +31,6 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/serialization_xml.h>
 
 #include <iterator>
@@ -46,12 +45,12 @@ namespace mesh_instance
 // frozen_mesh
 
 class frozen_mesh :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::imesh_sink,
 	public k3d::imesh_source,
 	public k3d::imesh_storage
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	frozen_mesh(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

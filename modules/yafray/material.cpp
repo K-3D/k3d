@@ -28,7 +28,6 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_yafray.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/vectors.h>
 
@@ -42,12 +41,12 @@ namespace yafray
 // material
 
 class material :
-	public k3d::persistent<k3d::node> ,
+	public k3d::node ,
 	public k3d::imaterial,
 	public k3d::yafray::imaterial,
 	public k3d::property_group_collection
 {
-	typedef k3d::persistent<k3d::node>  base;
+	typedef k3d::node  base;
 
 public:
 	material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

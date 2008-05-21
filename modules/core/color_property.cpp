@@ -26,15 +26,14 @@
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace libk3dcore
 {
 
 class color_property :
-	public k3d::persistent<k3d::node>
+	public k3d::node
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 public:
 	color_property(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),

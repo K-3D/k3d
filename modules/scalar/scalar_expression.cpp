@@ -27,7 +27,6 @@
 #include <k3dsdk/expression/parser.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_property_changed_signal.h>
@@ -36,9 +35,9 @@ namespace libk3dcore
 {
 
 class scalar_expression :
-	public k3d::persistent<k3d::node>
+	public k3d::node
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 public:
 	scalar_expression(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),

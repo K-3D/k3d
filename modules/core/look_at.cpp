@@ -28,7 +28,6 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/vectors.h>
 
 namespace libk3dcore
@@ -38,11 +37,11 @@ namespace libk3dcore
 // look_at
 
 class look_at :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::itransform_source,
 	public k3d::itransform_sink
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	look_at(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -28,7 +28,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace libk3dprimitives
 {
@@ -954,9 +953,9 @@ const unsigned long TeaspoonPatches[16][16] =
 // newell_primitive_implementation
 
 class newell_primitive_implementation :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
 
 public:
 	newell_primitive_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

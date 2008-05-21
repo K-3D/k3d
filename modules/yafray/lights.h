@@ -30,7 +30,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/ilight_yafray.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/transform.h>

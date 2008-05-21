@@ -2,7 +2,7 @@
 #define K3DSDK_NODE_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,14 +21,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares k3d::node, a default implementation of the k3d::inode interface, for use as a base class for document plugins
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "data.h"
 #include "idocument.h"
 #include "inode.h"
 #include "iselectable.h"
+#include "persistent_container.h"
 #include "property_collection.h"
 #include "result.h"
 
@@ -37,35 +37,32 @@ namespace k3d
 
 class iplugin_factory;
 
-/// A default implementation of the k3d::inode interface, for use as a base class for document plugins
+/// Implements the minimum functionality required of any K-3D node.  You should derive document plugins from node and override
+/// the default method implementations and/or implement additional interfaces as-needed.
 class node :
 	public inode,
+	public ipersistent,
 	public iselectable,
 	public property_collection,
+	public persistent_container,
 	public sigc::trackable
 {
 public:
 	node(iplugin_factory& Factory, idocument& Document);
 	virtual ~node();
 
-	// inode implementation ...
 	void set_name(const std::string Name);
 	const std::string name();
 	idocument& document();
 	iplugin_factory& factory();
-
 	deleted_signal_t& deleted_signal();
 	name_changed_signal_t& name_changed_signal();
 
-	double get_selection_weight()
-	{
-		return m_selection_weight.pipeline_value();
-	}
+	void save(xml::element& Element, const ipersistent::save_context& Context);
+	void load(xml::element& Element, const ipersistent::load_context& Context);
 
-	void set_selection_weight(const double Weight)
-	{
-		m_selection_weight.set_value(Weight);
-	}
+	double get_selection_weight();
+	void set_selection_weight(const double Weight);
 
 private:
 	void on_deleted();

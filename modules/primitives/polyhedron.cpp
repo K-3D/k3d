@@ -29,7 +29,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 #include <cctype>
 #include <cmath>
@@ -1429,9 +1428,9 @@ namespace detail
 // polyhedron_implementation
 
 class polyhedron_implementation :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
 
 public:
 	polyhedron_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

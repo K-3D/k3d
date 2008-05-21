@@ -28,7 +28,6 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/nurbs.h>
 #include <k3dsdk/measurement.h>
@@ -46,9 +45,9 @@ namespace module
 
 
 		class create_curve :
-			public k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > >
+			public k3d::material_sink<k3d::mesh_source<k3d::node > >
 		{
-			typedef k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
+			typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 		public:
 			create_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),

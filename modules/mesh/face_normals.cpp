@@ -24,7 +24,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh_modifier.h>
 
@@ -40,9 +39,9 @@ namespace mesh
 // face_normals_implementation
 
 class face_normals_implementation :
-	public k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_modifier<k3d::node >
 {
-	typedef k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_modifier<k3d::node > base;
 
 public:
 	face_normals_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

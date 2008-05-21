@@ -32,7 +32,6 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/xml.h>
 
@@ -48,10 +47,10 @@ namespace development
 // tweak_points
 
 class tweak_points :
-	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > >,
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >,
 	public k3d::icommand_node
 {
-	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 	typedef std::map<size_t, k3d::vector3> tweaks_t;
 public:
 	tweak_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

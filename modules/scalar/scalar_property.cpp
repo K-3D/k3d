@@ -25,16 +25,15 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/measurement.h>
 
 namespace libk3dcore
 {
 
 class scalar_property :
-	public k3d::persistent<k3d::node>
+	public k3d::node
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	scalar_property(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

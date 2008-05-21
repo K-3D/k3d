@@ -26,7 +26,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/i3d_2d_mapping.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/vectors.h>
 
 #include <iterator>
@@ -38,10 +37,10 @@ namespace libk3dtexture
 // sphere_map_implementation
 
 class sphere_map_implementation :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::i3d_2d_mapping
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	sphere_map_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

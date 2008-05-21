@@ -30,7 +30,6 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_sink.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace module
 {
@@ -45,9 +44,9 @@ namespace io
 // mesh_writerio
 
 class mesh_writer :
-	public k3d::mesh_sink<k3d::persistent<k3d::node> >
+	public k3d::mesh_sink<k3d::node >
 {
-	typedef k3d::mesh_sink<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_sink<k3d::node > base;
 
 public:
 	mesh_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

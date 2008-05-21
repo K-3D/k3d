@@ -51,7 +51,6 @@
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/property_group_collection.h>
@@ -113,14 +112,14 @@ private:
 // render_engine
 
 class render_engine :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::inode_collection_sink,
 	public k3d::irender_camera_preview,
 	public k3d::irender_camera_frame,
 	public k3d::irender_camera_animation,
 	public k3d::property_group_collection
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	render_engine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -36,7 +36,6 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_property_changed_signal.h>
@@ -51,9 +50,9 @@ namespace plot
 // surface_plot
 
 class surface_plot :
-	public k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	surface_plot(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

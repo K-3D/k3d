@@ -25,7 +25,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/ilight_ri.h>
 #include <k3dsdk/ilight_shader_ri.h>
@@ -42,10 +41,10 @@ namespace libk3drenderman
 // area_light
 
 class area_light :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::ri::ilight
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	area_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

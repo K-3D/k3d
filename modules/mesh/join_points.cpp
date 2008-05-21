@@ -23,7 +23,6 @@
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/utility.h>
@@ -40,9 +39,9 @@ namespace mesh
 // join_points_implementation
 
 class join_points_implementation :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
 
 public:
 	join_points_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

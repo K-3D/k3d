@@ -53,7 +53,6 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
@@ -76,13 +75,13 @@ namespace yafray
 // render_engine
 
 class render_engine :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::inode_collection_sink,
 	public k3d::irender_camera_preview,
 	public k3d::irender_camera_frame,
 	public k3d::irender_camera_animation
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	render_engine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

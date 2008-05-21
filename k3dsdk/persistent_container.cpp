@@ -24,12 +24,13 @@
 #include "inode.h"
 #include "iproperty_collection.h"
 #include "iuser_property.h"
-#include "persistent.h"
+#include "persistent_container.h"
 #include "properties.h"
 #include "result.h"
 #include "tokens.h"
 #include "type_registry.h"
 #include "utility.h"
+#include "xml.h"
 
 #include <iostream>
 #include <map>

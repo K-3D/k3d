@@ -27,7 +27,6 @@
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/subdivision_surface/sds_crease.h>
 
 #include <iterator>
@@ -42,9 +41,9 @@ namespace mesh
 // make_creases_implementation
 
 class make_creases_implementation :
-	public k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_modifier<k3d::node >
 {
-	typedef k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_modifier<k3d::node > base;
 
 public:
 	make_creases_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -32,7 +32,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/node_change_signal.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/types_ri.h>
 #include <k3dsdk/vectors.h>
@@ -49,12 +48,12 @@ const std::string shadowtype_opacity = "Opacity";
 const std::string shadowtype_shaded = "Shaded";
 
 class material :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::node_change_signal<material>,
 	public k3d::imaterial,
 	public k3d::ri::imaterial
 {
-	typedef k3d::persistent<k3d::node>  base;
+	typedef k3d::node  base;
 
 public:
 	material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

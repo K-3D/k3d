@@ -26,7 +26,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace libk3dcore
 {
@@ -35,10 +34,10 @@ namespace libk3dcore
 // material
 
 class multi_material :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::imaterial
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	multi_material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

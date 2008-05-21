@@ -30,7 +30,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 #include <complex>
 
@@ -270,9 +269,9 @@ bool create_fft_triangle(k3d::legacy::polyhedron& Polyhedron, k3d::legacy::point
 // poly_terrain_fft_implementation
 
 class poly_terrain_fft_implementation :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
 
 public:
 	poly_terrain_fft_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

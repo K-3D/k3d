@@ -27,7 +27,6 @@
 #include "data.h"
 #include "imesh_painter_gl.h"
 #include "node.h"
-#include "persistent.h"
 #include "utility_gl.h"
 
 namespace k3d
@@ -38,10 +37,10 @@ namespace gl
 
 /// Provides a boilerplate implementation of k3d::gl::imesh_painter
 class mesh_painter :
-	public persistent<node>,
+	public node,
 	public imesh_painter
 {
-	typedef persistent<node> base;
+	typedef node base;
 
 public:
 	mesh_painter(iplugin_factory& Factory, idocument& Document) :

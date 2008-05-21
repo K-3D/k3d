@@ -28,7 +28,6 @@
 #include <k3dsdk/imaterial_gl.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/node_change_signal.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/utility_gl.h>
 #include <k3dsdk/vectors.h>
 
@@ -42,12 +41,12 @@ namespace opengl
 // material
 
 class material :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::node_change_signal<material>,
 	public k3d::imaterial,
 	public k3d::gl::imaterial
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -26,7 +26,6 @@
 #include <k3dsdk/bounding_box3.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/transformable.h>
@@ -38,9 +37,9 @@ namespace libk3drenderman
 // delayed_read_archive
 
 class delayed_read_archive :
-	public k3d::gl::renderable<k3d::ri::renderable<k3d::transformable<k3d::persistent<k3d::node> > > >
+	public k3d::gl::renderable<k3d::ri::renderable<k3d::transformable<k3d::node > > >
 {
-	typedef k3d::gl::renderable<k3d::ri::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > base;
+	typedef k3d::gl::renderable<k3d::ri::renderable<k3d::transformable<k3d::node > > > base;
 
 public:
 	delayed_read_archive(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -29,7 +29,6 @@
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/xml.h>
 
 namespace module
@@ -45,10 +44,10 @@ namespace io
 // mesh_reader_implementation
 
 class mesh_reader_implementation :
-	public k3d::mesh_source<k3d::persistent<k3d::node> >,
+	public k3d::mesh_source<k3d::node >,
 	public k3d::imesh_storage
 {
-	typedef k3d::mesh_source<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_source<k3d::node > base;
 
 public:
 	mesh_reader_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

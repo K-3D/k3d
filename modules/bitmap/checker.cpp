@@ -28,7 +28,6 @@
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 #include <iterator>
 
@@ -42,10 +41,10 @@ namespace bitmap
 // checker
 
 class checker :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::bitmap_source<checker>
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	checker(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

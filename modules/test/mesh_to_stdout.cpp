@@ -26,7 +26,6 @@
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace module
 {
@@ -38,10 +37,10 @@ namespace test
 // mesh_to_stdout
 
 class mesh_to_stdout :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::imesh_sink
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	mesh_to_stdout(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

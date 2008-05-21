@@ -28,7 +28,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 #include "helpers.h"
 
@@ -42,9 +41,9 @@ namespace gts
 // mesh_volume
 
 class mesh_volume :
-	public k3d::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::mesh_modifier<k3d::node >
 {
-	typedef k3d::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::mesh_modifier<k3d::node > base;
 
 public:
 	mesh_volume(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

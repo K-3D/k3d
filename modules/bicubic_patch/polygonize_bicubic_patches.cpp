@@ -28,7 +28,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 namespace module
 {
@@ -40,9 +39,9 @@ namespace bicubic_patch
 // polygonize_bicubic_patches
 
 class polygonize_bicubic_patches :
-	public k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_modifier<k3d::node >
 {
-	typedef k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_modifier<k3d::node > base;
 
 public:
 	polygonize_bicubic_patches(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

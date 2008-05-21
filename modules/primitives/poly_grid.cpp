@@ -29,7 +29,6 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 
 #include <iterator>
 
@@ -40,9 +39,9 @@ namespace libk3dprimitives
 // poly_grid
 
 class poly_grid :
-	public k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::mesh_source<k3d::persistent<k3d::node> > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	poly_grid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

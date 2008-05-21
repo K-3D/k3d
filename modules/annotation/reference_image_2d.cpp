@@ -30,7 +30,6 @@
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/render_state_gl.h>
 #include <k3dsdk/utility_gl.h>
 
@@ -44,10 +43,10 @@ namespace annotation
 // reference_image_2d
 
 class reference_image_2d :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::gl::irenderable
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	reference_image_2d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

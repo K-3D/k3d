@@ -26,7 +26,6 @@
 #include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/painter_render_state_gl.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/selection.h>
 
 #include "normal_cache.h"

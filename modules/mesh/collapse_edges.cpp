@@ -28,7 +28,6 @@
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/utility.h>
 
 #include "helpers.h"
@@ -217,9 +216,9 @@ bool collapse_selected_edge(k3d::legacy::polyhedron& Polyhedron, point_map_t& Po
 // collapse_edges
 
 class collapse_edges :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
 
 public:
 	collapse_edges(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -501,9 +500,9 @@ private:
 // collapse_faces
 
 class collapse_faces :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > >
+	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > > base;
+	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
 
 public:
 	collapse_faces(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

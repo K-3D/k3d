@@ -29,7 +29,6 @@
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
@@ -41,10 +40,10 @@ namespace libk3drendermanpainters
 // linear_curve_painter
 
 class linear_curve_painter :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::ri::imesh_painter
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	linear_curve_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

@@ -29,7 +29,6 @@
 #include <k3dsdk/irender_viewport_gl.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/win32.h>
 
 #include <iterator>
@@ -146,10 +145,10 @@ public:
 // camera_to_bitmap
 
 class camera_to_bitmap :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::bitmap_source<camera_to_bitmap>
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	camera_to_bitmap(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

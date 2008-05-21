@@ -29,7 +29,6 @@
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/utility.h>
 
@@ -88,9 +87,9 @@ MxStdModel* triangulate_mesh(const k3d::legacy::mesh& Mesh)
 // quadric_decimation
 
 class quadric_decimation :
-	public k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> >
+	public k3d::legacy::mesh_modifier<k3d::node >
 {
-	typedef k3d::legacy::mesh_modifier<k3d::persistent<k3d::node> > base;
+	typedef k3d::legacy::mesh_modifier<k3d::node > base;
 
 public:
 	quadric_decimation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

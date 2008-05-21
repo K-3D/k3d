@@ -32,7 +32,6 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/plugins.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -49,10 +48,10 @@ namespace bitmap
 // reader
 
 class reader :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::bitmap_source<reader>
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

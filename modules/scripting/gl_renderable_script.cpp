@@ -24,7 +24,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
@@ -41,9 +40,9 @@ namespace scripting
 // gl_renderable_script
 
 class gl_renderable_script :
-	public k3d::scripted_node<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > >
+	public k3d::scripted_node<k3d::gl::renderable<k3d::transformable<k3d::node > > >
 {
-	typedef k3d::scripted_node<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > base;
+	typedef k3d::scripted_node<k3d::gl::renderable<k3d::transformable<k3d::node > > > base;
 
 public:
 	gl_renderable_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

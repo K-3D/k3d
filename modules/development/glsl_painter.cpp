@@ -27,7 +27,6 @@
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/persistent.h>
 #include <k3dsdk/properties.h>
 
 namespace module
@@ -87,10 +86,10 @@ GLhandleARB link_shader(const GLhandleARB VertexObject, const GLhandleARB Fragme
 // glsl_painter
 
 class glsl_painter :
-	public k3d::persistent<k3d::node>,
+	public k3d::node,
 	public k3d::gl::imesh_painter
 {
-	typedef k3d::persistent<k3d::node> base;
+	typedef k3d::node base;
 
 public:
 	glsl_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

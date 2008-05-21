@@ -59,7 +59,6 @@
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/imulti_mesh_sink.h>
 #include <k3dsdk/inode_collection_sink.h>
-#include <k3dsdk/ipersistent.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>

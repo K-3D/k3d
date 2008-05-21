@@ -34,9 +34,9 @@ namespace yafray
 // area_light
 
 class area_light :
-	public colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > >
+	public colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::node > > > >
 {
-	typedef colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
+	typedef colored_light<light<k3d::gl::renderable<k3d::transformable<k3d::node > > > > base;
 
 public:
 	area_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

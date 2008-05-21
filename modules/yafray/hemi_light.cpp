@@ -34,9 +34,9 @@ namespace yafray
 // hemi_light
 
 class hemi_light :
-	public renderable_light<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > >
+	public renderable_light<colored_light<light<k3d::transformable<k3d::node > > > >
 {
-	typedef renderable_light<colored_light<light<k3d::transformable<k3d::persistent<k3d::node> > > > > base;
+	typedef renderable_light<colored_light<light<k3d::transformable<k3d::node > > > > base;
 
 public:
 	hemi_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
