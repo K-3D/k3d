@@ -2,7 +2,7 @@
 #define K3DSDK_PROPERTY_COLLECTION_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,11 +21,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares commandnode, which provides a default implementation of icommand_node
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
 #include "iproperty_collection.h"
 
 namespace k3d
@@ -56,9 +54,6 @@ private:
 	sigc::signal<void, iunknown*> m_changed_signal;
 };
 
-/// Convenience function that returns the set of user properties from a collection
-const iproperty_collection::properties_t user_properties(iproperty_collection& PropertyCollection);
-	
 } // namespace k3d
 
 #endif // K3DSDK_PROPERTY_COLLECTION_H

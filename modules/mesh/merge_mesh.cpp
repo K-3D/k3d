@@ -659,7 +659,7 @@ public:
 
 	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
-		const k3d::iproperty_collection::properties_t properties = k3d::user_properties(*static_cast<k3d::iproperty_collection*>(this));
+		const k3d::iproperty_collection::properties_t properties = k3d::property::user_properties(*static_cast<k3d::iproperty_collection*>(this));
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
 		{
 			k3d::iproperty& property = **prop;

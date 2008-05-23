@@ -136,7 +136,7 @@ protected:
 	user_serialization(const init_t& Init) :
 		property_policy_t(Init)
 	{
-		Init.persistent_container().enable_serialization(Init.name(), *this);
+		Init.persistent_collection().enable_serialization(Init.name(), *this);
 	}
 };
 
@@ -180,7 +180,7 @@ protected:
 	user_mesh_serialization(const init_t& Init) :
 		property_policy_t(Init)
 	{
-		Init.persistent_container().enable_serialization(Init.name(), *this);
+		Init.persistent_collection().enable_serialization(Init.name(), *this);
 	}
 };
 
@@ -236,7 +236,7 @@ protected:
 	user_node_serialization(const init_t& Init) :
 		property_policy_t(Init)
 	{
-		Init.persistent_container().enable_serialization(Init.name(), *this);
+		Init.persistent_collection().enable_serialization(Init.name(), *this);
 	}
 
 private:
@@ -250,10 +250,10 @@ private:
 class property_factory
 {
 public:
-	property_factory(inode& Owner, iproperty_collection& PropertyCollection, ipersistent_container& PersistentContainer, const std::type_info& Type, const string_t& Name, const string_t& Label, const string_t& Description, const boost::any& Value, iproperty*& Result) :
+	property_factory(inode& Owner, iproperty_collection& PropertyCollection, ipersistent_collection& PersistentCollection, const std::type_info& Type, const string_t& Name, const string_t& Label, const string_t& Description, const boost::any& Value, iproperty*& Result) :
 		owner(Owner),
 		property_collection(PropertyCollection),
-		persistent_container(PersistentContainer),
+		persistent_collection(PersistentCollection),
 		type(Type),
 		name(Name),
 		label(Label),
@@ -289,7 +289,7 @@ public:
 		null_property_collection temp_property_collection;
 
 		result = new PropertyT(
-			init_owner(owner.document(), temp_property_collection, persistent_container, &owner)
+			init_owner(owner.document(), temp_property_collection, persistent_collection, &owner)
 			+ init_name(make_token(name.c_str()))
 			+ init_label(make_token(label.c_str()))
 			+ init_description(make_token(description.c_str()))
@@ -325,7 +325,7 @@ public:
 		null_property_collection temp_property_collection;
 
 		result = new PropertyT(
-			init_owner(owner.document(), temp_property_collection, persistent_container, &owner)
+			init_owner(owner.document(), temp_property_collection, persistent_collection, &owner)
 			+ init_name(make_token(name.c_str()))
 			+ init_label(make_token(label.c_str()))
 			+ init_description(make_token(description.c_str()))
@@ -386,7 +386,7 @@ public:
 private:
 	inode& owner;
 	iproperty_collection& property_collection;
-	ipersistent_container& persistent_container;
+	ipersistent_collection& persistent_collection;
 	const std::type_info& type;
 	const string_t& name;
 	const string_t& label;
@@ -697,7 +697,7 @@ protected:
 	renderman_attribute_serialization(const init_t& Init) :
 		property_policy_t(Init)
 	{
-		Init.persistent_container().enable_serialization(Init.name(), *this);
+		Init.persistent_collection().enable_serialization(Init.name(), *this);
 	}
 };
 
@@ -741,7 +741,7 @@ protected:
 	renderman_option_serialization(const init_t& Init) :
 		property_policy_t(Init)
 	{
-		Init.persistent_container().enable_serialization(Init.name(), *this);
+		Init.persistent_collection().enable_serialization(Init.name(), *this);
 	}
 };
 
@@ -752,10 +752,10 @@ protected:
 class renderman_attribute_factory
 {
 public:
-	renderman_attribute_factory(inode& Owner, iproperty_collection& PropertyCollection, ipersistent_container& PersistentContainer, const std::type_info& Type, const string_t& AttributeName, const string_t& Name, const string_t& Label, const string_t& Description, const boost::any& Value, iproperty*& Result) :
+	renderman_attribute_factory(inode& Owner, iproperty_collection& PropertyCollection, ipersistent_collection& PersistentCollection, const std::type_info& Type, const string_t& AttributeName, const string_t& Name, const string_t& Label, const string_t& Description, const boost::any& Value, iproperty*& Result) :
 		owner(Owner),
 		property_collection(PropertyCollection),
-		persistent_container(PersistentContainer),
+		persistent_collection(PersistentCollection),
 		type(Type),
 		attribute_name(AttributeName),
 		name(Name),
@@ -790,7 +790,7 @@ public:
 		null_property_collection temp_property_collection;
 
 		result = new PropertyT(
-			init_owner(owner.document(), temp_property_collection, persistent_container, &owner)
+			init_owner(owner.document(), temp_property_collection, persistent_collection, &owner)
 			+ init_parameter_list_name(make_token(attribute_name.c_str()))
 			+ init_name(make_token(name.c_str()))
 			+ init_label(make_token(label.c_str()))
@@ -810,7 +810,7 @@ public:
 private:
 	inode& owner;
 	iproperty_collection& property_collection;
-	ipersistent_container& persistent_container;
+	ipersistent_collection& persistent_collection;
 	const std::type_info& type;
 	const string_t& attribute_name;
 	const string_t& name;
@@ -827,10 +827,10 @@ private:
 class renderman_option_factory
 {
 public:
-	renderman_option_factory(inode& Owner, iproperty_collection& PropertyCollection, ipersistent_container& PersistentContainer, const std::type_info& Type, const string_t& OptionName, const string_t& Name, const string_t& Label, const string_t& Description, const boost::any& Value, iproperty*& Result) :
+	renderman_option_factory(inode& Owner, iproperty_collection& PropertyCollection, ipersistent_collection& PersistentCollection, const std::type_info& Type, const string_t& OptionName, const string_t& Name, const string_t& Label, const string_t& Description, const boost::any& Value, iproperty*& Result) :
 		owner(Owner),
 		property_collection(PropertyCollection),
-		persistent_container(PersistentContainer),
+		persistent_collection(PersistentCollection),
 		type(Type),
 		option_name(OptionName),
 		name(Name),
@@ -865,7 +865,7 @@ public:
 		null_property_collection temp_property_collection;
 
 		result = new PropertyT(
-			init_owner(owner.document(), temp_property_collection, persistent_container, &owner)
+			init_owner(owner.document(), temp_property_collection, persistent_collection, &owner)
 			+ init_parameter_list_name(make_token(option_name.c_str()))
 			+ init_name(make_token(name.c_str()))
 			+ init_label(make_token(label.c_str()))
@@ -885,7 +885,7 @@ public:
 private:
 	inode& owner;
 	iproperty_collection& property_collection;
-	ipersistent_container& persistent_container;
+	ipersistent_collection& persistent_collection;
 	const std::type_info& type;
 	const string_t& option_name;
 	const string_t& name;
@@ -993,6 +993,26 @@ bool set_internal_value(iproperty& Property, const boost::any& Value)
 	return writable_property->property_set_value(Value);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+// user_properties
+
+const std::vector<iproperty*> user_properties(iunknown& Object)
+{
+	std::vector<iproperty*> results;
+
+	if(iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(&Object))
+	{
+		const iproperty_collection::properties_t& properties = property_collection->properties();
+		for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+		{
+			if(dynamic_cast<iuser_property*>(*property))
+				results.push_back(*property);
+		}
+	}
+
+	return results;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // create
 
@@ -1001,11 +1021,11 @@ iproperty* create(inode& Owner, const std::type_info& Type, const string_t& Name
 	iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(&Owner);
 	return_val_if_fail(property_collection, 0);
 
-	ipersistent_container* const persistent_container = dynamic_cast<ipersistent_container*>(&Owner);
-	return_val_if_fail(persistent_container, 0);
+	ipersistent_collection* const persistent_collection = dynamic_cast<ipersistent_collection*>(&Owner);
+	return_val_if_fail(persistent_collection, 0);
 
 	iproperty* result = 0;
-	boost::mpl::for_each<k3d::property::types>(detail::property_factory(Owner, *property_collection, *persistent_container, Type, Name, Label, Description, Value, result));
+	boost::mpl::for_each<k3d::property::types>(detail::property_factory(Owner, *property_collection, *persistent_collection, Type, Name, Label, Description, Value, result));
 
 	return result;
 }
@@ -1032,11 +1052,11 @@ iproperty* create_attribute(inode& Owner, const std::type_info& Type, const stri
 	iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(&Owner);
 	return_val_if_fail(property_collection, 0);
 
-	ipersistent_container* const persistent_container = dynamic_cast<ipersistent_container*>(&Owner);
-	return_val_if_fail(persistent_container, 0);
+	ipersistent_collection* const persistent_collection = dynamic_cast<ipersistent_collection*>(&Owner);
+	return_val_if_fail(persistent_collection, 0);
 
 	iproperty* result = 0;
-	boost::mpl::for_each<k3d::property::ri::attribute_types>(k3d::property::detail::renderman_attribute_factory(Owner, *property_collection, *persistent_container, Type, AttributeName, Name, Label, Description, Value, result));
+	boost::mpl::for_each<k3d::property::ri::attribute_types>(k3d::property::detail::renderman_attribute_factory(Owner, *property_collection, *persistent_collection, Type, AttributeName, Name, Label, Description, Value, result));
 
 	return result;
 }
@@ -1060,11 +1080,11 @@ iproperty* create_option(inode& Owner, const std::type_info& Type, const string_
 	iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(&Owner);
 	return_val_if_fail(property_collection, 0);
 
-	ipersistent_container* const persistent_container = dynamic_cast<ipersistent_container*>(&Owner);
-	return_val_if_fail(persistent_container, 0);
+	ipersistent_collection* const persistent_collection = dynamic_cast<ipersistent_collection*>(&Owner);
+	return_val_if_fail(persistent_collection, 0);
 
 	iproperty* result = 0;
-	boost::mpl::for_each<k3d::property::ri::option_types>(k3d::property::detail::renderman_option_factory(Owner, *property_collection, *persistent_container, Type, OptionName, Name, Label, Description, Value, result));
+	boost::mpl::for_each<k3d::property::ri::option_types>(k3d::property::detail::renderman_option_factory(Owner, *property_collection, *persistent_collection, Type, OptionName, Name, Label, Description, Value, result));
 
 	return result;
 }

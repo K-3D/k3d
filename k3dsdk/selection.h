@@ -22,6 +22,7 @@
 
 #include "gl.h"
 #include "iselectable.h"
+#include <vector>
 
 namespace k3d
 {

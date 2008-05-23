@@ -31,7 +31,7 @@
 #include "inode_property.h"
 #include "ipath_property.h"
 #include "ipersistent.h"
-#include "ipersistent_container.h"
+#include "ipersistent_collection.h"
 #include "ipersistent_lookup.h"
 #include "iplugin_factory.h"
 #include "iproperty.h"
@@ -121,7 +121,7 @@ protected:
 	with_serialization(const init_t& Init) :
 		property_policy_t(Init)
 	{
-		Init.persistent_container().enable_serialization(Init.name(), *this);
+		Init.persistent_collection().enable_serialization(Init.name(), *this);
 	}
 };
 
@@ -162,7 +162,7 @@ protected:
 	path_serialization(const init_t& Init) :
 		property_policy_t(Init)
 	{
-		Init.persistent_container().enable_serialization(Init.name(), *this);
+		Init.persistent_collection().enable_serialization(Init.name(), *this);
 	}
 };
 
@@ -198,7 +198,7 @@ protected:
 	node_serialization(const init_t& Init) :
 		property_policy_t(Init)
 	{
-		Init.persistent_container().enable_serialization(Init.name(), *this);
+		Init.persistent_collection().enable_serialization(Init.name(), *this);
 	}
 
 private:
@@ -249,7 +249,7 @@ protected:
 	node_collection_serialization(const init_t& Init) :
 		property_policy_t(Init)
 	{
-		Init.persistent_container().enable_serialization(Init.name(), *this);
+		Init.persistent_collection().enable_serialization(Init.name(), *this);
 	}
 };
 
@@ -2644,7 +2644,7 @@ public:
 		return m_owner;
 	}
 
-	ipersistent_container& persistent_container() const
+	ipersistent_collection& persistent_collection() const
 	{
 		return m_owner;
 	}
@@ -2668,10 +2668,10 @@ inline const initializer_t<owner_initializer_t<owner_t> > init_owner(owner_t& Ow
 class external_owner_initializer_t
 {
 public:
-	explicit external_owner_initializer_t(idocument& Document, iproperty_collection& PropertyCollection, ipersistent_container& PersistentContainer, inode* const Node) :
+	explicit external_owner_initializer_t(idocument& Document, iproperty_collection& PropertyCollection, ipersistent_collection& PersistentCollection, inode* const Node) :
 		m_document(Document),
 		m_property_collection(PropertyCollection),
-		m_persistent_container(PersistentContainer),
+		m_persistent_collection(PersistentCollection),
 		m_node(Node)
 	{
 	}
@@ -2686,9 +2686,9 @@ public:
 		return m_property_collection;
 	}
 
-	ipersistent_container& persistent_container() const
+	ipersistent_collection& persistent_collection() const
 	{
-		return m_persistent_container;
+		return m_persistent_collection;
 	}
 
 	inode* node() const
@@ -2699,13 +2699,13 @@ public:
 private:
 	idocument& m_document;
 	iproperty_collection& m_property_collection;
-	ipersistent_container& m_persistent_container;
+	ipersistent_collection& m_persistent_collection;
 	inode* const m_node;
 };
 
-inline const initializer_t<external_owner_initializer_t> init_owner(idocument& Document, iproperty_collection& PropertyCollection, ipersistent_container& PersistentContainer, inode* const Object)
+inline const initializer_t<external_owner_initializer_t> init_owner(idocument& Document, iproperty_collection& PropertyCollection, ipersistent_collection& PersistentCollection, inode* const Object)
 {
-	return initializer_t<external_owner_initializer_t>(external_owner_initializer_t(Document, PropertyCollection, PersistentContainer, Object));
+	return initializer_t<external_owner_initializer_t>(external_owner_initializer_t(Document, PropertyCollection, PersistentCollection, Object));
 }
 
 /// Helper class used to initialize slots

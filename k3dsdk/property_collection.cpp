@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,10 +18,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements property_collection, which provides a default implementation of iproperty_collection
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "iproperty.h"
 #include "iuser_property.h"
 #include "property_collection.h"
 #include "result.h"
@@ -86,23 +86,6 @@ const iproperty_collection::properties_t& property_collection::properties()
 sigc::connection property_collection::connect_properties_changed_signal(const sigc::slot<void, iunknown*>& Slot)
 {
 	return m_changed_signal.connect(Slot);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// user_properties
-
-const iproperty_collection::properties_t user_properties(iproperty_collection& PropertyCollection)
-{
-	iproperty_collection::properties_t results;
-
-	const iproperty_collection::properties_t& properties = PropertyCollection.properties();
-	for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-	{
-		if(dynamic_cast<iuser_property*>(*property))
-			results.push_back(*property);
-	}
-
-	return results;
 }
 
 } // namespace k3d

@@ -32,7 +32,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/inode.h>
-#include <k3dsdk/ipersistent_container.h>
+#include <k3dsdk/ipersistent_collection.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/property_collection.h>
@@ -226,8 +226,8 @@ private:
 		k3d::iproperty_collection* const property_collection = dynamic_cast<k3d::iproperty_collection*>(&node());
 		return_if_fail(property_collection);
 
-		k3d::ipersistent_container* const persistent_container = dynamic_cast<k3d::ipersistent_container*>(&node());
-		return_if_fail(persistent_container);
+		k3d::ipersistent_collection* const persistent_collection = dynamic_cast<k3d::ipersistent_collection*>(&node());
+		return_if_fail(persistent_collection);
 
 		const string_t property_type = m_property_type.internal_value();
 

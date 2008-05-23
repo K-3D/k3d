@@ -62,9 +62,9 @@ const std::string node::name()
 void node::on_deleted()
 {
 	// Signal that our properties are going away ...
-	properties_t props(properties());
-	for(properties_t::iterator property = props.begin(); property != props.end(); ++property)
-		(*property)->property_deleted_signal().emit();
+	const property_collection::properties_t props = properties();
+	for(property_collection::properties_t::const_iterator property = props.begin(); property != props.end(); ++property)
+		(**property).property_deleted_signal().emit();
 }
 
 iplugin_factory& node::factory()
@@ -89,7 +89,7 @@ inode::name_changed_signal_t& node::name_changed_signal()
 
 void node::save(xml::element& Element, const ipersistent::save_context& Context)
 {
-	persistent_container::save(Element, Context);
+	persistent_property_collection::save(Element, Context);
 }
 
 void node::load(xml::element& Element, const ipersistent::load_context& Context)
@@ -98,7 +98,7 @@ void node::load(xml::element& Element, const ipersistent::load_context& Context)
 	set_name(xml::attribute_text(Element, "name"));
 
 	// Load Variables
-	persistent_container::load(Element, Context);
+	persistent_property_collection::load(Element, Context);
 }
 
 double node::get_selection_weight()

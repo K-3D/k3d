@@ -27,8 +27,9 @@
 #include "data.h"
 #include "idocument.h"
 #include "inode.h"
+#include "ipersistent.h"
 #include "iselectable.h"
-#include "persistent_container.h"
+#include "persistent_property_collection.h"
 #include "property_collection.h"
 #include "result.h"
 
@@ -44,7 +45,7 @@ class node :
 	public ipersistent,
 	public iselectable,
 	public property_collection,
-	public persistent_container,
+	public persistent_property_collection,
 	public sigc::trackable
 {
 public:
@@ -86,5 +87,4 @@ protected:
 } // namespace k3d
 
 #endif // !K3DSDK_NODE_H
-
 

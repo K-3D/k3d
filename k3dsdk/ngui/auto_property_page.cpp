@@ -378,8 +378,8 @@ public:
 		Collection->unregister_property(*Property);
 		if(ipersistent* const persistent = dynamic_cast<ipersistent*>(Property))
 		{
-			if(ipersistent_container* const persistent_container = dynamic_cast<ipersistent_container*>(Collection))
-				persistent_container->disable_serialization(*persistent);
+			if(ipersistent_collection* const persistent_collection = dynamic_cast<ipersistent_collection*>(Collection))
+				persistent_collection->disable_serialization(*persistent);
 		}
 
 		undoable_delete(Property, m_document_state.document());

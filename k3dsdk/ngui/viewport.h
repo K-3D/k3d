@@ -30,6 +30,7 @@
 #include "ui_component.h"
 
 #include <k3dsdk/algebra.h>
+#include <k3dsdk/idocument.h>
 #include <k3dsdk/irender_camera_animation.h>
 #include <k3dsdk/irender_camera_preview.h>
 #include <k3dsdk/irender_camera_frame.h>

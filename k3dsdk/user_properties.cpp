@@ -21,9 +21,12 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "ipersistent.h"
+#include "ipersistent_collection.h"
+#include "iproperty_collection.h"
 #include "iuser_property.h"
-#include "persistent_container.h"
-#include "property_collection.h"
+#include "properties.h"
+#include "result.h"
 #include "user_properties.h"
 
 namespace k3d
@@ -37,20 +40,23 @@ namespace user
 
 property_container::property_container(iunknown& Owner) :
 	m_property_collection(dynamic_cast<iproperty_collection*>(&Owner)),
-	m_persistent_container(dynamic_cast<ipersistent_container*>(&Owner))
+	m_persistent_collection(dynamic_cast<ipersistent_collection*>(&Owner))
 {
-	// Keep track of every user property in the collection ...
+	// Keep track of user properties ...
 	if(m_property_collection)
-		m_user_properties = user_properties(*m_property_collection);
+		m_user_properties = property::user_properties(Owner);
 
-	// Keep track of named properties that are serializable ...
-	if(m_persistent_container)
+	// Keep track of serialized properties ...
+	if(m_persistent_collection)
 	{
-		const ipersistent_container::named_children_t& persistent_children = m_persistent_container->persistent_children();
-		for(ipersistent_container::named_children_t::const_iterator child = persistent_children.begin(); child != persistent_children.end(); ++child)
+		const std::vector<std::pair<string_t, ipersistent*> > persistent_objects = m_persistent_collection->persistent_objects();
+		for(uint_t i = 0; i != persistent_objects.size(); ++i)
 		{
-			if(dynamic_cast<iuser_property*>(child->second))
-				m_persistent_properties.insert(*child);
+			if(dynamic_cast<iuser_property*>(persistent_objects[i].second))
+			{
+				m_persistent_property_names.push_back(persistent_objects[i].first);
+				m_persistent_properties.push_back(persistent_objects[i].second);
+			}
 		}
 	}
 }
@@ -59,23 +65,30 @@ void property_container::restore_state()
 {
 	// Unregister existing user properties and disable their serialization
 	if(m_property_collection)
-		m_property_collection->unregister_properties(user_properties(*m_property_collection));
-	if(m_persistent_container)
-		m_persistent_container->disable_serialization(user_properties(*m_persistent_container));
+		m_property_collection->unregister_properties(property::user_properties(*m_property_collection));
+
+	if(m_persistent_collection)
+	{
+		const std::vector<std::pair<string_t, ipersistent*> > persistent_objects = m_persistent_collection->persistent_objects();
+		for(uint_t i = 0; i != persistent_objects.size(); ++i)
+		{
+			if(dynamic_cast<iuser_property*>(persistent_objects[i].second))
+				m_persistent_collection->disable_serialization(*persistent_objects[i].second);
+		}
+	}
 
 	// Register our properties and enable their serialization
 	if(m_property_collection)
 		m_property_collection->register_properties(m_user_properties);
-	if(m_persistent_container)
-		m_persistent_container->enable_serialization(m_persistent_properties);
+
+	if(m_persistent_collection)
+	{
+		for(uint_t i = 0; i != m_persistent_property_names.size(); ++i)
+			m_persistent_collection->enable_serialization(m_persistent_property_names[i], *m_persistent_properties[i]);
+	}
 }
 
 } // namespace user
-
-namespace property
-{
-
-} // namespace property
 
 } // namespace k3d
 

@@ -21,11 +21,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\brief defines helper functions for working with properties
 	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iproperty.h"
+#include <vector>
 
 namespace k3d
 {
@@ -91,6 +91,9 @@ bool set_internal_value(iunknown& Object, const string_t Name, const boost::any&
 	\return true, iff the value was set successfully, false otherwise (the property wasn't writable or the type didn't match)
 */
 bool set_internal_value(iproperty& Property, const boost::any& Value);
+
+/// Returns the set of user properties (if any) owned by an object
+const std::vector<iproperty*> user_properties(iunknown& Object);
 
 /// Creates a new user property with the given type and initial value.
 iproperty* create(inode& Owner, const std::type_info& Type, const string_t& Name, const string_t& Label, const string_t& Description, const boost::any& Value = boost::any());

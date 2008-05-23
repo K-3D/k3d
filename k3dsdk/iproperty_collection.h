@@ -33,7 +33,6 @@
 namespace k3d
 {
 
-// Forward declarations
 class iproperty;
 
 /// Abstract interface for a collection of iproperty objects

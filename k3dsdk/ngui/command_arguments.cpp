@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,14 +18,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "viewport.h"
 #include "command_arguments.h"
+#include "viewport.h"
 
 #include <k3dsdk/command_node.h>
+#include <k3dsdk/inode.h>
 #include <k3dsdk/inode_name_map.h>
+#include <k3dsdk/nodes.h>
+#include <k3dsdk/xml.h>
 
 #include <sstream>
 

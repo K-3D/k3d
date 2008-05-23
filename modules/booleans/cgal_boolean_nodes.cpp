@@ -73,7 +73,7 @@ public:
 		
 		Nef_polyhedron result;
 		
-		const k3d::iproperty_collection::properties_t properties = k3d::user_properties(*static_cast<k3d::iproperty_collection*>(this));
+		const k3d::iproperty_collection::properties_t properties = k3d::property::user_properties(*static_cast<k3d::iproperty_collection*>(this));
 		try
 		{
 			if (m_type.pipeline_value() == BOOLEAN_REVERSE_DIFFERENCE)

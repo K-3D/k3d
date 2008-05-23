@@ -2,7 +2,7 @@
 #define K3DSDK_IPROPERTY_GROUPS_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,19 +21,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares iproperty_group_collection, an abstract interface for grouping a collection of iproperty objects (for UI purposes)
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iproperty_collection.h"
+#include "types.h"
 
-#include <string>
 #include <vector>
 
 namespace k3d
 {
 
-/// Abstract interface for objects that can accept commands from external entities
+/// Provides an abstract interface grouping a collection of iproperty objects (for UI purposes)
 class iproperty_group_collection :
 	public virtual iunknown
 {
@@ -45,19 +44,19 @@ public:
 		{
 		}
 		
-		group(const std::string& Name) :
+		group(const string_t& Name) :
 			name(Name)
 		{
 		}
 		
-		group(const std::string& Name, const iproperty_collection::properties_t& Properties) :
+		group(const string_t& Name, const iproperty_collection::properties_t& Properties) :
 			name(Name),
 			properties(Properties)
 		{
 		}
 		
 		/// Stores a human-readable name for the group
-		std::string name;
+		string_t name;
 
 		/// Stores references to the properties within the group
 		iproperty_collection::properties_t properties;

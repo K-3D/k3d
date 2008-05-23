@@ -180,10 +180,15 @@ void shader::on_shader_changed(iunknown*)
 
 void shader::delete_arguments()
 {
-	const iproperty_collection::properties_t user_properties = k3d::user_properties(*static_cast<iproperty_collection*>(this));
+	const iproperty_collection::properties_t user_properties = k3d::property::user_properties(*this);
 
 	unregister_properties(user_properties);
-	disable_serialization(k3d::user_properties(*static_cast<ipersistent_container*>(this)));
+
+	for(iproperty_collection::properties_t::const_iterator property = user_properties.begin(); property != user_properties.end(); ++property)
+	{
+		if(ipersistent* const persistent = dynamic_cast<ipersistent*>(*property))
+			disable_serialization(*persistent);
+	}
 
 	for(iproperty_collection::properties_t::const_iterator property = user_properties.begin(); property != user_properties.end(); ++property)
 		undoable_delete(*property, document());

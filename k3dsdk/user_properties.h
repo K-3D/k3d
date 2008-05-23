@@ -24,13 +24,15 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ipersistent_container.h"
-#include "iproperty_collection.h"
 #include "istate_container.h"
 #include "types.h"
 
 namespace k3d
 {
+
+class iproperty_collection;
+class ipersistent_collection;
+class iproperty;
 
 namespace user
 {
@@ -48,9 +50,10 @@ public:
 
 private:
 	iproperty_collection* const m_property_collection;
-	ipersistent_container* const m_persistent_container;
-	iproperty_collection::properties_t m_user_properties;
-	ipersistent_container::named_children_t m_persistent_properties;
+	ipersistent_collection* const m_persistent_collection;
+	std::vector<iproperty*> m_user_properties;
+	std::vector<string_t> m_persistent_property_names;
+	std::vector<ipersistent*> m_persistent_properties;
 };
 
 } // namespace user

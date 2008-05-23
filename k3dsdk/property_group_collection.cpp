@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,12 +18,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements property_group_collection, which provides a default implementation of iproperty_group_collection
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "property_group_collection.h"
-#include <iostream>
 
 namespace k3d
 {

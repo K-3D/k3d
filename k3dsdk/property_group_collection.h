@@ -2,7 +2,7 @@
 #define K3DSDK_PROPERTY_GROUP_COLLECTION_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,17 +21,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares commandnode, which provides a default implementation of icommand_node
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iproperty_group_collection.h"
 
 namespace k3d
 {
-
-// Forward declarations
-class iproperty;
 
 /////////////////////////////////////////////////////////////////////////////
 // property_group_collection
@@ -44,7 +40,6 @@ public:
 	property_group_collection();
 	virtual ~property_group_collection();
 
-	// iproperty_group_collection implementation ...
 	const groups_t property_groups();
 
 protected:
@@ -53,7 +48,7 @@ protected:
 	/// Stores a new group
 	void register_property_group(const group& Group);
 	/// Removes the group(s) named Name
-	void unregister_property_group(const std::string& Name);
+	void unregister_property_group(const string_t& Name);
 
 private:
 	/// Contains the collection of property groups
