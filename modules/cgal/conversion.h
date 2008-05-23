@@ -52,7 +52,7 @@
 namespace module
 {
 
-namespace booleans
+namespace cgal
 {
 	//typedef CGAL::Lazy_exact_nt<double> NT; // Using an exact number type would probably be a good idea, but fails to compile...
 	typedef CGAL::threshold_number NT;
@@ -75,7 +75,7 @@ namespace booleans
 	/// Convert errors to the k3d logging system
 	void k3d_failure_handler(const char *type, const char *expr, const char* file, int line, const char* msg);
 	
-} // namespace booleans
+} // namespace cgal
 
 } // namespace module
 

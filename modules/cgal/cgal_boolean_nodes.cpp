@@ -43,20 +43,20 @@
 namespace module
 {
 
-namespace booleans
+namespace cgal
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// cgal_boolean
+// boolean
 
-class cgal_boolean :
+class boolean :
 	public k3d::imulti_mesh_sink,
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	cgal_boolean(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	boolean(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_type(init_owner(*this) + init_name("type") + init_label(_("Type")) + init_description(_("Boolean operation (intersection, union, difference, reverse difference)")) + init_value(BOOLEAN_INTERSECTION) + init_enumeration(boolean_values())),
 		m_user_property_changed_signal(*this)	
@@ -64,8 +64,6 @@ public:
 		m_type.changed_signal().connect(make_topology_changed_slot());
 		m_user_property_changed_signal.connect(make_topology_changed_slot());
 	}
-	
-	virtual ~cgal_boolean() {}
 	
 	void on_create_mesh_topology(k3d::mesh& Mesh)
 	{
@@ -156,7 +154,7 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<cgal_boolean, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imulti_mesh_sink> > > factory(
+		static k3d::document_plugin_factory<boolean, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imulti_mesh_sink> > > factory(
 			k3d::uuid(0x0d88fe28, 0xea4fdf20, 0xae858297, 0x487f857b),
 			"CGALBoolean",
 			_("3D mesh boolean operations"),
@@ -234,11 +232,12 @@ private:
 	k3d::user_property_changed_signal m_user_property_changed_signal;
 };
 
-k3d::iplugin_factory& cgal_boolean_factory()
+k3d::iplugin_factory& boolean_factory()
 {
-	return cgal_boolean::get_factory();
+	return boolean::get_factory();
 }
 
-} // namespace booleans
+} // namespace cgal
 
 } // namespace module
+

@@ -38,7 +38,7 @@
 namespace module
 {
 
-namespace booleans
+namespace cgal
 {
 
 typedef CGAL::Plane_3<Kernel> Plane;
@@ -321,7 +321,7 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
   
 }
 
-} // namespace booleans
+} // namespace cgal
 
 } // namespace module
 

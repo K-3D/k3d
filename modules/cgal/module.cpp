@@ -23,20 +23,19 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the primitives plugin module, to protect public symbols from name clashes with other modules
 namespace module
 {
 
-namespace booleans
+namespace cgal
 {
 
-extern k3d::iplugin_factory& cgal_boolean_factory();
+extern k3d::iplugin_factory& boolean_factory();
 
-} // namespace booleans
+} // namespace cgal
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::booleans::cgal_boolean_factory());
+	Registry.register_factory(module::cgal::boolean_factory());
 K3D_MODULE_END
 

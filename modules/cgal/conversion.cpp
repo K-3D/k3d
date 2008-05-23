@@ -32,7 +32,7 @@
 namespace module
 {
 
-namespace booleans
+namespace cgal
 {
 
 typedef std::map<const Polyhedron::Vertex*, size_t> point_map_t;
@@ -218,6 +218,6 @@ void k3d_failure_handler(const char *type, const char *expr, const char* file, i
   k3d::log() << error << "CGAL " << type << ": " << expr << " at " << file << ":" << line << ". " << msg << std::endl;
 }
 
-} // namespace booleans
+} // namespace cgal
 
 } // namespace module
