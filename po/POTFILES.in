@@ -104,8 +104,8 @@ modules/blobby/blobbies.cpp
 modules/blobby/edges_to_blobby.cpp
 modules/blobby/points_to_blobby.cpp
 modules/blobby/polygonize_blobbies.cpp
-modules/booleans/cgal_boolean_nodes.cpp
 modules/bundled_renderman_engines/aqsis.cpp
+modules/cgal/cgal_boolean_nodes.cpp
 modules/cloth/module.cpp
 modules/collada_io/mesh_reader.cpp
 modules/core/axes.cpp
