@@ -205,13 +205,20 @@ namespace module
 					{
 						const size_t curve_knots_begin = (*groups.curve_first_knots)[curve1];
 						const size_t curve_knots_end = curve_knots_begin + curve_point_end - curve_point_begin + (*groups.curve_orders)[curve1];
-					
+
+						std::stringstream knot_stream;
+				
+						for(size_t i = curve_knots_begin; i < curve_knots_end; ++i)
+						{
+							knot_stream << knots[i] << " ";
+						}
+						k3d::log() << debug << "Knot vector before: " << knot_stream.str() << std::endl;
 						size_t knots_to_insert = (*groups.curve_orders)[curve1];
 						const size_t order = knots_to_insert;
 						const size_t half_order = static_cast<unsigned int> (floor(0.5 * knots_to_insert));
 						const size_t pos = half_order + (points - curve_point_begin) + curve_point_begin;
 						float x=0.0;
-						k3d::log() << debug << "Pos: " << pos << " Order: " << order << " KnotVector: ";
+						k3d::log() << debug << "Pos: " << pos << " Order: " << order << " KnotsBegin " << curve_knots_begin << " KnotsEnd " << curve_knots_end << " KnotVector: ";
 						for(size_t i = curve_knots_begin; i < curve_knots_end; ++i)
 						{
 							if( abs(pos - i) < half_order || i < order || curve_knots_end - i < order)// || knots_to_insert >= curve_point_end - curve_point_begin - i || (pos <= 2 * order && i <= order) )
