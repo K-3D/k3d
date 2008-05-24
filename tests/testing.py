@@ -304,12 +304,13 @@ def mesh_comparison(document, mesh, mesh_name, threshold):
 		if difference.equal:
 			return
 
-	# As a temporary measure, print results to stdout until CDash fully supports <DartMeasurement>
+	# Send the mesh difference to the dashboard as preformatted HTML, so the
+	# columns all line-up.
+	print """<DartMeasurement name="Mesh Difference" type="text/html"><![CDATA[\n"""
+	print """<pre>"""
 	print k3d.print_diff(mesh.pipeline_value(), reference.output_mesh, threshold)
-
-	print """<DartMeasurement name="Mesh Difference" type="text/text">\n"""
-	print k3d.print_diff(mesh.pipeline_value(), reference.output_mesh, threshold)
-	print """</DartMeasurement>\n"""
+	print """</pre>"""
+	print """]]></DartMeasurement>\n"""
 	sys.stdout.flush()
 
 	raise Exception("output mesh differs from reference")
