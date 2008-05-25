@@ -46,6 +46,7 @@
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/irender_preview.h>
 #include <k3dsdk/iuser_property.h>
+#include <k3dsdk/mesh.h> // for typeinfo crash on Win32
 #include <k3dsdk/utility.h>
 
 #include <gtkmm/image.h>
