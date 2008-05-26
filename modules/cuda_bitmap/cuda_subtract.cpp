@@ -28,7 +28,7 @@
 #include <k3d-i18n-config.h>
 
 // include the entry points as external definitions
-#include "cuda_entry_points.h"
+#include "../cuda_common/cuda_entry_points.h"
 
 namespace module
 {
