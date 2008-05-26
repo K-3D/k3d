@@ -162,7 +162,7 @@ private:
 		char token;
 		std::string arg;
 		float x, y;
-		int last;
+		int last, first;
 
 		std::istringstream def_stream(def_path);
 
@@ -172,9 +172,10 @@ private:
 			k3d::log() << error << "Error parsing path " << k3d::xml::attribute_text(xml_obj, "id") << " missing start point." << std::endl;
 
 		def_stream >> arg;
+		
 		sscanf(arg.c_str(), "%f,%f", &x, &y);
 
-		last = count;
+		last = first = count;
 		count++;
 		factory->add_point(k3d::point4(x,y,0,1));
 
@@ -188,7 +189,22 @@ private:
 			def_stream >> token;
 			switch(token)
 			{
+			case 'L':
+				order = 2;
+				def_stream >> x >> y;
+				points.push_back(count);
+				count++;
+				factory->add_point(k3d::point4(x,y,0,1));
+				last = points.back();
+				break;
+
+			case 'z':
+				order = 2;
+				points.push_back(first);
+				break;
+
 			case 'C':
+				order = 4;
 				for(int i=0; i<3; i++)
 				{
 					def_stream >> arg;
@@ -198,31 +214,6 @@ private:
 					factory->add_point(k3d::point4(x,y,0,1));
 				}
 				last = points.back();
-
-
-
-				//Start knot Vector Definition to be a Bezier curve
-				for(int i=0; i<order; i++)
-					knots.push_back(0);
-				for(int i=1; i<points.size()-1; i++)
-					knots.push_back(i);
-				for(int i=0; i<order-1; i++)
-					knots.push_back(knots.back());
-				//End knot vector definition
-
-				//Start weight vector definition as bezier curve
-                for(k3d::uint_t point = 0; point < points.size(); point++ )
-				{
-					if(point==0||point==points.size()-1)
-						weights.push_back(1.0);
-					else
-						weights.push_back(0.333);
-				}
-				//End weight vector definition
-
-
-				factory->add_nurbs_curve(order, points, knots, weights);
-
 				break;
 			/*
 			case 'c':
@@ -242,6 +233,23 @@ private:
 				break;
 				*/
 			}
+
+
+			//Start knot Vector Definition to be a Bezier curve
+			knots.push_back(0);
+			for(int i=0; i < order-1; i++)
+				knots.push_back(1);
+			for(int i=0; i < order-1; i++)
+				knots.push_back(2);
+			knots.push_back(3);
+			//End knot vector definition
+
+			//Start weight vector definition as bezier curve
+			for(k3d::uint_t point = 0; point < points.size(); point++ )
+				weights.push_back(1.0);
+			//End weight vector definition
+
+			factory->add_nurbs_curve(order, points, knots, weights);
 
 		}
 
