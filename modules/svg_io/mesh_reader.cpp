@@ -21,7 +21,7 @@
 	\author Carlos Andres Dominguez Caballero (carlos@gmail.com)
 */
 
-#include "gprim_factory.h"
+//#include "gprim_factory.h"
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
@@ -30,6 +30,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/xml.h>
+//#include <k3dsdk/gprim_factory.h>
 
 namespace module
 {
@@ -83,7 +84,8 @@ public:
 			k3d::log() << error << "Error reading SVG file from " << svg_path.native_console_string() << std::endl;
 		}
 
-		factory = new gprim_factory(Mesh);
+		factory = new k3d::gprim_factory(Mesh);
+		count = 0;
 
 		parse_graphics(xml_svg);
 		
@@ -108,7 +110,7 @@ public:
 
 private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
-	gprim_factory *factory;
+	k3d::gprim_factory *factory;
 	int count;
 
 	void parse_graphics(const k3d::xml::element& xml_root)
@@ -138,14 +140,19 @@ private:
 		w = atof(width.c_str());
 		h = atof(height.c_str());
 
-		rect.push_back(factory->add_point(k3d::point4(x,y,0,1)));
-		rect.push_back(factory->add_point(k3d::point4(x+w,y,0,1)));
-		rect.push_back(factory->add_point(k3d::point4(x+w,y+h,0,1)));
-		rect.push_back(factory->add_point(k3d::point4(x,y+h,0,1)));
-		rect.push_back(rect.front());
+		for(int i=0; i<4; i++)
+		{
+			rect.push_back(count);
+			count++;
+		}
+		//rect.push_back(rect.front());
+		factory->add_point(k3d::point4(x,y,0,1));
+		factory->add_point(k3d::point4(x+w,y,0,1));
+		factory->add_point(k3d::point4(x+w,y+h,0,1));
+		factory->add_point(k3d::point4(x,y+h,0,1));
 		
-		factory->add_curve(rect,2);
-		//factory->add_polygon(rect);		
+		//factory->add_curve(rect,2);
+		factory->add_polygon(rect);		
 	
 	}
 
@@ -167,12 +174,17 @@ private:
 		def_stream >> arg;
 		sscanf(arg.c_str(), "%f,%f", &x, &y);
 
-		last = factory->add_point(k3d::point4(x,y,0,1));
+		last = count;
+		count++;
+		factory->add_point(k3d::point4(x,y,0,1));
 
 		while(!def_stream.eof())
 		{
-			k3d::mesh::indices_t path;
-			path.push_back(last);
+			k3d::uint_t order = 3;
+			k3d::mesh::indices_t points;
+            k3d::mesh::knots_t knots;
+			k3d::mesh::weights_t weights;
+			points.push_back(last);
 			def_stream >> token;
 			switch(token)
 			{
@@ -181,11 +193,38 @@ private:
 				{
 					def_stream >> arg;
 					sscanf(arg.c_str(), "%f,%f", &x, &y);
-					path.push_back(factory->add_point(k3d::point4(x,y,0,1)));
+					points.push_back(count);
+					count++;
+					factory->add_point(k3d::point4(x,y,0,1));
 				}
-				last = path.back();
-				factory->add_bezier(path,3);
+				last = points.back();
+
+
+
+				//Start knot Vector Definition to be a Bezier curve
+				for(int i=0; i<order; i++)
+					knots.push_back(0);
+				for(int i=1; i<points.size()-1; i++)
+					knots.push_back(i);
+				for(int i=0; i<order-1; i++)
+					knots.push_back(knots.back());
+				//End knot vector definition
+
+				//Start weight vector definition as bezier curve
+                for(k3d::uint_t point = 0; point < points.size(); point++ )
+				{
+					if(point==0||point==points.size()-1)
+						weights.push_back(1.0);
+					else
+						weights.push_back(0.333);
+				}
+				//End weight vector definition
+
+
+				factory->add_nurbs_curve(order, points, knots, weights);
+
 				break;
+			/*
 			case 'c':
 				for(int i=0; i<3; i++)
 				{
@@ -194,11 +233,14 @@ private:
 					sscanf(arg.c_str(), "%f,%f", &tx, &ty);
 					x += tx;
 					y += ty;
-					path.push_back(factory->add_point(k3d::point4(x,y,0,1)));
+					points.push_back(count);
+					count++;
+					factory->add_point(k3d::point4(x,y,0,1));
 				}
-				last = path.back();
-				factory->add_bezier(path,3);
+				last = points.back();
+				//factory->add_bezier(path,3);
 				break;
+				*/
 			}
 
 		}
