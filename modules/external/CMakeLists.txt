@@ -7,7 +7,10 @@ FOREACH(module ${K3D_EXTERNAL_MODULES})
 	OPTION(K3D_BUILD_${module} "Build external ${module} module" ON)
 
 	IF(K3D_BUILD_${module})
-		FIND_PATH(${module}_EXTERNAL_SOURCE_DIR ${module}.cmake)
+		FIND_PATH(${module}_EXTERNAL_SOURCE_DIR
+			${module}.cmake
+			DOC "Path to the ${module}.cmake file."
+			)
 
 		SET(MODULE_DIRECTORY ${${module}_EXTERNAL_SOURCE_DIR})
 
