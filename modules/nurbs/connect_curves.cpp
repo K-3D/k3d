@@ -165,6 +165,59 @@ namespace module
 			return connect_curves::get_factory();
 		}
 		
+		
+		
+		void replace_point(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::indices_t& indices, k3d::mesh::knots_t& knots, size_t newIndex, size_t curve, size_t point, bool continuous)
+		{
+			const size_t curve_point_begin = (*groups.curve_first_points)[curve];
+			const size_t curve_point_end = curve_point_begin + (*groups.curve_point_counts)[curve];
+						
+			for(size_t points = curve_point_begin; points < curve_point_end; ++points)
+			{
+				if(indices[points] == point)
+				{
+					//we found the index pointing to point1
+					indices[points] = newIndex;
+					if(continuous)
+					{
+						
+						const size_t curve_knots_begin = (*groups.curve_first_knots)[curve];
+						const size_t curve_knots_end = curve_knots_begin + curve_point_end - curve_point_begin + (*groups.curve_orders)[curve];
+
+						const size_t order = (*groups.curve_orders)[curve];
+						const size_t half_order = static_cast<unsigned int> (floor(0.5 * order));
+						const size_t pos = half_order + (points - curve_point_begin) + curve_knots_begin;
+						float knot_at_pos = knots[ points - curve_point_begin + curve_knots_begin + half_order ];
+						
+						if( pos - curve_knots_begin < order )
+						{
+							for( size_t x = curve_knots_begin; x < order + curve_knots_begin; ++x )
+								knots[x] = knot_at_pos;
+							size_t knot_pos = order + curve_knots_begin;
+							while( (knots[knot_pos + 1] - knots[knot_pos] > 2) && (knot_pos < curve_knots_end -1) )
+							{
+								knots[knot_pos + 1] = knots[knot_pos] + 2;
+								knot_pos++;
+							}	
+						}
+						else if( pos - curve_knots_begin + order < curve_knots_end )
+						{
+							for( size_t x = curve_knots_end - 1; x > curve_knots_end - order; --x )
+								knots[x] = knot_at_pos;
+							size_t knot_pos = curve_knots_end - order;
+							while( (knots[knot_pos] - knots[knot_pos - 1] > 2) && (knot_pos < curve_knots_begin) )
+							{
+								knots[knot_pos - 1] = knots[knot_pos] - 2;
+								knot_pos--;
+							}	
+						}
+						else
+							k3d::log() << debug << "Should split up the curve here" << std::endl;
+					}
+				}
+			}
+		}
+		
 		void connectAtPoints(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2, bool continuous)
 		{
 						
@@ -192,61 +245,11 @@ namespace module
 			k3d::mesh::knots_t& knots = *k3d::make_unique(groups.curve_knots);
 			
 			//curve1 - point 1
-			const size_t curve_point_begin = (*groups.curve_first_points)[curve1];
-			const size_t curve_point_end = curve_point_begin + (*groups.curve_point_counts)[curve1];
-						
-			for(size_t points = curve_point_begin; points < curve_point_end; ++points)
-			{
-				if(indices[points] == point1)
-				{
-					//we found the index pointing to point1
-					indices[points] = newIndex;
-					if(continuous)
-					{
-						const size_t curve_knots_begin = (*groups.curve_first_knots)[curve1];
-						const size_t curve_knots_end = curve_knots_begin + curve_point_end - curve_point_begin + (*groups.curve_orders)[curve1];
-
-						std::stringstream knot_stream;
-				
-						for(size_t i = curve_knots_begin; i < curve_knots_end; ++i)
-						{
-							knot_stream << knots[i] << " ";
-						}
-						k3d::log() << debug << "Knot vector before: " << knot_stream.str() << std::endl;
-						size_t knots_to_insert = (*groups.curve_orders)[curve1];
-						const size_t order = knots_to_insert;
-						const size_t half_order = static_cast<unsigned int> (floor(0.5 * knots_to_insert));
-						const size_t pos = half_order + (points - curve_point_begin) + curve_point_begin;
-						float x=0.0;
-						k3d::log() << debug << "Pos: " << pos << " Order: " << order << " KnotsBegin " << curve_knots_begin << " KnotsEnd " << curve_knots_end << " KnotVector: ";
-						for(size_t i = curve_knots_begin; i < curve_knots_end; ++i)
-						{
-							if( abs(pos - i) < half_order || i < order || curve_knots_end - i < order)// || knots_to_insert >= curve_point_end - curve_point_begin - i || (pos <= 2 * order && i <= order) )
-							{
-								knots_to_insert --;
-								knots[i] = x;
-							}
-							else knots[i] = x++;
-							k3d::log() << x;
-						}
-						k3d::log() << std::endl;
-					}
-				}
-			}
+			replace_point(groups, indices, knots, newIndex, curve1, point1, continuous);
 			
 			
-			//curve1 - point2
-			const size_t curve_point_begin2 = (*groups.curve_first_points)[curve2];
-			const size_t curve_point_end2 = curve_point_begin2 + (*groups.curve_point_counts)[curve2];
-						
-			for(size_t points = curve_point_begin2; points < curve_point_end2; ++points)
-			{
-				if(indices[points] == point2)
-				{
-					//we found the index pointing to point2
-					indices[points] = newIndex;
-				}
-			}
+			//curve2 - point2
+			replace_point(groups, indices, knots, newIndex, curve2, point2, continuous);
 		}
 
 	}//namespace nurbs
