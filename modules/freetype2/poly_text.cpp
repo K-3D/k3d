@@ -461,7 +461,7 @@ public:
 			k3d::uuid(0x9acaeaf1, 0x1fe74387, 0xae71cbb3, 0x9b5e33fd),
 			"PolyText",
 			_("Generates polygonal text using Freetype 2"),
-			"Polygons Text",
+			"Polygon Text",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

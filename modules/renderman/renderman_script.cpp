@@ -106,7 +106,7 @@ public:
 			k3d::uuid(0xded017f6, 0xa08849fd, 0xa9d8dd63, 0xe3cd6f1d),
 			"RenderManScript",
 			_("Creates RenderMan output under script control"),
-			"RenderMan Scripting",
+			"RenderMan Script",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

@@ -62,7 +62,7 @@ public:
 				k3d::uuid(0xd9148b60, 0x7f2a49f0, 0xa28e505a, 0xa3f4d4df),
 				"PlanarMap",
 				_("Planar projection map"),
-				"Textures",
+				"Texture",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

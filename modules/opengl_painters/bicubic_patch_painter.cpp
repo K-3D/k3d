@@ -164,7 +164,7 @@ public:
 			k3d::uuid(0xe058ab07, 0x44384acd, 0xba321d58, 0xcdb3ef25),
 			"OpenGLBicubicPatchPainter",
 			_("Renders bicubic patches"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

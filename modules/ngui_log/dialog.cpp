@@ -148,7 +148,7 @@ public:
 			k3d::uuid(0xe552df91, 0x264b17ad, 0x6e65cd9d, 0x208bdfe7),
 			"NGUILogDialog",
 			_("Displays the contents of the K-3D log"),
-			"NGUI Dialogs",
+			"NGUI Dialog",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

@@ -710,9 +710,9 @@ namespace module{
           static k3d::application_plugin_factory<panel> 
             factory(
                     k3d::uuid(0xf11983c0, 0x974a039c, 0xc5d36bb9, 0xe65cf8a0),
-                    "shaderPreview",
+                    "NGUIShaderPreviewPanel",
                     _("Shader Preview Panel"),
-                    "NGUI Panels",
+                    "NGUI Panel",
                     k3d::iplugin_factory::EXPERIMENTAL,
                     boost::assign::map_list_of("ngui:component-type", "panel")
                     ("ngui:panel-type", "shader_preview")("ngui:panel-label", "Shader Preview"));

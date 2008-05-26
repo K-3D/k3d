@@ -123,7 +123,7 @@ public:
 			k3d::uuid(0x882e29b9, 0xc62a49da, 0x858cd48c, 0x43815d16),
 			"YafrayAreaLight",
 			_("Yafray Area Light"),
-			"Yafray Lights",
+			"Yafray Light",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

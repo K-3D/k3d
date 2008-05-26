@@ -63,7 +63,7 @@ public:
 				k3d::uuid(0xc9bfa2a1, 0xe5c44f55, 0x9dd23c3d, 0xc4370d49),
 				"CylinderMap",
 				_("Cylindrical projection map"),
-				"Textures",
+				"Texture",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

@@ -463,7 +463,7 @@ public:
 			k3d::uuid(0x680e37df, 0xe5428bb2, 0x5e159d8d, 0x283bf0b6),
 			"NGUINodeHistoryPanel",
 			_("Displays a hierarchical list of node inputs"),
-			"NGUI Panels",
+			"NGUI Panel",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Node History"));
 

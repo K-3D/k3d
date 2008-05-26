@@ -151,7 +151,7 @@ public:
 				k3d::uuid(0x6db5cbd0, 0x0c4c42eb, 0x81142404, 0x3c25889e),
 		"OpenGLVBOSDSFacePainter",
 		_("Renders mesh as SDS faces using OpenGL VBOs"),
-		"OpenGL Painters",
+		"OpenGL Painter",
 		k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

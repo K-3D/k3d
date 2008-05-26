@@ -407,7 +407,7 @@ public:
 				k3d::uuid(0xc3ca122a, 0x9e8b46dc, 0xa6649135, 0xd68ac1a6),
 				"BevelFaces",
 				"Bevels each selected face",
-				"Polygons",
+				"Polygon",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

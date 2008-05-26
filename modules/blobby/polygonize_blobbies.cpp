@@ -123,7 +123,7 @@ public:
 				k3d::uuid(0x446d652b, 0x938042d6, 0x9f006d66, 0x3cbff023),
 				"PolygonizeBlobbies",
 				"Polygonizes blobby implicit surfaces",
-				"Blobbies",
+				"Blobby",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

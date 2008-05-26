@@ -1102,7 +1102,7 @@ public:
 			k3d::uuid(0x274c0cae, 0x2efd5bbf, 0x986a500f, 0xff5e2de6),
 			"Newell",
 			_("Generates Newell primitives as Bezier patches"),
-			"Patches",
+			"Patch",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

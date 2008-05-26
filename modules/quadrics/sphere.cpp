@@ -189,7 +189,7 @@ public:
 				k3d::classes::Sphere(),
 				"Sphere",
 				_("Sphere primitive"),
-				"Quadrics",
+				"Quadric",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

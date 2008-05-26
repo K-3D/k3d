@@ -326,7 +326,7 @@ public:
 			k3d::uuid(0x07371997, 0x1040b5a8, 0x2cf245be, 0xf1bbb199),
 			"NGUIParentTool",
 			_("Provides interactive controls for reparenting nodes."),
-			"NGUI Tools",
+			"NGUI Tool",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "tool"));
 

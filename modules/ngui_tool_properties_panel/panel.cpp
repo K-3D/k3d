@@ -173,7 +173,7 @@ public:
 			k3d::uuid(0x2d5c6b09, 0x4b860158, 0x901dc7b6, 0xca8cb11e),
 			"NGUIToolPropertiesPanel",
 			_("Displays tool properties"),
-			"NGUI Panels",
+			"NGUI Panel",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Tool Properties"));
 

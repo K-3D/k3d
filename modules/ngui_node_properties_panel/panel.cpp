@@ -354,7 +354,7 @@ public:
 			k3d::uuid(0x159a2e07, 0x4b92028d, 0x9a998884, 0x4cf8bba5),
 			"NGUINodePropertiesPanel",
 			_("Displays properties for one node"),
-			"NGUI Panels",
+			"NGUI Panel",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Node Properties"));
 

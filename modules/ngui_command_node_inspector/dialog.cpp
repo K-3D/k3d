@@ -184,7 +184,7 @@ public:
 			k3d::uuid(0x73080084, 0x084b4f76, 0x1a3b5a9f, 0x6f683d7b),
 			"NGUICommandNodeInspectorDialog",
 			_("Provides a graphical view of the command-node hierarchy"),
-			"NGUI Dialogs",
+			"NGUI Dialog",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

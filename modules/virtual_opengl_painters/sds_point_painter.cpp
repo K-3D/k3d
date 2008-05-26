@@ -48,7 +48,7 @@ public:
 		base(k3d::uuid(0x46db8236, 0xa1408c58, 0xd829ceba, 0xffe78fca),
 			"VirtualOpenGLSDSPointPainter",
 			_("Renders mesh subdivision surface points"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL),
 		delegate(0)
 	{

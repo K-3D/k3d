@@ -183,7 +183,7 @@ public:
 			k3d::uuid(0x2f953308, 0xc8474bc9, 0x6d58bba7, 0x0355bcfe),
 			"OpenGLVBOFacePainter",
 			_("Renders mesh faces, after trianglulating them (OpenGL VBOs)"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

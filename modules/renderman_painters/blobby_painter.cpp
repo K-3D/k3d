@@ -146,7 +146,7 @@ public:
 			k3d::uuid(0x0221462c, 0xc3d44a12, 0x97b39425, 0x29774d3f),
 			"RenderManBlobbyPainter",
 			_("Renders blobbies (implicit surfaces)"),
-			"RenderMan Painters",
+			"RenderMan Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

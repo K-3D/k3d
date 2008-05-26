@@ -325,7 +325,7 @@ public:
 					k3d::classes::RenderManEngine(),
 					"RenderManEngine",
 					_("RenderMan Render Engine"),
-					"RenderMan RenderEngines",
+					"RenderMan RenderEngine",
 					k3d::iplugin_factory::STABLE);
 
 		return factory;

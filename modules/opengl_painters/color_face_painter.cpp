@@ -189,7 +189,7 @@ public:
 			k3d::uuid(0x60b5a9cf, 0xee4fe64c, 0x7559c98f, 0x9ed5b56b),
 			"OpenGLColorFacePainter",
 			_("Renders mesh faces using a per-face color array"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

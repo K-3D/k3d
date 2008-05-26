@@ -81,7 +81,7 @@ public:
 			k3d::uuid(0x024b737a, 0xdf144dca, 0xb29e32b4, 0x319e5466),
 			"Int32SourceScript",
 			_("Uses a script to generate an output k3d::int32_t value."),
-			"Scripting",
+			"Script",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

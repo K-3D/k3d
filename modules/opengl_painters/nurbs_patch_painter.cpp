@@ -324,7 +324,7 @@ public:
 			k3d::uuid(0x8881a190, 0x9d1c4e6f, 0x8b8c0523, 0x2dc43fda),
 			"OpenGLNURBSPatchPainter",
 			_("Renders NURBS patches"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

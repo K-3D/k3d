@@ -83,7 +83,7 @@ public:
 			k3d::classes::OpenGLMaterial(),
 			"OpenGLMaterial",
 			_("OpenGL Material"),
-			"OpenGL Materials",
+			"OpenGL Material",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

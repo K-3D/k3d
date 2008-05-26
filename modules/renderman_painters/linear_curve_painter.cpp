@@ -125,7 +125,7 @@ public:
 			k3d::uuid(0xf8b19206, 0xa0ae4bd1, 0xb3548a15, 0x1209469e),
 			"RenderManLinearCurvePainter",
 			_("Renders linear curves"),
-			"RenderMan Painters",
+			"RenderMan Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

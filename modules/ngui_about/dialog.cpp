@@ -487,7 +487,7 @@ public:
 			k3d::uuid(0xdf6588d0, 0xb8473152, 0xfe6e839b, 0x484b9694),
 			"NGUIAboutDialog",
 			_("Displays the current K-3D version and credits contributors"),
-			"NGUI Dialogs",
+			"NGUI Dialog",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

@@ -110,7 +110,7 @@ public:
 			k3d::uuid(0xeab34a69, 0xca442372, 0x473d7a96, 0xacb45eab),
 			"OpenGLPointNumberingPainter",
 			_("Numbers points"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

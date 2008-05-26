@@ -221,7 +221,7 @@ public:
 				k3d::uuid(0x24c2872a, 0x0f2c42b0, 0xacfda8da, 0xbbe888d6),
 				"TextureMap",
 				_("Maps texture values to geometry using an external texture mapping transformation"),
-				"Textures",
+				"Texture",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

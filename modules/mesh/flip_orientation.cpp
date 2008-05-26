@@ -119,7 +119,7 @@ public:
 				k3d::uuid( 0x7d95cd84, 0xee5a4ad6, 0x86feab94, 0xcbea91ca),
 				"FlipOrientation",
 				_("Reverses the orientation of selected polygons"),
-				"Polygons",
+				"Polygon",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

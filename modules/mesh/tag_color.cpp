@@ -175,7 +175,7 @@ public:
 				k3d::uuid(0x852e9ffb, 0x8e8b42f3, 0x993eb194, 0x5c342ca4),
 				"TagColor",
 				_("Tags geometry with a color"),
-				"Textures",
+				"Texture",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

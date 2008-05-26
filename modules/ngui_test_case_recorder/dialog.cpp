@@ -108,7 +108,7 @@ public:
 			k3d::plugin_factory(k3d::uuid(0x35c7678c, 0x4b4a32cc, 0x552223be, 0x593772b9),
 				"NGUITestCaseRecorderDialog",
 				_("Provides a user interface for recording test cases, including situations where the application crashes."),
-				"NGUI Dialogs",
+				"NGUI Dialog",
 				k3d::iplugin_factory::EXPERIMENTAL)
 		{
 		}

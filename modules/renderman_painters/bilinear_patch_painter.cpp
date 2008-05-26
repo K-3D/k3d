@@ -111,7 +111,7 @@ public:
 			k3d::uuid(0x3f51b275, 0x5a664903, 0x96ed9168, 0x503e30f0),
 			"RenderManBilinearPatchPainter",
 			_("Renders bilinear patches"),
-			"RenderMan Painters",
+			"RenderMan Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

@@ -48,7 +48,7 @@ public:
 		base(k3d::uuid(0x9d4043c8, 0x864fe71b, 0x38706d85, 0x8b60af0c),
 			"VirtualOpenGLSDSFacePainter",
 			_("Renders mesh subdivision surface faces"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL),
 		delegate(0)
 	{

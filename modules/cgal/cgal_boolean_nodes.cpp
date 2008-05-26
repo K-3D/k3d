@@ -158,7 +158,7 @@ public:
 			k3d::uuid(0x0d88fe28, 0xea4fdf20, 0xae858297, 0x487f857b),
 			"CGALBoolean",
 			_("3D mesh boolean operations"),
-			"Boolean",
+			"CSG",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

@@ -77,7 +77,7 @@ public:
 			k3d::uuid(0x24568302, 0x346e4e58, 0xbb700f09, 0x5dc96245),
 			"ColorSourceScript",
 			_("Color source that uses a script to create the output value"),
-			"Scripting Color",
+			"Script Color",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

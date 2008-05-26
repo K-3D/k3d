@@ -183,7 +183,7 @@ public:
 				k3d::uuid(0xc6a00316, 0x72a54b1a, 0xb9ac478e, 0x00fdfc6c),
 				"EdgesToBlobby",
 				"Converts input edges to segment blobbies",
-				"Blobbies",
+				"Blobby",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

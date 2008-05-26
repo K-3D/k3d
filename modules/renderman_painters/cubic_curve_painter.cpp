@@ -125,7 +125,7 @@ public:
 			k3d::uuid(0x8c5be7c4, 0x0e8d43c5, 0xa1daace4, 0xa79275d7),
 			"RenderManCubicCurvePainter",
 			_("Renders cubic curves"),
-			"RenderMan Painters",
+			"RenderMan Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

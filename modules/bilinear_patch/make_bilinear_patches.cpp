@@ -118,7 +118,7 @@ public:
 				k3d::uuid(0xe99f3672, 0x6e85457d, 0x9ce1f9dc, 0x6bb71691),
 				"MakeBilinearPatches",
 				_("Converts input quadrilaterals to bilinear patches"),
-				"Patches",
+				"Patch",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

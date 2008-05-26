@@ -1360,7 +1360,7 @@ public:
 			k3d::uuid(0x2e885acd, 0x9e914078, 0xb4fcb4a7, 0x415231c5),
 			"SphereEversion",
 			_("Generates sphere eversion at any stage"),
-			"Patches Polygons",
+			"Patch Polygon",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

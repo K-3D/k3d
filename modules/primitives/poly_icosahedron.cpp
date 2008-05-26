@@ -141,7 +141,7 @@ public:
 			k3d::uuid(0x100dff7b, 0x94410b60, 0x4989f4a9, 0x75f6c1bf),
 			"PolyIcosahedron",
 			_("Generates a polygonal sphere by recursive subdivision of an isocahedron"),
-			"Polygons",
+			"Polygon",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

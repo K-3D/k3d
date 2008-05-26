@@ -64,7 +64,7 @@ public:
 				k3d::uuid(0xdd28dc8d, 0x6a4b48f7, 0xa8f6fa0c, 0xe15f43b6),
 				"SphereMap",
 				_("Spherical projection map"),
-				"Textures",
+				"Texture",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

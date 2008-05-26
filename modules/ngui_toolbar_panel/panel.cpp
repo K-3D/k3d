@@ -531,7 +531,7 @@ public:
 			k3d::uuid(0xc4d044fe, 0x5043a104, 0xd97f0988, 0x19c053d8),
 			"NGUIToolbarPanel",
 			_("Provides the standard toolbar"),
-			"NGUI Panels",
+			"NGUI Panel",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Toolbar"));
 

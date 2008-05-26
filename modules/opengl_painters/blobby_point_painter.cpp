@@ -131,7 +131,7 @@ public:
 			k3d::uuid(0x06148329, 0xb2264760, 0x84b25aab, 0xf8401c63),
 			"OpenGLBlobbyPointPainter",
 			_("Renders blobby primitives using points and lines"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

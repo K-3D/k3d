@@ -175,7 +175,7 @@ public:
 				k3d::classes::Cone(),
 				"Cone",
 				_("Cone primitive"),
-				"Quadrics",
+				"Quadric",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

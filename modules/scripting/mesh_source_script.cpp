@@ -79,7 +79,7 @@ public:
 			k3d::uuid(0xc68d0187, 0xbb334026, 0xb4ca6a9f, 0x0d980cc9),
 			"MeshSourceScript",
 			_("Mesh source that uses a script to create geometry"),
-			"Scripting Mesh",
+			"Script Mesh",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

@@ -173,7 +173,7 @@ public:
 				k3d::classes::Torus(),
 				"Torus",
 				_("Torus primitive"),
-				"Quadrics",
+				"Quadric",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

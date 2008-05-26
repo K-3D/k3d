@@ -135,7 +135,7 @@ public:
 			k3d::uuid(0x02d092ca, 0x84405ff6, 0x4fe806a9, 0xab886cb1),
 			"OpenGLFaceNormalPainter",
 			_("Renders polyhedron face normal vectors"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

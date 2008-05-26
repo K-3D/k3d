@@ -591,7 +591,7 @@ public:
 				k3d::uuid(0x6c639ea2, 0x6ab542c2, 0xa8f2f2d6, 0xf5265e7c),
 				"Dissolve",
 				"Dissolves selected faces, edges and vertices",
-				"Polygons",
+				"Polygon",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

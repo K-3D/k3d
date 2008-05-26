@@ -187,7 +187,7 @@ public:
 			k3d::uuid(0x24d4d987, 0x62f849ea, 0xad1907fe, 0xe2a0a728),
 			"OpenGLSLPainter",
 			_("Applies an OpenGL shader to downstream painters"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

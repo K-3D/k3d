@@ -64,7 +64,7 @@ public:
 			k3d::uuid(0xb754daf5, 0x3a401b87, 0xdd144ba2, 0x00395dde),
 			"CommandNodeScript",
 			_("Script node that executes a script in response to command-node commands"),
-			"Scripting",
+			"Script",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

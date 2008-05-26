@@ -325,7 +325,7 @@ public:
 			k3d::classes::OpenGLEngine(),
 			"OpenGLEngine",
 			_("OpenGL Render Engine"),
-			"OpenGL RenderEngines",
+			"OpenGL RenderEngine",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

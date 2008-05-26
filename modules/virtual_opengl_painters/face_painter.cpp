@@ -48,7 +48,7 @@ public:
 		base(k3d::uuid(0x7e6e8354, 0x604f05ae, 0x1d4d658b, 0x96538240),
 			"VirtualOpenGLFacePainter",
 			_("Renders mesh faces"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL),
 		delegate(0)
 	{

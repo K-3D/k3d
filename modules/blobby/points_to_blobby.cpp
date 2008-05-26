@@ -118,7 +118,7 @@ public:
 				k3d::uuid(0x9d5d69d9, 0xfe994aa0, 0x9b7dee22, 0x1823bd2c),
 				"PointsToBlobby",
 				"Converts input points to an implicit surface composed of blobby ellipsoids",
-				"Blobbies",
+				"Blobby",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

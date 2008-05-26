@@ -142,7 +142,7 @@ public:
 				k3d::uuid(0xbd6bdff8, 0xb4374eb1, 0xad39f4ad, 0x87209e59),
 				"PolygonizeBicubicPatches",
 				_("Polygonizes bicubic patches"),
-				"Patches",
+				"Patch",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

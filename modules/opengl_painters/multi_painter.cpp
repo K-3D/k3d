@@ -104,7 +104,7 @@ public:
 			k3d::uuid(0x6bc7d8a1, 0xbbe7491f, 0xa2405d97, 0x8b136c41),
 			"OpenGLMultiPainter",
 			_("Distributes rendering across multiple mesh painters"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

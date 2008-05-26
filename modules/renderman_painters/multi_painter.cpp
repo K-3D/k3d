@@ -84,7 +84,7 @@ public:
 			k3d::uuid(0x243cba5a, 0x13f342fa, 0x8f1a19cd, 0xfaf34169),
 			"RenderManMultiPainter",
 			_("Distributes rendering across multiple mesh painters"),
-			"RenderMan Painters",
+			"RenderMan Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

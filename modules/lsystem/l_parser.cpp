@@ -1614,7 +1614,7 @@ public:
 			k3d::uuid(0xa637e99d, 0x707c4342, 0x8c6d4d15, 0x78c9054a),
 			"LSystemParser",
 			_("Generates an L-System object from a configuration file"),
-			"Polygons",
+			"Polygon",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

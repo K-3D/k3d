@@ -266,7 +266,7 @@ public:
 			k3d::uuid(0x893f3dff, 0x9648bc46, 0x5674c48f, 0x05df5463),
 			"OpenGLNormalArrayPainter",
 			_("Visualizes normal-vector arrays"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

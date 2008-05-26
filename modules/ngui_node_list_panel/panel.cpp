@@ -895,7 +895,7 @@ public:
 			k3d::uuid(0xdae07bf6, 0xa64cc64e, 0xce15e798, 0x16f8eb43),
 			"NGUINodeListPanel",
 			_("Displays the document nodes as a flat list"),
-			"NGUI Panels",
+			"NGUI Panel",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Node List"));
 

@@ -114,7 +114,7 @@ public:
 			k3d::uuid(0x64dfefde, 0xeedc4047, 0xb59fc8f6, 0x972a9b86),
 			"RenderManBicubicPatchPainter",
 			_("Renders bicubic patches"),
-			"RenderMan Painters",
+			"RenderMan Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

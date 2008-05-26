@@ -431,7 +431,7 @@ public:
 			k3d::uuid(0x919c3786, 0x619e4e84, 0xb4ad868f, 0x1e77e67c),
 			"PolySphere",
 			_("Generates a polygonal sphere"),
-			"Polygons",
+			"Polygon",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

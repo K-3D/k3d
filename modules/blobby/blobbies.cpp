@@ -84,7 +84,7 @@ public:
 			k3d::uuid(0x76ba2f7c, 0xd49945e2, 0xa54d32b0, 0x0f756a94),
 			"BlobbyEllipsoid",
 			"Creates a RenderMan Blobby Ellipsoid",
-			"Blobbies",
+			"Blobby",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -158,7 +158,7 @@ public:
 			k3d::uuid(0x975d22ad, 0xe55e41a5, 0x9fdb26d2, 0x529952e0),
 			"BlobbySegment",
 			"Creates a RenderMan Blobby Segment",
-			"Blobbies",
+			"Blobby",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -229,7 +229,7 @@ public:
 			k3d::uuid(0x580c8ebb, 0x300d49dc, 0x9c43cbf6, 0x2808872a),
 			"BlobbyAddOperator",
 			"Blobby Add operator",
-			"Blobbies",
+			"Blobby",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -294,7 +294,7 @@ public:
 			k3d::uuid(0x51777220, 0xbf7346fc, 0xbf66e8bf, 0x349853b9),
 			"BlobbyMultOperator",
 			"Blobby Mult operator",
-			"Blobbies",
+			"Blobby",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -359,7 +359,7 @@ public:
 			k3d::uuid(0x4a8e2958, 0x58d546aa, 0xad7bfb37, 0x5c67450b),
 			"BlobbyMaxOperator",
 			"Blobby Max operator",
-			"Blobbies",
+			"Blobby",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -424,7 +424,7 @@ public:
 			k3d::uuid(0xc8e5eabc, 0x86f44610, 0x8e2a647d, 0x847de77a),
 			"BlobbyMinOperator",
 			"Blobby Min operator",
-			"Blobbies",
+			"Blobby",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -494,7 +494,7 @@ public:
 			k3d::uuid(0x351e67c1, 0x12034c4c, 0x974516db, 0xbcb767d9),
 			"BlobbySubOperator",
 			"Blobby Sub operator",
-			"Blobbies",
+			"Blobby",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -613,7 +613,7 @@ public:
 			k3d::uuid(0xf650ce52, 0x2fc64539, 0xa184ef26, 0x03bbe6d7),
 			"BlobbyDivOperator",
 			"Blobby Div operator",
-			"Blobbies",
+			"Blobby",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

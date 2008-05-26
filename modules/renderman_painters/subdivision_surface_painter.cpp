@@ -147,7 +147,7 @@ public:
 			k3d::uuid(0x4d6fae39, 0x723e4ed3, 0xbc5735c5, 0x3b75edc0),
 			"RenderManSubdivisionSurfacePainter",
 			_("Renders mesh subdivision surfaces"),
-			"RenderMan Painters",
+			"RenderMan Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

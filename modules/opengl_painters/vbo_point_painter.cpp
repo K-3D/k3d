@@ -162,7 +162,7 @@ public:
 				k3d::uuid(0xe2495ce1, 0x0c4c42eb, 0x81142404, 0x3c25889e),
 		"OpenGLVBOPointPainter",
 		_("Renders mesh points (OpenGL VBOs)"),
-		"OpenGL Painters",
+		"OpenGL Painter",
 		k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

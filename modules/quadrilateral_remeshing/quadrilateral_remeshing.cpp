@@ -1001,7 +1001,7 @@ for(unsigned long t = 0; t < iso_flows.size(); ++t)
 					k3d::uuid(0xde6494ab, 0x1c4d448d, 0xa6a2657e, 0x1751fc93),
 					"QuadrilateralRemeshing",
 					"Quadrilateral Remeshing for Closed Manifolds",
-					"Polygons",
+					"Polygon",
 					k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

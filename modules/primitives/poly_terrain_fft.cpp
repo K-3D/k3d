@@ -398,7 +398,7 @@ public:
 			k3d::uuid(0x7646f5a1, 0x3f3640d6, 0x8d4c70af, 0x91bcb418),
 			"PolyTerrainFFT",
 			_("Generates an FFT-based fractal terrain"),
-			"Polygons",
+			"Polygon",
 			k3d::iplugin_factory::DEPRECATED);
 
 		return factory;

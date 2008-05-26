@@ -133,7 +133,7 @@ public:
 				k3d::uuid(0xbe72cb50, 0x011f41d8, 0x90449ae0, 0x4c24ace5),
 				"GraphVizEngine",
 				_("GraphViz Render Engine"),
-				"RenderEngines",
+				"RenderEngine",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

@@ -180,7 +180,7 @@ public:
 			k3d::classes::RenderManLight(),
 			"RenderManLight",
 			_("RenderMan light source"),
-			"RenderMan Lights",
+			"RenderMan Light",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

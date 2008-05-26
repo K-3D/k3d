@@ -501,7 +501,7 @@ public:
 			k3d::uuid(0x0242c7b7, 0x234e7664, 0x3a848fa7, 0x91465b42),
 			"NGUIUndoTreePanel",
 			_("Provides a panel for displaying the undo tree"),
-			"NGUI Panels",
+			"NGUI Panel",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Undo Tree"));
 

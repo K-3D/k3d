@@ -61,7 +61,7 @@ public:
 			k3d::uuid(0xb9897383, 0xba485a29, 0x9166ff98, 0xb4cb6be6),
 			"NGUIMorphPointsPage",
 			_("Provides a custom property page for the MorphPoints modifier."),
-			"NGUI Pages",
+			"NGUI Page",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "property-page")("ngui:plugin-type", "MorphPoints"));
 

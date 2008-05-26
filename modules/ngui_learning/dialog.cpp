@@ -347,7 +347,7 @@ public:
 			k3d::uuid(0xd7d79750, 0x344aa731, 0xbeb2a198, 0x739e0cfe),
 			"NGUILearningDialog",
 			_("Displays a menu containing interactive tutorials and sample documents"),
-			"NGUI Dialogs",
+			"NGUI Dialog",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

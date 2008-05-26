@@ -527,7 +527,7 @@ public:
 				k3d::uuid(0x444fbabf, 0x08164c85, 0x879751e7, 0x2d6d05b5),
 				"NextGenerationUI",
 				"Next Generation User Interface (NGUI)",
-				"");
+				"Interface");
 
 		return factory;
 	}

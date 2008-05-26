@@ -32,7 +32,7 @@ public:
 			k3d::uuid(0x35b34163, 0xa1ee432a, 0x8f8503d2, 0xf09e7ac7),
 			"SamplePlugin",
 			"Sample K-3D document plugin",
-			"Tutorials",
+			"Sample",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

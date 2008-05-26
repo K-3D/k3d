@@ -1156,7 +1156,7 @@ k3d::iplugin_factory& tool::get_factory()
 		k3d::uuid(0xba57d873, 0xa34fe142, 0xf9cb54b6, 0xffa15af4),
 		"NGUISnapTool",
 		_("Provides interactive controls for 'snapping' nodes."),
-		"NGUI Tools",
+		"NGUI Tool",
 		k3d::iplugin_factory::EXPERIMENTAL,
 		boost::assign::map_list_of("ngui:component-type", "tool"));
 

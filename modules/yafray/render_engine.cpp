@@ -236,7 +236,7 @@ public:
 				k3d::uuid(0xef38bf93, 0x66654f9f, 0x992ca91b, 0x62bae139),
 				"YafrayEngine",
 				_("Yafray Render Engine"),
-				"Yafray RenderEngines",
+				"Yafray RenderEngine",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

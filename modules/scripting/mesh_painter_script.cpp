@@ -95,7 +95,7 @@ public:
 			k3d::uuid(0xd841c417, 0x889a44d7, 0x8fe520eb, 0xf26dc650),
 			"MeshPainterScript",
 			_("Scripted Mesh Painter"),
-			"OpenGL Painters Scripting",
+			"OpenGL Painter Script",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

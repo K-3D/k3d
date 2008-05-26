@@ -48,7 +48,7 @@ public:
 		base(k3d::uuid(0x7e376143, 0xb640c3f4, 0x288543a0, 0x57f83514),
 			"VirtualOpenGLPointPainter",
 			_("Renders mesh points"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL),
 		delegate(0)
 	{

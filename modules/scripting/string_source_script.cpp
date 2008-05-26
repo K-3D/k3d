@@ -77,7 +77,7 @@ public:
 			k3d::uuid(0x44a411be, 0x60a24d0d, 0x9b9c7d8b, 0xb050835b),
 			"StringSourceScript",
 			_("String source that uses a script to create the output value"),
-			"Scripting String",
+			"Script String",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

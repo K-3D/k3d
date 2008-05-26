@@ -70,7 +70,7 @@ public:
 			k3d::uuid(0x16b6b2f1, 0x383d4d2c, 0x9bea5eb3, 0x94a8783f),
 			"NullOutputScript",
 			_("Script node that executes whenever one of its inputs changes"),
-			"Scripting",
+			"Script",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

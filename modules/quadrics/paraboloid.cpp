@@ -195,7 +195,7 @@ public:
 				k3d::classes::Paraboloid(),
 				"Paraboloid",
 				_("Paraboloid primitive"),
-				"Quadrics",
+				"Quadric",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

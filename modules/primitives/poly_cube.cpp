@@ -286,7 +286,7 @@ public:
 			k3d::uuid(0x7ec966d1, 0xd78a445c, 0x8806b8a3, 0x5593f241),
 			"PolyCube",
 			_("Generates a polygonal cube"),
-			"Polygons",
+			"Polygon",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

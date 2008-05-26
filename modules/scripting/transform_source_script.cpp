@@ -76,7 +76,7 @@ public:
 			k3d::uuid(0x59da7a41, 0xe08c4704, 0xbf75055f, 0x043628cc),
 			"TransformSourceScript",
 			_("Transform source that uses a script to create the output value"),
-			"Scripting Transform",
+			"Script Transform",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

@@ -113,7 +113,7 @@ public:
 			k3d::uuid(0xb39c53a3, 0xe2fe0e32, 0x21d09384, 0xc4ed13fe),
 				"KnotCurve",
 				_("Generates a PQ-knot curve"),
-				"Curves",
+				"Curve",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

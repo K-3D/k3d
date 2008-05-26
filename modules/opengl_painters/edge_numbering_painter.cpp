@@ -148,7 +148,7 @@ public:
 			k3d::uuid(0xd15d2acb, 0xa647d85b, 0x54dfbbb4, 0x69578f6f),
 			"OpenGLEdgeNumberingPainter",
 			_("Numbers polyhedron edges"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

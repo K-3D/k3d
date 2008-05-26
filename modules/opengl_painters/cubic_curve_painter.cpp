@@ -195,7 +195,7 @@ public:
 			k3d::uuid(0xcb30d291, 0x47e146a3, 0xb5167d0f, 0x6f56bd61),
 			"OpenGLCubicCurvePainter",
 			_("Renders cubic curves"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

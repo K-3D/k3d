@@ -84,7 +84,7 @@ public:
 			k3d::uuid(0xd57c84cc, 0xa9474b12, 0xa344763c, 0x8f4e7c8e),
 			"GLRenderableScript",
 			_("Scripted OpenGL Drawable"),
-			"OpenGL Scripting",
+			"OpenGL Script",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

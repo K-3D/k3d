@@ -190,7 +190,7 @@ public:
 				k3d::classes::Hyperboloid(),
 				"Hyperboloid",
 				_("Hyperboloid primitive"),
-				"Quadrics",
+				"Quadric",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

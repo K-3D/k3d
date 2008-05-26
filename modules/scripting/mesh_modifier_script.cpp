@@ -88,7 +88,7 @@ public:
 			k3d::uuid(0xd51fe8e4, 0x5aad4790, 0x82957933, 0xb22c1c1c),
 			"MeshModifierScript",
 			_("Mesh modifier that uses a script to modify geometry"),
-			"Mesh Scripting",
+			"Mesh Script",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

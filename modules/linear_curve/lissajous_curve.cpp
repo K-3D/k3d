@@ -142,7 +142,7 @@ public:
 		k3d::uuid(0x7fdcbdc1, 0xd1c6404e, 0xae15a8eb, 0x45ffc793),
 			"LissajousCurve",
 			_("Generates a lissajous (sine-wave) curve"),
-			"Curves",
+			"Curve",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

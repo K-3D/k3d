@@ -88,7 +88,7 @@ public:
 			k3d::uuid(0xd7cab1c3, 0x60214984, 0x995601b5, 0x4dc8d62e),
 			"RenderManAreaLight",
 			_("RenderMan area light source"),
-			"RenderMan Lights",
+			"RenderMan Light",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

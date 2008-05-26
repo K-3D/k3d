@@ -77,7 +77,7 @@ public:
 			k3d::uuid(0x98f6e0b6, 0x8423400b, 0xa5ae9144, 0x50e1c3cd),
 			"BitmapSourceScript",
 			_("Bitmap source that uses a script to generate images"),
-			"Scripting Bitmap",
+			"Script Bitmap",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

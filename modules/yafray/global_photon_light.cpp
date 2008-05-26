@@ -66,7 +66,7 @@ public:
 			k3d::uuid(0x8c651262, 0x2e2d4fcc, 0xbb20f617, 0xf0c56f41),
 			"YafrayGlobalPhotonLight",
 			_("Yafray Global Photon Light"),
-			"Yafray Lights",
+			"Yafray Light",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

@@ -85,7 +85,7 @@ public:
 			k3d::uuid(0xacafcc85, 0xa0bf4d69, 0x99592c4f, 0x7cf9b35c),
 			"TransformModifierScript",
 			_("Transform modifier that uses a script to modify a transformation matrix"),
-			"Scripting Transform",
+			"Script Transform",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

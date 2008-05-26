@@ -412,7 +412,7 @@ k3d::iplugin_factory& user_interface::get_factory()
 		k3d::uuid(0xc7c652c7, 0xfb4349fe, 0x9c7d52c4, 0x9f9e9d3f),
 		"QtUI",
 		"Qt User Interface (QTUI)",
-		"");
+		"Interface");
 
 	return factory;
 }

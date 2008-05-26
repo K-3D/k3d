@@ -180,7 +180,7 @@ public:
 				k3d::classes::Cylinder(),
 				"Cylinder",
 				_("Cylinder primitive"),
-				"Quadrics",
+				"Quadric",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

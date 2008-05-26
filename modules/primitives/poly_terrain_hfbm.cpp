@@ -238,7 +238,7 @@ public:
 			k3d::uuid(0xff22f8f8, 0xa8b540f6, 0xb612a012, 0x8d4e9adb),
 			"PolyTerrainHfBM",
 			_("Generates an HfBM-based fractal terrain"),
-			"Polygons",
+			"Polygon",
 			k3d::iplugin_factory::DEPRECATED);
 
 		return factory;

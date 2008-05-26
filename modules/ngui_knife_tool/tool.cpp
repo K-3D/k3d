@@ -600,7 +600,7 @@ public:
 			k3d::uuid(0xf8f24a97, 0x4db2f704, 0x3e5d4e88, 0x59c77d02),
 			"NGUIKnifeTool",
 			_("Provides interactive controls for splitting faces."),
-			"NGUI Tools",
+			"NGUI Tool",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "tool"));
 

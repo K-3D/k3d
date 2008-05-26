@@ -137,7 +137,7 @@ public:
 				k3d::uuid(0x7eed702d, 0xba274e6b, 0xb8a5db73, 0xba9c2382),
 				"SmoothShade",
 				_("Simulates smooth geometry by averaging polygon normals"),
-				"Textures",
+				"Texture",
 				k3d::iplugin_factory::DEPRECATED);
 
 		return factory;

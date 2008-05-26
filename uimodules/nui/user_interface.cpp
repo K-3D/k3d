@@ -131,7 +131,7 @@ public:
 			k3d::uuid(0x787f0380, 0x4aae4185, 0xb1611140, 0xaa1f5d79),
 			"NullUI",
 			"Null User Interface (NUI)",
-			"");
+			"Interface");
 
 		return factory;
 	}

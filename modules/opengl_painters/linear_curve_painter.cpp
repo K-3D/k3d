@@ -145,7 +145,7 @@ public:
 			k3d::uuid(0x6acd1d8e, 0x954f4b3a, 0xbce4c296, 0x523ebacd),
 			"OpenGLLinearCurvePainter",
 			_("Renders linear curves"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

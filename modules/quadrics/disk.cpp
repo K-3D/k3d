@@ -180,7 +180,7 @@ public:
 				k3d::classes::Disk(),
 				"Disk",
 				_("Disk primitive"),
-				"Quadrics",
+				"Quadric",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

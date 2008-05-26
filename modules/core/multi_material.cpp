@@ -52,7 +52,7 @@ public:
 				k3d::classes::MultiMaterial(),
 				"MultiMaterial",
 				_("Material"),
-				"Materials",
+				"Material",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

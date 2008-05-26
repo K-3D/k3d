@@ -216,7 +216,7 @@ public:
 			k3d::uuid(0x120d87f0, 0xfe05419f, 0xae2d14ce, 0xea9c32b4),
 			"RenderManNURBSPatchPainter",
 			_("Renders NURBS patches"),
-			"RenderMan Painters",
+			"RenderMan Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

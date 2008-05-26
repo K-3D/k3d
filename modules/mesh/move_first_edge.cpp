@@ -117,7 +117,7 @@ public:
 				k3d::uuid(0x81c766ed, 0x2cb943c7, 0x91e9e680, 0xeba9bc4b),
 				"MoveFirstEdge",
 				_("Changes the first edge for selected polygons"),
-				"Polygons",
+				"Polygon",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

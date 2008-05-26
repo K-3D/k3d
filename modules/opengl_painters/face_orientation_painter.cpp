@@ -135,7 +135,7 @@ public:
 			k3d::uuid(0x7bc1ee5f, 0x45802906, 0x323984bf, 0xcbe858d6),
 			"OpenGLFaceOrientationPainter",
 			_("Draws arrows to show polyhedron face orientation"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

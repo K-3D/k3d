@@ -171,7 +171,7 @@ public:
 			k3d::uuid(0x0771ea79, 0x6c8c4c6d, 0x8bab8c83, 0x42fc73e9),
 			"RenderManPolyhedronPainter",
 			_("Renders mesh polyhedra"),
-			"RenderMan Painters",
+			"RenderMan Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

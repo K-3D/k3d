@@ -77,7 +77,7 @@ public:
 			k3d::uuid(0xa4535c6e, 0xe19f4d7d, 0x8af30edb, 0x6e194f78),
 			"Vector3SourceScript",
 			_("Vector3 source that uses a script to create the output value"),
-			"Scripting",
+			"Script",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

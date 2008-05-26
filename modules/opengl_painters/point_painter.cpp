@@ -138,7 +138,7 @@ public:
 			k3d::uuid(0xad24a631, 0xacbd4af1, 0xbd6d6362, 0x75c3d5d7),
 			"OpenGLPointPainter",
 			_("Renders mesh points"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

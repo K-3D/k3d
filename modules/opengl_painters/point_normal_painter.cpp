@@ -129,7 +129,7 @@ public:
 			k3d::uuid(0x2285917f, 0xfe40cc4f, 0xb462449f, 0xf5172d0a),
 			"OpenGLPointNormalPainter",
 			_("Renders polyhedron point normal vectors"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

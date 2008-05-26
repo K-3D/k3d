@@ -134,7 +134,7 @@ public:
 			k3d::uuid(0xb1260f93, 0xe16e4ab2, 0xbd6a7cbd, 0x85ddca8b),
 			"OpenGLEdgePainter",
 			_("Renders mesh edges (OpenGL 1.1)"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

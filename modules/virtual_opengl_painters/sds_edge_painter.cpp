@@ -48,7 +48,7 @@ public:
 		base(k3d::uuid(0x6c827fec, 0xd74ffc1c, 0x79ba768f, 0xfc8fa4d5),
 			"VirtualOpenGLSDSEdgePainter",
 			_("Renders mesh subdivision surface edges"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL),
 		delegate(0)
 	{

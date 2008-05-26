@@ -378,7 +378,7 @@ public:
 			k3d::uuid(0x96a0445e, 0x85412ced, 0xfa1b9ca5, 0xd74e4922),
 			"NGUIRenderRegionTool",
 			_("Provides interactive controls for cropped rendering."),
-			"NGUI Tools",
+			"NGUI Tool",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "tool"));
 

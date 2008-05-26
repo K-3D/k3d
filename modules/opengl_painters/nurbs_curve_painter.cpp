@@ -212,7 +212,7 @@ public:
 			k3d::uuid(0x86705b44, 0xef534dc4, 0x86d9fc7a, 0x8709ec59),
 			"OpenGLNURBSCurvePainter",
 			_("Renders NURBS curves"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

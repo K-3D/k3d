@@ -151,7 +151,7 @@ public:
 			k3d::uuid(0x7c41b43f, 0x385143ab, 0x86969795, 0x368d6199),
 			"PolyCone",
 			_("Generates a polygonal cone with optional endcap"),
-			"Polygons",
+			"Polygon",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

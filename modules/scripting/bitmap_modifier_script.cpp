@@ -79,7 +79,7 @@ public:
 			k3d::uuid(0xe6ca5ca4, 0xcfa8452f, 0x8318b2aa, 0xe253956e),
 			"BitmapModifierScript",
 			_("Bitmap modifier that uses a script to modify an input bitmap"),
-			"Scripting Bitmap",
+			"Script Bitmap",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

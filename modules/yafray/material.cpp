@@ -124,7 +124,7 @@ public:
 			k3d::uuid(0x4b767ac5, 0x19ec4182, 0x9883cc81, 0x3f091dea),
 			"YafrayMaterial",
 			_("Yafray Material"),
-			"Yafray Materials",
+			"Yafray Material",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

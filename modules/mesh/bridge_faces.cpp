@@ -255,7 +255,7 @@ public:
 				k3d::uuid(0x8e744389, 0x5d284d38, 0x95bb89cc, 0x1b9e528e),
 				"BridgeFaces",
 				"Creates new polygons forming a bridge between two selected polygons",
-				"Polygons",
+				"Polygon",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

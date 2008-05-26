@@ -684,7 +684,7 @@ public:
 			k3d::uuid(0xf37f08af, 0xf542d517, 0xde317099, 0x79394ed8),
 			"NGUIPipelinePanel",
 			_("Displays the visualization pipeline"),
-			"NGUI Panels",
+			"NGUI Panel",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Pipeline"));
 

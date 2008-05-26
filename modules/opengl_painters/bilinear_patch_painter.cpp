@@ -164,7 +164,7 @@ public:
 			k3d::uuid(0xf172b866, 0xfce74aa8, 0xa9e792ff, 0x630653f3),
 			"OpenGLBilinearPatchPainter",
 			_("Renders bilinear patches"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

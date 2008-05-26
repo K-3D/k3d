@@ -550,7 +550,7 @@ public:
 			k3d::uuid(0xc8cab7fd, 0xa14a55af, 0x79779fa5, 0x1b516756),
 			"NGUITimelinePanel",
 			_("Provides a panel for manipulating the current time"),
-			"NGUI Panels",
+			"NGUI Panel",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Timeline"));
 

@@ -127,7 +127,7 @@ public:
 			k3d::classes::RenderManMaterial(),
 			"RenderManMaterial",
 			_("A RenderMan surface / displacement material"),
-			"RenderMan Materials",
+			"RenderMan Material",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

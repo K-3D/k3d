@@ -231,7 +231,7 @@ public:
 			k3d::uuid(0xbabb3819, 0x244163c5, 0xdec79daa, 0xf579ab3e),
 			"NGUIEventRecorderDialog",
 			_("Sends a stream of user interface events to stderr, primarily intended for troubleshooting"),
-			"NGUI Dialogs",
+			"NGUI Dialog",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

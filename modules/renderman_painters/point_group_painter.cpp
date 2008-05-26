@@ -107,7 +107,7 @@ public:
 			k3d::uuid(0x06fab90b, 0x2f034d69, 0xb4a1cb9f, 0xb9864144),
 			"RenderManPointGroupPainter",
 			_("Renders mesh point groups"),
-			"RenderMan Painters",
+			"RenderMan Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

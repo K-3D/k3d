@@ -77,7 +77,7 @@ public:
 			k3d::uuid(0xed110740, 0x7c2e4215, 0xbc8a4c1a, 0x3c1736ba),
 			"DoubleSourceScript",
 			_("Data source that uses a script to create a k3d::double_t output value"),
-			"Scripting Scalar",
+			"Script Scalar",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

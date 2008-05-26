@@ -83,7 +83,7 @@ public:
 			k3d::uuid(0x1f85ec59, 0xb348e0d0, 0x6381b4a6, 0x938947f0),
 			"RenderEngineScript",
 			_("Script node that acts as a render engine"),
-			"Scripting",
+			"Script",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

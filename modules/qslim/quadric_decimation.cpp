@@ -242,7 +242,7 @@ public:
 				k3d::uuid(0x9bfe8fce, 0x3c7c4b00, 0x9e050d1e, 0x062059fa),
 				"QuadricDecimation",
 				"Surface simplification using quadric error metrics",
-				"Polygons",
+				"Polygon",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

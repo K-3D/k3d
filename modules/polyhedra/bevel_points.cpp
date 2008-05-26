@@ -144,7 +144,7 @@ public:
 				k3d::uuid(0x5a578576, 0xc207453f, 0xa7a2b9ae, 0xfb1ad739),
 				"BevelPoints",
 				"Bevels a surface at each selected point",
-				"Polygons",
+				"Polygon",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

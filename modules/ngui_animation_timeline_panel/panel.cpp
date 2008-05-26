@@ -942,7 +942,7 @@ public:
 			k3d::uuid(0xd6ddc369, 0x674697b8, 0xb7e6fd81, 0xd42aed12),
 			"NGUIAnimationTimelinePanel",
 			_("Provides a panel for manipulating the current animation time"),
-			"NGUI Panels",
+			"NGUI Panel",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Animation Timeline"));
 

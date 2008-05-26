@@ -322,7 +322,7 @@ public:
 			k3d::uuid(0x1d35ab47, 0x4ed0c54b, 0xfa5ccc89, 0xe1f683d3),
 			"OpenGLPGPFacePainter",
 			_("Renders mesh faces with PGP"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

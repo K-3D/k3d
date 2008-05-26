@@ -102,7 +102,7 @@ public:
 				k3d::uuid(0x7743a7f2, 0x995345b9, 0x8d6dacc7, 0x3fa37029),
 				"SetMaterial",
 				_("Sets geometry materials"),
-				"Materials",
+				"Material",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

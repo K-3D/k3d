@@ -129,7 +129,7 @@ public:
 			k3d::uuid(0xb04f5b7b, 0x4849cb29, 0xdc339ea9, 0xfb22e728),
 			"OpenGLFaceNumberingPainter",
 			_("Numbers polyhedron faces"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

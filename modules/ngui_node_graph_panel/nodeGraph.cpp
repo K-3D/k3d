@@ -465,7 +465,7 @@ public:
 			k3d::uuid(0xfb11a3d8, 0x8c42e4d8, 0x2162d48e, 0x5e236a4b),
 			"NGUINodeGraphPanel",
 			_("Visual Graphing Of K3D Nodes"),
-			"NGUI Panels",
+			"NGUI Panel",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Material List"));
 

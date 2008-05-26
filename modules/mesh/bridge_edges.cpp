@@ -230,7 +230,7 @@ public:
 				k3d::uuid(0xa360bb82, 0x223a46df, 0x91e4b594, 0xf9b6b7a3),
 				"BridgeEdges",
 				"Creates new polygons bridging two sets of connected border edges",
-				"Polygons",
+				"Polygon",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

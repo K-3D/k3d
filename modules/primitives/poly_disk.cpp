@@ -105,7 +105,7 @@ public:
 			k3d::uuid(0xbfe3e783, 0x2a7a4f51, 0xb696858a, 0xb41d794f),
 			"PolyDisk",
 			_("Generates a polygonal disk"),
-			"Polygons",
+			"Polygon",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

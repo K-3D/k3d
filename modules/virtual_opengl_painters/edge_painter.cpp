@@ -48,7 +48,7 @@ public:
 		base(k3d::uuid(0x172c1208, 0xd24430f5, 0x63f70388, 0x1945866e),
 			"VirtualOpenGLEdgePainter",
 			_("Renders mesh edges"),
-			"OpenGL Painters",
+			"OpenGL Painter",
 			k3d::iplugin_factory::EXPERIMENTAL),
 		delegate(0)
 	{

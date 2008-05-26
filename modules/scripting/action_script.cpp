@@ -58,7 +58,7 @@ public:
 			k3d::uuid(0x479bc86c, 0xe4428a92, 0x9fabc692, 0xad655ebb),
 			"ActionScript",
 			_("Executes a script on-demand"),
-			"Scripting",
+			"Script",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
