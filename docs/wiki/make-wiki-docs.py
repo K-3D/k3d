@@ -6,6 +6,14 @@ import os
 
 doc = k3d.new_document()
 
+# Used to sort plugins by-name ...
+def plugin_sort(lhs, rhs):
+	if lhs.name() < rhs.name():
+		return -1
+	elif lhs.name() == rhs.name():
+		return 0
+	return 1
+
 # Generate a mapping of categories to plugins ...
 categories = { "All" : [], "Stable" : [], "Experimental" : [], "Deprecated" : [] }
 
@@ -25,11 +33,13 @@ for plugin in k3d.plugins():
 		categories[category].append(plugin)
 
 # Create the main article for each plugin ...
-for plugin in k3d.plugins():
+for plugin in sorted(k3d.plugins(), plugin_sort):
+	print """Creating main article for """ + plugin.name() + """ ..."""
 	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/articles/" + plugin.name(), "w")
 	article.write("<plugin>{{PAGENAME}}</plugin>\n")
 
 # Create an article listing every plugin category ...
+print """Creating plugin categories article ..."""
 article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/categories/Plugin Categories", "w")
 article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
 
@@ -44,16 +54,10 @@ article.write("""<table>\n""")
 article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
 
 # Create an article for each plugin category ...
-for category in categories.keys():
+for category in sorted(categories.keys()):
+	print """Creating plugin category article """ + category + """ ..."""
 	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/categories/" + category + " Plugins", "w")
 	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
-
-	def plugin_sort(lhs, rhs):
-		if lhs.name() < rhs.name():
-			return -1
-		elif lhs.name() == rhs.name():
-			return 0
-		return 1
 
 	article.write("""<table border="0" cellpadding="5" cellspacing="0">\n""")
 	article.write("""<tr><td><b>Category:</b></td><td>""" + category + """</td></tr>\n""")
@@ -78,7 +82,9 @@ for category in categories.keys():
 	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
 
 # Create the reference documentation for each plugin ...
-for plugin in k3d.plugins():
+for plugin in sorted(k3d.plugins(), plugin_sort):
+
+	print """Creating reference documentation for """ + plugin.name() + """ ..."""
 
 	plugin_quality = ""
 	if plugin.quality() == "stable":
