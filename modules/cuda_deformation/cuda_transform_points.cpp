@@ -55,10 +55,8 @@ public:
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
 		const k3d::matrix4 transformation = m_input_matrix.pipeline_value();
-
-		k3d::parallel::parallel_for(
-			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), k3d::parallel::grain_size()),
-			cuda_linear_transformation_worker(InputPoints, PointSelection, OutputPoints, transformation));
+		cuda_linear_transformation_worker tmp_worker(InputPoints, PointSelection, OutputPoints, transformation);
+		tmp_worker(0, OutputPoints.size());
 	}
 
 	static k3d::iplugin_factory& get_factory()

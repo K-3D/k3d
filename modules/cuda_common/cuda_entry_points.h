@@ -45,4 +45,12 @@ extern "C" void bitmap_color_monochrome_kernel_entry(int width, int height, floa
 extern "C" void bitmap_copy_data_from_device_to_host(unsigned short *output, int width, int height);
 extern "C" void CUDA_cleanup();
 
+extern "C" void apply_linear_transform_to_point_data ( float *device_points, float *device_matrix, int num_points );
+
+extern "C" void test_double_to_float_entry ( double *in, float *out, int num );
+
+extern "C" void allocate_device_memory ( void** device_pointer, int size_in_bytes );
+extern "C" void copy_from_host_to_device ( void* device_pointer, const void* host_pointer, int size_in_bytes );
+extern "C" void copy_from_device_to_host ( void* host_pointer, const void* device_pointer, int size_in_bytes );
+extern "C" void free_cuda_pointer ( void* device_pointer );
 #endif // !CUDA_ENTRY_POINTS_H

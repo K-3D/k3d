@@ -269,5 +269,50 @@ __global__ void color_monochrome_kernel ( ushort4 *image_RGBA, int width, int he
 	
 	
 }
+
+__global__ void linear_transform_kernel ( float4 *points, float4 *matrix, int num_points )
+{
+	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+	
+	__shared__ float4 m[4];
+	
+	m[0] = matrix[0];
+	m[1] = matrix[1];
+	m[2] = matrix[2];
+	m[3] = matrix[3];
+	
+	__syncthreads();
+		
+	if ( idx < num_points )
+	{
+		float4 vt;
+		float4 v = points[idx];
+		float w = m[3].x*v.x + m[3].y*v.y + m[3].z*v.z + m[3].w;
+
+		vt.x = (m[0].x*v.x + m[0].y*v.y + m[0].z*v.z + m[0].w)/w;
+		vt.y = (m[1].x*v.x + m[1].y*v.y + m[1].z*v.z + m[1].w)/w;
+		vt.z = (m[2].x*v.x + m[2].y*v.y + m[2].z*v.z + m[2].w)/w;
+		
+		float alpha = v.w;
+		
+		points[idx].x = v.x*(1 - alpha) + alpha*vt.x;
+		points[idx].y = v.y*(1 - alpha) + alpha*vt.y;
+		points[idx].z = v.z*(1 - alpha) + alpha*vt.z;
+	}
+	__syncthreads();
+
+}
+
  
+__global__ void test_double_to_float ( double *input, float *output, int num )
+{
+	const int ix = blockDim.x * blockIdx.x + threadIdx.x;
+	
+	if ( ix < num )
+	{
+		output[ix] = (float)input[ix];	
+	}
+	
+}
 #endif // #ifndef _CUDA_KERNELS_H_
+

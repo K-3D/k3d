@@ -28,6 +28,12 @@
 #include <k3dsdk/parallel/parallel_for.h>
 #include <k3dsdk/parallel/threads.h>
 
+
+#include <k3dsdk/log.h>
+
+// include the entry points as external definitions
+#include "../cuda_common/cuda_entry_points.h"
+
 namespace module
 {
 
@@ -47,12 +53,95 @@ public:
 	{
 	}
 
-	void operator()(const k3d::parallel::blocked_range<k3d::uint_t>& range) const
+	void operator()(const k3d::uint_t point_begin, const k3d::uint_t point_end) const
 	{
-		const k3d::uint_t point_begin = range.begin();
-		const k3d::uint_t point_end = range.end();
+		int num_points = point_end - point_begin;
+		
+		// first convert the double precision mesh points to single precision for the GPU
+		// use 3 floats for the points, and a 4th for the selection weight
+		// TODO:  Use CUDA to allocate host memory for assynchronous transfer 
+		float *host_points_single_p = (float*) malloc ( num_points*sizeof(float)*4);
+		// a 4 x 4 matrix of floats
+		float *float_transformation = (float*) malloc ( 64 );
+		
+		float_transformation[0] = transformation[0][0];
+		float_transformation[1] = transformation[0][1];
+		float_transformation[2] = transformation[0][2];
+		float_transformation[3] = transformation[0][3];
+		float_transformation[4] = transformation[1][0];
+		float_transformation[5] = transformation[1][1];
+		float_transformation[6] = transformation[1][2];
+		float_transformation[7] = transformation[1][3];
+		float_transformation[8] = transformation[2][0];
+		float_transformation[9] = transformation[2][1];
+		float_transformation[10] = transformation[2][2];
+		float_transformation[11] = transformation[2][3];
+		float_transformation[12] = transformation[3][0];
+		float_transformation[13] = transformation[3][1];
+		float_transformation[14] = transformation[3][2];
+		float_transformation[15] = transformation[3][3];
+		
 		for(k3d::uint_t point = point_begin; point != point_end; ++point)
-			output_points[point] = k3d::mix(input_points[point], transformation * input_points[point], point_selection[point]);
+		{
+			k3d::uint_t float_index = (point - point_begin)*4;
+			host_points_single_p[float_index] = (float)input_points[point][0];
+			host_points_single_p[float_index+1] = (float)input_points[point][1];
+			host_points_single_p[float_index+2] = (float)input_points[point][2];
+			host_points_single_p[float_index+3] = (float)point_selection[point];
+			
+			/*
+			k3d::log() << info << input_points[point] << std::endl;
+			k3d::log() << info << host_points_single_p[float_index] 
+			            << ":" <<  host_points_single_p[float_index+1] 
+			            << ":" <<  host_points_single_p[float_index+2]
+			            << ":" <<  host_points_single_p[float_index+3]
+			     		<< std::endl;
+			*/
+		}
+		
+		CUDA_initialize_device();
+      	float *device_points;
+		float *device_matrix;
+		
+    	// allocate the memory on the device - 16 bytes per point
+    	allocate_device_memory((void**)&device_points, num_points*sizeof(float)*4);
+    	
+    	allocate_device_memory((void**)&device_matrix, 64);
+		
+    	// copy the data to the device
+    	copy_from_host_to_device(device_points, host_points_single_p, num_points*16);
+    	copy_from_host_to_device(device_matrix, float_transformation, 64);
+    	
+		// call the kernel to execute
+		apply_linear_transform_to_point_data ( device_points, device_matrix, num_points );
+		
+		// copy the data from the device
+    	copy_from_device_to_host(host_points_single_p, device_points, num_points*16);
+		
+		free_cuda_pointer(device_points);
+		
+		//k3d::log() << info << "OUTPUT" << std::endl;
+		
+		// Convert the resulting points to double precision 
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
+		{
+			k3d::uint_t float_index = (point - point_begin)*4;
+			output_points[point][0] = host_points_single_p[float_index];
+			output_points[point][1] = host_points_single_p[float_index + 1];
+			output_points[point][2] = host_points_single_p[float_index + 2];
+			
+			/*
+			k3d::log() << info << input_points[point] << std::endl;
+			k3d::log() << info << host_points_single_p[float_index] 
+			            << ":" <<  host_points_single_p[float_index+1] 
+				        << ":" <<  host_points_single_p[float_index+2]
+				        << ":" <<  host_points_single_p[float_index+3]
+				     	<< std::endl;
+			*/     	
+				
+		}
+		
+		free ( host_points_single_p );
 	}
 
 private:

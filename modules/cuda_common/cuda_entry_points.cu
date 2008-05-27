@@ -94,3 +94,46 @@ extern "C" void CUDA_cleanup()
 	// cleanup memory
     CUDA_SAFE_CALL(cudaFree(d_image));	
 }
+
+
+extern "C" void apply_linear_transform_to_point_data ( float *device_points, float *device_matrix, int num_points )
+{
+	dim3 threads_per_block(64, 1);
+    dim3 blocks_per_grid( iDivUp(num_points, 64), 1);
+	
+	linear_transform_kernel <<< blocks_per_grid, threads_per_block >>> ((float4*)device_points, (float4*)device_matrix, num_points);
+	
+	// check if the kernel executed correctly
+    CUT_CHECK_ERROR("Add Kernel execution failed");					
+}
+
+extern "C" void test_double_to_float_entry ( double *in, float *out, int num )
+{
+	dim3 threads_per_block(8, 1);
+    dim3 blocks_per_grid( iDivUp(num, 8), 1);
+	
+	test_double_to_float<<< blocks_per_grid, threads_per_block >>> (in, out, num);
+	
+	// check if the kernel executed correctly
+    CUT_CHECK_ERROR("Add Kernel execution failed");		
+}
+
+extern "C" void allocate_device_memory ( void** device_pointer, int size_in_bytes )
+{
+	CUDA_SAFE_CALL(cudaMalloc(device_pointer, size_in_bytes));	
+}
+
+extern "C" void copy_from_host_to_device ( void* device_pointer, const void* host_pointer, int size_in_bytes )
+{
+	CUDA_SAFE_CALL(cudaMemcpy(device_pointer, host_pointer, size_in_bytes, cudaMemcpyHostToDevice));	
+}
+
+extern "C" void copy_from_device_to_host ( void* host_pointer, const void* device_pointer, int size_in_bytes )
+{
+	CUDA_SAFE_CALL(cudaMemcpy(host_pointer, device_pointer, size_in_bytes, cudaMemcpyDeviceToHost));	
+}
+
+extern "C" void free_cuda_pointer ( void* device_pointer )
+{
+	CUDA_SAFE_CALL(cudaFree(device_pointer));			
+}

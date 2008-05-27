@@ -118,9 +118,11 @@ MACRO (GET_CUFILE_DEPENDENCIES dependencies file)
 	
 	FOREACH(DEP ${DEPS})
 		STRING(REGEX REPLACE "#[ \t]*include[ \t]+\"" "" DEP "${DEP}")
+		
+		# clear the dependency path so that the correct version of the file can be found
+		SET (PATH_OF_${DEP} "${PATH_OF_${DEP}}-NOTFOUND")
 
-		FIND_PATH(PATH_OF_${DEP} ${DEP}
-			${filepath})
+		FIND_PATH(PATH_OF_${DEP} ${DEP} ${filepath})
 
 		IF(NOT ${PATH_OF_${DEP}} STREQUAL PATH_OF_${DEP}-NOTFOUND)
 			#MESSAGE("${file} : ${PATH_OF_${DEP}}/${DEP}")
