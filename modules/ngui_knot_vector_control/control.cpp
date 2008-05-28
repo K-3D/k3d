@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -20,7 +20,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/ngui/custom_property_page.h>
+#include <k3dsdk/ngui/custom_property_control.h>
 
 #include <gtkmm/label.h>
 
@@ -32,53 +32,54 @@ namespace module
 namespace ngui
 {
 
-namespace morph_points
+namespace knot_vector
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// page
+// control
 
-/// Provides a custom plugin-page for the MorphPoints modifier
-class page :
-	public k3d::ngui::custom_property_page::control,
-	public k3d::iunknown
+/// Provides a custom property-control for NURBS knot-vectors
+class control :
+	public k3d::ngui::custom_property::control,
+	public k3d::iunknown,
+	public Gtk::Label
 {
 public:
-	page() :
-		m_label("MorphPoints custom property page")
+	control() :
+		Gtk::Label("Custom Knot Vector Control")
 	{
 	}
 
-	Gtk::Widget& get_widget(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent, k3d::inode& Node)
+	~control()
 	{
-		m_label.show();
-		return m_label;
+	}
+
+	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent, k3d::iproperty& Property)
+	{
+		show();
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<page> factory(
-			k3d::uuid(0xb9897383, 0xba485a29, 0x9166ff98, 0xb4cb6be6),
-			"NGUIMorphPointsPage",
-			_("Provides a custom property page for the MorphPoints modifier."),
-			"NGUI Page",
+		static k3d::application_plugin_factory<control> factory(
+			k3d::uuid(0xade18285, 0x9a4333fc, 0x7449f382, 0x39628d15),
+			"NGUIKnotVectorControl",
+			_("Provides a custom property control for NURBS knot vectors."),
+			"NGUI Control",
 			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("ngui:component-type", "plugin-page")("ngui:plugin-type", "MorphPoints"));
+			boost::assign::map_list_of("ngui:component-type", "property-control")("ngui:property-type", "NurbsEditCurveKnotVector-KnotVector"));
 
 		return factory;
 	}
-
-private:
-	Gtk::Label m_label;
 };
 
-} // namespace morph_points
+} // namespace knot_vector
 
 } // namespace ngui
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::ngui::morph_points::page::get_factory());
+	Registry.register_factory(module::ngui::knot_vector::control::get_factory());
 K3D_MODULE_END
 

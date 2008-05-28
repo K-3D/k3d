@@ -30,6 +30,7 @@
 #include "collapsible_frame.h"
 #include "color_chooser.h"
 #include "combo_box.h"
+#include "custom_property_control.h"
 #include "document_state.h"
 #include "entry.h"
 #include "enumeration_chooser.h"
@@ -45,8 +46,12 @@
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application.h>
+#include <k3dsdk/iapplication.h>
+#include <k3dsdk/imetadata.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/iuser_property.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_properties.h>
@@ -202,144 +207,169 @@ public:
 					new property_label::control(m_parent, property_name + "_label", property_widget::proxy(m_document_state, property))),
 					prop_label_begin, prop_label_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
+				// Keep track of the control that's created (if any) ...
+				Gtk::Widget* control = 0;
+
+				// Allow custom property controls to override our defaults ...
+				if(!control)
+				{
+					if(imetadata* const metadata = dynamic_cast<imetadata*>(&property))
+					{
+						imetadata::metadata_t property_metadata = metadata->get_metadata();
+						if(property_metadata.count("k3d:property-type"))
+						{
+							static plugin::factory::collection_t control_factories;
+							static bool control_factories_initialized = false;
+							if(!control_factories_initialized)
+							{
+								control_factories_initialized = true;
+								const plugin::factory::collection_t factories = k3d::application().plugins();
+								for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+								{
+									iplugin_factory::metadata_t factory_metadata = (**factory).metadata();
+									if(factory_metadata["ngui:component-type"] != "property-control")
+										continue;
+
+									control_factories.insert(*factory);
+								}
+							}
+
+							for(plugin::factory::collection_t::const_iterator factory = control_factories.begin(); factory != control_factories.end(); ++factory)
+							{
+								iplugin_factory::metadata_t factory_metadata = (**factory).metadata();
+								if(factory_metadata["ngui:property-type"] != property_metadata["k3d:property-type"])
+									continue;
+
+								if(custom_property::control* const custom_control = plugin::create<custom_property::control>(**factory))
+								{
+									if(control = dynamic_cast<Gtk::Widget*>(custom_control))
+									{
+										custom_control->initialize(m_document_state, m_parent, property);
+									}
+									else
+									{
+										k3d::log() << error << "custom property control must derive from Gtk::Widget" << std::endl;
+									}
+								}
+								else
+								{
+									k3d::log() << error << "error creating custom property control" << std::endl;
+								}
+
+								break;
+							}
+						}
+					}
+				}
+
 				// Boolean properties ...
-				if(property_type == typeid(bool_t))
+				if(!control)
 				{
-					check_button::control* const control = new check_button::control(m_parent, property_name, check_button::proxy(property, state_recorder, property_name));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-					entry_list.push_back(control);
-				}
-				// Scalar properties ...
-				else if(property_type == typeid(int32_t) || property_type == typeid(uint32_t) || property_type == typeid(float_t) || property_type == typeid(double_t))
-				{
-					spin_button::control* const control = new spin_button::control(m_parent, property_name, spin_button::model(property), state_recorder);
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-					entry_list.push_back(control);
-				}
-				// Color properties ...
-				else if(property_type == typeid(color))
-				{
-					color_chooser::control* const control = new color_chooser::control(m_parent, property_name, color_chooser::proxy(property, state_recorder, property_name));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-					entry_list.push_back(control);
-				}
-				// String properties ...
-				else if(property_type == typeid(string_t))
-				{
-					if(dynamic_cast<ienumeration_property*>(&property))
+					if(property_type == typeid(bool_t))
 					{
-						enumeration_chooser::control* const control = new enumeration_chooser::control(m_parent, property_name, enumeration_chooser::model(property), state_recorder);
-						table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-						entry_list.push_back(control);
+						control = new check_button::control(m_parent, property_name, check_button::proxy(property, state_recorder, property_name));
 					}
-					else if(dynamic_cast<iscript_property*>(&property))
+					// Scalar properties ...
+					else if(property_type == typeid(int32_t) || property_type == typeid(uint32_t) || property_type == typeid(float_t) || property_type == typeid(double_t))
 					{
-						script_button::control* const control = new script_button::control(m_parent, property_name, script_button::proxy(property, state_recorder, property_name));
-						table->attach(*Gtk::manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-						entry_list.push_back(control);
+						control = new spin_button::control(m_parent, property_name, spin_button::model(property), state_recorder);
 					}
-					else if(ilist_property<string_t>* const list_property = dynamic_cast<ilist_property<string_t>*>(&property))
+					// Color properties ...
+					else if(property_type == typeid(color))
 					{
-						combo_box::control* const control = new combo_box::control(m_parent, property_name, combo_box::proxy(property, state_recorder, property_name));
-						control->set_values(list_property->property_values());
-						table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-						entry_list.push_back(control);
+						control = new color_chooser::control(m_parent, property_name, color_chooser::proxy(property, state_recorder, property_name));
+					}
+					// String properties ...
+					else if(property_type == typeid(string_t))
+					{
+						if(dynamic_cast<ienumeration_property*>(&property))
+						{
+							control = new enumeration_chooser::control(m_parent, property_name, enumeration_chooser::model(property), state_recorder);
+						}
+						else if(dynamic_cast<iscript_property*>(&property))
+						{
+							control = new script_button::control(m_parent, property_name, script_button::proxy(property, state_recorder, property_name));
+						}
+						else if(ilist_property<string_t>* const list_property = dynamic_cast<ilist_property<string_t>*>(&property))
+						{
+							combo_box::control* const combo_box = new combo_box::control(m_parent, property_name, combo_box::proxy(property, state_recorder, property_name));
+							combo_box->set_values(list_property->property_values());
+							control = combo_box;
+						}
+						else
+						{
+							control = new entry::control(m_parent, property_name, entry::proxy(property, state_recorder, property_name));
+						}
+					}
+					// inode* properties ...
+					else if(property_type == typeid(inode*))
+					{
+						control = new node_chooser::control(m_parent, property_name, node_chooser::proxy(m_document_state, property, state_recorder, property_name), node_chooser::filter(property));
+					}
+					else if(property_type == typeid(inode_collection_property::nodes_t))
+					{
+						control = new node_collection_chooser::control(m_parent, property_name, node_collection_chooser::model(property), state_recorder);
+					}
+					// Bitmap properties ...
+					else if(property_type == type_id_k3d_bitmap_ptr())
+					{
+						control = new bitmap_preview::control(m_parent, property_name, bitmap_preview::proxy(property));
+					}
+					// Filesystem-path properties ...
+					else if(property_type == typeid(filesystem::path))
+					{
+						control = new path_chooser::control(m_parent, property_name, path_chooser::proxy(property, state_recorder, property_name));
+					}
+					// bounding_box3 properties ...
+					else if(property_type == typeid(bounding_box3))
+					{
+						control = new bounding_box::control(m_parent, property_name, bounding_box::proxy(property));
+					}
+					// point3 properties ...
+					else if(property_type == typeid(point3) || property_type == typeid(vector3) || property_type == typeid(normal3))
+					{
+						control = new point::control(m_parent, property_name, point::proxy(property));
+					}
+					// angle_axis properties ...
+					else if(property_type == typeid(angle_axis))
+					{
+						control = new libk3dngui::angle_axis::control(m_parent, property_name, libk3dngui::angle_axis::proxy(property, state_recorder, property_name));
+					}
+					// Transformation properties ...
+					else if(property_type == typeid(matrix4))
+					{
+					}
+					// Mesh properties ...
+					else if(property_type == typeid(legacy::mesh*))
+					{
+					}
+					else if(property_type == typeid(mesh*))
+					{
+					}
+					// HPoint properties ...
+					else if(property_type == typeid(point4))
+					{
+					}
+					// Pipeline-profiler records ...
+					else if(property_type == typeid(std::map<inode*, std::map<string_t, double_t> >))
+					{
+					}
+					// Mesh Selection properties ...
+					else if(property_type == typeid(mesh_selection))
+					{
+						control = new selection_button::control(m_parent, property_name, selection_button::proxy(property, state_recorder, property_name));
 					}
 					else
 					{
-						entry::control* const control = new entry::control(m_parent, property_name, entry::proxy(property, state_recorder, property_name));
-						table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-						entry_list.push_back(control);
+						log() << warning << k3d_file_reference << "unknown property type: " << property_type.name() << " name: " << property_name << std::endl;
 					}
 				}
-				// inode* properties ...
-				else if(property_type == typeid(inode*))
-				{
-					node_chooser::control* const control = new node_chooser::control(m_parent, property_name, node_chooser::proxy(m_document_state, property, state_recorder, property_name), node_chooser::filter(property));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
-					entry_list.push_back(control);
-				}
-				else if(property_type == typeid(inode_collection_property::nodes_t))
+				// Pack the new control into the rest of the UI
+				if(control)
 				{
-					node_collection_chooser::control* const control = new node_collection_chooser::control(m_parent, property_name, node_collection_chooser::model(property), state_recorder);
 					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 					entry_list.push_back(control);
-				}
-				// Bitmap properties ...
-				else if(property_type == type_id_k3d_bitmap_ptr())
-				{
-					bitmap_preview::control* const control = new bitmap_preview::control(m_parent, property_name, bitmap_preview::proxy(property));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-					entry_list.push_back(control);
-				}
-				// Filesystem-path properties ...
-				else if(property_type == typeid(filesystem::path))
-				{
-					path_chooser::control* const control = new path_chooser::control(m_parent, property_name, path_chooser::proxy(property, state_recorder, property_name));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-					entry_list.push_back(control);
-				}
-				// bounding_box3 properties ...
-				else if(property_type == typeid(bounding_box3))
-				{
-					bounding_box::control* const control = new bounding_box::control(m_parent, property_name, bounding_box::proxy(property));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-					entry_list.push_back(control);
-				}
-				// point3 properties ...
-				else if(property_type == typeid(point3) || property_type == typeid(vector3) || property_type == typeid(normal3))
-				{
-					point::control* const control = new point::control(m_parent, property_name, point::proxy(property));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-					entry_list.push_back(control);
-				}
-				// angle_axis properties ...
-				else if(property_type == typeid(angle_axis))
-				{
-					libk3dngui::angle_axis::control* const control = new libk3dngui::angle_axis::control(m_parent, property_name, libk3dngui::angle_axis::proxy(property, state_recorder, property_name));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-
-					entry_list.push_back(control);
-				}
-				// Transformation properties ...
-				else if(property_type == typeid(matrix4))
-				{
-				}
-				// Mesh properties ...
-				else if(property_type == typeid(legacy::mesh*))
-				{
-				}
-				else if(property_type == typeid(mesh*))
-				{
-				}
-				// HPoint properties ...
-				else if(property_type == typeid(point4))
-				{
-				}
-				// Pipeline-profiler records ...
-				else if(property_type == typeid(std::map<inode*, std::map<string_t, double_t> >))
-				{
-				}
-				// Mesh Selection properties ...
-				else if(property_type == typeid(mesh_selection))
-				{
-					selection_button::control* const control = new selection_button::control(m_parent, property_name, selection_button::proxy(property, state_recorder, property_name));
-					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
-				}
-				else
-				{
-					log() << warning << k3d_file_reference << "unknown property type: " << property_type.name() << " name: " << property_name << std::endl;
 				}
 
 				// Provide a "delete" button for user properties ...

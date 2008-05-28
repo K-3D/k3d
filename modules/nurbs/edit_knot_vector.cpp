@@ -42,6 +42,27 @@
 #include <vector>
 #include <sstream>
 
+#include <k3dsdk/metadata.h>
+
+namespace k3d
+{
+
+/// Helper class for adding k3d::imetadata to properties
+template<typename value_t, class name_policy_t>
+class property_metadata :
+	public data::writable_property<value_t, name_policy_t>,
+	public metadata
+{
+protected:
+	template<typename init_t>
+	property_metadata(const init_t& Init) :
+		data::writable_property<value_t, name_policy_t>(Init)
+	{
+	}
+};
+
+} // namespace k3d
+
 namespace module
 {
 
@@ -56,6 +77,8 @@ namespace module
 				base(Factory, Document),
 				m_knot_vector(init_owner(*this) + init_name("knot_vector") + init_label(_("knot_vector")) + init_description(_("Knot Vector (csv):")) + init_value(_("not initialized")) )
 			{
+				m_knot_vector.set_metadata("k3d:property-type", "NurbsEditCurveKnotVector-KnotVector");
+
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 				m_knot_vector.changed_signal().connect(make_update_mesh_slot());
 			}
@@ -128,7 +151,7 @@ namespace module
 			}
 			
 		private:
-			k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_knot_vector;
+			k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, k3d::property_metadata, with_serialization) m_knot_vector;
 			
 			int select_mesh(k3d::mesh& Output)
 			{

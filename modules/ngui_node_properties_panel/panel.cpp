@@ -168,7 +168,7 @@ public:
 			{
 				k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
 
-				if(metadata["ngui:component-type"] != "property-page")
+				if(metadata["ngui:component-type"] != "plugin-page")
 					continue;
 
 				const k3d::string_t plugin_type = metadata["ngui:plugin-type"];
