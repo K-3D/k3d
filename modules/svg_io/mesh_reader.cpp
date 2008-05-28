@@ -156,13 +156,36 @@ private:
 	
 	}
 
+	bool is_together(const std::string& arg)
+	{
+		if(arg.find(",",1)>arg.length())
+			return false;
+		return true;
+	}
+
+	void get_pair(float& x, float& y, std::istringstream& def_stream)
+	{
+		std::string arg;
+		def_stream >> arg;
+		if(is_together(arg))
+			sscanf(arg.c_str(), "%f,%f", &x, &y);
+		else
+		{
+			x = atof(arg.c_str());
+			def_stream >> y;
+		}
+	}
+
 	void parse_path(const k3d::xml::element& xml_obj)
 	{
 		const std::string def_path = k3d::xml::attribute_text(xml_obj, "d");
 		char token;
-		std::string arg;
 		float x, y;
 		int last, first;
+		bool relative=false;
+		k3d::point4 slastpoint;
+		k3d::point4 lastpoint;
+		k3d::point4 firstpoint;
 
 		std::istringstream def_stream(def_path);
 
@@ -171,13 +194,12 @@ private:
 		if(token != 'M')
 			k3d::log() << error << "Error parsing path " << k3d::xml::attribute_text(xml_obj, "id") << " missing start point." << std::endl;
 
-		def_stream >> arg;
-		
-		sscanf(arg.c_str(), "%f,%f", &x, &y);
+		get_pair(x,y,def_stream);
 
 		last = first = count;
 		count++;
-		factory->add_point(k3d::point4(x,y,0,1));
+		firstpoint = k3d::point4(x,y,0,1);
+		factory->add_point(firstpoint);
 
 		while(!def_stream.eof())
 		{
@@ -189,49 +211,145 @@ private:
 			def_stream >> token;
 			switch(token)
 			{
+			case 'l':
+				relative = true;
 			case 'L':
 				order = 2;
-				def_stream >> x >> y;
+				slastpoint = k3d::point4(x,y,0,1);
+				get_pair(x,y,def_stream);
 				points.push_back(count);
 				count++;
-				factory->add_point(k3d::point4(x,y,0,1));
+				if(relative)
+				{
+					x+=lastpoint[0];
+					y+=lastpoint[1];
+				}
+				lastpoint = k3d::point4(x,y,0,1);
+				factory->add_point(lastpoint);
 				last = points.back();
 				break;
-
+			case 'h':
+				relative = true;
+			case 'H':
+				order = 2;
+				slastpoint = k3d::point4(x,y,0,1);
+				def_stream >> x;
+				points.push_back(count);
+				count++;
+				if(relative)
+					x+=lastpoint[0];
+				lastpoint = k3d::point4(x,lastpoint[1],0,1);
+				factory->add_point(lastpoint);
+				last = points.back();
+				break;
+			case 'v':
+				relative = true;
+			case 'V':
+				order = 2;
+				slastpoint = k3d::point4(x,y,0,1);
+				def_stream >> y;
+				points.push_back(count);
+				count++;
+				if(relative)
+					y+=lastpoint[1];
+				lastpoint = k3d::point4(lastpoint[0], y, 0, 1);
+				factory->add_point(lastpoint);
+				last = points.back();
+				break;
+			case 'Z':
 			case 'z':
 				order = 2;
+				slastpoint = k3d::point4(x,y,0,1);
+				lastpoint = firstpoint;
 				points.push_back(first);
 				break;
-
+			case 'c':
+				relative = true;
 			case 'C':
 				order = 4;
 				for(int i=0; i<3; i++)
 				{
-					def_stream >> arg;
-					sscanf(arg.c_str(), "%f,%f", &x, &y);
+					get_pair(x,y,def_stream);
 					points.push_back(count);
 					count++;
+					if(relative)
+					{
+						x += lastpoint[0];
+						y += lastpoint[1];
+					}
 					factory->add_point(k3d::point4(x,y,0,1));
+					if(i==1)
+						slastpoint = k3d::point4(x,y,0,1);
 				}
+				lastpoint = k3d::point4(x,y,0,1);
 				last = points.back();
 				break;
-			/*
-			case 'c':
-				for(int i=0; i<3; i++)
+			case 's':
+				relative = true;
+			case 'S':
+				order = 4;
+				points.push_back(count);
+				count++;
+				factory->add_point(k3d::point4(2*lastpoint[0]-slastpoint[0], 2*lastpoint[1]-slastpoint[1],0,1));
+				for(int i=0; i<2; i++)
 				{
-					int tx, ty;
-					def_stream >> arg;
-					sscanf(arg.c_str(), "%f,%f", &tx, &ty);
-					x += tx;
-					y += ty;
+					get_pair(x,y,def_stream);
 					points.push_back(count);
 					count++;
+					if(relative)
+					{
+						x+=lastpoint[0];
+						y+=lastpoint[1];
+					}
 					factory->add_point(k3d::point4(x,y,0,1));
+					if(i==0)
+						slastpoint = k3d::point4(x,y,0,1);
 				}
+				lastpoint = k3d::point4(x,y,0,1);
 				last = points.back();
-				//factory->add_bezier(path,3);
 				break;
-				*/
+			case 'q':
+				relative = true;
+			case 'Q':
+				order = 3;
+				for(int i=0; i<2; i++)
+				{
+					get_pair(x,y,def_stream);
+					points.push_back(count);
+					count++;
+					if(relative)
+					{
+						x += lastpoint[0];
+						y += lastpoint[1];
+					}
+					factory->add_point(k3d::point4(x,y,0,1));
+					if(i==0)
+						slastpoint = k3d::point4(x,y,0,1);
+				}
+				lastpoint = k3d::point4(x,y,0,1);
+				last = points.back();
+				break;
+			case 't':
+				relative = true;
+			case 'T':
+				order = 3;
+				points.push_back(count);
+				count++;
+				slastpoint =k3d::point4(2*lastpoint[0]-slastpoint[0], 2*lastpoint[1]-slastpoint[1],0,1);
+				factory->add_point(slastpoint);
+
+				get_pair(x,y,def_stream);
+				points.push_back(count);
+				count++;
+				if(relative)
+				{
+					x+=lastpoint[0];
+					y+=lastpoint[1];
+				}
+				factory->add_point(k3d::point4(x,y,0,1));
+				lastpoint = k3d::point4(x,y,0,1);
+				last = points.back();
+				break;
 			}
 
 
@@ -252,6 +370,7 @@ private:
 			factory->add_nurbs_curve(order, points, knots, weights);
 
 		}
+		relative = false;
 
 	}
 
