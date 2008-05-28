@@ -27,6 +27,7 @@
 #include <k3dsdk/parallel/parallel_for.h>
 #include <k3dsdk/parallel/threads.h>
 
+
 namespace module
 {
 
@@ -38,6 +39,7 @@ namespace deformation
 class linear_transformation_worker
 {
 public:
+
 	linear_transformation_worker(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints, const k3d::matrix4& Transformation) :
 		input_points(InputPoints),
 		point_selection(PointSelection),
@@ -45,7 +47,7 @@ public:
 		transformation(Transformation)
 	{
 	}
-
+	
 	void operator()(const k3d::parallel::blocked_range<k3d::uint_t>& range) const
 	{
 		const k3d::uint_t point_begin = range.begin();

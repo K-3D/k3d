@@ -30,6 +30,8 @@
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
 #include <k3dsdk/transformable.h>
 
+#include <k3dsdk/ipipeline_profiler.h>
+
 namespace module
 {
 
@@ -54,8 +56,8 @@ public:
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
+		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Deform Mesh");
 		const k3d::matrix4 transformation = m_input_matrix.pipeline_value();
-
 		k3d::parallel::parallel_for(
 			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), k3d::parallel::grain_size()),
 			linear_transformation_worker(InputPoints, PointSelection, OutputPoints, transformation));

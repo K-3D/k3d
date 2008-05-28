@@ -5,6 +5,7 @@ import testing
 
 setup = testing.setup_mesh_modifier_test("PolyCube", "CUDATransformPoints")
 
+profiler = setup.document.new_node("PipelineProfiler")
 selection = k3d.deselect_all()
 selection.points = k3d.component_select_all()
 

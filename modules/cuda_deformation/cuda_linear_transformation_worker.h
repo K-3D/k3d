@@ -27,7 +27,7 @@
 #include <k3dsdk/parallel/blocked_range.h>
 #include <k3dsdk/parallel/parallel_for.h>
 #include <k3dsdk/parallel/threads.h>
-
+#include <k3dsdk/idocument.h>
 
 #include <k3dsdk/log.h>
 
@@ -45,17 +45,22 @@ namespace cuda_deformation
 class cuda_linear_transformation_worker
 {
 public:
-	cuda_linear_transformation_worker(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints, const k3d::matrix4& Transformation) :
+	cuda_linear_transformation_worker(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints, const k3d::matrix4& Transformation, const k3d::idocument& Document) :
 		input_points(InputPoints),
 		point_selection(PointSelection),
 		output_points(OutputPoints),
-		transformation(Transformation)
+		transformation(Transformation),
+		doc(Document)
 	{
 	}
-
+		
 	void operator()(const k3d::uint_t point_begin, const k3d::uint_t point_end) const
 	{
+		
 		int num_points = point_end - point_begin;
+		
+		
+		doc.pipeline_profiler().start_execution(*this, "");
 		
 		// first convert the double precision mesh points to single precision for the GPU
 		// use 3 floats for the points, and a 4th for the selection weight
@@ -149,6 +154,7 @@ private:
 	const k3d::mesh::selection_t& point_selection;
 	k3d::mesh::points_t& output_points;
 	const k3d::matrix4& transformation;
+	const k3d::idocument& doc;
 };
 
 } // namespace cuda_deformation

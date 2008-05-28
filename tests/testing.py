@@ -55,7 +55,7 @@ def create_default_painter(document):
 			use_vbo = True
 	except KeyError:
 		pass
-       
+	   
 	if (not use_vbo):
 		edge_painter = document.new_node("OpenGLEdgePainter")
 		face_painter = document.new_node("OpenGLFacePainter")
@@ -355,113 +355,145 @@ def bitmap_perceptual_difference(document, input_image1, input_image2, threshold
 	if difference_measurement > threshold:
 		raise "pixel difference exceeds threshold"
 
+# extract the numerical results from the profiler
+def get_profiler_results_for_node(nodeName, profilerRecords, results = {}):
+	
+	for (node, timing) in profilerRecords.items():
+		if node.name == nodeName:
+			total = 0.0
+			for t in timing:
+				total += timing[t]
+				if t in results:
+					results[t] += [timing[t],]
+				else:
+					results[t] = [timing[t],]
+			results['Total'] += [total,]
+			
+	return results
+   
 # compare the results of two different bitmap plugins applied to the k-3d test image
 def bitmap_compare_plugin_outputs(referenceName, pluginToTest, pluginPropertyValues = {}):
-    # load the reference image
-    inputBitmap = setup_bitmap_reader_test("BitmapReader", "test_rgb_8.bmp")
-    document = inputBitmap.document
-    
-    referenceNode = document.new_node(referenceName)
-    testNode = document.new_node(pluginToTest)
-    
-    for (property, value) in pluginPropertyValues.items():
-        referenceNode.get_property(property).set_value(value)
-        testNode.get_property(property).set_value(value)
-    
-    # set the dependency to the input bitmap so that the errors can be measured
-    document.set_dependency(referenceNode.get_property("input_bitmap"), inputBitmap.reader.get_property("output_bitmap"))
-    document.set_dependency(testNode.get_property("input_bitmap"), inputBitmap.reader.get_property("output_bitmap"))
-    
-    print """<DartMeasurement name="Description" type="text/string"> Compare """ + pluginToTest + " to " + referenceName + """</DartMeasurement>"""
-    if len(pluginPropertyValues) > 0:
-        print """<DartMeasurement name="Parameters" type="text/string"> """ + str(pluginPropertyValues) + """</DartMeasurement>"""
+	# load the reference image
+	inputBitmap = setup_bitmap_reader_test("BitmapReader", "test_rgb_8.bmp")
+	document = inputBitmap.document
+	
+	referenceNode = document.new_node(referenceName)
+	testNode = document.new_node(pluginToTest)
+	
+	for (property, value) in pluginPropertyValues.items():
+		referenceNode.get_property(property).set_value(value)
+		testNode.get_property(property).set_value(value)
+	
+	# set the dependency to the input bitmap so that the errors can be measured
+	document.set_dependency(referenceNode.get_property("input_bitmap"), inputBitmap.reader.get_property("output_bitmap"))
+	document.set_dependency(testNode.get_property("input_bitmap"), inputBitmap.reader.get_property("output_bitmap"))
+	
+	print """<DartMeasurement name="Description" type="text/string"> Compare """ + pluginToTest + " to " + referenceName + """</DartMeasurement>"""
+	if len(pluginPropertyValues) > 0:
+		print """<DartMeasurement name="Parameters" type="text/string"> """ + str(pluginPropertyValues) + """</DartMeasurement>"""
 
-    # calculate the perceptual difference
-    bitmap_perceptual_difference(document, referenceNode.get_property("output_bitmap"), testNode.get_property("output_bitmap"))
-    
+	# calculate the perceptual difference
+	bitmap_perceptual_difference(document, referenceNode.get_property("output_bitmap"), testNode.get_property("output_bitmap"))
+
+def mesh_modifier_benchmark(meshModifierNodeName, inputNodeSetupFunction, numberOfRuns = 1, properties = {}):
+	document = k3d.new_document()
+	
+	profiler = document.new_node("PipelineProfiler")
+	
+	inputNode = inputNodeSetupFunction(document)
+	
+	selection = k3d.deselect_all()
+	selection.points = k3d.component_select_all()
+	
+	
+	benchmarkNode = document.new_node(meshModifierNodeName)
+	for (p, val) in properties.items():
+		benchmarkNode.get_property(p).set_value(val)
+	benchmarkNode.mesh_selection = selection
+	
+	results = {}
+	results['Total'] = []
+	for n in range(numberOfRuns):
+		document.set_dependency(benchmarkNode.get_property("input_mesh"), inputNode.get_property("output_mesh"))
+		benchmarkNode.output_mesh
+		results = get_profiler_results_for_node(meshModifierNodeName, profiler.records, results)
+	
+	dartTable("%s Benchmark" % (meshModifierNodeName), results)
+	
+	
 # Benchmark the performance of the Bitmap plugins using a solid as input 
 def bitmap_benchmark(BitmapNodeName, imageDimensions, numberOfRuns = 1):
-    document = k3d.new_document()
-        
-    profiler = document.new_node("PipelineProfiler")
-    inputSolid = document.new_node("BitmapSolid")
-    inputSolid.width = imageDimensions[0];
-    inputSolid.height = imageDimensions[1];
-    
-    benchmarkNode = document.new_node(BitmapNodeName)
-    results = {}
-    results['Total'] = []
-    for n in range(numberOfRuns):
-        document.set_dependency(benchmarkNode.get_property("input_bitmap"), inputSolid.get_property("output_bitmap"))
-        benchmarkNode.output_bitmap
-        for (node, timing) in profiler.records.items():
-            if node.name == BitmapNodeName:
-                total = 0.0
-                for t in timing:
-                    total += timing[t]
-                    if t in results:
-                        results[t] += [timing[t],]
-                    else:
-                        results[t] = [timing[t],]
-                
-                results['Total'] += [total,]
-    
-    dartTable("%s Benchmark : %d x %d" % (BitmapNodeName, imageDimensions[0], imageDimensions[1]), results)
+	document = k3d.new_document()
+		
+	profiler = document.new_node("PipelineProfiler")
+	inputSolid = document.new_node("BitmapSolid")
+	inputSolid.width = imageDimensions[0];
+	inputSolid.height = imageDimensions[1];
+	
+	benchmarkNode = document.new_node(BitmapNodeName)
+	results = {}
+	results['Total'] = []
+	for n in range(numberOfRuns):
+		document.set_dependency(benchmarkNode.get_property("input_bitmap"), inputSolid.get_property("output_bitmap"))
+		benchmarkNode.output_bitmap
+		results = get_profiler_results_for_node(BitmapNodeName, profiler.records, results)
+	
+	dartTable("%s Benchmark : %d x %d" % (BitmapNodeName, imageDimensions[0], imageDimensions[1]), results)
 
 def dartTable(description, results):
-    
-    print """<DartMeasurement name="Description" type="text/string">""" + description + """</DartMeasurement>"""
-    
-    tmpString = """""";
-    headingOrder = []
-    averages = []
-    maximums = []
-    
-    for heading in results:
-        if heading != "Total":
-            tmpString += heading + """ : """
-            headingOrder += [heading,]
-        averages += [0.0,]
-        maximums += [0.0,]
-            
-    tmpString += "Total"
-    headingOrder += ['Total',]
-    
-    print """<DartMeasurement name="HEADING" type="text/string">""" + tmpString + """</DartMeasurement>"""
-    
-    
-    # get the number of results
-    numResults = len(results['Total'])
-    numColumns = len(headingOrder)
-    for row in range(numResults):
-        tmpString = """"""
-        for col_index in range(numColumns):
-            col = headingOrder[col_index]
-            # update the averages and the maximums
-            averages[col_index] += results[col][row]
-            if results[col][row] > maximums[col_index]:
-                maximums[col_index] = results[col][row]
-            
-            tmpString += str(results[col][row])
-            if col != "Total":
-                tmpString += """ : """
+	
+	print """<DartMeasurement name="Description" type="text/string">""" + description + """</DartMeasurement>"""
+	
+	tmpString = """""";
+	headingOrder = []
+	averages = []
+	maximums = []
+	
+	for heading in results:
+		if heading != "Total":
+			tmpString += heading + """ : """
+			headingOrder += [heading,]
+		averages += [0.0,]
+		maximums += [0.0,]
+			
+	tmpString += "Total"
+	headingOrder += ['Total',]
+	
+	print """<DartMeasurement name="HEADING" type="text/string">""" + tmpString + """</DartMeasurement>"""
+	
+	
+	# get the number of results
+	numResults = len(results['Total'])
+	numColumns = len(headingOrder)
+	for row in range(numResults):
+		tmpString = """"""
+		for col_index in range(numColumns):
+			col = headingOrder[col_index]
+			# update the averages and the maximums
+			averages[col_index] += results[col][row]
+			if results[col][row] > maximums[col_index]:
+				maximums[col_index] = results[col][row]
+			
+			tmpString += str(results[col][row])
+			if col != "Total":
+				tmpString += """ : """
 
-        print """<DartMeasurement name="run""" + str(row) + """" type="text/string">""" + tmpString + """</DartMeasurement>"""
-        
-    # now handle the averages and the maximums
-    tmpString = ""
-    tmpStringMax = ""
-    for col_index in range(numColumns):
-        tmpString += str(averages[col_index]/numResults)
-        tmpStringMax += str(maximums[col_index])
-        if col_index < ( numColumns - 1 ):
-            tmpString += " : "
-            tmpStringMax += " : "
-    
-    print """<DartMeasurement name="Average" type="text/string">""" + tmpString + """</DartMeasurement>"""
-    print """<DartMeasurement name="Maximums" type="text/string">""" + tmpStringMax + """</DartMeasurement>"""
-    
-    
+		print """<DartMeasurement name="run""" + str(row) + """" type="text/string">""" + tmpString + """</DartMeasurement>"""
+		
+	# now handle the averages and the maximums
+	tmpString = ""
+	tmpStringMax = ""
+	for col_index in range(numColumns):
+		tmpString += str(averages[col_index]/numResults)
+		tmpStringMax += str(maximums[col_index])
+		if col_index < ( numColumns - 1 ):
+			tmpString += " : "
+			tmpStringMax += " : "
+	
+	print """<DartMeasurement name="Average" type="text/string">""" + tmpString + """</DartMeasurement>"""
+	print """<DartMeasurement name="Maximums" type="text/string">""" + tmpStringMax + """</DartMeasurement>"""
+	
+	
 
 def image_comparison(document, image, image_name, threshold):
 
@@ -507,4 +539,3 @@ def scalar_comparison(value, expected_value):
 	print """<DartMeasurement name="Expected Value" type="numeric/float">""" + str(expected_value) + """</DartMeasurement>"""
 	if value != expected_value:
 		raise Exception("value does not match expected value")
-

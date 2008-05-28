@@ -709,7 +709,7 @@ namespace module{
 	{
           static k3d::application_plugin_factory<panel> 
             factory(
-                    k3d::uuid(0xf11983c0, 0x974a039c, 0xc5d36bb9, 0xe65cf8a0),
+                    k3d::uuid(0x110409b4, 0xfe449699, 0x40f169a1, 0xcf3768a6),
                     "NGUIShaderPreviewPanel",
                     _("Shader Preview Panel"),
                     "NGUI Panel",
