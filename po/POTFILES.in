@@ -123,9 +123,11 @@ modules/core/scale.cpp
 modules/core/show_matrix.cpp
 modules/core/snap.cpp
 modules/core/view_matrix.cpp
-modules/cuda_bitmap/cuda_add.cpp
-modules/cuda_bitmap/cuda_multiply.cpp
-modules/cuda_bitmap/cuda_subtract.cpp
+modules/cuda/cuda_bitmap_add.cpp
+modules/cuda/cuda_bitmap_color_monochrome.cpp
+modules/cuda/cuda_bitmap_multiply.cpp
+modules/cuda/cuda_bitmap_subtract.cpp
+modules/cuda/cuda_deformation_transform_points.cpp
 modules/deformation/bend_points.cpp
 modules/deformation/bulge_points.cpp
 modules/deformation/center_points.cpp

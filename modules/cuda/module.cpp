@@ -17,7 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/** \file cuda_bitmap module
+/** \file cuda module
 	\author Evan Lezar (evanlezar@gmail.com)
 */
 
@@ -25,22 +25,27 @@
 namespace module
 {
 
-namespace cuda_bitmap
+namespace cuda
 {
-
-extern k3d::iplugin_factory& cuda_add_factory();
-extern k3d::iplugin_factory& cuda_multiply_factory();
-extern k3d::iplugin_factory& cuda_subtract_factory();
-extern k3d::iplugin_factory& cuda_color_monochrome_factory();
+// bitmap plugins
+extern k3d::iplugin_factory& cuda_bitmap_add_factory();
+extern k3d::iplugin_factory& cuda_bitmap_multiply_factory();
+extern k3d::iplugin_factory& cuda_bitmap_subtract_factory();
+extern k3d::iplugin_factory& cuda_bitmap_color_monochrome_factory();
+// deformation plugins
+extern k3d::iplugin_factory& cuda_deformation_transform_points_factory();
 
 } // namespace cuda_bitmap
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::cuda_bitmap::cuda_add_factory());
-	Registry.register_factory(module::cuda_bitmap::cuda_multiply_factory());
-	Registry.register_factory(module::cuda_bitmap::cuda_subtract_factory());
-	Registry.register_factory(module::cuda_bitmap::cuda_color_monochrome_factory());
+	// bitmap plugins
+	Registry.register_factory(module::cuda::cuda_bitmap_add_factory());
+	Registry.register_factory(module::cuda::cuda_bitmap_multiply_factory());
+	Registry.register_factory(module::cuda::cuda_bitmap_subtract_factory());
+	Registry.register_factory(module::cuda::cuda_bitmap_color_monochrome_factory());
+	// deformation plugins
+	Registry.register_factory(module::cuda::cuda_deformation_transform_points_factory());
 K3D_MODULE_END 
 

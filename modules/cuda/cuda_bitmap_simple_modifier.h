@@ -28,7 +28,7 @@
 namespace module
 {
 
-namespace cuda_bitmap
+namespace cuda
 {
 
 class simple_modifier :
@@ -61,7 +61,7 @@ private:
 
 };
 
-} // namespace cuda_bitmap
+} // namespace cuda
 
 } // namespace module
 

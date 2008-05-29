@@ -21,31 +21,31 @@
 	\author Evan Lezar (evanlezar@gmail.com)
 */
 
-#include "simple_modifier.h"
+#include "cuda_bitmap_simple_modifier.h"
 #include <k3dsdk/high_res_timer.h>
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 
 // include the entry points as external definitions
-#include "../cuda_common/cuda_entry_points.h"
+#include "cuda_entry_points.h"
 
 namespace module
 {
 
-namespace cuda_bitmap
+namespace cuda
 {
-
+	
 /////////////////////////////////////////////////////////////////////////////
-// cuda_add
+// cuda_bitmap_add
 
-class cuda_add :
+class cuda_bitmap_add :
 	public simple_modifier
 {
 	typedef simple_modifier base;
 
 public:
-	cuda_add(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	cuda_bitmap_add(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_value(init_owner(*this) + init_name("value") + init_label(_("Add value")) + init_description(_("Add value to each pixel's Red, Green and Blue component")) + init_value(0.0)),
 		m_host_to_device_time(init_owner(*this) + init_name("host_to_device_time") + init_label(_("Host to device time")) + init_description(_("Timer for measuring host to device transfer time")) + init_value(0.0)),
@@ -92,7 +92,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<cuda_add,
+		static k3d::document_plugin_factory<cuda_bitmap_add,
 			k3d::interface_list<k3d::ibitmap_source,
 			k3d::interface_list<k3d::ibitmap_sink> > > factory(
 				k3d::uuid(0x86ddee78, 0x074d46f7, 0x13bf758a, 0x8893b6c2),
@@ -115,12 +115,12 @@ private:
 /////////////////////////////////////////////////////////////////////////////
 // cuda_add
 
-k3d::iplugin_factory& cuda_add_factory()
+k3d::iplugin_factory& cuda_bitmap_add_factory()
 {
-	return cuda_add::get_factory();
+	return cuda_bitmap_add::get_factory();
 }
 
-} // namespace cuda_bitmap
+} // namespace cuda
 
 } // namespace module
 

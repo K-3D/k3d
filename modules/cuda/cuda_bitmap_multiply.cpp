@@ -21,88 +21,83 @@
 	\author Evan Lezar (evanlezar@gmail.com)
 */
 
-#include "simple_modifier.h"
+#include "cuda_bitmap_simple_modifier.h"
 #include <k3dsdk/high_res_timer.h>
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 
 // include the entry points as external definitions
-#include "../cuda_common/cuda_entry_points.h"
+#include "cuda_entry_points.h"
 
 namespace module
 {
 
-namespace cuda_bitmap
+namespace cuda
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// cuda_color_monochrome
+// cuda_multiply
 
-class cuda_color_monochrome :
+class cuda_bitmap_multiply :
 	public simple_modifier
 {
 	typedef simple_modifier base;
 
 public:
-	cuda_color_monochrome(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	cuda_bitmap_multiply(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_red_weight(init_owner(*this) + init_name("red_weight") + init_label(_("Red weight")) + init_description(_("Scale Red componnt value")) + init_value(0.3)),
-		m_green_weight(init_owner(*this) + init_name("green_weight") + init_label(_("Green weight")) + init_description(_("Scale Green component value")) + init_value(0.59)),
-		m_blue_weight(init_owner(*this) + init_name("blue_weight") + init_label(_("Blue weight")) + init_description(_("Scale Blue component value")) + init_value(0.11)),
+		m_value(init_owner(*this) + init_name("value") + init_label(_("Multiplicand")) + init_description(_("Multiply each pixel component with this value")) + init_value(1.0)),
 		m_host_to_device_time(init_owner(*this) + init_name("host_to_device_time") + init_label(_("Host to device time")) + init_description(_("Timer for measuring host to device transfer time")) + init_value(0.0)),
 		m_kernel_time(init_owner(*this) + init_name("kernel_time") + init_label(_("Kernel time")) + init_description(_("Timer for measuring kernel execution time")) + init_value(0.0)),
 		m_device_to_host_time(init_owner(*this) + init_name("device_to_host_time") + init_label(_("Device to host time")) + init_description(_("Timer for measuring device to host transfer time")) + init_value(0.0))
 	{
-		m_red_weight.changed_signal().connect(make_update_bitmap_slot());
-		m_green_weight.changed_signal().connect(make_update_bitmap_slot());
-		m_blue_weight.changed_signal().connect(make_update_bitmap_slot());
+		m_value.changed_signal().connect(make_update_bitmap_slot());
 	}
 
 
 	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
 		k3d::timer timer;
-        const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
-        unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));
-        
-        // intialize CUDA - should check for errors etc
-        CUDA_initialize_device();
-        
+		const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
+		unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));
+		
+		// intialize CUDA - should check for errors etc
+		CUDA_initialize_device();
+		
         // copy the data to the device
         start_profile_step();
-        timer.restart();
-        bitmap_copy_data_from_host_to_device(inputPixels, Input.width(), Input.height());
-        m_host_to_device_time.set_value(timer.elapsed());
+		timer.restart();
+		bitmap_copy_data_from_host_to_device(inputPixels, Input.width(), Input.height());
+		m_host_to_device_time.set_value(timer.elapsed());
         stop_profile_step(PROFILE_STRING_HOST_TO_DEVICE);
 
         // perform the calculation
         start_profile_step();
-        timer.restart();
-        bitmap_color_monochrome_kernel_entry(Input.width(), Input.height(), (float)(m_red_weight.pipeline_value()), (float)(m_green_weight.pipeline_value()), (float)(m_blue_weight.pipeline_value()));
-        m_kernel_time.set_value(timer.elapsed());
-        stop_profile_step(PROFILE_STRING_EXECUTE_KERNEL);       
+		timer.restart();
+		bitmap_arithmetic_kernel_entry(CUDA_BITMAP_MULTIPLY, Input.width(), Input.height(), (float)(m_value.pipeline_value()));
+		m_kernel_time.set_value(timer.elapsed());
+        stop_profile_step(PROFILE_STRING_EXECUTE_KERNEL);		
 
         // copy the data from the device
         start_profile_step();
-        timer.restart();
-        bitmap_copy_data_from_device_to_host(outputPixels, Input.width(), Input.height());
-        m_device_to_host_time.set_value(timer.elapsed());
+		timer.restart();
+		bitmap_copy_data_from_device_to_host(outputPixels, Input.width(), Input.height());
+		m_device_to_host_time.set_value(timer.elapsed());
         stop_profile_step(PROFILE_STRING_DEVICE_TO_HOST);
 
-        // cleanup the memory allocated on the device
-        CUDA_cleanup();
-
+		// cleanup the memory allocated on the device
+		CUDA_cleanup();
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<cuda_color_monochrome,
+		static k3d::document_plugin_factory<cuda_bitmap_multiply,
 			k3d::interface_list<k3d::ibitmap_source,
 			k3d::interface_list<k3d::ibitmap_sink> > > factory(
-				k3d::uuid(0xa51271ab, 0xfc43d4b9, 0xdec56aab, 0x35605d9c),
-				"CUDABitmapColorMonochrome",
-				_("Make any image black and white"),
+				k3d::uuid(0xf2b5cdd6, 0x574d0d53, 0x8053ff81, 0x8612d328),
+				"CUDABitmapMultiply",
+				_("Multiply each each pixel color component by a specified value using the CUDA API"),
 				"CUDABitmap",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -110,9 +105,7 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_red_weight;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_green_weight;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_blue_weight;
+	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_value;
 	// private member containers for timing measurements
 	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, with_serialization) m_host_to_device_time;
 	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, with_serialization) m_kernel_time;
@@ -120,14 +113,14 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// cuda_color_monochrome
+// cuda_multiply
 
-k3d::iplugin_factory& cuda_color_monochrome_factory()
+k3d::iplugin_factory& cuda_bitmap_multiply_factory()
 {
-	return cuda_color_monochrome::get_factory();
+	return cuda_bitmap_multiply::get_factory();
 }
 
-} // namespace cuda_bitmap
+} // namespace cuda
 
 } // namespace module
 

@@ -32,24 +32,24 @@
 #include <k3dsdk/log.h>
 
 // include the entry points as external definitions
-#include "../cuda_common/cuda_entry_points.h"
+#include "cuda_entry_points.h"
 
 namespace module
 {
 
-namespace cuda_deformation
+namespace cuda
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// cuda_transform_points
+// cuda_deformation_transform_points
 
-class cuda_transform_points :
+class cuda_deformation_transform_points :
 	public k3d::transformable<k3d::mesh_simple_deformation_modifier>
 {
 	typedef k3d::transformable<k3d::mesh_simple_deformation_modifier> base;
 
 public:
-	cuda_transform_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	cuda_deformation_transform_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
@@ -157,7 +157,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<cuda_transform_points,
+		static k3d::document_plugin_factory<cuda_deformation_transform_points,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink,
 			k3d::interface_list<k3d::itransform_source,
@@ -166,7 +166,7 @@ public:
 				"CUDATransformPoints",
 				_("Transform mesh points using input matrix"),
 				"CUDADeformation",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
@@ -175,14 +175,14 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// cuda_transform_points_factory
+// cuda_deformation_transform_points_factory
 
-k3d::iplugin_factory& cuda_transform_points_factory()
+k3d::iplugin_factory& cuda_deformation_transform_points_factory()
 {
-	return cuda_transform_points::get_factory();
+	return cuda_deformation_transform_points::get_factory();
 }
 
-} // namespace deformation
+} // namespace cuda
 
 } // namespace module
 

@@ -1,6 +1,6 @@
-INCLUDE ( ../cuda_common/FindCUDA.cmake )
+INCLUDE ( FindCUDA.cmake )
 
-WRAP_CUDA(CUDA_SOURCES ../cuda_common/cuda_entry_points.cu)
+WRAP_CUDA(CUDA_SOURCES cuda_entry_points.cu)
 
 GET_CUDA_INC_DIRS ( CUDA_INCLUDE_DIRECTORIES )
 
@@ -8,10 +8,10 @@ INCLUDE_DIRECTORIES(${CUDA_INCLUDE_DIRECTORIES})
 
 SET(CUDA_LIBS ${CUDA_LIBRARIES} ${CUDA_UTIL_LIBRARY})
 
-K3D_BUILD_CUDA_MODULE(k3d-cuda-bitmap)
-K3D_CREATE_MODULE_PROXY(k3d-cuda-bitmap)
+K3D_BUILD_CUDA_MODULE(k3d-cuda)
+K3D_CREATE_MODULE_PROXY(k3d-cuda)
 
-TARGET_LINK_LIBRARIES(k3d-cuda-bitmap ${CUDA_LIBS})
+TARGET_LINK_LIBRARIES(k3d-cuda ${CUDA_LIBS})
 
 # disable RPATH since it prevents the emulation mode from working correctly
 IF (CUDA_EMULATION)

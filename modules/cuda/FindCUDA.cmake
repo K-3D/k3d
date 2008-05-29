@@ -41,6 +41,7 @@ FIND_PATH (CUDA_UTIL_INCLUDE_PATH cutil.h
     $ENV{CUDA_UTIL_INC_PATH}
     ${CUDA_COMPILER_SUPER_DIR}/include
 	${CUDA_COMPILER_DIR}
+	${CUDA_COMPILER_SUPER_DIR}/NVIDIA_CUDA_SDK/common/inc
     DOC "Location of cutil.h")
 
 FIND_LIBRARY (CUDA_UTIL_LIBRARY
@@ -49,7 +50,8 @@ FIND_LIBRARY (CUDA_UTIL_LIBRARY
 	$ENV{CUDA_UTIL_LIB_PATH}
 	${CUDA_COMPILER_SUPER_DIR}/lib
 	${CUDA_COMPILER_DIR}
-	DOC "The CUDA util runtime library libcutil.a")
+	${CUDA_COMPILER_SUPER_DIR}/NVIDIA_CUDA_SDK/lib
+	DOC "The CUDA util runtime library libcutil.a (full path including the filename")
 
 FIND_LIBRARY (CUDA_RUNTIME_LIBRARY
 	NAMES cudart
