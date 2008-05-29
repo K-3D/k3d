@@ -67,7 +67,7 @@ public:
 			_("Provides a custom property control for NURBS knot vectors."),
 			"NGUI Control",
 			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("ngui:component-type", "property-control")("ngui:property-type", "NurbsEditCurveKnotVector-KnotVector"));
+			boost::assign::map_list_of("ngui:component-type", "property-control")("ngui:property-type", "k3d:nurbs-knot-vector"));
 
 		return factory;
 	}

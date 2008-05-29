@@ -77,7 +77,7 @@ namespace module
 				base(Factory, Document),
 				m_knot_vector(init_owner(*this) + init_name("knot_vector") + init_label(_("knot_vector")) + init_description(_("Knot Vector (csv):")) + init_value(_("not initialized")) )
 			{
-				m_knot_vector.set_metadata("k3d:property-type", "NurbsEditCurveKnotVector-KnotVector");
+				m_knot_vector.set_metadata("k3d:property-type", "k3d:nurbs-knot-vector");
 
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 				m_knot_vector.changed_signal().connect(make_update_mesh_slot());
