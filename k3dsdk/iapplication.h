@@ -55,6 +55,7 @@ public:
 	virtual const document_collection_t documents() = 0;
 
 	/// Returns the collection of available plugin factories
+	/** \deprecated Use k3d::plugin::factory::lookup() instead. */
 	virtual const iplugin_factory_collection::factories_t& plugins() = 0;
 
 	// Signals

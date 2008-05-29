@@ -148,6 +148,11 @@ inode* create_document_plugin(const uuid& ClassID, idocument& Document, const k3
 namespace factory
 {
 
+const collection_t lookup()
+{
+	return application().plugins();
+}
+
 iplugin_factory* lookup(const uuid& ID)
 {
 	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
@@ -178,6 +183,25 @@ iplugin_factory* lookup(const k3d::string_t& Name)
 			k3d::log() << error << "multiple plugin factories with name [" << Name << "]" << std::endl;
 			return 0;
 	}
+}
+
+const collection_t lookup(const string_t& MetadataName, const string_t& MetadataValue)
+{
+	collection_t results;
+
+	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	{
+		iplugin_factory::metadata_t::const_iterator pair = (**factory).metadata().find(MetadataName);
+		if(pair == (**factory).metadata().end())
+			continue;
+
+		if(pair->second != MetadataValue)
+			continue;
+
+		results.insert(*factory);
+	}
+
+	return results;
 }
 
 const collection_t lookup(const std::type_info& Interface)

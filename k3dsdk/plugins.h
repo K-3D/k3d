@@ -48,10 +48,14 @@ namespace factory
 /// Defines storage for a collection of plugin factories
 typedef std::set<iplugin_factory*> collection_t;
 
+/// Returns the set of all available plugin factories.
+const collection_t lookup();
 /// Returns the plugin factory that implements a specific factory ID, or NULL.
 iplugin_factory* lookup(const uuid& ID);
 /// Returns the plugin factory that matches the given name, or NULL.  Note: returns NULL if more than one factory matches Name.
 iplugin_factory* lookup(const string_t& Name);
+/// Returns the set of plugin factories that match the given metadata name-value pair.
+const collection_t lookup(const string_t& MetadataName, const string_t& MetadataValue);
 /// Returns the set of plugin factories that implement a specific interface.
 const collection_t lookup(const std::type_info& Interface);
 /// Returns the set of plugin factories that implement a specific interface.

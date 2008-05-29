@@ -218,22 +218,7 @@ public:
 						imetadata::metadata_t property_metadata = metadata->get_metadata();
 						if(property_metadata.count("k3d:property-type"))
 						{
-							static plugin::factory::collection_t control_factories;
-							static bool control_factories_initialized = false;
-							if(!control_factories_initialized)
-							{
-								control_factories_initialized = true;
-								const plugin::factory::collection_t factories = k3d::application().plugins();
-								for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
-								{
-									iplugin_factory::metadata_t factory_metadata = (**factory).metadata();
-									if(factory_metadata["ngui:component-type"] != "property-control")
-										continue;
-
-									control_factories.insert(*factory);
-								}
-							}
-
+							static plugin::factory::collection_t control_factories = plugin::factory::lookup("ngui:component-type", "property-control");
 							for(plugin::factory::collection_t::const_iterator factory = control_factories.begin(); factory != control_factories.end(); ++factory)
 							{
 								iplugin_factory::metadata_t factory_metadata = (**factory).metadata();
