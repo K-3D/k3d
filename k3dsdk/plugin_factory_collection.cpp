@@ -545,16 +545,26 @@ void plugin_factory_collection::load_modules(const filesystem::path& Path, const
 {
 	m_implementation->m_message_signal.emit(string_cast(boost::format(_("Searching for plugins in %1%")) % Path.native_utf8_string().raw()));
 
+	// Create a sorted list of files in this directory ...
+	std::vector<filesystem::path> files;
 	for(k3d::filesystem::directory_iterator path(Path); path != k3d::filesystem::directory_iterator(); ++path)
+		files.push_back(*path);
+	std::sort(files.begin(), files.end());
+
+	// Load modules
+	for(std::vector<filesystem::path>::const_iterator file = files.begin(); file != files.end(); ++file)
 	{
-		if(k3d::filesystem::is_directory(*path))
+		if(!filesystem::is_directory(*file))
+			load_module(*file, LoadProxies);
+	}
+
+	// Optionally descend recursively into subdirectories ...
+	if(Recursive)
+	{
+		for(std::vector<filesystem::path>::const_iterator file = files.begin(); file != files.end(); ++file)
 		{
-			if(Recursive)
-				load_modules(*path, Recursive, LoadProxies);
-		}
-		else
-		{
-			load_module(*path, LoadProxies);
+			if(filesystem::is_directory(*file))
+				load_modules(*file, Recursive, LoadProxies);
 		}
 	}
 }
