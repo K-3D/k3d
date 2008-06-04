@@ -63,6 +63,8 @@ protected:
 
 } // namespace k3d
 
+
+
 namespace module
 {
 
@@ -75,16 +77,16 @@ namespace module
 		public:
 			edit_knot_vector(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),
-				m_knot_vector(init_owner(*this) + init_name("knot_vector") + init_label(_("knot_vector")) + init_description(_("Knot Vector (csv):")) + init_value(_("not initialized")) )
+				m_knot_vector(init_owner(*this) + init_name("knot_vector") + init_label(_("knot_vector")) + init_description(_("Knot Vector (csv):")) + init_value(k3d::mesh::knots_t()) )
 			{
 				m_knot_vector.set_metadata("k3d:property-type", "k3d:nurbs-knot-vector");
-
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 				m_knot_vector.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output) 
 			{
+				k3d::log() << debug << "CreateMesh" << std::endl;
 				Output=Input;
 				
 				if(!k3d::validate_nurbs_curve_groups(Output))
@@ -98,27 +100,13 @@ namespace module
 				}
 				
 				
-				const k3d::mesh::nurbs_curve_groups_t& groups = *Output.nurbs_curve_groups;
-				const k3d::mesh::knots_t& knots = *groups.curve_knots;
-
-				std::stringstream knot_stream;
-				
-				const size_t curve_knots_begin = (*groups.curve_first_knots)[my_curve];
-				const size_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[my_curve] + (*groups.curve_orders)[my_curve];
-				
-				for(size_t i = curve_knots_begin; i < curve_knots_end-1; ++i)
-				{
-					knot_stream << knots[i] << ",";
-				}
-				
-				knot_stream << knots[curve_knots_end-1];
-				
-				m_knot_vector.set_value(knot_stream.str());
+				m_knot_vector.set_value(extract_knots(Output, my_curve));
 			}
 			
 
 			void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 			{
+				k3d::log() << debug << "UpdateMesh" << std::endl;
 				Output=Input;
 				
 				if(!k3d::validate_nurbs_curve_groups(Output))
@@ -126,7 +114,7 @@ namespace module
 
 				merge_selection(m_mesh_selection.pipeline_value(), Output);
 				
-				std::string knot_vector = m_knot_vector.pipeline_value();
+				const k3d::mesh::knots_t& knots = m_knot_vector.pipeline_value();
 				
 				int my_curve = select_mesh(Output);
 				if(my_curve < 0)
@@ -135,7 +123,8 @@ namespace module
 					return;
 				}
 				
-				parse_knot_vector(knot_vector, Output, my_curve);
+				if(!insert_knots(knots, Output, my_curve))
+					k3d::log() << error << "Invalid Knot Vector" << my_curve << std::endl;
 			}
 
 			static k3d::iplugin_factory& get_factory()
@@ -151,7 +140,7 @@ namespace module
 			}
 			
 		private:
-			k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, k3d::property_metadata, with_serialization) m_knot_vector;
+			k3d_data(k3d::mesh::knots_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, k3d::property_metadata, no_serialization) m_knot_vector;
 			
 			int select_mesh(k3d::mesh& Output)
 			{
@@ -181,42 +170,39 @@ namespace module
 				return my_curve;
 			}
 			
-			void parse_knot_vector(std::string knot_vector, k3d::mesh& Output, int curve)
+			k3d::mesh::knots_t extract_knots(const k3d::mesh& Output, int curve)
+			{
+				const k3d::mesh::nurbs_curve_groups_t& groups = *Output.nurbs_curve_groups;
+				const k3d::mesh::knots_t& knots = *groups.curve_knots;
+				k3d::mesh::knots_t curve_knots;
+				
+				const size_t curve_knots_begin = (*groups.curve_first_knots)[curve];
+				const size_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];
+				
+				for(size_t i = curve_knots_begin; i< curve_knots_end; i++)
+					curve_knots.push_back( knots[i] );
+					
+				return curve_knots;
+			}
+			
+			bool insert_knots(const k3d::mesh::knots_t& curve_knots, k3d::mesh& Output, int curve)
 			{
 				k3d::mesh::nurbs_curve_groups_t& groups = *k3d::make_unique(Output.nurbs_curve_groups);
 				k3d::mesh::knots_t& knots = *k3d::make_unique(groups.curve_knots);
-				k3d::mesh::knots_t new_knots;
-				
-				int nr_knots = (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];
-				k3d::log() << debug << "Looking for " << nr_knots << " knots in string" << std::endl;
-				
-				//Initialize knot_stream
-				std::stringstream knot_stream;
-				knot_stream.str(knot_vector);
-				
-				while(!knot_stream.eof())
-				{
-					short tmp;
-					knot_stream >> tmp;
-					new_knots.push_back(tmp);
-					//must be followed by a comma, otherwise we're at the end so the while loop breaks
-					knot_stream.get();
-				}
-				
-				if(new_knots.size() != nr_knots)
-				{
-					k3d::log() << error << "Knot vector is invalid!" << std::endl;
-					return;
-				}
 				
 				const size_t curve_knots_begin = (*groups.curve_first_knots)[curve];
-				const size_t curve_knots_end = curve_knots_begin + nr_knots;
+				const size_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];
 				
-				for(size_t knot = curve_knots_begin; knot < curve_knots_end; ++knot)
-				{
-					knots[knot] = new_knots[knot - curve_knots_begin];
-				}
+				if(curve_knots.size() != curve_knots_end - curve_knots_begin)
+					return false;
+					
+				for(size_t i = curve_knots_begin; i < curve_knots_end; i++)
+					knots[i] = curve_knots[i-curve_knots_begin];
+					
+				return true;
 			}
+			
+
 		};
 
 		//Create connect_curve factory

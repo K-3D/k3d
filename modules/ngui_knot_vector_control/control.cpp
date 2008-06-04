@@ -21,8 +21,11 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/custom_property_control.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/properties.h>
 
-#include <gtkmm/label.h>
+#include <gtkmm/table.h>
+#include <gtkmm/spinbutton.h>
 
 #include <boost/assign/list_of.hpp>
 
@@ -42,11 +45,11 @@ namespace knot_vector
 class control :
 	public k3d::ngui::custom_property::control,
 	public k3d::iunknown,
-	public Gtk::Label
+	public Gtk::Table
 {
 public:
 	control() :
-		Gtk::Label("Custom Knot Vector Control")
+		Gtk::Table(5,1,true)
 	{
 	}
 
@@ -56,6 +59,22 @@ public:
 
 	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent, k3d::iproperty& Property)
 	{
+		k3d::mesh::knots_t knot_vector = boost::any_cast<k3d::mesh::knots_t >(k3d::property::internal_value(Property));
+		//get the number of knots
+		int m_nr_knots = knot_vector.size();
+		resize(m_nr_knots,1);
+		k3d::log() << debug << m_nr_knots << std::endl;
+		//initialize all spin buttons
+		for(int i = 0; i < m_nr_knots; i++)
+		{
+			Gtk::SpinButton btn(0.1,1);
+			//add callback
+			btn.set_value(knot_vector[i]);
+			btn.show();
+			attach(btn, 0, 1, i, i + 1);
+			m_knots.push_back(&btn);
+		}
+		
 		show();
 	}
 
@@ -71,6 +90,10 @@ public:
 
 		return factory;
 	}
+	
+private:
+	std::vector<Gtk::SpinButton* > m_knots;
+	int m_nr_knots;
 };
 
 } // namespace knot_vector
