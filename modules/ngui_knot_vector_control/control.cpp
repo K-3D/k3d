@@ -24,7 +24,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/properties.h>
 
-#include <gtkmm/table.h>
+#include <gtkmm/box.h>
 #include <gtkmm/spinbutton.h>
 
 #include <boost/assign/list_of.hpp>
@@ -45,11 +45,11 @@ namespace knot_vector
 class control :
 	public k3d::ngui::custom_property::control,
 	public k3d::iunknown,
-	public Gtk::Table
+	public Gtk::VBox
 {
 public:
 	control() :
-		Gtk::Table(5,1,true)
+		Gtk::VBox()
 	{
 	}
 
@@ -62,20 +62,28 @@ public:
 		k3d::mesh::knots_t knot_vector = boost::any_cast<k3d::mesh::knots_t >(k3d::property::internal_value(Property));
 		//get the number of knots
 		int m_nr_knots = knot_vector.size();
-		resize(m_nr_knots,1);
+
 		k3d::log() << debug << m_nr_knots << std::endl;
 		//initialize all spin buttons
 		for(int i = 0; i < m_nr_knots; i++)
 		{
-			Gtk::SpinButton btn(0.1,1);
+			Gtk::SpinButton* btn = Gtk::manage(new Gtk::SpinButton(0.1,1));
 			//add callback
-			btn.set_value(knot_vector[i]);
-			btn.show();
-			attach(btn, 0, 1, i, i + 1);
-			m_knots.push_back(&btn);
+			btn->signal_value_changed().connect(sigc::mem_fun(*this, &control::on_change));
+			k3d::log() << debug << knot_vector[i] << std::endl;
+			btn->set_editable();
+			btn->set_value(knot_vector[i]);
+			pack_start(*btn, Gtk::PACK_EXPAND_WIDGET, 1);
+			m_knots.push_back(btn);
 		}
 		
-		show();
+		show_all_children();
+	}
+	
+	void on_change()
+	{
+		//pass new data to nurbs plugin?
+		k3d::log() << debug << "Value changed" << std::endl;
 	}
 
 	static k3d::iplugin_factory& get_factory()
