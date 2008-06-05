@@ -2,7 +2,7 @@
 #define K3DSDK_IUSER_INTERFACE_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,37 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
-#include <k3dsdk/path.h>
-#include <boost/python/list.hpp>
-
 namespace k3d
 {
-
-class iuser_interface;
 
 namespace python
 {
 
-class iuser_interface :
-	public interface_wrapper<k3d::iuser_interface>
-{
-	typedef interface_wrapper<k3d::iuser_interface> base;
-
-public:
-	iuser_interface();
-	iuser_interface(k3d::iuser_interface& UserInterface);
-
-	void open_uri(const std::string& URI);
-	void message(const std::string& Message);
-	void warning_message(const std::string& Message);
-	void error_message(const std::string& Message);
-	unsigned long query_message(const std::string& Message, const boost::python::list& Buttons);
-	const filesystem::path get_file_path(const std::string& Direction, const std::string& Type, const std::string& Message, const std::string& StartPath);
-	void synchronize();
-
-	static void define_class();
-};
+void define_iuser_interface_wrapper();
 
 } // namespace python
 

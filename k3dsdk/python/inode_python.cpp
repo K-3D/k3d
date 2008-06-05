@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "idocument_python.h"
 #include "inode_python.h"
+#include "interface_wrapper_python.h"
 
 #include <k3dsdk/inode.h>
 #include <boost/python.hpp>
@@ -33,42 +35,34 @@ namespace k3d
 namespace python
 {
 
-inode::inode() :
-	base()
+typedef interface_wrapper<k3d::inode> inode_wrapper;
+
+static interface_wrapper<k3d::idocument> document(inode_wrapper& Self)
 {
+	return wrap(Self.wrapped().document());
 }
 
-inode::inode(k3d::inode* Node) :
-	base(Node)
+static interface_wrapper<k3d::iplugin_factory> factory(inode_wrapper& Self)
 {
+	return wrap(Self.wrapped().factory());
 }
 
-object inode::document()
+static boost::uint64_t hash(inode_wrapper& Self)
 {
-	return object(idocument(wrapped().document()));
+	return reinterpret_cast<boost::uint64_t>(Self.wrapped_ptr());
 }
 
-object inode::factory()
+void define_inode_wrapper()
 {
-	return object(iplugin_factory(wrapped().factory()));
-}
-
-boost::uint64_t inode::hash()
-{
-	return reinterpret_cast<boost::uint64_t>(wrapped_ptr());
-}
-
-void inode::define_class()
-{
-	class_<inode>("inode",
+	class_<inode_wrapper>("inode",
 		"Abstract interface implemented by all document nodes.\n\n"
 		"Use L{dynamic_cast} to test whether an inode object implements a specific interface / "
 		"convert an inode object to a specific interface type.", no_init)
-		.def("document", &inode::document,
+		.def("document", &document,
 			"Returns the L{idocument} that owns this node.")
-		.def("factory", &inode::factory,
+		.def("factory", &factory,
 			"Returns the L{iplugin_factory} used to create this node type.")
-		.def("__hash__", &inode::hash,
+		.def("__hash__", &hash,
 			"Returns a hash value that can be used as a key when storing inode objects in a map.");
 }
 

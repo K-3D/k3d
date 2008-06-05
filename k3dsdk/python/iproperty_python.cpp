@@ -22,6 +22,7 @@
 */
 
 #include "any_python.h"
+#include "interface_wrapper_python.h"
 #include "iproperty_python.h"
 #include "node_python.h"
 
@@ -44,76 +45,68 @@ namespace k3d
 namespace python
 {
 
-iproperty::iproperty() :
-	base()
+typedef interface_wrapper<k3d::iproperty> iproperty_wrapper;
+
+const string_t name(iproperty_wrapper& Self)
 {
+	return Self.wrapped().property_name();
 }
 
-iproperty::iproperty(k3d::iproperty* Property) :
-	base(Property)
+const string_t label(iproperty_wrapper& Self)
 {
+	return Self.wrapped().property_label();
 }
 
-const std::string iproperty::name()
+const string_t description(iproperty_wrapper& Self)
 {
-	return wrapped().property_name();
+	return Self.wrapped().property_description();
 }
 
-const std::string iproperty::label()
+const string_t type(iproperty_wrapper& Self)
 {
-	return wrapped().property_label();
+	return k3d::type_string(Self.wrapped().property_type());
 }
 
-const std::string iproperty::description()
+object internal_value(iproperty_wrapper& Self)
 {
-	return wrapped().property_description();
+	return any_to_python(k3d::property::internal_value(Self.wrapped()));
 }
 
-const std::string iproperty::type()
+object pipeline_value(iproperty_wrapper& Self)
 {
-	return k3d::type_string(wrapped().property_type());
+	return any_to_python(k3d::property::pipeline_value(Self.wrapped()));
 }
 
-object iproperty::internal_value()
+object node(iproperty_wrapper& Self)
 {
-	return any_to_python(k3d::property::internal_value(wrapped()));
+	return any_to_python(Self.wrapped().property_node());
 }
 
-object iproperty::pipeline_value()
+const bool is_writable(iproperty_wrapper& Self)
 {
-	return any_to_python(k3d::property::pipeline_value(wrapped()));
+	return dynamic_cast<k3d::iwritable_property*>(Self.wrapped_ptr()) ? true : false;
 }
 
-object iproperty::node()
+void set_value(iproperty_wrapper& Self, const boost::python::object& Value)
 {
-	return any_to_python(wrapped().property_node());
-}
-
-const bool iproperty::is_writable()
-{
-	return dynamic_cast<k3d::iwritable_property*>(wrapped_ptr()) ? true : false;
-}
-
-void iproperty::set_value(const boost::python::object& Value)
-{
-	if(k3d::iwritable_property* const writable = dynamic_cast<k3d::iwritable_property*>(wrapped_ptr()))
+	if(k3d::iwritable_property* const writable = dynamic_cast<k3d::iwritable_property*>(Self.wrapped_ptr()))
 	{
-		writable->property_set_value(python_to_any(Value, wrapped_ptr()->property_type()));
+		writable->property_set_value(python_to_any(Value, Self.wrapped_ptr()->property_type()));
 		return;
 	}
 
-	throw std::runtime_error("property " + wrapped().property_name() + " is a read-only property");
+	throw std::runtime_error("property " + Self.wrapped().property_name() + " is a read-only property");
 }
 
-const bool iproperty::is_enumeration()
+const bool is_enumeration(iproperty_wrapper& Self)
 {
-	return dynamic_cast<k3d::ienumeration_property*>(wrapped_ptr()) ? true : false;
+	return dynamic_cast<k3d::ienumeration_property*>(Self.wrapped_ptr()) ? true : false;
 }
 
-list iproperty::enumeration_values()
+list enumeration_values(iproperty_wrapper& Self)
 {
 	list results;
-	if(k3d::ienumeration_property* const enumeration = dynamic_cast<k3d::ienumeration_property*>(wrapped_ptr()))
+	if(k3d::ienumeration_property* const enumeration = dynamic_cast<k3d::ienumeration_property*>(Self.wrapped_ptr()))
 	{
 		const k3d::ienumeration_property::enumeration_values_t values = enumeration->enumeration_values();
 		for(k3d::ienumeration_property::enumeration_values_t::const_iterator value = values.begin(); value != values.end(); ++value)
@@ -123,9 +116,9 @@ list iproperty::enumeration_values()
 	return results;
 }
 
-const std::string iproperty::units()
+const string_t units(iproperty_wrapper& Self)
 {
-	if(k3d::imeasurement_property* const measurement = dynamic_cast<k3d::imeasurement_property*>(wrapped_ptr()))
+	if(k3d::imeasurement_property* const measurement = dynamic_cast<k3d::imeasurement_property*>(Self.wrapped_ptr()))
 	{
 		const std::type_info& units = measurement->property_units();
 
@@ -162,34 +155,34 @@ const std::string iproperty::units()
 	return "";
 }
 
-void iproperty::define_class()
+void define_iproperty_wrapper()
 {
-	class_<iproperty>("iproperty",
+	class_<iproperty_wrapper>("iproperty",
 		"Encapsulates a K-3D property. In K-3D, a document contains nodes, and nodes contain properties, "
 		"which are the external representations of a node's internal state.", no_init)
-		.def("name", &iproperty::name,
+		.def("name", &name,
 			"Unique identifier, used for serialization and scripting.")
-		.def("label", &iproperty::label,
+		.def("label", &label,
 			"Localized, human-readable text that labels the property in the user interface.")
-		.def("description", &iproperty::description,
+		.def("description", &description,
 			"Localized, human-readable description of the property.")
-		.def("type", &iproperty::type,
+		.def("type", &type,
 			"Returns the type of data the property stores as a string.")
-		.def("internal_value", &iproperty::internal_value,
+		.def("internal_value", &internal_value,
 			"Returns the value stored by the property.")
-		.def("pipeline_value", &iproperty::pipeline_value,
+		.def("pipeline_value", &pipeline_value,
 			"Returns the property's 'pipeline' value, which will differ from its internal value if it's connected to another property by the Visualization Pipeline.")
-		.def("node", &iproperty::node,
+		.def("node", &node,
 			"Returns the node (if any) that owns the property, or None.")
-		.def("is_writable", &iproperty::is_writable,
+		.def("is_writable", &is_writable,
 			"Returns true if the property's internal value can be modified.")
-		.def("set_value", &iproperty::set_value,
+		.def("set_value", &set_value,
 			"Sets the property's internal value.")
-		.def("is_enumeration", &iproperty::is_enumeration,
+		.def("is_enumeration", &is_enumeration,
 			"Returns true if the property datatype is an enumeration.")
-		.def("enumeration_values", &iproperty::enumeration_values,
+		.def("enumeration_values", &enumeration_values,
 			"Returns a list containing the set of allowable property values, if the property is an enumeration.")
-		.def("units", &iproperty::units,
+		.def("units", &units,
 			"Returns a string describing the real-world unit-of-measure stored by the property, if any.");
 }
 

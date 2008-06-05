@@ -2,7 +2,7 @@
 #define K3DSDK_IPLUGIN_FACTORY_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,39 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
-
-#include <k3dsdk/uuid.h>
-#include <boost/python/list.hpp>
-
 namespace k3d
 {
-
-class iplugin_factory;
 
 namespace python
 {
 
-class iplugin_factory :
-	public interface_wrapper<k3d::iplugin_factory>
-{
-	typedef interface_wrapper<k3d::iplugin_factory> base;
-
-public:
-	iplugin_factory();
-	iplugin_factory(k3d::iplugin_factory* PluginFactory);
-	iplugin_factory(k3d::iplugin_factory& PluginFactory);
-
-	const uuid factory_id();
-	const std::string name();
-	const std::string short_description();
-	const bool is_application_plugin();
-	const bool is_document_plugin();
-	const boost::python::list categories();
-	const std::string quality();
-
-	static void define_class();
-};
+void define_iplugin_factory_wrapper();
 
 } // namespace python
 

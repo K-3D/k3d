@@ -21,27 +21,52 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "imaterial_python.h"
+#include "imetadata_python.h"
 #include "interface_wrapper_python.h"
 
-#include <k3dsdk/imaterial.h>
+#include <k3dsdk/imetadata.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
 
-namespace k3d 
+namespace k3d
 {
 
 namespace python
 {
 
-typedef interface_wrapper<k3d::imaterial> imaterial_wrapper;
+typedef interface_wrapper<k3d::imetadata> imetadata_wrapper;
 
-void define_imaterial_wrapper()
+static void set_metadata(imetadata_wrapper& Self, const string_t& Name, const string_t& Value)
 {
-	class_<imaterial_wrapper>("imaterial",
-		"Abstract interface implemented by objects that can act as surface materials within a shading model.\n\n"
-		"Use L{dynamic_cast} to convert an imaterial object to another interface type.", no_init);
+	Self.wrapped().set_metadata(Name, Value);
+}
+
+static boost::python::dict get_metadata(imetadata_wrapper& Self)
+{
+	boost::python::dict result;
+
+	const imetadata::metadata_t metadata = Self.wrapped().get_metadata();
+	for(imetadata::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
+		result[pair->first] = pair->second;
+
+	return result;
+}
+
+static void erase_metadata(imetadata_wrapper& Self, const string_t& Name)
+{
+	Self.wrapped().erase_metadata(Name);
+}
+
+void define_imetadata_wrapper()
+{
+	class_<imetadata_wrapper>("imetadata", 
+		"Abstract interface for objects that can store user-defined metadata.",
+		no_init)
+		.def("set_metadata", &set_metadata)
+		.def("get_metadata", &get_metadata)
+		.def("erase_metadata", &erase_metadata)
+		;
 }
 
 } // namespace python

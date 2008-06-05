@@ -22,8 +22,10 @@
 */
 
 #include "icommand_node_python.h"
+#include "interface_wrapper_python.h"
 
 #include <k3dsdk/command_tree.h>
+#include <k3dsdk/types.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -34,47 +36,39 @@ namespace k3d
 namespace python
 {
 
-icommand_node::icommand_node() :
-	base()
+typedef interface_wrapper<k3d::icommand_node> icommand_node_wrapper;
+
+static const string_t name(icommand_node_wrapper& Self)
 {
+	return k3d::command_tree().name(Self.wrapped());
 }
 
-icommand_node::icommand_node(k3d::icommand_node* CommandNode) :
-	base(CommandNode)
-{
-}
-
-const std::string icommand_node::name()
-{
-	return k3d::command_tree().name(wrapped());
-}
-
-const list icommand_node::children()
+static const list children(icommand_node_wrapper& Self)
 {
 	list results;
 	
-	const k3d::icommand_tree::nodes_t children = k3d::command_tree().children(&wrapped());
+	const k3d::icommand_tree::nodes_t children = k3d::command_tree().children(&Self.wrapped());
 	for(k3d::icommand_tree::nodes_t::const_iterator child = children.begin(); child != children.end(); ++child)
-		results.append(icommand_node(*child));
+		results.append(wrap(*child));
 	
 	return results;
 }
 
-icommand_node icommand_node::get_child(const std::string& Name)
+static icommand_node_wrapper get_child(icommand_node_wrapper& Self, const string_t& Name)
 {
-	k3d::icommand_tree::nodes_t children = k3d::command_tree().children(&wrapped());
+	k3d::icommand_tree::nodes_t children = k3d::command_tree().children(&Self.wrapped());
 	for(k3d::icommand_tree::nodes_t::iterator child = children.begin(); child != children.end(); ++child)
 	{
 		if(Name == k3d::command_tree().name(**child))
-			return icommand_node(*child);
+			return wrap(*child);
 	}
 
 	throw std::runtime_error("No child named " + Name);
 }
 
-void icommand_node::execute_command(const std::string& Command, const std::string& Arguments)
+static void execute_command(icommand_node_wrapper& Self, const string_t& Command, const string_t& Arguments)
 {
-	switch(wrapped().execute_command(Command, Arguments))
+	switch(Self.wrapped().execute_command(Command, Arguments))
 	{
 		case k3d::icommand_node::RESULT_STOP:
 			throw std::runtime_error("Stop executing");
@@ -89,18 +83,18 @@ void icommand_node::execute_command(const std::string& Command, const std::strin
 	throw std::runtime_error("Unknown command result");
 }
 
-void icommand_node::define_class()
+void define_icommand_node_wrapper()
 {
-	class_<icommand_node>("icommand_node",
+	class_<icommand_node_wrapper>("icommand_node",
 		"Abstract interface implemented by object that can execute arbitrary commands.\n\n"
 		"Use L{dynamic_cast} to convert an icommand_node object to some other interface type.", no_init)
-		.def("command_node_name", &icommand_node::name,
+		.def("command_node_name", &name,
 			"Returns the name of this command node as a string.")
-		.def("children", &icommand_node::children,
+		.def("children", &children,
 			"Returns this command node's children (if any) as a list of icommand_node objects.")
-		.def("get_child", &icommand_node::get_child,
+		.def("get_child", &get_child,
 			"Given a string name, returns the given child.")
-		.def("execute_command", &icommand_node::execute_command,
+		.def("execute_command", &execute_command,
 			"Executes a command.");
 }
 

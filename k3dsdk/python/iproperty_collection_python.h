@@ -2,7 +2,7 @@
 #define K3DSDK_IPROPERTY_COLLECTION_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,39 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "iproperty_python.h"
-
-#include <k3dsdk/types.h>
-#include <boost/python/list.hpp>
-
 namespace k3d
 {
 	
-class iproperty_collection;
-
 namespace python
 {
 
-class iproperty_collection :
-	public interface_wrapper<k3d::iproperty_collection>
-{
-	typedef interface_wrapper<k3d::iproperty_collection> base;
-public:
-	iproperty_collection();
-	iproperty_collection(k3d::iproperty_collection* CommandNode);
-
-	boost::python::list properties();
-	iproperty get_property(const string_t& Name);
-	iproperty create_property(const string_t& Type, const string_t& Name, const string_t& Label, const string_t& Description);
-	iproperty create_renderman_attribute(const string_t& Type, const string_t& List, const string_t& Name, const string_t& Label, const string_t& Description);
-	iproperty create_renderman_option(const string_t& Type, const string_t& List, const string_t& Name, const string_t& Label, const string_t& Description);
-	bool has_property(const string_t& Name);
-
-	boost::python::object getattr(const string_t& Name);
-	void setattr(const string_t& Name, const boost::python::object& Value);
-
-	static void define_class();
-};
+void define_iproperty_collection_wrapper();
 
 } // namespace python
 

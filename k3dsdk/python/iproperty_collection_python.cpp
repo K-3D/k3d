@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,11 +22,12 @@
 */
 
 #include "any_python.h"
-#include "iproperty_python.h"
+#include "interface_wrapper_python.h"
 #include "iproperty_collection_python.h"
 
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
+#include <k3dsdk/iproperty.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/properties.h>
@@ -43,36 +44,25 @@ namespace k3d
 namespace python
 {
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-// iproperty_collection
+typedef interface_wrapper<k3d::iproperty_collection> iproperty_collection_wrapper;
 
-iproperty_collection::iproperty_collection() :
-	base()
-{
-}
-
-iproperty_collection::iproperty_collection(k3d::iproperty_collection* PropertyCollection) :
-	base(PropertyCollection)
-{
-}
-
-list iproperty_collection::properties()
+static list properties(iproperty_collection_wrapper& Self)
 {
 	list results;
-	const k3d::iproperty_collection::properties_t& properties = wrapped().properties();
+	const k3d::iproperty_collection::properties_t& properties = Self.wrapped().properties();
 	for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-		results.append(iproperty(*property));
+		results.append(interface_wrapper<k3d::iproperty>(*property));
 	return results;
 }
 
-iproperty iproperty_collection::get_property(const string_t& Name)
+static interface_wrapper<k3d::iproperty> get_property(iproperty_collection_wrapper& Self, const string_t& Name)
 {
-	return iproperty(k3d::property::get(wrapped(), Name));
+	return wrap(k3d::property::get(Self.wrapped(), Name));
 }
 
-iproperty iproperty_collection::create_property(const string_t& Type, const string_t& Name, const string_t& Label, const string_t& Description)
+static interface_wrapper<k3d::iproperty> create_property(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& Name, const string_t& Label, const string_t& Description)
 {
-	k3d::inode* const node = dynamic_cast<k3d::inode*>(wrapped_ptr());
+	k3d::inode* const node = dynamic_cast<k3d::inode*>(Self.wrapped_ptr());
 	if(!node)
 		throw std::runtime_error("missing node");
 
@@ -80,12 +70,12 @@ iproperty iproperty_collection::create_property(const string_t& Type, const stri
 	if(!result)
 		throw std::invalid_argument("unknown user property type: " + Type);
 
-	return iproperty(result);
+	return wrap(result);
 }
 
-iproperty iproperty_collection::create_renderman_attribute(const string_t& Type, const string_t& AttributeName, const string_t& Name, const string_t& Label, const string_t& Description)
+static interface_wrapper<k3d::iproperty> create_renderman_attribute(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& AttributeName, const string_t& Name, const string_t& Label, const string_t& Description)
 {
-	k3d::inode* const node = dynamic_cast<k3d::inode*>(wrapped_ptr());
+	k3d::inode* const node = dynamic_cast<k3d::inode*>(Self.wrapped_ptr());
 	if(!node)
 		throw std::runtime_error("missing node");
 
@@ -93,12 +83,12 @@ iproperty iproperty_collection::create_renderman_attribute(const string_t& Type,
 	if(!result)
 		throw std::invalid_argument("unknown attribute type: " + Type);
 
-	return iproperty(result);
+	return wrap(result);
 }
 
-iproperty iproperty_collection::create_renderman_option(const string_t& Type, const string_t& OptionName, const string_t& Name, const string_t& Label, const string_t& Description)
+static interface_wrapper<k3d::iproperty> create_renderman_option(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& OptionName, const string_t& Name, const string_t& Label, const string_t& Description)
 {
-	k3d::inode* const node = dynamic_cast<k3d::inode*>(wrapped_ptr());
+	k3d::inode* const node = dynamic_cast<k3d::inode*>(Self.wrapped_ptr());
 	if(!node)
 		throw std::runtime_error("missing node");
 
@@ -106,27 +96,27 @@ iproperty iproperty_collection::create_renderman_option(const string_t& Type, co
 	if(!result)
 		throw std::invalid_argument("unknown option type: " + Type);
 
-	return iproperty(result);
+	return wrap(result);
 }
 
-bool iproperty_collection::has_property(const string_t& Name)
+static bool has_property(iproperty_collection_wrapper& Self, const string_t& Name)
 {
-	if (k3d::property::get(wrapped(), Name))
+	if (k3d::property::get(Self.wrapped(), Name))
 		return true;
 	return false;
 }
 
-object iproperty_collection::getattr(const string_t& Name)
+static object getattr(iproperty_collection_wrapper& Self, const string_t& Name)
 {
-	if(k3d::iproperty* property = k3d::property::get(wrapped(), Name))
+	if(k3d::iproperty* property = k3d::property::get(Self.wrapped(), Name))
 		return any_to_python(k3d::property::pipeline_value(*property));
 
 	throw std::invalid_argument("unknown property: " + Name);
 }
 
-void iproperty_collection::setattr(const string_t& Name, const object& Value)
+static void setattr(iproperty_collection_wrapper& Self, const string_t& Name, const object& Value)
 {
-	if(k3d::iproperty* const property = k3d::property::get(wrapped(), Name))
+	if(k3d::iproperty* const property = k3d::property::get(Self.wrapped(), Name))
 	{
 		if(k3d::iwritable_property* const writable = dynamic_cast<k3d::iwritable_property*>(property))
 		{
@@ -140,30 +130,30 @@ void iproperty_collection::setattr(const string_t& Name, const object& Value)
 	throw std::invalid_argument("unknown property: " + Name);
 }
 
-void iproperty_collection::define_class()
+void define_iproperty_collection_wrapper()
 {
-	class_<iproperty_collection>("iproperty_collection",
+	class_<iproperty_collection_wrapper>("iproperty_collection",
 		"Abstract interface for a collection of L{iproperty} objects.", no_init)
-		.def("properties", &iproperty_collection::properties,
+		.def("properties", &properties,
 			"Returns the set of all properties held within this collection.\n\n"
 			"@return: A list of L{iproperty} objects.")
-		.def("get_property", &iproperty_collection::get_property,
+		.def("get_property", &get_property,
 			"Returns a single property by name.\n\n"
 			"@rtype: L{iproperty}\n"
 			"@return: The property object if it exists, or None.")
-		.def("create_property", &iproperty_collection::create_property,
+		.def("create_property", &create_property,
 			"Adds a custom user property to the collection.\n\n"
 			"@rtype: L{iproperty}\n"
 			"@return: The newly-created property.\n\n")
-		.def("create_renderman_attribute", &iproperty_collection::create_renderman_attribute,
+		.def("create_renderman_attribute", &create_renderman_attribute,
 			"Adds a custom RenderMan attribute property to the collection.")
-		.def("create_renderman_option", &iproperty_collection::create_renderman_option,
+		.def("create_renderman_option", &create_renderman_option,
 			"Adds a custom RenderMan option property to the collection.")
-		.def("__getattr__", &iproperty_collection::getattr,
+		.def("__getattr__", &getattr,
 			"Returns the pipeline value of an L{iproperty} by name.")
-		.def("__setattr__", &iproperty_collection::setattr,
+		.def("__setattr__", &setattr,
 			"Sets the internal value of an L{iproperty} value by name.")
-		.def("has_property", &iproperty_collection::has_property,
+		.def("has_property", &has_property,
 			"True if the named property is registered");
 }
 

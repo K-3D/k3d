@@ -24,10 +24,12 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "imaterial_python.h"
-#include "inode_python.h"
+#include "interface_wrapper_python.h"
 
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/inode.h>
 #include <k3dsdk/typed_array.h>
+
 #include <boost/python.hpp>
 #include <boost/python/detail/api_placeholder.hpp>
 
@@ -137,7 +139,7 @@ public:
 			throw std::out_of_range("index out-of-range");
 
 		k3d::imaterial* const result = wrapped().at(item);
-		return result ? boost::python::object(k3d::python::imaterial(result)) : boost::python::object();
+		return result ? boost::python::object(k3d::python::interface_wrapper<k3d::imaterial>(result)) : boost::python::object();
 	}
 
 	void set_item(int item, const boost::python::object& value)
@@ -150,7 +152,7 @@ public:
 
 		if(value)
 		{
-			k3d::python::imaterial material = boost::python::extract<k3d::python::imaterial>(value);
+			k3d::python::interface_wrapper<k3d::imaterial> material = boost::python::extract<k3d::python::interface_wrapper<k3d::imaterial> >(value);
 			wrapped()[item] = &material.wrapped();
 		}
 		else
@@ -163,7 +165,7 @@ public:
 	{
 		if(Value)
 		{
-			k3d::python::imaterial material = boost::python::extract<k3d::python::imaterial>(Value);
+			k3d::python::interface_wrapper<k3d::imaterial> material = boost::python::extract<k3d::python::interface_wrapper<k3d::imaterial> >(Value);
 			wrapped().push_back(&material.wrapped());
 		}
 		else
@@ -182,7 +184,7 @@ public:
 		{
 			if(Value[i])
 			{
-				k3d::python::imaterial material = boost::python::extract<k3d::python::imaterial>(Value[i]);
+				k3d::python::interface_wrapper<k3d::imaterial> material = boost::python::extract<k3d::python::interface_wrapper<k3d::imaterial> >(Value[i]);
 				storage[i] = &material.wrapped();
 			}
 			else
@@ -234,7 +236,7 @@ public:
 			throw std::out_of_range("index out-of-range");
 
 		k3d::inode* const result = wrapped().at(item);
-		return result ? boost::python::object(k3d::python::inode(result)) : boost::python::object();
+		return result ? boost::python::object(wrap(result)) : boost::python::object();
 	}
 
 	void set_item(int item, const boost::python::object& value)
@@ -247,7 +249,7 @@ public:
 
 		if(value)
 		{
-			k3d::python::inode node = boost::python::extract<k3d::python::inode>(value);
+			k3d::python::interface_wrapper<k3d::inode> node = boost::python::extract<k3d::python::interface_wrapper<k3d::inode> >(value);
 			wrapped()[item] = &node.wrapped();
 		}
 		else
@@ -260,7 +262,7 @@ public:
 	{
 		if(Value)
 		{
-			k3d::python::inode node = boost::python::extract<k3d::python::inode>(Value);
+			k3d::python::interface_wrapper<k3d::inode> node = boost::python::extract<k3d::python::interface_wrapper<k3d::inode> >(Value);
 			wrapped().push_back(&node.wrapped());
 		}
 		else
@@ -279,7 +281,7 @@ public:
 		{
 			if(Value[i])
 			{
-				k3d::python::inode node = boost::python::extract<k3d::python::inode>(Value[i]);
+				k3d::python::interface_wrapper<k3d::inode> node = boost::python::extract<k3d::python::interface_wrapper<k3d::inode> >(Value[i]);
 				storage[i] = &node.wrapped();
 			}
 			else

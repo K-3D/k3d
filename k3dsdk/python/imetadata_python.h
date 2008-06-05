@@ -1,5 +1,5 @@
-#ifndef K3DSDK_DYNAMIC_CAST_PYTHON_H
-#define K3DSDK_DYNAMIC_CAST_PYTHON_H
+#ifndef K3DSDK_IMETADATA_PYTHON_H
+#define K3DSDK_IMETADATA_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -24,19 +24,17 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <boost/python/object.hpp>
-
 namespace k3d
 {
 
 namespace python
 {
 
-boost::python::object do_dynamic_cast(const boost::python::object& Source, const std::string& Type);
+void define_imetadata_wrapper();
 
 } // namespace python
 
 } // namespace k3d
 
-#endif // K3DSDK_DYNAMIC_CAST_PYTHON_H
+#endif // !K3DSDK_IMETADATA_PYTHON_H
 

@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,6 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "interface_wrapper_python.h"
 #include "isnappable_python.h"
 
 #include <k3dsdk/explicit_snap_source.h>
@@ -37,33 +38,25 @@ namespace k3d
 namespace python
 {
 
-isnappable::isnappable() :
-	base()
+typedef interface_wrapper<k3d::isnappable> isnappable_wrapper;
+
+static void add_snap_source(isnappable_wrapper& Self, const string_t& Label, const point3& Position)
 {
+	Self.wrapped().add_snap_source(new k3d::explicit_snap_source(Label, Position));
 }
 
-isnappable::isnappable(k3d::isnappable* Node) :
-	base(Node)
+static void add_snap_target(isnappable_wrapper& Self, const string_t& Label, const point3& Position)
 {
+	Self.wrapped().add_snap_target(new k3d::explicit_snap_target(Label, Position));
 }
 
-void isnappable::add_snap_source(const std::string& Label, const k3d::point3& Position)
+void define_isnappable_wrapper()
 {
-	wrapped().add_snap_source(new k3d::explicit_snap_source(Label, Position));
-}
-
-void isnappable::add_snap_target(const std::string& Label, const k3d::point3& Position)
-{
-	wrapped().add_snap_target(new k3d::explicit_snap_target(Label, Position));
-}
-
-void isnappable::define_class()
-{
-	class_<isnappable>("isnappable",
+	class_<isnappable_wrapper>("isnappable",
 		"Abstract interface implemented by nodes that can be interactive \"snapped\" to one another.", no_init)
-		.def("add_snap_source", &isnappable::add_snap_source,
+		.def("add_snap_source", &add_snap_source,
 			"Adds a new snap source to the object.\n\n")
-		.def("add_snap_target", &isnappable::add_snap_target,
+		.def("add_snap_target", &add_snap_target,
 			"Adds a new snap target to the object.\n\n")
 		;
 }

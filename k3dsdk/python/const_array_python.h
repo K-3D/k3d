@@ -2,7 +2,7 @@
 #define K3DSDK_CONST_ARRAY_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,10 +24,12 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "imaterial_python.h"
-#include "inode_python.h"
+#include "interface_wrapper_python.h"
 
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/inode.h>
 #include <k3dsdk/typed_array.h>
+
 #include <boost/python.hpp>
 
 namespace k3d
@@ -110,7 +112,7 @@ public:
 			throw std::out_of_range("index out-of-range");
 
 		k3d::imaterial* const result = wrapped().at(item);
-		return result ? boost::python::object(k3d::python::imaterial(result)) : boost::python::object();
+		return result ? boost::python::object(k3d::python::interface_wrapper<k3d::imaterial>(result)) : boost::python::object();
 	}
 
 private:
@@ -155,7 +157,7 @@ public:
 			throw std::out_of_range("index out-of-range");
 
 		k3d::inode* const result = wrapped().at(item);
-		return result ? boost::python::object(k3d::python::inode(result)) : boost::python::object();
+		return result ? boost::python::object(wrap(result)) : boost::python::object();
 	}
 
 private:

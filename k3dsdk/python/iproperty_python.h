@@ -2,7 +2,7 @@
 #define K3DSDK_IPROPERTY_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,40 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
-#include <boost/python/list.hpp>
-
 namespace k3d
 {
 	
-class iproperty;
-
 namespace python
 {
 
-class iproperty :
-	public interface_wrapper<k3d::iproperty>
-{
-	typedef interface_wrapper<k3d::iproperty> base;
-public:
-	iproperty();
-	iproperty(k3d::iproperty* Property);
-
-	const std::string name();
-	const std::string label();
-	const std::string description();
-	const std::string type();
-	boost::python::object internal_value();
-	boost::python::object pipeline_value();
-	boost::python::object node();
-	const bool is_writable();
-	void set_value(const boost::python::object& Value);
-	const bool is_enumeration();
-	boost::python::list enumeration_values();
-	const std::string units();
-
-	static void define_class();
-};
+void define_iproperty_wrapper();
 
 } // namespace python
 

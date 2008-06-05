@@ -2,7 +2,7 @@
 #define K3DSDK_ISNAPPABLE_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,31 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
-#include <boost/python/object.hpp>
-
 namespace k3d
 {
-
-class isnappable;
-class point3;
 
 namespace python
 {
 
-class isnappable :
-	public interface_wrapper<k3d::isnappable>
-{
-	typedef interface_wrapper<k3d::isnappable> base;
-public:
-	isnappable();
-	isnappable(k3d::isnappable* Node);
-
-	void add_snap_source(const std::string& Label, const k3d::point3& Position);
-	void add_snap_target(const std::string& Label, const k3d::point3& Position);
-
-	static void define_class();
-};
+void define_isnappable_wrapper();
 
 } // namespace python
 

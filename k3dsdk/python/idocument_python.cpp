@@ -22,6 +22,7 @@
 */
 
 #include "idocument_python.h"
+#include "interface_wrapper_python.h"
 #include "node_python.h"
 
 #include <k3dsdk/classes.h>
@@ -47,62 +48,49 @@ namespace k3d
 namespace python
 {
 
-idocument::idocument() :
-	base()
-{
-}
+typedef interface_wrapper<k3d::idocument> idocument_wrapper;
 
-idocument::idocument(k3d::idocument* Document) :
-	base(Document)
-{
-}
-
-idocument::idocument(k3d::idocument& Document) :
-	base(Document)
-{
-}
-
-const bool idocument::save(const std::string& Path)
+static const bool save(idocument_wrapper& Self, const std::string& Path)
 {
 	boost::scoped_ptr<k3d::idocument_exporter> exporter(k3d::plugin::create<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
 	if(!exporter)
 		throw std::runtime_error("no exporter plugin available");
 
-	return exporter->write_file(wrapped(), filesystem::native_path(ustring::from_utf8(Path)));
+	return exporter->write_file(Self.wrapped(), filesystem::native_path(ustring::from_utf8(Path)));
 }
 
-void idocument::start_change_set()
+static void start_change_set(idocument_wrapper& Self)
 {
-	k3d::start_state_change_set(wrapped(), K3D_CHANGE_SET_CONTEXT);
+	k3d::start_state_change_set(Self.wrapped(), K3D_CHANGE_SET_CONTEXT);
 }
 
-void idocument::cancel_change_set()
+static void cancel_change_set(idocument_wrapper& Self)
 {
-	k3d::cancel_state_change_set(wrapped(), K3D_CHANGE_SET_CONTEXT);
+	k3d::cancel_state_change_set(Self.wrapped(), K3D_CHANGE_SET_CONTEXT);
 }
 
-void idocument::finish_change_set(const std::string& Label)
+static void finish_change_set(idocument_wrapper& Self, const std::string& Label)
 {
-	k3d::finish_state_change_set(wrapped(), Label, K3D_CHANGE_SET_CONTEXT);
+	k3d::finish_state_change_set(Self.wrapped(), Label, K3D_CHANGE_SET_CONTEXT);
 }
 
-void idocument::redraw_all()
+static void redraw_all(idocument_wrapper& Self)
 {
-	k3d::gl::redraw_all(wrapped(), k3d::gl::irender_viewport::ASYNCHRONOUS);
+	k3d::gl::redraw_all(Self.wrapped(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 }
 
-const list idocument::nodes()
+static const list nodes(idocument_wrapper& Self)
 {
 	list results;
 
-	const k3d::inode_collection::nodes_t nodes = wrapped().nodes().collection();
+	const k3d::inode_collection::nodes_t nodes = Self.wrapped().nodes().collection();
 	for(k3d::inode_collection::nodes_t::const_iterator n = nodes.begin(); n != nodes.end(); ++n)
 		results.append(node(*n));
 
 	return results;
 }
 
-const object idocument::new_node(const object& Type)
+static const object new_node(idocument_wrapper& Self, const object& Type)
 {
 	extract<std::string> plugin_name(Type);
 	if(plugin_name.check())
@@ -111,54 +99,54 @@ const object idocument::new_node(const object& Type)
 		if(!plugin_factory)
 			throw std::runtime_error("no factory for plugin type " + plugin_name());
 
-		return object(node(k3d::plugin::create<k3d::iunknown>(*plugin_factory, wrapped(), k3d::unique_name(wrapped().nodes(), plugin_name()))));
+		return object(node(k3d::plugin::create<k3d::iunknown>(*plugin_factory, Self.wrapped(), k3d::unique_name(Self.wrapped().nodes(), plugin_name()))));
 	}
 
-	extract<iplugin_factory> plugin_factory(Type);
+	extract<interface_wrapper<k3d::iplugin_factory> > plugin_factory(Type);
 	if(plugin_factory.check())
 	{
-		return object(node(k3d::plugin::create<k3d::iunknown>(plugin_factory().wrapped(), wrapped())));
+		return object(node(k3d::plugin::create<k3d::iunknown>(plugin_factory().wrapped(), Self.wrapped())));
 	}
 
 	throw std::invalid_argument("can't create new node from given argument");
 }
 
-const object idocument::get_node(const std::string& Name)
+static const object get_node(idocument_wrapper& Self, const std::string& Name)
 {
-	return object(node(k3d::find_node(wrapped().nodes(), Name)));
+	return object(node(k3d::find_node(Self.wrapped().nodes(), Name)));
 }
 
-const bool idocument::has_node(const std::string& Name)
+static const bool has_node(idocument_wrapper& Self, const std::string& Name)
 {
-	if (k3d::find_node(wrapped().nodes(), Name) != 0)
+	if (k3d::find_node(Self.wrapped().nodes(), Name) != 0)
 		return true;
 	return false;
 }
 
-void idocument::delete_node(object& Node)
+static void delete_node(idocument_wrapper& Self, object& Node)
 {
 	extract<node> node(Node);
 	if(!node.check())
 		throw std::invalid_argument("argument isn't a node");
 
-	k3d::delete_nodes(wrapped(), k3d::make_collection<k3d::nodes_t>(node().interface_wrapper<k3d::inode>::wrapped_ptr()));
+	k3d::delete_nodes(Self.wrapped(), k3d::make_collection<k3d::nodes_t>(node().interface_wrapper<k3d::inode>::wrapped_ptr()));
 }
 
-object idocument::get_dependency(iproperty& Property)
+static object get_dependency(idocument_wrapper& Self, interface_wrapper<k3d::iproperty>& Property)
 {
 	k3d::iproperty* const property = Property.wrapped_ptr();
 	if(!property)
 		throw std::invalid_argument("property cannot be null");
 
-	k3d::iproperty* const dependency = wrapped().pipeline().dependency(*property);
-	return dependency ? object(iproperty(dependency)) : object();
+	k3d::iproperty* const dependency = Self.wrapped().pipeline().dependency(*property);
+	return dependency ? object(wrap(dependency)) : object();
 }
 
-void idocument::set_dependency(iproperty& From, boost::python::object& To)
+static void set_dependency(idocument_wrapper& Self, interface_wrapper<k3d::iproperty>& From, boost::python::object& To)
 {
 	k3d::iproperty* to = 0;
 
-	extract<iproperty> iproperty_value(To);
+	extract<interface_wrapper<k3d::iproperty> > iproperty_value(To);
 	if(iproperty_value.check())
 	{
 		to = iproperty_value().wrapped_ptr();
@@ -181,24 +169,24 @@ void idocument::set_dependency(iproperty& From, boost::python::object& To)
 
 	k3d::ipipeline::dependencies_t dependencies;
 	dependencies[from] = to;
-	wrapped().pipeline().set_dependencies(dependencies);
+	Self.wrapped().pipeline().set_dependencies(dependencies);
 }
 
-void idocument::define_class()
+void define_idocument_wrapper()
 {
-	class_<idocument>("idocument")
-		.def("save", &idocument::save)
-		.def("start_change_set", &idocument::start_change_set)
-		.def("cancel_change_set", &idocument::cancel_change_set)
-		.def("finish_change_set", &idocument::finish_change_set)
-		.def("redraw_all", &idocument::redraw_all)
-		.def("nodes", &idocument::nodes)
-		.def("new_node", &idocument::new_node)
-		.def("get_node", &idocument::get_node)
-		.def("has_node", &idocument::has_node)
-		.def("delete_node", &idocument::delete_node)
-		.def("get_dependency", &idocument::get_dependency)
-		.def("set_dependency", &idocument::set_dependency);
+	class_<idocument_wrapper>("idocument")
+		.def("save", &save)
+		.def("start_change_set", &start_change_set)
+		.def("cancel_change_set", &cancel_change_set)
+		.def("finish_change_set", &finish_change_set)
+		.def("redraw_all", &redraw_all)
+		.def("nodes", &nodes)
+		.def("new_node", &new_node)
+		.def("get_node", &get_node)
+		.def("has_node", &has_node)
+		.def("delete_node", &delete_node)
+		.def("get_dependency", &get_dependency)
+		.def("set_dependency", &set_dependency);
 }
 
 } // namespace python

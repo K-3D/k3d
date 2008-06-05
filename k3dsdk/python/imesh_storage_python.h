@@ -2,7 +2,7 @@
 #define K3DSDK_IMESH_STORAGE_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,31 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
-
-#include <boost/python/object.hpp>
-
 namespace k3d
 {
-
-class imesh_storage;
 
 namespace python
 {
 
-class imesh_storage :
-	public interface_wrapper<k3d::imesh_storage>
-{
-	typedef interface_wrapper<k3d::imesh_storage> base;
-public:
-	imesh_storage();
-	imesh_storage(k3d::imesh_storage* Node);
-
-	boost::python::object reset_mesh();
-	void clear_mesh();
-
-	static void define_class();
-};
+void define_imesh_storage_wrapper();
 
 } // namespace python
 

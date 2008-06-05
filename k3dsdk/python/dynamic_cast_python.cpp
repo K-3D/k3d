@@ -22,23 +22,22 @@
 */
 
 #include "dynamic_cast_python.h"
-#include "icommand_node_python.h"
 #include "idocument_python.h"
-#include "imaterial_python.h"
-#include "imesh_storage_python.h"
 #include "inode_python.h"
-#include "iproperty_collection_python.h"
+#include "interface_wrapper_python.h"
 #include "isnappable_python.h"
-#include "iunknown_python.h"
 #include "node_python.h"
 
 #include <k3dsdk/icommand_node.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_storage.h>
+#include <k3dsdk/imetadata.h>
 #include <k3dsdk/inode.h>
+#include <k3dsdk/iproperty.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/isnappable.h>
+#include <k3dsdk/iunknown.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -61,65 +60,84 @@ object do_dynamic_cast(k3d::iunknown* Unknown)
 	return object();
 }
 
+template<typename InterfaceT>
+object do_dynamic_cast(k3d::iunknown* Unknown)
+{
+	if(InterfaceT* interface = dynamic_cast<InterfaceT*>(Unknown))
+		return object(wrap(interface));
+
+	return object();
+}
+
 } // namespace detail
 	
-object do_dynamic_cast(k3d::iunknown* const Source, const std::string& Type)
+object do_dynamic_cast(k3d::iunknown* const Source, const string_t& Type)
 {
 	if(Type == "icommand_node")
-		return detail::do_dynamic_cast<k3d::icommand_node, k3d::python::icommand_node>(Source);
+		return detail::do_dynamic_cast<k3d::icommand_node>(Source);
 	if(Type == "imaterial")
-		return detail::do_dynamic_cast<k3d::imaterial, k3d::python::imaterial>(Source);
+		return detail::do_dynamic_cast<k3d::imaterial>(Source);
 	if(Type == "imesh_storage")
-		return detail::do_dynamic_cast<k3d::imesh_storage, k3d::python::imesh_storage>(Source);
+		return detail::do_dynamic_cast<k3d::imesh_storage>(Source);
+	if(Type == "imetadata")
+		return detail::do_dynamic_cast<k3d::imetadata>(Source);
 	if(Type == "inode")
-		return detail::do_dynamic_cast<k3d::inode, k3d::python::inode>(Source);
+		return detail::do_dynamic_cast<k3d::inode>(Source);
 	if(Type == "iproperty_collection")
-		return detail::do_dynamic_cast<k3d::iproperty_collection, k3d::python::iproperty_collection>(Source);
+		return detail::do_dynamic_cast<k3d::iproperty_collection>(Source);
 	if(Type == "isnappable")
-		return detail::do_dynamic_cast<k3d::isnappable, k3d::python::isnappable>(Source);
+		return detail::do_dynamic_cast<k3d::isnappable>(Source);
 	if(Type == "iunknown")
-		return detail::do_dynamic_cast<k3d::iunknown, k3d::python::iunknown>(Source);
+		return detail::do_dynamic_cast<k3d::iunknown>(Source);
 
 	throw std::invalid_argument("unknown cast type: " + Type);
 }
 
-object do_dynamic_cast(const object& Source, const std::string& Type)
+object do_dynamic_cast(const object& Source, const string_t& Type)
 {
-	extract<k3d::python::icommand_node> icommand_node(Source);
+	extract<k3d::python::interface_wrapper<k3d::icommand_node> > icommand_node(Source);
 	if(icommand_node.check())
 		return do_dynamic_cast(icommand_node().wrapped_ptr(), Type);
 
-	extract<k3d::python::idocument> idocument(Source);
+	extract<k3d::python::interface_wrapper<idocument> > idocument(Source);
 	if(idocument.check())
 		return do_dynamic_cast(idocument().wrapped_ptr(), Type);
 
-	extract<k3d::python::imaterial> imaterial(Source);
+	extract<k3d::python::interface_wrapper<k3d::imaterial> > imaterial(Source);
 	if(imaterial.check())
 		return do_dynamic_cast(imaterial().wrapped_ptr(), Type);
 
-	extract<k3d::python::imesh_storage> imesh_storage(Source);
+	extract<k3d::python::interface_wrapper<k3d::imesh_storage> > imesh_storage(Source);
 	if(imesh_storage.check())
 		return do_dynamic_cast(imesh_storage().wrapped_ptr(), Type);
 
-	extract<k3d::python::inode> inode(Source);
+	extract<k3d::python::interface_wrapper<k3d::imetadata> > imetadata(Source);
+	if(imetadata.check())
+		return do_dynamic_cast(imetadata().wrapped_ptr(), Type);
+
+	extract<k3d::python::interface_wrapper<k3d::inode> > inode(Source);
 	if(inode.check())
 		return do_dynamic_cast(inode().wrapped_ptr(), Type);
 
-	extract<k3d::python::iproperty_collection> iproperty_collection(Source);
+	extract<k3d::python::interface_wrapper<k3d::iproperty> > iproperty(Source);
+	if(iproperty.check())
+		return do_dynamic_cast(iproperty().wrapped_ptr(), Type);
+
+	extract<k3d::python::interface_wrapper<k3d::iproperty_collection> > iproperty_collection(Source);
 	if(iproperty_collection.check())
 		return do_dynamic_cast(iproperty_collection().wrapped_ptr(), Type);
 
-	extract<k3d::python::isnappable> isnappable(Source);
+	extract<k3d::python::interface_wrapper<k3d::isnappable> > isnappable(Source);
 	if(isnappable.check())
 		return do_dynamic_cast(isnappable().wrapped_ptr(), Type);
 
-	extract<k3d::python::iunknown> iunknown(Source);
-	if(iunknown.check())
-		return do_dynamic_cast(iunknown().wrapped_ptr(), Type);
-
 	extract<k3d::python::node> node(Source);
 	if(node.check())
-		return do_dynamic_cast(static_cast<const k3d::python::inode&>(node()).wrapped_ptr(), Type);
+		return do_dynamic_cast(node().interface_wrapper<k3d::inode>::wrapped_ptr(), Type);
+
+	extract<k3d::python::interface_wrapper<k3d::iunknown> > iunknown(Source);
+	if(iunknown.check())
+		return do_dynamic_cast(iunknown().wrapped_ptr(), Type);
 
 	throw std::invalid_argument("unknown source type for dynamic cast");
 }

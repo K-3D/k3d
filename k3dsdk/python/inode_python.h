@@ -2,7 +2,7 @@
 #define K3DSDK_INODE_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,34 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "idocument_python.h"
-#include "iplugin_factory_python.h"
-
-#include <boost/python/object.hpp>
-
 namespace k3d
 {
-
-class inode;
 
 namespace python
 {
 
-class inode :
-	public interface_wrapper<k3d::inode>
-{
-	typedef interface_wrapper<k3d::inode> base;
-public:
-	inode();
-	inode(k3d::inode* Node);
-
-	boost::python::object document();
-	boost::python::object factory();
-
-	boost::uint64_t hash();
-
-	static void define_class();
-};
+void define_inode_wrapper();
 
 } // namespace python
 

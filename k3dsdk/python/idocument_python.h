@@ -24,46 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "iproperty_python.h"
-
-#include <boost/python/list.hpp>
-
 namespace k3d
 {
-	
-class idocument;
 
 namespace python
 {
 
-class idocument :
-	public interface_wrapper<k3d::idocument>
-{
-	typedef interface_wrapper<k3d::idocument> base;
-public:
-	idocument();
-	idocument(k3d::idocument* Document);
-	idocument(k3d::idocument& Document);
-
-	const bool save(const std::string& Path);
-	
-	void start_change_set();
-	void cancel_change_set();
-	void finish_change_set(const std::string& Label);
-	
-	void redraw_all();
-
-	const boost::python::list nodes();
-	const boost::python::object new_node(const boost::python::object& Type);
-	const boost::python::object get_node(const std::string& Name);
-	const bool has_node(const std::string& Name);
-	void delete_node(boost::python::object& Node);
-
-	boost::python::object get_dependency(iproperty& Property);
-	void set_dependency(iproperty& LHS, boost::python::object& RHS);
-
-	static void define_class();
-};
+void define_idocument_wrapper();
 
 } // namespace python
 

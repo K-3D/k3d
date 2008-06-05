@@ -22,6 +22,9 @@
 */
 
 #include "iunknown_python.h"
+#include "interface_wrapper_python.h"
+
+#include <k3dsdk/iunknown.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -32,22 +35,15 @@ namespace k3d
 namespace python
 {
 
-iunknown::iunknown() :
-	base()
-{
-}
+typedef interface_wrapper<k3d::iunknown> iunknown_wrapper;
 
-iunknown::iunknown(k3d::iunknown* Unknown) :
-	base(Unknown)
+void define_iunknown_wrapper()
 {
-}
-
-void iunknown::define_class()
-{
-	class_<iunknown>("iunknown", 
+	class_<iunknown_wrapper>("iunknown", 
 		"Abstract interface that represents an object with unknown capabilities.\n\n"
 		"Use L{dynamic_cast} to test whether an iunknown object implements a specific interface / "
-		"convert an iunknown object to a specific interface type.", no_init);
+		"convert an iunknown object to a specific interface type.",
+		no_init);
 }
 
 } // namespace python

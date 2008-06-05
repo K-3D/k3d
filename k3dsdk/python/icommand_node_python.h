@@ -2,7 +2,7 @@
 #define K3DSDK_ICOMMAND_NODE_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,33 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
-#include <boost/python/list.hpp>
-
 namespace k3d
 {
 	
-class icommand_node;
-
 namespace python
 {
 
-class icommand_node :
-	public interface_wrapper<k3d::icommand_node>
-{
-	typedef interface_wrapper<k3d::icommand_node> base;
-public:
-	icommand_node();
-	icommand_node(k3d::icommand_node* CommandNode);
-
-	const std::string name();
-	const boost::python::list children();
-	icommand_node get_child(const std::string& Name);
-
-	void execute_command(const std::string& Command, const std::string& Arguments);
-
-	static void define_class();
-};
+void define_icommand_node_wrapper();
 
 } // namespace python
 

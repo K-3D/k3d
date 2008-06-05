@@ -72,6 +72,8 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	imaterial_python.h
 	imesh_storage_python.cpp
 	imesh_storage_python.h
+	imetadata_python.cpp
+	imetadata_python.h
 	inode_python.cpp
 	inode_python.h
 	interface_wrapper_python.h

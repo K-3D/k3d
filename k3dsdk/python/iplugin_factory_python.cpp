@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,11 +22,13 @@
 */
 
 #include "iplugin_factory_python.h"
+#include "interface_wrapper_python.h"
 
 #include <k3dsdk/iapplication_plugin_factory.h>
 #include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/log.h>
+#include <k3dsdk/types.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -37,60 +39,47 @@ namespace k3d
 namespace python
 {
 
-iplugin_factory::iplugin_factory() :
-	base()
+typedef interface_wrapper<k3d::iplugin_factory> iplugin_factory_wrapper;
+
+static const k3d::uuid factory_id(iplugin_factory_wrapper& Self)
 {
+	return Self.wrapped().factory_id();
 }
 
-iplugin_factory::iplugin_factory(k3d::iplugin_factory* PluginFactory) :
-	base(PluginFactory)
+static const string_t name(iplugin_factory_wrapper& Self)
 {
+	return Self.wrapped().name();
 }
 
-iplugin_factory::iplugin_factory(k3d::iplugin_factory& PluginFactory) :
-	base(PluginFactory)
+static const string_t short_description(iplugin_factory_wrapper& Self)
 {
+	return Self.wrapped().short_description();
 }
 
-const k3d::uuid iplugin_factory::factory_id()
+static const bool_t is_application_plugin(iplugin_factory_wrapper& Self)
 {
-	return wrapped().factory_id();
+	return dynamic_cast<k3d::iapplication_plugin_factory*>(&Self.wrapped()) ? true : false;
 }
 
-const std::string iplugin_factory::name()
+static const bool_t is_document_plugin(iplugin_factory_wrapper& Self)
 {
-	return wrapped().name();
+	return dynamic_cast<k3d::idocument_plugin_factory*>(&Self.wrapped()) ? true : false;
 }
 
-const std::string iplugin_factory::short_description()
-{
-	return wrapped().short_description();
-}
-
-const bool iplugin_factory::is_application_plugin()
-{
-	return dynamic_cast<k3d::iapplication_plugin_factory*>(&wrapped()) ? true : false;
-}
-
-const bool iplugin_factory::is_document_plugin()
-{
-	return dynamic_cast<k3d::idocument_plugin_factory*>(&wrapped()) ? true : false;
-}
-
-const list iplugin_factory::categories()
+static const list categories(iplugin_factory_wrapper& Self)
 {
 	list results;
 	
-	const k3d::iplugin_factory::categories_t& categories = wrapped().categories();
+	const k3d::iplugin_factory::categories_t& categories = Self.wrapped().categories();
 	for(k3d::iplugin_factory::categories_t::const_iterator category = categories.begin(); category != categories.end(); ++category)
 		results.append(*category);
 
 	return results;
 }
 
-const std::string iplugin_factory::quality()
+static const string_t quality(iplugin_factory_wrapper& Self)
 {
-	switch(wrapped().quality())
+	switch(Self.wrapped().quality())
 	{
 		case k3d::iplugin_factory::STABLE:
 			return "stable";
@@ -104,23 +93,23 @@ const std::string iplugin_factory::quality()
 	return "unknown";
 }
 
-void iplugin_factory::define_class()
+void define_iplugin_factory_wrapper()
 {
-	class_<iplugin_factory>("iplugin_factory",
+	class_<iplugin_factory_wrapper>("iplugin_factory",
 		"Encapsulates a K-3D plugin factory, which stores metadata describing a plugin type.")
-		.def("factory_id", &iplugin_factory::factory_id,
+		.def("factory_id", &factory_id,
 			"Returns a universally-unique identifier for this factory.")
-		.def("name", &iplugin_factory::name,
+		.def("name", &name,
 			"Returns the human-readable plugin name, which is displayed in the user interface and can be used to instantiate plugins.")
-		.def("short_description", &iplugin_factory::short_description,
+		.def("short_description", &short_description,
 			"Returns a short human-readable description of the plugin's purpose.")
-		.def("is_application_plugin", &iplugin_factory::is_application_plugin,
+		.def("is_application_plugin", &is_application_plugin,
 			"Returns true if the plugin is an application plugin.")
-		.def("is_document_plugin", &iplugin_factory::is_document_plugin,
+		.def("is_document_plugin", &is_document_plugin,
 			"Returns true if the plugin is a document plugin.")
-		.def("categories", &iplugin_factory::categories,
+		.def("categories", &categories,
 			"Returns an arbitrary collection of human-readable categories used to organize the list of plugins in the user interface.")
-		.def("quality", &iplugin_factory::quality,
+		.def("quality", &quality,
 			"Returns the string \"stable\", \"experimental\", or \"deprecated\".");
 }
 

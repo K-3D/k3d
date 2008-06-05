@@ -2,7 +2,7 @@
 #define K3DSDK_INTERFACE_WRAPPER_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -75,6 +75,18 @@ public:
 private:
 	T* m_wrapped;
 };
+
+template<typename T>
+interface_wrapper<T> wrap(T* Wrapped)
+{
+	return interface_wrapper<T>(Wrapped);
+}
+
+template<typename T>
+interface_wrapper<T> wrap(T& Wrapped)
+{
+	return interface_wrapper<T>(Wrapped);
+}
 
 } // namespace python
 

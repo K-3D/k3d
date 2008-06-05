@@ -2,7 +2,7 @@
 #define K3DSDK_IUNKNOWN_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,27 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
-#include <k3dsdk/iunknown.h>
-
 namespace k3d
 {
 
 namespace python
 {
 
-/// Wraps an iunknown pointer, providing some common functionality
-class iunknown :
-	public interface_wrapper<k3d::iunknown>
-{
-	typedef interface_wrapper<k3d::iunknown> base;
-
-public:
-	iunknown();
-	iunknown(k3d::iunknown* Unknown);
-
-	static void define_class();
-};
+void define_iunknown_wrapper();
 
 } // namespace python
 

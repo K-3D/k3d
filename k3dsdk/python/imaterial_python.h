@@ -2,7 +2,7 @@
 #define K3DSDK_IMATERIAL_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,27 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
-#include <boost/python/object.hpp>
-
 namespace k3d
 {
-
-class imaterial;
 
 namespace python
 {
 
-class imaterial :
-	public interface_wrapper<k3d::imaterial>
-{
-	typedef interface_wrapper<k3d::imaterial> base;
-public:
-	imaterial();
-	imaterial(k3d::imaterial* Material);
-
-	static void define_class();
-};
+void define_imaterial_wrapper();
 
 } // namespace python
 

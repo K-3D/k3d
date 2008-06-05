@@ -22,6 +22,8 @@
 */
 
 #include "iuser_interface_python.h"
+#include "interface_wrapper_python.h"
+
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/path.h>
 
@@ -35,88 +37,80 @@ namespace k3d
 namespace python
 {
 
-iuser_interface::iuser_interface() :
-	base()
+typedef interface_wrapper<k3d::iuser_interface> iuser_interface_wrapper;
+
+static void open_uri(iuser_interface_wrapper& Self, const string_t& URI)
 {
+	Self.wrapped().open_uri(URI);
 }
 
-iuser_interface::iuser_interface(k3d::iuser_interface& UserInterface) :
-	base(UserInterface)
+static void message(iuser_interface_wrapper& Self, const string_t& Message)
 {
+	Self.wrapped().message(Message);
 }
 
-void iuser_interface::open_uri(const std::string& URI)
+static void warning_message(iuser_interface_wrapper& Self, const string_t& Message)
 {
-	wrapped().open_uri(URI);
+	Self.wrapped().warning_message(Message);
 }
 
-void iuser_interface::message(const std::string& Message)
+static void error_message(iuser_interface_wrapper& Self, const string_t& Message)
 {
-	wrapped().message(Message);
+	Self.wrapped().error_message(Message);
 }
 
-void iuser_interface::warning_message(const std::string& Message)
+static unsigned long query_message(iuser_interface_wrapper& Self, const string_t& Message, const list& Buttons)
 {
-	wrapped().warning_message(Message);
-}
-
-void iuser_interface::error_message(const std::string& Message)
-{
-	wrapped().error_message(Message);
-}
-
-unsigned long iuser_interface::query_message(const std::string& Message, const list& Buttons)
-{
-	std::vector<std::string> buttons;
+	std::vector<string_t> buttons;
 	for(long i = 0; i != len(Buttons); ++i)
-		buttons.push_back(extract<std::string>(Buttons[i]));
-	return wrapped().query_message(Message, 0, buttons);
+		buttons.push_back(extract<string_t>(Buttons[i]));
+	return Self.wrapped().query_message(Message, 0, buttons);
 }
 
-const filesystem::path iuser_interface::get_file_path(const std::string& Direction, const std::string& Type, const std::string& Message, const std::string& StartPath)
+static const filesystem::path get_file_path(iuser_interface_wrapper& Self, const string_t& Direction, const string_t& Type, const string_t& Message, const string_t& StartPath)
 {
 	const filesystem::path old_path = filesystem::native_path(ustring::from_utf8(StartPath));
 	filesystem::path new_path;
 	if(Direction == "r" || Direction == "read")
-		wrapped().get_file_path(k3d::ipath_property::READ, Type, Message, old_path, new_path);
+		Self.wrapped().get_file_path(k3d::ipath_property::READ, Type, Message, old_path, new_path);
 	else if(Direction == "w" || Direction == "write")
-		wrapped().get_file_path(k3d::ipath_property::WRITE, Type, Message, old_path, new_path);
+		Self.wrapped().get_file_path(k3d::ipath_property::WRITE, Type, Message, old_path, new_path);
 	else
 		throw std::invalid_argument("unknown file path operation, should be \"read\" or \"write\"");
 
 	return new_path;
 }
 
-void iuser_interface::synchronize()
+static void synchronize(iuser_interface_wrapper& Self)
 {
-	wrapped().synchronize();
+	Self.wrapped().synchronize();
 }
 
-void iuser_interface::define_class()
+void define_iuser_interface_wrapper()
 {
-	class_<iuser_interface>("iuser_interface", 
+	class_<iuser_interface_wrapper>("iuser_interface", 
 		"Provides access to the user interface plugin specified by the user at program startup.", no_init)
-		.def("open_uri", &iuser_interface::open_uri,
+		.def("open_uri", &open_uri,
 			"Opens a Uniform Resource Identifier (URI) in the user's preferred application.\n"
 			"@param URI: The URI string to be opened.\n"
 			"@note: Depending on the user interface plugin, this might open an application, "
 			"print a message to the console, display a dialog box, or do nothing.")
-		.def("message", &iuser_interface::message,
+		.def("message", &message,
 			"Displays an information message to the user.\n"
 			"@param message: The message string to be displayed.\n" 
 			"@note: Depending on the user interface plugin, this might print a message "
 			"to the console, display a dialog box, or do nothing.")
-		.def("warning_message", &iuser_interface::warning_message,
+		.def("warning_message", &warning_message,
 			"Displays a warning message to the user.\n"
 			"@param message: The warning message string to be displayed.\n" 
 			"@note: Depending on the user interface plugin, this might print a message "
 			"to the console, display a dialog box, or do nothing.")
-		.def("error_message", &iuser_interface::error_message,
+		.def("error_message", &error_message,
 			"Displays a warning message to the user.\n"
 			"@param message: The error message string to be displayed.\n" 
 			"@note: Depending on the user interface plugin, this might print a message "
 			"to the console, display a dialog box, or do nothing.")
-		.def("query_message", &iuser_interface::query_message,
+		.def("query_message", &query_message,
 			"Query the user to choose from among a set of fixed options.\n"
 			"@param message: The error message string to be displayed.\n" 
 			"@param options: A list of strings where each string is an option to be displayed.\n" 
@@ -124,7 +118,7 @@ void iuser_interface::define_class()
 			"the user cancelled the query.\n" 
 			"@note: Depending on the user interface plugin, this might print a message "
 			"to the console, display a dialog box, or do nothing.")
-		.def("get_file_path", &iuser_interface::get_file_path,
+		.def("get_file_path", &get_file_path,
 			"Query the user to choose a filesystem path.\n"
 			"@param direction: Either \"read\" or \"write\".\n"
 			"@param type: The type of path to be accessed (used to group most-recently-used paths.\n"
@@ -133,7 +127,7 @@ void iuser_interface::define_class()
 			"@return: Returns the path chosen by the as a string, empty string if the user cancels.\n"
 			"@note: Depending on the user interface plugin, this might print a message "
 			"to the console, display a dialog box, or do nothing.")
-		.def("synchronize", &iuser_interface::synchronize,
+		.def("synchronize", &synchronize,
 			"Gives the user interface a chance to synchronize itself with the current application state.");
 }
 

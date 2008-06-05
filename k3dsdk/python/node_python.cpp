@@ -37,20 +37,20 @@ namespace python
 {
 
 node::node() :
-	inode(),
-	iproperty_collection()
+	interface_wrapper<k3d::inode>(),
+	interface_wrapper<k3d::iproperty_collection>()
 {
 }
 
 node::node(k3d::iunknown* Node) :
-	inode(dynamic_cast<k3d::inode*>(Node)),
-	iproperty_collection(dynamic_cast<k3d::iproperty_collection*>(Node))
+	interface_wrapper<k3d::inode>(dynamic_cast<k3d::inode*>(Node)),
+	interface_wrapper<k3d::iproperty_collection>(dynamic_cast<k3d::iproperty_collection*>(Node))
 {
 }
 
 const double node::get_selection_weight() const
 {
-	if(k3d::iselectable* const selectable = dynamic_cast<k3d::iselectable*>(inode::wrapped_ptr()))
+	if(k3d::iselectable* const selectable = dynamic_cast<k3d::iselectable*>(interface_wrapper<k3d::inode>::wrapped_ptr()))
 		return selectable->get_selection_weight();
 
 	throw std::runtime_error("internal error: node does not implement k3d::iselectable");
@@ -58,7 +58,7 @@ const double node::get_selection_weight() const
 
 void node::set_selection_weight(const double Weight)
 {
-	if(k3d::iselectable* const selectable = dynamic_cast<k3d::iselectable*>(inode::wrapped_ptr()))
+	if(k3d::iselectable* const selectable = dynamic_cast<k3d::iselectable*>(interface_wrapper<k3d::inode>::wrapped_ptr()))
 	{
 		selectable->set_selection_weight(Weight);
 		return;
@@ -69,7 +69,7 @@ void node::set_selection_weight(const double Weight)
 
 void node::define_class()
 {
-	class_<node, bases<inode, iproperty_collection> >("node")
+	class_<node, bases<interface_wrapper<k3d::inode>, interface_wrapper<k3d::iproperty_collection> > >("node")
 		.add_property("selection_weight", &node::get_selection_weight, &node::set_selection_weight);
 }
 

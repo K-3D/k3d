@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,6 +22,7 @@
 */
 
 #include "imesh_storage_python.h"
+#include "interface_wrapper_python.h"
 #include "mesh_python.h"
 
 #include <k3dsdk/mesh.h>
@@ -36,37 +37,29 @@ namespace k3d
 namespace python
 {
 
-imesh_storage::imesh_storage() :
-	base()
-{
-}
+typedef interface_wrapper<k3d::imesh_storage> imesh_storage_wrapper;
 
-imesh_storage::imesh_storage(k3d::imesh_storage* Node) :
-	base(Node)
-{
-}
-
-boost::python::object imesh_storage::reset_mesh()
+static k3d::python::mesh reset_mesh(imesh_storage_wrapper& Self)
 {
 	k3d::mesh* const mesh = new k3d::mesh();
-	wrapped().reset_mesh(mesh);
+	Self.wrapped().reset_mesh(mesh);
 
-	return boost::python::object(k3d::python::mesh(mesh));
+	return k3d::python::mesh(mesh);
 }
 
-void imesh_storage::clear_mesh()
+static void clear_mesh(imesh_storage_wrapper& Self)
 {
-	wrapped().reset_mesh(0);
+	Self.wrapped().reset_mesh(0);
 }
 
-void imesh_storage::define_class()
+void define_imesh_storage_wrapper()
 {
-	class_<imesh_storage>("imesh_storage",
+	class_<imesh_storage_wrapper>("imesh_storage",
 		"Abstract interface implemented by nodes that can provide persistent storage of L{mesh} objects.", no_init)
-		.def("reset_mesh", &imesh_storage::reset_mesh,
+		.def("reset_mesh", &reset_mesh,
 			"Creates a new L{mesh} object whose lifetime will be managed by the imesh_storage object.\n\n"
 			"@return: Returns a new L{mesh} object.")
-		.def("clear_mesh", &imesh_storage::clear_mesh,
+		.def("clear_mesh", &clear_mesh,
 			"Deletes the stored mesh and resets the storage to a null mesh.");
 }
 

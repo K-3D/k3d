@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -35,7 +35,9 @@
 #include "idocument_python.h"
 #include "imaterial_python.h"
 #include "imesh_storage_python.h"
+#include "imetadata_python.h"
 #include "inode_python.h"
+#include "interface_wrapper_python.h"
 #include "iplugin_factory_python.h"
 #include "iproperty_python.h"
 #include "iproperty_collection_python.h"
@@ -160,29 +162,29 @@ const list module_command_nodes()
 
 	k3d::icommand_tree::nodes_t children = k3d::command_tree().children(0);
 	for(k3d::icommand_tree::nodes_t::iterator child = children.begin(); child != children.end(); ++child)
-		nodes.append(icommand_node(*child));
+		nodes.append(wrap(*child));
 
 	return nodes;
 }
 
-iunknown module_create_plugin(const std::string& Type)
+interface_wrapper<k3d::iunknown> module_create_plugin(const string_t& Type)
 {
 	k3d::iplugin_factory* const plugin_factory = k3d::plugin::factory::lookup(Type);
 	if(!plugin_factory)
 		throw std::invalid_argument("unknown plugin type: " + Type);
 
-	return iunknown(k3d::plugin::create(*plugin_factory));
+	return wrap(k3d::plugin::create(*plugin_factory));
 }
 
-void module_check_node_environment(const boost::python::dict& Locals, const std::string& PluginType)
+void module_check_node_environment(const dict& Locals, const string_t& PluginType)
 {
 	if(Locals.has_key("Node"))
 	{
-		boost::python::object object = Locals.get("Node");
-		boost::python::extract<node> node(object);
+		object object = Locals.get("Node");
+		extract<node> node(object);
 		if(node.check())
 		{
-			if(node().inode::wrapped().factory().name() == PluginType)
+			if(node().interface_wrapper<k3d::inode>::wrapped().factory().name() == PluginType)
 			{
 				return;
 			}
@@ -193,18 +195,18 @@ void module_check_node_environment(const boost::python::dict& Locals, const std:
 	throw std::runtime_error("script can only be run from " + PluginType);
 }
 
-void module_execute_script_context(const std::string& Script, const boost::python::dict& PythonContext)
+void module_execute_script_context(const string_t& Script, const dict& PythonContext)
 {
 	k3d::iscript_engine::context_t context;
 
-	boost::python::dict python_context = PythonContext;
-	while(boost::python::len(python_context))
+	dict python_context = PythonContext;
+	while(len(python_context))
 	{
-		boost::python::tuple python_item = python_context.popitem();
-		boost::python::object python_key = python_item[0];
-		boost::python::object python_value = python_item[1];
+		tuple python_item = python_context.popitem();
+		object python_key = python_item[0];
+		object python_value = python_item[1];
 
-		const std::string key = PyString_AsString(python_key.ptr());
+		const string_t key = PyString_AsString(python_key.ptr());
 		boost::any value = python_to_any(python_value);
 
 		context.insert(std::make_pair(key, value));
@@ -219,9 +221,9 @@ void module_execute_script_context(const std::string& Script, const boost::pytho
 		throw std::runtime_error("Error executing script");
 }
 
-void module_execute_script(const std::string& Script)
+void module_execute_script(const string_t& Script)
 {
-	module_execute_script_context(Script, boost::python::dict());
+	module_execute_script_context(Script, dict());
 }
 
 const double module_length(const object& Value)
@@ -233,27 +235,27 @@ const double module_length(const object& Value)
 	throw std::invalid_argument("can't calculate length for this type");
 }
 
-void module_log_critical(const std::string& Message)
+void module_log_critical(const string_t& Message)
 {
 	k3d::log() << critical << Message << std::endl;
 }
 
-void module_log_debug(const std::string& Message)
+void module_log_debug(const string_t& Message)
 {
 	k3d::log() << debug << Message << std::endl;
 }
 
-void module_log_error(const std::string& Message)
+void module_log_error(const string_t& Message)
 {
 	k3d::log() << error << Message << std::endl;
 }
 
-void module_log_info(const std::string& Message)
+void module_log_info(const string_t& Message)
 {
 	k3d::log() << info << Message << std::endl;
 }
 
-void module_log_warning(const std::string& Message)
+void module_log_warning(const string_t& Message)
 {
 	k3d::log() << warning << Message << std::endl;
 }
@@ -264,7 +266,7 @@ const list module_plugins()
 
 	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
 	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
-		plugins.append(iplugin_factory(*factory));
+		plugins.append(interface_wrapper<k3d::iplugin_factory>(*factory));
 
 	return plugins;
 }
@@ -300,9 +302,9 @@ const k3d::matrix4 module_translate3(const object& Value)
 	throw std::invalid_argument("cannot generate translation matrix from given type");
 }
 
-iuser_interface module_ui()
+interface_wrapper<k3d::iuser_interface> module_ui()
 {
-	return iuser_interface(k3d::user_interface());
+	return wrap(k3d::user_interface());
 }
 
 void module_exit()
@@ -310,36 +312,36 @@ void module_exit()
 	k3d::application().exit();
 }
 
-idocument module_new_document()
+interface_wrapper<k3d::idocument> module_new_document()
 {
-	return idocument(k3d::application().create_document());
+	return wrap(k3d::application().create_document());
 }
 
-boost::python::list module_documents()
+list module_documents()
 {
-	boost::python::list results;
+	list results;
 
 	const k3d::iapplication::document_collection_t documents = k3d::application().documents();
 	for(k3d::iapplication::document_collection_t::const_iterator document = documents.begin(); document != documents.end(); ++document)
-		results.append(idocument(*document));
+		results.append(wrap(*document));
 
 	return results;
 }
 
-void module_close_document(idocument& Document)
+void module_close_document(interface_wrapper<k3d::idocument>& Document)
 {
 	k3d::application().close_document(Document.wrapped());
 }
 
-object module_get_command_node(const std::string& Path)
+object module_get_command_node(const string_t& Path)
 {
 	if(k3d::icommand_node* const command_node = k3d::command_node::lookup(Path))
-		return object(icommand_node(command_node));
+		return object(wrap(command_node));
 
 	return object();
 }
 
-idocument module_open_document(const std::string& Path)
+interface_wrapper<k3d::idocument> module_open_document(const string_t& Path)
 {
 	const filesystem::path document_path = filesystem::native_path(ustring::from_utf8(Path));
 
@@ -354,10 +356,10 @@ idocument module_open_document(const std::string& Path)
 	if(!importer->read_file(*document, document_path))
 		throw std::runtime_error("error loading document");
 
-	return idocument(document);
+	return wrap(document);
 }
 
-const std::string module_print_diff(const object& A, const object& B, const object& Threshold)
+const string_t module_print_diff(const object& A, const object& B, const object& Threshold)
 {
 	extract<mesh> a(A);
 	extract<mesh> b(B);
@@ -396,6 +398,18 @@ BOOST_PYTHON_MODULE(k3d)
 
 	angle_axis::define_class();
 	const_named_arrays::define_class();
+	define_icommand_node_wrapper();
+	define_idocument_wrapper();
+	define_imaterial_wrapper();
+	define_imesh_storage_wrapper();
+	define_imetadata_wrapper();
+	define_inode_wrapper();
+	define_iplugin_factory_wrapper();
+	define_iproperty_collection_wrapper();
+	define_iproperty_wrapper();
+	define_isnappable_wrapper();
+	define_iunknown_wrapper();
+	define_iuser_interface_wrapper();
 	euler_angles::define_class();
 	export_arrays();
 	export_bitmap();
@@ -412,17 +426,6 @@ BOOST_PYTHON_MODULE(k3d)
 	export_texture3();
 	export_uuid();
 	export_vector3();
-	icommand_node::define_class();
-	idocument::define_class();
-	imaterial::define_class();
-	imesh_storage::define_class();
-	inode::define_class();
-	iplugin_factory::define_class();
-	iproperty::define_class();
-	iproperty_collection::define_class();
-	isnappable::define_class();
-	iunknown::define_class();
-	iuser_interface::define_class();
 	mesh::define_class();
 	named_arrays::define_class();
 	node::define_class();
@@ -514,7 +517,7 @@ BOOST_PYTHON_MODULE(k3d)
 /////////////////////////////////////////////////////////////////////////////
 // set_context
 
-void set_context(const k3d::iscript_engine::context_t& Context, boost::python::dict& Dictionary)
+void set_context(const k3d::iscript_engine::context_t& Context, dict& Dictionary)
 {
 	for(k3d::iscript_engine::context_t::const_iterator context = Context.begin(); context != Context.end(); ++context)
 	{
@@ -532,7 +535,7 @@ void set_context(const k3d::iscript_engine::context_t& Context, boost::python::d
 /////////////////////////////////////////////////////////////////////////////
 // get_context
 
-void get_context(boost::python::dict& Dictionary, k3d::iscript_engine::context_t& Context)
+void get_context(dict& Dictionary, k3d::iscript_engine::context_t& Context)
 {
 	for(k3d::iscript_engine::context_t::iterator context = Context.begin(); context != Context.end(); ++context)
 	{
