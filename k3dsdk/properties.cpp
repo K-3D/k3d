@@ -27,6 +27,7 @@
 #include "inode.h"
 #include "ioption_property_ri.h"
 #include "iuser_property.h"
+#include "metadata.h"
 #include "properties.h"
 #include "property_types.h"
 #include "property_types_ri.h"
@@ -53,7 +54,8 @@ namespace detail
 template<typename property_t>
 class user_property :
 	public property_t,
-	public iuser_property
+	public iuser_property,
+	public metadata
 {
 public:
 	template<typename init_t>
