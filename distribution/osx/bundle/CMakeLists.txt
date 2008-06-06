@@ -1,17 +1,15 @@
-# Setup creation of an application bundle
+# Generate an application bundle (legacy-style)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/create_bundle.sh.in ${CMAKE_CURRENT_BINARY_DIR}/create_bundle.sh @ONLY)
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in ${CMAKE_CURRENT_BINARY_DIR}/Info.plist @ONLY)
-
-ADD_CUSTOM_TARGET(package-bundle
+ADD_CUSTOM_TARGET(package-binary-bundle-legacy
 	COMMAND sh ${CMAKE_CURRENT_BINARY_DIR}/create_bundle.sh
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	)
 
-SET(CPACK_GENERATOR Bundle)
-SET(CPACK_PACKAGE_ICON ${CMAKE_CURRENT_SOURCE_DIR}/volume.icns)
-SET(CPACK_BUNDLE_NAME K-3D)
-SET(CPACK_BUNDLE_ICON ${share_SOURCE_DIR}/icons/k3d.icns)
-SET(CPACK_BUNDLE_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
-SET(CPACK_BUNDLE_STARTUP_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/k3d-startup)
-INCLUDE(CPack)
+# Generate an application bundle (new-style)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/package-binary-bundle.cpack.in ${CMAKE_CURRENT_BINARY_DIR}/package-binary-bundle.cpack)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in ${CMAKE_CURRENT_BINARY_DIR}/Info.plist @ONLY)
+ADD_CUSTOM_TARGET(package-binary-bundle
+	${CMAKE_CPACK_COMMAND}
+	--config ${CMAKE_CURRENT_BINARY_DIR}/package-binary-bundle.cpack
+	)
 

@@ -1,18 +1,14 @@
 # The CPack PackageMaker generator ignores CMAKE_INSTALL_PREFIX and places everything in /usr, complain if there is a mismatch
-IF(NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr")
-	MESSAGE(SEND_ERROR "CMAKE_INSTALL_PREFIX must be set to \"/usr\" when generating a PackageMaker install.")
-ENDIF(NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr")
+IF(NOT "${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
+       MESSAGE(SEND_ERROR "K3D_CREATE_PACKAGEMAKER_PACKAGE requires CMAKE_INSTALL_PREFIX set to \"/usr\".")
+ENDIF(NOT "${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
 
-# Setup creation of an installer with PackageMaker
-SET(CPACK_GENERATOR "PackageMaker")
-SET(CPACK_PACKAGE_NAME "K-3D")
-SET(CPACK_PACKAGE_FILE_NAME "k3d-setup-${K3D_VERSION}-${CMAKE_SYSTEM_PROCESSOR}")
-
-SET(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/welcome.txt")
-SET(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/readme.txt")
-
+# Generate a packagemaker package ...
 CONFIGURE_FILE(${k3d_SOURCE_DIR}/COPYING ${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt COPYONLY)
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/package-binary-packagemaker.cpack.in ${CMAKE_CURRENT_BINARY_DIR}/package-binary-packagemaker.cpack)
 
-INCLUDE(CPack)
+ADD_CUSTOM_TARGET(package-binary-packagemaker
+	${CMAKE_CPACK_COMMAND}
+	--config ${CMAKE_CURRENT_BINARY_DIR}/package-binary-packagemaker.cpack
+	)
 
