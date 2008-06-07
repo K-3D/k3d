@@ -119,22 +119,22 @@ public:
 		table->attach(*Gtk::manage(m_renderman_type_control), 1, 2, 2, 3);
 
 		m_renderman_name_label = new Gtk::Label(_("Attribute Name"));
-		m_renderman_name_control = new entry::control(*this, "renderman_name", entry::proxy(m_renderman_name));
+		m_renderman_name_control = new entry::control(*this, "renderman_name", entry::model(m_renderman_name), 0);
 		table->attach(*Gtk::manage(m_renderman_name_label), 0, 1, 4, 5, Gtk::SHRINK, Gtk::SHRINK);
 		table->attach(*Gtk::manage(m_renderman_name_control), 1, 2, 4, 5);
 
-		m_name_control = new entry::control(*this, "name", entry::proxy(m_name))
+		m_name_control = new entry::control(*this, "name", entry::model(m_name), 0)
 			<< connect_signal_changed(sigc::mem_fun(*this, &create_dialog::on_name_changed));
 
 		table->attach(*Gtk::manage(new Gtk::Label(_("Name"))), 0, 1, 5, 6, Gtk::SHRINK, Gtk::SHRINK);
 		table->attach(*Gtk::manage(m_name_control), 1, 2, 5, 6);
 
 		table->attach(*Gtk::manage(new Gtk::Label(_("Label"))), 0, 1, 6, 7, Gtk::SHRINK, Gtk::SHRINK);
-		table->attach(*Gtk::manage(new entry::control(*this, "label", entry::proxy(m_label))
+		table->attach(*Gtk::manage(new entry::control(*this, "label", entry::model(m_label), 0)
 			<< connect_signal_changed(sigc::mem_fun(*this, &create_dialog::on_label_changed))), 1, 2, 6, 7);
 
 		table->attach(*Gtk::manage(new Gtk::Label(_("Description"))), 0, 1, 7, 8, Gtk::SHRINK, Gtk::SHRINK);
-		table->attach(*Gtk::manage(new entry::control(*this, "description", entry::proxy(m_description))), 1, 2, 7, 8);
+		table->attach(*Gtk::manage(new entry::control(*this, "description", entry::model(m_description), 0)), 1, 2, 7, 8);
 
 		Gtk::HButtonBox* const button_box = new Gtk::HButtonBox(Gtk::BUTTONBOX_END);
 		button_box->pack_start(*Gtk::manage(new button::control(*this, "cancel", _("Cancel"), Gtk::Stock::CANCEL)

@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,19 +18,25 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the k3d::edit_control::control class, which provides a UI for string quantities
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "entry.h"
 #include "interactive.h"
 
+#include <k3d-i18n-config.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/iproperty.h>
 #include <k3dsdk/istate_recorder.h>
+#include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/state_change_set.h>
-#include <k3dsdk/types_ri.h>
+#include <k3dsdk/string_cast.h>
 
 #include <gtkmm/window.h>
+
+#include <boost/format.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace libk3dngui
 {
@@ -38,85 +44,111 @@ namespace libk3dngui
 namespace entry
 {
 
-/// Specialization of k3d::edit_control::data_proxy for use with k3d::iproperty objects
-template<>
-class data_proxy<k3d::iproperty> :
-	public idata_proxy
+/////////////////////////////////////////////////////////////////////////////
+// property_model
+
+/// Implementation of entry::imodel for use with k3d::iproperty objects
+class property_model :
+	public imodel
 {
 public:
-	typedef k3d::iproperty data_t;
-
-	data_proxy(data_t& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
-		idata_proxy(StateRecorder, ChangeMessage),
+	property_model(k3d::iproperty& Data) :
 		m_readable_data(Data),
 		m_writable_data(dynamic_cast<k3d::iwritable_property*>(&Data))
 	{
 	}
 
-	const std::string value()
+	const Glib::ustring label()
+	{
+		Glib::ustring result = m_readable_data.property_label();
+
+		if(m_readable_data.property_node())
+			result = m_readable_data.property_node()->name() + " " + result;
+
+		return result;
+	}
+
+	const k3d::string_t value()
 	{
 		const std::type_info& type = m_readable_data.property_type();
 
-		if(type == typeid(std::string))
-		{
-			return boost::any_cast<std::string>(m_readable_data.property_internal_value());
-		}
-		else if(type == typeid(k3d::ri::string))
-		{
-			return boost::any_cast<k3d::ri::string>(m_readable_data.property_internal_value());
-		}
-		else
-		{
-			k3d::log() << error << k3d_file_reference << ": unknown property type: " << type.name() << std::endl;
-			return std::string();
-		}
+		if(type == typeid(k3d::string_t))
+			return boost::any_cast<k3d::string_t>(m_readable_data.property_internal_value());
+		k3d::log() << error << k3d_file_reference << ": unknown property type: " << type.name() << std::endl;
+		return k3d::string_t();
 	}
 
-	void set_value(const std::string& Value)
+	void set_value(const k3d::string_t& Value)
 	{
 		return_if_fail(m_writable_data);
 
 		const std::type_info& type = m_readable_data.property_type();
 
-		if(type == typeid(std::string))
+		if(type == typeid(k3d::string_t))
 			m_writable_data->property_set_value(Value);
-		else if(type == typeid(k3d::ri::string))
-			m_writable_data->property_set_value(k3d::ri::string(Value));
 		else
 			k3d::log() << error << k3d_file_reference << ": unknown property type: " << type.name() << std::endl;
 	}
 
-	changed_signal_t& changed_signal()
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
 	{
-		return m_readable_data.property_changed_signal();
+		return m_readable_data.property_changed_signal().connect(sigc::hide(Slot));
 	}
 
 private:
-	data_proxy(const data_proxy& RHS);
-	data_proxy& operator=(const data_proxy& RHS);
+	property_model(const property_model& RHS);
+	property_model& operator=(const property_model& RHS);
 
-	data_t& m_readable_data;
+	k3d::iproperty& m_readable_data;
 	k3d::iwritable_property* const m_writable_data;
 };
 
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
+/////////////////////////////////////////////////////////////////////////////
+// model
+
+imodel* const model(k3d::iproperty& Property)
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<k3d::iproperty>(Data, StateRecorder, ChangeMessage));
+	return new property_model(Property);
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// control::implementation
+
+class control::implementation
+{
+public:
+	implementation(imodel* const Model, k3d::istate_recorder* const StateRecorder) :
+		m_model(Model),
+		m_state_recorder(StateRecorder)
+	{
+		assert(m_model.get());
+	}
+
+	/// Stores a reference to the underlying data object
+	const boost::scoped_ptr<imodel> m_model;
+	/// Stores a reference to the (optional) object for recording undo/redo data
+	k3d::istate_recorder* const m_state_recorder;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
+control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
 	ui_component(Name, &Parent),
-	m_data(Data)
+	m_implementation(new implementation(Model, StateRecorder))
 {
 	set_name("k3d-entry");
 
-	data_changed(0);
+	// Synchronize the view with the data source ...
+	on_data_changed();
 
-	if(m_data.get())
-		m_data->changed_signal().connect(sigc::mem_fun(*this, &control::data_changed));
+	// We want to be notified if the data source changes ...
+	m_implementation->m_model->connect_changed_signal(sigc::mem_fun(*this, &control::on_data_changed));
+}
+
+control::~control()
+{
+	delete m_implementation;
 }
 
 const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
@@ -125,7 +157,7 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 	{
 		interactive::set_text(*this, Arguments);
 		select_region(0, 0);
-		set_value();
+		on_set_value();
 		return RESULT_CONTINUE;
 	}
 
@@ -134,45 +166,46 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 
 bool control::on_focus_out_event(GdkEventFocus* Event)
 {
-	set_value();
+	on_set_value();
 	return base::on_focus_out_event(Event);
 }
 
 void control::on_activate()
 {
-	set_value();
+	on_set_value();
 	base::on_activate();
 }
 
-void control::set_value()
+void control::on_set_value()
 {
-	if(!m_data.get())
-		return;
-
 	// If the value didn't change, we're done ...
-	const std::string new_value = get_text();
-	if(new_value == m_data->value())
+	const k3d::string_t new_value = get_text();
+	if(new_value == m_implementation->m_model->value())
 		return;
 
 	// Record the command for posterity (tutorials) ...
 	record_command("set_value", new_value);
 
 	// Turn this into an undo/redo -able event ...
-	if(m_data->state_recorder)
-		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
+	if(m_implementation->m_state_recorder)
+		m_implementation->m_state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
 	// Update everything with the new value ...
-	m_data->set_value(new_value);
+	m_implementation->m_model->set_value(new_value);
 
 	// Turn this into an undo/redo -able event ...
-	if(m_data->state_recorder)
-		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_data->change_message + " " + new_value, K3D_CHANGE_SET_CONTEXT);
+	if(m_implementation->m_state_recorder)
+		m_implementation->m_state_recorder->commit_change_set(m_implementation->m_state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), change_message(m_implementation->m_model->value()), K3D_CHANGE_SET_CONTEXT);
 }
 
-void control::data_changed(k3d::iunknown*)
+void control::on_data_changed()
 {
-	return_if_fail(m_data.get());
-	set_text(m_data->value());
+	set_text(m_implementation->m_model->value());
+}
+
+const k3d::string_t control::change_message(const k3d::string_t& Value)
+{
+	return k3d::string_cast(boost::format(_("Change %1% to %2%")) % m_implementation->m_model->label().raw() % Value);
 }
 
 } // namespace edit_control

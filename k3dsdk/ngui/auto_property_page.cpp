@@ -283,7 +283,7 @@ public:
 						}
 						else
 						{
-							control = new entry::control(m_parent, property_name, entry::proxy(property, state_recorder, property_name));
+							control = new entry::control(m_parent, property_name, entry::model(property), state_recorder);
 						}
 					}
 					// inode* properties ...
