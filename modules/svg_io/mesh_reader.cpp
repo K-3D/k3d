@@ -30,6 +30,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/xml.h>
+#include <k3dsdk/nurbs.h>
 //#include <k3dsdk/gprim_factory.h>
 
 namespace module
@@ -123,6 +124,14 @@ private:
 				parse_rect(*xml_obj);
 			if(xml_obj->name == "g")
 				parse_graphics(*xml_obj);
+            if(xml_obj->name == "circle"||xml_obj->name == "ellipse")
+                parse_ellipse(*xml_obj);
+            if(xml_obj->name == "line")
+                parse_line(*xml_obj);
+            if(xml_obj->name == "polyline")
+                parse_polyline(*xml_obj, false);
+            if(xml_obj->name == "polygon")
+                parse_polyline(*xml_obj, true);
 		}
 	}
 
@@ -130,15 +139,11 @@ private:
 	{	
 		double x, y, w, h;
 		k3d::mesh::indices_t rect;
-		const std::string xx = k3d::xml::attribute_text(xml_obj, "x");
-		const std::string yy = k3d::xml::attribute_text(xml_obj, "y");
-		const std::string width = k3d::xml::attribute_text(xml_obj, "width");
-		const std::string height = k3d::xml::attribute_text(xml_obj, "height");
 
-		x = atof(xx.c_str());
-		y = atof(yy.c_str());
-		w = atof(width.c_str());
-		h = atof(height.c_str());
+        x = k3d::xml::attribute_value<double>(xml_obj, "x", 0);
+        y = k3d::xml::attribute_value<double>(xml_obj, "y", 0);
+        w = k3d::xml::attribute_value<double>(xml_obj, "width", 1);
+        h = k3d::xml::attribute_value<double>(xml_obj, "height", 1);
 
 		for(int i=0; i<4; i++)
 		{
@@ -156,7 +161,67 @@ private:
 	
 	}
 
-	bool is_together(const std::string& arg)
+    void parse_ellipse(const k3d::xml::element& xml_obj)
+    {
+        double cx, cy, rx, ry;
+        cx = k3d::xml::attribute_value<double>(xml_obj, "cx", 0);
+        cy = k3d::xml::attribute_value<double>(xml_obj, "cy", 0);
+
+        rx = ry = k3d::xml::attribute_value<double>(xml_obj, "r", -1);
+
+        if(rx == -1)
+        {
+            rx = k3d::xml::attribute_value<double>(xml_obj, "rx", 1);
+            ry = k3d::xml::attribute_value<double>(xml_obj, "ry", 1);
+        }
+
+        std::vector<double> tmp_weights;
+		std::vector<k3d::point3> control_points;
+        k3d::mesh::indices_t points;
+        k3d::mesh::knots_t knots;
+        k3d::mesh::weights_t weights;
+		k3d::nurbs::circular_arc(k3d::point3(rx, 0, 0), k3d::point3(0, ry, 0), 0, 3.14159264*2, 4, knots, tmp_weights, control_points);
+		return_if_fail(tmp_weights.size() == control_points.size());
+
+        for(int i=0; i<control_points.size(); i++)
+        {
+            points.push_back(count);
+            count++;
+            factory->add_point(k3d::point4(control_points[i][0]+cx, control_points[i][1]+cy, control_points[i][2],1));
+            weights.push_back(tmp_weights[i]);
+        }
+
+        factory->add_nurbs_curve(3, points, knots, weights);
+    }
+
+    void parse_line(const k3d::xml::element& xml_obj)
+    {
+        double x1,x2,y1,y2;
+        x1 = k3d::xml::attribute_value<double>(xml_obj, "x1", 0);
+        y1 = k3d::xml::attribute_value<double>(xml_obj, "y1", 0);
+        x2 = k3d::xml::attribute_value<double>(xml_obj, "x2", 1);
+        y2 = k3d::xml::attribute_value<double>(xml_obj, "y2", 0);
+
+        k3d::mesh::indices_t points;
+        k3d::mesh::knots_t knots;
+        k3d::mesh::weights_t weights;
+
+        for(int i=0; i<2; i++)
+        {
+            points.push_back(count);
+            count++;
+            weights.push_back(1);
+            knots.push_back(i);
+            knots.push_back(i);
+        }
+        factory->add_point(k3d::point4(x1,y1,0,1));
+        factory->add_point(k3d::point4(x2,y2,0,1));
+
+        factory->add_nurbs_curve(2,points,knots,weights);
+
+    }
+
+    bool is_together(const std::string& arg)
 	{
 		if(arg.find(",",1)>arg.length())
 			return false;
@@ -175,6 +240,41 @@ private:
 			def_stream >> y;
 		}
 	}
+
+    void parse_polyline(const k3d::xml::element& xml_obj, bool is_closed)
+    {
+        const std::string str_points = k3d::xml::attribute_text(xml_obj, "points");
+        std::istringstream def_stream(str_points);
+        float x, y;
+
+        k3d::mesh::indices_t points;
+        k3d::mesh::knots_t knots;
+        k3d::mesh::weights_t weights;
+
+        int i=0;
+        int first = count;
+        while(!def_stream.eof())
+        {
+            get_pair(x,y,def_stream);
+            points.push_back(count);
+            count++;
+            factory->add_point(k3d::point4(x,y,0,1));
+            weights.push_back(1);
+            i++;
+        }
+        if(is_closed)
+        {
+            points.push_back(first);
+            weights.push_back(1);
+        }
+
+        knots.push_back(0);
+        for(int i=0; i<points.size();i++)
+            knots.push_back(i+1);
+        knots.push_back(knots.back());
+
+        factory->add_nurbs_curve(2,points,knots,weights);
+    }
 
 	void parse_path(const k3d::xml::element& xml_obj)
 	{
