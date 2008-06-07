@@ -21,8 +21,11 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/custom_property_control.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/entry.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/properties.h>
+#include <k3dsdk/type_registry.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/spinbutton.h>
@@ -57,33 +60,80 @@ public:
 	{
 	}
 
+	/// Implementation of entry::imodel for use with knot vectors
+	class knot_vector_model :
+		public libk3dngui::entry::imodel
+	{
+	public:
+		knot_vector_model(k3d::iproperty& Data) :
+			m_readable_data(Data),
+			m_writable_data(dynamic_cast<k3d::iwritable_property*>(&Data))
+		{
+		}
+
+		const Glib::ustring label()
+		{
+			Glib::ustring result = m_readable_data.property_label();
+
+			if(m_readable_data.property_node())
+				result = m_readable_data.property_node()->name() + " " + result;
+
+			return result;
+		}
+
+		const k3d::string_t value()
+		{
+			const std::type_info& type = m_readable_data.property_type();
+
+			if(type == typeid(k3d::mesh::knots_t))
+			{
+				const k3d::mesh::knots_t knots = boost::any_cast<k3d::mesh::knots_t>(m_readable_data.property_internal_value());
+
+				std::ostringstream buffer;
+				std::copy(knots.begin(), knots.end(), std::ostream_iterator<double>(buffer, " "));
+
+				return buffer.str();
+			}
+			
+			k3d::log() << error << k3d_file_reference << ": unsupported property type: " << k3d::demangle(type) << std::endl;
+			return k3d::string_t();
+		}
+
+		void set_value(const k3d::string_t& Value)
+		{
+			return_if_fail(m_writable_data);
+
+			const std::type_info& type = m_readable_data.property_type();
+
+			if(type == typeid(k3d::mesh::knots_t))
+			{
+				double knot;
+				k3d::mesh::knots_t knots;
+				std::istringstream buffer(Value);
+				for(buffer >> knot; buffer; buffer >> knot)
+					knots.push_back(knot);
+
+				m_writable_data->property_set_value(knots);
+				return;
+			}
+
+			k3d::log() << error << k3d_file_reference << ": unsupported property type: " << k3d::demangle(type) << std::endl;
+		}
+
+		sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
+		{
+			return m_readable_data.property_changed_signal().connect(sigc::hide(Slot));
+		}
+
+	private:
+		k3d::iproperty& m_readable_data;
+		k3d::iwritable_property* const m_writable_data;
+	};
+
 	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent, k3d::iproperty& Property)
 	{
-		k3d::mesh::knots_t knot_vector = boost::any_cast<k3d::mesh::knots_t >(k3d::property::internal_value(Property));
-		//get the number of knots
-		int m_nr_knots = knot_vector.size();
-
-		k3d::log() << debug << m_nr_knots << std::endl;
-		//initialize all spin buttons
-		for(int i = 0; i < m_nr_knots; i++)
-		{
-			Gtk::SpinButton* btn = Gtk::manage(new Gtk::SpinButton(0.1,1));
-			//add callback
-			btn->signal_value_changed().connect(sigc::mem_fun(*this, &control::on_change));
-			k3d::log() << debug << knot_vector[i] << std::endl;
-			btn->set_editable();
-			btn->set_value(knot_vector[i]);
-			pack_start(*btn, Gtk::PACK_EXPAND_WIDGET, 1);
-			m_knots.push_back(btn);
-		}
-		
-		show_all_children();
-	}
-	
-	void on_change()
-	{
-		//pass new data to nurbs plugin?
-		k3d::log() << debug << "Value changed" << std::endl;
+		libk3dngui::entry::control* const control = new libk3dngui::entry::control(Parent, "knot_vector", new knot_vector_model(Property), &DocumentState.document().state_recorder());
+		pack_start(*Gtk::manage(control), Gtk::PACK_EXPAND_WIDGET);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -98,10 +148,6 @@ public:
 
 		return factory;
 	}
-	
-private:
-	std::vector<Gtk::SpinButton* > m_knots;
-	int m_nr_knots;
 };
 
 } // namespace knot_vector
