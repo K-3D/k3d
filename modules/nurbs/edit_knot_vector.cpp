@@ -77,7 +77,7 @@ namespace module
 		public:
 			edit_knot_vector(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),
-				m_knot_vector(init_owner(*this) + init_name("knot_vector") + init_label(_("knot_vector")) + init_description(_("Knot Vector (csv):")) + init_value(k3d::mesh::knots_t()) )
+				m_knot_vector(init_owner(*this) + init_name("knot_vector") + init_label(_("Knot Vector")) + init_description(_("Enter a new knot vector containing knot values separated with spaces.")) + init_value(k3d::mesh::knots_t()) )
 			{
 				m_knot_vector.set_metadata("k3d:property-type", "k3d:nurbs-knot-vector");
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
@@ -140,7 +140,7 @@ namespace module
 			}
 			
 		private:
-			k3d_data(k3d::mesh::knots_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, k3d::property_metadata, no_serialization) m_knot_vector;
+			k3d_data(k3d::mesh::knots_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, k3d::property_metadata, no_serialization) m_knot_vector;
 			
 			int select_mesh(k3d::mesh& Output)
 			{
