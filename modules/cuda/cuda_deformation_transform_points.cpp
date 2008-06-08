@@ -89,14 +89,11 @@ public:
 		float_transformation[12] = Transformation[3][0];
 		float_transformation[13] = Transformation[3][1];
 		float_transformation[14] = Transformation[3][2];
-		float_transformation[15] = Transformation[3][3];
+		float_transformation[15] = Transformation[3][3]; 
 		
 		copy_and_bind_texture_to_array( &cuda_array, float_transformation, 4, 4 );
     	
-    	
-    	
     	test_stream_implementation ( (double *)&(InputPoints[0]), (double *)&(PointSelection[0]), host_points_single_p, num_points );
-		
 		
 		for (int point = 0; point < num_points; ++point)
 		{
