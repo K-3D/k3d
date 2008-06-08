@@ -1,6 +1,9 @@
 #ifndef _CUDA_KERNELS_H_
 #define _CUDA_KERNELS_H_
 
+// declare the texture reference for Matrix multiplication
+texture<float, 2> transformTexture;
+
 // convert a half-float to a single precision float
 __device__ float halfToFloat (unsigned short halfIn)
 {
@@ -270,49 +273,63 @@ __global__ void color_monochrome_kernel ( ushort4 *image_RGBA, int width, int he
 	
 }
 
-__global__ void linear_transform_kernel ( float4 *points, float4 *matrix, int num_points )
+__global__ void linear_transform_kernel ( float4 *points, int num_points )
 {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+	__shared__ float T[4][4];
 	
-	__shared__ float4 m[4];
+	__shared__ float4 ThreadPoints[64];
 	
-	m[0] = matrix[0];
-	m[1] = matrix[1];
-	m[2] = matrix[2];
-	m[3] = matrix[3];
 	
 	__syncthreads();
-		
+	
+	if ( threadIdx.x < 1 )
+	{
+		T[0][0] = tex2D(transformTexture, 0, 0);
+		T[1][0] = tex2D(transformTexture, 0, 1);
+		T[2][0] = tex2D(transformTexture, 0, 2);
+		T[3][0] = tex2D(transformTexture, 0, 3);
+		T[0][1] = tex2D(transformTexture, 1, 0);
+		T[1][1] = tex2D(transformTexture, 1, 1);
+		T[2][1] = tex2D(transformTexture, 1, 2);
+		T[3][1] = tex2D(transformTexture, 1, 3);
+		T[0][2] = tex2D(transformTexture, 2, 0);
+		T[1][2] = tex2D(transformTexture, 2, 1);
+		T[2][2] = tex2D(transformTexture, 2, 2);
+		T[3][2] = tex2D(transformTexture, 2, 3);
+		T[0][3] = tex2D(transformTexture, 3, 0);
+		T[1][3] = tex2D(transformTexture, 3, 1);
+		T[2][3] = tex2D(transformTexture, 3, 2);
+		T[3][3] = tex2D(transformTexture, 3, 3);
+	}
+	
+	
+/*	if ( threadIdx.x < 16 )
+	{
+		const int row = idx >> 2;
+		const int col = idx & 0x3; 
+		T[row][col] = tex2D(transformTexture, col, row);
+	}*/
+	__syncthreads();
+	
 	if ( idx < num_points )
 	{
 		float4 vt;
-		float4 v = points[idx];
-		float w = m[3].x*v.x + m[3].y*v.y + m[3].z*v.z + m[3].w;
+		ThreadPoints[threadIdx.x] = points[idx];
+		vt.w = T[3][0]*ThreadPoints[threadIdx.x].x + T[3][1]*ThreadPoints[threadIdx.x].y + T[3][2]*ThreadPoints[threadIdx.x].z + T[3][3];
 
-		vt.x = (m[0].x*v.x + m[0].y*v.y + m[0].z*v.z + m[0].w)/w;
-		vt.y = (m[1].x*v.x + m[1].y*v.y + m[1].z*v.z + m[1].w)/w;
-		vt.z = (m[2].x*v.x + m[2].y*v.y + m[2].z*v.z + m[2].w)/w;
+		vt.x = (T[0][0]*ThreadPoints[threadIdx.x].x + T[0][1]*ThreadPoints[threadIdx.x].y + T[0][2]*ThreadPoints[threadIdx.x].z + T[0][3])/vt.w;
+		vt.y = (T[1][0]*ThreadPoints[threadIdx.x].x + T[1][1]*ThreadPoints[threadIdx.x].y + T[1][2]*ThreadPoints[threadIdx.x].z + T[1][3])/vt.w;
+		vt.z = (T[2][0]*ThreadPoints[threadIdx.x].x + T[2][1]*ThreadPoints[threadIdx.x].y + T[2][2]*ThreadPoints[threadIdx.x].z + T[2][3])/vt.w;
 		
-		float alpha = v.w;
-		
-		points[idx].x = v.x*(1 - alpha) + alpha*vt.x;
-		points[idx].y = v.y*(1 - alpha) + alpha*vt.y;
-		points[idx].z = v.z*(1 - alpha) + alpha*vt.z;
+		points[idx].x = ThreadPoints[threadIdx.x].x*(1 - ThreadPoints[threadIdx.x].w) + ThreadPoints[threadIdx.x].w*vt.x;
+		points[idx].y = ThreadPoints[threadIdx.x].y*(1 - ThreadPoints[threadIdx.x].w) + ThreadPoints[threadIdx.x].w*vt.y;
+		points[idx].z = ThreadPoints[threadIdx.x].z*(1 - ThreadPoints[threadIdx.x].w) + ThreadPoints[threadIdx.x].w*vt.z;
 	}
-	__syncthreads();
+	
+	__syncthreads();	
 
 }
 
- 
-__global__ void test_double_to_float ( double *input, float *output, int num )
-{
-	const int ix = blockDim.x * blockIdx.x + threadIdx.x;
-	
-	if ( ix < num )
-	{
-		output[ix] = (float)input[ix];	
-	}
-	
-}
 #endif // #ifndef _CUDA_KERNELS_H_
 

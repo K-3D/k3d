@@ -15,7 +15,7 @@ TARGET_LINK_LIBRARIES(k3d-cuda ${CUDA_LIBS})
 
 # disable RPATH since it prevents the emulation mode from working correctly
 IF (CUDA_EMULATION)
-    SET_TARGET_PROPERTIES ( k3d-cuda-bitmap PROPERTIES SKIP_RPATH "ON" )
+    SET_TARGET_PROPERTIES ( k3d-cuda PROPERTIES SKIP_RPATH "ON" )
 ENDIF (CUDA_EMULATION)
 
 

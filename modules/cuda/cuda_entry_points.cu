@@ -57,8 +57,7 @@ extern "C" void bitmap_arithmetic_kernel_entry(int operation, int width, int hei
     	case CUDA_BITMAP_SUBTRACT:
     		// execute the add kernel with value negated
     		add_kernel<<< blocks_per_grid, threads_per_block >>> (d_image, width, height, -value);
-    		break
-    		;
+    		break;
     	default:
     		// unknown operation
     		;
@@ -80,6 +79,7 @@ extern "C" void bitmap_color_monochrome_kernel_entry(int width, int height, floa
     	
     // check if the kernel executed correctly
     CUT_CHECK_ERROR("Add Kernel execution failed");
+    cudaThreadSynchronize();
 	
 }
 
@@ -95,27 +95,41 @@ extern "C" void CUDA_cleanup()
     CUDA_SAFE_CALL(cudaFree(d_image));	
 }
 
+extern "C" void copy_and_bind_texture_to_array( void** cudaArrayPointer, float* arrayData, int width, int height )
+{
+	// alocate a cudaArray to store the transformation matrix
+	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+	cudaArray* cu_array;
+	CUDA_SAFE_CALL( cudaMallocArray( &cu_array, &channelDesc, width, height )); 
+    CUDA_SAFE_CALL( cudaMemcpyToArray( cu_array, 0, 0, arrayData, width*height*sizeof(float), cudaMemcpyHostToDevice));
+	
+	// set texture parameters
+    transformTexture.addressMode[0] = cudaAddressModeClamp;
+    transformTexture.addressMode[1] = cudaAddressModeClamp;
+    transformTexture.filterMode = cudaFilterModePoint;
+    transformTexture.normalized = false;
+	
+	// Bind the array to the texture
+    CUDA_SAFE_CALL( cudaBindTextureToArray( transformTexture, cu_array, channelDesc));
+	
+	*cudaArrayPointer = (void*)cu_array;
+}
 
-extern "C" void apply_linear_transform_to_point_data ( float *device_points, float *device_matrix, int num_points )
+extern "C" void free_CUDA_array ( void* cudaArrayPointer )
+{
+	CUDA_SAFE_CALL(cudaFreeArray((cudaArray*)cudaArrayPointer));			
+}
+
+extern "C" void apply_linear_transform_to_point_data ( float *device_points, float *T_matrix, int num_points )
 {
 	dim3 threads_per_block(64, 1);
     dim3 blocks_per_grid( iDivUp(num_points, 64), 1);
 	
-	linear_transform_kernel <<< blocks_per_grid, threads_per_block >>> ((float4*)device_points, (float4*)device_matrix, num_points);
+	linear_transform_kernel <<< blocks_per_grid, threads_per_block >>> ((float4*)device_points, num_points);
 	
 	// check if the kernel executed correctly
-    CUT_CHECK_ERROR("Add Kernel execution failed");					
-}
-
-extern "C" void test_double_to_float_entry ( double *in, float *out, int num )
-{
-	dim3 threads_per_block(8, 1);
-    dim3 blocks_per_grid( iDivUp(num, 8), 1);
-	
-	test_double_to_float<<< blocks_per_grid, threads_per_block >>> (in, out, num);
-	
-	// check if the kernel executed correctly
-    CUT_CHECK_ERROR("Add Kernel execution failed");		
+    CUT_CHECK_ERROR("Add Kernel execution failed");
+    cudaThreadSynchronize();
 }
 
 extern "C" void allocate_device_memory ( void** device_pointer, int size_in_bytes )
@@ -137,3 +151,72 @@ extern "C" void free_cuda_pointer ( void* device_pointer )
 {
 	CUDA_SAFE_CALL(cudaFree(device_pointer));			
 }
+
+extern "C" void allocate_pinned_host_memory ( void** pointer_on_host, size_t size_in_bytes )  
+{
+	CUDA_SAFE_CALL(cudaMallocHost(pointer_on_host, size_in_bytes));	
+}
+
+extern "C" void free_pinned_host_memory ( void* pointer_on_host )  
+{
+	CUDA_SAFE_CALL(cudaFreeHost(pointer_on_host));	
+}
+
+extern "C" void test_stream_implementation ( double *InputPoints, double *PointSelection, float* host_points_single_p, int num_points )
+{
+	// set the number of streams
+	int nstreams = 1;
+    float *device_points;
+	
+	// allocate the memory on the device - 16 bytes per point
+	allocate_device_memory((void**)&device_points, num_points*sizeof(float)*4);	
+		
+		
+	// allocate and initialize an array of stream handles
+    cudaStream_t *streams = (cudaStream_t*) malloc(nstreams * sizeof(cudaStream_t));
+    for(int i = 0; i < nstreams; i++)
+    	CUDA_SAFE_CALL( cudaStreamCreate(&(streams[i])) );
+	
+	int points_per_stream = num_points/nstreams;
+	
+	dim3 threads_per_block(64, 1);
+	dim3 blocks_per_grid( iDivUp(points_per_stream, 64), 1);
+		
+	for ( int n = 0; n < nstreams; n++ )
+	{
+		for (int point = n*points_per_stream; point < (n+1)*points_per_stream; ++point)
+		{
+			int float_index = (point)*4;
+			int double_index = (point)*3;
+			host_points_single_p[float_index] = (float)InputPoints[double_index];
+			host_points_single_p[float_index+1] = (float)InputPoints[double_index+1];
+			host_points_single_p[float_index+2] = (float)InputPoints[double_index+2];
+			host_points_single_p[float_index+3] = (float)PointSelection[point];
+		}
+		
+		
+		CUDA_SAFE_CALL ( cudaMemcpyAsync(device_points + n*points_per_stream*16, host_points_single_p + n*points_per_stream*16, points_per_stream*16, cudaMemcpyHostToDevice, streams[n]) );
+		//CUDA_SAFE_CALL ( cudaMemcpy(device_points + n*points_per_stream*16, host_points_single_p + n*points_per_stream*16, points_per_stream*16, cudaMemcpyHostToDevice) );
+		
+		linear_transform_kernel <<< blocks_per_grid, threads_per_block, 0, streams[n] >>> ((float4*)(device_points + n*points_per_stream*16), points_per_stream);
+		//linear_transform_kernel <<< blocks_per_grid, threads_per_block >>> ((float4*)(device_points + n*points_per_stream*16), points_per_stream);
+		cudaStreamSynchronize(streams[n]);
+		//CUDA_SAFE_CALL ( cudaMemcpyAsync(host_points_single_p + n*points_per_stream*16, device_points + n*points_per_stream*16, points_per_stream*16, cudaMemcpyDeviceToHost, streams[n]) );
+		//CUDA_SAFE_CALL ( cudaMemcpy(host_points_single_p + n*points_per_stream*16, device_points + n*points_per_stream*16, points_per_stream*16, cudaMemcpyDeviceToHost) );
+		
+		
+	}
+	cudaThreadSynchronize();
+	CUDA_SAFE_CALL ( cudaMemcpy(host_points_single_p, device_points, num_points*16, cudaMemcpyDeviceToHost) );
+	//for (int point = n*points_per_stream; point < (n+1)*points_per_stream; ++point)
+	
+	// release resources
+	for(int i = 0; i < nstreams; i++)
+	{
+		cudaStreamSynchronize(streams[i]);
+    	cudaStreamDestroy(streams[i]);
+	}
+	
+	free_cuda_pointer(device_points);
+}
+

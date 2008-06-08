@@ -47,10 +47,17 @@ extern "C" void CUDA_cleanup();
 
 extern "C" void apply_linear_transform_to_point_data ( float *device_points, float *device_matrix, int num_points );
 
-extern "C" void test_double_to_float_entry ( double *in, float *out, int num );
-
 extern "C" void allocate_device_memory ( void** device_pointer, int size_in_bytes );
 extern "C" void copy_from_host_to_device ( void* device_pointer, const void* host_pointer, int size_in_bytes );
 extern "C" void copy_from_device_to_host ( void* host_pointer, const void* device_pointer, int size_in_bytes );
 extern "C" void free_cuda_pointer ( void* device_pointer );
+extern "C" void allocate_pinned_host_memory ( void** pointer_on_host, size_t size_in_bytes );
+extern "C" void free_pinned_host_memory ( void* pointer_on_host );
+
+
+extern "C" void copy_and_bind_texture_to_array( void** cudaArrayPointer, float* arrayData, int width, int height );
+extern "C" void free_CUDA_array ( void* cudaArrayPointer );
+
+extern "C" void test_stream_implementation ( double *InputPoints, double *PointSelection, float* host_points_single_p, int num_points );
+
 #endif // !CUDA_ENTRY_POINTS_H
