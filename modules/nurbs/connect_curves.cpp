@@ -64,33 +64,6 @@ namespace module
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output) 
 			{
-				/*const k3d::iproperty_collection::properties_t properties = k3d::user_properties(*static_cast<k3d::iproperty_collection*>(this));
-
-				//bool *endPointUsed = new bool[properties.size()]; //needs shared_ptr
-				boost::shared_ptr<vector<unsigned char> > endPointUsed(new vector<unsigned_char>(properties.size());
-				
-				//list of these: std::vector<double> distanceList;
-				
-				for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
-				{
-					k3d::iproperty& property = **prop;
-					if(property.property_type() == typeid(k3d::mesh*))
-					{
-						const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property));
-						return_if_fail(mesh);
-						
-						//grade nochmal die selben schleifen anlegen
-						
-						//Pseudocode here:
-						//if(properties.size()>=2)
-						//	lege für jeden end-kontrollpunkt eine liste mit entfernungen zu andren kontrollpunkten an
-						//	
-						//	für jeden knoten die verbindung mit der kleinsten Entfernung (sortiert nach entfernungen das ganze durchführen!) so anlegen, dass der übergang stetig diffbar wird
-						//	(2 ctrl points von jeder seite transformieren)
-						
-					}
-				}*/
-
 				Output = Input;
 				k3d::bool_t make_continuous = m_make_continuous.internal_value();
 				

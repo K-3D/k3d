@@ -86,7 +86,6 @@ namespace module
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output) 
 			{
-				k3d::log() << debug << "CreateMesh" << std::endl;
 				Output=Input;
 				
 				if(!k3d::validate_nurbs_curve_groups(Output))
@@ -106,7 +105,6 @@ namespace module
 
 			void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 			{
-				k3d::log() << debug << "UpdateMesh" << std::endl;
 				Output=Input;
 				
 				if(!k3d::validate_nurbs_curve_groups(Output))
@@ -124,7 +122,7 @@ namespace module
 				}
 				
 				if(!insert_knots(knots, Output, my_curve))
-					k3d::log() << error << "Invalid Knot Vector" << my_curve << std::endl;
+					k3d::log() << error << "Invalid Knot Vector on curve " << my_curve << std::endl;
 			}
 
 			static k3d::iplugin_factory& get_factory()
