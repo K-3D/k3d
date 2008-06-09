@@ -20,6 +20,43 @@ class timer:
 	def elapsed(self):
 		return self.current_time() - self.start_time
 
+# this class is used to setup an input mesh for mesh benchmarks
+class benchmarkMesh(object):
+    def __init__(self, counts = (1,1,1)):
+        self.__counts = counts
+        
+    def set_document(self, document):
+        self.__document = document
+        self.initialize_mesh()
+        
+    def initialize_mesh(self):
+        self.__cube = self.__document.new_node("PolyCube")
+        self.__cube.columns = 1;
+        self.__cube.rows = 1;
+        self.__cube.slices = 1;
+        self.__cube.width = 1;
+        self.__cube.height = 1;
+        self.__cube.depth = 1;
+        
+        self.__mesh_array_3D = self.__document.new_node("MeshArray3D")
+        self.__mesh_array_3D.count1 = self.__counts[0]
+        self.__mesh_array_3D.count2 = self.__counts[1]
+        self.__mesh_array_3D.count3 = self.__counts[2]
+    
+        self.__mesh_array_3D.layout = self.__document.new_node("TranslateArray3D")
+    
+        self.__document.set_dependency(self.__mesh_array_3D.get_property("input_mesh"), self.__cube.get_property("output_mesh"))
+    
+    def set_counts(self, counts):
+        # counts is a tuple of values
+        self.__counts = counts
+        
+    def get_mesh(self):
+        return self.__mesh_array_3D
+    
+    def get_size_metric(self):
+    	return self.__counts[0]*self.__counts[1]*self.__counts[2]*4
+
 def source_path():
 	return os.environ["K3D_TEST_SOURCE_PATH"]
 
@@ -395,16 +432,17 @@ def bitmap_compare_plugin_outputs(referenceName, pluginToTest, pluginPropertyVal
 	# calculate the perceptual difference
 	bitmap_perceptual_difference(document, referenceNode.get_property("output_bitmap"), testNode.get_property("output_bitmap"))
 
-def mesh_modifier_benchmark(meshModifierNodeName, inputNodeSetupFunction, numberOfRuns = 1, properties = {}):
+def mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRuns = 1, properties = {}):
 	document = k3d.new_document()
-	
+		
 	profiler = document.new_node("PipelineProfiler")
 	
-	inputNode = inputNodeSetupFunction(document)
+	benchmarkMesh.set_document(document)
+	
+	inputNode = benchmarkMesh.get_mesh()
 	
 	selection = k3d.deselect_all()
 	selection.points = k3d.component_select_all()
-	
 	
 	benchmarkNode = document.new_node(meshModifierNodeName)
 	for (p, val) in properties.items():
@@ -418,7 +456,9 @@ def mesh_modifier_benchmark(meshModifierNodeName, inputNodeSetupFunction, number
 		benchmarkNode.output_mesh
 		results = get_profiler_results_for_node(meshModifierNodeName, profiler.records, results)
 	
-	dartTable("%s Benchmark" % (meshModifierNodeName), results)
+	dartTable("%s Benchmark : %d" % (meshModifierNodeName, benchmarkMesh.get_size_metric()), results)
+	
+	
 	
 	
 # Benchmark the performance of the Bitmap plugins using a solid as input 

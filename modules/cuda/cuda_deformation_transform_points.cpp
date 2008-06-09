@@ -108,7 +108,6 @@ public:
 		free ( float_transformation );
 		free_pinned_host_memory ( host_points_single_p );
 		document().pipeline_profiler().finish_execution(*this, "Deform Mesh");
-		k3d::log() << debug << "End of deform mesh" << std::endl;
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -3,13 +3,9 @@
 import testing
 import k3d
 
-# this function is used to setup the benchmark for the mesh modifiers
-def createSimpleCube(document):
-    cube = document.new_node("PolyCube")
-    cube.columns = 10;
-    cube.rows = 10;
-    cube.slices = 10;
-    return cube
+current_count = [1,1,1]
 
-testing.mesh_modifier_benchmark("CUDATransformPoints", createSimpleCube, 10, {"input_matrix" : k3d.translate3(k3d.vector3(0, 0, 1))})
-
+for k in range(20):
+    benchmark_mesh = testing.benchmarkMesh(current_count)
+    testing.mesh_modifier_benchmark("CUDATransformPoints", benchmark_mesh, 10, {"input_matrix" : k3d.translate3(k3d.vector3(0, 0, 1))})
+    current_count[k % 3] *= 2
