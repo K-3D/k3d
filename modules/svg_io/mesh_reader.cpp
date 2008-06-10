@@ -137,27 +137,103 @@ private:
 
 	void parse_rect(const k3d::xml::element& xml_obj)
 	{	
-		double x, y, w, h;
+		double x, y, w, h, rx, ry;
 		k3d::mesh::indices_t rect;
 
         x = k3d::xml::attribute_value<double>(xml_obj, "x", 0);
         y = k3d::xml::attribute_value<double>(xml_obj, "y", 0);
         w = k3d::xml::attribute_value<double>(xml_obj, "width", 1);
         h = k3d::xml::attribute_value<double>(xml_obj, "height", 1);
+		rx = k3d::xml::attribute_value<double>(xml_obj, "rx", -1);
+		ry = k3d::xml::attribute_value<double>(xml_obj, "ry", -1);
 
-		for(int i=0; i<4; i++)
+		if(rx ==-1)
 		{
-			rect.push_back(count);
-			count++;
+			for(int i=0; i<4; i++)
+			{
+				rect.push_back(count);
+				count++;
+			}
+			//rect.push_back(rect.front());
+			factory->add_point(k3d::point4(x,y,0,1));
+			factory->add_point(k3d::point4(x+w,y,0,1));
+			factory->add_point(k3d::point4(x+w,y+h,0,1));
+			factory->add_point(k3d::point4(x,y+h,0,1));
+			
+			//factory->add_curve(rect,2);
+			factory->add_polygon(rect);	
 		}
-		//rect.push_back(rect.front());
-		factory->add_point(k3d::point4(x,y,0,1));
-		factory->add_point(k3d::point4(x+w,y,0,1));
-		factory->add_point(k3d::point4(x+w,y+h,0,1));
-		factory->add_point(k3d::point4(x,y+h,0,1));
+		else
+		{
+			if(ry==-1)
+				ry = rx;
+			std::vector<double> tmp_weights;
+			std::vector<k3d::point3> control_points;
+			k3d::mesh::knots_t knots;
+			k3d::mesh::indices_t points;
+			k3d::mesh::weights_t weights;
+			k3d::nurbs::circular_arc(k3d::point3(-rx, 0, 0), k3d::point3(0, -ry, 0), 0, k3d::pi()/2, 1, knots, tmp_weights, control_points);
+			return_if_fail(tmp_weights.size() == control_points.size());
+
+			for(int i=0; i<control_points.size(); i++)
+			{
+				points.push_back(count);
+				count++;
+				factory->add_point(k3d::point4(control_points[i][0]+x+rx, control_points[i][1]+y+ry, control_points[i][2],1));
+				weights.push_back(tmp_weights[i]);
+			}
+
+			double tmx = 2*x+w;
+			double tmy = 2*y+h;
+
+			for(int i=control_points.size()-1; i>=0; i--)
+			{
+				points.push_back(count);
+				count++;
+				factory->add_point(k3d::point4(tmx - (control_points[i][0]+x+rx), control_points[i][1]+y+ry,control_points[i][2],1));
+				weights.push_back(tmp_weights[i]);
+				knots.push_back(knots[i]+2);
+			}
+
+			for(int i=0; i<control_points.size(); i++)
+			{
+				points.push_back(count);
+				count++;
+				factory->add_point(k3d::point4(tmx - (control_points[i][0]+x+rx), tmy - (control_points[i][1]+y+ry),control_points[i][2],1));
+				weights.push_back(tmp_weights[i]);
+				knots.push_back(knots[i]+4);
+			}
+
+			for(int i=control_points.size()-1; i>=0; i--)
+			{
+				points.push_back(count);
+				count++;
+				factory->add_point(k3d::point4(control_points[i][0]+x+rx, tmy - (control_points[i][1]+y+ry),control_points[i][2],1));
+				weights.push_back(tmp_weights[i]);
+				knots.push_back(knots[i]+6);
+			}
+
+			factory->add_nurbs_curve(3, points, knots, weights);
+
+			for(int i=2; i<=11; i+=3)
+			{
+				k3d::mesh::indices_t line_points;
+				k3d::mesh::knots_t line_knots;
+				k3d::mesh::weights_t line_weights;
 		
-		//factory->add_curve(rect,2);
-		factory->add_polygon(rect);		
+				line_points.push_back(points[i]);
+				line_points.push_back(points[(i+1)%12]);
+				line_weights.push_back(1);
+				for(int j=0; j<2; j++)
+				{
+					line_knots.push_back(j);
+					line_knots.push_back(j);
+				}
+
+				factory->add_nurbs_curve(2,line_points,line_knots,line_weights);
+			}	
+		}
+
 	
 	}
 
@@ -180,7 +256,7 @@ private:
         k3d::mesh::indices_t points;
         k3d::mesh::knots_t knots;
         k3d::mesh::weights_t weights;
-		k3d::nurbs::circular_arc(k3d::point3(rx, 0, 0), k3d::point3(0, ry, 0), 0, 3.14159264*2, 4, knots, tmp_weights, control_points);
+		k3d::nurbs::circular_arc(k3d::point3(rx, 0, 0), k3d::point3(0, ry, 0), 0, k3d::pi_times_2(), 4, knots, tmp_weights, control_points);
 		return_if_fail(tmp_weights.size() == control_points.size());
 
         for(int i=0; i<control_points.size(); i++)
