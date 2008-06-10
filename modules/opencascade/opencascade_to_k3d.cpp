@@ -41,6 +41,7 @@
 #include <Geom_BSplineCurve.hxx>
 #include <Geom_BSplineSurface.hxx>
 #include <Geom_Curve.hxx>
+#include <Geom_Plane.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
 #include <Geom_Surface.hxx>
 #include <gp_Pnt2d.hxx>
@@ -48,6 +49,7 @@
 #include <ShapeAnalysis_Surface.hxx>
 #include <ShapeConstruct_CompBezierCurves2dToBSplineCurve2d.hxx>
 #include <ShapeCustom.hxx>
+#include <ShapeCustom_BSplineRestriction.hxx>
 #include <ShapeCustom_RestrictionParameters.hxx>
 #include <ShapeFix_Shape.hxx>
 #include <ShapeUpgrade_ConvertCurve2dToBezier.hxx>
@@ -58,6 +60,7 @@
 #include <TColgp_Array1OfPnt2d.hxx>
 #include <TColStd_Array1OfReal.hxx>
 #include <TColStd_Array1OfInteger.hxx>
+#include <TColgp_Array2OfPnt.hxx>
 #include <TColGeom2d_HArray1OfCurve.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDataStd_Shape.hxx>
@@ -223,35 +226,75 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 {
 	const double maxsize = 1000; // Maximum size of the bbox in any direction 
 	const TopoDS_Face& face = Face;
-	Handle(Geom_Surface) surface = BRep_Tool::Surface(face);
-	TopExp_Explorer wire_explorer;
-	Handle(Geom_BSplineSurface) nurbs_surface = Handle(Geom_BSplineSurface)::DownCast(surface);
-	if (nurbs_surface.IsNull()) // Entered when somehow the global NURBS conversion yielded a non-NURBS face
+	
+	Handle(ShapeCustom_RestrictionParameters) nurbs_parameters = new ShapeCustom_RestrictionParameters();
+	// Set conversion parameters
+	nurbs_parameters->ConvertBezierSurf() = true;
+	nurbs_parameters->ConvertCurve2d() = true;
+	nurbs_parameters->ConvertCurve3d() = true;
+	nurbs_parameters->ConvertExtrusionSurf() = true;
+	nurbs_parameters->ConvertOffsetCurv2d() = true;
+	nurbs_parameters->ConvertOffsetCurv3d() = true;
+	nurbs_parameters->ConvertOffsetSurf() = true;
+	nurbs_parameters->ConvertPlane() = true;
+	nurbs_parameters->ConvertRevolutionSurf() = true;
+	nurbs_parameters->SegmentSurfaceMode() = true;
+	
+	ShapeCustom_BSplineRestriction nurbs_convertor(true,
+			true,
+			true,
+			Precision,
+			Precision,
+			GeomAbs_C2,
+			GeomAbs_C2,
+			8,
+			4096,
+			true,
+			false,
+			nurbs_parameters);
+	
+	//Handle(Geom_Surface) surface = BRep_Tool::Surface(face);
+	Handle(Geom_Surface) surface;
+	TopLoc_Location L;
+	Standard_Real tol;
+	Standard_Boolean rev_wires, rev_face;
+	nurbs_convertor.NewSurface(face, surface, L, tol, rev_wires, rev_face);
+	//k3d::log() << debug << "Surface conversion tolerance: " << tol << std::endl;
+	Handle(Geom_BSplineSurface) nurbs_surface;
+	if(surface.IsNull())
 	{
-		k3d::log() << debug << "Performing explicit conversion to NURBS" << std::endl; 
-		double umin, umax, vmin, vmax;
-		surface->Bounds(umin, umax, vmin, vmax);
-		// Make sure we are within our predefined maximum size
-		if (umin < -maxsize) umin = -maxsize;
-		if (vmin < -maxsize) vmin = -maxsize;
-		if (umax > maxsize) umax = maxsize;
-		if (vmax > maxsize) vmax = maxsize;
-		try
-		{
-			Handle(Geom_Surface) bounded_surface = new Geom_RectangularTrimmedSurface(surface, umin, umax, vmin, vmax);
-			nurbs_surface = GeomConvert::SurfaceToBSplineSurface(bounded_surface);
-		}
-		catch(Standard_Failure& Exception)
-		{
-			k3d::log() << warning << "Conversion to NURBS failed: " << Exception.GetMessageString() << ". Skipping face." << std::endl;
-			return;
-		}
+		surface = BRep_Tool::Surface(face);
+		k3d::log() << debug << "Passing unconverted surface" << std::endl;
+	}
+	Standard_Real UF,UL,VF,VL;
+	surface->Bounds(UF,UL,VF,VL);
+	if(surface->IsKind(STANDARD_TYPE(Geom_RectangularTrimmedSurface)))
+	{
+		Handle(Geom_RectangularTrimmedSurface) trimmed_surface = Handle(Geom_RectangularTrimmedSurface)::DownCast(surface);
+		surface = trimmed_surface->BasisSurface();
+	}
+	if(surface->IsKind(STANDARD_TYPE(Geom_BSplineSurface)))
+	{
+		nurbs_surface = Handle(Geom_BSplineSurface)::DownCast(surface);
+	}
+//	else
+//	{
+//		if(nurbs_convertor.ConvertSurface(surface, nurbs_surface, UF, UL, VF, VL, false))
+//			k3d::log() << debug << "Converted surface with a precision of " << nurbs_convertor.SurfaceError() << std::endl;
+//		else
+//			k3d::log() << debug << "Failed to convert surface" << std::endl;
+//	}
+	if(nurbs_surface.IsNull())
+	{
+		k3d::log() << debug << "Failed to convert surface of type " << surface->DynamicType() << " to NURBS" << std::endl;
+		return;
 	}
 	if (!on_bspline_surface(nurbs_surface, Factory))
 	{
 		return;
 	}
 	// Visit trim curves in their connected order, and add them to the mesh
+	TopExp_Explorer wire_explorer;
 	for (wire_explorer.Init(face, TopAbs_WIRE); wire_explorer.More(); wire_explorer.Next()) // wires (trim curve loops)
 	{
 		TopAbs_Orientation wire_orientation = wire_explorer.Current().Orientation();
@@ -269,7 +312,9 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 				k3d::log() << warning << "Invalid trim curve orientation" << std::endl;
 			double first = 0.0;
 			double last = 0.0;
-			Handle(Geom2d_Curve) curve = BRep_Tool::CurveOnSurface(TopoDS::Edge(trim_explorer.Current()), face, first, last);
+			//Handle(Geom2d_Curve) curve = BRep_Tool::CurveOnSurface(TopoDS::Edge(trim_explorer.Current()), face, first, last);
+			Handle(Geom2d_Curve) curve;
+			nurbs_convertor.NewCurve2d(TopoDS::Edge(trim_explorer.Current()), face, TopoDS::Edge(trim_explorer.Current()), face, curve, tol);
 			if (curve.IsNull())
 			{
 				k3d::log() << warning << "Skipping null trim curve" << std::endl;
@@ -278,7 +323,7 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 			if (first < -maxsize) first = -maxsize;
 			if (last > maxsize) last = maxsize;
 			Handle(Geom2d_BSplineCurve) nurbs_trim = Handle(Geom2d_BSplineCurve)::DownCast(curve);
-			if (nurbs_trim.IsNull()) // Encountered a non-NURBS trim curve, do explicit conversion
+			if(nurbs_trim.IsNull()) // Do explicit conversion
 			{
 				// Trim the curve, so the converter knows the endpoints
 				Handle(Geom2d_TrimmedCurve) trimmed_curve = new Geom2d_TrimmedCurve(curve, first, last);
@@ -365,55 +410,62 @@ void process_surface(const TopoDS_Shape& Shape, k3d::gprim_factory& Factory)
 			TopoDS_Shape revolution_shape = ShapeCustom::ConvertToRevolution(shell_explorer.Current());
 			
 			// Split closed shapes
-			ShapeUpgrade_ShapeDivideAngle angle_tool(k3d::pi_over_2(), revolution_shape);
+			ShapeUpgrade_ShapeDivideAngle angle_tool(k3d::pi(), revolution_shape);
 			if (!angle_tool.Perform() && angle_tool.Status (ShapeExtend_FAIL)) {
 			  k3d::log() << debug << "Splitting of angles failed" << std::endl;
 			  return;
 			}
 			
-			ShapeUpgrade_ShapeConvertToBezier bezier_converter(angle_tool.Result());
-			bezier_converter.SetSurfaceConversion(true);
-			bezier_converter.SetRevolutionMode(true);
-			bezier_converter.SetSurfaceSegmentMode(true);
-			bezier_converter.Set2dConversion(true);
-			bezier_converter.Set3dConversion(false);
-			bezier_converter.SetBSplineMode(false);
-			bezier_converter.SetPlaneMode(false);
-			bezier_converter.Set3dConicConversion(true);
-			if (!bezier_converter.Perform() && bezier_converter.Status(ShapeExtend_FAIL))
-			{
-				k3d::log() << debug << "Bezier conversion failed" << std::endl;
-				return;
-			}
+//			ShapeUpgrade_ShapeConvertToBezier bezier_converter(angle_tool.Result());
+//			bezier_converter.SetSurfaceConversion(true);
+//			bezier_converter.SetRevolutionMode(true);
+//			bezier_converter.SetSurfaceSegmentMode(true);
+//			bezier_converter.Set2dConversion(true);
+//			bezier_converter.Set3dConversion(false);
+//			bezier_converter.SetBSplineMode(false);
+//			bezier_converter.SetPlaneMode(false);
+//			bezier_converter.Set3dConicConversion(true);
+//			try {
+//			if (!bezier_converter.Perform() && bezier_converter.Status(ShapeExtend_FAIL))
+//			{
+//				k3d::log() << debug << "Bezier conversion failed" << std::endl;
+//				return;
+//			}
+//			} catch(...)
+//			{
+//				k3d::log() << debug << "Exception in bezier conversion" << std::endl;
+//			}
 			
-			// Convert everything to NURBS
-			Handle(ShapeCustom_RestrictionParameters) nurbs_parameters = new ShapeCustom_RestrictionParameters();
-			// Set conversion parameters
-			nurbs_parameters->ConvertBezierSurf() = true;
-			nurbs_parameters->ConvertCurve2d() = true;
-			nurbs_parameters->ConvertCurve3d() = true;
-			nurbs_parameters->ConvertExtrusionSurf() = true;
-			nurbs_parameters->ConvertOffsetCurv2d() = true;
-			nurbs_parameters->ConvertOffsetCurv3d() = true;
-			nurbs_parameters->ConvertOffsetSurf() = true;
-			nurbs_parameters->ConvertPlane() = true;
-			nurbs_parameters->ConvertRevolutionSurf() = true;
-			nurbs_parameters->SegmentSurfaceMode() = true;
-			// Execute the conversion
-			TopoDS_Shape nurbs_shape = ShapeCustom::BSplineRestriction(bezier_converter.Result(),
-					precision,
-					precision,
-					4,
-					4096,
-					GeomAbs_C2,
-					GeomAbs_C2,
-					false,
-					false,
-					nurbs_parameters);
-		
+			
+//			// Convert everything to NURBS
+//			Handle(ShapeCustom_RestrictionParameters) nurbs_parameters = new ShapeCustom_RestrictionParameters();
+//			// Set conversion parameters
+//			nurbs_parameters->ConvertBezierSurf() = true;
+//			nurbs_parameters->ConvertCurve2d() = true;
+//			nurbs_parameters->ConvertCurve3d() = true;
+//			nurbs_parameters->ConvertExtrusionSurf() = true;
+//			nurbs_parameters->ConvertOffsetCurv2d() = true;
+//			nurbs_parameters->ConvertOffsetCurv3d() = true;
+//			nurbs_parameters->ConvertOffsetSurf() = true;
+//			nurbs_parameters->ConvertPlane() = true;
+//			nurbs_parameters->ConvertRevolutionSurf() = true;
+//			nurbs_parameters->SegmentSurfaceMode() = true;
+//			// Execute the conversion
+//			TopoDS_Shape nurbs_shape = ShapeCustom::BSplineRestriction(angle_tool.Result(),
+//					precision,
+//					precision,
+//					512,
+//					409600,
+//					GeomAbs_C2,
+//					GeomAbs_C2,
+//					true,
+//					false,
+//					nurbs_parameters);
+			
+			//TopoDS_Shape nurbs_shape = ShapeCustom::ConvertToBSpline(angle_tool.Result(), true, true, true);
 			
 			TopExp_Explorer face_explorer;
-			for (face_explorer.Init(nurbs_shape,TopAbs_FACE); face_explorer.More(); face_explorer.Next())
+			for (face_explorer.Init(angle_tool.Result(),TopAbs_FACE); face_explorer.More(); face_explorer.Next())
 			{
 				process_face(TopoDS::Face(face_explorer.Current()), Factory, precision);
 			}
