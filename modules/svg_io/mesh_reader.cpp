@@ -31,7 +31,7 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/xml.h>
 #include <k3dsdk/nurbs.h>
-//#include <k3dsdk/gprim_factory.h>
+#include <stack>
 
 namespace module
 {
@@ -88,6 +88,7 @@ public:
 		factory = new k3d::gprim_factory(Mesh);
 		count = 0;
 
+        mstack.push(k3d::identity3D());
 		parse_graphics(xml_svg);
 		
 	}
@@ -113,11 +114,76 @@ private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
 	k3d::gprim_factory *factory;
 	int count;
+    std::stack<k3d::matrix4> mstack;
+
+	void add_point(k3d::point4 p)
+	{
+		factory->add_point(p*mstack.top());
+	}
 
 	void parse_graphics(const k3d::xml::element& xml_root)
 	{
 		for(k3d::xml::element::elements_t::const_iterator xml_obj = xml_root.children.begin(); xml_obj != xml_root.children.end(); ++xml_obj)
 		{
+			const std::string trans = k3d::xml::attribute_text(*xml_obj,"transform","none");
+			if(trans!="none")
+			{
+				k3d::matrix4 mat = k3d::identity3D();
+				std::istringstream trans_stream(trans);
+				float x,y;
+				char token;
+				char tmp;
+				while(!trans_stream.eof())
+				{
+					trans_stream >> token;
+					k3d::matrix4 tmp_mat = k3d::identity3D();
+					switch(token)
+					{
+					case 't':
+						trans_stream.ignore(9);
+						get_pair(x,y,trans_stream);
+						tmp_mat[3][0]=x;
+						tmp_mat[3][1]=y;
+						break;
+					case 'r':
+						trans_stream.ignore(6);
+						trans_stream >> x;
+						x = -k3d::radians(x);
+						tmp_mat[0][0] = cos(x);
+						tmp_mat[0][1] = -sin(x);
+						tmp_mat[1][0] = sin(x);
+						tmp_mat[1][1] = cos(x);
+						break;
+					case 's':
+						trans_stream >> token;
+						if(token=='k')
+						{
+							trans_stream.ignore(2);
+							trans_stream >> token;
+							trans_stream.ignore();
+							trans_stream >> x;
+							if(token=='X')
+								tmp_mat[1][0] = tan(k3d::radians(x));
+							else
+								tmp_mat[0][1] = tan(k3d::radians(x));
+						}
+						else
+						{
+							trans_stream.ignore(4);
+							trans_stream >> x;
+							tmp_mat[0][0] = x;
+							tmp_mat[1][1] = x;
+							break;
+						}
+						break;
+					}
+					
+					trans_stream.ignore(2);
+					mat =  tmp_mat * mat;
+				}
+				mstack.push(mat*mstack.top());
+			}
+
 			if(xml_obj->name == "path")
 				parse_path(*xml_obj);
 			if(xml_obj->name == "rect")
@@ -132,6 +198,8 @@ private:
                 parse_polyline(*xml_obj, false);
             if(xml_obj->name == "polygon")
                 parse_polyline(*xml_obj, true);
+			if(trans!="none")
+				mstack.pop();
 		}
 	}
 
@@ -155,10 +223,10 @@ private:
 				count++;
 			}
 			//rect.push_back(rect.front());
-			factory->add_point(k3d::point4(x,y,0,1));
-			factory->add_point(k3d::point4(x+w,y,0,1));
-			factory->add_point(k3d::point4(x+w,y+h,0,1));
-			factory->add_point(k3d::point4(x,y+h,0,1));
+			add_point(k3d::point4(x,y,0,1));
+			add_point(k3d::point4(x+w,y,0,1));
+			add_point(k3d::point4(x+w,y+h,0,1));
+			add_point(k3d::point4(x,y+h,0,1));
 			
 			//factory->add_curve(rect,2);
 			factory->add_polygon(rect);	
@@ -179,7 +247,7 @@ private:
 			{
 				points.push_back(count);
 				count++;
-				factory->add_point(k3d::point4(control_points[i][0]+x+rx, control_points[i][1]+y+ry, control_points[i][2],1));
+				add_point(k3d::point4(control_points[i][0]+x+rx, control_points[i][1]+y+ry, control_points[i][2],1));
 				weights.push_back(tmp_weights[i]);
 			}
 
@@ -190,7 +258,7 @@ private:
 			{
 				points.push_back(count);
 				count++;
-				factory->add_point(k3d::point4(tmx - (control_points[i][0]+x+rx), control_points[i][1]+y+ry,control_points[i][2],1));
+				add_point(k3d::point4(tmx - (control_points[i][0]+x+rx), control_points[i][1]+y+ry,control_points[i][2],1));
 				weights.push_back(tmp_weights[i]);
 				knots.push_back(knots[i]+2);
 			}
@@ -199,7 +267,7 @@ private:
 			{
 				points.push_back(count);
 				count++;
-				factory->add_point(k3d::point4(tmx - (control_points[i][0]+x+rx), tmy - (control_points[i][1]+y+ry),control_points[i][2],1));
+				add_point(k3d::point4(tmx - (control_points[i][0]+x+rx), tmy - (control_points[i][1]+y+ry),control_points[i][2],1));
 				weights.push_back(tmp_weights[i]);
 				knots.push_back(knots[i]+4);
 			}
@@ -208,7 +276,7 @@ private:
 			{
 				points.push_back(count);
 				count++;
-				factory->add_point(k3d::point4(control_points[i][0]+x+rx, tmy - (control_points[i][1]+y+ry),control_points[i][2],1));
+				add_point(k3d::point4(control_points[i][0]+x+rx, tmy - (control_points[i][1]+y+ry),control_points[i][2],1));
 				weights.push_back(tmp_weights[i]);
 				knots.push_back(knots[i]+6);
 			}
@@ -263,7 +331,7 @@ private:
         {
             points.push_back(count);
             count++;
-            factory->add_point(k3d::point4(control_points[i][0]+cx, control_points[i][1]+cy, control_points[i][2],1));
+            add_point(k3d::point4(control_points[i][0]+cx, control_points[i][1]+cy, control_points[i][2],1));
             weights.push_back(tmp_weights[i]);
         }
 
@@ -290,8 +358,8 @@ private:
             knots.push_back(i);
             knots.push_back(i);
         }
-        factory->add_point(k3d::point4(x1,y1,0,1));
-        factory->add_point(k3d::point4(x2,y2,0,1));
+        add_point(k3d::point4(x1,y1,0,1));
+        add_point(k3d::point4(x2,y2,0,1));
 
         factory->add_nurbs_curve(2,points,knots,weights);
 
@@ -334,7 +402,7 @@ private:
             get_pair(x,y,def_stream);
             points.push_back(count);
             count++;
-            factory->add_point(k3d::point4(x,y,0,1));
+            add_point(k3d::point4(x,y,0,1));
             weights.push_back(1);
             i++;
         }
@@ -375,7 +443,7 @@ private:
 		last = first = count;
 		count++;
 		firstpoint = k3d::point4(x,y,0,1);
-		factory->add_point(firstpoint);
+		add_point(firstpoint);
 
 		while(!def_stream.eof())
 		{
@@ -401,7 +469,7 @@ private:
 					y+=lastpoint[1];
 				}
 				lastpoint = k3d::point4(x,y,0,1);
-				factory->add_point(lastpoint);
+				add_point(lastpoint);
 				last = points.back();
 				break;
 			case 'h':
@@ -415,7 +483,7 @@ private:
 				if(relative)
 					x+=lastpoint[0];
 				lastpoint = k3d::point4(x,lastpoint[1],0,1);
-				factory->add_point(lastpoint);
+				add_point(lastpoint);
 				last = points.back();
 				break;
 			case 'v':
@@ -429,7 +497,7 @@ private:
 				if(relative)
 					y+=lastpoint[1];
 				lastpoint = k3d::point4(lastpoint[0], y, 0, 1);
-				factory->add_point(lastpoint);
+				add_point(lastpoint);
 				last = points.back();
 				break;
 			case 'Z':
@@ -453,7 +521,7 @@ private:
 						x += lastpoint[0];
 						y += lastpoint[1];
 					}
-					factory->add_point(k3d::point4(x,y,0,1));
+					add_point(k3d::point4(x,y,0,1));
 					if(i==1)
 						slastpoint = k3d::point4(x,y,0,1);
 				}
@@ -466,7 +534,7 @@ private:
 				order = 4;
 				points.push_back(count);
 				count++;
-				factory->add_point(k3d::point4(2*lastpoint[0]-slastpoint[0], 2*lastpoint[1]-slastpoint[1],0,1));
+				add_point(k3d::point4(2*lastpoint[0]-slastpoint[0], 2*lastpoint[1]-slastpoint[1],0,1));
 				for(int i=0; i<2; i++)
 				{
 					get_pair(x,y,def_stream);
@@ -477,7 +545,7 @@ private:
 						x+=lastpoint[0];
 						y+=lastpoint[1];
 					}
-					factory->add_point(k3d::point4(x,y,0,1));
+					add_point(k3d::point4(x,y,0,1));
 					if(i==0)
 						slastpoint = k3d::point4(x,y,0,1);
 				}
@@ -498,7 +566,7 @@ private:
 						x += lastpoint[0];
 						y += lastpoint[1];
 					}
-					factory->add_point(k3d::point4(x,y,0,1));
+					add_point(k3d::point4(x,y,0,1));
 					if(i==0)
 						slastpoint = k3d::point4(x,y,0,1);
 				}
@@ -512,7 +580,7 @@ private:
 				points.push_back(count);
 				count++;
 				slastpoint =k3d::point4(2*lastpoint[0]-slastpoint[0], 2*lastpoint[1]-slastpoint[1],0,1);
-				factory->add_point(slastpoint);
+				add_point(slastpoint);
 
 				get_pair(x,y,def_stream);
 				points.push_back(count);
@@ -522,7 +590,7 @@ private:
 					x+=lastpoint[0];
 					y+=lastpoint[1];
 				}
-				factory->add_point(k3d::point4(x,y,0,1));
+				add_point(k3d::point4(x,y,0,1));
 				lastpoint = k3d::point4(x,y,0,1);
 				last = points.back();
 				break;
