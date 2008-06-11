@@ -136,7 +136,7 @@ void merge_polyhedra(k3d::mesh& Output, const k3d::mesh& Input, bool SinglePolyh
   if (!SinglePolyhedron)
   {
     output_types.insert(output_types.end(), input_types.begin(), input_types.end());
-    extend_array(input_first_faces, output_first_faces, output_face_loop_counts.size());
+    extend_array(input_first_faces, output_first_faces, output_face_loop_counts.size() - input_face_first_loops.size());
     output_face_counts.insert(output_face_counts.end(), input_face_counts.begin(), input_face_counts.end());
     
   }

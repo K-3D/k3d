@@ -317,7 +317,7 @@ private:
 				end = end > edge_count ? edge_count : end;
 				k3d::uint_t start_index = visitor.edge_starts[start];
 				k3d::uint_t end_index = end == edge_count ? visitor.points_array.size() : visitor.edge_starts[end];
-				for (k3d::uint_t i = start_index; i != end_index; ++i)
+				for (k3d::uint_t i = start_index; i < end_index; ++i)
 				{
 					k3d::gl::vertex3d(visitor.points_array[i]);
 				}
@@ -352,7 +352,7 @@ private:
 			k3d::uint_t start_index = visitor.edge_starts[edge];
 			k3d::uint_t end_index = edge == (edge_count-1) ? visitor.points_array.size() : visitor.edge_starts[edge+1];
 			glBegin(GL_LINES);
-			for (k3d::uint_t i = start_index; i != end_index; ++i)
+			for (k3d::uint_t i = start_index; i < end_index; ++i)
 			{
 				k3d::gl::vertex3d(visitor.points_array[i]);
 			}
