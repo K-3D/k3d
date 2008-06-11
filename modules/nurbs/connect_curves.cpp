@@ -203,7 +203,7 @@ namespace module
 			k3d::point3 p2 = mesh_points[point2];
 			
 			k3d::point3 new_point = (p1 + p2); //middle of the 2 points
-			new_point*=0.5;
+			new_point*=0.5;//has to be calculated according to ending tangential vectors
 			
 			size_t newIndex = mesh_points.size();
 			mesh_points.push_back(new_point);
