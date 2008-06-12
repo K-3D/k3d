@@ -29,8 +29,10 @@ namespace k3d
 {
 
 mesh_simple_deformation_modifier::mesh_simple_deformation_modifier(iplugin_factory& Factory, idocument& Document) :
-	base(Factory, Document)
+	base(Factory, Document),
+	m_selection_changed(false)
 {
+	m_mesh_selection.changed_signal().connect(sigc::mem_fun(*this, &mesh_simple_deformation_modifier::on_selection_changed));
 }
 
 void mesh_simple_deformation_modifier::on_create_mesh(const mesh& Input, mesh& Output)
@@ -46,7 +48,11 @@ void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& O
 		return;
 	return_if_fail(Input.points->size() == Output.points->size());
 
-	merge_selection(m_mesh_selection.pipeline_value(), Output);
+	if(m_selection_changed)
+	{
+		merge_selection(m_mesh_selection.pipeline_value(), Output);
+		m_selection_changed = false;
+	}
 	return_if_fail(Output.point_selection);
 	return_if_fail(Output.point_selection->size() == Output.points->size());
 
@@ -56,6 +62,11 @@ void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& O
 	mesh::points_t& output_points = *make_unique(Output.points);
 
 	on_deform_mesh(input_points, selection, output_points);
+}
+
+void mesh_simple_deformation_modifier::on_selection_changed(iunknown* Hint)
+{
+	m_selection_changed = true;
 }
 
 } // namespace k3d
