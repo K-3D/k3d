@@ -40,7 +40,7 @@
 // split the entry functions for timing reasons
 extern "C" void CUDA_initialize_device();
 extern "C" void bitmap_copy_data_from_host_to_device(const unsigned short *input, int width, int height);
-extern "C" void bitmap_arithmetic_kernel_entry(int operation, int width, int height, float value);
+extern "C" void bitmap_arithmetic_kernel_entry(int operation, unsigned short* p_deviceImage, int width, int height, float value);
 extern "C" void bitmap_color_monochrome_kernel_entry(int width, int height, float redWeight, float greenWeight, float blueWeight);
 extern "C" void bitmap_copy_data_from_device_to_host(unsigned short *output, int width, int height);
 extern "C" void CUDA_cleanup();
@@ -50,7 +50,7 @@ extern "C" void apply_linear_transform_to_point_data ( float *device_points, flo
 extern "C" void allocate_device_memory ( void** device_pointer, int size_in_bytes );
 extern "C" void copy_from_host_to_device ( void* device_pointer, const void* host_pointer, int size_in_bytes );
 extern "C" void copy_from_device_to_host ( void* host_pointer, const void* device_pointer, int size_in_bytes );
-extern "C" void free_cuda_pointer ( void* device_pointer );
+extern "C" void free_device_memory ( void* device_pointer );
 extern "C" void allocate_pinned_host_memory ( void** pointer_on_host, size_t size_in_bytes );
 extern "C" void free_pinned_host_memory ( void* pointer_on_host );
 

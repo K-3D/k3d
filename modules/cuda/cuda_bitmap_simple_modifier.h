@@ -24,6 +24,8 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/ipipeline_profiler.h>
 
+// include the entry points as external definitions
+#include "cuda_entry_points.h"
 
 namespace module
 {
@@ -31,14 +33,14 @@ namespace module
 namespace cuda
 {
 
-class simple_modifier :
+class cuda_bitmap_simple_modifier :
 	public k3d::node,
-	public k3d::bitmap_modifier<simple_modifier>
+	public k3d::bitmap_modifier<cuda_bitmap_simple_modifier>
 {
 	typedef k3d::node base;
 
 public:
-	simple_modifier(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	cuda_bitmap_simple_modifier(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
@@ -52,7 +54,38 @@ protected:
     {
         document().pipeline_profiler().finish_execution(*this, Task);
     }
-
+	
+	void bitmap_arithmetic(const k3d::bitmap& Input, k3d::bitmap& Output, const k3d::int32_t bitmapOperation, float value)
+	{
+		// intialize CUDA - should check for errors etc
+		CUDA_initialize_device();
+		const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
+		unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));
+		k3d::int32_t sizeInBytes = Input.width()*Input.height()*8;
+		
+		start_profile_step();
+		
+		// allocate device storage for the image at 8 bits per pixel
+		unsigned short *p_device_image;
+		allocate_device_memory((void**)&p_device_image, sizeInBytes);
+		// copy the data to the device		
+		copy_from_host_to_device(p_device_image, inputPixels, sizeInBytes);  		
+		stop_profile_step(PROFILE_STRING_HOST_TO_DEVICE);
+		
+		// perform the calculation
+		start_profile_step();
+		bitmap_arithmetic_kernel_entry(bitmapOperation, p_device_image, Input.width(), Input.height(), value);
+		stop_profile_step(PROFILE_STRING_EXECUTE_KERNEL);
+		
+		// copy the data from the device
+		start_profile_step();
+		copy_from_device_to_host(outputPixels, p_device_image, sizeInBytes);
+		stop_profile_step(PROFILE_STRING_DEVICE_TO_HOST);
+		
+		// free the memory allocated on the device
+		free_device_memory(p_device_image);			
+	} 
+	
 private:
 	virtual void on_create_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{

@@ -22,13 +22,9 @@
 */
 
 #include "cuda_bitmap_simple_modifier.h"
-#include <k3dsdk/high_res_timer.h>
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
-
-// include the entry points as external definitions
-#include "cuda_entry_points.h"
 
 namespace module
 {
@@ -40,17 +36,14 @@ namespace cuda
 // cuda_multiply
 
 class cuda_bitmap_multiply :
-	public simple_modifier
+	public cuda_bitmap_simple_modifier
 {
-	typedef simple_modifier base;
+	typedef cuda_bitmap_simple_modifier base;
 
 public:
 	cuda_bitmap_multiply(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_value(init_owner(*this) + init_name("value") + init_label(_("Multiplicand")) + init_description(_("Multiply each pixel component with this value")) + init_value(1.0)),
-		m_host_to_device_time(init_owner(*this) + init_name("host_to_device_time") + init_label(_("Host to device time")) + init_description(_("Timer for measuring host to device transfer time")) + init_value(0.0)),
-		m_kernel_time(init_owner(*this) + init_name("kernel_time") + init_label(_("Kernel time")) + init_description(_("Timer for measuring kernel execution time")) + init_value(0.0)),
-		m_device_to_host_time(init_owner(*this) + init_name("device_to_host_time") + init_label(_("Device to host time")) + init_description(_("Timer for measuring device to host transfer time")) + init_value(0.0))
+		m_value(init_owner(*this) + init_name("value") + init_label(_("Multiplicand")) + init_description(_("Multiply each pixel component with this value")) + init_value(1.0))
 	{
 		m_value.changed_signal().connect(make_update_bitmap_slot());
 	}
@@ -58,36 +51,7 @@ public:
 
 	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
-		k3d::timer timer;
-		const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
-		unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));
-		
-		// intialize CUDA - should check for errors etc
-		CUDA_initialize_device();
-		
-        // copy the data to the device
-        start_profile_step();
-		timer.restart();
-		bitmap_copy_data_from_host_to_device(inputPixels, Input.width(), Input.height());
-		m_host_to_device_time.set_value(timer.elapsed());
-        stop_profile_step(PROFILE_STRING_HOST_TO_DEVICE);
-
-        // perform the calculation
-        start_profile_step();
-		timer.restart();
-		bitmap_arithmetic_kernel_entry(CUDA_BITMAP_MULTIPLY, Input.width(), Input.height(), (float)(m_value.pipeline_value()));
-		m_kernel_time.set_value(timer.elapsed());
-        stop_profile_step(PROFILE_STRING_EXECUTE_KERNEL);		
-
-        // copy the data from the device
-        start_profile_step();
-		timer.restart();
-		bitmap_copy_data_from_device_to_host(outputPixels, Input.width(), Input.height());
-		m_device_to_host_time.set_value(timer.elapsed());
-        stop_profile_step(PROFILE_STRING_DEVICE_TO_HOST);
-
-		// cleanup the memory allocated on the device
-		CUDA_cleanup();
+		bitmap_arithmetic(Input, Output, CUDA_BITMAP_MULTIPLY, (float)(m_value.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -106,14 +70,10 @@ public:
 
 private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_value;
-	// private member containers for timing measurements
-	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, with_serialization) m_host_to_device_time;
-	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, with_serialization) m_kernel_time;
-	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, with_serialization) m_device_to_host_time;
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// cuda_multiply
+// cuda_bitmap_multiply
 
 k3d::iplugin_factory& cuda_bitmap_multiply_factory()
 {

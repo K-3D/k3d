@@ -38,7 +38,7 @@ extern "C" void bitmap_copy_data_from_host_to_device(const unsigned short *input
 }
 
 /// entry point for the CUDA version of the BitmapAdd BitmapSubtract and BitmapMultiply plugin
-extern "C" void bitmap_arithmetic_kernel_entry(int operation, int width, int height, float value)
+extern "C" void bitmap_arithmetic_kernel_entry(int operation, unsigned short* p_deviceImage, int width, int height, float value)
 {
     // allocate the blocks and threads
     dim3 threads_per_block(8, 8);
@@ -48,15 +48,15 @@ extern "C" void bitmap_arithmetic_kernel_entry(int operation, int width, int hei
 	{
     	case CUDA_BITMAP_ADD:
     		// execute the add
-    		add_kernel<<< blocks_per_grid, threads_per_block >>> (d_image, width, height, value);
+    		add_kernel<<< blocks_per_grid, threads_per_block >>> ((ushort4*)p_deviceImage, width, height, value);
     		break;
     	case CUDA_BITMAP_MULTIPLY:
     		// execute the multiply kernel
-    		multiply_kernel<<< blocks_per_grid, threads_per_block >>> (d_image, width, height, value);
+    		multiply_kernel<<< blocks_per_grid, threads_per_block >>> ((ushort4*)p_deviceImage, width, height, value);
     		break;
     	case CUDA_BITMAP_SUBTRACT:
     		// execute the add kernel with value negated
-    		add_kernel<<< blocks_per_grid, threads_per_block >>> (d_image, width, height, -value);
+    		add_kernel<<< blocks_per_grid, threads_per_block >>> ((ushort4*)d_image, width, height, -value);
     		break;
     	default:
     		// unknown operation
@@ -147,7 +147,7 @@ extern "C" void copy_from_device_to_host ( void* host_pointer, const void* devic
 	CUDA_SAFE_CALL(cudaMemcpy(host_pointer, device_pointer, size_in_bytes, cudaMemcpyDeviceToHost));	
 }
 
-extern "C" void free_cuda_pointer ( void* device_pointer )
+extern "C" void free_device_memory ( void* device_pointer )
 {
 	CUDA_SAFE_CALL(cudaFree(device_pointer));			
 }
@@ -218,6 +218,6 @@ extern "C" void test_stream_implementation ( double *InputPoints, double *PointS
     	cudaStreamDestroy(streams[i]);
 	}
 	
-	free_cuda_pointer(device_points);
+	free_device_memory(device_points);
 }
 

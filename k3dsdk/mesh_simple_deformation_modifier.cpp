@@ -47,12 +47,14 @@ void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& O
 	if(!Output.points)
 		return;
 	return_if_fail(Input.points->size() == Output.points->size());
-
+	
+	document().pipeline_profiler().start_execution(*this, "on_update_mesh::merge_selection");
 	if(m_selection_changed)
 	{
 		merge_selection(m_mesh_selection.pipeline_value(), Output);
 		m_selection_changed = false;
 	}
+	document().pipeline_profiler().finish_execution(*this, "on_update_mesh::merge_selection");
 	return_if_fail(Output.point_selection);
 	return_if_fail(Output.point_selection->size() == Output.points->size());
 
