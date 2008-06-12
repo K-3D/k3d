@@ -29,6 +29,7 @@
 #include "inode.h"
 #include "ipersistent.h"
 #include "iselectable.h"
+#include "metadata.h"
 #include "persistent_property_collection.h"
 #include "property_collection.h"
 #include "result.h"
@@ -46,6 +47,7 @@ class node :
 	public iselectable,
 	public property_collection,
 	public persistent_property_collection,
+	public metadata,
 	public sigc::trackable
 {
 public:

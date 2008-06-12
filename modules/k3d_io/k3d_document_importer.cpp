@@ -97,7 +97,7 @@ public:
 			if(k3d::xml::element* xml_nodes = k3d::xml::find_element(*xml_document, "nodes"))
 			{
 				k3d::inode_collection::nodes_t nodes;
-				std::vector<k3d::ipersistent*> persistent_nodes;
+				std::vector<k3d::inode*> persistent_nodes;
 				std::vector<k3d::xml::element*> node_storage;
 
 				for(k3d::xml::element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
@@ -156,7 +156,7 @@ public:
 					k3d::undoable_new(node, Document);
 
 					nodes.push_back(node);
-					persistent_nodes.push_back(persistent);
+					persistent_nodes.push_back(node);
 					node_storage.push_back(&(*xml_node));
 
 					persistent_lookup.insert_lookup(node_id, node);
@@ -164,10 +164,8 @@ public:
 
 				Document.nodes().add_nodes(nodes);
 
-				for(unsigned long i = 0; i != persistent_nodes.size(); ++i)
-				{
-					persistent_nodes[i]->load(*node_storage[i], context);
-				}
+				for(k3d::uint_t i = 0; i != persistent_nodes.size(); ++i)
+					k3d::xml::load(*persistent_nodes[i], *node_storage[i], context);
 			}
 
 			// Load the DAG ...

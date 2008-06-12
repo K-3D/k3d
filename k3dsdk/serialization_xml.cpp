@@ -27,6 +27,7 @@
 #include "imaterial.h"
 #include "imesh_painter_gl.h"
 #include "imesh_painter_ri.h"
+#include "imetadata.h"
 #include "inode.h"
 #include "inode_collection.h"
 #include "ipersistent_lookup.h"
@@ -1349,13 +1350,51 @@ void load_pipeline(idocument& Document, element& XML, const ipersistent::load_co
 
 void save(inode& Node, element& XML, const ipersistent::save_context& Context)
 {
+	// Save the basic node information ...
 	element& xml_node = XML.append(element("node",
 		attribute("name", Node.name()),
 		attribute("factory", Node.factory().factory_id()),
 		attribute("id", Context.lookup.lookup_id(&Node))));
 
+	// Save node metadata (if any) ...
+	if(imetadata* const metadata = dynamic_cast<imetadata*>(&Node))
+	{
+		xml::element& xml_metadata = xml_node.append(xml::element("metadata"));
+
+		const imetadata::metadata_t& pairs = metadata->get_metadata();
+		for(imetadata::metadata_t::const_iterator pair = pairs.begin(); pair != pairs.end(); ++pair)
+			xml_metadata.append(xml::element("pair", xml::attribute("name", pair->first), xml::attribute("value", pair->second)));
+	}
+
+	// Allow the node to save the rest of its internal state ...
 	if(ipersistent* const persistent = dynamic_cast<ipersistent*>(&Node))
 		persistent->save(xml_node, Context);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// load
+
+void load(inode& Node, element& XML, const ipersistent::load_context& Context)
+{
+	// Load (optional) node metadata ...
+	if(xml::element* const xml_metadata = xml::find_element(XML, "metadata"))
+	{
+		imetadata::metadata_t pairs;
+		for(xml::element::elements_t::const_iterator xml_pair = xml_metadata->children.begin(); xml_pair != xml_metadata->children.end(); ++xml_pair)
+		{
+			if(xml_pair->name != "pair")
+				continue;
+
+			pairs.insert(std::make_pair(xml::attribute_text(*xml_pair, "name"), xml::attribute_text(*xml_pair, "value")));
+		}
+
+		if(imetadata* const metadata = dynamic_cast<imetadata*>(&Node))
+			metadata->set_metadata(pairs);
+	}
+
+	// Allow the node to load the rest of its internal state ...
+	if(ipersistent* const persistent = dynamic_cast<ipersistent*>(&Node))
+		persistent->load(XML, Context);
 }
 
 namespace detail
