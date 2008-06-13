@@ -164,11 +164,11 @@ namespace module{
           light_t* getPreviewLight(){return currentLight;}
           lightShader_t* getPreviewLShader(){return currentLShader;}
 	 
-	  void addRmanEngine(rManEngine_t* e){availibleEngines.push_back(e); k3d::log() << "add: " << availibleEngines.size() << std::endl;}
-	  void removeRmanEngine(rManEngine_t* e){availibleEngines.remove(e); k3d::log() << "del: " << availibleEngines.size() << std::endl; }
+	  void addRmanEngine(rManEngine_t* e){availibleEngines.push_back(e);}
+	  void removeRmanEngine(rManEngine_t* e){availibleEngines.remove(e);}
 
-	  void addGeo(geo_t* g){availibleGeo.push_back(g); k3d::log() << "addgeo: " << availibleGeo.size() << std::endl;}
-	  void removeGeo(geo_t* g){availibleGeo.remove(g); k3d::log() << "delgeo: " << availibleGeo.size() << std::endl; }
+	  void addGeo(geo_t* g){availibleGeo.push_back(g);}
+	  void removeGeo(geo_t* g){availibleGeo.remove(g);}
 	  
 	  //Find Availible RMan Engine Using Ptr
 	  bool findRmanEngine(rManEngine_t* e)
