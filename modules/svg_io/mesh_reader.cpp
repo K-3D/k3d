@@ -176,6 +176,20 @@ private:
 							break;
 						}
 						break;
+					case 'm':
+						trans_stream.ignore(6);
+						trans_stream >> tmp_mat[0][0];
+						trans_stream.ignore();
+						trans_stream >> tmp_mat[0][1];
+						trans_stream.ignore();
+						trans_stream >> tmp_mat[1][0];
+						trans_stream.ignore();
+						trans_stream >> tmp_mat[1][1];
+						trans_stream.ignore();
+						trans_stream >> tmp_mat[3][0];
+						trans_stream.ignore();
+						trans_stream >> tmp_mat[3][1];
+						trans_stream.ignore();
 					}
 					
 					trans_stream.ignore(2);
@@ -206,7 +220,9 @@ private:
 	void parse_rect(const k3d::xml::element& xml_obj)
 	{	
 		double x, y, w, h, rx, ry;
-		k3d::mesh::indices_t rect;
+		k3d::mesh::weights_t weights;
+		k3d::mesh::knots_t knots;
+		k3d::mesh::indices_t points;
 
         x = k3d::xml::attribute_value<double>(xml_obj, "x", 0);
         y = k3d::xml::attribute_value<double>(xml_obj, "y", 0);
@@ -219,17 +235,21 @@ private:
 		{
 			for(int i=0; i<4; i++)
 			{
-				rect.push_back(count);
+				points.push_back(count);
 				count++;
+				weights.push_back(1);
+				knots.push_back(2*i);
+				knots.push_back(2*i+1);
 			}
-			//rect.push_back(rect.front());
+			points.push_back(points.front());
+			weights.push_back(1);
+			knots.push_back(8);
+			knots.push_back(9);
 			add_point(k3d::point4(x,y,0,1));
 			add_point(k3d::point4(x+w,y,0,1));
 			add_point(k3d::point4(x+w,y+h,0,1));
 			add_point(k3d::point4(x,y+h,0,1));
-			
-			//factory->add_curve(rect,2);
-			factory->add_polygon(rect);	
+			factory->add_nurbs_curve(2,points,knots,weights);
 		}
 		else
 		{
@@ -237,9 +257,7 @@ private:
 				ry = rx;
 			std::vector<double> tmp_weights;
 			std::vector<k3d::point3> control_points;
-			k3d::mesh::knots_t knots;
-			k3d::mesh::indices_t points;
-			k3d::mesh::weights_t weights;
+			
 			k3d::nurbs::circular_arc(k3d::point3(-rx, 0, 0), k3d::point3(0, -ry, 0), 0, k3d::pi()/2, 1, knots, tmp_weights, control_points);
 			return_if_fail(tmp_weights.size() == control_points.size());
 
