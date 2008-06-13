@@ -15,8 +15,11 @@
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/label.h>
 #include <gtkmm/comboboxtext.h>
+
 #include <gtkmm/entry.h>
 #include <gtk/gtkmain.h>
+
+#include <k3dsdk/ngui/spin_button.h>
 
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
@@ -52,9 +55,11 @@
 #include <k3dsdk/properties.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/property_collection.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/user_property_changed_signal.h>
 #include <k3dsdk/signal_system.h>
+#include <k3dsdk/inode_change_signal.h>
 
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/iunknown.h>
@@ -69,10 +74,18 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_ri.h>
 
+#include <k3dsdk/data.h>
+#include <k3dsdk/icommand_node.h>
+#include <k3dsdk/istate_recorder.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/measurement.h>
+
 #include <k3dsdk/log.h>
 #include <iostream>
 
 using namespace libk3dngui;
+using namespace k3d::data;
 
 namespace module{
 
@@ -89,18 +102,51 @@ namespace module{
         typedef k3d::inode /*k3d::itransform_sink*/ geo_t;
 
 	const k3d::string_t shaderImgFile = "k3d_shader_preview.tiff";
+	const k3d::string_t holderImgFile = "sp_noShaderSelected.png";
+	const k3d::string_t initRManEngine = "sPreview::RenderManEngine";
+
 	typedef std::vector<sigc::connection> connections_t;
 
         // [sPreviewModel]*********************************************************************************
-
-        //Model Constants
+	
+	//Model Constants
         const k3d::uint_t dPSize = 120;
+
+
+	class pSizeModel : public spin_button::imodel{
+	  pSizeModel()
+	  {
+	    //Set Default Value
+	    this->set_value(dPSize);
+	  }
+
+	  virtual ~pSizeModel()
+	  {
+	  }
+
+	  virtual void set_value (const k3d::double_t Value)
+	  {
+	    pSize = Value;
+	  }
+
+	public:
+	  //Preview Dimensions
+	  /* k3d::uint_t*/ k3d::double_t pSize;
+ 
+	};
 
         class sPreviewModel{
         public:
+          sPreviewModel() 
+	    :engineUsed(0)	     
+	  {
+	    //Default The PDimensions
+	    pSize = dPSize;
+	  }
 
-          sPreviewModel();
-          ~sPreviewModel();
+          ~sPreviewModel()
+	  {
+	  }
 
           void setPreviewSize(const k3d::uint_t &s){pSize  = s;}
           void setPreviewEngine(rManEngine_t* const e){engineUsed = e;}
@@ -118,9 +164,64 @@ namespace module{
           light_t* getPreviewLight(){return currentLight;}
           lightShader_t* getPreviewLShader(){return currentLShader;}
 	 
-        private:
+	  void addRmanEngine(rManEngine_t* e){availibleEngines.push_back(e); k3d::log() << "add: " << availibleEngines.size() << std::endl;}
+	  void removeRmanEngine(rManEngine_t* e){availibleEngines.remove(e); k3d::log() << "del: " << availibleEngines.size() << std::endl; }
+
+	  void addGeo(geo_t* g){availibleGeo.push_back(g); k3d::log() << "addgeo: " << availibleGeo.size() << std::endl;}
+	  void removeGeo(geo_t* g){availibleGeo.remove(g); k3d::log() << "delgeo: " << availibleGeo.size() << std::endl; }
+	  
+	  //Find Availible RMan Engine Using Ptr
+	  bool findRmanEngine(rManEngine_t* e)
+	  {
+	    std::list<rManEngine_t*>::const_iterator iter = availibleEngines.begin();
+	    for(; iter != availibleEngines.end(); iter++){
+	      if((*iter) == e)
+		return true;
+	    }//for
+
+	    return false; //No RMan Engine Found
+	  }
+
+	  //Find RenderMan Engine Based On Name
+	  rManEngine_t* findRmanEngine(k3d::string_t str)
+	  {
+	    std::list<rManEngine_t*>::const_iterator iter = availibleEngines.begin();
+	    for(; iter != availibleEngines.end(); iter++){
+	      k3d::inode* rmanEngineNode = dynamic_cast<k3d::inode*>(*iter);
+	      if(rmanEngineNode->name() == str)
+		{
+		  return (*iter);
+		}//if
+	    }//for
+
+	    return 0;
+	  }
+
+	  //Used For Node Delete And List Reset
+	  rManEngine_t* getFirstRManEngine()
+	  {
+	    return (availibleEngines.front());
+	  }
+
+	  //Create Copies Of PRIVATE Containers
+	  std::list<rManEngine_t*> getAvailibleRManEngines(){
+	    return availibleEngines;
+	  }
+
+	  std::list<geo_t*> getAvailibleGeo(){
+	    return availibleGeo;
+	  }
+
           //Preview Dimensions
-          k3d::uint_t pSize; 
+	  k3d::uint_t pSize; 
+	  
+
+	private:
+	  //List Of Availible RMan Engines
+	  std::list<rManEngine_t*> availibleEngines;
+
+	  //List Of Availible Geometry
+	  std::list<geo_t*> availibleGeo;
 
           //Render Engine & Camera Used For Preview
           rManEngine_t *engineUsed;
@@ -137,23 +238,13 @@ namespace module{
           k3d::filesystem::path previewImagePath;
 
 	public:
-	  //Property Signal connections
+	  //Property Signal connection
+	  sigc::connection m_pConnection;
+
 	  connections_t propertyConnections;
 	  sigc::signal<void, k3d::iunknown*> m_changed_signal;
 
         };//sPreviewModel
-        
-        
-        sPreviewModel::sPreviewModel() :engineUsed(0)
-	{
-          //Default The PDimensions
-          pSize = dPSize;
-
-        }//sPreviewModel()
-
-        sPreviewModel::~sPreviewModel()
-	{
-        }//~sPreviewModel
 
         // [/sPreviewModel]***************************************************************************
 
@@ -173,6 +264,7 @@ namespace module{
 
         public:
           k3d::filesystem::path imgFilePath;
+	  k3d::filesystem::path imgHolderPath;
 
         protected:
           //Override default signal handler:
@@ -184,7 +276,10 @@ namespace module{
         shaderPreviewImage::shaderPreviewImage(k3d::filesystem::path _imgPath)
 	{
           imgFilePath = _imgPath;
-	  
+
+	  //Define Location of image holder (if no render preview file found)
+	  imgHolderPath = k3d::share_path() / k3d::filesystem::generic_path("ngui/rasterized") 
+	    / k3d::filesystem::generic_path(holderImgFile);
         }
 
         shaderPreviewImage::~shaderPreviewImage()
@@ -193,11 +288,26 @@ namespace module{
 
         bool shaderPreviewImage::on_expose_event(GdkEventExpose* event)
         {
-          //Glib::FileError Exception catch needs putting in here. So if image dont exist load default image
+	  try
+	    {
           Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_file(imgFilePath.native_filesystem_string());
           image->render_to_drawable(get_window(), get_style()->get_black_gc(),
                                     0, 0, 10, 10, image->get_width(), image->get_height(),
                                     Gdk::RGB_DITHER_NONE, 0, 0);
+	  }
+	  catch(Glib::FileError)
+	    {
+	      //No Image File. Display Default Image Holder
+	      Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_file(imgHolderPath.native_filesystem_string());
+	      image->render_to_drawable(get_window(), get_style()->get_black_gc(),
+                                    0, 0, 10, 10, image->get_width(), image->get_height(),
+					Gdk::RGB_DITHER_NONE, 0, 0);
+	    }
+	  catch(Glib::Error)
+	    {
+
+	      //Should not hopefully Get Here!
+	    }
 
           return true;
 
@@ -209,11 +319,12 @@ namespace module{
 
         class implementation : public libk3dngui::asynchronous_update{
         public:
-          implementation(document_state& DocumentState) :
+          implementation(document_state& DocumentState, k3d::icommand_node& Parent) :
             m_document_state(DocumentState),
             m_model(new sPreviewModel),
             previewArea(0),
 	    piIntervalUpdate(250)
+	    //size_k3dField(Parent, k3d::string_t("psize_field"),spin_button::model(property),) //Init pSize Spin GUI Widget
 	  {
 		
             //Setup the Window
@@ -225,7 +336,9 @@ namespace module{
             k3d::filesystem::path imgPath = k3d::system::get_temp_directory();
 	    imgPath = imgPath / k3d::filesystem::generic_path(shaderImgFile);
 	    m_model->setPreviewImagePath(imgPath);
-
+	    
+	    //Ensure Preview Image Is Deleted From File System
+	    deletePImage();
 
             //Create A New Drawer Widget Using Path
             previewArea = new shaderPreviewImage(m_model->getPreviewImagePath());
@@ -238,13 +351,13 @@ namespace module{
 
             // Reset the Renderer combo contents anytime the document node collection changes
             m_document_state.document().nodes().add_nodes_signal()
-              .connect(sigc::mem_fun(*this, &implementation::on_renderNode_added));
+              .connect(sigc::mem_fun(*this, &implementation::on_node_added));
 
             m_document_state.document().nodes().remove_nodes_signal()
-              .connect(sigc::mem_fun(*this, &implementation::on_renderNode_removed));
+              .connect(sigc::mem_fun(*this, &implementation::on_node_removed));
 
             m_document_state.document().nodes().rename_node_signal()
-              .connect(sigc::mem_fun(*this, &implementation::on_renderNode_renamed));
+              .connect(sigc::mem_fun(*this, &implementation::on_node_renamed));
 
             renderCombo.signal_changed()
               .connect(sigc::mem_fun(*this, &implementation::onRenderComboSelect));
@@ -266,6 +379,44 @@ namespace module{
 
 	    m_model->m_changed_signal.connect(sigc::mem_fun(*this, &implementation::propertySignalRender));
 
+	    //Find if any nodes selected when panel launches
+	    k3d::inode_collection::nodes_t::const_iterator nodeIter = m_document_state.document().nodes().collection().begin();
+	    bool selectedResult = false;
+	    
+	    for(nodeIter; nodeIter != m_document_state.document().nodes().collection().end(); ++nodeIter){
+	      
+	      //Check For Existing RManEngine Nodes
+	      if((*nodeIter)->factory().implements(typeid(k3d::irender_camera_frame))){
+		rManEngine_t* rManEngineNode = dynamic_cast<rManEngine_t*>(*nodeIter);
+		if(rManEngineNode)
+		  m_model->addRmanEngine(rManEngineNode);
+		
+	      }//if
+
+	      //Check if selected
+	      selectedResult = m_document_state.is_selected((*nodeIter));
+	      if(selectedResult){
+	     
+		//Call Check & Render on selected node
+		bool isMat = on_node_selection((*nodeIter));
+		//if(isMat)
+		  // break;
+
+	      }//if
+
+	    }//for
+
+
+	    
+
+	    k3d::istate_recorder* const state_recorder = &m_document_state.document().state_recorder();
+
+	    //k3d::iproperty *test = k3d::property::create(0, typeid(k3d::uint_t), "test", "this_test", "description_test", dPSize);
+	    
+	    //spin_button::control size_k3dField(Parent, k3d::string_t("test"), spin_button::model(m_model->m_pSize), state_recorder);
+
+
+
             schedule_update();
           }
 
@@ -274,11 +425,26 @@ namespace module{
             //Clean Up Dynamic Memory Allocation
             if(previewArea)
               delete previewArea;
+
+	    //Remove Preview Render from tmp dir
+	    deletePImage();
+
+	    //Disconnect Any Existing Connection With Properties
+	    m_model->m_pConnection.disconnect();
+
+	    //Remove Required Panel Document Nodes
+
           }
 
 	  //Property Signal Change -> Render Init Wrapper
 	  void propertySignalRender(k3d::iunknown* t){
 	    this->renderPreview();
+	  }
+
+	  //Delete Preview Image From FileSystem
+	  void deletePImage(){
+	    //Remove Preview Render from tmp dir
+	    k3d::filesystem::remove(m_model->getPreviewImagePath());
 	  }
 
           /// Updates the contents of the control
@@ -294,9 +460,9 @@ namespace module{
 	  void renderPreview();
 
           //Signal Responders
-          void on_renderNode_added(const k3d::inode_collection::nodes_t& Nodes);
-          void on_renderNode_removed(const k3d::inode_collection::nodes_t& Nodes);
-          void on_renderNode_renamed(k3d::inode* const Node);
+          void on_node_added(const k3d::inode_collection::nodes_t& Nodes);
+          void on_node_removed(const k3d::inode_collection::nodes_t& Nodes);
+          void on_node_renamed(k3d::inode* const Node);
 
           void onRenderComboSelect();
           void onGeoComboSelect();
@@ -320,6 +486,9 @@ namespace module{
           Gtk::Label sizeLabel;
           Gtk::HBox dim_c;
           Gtk::Entry sizeField;
+
+	  //spin_button::control size_k3dField;
+
 	  Gtk::Frame previewFrame;
 	  
 	  //Preview Image Update Interval
@@ -468,6 +637,8 @@ namespace module{
                                  (k3d::plugin::create("Sphere", 
                                                       m_document_state.document(), 
                                                       "sPreview::Geo::Sphere")));
+	  //Add All Geometry To m_model
+	  m_model->addGeo(m_model->getPreviewGeo());
 
           k3d::property::set_internal_value(*(m_model->getPreviewGeo()), 
                                             "render_shadows", false);
@@ -479,7 +650,7 @@ namespace module{
           m_model->setPreviewEngine(dynamic_cast<rManEngine_t*>
                                     (k3d::plugin::create("RenderManEngine", 
                                                          m_document_state.document(), 
-                                                         "sPreview::RenderManEngine")));
+							 initRManEngine)));
 
           k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
                                             "enabled_lights", 
@@ -516,27 +687,35 @@ namespace module{
 	//This invoked when node selection changes
 	bool implementation::on_node_selection(k3d::inode* const Node)
 	{
+
+	  //return result (if RMAN Material)
+	  bool result = false;
+
 	  //Check If Node Is A RenderMan Material
 	  if((Node)->factory().implements(typeid(k3d::ri::imaterial))){
+
+	    //It Is A RMAN Material!
+	    result = true;
 
 	    //If it is, assign to current geometry as surface shader
 	    k3d::property::set_internal_value(*(m_model->getPreviewGeo()), 
 					      "material", Node);
 
-	    //Clear Property Connections 
-	    for(connections_t::iterator cIter = m_model->propertyConnections.begin(); cIter != m_model->propertyConnections.end(); cIter++)
-	      cIter->disconnect();
-	    m_model->propertyConnections.clear();
+	    //Disconnect Any Existing Connection With Properties
+	    m_model->m_pConnection.disconnect();
 
-	if(k3d::inode_change_signal* const node_change_signal = dynamic_cast<k3d::inode_change_signal*>(Node))
-		m_model->propertyConnections.push_back(node_change_signal->connect_node_changed_signal(m_model->m_changed_signal.make_slot()));		
+	    //Create Connection For Node Change
+	    k3d::inode_change_signal *n_sig = dynamic_cast<k3d::inode_change_signal*>(Node);
+
+	    if(n_sig)
+	      m_model->m_pConnection =  n_sig->connect_node_changed_signal(sigc::mem_fun(*this, &implementation::propertySignalRender));
 
 	    //Render A Preview Image
-	    // renderPreview();
+	    renderPreview();
 
 	  }//if
 
-	  return false;
+	  return result;
 
 	}//on_node_selection
 
@@ -573,12 +752,22 @@ namespace module{
           sizeField.set_text(Glib::ustring(boost::lexical_cast<k3d::string_t>(m_model->getPreviewSize())));
  
 	  //Update Combo Boxes (Renderer & Geometry)
+	  std::list<rManEngine_t*> enginesCopy =  m_model->getAvailibleRManEngines();
 
-	  //Following temp untill more important stuff done
+	  std::list<rManEngine_t*>::const_iterator engineIter = enginesCopy.begin();
+	  for(; engineIter != enginesCopy.end(); engineIter++)
+	    renderCombo.append_text((dynamic_cast<k3d::inode*>(*engineIter))->name());
+
+	  //This Will Work As Always Initial RMAN Engine Is One Created
+	  renderCombo.set_active_text(initRManEngine);
+
+	  std::list<geo_t*> geoCopy = m_model->getAvailibleGeo();
+	  std::list<geo_t*>::const_iterator geoIter = geoCopy.begin();
+	  for(; geoIter != geoCopy.end(); geoIter++)
+	    geoCombo.append_text((dynamic_cast<k3d::inode*>(*geoIter))->name());
+
+	  //Set Geo Active Text To Current Geo Selection
 	  k3d::inode *pGeo = m_model->getPreviewGeo();
-	  renderCombo.append_text(Glib::ustring("sPreview::RenderManEngine"));
-	  renderCombo.set_active_text(Glib::ustring("sPreview::RenderManEngine"));
-	  geoCombo.append_text(Glib::ustring(pGeo->name()));
 	  geoCombo.set_active_text(Glib::ustring(pGeo->name()));
 
 	  k3d::uint_t pFrameSizer = m_model->getPreviewSize() + 22;
@@ -591,7 +780,12 @@ namespace module{
         //Called by the signal system when the render combo box selection gets changed
         void implementation::onRenderComboSelect()
 	{
-
+	  //Find RenderMan Engine Based On Name
+	 rManEngine_t* selectedRNode =  m_model->findRmanEngine(renderCombo.get_active_text());
+	 if(selectedRNode){
+	   m_model->setPreviewEngine(selectedRNode);
+	   //renderPreview();
+	 }//if
          
         }//onRenderComboSelect
 
@@ -623,31 +817,62 @@ namespace module{
 
 
         // Called by the signal system anytime any new nodes are added to the document
-	void implementation::on_renderNode_added(const k3d::inode_collection::nodes_t& Nodes)
+	void implementation::on_node_added(const k3d::inode_collection::nodes_t& Nodes)
 	{
+	  for(k3d::inode_collection::nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node){
+	    if((*node)->factory().implements(typeid(k3d::irender_camera_frame))){
+	      
+	      //Add To List Of Render Engines In Model
+	      m_model->addRmanEngine(dynamic_cast<rManEngine_t*>(*node));
 
-         
-          
-	}//on_renderNode_added
+	      //Add To Combo GUI Widget
+	      renderCombo.append_text((*node)->name());
+
+	    }//if
+	  }//for
+        
+	}//on_node_added
 
 
 	// Called by the signal system anytime renderer nodes are removed from document
-	void implementation::on_renderNode_removed(const k3d::inode_collection::nodes_t& Nodes)
+	void implementation::on_node_removed(const k3d::inode_collection::nodes_t& Nodes)
 	{
+	  for(k3d::inode_collection::nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node){
+	    //Check If RManEngine Is Known By m_model
+	    rManEngine_t *rmanNode = dynamic_cast<rManEngine_t*>(*node);
+	    bool result = m_model->findRmanEngine(rmanNode);
+	    if(result){
 
-         
-          
-	}//on_renderNode_removed
+	      //Remove RMan Node From m_model
+	      m_model->removeRmanEngine(rmanNode);
+
+	      //If Selected Is To Be Deleted Then Move To First Element in List
+	      if((*node)->name() == renderCombo.get_active_text()){
+
+		k3d::inode* rEngineNode = dynamic_cast<k3d::inode*>(m_model->getFirstRManEngine());
+		renderCombo.set_active_text(rEngineNode->name());
+		m_model->setPreviewEngine(m_model->getFirstRManEngine());
+
+	      }//if
+
+	      //Remove Node From GUI Widget
+	      renderCombo.remove_text((*node)->name());
+
+	    }//if
+
+	  }//for
+
+	}//on_node_removed
 
 
 
 	// Called by the signal system anytime a renderer node is renamed
-	void implementation::on_renderNode_renamed(k3d::inode* const Node)
+	void implementation::on_node_renamed(k3d::inode* const Node)
 	{
-
-
+	  //NEED TO CHANGE THIS TO BE MORE ROBUST.. PROBLEM: CHANGES SELECTED TO DEFAULT UPON RENAME
+	  schedule_update();
         
-	}//on_renderNode_renamed
+	}//on_node_renamed
 
 
         // [/implementation]************************************************************************
@@ -682,7 +907,7 @@ namespace module{
 	{
           ui_component::set_parent("shader_preview", &Parent);
 
-          m_implementation = new mechanics::implementation(DocumentState);
+          m_implementation = new mechanics::implementation(DocumentState, Parent);
           
           m_implementation->sizeField.signal_focus_in_event()
             .connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), 
@@ -709,10 +934,10 @@ namespace module{
 	{
           static k3d::application_plugin_factory<panel> 
             factory(
-                    k3d::uuid(0x110409b4, 0xfe449699, 0x40f169a1, 0xcf3768a6),
-                    "NGUIShaderPreviewPanel",
+                    k3d::uuid(0xf11983c0, 0x974a039c, 0xc5d36bb9, 0xe65cf8a0),
+                    "shaderPreview",
                     _("Shader Preview Panel"),
-                    "NGUI Panel",
+                    "NGUI Panels",
                     k3d::iplugin_factory::EXPERIMENTAL,
                     boost::assign::map_list_of("ngui:component-type", "panel")
                     ("ngui:panel-type", "shader_preview")("ngui:panel-label", "Shader Preview"));
@@ -737,6 +962,6 @@ namespace module{
 
 //Register The Plugin (K-3D)************************************************************************
 K3D_MODULE_START(Registry)
-  Registry.register_factory(module::ngui::shader_preview::panel::get_factory());
+Registry.register_factory(module::ngui::shader_preview::panel::get_factory());
 K3D_MODULE_END
 //**************************************************************************************************
