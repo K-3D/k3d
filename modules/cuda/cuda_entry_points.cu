@@ -162,7 +162,48 @@ extern "C" void free_pinned_host_memory ( void* pointer_on_host )
 	CUDA_SAFE_CALL(cudaFreeHost(pointer_on_host));	
 }
 
-extern "C" void test_stream_implementation ( double *InputPoints, double *PointSelection, float* host_points_single_p, int num_points )
+extern "C" void transform_points_synchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points )
+{
+    float *device_points;
+	
+	// allocate the memory on the device - 16 bytes per point
+	allocate_device_memory((void**)&device_points, num_points*sizeof(float)*4);	
+	
+	// allocate pinned host memory to allow for asynchronous operations	
+	float *host_points_single_p;
+	allocate_pinned_host_memory ((void**)&host_points_single_p, num_points*sizeof(float)*4);
+	
+	dim3 threads_per_block(64, 1);
+	dim3 blocks_per_grid( iDivUp(num_points, 64), 1);
+	
+	for (int point = 0; point < num_points; ++point)
+	{
+		int float_index = (point)*4;
+		int double_index = (point)*3;
+		host_points_single_p[float_index] = (float)InputPoints[double_index];
+		host_points_single_p[float_index+1] = (float)InputPoints[double_index+1];
+		host_points_single_p[float_index+2] = (float)InputPoints[double_index+2];
+		host_points_single_p[float_index+3] = (float)PointSelection[point];
+	}
+		
+	CUDA_SAFE_CALL ( cudaMemcpy(device_points, host_points_single_p, num_points*16, cudaMemcpyHostToDevice) );
+	linear_transform_kernel <<< blocks_per_grid, threads_per_block >>> ((float4*)(device_points), num_points);
+	CUDA_SAFE_CALL ( cudaMemcpy(host_points_single_p, device_points, num_points*16, cudaMemcpyDeviceToHost) );
+	
+	for (int point = 0; point < num_points; ++point)
+	{
+		int float_index = (point)*4;
+		int double_index = (point)*3;
+		OutputPoints[double_index] = host_points_single_p[float_index];
+		OutputPoints[double_index+1] = host_points_single_p[float_index+1];
+		OutputPoints[double_index+2] = host_points_single_p[float_index+2];
+	}
+	
+	free_device_memory(device_points);
+	free_pinned_host_memory ( host_points_single_p );	
+}
+
+extern "C" void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points )
 {
 	// set the number of streams
 	int nstreams = 4;
@@ -170,12 +211,15 @@ extern "C" void test_stream_implementation ( double *InputPoints, double *PointS
 	
 	// allocate the memory on the device - 16 bytes per point
 	allocate_device_memory((void**)&device_points, num_points*sizeof(float)*4);	
-		
-		
+	
+	// allocate pinned host memory to allow for asynchronous operations	
+	float *host_points_single_p;
+	allocate_pinned_host_memory ((void**)&host_points_single_p, num_points*sizeof(float)*4);
+	
 	// allocate and initialize an array of stream handles
     cudaStream_t *streams = (cudaStream_t*) malloc(nstreams * sizeof(cudaStream_t));
-    for(int i = 0; i < nstreams; i++)
-    	CUDA_SAFE_CALL( cudaStreamCreate(&(streams[i])) ); 
+    for(int n = 0; n < nstreams; n++)
+    	CUDA_SAFE_CALL( cudaStreamCreate(&(streams[n])) ); 
 	
 	int points_per_stream = num_points/nstreams;
 	
@@ -207,17 +251,29 @@ extern "C" void test_stream_implementation ( double *InputPoints, double *PointS
 		linear_transform_kernel <<< blocks_per_grid, threads_per_block, 0, streams[n] >>> ((float4*)(device_points + n*points_per_stream*4), points_per_stream);
 		//linear_transform_kernel <<< blocks_per_grid, threads_per_block >>> ((float4*)(device_points + n*points_per_stream*16), points_per_stream);
 		CUDA_SAFE_CALL ( cudaMemcpyAsync(host_points_single_p + n*points_per_stream*4, device_points + n*points_per_stream*4, points_per_stream*16, cudaMemcpyDeviceToHost, streams[n]) );
-				
+		
+		// need to synchronize the streams so that the data is available to copy to the output points	
+		cudaStreamSynchronize(streams[n]);		
+		for (int point = n*points_per_stream; point < (n+1)*points_per_stream; ++point)
+		{
+			int float_index = (point)*4;
+			int double_index = (point)*3;
+			OutputPoints[double_index] = host_points_single_p[float_index];
+			OutputPoints[double_index+1] = host_points_single_p[float_index+1];
+			OutputPoints[double_index+2] = host_points_single_p[float_index+2];
+		}
+	
 	}
 	//for (int point = n*points_per_stream; point < (n+1)*points_per_stream; ++point)
 	
 	// release resources
-	for(int i = 0; i < nstreams; i++)
+	for(int n = 0; n < nstreams; n++)
 	{
-		cudaStreamSynchronize(streams[i]);
-    	cudaStreamDestroy(streams[i]);
+		cudaStreamSynchronize(streams[n]);
+    	cudaStreamDestroy(streams[n]);
 	}
 	
 	free_device_memory(device_points);
+	free_pinned_host_memory ( host_points_single_p );
 }
 

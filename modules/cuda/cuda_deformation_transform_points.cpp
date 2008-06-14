@@ -71,8 +71,6 @@ public:
 		
 		// a 4 x 4 matrix of floats
 		float *float_transformation = (float*) malloc ( 64 );
-		float *host_points_single_p;// = (float*) malloc ( num_points*sizeof(float)*4);
-		allocate_pinned_host_memory ((void**)&host_points_single_p, num_points*sizeof(float)*4);
 		
 		float_transformation[0] = Transformation[0][0];
 		float_transformation[1] = Transformation[0][1];
@@ -90,23 +88,15 @@ public:
 		float_transformation[13] = Transformation[3][1];
 		float_transformation[14] = Transformation[3][2];
 		float_transformation[15] = Transformation[3][3]; 
-		
 		copy_and_bind_texture_to_array( &cuda_array, float_transformation, 4, 4 );
     	
-    	test_stream_implementation ( (double *)&(InputPoints[0]), (double *)&(PointSelection[0]), host_points_single_p, num_points );
-		
-		for (int point = 0; point < num_points; ++point)
-		{
-			int float_index = (point)*4;
-			OutputPoints[point][0] = (double)host_points_single_p[float_index];
-			OutputPoints[point][1] = (double)host_points_single_p[float_index+1];
-			OutputPoints[point][2] = (double)host_points_single_p[float_index+2];
-		}
+    	// use non-streamed version
+    	//transform_points_synchronous ( (double *)&(InputPoints[0]), (double *)&(PointSelection[0]), (double *)&(OutputPoints[0]), num_points );
+    	// use streams
+		transform_points_asynchronous ( (double *)&(InputPoints[0]), (double *)&(PointSelection[0]), (double *)&(OutputPoints[0]), num_points );
 		
 		free_CUDA_array ( cuda_array );
-		//free ( host_points_single_p );	
 		free ( float_transformation );
-		free_pinned_host_memory ( host_points_single_p );
 		document().pipeline_profiler().finish_execution(*this, "Deform Mesh");
 	}
 

@@ -58,6 +58,7 @@ extern "C" void free_pinned_host_memory ( void* pointer_on_host );
 extern "C" void copy_and_bind_texture_to_array( void** cudaArrayPointer, float* arrayData, int width, int height );
 extern "C" void free_CUDA_array ( void* cudaArrayPointer );
 
-extern "C" void test_stream_implementation ( double *InputPoints, double *PointSelection, float* host_points_single_p, int num_points );
+extern "C" void transform_points_synchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points );
+extern "C" void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points );
 
 #endif // !CUDA_ENTRY_POINTS_H

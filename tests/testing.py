@@ -145,7 +145,7 @@ class k3dProfilingProcessor(object):
 		print '<DartMeasurement name="Maximums" type="text/string">' + tmpStringMax + '</DartMeasurement>'
 	
 	# output the results to a comma-separated file
-	def output_as_CSV_file(self, filename, description = ''):
+	def output_as_CSV_file(self, filename, description = '', appendFile = False):
 		def output_headings(file):
 			tmpString = '';
 			headingOrder = []
@@ -176,9 +176,11 @@ class k3dProfilingProcessor(object):
 		
 				file.write(tmpString + '\n')
 		
-		
-		out_file = open(filename, 'w')
-		
+		if appendFile:
+			out_file = open(filename, 'w+')
+		else:
+			out_file = open(filename, 'w')
+			
 		try:
 			if description:
 				out_file.write('"' + self.__nodeName + '","' +  description + '",' + str(self.number_of_results()) + '\n')
