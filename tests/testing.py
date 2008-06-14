@@ -57,6 +57,139 @@ class benchmarkMesh(object):
     def get_size_metric(self):
     	return self.__counts[0]*self.__counts[1]*self.__counts[2]*4
 
+# class to handle profiler output for benchmarking
+class k3dProfilingProcessor(object):
+	def __init__(self):
+		self.__results = {}
+		self.__results['Total'] = []
+		self.__nodeName = ''
+	
+	def number_of_results(self):
+		try:
+			return len(self.__results['Total'])
+		except:
+			return 0
+	
+	def number_of_columns(self):
+		return len(self.__results)
+		
+	def clear_results(self):
+		self.__init__()
+		
+	def add_profiler_results_for_node(self, nodeName, profilerRecords):
+		self.__nodeName = nodeName
+		for (node, timing) in profilerRecords.items():
+			if node.name == self.__nodeName:
+				total = 0.0
+				for t in timing:
+					total += timing[t]
+					if t in self.__results:
+						self.__results[t] += [timing[t],]
+					else:
+						self.__results[t] = [timing[t],]
+				self.__results['Total'] += [total,]
+				break
+	
+	# oputput the results as a table to display on the dashboard
+	def output_as_dart_table(self, description = ''):
+		if description:
+			print '<DartMeasurement name="Description" type="text/string">' + description + '</DartMeasurement>'
+	
+		tmpString = '';
+		headingOrder = []
+		averages = []
+		maximums = []
+	
+		for heading in self.__results:
+			if heading != 'Total':
+				tmpString += heading + ' : '
+				headingOrder += [heading,]
+			averages += [0.0,]
+			maximums += [0.0,]
+			
+		tmpString += 'Total'
+		headingOrder += ['Total',]
+	
+		print '<DartMeasurement name="HEADING" type="text/string">' + tmpString + '</DartMeasurement>'
+		
+		# get the number of self.__results
+		numResults = self.number_of_results()
+		numColumns = self.number_of_columns()
+		
+		for row in range(numResults):
+			tmpString = ''
+			for col_index in range(numColumns):
+				heading = headingOrder[col_index]
+				# update the averages and the maximums
+				averages[col_index] += self.__results[heading][row]
+				if self.__results[heading][row] > maximums[col_index]:
+					maximums[col_index] = self.__results[heading][row]
+				
+				tmpString += str(self.__results[heading][row])
+				if heading != 'Total':
+					tmpString += ' : '
+	
+			print '<DartMeasurement name="run' + str(row) + '" type="text/string">' + tmpString + '</DartMeasurement>'
+			
+		# now handle the averages and the maximums
+		tmpString = ''
+		tmpStringMax = ''
+		for col_index in range(numColumns):
+			tmpString += str(averages[col_index]/numResults)
+			tmpStringMax += str(maximums[col_index])
+			if col_index < ( numColumns - 1 ):
+				tmpString += ' : '
+				tmpStringMax += ' : '
+		
+		print '<DartMeasurement name="Average" type="text/string">' + tmpString + '</DartMeasurement>'
+		print '<DartMeasurement name="Maximums" type="text/string">' + tmpStringMax + '</DartMeasurement>'
+	
+	# output the results to a comma-separated file
+	def output_as_CSV_file(self, filename, description = ''):
+		def output_headings(file):
+			tmpString = '';
+			headingOrder = []
+	
+			for heading in self.__results:
+				if heading != 'Total':
+					tmpString += '"' + heading + '",'
+					headingOrder += [heading,]
+				
+			tmpString += '"Total"'
+			headingOrder += ['Total',]
+		
+			file.write(tmpString + '\n')
+			return headingOrder
+		
+		def output_result_data(file, headingOrder):
+			numResults = self.number_of_results()
+			numColumns = self.number_of_columns()
+			
+			for row in range(numResults):
+				tmpString = ''
+				for col_index in range(numColumns):
+					heading = headingOrder[col_index]
+					
+					tmpString += str(self.__results[heading][row])
+					if heading != 'Total':
+						tmpString += ','
+		
+				file.write(tmpString + '\n')
+		
+		
+		out_file = open(filename, 'w')
+		
+		try:
+			if description:
+				out_file.write('"' + self.__nodeName + '","' +  description + '",' + str(self.number_of_results()) + '\n')
+			headingOrder = output_headings(out_file)
+			output_result_data(out_file, headingOrder)
+		finally:
+	  		out_file.close()
+       
+	def output_file_to_Dart(self, filename):
+	 	print """<DartMeasurementFile name="CSV_file" type="text/plain">""" + str(filename) + """</DartMeasurementFile>"""
+     	
 def source_path():
 	return os.environ["K3D_TEST_SOURCE_PATH"]
 
@@ -391,22 +524,6 @@ def bitmap_perceptual_difference(document, input_image1, input_image2, threshold
 
 	if difference_measurement > threshold:
 		raise "pixel difference exceeds threshold"
-
-# extract the numerical results from the profiler
-def get_profiler_results_for_node(nodeName, profilerRecords, results = {}):
-	
-	for (node, timing) in profilerRecords.items():
-		if node.name == nodeName:
-			total = 0.0
-			for t in timing:
-				total += timing[t]
-				if t in results:
-					results[t] += [timing[t],]
-				else:
-					results[t] = [timing[t],]
-			results['Total'] += [total,]
-			
-	return results
    
 # compare the results of two different bitmap plugins applied to the k-3d test image
 def bitmap_compare_plugin_outputs(referenceName, pluginToTest, pluginPropertyValues = {}):
@@ -449,17 +566,17 @@ def mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRuns = 
 		benchmarkNode.get_property(p).set_value(val)
 	benchmarkNode.mesh_selection = selection
 	
-	results = {}
-	results['Total'] = []
+	profilingResults = k3dProfilingProcessor()
 	for n in range(numberOfRuns):
 		document.set_dependency(benchmarkNode.get_property("input_mesh"), inputNode.get_property("output_mesh"))
 		benchmarkNode.output_mesh
-		results = get_profiler_results_for_node(meshModifierNodeName, profiler.records, results)
+		profilingResults.add_profiler_results_for_node(meshModifierNodeName, profiler.records)
 	
-	dartTable("%s Benchmark : %d" % (meshModifierNodeName, benchmarkMesh.get_size_metric()), results)
-	
-	
-	
+	description = "%s Benchmark : %d" % (meshModifierNodeName, benchmarkMesh.get_size_metric())
+	profilingResults.output_as_dart_table(description)
+	# save to CSV file
+	CSV_output_file = k3d.generic_path(binary_path() + "/" + meshModifierNodeName + str(benchmarkMesh.get_size_metric()) + ".benchmark.txt")
+	profilingResults.output_as_CSV_file(str(CSV_output_file), description)
 	
 # Benchmark the performance of the Bitmap plugins using a solid as input 
 def bitmap_benchmark(BitmapNodeName, imageDimensions, numberOfRuns = 1):
@@ -471,70 +588,20 @@ def bitmap_benchmark(BitmapNodeName, imageDimensions, numberOfRuns = 1):
 	inputSolid.height = imageDimensions[1];
 	
 	benchmarkNode = document.new_node(BitmapNodeName)
-	results = {}
-	results['Total'] = []
+	
+	profilingResults = k3dProfilingProcessor()
 	for n in range(numberOfRuns):
 		document.set_dependency(benchmarkNode.get_property("input_bitmap"), inputSolid.get_property("output_bitmap"))
 		benchmarkNode.output_bitmap
-		results = get_profiler_results_for_node(BitmapNodeName, profiler.records, results)
+		profilingResults.add_profiler_results_for_node(BitmapNodeName, profiler.records)
 	
-	dartTable("%s Benchmark : %d x %d" % (BitmapNodeName, imageDimensions[0], imageDimensions[1]), results)
-
-def dartTable(description, results):
+	description = "%s Benchmark : %d x %d" % (BitmapNodeName, imageDimensions[0], imageDimensions[1])
+	profilingResults.output_as_dart_table(description)
 	
-	print """<DartMeasurement name="Description" type="text/string">""" + description + """</DartMeasurement>"""
+	CSV_output_file = k3d.generic_path(binary_path() + "/" + BitmapNodeName + str(imageDimensions[0]) + 'x' + str(imageDimensions[1]) + ".benchmark.txt")
+	profilingResults.output_as_CSV_file(str(CSV_output_file), description)
+	#profilingResults.output_file_to_Dart(str(CSV_output_file))								    
 	
-	tmpString = """""";
-	headingOrder = []
-	averages = []
-	maximums = []
-	
-	for heading in results:
-		if heading != "Total":
-			tmpString += heading + """ : """
-			headingOrder += [heading,]
-		averages += [0.0,]
-		maximums += [0.0,]
-			
-	tmpString += "Total"
-	headingOrder += ['Total',]
-	
-	print """<DartMeasurement name="HEADING" type="text/string">""" + tmpString + """</DartMeasurement>"""
-	
-	
-	# get the number of results
-	numResults = len(results['Total'])
-	numColumns = len(headingOrder)
-	for row in range(numResults):
-		tmpString = """"""
-		for col_index in range(numColumns):
-			col = headingOrder[col_index]
-			# update the averages and the maximums
-			averages[col_index] += results[col][row]
-			if results[col][row] > maximums[col_index]:
-				maximums[col_index] = results[col][row]
-			
-			tmpString += str(results[col][row])
-			if col != "Total":
-				tmpString += """ : """
-
-		print """<DartMeasurement name="run""" + str(row) + """" type="text/string">""" + tmpString + """</DartMeasurement>"""
-		
-	# now handle the averages and the maximums
-	tmpString = ""
-	tmpStringMax = ""
-	for col_index in range(numColumns):
-		tmpString += str(averages[col_index]/numResults)
-		tmpStringMax += str(maximums[col_index])
-		if col_index < ( numColumns - 1 ):
-			tmpString += " : "
-			tmpStringMax += " : "
-	
-	print """<DartMeasurement name="Average" type="text/string">""" + tmpString + """</DartMeasurement>"""
-	print """<DartMeasurement name="Maximums" type="text/string">""" + tmpStringMax + """</DartMeasurement>"""
-	
-	
-
 def image_comparison(document, image, image_name, threshold):
 
 	output_file = k3d.generic_path(binary_path() + "/" + image_name + ".output.png")

@@ -280,7 +280,7 @@ __global__ void linear_transform_kernel ( float4 *points, int num_points )
 	
 	__shared__ float4 ThreadPoints[64];
 	
-	
+	/*
 	__syncthreads();
 	
 	if ( threadIdx.x < 1 )
@@ -302,14 +302,21 @@ __global__ void linear_transform_kernel ( float4 *points, int num_points )
 		T[2][3] = tex2D(transformTexture, 3, 2);
 		T[3][3] = tex2D(transformTexture, 3, 3);
 	}
+	*/
 	
-	
-/*	if ( threadIdx.x < 16 )
+    if ( threadIdx.x < 16 )
 	{
-		const int row = idx >> 2;
-		const int col = idx & 0x3; 
-		T[row][col] = tex2D(transformTexture, col, row);
-	}*/
+		//const int row = idx >> 2;
+		//const int col = idx & 0x3; 
+		T[idx >> 2][idx & 0x3] = tex2D(transformTexture, idx & 0x3, idx >> 2);
+	}
+	if ( blockDim.x < 16 )
+	{
+		for ( int i = blockDim.x ; i < 16 ; i++ )
+		{
+			T[i >> 2][i & 0x3] = tex2D(transformTexture, i & 0x3, i >> 2);		
+		}	
+	}
 	__syncthreads();
 	
 	if ( idx < num_points )
