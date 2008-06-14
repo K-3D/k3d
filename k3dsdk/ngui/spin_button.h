@@ -72,6 +72,55 @@ private:
 /// Factory method for creating an imodel object given a suitably-typed property
 imodel* const model(k3d::iproperty& Property);
 
+/// Provides an implementation of spin_button::imodel that can "wrap" any data source that supports the internal_value(), set_value(), and changed_signal() concepts
+template<typename data_t>
+class generic_model_t :
+	public imodel
+{
+public:
+	generic_model_t(data_t& Data, const Glib::ustring& Label) :
+		m_data(Data),
+		m_label(Label)
+	{
+	}
+
+	const Glib::ustring label()
+	{
+		return m_label;
+	}
+
+	const k3d::bool_t writable()
+	{
+		return true;
+	}
+
+	const k3d::double_t value()
+	{
+		return m_data.internal_value();
+	}
+
+	void set_value(const k3d::double_t Value)
+	{
+		m_data.set_value(Value);
+	}
+
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
+	{
+		return m_data.changed_signal().connect(sigc::hide(Slot));
+	}
+
+private:
+	data_t& m_data;
+	const Glib::ustring m_label;
+};
+
+/// Convenience factory function for creating generic_model_t objects
+template<typename data_t>
+imodel* model(data_t& Data, const Glib::ustring& Label = "")
+{
+	return new generic_model_t<data_t>(Data, Label);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // control
 
