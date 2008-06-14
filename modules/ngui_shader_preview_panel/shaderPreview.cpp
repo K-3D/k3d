@@ -112,33 +112,11 @@ namespace module{
 	//Model Constants
         const k3d::uint_t dPSize = 120;
 
-
-	class pSizeModel : public spin_button::imodel{
-	  pSizeModel()
-	  {
-	    //Set Default Value
-	    this->set_value(dPSize);
-	  }
-
-	  virtual ~pSizeModel()
-	  {
-	  }
-
-	  virtual void set_value (const k3d::double_t Value)
-	  {
-	    pSize = Value;
-	  }
-
-	public:
-	  //Preview Dimensions
-	  /* k3d::uint_t*/ k3d::double_t pSize;
- 
-	};
-
         class sPreviewModel{
         public:
           sPreviewModel() 
-	    :engineUsed(0)	     
+	    :engineUsed(0),
+	     m_pSize(init_name("m_pSize") + init_label(_("Preview Size")) + init_description(_("Size Of Shader Preview Image")) + init_value(dPSize))	
 	  {
 	    //Default The PDimensions
 	    pSize = dPSize;
@@ -164,11 +142,11 @@ namespace module{
           light_t* getPreviewLight(){return currentLight;}
           lightShader_t* getPreviewLShader(){return currentLShader;}
 	 
-	  void addRmanEngine(rManEngine_t* e){availibleEngines.push_back(e);}
-	  void removeRmanEngine(rManEngine_t* e){availibleEngines.remove(e);}
+	  void addRmanEngine(rManEngine_t* e){availibleEngines.push_back(e); k3d::log() << "add: " << availibleEngines.size() << std::endl;}
+	  void removeRmanEngine(rManEngine_t* e){availibleEngines.remove(e); k3d::log() << "del: " << availibleEngines.size() << std::endl; }
 
-	  void addGeo(geo_t* g){availibleGeo.push_back(g);}
-	  void removeGeo(geo_t* g){availibleGeo.remove(g);}
+	  void addGeo(geo_t* g){availibleGeo.push_back(g); k3d::log() << "addgeo: " << availibleGeo.size() << std::endl;}
+	  void removeGeo(geo_t* g){availibleGeo.remove(g); k3d::log() << "delgeo: " << availibleGeo.size() << std::endl; }
 	  
 	  //Find Availible RMan Engine Using Ptr
 	  bool findRmanEngine(rManEngine_t* e)
@@ -214,7 +192,7 @@ namespace module{
 
           //Preview Dimensions
 	  k3d::uint_t pSize; 
-	  
+	  k3d_data(k3d::uint_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) m_pSize;
 
 	private:
 	  //List Of Availible RMan Engines
@@ -230,9 +208,13 @@ namespace module{
           //Geometry Used For Preview
           geo_t *currentGeo;
 
-          //Light and Light Shader Used In Preview
+          //Objects (Nodes) Created By Panel
           light_t *currentLight;
           lightShader_t *currentLShader;
+	  geo_t *panelGeo;
+	  rManEngine_t *panelEngine;
+	  camera_t *panelCamera;
+	  k3d::ri::irender_engine *panelRenderEngine;
 
           //File_io
           k3d::filesystem::path previewImagePath;
@@ -407,7 +389,6 @@ namespace module{
 	    }//for
 
 
-	    
 
 	    k3d::istate_recorder* const state_recorder = &m_document_state.document().state_recorder();
 
@@ -819,6 +800,12 @@ namespace module{
         // Called by the signal system anytime any new nodes are added to the document
 	void implementation::on_node_added(const k3d::inode_collection::nodes_t& Nodes)
 	{
+	  // //Make sure not rendered in preview window using default engine
+// 	  k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
+//                                             "visible_nodes", 
+//                                             k3d::inode_collection_property::nodes_t(0, Nodes));
+
+
 	  for(k3d::inode_collection::nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node){
 	    if((*node)->factory().implements(typeid(k3d::irender_camera_frame))){
 	      
