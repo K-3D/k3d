@@ -2,7 +2,7 @@
 #define NGUI_SPIN_BUTTON_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -27,7 +27,10 @@
 */
 
 #include "ui_component.h"
+
+#include <k3dsdk/measurement.h>
 #include <k3dsdk/types.h>
+
 #include <gtkmm/table.h>
 
 namespace k3d { class iproperty; }
@@ -73,7 +76,7 @@ private:
 imodel* const model(k3d::iproperty& Property);
 
 /// Provides an implementation of spin_button::imodel that can "wrap" any data source that supports the internal_value(), set_value(), and changed_signal() concepts
-template<typename data_t>
+template<typename value_t, typename data_t>
 class generic_model_t :
 	public imodel
 {
@@ -101,12 +104,22 @@ public:
 
 	void set_value(const k3d::double_t Value)
 	{
-		m_data.set_value(Value);
+		m_data.set_value(static_cast<value_t>(Value));
 	}
 
 	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
 	{
 		return m_data.changed_signal().connect(sigc::hide(Slot));
+	}
+
+	const k3d::double_t step_increment()
+	{
+		return 1.0;
+	}
+
+	const std::type_info& units()
+	{
+		return typeid(k3d::measurement::scalar);
 	}
 
 private:
@@ -115,10 +128,10 @@ private:
 };
 
 /// Convenience factory function for creating generic_model_t objects
-template<typename data_t>
+template<typename value_t, typename data_t>
 imodel* model(data_t& Data, const Glib::ustring& Label = "")
 {
-	return new generic_model_t<data_t>(Data, Label);
+	return new generic_model_t<value_t, data_t>(Data, Label);
 }
 
 /////////////////////////////////////////////////////////////////////////////

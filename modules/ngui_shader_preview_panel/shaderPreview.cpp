@@ -303,10 +303,10 @@ namespace module{
         public:
           implementation(document_state& DocumentState, k3d::icommand_node& Parent) :
             m_document_state(DocumentState),
-            m_model(new sPreviewModel),
+            m_model(new sPreviewModel()),
             previewArea(0),
-	    piIntervalUpdate(250)
-	    //size_k3dField(Parent, k3d::string_t("psize_field"),spin_button::model(property),) //Init pSize Spin GUI Widget
+	    piIntervalUpdate(250),
+	    size_k3dField(Parent, k3d::string_t("psize_field"), spin_button::model<k3d::uint_t>(m_model->m_pSize), 0) //Init pSize Spin GUI Widget
 	  {
 		
             //Setup the Window
@@ -394,10 +394,6 @@ namespace module{
 
 	    //k3d::iproperty *test = k3d::property::create(0, typeid(k3d::uint_t), "test", "this_test", "description_test", dPSize);
 	    
-	    //spin_button::control size_k3dField(Parent, k3d::string_t("test"), spin_button::model(m_model->m_pSize), state_recorder);
-
-
-
             schedule_update();
           }
 
@@ -468,8 +464,6 @@ namespace module{
           Gtk::HBox dim_c;
           Gtk::Entry sizeField;
 
-	  //spin_button::control size_k3dField;
-
 	  Gtk::Frame previewFrame;
 	  
 	  //Preview Image Update Interval
@@ -483,6 +477,8 @@ namespace module{
 
           // Stores The Data Model
           std::auto_ptr<sPreviewModel> m_model;
+
+	  spin_button::control size_k3dField;
 
           // Signal that will be emitted whenever this control should grab the panel focus
           sigc::signal<void> m_panel_grab_signal;
