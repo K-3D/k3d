@@ -198,6 +198,15 @@ def source_path():
 def binary_path():
 	return os.environ["K3D_TEST_BINARY_PATH"]
 
+def benchmark_path():
+	b_path = binary_path() + '/benchmarks'
+	try:
+		os.listdir(b_path)
+	except:
+		os.makedirs(b_path);
+	
+	return b_path
+
 def create_camera(document):
 	
 	camera_view = document.new_node("ViewMatrix")
@@ -577,7 +586,7 @@ def mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRuns = 
 	description = "%s Benchmark : %d" % (meshModifierNodeName, benchmarkMesh.get_size_metric())
 	profilingResults.output_as_dart_table(description)
 	# save to CSV file
-	CSV_output_file = k3d.generic_path(binary_path() + "/" + meshModifierNodeName + str(benchmarkMesh.get_size_metric()) + ".benchmark.txt")
+	CSV_output_file = k3d.generic_path(benchmark_path() + '/' + meshModifierNodeName + str(benchmarkMesh.get_size_metric()) + '.benchmark.txt')
 	profilingResults.output_as_CSV_file(str(CSV_output_file), description)
 	
 # Benchmark the performance of the Bitmap plugins using a solid as input 
@@ -600,7 +609,7 @@ def bitmap_benchmark(BitmapNodeName, imageDimensions, numberOfRuns = 1):
 	description = "%s Benchmark : %d x %d" % (BitmapNodeName, imageDimensions[0], imageDimensions[1])
 	profilingResults.output_as_dart_table(description)
 	
-	CSV_output_file = k3d.generic_path(binary_path() + "/" + BitmapNodeName + str(imageDimensions[0]) + 'x' + str(imageDimensions[1]) + ".benchmark.txt")
+	CSV_output_file = k3d.generic_path(benchmark_path() + '/' + BitmapNodeName + str(imageDimensions[0]) + 'x' + str(imageDimensions[1]) + ".benchmark.txt")
 	profilingResults.output_as_CSV_file(str(CSV_output_file), description)
 	#profilingResults.output_file_to_Dart(str(CSV_output_file))								    
 	

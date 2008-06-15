@@ -61,6 +61,16 @@ void pipeline_profiler::start_execution(inode& Node, const string_t& Task)
 	m_implementation->adjustments.push(0.0);
 }
 
+/**
+ * Start a pipeline profiler entry with an adjustment.
+ * The adjustment value effectively moves the start forward in time.
+ */
+void pipeline_profiler::start_execution(inode& Node, const string_t& Task, const double Adjustment)
+{
+	m_implementation->timers.push(timer());
+	m_implementation->adjustments.push(Adjustment);
+}
+
 void pipeline_profiler::finish_execution(inode& Node, const string_t& Task)
 {
 	return_if_fail(m_implementation->timers.size());
@@ -74,6 +84,14 @@ void pipeline_profiler::finish_execution(inode& Node, const string_t& Task)
 
 	if(m_implementation->adjustments.size())
 		m_implementation->adjustments.top() += elapsed;
+}
+
+/**
+ * Manually add a timing entry
+ */
+void pipeline_profiler::add_timing_entry(inode& Node, const string_t& Task, const double TimingValue)
+{
+	m_implementation->node_execution_signal.emit(Node, Task, TimingValue);
 }
 
 sigc::connection pipeline_profiler::connect_node_execution_signal(const sigc::slot<void, inode&, const string_t&, double>& Slot)

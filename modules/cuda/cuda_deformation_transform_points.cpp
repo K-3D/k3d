@@ -89,15 +89,42 @@ public:
 		float_transformation[14] = Transformation[3][2];
 		float_transformation[15] = Transformation[3][3]; 
 		copy_and_bind_texture_to_array( &cuda_array, float_transformation, 4, 4 );
+		
+		// struct to store timing info for GPU implementation
+    	timingInfo_t timing_info;
+    	timing_info.numEntries = 0;
+    	timing_info.timings = 0;
+    	timing_info.labels = 0;
+
+    	document().pipeline_profiler().finish_execution(*this, "BIND_TEXTURE");
     	
     	// use non-streamed version
-    	//transform_points_synchronous ( (double *)&(InputPoints[0]), (double *)&(PointSelection[0]), (double *)&(OutputPoints[0]), num_points );
-    	// use streams
-		transform_points_asynchronous ( (double *)&(InputPoints[0]), (double *)&(PointSelection[0]), (double *)&(OutputPoints[0]), num_points );
+    	transform_points_synchronous ( (double *)&(InputPoints[0]), (double *)&(PointSelection[0]), (double *)&(OutputPoints[0]), num_points, &timing_info );
+		// use streams
+		//transform_points_asynchronous ( (double *)&(InputPoints[0]), (double *)&(PointSelection[0]), (double *)&(OutputPoints[0]), num_points, &timing_info );
 		
 		free_CUDA_array ( cuda_array );
 		free ( float_transformation );
-		document().pipeline_profiler().finish_execution(*this, "Deform Mesh");
+		
+		if ( timing_info.timings && timing_info.labels )
+		{
+			for ( int i = 0; i < timing_info.numEntries; i++ )
+			{
+				if ( timing_info.labels[i])
+				{
+					document().pipeline_profiler().add_timing_entry(*this, timing_info.labels[i], timing_info.timings[i]*1e-3);
+					free ( timing_info.labels[i] );
+				}
+				else
+				{
+					document().pipeline_profiler().add_timing_entry(*this, "", timing_info.timings[i]*1e-3);
+				}
+			}
+			free ( timing_info.labels );
+			free ( timing_info.timings );
+		}
+		
+		
 	}
 
 	static k3d::iplugin_factory& get_factory()

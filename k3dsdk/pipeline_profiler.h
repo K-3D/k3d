@@ -38,7 +38,10 @@ public:
 	~pipeline_profiler();
 	
 	void start_execution(inode& Node, const string_t& Task);
+	void start_execution(inode& Node, const string_t& Task, const double Adjustment);
 	void finish_execution(inode& Node, const string_t& Task);
+	void add_timing_entry(inode& Node, const string_t& Task, const double TimingValue);
+	
 	sigc::connection connect_node_execution_signal(const sigc::slot<void, inode&, const string_t&, double>& Slot);
 
 private:

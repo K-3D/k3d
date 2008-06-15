@@ -36,6 +36,17 @@
 #define PROFILE_STRING_EXECUTE_KERNEL "Execute Kernel"
 #define PROFILE_STRING_DEVICE_TO_HOST "Copy from Device to Host"
 
+/**
+ * a struct to pass timing info back from external C functions
+ */
+typedef struct
+{
+	int numEntries;
+	double *timings;
+	char **labels;	
+} timingInfo_t;
+
+
 // forward declaration of the entry functions
 // split the entry functions for timing reasons
 extern "C" void CUDA_initialize_device();
@@ -58,7 +69,7 @@ extern "C" void free_pinned_host_memory ( void* pointer_on_host );
 extern "C" void copy_and_bind_texture_to_array( void** cudaArrayPointer, float* arrayData, int width, int height );
 extern "C" void free_CUDA_array ( void* cudaArrayPointer );
 
-extern "C" void transform_points_synchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points );
-extern "C" void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points );
+extern "C" void transform_points_synchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
+extern "C" void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 
 #endif // !CUDA_ENTRY_POINTS_H
