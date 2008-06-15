@@ -81,9 +81,11 @@ class generic_model_t :
 	public imodel
 {
 public:
-	generic_model_t(data_t& Data, const Glib::ustring& Label) :
+	generic_model_t(data_t& Data, const Glib::ustring& Label, const value_t StepIncrement, const std::type_info& Units) :
 		m_data(Data),
-		m_label(Label)
+		m_label(Label),
+		m_step_increment(StepIncrement),
+		m_units(Units)
 	{
 	}
 
@@ -114,24 +116,26 @@ public:
 
 	const k3d::double_t step_increment()
 	{
-		return 1.0;
+		return m_step_increment;
 	}
 
 	const std::type_info& units()
 	{
-		return typeid(k3d::measurement::scalar);
+		return m_units;
 	}
 
 private:
 	data_t& m_data;
 	const Glib::ustring m_label;
+	const value_t m_step_increment;
+	const std::type_info& m_units;
 };
 
 /// Convenience factory function for creating generic_model_t objects
 template<typename value_t, typename data_t>
-imodel* model(data_t& Data, const Glib::ustring& Label = "")
+imodel* model(data_t& Data, const Glib::ustring& Label = "", const value_t StepIncrement = 1, const std::type_info& Units = typeid(k3d::measurement::scalar))
 {
-	return new generic_model_t<value_t, data_t>(Data, Label);
+	return new generic_model_t<value_t, data_t>(Data, Label, StepIncrement, Units);
 }
 
 /////////////////////////////////////////////////////////////////////////////

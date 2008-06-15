@@ -110,23 +110,18 @@ namespace module{
         // [sPreviewModel]*********************************************************************************
 	
 	//Model Constants
-        const k3d::uint_t dPSize = 120;
-
         class sPreviewModel{
         public:
           sPreviewModel() 
 	    :engineUsed(0),
-	     m_pSize(init_name("m_pSize") + init_label(_("Preview Size")) + init_description(_("Size Of Shader Preview Image")) + init_value(dPSize))	
+	     preview_size(init_value(120))	
 	  {
-	    //Default The PDimensions
-	    pSize = dPSize;
 	  }
 
           ~sPreviewModel()
 	  {
 	  }
 
-          void setPreviewSize(const k3d::uint_t &s){pSize  = s;}
           void setPreviewEngine(rManEngine_t* const e){engineUsed = e;}
           void setPreviewImagePath(k3d::filesystem::path img){previewImagePath = img;}
           void setPreviewCamera(camera_t* const cam){currentCamera = cam;}
@@ -134,7 +129,6 @@ namespace module{
           void setPreviewLight(light_t* const light){currentLight = light;}
           void setPreviewLShader(lightShader_t* const lshd){currentLShader = lshd;}
 
-          k3d::uint_t getPreviewSize(){return pSize;}
           rManEngine_t* getPreviewEngine(){return engineUsed;}
           k3d::filesystem::path getPreviewImagePath(){return previewImagePath;}
           camera_t* getPreviewCamera(){return currentCamera;}
@@ -191,8 +185,7 @@ namespace module{
 	  }
 
           //Preview Dimensions
-	  k3d::uint_t pSize; 
-	  k3d_data(k3d::uint_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) m_pSize;
+	  k3d_data(k3d::uint_t, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) preview_size;
 
 	private:
 	  //List Of Availible RMan Engines
@@ -306,7 +299,7 @@ namespace module{
             m_model(new sPreviewModel()),
             previewArea(0),
 	    piIntervalUpdate(250),
-	    size_k3dField(Parent, k3d::string_t("psize_field"), spin_button::model<k3d::uint_t>(m_model->m_pSize), 0) //Init pSize Spin GUI Widget
+	    preview_size_control(Parent, k3d::string_t("psize_field"), spin_button::model<k3d::uint_t>(m_model->preview_size), 0) //Init pSize Spin GUI Widget
 	  {
 		
             //Setup the Window
@@ -347,8 +340,7 @@ namespace module{
             geoCombo.signal_changed()
               .connect(sigc::mem_fun(*this, &implementation::onGeoComboSelect));
 
-            sizeField.signal_activate()
-              .connect(sigc::mem_fun(*this, &implementation::onSizeChange));
+            m_model->preview_size.changed_signal().connect(sigc::hide(sigc::mem_fun(*this, &implementation::onSizeChange)));
 
 	    //Called By Signal System when node selection changed (redo preview render)
 	    m_document_state.view_node_properties_signal()
@@ -462,7 +454,6 @@ namespace module{
           Gtk::ComboBoxText geoCombo;
           Gtk::Label sizeLabel;
           Gtk::HBox dim_c;
-          Gtk::Entry sizeField;
 
 	  Gtk::Frame previewFrame;
 	  
@@ -478,7 +469,7 @@ namespace module{
           // Stores The Data Model
           std::auto_ptr<sPreviewModel> m_model;
 
-	  spin_button::control size_k3dField;
+	  spin_button::control preview_size_control;
 
           // Signal that will be emitted whenever this control should grab the panel focus
           sigc::signal<void> m_panel_grab_signal;
@@ -490,7 +481,7 @@ namespace module{
 	  previewFrame.set_label("Preview Render:");
 	  previewFrame.set_shadow_type(Gtk::SHADOW_ETCHED_OUT);
 
-          previewArea->set_size_request(m_model->getPreviewSize(), m_model->getPreviewSize());
+          previewArea->set_size_request(m_model->preview_size.internal_value(), m_model->preview_size.internal_value());
 
           //Pack the Image Preview into preview / control HBox
           preview_ctrl_c.pack_start(preview_c, false, false, 0);
@@ -536,9 +527,7 @@ namespace module{
           sizeLabel.set_padding(0, 3);
 
           //Finally Pack The dimensions container
-          dim_c.pack_start(sizeField, true, false, 0);  
-	  sizeField.set_size_request(60, -1); 
-	  sizeField.set_editable(true);
+          dim_c.pack_start(preview_size_control, true, false, 0);  
 
           //Fill Labels
           renderLabel.set_label(Glib::ustring("Renderer Used:"));
@@ -648,11 +637,11 @@ namespace module{
                                             "render_engine", dynamic_cast<k3d::inode*>(aqsis));
 
           k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
-                                            "pixel_width", static_cast<k3d::int32_t>(m_model->getPreviewSize()));
+                                            "pixel_width", static_cast<k3d::int32_t>(m_model->preview_size.internal_value()));
 
 
           k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
-                                            "pixel_height", static_cast<k3d::int32_t>(m_model->getPreviewSize()));
+                                            "pixel_height", static_cast<k3d::int32_t>(m_model->preview_size.internal_value()));
 
           k3d::double_t aspectRatio = 1.0;
 
@@ -714,7 +703,7 @@ namespace module{
 	  previewArea->queue_draw();
 
 	  //Set Preview Frame Sizer including padding
-	  k3d::uint_t pFrameSizer = m_model->getPreviewSize() + 22;
+	  k3d::uint_t pFrameSizer = m_model->preview_size.internal_value() + 22;
 	  previewFrame.set_size_request(pFrameSizer, pFrameSizer + 12);
 
 	}//on_preview_update
@@ -724,9 +713,9 @@ namespace module{
           //Repopulate the Model And GUI Elements
           renderCombo.clear();
 
-	  previewArea->set_size_request(m_model->getPreviewSize(), m_model->getPreviewSize());
+	  previewArea->set_size_request(m_model->preview_size.internal_value(), m_model->preview_size.internal_value());
 
-          sizeField.set_text(Glib::ustring(boost::lexical_cast<k3d::string_t>(m_model->getPreviewSize())));
+//          sizeField.set_text(Glib::ustring(boost::lexical_cast<k3d::string_t>(m_model->getPreviewSize())));
  
 	  //Update Combo Boxes (Renderer & Geometry)
 	  std::list<rManEngine_t*> enginesCopy =  m_model->getAvailibleRManEngines();
@@ -747,7 +736,7 @@ namespace module{
 	  k3d::inode *pGeo = m_model->getPreviewGeo();
 	  geoCombo.set_active_text(Glib::ustring(pGeo->name()));
 
-	  k3d::uint_t pFrameSizer = m_model->getPreviewSize() + 22;
+	  k3d::uint_t pFrameSizer = m_model->preview_size.internal_value() + 22;
 
 	  previewFrame.set_size_request(pFrameSizer, pFrameSizer + 12);
 	}//on_update
@@ -779,12 +768,12 @@ namespace module{
 	{
 
 	  //Update model variable
-	  m_model->setPreviewSize(boost::lexical_cast<k3d::int32_t>(sizeField.get_text()));
+//	  m_model->setPreviewSize(boost::lexical_cast<k3d::int32_t>(sizeField.get_text()));
 
 	  k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
-                                            "pixel_width", static_cast<k3d::int32_t>(m_model->getPreviewSize()));
+                                            "pixel_width", static_cast<k3d::int32_t>(m_model->preview_size.internal_value()));
 	  k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
-                                            "pixel_height", static_cast<k3d::int32_t>(m_model->getPreviewSize()));
+                                            "pixel_height", static_cast<k3d::int32_t>(m_model->preview_size.internal_value()));
 
 	  //Re-Render The Preview Image
 	  renderPreview();
@@ -892,9 +881,9 @@ namespace module{
 
           m_implementation = new mechanics::implementation(DocumentState, Parent);
           
-          m_implementation->sizeField.signal_focus_in_event()
-            .connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), 
-                                       false), false);
+//          m_implementation->sizeField.signal_focus_in_event()
+//            .connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), 
+//                                       false), false);
 
           pack_start(m_implementation->m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
 
