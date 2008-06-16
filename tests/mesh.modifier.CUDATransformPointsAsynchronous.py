@@ -3,7 +3,7 @@
 import k3d
 import testing
 
-setup = testing.setup_mesh_modifier_test("PolyCube", "CUDATransformPoints")
+setup = testing.setup_mesh_modifier_test("PolyCube", "CUDATransformPointsAsynchronous")
 
 selection = k3d.deselect_all()
 selection.points = k3d.component_select_all()

@@ -46,7 +46,6 @@ typedef struct
 	char **labels;	
 } timingInfo_t;
 
-
 // forward declaration of the entry functions
 // split the entry functions for timing reasons
 extern "C" void CUDA_initialize_device();

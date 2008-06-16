@@ -13,6 +13,36 @@ static ushort4 *d_image = 0;
 unsigned int input_size = 0;
 
 /**
+ * Initialize the timing info structure
+ */
+void initTimingInfo(timingInfo_t* tInfo, int numberOfEntries)
+{
+	(*tInfo).numEntries = numberOfEntries;
+	(*tInfo).timings = (double*)malloc ( numberOfEntries*sizeof(double) );
+	(*tInfo).labels = (char**)malloc ( numberOfEntries*sizeof(char*) );
+	for ( int i = 0 ; i < numberOfEntries ; i++ )
+	{
+		(*tInfo).labels[i] = (char*) malloc ( 33*sizeof(char) );
+	}	
+} 
+
+/**
+ * Set the label of a given timing_info entry
+ */
+inline void setTimingInfoLabel(timingInfo_t* tInfo, int index, char* label)
+{
+	sprintf((*tInfo).labels[index], "%s", label);
+}
+
+/**
+ * Set the timing value of a given timing_info entry
+ */
+inline void setTimingInfoTiming(timingInfo_t* tInfo, int index, double timingVal)
+{
+	(*tInfo).timings[index] = timingVal;
+}
+
+/**
  * Integer division and rounding up
  */
 int iDivUp(int a, int b)
@@ -172,21 +202,17 @@ extern "C" void transform_points_synchronous ( double *InputPoints, double *Poin
 	#define EXECUTE 3
 	#define TO_HOST 4
 	#define CONVERT_POST 5
-
-    // setup the timing info struct - stores time in s
-	(*tInfo).numEntries = 6;
-	(*tInfo).timings = (double*)malloc ( 6*sizeof(double) );
-	(*tInfo).labels = (char**)malloc ( 6*sizeof(char*) );
-	for ( int i = 0 ; i < 6 ; i++ )
-	{
-		(*tInfo).labels[i] = (char*) malloc ( 33*sizeof(char) );
-	}
-	sprintf((*tInfo).labels[OTHER], "%s", "OTHER");
-	sprintf((*tInfo).labels[CONVERT_PRE], "%s", "CONVERT_PRE");
-	sprintf((*tInfo).labels[TO_DEVICE], "%s", "TO_DEVICE");
-	sprintf((*tInfo).labels[EXECUTE], "%s", "EXECUTE");
-	sprintf((*tInfo).labels[TO_HOST], "%s", "TO_HOST");
-	sprintf((*tInfo).labels[CONVERT_POST], "%s", "CONVERT_POST");
+	
+	// initialize the timing info structure
+	initTimingInfo(tInfo, 6);
+    
+    setTimingInfoLabel(tInfo, OTHER, "OTHER");
+	setTimingInfoLabel(tInfo, CONVERT_PRE, "CONVERT_PRE");
+	setTimingInfoLabel(tInfo, TO_DEVICE, "TO_DEVICE");
+	setTimingInfoLabel(tInfo, EXECUTE, "EXECUTE");
+	setTimingInfoLabel(tInfo, TO_HOST, "TO_HOST");
+	setTimingInfoLabel(tInfo, CONVERT_POST, "CONVERT_POST");
+		
 	
 	// use a cuda timer for timing
 	unsigned int timer = 0;
@@ -206,7 +232,8 @@ extern "C" void transform_points_synchronous ( double *InputPoints, double *Poin
 	dim3 blocks_per_grid( iDivUp(num_points, 64), 1);
 	
 	CUT_SAFE_CALL( cutStopTimer( timer));
-    (*tInfo).timings[OTHER] = cutGetTimerValue( timer);
+    setTimingInfoTiming(tInfo, OTHER, cutGetTimerValue( timer));
+		
 	
 	CUT_SAFE_CALL( cutResetTimer( timer));
 	CUT_SAFE_CALL( cutStartTimer( timer));
@@ -220,26 +247,27 @@ extern "C" void transform_points_synchronous ( double *InputPoints, double *Poin
 		host_points_single_p[float_index+3] = (float)PointSelection[point];
 	}
 	CUT_SAFE_CALL( cutStopTimer( timer));
-	(*tInfo).timings[CONVERT_PRE] = cutGetTimerValue( timer);	
+	setTimingInfoTiming(tInfo, CONVERT_PRE, cutGetTimerValue( timer));	
 	
 	CUT_SAFE_CALL( cutResetTimer( timer));
 	CUT_SAFE_CALL( cutStartTimer( timer));		
 	CUDA_SAFE_CALL ( cudaMemcpy(device_points, host_points_single_p, num_points*16, cudaMemcpyHostToDevice) );
 	CUT_SAFE_CALL( cutStopTimer( timer));
-	(*tInfo).timings[TO_DEVICE] = cutGetTimerValue( timer);	
+	setTimingInfoTiming(tInfo, TO_DEVICE, cutGetTimerValue( timer));
+		
 	
 	CUT_SAFE_CALL( cutResetTimer( timer));
 	CUT_SAFE_CALL( cutStartTimer( timer));
 	linear_transform_kernel <<< blocks_per_grid, threads_per_block >>> ((float4*)(device_points), num_points);
 	CUT_SAFE_CALL( cutStopTimer( timer));
-	(*tInfo).timings[EXECUTE] = cutGetTimerValue( timer);	
+	setTimingInfoTiming(tInfo, EXECUTE, cutGetTimerValue( timer));
 	
 	CUT_SAFE_CALL( cutResetTimer( timer));
 	CUT_SAFE_CALL( cutStartTimer( timer));
 	CUDA_SAFE_CALL ( cudaMemcpy(host_points_single_p, device_points, num_points*16, cudaMemcpyDeviceToHost) );
 	CUT_SAFE_CALL( cutStopTimer( timer));
-	(*tInfo).timings[TO_HOST] = cutGetTimerValue( timer);	
-	
+	setTimingInfoTiming(tInfo, TO_HOST, cutGetTimerValue( timer));
+		
 	CUT_SAFE_CALL( cutResetTimer( timer));
 	CUT_SAFE_CALL( cutStartTimer( timer));
 	for (int point = 0; point < num_points; ++point)
@@ -251,8 +279,8 @@ extern "C" void transform_points_synchronous ( double *InputPoints, double *Poin
 		OutputPoints[double_index+2] = host_points_single_p[float_index+2];
 	}
 	CUT_SAFE_CALL( cutStopTimer( timer));
-	(*tInfo).timings[CONVERT_POST] = cutGetTimerValue( timer);
-	
+	setTimingInfoTiming(tInfo, CONVERT_POST, cutGetTimerValue( timer));
+		
 	CUT_SAFE_CALL( cutResetTimer( timer));	
 	CUT_SAFE_CALL( cutStartTimer( timer));
 	free_device_memory(device_points);
@@ -264,12 +292,30 @@ extern "C" void transform_points_synchronous ( double *InputPoints, double *Poin
 
 extern "C" void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo )
 {
-	// set the number of streams
-	int nstreams = 2;
+	#define OTHER 0
+	#define STREAM_CREATE 1
+	#define PHASE_1 2
+	#define PHASE_2 3
+	#define STREAM_DESTROY 4
 	
+	// initialize the timing info structure
+	initTimingInfo(tInfo, 5);
+    
+    setTimingInfoLabel(tInfo, OTHER, "OTHER");
+	setTimingInfoLabel(tInfo, STREAM_CREATE, "STREAM_CREATE");
+	setTimingInfoLabel(tInfo, PHASE_1, "CONVERT_TO_DEVICE_EXECUTE");
+	setTimingInfoLabel(tInfo, PHASE_2, "TO_HOST_CONVERT");
+	setTimingInfoLabel(tInfo, STREAM_DESTROY, "STREAM_DESTROY");
+	
+	// use a cuda timer for timing
+	unsigned int timer = 0;
+	CUT_SAFE_CALL( cutCreateTimer( &timer ) );
+	
+	CUT_SAFE_CALL( cutStartTimer( timer));
+	// set the number of streams
+	int nstreams = 4;
 	
     float *device_points;
-	
 	// allocate the memory on the device - 16 bytes per point
 	allocate_device_memory((void**)&device_points, num_points*sizeof(float)*4);	
 	
@@ -277,18 +323,29 @@ extern "C" void transform_points_asynchronous ( double *InputPoints, double *Poi
 	float *host_points_single_p;
 	allocate_pinned_host_memory ((void**)&host_points_single_p, num_points*sizeof(float)*4);
 	
-	// allocate and initialize an array of stream handles
-    cudaStream_t *streams = (cudaStream_t*) malloc(nstreams * sizeof(cudaStream_t));
-    for(int n = 0; n < nstreams; n++)
-    	CUDA_SAFE_CALL( cudaStreamCreate(&(streams[n])) ); 
-	
 	int points_per_stream = num_points/nstreams;
 
 	dim3 threads_per_block(32, 1);
 	dim3 blocks_per_grid( iDivUp(points_per_stream, 32), 1);
 	
+	CUT_SAFE_CALL( cutStopTimer( timer));
+    setTimingInfoTiming(tInfo, OTHER, cutGetTimerValue( timer));
+	
+	CUT_SAFE_CALL( cutResetTimer( timer));
+	CUT_SAFE_CALL( cutStartTimer( timer));
+	// allocate and initialize an array of stream handles
+    cudaStream_t *streams = (cudaStream_t*) malloc(nstreams * sizeof(cudaStream_t));
+    for(int n = 0; n < nstreams; n++)
+    	CUDA_SAFE_CALL( cudaStreamCreate(&(streams[n])) ); 
+	
+	CUT_SAFE_CALL( cutStopTimer( timer));
+    setTimingInfoTiming(tInfo, STREAM_CREATE, cutGetTimerValue( timer));
+	
+	CUT_SAFE_CALL( cutResetTimer( timer));
+	CUT_SAFE_CALL( cutStartTimer( timer));
 	for ( int n = 0; n < nstreams; n++ )
 	{
+		// Convert a subset of the data to floats 
 		for (int point = n*points_per_stream; point < (n+1)*points_per_stream; ++point)
 		{
 			int float_index = (point)*4;
@@ -298,12 +355,20 @@ extern "C" void transform_points_asynchronous ( double *InputPoints, double *Poi
 			host_points_single_p[float_index+2] = (float)InputPoints[double_index+2];
 			host_points_single_p[float_index+3] = (float)PointSelection[point];
 		}
-
+		
+		// for each stream copy the data to the device and execute the kernel
 		CUDA_SAFE_CALL ( cudaMemcpyAsync(device_points + n*points_per_stream*4, host_points_single_p + n*points_per_stream*4, points_per_stream*16, cudaMemcpyHostToDevice, streams[n]) );
 		linear_transform_kernel <<< blocks_per_grid, threads_per_block, 0, streams[n] >>> ((float4*)(device_points + n*points_per_stream*4), points_per_stream);
-		//linear_transform_kernel <<< blocks_per_grid, threads_per_block >>> ((float4*)(device_points + n*points_per_stream*16), points_per_stream);
+	}
+	CUT_SAFE_CALL( cutStopTimer( timer));
+    setTimingInfoTiming(tInfo, PHASE_1, cutGetTimerValue( timer));
+	
+	CUT_SAFE_CALL( cutResetTimer( timer));
+	CUT_SAFE_CALL( cutStartTimer( timer));
+	// copy the data back from the device and convert
+	for ( int n = 0; n < nstreams; n++ )
+	{
 		CUDA_SAFE_CALL ( cudaMemcpyAsync(host_points_single_p + n*points_per_stream*4, device_points + n*points_per_stream*4, points_per_stream*16, cudaMemcpyDeviceToHost, streams[n]) );
-		
 		// need to synchronize the streams so that the data is available to copy to the output points	
 		cudaStreamSynchronize(streams[n]);		
 		for (int point = n*points_per_stream; point < (n+1)*points_per_stream; ++point)
@@ -313,17 +378,27 @@ extern "C" void transform_points_asynchronous ( double *InputPoints, double *Poi
 			OutputPoints[double_index] = host_points_single_p[float_index];
 			OutputPoints[double_index+1] = host_points_single_p[float_index+1];
 			OutputPoints[double_index+2] = host_points_single_p[float_index+2];
-		}
-	
+		}		
 	}
+	CUT_SAFE_CALL( cutStopTimer( timer));
+	setTimingInfoTiming(tInfo, PHASE_2, cutGetTimerValue( timer));
 	
+	CUT_SAFE_CALL( cutResetTimer( timer));
+	CUT_SAFE_CALL( cutStartTimer( timer));
 	// release resources
 	for(int n = 0; n < nstreams; n++)
 	{
     	cudaStreamDestroy(streams[n]);
 	}
+	CUT_SAFE_CALL( cutStopTimer( timer));
+	setTimingInfoTiming(tInfo, STREAM_DESTROY, cutGetTimerValue( timer));
 	
+	CUT_SAFE_CALL( cutResetTimer( timer));
+	CUT_SAFE_CALL( cutStartTimer( timer));
 	free_device_memory(device_points);
 	free_pinned_host_memory ( host_points_single_p );
+	CUT_SAFE_CALL( cutStopTimer( timer));
+	(*tInfo).timings[OTHER] += cutGetTimerValue( timer);	
+	CUT_SAFE_CALL ( cutDeleteTimer ( timer ));
 }
 

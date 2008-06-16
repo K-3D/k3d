@@ -177,13 +177,13 @@ class k3dProfilingProcessor(object):
 				file.write(tmpString + '\n')
 		
 		if appendFile:
-			out_file = open(filename, 'w+')
+			out_file = open(filename, 'a+')
 		else:
 			out_file = open(filename, 'w')
 			
 		try:
 			if description:
-				out_file.write('"' + self.__nodeName + '","' +  description + '",' + str(self.number_of_results()) + '\n')
+				out_file.write('"' + self.__nodeName + '",'  +  description + ',' + str(self.number_of_results()) + '\n')
 			headingOrder = output_headings(out_file)
 			output_result_data(out_file, headingOrder)
 		finally:
@@ -560,58 +560,70 @@ def bitmap_compare_plugin_outputs(referenceName, pluginToTest, pluginPropertyVal
 	# calculate the perceptual difference
 	bitmap_perceptual_difference(document, referenceNode.get_property("output_bitmap"), testNode.get_property("output_bitmap"))
 
-def mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRuns = 1, properties = {}):
-	document = k3d.new_document()
-		
-	profiler = document.new_node("PipelineProfiler")
-	
-	benchmarkMesh.set_document(document)
-	
-	inputNode = benchmarkMesh.get_mesh()
-	
-	selection = k3d.deselect_all()
-	selection.points = k3d.component_select_all()
-	
-	benchmarkNode = document.new_node(meshModifierNodeName)
-	for (p, val) in properties.items():
-		benchmarkNode.get_property(p).set_value(val)
-	benchmarkNode.mesh_selection = selection
-	
-	profilingResults = k3dProfilingProcessor()
-	for n in range(numberOfRuns):
-		document.set_dependency(benchmarkNode.get_property("input_mesh"), inputNode.get_property("output_mesh"))
-		benchmarkNode.output_mesh
-		profilingResults.add_profiler_results_for_node(meshModifierNodeName, profiler.records)
-	
-	description = "%s Benchmark : %d" % (meshModifierNodeName, benchmarkMesh.get_size_metric())
-	profilingResults.output_as_dart_table(description)
-	# save to CSV file
-	CSV_output_file = k3d.generic_path(benchmark_path() + '/' + meshModifierNodeName + str(benchmarkMesh.get_size_metric()) + '.benchmark.txt')
-	profilingResults.output_as_CSV_file(str(CSV_output_file), description)
+def mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRuns = 1, properties = {}, appendToFile = False, firstInFile=False):
+    document = k3d.new_document()
+        
+    profiler = document.new_node("PipelineProfiler")
+    
+    benchmarkMesh.set_document(document)
+    
+    inputNode = benchmarkMesh.get_mesh()
+    
+    selection = k3d.deselect_all()
+    selection.points = k3d.component_select_all()
+    
+    benchmarkNode = document.new_node(meshModifierNodeName)
+    for (p, val) in properties.items():
+        benchmarkNode.get_property(p).set_value(val)
+    benchmarkNode.mesh_selection = selection
+    
+    profilingResults = k3dProfilingProcessor()
+    for n in range(numberOfRuns):
+        document.set_dependency(benchmarkNode.get_property("input_mesh"), inputNode.get_property("output_mesh"))
+        benchmarkNode.output_mesh
+        profilingResults.add_profiler_results_for_node(meshModifierNodeName, profiler.records)
+    
+    description = '%d' % (benchmarkMesh.get_size_metric())
+    profilingResults.output_as_dart_table(meshModifierNodeName + ' : ' + description)
+    # save to CSV file
+    if (appendToFile or firstInFile):
+    	if firstInFile:
+    		appendToFile = False
+        CSV_output_file = k3d.generic_path(benchmark_path() + '/' + meshModifierNodeName + '.benchmark.txt')
+    else:
+        CSV_output_file = k3d.generic_path(benchmark_path() + '/' + meshModifierNodeName + description + '.benchmark.txt')
+    
+    profilingResults.output_as_CSV_file(str(CSV_output_file), description, appendToFile)
 	
 # Benchmark the performance of the Bitmap plugins using a solid as input 
-def bitmap_benchmark(BitmapNodeName, imageDimensions, numberOfRuns = 1):
-	document = k3d.new_document()
-		
-	profiler = document.new_node("PipelineProfiler")
-	inputSolid = document.new_node("BitmapSolid")
-	inputSolid.width = imageDimensions[0];
-	inputSolid.height = imageDimensions[1];
-	
-	benchmarkNode = document.new_node(BitmapNodeName)
-	
-	profilingResults = k3dProfilingProcessor()
-	for n in range(numberOfRuns):
-		document.set_dependency(benchmarkNode.get_property("input_bitmap"), inputSolid.get_property("output_bitmap"))
-		benchmarkNode.output_bitmap
-		profilingResults.add_profiler_results_for_node(BitmapNodeName, profiler.records)
-	
-	description = "%s Benchmark : %d x %d" % (BitmapNodeName, imageDimensions[0], imageDimensions[1])
-	profilingResults.output_as_dart_table(description)
-	
-	CSV_output_file = k3d.generic_path(benchmark_path() + '/' + BitmapNodeName + str(imageDimensions[0]) + 'x' + str(imageDimensions[1]) + ".benchmark.txt")
-	profilingResults.output_as_CSV_file(str(CSV_output_file), description)
-	#profilingResults.output_file_to_Dart(str(CSV_output_file))								    
+def bitmap_benchmark(BitmapNodeName, imageDimensions, numberOfRuns = 1, appendToFile = False, firstInFile=False):
+    document = k3d.new_document()
+        
+    profiler = document.new_node("PipelineProfiler")
+    inputSolid = document.new_node("BitmapSolid")
+    inputSolid.width = imageDimensions[0];
+    inputSolid.height = imageDimensions[1];
+    
+    benchmarkNode = document.new_node(BitmapNodeName)
+    
+    profilingResults = k3dProfilingProcessor()
+    for n in range(numberOfRuns):
+        document.set_dependency(benchmarkNode.get_property("input_bitmap"), inputSolid.get_property("output_bitmap"))
+        benchmarkNode.output_bitmap
+        profilingResults.add_profiler_results_for_node(BitmapNodeName, profiler.records)
+    
+    description = '%dx%d' % (imageDimensions[0], imageDimensions[1])
+    profilingResults.output_as_dart_table(BitmapNodeName + ' : ' + description)
+    
+    if (appendToFile or firstInFile):
+        if firstInFile:
+            appendToFile = False
+        CSV_output_file = k3d.generic_path(benchmark_path() + '/' + BitmapNodeName + '.benchmark.txt')
+    else:
+        CSV_output_file = k3d.generic_path(benchmark_path() + '/' + BitmapNodeName + description +  '.benchmark.txt')
+
+    profilingResults.output_as_CSV_file(str(CSV_output_file), description, appendToFile)
+    #profilingResults.output_file_to_Dart(str(CSV_output_file))                                    
 	
 def image_comparison(document, image, image_name, threshold):
 
