@@ -3,6 +3,34 @@
 import testing
 import k3d
 
+CALC_AVERAGE = -1
+
+class ResultSet(object):
+    def __init__(self, x, y, label, plot_style):
+        self.x = x
+        self.y = y
+        self.label = label
+        self.plot_style = plot_style
+    
+class ResultsProcessor(object):
+    def __init__(self, operation = CALC_AVERAGE):
+        self.__operation = operation
+        self.__results = []
+    
+    def add_dataset(self, benchmarkPluginName, ColumnTitle, plot_style = '-'):
+        print "Adding Dataset %s" % benchmarkPluginName
+        (x, y) = extract_data(benchmarkPluginName, ColumnTitle, self.__operation)
+        self.__results += [ResultSet(x, y, (benchmarkPluginName, ColumnTitle, self.__operation), plot_style)]
+        
+    def plot_data(self):
+        import pylab as P
+        legend = ()
+        for result in self.__results:
+            P.plot(result.x, result.y, result.plot_style)
+            legend += (result.label[0],)
+        
+        P.legend(legend)
+        
 # run a mesh modifier benchmark for the specified node
 def mesh_modifier_benchmark(benchmarkPluginName, maxSize = 15):
     current_count = [1,1,1]
@@ -25,3 +53,100 @@ def bitmap_modifier_benchmark(benchmarkPluginName):
             testing.bitmap_benchmark(benchmarkPluginName, sizes[k], runsPerBenchmark, append, k == 0)
         except:
             break
+        
+def convert_dim_string_to_size_measure(dimString):
+    # image where dimension is given as (width)x(height)
+    if 'x' in dimString:
+        dims = dimString.split('x')
+        return int(dims[0])*int(dims[1])
+    
+    # as default try to convert string to int and return
+    # return 0 if it fails
+    try:
+        dims = int(dimString)
+        return dims
+    except:
+        pass
+
+    return 0
+        
+def extract_data(benchmarkPluginName, ColumnTitle, operation = CALC_AVERAGE):
+    """
+        Open the benchmark file and read the lines
+    """
+    def read_benchmark_file(pluginName):
+        benchmarkFilename = testing.benchmark_path() + '/' + benchmarkPluginName + '.benchmark.txt'
+        f = open(benchmarkFilename, 'r')
+        lines = f.readlines()
+        f.close()
+        return (lines, len(lines))
+    
+    def process_header_lines(lines, k):
+        splitLine = lines[k].strip().split(',')
+        dimension = convert_dim_string_to_size_measure(splitLine[1])
+        number_of_runs = int(splitLine[2])
+        
+        splitLine = lines[k+1].strip().split(',')
+        if ('"' + ColumnTitle + '"') in splitLine:
+            column_of_interest_index = splitLine.index('"' + ColumnTitle + '"')
+            
+        return (k+2, dimension, number_of_runs, column_of_interest_index)
+    
+    def process_data_lines(lines, k, number_of_runs, column_of_interest_index, operation):    
+        """
+            Retrive the desired data from the lines
+            @param operation - specify the row of interest or average, max, min
+        """
+        if operation > 0:
+            splitLine = lines[k+operation-1].strip().split(',')
+            datum = float(splitLine[column_of_interest_index])
+        elif operation == CALC_AVERAGE:
+            datum = 0
+            for data_row in range(k, k+number_of_runs):
+                splitLine = lines[data_row].strip().split(',')
+                datum += float(splitLine[column_of_interest_index])
+            datum /= number_of_runs
+        else:
+            datum = -1
+        
+        return (k+number_of_runs, datum)
+        
+    (lines, number_of_lines) = read_benchmark_file(benchmarkPluginName)
+    k = 0;
+    data_list = []
+    dimension_list = []
+    
+    while k < number_of_lines:
+        (k, dimension, number_of_runs, column_of_interest_index) = process_header_lines(lines, k)
+        if k >= number_of_lines:
+            break
+        (k, datum) = process_data_lines(lines, k, number_of_runs, column_of_interest_index, operation)
+        dimension_list += [dimension, ]
+        data_list += [datum, ]
+    
+    return (dimension_list, data_list)
+        
+    
+    
+    
+    
+    
+    
+    
+def impl():    
+    import pylab as P
+    
+    processor = benchmarking.ResultsProcessor()
+    #processor.add_dataset("CUDABitmapAdd", "Total", "ro-")
+    #processor.add_dataset("BitmapAdd", "Total", "bo--")
+
+    processor.add_dataset("CUDATransformPoints", "Total", "ro-")
+    processor.add_dataset("CUDATransformPointsAsynchronous", "Total", "go-")
+    processor.add_dataset("TransformPoints", "Total", "bo--")
+    processor.add_dataset("TransformPoints", "Update Mesh", "co--")
+
+
+    processor.plot_data()
+
+    P.show()
+    
