@@ -320,3 +320,5 @@ K3D_ADD_TEST(mesh.modifier.CUDATransformPointsAsynchronous.py PYTHON REQUIRES K3
 K3D_ADD_TEST(mesh.modifier.CUDATransformPointsAsynchronous.benchmark.py PYTHON REQUIRES K3D_BUILD_CUDA_MODULE)
 
 K3D_ADD_TEST(mesh.modifier.TransformPoints.benchmark.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+
+K3D_ADD_TEST(benchmark.CompareResults.py PYTHON)

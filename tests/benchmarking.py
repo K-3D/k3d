@@ -5,6 +5,9 @@ import k3d
 
 CALC_AVERAGE = -1
 
+def benchmark_path():
+    return testing.benchmark_path()
+
 class ResultSet(object):
     def __init__(self, x, y, label, plot_style):
         self.x = x
@@ -17,19 +20,31 @@ class ResultsProcessor(object):
         self.__operation = operation
         self.__results = []
     
-    def add_dataset(self, benchmarkPluginName, ColumnTitle, plot_style = '-'):
-        print "Adding Dataset %s" % benchmarkPluginName
+    def add_dataset(self, benchmarkPluginName, ColumnTitle, plot_style = 'o-'):
+        print "Adding Dataset %s : %s" % (benchmarkPluginName, ColumnTitle)
         (x, y) = extract_data(benchmarkPluginName, ColumnTitle, self.__operation)
         self.__results += [ResultSet(x, y, (benchmarkPluginName, ColumnTitle, self.__operation), plot_style)]
         
-    def plot_data(self):
+    def plot_data(self, xlabel=None, ylabel=None):
         import pylab as P
         legend = ()
         for result in self.__results:
             P.plot(result.x, result.y, result.plot_style)
-            legend += (result.label[0],)
+            legend += ("%s : %s" % (result.label[0], result.label[1]),)
         
-        P.legend(legend)
+        
+        if xlabel:
+            P.xlabel(xlabel)
+        if ylabel:
+            P.ylabel(ylabel)
+        
+        P.legend(legend, loc='upper left')
+        # set the legend fontsize    
+        ltexts = P.gca().get_legend().get_texts()
+        for lt in ltexts:
+            P.setp(lt, fontsize = 10)
+            
+
         
 # run a mesh modifier benchmark for the specified node
 def mesh_modifier_benchmark(benchmarkPluginName, maxSize = 15):
@@ -69,13 +84,21 @@ def convert_dim_string_to_size_measure(dimString):
         pass
 
     return 0
-        
-def extract_data(benchmarkPluginName, ColumnTitle, operation = CALC_AVERAGE):
+ 
+ 
+"""
+    Read the data from a benchmark file generated py parsing the pipeline profiler output
+    @param - bencmarkPluginName : the name of the plugin that was benchmarked
+    @param - ColumnTitle : the column of interest
+    @param - operation : specify the operation to perform on the data.  If operation >= 0 then a specific run is 
+                         selected.
+"""        
+def extract_data(benchmarkPluginName, ColumnTitle = "Total", operation = CALC_AVERAGE):
     """
         Open the benchmark file and read the lines
     """
     def read_benchmark_file(pluginName):
-        benchmarkFilename = testing.benchmark_path() + '/' + benchmarkPluginName + '.benchmark.txt'
+        benchmarkFilename = benchmark_path() + '/' + benchmarkPluginName + '.benchmark.txt'
         f = open(benchmarkFilename, 'r')
         lines = f.readlines()
         f.close()
@@ -127,26 +150,4 @@ def extract_data(benchmarkPluginName, ColumnTitle, operation = CALC_AVERAGE):
     return (dimension_list, data_list)
         
     
-    
-    
-    
-    
-    
-    
-def impl():    
-    import pylab as P
-    
-    processor = benchmarking.ResultsProcessor()
-    #processor.add_dataset("CUDABitmapAdd", "Total", "ro-")
-    #processor.add_dataset("BitmapAdd", "Total", "bo--")
-
-    processor.add_dataset("CUDATransformPoints", "Total", "ro-")
-    processor.add_dataset("CUDATransformPointsAsynchronous", "Total", "go-")
-    processor.add_dataset("TransformPoints", "Total", "bo--")
-    processor.add_dataset("TransformPoints", "Update Mesh", "co--")
-
-
-    processor.plot_data()
-
-    P.show()
     
