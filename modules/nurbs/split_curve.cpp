@@ -139,13 +139,13 @@ namespace module
 				k3d::mesh::points_t& mesh_points = *k3d::make_unique(Output.points);
 				k3d::mesh::selection_t& point_selection = *k3d::make_unique(Output.point_selection);
 				//find u of selected point
-				double u = (*groups.curve_knots)[curve_first_knots[curve] + curve_orders[curve] + point];
+				double u = (*groups.curve_knots)[curve_first_knots[curve] + ceil(0.5*(curve_orders[curve]-1)) + point];
 				//prepare curve for splitting
 				curve_knot_insertion(Output, curve, u, curve_orders[curve] - 1);
 				
 				//double the "point"
 				
-				k3d::point3 p = mesh_points[ curve_points[point + curve_first_points[curve] ] ];
+				/*k3d::point3 p = mesh_points[ curve_points[point + curve_first_points[curve] ] ];
 				mesh_points.push_back(p);
 				point_selection.push_back(0.0);
 				
@@ -158,7 +158,7 @@ namespace module
 				for( size_t curr_curve = curve; curr_curve < curve_counts[0]; curr_curve++ )
 				{
 					curve_first_points[curr_curve] += 1;
-				}
+				}*/
 				
 				//split the curve into 2
 				//	add new curve_first_points & curve_first_knots
@@ -186,6 +186,7 @@ namespace module
 				k3d::mesh::knots_t& curve_knots = *k3d::make_unique(groups.curve_knots);
 				k3d::mesh::points_t& mesh_points = *k3d::make_unique(input.points);
 				k3d::mesh::selection_t& point_selection = *k3d::make_unique(input.point_selection);
+				k3d::mesh::indices_t& curve_points = *k3d::make_unique(groups.curve_points);
 			
 				size_t order = (*groups.curve_orders)[curve];
 				size_t nr_points = (*groups.curve_point_counts)[curve];
@@ -211,7 +212,7 @@ namespace module
 			
 				k3d::log() << debug << "While loop stopped with i=" << i << std::endl;			
 				//we found the first knot greater than u or we're at the end so thats our k now
-				k=--i;
+				k = i;
 				if ( i < curve_knots_end)
 				{
 					//we go back to see how often we have this knot
@@ -235,15 +236,17 @@ namespace module
 				//Algorithm from "The NURBS book"
 				//*******************************************************************
 			
-				size_t mp = curve_knots.size();
-				size_t np = nr_points + r;
-			
+				size_t mp = curve_knots_end - curve_knots_begin;
+				size_t nq = nr_points + r;
+				
+				k3d::log() << debug << "Inserting knot " << u << " with multiplicity " << r << " into curve" << std::endl;
+ 				
 				k3d::mesh::knots_t knots;
 			
 				for( size_t i = 0; i <= k; i++ )
 				{
-					knots.push_back(curve_knots[i + curve_knots_begin]);
-					k3d::log() << debug << curve_knots[i + curve_knots_begin] << std::endl;
+					knots.push_back(curve_knots.at(i + curve_knots_begin));
+					k3d::log() << debug << curve_knots.at(i + curve_knots_begin) << std::endl;
 				}
 				
 			
@@ -255,28 +258,32 @@ namespace module
 			
 				for( size_t i = k + 1; i < mp; i++ )
 				{
-					knots.push_back(curve_knots[i + curve_knots_begin]);
-					k3d::log() << debug << curve_knots[i + curve_knots_begin] << std::endl;
+					knots.push_back(curve_knots.at(i + curve_knots_begin));
+					k3d::log() << debug << curve_knots.at(i + curve_knots_begin) << std::endl;
 				}
 				
-				k3d::mesh::points_t points(mp, mesh_points.at( ((*groups.curve_points)[ curve_points_begin ]) ) );
-				
+				k3d::mesh::points_t points(nq, mesh_points.at( (curve_points.at( curve_points_begin )) ) );
+				k3d::log() << debug << "Points array has size " << points.size() << std::endl;
 				k3d::log() << debug << "Loading control points part 1" << std::endl;
 				
 				for( size_t i = 0; i <= k + 1 - order; i++ )
-					points[i] = mesh_points.at( (*groups.curve_points)[ curve_points_begin + i] );
+					points.at(i) = mesh_points.at( curve_points.at( curve_points_begin + i ) );
 				
 				k3d::log() << debug << "Control points part 2" << std::endl;
 				
-				for( size_t i = k - s; i < np; i++ )
-					points[i + r] = mesh_points.at( (*groups.curve_points)[ curve_points_begin + i] );
-			
+				for( size_t i = k - s; i < nr_points; i++ )
+				{
+					k3d::log() << debug << "Trying to put Mesh point " << curve_points.at( curve_points_begin + i ) << " from curve point " <<  curve_points_begin + i << " to index " << i+r << std::endl;
+					points.at(i + r) = mesh_points.at( curve_points.at( curve_points_begin + i ) );
+				}
+				
+				
 				k3d::mesh::points_t tmp;
 				
 				k3d::log() << debug << "Filling temp array" << std::endl;
 				
-				for( size_t i = 0; i<= order - 1 - s; i++ )
-					tmp.push_back( mesh_points.at( (*groups.curve_points).at( curve_points_begin + i + k - (order - 1)) ) );
+				for( size_t i = 0; i<= order -1 - s; i++ )
+					tmp.push_back( mesh_points.at( curve_points.at( curve_points_begin + i + k - (order - 1)) ) );
 				
 				size_t L=0;
 				
@@ -288,7 +295,7 @@ namespace module
 					float alpha=0.0;
 					for( size_t i = 0; i <= order - 1 - j - s; i++ )
 					{
-						alpha = (u - knots[L + i]) / (knots[i + k + 1] - knots[L + i]);
+						alpha = (u - curve_knots.at(curve_knots_begin + L + i)) / (curve_knots.at(curve_knots_begin + i + k + 1) - curve_knots.at(curve_knots_begin + L + i));
 						tmp[i] = alpha * tmp.at(i + 1) + (1.0 - alpha) * tmp.at(i);
 					}
 					points[L] = tmp.at(0);
@@ -303,46 +310,61 @@ namespace module
 				//*******************************************************************
 			
 				//insert knots
-				const size_t knot_offset = knots.size() - curve_knots.size();
+				k3d::log() << debug << "Inserting knots" << std::endl;
+				const size_t knot_offset = knots.size() - mp;
+				k3d::mesh::indices_t& curve_first_knots = *k3d::make_unique( groups.curve_first_knots );
 				k3d::mesh::knots_t::iterator knot = curve_knots.begin();
-				knot += (*groups.curve_first_knots)[curve];
+				knot += curve_first_knots[curve];
 				//remove old knot vector
-				for( size_t i = 0; i < nr_points + order; i++)
+				for( size_t i = 0; i < mp; i++)
 					curve_knots.erase(knot);
 				//insert new one
 				curve_knots.insert(knot, knots.begin(), knots.end());
-			
-				k3d::mesh::indices_t& curve_first_knots = *k3d::make_unique( groups.curve_first_knots );
-			
-				for( size_t curr_curve = curve; curr_curve < (*groups.curve_counts)[0]; curr_curve++ )
+							
+				for( size_t curr_curve = curve + 1; curr_curve < (*groups.curve_counts)[0]; curr_curve++ )
 				{
 					curve_first_knots[curr_curve] += knot_offset;
 				}
 			
+				k3d::log() << debug << "Inserting points" << std::endl;
 				//new points
-				k3d::mesh::indices_t curve_points(points.size(), 0);
+				k3d::mesh::indices_t new_curve_points(points.size(), 0);
 			
 				for( size_t i = 0; i < points.size(); i++ )
 				{
 					k3d::mesh::points_t::iterator index = find(mesh_points.begin(), mesh_points.end(), points[i]);
 					if( index != mesh_points.end())
-						curve_points[i] = distance(mesh_points.begin(),index);
+					{
+						new_curve_points[i] = distance(mesh_points.begin(),index);
+						k3d::log() << debug << "Point already there, adding index " << new_curve_points[i] << " to curve_points" << std::endl;
+					}
 					else
 					{
 						k3d::log() << debug << "Point: " << points.at(i).n[0] << " x " << points.at(i).n[1] << " x " << points.at(i).n[2] << std::endl;
 						mesh_points.push_back(points[i]);
 						point_selection.push_back(0.0);
-						curve_points[i] = mesh_points.size() - 1;
+						new_curve_points[i] = mesh_points.size() - 1;
 					}
 				}			
-			
-				const size_t point_offset = mesh_points.size() - nr_points;
+
 				k3d::mesh::indices_t& curve_first_points = *k3d::make_unique( groups.curve_first_points );
+				
+				k3d::mesh::indices_t::iterator point = curve_points.begin();
+				point += curve_first_points[curve];
+				for(size_t i = 0; i < nr_points; i++)
+					curve_points.erase(point);
+				curve_points.insert(point,new_curve_points.begin(),new_curve_points.end());
+
+				const size_t point_offset = new_curve_points.size() - (curve_points_end - curve_points_begin);
 			
-				for( size_t curr_curve = curve; curr_curve < (*groups.curve_counts)[0]; curr_curve++ )
+				for( size_t curr_curve = curve + 1; curr_curve < (*groups.curve_counts)[0]; curr_curve++ )
 				{
 					curve_first_points[curr_curve] += point_offset;
 				}
+				
+				k3d::mesh::counts_t& curve_point_counts = *k3d::make_unique(groups.curve_point_counts);
+				curve_point_counts[curve]+=point_offset;
+				
 				k3d::log() << debug << "Inserted " << knot_offset << " knots and " << point_offset << " points!" << std::endl;
 			}
 			catch(...)
