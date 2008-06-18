@@ -383,15 +383,9 @@ void check_dependencies(bool& Quit, bool& Error)
 	}
 
 	k3d::filesystem::create_directories(g_options_path.branch_path());
-	if(!k3d::filesystem::exists(g_options_path))
+	if(!k3d::filesystem::exists(g_options_path.branch_path()))
 	{
-		k3d::filesystem::ofstream stream(g_options_path);
-		stream << k3d::xml::declaration() << k3d::xml::element("k3dml") << std::endl;
-	}
-
-	if(!k3d::filesystem::exists(g_options_path))
-	{
-		handle_error("Options path [" + g_options_path.native_console_string() + "] does not exist and could not be created.", Quit, Error);
+		handle_error("Options directory [" + g_options_path.branch_path().native_console_string() + "] does not exist and could not be created.", Quit, Error);
 		return;
 	}
 

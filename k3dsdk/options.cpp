@@ -101,6 +101,7 @@ public:
 			log() << info << "Loading options from " << m_file.native_console_string() << std::endl;
 			filesystem::ifstream stream(m_file);
 			stream >> m_tree;
+			return;
 		}
 		catch(std::exception& e)
 		{
@@ -110,6 +111,9 @@ public:
 		{
 			log() << error << "Unknown exception loading options" << std::endl;
 		}
+
+		// Create a new, empty tree ...
+		m_tree = xml::element("k3dml");
 	}
 
 	~implementation()
@@ -182,7 +186,7 @@ void set_storage(istorage& Storage)
 	const unsigned long current_version = 4;
 	if(detail::version_element().text.empty() || (boost::lexical_cast<unsigned long>(detail::version_element().text) < current_version))
 	{
-		log() << info << "Resetting options data to version " << current_version << std::endl;
+		log() << warning << "Resetting options data to version " << current_version << std::endl;
 
 		tree().children.clear();
 		detail::version_element().text = k3d::string_cast(current_version);
