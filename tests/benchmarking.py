@@ -47,13 +47,13 @@ class ResultsProcessor(object):
 
         
 # run a mesh modifier benchmark for the specified node
-def mesh_modifier_benchmark(benchmarkPluginName, maxSize = 15):
+def mesh_modifier_benchmark(benchmarkPluginName, maxSize = 15, properties = {"input_matrix" : k3d.translate3(k3d.vector3(0, 0, 1))}):
     current_count = [1,1,1]
     append = True
     for k in range(maxSize):
         try:
             benchmark_mesh = testing.benchmarkMesh(current_count)
-            testing.mesh_modifier_benchmark(benchmarkPluginName, benchmark_mesh, 10, {"input_matrix" : k3d.translate3(k3d.vector3(0, 0, 1))}, append, k == 0)
+            testing.mesh_modifier_benchmark(benchmarkPluginName, benchmark_mesh, 10, properties, append, k == 0)
             current_count[k % 3] *= 2
         except:
             break
