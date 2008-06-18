@@ -734,6 +734,8 @@ namespace module{
 	  //Set Preview Frame Sizer including padding
 	  k3d::uint_t pFrameSizer = m_model->preview_size.internal_value() + 22;
 	  previewFrame.set_size_request(pFrameSizer, pFrameSizer + 12);
+	  
+	  return true;
 
 	}//on_preview_update
 
