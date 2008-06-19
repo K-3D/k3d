@@ -18,14 +18,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/node.h>
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/material_sink.h>
+#include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/shared_pointer.h>
 
 #include <iterator>
 #include <set>
@@ -36,148 +40,122 @@ namespace module
 namespace blobby
 {
 
-namespace detail
-{
-
-/// std::pair equivalent that maintains the order of its members
-template<typename T1, typename T2>
-class ordered_pair;
-
-template<typename T1, typename T2>
-bool operator<(const ordered_pair<T1,T2>& lhs, const ordered_pair<T1,T2>& rhs);
-
-template<typename T1, typename T2>
-class ordered_pair :
-	public std::pair<T1, T2>
-{
-public:
-	typedef T1 first_type;
-	typedef T2 second_type;
-
-	T1 first;
-	T2 second;
-
-	explicit ordered_pair()
-	{
-	}
-
-	explicit ordered_pair(const T1& First, const T2& Second) :
-		first(First < Second ? First : Second),
-		second(First < Second ? Second : First)
-	{
-	}
-
-	explicit ordered_pair(const k3d::legacy::split_edge* Edge) :
-		first(Edge->vertex < Edge->face_clockwise->vertex ? Edge->vertex : Edge->face_clockwise->vertex),
-		second(Edge->vertex < Edge->face_clockwise->vertex ? Edge->face_clockwise->vertex : Edge->vertex)
-	{
-	}
-
-	friend bool operator< <>(const ordered_pair& lhs, const ordered_pair& rhs);
-};
-
-template<typename T1, typename T2>
-bool operator<(const ordered_pair<T1,T2>& lhs, const ordered_pair<T1,T2>& rhs)
-{
-	if(lhs.first != rhs.first)
-		return lhs.first < rhs.first;
-
-	return lhs.second < rhs.second;
-}
-
-typedef ordered_pair<k3d::legacy::point*, k3d::legacy::point*> ordered_edge_t;
-typedef std::set<ordered_edge_t> ordered_edges_t;
-
-struct get_edges
-{
-	get_edges(const k3d::legacy::mesh& Input, k3d::legacy::mesh& Output, ordered_edges_t& Edges) :
-		edges(Edges)
-	{
-		for(k3d::legacy::mesh::points_t::const_iterator point = Input.points.begin(); point != Input.points.end(); ++point)
-		{
-			k3d::legacy::point* const new_point = new k3d::legacy::point(**point);
-			Output.points.push_back(new_point);
-			point_map[*point] = new_point;
-		}
-	}
-
-	void operator()(k3d::legacy::split_edge& Edge)
-	{
-		k3d::legacy::point* p1 = Edge.vertex;
-		assert_warning(Edge.face_clockwise);
-		k3d::legacy::point* p2 = Edge.face_clockwise->vertex;
-		assert_warning(p1 && p2);
-		edges.insert(ordered_edge_t(point_map[p1], point_map[p2]));
-	}
-
-	ordered_edges_t& edges;
-	std::map<k3d::legacy::point*, k3d::legacy::point*> point_map;
-};
-
-} // namespace detail
-
 /////////////////////////////////////////////////////////////////////////////
-// edges_to_blobby_implementation
+// edges_to_blobby
 
-class edges_to_blobby_implementation :
-	public k3d::legacy::mesh_modifier<k3d::node >
+class edges_to_blobby :
+	public k3d::material_sink<k3d::mesh_modifier<k3d::node > >
 {
-	typedef k3d::legacy::mesh_modifier<k3d::node > base;
+	typedef k3d::material_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
-	edges_to_blobby_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	edges_to_blobby(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Segments radius")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
-		m_type(init_owner(*this) + init_name("type") + init_label(_("Operator type")) + init_description(_("Addition, multiplication, minimum or maximum")) + init_enumeration(operation_values()) + init_value(MAX))
+		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Controls the radius of each blobby segment.")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
+		m_type(init_owner(*this) + init_name("type") + init_label(_("Operator")) + init_description(_("Specify the mathematical operator to merge segments: addition, multiplication, minimum or maximum.")) + init_enumeration(operation_values()) + init_value(MAX))
 	{
+		m_material.changed_signal().connect(make_reset_mesh_slot());
 		m_radius.changed_signal().connect(make_reset_mesh_slot());
 		m_type.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
-	}
-
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-		// Collect edges ...
-		detail::ordered_edges_t edges;
-		k3d::legacy::for_each_edge(const_cast<k3d::legacy::mesh&>(InputMesh), detail::get_edges(InputMesh, Mesh, edges));
+		if(!k3d::validate_polyhedra(Input))
+			return;
 
 		const double radius = m_radius.pipeline_value();
-		k3d::legacy::blobby::variable_operands* new_blobby = 0;
-		switch(m_type.pipeline_value())
+		const operation_t type = m_type.pipeline_value();
+		k3d::imaterial* const material = m_material.pipeline_value();
+
+		// Build a list of edges, eliminating duplicates (neighbors) as we go ...
+		const k3d::mesh::points_t& points = *Input.points;
+		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
+
+		typedef std::set<std::pair<k3d::uint_t, k3d::uint_t> > edges_t;
+		edges_t edges;
+
+		const k3d::uint_t edge_begin = 0;
+		const k3d::uint_t edge_end = edge_begin + edge_points.size();
+		for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 		{
-			case ADD:
-				new_blobby = new k3d::legacy::blobby::add();
-				break;
-			case MULT:
-				new_blobby = new k3d::legacy::blobby::multiply();
-				break;
-			case MIN:
-				new_blobby = new k3d::legacy::blobby::min();
-				break;
-			default:
-				new_blobby = new k3d::legacy::blobby::max();
-				break;
+			edges.insert(std::make_pair(
+				std::min(edge_points[edge], edge_points[clockwise_edges[edge]]),
+				std::max(edge_points[edge], edge_points[clockwise_edges[edge]])));
 		}
 
-		for(detail::ordered_edges_t::const_iterator edge = edges.begin(); edge != edges.end(); ++edge)
-			new_blobby->add_operand(new k3d::legacy::blobby::segment(edge->first, edge->second, radius, k3d::identity3D()));
+		// Setup arrays to build a new blobby ...
+		k3d::mesh::blobbies_t& blobbies = *k3d::make_unique(Output.blobbies);
+		k3d::mesh::indices_t& first_primitives = *k3d::make_unique(blobbies.first_primitives);
+		k3d::mesh::counts_t& primitive_counts = *k3d::make_unique(blobbies.primitive_counts);
+		k3d::mesh::indices_t& first_operators = *k3d::make_unique(blobbies.first_operators);
+		k3d::mesh::counts_t& operator_counts = *k3d::make_unique(blobbies.operator_counts);
+		k3d::mesh::materials_t& materials = *k3d::make_unique(blobbies.materials);
+		k3d::mesh::blobbies_t::primitives_t& primitives = *k3d::make_unique(blobbies.primitives);
+		k3d::mesh::indices_t& primitive_first_floats = *k3d::make_unique(blobbies.primitive_first_floats);
+		k3d::mesh::counts_t& primitive_float_counts = *k3d::make_unique(blobbies.primitive_float_counts);
+		k3d::mesh::blobbies_t::operators_t& operators = *k3d::make_unique(blobbies.operators);
+		k3d::mesh::indices_t& operator_first_operands = *k3d::make_unique(blobbies.operator_first_operands);
+		k3d::mesh::counts_t& operator_operand_counts = *k3d::make_unique(blobbies.operator_operand_counts);
+		k3d::mesh::blobbies_t::floats_t& floats = *k3d::make_unique(blobbies.floats);
+		k3d::mesh::blobbies_t::operands_t& operands = *k3d::make_unique(blobbies.operands);
 
-		Mesh.blobbies.push_back(new k3d::legacy::blobby(new_blobby));
+		first_primitives.push_back(0);
+		primitive_counts.push_back(edges.size());
+		first_operators.push_back(0);
+		operator_counts.push_back(1);
+		materials.push_back(material);
+
+		// Add a blobby segment for each edge ...
+		for(edges_t::const_iterator edge = edges.begin(); edge != edges.end(); ++edge)
+		{
+			primitives.push_back(k3d::mesh::blobbies_t::SEGMENT);
+			primitive_first_floats.push_back(floats.size());
+			primitive_float_counts.push_back(23);
+
+			floats.push_back(points[edge->first][0]);
+			floats.push_back(points[edge->first][1]);
+			floats.push_back(points[edge->first][2]);
+			floats.push_back(points[edge->second][0]);
+			floats.push_back(points[edge->second][1]);
+			floats.push_back(points[edge->second][2]);
+			floats.push_back(radius);
+
+			k3d::matrix4 matrix = k3d::transpose(k3d::identity3D());
+			floats.insert(floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
+		}
+
+		// Merge the edges together ...
+		switch(type)
+		{
+			case ADD:
+				operators.push_back(k3d::mesh::blobbies_t::ADD);
+				break;
+			case MULT:
+				operators.push_back(k3d::mesh::blobbies_t::MULTIPLY);
+				break;
+			case MIN:
+				operators.push_back(k3d::mesh::blobbies_t::MINIMUM);
+				break;
+			case MAX:
+				operators.push_back(k3d::mesh::blobbies_t::MAXIMUM);
+				break;
+		}
+		operator_first_operands.push_back(operands.size());
+		operator_operand_counts.push_back(edges.size() + 1);
+		operands.push_back(edges.size());
+		for(k3d::uint_t i = 0; i != edges.size(); ++i)
+			operands.push_back(i);
 	}
 
-	void on_update_mesh(const k3d::legacy::mesh& Input, k3d::legacy::mesh& Output)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<edges_to_blobby_implementation,
+		static k3d::document_plugin_factory<edges_to_blobby,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink> > > factory(
 				k3d::uuid(0xc6a00316, 0x72a54b1a, 0xb9ac478e, 0x00fdfc6c),
@@ -198,37 +176,23 @@ private:
 		MAX
 	} operation_t;
 
-	static const k3d::ienumeration_property::enumeration_values_t& operation_values()
-	{
-		static k3d::ienumeration_property::enumeration_values_t values;
-		if(values.empty())
-			{
-				values.push_back(k3d::ienumeration_property::enumeration_value_t("Addition", "addition", "Combine blobby segments with BlobbyAdd"));
-				values.push_back(k3d::ienumeration_property::enumeration_value_t("Multiplication", "multiplication", "Combine blobby segments with BlobbyMult"));
-				values.push_back(k3d::ienumeration_property::enumeration_value_t("Minimum", "minimum", "Combine blobby segments with BlobbyMin"));
-				values.push_back(k3d::ienumeration_property::enumeration_value_t("Maximum", "maximum", "Combine blobby segments with BlobbyMax"));
-			}
-
-		return values;
-	}
-
 	friend std::ostream& operator << (std::ostream& Stream, const operation_t& Value)
 	{
 		switch(Value)
-			{
-				case ADD:
-					Stream << "addition";
-					break;
-				case MULT:
-					Stream << "multiplication";
-					break;
-				case MIN:
-					Stream << "minimum";
-					break;
-				case MAX:
-					Stream << "maximum";
-					break;
-			}
+		{
+			case ADD:
+				Stream << "addition";
+				break;
+			case MULT:
+				Stream << "multiplication";
+				break;
+			case MIN:
+				Stream << "minimum";
+				break;
+			case MAX:
+				Stream << "maximum";
+				break;
+		}
 
 		return Stream;
 	}
@@ -252,6 +216,20 @@ private:
 		return Stream;
 	}
 
+	static const k3d::ienumeration_property::enumeration_values_t& operation_values()
+	{
+		static k3d::ienumeration_property::enumeration_values_t values;
+		if(values.empty())
+		{
+			values.push_back(k3d::ienumeration_property::enumeration_value_t("Addition", "addition", "Combine blobby segments with BlobbyAdd"));
+			values.push_back(k3d::ienumeration_property::enumeration_value_t("Multiplication", "multiplication", "Combine blobby segments with BlobbyMult"));
+			values.push_back(k3d::ienumeration_property::enumeration_value_t("Minimum", "minimum", "Combine blobby segments with BlobbyMin"));
+			values.push_back(k3d::ienumeration_property::enumeration_value_t("Maximum", "maximum", "Combine blobby segments with BlobbyMax"));
+		}
+
+		return values;
+	}
+
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
 	k3d_data(operation_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_type;
 };
@@ -261,7 +239,7 @@ private:
 
 k3d::iplugin_factory& edges_to_blobby_factory()
 {
-	return edges_to_blobby_implementation::get_factory();
+	return edges_to_blobby::get_factory();
 }
 
 } // namespace blobby

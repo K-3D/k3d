@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<blobbies>
+			<first_primitives>0</first_primitives>
+			<primitive_counts>12</primitive_counts>
+			<first_operators>0</first_operators>
+			<operator_counts>1</operator_counts>
+			<materials>0</materials>
+			<primitives>segment segment segment segment segment segment segment segment segment segment segment segment</primitives>
+			<primitive_first_floats>0 23 46 69 92 115 138 161 184 207 230 253</primitive_first_floats>
+			<primitive_float_counts>23 23 23 23 23 23 23 23 23 23 23 23</primitive_float_counts>
+			<operators>maximum</operators>
+			<operator_first_operands>0</operator_first_operands>
+			<operator_operand_counts>13</operator_operand_counts>
+			<floats>-2.5 -2.5 2.5 -2.5 2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 2.5 2.5 -2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 2.5 -2.5 -2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 2.5 2.5 2.5 2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 2.5 2.5 -2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 -2.5 2.5 2.5 2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 -2.5 2.5 2.5 -2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 2.5 2.5 2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 -2.5 2.5 -2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 -2.5 -2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 -2.5 -2.5 2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 2.5 -2.5 -2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</floats>
+			<operands>12 0 1 2 3 4 5 6 7 8 9 10 11</operands>
+		</blobbies>
+	</mesh_arrays>
+</k3dml>

@@ -37,15 +37,15 @@ namespace blobby
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// points_to_blobby_implementation
+// points_to_blobby
 
-class points_to_blobby_implementation :
+class points_to_blobby :
 	public k3d::material_sink<k3d::mesh_modifier<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
-	points_to_blobby_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	points_to_blobby(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Points radius")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
@@ -77,8 +77,6 @@ public:
 
 		const double radius = m_radius.pipeline_value();
 		k3d::imaterial* const material = m_material.pipeline_value();
-
-		const k3d::matrix4 matrix = k3d::scaling3D(k3d::point3(radius, radius, radius));
 
 		first_primitives.push_back(0);
 		primitive_counts.push_back(points.size());
@@ -112,7 +110,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<points_to_blobby_implementation,
+		static k3d::document_plugin_factory<points_to_blobby,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x9d5d69d9, 0xfe994aa0, 0x9b7dee22, 0x1823bd2c),
@@ -133,7 +131,7 @@ private:
 
 k3d::iplugin_factory& points_to_blobby_factory()
 {
-	return points_to_blobby_implementation::get_factory();
+	return points_to_blobby::get_factory();
 }
 
 } // namespace blobby
