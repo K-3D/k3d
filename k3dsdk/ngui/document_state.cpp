@@ -65,6 +65,7 @@
 #include <k3dsdk/itime_sink.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_selection.h>
+#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/selection.h>
@@ -187,7 +188,7 @@ const node_selection_map_t map_nodes(const k3d::selection::records& Selection)
 /// Policy class that updates a mesh_selection to select the given points
 struct select_points
 {
-	select_points(const double Weight) :
+	select_points(const double Weight, const k3d::mesh* Mesh) :
 		weight(Weight)
 	{
 	}
@@ -213,19 +214,27 @@ struct select_points
 /// Policy class that updates a mesh_selection to select the given lines
 struct select_lines
 {
-	select_lines(const double Weight) :
+	select_lines(const double Weight, const k3d::mesh* Mesh) :
 		weight(Weight)
 	{
+		if(Mesh->polyhedra && Mesh->polyhedra->edge_points && Mesh->polyhedra->clockwise_edges)
+			k3d::create_edge_adjacency_lookup(*Mesh->polyhedra->edge_points, *Mesh->polyhedra->clockwise_edges, boundary_edges, companions);
 	}
 
 	void operator()(const k3d::selection::record& Record, k3d::mesh_selection& Selection) const
 	{
 		for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
 		{
+			const k3d::uint_t edge = token->id;
 			switch(token->type)
 			{
 				case k3d::selection::ABSOLUTE_SPLIT_EDGE:
-					Selection.edges.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
+					Selection.edges.push_back(k3d::mesh_selection::record(edge, edge+1, weight));
+					if(edge < companions.size() && !boundary_edges[edge])
+					{
+						const k3d::uint_t companion = companions[edge];
+						Selection.edges.push_back(k3d::mesh_selection::record(companion, companion+1, weight));
+					}
 					return;
 
 				case k3d::selection::ABSOLUTE_LINEAR_CURVE:
@@ -247,12 +256,14 @@ struct select_lines
 	}
 
 	const double weight;
+	k3d::mesh::indices_t companions;
+	k3d::mesh::bools_t boundary_edges;
 };
 
 /// Policy class that updates a mesh_selection to select the given faces
 struct select_faces
 {
-	select_faces(const double Weight) :
+	select_faces(const double Weight, const k3d::mesh* Mesh) :
 		weight(Weight)
 	{
 	}
@@ -290,7 +301,7 @@ struct select_faces
 
 /// Uses an update policy to convert the supplied selection into updates to MeshInstance mesh selections
 template<typename UpdatePolicyT>
-void select_components(const k3d::selection::records& Selection, const UpdatePolicyT& UpdatePolicy)
+void select_components(const k3d::selection::records& Selection, const k3d::double_t Weight)
 {
 	k3d::inode* node = 0;
 	k3d::mesh_selection selection;
@@ -315,8 +326,14 @@ void select_components(const k3d::selection::records& Selection, const UpdatePol
 
 		if(!sink)
 			continue;
-
-		UpdatePolicy(*n->second, selection);
+		
+		k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(node);
+		const k3d::mesh* mesh = 0;
+		if(mesh_source)
+			mesh = k3d::property::pipeline_value<k3d::mesh*>(mesh_source->mesh_source_output());
+		
+		UpdatePolicyT policy(Weight, mesh);
+		policy(*n->second, selection);
 	}
 
 	if(sink && node)
@@ -666,7 +683,18 @@ struct convert_to_points
 /** \todo Select adjacent edges */
 struct convert_to_lines
 {
-	convert_to_lines(bool KeepSelection) : m_keep_selection(KeepSelection) {}
+	struct implementation
+	{
+		implementation() : mesh(0) {}
+		k3d::mesh::indices_t companions;
+		k3d::mesh::bools_t boundary_edges;
+		const k3d::mesh* mesh;
+	};
+	
+	convert_to_lines(bool KeepSelection) : m_keep_selection(KeepSelection)
+	{
+		m_implementation = new implementation();
+	}
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		// Convert point selections to edge selections ...
@@ -676,6 +704,12 @@ struct convert_to_lines
 			const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 			const k3d::mesh::selection_t edge_selection = *Mesh.polyhedra->edge_selection;
 			const k3d::mesh::selection_t point_selection = *Mesh.point_selection;
+			
+			if(m_implementation->mesh != &Mesh)
+			{
+				k3d::create_edge_adjacency_lookup(edge_points, clockwise_edges, m_implementation->boundary_edges, m_implementation->companions);
+				m_implementation->mesh = &Mesh;
+			}
 
 			const size_t edge_begin = 0;
 			const size_t edge_end = edge_begin + edge_points.size();
@@ -803,7 +837,8 @@ struct convert_to_lines
 					for(size_t edge = first_edge; ; )
 					{
 						Selection.edges.push_back(k3d::mesh_selection::record(edge, 1.0));
-
+						if(!m_implementation->boundary_edges[edge])
+							Selection.edges.push_back(k3d::mesh_selection::record(m_implementation->companions[edge], 1.0));
 						edge = clockwise_edges[edge];
 						if(edge == first_edge)
 							break;
@@ -825,6 +860,7 @@ struct convert_to_lines
 		deselect_gaps(Selection);
 	}
 	bool m_keep_selection;
+	implementation* m_implementation;
 };
 
 /** \todo Handle adjacent edge selections */
@@ -1303,17 +1339,17 @@ public:
 
 	void select_points(const k3d::selection::records& Selection)
 	{
-		detail::select_components(Selection, detail::select_points(1.0));
+		detail::select_components<detail::select_points>(Selection, 1.0);
 	}
 
 	void select_lines(const k3d::selection::records& Selection)
 	{
-		detail::select_components(Selection, detail::select_lines(1.0));
+		detail::select_components<detail::select_lines>(Selection, 1.0);
 	}
 
 	void select_faces(const k3d::selection::records& Selection)
 	{
-		detail::select_components(Selection, detail::select_faces(1.0));
+		detail::select_components<detail::select_faces>(Selection, 1.0);
 	}
 
 	void select_nodes(const k3d::selection::records& Selection)
@@ -1407,17 +1443,17 @@ public:
 
 	void deselect_points(const k3d::selection::records& Selection)
 	{
-		detail::select_components(Selection, detail::select_points(0.0));
+		detail::select_components<detail::select_points>(Selection, 0.0);
 	}
 
 	void deselect_lines(const k3d::selection::records& Selection)
 	{
-		detail::select_components(Selection, detail::select_lines(0.0));
+		detail::select_components<detail::select_lines>(Selection, 0.0);
 	}
 
 	void deselect_faces(const k3d::selection::records& Selection)
 	{
-		detail::select_components(Selection, detail::select_faces(0.0));
+		detail::select_components<detail::select_faces>(Selection, 0.0);
 	}
 
 	void deselect_nodes(const k3d::selection::records& Selection)
