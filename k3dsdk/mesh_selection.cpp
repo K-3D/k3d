@@ -102,34 +102,6 @@ private:
 	uint_t index;
 };
 
-/// Updates edge selection, ensuring companions are also selected
-class merge_edge_selection
-{
-public:
-	merge_edge_selection(mesh_selection::records_t::const_iterator& Record) :
-		record(Record),
-		index(0)
-	{
-	}
-
-	void operator()(legacy::split_edge& Component)
-	{
-		
-		if(record->begin <= index && index < record->end)
-		{
-			Component.selection_weight = record->weight;
-			if(Component.companion)
-				Component.companion->selection_weight = record->weight;
-		}
-
-		++index;
-	}
-
-private:
-	const mesh_selection::records_t::const_iterator& record;
-	uint_t index;
-};
-
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
@@ -418,31 +390,28 @@ void merge_selection(const mesh_selection& MeshSelection, legacy::mesh& Mesh)
 
 	k3d::legacy::for_each_point(Mesh, detail::merge_selection(MeshSelection.points));
 
-	for(mesh_selection::records_t::const_iterator record = MeshSelection.edges.begin(); record != MeshSelection.edges.end(); ++record)
+	detail::merge_selection replace_edge_selection(MeshSelection.edges);
+	for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 	{
-		detail::merge_edge_selection replace_edge_selection(record);
-		for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
+		for(legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
 		{
-			for(legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
+			legacy::split_edge* edge = (*face)->first_edge;
+			do
 			{
-				legacy::split_edge* edge = (*face)->first_edge;
+				replace_edge_selection(*edge);
+				edge = edge->face_clockwise;
+			}
+			while(edge != (*face)->first_edge);
+
+			for(legacy::face::holes_t::iterator hole = (*face)->holes.begin(); hole != (*face)->holes.end(); ++hole)
+			{
+				legacy::split_edge* edge = *hole;
 				do
 				{
 					replace_edge_selection(*edge);
 					edge = edge->face_clockwise;
 				}
-				while(edge != (*face)->first_edge);
-	
-				for(legacy::face::holes_t::iterator hole = (*face)->holes.begin(); hole != (*face)->holes.end(); ++hole)
-				{
-					legacy::split_edge* edge = *hole;
-					do
-					{
-						replace_edge_selection(*edge);
-						edge = edge->face_clockwise;
-					}
-					while(edge != (*hole));
-				}
+				while(edge != (*hole));
 			}
 		}
 	}

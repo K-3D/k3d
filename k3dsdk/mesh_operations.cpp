@@ -392,24 +392,6 @@ void merge_selection(const mesh_selection& MeshSelection, mesh& Mesh)
 	{
 		k3d::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
 		detail::merge_selection(MeshSelection.edges, polyhedra->edge_points, polyhedra->edge_selection);
-		// Make sure selecting an edge also selects its companion
-		mesh::selection_t& edge_selection = *make_unique(polyhedra->edge_selection);
-		const mesh::indices_t& edge_points = *polyhedra->edge_points;
-		const mesh::indices_t& clockwise_edges = *polyhedra->clockwise_edges;
-		std::map<std::pair<size_t, size_t>, size_t > edge_end_points; // maps edge start and endpoint to edge number
-		k3d::uint_t edge_count = edge_points.size();
-		for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
-		{
-			edge_end_points[std::make_pair(edge_points[edge], edge_points[clockwise_edges[edge]])] = edge;
-		}
-		for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
-		{
-			std::map<std::pair<size_t, size_t>, size_t >::iterator endpoints = edge_end_points.find(std::make_pair(edge_points[clockwise_edges[edge]], edge_points[edge]));
-			if (edge_selection[edge] && endpoints != edge_end_points.end())
-			{
-				edge_selection[endpoints->second] = edge_selection[edge];
-			}
-		}
 	}
 
 	if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops)
