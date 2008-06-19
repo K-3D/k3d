@@ -333,8 +333,6 @@ public:
 		for(k3d::uint_t face = 0; face != polyhedra.face_first_loops->size(); ++face) edge_index_calculator(face);
 		document().pipeline_profiler().finish_execution(*this, "Calculate indices");
 		
-		k3d::log() << debug << "found " << edge_index_calculator.edge_count << " edges and " << m_edge_list.size() << " unique edges" << std::endl;
-		
 		document().pipeline_profiler().start_execution(*this, "Allocate memory");
 		boost::shared_ptr<k3d::mesh::indices_t> output_edge_points(new k3d::mesh::indices_t(edge_index_calculator.edge_count));
 		boost::shared_ptr<k3d::mesh::indices_t> output_clockwise_edges(new k3d::mesh::indices_t(edge_index_calculator.edge_count));
