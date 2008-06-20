@@ -1406,15 +1406,13 @@ namespace detail
 template<typename array_type>
 void save_array(element& Container, element Storage, const array_type& Array, const ipersistent::save_context& Context)
 {
-	if(Array.empty())
-		return;
-
 	typename array_type::const_iterator item = Array.begin();
 	const typename array_type::const_iterator end = Array.end();
 
 	std::ostringstream buffer;
 
-	buffer << *item++;
+	if(item != end)
+		buffer << *item++;
 	for(; item != end; ++item)
 		buffer << " " << *item;
 
@@ -1430,16 +1428,14 @@ void save_array(element& Container, element Storage, const typed_array<double>& 
 {
 	typedef typed_array<double> array_type;
 
-	if(Array.empty())
-		return;
-
 	array_type::const_iterator item = Array.begin();
 	const array_type::const_iterator end = Array.end();
 
 	std::ostringstream buffer;
 	buffer << std::setprecision(17);
 
-	buffer << *item++;
+	if(item != end)
+		buffer << *item++;
 	for(; item != end; ++item)
 		buffer << " " << *item;
 
@@ -1454,15 +1450,13 @@ void save_array(element& Container, element Storage, const typed_array<imaterial
 {
 	typedef typed_array<imaterial*> array_type;
 
-	if(Array.empty())
-		return;
-
 	array_type::const_iterator item = Array.begin();
 	const array_type::const_iterator end = Array.end();
 
 	std::ostringstream buffer;
 
-	buffer << Context.lookup.lookup_id(*item++);
+	if(item != end)
+		buffer << Context.lookup.lookup_id(*item++);
 	for(; item != end; ++item)
 		buffer << " " << Context.lookup.lookup_id(*item);
 
