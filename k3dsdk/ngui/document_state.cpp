@@ -695,6 +695,12 @@ struct convert_to_lines
 	{
 		m_implementation = new implementation();
 	}
+	
+	~convert_to_lines()
+	{
+		delete m_implementation;
+	}
+	
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		// Convert point selections to edge selections ...
