@@ -101,9 +101,9 @@ public:
 		k3d::mesh::blobbies_t::floats_t& floats = *k3d::make_unique(blobbies.floats);
 		k3d::mesh::blobbies_t::operands_t& operands = *k3d::make_unique(blobbies.operands);
 
-		first_primitives.push_back(0);
+		first_primitives.push_back(primitives.size());
 		primitive_counts.push_back(edges.size());
-		first_operators.push_back(0);
+		first_operators.push_back(operators.size());
 		operator_counts.push_back(1);
 		materials.push_back(material);
 

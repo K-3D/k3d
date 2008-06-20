@@ -18,15 +18,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the RenderMan Blobby primitives and operators
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
-#include <k3dsdk/measurement.h>
 #include <k3dsdk/legacy_mesh_source.h>
+#include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 
 namespace module
@@ -35,147 +34,7 @@ namespace module
 namespace blobby
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// blobby_ellipsoid
-
-class blobby_ellipsoid :
-	public k3d::legacy::mesh_source<k3d::node >
-{
-	typedef k3d::legacy::mesh_source<k3d::node > base;
-
-public:
-	blobby_ellipsoid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_x(init_owner(*this) + init_name("x") + init_label(_("X Position")) + init_description(_("Position on X axis")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_y(init_owner(*this) + init_name("y") + init_label(_("Y Position")) + init_description(_("Position on Y axis")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_z(init_owner(*this) + init_name("z") + init_label(_("Z Position")) + init_description(_("Position on Z axis")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_size_x(init_owner(*this) + init_name("size_x") + init_label(_("X Size")) + init_description(_("Size on X axis")) + init_value(1.0) + init_step_increment(0.1) + init_constraint(constraint::minimum<double>(0.1)) + init_units(typeid(k3d::measurement::distance))),
-		m_size_y(init_owner(*this) + init_name("size_y") + init_label(_("Y Size")) + init_description(_("Size on Y axis")) + init_value(1.0) + init_step_increment(0.1) + init_constraint(constraint::minimum<double>(0.1)) + init_units(typeid(k3d::measurement::distance))),
-		m_size_z(init_owner(*this) + init_name("size_z") + init_label(_("Z Size")) + init_description(_("Size on Z axis")) + init_value(1.0) + init_step_increment(0.1) + init_constraint(constraint::minimum<double>(0.1)) + init_units(typeid(k3d::measurement::distance))),
-		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Ellipsoid color")) + init_value(k3d::color(1, 1, 1)))
-	{
-		m_x.changed_signal().connect(make_reset_mesh_slot());
-		m_y.changed_signal().connect(make_reset_mesh_slot());
-		m_z.changed_signal().connect(make_reset_mesh_slot());
-		m_size_x.changed_signal().connect(make_reset_mesh_slot());
-		m_size_y.changed_signal().connect(make_reset_mesh_slot());
-		m_size_z.changed_signal().connect(make_reset_mesh_slot());
-	}
-
-	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
-	{
-		k3d::legacy::point* position = new k3d::legacy::point(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value());
-		Mesh.points.push_back(position);
-
-		k3d::matrix4 transformation = k3d::scaling3D(k3d::point3(m_size_x.pipeline_value(), m_size_y.pipeline_value(), m_size_z.pipeline_value()));
-		k3d::legacy::blobby::ellipsoid* ellipsoid = new k3d::legacy::blobby::ellipsoid(position, transformation);
-		ellipsoid->vertex_data["Cs"] = m_color.pipeline_value();
-
-		Mesh.blobbies.push_back(new k3d::legacy::blobby(ellipsoid));
-	}
-
-	void on_update_mesh(k3d::legacy::mesh& Mesh)
-	{
-	}
-
-	static k3d::iplugin_factory& get_factory()
-	{
-		static k3d::document_plugin_factory<blobby_ellipsoid > factory(
-			k3d::uuid(0x76ba2f7c, 0xd49945e2, 0xa54d32b0, 0x0f756a94),
-			"BlobbyEllipsoid",
-			"Creates a RenderMan Blobby Ellipsoid",
-			"Blobby",
-			k3d::iplugin_factory::STABLE);
-
-		return factory;
-	}
-
-private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_size_x;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_size_y;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_size_z;
-	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
-};
-
-/////////////////////////////////////////////////////////////////////////////
-// blobby_segment
-
-class blobby_segment :
-	public k3d::legacy::mesh_source<k3d::node >
-{
-	typedef k3d::legacy::mesh_source<k3d::node > base;
-
-public:
-	blobby_segment(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Segment radius")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_x1(init_owner(*this) + init_name("x1") + init_label(_("X1 Position")) + init_description(_("First segment end X position")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_y1(init_owner(*this) + init_name("y1") + init_label(_("Y1 Position")) + init_description(_("First segment end Y position")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_z1(init_owner(*this) + init_name("z1") + init_label(_("Z1 Position")) + init_description(_("First segment end Z position")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_x2(init_owner(*this) + init_name("x2") + init_label(_("X2 Position")) + init_description(_("Second segment end X position")) + init_value(3.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_y2(init_owner(*this) + init_name("y2") + init_label(_("Y2 Position")) + init_description(_("Second segment end Y position")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_z2(init_owner(*this) + init_name("z2") + init_label(_("Z2 Position")) + init_description(_("Second segment end Z position")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Segment color")) + init_value(k3d::color(1, 1, 1)))
-	{
-		m_x1.changed_signal().connect(make_reset_mesh_slot());
-		m_y1.changed_signal().connect(make_reset_mesh_slot());
-		m_z1.changed_signal().connect(make_reset_mesh_slot());
-		m_x2.changed_signal().connect(make_reset_mesh_slot());
-		m_y2.changed_signal().connect(make_reset_mesh_slot());
-		m_z2.changed_signal().connect(make_reset_mesh_slot());
-		m_radius.changed_signal().connect(make_reset_mesh_slot());
-	}
-
-	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
-	{
-		k3d::legacy::point* start = new k3d::legacy::point(m_x1.pipeline_value(), m_y1.pipeline_value(), m_z1.pipeline_value());
-		k3d::legacy::point* end = new k3d::legacy::point(m_x2.pipeline_value(), m_y2.pipeline_value(), m_z2.pipeline_value());
-		Mesh.points.push_back(start);
-		Mesh.points.push_back(end);
-
-		k3d::matrix4 id = k3d::identity3D();
-		k3d::legacy::blobby::segment* segment = new k3d::legacy::blobby::segment(start, end, m_radius.pipeline_value(), id);
-		segment->vertex_data["Cs"] = m_color.pipeline_value();
-
-		Mesh.blobbies.push_back(new k3d::legacy::blobby(segment));
-	}
-
-	void on_update_mesh(k3d::legacy::mesh& Mesh)
-	{
-	}
-
-	k3d::iplugin_factory& factory()
-	{
-		return get_factory();
-	}
-
-	static k3d::iplugin_factory& get_factory()
-	{
-		static k3d::document_plugin_factory<blobby_segment> factory(
-			k3d::uuid(0x975d22ad, 0xe55e41a5, 0x9fdb26d2, 0x529952e0),
-			"BlobbySegment",
-			"Creates a RenderMan Blobby Segment",
-			"Blobby",
-			k3d::iplugin_factory::STABLE);
-
-		return factory;
-	}
-
-private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x1;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y1;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z1;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x2;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y2;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z2;
-	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
-};
-
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 // blobby_add_operator
 
 class blobby_add_operator :
@@ -675,16 +534,6 @@ private:
 
 /////////////////////////////////////////////////////////////////////////////
 // blobby factories
-
-k3d::iplugin_factory& blobby_ellipsoid_factory()
-{
-	return blobby_ellipsoid::get_factory();
-}
-
-k3d::iplugin_factory& blobby_segment_factory()
-{
-	return blobby_segment::get_factory();
-}
 
 k3d::iplugin_factory& blobby_add_operator_factory()
 {

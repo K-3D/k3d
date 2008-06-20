@@ -78,9 +78,9 @@ public:
 		const double radius = m_radius.pipeline_value();
 		k3d::imaterial* const material = m_material.pipeline_value();
 
-		first_primitives.push_back(0);
+		first_primitives.push_back(primitives.size());
 		primitive_counts.push_back(points.size());
-		first_operators.push_back(0);
+		first_operators.push_back(operators.size());
 		operator_counts.push_back(1);
 		materials.push_back(material);
 

@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<blobbies>
+			<first_primitives>0</first_primitives>
+			<primitive_counts>1</primitive_counts>
+			<first_operators>0</first_operators>
+			<operator_counts>0</operator_counts>
+			<materials>0</materials>
+			<primitives>ellipsoid</primitives>
+			<primitive_first_floats>0</primitive_first_floats>
+			<primitive_float_counts>16</primitive_float_counts>
+			<varying_data>
+				<array name="Cs" type="k3d::color">1 1 1</array>
+			</varying_data>
+			<operators/>
+			<operator_first_operands/>
+			<operator_operand_counts/>
+			<floats>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</floats>
+			<operands/>
+		</blobbies>
+	</mesh_arrays>
+</k3dml>
