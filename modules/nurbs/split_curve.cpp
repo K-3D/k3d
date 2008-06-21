@@ -187,6 +187,7 @@ namespace module
 				k3d::mesh::points_t& mesh_points = *k3d::make_unique(input.points);
 				k3d::mesh::selection_t& point_selection = *k3d::make_unique(input.point_selection);
 				k3d::mesh::indices_t& curve_points = *k3d::make_unique(groups.curve_points);
+				k3d::mesh::weights_t& curve_point_weights = *k3d::make_unique(groups.curve_point_weights);				
 			
 				size_t order = (*groups.curve_orders)[curve];
 				size_t nr_points = (*groups.curve_point_counts)[curve];
@@ -233,7 +234,7 @@ namespace module
 				}
 			
 				//*******************************************************************
-				//Algorithm from "The NURBS book"
+				//Algorithm from "The NURBS book" page 151
 				//*******************************************************************
 			
 				size_t mp = curve_knots_end - curve_knots_begin;
@@ -273,17 +274,17 @@ namespace module
 				
 				for( size_t i = k - s; i < nr_points; i++ )
 				{
-					k3d::log() << debug << "Trying to put Mesh point " << curve_points.at( curve_points_begin + i ) << " from curve point " <<  curve_points_begin + i << " to index " << i+r << std::endl;
+					//k3d::log() << debug << "Trying to put Mesh point " << curve_points.at( curve_points_begin + i ) << " from curve point " <<  curve_points_begin + i << " to index " << i+r << std::endl;
 					points.at(i + r) = mesh_points.at( curve_points.at( curve_points_begin + i ) );
 				}
 				
 				
 				k3d::mesh::points_t tmp;
 				
-				k3d::log() << debug << "Filling temp array" << std::endl;
+				k3d::log() << debug << "Filling temp array with weighted control points" << std::endl;
 				
 				for( size_t i = 0; i<= order -1 - s; i++ )
-					tmp.push_back( mesh_points.at( curve_points.at( curve_points_begin + i + k - (order - 1)) ) );
+					tmp.push_back( curve_point_weights.at(curve_points_begin + i + k - (order - 1)) * mesh_points.at( curve_points.at( curve_points_begin + i + k - (order - 1)) ) );
 				
 				size_t L=0;
 				
@@ -329,7 +330,9 @@ namespace module
 				k3d::log() << debug << "Inserting points" << std::endl;
 				//new points
 				k3d::mesh::indices_t new_curve_points(points.size(), 0);
-			
+				
+				k3d::mesh::weights_t::iterator point_weight = curve_point_weights.begin();
+				
 				for( size_t i = 0; i < points.size(); i++ )
 				{
 					k3d::mesh::points_t::iterator index = find(mesh_points.begin(), mesh_points.end(), points[i]);
@@ -344,6 +347,11 @@ namespace module
 						mesh_points.push_back(points[i]);
 						point_selection.push_back(0.0);
 						new_curve_points[i] = mesh_points.size() - 1;
+						
+						//insert curve_point_weight
+						point_weight = curve_point_weights.begin();
+						point_weight += i;
+						curve_point_weights.insert(point_weight, 1.0);
 					}
 				}			
 
@@ -363,7 +371,7 @@ namespace module
 				}
 				
 				k3d::mesh::counts_t& curve_point_counts = *k3d::make_unique(groups.curve_point_counts);
-				curve_point_counts[curve]+=point_offset;
+				curve_point_counts[curve] += point_offset;
 				
 				k3d::log() << debug << "Inserted " << knot_offset << " knots and " << point_offset << " points!" << std::endl;
 			}
