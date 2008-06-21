@@ -39,6 +39,11 @@ void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::
 void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces);
 
 /// Initialize Valences array for constant time lookup of vertex valence (number of incoming edges)
+/**
+ * \param PointCount Initial guess for the number of points. Valences will be expanded to the correct size if this is too small
+ * \param EdgePoints The indices of the edge points
+ * \param Valences will store the number of edges for each point
+ */
 void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& EdgePoints, mesh::counts_t& Valences);
 
 /// Initialise boundary_faces array for constant time lookup of faces that are on the mesh boundary. BoundaryEdges and AdjacentEdges can be created using create_edge_adjacency_lookup

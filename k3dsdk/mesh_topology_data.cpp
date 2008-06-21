@@ -23,40 +23,100 @@
 
 #include "mesh_topology_data.h"
 
+#include "parallel/blocked_range.h"
+#include "parallel/parallel_for.h"
+#include "parallel/threads.h"
+
 namespace k3d
 {
 
+namespace detail
+{
+
+class find_companion_worker
+{
+public:
+	find_companion_worker(const mesh::indices_t& EdgePoints,
+			const mesh::indices_t& ClockwiseEdges,
+			const mesh::counts_t& Valences,
+			const mesh::indices_t& FirstEdges,
+			const mesh::indices_t& PointEdges,
+			mesh::bools_t& BoundaryEdges,
+			mesh::indices_t& AdjacentEdges) :
+				m_edge_points(EdgePoints),
+				m_clockwise_edges(ClockwiseEdges),
+				m_valences(Valences),
+				m_first_edges(FirstEdges),
+				m_point_edges(PointEdges),
+				m_boundary_edges(BoundaryEdges),
+				m_adjacent_edges(AdjacentEdges)
+			{}
+	
+	void operator()(const k3d::parallel::blocked_range<k3d::uint_t>& range) const
+	{
+		const k3d::uint_t edge_begin = range.begin();
+		const k3d::uint_t edge_end = range.end();
+		for(size_t edge = edge_begin; edge != edge_end; ++edge)
+		{
+			const uint_t vertex1 = m_edge_points[edge];
+			const uint_t vertex2 = m_edge_points[m_clockwise_edges[edge]];
+
+			const uint_t first_index = m_first_edges[vertex2];
+			const uint_t last_index = first_index + m_valences[vertex2];
+			for(uint_t i = first_index; i != last_index; ++i)
+			{
+				const uint_t companion = m_point_edges[i];
+				if(m_edge_points[m_clockwise_edges[companion]] == vertex1)
+				{
+					m_boundary_edges[edge] = false;
+					m_adjacent_edges[edge] = companion;
+					break;
+				}
+			}
+		}
+	}
+	
+private:
+	const mesh::indices_t& m_edge_points;
+	const mesh::indices_t& m_clockwise_edges;
+	const mesh::counts_t& m_valences;
+	const mesh::indices_t& m_first_edges;
+	const mesh::indices_t& m_point_edges;
+	mesh::bools_t& m_boundary_edges;
+	mesh::indices_t& m_adjacent_edges;
+};
+
+}
+
 void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges)
 {
+	mesh::counts_t valences;
+	create_vertex_valence_lookup(0, EdgePoints, valences);
+	mesh::counts_t found_edges(valences.size(), 0);
+	mesh::indices_t first_edges(valences.size(), 0); // first edge in point_edges for each point
+	mesh::indices_t point_edges(EdgePoints.size(), 0);
+	uint_t count = 0;
+	for(uint_t point = 0; point != valences.size(); ++point)
+	{
+		first_edges[point] = count;
+		count += valences[point];
+	}
 	BoundaryEdges.assign(EdgePoints.size(), true);
 	AdjacentEdges.assign(EdgePoints.size(), 0);
 
-	typedef std::map<std::pair<size_t, size_t>, size_t> adjacent_edges_t;
-	adjacent_edges_t adjacent_edges;
-
-	const size_t edge_begin = 0;
-	const size_t edge_end = edge_begin + EdgePoints.size();
-	for(size_t edge = edge_begin; edge != edge_end; ++edge)
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + EdgePoints.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
 	{
-		const size_t vertex1 = EdgePoints[edge];
-		const size_t vertex2 = EdgePoints[ClockwiseEdges[edge]];
-		adjacent_edges.insert(std::make_pair(std::make_pair(vertex1, vertex2), edge));
+		const uint_t point = EdgePoints[edge];
+		point_edges[first_edges[point] + found_edges[point]] = edge;
+		++found_edges[point];
 	}
-
-	for(size_t edge = edge_begin; edge != edge_end; ++edge)
-	{
-		const size_t vertex1 = EdgePoints[edge];
-		const size_t vertex2 = EdgePoints[ClockwiseEdges[edge]];
-
-		const adjacent_edges_t::const_iterator adjacent_edge_iterator = adjacent_edges.find(std::make_pair(vertex2, vertex1));
-		if(adjacent_edge_iterator != adjacent_edges.end())
-		{
-			const size_t adjacent_edge = adjacent_edge_iterator->second;
-
-			BoundaryEdges[adjacent_edge] = false;
-			AdjacentEdges[adjacent_edge] = edge;
-		}
-	}
+	
+	// Making this parallel decreases running time by 20 % on a Pentium D. 
+	k3d::parallel::parallel_for(
+				k3d::parallel::blocked_range<k3d::uint_t>(edge_begin, edge_end, k3d::parallel::grain_size()),
+				detail::find_companion_worker(EdgePoints, ClockwiseEdges, valences, first_edges, point_edges, BoundaryEdges, AdjacentEdges));
 }
 
 void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::indices_t& EdgeFaces)
@@ -124,15 +184,16 @@ void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh
 
 void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& EdgePoints, mesh::counts_t& Valences)
 {
-	// Default to 0 for all points
-	Valences.clear();
-	Valences.resize(PointCount, 0);
-		
+	Valences.assign(PointCount, 0);
+	
 	// Add 1 for each edge that starts at a point
 	uint_t edge_count = EdgePoints.size();
 	for (uint_t edge = 0; edge != edge_count; ++edge)
 	{
-		++Valences[EdgePoints[edge]];
+		const uint_t edge_point = EdgePoints[edge];
+		if(edge_point >= Valences.size()) // In case PointCount was not known to the caller
+			Valences.resize(edge_point + 1, 0);
+		++Valences[edge_point];
 	}
 }
 
