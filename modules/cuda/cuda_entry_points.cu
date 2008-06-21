@@ -259,6 +259,7 @@ extern "C" void transform_points_synchronous ( double *InputPoints, double *Poin
 	CUT_SAFE_CALL( cutResetTimer( timer));
 	CUT_SAFE_CALL( cutStartTimer( timer));
 	linear_transform_kernel <<< blocks_per_grid, threads_per_block >>> ((float4*)(device_points), num_points);
+	cudaThreadSynchronize();
 	CUT_SAFE_CALL( cutStopTimer( timer));
 	setTimingInfoTiming(tInfo, EXECUTE, cutGetTimerValue( timer));
 	

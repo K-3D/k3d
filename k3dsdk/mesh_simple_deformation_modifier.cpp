@@ -59,7 +59,9 @@ void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& O
 	const mesh::points_t& input_points = *Input.points;
 	const mesh::selection_t& selection = *Output.point_selection;
 
+	document().pipeline_profiler().start_execution(*this, "Copy points");
 	mesh::points_t& output_points = *make_unique(Output.points);
+	document().pipeline_profiler().finish_execution(*this, "Copy points");
 
 	on_deform_mesh(input_points, selection, output_points);
 }
