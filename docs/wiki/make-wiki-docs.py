@@ -18,6 +18,9 @@ def plugin_sort(lhs, rhs):
 categories = { "All" : [], "Stable" : [], "Experimental" : [], "Deprecated" : [] }
 
 for plugin in k3d.plugins():
+	if plugin.metadata().has_key("k3d:disable-documentation"):
+		continue
+
 	categories["All"].append(plugin)
 
 	if plugin.quality() == "stable":
@@ -34,6 +37,9 @@ for plugin in k3d.plugins():
 
 # Create the main article for each plugin ...
 for plugin in sorted(k3d.plugins(), plugin_sort):
+	if plugin.metadata().has_key("k3d:disable-documentation"):
+		continue
+
 	print """Creating main article for """ + plugin.name() + """ ..."""
 	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/articles/" + plugin.name(), "w")
 	article.write("<plugin>{{PAGENAME}}</plugin>\n")
@@ -84,6 +90,9 @@ for category in sorted(categories.keys()):
 # Create the reference documentation for each plugin ...
 for plugin in sorted(k3d.plugins(), plugin_sort):
 
+	if plugin.metadata().has_key("k3d:disable-documentation"):
+		continue
+
 	print """Creating reference documentation for """ + plugin.name() + """ ..."""
 
 	plugin_quality = ""
@@ -119,6 +128,19 @@ for plugin in sorted(k3d.plugins(), plugin_sort):
 	article.write("""</td></tr>\n""")
 
 	article.write("""</table>\n""")
+
+	article.write("== Metadata == " + "\n")
+
+	article.write("{| border=\"1\" cellpadding=\"5\" cellspacing=\"0\"\n")
+	article.write("! Name\n")
+	article.write("! Value\n")
+
+	for name in plugin.metadata():
+		article.write("|-\n")
+		article.write("|'''" + name + "'''\n")
+		article.write("|" + plugin.metadata()[name] + "\n")
+
+	article.write("|}\n")
 
 	if plugin.is_document_plugin():
 		node = doc.new_node(plugin.name())

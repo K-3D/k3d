@@ -196,6 +196,9 @@ void register_plugins(const k3d::filesystem::path& Path, k3d::iplugin_registry& 
 				plugin_metadata.insert(std::make_pair(name, value));
 		}
 
+		// Automatically disable documentation for all scripted plugins ...
+		plugin_metadata.insert(std::make_pair("k3d:disable-documentation", ""));
+
 		if(plugin_class.empty())
 		{
 			continue;
