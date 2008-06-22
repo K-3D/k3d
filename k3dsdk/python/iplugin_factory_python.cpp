@@ -93,6 +93,17 @@ static const string_t quality(iplugin_factory_wrapper& Self)
 	return "unknown";
 }
 
+static boost::python::dict metadata(iplugin_factory_wrapper& Self)
+{
+	boost::python::dict result;
+
+	const iplugin_factory::metadata_t metadata = Self.wrapped().metadata();
+	for(iplugin_factory::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
+		result[pair->first] = pair->second;
+
+	return result;
+}
+
 void define_iplugin_factory_wrapper()
 {
 	class_<iplugin_factory_wrapper>("iplugin_factory",
@@ -110,7 +121,9 @@ void define_iplugin_factory_wrapper()
 		.def("categories", &categories,
 			"Returns an arbitrary collection of human-readable categories used to organize the list of plugins in the user interface.")
 		.def("quality", &quality,
-			"Returns the string \"stable\", \"experimental\", or \"deprecated\".");
+			"Returns the string \"stable\", \"experimental\", or \"deprecated\".")
+		.def("metadata", &metadata,
+			"Returns plugin metadata as a dict containing name-value pairs.");
 }
 
 } // namespace python
