@@ -67,8 +67,14 @@ vbo::operator GLuint( ) const
 
 void point_vbo::bind()
 {
-	return_if_fail(m_vbo);
-	return_if_fail(glIsBuffer(*m_vbo));
+	if(!m_vbo)
+	{
+		throw vbo_exception("point_vbo is null");
+	}
+	if(!glIsBuffer(*m_vbo))
+	{
+		throw vbo_exception("point_vbo is not a buffer!");
+	}
 	glBindBuffer(GL_ARRAY_BUFFER, *m_vbo);	
 	glVertexPointer(3, GL_DOUBLE, 0, 0);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -126,7 +132,14 @@ void point_vbo::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 
 void edge_vbo::bind()
 {
-	return_if_fail(glIsBuffer(*m_vbo));
+	if(!m_vbo)
+	{
+		throw vbo_exception("edge_vbo is null");
+	}
+	if(!glIsBuffer(*m_vbo))
+	{
+		throw vbo_exception("edge_vbo is not a buffer!");
+	}
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_vbo);
 }
 

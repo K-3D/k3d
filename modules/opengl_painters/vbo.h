@@ -54,6 +54,14 @@ typedef std::map<size_t, size_t> indexmap_t;
 typedef std::multimap<size_t, size_t> indexmultimap_t;
 typedef std::list<size_t> indexlist_t;
 
+/// Exception for VBO-related errors
+class vbo_exception : public std::runtime_error
+{
+	typedef std::runtime_error base;
+public:
+	vbo_exception(const std::string& Message) : base("VBO error: " + Message) {} 
+};
+
 /// Convenience wrapper for OpenGL vertex buffer objects
 class vbo
 {

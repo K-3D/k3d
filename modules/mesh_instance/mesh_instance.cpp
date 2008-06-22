@@ -194,7 +194,15 @@ public:
 			double parent_selection = parent ? parent->get_selection_weight() : 0.0;
 
 			k3d::gl::painter_render_state render_state(State, matrix(), m_selection_weight.pipeline_value(), m_show_component_selection.pipeline_value(), parent_selection);
-			painter->paint_mesh(*output_mesh, render_state);
+			try
+			{
+				painter->paint_mesh(*output_mesh, render_state);
+			}
+			catch(std::runtime_error& E) // VBO painters throw an exception if the VBO state is corrupted. We force regeneration using mesh_changed.
+			{
+				k3d::log() << error << E.what() << std::endl;
+				mesh_changed(0);
+			}
 		}
 	}
 
@@ -222,7 +230,15 @@ public:
 			// Then, ID the underlying mesh ...
 			k3d::gl::push_selection_token(k3d::selection::MESH, 0);
 			// Now give the painters a chance ...
-			painter->select_mesh(*output_mesh, render_state, selection_state);
+			try
+			{
+				painter->select_mesh(*output_mesh, render_state, selection_state);
+			}
+			catch(std::runtime_error& E) // VBO painters throw an exception if the VBO state is corrupted. We force regeneration using mesh_changed.
+			{
+				k3d::log() << error << E.what() << std::endl;
+				mesh_changed(0);
+			}
 
 			k3d::gl::pop_selection_token(); // mesh
 			k3d::gl::pop_selection_token(); // node
