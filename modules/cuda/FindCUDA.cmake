@@ -155,7 +155,7 @@ MACRO (WRAP_CUDA outfiles)
 	ADD_CUSTOM_COMMAND (
 			OUTPUT ${OFILE}
 			COMMAND ${CUDA_COMPILER}
-			ARGS -shared 
+			ARGS -shared -Xcompiler -fPIC
                 ${CUDA_OPTIONS}
 				${cuda_includes} -o ${OFILE} ${INFILES}
 				-lcudart -L${CUTIL_PATH} -lcutil)
