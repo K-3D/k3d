@@ -21,7 +21,7 @@
 	\author Evan Lezar (evanlezar@gmail.com)
 */
 
-#include "cuda_bitmap_simple_modifier.h"
+#include "cuda_bitmap_simple_modifier.h" 
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
