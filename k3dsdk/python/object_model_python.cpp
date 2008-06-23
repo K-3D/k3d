@@ -79,6 +79,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/parallel/threads.h>
+#include <k3dsdk/render_state_ri.h> // MinGW needs typeinfo
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/share.h>
@@ -561,20 +562,19 @@ void get_context(dict& Dictionary, k3d::iscript_engine::context_t& Context)
 {
 	for(k3d::iscript_engine::context_t::iterator context = Context.begin(); context != Context.end(); ++context)
 	{
-		// note: demangling is used as workaround for mingw build, which segfaults on the std::type_info operator== 
-		const k3d::string_t type = k3d::demangle(context->second.type());
-		
-		if(type == "k3d::idocument*")
+		const std::type_info& type = context->second.type();
+
+		if(type == typeid(k3d::idocument*))
 			continue;
-		else if(type == "k3d::inode*")
+		else if(type == typeid(k3d::inode*))
 			continue;
-		else if(type == "k3d::mesh*")
+		else if(type == typeid(k3d::mesh*))
 			continue;
-		else if(type == "const k3d::ri::render_state*")
+		else if(type == typeid(const k3d::ri::render_state*))
 			continue;
 		else
 		{
-			context->second = python_to_any(Dictionary[context->first], context->second.type());
+			context->second = python_to_any(Dictionary[context->first], type);
 		}
 	}
 }
