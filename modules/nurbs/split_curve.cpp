@@ -331,7 +331,7 @@ namespace module
 				//new points
 				k3d::mesh::indices_t new_curve_points(points.size(), 0);
 				
-				k3d::mesh::weights_t::iterator point_weight = curve_point_weights.begin();
+				k3d::mesh::weights_t new_curve_point_weights;
 				
 				for( size_t i = 0; i < points.size(); i++ )
 				{
@@ -339,6 +339,7 @@ namespace module
 					if( index != mesh_points.end())
 					{
 						new_curve_points[i] = distance(mesh_points.begin(),index);
+						new_curve_point_weights.push_back( curve_point_weights[new_curve_points[i]] );
 						k3d::log() << debug << "Point already there, adding index " << new_curve_points[i] << " to curve_points" << std::endl;
 					}
 					else
@@ -349,11 +350,17 @@ namespace module
 						new_curve_points[i] = mesh_points.size() - 1;
 						
 						//insert curve_point_weight
-						point_weight = curve_point_weights.begin();
-						point_weight += i;
-						curve_point_weights.insert(point_weight, 1.0);
+						new_curve_point_weights.push_back( 1.0 );
 					}
-				}			
+				}
+				
+				k3d::mesh::weights_t::iterator point_weight = curve_point_weights.begin() + curve_points_begin;
+				for( size_t i = 0; i < curve_points_end - curve_points_begin; i++ )
+				{
+					curve_point_weights.erase(point_weight);
+				}
+				
+				curve_point_weights.insert(point_weight, new_curve_point_weights.begin(), new_curve_point_weights.end());
 
 				k3d::mesh::indices_t& curve_first_points = *k3d::make_unique( groups.curve_first_points );
 				
