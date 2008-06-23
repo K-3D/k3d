@@ -1,3 +1,4 @@
+#include <boost/algorithm/string.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/program_options.hpp>
 
@@ -65,6 +66,11 @@ int main(int argc, char* argv[])
 		if(!options.count("path"))
 			throw std::runtime_error("missing output path");
 		std::string resource_path = options["path"].as<std::string>();
+
+		// This is a lousy damn hack, but the !@#$! msys shell automatically converts relative paths into
+		// absolute paths, so we wrap the resource path in XML-style <path>...</path> 
+		boost::replace_first(resource_path, "<path>", "");
+		boost::replace_last(resource_path, "</path>", "");
 
 		std::string output_path = "-";
 		if(options.count("output"))
