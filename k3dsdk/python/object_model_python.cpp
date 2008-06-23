@@ -272,16 +272,20 @@ const list module_plugins()
 	return plugins;
 }
 
-const list module_resources()
+class resource
 {
-	list resources;
+public:
+	static const list keys()
+	{
+		list python_keys;
 
-	const k3d::resource::keys_t& keys = k3d::resource::keys();
-	for(k3d::resource::keys_t::const_iterator key = keys.begin(); key != keys.end(); ++key)
-		resources.append(*key);
+		const k3d::resource::keys_t& keys = k3d::resource::keys();
+		for(k3d::resource::keys_t::const_iterator key = keys.begin(); key != keys.end(); ++key)
+			python_keys.append(*key);
 
-	return resources;
-}
+		return python_keys;
+	}
+};
 
 const k3d::matrix4 module_rotate3(const object& Value)
 {
@@ -502,8 +506,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Opens an existing document stored on disk.");
 	def("plugins", module_plugins,
 		"Returns a list containing the set of all plugin factories.");
-	def("resources", module_resources,
-		"Returns a list containing the set of all resources.");
 	def("rotate3", module_rotate3,
 		"Returns a L{matrix4} containing a three-dimensional rotation matrix.");
 	def("scale3", module_scale3,
@@ -524,6 +526,12 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
 	def("ui", module_ui,
 		"Returns the singleton runtime L{iuser_interface} plugin instance.");
+
+	class_<resource>("resource")
+		.def("keys", resource::keys,
+			"Returns a list containing the set of all resources.").staticmethod("keys")
+		.def("get_string", k3d::resource::get_string,
+			"Returns a resource as a string, or empty string if the resource does not exist.").staticmethod("get_string");
 
 	scope().attr("__doc__") = "Provides access to the K-3D API";
 }
