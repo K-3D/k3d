@@ -103,6 +103,7 @@ ADD_LIBRARY(k3dsdk-python SHARED
 K3D_GENERATE_DEF_FILE(k3dsdk-python)
         
 TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-python-types)
+TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-resource)
 
 INSTALL(TARGETS k3dsdk-python-types
 	RUNTIME DESTINATION bin 

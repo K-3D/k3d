@@ -25,6 +25,7 @@
 */
 
 #include <k3dsdk/types.h>
+#include <vector>
 
 namespace k3d
 {
@@ -36,6 +37,11 @@ namespace resource
 
 /// Initializes a resource, associating a string key (the Path) with the given data.
 const bool_t initialize(const string_t& Path, unsigned char* Data, const uint64_t ByteCount);
+
+/// Defines storage for a list of resource keys
+typedef std::vector<string_t> keys_t;
+/// Returns the current list of resource keys
+const keys_t keys();
 
 /// Returns a resource as a string (note: it is up to the caller to decide whether this is safe).
 /// Returns empty string if the resource does not exist.

@@ -74,6 +74,16 @@ const bool_t initialize(const string_t& Path, unsigned char* Data, const uint64_
 	return true;
 }
 
+const keys_t keys()
+{
+	keys_t result;
+
+	for(records_t::const_iterator record = records.begin(); record != records.end(); ++record)
+		result.push_back(record->first);
+	
+	return result;
+}
+
 const string_t get_string(const string_t& Path)
 {
 	if(!records.count(Path))

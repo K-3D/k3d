@@ -79,6 +79,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/parallel/threads.h>
+#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/type_registry.h>
@@ -269,6 +270,17 @@ const list module_plugins()
 		plugins.append(interface_wrapper<k3d::iplugin_factory>(*factory));
 
 	return plugins;
+}
+
+const list module_resources()
+{
+	list resources;
+
+	const k3d::resource::keys_t& keys = k3d::resource::keys();
+	for(k3d::resource::keys_t::const_iterator key = keys.begin(); key != keys.end(); ++key)
+		resources.append(*key);
+
+	return resources;
 }
 
 const k3d::matrix4 module_rotate3(const object& Value)
@@ -490,6 +502,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Opens an existing document stored on disk.");
 	def("plugins", module_plugins,
 		"Returns a list containing the set of all plugin factories.");
+	def("resources", module_resources,
+		"Returns a list containing the set of all resources.");
 	def("rotate3", module_rotate3,
 		"Returns a L{matrix4} containing a three-dimensional rotation matrix.");
 	def("scale3", module_scale3,
