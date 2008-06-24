@@ -44,7 +44,13 @@ const std::type_info* type_id(const string_t& Name);
 
 const std::type_info& type_id_k3d_bitmap_ptr();
 
-/// Returns the demangled name of a type, or the input string if demangling isn't available
+/// Returns an informal, human-readable string representation for the given type.
+/// On platforms that support it, the returned string will be the fully-qualified
+/// type-name, including namespaces.  Otherwise, the result will be the mangled
+/// symbol name or some other unique string representation.
+///
+/// Note: this function is only for use in error-messages and for troubleshooting,
+/// you cannot make any assumptions about the return values.
 const string_t demangle(const std::type_info& Type);
 
 } // namespace k3d
