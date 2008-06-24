@@ -528,7 +528,7 @@ BOOST_PYTHON_MODULE(k3d)
 	def("ui", module_ui,
 		"Returns the singleton runtime L{iuser_interface} plugin instance.");
 
-	class_<resource>("resource")
+	class_<resource>("resource", no_init)
 		.def("keys", resource::keys,
 			"Returns a list containing the set of all resources.").staticmethod("keys")
 		.def("get_string", k3d::resource::get_string,
