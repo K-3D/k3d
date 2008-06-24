@@ -37,12 +37,12 @@ namespace python
 
 typedef interface_wrapper<k3d::inode> inode_wrapper;
 
-static interface_wrapper<k3d::idocument> document(inode_wrapper& Self)
+static object document(inode_wrapper& Self)
 {
 	return wrap(Self.wrapped().document());
 }
 
-static interface_wrapper<k3d::iplugin_factory> factory(inode_wrapper& Self)
+static object factory(inode_wrapper& Self)
 {
 	return wrap(Self.wrapped().factory());
 }

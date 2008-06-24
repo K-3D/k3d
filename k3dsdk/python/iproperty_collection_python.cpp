@@ -55,12 +55,12 @@ static list properties(iproperty_collection_wrapper& Self)
 	return results;
 }
 
-static interface_wrapper<k3d::iproperty> get_property(iproperty_collection_wrapper& Self, const string_t& Name)
+static object get_property(iproperty_collection_wrapper& Self, const string_t& Name)
 {
 	return wrap(k3d::property::get(Self.wrapped(), Name));
 }
 
-static interface_wrapper<k3d::iproperty> create_property(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& Name, const string_t& Label, const string_t& Description)
+static object create_property(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& Name, const string_t& Label, const string_t& Description)
 {
 	k3d::inode* const node = dynamic_cast<k3d::inode*>(Self.wrapped_ptr());
 	if(!node)
@@ -73,7 +73,7 @@ static interface_wrapper<k3d::iproperty> create_property(iproperty_collection_wr
 	return wrap(result);
 }
 
-static interface_wrapper<k3d::iproperty> create_renderman_attribute(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& AttributeName, const string_t& Name, const string_t& Label, const string_t& Description)
+static object create_renderman_attribute(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& AttributeName, const string_t& Name, const string_t& Label, const string_t& Description)
 {
 	k3d::inode* const node = dynamic_cast<k3d::inode*>(Self.wrapped_ptr());
 	if(!node)
@@ -86,7 +86,7 @@ static interface_wrapper<k3d::iproperty> create_renderman_attribute(iproperty_co
 	return wrap(result);
 }
 
-static interface_wrapper<k3d::iproperty> create_renderman_option(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& OptionName, const string_t& Name, const string_t& Label, const string_t& Description)
+static object create_renderman_option(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& OptionName, const string_t& Name, const string_t& Label, const string_t& Description)
 {
 	k3d::inode* const node = dynamic_cast<k3d::inode*>(Self.wrapped_ptr());
 	if(!node)

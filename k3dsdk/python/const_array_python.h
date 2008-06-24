@@ -156,8 +156,7 @@ public:
 		if(item < 0 || item >= wrapped().size())
 			throw std::out_of_range("index out-of-range");
 
-		k3d::inode* const result = wrapped().at(item);
-		return result ? boost::python::object(wrap(result)) : boost::python::object();
+		return wrap(wrapped().at(item));
 	}
 
 private:

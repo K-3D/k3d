@@ -138,8 +138,7 @@ static object get_dependency(idocument_wrapper& Self, interface_wrapper<k3d::ipr
 	if(!property)
 		throw std::invalid_argument("property cannot be null");
 
-	k3d::iproperty* const dependency = Self.wrapped().pipeline().dependency(*property);
-	return dependency ? object(wrap(dependency)) : object();
+	return wrap(Self.wrapped().pipeline().dependency(*property));
 }
 
 static void set_dependency(idocument_wrapper& Self, interface_wrapper<k3d::iproperty>& From, boost::python::object& To)

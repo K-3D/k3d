@@ -52,9 +52,11 @@
 #include "normal3_python.h"
 #include "object_model_python.h"
 #include "path_python.h"
+#include "plugin_python.h"
 #include "point2_python.h"
 #include "point3_python.h"
 #include "point4_python.h"
+#include "resource_python.h"
 #include "ri_render_state_python.h"
 #include "texture3_python.h"
 #include "uuid_python.h"
@@ -80,7 +82,6 @@
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/parallel/threads.h>
 #include <k3dsdk/render_state_ri.h> // MinGW needs typeinfo
-#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/type_registry.h>
@@ -169,8 +170,10 @@ const list module_command_nodes()
 	return nodes;
 }
 
-interface_wrapper<k3d::iunknown> module_create_plugin(const string_t& Type)
+object module_create_plugin(const string_t& Type)
 {
+	k3d::log() << warning << "k3d.create_plugin() is deprecated, use k3d.plugin.create() instead." << std::endl;
+
 	k3d::iplugin_factory* const plugin_factory = k3d::plugin::factory::lookup(Type);
 	if(!plugin_factory)
 		throw std::invalid_argument("unknown plugin type: " + Type);
@@ -264,6 +267,8 @@ void module_log_warning(const string_t& Message)
 
 const list module_plugins()
 {
+	k3d::log() << warning << "k3d.plugins() is deprecated, use k3d.plugin.factory.lookup() instead." << std::endl;
+
 	list plugins;
 
 	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
@@ -272,21 +277,6 @@ const list module_plugins()
 
 	return plugins;
 }
-
-class resource
-{
-public:
-	static const list keys()
-	{
-		list python_keys;
-
-		const k3d::resource::keys_t& keys = k3d::resource::keys();
-		for(k3d::resource::keys_t::const_iterator key = keys.begin(); key != keys.end(); ++key)
-			python_keys.append(*key);
-
-		return python_keys;
-	}
-};
 
 const k3d::matrix4 module_rotate3(const object& Value)
 {
@@ -319,7 +309,7 @@ const k3d::matrix4 module_translate3(const object& Value)
 	throw std::invalid_argument("cannot generate translation matrix from given type");
 }
 
-interface_wrapper<k3d::iuser_interface> module_ui()
+object module_ui()
 {
 	return wrap(k3d::user_interface());
 }
@@ -329,7 +319,7 @@ void module_exit()
 	k3d::application().exit();
 }
 
-interface_wrapper<k3d::idocument> module_new_document()
+object module_new_document()
 {
 	return wrap(k3d::application().create_document());
 }
@@ -352,13 +342,10 @@ void module_close_document(interface_wrapper<k3d::idocument>& Document)
 
 object module_get_command_node(const string_t& Path)
 {
-	if(k3d::icommand_node* const command_node = k3d::command_node::lookup(Path))
-		return object(wrap(command_node));
-
-	return object();
+	return wrap(k3d::command_node::lookup(Path));
 }
 
-interface_wrapper<k3d::idocument> module_open_document(const string_t& Path)
+object module_open_document(const string_t& Path)
 {
 	const filesystem::path document_path = filesystem::native_path(ustring::from_utf8(Path));
 
@@ -427,6 +414,8 @@ BOOST_PYTHON_MODULE(k3d)
 	define_isnappable_wrapper();
 	define_iunknown_wrapper();
 	define_iuser_interface_wrapper();
+	define_plugin_namespace();
+	define_resource_namespace();
 	euler_angles::define_class();
 	export_arrays();
 	export_bitmap();
@@ -527,12 +516,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
 	def("ui", module_ui,
 		"Returns the singleton runtime L{iuser_interface} plugin instance.");
-
-	class_<resource>("resource", no_init)
-		.def("keys", resource::keys,
-			"Returns a list containing the set of all resources.").staticmethod("keys")
-		.def("get_string", k3d::resource::get_string,
-			"Returns a resource as a string, or empty string if the resource does not exist.").staticmethod("get_string");
 
 	scope().attr("__doc__") = "Provides access to the K-3D API";
 }

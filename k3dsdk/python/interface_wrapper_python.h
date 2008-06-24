@@ -24,6 +24,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python/object.hpp>
 #include <stdexcept>
 
 namespace k3d
@@ -77,15 +78,15 @@ private:
 };
 
 template<typename T>
-interface_wrapper<T> wrap(T* Wrapped)
+boost::python::object wrap(T* Wrapped)
 {
-	return interface_wrapper<T>(Wrapped);
+	return Wrapped ? boost::python::object(interface_wrapper<T>(*Wrapped)) : boost::python::object();
 }
 
 template<typename T>
-interface_wrapper<T> wrap(T& Wrapped)
+boost::python::object wrap(T& Wrapped)
 {
-	return interface_wrapper<T>(Wrapped);
+	return boost::python::object(interface_wrapper<T>(Wrapped));
 }
 
 } // namespace python

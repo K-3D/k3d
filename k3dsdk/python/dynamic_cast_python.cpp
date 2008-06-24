@@ -63,10 +63,7 @@ object do_dynamic_cast(k3d::iunknown* Unknown)
 template<typename InterfaceT>
 object do_dynamic_cast(k3d::iunknown* Unknown)
 {
-	if(InterfaceT* interface = dynamic_cast<InterfaceT*>(Unknown))
-		return object(wrap(interface));
-
-	return object();
+	return wrap(dynamic_cast<InterfaceT*>(Unknown));
 }
 
 } // namespace detail

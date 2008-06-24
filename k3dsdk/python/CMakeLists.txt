@@ -99,6 +99,10 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	node_python.h
 	object_model_python.cpp
 	object_model_python.h
+	plugin_python.cpp
+	plugin_python.h
+	resource_python.cpp
+	resource_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python)
         

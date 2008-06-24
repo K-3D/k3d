@@ -54,7 +54,7 @@ static const list children(icommand_node_wrapper& Self)
 	return results;
 }
 
-static icommand_node_wrapper get_child(icommand_node_wrapper& Self, const string_t& Name)
+static object get_child(icommand_node_wrapper& Self, const string_t& Name)
 {
 	k3d::icommand_tree::nodes_t children = k3d::command_tree().children(&Self.wrapped());
 	for(k3d::icommand_tree::nodes_t::iterator child = children.begin(); child != children.end(); ++child)
