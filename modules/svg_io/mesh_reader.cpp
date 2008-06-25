@@ -290,8 +290,9 @@ private:
 		{
 			if(ry == -1)
 				ry = rx;
-			else
+			else if (rx == -1)
 				rx = ry;
+			
 			std::vector<double> tmp_weights;
 			std::vector<k3d::point3> control_points;
 
