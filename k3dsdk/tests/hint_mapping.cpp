@@ -1,5 +1,6 @@
 #include <k3dsdk/iunknown.h>
 #include <k3dsdk/signal_system.h>
+#include <k3dsdk/types.h>
 
 #include <iostream>
 
@@ -23,6 +24,9 @@ protected:
 namespace hint
 {
 
+//////////////////////////////////////////////////////////////////////////////
+// bitmap_dimensions_changed
+
 class bitmap_dimensions_changed :
 	public ihint
 {
@@ -32,6 +36,9 @@ public:
 		Stream << "bitmap_dimensions_changed";
 	}
 };
+
+//////////////////////////////////////////////////////////////////////////////
+// bitmap_pixels_changed
 
 class bitmap_pixels_changed :
 	public ihint
@@ -43,9 +50,104 @@ public:
 	}
 };
 
+//////////////////////////////////////////////////////////////////////////////
+// any
+
 class any
 {
 public:
+};
+
+//////////////////////////////////////////////////////////////////////////////
+// none
+
+class none
+{
+public:
+};
+
+//////////////////////////////////////////////////////////////////////////////
+// unchanged
+
+class unchanged
+{
+public:
+};
+
+//////////////////////////////////////////////////////////////////////////////
+// hint_traits
+
+template<typename HintT>
+class hint_traits
+{
+public:
+};
+
+template<>
+class hint_traits<bitmap_dimensions_changed>
+{
+public:
+	static const bool_t match(ihint* Hint)
+	{
+		return dynamic_cast<bitmap_dimensions_changed*>(Hint);
+	}
+
+	static ihint* convert(ihint*)
+	{
+		static bitmap_dimensions_changed hint;
+		return &hint;
+	}
+};
+
+template<>
+class hint_traits<bitmap_pixels_changed>
+{
+public:
+	static const bool_t match(ihint* Hint)
+	{
+		return dynamic_cast<bitmap_pixels_changed*>(Hint);
+	}
+
+	static ihint* convert(ihint*)
+	{
+		static bitmap_pixels_changed hint;
+		return &hint;
+	}
+};
+
+template<>
+class hint_traits<any>
+{
+public:
+	static const bool_t match(ihint* Hint)
+	{
+		return true;
+	}
+};
+
+template<>
+class hint_traits<none>
+{
+public:
+	static const bool_t match(ihint* Hint)
+	{
+		return false;
+	}
+
+	static ihint* convert(ihint*)
+	{
+		return 0;
+	}
+};
+
+template<>
+class hint_traits<unchanged>
+{
+public:
+	static ihint* convert(ihint* Hint)
+	{
+		return Hint;
+	}
 };
 
 /// iostream-compatible manipulator object that serializes information about a hint object
@@ -78,28 +180,32 @@ std::ostream& operator<<(std::ostream& Stream, const print& RHS)
 	return Stream;
 }
 
-template<typename SlotT>
-class unfiltered_slot
+//////////////////////////////////////////////////////////////////////////////
+// filtered_slot
+
+template<typename InputT, typename OutputT, typename SlotT>
+class filtered_slot
 {
 public:
-	unfiltered_slot(const SlotT& Slot) :
+	filtered_slot(const SlotT& Slot) :
 		slot(Slot)
 	{
 	}
 
 	void operator()(ihint* const Hint)
 	{
-		slot(Hint);
+		if(hint_traits<InputT>::match(Hint))
+			slot(hint_traits<OutputT>::convert(Hint));
 	}
 
 private:
 	SlotT slot;
 };
 
-template<typename SlotT>
-unfiltered_slot<SlotT> make_filter_slot(const SlotT& Slot)
+template<typename InputT, typename OutputT, typename SlotT>
+filtered_slot<InputT, OutputT, SlotT> make_filter_slot(const SlotT& Slot)
 {
-	return unfiltered_slot<SlotT>(Slot);
+	return filtered_slot<InputT, OutputT, SlotT>(Slot);
 }
 
 } // namespace hint
@@ -138,15 +244,11 @@ int main(int argc, char* arv[])
 	color_signal.connect(sigc::ptr_fun(color_changed));
 	output_bitmap_signal.connect(sigc::ptr_fun(output_bitmap_changed));
 
-	input_bitmap_signal.connect(k3d::hint::make_filter_slot(output_bitmap_signal.make_slot()));
-	border_signal.connect(k3d::hint::make_filter_slot(output_bitmap_signal.make_slot()));
-	color_signal.connect(k3d::hint::make_filter_slot(output_bitmap_signal.make_slot()));
-
-	std::cerr << "****************" << std::endl;
-	border_signal.emit(0);
-
-	std::cerr << "****************" << std::endl;
-	color_signal.emit(0);
+	input_bitmap_signal.connect(k3d::hint::make_filter_slot<k3d::hint::bitmap_dimensions_changed, k3d::hint::unchanged>(output_bitmap_signal.make_slot()));
+	input_bitmap_signal.connect(k3d::hint::make_filter_slot<k3d::hint::bitmap_pixels_changed, k3d::hint::unchanged>(output_bitmap_signal.make_slot()));
+	input_bitmap_signal.connect(k3d::hint::make_filter_slot<k3d::hint::any, k3d::hint::none>(output_bitmap_signal.make_slot()));
+	border_signal.connect(k3d::hint::make_filter_slot<k3d::hint::any, k3d::hint::bitmap_dimensions_changed>(output_bitmap_signal.make_slot()));
+	color_signal.connect(k3d::hint::make_filter_slot<k3d::hint::any, k3d::hint::bitmap_pixels_changed>(output_bitmap_signal.make_slot()));
 
 	std::cerr << "****************" << std::endl;
 	input_bitmap_signal.emit(&k3d::hint::bitmap_dimensions_changed());
@@ -156,6 +258,12 @@ int main(int argc, char* arv[])
 
 	std::cerr << "****************" << std::endl;
 	input_bitmap_signal.emit(0);
+
+	std::cerr << "****************" << std::endl;
+	border_signal.emit(0);
+
+	std::cerr << "****************" << std::endl;
+	color_signal.emit(0);
 
 	return 0;
 }
