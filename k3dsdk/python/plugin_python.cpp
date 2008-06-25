@@ -20,6 +20,7 @@
 #include "interface_wrapper_python.h"
 #include "plugin_python.h"
 
+#include <k3dsdk/mime_types.h>
 #include <k3dsdk/plugins.h>
 
 #include <boost/python.hpp>
@@ -34,6 +35,16 @@ namespace python
 class plugin
 {
 public:
+	static list wrap_factories(const k3d::plugin::factory::collection_t& Factories)
+	{
+		list python_factories;
+
+		for(k3d::plugin::factory::collection_t::const_iterator factory = Factories.begin(); factory != Factories.end(); ++factory)
+			python_factories.append(wrap(*factory));
+
+		return python_factories;
+	}
+
 	static object create_by_uuid(const uuid& ID)
 	{
 		return wrap(k3d::plugin::create(ID));
@@ -52,15 +63,9 @@ public:
 	class factory
 	{
 	public:
-		static const list lookup()
+		static list lookup()
 		{
-			list plugins;
-
-			const k3d::plugin::factory::collection_t& factories = k3d::plugin::factory::lookup();
-			for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
-				plugins.append(interface_wrapper<k3d::iplugin_factory>(*factory));
-
-			return plugins;
+			return wrap_factories(k3d::plugin::factory::lookup());
 		}
 
 		static object lookup_by_uuid(const uuid& ID)
@@ -71,6 +76,16 @@ public:
 		static object lookup_by_name(const string_t& Name)
 		{
 			return wrap(k3d::plugin::factory::lookup(Name));
+		}
+
+		static list lookup_by_metadata(const string_t& MetadataName, const string_t& MetadataValue)
+		{
+			return wrap_factories(k3d::plugin::factory::lookup(MetadataName, MetadataValue));
+		}
+
+		static list lookup_by_mime_type(const k3d::mime::type& Type)
+		{
+			return wrap_factories(k3d::plugin::factory::lookup(Type));
 		}
 	};
 };
@@ -88,11 +103,15 @@ void define_plugin_namespace()
 
 	class_<plugin::factory>("factory", no_init)
 		.def("lookup", plugin::factory::lookup,
-			"Returns the list of all available plugin factories.")
+			"Returns a list containing all available plugin factories.")
 		.def("lookup", plugin::factory::lookup_by_uuid,
 			"Returns the plugin factory that matches the given id, or None.")
 		.def("lookup", plugin::factory::lookup_by_name,
 			"Returns the plugin factory that matches the given name, or None.")
+		.def("lookup", plugin::factory::lookup_by_metadata,
+			"Returns a list containing all plugin factories that match the given metadata name and value.")
+		.def("lookup", plugin::factory::lookup_by_mime_type,
+			"Returns a list containing all plugin factories that match the given MIME type.")
 		.staticmethod("lookup");
 }
 
