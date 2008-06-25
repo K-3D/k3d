@@ -30,7 +30,7 @@ namespace k3d
 
 mesh_simple_deformation_modifier::mesh_simple_deformation_modifier(iplugin_factory& Factory, idocument& Document) :
 	base(Factory, Document),
-	m_selection_changed(false)
+	m_selection_changed(true)
 {
 	m_mesh_selection.changed_signal().connect(sigc::mem_fun(*this, &mesh_simple_deformation_modifier::on_selection_changed));
 }
