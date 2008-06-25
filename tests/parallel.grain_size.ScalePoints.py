@@ -16,8 +16,8 @@ setup.modifier.mesh_selection = selection
 mesh = setup.source.output_mesh
 
 for grain_size in range(5000, 100000, 5000):
-	k3d.set_parallel_grain_size(grain_size)
-	k3d.set_parallel_thread_count(2)
+	k3d.parallel.set_grain_size(grain_size)
+	k3d.parallel.set_thread_count(2)
 	setup.modifier.x = 1.0
 	setup.modifier.x = 2.0
 

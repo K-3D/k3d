@@ -17,8 +17,8 @@ mesh = setup.source.output_mesh
 
 
 for thread_count in range(1, 9):
-	k3d.set_parallel_grain_size(10000)
-	k3d.set_parallel_thread_count(thread_count)
+	k3d.parallel.set_grain_size(10000)
+	k3d.parallel.set_thread_count(thread_count)
 	setup.modifier.x = 1.0
 	setup.modifier.x = 2.0
 
