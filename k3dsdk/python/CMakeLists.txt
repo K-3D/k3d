@@ -24,6 +24,8 @@ ADD_LIBRARY(k3dsdk-python-types SHARED
 	euler_angles_python.h
 	matrix4_python.cpp
 	matrix4_python.h
+	mime_python.cpp
+	mime_python.h
 	normal3_python.cpp
 	normal3_python.h
 	path_python.cpp
@@ -99,6 +101,7 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	node_python.h
 	object_model_python.cpp
 	object_model_python.h
+	parallel_python.cpp
 	plugin_python.cpp
 	plugin_python.h
 	resource_python.cpp

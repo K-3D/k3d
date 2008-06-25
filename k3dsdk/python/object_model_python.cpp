@@ -47,10 +47,12 @@
 #include "matrix4_python.h"
 #include "mesh_python.h"
 #include "mesh_selection_python.h"
+#include "mime_python.h"
 #include "named_arrays_python.h"
 #include "node_python.h"
 #include "normal3_python.h"
 #include "object_model_python.h"
+#include "parallel_python.h"
 #include "path_python.h"
 #include "plugin_python.h"
 #include "point2_python.h"
@@ -79,8 +81,6 @@
 #include <k3dsdk/mesh_diff.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/mime_types.h>
-#include <k3dsdk/parallel/threads.h>
 #include <k3dsdk/render_state_ri.h> // MinGW needs typeinfo
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/share.h>
@@ -378,16 +378,6 @@ const string_t module_print_diff(const object& A, const object& B, const object&
 	throw std::invalid_argument("cannot diff given objects");
 }
 
-const k3d::string_t module_path_mime_type(const k3d::filesystem::path& File)
-{
-	return k3d::mime::type::lookup(File).str();
-}
-
-const k3d::string_t module_data_mime_type(const k3d::string_t& Data)
-{
-	return k3d::mime::type::lookup(Data).str();
-}
-
 const k3d::vector3 module_to_vector3(const k3d::point3& v)
 {
 	return k3d::to_vector(v);
@@ -414,6 +404,8 @@ BOOST_PYTHON_MODULE(k3d)
 	define_isnappable_wrapper();
 	define_iunknown_wrapper();
 	define_iuser_interface_wrapper();
+	define_mime_namespace();
+	define_parallel_namespace();
 	define_plugin_namespace();
 	define_resource_namespace();
 	euler_angles::define_class();
@@ -470,8 +462,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns a command node by path.");
 	def("intersect_lines", k3d::intersect_lines,
 		"Find the point at which two infinite lines intersect.");
-	def("parallel_grain_size", k3d::parallel::grain_size,
-		"Returns the global grain size to be used for parallel computation.");
 	def("identity3", k3d::identity3D,
 		"Returns a L{matrix4} containing a three-dimensional identity matrix.");
 	def("length", module_length,
@@ -486,10 +476,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Sends an informational message to the K-3D log.");
 	def("log_warning", module_log_warning,
 		"Sends a warning message to the K-3D log.");
-	def("mime_type", module_path_mime_type,
-		"Returns the MIME type of a file.");
-	def("mime_type", module_data_mime_type,
-		"Returns the MIME type of a chunk of data.");
 	def("new_document", module_new_document,
 		"Returns a new (completely empty) document.");
 	def("open_document", module_open_document,
@@ -504,10 +490,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns a L{mesh_selection} that explicitly selects every component.");
 	def("select_null", k3d::mesh_selection::select_null,
 		"Returns a L{mesh_selection} that does not select or deselect any components.");
-	def("set_parallel_grain_size", k3d::parallel::set_grain_size,
-		"Sets the global grain size to be used for parallel computation.");
-	def("set_parallel_thread_count", k3d::parallel::set_thread_count,
-		"Sets the number of threads to be used for parallel computation (quietly ignored if parallel computation wasn't enabled in the build.");
 	def("share_path", k3d::share_path,
 		"Returns the runtime path to shared data.");
 	def("to_vector3", module_to_vector3,

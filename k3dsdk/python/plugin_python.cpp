@@ -34,9 +34,19 @@ namespace python
 class plugin
 {
 public:
-	static object create(const string_t& Type)
+	static object create_by_uuid(const uuid& ID)
+	{
+		return wrap(k3d::plugin::create(ID));
+	}
+
+	static object create_by_name(const string_t& Type)
 	{
 		return wrap(k3d::plugin::create(Type));
+	}
+
+	static object create_by_factory(const interface_wrapper<iplugin_factory>& Factory)
+	{
+		return wrap(k3d::plugin::create(Factory.wrapped()));
 	}
 
 	class factory
@@ -53,6 +63,11 @@ public:
 			return plugins;
 		}
 
+		static object lookup_by_uuid(const uuid& ID)
+		{
+			return wrap(k3d::plugin::factory::lookup(ID));
+		}
+
 		static object lookup_by_name(const string_t& Name)
 		{
 			return wrap(k3d::plugin::factory::lookup(Name));
@@ -63,13 +78,19 @@ public:
 void define_plugin_namespace()
 {
 	scope outer = class_<plugin>("plugin", no_init)
-		.def("create", plugin::create,
+		.def("create", plugin::create_by_name,
+			"Returns a new application plugin instance, or None.")
+		.def("create", plugin::create_by_uuid,
+			"Returns a new application plugin instance, or None.")
+		.def("create", plugin::create_by_factory,
 			"Returns a new application plugin instance, or None.")
 		.staticmethod("create");
 
 	class_<plugin::factory>("factory", no_init)
 		.def("lookup", plugin::factory::lookup,
 			"Returns the list of all available plugin factories.")
+		.def("lookup", plugin::factory::lookup_by_uuid,
+			"Returns the plugin factory that matches the given id, or None.")
 		.def("lookup", plugin::factory::lookup_by_name,
 			"Returns the plugin factory that matches the given name, or None.")
 		.staticmethod("lookup");
