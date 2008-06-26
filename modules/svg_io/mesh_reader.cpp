@@ -499,7 +499,7 @@ private:
 		k3d::matrix4 T = k3d::identity3D();
 		k3d::point4 xp, cp, c;
 		k3d::vector3 v1, v2;
-		float theta_one, delta_theta;
+		float theta_one, theta_two, delta_theta;
 
 		T[0][0] = cos(phi);
 		T[0][1] = sin(phi);
@@ -532,11 +532,30 @@ private:
 		v1 = v2;
 		v2 = k3d::vector3((-xp[0]-cp[0])/rx, (-xp[1]-cp[1])/ry,0);
 		delta_theta = k3d::radians((int)k3d::degrees((acos((v1*v2)/(k3d::length(v1)*k3d::length(v2)))))%360);
+	
+		if(sweep_flag == large_arc_flag)
+			delta_theta = -delta_theta;
+
+		//k3d::log() << debug << "C:  "<< c << std::endl;
+		//k3d::log() << debug << "Theta1: " << theta_one << std::endl;
+		//k3d::log() << debug << "Theta2: " << theta_one + delta_theta << std::endl;
+		//k3d::log() << debug << "DeltaTheta: " << delta_theta << std::endl;
 
 		theta_one += k3d::pi_times_2();
+		if(large_arc_flag == 0)
+			theta_two = theta_one + delta_theta;
+		else
+			if(sweep_flag == 0)
+			{
+				theta_two = theta_one + k3d::pi_times_2() - delta_theta;
+				rx = -rx;
+			}
+			else
+				theta_two = theta_one + k3d::pi_times_2() +  delta_theta;
 
-		k3d::nurbs::circular_arc(k3d::point3(rx, 0, 0), k3d::point3(0, ry, 0), theta_one, theta_one - delta_theta, segments, knots, weights, control_points);
-		if(theta_one - delta_theta < theta_one)
+
+		k3d::nurbs::circular_arc(k3d::point3(rx, 0, 0), k3d::point3(0, ry, 0), theta_one, theta_two, segments, knots, weights, control_points);
+		if(theta_two < theta_one)
 		{
 			std::vector<k3d::point3> tmp_cp;
 			for(int i=0; i<control_points.size(); i++)
@@ -546,6 +565,13 @@ private:
 		}
 		cx = c[0];
 		cy = c[1];
+		for(int i=0; i<control_points.size(); i++)
+		{
+			k3d::point4 tmp(control_points[i][0],control_points[i][1],control_points[i][2],1);
+			tmp = T*tmp;
+			control_points[i] = k3d::point3(tmp[0],tmp[1],tmp[2]);
+			
+		}
 	}
 
 	///Creates paths composed by either lines, cubic or quadratic bezier curves or arcs
@@ -765,8 +791,7 @@ private:
 					x+=lastpoint[0];
 					y+=lastpoint[1];
 				}
-
-				create_arc(p1,k3d::point4(x,y,0,1),k3d::radians(phi),cx,cy,rx,ry,fa,fs,3,control_points,knots,tmp_weights);
+				create_arc(p1,k3d::point4(x,y,0,1),k3d::radians(phi),cx,cy,rx,ry,fa,fs,8,control_points,knots,tmp_weights);
 				return_if_fail(tmp_weights.size() == control_points.size());
 				for(int i=1; i<control_points.size(); i++)
 				{
@@ -774,7 +799,6 @@ private:
 					count++;
 					add_point(k3d::point4(control_points[i][0]+cx, control_points[i][1]+cy, control_points[i][2],1));
 				}
-
 				is_arc = true;
 				k3d::point3 t_point = control_points.at(control_points.size()-2);
 				slastpoint = k3d::point4(t_point[0], t_point[1], t_point[2],1);
@@ -794,12 +818,14 @@ private:
 					knots.push_back(2);
 				knots.push_back(3);
 				//End knot vector definition
+
 			}
 
+			//Start weight vector definition as bezier curve
 			for(k3d::uint_t point = 0; point < points.size(); point++ )
 				weights.push_back(1.0);
+			//End weight vector definition
 
-			
 			factory->add_nurbs_curve(order, points, knots, weights);
 
 		}
