@@ -24,6 +24,13 @@
 	\author Evan Lezar (evanlezar@gmail.com)
 */
 
+#include <k3d-platform-config.h>
+
+#if defined K3D_API_WIN32
+	#define K3D_CUDA_DECLSPEC __declspec(dllexport)
+#else
+	#define K3D_CUDA_DECLSPEC
+#endif // !K3D_API_WIN32
 
 // define the types of kernels supported
 #define CUDA_BITMAP_ADD 0x00
@@ -48,27 +55,27 @@ typedef struct
 
 // forward declaration of the entry functions
 // split the entry functions for timing reasons
-extern "C" void CUDA_initialize_device();
-extern "C" void bitmap_copy_data_from_host_to_device(const unsigned short *input, int width, int height);
-extern "C" void bitmap_arithmetic_kernel_entry(int operation, unsigned short* p_deviceImage, int width, int height, float value);
-extern "C" void bitmap_color_monochrome_kernel_entry(int width, int height, float redWeight, float greenWeight, float blueWeight);
-extern "C" void bitmap_copy_data_from_device_to_host(unsigned short *output, int width, int height);
-extern "C" void CUDA_cleanup();
+extern "C" K3D_CUDA_DECLSPEC void CUDA_initialize_device();
+extern "C" K3D_CUDA_DECLSPEC void bitmap_copy_data_from_host_to_device(const unsigned short *input, int width, int height);
+extern "C" K3D_CUDA_DECLSPEC void bitmap_arithmetic_kernel_entry(int operation, unsigned short* p_deviceImage, int width, int height, float value);
+extern "C" K3D_CUDA_DECLSPEC void bitmap_color_monochrome_kernel_entry(int width, int height, float redWeight, float greenWeight, float blueWeight);
+extern "C" K3D_CUDA_DECLSPEC void bitmap_copy_data_from_device_to_host(unsigned short *output, int width, int height);
+extern "C" K3D_CUDA_DECLSPEC void CUDA_cleanup();
 
-extern "C" void apply_linear_transform_to_point_data ( float *device_points, float *device_matrix, int num_points );
+extern "C" K3D_CUDA_DECLSPEC void apply_linear_transform_to_point_data ( float *device_points, float *device_matrix, int num_points );
 
-extern "C" void allocate_device_memory ( void** device_pointer, int size_in_bytes );
-extern "C" void copy_from_host_to_device ( void* device_pointer, const void* host_pointer, int size_in_bytes );
-extern "C" void copy_from_device_to_host ( void* host_pointer, const void* device_pointer, int size_in_bytes );
-extern "C" void free_device_memory ( void* device_pointer );
-extern "C" void allocate_pinned_host_memory ( void** pointer_on_host, size_t size_in_bytes );
-extern "C" void free_pinned_host_memory ( void* pointer_on_host );
+extern "C" K3D_CUDA_DECLSPEC void allocate_device_memory ( void** device_pointer, int size_in_bytes );
+extern "C" K3D_CUDA_DECLSPEC void copy_from_host_to_device ( void* device_pointer, const void* host_pointer, int size_in_bytes );
+extern "C" K3D_CUDA_DECLSPEC void copy_from_device_to_host ( void* host_pointer, const void* device_pointer, int size_in_bytes );
+extern "C" K3D_CUDA_DECLSPEC void free_device_memory ( void* device_pointer );
+extern "C" K3D_CUDA_DECLSPEC void allocate_pinned_host_memory ( void** pointer_on_host, size_t size_in_bytes );
+extern "C" K3D_CUDA_DECLSPEC void free_pinned_host_memory ( void* pointer_on_host );
 
 
-extern "C" void copy_and_bind_texture_to_array( void** cudaArrayPointer, float* arrayData, int width, int height );
-extern "C" void free_CUDA_array ( void* cudaArrayPointer );
+extern "C" K3D_CUDA_DECLSPEC void copy_and_bind_texture_to_array( void** cudaArrayPointer, float* arrayData, int width, int height );
+extern "C" K3D_CUDA_DECLSPEC void free_CUDA_array ( void* cudaArrayPointer );
 
-extern "C" void transform_points_synchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
-extern "C" void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
+extern "C" K3D_CUDA_DECLSPEC void transform_points_synchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
+extern "C" K3D_CUDA_DECLSPEC void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 
 #endif // !CUDA_ENTRY_POINTS_H
