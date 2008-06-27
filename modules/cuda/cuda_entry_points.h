@@ -78,4 +78,6 @@ extern "C" K3D_CUDA_DECLSPEC void free_CUDA_array ( void* cudaArrayPointer );
 extern "C" K3D_CUDA_DECLSPEC void transform_points_synchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 extern "C" K3D_CUDA_DECLSPEC void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 
+extern "C" void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, size_t device_pitch, size_t host_pitch, size_t width_in_bytes, size_t rows );
+
 #endif // !CUDA_ENTRY_POINTS_H

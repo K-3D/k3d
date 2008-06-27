@@ -403,3 +403,7 @@ extern "C" void transform_points_asynchronous ( double *InputPoints, double *Poi
 	CUT_SAFE_CALL ( cutDeleteTimer ( timer ));
 }
 
+extern "C" void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, size_t device_pitch, size_t host_pitch, size_t width_in_bytes, size_t rows )
+{
+    CUDA_SAFE_CALL ( cudaMemcpy2D(device_pointer, device_pitch, host_pointer, host_pitch, width_in_bytes, rows, cudaMemcpyHostToDevice) );
+}
