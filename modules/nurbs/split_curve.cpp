@@ -202,18 +202,20 @@ namespace module
 				size_t s=0;
 			
 				//look where to insert the new knot, check multiplicity(s) of the knot at u
-				size_t i = curve_knots_begin;
+				int i = curve_knots_begin;
 			
 				k3d::log() << debug << "Starting while loop" << std::endl;
 			
-				while( (i < curve_knots_end) && (curve_knots[i] < u) )
+				while( (i < curve_knots_end) && (curve_knots[i] <= u) )
 				{
 					i++;
 				}
 			
 				k3d::log() << debug << "While loop stopped with i=" << i << std::endl;			
 				//we found the first knot greater than u or we're at the end so thats our k now
-				k = i;
+				k = --i;
+				if( i < 0 )
+					i++;
 				if ( i < curve_knots_end)
 				{
 					//we go back to see how often we have this knot
@@ -223,14 +225,23 @@ namespace module
 						i--;
 						s++;
 					}
-					k3d::log() << debug << "While loop stopped with s=" << s << " and u=" << u << std::endl;
+					//s--;
+					k3d::log() << debug << "While loop stopped with i=" << i << ", s=" << s << " and u=" << u << std::endl;
 				}
 			
 				if( s + r > order - 1)
 				{
 					k3d::log() << error << "Cannot insert knot r=" << r << " times, multiplicity would be greater than degree " << order - 1 << std::endl;
-					r = order - 1 - s;
-					k3d::log() << debug << "Reducing r to the maximum possible value " << r << std::endl;				
+					int new_r = order - 1 - s;
+					if(new_r <= 0)
+					{
+						//we had a knot that was already inserted too often, so dont insert it again
+						new_r = 0;
+						k3d::log() << error << "We're not going to insert the knot at all" << std::endl;
+						return;
+					}
+					r = new_r;
+					k3d::log() << debug << "Reducing r to the maximum possible value " << r << std::endl;			
 				}
 			
 				//*******************************************************************
@@ -247,20 +258,20 @@ namespace module
 				for( size_t i = 0; i <= k; i++ )
 				{
 					knots.push_back(curve_knots.at(i + curve_knots_begin));
-					k3d::log() << debug << curve_knots.at(i + curve_knots_begin) << std::endl;
+					k3d::log() << debug << "a " << curve_knots.at(i + curve_knots_begin) << std::endl;
 				}
 				
 			
 				for( size_t i = 1; i <= r; i++ )
 				{
 					knots.push_back(u);
-					k3d::log() << debug << u << std::endl;
+					k3d::log() << debug << r << "b " << u << std::endl;
 				}
 			
 				for( size_t i = k + 1; i < mp; i++ )
 				{
 					knots.push_back(curve_knots.at(i + curve_knots_begin));
-					k3d::log() << debug << curve_knots.at(i + curve_knots_begin) << std::endl;
+					k3d::log() << debug << "c " << curve_knots.at(i + curve_knots_begin) << std::endl;
 				}
 				
 				k3d::mesh::points_t points(nq, mesh_points.at( (curve_points.at( curve_points_begin )) ) );
@@ -283,9 +294,11 @@ namespace module
 				
 				k3d::log() << debug << "Filling temp array with weighted control points" << std::endl;
 				
-				for( size_t i = 0; i<= order -1 - s; i++ )
+				for( size_t i = 0; i<= order - 1 - s; i++ )
+				{
+					k3d::log() << debug << "Accessing value " << i + k - (order - 1) << std::endl;
 					tmp.push_back( curve_point_weights.at(curve_points_begin + i + k - (order - 1)) * mesh_points.at( curve_points.at( curve_points_begin + i + k - (order - 1)) ) );
-				
+				}
 				size_t L=0;
 				
 				k3d::log() << debug << "Starting calculation loop" << std::endl;

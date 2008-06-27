@@ -70,6 +70,8 @@ namespace module
 
 	namespace nurbs
 	{
+		int selected_curve(k3d::mesh& Output);
+		
 		class edit_knot_vector :
 			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 		{
@@ -90,8 +92,10 @@ namespace module
 				
 				if(!k3d::validate_nurbs_curve_groups(Output))
 					return;
+				
+				merge_selection(m_mesh_selection.pipeline_value(), Output);
 
-				int my_curve = select_mesh(Output);
+				int my_curve = selected_curve(Output);
 				if(my_curve < 0)
 				{
 					k3d::log() << error << "More than one curve or no curve selected! " << my_curve << std::endl;
@@ -114,7 +118,7 @@ namespace module
 				
 				const k3d::mesh::knots_t& knots = m_knot_vector.pipeline_value();
 				
-				int my_curve = select_mesh(Output);
+				int my_curve = selected_curve(Output);
 				if(my_curve < 0)
 				{
 					k3d::log() << error << "More than one curve or no curve selected! " << my_curve << std::endl;
@@ -139,34 +143,6 @@ namespace module
 			
 		private:
 			k3d_data(k3d::mesh::knots_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, k3d::property_metadata, no_serialization) m_knot_vector;
-			
-			int select_mesh(k3d::mesh& Output)
-			{
-				merge_selection(m_mesh_selection.pipeline_value(), Output);
-				
-				int my_curve=-1;
-				
-				const size_t group_begin = 0;
-				const size_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
-				for(size_t group = group_begin; group != group_end; ++group)
-				{
-					const size_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
-					const size_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
-					for(size_t curve = curve_begin; curve != curve_end; ++curve)
-					{
-						if( (*Output.nurbs_curve_groups->curve_selection)[curve]>0.0)
-							if(my_curve>=0)
-							{
-								return -1;
-							}
-							else 
-							{
-								my_curve=curve;
-							}						
-					}
-				}
-				return my_curve;
-			}
 			
 			k3d::mesh::knots_t extract_knots(const k3d::mesh& Output, int curve)
 			{
@@ -202,6 +178,33 @@ namespace module
 			
 
 		};
+		
+		
+		int selected_curve(k3d::mesh& Output)
+		{
+			int my_curve=-1;
+			
+			const size_t group_begin = 0;
+			const size_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
+			for(size_t group = group_begin; group != group_end; ++group)
+			{
+				const size_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
+				const size_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
+				for(size_t curve = curve_begin; curve != curve_end; ++curve)
+				{
+					if( (*Output.nurbs_curve_groups->curve_selection)[curve]>0.0)
+						if(my_curve>=0)
+						{
+							return -1;
+						}
+						else 
+						{
+							my_curve=curve;
+						}						
+				}
+			}
+			return my_curve;
+		}
 
 		//Create connect_curve factory
 		k3d::iplugin_factory& edit_knot_vector_factory()
