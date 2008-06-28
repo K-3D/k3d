@@ -116,7 +116,7 @@ namespace module{
 
 	const k3d::string_t shaderImgFile = "k3d_shader_preview.tiff";
 	const k3d::string_t holderImgFile = "sp_noShaderSelected.png";
-	const k3d::string_t initRManEngine = "sPreview::RenderManEngine";
+	const k3d::string_t initRManEngine = "Preview Core::RenderManEngine";
 
 	typedef std::vector<sigc::connection> connections_t;
 
@@ -549,7 +549,7 @@ namespace module{
           m_model->setPreviewLShader(dynamic_cast<k3d::inode*>
                                      ( k3d::plugin::create("RenderManLightShader", 
                                                            m_document_state.document(), 
-                                                           "sPreview::Light Shader")));
+                                                           "Preview Core::Light Shader")));
 
           k3d::property::set_internal_value(*(m_model->getPreviewLShader()), 
                                             "shader_path", k3d::share_path() /
@@ -561,7 +561,7 @@ namespace module{
           m_model->setPreviewLight(dynamic_cast<light_t*>
                                    (k3d::plugin::create("RenderManLight", 
                                                         m_document_state.document(), 
-                                                        "sPreview::Light")));
+                                                        "Preview Core::Light")));
 
           k3d::property::set_internal_value(*(m_model->getPreviewLight()), 
                                             "shader", m_model->getPreviewLShader());
@@ -576,7 +576,7 @@ namespace module{
           m_model->setPreviewCamera(dynamic_cast<camera_t*>
                                     (k3d::plugin::create("Camera", 
                                                          m_document_state.document(), 
-                                                         "sPreview::Camera")));
+                                                         "Preview Core::Camera")));
           const k3d::point3 origin = k3d::point3(0, 0, 0);
           const k3d::vector3 world_up = k3d::vector3(0, 0, 1);
 
@@ -603,7 +603,7 @@ namespace module{
           m_model->setPreviewGeo(dynamic_cast<geo_t*>
                                  (k3d::plugin::create("Sphere", 
                                                       m_document_state.document(), 
-                                                      "sPreview::Geo::Sphere")));
+                                                      "Preview Core::Geo::Sphere")));
 	  //Add All Geometry To m_model
 	  m_model->addGeo(m_model->getPreviewGeo());
 
@@ -631,7 +631,7 @@ namespace module{
           // To ensure Universal Compatibility With user documents, create a RMAN Node (Aqsis)
           k3d::ri::irender_engine* const aqsis = k3d::plugin::create<k3d::ri::irender_engine>("AqsisRenderManEngine", 
                                                                                               m_document_state.document(), 
-                                                                                              "sPreview::Aqsis Renderer");
+                                                                                              "Preview Core::Aqsis Renderer");
 
           //Setup the shader preview render engine*****
           k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
