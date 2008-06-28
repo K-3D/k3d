@@ -57,7 +57,7 @@ namespace module
 		public:
 			insert_knot(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),
-				m_u_value(init_owner(*this) + init_name(_("u_value")) + init_label(_("u_value")) + init_description(_("Insert knot at [0,1]")) + init_step_increment(0.1) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.5) ),
+				m_u_value(init_owner(*this) + init_name(_("u_value")) + init_label(_("u_value")) + init_description(_("Insert knot at [0,1]")) + init_step_increment(0.01)+ init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.5) ),
 				m_multiplicity(init_owner(*this) + init_name(_("multiplicity")) + init_label(_("multiplicity")) + init_description(_("Multiplicity")) + init_constraint(constraint::minimum(1 , constraint::maximum(3))) + init_value(1) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
@@ -113,7 +113,7 @@ namespace module
 				return factory;
 			}
 		private:
-			k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_u_value;
+			k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_value;
 			k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_multiplicity;
 		};
 		
