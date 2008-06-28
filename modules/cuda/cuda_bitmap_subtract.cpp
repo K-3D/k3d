@@ -22,7 +22,6 @@
 */
 
 #include "cuda_bitmap_simple_modifier.h"
-#include <k3dsdk/high_res_timer.h>
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
@@ -51,29 +50,7 @@ public:
 
 	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
-        const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
-        unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));
-        
-        // intialize CUDA - should check for errors etc
-        CUDA_initialize_device();
-        
-        // copy the data to the device
-        start_profile_step();
-        bitmap_copy_data_from_host_to_device(inputPixels, Input.width(), Input.height());
-        stop_profile_step(PROFILE_STRING_HOST_TO_DEVICE);
-
-        // perform the calculation
-        start_profile_step();
-        bitmap_arithmetic_kernel_entry(CUDA_BITMAP_SUBTRACT, 0, Input.width(), Input.height(), (float)(m_value.pipeline_value()));
-        stop_profile_step(PROFILE_STRING_EXECUTE_KERNEL);       
-
-        // copy the data from the device
-        start_profile_step();
-        bitmap_copy_data_from_device_to_host(outputPixels, Input.width(), Input.height());
-        stop_profile_step(PROFILE_STRING_DEVICE_TO_HOST);
-
-        // cleanup the memory allocated on the device
-        CUDA_cleanup();
+        bitmap_arithmetic(Input, Output, CUDA_BITMAP_SUBTRACT, (float)(m_value.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()

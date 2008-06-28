@@ -57,27 +57,30 @@ public:
 	{
         const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
         unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));
+        unsigned short *p_device_image;
+        k3d::int32_t sizeInBytes = Input.width()*Input.height()*8;
         
         // intialize CUDA - should check for errors etc
         CUDA_initialize_device();
         
         // copy the data to the device
         start_profile_step();
-        bitmap_copy_data_from_host_to_device(inputPixels, Input.width(), Input.height());
+        allocate_device_memory((void**)&p_device_image, sizeInBytes);
+        copy_from_host_to_device(p_device_image, inputPixels, sizeInBytes);
         stop_profile_step(PROFILE_STRING_HOST_TO_DEVICE);
 
         // perform the calculation
         start_profile_step();
-        bitmap_color_monochrome_kernel_entry(Input.width(), Input.height(), (float)(m_red_weight.pipeline_value()), (float)(m_green_weight.pipeline_value()), (float)(m_blue_weight.pipeline_value()));
+        bitmap_color_monochrome_kernel_entry(p_device_image, Input.width(), Input.height(), (float)(m_red_weight.pipeline_value()), (float)(m_green_weight.pipeline_value()), (float)(m_blue_weight.pipeline_value()));
         stop_profile_step(PROFILE_STRING_EXECUTE_KERNEL);       
 
         // copy the data from the device
         start_profile_step();
-        bitmap_copy_data_from_device_to_host(outputPixels, Input.width(), Input.height());
+        copy_from_device_to_host(outputPixels, p_device_image, sizeInBytes);
         stop_profile_step(PROFILE_STRING_DEVICE_TO_HOST);
 
-        // cleanup the memory allocated on the device
-        CUDA_cleanup();
+        // free the memory allocated on the device
+        free_device_memory(p_device_image);
 
 	}
 

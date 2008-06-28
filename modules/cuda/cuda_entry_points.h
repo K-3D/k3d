@@ -56,11 +56,9 @@ typedef struct
 // forward declaration of the entry functions
 // split the entry functions for timing reasons
 extern "C" K3D_CUDA_DECLSPEC void CUDA_initialize_device();
-extern "C" K3D_CUDA_DECLSPEC void bitmap_copy_data_from_host_to_device(const unsigned short *input, int width, int height);
+
 extern "C" K3D_CUDA_DECLSPEC void bitmap_arithmetic_kernel_entry(int operation, unsigned short* p_deviceImage, int width, int height, float value);
-extern "C" K3D_CUDA_DECLSPEC void bitmap_color_monochrome_kernel_entry(int width, int height, float redWeight, float greenWeight, float blueWeight);
-extern "C" K3D_CUDA_DECLSPEC void bitmap_copy_data_from_device_to_host(unsigned short *output, int width, int height);
-extern "C" K3D_CUDA_DECLSPEC void CUDA_cleanup();
+extern "C" K3D_CUDA_DECLSPEC void bitmap_color_monochrome_kernel_entry(unsigned short* p_deviceImage, int width, int height, float redWeight, float greenWeight, float blueWeight);
 
 extern "C" K3D_CUDA_DECLSPEC void apply_linear_transform_to_point_data ( float *device_points, float *device_matrix, int num_points );
 
@@ -78,6 +76,6 @@ extern "C" K3D_CUDA_DECLSPEC void free_CUDA_array ( void* cudaArrayPointer );
 extern "C" K3D_CUDA_DECLSPEC void transform_points_synchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 extern "C" K3D_CUDA_DECLSPEC void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 
-extern "C" void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, size_t device_pitch, size_t host_pitch, size_t width_in_bytes, size_t rows );
+extern "C" K3D_CUDA_DECLSPEC void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, size_t device_pitch, size_t host_pitch, size_t width_in_bytes, size_t rows );
 
 #endif // !CUDA_ENTRY_POINTS_H

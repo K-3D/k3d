@@ -34,6 +34,10 @@ class cuda_polyhedra
         /// Destructor
         ~cuda_polyhedra ();
         
+        /// initialize the polyhedra on the device
+        void init_device_version ();
+        
+    private:    
         /// a pointer to a uint2 array allocated on the device
         k3d::uint_t* pdev_per_polygon_first_face_and_face_count;
         /// a pointer to a int array allocated on the device
@@ -63,7 +67,7 @@ class cuda_polyhedra
         /// the number of edges - ie.  The length of the above 2 arrays
         k3d::uint_t number_of_edges;
         
-    private:
+        /// a reference to the host version of the polyhedra_t   
         const k3d::mesh::polyhedra_t& m_polyhedra_reference;
         
 };
@@ -73,18 +77,21 @@ class cuda_polyhedra
 class cuda_mesh
 {
     public:
-        
         /// Construct a CUDA mesh from an existing mesh data structure
         cuda_mesh ( k3d::mesh& intput_mesh );
         ~cuda_mesh ();
         
-        
+        /// initialize the mesh on the device
+        void init_device_version ();
+
+    private:
         /// a pointer to a array of float4's allocated on the device
         float* pdev_points_and_selection;
         k3d::uint_t number_of_points;
         
-    private:
+        /// a reference to the host verion of the mesh        
         k3d::mesh& m_mesh_reference;
+        
         cuda_polyhedra m_cuda_polyhedra;
 };        
 

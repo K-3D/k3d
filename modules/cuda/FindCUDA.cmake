@@ -175,7 +175,8 @@ MACRO (WRAP_CUDA outfiles)
 			ARGS -shared ${CUDA_LINUX_64_FLAGS}
                 ${CUDA_OPTIONS}
 				${cuda_includes} -o ${OFILE} ${INFILES}
-				-lcudart -L${CUTIL_PATH} -l${CUTIL_LIB})
+				-lcudart -L${CUTIL_PATH} -l${CUTIL_LIB}
+			DEPENDS ${INFILES})
 
         #MACRO_ADD_FILE_DEPENDENCIES(${CUFILE} ${OFILE})
 
