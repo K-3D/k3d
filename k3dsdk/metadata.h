@@ -45,6 +45,23 @@ private:
 	sigc::signal<void> m_changed_signal;
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////
+// metadata_property
+
+/// Wraps a k3d_data object to add metadata
+template<typename property_t>
+class metadata_property :
+	public property_t,
+	public metadata
+{
+public:
+	template<typename init_t>
+	metadata_property(const init_t& Init) :
+		property_t(Init)
+	{
+	}
+};
+
 } // namespace k3d
 
 #endif // K3DSDK_METADATA_H
