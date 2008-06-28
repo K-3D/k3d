@@ -43,6 +43,7 @@
 #include "script_button.h"
 #include "selection_button.h"
 #include "spin_button.h"
+#include "text.h"
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
@@ -283,7 +284,19 @@ public:
 						}
 						else
 						{
-							control = new entry::control(m_parent, property_name, entry::model(property), state_recorder);
+							if(imetadata* const metadata = dynamic_cast<imetadata*>(&property))
+							{
+								imetadata::metadata_t property_metadata = metadata->get_metadata();
+								if(property_metadata["k3d:property-type"] == "k3d:multi-line-text")
+								{
+									control = new text::control(m_parent, property_name, text::model(property), state_recorder);
+								}
+							}
+
+							if(!control)
+							{
+								control = new entry::control(m_parent, property_name, entry::model(property), state_recorder);
+							}
 						}
 					}
 					// inode* properties ...

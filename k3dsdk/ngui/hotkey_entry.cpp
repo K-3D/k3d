@@ -33,8 +33,7 @@ namespace libk3dngui
 bool hotkey_entry::on_focus_in_event(GdkEventFocus* Event)
 {
 	// Disable accelerators for this window
-	Gtk::Window* const window = dynamic_cast<Gtk::Window*>(get_toplevel());
-	if(window)
+	if(Gtk::Window* const window = dynamic_cast<Gtk::Window*>(get_toplevel()))
 	{
 		m_disabled_accel_group = window->get_accel_group();
 		window->remove_accel_group(window->get_accel_group());
@@ -46,8 +45,7 @@ bool hotkey_entry::on_focus_in_event(GdkEventFocus* Event)
 bool hotkey_entry::on_focus_out_event(GdkEventFocus* Event)
 {
 	// Enable accelerators for this window
-	Gtk::Window* const window = dynamic_cast<Gtk::Window*>(get_toplevel());
-	if(window)
+	if(Gtk::Window* const window = dynamic_cast<Gtk::Window*>(get_toplevel()))
 	{
 		window->add_accel_group(m_disabled_accel_group);
 		m_disabled_accel_group.clear();

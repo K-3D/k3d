@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "entry.h"
+#include "text.h"
 #include "interactive.h"
 
 #include <k3d-i18n-config.h>
@@ -33,6 +33,8 @@
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
 
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/textview.h>
 #include <gtkmm/window.h>
 
 #include <boost/format.hpp>
@@ -41,13 +43,13 @@
 namespace libk3dngui
 {
 
-namespace entry
+namespace text
 {
 
 /////////////////////////////////////////////////////////////////////////////
 // property_model
 
-/// Implementation of entry::imodel for use with k3d::iproperty objects
+/// Implementation of text::imodel for use with k3d::iproperty objects
 class property_model :
 	public imodel
 {
@@ -66,6 +68,11 @@ public:
 			result = m_readable_data.property_node()->name() + " " + result;
 
 		return result;
+	}
+
+	const k3d::bool_t writable()
+	{
+		return m_writable_data ? true : false;
 	}
 
 	const k3d::string_t value()
@@ -128,6 +135,10 @@ public:
 	const boost::scoped_ptr<imodel> m_model;
 	/// Stores a reference to the (optional) object for recording undo/redo data
 	k3d::istate_recorder* const m_state_recorder;
+	/// Stores the global accel group while the control has the keyboard focus
+	Glib::RefPtr<Gtk::AccelGroup> m_disabled_accel_group;
+	/// Provides the main view widget
+	Gtk::TextView m_text_view;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -137,7 +148,24 @@ control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* 
 	ui_component(Name, &Parent),
 	m_implementation(new implementation(Model, StateRecorder))
 {
-	set_name("k3d-entry");
+	set_name("k3d-text");
+
+	Gtk::ScrolledWindow* const scrolled_window = new Gtk::ScrolledWindow();
+	scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+	scrolled_window->add(m_implementation->m_text_view);
+	pack_start(*Gtk::manage(scrolled_window), Gtk::PACK_EXPAND_WIDGET);
+
+	m_implementation->m_text_view.signal_focus_in_event().connect(sigc::mem_fun(*this, &control::on_focus_in_event));
+	m_implementation->m_text_view.signal_focus_out_event().connect(sigc::mem_fun(*this, &control::on_focus_out_event));
+
+	if(m_implementation->m_model->writable())
+	{
+		m_implementation->m_text_view.set_editable(false);
+	}
+	else
+	{
+		m_implementation->m_text_view.set_editable(false);
+	}
 
 	// Synchronize the view with the data source ...
 	on_data_changed();
@@ -155,31 +183,49 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 {
 	if(Command == "set_value")
 	{
+		assert_not_implemented();
+		return RESULT_ERROR;
+/*
 		interactive::set_text(*this, Arguments);
 		select_region(0, 0);
 		on_set_value();
 		return RESULT_CONTINUE;
+*/
 	}
 
 	return ui_component::execute_command(Command, Arguments);
 }
 
+bool control::on_focus_in_event(GdkEventFocus* Event)
+{
+	// Disable accelerators for this window
+	if(Gtk::Window* const window = dynamic_cast<Gtk::Window*>(get_toplevel()))
+	{
+		m_implementation->m_disabled_accel_group = window->get_accel_group();
+		window->remove_accel_group(window->get_accel_group());
+	}
+
+	return base::on_focus_in_event(Event);
+}
+
 bool control::on_focus_out_event(GdkEventFocus* Event)
 {
 	on_set_value();
-	return base::on_focus_out_event(Event);
-}
 
-void control::on_activate()
-{
-	on_set_value();
-	base::on_activate();
+	// Enable accelerators for this window
+	if(Gtk::Window* const window = dynamic_cast<Gtk::Window*>(get_toplevel()))
+	{
+		window->add_accel_group(m_implementation->m_disabled_accel_group);
+		m_implementation->m_disabled_accel_group.clear();
+	}
+
+	return base::on_focus_out_event(Event);
 }
 
 void control::on_set_value()
 {
 	// If the value didn't change, we're done ...
-	const k3d::string_t new_value = get_text();
+	const k3d::string_t new_value = m_implementation->m_text_view.get_buffer()->get_text();
 	if(new_value == m_implementation->m_model->value())
 		return;
 
@@ -200,16 +246,15 @@ void control::on_set_value()
 
 void control::on_data_changed()
 {
-	set_text(m_implementation->m_model->value());
+	m_implementation->m_text_view.get_buffer()->set_text(m_implementation->m_model->value());
 }
 
 const k3d::string_t control::change_message(const k3d::string_t& Value)
 {
-	return k3d::string_cast(boost::format(_("Change %1% to %2%")) % m_implementation->m_model->label().raw() % Value);
+	return k3d::string_cast(boost::format(_("Change %1%")) % m_implementation->m_model->label().raw());
 }
 
-} // namespace entry
+} // namespace text
 
 } // namespace libk3dngui
-
 

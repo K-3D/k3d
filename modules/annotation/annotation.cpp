@@ -25,6 +25,7 @@
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/metadata.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/selection.h>
@@ -53,6 +54,8 @@ public:
 		m_leader(init_owner(*this) + init_name("leader") + init_label(_("Leader")) + init_description(_("Leader line")) + init_value(false)),
 		m_leader_target(init_owner(*this) + init_name("leader_target") + init_label(_("Leader Target")) + init_description(_("Leader line target")) + init_value(k3d::identity3D()))
 	{
+		m_text.set_metadata("k3d:property-type", "k3d:multi-line-text");
+
 		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
 		m_text.changed_signal().connect(make_async_redraw_slot());
 		m_color.changed_signal().connect(make_async_redraw_slot());
@@ -121,7 +124,7 @@ public:
 	}
 
 private:
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_text;
+	k3d::metadata_property<k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization)> m_text;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_leader;
 	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_leader_target;
