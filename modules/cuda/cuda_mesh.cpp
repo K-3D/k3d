@@ -36,19 +36,47 @@ cuda_polyhedra::cuda_polyhedra ( const k3d::mesh::polyhedra_t& input_polyhedra )
     number_of_edges = m_polyhedra_reference.edge_points->size();
     
     // allocate the device memory for the polygons, faces, loops and edges
-    allocate_device_memory((void**)&pdev_per_polygon_first_face_and_face_count, number_of_polygons*2*sizeof(k3d::uint_t));
+    allocate_device_memory((void**)&pdev_per_polygon_first_face_and_face_count, number_of_polygons*2*sizeof(k3d::uint_t) + 4);
     allocate_device_memory((void**)&pdev_per_polygon_types, number_of_polygons*sizeof(int32_t));
     
-    allocate_device_memory((void**)&pdev_per_face_first_loops_and_loop_count, number_of_faces*2*sizeof(k3d::uint_t));        
+    allocate_device_memory((void**)&pdev_per_face_first_loops_and_loop_count, number_of_faces*2*sizeof(k3d::uint_t) + 4);        
     allocate_device_memory((void**)&pdev_per_face_selection, number_of_faces*sizeof(float));
     
     allocate_device_memory((void**)&pdev_per_loop_first_edge, number_of_loops*sizeof(k3d::uint_t));
     
-    allocate_device_memory((void**)&pdev_per_edge_point_and_clockwise_edge, number_of_edges*2*sizeof(k3d::uint_t));
+    allocate_device_memory((void**)&pdev_per_edge_point_and_clockwise_edge, number_of_edges*2*sizeof(k3d::uint_t) + 4);
     allocate_device_memory((void**)&pdev_per_edge_selection, number_of_edges*sizeof(float));
             
     // copy the data to the device (pre-convert if needed)
-            
+    copy_2D_from_host_to_device_with_padding(pdev_per_polygon_first_face_and_face_count, &(m_polyhedra_reference.first_faces->front()), 8, 4, 4, number_of_polygons);
+    copy_2D_from_host_to_device_with_padding(pdev_per_polygon_first_face_and_face_count+4, &(m_polyhedra_reference.face_counts->front()), 8, 4, 4, number_of_polygons);
+    
+    copy_from_host_to_device(pdev_per_polygon_types, &(m_polyhedra_reference.types->front()), number_of_polygons*sizeof(int32_t));
+    
+    copy_2D_from_host_to_device_with_padding(pdev_per_face_first_loops_and_loop_count, &(m_polyhedra_reference.face_first_loops->front()), 8, 4, 4, number_of_faces);
+    copy_2D_from_host_to_device_with_padding(pdev_per_face_first_loops_and_loop_count+4, &(m_polyhedra_reference.face_loop_counts->front()), 8, 4, 4, number_of_faces);
+    
+    float* face_selection_temp = (float*) malloc ( number_of_faces*sizeof(float) );
+    for ( k3d::uint_t face = 0 ; face < number_of_faces ; ++face )
+    {
+        face_selection_temp[face] = (float)((*m_polyhedra_reference.face_selection)[face]);   
+    }    
+    copy_from_host_to_device(pdev_per_face_selection, face_selection_temp, number_of_faces*sizeof(float));
+    
+    float* edge_selection_temp = (float*) malloc (  number_of_edges*sizeof(float) );
+    for ( k3d::uint_t edge = 0 ; edge < number_of_edges ; ++edge )
+    {
+        edge_selection_temp[edge] = (float)((*m_polyhedra_reference.edge_selection)[edge]);   
+    }
+    copy_from_host_to_device(pdev_per_edge_selection, edge_selection_temp, number_of_edges*sizeof(float));
+    
+    copy_from_host_to_device(pdev_per_loop_first_edge, &(m_polyhedra_reference.loop_first_edges->front()), number_of_loops*sizeof(k3d::uint_t));
+    
+    copy_2D_from_host_to_device_with_padding(pdev_per_edge_point_and_clockwise_edge, &(m_polyhedra_reference.edge_points->front()), 8, 4, 4, number_of_edges);
+    copy_2D_from_host_to_device_with_padding(pdev_per_edge_point_and_clockwise_edge+4, &(m_polyhedra_reference.clockwise_edges->front()), 8, 4, 4, number_of_edges);
+    
+    free ( face_selection_temp );
+    free ( edge_selection_temp );
 }
 
 /// Destructor - free the allocated device pointers
@@ -78,9 +106,23 @@ cuda_mesh::cuda_mesh(k3d::mesh& input_mesh):
     allocate_device_memory((void**)&pdev_points_and_selection, number_of_points*4*sizeof(float));
     
     // convert the point coordinates and selection to floats and copy to the device
+    // first allocate host memory
+    float* host_points_and_selection = (float*) malloc ( number_of_points*4*sizeof(float) );
     
-    // create a cuda_polyhedron
-            
+    for ( int point = 0 ; point < number_of_points ; ++point )
+    {
+        int float_index = point*3;
+        host_points_and_selection[float_index] = (float)((*m_mesh_reference.points)[point][0]);
+        host_points_and_selection[float_index+1] = (float)((*m_mesh_reference.points)[point][1]);
+        host_points_and_selection[float_index+2] = (float)((*m_mesh_reference.points)[point][2]);
+        host_points_and_selection[float_index+3] = (float)((*m_mesh_reference.point_selection)[point]);
+    }
+    
+    // copy the coordinates and selection to the device
+    copy_from_host_to_device( pdev_points_and_selection, host_points_and_selection, number_of_points*4*sizeof(float));
+    
+    // free the temporary host data
+    free ( host_points_and_selection );
 }
 
 /// Destructor - frees the allocated device pointers
