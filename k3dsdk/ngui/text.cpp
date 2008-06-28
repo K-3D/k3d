@@ -160,7 +160,7 @@ control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* 
 
 	if(m_implementation->m_model->writable())
 	{
-		m_implementation->m_text_view.set_editable(false);
+		m_implementation->m_text_view.set_editable(true);
 	}
 	else
 	{
