@@ -38,6 +38,7 @@ mesh_simple_deformation_modifier::mesh_simple_deformation_modifier(iplugin_facto
 void mesh_simple_deformation_modifier::on_create_mesh(const mesh& Input, mesh& Output)
 {
 	Output = Input;
+	m_selection_changed = true; // make sure we merge selection after the mesh has been recreated
 }
 
 void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& Output)
