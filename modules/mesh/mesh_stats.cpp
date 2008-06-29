@@ -31,7 +31,7 @@
 namespace module
 {
 
-namespace annotation
+namespace mesh
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -264,7 +264,7 @@ k3d::iplugin_factory& mesh_stats_factory()
 	return mesh_stats::get_factory();
 }
 
-} // namespace annotation
+} // namespace mesh
 
 } // namespace module
 

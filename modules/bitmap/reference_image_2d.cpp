@@ -36,7 +36,7 @@
 namespace module
 {
 
-namespace annotation
+namespace bitmap
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -315,7 +315,7 @@ k3d::iplugin_factory& reference_image_2d_factory()
 	return reference_image_2d::get_factory();
 }
 
-} // namespace annotation
+} // namespace bitmap
 
 } // namespace module
 

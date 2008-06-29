@@ -38,6 +38,8 @@ extern k3d::iplugin_factory& matte_colordiff_factory();
 extern k3d::iplugin_factory& matte_invert_factory();
 extern k3d::iplugin_factory& multiply_factory();
 extern k3d::iplugin_factory& reader_factory();
+extern k3d::iplugin_factory& reference_image_2d_factory();
+extern k3d::iplugin_factory& reference_image_3d_factory();
 extern k3d::iplugin_factory& solid_factory();
 extern k3d::iplugin_factory& subtract_factory();
 extern k3d::iplugin_factory& threshold_factory();
@@ -56,6 +58,8 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::bitmap::matte_invert_factory());
 	Registry.register_factory(module::bitmap::multiply_factory());
 	Registry.register_factory(module::bitmap::reader_factory());
+	Registry.register_factory(module::bitmap::reference_image_2d_factory());
+	Registry.register_factory(module::bitmap::reference_image_3d_factory());
 	Registry.register_factory(module::bitmap::solid_factory());
 	Registry.register_factory(module::bitmap::subtract_factory());
 	Registry.register_factory(module::bitmap::threshold_factory());

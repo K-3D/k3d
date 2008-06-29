@@ -33,9 +33,6 @@ namespace annotation
 extern k3d::iplugin_factory& annotation_factory();
 extern k3d::iplugin_factory& annotation_2d_factory();
 extern k3d::iplugin_factory& annotate_normal_factory();
-extern k3d::iplugin_factory& mesh_stats_factory();
-extern k3d::iplugin_factory& reference_image_2d_factory();
-extern k3d::iplugin_factory& reference_image_3d_factory();
 
 } // namespace annotation
 
@@ -45,8 +42,5 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::annotation::annotation_factory());
 	Registry.register_factory(module::annotation::annotation_2d_factory());
 	Registry.register_factory(module::annotation::annotate_normal_factory());
-	Registry.register_factory(module::annotation::mesh_stats_factory());
-	Registry.register_factory(module::annotation::reference_image_2d_factory());
-	Registry.register_factory(module::annotation::reference_image_3d_factory());
 K3D_MODULE_END
 

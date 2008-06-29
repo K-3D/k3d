@@ -51,6 +51,7 @@ extern k3d::iplugin_factory& make_creases_factory();
 extern k3d::iplugin_factory& make_sds_factory();
 extern k3d::iplugin_factory& merge_mesh_factory();
 extern k3d::iplugin_factory& mesh_instance_factory();
+extern k3d::iplugin_factory& mesh_stats_factory();
 extern k3d::iplugin_factory& move_first_edge_factory();
 extern k3d::iplugin_factory& sds_corner_factory();
 extern k3d::iplugin_factory& sds_crease_factory();
@@ -90,6 +91,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::mesh::make_creases_factory());
 	Registry.register_factory(module::mesh::make_sds_factory());
 	Registry.register_factory(module::mesh::merge_mesh_factory());
+	Registry.register_factory(module::mesh::mesh_stats_factory());
 	Registry.register_factory(module::mesh::move_first_edge_factory());
 	Registry.register_factory(module::mesh::sds_corner_factory());
 	Registry.register_factory(module::mesh::sds_crease_factory());
