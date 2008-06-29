@@ -61,17 +61,17 @@ public:
 		m_knot_vector(init_owner(*this) + init_name("knot_vector") + init_label(_("Knot Vector")) + init_description(_("Enter a new knot vector containing knot values separated with spaces.")) + init_value(k3d::mesh::knots_t()) )
 	{
 		m_knot_vector.set_metadata("k3d:property-type", "k3d:nurbs-knot-vector");
-		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
 		m_knot_vector.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output) 
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output=Input;
-		
+
 		if(!k3d::validate_nurbs_curve_groups(Output))
 			return;
-		
+
 		merge_selection(m_mesh_selection.pipeline_value(), Output);
 
 		int my_curve = selected_curve(Output);
@@ -80,30 +80,30 @@ public:
 			k3d::log() << error << "More than one curve or no curve selected! " << my_curve << std::endl;
 			return;
 		}
-		
-		
+
+
 		m_knot_vector.set_value(extract_knots(Output, my_curve));
 	}
-	
+
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output=Input;
-		
+
 		if(!k3d::validate_nurbs_curve_groups(Output))
 			return;
 
 		merge_selection(m_mesh_selection.pipeline_value(), Output);
-		
+
 		const k3d::mesh::knots_t& knots = m_knot_vector.pipeline_value();
-		
+
 		int my_curve = selected_curve(Output);
 		if(my_curve < 0)
 		{
 			k3d::log() << error << "More than one curve or no curve selected! " << my_curve << std::endl;
 			return;
 		}
-		
+
 		if(!insert_knots(knots, Output, my_curve))
 			k3d::log() << error << "Invalid Knot Vector on curve " << my_curve << std::endl;
 	}
@@ -119,49 +119,49 @@ public:
 
 		return factory;
 	}
-	
+
 private:
 	k3d::metadata_property<k3d_data(k3d::mesh::knots_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization)> m_knot_vector;
-	
+
 	k3d::mesh::knots_t extract_knots(const k3d::mesh& Output, int curve)
 	{
 		const k3d::mesh::nurbs_curve_groups_t& groups = *Output.nurbs_curve_groups;
 		const k3d::mesh::knots_t& knots = *groups.curve_knots;
 		k3d::mesh::knots_t curve_knots;
-		
+
 		const size_t curve_knots_begin = (*groups.curve_first_knots)[curve];
 		const size_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];
-		
+
 		for(size_t i = curve_knots_begin; i< curve_knots_end; i++)
 			curve_knots.push_back( knots[i] );
-			
+
 		return curve_knots;
 	}
-	
+
 	bool insert_knots(const k3d::mesh::knots_t& curve_knots, k3d::mesh& Output, int curve)
 	{
 		k3d::mesh::nurbs_curve_groups_t& groups = *k3d::make_unique(Output.nurbs_curve_groups);
 		k3d::mesh::knots_t& knots = *k3d::make_unique(groups.curve_knots);
-		
+
 		const size_t curve_knots_begin = (*groups.curve_first_knots)[curve];
 		const size_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];
-		
+
 		if(curve_knots.size() != curve_knots_end - curve_knots_begin)
 			return false;
-			
+
 		for(size_t i = curve_knots_begin; i < curve_knots_end; i++)
 			knots[i] = curve_knots[i-curve_knots_begin];
-			
+
 		return true;
 	}
-	
+
 
 };
 
 int selected_curve(k3d::mesh& Output)
 {
 	int my_curve=-1;
-	
+
 	const size_t group_begin = 0;
 	const size_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
 	for(size_t group = group_begin; group != group_end; ++group)
@@ -175,10 +175,10 @@ int selected_curve(k3d::mesh& Output)
 				{
 					return -1;
 				}
-				else 
+				else
 				{
 					my_curve=curve;
-				}						
+				}
 		}
 	}
 	return my_curve;
