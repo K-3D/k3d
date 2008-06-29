@@ -27,11 +27,13 @@
 #include <list>
 #include <vector>
 #include <iostream>
+#include <stack>
 #include <dae.h>
 #include <dom/domMaterial.h>
 #include <dom/domGeometry.h>
 #include <dom/domNode.h>
 #include <dom/domCOLLADA.h>
+#include <k3dsdk/mesh_source.h>
 #include "intGeometry.h"
 
 using namespace std;
@@ -43,38 +45,49 @@ namespace collada
 
 namespace io
 {
-
-// Our node structure, which we create by converting a domNode object
-class Node {
-public:
-	list<intGeometry*> meshes;
-	list<Node*> childNodes;
-
-	// This is defined later to work around a circular dependency on the lookup function
-	Node(domNode& node);
-};
-
-// This function checks to see if a user data object has already been attached to
-// the DOM object. If so, that object is casted from void* to the appropriate type
-// and returned, otherwise the object is created and attached to the DOM object
-// via the setUserData method.
-template<typename MyType, typename DomType>
-MyType& lookup(DomType& domObject) {
-	if (!domObject.getUserData())
-		domObject.setUserData(new MyType(domObject));
-	return *(MyType*)(domObject.getUserData());
-
-}
-
-// This function traverses all the DOM objects of a particular type and frees
-// destroys the associated user data object.
-template<typename MyType, typename DomType>
-void freeConversionObjects(DAE& dae) {
-	vector<daeElement*> elts = dae.getDatabase()->typeLookup(DomType::ID());
-	for (size_t i = 0; i < elts.size(); i++)
-		delete (MyType*)elts[i]->getUserData();
-
-}
-void convertModel(domCOLLADA&, k3d::mesh& );
+	// Our node structure, which we create by converting a domNode object
+	class Node {
+	public:
+		list<intGeometry*> meshes;
+		list<Node*> childNodes;
+	
+		// This is defined later to work around a circular dependency on the lookup function
+		Node(domNode& node, const k3d::matrix4& mat);
+		k3d::matrix4 getTransformation(domNode& node, const k3d::matrix4& mat);
+	};
+	
+	// This function checks to see if a user data object has already been attached to
+	// the DOM object. If so, that object is casted from void* to the appropriate type
+	// and returned, otherwise the object is created and attached to the DOM object
+	// via the setUserData method.
+	template<typename MyType, typename DomType>
+	MyType& lookup(DomType& domObject, const k3d::matrix4& mat) {
+		if (!domObject.getUserData())
+			domObject.setUserData(new MyType(domObject,mat));
+		return *(MyType*)(domObject.getUserData());
+	
+	}
+	
+	// This function traverses all the DOM objects of a particular type and frees
+	// destroys the associated user data object.
+	template<typename MyType, typename DomType>
+	void freeConversionObjects(DAE& dae) {
+		vector<daeElement*> elts = dae.getDatabase()->typeLookup(DomType::ID());
+		for (size_t i = 0; i < elts.size(); i++)
+			delete (MyType*)elts[i]->getUserData();
+	
+	}
+	
+	class daeParser
+	{
+	public:
+		daeParser(domCOLLADA& root);
+		k3d::mesh get_mesh(){return Mesh;}
+	private:
+		k3d::mesh Mesh;
+		///Matrix stack to handle coordinate system transformations
+		std::stack<k3d::matrix4> mstack;
+	};
+	//void convertModel(domCOLLADA&, k3d::mesh& );
 }}}
 #endif

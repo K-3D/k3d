@@ -119,7 +119,7 @@ private:
 	///Variable to keep track of the index of the last point added to the gprim_factory
 	int count;
 	///Matrix stack to handle coordinate system transformations
-    std::stack<k3d::matrix4> mstack;
+	std::stack<k3d::matrix4> mstack;
 
 	///Add point to the gprim_factory using the current coordinate system transformation
 	void add_point(k3d::point4 p)

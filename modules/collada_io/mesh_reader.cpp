@@ -21,7 +21,7 @@
 	\author Barbiero Mattia
 */
 
-#include "gprim_factory.h"
+
 #include <dae.h>
 #include <dom/domCOLLADA.h>
 #include <dom/domConstants.h>
@@ -31,6 +31,7 @@
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/gprim_factory.h>
 #include "intGeometry.h"
 #include "integration.h"
 
@@ -87,14 +88,16 @@ public:
             		k3d::log() << error << k3d_file_reference << ": error opening [" << path.native_console_string() << "]" << std::endl;
 			return;
 		}
-        // Do the conversion. The conversion process throws an exception on error, so
-        // we'll include a try/catch handler.
-       		 convertModel(*root, Mesh);
-
-        // destroy the objects we created during the conversion process
-        freeConversionObjects<Node, domNode>(dae);
-        freeConversionObjects<intGeometry, domGeometry>(dae);
-        //freeConversionObjects<Material, domMaterial>(dae);
+		// Do the conversion. The conversion process throws an exception on error, so
+		// we'll include a try/catch handler.
+		//convertModel(*root, Mesh);
+		daeParser dae_file(*root);
+		Mesh = dae_file.get_mesh();
+	
+		// destroy the objects we created during the conversion process
+		freeConversionObjects<Node, domNode>(dae);
+		freeConversionObjects<intGeometry, domGeometry>(dae);
+		//freeConversionObjects<Material, domMaterial>(dae);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Mesh)

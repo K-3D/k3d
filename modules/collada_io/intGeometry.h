@@ -26,6 +26,7 @@
 
 
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/algebra.h>
 #include <dom/domGeometry.h>
 
 
@@ -55,9 +56,10 @@ private:
     k3d::mesh Mesh;
 public: // Constuctor and Destructor
 	/**
-	 * Default Constructor.
-	 */
-	intGeometry(domGeometry&);
+	* Default Constructor.
+	* Passes ccst (Current Coordinate System Transformation) to compute real vertex positions
+	*/
+	intGeometry(domGeometry&, const k3d::matrix4& ccst);
 	k3d::mesh getMesh(){return Mesh;}
 	/**
 	 * Default Destructor.
