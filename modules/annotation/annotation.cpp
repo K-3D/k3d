@@ -21,6 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "common.h"
+
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -66,7 +68,10 @@ public:
 	annotation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_font_path(init_owner(*this) + init_name("font") + init_label(_("Font")) + init_description(_("Font path")) + init_value(detail::default_font()) + init_path_mode(k3d::ipath_property::READ) + init_path_type(k3d::options::path::fonts())),
-		m_font_size(init_owner(*this) + init_name("font_size") + init_label(_("Font Size")) + init_description(_("Font size.")) + init_value(24.0)),
+		m_font_size(init_owner(*this) + init_name("font_size") + init_label(_("Font Size")) + init_description(_("Font size.")) + init_value(14.0)),
+		m_line_width(init_owner(*this) + init_name("line_width") + init_label(_("Line Width")) + init_description(_("Maximum width of a single line of text..")) + init_value(200.0)),
+		m_line_spacing(init_owner(*this) + init_name("line_spacing") + init_label(_("Line Spacing")) + init_description(_("Controls the spacing between lines of text.")) + init_value(1.0)),
+		m_alignment(init_owner(*this) + init_name("alignment") + init_label(_("Alignment")) + init_description(_("Controls the alignment of adjacent lines of text.")) + init_value(LEFT) + init_values(alignment_values())),
 		m_text(init_owner(*this) + init_name("text") + init_label(_("Text")) + init_description(_("Annotation text")) + init_value(k3d::string_t(_("Annotation")))),
 		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Annotation color")) + init_value(k3d::color(0, 0, 0))),
 		m_leader(init_owner(*this) + init_name("leader") + init_label(_("Leader")) + init_description(_("Leader line")) + init_value(false)),
@@ -77,6 +82,9 @@ public:
 		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
 		m_font_path.changed_signal().connect(make_async_redraw_slot());
 		m_font_size.changed_signal().connect(make_async_redraw_slot());
+		m_line_width.changed_signal().connect(make_async_redraw_slot());
+		m_line_spacing.changed_signal().connect(make_async_redraw_slot());
+		m_alignment.changed_signal().connect(make_async_redraw_slot());
 		m_text.changed_signal().connect(make_async_redraw_slot());
 		m_color.changed_signal().connect(make_async_redraw_slot());
 		m_leader.changed_signal().connect(make_async_redraw_slot());
@@ -99,24 +107,34 @@ public:
 
 	void draw(const k3d::gl::render_state& State)
 	{
-		const k3d::filesystem::path font_path = m_font_path.pipeline_value();
-		if(font_path != m_current_font_path || !m_current_font)
+		FTGLPixmapFont font(m_font_path.pipeline_value().native_filesystem_string().c_str());
+		if(font.Error())
 		{
-			m_current_font.reset(new FTGLPixmapFont(font_path.native_filesystem_string().c_str()));
-			if(m_current_font->Error())
-			{
-				k3d::log() << error << "error initializing font" << std::endl;
-				m_current_font.reset();
-				return;
-			}
-
-			m_current_font_path = font_path;
-			m_current_font->FaceSize(14);
+			k3d::log() << error << "error initializing font" << std::endl;
+			return;
 		}
+		font.FaceSize(m_font_size.pipeline_value());
 
-		const k3d::double_t font_size = m_font_size.pipeline_value();
-		if(font_size != m_current_font->FaceSize())
-			m_current_font->FaceSize(font_size);
+		FTSimpleLayout layout;
+		layout.SetFont(&font);
+		layout.SetLineLength(m_line_width.pipeline_value());
+		layout.SetLineSpacing(m_line_spacing.pipeline_value());
+
+		switch(m_alignment.pipeline_value())
+		{
+			case LEFT:
+				layout.SetAlignment(FTGL::ALIGN_LEFT);
+				break;
+			case CENTER:
+				layout.SetAlignment(FTGL::ALIGN_CENTER);
+				break;
+			case RIGHT:
+				layout.SetAlignment(FTGL::ALIGN_RIGHT);
+				break;
+			case JUSTIFY:
+				layout.SetAlignment(FTGL::ALIGN_JUSTIFY);
+				break;
+		}
 
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_1D);
@@ -124,9 +142,6 @@ public:
 		glDisable(GL_BLEND);
 
 		glRasterPos3d(0, 0, 0);
-		FTSimpleLayout layout;
-		layout.SetFont(m_current_font.get());
-		layout.SetAlignment(FTGL::ALIGN_CENTER);
 		layout.Render(m_text.pipeline_value().c_str());
 
 		if(m_leader.pipeline_value())
@@ -165,13 +180,13 @@ public:
 private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_font_path;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_font_size;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_line_width;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_line_spacing;
+	k3d_data(alignment_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_alignment;
 	k3d::metadata_property<k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization)> m_text;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_leader;
 	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_leader_target;
-
-	boost::scoped_ptr<FTFont> m_current_font;
-	k3d::filesystem::path m_current_font_path;
 };
 
 /////////////////////////////////////////////////////////////////////////////
