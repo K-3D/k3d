@@ -26,7 +26,11 @@ class ResultsProcessor(object):
         self.__results += [ResultSet(x, y, (benchmarkPluginName, ColumnTitle, self.__operation), plot_style)]
         
     def plot_data(self, xlabel=None, ylabel=None):
-        import pylab as P
+        try:
+            import pylab as P
+        except:
+            return 0
+        
         legend = ()
         for result in self.__results:
             P.plot(result.x, result.y, result.plot_style)

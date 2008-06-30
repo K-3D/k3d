@@ -36,7 +36,10 @@ extern k3d::iplugin_factory& cuda_bitmap_color_monochrome_factory();
 extern k3d::iplugin_factory& cuda_deformation_transform_points_factory();
 extern k3d::iplugin_factory& cuda_deformation_transform_points_asynchronous_factory();
 
-} // namespace cuda_bitmap
+// mesh plugins
+extern k3d::iplugin_factory& cuda_mesh_subdivide_edges_factory();
+
+} // namespace cuda
 
 } // namespace module
 
@@ -49,6 +52,8 @@ K3D_MODULE_START(Registry)
 	// deformation plugins
 	Registry.register_factory(module::cuda::cuda_deformation_transform_points_factory());
 	Registry.register_factory(module::cuda::cuda_deformation_transform_points_asynchronous_factory());
+    // mesh plugins
+    Registry.register_factory(module::cuda::cuda_mesh_subdivide_edges_factory());
 	
 K3D_MODULE_END 
 

@@ -375,7 +375,35 @@ extern "C" void transform_points_asynchronous ( double *InputPoints, double *Poi
 	CUT_SAFE_CALL ( cutDeleteTimer ( timer ));
 }
 
+extern "C" void subdivide_edges_split_point_calculator ( unsigned int* edge_indices, 
+                                                         unsigned int num_edge_indices, 
+                                                         float* points_and_selection,
+                                                         unsigned int num_points,  
+                                                         unsigned int* edge_point_indices,
+                                                         unsigned int* clockwise_edge_indices,
+                                                         int num_split_points )
+{
+    int threads_x = 512 / num_split_points;
+    
+    dim3 threads_per_block(threads_x, num_split_points);
+    dim3 blocks_per_grid( iDivUp(num_points, threads_x), 1);
+    
+    subdivide_edges_split_point_kernel<<< blocks_per_grid, threads_per_block >>> ( edge_indices, num_edge_indices, (float4*)points_and_selection, edge_point_indices, clockwise_edge_indices, num_points, num_split_points );  
+    
+    // check if the kernel executed correctly
+    CUT_CHECK_ERROR("Add Kernel execution failed");
+    cudaThreadSynchronize();
+}
+
 extern "C" void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, size_t device_pitch, size_t host_pitch, size_t width_in_bytes, size_t rows )
 {
     CUDA_SAFE_CALL ( cudaMemcpy2D(device_pointer, device_pitch, host_pointer, host_pitch, width_in_bytes, rows, cudaMemcpyHostToDevice) );
+}
+
+/**
+ * Call thread synchronize to ensure consistency
+ */
+extern "C" void synchronize_threads ()
+{
+    cudaThreadSynchronize();    
 }
