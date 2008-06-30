@@ -23,6 +23,7 @@
 */
 
 #include "stream_io_ri.h"
+#include "texture3.h"
 #include <set>
 
 namespace k3d
@@ -204,6 +205,8 @@ std::ostream& operator<<(std::ostream& Stream, const parameter& RHS)
 	if(detail::print_parameter<vector>("vector", Stream, RHS))
 		return Stream;
 	if(detail::print_parameter<normal>("normal", Stream, RHS))
+		return Stream;
+	if(detail::print_parameter<texture3>("float[3]", Stream, RHS))
 		return Stream;
 	if(detail::print_parameter<color>("color", Stream, RHS))
 		return Stream;

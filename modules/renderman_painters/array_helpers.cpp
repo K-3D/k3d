@@ -23,6 +23,7 @@
 
 #include "array_helpers.h"
 #include <k3dsdk/utility.h>
+#include <k3dsdk/texture3.h>
 
 namespace libk3drendermanpainters
 {
@@ -65,6 +66,8 @@ public:
 		if(create_copier<k3d::typed_array<k3d::vector3> >(Name, Source))
 			return;
 		if(create_copier<k3d::typed_array<k3d::normal3> >(Name, Source))
+			return;
+		if(create_copier<k3d::typed_array<k3d::texture3> >(Name, Source))
 			return;
 		if(create_copier<k3d::typed_array<k3d::color> >(Name, Source))
 			return;
