@@ -27,17 +27,17 @@
 namespace libk3dtexture
 {
 
-extern k3d::iplugin_factory& cylinder_map_factory();
+//extern k3d::iplugin_factory& cylinder_map_factory();
 extern k3d::iplugin_factory& planar_map_factory();
-extern k3d::iplugin_factory& sphere_map_factory();
-extern k3d::iplugin_factory& texture_map_factory();
+//extern k3d::iplugin_factory& sphere_map_factory();
+//extern k3d::iplugin_factory& texture_map_factory();
 
 } // namespace libk3dtexture
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dtexture::cylinder_map_factory());
+	//Registry.register_factory(libk3dtexture::cylinder_map_factory());
 	Registry.register_factory(libk3dtexture::planar_map_factory());
-	Registry.register_factory(libk3dtexture::sphere_map_factory());
-	Registry.register_factory(libk3dtexture::texture_map_factory());
+	//Registry.register_factory(libk3dtexture::sphere_map_factory());
+	//Registry.register_factory(libk3dtexture::texture_map_factory());
 K3D_MODULE_END
 
