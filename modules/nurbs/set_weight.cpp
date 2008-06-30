@@ -52,7 +52,7 @@ class set_weight :
 public:
 	set_weight(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_weight(init_owner(*this) + init_name("weight") + init_label(_("Weight")) + init_description(_("The new weight for the selected points")) + init_value(1.0))
+		m_weight(init_owner(*this) + init_name("weight") + init_label(_("Weight")) + init_description(_("The new weight for the selected points")) + init_value(1.0) + init_step_increment(0.1)+ init_units(typeid(k3d::measurement::scalar)))
 	{	
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_weight.changed_signal().connect(make_update_mesh_slot());
@@ -116,7 +116,7 @@ public:
 	}
 
 private:
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_weight;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, no_serialization) m_weight;
 };
 
 //Create connect_curve factory
