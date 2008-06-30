@@ -378,38 +378,7 @@ public:
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		document().pipeline_profiler().start_execution(*this, "Validate input");
-		if(!k3d::validate_polyhedra(Input))
-		{
-			document().pipeline_profiler().finish_execution(*this, "Validate input");
-			return;
-		}
-		document().pipeline_profiler().finish_execution(*this, "Validate input");
-		
-		k3d::mesh::points_t& output_points = *k3d::make_unique(Output.points);
-		
-		document().pipeline_profiler().start_execution(*this, "Calculate positions");
-		
-        // initialize the device
-        CUDA_initialize_device();
-        
-        // initialize the device version of the mesh
-        cuda_mesh device_mesh ( Input );
-        
-        k3d::uint_t number_of_new_points = output_points.size() - Input.points->size();
-        
-        device_mesh.init_device_version ( number_of_new_points );
-        
-        subdivide_edges_split_point_calculator ( &(m_edge_list.front()), m_edge_list.size(),  
-                                                         device_mesh.pdev_points_and_selection,
-                                                         Input.points->size(),  
-                                                         device_mesh.m_cuda_polyhedra.pdev_per_edge_point,
-                                                         device_mesh.m_cuda_polyhedra.pdev_per_edge_clockwise_edge,
-                                                         m_vertices.pipeline_value());
 
-        device_mesh.copy_from_device ( Output );
-        
-		document().pipeline_profiler().finish_execution(*this, "Calculate positions");
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -419,7 +388,7 @@ public:
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x7cf6b6b8, 0x154c3103, 0x2db817b2, 0x1319509a),
 				"CUDASubdivideEdges",
-				"Subdivides edges by creating one or more vertices along",
+				"Subdivides edges by creating one or more vertices along selected edges",
 				"CUDAMesh",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
