@@ -141,9 +141,9 @@ private:
 	/// Called when the control loses the keyboard focus
 	bool on_focus_out_event(GdkEventFocus* Event);
 	/// Called when the user finishes editing data
-	void on_set_value();
-	/// Called whenever the underlying data changes
-	void on_data_changed();
+	void on_apply();
+	/// Called to synchronize the control with the current model value
+	void on_reset();
 
 	const k3d::string_t change_message(const k3d::string_t& Value);
 

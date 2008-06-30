@@ -21,8 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "button.h"
 #include "text.h"
 #include "interactive.h"
+#include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/inode.h>
@@ -33,6 +35,7 @@
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
 
+#include <gtkmm/buttonbox.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/textview.h>
 #include <gtkmm/window.h>
@@ -155,23 +158,40 @@ control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* 
 	scrolled_window->add(m_implementation->m_text_view);
 	pack_start(*Gtk::manage(scrolled_window), Gtk::PACK_EXPAND_WIDGET);
 
-	m_implementation->m_text_view.signal_focus_in_event().connect(sigc::mem_fun(*this, &control::on_focus_in_event));
-	m_implementation->m_text_view.signal_focus_out_event().connect(sigc::mem_fun(*this, &control::on_focus_out_event));
-
 	if(m_implementation->m_model->writable())
 	{
 		m_implementation->m_text_view.set_editable(true);
+
+		button::control* const apply_button =
+			new button::control(Parent, "apply", _("Apply"))
+				<< connect_button(sigc::mem_fun(*this, &control::on_apply))
+				<< set_tooltip(_("Apply modifications."));
+
+		button::control* const reset_button =
+			new button::control(Parent, "reset", _("Reset"))
+				<< connect_button(sigc::mem_fun(*this, &control::on_reset))
+				<< set_tooltip(_("Reset modifications."));
+
+		Gtk::HButtonBox* const bbox = new Gtk::HButtonBox(Gtk::BUTTONBOX_END);
+		bbox->pack_start(*Gtk::manage(apply_button));
+		bbox->pack_start(*Gtk::manage(reset_button));
+
+		pack_start(*Gtk::manage(bbox));
 	}
 	else
 	{
 		m_implementation->m_text_view.set_editable(false);
 	}
 
-	// Synchronize the view with the data source ...
-	on_data_changed();
+	// Keep track of when the TextView control receives/loses the keyboard focus, so we can disable/enable hotkeys ...
+	m_implementation->m_text_view.signal_focus_in_event().connect(sigc::mem_fun(*this, &control::on_focus_in_event));
+	m_implementation->m_text_view.signal_focus_out_event().connect(sigc::mem_fun(*this, &control::on_focus_out_event));
 
 	// We want to be notified if the data source changes ...
-	m_implementation->m_model->connect_changed_signal(sigc::mem_fun(*this, &control::on_data_changed));
+	m_implementation->m_model->connect_changed_signal(sigc::mem_fun(*this, &control::on_reset));
+
+	// Synchronize the view with the data source ...
+	on_reset();
 }
 
 control::~control()
@@ -210,8 +230,6 @@ bool control::on_focus_in_event(GdkEventFocus* Event)
 
 bool control::on_focus_out_event(GdkEventFocus* Event)
 {
-	on_set_value();
-
 	// Enable accelerators for this window
 	if(Gtk::Window* const window = dynamic_cast<Gtk::Window*>(get_toplevel()))
 	{
@@ -222,7 +240,7 @@ bool control::on_focus_out_event(GdkEventFocus* Event)
 	return base::on_focus_out_event(Event);
 }
 
-void control::on_set_value()
+void control::on_apply()
 {
 	// If the value didn't change, we're done ...
 	const k3d::string_t new_value = m_implementation->m_text_view.get_buffer()->get_text();
@@ -244,7 +262,7 @@ void control::on_set_value()
 		m_implementation->m_state_recorder->commit_change_set(m_implementation->m_state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), change_message(m_implementation->m_model->value()), K3D_CHANGE_SET_CONTEXT);
 }
 
-void control::on_data_changed()
+void control::on_reset()
 {
 	m_implementation->m_text_view.get_buffer()->set_text(m_implementation->m_model->value());
 }
