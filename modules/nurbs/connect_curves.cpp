@@ -394,7 +394,7 @@ namespace module
 		
 
 		//assumes that the 2 curves share one end point (the one with new_index)
-		void join_curves(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::indices_t& indices, k3d::mesh::knots_t& knots, size_t new_index, size_t curve1, size_t curve2)
+		void join_curves(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::indices_t& indices, k3d::mesh::knots_t& knots, size_t point1, size_t curve1, size_t point2, size_t curve2)
 		{
 
 			k3d::log() << debug << "Join curves " << curve1 << " and " << curve2 << std::endl;
@@ -421,11 +421,11 @@ namespace module
 			size_t use1 = 0;
 			size_t use2 = 1;
 
-			if( new_index == curve_points_begin[0] && new_index == curve_points_begin[1] )
+			if( point1 == curve_points_begin[0] && point2 == curve_points_begin[1] )
 				flip_curve(groups, indices, knots, curve1);
-			else if( new_index == curve_points_end[0]-1 && new_index == curve_points_end[1]-1 )
+			else if( point1 == curve_points_end[0]-1 && point2 == curve_points_end[1]-1 )
 				flip_curve(groups, indices, knots, curve2);
-			else if( new_index == curve_points_begin[0] && new_index == curve_points_end[1]-1 )
+			else if( point1 == curve_points_begin[0] && point2 == curve_points_end[1]-1 )
 			{
 				use_curve1 = curve2;
 				use_curve2 = curve1;
@@ -442,12 +442,9 @@ namespace module
 			k3d::mesh::indices_t::iterator points_end = indices.begin() + curve_points_end[use2];
 
 			k3d::mesh::indices_t::iterator points_insert_at = indices.begin() + curve_points_end[use1];
-//**********************************			
-//TODO: add another knot in between!
-//**********************************			
 			indices.insert(points_insert_at, points_begin, points_end);
 
-			const size_t point_offset = curve_points_end[use2] - curve_points_begin[use2] + 1;
+			const size_t point_offset = curve_points_end[use2] - curve_points_begin[use2];
 			
 			k3d::log() << debug << "PointOffset " << point_offset << std::endl;
 			
@@ -463,14 +460,12 @@ namespace module
 			k3d::log() << debug << "Copy Weights" << std::endl;
 			//copy weights
 			k3d::mesh::weights_t& weights = *k3d::make_unique(groups.curve_point_weights);
-			double shared_weight = 0.5 * (weights[curve_points_begin[use2]] + weights[curve_points_end[use1]]);
-
-			k3d::mesh::weights_t::iterator weights_begin = weights.begin() + curve_points_begin[use2] + 1; // we need to adapt the weight of the 1st point though
+			
+			k3d::mesh::weights_t::iterator weights_begin = weights.begin() + curve_points_begin[use2];
 			k3d::mesh::weights_t::iterator weights_end = weights.begin() + curve_points_end[use2];
 
 			k3d::mesh::weights_t::iterator weights_insert_at = weights.begin() + curve_points_end[use1];
 			weights.insert(weights_insert_at, weights_begin, weights_end);
-			weights[curve_points_end[use1]] = shared_weight;
 
 			k3d::log() << debug << "Copy Knots" << std::endl;
 			//copy knots
@@ -487,6 +482,7 @@ namespace module
 			knots.erase(std::remove(knots1_begin,knots1_end,1.0), knots1_end);
 			
 			//if curve_knots_begin[use_curve1] < curve_knots_begin[use_curve2] do nothing, else subtract offset1
+			knots1_end = knots.begin() + curve_knots_end[use1] - offset1;
 			k3d::mesh::knots_t::iterator knots2_begin = knots.begin() + curve_knots_begin[use2];
 			k3d::mesh::knots_t::iterator knots2_end = knots.begin() + curve_knots_end[use2];
 			
@@ -500,23 +496,23 @@ namespace module
 			else
 				k3d::log() << debug << "Without offset " << std::distance(knots2_begin, knots2_end) << std::endl;
 			
-			k3d::log() << debug << "Adding 1.0 to each knot of 2nd curve" << std::endl;
+			knots1_end--;
+			double knot_inc = (1.0 - *knots1_end);
+			k3d::log() << debug << "Adding " << 1 + 2 * knot_inc << " to each knot of 2nd curve" << std::endl;
 			
-
 			std::stringstream str;
 			str << "Knot vector:";
 			
 			for(k3d::mesh::knots_t::iterator i = knots2_begin; i < knots2_end; ++i)
 			{
-				*i += 1.0;
+				*i += 1 + 2 * knot_inc;
 				str << " " << *i;
 			}
 			k3d::log() << debug << str.str() << std::endl;
 			
-			size_t offset2 = std::count(knots2_begin, knots2_end, 1.0);
-			k3d::log() << debug << "Found " << offset2 << " knots with value 1.0 in curve 2" << std::endl;
-			
-			k3d::log() << debug << "Erased Knots" << std::endl;
+			double find_first = *knots2_begin;
+			size_t offset2 = std::count(knots2_begin, knots2_end, find_first);
+			k3d::log() << debug << "Found " << offset2 << " knots with value " << find_first << " in curve 2" << std::endl;
 			
 			knots1_end = knots.begin() + curve_knots_end[use1] - offset1;
 			knots2_begin = knots.begin() + curve_knots_begin[use2] + offset2;
@@ -526,17 +522,17 @@ namespace module
 			{
 				knots2_begin -= offset1;
 				knots2_end -= offset1;
-				curve_first_knots[use_curve2] -=offset1;
 			}
 			
 			k3d::log() << debug << "Going to insert at pos " << std::distance(knots.begin(), knots1_end) << " with size " << knots.size() << std::endl;
-			knots.insert(knots1_end, 1.0);//insert 1.0 one time after removing all other ocurrences
-			k3d::log() << debug << "Inserted 1.0" << std::endl;
+			knots.insert(knots1_end, 1.0);
+			knots1_end++;
+			knots.insert(knots1_end, 1.0 + knot_inc);
 			knots1_end++;
 			knots.insert(knots1_end, knots2_begin, knots2_end);
 			k3d::log() << debug << "Inserted Knots" << std::endl;
 			
-			int knot_offset = curve_knots_end[use2] - curve_knots_begin[use2] - offset1 - offset2 + 1;
+			int knot_offset = curve_knots_end[use2] - curve_knots_begin[use2] - offset1 - offset2 + 3;
 			
 			k3d::log() << debug << "Offset for first_knots is " << knot_offset << std::endl;
 			
@@ -553,18 +549,15 @@ namespace module
 
 		void connect_at_points(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2, bool continuous)
 		{
-			
-
 			k3d::mesh::nurbs_curve_groups_t& groups = *k3d::make_unique(Mesh.nurbs_curve_groups);
 			k3d::mesh::indices_t& curve_points = *k3d::make_unique(groups.curve_points);
 			k3d::mesh::knots_t& curve_knots = *k3d::make_unique(groups.curve_knots);
 	
-			//Add the new point
 			k3d::mesh::points_t& mesh_points = *k3d::make_unique(Mesh.points);
 			k3d::mesh::selection_t& point_selection = *k3d::make_unique(Mesh.point_selection);
 
 			//now join the 2 curves
-			//join_curves(groups, indices, knots, newIndex, curve2, curve1);
+			join_curves(groups, curve_points, curve_knots, point1, curve1, point2, curve2);
 		}
 
 	}//namespace nurbs

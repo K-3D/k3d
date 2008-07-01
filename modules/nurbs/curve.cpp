@@ -99,41 +99,15 @@ namespace module
 				//we need at least as much control points as the order is
 				assert_warning(curve_orders->back() < control_points);
 				
-				if(control_points >= 2*curve_orders->back())
-				{
-					for(size_t i = 0; i < curve_orders->back(); ++i) //first point order times
-						curve_knots->push_back(0);
-					
-					for(size_t i = 0; i < control_points - curve_orders->back() + 1; ++i)
-						curve_knots->push_back(curve_knots->back()+1); //curve_knots is not empty!
-					
-					for(size_t i = 0; i < curve_orders->back() - 1; ++i) //last point order times
-						curve_knots->push_back(curve_knots->back());
-				}
-				else
-				{
-					k3d::uint_t surr_knots = curve_orders->back(); //order is at least 2!
-
-					if(surr_knots % 2 != 0)
-					{
-						surr_knots--;
-						curve_knots->push_back(0);
-					}
-
-					for(k3d::uint_t prefix_knots = 0; prefix_knots < static_cast<k3d::uint_t>(surr_knots * 0.5); prefix_knots++)
-					{
-						curve_knots->push_back(0);
-					}
+				for(size_t i = 0; i < curve_orders->back(); ++i) //first point order times
+					curve_knots->push_back(0);
 				
-					for(k3d::uint_t point = 0; point < control_points; point++ )
-						curve_knots->push_back(curve_knots->back()+1); //curve_knots is not empty!
+				for(size_t i = 0; i < control_points - curve_orders->back() + 1; ++i)
+					curve_knots->push_back(curve_knots->back()+1); //curve_knots is not empty!
 				
-					for(k3d::uint_t suffix_knots = 0; suffix_knots < static_cast<k3d::uint_t>(surr_knots * 0.5); suffix_knots++)
-					{
-						curve_knots->push_back(curve_knots->back());
-					}
-				}
-
+				for(size_t i = 0; i < curve_orders->back() - 1; ++i) //last point order times
+					curve_knots->push_back(curve_knots->back());
+				
 				for(k3d::uint_t point = 0; point < control_points; point++ )
 				{
 					curve_points->push_back(point); //store the index of the point
@@ -143,7 +117,7 @@ namespace module
 					point_selection->push_back(0.0);
 				}
 				
-		
+				
 				curve_group->first_curves = first_curves;
 				curve_group->curve_counts = curve_counts;
 				curve_group->materials = materials;
@@ -155,7 +129,7 @@ namespace module
 				curve_group->curve_points = curve_points;
 				curve_group->curve_point_weights = curve_point_weights;
 				curve_group->curve_knots = curve_knots;
-		
+				
 				Mesh.points = points;
 				Mesh.point_selection = point_selection;
 
