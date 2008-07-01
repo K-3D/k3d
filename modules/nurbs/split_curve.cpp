@@ -318,7 +318,6 @@ namespace module
 				
 				for( size_t i = 0; i<= order - 1 - s; i++ )
 				{
-					k3d::log() << debug << "Accessing value " << i + k - (order - 1) << std::endl;
 					p = mesh_points.at( curve_points.at( curve_points_begin + i + k - (order - 1)) );
 					tmp.push_back( k3d::point4(p[0],p[1],p[2], curve_point_weights.at( curve_points_begin + i + k - (order - 1)) ) );
 				}
@@ -366,30 +365,31 @@ namespace module
 			
 				k3d::log() << debug << "Inserting points" << std::endl;
 				//new points
-				k3d::mesh::indices_t new_curve_points(points.size(), 0);
+				k3d::mesh::indices_t new_curve_points;
 				
 				k3d::mesh::weights_t new_curve_point_weights;
 				
 				for( size_t i = 0; i < points.size(); i++ )
 				{
 					p = k3d::point3(points[i][0],points[i][1],points[i][2]);
+					
 					k3d::mesh::points_t::iterator index = find(mesh_points.begin(), mesh_points.end(), p);
 					if( index != mesh_points.end())
 					{
-						new_curve_points[i] = distance(mesh_points.begin(),index);
-						new_curve_point_weights.push_back( points[i][3] );
+						new_curve_points.push_back(distance(mesh_points.begin(),index));
 						k3d::log() << debug << "Point already there, adding index " << new_curve_points[i] << " to curve_points" << std::endl;
+						k3d::log() << debug << "Point: " << points.at(i).n[0] << " x " << points.at(i).n[1] << " x " << points.at(i).n[2] << " x " << points.at(i).n[3] << std::endl;
 					}
 					else
 					{
+						k3d::log() << debug << "Need to add point:" << std::endl;
 						k3d::log() << debug << "Point: " << points.at(i).n[0] << " x " << points.at(i).n[1] << " x " << points.at(i).n[2] << " x " << points.at(i).n[3] << std::endl;
-						mesh_points.push_back(k3d::point3(points[i][0],points[i][1],points[i][2]));
+						mesh_points.push_back(p);
 						point_selection.push_back(0.0);
-						new_curve_points[i] = mesh_points.size() - 1;
-						
-						//insert curve_point_weight
-						new_curve_point_weights.push_back( points[i][3] );
+						new_curve_points.push_back(mesh_points.size() - 1);
 					}
+					//insert curve_point_weight
+					new_curve_point_weights.push_back( points[i][3] );
 				}
 				
 				k3d::mesh::weights_t::iterator point_weight = curve_point_weights.begin() + curve_points_begin;
