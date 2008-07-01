@@ -39,6 +39,7 @@
 #include <gtkmm/menutoolbutton.h>
 
 #include <k3dsdk/ngui/entry.h>
+#include <k3dsdk/ngui/text.h>
 
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/command_arguments.h>
@@ -66,6 +67,7 @@
 #include <k3dsdk/imaterial_gl.h>
 #include <k3dsdk/imaterial_ri.h>
 
+#include <k3dsdk/metadata.h>
 
 #include <gtkmm/drawingarea.h>
 #include <k3dsdk/fstream.h>
@@ -73,6 +75,8 @@
 
 #include <k3dsdk/log.h>
 #include <iostream>
+
+#include <k3dsdk/ngui/icons.h>
 
 using namespace libk3dngui;
 using namespace k3d::data;
@@ -88,36 +92,36 @@ namespace module{
 	// [model Components]***********************************************************************
 
 	//Static Material Type Definitions
-	const std::string riMaterialStr 	= "Renderman Material";
-	const std::string glMaterialStr 	= "OpenGL Material";
-	const std::string otherStuffStr 	= "Other Stuff";
-
+	const std::string riMaterialStr 	= "Renderman Materials";
+	const std::string glMaterialStr 	= "OpenGL Materials";
+	const std::string otherStuffStr 	= "Other Stuff";	
+       
 	//forward declaration for list of shaders
 	class s_group;
 
 	class s_object{
 	public:
 	  s_object(s_group *_parent, k3d::inode *_node, k3d::string_t _s_type)
-	    :parent(_parent), node(_node), s_type(_s_type), 
+	    :parent(_parent), node(_node), 
 	     so_name(init_value(_node->name())),
 	     so_type(init_value(_s_type)),
 	     so_datestamp(init_value(k3d::string_t(""))),
 	     so_artistname(init_value(k3d::string_t(""))),
 	     so_artistnotes(init_value(k3d::string_t("")))
 	  {
-	    //Get Name From Node ptr
-	    s_name = _node->name();
+	    so_artistnotes.set_metadata("k3d:property-type", "k3d:multi-line-text");
 	  }
 	  
 	  ~s_object()
 	  {
 	  }
 
+	public:
 	  //Accessor Functions
-	  k3d::string_t getName(){return s_name;}
+	  k3d::string_t getName(){return so_name.internal_value();}
 
 	  //Mutator Functions
-	  void setDescription(k3d::string_t str){s_description = str;}
+	  void setName(k3d::string_t str){so_name.set_value(str);}
 
 
 	public:
@@ -125,12 +129,8 @@ namespace module{
 	  k3d_data(k3d::string_t, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) so_type;
 	  k3d_data(k3d::string_t, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) so_datestamp;
 	  k3d_data(k3d::string_t, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) so_artistname;
-	  k3d_data(k3d::string_t, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) so_artistnotes;
-
+	  k3d::metadata_property<k3d_data(k3d::string_t, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization)> so_artistnotes;
 	  k3d::inode       *node;
-	  k3d::string_t    s_name;
-	  k3d::string_t    s_type;
-	  k3d::string_t    s_description;
 	  s_group          *parent;
 
 	};//s_object
@@ -180,32 +180,42 @@ namespace module{
 	  m_shaders.remove(shd);
 	}
 
+	//***********************************************
+	  //Constant Groups -> These Wont Be Deleted
+	s_group *rman = new s_group(riMaterialStr);
+	s_group *gl = new s_group(glMaterialStr);
+	s_group *other = new s_group(otherStuffStr);
+	//***********************************************
 
-	//************
-	class model{
-	public:
-	  model()
-	  {
-	  }
-	  ~model()
-	  {
-	  }
+	  //************
+	  class model{
+	  public:
+	    model()
+	    {
+	    }
+	    ~model()
+	    {
+	      //Clean Up RMAN, GL AND Other Groups
+	      if(rman)
+		delete rman;
+	      if(gl)
+		delete gl;
+	      if(other)
+		delete other;
+	    }
 
-	public:
-	  void buildModel(document_state& DocumentState);
-	  void clearModel();
+	  public:
+	    void buildModel(document_state& DocumentState);
+	    void clearModel();
 
-	public:
-	  std::list<s_group*>     m_groups;
+	  public:
+	    std::list<s_group*>     m_groups;
 
-	};//m_model
+	  };//m_model
 
 	void model::buildModel(document_state& DocumentState)
 	{
-	  //Build The Groups (RMAN, GL & Other)
-	  s_group *rman = new s_group("RenderMan Materials");
-	  s_group *gl = new s_group("OpenGL Materials");
-	  s_group *other = new s_group("Other");
+	  //Push Back Global Groups RMAN, GL and other
 	  m_groups.push_back(rman);
 	  m_groups.push_back(gl);
 	  m_groups.push_back(other);
@@ -214,23 +224,23 @@ namespace module{
 	  k3d::inode_collection::nodes_t::const_iterator nodeIter 
 	    = DocumentState.document().nodes().collection().begin();
 	
-	for(nodeIter; nodeIter != DocumentState.document().nodes().collection().end(); ++nodeIter)
-	  {
-	    //Check IF A Node Is A Material
-	    if((*nodeIter)->factory().implements(typeid(k3d::imaterial)))
-	      {
-		//Check To Find Group Catagory and Build Group
-		if((*nodeIter)->factory().implements(typeid(k3d::ri::imaterial)))
-		  rman->addShader(new s_object(rman, (*nodeIter), riMaterialStr));
+	  for(nodeIter; nodeIter != DocumentState.document().nodes().collection().end(); ++nodeIter)
+	    {
+	      //Check IF A Node Is A Material
+	      if((*nodeIter)->factory().implements(typeid(k3d::imaterial)))
+		{
+		  //Check To Find Group Catagory and Build Group
+		  if((*nodeIter)->factory().implements(typeid(k3d::ri::imaterial)))
+		    rman->addShader(new s_object(rman, (*nodeIter), riMaterialStr));
 
-		else if((*nodeIter)->factory().implements(typeid(k3d::gl::imaterial)))
-		  gl->addShader(new s_object(gl, (*nodeIter), glMaterialStr));
+		  else if((*nodeIter)->factory().implements(typeid(k3d::gl::imaterial)))
+		    gl->addShader(new s_object(gl, (*nodeIter), glMaterialStr));
 
-		else
-		  other->addShader(new s_object(other, (*nodeIter), otherStuffStr));
+		  else
+		    other->addShader(new s_object(other, (*nodeIter), otherStuffStr));
 
-	      }//if
-	}//for
+		}//if
+	    }//for
 
 	}
 
@@ -259,7 +269,7 @@ namespace module{
 	class content_pane{
 	public:
 	  content_pane(Gtk::HPaned *_m_Hpane, k3d::icommand_node *_m_parent)
-	    :m_Hpane(_m_Hpane), m_parent(_m_parent)	  
+	    :m_Hpane(_m_Hpane), m_parent(_m_parent), preview_primitive("Preview Primitive")	  
 	  {
 	  }
 	  virtual ~content_pane(){}
@@ -271,6 +281,8 @@ namespace module{
 	  Gtk::HPaned *m_Hpane;
 	  k3d::icommand_node *m_parent;
 
+	  Gtk::MenuToolButton preview_primitive;
+
 	};//content_pane
 
 	//GROUP CONTENT PANE
@@ -278,7 +290,7 @@ namespace module{
 	public:
 	  g_content_pane(Gtk::HPaned *_m_Hpane, s_group *_m_grp, k3d::icommand_node *_m_parent)
 	    :content_pane(_m_Hpane, _m_parent), m_grp(_m_grp),
-	     group_display("Display Settings")
+	     group_display("List Settings")
 	  {
 	    
 	  }
@@ -296,6 +308,7 @@ namespace module{
 		//ToolBar Setup
 		toolbar_main_c.pack_start(m_toolbar, false, false, 0);
 		m_toolbar.append(group_display);
+		m_toolbar.append(preview_primitive);
 
 		m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 		toolbar_main_c.pack_start(m_scrolled_window, true, true, 0);
@@ -413,8 +426,8 @@ namespace module{
 	      k3d::log() << "Invalid HPaned Pointer" << std::endl;  
 
 	    //DEBUG INFO -> DELETE ON RELEASE
-		k3d::log() << "building Group panel" << std::endl;
-		m_Hpane->show_all(); 
+	    k3d::log() << "building Group panel" << std::endl;
+	    m_Hpane->show_all(); 
 
 	  }//buildPane
 
@@ -471,7 +484,8 @@ namespace module{
 	     s_name_entry(*_m_parent, k3d::string_t("so_name_field"), entry::model(_m_so->so_name), 0),
 	     s_type_entry(*_m_parent, k3d::string_t("so_type_field"), entry::model(_m_so->so_type), 0),
 	     s_datemod_entry(*_m_parent, k3d::string_t("so_datestamp_field"), entry::model(_m_so->so_datestamp), 0),
-	     s_artistname_entry(*_m_parent, k3d::string_t("so_artisname_field"), entry::model(_m_so->so_artistname), 0)
+	     s_artistname_entry(*_m_parent, k3d::string_t("so_artistname_field"), entry::model(_m_so->so_artistname), 0),
+	     s_artistnotes_mltext(*_m_parent, k3d::string_t("so_artistnotes_mltxt"), text::model(_m_so->so_artistnotes), 0)
 	  {
 	    s_name_l.set_text		("Shader Name: ");
 	    s_type_l.set_text		("Shader Type: ");
@@ -492,8 +506,7 @@ namespace module{
 		//Add Container To Right Pane From Implementation
 		m_Hpane->add2(main_detail_c);
 
-		main_detail_c.pack_start(preview_label_data_c, false, false, 0); //pack desc ++
-		
+		main_detail_c.pack_start(preview_label_data_c, false, false, 0); 
 
 		preview_label_data_c.pack_start(preview_c, false, false, 0);
 		preview_label_data_c.pack_start(label_c, false, false, 0);
@@ -523,7 +536,8 @@ namespace module{
 
 		//Artist Notes
 		main_detail_c.pack_start(artistnotes_frame, true, true, 10);
-		
+		artistnotes_frame.add(s_artistnotes_mltext);
+
 		//INSERT K3D TEXT VIEW HERE FOR ARTIST NOTES
 	       
 		//DEBUG INFO -> DELETE ON RELEASE
@@ -561,6 +575,8 @@ namespace module{
 	  entry::control s_datemod_entry;
 	  entry::control s_artistname_entry;
 
+	  text::control s_artistnotes_mltext;
+
 	private:
 	  s_object *m_so;
 
@@ -584,6 +600,7 @@ namespace module{
 	    // Connect signals
 	    //m_nav.signal_button_press_event().connect(sigc::mem_fun(*this, &implementation::on_button_press_event), false);
 	    //m_nav.get_selection()->set_select_function(sigc::mem_fun(*this, &implementation::on_select_row));
+
 	    //m_nav.get_selection()->signal_changed().connect(sigc::mem_fun(*this, &implementation::on_selection_changed)); 
 	
 	    tree_selection->signal_changed().connect(sigc::mem_fun(*this,  &implementation::on_tree_row_changed));
@@ -611,11 +628,13 @@ namespace module{
 	  void build_content_pane(Gtk::TreeModel::Row row, bool is_group);
 
 	  //Event Handlers (Tree)
-	  void on_nodes_added(const k3d::inode_collection::nodes_t& Nodes){}
-          void on_nodes_removed(const k3d::inode_collection::nodes_t& Nodes){}
-          void on_node_renamed(k3d::inode* const Node){}
+	  void on_nodes_added(const k3d::inode_collection::nodes_t& Nodes) ;
+          void on_nodes_removed(const k3d::inode_collection::nodes_t& Nodes);
+          void on_node_renamed(k3d::inode* const Node);
 
 	  void on_tree_row_changed();
+
+	  bool get_row(k3d::inode* const Node, Gtk::TreeIter& Row);
 	
 	private:
 	  k3d::icommand_node *m_parent;
@@ -652,6 +671,7 @@ namespace module{
 	    columns()
 	    {
 	      add(name);
+	      add(icon);
 	      add(is_group);
 	      add(s_group_ptr);
 	      add(s_object_ptr);
@@ -660,11 +680,13 @@ namespace module{
 	    Gtk::TreeModelColumn<s_object*> 		s_object_ptr;
 	    Gtk::TreeModelColumn<Glib::ustring> 	name;
 	    Gtk::TreeModelColumn<bool>		    	is_group;	//Group Or Object Pointer Used
+	    Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf> > icon;
 	  };
 
 	  columns m_columns;
 	  Glib::RefPtr<Gtk::TreeStore> tree_model;
 	  Glib::RefPtr<Gtk::TreeSelection> tree_selection;
+
 
 	};//implementation
 
@@ -699,6 +721,7 @@ namespace module{
 	  name_column->pack_start(*manage(cell_text), true);
 	  name_column->add_attribute(cell_text->property_text(), m_columns.name);
 
+	  m_nav.append_column("icon", m_columns.icon);
 	  m_nav.append_column(*manage(name_column));
 
 	  //Setup the Window
@@ -743,6 +766,7 @@ namespace module{
 		  childrow[m_columns.is_group] = false;
 		  childrow[m_columns.s_group_ptr] = 0;
 		  childrow[m_columns.s_object_ptr] = (*sIter);
+		  childrow[m_columns.icon] = quiet_load_icon((*sIter)->node->factory().name(), Gtk::ICON_SIZE_MENU);
 		}//for		
 	    }//for
 
@@ -791,6 +815,122 @@ namespace module{
 
 	}//build_content_pane
 
+	void implementation::on_nodes_added(const k3d::inode_collection::nodes_t& Nodes)
+	{
+	  //Iterate through each node and if appropriate add to tree
+	  for(k3d::inode_collection::nodes_t::const_iterator nodeIter = Nodes.begin(); nodeIter != Nodes.end(); ++nodeIter)
+	    {
+	      //Check If Is A Material Type First
+	      if((*nodeIter)->factory().implements(typeid(k3d::imaterial))){
+
+		Gtk::TreeNodeChildren rows = tree_model->children();
+		Gtk::TreeRow new_row;
+		Gtk::TreeIter row = rows.begin();
+
+		k3d::string_t typeStr = "";
+		s_group *groupPtr = 0;
+
+		//Place Renderman Material
+		if((*nodeIter)->factory().implements(typeid(k3d::ri::imaterial))){
+		  typeStr = riMaterialStr;
+		  groupPtr = rman;
+		}
+		//Place GL Material
+		else if((*nodeIter)->factory().implements(typeid(k3d::gl::imaterial))){
+		  typeStr = glMaterialStr;
+		  groupPtr = gl;
+		}
+		//Place Other Material
+		else{
+		  typeStr = otherStuffStr;
+		  groupPtr = other;
+		}
+		for(; row != rows.end(); ++row)
+		  {
+		    if(row->get_value(m_columns.name) == typeStr)
+		      {
+			//Create Shader Object
+			s_object *newSObject = new s_object(groupPtr, *nodeIter, typeStr);
+
+			//Push The Shader Onto Groups List
+			groupPtr->addShader(newSObject);
+
+			//Create The Tree Entry
+			new_row = *tree_model->append(row->children());
+			new_row[m_columns.s_object_ptr] = newSObject;
+			new_row[m_columns.s_group_ptr] = 0;
+			new_row[m_columns.is_group] = false;
+			new_row[m_columns.name] = (*nodeIter)->name();
+			new_row[m_columns.icon] = quiet_load_icon((*nodeIter)->factory().name(), Gtk::ICON_SIZE_MENU);
+			break;
+		      }//if
+		  }//for
+	      }//if
+	    }//for
+
+	}//on_nodes_added
+
+	void implementation::on_nodes_removed(const k3d::inode_collection::nodes_t& Nodes)
+	{
+	  s_group *grpPtr = 0;
+	  s_object *tmpSObj = 0;
+	  for(k3d::inode_collection::nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node){
+	    Gtk::TreeIter row;
+	    return_if_fail(get_row(*node, row));
+	    
+	    tmpSObj = row->get_value(m_columns.s_object_ptr);
+
+	    if(tmpSObj)
+		grpPtr = tmpSObj->parent;
+	      
+	    tree_model->erase(row);
+	  }
+
+	  //Delete In Stored Model
+	  if(grpPtr)
+	      grpPtr->removeShader(tmpSObj);
+	    
+
+	}//on_nodes_removed
+
+	void implementation::on_node_renamed(k3d::inode* const Node)
+	{
+	  // Rename row
+	  Gtk::TreeIter row;
+	  return_if_fail(get_row(Node, row));
+	  (*row)[m_columns.name] = Node->name();
+
+	  //Rename In Stored Model
+	  (row->get_value(m_columns.s_object_ptr))->setName(Node->name());
+
+	}//on_node_renamed
+
+	/// Looks-up a model row based on a node pointer
+	bool implementation::get_row(k3d::inode* const Node, Gtk::TreeIter& Row){
+	
+		Gtk::TreeNodeChildren rows = tree_model->children();
+
+		//Iterate Through Each Row (Parent)
+		for(Gtk::TreeIter row = rows.begin(); row != rows.end(); row++)
+		  {
+		   //  //Iterate Through Each Child Of Parent
+		    for(Gtk::TreeIter rowCIter = row->children().begin(); rowCIter != row->children().end(); rowCIter++)
+		      {
+			//Check If Shader Object and Not Group
+			if(rowCIter->get_value(m_columns.s_object_ptr) && !(rowCIter->get_value(m_columns.is_group))){
+			  k3d::log() << "checking so" << std::endl;
+			  if((rowCIter->get_value(m_columns.s_object_ptr)->node) == Node){
+			    Row = rowCIter;
+			    return true;
+			  }//if
+			}//if
+		      }//for
+		}//for
+
+		return false;
+	}
+
+
 
 	// [/implementation]************************************************************************
 
@@ -810,7 +950,7 @@ namespace module{
 	panel() :
           baseContainer(false, 0),
           ui_component("shader_manager", 0)//,
-          //m_implementation(0)
+	     //m_implementation(0)
 	{
 	}
 
@@ -836,7 +976,7 @@ namespace module{
           return "shader_manager";
 	}
 
-	 sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
+	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
  	{
 	  return m_implementation->m_panel_grab_signal.connect(Slot);
  	}
@@ -857,7 +997,7 @@ namespace module{
           return factory;
 	}
 
-	private:
+      private:
 	mechanics::implementation* m_implementation;
       };
 
