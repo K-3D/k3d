@@ -122,8 +122,8 @@ public:
 		switch(orientation)
 		{
 			case k3d::PX:
-				i = k3d::vector3(0, -1, 0);
-				j = k3d::vector3(0, 0, -1);
+				i = k3d::vector3(0, 1, 0);
+				j = k3d::vector3(0, 0, 1);
 				k = k3d::vector3(1, 0, 0);
 				break;
 			case k3d::NX:
@@ -131,19 +131,19 @@ public:
 				j = k3d::vector3(0, 0, -1);
 				k = k3d::vector3(-1, 0, 0);
 				break;
-			case k3d::NY:
-				i = k3d::vector3(-1, 0, 0);
-				j = k3d::vector3(0, 0, -1);
-				k = k3d::vector3(0, -1, 0);
-				break;
 			case k3d::PY:
-				i = k3d::vector3(1, 0, 0);
-				j = k3d::vector3(0, 0, -1);
+				i = k3d::vector3(0, 0, 1);
+				j = k3d::vector3(1, 0, 0);
 				k = k3d::vector3(0, 1, 0);
 				break;
+			case k3d::NY:
+				i = k3d::vector3(0, 0, 1);
+				j = k3d::vector3(-1, 0, 0);
+				k = k3d::vector3(0, -1, 0);
+				break;			
 			case k3d::PZ:
-				i = k3d::vector3(-1, 0, 0);
-				j = k3d::vector3(0, -1, 0);
+				i = k3d::vector3(1, 0, 0);
+				j = k3d::vector3(0, 1, 0);
 				k = k3d::vector3(0, 0, 1);
 				break;
 			case k3d::NZ:
