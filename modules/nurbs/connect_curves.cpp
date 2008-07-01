@@ -111,8 +111,8 @@ namespace module
 				{
 					k3d::log() << error << "You need to select exactly 2 points on 2 different curves!\n"<<"Selected: "<<points.size()<<" points on "<<curves.size()<<" curves" << std::endl;
 				}
-
-				connect_at_points(Output, curves[0], curves[1], points[0], points[1], make_continuous);
+				else
+					connect_at_points(Output, curves[0], curves[1], points[0], points[1], make_continuous);
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 			}
@@ -212,23 +212,36 @@ namespace module
 			const size_t curve_point_end = curve_point_begin + (*groups.curve_point_counts)[curve];
 
 			const size_t curve_knots_begin = (*groups.curve_first_knots)[curve];
-			const size_t curve_knots_end = curve_knots_begin + curve_point_end - curve_point_begin + (*groups.curve_orders)[curve];
-
-			double last = knots[curve_knots_end];
+			const size_t curve_knots_end = curve_knots_begin + (curve_point_end - curve_point_begin) + (*groups.curve_orders)[curve];
+			
+			k3d::log() << debug << "Get last knot within " << curve_knots_begin << " and " << curve_knots_end << " with size " << knots.size() << std::endl;
+			double last = knots[curve_knots_end - 1];
 
 			k3d::mesh::knots_t new_knots;
 
 			//flip knot vector
-			for(size_t knot = curve_knots_end - 1; knot >= curve_knots_begin; knot--)
+			for(int knot = curve_knots_end - 1; (knot >= curve_knots_begin) && (knot >= 0); knot--)
 			{
+				k3d::log() << debug << "Flip knot vector (knot = " << knot << "), last was " << last  << std::endl;
 				new_knots.push_back(last - knots[knot]);
-				last = knots[knot];
 			}
+			
+			k3d::mesh::knots_t::iterator knot_iter = knots.begin() + curve_knots_begin;
+			
+			k3d::log() << debug << "erase old knots" << std::endl;
+			for(size_t i = curve_knots_begin; i < curve_knots_end; i++)
+				knots.erase(knot_iter);
 
+			k3d::log() << debug << "insert new ones" << std::endl;
+			knots.insert(knot_iter, new_knots.begin(), new_knots.end());
+			
+			print_knot_vector(groups, knots, curve);
+			
 			//flip point indices
 			k3d::mesh::indices_t::iterator curve_points_begin_iter = point_indices.begin() + curve_point_begin;
 			k3d::mesh::indices_t::iterator curve_points_end_iter = point_indices.begin() + curve_point_end;
 
+			k3d::log() << debug << "reverse points" << std::endl;
 			std::reverse(curve_points_begin_iter, curve_points_end_iter);
 
 			//flip weights
@@ -236,8 +249,9 @@ namespace module
 
 			k3d::mesh::weights_t::iterator point_weights_begin_iter = curve_point_weights.begin() + curve_point_begin;
 			k3d::mesh::weights_t::iterator point_weights_end_iter = curve_point_weights.begin() + curve_point_end;
-
+			k3d::log() << debug << "reverse weights" << std::endl;
 			std::reverse(point_weights_begin_iter, point_weights_end_iter);
+			k3d::log() << debug << "finished flipping\n" << std::endl;
 		}
 
 		void normalize_knot_vector(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::knots_t& knots, size_t curve)
