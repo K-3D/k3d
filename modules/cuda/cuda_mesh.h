@@ -78,23 +78,20 @@ class cuda_polyhedra
 
 /// Start fleshing out cuda mesh structure.
 
-class cuda_mesh
+class cuda_device_mesh
 {
     public:
-        cuda_mesh ( const k3d::mesh& input_mesh, k3d::mesh& output_mesh);
-        ~cuda_mesh ();
+        cuda_device_mesh ( const k3d::mesh& host_mesh );
+        ~cuda_device_mesh ();
         
         void copy_to_device ();
-        void copy_from_device ();
+        void copy_from_device ( k3d::mesh& destination_mesh );
 
     private:
         /// a pointer to a array of float4's allocated on the device
         float* pdev_points_and_selection;       
         k3d::uint_t m_number_of_points;
         
-        const k3d::mesh* m_p_input_mesh;
-        k3d::mesh* m_p_output_mesh;
-        
-        cuda_polyhedra m_cuda_polyhedra;
+        const k3d::mesh* m_p_host_mesh;
 };        
 

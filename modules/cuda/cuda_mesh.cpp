@@ -137,17 +137,15 @@ void cuda_polyhedra::copy_from_device( )
 }
 
 /// Constructor
-cuda_mesh::cuda_mesh ( const k3d::mesh& input_mesh, k3d::mesh& output_mesh ):
-    m_p_input_mesh(&input_mesh),
-    m_p_output_mesh(&output_mesh),
-    m_cuda_polyhedra (*(input_mesh.polyhedra),*(output_mesh.polyhedra)) 
+cuda_device_mesh::cuda_device_mesh ( const k3d::mesh& mesh ):
+    m_p_host_mesh(&mesh)
 {
     pdev_points_and_selection = 0;
     m_number_of_points = 0;
 }
 
 /// Destructor - frees the allocated device pointers
-cuda_mesh::~cuda_mesh()
+cuda_device_mesh::~cuda_device_mesh()
 {
     free_device_memory((void*)pdev_points_and_selection);
 }
@@ -155,9 +153,9 @@ cuda_mesh::~cuda_mesh()
 /**
  * copy the specified mesh to the device
  */
-void cuda_mesh::copy_to_device()
+void cuda_device_mesh::copy_to_device()
 {
-    m_number_of_points = m_p_input_mesh->points->size(); 
+    m_number_of_points = m_p_host_mesh->points->size(); 
     
     // allocate the memory for the points and the point selection
     allocate_device_memory((void**)&pdev_points_and_selection, (m_number_of_points)*4*sizeof(float));
@@ -169,17 +167,16 @@ void cuda_mesh::copy_to_device()
     for ( int point = 0 ; point < m_number_of_points ; ++point )
     {
         int float_index = point*3;
-        host_points_and_selection[float_index] = (float)((*m_p_input_mesh->points)[point][0]);
-        host_points_and_selection[float_index+1] = (float)((*m_p_input_mesh->points)[point][1]);
-        host_points_and_selection[float_index+2] = (float)((*m_p_input_mesh->points)[point][2]);
-        host_points_and_selection[float_index+3] = (float)((*m_p_input_mesh->point_selection)[point]);
+        host_points_and_selection[float_index] = (float)((*m_p_host_mesh->points)[point][0]);
+        host_points_and_selection[float_index+1] = (float)((*m_p_host_mesh->points)[point][1]);
+        host_points_and_selection[float_index+2] = (float)((*m_p_host_mesh->points)[point][2]);
+        host_points_and_selection[float_index+3] = (float)((*m_p_host_mesh->point_selection)[point]);
     }
     
     // copy the coordinates and selection to the device
     copy_from_host_to_device( pdev_points_and_selection, host_points_and_selection, m_number_of_points*4*sizeof(float));
     
-    // also init the device version of the polyhedra
-    m_cuda_polyhedra.copy_to_device();
+    // remember to also copy the device versions of polyhedra etc
     
     // make sure the copy is complete before freeing memory
     synchronize_threads();
@@ -191,22 +188,23 @@ void cuda_mesh::copy_to_device()
 /**
  * Copy the specified mesh from the device
  */
-void cuda_mesh::copy_from_device()
+void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh )
 {
+    k3d::mesh* p_output_mesh = &destination_mesh;
     // allocate temporary storage for the floats from the device
     float* host_points_and_selection = (float*) malloc ( m_number_of_points*4*sizeof(float) );
     
     copy_from_device_to_host( (void*) host_points_and_selection, (void*) pdev_points_and_selection, m_number_of_points*4*sizeof(float) );
     
     // check to see if the number of points has changed
-    if ( m_number_of_points != m_p_output_mesh->points->size() )
+    if ( m_number_of_points != p_output_mesh->points->size() )
     {
-        m_p_output_mesh->points.reset( new k3d::mesh::points_t ( m_number_of_points ) );
-        m_p_output_mesh->point_selection.reset ( new k3d::mesh::selection_t ( m_number_of_points ) );
+        p_output_mesh->points.reset( new k3d::mesh::points_t ( m_number_of_points ) );
+        p_output_mesh->point_selection.reset ( new k3d::mesh::selection_t ( m_number_of_points ) );
     }
     
-    double* out_points = (double*)&(m_p_output_mesh->points->front());
-    double* out_selection = (double*)&(m_p_output_mesh->point_selection->front());
+    double* out_points = (double*)&(p_output_mesh->points->front());
+    double* out_selection = (double*)&(p_output_mesh->point_selection->front());
     
     synchronize_threads();
     for ( int point = 0 ; point < m_number_of_points ; ++point )
@@ -220,8 +218,7 @@ void cuda_mesh::copy_from_device()
         out_selection[point] = host_points_and_selection[float_index+3];
     }
     
-    m_cuda_polyhedra.copy_from_device();
-    
+    // remember to also copy polyhedra from the device
     synchronize_threads();    
 }
 
