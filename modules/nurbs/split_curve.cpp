@@ -311,7 +311,7 @@ namespace module
 				k3d::log() << debug << "Starting while loop" << std::endl;
 				
 				
-				while( (i < (int)curve_knots_end) && fabs(curve_knots[i] - u) < 0.000001 )
+				while( (i < (int)curve_knots_end) && (curve_knots[i] - u) < 0.000001 )
 				{
 					i++;
 				}
