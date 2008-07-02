@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
+	\author Carlos Andres Dominguez Caballero (carlosadc@gmail.com)
 	\author Barbiero Mattia
 */
 
@@ -30,8 +31,10 @@
 #include <dom/domNode.h>
 #include <dom/domCOLLADA.h>
 #include <k3dsdk/algebra.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/idocument_plugin_factory.h>
 #include "integration.h"
-#include "intGeometry.h"
+#include "intElements.h"
 using namespace std;
 namespace module
 {
@@ -88,6 +91,34 @@ Node::Node(domNode& node, const k3d::matrix4& mat)
 		// the mesh a material.
 		meshes.push_back(&lookup<intGeometry, domGeometry>(*geom,mcurrent));
 		//meshes.back()->mtl = &convertedMtl;
+	}
+
+	// Iterate over all the <instance_light> elements
+	for(size_t i=0; i < node.getInstance_light_array().getCount(); i++)
+	{
+		domInstance_light* instanceLight = node.getInstance_light_array()[i];
+		domLight* light = daeSafeCast<domLight>(instanceLight->getUrl().getElement());
+		if(!light)
+		{
+			k3d::log() << "Invalid <instance_light> element\n";
+			return;
+		}
+		k3d::log() << debug << "A light" << std::endl;
+		lights.push_back(&lookup<intLight, domLight>(*light, mcurrent));
+	}
+
+	// Iterate over all the <instance_camera> elements
+	for(size_t i=0; i < node.getInstance_camera_array().getCount(); i++)
+	{
+		domInstance_camera* instanceCamera = node.getInstance_camera_array()[i];
+		domCamera* camera = daeSafeCast<domCamera>(instanceCamera->getUrl().getElement());
+		if(!camera)
+		{
+			k3d::log() << "Invalid <instance_camera> element\n";
+			return;
+		}
+		k3d::log() << debug << "A camera" << std::endl;
+		cameras.push_back(&lookup<intCamera, domCamera>(*camera, mcurrent));
 	}
 }
 
@@ -150,17 +181,15 @@ k3d::matrix4 Node::getTransformation(domNode& node, const k3d::matrix4& mat)
 
 
 //void convertModel(domCOLLADA& root, k3d::mesh& Mesh) 
-daeParser::daeParser(domCOLLADA& root)
+daeParser::daeParser(domCOLLADA& root, k3d::mesh& Mesh)
 {
-	// Push an identity matrix to the stack as bottom
-	k3d::matrix4 mstack = k3d::identity3D();
-
 	// We need to convert the model from the DOM's representation to our internal representation.
 	// First find a <visual_scene> to load. In a real app we would look for and load all
 	// the <visual_scene>s in a document, but for this app we just convert the first
 	// <visual_scene> we find.
 	domVisual_scene* visualScene = daeSafeCast<domVisual_scene>(root.getDescendant("visual_scene"));
-	if(!visualScene){
+	if(!visualScene)
+	{
 	     k3d::log() << "Invalid <visual_scene> element\n";
 	     return;
 	}
@@ -173,10 +202,110 @@ daeParser::daeParser(domCOLLADA& root)
 	
 	for (size_t i = 0; i < nodes.getCount(); i++)
 		if(!lookup<Node, domNode>(*nodes[i],k3d::identity3D()).meshes.empty()){	
-			Mesh = lookup<Node, domNode>(*nodes[i],k3d::identity3D()).meshes.back()->getMesh();		
+			Mesh = lookup<Node, domNode>(*nodes[i],k3d::identity3D()).meshes.back()->getMesh();
 			return;
 		}
 	
+}
+
+daeParser::daeParser(domCOLLADA& root, k3d::idocument& Document)
+{
+
+	// We need to convert the model from the DOM's representation to our internal representation.
+	// First find a <visual_scene> to load. In a real app we would look for and load all
+	// the <visual_scene>s in a document, but for this app we just convert the first
+	// <visual_scene> we find.
+	domVisual_scene* visualScene = daeSafeCast<domVisual_scene>(root.getDescendant("visual_scene"));
+	if(!visualScene)
+	{
+	     k3d::log() << "Invalid <visual_scene> element\n";
+	     return;
+	}
+
+	// Now covert all the <node>s in the <visual_scene>. This is a recursive process,
+	// so any child nodes will also be converted.
+	domNode_Array& scene_nodes = visualScene->getNode_array();
+	for (size_t i = 0; i < scene_nodes.getCount(); i++)
+		lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D());
+
+
+	////////////////////////////////////////////////////
+	////////////////////////////////////////////////////
+
+	k3d::inode_collection::nodes_t nodes;
+	std::vector<k3d::inode*> persistent_nodes;
+
+	for(size_t i =0; i < scene_nodes.getCount(); i++)
+	{
+		std::string name;// = "Light";
+		k3d::uuid factory_id;// = k3d::uuid(1,0,0,29);
+
+		if(!lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D()).lights.empty())
+		{
+			name = "Light";
+			factory_id = k3d::uuid(1,0,0,29);
+		}
+		else
+		if(!lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D()).cameras.empty())
+		{
+			name = "Camera";
+			factory_id = k3d::uuid(0x45ce1872, 0xaf184b6d, 0xb391e136, 0x0dcfe8b5);
+		}
+		else
+			factory_id == k3d::uuid::null();
+
+		if(factory_id == k3d::uuid::null())
+		{
+			k3d::log() << error << "node [" << name << "] with unspecified factory ID will not be loaded" << std::endl;
+			continue;
+		}
+	
+		const k3d::ipersistent_lookup::id_type node_id = 2;
+		if(node_id == 0)
+		{
+			k3d::log() << error << "node [" << name << "] with unspecified ID will not be loaded" << std::endl;
+			continue;
+		}
+	
+		k3d::iplugin_factory* const plugin_factory = k3d::plugin::factory::lookup(factory_id);
+		if(!plugin_factory)
+		{
+			k3d::log() << error << "node [" << name << "] with unknown factory ID [" << factory_id << "] will not be loaded" << std::endl;
+			continue;
+		}
+	
+		k3d::idocument_plugin_factory* const document_plugin_factory = dynamic_cast<k3d::idocument_plugin_factory*>(plugin_factory);
+		if(!document_plugin_factory)
+		{
+			k3d::log() << error << "Non-document plugin [" << name << "] will not be loaded" << std::endl;
+			continue;
+		}
+	
+		k3d::inode* const node = document_plugin_factory->create_plugin(*plugin_factory, Document);
+		if(!node)
+		{
+			k3d::log() << error << "Error creating node [" << name << "] instance" << std::endl;
+			continue;
+		}
+	
+		k3d::ipersistent* const persistent = dynamic_cast<k3d::ipersistent*>(node);
+		if(!persistent)
+		{
+			k3d::log() << error << "node [" << name << "] does not support persistence" << std::endl;
+	
+			delete node;
+			continue;
+		}
+	
+		k3d::undoable_new(node, Document);
+	
+		nodes.push_back(node);
+		persistent_nodes.push_back(node);
+	}
+
+	Document.nodes().add_nodes(nodes);
+	////////////////////////////////////////////////////
+	////////////////////////////////////////////////////
 }
 
 }}}

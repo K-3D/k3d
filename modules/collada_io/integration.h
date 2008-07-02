@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
+	\author Carlos Andres Dominguez Caballero (carlosadc@gmail.com)
 	\author Barbiero Mattia
 */
 
@@ -34,7 +35,7 @@
 #include <dom/domNode.h>
 #include <dom/domCOLLADA.h>
 #include <k3dsdk/mesh_source.h>
-#include "intGeometry.h"
+#include "intElements.h"
 
 using namespace std;
 namespace module
@@ -49,6 +50,8 @@ namespace io
 	class Node {
 	public:
 		list<intGeometry*> meshes;
+		list<intCamera*> cameras;
+		list<intLight*> lights;
 		list<Node*> childNodes;
 	
 		// This is defined later to work around a circular dependency on the lookup function
@@ -77,16 +80,20 @@ namespace io
 			delete (MyType*)elts[i]->getUserData();
 	
 	}
-	
+
+	enum
+	{IMPORTER,READER};	
+
 	class daeParser
 	{
 	public:
-		daeParser(domCOLLADA& root);
-		k3d::mesh get_mesh(){return Mesh;}
+		daeParser(domCOLLADA& root, k3d::mesh& Mesh);
+		daeParser(domCOLLADA& root, k3d::idocument& Document);
+		//k3d::mesh get_mesh(){return Mesh;}
+		//k3d::idocument &get_document(){return Document;}
 	private:
-		k3d::mesh Mesh;
-		///Matrix stack to handle coordinate system transformations
-		std::stack<k3d::matrix4> mstack;
+		//k3d::mesh Mesh;
+		//k3d::idocument Document;
 	};
 	//void convertModel(domCOLLADA&, k3d::mesh& );
 }}}

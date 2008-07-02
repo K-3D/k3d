@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
+	\author Carlos Andres Dominguez Caballero (carlosadc@gmail.com)
 	\author Barbiero Mattia
 */
 
@@ -32,7 +33,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/gprim_factory.h>
-#include "intGeometry.h"
+#include "intElements.h"
 #include "integration.h"
 
 namespace module
@@ -90,9 +91,7 @@ public:
 		}
 		// Do the conversion. The conversion process throws an exception on error, so
 		// we'll include a try/catch handler.
-		//convertModel(*root, Mesh);
-		daeParser dae_file(*root);
-		Mesh = dae_file.get_mesh();
+		daeParser dae_file(*root, Mesh);
 	
 		// destroy the objects we created during the conversion process
 		freeConversionObjects<Node, domNode>(dae);

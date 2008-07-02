@@ -18,11 +18,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
+	\author Carlos Andres Dominguez Caballero (carlosadc@gmail.com)
 	\author Barbiero Mattia
 */
 #include <dae.h>
 #include <dae/daeDom.h>
-#include "intGeometry.h"
+#include "intElements.h"
 #include <k3dsdk/gprim_factory.h>
 #include <iostream>
 #include <dom/domPolylist.h>
@@ -167,6 +168,16 @@ namespace io
 					1);
 			local->add_point(ccst*vertex);
 		}
+	}
+
+	intLight::intLight(domLight& Light, const k3d::matrix4& ccst)
+	{
+		//TODO Extract light attributes
+	}
+
+	intCamera::intCamera(domCamera& Camera, const k3d::matrix4& ccst)
+	{
+		//TODO Extract camera attributes
 	}
 }}}
 

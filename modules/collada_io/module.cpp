@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
+	\author Carlos Andres Dominguez Caballero (carlosadc@gmail.com)
 	\author Barbiero Mattia
 */
 
@@ -33,7 +34,7 @@ namespace io
 {
 
 extern k3d::iplugin_factory& mesh_reader_factory();
-//extern k3d::iplugin_factory& mesh_writer_factory();
+extern k3d::iplugin_factory& document_importer_factory();
 
 } // namespace io
 
@@ -42,6 +43,7 @@ extern k3d::iplugin_factory& mesh_reader_factory();
 } // namespace module
 
 K3D_MODULE_START(Registry)
+	Registry.register_factory(module::collada::io::document_importer_factory());
 	Registry.register_factory(module::collada::io::mesh_reader_factory());
 	//Registry.register_factory(module::dae::io::mesh_writer_factory());
 K3D_MODULE_END

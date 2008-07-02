@@ -28,10 +28,8 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/algebra.h>
 #include <dom/domGeometry.h>
-
-
-//typedef daeSmartRef<intGeometry> intGeometryRef;
-//typedef daeTArray<intGeometryRef> intGeometryArray;
+#include <dom/domCamera.h>
+#include <dom/domLight.h>
 
 /**
  * Geometry describes the visual shape and appearance of an object in the
@@ -66,5 +64,27 @@ public: // Constuctor and Destructor
 	 */
 	~intGeometry(){}
 };
+
+class intCamera
+{
+private:
+	k3d::point3 Position;
+	k3d::point3 Direction;
+	//k3d::float FOV;
+public:
+	intCamera(domCamera&, const k3d::matrix4& ccst);
+	k3d::point3 get_position(){return Position;}
+	k3d::point3 get_direction(){return Direction;}
+};
+
+class intLight
+{
+private:
+	k3d::point3 Position;
+public:
+	intLight(domLight&, const k3d::matrix4& ccst);
+	k3d::point3 get_position(){return Position;}
+};
+
 }}}
 #endif
