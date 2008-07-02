@@ -404,7 +404,8 @@ namespace module
 				for( size_t i = 0; i<= order - 1 - s; i++ )
 				{
 					p = mesh_points.at( curve_points.at( curve_points_begin + i + k - (order - 1)) );
-					tmp.push_back( k3d::point4(p[0],p[1],p[2], curve_point_weights.at( curve_points_begin + i + k - (order - 1)) ) );
+					const k3d::double_t w = curve_point_weights.at( curve_points_begin + i + k - (order - 1)); 
+					tmp.push_back( k3d::point4(w*p[0],w*p[1],w*p[2], w) );
 				}
 				size_t L=0;
 				
@@ -419,12 +420,20 @@ namespace module
 						alpha = (u - curve_knots.at(curve_knots_begin + L + i)) / (curve_knots.at(curve_knots_begin + i + k + 1) - curve_knots.at(curve_knots_begin + L + i));
 						tmp[i] = alpha * tmp.at(i + 1) + (1.0 - alpha) * tmp.at(i);
 					}
-					points[L] = tmp.at(0);
-					points[k + r - j - s] = tmp.at(order - 1 - j - s);
+					const k3d::point4& t1 = tmp[0];
+					double w = t1[3];
+					points[L] = k3d::point4(t1[0]/w, t1[1]/w, t1[2]/w, w);
+					const k3d::point4& t2 = tmp[order - 1 - j - s];
+					w = t2[3];
+					points[k + r - j - s] = k3d::point4(t2[0]/w, t2[1]/w, t2[2]/w, w);
 				}
 			
 				for( size_t i = L + 1; i < k - s; i++ )
-					points[i] = tmp.at(i - L);
+				{
+					const k3d::point4& t = tmp[i - L];
+					double w = t[3];
+					points[i] = k3d::point4(t[0]/w, t[1]/w, t[2]/w, w);
+				}
 				
 				//*******************************************************************
 				//Insert new points and knot vector into the mesh
