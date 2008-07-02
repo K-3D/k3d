@@ -46,7 +46,7 @@ namespace module
 
 	namespace nurbs
 	{
-		void connect_at_points(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2, bool continuous);
+		void connect_at_points(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2);
 
 
 		class connect_curves :
@@ -55,11 +55,9 @@ namespace module
 			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 		public:
 			connect_curves(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-				base(Factory, Document),
-				m_make_continuous(init_owner(*this) + init_name("make_continuous") + init_label(_("make_continuous")) + init_description(_("Connect Continuous? Resets the Knot-Vector!")) + init_value(false) )
+				base(Factory, Document)
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
-				m_make_continuous.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -71,8 +69,6 @@ namespace module
 			{
 				Output = Input;
 				
-				k3d::bool_t make_continuous = m_make_continuous.internal_value();
-
 				if(!k3d::validate_nurbs_curve_groups(Output))
 					return;
 
@@ -112,7 +108,7 @@ namespace module
 					k3d::log() << error << "You need to select exactly 2 points on 2 different curves!\n"<<"Selected: "<<points.size()<<" points on "<<curves.size()<<" curves" << std::endl;
 				}
 				else
-					connect_at_points(Output, curves[0], curves[1], points[0], points[1], make_continuous);
+					connect_at_points(Output, curves[0], curves[1], points[0], points[1]);
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 			}
@@ -130,7 +126,6 @@ namespace module
 			}
 
 		private:
-			k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_make_continuous;
 		};
 
 		//Create connect_curve factory
@@ -410,7 +405,6 @@ namespace module
 		//assumes that the 2 curves share one end point (the one with new_index)
 		void join_curves(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::indices_t& indices, k3d::mesh::knots_t& knots, size_t point1, size_t curve1, size_t point2, size_t curve2)
 		{
-
 			k3d::log() << debug << "Join curves " << curve1 << " and " << curve2 << std::endl;
 			//	if point is the first or last point of both curves, flip one of them
 			//	->choose them in a way that they can be joined
@@ -446,6 +440,16 @@ namespace module
 				use1 = 1;
 				use2 = 0;
 			}
+			else if( point1 == curve_points_end[0] - 1 && point2 == curve_points_begin[1] )
+			{
+				//no changes
+			}
+			else
+			{
+				k3d::log() << error << "You need to select and end-point of each curve!" << std::endl;
+				return;
+			}
+			
 
 			normalize_knot_vector(groups, knots, curve1);
 			normalize_knot_vector(groups, knots, curve2);
@@ -497,18 +501,21 @@ namespace module
 			
 			//if curve_knots_begin[use_curve1] < curve_knots_begin[use_curve2] do nothing, else subtract offset1
 			knots1_end = knots.begin() + curve_knots_end[use1] - offset1;
-			k3d::mesh::knots_t::iterator knots2_begin = knots.begin() + curve_knots_begin[use2];
-			k3d::mesh::knots_t::iterator knots2_end = knots.begin() + curve_knots_end[use2];
+			k3d::mesh::knots_t::iterator knots2_begin = knots.begin();
+			k3d::mesh::knots_t::iterator knots2_end = knots.begin();
 			
 			if(curve_knots_begin[use2] > curve_knots_begin[use1])
 			{
-				knots2_begin -= offset1;
-				knots2_end -= offset1;
-				curve_first_knots[use_curve2] -= offset1;
+				knots2_begin +=  curve_knots_begin[use2] - offset1;
+				knots2_end +=  curve_knots_end[use2] - offset1;
 				k3d::log() << debug << "With offset " << std::distance(knots2_begin, knots2_end) << std::endl;
 			}
 			else
+			{
+				knots2_begin +=  curve_knots_begin[use2];
+				knots2_end +=  curve_knots_end[use2];
 				k3d::log() << debug << "Without offset " << std::distance(knots2_begin, knots2_end) << std::endl;
+			}
 			
 			knots1_end--;
 			double knot_inc = (1.0 - *knots1_end);
@@ -529,14 +536,7 @@ namespace module
 			k3d::log() << debug << "Found " << offset2 << " knots with value " << find_first << " in curve 2" << std::endl;
 			
 			knots1_end = knots.begin() + curve_knots_end[use1] - offset1;
-			knots2_begin = knots.begin() + curve_knots_begin[use2] + offset2;
-			knots2_end = knots.begin() + curve_knots_end[use2];
-			
-			if(curve_knots_begin[use1] < curve_knots_begin[use2])
-			{
-				knots2_begin -= offset1;
-				knots2_end -= offset1;
-			}
+			knots2_begin += offset2 - 1;
 			
 			k3d::log() << debug << "Going to insert at pos " << std::distance(knots.begin(), knots1_end) << " with size " << knots.size() << std::endl;
 			knots.insert(knots1_end, 1.0);
@@ -561,7 +561,7 @@ namespace module
 			delete_curve(groups,use_curve2);
 		}
 
-		void connect_at_points(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2, bool continuous)
+		void connect_at_points(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2)
 		{
 			k3d::mesh::nurbs_curve_groups_t& groups = *k3d::make_unique(Mesh.nurbs_curve_groups);
 			k3d::mesh::indices_t& curve_points = *k3d::make_unique(groups.curve_points);
