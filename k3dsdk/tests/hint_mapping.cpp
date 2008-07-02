@@ -198,16 +198,7 @@ public:
 
 	~connector()
 	{
-//		m_source.connect(filter_slot<SlotT>(m_target));
 	}
-
-/*
-	template<typename SourceT, typename TargetT>
-	connector& convert()
-	{
-		return *this;
-	}
-*/
 
 	template<typename ConverterT>
 	void operator=(const ConverterT& Converter)
@@ -254,31 +245,6 @@ public:
 		}
 	}
 };
-
-/*
-template<typename SourceT, typename TargetT>
-class converter<SourceT, TargetT, first_converter>
-{
-public:
-	template<typename NextSourceT, typename NextTargetT>
-	converter<SourceT, TargetT, converter<NextSourceT, NextTargetT> > convert()
-	{
-		return converter<SourceT, TargetT, converter<NextSourceT, NextTargetT> >();
-	}
-
-	void operator()(ihint* const Hint)
-	{
-		if(hint_traits<SourceT>::match(Hint))
-		{
-			std::cerr << "input hint: " << print(Hint) << " output hint: " << print(hint_traits<TargetT>::convert(Hint)) << std::endl;
-		}
-		else
-		{
-			std::cerr << "unhandled hint: " << print(Hint) << std::endl;
-		}
-	}
-};
-*/
 
 class converter_helper
 {
