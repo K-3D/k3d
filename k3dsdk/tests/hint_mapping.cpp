@@ -25,6 +25,11 @@ namespace hint
 {
 
 //////////////////////////////////////////////////////////////////////////////
+// slot_t
+
+typedef sigc::slot<void, ihint*> slot_t;
+
+//////////////////////////////////////////////////////////////////////////////
 // bitmap_dimensions_changed
 
 class bitmap_dimensions_changed :
@@ -180,96 +185,82 @@ std::ostream& operator<<(std::ostream& Stream, const print& RHS)
 	return Stream;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// last_conversion
+
+class last_conversion
+{
+};
+
+//////////////////////////////////////////////////////////////////////////////
+// convert
+
+template<typename SourceT, typename TargetT, typename NextT = last_conversion>
+struct convert
+{
+	typedef SourceT Source;
+	typedef TargetT Target;
+	typedef NextT Next;
+};
+
 namespace detail
 {
 
-//////////////////////////////////////////////////////////////////////////////
-// connector
+template<typename ListT>
+void execute(ihint* const Hint, const slot_t& Slot)
+{
+	if(hint_traits<typename ListT::Source>::match(Hint))
+	{
+		Slot(hint_traits<typename ListT::Target>::convert(Hint));
+	}
+	else
+	{
+		execute<typename ListT::Next>(Hint, Slot);
+	}
+}
 
-template<typename SlotT>
-class connector
+template<>
+void execute<last_conversion>(ihint* const Hint, const slot_t& Slot)
+{
+	std::cerr << "unhandled hint: " << print(Hint) << std::endl;
+}
+
+template<typename ListT>
+class converter
 {
 public:
-	connector(sigc::signal<void, ihint*>& Source, const SlotT& Target) :
-		m_source(Source),
-		m_target(Target)
+	converter(const slot_t& Slot) :
+		slot(Slot)
 	{
 	}
 
-	~connector()
+	void operator()(ihint* const Hint)
 	{
-	}
-
-	template<typename ConverterT>
-	void operator=(const ConverterT& Converter)
-	{
-		m_source.connect(Converter);
+		execute<ListT>(Hint, slot);
 	}
 
 private:
-	sigc::signal<void, ihint*>& m_source;
-	const SlotT& m_target;
-};
-
-class first_converter
-{
-public:
-	void operator()(ihint* const Hint)
-	{
-		std::cerr << "unhandled hint: " << print(Hint) << std::endl;
-	}
-};
-
-template<typename SourceT, typename TargetT, typename NextT>
-class converter :
-	private NextT
-{
-public:
-	typedef converter<SourceT, TargetT, NextT> ThisT;
-
-	template<typename NextSourceT, typename NextTargetT>
-	converter<NextSourceT, NextTargetT, ThisT> convert()
-	{
-		return converter<NextSourceT, NextTargetT, ThisT>();
-	}
-
-	void operator()(ihint* const Hint)
-	{
-		if(hint_traits<SourceT>::match(Hint))
-		{
-			std::cerr << "input hint: " << print(Hint) << " output hint: " << print(hint_traits<TargetT>::convert(Hint)) << std::endl;
-		}
-		else
-		{
-			NextT::operator()(Hint);
-		}
-	}
-};
-
-class converter_helper
-{
-public:
-	template<typename SourceT, typename TargetT>
-	converter<SourceT, TargetT, first_converter> convert()
-	{
-		return converter<SourceT, TargetT, first_converter>();
-	}
+	slot_t slot;
 };
 
 } // namespace detail
 
 //////////////////////////////////////////////////////////////////////////////
-// connection
+// connect
 
-template<typename SlotT>
-detail::connector<SlotT> connection(sigc::signal<void, ihint*>& Source, const SlotT& Target)
+template<typename SourceT, typename ConverterT>
+sigc::connection connect(SourceT& Source, const ConverterT& Converter)
 {
-	return detail::connector<SlotT>(Source, Target);
+	return Source.connect(Converter);
 }
 
-detail::converter_helper converter()
+//////////////////////////////////////////////////////////////////////////////
+// converter
+
+template<typename ListT>
+detail::converter<ListT> converter(const sigc::slot<void, ihint*>& Slot)
 {
-	return detail::converter_helper();
+	return detail::converter<ListT>(Slot);
 }
 
 } // namespace hint
@@ -296,16 +287,16 @@ int main(int argc, char* arv[])
 	output_bitmap.connect(sigc::bind(sigc::ptr_fun(signal_changed), "output changed"));
 
 	// Setup our "network" of mappings from input signals to output signals ...
-	k3d::hint::connection(input_bitmap, output_bitmap.make_slot()) = k3d::hint::converter()
-		.convert<k3d::hint::bitmap_dimensions_changed, k3d::hint::unchanged>()
-		.convert<k3d::hint::bitmap_pixels_changed, k3d::hint::unchanged>()
-		.convert<k3d::hint::any, k3d::hint::none>();
+	k3d::hint::connect(input_bitmap, k3d::hint::converter<
+		k3d::hint::convert<k3d::hint::bitmap_dimensions_changed, k3d::hint::unchanged,
+		k3d::hint::convert<k3d::hint::bitmap_pixels_changed, k3d::hint::unchanged,
+		k3d::hint::convert<k3d::hint::any, k3d::hint::none> > > >(output_bitmap.make_slot()));
 
-	k3d::hint::connection(border, output_bitmap.make_slot()) = k3d::hint::converter()
-		.convert<k3d::hint::any, k3d::hint::bitmap_dimensions_changed>();
+	k3d::hint::connect(border, k3d::hint::converter<
+		k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_dimensions_changed> >(output_bitmap.make_slot()));
 
-	k3d::hint::connection(color, output_bitmap.make_slot()) = k3d::hint::converter()
-		.convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed>();
+	k3d::hint::connect(color, k3d::hint::converter<
+		k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(output_bitmap.make_slot()));
 
 	// Exercise the hint-mapping network ...
 	std::cerr << "****************" << std::endl;
