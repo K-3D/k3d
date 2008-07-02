@@ -155,6 +155,7 @@ cuda_device_mesh::~cuda_device_mesh()
  */
 void cuda_device_mesh::copy_to_device()
 {
+    k3d::log() << debug << "cuda_device_mesh::copy_to_device" << std::endl;
     m_number_of_points = m_p_host_mesh->points->size(); 
     
     // allocate the memory for the points and the point selection
@@ -166,11 +167,13 @@ void cuda_device_mesh::copy_to_device()
     
     for ( int point = 0 ; point < m_number_of_points ; ++point )
     {
-        int float_index = point*3;
+        int float_index = point*4;
         host_points_and_selection[float_index] = (float)((*m_p_host_mesh->points)[point][0]);
         host_points_and_selection[float_index+1] = (float)((*m_p_host_mesh->points)[point][1]);
         host_points_and_selection[float_index+2] = (float)((*m_p_host_mesh->points)[point][2]);
         host_points_and_selection[float_index+3] = (float)((*m_p_host_mesh->point_selection)[point]);
+        
+        //k3d::log() << debug << "P: " << (*m_p_host_mesh->points)[point] << " D: " << host_points_and_selection[float_index]
     }
     
     // copy the coordinates and selection to the device
@@ -183,6 +186,7 @@ void cuda_device_mesh::copy_to_device()
     
     // free the temporary host data
     free ( host_points_and_selection );
+    k3d::log() << debug << "cuda_device_mesh::copy_to_device::end" << std::endl;
 }
 
 /**
@@ -190,19 +194,32 @@ void cuda_device_mesh::copy_to_device()
  */
 void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh )
 {
+    k3d::log() << debug << "cuda_device_mesh::copy_from_device" << std::endl;
+
     k3d::mesh* p_output_mesh = &destination_mesh;
+    
     // allocate temporary storage for the floats from the device
     float* host_points_and_selection = (float*) malloc ( m_number_of_points*4*sizeof(float) );
     
     copy_from_device_to_host( (void*) host_points_and_selection, (void*) pdev_points_and_selection, m_number_of_points*4*sizeof(float) );
     
+    
+        
+    // check to see if mesh's points and point selection exists
+    if ( !(p_output_mesh->points) )
+    {
+        boost::shared_ptr<k3d::mesh::points_t> points(new k3d::mesh::points_t( m_number_of_points ));
+        boost::shared_ptr<k3d::mesh::selection_t> point_selection(new k3d::mesh::selection_t(m_number_of_points));
+        p_output_mesh->points = points;
+        p_output_mesh->point_selection = point_selection;               
+    }
     // check to see if the number of points has changed
-    if ( m_number_of_points != p_output_mesh->points->size() )
+    else if ( m_number_of_points != p_output_mesh->points->size() )
     {
         p_output_mesh->points.reset( new k3d::mesh::points_t ( m_number_of_points ) );
         p_output_mesh->point_selection.reset ( new k3d::mesh::selection_t ( m_number_of_points ) );
     }
-    
+
     double* out_points = (double*)&(p_output_mesh->points->front());
     double* out_selection = (double*)&(p_output_mesh->point_selection->front());
     
@@ -212,13 +229,27 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh )
         int float_index = point*4;
         int double_index = point*3;
         
-        out_points[double_index] = host_points_and_selection[float_index];
-        out_points[double_index+1] = host_points_and_selection[float_index+1];
-        out_points[double_index+2] = host_points_and_selection[float_index+2];
-        out_selection[point] = host_points_and_selection[float_index+3];
+        out_points[double_index] = (double)(host_points_and_selection[float_index]);
+        out_points[double_index+1] = (double)(host_points_and_selection[float_index+1]);
+        out_points[double_index+2] = (double)(host_points_and_selection[float_index+2]);
+        out_selection[point] = (double)(host_points_and_selection[float_index+3]);
     }
     
     // remember to also copy polyhedra from the device
+
     synchronize_threads();    
+    k3d::log() << debug << "cuda_device_mesh::copy_from_device::end" << std::endl;
 }
 
+/**
+ * Ouput debug information for the data structure
+ */
+void cuda_device_mesh::output_debug_info()
+{
+    k3d::log() << debug << "CUDA Device mesh info" << std::endl;
+    k3d::log() << debug << "=====================" << std::endl;
+    k3d::log() << debug << "pdev_points_and_selection: " << pdev_points_and_selection << std::endl;       
+    k3d::log() << debug << "m_number_of_points: " << m_number_of_points << std::endl;
+    k3d::log() << debug << "m_p_host_mesh: " << m_p_host_mesh << std::endl;        
+    k3d::log() << debug << "=====================" << std::endl;
+}

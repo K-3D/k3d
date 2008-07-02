@@ -86,7 +86,9 @@ class cuda_device_mesh
         
         void copy_to_device ();
         void copy_from_device ( k3d::mesh& destination_mesh );
-
+        
+        void output_debug_info ();
+        
     private:
         /// a pointer to a array of float4's allocated on the device
         float* pdev_points_and_selection;       

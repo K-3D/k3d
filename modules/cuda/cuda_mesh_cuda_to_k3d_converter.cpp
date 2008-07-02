@@ -54,7 +54,14 @@ public:
     {
         k3d::log() << info << "Converting from CUDA" << std::endl;
         
-        m_input_cuda_device_mesh.internal_value()->copy_from_device( *(m_output_mesh.internal_value()) ); 
+        k3d::log() << debug <<  m_input_cuda_device_mesh.internal_value() << " : " << m_input_cuda_device_mesh.pipeline_value() << std::endl;
+        
+        if ( m_input_cuda_device_mesh.pipeline_value() )
+        {
+            m_input_cuda_device_mesh.pipeline_value()->output_debug_info();
+            m_input_cuda_device_mesh.pipeline_value()->copy_from_device( *(m_output_mesh.internal_value()) );
+        } 
+        k3d::log() << info << "After Conversion" << std::endl;
     }
     
     void on_create_mesh_topology(k3d::mesh& Mesh)

@@ -52,6 +52,7 @@ public:
     
     ~cuda_mesh_k3d_to_cuda_converter()
     {
+        k3d::log() << debug << "Free the cuda mesh object" << std::endl;
         // free the device mesh allocated
         delete m_output_cuda_device_mesh.internal_value();       
     }
@@ -64,12 +65,14 @@ public:
         {
             delete m_output_cuda_device_mesh.internal_value(); 
         }
-                        
-        m_output_cuda_device_mesh.set_value( new cuda_device_mesh ( *(m_input_mesh.pipeline_value()) ) );
         
+        m_output_cuda_device_mesh.set_value( new cuda_device_mesh ( *(m_input_mesh.pipeline_value()) ) );
         m_output_cuda_device_mesh.internal_value()->copy_to_device();
         
-        delete m_output_cuda_device_mesh.internal_value();
+        k3d::log() << info << "Converting to CUDA : after copy" << std::endl;
+        
+        m_output_cuda_device_mesh.internal_value()->output_debug_info();
+
     }
     
     static k3d::iplugin_factory& get_factory()
