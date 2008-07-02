@@ -26,16 +26,19 @@
 #include <k3dsdk/mesh.h>
 #include "cuda_entry_points.h"
 
-class cuda_polyhedra
+class cuda_device_polyhedra
 {
     public:
         /// Constructors
-        cuda_polyhedra ( const k3d::mesh::polyhedra_t& input_polyhedra, const k3d::mesh::polyhedra_t& output_polyhedra );
+        cuda_device_polyhedra ( const k3d::mesh::polyhedra_t& host_polyhedra );
         /// Destructor
-        ~cuda_polyhedra ();
+        ~cuda_device_polyhedra ();
         
         void copy_to_device ();
-        void copy_from_device ();
+        void copy_from_device ( k3d::mesh::polyhedra_t& destination_polyhedra );
+        
+        void output_debug_info ();
+        
     private:    
         /// a pointer to uint arrays allocated on the device
         k3d::uint_t* pdev_per_polygon_first_face;
@@ -73,7 +76,6 @@ class cuda_polyhedra
         
         /// a reference to the host version of the polyhedra_t   
         const k3d::mesh::polyhedra_t* m_p_input_polyhedra;
-        const k3d::mesh::polyhedra_t* m_p_output_polyhedra;
 };
 
 /// Start fleshing out cuda mesh structure.
@@ -95,5 +97,6 @@ class cuda_device_mesh
         k3d::uint_t m_number_of_points;
         
         const k3d::mesh* m_p_host_mesh;
+        cuda_device_polyhedra m_cuda_device_polyhedra;        
 };        
 

@@ -50,27 +50,25 @@ public:
         m_input_mesh.changed_signal().connect(sigc::mem_fun(*this, &cuda_mesh_k3d_to_cuda_converter::convert_to_cuda_mesh));
     }
     
+    
     ~cuda_mesh_k3d_to_cuda_converter()
     {
-        k3d::log() << debug << "Free the cuda mesh object" << std::endl;
         // free the device mesh allocated
-        delete m_output_cuda_device_mesh.internal_value();       
+        delete m_output_cuda_device_mesh.internal_value();
     }
+    
     
     void convert_to_cuda_mesh(k3d::iunknown*)
     {
         k3d::log() << info << "Converting to CUDA" << std::endl;
         
-        if ( m_output_cuda_device_mesh.internal_value() )
+        if ( m_output_cuda_device_mesh.pipeline_value() )
         {
-            delete m_output_cuda_device_mesh.internal_value(); 
+            delete m_output_cuda_device_mesh.pipeline_value(); 
         }
-        
+
         m_output_cuda_device_mesh.set_value( new cuda_device_mesh ( *(m_input_mesh.pipeline_value()) ) );
         m_output_cuda_device_mesh.internal_value()->copy_to_device();
-        
-        k3d::log() << info << "Converting to CUDA : after copy" << std::endl;
-        
         m_output_cuda_device_mesh.internal_value()->output_debug_info();
 
     }
