@@ -378,7 +378,7 @@ public:
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-
+        
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -46,6 +46,26 @@ cuda_device_polyhedra::cuda_device_polyhedra ( const k3d::mesh::polyhedra_t& hos
     pdev_per_edge_clockwise_edge = 0;       
     pdev_per_edge_selection = 0;
     m_number_of_edges = 0;
+    
+    // initialize additional storage pointers
+    pdev_additional_per_polygon_first_face = 0;
+    pdev_additional_per_polygon_face_count = 0;
+    pdev_additional_per_polygon_types = 0;
+    m_number_of_additional_polyhedra = 0;
+    
+    pdev_additional_per_face_first_loops = 0;
+    pdev_additional_per_face_loop_count = 0;
+    pdev_additional_per_face_selection = 0;
+    m_number_of_additional_faces = 0;
+    
+    pdev_additional_per_loop_first_edge = 0;
+    m_number_of_additional_loops = 0;
+    
+    pdev_additional_per_edge_point = 0;
+    pdev_additional_per_edge_clockwise_edge = 0;       
+    pdev_additional_per_edge_selection = 0;
+    m_number_of_additional_edges = 0;
+    
 }
 
 /// Destructor - free the allocated device pointers
@@ -64,8 +84,101 @@ cuda_device_polyhedra::~cuda_device_polyhedra ()
     
     free_device_memory((void*)pdev_per_edge_point);
     free_device_memory((void*)pdev_per_edge_clockwise_edge);
-    free_device_memory((void*)pdev_per_edge_selection);uniform_data
+    free_device_memory((void*)pdev_per_edge_selection);
+    
+    // free the memory allocated for additional structures
+    free_device_memory(pdev_additional_per_polygon_face_count);    
+    free_device_memory(pdev_additional_per_polygon_first_face);
+    free_device_memory(pdev_additional_per_polygon_types);
+    
+    free_device_memory ( pdev_additional_per_face_first_loops );   
+    free_device_memory(pdev_additional_per_face_loop_count);   
+    free_device_memory(pdev_additional_per_face_selection);
+    
+    free_device_memory(pdev_additional_per_loop_first_edge);
+    
+    free_device_memory(pdev_additional_per_edge_point);   
+    free_device_memory(pdev_additional_per_edge_clockwise_edge);    
+    free_device_memory(pdev_additional_per_edge_selection);    
 }   
+
+/**
+ * Allocate device memory for additional polyhedra components
+ */ 
+void cuda_device_polyhedra::allocate_additional_polyhedra ( k3d::uint_t number_of_additional_polyhedra )
+{
+    if ( pdev_additional_per_polygon_face_count )
+    {
+        free_device_memory(pdev_additional_per_polygon_face_count);    
+    }
+    if ( pdev_additional_per_polygon_first_face )
+    {
+        free_device_memory(pdev_additional_per_polygon_first_face);
+    }
+    if ( pdev_additional_per_polygon_types )
+    {
+        free_device_memory(pdev_additional_per_polygon_types);
+    }
+    
+    allocate_device_memory((void**)&pdev_additional_per_polygon_face_count, number_of_additional_polyhedra*sizeof(k3d::uint_t));
+    allocate_device_memory((void**)&pdev_additional_per_polygon_first_face, number_of_additional_polyhedra*sizeof(k3d::uint_t));
+    allocate_device_memory((void**)&pdev_additional_per_polygon_types, number_of_additional_polyhedra*sizeof(k3d::int32_t));
+    
+    m_number_of_additional_polyhedra = number_of_additional_polyhedra;        
+}
+
+void cuda_device_polyhedra::allocate_additional_faces ( k3d::uint_t number_of_additional_faces )
+{
+    if ( pdev_additional_per_face_first_loops )
+    {
+        free_device_memory ( pdev_additional_per_face_first_loops );   
+    }
+    if ( pdev_additional_per_face_loop_count )
+    {
+        free_device_memory(pdev_additional_per_face_loop_count);   
+    }
+    if ( pdev_additional_per_face_selection )
+    {
+        free_device_memory(pdev_additional_per_face_selection);
+    }
+    
+    allocate_device_memory((void**)&pdev_additional_per_face_first_loops, number_of_additional_faces*sizeof(k3d::uint_t));
+    allocate_device_memory((void**)&pdev_additional_per_face_loop_count, number_of_additional_faces*sizeof(k3d::uint_t));
+    allocate_device_memory((void**)&pdev_additional_per_face_selection, number_of_additional_faces*sizeof(float));
+    m_number_of_additional_faces = number_of_additional_faces;
+    
+}
+void cuda_device_polyhedra::allocate_additional_loops ( k3d::uint_t number_of_additional_loops )
+{
+    if ( pdev_additional_per_loop_first_edge )
+    {
+        free_device_memory(pdev_additional_per_loop_first_edge);
+    }
+    
+    allocate_device_memory((void**)&pdev_additional_per_loop_first_edge, number_of_additional_loops*sizeof(k3d::uint_t));
+    m_number_of_additional_loops = number_of_additional_loops;   
+}
+void cuda_device_polyhedra::allocate_additional_edges ( k3d::uint_t number_of_additional_edges )
+{
+    if ( pdev_additional_per_edge_point )
+    {
+        free_device_memory(pdev_additional_per_edge_point);   
+    }
+    if ( pdev_additional_per_edge_clockwise_edge )
+    {
+        free_device_memory(pdev_additional_per_edge_clockwise_edge);    
+    }       
+    if ( pdev_additional_per_edge_selection )
+    {
+        free_device_memory(pdev_additional_per_edge_selection);    
+    }
+    
+    allocate_device_memory((void**)&pdev_additional_per_edge_point, number_of_additional_edges*sizeof(k3d::uint_t));
+    allocate_device_memory((void**)&pdev_additional_per_edge_clockwise_edge, number_of_additional_edges*sizeof(k3d::uint_t));
+    allocate_device_memory((void**)&pdev_additional_per_edge_selection, number_of_additional_edges*sizeof(float));
+    m_number_of_additional_edges = number_of_additional_edges;
+    
+}
 
 /**
  * copy the specified polyhedra to the device
@@ -193,7 +306,7 @@ void cuda_device_polyhedra::copy_from_device( k3d::mesh::polyhedra_t& destinatio
     p_output_polyhedra->face_materials = m_p_input_polyhedra->face_materials;
     p_output_polyhedra->constant_data = m_p_input_polyhedra->constant_data;
     p_output_polyhedra->uniform_data = m_p_input_polyhedra->uniform_data;    
-    p_output_polyhedra->face_varying_data = m_p_input_polyhedra->face_varying;
+    p_output_polyhedra->face_varying_data = m_p_input_polyhedra->face_varying_data;
     
     synchronize_threads();
     free ( face_selection_temp );
@@ -245,6 +358,21 @@ cuda_device_mesh::~cuda_device_mesh()
 {
     k3d::log() << debug << "~cuda_device_mesh" << std::endl;
     free_device_memory((void*)pdev_points_and_selection);
+    free_device_memory((void*)pdev_additional_points);
+}
+
+/**
+ *  Allocate space on the device for additional points
+ */
+void cuda_device_mesh::allocate_additional_points ( k3d::uint_t number_of_new_points )
+{
+    if ( pdev_additional_points )
+    {
+        free_device_memory(pdev_additional_points);
+    }        
+    
+    allocate_device_memory((void**)&pdev_additional_points, number_of_new_points*4*sizeof(float));
+    m_number_of_additional_points = number_of_new_points;
 }
 
 /**
@@ -349,9 +477,17 @@ void cuda_device_mesh::output_debug_info()
     k3d::log() << debug << "=====================" << std::endl;
     k3d::log() << debug << "CUDA Device mesh info" << std::endl;
     k3d::log() << debug << "=====================" << std::endl;
-    k3d::log() << debug << "pdev_points_and_selection: " << pdev_points_and_selection << std::endl;       
+    k3d::log() << debug << "pdev_points_and_selection: " << pdev_points_and_selection << std::endl;
     k3d::log() << debug << "m_number_of_points: " << m_number_of_points << std::endl;
+    k3d::log() << debug << "pdev_additional_points: " << pdev_additional_points << std::endl;
+    k3d::log() << debug << "m_number_of_additional_points: " << m_number_of_additional_points << std::endl;
     k3d::log() << debug << "m_p_host_mesh: " << m_p_host_mesh << std::endl;
     m_cuda_device_polyhedra.output_debug_info();        
     k3d::log() << debug << "=====================" << std::endl;
 }
+
+
+cuda_device_polyhedra& cuda_device_mesh::get_device_polyhedra ()
+{   
+    return m_cuda_device_polyhedra;
+}   
