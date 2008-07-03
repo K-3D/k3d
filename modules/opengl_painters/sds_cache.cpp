@@ -85,7 +85,7 @@ void sds_cache::on_schedule(k3d::hint::selection_changed_t* Hint, k3d::inode* Pa
 	m_selection_changed = true;
 }
 
-void sds_cache::level_changed(k3d::iunknown* Hint)
+void sds_cache::level_changed(k3d::ihint* Hint)
 {
 	// search the highest level requested by the clients
 	m_levels = 0;

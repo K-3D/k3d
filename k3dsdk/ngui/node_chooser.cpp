@@ -169,7 +169,7 @@ void control::on_nodes_removed(const k3d::inode_collection::nodes_t&)
 	reset_menu();
 }
 
-void control::data_changed(k3d::iunknown*)
+void control::data_changed(k3d::ihint*)
 {
 	return_if_fail(m_data.get());
 

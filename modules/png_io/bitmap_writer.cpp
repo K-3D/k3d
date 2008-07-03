@@ -54,7 +54,7 @@ public:
 		m_file.changed_signal().connect(make_input_changed_slot());
 	}
 
-	void on_input_changed(k3d::iunknown*)
+	void on_input_changed(k3d::ihint*)
 	{
 		try
 		{

@@ -25,7 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
+#include "ihint.h"
 
 namespace k3d
 {
@@ -41,7 +41,7 @@ public:
 	virtual iproperty& mesh_source_output() = 0;
 	
 	/// Hint for the type of change the creation of this source entails
-	virtual iunknown* hint() const { return 0; }
+	virtual ihint* hint() const { return 0; }
 
 protected:
 	imesh_source() {}

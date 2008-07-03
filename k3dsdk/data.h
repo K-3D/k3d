@@ -2,7 +2,7 @@
 #define K3DSDK_DATA_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,6 +22,7 @@
 
 #include "idocument.h"
 #include "ienumeration_property.h"
+#include "ihint.h"
 #include "ilist_property.h"
 #include "imeasurement_property.h"
 #include "inode.h"
@@ -443,7 +444,7 @@ public:
 		return m_deleted_signal;
 	}
 
-	bool property_set_value(const boost::any Value, iunknown* const Hint)
+	bool property_set_value(const boost::any Value, ihint* const Hint)
 	{
 		const value_t* const new_value = boost::any_cast<value_t>(&Value);
 		if(!new_value)
@@ -571,7 +572,7 @@ public:
 		m_dependency = Dependency;
 	}
 
-	bool property_set_value(const boost::any Value, iunknown* const Hint)
+	bool property_set_value(const boost::any Value, ihint* const Hint)
 	{
 		const std::string* const new_value = boost::any_cast<std::string>(&Value);
 		if(!new_value)
@@ -690,7 +691,7 @@ public:
 		m_dependency = Dependency;
 	}
 
-	bool property_set_value(const boost::any Value, iunknown* const Hint)
+	bool property_set_value(const boost::any Value, ihint* const Hint)
 	{
 		const value_t* const new_value = boost::any_cast<value_t>(&Value);
 		if(!new_value)
@@ -856,7 +857,7 @@ public:
 		m_dependency = Dependency;
 	}
 
-	bool property_set_value(const boost::any Value, iunknown* const Hint)
+	bool property_set_value(const boost::any Value, ihint* const Hint)
 	{
 		const std::string* const new_value = boost::any_cast<std::string>(&Value);
 		if(!new_value)
@@ -1002,7 +1003,7 @@ public:
 		m_dependency = Dependency;
 	}
 
-	bool property_set_value(const boost::any Value, iunknown* const Hint)
+	bool property_set_value(const boost::any Value, ihint* const Hint)
 	{
 		const string_t* const new_value = boost::any_cast<string_t>(&Value);
 		if(!new_value)
@@ -1139,7 +1140,7 @@ public:
 		m_dependency = Dependency;
 	}
 
-	bool property_set_value(const boost::any Value, iunknown* const Hint)
+	bool property_set_value(const boost::any Value, ihint* const Hint)
 	{
 		const value_t* const new_value = boost::any_cast<value_t>(&Value);
 		if(!new_value)
@@ -1257,7 +1258,7 @@ public:
 		m_dependency = Dependency;
 	}
 
-	bool property_set_value(const boost::any Value, iunknown* const Hint)
+	bool property_set_value(const boost::any Value, ihint* const Hint)
 	{
 		inode* const * new_value = boost::any_cast<inode*>(&Value);
 		if(!new_value)
@@ -1383,7 +1384,7 @@ public:
 		m_dependency = Dependency;
 	}
 
-	bool property_set_value(const boost::any Value, iunknown* const Hint)
+	bool property_set_value(const boost::any Value, ihint* const Hint)
 	{
 		const value_t* const new_value = boost::any_cast<value_t>(&Value);
 		if(!new_value)
@@ -1485,7 +1486,7 @@ class no_constraint :
 	public undo_policy_t
 {
 public:
-	void set_value(const value_t& Value, iunknown* const Hint = 0)
+	void set_value(const value_t& Value, ihint* const Hint = 0)
 	{
 		if(Value != undo_policy_t::internal_value())
 			undo_policy_t::set_value(Value, Hint);
@@ -1624,7 +1625,7 @@ class with_constraint :
 	public undo_policy_t
 {
 public:
-	void set_value(value_t Value, iunknown* const Hint = 0)
+	void set_value(value_t Value, ihint* const Hint = 0)
 	{
 		m_constraint->constrain(Value);
 
@@ -1668,7 +1669,7 @@ protected:
 	}
 
 	/// This little bit of magic makes it possible for base classes (such as node_storage) to update their own values while observing the correct undo policy
-	void internal_set_value(const value_t& Value, iunknown* const Hint)
+	void internal_set_value(const value_t& Value, ihint* const Hint)
 	{
 		set_value(Value, Hint);
 	}
@@ -1708,12 +1709,12 @@ protected:
 	typedef with_undo<value_t, storage_policy_t> this_t;
 
 	/// This little bit of magic makes it possible for base classes (such as node_storage) to update their own values while observing the correct undo policy
-	void internal_set_value(const value_t& Value, iunknown* const Hint)
+	void internal_set_value(const value_t& Value, ihint* const Hint)
 	{
 		set_value(Value, Hint);
 	}
 
-	void set_value(const value_t& Value, iunknown* const Hint = 0)
+	void set_value(const value_t& Value, ihint* const Hint = 0)
 	{
 		if(ready_to_record())
 		{
@@ -1781,7 +1782,7 @@ protected:
 	}
 
 	/// Sets a new value for the data
-	void set_value(const value_t& Value, iunknown* const Hint = 0)
+	void set_value(const value_t& Value, ihint* const Hint = 0)
 	{
 		m_value = Value;
 		signal_policy_t::set_value(Hint);
@@ -1891,7 +1892,7 @@ protected:
 	}
 
 	/// Sets a new value for the data
-	void set_value(value_t Value, iunknown* const Hint)
+	void set_value(value_t Value, ihint* const Hint)
 	{
 		if(m_node)
 		{
@@ -1920,7 +1921,7 @@ protected:
 
 private:
 	/// This little bit of magic allows us to "call" the derived undo policy when our state is modified internally, e.g. if the node is deleted
-	virtual void internal_set_value(const value_t& Value, iunknown* const Hint)
+	virtual void internal_set_value(const value_t& Value, ihint* const Hint)
 	{
 	}
 
@@ -1965,13 +1966,13 @@ public:
 	BOOST_STATIC_ASSERT((boost::is_pointer<value_t>::value));
 
 	/// Returns a slot that will invoke the reset() method
-	sigc::slot<void, iunknown*> make_reset_slot()
+	sigc::slot<void, ihint*> make_reset_slot()
 	{
 		return sigc::mem_fun(*this, &demand_storage<value_t, signal_policy_t>::internal_reset);
 	}
 
 	/// Resets the underlying data so it will be created-again next read
-	void reset(value_t NewValue = 0, iunknown* const Hint = 0)
+	void reset(value_t NewValue = 0, ihint* const Hint = 0)
 	{
 		// Ensure that our value doesn't go out-of-scope while it's getting initialized ...
 		if(m_executing)
@@ -2010,7 +2011,7 @@ protected:
 
 private:
 	/// Resets the underlying data so it will be created-again next read
-	void internal_reset(iunknown* const Hint = 0)
+	void internal_reset(ihint* const Hint = 0)
 	{
 		// Ensure that our value doesn't go out-of-scope while it's getting initialized ...
 		if(m_executing)
@@ -2058,19 +2059,19 @@ public:
 	}
 
 	/// Returns a slot that will invoke the reset() method
-	sigc::slot<void, iunknown*> make_reset_slot()
+	sigc::slot<void, ihint*> make_reset_slot()
 	{
 		return sigc::bind<0>(sigc::mem_fun(*this, &this_t::reset), static_cast<pointer_t>(0));
 	}
 
 	/// Returns a slot that will invoke the update() method
-	sigc::slot<void, iunknown*> make_update_slot()
+	sigc::slot<void, ihint*> make_update_slot()
 	{
 		return sigc::mem_fun(*this, &this_t::update);
 	}
 
 	/// Store an object as the new value, taking control of its lifetime
-	void reset(pointer_t NewValue = 0, iunknown* const Hint = 0)
+	void reset(pointer_t NewValue = 0, ihint* const Hint = 0)
 	{
 		// Ensure that our value doesn't go out-of-scope while it's being modified
 		if(m_executing)
@@ -2081,7 +2082,7 @@ public:
 	}
 
 	/// Schedule an update for the value the next time it's read
-	void update(iunknown* const Hint = 0)
+	void update(ihint* const Hint = 0)
 	{
 		// Ensure that our value doesn't go out-of-scope while it's being modified
 		if(m_executing)
@@ -2157,13 +2158,13 @@ public:
 	BOOST_STATIC_ASSERT((!boost::is_pointer<value_t>::value));
 
 	/// Returns a slot that will invoke the reset() method
-	sigc::slot<void, iunknown*> make_reset_slot()
+	sigc::slot<void, ihint*> make_reset_slot()
 	{
 		return sigc::mem_fun(*this, &computed_storage<value_t, signal_policy_t>::reset);
 	}
 
 	/// Resets the underlying data so it will be recalculated the next time it's read
-	void reset(iunknown* const Hint = 0)
+	void reset(ihint* const Hint = 0)
 	{
 		if(m_executing)
 			return;
@@ -2225,7 +2226,7 @@ protected:
 	{
 	}
 
-	void set_value(iunknown* const Hint)
+	void set_value(ihint* const Hint)
 	{
 	}
 
@@ -2243,7 +2244,7 @@ class change_signal
 {
 public:
 	/// Defines a signal emitted when the underlying data changes.  The signal includes an optional "hint" that describes the nature of the change.
-	typedef sigc::signal<void, iunknown*> changed_signal_t;
+	typedef sigc::signal<void, ihint*> changed_signal_t;
 
 	/// Returns a reference to the signal that is emitted whenever the underlying data changes
 	changed_signal_t& changed_signal()
@@ -2261,15 +2262,15 @@ protected:
 	{
 	}
 
-	void set_value(iunknown* const Hint)
+	void set_value(ihint* const Hint)
 	{
 		m_changed_signal.emit(Hint);
 	}
 
 	void finish_recording(istate_recorder& StateRecorder)
 	{
-		StateRecorder.current_change_set()->connect_undo_signal(sigc::bind(m_changed_signal.make_slot(), static_cast<iunknown*>(0)));
-		StateRecorder.current_change_set()->connect_redo_signal(sigc::bind(m_changed_signal.make_slot(), static_cast<iunknown*>(0)));
+		StateRecorder.current_change_set()->connect_undo_signal(sigc::bind(m_changed_signal.make_slot(), static_cast<ihint*>(0)));
+		StateRecorder.current_change_set()->connect_redo_signal(sigc::bind(m_changed_signal.make_slot(), static_cast<ihint*>(0)));
 	}
 
 private:
@@ -2282,7 +2283,7 @@ class explicit_change_signal
 {
 public:
 	/// Defines a signal emitted when the underlying data changes.  The signal includes an optional "hint" that describes the nature of the change.
-	typedef sigc::signal<void, k3d::iunknown*> changed_signal_t;
+	typedef sigc::signal<void, k3d::ihint*> changed_signal_t;
 
 	/// Returns a reference to the signal that is emitted whenever the underlying data changes.
 	changed_signal_t& changed_signal()
@@ -2291,7 +2292,7 @@ public:
 	}
 
 	/// Connects a slot to a signal that is emitted whenever the underlying data is modified explicitly through set_value, never by undo/redo
-	const sigc::connection connect_explicit_change_signal(const sigc::slot<void, k3d::iunknown*>& Slot)
+	const sigc::connection connect_explicit_change_signal(const sigc::slot<void, k3d::ihint*>& Slot)
 	{
 		return m_explicit_change_signal.connect(Slot);
 	}
@@ -2306,7 +2307,7 @@ protected:
 	{
 	}
 
-	void set_value(k3d::iunknown* const Hint)
+	void set_value(k3d::ihint* const Hint)
 	{
 		m_changed_signal.emit(Hint);
 		m_explicit_change_signal.emit(Hint);
@@ -2314,8 +2315,8 @@ protected:
 
 	void finish_recording(k3d::istate_recorder& StateRecorder)
 	{
-		StateRecorder.current_change_set()->connect_undo_signal(sigc::bind(m_changed_signal.make_slot(), static_cast<k3d::iunknown*>(0)));
-		StateRecorder.current_change_set()->connect_redo_signal(sigc::bind(m_changed_signal.make_slot(), static_cast<k3d::iunknown*>(0)));
+		StateRecorder.current_change_set()->connect_undo_signal(sigc::bind(m_changed_signal.make_slot(), static_cast<k3d::ihint*>(0)));
+		StateRecorder.current_change_set()->connect_redo_signal(sigc::bind(m_changed_signal.make_slot(), static_cast<k3d::ihint*>(0)));
 	}
 
 private:

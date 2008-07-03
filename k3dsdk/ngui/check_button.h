@@ -59,7 +59,7 @@ public:
 	/// Called to set a new data value
 	virtual void set_value(const bool Value) = 0;
 	/// Signal emitted if the underlying data changes
-	typedef sigc::signal<void, k3d::iunknown*> changed_signal_t;
+	typedef sigc::signal<void, k3d::ihint*> changed_signal_t;
 	/// Signal emitted if the underlying data changes
 	virtual changed_signal_t& changed_signal() = 0;
 
@@ -101,7 +101,7 @@ private:
 	/// Common construction code
 	void attach();
 	/// Called to update the state of the widget when the underlying data source changes
-	void update(k3d::iunknown*);
+	void update(k3d::ihint*);
 	/// Storeas a reference to the underlying data object
 	const std::auto_ptr<idata_proxy> m_data;
 };

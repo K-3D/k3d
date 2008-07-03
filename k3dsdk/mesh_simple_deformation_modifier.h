@@ -45,7 +45,7 @@ private:
 	void on_update_mesh(const mesh& Input, mesh& Output);
 	
 	/// Executed when the selection changed
-	void on_selection_changed(iunknown* Hint);
+	void on_selection_changed(ihint* Hint);
 
 	/// Implement this method in derived classes and deform the output mesh using its input points and selection.
 	virtual void on_deform_mesh(const mesh::points_t& InputPoints, const mesh::selection_t& PointSelection, mesh::points_t& OutputPoints) = 0;

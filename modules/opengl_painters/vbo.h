@@ -204,7 +204,7 @@ protected:
 		schedule_data<sds_cache>(m_mesh, Hint, Painter);
 	}
 private:
-	void clear(k3d::iunknown* Hint = 0)
+	void clear(k3d::ihint* Hint = 0)
 	{
 		m_caches.clear();
 	}

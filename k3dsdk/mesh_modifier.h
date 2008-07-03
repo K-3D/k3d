@@ -64,12 +64,12 @@ public:
 		return m_input_mesh;
 	}
 
-	sigc::slot<void, iunknown*> make_reset_mesh_slot()
+	sigc::slot<void, ihint*> make_reset_mesh_slot()
 	{
 		return m_output_mesh.make_reset_slot();
 	}
 
-	sigc::slot<void, iunknown*> make_update_mesh_slot()
+	sigc::slot<void, ihint*> make_update_mesh_slot()
 	{
 		return m_output_mesh.make_update_slot();
 	}

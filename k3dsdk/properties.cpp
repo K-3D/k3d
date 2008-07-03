@@ -94,7 +94,7 @@ struct null_property_collection :
 		return properties;
 	}
 
-	sigc::connection connect_properties_changed_signal(const sigc::slot<void, iunknown*>& Slot)
+	sigc::connection connect_properties_changed_signal(const sigc::slot<void, ihint*>& Slot)
 	{
 		return sigc::connection();
 	}
@@ -504,7 +504,7 @@ public:
 		m_dependency = Dependency;
 	}
 
-	bool property_set_value(const boost::any Value, iunknown* const Hint)
+	bool property_set_value(const boost::any Value, ihint* const Hint)
 	{
 		const value_t* const new_value = boost::any_cast<value_t>(&Value);
 		if(!new_value)
@@ -622,7 +622,7 @@ public:
 		m_dependency = Dependency;
 	}
 
-	bool property_set_value(const boost::any Value, iunknown* const Hint)
+	bool property_set_value(const boost::any Value, ihint* const Hint)
 	{
 		const value_t* const new_value = boost::any_cast<value_t>(&Value);
 		if(!new_value)

@@ -35,7 +35,7 @@
 
 #include <memory>
 
-// Forward declarations
+namespace k3d { class ihint; }
 namespace k3d { class istate_recorder; }
 
 namespace libk3dngui
@@ -58,7 +58,7 @@ public:
 	/// Called to set a new data value
 	virtual void set_value(const std::string Value) = 0;
 	/// Signal emitted if the underlying data changes
-	typedef sigc::signal<void, k3d::iunknown*> changed_signal_t;
+	typedef sigc::signal<void, k3d::ihint*> changed_signal_t;
 	/// Signal emitted if the underlying data changes
 	virtual changed_signal_t& changed_signal() = 0;
 
@@ -100,7 +100,7 @@ private:
 	Gtk::Button m_edit;
 
 	/// Called to update the state of the widget when the underlying data source changes
-	void update(k3d::iunknown*);
+	void update(k3d::ihint*);
 	/// Called to replace the current data with a script from disk
 	void on_load();
 	/// Called to store the current data to disk

@@ -62,12 +62,12 @@ public:
 		return m_output;
 	}
 
-	sigc::slot<void, k3d::iunknown*> make_reset_graph_slot()
+	sigc::slot<void, k3d::ihint*> make_reset_graph_slot()
 	{
 		return m_output.make_reset_slot();
 	}
 
-	sigc::slot<void, k3d::iunknown*> make_update_graph_slot()
+	sigc::slot<void, k3d::ihint*> make_update_graph_slot()
 	{
 		return m_output.make_update_slot();
 	}

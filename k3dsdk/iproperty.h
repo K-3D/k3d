@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
+#include "ihint.h"
 #include "signal_system.h"
 #include "types.h"
 
@@ -57,7 +57,7 @@ public:
 	/// Returns a reference to the object that owns the property (if any)
 	virtual inode* property_node() = 0;
 	/// Defines a signal that will be emitted if the property value changes.  The signal includes a pointer to an optional "hint" object that may provide additional information about what changed.
-	typedef sigc::signal<void, iunknown*> changed_signal_t;
+	typedef sigc::signal<void, ihint*> changed_signal_t;
 	virtual changed_signal_t& property_changed_signal() = 0;
 	/// Defines a signal that will be emitted when the property is destroyed
 	typedef sigc::signal<void> deleted_signal_t;

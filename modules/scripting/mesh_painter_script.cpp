@@ -79,7 +79,7 @@ public:
 		k3d::gl::pop_selection_token();
 	}
 
-	void mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	void mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
 	}
 

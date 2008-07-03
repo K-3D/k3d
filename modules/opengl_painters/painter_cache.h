@@ -72,7 +72,7 @@ template<class data_t, class key_t=const k3d::mesh* const> class painter_cache
 		}
 
 		/// Schedule a cache creation/update for the given key
-		void schedule_data(key_t Key, k3d::iunknown* Hint, k3d::inode* Painter)
+		void schedule_data(key_t Key, k3d::ihint* Hint, k3d::inode* Painter)
 		{
 			if(dynamic_cast<k3d::hint::mesh_deleted_t*>(Hint))
 			{
@@ -177,7 +177,7 @@ template<class data_t> data_t& get_data(const k3d::mesh* const Key, k3d::inode* 
 }
 
 /// Convenience function to easily schedule cache storage
-template<class data_t> void schedule_data(const k3d::mesh* const Key, k3d::iunknown* Hint, k3d::inode* Painter)
+template<class data_t> void schedule_data(const k3d::mesh* const Key, k3d::ihint* Hint, k3d::inode* Painter)
 {
 	painter_cache<data_t>::instance(Painter->document()).schedule_data(Key, Hint, Painter);
 }

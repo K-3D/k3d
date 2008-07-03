@@ -29,6 +29,7 @@
 namespace k3d
 {
 
+class ihint;
 class mesh;
 
 namespace gl
@@ -47,7 +48,7 @@ public:
 	/// Called to render a mesh for interactive selection
 	virtual void select_mesh(const mesh& Mesh, const painter_render_state& RenderState, const painter_selection_state& SelectionState) = 0;
 	/// Called when a mesh changes to allow painters to clear any cached data
-	virtual void mesh_changed(const mesh& Mesh, iunknown* Hint) = 0;
+	virtual void mesh_changed(const mesh& Mesh, ihint* Hint) = 0;
 };
 
 } // namespace gl

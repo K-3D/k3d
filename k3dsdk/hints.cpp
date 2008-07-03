@@ -35,6 +35,11 @@ namespace hint
 //////////////////////////////////////////////////////////////////////////////
 // selection_changed
 
+void selection_changed_t::print(std::ostream& Stream)
+{
+	Stream << "selection_changed_t";
+}
+
 selection_changed_t* selection_changed()
 {
 	static selection_changed_t hint;
@@ -43,6 +48,11 @@ selection_changed_t* selection_changed()
 
 //////////////////////////////////////////////////////////////////////////////
 // mesh_geometry_changed
+
+void mesh_geometry_changed_t::print(std::ostream& Stream)
+{
+	Stream << "mesh_geometry_changed_t";
+}
 
 mesh_geometry_changed_t* mesh_geometry_changed()
 {
@@ -53,6 +63,11 @@ mesh_geometry_changed_t* mesh_geometry_changed()
 //////////////////////////////////////////////////////////////////////////////
 // mesh_topology_changed
 
+void mesh_topology_changed_t::print(std::ostream& Stream)
+{
+	Stream << "mesh_topology_changed_t";
+}
+
 mesh_topology_changed_t* mesh_topology_changed()
 {
 	static mesh_topology_changed_t hint;
@@ -61,6 +76,11 @@ mesh_topology_changed_t* mesh_topology_changed()
 
 //////////////////////////////////////////////////////////////////////////////
 // mesh_deleted
+
+void mesh_deleted_t::print(std::ostream& Stream)
+{
+	Stream << "mesh_deleted_t";
+}
 
 mesh_deleted_t* mesh_deleted()
 {
@@ -71,7 +91,7 @@ mesh_deleted_t* mesh_deleted()
 //////////////////////////////////////////////////////////////////////////////
 // print
 
-print::print(iunknown* Hint) :
+print::print(ihint* Hint) :
 	hint(Hint)
 {
 }
@@ -79,28 +99,9 @@ print::print(iunknown* Hint) :
 std::ostream& operator<<(std::ostream& Stream, const print& RHS)
 {
 	if(RHS.hint)
-	{
-		if(dynamic_cast<selection_changed_t*>(RHS.hint))
-		{
-			Stream << "hint: selection changed";
-		}
-		else if(dynamic_cast<mesh_geometry_changed_t*>(RHS.hint))
-		{
-			Stream << "hint: mesh geometry changed";
-		}
-		else if(dynamic_cast<mesh_topology_changed_t*>(RHS.hint))
-		{
-			Stream << "hint: mesh topology changed";
-		}
-		else
-		{
-			Stream << "hint: " << typeid(*RHS.hint).name();
-		}
-	}
+		RHS.hint->print(Stream);
 	else
-	{
-		Stream << "hint: (none)";
-	}
+		Stream << "(none)";
 	
 	return Stream;
 }

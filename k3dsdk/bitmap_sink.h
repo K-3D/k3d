@@ -38,7 +38,7 @@ public:
 		return m_input_bitmap;
 	}
 
-	sigc::slot<void, iunknown*> make_input_changed_slot()
+	sigc::slot<void, ihint*> make_input_changed_slot()
 	{
 		return sigc::mem_fun(*this, &bitmap_sink<derived_t>::input_changed);
 	}
@@ -58,12 +58,12 @@ protected:
 	k3d_data(bitmap*, data::immutable_name, data::change_signal, data::no_undo, data::local_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_input_bitmap;
 
 private:
-	void input_changed(k3d::iunknown* Hint)
+	void input_changed(k3d::ihint* Hint)
 	{
 		on_input_changed(Hint);
 	}
 
-	virtual void on_input_changed(k3d::iunknown*) = 0;
+	virtual void on_input_changed(k3d::ihint*) = 0;
 };
 
 } // namespace k3d

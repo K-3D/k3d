@@ -83,7 +83,7 @@ const iproperty_collection::properties_t& property_collection::properties()
 	return m_properties;
 }
 
-sigc::connection property_collection::connect_properties_changed_signal(const sigc::slot<void, iunknown*>& Slot)
+sigc::connection property_collection::connect_properties_changed_signal(const sigc::slot<void, ihint*>& Slot)
 {
 	return m_changed_signal.connect(Slot);
 }

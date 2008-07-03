@@ -66,7 +66,7 @@ public:
 		m_levels.changed_signal().connect(sigc::mem_fun(*this, &sds_painter<selection_t>::on_levels_changed));
 	}
 	
-	void on_levels_changed(k3d::iunknown* Hint)
+	void on_levels_changed(k3d::ihint* Hint)
 	{
 		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
@@ -98,7 +98,7 @@ public:
 		select(Mesh, get_data<sds_cache>(&Mesh, this).cache(), SelectionState);
 	}
 	
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
 		if(!k3d::validate_polyhedra(Mesh))
 			return;

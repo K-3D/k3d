@@ -108,7 +108,7 @@ public:
 			glDeleteObjectARB(m_program_object);
 	}
 
-	void on_shader_source_changed(k3d::iunknown* Hint)
+	void on_shader_source_changed(k3d::ihint* Hint)
 	{
 		if(m_program_object)
 		{
@@ -165,7 +165,7 @@ public:
 		}
 	}
 	
-	void mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	void mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)

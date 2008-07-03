@@ -123,7 +123,7 @@ public:
 		}
 	}
 	
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
 		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}

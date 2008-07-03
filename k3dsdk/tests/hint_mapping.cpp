@@ -1,4 +1,7 @@
-#include <k3dsdk/iunknown.h>
+#include <k3dsdk/bitmap.h>
+#include <k3dsdk/color.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/signal_system.h>
 #include <k3dsdk/types.h>
 
@@ -6,20 +9,6 @@
 
 namespace k3d
 {
-
-/// Abstract interface implemented by objects that can act as "hints" for change events
-class ihint :
-	public virtual iunknown
-{
-public:
-	virtual void print(std::ostream& Stream) = 0;
-
-protected:
-	ihint() {}
-	ihint(const ihint&) {}
-	ihint& operator=(const ihint&) { return *this; }
-	virtual ~ihint() {}
-};
 
 namespace hint
 {
@@ -155,36 +144,6 @@ public:
 	}
 };
 
-/// iostream-compatible manipulator object that serializes information about a hint object
-class print
-{
-public:
-	print(ihint* Hint);
-
-	ihint* const hint;
-};
-
-/// Stream serialization
-std::ostream& operator<<(std::ostream& Stream, const print& RHS);
-
-//////////////////////////////////////////////////////////////////////////////
-// print
-
-print::print(ihint* Hint) :
-	hint(Hint)
-{
-}
-
-std::ostream& operator<<(std::ostream& Stream, const print& RHS)
-{
-	if(RHS.hint)
-		RHS.hint->print(Stream);
-	else
-		Stream << "(none)";
-	
-	return Stream;
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // last_conversion
 
@@ -275,44 +234,44 @@ void signal_changed(k3d::ihint* Hint, const k3d::string_t& Message)
 int main(int argc, char* arv[])
 {
 	// Setup some example signals ...
-	sigc::signal<void, k3d::ihint*> input_bitmap;
-	sigc::signal<void, k3d::ihint*> border;
-	sigc::signal<void, k3d::ihint*> color;
-	sigc::signal<void, k3d::ihint*> output_bitmap;
+	k3d_data(k3d::bitmap*, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) input_bitmap(init_value<k3d::bitmap*>(0));
+	k3d_data(k3d::uint32_t, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) border(init_value<k3d::uint32_t>(0));
+	k3d_data(k3d::color, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) color(init_value(k3d::color(0, 0, 0)));
+	k3d_data(k3d::bitmap*, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) output_bitmap(init_value<k3d::bitmap*>(0));
 
 	// We want to print to the console whenever a signal is emitted ...
-	input_bitmap.connect(sigc::bind(sigc::ptr_fun(signal_changed), "input changed"));
-	border.connect(sigc::bind(sigc::ptr_fun(signal_changed), "border changed"));
-	color.connect(sigc::bind(sigc::ptr_fun(signal_changed), "color changed"));
-	output_bitmap.connect(sigc::bind(sigc::ptr_fun(signal_changed), "output changed"));
+	input_bitmap.changed_signal().connect(sigc::bind(sigc::ptr_fun(signal_changed), "input changed"));
+	border.changed_signal().connect(sigc::bind(sigc::ptr_fun(signal_changed), "border changed"));
+	color.changed_signal().connect(sigc::bind(sigc::ptr_fun(signal_changed), "color changed"));
+	output_bitmap.changed_signal().connect(sigc::bind(sigc::ptr_fun(signal_changed), "output changed"));
 
 	// Setup our "network" of mappings from input signals to output signals ...
-	k3d::hint::connect(input_bitmap, k3d::hint::converter<
+	k3d::hint::connect(input_bitmap.changed_signal(), k3d::hint::converter<
 		k3d::hint::convert<k3d::hint::bitmap_dimensions_changed, k3d::hint::unchanged,
 		k3d::hint::convert<k3d::hint::bitmap_pixels_changed, k3d::hint::unchanged,
-		k3d::hint::convert<k3d::hint::any, k3d::hint::none> > > >(output_bitmap.make_slot()));
+		k3d::hint::convert<k3d::hint::any, k3d::hint::none> > > >(output_bitmap.changed_signal().make_slot()));
 
-	k3d::hint::connect(border, k3d::hint::converter<
-		k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_dimensions_changed> >(output_bitmap.make_slot()));
+	k3d::hint::connect(border.changed_signal(), k3d::hint::converter<
+		k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_dimensions_changed> >(output_bitmap.changed_signal().make_slot()));
 
-	k3d::hint::connect(color, k3d::hint::converter<
-		k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(output_bitmap.make_slot()));
+	k3d::hint::connect(color.changed_signal(), k3d::hint::converter<
+		k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(output_bitmap.changed_signal().make_slot()));
 
 	// Exercise the hint-mapping network ...
 	std::cerr << "****************" << std::endl;
-	input_bitmap.emit(&k3d::hint::bitmap_dimensions_changed());
+	input_bitmap.changed_signal().emit(&k3d::hint::bitmap_dimensions_changed());
 
 	std::cerr << "****************" << std::endl;
-	input_bitmap.emit(&k3d::hint::bitmap_pixels_changed());
+	input_bitmap.changed_signal().emit(&k3d::hint::bitmap_pixels_changed());
 
 	std::cerr << "****************" << std::endl;
-	input_bitmap.emit(0);
+	input_bitmap.changed_signal().emit(0);
 
 	std::cerr << "****************" << std::endl;
-	border.emit(0);
+	border.changed_signal().emit(0);
 
 	std::cerr << "****************" << std::endl;
-	color.emit(0);
+	color.changed_signal().emit(0);
 
 	return 0;
 }

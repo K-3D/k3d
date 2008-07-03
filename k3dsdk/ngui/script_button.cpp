@@ -126,7 +126,7 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	m_data->changed_signal().connect(sigc::mem_fun(*this, &control::update));
 }
 
-void control::update(k3d::iunknown*)
+void control::update(k3d::ihint*)
 {
 	return_if_fail(m_data.get());
 }

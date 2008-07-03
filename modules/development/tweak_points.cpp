@@ -66,7 +66,7 @@ public:
 		m_tweaks.changed_signal().connect(sigc::mem_fun(*this, &tweak_points::on_tweaks_changed));
 	}
 	
-	void on_matrix_changed(k3d::iunknown* Hint)
+	void on_matrix_changed(k3d::ihint* Hint)
 	{
 		m_hint.transformation_matrix = m_matrix.pipeline_value();
 		m_output_mesh.update(&m_hint);
@@ -126,13 +126,13 @@ public:
 		}
 	}
 	
-	virtual iunknown* hint() const
+	virtual k3d::ihint* hint() const
 	{
 		return k3d::hint::mesh_geometry_changed();
 	}
 	
 	/// Update affected mesh components in the hint. This needs to be done only when the selection changed
-	void on_selected_points_changed(k3d::iunknown* Hint)
+	void on_selected_points_changed(k3d::ihint* Hint)
 	{
 		const k3d::mesh::indices_t selected_points = m_selected_points.pipeline_value();
 		const size_t selected_count = selected_points.size();
@@ -151,7 +151,7 @@ public:
 	}
 
 	/// Needed for undo
-	void on_tweaks_changed(k3d::iunknown* Hint)
+	void on_tweaks_changed(k3d::ihint* Hint)
 	{
 		if (!m_input_points)
 			return;
@@ -279,7 +279,15 @@ private:
 	bool m_selection_copied;
 
 	/// Used to pass along the fact that we are doing an internal update on the tweaks
-	class internal_update_hint : public k3d::iunknown {};
+	class internal_update_hint : public k3d::ihint
+	{
+	public:
+		void print(std::ostream& Stream)
+		{
+			Stream << "internal_update_hint";
+		}
+	};
+
 	/// Convenience function to get a static instance of the above hint
 	internal_update_hint* update_hint()
 	{

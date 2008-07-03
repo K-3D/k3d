@@ -73,7 +73,7 @@ public:
 			glDeleteTextures(1, &m_texture_name);
 	}
 
-	void bitmap_changed(iunknown* Hint)
+	void bitmap_changed(k3d::ihint* Hint)
 	{
 		if(m_texture_name)
 		{
@@ -84,7 +84,7 @@ public:
 		async_redraw(Hint);
 	}
 
-	void async_redraw(iunknown*)
+	void async_redraw(k3d::ihint*)
 	{
 		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
@@ -234,7 +234,7 @@ public:
 		}
 	}
 	
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
 		if(!k3d::validate_polyhedra(Mesh))
 			return;

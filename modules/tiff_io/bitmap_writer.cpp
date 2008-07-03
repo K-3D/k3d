@@ -65,7 +65,7 @@ public:
 		}
 	};
 
-	void on_input_changed(k3d::iunknown*)
+	void on_input_changed(k3d::ihint*)
 	{
 		const k3d::filesystem::path file = m_file.pipeline_value();
 		if(file.empty())

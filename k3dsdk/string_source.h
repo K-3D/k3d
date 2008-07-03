@@ -36,7 +36,7 @@ public:
 		return m_output_string;
 	}
 
-	sigc::slot<void, iunknown*> make_reset_string_slot()
+	sigc::slot<void, ihint*> make_reset_string_slot()
 	{
 		return m_output_string.make_reset_slot();
 	}

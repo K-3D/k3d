@@ -53,12 +53,12 @@ public:
 		return m_output_mesh;
 	}
 
-	sigc::slot<void, iunknown*> make_topology_changed_slot()
+	sigc::slot<void, ihint*> make_topology_changed_slot()
 	{
 		return sigc::mem_fun(*this, &mesh_source<base_t>::mesh_topology_changed);
 	}
 
-	sigc::slot<void, iunknown*> make_geometry_changed_slot()
+	sigc::slot<void, ihint*> make_geometry_changed_slot()
 	{
 		return sigc::mem_fun(*this, &mesh_source<base_t>::mesh_geometry_changed);
 	}
@@ -66,12 +66,12 @@ public:
 protected:
 	k3d_data(mesh*, data::immutable_name, data::change_signal, data::no_undo, data::pointer_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
 
-	void mesh_topology_changed(iunknown* const Hint)
+	void mesh_topology_changed(ihint* const Hint)
 	{
 		m_output_mesh.reset(0, hint::mesh_topology_changed());
 	}
 
-	void mesh_geometry_changed(iunknown* const Hint)
+	void mesh_geometry_changed(ihint* const Hint)
 	{
 		m_output_mesh.update(hint::mesh_geometry_changed());
 	}

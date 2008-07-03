@@ -42,7 +42,7 @@ public:
 	~pipeline();
 
 	// ipipeline methods
-	void set_dependencies(dependencies_t& Dependencies, iunknown* Hint = 0);
+	void set_dependencies(dependencies_t& Dependencies, ihint* Hint = 0);
 	iproperty* dependency(iproperty& Property);
 	const dependencies_t& dependencies();
 	dependency_signal_t& dependency_signal();

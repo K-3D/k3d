@@ -32,6 +32,7 @@
 #include <gtkmm/buttonbox.h>
 
 namespace Gtk { class Image; }
+namespace k3d { class ihint; }
 namespace k3d { class iproperty; }
 
 namespace libk3dngui
@@ -52,7 +53,7 @@ public:
 	/// Called to return the underlying data value
 	virtual k3d::bitmap* value() = 0;
 	/// Signal emitted if the underlying data changes
-	typedef sigc::signal<void, k3d::iunknown*> changed_signal_t;
+	typedef sigc::signal<void, k3d::ihint*> changed_signal_t;
 	/// Signal emitted if the underlying data changes
 	virtual changed_signal_t& changed_signal() = 0;
 
@@ -77,7 +78,7 @@ public:
 
 private:
 	/// Called whenever the underlying data changes
-	void data_changed(k3d::iunknown*);
+	void data_changed(k3d::ihint*);
 
 	boost::gil::rgb8_image_t m_image_buffer;
 	boost::gil::rgb8_image_t m_alpha_buffer;

@@ -23,7 +23,7 @@
 namespace k3d
 {
 
-class iunknown;
+class ihint;
 
 namespace signal
 {
@@ -48,7 +48,7 @@ public:
 		emitting = false;
 	}
 
-	void operator()(iunknown* const Hint)
+	void operator()(ihint* const Hint)
 	{
 		if(emitting)
 			return;

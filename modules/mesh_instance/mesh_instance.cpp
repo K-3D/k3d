@@ -93,12 +93,12 @@ public:
 		document().close_signal().connect(sigc::mem_fun(*this, &mesh_instance::disconnect));
 	}
 
-	sigc::slot<void, iunknown*> make_mesh_changed_slot()
+	sigc::slot<void, k3d::ihint*> make_mesh_changed_slot()
 	{
 		return sigc::mem_fun(*this, &mesh_instance::mesh_changed);
 	}
 	
-	sigc::slot<void, iunknown*> make_selection_changed_slot()
+	sigc::slot<void, k3d::ihint*> make_selection_changed_slot()
 	{
 		return sigc::mem_fun(*this, &mesh_instance::selection_changed);
 	}
@@ -111,7 +111,7 @@ public:
 	}
 	
 	/// Executed when the input mesh changed
-	void mesh_changed(k3d::iunknown* Hint)
+	void mesh_changed(k3d::ihint* Hint)
 	{
 		if (m_document_closed)
 			return;
@@ -131,7 +131,7 @@ public:
 		mesh_changed(k3d::hint::mesh_deleted());
 	}
 
-	void selection_changed(iunknown* const Hint)
+	void selection_changed(k3d::ihint* const Hint)
 	{
 		mesh_changed(k3d::hint::selection_changed());
 	}

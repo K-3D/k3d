@@ -52,7 +52,7 @@ public:
 		clear();
 	}
 
-	void set_dependencies(dependencies_t& Dependencies, iunknown* Hint = 0)
+	void set_dependencies(dependencies_t& Dependencies, ihint* Hint = 0)
 	{
 		// Don't let any NULLs creep in ...
 		if(Dependencies.erase(static_cast<iproperty*>(0)))
@@ -231,7 +231,7 @@ pipeline::~pipeline()
 	delete m_implementation;
 }
 
-void pipeline::set_dependencies(dependencies_t& Dependencies, iunknown* Hint)
+void pipeline::set_dependencies(dependencies_t& Dependencies, ihint* Hint)
 {
 	m_implementation->set_dependencies(Dependencies, Hint);
 }

@@ -62,7 +62,7 @@ public:
 			on_select_mesh(Mesh, RenderState, SelectionState);
 	}
 
-	void mesh_changed(const mesh& Mesh, iunknown* Hint)
+	void mesh_changed(const mesh& Mesh, ihint* Hint)
 	{
 		// Note - on_mesh_changed() is always called whether we're enabled or not to prevent caching of stale data
 		on_mesh_changed(Mesh, Hint);
@@ -70,13 +70,13 @@ public:
 
 protected:
 	/// Returns a slot that will schedule an asynchronous screen update when called
-	sigc::slot<void, iunknown*> make_async_redraw_slot()
+	sigc::slot<void, ihint*> make_async_redraw_slot()
 	{
 		return sigc::mem_fun(*this, &mesh_painter::async_redraw);
 	}
 
 	/// Schedules an asynchronous screen update
-	void async_redraw(iunknown*)
+	void async_redraw(ihint*)
 	{
 		redraw_all(document(), irender_viewport::ASYNCHRONOUS);
 	}
@@ -92,7 +92,7 @@ protected:
 	}
 
 	/// Implement this in derived classes to clear cached data when a mesh changes
-	virtual void on_mesh_changed(const mesh& Mesh, iunknown* Hint)
+	virtual void on_mesh_changed(const mesh& Mesh, ihint* Hint)
 	{
 	}
 

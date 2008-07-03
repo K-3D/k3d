@@ -54,7 +54,7 @@ public:
 	}
 	
 	/// Clears cached valencies and companions if the mesh topology is changed
-	void mesh_changed(k3d::iunknown* Hint)
+	void mesh_changed(k3d::ihint* Hint)
 	{
 		if (!Hint || dynamic_cast<k3d::hint::mesh_topology_changed_t*>(Hint))
 		{

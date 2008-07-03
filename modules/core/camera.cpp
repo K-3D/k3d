@@ -193,7 +193,7 @@ public:
 		return m_crop_window_bottom;
 	}
 
-	void on_aspect_ratio_changed(k3d::iunknown*)
+	void on_aspect_ratio_changed(k3d::ihint*)
 	{
 		const std::string new_ratio = m_aspect_ratio.pipeline_value();
 
@@ -214,7 +214,7 @@ public:
 		assert_not_reached();
 	}
 
-	void on_position_changed(k3d::iunknown* const Hint)
+	void on_position_changed(k3d::ihint* const Hint)
 	{
 		m_target_distance.reset(Hint);
 	}

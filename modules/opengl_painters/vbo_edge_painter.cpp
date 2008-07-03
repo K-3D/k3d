@@ -150,7 +150,7 @@ public:
 		clean_vbo_state();
 	}
 	
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 		

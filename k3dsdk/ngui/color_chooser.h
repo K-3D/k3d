@@ -57,7 +57,7 @@ public:
 	/// Called to set a new data value
 	virtual void set_value(const k3d::color Value) = 0;
 	/// Signal emitted if the underlying data changes
-	typedef sigc::signal<void, k3d::iunknown*> changed_signal_t;
+	typedef sigc::signal<void, k3d::ihint*> changed_signal_t;
 	/// Signal emitted if the underlying data changes
 	virtual changed_signal_t& changed_signal() = 0;
 
@@ -103,7 +103,7 @@ private:
 	/// Called when the user clicks on the control
 	void on_clicked();
 	/// Called whenever the underlying data changes
-	void data_changed(k3d::iunknown*);
+	void data_changed(k3d::ihint*);
 
 	/// Displays the currently color
 	Gtk::DrawingArea* const m_area;

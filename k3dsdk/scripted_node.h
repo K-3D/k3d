@@ -56,7 +56,7 @@ protected:
 		m_script.set_value(Script);
 	}
 
-	void connect_script_changed_signal(const sigc::slot<void, iunknown*>& Slot)
+	void connect_script_changed_signal(const sigc::slot<void, ihint*>& Slot)
 	{
 		m_script.changed_signal().connect(Slot);
 		m_user_property_changed_signal.connect(Slot);
@@ -102,7 +102,7 @@ private:
 		bool_t& executing;
 	};
 
-	void on_script_changed(iunknown* hint)
+	void on_script_changed(ihint* hint)
 	{
 		m_script_engine.reset();
 	}

@@ -184,7 +184,7 @@ void control::on_select_null()
 		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), _("Clear Selection"), K3D_CHANGE_SET_CONTEXT);
 }
 
-void control::update(k3d::iunknown*)
+void control::update(k3d::ihint*)
 {
 	if(!m_data.get())
 		return;

@@ -25,7 +25,7 @@
 */
 
 #include "algebra.h"
-#include "iunknown.h"
+#include "ihint.h"
 #include "mesh_selection.h"
 #include "mesh.h"
 
@@ -44,8 +44,10 @@ namespace hint
 
 /// Hint object that indicates that an object's selection state has changed
 class selection_changed_t :
-	public iunknown
+	public ihint
 {
+public:
+	void print(std::ostream& Stream);
 };
 
 /// Convenience function that returns a reference to a static instance of selection_changed_t
@@ -53,10 +55,10 @@ selection_changed_t* selection_changed();
 
 /// Hint object that indicates that a mesh's geometry (the locations of its points) has changed
 class mesh_geometry_changed_t :
-	public iunknown
+	public ihint
 {
 public:
-	mesh_geometry_changed_t() {}
+	void print(std::ostream& Stream);
 	/// Indices of the points affected by the change
 	k3d::mesh::indices_t changed_points;
 	/// Transformation matrix used for the change
@@ -68,8 +70,10 @@ mesh_geometry_changed_t* mesh_geometry_changed();
 
 /// Hint object that indicates that a mesh's topology has changed
 class mesh_topology_changed_t :
-	public iunknown
+	public ihint
 {
+public:
+	void print(std::ostream& Stream);
 };
 
 /// Convenience function that returns a reference to a static instance of mesh_topology_changed_t
@@ -77,8 +81,10 @@ mesh_topology_changed_t* mesh_topology_changed();
 
 /// Hint object that indicates a mesh was deleted
 class mesh_deleted_t :
-	public iunknown
+	public ihint
 {
+public:
+	void print(std::ostream& Stream);
 };
 
 /// Convenience function that returns a reference to a static instance of mesh_deleted_t
@@ -88,9 +94,9 @@ mesh_deleted_t* mesh_deleted();
 class print
 {
 public:
-	print(iunknown* Hint);
+	print(ihint* Hint);
 
-	iunknown* const hint;
+	ihint* const hint;
 };
 
 /// Stream serialization

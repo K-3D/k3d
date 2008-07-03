@@ -25,7 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
+#include "ihint.h"
 #include "signal_system.h"
 
 #include <vector>
@@ -56,7 +56,7 @@ public:
 	/// Returns the set of all properties in the collection
 	virtual const properties_t& properties() = 0;
 	/// Connects a slot to a signal emitted whenever the collection changes - note: the signal is emitted when the collection changes (properties are registered and unregistered), not when individual property values are changed
-	virtual sigc::connection connect_properties_changed_signal(const sigc::slot<void, iunknown*>& Slot) = 0;
+	virtual sigc::connection connect_properties_changed_signal(const sigc::slot<void, ihint*>& Slot) = 0;
 
 protected:
 	iproperty_collection() {}

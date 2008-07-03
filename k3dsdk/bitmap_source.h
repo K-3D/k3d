@@ -38,12 +38,12 @@ public:
 		return m_output_bitmap;
 	}
 
-	sigc::slot<void, iunknown*> make_reset_bitmap_slot()
+	sigc::slot<void, ihint*> make_reset_bitmap_slot()
 	{
 		return m_output_bitmap.make_reset_slot();
 	}
 
-	sigc::slot<void, iunknown*> make_update_bitmap_slot()
+	sigc::slot<void, ihint*> make_update_bitmap_slot()
 	{
 		return sigc::mem_fun(*this, &bitmap_source<derived_t>::update_bitmap);
 	}
@@ -68,7 +68,7 @@ private:
 		on_update_bitmap(Bitmap);
 	}
 
-	void update_bitmap(iunknown* const Hint)
+	void update_bitmap(ihint* const Hint)
 	{
 		if(bitmap* const output_bitmap = m_output_bitmap.internal_value())
 		{

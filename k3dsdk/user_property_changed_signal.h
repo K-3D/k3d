@@ -39,13 +39,13 @@ class user_property_changed_signal
 public:
 	user_property_changed_signal(iproperty_collection& Collection);
 
-	sigc::connection connect(const sigc::slot<void, iunknown*>& Slot);
+	sigc::connection connect(const sigc::slot<void, ihint*>& Slot);
 
 private:
-	void on_collection_changed(iunknown*);
+	void on_collection_changed(ihint*);
 
 	iproperty_collection& m_collection;
-	sigc::signal<void, iunknown*> m_changed_signal;
+	sigc::signal<void, ihint*> m_changed_signal;
 	typedef std::vector<sigc::connection> connections_t;
 	connections_t m_connections;
 };

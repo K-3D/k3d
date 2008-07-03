@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
+#include "ihint.h"
 #include "signal_system.h"
 
 #include <map>
@@ -46,7 +46,7 @@ public:
 	typedef std::map<iproperty*, iproperty*> dependencies_t;
 
 	/// Updates dependencies between a set of properties
-	virtual void set_dependencies(dependencies_t& Dependencies, iunknown* Hint = 0) = 0;
+	virtual void set_dependencies(dependencies_t& Dependencies, ihint* Hint = 0) = 0;
 
 	/// Returns the dependency for a given property - may return NULL for no dependency
 	virtual iproperty* dependency(iproperty& Target) = 0;

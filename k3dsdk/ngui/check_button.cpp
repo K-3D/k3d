@@ -124,7 +124,7 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 	return ui_component::execute_command(Command, Arguments);
 }
 
-void control::update(k3d::iunknown*)
+void control::update(k3d::ihint*)
 {
 	if(!m_data.get())
 		return;

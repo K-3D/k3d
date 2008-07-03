@@ -92,12 +92,12 @@ public:
 	}
 
 protected:
-	sigc::slot<void, iunknown*> make_async_redraw_slot()
+	sigc::slot<void, ihint*> make_async_redraw_slot()
 	{
 		return sigc::mem_fun(*this, &renderable<base_t>::async_redraw);
 	}
 
-	void async_redraw(iunknown*)
+	void async_redraw(ihint*)
 	{
 		redraw_all(base_t::document(), irender_viewport::ASYNCHRONOUS);
 	}

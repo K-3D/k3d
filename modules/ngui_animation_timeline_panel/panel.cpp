@@ -519,22 +519,22 @@ public:
 		m_timeline.set_time(time);
 	}
 	
-	void on_start_time_changed(k3d::iunknown*)
+	void on_start_time_changed(k3d::ihint*)
 	{
 		schedule_update();
 	}
 
-	void on_end_time_changed(k3d::iunknown*)
+	void on_end_time_changed(k3d::ihint*)
 	{
 		schedule_update();
 	}
 	
-	void on_frame_rate_changed(k3d::iunknown*)
+	void on_frame_rate_changed(k3d::ihint*)
 	{
 		schedule_update();
 	}
 	
-	void on_time_changed(k3d::iunknown*)
+	void on_time_changed(k3d::ihint*)
 	{
 		return_if_fail(m_time && m_frame_rate);
 		const double frame_rate = boost::any_cast<double>(m_frame_rate->property_internal_value());
@@ -549,7 +549,7 @@ public:
 			m_writable_time->property_set_value(Time);
 	}
 	
-	void on_keytime_changed(k3d::iunknown* Hint, k3d::iproperty* Property)
+	void on_keytime_changed(k3d::ihint* Hint, k3d::iproperty* Property)
 	{
 		m_timeline.delete_key(Property->property_label());
 		m_timeline.add_key(Property->property_label(), k3d::property::pipeline_value<double>(*Property));
@@ -699,7 +699,7 @@ public:
 		m_writable_time->property_set_value(end_time - frame_length);
 	}
 
-	void on_playback_mode_changed(k3d::iunknown*)
+	void on_playback_mode_changed(k3d::ihint*)
 	{
 		switch(m_playback_mode.internal_value())
 		{

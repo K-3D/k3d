@@ -379,7 +379,7 @@ public:
 private:
 	
 	/// Executed when the input value changes
-	void on_value_change(k3d::iunknown* Hint)
+	void on_value_change(k3d::ihint* Hint)
 	{
 		bool manual_key = m_manual_keyframe.pipeline_value();
 		if(!manual_key && document().state_recorder().current_change_set())

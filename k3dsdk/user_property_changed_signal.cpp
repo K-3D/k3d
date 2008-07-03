@@ -39,12 +39,12 @@ user_property_changed_signal::user_property_changed_signal(iproperty_collection&
 	on_collection_changed(0);
 }
 
-sigc::connection user_property_changed_signal::connect(const sigc::slot<void, iunknown*>& Slot)
+sigc::connection user_property_changed_signal::connect(const sigc::slot<void, ihint*>& Slot)
 {
 	return m_changed_signal.connect(Slot);
 }
 
-void user_property_changed_signal::on_collection_changed(iunknown*)
+void user_property_changed_signal::on_collection_changed(ihint*)
 {
 	for(connections_t::iterator connection = m_connections.begin(); connection != m_connections.end(); ++connection)
 		connection->disconnect();

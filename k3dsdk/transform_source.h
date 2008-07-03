@@ -44,7 +44,7 @@ public:
 		return m_output_matrix;
 	}
 
-	sigc::slot<void, iunknown*> make_reset_matrix_slot()
+	sigc::slot<void, ihint*> make_reset_matrix_slot()
 	{
 		return m_output_matrix.make_reset_slot();
 	}

@@ -66,7 +66,7 @@ public:
 	/// Called to return the owning document
 	virtual document_state& document() = 0;
 	/// Signal emitted if the underlying data changes
-	typedef sigc::signal<void, k3d::iunknown*> changed_signal_t;
+	typedef sigc::signal<void, k3d::ihint*> changed_signal_t;
 	/// Signal emitted if the underlying data changes
 	virtual changed_signal_t& changed_signal() = 0;
 
@@ -130,7 +130,7 @@ private:
 	/// Called when nodes are removed from the document
 	void on_nodes_removed(const k3d::inode_collection::nodes_t&);
 	/// Called whenever the underlying data source changes
-	void data_changed(k3d::iunknown*);
+	void data_changed(k3d::ihint*);
 	/// Called to display the set of available choices
 	void on_choose();
 	/// Called when the user decides to select no node

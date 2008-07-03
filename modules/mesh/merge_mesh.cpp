@@ -649,7 +649,7 @@ public:
 		m_same_polyhedron.changed_signal().connect(sigc::mem_fun(*this, &merge_mesh_implementation::mesh_changed));
 	}
 	
-	void mesh_changed(k3d::iunknown* Hint)
+	void mesh_changed(k3d::ihint* Hint)
 	{
 		if (dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint))
 			mesh_geometry_changed(Hint);

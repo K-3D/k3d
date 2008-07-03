@@ -59,12 +59,12 @@ public:
 		return m_output_mesh;
 	}
 
-	sigc::slot<void, iunknown*> make_reset_mesh_slot()
+	sigc::slot<void, ihint*> make_reset_mesh_slot()
 	{
 		return sigc::mem_fun(*this, &mesh_source<base_t>::reset_mesh);
 	}
 
-	sigc::slot<void, iunknown*> make_update_mesh_slot()
+	sigc::slot<void, ihint*> make_update_mesh_slot()
 	{
 		return m_output_mesh.make_update_slot();
 	}
@@ -73,7 +73,7 @@ protected:
 	k3d_data(k3d::mesh*, data::immutable_name, data::change_signal, data::no_undo, data::pointer_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_mesh;
 
 private:
-	void reset_mesh(iunknown* Hint)
+	void reset_mesh(ihint* Hint)
 	{
 		m_legacy_output.reset();
 		m_output_mesh.changed_signal().emit(hint::mesh_deleted());

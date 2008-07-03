@@ -72,7 +72,7 @@ protected:
 private:
 	
 	/// Executed when a level has changed 
-	void level_changed(k3d::iunknown* Hint);
+	void level_changed(k3d::ihint* Hint);
 	
 	/// Register a level property
 	void register_painter(k3d::inode* Painter);

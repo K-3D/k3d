@@ -36,7 +36,7 @@ public:
 		return m_output_int32;
 	}
 
-	sigc::slot<void, k3d::iunknown*> make_reset_int32_slot()
+	sigc::slot<void, k3d::ihint*> make_reset_int32_slot()
 	{
 		return m_output_int32.make_reset_slot();
 	}

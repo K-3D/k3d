@@ -35,6 +35,7 @@
 
 // Forward declarations
 namespace Gtk { class Button; }
+namespace k3d { class ihint; }
 namespace k3d { class iproperty; }
 namespace k3d { class istate_recorder; }
 
@@ -58,7 +59,7 @@ public:
 	/// Called to set a new data value
 	virtual void set_value(const k3d::bounding_box3& Value) = 0;
 	/// Signal emitted if the underlying data changes
-	typedef sigc::signal<void, k3d::iunknown*> changed_signal_t;
+	typedef sigc::signal<void, k3d::ihint*> changed_signal_t;
 	/// Signal emitted if the underlying data changes
 	virtual changed_signal_t& changed_signal() = 0;
 

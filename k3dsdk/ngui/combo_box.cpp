@@ -138,7 +138,7 @@ void control::set_values(const values_t& Values)
 	data_changed(0);
 }
 
-void control::data_changed(k3d::iunknown*)
+void control::data_changed(k3d::ihint*)
 {
 	return_if_fail(m_data.get());
 

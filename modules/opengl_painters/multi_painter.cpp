@@ -82,7 +82,7 @@ public:
 		}
 	}
 	
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::iunknown* Hint)
+	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)

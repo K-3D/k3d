@@ -36,7 +36,7 @@ public:
 		return m_output_double;
 	}
 
-	sigc::slot<void, iunknown*> make_reset_double_slot()
+	sigc::slot<void, ihint*> make_reset_double_slot()
 	{
 		return m_output_double.make_reset_slot();
 	}

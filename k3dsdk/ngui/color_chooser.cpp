@@ -118,7 +118,7 @@ private:
 			m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_data->change_message + " " + k3d::string_cast(color), K3D_CHANGE_SET_CONTEXT);
 	}
 
-	void on_data_changed(k3d::iunknown*)
+	void on_data_changed(k3d::ihint*)
 	{
 		return_if_fail(m_data.get());
 
@@ -262,7 +262,7 @@ void control::on_clicked()
 	base::on_clicked();
 }
 
-void control::data_changed(k3d::iunknown*)
+void control::data_changed(k3d::ihint*)
 {
 	m_area->queue_draw();
 }

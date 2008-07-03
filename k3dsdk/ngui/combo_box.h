@@ -58,7 +58,7 @@ public:
 	/// Called to set a new data value
 	virtual void set_value(const std::string& Value) = 0;
 	/// Signal emitted if the underlying data changes
-	typedef sigc::signal<void, k3d::iunknown*> changed_signal_t;
+	typedef sigc::signal<void, k3d::ihint*> changed_signal_t;
 	/// Signal emitted if the underlying data changes
 	virtual changed_signal_t& changed_signal() = 0;
 
@@ -101,7 +101,7 @@ public:
 
 private:
 	/// Called whenever the underlying data changes
-	void data_changed(k3d::iunknown*);
+	void data_changed(k3d::ihint*);
 	/// Called when the user picks an existing value using the dropdown list
 	void on_list_changed();
 	/// Called when the edit control receives the focus

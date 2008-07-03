@@ -40,7 +40,7 @@ public:
 		return m_output_vector3;
 	}
 
-	sigc::slot<void, iunknown*> make_reset_vector3_slot()
+	sigc::slot<void, ihint*> make_reset_vector3_slot()
 	{
 		return m_output_vector3.make_reset_slot();
 	}

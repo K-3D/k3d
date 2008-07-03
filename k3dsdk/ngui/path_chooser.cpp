@@ -337,7 +337,7 @@ void control::set_value()
 	m_disable_set_value = false;
 }
 
-void control::data_changed(k3d::iunknown*)
+void control::data_changed(k3d::ihint*)
 {
 	return_if_fail(m_data.get());
 

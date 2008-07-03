@@ -74,7 +74,7 @@ public:
 			glDeleteTextures(1, &m_texture_name);
 	}
 
-	void bitmap_changed(iunknown* Hint)
+	void bitmap_changed(k3d::ihint* Hint)
 	{
 		if(m_texture_name)
 		{

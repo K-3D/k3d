@@ -78,12 +78,12 @@ public:
 		return m_bitmap_a;
 	}
 
-	sigc::slot<void, iunknown*> make_reset_output_slot()
+	sigc::slot<void, k3d::ihint*> make_reset_output_slot()
 	{
 		return sigc::mem_fun(*this, &bitmap_perceptual_difference::reset_output);
 	}
 
-	void reset_output(k3d::iunknown* Hint)
+	void reset_output(k3d::ihint* Hint)
 	{
 		m_difference_pixels = std::numeric_limits<k3d::uint32_t>::max();
 

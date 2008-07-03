@@ -25,7 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
+#include "ihint.h"
 #include <boost/any.hpp>
 
 namespace k3d
@@ -37,7 +37,7 @@ class iwritable_property :
 {
 public:
 	/// Sets the property value (note - could fail and return false if there's a type-mismatch or other problem with the input data).  The optional Hint will be passed to observers and can provide additional information about what changed.
-	virtual bool property_set_value(const boost::any Value, iunknown* const Hint = 0) = 0;
+	virtual bool property_set_value(const boost::any Value, ihint* const Hint = 0) = 0;
 
 protected:
 	iwritable_property() {}

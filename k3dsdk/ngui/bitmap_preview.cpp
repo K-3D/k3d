@@ -117,7 +117,7 @@ struct extract_alpha
 	}
 };
 
-void control::data_changed(k3d::iunknown*)
+void control::data_changed(k3d::ihint*)
 {
 	return_if_fail(m_data.get());
 

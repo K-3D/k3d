@@ -53,7 +53,7 @@ public:
 		connect_script_changed_signal(sigc::mem_fun(*this, &transform_modifier_script::reset_output_cache));
 	}
 
-	void reset_output_cache(k3d::iunknown* const Hint)
+	void reset_output_cache(k3d::ihint* const Hint)
 	{
 		m_output_matrix.reset(Hint);
 	}

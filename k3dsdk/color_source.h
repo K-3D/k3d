@@ -37,7 +37,7 @@ public:
 		return m_output_color;
 	}
 
-	sigc::slot<void, iunknown*> make_reset_color_slot()
+	sigc::slot<void, ihint*> make_reset_color_slot()
 	{
 		return m_output_color.make_reset_slot();
 	}
