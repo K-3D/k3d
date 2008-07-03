@@ -23,7 +23,7 @@
 */
 
 
-#include "cuda_mesh.h"
+#include "cuda_device_mesh.h"
 
 /// Constructor
 cuda_device_polyhedra::cuda_device_polyhedra ( const k3d::mesh::polyhedra_t& host_polyhedra ):
@@ -46,7 +46,6 @@ cuda_device_polyhedra::cuda_device_polyhedra ( const k3d::mesh::polyhedra_t& hos
     pdev_per_edge_clockwise_edge = 0;       
     pdev_per_edge_selection = 0;
     m_number_of_edges = 0;
-    
 }
 
 /// Destructor - free the allocated device pointers
@@ -65,7 +64,7 @@ cuda_device_polyhedra::~cuda_device_polyhedra ()
     
     free_device_memory((void*)pdev_per_edge_point);
     free_device_memory((void*)pdev_per_edge_clockwise_edge);
-    free_device_memory((void*)pdev_per_edge_selection);
+    free_device_memory((void*)pdev_per_edge_selection);uniform_data
 }   
 
 /**
@@ -192,9 +191,9 @@ void cuda_device_polyhedra::copy_from_device( k3d::mesh::polyhedra_t& destinatio
     
     // TODO:  constant_data, face_materlials, face_varying_data
     p_output_polyhedra->face_materials = m_p_input_polyhedra->face_materials;
-    
-    
-    
+    p_output_polyhedra->constant_data = m_p_input_polyhedra->constant_data;
+    p_output_polyhedra->uniform_data = m_p_input_polyhedra->uniform_data;    
+    p_output_polyhedra->face_varying_data = m_p_input_polyhedra->face_varying;
     
     synchronize_threads();
     free ( face_selection_temp );
@@ -336,6 +335,7 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh )
     
     p_output_mesh->polyhedra = polyhedra;
     // TODO:  copy vertex data
+    p_output_mesh->vertex_data = m_p_host_mesh->vertex_data;
     
     synchronize_threads();    
     k3d::log() << debug << "cuda_device_mesh::copy_from_device::end" << std::endl;

@@ -37,7 +37,7 @@
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
 
-#include "cuda_mesh.h"
+#include "cuda_device_mesh.h"
 
 namespace module
 {

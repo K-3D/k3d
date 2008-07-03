@@ -26,7 +26,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 
-#include "cuda_mesh.h"
+#include "cuda_device_mesh.h"
 
 namespace module
 {

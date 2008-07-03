@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -26,7 +26,7 @@
 #include <k3dsdk/mesh_sink.h>
 #include <k3dsdk/node.h>
 
-#include "cuda_mesh.h"
+#include "cuda_device_mesh.h"
 
 namespace module
 {
