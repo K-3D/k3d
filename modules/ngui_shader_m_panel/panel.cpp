@@ -75,8 +75,24 @@
 
 #include <k3dsdk/log.h>
 #include <iostream>
+#include <sstream>
 
 #include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/icamera.h>
+#include <k3dsdk/irender_camera_frame.h>
+#include <k3dsdk/irender_engine_ri.h>
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/iuser_property.h>
+#include <k3dsdk/user_property_changed_signal.h>
+#include <k3dsdk/transform.h>
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/system.h>
+#include <k3dsdk/path.h>
+#include <k3dsdk/share.h>
+#include <k3dsdk/ilight_ri.h>
+#include <k3dsdk/ilight_shader_ri.h>
+#include <k3dsdk/itransform_sink.h>
 
 using namespace libk3dngui;
 using namespace k3d::data;
@@ -92,12 +108,23 @@ namespace module{
 	// [model Components]***********************************************************************
 
 	//Static Material Type Definitions
-	const std::string riMaterialStr 	= "Renderman Materials";
-	const std::string glMaterialStr 	= "OpenGL Materials";
-	const std::string otherStuffStr 	= "Other Stuff";	
+	const k3d::string_t riMaterialStr 	= "Renderman Materials";
+	const k3d::string_t glMaterialStr 	= "OpenGL Materials";
+	const k3d::string_t otherStuffStr 	= "Other Stuff";	
        
+	const k3d::string_t holderImgFile = "renderingShader.png";
+	const k3d::string_t s_shaderImgFile = "singlePreviewRender.png";
+	const k3d::string_t multi_s_shaderImgFile = "multiPreviewRender";
+
 	//forward declaration for list of shaders
 	class s_group;
+
+	//Type Definitions
+	typedef k3d::irender_camera_frame rManEngine_t;
+        typedef k3d::icamera camera_t;
+        typedef k3d::inode light_t;
+        typedef k3d::inode lightShader_t;
+        typedef k3d::inode geo_t;
 
 	class s_object{
 	public:
@@ -261,41 +288,232 @@ namespace module{
 
 	// [implementation]*************************************************************************
 
-	//Forward declarations of Gui Objects to make life easier
-	//class implementation;
+	//************ PREVIEW IMAGE CONTENT CLASS
+	class shaderPreviewImage: public Gtk::DrawingArea{
+        public:
+          shaderPreviewImage(k3d::filesystem::path _imgPath);
+          virtual ~shaderPreviewImage();
+	  
+	  //Function to be called on preview img update request signal
+	  bool onUpdatePreview();
+
+        public:
+          k3d::filesystem::path imgFilePath;
+	  k3d::filesystem::path imgHolderPath;
+
+        protected:
+          //Override default signal handler:
+          virtual bool on_expose_event(GdkEventExpose* event);
+
+        };//shaderPreviewImage
+
+
+        shaderPreviewImage::shaderPreviewImage(k3d::filesystem::path _imgPath)
+	{
+          imgFilePath = _imgPath;
+
+	  //Define Location of image holder (if no render preview file found)
+	  imgHolderPath = k3d::share_path() / k3d::filesystem::generic_path("ngui/rasterized") 
+	    / k3d::filesystem::generic_path(holderImgFile);
+        }
+
+        shaderPreviewImage::~shaderPreviewImage()
+	{
+        }
+
+        bool shaderPreviewImage::on_expose_event(GdkEventExpose* event)
+        {
+	  try
+	    {
+	      Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_file(imgFilePath.native_filesystem_string());
+	      image->render_to_drawable(get_window(), get_style()->get_black_gc(),
+					0, 0, 10, 10, image->get_width(), image->get_height(),
+					Gdk::RGB_DITHER_NONE, 0, 0);
+	    }
+	  catch(Glib::FileError)
+	    {
+	      //No Image File. Display Default Image Holder
+	      Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_file(imgHolderPath.native_filesystem_string());
+	      image->render_to_drawable(get_window(), get_style()->get_black_gc(),
+					0, 0, 10, 10, image->get_width(), image->get_height(),
+					Gdk::RGB_DITHER_NONE, 0, 0);
+	    }
+	  catch(Glib::Error)
+	    {
+
+	      //Should not hopefully Get Here!
+	    }
+
+          return true;
+
+        }//on_expose_event
 
 	//************ GUI CONTENT PANE CLASSES
-	
 	class content_pane{
 	public:
-	  content_pane(Gtk::HPaned *_m_Hpane, k3d::icommand_node *_m_parent)
-	    :m_Hpane(_m_Hpane), m_parent(_m_parent), preview_primitive("Preview Primitive")	  
+	  content_pane(Gtk::HPaned *_m_Hpane, k3d::icommand_node *_m_parent, document_state *_documentState)
+	    :m_Hpane(_m_Hpane), m_parent(_m_parent), preview_primitive("Preview Primitive"), 
+	     m_document_state(_documentState),
+	     previewSize(200)	  
 	  {
+	    //Setup The Rendering Components (Using Meta Data Eventually)
+
+	    //Light Shader Setup*******************
+
+	    panelLShader = dynamic_cast<k3d::inode*>(k3d::plugin::create("RenderManLightShader", 
+									 m_document_state->document(), 
+									 "Preview Core::Light Shader"));
+
+	    k3d::property::set_internal_value(*panelLShader, 
+					      "shader_path", k3d::share_path() /
+					      k3d::filesystem::generic_path("shaders/light/k3d_pointlight.sl"));
+
+
+
+	    //Light Setup*************************
+	    panelLight = dynamic_cast<light_t*>(k3d::plugin::create("RenderManLight", 
+								    m_document_state->document(), 
+								    "Preview Core::Light"));
+
+	    k3d::property::set_internal_value(*panelLight, 
+					      "shader", panelLShader);
+
+
+	    k3d::inode* light_transformation = k3d::set_matrix(*panelLight, 
+							       k3d::translation3D(k3d::point3(-20, 20, 30)));
+
+     
+
+	    //Camera Setup************************
+	    panelCamera = dynamic_cast<camera_t*>
+	      (k3d::plugin::create("Camera", 
+				   m_document_state->document(), 
+				   "Preview Core::CameraTMP"));
+	    const k3d::point3 origin = k3d::point3(0, 0, 0);
+	    const k3d::vector3 world_up = k3d::vector3(0, 0, 1);
+
+	    const k3d::point3 position = k3d::point3(0, 13, 0);
+	    const k3d::vector3 look_vector = origin - position;
+	    const k3d::vector3 right_vector = look_vector ^ world_up;
+	    const k3d::vector3 up_vector = right_vector ^ look_vector;
+
+	    k3d::inode* const camera_transformation 
+	      = k3d::set_matrix(*panelCamera, 
+				k3d::view_matrix(look_vector, up_vector, position));
+       
+	    camera_transformation->set_name("Camera Transformation");
+	    k3d::property::set_internal_value(*panelCamera, 
+					      "world_target", k3d::point3(0, 0, 0));
+
+	    k3d::property::set_internal_value(*panelCamera, 
+					      "viewport_visible", false);
+
+	    k3d::property::set_internal_value(*panelCamera, 
+					      "aspect_ratio", k3d::string_t("Square"));
+
+	    //Geometry Setup**********************
+	    panelGeo = dynamic_cast<geo_t*>
+	      (k3d::plugin::create("Sphere", 
+				   m_document_state->document(), 
+				   "Preview Core::Geo::SphereTMP"));
+
+	    k3d::property::set_internal_value(*panelGeo, 
+					      "render_shadows", false);
+
+	    k3d::property::set_internal_value(*panelGeo, 
+					      "viewport_visible", false);
+
+	    //Renderman Engine Setup**************
+	    panelEngine = dynamic_cast<rManEngine_t*>
+	      (k3d::plugin::create("RenderManEngine", 
+				   m_document_state->document(), 
+				   "Preview Core::RMANENGINETMP"));
+
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "enabled_lights", 
+					      k3d::inode_collection_property::nodes_t(1, panelLight));
+
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "visible_nodes", 
+					      k3d::inode_collection_property::nodes_t(1, panelGeo));
+
+
+	    // To ensure Universal Compatibility With user documents, create a RMAN Node (Aqsis)
+	    k3d::ri::irender_engine* const aqsis = k3d::plugin::create<k3d::ri::irender_engine>("AqsisRenderManEngine", 
+												m_document_state->document(), 
+												"Preview Core::Aqsis RendererTMP");
+
+	    //Setup the shader preview render engine*****
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "render_engine", dynamic_cast<k3d::inode*>(aqsis));
+
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "pixel_width", static_cast<k3d::int32_t>(previewSize));
+
+
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "pixel_height", static_cast<k3d::int32_t>(previewSize));
+
+	    k3d::double_t aspectRatio = 1.0;
+
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "pixel_aspect_ratio", aspectRatio);
+	    
 	  }
+
 	  virtual ~content_pane(){}
 
 	public:
+	  //Render The Preview Image
+	  virtual void renderPreview() = 0;
+	  virtual bool updatePreviewImage() = 0;
+
 	  virtual void buildPane() = 0;
 
 	protected:
 	  Gtk::HPaned *m_Hpane;
-	  k3d::icommand_node *m_parent;
-
 	  Gtk::MenuToolButton preview_primitive;
+
+	  k3d::icommand_node *m_parent;
+	  document_state *m_document_state;
+
+	protected:
+	  //Render Preview Components
+          light_t *panelLight;
+          lightShader_t *panelLShader;
+	  geo_t *panelGeo;
+	  rManEngine_t *panelEngine;
+	  camera_t *panelCamera;
+	  //k3d::ri::irender_engine *panelRenderEngine;
+	  k3d::uint_t previewSize;
+
+	  sigc::connection timerPreviewConnection;
 
 	};//content_pane
 
 	//GROUP CONTENT PANE
 	class g_content_pane : public content_pane{
 	public:
-	  g_content_pane(Gtk::HPaned *_m_Hpane, s_group *_m_grp, k3d::icommand_node *_m_parent)
-	    :content_pane(_m_Hpane, _m_parent), m_grp(_m_grp),
+	  g_content_pane(Gtk::HPaned *_m_Hpane, s_group *_m_grp, k3d::icommand_node *_m_parent, document_state *_documentState)
+	    :content_pane(_m_Hpane, _m_parent, _documentState), m_grp(_m_grp),
 	     group_display("List Settings")
 	  {
 	    
+	    //Preview Update Timer
+	    //glib timer set that updates preview image every 0.25 seconds
+	    // << Will Delete when panel closed
+	    timerPreviewConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this, &g_content_pane::updatePreviewImage), 250);	    
 	  }
 
-	  ~g_content_pane(){}
+	  ~g_content_pane()
+	  {
+	    //Clean Up
+	    std::vector<shaderPreviewImage*>::iterator pIter = shaderPreviews.begin();
+	    for(; pIter != shaderPreviews.end(); pIter++)
+		delete (*pIter);    
+
+	    timerPreviewConnection.disconnect();
+	  }
 
 	public:
 	  void buildPane()
@@ -318,17 +536,35 @@ namespace module{
 		//Setup ToolBar
 		shaderBoxes_c.pack_start(m_toolbar, false, false, 0);
 
+		//Integer To Tack onto filenames to make them unique
+		int fileName_int = 0;
+
 		//For Each Of The Elements In Group->m_shaders Create A GUI Strip
 		std::list<s_object*>::iterator soIter = m_grp->m_shaders.begin();
 		for(; soIter != m_grp->m_shaders.end(); soIter++)
 		  {
+		    //Create File Name For Shader Preview Image
+		    k3d::string_t int_str;
+		    k3d::string_t finalFile_str;
+		    std::stringstream out;
+		    out << fileName_int;
+		    int_str = out.str();
+		    int_str += k3d::string_t(".png");
+		    finalFile_str.append(multi_s_shaderImgFile);
+		    finalFile_str.append(int_str);		    
+
+		    //Create The Shader Preview Image Object
+		    shaderPreviewImage *s_preview_obj = new shaderPreviewImage(k3d::system::get_temp_directory() / k3d::filesystem::generic_path(finalFile_str));
+		    shaderPreviews.push_back(s_preview_obj);
+		    
 		    Gtk::HBox *tmpHBox = new Gtk::HBox;
 		    object_preview_data_c.push_back(tmpHBox);
 		    shaderBoxes_c.pack_start(*tmpHBox, false, false, 10);
 
 		    Gtk::Frame *tmpFrame = new Gtk::Frame("PREVIEW");
+		    tmpFrame->add(*s_preview_obj);
 		    img_holder_frames.push_back(tmpFrame);
-		    tmpFrame->set_size_request(200, 200);
+		    tmpFrame->set_size_request(previewSize + 25, previewSize + 35);
 		    tmpHBox->pack_start(*tmpFrame, false, false, 5);
 
 		    //Data & Notes VBox
@@ -399,6 +635,11 @@ namespace module{
 		    tmpdateMod_d->set_alignment(0.0);
 		    tmpArtistName_d->set_alignment(0.0);
 
+		    //Horizontal rule between data and notes
+		    Gtk::HSeparator *tmpDataHBreaker = new Gtk::HSeparator();
+		    data_notes_breakers.push_back(tmpDataHBreaker);
+		    tmpVBox_dd->pack_start(*tmpDataHBreaker, false, false, 0);
+
 		    //Artist Notes Build
 
 		    Glib::RefPtr<Gtk::TextBuffer> txtDisplay = Gtk::TextBuffer::create();
@@ -418,9 +659,14 @@ namespace module{
 		    Gtk::HSeparator *tmpHBreaker = new Gtk::HSeparator();
 		    s_breakers.push_back(tmpHBreaker);
 		    shaderBoxes_c.pack_start(*tmpHBreaker, false, false, 0);
-
+		     
+		     fileName_int++;
 
 		  }//for
+
+		//Set Off Renderer In New Process 
+		renderPreview();
+
 	      }
 	    else
 	      k3d::log() << "Invalid HPaned Pointer" << std::endl;  
@@ -430,6 +676,83 @@ namespace module{
 	    m_Hpane->show_all(); 
 
 	  }//buildPane
+
+	  void renderPreview()
+	  {
+	     //Ensure Current Preview Engine Has Selected Nodes Only Visible
+	    k3d::inode_collection::nodes_t::const_iterator node = m_document_state->document().nodes().collection().begin();
+	  for(; node != m_document_state->document().nodes().collection().end(); ++node){
+
+	    if((*node)->factory().implements(typeid(k3d::ri::ilight)))
+	      {
+	    //Disable Node Regardless In RMANEngine::lights and nodes
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "enabled_lights", 
+					      k3d::inode_collection_property::nodes_t(0, (*node)));
+	    }//if
+	    else if((*node)->factory().implements(typeid(k3d::itransform_sink)))
+	      {
+	      k3d::property::set_internal_value(*panelEngine, 
+						"visible_nodes", 
+						k3d::inode_collection_property::nodes_t(0, (*node)));
+	    }//else if
+	    
+	  }//for
+
+	  //Simply Enable Now Only USed Light & Geo
+	  k3d::property::set_internal_value(*panelEngine, 
+                                            "enabled_lights", 
+					    k3d::inode_collection_property::nodes_t(1, panelLight));
+
+	  k3d::property::set_internal_value(*panelEngine, 
+					    "visible_nodes", 
+					    k3d::inode_collection_property::nodes_t(1, panelGeo));
+  
+	  //Go Though Every Shader In Group Render To Image File.. Done
+	  std::list<s_object*>::const_iterator soIter = m_grp->m_shaders.begin();
+	  std::vector<shaderPreviewImage*>::iterator pIter = shaderPreviews.begin();   //NEE TO FIX THIS AS ASSUMES TOO MUCH (CORRECT SIZES) -> DANGEROUS
+	  for(; soIter != m_grp->m_shaders.end(); soIter++)
+	    {
+	      //Check If NodeIn sobject Is A RenderMan Material
+	      if((*soIter)->node->factory().implements(typeid(k3d::ri::imaterial)))
+		{
+		  //If it is, assign to current geometry as surface shader
+		  k3d::property::set_internal_value(*panelGeo, 
+						    "material", (*soIter)->node);
+	   
+		  //Render The Preview Using Selected External Renderer
+		  panelEngine->render_camera_frame(*panelCamera, (*pIter)->imgFilePath, false);
+
+		}//if	 
+	      else
+		{
+		  k3d::log() << "Is NOT A Rman Material" << std::endl;
+		}
+
+	      pIter++;
+
+	    }//for
+
+
+	
+
+	  
+
+	  }//renderPreview
+
+
+	  bool updatePreviewImage()
+	  {
+	    std::vector<shaderPreviewImage*>::iterator simgIter = shaderPreviews.begin();
+	    for(; simgIter != shaderPreviews.end(); simgIter++)
+	      {
+		(*simgIter)->queue_resize();
+		(*simgIter)->queue_draw();
+	      }//for
+	    
+	    return true;
+	  }
+
 
 	public:
 	  //GTK Widgets
@@ -456,6 +779,7 @@ namespace module{
 	  std::vector<Gtk::TextView*> s_artistnotes_view;
 	  std::vector<Gtk::ScrolledWindow*> notes_scroll_win;
 
+	  std::vector<Gtk::HSeparator*> data_notes_breakers;
 	  std::vector<Gtk::HSeparator*> s_breakers;
 
 	  Gtk::HBox s_name_c;
@@ -469,8 +793,10 @@ namespace module{
 	  Gtk::Toolbar m_toolbar; 
 	  Gtk::MenuToolButton group_display;
 
-	  
+	  //Shader Preview
+	  std::vector<shaderPreviewImage*> shaderPreviews;
 
+	 
 	private:
 	  s_group *m_grp;
 
@@ -479,28 +805,43 @@ namespace module{
 	//SHADER OBJECT CONTENT PANE
 	class so_content_pane : public content_pane{
 	public:
-	  so_content_pane(Gtk::HPaned *_m_Hpane, s_object *_m_so, k3d::icommand_node *_m_parent)
-	    :content_pane(_m_Hpane, _m_parent), m_so(_m_so), so_preview_frame("PREVIEW"), artistnotes_frame("ARTIST NOTES"),
+	  so_content_pane(Gtk::HPaned *_m_Hpane, s_object *_m_so, k3d::icommand_node *_m_parent, document_state *_documentState)
+	    :content_pane(_m_Hpane, _m_parent, _documentState), m_so(_m_so),
+	     so_preview_frame("PREVIEW"), artistnotes_frame("ARTIST NOTES"),
 	     s_name_entry(*_m_parent, k3d::string_t("so_name_field"), entry::model(_m_so->so_name), 0),
 	     s_type_entry(*_m_parent, k3d::string_t("so_type_field"), entry::model(_m_so->so_type), 0),
 	     s_datemod_entry(*_m_parent, k3d::string_t("so_datestamp_field"), entry::model(_m_so->so_datestamp), 0),
 	     s_artistname_entry(*_m_parent, k3d::string_t("so_artistname_field"), entry::model(_m_so->so_artistname), 0),
-	     s_artistnotes_mltext(*_m_parent, k3d::string_t("so_artistnotes_mltxt"), text::model(_m_so->so_artistnotes), 0)
+	     s_artistnotes_mltext(*_m_parent, k3d::string_t("so_artistnotes_mltxt"), text::model(_m_so->so_artistnotes), 0),
+	     shaderPreview(k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_shaderImgFile))
 	  {
 	    s_name_l.set_text		("Shader Name: ");
 	    s_type_l.set_text		("Shader Type: ");
 	    s_datemod_l.set_text	("Date Modified: ");
 	    s_artistname_l.set_text	("Artist's Name: ");
+
+	    //Preview Update Timer
+	    //glib timer set that updates preview image every 0.25 seconds
+	    // << Will Delete when panel closed
+	    timerPreviewConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this, &so_content_pane::updatePreviewImage), 250);
+
 	  }
 
-	  ~so_content_pane(){}
+	  ~so_content_pane()
+	  {
+	    timerPreviewConnection.disconnect();
+	  }
 
 	public:
 	  void buildPane()
 	  {
 	    if(m_Hpane)
 	      {
-		so_preview_frame.set_size_request(200, 200);
+		//Set Off Renderer In New Process 
+		renderPreview();
+
+		so_preview_frame.set_size_request(previewSize + 25, previewSize + 35);
+		so_preview_frame.add(shaderPreview);
 		preview_c.pack_start(so_preview_frame, false, false, 10);
  	      
 		//Add Container To Right Pane From Implementation
@@ -548,6 +889,65 @@ namespace module{
 	      k3d::log() << "Invalid HPaned Pointer" << std::endl;  	
 
 	  }//buildPane
+
+	  void renderPreview()
+	  {
+	    //Ensure Current Preview Engine Has Selected Nodes Only Visible
+	  k3d::inode_collection::nodes_t::const_iterator node = m_document_state->document().nodes().collection().begin();
+	  for(; node != m_document_state->document().nodes().collection().end(); ++node){
+
+	    if((*node)->factory().implements(typeid(k3d::ri::ilight)))
+	      {
+	    //Disable Node Regardless In RMANEngine::lights and nodes
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "enabled_lights", 
+					      k3d::inode_collection_property::nodes_t(0, (*node)));
+	    }//if
+	    else if((*node)->factory().implements(typeid(k3d::itransform_sink)))
+	      {
+	      k3d::property::set_internal_value(*panelEngine, 
+						"visible_nodes", 
+						k3d::inode_collection_property::nodes_t(0, (*node)));
+	    }//else if
+	    
+	  }//for
+
+	  //Simply Enable Now Only USed Light & Geo
+	  k3d::property::set_internal_value(*panelEngine, 
+                                            "enabled_lights", 
+					    k3d::inode_collection_property::nodes_t(1, panelLight));
+
+	  k3d::property::set_internal_value(*panelEngine, 
+					    "visible_nodes", 
+					    k3d::inode_collection_property::nodes_t(1, panelGeo));
+  
+	  //Check If NodeIn sobject Is A RenderMan Material
+	  if(m_so->node->factory().implements(typeid(k3d::ri::imaterial)))
+	    {
+	    //If it is, assign to current geometry as surface shader
+	    k3d::property::set_internal_value(*panelGeo, 
+					      "material", m_so->node);
+	   
+
+	  //Render The Preview Using Selected External Renderer
+	  panelEngine->render_camera_frame(*panelCamera, k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_shaderImgFile),
+					   false);
+
+	  }//if	 
+	  else
+	    {
+	      k3d::log() << "Is NOT A Rman Material" << std::endl;
+	    }
+	    
+	  }//renderPreview
+
+	  bool updatePreviewImage()
+	  {
+	    shaderPreview.queue_resize();
+	    shaderPreview.queue_draw();
+	    return true;
+	  }
+
 	public:
 	  //GTK Widgets
 	  Gtk::Label s_name_l;
@@ -577,8 +977,11 @@ namespace module{
 
 	  text::control s_artistnotes_mltext;
 
+	  k3d::string_t previewPath;
+
 	private:
 	  s_object *m_so;
+	  shaderPreviewImage shaderPreview;
 
 	};//so_content_pane
 
@@ -801,12 +1204,12 @@ namespace module{
 	  if(is_group)
 	    {
 	      //Delete current obj (group or shader gui) and create new group gui obj
-	      m_rpane_content = std::auto_ptr<content_pane>(new g_content_pane(&m_HPanedMain, row->get_value(m_columns.s_group_ptr), m_parent));
+	      m_rpane_content = std::auto_ptr<content_pane>(new g_content_pane(&m_HPanedMain, row->get_value(m_columns.s_group_ptr), m_parent, &m_document_state));
 	    }
 	  else
 	    {
 	      //Delete current obj (group or shader gui) and create new group gui obj
-	      m_rpane_content = std::auto_ptr<content_pane>(new so_content_pane(&m_HPanedMain, row->get_value(m_columns.s_object_ptr), m_parent));
+	      m_rpane_content = std::auto_ptr<content_pane>(new so_content_pane(&m_HPanedMain, row->get_value(m_columns.s_object_ptr), m_parent, &m_document_state));
 
 	    }//endif
 
@@ -868,6 +1271,8 @@ namespace module{
 	      }//if
 	    }//for
 
+	  //Rebuild Currently Selected Pane
+
 	}//on_nodes_added
 
 	void implementation::on_nodes_removed(const k3d::inode_collection::nodes_t& Nodes)
@@ -881,14 +1286,14 @@ namespace module{
 	    tmpSObj = row->get_value(m_columns.s_object_ptr);
 
 	    if(tmpSObj)
-		grpPtr = tmpSObj->parent;
+	      grpPtr = tmpSObj->parent;
 	      
 	    tree_model->erase(row);
 	  }
 
 	  //Delete In Stored Model
 	  if(grpPtr)
-	      grpPtr->removeShader(tmpSObj);
+	    grpPtr->removeShader(tmpSObj);
 	    
 
 	}//on_nodes_removed
@@ -908,26 +1313,26 @@ namespace module{
 	/// Looks-up a model row based on a node pointer
 	bool implementation::get_row(k3d::inode* const Node, Gtk::TreeIter& Row){
 	
-		Gtk::TreeNodeChildren rows = tree_model->children();
+	  Gtk::TreeNodeChildren rows = tree_model->children();
 
-		//Iterate Through Each Row (Parent)
-		for(Gtk::TreeIter row = rows.begin(); row != rows.end(); row++)
-		  {
-		   //  //Iterate Through Each Child Of Parent
-		    for(Gtk::TreeIter rowCIter = row->children().begin(); rowCIter != row->children().end(); rowCIter++)
-		      {
-			//Check If Shader Object and Not Group
-			if(rowCIter->get_value(m_columns.s_object_ptr) && !(rowCIter->get_value(m_columns.is_group))){
-			  k3d::log() << "checking so" << std::endl;
-			  if((rowCIter->get_value(m_columns.s_object_ptr)->node) == Node){
-			    Row = rowCIter;
-			    return true;
-			  }//if
-			}//if
-		      }//for
+	  //Iterate Through Each Row (Parent)
+	  for(Gtk::TreeIter row = rows.begin(); row != rows.end(); row++)
+	    {
+	      //  //Iterate Through Each Child Of Parent
+	      for(Gtk::TreeIter rowCIter = row->children().begin(); rowCIter != row->children().end(); rowCIter++)
+		{
+		  //Check If Shader Object and Not Group
+		  if(rowCIter->get_value(m_columns.s_object_ptr) && !(rowCIter->get_value(m_columns.is_group))){
+		    k3d::log() << "checking so" << std::endl;
+		    if((rowCIter->get_value(m_columns.s_object_ptr)->node) == Node){
+		      Row = rowCIter;
+		      return true;
+		    }//if
+		  }//if
 		}//for
+	    }//for
 
-		return false;
+	  return false;
 	}
 
 
