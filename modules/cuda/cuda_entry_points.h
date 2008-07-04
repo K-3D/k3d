@@ -82,6 +82,7 @@ extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_split_point_calculator ( unsig
                                                          unsigned int num_points,  
                                                          unsigned int* edge_point_indices,
                                                          unsigned int* clockwise_edge_indices,
+                                                         float* new_points_and_selection,
                                                          int num_split_points );
 
 extern "C" K3D_CUDA_DECLSPEC void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, size_t device_pitch, size_t host_pitch, size_t width_in_bytes, size_t rows );

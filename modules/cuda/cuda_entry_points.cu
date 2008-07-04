@@ -381,6 +381,7 @@ extern "C" void subdivide_edges_split_point_calculator ( unsigned int* edge_indi
                                                          unsigned int num_points,  
                                                          unsigned int* edge_point_indices,
                                                          unsigned int* clockwise_edge_indices,
+                                                         float* new_points_and_selection,
                                                          int num_split_points )
 {
     int threads_x = 512 / num_split_points;
@@ -388,10 +389,10 @@ extern "C" void subdivide_edges_split_point_calculator ( unsigned int* edge_indi
     dim3 threads_per_block(threads_x, num_split_points);
     dim3 blocks_per_grid( iDivUp(num_points, threads_x), 1);
     
-    subdivide_edges_split_point_kernel<<< blocks_per_grid, threads_per_block >>> ( edge_indices, num_edge_indices, (float4*)points_and_selection, edge_point_indices, clockwise_edge_indices, num_points, num_split_points );  
+    subdivide_edges_split_point_kernel<<< blocks_per_grid, threads_per_block >>> ( edge_indices, num_edge_indices, (float4*)points_and_selection, (float4*)new_points_and_selection, edge_point_indices, clockwise_edge_indices, num_points, num_split_points );  
     
     // check if the kernel executed correctly
-    CUT_CHECK_ERROR("Add Kernel execution failed");
+    CUT_CHECK_ERROR("Kernel execution failed");
     cudaThreadSynchronize();
 }
 

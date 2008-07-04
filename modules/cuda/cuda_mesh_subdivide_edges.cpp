@@ -378,7 +378,51 @@ public:
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		document().pipeline_profiler().start_execution(*this, "Validate input");
+		if(!k3d::validate_polyhedra(Input))
+		{
+			document().pipeline_profiler().finish_execution(*this, "Validate input");
+			return;
+		}
+		document().pipeline_profiler().finish_execution(*this, "Validate input");
+		
+		k3d::mesh::points_t& output_points = *k3d::make_unique(Output.points);
+		
+		document().pipeline_profiler().start_execution(*this, "Calculate positions");
+		
+        // initialize the device
+        CUDA_initialize_device();
         
+        k3d::log() << debug << Input << std::endl;
+        
+        // initialize the device version of the mesh
+        cuda_device_mesh device_mesh ( Input );
+        
+        device_mesh.output_debug_info();
+        
+        k3d::uint_t number_of_new_points = output_points.size() - Input.points->size();
+        
+        device_mesh.allocate_additional_points ( number_of_new_points );
+        
+        device_mesh.output_debug_info();
+        
+        device_mesh.copy_to_device();
+        
+        k3d::log() << debug << "Calling kernel" << std::endl;
+        
+        subdivide_edges_split_point_calculator ( &(m_edge_list.front()), m_edge_list.size(),  
+                                                         device_mesh.get_points_and_selection_pointer(),
+                                                         Input.points->size(),  
+                                                         device_mesh.get_device_polyhedra().get_per_edge_points_pointer(),
+                                                         device_mesh.get_device_polyhedra().get_per_edge_clockwise_edges_pointer(),
+                                                         device_mesh.get_additional_points_and_selection_pointer(),
+                                                         m_vertices.pipeline_value());
+        
+        device_mesh.copy_from_device ( Output ); 
+        
+        k3d::log() << debug << Output << std::endl;
+        
+		document().pipeline_profiler().finish_execution(*this, "Calculate positions");
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -344,7 +344,8 @@ __global__ void linear_transform_kernel ( float4 *points, int num_points )
  */
 __global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices, 
                                                      unsigned int num_edge_indices, 
-                                                     float4* points_and_selection, 
+                                                     float4* points_and_selection,
+                                                     float4* new_points_and_selection, 
                                                      unsigned int* edge_points,
                                                      unsigned int* clockwise_edges,
                                                      unsigned int first_new_point_index,
@@ -356,7 +357,7 @@ __global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices,
     if ( edge_index_index < num_edge_indices )
     {
         int edge_index = edge_indices[edge_index_index];
-        int new_point_index = edge_index*num_split_points + first_new_point_index + split_index;
+        int new_point_index = edge_index*num_split_points + split_index;
         
         float4 p0 = points_and_selection[edge_points[edge_index]];
         float4 p1 = points_and_selection[edge_points[clockwise_edges[edge_index]]];        
@@ -365,9 +366,10 @@ __global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices,
         p1.y = (p1.y - p0.y) / (num_split_points + 1);
         p1.z = (p1.z - p0.z) / (num_split_points + 1);
         
-        points_and_selection[new_point_index].x = p0.x + (split_index + 1)*p1.x;
-        points_and_selection[new_point_index].y = p0.y + (split_index + 1)*p1.y;
-        points_and_selection[new_point_index].z = p0.z + (split_index + 1)*p1.z;
+        new_points_and_selection[new_point_index].x = 2;// + (split_index + 1)*p1.x;
+        new_points_and_selection[new_point_index].y = 3;// + (split_index + 1)*p1.y;
+        new_points_and_selection[new_point_index].z = 4;// + (split_index + 1)*p1.z;
+        new_points_and_selection[new_point_index].w = 5;
                 
     }   
 }

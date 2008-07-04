@@ -44,6 +44,10 @@ class cuda_device_polyhedra
         void allocate_additional_loops ( k3d::uint_t number_of_additional_loops );
         void allocate_additional_edges ( k3d::uint_t number_of_additional_edges );
         
+        k3d::uint_t* get_per_edge_points_pointer();
+        k3d::uint_t* get_additional_per_edge_points_pointer();
+        k3d::uint_t* get_per_edge_clockwise_edges_pointer();
+        k3d::uint_t* get_additional_per_edge_clockwise_edges_pointer();
     private:    
         /// a pointer to uint arrays allocated on the device
         k3d::uint_t* pdev_per_polygon_first_face;
@@ -122,6 +126,9 @@ class cuda_device_mesh
         void allocate_additional_points ( k3d::uint_t number_of_new_points );
         
         cuda_device_polyhedra& get_device_polyhedra ();
+        
+        float* get_points_and_selection_pointer();
+        float* get_additional_points_and_selection_pointer();
     private:
         /// a pointer to a array of float4's allocated on the device
         float* pdev_points_and_selection;       
