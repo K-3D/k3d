@@ -223,7 +223,7 @@ public:
 		return m_interfaces;
 	}
 
-	const metadata_t& metadata()
+	metadata_t metadata()
 	{
 		return m_metadata;
 	}
@@ -321,7 +321,7 @@ public:
 		return m_interfaces;
 	}
 
-	const metadata_t& metadata()
+	metadata_t metadata()
 	{
 		return m_metadata;
 	}

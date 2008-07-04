@@ -36,7 +36,7 @@ class metadata :
 public:
 	void set_metadata(const string_t& name, const string_t& value);
 	void set_metadata(const metadata_t& values);
-	const metadata_t& get_metadata();
+	metadata_t get_metadata();
 	void erase_metadata(const string_t& name);
 	sigc::connection connect_metadata_changed_signal(const sigc::slot<void>& Slot);
 

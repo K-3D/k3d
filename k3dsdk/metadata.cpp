@@ -38,7 +38,7 @@ void metadata::set_metadata(const metadata_t& values)
 	m_changed_signal.emit();
 }
 
-const metadata::metadata_t& metadata::get_metadata()
+metadata::metadata_t metadata::get_metadata()
 {
 	return m_storage;
 }

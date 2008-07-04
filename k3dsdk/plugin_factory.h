@@ -47,7 +47,7 @@ public:
 	const std::string short_description();
 	const categories_t& categories();
 	quality_t quality();
-	const metadata_t& metadata();
+	metadata_t metadata();
 
 private:
 	const uuid m_factory_id;

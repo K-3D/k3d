@@ -1361,7 +1361,7 @@ void save(inode& Node, element& XML, const ipersistent::save_context& Context)
 	{
 		xml::element& xml_metadata = xml_node.append(xml::element("metadata"));
 
-		const imetadata::metadata_t& pairs = metadata->get_metadata();
+		const imetadata::metadata_t pairs = metadata->get_metadata();
 		for(imetadata::metadata_t::const_iterator pair = pairs.begin(); pair != pairs.end(); ++pair)
 			xml_metadata.append(xml::element("pair", xml::attribute("name", pair->first), xml::attribute("value", pair->second)));
 	}

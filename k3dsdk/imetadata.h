@@ -45,7 +45,7 @@ public:
 	/// Sets a collection of name-value pair, overwriting any existing values
 	virtual void set_metadata(const metadata_t& values) = 0;
 	/// Returns the set of existing name-value pairs
-	virtual const metadata_t& get_metadata() = 0;
+	virtual metadata_t get_metadata() = 0;
 	/// Erases an existing name-value pair
 	virtual void erase_metadata(const string_t& name) = 0;
 

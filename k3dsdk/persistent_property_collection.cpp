@@ -110,7 +110,7 @@ void persistent_property_collection::save(xml::element& Element, const ipersiste
 		{
 			xml::element& xml_metadata = xml_properties.append(xml::element("metadata", xml::attribute("name", m_names[i])));
 
-			const imetadata::metadata_t& pairs = metadata->get_metadata();
+			const imetadata::metadata_t pairs = metadata->get_metadata();
 			for(imetadata::metadata_t::const_iterator pair = pairs.begin(); pair != pairs.end(); ++pair)
 				xml_metadata.append(xml::element("pair", xml::attribute("name", pair->first), xml::attribute("value", pair->second)));
 		}

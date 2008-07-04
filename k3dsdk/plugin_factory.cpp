@@ -72,7 +72,7 @@ k3d::iplugin_factory::quality_t plugin_factory::quality()
 	return m_quality;
 }
 
-const k3d::iplugin_factory::metadata_t& plugin_factory::metadata()
+k3d::iplugin_factory::metadata_t plugin_factory::metadata()
 {
 	return m_metadata;
 }

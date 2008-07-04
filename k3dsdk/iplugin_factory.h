@@ -72,7 +72,7 @@ public:
 	/// Returns the set of interfaces implemented by the plugin 
 	virtual const interfaces_t interfaces() = 0;
 	/// Returns metadata describing the plugin
-	virtual const metadata_t& metadata() = 0;
+	virtual metadata_t metadata() = 0;
 
 protected:
 	iplugin_factory() {}
