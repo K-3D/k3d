@@ -753,7 +753,6 @@ namespace module{
 	    return true;
 	  }
 
-
 	public:
 	  //GTK Widgets
 	  Gtk::ScrolledWindow m_scrolled_window;
@@ -796,7 +795,6 @@ namespace module{
 	  //Shader Preview
 	  std::vector<shaderPreviewImage*> shaderPreviews;
 
-	 
 	private:
 	  s_group *m_grp;
 
@@ -1190,8 +1188,20 @@ namespace module{
 		}
 	      else
 		{
+		  //Single Shader Selected***
+
+		  //Send Selection Signal For Other Panels
+		  k3d::inode *selectedNode = (row->get_value(m_columns.s_object_ptr))->node;
+
+		  k3d::selection::record selected_record = k3d::selection::make_record(selectedNode);
+
+		  m_document_state.select(selected_record);
+
+		  //Build The GUI Context
 		  build_content_pane(row, false);
 		}
+
+	      
  
 	    }//if
 
