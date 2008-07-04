@@ -140,7 +140,7 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<document_exporter, k3d::interface_list<k3d::idocument_exporter> > factory(
-			k3d::classes::DocumentExporter(),
+			k3d::uuid(0x33f1ba2c, 0x5b41392d, 0xe9dc9d99, 0x66a8129d),
 			"COLLADADocumentExporter",
 			_("COLLADA ( .dae )"),
 			"");
