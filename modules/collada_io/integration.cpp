@@ -33,6 +33,17 @@
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/idocument_plugin_factory.h>
+
+#include <k3dsdk/imesh_sink.h>
+#include <k3dsdk/imesh_source.h>
+#include <k3dsdk/imesh_storage.h>
+#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/inode_collection_sink.h>
+#include <k3dsdk/classes.h>
+
+#include <k3dsdk/icamera.h>
+
 #include "integration.h"
 #include "intElements.h"
 using namespace std;
@@ -44,6 +55,71 @@ namespace collada
 
 namespace io
 {
+
+/// Creates a new FrozenMesh using the given name, and returns a pointer to the MeshInstance of the new node
+k3d::inode* create_frozen_mesh(k3d::idocument& Document, const std::string& Name, k3d::mesh* Mesh)
+{
+	std::string unique_name = k3d::unique_name(Document.nodes(), Name);
+	// The frozen mesh
+	k3d::inode* const mesh_node = k3d::plugin::create<k3d::inode>(k3d::classes::FrozenMesh(), Document, unique_name);
+	// The mesh instance
+	k3d::inode* const mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), Document, unique_name + " Instance");
+	// Set painters
+	const k3d::nodes_t gl_nodes = k3d::find_nodes(Document.nodes(), "GL Default Painter");
+	k3d::inode* gl_painter = (1 == gl_nodes.size()) ? *gl_nodes.begin() : 0;
+	const k3d::nodes_t ri_nodes = k3d::find_nodes(Document.nodes(), "RenderMan Default Painter");
+	k3d::inode* ri_painter = (1 == ri_nodes.size()) ? *ri_nodes.begin() : 0;
+	k3d::property::set_internal_value(*mesh_instance, "gl_painter", gl_painter);
+	k3d::property::set_internal_value(*mesh_instance, "ri_painter", ri_painter);
+	// Connect the MeshInstance
+	k3d::ipipeline::dependencies_t dependencies;
+	k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(mesh_instance);
+	k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(mesh_node);
+	if(mesh_sink && mesh_node)
+		dependencies.insert(std::make_pair(&mesh_sink->mesh_sink_input(), &mesh_source->mesh_source_output()));
+	Document.pipeline().set_dependencies(dependencies);
+	k3d::imesh_storage* mesh_storage = dynamic_cast<k3d::imesh_storage*>(mesh_node);
+	return_val_if_fail(mesh_storage, 0);
+	mesh_storage->reset_mesh(Mesh);
+	
+	// Make the mesh_instance visible (shamelessly stolen from document_state.cpp)
+	const k3d::inode_collection::nodes_t::const_iterator doc_node_end = Document.nodes().collection().end();
+	for(k3d::inode_collection::nodes_t::const_iterator doc_node = Document.nodes().collection().begin(); doc_node != doc_node_end; ++doc_node)
+	{
+		if(k3d::inode_collection_sink* const node_collection_sink = dynamic_cast<k3d::inode_collection_sink*>(*doc_node))
+		{
+			const k3d::inode_collection_sink::properties_t properties = node_collection_sink->node_collection_properties();
+			for(k3d::inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+			{
+				if(k3d::inode_collection_property* const node_collection_property = dynamic_cast<k3d::inode_collection_property*>(*property))
+				{
+					k3d::inode_collection_property::nodes_t nodes = k3d::property::internal_value<k3d::inode_collection_property::nodes_t>(**property);
+					if(node_collection_property->property_allow(*mesh_instance))
+						nodes.push_back(mesh_instance);
+					k3d::property::set_internal_value(**property, nodes);
+				}
+			}
+		}
+	}
+	
+	return mesh_instance;
+}
+
+/// Creates a new Light using the given name, and returns a pointer to the Node of the new node
+k3d::inode* create_light(k3d::idocument& Document, const std::string& Name)
+{
+	std::string unique_name = k3d::unique_name(Document.nodes(), Name);
+	k3d::inode* const light_node = k3d::plugin::create<k3d::inode>(k3d::uuid(1,0,0,29), Document, unique_name);
+	return light_node;
+}
+
+/// Creates a new Camera using the given name, and returns a pointer to the Node of the new node
+k3d::inode* create_camera(k3d::idocument& Document, const std::string& Name)
+{
+	std::string unique_name = k3d::unique_name(Document.nodes(), Name);
+	k3d::inode* const camera_node = k3d::plugin::create<k3d::inode>(k3d::classes::Camera(), Document, unique_name);
+	return camera_node;
+}
 
 Node::Node(domNode& node, const k3d::matrix4& mat)
 {
@@ -232,8 +308,8 @@ daeParser::daeParser(domCOLLADA& root, k3d::idocument& Document)
 	////////////////////////////////////////////////////
 	////////////////////////////////////////////////////
 
-	k3d::inode_collection::nodes_t nodes;
-	std::vector<k3d::inode*> persistent_nodes;
+	//k3d::inode_collection::nodes_t nodes;
+	//std::vector<k3d::inode*> persistent_nodes;
 
 	for(size_t i =0; i < scene_nodes.getCount(); i++)
 	{
@@ -242,24 +318,32 @@ daeParser::daeParser(domCOLLADA& root, k3d::idocument& Document)
 
 		if(!lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D()).lights.empty())
 		{
-			name = "Light";
-			factory_id = k3d::uuid(1,0,0,29);
+			k3d::inode *light_node;
+			light_node = create_light(Document,"COLLADA Light");
 		}
 		else
 		if(!lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D()).cameras.empty())
 		{
-			name = "Camera";
-			factory_id = k3d::uuid(0x45ce1872, 0xaf184b6d, 0xb391e136, 0x0dcfe8b5);
+			k3d::inode *camera_node;
+			camera_node = create_camera(Document,"COLLADA Camera");
+		}
+		else
+		if(!lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D()).meshes.empty())
+		{
+			k3d::mesh *mesh = new k3d::mesh();
+			create_frozen_mesh(Document,"COLLADA Mesh", mesh);
+			*mesh = lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D()).meshes.back()->getMesh();
+			continue;
 		}
 		else
 			factory_id == k3d::uuid::null();
-
+/*
 		if(factory_id == k3d::uuid::null())
 		{
 			k3d::log() << error << "node [" << name << "] with unspecified factory ID will not be loaded" << std::endl;
 			continue;
 		}
-	
+
 		const k3d::ipersistent_lookup::id_type node_id = 2;
 		if(node_id == 0)
 		{
@@ -301,9 +385,10 @@ daeParser::daeParser(domCOLLADA& root, k3d::idocument& Document)
 	
 		nodes.push_back(node);
 		persistent_nodes.push_back(node);
+*/
 	}
 
-	Document.nodes().add_nodes(nodes);
+	//Document.nodes().add_nodes(nodes);
 	////////////////////////////////////////////////////
 	////////////////////////////////////////////////////
 }

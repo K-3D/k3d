@@ -35,6 +35,7 @@ namespace io
 
 extern k3d::iplugin_factory& mesh_reader_factory();
 extern k3d::iplugin_factory& document_importer_factory();
+extern k3d::iplugin_factory& document_exporter_factory();
 
 } // namespace io
 
@@ -44,6 +45,7 @@ extern k3d::iplugin_factory& document_importer_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::collada::io::document_importer_factory());
+	Registry.register_factory(module::collada::io::document_exporter_factory());
 	Registry.register_factory(module::collada::io::mesh_reader_factory());
 	//Registry.register_factory(module::dae::io::mesh_writer_factory());
 K3D_MODULE_END

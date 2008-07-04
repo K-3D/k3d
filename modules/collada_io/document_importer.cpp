@@ -26,22 +26,11 @@
 #include <dom/domCOLLADA.h>
 #include <dom/domConstants.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/algebra.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/data.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/gzstream.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
-#include <k3dsdk/idocument_plugin_factory.h>
-#include <k3dsdk/inode_collection.h>
-#include <k3dsdk/log.h>
-#include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/serialization_xml.h>
-#include <k3dsdk/string_modifiers.h>
-#include <k3dsdk/vectors.h>
-#include <k3dsdk/xml.h>
+
 #include "intElements.h"
 #include "integration.h"
 
@@ -75,9 +64,20 @@ public:
 			return false;
 		}
 
+		//////////////////////TEST///////////////////////////
+		//daeParser dae_file2(*root, Document);
+		//k3d::mesh* mesh = new k3d::mesh();
+		//k3d::gprim_factory factory(*mesh);
+		//std::string name = "Hoorray";
+		//k3d::inode* frozen_mesh = create_frozen_mesh(Document, name, mesh);
+		//daeParser dae_file(*root, *mesh);
+
+		/////////////////////////////////////////////////////
+
+
+
 		// Do the conversion. The conversion process throws an exception on error, so
 		// we'll include a try/catch handler.
-		//convertModel(*root, Mesh);
 		daeParser dae_file(*root, Document);
 	
 		// destroy the objects we created during the conversion process
