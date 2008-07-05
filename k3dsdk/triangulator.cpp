@@ -21,6 +21,7 @@
 #include "mesh_operations.h"
 #include "sgi_tesselator.h"
 #include "triangulator.h"
+#include <set>
 
 namespace k3d
 {
@@ -62,9 +63,10 @@ public:
 		const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 		const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 
+		vertex_edges.resize(points.size());
+
 		const uint_t face_begin = 0;
 		const uint_t face_end = face_begin + face_first_loops.size();
-
 		for(uint_t face = face_begin; face != face_end; ++face)
 		{
 			owner.start_face(face);
@@ -85,6 +87,8 @@ public:
 
 				for(uint_t edge = first_edge; ; )
 				{
+					vertex_edges[edge_points[edge]] = edge;
+
 					sgiTessVertex(tessellator, const_cast<double_t*>(points[edge_points[edge]].n), const_cast<void*>(reinterpret_cast<void*>(edge_points[edge])));
 
 					edge = clockwise_edges[edge];
@@ -118,6 +122,12 @@ public:
 		vertices[2] = reinterpret_cast<uint_t>(VertexData[2]);
 		vertices[3] = reinterpret_cast<uint_t>(VertexData[3]);
 
+		uint_t edges[4];
+		edges[0] = vertex_edges[vertices[0]];
+		edges[1] = vertex_edges[vertices[1]];
+		edges[2] = vertex_edges[vertices[2]];
+		edges[3] = vertex_edges[vertices[3]];
+
 		double_t weights[4];
 		weights[0] = Weight[0];
 		weights[1] = Weight[1];
@@ -125,8 +135,10 @@ public:
 		weights[3] = Weight[3];
 
 		uint_t new_vertex = 0;
+		owner.add_vertex(coordinates, vertices, edges, weights, new_vertex);
 
-		owner.add_vertex(coordinates, vertices, weights, new_vertex);
+		while(vertex_edges.size() <= new_vertex)
+			vertex_edges.push_back(0);
 
 		*OutputData = reinterpret_cast<void*>(new_vertex);
 	}
@@ -137,26 +149,49 @@ public:
 
 		if(++vertex_count > 2)
 		{
+			uint_t triangle_vertices[3];
 			switch(mode)
 			{
 				case GL_TRIANGLE_FAN:
-					owner.add_triangle(vertices[0], vertices[1], vertices[2]);
+					triangle_vertices[0] = vertices[0];
+					triangle_vertices[1] = vertices[1];
+					triangle_vertices[2] = vertices[2];
+
 					vertices[1] = vertices[2];
 					break;
 				case GL_TRIANGLE_STRIP:
 					if(flip_strip)
-						owner.add_triangle(vertices[2], vertices[1], vertices[0]);
+					{
+						triangle_vertices[0] = vertices[2];
+						triangle_vertices[1] = vertices[1];
+						triangle_vertices[2] = vertices[0];
+					}
 					else
-						owner.add_triangle(vertices[0], vertices[1], vertices[2]);
+					{
+						triangle_vertices[0] = vertices[0];
+						triangle_vertices[1] = vertices[1];
+						triangle_vertices[2] = vertices[2];
+					}
+
 					flip_strip = !flip_strip;
 					vertices[0] = vertices[1];
 					vertices[1] = vertices[2];
 					break;
 				case GL_TRIANGLES:
-					owner.add_triangle(vertices[0], vertices[1], vertices[2]);
+					triangle_vertices[0] = vertices[0];
+					triangle_vertices[1] = vertices[1];
+					triangle_vertices[2] = vertices[2];
+
 					vertex_count = 0;
 					break;
 			}
+
+			uint_t triangle_edges[3];
+			triangle_edges[0] = vertex_edges[triangle_vertices[0]];
+			triangle_edges[1] = vertex_edges[triangle_vertices[1]];
+			triangle_edges[2] = vertex_edges[triangle_vertices[2]];
+					
+			owner.add_triangle(triangle_vertices, triangle_edges);
 		}
 	}
 
@@ -211,6 +246,7 @@ public:
 	uint_t vertex_count;
 	uint_t vertices[3];
 	bool flip_strip;
+	std::vector<uint_t> vertex_edges;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -241,11 +277,11 @@ void triangulator::start_face(const uint_t Face)
 {
 }
 
-void triangulator::add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex)
+void triangulator::add_vertex(const point3& Coordinates, uint_t Vertices[4], uint_t Edges[4], double_t Weights[4], uint_t& NewVertex)
 {
 }
 
-void triangulator::add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3)
+void triangulator::add_triangle(uint_t Points[3], uint_t Edges[3])
 {
 }
 

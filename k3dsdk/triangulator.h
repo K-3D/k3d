@@ -45,9 +45,9 @@ private:
 	/// Called once before processing begins on the given polygon face
 	virtual void start_face(const uint_t Face);
 	/// Called anytime the triangulation process needs to create a new vertex (e.g: when edges cross within a self-intersecting polygon)
-	virtual void add_vertex(const point3& Coordinates, uint_t Vertices[4], double_t Weights[4], uint_t& NewVertex);
+	virtual void add_vertex(const point3& Coordinates, uint_t Vertices[4], uint_t Edges[4], double_t Weights[4], uint_t& NewVertex);
 	/// Called once for each triangle generated
-	virtual void add_triangle(const uint_t Point1, const uint_t Point2, const uint_t Point3);
+	virtual void add_triangle(uint_t Vertices[3], uint_t Edges[3]);
 	/// Called once after processing for the given face has been completed
 	virtual void finish_face(const uint_t Face);
 	/// Called once after the entire mesh has been processed

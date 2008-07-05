@@ -288,17 +288,17 @@ private:
 			m_current_face = Face;
 		}
 
-		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], double Weights[4], k3d::uint_t& NewVertex)
+		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], double Weights[4], k3d::uint_t& NewVertex)
 		{
 			NewVertex = m_points.size();
 			m_points.push_back(Coordinates);
 		}
 
-		void add_triangle(const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3)
+		void add_triangle(k3d::uint_t Vertices[3], k3d::uint_t Edges[3])
 		{
-			m_a_points.push_back(Point1);
-			m_b_points.push_back(Point2);
-			m_c_points.push_back(Point3);
+			m_a_points.push_back(Vertices[0]);
+			m_b_points.push_back(Vertices[1]);
+			m_c_points.push_back(Vertices[2]);
 			m_materials.push_back(m_original_materials[m_current_face]);
 		}
 

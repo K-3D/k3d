@@ -104,8 +104,8 @@ private:
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
 
 	virtual void start_face(const k3d::uint_t Face);
-	virtual void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::double_t Weights[4], k3d::uint_t& NewVertex);
-	virtual void add_triangle(const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3);
+	virtual void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], k3d::double_t Weights[4], k3d::uint_t& NewVertex);
+	virtual void add_triangle(k3d::uint_t Vertices[3], k3d::uint_t Edges[3]);
 	
 	boost::shared_ptr<const k3d::mesh::points_t> m_input_points;
 	

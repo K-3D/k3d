@@ -73,7 +73,7 @@ void cached_triangulation::start_face(const k3d::uint_t Face)
 	m_face_points.push_back(k3d::mesh::indices_t());
 }
 
-void cached_triangulation::add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::double_t Weights[4], k3d::uint_t& NewVertex)
+void cached_triangulation::add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], k3d::double_t Weights[4], k3d::uint_t& NewVertex)
 {
 	NewVertex = m_points.size();
 	k3d::log() << debug << "added new vertex: " << NewVertex << std::endl;
@@ -82,32 +82,32 @@ void cached_triangulation::add_vertex(const k3d::point3& Coordinates, k3d::uint_
 	m_points.push_back(Coordinates);
 }
 
-void cached_triangulation::add_triangle(const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3)
+void cached_triangulation::add_triangle(k3d::uint_t Vertices[3], k3d::uint_t Edges[3])
 {
 	typedef std::pair<point_map_t::iterator, bool> result_t;
 	// Create point copies for this face, if they don't exist already
-	result_t r1 = m_point_map.insert(std::make_pair(Point1, m_progress));
+	result_t r1 = m_point_map.insert(std::make_pair(Vertices[0], m_progress));
 	if (r1.second)
 	{
-		m_point_links[Point1].push_back(m_progress);
+		m_point_links[Vertices[0]].push_back(m_progress);
 		m_face_points.back().push_back(m_progress);
-		m_points[m_progress] = m_input_points->at(Point1);
+		m_points[m_progress] = m_input_points->at(Vertices[0]);
 		++m_progress;
 	}
-	result_t r2 = m_point_map.insert(std::make_pair(Point2, m_progress));
+	result_t r2 = m_point_map.insert(std::make_pair(Vertices[1], m_progress));
 	if (r2.second)
 	{
-		m_point_links[Point2].push_back(m_progress);
+		m_point_links[Vertices[1]].push_back(m_progress);
 		m_face_points.back().push_back(m_progress);
-		m_points[m_progress] = m_input_points->at(Point2);
+		m_points[m_progress] = m_input_points->at(Vertices[1]);
 		++m_progress;
 	}
-	result_t r3 = m_point_map.insert(std::make_pair(Point3, m_progress));
+	result_t r3 = m_point_map.insert(std::make_pair(Vertices[2], m_progress));
 	if (r3.second)
 	{
-		m_point_links[Point3].push_back(m_progress);
+		m_point_links[Vertices[2]].push_back(m_progress);
 		m_face_points.back().push_back(m_progress);
-		m_points[m_progress] = m_input_points->at(Point3);
+		m_points[m_progress] = m_input_points->at(Vertices[2]);
 		++m_progress;
 	}
 		

@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
  */
 
 #include <k3d-i18n-config.h>
@@ -124,8 +124,8 @@ private:
 			m_polyhedra->uniform_data = Input.polyhedra->uniform_data.clone_types();
 			m_uniform_data_copier.reset(new k3d::named_array_copier(Input.polyhedra->uniform_data, m_polyhedra->uniform_data));
 
-//			m_polyhedra->face_varying_data = Input.polyhedra->face_varying_data.clone_types();
-//			m_face_varying_data_copier.reset(new k3d::named_array_copier(Input.polyhedra->face_varying_data, m_polyhedra->face_varying_data));
+			m_polyhedra->face_varying_data = Input.polyhedra->face_varying_data.clone_types();
+			m_face_varying_data_copier.reset(new k3d::named_array_copier(Input.polyhedra->face_varying_data, m_polyhedra->face_varying_data));
 
 			Output.vertex_data = Input.vertex_data.clone();
 			m_vertex_data_copier.reset(new k3d::named_array_copier(Input.vertex_data, Output.vertex_data));
@@ -148,7 +148,7 @@ private:
 			m_current_face = Face;
 		}
 
-		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], double Weights[4], k3d::uint_t& NewVertex)
+		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], double Weights[4], k3d::uint_t& NewVertex)
 		{
 			NewVertex = m_points->size();
 
@@ -156,18 +156,20 @@ private:
 			m_point_selection->push_back(0.0);
 
 			m_vertex_data_copier->push_back(4, Vertices, Weights);
+
+			m_new_face_varying_data[NewVertex] = new_face_varying_record(Edges, Weights);
 		}
 
-		void add_triangle(const k3d::uint_t Point1, const k3d::uint_t Point2, const k3d::uint_t Point3)
+		void add_triangle(k3d::uint_t Vertices[3], k3d::uint_t Edges[3])
 		{
 			m_face_first_loops->push_back(m_loop_first_edges->size());
 			m_face_loop_counts->push_back(1);
 			m_face_selection->push_back(1.0);
 			m_face_materials->push_back((*m_input->polyhedra->face_materials)[m_current_face]);
 			m_loop_first_edges->push_back(m_edge_points->size());
-			m_edge_points->push_back(Point1);
-			m_edge_points->push_back(Point2);
-			m_edge_points->push_back(Point3);
+			m_edge_points->push_back(Vertices[0]);
+			m_edge_points->push_back(Vertices[1]);
+			m_edge_points->push_back(Vertices[2]);
 			m_clockwise_edges->push_back(m_edge_points->size() - 2);
 			m_clockwise_edges->push_back(m_edge_points->size() - 1);
 			m_clockwise_edges->push_back(m_edge_points->size() - 3);
@@ -177,9 +179,13 @@ private:
 
 			m_uniform_data_copier->push_back(m_current_face);
 
-//			m_face_varying_data_copier->push_back(Point1);
-//			m_face_varying_data_copier->push_back(Point2);
-//			m_face_varying_data_copier->push_back(Point3);
+			for(k3d::uint_t i = 0; i != 3; ++i)
+			{
+				if(m_new_face_varying_data.count(Vertices[i]))
+					m_face_varying_data_copier->push_back(4, m_new_face_varying_data[Vertices[i]].edges, m_new_face_varying_data[Vertices[i]].weights);
+				else
+					m_face_varying_data_copier->push_back(Edges[i]);
+			}
 		}
 
 		const k3d::mesh* m_input;
@@ -200,10 +206,28 @@ private:
 		boost::shared_ptr<k3d::mesh::selection_t> m_point_selection;
 
 		boost::shared_ptr<k3d::named_array_copier> m_uniform_data_copier;
-//		boost::shared_ptr<k3d::named_array_copier> m_face_varying_data_copier;
+		boost::shared_ptr<k3d::named_array_copier> m_face_varying_data_copier;
 		boost::shared_ptr<k3d::named_array_copier> m_vertex_data_copier;
 
 		k3d::uint_t m_current_face;
+
+		struct new_face_varying_record
+		{
+			new_face_varying_record()
+			{
+			}
+
+			new_face_varying_record(k3d::uint_t Edges[4], k3d::double_t Weights[4])
+			{
+				std::copy(Edges, Edges + 4, edges);
+				std::copy(Weights, Weights + 4, weights);
+			}
+
+			k3d::uint_t edges[4];
+			k3d::double_t weights[4];
+		};
+
+		std::map<k3d::uint_t, new_face_varying_record> m_new_face_varying_data;
 	};
 };
 

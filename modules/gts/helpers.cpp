@@ -64,17 +64,17 @@ public:
 	}
 
 private:
-	void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], double Weights[4], k3d::uint_t& NewVertex)
+	void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], double Weights[4], k3d::uint_t& NewVertex)
 	{
 		NewVertex = gts_vertices.size();
 		gts_vertices.push_back(0);
 	}
 
-	void add_triangle(const k3d::uint_t Vertex1, const k3d::uint_t Vertex2, const k3d::uint_t Vertex3)
+	void add_triangle(k3d::uint_t Vertices[3], k3d::uint_t Edges[3])
 	{
-		GtsVertex* const vertex1 = get_vertex(Vertex1);
-		GtsVertex* const vertex2 = get_vertex(Vertex2);
-		GtsVertex* const vertex3 = get_vertex(Vertex3);
+		GtsVertex* const vertex1 = get_vertex(Vertices[0]);
+		GtsVertex* const vertex2 = get_vertex(Vertices[1]);
+		GtsVertex* const vertex3 = get_vertex(Vertices[2]);
 
 		GtsEdge* const edge1 = gts_edge_new(gts_edge_class(), vertex1, vertex2);
 		GtsEdge* const edge2 = gts_edge_new(gts_edge_class(), vertex2, vertex3);
