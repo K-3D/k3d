@@ -319,6 +319,8 @@ namespace module{
 
         shaderPreviewImage::~shaderPreviewImage()
 	{
+	  //Remove Preview Render from tmp dir
+	   k3d::filesystem::remove(imgFilePath);
         }
 
         bool shaderPreviewImage::on_expose_event(GdkEventExpose* event)
@@ -357,108 +359,220 @@ namespace module{
 	     previewSize(200)	  
 	  {
 	    //Setup The Rendering Components (Using Meta Data Eventually)
+	    createPreviewNodes(); 
+	  }
+	  
+	  //Analyse Current Document For Preview Nodes And Create As Appropriate
+	  void createPreviewNodes()
+	  {
+	    //Flags For Each Node
+	    bool hasAqsis_renderer = 	false;
+	    bool hasCamera = 		false;
+	    bool hasGeo = 		false;
+	    bool hasLight = 		false;
+	    bool hasLight_shader = 	false;
+	    bool hasRenderman_engine = 	false;
+
+	    //Pointer To Aqsis Engine For RMAN Engine Node
+	    k3d::ri::irender_engine* aqsis = 0;
+
+	    //Check All Nodes MetaData To See If These Nodes Exist. If They Do Dont Create New Nodes
+	    k3d::inode_collection::nodes_t::const_iterator node = m_document_state->document().nodes().collection().begin();
+	    for(; node != m_document_state->document().nodes().collection().end(); ++node)
+	      {
+		if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(*node))
+		  {
+		    k3d::string_t value = metadata->get_metadata()["PreviewCore::nametag"];
+
+		    if(value == "p_aqsis_renderer")
+		      {
+			hasAqsis_renderer = true;
+			aqsis = dynamic_cast<k3d::ri::irender_engine*>(*node);
+		      }
+
+		    if(value == "p_camera")
+		      {
+			hasCamera = true;
+			panelCamera = dynamic_cast<camera_t*>(*node);
+		      }
+
+		    if(value == "p_geo")
+		      {
+			hasGeo = true;
+			panelGeo = dynamic_cast<geo_t*>(*node);
+		      }
+
+		    if(value == "p_light")
+		      {
+			hasLight = true;
+			panelLight = dynamic_cast<light_t*>(*node);
+		      }
+
+		    if(value == "p_light_shader")
+		      {
+			hasLight_shader = true;
+			panelLShader = dynamic_cast<k3d::inode*>(*node);				
+		      }
+
+		    if(value == "p_rman_engine")
+		      {
+			hasRenderman_engine = true;
+			panelEngine = dynamic_cast<rManEngine_t*>(*node);					
+		      }		
+
+		  }//if
+	      }//for
+
 
 	    //Light Shader Setup*******************
 
-	    panelLShader = dynamic_cast<k3d::inode*>(k3d::plugin::create("RenderManLightShader", 
-									 m_document_state->document(), 
-									 "Preview Core::Light Shader"));
+	    if(!hasLight_shader)
+	      {
+		panelLShader = dynamic_cast<k3d::inode*>(k3d::plugin::create("RenderManLightShader", 
+									     m_document_state->document(), 
+									     "Preview Core::Light Shader"));
 
-	    k3d::property::set_internal_value(*panelLShader, 
-					      "shader_path", k3d::share_path() /
-					      k3d::filesystem::generic_path("shaders/light/k3d_pointlight.sl"));
-
-
+		k3d::property::set_internal_value(*panelLShader, 
+						  "shader_path", k3d::share_path() /
+						  k3d::filesystem::generic_path("shaders/light/k3d_pointlight.sl"));
+	      
+		//METADATA INSERT
+		if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelLShader))
+		  metadata->set_metadata("PreviewCore::nametag", "p_light_shader");
+   
+	      }//if
 
 	    //Light Setup*************************
-	    panelLight = dynamic_cast<light_t*>(k3d::plugin::create("RenderManLight", 
-								    m_document_state->document(), 
-								    "Preview Core::Light"));
 
-	    k3d::property::set_internal_value(*panelLight, 
-					      "shader", panelLShader);
+	    if(!hasLight)
+	      {
+		panelLight = dynamic_cast<light_t*>(k3d::plugin::create("RenderManLight", 
+									m_document_state->document(), 
+									"Preview Core::Light"));
+
+		k3d::property::set_internal_value(*panelLight, 
+						  "shader", panelLShader);
 
 
-	    k3d::inode* light_transformation = k3d::set_matrix(*panelLight, 
-							       k3d::translation3D(k3d::point3(-20, 20, 30)));
+		k3d::inode* light_transformation = k3d::set_matrix(*panelLight, 
+								   k3d::translation3D(k3d::point3(-20, 20, 30)));
 
-     
+		//METADATA INSERT
+		if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelLight))
+		  metadata->set_metadata("PreviewCore::nametag", "p_light");
+
+	      }//if
 
 	    //Camera Setup************************
-	    panelCamera = dynamic_cast<camera_t*>
-	      (k3d::plugin::create("Camera", 
-				   m_document_state->document(), 
-				   "Preview Core::CameraTMP"));
-	    const k3d::point3 origin = k3d::point3(0, 0, 0);
-	    const k3d::vector3 world_up = k3d::vector3(0, 0, 1);
+	  
+	    if(!hasCamera)
+	      {
+		panelCamera = dynamic_cast<camera_t*>
+		  (k3d::plugin::create("Camera", 
+				       m_document_state->document(), 
+				       "Preview Core::Camera"));
+		const k3d::point3 origin = k3d::point3(0, 0, 0);
+		const k3d::vector3 world_up = k3d::vector3(0, 0, 1);
 
-	    const k3d::point3 position = k3d::point3(0, 13, 0);
-	    const k3d::vector3 look_vector = origin - position;
-	    const k3d::vector3 right_vector = look_vector ^ world_up;
-	    const k3d::vector3 up_vector = right_vector ^ look_vector;
+		const k3d::point3 position = k3d::point3(0, 13, 0);
+		const k3d::vector3 look_vector = origin - position;
+		const k3d::vector3 right_vector = look_vector ^ world_up;
+		const k3d::vector3 up_vector = right_vector ^ look_vector;
 
-	    k3d::inode* const camera_transformation 
-	      = k3d::set_matrix(*panelCamera, 
-				k3d::view_matrix(look_vector, up_vector, position));
+		k3d::inode* const camera_transformation 
+		  = k3d::set_matrix(*panelCamera, 
+				    k3d::view_matrix(look_vector, up_vector, position));
        
-	    camera_transformation->set_name("Camera Transformation");
-	    k3d::property::set_internal_value(*panelCamera, 
-					      "world_target", k3d::point3(0, 0, 0));
+		camera_transformation->set_name("Camera Transformation");
+		k3d::property::set_internal_value(*panelCamera, 
+						  "world_target", k3d::point3(0, 0, 0));
 
-	    k3d::property::set_internal_value(*panelCamera, 
-					      "viewport_visible", false);
+		k3d::property::set_internal_value(*panelCamera, 
+						  "viewport_visible", false);
 
-	    k3d::property::set_internal_value(*panelCamera, 
-					      "aspect_ratio", k3d::string_t("Square"));
+		k3d::property::set_internal_value(*panelCamera, 
+						  "aspect_ratio", k3d::string_t("Square"));
+
+		//METADATA INSERT
+		if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelCamera))
+		  metadata->set_metadata("PreviewCore::nametag", "p_camera");
+
+	      }//if
 
 	    //Geometry Setup**********************
-	    panelGeo = dynamic_cast<geo_t*>
-	      (k3d::plugin::create("Sphere", 
-				   m_document_state->document(), 
-				   "Preview Core::Geo::SphereTMP"));
 
-	    k3d::property::set_internal_value(*panelGeo, 
-					      "render_shadows", false);
+	    if(!hasGeo)
+	      {
+		panelGeo = dynamic_cast<geo_t*>
+		  (k3d::plugin::create("Sphere", 
+				       m_document_state->document(), 
+				       "Preview Core::Geo::Sphere"));
 
-	    k3d::property::set_internal_value(*panelGeo, 
-					      "viewport_visible", false);
+		k3d::property::set_internal_value(*panelGeo, 
+						  "render_shadows", false);
+
+		k3d::property::set_internal_value(*panelGeo, 
+						  "viewport_visible", false);
+
+		//METADATA INSERT
+		if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelGeo))
+		  metadata->set_metadata("PreviewCore::nametag", "p_geo");
+
+	      }//if
+
+	    //Aqsis Engine Setup**************
+
+	    if(!hasAqsis_renderer)
+	      {
+		aqsis = k3d::plugin::create<k3d::ri::irender_engine>("AqsisRenderManEngine", 
+								     m_document_state->document(), 
+								     "Preview Core::Aqsis Renderer");
+		//METADATA INSERT
+		if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(aqsis))
+		  metadata->set_metadata("PreviewCore::nametag", "p_aqsis_renderer");
+
+	      }//if
+
 
 	    //Renderman Engine Setup**************
-	    panelEngine = dynamic_cast<rManEngine_t*>
-	      (k3d::plugin::create("RenderManEngine", 
-				   m_document_state->document(), 
-				   "Preview Core::RMANENGINETMP"));
 
-	    k3d::property::set_internal_value(*panelEngine, 
-					      "enabled_lights", 
-					      k3d::inode_collection_property::nodes_t(1, panelLight));
+	    if(!hasRenderman_engine)
+	      {
+		panelEngine = dynamic_cast<rManEngine_t*>
+		  (k3d::plugin::create("RenderManEngine", 
+				       m_document_state->document(), 
+				       "Preview Core::RenderManEngine"));
 
-	    k3d::property::set_internal_value(*panelEngine, 
-					      "visible_nodes", 
-					      k3d::inode_collection_property::nodes_t(1, panelGeo));
+		k3d::property::set_internal_value(*panelEngine, 
+						  "enabled_lights", 
+						  k3d::inode_collection_property::nodes_t(1, panelLight));
 
+		k3d::property::set_internal_value(*panelEngine, 
+						  "visible_nodes", 
+						  k3d::inode_collection_property::nodes_t(1, panelGeo));
 
-	    // To ensure Universal Compatibility With user documents, create a RMAN Node (Aqsis)
-	    k3d::ri::irender_engine* const aqsis = k3d::plugin::create<k3d::ri::irender_engine>("AqsisRenderManEngine", 
-												m_document_state->document(), 
-												"Preview Core::Aqsis RendererTMP");
+		//Setup the shader preview render engine*****
+		k3d::property::set_internal_value(*panelEngine, 
+						  "render_engine", dynamic_cast<k3d::inode*>(aqsis));
 
-	    //Setup the shader preview render engine*****
-	    k3d::property::set_internal_value(*panelEngine, 
-					      "render_engine", dynamic_cast<k3d::inode*>(aqsis));
-
-	    k3d::property::set_internal_value(*panelEngine, 
-					      "pixel_width", static_cast<k3d::int32_t>(previewSize));
+		k3d::property::set_internal_value(*panelEngine, 
+						  "pixel_width", static_cast<k3d::int32_t>(previewSize));
 
 
-	    k3d::property::set_internal_value(*panelEngine, 
-					      "pixel_height", static_cast<k3d::int32_t>(previewSize));
+		k3d::property::set_internal_value(*panelEngine, 
+						  "pixel_height", static_cast<k3d::int32_t>(previewSize));
 
-	    k3d::double_t aspectRatio = 1.0;
+		k3d::double_t aspectRatio = 1.0;
 
-	    k3d::property::set_internal_value(*panelEngine, 
-					      "pixel_aspect_ratio", aspectRatio);
-	    
+		k3d::property::set_internal_value(*panelEngine, 
+						  "pixel_aspect_ratio", aspectRatio);
+
+
+		//METADATA INSERT
+		if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelEngine))
+		  metadata->set_metadata("PreviewCore::nametag", "p_rman_engine");
+
+	      }//if
 	  }
 
 	  virtual ~content_pane(){}
@@ -510,7 +624,7 @@ namespace module{
 	    //Clean Up
 	    std::vector<shaderPreviewImage*>::iterator pIter = shaderPreviews.begin();
 	    for(; pIter != shaderPreviews.end(); pIter++)
-		delete (*pIter);    
+	      delete (*pIter);    
 
 	    timerPreviewConnection.disconnect();
 	  }
@@ -660,7 +774,7 @@ namespace module{
 		    s_breakers.push_back(tmpHBreaker);
 		    shaderBoxes_c.pack_start(*tmpHBreaker, false, false, 0);
 		     
-		     fileName_int++;
+		    fileName_int++;
 
 		  }//for
 
@@ -679,64 +793,68 @@ namespace module{
 
 	  void renderPreview()
 	  {
-	     //Ensure Current Preview Engine Has Selected Nodes Only Visible
-	    k3d::inode_collection::nodes_t::const_iterator node = m_document_state->document().nodes().collection().begin();
-	  for(; node != m_document_state->document().nodes().collection().end(); ++node){
-
-	    if((*node)->factory().implements(typeid(k3d::ri::ilight)))
-	      {
-	    //Disable Node Regardless In RMANEngine::lights and nodes
+	    //Re-init The Preview Render Dimensions
 	    k3d::property::set_internal_value(*panelEngine, 
-					      "enabled_lights", 
-					      k3d::inode_collection_property::nodes_t(0, (*node)));
-	    }//if
-	    else if((*node)->factory().implements(typeid(k3d::itransform_sink)))
-	      {
-	      k3d::property::set_internal_value(*panelEngine, 
-						"visible_nodes", 
-						k3d::inode_collection_property::nodes_t(0, (*node)));
-	    }//else if
+					      "pixel_width", static_cast<k3d::int32_t>(previewSize));
+
+
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "pixel_height", static_cast<k3d::int32_t>(previewSize));
+
+
+	    //Ensure Current Preview Engine Has Selected Nodes Only Visible
+	    k3d::inode_collection::nodes_t::const_iterator node = m_document_state->document().nodes().collection().begin();
+	    for(; node != m_document_state->document().nodes().collection().end(); ++node){
+
+	      if((*node)->factory().implements(typeid(k3d::ri::ilight)))
+		{
+		  //Disable Node Regardless In RMANEngine::lights and nodes
+		  k3d::property::set_internal_value(*panelEngine, 
+						    "enabled_lights", 
+						    k3d::inode_collection_property::nodes_t(0, (*node)));
+		}//if
+	      else if((*node)->factory().implements(typeid(k3d::itransform_sink)))
+		{
+		  k3d::property::set_internal_value(*panelEngine, 
+						    "visible_nodes", 
+						    k3d::inode_collection_property::nodes_t(0, (*node)));
+		}//else if
 	    
-	  }//for
-
-	  //Simply Enable Now Only USed Light & Geo
-	  k3d::property::set_internal_value(*panelEngine, 
-                                            "enabled_lights", 
-					    k3d::inode_collection_property::nodes_t(1, panelLight));
-
-	  k3d::property::set_internal_value(*panelEngine, 
-					    "visible_nodes", 
-					    k3d::inode_collection_property::nodes_t(1, panelGeo));
-  
-	  //Go Though Every Shader In Group Render To Image File.. Done
-	  std::list<s_object*>::const_iterator soIter = m_grp->m_shaders.begin();
-	  std::vector<shaderPreviewImage*>::iterator pIter = shaderPreviews.begin();   //NEE TO FIX THIS AS ASSUMES TOO MUCH (CORRECT SIZES) -> DANGEROUS
-	  for(; soIter != m_grp->m_shaders.end(); soIter++)
-	    {
-	      //Check If NodeIn sobject Is A RenderMan Material
-	      if((*soIter)->node->factory().implements(typeid(k3d::ri::imaterial)))
-		{
-		  //If it is, assign to current geometry as surface shader
-		  k3d::property::set_internal_value(*panelGeo, 
-						    "material", (*soIter)->node);
-	   
-		  //Render The Preview Using Selected External Renderer
-		  panelEngine->render_camera_frame(*panelCamera, (*pIter)->imgFilePath, false);
-
-		}//if	 
-	      else
-		{
-		  k3d::log() << "Is NOT A Rman Material" << std::endl;
-		}
-
-	      pIter++;
-
 	    }//for
 
+	    //Simply Enable Now Only USed Light & Geo
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "enabled_lights", 
+					      k3d::inode_collection_property::nodes_t(1, panelLight));
 
-	
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "visible_nodes", 
+					      k3d::inode_collection_property::nodes_t(1, panelGeo));
+  
+	    //Go Though Every Shader In Group Render To Image File.. Done
+	    std::list<s_object*>::const_iterator soIter = m_grp->m_shaders.begin();
+	    std::vector<shaderPreviewImage*>::iterator pIter = shaderPreviews.begin();   //NEE TO FIX THIS AS ASSUMES TOO MUCH (CORRECT SIZES) -> DANGEROUS
+	    for(; soIter != m_grp->m_shaders.end(); soIter++)
+	      {
+		//Check If NodeIn sobject Is A RenderMan Material
+		if((*soIter)->node->factory().implements(typeid(k3d::ri::imaterial)))
+		  {
+		    //If it is, assign to current geometry as surface shader
+		    k3d::property::set_internal_value(*panelGeo, 
+						      "material", (*soIter)->node);
+	   
+		    //Render The Preview Using Selected External Renderer
+		    panelEngine->render_camera_frame(*panelCamera, (*pIter)->imgFilePath, false);
 
-	  
+		  }//if	 
+		else
+		  {
+		    k3d::log() << "Is NOT A Rman Material" << std::endl;
+		  }
+
+		pIter++;
+
+	      }//for  
 
 	  }//renderPreview
 
@@ -890,52 +1008,60 @@ namespace module{
 
 	  void renderPreview()
 	  {
-	    //Ensure Current Preview Engine Has Selected Nodes Only Visible
-	  k3d::inode_collection::nodes_t::const_iterator node = m_document_state->document().nodes().collection().begin();
-	  for(; node != m_document_state->document().nodes().collection().end(); ++node){
+	    //Re-init The Preview Render Dimensions
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "pixel_width", static_cast<k3d::int32_t>(previewSize));
 
-	    if((*node)->factory().implements(typeid(k3d::ri::ilight)))
-	      {
-	    //Disable Node Regardless In RMANEngine::lights and nodes
+
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "pixel_height", static_cast<k3d::int32_t>(previewSize));
+
+	    //Ensure Current Preview Engine Has Selected Nodes Only Visible
+	    k3d::inode_collection::nodes_t::const_iterator node = m_document_state->document().nodes().collection().begin();
+	    for(; node != m_document_state->document().nodes().collection().end(); ++node){
+
+	      if((*node)->factory().implements(typeid(k3d::ri::ilight)))
+		{
+		  //Disable Node Regardless In RMANEngine::lights and nodes
+		  k3d::property::set_internal_value(*panelEngine, 
+						    "enabled_lights", 
+						    k3d::inode_collection_property::nodes_t(0, (*node)));
+		}//if
+	      else if((*node)->factory().implements(typeid(k3d::itransform_sink)))
+		{
+		  k3d::property::set_internal_value(*panelEngine, 
+						    "visible_nodes", 
+						    k3d::inode_collection_property::nodes_t(0, (*node)));
+		}//else if
+	    
+	    }//for
+
+	    //Simply Enable Now Only USed Light & Geo
 	    k3d::property::set_internal_value(*panelEngine, 
 					      "enabled_lights", 
-					      k3d::inode_collection_property::nodes_t(0, (*node)));
-	    }//if
-	    else if((*node)->factory().implements(typeid(k3d::itransform_sink)))
-	      {
-	      k3d::property::set_internal_value(*panelEngine, 
-						"visible_nodes", 
-						k3d::inode_collection_property::nodes_t(0, (*node)));
-	    }//else if
-	    
-	  }//for
+					      k3d::inode_collection_property::nodes_t(1, panelLight));
 
-	  //Simply Enable Now Only USed Light & Geo
-	  k3d::property::set_internal_value(*panelEngine, 
-                                            "enabled_lights", 
-					    k3d::inode_collection_property::nodes_t(1, panelLight));
-
-	  k3d::property::set_internal_value(*panelEngine, 
-					    "visible_nodes", 
-					    k3d::inode_collection_property::nodes_t(1, panelGeo));
+	    k3d::property::set_internal_value(*panelEngine, 
+					      "visible_nodes", 
+					      k3d::inode_collection_property::nodes_t(1, panelGeo));
   
-	  //Check If NodeIn sobject Is A RenderMan Material
-	  if(m_so->node->factory().implements(typeid(k3d::ri::imaterial)))
-	    {
-	    //If it is, assign to current geometry as surface shader
-	    k3d::property::set_internal_value(*panelGeo, 
-					      "material", m_so->node);
+	    //Check If NodeIn sobject Is A RenderMan Material
+	    if(m_so->node->factory().implements(typeid(k3d::ri::imaterial)))
+	      {
+		//If it is, assign to current geometry as surface shader
+		k3d::property::set_internal_value(*panelGeo, 
+						  "material", m_so->node);
 	   
 
-	  //Render The Preview Using Selected External Renderer
-	  panelEngine->render_camera_frame(*panelCamera, k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_shaderImgFile),
-					   false);
+		//Render The Preview Using Selected External Renderer
+		panelEngine->render_camera_frame(*panelCamera, k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_shaderImgFile),
+						 false);
 
-	  }//if	 
-	  else
-	    {
-	      k3d::log() << "Is NOT A Rman Material" << std::endl;
-	    }
+	      }//if	 
+	    else
+	      {
+		k3d::log() << "Is NOT A Rman Material" << std::endl;
+	      }
 	    
 	  }//renderPreview
 
@@ -1200,9 +1326,6 @@ namespace module{
 		  //Build The GUI Context
 		  build_content_pane(row, false);
 		}
-
-	      
- 
 	    }//if
 
 	}//on_tree_row_changed
