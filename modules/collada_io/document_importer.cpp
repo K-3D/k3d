@@ -92,7 +92,7 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<document_importer, k3d::interface_list<k3d::idocument_importer> > factory(
-			k3d::classes::DocumentImporter(),
+			k3d::uuid(0xd473c2a6, 0x45447d4c, 0x7fb4bfbc, 0xf0feda54),
 			"COLLADADocumentImporter",
 			_("COLLADA ( .dae )"),
 			"",
