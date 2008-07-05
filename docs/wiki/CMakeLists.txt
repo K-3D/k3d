@@ -1,7 +1,7 @@
 PROJECT(wiki)
 
 IF(NOT WIN32)
-	SET(K3D_NUI_BINARY ${k3d_BINARY_DIR}/lib/k3d/uiplugins/k3d-nui.module)
+	SET(K3D_NUI_BINARY ${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/uiplugins/k3d-nui.module)
 
 	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/make-wiki-docs.py ${CMAKE_CURRENT_BINARY_DIR}/make-wiki-docs.py)
 	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext)
@@ -16,7 +16,7 @@ IF(NOT WIN32)
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/categories
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/reference
 		COMMAND ${k3d_BINARY_DIR}/bin/k3d --log-level=debug --color
-		--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
+		--plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins
 		--share=${k3d_SOURCE_DIR}/share
 		--script=${CMAKE_CURRENT_BINARY_DIR}/make-wiki-docs.py
 		--ui=${K3D_NUI_BINARY}

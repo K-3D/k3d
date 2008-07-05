@@ -11,7 +11,7 @@ FIND_PATH(K3D_BONOBO_INCLUDE_DIR libbonobo.h
 MARK_AS_ADVANCED(K3D_BONOBO_INCLUDE_DIR)
 
 FIND_PATH(K3D_GNOME_VFS_CONFIG_INCLUDE_DIR gnome-vfs-file-size.h
-	/usr/lib/gnome-vfs-2.0/include
+	/usr/${K3D_LIBDIR}/gnome-vfs-2.0/include
 	DOC "Directory where the gnome vfs config file is located"
 	)
 MARK_AS_ADVANCED(K3D_GNOME_VFS_CONFIG_INCLUDE_DIR)

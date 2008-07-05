@@ -3,7 +3,7 @@ PROJECT(k3d-tests)
 MACRO(K3D_ADD_TEST TEST_NAME)
 	
 	SET(REQUIREMENTS_MET 1)
-	SET(USER_INTERFACE --ui=${k3d_BINARY_DIR}/lib/k3d/uiplugins/k3d-nui.module)
+	SET(USER_INTERFACE --ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/uiplugins/k3d-nui.module)
 	SET(WILL_FAIL 0)
 
 	SET(REQUIRES_KEYWORD 0)
@@ -17,7 +17,7 @@ MACRO(K3D_ADD_TEST TEST_NAME)
 				MESSAGE(STATUS "Test \"${TEST_NAME}\" skipped by configuration: K3D_BUILD_NGUI_MODULE")
 				SET(REQUIREMENTS_MET 0)
 			ENDIF(NOT K3D_BUILD_NGUI_MODULE)
-			SET(USER_INTERFACE --ui=${k3d_BINARY_DIR}/lib/k3d/uiplugins/k3d-ngui.module --batch --no-custom-layouts --no-splash)
+			SET(USER_INTERFACE --ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/uiplugins/k3d-ngui.module --batch --no-custom-layouts --no-splash)
 			SET(KEYWORD 1)
 		ENDIF(ARGUMENT STREQUAL "NGUI")
 
@@ -83,7 +83,7 @@ MACRO(K3D_ADD_TEST TEST_NAME)
 		ADD_TEST(${TEST_NAME}
 			${k3d_BINARY_DIR}/bin/k3d
 			--log-level=debug
-			--plugins=${k3d_BINARY_DIR}/lib/k3d/plugins
+			--plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins
 			--share=${k3d_SOURCE_DIR}/share
 			${USER_INTERFACE}
 			${SCRIPT}

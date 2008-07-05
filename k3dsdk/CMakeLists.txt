@@ -96,13 +96,13 @@ ENDIF(BUILD_TESTING)
 
 INSTALL(TARGETS k3dsdk
 	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib)
+	LIBRARY DESTINATION ${K3D_LIBDIR}
+	ARCHIVE DESTINATION ${K3D_LIBDIR})
 INSTALL(FILES ${HEADERS} DESTINATION include/k3d/k3dsdk)
 
-INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-i18n-config.h DESTINATION lib/k3d/include)
-INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-parallel-config.h DESTINATION lib/k3d/include)
-INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-path-config.h DESTINATION lib/k3d/include)
-INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-platform-config.h DESTINATION lib/k3d/include)
-INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-version-config.h DESTINATION lib/k3d/include)
+INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-i18n-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
+INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-parallel-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
+INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-path-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
+INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-platform-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
+INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-version-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
 
