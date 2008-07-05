@@ -94,6 +94,8 @@
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/measurement.h>
 
+#include <k3dsdk/metadata.h>
+
 #include <k3dsdk/log.h>
 #include <iostream>
 
@@ -428,6 +430,9 @@ namespace module{
 	  //Render The Preview Image
 	  void renderPreview();
 
+	  //Creates Preview Render Nodes
+	  void createPreviewNodes();
+
           //Signal Responders
           void on_node_added(const k3d::inode_collection::nodes_t& Nodes);
           void on_node_removed(const k3d::inode_collection::nodes_t& Nodes);
@@ -543,113 +548,242 @@ namespace module{
 	{
       
           //create required node objects
-
-          //Light Shader Setup*******************
-
-          m_model->setPreviewLShader(dynamic_cast<k3d::inode*>
-                                     ( k3d::plugin::create("RenderManLightShader", 
-                                                           m_document_state.document(), 
-                                                           "Preview Core::Light Shader")));
-
-          k3d::property::set_internal_value(*(m_model->getPreviewLShader()), 
-                                            "shader_path", k3d::share_path() /
-                                            k3d::filesystem::generic_path("shaders/light/k3d_pointlight.sl"));
-
-
-
-          //Light Setup*************************
-          m_model->setPreviewLight(dynamic_cast<light_t*>
-                                   (k3d::plugin::create("RenderManLight", 
-                                                        m_document_state.document(), 
-                                                        "Preview Core::Light")));
-
-          k3d::property::set_internal_value(*(m_model->getPreviewLight()), 
-                                            "shader", m_model->getPreviewLShader());
-
-
-          k3d::inode* light_transformation = k3d::set_matrix(*(m_model->getPreviewLight()), 
-                                                             k3d::translation3D(k3d::point3(-20, 20, 30)));
-
-     
-
-          //Camera Setup************************
-          m_model->setPreviewCamera(dynamic_cast<camera_t*>
-                                    (k3d::plugin::create("Camera", 
-                                                         m_document_state.document(), 
-                                                         "Preview Core::Camera")));
-          const k3d::point3 origin = k3d::point3(0, 0, 0);
-          const k3d::vector3 world_up = k3d::vector3(0, 0, 1);
-
-          const k3d::point3 position = k3d::point3(0, 13, 0);
-          const k3d::vector3 look_vector = origin - position;
-          const k3d::vector3 right_vector = look_vector ^ world_up;
-          const k3d::vector3 up_vector = right_vector ^ look_vector;
-
-          k3d::inode* const camera_transformation 
-            = k3d::set_matrix(*(m_model->getPreviewCamera()), 
-                              k3d::view_matrix(look_vector, up_vector, position));
-       
-          camera_transformation->set_name("Camera Transformation");
-          k3d::property::set_internal_value(*(m_model->getPreviewCamera()), 
-                                            "world_target", k3d::point3(0, 0, 0));
-
-          k3d::property::set_internal_value(*(m_model->getPreviewCamera()), 
-                                            "viewport_visible", false);
-
-          k3d::property::set_internal_value(*(m_model->getPreviewCamera()), 
-                                            "aspect_ratio", k3d::string_t("Square"));
-
-          //Geometry Setup**********************
-          m_model->setPreviewGeo(dynamic_cast<geo_t*>
-                                 (k3d::plugin::create("Sphere", 
-                                                      m_document_state.document(), 
-                                                      "Preview Core::Geo::Sphere")));
-	  //Add All Geometry To m_model
-	  m_model->addGeo(m_model->getPreviewGeo());
-
-          k3d::property::set_internal_value(*(m_model->getPreviewGeo()), 
-                                            "render_shadows", false);
-
-          k3d::property::set_internal_value(*(m_model->getPreviewGeo()), 
-                                            "viewport_visible", false);
-
-          //Renderman Engine Setup**************
-          m_model->setPreviewEngine(dynamic_cast<rManEngine_t*>
-                                    (k3d::plugin::create("RenderManEngine", 
-                                                         m_document_state.document(), 
-							 initRManEngine)));
-
-          k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
-                                            "enabled_lights", 
-                                            k3d::inode_collection_property::nodes_t(1, m_model->getPreviewLight()));
-
-          k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
-                                            "visible_nodes", 
-                                            k3d::inode_collection_property::nodes_t(1, m_model->getPreviewGeo()));
-
-
-          // To ensure Universal Compatibility With user documents, create a RMAN Node (Aqsis)
-          k3d::ri::irender_engine* const aqsis = k3d::plugin::create<k3d::ri::irender_engine>("AqsisRenderManEngine", 
-                                                                                              m_document_state.document(), 
-                                                                                              "Preview Core::Aqsis Renderer");
-
-          //Setup the shader preview render engine*****
-          k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
-                                            "render_engine", dynamic_cast<k3d::inode*>(aqsis));
-
-          k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
-                                            "pixel_width", static_cast<k3d::int32_t>(m_model->preview_size.internal_value()));
-
-
-          k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
-                                            "pixel_height", static_cast<k3d::int32_t>(m_model->preview_size.internal_value()));
-
-          k3d::double_t aspectRatio = 1.0;
-
-          k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
-                                            "pixel_aspect_ratio", aspectRatio);
+	  createPreviewNodes();
+          
 
         }//buildModel
+
+	void implementation::createPreviewNodes()
+	{
+	  //Flags For Each Node
+	  bool hasAqsis_renderer = 	false;
+	  bool hasCamera = 		false;
+	  bool hasGeo = 		false;
+	  bool hasLight = 		false;
+	  bool hasLight_shader = 	false;
+	  bool hasRenderman_engine = 	false;
+
+	  //Pointer To Aqsis Engine For RMAN Engine Node
+	  k3d::ri::irender_engine* aqsis = 0;
+
+	  //Check All Nodes MetaData To See If These Nodes Exist. If They Do Dont Create New Nodes
+	  k3d::inode_collection::nodes_t::const_iterator node = m_document_state.document().nodes().collection().begin();
+	  for(; node != m_document_state.document().nodes().collection().end(); ++node)
+	    {
+	      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(*node))
+		{
+		  k3d::string_t value = metadata->get_metadata()["PreviewCore::nametag"];
+
+		  if(value == "p_aqsis_renderer")
+		    {
+		      hasAqsis_renderer = true;
+		      aqsis = dynamic_cast<k3d::ri::irender_engine*>(*node);
+		    }
+
+		  if(value == "p_camera")
+		    {
+		      hasCamera = true;
+		      m_model->setPreviewCamera(dynamic_cast<camera_t*>(*node));
+		    }
+
+		  if(value == "p_geo")
+		    {
+		      hasGeo = true;
+		      m_model->setPreviewGeo(dynamic_cast<geo_t*>(*node));
+		    }
+
+		  if(value == "p_light")
+		    {
+		      hasLight = true;
+		      m_model->setPreviewLight(dynamic_cast<light_t*>(*node));
+		    }
+
+		  if(value == "p_light_shader")
+		    {
+		      hasLight_shader = true;
+		      m_model->setPreviewLShader(dynamic_cast<k3d::inode*>(*node));				
+		    }
+
+		  if(value == "p_rman_engine")
+		    {
+		      hasRenderman_engine = true;
+		      m_model->setPreviewEngine(dynamic_cast<rManEngine_t*>(*node));					
+		    }		
+
+		}//if
+	    }//for
+
+
+	  //Light Shader Setup*******************
+
+	  if(!hasLight_shader)
+	    {
+	      k3d::log() << "building lightShader" << std::endl;
+
+	      m_model->setPreviewLShader(dynamic_cast<k3d::inode*>
+					 ( k3d::plugin::create("RenderManLightShader", 
+							       m_document_state.document(), 
+							       "Preview Core::Light Shader")));
+
+	      k3d::property::set_internal_value(*(m_model->getPreviewLShader()), 
+						"shader_path", k3d::share_path() /
+						k3d::filesystem::generic_path("shaders/light/k3d_pointlight.sl"));
+	      
+	      //METADATA INSERT
+	      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_model->getPreviewLShader()))
+		metadata->set_metadata("PreviewCore::nametag", "p_light_shader");
+   
+	    }//if
+
+	  //Light Setup*************************
+
+	  if(!hasLight)
+	    {
+	      k3d::log() << "building light" << std::endl;
+
+	      m_model->setPreviewLight(dynamic_cast<light_t*>
+				       (k3d::plugin::create("RenderManLight", 
+							    m_document_state.document(), 
+							    "Preview Core::Light")));
+
+	      k3d::property::set_internal_value(*(m_model->getPreviewLight()), 
+						"shader", m_model->getPreviewLShader());
+
+
+	      k3d::inode* light_transformation = k3d::set_matrix(*(m_model->getPreviewLight()), 
+								 k3d::translation3D(k3d::point3(-20, 20, 30)));
+
+	      //METADATA INSERT
+	      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_model->getPreviewLight()))
+		metadata->set_metadata("PreviewCore::nametag", "p_light");
+
+	    }//if
+
+          //Camera Setup************************
+	  
+	  if(!hasCamera)
+	    {
+	      k3d::log() << "building camera" << std::endl;
+ 
+	      m_model->setPreviewCamera(dynamic_cast<camera_t*>
+					(k3d::plugin::create("Camera", 
+							     m_document_state.document(), 
+							     "Preview Core::Camera")));
+	      const k3d::point3 origin = k3d::point3(0, 0, 0);
+	      const k3d::vector3 world_up = k3d::vector3(0, 0, 1);
+
+	      const k3d::point3 position = k3d::point3(0, 13, 0);
+	      const k3d::vector3 look_vector = origin - position;
+	      const k3d::vector3 right_vector = look_vector ^ world_up;
+	      const k3d::vector3 up_vector = right_vector ^ look_vector;
+
+	      k3d::inode* const camera_transformation 
+		= k3d::set_matrix(*(m_model->getPreviewCamera()), 
+				  k3d::view_matrix(look_vector, up_vector, position));
+       
+	      camera_transformation->set_name("Camera Transformation");
+	      k3d::property::set_internal_value(*(m_model->getPreviewCamera()), 
+						"world_target", k3d::point3(0, 0, 0));
+
+	      k3d::property::set_internal_value(*(m_model->getPreviewCamera()), 
+						"viewport_visible", false);
+
+	      k3d::property::set_internal_value(*(m_model->getPreviewCamera()), 
+						"aspect_ratio", k3d::string_t("Square"));
+
+	      //METADATA INSERT
+	      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_model->getPreviewCamera()))
+		metadata->set_metadata("PreviewCore::nametag", "p_camera");
+
+	    }//if
+
+          //Geometry Setup**********************
+
+	  if(!hasGeo)
+	    {
+
+	      k3d::log() << "building geo" << std::endl;
+
+	      m_model->setPreviewGeo(dynamic_cast<geo_t*>
+				     (k3d::plugin::create("Sphere", 
+							  m_document_state.document(), 
+							  "Preview Core::Geo::Sphere")));
+	      //Add All Geometry To m_model
+	      m_model->addGeo(m_model->getPreviewGeo());
+
+	      k3d::property::set_internal_value(*(m_model->getPreviewGeo()), 
+						"render_shadows", false);
+
+	      k3d::property::set_internal_value(*(m_model->getPreviewGeo()), 
+						"viewport_visible", false);
+
+	      //METADATA INSERT
+	      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_model->getPreviewGeo()))
+		metadata->set_metadata("PreviewCore::nametag", "p_geo");
+
+	    }//if
+
+	  //Aqsis Engine Setup**************
+
+	  if(!hasAqsis_renderer)
+	    {
+	      k3d::log() << "building aqsis" << std::endl;
+
+	      aqsis = k3d::plugin::create<k3d::ri::irender_engine>("AqsisRenderManEngine", 
+								   m_document_state.document(), 
+								   "Preview Core::Aqsis Renderer");
+	      //METADATA INSERT
+	      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(aqsis))
+		metadata->set_metadata("PreviewCore::nametag", "p_aqsis_renderer");
+
+	    }//if
+
+
+          //Renderman Engine Setup**************
+
+	  if(!hasRenderman_engine)
+	    {
+	      k3d::log() << "building rman" << std::endl;
+	      
+	      m_model->setPreviewEngine(dynamic_cast<rManEngine_t*>
+					(k3d::plugin::create("RenderManEngine", 
+							     m_document_state.document(), 
+							     initRManEngine)));
+
+	      k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
+						"enabled_lights", 
+						k3d::inode_collection_property::nodes_t(1, m_model->getPreviewLight()));
+
+	      k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
+						"visible_nodes", 
+						k3d::inode_collection_property::nodes_t(1, m_model->getPreviewGeo()));
+  
+
+	      //Setup the shader preview render engine*****
+	      k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
+						"render_engine", dynamic_cast<k3d::inode*>(aqsis));
+
+	      k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
+						"pixel_width", static_cast<k3d::int32_t>(m_model->preview_size.internal_value()));
+
+
+	      k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
+						"pixel_height", static_cast<k3d::int32_t>(m_model->preview_size.internal_value()));
+
+	      k3d::double_t aspectRatio = 1.0;
+
+	      k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
+						"pixel_aspect_ratio", aspectRatio);
+
+	      //METADATA INSERT
+	      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_model->getPreviewEngine()))
+		metadata->set_metadata("PreviewCore::nametag", "p_rman_engine");
+
+	    }//if
+
+	}//createPreviewNodes
+
+
 
 	//This invoked when node selection changes
 	bool implementation::on_node_selection(k3d::inode* const Node)
@@ -688,16 +822,24 @@ namespace module{
 	//Focal Point when preview image needs rendering
 	void implementation::renderPreview()
 	{
+	  //Re-Init The Preview Render Dimensions
+	  k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
+					    "pixel_width", static_cast<k3d::int32_t>(m_model->preview_size.internal_value()));
+
+
+	  k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
+					    "pixel_height", static_cast<k3d::int32_t>(m_model->preview_size.internal_value()));
+
 
 	  //Ensure Current Preview Engine Has Selected Nodes Only Visible
 	  k3d::inode_collection::nodes_t::const_iterator node = m_document_state.document().nodes().collection().begin();
 	  for(; node != m_document_state.document().nodes().collection().end(); ++node){
 
 	    if((*node)->factory().implements(typeid(k3d::ri::ilight))){
-	    //Disable Node Regardless In RMANEngine::lights and nodes
-	    k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
-					      "enabled_lights", 
-					      k3d::inode_collection_property::nodes_t(0, (*node)));
+	      //Disable Node Regardless In RMANEngine::lights and nodes
+	      k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
+						"enabled_lights", 
+						k3d::inode_collection_property::nodes_t(0, (*node)));
 	    }//if
 	    else if((*node)->factory().implements(typeid(k3d::itransform_sink))){
 	      k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
