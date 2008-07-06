@@ -25,18 +25,32 @@
 #include <dae.h>
 #include <dom/domCOLLADA.h>
 #include <dom/domConstants.h>
+#include <dom/domLibrary_geometries.h>
+#include <dom/domLibrary_visual_scenes.h>
+#include <dom/domGeometry.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/imesh_sink.h>
+#include <k3dsdk/imesh_source.h>
+#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/itransform_sink.h>
+
+#include <k3dsdk/plugins.h>
 
 #include "intElements.h"
 #include "integration.h"
+#include "collada.h"
 
 #include <boost/assign/list_of.hpp>
 
 #include <iostream>
+#include <vector>
 
 namespace module
 {
@@ -47,6 +61,69 @@ namespace collada
 namespace io
 {
 
+k3d::matrix4 getTransformation(domNode& node)
+{
+	k3d::matrix4 result = k3d::identity3D();
+
+	// Look for Translations
+	domTranslate_Array translate_array = node.getTranslate_array();
+	for(int i=0; i<translate_array.getCount(); i++)
+	{
+		domTranslate* translate = translate_array[i];
+		domFloat3 trans = translate->getValue();
+		k3d::matrix4 tmp_matrix = k3d::identity3D();
+		tmp_matrix[0][3] = trans[0];
+		tmp_matrix[1][3] = trans[1];
+		tmp_matrix[2][3] = trans[2];
+		result = result * tmp_matrix;
+	}
+
+	// Look for Scaling
+	domScale_Array scale_array = node.getScale_array();
+	for(int i=0; i<scale_array.getCount(); i++)
+	{
+		domScale* scale = scale_array[i];
+		domFloat3 sc = scale->getValue();
+		k3d::matrix4 tmp_matrix = k3d::identity3D();
+		tmp_matrix[0][0] = sc[0];
+		tmp_matrix[1][1] = sc[1];
+		tmp_matrix[2][2] = sc[2];
+		result = result * tmp_matrix;
+	}
+
+	// Look for Rotations
+	domRotate_Array rotate_array = node.getRotate_array();
+	for(int i=0; i<rotate_array.getCount(); i++)
+	{
+		domRotate* rotate = rotate_array[i];
+		domFloat4 rot = rotate->getValue();
+		k3d::matrix4 tmp_matrix = k3d::identity3D();
+		float c = cos(k3d::radians(rot[3])), s = sin(k3d::radians(rot[3])), C = 1-c;
+		float x = rot[0], y = rot[1], z = rot[2];
+		float xs = x*s, ys = y*s, zs = z*s;
+		float xC = x*C, yC = y*C, zC = z*C;
+		float xyC=x*y*C,yzC=y*z*C,zxC=z*x*C;
+		tmp_matrix[0][0] = x*xC+c;
+		tmp_matrix[0][1] = xyC-zs;
+		tmp_matrix[0][2] = zxC+ys;
+		tmp_matrix[1][0] = xyC+zs;
+		tmp_matrix[1][1] = y*yC+c;
+		tmp_matrix[1][2] = yzC-xs;
+		tmp_matrix[2][0] = zxC-ys;
+		tmp_matrix[2][1] = yzC+xs;
+		tmp_matrix[2][2] = z*zC+c;
+		result = result * tmp_matrix;
+	}
+
+	return result;
+}
+
+
+collada_obj lookcollada(std::vector<collada_obj> &collada_objs, std::string name)
+{
+	return collada_objs[0];
+}
+
 class document_importer :
 	public k3d::idocument_importer
 {
@@ -55,6 +132,7 @@ public:
 	{
 		// Instantiate the reference implementation
 		DAE dae;
+		std::vector<collada_obj> collada_objs;
 
 		k3d::log() << info << "Importing .dae file: " << FilePath.native_console_string() << std::endl;
 		domCOLLADA* root = dae.open(k3d::string_cast<k3d::filesystem::path>(FilePath));
@@ -64,28 +142,88 @@ public:
 			return false;
 		}
 
-		//////////////////////TEST///////////////////////////
-		//daeParser dae_file2(*root, Document);
-		//k3d::mesh* mesh = new k3d::mesh();
-		//k3d::gprim_factory factory(*mesh);
-		//std::string name = "Hoorray";
-		//k3d::inode* frozen_mesh = create_frozen_mesh(Document, name, mesh);
-		//daeParser dae_file(*root, *mesh);
+		domLibrary_geometries_Array library_geometries = root->getLibrary_geometries_array();
+		for(int j=0; j<library_geometries.getCount(); j++)
+		{
+			domGeometry_Array geometries = library_geometries[j]->getGeometry_array();
+			for(int i=0; i<geometries.getCount(); i++)
+			{
+				//k3d::log() << debug << "A geometry" << std::endl;
+				collada_objs.push_back(collada_obj(Document,*geometries[i]));
+			}
+		}
 
-		/////////////////////////////////////////////////////
+		domLibrary_visual_scenes_Array library_visual_scenes = root->getLibrary_visual_scenes_array();
+		for(int j=0; j<library_visual_scenes.getCount(); j++)
+		{
+			domVisual_scene_Array visual_scenes = library_visual_scenes[j]->getVisual_scene_array();
+			for(int k=0; k<visual_scenes.getCount(); k++)
+			{
+				//k3d::log() << debug << "A visual_scene" << std::endl;
+				domNode_Array scene_nodes = visual_scenes[k]->getNode_array();
+				for(int i=0; i<scene_nodes.getCount(); i++)
+				{
+					k3d::matrix4 mcurrent = getTransformation(*scene_nodes[i]);
 
+					std::stringstream trans_name;
+					trans_name << scene_nodes[i]->getName() << " Transformation";
+					k3d::inode *frozen_trans = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("FrozenTransformation"), Document, k3d::unique_name(Document.nodes(),trans_name.str()));
+					k3d::property::set_internal_value(*frozen_trans, "matrix", mcurrent);
 
+					for (size_t l = 0; l < scene_nodes[i]->getInstance_geometry_array().getCount(); l++) 
+					{
+						domInstance_geometry* instanceGeom = scene_nodes[i]->getInstance_geometry_array()[l];
+	
+						std::stringstream instance_name;
+						instance_name << scene_nodes[i]->getName() << " Instance";
+						k3d::inode *mesh_instance = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("MeshInstance"),Document,k3d::unique_name(Document.nodes(),instance_name.str()));
 
+						// Set painters
+						const k3d::nodes_t gl_nodes = k3d::find_nodes(Document.nodes(), "GL Default Painter");
+						k3d::inode* gl_painter = (1 == gl_nodes.size()) ? *gl_nodes.begin() : 0;
+						const k3d::nodes_t ri_nodes = k3d::find_nodes(Document.nodes(), "RenderMan Default Painter");
+						k3d::inode* ri_painter = (1 == ri_nodes.size()) ? *ri_nodes.begin() : 0;
+						k3d::property::set_internal_value(*mesh_instance, "gl_painter", gl_painter);
+						k3d::property::set_internal_value(*mesh_instance, "ri_painter", ri_painter);
+
+						// Connect the MeshInstance
+						k3d::ipipeline::dependencies_t dependencies;
+						k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(mesh_instance);
+
+						dependencies.insert(std::make_pair(&mesh_sink->mesh_sink_input(), lookcollada(collada_objs,instanceGeom->getUrl().getElement()->getAttribute("name")).get_mesh_source_output()));
+
+						k3d::itransform_source* const transform_source = dynamic_cast<k3d::itransform_source*>(frozen_trans);
+						k3d::itransform_sink* const transform_sink = dynamic_cast<k3d::itransform_sink*>(mesh_instance);
+
+						dependencies.insert(std::make_pair(&transform_sink->transform_sink_input(),&transform_source->transform_source_output()));
+
+						//dependencies.insert(std::make_pair(&
+						Document.pipeline().set_dependencies(dependencies);
+					}
+				}
+			}
+		}
+
+/*
 		// Do the conversion. The conversion process throws an exception on error, so
 		// we'll include a try/catch handler.
-		daeParser dae_file(*root, Document);
-	
+		//daeParser dae_file(*root, Document);
+
+		//k3d::inode* const mesh_node = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("Scale"), Document, "MyScale");
+		//mesh_node->set_property("name", "Bla");
+		k3d::iplugin_factory *factory = k3d::plugin::factory::lookup("Scale");
+		if(!factory)
+			k3d::log() << debug << "No factory found" << std::endl;
+		else
+			k3d::log() << debug << "Factory found" << std::endl;
+*/
+
 		// destroy the objects we created during the conversion process
 		freeConversionObjects<Node, domNode>(dae);
 		freeConversionObjects<intGeometry, domGeometry>(dae);
 		freeConversionObjects<intLight, domLight>(dae);
 		freeConversionObjects<intCamera, domCamera>(dae);
-		
+
 		return true;
 	}
 

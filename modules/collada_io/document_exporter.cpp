@@ -131,6 +131,10 @@ public:
 				domElement *aspect = cam_type->add("aspect_ratio");
 				aspect->setCharData(to_string(aspect_ratio).c_str());
 			}
+			if((*node)->factory().factory_id() == k3d::classes::FrozenMesh())
+			{
+				
+			}
 		}
 
 		dae.writeAll();

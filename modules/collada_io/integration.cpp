@@ -123,8 +123,8 @@ k3d::inode* create_camera(k3d::idocument& Document, const std::string& Name)
 
 Node::Node(domNode& node, const k3d::matrix4& mat)
 {
-	// Extract and compute current transformation matrix
-	k3d::matrix4 mcurrent = getTransformation(node,mat);
+	// Extract and compute transformation matrix
+	k3d::matrix4 mcurrent = getTransformation(node);
 	
 
 	// Recursively convert all child nodes. First iterate over the <node> elements.
@@ -198,9 +198,9 @@ Node::Node(domNode& node, const k3d::matrix4& mat)
 	}
 }
 
-k3d::matrix4 Node::getTransformation(domNode& node, const k3d::matrix4& mat)
+k3d::matrix4 Node::getTransformation(domNode& node)
 {
-	k3d::matrix4 result = mat;
+	k3d::matrix4 result = k3d::identity3D();
 
 	// Look for Translations
 	domTranslate_Array translate_array = node.getTranslate_array();

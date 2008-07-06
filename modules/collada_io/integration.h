@@ -56,7 +56,7 @@ namespace io
 	
 		// This is defined later to work around a circular dependency on the lookup function
 		Node(domNode& node, const k3d::matrix4& mat);
-		k3d::matrix4 getTransformation(domNode& node, const k3d::matrix4& mat);
+		k3d::matrix4 getTransformation(domNode& node);
 	};
 	
 	// This function checks to see if a user data object has already been attached to
