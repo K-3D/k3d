@@ -508,7 +508,7 @@ private:
 
 		xp = T*((p1-p2)/2);
 
-		cp = sqrt(abs(rx*rx*ry*ry - rx*rx*xp[1]*xp[1] - ry*ry*xp[0]*xp[0])/(rx*rx*xp[1]*xp[1] + ry*ry*xp[0]*xp[0]))*k3d::point4((rx/ry)*xp[1], (-ry/rx)*xp[0], 0, 1);
+		cp = std::sqrt(std::abs(rx*rx*ry*ry - rx*rx*xp[1]*xp[1] - ry*ry*xp[0]*xp[0])/(rx*rx*xp[1]*xp[1] + ry*ry*xp[0]*xp[0]))*k3d::point4((rx/ry)*xp[1], (-ry/rx)*xp[0], 0, 1);
 		
 		if(large_arc_flag==sweep_flag)
 			cp = -cp;
