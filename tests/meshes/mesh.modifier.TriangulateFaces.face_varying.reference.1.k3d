@@ -2,7 +2,7 @@
 <k3dml>
 	<mesh_arrays>
 		<points>0 0 1 1 0 1 2 0 0 2 0 1 1 0 0 0 0 0 1.5 0 0.5</points>
-		<point_selection>1 1 1 1 1 1 0</point_selection>
+		<point_selection>0 0 0 0 0 0 0</point_selection>
 		<polyhedra>
 			<first_faces>0</first_faces>
 			<face_counts>4</face_counts>
@@ -15,6 +15,9 @@
 			<edge_points>0 1 4 0 4 5 1 6 4 3 2 6</edge_points>
 			<clockwise_edges>1 2 0 4 5 3 7 8 6 10 11 9</clockwise_edges>
 			<edge_selection>0 0 0 0 0 0 0 0 0 0 0 0</edge_selection>
+			<face_varying_data>
+				<array name="Cs" type="k3d::color">1 0 0 0 1 0 0 0 1 1 0 0 0 0 1 1 1 1 1 0 0 0.5 0.5 0.5 1 1 1 0 0 1 0 1 0 0.5 0.5 0.5</array>
+			</face_varying_data>
 		</polyhedra>
 	</mesh_arrays>
 </k3dml>

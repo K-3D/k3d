@@ -139,7 +139,7 @@ public:
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x3796ae29, 0xbcc84a5c, 0xb6bae620, 0x87a9b1bd),
-				"TriangulateFaces",
+				"LegacyTriangulateFaces",
 				_("Converts input faces into triangles"),
 				"Polygon",
 				k3d::iplugin_factory::DEPRECATED);

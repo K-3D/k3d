@@ -2,7 +2,7 @@
 #define K3DSDK_TRIANGULATOR_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -20,13 +20,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "types.h"
+#include "mesh.h"
 
 namespace k3d
 {
-
-class mesh;
-class point3;
 
 /// Provides a template design pattern object for triangulating polygons.
 /// To generate triangulated data, derive from k3d::triangulator and
@@ -37,7 +34,18 @@ public:
 	triangulator();
 	~triangulator();
 
+	/// Generates triangles for every polyhedron face in a mesh
 	void process(const mesh& SourceMesh);
+
+	/// Generates triangles for a single polyhedron face
+	void process(
+		const mesh::points_t& Points,
+		const mesh::indices_t& FaceFirstLoops,
+		const mesh::counts_t& FaceLoopCounts,
+		const mesh::indices_t& LoopFirstEdges,
+		const mesh::indices_t& EdgePoints,
+		const mesh::indices_t& ClockwiseEdges,
+		const uint_t Face);
 
 private:
 	/// Called once before processin begins on the given mesh

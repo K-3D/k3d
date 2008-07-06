@@ -63,46 +63,62 @@ public:
 		const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 		const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 
-		vertex_edges.resize(points.size());
-
 		const uint_t face_begin = 0;
 		const uint_t face_end = face_begin + face_first_loops.size();
 		for(uint_t face = face_begin; face != face_end; ++face)
 		{
-			owner.start_face(face);
+			process(
+				points,
+				face_first_loops,
+				face_loop_counts,
+				loop_first_edges,
+				edge_points,
+				clockwise_edges,
+				face);
+		}
+	}
 
-//			const normal3 face_normal = normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[current_face]]);
-//			sgiTessNormal(tessellator, face_normal[0], face_normal[1], face_normal[2]);
 
-			sgiTessBeginPolygon(tessellator, this);
+	void process(
+		const mesh::points_t& Points,
+		const mesh::indices_t& FaceFirstLoops,
+		const mesh::counts_t& FaceLoopCounts,
+		const mesh::indices_t& LoopFirstEdges,
+		const mesh::indices_t& EdgePoints,
+		const mesh::indices_t& ClockwiseEdges,
+		const uint_t Face)
+	{
+		owner.start_face(Face);
 
-			const uint_t loop_begin = face_first_loops[face];
-			const uint_t loop_end = loop_begin + face_loop_counts[face];
+		vertex_edges.resize(Points.size());
 
-			for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		sgiTessBeginPolygon(tessellator, this);
+
+		const uint_t loop_begin = FaceFirstLoops[Face];
+		const uint_t loop_end = loop_begin + FaceLoopCounts[Face];
+
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			sgiTessBeginContour(tessellator);
+
+			const uint_t first_edge = LoopFirstEdges[loop];
+			for(uint_t edge = first_edge; ; )
 			{
-				sgiTessBeginContour(tessellator);
+				vertex_edges[EdgePoints[edge]] = edge;
 
-				const uint_t first_edge = loop_first_edges[loop];
+				sgiTessVertex(tessellator, const_cast<double_t*>(Points[EdgePoints[edge]].n), const_cast<void*>(reinterpret_cast<void*>(EdgePoints[edge])));
 
-				for(uint_t edge = first_edge; ; )
-				{
-					vertex_edges[edge_points[edge]] = edge;
-
-					sgiTessVertex(tessellator, const_cast<double_t*>(points[edge_points[edge]].n), const_cast<void*>(reinterpret_cast<void*>(edge_points[edge])));
-
-					edge = clockwise_edges[edge];
-					if(edge == first_edge)
-						break;
-				}
-
-				sgiTessEndContour(tessellator);
+				edge = ClockwiseEdges[edge];
+				if(edge == first_edge)
+					break;
 			}
 
-			sgiTessEndPolygon(tessellator);
-
-			owner.finish_face(face);
+			sgiTessEndContour(tessellator);
 		}
+
+		sgiTessEndPolygon(tessellator);
+
+		owner.finish_face(Face);
 	}
 
 	void begin_callback(GLenum Mode)
@@ -267,6 +283,25 @@ void triangulator::process(const mesh& SourceMesh)
 	start_processing(SourceMesh);
 	m_implementation->process(SourceMesh);
 	finish_processing(SourceMesh);
+}
+
+void triangulator::process(
+	const mesh::points_t& Points,
+	const mesh::indices_t& FaceFirstLoops,
+	const mesh::counts_t& FaceLoopCounts,
+	const mesh::indices_t& LoopFirstEdges,
+	const mesh::indices_t& EdgePoints,
+	const mesh::indices_t& ClockwiseEdges,
+	const uint_t Face)
+{
+	m_implementation->process(
+		Points,
+		FaceFirstLoops,
+		FaceLoopCounts,
+		LoopFirstEdges,
+		EdgePoints,
+		ClockwiseEdges,
+		Face);
 }
 
 void triangulator::start_processing(const mesh& SourceMesh)

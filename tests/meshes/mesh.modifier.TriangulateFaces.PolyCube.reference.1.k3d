@@ -2,7 +2,7 @@
 <k3dml>
 	<mesh_arrays>
 		<points>-2.5 -2.5 2.5 -2.5 2.5 2.5 2.5 -2.5 2.5 2.5 2.5 2.5 -2.5 -2.5 -2.5 2.5 -2.5 -2.5 2.5 2.5 -2.5 -2.5 2.5 -2.5</points>
-		<point_selection>1 1 1 1 1 1 1 1</point_selection>
+		<point_selection>0 0 0 0 0 0 0 0</point_selection>
 		<polyhedra>
 			<first_faces>0</first_faces>
 			<face_counts>12</face_counts>

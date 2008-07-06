@@ -51,7 +51,7 @@ public:
 	
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		create_triangles().process(Input, Output);
+		create_triangles().process(Input, m_mesh_selection.pipeline_value(), Output);
 	}
 	
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -62,7 +62,7 @@ public:
 	{
 		static k3d::document_plugin_factory<triangulate_faces, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
 			k3d::uuid(0x871ccafd, 0xc944da92, 0xcdf9f2b4, 0xcbc40cd8),
-			"NewTriangulateFaces",
+			"TriangulateFaces",
 			_("Converts input faces into triangles"),
 			"Development",
 			k3d::iplugin_factory::EXPERIMENTAL);
@@ -82,7 +82,7 @@ private:
 		{
 		}
 
-		void process(const k3d::mesh& Input, k3d::mesh& Output)
+		void process(const k3d::mesh& Input, const k3d::mesh_selection& Selection, k3d::mesh& Output)
 		{
 			if(!k3d::validate_polyhedra(Input))
 				return;
@@ -102,8 +102,8 @@ private:
 			m_edge_points.reset(new k3d::mesh::indices_t());
 			m_clockwise_edges.reset(new k3d::mesh::indices_t());
 			m_edge_selection.reset(new k3d::mesh::selection_t());
-			m_points.reset(new k3d::mesh::points_t(*Input.points));
-			m_point_selection.reset(new k3d::mesh::selection_t(*Input.point_selection));
+			m_points.reset(new k3d::mesh::points_t(*m_input->points));
+			m_point_selection.reset(new k3d::mesh::selection_t(m_input->point_selection->size(), 0.0));
 
 			// Hook everything together ...
 			m_polyhedra->first_faces = m_first_faces;
@@ -119,23 +119,45 @@ private:
 			m_polyhedra->edge_selection = m_edge_selection;
 
 			// Setup copying of attribute arrays ...
-			m_polyhedra->constant_data = Input.polyhedra->constant_data;
+			m_polyhedra->constant_data = m_input->polyhedra->constant_data;
 
-			m_polyhedra->uniform_data = Input.polyhedra->uniform_data.clone_types();
-			m_uniform_data_copier.reset(new k3d::named_array_copier(Input.polyhedra->uniform_data, m_polyhedra->uniform_data));
+			m_polyhedra->uniform_data = m_input->polyhedra->uniform_data.clone_types();
+			m_uniform_data_copier.reset(new k3d::named_array_copier(m_input->polyhedra->uniform_data, m_polyhedra->uniform_data));
 
-			m_polyhedra->face_varying_data = Input.polyhedra->face_varying_data.clone_types();
-			m_face_varying_data_copier.reset(new k3d::named_array_copier(Input.polyhedra->face_varying_data, m_polyhedra->face_varying_data));
+			m_polyhedra->face_varying_data = m_input->polyhedra->face_varying_data.clone_types();
+			m_face_varying_data_copier.reset(new k3d::named_array_copier(m_input->polyhedra->face_varying_data, m_polyhedra->face_varying_data));
 
-			Output.vertex_data = Input.vertex_data.clone();
-			m_vertex_data_copier.reset(new k3d::named_array_copier(Input.vertex_data, Output.vertex_data));
+			Output.vertex_data = m_input->vertex_data.clone();
+			m_vertex_data_copier.reset(new k3d::named_array_copier(m_input->vertex_data, Output.vertex_data));
 
 			// Setup the output mesh ...
 			Output.polyhedra = m_polyhedra;
 			Output.points = m_points;
 			Output.point_selection = m_point_selection;
 
-			base::process(Input);
+			k3d::mesh::selection_t input_face_selection(*m_input->polyhedra->face_selection);
+			k3d::merge_selection(Selection.faces, input_face_selection);
+
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + m_input->polyhedra->face_first_loops->size();
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
+			{
+				if(input_face_selection[face])
+				{
+					base::process(
+						*m_input->points,
+						*m_input->polyhedra->face_first_loops,
+						*m_input->polyhedra->face_loop_counts,
+						*m_input->polyhedra->loop_first_edges,
+						*m_input->polyhedra->edge_points,
+						*m_input->polyhedra->clockwise_edges,
+						face);
+				}
+				else
+				{
+					add_existing_face(face);
+				}
+			}
 
 			m_first_faces->push_back(0);
 			m_face_counts->push_back(m_face_first_loops->size());
@@ -166,6 +188,9 @@ private:
 			m_face_loop_counts->push_back(1);
 			m_face_selection->push_back(1.0);
 			m_face_materials->push_back((*m_input->polyhedra->face_materials)[m_current_face]);
+
+			m_uniform_data_copier->push_back(m_current_face);
+
 			m_loop_first_edges->push_back(m_edge_points->size());
 			m_edge_points->push_back(Vertices[0]);
 			m_edge_points->push_back(Vertices[1]);
@@ -177,14 +202,52 @@ private:
 			m_edge_selection->push_back(0.0);
 			m_edge_selection->push_back(0.0);
 
-			m_uniform_data_copier->push_back(m_current_face);
-
 			for(k3d::uint_t i = 0; i != 3; ++i)
 			{
 				if(m_new_face_varying_data.count(Vertices[i]))
 					m_face_varying_data_copier->push_back(4, m_new_face_varying_data[Vertices[i]].edges, m_new_face_varying_data[Vertices[i]].weights);
 				else
 					m_face_varying_data_copier->push_back(Edges[i]);
+			}
+		}
+
+		void add_existing_face(const k3d::uint_t Face)
+		{
+			const k3d::mesh::indices_t& input_face_first_loops = *m_input->polyhedra->face_first_loops;
+			const k3d::mesh::indices_t& input_face_loop_counts = *m_input->polyhedra->face_loop_counts;
+			const k3d::mesh::materials_t& input_face_materials = *m_input->polyhedra->face_materials;
+
+			const k3d::mesh::indices_t& input_loop_first_edges = *m_input->polyhedra->loop_first_edges;
+			
+			const k3d::mesh::indices_t& input_edge_points = *m_input->polyhedra->edge_points;
+			const k3d::mesh::indices_t& input_clockwise_edges = *m_input->polyhedra->clockwise_edges;
+
+			m_face_first_loops->push_back(m_loop_first_edges->size());
+			m_face_loop_counts->push_back(input_face_loop_counts[Face]);
+			m_face_selection->push_back(0.0);
+			m_face_materials->push_back(input_face_materials[Face]);
+
+			m_uniform_data_copier->push_back(Face);
+
+			const k3d::uint_t loop_begin = input_face_first_loops[Face];
+			const k3d::uint_t loop_end = loop_begin + input_face_loop_counts[Face];
+			for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+			{
+				m_loop_first_edges->push_back(m_edge_points->size());
+
+				const k3d::uint_t first_edge = input_loop_first_edges[loop];
+				const k3d::uint_t edge_offset = m_edge_points->size() - first_edge;
+				for(k3d::uint_t edge = first_edge; ;)
+				{
+					m_edge_points->push_back(input_edge_points[edge]);
+					m_clockwise_edges->push_back(input_clockwise_edges[edge] + edge_offset);
+					m_edge_selection->push_back(0.0);
+					m_face_varying_data_copier->push_back(edge);
+
+					edge = input_clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
+				}
 			}
 		}
 
