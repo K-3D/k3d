@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,20 +18,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
-*/
+	\author Timothy M. Shead (tshead@k-3d.com)
+ */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/utility.h>
-
-#include "helpers.h"
-
-#include <iterator>
+#include <k3dsdk/shared_pointer.h>
+#include <k3dsdk/triangulator.h>
 
 namespace module
 {
@@ -39,113 +38,197 @@ namespace module
 namespace mesh
 {
 
-namespace detail
+class triangulate_faces :
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
-
-struct do_triangulate
-{
-	do_triangulate(const bool WithHolesOnly) :
-		with_holes_only(WithHolesOnly)
-	{
-	}
-
-	bool operator()(k3d::legacy::face* Face)
-	{
-		if(!Face->selection_weight)
-			return false;
-
-		if(with_holes_only && !Face->holes.size())
-			return false;
-
-		if(helpers::edge_number(Face->first_edge) > 3)
-			return true;
-
-		return false;
-	}
-
-	const bool with_holes_only;
-};
-
-} // namespace detail
-
-/////////////////////////////////////////////////////////////////////////////
-// triangulate_faces_implementation
-
-class triangulate_faces_implementation :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
-{
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
-	triangulate_faces_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_holes_only(init_owner(*this) + init_name("holes_only") + init_label(_("Holes only")) + init_description(_("Triangulate only faces that contain holes")) + init_value(false))
-	{
-		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
-		m_holes_only.changed_signal().connect(make_reset_mesh_slot());
-	}
-
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
-	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
-	}
-
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Mesh);
-
-		const bool holes_only = m_holes_only.pipeline_value();
-
-		// For each polyhedron ...
-		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron_iterator = Mesh.polyhedra.begin(); polyhedron_iterator != Mesh.polyhedra.end(); ++polyhedron_iterator)
-		{
-			k3d::legacy::polyhedron& polyhedron = **polyhedron_iterator;
-
-			// Triangulate faces that are not triangles
-			k3d::legacy::polyhedron::faces_t selected_faces;
-			k3d::copy_if(polyhedron.faces.begin(), polyhedron.faces.end(), std::inserter(selected_faces, selected_faces.end()), detail::do_triangulate(holes_only));
-
-			// For each face ...
-			for(k3d::legacy::polyhedron::faces_t::iterator face = selected_faces.begin(); face != selected_faces.end(); ++face)
-			{
-				k3d::legacy::polyhedron::faces_t faces;
-				faces.push_back(*face);
-
-				k3d::legacy::triangulate(faces, polyhedron.faces, Mesh.points);
-
-				polyhedron.faces.erase(std::remove(polyhedron.faces.begin(), polyhedron.faces.end(), *face), polyhedron.faces.end());
-				delete *face;
-			}
-
-			// Set companions
-			k3d::legacy::set_companions(polyhedron);
-			assert_warning(k3d::legacy::is_valid(polyhedron));
-		}
-	}
-
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	triangulate_faces(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+		base(Factory, Document)
 	{
 	}
-
+	
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	{
+		create_triangles().process(Input, Output);
+	}
+	
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	{
+	}
+	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<triangulate_faces_implementation,
-			k3d::interface_list<k3d::imesh_source,
-			k3d::interface_list<k3d::imesh_sink > > > factory(
-				k3d::uuid(0x3796ae29, 0xbcc84a5c, 0xb6bae620, 0x87a9b1bd),
-				"TriangulateFaces",
-				_("Converts input faces into triangles"),
-				"Polygon",
-				k3d::iplugin_factory::STABLE);
+		static k3d::document_plugin_factory<triangulate_faces, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
+			k3d::uuid(0x871ccafd, 0xc944da92, 0xcdf9f2b4, 0xcbc40cd8),
+			"NewTriangulateFaces",
+			_("Converts input faces into triangles"),
+			"Development",
+			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
-
+	
 private:
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_holes_only;
+	class create_triangles :
+		public k3d::triangulator
+	{
+		typedef k3d::triangulator base;
+
+	public:
+		create_triangles() :
+			m_input(0)
+		{
+		}
+
+		void process(const k3d::mesh& Input, k3d::mesh& Output)
+		{
+			if(!k3d::validate_polyhedra(Input))
+				return;
+
+			m_input = &Input;
+
+			// Allocate new data structures for our output ...
+			m_polyhedra.reset(new k3d::mesh::polyhedra_t());
+			m_first_faces.reset(new k3d::mesh::indices_t());
+			m_face_counts.reset(new k3d::mesh::counts_t());
+			m_types.reset(new k3d::mesh::polyhedra_t::types_t());
+			m_face_first_loops.reset(new k3d::mesh::indices_t());
+			m_face_loop_counts.reset(new k3d::mesh::counts_t());
+			m_face_selection.reset(new k3d::mesh::selection_t());
+			m_face_materials.reset(new k3d::mesh::materials_t());
+			m_loop_first_edges.reset(new k3d::mesh::indices_t());
+			m_edge_points.reset(new k3d::mesh::indices_t());
+			m_clockwise_edges.reset(new k3d::mesh::indices_t());
+			m_edge_selection.reset(new k3d::mesh::selection_t());
+			m_points.reset(new k3d::mesh::points_t(*Input.points));
+			m_point_selection.reset(new k3d::mesh::selection_t(*Input.point_selection));
+
+			// Hook everything together ...
+			m_polyhedra->first_faces = m_first_faces;
+			m_polyhedra->face_counts = m_face_counts;
+			m_polyhedra->types = m_types;
+			m_polyhedra->face_first_loops = m_face_first_loops;
+			m_polyhedra->face_loop_counts = m_face_loop_counts;
+			m_polyhedra->face_selection = m_face_selection;
+			m_polyhedra->face_materials = m_face_materials;
+			m_polyhedra->loop_first_edges = m_loop_first_edges;
+			m_polyhedra->edge_points = m_edge_points;
+			m_polyhedra->clockwise_edges = m_clockwise_edges;
+			m_polyhedra->edge_selection = m_edge_selection;
+
+			// Setup copying of attribute arrays ...
+			m_polyhedra->constant_data = Input.polyhedra->constant_data;
+
+			m_polyhedra->uniform_data = Input.polyhedra->uniform_data.clone_types();
+			m_uniform_data_copier.reset(new k3d::named_array_copier(Input.polyhedra->uniform_data, m_polyhedra->uniform_data));
+
+			m_polyhedra->face_varying_data = Input.polyhedra->face_varying_data.clone_types();
+			m_face_varying_data_copier.reset(new k3d::named_array_copier(Input.polyhedra->face_varying_data, m_polyhedra->face_varying_data));
+
+			Output.vertex_data = Input.vertex_data.clone();
+			m_vertex_data_copier.reset(new k3d::named_array_copier(Input.vertex_data, Output.vertex_data));
+
+			// Setup the output mesh ...
+			Output.polyhedra = m_polyhedra;
+			Output.points = m_points;
+			Output.point_selection = m_point_selection;
+
+			base::process(Input);
+
+			m_first_faces->push_back(0);
+			m_face_counts->push_back(m_face_first_loops->size());
+			m_types->push_back(k3d::mesh::polyhedra_t::POLYGONS);
+		}
+
+	private:
+		void start_face(const k3d::uint_t Face)
+		{
+			m_current_face = Face;
+		}
+
+		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], double Weights[4], k3d::uint_t& NewVertex)
+		{
+			NewVertex = m_points->size();
+
+			m_points->push_back(Coordinates);
+			m_point_selection->push_back(0.0);
+
+			m_vertex_data_copier->push_back(4, Vertices, Weights);
+
+			m_new_face_varying_data[NewVertex] = new_face_varying_record(Edges, Weights);
+		}
+
+		void add_triangle(k3d::uint_t Vertices[3], k3d::uint_t Edges[3])
+		{
+			m_face_first_loops->push_back(m_loop_first_edges->size());
+			m_face_loop_counts->push_back(1);
+			m_face_selection->push_back(1.0);
+			m_face_materials->push_back((*m_input->polyhedra->face_materials)[m_current_face]);
+			m_loop_first_edges->push_back(m_edge_points->size());
+			m_edge_points->push_back(Vertices[0]);
+			m_edge_points->push_back(Vertices[1]);
+			m_edge_points->push_back(Vertices[2]);
+			m_clockwise_edges->push_back(m_edge_points->size() - 2);
+			m_clockwise_edges->push_back(m_edge_points->size() - 1);
+			m_clockwise_edges->push_back(m_edge_points->size() - 3);
+			m_edge_selection->push_back(0.0);
+			m_edge_selection->push_back(0.0);
+			m_edge_selection->push_back(0.0);
+
+			m_uniform_data_copier->push_back(m_current_face);
+
+			for(k3d::uint_t i = 0; i != 3; ++i)
+			{
+				if(m_new_face_varying_data.count(Vertices[i]))
+					m_face_varying_data_copier->push_back(4, m_new_face_varying_data[Vertices[i]].edges, m_new_face_varying_data[Vertices[i]].weights);
+				else
+					m_face_varying_data_copier->push_back(Edges[i]);
+			}
+		}
+
+		const k3d::mesh* m_input;
+
+		boost::shared_ptr<k3d::mesh::polyhedra_t> m_polyhedra;
+		boost::shared_ptr<k3d::mesh::indices_t> m_first_faces;
+		boost::shared_ptr<k3d::mesh::counts_t> m_face_counts;
+		boost::shared_ptr<k3d::mesh::polyhedra_t::types_t> m_types;
+		boost::shared_ptr<k3d::mesh::indices_t> m_face_first_loops;
+		boost::shared_ptr<k3d::mesh::counts_t> m_face_loop_counts;
+		boost::shared_ptr<k3d::mesh::selection_t> m_face_selection;
+		boost::shared_ptr<k3d::mesh::materials_t> m_face_materials;
+		boost::shared_ptr<k3d::mesh::indices_t> m_loop_first_edges;
+		boost::shared_ptr<k3d::mesh::indices_t> m_edge_points;
+		boost::shared_ptr<k3d::mesh::indices_t> m_clockwise_edges;
+		boost::shared_ptr<k3d::mesh::selection_t> m_edge_selection;
+		boost::shared_ptr<k3d::mesh::points_t> m_points;
+		boost::shared_ptr<k3d::mesh::selection_t> m_point_selection;
+
+		boost::shared_ptr<k3d::named_array_copier> m_uniform_data_copier;
+		boost::shared_ptr<k3d::named_array_copier> m_face_varying_data_copier;
+		boost::shared_ptr<k3d::named_array_copier> m_vertex_data_copier;
+
+		k3d::uint_t m_current_face;
+
+		struct new_face_varying_record
+		{
+			new_face_varying_record()
+			{
+			}
+
+			new_face_varying_record(k3d::uint_t Edges[4], k3d::double_t Weights[4])
+			{
+				std::copy(Edges, Edges + 4, edges);
+				std::copy(Weights, Weights + 4, weights);
+			}
+
+			k3d::uint_t edges[4];
+			k3d::double_t weights[4];
+		};
+
+		std::map<k3d::uint_t, new_face_varying_record> m_new_face_varying_data;
+	};
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -153,7 +236,7 @@ private:
 
 k3d::iplugin_factory& triangulate_faces_factory()
 {
-	return triangulate_faces_implementation::get_factory();
+	return triangulate_faces::get_factory();
 }
 
 } // namespace mesh

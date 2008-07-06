@@ -89,14 +89,10 @@ clockwise_edges.append(4)
 edge_selection.append(0.0)
 Cs.append(k3d.color(1, 1, 1))
 
-modifier = document.new_node("NewTriangulateFaces")
+modifier = document.new_node("TriangulateFaces")
 mesh_selection = k3d.select_all()
 modifier.mesh_selection = mesh_selection
 document.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
 
-# Force execution ...
-print repr(mesh)
-print repr(modifier.output_mesh)
-
-#testing.mesh_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.TriangulateFaces.self_intersection", 0)
+testing.mesh_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.TriangulateFaces.face_varying", 0)
 

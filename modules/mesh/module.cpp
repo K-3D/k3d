@@ -23,7 +23,6 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the mesh plugin module, to protect public symbols from name clashes with other modules
 namespace module
 {
 
@@ -66,6 +65,13 @@ extern k3d::iplugin_factory& tag_color_factory();
 extern k3d::iplugin_factory& triangulate_faces_factory();
 extern k3d::iplugin_factory& weld_factory();
 
+namespace legacy
+{
+
+extern k3d::iplugin_factory& triangulate_faces_factory();
+
+} // namespace legacy
+
 } // namespace mesh
 
 } // namespace module
@@ -103,5 +109,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::mesh::tag_color_factory());
 	Registry.register_factory(module::mesh::triangulate_faces_factory());
 	Registry.register_factory(module::mesh::weld_factory());
+
+	Registry.register_factory(module::mesh::legacy::triangulate_faces_factory());
 K3D_MODULE_END
 
