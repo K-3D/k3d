@@ -119,8 +119,12 @@ k3d::matrix4 getTransformation(domNode& node)
 }
 
 
-collada_obj lookcollada(std::vector<collada_obj> &collada_objs, std::string name)
+collada_obj lookcollada(std::vector<collada_obj> &collada_objs, std::string id)
 {
+	for(int i=0; i<collada_objs.size(); i++)
+		if(id==collada_objs[i].get_id())
+			return collada_objs[i];
+	k3d::log() << error << "Could not connect collada object with instace!" << std::endl;
 	return collada_objs[0];
 }
 
@@ -190,7 +194,7 @@ public:
 						k3d::ipipeline::dependencies_t dependencies;
 						k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(mesh_instance);
 
-						dependencies.insert(std::make_pair(&mesh_sink->mesh_sink_input(), lookcollada(collada_objs,instanceGeom->getUrl().getElement()->getAttribute("name")).get_mesh_source_output()));
+						dependencies.insert(std::make_pair(&mesh_sink->mesh_sink_input(), lookcollada(collada_objs,instanceGeom->getUrl().getElement()->getAttribute("id")).get_mesh_source_output()));
 
 						k3d::itransform_source* const transform_source = dynamic_cast<k3d::itransform_source*>(frozen_trans);
 						k3d::itransform_sink* const transform_sink = dynamic_cast<k3d::itransform_sink*>(mesh_instance);
