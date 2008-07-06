@@ -136,6 +136,10 @@ namespace module{
 	     so_artistname(init_value(k3d::string_t(""))),
 	     so_artistnotes(init_value(k3d::string_t("")))
 	  {
+	    //Get Any Availible Data (If There Is Any)
+	    resetToNode();
+
+	    //Drop Hind To Multiline Text Item
 	    so_artistnotes.set_metadata("k3d:property-type", "k3d:multi-line-text");
 	  }
 	  
@@ -150,6 +154,37 @@ namespace module{
 	  //Mutator Functions
 	  void setName(k3d::string_t str){so_name.set_value(str);}
 
+	  //Save Extra Content To Node
+	  void saveToNode()
+	  {
+	    //Save K3D::DATA so_name to node
+	    node->set_name(so_name.internal_value());
+
+	    //Save Rest To Meta Data Properties (Allows File Save)
+	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
+	      {
+		metadata->set_metadata("ShaderManager::shader_type", so_type.internal_value());
+		metadata->set_metadata("ShaderManager::shader_datestamp", so_datestamp.internal_value());
+		metadata->set_metadata("ShaderManager::shader_artistname", so_artistname.internal_value());
+		metadata->set_metadata("ShaderManager::shader_artistnotes", so_artistnotes.internal_value());
+	      }//if					       					   
+	  }
+
+	  //Reset Content To Curent Saved Node Data
+	  void resetToNode()
+	  {
+	    //Get Node Name
+	    so_name.set_value(node->name());
+
+	    //Get Any Availible Meta Data (If There Is Any)
+	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
+	      {
+		so_type.set_value(metadata->get_metadata()["ShaderManager::shader_type"]);
+		so_datestamp.set_value(metadata->get_metadata()["ShaderManager::shader_datestamp"]);
+		so_artistname.set_value(metadata->get_metadata()["ShaderManager::shader_artistname"]);
+		so_artistnotes.set_value(metadata->get_metadata()["ShaderManager::shader_artistnotes"]);
+	      }//if
+	  }
 
 	public:
 	  k3d_data(k3d::string_t, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) so_name;
@@ -193,8 +228,10 @@ namespace module{
 	      //Clean Up The List Of Shader Objects (s_object)
 	      delete (*shaderIter);
 	      m_shaders.erase(shaderIter);
-
 	    }//for
+
+	  //Ensure Clean Storage 
+	  m_shaders.clear();
 	}
 
 	void s_group::addShader(s_object* shd)
@@ -280,6 +317,9 @@ namespace module{
 	      delete (*groupIter);
 	      m_groups.erase(groupIter);
 	    }//for
+
+	  //Ensure Clean Storage 
+	  m_groups.clear();
 
 	}
 
@@ -929,7 +969,8 @@ namespace module{
 	     s_datemod_entry(*_m_parent, k3d::string_t("so_datestamp_field"), entry::model(_m_so->so_datestamp), 0),
 	     s_artistname_entry(*_m_parent, k3d::string_t("so_artistname_field"), entry::model(_m_so->so_artistname), 0),
 	     s_artistnotes_mltext(*_m_parent, k3d::string_t("so_artistnotes_mltxt"), text::model(_m_so->so_artistnotes), 0),
-	     shaderPreview(k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_shaderImgFile))
+	     shaderPreview(k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_shaderImgFile)),
+	     save_button("Save Shader"), reset_button("Reset Shader")
 	  {
 	    s_name_l.set_text		("Shader Name: ");
 	    s_type_l.set_text		("Shader Type: ");
@@ -940,6 +981,12 @@ namespace module{
 	    //glib timer set that updates preview image every 0.25 seconds
 	    // << Will Delete when panel closed
 	    timerPreviewConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this, &so_content_pane::updatePreviewImage), 250);
+
+	    //Create A Signal Connection For Save Button
+	    save_button.signal_clicked().connect( sigc::mem_fun(*this, &so_content_pane::on_save_button_clicked));
+
+	    //Create A Signal Connection For Reset Button
+	    reset_button.signal_clicked().connect( sigc::mem_fun(*this, &so_content_pane::on_reset_button_clicked));
 
 	  }
 
@@ -958,7 +1005,7 @@ namespace module{
 
 		so_preview_frame.set_size_request(previewSize + 25, previewSize + 35);
 		so_preview_frame.add(shaderPreview);
-		preview_c.pack_start(so_preview_frame, false, false, 10);
+		preview_c.pack_start(so_preview_frame, false, false, 8);
  	      
 		//Add Container To Right Pane From Implementation
 		m_Hpane->add2(main_detail_c);
@@ -990,6 +1037,20 @@ namespace module{
 		s_artistname_l.set_alignment(0.0);
 		label_c.pack_start(s_artistname_l, true, true, 0);
 		data_c.pack_start(s_artistname_entry, true, true, 0);
+
+		//Reset To Document Button
+		reset_button_l.set_text("Reset To The Document: ");
+		reset_button_l.set_alignment(0.0);
+		label_c.pack_start(reset_button_l, true, true, 0);
+
+		data_c.pack_start(reset_button, true, false, 0);
+
+		//Save To Document Button
+		save_button_l.set_text("Save To The Document: ");
+		save_button_l.set_alignment(0.0);
+		label_c.pack_start(save_button_l, true, true, 0);
+
+		data_c.pack_start(save_button, true, false, 0);
 
 		//Artist Notes
 		main_detail_c.pack_start(artistnotes_frame, true, true, 10);
@@ -1072,6 +1133,28 @@ namespace module{
 	    return true;
 	  }
 
+	  //Save The Shader Context To Document
+	  void on_save_button_clicked()
+	  {
+	    k3d::log() << "SAVING SHADER TO DOCUMENT!" << std::endl;
+	    
+	    //Save Certain Values To Document Nodes
+	    m_so->saveToNode();
+
+	    //Save Rest To File	      
+	  }
+	  
+
+	  void on_reset_button_clicked()
+	  { 
+	    //Reset Values To Node Values (On Document)
+	    m_so->resetToNode();
+
+	    //Reset Reset From Saved Attributes On File
+	  }
+
+	     
+
 	public:
 	  //GTK Widgets
 	  Gtk::Label s_name_l;
@@ -1093,6 +1176,12 @@ namespace module{
 
 	  Gtk::Frame so_preview_frame;
 	  Gtk::Frame artistnotes_frame;
+
+	  Gtk::Label save_button_l;
+	  Gtk::Button save_button;
+
+	  Gtk::Label reset_button_l;
+	  Gtk::Button reset_button;
 
 	  entry::control s_name_entry;
 	  entry::control s_type_entry;
@@ -1143,7 +1232,8 @@ namespace module{
 	  }
 
 	  ~implementation()
-	  {	      
+	  {	
+	    
 	  }
 
 	public:
@@ -1274,7 +1364,7 @@ namespace module{
 
 	void implementation::build_tree()
 	{
-	  //Gro Through Groups And Add To Tree
+	  //Group Through Groups And Add To Tree
 	  std::list<s_group*>::const_iterator gIter = m_model->m_groups.begin();
 	  for(; gIter !=  m_model->m_groups.end(); gIter++)
 	    {
@@ -1294,6 +1384,10 @@ namespace module{
 		  childrow[m_columns.s_group_ptr] = 0;
 		  childrow[m_columns.s_object_ptr] = (*sIter);
 		  childrow[m_columns.icon] = quiet_load_icon((*sIter)->node->factory().name(), Gtk::ICON_SIZE_MENU);
+
+
+	      k3d::log() << childrow->get_value(m_columns.name) << std::endl;
+
 		}//for		
 	    }//for
 
