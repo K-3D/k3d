@@ -113,7 +113,7 @@ public:
 			k3d::log() << error << "error initializing font" << std::endl;
 			return;
 		}
-		font.FaceSize(m_font_size.pipeline_value());
+		font.FaceSize(static_cast<unsigned int>(m_font_size.pipeline_value()));
 
 		FTSimpleLayout layout;
 		layout.SetFont(&font);
