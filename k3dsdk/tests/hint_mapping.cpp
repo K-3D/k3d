@@ -29,6 +29,12 @@ public:
 	{
 		Stream << "bitmap_dimensions_changed";
 	}
+
+	static bitmap_dimensions_changed* instance()
+	{
+		static bitmap_dimensions_changed hint;
+		return &hint;
+	}
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -41,6 +47,12 @@ public:
 	void print(std::ostream& Stream)
 	{
 		Stream << "bitmap_pixels_changed";
+	}
+
+	static bitmap_pixels_changed* instance()
+	{
+		static bitmap_pixels_changed hint;
+		return &hint;
 	}
 };
 
@@ -259,10 +271,10 @@ int main(int argc, char* arv[])
 
 	// Exercise the hint-mapping network ...
 	std::cerr << "****************" << std::endl;
-	input_bitmap.changed_signal().emit(&k3d::hint::bitmap_dimensions_changed());
+	input_bitmap.changed_signal().emit(k3d::hint::bitmap_dimensions_changed::instance());
 
 	std::cerr << "****************" << std::endl;
-	input_bitmap.changed_signal().emit(&k3d::hint::bitmap_pixels_changed());
+	input_bitmap.changed_signal().emit(k3d::hint::bitmap_pixels_changed::instance());
 
 	std::cerr << "****************" << std::endl;
 	input_bitmap.changed_signal().emit(0);
