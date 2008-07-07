@@ -53,6 +53,7 @@ namespace module
 		extern int count_all_curves_in_groups(k3d::mesh::nurbs_curve_groups_t& groups);
 		extern int selected_curve(k3d::mesh& Output);
 		k3d::point4 curve_point(k3d::mesh& input, size_t curve, double u);
+		bool point3_float_equal(const k3d::point3& p1, const k3d::point3& p2, float threshold=0.000001);
 		
 		class split_curve :
 			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
@@ -90,6 +91,12 @@ namespace module
 				}
 				
 				double u = m_u_value.pipeline_value();
+				
+				if(u == 0.0 || u == 1.0)
+				{
+					k3d::log() << error << "Cannot split a curve at its end point" << std::endl;
+					return;
+				}
 				
 				split_curve_at(Output, curve, u);
 				
@@ -140,15 +147,7 @@ namespace module
 				k3d::point4 p = curve_point(Output, curve, u);
 				double w = p[3];
 				k3d::point3 p3(p[0]/w, p[1]/w, p[2]/w);
-				k3d::mesh::points_t::iterator i = std::find( mesh_points.begin(), mesh_points.end(), p3);
-				if( i == mesh_points.end() )
-				{
-					k3d::log() << error << "Wasnt able to find point in curve!" << std::endl;
-					return;
-				}
-				size_t point_index = std::distance(mesh_points.begin(), std::find( mesh_points.begin(), mesh_points.end(), p3)); 
 				k3d::log() << debug << "Point: " << p[0] << " x " << p[1] << " x " << p[2] << " x " << p[3] << std::endl;
-				k3d::log() << debug << "Found in mesh at index: " << point_index << std::endl;
 				
 				//search the point in the actual curve
 				size_t curve_points_begin = curve_first_points[curve];
@@ -157,8 +156,7 @@ namespace module
 				
 				for( size_t point = curve_points_begin; point < curve_points_end; point++)
 				{
-					//use almost_equal here
-					if( mesh_points[ curve_points[point] ] == p3 )
+					if( point3_float_equal(mesh_points[ curve_points[point] ],p3) )
 					{
 						if( curve_point_index < 0)
 							curve_point_index = point;
@@ -180,7 +178,8 @@ namespace module
 				//double points and weights
 				k3d::mesh::indices_t::iterator point_iter = curve_points.begin();
 				point_iter += curve_point_index + 1;
-				mesh_points.push_back(p3);				
+				mesh_points.push_back(p3);	
+				point_selection.push_back(0.0);
 				curve_points.insert(point_iter, mesh_points.size() - 1);
 				
 				k3d::mesh::weights_t::iterator weight_iter = curve_point_weights.begin();
@@ -194,7 +193,7 @@ namespace module
 				
 				for( size_t knot = curve_knots_begin; knot < curve_knots_end; knot++)
 				{
-					if( curve_knots[knot] == u && knot_index < 0)
+					if( fabs(curve_knots[knot] - u) < 0.000001 && knot_index < 0)
 						knot_index = knot;						
 				}
 				
@@ -258,6 +257,26 @@ namespace module
 			return split_curve::get_factory();
 		}
 		
+		
+		bool point3_float_equal(const k3d::point3& p1, const k3d::point3& p2, float threshold)
+		{
+			float point1[3], point2[3];
+			
+			point1[0] = static_cast<float>(p1[0]);
+			point1[1] = static_cast<float>(p1[1]);
+			point1[2] = static_cast<float>(p1[2]);
+			
+			point2[0] = static_cast<float>(p2[0]);
+			point2[1] = static_cast<float>(p2[1]);
+			point2[2] = static_cast<float>(p2[2]);
+			
+			if( fabs(point1[0] - point2[0]) < threshold
+				&& fabs(point1[1] - point2[1]) < threshold
+				&& fabs(point1[2] - point2[2]) < threshold)
+				return true;
+			return false;
+		}
+		
 		int find_span(k3d::mesh& input, size_t curve, double u)
 		{
 			k3d::log() << debug << "FindSpan of " << u << " in curve " << curve << std::endl;
@@ -274,7 +293,10 @@ namespace module
 			size_t n = curve_knots_end - curve_knots_begin - (order - 1);
 			
 			if( u == curve_knots.at(curve_knots_begin + n) )
+			{
+				k3d::log() << debug << "Span is " << n - 1 << std::endl;
 				return n - 1;
+			}
 			
 			int low = (order - 1);
 			int high = n;
