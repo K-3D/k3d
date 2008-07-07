@@ -221,11 +221,12 @@ namespace module{
 	};//s_group
 
 	void s_group::clearGroup()
-	{
+	{k3d::log() << "CLEAR GROUP STUFF " << std::endl;
 	  std::list<s_object*>::iterator shaderIter = m_shaders.begin();
 	  for(; shaderIter != m_shaders.end(); shaderIter++)
 	    {
 	      //Clean Up The List Of Shader Objects (s_object)
+	      k3d::log() << "DELETEING: " << (*shaderIter)->getName() << std::endl;
 	      delete (*shaderIter);
 	      m_shaders.erase(shaderIter);
 	    }//for
@@ -266,6 +267,8 @@ namespace module{
 		delete gl;
 	      if(other)
 		delete other;
+
+	      clearModel();
 	    }
 
 	  public:
@@ -294,8 +297,10 @@ namespace module{
 	      if((*nodeIter)->factory().implements(typeid(k3d::imaterial)))
 		{
 		  //Check To Find Group Catagory and Build Group
-		  if((*nodeIter)->factory().implements(typeid(k3d::ri::imaterial)))
+		  if((*nodeIter)->factory().implements(typeid(k3d::ri::imaterial))){
 		    rman->addShader(new s_object(rman, (*nodeIter), riMaterialStr));
+		    k3d::log() << "BASE NAME: " <<  (*nodeIter)->name() << std::endl;
+		  }
 
 		  else if((*nodeIter)->factory().implements(typeid(k3d::gl::imaterial)))
 		    gl->addShader(new s_object(gl, (*nodeIter), glMaterialStr));
@@ -350,7 +355,10 @@ namespace module{
 
         shaderPreviewImage::shaderPreviewImage(k3d::filesystem::path _imgPath)
 	{
-          imgFilePath = _imgPath;
+	  imgFilePath = _imgPath;
+
+	  //Remove Preview Render from tmp dir -> Required at uncertain close events occur
+	   k3d::filesystem::remove(imgFilePath);
 
 	  //Define Location of image holder (if no render preview file found)
 	  imgHolderPath = k3d::share_path() / k3d::filesystem::generic_path("ngui/rasterized") 
@@ -1226,9 +1234,16 @@ namespace module{
 	    m_document_state.document().nodes().remove_nodes_signal().connect(sigc::mem_fun(*this, &implementation::on_nodes_removed));
 	    m_document_state.document().nodes().rename_node_signal().connect(sigc::mem_fun(*this, &implementation::on_node_renamed));
 
+	    //Group Buttons
+	    //Create A Signal Connection For Add Group Button
+	    add_group.signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_add_button_button_clicked));
+
+	    //Create A Signal Connection For Remove Group Button
+	    remove_group.signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_remove_button_button_clicked));
 
 	    build_gui();
 	    schedule_update();
+
 	  }
 
 	  ~implementation()
@@ -1248,7 +1263,10 @@ namespace module{
 	  void on_nodes_added(const k3d::inode_collection::nodes_t& Nodes) ;
           void on_nodes_removed(const k3d::inode_collection::nodes_t& Nodes);
           void on_node_renamed(k3d::inode* const Node);
-
+	  
+	  void on_add_button_button_clicked();
+	  void on_remove_button_button_clicked();
+	  
 	  void on_tree_row_changed();
 
 	  bool get_row(k3d::inode* const Node, Gtk::TreeIter& Row);
@@ -1340,6 +1358,13 @@ namespace module{
 
 	  m_nav.append_column("icon", m_columns.icon);
 	  m_nav.append_column(*manage(name_column));
+
+	  //Set Rows Reordable
+	  m_nav.set_reorderable(true);
+
+	  //Set Headers & Display Look & Feel Options
+	  m_nav.set_headers_visible(false);
+	  m_nav.set_rules_hint(true);  	
 
 	  //Setup the Window
 	  m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
@@ -1560,7 +1585,48 @@ namespace module{
 	    }//for
 
 	  return false;
-	}
+	}//on_node_renamed
+
+
+	void implementation::on_add_button_button_clicked()
+	{
+	  k3d::log() << " Add Button Pressed" << std::endl;
+
+	  //Create & Embed New Group
+	  s_group *newGroup = new s_group("New Group");
+	  m_model->m_groups.push_back(newGroup);
+
+	  //Add New Group To The Tree
+	  Gtk::TreeRow row = *tree_model->append();
+	  row[m_columns.name] = newGroup->sg_name;
+	  row[m_columns.is_group] = true;
+	  row[m_columns.s_group_ptr] = newGroup;
+	  row[m_columns.s_object_ptr] = 0;
+
+	}//on_add_button_button_clicked
+
+
+
+	void implementation::on_remove_button_button_clicked()
+	{
+
+	  //Get The Currently Selected Row (Group)
+	  Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+	  if(iter) //If anything is selected
+	    {
+	      Gtk::TreeModel::Row row = *iter;
+
+	      //Is It A Group?
+	      if(row[m_columns.is_group])
+		{
+		  
+		  k3d::log() << " Remove Button Pressed... Will Delete Group (Eventually :) )" << std::endl;
+
+		}//if
+	    }//if
+
+	}//on_remove_button_button_clicked
+
 
 
 
