@@ -222,13 +222,15 @@ namespace module{
 
 	void s_group::clearGroup()
 	{k3d::log() << "CLEAR GROUP STUFF " << std::endl;
+	  k3d::log() << "M_MATERIAL SIZE " <<  m_materials.size() << std::endl;
+
 	  std::list<s_object*>::iterator materialIter = m_materials.begin();
 	  for(; materialIter != m_materials.end(); materialIter++)
 	    {
 	      //Clean Up The List Of material Objects (s_object)
 	      k3d::log() << "DELETEING: " << (*materialIter)->getName() << std::endl;
 	      delete (*materialIter);
-	      m_materials.erase(materialIter);
+	      //m_materials.erase(materialIter);
 	    }//for
 
 	  //Ensure Clean Storage 
@@ -247,9 +249,9 @@ namespace module{
 
 	//***********************************************
 	  //Constant Groups -> These Wont Be Deleted
-	s_group *rman = new s_group(riMaterialStr);
-	s_group *gl = new s_group(glMaterialStr);
-	s_group *other = new s_group(otherStuffStr);
+	s_group *rman = 0;
+	s_group *gl = 0;
+	s_group *other = 0;
 	//***********************************************
 
 	  //************
@@ -257,6 +259,9 @@ namespace module{
 	  public:
 	    model()
 	    {
+	      rman = new s_group(riMaterialStr);
+	      gl = new s_group(glMaterialStr);
+	      other = new s_group(otherStuffStr);
 	    }
 	    ~model()
 	    {
@@ -320,7 +325,7 @@ namespace module{
 	    {
 	      (*groupIter)->clearGroup();
 	      delete (*groupIter);
-	      m_groups.erase(groupIter);
+	      //m_groups.erase(groupIter);
 	    }//for
 
 	  //Ensure Clean Storage 
@@ -1241,6 +1246,12 @@ namespace module{
 	    //Create A Signal Connection For Remove Group Button
 	    remove_group.signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_remove_button_button_clicked));
 
+ 	    //Delete Model Data
+	     m_model->clearModel();
+
+ 	    //Rebuild Model Data
+	    m_model->buildModel(m_document_state);
+
 	    build_gui();
 	    schedule_update();
 
@@ -1330,12 +1341,6 @@ namespace module{
 	{
 	  //Clear The Tree Model
 	  tree_model->clear();
-
-	  //Delete Model Data
-	  m_model->clearModel();
-
-	  //Rebuild Model Data
-	  m_model->buildModel(m_document_state);
 
 	  //Rebuild Tree From Rebuilt Model
 	  build_tree();
