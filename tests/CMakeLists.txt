@@ -114,6 +114,7 @@ K3D_ADD_TEST(test.PipelineProfiler.py PYTHON)
 K3D_ADD_TEST(property.linking.enumeration.py PYTHON)
 
 K3D_ADD_TEST(document.create.py PYTHON)
+K3D_ADD_TEST(document.NodeSelection.benchmark.py PYTHON REQUIRES K3D_BUILD_DEVELOPMENT_MODULE)
 K3D_ADD_TEST(document.stress.high_node_count.py PYTHON)
 K3D_ADD_TEST(document.stress.all_node_types.py PYTHON)
 #K3D_ADD_TEST(document.stress.read_all_properties.py PYTHON)
