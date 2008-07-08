@@ -151,7 +151,6 @@ modules/deformation/tweak_points.cpp
 modules/deformation/twist_points.cpp
 modules/development/glsl_painter.cpp
 modules/development/sharp_edges.cpp
-modules/development/triangulate_faces.cpp
 modules/development/tweak_points.cpp
 modules/file_magic/mime_type_handler.cpp
 modules/freetype2/poly_text.cpp
