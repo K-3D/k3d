@@ -27,6 +27,7 @@
 #include <k3dsdk/gprim_factory.h>
 #include <iostream>
 #include <dom/domPolylist.h>
+#include <dom/domTriangles.h>
 using namespace std;
 namespace module
 {
@@ -46,18 +47,25 @@ namespace io
 		domMesh *meshElement = geomElement.getMesh();
 	
 		k3d::gprim_factory *local = new k3d::gprim_factory(Mesh);
-	
-		// Get a pointer to the domPolygons in this domMesh. To simplify this example,
-		// we will handle only a domMesh that has a single domPolygons.
-		if(meshElement->getPolylist_array().getCount() != 1)
+
+		domTriangles *triangles;
+		domPolylist *polygons;
+
+		bool areTriangles = false;
+		bool arePolygons = false;
+		if(meshElement->getPolylist_array().getCount() >0)
 		{
-			k3d::log() << "This demo supports only one domPolygons per domMesh\n";
-			return;
+			arePolygons = true;
+			polygons = meshElement->getPolylist_array()[0];
 		}
-		domPolylist *polygons = meshElement->getPolylist_array()[0];
-		int polygonCount = polygons->getCount();
-		
-		int inputArraysCount = polygons->getInput_array().getCount();
+		if(meshElement->getTriangles_array().getCount() >0)
+		{
+			areTriangles = true;
+			triangles = meshElement->getTriangles_array()[0];
+		}
+
+		int polyCount = 0;
+		int inputArraysCount = 0;
 
 		int v_offset = -1;
 		int n_offset = -1;
@@ -68,37 +76,78 @@ namespace io
 		domInputLocalOffset* normal_input;
 		domInputLocalOffset* texcoord_input;
 
-		for (int i=0; i<inputArraysCount; i++)
+		domP *poly;
+
+		if(areTriangles)
 		{
-			if(strcmp(polygons->getInput_array()[i]->getSemantic(),"VERTEX")==0){
-				v_offset = polygons->getInput_array()[i]->getOffset();
-				vertex_input = polygons->getInput_array()[i];
-			}else
-			if(strcmp(polygons->getInput_array()[i]->getSemantic(),"NORMAL")==0){
-				n_offset = polygons->getInput_array()[i]->getOffset();
-				normal_input = polygons->getInput_array()[i];
-			}else
-			if(strcmp(polygons->getInput_array()[i]->getSemantic(),"TEXCOORD")==0){
-				t_offset = polygons->getInput_array()[i]->getOffset();
-				texcoord_input = polygons->getInput_array()[i];
+			polyCount = triangles->getCount();
+			inputArraysCount = triangles->getInput_array().getCount();
+
+			for (int i=0; i<inputArraysCount; i++)
+			{
+				if(strcmp(triangles->getInput_array()[i]->getSemantic(),"VERTEX")==0){
+					v_offset = triangles->getInput_array()[i]->getOffset();
+					vertex_input = triangles->getInput_array()[i];
+				}else
+				if(strcmp(triangles->getInput_array()[i]->getSemantic(),"NORMAL")==0){
+					n_offset = triangles->getInput_array()[i]->getOffset();
+					normal_input = triangles->getInput_array()[i];
+				}else
+				if(strcmp(triangles->getInput_array()[i]->getSemantic(),"TEXCOORD")==0){
+					t_offset = triangles->getInput_array()[i]->getOffset();
+					texcoord_input = triangles->getInput_array()[i];
+				}
+				if(max_offset< triangles->getInput_array()[i]->getOffset())
+					max_offset = triangles->getInput_array()[i]->getOffset();
 			}
-			if(max_offset< polygons->getInput_array()[i]->getOffset())
-				max_offset = polygons->getInput_array()[i]->getOffset();
+
+			poly = triangles->getP();
 		}
-	
+		else
+		if(arePolygons)
+		{
+			polyCount = polygons->getCount();
+			inputArraysCount = polygons->getInput_array().getCount();
+
+			for (int i=0; i<inputArraysCount; i++)
+			{
+				if(strcmp(polygons->getInput_array()[i]->getSemantic(),"VERTEX")==0){
+					v_offset = polygons->getInput_array()[i]->getOffset();
+					vertex_input = polygons->getInput_array()[i];
+				}else
+				if(strcmp(polygons->getInput_array()[i]->getSemantic(),"NORMAL")==0){
+					n_offset = polygons->getInput_array()[i]->getOffset();
+					normal_input = polygons->getInput_array()[i];
+				}else
+				if(strcmp(polygons->getInput_array()[i]->getSemantic(),"TEXCOORD")==0){
+					t_offset = polygons->getInput_array()[i]->getOffset();
+					texcoord_input = polygons->getInput_array()[i];
+				}
+				if(max_offset< polygons->getInput_array()[i]->getOffset())
+					max_offset = polygons->getInput_array()[i]->getOffset();
+			}
+
+			poly = polygons->getP();
+		}
+
 		max_offset++;
-		
-		domP *poly = polygons->getP();
-	
+
 		int tot = 0;
-		for (int i=0;i<polygonCount;i++)
+
+		for (int i=0;i<polyCount;i++)
 		{
 			k3d::mesh::indices_t vertex_coordinates;
 			k3d::mesh::indices_t texture_coordinates;
 			k3d::mesh::indices_t normal_coordinates;
 	
 			// Copy all the indices from the domP into my structure.
-			for(int v=0;v<polygons->getVcount()->getValue()[i]*max_offset;v+=max_offset)
+			int vcount = 0;
+			if(areTriangles)
+				vcount = 3;
+			else
+			if(arePolygons)
+				vcount = polygons->getVcount()->getValue()[i];
+			for(int v=0;v<vcount*max_offset;v+=max_offset)
 			{
 				if(v_offset!=-1)
 					vertex_coordinates.push_back(poly->getValue()[tot+v+v_offset]);		
@@ -107,10 +156,11 @@ namespace io
 				if(t_offset!=-1)
 					texture_coordinates.push_back(poly->getValue()[tot+v+t_offset]);
 			}
-			tot+=polygons->getVcount()->getValue()[i]*max_offset;
+			tot+=vcount*max_offset;
 			// Push this polygon into the list of polygons in my structure.
 			local->add_polygon(vertex_coordinates); //and soon texture_coordinates, normal_coordinates
 		}
+
 		// Copy the vertices we are going to use. To keep things simple,
 		// we will assume there is only one domSource and domFloatArray in the domMesh,
 		// that it is the array of vertices, and that it is in X, Y, Z format. A real
