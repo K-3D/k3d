@@ -3,7 +3,7 @@
 //
 // Contact: tshead@k-3d.com
 //
-// Shader Manager Panel Developed By Alex Curtis
+// Material Manager Panel Developed By Alex Curtis
 // Contact: alx.curtis@gmail.com
 //
 // This program is free software; you can redistribute it and/or
@@ -101,7 +101,7 @@ namespace module{
 
   namespace ngui{
 
-    namespace shader_manager{
+    namespace material_manager{
 
       namespace mechanics{
 
@@ -113,10 +113,10 @@ namespace module{
 	const k3d::string_t otherStuffStr 	= "Other Stuff";	
        
 	const k3d::string_t holderImgFile = "renderingShader.png";
-	const k3d::string_t s_shaderImgFile = "singlePreviewRender.png";
-	const k3d::string_t multi_s_shaderImgFile = "multiPreviewRender";
+	const k3d::string_t s_materialImgFile = "singlePreviewRender.png";
+	const k3d::string_t multi_s_materialImgFile = "multiPreviewRender";
 
-	//forward declaration for list of shaders
+	//forward declaration for list of materials
 	class s_group;
 
 	//Type Definitions
@@ -163,10 +163,10 @@ namespace module{
 	    //Save Rest To Meta Data Properties (Allows File Save)
 	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
 	      {
-		metadata->set_metadata("ShaderManager::shader_type", so_type.internal_value());
-		metadata->set_metadata("ShaderManager::shader_datestamp", so_datestamp.internal_value());
-		metadata->set_metadata("ShaderManager::shader_artistname", so_artistname.internal_value());
-		metadata->set_metadata("ShaderManager::shader_artistnotes", so_artistnotes.internal_value());
+		metadata->set_metadata("materialManager::material_type", so_type.internal_value());
+		metadata->set_metadata("materialManager::material_datestamp", so_datestamp.internal_value());
+		metadata->set_metadata("materialManager::material_artistname", so_artistname.internal_value());
+		metadata->set_metadata("materialManager::material_artistnotes", so_artistnotes.internal_value());
 	      }//if					       					   
 	  }
 
@@ -179,10 +179,10 @@ namespace module{
 	    //Get Any Availible Meta Data (If There Is Any)
 	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
 	      {
-		so_type.set_value(metadata->get_metadata()["ShaderManager::shader_type"]);
-		so_datestamp.set_value(metadata->get_metadata()["ShaderManager::shader_datestamp"]);
-		so_artistname.set_value(metadata->get_metadata()["ShaderManager::shader_artistname"]);
-		so_artistnotes.set_value(metadata->get_metadata()["ShaderManager::shader_artistnotes"]);
+		so_type.set_value(metadata->get_metadata()["materialManager::material_type"]);
+		so_datestamp.set_value(metadata->get_metadata()["materialManager::material_datestamp"]);
+		so_artistname.set_value(metadata->get_metadata()["materialManager::material_artistname"]);
+		so_artistnotes.set_value(metadata->get_metadata()["materialManager::material_artistnotes"]);
 	      }//if
 	  }
 
@@ -211,38 +211,38 @@ namespace module{
 
 	public:
 	  void clearGroup();
-	  void addShader(s_object* shd);
-	  void removeShader(s_object* shd);
+	  void addMaterial(s_object* shd);
+	  void removeMaterial(s_object* shd);
 
 	public:
-	  std::list<s_object*>     m_shaders; //children
+	  std::list<s_object*>     m_materials; //children
 	  k3d::string_t            sg_name;
 
 	};//s_group
 
 	void s_group::clearGroup()
 	{k3d::log() << "CLEAR GROUP STUFF " << std::endl;
-	  std::list<s_object*>::iterator shaderIter = m_shaders.begin();
-	  for(; shaderIter != m_shaders.end(); shaderIter++)
+	  std::list<s_object*>::iterator materialIter = m_materials.begin();
+	  for(; materialIter != m_materials.end(); materialIter++)
 	    {
-	      //Clean Up The List Of Shader Objects (s_object)
-	      k3d::log() << "DELETEING: " << (*shaderIter)->getName() << std::endl;
-	      delete (*shaderIter);
-	      m_shaders.erase(shaderIter);
+	      //Clean Up The List Of material Objects (s_object)
+	      k3d::log() << "DELETEING: " << (*materialIter)->getName() << std::endl;
+	      delete (*materialIter);
+	      m_materials.erase(materialIter);
 	    }//for
 
 	  //Ensure Clean Storage 
-	  m_shaders.clear();
+	  m_materials.clear();
 	}
 
-	void s_group::addShader(s_object* shd)
+	void s_group::addMaterial(s_object* shd)
 	{
-	  m_shaders.push_back(shd);
+	  m_materials.push_back(shd);
 	}
 
-	void s_group::removeShader(s_object* shd)
+	void s_group::removeMaterial(s_object* shd)
 	{
-	  m_shaders.remove(shd);
+	  m_materials.remove(shd);
 	}
 
 	//***********************************************
@@ -298,15 +298,15 @@ namespace module{
 		{
 		  //Check To Find Group Catagory and Build Group
 		  if((*nodeIter)->factory().implements(typeid(k3d::ri::imaterial))){
-		    rman->addShader(new s_object(rman, (*nodeIter), riMaterialStr));
+		    rman->addMaterial(new s_object(rman, (*nodeIter), riMaterialStr));
 		    k3d::log() << "BASE NAME: " <<  (*nodeIter)->name() << std::endl;
 		  }
 
 		  else if((*nodeIter)->factory().implements(typeid(k3d::gl::imaterial)))
-		    gl->addShader(new s_object(gl, (*nodeIter), glMaterialStr));
+		    gl->addMaterial(new s_object(gl, (*nodeIter), glMaterialStr));
 
 		  else
-		    other->addShader(new s_object(other, (*nodeIter), otherStuffStr));
+		    other->addMaterial(new s_object(other, (*nodeIter), otherStuffStr));
 
 		}//if
 	    }//for
@@ -334,10 +334,10 @@ namespace module{
 	// [implementation]*************************************************************************
 
 	//************ PREVIEW IMAGE CONTENT CLASS
-	class shaderPreviewImage: public Gtk::DrawingArea{
+	class materialPreviewImage: public Gtk::DrawingArea{
         public:
-          shaderPreviewImage(k3d::filesystem::path _imgPath);
-          virtual ~shaderPreviewImage();
+          materialPreviewImage(k3d::filesystem::path _imgPath);
+          virtual ~materialPreviewImage();
 	  
 	  //Function to be called on preview img update request signal
 	  bool onUpdatePreview();
@@ -350,10 +350,10 @@ namespace module{
           //Override default signal handler:
           virtual bool on_expose_event(GdkEventExpose* event);
 
-        };//shaderPreviewImage
+        };//materialPreviewImage
 
 
-        shaderPreviewImage::shaderPreviewImage(k3d::filesystem::path _imgPath)
+        materialPreviewImage::materialPreviewImage(k3d::filesystem::path _imgPath)
 	{
 	  imgFilePath = _imgPath;
 
@@ -365,13 +365,13 @@ namespace module{
 	    / k3d::filesystem::generic_path(holderImgFile);
         }
 
-        shaderPreviewImage::~shaderPreviewImage()
+        materialPreviewImage::~materialPreviewImage()
 	{
 	  //Remove Preview Render from tmp dir
 	   k3d::filesystem::remove(imgFilePath);
         }
 
-        bool shaderPreviewImage::on_expose_event(GdkEventExpose* event)
+        bool materialPreviewImage::on_expose_event(GdkEventExpose* event)
         {
 	  try
 	    {
@@ -599,7 +599,7 @@ namespace module{
 						  "visible_nodes", 
 						  k3d::inode_collection_property::nodes_t(1, panelGeo));
 
-		//Setup the shader preview render engine*****
+		//Setup the material preview render engine*****
 		k3d::property::set_internal_value(*panelEngine, 
 						  "render_engine", dynamic_cast<k3d::inode*>(aqsis));
 
@@ -670,8 +670,8 @@ namespace module{
 	  ~g_content_pane()
 	  {
 	    //Clean Up
-	    std::vector<shaderPreviewImage*>::iterator pIter = shaderPreviews.begin();
-	    for(; pIter != shaderPreviews.end(); pIter++)
+	    std::vector<materialPreviewImage*>::iterator pIter = materialPreviews.begin();
+	    for(; pIter != materialPreviews.end(); pIter++)
 	      delete (*pIter);    
 
 	    timerPreviewConnection.disconnect();
@@ -693,35 +693,35 @@ namespace module{
 		m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 		toolbar_main_c.pack_start(m_scrolled_window, true, true, 0);
 
-		m_scrolled_window.add(shaderBoxes_c);
+		m_scrolled_window.add(materialBoxes_c);
 
 		//Setup ToolBar
-		shaderBoxes_c.pack_start(m_toolbar, false, false, 0);
+		materialBoxes_c.pack_start(m_toolbar, false, false, 0);
 
 		//Integer To Tack onto filenames to make them unique
 		int fileName_int = 0;
 
-		//For Each Of The Elements In Group->m_shaders Create A GUI Strip
-		std::list<s_object*>::iterator soIter = m_grp->m_shaders.begin();
-		for(; soIter != m_grp->m_shaders.end(); soIter++)
+		//For Each Of The Elements In Group->m_materials Create A GUI Strip
+		std::list<s_object*>::iterator soIter = m_grp->m_materials.begin();
+		for(; soIter != m_grp->m_materials.end(); soIter++)
 		  {
-		    //Create File Name For Shader Preview Image
+		    //Create File Name For material Preview Image
 		    k3d::string_t int_str;
 		    k3d::string_t finalFile_str;
 		    std::stringstream out;
 		    out << fileName_int;
 		    int_str = out.str();
 		    int_str += k3d::string_t(".png");
-		    finalFile_str.append(multi_s_shaderImgFile);
+		    finalFile_str.append(multi_s_materialImgFile);
 		    finalFile_str.append(int_str);		    
 
-		    //Create The Shader Preview Image Object
-		    shaderPreviewImage *s_preview_obj = new shaderPreviewImage(k3d::system::get_temp_directory() / k3d::filesystem::generic_path(finalFile_str));
-		    shaderPreviews.push_back(s_preview_obj);
+		    //Create The material Preview Image Object
+		    materialPreviewImage *s_preview_obj = new materialPreviewImage(k3d::system::get_temp_directory() / k3d::filesystem::generic_path(finalFile_str));
+		    materialPreviews.push_back(s_preview_obj);
 		    
 		    Gtk::HBox *tmpHBox = new Gtk::HBox;
 		    object_preview_data_c.push_back(tmpHBox);
-		    shaderBoxes_c.pack_start(*tmpHBox, false, false, 10);
+		    materialBoxes_c.pack_start(*tmpHBox, false, false, 10);
 
 		    Gtk::Frame *tmpFrame = new Gtk::Frame("PREVIEW");
 		    tmpFrame->add(*s_preview_obj);
@@ -731,25 +731,25 @@ namespace module{
 
 		    //Data & Notes VBox
 		    Gtk::VBox *tmpVBox_dd = new Gtk::VBox;
-		    shader_data_desc_c.push_back(tmpVBox_dd);
+		    material_data_desc_c.push_back(tmpVBox_dd);
 		    tmpHBox->pack_start(*tmpVBox_dd, true, true, 5); //HERE
 
 		    //Data HBox (Contains x2 VBox -> Label and Data)
 		    Gtk::HBox *tmpHBox_ld = new Gtk::HBox;
-		    shader_label_data_c.push_back(tmpHBox_ld);
+		    material_label_data_c.push_back(tmpHBox_ld);
 		    tmpVBox_dd->pack_start(*tmpHBox_ld, false, false, 5);
 		    
 		    //Label VBox
 		    Gtk::VBox *tmpVBox_l = new Gtk::VBox;
-		    shader_label_c.push_back(tmpVBox_l);
+		    material_label_c.push_back(tmpVBox_l);
 		    tmpHBox_ld->pack_start(*tmpVBox_l, false, false, 0);
 
 		    tmpVBox_l->set_spacing(4);
 
 		    //BUILD LABEL STUFF
 
-		    Gtk::Label *tmpName_l = new Gtk::Label("Shader Name: ");
-		    Gtk::Label *tmpType_l = new Gtk::Label("Shader Type: ");
+		    Gtk::Label *tmpName_l = new Gtk::Label("Material Name: ");
+		    Gtk::Label *tmpType_l = new Gtk::Label("Material Type: ");
 		    Gtk::Label *tmpdateMod_l = new Gtk::Label("Date Modified: ");
 		    Gtk::Label *tmpArtistName_l = new Gtk::Label("Artist's Name: ");
 
@@ -771,7 +771,7 @@ namespace module{
 
 		    //Data VBox
 		    Gtk::VBox *tmpVBox_d = new Gtk::VBox;
-		    shader_data_c.push_back(tmpVBox_d);
+		    material_data_c.push_back(tmpVBox_d);
 		    tmpHBox_ld->pack_start(*tmpVBox_d, false, false, 0);
 		    tmpVBox_d->set_spacing(4);
 
@@ -820,7 +820,7 @@ namespace module{
 		    //Add Horizontal Breaker At Bottom
 		    Gtk::HSeparator *tmpHBreaker = new Gtk::HSeparator();
 		    s_breakers.push_back(tmpHBreaker);
-		    shaderBoxes_c.pack_start(*tmpHBreaker, false, false, 0);
+		    materialBoxes_c.pack_start(*tmpHBreaker, false, false, 0);
 		     
 		    fileName_int++;
 
@@ -879,10 +879,10 @@ namespace module{
 					      "visible_nodes", 
 					      k3d::inode_collection_property::nodes_t(1, panelGeo));
   
-	    //Go Though Every Shader In Group Render To Image File.. Done
-	    std::list<s_object*>::const_iterator soIter = m_grp->m_shaders.begin();
-	    std::vector<shaderPreviewImage*>::iterator pIter = shaderPreviews.begin();   //NEE TO FIX THIS AS ASSUMES TOO MUCH (CORRECT SIZES) -> DANGEROUS
-	    for(; soIter != m_grp->m_shaders.end(); soIter++)
+	    //Go Though Every material In Group Render To Image File.. Done
+	    std::list<s_object*>::const_iterator soIter = m_grp->m_materials.begin();
+	    std::vector<materialPreviewImage*>::iterator pIter = materialPreviews.begin();   //NEE TO FIX THIS AS ASSUMES TOO MUCH (CORRECT SIZES) -> DANGEROUS
+	    for(; soIter != m_grp->m_materials.end(); soIter++)
 	      {
 		//Check If NodeIn sobject Is A RenderMan Material
 		if((*soIter)->node->factory().implements(typeid(k3d::ri::imaterial)))
@@ -909,8 +909,8 @@ namespace module{
 
 	  bool updatePreviewImage()
 	  {
-	    std::vector<shaderPreviewImage*>::iterator simgIter = shaderPreviews.begin();
-	    for(; simgIter != shaderPreviews.end(); simgIter++)
+	    std::vector<materialPreviewImage*>::iterator simgIter = materialPreviews.begin();
+	    for(; simgIter != materialPreviews.end(); simgIter++)
 	      {
 		(*simgIter)->queue_resize();
 		(*simgIter)->queue_draw();
@@ -923,13 +923,13 @@ namespace module{
 	  //GTK Widgets
 	  Gtk::ScrolledWindow m_scrolled_window;
 
-	  Gtk::VBox shaderBoxes_c;
+	  Gtk::VBox materialBoxes_c;
 	  std::vector<Gtk::HBox *> object_preview_data_c;
 	  std::vector<Gtk::Frame *> img_holder_frames;
-	  std::vector<Gtk::VBox *> shader_data_desc_c;
-	  std::vector<Gtk::HBox *> shader_label_data_c;
-	  std::vector<Gtk::VBox *> shader_label_c;
-	  std::vector<Gtk::VBox *> shader_data_c;
+	  std::vector<Gtk::VBox *> material_data_desc_c;
+	  std::vector<Gtk::HBox *> material_label_data_c;
+	  std::vector<Gtk::VBox *> material_label_c;
+	  std::vector<Gtk::VBox *> material_data_c;
 
 	  std::vector<Gtk::Label*> s_name_l;
 	  std::vector<Gtk::Label*> s_type_l;
@@ -958,15 +958,15 @@ namespace module{
 	  Gtk::Toolbar m_toolbar; 
 	  Gtk::MenuToolButton group_display;
 
-	  //Shader Preview
-	  std::vector<shaderPreviewImage*> shaderPreviews;
+	  //material Preview
+	  std::vector<materialPreviewImage*> materialPreviews;
 
 	private:
 	  s_group *m_grp;
 
 	};//g_content_pane
 
-	//SHADER OBJECT CONTENT PANE
+	//MATERIAL OBJECT CONTENT PANE
 	class so_content_pane : public content_pane{
 	public:
 	  so_content_pane(Gtk::HPaned *_m_Hpane, s_object *_m_so, k3d::icommand_node *_m_parent, document_state *_documentState)
@@ -977,11 +977,11 @@ namespace module{
 	     s_datemod_entry(*_m_parent, k3d::string_t("so_datestamp_field"), entry::model(_m_so->so_datestamp), 0),
 	     s_artistname_entry(*_m_parent, k3d::string_t("so_artistname_field"), entry::model(_m_so->so_artistname), 0),
 	     s_artistnotes_mltext(*_m_parent, k3d::string_t("so_artistnotes_mltxt"), text::model(_m_so->so_artistnotes), 0),
-	     shaderPreview(k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_shaderImgFile)),
-	     save_button("Save Shader"), reset_button("Reset Shader")
+	     materialPreview(k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_materialImgFile)),
+	     save_button("Save Material"), reset_button("Reset Material")
 	  {
-	    s_name_l.set_text		("Shader Name: ");
-	    s_type_l.set_text		("Shader Type: ");
+	    s_name_l.set_text		("Material Name: ");
+	    s_type_l.set_text		("Material Type: ");
 	    s_datemod_l.set_text	("Date Modified: ");
 	    s_artistname_l.set_text	("Artist's Name: ");
 
@@ -1012,7 +1012,7 @@ namespace module{
 		renderPreview();
 
 		so_preview_frame.set_size_request(previewSize + 25, previewSize + 35);
-		so_preview_frame.add(shaderPreview);
+		so_preview_frame.add(materialPreview);
 		preview_c.pack_start(so_preview_frame, false, false, 8);
  	      
 		//Add Container To Right Pane From Implementation
@@ -1026,12 +1026,12 @@ namespace module{
 
 		preview_label_data_c.set_spacing(10);
 
-		//Shader Name
+		//material Name
 		s_name_l.set_alignment(0.0);
 		label_c.pack_start(s_name_l, true, true, 0);
 		data_c.pack_start(s_name_entry, true, true, 0);
 
-		//Shader Type
+		//material Type
 		s_type_l.set_alignment(0.0);
 		label_c.pack_start(s_type_l, true, true, 0);
 		data_c.pack_start(s_type_entry, true, true, 0);
@@ -1067,7 +1067,7 @@ namespace module{
 		//INSERT K3D TEXT VIEW HERE FOR ARTIST NOTES
 	       
 		//DEBUG INFO -> DELETE ON RELEASE
-		k3d::log() << "building shader panel" << std::endl;
+		k3d::log() << "building material panel" << std::endl;
 		m_Hpane->show_all(); 
 	      }
 	    else
@@ -1123,7 +1123,7 @@ namespace module{
 	   
 
 		//Render The Preview Using Selected External Renderer
-		panelEngine->render_camera_frame(*panelCamera, k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_shaderImgFile),
+		panelEngine->render_camera_frame(*panelCamera, k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_materialImgFile),
 						 false);
 
 	      }//if	 
@@ -1136,15 +1136,15 @@ namespace module{
 
 	  bool updatePreviewImage()
 	  {
-	    shaderPreview.queue_resize();
-	    shaderPreview.queue_draw();
+	    materialPreview.queue_resize();
+	    materialPreview.queue_draw();
 	    return true;
 	  }
 
-	  //Save The Shader Context To Document
+	  //Save The material Context To Document
 	  void on_save_button_clicked()
 	  {
-	    k3d::log() << "SAVING SHADER TO DOCUMENT!" << std::endl;
+	    k3d::log() << "SAVING material TO DOCUMENT!" << std::endl;
 	    
 	    //Save Certain Values To Document Nodes
 	    m_so->saveToNode();
@@ -1202,7 +1202,7 @@ namespace module{
 
 	private:
 	  s_object *m_so;
-	  shaderPreviewImage shaderPreview;
+	  materialPreviewImage materialPreview;
 
 	};//so_content_pane
 
@@ -1216,7 +1216,7 @@ namespace module{
 	     add_group("Add"),
 	     remove_group("Remove")
 	  {
-	    //Create The Shader Tree Model
+	    //Create The Material Tree Model
 	    tree_model = Gtk::TreeStore::create(m_columns);
 	    m_nav.set_model(tree_model);
 	    tree_selection = m_nav.get_selection();
@@ -1344,7 +1344,7 @@ namespace module{
 
 	void implementation::build_gui()
 	{
-	  //Shader Tree Setup
+	  //Material Tree Setup
 	  m_nav.set_headers_visible(false);
 	  m_nav.set_reorderable(false);
 
@@ -1399,9 +1399,9 @@ namespace module{
 	      row[m_columns.s_group_ptr] = (*gIter);
 	      row[m_columns.s_object_ptr] = 0;
 
-	      //Go Through Shaders/Other and and to tree under groups
-	      std::list<s_object*>::const_iterator sIter = (*gIter)->m_shaders.begin();
-	      for(; sIter !=  (*gIter)->m_shaders.end(); sIter++)
+	      //Go Through Materials/Other and and to tree under groups
+	      std::list<s_object*>::const_iterator sIter = (*gIter)->m_materials.begin();
+	      for(; sIter !=  (*gIter)->m_materials.end(); sIter++)
 		{
 		  Gtk::TreeModel::Row childrow = *(tree_model->append(row.children()));
 		  childrow[m_columns.name] = (*sIter)->getName();
@@ -1433,7 +1433,7 @@ namespace module{
 		}
 	      else
 		{
-		  //Single Shader Selected***
+		  //Single Material Selected***
 
 		  //Send Selection Signal For Other Panels
 		  k3d::inode *selectedNode = (row->get_value(m_columns.s_object_ptr))->node;
@@ -1452,15 +1452,15 @@ namespace module{
 	//Build the right Content Pane (GUI Stuff)
 	void implementation::build_content_pane(Gtk::TreeModel::Row row, bool is_group)
 	{
-	  //Check If Building Group Panel Or Shader Object Panel
+	  //Check If Building Group Panel Or Material Object Panel
 	  if(is_group)
 	    {
-	      //Delete current obj (group or shader gui) and create new group gui obj
+	      //Delete current obj (group or material gui) and create new group gui obj
 	      m_rpane_content = std::auto_ptr<content_pane>(new g_content_pane(&m_HPanedMain, row->get_value(m_columns.s_group_ptr), m_parent, &m_document_state));
 	    }
 	  else
 	    {
-	      //Delete current obj (group or shader gui) and create new group gui obj
+	      //Delete current obj (group or material gui) and create new group gui obj
 	      m_rpane_content = std::auto_ptr<content_pane>(new so_content_pane(&m_HPanedMain, row->get_value(m_columns.s_object_ptr), m_parent, &m_document_state));
 
 	    }//endif
@@ -1504,11 +1504,11 @@ namespace module{
 		  {
 		    if(row->get_value(m_columns.name) == typeStr)
 		      {
-			//Create Shader Object
+			//Create material Object
 			s_object *newSObject = new s_object(groupPtr, *nodeIter, typeStr);
 
-			//Push The Shader Onto Groups List
-			groupPtr->addShader(newSObject);
+			//Push The material Onto Groups List
+			groupPtr->addMaterial(newSObject); //check
 
 			//Create The Tree Entry
 			new_row = *tree_model->append(row->children());
@@ -1523,7 +1523,14 @@ namespace module{
 	      }//if
 	    }//for
 
-	  //Rebuild Currently Selected Pane
+	  // //Rebuild Currently Selected Pane (Only If Group)
+// 	  Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+// 	  if(iter) //If anything is selected
+// 	    {
+// 	      Gtk::TreeModel::Row row = *iter;
+// 	      if(row[m_columns.is_group])
+// 		on_tree_row_changed();
+// 	    }//if
 
 	}//on_nodes_added
 
@@ -1541,11 +1548,21 @@ namespace module{
 	      grpPtr = tmpSObj->parent;
 	      
 	    tree_model->erase(row);
+
+	    // //Rebuild Currently Selected Pane (Only If Group)
+// 	    Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+// 	    if(iter) //If anything is selected
+// 	      {
+// 		Gtk::TreeModel::Row row = *iter;
+// 		if(row[m_columns.is_group])
+// 		  on_tree_row_changed();
+// 	      }//if
+
 	  }
 
 	  //Delete In Stored Model
 	  if(grpPtr)
-	    grpPtr->removeShader(tmpSObj);
+	    grpPtr->removeMaterial(tmpSObj);
 	    
 
 	}//on_nodes_removed
@@ -1573,7 +1590,7 @@ namespace module{
 	      //  //Iterate Through Each Child Of Parent
 	      for(Gtk::TreeIter rowCIter = row->children().begin(); rowCIter != row->children().end(); rowCIter++)
 		{
-		  //Check If Shader Object and Not Group
+		  //Check If material Object and Not Group
 		  if(rowCIter->get_value(m_columns.s_object_ptr) && !(rowCIter->get_value(m_columns.is_group))){
 		    k3d::log() << "checking so" << std::endl;
 		    if((rowCIter->get_value(m_columns.s_object_ptr)->node) == Node){
@@ -1647,7 +1664,7 @@ namespace module{
       public:
 	panel() :
           baseContainer(false, 0),
-          ui_component("shader_manager", 0)//,
+          ui_component("material_manager", 0)//,
 	     //m_implementation(0)
 	{
 	}
@@ -1659,7 +1676,7 @@ namespace module{
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-          ui_component::set_parent("shader_manager", &Parent);
+          ui_component::set_parent("material_manager", &Parent);
 
           m_implementation = new mechanics::implementation(DocumentState, Parent);
 
@@ -1671,7 +1688,7 @@ namespace module{
 
 	const k3d::string_t panel_type()
 	{
-          return "shader_manager";
+          return "material_manager";
 	}
 
 	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
@@ -1685,12 +1702,12 @@ namespace module{
           static k3d::application_plugin_factory<panel> 
             factory(
                     k3d::uuid(0xd363f420, 0x7240b35e, 0x7cf38788, 0xda06e8e6),
-                    "shaderManager",
-                    _("Shader Manager Panel"),
+                    "materialManager",
+                    _("Material Manager Panel"),
                     "NGUI Panels",
                     k3d::iplugin_factory::EXPERIMENTAL,
                     boost::assign::map_list_of("ngui:component-type", "panel")
-                    ("ngui:panel-type", "shader_manager")("ngui:panel-label", "Shader Manager"));
+                    ("ngui:panel-type", "material_manager")("ngui:panel-label", "Material Manager"));
 
           return factory;
 	}
@@ -1701,7 +1718,7 @@ namespace module{
 
       // [/panel]***********************************************************************************
 
-    } // namespace shader_manager
+    } // namespace material_manager
 
   } // namespace ngui
 
@@ -1710,7 +1727,7 @@ namespace module{
 
 //Register The Plugin (K-3D)************************************************************************
 K3D_MODULE_START(Registry)
-  Registry.register_factory(module::ngui::shader_manager::panel::get_factory());
+  Registry.register_factory(module::ngui::material_manager::panel::get_factory());
 K3D_MODULE_END
 //**************************************************************************************************
 //0xd363f420, 0x7240b35e, 0x7cf38788, 0xda06e8e6
