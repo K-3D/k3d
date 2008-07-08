@@ -41,15 +41,13 @@
 #include <iostream>
 #include <vector>
 
+#include "nurbs_curve_operations.h"
+
 namespace module
 {
 
 	namespace nurbs
 	{
-		extern void curve_knot_insertion(k3d::mesh& input, size_t curve, double u, size_t r);
-		extern int selected_curve(k3d::mesh& Output);
-		extern void normalize_knot_vector(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::knots_t& knots, size_t curve);
-	
 		class insert_knot :
 			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 		{

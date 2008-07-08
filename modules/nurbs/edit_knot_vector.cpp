@@ -43,13 +43,13 @@
 #include <vector>
 #include <sstream>
 
+#include "nurbs_curve_operations.h"
+
 namespace module
 {
 
 namespace nurbs
 {
-
-int selected_curve(k3d::mesh& Output);
 
 class edit_knot_vector :
 	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
@@ -157,32 +157,6 @@ private:
 
 
 };
-
-int selected_curve(k3d::mesh& Output)
-{
-	int my_curve=-1;
-
-	const size_t group_begin = 0;
-	const size_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
-	for(size_t group = group_begin; group != group_end; ++group)
-	{
-		const size_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
-		const size_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
-		for(size_t curve = curve_begin; curve != curve_end; ++curve)
-		{
-			if( (*Output.nurbs_curve_groups->curve_selection)[curve]>0.0)
-				if(my_curve>=0)
-				{
-					return -1;
-				}
-				else
-				{
-					my_curve=curve;
-				}
-		}
-	}
-	return my_curve;
-}
 
 k3d::iplugin_factory& edit_knot_vector_factory()
 {
