@@ -26,6 +26,7 @@
 
 #include "data.h"
 #include "imesh_painter_gl.h"
+#include "k3d-i18n-config.h"
 #include "node.h"
 #include "utility_gl.h"
 
