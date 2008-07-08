@@ -3,7 +3,7 @@
 //
 // Contact: tshead@k-3d.com
 //
-// Shader Preview Panel Developed By Alex Curtis
+// Material Preview Panel Developed By Alex Curtis
 // Contact: alx.curtis@gmail.com
 //
 // This program is free software; you can redistribute it and/or
@@ -106,7 +106,7 @@ namespace module{
 
   namespace ngui{
 
-    namespace shader_preview{
+    namespace material_preview{
 
       namespace mechanics{
 
@@ -241,12 +241,12 @@ namespace module{
 
         // [implementation]***************************************************************************
 
-        //The Shader Preview Image Drawer Class
+        //The material Preview Image Drawer Class
 
-        class shaderPreviewImage: public Gtk::DrawingArea{
+        class materialPreviewImage: public Gtk::DrawingArea{
         public:
-          shaderPreviewImage(k3d::filesystem::path _imgPath);
-          virtual ~shaderPreviewImage();
+          materialPreviewImage(k3d::filesystem::path _imgPath);
+          virtual ~materialPreviewImage();
 	  
 	  //Function to be called on preview img update request signal
 	  bool onUpdatePreview();
@@ -259,10 +259,10 @@ namespace module{
           //Override default signal handler:
           virtual bool on_expose_event(GdkEventExpose* event);
 
-        };//shaderPreviewImage
+        };//materialPreviewImage
 
 
-        shaderPreviewImage::shaderPreviewImage(k3d::filesystem::path _imgPath)
+        materialPreviewImage::materialPreviewImage(k3d::filesystem::path _imgPath)
 	{
           imgFilePath = _imgPath;
 
@@ -271,11 +271,11 @@ namespace module{
 	    / k3d::filesystem::generic_path(holderImgFile);
         }
 
-        shaderPreviewImage::~shaderPreviewImage()
+        materialPreviewImage::~materialPreviewImage()
 	{
         }
 
-        bool shaderPreviewImage::on_expose_event(GdkEventExpose* event)
+        bool materialPreviewImage::on_expose_event(GdkEventExpose* event)
         {
 	  try
 	    {
@@ -330,7 +330,7 @@ namespace module{
 	    deletePImage();
 
             //Create A New Drawer Widget Using Path
-            previewArea = new shaderPreviewImage(m_model->getPreviewImagePath());
+            previewArea = new materialPreviewImage(m_model->getPreviewImagePath());
 
             buildModel();
 
@@ -421,7 +421,7 @@ namespace module{
           /// Updates the contents of the control
           void on_update();
 
-          //Build The Shader Preview GUI
+          //Build The material Preview GUI
           void buildGui(); 
 
           //(re)Build the model
@@ -465,8 +465,8 @@ namespace module{
 	  //Preview Image Update Interval
 	  const k3d::uint_t piIntervalUpdate;
 
-          //Shader Image Preview Specifics
-          shaderPreviewImage *previewArea;
+          //material Image Preview Specifics
+          materialPreviewImage *previewArea;
 
           // Stores a reference to the owning document
           document_state& m_document_state;
@@ -759,7 +759,7 @@ namespace module{
 						k3d::inode_collection_property::nodes_t(1, m_model->getPreviewGeo()));
   
 
-	      //Setup the shader preview render engine*****
+	      //Setup the material preview render engine*****
 	      k3d::property::set_internal_value(*(m_model->getPreviewEngine()), 
 						"render_engine", dynamic_cast<k3d::inode*>(aqsis));
 
@@ -1025,7 +1025,7 @@ namespace module{
       public:
 	panel() :
           baseContainer(false, 0),
-          ui_component("shader_preview", 0),
+          ui_component("material_preview", 0),
           m_implementation(0)
 	{
 	}
@@ -1037,7 +1037,7 @@ namespace module{
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-          ui_component::set_parent("shader_preview", &Parent);
+          ui_component::set_parent("material_preview", &Parent);
 
           m_implementation = new mechanics::implementation(DocumentState, Parent);
 
@@ -1049,7 +1049,7 @@ namespace module{
 
 	const k3d::string_t panel_type()
 	{
-          return "shader_preview";
+          return "material_preview";
 	}
 
 	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
@@ -1063,12 +1063,12 @@ namespace module{
           static k3d::application_plugin_factory<panel> 
             factory(
                     k3d::uuid(0xf11983c0, 0x974a039c, 0xc5d36bb9, 0xe65cf8a0),
-                    "shaderPreview",
-                    _("Shader Preview Panel"),
+                    "materialPreview",
+                    _("Material Preview Panel"),
                     "NGUI Panels",
                     k3d::iplugin_factory::EXPERIMENTAL,
                     boost::assign::map_list_of("ngui:component-type", "panel")
-                    ("ngui:panel-type", "shader_preview")("ngui:panel-label", "Shader Preview"));
+                    ("ngui:panel-type", "material_preview")("ngui:panel-label", "Material Preview"));
 
           return factory;
 	}
@@ -1081,7 +1081,7 @@ namespace module{
       // [/panel]***********************************************************************************
 
 
-    } // namespace shader_preview
+    } // namespace material_preview
 
   } // namespace ngui
 
@@ -1090,6 +1090,6 @@ namespace module{
 
 //Register The Plugin (K-3D)************************************************************************
 K3D_MODULE_START(Registry)
-  Registry.register_factory(module::ngui::shader_preview::panel::get_factory());
+  Registry.register_factory(module::ngui::material_preview::panel::get_factory());
 K3D_MODULE_END
 //**************************************************************************************************
