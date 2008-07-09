@@ -18,4 +18,4 @@ modifier.gradient_spacing = 1.1
 modifier.iso_spacing = 1.1
 document.set_dependency(modifier.get_property("input_mesh"), triangles.get_property("output_mesh"))
 
-testing.mesh_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.QuadrilateralRemeshing", 1)
+testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.QuadrilateralRemeshing", 1)

@@ -94,5 +94,5 @@ mesh_selection = k3d.select_all()
 modifier.mesh_selection = mesh_selection
 document.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
 
-testing.mesh_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.TriangulateFaces.face_varying", 0)
+testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.TriangulateFaces.face_varying", 0)
 

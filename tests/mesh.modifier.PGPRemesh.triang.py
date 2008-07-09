@@ -23,5 +23,5 @@ document.set_dependency(modifier.get_property("input_mesh"), triangles.get_prope
 #print "triangles output: " + repr(triangles.output_mesh)
 #print "modifier output: " + repr(modifier.output_mesh)
 
-testing.mesh_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.PGPRemesh.triang", 1)
+testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.PGPRemesh.triang", 1)
 

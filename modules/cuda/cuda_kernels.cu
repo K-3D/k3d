@@ -1,6 +1,10 @@
 #ifndef _CUDA_KERNELS_H_
 #define _CUDA_KERNELS_H_
 
+#ifdef __DEVICE_EMULATION__
+#include <stdio.h>
+#endif
+
 // declare the texture reference for Matrix multiplication
 texture<float, 2> transformTexture;
 
@@ -351,27 +355,45 @@ __global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices,
                                                      unsigned int first_new_point_index,
                                                      int num_split_points )
 {
+    
     int edge_index_index = (blockIdx.x * blockDim.x) + threadIdx.x;
     int split_index = (blockIdx.y * blockDim.y) + threadIdx.y;
-   
+    
     if ( edge_index_index < num_edge_indices )
     {
-        int edge_index = edge_indices[edge_index_index];
-        int new_point_index = edge_index*num_split_points + split_index;
         
+        int edge_index = edge_indices[edge_index_index];
+        int new_point_index = edge_index_index*num_split_points + split_index;
+        
+        #ifdef __DEVICE_EMULATION__
+            printf("Edge Index Index: %d\n", edge_index_index);
+            printf("Split Index: %d\n", split_index);
+            printf("Edge Index: %d\n", edge_index);
+            printf("New Point Index: %d\n", new_point_index);
+        #endif 
+                
         float4 p0 = points_and_selection[edge_points[edge_index]];
         float4 p1 = points_and_selection[edge_points[clockwise_edges[edge_index]]];        
+        
+        #ifdef __DEVICE_EMULATION__
+            printf("P_0:%d: (%f, %f, %f)\n", edge_points[edge_index], p0.x, p0.y, p0.z);
+            printf("P_1:%d: (%f, %f, %f)\n", edge_points[clockwise_edges[edge_index]], p1.x, p1.y, p1.z);
+        #endif
         
         p1.x = (p1.x - p0.x) / (num_split_points + 1);
         p1.y = (p1.y - p0.y) / (num_split_points + 1);
         p1.z = (p1.z - p0.z) / (num_split_points + 1);
         
-        new_points_and_selection[new_point_index].x = 2;// + (split_index + 1)*p1.x;
-        new_points_and_selection[new_point_index].y = 3;// + (split_index + 1)*p1.y;
-        new_points_and_selection[new_point_index].z = 4;// + (split_index + 1)*p1.z;
-        new_points_and_selection[new_point_index].w = 5;
-                
-    }   
+        #ifdef __DEVICE_EMULATION__
+            printf("P_delta:(%f, %f, %f)\n", p1.x, p1.y, p1.z);
+        #endif
+        
+        new_points_and_selection[new_point_index].x = p0.x + (split_index + 1)*p1.x;
+        new_points_and_selection[new_point_index].y = p0.y + (split_index + 1)*p1.y;
+        new_points_and_selection[new_point_index].z = p0.z + (split_index + 1)*p1.z;
+        new_points_and_selection[new_point_index].w = 1;
+    } 
+      
 }
 
 #endif // #ifndef _CUDA_KERNELS_H_

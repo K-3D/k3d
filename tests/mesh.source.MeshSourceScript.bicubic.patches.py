@@ -9,5 +9,5 @@ script_file = file(str(script_path), "r")
 setup = testing.setup_mesh_source_test("MeshSourceScript")
 setup.source.script = script_file.read()
 
-testing.mesh_comparison(setup.document, setup.source.get_property("output_mesh"), "mesh.source.MeshSourceScript.bicubic.patches", 2)
+testing.mesh_comparison_to_reference(setup.document, setup.source.get_property("output_mesh"), "mesh.source.MeshSourceScript.bicubic.patches", 2)
 

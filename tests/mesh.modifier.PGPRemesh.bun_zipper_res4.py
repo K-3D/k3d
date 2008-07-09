@@ -17,5 +17,5 @@ modifier = document.new_node("PGPRemesh")
 #modifier.div = 2
 document.set_dependency(modifier.get_property("input_mesh"), reader.get_property("output_mesh"))
 
-testing.mesh_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.PGPRemesh.bun_zipper_res4", 1)
+testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.PGPRemesh.bun_zipper_res4", 1)
 

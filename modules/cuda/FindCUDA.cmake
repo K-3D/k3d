@@ -142,6 +142,23 @@ MACRO (GET_CUFILE_DEPENDENCIES dependencies file)
 
 ENDMACRO (GET_CUFILE_DEPENDENCIES)
 
+# Get the dependencies (simplified)
+MACRO (GET_CUFILE_DEPS depend file)
+	GET_FILENAME_COMPONENT(filepath ${file} PATH)
+	
+	#  parse file for dependencies
+	FILE(READ "${file}" CONTENTS)
+	STRING(REGEX MATCHALL "#[ \t]*include[ \t]+\"[^\"]*" DEPS "${CONTENTS}")
+	
+	SET(${depend})
+
+	FOREACH(DEP ${DEPS})
+		STRING(REGEX REPLACE "#[ \t]*include[ \t]+\"" "" DEP "${DEP}")
+		SET(${depend} ${${depend}}  "${DEP}")
+	ENDFOREACH(DEP)
+
+ENDMACRO (GET_CUFILE_DEPS)
+
 
 # WRAP_CUDA(outfile ...)
 
@@ -166,7 +183,7 @@ MACRO (WRAP_CUDA outfiles)
 	
 	GET_FILENAME_COMPONENT(CUTIL_PATH ${CUDA_UTIL_LIBRARY} PATH)
 
-	#GET_CUFILE_DEPENDENCIES(CUDEPS ${CUFILE})
+	GET_CUFILE_DEPS(CUDEPS ${INFILES})
 	#MESSAGE("${CUDEPS}")
 
 	ADD_CUSTOM_COMMAND (
@@ -176,7 +193,7 @@ MACRO (WRAP_CUDA outfiles)
                 ${CUDA_OPTIONS}
 				${cuda_includes} -o ${OFILE} ${INFILES}
 				-lcudart -L${CUTIL_PATH} -l${CUTIL_LIB}
-			DEPENDS ${INFILES})
+			DEPENDS ${INFILES} ${CUDEPS})
 
         #MACRO_ADD_FILE_DEPENDENCIES(${CUFILE} ${OFILE})
 

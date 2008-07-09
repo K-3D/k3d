@@ -19,4 +19,4 @@ cgal_boolean.create_property("k3d::mesh*", "input_2", "Input 2", "")
 document.set_dependency(cgal_boolean.get_property("input_1"), big_cube.get_property("output_mesh"))
 document.set_dependency(cgal_boolean.get_property("input_2"), small_cube.get_property("output_mesh"))
 
-testing.mesh_comparison(document, cgal_boolean.get_property("output_mesh"), "mesh.modifier.CGALBoolean.cubes", 1)
+testing.mesh_comparison_to_reference(document, cgal_boolean.get_property("output_mesh"), "mesh.modifier.CGALBoolean.cubes", 1)

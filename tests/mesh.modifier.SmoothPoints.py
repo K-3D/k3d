@@ -14,5 +14,5 @@ selection.points = k3d.component_select_all()
 
 setup.modifier.mesh_selection = selection
 
-testing.mesh_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.SmoothPoints", 1)
+testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.SmoothPoints", 1)
 

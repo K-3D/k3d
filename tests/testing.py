@@ -281,23 +281,18 @@ def bitmap_size_comparison(bitmap, width, height):
 	if bitmap.width() != width or bitmap.height() != height:
 		raise "bitmap dimensions incorrect"
 
-def mesh_comparison(document, mesh, mesh_name, threshold):
+def mesh_comparison_to_reference(document, input_mesh, reference_mesh_name, threshold):
 
 	mesh_writer = document.new_node("K3DMeshWriter")
-	mesh_writer.file = k3d.generic_path(binary_path() + "/" + mesh_name + ".output.k3d")
-	document.set_dependency(mesh_writer.get_property("input_mesh"), mesh)
+	mesh_writer.file = k3d.generic_path(binary_path() + "/" + reference_mesh_name + ".output.k3d")
+	document.set_dependency(mesh_writer.get_property("input_mesh"), input_mesh)
 
 	reference = document.new_node("K3DMeshReader")
 
-	difference = document.new_node("MeshDiff")
-	difference.threshold = threshold
-	difference.create_property("k3d::mesh*", "input_a", "InputA", "First input mesh")
-	difference.create_property("k3d::mesh*", "input_b", "InputB", "Second input mesh")
-	document.set_dependency(difference.get_property("input_a"), mesh)
-	document.set_dependency(difference.get_property("input_b"), reference.get_property("output_mesh"))
+	difference = get_mesh_difference(document, input_mesh, reference.get_property("output_mesh"), threshold)
 
 	for index in range(1, 100):
-		reference_file = k3d.generic_path(source_path() + "/meshes/" + mesh_name + ".reference." + str(index) + ".k3d")
+		reference_file = k3d.generic_path(source_path() + "/meshes/" + reference_mesh_name + ".reference." + str(index) + ".k3d")
 
 		if not os.path.exists(str(reference_file)):
 			if index == 1:
@@ -312,17 +307,34 @@ def mesh_comparison(document, mesh, mesh_name, threshold):
 
 		if difference.equal:
 			return
+	
+	# if there is a difference, output it
+	output_mesh_difference(input_mesh.pipeline_value(), reference.output_mesh, threshold)
+	raise Exception("output mesh differs from reference")
 
-	# Send the mesh difference to the dashboard as preformatted HTML, so the
-	# columns all line-up.
+"""
+	setup a difference node between two meshes
+"""
+def get_mesh_difference(document, input_mesh, reference_mesh, threshold):
+	difference = document.new_node("MeshDiff")
+	difference.threshold = threshold
+	difference.create_property("k3d::mesh*", "input_a", "InputA", "First input mesh")
+	difference.create_property("k3d::mesh*", "input_b", "InputB", "Second input mesh")
+	document.set_dependency(difference.get_property("input_a"), input_mesh)
+	document.set_dependency(difference.get_property("input_b"), reference_mesh)
+	
+	return difference
+
+"""
+	Output the mesh difference to the dashboard
+"""
+def output_mesh_difference(input_mesh, reference_mesh, threshold, name = "Mesh Difference"):
 	print """<DartMeasurement name="Mesh Difference" type="text/html"><![CDATA[\n"""
 	print """<pre>"""
-	print k3d.print_diff(mesh.pipeline_value(), reference.output_mesh, threshold)
+	print k3d.print_diff(input_mesh, reference_mesh, threshold)
 	print """</pre>"""
 	print """]]></DartMeasurement>\n"""
 	sys.stdout.flush()
-
-	raise Exception("output mesh differs from reference")
 
 def mesh_area_comparison(calculated_area, expected_area):
 	if calculated_area != expected_area:

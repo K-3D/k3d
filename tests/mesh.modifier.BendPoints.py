@@ -14,5 +14,5 @@ setup.modifier.mesh_selection = selection
 setup.modifier.angle = 90
 setup.modifier.around = "y"
 
-testing.mesh_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.BendPoints", 32)
+testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.BendPoints", 32)
 

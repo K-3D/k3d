@@ -15,5 +15,5 @@ setup.modifier.bulge_factor = 5
 setup.modifier.displace_y = False
 setup.modifier.displace_z = False
 
-testing.mesh_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.BulgePoints", 2)
+testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.BulgePoints", 2)
 
