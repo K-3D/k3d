@@ -60,6 +60,7 @@ namespace module{
 		std::vector<double> basis_functions(k3d::mesh& input, size_t curve, double u, size_t span);
 		k3d::point4 curve_point(k3d::mesh& input, size_t curve, double u);
 		void curve_knot_insertion(k3d::mesh& input, size_t curve, double u, size_t r);
+		void nurbs_close_curve(k3d::mesh& input, size_t curve, bool keep_ends);
 	}//namespace nurbs
 }//namespace module
 
