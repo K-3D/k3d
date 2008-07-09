@@ -68,7 +68,7 @@ namespace module
 			void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 			{
 				Output = Input;
-				
+
 				if(!k3d::validate_nurbs_curve_groups(Output))
 					return;
 
@@ -139,7 +139,7 @@ namespace module
 			k3d::mesh::nurbs_curve_groups_t& groups = *k3d::make_unique(Mesh.nurbs_curve_groups);
 			k3d::mesh::indices_t& curve_points = *k3d::make_unique(groups.curve_points);
 			k3d::mesh::knots_t& curve_knots = *k3d::make_unique(groups.curve_knots);
-	
+
 			k3d::mesh::points_t& mesh_points = *k3d::make_unique(Mesh.points);
 			k3d::mesh::selection_t& point_selection = *k3d::make_unique(Mesh.point_selection);
 
