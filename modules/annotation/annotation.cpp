@@ -38,8 +38,6 @@
 
 #include <FTGL/ftgl.h>
 
-#include <boost/scoped_ptr.hpp>
-
 namespace module
 {
 
