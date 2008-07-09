@@ -31,6 +31,7 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/mesh_topology_data.h>
+#include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/shared_pointer.h>
@@ -70,7 +71,7 @@ public:
 				m_first_midpoint(FirstMidPoint),
 				m_has_midpoint(HasMidPoint)
 			{}
-	
+
 	void operator()(const k3d::uint_t Face)
 	{
 		const k3d::mesh::indices_t& face_first_loops = *m_polyhedra.face_first_loops;
@@ -78,7 +79,7 @@ public:
 		const k3d::mesh::selection_t& edge_selection = *m_polyhedra.edge_selection;
 		const k3d::mesh::indices_t& loop_first_edges = *m_polyhedra.loop_first_edges;
 		const k3d::mesh::indices_t& clockwise_edges = *m_polyhedra.clockwise_edges;
-		
+
 		const k3d::uint_t loop_begin = face_first_loops[Face];
 		const k3d::uint_t loop_end = loop_begin + face_loop_counts[Face];
 		for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
@@ -93,7 +94,7 @@ public:
 					edge_count += m_split_point_count;
 					m_first_midpoint[edge] = m_first_midpoint[m_companions[edge]];
 				}
-				
+
 				if(edge_selection[edge])
 				{
 					edge_count += m_split_point_count;
@@ -102,23 +103,23 @@ public:
 						m_first_midpoint[edge] = m_first_midpoint[m_companions[edge]];
 					}
 					else
-					{ 
+					{
 						m_first_midpoint[edge] = m_first_new_point + m_split_point_count * m_edge_list.size();
 						m_edge_list.push_back(edge);
 						m_has_midpoint[edge] = true;
 					}
 				}
-				
+
 				edge = clockwise_edges[edge];
 				if(edge == first_edge)
 					break;
 			}
 		}
 	}
-	
+
 	/// The new total edge count
 	k3d::uint_t edge_count;
-	
+
 private:
 	const k3d::mesh::polyhedra_t& m_polyhedra;
 	const k3d::mesh::indices_t& m_companions;
@@ -155,7 +156,7 @@ public:
 				m_output_clockwise_edges(OutputClockwiseEdges)
 	{
 	}
-	
+
 	void operator()(const k3d::uint_t EdgeIndex)
 	{
 		const k3d::uint_t edge = m_edge_list[EdgeIndex];
@@ -172,7 +173,7 @@ public:
 		}
 		if(!m_boundary_edges[edge])
 		{
-			const k3d::uint_t companion = m_companions[edge]; 
+			const k3d::uint_t companion = m_companions[edge];
 			const k3d::uint_t old_clockwise = m_input_polyhedra.clockwise_edges->at(companion);
 			const k3d::uint_t first_new_edge = m_index_map[companion] + 1;
 			for(k3d::uint_t i = 0; i != m_split_point_count; ++i)
@@ -184,8 +185,8 @@ public:
 			m_output_clockwise_edges[first_new_edge + m_split_point_count - 1] = m_index_map[old_clockwise];
 		}
 	}
-	
-private:	
+
+private:
 	const k3d::mesh::polyhedra_t& m_input_polyhedra;
 	const k3d::mesh::indices_t& m_edge_list;
 	const k3d::mesh::indices_t& m_index_map;
@@ -197,7 +198,7 @@ private:
 	k3d::mesh::indices_t& m_output_clockwise_edges;
 };
 
-/// Updates edge indices using the mapping from old to new indices 
+/// Updates edge indices using the mapping from old to new indices
 class edge_index_updater
 {
 public:
@@ -212,14 +213,14 @@ public:
 				m_output_edge_points(OutputEdgePoints),
 				m_output_clockwise_edges(OutputClockwiseEdges)
 	{}
-	
+
 	void operator()(const k3d::uint_t Edge)
 	{
-		const k3d::uint_t mapped_edge = m_index_map[Edge];  
+		const k3d::uint_t mapped_edge = m_index_map[Edge];
 		m_output_edge_points[mapped_edge] = m_input_edge_points[Edge];
 		m_output_clockwise_edges[mapped_edge] = m_index_map[m_input_clockwise_edges[Edge]];
 	}
-	
+
 private:
 	const k3d::mesh::indices_t& m_input_edge_points;
 	const k3d::mesh::indices_t& m_input_clockwise_edges;
@@ -246,7 +247,7 @@ public:
 		m_points(Points)
 	{
 	}
-	
+
 	void operator()(const k3d::uint_t EdgeIndex)
 	{
 		const k3d::uint_t edge = m_edge_list[EdgeIndex];
@@ -258,7 +259,7 @@ public:
 			m_points[(EdgeIndex * m_split_point_count) + m_first_new_point + split] = start_point + (split + 1) * step;
 		}
 	}
-	
+
 private:
 	const k3d::mesh::indices_t& m_edge_list;
 	const k3d::mesh::indices_t& m_input_edge_points;
@@ -266,6 +267,58 @@ private:
 	const k3d::uint_t m_split_point_count;
 	const k3d::uint_t m_first_new_point;
 	k3d::mesh::points_t& m_points;
+};
+
+/// Copies and interpolates the varying data as needed (serial usage only)
+class varying_data_copier
+{
+public:
+	varying_data_copier(const k3d::mesh::points_t Points,
+			const k3d::mesh::indices_t& EdgePoints,
+			const k3d::mesh::indices_t& ClockwiseEdges,
+			const k3d::mesh::indices_t& Companions,
+			const k3d::mesh::bools_t& BoundaryEdges,
+			const k3d::mesh::bools_t& HasMidpoint,
+			const k3d::uint_t SplitPointCount,
+			k3d::named_array_copier& Copier) :
+				m_points(Points),
+				m_edge_points(EdgePoints),
+				m_clockwise_edges(ClockwiseEdges),
+				m_companions(Companions),
+				m_boundary_edges(BoundaryEdges),
+				m_has_midpoint(HasMidpoint),
+				m_split_point_count(SplitPointCount),
+				m_copier(Copier)
+			{}
+
+	void operator()(const k3d::uint_t Edge)
+	{
+		m_copier.push_back(Edge);
+		if(m_has_midpoint[Edge] || (!m_boundary_edges[Edge] && m_has_midpoint[m_companions[Edge]]))
+		{
+			const k3d::uint_t clockwise = m_clockwise_edges[Edge];
+			const k3d::uint_t indices[] = {Edge, clockwise};
+			const k3d::point3& start_point = m_points[m_edge_points[Edge]];
+			const k3d::point3& end_point = m_points[m_edge_points[Edge]];
+			const k3d::double_t weight_step = 1.0 / static_cast<double>(m_split_point_count + 1);
+			for(k3d::uint_t i = 1; i <= m_split_point_count; ++i)
+			{
+				const k3d::double_t last_weight = weight_step * static_cast<k3d::double_t>(i);
+				const k3d::double_t weights[] = {1 - last_weight, last_weight};
+				m_copier.push_back(2, indices, weights);
+			}
+		}
+	}
+
+private:
+	const k3d::mesh::points_t m_points;
+	const k3d::mesh::indices_t& m_edge_points;
+	const k3d::mesh::indices_t& m_clockwise_edges;
+	const k3d::mesh::indices_t& m_companions;
+	const k3d::mesh::bools_t& m_boundary_edges;
+	const k3d::mesh::bools_t& m_has_midpoint;
+	const k3d::uint_t m_split_point_count;
+	k3d::named_array_copier& m_copier;
 };
 
 } // namespace detail
@@ -290,7 +343,7 @@ public:
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		m_edge_list.clear();
-		
+
 		// If there are no valid polyhedra, we give up
 		document().pipeline_profiler().start_execution(*this, "Validate input");
 		if(!k3d::validate_polyhedra(Input))
@@ -299,23 +352,23 @@ public:
 			return;
 		}
 		document().pipeline_profiler().finish_execution(*this, "Validate input");
-		
+
 		// Shallow copy of the input (no data is copied, only shared pointers are)
 		document().pipeline_profiler().start_execution(*this, "Merge selection");
 		Output = Input;
 		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
 		document().pipeline_profiler().finish_execution(*this, "Merge selection");
-		
+
 		k3d::mesh::polyhedra_t& polyhedra = *k3d::make_unique(Output.polyhedra);
-		
+
 		document().pipeline_profiler().start_execution(*this, "Calculate companions");
 		k3d::mesh::bools_t boundary_edges;
 		k3d::mesh::indices_t companions;
 		k3d::create_edge_adjacency_lookup(*polyhedra.edge_points, *polyhedra.clockwise_edges, boundary_edges, companions);
 		document().pipeline_profiler().finish_execution(*this, "Calculate companions");
-		
+
 		const k3d::uint_t split_point_count = m_vertices.pipeline_value();
-		
+
 		document().pipeline_profiler().start_execution(*this, "Calculate indices");
 		const k3d::uint_t old_edge_count = polyhedra.edge_points->size();
 		k3d::mesh::indices_t index_map(old_edge_count);
@@ -332,7 +385,7 @@ public:
 				has_midpoint);
 		for(k3d::uint_t face = 0; face != polyhedra.face_first_loops->size(); ++face) edge_index_calculator(face);
 		document().pipeline_profiler().finish_execution(*this, "Calculate indices");
-		
+
 		document().pipeline_profiler().start_execution(*this, "Allocate memory");
 		boost::shared_ptr<k3d::mesh::indices_t> output_edge_points(new k3d::mesh::indices_t(edge_index_calculator.edge_count));
 		boost::shared_ptr<k3d::mesh::indices_t> output_clockwise_edges(new k3d::mesh::indices_t(edge_index_calculator.edge_count));
@@ -343,8 +396,10 @@ public:
 		output_points.resize(new_point_count);
 		output_point_selection.resize(new_point_count, 1.0);
 		k3d::mesh::indices_t& output_loop_first_edges = *k3d::make_unique(polyhedra.loop_first_edges);
+		polyhedra.face_varying_data = Input.polyhedra->face_varying_data.clone_types();
+		k3d::named_array_copier face_varying_data_copier(Input.polyhedra->face_varying_data, polyhedra.face_varying_data);
 		document().pipeline_profiler().finish_execution(*this, "Allocate memory");
-		
+
 		document().pipeline_profiler().start_execution(*this, "Update indices");
 		detail::edge_index_updater edge_index_updater(*polyhedra.edge_points,
 				*polyhedra.clockwise_edges,
@@ -355,7 +410,7 @@ public:
 		for(k3d::uint_t loop = 0; loop != output_loop_first_edges.size(); ++loop)
 			output_loop_first_edges[loop] = index_map[output_loop_first_edges[loop]];
 		document().pipeline_profiler().finish_execution(*this, "Update indices");
-		
+
 		document().pipeline_profiler().start_execution(*this, "Split edges");
 		detail::edge_splitter edge_splitter(*Input.polyhedra,
 					m_edge_list,
@@ -368,10 +423,25 @@ public:
 					*output_clockwise_edges);
 		for(k3d::uint_t edge_index = 0; edge_index != m_edge_list.size(); ++edge_index) edge_splitter(edge_index);
 		document().pipeline_profiler().finish_execution(*this, "Split edges");
-		
+
+		document().pipeline_profiler().start_execution(*this, "Copy varying data");
+		detail::varying_data_copier varying_data_copier(*Input.points,
+					*Input.polyhedra->edge_points,
+					*Input.polyhedra->clockwise_edges,
+					companions,
+					boundary_edges,
+					has_midpoint,
+					split_point_count,
+					face_varying_data_copier);
+		const k3d::mesh::indices_t& input_edge_points = *Input.polyhedra->edge_points;
+		for(k3d::uint_t edge = 0; edge != input_edge_points.size(); ++edge) varying_data_copier(edge);
+		document().pipeline_profiler().finish_execution(*this, "Copy varying data");
+
 		polyhedra.edge_points = output_edge_points;
 		polyhedra.clockwise_edges = output_clockwise_edges;
 		polyhedra.edge_selection = output_edge_selection;
+		polyhedra.constant_data = Input.polyhedra->constant_data;
+		polyhedra.uniform_data = Input.polyhedra->uniform_data;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -383,9 +453,9 @@ public:
 			return;
 		}
 		document().pipeline_profiler().finish_execution(*this, "Validate input");
-		
+
 		k3d::mesh::points_t& output_points = *k3d::make_unique(Output.points);
-		
+
 		document().pipeline_profiler().start_execution(*this, "Calculate positions");
 		detail::split_point_calculator split_point_calculator(m_edge_list,
 				*Input.polyhedra->edge_points,
@@ -413,7 +483,7 @@ public:
 
 private:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_vertices;
-	
+
 	// Cache the midpoints, for fast updating
 	k3d::mesh::indices_t m_edge_list;
 };
