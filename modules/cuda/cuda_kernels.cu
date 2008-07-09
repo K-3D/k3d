@@ -252,6 +252,31 @@ __global__ void multiply_kernel (ushort4 *image_RGBA, int width, int height, flo
 	__syncthreads();
 }
 
+/**
+ * Apply gamma transform to each pixel value of an immage
+ */
+__global__ void gamma_kernel (ushort4 *image_RGBA, int width, int height, float value)
+{
+    const int ix = blockDim.x * blockIdx.x + threadIdx.x;
+    const int iy = blockDim.y * blockIdx.y + threadIdx.y;
+    
+    if(ix < width && iy < height)
+    {
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        const int idx = width * iy + ix;
+        
+        float4 pixelFloat;
+        
+        pixelFloat.x = powf(halfToFloat((unsigned short)image_RGBA[idx].x), value);
+        pixelFloat.y = powf(halfToFloat((unsigned short)image_RGBA[idx].y), value);
+        pixelFloat.z = powf(halfToFloat((unsigned short)image_RGBA[idx].z), value);
+        
+        image_RGBA[idx].x = floatToHalf(pixelFloat.x);
+        image_RGBA[idx].y = floatToHalf(pixelFloat.y);
+        image_RGBA[idx].z = floatToHalf(pixelFloat.z);
+    }
+}
+
 __global__ void color_monochrome_kernel ( ushort4 *image_RGBA, int width, int height, float redWeight, float greenWeight, float blueWeight)
 {
 	const int ix = blockDim.x * blockIdx.x + threadIdx.x;
@@ -273,8 +298,6 @@ __global__ void color_monochrome_kernel ( ushort4 *image_RGBA, int width, int he
         image_RGBA[idx].z = floatToHalf(monoValue);
     }
 	__syncthreads();
-	
-	
 }
 
 __global__ void linear_transform_kernel ( float4 *points, int num_points )
@@ -349,35 +372,40 @@ __global__ void linear_transform_kernel ( float4 *points, int num_points )
 __global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices, 
                                                      unsigned int num_edge_indices, 
                                                      float4* points_and_selection,
+                                                     unsigned int num_points,
                                                      float4* new_points_and_selection, 
-                                                     unsigned int* edge_points,
-                                                     unsigned int* clockwise_edges,
-                                                     unsigned int first_new_point_index,
+                                                     unsigned int* edge_point_indices,
+                                                     unsigned int* clockwise_edge_indices,
                                                      int num_split_points )
 {
     
-    int edge_index_index = (blockIdx.x * blockDim.x) + threadIdx.x;
+    unsigned int edge_index_index = (blockIdx.x * blockDim.x) + threadIdx.x;
     int split_index = (blockIdx.y * blockDim.y) + threadIdx.y;
     
     if ( edge_index_index < num_edge_indices )
     {
         
-        int edge_index = edge_indices[edge_index_index];
-        int new_point_index = edge_index_index*num_split_points + split_index;
+        unsigned int edge_index = edge_indices[edge_index_index];
+        unsigned int p_index = edge_point_indices[edge_index];
+        unsigned int new_point_index = edge_index_index*num_split_points + split_index;
         
         #ifdef __DEVICE_EMULATION__
             printf("Edge Index Index: %d\n", edge_index_index);
             printf("Split Index: %d\n", split_index);
             printf("Edge Index: %d\n", edge_index);
+            printf("Clockwise Edge Index: %d\n", clockwise_edge_indices[edge_index]);
+            printf("Point Index: %d\n", edge_point_indices[edge_index]);
+            printf("Clockwise Point Index: %d\n", edge_point_indices[clockwise_edge_indices[edge_index]]);
             printf("New Point Index: %d\n", new_point_index);
         #endif 
-                
-        float4 p0 = points_and_selection[edge_points[edge_index]];
-        float4 p1 = points_and_selection[edge_points[clockwise_edges[edge_index]]];        
         
+        
+        float4 p0 = points_and_selection[p_index];
+        float4 p1 = points_and_selection[edge_point_indices[clockwise_edge_indices[edge_index]]];
+
         #ifdef __DEVICE_EMULATION__
-            printf("P_0:%d: (%f, %f, %f)\n", edge_points[edge_index], p0.x, p0.y, p0.z);
-            printf("P_1:%d: (%f, %f, %f)\n", edge_points[clockwise_edges[edge_index]], p1.x, p1.y, p1.z);
+            printf("P_0:%d: (%f, %f, %f)\n", p_index, p0.x, p0.y, p0.z);
+            printf("P_1:%d: (%f, %f, %f)\n", edge_point_indices[clockwise_edge_indices[edge_index]], p1.x, p1.y, p1.z);
         #endif
         
         p1.x = (p1.x - p0.x) / (num_split_points + 1);
@@ -392,6 +420,7 @@ __global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices,
         new_points_and_selection[new_point_index].y = p0.y + (split_index + 1)*p1.y;
         new_points_and_selection[new_point_index].z = p0.z + (split_index + 1)*p1.z;
         new_points_and_selection[new_point_index].w = 1;
+        
     } 
       
 }

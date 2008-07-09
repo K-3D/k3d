@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -73,7 +73,7 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// cuda_add
+// cuda_bitmap_add
 
 k3d::iplugin_factory& cuda_bitmap_add_factory()
 {

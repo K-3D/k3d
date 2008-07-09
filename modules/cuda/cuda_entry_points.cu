@@ -97,6 +97,9 @@ extern "C" void bitmap_arithmetic_kernel_entry(int operation, unsigned short* p_
     		// execute the add kernel with value negated
     		add_kernel<<< blocks_per_grid, threads_per_block >>> ((ushort4*)p_deviceImage, width, height, -value);
     		break;
+        case CUDA_BITMAP_GAMMA:
+            // execute the gamma kernel
+            gamma_kernel<<< blocks_per_grid, threads_per_block >>> ((ushort4*)p_deviceImage, width, height, value);
     	default:
     		// unknown operation 
     		;
@@ -407,15 +410,29 @@ extern "C" void subdivide_edges_split_point_calculator ( unsigned int* edge_indi
                                                          float* new_points_and_selection,
                                                          int num_split_points )
 {
-    int threads_x = 512 / num_split_points;
+    int threads_x = 64 / num_split_points;
     
     dim3 threads_per_block(threads_x, num_split_points);
     dim3 blocks_per_grid( iDivUp(num_points, threads_x), 1);
     
-    subdivide_edges_split_point_kernel<<< blocks_per_grid, threads_per_block >>> ( edge_indices, num_edge_indices, (float4*)points_and_selection, (float4*)new_points_and_selection, edge_point_indices, clockwise_edge_indices, num_points, num_split_points );  
+    printf("CUDA DEBUG: Calling split kernel\n");
+    
+    subdivide_edges_split_point_kernel<<< blocks_per_grid, threads_per_block >>> ( edge_indices, 
+                                                                                   num_edge_indices, 
+                                                                                   (float4*)points_and_selection, 
+                                                                                   num_points,
+                                                                                   (float4*)new_points_and_selection, 
+                                                                                   edge_point_indices, 
+                                                                                   clockwise_edge_indices, 
+                                                                                   num_split_points );  
     
     // check if the kernel executed correctly
-    CUT_CHECK_ERROR("Kernel execution failed");
+    //CUT_CHECK_ERROR("Kernel execution failed");
+    
+    cudaError_t last_error = cudaGetLastError();
+    
+    printf("CUDA ERROR: %s\n", cudaGetErrorString(last_error));
+    
     cudaThreadSynchronize();
 }
 

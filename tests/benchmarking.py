@@ -400,3 +400,46 @@ def run_mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRun
         CSV_output_file = k3d.generic_path(benchmark_path() + '/' + meshModifierNodeName + description + '.benchmark.txt')
     
     profilingResults.output_as_CSV_file(str(CSV_output_file), description, appendToFile)
+
+"""
+    selected is a list of tuples (PluginName, ColumnName)
+"""
+def compare_and_output_image(filename, selected_benchmarks, plotLabels = (None, None)):
+    try:
+        import pylab as P
+    except:
+        return 0
+    
+    import os
+    
+    processor = ResultsProcessor()
+    for selected in selected_benchmarks:
+        processor.add_dataset(selected[0], selected[1])
+        
+    processor.plot_data(plotLabels[0], plotLabels[1])
+
+    image_filename = benchmark_path() + '/' + filename + '.png';
+    try:
+        os.delete(image_filename)
+    except:
+        pass
+    
+    P.savefig(image_filename, format='png')
+    
+    P.close()
+    return image_filename
+    
+
+def generate_comparison_image(description, run_names, column = "Total"):
+    selected = [];
+    for run in run_names:
+        selected += [(run, column),]
+    
+    filename = compare_and_output_image(description, selected)
+    
+    
+    if filename != 0:
+        print '<DartMeasurementFile name="' + description + '" type="image/png">' + str(filename) + '</DartMeasurementFile>'
+    else:
+        print '<DartMeasurement name="' + description + '" type="text/string">  Error in comparison </DartMeasurementFile>'
+        

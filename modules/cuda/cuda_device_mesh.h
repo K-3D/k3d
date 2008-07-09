@@ -129,6 +129,7 @@ class cuda_device_mesh
         
         float* get_points_and_selection_pointer();
         float* get_additional_points_and_selection_pointer();
+        
     private:
         /// a pointer to a array of float4's allocated on the device
         float* pdev_points_and_selection;       

@@ -391,9 +391,6 @@ public:
 		
 		document().pipeline_profiler().start_execution(*this, "Calculate positions");
 		
-        // initialize the device
-        CUDA_initialize_device();
-        
         //k3d::log() << debug << Input << std::endl;
         
         // initialize the device version of the mesh
@@ -412,15 +409,16 @@ public:
         //k3d::log() << debug << "Calling kernel" << std::endl;
         
         
-        subdivide_edges_split_point_calculator ( &(m_edge_list.front()), 
-                                                m_edge_list.size(),  
+        subdivide_edges_split_point_calculator ( (unsigned int*)&(m_edge_list.front()), 
+                                                (unsigned int)m_edge_list.size(),  
                                                 device_mesh.get_points_and_selection_pointer(),
-                                                Input.points->size(),  
+                                                (unsigned int)Input.points->size(),  
                                                 device_mesh.get_device_polyhedra().get_per_edge_points_pointer(),
                                                 device_mesh.get_device_polyhedra().get_per_edge_clockwise_edges_pointer(),
                                                 device_mesh.get_additional_points_and_selection_pointer(),
-                                                m_vertices.pipeline_value());
-
+                                                (unsigned int)m_vertices.pipeline_value());
+        
+        synchronize_threads();
         device_mesh.copy_from_device ( Output ); 
         //k3d::log() << debug << Output << std::endl;
         

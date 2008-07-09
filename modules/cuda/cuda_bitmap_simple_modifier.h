@@ -57,8 +57,6 @@ protected:
 	
 	void bitmap_arithmetic(const k3d::bitmap& Input, k3d::bitmap& Output, const k3d::int32_t bitmapOperation, float value)
 	{
-		// intialize CUDA - should check for errors etc
-		CUDA_initialize_device();
 		const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
 		unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));
 		k3d::int32_t sizeInBytes = Input.width()*Input.height()*8;

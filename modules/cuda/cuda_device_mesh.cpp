@@ -483,14 +483,12 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh )
     }
     
     // copy the polyhedra data from the device
-    /*
     boost::shared_ptr<k3d::mesh::polyhedra_t> polyhedra (new k3d::mesh::polyhedra_t() );
     m_cuda_device_polyhedra.copy_from_device(*(polyhedra));
     
     p_output_mesh->polyhedra = polyhedra;
     // TODO:  copy vertex data
     p_output_mesh->vertex_data = m_p_host_mesh->vertex_data;
-    */
     
     synchronize_threads();
     k3d::log() << debug << "cuda_device_mesh::copy_from_device::end" << std::endl;
