@@ -47,15 +47,15 @@ namespace annotation
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// annotation
+// annotation_3d
 
-class annotation :
+class annotation_3d :
 	public k3d::gl::renderable<k3d::transformable<k3d::node > >
 {
 	typedef k3d::gl::renderable<k3d::transformable<k3d::node > > base;
 
 public:
-	annotation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	annotation_3d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_font_path(init_owner(*this) + init_name("font") + init_label(_("Font")) + init_description(_("Font path")) + init_value(k3d::share_path() / k3d::filesystem::generic_path("fonts/VeraBd.ttf")) + init_path_mode(k3d::ipath_property::READ) + init_path_type(k3d::options::path::fonts())),
 		m_font_size(init_owner(*this) + init_name("font_size") + init_label(_("Font Size")) + init_description(_("Font size.")) + init_value(14.0)),
@@ -63,9 +63,7 @@ public:
 		m_line_spacing(init_owner(*this) + init_name("line_spacing") + init_label(_("Line Spacing")) + init_description(_("Controls the spacing between lines of text.")) + init_value(1.0)),
 		m_alignment(init_owner(*this) + init_name("alignment") + init_label(_("Alignment")) + init_description(_("Controls the alignment of adjacent lines of text.")) + init_value(LEFT) + init_values(alignment_values())),
 		m_text(init_owner(*this) + init_name("text") + init_label(_("Text")) + init_description(_("Annotation text")) + init_value(k3d::string_t(_("Annotation")))),
-		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Annotation color")) + init_value(k3d::color(0, 0, 0))),
-		m_leader(init_owner(*this) + init_name("leader") + init_label(_("Leader")) + init_description(_("Leader line")) + init_value(false)),
-		m_leader_target(init_owner(*this) + init_name("leader_target") + init_label(_("Leader Target")) + init_description(_("Leader line target")) + init_value(k3d::identity3D()))
+		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Annotation color")) + init_value(k3d::color(0, 0, 0)))
 	{
 		m_text.set_metadata("k3d:property-type", "k3d:multi-line-text");
 
@@ -77,8 +75,6 @@ public:
 		m_alignment.changed_signal().connect(make_async_redraw_slot());
 		m_text.changed_signal().connect(make_async_redraw_slot());
 		m_color.changed_signal().connect(make_async_redraw_slot());
-		m_leader.changed_signal().connect(make_async_redraw_slot());
-		m_leader_target.changed_signal().connect(make_async_redraw_slot());
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 	}
 
@@ -97,7 +93,7 @@ public:
 
 	void draw(const k3d::gl::render_state& State)
 	{
-		FTGLPixmapFont font(m_font_path.pipeline_value().native_filesystem_string().c_str());
+		FTGLPolygonFont font(m_font_path.pipeline_value().native_filesystem_string().c_str());
 		if(font.Error())
 		{
 			k3d::log() << error << "error initializing font" << std::endl;
@@ -133,33 +129,15 @@ public:
 
 		glRasterPos3d(0, 0, 0);
 		layout.Render(m_text.pipeline_value().c_str());
-
-		if(m_leader.pipeline_value())
-		{
-			glMatrixMode(GL_MODELVIEW);
-			glPushMatrix();
-			k3d::gl::push_matrix(k3d::inverse(matrix()));
-
-			const k3d::point3 a = m_input_matrix.pipeline_value() * k3d::point3(0, 0, 0);
-			const k3d::point3 c = m_leader_target.pipeline_value() * k3d::point3(0, 0, 0);
-			const k3d::point3 b = a + (0.05 * (b - a));
-
-			glBegin(GL_LINES);
-			k3d::gl::vertex3d(b);
-			k3d::gl::vertex3d(c);
-			glEnd();
-
-			glPopMatrix();
-		}
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<annotation,
+		static k3d::document_plugin_factory<annotation_3d,
 				k3d::interface_list<k3d::itransform_source,
 				k3d::interface_list<k3d::itransform_sink > > >factory(
-			k3d::uuid(0x951d3c20, 0xe2f74d6d, 0x8bc90ef8, 0x9a8967b6),
-			"Annotation",
+			k3d::uuid(0xc507e5ea, 0x8f425637, 0x85b2829d, 0x7eb1c4c4),
+			"Annotation3D",
 			_("Displays text annotations in the 3D document, primarily for documentation / tutorials"),
 			"Annotation",
 			k3d::iplugin_factory::STABLE);
@@ -175,16 +153,14 @@ private:
 	k3d_data(alignment_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_alignment;
 	k3d::metadata_property<k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization)> m_text;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_leader;
-	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_leader_target;
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// annotation_factory
+// annotation_3d_factory
 
-k3d::iplugin_factory& annotation_factory()
+k3d::iplugin_factory& annotation_3d_factory()
 {
-	return annotation::get_factory();
+	return annotation_3d::get_factory();
 }
 
 } // namespace annotation
