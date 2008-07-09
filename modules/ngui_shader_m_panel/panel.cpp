@@ -137,14 +137,21 @@ namespace module{
 	     so_artistnotes(init_value(k3d::string_t("")))
 	  {
 	    //Get Any Availible Data (If There Is Any)
-	    resetToNode();
+	    loadFromMeta();
 
 	    //Drop Hind To Multiline Text Item
 	    so_artistnotes.set_metadata("k3d:property-type", "k3d:multi-line-text");
+
+	    //Set Change Signals
+	    so_name.changed_signal().connect(sigc::mem_fun(*this, &s_object::on_name_changed));
+	    so_type.changed_signal().connect(sigc::mem_fun(*this, &s_object::on_type_changed));
+	    so_datestamp.changed_signal().connect(sigc::mem_fun(*this, &s_object::on_datestamp_changed));
+	    so_artistname.changed_signal().connect(sigc::mem_fun(*this, &s_object::on_artistname_changed));
+	    so_artistnotes.changed_signal().connect(sigc::mem_fun(*this, &s_object::on_artistnotes_changed));
 	  }
-	  
+ 
 	  ~s_object()
-	  {
+	  {	   
 	  }
 
 	public:
@@ -154,24 +161,39 @@ namespace module{
 	  //Mutator Functions
 	  void setName(k3d::string_t str){so_name.set_value(str);}
 
-	  //Save Extra Content To Node
-	  void saveToNode()
+	  //SIGNAL EVENTS FROM MATERIAL PROFILE
+	  void on_name_changed(k3d::ihint *h)
 	  {
 	    //Save K3D::DATA so_name to node
 	    node->set_name(so_name.internal_value());
-
-	    //Save Rest To Meta Data Properties (Allows File Save)
+	  }
+	  
+	  void on_type_changed(k3d::ihint *h)
+	  {
 	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
-	      {
-		metadata->set_metadata("materialManager::material_type", so_type.internal_value());
-		metadata->set_metadata("materialManager::material_datestamp", so_datestamp.internal_value());
-		metadata->set_metadata("materialManager::material_artistname", so_artistname.internal_value());
-		metadata->set_metadata("materialManager::material_artistnotes", so_artistnotes.internal_value());
-	      }//if					       					   
+	      metadata->set_metadata("materialManager::material_type", so_type.internal_value());
 	  }
 
+	  void on_datestamp_changed(k3d::ihint *h)
+	  {
+	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
+	      metadata->set_metadata("materialManager::material_datestamp", so_datestamp.internal_value());
+	  }
+
+	  void on_artistname_changed(k3d::ihint *h)
+	  {
+	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
+	      metadata->set_metadata("materialManager::material_artistname", so_artistname.internal_value());
+	  }
+
+	  void on_artistnotes_changed(k3d::ihint *h)
+	  {
+	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
+	      metadata->set_metadata("materialManager::material_artistnotes", so_artistnotes.internal_value());
+	  }	 
+
 	  //Reset Content To Curent Saved Node Data
-	  void resetToNode()
+	  void loadFromMeta()
 	  {
 	    //Get Node Name
 	    so_name.set_value(node->name());
@@ -982,8 +1004,7 @@ namespace module{
 	     s_datemod_entry(*_m_parent, k3d::string_t("so_datestamp_field"), entry::model(_m_so->so_datestamp), 0),
 	     s_artistname_entry(*_m_parent, k3d::string_t("so_artistname_field"), entry::model(_m_so->so_artistname), 0),
 	     s_artistnotes_mltext(*_m_parent, k3d::string_t("so_artistnotes_mltxt"), text::model(_m_so->so_artistnotes), 0),
-	     materialPreview(k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_materialImgFile)),
-	     save_button("Save Material"), reset_button("Reset Material")
+	     materialPreview(k3d::system::get_temp_directory() / k3d::filesystem::generic_path(s_materialImgFile))
 	  {
 	    s_name_l.set_text		("Material Name: ");
 	    s_type_l.set_text		("Material Type: ");
@@ -994,13 +1015,6 @@ namespace module{
 	    //glib timer set that updates preview image every 0.25 seconds
 	    // << Will Delete when panel closed
 	    timerPreviewConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this, &so_content_pane::updatePreviewImage), 250);
-
-	    //Create A Signal Connection For Save Button
-	    save_button.signal_clicked().connect( sigc::mem_fun(*this, &so_content_pane::on_save_button_clicked));
-
-	    //Create A Signal Connection For Reset Button
-	    reset_button.signal_clicked().connect( sigc::mem_fun(*this, &so_content_pane::on_reset_button_clicked));
-
 	  }
 
 	  ~so_content_pane()
@@ -1049,21 +1063,7 @@ namespace module{
 		//Artist Name
 		s_artistname_l.set_alignment(0.0);
 		label_c.pack_start(s_artistname_l, true, true, 0);
-		data_c.pack_start(s_artistname_entry, true, true, 0);
-
-		//Reset To Document Button
-		reset_button_l.set_text("Reset To The Document: ");
-		reset_button_l.set_alignment(0.0);
-		label_c.pack_start(reset_button_l, true, true, 0);
-
-		data_c.pack_start(reset_button, true, false, 0);
-
-		//Save To Document Button
-		save_button_l.set_text("Save To The Document: ");
-		save_button_l.set_alignment(0.0);
-		label_c.pack_start(save_button_l, true, true, 0);
-
-		data_c.pack_start(save_button, true, false, 0);
+		data_c.pack_start(s_artistname_entry, true, true, 0);	
 
 		//Artist Notes
 		main_detail_c.pack_start(artistnotes_frame, true, true, 10);
@@ -1144,29 +1144,7 @@ namespace module{
 	    materialPreview.queue_resize();
 	    materialPreview.queue_draw();
 	    return true;
-	  }
-
-	  //Save The material Context To Document
-	  void on_save_button_clicked()
-	  {
-	    k3d::log() << "SAVING material TO DOCUMENT!" << std::endl;
-	    
-	    //Save Certain Values To Document Nodes
-	    m_so->saveToNode();
-
-	    //Save Rest To File	      
-	  }
-	  
-
-	  void on_reset_button_clicked()
-	  { 
-	    //Reset Values To Node Values (On Document)
-	    m_so->resetToNode();
-
-	    //Reset Reset From Saved Attributes On File
-	  }
-
-	     
+	  }	     
 
 	public:
 	  //GTK Widgets
@@ -1189,12 +1167,6 @@ namespace module{
 
 	  Gtk::Frame so_preview_frame;
 	  Gtk::Frame artistnotes_frame;
-
-	  Gtk::Label save_button_l;
-	  Gtk::Button save_button;
-
-	  Gtk::Label reset_button_l;
-	  Gtk::Button reset_button;
 
 	  entry::control s_name_entry;
 	  entry::control s_type_entry;
@@ -1477,6 +1449,9 @@ namespace module{
 
 	void implementation::on_nodes_added(const k3d::inode_collection::nodes_t& Nodes)
 	{
+	  //Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+
+
 	  //Iterate through each node and if appropriate add to tree
 	  for(k3d::inode_collection::nodes_t::const_iterator nodeIter = Nodes.begin(); nodeIter != Nodes.end(); ++nodeIter)
 	    {
@@ -1529,12 +1504,12 @@ namespace module{
 	    }//for
 
 	  // //Rebuild Currently Selected Pane (Only If Group)
-// 	  Gtk::TreeModel::iterator iter = tree_selection->get_selected();
-// 	  if(iter) //If anything is selected
+	 //  Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+	 //  if(iter) //If anything is selected
 // 	    {
 // 	      Gtk::TreeModel::Row row = *iter;
 // 	      if(row[m_columns.is_group])
-// 		on_tree_row_changed();
+// 		build_content_pane(row, true);
 // 	    }//if
 
 	}//on_nodes_added
@@ -1552,23 +1527,25 @@ namespace module{
 	    if(tmpSObj)
 	      grpPtr = tmpSObj->parent;
 	      
-	    tree_model->erase(row);
-
-	    // //Rebuild Currently Selected Pane (Only If Group)
-// 	    Gtk::TreeModel::iterator iter = tree_selection->get_selected();
-// 	    if(iter) //If anything is selected
-// 	      {
-// 		Gtk::TreeModel::Row row = *iter;
-// 		if(row[m_columns.is_group])
-// 		  on_tree_row_changed();
-// 	      }//if
-
-	  }
+	    tree_model->erase(row);	    
 
 	  //Delete In Stored Model
 	  if(grpPtr)
 	    grpPtr->removeMaterial(tmpSObj);
 	    
+	  // //Rebuild Currently Selected Pane (Only If Group)
+// 	  Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+// 	  if(iter) //If anything is selected
+// 	    {
+// 	      Gtk::TreeModel::Row row = *iter;
+// 	      if(row[m_columns.is_group])
+// 		on_tree_row_changed();
+// 	    }//if
+
+	  }
+
+
+
 
 	}//on_nodes_removed
 
