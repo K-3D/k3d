@@ -40,6 +40,7 @@
 #define CUDA_BITMAP_GAMMA 0x04
 #define CUDA_BITMAP_INVERT 0x05
 #define CUDA_BITMAP_MATTE_COLORDIFF 0x06
+#define CUDA_BITMAP_MATTE_INVERT 0x07
 
 // define the profiling strings
 #define PROFILE_STRING_HOST_TO_DEVICE "Copy from Host to Device"

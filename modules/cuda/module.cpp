@@ -35,6 +35,7 @@ extern k3d::iplugin_factory& cuda_bitmap_color_monochrome_factory();
 extern k3d::iplugin_factory& cuda_bitmap_gamma_factory();
 extern k3d::iplugin_factory& cuda_bitmap_invert_factory();
 extern k3d::iplugin_factory& cuda_bitmap_matte_colordiff_factory();
+extern k3d::iplugin_factory& cuda_bitmap_matte_invert_factory();
 // deformation plugins
 extern k3d::iplugin_factory& cuda_deformation_transform_points_factory();
 extern k3d::iplugin_factory& cuda_deformation_transform_points_asynchronous_factory();
@@ -57,6 +58,7 @@ K3D_MODULE_START(Registry)
     Registry.register_factory(module::cuda::cuda_bitmap_gamma_factory());
     Registry.register_factory(module::cuda::cuda_bitmap_invert_factory());
     Registry.register_factory(module::cuda::cuda_bitmap_matte_colordiff_factory());
+    Registry.register_factory(module::cuda::cuda_bitmap_matte_invert_factory());
 	// deformation plugins
 	Registry.register_factory(module::cuda::cuda_deformation_transform_points_factory());
 	Registry.register_factory(module::cuda::cuda_deformation_transform_points_asynchronous_factory());

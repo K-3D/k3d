@@ -106,8 +106,10 @@ extern "C" void bitmap_arithmetic_kernel_entry(int operation, unsigned short* p_
             invert_kernel<<< blocks_per_grid, threads_per_block >>> ((ushort4*)p_deviceImage, width, height);
             break;
         case CUDA_BITMAP_MATTE_COLORDIFF:
-            // excute the bitmap invert kernel
             matte_color_diff_kernel<<< blocks_per_grid, threads_per_block >>> ((ushort4*)p_deviceImage, width, height, value);
+            break;    
+        case CUDA_BITMAP_MATTE_INVERT:
+            matte_invert_kernel<<< blocks_per_grid, threads_per_block >>> ((ushort4*)p_deviceImage, width, height);
             break;    
     	default:
     		// unknown operation 
