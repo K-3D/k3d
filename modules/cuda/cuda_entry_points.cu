@@ -100,6 +100,11 @@ extern "C" void bitmap_arithmetic_kernel_entry(int operation, unsigned short* p_
         case CUDA_BITMAP_GAMMA:
             // execute the gamma kernel
             gamma_kernel<<< blocks_per_grid, threads_per_block >>> ((ushort4*)p_deviceImage, width, height, value);
+            break;
+        case CUDA_BITMAP_INVERT:
+            // excute the bitmap invert kernel
+            invert_kernel<<< blocks_per_grid, threads_per_block >>> ((ushort4*)p_deviceImage, width, height);
+            break;
     	default:
     		// unknown operation 
     		;

@@ -3,7 +3,7 @@
 import benchmarking
 # a test to compare the benchmark results for a number of bitmap plugins
 
-compare_list = ["BitmapAdd", "BitmapSubtract", "BitmapMultiply", "BitmapColorMonochrome", "BitmapGamma"]
+compare_list = ["BitmapAdd", "BitmapSubtract", "BitmapMultiply", "BitmapColorMonochrome", "BitmapGamma", "BitmapInvert"]
 
 for run in compare_list:
     try:

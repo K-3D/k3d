@@ -32,12 +32,13 @@
 	#define K3D_CUDA_DECLSPEC
 #endif // !K3D_API_WIN32
 
-// define the types of kernels supported
+// define the types of bitmap kernels supported
 #define CUDA_BITMAP_ADD 0x00
 #define CUDA_BITMAP_MULTIPLY 0x01
 #define CUDA_BITMAP_SUBTRACT 0x02
 #define CUDA_BITMAP_COLOR_MONOCHROME 0x03
 #define CUDA_BITMAP_GAMMA 0x04
+#define CUDA_BITMAP_INVERT 0x05
 
 // define the profiling strings
 #define PROFILE_STRING_HOST_TO_DEVICE "Copy from Host to Device"
