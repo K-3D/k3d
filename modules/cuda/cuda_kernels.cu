@@ -304,6 +304,41 @@ __global__ void invert_kernel (ushort4 *image_RGBA, int width, int height)
     }
 }
 
+/**
+ * Create an alpha channel from the color difference
+ */
+__global__ void matte_color_diff_kernel (ushort4 *image_RGBA, int width, int height, float threshold)
+{
+    const int ix = blockDim.x * blockIdx.x + threadIdx.x;
+    const int iy = blockDim.y * blockIdx.y + threadIdx.y;
+    
+    if(ix < width && iy < height)
+    {
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        const int idx = width * iy + ix;
+        
+        float4 pixelFloat;
+        
+        pixelFloat.x = halfToFloat((unsigned short)image_RGBA[idx].x);
+        pixelFloat.y = halfToFloat((unsigned short)image_RGBA[idx].y);
+        pixelFloat.z = fminf(pixelFloat.y, halfToFloat((unsigned short)image_RGBA[idx].z));
+        
+        if ( pixelFloat.z > threshold )
+        {
+            pixelFloat.w = 1 - pixelFloat.z + fmaxf(pixelFloat.x, pixelFloat.y);
+        }
+        else
+        { 
+            pixelFloat.w = 1.0f;
+        }
+        
+        // red and green channels are unchanged
+        image_RGBA[idx].z = floatToHalf(pixelFloat.z);
+        image_RGBA[idx].w = floatToHalf(pixelFloat.w);
+        
+    }
+}
+
 __global__ void color_monochrome_kernel ( ushort4 *image_RGBA, int width, int height, float redWeight, float greenWeight, float blueWeight)
 {
 	const int ix = blockDim.x * blockIdx.x + threadIdx.x;
