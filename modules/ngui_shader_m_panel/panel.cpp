@@ -61,6 +61,7 @@
 #include <k3dsdk/nodes.h>
 
 #include <boost/assign/list_of.hpp>
+
 #include <k3dsdk/types.h>
 
 #include <k3dsdk/imaterial.h>
@@ -1193,6 +1194,10 @@ namespace module{
 	     add_group("Add"),
 	     remove_group("Remove")
 	  {
+	    //Get Instance Number From Random Integer
+	    //instance_number++;
+
+
 	    //Create The Material Tree Model
 	    tree_model = Gtk::TreeStore::create(m_columns);
 	    m_nav.set_model(tree_model);
@@ -1226,6 +1231,9 @@ namespace module{
 
 	    build_gui();
 	    schedule_update();
+
+	   
+	    //k3d::log() << "INSTANCE NUMBER : " << instance_number << std::endl;
 
 	  }
 
@@ -1271,6 +1279,11 @@ namespace module{
 	  Gtk::ToolButton remove_group;
 
 	public:
+
+	  //Instance Numbering For Rendered Images & Problem With Mutliple Panels
+	  k3d::string_t currentDateTime;
+	  //static int instance_number;
+
 	  // Signal that will be emitted whenever this control should grab the panel focus
 	  sigc::signal<void> m_panel_grab_signal;
 	  // Stores a reference to the owning document
@@ -1368,6 +1381,9 @@ namespace module{
 	{
 	  //Group Through Groups And Add To Tree
 	  std::list<s_group*>::const_iterator gIter = m_model->m_groups.begin();
+	  Gtk::TreeRow first_group_row;
+	  bool on_first_row = true;
+
 	  for(; gIter !=  m_model->m_groups.end(); gIter++)
 	    {
 	      Gtk::TreeRow row = *tree_model->append();
@@ -1375,6 +1391,13 @@ namespace module{
 	      row[m_columns.is_group] = true;
 	      row[m_columns.s_group_ptr] = (*gIter);
 	      row[m_columns.s_object_ptr] = 0;
+
+	      //Grab First Row For Groups
+	      if(on_first_row)
+		{
+		  first_group_row = row;
+		  on_first_row = false;
+		}
 
 	      //Go Through Materials/Other and and to tree under groups
 	      std::list<s_object*>::const_iterator sIter = (*gIter)->m_materials.begin();
@@ -1386,12 +1409,12 @@ namespace module{
 		  childrow[m_columns.s_group_ptr] = 0;
 		  childrow[m_columns.s_object_ptr] = (*sIter);
 		  childrow[m_columns.icon] = quiet_load_icon((*sIter)->node->factory().name(), Gtk::ICON_SIZE_MENU);
-
-
-	      k3d::log() << childrow->get_value(m_columns.name) << std::endl;
-
 		}//for		
 	    }//for
+
+	  //Set Selected Tree Row
+	  if(!on_first_row)
+	      tree_selection->select(first_group_row);	   
 
 	}//build_tree
 
@@ -1503,14 +1526,16 @@ namespace module{
 	      }//if
 	    }//for
 
-	  // //Rebuild Currently Selected Pane (Only If Group)
-	 //  Gtk::TreeModel::iterator iter = tree_selection->get_selected();
-	 //  if(iter) //If anything is selected
-// 	    {
-// 	      Gtk::TreeModel::Row row = *iter;
-// 	      if(row[m_columns.is_group])
-// 		build_content_pane(row, true);
-// 	    }//if
+	 //   //Rebuild Currently Selected Pane (Only If Group)
+// 	   Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+//  	   if(iter) //If anything is selected
+// 	     {
+//  	       Gtk::TreeModel::Row row = *iter;
+// // 	       if(row[m_columns.is_group]) //Build The Content Pane From Corrected Pointer
+ 	 	  
+
+//  		build_content_pane(row, true);
+// 	     }//if
 
 	}//on_nodes_added
 
@@ -1646,9 +1671,10 @@ namespace module{
       public:
 	panel() :
           baseContainer(false, 0),
-          ui_component("material_manager", 0)//,
-	     //m_implementation(0)
+          ui_component("material_manager", 0),
+	  m_implementation(0)
 	{
+
 	}
 
 	~panel()
