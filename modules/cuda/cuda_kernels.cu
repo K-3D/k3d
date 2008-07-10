@@ -385,6 +385,31 @@ __global__ void color_monochrome_kernel ( ushort4 *image_RGBA, int width, int he
 	__syncthreads();
 }
 
+__global__ void threshold_kernel ( ushort4 *image_RGBA, int width, int height, float redThreshold, float greenThreshold, float blueThreshold, float alphaThreshold)
+{
+    const int ix = blockDim.x * blockIdx.x + threadIdx.x;
+    const int iy = blockDim.y * blockIdx.y + threadIdx.y;
+    
+    if(ix < width && iy < height)
+    {
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        const int idx = width * iy + ix;
+        
+        float4 pixelFloat;
+        
+        pixelFloat.x = fmaxf(halfToFloat((unsigned short)image_RGBA[idx].x), redThreshold);
+        pixelFloat.y = fmaxf(halfToFloat((unsigned short)image_RGBA[idx].y), blueThreshold);
+        pixelFloat.z = fmaxf(halfToFloat((unsigned short)image_RGBA[idx].z), greenThreshold);
+        pixelFloat.w = fmaxf(halfToFloat((unsigned short)image_RGBA[idx].w), alphaThreshold);
+        
+        image_RGBA[idx].x = floatToHalf(pixelFloat.x);
+        image_RGBA[idx].y = floatToHalf(pixelFloat.y);
+        image_RGBA[idx].z = floatToHalf(pixelFloat.z);
+        image_RGBA[idx].w = floatToHalf(pixelFloat.w);
+    }
+    __syncthreads();
+}
+
 __global__ void linear_transform_kernel ( float4 *points, int num_points )
 {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;

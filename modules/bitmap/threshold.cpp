@@ -45,7 +45,7 @@ public:
 	threshold(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_red_threshold(init_owner(*this) + init_name("red_threshold") + init_label(_("Red threshold")) + init_description(_("Clamp Red channel to threshold")) + init_value(0.0)),
-		m_green_threshold(init_owner(*this) + init_name("geen_threshold") + init_label(_("Green threshold")) + init_description(_("Clamp Green channel to threshold")) + init_value(0.0)),
+		m_green_threshold(init_owner(*this) + init_name("green_threshold") + init_label(_("Green threshold")) + init_description(_("Clamp Green channel to threshold")) + init_value(0.0)),
 		m_blue_threshold(init_owner(*this) + init_name("blue_threshold") + init_label(_("Blue threshold")) + init_description(_("Clamp Blue channel to threshold")) + init_value(0.0)),
 		m_alpha_threshold(init_owner(*this) + init_name("alpha_threshold") + init_label(_("Alpha threshold")) + init_description(_("Clamp Alpha channel to threshold")) + init_value(0.0))
 	{

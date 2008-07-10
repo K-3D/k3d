@@ -10,7 +10,8 @@ compare_list = ["BitmapAdd",
                 "BitmapGamma", 
                 "BitmapInvert", 
                 "BitmapMatteColorDiff", 
-                "BitmapMatteInvert"]
+                "BitmapMatteInvert",
+                "BitmapThreshold"]
 
 for run in compare_list:
     try:

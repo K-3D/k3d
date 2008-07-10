@@ -60,9 +60,6 @@ public:
         unsigned short *p_device_image;
         k3d::int32_t sizeInBytes = Input.width()*Input.height()*8;
         
-        // intialize CUDA - should check for errors etc
-        CUDA_initialize_device();
-        
         // copy the data to the device
         start_profile_step();
         allocate_device_memory((void**)&p_device_image, sizeInBytes);
@@ -81,7 +78,6 @@ public:
 
         // free the memory allocated on the device
         free_device_memory(p_device_image);
-
 	}
 
 	static k3d::iplugin_factory& get_factory()

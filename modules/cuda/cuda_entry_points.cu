@@ -136,6 +136,20 @@ extern "C" void bitmap_color_monochrome_kernel_entry(unsigned short* p_deviceIma
 	
 }
 
+extern "C" void bitmap_threshold_kernel_entry(unsigned short* p_deviceImage, int width, int height, float redThreshold, float greenThreshold, float blueThreshold, float alphaThreshold)
+{
+    // allocate the blocks and threads
+    dim3 threads_per_block(8, 8);
+    dim3 blocks_per_grid( iDivUp(width, 8), iDivUp(height,8));
+    
+    threshold_kernel<<< blocks_per_grid, threads_per_block >>> ((ushort4*)p_deviceImage, width, height, redThreshold, greenThreshold, blueThreshold, alphaThreshold);
+        
+    // check if the kernel executed correctly
+    CUT_CHECK_ERROR("Add Kernel execution failed");
+    cudaThreadSynchronize();
+    
+}
+
 extern "C" void copy_and_bind_texture_to_array( void** cudaArrayPointer, float* arrayData, int width, int height )
 {
 	// alocate a cudaArray to store the transformation matrix
