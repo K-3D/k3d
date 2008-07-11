@@ -282,6 +282,11 @@ private:
 	class internal_update_hint : public k3d::ihint
 	{
 	public:
+		k3d::ihint* clone()
+		{
+			return new internal_update_hint();
+		}
+
 		void print(std::ostream& Stream)
 		{
 			Stream << "internal_update_hint";

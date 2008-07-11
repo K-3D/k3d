@@ -35,6 +35,11 @@ namespace hint
 //////////////////////////////////////////////////////////////////////////////
 // selection_changed
 
+ihint* selection_changed_t::clone()
+{
+	return new selection_changed_t();
+}
+
 void selection_changed_t::print(std::ostream& Stream)
 {
 	Stream << "selection_changed_t";
@@ -48,6 +53,11 @@ selection_changed_t* selection_changed()
 
 //////////////////////////////////////////////////////////////////////////////
 // mesh_geometry_changed
+
+ihint* mesh_geometry_changed_t::clone()
+{
+	return new mesh_geometry_changed_t();
+}
 
 void mesh_geometry_changed_t::print(std::ostream& Stream)
 {
@@ -63,6 +73,11 @@ mesh_geometry_changed_t* mesh_geometry_changed()
 //////////////////////////////////////////////////////////////////////////////
 // mesh_topology_changed
 
+ihint* mesh_topology_changed_t::clone()
+{
+	return new mesh_topology_changed_t();
+}
+
 void mesh_topology_changed_t::print(std::ostream& Stream)
 {
 	Stream << "mesh_topology_changed_t";
@@ -76,6 +91,11 @@ mesh_topology_changed_t* mesh_topology_changed()
 
 //////////////////////////////////////////////////////////////////////////////
 // mesh_deleted
+
+ihint* mesh_deleted_t::clone()
+{
+	return new mesh_deleted_t();
+}
 
 void mesh_deleted_t::print(std::ostream& Stream)
 {

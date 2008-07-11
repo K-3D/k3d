@@ -47,6 +47,7 @@ class selection_changed_t :
 	public ihint
 {
 public:
+	ihint* clone();
 	void print(std::ostream& Stream);
 };
 
@@ -58,6 +59,7 @@ class mesh_geometry_changed_t :
 	public ihint
 {
 public:
+	ihint* clone();
 	void print(std::ostream& Stream);
 	/// Indices of the points affected by the change
 	k3d::mesh::indices_t changed_points;
@@ -73,6 +75,7 @@ class mesh_topology_changed_t :
 	public ihint
 {
 public:
+	ihint* clone();
 	void print(std::ostream& Stream);
 };
 
@@ -84,6 +87,7 @@ class mesh_deleted_t :
 	public ihint
 {
 public:
+	ihint* clone();
 	void print(std::ostream& Stream);
 };
 
