@@ -191,8 +191,10 @@ const collection_t lookup(const string_t& MetadataName, const string_t& Metadata
 
 	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
 	{
-		iplugin_factory::metadata_t::const_iterator pair = (**factory).metadata().find(MetadataName);
-		if(pair == (**factory).metadata().end())
+		const iplugin_factory::metadata_t metadata = (**factory).metadata();
+
+		iplugin_factory::metadata_t::const_iterator pair = metadata.find(MetadataName);
+		if(pair == metadata.end())
 			continue;
 
 		if(pair->second != MetadataValue)
