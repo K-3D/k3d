@@ -1,3 +1,5 @@
+#ifndef MODULE_NURBS_CURVE_OPERATIONS_H
+#define MODULE_NURBS_CURVE_OPERATIONS_H
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
 //
@@ -39,11 +41,14 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/shared_pointer.h>
 
-#ifndef MODULE_NURBS_CURVE_OPERATIONS_H
-#define MODULE_NURBS_CURVE_OPERATIONS_H
+#define MODULE_NURBS_DEBUG 1
+#define nurbs_debug __FILE__ << ": " << __LINE__ << " "
+#define MY_DEBUG if(MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug
 
 namespace module{
 	namespace nurbs{
+
+
 		int selected_curve(k3d::mesh& Output);
 		void print_knot_vector(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::knots_t& knots, size_t curve);
 		void replace_point(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::indices_t& indices, k3d::mesh::knots_t& knots, size_t newIndex, size_t curve, size_t point, bool continuous);
@@ -61,6 +66,7 @@ namespace module{
 		k3d::point4 curve_point(k3d::mesh& input, size_t curve, double u);
 		void curve_knot_insertion(k3d::mesh& input, size_t curve, double u, size_t r);
 		void nurbs_close_curve(k3d::mesh& input, size_t curve, bool keep_ends);
+		void curve_degree_elevate(k3d::mesh& input, size_t curve, size_t t);
 	}//namespace nurbs
 }//namespace module
 

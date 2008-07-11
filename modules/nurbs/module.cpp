@@ -46,6 +46,7 @@ extern k3d::iplugin_factory& split_curve_factory();
 extern k3d::iplugin_factory& edit_knot_vector_factory();
 extern k3d::iplugin_factory& insert_knot_factory();
 extern k3d::iplugin_factory& close_curve_factory();
+extern k3d::iplugin_factory& curve_degree_elevation_factory();
 
 } // namespace nurbs
 
@@ -70,5 +71,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::nurbs::edit_knot_vector_factory());
 	Registry.register_factory(module::nurbs::insert_knot_factory());
 	Registry.register_factory(module::nurbs::close_curve_factory());
+	Registry.register_factory(module::nurbs::curve_degree_elevation_factory());
 K3D_MODULE_END
 
