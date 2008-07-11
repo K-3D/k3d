@@ -116,7 +116,6 @@ namespace module{
         typedef k3d::inode lightShader_t;
         typedef k3d::inode geo_t;
 
-	const k3d::string_t shaderImgFile = "k3d_shader_preview.tiff";
 	const k3d::string_t holderImgFile = "sp_noShaderSelected.png";
 	const k3d::string_t initRManEngine = "Preview Core::RenderManEngine";
 
@@ -273,6 +272,8 @@ namespace module{
 
         materialPreviewImage::~materialPreviewImage()
 	{
+	   //Remove Preview Render from tmp dir
+	   k3d::filesystem::remove(imgFilePath);
         }
 
         bool materialPreviewImage::on_expose_event(GdkEventExpose* event)
@@ -313,7 +314,8 @@ namespace module{
             m_model(new sPreviewModel()),
             previewArea(0),
 	    piIntervalUpdate(250),
-	    preview_size_control(Parent, k3d::string_t("psize_field"), spin_button::model<k3d::uint_t>(m_model->preview_size), 0) //Init pSize Spin GUI Widget
+	    preview_size_control(Parent, k3d::string_t("psize_field"), spin_button::model<k3d::uint_t>(m_model->preview_size), 0), //Init pSize Spin GUI Widget
+	    shaderImgFile("k3d_shader_preview")
 	  {
 		
             //Setup the Window
@@ -321,14 +323,24 @@ namespace module{
             
             m_scrolled_window.add(preview_ctrl_c);
 
+	    //Get Instance Number From This Value & Mark Render Images Accordingly
+	    std::stringstream stream_for_id;
+	    stream_for_id << this;
+	    k3d::string_t instance_id = stream_for_id.str();
+
+	    //Edit Render File Names To Represent Unique Files
+	    shaderImgFile.append(instance_id);
+	    shaderImgFile += k3d::string_t(".png");
+
+
+	    k3d::log() << "single: " << shaderImgFile << std::endl;
+	
+
             //Preview Image File_IO Stuff (System Temp Directory)
             k3d::filesystem::path imgPath = k3d::system::get_temp_directory();
 	    imgPath = imgPath / k3d::filesystem::generic_path(shaderImgFile);
 	    m_model->setPreviewImagePath(imgPath);
-	    
-	    //Ensure Preview Image Is Deleted From File System
-	    deletePImage();
-
+	  
             //Create A New Drawer Widget Using Path
             previewArea = new materialPreviewImage(m_model->getPreviewImagePath());
 
@@ -400,9 +412,6 @@ namespace module{
             if(previewArea)
               delete previewArea;
 
-	    //Remove Preview Render from tmp dir
-	    deletePImage();
-
 	    //Disconnect Any Existing Connection With Properties
 	    m_model->m_pConnection.disconnect();
           }
@@ -410,12 +419,6 @@ namespace module{
 	  //Property Signal Change -> Render Init Wrapper
 	  void propertySignalRender(k3d::iunknown* t){
 	    this->renderPreview();
-	  }
-
-	  //Delete Preview Image From FileSystem
-	  void deletePImage(){
-	    //Remove Preview Render from tmp dir
-	    k3d::filesystem::remove(m_model->getPreviewImagePath());
 	  }
 
           /// Updates the contents of the control
@@ -479,6 +482,9 @@ namespace module{
 
           // Signal that will be emitted whenever this control should grab the panel focus
           sigc::signal<void> m_panel_grab_signal;
+
+	protected:
+	  k3d::string_t shaderImgFile;
 
         };
 
