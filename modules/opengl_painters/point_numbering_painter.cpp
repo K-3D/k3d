@@ -28,8 +28,12 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_painter_gl.h>
+#include <k3dsdk/options.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/selection.h>
+#include <k3dsdk/share.h>
+
+#include <FTGL/ftgl.h>
 
 namespace module
 {
@@ -51,11 +55,15 @@ class point_numbering_painter :
 public:
 	point_numbering_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
+		m_font_path(init_owner(*this) + init_name("font") + init_label(_("Font")) + init_description(_("Font path")) + init_value(k3d::share_path() / k3d::filesystem::generic_path("fonts/VeraBd.ttf")) + init_path_mode(k3d::ipath_property::READ) + init_path_type(k3d::options::path::fonts())),
+		m_font_size(init_owner(*this) + init_name("font_size") + init_label(_("Font Size")) + init_description(_("Font size.")) + init_value(14.0)),
 		m_draw_selected(init_owner(*this) + init_name("draw_selected") + init_label(_("Draw Selected")) + init_description(_("Draw normals for selected polygons")) + init_value(true)),
 		m_draw_unselected(init_owner(*this) + init_name("draw_unselected") + init_label(_("Draw Unselected")) + init_description(_("Draw normals for unselected polygons")) + init_value(false)),
 		m_selected_color(init_owner(*this) + init_name("selected_color") + init_label(_("Selected Color")) + init_description(_("Normal color for selected polygons")) + init_value(k3d::color(1, 0, 0))),
 		m_unselected_color(init_owner(*this) + init_name("unselected_color") + init_label(_("Unselected Color")) + init_description(_("Normal color for unselected polygons")) + init_value(k3d::color(0.5, 0, 0)))
 	{
+		m_font_path.changed_signal().connect(make_async_redraw_slot());
+		m_font_size.changed_signal().connect(make_async_redraw_slot());
 		m_draw_selected.changed_signal().connect(make_async_redraw_slot());
 		m_draw_unselected.changed_signal().connect(make_async_redraw_slot());
 		m_selected_color.changed_signal().connect(make_async_redraw_slot());
@@ -63,10 +71,9 @@ public:
 	}
 
 	template<typename FunctorT>
-	void draw(const k3d::typed_array<k3d::point3>& Points, const k3d::color& Color, const FunctorT& PointTest, const k3d::gl::painter_render_state& RenderState)
+	void draw(const k3d::typed_array<k3d::point3>& Points, const k3d::color& Color, const FunctorT& PointTest, FTFont& Font)
 	{
 		k3d::gl::color3d(Color);
-		glListBase(RenderState.gl_ascii_font_list_base);
 
 		const size_t point_begin = 0;
 		const size_t point_end = point_begin + Points.size();
@@ -74,10 +81,9 @@ public:
 		{
 			if(PointTest(point))
 			{
-				const std::string text = k3d::string_cast(point);
 				const k3d::point3 position = Points[point];
 				glRasterPos3d(position[0], position[1], position[2]);
-				glCallLists(text.size(), GL_UNSIGNED_BYTE, text.c_str());
+				Font.Render(k3d::string_cast(point).c_str());
 			}
 		}
 	}
@@ -92,16 +98,24 @@ public:
 		if(!k3d::validate_points(Mesh))
 			return;
 
+		FTPixmapFont font(m_font_path.pipeline_value().native_filesystem_string().c_str());
+		if(font.Error())
+		{
+			k3d::log() << error << "error initializing font" << std::endl;
+			return;
+		}
+		font.FaceSize(static_cast<unsigned int>(m_font_size.pipeline_value()));
+
 		const k3d::mesh::points_t& points = *Mesh.points;
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
 		if(draw_selected)
-			draw(points, m_selected_color.pipeline_value(), selected_points(Mesh), RenderState);
+			draw(points, m_selected_color.pipeline_value(), selected_points(Mesh), font);
 
 		if(draw_unselected)
-			draw(points, m_unselected_color.pipeline_value(), unselected_points(Mesh), RenderState);
+			draw(points, m_unselected_color.pipeline_value(), unselected_points(Mesh), font);
 	}
 	
 	static k3d::iplugin_factory& get_factory()
@@ -117,6 +131,8 @@ public:
 	}
 
 private:
+	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_font_path;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_font_size;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_selected;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_unselected;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_selected_color;
