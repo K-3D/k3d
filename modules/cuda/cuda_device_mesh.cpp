@@ -71,7 +71,7 @@ cuda_device_polyhedra::cuda_device_polyhedra ( const k3d::mesh::polyhedra_t& hos
 /// Destructor - free the allocated device pointers
 cuda_device_polyhedra::~cuda_device_polyhedra ()
 {
-    k3d::log() << debug << "~cuda_device_polyhedra" << std::endl;
+    //k3d::log() << debug << "~cuda_device_polyhedra" << std::endl;
     free_device_memory((void*)pdev_per_polygon_first_face);
     free_device_memory((void*)pdev_per_polygon_face_count);
     free_device_memory((void*)pdev_per_polygon_types);
@@ -245,7 +245,7 @@ void cuda_device_polyhedra::copy_to_device( )
  */
 void cuda_device_polyhedra::copy_from_device( k3d::mesh::polyhedra_t& destination_polyhedra )
 {
-    k3d::log() << debug << "cuda_device_polyhedra::copy_from_device" << std::endl;
+    //k3d::log() << debug << "cuda_device_polyhedra::copy_from_device" << std::endl;
     
     k3d::mesh::polyhedra_t* p_output_polyhedra = &destination_polyhedra;
 
@@ -311,7 +311,7 @@ void cuda_device_polyhedra::copy_from_device( k3d::mesh::polyhedra_t& destinatio
     synchronize_threads();
     free ( face_selection_temp );
     free ( edge_selection_temp );
-    k3d::log() << debug << "cuda_device_polyhedra::copy_from_device::end" << std::endl;
+    //k3d::log() << debug << "cuda_device_polyhedra::copy_from_device::end" << std::endl;
 }
 
 /**
@@ -378,7 +378,7 @@ cuda_device_mesh::cuda_device_mesh ( const k3d::mesh& mesh ):
 /// Destructor - frees the allocated device pointers
 cuda_device_mesh::~cuda_device_mesh()
 {
-    k3d::log() << debug << "~cuda_device_mesh" << std::endl;
+    //k3d::log() << debug << "~cuda_device_mesh" << std::endl;
     free_device_memory((void*)pdev_points_and_selection);
     free_device_memory((void*)pdev_additional_points);
 }
@@ -402,7 +402,7 @@ void cuda_device_mesh::allocate_additional_points ( k3d::uint32_t number_of_new_
  */
 void cuda_device_mesh::copy_to_device()
 {
-    k3d::log() << debug << "cuda_device_mesh::copy_to_device" << std::endl;
+    //k3d::log() << debug << "cuda_device_mesh::copy_to_device" << std::endl;
     m_number_of_points = m_p_host_mesh->points->size(); 
     
     // allocate the memory for the points and the point selection
@@ -432,7 +432,7 @@ void cuda_device_mesh::copy_to_device()
     
     // free the temporary host data
     free ( host_points_and_selection );
-    k3d::log() << debug << "cuda_device_mesh::copy_to_device::end" << std::endl;
+    //k3d::log() << debug << "cuda_device_mesh::copy_to_device::end" << std::endl;
 }
 
 /**
@@ -440,7 +440,7 @@ void cuda_device_mesh::copy_to_device()
  */
 void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh )
 {
-    k3d::log() << debug << "cuda_device_mesh::copy_from_device" << std::endl;
+    //k3d::log() << debug << "cuda_device_mesh::copy_from_device" << std::endl;
     k3d::uint32_t total_number_of_points = m_number_of_points + m_number_of_additional_points;
     
     k3d::mesh* p_output_mesh = &destination_mesh;
@@ -491,7 +491,7 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh )
     p_output_mesh->vertex_data = m_p_host_mesh->vertex_data;
     
     synchronize_threads();
-    k3d::log() << debug << "cuda_device_mesh::copy_from_device::end" << std::endl;
+    //k3d::log() << debug << "cuda_device_mesh::copy_from_device::end" << std::endl;
 }
 
 /**

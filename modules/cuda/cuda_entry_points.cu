@@ -440,8 +440,6 @@ extern "C" void subdivide_edges_split_point_calculator ( unsigned int* edge_indi
     dim3 threads_per_block(threads_x, num_split_points);
     dim3 blocks_per_grid( iDivUp(num_points, threads_x), 1);
     
-    printf("CUDA DEBUG: Calling split kernel\n");
-    
     subdivide_edges_split_point_kernel<<< blocks_per_grid, threads_per_block >>> ( edge_indices, 
                                                                                    num_edge_indices, 
                                                                                    (float4*)points_and_selection, 
@@ -452,11 +450,12 @@ extern "C" void subdivide_edges_split_point_calculator ( unsigned int* edge_indi
                                                                                    num_split_points );  
     
     // check if the kernel executed correctly
-    //CUT_CHECK_ERROR("Kernel execution failed");
+    CUT_CHECK_ERROR("Kernel execution failed");
     
+    /*
     cudaError_t last_error = cudaGetLastError();
-    
     printf("CUDA ERROR: %s\n", cudaGetErrorString(last_error));
+    */
     
     cudaThreadSynchronize();
 }
