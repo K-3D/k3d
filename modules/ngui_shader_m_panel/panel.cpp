@@ -114,8 +114,6 @@ namespace module{
 	const k3d::string_t otherStuffStr 	= "Other Stuff";	
        
 	const k3d::string_t holderImgFile = "renderingShader.png";
-	const k3d::string_t s_materialImgFile = "singlePreviewRender.png";
-	const k3d::string_t multi_s_materialImgFile = "multiPreviewRender";
 
 	//forward declaration for list of materials
 	class s_group;
@@ -217,7 +215,7 @@ namespace module{
 	  k3d::metadata_property<k3d_data(k3d::string_t, no_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization)> so_artistnotes;
 	  k3d::inode       *node;
 	  s_group          *parent;
-
+	  
 	};//s_object
 
 	//************
@@ -397,6 +395,7 @@ namespace module{
 	{
 	  //Remove Preview Render from tmp dir
 	   k3d::filesystem::remove(imgFilePath);
+	   k3d::log() << "REMOVING IMAGE FROM FILESYSTEM" << std::endl;
         }
 
         bool materialPreviewImage::on_expose_event(GdkEventExpose* event)
@@ -432,10 +431,28 @@ namespace module{
 	  content_pane(Gtk::HPaned *_m_Hpane, k3d::icommand_node *_m_parent, document_state *_documentState)
 	    :m_Hpane(_m_Hpane), m_parent(_m_parent), preview_primitive("Preview Primitive"), 
 	     m_document_state(_documentState),
-	     previewSize(200)	  
+	     previewSize(200), s_materialImgFile("singlePreviewRender"),
+	     multi_s_materialImgFile("multiPreviewRender")
+	     
 	  {
+	    //Get Instance Number From This Value & Mark Render Images Accordingly
+	    std::stringstream stream_for_id;
+	    stream_for_id << this;
+	    k3d::string_t instance_id = stream_for_id.str();
+
+	    //Edit Render File Names To Represent Unique Files
+	    multi_s_materialImgFile.append(instance_id);
+	    s_materialImgFile.append(instance_id);
+	    s_materialImgFile += k3d::string_t(".png");
+
+
+	    k3d::log() << "single: " << s_materialImgFile << std::endl;
+	    k3d::log() << "multi: " << multi_s_materialImgFile << std::endl;
+
+
 	    //Setup The Rendering Components (Using Meta Data Eventually)
 	    createPreviewNodes(); 
+
 	  }
 	  
 	  //Analyse Current Document For Preview Nodes And Create As Appropriate
@@ -666,6 +683,10 @@ namespace module{
 
 	  k3d::icommand_node *m_parent;
 	  document_state *m_document_state;
+   
+	  k3d::string_t s_materialImgFile;		//Unqiue Identifer Added + Extension
+	  k3d::string_t multi_s_materialImgFile; 	//Unqiue Identifer Added + Extension (in new str)
+	  
 
 	protected:
 	  //Render Preview Components
@@ -1194,10 +1215,6 @@ namespace module{
 	     add_group("Add"),
 	     remove_group("Remove")
 	  {
-	    //Get Instance Number From Random Integer
-	    //instance_number++;
-
-
 	    //Create The Material Tree Model
 	    tree_model = Gtk::TreeStore::create(m_columns);
 	    m_nav.set_model(tree_model);
@@ -1231,10 +1248,6 @@ namespace module{
 
 	    build_gui();
 	    schedule_update();
-
-	   
-	    //k3d::log() << "INSTANCE NUMBER : " << instance_number << std::endl;
-
 	  }
 
 	  ~implementation()
@@ -1279,10 +1292,6 @@ namespace module{
 	  Gtk::ToolButton remove_group;
 
 	public:
-
-	  //Instance Numbering For Rendered Images & Problem With Mutliple Panels
-	  k3d::string_t currentDateTime;
-	  //static int instance_number;
 
 	  // Signal that will be emitted whenever this control should grab the panel focus
 	  sigc::signal<void> m_panel_grab_signal;
@@ -1526,16 +1535,27 @@ namespace module{
 	      }//if
 	    }//for
 
-	 //   //Rebuild Currently Selected Pane (Only If Group)
-// 	   Gtk::TreeModel::iterator iter = tree_selection->get_selected();
-//  	   if(iter) //If anything is selected
-// 	     {
-//  	       Gtk::TreeModel::Row row = *iter;
-// // 	       if(row[m_columns.is_group]) //Build The Content Pane From Corrected Pointer
- 	 	  
+	   //Rebuild Currently Selected Pane (Only If Group)
 
-//  		build_content_pane(row, true);
-// 	     }//if
+// 	  //Ensure Pointers Are Valid
+// 	  if(finished_init)
+// 	    {
+// 	      on_tree_row_changed();
+
+
+// // 	      Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+// // 	      if(iter) //If anything is selected
+// // 		{
+// // 		  Gtk::TreeModel::Row row = *iter;
+// // 		  if(row[m_columns.is_group])
+// // 		    { 
+// // 		      //Build The Content Pane From Corrected Pointer
+// // 		      //m_rpane_content->buildPane();
+// // 		      on_tree_row_changed();
+// // 		    }//if
+// // 		}//if
+
+// 	    }//if
 
 	}//on_nodes_added
 
