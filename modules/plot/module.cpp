@@ -30,6 +30,7 @@ namespace plot
 {
 
 extern k3d::iplugin_factory& surface_plot_factory();
+extern k3d::iplugin_factory& least_squares_plot_factory();
 
 } // namespace plot
 
@@ -37,5 +38,6 @@ extern k3d::iplugin_factory& surface_plot_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::plot::surface_plot_factory());
+	Registry.register_factory(module::plot::least_squares_plot_factory());
 K3D_MODULE_END
 
