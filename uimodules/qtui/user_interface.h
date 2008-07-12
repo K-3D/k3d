@@ -79,7 +79,6 @@ private slots:
 	void on_render_engine_changed(k3d::gl::irender_viewport* const Engine);
 	
 private:
-	void createFont();
 	void initializeGL();
 	void paintGL();
 
