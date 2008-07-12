@@ -460,6 +460,48 @@ extern "C" void subdivide_edges_split_point_calculator ( unsigned int* edge_indi
     cudaThreadSynchronize();
 }
 
+extern "C" void subdivide_edges_update_indices_entry (unsigned int* host_input_edge_point_indices, 
+                                                      unsigned int* host_input_clockwise_edge_point_indices,
+                                                      unsigned int num_host_edges,
+                                                      unsigned int* pdev_output_edge_point_indices, 
+                                                      unsigned int* pdev_output_clockwise_edge_point_indices,
+                                                      unsigned int* host_edge_index_map,
+                                                      int num_edge_maps)
+{
+    // allocate the device memory for the input indices
+    unsigned int* pdev_input_edge_point_indices;
+    unsigned int* pdev_input_clockwise_edge_point_indices;
+    unsigned int* pdev_edge_index_map;
+    
+    int num_bytes = num_host_edges*sizeof(unsigned int);
+    allocate_device_memory ((void**)&pdev_input_edge_point_indices, num_bytes);
+    allocate_device_memory ((void**)&pdev_input_clockwise_edge_point_indices, num_bytes);
+    allocate_device_memory ((void**)&pdev_edge_index_map, num_edge_maps*sizeof(unsigned int));
+     
+    copy_from_host_to_device((void*)pdev_input_edge_point_indices, (const void*)host_input_edge_point_indices, num_bytes);
+    copy_from_host_to_device((void*)pdev_input_clockwise_edge_point_indices, (const void*)host_input_edge_point_indices, num_bytes);
+    copy_from_host_to_device((void*)pdev_edge_index_map, (const void*)host_edge_index_map, num_edge_maps*sizeof(unsigned int));
+    
+    int threads_x = 512;
+    dim3 threads_per_block(threads_x, 1);
+    dim3 blocks_per_grid( iDivUp(num_edge_maps, threads_x), 1);
+    
+    subdivide_edges_update_edge_indices_kernel<<< blocks_per_grid, threads_per_block >>>
+                                              ( pdev_output_edge_point_indices, 
+                                                pdev_output_clockwise_edge_point_indices, 
+                                                pdev_input_edge_point_indices, 
+                                                pdev_input_clockwise_edge_point_indices,
+                                                pdev_edge_index_map,
+                                                num_edge_maps );
+                                                
+    CUT_CHECK_ERROR("Kernel execution failed");
+    cudaThreadSynchronize();                        
+    
+    free_device_memory ( pdev_input_edge_point_indices );
+    free_device_memory ( pdev_input_clockwise_edge_point_indices );
+    free_device_memory ( pdev_edge_index_map );
+}
+
 extern "C" void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, size_t device_pitch, size_t host_pitch, size_t width_in_bytes, size_t rows )
 {
     CUDA_SAFE_CALL ( cudaMemcpy2D(device_pointer, device_pitch, host_pointer, host_pitch, width_in_bytes, rows, cudaMemcpyHostToDevice) );

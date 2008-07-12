@@ -535,5 +535,24 @@ __global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices,
       
 }
 
+__global__ void subdivide_edges_update_edge_indices_kernel ( unsigned int* output_edge_point_indices, 
+                                                        unsigned int* output_clockwise_edge_point_indices, 
+                                                        unsigned int* input_edge_point_indices, 
+                                                        unsigned int* input_clockwise_edge_point_indices,
+                                                        unsigned int* edge_index_map,
+                                                        int num_edge_maps)
+{
+    unsigned int edge_index_index = (blockIdx.x * blockDim.x) + threadIdx.x;
+    
+    if ( edge_index_index < num_edge_maps )
+    {
+        unsigned int out_edge_index = edge_index_map[edge_index_index];
+        
+        output_edge_point_indices[out_edge_index] = input_edge_point_indices[edge_index_index];
+        output_clockwise_edge_point_indices[out_edge_index] = edge_index_map[input_clockwise_edge_point_indices[edge_index_index]];
+    }
+}
+
+
 #endif // #ifndef _CUDA_KERNELS_H_
 

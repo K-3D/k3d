@@ -81,14 +81,26 @@ extern "C" K3D_CUDA_DECLSPEC void free_CUDA_array ( void* cudaArrayPointer );
 extern "C" K3D_CUDA_DECLSPEC void transform_points_synchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 extern "C" K3D_CUDA_DECLSPEC void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 
-extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_split_point_calculator ( unsigned int* edge_indices, 
-                                                         unsigned int num_edge_indices, 
-                                                         float* points_and_selection,
-                                                         unsigned int num_points,  
-                                                         unsigned int* edge_point_indices,
-                                                         unsigned int* clockwise_edge_indices,
-                                                         float* new_points_and_selection,
-                                                         int num_split_points );
+extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_split_point_calculator ( 
+                                                        unsigned int* edge_indices, 
+                                                        unsigned int num_edge_indices, 
+                                                        float* points_and_selection,
+                                                        unsigned int num_points,  
+                                                        unsigned int* edge_point_indices,
+                                                        unsigned int* clockwise_edge_indices,
+                                                        float* new_points_and_selection,
+                                                        int num_split_points 
+                                                            );
+
+extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_update_indices_entry (
+                                                        unsigned int* host_input_edge_point_indices, 
+                                                        unsigned int* host_input_clockwise_edge_point_indices,
+                                                        unsigned int num_host_edges,
+                                                        unsigned int* pdev_output_edge_point_indices, 
+                                                        unsigned int* pdev_output_clockwise_edge_point_indices,
+                                                        unsigned int* host_edge_index_map,
+                                                        int num_edge_maps
+                                                            );
 
 extern "C" K3D_CUDA_DECLSPEC void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, size_t device_pitch, size_t host_pitch, size_t width_in_bytes, size_t rows );
 

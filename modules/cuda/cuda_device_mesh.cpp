@@ -526,3 +526,13 @@ float* cuda_device_mesh::get_additional_points_and_selection_pointer()
 {
     return pdev_additional_points;   
 }
+
+k3d::uint32_t* cuda_device_mesh::get_polyhedra_edge_point_indices_pointer()
+{
+    return m_cuda_device_polyhedra.get_per_edge_points_pointer();    
+}
+
+k3d::uint32_t* cuda_device_mesh::get_polyhedra_clockwise_edge_point_indices_pointer()
+{
+    return m_cuda_device_polyhedra.get_per_edge_clockwise_edges_pointer();
+}
