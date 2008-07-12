@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_idocument_wrapper();
+void define_class_idocument();
 
 } // namespace python
 

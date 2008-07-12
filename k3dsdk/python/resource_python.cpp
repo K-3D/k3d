@@ -46,7 +46,7 @@ public:
 };
 
 
-void define_resource_namespace()
+void define_namespace_resource()
 {
 	class_<resource>("resource", no_init)
 		.def("keys", resource::keys,

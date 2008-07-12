@@ -52,7 +52,7 @@ static void clear_mesh(imesh_storage_wrapper& Self)
 	Self.wrapped().reset_mesh(0);
 }
 
-void define_imesh_storage_wrapper()
+void define_class_imesh_storage()
 {
 	class_<imesh_storage_wrapper>("imesh_storage",
 		"Abstract interface implemented by nodes that can provide persistent storage of L{mesh} objects.", no_init)

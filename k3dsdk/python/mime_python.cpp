@@ -56,7 +56,7 @@ public:
 	};
 };
 
-void define_mime_namespace()
+void define_namespace_mime()
 {
 	scope outer = class_<mime>("mime", no_init);
 

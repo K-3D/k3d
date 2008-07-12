@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_isnappable_wrapper();
+void define_class_isnappable();
 
 } // namespace python
 

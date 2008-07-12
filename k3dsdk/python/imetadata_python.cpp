@@ -58,7 +58,7 @@ static void erase_metadata(imetadata_wrapper& Self, const string_t& Name)
 	Self.wrapped().erase_metadata(Name);
 }
 
-void define_imetadata_wrapper()
+void define_class_imetadata()
 {
 	class_<imetadata_wrapper>("imetadata", 
 		"Abstract interface for objects that can store user-defined metadata.",

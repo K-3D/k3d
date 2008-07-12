@@ -86,7 +86,7 @@ static void synchronize(iuser_interface_wrapper& Self)
 	Self.wrapped().synchronize();
 }
 
-void define_iuser_interface_wrapper()
+void define_class_iuser_interface()
 {
 	class_<iuser_interface_wrapper>("iuser_interface", 
 		"Provides access to the user interface plugin specified by the user at program startup.", no_init)

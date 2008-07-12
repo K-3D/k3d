@@ -56,7 +56,7 @@ void point3_setitem(k3d::point3& lhs, int item, double value)
 	lhs[item] = value;
 }
 
-void export_point3()
+void define_class_point3()
 {
 	class_<k3d::point3>("point3",
 		"Stores a position in three-dimensional space", no_init)

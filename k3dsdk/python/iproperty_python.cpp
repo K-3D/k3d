@@ -155,7 +155,7 @@ const string_t units(iproperty_wrapper& Self)
 	return "";
 }
 
-void define_iproperty_wrapper()
+void define_class_iproperty()
 {
 	class_<iproperty_wrapper>("iproperty",
 		"Encapsulates a K-3D property. In K-3D, a document contains nodes, and nodes contain properties, "

@@ -104,7 +104,7 @@ static boost::python::dict metadata(iplugin_factory_wrapper& Self)
 	return result;
 }
 
-void define_iplugin_factory_wrapper()
+void define_class_iplugin_factory()
 {
 	class_<iplugin_factory_wrapper>("iplugin_factory",
 		"Encapsulates a K-3D plugin factory, which stores metadata describing a plugin type.")

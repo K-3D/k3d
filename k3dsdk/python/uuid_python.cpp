@@ -76,7 +76,7 @@ void uuid_setitem(k3d::uuid& LHS, const int Item, unsigned long Value)
 	throw std::out_of_range("index out of range");
 }
 
-void export_uuid()
+void define_class_uuid()
 {
 	class_<k3d::uuid>("uuid",
 		"Stores a 128-bit universally unique identifier.")

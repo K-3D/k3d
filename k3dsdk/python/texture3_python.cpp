@@ -56,7 +56,7 @@ void texture3_setitem(k3d::texture3& lhs, int item, double value)
 	lhs[item] = value;
 }
 
-void export_texture3()
+void define_class_texture3()
 {
 	class_<k3d::texture3>("texture3",
 		"Stores a set of three-dimensional texture coordinates", no_init)

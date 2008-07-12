@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_iuser_interface_wrapper();
+void define_class_iuser_interface();
 
 } // namespace python
 

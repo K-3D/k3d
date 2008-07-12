@@ -52,7 +52,7 @@ static boost::uint64_t hash(inode_wrapper& Self)
 	return reinterpret_cast<boost::uint64_t>(Self.wrapped_ptr());
 }
 
-void define_inode_wrapper()
+void define_class_inode()
 {
 	class_<inode_wrapper>("inode",
 		"Abstract interface implemented by all document nodes.\n\n"

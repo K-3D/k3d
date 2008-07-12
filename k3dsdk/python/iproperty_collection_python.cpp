@@ -130,7 +130,7 @@ static void setattr(iproperty_collection_wrapper& Self, const string_t& Name, co
 	throw std::invalid_argument("unknown property: " + Name);
 }
 
-void define_iproperty_collection_wrapper()
+void define_class_iproperty_collection()
 {
 	class_<iproperty_collection_wrapper>("iproperty_collection",
 		"Abstract interface for a collection of L{iproperty} objects.", no_init)

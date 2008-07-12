@@ -54,7 +54,7 @@ void vector3_setitem(k3d::vector3& lhs, int item, double value)
 	lhs[item] = value;
 }
 
-void export_vector3()
+void define_class_vector3()
 {
 	class_<k3d::vector3>("vector3",
 		"Stores a direction vector in three-dimensional space", no_init)

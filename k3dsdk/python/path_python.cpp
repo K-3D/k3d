@@ -62,7 +62,7 @@ const k3d::string_t path_string(const k3d::filesystem::path& Path)
 	return Path.native_filesystem_string();
 }
 
-void export_path()
+void define_class_path()
 {
 	class_<k3d::filesystem::path>("path",
 		"Stores a filesystem path")

@@ -50,7 +50,7 @@ static void add_snap_target(isnappable_wrapper& Self, const string_t& Label, con
 	Self.wrapped().add_snap_target(new k3d::explicit_snap_target(Label, Position));
 }
 
-void define_isnappable_wrapper()
+void define_class_isnappable()
 {
 	class_<isnappable_wrapper>("isnappable",
 		"Abstract interface implemented by nodes that can be interactive \"snapped\" to one another.", no_init)

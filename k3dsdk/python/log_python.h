@@ -1,8 +1,8 @@
-#ifndef K3DSDK_MESH_SELECTION_PYTHON_H
-#define K3DSDK_MESH_SELECTION_PYTHON_H
+#ifndef LOG_PYTHON_H
+#define LOG_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -30,10 +30,11 @@ namespace k3d
 namespace python
 {
 
-void define_class_mesh_selection();
+void define_namespace_log();
 
 } // namespace python
 
 } // namespace k3d
 
-#endif // !K3DSDK_MESH_SELECTION_PYTHON_H
+#endif // LOG_PYTHON_H
+

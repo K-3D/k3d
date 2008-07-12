@@ -81,7 +81,7 @@ list matrix4_column_major_list(const k3d::matrix4& lhs)
 	return results;
 }
 
-void export_matrix4()
+void define_class_matrix4()
 {
 	class_<k3d::matrix4>("matrix4",
 		"Stores a 4x4 transformation matrix.")

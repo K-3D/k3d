@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_iplugin_factory_wrapper();
+void define_class_iplugin_factory();
 
 } // namespace python
 

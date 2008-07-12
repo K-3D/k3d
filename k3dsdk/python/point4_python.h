@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void export_point4();
+void define_class_point4();
 
 } // namespace python
 

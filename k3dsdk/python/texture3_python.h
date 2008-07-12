@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void export_texture3();
+void define_class_texture3();
 
 } // namespace python
 

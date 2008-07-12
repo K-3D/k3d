@@ -83,7 +83,7 @@ static void execute_command(icommand_node_wrapper& Self, const string_t& Command
 	throw std::runtime_error("Unknown command result");
 }
 
-void define_icommand_node_wrapper()
+void define_class_icommand_node()
 {
 	class_<icommand_node_wrapper>("icommand_node",
 		"Abstract interface implemented by object that can execute arbitrary commands.\n\n"

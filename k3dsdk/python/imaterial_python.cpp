@@ -37,7 +37,7 @@ namespace python
 
 typedef interface_wrapper<k3d::imaterial> imaterial_wrapper;
 
-void define_imaterial_wrapper()
+void define_class_imaterial()
 {
 	class_<imaterial_wrapper>("imaterial",
 		"Abstract interface implemented by objects that can act as surface materials within a shading model.\n\n"

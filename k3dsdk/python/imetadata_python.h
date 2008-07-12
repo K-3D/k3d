@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_imetadata_wrapper();
+void define_class_imetadata();
 
 } // namespace python
 

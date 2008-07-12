@@ -36,7 +36,7 @@ namespace k3d
 namespace python
 {
 
-void export_bounding_box3()
+void define_class_bounding_box3()
 {
 	class_<k3d::bounding_box3>("bounding_box3",
 		"Stores a three-dimensional bounding box.")

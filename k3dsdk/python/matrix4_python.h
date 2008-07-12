@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void export_matrix4();
+void define_class_matrix4();
 
 } // namespace python
 

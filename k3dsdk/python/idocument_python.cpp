@@ -171,7 +171,7 @@ static void set_dependency(idocument_wrapper& Self, interface_wrapper<k3d::iprop
 	Self.wrapped().pipeline().set_dependencies(dependencies);
 }
 
-void define_idocument_wrapper()
+void define_class_idocument()
 {
 	class_<idocument_wrapper>("idocument")
 		.def("save", &save)

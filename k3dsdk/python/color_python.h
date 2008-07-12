@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void export_color();
+void define_class_color();
 
 } // namespace python
 

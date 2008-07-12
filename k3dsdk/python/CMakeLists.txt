@@ -22,6 +22,8 @@ ADD_LIBRARY(k3dsdk-python-types SHARED
 	color_python.h
 	euler_angles_python.cpp
 	euler_angles_python.h
+	log_python.cpp
+	log_python.h
 	matrix4_python.cpp
 	matrix4_python.h
 	mime_python.cpp

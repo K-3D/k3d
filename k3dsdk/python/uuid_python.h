@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void export_uuid();
+void define_class_uuid();
 
 } // namespace python
 

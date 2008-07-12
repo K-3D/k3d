@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_iproperty_collection_wrapper();
+void define_class_iproperty_collection();
 
 } // namespace python
 

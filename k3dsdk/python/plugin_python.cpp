@@ -90,7 +90,7 @@ public:
 	};
 };
 
-void define_plugin_namespace()
+void define_namespace_plugin()
 {
 	scope outer = class_<plugin>("plugin", no_init)
 		.def("create", plugin::create_by_name,

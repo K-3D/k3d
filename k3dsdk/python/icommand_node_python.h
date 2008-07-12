@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_icommand_node_wrapper();
+void define_class_icommand_node();
 
 } // namespace python
 

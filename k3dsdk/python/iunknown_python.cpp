@@ -37,7 +37,7 @@ namespace python
 
 typedef interface_wrapper<k3d::iunknown> iunknown_wrapper;
 
-void define_iunknown_wrapper()
+void define_class_iunknown()
 {
 	class_<iunknown_wrapper>("iunknown", 
 		"Abstract interface that represents an object with unknown capabilities.\n\n"

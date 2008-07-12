@@ -142,7 +142,7 @@ void mesh_selection_set_nurbs_patches(k3d::mesh_selection& lhs, const list& rhs)
 	lhs.nurbs_patches = mesh_selection_records(rhs);
 }
 
-void export_mesh_selection()
+void define_class_mesh_selection()
 {
 	class_<k3d::mesh_selection>("mesh_selection",
 		"Stores a change in mesh selection state.\n\n"

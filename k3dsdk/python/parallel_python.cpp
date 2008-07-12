@@ -36,7 +36,7 @@ public:
 };
 
 
-void define_parallel_namespace()
+void define_namespace_parallel()
 {
 	class_<parallel>("parallel", no_init)
 		.def("grain_size", k3d::parallel::grain_size,

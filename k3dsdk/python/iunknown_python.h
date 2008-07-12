@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_iunknown_wrapper();
+void define_class_iunknown();
 
 } // namespace python
 

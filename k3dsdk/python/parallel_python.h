@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_parallel_namespace();
+void define_namespace_parallel();
 
 } // namespace python
 

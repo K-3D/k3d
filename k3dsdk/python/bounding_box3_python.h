@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void export_bounding_box3();
+void define_class_bounding_box3();
 
 } // namespace python
 

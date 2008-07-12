@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_imaterial_wrapper();
+void define_class_imaterial();
 
 } // namespace python
 

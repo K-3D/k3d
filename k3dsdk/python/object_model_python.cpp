@@ -44,6 +44,7 @@
 #include "isnappable_python.h"
 #include "iunknown_python.h"
 #include "iuser_interface_python.h"
+#include "log_python.h"
 #include "matrix4_python.h"
 #include "mesh_python.h"
 #include "mesh_selection_python.h"
@@ -242,26 +243,31 @@ const double module_length(const object& Value)
 
 void module_log_critical(const string_t& Message)
 {
+	k3d::log() << warning << "k3d.log_critical() is deprecated, use k3d.log.critical() instead." << std::endl;
 	k3d::log() << critical << Message << std::endl;
 }
 
 void module_log_debug(const string_t& Message)
 {
+	k3d::log() << warning << "k3d.log_debug() is deprecated, use k3d.log.debug() instead." << std::endl;
 	k3d::log() << debug << Message << std::endl;
 }
 
 void module_log_error(const string_t& Message)
 {
+	k3d::log() << warning << "k3d.log_error() is deprecated, use k3d.log.error() instead." << std::endl;
 	k3d::log() << error << Message << std::endl;
 }
 
 void module_log_info(const string_t& Message)
 {
+	k3d::log() << warning << "k3d.log_info() is deprecated, use k3d.log.info() instead." << std::endl;
 	k3d::log() << info << Message << std::endl;
 }
 
 void module_log_warning(const string_t& Message)
 {
+	k3d::log() << warning << "k3d.log_warning() is deprecated, use k3d.log.warning() instead." << std::endl;
 	k3d::log() << warning << Message << std::endl;
 }
 
@@ -392,38 +398,39 @@ BOOST_PYTHON_MODULE(k3d)
 
 	angle_axis::define_class();
 	const_named_arrays::define_class();
-	define_icommand_node_wrapper();
-	define_idocument_wrapper();
-	define_imaterial_wrapper();
-	define_imesh_storage_wrapper();
-	define_imetadata_wrapper();
-	define_inode_wrapper();
-	define_iplugin_factory_wrapper();
-	define_iproperty_collection_wrapper();
-	define_iproperty_wrapper();
-	define_isnappable_wrapper();
-	define_iunknown_wrapper();
-	define_iuser_interface_wrapper();
-	define_mime_namespace();
-	define_parallel_namespace();
-	define_plugin_namespace();
-	define_resource_namespace();
+	define_class_bounding_box3();
+	define_class_color();
+	define_class_icommand_node();
+	define_class_idocument();
+	define_class_imaterial();
+	define_class_imesh_storage();
+	define_class_imetadata();
+	define_class_inode();
+	define_class_iplugin_factory();
+	define_class_iproperty();
+	define_class_iproperty_collection();
+	define_class_isnappable();
+	define_class_iunknown();
+	define_class_iuser_interface();
+	define_class_matrix4();
+	define_class_mesh_selection();
+	define_class_normal3();
+	define_class_path();
+	define_class_point2();
+	define_class_point3();
+	define_class_point4();
+	define_class_texture3();
+	define_class_uuid();
+	define_class_vector3();
+	define_namespace_log();
+	define_namespace_mime();
+	define_namespace_parallel();
+	define_namespace_plugin();
+	define_namespace_resource();
 	euler_angles::define_class();
 	export_arrays();
 	export_bitmap();
-	export_bounding_box3();
-	export_color();
 	export_const_arrays();
-	export_matrix4();
-	export_mesh_selection();
-	export_normal3();
-	export_path();
-	export_point2();
-	export_point3();
-	export_point4();
-	export_texture3();
-	export_uuid();
-	export_vector3();
 	mesh::define_class();
 	named_arrays::define_class();
 	node::define_class();

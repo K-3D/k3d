@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_mime_namespace();
+void define_namespace_mime();
 
 } // namespace python
 

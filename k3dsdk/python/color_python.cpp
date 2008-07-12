@@ -33,7 +33,7 @@ namespace k3d
 namespace python
 {
 
-void export_color()
+void define_class_color()
 {
 	class_<k3d::color>("color",
 		"Stores a color using half-precision floating-point RGB values.\n\n"

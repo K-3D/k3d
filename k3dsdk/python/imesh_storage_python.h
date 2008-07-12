@@ -30,7 +30,7 @@ namespace k3d
 namespace python
 {
 
-void define_imesh_storage_wrapper();
+void define_class_imesh_storage();
 
 } // namespace python
 
