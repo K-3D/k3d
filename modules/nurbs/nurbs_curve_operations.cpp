@@ -204,7 +204,7 @@ namespace module
 
             std::vector<size_t> to_delete;
 
-            for (size_t group = group_begin; group != group_end; ++group)
+            for (size_t group = group_begin; group < group_end; ++group)
             {
                 if (curve_counts[group] == 0)
                     to_delete.push_back(group);
@@ -256,9 +256,12 @@ namespace module
             }
 
             int curr_group = get_curve_group(groups,curve);
-            MY_DEBUG << "Decreasing curve count of group " << curr_group << std::endl;
+
             if (curr_group >= 0)
+            {
                 curve_counts[curr_group]--;
+                MY_DEBUG << "Decreasing curve count of group " << curr_group <<  " to " << curve_counts[curr_group] << std::endl;
+            }
 
             const size_t group_begin = 0;
             const size_t group_end = group_begin + (*groups.first_curves).size();
@@ -266,7 +269,10 @@ namespace module
             for (size_t group = group_begin; group < group_end; group++)
             {
                 if (first_curves[group] > first_curves[curr_group])
+                {
                     first_curves[group]--;
+                    MY_DEBUG << "Decreasing first_curves of group " << group <<  " to " << first_curves[group] << std::endl;
+                }
             }
 
             //remove points, weights, knots, point_count and order
@@ -304,8 +310,6 @@ namespace module
             if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing selection" << std::endl;
             k3d::mesh::selection_t::iterator selection_pos = curve_selection.begin() + curve;
             curve_selection.erase(selection_pos);
-
-
 
             remove_empty_groups(groups);
         }
@@ -1228,7 +1232,7 @@ namespace module
                         for (int j = Max(0, i-t); j <= mpi; j++)
                         {
                             ebpts.at(i) += bezalfs.at(i).at(j) * bpts.at(j);
-                            MY_DEBUG << "ebpts[" << j << "] = " << output_point(ebpts.at(j)) << " = " << bezalfs.at(i).at(j) << " * " << output_point(bpts.at(j)) << std::endl;
+                            MY_DEBUG << "ebpts[" << i << "] = " << output_point(ebpts.at(i)) << " = " << bezalfs.at(i).at(j) << " * " << output_point(bpts.at(j)) << std::endl;
                         }
                     }
                     MY_DEBUG << "ebpts calculation done" << std::endl;
@@ -1337,20 +1341,43 @@ namespace module
                 k3d::mesh::weights_t new_weights = create_curve_point_weights(input,new_points);
                 k3d::mesh::indices_t new_curve_points = create_curve_points(input,new_points);
 
-                k3d::gprim_factory gprim_fac(input);
-                gprim_fac.add_nurbs_curve(order + t, new_curve_points, new_knots, new_weights);
+                k3d::mesh::indices_t::iterator curve_points_begin_iter = curve_points.begin() + curve_points_begin;
+                k3d::mesh::indices_t::iterator curve_points_end_iter = curve_points.begin() + curve_points_end;
 
-                int new_curve = count_all_curves_in_groups(groups) - 2; //index would be all -1 but as we delete another curve before that its -2
+                curve_points.erase(curve_points_begin_iter, curve_points_end_iter);
+                curve_points.insert(curve_points_begin_iter, new_curve_points.begin(), new_curve_points.end());
 
-                delete_curve(groups, curve);
+                k3d::mesh::knots_t::iterator curve_knots_begin_iter = curve_knots.begin() + curve_knots_begin;
+                k3d::mesh::knots_t::iterator curve_knots_end_iter = curve_knots.begin() + curve_knots_end;
 
-                MY_DEBUG << "DegreeElevation ended, added curve!" << new_curve << std::endl;
-                return new_curve;
+                curve_knots.erase(curve_knots_begin_iter, curve_knots_end_iter);
+                curve_knots.insert(curve_knots_begin_iter, new_knots.begin(), new_knots.end());
+
+                k3d::mesh::weights_t::iterator curve_point_weights_begin_iter = curve_point_weights.begin() + curve_points_begin;
+                k3d::mesh::weights_t::iterator curve_point_weights_end_iter = curve_point_weights.begin() + curve_points_end;
+
+                curve_point_weights.erase(curve_point_weights_begin_iter, curve_point_weights_end_iter);
+                curve_point_weights.insert(curve_point_weights_begin_iter, new_weights.begin(), new_weights.end());
+
+                int point_offset = new_points.size() - (curve_points_end - curve_points_begin);
+                int knot_offset = new_knots.size() - (curve_knots_end - curve_knots_begin);
+
+                for ( size_t curr_curve = 0; curr_curve < count_all_curves_in_groups(groups); curr_curve++)
+                {
+                    if (curve_first_points[curr_curve] > curve_first_points[curve])
+                        curve_first_points[curr_curve] += point_offset;
+                    if (curve_first_knots[curr_curve] > curve_first_knots[curve])
+                        curve_first_knots[curr_curve] += knot_offset;
+                }
+
+                curve_point_counts[curve] += point_offset;
+                curve_orders[curve]++;
+
+                MY_DEBUG << "DegreeElevation ended, added curve!" << std::endl;
             }
             catch (...)
             {
                 k3d::log() << error << nurbs_debug << "Tried to access nonexisting values" << std::endl;
-                return -1;
             }
         }
 

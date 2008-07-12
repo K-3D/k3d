@@ -512,7 +512,7 @@ void gprim_factory::add_nurbs_curve(const uint_t Order, const mesh::indices_t& P
 		m_implementation->materials->push_back(static_cast<imaterial*>(0));
 	}
 	mesh::counts_t& curve_counts = *m_implementation->curve_counts;
-	++curve_counts[curve_counts.size() - 1];
+	++curve_counts[0];
 	m_implementation->curve_first_points->push_back(m_implementation->curve_points->size());
 	m_implementation->curve_point_counts->push_back(Points.size());
 	m_implementation->curve_orders->push_back(Order);
