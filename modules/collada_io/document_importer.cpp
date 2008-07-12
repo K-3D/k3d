@@ -180,6 +180,15 @@ public:
 				collada_objs.push_back(collada_obj(Document,*lights[i]));
 		}
 
+		//Add all images to pipeline
+		domLibrary_images_Array library_images = root->getLibrary_images_array();
+		for(int j=0; j<library_images.getCount(); j++)
+		{
+			domImage_Array images = library_images[j]->getImage_array();
+			for(int i=0; i<images.getCount(); i++)
+				collada_objs.push_back(collada_obj(Document,*images[i]));
+		}
+
 		domLibrary_visual_scenes_Array library_visual_scenes = root->getLibrary_visual_scenes_array();
 		for(int j=0; j<library_visual_scenes.getCount(); j++)
 		{

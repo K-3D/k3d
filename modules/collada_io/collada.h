@@ -28,6 +28,7 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/properties.h>
+#include <k3dsdk/ustring.h>
 #include <dom/domGeometry.h>
 #include "intElements.h"
 
@@ -149,8 +150,41 @@ namespace io
 			}
 
 			//k3d::property::set_internal_value(*light_shader, "shader_path", shader_path);
+		}
 
+		collada_obj(k3d::idocument &Document, domImage &img)
+		{
+			id = img.getAttribute("id");
+			name = "COLLADA " + k3d::unique_name(Document.nodes(), img.getAttribute("name"));
+			type = "image";
 
+			domImage::domInit_from *init_from = img.getInit_from();
+
+			if(init_from != NULL)
+			{
+				std::string factory;
+				std::string img_path = init_from->getValue().str().substr(5);
+				std::string img_type = img_path.substr(img_path.length()-4);
+				//k3d::log() << debug << img_path << std::endl;
+				//k3d::log() << debug << img_type << std::endl;
+				if(img_type==".jpg")
+					factory = "JPEGBitmapReader";
+				else
+				if(img_type==".png")
+					factory = "PNGBitmapReader";
+				else
+				if(img_type==".tif"||img_type=="tiff")
+					factory = "TIFFBitmapReader";
+				else
+				{
+					k3d::log() << error << "Image type required by " << img.getAttribute("name") << " not supported by K-3D yet!" << std::endl;
+					return;
+				}
+
+				k3d::inode *image = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup(factory),Document,name);
+				k3d::property::set_internal_value(*image, "file", k3d::filesystem::generic_path(img_path));
+
+			}
 		}
 
 		std::string get_name(){return name;}
