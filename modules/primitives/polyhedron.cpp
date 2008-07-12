@@ -70,7 +70,7 @@ namespace kaleido
 * kaleido
 *
 *	Kaleidoscopic construction of uniform polyhedra
-*	Copyright © 1991-1997 Dr. Zvi Har'El <rl@math.technion.ac.il>
+*	Copyright ï¿½ 1991-1997 Dr. Zvi Har'El <rl@math.technion.ac.il>
 *
 *	This program is free software; you can redistribute it and/or modify
 *	it under the terms of the GNU General Public License as published by

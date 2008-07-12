@@ -40,6 +40,7 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/shared_pointer.h>
+#include <k3dsdk/gprim_factory.h>
 
 #define MODULE_NURBS_DEBUG 1
 #define nurbs_debug __FILE__ << ": " << __LINE__ << " "
@@ -66,7 +67,7 @@ namespace module{
 		k3d::point4 curve_point(k3d::mesh& input, size_t curve, double u);
 		void curve_knot_insertion(k3d::mesh& input, size_t curve, double u, size_t r);
 		void nurbs_close_curve(k3d::mesh& input, size_t curve, bool keep_ends);
-		void curve_degree_elevate(k3d::mesh& input, size_t curve, size_t t);
+		int curve_degree_elevate(k3d::mesh& input, size_t curve, size_t t);
 	}//namespace nurbs
 }//namespace module
 

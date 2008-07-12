@@ -32,7 +32,7 @@ namespace k3d
 namespace detail
 {
 
-// Knot multiplicity validation identical to knotvector.cc from the GLU toolkit. 
+// Knot multiplicity validation identical to knotvector.cc from the GLU toolkit.
 bool validate_knot_vector(const uint_t Order, const mesh::knots_t& Knots)
 {
 	double tol = 1e-5;
@@ -52,14 +52,14 @@ bool validate_knot_vector(const uint_t Order, const mesh::knots_t& Knots)
 		}
 		multi = 1;
 	}
-	
+
 	if (!valid)
 	{
 		log() << debug << "Invalid knot vector:" << std::endl;
 		for (uint_t knot = 0; knot != Knots.size(); ++knot)
 			log() << debug << "    " << Knots[knot] << std::endl;
 	}
-	
+
 	return valid;
 }
 
@@ -116,7 +116,7 @@ public:
 		nurbs_patch_point_weights(0),
 		nurbs_patch_u_knots(0),
 		nurbs_patch_v_knots(0),
-		
+
 		patch_trim_curve_loop_counts(0),
 		patch_first_trim_curve_loops(0),
 		trim_points(0),
@@ -132,7 +132,7 @@ public:
 		trim_curve_points(0),
 		trim_curve_point_weights(0),
 		trim_curve_knots(0),
-		
+
 		first_curves(0),
 		curve_counts(0),
 		materials(0),
@@ -144,7 +144,7 @@ public:
 		curve_points(0),
 		curve_point_weights(0),
 		curve_knots(0),
-		
+
 		trim_curve_closed(true)
 	{
 	}
@@ -189,7 +189,7 @@ public:
 	mesh::weights_t* nurbs_patch_point_weights;
 	mesh::knots_t* nurbs_patch_u_knots;
 	mesh::knots_t* nurbs_patch_v_knots;
-	
+
 	mesh::counts_t* patch_trim_curve_loop_counts;
 	mesh::indices_t* patch_first_trim_curve_loops;
 	mesh::points_2d_t* trim_points;
@@ -205,7 +205,7 @@ public:
 	mesh::indices_t* trim_curve_points;
 	mesh::weights_t* trim_curve_point_weights;
 	mesh::knots_t* trim_curve_knots;
-	
+
 	mesh::indices_t* first_curves;
 	mesh::counts_t* curve_counts;
 	mesh::materials_t* materials;
@@ -217,13 +217,13 @@ public:
 	mesh::indices_t* curve_points;
 	mesh::weights_t* curve_point_weights;
 	mesh::knots_t* curve_knots;
-	
+
 	// Applied normalization factors (needed for trim curve adjustment)
 	mesh::knots_t u_offsets;
 	mesh::knots_t u_factors;
 	mesh::knots_t v_offsets;
 	mesh::knots_t v_factors;
-	
+
 	bool trim_curve_closed; // Indicates if the last trim curve was closed
 };
 
@@ -313,7 +313,7 @@ void gprim_factory::add_hole(const mesh::indices_t& Points)
 {
 	return_if_fail(Points.size());
 	return_if_fail(m_implementation->first_faces);
-	
+
 	m_implementation->face_loop_counts->back()++;
 	m_implementation->loop_first_edges->push_back(m_implementation->edge_points->size());
 
@@ -348,25 +348,25 @@ bool gprim_factory::add_nurbs_patch(const size_t UOrder, const size_t VOrder, co
 		m_implementation->nurbs_patch_u_knots = make_unique(nurbs_patches->patch_u_knots);
 		m_implementation->nurbs_patch_v_knots = make_unique(nurbs_patches->patch_v_knots);
 	}
-	
+
 	m_implementation->u_offsets.push_back(0.0);
 	m_implementation->u_factors.push_back(0.0);
 	m_implementation->v_offsets.push_back(0.0);
 	m_implementation->v_factors.push_back(0.0);
-	
+
 	uint_t patch_number = m_implementation->nurbs_patch_first_points->size();
-		
+
 	mesh::knots_t uknots = UKnots;
 	mesh::knots_t vknots = VKnots;
 	detail::normalize_knot_vector(uknots, m_implementation->u_factors[patch_number], m_implementation->u_offsets[patch_number]);
 	detail::normalize_knot_vector(vknots, m_implementation->v_factors[patch_number], m_implementation->v_offsets[patch_number]);
-	
+
 	//return_val_if_fail(detail::validate_knot_vector(UOrder, uknots), false);
-	//return_val_if_fail(detail::validate_knot_vector(VOrder, vknots), false); 
-	
+	//return_val_if_fail(detail::validate_knot_vector(VOrder, vknots), false);
+
 	return_val_if_fail((uknots.size() - UOrder) * (vknots.size() - VOrder) == Points.size(), false);
 	return_val_if_fail(Points.size() == Weights.size(), false);
-	
+
 	m_implementation->nurbs_patch_first_points->push_back(m_implementation->nurbs_patch_points->size());
 	m_implementation->nurbs_patch_u_point_counts->push_back(uknots.size() - UOrder);
 	m_implementation->nurbs_patch_v_point_counts->push_back(vknots.size() - VOrder);
@@ -380,23 +380,23 @@ bool gprim_factory::add_nurbs_patch(const size_t UOrder, const size_t VOrder, co
 
 	for(size_t i = 0; i != Weights.size(); ++i)
 		m_implementation->nurbs_patch_point_weights->push_back(Weights[i]);
-	
+
 	m_implementation->nurbs_patch_u_knots->insert(m_implementation->nurbs_patch_u_knots->end(), uknots.begin(), uknots.end());
 	m_implementation->nurbs_patch_v_knots->insert(m_implementation->nurbs_patch_v_knots->end(), vknots.begin(), vknots.end());
-	
+
 	if (m_implementation->patch_trim_curve_loop_counts)
 	{
 		m_implementation->patch_trim_curve_loop_counts->push_back(0);
 		m_implementation->patch_first_trim_curve_loops->push_back(0);
 	}
-	
+
 	return true;
 }
 
 bool gprim_factory::add_trim_curve(const uint_t Order, const mesh::points_2d_t& Points, const mesh::knots_t& Knots, const mesh::weights_t& Weights)
 {
 	mesh::nurbs_patches_t* const nurbs_patches = make_unique(m_implementation->target_mesh.nurbs_patches);
-	
+
 	if (!m_implementation->patch_trim_curve_loop_counts)
 	{
 		m_implementation->patch_trim_curve_loop_counts = make_unique(nurbs_patches->patch_trim_curve_loop_counts);
@@ -417,20 +417,20 @@ bool gprim_factory::add_trim_curve(const uint_t Order, const mesh::points_2d_t& 
 		m_implementation->trim_curve_point_weights = make_unique(nurbs_patches->trim_curve_point_weights);
 		m_implementation->trim_curve_knots = make_unique(nurbs_patches->trim_curve_knots);
 	}
-		
+
 	return_val_if_fail(!m_implementation->nurbs_patch_first_points->empty(), false);
-		
+
 	const uint_t patch = m_implementation->nurbs_patch_first_points->size() - 1;
-	
+
 	return_val_if_fail(Points.size() == Knots.size() - Order, false);
 	return_val_if_fail(Points.size() == Weights.size(), false);
-	
+
 	double factor, offset;
 	mesh::knots_t knots = Knots;
 	detail::normalize_knot_vector(knots, factor, offset);
-	
+
 	//return_val_if_fail(detail::validate_knot_vector(Order, knots), false);
-	
+
 	mesh::counts_t& patch_trim_curve_loop_counts = *m_implementation->patch_trim_curve_loop_counts;
 	mesh::indices_t& patch_first_trim_curve_loops = *m_implementation->patch_first_trim_curve_loops;
 	mesh::counts_t& trim_curve_counts = *m_implementation->trim_curve_counts;
@@ -487,7 +487,7 @@ void gprim_factory::close_trim_loop()
 	uint_t first_point = m_implementation->trim_curve_points->at(m_implementation->trim_curve_first_points->at(first_curve));
 	m_implementation->trim_curve_points->pop_back();
 	m_implementation->trim_curve_points->push_back(first_point);
-	
+
 	m_implementation->trim_curve_closed = true;
 }
 
@@ -512,7 +512,7 @@ void gprim_factory::add_nurbs_curve(const uint_t Order, const mesh::indices_t& P
 		m_implementation->materials->push_back(static_cast<imaterial*>(0));
 	}
 	mesh::counts_t& curve_counts = *m_implementation->curve_counts;
-	++curve_counts[0];
+	++curve_counts[curve_counts.size() - 1];
 	m_implementation->curve_first_points->push_back(m_implementation->curve_points->size());
 	m_implementation->curve_point_counts->push_back(Points.size());
 	m_implementation->curve_orders->push_back(Order);
