@@ -80,9 +80,6 @@ public:
 	float gl_projection_matrix[16];
 	/// Stores the current OpenGL viewport
 	GLint gl_viewport[4];
-	/// Stores an OpenGL call list index for an ASCII font
-	/** \todo Figure out a better way to do this - what about unicode?  Different font styles? */
-	unsigned int gl_ascii_font_list_base;
 };
 
 } // namespace gl

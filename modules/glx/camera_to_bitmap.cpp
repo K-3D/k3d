@@ -98,12 +98,11 @@ public:
 
 			glViewport(0, 0, width, height);
 
-			unsigned long font_begin = 0;
 			GLdouble gl_view_matrix[16];
 			GLdouble gl_projection_matrix[16];
 			GLint gl_viewport[4];
 
-			render_engine->render_viewport(*camera, width, height, font_begin, gl_view_matrix, gl_projection_matrix, gl_viewport);
+			render_engine->render_viewport(*camera, width, height, gl_view_matrix, gl_projection_matrix, gl_viewport);
 			glFlush();
 
 			boost::gil::image<boost::gil::rgba8_pixel_t, false> buffer(width, height);

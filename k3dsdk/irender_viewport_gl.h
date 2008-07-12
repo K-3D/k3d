@@ -49,7 +49,7 @@ public:
 
 	/** \brief Redraws the document
 	    \note The caller must setup an OpenGL render context before calling this method, and must call glFlush() after it returns */
-	virtual void render_viewport(icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4]) = 0;
+	virtual void render_viewport(icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4]) = 0;
 
 	/**
 	  \brief Draws the document in OpenGL selection mode, so selection "hits" can be extracted
@@ -63,7 +63,7 @@ public:
 	  \param Viewport Returns the OpenGL viewport used for drawing
 	  \note The caller must setup the OpenGL render context, allocate the selection buffer, put OpenGL in selection mode, and call glFlush() when done
 	*/
-	virtual void render_viewport_selection(const selection_state& SelectionState, icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, const rectangle& Rectangle, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4]) = 0;
+	virtual void render_viewport_selection(const selection_state& SelectionState, icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const rectangle& Rectangle, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4]) = 0;
 
 	/// Enumerates redraw request types
 	typedef enum

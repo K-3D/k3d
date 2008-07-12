@@ -437,13 +437,13 @@ public:
 		return true;
 	}
 
-	void render_viewport(k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4])
+	void render_viewport(k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4])
 	{
 		k3d::timer timer;
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Render Viewport");
 		k3d::gl::render_state state(Camera);
 		k3d::rectangle unused(0, 0, 0, 0);
-		if(!draw_scene(Camera, PixelWidth, PixelHeight, FontListBase, ViewMatrix, ProjectionMatrix, Viewport, false, unused, state))
+		if(!draw_scene(Camera, PixelWidth, PixelHeight, ViewMatrix, ProjectionMatrix, Viewport, false, unused, state))
 			return;
 
 		// Setup fog ...
@@ -481,10 +481,10 @@ public:
 		m_frame_time.set_value(timer.elapsed());  
 	}
 
-	void render_viewport_selection(const k3d::gl::selection_state& SelectState, k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, const k3d::rectangle& Region, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4])
+	void render_viewport_selection(const k3d::gl::selection_state& SelectState, k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const k3d::rectangle& Region, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4])
 	{
 		k3d::gl::render_state state(Camera);
-		if(!draw_scene(Camera, PixelWidth, PixelHeight, FontListBase, ViewMatrix, ProjectionMatrix, Viewport, true, Region, state))
+		if(!draw_scene(Camera, PixelWidth, PixelHeight, ViewMatrix, ProjectionMatrix, Viewport, true, Region, state))
 			return;
 
 		// Clear background ...
@@ -501,7 +501,7 @@ public:
 	}
 
 private:
-	bool draw_scene(k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, const unsigned long FontListBase, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4], const bool Select, const k3d::rectangle& SelectionRegion, k3d::gl::render_state& RenderState)
+	bool draw_scene(k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4], const bool Select, const k3d::rectangle& SelectionRegion, k3d::gl::render_state& RenderState)
 	{
 		// If width or height are zero, we're done ...
 		if(!PixelWidth || !PixelHeight)
@@ -542,9 +542,6 @@ private:
 
 		if(!Select)
 			detail::gl_setup_textures();
-
-		// Cache render state to pass to clients ...
-		RenderState.gl_ascii_font_list_base = FontListBase;
 
 		// Setup viewport ...
 		glViewport(0, 0, PixelWidth, PixelHeight);

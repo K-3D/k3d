@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,8 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the Axes K-3D object, which provides a configurable set of axes to help in visualizing the 3D workspace
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -29,12 +28,18 @@
 #include <k3dsdk/ibounded.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/options.h>
 #include <k3dsdk/renderable_gl.h>
+#include <k3dsdk/share.h>
 #include <k3dsdk/snap_target.h>
 #include <k3dsdk/snappable.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/transformable.h>
 #include <k3dsdk/vectors.h>
+
+#include <FTGL/ftgl.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace libk3dcore
 {
@@ -42,6 +47,7 @@ namespace libk3dcore
 /////////////////////////////////////////////////////////////////////////////
 // axes
 
+/// Provides a configurable set of axes to assist users in visualizing the 3D workspace
 class axes :
 	public k3d::snappable<k3d::gl::renderable<k3d::transformable<k3d::node > > >,
 	public k3d::ibounded
@@ -60,7 +66,9 @@ public:
 		m_x_color(init_owner(*this) + init_name("xcolor") + init_label(_("X Color")) + init_description(_("X axis color")) + init_value(k3d::color(1, 0, 0))),
 		m_y_color(init_owner(*this) + init_name("ycolor") + init_label(_("Y Color")) + init_description(_("Y axis color")) + init_value(k3d::color(0, 0.7, 0))),
 		m_z_color(init_owner(*this) + init_name("zcolor") + init_label(_("Z Color")) + init_description(_("Z axis color")) + init_value(k3d::color(0, 0, 0.7))),
-		m_grid_color(init_owner(*this) + init_name("gridcolor") + init_label(_("Grid Color")) + init_description(_("Grid color")) + init_value(k3d::color(0.4, 0.4, 0.4)))
+		m_grid_color(init_owner(*this) + init_name("gridcolor") + init_label(_("Grid Color")) + init_description(_("Grid color")) + init_value(k3d::color(0.4, 0.4, 0.4))),
+		m_font_path(init_owner(*this) + init_name("font") + init_label(_("Font")) + init_description(_("Font path")) + init_value(k3d::share_path() / k3d::filesystem::generic_path("fonts/Vera.ttf")) + init_path_mode(k3d::ipath_property::READ) + init_path_type(k3d::options::path::fonts())),
+		m_font_size(init_owner(*this) + init_name("font_size") + init_label(_("Font Size")) + init_description(_("Font size.")) + init_value(12.0))
 	{
 		m_axes.changed_signal().connect(make_async_redraw_slot());
 		m_xy_plane.changed_signal().connect(make_async_redraw_slot());
@@ -74,7 +82,16 @@ public:
 		m_grid_color.changed_signal().connect(make_async_redraw_slot());
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 
+		m_font_path.changed_signal().connect(sigc::mem_fun(this, &axes::font_changed));
+		m_font_size.changed_signal().connect(sigc::mem_fun(this, &axes::font_changed));
+
 		add_snap_target(new k3d::snap_target(_("Grid"), sigc::mem_fun(*this, &axes::grid_target_position), sigc::mem_fun(*this, &axes::grid_target_orientation)));
+	}
+
+	void font_changed(k3d::ihint*)
+	{
+		m_font.reset();
+		async_redraw(0);
 	}
 
 	bool grid_target_position(const k3d::point3& Position, k3d::point3& TargetPosition)
@@ -153,21 +170,28 @@ public:
 
 			double labelposition = size * 1.1;
 
-			glListBase(State.gl_ascii_font_list_base);
+			if(!m_font)
+			{
+				m_font.reset(new FTPixmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
+				m_font->FaceSize(static_cast<unsigned int>(m_font_size.pipeline_value()));
+				m_font->UseDisplayList(true);
+				if(m_font->Error())
+					k3d::log() << error << "error initializing font" << std::endl;
+			}
 
 			glRasterPos3d(labelposition, 0, 0);
-			glCallLists(2, GL_UNSIGNED_BYTE, "+X");
+			m_font->Render("+X");
 			glRasterPos3d(0, labelposition, 0);
-			glCallLists(2, GL_UNSIGNED_BYTE, "+Y");
+			m_font->Render("+Y");
 			glRasterPos3d(0, 0, labelposition);
-			glCallLists(2, GL_UNSIGNED_BYTE, "+Z");
+			m_font->Render("+Z");
 
 			glRasterPos3d(-labelposition, 0, 0);
-			glCallLists(2, GL_UNSIGNED_BYTE, "-X");
+			m_font->Render("-X");
 			glRasterPos3d(0, -labelposition, 0);
-			glCallLists(2, GL_UNSIGNED_BYTE, "-Y");
+			m_font->Render("-Y");
 			glRasterPos3d(0, 0, -labelposition);
-			glCallLists(2, GL_UNSIGNED_BYTE, "-Z");
+			m_font->Render("-Z");
 		}
 
 		// Setup grid color
@@ -260,6 +284,10 @@ private:
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_y_color;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_z_color;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_grid_color;
+	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_font_path;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_font_size;
+
+	boost::scoped_ptr<FTFont> m_font;
 };
 
 /////////////////////////////////////////////////////////////////////////////
