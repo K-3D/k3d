@@ -82,13 +82,13 @@ public:
 		m_grid_color.changed_signal().connect(make_async_redraw_slot());
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 
-		m_font_path.changed_signal().connect(sigc::mem_fun(this, &axes::font_changed));
-		m_font_size.changed_signal().connect(sigc::mem_fun(this, &axes::font_changed));
+		m_font_path.changed_signal().connect(sigc::mem_fun(this, &axes::on_font_changed));
+		m_font_size.changed_signal().connect(sigc::mem_fun(this, &axes::on_font_changed));
 
 		add_snap_target(new k3d::snap_target(_("Grid"), sigc::mem_fun(*this, &axes::grid_target_position), sigc::mem_fun(*this, &axes::grid_target_orientation)));
 	}
 
-	void font_changed(k3d::ihint*)
+	void on_font_changed(k3d::ihint*)
 	{
 		m_font.reset();
 		async_redraw(0);

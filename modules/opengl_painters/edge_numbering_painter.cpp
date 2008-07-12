@@ -35,6 +35,8 @@
 
 #include <FTGL/ftgl.h>
 
+#include <boost/scoped_ptr.hpp>
+
 namespace module
 {
 
@@ -57,6 +59,7 @@ public:
 		base(Factory, Document),
 		m_font_path(init_owner(*this) + init_name("font") + init_label(_("Font")) + init_description(_("Font path")) + init_value(k3d::share_path() / k3d::filesystem::generic_path("fonts/VeraBd.ttf")) + init_path_mode(k3d::ipath_property::READ) + init_path_type(k3d::options::path::fonts())),
 		m_font_size(init_owner(*this) + init_name("font_size") + init_label(_("Font Size")) + init_description(_("Font size.")) + init_value(14.0)),
+		m_antialias(init_owner(*this) + init_name("antialias") + init_label(_("Font Antialiasing")) + init_description(_("Render antialiased text.")) + init_value(true)),
 		m_draw_selected(init_owner(*this) + init_name("draw_selected") + init_label(_("Draw Selected")) + init_description(_("Draw normals for selected polygons.")) + init_value(true)),
 		m_draw_unselected(init_owner(*this) + init_name("draw_unselected") + init_label(_("Draw Unselected")) + init_description(_("Draw normals for unselected polygons.")) + init_value(false)),
 		m_selected_color(init_owner(*this) + init_name("selected_color") + init_label(_("Selected Color")) + init_description(_("Normal color for selected polygons.")) + init_value(k3d::color(0, 1, 0))),
@@ -64,8 +67,9 @@ public:
 		m_edge_offset(init_owner(*this) + init_name("edge_offset") + init_label(_("Edge Offset")) + init_description(_("Offsets numbers away from their edges.")) + init_value(0.5)),
 		m_face_offset(init_owner(*this) + init_name("face_offset") + init_label(_("Face Offset")) + init_description(_("Offsets numbers away from their polygons.")) + init_value(0.2))
 	{
-		m_font_path.changed_signal().connect(make_async_redraw_slot());
-		m_font_size.changed_signal().connect(make_async_redraw_slot());
+		m_font_path.changed_signal().connect(sigc::mem_fun(*this, &edge_numbering_painter::on_font_changed));
+		m_font_size.changed_signal().connect(sigc::mem_fun(*this, &edge_numbering_painter::on_font_changed));
+		m_antialias.changed_signal().connect(sigc::mem_fun(*this, &edge_numbering_painter::on_font_changed));
 		m_draw_selected.changed_signal().connect(make_async_redraw_slot());
 		m_draw_unselected.changed_signal().connect(make_async_redraw_slot());
 		m_selected_color.changed_signal().connect(make_async_redraw_slot());
@@ -74,8 +78,14 @@ public:
 		m_face_offset.changed_signal().connect(make_async_redraw_slot());
 	}
 
+	void on_font_changed(k3d::ihint*)
+	{
+		m_font.reset();
+		async_redraw(0);
+	}
+
 	template<typename FunctorT>
-	void draw(const k3d::mesh::indices_t& FaceFirstLoops, const k3d::mesh::counts_t& FaceLoopCounts, const k3d::mesh::indices_t& LoopFirstEdges, const k3d::mesh::indices_t& EdgePoints, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::points_t& Points, const k3d::mesh::normals_t& FaceNormals, const k3d::color& Color, const double EdgeOffset, const double FaceOffset, const FunctorT& EdgeTest, FTFont& Font)
+	void draw(const k3d::mesh::indices_t& FaceFirstLoops, const k3d::mesh::counts_t& FaceLoopCounts, const k3d::mesh::indices_t& LoopFirstEdges, const k3d::mesh::indices_t& EdgePoints, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::points_t& Points, const k3d::mesh::normals_t& FaceNormals, const k3d::color& Color, const k3d::double_t EdgeOffset, const k3d::double_t FaceOffset, const FunctorT& EdgeTest, FTFont& Font)
 	{
 		k3d::gl::color3d(Color);
 
@@ -112,24 +122,32 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		const bool draw_selected = m_draw_selected.pipeline_value();
-		const bool draw_unselected = m_draw_unselected.pipeline_value();
+		const k3d::bool_t draw_selected = m_draw_selected.pipeline_value();
+		const k3d::bool_t draw_unselected = m_draw_unselected.pipeline_value();
 		if(!draw_selected && !draw_unselected)
 			return;
 
 		if(!k3d::validate_polyhedra(Mesh))
 			return;
 
-		FTPixmapFont font(m_font_path.pipeline_value().native_filesystem_string().c_str());
-		if(font.Error())
+		if(!m_font)
 		{
-			k3d::log() << error << "error initializing font" << std::endl;
-			return;
-		}
-		font.FaceSize(static_cast<unsigned int>(m_font_size.pipeline_value()));
+			if(m_antialias.pipeline_value())
+				m_font.reset(new FTPixmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
+			else
+				m_font.reset(new FTBitmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
 
-		const double edge_offset = m_edge_offset.pipeline_value();
-		const double face_offset = m_face_offset.pipeline_value();
+			m_font->FaceSize(static_cast<unsigned int>(m_font_size.pipeline_value()));
+			m_font->UseDisplayList(true);
+			if(m_font->Error())
+			{
+				k3d::log() << error << "error initializing font" << std::endl;
+				return;
+			}
+		}
+
+		const k3d::double_t edge_offset = m_edge_offset.pipeline_value();
+		const k3d::double_t face_offset = m_face_offset.pipeline_value();
 
 		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
 		const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
@@ -149,10 +167,10 @@ public:
 		glDisable(GL_LIGHTING);
 
 		if(draw_selected)
-			draw(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, normals, m_selected_color.pipeline_value(), edge_offset, face_offset, selected_edges(Mesh), font);
+			draw(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, normals, m_selected_color.pipeline_value(), edge_offset, face_offset, selected_edges(Mesh), *m_font);
 
 		if(draw_unselected)
-			draw(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, normals, m_unselected_color.pipeline_value(), edge_offset, face_offset, unselected_edges(Mesh), font);
+			draw(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, normals, m_unselected_color.pipeline_value(), edge_offset, face_offset, unselected_edges(Mesh), *m_font);
 	}
 	
 	static k3d::iplugin_factory& get_factory()
@@ -170,12 +188,15 @@ public:
 private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_font_path;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_font_size;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_selected;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_unselected;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_antialias;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_selected;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_unselected;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_selected_color;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_unselected_color;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_edge_offset;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_face_offset;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_edge_offset;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_face_offset;
+
+	boost::scoped_ptr<FTFont> m_font;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -191,5 +212,4 @@ k3d::iplugin_factory& edge_numbering_painter_factory()
 } // namespace opengl
 
 } // namespace module
-
 
