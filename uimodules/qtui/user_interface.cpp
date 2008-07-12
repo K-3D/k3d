@@ -75,7 +75,6 @@ viewport::viewport(QWidget* parent) :
 	QGLWidget(parent),
 	m_camera(init_value<k3d::icamera*>(0)),
 	m_gl_engine(init_value<k3d::gl::irender_viewport*>(0)),
-	m_font_begin(0),
 	m_font_end(0)
 {
 	setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
@@ -93,21 +92,8 @@ void viewport::on_render_engine_changed(k3d::gl::irender_viewport* const Engine)
 	update();
 }
 
-void viewport::createFont()
-{
-	if(m_font_begin != m_font_end)
-		return;
-
-	const unsigned long begin_glyph = 0;
-	const unsigned long end_glyph = 256;
-	m_font_begin = glGenLists(end_glyph - begin_glyph);
-	return_if_fail(m_font_begin);
-	m_font_end = m_font_begin + end_glyph - begin_glyph;
-}
-
 void viewport::initializeGL()
 {
-	createFont();
 }
 
 void viewport::paintGL()
@@ -117,7 +103,7 @@ void viewport::paintGL()
 	{
 		k3d::timer timer;
 
-		m_gl_engine.internal_value()->render_viewport(*m_camera.internal_value(), width(), height(), m_font_begin, m_gl_view_matrix, m_gl_projection_matrix, m_gl_viewport);
+		m_gl_engine.internal_value()->render_viewport(*m_camera.internal_value(), width(), height(), m_gl_view_matrix, m_gl_projection_matrix, m_gl_viewport);
 
 		const double elapsed = timer.elapsed();
 		if(elapsed)
