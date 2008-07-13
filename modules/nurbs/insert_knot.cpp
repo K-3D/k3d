@@ -63,42 +63,41 @@ namespace module
 				m_multiplicity.changed_signal().connect(make_update_mesh_slot());
 			}
 
-			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output) 
+			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 			{
 				Output = Input;
 			}
-			
-			void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output) 
+
+			void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 			{
 				Output = Input;
-								
+
 				if(!k3d::validate_nurbs_curve_groups(Output))
 					return;
 
 				merge_selection(m_mesh_selection.pipeline_value(), Output);
-				
-				int curve = selected_curve(Output);
-				
-				if( curve < 0 )
+
+				nurbs_curve_modifier mod(Output);
+
+				int my_curve = mod.selected_curve();
+
+				if( my_curve < 0 )
 				{
 					k3d::log() << error << "You need to select a curve!" << std::endl;
 					return;
 				}
-				
+
 				double u = m_u_value.pipeline_value();
 				int multiplicity = m_multiplicity.pipeline_value();
-				
+
 				//call curve_knot_insertion
-				
-				k3d::mesh::nurbs_curve_groups_t& groups = *k3d::make_unique(Output.nurbs_curve_groups);
-				k3d::mesh::knots_t& curve_knots = *k3d::make_unique(groups.curve_knots);
-				
-				normalize_knot_vector(groups,curve_knots,curve);
-				curve_knot_insertion(Output, curve, u, multiplicity);
-				
+
+				mod.normalize_knot_vector(my_curve);
+				mod.curve_knot_insertion(my_curve, u, multiplicity);
+
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 			}
-			
+
 			static k3d::iplugin_factory& get_factory()
 			{
 				static k3d::document_plugin_factory<insert_knot, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
@@ -114,12 +113,12 @@ namespace module
 			k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_value;
 			k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_multiplicity;
 		};
-		
+
 		//Create connect_curve factory
 		k3d::iplugin_factory& insert_knot_factory()
 		{
 			return insert_knot::get_factory();
 		}
-		
+
 	}//namespace nurbs
 }//namespace module

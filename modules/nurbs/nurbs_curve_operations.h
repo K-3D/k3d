@@ -48,26 +48,57 @@
 
 namespace module{
 	namespace nurbs{
+        class nurbs_curve_modifier{
+            public:
+                nurbs_curve_modifier(k3d::mesh& input);
 
+                int selected_curve();
+                void print_knot_vector(size_t curve);
+                void replace_point(size_t newIndex, size_t curve, size_t point, bool continuous);
+                void flip_curve(size_t curve);
+                void normalize_knot_vector(size_t curve);
+                int count_all_curves_in_groups();
+                int get_curve_group(size_t curve);
+                void remove_empty_groups();
+                //void remove_unused_points();
+                void delete_curve(size_t curve);
+                void join_curves(size_t point1, size_t curve1, size_t point2, size_t curve2);
+                bool point3_float_equal(const k3d::point3& p1, const k3d::point3& p2, float threshold);
+                int find_span(size_t curve,double u);
+                std::vector<double> basis_functions(size_t curve, double u, size_t span);
+                k3d::point4 curve_point(size_t curve,double u);
+                void curve_knot_insertion(size_t curve,double u, size_t r);
+                void close_curve(size_t curve,bool keep_ends);
+                int curve_degree_elevate(size_t curve);
+                k3d::point4 get_homogenous_point(size_t point);
+                void split_curve_at(size_t curve, double u);
 
-		int selected_curve(k3d::mesh& Output);
-		void print_knot_vector(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::knots_t& knots, size_t curve);
-		void replace_point(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::indices_t& indices, k3d::mesh::knots_t& knots, size_t newIndex, size_t curve, size_t point, bool continuous);
-		void flip_curve(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::indices_t& point_indices, k3d::mesh::knots_t& knots, size_t curve);
-		void normalize_knot_vector(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::knots_t& knots, size_t curve);
-		int count_all_curves_in_groups(k3d::mesh::nurbs_curve_groups_t& groups);
-		int get_curve_group(k3d::mesh::nurbs_curve_groups_t& groups, size_t curve);
-		void remove_empty_groups(k3d::mesh::nurbs_curve_groups_t& groups);
-		void offset_firsts(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::indices_t& firsts, size_t curve, int offset);
-		void delete_curve(k3d::mesh::nurbs_curve_groups_t& groups, size_t curve);
-		void join_curves(k3d::mesh::nurbs_curve_groups_t& groups, k3d::mesh::indices_t& indices, k3d::mesh::knots_t& knots, size_t point1, size_t curve1, size_t point2, size_t curve2);
-		bool point3_float_equal(const k3d::point3& p1, const k3d::point3& p2, float threshold);
-		int find_span(k3d::mesh& input, size_t curve, double u);
-		std::vector<double> basis_functions(k3d::mesh& input, size_t curve, double u, size_t span);
-		k3d::point4 curve_point(k3d::mesh& input, size_t curve, double u);
-		void curve_knot_insertion(k3d::mesh& input, size_t curve, double u, size_t r);
-		void nurbs_close_curve(k3d::mesh& input, size_t curve, bool keep_ends);
-		int curve_degree_elevate(k3d::mesh& input, size_t curve, size_t t);
+            private:
+                int factorial(int n);
+                double binomial_coefficient(int n, int k);
+                int Min(int a, int b);
+                int Max(int a, int b);
+                void fill_bezalfs(std::vector<std::vector<double> >& bezalfs, int power, int t);
+                std::string output_point(const k3d::point4& point);
+                k3d::mesh::indices_t create_curve_points(std::vector<k3d::point4>& points);
+                k3d::mesh::weights_t create_curve_point_weights(std::vector<k3d::point4>& points);
+
+                k3d::mesh *m_instance;
+                k3d::mesh::nurbs_curve_groups_t *groups;
+                k3d::mesh::knots_t *curve_knots;
+                k3d::mesh::indices_t *curve_points;
+                k3d::mesh::weights_t *curve_point_weights;
+                k3d::mesh::counts_t *curve_counts;
+                k3d::mesh::orders_t *curve_orders;
+                k3d::mesh::counts_t *curve_point_counts;
+                k3d::mesh::indices_t *curve_first_points;
+                k3d::mesh::indices_t *curve_first_knots;
+                k3d::mesh::indices_t *first_curves;
+                k3d::mesh::selection_t *curve_selection;
+                k3d::mesh::selection_t *point_selection;
+                k3d::mesh::points_t *mesh_points;
+                k3d::mesh::materials_t *materials;
+        };
 	}//namespace nurbs
 }//namespace module
 

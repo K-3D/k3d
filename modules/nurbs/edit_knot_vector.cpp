@@ -74,7 +74,10 @@ public:
 
 		merge_selection(m_mesh_selection.pipeline_value(), Output);
 
-		int my_curve = selected_curve(Output);
+		nurbs_curve_modifier mod(Output);
+
+        int my_curve = mod.selected_curve();
+
 		if(my_curve < 0)
 		{
 			k3d::log() << error << "More than one curve or no curve selected! " << my_curve << std::endl;
@@ -97,7 +100,10 @@ public:
 
 		const k3d::mesh::knots_t& knots = m_knot_vector.pipeline_value();
 
-		int my_curve = selected_curve(Output);
+		nurbs_curve_modifier mod(Output);
+
+        int my_curve = mod.selected_curve();
+
 		if(my_curve < 0)
 		{
 			k3d::log() << error << "More than one curve or no curve selected! " << my_curve << std::endl;

@@ -76,7 +76,9 @@ namespace module
 
                 merge_selection(m_mesh_selection.pipeline_value(), Output);
 
-				int my_curve = selected_curve(Output);
+                nurbs_curve_modifier mod(Output);
+
+				int my_curve = mod.selected_curve();
 
 
 				if( my_curve < 0)
@@ -85,7 +87,9 @@ namespace module
 					return;
 				}
 
-                curve_degree_elevate(Output, my_curve, m_degree.pipeline_value());
+                int t = m_degree.pipeline_value();
+                for(int i = 0; i < t; i++)
+                    mod.curve_degree_elevate(my_curve);
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 			}

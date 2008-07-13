@@ -108,7 +108,10 @@ namespace module
 					k3d::log() << error << "You need to select exactly 2 points on 2 different curves!\n"<<"Selected: "<<points.size()<<" points on "<<curves.size()<<" curves" << std::endl;
 				}
 				else
-					connect_at_points(Output, curves[0], curves[1], points[0], points[1]);
+				{
+                    nurbs_curve_modifier mod(Output);
+                    mod.join_curves(points[0], curves[0], points[1], curves[1]);
+				}
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 			}
@@ -132,19 +135,6 @@ namespace module
 		k3d::iplugin_factory& connect_curves_factory()
 		{
 			return connect_curves::get_factory();
-		}
-
-		void connect_at_points(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2)
-		{
-			k3d::mesh::nurbs_curve_groups_t& groups = *k3d::make_unique(Mesh.nurbs_curve_groups);
-			k3d::mesh::indices_t& curve_points = *k3d::make_unique(groups.curve_points);
-			k3d::mesh::knots_t& curve_knots = *k3d::make_unique(groups.curve_knots);
-
-			k3d::mesh::points_t& mesh_points = *k3d::make_unique(Mesh.points);
-			k3d::mesh::selection_t& point_selection = *k3d::make_unique(Mesh.point_selection);
-
-			//now join the 2 curves
-			join_curves(groups, curve_points, curve_knots, point1, curve1, point2, curve2);
 		}
 
 	}//namespace nurbs
