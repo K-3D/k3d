@@ -1365,7 +1365,7 @@ void save(inode& Node, element& XML, const ipersistent::save_context& Context)
 			xml::element& xml_metadata = xml_node.append(xml::element("metadata"));
 
 			for(imetadata::metadata_t::const_iterator pair = pairs.begin(); pair != pairs.end(); ++pair)
-				xml_metadata.append(xml::element("pair", xml::attribute("name", pair->first), xml::attribute("value", pair->second)));
+				xml_metadata.append(xml::element("pair", xml::attribute("name", pair->first), pair->second));
 		}
 	}
 
@@ -1388,7 +1388,7 @@ void load(inode& Node, element& XML, const ipersistent::load_context& Context)
 			if(xml_pair->name != "pair")
 				continue;
 
-			pairs.insert(std::make_pair(xml::attribute_text(*xml_pair, "name"), xml::attribute_text(*xml_pair, "value")));
+			pairs.insert(std::make_pair(xml::attribute_text(*xml_pair, "name"), xml_pair->text));
 		}
 
 		if(imetadata* const metadata = dynamic_cast<imetadata*>(&Node))

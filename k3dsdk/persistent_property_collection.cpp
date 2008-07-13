@@ -113,7 +113,7 @@ void persistent_property_collection::save(xml::element& Element, const ipersiste
 			{
 				xml::element& xml_metadata = xml_properties.append(xml::element("metadata", xml::attribute("name", m_names[i])));
 				for(imetadata::metadata_t::const_iterator pair = pairs.begin(); pair != pairs.end(); ++pair)
-					xml_metadata.append(xml::element("pair", xml::attribute("name", pair->first), xml::attribute("value", pair->second)));
+					xml_metadata.append(xml::element("pair", xml::attribute("name", pair->first), pair->second));
 			}
 		}
 	}
@@ -258,7 +258,7 @@ void persistent_property_collection::load(xml::element& Element, const ipersiste
 				if(xml_pair->name != "pair")
 					continue;
 
-				pairs.insert(std::make_pair(xml::attribute_text(*xml_pair, "name"), xml::attribute_text(*xml_pair, "value")));
+				pairs.insert(std::make_pair(xml::attribute_text(*xml_pair, "name"), xml_pair->text));
 			}
 
 			if(imetadata* const metadata = dynamic_cast<imetadata*>(m_properties[i]))

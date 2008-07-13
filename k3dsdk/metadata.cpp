@@ -28,13 +28,14 @@ namespace k3d
 
 void metadata::set_metadata(const string_t& name, const string_t& value)
 {
-	m_storage.insert(std::make_pair(name, value));
+	m_storage[name] = value;
 	m_changed_signal.emit();
 }
 
 void metadata::set_metadata(const metadata_t& values)
 {
-	m_storage.insert(values.begin(), values.end());
+	for(metadata_t::const_iterator pair = values.begin(); pair != values.end(); ++pair)
+		m_storage[pair->first] = pair->second;
 	m_changed_signal.emit();
 }
 

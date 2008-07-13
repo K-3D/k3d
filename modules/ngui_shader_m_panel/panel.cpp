@@ -170,37 +170,25 @@ namespace module{
 	  void on_type_changed(k3d::ihint *h)
 	  {
 	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
-	      {
-		metadata->erase_metadata("materialManager::material_type");
-		metadata->set_metadata("materialManager::material_type", so_type.internal_value());
-	      }
+	      metadata->set_metadata("materialManager::material_type", so_type.internal_value());
 	  }
 
 	  void on_datestamp_changed(k3d::ihint *h)
 	  {
 	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
-	      {
-		metadata->erase_metadata("materialManager::material_datestamp");
-		metadata->set_metadata("materialManager::material_datestamp", so_datestamp.internal_value());
-	      }
+	      metadata->set_metadata("materialManager::material_datestamp", so_datestamp.internal_value());
 	  }
 
 	  void on_artistname_changed(k3d::ihint *h)
 	  {
 	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
-	      {
-		metadata->erase_metadata("materialManager::material_artistname");
-		metadata->set_metadata("materialManager::material_artistname", so_artistname.internal_value());
-	      }
+	      metadata->set_metadata("materialManager::material_artistname", so_artistname.internal_value());
 	  }
 
 	  void on_artistnotes_changed(k3d::ihint *h)
 	  {
 	    if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(node))
-	      {
-		metadata->erase_metadata("materialManager::material_artistnotes");
-		metadata->set_metadata("materialManager::material_artistnotes", so_artistnotes.internal_value());
-	      }
+	      metadata->set_metadata("materialManager::material_artistnotes", so_artistnotes.internal_value());
 	  }	 
 
 	  //Reset Content To Curent Saved Node Data
