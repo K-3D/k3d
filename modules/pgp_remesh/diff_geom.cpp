@@ -23,9 +23,10 @@
 */
 #include "diff_geom.h"
 
+#include <gmm/gmm.h>
+
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/gmm/gmm.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>

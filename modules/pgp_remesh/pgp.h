@@ -28,9 +28,10 @@
 #include "diff_geom.h"
 #include "mesh_info.h"
 
+#include <gmm/gmm.h>
+
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/gmm/gmm.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
