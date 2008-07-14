@@ -63,7 +63,7 @@ class least_squares_plot :
 public:
 	least_squares_plot(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input_points(init_owner(*this) + init_name("mesh_input_points") + init_label(_("Input Points")) + init_description(_("First to aproximate")) + init_value<k3d::mesh*>(0)),
+		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Points to approximate")) + init_value<k3d::mesh*>(0)),
 		m_uv_rename(init_owner(*this) + init_name("uv_rename") + init_label(_("Rename u v")) + init_description(_("Renames the u,v variables to suit the variables from your function. Could be x,y for example")) + init_value(std::string(_("u,v")))),
 		m_columns(init_owner(*this) + init_name("columns") + init_label(_("Columns")) + init_description(_("Column number")) + init_value(15) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_rows(init_owner(*this) + init_name("rows") + init_label(_("Rows")) + init_description(_("Row number")) + init_value(15) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -76,7 +76,7 @@ public:
 		m_rows.changed_signal().connect(make_topology_changed_slot());
 		m_material.changed_signal().connect(make_topology_changed_slot());
 		
-		m_input_points.changed_signal().connect(make_geometry_changed_slot());
+		m_input_mesh.changed_signal().connect(make_geometry_changed_slot());
 		m_width.changed_signal().connect(make_geometry_changed_slot());
 		m_height.changed_signal().connect(make_geometry_changed_slot());
 
@@ -90,8 +90,8 @@ public:
 
 	void on_update_mesh_geometry(k3d::mesh& Mesh)
 	{
-		const k3d::mesh* const mesh_input_points = m_input_points.pipeline_value();
-		if(!mesh_input_points)
+		const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value();
+		if(!input_mesh)
 			return;
 		
 		std::string variables = m_uv_rename.pipeline_value();
@@ -137,7 +137,7 @@ public:
 		}
 		
 	// Evaluate each function on every point and create a new array for accesing the z values of points
-		const k3d::mesh::points_t& points = *mesh_input_points->points.get();
+		const k3d::mesh::points_t& points = *input_mesh->points.get();
 		k3d::uint64_t points_size = points.size(); 
 
 		boost::multi_array<k3d::double_t,1> points_z_value(boost::extents[points_size]);
@@ -258,7 +258,7 @@ public:
 	}
 
 private:
-	k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_input_points;
+	k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_input_mesh;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_uv_rename;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_columns;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_rows;
