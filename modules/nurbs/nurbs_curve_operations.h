@@ -60,7 +60,7 @@ namespace module{
                 int count_all_curves_in_groups();
                 int get_curve_group(size_t curve);
                 void remove_empty_groups();
-                //void remove_unused_points();
+                void remove_unused_points();
                 void delete_curve(size_t curve);
                 void join_curves(size_t point1, size_t curve1, size_t point2, size_t curve2);
                 bool point3_float_equal(const k3d::point3& p1, const k3d::point3& p2, float threshold);
@@ -82,6 +82,8 @@ namespace module{
                 std::string output_point(const k3d::point4& point);
                 k3d::mesh::indices_t create_curve_points(std::vector<k3d::point4>& points);
                 k3d::mesh::weights_t create_curve_point_weights(std::vector<k3d::point4>& points);
+                bool find_point_inside(k3d::mesh::indices_t *points, size_t index);
+                void offset_all_after(k3d::mesh::indices_t *points, size_t first, int offset);
 
                 k3d::mesh *m_instance;
                 k3d::mesh::nurbs_curve_groups_t *groups;
