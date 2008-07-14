@@ -286,13 +286,6 @@ namespace module{
           m_materials.remove(shd);
         }
 
-        //***********************************************
-          //Constant Groups -> These Wont Be Deleted
-        s_group *rman = 0;
-        s_group *gl = 0;
-        s_group *other = 0;
-        //***********************************************
-
           //************
           class model{
           public:
@@ -321,6 +314,10 @@ namespace module{
 
           public:
             std::list<s_group*>     m_groups;
+
+            s_group *rman;
+            s_group *gl;
+            s_group *other;
 
           };//m_model
 
@@ -736,11 +733,102 @@ namespace module{
 
           ~g_content_pane()
           {
-            //Clean Up
+            //Clean Up Dynamic Allocated Memory :)
+
+            //Preview Image Cleanup
             std::vector<materialPreviewImage*>::iterator pIter = materialPreviews.begin();
             for(; pIter != materialPreviews.end(); pIter++)
-              delete (*pIter);    
+              delete (*pIter);   
 
+            //All GTK Widgets >>
+
+            //ALL Gtk Hboxes*****************
+            std::vector<Gtk::HBox*>::iterator hBoxIter = object_preview_data_c.begin();
+            for(; hBoxIter != object_preview_data_c.end(); hBoxIter++)
+              delete (*hBoxIter);  
+
+            hBoxIter = material_label_data_c.begin();
+            for(; hBoxIter != material_label_data_c.end(); hBoxIter++)
+              delete (*hBoxIter);  
+
+
+            //ALL Gtk Vboxes*****************
+            std::vector<Gtk::VBox*>::iterator vBoxIter = material_data_desc_c.begin();
+            for(; vBoxIter != material_data_desc_c.end(); vBoxIter++)
+              delete (*vBoxIter); 
+            
+            vBoxIter = material_label_c.begin();
+            for(; vBoxIter != material_label_c.end(); vBoxIter++)
+              delete (*vBoxIter); 
+
+            vBoxIter = material_data_c.begin();
+            for(; vBoxIter != material_data_c.end(); vBoxIter++)
+              delete (*vBoxIter); 
+
+
+            //ALL Gtk Frames*****************
+            std::vector<Gtk::Frame*>::iterator frameIter = img_holder_frames.begin();
+            for(; frameIter != img_holder_frames.end(); frameIter++)
+              delete (*frameIter); 
+
+
+            //ALL Gtk Labels*****************
+            std::vector<Gtk::Label*>::iterator labelIter = s_name_l.begin();
+            for(; labelIter != s_name_l.end(); labelIter++)
+              delete (*labelIter); 
+
+            labelIter = s_type_l.begin();
+            for(; labelIter != s_type_l.end(); labelIter++)
+              delete (*labelIter); 
+
+            labelIter = s_datemod_l.begin();
+            for(; labelIter != s_datemod_l.end(); labelIter++)
+              delete (*labelIter); 
+
+            labelIter = s_artistname_l.begin();
+            for(; labelIter != s_artistname_l.end(); labelIter++)
+              delete (*labelIter); 
+
+            labelIter = s_name_d.begin();
+            for(; labelIter != s_name_d.end(); labelIter++)
+              delete (*labelIter); 
+
+            labelIter = s_type_d.begin();
+            for(; labelIter != s_type_d.end(); labelIter++)
+              delete (*labelIter); 
+
+            labelIter = s_datemod_d.begin();
+            for(; labelIter != s_datemod_d.end(); labelIter++)
+              delete (*labelIter); 
+
+            labelIter = s_artistname_d.begin();
+            for(; labelIter != s_artistname_d.end(); labelIter++)
+              delete (*labelIter); 
+
+            
+            //ALL Gtk Textviews*****************
+            std::vector<Gtk::TextView*>::iterator tvIter = s_artistnotes_view.begin();
+            for(; tvIter != s_artistnotes_view.end(); tvIter++)
+              delete (*tvIter); 
+
+
+            //ALL Gtk ScrolledWindows*****************
+            std::vector<Gtk::ScrolledWindow*>::iterator swIter = notes_scroll_win.begin();
+            for(; swIter != notes_scroll_win.end(); swIter++)
+              delete (*swIter); 
+
+
+            //ALL Gtk HSeparator*****************
+            std::vector<Gtk::HSeparator*>::iterator hsepIter = data_notes_breakers.begin();
+            for(; hsepIter != data_notes_breakers.end(); hsepIter++)
+              delete (*hsepIter); 
+
+            hsepIter = s_breakers.begin();
+            for(; hsepIter != s_breakers.end(); hsepIter++)
+              delete (*hsepIter); 
+
+
+            //Disconect Signal Connections***********
             timerPreviewConnection.disconnect();
           }
 
@@ -1121,7 +1209,9 @@ namespace module{
 
                 //Artist Notes
                 main_detail_c.pack_start(artistnotes_frame, true, true, 10);
-                artistnotes_frame.add(s_artistnotes_mltext);
+
+                s_artistnotes_c.pack_start( s_artistnotes_mltext, true, true, 5);
+                artistnotes_frame.add(s_artistnotes_c);
 
                 //INSERT K3D TEXT VIEW HERE FOR ARTIST NOTES
 	       
@@ -1225,6 +1315,8 @@ namespace module{
           Gtk::HBox s_type_c;
           Gtk::HBox s_datemod_c;
           Gtk::HBox s_artistname_c;
+
+          Gtk::HBox s_artistnotes_c;
 
           Gtk::Frame so_preview_frame;
           Gtk::Frame artistnotes_frame;
@@ -1541,17 +1633,17 @@ namespace module{
                 //Place Renderman Material
                 if((*nodeIter)->factory().implements(typeid(k3d::ri::imaterial))){
                   typeStr = riMaterialStr;
-                  groupPtr = rman;
+                  groupPtr = m_model->rman;
                 }
                 //Place GL Material
                 else if((*nodeIter)->factory().implements(typeid(k3d::gl::imaterial))){
                   typeStr = glMaterialStr;
-                  groupPtr = gl;
+                  groupPtr = m_model->gl;
                 }
                 //Place Other Material
                 else{
                   typeStr = otherStuffStr;
-                  groupPtr = other;
+                  groupPtr = m_model->other;
                 }
                 for(; row != rows.end(); ++row)
                   {
