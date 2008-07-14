@@ -246,6 +246,8 @@ namespace module{
 
           ~s_group()
           {
+            //Clear Up All Of The Shader Objects
+            clearGroup();
           }
 
         public:
@@ -260,10 +262,12 @@ namespace module{
         };//s_group
 
         void s_group::clearGroup()
-        {k3d::log() << "CLEAR GROUP STUFF " << std::endl;
+        {
+          k3d::log() << "CLEAR GROUP STUFF " << std::endl;
+  
           k3d::log() << "M_MATERIAL SIZE " <<  m_materials.size() << std::endl;
 
-          std::list<s_object*>::iterator materialIter = m_materials.begin();
+          std::list<s_object*>::iterator materialIter = m_materials.begin(); //BUG WITH M_MATERIAL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           for(; materialIter != m_materials.end(); materialIter++)
             {
               //Clean Up The List Of material Objects (s_object)
@@ -304,8 +308,6 @@ namespace module{
                 delete gl;
               if(other)
                 delete other;
-
-              clearModel();
             }
 
           public:
@@ -356,16 +358,16 @@ namespace module{
 
         void model::clearModel()
         {
+
+          k3d::log() << "NUMBER OF GROUPS: " << m_groups.size() << std::endl;
           std::list<s_group*>::iterator groupIter = m_groups.begin();
           for(; groupIter != m_groups.end(); groupIter++)
-            {
-              (*groupIter)->clearGroup();
-              delete (*groupIter);
-              //m_groups.erase(groupIter);
-            }//for
+              delete (*groupIter);      
 
           //Ensure Clean Storage 
           m_groups.clear();
+
+          k3d::log() << "groups cleared...therefore shader_o cleared" << std::endl;
 
         }
 
@@ -1614,14 +1616,17 @@ namespace module{
 
         void implementation::on_nodes_added(const k3d::inode_collection::nodes_t& Nodes)
         {
-          //Gtk::TreeModel::iterator iter = tree_selection->get_selected();
-
+          //Flag For Possible Panel Update
+          bool material_added = false;
 
           //Iterate through each node and if appropriate add to tree
           for(k3d::inode_collection::nodes_t::const_iterator nodeIter = Nodes.begin(); nodeIter != Nodes.end(); ++nodeIter)
             {
               //Check If Is A Material Type First
               if((*nodeIter)->factory().implements(typeid(k3d::imaterial))){
+
+                //Set Flag (Material Added) > Will Try To Update Panel
+                material_added = true;
 
                 Gtk::TreeNodeChildren rows = tree_model->children();
                 Gtk::TreeRow new_row;
@@ -1668,35 +1673,38 @@ namespace module{
               }//if
             }//for
 
-          //Rebuild Currently Selected Pane (Only If Group)
+          //Check If Material Added -> If So Update Panel Only If Group
+          if(material_added)
+            {
+              Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+              if(iter) //If anything is selected
+                {
+                  Gtk::TreeModel::Row row = *iter;
+                  if(row[m_columns.is_group])
+                    build_content_pane(row, true); //Build The Content Pane From Corrected Pointer
+   
+                }//if
+            }//if
 
-          // 	  //Ensure Pointers Are Valid
-          // 	  if(finished_init)
-          // 	    {
-          // 	      on_tree_row_changed();
-
-
-          // // 	      Gtk::TreeModel::iterator iter = tree_selection->get_selected();
-          // // 	      if(iter) //If anything is selected
-          // // 		{
-          // // 		  Gtk::TreeModel::Row row = *iter;
-          // // 		  if(row[m_columns.is_group])
-          // // 		    { 
-          // // 		      //Build The Content Pane From Corrected Pointer
-          // // 		      //m_rpane_content->buildPane();
-          // // 		      on_tree_row_changed();
-          // // 		    }//if
-          // // 		}//if
-
-          // 	    }//if
 
         }//on_nodes_added
 
         void implementation::on_nodes_removed(const k3d::inode_collection::nodes_t& Nodes)
         {
+          //Flag For Possible Panel Update
+          bool material_removed = false;
+
           s_group *grpPtr = 0;
           s_object *tmpSObj = 0;
           for(k3d::inode_collection::nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node){
+
+            //Check If Is A Material Type First
+            if((*node)->factory().implements(typeid(k3d::imaterial)))
+              {
+                //Set Flag (Material Added) > Will Try To Update Panel
+                material_removed = true;
+              }
+
             Gtk::TreeIter row;
             return_if_fail(get_row(*node, row));
 	    
@@ -1705,25 +1713,27 @@ namespace module{
             if(tmpSObj)
               grpPtr = tmpSObj->parent;
 	      
-            tree_model->erase(row);	    
+            tree_model->erase(row);	
+    
 
             //Delete In Stored Model
             if(grpPtr)
               grpPtr->removeMaterial(tmpSObj);
 	    
-            // //Rebuild Currently Selected Pane (Only If Group)
-            // 	  Gtk::TreeModel::iterator iter = tree_selection->get_selected();
-            // 	  if(iter) //If anything is selected
-            // 	    {
-            // 	      Gtk::TreeModel::Row row = *iter;
-            // 	      if(row[m_columns.is_group])
-            // 		on_tree_row_changed();
-            // 	    }//if
+          }//for
 
-          }
-
-
-
+           //Rebuild Currently Selected Pane (Only If Group && Material Removed)
+          if(material_removed)
+            {
+              Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+              if(iter) //If anything is selected
+                {
+                  Gtk::TreeModel::Row row = *iter;
+                  if(row[m_columns.is_group])
+                    build_content_pane(row, true); //Build The Content Pane From Corrected Pointer
+            		
+                }//if
+            }//if
 
         }//on_nodes_removed
 
@@ -1832,7 +1842,7 @@ namespace module{
 
         ~panel()
         {
-          //delete m_implementation;
+          delete m_implementation;
         }
 
         void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
