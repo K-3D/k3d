@@ -219,7 +219,7 @@ namespace module{
 
             std::stringstream stream_for_date;
             //Adding to values as they origionally represent amount from jan (jan = 0) and 1900 
-            stream_for_date << timeinfo->tm_mon << "/" << (1 + timeinfo->tm_mday) << "/" << (1900 + timeinfo->tm_year);
+            stream_for_date << (1 + timeinfo->tm_mon) << "/" << timeinfo->tm_mday << "/" << (1900 + timeinfo->tm_year);
             k3d::string_t current_date_str = stream_for_date.str();
 
             so_datestamp.set_value(current_date_str);
