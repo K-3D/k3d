@@ -29,6 +29,8 @@
 #include <dom/domLibrary_cameras.h>
 #include <dom/domLibrary_visual_scenes.h>
 #include <dom/domGeometry.h>
+#include <dom/domMatrix.h>
+#include <dom/domNode.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
@@ -113,6 +115,18 @@ k3d::matrix4 getTransformation(domNode& node)
 		tmp_matrix[2][0] = zxC-ys;
 		tmp_matrix[2][1] = yzC+xs;
 		tmp_matrix[2][2] = z*zC+c;
+		result = result * tmp_matrix;
+	}
+
+	// Look for complete transformation matrix
+	domMatrix_Array matrix_array = node.getMatrix_array();
+	for(int k=0; k<matrix_array.getCount(); k++)
+	{
+		domFloat4x4 mat = matrix_array[k]->getValue();
+		k3d::matrix4 tmp_matrix = k3d::identity3D();
+		for(int i=0; i<4; i++)
+			for(int j=0; j<4; j++)
+				tmp_matrix[i][j] = mat[4*i+j];
 		result = result * tmp_matrix;
 	}
 

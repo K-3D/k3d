@@ -25,12 +25,22 @@
 #define COLLADA_H
 
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imesh_storage.h>
+#include <k3dsdk/imesh_source.h>
 #include <k3dsdk/properties.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/ustring.h>
-#include <dom/domGeometry.h>
+#include <dae.h>
+#include <dae/daeUtils.h>
+#include <dom/domCOLLADA.h>
+#include <dom/domLight.h>
+#include <dom/domCamera.h>
 #include "intElements.h"
+
+#define SafeAdd(elt, name, var) \
+	daeElement* var = elt->add(name);
 
 namespace module
 {
@@ -39,11 +49,26 @@ namespace collada
 namespace io
 {
 
-	k3d::mesh to_k3d_mesh(domGeometry &geom)
+	// "myGeom" --> "#myGeom"
+	std::string makeUriRef(const std::string& id);
+	
+	template<typename T>
+	daeTArray<T> rawArrayToDaeArray(T rawArray[], size_t count) 
 	{
-		intGeometry result(geom,k3d::identity3D());
-		return result.getMesh();
+		daeTArray<T> result;
+		for (size_t i = 0; i < count; i++)
+			result.append(rawArray[i]);
+		return result;
 	}
+	
+	std::string removeSpaces(std::string str);
+
+	void addSource(daeElement* mesh, const std::string& srcID, const std::string& paramNames, domFloat values[], int valueCount);
+	void addInput(daeElement* triangles, const std::string& semantic, const std::string& srcID, int offset);
+	void addGeometry(daeElement* library_geometries, const std::string &name, k3d::mesh *mesh);
+	void addMeshInstance(daeElement * visualScene, k3d::inode *inode);
+
+	k3d::mesh to_k3d_mesh(domGeometry &geom);
 
 	class collada_obj
 	{
@@ -51,11 +76,10 @@ namespace io
 		collada_obj(k3d::idocument &Document, domGeometry &geom)
 		{
 			id = geom.getAttribute("id");
-			name = "COLLADA " + k3d::unique_name(Document.nodes(), geom.getAttribute("name"));
+			name =  k3d::unique_name(Document.nodes(), "COLLADA " + geom.getAttribute("name"));
 			type = "frozen_mesh";
 
 			k3d::mesh *mesh = new k3d::mesh();
-			//mesh = to_k3d_mesh(geom);
 			k3d::inode *frozen_mesh = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("FrozenMesh"), Document, name);
 			k3d::imesh_storage* mesh_storage = dynamic_cast<k3d::imesh_storage*>(frozen_mesh);
 			mesh_storage->reset_mesh(mesh);
@@ -67,7 +91,7 @@ namespace io
 		collada_obj(k3d::idocument &Document, domCamera &cam)
 		{
 			id = cam.getAttribute("id");
-			name = "COLLADA " + k3d::unique_name(Document.nodes(), cam.getAttribute("name"));
+			name = k3d::unique_name(Document.nodes(), "COLLADA " + cam.getAttribute("name"));
 			type = "camera";
 
 			k3d::inode *camera = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("Camera"), Document, name);
@@ -76,7 +100,7 @@ namespace io
 			domCamera::domOptics::domTechnique_common::domPerspective *perspective = technique_common->getPerspective();
 			domCamera::domOptics::domTechnique_common::domOrthographic *orthographic = technique_common->getOrthographic();
 			double znear, zfar;
-			double aspect_ratio;// = perspective->getAspect_ratio()->getValue();
+			double aspect_ratio;
 			if(orthographic!=NULL)
 			{
 				double xmag = orthographic->getXmag()->getValue();
@@ -113,7 +137,6 @@ namespace io
 			k3d::property::set_internal_value(*camera, "viewport_visible", false);
 			k3d::property::set_internal_value(*camera, "near", znear);
 			k3d::property::set_internal_value(*camera, "far", zfar);
-			//k3d::property::set_internal_value(*camera, "
 
 			//Collect properties
 			top = k3d::property::get(*camera, "top");
@@ -127,7 +150,7 @@ namespace io
 		collada_obj(k3d::idocument &Document, domLight &li)
 		{
 			id = li.getAttribute("id");
-			name = "COLLADA " + k3d::unique_name(Document.nodes(), li.getAttribute("name"));
+			name = k3d::unique_name(Document.nodes(), "COLLADA " + li.getAttribute("name"));
 			std::string shader_name = k3d::unique_name(Document.nodes(), name + " Shader");
 			type = "light";
 
@@ -155,7 +178,7 @@ namespace io
 		collada_obj(k3d::idocument &Document, domImage &img)
 		{
 			id = img.getAttribute("id");
-			name = "COLLADA " + k3d::unique_name(Document.nodes(), img.getAttribute("name"));
+			name = k3d::unique_name(Document.nodes(), "COLLADA " + img.getAttribute("name"));
 			type = "image";
 
 			domImage::domInit_from *init_from = img.getInit_from();
@@ -165,8 +188,6 @@ namespace io
 				std::string factory;
 				std::string img_path = init_from->getValue().str().substr(5);
 				std::string img_type = img_path.substr(img_path.length()-4);
-				//k3d::log() << debug << img_path << std::endl;
-				//k3d::log() << debug << img_type << std::endl;
 				if(img_type==".jpg")
 					factory = "JPEGBitmapReader";
 				else
