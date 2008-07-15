@@ -480,7 +480,10 @@ namespace module{
             bool hasCamera = 		false;
             bool hasGeo = 		false;
             bool hasLight = 		false;
+            bool hasLightFill = 		false;
+            bool hasLightBack = 		false;
             bool hasLight_shader = 	false;
+            bool hasLightFill_shader = 	false;
             bool hasRenderman_engine = 	false;
 
             //Pointer To Aqsis Engine For RMAN Engine Node
@@ -518,11 +521,30 @@ namespace module{
                         panelLight = dynamic_cast<light_t*>(*node);
                       }
 
+                    if(value == "p_fill_light")
+                      {
+                        hasLightFill = true;
+                        panelFillLight = dynamic_cast<light_t*>(*node);
+                      }
+
+                    if(value == "p_back_light")
+                      {
+                        hasLightBack = true;
+                        panelBackLight = dynamic_cast<light_t*>(*node);
+                      }
+
+
                     if(value == "p_light_shader")
                       {
                         hasLight_shader = true;
                         panelLShader = dynamic_cast<k3d::inode*>(*node);				
                       }
+
+                    if(value == "p_fill_light_shader")
+                      {
+                        hasLightFill_shader = true;
+                        panelLShaderFill = dynamic_cast<k3d::inode*>(*node);				
+                      }          
 
                     if(value == "p_rman_engine")
                       {
@@ -545,10 +567,33 @@ namespace module{
                 k3d::property::set_internal_value(*panelLShader, 
                                                   "shader_path", k3d::share_path() /
                                                   k3d::filesystem::generic_path("shaders/light/k3d_pointlight.sl"));
+
+                k3d::property::set_internal_value(*panelLShader, 
+                                                  "intensity", k3d::double_t(2000));
 	      
                 //METADATA INSERT
                 if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelLShader))
                   metadata->set_metadata("PreviewCore::nametag", "p_light_shader");
+   
+              }//if
+
+
+            if(!hasLightFill_shader)
+              {
+                panelLShaderFill = dynamic_cast<k3d::inode*>(k3d::plugin::create("RenderManLightShader", 
+                                                                             m_document_state->document(), 
+                                                                             "Preview Core::Fill Light Shader"));
+
+                k3d::property::set_internal_value(*panelLShaderFill, 
+                                                  "shader_path", k3d::share_path() /
+                                                  k3d::filesystem::generic_path("shaders/light/k3d_pointlight.sl"));
+
+                k3d::property::set_internal_value(*panelLShaderFill, 
+                                                  "intensity", k3d::double_t(800));
+	      
+                //METADATA INSERT
+                if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelLShaderFill))
+                  metadata->set_metadata("PreviewCore::nametag", "p_fill_light_shader");
    
               }//if
 
@@ -565,13 +610,68 @@ namespace module{
 
 
                 k3d::inode* light_transformation = k3d::set_matrix(*panelLight, 
-                                                                   k3d::translation3D(k3d::point3(-20, 20, 30)));
+                                                                   k3d::translation3D(k3d::point3(-20, 20, 20)));
+
+                k3d::property::set_internal_value(*panelLight, 
+                                                  "viewport_visible", false);
+
+
 
                 //METADATA INSERT
                 if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelLight))
                   metadata->set_metadata("PreviewCore::nametag", "p_light");
 
               }//if
+
+
+            if(!hasLightFill)
+              {
+                panelFillLight = dynamic_cast<light_t*>(k3d::plugin::create("RenderManLight", 
+                                                                        m_document_state->document(), 
+                                                                        "Preview Core::Fill Light"));
+
+                k3d::property::set_internal_value(*panelFillLight, 
+                                                  "shader", panelLShaderFill);
+
+
+                k3d::inode* light_transformation = k3d::set_matrix(*panelFillLight, 
+                                                                   k3d::translation3D(k3d::point3(20, 28, -18)));
+
+
+                k3d::property::set_internal_value(*panelFillLight, 
+                                                  "viewport_visible", false);
+
+
+                //METADATA INSERT
+                if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelFillLight))
+                  metadata->set_metadata("PreviewCore::nametag", "p_fill_light");
+
+              }//if
+
+
+            if(!hasLightBack)
+              {
+                panelBackLight = dynamic_cast<light_t*>(k3d::plugin::create("RenderManLight", 
+                                                                        m_document_state->document(), 
+                                                                        "Preview Core::Back Light"));
+
+                k3d::property::set_internal_value(*panelBackLight, 
+                                                  "shader", panelLShader);
+
+
+                k3d::inode* light_transformation = k3d::set_matrix(*panelBackLight, 
+                                                                   k3d::translation3D(k3d::point3(0, -38, 18)));
+
+                k3d::property::set_internal_value(*panelBackLight, 
+                                                  "viewport_visible", false);
+
+
+                //METADATA INSERT
+                if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelBackLight))
+                  metadata->set_metadata("PreviewCore::nametag", "p_back_light");
+
+              }//if
+
 
             //Camera Setup************************
 	  
@@ -708,12 +808,22 @@ namespace module{
         protected:
           //Render Preview Components
           light_t *panelLight;
+          light_t *panelFillLight;
+          light_t *panelBackLight;
+
           lightShader_t *panelLShader;
+          lightShader_t *panelLShaderFill;
+
+          //NOTE: Back Uses Key Light Shader
+
           geo_t *panelGeo;
           rManEngine_t *panelEngine;
           camera_t *panelCamera;
           //k3d::ri::irender_engine *panelRenderEngine;
           k3d::uint_t previewSize;
+
+          //GTK Widgets
+          Gtk::ScrolledWindow m_scrolled_window;
 
           sigc::connection timerPreviewConnection;
 
@@ -830,6 +940,12 @@ namespace module{
               delete (*hsepIter); 
 
 
+            //ALL Gtk VSeparator*****************
+            std::vector<Gtk::VSeparator*>::iterator vsepIter = label_data_breakers.begin();
+            for(; vsepIter !=  label_data_breakers.end(); vsepIter++)
+              delete (*vsepIter); 
+
+
             //Disconect Signal Connections***********
             timerPreviewConnection.disconnect();
           }
@@ -880,7 +996,7 @@ namespace module{
                     object_preview_data_c.push_back(tmpHBox);
                     materialBoxes_c.pack_start(*tmpHBox, false, false, 10);
 
-                    Gtk::Frame *tmpFrame = new Gtk::Frame("PREVIEW");
+                    Gtk::Frame *tmpFrame = new Gtk::Frame("Preview Render:");
                     tmpFrame->add(*s_preview_obj);
                     img_holder_frames.push_back(tmpFrame);
                     tmpFrame->set_size_request(previewSize + 25, previewSize + 35);
@@ -891,7 +1007,7 @@ namespace module{
                     material_data_desc_c.push_back(tmpVBox_dd);
                     tmpHBox->pack_start(*tmpVBox_dd, true, true, 5); //HERE
 
-                    //Data HBox (Contains x2 VBox -> Label and Data)
+                    //Data HBox (Contains x3 VBox -> Label, vertical break and Data)
                     Gtk::HBox *tmpHBox_ld = new Gtk::HBox;
                     material_label_data_c.push_back(tmpHBox_ld);
                     tmpVBox_dd->pack_start(*tmpHBox_ld, false, false, 5);
@@ -905,10 +1021,10 @@ namespace module{
 
                     //BUILD LABEL STUFF
 
-                    Gtk::Label *tmpName_l = new Gtk::Label("Material Name: ");
-                    Gtk::Label *tmpType_l = new Gtk::Label("Material Type: ");
-                    Gtk::Label *tmpdateMod_l = new Gtk::Label("Date Modified: ");
-                    Gtk::Label *tmpArtistName_l = new Gtk::Label("Artist's Name: ");
+                    Gtk::Label *tmpName_l = new Gtk::Label("Material Name:");
+                    Gtk::Label *tmpType_l = new Gtk::Label("Material Type:");
+                    Gtk::Label *tmpdateMod_l = new Gtk::Label("Date Modified:");
+                    Gtk::Label *tmpArtistName_l = new Gtk::Label("Artist's Name:");
 
                     s_name_l.push_back(tmpName_l);
                     s_type_l.push_back(tmpType_l);
@@ -925,6 +1041,12 @@ namespace module{
                     tmpType_l->set_alignment(0.0);
                     tmpdateMod_l->set_alignment(0.0);
                     tmpArtistName_l->set_alignment(0.0);
+
+
+                    //Build Vertical Breaker
+                    Gtk::VSeparator *tmpVBreaker = new Gtk::VSeparator();
+                    label_data_breakers.push_back(tmpVBreaker);
+                    tmpHBox_ld->pack_start(*tmpVBreaker, false, false, 10);
 
                     //Data VBox
                     Gtk::VBox *tmpVBox_d = new Gtk::VBox;
@@ -1027,10 +1149,17 @@ namespace module{
 	    
             }//for
 
-            //Simply Enable Now Only USed Light & Geo
+
+            //Vector List Of Lights To Be Enabled In Chosen Render Engine
+            std::vector<k3d::inode*>lightsEnabled;
+            lightsEnabled.push_back(panelLight);
+            lightsEnabled.push_back(panelFillLight);
+            lightsEnabled.push_back(panelBackLight);
+
+            //Simply Enable Now Only USed Lights & Geo
             k3d::property::set_internal_value(*panelEngine, 
-                                              "enabled_lights", 
-                                              k3d::inode_collection_property::nodes_t(1, panelLight));
+                                              "enabled_lights", lightsEnabled);
+
 
             k3d::property::set_internal_value(*panelEngine, 
                                               "visible_nodes", 
@@ -1077,9 +1206,8 @@ namespace module{
           }
 
         public:
+          
           //GTK Widgets
-          Gtk::ScrolledWindow m_scrolled_window;
-
           Gtk::VBox materialBoxes_c;
           std::vector<Gtk::HBox *> object_preview_data_c;
           std::vector<Gtk::Frame *> img_holder_frames;
@@ -1103,6 +1231,8 @@ namespace module{
 
           std::vector<Gtk::HSeparator*> data_notes_breakers;
           std::vector<Gtk::HSeparator*> s_breakers;
+
+          std::vector<Gtk::VSeparator*> label_data_breakers;
 
           Gtk::HBox s_name_c;
           Gtk::HBox s_type_c;
@@ -1128,7 +1258,7 @@ namespace module{
         public:
           so_content_pane(Gtk::HPaned *_m_Hpane, s_object *_m_so, k3d::icommand_node *_m_parent, document_state *_documentState)
             :content_pane(_m_Hpane, _m_parent, _documentState), m_so(_m_so),
-             so_preview_frame("PREVIEW"), artistnotes_frame("ARTIST NOTES"),
+             so_preview_frame("Preview Render:"), artistnotes_frame("Artist's Notes:"),
              s_name_entry(*_m_parent, k3d::string_t("so_name_field"), entry::model(_m_so->so_name), 0),
              s_type_entry(*_m_parent, k3d::string_t("so_type_field"), entry::model(_m_so->so_type), 0),
              s_datemod_entry(*_m_parent, k3d::string_t("so_datestamp_field"), entry::model(_m_so->so_datestamp), 0),
@@ -1167,8 +1297,11 @@ namespace module{
                 so_preview_frame.add(materialPreview);
                 preview_c.pack_start(so_preview_frame, false, false, 8);
  	      
-                //Add Container To Right Pane From Implementation
-                m_Hpane->add2(main_detail_c);
+                //Add ScrollWindowed Panel To Right Pane From Implementation
+                m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+                m_scrolled_window.add(main_detail_c);
+
+                m_Hpane->add2(m_scrolled_window);
 
                 main_detail_c.pack_start(preview_label_data_c, false, false, 0); 
 
@@ -1215,7 +1348,6 @@ namespace module{
                 s_artistnotes_c.pack_start( s_artistnotes_mltext, true, true, 5);
                 artistnotes_frame.add(s_artistnotes_c);
 
-                //INSERT K3D TEXT VIEW HERE FOR ARTIST NOTES
 	       
                 //DEBUG INFO -> DELETE ON RELEASE
                 k3d::log() << "building material panel" << std::endl;
@@ -1256,10 +1388,17 @@ namespace module{
 	    
             }//for
 
-            //Simply Enable Now Only USed Light & Geo
+            //Vector List Of Lights To Be Enabled In Chosen Render Engine
+            std::vector<k3d::inode*>lightsEnabled;
+            lightsEnabled.push_back(panelLight);
+            lightsEnabled.push_back(panelFillLight);
+            lightsEnabled.push_back(panelBackLight);
+
+            //Simply Enable Now Only USed Lights & Geo
             k3d::property::set_internal_value(*panelEngine, 
-                                              "enabled_lights", 
-                                              k3d::inode_collection_property::nodes_t(1, panelLight));
+                                              "enabled_lights", lightsEnabled);
+ 
+
 
             k3d::property::set_internal_value(*panelEngine, 
                                               "visible_nodes", 
@@ -1387,7 +1526,6 @@ namespace module{
 
           ~implementation()
           {	
-	    
           }
 
         public:
@@ -1415,7 +1553,7 @@ namespace module{
 
         public:
           //GTK Widgets
-          Gtk::ScrolledWindow m_scrolled_window;
+          Gtk::ScrolledWindow m_tree_scrolled_window;
           Gtk::HPaned m_HPanedMain;
           Gtk::TreeView m_nav;
 
@@ -1501,10 +1639,10 @@ namespace module{
           m_nav.set_rules_hint(true);  	
 
           //Setup the Window
-          m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+          m_tree_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
    
-          //Embed The HPanel Container Widget
-          m_scrolled_window.add(m_HPanedMain);
+          //Add The Tree To The Scrolling Window
+          m_tree_scrolled_window.add(m_nav);
 
           m_HPanedMain.add1(toolbar_tree_c);
 
@@ -1514,9 +1652,10 @@ namespace module{
 
           toolbar_tree_c.pack_start(m_toolbar, false, false, 0);
 
+          m_tree_scrolled_window.set_size_request(220, -1);	//Required Otherwise Scrolledwindow Is Too Thin
 
           //Pack Tree
-          toolbar_tree_c.pack_start(m_nav, true, true, 0);
+          toolbar_tree_c.pack_start(m_tree_scrolled_window, true, true, 0);
 	  
 	  
         }//build_gui
@@ -1851,7 +1990,7 @@ namespace module{
 
           m_implementation = new mechanics::implementation(DocumentState, Parent);
 
-          pack_start(m_implementation->m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
+          pack_start(m_implementation->m_HPanedMain, Gtk::PACK_EXPAND_WIDGET);
 
           show_all();
 
