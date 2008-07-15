@@ -1,5 +1,5 @@
-#ifndef MODULE_NURBS_CURVE_OPERATIONS_H
-#define MODULE_NURBS_CURVE_OPERATIONS_H
+#ifndef MODULE_NURBS_CURVE_MODIFIER_H
+#define MODULE_NURBS_CURVE_MODIFIER_H
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
 //
@@ -42,12 +42,16 @@
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/gprim_factory.h>
 
+#include "nurbs_patch_modifier.h"
+
 #define MODULE_NURBS_DEBUG 1
 #define nurbs_debug __FILE__ << ": " << __LINE__ << " "
 #define MY_DEBUG if(MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug
 
 namespace module{
 	namespace nurbs{
+	    class nurbs_patch_modifier;
+
         class nurbs_curve_modifier{
             public:
                 nurbs_curve_modifier(k3d::mesh& input);
@@ -72,6 +76,9 @@ namespace module{
                 int curve_degree_elevate(size_t curve);
                 k3d::point4 get_homogenous_point(size_t point);
                 void split_curve_at(size_t curve, double u);
+
+                //the following methods create surfaces from the curves this mesh contains
+                void traverse_curve(size_t curve1, size_t curve2);
 
             private:
                 int factorial(int n);

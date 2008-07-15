@@ -42,7 +42,7 @@
 #include <iostream>
 #include <vector>
 
-#include "nurbs_curve_operations.h"
+#include "nurbs_curve_modifier.h"
 
 namespace module
 {
