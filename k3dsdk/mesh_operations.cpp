@@ -20,6 +20,7 @@
 #include "imaterial.h"
 #include "mesh_operations.h"
 #include "mesh_selection.h"
+#include "polyhedra.h"
 #include "shared_pointer.h"
 #include "vectors.h"
 
@@ -236,31 +237,11 @@ const mesh create_cylinder(const uint_t Rows, const uint_t Columns, imaterial* c
 
 const bool_t is_solid(const mesh& Mesh)
 {
-	// K-3D uses a split-edge data structure to represent polyhedra.
-	// We test for solidity by counting the number of edges that
-	// connect each pair of points in the polyhedra.  The polyhedra are
-	// solid if-and-only-if each pair of points is used by two edges.
-	if(!validate_polyhedra(Mesh))
-		return true;
-
-	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-
-	typedef std::map<std::pair<uint_t, uint_t>, uint_t> adjacent_edges_t;
-	adjacent_edges_t adjacent_edges;
-
-	const uint_t edge_begin = 0;
-	const uint_t edge_end = edge_begin + edge_points.size();
-	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	const uint_t polyhedron_begin = 0;
+	const uint_t polyhedron_end = polyhedron_begin + polyhedron::count(Mesh);
+	for(uint_t polyhedron = polyhedron_begin; polyhedron != polyhedron_end; ++polyhedron)
 	{
-		const uint_t vertex1 = std::min(edge_points[edge], edge_points[clockwise_edges[edge]]);
-		const uint_t vertex2 = std::max(edge_points[edge], edge_points[clockwise_edges[edge]]);
-		adjacent_edges[std::make_pair(vertex1, vertex2)] += 1;
-	}
-
-	for(adjacent_edges_t::iterator edges = adjacent_edges.begin(); edges != adjacent_edges.end(); ++edges)
-	{
-		if(edges->second != 2)
+		if(!polyhedron::is_solid(Mesh, polyhedron))
 			return false;
 	}
 

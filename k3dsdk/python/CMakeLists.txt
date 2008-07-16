@@ -68,6 +68,8 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	const_named_arrays_python.h
 	dynamic_cast_python.cpp
 	dynamic_cast_python.h
+	euler_python.cpp
+	euler_python.h
 	icommand_node_python.cpp
 	icommand_node_python.h
 	idocument_python.cpp

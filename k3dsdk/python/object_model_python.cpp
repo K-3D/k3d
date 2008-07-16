@@ -31,6 +31,7 @@
 #include "const_named_arrays_python.h"
 #include "dynamic_cast_python.h"
 #include "euler_angles_python.h"
+#include "euler_python.h"
 #include "icommand_node_python.h"
 #include "idocument_python.h"
 #include "imaterial_python.h"
@@ -422,6 +423,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_texture3();
 	define_class_uuid();
 	define_class_vector3();
+	define_namespace_euler();
 	define_namespace_log();
 	define_namespace_mime();
 	define_namespace_parallel();
