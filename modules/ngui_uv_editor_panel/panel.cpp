@@ -34,7 +34,6 @@
 #include <k3dsdk/file_range.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
-#include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imesh_source.h>

@@ -23,7 +23,6 @@
 
 #include "k3d_sds_binding.h"
 
-#include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/hints.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_operations.h>
@@ -132,7 +131,6 @@ void k3d_cache_input::update(const indices_t& Indices, facevertices_t& updated_m
 	const k3d::mesh::indices_t& edge_points = *m_input_polyhedra->edge_points;
 	init_counters();
 	const size_t face_count = face_first_loops.size();
-	k3d::timer timer;
 	indexset_t indexset;
 	for (size_t i = 0; i != Indices.size(); ++i)
 		indexset.insert(Indices[i]);
@@ -142,7 +140,6 @@ void k3d_cache_input::update(const indices_t& Indices, facevertices_t& updated_m
 	}
 	if (m_modified_faces.empty()) // search faces to modify using selection data
 	{
-		k3d::timer timer;
 		for(size_t face = 0; face != face_count; ++face)
 		{
 			if(indexset.empty() || selected(face, indexset)) // selected(face) is expensive!
