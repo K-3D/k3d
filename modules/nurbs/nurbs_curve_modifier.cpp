@@ -7,7 +7,7 @@ namespace module
         nurbs_curve_modifier::nurbs_curve_modifier(k3d::mesh& input)
         {
             m_instance = &input;
-            if(m_instance->nurbs_curve_groups != NULL)
+            if (m_instance->nurbs_curve_groups != NULL)
             {
                 groups = k3d::make_unique(input.nurbs_curve_groups);
                 curve_knots = k3d::make_unique(groups->curve_knots);
@@ -639,7 +639,7 @@ namespace module
             double a = *knots1_end;
             double step = (*knots2_begin - a) / (curve_orders->at(use_curve1) + 1);
 
-            for(int i = 0; i < curve_orders->at(use_curve1) + 2; i++)
+            for (int i = 0; i < curve_orders->at(use_curve1) + 2; i++)
             {
                 new_knots.push_back(a + step*i);
                 MY_DEBUG << new_knots.back() << std::endl;
@@ -667,7 +667,7 @@ namespace module
             new_knots.clear();
             new_knots.insert(new_knots.end(), knots2_begin, knots2_end);
 
-            for(k3d::mesh::knots_t::iterator i = new_knots.begin(); i != new_knots.end(); ++i)
+            for (k3d::mesh::knots_t::iterator i = new_knots.begin(); i != new_knots.end(); ++i)
             {
                 MY_DEBUG << *i << std::endl;
             }
@@ -1256,6 +1256,13 @@ namespace module
             return str.str();
         }
 
+        std::string nurbs_curve_modifier::output_point(const k3d::point3& point)
+        {
+            std::stringstream str;
+            str << point[0] << " x " << point[1] << " x " << point[2];
+            return str.str();
+        }
+
         k3d::mesh::indices_t nurbs_curve_modifier::create_curve_points(std::vector<k3d::point4>& points)
         {
             k3d::mesh::indices_t new_curve_points;
@@ -1709,12 +1716,12 @@ namespace module
 
             const size_t point_count = curve_point_counts->at(curve1);
 
-            for(int i = 0; i < curve_point_counts->at(curve2); i++)
+            for (int i = 0; i < curve_point_counts->at(curve2); i++)
             {
                 k3d::point3 delta_u = mesh_points->at( curve_points->at(curve_points_begin[1] + i) ) + (-mesh_points->at( curve_points->at(curve_points_begin[1]) ));
                 double w_u = curve_point_weights->at(curve_points_begin[1] + i);
 
-                for(int j = 0; j < point_count; j++)
+                for (int j = 0; j < point_count; j++)
                 {
                     k3d::point3 p_v = mesh_points->at( curve_points->at(curve_points_begin[0] + j) );
                     double w_v = curve_point_weights->at(curve_points_begin[0] + j);
@@ -1727,12 +1734,65 @@ namespace module
                 }
             }
 
-            if(m_instance->nurbs_patches == NULL)
+
+            MY_DEBUG << "Adding patch using gprim_factory" << std::endl;
+            k3d::gprim_factory fac(*m_instance);
+            fac.add_nurbs_patch(u_order, v_order, new_points, u_knots, v_knots, new_weights);
+        }
+
+        void nurbs_curve_modifier::revolve_curve(size_t curve, double angle, int segments)
+        {
+            //revolve this curve to a certain angle
+
+            const size_t curve_points_begin = curve_first_points->at(curve);
+            const size_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
+
+            const size_t curve_knots_begin = curve_first_knots->at(curve);
+            const size_t curve_knots_end = curve_knots_begin + (curve_points_end - curve_points_begin) + curve_orders->at(curve);
+
+            //create a circle with the given angle
+            k3d::mesh::knots_t u_knots;
+            std::vector<double> weights;
+            std::vector<k3d::point3> control_points;
+            k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, angle, segments, u_knots, weights, control_points);
+
+            for(int i = 0; i < control_points.size(); i++)
             {
-                MY_DEBUG << "Adding patch using gprim_factory" << std::endl;
-                k3d::gprim_factory fac(*m_instance);
-                fac.add_nurbs_patch(u_order, v_order, new_points, u_knots, v_knots, new_weights);
+                MY_DEBUG << output_point(control_points.at(i)) << " x " << weights.at(i) << std::endl;
             }
+
+            //we're going to scale this arc to the size of the distance of each point of the curve
+            k3d::mesh::indices_t new_points;
+            k3d::mesh::weights_t new_weights;
+
+            k3d::mesh::knots_t v_knots;
+            v_knots.insert(v_knots.end(), curve_knots->begin() + curve_knots_begin, curve_knots->begin() + curve_knots_end);
+
+            size_t v_order = curve_orders->at(curve);
+            size_t u_order = 3;//the circle is of degree 2
+
+            for (int i = 0; i < curve_point_counts->at(curve); i++)
+            {
+                k3d::point3 p = mesh_points->at(curve_points->at(curve_points_begin + i));
+                double w = curve_point_weights->at(curve_points_begin + i);
+                double distance = sqrt((p[0] * p[0]) + (p[1] * p[1])); // we want the distance to the z axis
+
+                MY_DEBUG << "Working with point: " << output_point(p) << " and weight " << w << "Creating circle with radius: " << distance << std::endl;
+
+                for (int j = 0; j < control_points.size(); j++)
+                {
+                    k3d::point3 p_u(control_points.at(j)[0] * distance, control_points.at(j)[1] * distance, p[2]);
+                    mesh_points->push_back(p_u);
+                    point_selection->push_back(0.0);
+
+                    new_points.push_back(mesh_points->size()-1);
+                    new_weights.push_back(w * weights.at(j));
+                }
+            }
+
+            MY_DEBUG << "Adding patch using gprim_factory" << std::endl;
+            k3d::gprim_factory fac(*m_instance);
+            fac.add_nurbs_patch(u_order, v_order, new_points, u_knots, v_knots, new_weights);
         }
 
     }//nurbs

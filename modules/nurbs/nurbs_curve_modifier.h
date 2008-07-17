@@ -79,6 +79,7 @@ namespace module{
 
                 //the following methods create surfaces from the curves this mesh contains
                 void traverse_curve(size_t curve1, size_t curve2);
+                void revolve_curve(size_t curve, double angle, int segments);
 
             private:
                 int factorial(int n);
@@ -87,6 +88,7 @@ namespace module{
                 int Max(int a, int b);
                 void fill_bezalfs(std::vector<std::vector<double> >& bezalfs, int power, int t);
                 std::string output_point(const k3d::point4& point);
+                std::string output_point(const k3d::point3& point);
                 k3d::mesh::indices_t create_curve_points(std::vector<k3d::point4>& points);
                 k3d::mesh::weights_t create_curve_point_weights(std::vector<k3d::point4>& points);
                 bool find_point_inside(k3d::mesh::indices_t *points, size_t index);

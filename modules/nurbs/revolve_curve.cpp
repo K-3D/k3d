@@ -48,15 +48,19 @@ namespace module
 
 	namespace nurbs
 	{
-		class curve_traversal :
+		class revolve_curve :
 			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 		{
 			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 		public:
-			curve_traversal(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-				base(Factory, Document)
+			revolve_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+				base(Factory, Document),
+				m_angle(init_owner(*this) + init_name("angle") + init_label(_("angle")) + init_description(_("The curve will be rotated to this angle, specify 360 for a closed shape")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
+                m_segments(init_owner(*this) + init_name("segments") + init_label(_("segments")) + init_description(_("Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+				m_angle.changed_signal().connect(make_update_mesh_slot());
+                m_segments.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -73,30 +77,16 @@ namespace module
 
 				merge_selection(m_mesh_selection.pipeline_value(), Output);
 
-				std::vector<size_t> curves;
+				nurbs_curve_modifier mod(Output);
+                int my_curve = mod.selected_curve();
 
-				const size_t group_begin = 0;
-				const size_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
-				for(size_t group = group_begin; group != group_end; ++group)
-				{
-					const size_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
-					const size_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
-					for(size_t curve = curve_begin; curve != curve_end; ++curve)
-					{
-						if((*Output.nurbs_curve_groups->curve_selection)[curve] > 0.0)
-                            curves.push_back(curve);
-					}
-				}
+                if(my_curve < 0)
+                {
+                    k3d::log() << error << nurbs_debug << "You need to select exactly one curve!" << std::endl;
+                    return;
+                }
 
-				if( curves.size() != 2)
-				{
-					k3d::log() << error << nurbs_debug << "You need to select 2 curves!\n" << std::endl;
-				}
-				else
-				{
-                    nurbs_curve_modifier mod(Output);
-                    mod.traverse_curve(curves[0], curves[1]);
-				}
+                mod.revolve_curve(my_curve,m_angle.pipeline_value(),m_segments.pipeline_value());
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 				assert_warning(k3d::validate_nurbs_patches(Output));
@@ -104,10 +94,10 @@ namespace module
 
 			static k3d::iplugin_factory& get_factory()
 			{
-				static k3d::document_plugin_factory<curve_traversal, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
-				k3d::uuid(0x9e316d5f, 0x9945f986, 0xbb2f70b6, 0xec54bada),
-					"NurbsCurveTraversal",
-					_("Creates a NURBS surface while traversing one NURBS curve along another"),
+				static k3d::document_plugin_factory<revolve_curve, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
+				k3d::uuid(0x973e535d, 0x434f2e26, 0x0f41d280, 0x2b79350b),
+					"NurbsRevolveCurve",
+					_("Take a NURBS curve and rotate it around the y axis"),
 					"NURBS",
 					k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -115,12 +105,14 @@ namespace module
 			}
 
 		private:
+            k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_angle;
+            k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_segments;
 		};
 
 		//Create connect_curve factory
-		k3d::iplugin_factory& curve_traversal_factory()
+		k3d::iplugin_factory& revolve_curve_factory()
 		{
-			return curve_traversal::get_factory();
+			return revolve_curve::get_factory();
 		}
 
 	}//namespace nurbs
