@@ -84,6 +84,7 @@ public:
 		m_view.append_column(*Gtk::manage(node_column));
 
 		m_view.append_column(_("Task"), m_columns.task);
+		m_view.append_column(_("Count"), m_columns.count);
 		m_view.append_column(_("Time"), m_columns.time);
 		m_view.append_column_numeric(_("%"), m_columns.percent, _("%.2f%%"));
 
@@ -134,7 +135,7 @@ public:
 
 private:
 	/// Called by the signal system when profile data arrives
-	void on_node_execution(k3d::inode& Node, const std::string& Task, double Time)
+	void on_node_execution(k3d::inode& Node, const k3d::string_t& Task, k3d::double_t Time)
 	{
 		new_records.push_back(new_record(Node, Task, Time));
 		schedule_update();
@@ -172,7 +173,7 @@ private:
 	}
 
 	/// Looks-up the row for a given task
-	bool get_task_row(Gtk::TreeRow NodeRow, const std::string& Task, Gtk::TreeRow& Row)
+	bool get_task_row(Gtk::TreeRow NodeRow, const k3d::string_t& Task, Gtk::TreeRow& Row)
 	{
 		Gtk::TreeNodeChildren rows = NodeRow.children();
 		for(Gtk::TreeIter row = rows.begin(); row != rows.end(); ++row)
@@ -188,7 +189,7 @@ private:
 	}
 
 	/// Computes a color based on a percentage
-	const Gdk::Color get_color(const double percentage)
+	const Gdk::Color get_color(const k3d::double_t percentage)
 	{	
 		Gdk::Color result;
 	
@@ -210,18 +211,21 @@ private:
 		Gdk::Color white;
 		white.set_rgb_p(1, 1, 1);
 
-		double total_time = 0;
+		k3d::double_t total_time = 0;
 
 		Gtk::TreeNodeChildren node_rows = m_model->children();
 		for(Gtk::TreeIter node_row = node_rows.begin(); node_row != node_rows.end(); ++node_row)
 		{
+			(*node_row)[m_columns.count] = 0;
 			(*node_row)[m_columns.time] = 0.0;
 
 			Gtk::TreeNodeChildren task_rows = node_row->children();
 			for(Gtk::TreeIter task_row = task_rows.begin(); task_row != task_rows.end(); ++task_row)
 			{
-				const double task_time = (*task_row)[m_columns.time];
+				const k3d::uint_t task_count = (*task_row)[m_columns.count];
+				const k3d::double_t task_time = (*task_row)[m_columns.time];
 
+				(*node_row)[m_columns.count] = (*node_row)[m_columns.count] + task_count;
 				(*node_row)[m_columns.time] = (*node_row)[m_columns.time] + task_time;
 				total_time += task_time;
 			}
@@ -231,7 +235,7 @@ private:
 		{
 			if(total_time)
 			{
-				const double percent = (*node_row)[m_columns.time] / total_time;
+				const k3d::double_t percent = (*node_row)[m_columns.time] / total_time;
 
 				(*node_row)[m_columns.percent] = 100.0 * percent;
 				(*node_row)[m_columns.color] = get_color(percent);
@@ -247,7 +251,7 @@ private:
 			{
 				if(total_time)
 				{
-					const double percent = (*task_row)[m_columns.time] / total_time;
+					const k3d::double_t percent = (*task_row)[m_columns.time] / total_time;
 
 					(*task_row)[m_columns.percent] = 100.0 * (*task_row)[m_columns.time] / total_time;
 					(*task_row)[m_columns.color] = get_color(percent);
@@ -274,6 +278,7 @@ private:
 				node_row[m_columns.node] = new_records[i].node;
 				node_row[m_columns.icon] = libk3dngui::quiet_load_icon(new_records[i].node->factory().name(), Gtk::ICON_SIZE_MENU);
 				node_row[m_columns.name] = new_records[i].node->name();
+				node_row[m_columns.count] = 0;
 			}
 
 			Gtk::TreeRow task_row;
@@ -283,8 +288,10 @@ private:
 
 				task_row[m_columns.node] = new_records[i].node;
 				task_row[m_columns.task] = new_records[i].task;
+				task_row[m_columns.count] = 0;
 			}
 
+			task_row[m_columns.count] = task_row[m_columns.count] + 1;
 			task_row[m_columns.time] = new_records[i].time;
 		}
 		new_records.clear();
@@ -302,6 +309,7 @@ private:
 			add(icon);
 			add(name);
 			add(task);
+			add(count);
 			add(time);
 			add(percent);
 			add(color);
@@ -311,8 +319,9 @@ private:
 		Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf> > icon;
 		Gtk::TreeModelColumn<Glib::ustring> name;
 		Gtk::TreeModelColumn<Glib::ustring> task;
-		Gtk::TreeModelColumn<double> time;
-		Gtk::TreeModelColumn<double> percent;
+		Gtk::TreeModelColumn<k3d::uint_t> count;
+		Gtk::TreeModelColumn<k3d::double_t> time;
+		Gtk::TreeModelColumn<k3d::double_t> percent;
 		Gtk::TreeModelColumn<Gdk::Color> color;
 	};
 	columns m_columns;
@@ -331,7 +340,7 @@ private:
 		{
 		}
 
-		new_record(k3d::inode& Node, const std::string& Task, double Time) :
+		new_record(k3d::inode& Node, const k3d::string_t& Task, k3d::double_t Time) :
 			node(&Node),
 			task(Task),
 			time(Time)
@@ -339,8 +348,8 @@ private:
 		}
 
 		k3d::inode* node;
-		std::string task;
-		double time;
+		k3d::string_t task;
+		k3d::double_t time;
 	};
 
 	std::vector<new_record> new_records;
