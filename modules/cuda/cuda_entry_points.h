@@ -71,7 +71,7 @@ extern "C" K3D_CUDA_DECLSPEC void allocate_device_memory ( void** device_pointer
 extern "C" K3D_CUDA_DECLSPEC void copy_from_host_to_device ( void* device_pointer, const void* host_pointer, int size_in_bytes );
 extern "C" K3D_CUDA_DECLSPEC void copy_from_device_to_host ( void* host_pointer, const void* device_pointer, int size_in_bytes );
 extern "C" K3D_CUDA_DECLSPEC void free_device_memory ( void* device_pointer );
-extern "C" K3D_CUDA_DECLSPEC void allocate_pinned_host_memory ( void** pointer_on_host, size_t size_in_bytes );
+extern "C" K3D_CUDA_DECLSPEC void allocate_pinned_host_memory ( void** pointer_on_host, int size_in_bytes );
 extern "C" K3D_CUDA_DECLSPEC void free_pinned_host_memory ( void* pointer_on_host );
 
 
@@ -82,27 +82,33 @@ extern "C" K3D_CUDA_DECLSPEC void transform_points_synchronous ( double *InputPo
 extern "C" K3D_CUDA_DECLSPEC void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 
 extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_split_point_calculator ( 
-                                                        unsigned int* edge_indices, 
+                                                        unsigned int* phost_edge_indices, 
                                                         unsigned int num_edge_indices, 
-                                                        float* points_and_selection,
-                                                        unsigned int num_points,  
-                                                        unsigned int* edge_point_indices,
-                                                        unsigned int* clockwise_edge_indices,
-                                                        float* new_points_and_selection,
+                                                        float* pdev_points_and_selection,
+                                                        unsigned int num_input_points,  
+                                                        unsigned int* pdev_edge_point_indices,
+                                                        unsigned int* pdev_clockwise_edge_indices,
                                                         int num_split_points 
                                                             );
 
 extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_update_indices_entry (
-                                                        unsigned int* host_input_edge_point_indices, 
-                                                        unsigned int* host_input_clockwise_edge_point_indices,
+                                                        unsigned int* pdev_input_edge_point_indices, 
+                                                        unsigned int* pdev_input_clockwise_edge_point_indices,
                                                         unsigned int num_host_edges,
                                                         unsigned int* pdev_output_edge_point_indices, 
                                                         unsigned int* pdev_output_clockwise_edge_point_indices,
-                                                        unsigned int* host_edge_index_map,
+                                                        unsigned int* pdev_edge_index_map,
                                                         int num_edge_maps
                                                             );
 
-extern "C" K3D_CUDA_DECLSPEC void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, size_t device_pitch, size_t host_pitch, size_t width_in_bytes, size_t rows );
+extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_update_loop_first_edges (
+                                                        unsigned int* pdev_ouput_loop_first_edges, 
+                                                        unsigned int num_loops,
+                                                        unsigned int* pdev_edge_index_map,
+                                                        int num_edge_maps
+                                                            );
+
+extern "C" K3D_CUDA_DECLSPEC void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, int device_pitch, int host_pitch, int width_in_bytes, int rows );
 
 extern "C" K3D_CUDA_DECLSPEC void synchronize_threads ();
 

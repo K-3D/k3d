@@ -22,93 +22,8 @@
     \date 27 July 2008
 */
 
-
 #include <k3dsdk/mesh.h>
-#include "cuda_entry_points.h"
-
-class cuda_device_polyhedra
-{
-    public:
-        /// Constructors
-        cuda_device_polyhedra ( const k3d::mesh::polyhedra_t& host_polyhedra );
-        /// Destructor
-        ~cuda_device_polyhedra ();
-        
-        void copy_to_device ();
-        void copy_from_device ( k3d::mesh::polyhedra_t& destination_polyhedra );
-        
-        void output_debug_info ();
-        
-        void allocate_additional_polyhedra ( k3d::uint32_t number_of_additional_polyhedra );
-        void allocate_additional_faces ( k3d::uint32_t number_of_additional_polyhedra );
-        void allocate_additional_loops ( k3d::uint32_t number_of_additional_loops );
-        void allocate_additional_edges ( k3d::uint32_t number_of_additional_edges );
-        
-        k3d::uint32_t* get_per_edge_points_pointer();
-        k3d::uint32_t* get_additional_per_edge_points_pointer();
-        k3d::uint32_t* get_per_edge_clockwise_edges_pointer();
-        k3d::uint32_t* get_additional_per_edge_clockwise_edges_pointer();
-    private:    
-        /// a pointer to uint arrays allocated on the device
-        k3d::uint32_t* pdev_per_polygon_first_face;
-        k3d::uint32_t* pdev_per_polygon_face_count;
-        
-        /// a pointer to a int array allocated on the device
-        int32_t* pdev_per_polygon_types;
-        
-        /// the number of polyhedra        
-        k3d::uint32_t m_number_of_polygons;
-        
-        /// storage for additional polyhedra
-        k3d::uint32_t* pdev_additional_per_polygon_first_face;
-        k3d::uint32_t* pdev_additional_per_polygon_face_count;
-        int32_t* pdev_additional_per_polygon_types;
-        k3d::uint32_t m_number_of_additional_polyhedra;
-        
-        
-        /// a pointer to uint arrays allocated on the device
-        k3d::uint32_t* pdev_per_face_first_loops;
-        k3d::uint32_t* pdev_per_face_loop_count;
-        
-        /// a pointer to a float array on the device
-        float* pdev_per_face_selection;
-        
-        /// the number of faces - ie.  The length of the above 3 arrays
-        k3d::uint32_t m_number_of_faces;
-        
-        /// storage for additional faces
-        k3d::uint32_t* pdev_additional_per_face_first_loops;
-        k3d::uint32_t* pdev_additional_per_face_loop_count;
-        float* pdev_additional_per_face_selection;
-        k3d::uint32_t m_number_of_additional_faces;
-        
-        /// a pointer to a uint array allocated on the device
-        k3d::uint32_t* pdev_per_loop_first_edge;
-        /// the number of loops - ie.  The length of the above array
-        k3d::uint32_t m_number_of_loops;
-        
-        /// storage for additional loops
-        k3d::uint32_t* pdev_additional_per_loop_first_edge;
-        k3d::uint32_t m_number_of_additional_loops;
-        
-        /// a pointer to uint arrays allocated on the device
-        k3d::uint32_t* pdev_per_edge_point;
-        k3d::uint32_t* pdev_per_edge_clockwise_edge;       
-        /// a pointer to a float array on the device
-        float* pdev_per_edge_selection;
-        
-        /// the number of edges - ie.  The length of the above 3 arrays
-        k3d::uint32_t m_number_of_edges;
-        
-        /// storage for additional edges
-        k3d::uint32_t* pdev_additional_per_edge_point;
-        k3d::uint32_t* pdev_additional_per_edge_clockwise_edge;       
-        float* pdev_additional_per_edge_selection;
-        k3d::uint32_t m_number_of_additional_edges;
-        
-        /// a reference to the host version of the polyhedra_t   
-        const k3d::mesh::polyhedra_t* m_p_input_polyhedra;
-};
+#include "cuda_device_polyhedra.h"
 
 /// Start fleshing out cuda mesh structure.
 
@@ -117,30 +32,43 @@ class cuda_device_mesh
     public:
         cuda_device_mesh ( const k3d::mesh& host_mesh );
         ~cuda_device_mesh ();
+
+        void set_mesh ( const k3d::mesh& input_mesh );
+        void set_points_and_selections ( k3d::mesh::points_t input_points, k3d::mesh::selection_t input_selections );
+
         
-        void copy_to_device ();
-        void copy_from_device ( k3d::mesh& destination_mesh );
+        void copy_to_device ( k3d::uint32_t what_to_copy = ALL_MESH_INFO );
         
+        void copy_points_and_selections_to_device ( );
+        
+        void copy_from_device ( k3d::mesh& destination_mesh, k3d::uint32_t what_to_copy = ALL_MESH_INFO );
+
         void output_debug_info ();
-        
+
         void allocate_additional_points ( k3d::uint32_t number_of_new_points );
-        
+
         cuda_device_polyhedra& get_device_polyhedra ();
+        void set_device_polyhedra ( const k3d::mesh::polyhedra_t& host_polyhedra );
         
         float* get_points_and_selection_pointer();
         float* get_additional_points_and_selection_pointer();
-        
+
         k3d::uint32_t* get_polyhedra_edge_point_indices_pointer();
         k3d::uint32_t* get_polyhedra_clockwise_edge_point_indices_pointer();
+        k3d::uint32_t* get_polyhedra_loop_first_edges_pointer();
     private:
         /// a pointer to a array of float4's allocated on the device
-        float* pdev_points_and_selection;       
+        float* pdev_points_and_selection;
         k3d::uint32_t m_number_of_points;
-        
+
         float* pdev_additional_points;
         k3d::uint32_t m_number_of_additional_points;
-        
+
         const k3d::mesh* m_p_host_mesh;
-        cuda_device_polyhedra m_cuda_device_polyhedra;        
-};        
+
+        k3d::mesh::points_t* m_p_host_points;
+        k3d::mesh::selection_t* m_p_host_selections;
+
+        cuda_device_polyhedra m_cuda_device_polyhedra;
+};
 

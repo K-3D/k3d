@@ -548,10 +548,33 @@ __global__ void subdivide_edges_update_edge_indices_kernel ( unsigned int* outpu
     {
         unsigned int out_edge_index = edge_index_map[edge_index_index];
         
+        #ifdef __DEVICE_EMULATION__
+            printf("Edge: %d : Mapped Edge : %d \n", edge_index_index, out_edge_index);
+        #endif
+                
         output_edge_point_indices[out_edge_index] = input_edge_point_indices[edge_index_index];
         output_clockwise_edge_point_indices[out_edge_index] = edge_index_map[input_clockwise_edge_point_indices[edge_index_index]];
+        
+        #ifdef __DEVICE_EMULATION__
+            printf("Input Edge Point: %d : Input CW Edge Point : %d \n", input_edge_point_indices[edge_index_index], input_clockwise_edge_point_indices[edge_index_index]);
+        #endif
     }
 }
+
+__global__ void subdivide_edges_update_loop_first_edges_kernel ( 
+                                                        unsigned int* pdev_ouput_loop_first_edges, 
+                                                        int num_loops,
+                                                        unsigned int* edge_index_map
+                                                        )
+{
+    unsigned int loop_index = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+    if ( loop_index < num_loops )
+    {
+        pdev_ouput_loop_first_edges[loop_index] = edge_index_map[pdev_ouput_loop_first_edges[loop_index]];
+    }
+}
+
 
 
 #endif // #ifndef _CUDA_KERNELS_H_
