@@ -101,12 +101,27 @@ extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_update_indices_entry (
                                                         int num_edge_maps
                                                             );
 
-extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_update_loop_first_edges (
+extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_update_loop_first_edges_entry (
                                                         unsigned int* pdev_ouput_loop_first_edges, 
                                                         unsigned int num_loops,
                                                         unsigned int* pdev_edge_index_map,
                                                         int num_edge_maps
                                                             );
+extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_split_edges_entry (
+                                                        unsigned int* pdev_output_edge_point_indices, 
+                                                        unsigned int* pdev_output_clockwise_edge_point_indices, 
+                                                        unsigned int* pdev_input_clockwise_edge_point_indices,
+                                                        unsigned int* pdev_edge_index_map,
+                                                        unsigned int* phost_edge_indices, 
+                                                        unsigned int num_edge_indices, 
+                                                        int num_split_points,
+                                                        unsigned int* phost_first_midpoint,
+                                                        int num_first_midpoints,
+                                                        unsigned int* phost_companions,
+                                                        int num_companions,
+                                                        unsigned char* phost_boundary_edges,
+                                                        int num_boundary_edges
+                                                        );                                                                
 
 extern "C" K3D_CUDA_DECLSPEC void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, int device_pitch, int host_pitch, int width_in_bytes, int rows );
 

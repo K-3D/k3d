@@ -439,7 +439,7 @@ extern "C" void subdivide_edges_split_point_calculator ( unsigned int* phost_edg
     allocate_device_memory((void**)&pdev_edge_list, num_edge_indices*sizeof(unsigned int));
     copy_from_host_to_device((void*)pdev_edge_list, (void*)phost_edge_indices, num_edge_indices*sizeof(unsigned int));
 
-    int threads_x = 64 / num_split_points;
+    int threads_x = 512 / num_split_points;
     
     dim3 threads_per_block(threads_x, num_split_points);
     dim3 blocks_per_grid( iDivUp(num_edge_indices, threads_x), 1);
@@ -489,7 +489,7 @@ extern "C" void subdivide_edges_update_indices_entry (unsigned int* pdev_input_e
     CUT_CHECK_ERROR("Kernel execution failed");
 }
 
-extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_update_loop_first_edges (
+extern "C" void subdivide_edges_update_loop_first_edges_entry (
                                                         unsigned int* pdev_ouput_loop_first_edges, 
                                                         unsigned int num_loops,
                                                         unsigned int* pdev_edge_index_map,
@@ -507,6 +507,61 @@ extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_update_loop_first_edges (
     
     CUT_CHECK_ERROR("Kernel execution failed");
 }
+
+extern "C" void subdivide_edges_split_edges_entry (unsigned int* pdev_output_edge_point_indices, 
+                                                    unsigned int* pdev_output_clockwise_edge_point_indices, 
+                                                    unsigned int* pdev_input_clockwise_edge_point_indices,
+                                                    unsigned int* pdev_edge_index_map,
+                                                    unsigned int* phost_edge_indices, 
+                                                    unsigned int num_edge_indices, 
+                                                    int num_split_points,
+                                                    unsigned int* phost_first_midpoint,
+                                                    int num_first_midpoints,
+                                                    unsigned int* phost_companions,
+                                                    int num_companions,
+                                                    unsigned char* phost_boundary_edges,
+                                                    int num_boundary_edges
+                                                    )    
+{
+    
+    unsigned int* pdev_edge_list;
+    unsigned int* pdev_first_midpoint;
+    unsigned int* pdev_companions;
+    unsigned char* pdev_boundary_edges;
+    
+    allocate_device_memory((void**)&pdev_edge_list, num_edge_indices*sizeof(unsigned int));
+    allocate_device_memory((void**)&pdev_first_midpoint, num_first_midpoints*sizeof(unsigned int));
+    allocate_device_memory((void**)&pdev_companions, num_companions*sizeof(unsigned int));
+    allocate_device_memory((void**)&pdev_boundary_edges, num_boundary_edges*sizeof(unsigned char));
+    
+    copy_from_host_to_device((void*)pdev_edge_list, (const void*)phost_edge_indices, num_edge_indices*sizeof(unsigned int));
+    copy_from_host_to_device((void*)pdev_first_midpoint, (const void*)phost_first_midpoint, num_first_midpoints*sizeof(unsigned int));
+    copy_from_host_to_device((void*)pdev_companions, (const void*)phost_companions, num_companions*sizeof(unsigned int));
+    copy_from_host_to_device((void*)pdev_boundary_edges, (const void*)phost_boundary_edges, num_boundary_edges*sizeof(unsigned char));
+    
+    int threads_x = 512 / num_split_points;
+    dim3 threads_per_block(threads_x, num_split_points);
+    dim3 blocks_per_grid( iDivUp(num_edge_indices, threads_x), 1);
+    
+    subdivide_edges_split_edges_kernel<<< blocks_per_grid, threads_per_block >>> 
+                                                   (pdev_output_edge_point_indices, 
+                                                    pdev_output_clockwise_edge_point_indices, 
+                                                    pdev_input_clockwise_edge_point_indices,
+                                                    pdev_edge_index_map,
+                                                    pdev_edge_list, 
+                                                    num_edge_indices, 
+                                                    num_split_points,
+                                                    pdev_first_midpoint,
+                                                    pdev_companions,
+                                                    pdev_boundary_edges
+                                                    );  
+    CUT_CHECK_ERROR("Kernel execution failed");                                                     
+    free_device_memory ( pdev_edge_list );
+    free_device_memory ( pdev_first_midpoint );
+    free_device_memory ( pdev_companions );
+    free_device_memory ( pdev_boundary_edges );
+}
+
 
 extern "C" void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, int device_pitch, int host_pitch, int width_in_bytes, int rows )
 {

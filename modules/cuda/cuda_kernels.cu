@@ -575,7 +575,58 @@ __global__ void subdivide_edges_update_loop_first_edges_kernel (
     }
 }
 
-
+__global__ void subdivide_edges_split_edges_kernel (unsigned int* output_edge_point_indices, 
+                                                    unsigned int* output_clockwise_edge_point_indices, 
+                                                    unsigned int* input_clockwise_edge_point_indices,
+                                                    unsigned int* edge_index_map,
+                                                    unsigned int* edge_indices, 
+                                                    unsigned int num_edge_indices, 
+                                                    int num_split_points,
+                                                    unsigned int* pdev_first_midpoint,
+                                                    unsigned int* pdev_companions,
+                                                    unsigned char* pdev_boundary_edges
+                                                    )
+                                                    
+{
+    unsigned int edge_index_index = (blockIdx.x * blockDim.x) + threadIdx.x;
+    int split_index = (blockIdx.y * blockDim.y) + threadIdx.y;
+    
+    if ( edge_index_index < num_edge_indices )
+    {
+        unsigned int edge = edge_indices[edge_index_index];
+        unsigned int old_clockwise = input_clockwise_edge_point_indices[edge];
+        unsigned int new_edge = edge_index_map[edge] + 1 + split_index;
+        
+        output_edge_point_indices[new_edge] = pdev_first_midpoint[edge] + split_index;
+        output_clockwise_edge_point_indices[new_edge - 1] = new_edge;
+        
+        if ( split_index == 0 )
+        {
+            output_clockwise_edge_point_indices[new_edge + num_split_points - 1] = edge_index_map[old_clockwise];        
+        }
+        
+        
+        #ifdef __DEVICE_EMULATION__
+            printf("%c\n", pdev_boundary_edges[edge]);
+        #endif       
+                
+        if ( !pdev_boundary_edges[edge] )
+        {
+            unsigned int companion = pdev_companions[edge];
+            old_clockwise = input_clockwise_edge_point_indices[companion];
+            new_edge = edge_index_map[companion] + 1 + split_index;
+            
+            output_edge_point_indices[new_edge] = pdev_first_midpoint[edge] - split_index + num_split_points - 1;
+            output_clockwise_edge_point_indices[new_edge - 1] = new_edge;
+            
+            if ( split_index == 0 )
+            {
+                output_clockwise_edge_point_indices[new_edge + num_split_points - 1] = edge_index_map[old_clockwise];                                
+            }
+        }
+    }
+           
+}
 
 #endif // #ifndef _CUDA_KERNELS_H_
 
