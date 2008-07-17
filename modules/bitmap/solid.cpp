@@ -21,14 +21,12 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/color.h>
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/bitmap_source.h>
+#include <k3dsdk/color.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/ipipeline_profiler.h>
-
 
 namespace module
 {
@@ -52,26 +50,28 @@ public:
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Bitmap height")) + init_value(64L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
 		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Bitmap color")) + init_value(k3d::color(1, 1, 1)))
 	{
-		m_width.changed_signal().connect(make_reset_bitmap_slot());
-		m_height.changed_signal().connect(make_reset_bitmap_slot());
-		m_color.changed_signal().connect(make_reset_bitmap_slot());
+		m_width.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_dimensions_changed> >(make_update_bitmap_slot()));
+
+		m_height.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_dimensions_changed> >(make_update_bitmap_slot()));
+
+		m_color.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
 	}
 
-	void on_create_bitmap(k3d::bitmap& Bitmap)
+	void on_resize_bitmap(k3d::bitmap& Bitmap)
 	{
-		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Create Bitmap");
-        const k3d::pixel_size_t width = m_width.pipeline_value();
+		const k3d::pixel_size_t width = m_width.pipeline_value();
 		const k3d::pixel_size_t height = m_height.pipeline_value();
-		const k3d::color color = m_color.pipeline_value();
-
 		Bitmap.recreate(width, height);
+	}
 
+	void on_assign_pixels(k3d::bitmap& Bitmap)
+	{
+		const k3d::color color = m_color.pipeline_value();
 		const k3d::bitmap::view_t& bitmap = boost::gil::view(Bitmap);
 		std::fill(bitmap.begin(), bitmap.end(), k3d::pixel(color.red, color.green, color.blue, 1.0));
-	}
-
-	void on_update_bitmap(k3d::bitmap& Bitmap)
-	{
 	}
 
 	static k3d::iplugin_factory& get_factory()

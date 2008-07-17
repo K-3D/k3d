@@ -26,7 +26,6 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/ibitmap_importer.h>
-#include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/node.h>
@@ -58,13 +57,13 @@ public:
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Browse for an input bitmap")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type(k3d::options::path::bitmaps()))
 	{
-		m_file.changed_signal().connect(make_reset_bitmap_slot());
+		m_file.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_bitmap_slot()));
 	}
 
-	void on_create_bitmap(k3d::bitmap& Bitmap)
+	void on_resize_bitmap(k3d::bitmap& Bitmap)
 	{
-		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Create Bitmap");
-        const k3d::filesystem::path file = m_file.pipeline_value();
+		const k3d::filesystem::path file = m_file.pipeline_value();
 		if(!k3d::filesystem::exists(file))
 			return;
 
@@ -98,7 +97,7 @@ public:
 		}
 	}
 
-	void on_update_bitmap(k3d::bitmap& Bitmap)
+	void on_assign_pixels(k3d::bitmap& Bitmap)
 	{
 	}
 

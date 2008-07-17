@@ -21,11 +21,10 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/bitmap_source.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
-#include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 
@@ -56,30 +55,40 @@ public:
 		m_color1(init_owner(*this) + init_name("color1") + init_label(_("Color 1")) + init_description(_("First check color")) + init_value(k3d::color(1, 1, 1))),
 		m_color2(init_owner(*this) + init_name("color2") + init_label(_("Color 2")) + init_description(_("Second check color")) + init_value(k3d::color(0, 0, 0)))
 	{
-		m_width.changed_signal().connect(make_reset_bitmap_slot());
-		m_height.changed_signal().connect(make_reset_bitmap_slot());
-		m_check_width.changed_signal().connect(make_reset_bitmap_slot());
-		m_check_height.changed_signal().connect(make_reset_bitmap_slot());
-		m_color1.changed_signal().connect(make_reset_bitmap_slot());
-		m_color2.changed_signal().connect(make_reset_bitmap_slot());
+		m_width.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_dimensions_changed> >(make_update_bitmap_slot()));
+
+		m_height.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_dimensions_changed> >(make_update_bitmap_slot()));
+
+		m_check_width.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+
+		m_check_height.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+
+		m_color1.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+
+		m_color2.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
 	}
 
-	void on_create_bitmap(k3d::bitmap& Bitmap)
+	void on_resize_bitmap(k3d::bitmap& Bitmap)
 	{
-		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Create Bitmap");
-        const k3d::pixel_size_t width = m_width.pipeline_value();
+	        const k3d::pixel_size_t width = m_width.pipeline_value();
 		const k3d::pixel_size_t height = m_height.pipeline_value();
+		Bitmap.recreate(width, height);
+	}
+
+	void on_assign_pixels(k3d::bitmap& Bitmap)
+	{
 		const k3d::pixel_size_t check_width = m_check_width.pipeline_value();
 		const k3d::pixel_size_t check_height = m_check_height.pipeline_value();
 		const k3d::color color1 = m_color1.pipeline_value();
 		const k3d::color color2 = m_color2.pipeline_value();
 
-		Bitmap.recreate(width, height);
 		k3d::checkerboard_fill(view(Bitmap), check_width, check_height, k3d::pixel(color1.red, color1.green, color1.blue, 1.0), k3d::pixel(color2.red, color2.green, color2.blue, 1.0));
-	}
-
-	void on_update_bitmap(k3d::bitmap& Bitmap)
-	{
 	}
 
 	static k3d::iplugin_factory& get_factory()

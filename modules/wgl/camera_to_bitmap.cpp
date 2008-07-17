@@ -158,20 +158,27 @@ public:
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Bitmap width")) + init_value(256L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Bitmap height")) + init_value(256L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1)))
 	{
-		m_camera.changed_signal().connect(make_reset_bitmap_slot());
-		m_render_engine.changed_signal().connect(make_reset_bitmap_slot());
-		m_width.changed_signal().connect(make_reset_bitmap_slot());
-		m_height.changed_signal().connect(make_reset_bitmap_slot());
+		m_camera.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+
+		m_render_engine.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+
+		m_width.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_dimensions_changed> >(make_update_bitmap_slot()));
+
+		m_height.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_dimensions_changed> >(make_update_bitmap_slot()));
 	}
 
-	void on_create_bitmap(k3d::bitmap& Bitmap)
+	void on_resize_bitmap(k3d::bitmap& Bitmap)
 	{
 		const k3d::pixel_size_t width = m_width.pipeline_value();
 		const k3d::pixel_size_t height = m_height.pipeline_value();
 		Bitmap.recreate(width, height);
 	}
 
-	void on_update_bitmap(k3d::bitmap& Bitmap)
+	void on_assign_pixels(k3d::bitmap& Bitmap)
 	{
 		k3d::icamera* const camera = m_camera.pipeline_value();
 		k3d::gl::irender_viewport* const render_engine = m_render_engine.pipeline_value();

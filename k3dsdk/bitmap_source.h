@@ -22,12 +22,16 @@
 
 #include "bitmap.h"
 #include "data.h"
+#include "hints.h"
 #include "ibitmap_source.h"
+#include "ipipeline_profiler.h"
 #include "k3d-i18n-config.h"
+#include "pointer_demand_storage.h"
 
 namespace k3d
 {
 
+/// Boilerplate CRTP class for bitmap source objects that produce a k3d::bitmap* as output.
 template<typename derived_t>
 class bitmap_source :
 	public ibitmap_source
@@ -38,47 +42,74 @@ public:
 		return m_output_bitmap;
 	}
 
-	sigc::slot<void, ihint*> make_reset_bitmap_slot()
-	{
-		return m_output_bitmap.make_reset_slot();
-	}
-
+	/// Returns a slot that should be connected to input properties to signal that the output bitmap has changed.
 	sigc::slot<void, ihint*> make_update_bitmap_slot()
 	{
-		return sigc::mem_fun(*this, &bitmap_source<derived_t>::update_bitmap);
+		return m_output_bitmap.make_slot();
 	}
 
 protected:
 	bitmap_source() :
 		m_output_bitmap(
-			init_owner(*static_cast<derived_t*>(this))
+			init_owner(owner())
 			+ init_name("output_bitmap")
 			+ init_label(_("Output Bitmap"))
-			+ init_description(_("Output bitmap"))
-			+ init_slot(sigc::mem_fun(*this, &bitmap_source<derived_t>::create_bitmap)))
+			+ init_description(_("Output bitmap")))
 	{
+		m_output_bitmap.set_update_slot(sigc::mem_fun(*this, &bitmap_source<derived_t>::execute));
 	}
 
-	k3d_data(bitmap*, immutable_name, change_signal, no_undo, demand_storage, no_constraint, read_only_property, no_serialization) m_output_bitmap;
+	/// Stores the output bitmap, which is created on-demand.
+	k3d_data(bitmap*, immutable_name, change_signal, no_undo, pointer_demand_storage, no_constraint, read_only_property, no_serialization) m_output_bitmap;
 
 private:
-	void create_bitmap(bitmap& Bitmap)
+	inline derived_t& owner()
 	{
-		on_create_bitmap(Bitmap);
-		on_update_bitmap(Bitmap);
+		return *static_cast<derived_t*>(this);
 	}
 
-	void update_bitmap(ihint* const Hint)
+	/// Called whenever the output bitmap has been modified and needs to be updated.
+	void execute(const std::vector<ihint*>& Hints, bitmap& Bitmap)
 	{
-		if(bitmap* const output_bitmap = m_output_bitmap.internal_value())
+		bool resize_bitmap = false;
+		bool assign_pixels = false;
+
+		for(int i = 0; i != Hints.size(); ++i)
 		{
-			on_update_bitmap(*output_bitmap);
-			m_output_bitmap.changed_signal().emit(Hint);
+			// Input pixels changed, so all we have to do is reassign ours ...
+			if(dynamic_cast<hint::bitmap_pixels_changed*>(Hints[i]))
+			{
+				assign_pixels = true;
+			}
+			// In every other case (bitmap_dimensions_changed, unknown hint, or no hint),
+			// we must assume the worst and recreate everything from scratch ...
+			else
+			{
+				resize_bitmap = true;
+				assign_pixels = true;
+				break;
+			}
+		}
+
+		if(resize_bitmap)
+		{
+			owner().document().pipeline_profiler().start_execution(owner(), "Resize Bitmap");
+			on_resize_bitmap(Bitmap);
+			owner().document().pipeline_profiler().finish_execution(owner(), "Resize Bitmap");
+		}
+
+		if(assign_pixels)
+		{
+			owner().document().pipeline_profiler().start_execution(owner(), "Assign Pixels");
+			on_assign_pixels(Bitmap);
+			owner().document().pipeline_profiler().finish_execution(owner(), "Assign Pixels");
 		}
 	}
 
-	virtual void on_create_bitmap(bitmap& Bitmap) = 0;
-	virtual void on_update_bitmap(bitmap& Bitmap) = 0;
+	/// Implement this in derived classes to set the size of the output bitmap.
+	virtual void on_resize_bitmap(bitmap& Bitmap) = 0;
+	/// Implement this in derived classes to assign values to each output pixel.
+	virtual void on_assign_pixels(bitmap& Bitmap) = 0;
 };
 
 } // namespace k3d

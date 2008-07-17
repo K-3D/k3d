@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include "hints.h"
@@ -31,6 +31,44 @@ namespace k3d
 
 namespace hint
 {
+
+//////////////////////////////////////////////////////////////////////////////
+// bitmap_dimensions_changed
+
+ihint* bitmap_dimensions_changed::clone()
+{
+	return new bitmap_dimensions_changed();
+}
+
+void bitmap_dimensions_changed::print(std::ostream& Stream)
+{
+	Stream << "bitmap_dimensions_changed";
+}
+
+bitmap_dimensions_changed* bitmap_dimensions_changed::instance()
+{
+	static bitmap_dimensions_changed hint;
+	return &hint;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// bitmap_pixels_changed
+
+ihint* bitmap_pixels_changed::clone()
+{
+	return new bitmap_pixels_changed();
+}
+
+void bitmap_pixels_changed::print(std::ostream& Stream)
+{
+	Stream << "bitmap_pixels_changed";
+}
+
+bitmap_pixels_changed* bitmap_pixels_changed::instance()
+{
+	static bitmap_pixels_changed hint;
+	return &hint;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // selection_changed
