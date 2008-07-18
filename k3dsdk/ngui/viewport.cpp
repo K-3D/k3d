@@ -44,6 +44,7 @@
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/selection_state_gl.h>
@@ -405,7 +406,7 @@ public:
 
 	/// Signal that will be emitted whenever this control should grab the panel focus
 	sigc::signal<void> m_panel_grab_signal;
-	
+
 	/// Keep track of glew initialisation
 	GLEWContext* m_glew_context;
 };
@@ -973,6 +974,95 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 			}
 		}
 	}
+	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_CURVE))
+	{
+		if(mesh->nurbs_curve_groups && mesh->nurbs_curve_groups->curve_first_points && mesh->nurbs_curve_groups->curve_point_counts && mesh->nurbs_curve_groups->curve_points)
+		{
+			const k3d::selection::id curve = tokens[k3d::selection::ABSOLUTE_NURBS_CURVE];
+
+			const size_t curve_points_begin = (*mesh->nurbs_curve_groups->curve_first_points)[curve];
+			const size_t curve_points_end = curve_points_begin + (*mesh->nurbs_curve_groups->curve_point_counts)[curve];
+			for(size_t curve_point = curve_points_begin; curve_point != curve_points_end; ++curve_point)
+			{
+				detail::select_nearest_point(
+					*mesh->points,
+					(*mesh->nurbs_curve_groups->curve_points)[curve_point],
+					Coordinates,
+					get_height(),
+					model_view_matrix,
+					projection_matrix,
+					viewport,
+					selected_point,
+					distance);
+			}
+		}
+	}
+	else if(tokens.count(k3d::selection::ABSOLUTE_BILINEAR_PATCH))
+	{
+		if(k3d::validate_bilinear_patches(*mesh))
+		{
+			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_BILINEAR_PATCH];
+			k3d::uint_t patch_begin = patch * 4;
+			k3d::uint_t patch_end = patch_begin + 4;
+			for(k3d::uint_t patch_point = patch_begin; patch_point != patch_end; ++patch_point)
+			{
+				detail::select_nearest_point(
+					*mesh->points,
+					(*mesh->bilinear_patches->patch_points)[patch_point],
+					Coordinates,
+					get_height(),
+					model_view_matrix,
+					projection_matrix,
+					viewport,
+					selected_point,
+					distance);
+			}
+		}
+	}
+	else if(tokens.count(k3d::selection::ABSOLUTE_BICUBIC_PATCH))
+	{
+		if(k3d::validate_bicubic_patches(*mesh))
+		{
+			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_BICUBIC_PATCH];
+			k3d::uint_t patch_begin = patch * 4;
+			k3d::uint_t patch_end = patch_begin + 4;
+			for(k3d::uint_t patch_point = patch_begin; patch_point != patch_end; ++patch_point)
+			{
+				detail::select_nearest_point(
+					*mesh->points,
+					(*mesh->bicubic_patches->patch_points)[patch_point],
+					Coordinates,
+					get_height(),
+					model_view_matrix,
+					projection_matrix,
+					viewport,
+					selected_point,
+					distance);
+			}
+		}
+	}
+	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_PATCH))
+	{
+		if(k3d::validate_nurbs_patches(*mesh))
+		{
+			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_BICUBIC_PATCH];
+			k3d::uint_t patch_begin = mesh->nurbs_patches->patch_first_points->at(patch);
+			k3d::uint_t patch_end = patch_begin + (mesh->nurbs_patches->patch_u_point_counts->at(patch) * mesh->nurbs_patches->patch_v_point_counts->at(patch));
+			for(k3d::uint_t patch_point = patch_begin; patch_point != patch_end; ++patch_point)
+			{
+				detail::select_nearest_point(
+					*mesh->points,
+					(*mesh->nurbs_patches->patch_points)[patch_point],
+					Coordinates,
+					get_height(),
+					model_view_matrix,
+					projection_matrix,
+					viewport,
+					selected_point,
+					distance);
+			}
+		}
+	}
 
 	if(distance < std::numeric_limits<double>::max())
 	{
@@ -982,34 +1072,6 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 		record.tokens.push_back(k3d::selection::token(ABSOLUTE_POINT, selected_point));
 		return record;
 	}
-
-	assert_not_implemented();
-/*
-	else if(tokens.count(NUCURVE_GROUP) && tokens.count(NUCURVE))
-	{
-		k3d::legacy::nucurve* const curve = mesh->nucurve_groups[tokens[NUCURVE_GROUP]]->curves[tokens[NUCURVE]];
-		for(k3d::legacy::nucurve::control_points_t::const_iterator control_point = curve->control_points.begin(); control_point != curve->control_points.end(); ++control_point)
-			detail::select_nearest_point(control_point->position, Coordinates, get_height(), model_view_matrix, projection_matrix, viewport, point, distance);
-	}
-	else if(tokens.count(BILINEAR_PATCH))
-	{
-		k3d::legacy::bilinear_patch* const patch = mesh->bilinear_patches[tokens[BILINEAR_PATCH]];
-		for(k3d::legacy::bilinear_patch::control_points_t::const_iterator control_point = patch->control_points.begin(); control_point != patch->control_points.end(); ++control_point)
-			detail::select_nearest_point(*control_point, Coordinates, get_height(), model_view_matrix, projection_matrix, viewport, point, distance);
-	}
-	else if(tokens.count(BICUBIC_PATCH))
-	{
-		k3d::legacy::bicubic_patch* const patch = mesh->bicubic_patches[tokens[BICUBIC_PATCH]];
-		for(k3d::legacy::bicubic_patch::control_points_t::const_iterator control_point = patch->control_points.begin(); control_point != patch->control_points.end(); ++control_point)
-			detail::select_nearest_point(*control_point, Coordinates, get_height(), model_view_matrix, projection_matrix, viewport, point, distance);
-	}
-	else if(tokens.count(NUPATCH))
-	{
-		k3d::legacy::nupatch* const patch = mesh->nupatches[tokens[NUPATCH]];
-		for(k3d::legacy::nupatch::control_points_t::const_iterator control_point = patch->control_points.begin(); control_point != patch->control_points.end(); ++control_point)
-			detail::select_nearest_point(control_point->position, Coordinates, get_height(), model_view_matrix, projection_matrix, viewport, point, distance);
-	}
-*/
 
 	return k3d::selection::record::empty_record();
 }
@@ -1247,7 +1309,7 @@ bool control::on_redraw()
 	return_val_if_fail(context, true);
 
 	return_val_if_fail(gdk_gl_drawable_gl_begin(drawable, context), true);
-		
+
 	if (!m_implementation->m_glew_context)
 	{
 		m_implementation->m_glew_context = new GLEWContext();
@@ -1259,9 +1321,9 @@ bool control::on_redraw()
 			assert_not_reached();
 		}
 	}
-	
+
 	glew_context::instance().set_context(m_implementation->m_glew_context);
-	
+
 	create_font();
 	glViewport(0, 0, width, height);
 	if(m_implementation->m_gl_engine.internal_value() && m_implementation->m_camera.internal_value())
