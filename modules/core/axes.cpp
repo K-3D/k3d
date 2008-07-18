@@ -164,34 +164,6 @@ public:
 			glVertex3d(0.0, 0.0, -size);
 			glVertex3d(0.0, 0.0, size);
 			glEnd();
-
-			// Draw axis labels ...
-			k3d::gl::color3d(grid_color);
-
-			double labelposition = size * 1.1;
-
-			if(!m_font)
-			{
-				m_font.reset(new FTPixmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
-				m_font->FaceSize(static_cast<unsigned int>(m_font_size.pipeline_value()));
-				m_font->UseDisplayList(true);
-				if(m_font->Error())
-					k3d::log() << error << "error initializing font" << std::endl;
-			}
-
-			glRasterPos3d(labelposition, 0, 0);
-			m_font->Render("+X");
-			glRasterPos3d(0, labelposition, 0);
-			m_font->Render("+Y");
-			glRasterPos3d(0, 0, labelposition);
-			m_font->Render("+Z");
-
-			glRasterPos3d(-labelposition, 0, 0);
-			m_font->Render("-X");
-			glRasterPos3d(0, -labelposition, 0);
-			m_font->Render("-Y");
-			glRasterPos3d(0, 0, -labelposition);
-			m_font->Render("-Z");
 		}
 
 		// Setup grid color
@@ -237,6 +209,44 @@ public:
 				glVertex3d(size, 0.0, i * grid_size);
 			}
 			glEnd();
+		}
+
+		if(m_axes.pipeline_value())
+		{
+			// Draw axis labels ...
+			k3d::gl::color3d(grid_color);
+
+			double labelposition = size * 1.1;
+
+			if(!m_font)
+			{
+				k3d::filesystem::path font_path = m_font_path.pipeline_value();
+				if(!k3d::filesystem::exists(font_path))
+				{
+					k3d::log() << error << "axis: error loading font " << font_path.native_filesystem_string().c_str() << std::endl;
+					return;
+				}
+
+				m_font.reset(new FTPixmapFont(font_path.native_filesystem_string().c_str()));
+				m_font->FaceSize(static_cast<unsigned int>(m_font_size.pipeline_value()));
+				m_font->UseDisplayList(true);
+				if(m_font->Error())
+					k3d::log() << error << "error initializing font" << std::endl;
+			}
+
+			glRasterPos3d(labelposition, 0, 0);
+			m_font->Render("+X");
+			glRasterPos3d(0, labelposition, 0);
+			m_font->Render("+Y");
+			glRasterPos3d(0, 0, labelposition);
+			m_font->Render("+Z");
+
+			glRasterPos3d(-labelposition, 0, 0);
+			m_font->Render("-X");
+			glRasterPos3d(0, -labelposition, 0);
+			m_font->Render("-Y");
+			glRasterPos3d(0, 0, -labelposition);
+			m_font->Render("-Z");
 		}
 	}
 
