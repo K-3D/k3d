@@ -65,31 +65,28 @@ public:
 
 		const k3d::mesh::points_t& points = *Mesh.points;
 		const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
-		
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &points[0]);
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
-	
+
 		enable_blending();
-		
+
 		glBegin(GL_POINTS);
-		const size_t point_begin = 0;
-		const size_t point_end = points.size();
-		for(size_t point = point_begin; point != point_end; ++point)
+		const k3d::uint_t point_begin = 0;
+		const k3d::uint_t point_end = points.size();
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
 			color4d(point_selection[point] ? selected_color : color);
-			glArrayElement(point);
+			k3d::gl::vertex3d(points[point]);
 		}
 		glEnd();
-		
+
 		disable_blending();
 	}
-	
+
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if(!SelectionState.select_points)
@@ -99,39 +96,36 @@ public:
 			return;
 
 		const k3d::mesh::points_t& points = *Mesh.points;
-		
-		bool valid_polyhedra = k3d::validate_polyhedra(Mesh) && !Mesh.polyhedra->face_first_loops->empty();
 
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &points[0]);
+		bool valid_polyhedra = k3d::validate_polyhedra(Mesh) && !Mesh.polyhedra->face_first_loops->empty();
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
-		const size_t point_begin = 0;
-		const size_t point_end = points.size();
-		for(size_t point = point_begin; point != point_end; ++point)
+		const k3d::uint_t point_begin = 0;
+		const k3d::uint_t point_end = points.size();
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-			if (!valid_polyhedra || SelectionState.select_backfacing || 
-					(!SelectionState.select_backfacing && 
+			if (!valid_polyhedra || SelectionState.select_backfacing ||
+					(!SelectionState.select_backfacing &&
 							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
 			{
 				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, point);
-	
+
 				glBegin(GL_POINTS);
-				glArrayElement(point);
+				k3d::gl::vertex3d(points[point]);
 				glEnd();
-	
+
 				k3d::gl::pop_selection_token(); // ABSOLUTE_POINT
 			}
 		}
 	}
-	
+
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
 		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
-	
+
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<point_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
