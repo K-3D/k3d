@@ -53,17 +53,17 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_bitmap_slot()));
 	}
 
-	void on_resize_bitmap(k3d::bitmap& Bitmap)
+	void on_resize_bitmap(k3d::bitmap& Output)
 	{
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
 		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = &Bitmap;
+		context["Output"] = &Output;
 
 		execute_script(context);
 	}
 
-	void on_assign_pixels(k3d::bitmap& Bitmap)
+	void on_assign_pixels(k3d::bitmap& Output)
 	{
 	}
 

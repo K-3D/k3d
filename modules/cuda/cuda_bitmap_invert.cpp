@@ -24,8 +24,8 @@
 
 #include "cuda_bitmap_simple_modifier.h" 
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 
 namespace module
 {
@@ -47,7 +47,7 @@ public:
 	{
 	}
 
-	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
 		bitmap_arithmetic(Input, Output, CUDA_BITMAP_INVERT, 0);
 	}

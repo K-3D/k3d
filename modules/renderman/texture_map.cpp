@@ -108,13 +108,14 @@ public:
 		return m_ri_texture_path;
 	}
 
-	void on_create_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_resize_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
-		Output = Input;
+		Output.recreate(Input.width(), Input.height());
 	}
 
-	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
+		Output = Input;
 		m_refresh_cache = true;
 	}
 

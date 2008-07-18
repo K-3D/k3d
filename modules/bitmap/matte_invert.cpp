@@ -24,9 +24,8 @@
 
 #include "simple_modifier.h"
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/ipipeline_profiler.h>
+#include <k3dsdk/document_plugin_factory.h>
 
 namespace module
 {
@@ -60,10 +59,9 @@ public:
 		}
 	};
 
-	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
-		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Update Bitmap");
-        boost::gil::transform_pixels(const_view(Input), view(Output), functor());
+		boost::gil::transform_pixels(const_view(Input), view(Output), functor());
 	}
 
 	static k3d::iplugin_factory& get_factory()

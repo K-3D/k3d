@@ -24,8 +24,8 @@
 
 #include "cuda_bitmap_simple_modifier.h" 
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 
 namespace module
 {
@@ -46,11 +46,12 @@ public:
         base(Factory, Document),
         m_value(init_owner(*this) + init_name("value") + init_label(_("Gamma value")) + init_description(_("Apply gamma value to each pixel")) + init_value(1.0))
     {
-        m_value.changed_signal().connect(make_update_bitmap_slot());
+		m_value.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
     }
 
 
-    void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+    void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
     {
         bitmap_arithmetic(Input, Output, CUDA_BITMAP_GAMMA, (float)((m_value.pipeline_value() ? 1.0 / m_value.pipeline_value() : 1.0)));
     }

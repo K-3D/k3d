@@ -21,8 +21,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <k3dsdk/bitmap_modifier.h>
-#include <k3dsdk/node.h>
 #include <k3dsdk/ipipeline_profiler.h>
+#include <k3dsdk/node.h>
 
 // include the entry points as external definitions
 #include "cuda_entry_points.h"
@@ -46,14 +46,15 @@ public:
 	}
 
 protected:
-    void start_profile_step()
-    {
-        document().pipeline_profiler().start_execution(*this, "");
-    }    
-    void stop_profile_step(const std::string& Task)
-    {
-        document().pipeline_profiler().finish_execution(*this, Task);
-    }
+	void start_profile_step()
+	{
+		document().pipeline_profiler().start_execution(*this, "");
+	}
+
+	void stop_profile_step(const std::string& Task)
+	{
+		document().pipeline_profiler().finish_execution(*this, Task);
+	}
 	
 	void bitmap_arithmetic(const k3d::bitmap& Input, k3d::bitmap& Output, const k3d::int32_t bitmapOperation, float value)
 	{
@@ -85,7 +86,7 @@ protected:
 	} 
 	
 private:
-	virtual void on_create_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	virtual void on_resize_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
 		Output.recreate(Input.width(), Input.height());
 	}

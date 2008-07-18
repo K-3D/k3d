@@ -22,12 +22,9 @@
 */
 
 #include "simple_modifier.h"
-// timing for CUDA comparison
-#include <k3dsdk/high_res_timer.h>
-#include <k3dsdk/ipipeline_profiler.h>
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 
 namespace module
 {
@@ -46,10 +43,10 @@ class add :
 public:
 	add(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_value(init_owner(*this) + init_name("value") + init_label(_("Add value")) + init_description(_("Add value to each pixel's Red, Green and Blue component")) + init_value(0.0)),
-		m_timer(init_owner(*this) + init_name("timer") + init_label(_("Timer")) + init_description(_("Timer for BitmapAdd execution")) + init_value(0.0))
+		m_value(init_owner(*this) + init_name("value") + init_label(_("Add value")) + init_description(_("Add value to each pixel's Red, Green and Blue component")) + init_value(0.0))
 	{
-		m_value.changed_signal().connect(make_update_bitmap_slot());
+		m_value.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
 	}
 
 	struct functor
@@ -71,12 +68,9 @@ public:
 		const double value;
 	};
 
-	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
-		k3d::timer timer;
-		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Update Bitmap");
 		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_value.pipeline_value()));
-		m_timer.set_value(timer.elapsed());
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -95,8 +89,6 @@ public:
 
 private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_value;
-	// timer for comparative benchmarking
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, read_only_property, with_serialization) m_timer;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -42,7 +42,7 @@ public:
 	}
 
 private:
-	virtual void on_create_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	virtual void on_resize_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
 		Output.recreate(Input.width(), Input.height());
 	}

@@ -18,14 +18,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Anders Dahnielson (anders@dahnielson.com)
+	\author Anders Dahnielson (anders@dahnielson.com)
 */
 
 #include "simple_modifier.h"
 
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/ipipeline_profiler.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 
 namespace module
 {
@@ -49,10 +48,14 @@ public:
 		m_blue_threshold(init_owner(*this) + init_name("blue_threshold") + init_label(_("Blue threshold")) + init_description(_("Clamp Blue channel to threshold")) + init_value(0.0)),
 		m_alpha_threshold(init_owner(*this) + init_name("alpha_threshold") + init_label(_("Alpha threshold")) + init_description(_("Clamp Alpha channel to threshold")) + init_value(0.0))
 	{
-		m_red_threshold.changed_signal().connect(make_update_bitmap_slot());
-		m_green_threshold.changed_signal().connect(make_update_bitmap_slot());
-		m_blue_threshold.changed_signal().connect(make_update_bitmap_slot());
-		m_alpha_threshold.changed_signal().connect(make_update_bitmap_slot());
+		m_red_threshold.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+		m_green_threshold.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+		m_blue_threshold.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+		m_alpha_threshold.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
 	}
 
 	struct functor
@@ -81,10 +84,9 @@ public:
 		const double alpha_threshold;
 	};
 
-	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
-		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Update Bitmap");
-        boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_red_threshold.pipeline_value(), m_green_threshold.pipeline_value(), m_blue_threshold.pipeline_value(), m_alpha_threshold.pipeline_value()));
+		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_red_threshold.pipeline_value(), m_green_threshold.pipeline_value(), m_blue_threshold.pipeline_value(), m_alpha_threshold.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()

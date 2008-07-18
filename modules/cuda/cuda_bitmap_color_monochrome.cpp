@@ -23,8 +23,8 @@
 
 #include "cuda_bitmap_simple_modifier.h"
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 
 namespace module
 {
@@ -47,37 +47,40 @@ public:
 		m_green_weight(init_owner(*this) + init_name("green_weight") + init_label(_("Green weight")) + init_description(_("Scale Green component value")) + init_value(0.59)),
 		m_blue_weight(init_owner(*this) + init_name("blue_weight") + init_label(_("Blue weight")) + init_description(_("Scale Blue component value")) + init_value(0.11))
 	{
-		m_red_weight.changed_signal().connect(make_update_bitmap_slot());
-		m_green_weight.changed_signal().connect(make_update_bitmap_slot());
-		m_blue_weight.changed_signal().connect(make_update_bitmap_slot());
+		m_red_weight.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+		m_green_weight.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+		m_blue_weight.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
 	}
 
 
-	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
-        const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
-        unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));
-        unsigned short *p_device_image;
-        k3d::int32_t sizeInBytes = Input.width()*Input.height()*8;
-        
-        // copy the data to the device
-        start_profile_step();
-        allocate_device_memory((void**)&p_device_image, sizeInBytes);
-        copy_from_host_to_device(p_device_image, inputPixels, sizeInBytes);
-        stop_profile_step(PROFILE_STRING_HOST_TO_DEVICE);
+		const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
+		unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));
+		unsigned short *p_device_image;
+		k3d::int32_t sizeInBytes = Input.width()*Input.height()*8;
+		
+		// copy the data to the device
+		start_profile_step();
+		allocate_device_memory((void**)&p_device_image, sizeInBytes);
+		copy_from_host_to_device(p_device_image, inputPixels, sizeInBytes);
+		stop_profile_step(PROFILE_STRING_HOST_TO_DEVICE);
 
-        // perform the calculation
-        start_profile_step();
-        bitmap_color_monochrome_kernel_entry(p_device_image, Input.width(), Input.height(), (float)(m_red_weight.pipeline_value()), (float)(m_green_weight.pipeline_value()), (float)(m_blue_weight.pipeline_value()));
-        stop_profile_step(PROFILE_STRING_EXECUTE_KERNEL);       
+		// perform the calculation
+		start_profile_step();
+		bitmap_color_monochrome_kernel_entry(p_device_image, Input.width(), Input.height(), (float)(m_red_weight.pipeline_value()), (float)(m_green_weight.pipeline_value()), (float)(m_blue_weight.pipeline_value()));
+		stop_profile_step(PROFILE_STRING_EXECUTE_KERNEL);       
 
-        // copy the data from the device
-        start_profile_step();
-        copy_from_device_to_host(outputPixels, p_device_image, sizeInBytes);
-        stop_profile_step(PROFILE_STRING_DEVICE_TO_HOST);
+		// copy the data from the device
+		start_profile_step();
+		copy_from_device_to_host(outputPixels, p_device_image, sizeInBytes);
+		stop_profile_step(PROFILE_STRING_DEVICE_TO_HOST);
 
-        // free the memory allocated on the device
-        free_device_memory(p_device_image);
+		// free the memory allocated on the device
+		free_device_memory(p_device_image);
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -69,14 +69,14 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_dimensions_changed> >(make_update_bitmap_slot()));
 	}
 
-	void on_resize_bitmap(k3d::bitmap& Bitmap)
+	void on_resize_bitmap(k3d::bitmap& Output)
 	{
 		const k3d::pixel_size_t width = m_width.pipeline_value();
 		const k3d::pixel_size_t height = m_height.pipeline_value();
-		Bitmap.recreate(width, height);
+		Output.recreate(width, height);
 	}
 
-	void on_assign_pixels(k3d::bitmap& Bitmap)
+	void on_assign_pixels(k3d::bitmap& Output)
 	{
 		k3d::icamera* const camera = m_camera.pipeline_value();
 		k3d::gl::irender_viewport* const render_engine = m_render_engine.pipeline_value();
@@ -117,7 +117,7 @@ public:
 				glPixelStorei(GL_PACK_ALIGNMENT, 1);
 				glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, &view(buffer)[0]);
 
-				boost::gil::copy_pixels(boost::gil::flipped_up_down_view(boost::gil::color_converted_view<boost::gil::rgba16f_pixel_t>(view(buffer))), view(Bitmap));
+				boost::gil::copy_pixels(boost::gil::flipped_up_down_view(boost::gil::color_converted_view<boost::gil::rgba16f_pixel_t>(view(buffer))), view(Output));
 			}
 			else
 			{
@@ -131,7 +131,7 @@ public:
 		}
 		else
 		{
-			std::fill(view(Bitmap).begin(), view(Bitmap).end(), k3d::pixel(0.6, 0.6, 0.6, 1.0));
+			std::fill(view(Output).begin(), view(Output).end(), k3d::pixel(0.6, 0.6, 0.6, 1.0));
 		}
 	}
 

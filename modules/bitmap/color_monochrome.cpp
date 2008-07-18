@@ -23,7 +23,6 @@
 
 #include "simple_modifier.h"
 
-#include <k3dsdk/ipipeline_profiler.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 
@@ -48,9 +47,12 @@ public:
 		m_green_weight(init_owner(*this) + init_name("green_weight") + init_label(_("Green weight")) + init_description(_("Scale Green component value")) + init_value(0.59)),
 		m_blue_weight(init_owner(*this) + init_name("blue_weight") + init_label(_("Blue weight")) + init_description(_("Scale Blue component value")) + init_value(0.11))
 	{
-		m_red_weight.changed_signal().connect(make_update_bitmap_slot());
-		m_green_weight.changed_signal().connect(make_update_bitmap_slot());
-		m_blue_weight.changed_signal().connect(make_update_bitmap_slot());
+		m_red_weight.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+		m_green_weight.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+		m_blue_weight.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
 	}
 
 	struct functor
@@ -81,10 +83,10 @@ public:
 		const double blue_weight;
 	};
 
-	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Update Bitmap");
-        boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_red_weight.pipeline_value(), m_green_weight.pipeline_value(), m_blue_weight.pipeline_value()));
+		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_red_weight.pipeline_value(), m_green_weight.pipeline_value(), m_blue_weight.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -118,5 +120,4 @@ k3d::iplugin_factory& color_monochrome_factory()
 } // namespace bitmap
 
 } // namespace module
-
 

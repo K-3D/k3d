@@ -22,9 +22,12 @@
 
 #include "bitmap.h"
 #include "data.h"
+#include "hints.h"
 #include "ibitmap_sink.h"
 #include "ibitmap_source.h"
+#include "ipipeline_profiler.h"
 #include "k3d-i18n-config.h"
+#include "pointer_demand_storage.h"
 
 namespace k3d
 {
@@ -45,61 +48,84 @@ public:
 		return m_input_bitmap;
 	}
 
-	sigc::slot<void, ihint*> make_reset_bitmap_slot()
-	{
-		return m_output_bitmap.make_reset_slot();
-	}
-
 	sigc::slot<void, ihint*> make_update_bitmap_slot()
 	{
-		return sigc::mem_fun(*this, &bitmap_modifier<derived_t>::update_bitmap);
+		return m_output_bitmap.make_slot();
 	}
 
 protected:
 	bitmap_modifier() :
 		m_input_bitmap(
-			init_owner(*static_cast<derived_t*>(this))
+			init_owner(owner())
 			+ init_name("input_bitmap")
 			+ init_label(_("Input Bitmap"))
 			+ init_description(_("Input bitmap"))
 			+ init_value<bitmap*>(0)),
 		m_output_bitmap(
-			init_owner(*static_cast<derived_t*>(this))
+			init_owner(owner())
 			+ init_name("output_bitmap")
 			+ init_label(_("Output Bitmap"))
-			+ init_description(_("Output bitmap"))
-			+ init_slot(sigc::mem_fun(*this, &bitmap_modifier<derived_t>::create_bitmap)))
+			+ init_description(_("Output bitmap")))
 	{
-		m_input_bitmap.changed_signal().connect(make_reset_bitmap_slot());
+		m_output_bitmap.set_update_slot(sigc::mem_fun(*this, &bitmap_modifier<derived_t>::execute));
+
+		m_input_bitmap.changed_signal().connect(hint::converter<
+			hint::convert<hint::bitmap_dimensions_changed, hint::unchanged,
+			hint::convert<hint::bitmap_pixels_changed, hint::unchanged,
+			hint::convert<hint::any, hint::none> > > >(m_output_bitmap.make_slot()));
 	}
 
-	k3d_data(bitmap*, data::immutable_name, data::change_signal, data::no_undo, data::local_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_input_bitmap;
-	k3d_data(bitmap*, data::immutable_name, data::change_signal, data::no_undo, data::demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_bitmap;
+	k3d_data(bitmap*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_input_bitmap;
+	k3d_data(bitmap*, immutable_name, change_signal, no_undo, pointer_demand_storage, no_constraint, read_only_property, no_serialization) m_output_bitmap;
 
 private:
-	void create_bitmap(bitmap& OutputBitmap)
+	inline derived_t& owner()
 	{
-		if(const bitmap* const input_bitmap = m_input_bitmap.pipeline_value())
-		{
-			on_create_bitmap(*input_bitmap, OutputBitmap);
-			on_update_bitmap(*input_bitmap, OutputBitmap);
-		}
+		return *static_cast<derived_t*>(this);
 	}
 
-	void update_bitmap(ihint* const Hint)
+	void execute(const std::vector<ihint*>& Hints, bitmap& Bitmap)
 	{
-		if(bitmap* const input_bitmap = m_input_bitmap.pipeline_value())
+		if(const bitmap* const input = m_input_bitmap.pipeline_value())
 		{
-			if(bitmap* const output_bitmap = m_output_bitmap.internal_value())
+			bool resize_bitmap = false;
+			bool assign_pixels = false;
+
+			for(int i = 0; i != Hints.size(); ++i)
 			{
-				on_update_bitmap(*input_bitmap, *output_bitmap);
-				m_output_bitmap.changed_signal().emit(Hint);
+				// Input pixels changed, so all we have to do is reassign ours ...
+				if(dynamic_cast<hint::bitmap_pixels_changed*>(Hints[i]))
+				{
+					assign_pixels = true;
+				}
+				// In every other case (bitmap_dimensions_changed, unknown hint, or no hint),
+				// we must assume the worst and recreate everything from scratch ...
+				else
+				{
+					resize_bitmap = true;
+					assign_pixels = true;
+					break;
+				}
+			}
+
+			if(resize_bitmap)
+			{
+				owner().document().pipeline_profiler().start_execution(owner(), "Resize Bitmap");
+				on_resize_bitmap(*input, Bitmap);
+				owner().document().pipeline_profiler().finish_execution(owner(), "Resize Bitmap");
+			}
+
+			if(assign_pixels)
+			{
+				owner().document().pipeline_profiler().start_execution(owner(), "Assign Pixels");
+				on_assign_pixels(*input, Bitmap);
+				owner().document().pipeline_profiler().finish_execution(owner(), "Assign Pixels");
 			}
 		}
 	}
 
-	virtual void on_create_bitmap(const bitmap& Input, bitmap& Output) = 0;
-	virtual void on_update_bitmap(const bitmap& Input, bitmap& Output) = 0;
+	virtual void on_resize_bitmap(const bitmap& Input, bitmap& Output) = 0;
+	virtual void on_assign_pixels(const bitmap& Input, bitmap& Output) = 0;
 };
 
 } // namespace k3d

@@ -57,7 +57,7 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_bitmap_slot()));
 	}
 
-	void on_resize_bitmap(k3d::bitmap& Bitmap)
+	void on_resize_bitmap(k3d::bitmap& Output)
 	{
 		const k3d::filesystem::path file = m_file.pipeline_value();
 		if(file.empty())
@@ -66,7 +66,7 @@ public:
 		try
 		{
 			k3d::log() << info << "Reading " << file.native_console_string() << " using " << get_factory().name() << std::endl;
-			boost::gil::tiff_read_and_convert_image(file.native_filesystem_string(), Bitmap);
+			boost::gil::tiff_read_and_convert_image(file.native_filesystem_string(), Output);
 		}
 		catch(std::exception& e)
 		{
@@ -78,7 +78,7 @@ public:
 		}
 	}
 
-	void on_assign_pixels(k3d::bitmap& Bitmap)
+	void on_assign_pixels(k3d::bitmap& Output)
 	{
 	}
 

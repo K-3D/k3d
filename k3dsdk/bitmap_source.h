@@ -107,9 +107,9 @@ private:
 	}
 
 	/// Implement this in derived classes to set the size of the output bitmap.
-	virtual void on_resize_bitmap(bitmap& Bitmap) = 0;
+	virtual void on_resize_bitmap(bitmap& Output) = 0;
 	/// Implement this in derived classes to assign values to each output pixel.
-	virtual void on_assign_pixels(bitmap& Bitmap) = 0;
+	virtual void on_assign_pixels(bitmap& Output) = 0;
 };
 
 } // namespace k3d

@@ -49,10 +49,11 @@ public:
 	{
 		set_script(k3d::resource::get_string("/module/scripting/bitmap_modifier_script.py"));
 
-		connect_script_changed_signal(make_reset_bitmap_slot());
+		connect_script_changed_signal(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_bitmap_slot()));
 	}
 
-	void on_create_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_resize_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
@@ -63,7 +64,7 @@ public:
 		execute_script(context);
 	}
 
-	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
 	}
 

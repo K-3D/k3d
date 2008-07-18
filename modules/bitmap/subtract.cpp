@@ -18,14 +18,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Anders Dahnielson (anders@dahnielson.com)
+	\author Anders Dahnielson (anders@dahnielson.com)
 */
 
 #include "simple_modifier.h"
 
-#include <k3dsdk/ipipeline_profiler.h>
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 
 namespace module
 {
@@ -46,7 +45,8 @@ public:
 		base(Factory, Document),
 		m_value(init_owner(*this) + init_name("value") + init_label(_("Subtract value")) + init_description(_("Subtract value to each pixel color component")) + init_value(0.0))
 	{
-		m_value.changed_signal().connect(make_update_bitmap_slot());
+		m_value.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
 	}
 
 	struct functor
@@ -68,10 +68,9 @@ public:
 		const double value;
 	};
 
-	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
-		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Update Bitmap");
-        boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_value.pipeline_value()));
+		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_value.pipeline_value()));
 	}
 
 

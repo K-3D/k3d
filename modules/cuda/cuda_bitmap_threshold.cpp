@@ -24,8 +24,8 @@
 
 #include "cuda_bitmap_simple_modifier.h" 
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 
 namespace module
 {
@@ -49,14 +49,18 @@ public:
         m_blue_threshold(init_owner(*this) + init_name("blue_threshold") + init_label(_("Blue threshold")) + init_description(_("Clamp Blue channel to threshold")) + init_value(0.0)),
         m_alpha_threshold(init_owner(*this) + init_name("alpha_threshold") + init_label(_("Alpha threshold")) + init_description(_("Clamp Alpha channel to threshold")) + init_value(0.0))
     {
-        m_red_threshold.changed_signal().connect(make_update_bitmap_slot());
-        m_green_threshold.changed_signal().connect(make_update_bitmap_slot());
-        m_blue_threshold.changed_signal().connect(make_update_bitmap_slot());
-        m_alpha_threshold.changed_signal().connect(make_update_bitmap_slot());
+		m_red_threshold.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+		m_green_threshold.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+		m_blue_threshold.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
+		m_alpha_threshold.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
     }
 
 
-	void on_update_bitmap(const k3d::bitmap& Input, k3d::bitmap& Output)
+	void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
 		const unsigned short* inputPixels = reinterpret_cast<const unsigned short*>(&(const_view(Input)[0]));
         unsigned short* outputPixels = reinterpret_cast<unsigned short*>(&(view(Output)[0]));

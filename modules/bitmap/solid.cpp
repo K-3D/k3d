@@ -60,17 +60,17 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
 	}
 
-	void on_resize_bitmap(k3d::bitmap& Bitmap)
+	void on_resize_bitmap(k3d::bitmap& Output)
 	{
 		const k3d::pixel_size_t width = m_width.pipeline_value();
 		const k3d::pixel_size_t height = m_height.pipeline_value();
-		Bitmap.recreate(width, height);
+		Output.recreate(width, height);
 	}
 
-	void on_assign_pixels(k3d::bitmap& Bitmap)
+	void on_assign_pixels(k3d::bitmap& Output)
 	{
 		const k3d::color color = m_color.pipeline_value();
-		const k3d::bitmap::view_t& bitmap = boost::gil::view(Bitmap);
+		const k3d::bitmap::view_t& bitmap = boost::gil::view(Output);
 		std::fill(bitmap.begin(), bitmap.end(), k3d::pixel(color.red, color.green, color.blue, 1.0));
 	}
 

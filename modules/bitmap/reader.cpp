@@ -61,7 +61,7 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_bitmap_slot()));
 	}
 
-	void on_resize_bitmap(k3d::bitmap& Bitmap)
+	void on_resize_bitmap(k3d::bitmap& Output)
 	{
 		const k3d::filesystem::path file = m_file.pipeline_value();
 		if(!k3d::filesystem::exists(file))
@@ -87,7 +87,7 @@ public:
 			if(!importer)
 				continue;
 
-			if(!importer->read_file(file, Bitmap))
+			if(!importer->read_file(file, Output))
 			{
 				k3d::log() << error << "factory [" << (**factory).name() << "] couldn't load file [" << file.native_console_string() << "]" << std::endl;
 				continue;
@@ -97,7 +97,7 @@ public:
 		}
 	}
 
-	void on_assign_pixels(k3d::bitmap& Bitmap)
+	void on_assign_pixels(k3d::bitmap& Output)
 	{
 	}
 
