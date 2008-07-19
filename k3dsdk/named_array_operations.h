@@ -60,26 +60,6 @@ const array_t* get_array(const named_arrays& Arrays, const std::string& Name)
 	return result;
 }
 
-/// Handles random-access copying between named arrays
-class named_array_copier
-{
-public:
-	named_array_copier(const named_arrays& Source, named_arrays& Target);
-	~named_array_copier();
-
-	/// Appends the given index value from each source array to each corresponding target array
-	void push_back(const uint_t Index);
-	/// Computes a weighted sum of N values from each source array and appends the result to the corresponding target array
-	void push_back(const uint_t Count, const uint_t* Indices, const double_t* Weights);
-
-private:
-	class implementation;
-	implementation* const m_implementation;
-
-	named_array_copier(const named_array_copier&);
-	named_array_copier& operator=(const named_array_copier&);
-};
-
 } // namespace k3d
 
 #endif // !K3DSDK_NAMED_ARRAY_OPERATIONS_H

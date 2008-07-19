@@ -22,7 +22,7 @@
 */
 
 #include "array.h"
-#include "named_array_operations.h"
+#include "named_array_copier.h"
 #include "named_array_types.h"
 #include "result.h"
 #include "typed_array.h"

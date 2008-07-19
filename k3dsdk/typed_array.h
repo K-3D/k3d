@@ -80,6 +80,16 @@ public:
 	    return new this_type(this->begin() + Begin, this->begin() + End);
 	}
 
+	void resize(const uint_t NewSize)
+	{
+		base_type::resize(NewSize);
+	}
+
+	void resize(const uint_t NewSize, const T& Value)
+	{
+		base_type::resize(NewSize, Value);
+	}
+
 	const uint_t size() const
 	{
 		return base_type::size();

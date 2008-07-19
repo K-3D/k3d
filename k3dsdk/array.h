@@ -37,6 +37,9 @@ public:
 	virtual array* clone() const = 0;
 	/// Returns a copy of a half-open range of this array (a variation on virtual ctor)
 	virtual array* clone(const uint_t Begin, const uint_t End) const = 0;
+
+	/// Sets the size of this array.
+	virtual void resize(const uint_t NewSize) = 0;
 	/// Returns the size of this array
 	virtual const uint_t size() const = 0;
 	/// Returns true iff this array is empty

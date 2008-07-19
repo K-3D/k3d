@@ -27,7 +27,7 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/named_array_operations.h>
+#include <k3dsdk/named_array_copier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/triangulator.h>

@@ -46,7 +46,7 @@ named_arrays named_arrays::clone() const
 	return result;
 }
 
-named_arrays named_arrays::clone(size_t Begin, size_t End) const
+named_arrays named_arrays::clone(const uint_t Begin, const uint_t End) const
 {
 	named_arrays result;
 
@@ -54,6 +54,12 @@ named_arrays named_arrays::clone(size_t Begin, size_t End) const
 		result.insert(std::make_pair(array->first, array->second->clone(Begin, End)));
 
 	return result;
+}
+
+void named_arrays::resize(const uint_t NewSize)
+{
+	for(const_iterator array = begin(); array != end(); ++array)
+		array->second->resize(NewSize);
 }
 
 } // namespace k3d

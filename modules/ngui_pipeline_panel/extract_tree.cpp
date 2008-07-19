@@ -23,7 +23,7 @@
 
 #include "extract_tree.h"
 
-#include <k3dsdk/named_array_operations.h>
+#include <k3dsdk/named_array_copier.h>
 
 #include <boost/graph/breadth_first_search.hpp>
 
