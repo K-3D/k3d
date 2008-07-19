@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -28,8 +28,10 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/bitmap.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/ibitmap_sink.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/ibitmap_source.h>
+#include <k3dsdk/pointer_demand_storage.h>
+#include <k3dsdk/value_demand_storage.h>
 #include <k3dsdk/node.h>
 
 namespace module
@@ -39,62 +41,117 @@ namespace pdiff
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_perceptual_difference
+// perceptual_difference
 
-class bitmap_perceptual_difference :
+/// Computes the a difference metric between two images based on the physiology of human vision.
+class perceptual_difference :
 	public k3d::node,
-	public k3d::ibitmap_source,
-	public k3d::ibitmap_sink
+	public k3d::ibitmap_source
 {
 	typedef k3d::node base;
 
 public:
-	bitmap_perceptual_difference(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	perceptual_difference(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_bitmap_a(init_owner(*this) + init_name("input_a") + init_label(_("Input A")) + init_description(_("A input bitmap")) + init_value<k3d::bitmap*>(0)),
 		m_bitmap_b(init_owner(*this) + init_name("input_b") + init_label(_("Input B")) + init_description(_("B input bitmap")) + init_value<k3d::bitmap*>(0)),
 		m_field_of_view(init_owner(*this) + init_name("field_of_view") + init_label(_("Field-of-view")) + init_description(_("Field-of-view (degrees)")) + init_value(45.0) + init_step_increment(0.01)),
 		m_gamma(init_owner(*this) + init_name("gamma") + init_label(_("Gamma")) + init_description(_("Gamma")) + init_value(2.2) + init_step_increment(0.01)),
 		m_luminance(init_owner(*this) + init_name("luminance") + init_label(_("Luminance")) + init_description(_("Display Luminance (candela per square meter)")) + init_value(100.0) + init_step_increment(1.0)),
-		m_difference(init_owner(*this) + init_name("difference") + init_label(_("Difference")) + init_description(_("The count of perceivably-different pixels")) + init_slot(sigc::mem_fun(*this, &bitmap_perceptual_difference::get_difference_pixels))),
-		m_bitmap_o(init_owner(*this) + init_name("output") + init_label(_("Output Bitmap")) + init_description(_("Output bitmap")) + init_slot(sigc::mem_fun(*this, &bitmap_perceptual_difference::get_difference_image))),
-		m_difference_pixels(std::numeric_limits<k3d::uint32_t>::max()),
-		m_difference_image(0)
+		m_difference(init_owner(*this) + init_name("difference") + init_label(_("Difference")) + init_description(_("The count of perceivably-different pixels")) + init_value(std::numeric_limits<k3d::uint32_t>::max())),
+		m_output_bitmap(init_owner(*this) + init_name("output_bitmap") + init_label(_("Output Bitmap")) + init_description(_("Output bitmap")))
 	{
-		m_bitmap_a.changed_signal().connect(make_reset_output_slot());
-		m_bitmap_b.changed_signal().connect(make_reset_output_slot());
-		m_field_of_view.changed_signal().connect(make_reset_output_slot());
-		m_gamma.changed_signal().connect(make_reset_output_slot());
-		m_luminance.changed_signal().connect(make_reset_output_slot());
+		m_difference.set_update_slot(sigc::mem_fun(*this, &perceptual_difference::difference_execute));
+		m_output_bitmap.set_update_slot(sigc::mem_fun(*this, &perceptual_difference::bitmap_execute));
+
+		m_bitmap_a.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_difference.make_slot()));
+		m_bitmap_b.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_difference.make_slot()));
+		m_field_of_view.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_difference.make_slot()));
+		m_gamma.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_difference.make_slot()));
+		m_luminance.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_difference.make_slot()));
+
+		m_bitmap_a.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_output_bitmap.make_slot()));
+		m_bitmap_b.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_output_bitmap.make_slot()));
+		m_field_of_view.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_output_bitmap.make_slot()));
+		m_gamma.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_output_bitmap.make_slot()));
+		m_luminance.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_output_bitmap.make_slot()));
+
 	}
 
 	k3d::iproperty& bitmap_source_output()
 	{
-		return m_bitmap_o;
+		return m_output_bitmap;
 	}
 
-	k3d::iproperty& bitmap_sink_input()
+	void difference_execute(const std::vector<k3d::ihint*>& Hints, k3d::uint32_t& Difference)
 	{
-		return m_bitmap_a;
+		Difference = std::numeric_limits<k3d::uint32_t>::max();
+
+		k3d::bitmap* const bitmap_a = m_bitmap_a.pipeline_value();
+		if(!bitmap_a)
+			return;
+
+		k3d::bitmap* const bitmap_b = m_bitmap_b.pipeline_value();
+		if(!bitmap_b)
+			return;
+
+		if(bitmap_a->width() != bitmap_b->width() || bitmap_a->height() != bitmap_b->height())
+			return;
+
+		CompareArgs args;
+		args.ImgA = convert(*bitmap_a);
+		args.ImgB = convert(*bitmap_b);
+		args.ImgDiff = new RGBAImage(bitmap_a->width(), bitmap_a->height());
+		args.Verbose = false;
+		args.FieldOfView = m_field_of_view.pipeline_value();
+		args.Gamma = m_gamma.pipeline_value();
+		args.Luminance = m_luminance.pipeline_value();
+		args.ThresholdPixels = 0;
+
+		Yee_Compare(args);
+	
+		Difference = args.FailedPixels;
 	}
 
-	sigc::slot<void, k3d::ihint*> make_reset_output_slot()
+	void bitmap_execute(const std::vector<k3d::ihint*>& Hints, k3d::bitmap& Bitmap)
 	{
-		return sigc::mem_fun(*this, &bitmap_perceptual_difference::reset_output);
+		k3d::bitmap* const bitmap_a = m_bitmap_a.pipeline_value();
+		if(!bitmap_a)
+			return;
+
+		k3d::bitmap* const bitmap_b = m_bitmap_b.pipeline_value();
+		if(!bitmap_b)
+			return;
+
+		if(bitmap_a->width() != bitmap_b->width() || bitmap_a->height() != bitmap_b->height())
+			return;
+
+		CompareArgs args;
+		args.ImgA = convert(*bitmap_a);
+		args.ImgB = convert(*bitmap_b);
+		args.ImgDiff = new RGBAImage(bitmap_a->width(), bitmap_a->height());
+		args.Verbose = false;
+		args.FieldOfView = m_field_of_view.pipeline_value();
+		args.Gamma = m_gamma.pipeline_value();
+		args.Luminance = m_luminance.pipeline_value();
+		args.ThresholdPixels = 0;
+
+		Yee_Compare(args);
+
+		convert(*args.ImgDiff, Bitmap);
 	}
 
-	void reset_output(k3d::ihint* Hint)
-	{
-		m_difference_pixels = std::numeric_limits<k3d::uint32_t>::max();
-
-		delete m_difference_image;
-		m_difference_image = 0;
-
-		m_difference.reset(Hint);
-		m_bitmap_o.reset(0, Hint);
-	}
-
-	RGBAImage* convert(k3d::bitmap& Source)
+	static RGBAImage* convert(k3d::bitmap& Source)
 	{
 		RGBAImage* const result = new RGBAImage(Source.width(), Source.height());
 
@@ -117,7 +174,7 @@ public:
 		return result;
 	}
 
-	void convert(RGBAImage& Source, k3d::bitmap& Destination)
+	static void convert(RGBAImage& Source, k3d::bitmap& Destination)
 	{
 		Destination.recreate(Source.Get_Width(), Source.Get_Height());
 
@@ -136,68 +193,10 @@ public:
 	
 	}
 
-	void update_output()
-	{
-		if(m_difference_image)
-			return;
-
-		k3d::bitmap* const bitmap_a = m_bitmap_a.pipeline_value();
-		if(!bitmap_a)
-		{
-			m_difference_pixels = std::numeric_limits<k3d::uint32_t>::max();
-			return;
-		}
-
-		k3d::bitmap* const bitmap_b = m_bitmap_b.pipeline_value();
-		if(!bitmap_b)
-		{
-			m_difference_pixels = std::numeric_limits<k3d::uint32_t>::max();
-			return;
-		}
-
-		if(bitmap_a->width() != bitmap_b->width() || bitmap_a->height() != bitmap_b->height())
-		{
-			m_difference_pixels = std::numeric_limits<k3d::uint32_t>::max();
-			return;
-		}
-
-		CompareArgs args;
-		args.ImgA = convert(*bitmap_a);
-		args.ImgB = convert(*bitmap_b);
-		args.ImgDiff = new RGBAImage(bitmap_a->width(), bitmap_a->height());
-		args.Verbose = false;
-		args.FieldOfView = m_field_of_view.pipeline_value();
-		args.Gamma = m_gamma.pipeline_value();
-		args.Luminance = m_luminance.pipeline_value();
-		args.ThresholdPixels = 0;
-
-		Yee_Compare(args);
-	
-		m_difference_pixels = args.FailedPixels;
-		m_difference_image = args.ImgDiff;
-
-		args.ImgDiff = 0;
-	}
-
-	k3d::uint32_t get_difference_pixels()
-	{
-		update_output();
-		return m_difference_pixels;
-	}
-
-	void get_difference_image(k3d::bitmap& Bitmap)
-	{
-		update_output();
-
-		if(m_difference_image)
-			convert(*m_difference_image, Bitmap);
-	}
-
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bitmap_perceptual_difference,
-				k3d::interface_list<k3d::ibitmap_source,
-				k3d::interface_list<k3d::ibitmap_sink> > > factory(
+		static k3d::document_plugin_factory<perceptual_difference,
+				k3d::interface_list<k3d::ibitmap_source > > factory(
 					k3d::uuid(0x2f0ffccf, 0xaa40e2f3, 0xb5221a9f, 0x20131d9f),
 					"BitmapPerceptualDifference",
 					_("Calculate a perceptual difference metric between two bitmap images"),
@@ -213,19 +212,16 @@ private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_field_of_view;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_gamma;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_luminance;
-	k3d_data(k3d::uint32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_difference;
-	k3d_data(k3d::bitmap*, immutable_name, change_signal, no_undo, demand_storage, no_constraint, read_only_property, no_serialization) m_bitmap_o;
-
-	k3d::uint32_t m_difference_pixels;
-	RGBAImage* m_difference_image;
+	k3d_data(k3d::uint32_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_difference;
+	k3d_data(k3d::bitmap*, immutable_name, change_signal, no_undo, pointer_demand_storage, no_constraint, read_only_property, no_serialization) m_output_bitmap;
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// bitmap_perceptual_difference_factory
+// perceptual_difference_factory
 
-k3d::iplugin_factory& bitmap_perceptual_difference_factory()
+k3d::iplugin_factory& perceptual_difference_factory()
 {
-	return bitmap_perceptual_difference::get_factory();
+	return perceptual_difference::get_factory();
 }
 
 } // namespace pdiff

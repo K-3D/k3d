@@ -29,13 +29,13 @@ namespace module
 namespace pdiff
 {
 
-extern k3d::iplugin_factory& bitmap_perceptual_difference_factory();
+extern k3d::iplugin_factory& perceptual_difference_factory();
 
 } // namespace pdiff
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::pdiff::bitmap_perceptual_difference_factory());
+	Registry.register_factory(module::pdiff::perceptual_difference_factory());
 K3D_MODULE_END
 
