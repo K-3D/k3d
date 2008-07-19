@@ -374,7 +374,7 @@ public:
         k3d::mesh::bools_t boundary_edges;
         detail::indices_t companions;
 #ifndef K3D_UINT_T_64_BITS
-        k3d::create_edge_adjacency_lookup(*polyhedra.edge_points, *polyhedra.clockwise_edges, boundary_edges, companions);
+        k3d::create_edge_adjacency_lookup(*polyhedra.edge_points, *polyhedra.clockwise_edges, boundary_edges, static_cast<k3d::mesh::indices_t&>(companions));
 #else
         k3d::mesh::indices_t companions_64;
         k3d::create_edge_adjacency_lookup(*polyhedra.edge_points, *polyhedra.clockwise_edges, boundary_edges, companions_64);

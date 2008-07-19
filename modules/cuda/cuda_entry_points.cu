@@ -77,7 +77,7 @@ extern "C" void CUDA_initialize_device()
 #if CUDA_VERSION > 1010
 	CUT_DEVICE_INIT(0, 0);
 #else
-	CUT_DEVICE_INIT()
+	CUT_DEVICE_INIT();
 #endif
 }
 
