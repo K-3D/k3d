@@ -39,6 +39,7 @@
 #include <k3dsdk/vectors.h>
 
 #include "helpers.h"
+#include "named_array_random_access_copier.h"
 
 #include <set>
 
@@ -86,7 +87,7 @@ public:
 		m_face_centers(FaceCenters),
 		m_midpoint(FirstMidpoint)
 	{}
-	
+
 	void operator()(const k3d::uint_t Face)
 	{
 		const k3d::mesh::indices_t& face_first_loops = *m_polyhedra.face_first_loops;
@@ -94,7 +95,7 @@ public:
 		const k3d::mesh::selection_t& face_selection = *m_polyhedra.face_selection;
 		const k3d::mesh::indices_t& loop_first_edges = *m_polyhedra.loop_first_edges;
 		const k3d::mesh::indices_t& clockwise_edges = *m_polyhedra.clockwise_edges;
-		
+
 		// Skip unselected faces and faces with holes
 		if(!face_selection[Face] || face_loop_counts[Face] != 1)
 			return;
@@ -114,7 +115,7 @@ public:
 				}
 				if(!m_boundary_edges[edge])
 					m_edge_midpoints[m_companions[edge]] = m_edge_midpoints[edge];
-	
+
 				edge = clockwise_edges[edge];
 				if(edge == first_edge)
 					break;
@@ -126,7 +127,7 @@ public:
 			++m_midpoint;
 		}
 	}
-	
+
 private:
 	const k3d::mesh::polyhedra_t& m_polyhedra;
 	const k3d::mesh::indices_t& m_companions;
@@ -150,7 +151,7 @@ public:
 	 * \param HasMidpoint True for edges belonging to a selected face that have a midpoint
 	 * \param ExtraFaceCount The number of extra faces for each subdivided faces (in addision to the number of edges)
 	 * \param NewEdgeCount The number of edges for each new face created
-	 * \param ReplacementFaceKeepsEdgeCount True if the face of a subdivided face that replaces the original face has the same edge count as the original face. If false, NewEdgeCount is used instead 
+	 * \param ReplacementFaceKeepsEdgeCount True if the face of a subdivided face that replaces the original face has the same edge count as the original face. If false, NewEdgeCount is used instead
 	 * \param AffectedFaces The indices for all selected faces without holes
 	 * \param FirstNewEdges For each old face, the index of the first new edge in the output
 	 * \param FirstNewFaces For each old face, the corresponding index in the new array or the first subface in the new array
@@ -199,11 +200,11 @@ public:
 		m_face_starts.push_back(0);
 		m_face_counts.push_back(0);
 	}
-	
+
 	void operator()(const k3d::uint_t Polyhedron, const k3d::uint_t Face)
 	{
 		if(Polyhedron != m_last_polyhedron)
-		{ 
+		{
 			m_running_loop_counter += m_new_face_count;
 			m_running_edge_counter += m_new_face_count * (m_new_edge_count);
 			m_new_face_count = 0;
@@ -211,7 +212,7 @@ public:
 			m_face_counts.push_back(0);
 		}
 		m_last_polyhedron = Polyhedron;
-		
+
 		const k3d::mesh::counts_t& face_counts = *m_polyhedra.face_counts;
 		const k3d::mesh::indices_t& first_faces = *m_polyhedra.first_faces;
 		const k3d::mesh::indices_t& face_first_loops = *m_polyhedra.face_first_loops;
@@ -219,12 +220,12 @@ public:
 		const k3d::mesh::selection_t& face_selection = *m_polyhedra.face_selection;
 		const k3d::mesh::indices_t& loop_first_edges = *m_polyhedra.loop_first_edges;
 		const k3d::mesh::indices_t& clockwise_edges = *m_polyhedra.clockwise_edges;
-		
+
 		m_first_new_edges[Face] = m_running_edge_counter;
 		m_first_new_loops[Face] = m_running_loop_counter;
 
 		m_running_loop_counter += face_loop_counts[Face];
-	
+
 		if(!face_selection[Face] || face_loop_counts[Face] != 1) // Faces that will not be split
 		{
 			++(m_face_counts.back());
@@ -263,14 +264,14 @@ public:
 				++face_count;
 				++loop_count;
 				edge_count += m_new_edge_count;
-				
+
 				if(m_replacement_face_keeps_edge_count)
 				{
 					++(m_face_edge_counts[Face]);
 					++m_running_edge_counter;
 					++edge_count;
 				}
-	
+
 				edge = clockwise_edges[edge];
 				if(edge == first_edge)
 					break;
@@ -287,11 +288,11 @@ public:
 			loop_count += m_extra_face_count;
 		}
 	}
-	
+
 	k3d::uint_t edge_count;
 	k3d::uint_t face_count;
 	k3d::uint_t loop_count;
-	
+
 private:
 	const k3d::mesh::polyhedra_t& m_polyhedra;
 	const k3d::mesh::indices_t& m_companions;
@@ -336,7 +337,7 @@ public:
 				m_edge_list(EdgeList),
 				m_edge_midpoints(EdgeMidpoints),
 				m_offset(Offset) {}
-	
+
 	void operator()(const k3d::uint_t EdgeIndex)
 	{
 		const k3d::uint_t edge = m_edge_list[EdgeIndex];
@@ -354,7 +355,7 @@ public:
 			mid_point = (start_point + end_point) * 0.5;
 		}
 	}
-	
+
 private:
 	k3d::mesh::points_t& m_points;
 	const k3d::mesh::indices_t& m_edge_points;
@@ -371,7 +372,7 @@ public:
 	/// Constructs a new functor that will calculate the face centers of all faces listed in FaceList and store them in Points starting at StartIndex
 	/*
 	 * \param FaceCenters The point index of the center for each face (only defined for faces listed in FaceList)
-	 */ 
+	 */
 	face_center_calculator(
 			const k3d::mesh::indices_t& FaceFirstLoops,
 			const k3d::mesh::indices_t& LoopFirstEdges,
@@ -388,8 +389,8 @@ public:
 		m_face_centers(FaceCenters),
 		m_points(Points)
 	{}
-	
-	
+
+
 	void operator()(const k3d::uint_t FaceIndex)
 	{
 		const k3d::uint_t first_edge = m_loop_first_edges[m_face_first_loops[m_face_list[FaceIndex]]];
@@ -404,10 +405,10 @@ public:
 			if(edge == first_edge)
 				break;
 		}
-		
+
 		center /= count;
 	}
-	
+
 private:
 	const k3d::mesh::indices_t& m_face_first_loops;
 	const k3d::mesh::indices_t& m_loop_first_edges;
@@ -415,7 +416,7 @@ private:
 	const k3d::mesh::indices_t& m_edge_points;
 	const k3d::mesh::indices_t& m_face_list;
 	const k3d::mesh::indices_t& m_face_centers;
-	k3d::mesh::points_t& m_points; 
+	k3d::mesh::points_t& m_points;
 };
 
 /// Store in- and output mesh data
@@ -447,7 +448,9 @@ struct mesh_arrays
 			k3d::mesh::indices_t& OutputFaceFirstLoops,
 			k3d::mesh::counts_t& OutputFaceLoopCounts,
 			k3d::mesh::materials_t& OutputFaceMaterials,
-			k3d::mesh::selection_t& OutputFaceSelection
+			k3d::mesh::selection_t& OutputFaceSelection,
+			k3d::named_array_random_access_copier& UniformCopier,
+			k3d::named_array_random_access_copier& VaryingCopier
 			) :
 				input_first_faces(InputFirstFaces),
 				input_face_counts(InputFaceCounts),
@@ -475,16 +478,18 @@ struct mesh_arrays
 				output_face_first_loops(OutputFaceFirstLoops),
 				output_face_loop_counts(OutputFaceLoopCounts),
 				output_face_materials(OutputFaceMaterials),
-				output_face_selection(OutputFaceSelection)
+				output_face_selection(OutputFaceSelection),
+				uniform_copier(UniformCopier),
+				varying_copier(VaryingCopier)
 				{}
-	
+
 	/// Copies the face to the correct location in the output
 	void copy_face(const k3d::uint_t Polyhedron, const k3d::uint_t Face)
 	{
 		const k3d::uint_t first_new_edge = first_new_edges[Face];
 		const k3d::uint_t first_new_face = Face + output_first_faces[Polyhedron] - input_first_faces[Polyhedron];
 		const k3d::uint_t first_new_loop = first_new_loops[Face];
-	
+
 		const k3d::uint_t loop_begin = input_face_first_loops[Face];
 		const k3d::uint_t loop_end = loop_begin + input_face_loop_counts[Face];
 		k3d::uint_t edgenumber = 0;
@@ -497,30 +502,38 @@ struct mesh_arrays
 			{
 				const k3d::uint_t newedge = first_new_edge + edgenumber + loopedgenumber;
 				output_edge_points[newedge] = input_edge_points[edge];
+				// Copy varying data.
+				varying_copier.copy(edge, newedge);
 				output_clockwise_edges[newedge] = newedge + 1;
 				if(!boundary_edges[edge] && has_midpoints[companions[edge]])
 				{
+					const k3d::double_t weights[] = {0.5, 0.5};
+					const k3d::uint_t indices[] = {edge, input_clockwise_edges[edge]};
+					varying_copier.copy(2, indices, weights, newedge + 1);
 					output_edge_points[newedge + 1] = edge_midpoints[companions[edge]];
 					output_clockwise_edges[newedge + 1] = newedge + 2;
 					++loopedgenumber;
 				}
-				
+
 				edge = input_clockwise_edges[edge];
 				if(edge == first_edge)
 					break;
 				++loopedgenumber;
-			} 
+			}
 			output_clockwise_edges[first_new_edge + edgenumber + loopedgenumber] = first_new_edge + edgenumber; // close the loop
 			edgenumber += loopedgenumber + 1;
 		}
-		
+
 		// Set face data
 		output_face_loop_counts[first_new_face] = input_face_loop_counts[Face];
 		output_face_first_loops[first_new_face] = first_new_loop;
 		output_face_materials[first_new_face] = input_face_materials[Face];
 		output_face_selection[first_new_face] = input_face_selection[Face];
+
+		// Copy uniform data.
+		uniform_copier.copy(Face, first_new_face);
 	}
-	
+
 	const k3d::mesh::indices_t& input_first_faces;
 	const k3d::mesh::counts_t& input_face_counts;
 	const k3d::mesh::indices_t& input_edge_points;
@@ -548,6 +561,8 @@ struct mesh_arrays
 	k3d::mesh::counts_t& output_face_loop_counts;
 	k3d::mesh::materials_t& output_face_materials;
 	k3d::mesh::selection_t& output_face_selection;
+	k3d::named_array_random_access_copier& uniform_copier;
+	k3d::named_array_random_access_copier& varying_copier;
 };
 
 /// Subdivide faces by connecting their centers to the midpoints of the edges.
@@ -560,7 +575,7 @@ public:
 	{
 		const k3d::uint_t first_new_face = m_mesh_arrays.first_new_faces[Face];
 		const k3d::uint_t first_new_loop = m_mesh_arrays.first_new_loops[Face];
-		
+
 		if(!m_mesh_arrays.input_face_selection[Face] || m_mesh_arrays.input_face_loop_counts[Face] != 1)
 		{ // copy unaffected face, splitting edges adjacent to affected faces
 			m_mesh_arrays.copy_face(Polyhedron, Face);
@@ -576,12 +591,25 @@ public:
 			const k3d::uint_t face_center = m_mesh_arrays.face_centers[Face];
 			const k3d::uint_t first_edge = m_mesh_arrays.input_loop_first_edges[m_mesh_arrays.input_face_first_loops[Face]];
 			k3d::uint_t edgenumber = 0;
-			k3d::uint_t first_new_edge = m_mesh_arrays.first_new_edges[Face]; 
+			k3d::uint_t first_new_edge = m_mesh_arrays.first_new_edges[Face];
 			m_mesh_arrays.output_loop_first_edges[first_new_loop] = first_new_edge;
 			m_mesh_arrays.output_face_first_loops[newface] = first_new_loop;
 			m_mesh_arrays.output_face_materials[newface] = m_mesh_arrays.input_face_materials[Face];
 			m_mesh_arrays.output_face_selection[newface] = m_mesh_arrays.input_face_selection[Face];
-			
+
+			// Store all corner indices for facevarying data copy
+			k3d::mesh::indices_t face_indices;
+			for(k3d::uint_t edge = first_edge; ; )
+			{
+				face_indices.push_back(edge);
+				edge = m_mesh_arrays.input_clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+
+			const k3d::uint_t num_edges = face_indices.size();
+			k3d::mesh::weights_t face_weights(num_edges, 1.0/static_cast<k3d::double_t>(num_edges));
+
 			for(k3d::uint_t edge = first_edge; ; )
 			{
 				const k3d::uint_t clockwise = m_mesh_arrays.input_clockwise_edges[edge];
@@ -599,7 +627,15 @@ public:
 				m_mesh_arrays.output_clockwise_edges[corner_to_mid2] = mid2_to_center;
 				m_mesh_arrays.output_clockwise_edges[mid2_to_center] = center_to_mid1;
 				m_mesh_arrays.output_clockwise_edges[center_to_mid1] = mid1_to_corner;
-				
+				const k3d::double_t weights[] = {0.5, 0.5};
+				const k3d::uint_t mid1_to_corner_indices[] = {edge, clockwise};
+				m_mesh_arrays.varying_copier.copy(2, mid1_to_corner_indices, weights, mid1_to_corner);
+				m_mesh_arrays.varying_copier.copy(clockwise, corner_to_mid2);
+				const k3d::uint_t mid2_to_center_indices[] = {clockwise, m_mesh_arrays.input_clockwise_edges[clockwise]};
+				m_mesh_arrays.varying_copier.copy(2, mid2_to_center_indices, weights, mid2_to_center);
+				m_mesh_arrays.varying_copier.copy(num_edges, &face_indices[0], &face_weights[0], center_to_mid1);
+
+
 				// Append face data
 				if(edge != first_edge)
 				{
@@ -609,17 +645,18 @@ public:
 					m_mesh_arrays.output_face_materials[first_new_face + edgenumber - 1] = m_mesh_arrays.input_face_materials[Face];
 					m_mesh_arrays.output_face_selection[first_new_face + edgenumber - 1] = m_mesh_arrays.input_face_selection[Face];
 				}
+				m_mesh_arrays.uniform_copier.copy(Face, first_new_face + edgenumber - 1);
 
 				first_new_edge = m_mesh_arrays.first_new_edges[last_old_face] + m_mesh_arrays.face_edge_counts[last_old_face] + 4 * (edgenumber + new_face_number);
-				
+
 				edge = m_mesh_arrays.input_clockwise_edges[edge];
 				++edgenumber;
 				if(edge == first_edge)
-					break; 
+					break;
 			}
 		}
 	}
-			
+
 private:
 	mesh_arrays& m_mesh_arrays;
 };
@@ -629,12 +666,12 @@ class mid_contiguous_subdivider
 {
 public:
 	mid_contiguous_subdivider(mesh_arrays& MeshArrays) : m_mesh_arrays(MeshArrays) {}
-			
+
 	void operator()(const k3d::uint_t Polyhedron, const k3d::uint_t Face)
 	{
 		const k3d::uint_t first_new_face = m_mesh_arrays.first_new_faces[Face];
 		const k3d::uint_t first_new_loop = m_mesh_arrays.first_new_loops[Face];
-		
+
 		if(!m_mesh_arrays.input_face_selection[Face] || m_mesh_arrays.input_face_loop_counts[Face] != 1)
 		{ // copy unaffected face, splitting edges adjacent to affected faces
 			m_mesh_arrays.copy_face(Polyhedron, Face);
@@ -655,6 +692,7 @@ public:
 			m_mesh_arrays.output_face_first_loops[newface] = first_new_loop;
 			m_mesh_arrays.output_face_materials[newface] = m_mesh_arrays.input_face_materials[Face];
 			m_mesh_arrays.output_face_selection[newface] = m_mesh_arrays.input_face_selection[Face];
+			m_mesh_arrays.uniform_copier.copy(Face, newface);
 			for(k3d::uint_t edge = first_edge; ; )
 			{
 				first_new_edge = m_mesh_arrays.first_new_edges[last_old_face] + m_mesh_arrays.face_edge_counts[last_old_face] + 3 * (edgenumber + new_face_number);
@@ -672,14 +710,23 @@ public:
 				m_mesh_arrays.output_clockwise_edges[mid1_to_corner] = corner_to_mid2;
 				m_mesh_arrays.output_clockwise_edges[corner_to_mid2] = mid2_to_mid1;
 				m_mesh_arrays.output_clockwise_edges[mid2_to_mid1] = mid1_to_corner;
-				
+
+				const k3d::double_t weights[] = {0.5, 0.5};
+				const k3d::uint_t mid1_indices[] = {edge, clockwise};
+				const k3d::uint_t mid2_indices[] = {clockwise, m_mesh_arrays.input_clockwise_edges[clockwise]};
+				m_mesh_arrays.varying_copier.copy(2, mid1_indices, weights, center_first_edge + edgenumber);
+				m_mesh_arrays.varying_copier.copy(2, mid1_indices, weights, mid1_to_corner);
+				m_mesh_arrays.varying_copier.copy(clockwise, corner_to_mid2);
+				m_mesh_arrays.varying_copier.copy(2, mid2_indices, weights, mid2_to_mid1);
+
 				// Append face data
 				const k3d::uint_t newloop = m_mesh_arrays.first_new_loops[m_mesh_arrays.input_first_faces[Polyhedron]] + m_mesh_arrays.loops_per_polyhedra[Polyhedron] + new_face_number + edgenumber;
 				m_mesh_arrays.output_loop_first_edges[newloop] = mid1_to_corner;
 				m_mesh_arrays.output_face_first_loops[first_new_face + edgenumber] = newloop;
 				m_mesh_arrays.output_face_materials[first_new_face + edgenumber] = m_mesh_arrays.input_face_materials[Face];
 				m_mesh_arrays.output_face_selection[first_new_face + edgenumber] = m_mesh_arrays.input_face_selection[Face];
-				
+				m_mesh_arrays.uniform_copier.copy(Face, first_new_face + edgenumber);
+
 				edge = m_mesh_arrays.input_clockwise_edges[edge];
 				if(edge == first_edge)
 					break;
@@ -704,7 +751,7 @@ public:
 	{
 		const k3d::uint_t first_new_face = m_mesh_arrays.first_new_faces[Face];
 		const k3d::uint_t first_new_loop = m_mesh_arrays.first_new_loops[Face];
-		
+
 		if(!m_mesh_arrays.input_face_selection[Face] || m_mesh_arrays.input_face_loop_counts[Face] != 1)
 		{ // copy unaffected face, splitting edges adjacent to affected faces
 			m_mesh_arrays.copy_face(Polyhedron, Face);
@@ -720,11 +767,25 @@ public:
 			const k3d::uint_t face_center = m_mesh_arrays.face_centers[Face];
 			const k3d::uint_t first_edge = m_mesh_arrays.input_loop_first_edges[m_mesh_arrays.input_face_first_loops[Face]];
 			k3d::uint_t edgenumber = 0;
-			k3d::uint_t first_new_edge = m_mesh_arrays.first_new_edges[Face]; 
+			k3d::uint_t first_new_edge = m_mesh_arrays.first_new_edges[Face];
 			m_mesh_arrays.output_loop_first_edges[first_new_loop] = first_new_edge;
 			m_mesh_arrays.output_face_first_loops[newface] = first_new_loop;
 			m_mesh_arrays.output_face_materials[newface] = m_mesh_arrays.input_face_materials[Face];
-			m_mesh_arrays.output_face_selection[newface] = m_mesh_arrays.input_face_selection[Face]; 
+			m_mesh_arrays.output_face_selection[newface] = m_mesh_arrays.input_face_selection[Face];
+
+			// Store all corner indices for facevarying data copy
+			k3d::mesh::indices_t face_indices;
+			for(k3d::uint_t edge = first_edge; ; )
+			{
+				face_indices.push_back(edge);
+				edge = m_mesh_arrays.input_clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+
+			const k3d::uint_t num_edges = face_indices.size();
+			k3d::mesh::weights_t face_weights(num_edges, 1.0/static_cast<k3d::double_t>(num_edges));
+
 			for(k3d::uint_t edge = first_edge; ; )
 			{
 				const k3d::uint_t clockwise = m_mesh_arrays.input_clockwise_edges[edge];
@@ -737,7 +798,11 @@ public:
 				m_mesh_arrays.output_clockwise_edges[corner1_to_corner2] = corner2_to_center;
 				m_mesh_arrays.output_clockwise_edges[corner2_to_center] = center_to_corner1;
 				m_mesh_arrays.output_clockwise_edges[center_to_corner1] = corner1_to_corner2;
-				
+
+				m_mesh_arrays.varying_copier.copy(edge, corner1_to_corner2);
+				m_mesh_arrays.varying_copier.copy(clockwise, corner2_to_center);
+				m_mesh_arrays.varying_copier.copy(num_edges, &face_indices[0], &face_weights[0], center_to_corner1);
+
 				// Append face data
 				if(edge != first_edge)
 				{
@@ -747,17 +812,18 @@ public:
 					m_mesh_arrays.output_face_materials[first_new_face + edgenumber - 1] = m_mesh_arrays.input_face_materials[Face];
 					m_mesh_arrays.output_face_selection[first_new_face + edgenumber - 1] = m_mesh_arrays.input_face_selection[Face];
 				}
+				m_mesh_arrays.uniform_copier.copy(Face, first_new_face + edgenumber - 1);
 
 				first_new_edge = m_mesh_arrays.first_new_edges[last_old_face] + m_mesh_arrays.face_edge_counts[last_old_face] + 3 * (edgenumber + new_face_number);
-				
+
 				edge = m_mesh_arrays.input_clockwise_edges[edge];
 				++edgenumber;
 				if(edge == first_edge)
-					break; 
+					break;
 			}
 		}
 	}
-			
+
 private:
 	mesh_arrays& m_mesh_arrays;
 };
@@ -792,7 +858,7 @@ public:
 		Output = Input;
 		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
 		document().pipeline_profiler().finish_execution(*this, "Merge selection");
-		
+
 		// If there are no valid polyhedra, we give up
 		document().pipeline_profiler().start_execution(*this, "Validate input");
 		if(!k3d::validate_polyhedra(Input))
@@ -801,8 +867,8 @@ public:
 			return;
 		}
 		document().pipeline_profiler().finish_execution(*this, "Validate input");
-		
-		
+
+
 		// Make writeable copies of the arrays we intend to modify
 		document().pipeline_profiler().start_execution(*this, "Copy input");
 		k3d::mesh::points_t& output_points = *k3d::make_unique(Output.points);
@@ -813,7 +879,15 @@ public:
 		k3d::mesh::indices_t& output_edge_points = *k3d::make_unique(output_polyhedra.edge_points);
 		k3d::mesh::indices_t& output_clockwise_edges = *k3d::make_unique(output_polyhedra.clockwise_edges);
 		k3d::mesh::selection_t& output_edge_selection = *k3d::make_unique(output_polyhedra.edge_selection);
-		
+
+		// Copy the unaffected constant data
+		output_polyhedra.constant_data = Input.polyhedra->constant_data;
+		// Create copiers for the uniform and varying data
+		output_polyhedra.uniform_data = Input.polyhedra->uniform_data.clone_types();
+		k3d::named_array_random_access_copier uniform_data_copier(Input.polyhedra->uniform_data, output_polyhedra.uniform_data);
+		output_polyhedra.face_varying_data = Input.polyhedra->face_varying_data.clone_types();
+		k3d::named_array_random_access_copier face_varying_data_copier(Input.polyhedra->face_varying_data, output_polyhedra.face_varying_data);
+
 		// Face-related arrays can not be appended to because of the possibility of multiple polyhedra,
 		// so we will rebuild them from scratch in the new order
 		const k3d::mesh::indices_t& input_first_faces = *(output_polyhedra.first_faces);
@@ -836,8 +910,8 @@ public:
 		m_affected_faces.clear();
 		m_face_centers.clear();
 		document().pipeline_profiler().finish_execution(*this, "Copy input");
-		
-		
+
+
 		// Get the "companion" edge for each edge
 		document().pipeline_profiler().start_execution(*this, "Calculate companions");
 		k3d::mesh::indices_t companions;
@@ -872,7 +946,7 @@ public:
 		{
 			midpoint_index_calculator(face);
 		}
-		
+
 		const k3d::uint_t extra_face_count = subdivision_type == CONTIGUOUSMIDPOINTS ? 1 : 0;
 		k3d::uint_t new_edge_count = 3;
 		if(subdivision_type == CENTERTOMIDPOINTS)
@@ -918,7 +992,7 @@ public:
 				face_edge_counter(polyhedron, face);
 			}
 		}
-		
+
 		// Store midpoint and face center indices, so they are accessible in the update step
 		if(subdivision_type != CENTERTOPOINTS)
 		{
@@ -946,8 +1020,10 @@ public:
 		output_face_loop_counts->resize(face_edge_counter.face_count, 1);
 		output_face_selection->resize(face_edge_counter.face_count, 0.0);
 		output_face_materials->resize(face_edge_counter.face_count);
+		k3d::resize(output_polyhedra.face_varying_data, face_edge_counter.edge_count);
+		k3d::resize(output_polyhedra.uniform_data, face_edge_counter.face_count);
 		document().pipeline_profiler().finish_execution(*this, "Allocate memory");
-		
+
 		detail::mesh_arrays mesh_arrays(
 						input_first_faces,
 						input_face_counts,
@@ -975,8 +1051,10 @@ public:
 						*output_face_first_loops,
 						*output_face_loop_counts,
 						*output_face_materials,
-						*output_face_selection);
-		
+						*output_face_selection,
+						uniform_data_copier,
+						face_varying_data_copier);
+
 		if(subdivision_type == CENTERTOMIDPOINTS)
 		{
 			// Connect face centers to edge midpoints
@@ -991,7 +1069,7 @@ public:
 				}
 			}
 		}
-		
+
 		if(subdivision_type == CONTIGUOUSMIDPOINTS)
 		{
 			// Connect face centers to edge midpoints
@@ -1006,7 +1084,7 @@ public:
 				}
 			}
 		}
-		
+
 		if(subdivision_type == CENTERTOPOINTS)
 		{
 			// Connect face centers to edge midpoints
@@ -1021,11 +1099,11 @@ public:
 				}
 			}
 		}
-		
+
 		// Update selection arrays
 		output_edge_selection.assign(output_edge_points.size(), 0.0);
 		output_point_selection.resize(output_points.size(), 0.0);
-		
+
 		// Set the arrays that were rebuilt
 		output_polyhedra.first_faces = output_first_faces;
 		output_polyhedra.face_counts = output_face_counts;
@@ -1045,16 +1123,16 @@ public:
 			return;
 		}
 		document().pipeline_profiler().finish_execution(*this, "Validate input");
-		
+
 		subdivision_t subdivision_type = m_subdivision_type.pipeline_value();
-		
+
 		const k3d::mesh::indices_t& input_face_first_loops = *Input.polyhedra->face_first_loops;
 		const k3d::mesh::indices_t& input_loop_first_edges = *Input.polyhedra->loop_first_edges;
 		const k3d::mesh::indices_t& input_clockwise_edges = *Input.polyhedra->clockwise_edges;
 		const k3d::mesh::indices_t& input_edge_points = *Input.polyhedra->edge_points;
-		
+
 		k3d::mesh::points_t& output_points = *k3d::make_unique(Output.points);
-		
+
 		if(subdivision_type != CONTIGUOUSMIDPOINTS)
 		{
 			return_if_fail(m_affected_faces.size() == m_face_centers.size());
@@ -1070,7 +1148,7 @@ public:
 			for(k3d::uint_t face_index = 0; face_index != m_affected_faces.size(); ++face_index) face_center_functor(face_index);
 			document().pipeline_profiler().finish_execution(*this, "Face centers");
 		}
-		
+
 		if(subdivision_type != CENTERTOPOINTS)
 		{
 			return_if_fail(m_affected_edges.size() == m_edge_midpoints.size());
