@@ -1953,86 +1953,10 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// demand_storage
-
-/// Read-only storage policy that stores a value by pointer, created on-demand
-/** \deprecated You should prefer to use pointer_storage, instead */
-template<typename value_t, typename signal_policy_t>
-class demand_storage :
-	public signal_policy_t
-{
-public:
-	// This policy only works for data stored by-pointer
-	BOOST_STATIC_ASSERT((boost::is_pointer<value_t>::value));
-
-	/// Returns a slot that will invoke the reset() method
-	sigc::slot<void, ihint*> make_reset_slot()
-	{
-		return sigc::mem_fun(*this, &demand_storage<value_t, signal_policy_t>::internal_reset);
-	}
-
-	/// Resets the underlying data so it will be created-again next read
-	void reset(value_t NewValue = 0, ihint* const Hint = 0)
-	{
-		// Ensure that our value doesn't go out-of-scope while it's getting initialized ...
-		if(m_executing)
-			return;
-
-		m_cache.reset(NewValue);
-		signal_policy_t::set_value(Hint);
-	}
-
-	/// Accesses the underlying data, creating it if it doesn't already exist
-	value_t internal_value()
-	{
-		if(!m_cache.get())
-		{
-			m_executing = true;
-
-			// Note: we create the value and update its state in two steps
-			// because m_data_slot() may cause this method to be executed in a loop
-			m_cache.reset(new typename boost::remove_pointer<value_t>::type());
-			m_data_slot(*m_cache);
-
-			m_executing = false;
-		}
-
-		return m_cache.get();
-	}
-
-protected:
-	template<typename init_t>
-	demand_storage(const init_t& Init) :
-		signal_policy_t(Init),
-		m_data_slot(Init.slot()),
-		m_executing(false)
-	{
-	}
-
-private:
-	/// Resets the underlying data so it will be created-again next read
-	void internal_reset(ihint* const Hint = 0)
-	{
-		// Ensure that our value doesn't go out-of-scope while it's getting initialized ...
-		if(m_executing)
-			return;
-
-		m_cache.reset();
-		signal_policy_t::set_value(Hint);
-	}
-
-	/// Storage for this policy's value
-	std::auto_ptr<typename boost::remove_pointer<value_t>::type> m_cache;
-	/// Stores a slot that will be executed to initialize this policy's value
-	sigc::slot<void, typename boost::remove_pointer<value_t>::type&> m_data_slot;
-	/// Set to true during initialization of the policy's value, to prevent problems with recursion
-	bool m_executing;
-};
-
-/////////////////////////////////////////////////////////////////////////////
 // pointer_storage
 
 /// Read-only storage policy that stores a value by pointer, created on-demand
+/** \deprecated Use pointer_demand_storage instead */
 template<typename pointer_t, typename signal_policy_t>
 class pointer_storage :
 	public signal_policy_t

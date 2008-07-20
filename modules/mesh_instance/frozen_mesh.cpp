@@ -31,6 +31,7 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/pointer_demand_storage.h>
 #include <k3dsdk/serialization_xml.h>
 
 #include <iterator>
@@ -56,11 +57,12 @@ public:
 	frozen_mesh(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::mesh*>(0)),
-		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")) + init_slot(sigc::mem_fun(*this, &frozen_mesh::create_mesh)))
+		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")))
 	{
+		m_output_mesh.set_update_slot(sigc::mem_fun(*this, &frozen_mesh::execute));
 	}
 
-	void create_mesh(k3d::mesh& Output)
+	void execute(const std::vector<k3d::ihint*>& Hints, k3d::mesh& Output)
 	{
 		if(const k3d::mesh* const input = m_input_mesh.pipeline_value())
 			k3d::deep_copy(*input, Output);
@@ -132,7 +134,7 @@ public:
 	}
 
 	k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_input_mesh;
-	k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, demand_storage, no_constraint, read_only_property, no_serialization) m_output_mesh;
+	k3d_data(k3d::mesh*, immutable_name, change_signal, no_undo, pointer_demand_storage, no_constraint, read_only_property, no_serialization) m_output_mesh;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -146,5 +148,4 @@ k3d::iplugin_factory& frozen_mesh_factory()
 } // namespace mesh_instance
 
 } // namespace module
-
 
