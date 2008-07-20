@@ -94,8 +94,15 @@ if result == gtk.RESPONSE_ACCEPT:
 		frozen_mesh.name = function
 
 		mesh = k3d.dynamic_cast(frozen_mesh, "imesh_storage").reset_mesh()
+
 		points = mesh.create_points()
 		point_selection = mesh.create_point_selection()
+		point_groups = mesh.create_point_groups()
+		first_points = point_groups.create_first_points()
+		point_counts = point_groups.create_point_counts()
+		materials = point_groups.create_materials()
+		constantwidth = point_groups.writable_constant_data().create_array("constantwidth", "k3d::double_t")
+		group_points = point_groups.create_points()
 
 		for xi in range(0, xcount):
 			for yi in range(0, ycount):
@@ -106,21 +113,11 @@ if result == gtk.RESPONSE_ACCEPT:
 				points.append(point)
 				point_selection.append(0.0)
 
-		point_groups = mesh.create_point_groups()
-
-		first_points = point_groups.create_first_points()
-		first_points.append(0)
-
-		point_counts = point_groups.create_point_counts()
+		first_points.append(len(group_points))
 		point_counts.append(len(points))
-
-		materials = point_groups.create_materials()
 		materials.append(None)
-
-		constantwidth = point_groups.writable_constant_data().create_array("constantwidth", "double")
 		constantwidth.append(0.2)
 
-		group_points = point_groups.create_points()
 		for i in range(len(points)):
 		        group_points.append(i)
 

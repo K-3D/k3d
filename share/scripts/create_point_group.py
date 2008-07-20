@@ -6,15 +6,6 @@ from random import uniform
 doc = Document
 doc.start_change_set()
 try:
-	shader = doc.new_node("RenderManSurfaceShader")
-	shader.name = "Group Shader"
-	shader.shader_path = k3d.share_path() + "/shaders/surface/k3d_constant.sl"
-
-	material = doc.new_node("RenderManMaterial")
-	material.name = "Group Material"
-	material.color = k3d.color(1, 1, 1)
-	material.surface_shader = shader
-
 	frozen_mesh = doc.new_node("FrozenMesh")
 	frozen_mesh.name = "Point Group"
 
@@ -25,33 +16,28 @@ try:
 
 	points = mesh.create_points()
 	point_selection = mesh.create_point_selection()
+	point_groups = mesh.create_point_groups()
+	first_points = point_groups.create_first_points()
+	point_counts = point_groups.create_point_counts()
+	materials = point_groups.create_materials()
+	constantwidth = point_groups.writable_constant_data().create_array("constantwidth", "k3d::double_t")
+	group_points = point_groups.create_points()
+	Cs = point_groups.writable_varying_data().create_array("Cs", "k3d::color")
 
 	for i in range(count):
 		points.append(k3d.point3(uniform(-size, size), uniform(-size, size), uniform(-size, size)))
 		point_selection.append(0.0)
 
-	point_groups = mesh.create_point_groups()
-
-	first_points = point_groups.create_first_points()
-	first_points.append(0)
-
-	point_counts = point_groups.create_point_counts()
+	first_points.append(len(group_points))
 	point_counts.append(len(points))
-
-	materials = point_groups.create_materials()
 	materials.append(None)
-
-	constantwidth = point_groups.writable_constant_data().create_array("constantwidth", "double")
 	constantwidth.append(0.2)
 
-	group_points = point_groups.create_points()
 	for i in range(len(points)):
 		group_points.append(i)
 
-	Cs = point_groups.writable_varying_data().create_array("Cs", "k3d::color")
 	for i in range(len(points)):
 		Cs.append(k3d.color(uniform(0, 1), uniform(0, 1), uniform(0, 1)))
-
 	
 	mesh_instance = doc.new_node("MeshInstance")
 	mesh_instance.name = "Point Group Instance"

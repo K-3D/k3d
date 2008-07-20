@@ -10,7 +10,7 @@ class inspector:
 
 		message += "command-node: " + Node.command_node_name()
 
-		k3d.log_debug(message)
+		k3d.log.debug(message)
 
 		for child in Node.children():
 			self.print_node(child, Level + 1)

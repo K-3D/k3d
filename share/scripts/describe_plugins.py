@@ -2,7 +2,7 @@
 
 import k3d
 
-factories = k3d.plugins()
+factories = k3d.plugin.factory.lookup()
 
 application_plugins = []
 document_plugins = []
