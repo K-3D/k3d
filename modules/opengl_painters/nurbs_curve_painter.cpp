@@ -48,7 +48,7 @@ namespace painters
 
 static void on_nurbs_error(GLenum ErrorCode)
 {
-		k3d::log() << debug << "NURBS error: " << gluErrorString(ErrorCode) << std::endl;
+		k3d::log() << debug << "NURBS curve error: " << gluErrorString(ErrorCode) << std::endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -92,14 +92,14 @@ public:
 		const k3d::mesh::weights_t& curve_point_weights = *Mesh.nurbs_curve_groups->curve_point_weights;
 		const k3d::mesh::knots_t& curve_knots = *Mesh.nurbs_curve_groups->curve_knots;
 		const k3d::mesh::points_t& points = *Mesh.points;
-		
+
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
 		GLfloat gl_modelview_matrix[16];
 		glGetFloatv(GL_MODELVIEW_MATRIX, gl_modelview_matrix);
 		gluLoadSamplingMatrices(nurbs_renderer, gl_modelview_matrix, RenderState.gl_projection_matrix, RenderState.gl_viewport);
-		
+
 		const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0);
 		const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
 
@@ -140,7 +140,7 @@ public:
 			}
 		}
 	}
-	
+
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if(!SelectionState.select_nurbs_curves)
@@ -159,13 +159,13 @@ public:
 		const k3d::mesh::weights_t& curve_point_weights = *Mesh.nurbs_curve_groups->curve_point_weights;
 		const k3d::mesh::knots_t& curve_knots = *Mesh.nurbs_curve_groups->curve_knots;
 		const k3d::mesh::points_t& points = *Mesh.points;
-		
+
 		k3d::gl::store_attributes attributes;
 
 		GLfloat gl_modelview_matrix[16];
 		glGetFloatv(GL_MODELVIEW_MATRIX, gl_modelview_matrix);
 		gluLoadSamplingMatrices(nurbs_renderer, gl_modelview_matrix, RenderState.gl_projection_matrix, RenderState.gl_viewport);
-		
+
 		const size_t group_begin = 0;
 		const size_t group_end = group_begin + first_curves.size();
 		for(size_t group = group_begin; group != group_end; ++group)
@@ -205,7 +205,7 @@ public:
 			}
 		}
 	}
-	
+
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<nurbs_curve_painter, k3d::interface_list<k3d::gl::imesh_painter > > factory(
