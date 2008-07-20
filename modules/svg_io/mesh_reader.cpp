@@ -92,7 +92,7 @@ public:
 
         mstack.push(k3d::identity3D());
 		parse_graphics(xml_svg);
-		
+		delete factory;
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Mesh)

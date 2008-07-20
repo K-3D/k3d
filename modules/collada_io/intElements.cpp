@@ -45,8 +45,8 @@ namespace io
 	{
 
 		domMesh *meshElement = geomElement.getMesh();
-	
-		k3d::gprim_factory *local = new k3d::gprim_factory(Mesh);
+
+		k3d::gprim_factory factory(Mesh);
 
 		domTriangles *triangles;
 		domPolylist *polygons;
@@ -158,7 +158,7 @@ namespace io
 			}
 			tot+=vcount*max_offset;
 			// Push this polygon into the list of polygons in my structure.
-			local->add_polygon(vertex_coordinates); //and soon texture_coordinates, normal_coordinates
+			factory.add_polygon(vertex_coordinates); //and soon texture_coordinates, normal_coordinates
 		}
 
 		// Copy the vertices we are going to use. To keep things simple,
@@ -210,13 +210,13 @@ namespace io
 		// Assume there are 3 values per vertex with a stride of 3.
 		// Copy the vertices into my structure one-by-one
 		// (converts from COLLADA's doubles to floats).
-		for ( unsigned int i = 0; i < floatArray_vertex->getCount(); i+=stride ) 
+		for ( unsigned int i = 0; i < floatArray_vertex->getCount(); i+=stride )
 		{
 			k3d::point4 vertex(floatArray_vertex->getValue()[i],
 					floatArray_vertex->getValue()[i+1],
 					floatArray_vertex->getValue()[i+2],
 					1);
-			local->add_point(ccst*vertex);
+			factory.add_point(ccst*vertex);
 		}
 	}
 

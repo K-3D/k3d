@@ -286,7 +286,6 @@ void gprim_factory::add_polygon(const mesh::indices_t& Points)
 		m_implementation->edge_points = make_unique(polyhedra->edge_points);
 		m_implementation->clockwise_edges = make_unique(polyhedra->clockwise_edges);
 		m_implementation->edge_selection = make_unique(polyhedra->edge_selection);
-		m_implementation->face_counts->push_back(0);
 		m_implementation->first_faces->push_back(0);
 		m_implementation->types->push_back(mesh::polyhedra_t::POLYGONS);
 	}
