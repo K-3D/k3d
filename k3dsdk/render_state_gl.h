@@ -39,7 +39,9 @@ class render_state
 {
 public:
 	render_state(icamera& Camera) :
-		camera(Camera)
+		camera(Camera),
+		orthographic(false),
+		draw_two_sided(true)
 	{
 	}
 
