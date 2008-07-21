@@ -179,6 +179,14 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 
 } // namespace detail
 
+	transform_tool::itarget::~itarget()
+	{
+		for(connections_t::iterator connection = m_connections.begin(); connection != m_connections.end(); ++connection)
+		{
+			connection->disconnect();
+		}
+	}
+
 	k3d::matrix4 transform_tool::itarget::world_orientation()
 	{
 		if(LOCAL == current_system_type)
@@ -193,7 +201,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 	void transform_tool::itarget::set_transform_modifier(k3d::inode* Modifier)
 	{
 		modifier = Modifier;
-		Modifier->deleted_signal().connect(sigc::mem_fun(*this, &itarget::reset_transform_modifier));
+		m_connections.push_back(Modifier->deleted_signal().connect(sigc::mem_fun(*this, &itarget::reset_transform_modifier)));
 	}
 
 	void transform_tool::itarget::reset_transform_modifier()
@@ -544,6 +552,16 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 
 
 // transform_tool implementation
+
+transform_tool::~transform_tool()
+{
+	for(connections_t::iterator connection = m_connections.begin(); connection != m_connections.end(); ++connection)
+	{
+		connection->disconnect();
+	}
+	clear_targets();
+}
+	
 void transform_tool::lbutton_down(viewport::control& Viewport, const k3d::point2& Coordinates, const k3d::key_modifiers& Modifiers)
 {
 	// Return if an action is in progress
@@ -1178,7 +1196,7 @@ void transform_tool::get_current_selection()
 				continue;
 
 			m_targets.push_back(new transform_target(*node));
-			(*node)->deleted_signal().connect(sigc::mem_fun(*this, &transform_tool::target_list_changed));
+			m_connections.push_back((*node)->deleted_signal().connect(sigc::mem_fun(*this, &transform_tool::target_list_changed)));
 		}
 	}
 	else
@@ -1198,7 +1216,7 @@ void transform_tool::get_current_selection()
 			k3d::iproperty& property = mesh_source->mesh_source_output();
 			m_targets.push_back(new mesh_target(m_document_state, *node, property));
 
-			(*node)->deleted_signal().connect(sigc::mem_fun(*this, &transform_tool::target_list_changed));
+			m_connections.push_back((*node)->deleted_signal().connect(sigc::mem_fun(*this, &transform_tool::target_list_changed)));
 		}
 	}
 

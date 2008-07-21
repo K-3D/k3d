@@ -116,10 +116,7 @@ public:
 		connect_navigation_input_model();
 	}
 
-	~transform_tool()
-	{
-		clear_targets();
-	}
+	virtual ~transform_tool();
 
 	// Interface required for data containers
 	k3d::idocument& document()
@@ -150,6 +147,9 @@ public:
 	virtual void reset() = 0;
 
 protected:
+	
+	typedef std::vector<sigc::connection> connections_t;
+	
 	sigc::connection m_mbutton_start_drag_signal;
 	sigc::connection m_mbutton_drag_signal;
 	sigc::connection m_mbutton_end_drag_signal;
@@ -264,7 +264,7 @@ private:
 		{
 		}
 
-		virtual ~itarget() {}
+		virtual ~itarget();
 
 		// Returns selected target number
 		virtual unsigned long target_number() = 0;
@@ -319,6 +319,9 @@ private:
 		/// Stores coordinate system change matrices
 		k3d::matrix4 m_system_matrix;
 		k3d::matrix4 m_system_matrix_inverse;
+		
+		/// Connections made that need cleaning up
+		connections_t m_connections;
 	};
 
 	class transform_target :
@@ -490,6 +493,8 @@ protected:
 
 	/// Stores the enabled/disabled state for the manipulators
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_visible_manipulators;
+	
+	connections_t m_connections;
 };
 
 } // namespace libk3dngui
