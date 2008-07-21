@@ -222,11 +222,30 @@ extern "C" void copy_from_host_to_device_64_to_32_convert ( void* device_pointer
     free_device_memory ( pdev_uint_64 );
 }
 
-
-
 extern "C" void copy_from_device_to_host ( void* host_pointer, const void* device_pointer, int size_in_bytes )
 {
 	CUDA_SAFE_CALL(cudaMemcpy(host_pointer, device_pointer, size_in_bytes, cudaMemcpyDeviceToHost));
+}
+
+extern "C" void copy_from_device_to_host_32_to_64_convert ( void* host_pointer, const void* device_pointer, int size_in_bytes )
+{
+	#define NUM_THREADS 64
+	int num_uints = size_in_bytes/sizeof(unsigned int);
+	uint2* pdev_uint_64;
+	
+	allocate_device_memory((void**)&pdev_uint_64, size_in_bytes*2);
+	
+	dim3 threads_per_block(NUM_THREADS, 1);
+	dim3 blocks_per_grid( iDivUp(num_uints, NUM_THREADS), 1);
+	
+	convert_uint_32_to_64_kernel <<< blocks_per_grid, threads_per_block >>> ( pdev_uint_64, (unsigned int*) device_pointer, num_uints)
+	
+	CUT_CHECK_ERROR("Kernel execution failed");
+	
+	copy_from_device_to_host(host_pointer, (const void*)pdev_uint_64, size_in_bytes*2);
+	
+	cudaThreadSynchronize();
+	free_device_memory ( pdev_uint_64 );
 }
 
 extern "C" void free_device_memory ( void* device_pointer )

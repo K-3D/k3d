@@ -33,6 +33,15 @@ inline void copy_from_host_to_device_uint_64_bit_check ( void* device_pointer, c
 #endif            
 }
 
+inline void copy_from_device_to_host_uint_64_bit_check ( void* host_pointer, const void* device_pointer, int size_in_bytes )
+{
+#ifdef K3D_UINT_T_64_BITS
+	copy_from_device_to_host_32_to_64_convert (host_pointer, device_pointer, size_in_bytes );   
+#else
+  copy_from_device_to_host (host_pointer, device_pointer, size_in_bytes );
+#endif
+}
+
 /// Constructor
 cuda_device_polyhedra::cuda_device_polyhedra ( const k3d::mesh::polyhedra_t& host_polyhedra ):
     m_p_input_polyhedra(&host_polyhedra)
@@ -312,8 +321,8 @@ void cuda_device_polyhedra::copy_from_device(const k3d::mesh::polyhedra_t& desti
             (out_selection)[edge] = (double) edge_selection_temp[edge];
         }
 
-        copy_from_device_to_host((void*)&(p_output_polyhedra->edge_points->front()),(const void*) pdev_per_edge_point, m_number_of_edges*sizeof(k3d::uint32_t));
-        copy_from_device_to_host((void*)&(p_output_polyhedra->clockwise_edges->front()), (const void*) pdev_per_edge_clockwise_edge, m_number_of_edges*sizeof(k3d::uint32_t));
+        copy_from_device_to_host_uint_64_bit_check((void*)&(p_output_polyhedra->edge_points->front()),(const void*) pdev_per_edge_point, m_number_of_edges*sizeof(k3d::uint32_t));
+        copy_from_device_to_host_uint_64_bit_check((void*)&(p_output_polyhedra->clockwise_edges->front()), (const void*) pdev_per_edge_clockwise_edge, m_number_of_edges*sizeof(k3d::uint32_t));
     }
     
     if ( what_to_copy & POLYHEDRA_ALL_LOOPS )
@@ -329,7 +338,7 @@ void cuda_device_polyhedra::copy_from_device(const k3d::mesh::polyhedra_t& desti
             p_output_polyhedra->loop_first_edges.reset ( new k3d::mesh::indices_t ( m_number_of_loops ) );      
         }
             
-        copy_from_device_to_host((void*)&(p_output_polyhedra->loop_first_edges->front()), (const void*)pdev_per_loop_first_edge, m_number_of_loops*sizeof(k3d::uint32_t));    
+        copy_from_device_to_host_uint_64_bit_check((void*)&(p_output_polyhedra->loop_first_edges->front()), (const void*)pdev_per_loop_first_edge, m_number_of_loops*sizeof(k3d::uint32_t));    
     }
     
     float* face_selection_temp = 0;
@@ -377,8 +386,8 @@ void cuda_device_polyhedra::copy_from_device(const k3d::mesh::polyhedra_t& desti
             (out_selection)[face] = (double)face_selection_temp[face];
         }
     
-        copy_from_device_to_host((void*)&(p_output_polyhedra->face_first_loops->front()), (const void*)pdev_per_face_first_loops, m_number_of_faces*sizeof(k3d::uint32_t));
-        copy_from_device_to_host((void*)&(p_output_polyhedra->face_loop_counts->front()), (const void*)pdev_per_face_loop_count, m_number_of_faces*sizeof(k3d::uint32_t));
+        copy_from_device_to_host_uint_64_bit_check((void*)&(p_output_polyhedra->face_first_loops->front()), (const void*)pdev_per_face_first_loops, m_number_of_faces*sizeof(k3d::uint32_t));
+        copy_from_device_to_host_uint_64_bit_check((void*)&(p_output_polyhedra->face_loop_counts->front()), (const void*)pdev_per_face_loop_count, m_number_of_faces*sizeof(k3d::uint32_t));
     }
     
     if ( what_to_copy & ( POLYHEDRA_ALL_POLYGONS ) )
@@ -415,8 +424,8 @@ void cuda_device_polyhedra::copy_from_device(const k3d::mesh::polyhedra_t& desti
             p_output_polyhedra->types.reset ( new k3d::mesh::polyhedra_t::types_t ( m_number_of_polygons ) );      
         }
         
-        copy_from_device_to_host((void*)&(p_output_polyhedra->first_faces->front()), (const void*)pdev_per_polygon_first_face, m_number_of_polygons*sizeof(k3d::uint32_t));
-        copy_from_device_to_host((void*)&(p_output_polyhedra->face_counts->front()), (const void*)pdev_per_polygon_face_count, m_number_of_polygons*sizeof(k3d::uint32_t));
+        copy_from_device_to_host_uint_64_bit_check((void*)&(p_output_polyhedra->first_faces->front()), (const void*)pdev_per_polygon_first_face, m_number_of_polygons*sizeof(k3d::uint32_t));
+        copy_from_device_to_host_uint_64_bit_check((void*)&(p_output_polyhedra->face_counts->front()), (const void*)pdev_per_polygon_face_count, m_number_of_polygons*sizeof(k3d::uint32_t));
         copy_from_device_to_host((void*)&(p_output_polyhedra->types->front()), (const void*)pdev_per_polygon_types, m_number_of_polygons*sizeof(int32_t));
 
         // TODO:  constant_data, face_materlials, face_varying_data

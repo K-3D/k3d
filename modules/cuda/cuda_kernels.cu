@@ -635,7 +635,7 @@ __global__ void convert_uint_64_to_32_kernel ( uint2* p_uint_64, unsigned int* p
     if ( int_index < num_ints )
     {
         // set the 32bit unsigned int to the lower 32bits of the 64bit unsigned int
-        p_uint_32[int_index] = p_uint_64[int_index].y;    
+        p_uint_32[int_index] = p_uint_64[int_index].x;    
     }
 }
 
@@ -646,8 +646,8 @@ __global__ void convert_uint_32_to_64_kernel ( uint2* p_uint_64, unsigned int* p
     if ( int_index < num_ints )
     {
         // zero the upper 32bits and equate the lower 32
-        p_uint_64[int_index].x = 0;
-        p_uint_64[int_index].y = p_uint_32[int_index];
+        p_uint_64[int_index].y = 0;
+        p_uint_64[int_index].x = p_uint_32[int_index];
     }
 }
 
