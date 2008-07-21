@@ -298,7 +298,8 @@ private:
 
 			//creates upper left corner as a circular_arc and then mirror
 			//the points to generate the other corners to save computations
-			k3d::nurbs::circular_arc(k3d::point3(-rx, 0, 0), k3d::point3(0, -ry, 0), 0, k3d::pi()/2, 1, knots, tmp_weights, control_points);
+			k3d::mesh::knots_t tmp_knots;
+			k3d::nurbs::circular_arc(k3d::point3(-rx, 0, 0), k3d::point3(0, -ry, 0), 0, k3d::pi()/2, 1, tmp_knots, tmp_weights, control_points);
 			return_if_fail(tmp_weights.size() == control_points.size());
 
 			//Upper left corner
@@ -314,6 +315,9 @@ private:
 			double tmx = 2*x+w;
 			double tmy = 2*y+h;
 
+			points.push_back(points.back());
+			weights.push_back(1);
+
 			//Upper right corner
 			for(int i=control_points.size()-1; i>=0; i--)
 			{
@@ -321,8 +325,10 @@ private:
 				count++;
 				add_point(k3d::point4(tmx - (control_points[i][0]+x+rx), control_points[i][1]+y+ry,control_points[i][2],1));
 				weights.push_back(tmp_weights[i]);
-				knots.push_back(knots[i]+2);
 			}
+
+			points.push_back(points.back());
+			weights.push_back(1);
 
 			//Lower right corner
 			for(int i=0; i<control_points.size(); i++)
@@ -331,8 +337,10 @@ private:
 				count++;
 				add_point(k3d::point4(tmx - (control_points[i][0]+x+rx), tmy - (control_points[i][1]+y+ry),control_points[i][2],1));
 				weights.push_back(tmp_weights[i]);
-				knots.push_back(knots[i]+4);
 			}
+
+			points.push_back(points.back());
+			weights.push_back(1);
 
 			//Lower left corner
 			for(int i=control_points.size()-1; i>=0; i--)
@@ -341,29 +349,23 @@ private:
 				count++;
 				add_point(k3d::point4(control_points[i][0]+x+rx, tmy - (control_points[i][1]+y+ry),control_points[i][2],1));
 				weights.push_back(tmp_weights[i]);
-				knots.push_back(knots[i]+6);
 			}
 
-			factory->add_nurbs_curve(3, points, knots, weights);
+			points.push_back(points.back());
+			weights.push_back(1);
 
-			//Create the lines connecting the circular_arcs
-			for(int i=2; i<=11; i+=3)
-			{
-				k3d::mesh::indices_t line_points;
-				k3d::mesh::knots_t line_knots;
-				k3d::mesh::weights_t line_weights;
-		
-				line_points.push_back(points[i]);
-				line_points.push_back(points[(i+1)%12]);
+			points.push_back(points.front());
+			weights.push_back(1);
+
+			for(int i=0; i<3; i++)
+				knots.push_back(0);
+			for(int i=1; i<=7; i++)
 				for(int j=0; j<2; j++)
-				{
-					line_weights.push_back(1);
-					line_knots.push_back(j);
-					line_knots.push_back(j);
-				}
+					knots.push_back(i);
+			for(int i=0; i<3; i++)
+				knots.push_back(8);
 
-				factory->add_nurbs_curve(2,line_points,line_knots,line_weights);
-			}	
+			factory->add_nurbs_curve(3, points, knots, weights);
 		}
 
 	
@@ -536,11 +538,6 @@ private:
 		if(sweep_flag == large_arc_flag)
 			delta_theta = -delta_theta;
 
-		//k3d::log() << debug << "C:  "<< c << std::endl;
-		//k3d::log() << debug << "Theta1: " << theta_one << std::endl;
-		//k3d::log() << debug << "Theta2: " << theta_one + delta_theta << std::endl;
-		//k3d::log() << debug << "DeltaTheta: " << delta_theta << std::endl;
-
 		theta_one += k3d::pi_times_2();
 		if(large_arc_flag == 0)
 			theta_two = theta_one + delta_theta;
@@ -608,12 +605,17 @@ private:
 		lastpoint = k3d::point4(x,y,0,1);
 		add_point(firstpoint);
 
+		k3d::mesh::indices_t points;
+		k3d::mesh::knots_t knots;
+		k3d::mesh::weights_t weights;
+
+		knots.push_back(0);
+		knots.push_back(0);
+
 		while(!def_stream.eof())
 		{
 			k3d::uint_t order = 3;
-			k3d::mesh::indices_t points;
-            k3d::mesh::knots_t knots;
-			k3d::mesh::weights_t weights;
+			
 			points.push_back(last);
 			def_stream >> token;
 			switch(token)
@@ -625,6 +627,8 @@ private:
 				order = 2;
 				slastpoint = k3d::point4(x,y,0,1);
 				get_pair(x,y,def_stream);
+				points.push_back(points.back());
+				points.push_back(count);
 				points.push_back(count);
 				count++;
 				if(relative)
@@ -643,6 +647,8 @@ private:
 				order = 2;
 				slastpoint = k3d::point4(x,y,0,1);
 				def_stream >> x;
+				points.push_back(points.back());
+				points.push_back(count);
 				points.push_back(count);
 				count++;
 				if(relative)
@@ -658,6 +664,8 @@ private:
 				order = 2;
 				slastpoint = k3d::point4(x,y,0,1);
 				def_stream >> y;
+				points.push_back(points.back());
+				points.push_back(count);
 				points.push_back(count);
 				count++;
 				if(relative)
@@ -672,6 +680,8 @@ private:
 				order = 2;
 				slastpoint = k3d::point4(x,y,0,1);
 				lastpoint = firstpoint;
+				points.push_back(points.back());
+				points.push_back(first);
 				points.push_back(first);
 				break;
 			//Curve: Creates a cubic bezier spline from current point to (x3,y3) using (x1,y1) and (x2,y2)
@@ -696,6 +706,16 @@ private:
 				}
 				lastpoint = k3d::point4(x,y,0,1);
 				last = points.back();
+
+				//if(knots.size()==0)
+				//	knots.push_back(0);
+				//else
+				//	knots.push_back(knots.back()+1);
+				//for(int i=0; i<2; i++)
+				//	knots.push_back(knots.back());
+				//knots.push_back(knots.back()+1);
+				//for(int i=0; i<2; i++)
+				//	knots.push_back(knots.back());
 				break;
 			//Smooth curve: Creates a cubic bezier spline from current point to (x2,y2) 
 			//              using slastpoint and (x1 y1) as control points
@@ -811,24 +831,28 @@ private:
 			if(!is_arc)
 			{
 				//Start knot Vector Definition to be a Bezier curve
-				knots.push_back(0);
-				for(int i=0; i < order-1; i++)
-					knots.push_back(1);
-				for(int i=0; i < order-1; i++)
-					knots.push_back(2);
-				knots.push_back(3);
+				//knots.push_back(0);
+				//for(int i=0; i < order-1; i++)
+				//	knots.push_back(1);
+				//for(int i=0; i < order-1; i++)
+				//	knots.push_back(2);
+				//knots.push_back(3);
+				knots.push_back(knots.back());
+				knots.push_back(knots.back());
+				knots.push_back(knots.back()+1);
+				knots.push_back(knots.back());
 				//End knot vector definition
 
 			}
-
-			//Start weight vector definition as bezier curve
-			for(k3d::uint_t point = 0; point < points.size(); point++ )
-				weights.push_back(1.0);
-			//End weight vector definition
-
-			factory->add_nurbs_curve(order, points, knots, weights);
-
 		}
+
+ 		knots.push_back(knots.back());
+		knots.push_back(knots.back());
+
+		for(k3d::uint_t point = 0; point < points.size(); point++ )
+				weights.push_back(1.0);
+
+		factory->add_nurbs_curve(4, points, knots, weights);
 		relative = false;
 		is_arc = false;
 

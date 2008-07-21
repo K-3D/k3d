@@ -67,6 +67,7 @@ namespace io
 	void addInput(daeElement* triangles, const std::string& semantic, const std::string& srcID, int offset);
 	void addGeometry(daeElement* library_geometries, const std::string &name, k3d::mesh *mesh);
 	void addMeshInstance(daeElement * visualScene, k3d::inode *inode);
+	void addCameraInstance(daeElement * visualscene, k3d::inode *inode);
 
 	k3d::mesh to_k3d_mesh(domGeometry &geom);
 

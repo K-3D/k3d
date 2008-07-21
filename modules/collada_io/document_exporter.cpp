@@ -99,7 +99,7 @@ public:
 
 		for(k3d::inode_collection::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
-			if((*node)->factory().factory_id() == k3d::classes::Camera())
+			if((*node)->factory().factory_id() == k3d::plugin::factory::lookup("Camera")->factory_id())
 			{
 				domCamera *camera = daeSafeCast<domCamera>(library_cameras->add("camera"));
 				domCamera::domOptics::domTechnique_common *technique = daeSafeCast<domCamera::domOptics::domTechnique_common>(camera->add("optics technique_common"));
@@ -157,8 +157,12 @@ public:
 
 
 		for(k3d::inode_collection::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+		{
 			if((*node)->factory().factory_id() == k3d::plugin::factory::lookup("MeshInstance")->factory_id())
 				addMeshInstance(visualScene,(*node));
+			if((*node)->factory().factory_id() == k3d::plugin::factory::lookup("Camera")->factory_id())
+				addCameraInstance(visualScene,(*node));
+		}
 
 		root->add("scene instance_visual_scene")->setAttribute("url", makeUriRef("mainScene").c_str());
 

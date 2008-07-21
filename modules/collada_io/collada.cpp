@@ -182,6 +182,27 @@ namespace io
 		node->add("matrix")->setCharData(mat.str());
 	}
 
+	void addCameraInstance(daeElement * visualScene, k3d::inode *inode)
+	{
+		// Add a <node> with a simple transformation
+		SafeAdd(visualScene, "node", node);
+		node->setAttribute("id", removeSpaces(inode->name()).c_str());
+		node->setAttribute("name", removeSpaces(inode->name()).c_str());
+	
+		// Instantiate the <geometry>
+		SafeAdd(node, "instance_camera", instanceCam);
+
+		instanceCam->setAttribute("url", makeUriRef(removeSpaces(inode->name())).c_str());
+
+		k3d::matrix4 matrix = boost::any_cast<k3d::matrix4>(k3d::property::get(*inode, "input_matrix")->property_pipeline_value());
+
+		std::stringstream mat;
+		for(int i=0; i<4; i++)
+			for(int j=0; j<4; j++)
+				mat << matrix[i][j] << " " << std::endl;
+		node->add("matrix")->setCharData(mat.str());
+	}
+
 	k3d::mesh to_k3d_mesh(domGeometry &geom)
 	{
 		intGeometry result(geom,k3d::identity3D());
