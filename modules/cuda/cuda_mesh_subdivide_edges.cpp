@@ -555,8 +555,8 @@ public:
         //document().pipeline_profiler().start_execution(*this, "");
 
         // initialize the device version of the mesh
-        m_p_output_device_mesh.reset (  new cuda_device_mesh ( Output ) );
-        m_p_output_device_mesh->copy_to_device(MESH_POINTS);
+        //m_p_output_device_mesh.reset (  new cuda_device_mesh ( Output ) );
+        //m_p_output_device_mesh->copy_to_device(MESH_POINTS);
 
         //document().pipeline_profiler().finish_execution(*this, "Calculate positions : Init Copy and Allocate");
         document().pipeline_profiler().start_execution(*this, "");

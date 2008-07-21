@@ -69,6 +69,8 @@ extern "C" K3D_CUDA_DECLSPEC void apply_linear_transform_to_point_data ( float *
 
 extern "C" K3D_CUDA_DECLSPEC void allocate_device_memory ( void** device_pointer, int size_in_bytes );
 extern "C" K3D_CUDA_DECLSPEC void copy_from_host_to_device ( void* device_pointer, const void* host_pointer, int size_in_bytes );
+extern "C" K3D_CUDA_DECLSPEC void copy_from_host_to_device_64_to_32_convert ( void* device_pointer, const void* host_pointer, int size_in_bytes );
+
 extern "C" K3D_CUDA_DECLSPEC void copy_from_device_to_host ( void* host_pointer, const void* device_pointer, int size_in_bytes );
 extern "C" K3D_CUDA_DECLSPEC void free_device_memory ( void* device_pointer );
 extern "C" K3D_CUDA_DECLSPEC void allocate_pinned_host_memory ( void** pointer_on_host, int size_in_bytes );
