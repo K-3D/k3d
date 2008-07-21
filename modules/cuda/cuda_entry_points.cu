@@ -202,7 +202,7 @@ extern "C" void copy_from_host_to_device ( void* device_pointer, const void* hos
 	CUDA_SAFE_CALL(cudaMemcpy(device_pointer, host_pointer, size_in_bytes, cudaMemcpyHostToDevice));
 }
 
-extern "C" void copy_from_host_to_device_unsigned_64_to_32_convert ( void* device_pointer, const void* host_pointer, int size_in_bytes )
+extern "C" void copy_from_host_to_device_64_to_32_convert ( void* device_pointer, const void* host_pointer, int size_in_bytes )
 {
     #define NUM_THREADS 64
     int num_uints = size_in_bytes/sizeof(unsigned int);
