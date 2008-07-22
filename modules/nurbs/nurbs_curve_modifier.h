@@ -50,6 +50,8 @@
 
 namespace module{
 	namespace nurbs{
+
+        struct nurbs_curve;
 	    class nurbs_patch_modifier;
 
         class nurbs_curve_modifier{
@@ -77,9 +79,14 @@ namespace module{
                 k3d::point4 get_homogenous_point(size_t point);
                 void split_curve_at(size_t curve, double u);
 
+                nurbs_curve extract_curve(size_t curve);
+                void knot_vector_adaption(std::vector<size_t> curves);
+
                 //the following methods create surfaces from the curves this mesh contains
                 void traverse_curve(size_t curve1, size_t curve2);
                 void revolve_curve(size_t curve, double angle, int segments);
+                void ruled_surface(size_t curve1, size_t curve2);
+                bool create_cap(size_t curve);
 
             private:
                 int factorial(int n);

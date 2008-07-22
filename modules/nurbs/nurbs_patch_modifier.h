@@ -48,11 +48,19 @@ namespace module
 {
 	namespace nurbs
 	{
+	    typedef struct nurbs_curve{
+	        k3d::mesh::knots_t curve_knots;
+	        k3d::mesh::weights_t curve_point_weights;
+	        k3d::mesh::points_t control_points;
+	    };
+
 		class nurbs_patch_modifier
 		{
 			public:
 				nurbs_patch_modifier(k3d::mesh& input);
-                void add_patch(const size_t u_order, const size_t v_order, const k3d::mesh::indices_t& points, const k3d::mesh::knots_t& u_knots, const k3d::mesh::knots_t v_knots, const k3d::mesh::weights_t& weights);
+
+				nurbs_curve extract_u_curve(size_t patch, size_t v);
+				nurbs_curve extract_v_curve(size_t patch, size_t u);
 
 			private:
 				k3d::mesh *m_instance;
@@ -85,6 +93,8 @@ namespace module
                 k3d::mesh::indices_t *m_trim_curve_points;
                 k3d::mesh::weights_t *m_trim_curve_point_weights;
                 k3d::mesh::knots_t *m_trim_curve_knots;
+                k3d::mesh::points_t *m_mesh_points;
+                k3d::mesh::selection_t *m_point_selections;
 
 		};
 	}
