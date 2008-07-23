@@ -54,8 +54,10 @@ namespace module
 			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 		public:
 			ruled_surface(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-				base(Factory, Document)
+				base(Factory, Document),
+				m_flip(init_owner(*this) + init_name(_("flip")) + init_label(_("flip")) + init_description(_("Flip one of the curves before creating the surface")) + init_value(false) )
 			{
+			    m_flip.changed_signal().connect(make_update_mesh_slot());
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 			}
 
@@ -95,6 +97,8 @@ namespace module
 				else
 				{
                     nurbs_curve_modifier mod(Output);
+                    if(m_flip.pipeline_value())
+                        mod.flip_curve(curves[1]);
                     mod.ruled_surface(curves[0], curves[1]);
 				}
 
@@ -115,6 +119,7 @@ namespace module
 			}
 
 		private:
+            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_flip;
 		};
 
 		//Create connect_curve factory

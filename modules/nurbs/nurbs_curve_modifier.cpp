@@ -45,6 +45,60 @@ namespace module
             }
         }
 
+        nurbs_curve_modifier::nurbs_curve_modifier(nurbs_curve& curve)
+        {
+            MY_DEBUG << "Creating Mesh from NurbsCurve" << std::endl;
+            m_instance = new k3d::mesh();
+            k3d::gprim_factory fac(*m_instance);
+
+            k3d::mesh::indices_t points;
+
+            for(int i = 0; i < curve.control_points.size(); i++)
+            {
+                fac.add_point(curve.control_points.at(i));
+                points.push_back(i);
+            }
+
+            fac.add_nurbs_curve(curve.curve_knots.size() - curve.control_points.size(), points, curve.curve_knots, curve.curve_point_weights);
+
+            if (m_instance->nurbs_curve_groups != NULL)
+            {
+                groups = k3d::make_unique(m_instance->nurbs_curve_groups);
+                curve_knots = k3d::make_unique(groups->curve_knots);
+                curve_points = k3d::make_unique(groups->curve_points);
+                curve_point_weights = k3d::make_unique(groups->curve_point_weights);
+                curve_counts = k3d::make_unique(groups->curve_counts);
+                curve_orders = k3d::make_unique(groups->curve_orders);
+                curve_point_counts = k3d::make_unique(groups->curve_point_counts);
+                curve_first_points = k3d::make_unique(groups->curve_first_points);
+                curve_first_knots = k3d::make_unique(groups->curve_first_knots);
+                first_curves = k3d::make_unique(groups->first_curves);
+                curve_selection = k3d::make_unique(groups->curve_selection);
+                point_selection = k3d::make_unique(m_instance->point_selection);
+                mesh_points = k3d::make_unique(m_instance->points);
+                materials = k3d::make_unique(groups->materials);
+            }
+            else
+            {
+                k3d::log() << error << nurbs_debug << "NurbsCurveGroups not initialized, program might crash" << std::endl;
+
+                groups = NULL;
+                curve_knots = NULL;
+                curve_points = NULL;
+                curve_point_weights = NULL;
+                curve_counts = NULL;
+                curve_orders = NULL;
+                curve_point_counts = NULL;
+                curve_first_points = NULL;
+                curve_first_knots = NULL;
+                first_curves = NULL;
+                curve_selection = NULL;
+                point_selection = NULL;
+                mesh_points = NULL;
+                materials = NULL;
+            }
+        }
+
         bool nurbs_curve_modifier::find_point_inside(k3d::mesh::indices_t *points, size_t index)
         {
             if (points == NULL)
@@ -1579,120 +1633,131 @@ namespace module
 
         void nurbs_curve_modifier::split_curve_at(size_t curve, double u)
         {
-            normalize_knot_vector(curve);
-            //prepare curve for splitting
-            curve_knot_insertion(curve, u, curve_orders->at(curve) - 1);
-
-            //double the point at knot "u"
-            k3d::point4 p = curve_point(curve, u);
-            double w = p[3];
-            k3d::point3 p3(p[0]/w, p[1]/w, p[2]/w);
-            MY_DEBUG << "Point: " << p[0] << " x " << p[1] << " x " << p[2] << " x " << p[3] << std::endl;
-
-            //search the point in the actual curve
-            size_t curve_points_begin = curve_first_points->at(curve);
-            size_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
-            int curve_point_index = -1;
-
-            for ( size_t point = curve_points_begin; point < curve_points_end; point++)
+            try
             {
-                if ( point3_float_equal(mesh_points->at( curve_points->at(point) ),p3, 0.000001) )
+                normalize_knot_vector(curve);
+                //prepare curve for splitting
+                curve_knot_insertion(curve, u, curve_orders->at(curve) - 1);
+
+                //double the point at knot "u"
+                k3d::point4 p = curve_point(curve, u);
+                double w = p[3];
+                k3d::point3 p3(p[0]/w, p[1]/w, p[2]/w);
+                MY_DEBUG << "Point: " << p[0] << " x " << p[1] << " x " << p[2] << " x " << p[3] << std::endl;
+
+                //search the point in the actual curve
+                size_t curve_points_begin = curve_first_points->at(curve);
+                size_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
+                int curve_point_index = -1;
+
+                for ( size_t point = curve_points_begin; point < curve_points_end; point++)
                 {
-                    if ( curve_point_index < 0)
-                        curve_point_index = point;
-                    else
+                    if ( point3_float_equal(mesh_points->at( curve_points->at(point) ),p3, 0.000001) )
                     {
-                        k3d::log() << error << "Curve contains this point several times, don't know where to split" << std::endl;
-                        return;
+                        if ( curve_point_index < 0)
+                            curve_point_index = point;
+                        else
+                        {
+                            k3d::log() << error << "Curve contains this point several times, don't know where to split" << std::endl;
+                            return;
+                        }
                     }
                 }
-            }
 
-            if (curve_point_index < 0)
+                if (curve_point_index < 0)
+                {
+                    k3d::log() << error << "Curve does not contain this point" << std::endl;
+                    return;
+                }
+                MY_DEBUG  << "Found in curve at index: " << curve_point_index << std::endl;
+
+                //double points and weights
+                k3d::mesh::indices_t::iterator point_iter = curve_points->begin();
+                point_iter += curve_point_index + 1;
+                mesh_points->push_back(p3);
+                point_selection->push_back(0.0);
+                curve_points->insert(point_iter, mesh_points->size() - 1);
+
+                k3d::mesh::weights_t::iterator weight_iter = curve_point_weights->begin();
+                weight_iter += curve_point_index;
+                curve_point_weights->insert(weight_iter, w);
+
+                //insert knots
+                size_t curve_knots_begin = curve_first_knots->at(curve);
+                size_t curve_knots_end = curve_knots_begin + curve_point_counts->at(curve) + curve_orders->at(curve);
+                int knot_index = -1;
+
+                for ( size_t knot = curve_knots_begin; knot < curve_knots_end; knot++)
+                {
+                    if ( fabs(curve_knots->at(knot) - u) < 0.000001 && knot_index < 0)
+                        knot_index = knot;
+                }
+
+                if (knot_index < 0)
+                {
+                    k3d::log() << error << "Curve does not contain knot " << u << std::endl;
+                    return;
+                }
+                MY_DEBUG  << "First occurrence of knot " << u << " is " << knot_index << std::endl;
+
+                k3d::mesh::knots_t::iterator knot = curve_knots->begin() + knot_index;
+                curve_knots->insert(knot, curve_orders->at(curve) + 1, u);
+
+                //offset all first_knots and first_points
+                for ( size_t curr_curve = 0; curr_curve < count_all_curves_in_groups(); curr_curve++ )
+                {
+                    if ( curve_first_points->at(curr_curve) > curve_first_points->at(curve) )
+                        curve_first_points->at(curr_curve)++;
+
+                    if ( curve_first_knots->at(curr_curve) > curve_first_knots->at(curve) )
+                        curve_first_knots->at(curr_curve) += curve_orders->at(curve) + 1;
+                }
+
+                MY_DEBUG  << "Inserting new curve" << std::endl;
+                //insert new curve
+                curve_point_counts->at(curve) -= curve_points_end - curve_point_index - 1;
+
+                k3d::mesh::indices_t::iterator cfp = curve_first_points->begin() + curve + 1;
+                curve_first_points->insert(cfp, curve_point_index + 1);
+
+                k3d::mesh::indices_t::iterator cfk = curve_first_knots->begin() + curve + 1;
+                curve_first_knots->insert(cfk, knot_index + curve_orders->at(curve));
+
+                k3d::mesh::orders_t::iterator co = curve_orders->begin() + curve + 1;
+                curve_orders->insert(co, curve_orders->at(curve));
+
+                k3d::mesh::counts_t::iterator cpc = curve_point_counts->begin() + curve + 1;
+                curve_point_counts->insert(cpc, curve_points_end - curve_point_index);
+
+                k3d::mesh::selection_t::iterator cs = curve_selection->begin() + curve + 1;
+                curve_selection->insert(cs, 0.0);
+
+                MY_DEBUG  << "Increasing curve_counts" << std::endl;
+
+                //increase curve_counts, offset first_curves
+                int my_group = get_curve_group(curve);
+
+                curve_counts->at(my_group)++;
+
+                const size_t group_begin = 0;
+                const size_t group_end = group_begin + first_curves->size();
+
+                for (size_t group = group_begin; group < group_end; ++group)
+                {
+                    if (first_curves->at(group) > first_curves->at(my_group))
+                        first_curves->at(group)++;
+                }
+
+                remove_unused_points();
+            }
+            catch(std::exception& e)
             {
-                k3d::log() << error << "Curve does not contain this point" << std::endl;
-                return;
+                MY_DEBUG << "Error in SplitCurve: " << e.what() << std::endl;
             }
-            MY_DEBUG  << "Found in curve at index: " << curve_point_index << std::endl;
-
-            //double points and weights
-            k3d::mesh::indices_t::iterator point_iter = curve_points->begin();
-            point_iter += curve_point_index + 1;
-            mesh_points->push_back(p3);
-            point_selection->push_back(0.0);
-            curve_points->insert(point_iter, mesh_points->size() - 1);
-
-            k3d::mesh::weights_t::iterator weight_iter = curve_point_weights->begin();
-            weight_iter += curve_point_index;
-            curve_point_weights->insert(weight_iter, w);
-
-            //insert knots
-            size_t curve_knots_begin = curve_first_knots->at(curve);
-            size_t curve_knots_end = curve_knots_begin + curve_point_counts->at(curve) + curve_orders->at(curve);
-            int knot_index = -1;
-
-            for ( size_t knot = curve_knots_begin; knot < curve_knots_end; knot++)
+            catch(...)
             {
-                if ( fabs(curve_knots->at(knot) - u) < 0.000001 && knot_index < 0)
-                    knot_index = knot;
+                MY_DEBUG << "Error in SplitCurve" << std::endl;
             }
-
-            if (knot_index < 0)
-            {
-                k3d::log() << error << "Curve does not contain knot " << u << std::endl;
-                return;
-            }
-            MY_DEBUG  << "First occurrence of knot " << u << " is " << knot_index << std::endl;
-
-            k3d::mesh::knots_t::iterator knot = curve_knots->begin() + knot_index;
-            curve_knots->insert(knot, curve_orders->at(curve) + 1, u);
-
-            //offset all first_knots and first_points
-            for ( size_t curr_curve = 0; curr_curve < count_all_curves_in_groups(); curr_curve++ )
-            {
-                if ( curve_first_points->at(curr_curve) > curve_first_points->at(curve) )
-                    curve_first_points->at(curr_curve)++;
-
-                if ( curve_first_knots->at(curr_curve) > curve_first_knots->at(curve) )
-                    curve_first_knots->at(curr_curve) += curve_orders->at(curve) + 1;
-            }
-
-            MY_DEBUG  << "Inserting new curve" << std::endl;
-            //insert new curve
-            curve_point_counts->at(curve) -= curve_points_end - curve_point_index - 1;
-
-            k3d::mesh::indices_t::iterator cfp = curve_first_points->begin() + curve + 1;
-            curve_first_points->insert(cfp, curve_point_index + 1);
-
-            k3d::mesh::indices_t::iterator cfk = curve_first_knots->begin() + curve + 1;
-            curve_first_knots->insert(cfk, knot_index + curve_orders->at(curve));
-
-            k3d::mesh::orders_t::iterator co = curve_orders->begin() + curve + 1;
-            curve_orders->insert(co, curve_orders->at(curve));
-
-            k3d::mesh::counts_t::iterator cpc = curve_point_counts->begin() + curve + 1;
-            curve_point_counts->insert(cpc, curve_points_end - curve_point_index);
-
-            k3d::mesh::selection_t::iterator cs = curve_selection->begin() + curve + 1;
-            curve_selection->insert(cs, 0.0);
-
-            MY_DEBUG  << "Increasing curve_counts" << std::endl;
-
-            //increase curve_counts, offset first_curves
-            int my_group = get_curve_group(curve);
-
-            curve_counts->at(my_group)++;
-
-            const size_t group_begin = 0;
-            const size_t group_end = group_begin + first_curves->size();
-
-            for (size_t group = group_begin; group < group_end; ++group)
-            {
-                if (first_curves->at(group) > first_curves->at(my_group))
-                    first_curves->at(group)++;
-            }
-
-            remove_unused_points();
         }
 
         void nurbs_curve_modifier::traverse_curve(size_t curve1, size_t curve2)
@@ -1908,90 +1973,123 @@ namespace module
 
         void nurbs_curve_modifier::ruled_surface(size_t curve1, size_t curve2)
         {
-            int order = Max(curve_orders->at(curve1), curve_orders->at(curve2));
-            int diff = order - curve_orders->at(curve1);
-
-            for(int i = 0; i < diff; i++)
+            try
             {
-                curve_degree_elevate(curve1);
-            }
+                MY_DEBUG << "Ruled Surface between " << curve1 << " and " << curve2 << std::endl;
+                int order = Max(curve_orders->at(curve1), curve_orders->at(curve2));
+                int diff = order - curve_orders->at(curve1);
 
-            diff = order - curve_orders->at(curve2);
-            for(int i = 0; i < diff; i++)
+                for(int i = 0; i < diff; i++)
+                {
+                    curve_degree_elevate(curve1);
+                }
+
+                diff = order - curve_orders->at(curve2);
+                for(int i = 0; i < diff; i++)
+                {
+                    curve_degree_elevate(curve1);
+                }
+
+                std::vector<size_t> curves;
+                curves.push_back(curve1);
+                curves.push_back(curve2);
+
+                normalize_knot_vector(curve1);
+                normalize_knot_vector(curve2);
+
+                knot_vector_adaption(curves);
+
+                k3d::mesh::indices_t patch_points;
+                k3d::mesh::weights_t patch_point_weights;
+
+                k3d::mesh::knots_t u_knots;
+                u_knots.push_back(0);
+                u_knots.push_back(0);
+                u_knots.push_back(1);
+                u_knots.push_back(1);
+
+                k3d::mesh::knots_t v_knots;
+
+                const size_t curve_points_begin = curve_first_points->at(curve1);
+                const size_t curve_points_end = curve_points_begin + curve_point_counts->at(curve1);
+
+                const size_t curve2_points_begin = curve_first_points->at(curve2);
+                const size_t curve2_points_end = curve2_points_begin + curve_point_counts->at(curve2);
+
+                const size_t curve_knots_begin = curve_first_knots->at(curve1);
+                const size_t curve_knots_end = curve_knots_begin + (curve_points_end - curve_points_begin) + curve_orders->at(curve1);
+
+                //copy knots
+                for(int i = curve_knots_begin; i < curve_knots_end; i++)
+                {
+                    v_knots.push_back( curve_knots->at(i) );
+                }
+
+                size_t v_order = curve_orders->at(curve1);
+
+                for(int i = 0; i < curve_point_counts->at(curve1); i++)
+                {
+                    patch_points.push_back( curve_points->at(curve_points_begin + i) );
+                    patch_points.push_back( curve_points->at(curve2_points_begin + i) );
+
+                    patch_point_weights.push_back( curve_point_weights->at(curve_points_begin + i) );
+                    patch_point_weights.push_back( curve_point_weights->at(curve2_points_begin + i) );
+                }
+
+                k3d::gprim_factory fac(*m_instance);
+                fac.add_nurbs_patch(2, v_order, patch_points, u_knots, v_knots, patch_point_weights);
+            }
+            catch(std::exception& e)
             {
-                curve_degree_elevate(curve1);
+                MY_DEBUG << "Error in RuledSurface: " << e.what() << std::endl;
             }
-
-            std::vector<size_t> curves;
-            curves.push_back(curve1);
-            curves.push_back(curve2);
-
-            normalize_knot_vector(curve1);
-            normalize_knot_vector(curve2);
-
-            knot_vector_adaption(curves);
-
-            k3d::mesh::indices_t patch_points;
-            k3d::mesh::weights_t patch_point_weights;
-
-            k3d::mesh::knots_t u_knots;
-            u_knots.push_back(0);
-            u_knots.push_back(0);
-            u_knots.push_back(1);
-            u_knots.push_back(1);
-
-            k3d::mesh::knots_t v_knots;
-
-            const size_t curve_points_begin = curve_first_points->at(curve1);
-            const size_t curve_points_end = curve_points_begin + curve_point_counts->at(curve1);
-
-            const size_t curve2_points_begin = curve_first_points->at(curve2);
-            const size_t curve2_points_end = curve2_points_begin + curve_point_counts->at(curve2);
-
-            const size_t curve_knots_begin = curve_first_knots->at(curve1);
-            const size_t curve_knots_end = curve_knots_begin + (curve_points_end - curve_points_begin) + curve_orders->at(curve1);
-
-            //copy knots
-            for(int i = curve_knots_begin; i < curve_knots_end; i++)
+            catch(...)
             {
-                v_knots.push_back( curve_knots->at(i) );
+                MY_DEBUG << "Error in RuledSurface" << std::endl;
             }
-
-            size_t v_order = curve_orders->at(curve1);
-
-            for(int i = 0; i < curve_point_counts->at(curve1); i++)
-            {
-                patch_points.push_back( curve_points->at(curve_points_begin + i) );
-                patch_points.push_back( curve_points->at(curve2_points_begin + i) );
-
-                patch_point_weights.push_back( curve_point_weights->at(curve_points_begin + i) );
-                patch_point_weights.push_back( curve_point_weights->at(curve2_points_begin + i) );
-            }
-
-            k3d::gprim_factory fac(*m_instance);
-            fac.add_nurbs_patch(2, v_order, patch_points, u_knots, v_knots, patch_point_weights);
         }
 
         bool nurbs_curve_modifier::create_cap(size_t curve)
         {
-            //check whether curve is a loop
-            const size_t curve_points_begin = curve_first_points->at(curve);
-            const size_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
+            try{
+                MY_DEBUG << "Create Cap" << std::endl;
 
-            const size_t curve_knots_begin = curve_first_knots->at(curve);
-            const size_t curve_knots_end = curve_knots_begin + (curve_points_end - curve_points_begin) + curve_orders->at(curve);
+                //check whether curve is a loop
+                const size_t curve_points_begin = curve_first_points->at(curve);
+                const size_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
 
-            if(curve_points->at(curve_points_begin) == curve_points->at(curve_points_end) || point3_float_equal(mesh_points->at(curve_points->at(curve_points_begin)), mesh_points->at(curve_points->at(curve_points_end)), 0.000001))
-            {
-                //split it up at the middle
-                normalize_knot_vector(curve);
-                split_curve_at(curve, 0.5);
-                //->ruled surface
-                ruled_surface(curve, curve + 1);
+                if(curve_points->at(curve_points_begin) == curve_points->at(curve_points_end-1) || point3_float_equal(mesh_points->at(curve_points->at(curve_points_begin)), mesh_points->at(curve_points->at(curve_points_end-1)), 0.000001))
+                {
+                    nurbs_curve tmp = extract_curve(curve);
+                    nurbs_curve_modifier mod(tmp);
 
-                return true;
+                    //split it up at the middle
+                    mod.normalize_knot_vector(0);
+                    mod.split_curve_at(0, 0.5);
+                    mod.flip_curve(0);
+                    //->ruled surface
+                    mod.ruled_surface(0, 1);
+                    mod.flip_curve(0);
+                    //join the 2 curves again and close them to a loop
+                    const size_t curve1_points_begin = mod.curve_first_points->at(0);
+                    const size_t curve1_points_end = curve_points_begin + mod.curve_point_counts->at(0);
+
+                    const size_t curve2_points_begin = mod.curve_first_points->at(1);
+                    mod.join_curves(curve1_points_end - 1, 0, curve2_points_begin, 1);
+                    mod.close_curve(0,true);
+
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch(std::exception& e)
+            {
+                MY_DEBUG << "Error in CreateCap: " << e.what() << std::endl;
+            }
+            catch(...)
+            {
+                MY_DEBUG << "Error in CreateCap" << std::endl;
+            }
         }
 
     }//nurbs

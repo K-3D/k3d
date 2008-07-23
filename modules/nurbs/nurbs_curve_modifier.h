@@ -57,6 +57,7 @@ namespace module{
         class nurbs_curve_modifier{
             public:
                 nurbs_curve_modifier(k3d::mesh& input);
+                nurbs_curve_modifier(nurbs_curve& curve);
 
                 int selected_curve();
                 void print_knot_vector(size_t curve);

@@ -50,6 +50,7 @@ extern k3d::iplugin_factory& curve_degree_elevation_factory();
 extern k3d::iplugin_factory& curve_traversal_factory();
 extern k3d::iplugin_factory& revolve_curve_factory();
 extern k3d::iplugin_factory& ruled_surface_factory();
+extern k3d::iplugin_factory& create_cap_factory();
 
 } // namespace nurbs
 
@@ -78,5 +79,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::nurbs::curve_traversal_factory());
 	Registry.register_factory(module::nurbs::revolve_curve_factory());
 	Registry.register_factory(module::nurbs::ruled_surface_factory());
+	Registry.register_factory(module::nurbs::create_cap_factory());
 K3D_MODULE_END
 
