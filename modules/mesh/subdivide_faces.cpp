@@ -24,6 +24,7 @@
 
 #include <k3d-i18n-config.h>
 
+#include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/ipipeline_profiler.h>
@@ -32,14 +33,12 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/mesh_topology_data.h>
+#include <k3dsdk/named_array_copier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
-
-#include "helpers.h"
-#include "named_array_random_access_copier.h"
 
 #include <set>
 
@@ -449,8 +448,8 @@ struct mesh_arrays
 			k3d::mesh::counts_t& OutputFaceLoopCounts,
 			k3d::mesh::materials_t& OutputFaceMaterials,
 			k3d::mesh::selection_t& OutputFaceSelection,
-			k3d::named_array_random_access_copier& UniformCopier,
-			k3d::named_array_random_access_copier& VaryingCopier
+			k3d::named_array_copier& UniformCopier,
+			k3d::named_array_copier& VaryingCopier
 			) :
 				input_first_faces(InputFirstFaces),
 				input_face_counts(InputFaceCounts),
@@ -561,8 +560,8 @@ struct mesh_arrays
 	k3d::mesh::counts_t& output_face_loop_counts;
 	k3d::mesh::materials_t& output_face_materials;
 	k3d::mesh::selection_t& output_face_selection;
-	k3d::named_array_random_access_copier& uniform_copier;
-	k3d::named_array_random_access_copier& varying_copier;
+	k3d::named_array_copier& uniform_copier;
+	k3d::named_array_copier& varying_copier;
 };
 
 /// Subdivide faces by connecting their centers to the midpoints of the edges.
@@ -884,9 +883,9 @@ public:
 		output_polyhedra.constant_data = Input.polyhedra->constant_data;
 		// Create copiers for the uniform and varying data
 		output_polyhedra.uniform_data = Input.polyhedra->uniform_data.clone_types();
-		k3d::named_array_random_access_copier uniform_data_copier(Input.polyhedra->uniform_data, output_polyhedra.uniform_data);
+		k3d::named_array_copier uniform_data_copier(Input.polyhedra->uniform_data, output_polyhedra.uniform_data);
 		output_polyhedra.face_varying_data = Input.polyhedra->face_varying_data.clone_types();
-		k3d::named_array_random_access_copier face_varying_data_copier(Input.polyhedra->face_varying_data, output_polyhedra.face_varying_data);
+		k3d::named_array_copier face_varying_data_copier(Input.polyhedra->face_varying_data, output_polyhedra.face_varying_data);
 
 		// Face-related arrays can not be appended to because of the possibility of multiple polyhedra,
 		// so we will rebuild them from scratch in the new order
@@ -1020,8 +1019,8 @@ public:
 		output_face_loop_counts->resize(face_edge_counter.face_count, 1);
 		output_face_selection->resize(face_edge_counter.face_count, 0.0);
 		output_face_materials->resize(face_edge_counter.face_count);
-		k3d::resize(output_polyhedra.face_varying_data, face_edge_counter.edge_count);
-		k3d::resize(output_polyhedra.uniform_data, face_edge_counter.face_count);
+		output_polyhedra.face_varying_data.resize(face_edge_counter.edge_count);
+		output_polyhedra.uniform_data.resize(face_edge_counter.face_count);
 		document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
 		detail::mesh_arrays mesh_arrays(

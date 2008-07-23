@@ -144,7 +144,8 @@ public:
 			const k3d::mesh::bools_t& BoundaryEdges,
 			const k3d::uint_t SplitPointCount,
 			k3d::mesh::indices_t& OutputEdgePoints,
-			k3d::mesh::indices_t& OutputClockwiseEdges) :
+			k3d::mesh::indices_t& OutputClockwiseEdges,
+			k3d::named_array_copier& Copier) :
 				m_input_polyhedra(InputPolyhedra),
 				m_edge_list(EdgeList),
 				m_index_map(IndexMap),
@@ -153,21 +154,29 @@ public:
 				m_boundary_edges(BoundaryEdges),
 				m_split_point_count(SplitPointCount),
 				m_output_edge_points(OutputEdgePoints),
-				m_output_clockwise_edges(OutputClockwiseEdges)
+				m_output_clockwise_edges(OutputClockwiseEdges),
+				m_copier(Copier)
 	{
 	}
 
 	void operator()(const k3d::uint_t EdgeIndex)
 	{
+		const k3d::double_t weight_step = 1.0 / static_cast<double>(m_split_point_count + 1);
 		const k3d::uint_t edge = m_edge_list[EdgeIndex];
 		{
 			const k3d::uint_t old_clockwise = m_input_polyhedra.clockwise_edges->at(edge);
 			const k3d::uint_t first_new_edge = m_index_map[edge] + 1;
+			const k3d::uint_t indices[] = {edge, old_clockwise};
 			for(k3d::uint_t i = 0; i != m_split_point_count; ++i)
 			{
 				const k3d::uint_t new_edge = first_new_edge + i;
 				m_output_edge_points[new_edge] = m_first_midpoint[edge] + i;
 				m_output_clockwise_edges[new_edge- 1] = new_edge;
+				
+				// copy varying data
+				const k3d::double_t last_weight = weight_step * static_cast<k3d::double_t>(i+1);
+				const k3d::double_t weights[] = {1 - last_weight, last_weight};
+				m_copier.copy(2, indices, weights, new_edge);
 			}
 			m_output_clockwise_edges[first_new_edge + m_split_point_count - 1] = m_index_map[old_clockwise];
 		}
@@ -176,11 +185,17 @@ public:
 			const k3d::uint_t companion = m_companions[edge];
 			const k3d::uint_t old_clockwise = m_input_polyhedra.clockwise_edges->at(companion);
 			const k3d::uint_t first_new_edge = m_index_map[companion] + 1;
+			const k3d::uint_t indices[] = {companion, old_clockwise};
 			for(k3d::uint_t i = 0; i != m_split_point_count; ++i)
 			{
 				const k3d::uint_t new_edge = first_new_edge + i;
 				m_output_edge_points[new_edge] = m_first_midpoint[edge] + m_split_point_count - i - 1;
 				m_output_clockwise_edges[new_edge - 1] = new_edge;
+				
+				// copy varying data
+				const k3d::double_t last_weight = weight_step * static_cast<k3d::double_t>(i + 1);
+				const k3d::double_t weights[] = {1 - last_weight, last_weight};
+				m_copier.copy(2, indices, weights, new_edge);
 			}
 			m_output_clockwise_edges[first_new_edge + m_split_point_count - 1] = m_index_map[old_clockwise];
 		}
@@ -196,6 +211,7 @@ private:
 	const k3d::uint_t m_split_point_count;
 	k3d::mesh::indices_t& m_output_edge_points;
 	k3d::mesh::indices_t& m_output_clockwise_edges;
+	k3d::named_array_copier& m_copier;
 };
 
 /// Updates edge indices using the mapping from old to new indices
@@ -206,12 +222,14 @@ public:
 			const k3d::mesh::indices_t& InputClockwiseEdges,
 			const k3d::mesh::indices_t& IndexMap,
 			k3d::mesh::indices_t& OutputEdgePoints,
-			k3d::mesh::indices_t& OutputClockwiseEdges) :
+			k3d::mesh::indices_t& OutputClockwiseEdges,
+			k3d::named_array_copier& Copier) :
 				m_input_edge_points(InputEdgePoints),
 				m_input_clockwise_edges(InputClockwiseEdges),
 				m_index_map(IndexMap),
 				m_output_edge_points(OutputEdgePoints),
-				m_output_clockwise_edges(OutputClockwiseEdges)
+				m_output_clockwise_edges(OutputClockwiseEdges),
+				m_copier(Copier)
 	{}
 
 	void operator()(const k3d::uint_t Edge)
@@ -219,6 +237,7 @@ public:
 		const k3d::uint_t mapped_edge = m_index_map[Edge];
 		m_output_edge_points[mapped_edge] = m_input_edge_points[Edge];
 		m_output_clockwise_edges[mapped_edge] = m_index_map[m_input_clockwise_edges[Edge]];
+		m_copier.copy(Edge, mapped_edge);
 	}
 
 private:
@@ -227,6 +246,7 @@ private:
 	const k3d::mesh::indices_t& m_index_map;
 	k3d::mesh::indices_t& m_output_edge_points;
 	k3d::mesh::indices_t& m_output_clockwise_edges;
+	k3d::named_array_copier& m_copier;
 };
 
 /// Calculates the split points positions for each edge
@@ -267,58 +287,6 @@ private:
 	const k3d::uint_t m_split_point_count;
 	const k3d::uint_t m_first_new_point;
 	k3d::mesh::points_t& m_points;
-};
-
-/// Copies and interpolates the varying data as needed (serial usage only)
-class varying_data_copier
-{
-public:
-	varying_data_copier(const k3d::mesh::points_t Points,
-			const k3d::mesh::indices_t& EdgePoints,
-			const k3d::mesh::indices_t& ClockwiseEdges,
-			const k3d::mesh::indices_t& Companions,
-			const k3d::mesh::bools_t& BoundaryEdges,
-			const k3d::mesh::bools_t& HasMidpoint,
-			const k3d::uint_t SplitPointCount,
-			k3d::named_array_copier& Copier) :
-				m_points(Points),
-				m_edge_points(EdgePoints),
-				m_clockwise_edges(ClockwiseEdges),
-				m_companions(Companions),
-				m_boundary_edges(BoundaryEdges),
-				m_has_midpoint(HasMidpoint),
-				m_split_point_count(SplitPointCount),
-				m_copier(Copier)
-			{}
-
-	void operator()(const k3d::uint_t Edge)
-	{
-		m_copier.push_back(Edge);
-		if(m_has_midpoint[Edge] || (!m_boundary_edges[Edge] && m_has_midpoint[m_companions[Edge]]))
-		{
-			const k3d::uint_t clockwise = m_clockwise_edges[Edge];
-			const k3d::uint_t indices[] = {Edge, clockwise};
-			const k3d::point3& start_point = m_points[m_edge_points[Edge]];
-			const k3d::point3& end_point = m_points[m_edge_points[Edge]];
-			const k3d::double_t weight_step = 1.0 / static_cast<double>(m_split_point_count + 1);
-			for(k3d::uint_t i = 1; i <= m_split_point_count; ++i)
-			{
-				const k3d::double_t last_weight = weight_step * static_cast<k3d::double_t>(i);
-				const k3d::double_t weights[] = {1 - last_weight, last_weight};
-				m_copier.push_back(2, indices, weights);
-			}
-		}
-	}
-
-private:
-	const k3d::mesh::points_t m_points;
-	const k3d::mesh::indices_t& m_edge_points;
-	const k3d::mesh::indices_t& m_clockwise_edges;
-	const k3d::mesh::indices_t& m_companions;
-	const k3d::mesh::bools_t& m_boundary_edges;
-	const k3d::mesh::bools_t& m_has_midpoint;
-	const k3d::uint_t m_split_point_count;
-	k3d::named_array_copier& m_copier;
 };
 
 } // namespace detail
@@ -397,6 +365,7 @@ public:
 		output_point_selection.resize(new_point_count, 1.0);
 		k3d::mesh::indices_t& output_loop_first_edges = *k3d::make_unique(polyhedra.loop_first_edges);
 		polyhedra.face_varying_data = Input.polyhedra->face_varying_data.clone_types();
+		polyhedra.face_varying_data.resize(edge_index_calculator.edge_count);
 		k3d::named_array_copier face_varying_data_copier(Input.polyhedra->face_varying_data, polyhedra.face_varying_data);
 		document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
@@ -405,7 +374,8 @@ public:
 				*polyhedra.clockwise_edges,
 				index_map,
 				*output_edge_points,
-				*output_clockwise_edges);
+				*output_clockwise_edges,
+				face_varying_data_copier);
 		for(k3d::uint_t edge = 0; edge != index_map.size(); ++edge) edge_index_updater(edge);
 		for(k3d::uint_t loop = 0; loop != output_loop_first_edges.size(); ++loop)
 			output_loop_first_edges[loop] = index_map[output_loop_first_edges[loop]];
@@ -420,22 +390,10 @@ public:
 					boundary_edges,
 					split_point_count,
 					*output_edge_points,
-					*output_clockwise_edges);
+					*output_clockwise_edges,
+					face_varying_data_copier);
 		for(k3d::uint_t edge_index = 0; edge_index != m_edge_list.size(); ++edge_index) edge_splitter(edge_index);
 		document().pipeline_profiler().finish_execution(*this, "Split edges");
-
-		document().pipeline_profiler().start_execution(*this, "Copy varying data");
-		detail::varying_data_copier varying_data_copier(*Input.points,
-					*Input.polyhedra->edge_points,
-					*Input.polyhedra->clockwise_edges,
-					companions,
-					boundary_edges,
-					has_midpoint,
-					split_point_count,
-					face_varying_data_copier);
-		const k3d::mesh::indices_t& input_edge_points = *Input.polyhedra->edge_points;
-		for(k3d::uint_t edge = 0; edge != input_edge_points.size(); ++edge) varying_data_copier(edge);
-		document().pipeline_profiler().finish_execution(*this, "Copy varying data");
 
 		polyhedra.edge_points = output_edge_points;
 		polyhedra.clockwise_edges = output_clockwise_edges;

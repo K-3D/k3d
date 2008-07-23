@@ -324,6 +324,16 @@ public:
 	{
 		std::for_each(copiers.begin(), copiers.end(), boost::bind(&array_copier::push_back, _1, Count, Indices, Weights));
 	}
+	
+	void copy(const uint_t SourceIndex, const uint_t TargetIndex)
+	{
+		std::for_each(copiers.begin(), copiers.end(), boost::bind(&array_copier::copy, _1, SourceIndex, TargetIndex));
+	}
+
+	void copy(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex)
+	{
+		std::for_each(copiers.begin(), copiers.end(), boost::bind(&array_copier::copy, _1, Count, Indices, Weights, TargetIndex));
+	}
 
 private:
 	/// Abstract interface for concrete objects that provide array-copying operations
@@ -334,6 +344,10 @@ private:
 		virtual void push_back(const uint_t Index) = 0;
 		/// Called to compute a weighted sum from the source array and append the result to the target array
 		virtual void push_back(const uint_t Count, const uint_t* Indices, const double_t* Weights) = 0;
+		/// Called to copy a value (identified by SourceIndex) from the source array to the target array at position TargetIndex
+		virtual void copy(const uint_t SourceIndex, const uint_t TargetIndex) = 0;
+		/// Called to compute a weighted sum from the source array and store the result at TargetIndex in the target array
+		virtual void copy(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TagetIndex) = 0;
 	};
 
 	/// Defines storage for a collection of array copiers
@@ -396,6 +410,16 @@ private:
 			{
 				target.push_back(weighted_sum(source, Count, Indices, Weights));
 			}
+			
+			void copy(const uint_t SourceIndex, const uint_t TargetIndex)
+			{
+				target[TargetIndex] = source[SourceIndex];
+			}
+
+			void copy(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex)
+			{
+				target[TargetIndex] = weighted_sum(source, Count, Indices, Weights);
+			}
 
 		private:
 			const array_t& source;
@@ -432,6 +456,16 @@ void named_array_copier::push_back(const uint_t Index)
 void named_array_copier::push_back(const uint_t Count, const uint_t* Indices, const double_t* Weights)
 {
 	m_implementation->push_back(Count, Indices, Weights);
+}
+
+void named_array_copier::copy(const uint_t SourceIndex, const uint_t TargetIndex)
+{
+	m_implementation->copy(SourceIndex, TargetIndex);
+}
+
+void named_array_copier::copy(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex)
+{
+	m_implementation->copy(Count, Indices, Weights, TargetIndex);
 }
 
 } // namespace k3d
