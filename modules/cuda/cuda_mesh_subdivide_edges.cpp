@@ -433,10 +433,15 @@ public:
         m_p_output_device_mesh.reset( new cuda_device_mesh ( Output ) );
         m_p_output_device_mesh->copy_to_device(MESH_POINTS + POLYHEDRA_ALL_EDGES + POLYHEDRA_ALL_LOOPS);
 
-
         unsigned int* pdev_edge_index_map;
         allocate_device_memory ((void**)&pdev_edge_index_map, index_map.size()*sizeof(unsigned int));
+#ifndef K3D_UINT_T_64_BITS
         copy_from_host_to_device((void*)pdev_edge_index_map, (const void*)&(index_map.front()), index_map.size()*sizeof(unsigned int));
+#else
+        detail::indices_t index_map32(index_map.size());
+        std::copy(index_map.begin(), index_map.end(), index_map32.begin());
+        copy_from_host_to_device((void*)pdev_edge_index_map, (const void*)&(index_map32.front()), index_map32.size()*sizeof(unsigned int));
+#endif
 
 
         //k3d::log() << debug << "Pre-Kernel" << std::endl;
