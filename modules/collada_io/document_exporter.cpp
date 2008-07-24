@@ -47,7 +47,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/transformable.h>
-#include <k3dsdk/legacy_mesh_source.h>
+
 #include <string>
 #include <list>
 
