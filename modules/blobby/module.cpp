@@ -29,6 +29,7 @@ namespace module
 namespace blobby
 {
 
+extern k3d::iplugin_factory& add_factory();
 extern k3d::iplugin_factory& blobby_add_operator_factory();
 extern k3d::iplugin_factory& blobby_div_operator_factory();
 extern k3d::iplugin_factory& blobby_max_operator_factory();
@@ -46,6 +47,7 @@ extern k3d::iplugin_factory& segment_factory();
 } // namespace module
 
 K3D_MODULE_START(Registry)
+	Registry.register_factory(module::blobby::add_factory());
 	Registry.register_factory(module::blobby::blobby_add_operator_factory());
 	Registry.register_factory(module::blobby::blobby_div_operator_factory());
 	Registry.register_factory(module::blobby::blobby_max_operator_factory());
