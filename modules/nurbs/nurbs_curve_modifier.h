@@ -52,6 +52,7 @@ namespace module{
 	namespace nurbs{
 
         struct nurbs_curve;
+        struct nurbs_patch;
 	    class nurbs_patch_modifier;
 
         class nurbs_curve_modifier{

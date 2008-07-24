@@ -54,6 +54,13 @@ namespace module
 	        k3d::mesh::points_t control_points;
 	    };
 
+	    typedef struct nurbs_patch{
+	        k3d::mesh::knots_t u_knots;
+	        k3d::mesh::knots_t v_knots;
+	        k3d::mesh::weights_t point_weights;
+	        k3d::mesh::points_t control_points;
+	    };
+
 		class nurbs_patch_modifier
 		{
 			public:
@@ -61,6 +68,9 @@ namespace module
 
 				nurbs_curve extract_u_curve(size_t patch, size_t v);
 				nurbs_curve extract_v_curve(size_t patch, size_t u);
+
+				nurbs_patch extract_patch(size_t patch);
+				int get_patch_count();
 
 			private:
 				k3d::mesh *m_instance;

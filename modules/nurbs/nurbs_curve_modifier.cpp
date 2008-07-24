@@ -1844,7 +1844,6 @@ namespace module
                 k3d::point3 p = mesh_points->at(curve_points->at(curve_points_begin + i));
                 double w = curve_point_weights->at(curve_points_begin + i);
                 double distance = sqrt((p[0] * p[0]) + (p[1] * p[1])); // we want the distance to the z axis
-                distance = 1.0;
                 MY_DEBUG << "Working with point: " << output_point(p) << " and weight " << w << "Creating circle with radius: " << distance << std::endl;
 
                 for (int j = 0; j < control_points.size(); j++)
@@ -2069,14 +2068,12 @@ namespace module
                     mod.flip_curve(0);
                     //->ruled surface
                     mod.ruled_surface(0, 1);
-                    mod.flip_curve(0);
-                    //join the 2 curves again and close them to a loop
-                    const size_t curve1_points_begin = mod.curve_first_points->at(0);
-                    const size_t curve1_points_end = curve_points_begin + mod.curve_point_counts->at(0);
 
-                    const size_t curve2_points_begin = mod.curve_first_points->at(1);
-                    mod.join_curves(curve1_points_end - 1, 0, curve2_points_begin, 1);
-                    mod.close_curve(0,true);
+                    //now extract the surface and add it to this mesh
+                    nurbs_patch_modifier mod2(*mod.m_instance);
+                    nurbs_patch p = mod2.extract_patch(mod2.get_patch_count() - 1);
+
+                    //insert with shared points!!
 
                     return true;
                 }
@@ -2085,10 +2082,12 @@ namespace module
             catch(std::exception& e)
             {
                 MY_DEBUG << "Error in CreateCap: " << e.what() << std::endl;
+                return false;
             }
             catch(...)
             {
                 MY_DEBUG << "Error in CreateCap" << std::endl;
+                return false;
             }
         }
 

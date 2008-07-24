@@ -137,5 +137,31 @@ namespace module
 
             return result;
 		}
+
+		nurbs_patch nurbs_patch_modifier::extract_patch(size_t patch)
+		{
+		    nurbs_curve u = extract_u_curve(patch,0);
+		    nurbs_curve v = extract_v_curve(patch,0);
+
+            nurbs_patch result;
+            result.u_knots = u.curve_knots;
+            result.v_knots = v.curve_knots;
+
+            for(int i = 0; i < m_patch_u_point_counts->at(patch); i++)
+            {
+                for(int j = 0; j < m_patch_v_point_counts->at(patch); j++)
+                {
+                   result.control_points.push_back( m_mesh_points->at( m_patch_points->at(j + i * m_patch_u_point_counts->at(patch))) );
+                   result.point_weights.push_back( m_patch_point_weights->at(j + i * m_patch_u_point_counts->at(patch)) );
+                }
+            }
+
+            return result;
+		}
+
+		int nurbs_patch_modifier::get_patch_count()
+		{
+		    return m_patch_first_points->size();
+		}
 	}
 }
