@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -280,39 +280,55 @@ inode* weighted_sum(const typed_array<inode*>& Source, const uint_t Count, const
 class named_array_copier::implementation
 {
 public:
-	implementation(const named_arrays& Source, named_arrays& Target)
+	implementation(const named_arrays& Source, named_arrays& Target, const copy_policy& CopyPolicy)
 	{
-		named_arrays::const_iterator source = Source.begin();
-		named_arrays::const_iterator source_end = Source.end();
-		named_arrays::iterator target = Target.begin();
-		named_arrays::iterator target_end = Target.end();
-		for(; source != source_end && target != target_end ; ++source, ++target)
+		std::vector<bool_t> used_source(Source.size(), false);
+		std::vector<bool_t> used_target(Target.size(), false);
+
+		const named_arrays::const_iterator source_begin = Source.begin();
+		const named_arrays::const_iterator source_end = Source.end();
+
+		const named_arrays::iterator target_begin = Target.begin();
+		const named_arrays::iterator target_end = Target.end();
+	
+		uint_t target_index = 0;
+		for(named_arrays::const_iterator target = target_begin; target != target_end; ++target, ++target_index)
 		{
-			const std::string source_name = source->first;
-			const std::string target_name = target->first;
-			if(source_name != target_name)
+			uint_t source_index = 0;
+			for(named_arrays::const_iterator source = source_begin; source != source_end; ++source, ++source_index)
 			{
-				log() << error << "arrays with mis-matched names will not be copied: [" << source_name << "] versus [" << target_name << "]" << std::endl;
-				continue;
-			}
+				if(CopyPolicy.copy(source->first, *source->second.get(), target->first, *target->second.get()))
+				{
+					used_source[source_index] = true;
+					used_target[target_index] = true;
 
-			const array* source_array = source->second.get();
-			array* target_array = target->second.get();
-			if(typeid(*source_array) != typeid(*target_array))
-			{
-				log() << error << "array [" << source_name << "] with mis-matched types will not be copied: [" << demangle(typeid(*source_array)) << "] versus [" << demangle(typeid(*target_array)) << "]" << std::endl;
-				continue;
-			}
+					if(!copier_factory::create_copier(source->second.get(), target->second.get(), copiers))
+					{
+						log() << error << "array [" << target->first << "] of unknown type [" << demangle(typeid(*target->second)) << "] will not receive data." << std::endl;
+					}
 
-			if(!copier_factory::create_copier(source_array, target_array, copiers))
-				log() << error << "array [" << source_name << "] with unknown type [" << demangle(typeid(*source_array)) << "] will not be copied" << std::endl;
+					break;
+				}
+			}
 		}
 
-		for(; source != source_end; ++source)
-			log() << error << "source array [" << source->first << "] has no corresponding target and will not be copied" << std::endl;
+		{
+			uint_t source_index = 0;
+			for(named_arrays::const_iterator source = source_begin; source != source_end; ++source, ++source_index)
+			{
+				if(!used_source[source_index])
+					CopyPolicy.unused_source(source->first, *source->second);
+			}
+		}
 
-		for(; target != target_end; ++target)
-			log() << error << "target array [" << target->first << "] has no corresponding source and will not receive data" << std::endl;
+		{
+			uint_t target_index = 0;
+			for(named_arrays::const_iterator target = target_begin; target != target_end; ++target, ++target_index)
+			{
+				if(!used_target[target_index])
+					CopyPolicy.unused_target(target->first, *target->second);
+			}
+		}
 	}
 
 	void push_back(const uint_t Index)
@@ -437,10 +453,54 @@ private:
 };
 
 ////////////////////////////////////////////////////////////////////////////
+// named_array_copier::strict_copy
+
+const bool_t named_array_copier::strict_copy::copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const
+{
+	if(SourceName != TargetName)
+		return false;
+
+	if(typeid(Source) != typeid(Target))
+	{
+		log() << error << "Source array [" << SourceName << "] of type [" << demangle(typeid(Source)) << "] does not match target array of type [" << demangle(typeid(Target)) << "]." << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
+void named_array_copier::strict_copy::unused_source(const string_t& SourceName, const array& Source) const
+{
+	log() << error << "Source array [" << SourceName << "] of type [" << demangle(typeid(Source)) << "] has no corresponding target and will not supply data." << std::endl;
+}
+
+void named_array_copier::strict_copy::unused_target(const string_t& TargetName, const array& Target) const
+{
+	log() << error << "Target array [" << TargetName << "] of type [" << demangle(typeid(Target)) << "] has no corresponding source and will not receive data." << std::endl;
+}
+
+////////////////////////////////////////////////////////////////////////////
+// named_array_copier::copy_subset
+
+const bool_t named_array_copier::copy_subset::copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const
+{
+	return SourceName == TargetName && typeid(Source) == typeid(Target);
+}
+
+void named_array_copier::copy_subset::unused_source(const string_t& SourceName, const array& Source) const
+{
+}
+
+void named_array_copier::copy_subset::unused_target(const string_t& TargetName, const array& Target) const
+{
+	log() << error << "Target array [" << TargetName << "] of type [" << demangle(typeid(Target)) << "] has no corresponding source and will not receive data." << std::endl;
+}
+
+////////////////////////////////////////////////////////////////////////////
 // named_array_copier
 
-named_array_copier::named_array_copier(const named_arrays& Source, named_arrays& Target) :
-	m_implementation(new implementation(Source, Target))
+named_array_copier::named_array_copier(const named_arrays& Source, named_arrays& Target, const copy_policy& CopyPolicy) :
+	m_implementation(new implementation(Source, Target, CopyPolicy))
 {
 }
 
