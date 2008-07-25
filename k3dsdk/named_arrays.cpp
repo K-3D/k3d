@@ -56,6 +56,33 @@ named_arrays named_arrays::clone(const uint_t Begin, const uint_t End) const
 	return result;
 }
 
+named_arrays named_arrays::clone_types(const named_arrays_collection& NamedArrays)
+{
+	named_arrays result;
+
+	if(NamedArrays.size())
+	{
+		for(const_iterator array = NamedArrays[0]->begin(); array != NamedArrays[0]->end(); ++array)
+			result.insert(std::make_pair(array->first, array->second->clone_type()));
+
+/*
+		{
+			bool_t use_array = true;
+
+			for(uint_t i = 1; i < NamedArrays.size(); ++i)
+			{
+				
+			}
+
+			if(use_array)
+				result.insert(std::make_pair(array->first, array->second->clone_type()));
+		}
+*/
+	}
+
+	return result;
+}
+
 void named_arrays::resize(const uint_t NewSize)
 {
 	for(const_iterator array = begin(); array != end(); ++array)

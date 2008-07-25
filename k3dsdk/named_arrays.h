@@ -24,6 +24,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <map>
+#include <vector>
 
 namespace k3d
 {
@@ -42,6 +43,9 @@ public:
 	named_arrays clone() const;
 	/// Returns an object containing copies of a half-open range of all the original arrays.
 	named_arrays clone(const uint_t Begin, const uint_t End) const;
+
+	typedef std::vector<const named_arrays*> named_arrays_collection;
+	static named_arrays clone_types(const named_arrays_collection& NamedArrays);
 
 	/// Sets the size of every array in the collection.
 	void resize(const uint_t NewSize);
