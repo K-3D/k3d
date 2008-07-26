@@ -438,11 +438,23 @@ public:
 #ifndef K3D_UINT_T_64_BITS
         copy_from_host_to_device((void*)pdev_edge_index_map, (const void*)&(index_map.front()), index_map.size()*sizeof(unsigned int));
 #else
+        document().pipeline_profiler().finish_execution(*this, "Update indices(1)");
+        
+        // use host conversion        
+        document().pipeline_profiler().start_execution(*this, "");
         detail::indices_t index_map32(index_map.size());
         std::copy(index_map.begin(), index_map.end(), index_map32.begin());
         copy_from_host_to_device((void*)pdev_edge_index_map, (const void*)&(index_map32.front()), index_map32.size()*sizeof(unsigned int));
+        document().pipeline_profiler().finish_execution(*this, "64to32: Host");
+        
+        
+        // use GPU conversion
+        document().pipeline_profiler().start_execution(*this, "");
+        copy_from_host_to_device_64_to_32_convert ((void*)pdev_edge_index_map, (const void*)&(index_map.front()), index_map.size()*sizeof(unsigned int) );
+        document().pipeline_profiler().finish_execution(*this, "64to32: Device");    
+        
+        document().pipeline_profiler().start_execution(*this, "Update indices");            
 #endif
-
 
         //k3d::log() << debug << "Pre-Kernel" << std::endl;
         subdivide_edges_update_indices_entry ((unsigned int*)m_p_input_device_mesh->get_polyhedra_edge_point_indices_pointer(),

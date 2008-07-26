@@ -24,23 +24,27 @@ def run_compare_test():
         out_filename = benchmarking.k3d.generic_path(filename)
         print """<DartMeasurementFile name="Benchmark Comparison" type="image/png">""" + str(out_filename) + """</DartMeasurementFile>"""
     
-    
-        selected = []
-        selected += [("CUDATransformPoints", "BIND_TEXTURE"),]
-        selected += [("CUDATransformPoints", "CONVERT_PRE"),]
-        selected += [("CUDATransformPoints", "TO_DEVICE"),]
-        selected += [("CUDATransformPoints", "EXECUTE"),]
-        selected += [("CUDATransformPoints", "TO_HOST"),]
-        selected += [("CUDATransformPoints", "CONVERT_POST"),]
-        selected += [("CUDATransformPoints", "OTHER"),]
-        selected += [("CUDATransformPoints", "Create Mesh"),]
-        selected += [("CUDATransformPoints", "Update Mesh"),]
-        selected += [("CUDATransformPoints", "Total"),]
-    
+    selected = []
+    selected += [("CUDATransformPoints", "BIND_TEXTURE"),]
+    selected += [("CUDATransformPoints", "CONVERT_PRE"),]
+    selected += [("CUDATransformPoints", "TO_DEVICE"),]
+    selected += [("CUDATransformPoints", "EXECUTE"),]
+    selected += [("CUDATransformPoints", "TO_HOST"),]
+    selected += [("CUDATransformPoints", "CONVERT_POST"),]
+    selected += [("CUDATransformPoints", "OTHER"),]
+    selected += [("CUDATransformPoints", "Create Mesh"),]
+    selected += [("CUDATransformPoints", "Update Mesh"),]
+    selected += [("CUDATransformPoints", "Total"),]
+
     filename = benchmarking.compare_and_output_image("CUDATransformPointsBreakdown", selected, ('Number of Pixels', 'Time [s]'))
     if filename != 0:
         out_filename = benchmarking.k3d.generic_path(filename)
         print """<DartMeasurementFile name="Benchmark Comparison" type="image/png">""" + str(out_filename) + """</DartMeasurementFile>"""
     
+    selected = [("CUDASubdivideEdges", "64to32: Host"), ("CUDASubdivideEdges", "64to32: Device")]
+    filename = benchmarking.compare_and_output_image("CUDASubdivideConversion", selected, ('Mesh Size', 'Time [s]'))
+    if filename != 0:
+        out_filename = benchmarking.k3d.generic_path(filename)
+        print """<DartMeasurementFile name="Benchmark Comparison" type="image/png">""" + str(out_filename) + """</DartMeasurementFile>"""
     
 run_compare_test()
