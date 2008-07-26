@@ -345,8 +345,8 @@ public:
 			MULTIPLY = 1,
 			MAXIMUM = 2,
 			MINIMUM = 3,
-			DIVIDE = 4,
-			SUBTRACT = 5,
+			SUBTRACT = 4,
+			DIVIDE = 5,
 			NEGATE = 6,
 			IDENTITY = 7
 
