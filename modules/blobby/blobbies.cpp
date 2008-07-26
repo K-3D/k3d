@@ -89,7 +89,7 @@ public:
 			"BlobbyAddOperator",
 			"Blobby Add operator",
 			"Blobby",
-			k3d::iplugin_factory::STABLE);
+			k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
@@ -154,7 +154,7 @@ public:
 			"BlobbyMultOperator",
 			"Blobby Mult operator",
 			"Blobby",
-			k3d::iplugin_factory::STABLE);
+			k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
@@ -219,7 +219,7 @@ public:
 			"BlobbyMaxOperator",
 			"Blobby Max operator",
 			"Blobby",
-			k3d::iplugin_factory::STABLE);
+			k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
@@ -284,7 +284,7 @@ public:
 			"BlobbyMinOperator",
 			"Blobby Min operator",
 			"Blobby",
-			k3d::iplugin_factory::STABLE);
+			k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
@@ -354,7 +354,7 @@ public:
 			"BlobbySubOperator",
 			"Blobby Sub operator",
 			"Blobby",
-			k3d::iplugin_factory::STABLE);
+			k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
@@ -473,7 +473,7 @@ public:
 			"BlobbyDivOperator",
 			"Blobby Div operator",
 			"Blobby",
-			k3d::iplugin_factory::STABLE);
+			k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}

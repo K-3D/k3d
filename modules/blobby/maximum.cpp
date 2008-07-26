@@ -44,20 +44,20 @@ namespace blobby
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// add
+// maximum
 
-class add :
+class maximum :
 	public k3d::imulti_mesh_sink,
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	add(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	maximum(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_user_property_changed_signal(*this)
 	{
-		m_user_property_changed_signal.connect(sigc::mem_fun(*this, &add::mesh_topology_changed));
+		m_user_property_changed_signal.connect(sigc::mem_fun(*this, &maximum::mesh_topology_changed));
 	}
 	
 	void on_create_mesh_topology(k3d::mesh& Mesh)
@@ -83,7 +83,7 @@ public:
 		}
 
 		// Merge 'em ...
-		detail::merge(meshes, m_material.pipeline_value(), k3d::mesh::blobbies_t::ADD, true, Mesh);
+		detail::merge(meshes, m_material.pipeline_value(), k3d::mesh::blobbies_t::MAXIMUM, true, Mesh);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Mesh)
@@ -92,10 +92,10 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<add, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imulti_mesh_sink> > > factory(
-			k3d::uuid(0xf075d161, 0x2b42365f, 0x5eeb458b, 0x67c2a928),
-			"BlobbyAdd",
-			_("Combines blobbies using the Addition operator."),
+		static k3d::document_plugin_factory<maximum, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imulti_mesh_sink> > > factory(
+			k3d::uuid(0x196b28f1, 0xde4d1b2e, 0x0350a5b7, 0x493514e8),
+			"BlobbyMaximum",
+			_("Combines blobbies using the Maximum operator."),
 			"Blobby",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -107,11 +107,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// add_factory
+// maximum_factory
 
-k3d::iplugin_factory& add_factory()
+k3d::iplugin_factory& maximum_factory()
 {
-	return add::get_factory();
+	return maximum::get_factory();
 }
 
 } // namespace blobby

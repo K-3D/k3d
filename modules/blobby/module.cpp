@@ -36,11 +36,17 @@ extern k3d::iplugin_factory& blobby_max_operator_factory();
 extern k3d::iplugin_factory& blobby_min_operator_factory();
 extern k3d::iplugin_factory& blobby_mult_operator_factory();
 extern k3d::iplugin_factory& blobby_sub_operator_factory();
+extern k3d::iplugin_factory& divide_factory();
 extern k3d::iplugin_factory& edges_to_blobby_factory();
 extern k3d::iplugin_factory& ellipsoid_factory();
+extern k3d::iplugin_factory& maximum_factory();
+extern k3d::iplugin_factory& minimum_factory();
+extern k3d::iplugin_factory& multiply_factory();
+extern k3d::iplugin_factory& negate_factory();
 extern k3d::iplugin_factory& points_to_blobby_factory();
 extern k3d::iplugin_factory& polygonize_blobbies_factory();
 extern k3d::iplugin_factory& segment_factory();
+extern k3d::iplugin_factory& subtract_factory();
 
 } // namespace blobby
 
@@ -54,10 +60,16 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::blobby::blobby_min_operator_factory());
 	Registry.register_factory(module::blobby::blobby_mult_operator_factory());
 	Registry.register_factory(module::blobby::blobby_sub_operator_factory());
+	Registry.register_factory(module::blobby::divide_factory());
 	Registry.register_factory(module::blobby::edges_to_blobby_factory());
 	Registry.register_factory(module::blobby::ellipsoid_factory());
+	Registry.register_factory(module::blobby::maximum_factory());
+	Registry.register_factory(module::blobby::minimum_factory());
+	Registry.register_factory(module::blobby::multiply_factory());
+	Registry.register_factory(module::blobby::negate_factory());
 	Registry.register_factory(module::blobby::points_to_blobby_factory());
 	Registry.register_factory(module::blobby::polygonize_blobbies_factory());
 	Registry.register_factory(module::blobby::segment_factory());
+	Registry.register_factory(module::blobby::subtract_factory());
 K3D_MODULE_END
 

@@ -44,20 +44,20 @@ namespace blobby
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// add
+// multiply
 
-class add :
+class multiply :
 	public k3d::imulti_mesh_sink,
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	add(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	multiply(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_user_property_changed_signal(*this)
 	{
-		m_user_property_changed_signal.connect(sigc::mem_fun(*this, &add::mesh_topology_changed));
+		m_user_property_changed_signal.connect(sigc::mem_fun(*this, &multiply::mesh_topology_changed));
 	}
 	
 	void on_create_mesh_topology(k3d::mesh& Mesh)
@@ -83,7 +83,7 @@ public:
 		}
 
 		// Merge 'em ...
-		detail::merge(meshes, m_material.pipeline_value(), k3d::mesh::blobbies_t::ADD, true, Mesh);
+		detail::merge(meshes, m_material.pipeline_value(), k3d::mesh::blobbies_t::MULTIPLY, true, Mesh);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Mesh)
@@ -92,10 +92,10 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<add, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imulti_mesh_sink> > > factory(
-			k3d::uuid(0xf075d161, 0x2b42365f, 0x5eeb458b, 0x67c2a928),
-			"BlobbyAdd",
-			_("Combines blobbies using the Addition operator."),
+		static k3d::document_plugin_factory<multiply, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imulti_mesh_sink> > > factory(
+			k3d::uuid(0xbbe264dc, 0x524e47a5, 0x9e3d04bb, 0x72ecec5a),
+			"BlobbyMultiply",
+			_("Combines blobbies using the Multiplication operator."),
 			"Blobby",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -107,11 +107,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// add_factory
+// multiply_factory
 
-k3d::iplugin_factory& add_factory()
+k3d::iplugin_factory& multiply_factory()
 {
-	return add::get_factory();
+	return multiply::get_factory();
 }
 
 } // namespace blobby
