@@ -749,6 +749,7 @@ private:
 				relative = true;
 			case 'Q':
 				order = 3;
+				points.push_back(count);
 				for(int i=0; i<2; i++)
 				{
 					get_pair(x,y,def_stream);
@@ -772,6 +773,7 @@ private:
 				relative = true;
 			case 'T':
 				order = 3;
+				points.push_back(count);
 				points.push_back(count);
 				count++;
 				slastpoint =k3d::point4(2*lastpoint[0]-slastpoint[0], 2*lastpoint[1]-slastpoint[1],0,1);
@@ -850,7 +852,7 @@ private:
 		knots.push_back(knots.back());
 
 		for(k3d::uint_t point = 0; point < points.size(); point++ )
-				weights.push_back(1.0);
+			weights.push_back(1.0);
 
 		factory->add_nurbs_curve(4, points, knots, weights);
 		relative = false;
