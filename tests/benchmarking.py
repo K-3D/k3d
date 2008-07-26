@@ -229,7 +229,7 @@ def mesh_modifier_benchmark(benchmarkPluginName, maxSize = 15, properties = {"in
     for k in range(maxSize):
         try:
             benchmark_mesh = benchmarkMesh(current_count)
-            run_mesh_modifier_benchmark(benchmarkPluginName, benchmark_mesh, 10, properties, append, k == 0)
+            run_mesh_modifier_benchmark(benchmarkPluginName, benchmark_mesh, 1, properties, append, k == 0)
             current_count[k % 3] *= 2
         except:
             break
@@ -375,14 +375,14 @@ def run_mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRun
     
     inputNode = benchmarkMesh.get_mesh()
     
-    selection = k3d.deselect_all()
-    selection.points = k3d.component_select_all()
+    selection = k3d.select_all()
     
+
     benchmarkNode = document.new_node(meshModifierNodeName)
     for (p, val) in properties.items():
         benchmarkNode.get_property(p).set_value(val)
     benchmarkNode.mesh_selection = selection
-    
+        
     profilingResults = k3dProfilingProcessor()
     for n in range(numberOfRuns):
         document.set_dependency(benchmarkNode.get_property("input_mesh"), inputNode.get_property("output_mesh"))

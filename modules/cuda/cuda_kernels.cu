@@ -488,7 +488,6 @@ __global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices,
                                                      unsigned int* clockwise_edge_indices,
                                                      int num_split_points )
 {
-    
     unsigned int edge_index_index = (blockIdx.x * blockDim.x) + threadIdx.x;
     int split_index = (blockIdx.y * blockDim.y) + threadIdx.y;
     
@@ -649,6 +648,16 @@ __global__ void convert_uint_32_to_64_kernel ( uint2* p_uint_64, unsigned int* p
         p_uint_64[int_index].y = 0;
         p_uint_64[int_index].x = p_uint_32[int_index];
     }
+}
+
+
+__global__ void set_selection_value_kernel ( float4* points_and_selection, float selection_value, int num_points )
+{
+    const int index = (blockDim.x * blockIdx.x) + threadIdx.x;      
+    if ( index < num_points )
+    {
+        points_and_selection[index].w = selection_value;    
+    } 
 }
 
 #endif // #ifndef _CUDA_KERNELS_H_

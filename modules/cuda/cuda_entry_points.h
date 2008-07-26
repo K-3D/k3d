@@ -73,6 +73,9 @@ extern "C" K3D_CUDA_DECLSPEC void copy_from_host_to_device_64_to_32_convert ( vo
 
 extern "C" K3D_CUDA_DECLSPEC void copy_from_device_to_host ( void* host_pointer, const void* device_pointer, int size_in_bytes );
 extern "C" K3D_CUDA_DECLSPEC void copy_from_device_to_host_32_to_64_convert ( void* host_pointer, const void* device_pointer, int size_in_bytes );
+
+extern "C" K3D_CUDA_DECLSPEC void copy_from_device_to_device ( void* device_dest_pointer, const void* device_source_pointer, int size_in_bytes );
+
 extern "C" K3D_CUDA_DECLSPEC void free_device_memory ( void* device_pointer );
 extern "C" K3D_CUDA_DECLSPEC void allocate_pinned_host_memory ( void** pointer_on_host, int size_in_bytes );
 extern "C" K3D_CUDA_DECLSPEC void free_pinned_host_memory ( void* pointer_on_host );
@@ -129,5 +132,7 @@ extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_split_edges_entry (
 extern "C" K3D_CUDA_DECLSPEC void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, int device_pitch, int host_pitch, int width_in_bytes, int rows );
 
 extern "C" K3D_CUDA_DECLSPEC void synchronize_threads ();
+
+extern "C" K3D_CUDA_DECLSPEC void set_selection_value_entry ( float* points_and_selection, float selection_value, int num_points );
 
 #endif // !CUDA_ENTRY_POINTS_H

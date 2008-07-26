@@ -248,6 +248,10 @@ extern "C" void copy_from_device_to_host_32_to_64_convert ( void* host_pointer, 
 	free_device_memory ( pdev_uint_64 );
 }
 
+extern "C" void copy_from_device_to_device ( void* device_dest_pointer, const void* device_source_pointer, int size_in_bytes )
+{
+    CUDA_SAFE_CALL(cudaMemcpy(device_dest_pointer, device_source_pointer, size_in_bytes, cudaMemcpyDeviceToDevice));
+}
 extern "C" void free_device_memory ( void* device_pointer )
 {
 	CUDA_SAFE_CALL(cudaFree(device_pointer));
@@ -481,34 +485,35 @@ extern "C" void subdivide_edges_split_point_calculator ( unsigned int* phost_edg
                                                         int num_split_points )
 {
     // allocate device memory for the edge_indices
-    unsigned int* pdev_edge_list;
-    allocate_device_memory((void**)&pdev_edge_list, num_edge_indices*sizeof(unsigned int));
-    copy_from_host_to_device((void*)pdev_edge_list, (void*)phost_edge_indices, num_edge_indices*sizeof(unsigned int));
-
-    int threads_x = 512 / num_split_points;
-
-    dim3 threads_per_block(threads_x, num_split_points);
-    dim3 blocks_per_grid( iDivUp(num_edge_indices, threads_x), 1);
-
-    subdivide_edges_split_point_kernel<<< blocks_per_grid, threads_per_block >>> ( pdev_edge_list,
-                                                                                   num_edge_indices,
-                                                                                   (float4*)pdev_points_and_selection,
-                                                                                   num_input_points,
-                                                                                   (float4*)(pdev_points_and_selection + num_input_points*4),
-                                                                                   pdev_edge_point_indices,
-                                                                                   pdev_clockwise_edge_indices,
-                                                                                   num_split_points );
-
-    // check if the kernel executed correctly
-    CUT_CHECK_ERROR("Kernel execution failed");
-
-    /*
-    cudaError_t last_error = cudaGetLastError();
-    printf("CUDA ERROR: %s\n", cudaGetErrorString(last_error));
-    */
-
-    cudaThreadSynchronize();
-    free_device_memory ( pdev_edge_list );
+    if ( num_edge_indices > 0 & num_split_points > 0 & num_input_points > 0 )
+    {
+        unsigned int* pdev_edge_list;
+        allocate_device_memory((void**)&pdev_edge_list, num_edge_indices*sizeof(unsigned int));
+        copy_from_host_to_device((void*)pdev_edge_list, (void*)phost_edge_indices, num_edge_indices*sizeof(unsigned int));
+    
+        int threads_x = 512 / num_split_points;
+    
+        dim3 threads_per_block(threads_x, num_split_points);
+        dim3 blocks_per_grid( iDivUp(num_edge_indices, threads_x), 1);
+    
+        subdivide_edges_split_point_kernel<<< blocks_per_grid, threads_per_block >>> ( pdev_edge_list,
+                                                                                       num_edge_indices,
+                                                                                       (float4*)pdev_points_and_selection,
+                                                                                       num_input_points,
+                                                                                       (float4*)(pdev_points_and_selection + num_input_points*4),
+                                                                                       pdev_edge_point_indices,
+                                                                                       pdev_clockwise_edge_indices,
+                                                                                       num_split_points );
+        
+        cudaError_t last_error = cudaGetLastError();
+        if ( last_error != cudaSuccess )
+        {
+            printf("CUDA ERROR: %s\n", cudaGetErrorString(last_error));
+        }
+        
+        cudaThreadSynchronize();
+        free_device_memory ( pdev_edge_list );
+    }
 }
 
 extern "C" void subdivide_edges_update_indices_entry (unsigned int* pdev_input_edge_point_indices,
@@ -622,3 +627,18 @@ extern "C" void synchronize_threads ()
 {
     cudaThreadSynchronize();
 }
+
+extern "C" void set_selection_value_entry ( float* points_and_selection, float selection_value, int num_points )
+{
+    #define NUM_THREADS 64
+    
+    dim3 threads_per_block(NUM_THREADS, 1);
+    dim3 blocks_per_grid( iDivUp(num_points, NUM_THREADS), 1);
+    
+    set_selection_value_kernel <<< blocks_per_grid, threads_per_block >>> ( (float4*)points_and_selection, selection_value, num_points)
+    
+    CUT_CHECK_ERROR("Kernel execution failed");
+    
+    cudaThreadSynchronize();
+}
+
