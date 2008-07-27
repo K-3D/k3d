@@ -37,7 +37,7 @@ namespace libk3dngui
 /////////////////////////////////////////////////////////////////////////////
 // savable_document_window
 
-savable_document_window::savable_document_window(document_state& Document, const std::string& Name) :
+savable_document_window::savable_document_window(document_state& Document, const k3d::string_t& Name) :
 	base(Gtk::WINDOW_TOPLEVEL),
 	ui_component(Name, dynamic_cast<k3d::icommand_node*>(&Document.document())),
 	m_document(Document)
@@ -57,7 +57,7 @@ k3d::idocument& savable_document_window::document()
 	return m_document.document();
 }
 
-bool savable_document_window::on_key_press_event(GdkEventKey* event)
+k3d::bool_t savable_document_window::on_key_press_event(GdkEventKey* event)
 {
 	if(event->keyval == GDK_Escape)
 	{
@@ -68,7 +68,7 @@ bool savable_document_window::on_key_press_event(GdkEventKey* event)
 	return base::on_key_press_event(event);
 }
 
-bool savable_document_window::on_delete_event(GdkEventAny* event)
+k3d::bool_t savable_document_window::on_delete_event(GdkEventAny* event)
 {
 	safe_close();
 	return true;
@@ -79,7 +79,7 @@ unsaved_document* savable_document_window::on_safe_close()
 	return this;
 }
 
-const bool savable_document_window::save_changes()
+const k3d::bool_t savable_document_window::save_changes()
 {
 	if(k3d::batch_mode() || !unsaved_changes())
 		return true;

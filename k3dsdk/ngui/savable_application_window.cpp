@@ -38,7 +38,7 @@ namespace libk3dngui
 /////////////////////////////////////////////////////////////////////////////
 // savable_application_window
 
-savable_application_window::savable_application_window(const std::string& Name, k3d::icommand_node* const Parent) :
+savable_application_window::savable_application_window(const k3d::string_t& Name, k3d::icommand_node* const Parent) :
 	base(Gtk::WINDOW_TOPLEVEL),
 	ui_component(Name, Parent)
 {
@@ -50,7 +50,7 @@ savable_application_window::~savable_application_window()
 {
 }
 
-bool savable_application_window::on_key_press_event(GdkEventKey* event)
+k3d::bool_t savable_application_window::on_key_press_event(GdkEventKey* event)
 {
 	if(event->keyval == GDK_Escape)
 	{
@@ -61,7 +61,7 @@ bool savable_application_window::on_key_press_event(GdkEventKey* event)
 	return base::on_key_press_event(event);
 }
 
-bool savable_application_window::on_delete_event(GdkEventAny* event)
+k3d::bool_t savable_application_window::on_delete_event(GdkEventAny* event)
 {
 	safe_close();
 	return true;
@@ -72,7 +72,7 @@ unsaved_document* savable_application_window::on_safe_close()
 	return this;
 }
 
-const bool savable_application_window::save_changes()
+const k3d::bool_t savable_application_window::save_changes()
 {
 	if(k3d::batch_mode() || !unsaved_changes())
 		return true;

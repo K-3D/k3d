@@ -2,7 +2,7 @@
 #define NGUI_SAVABLE_APPLICATION_WINDOW_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "ui_component.h"
@@ -44,14 +44,14 @@ class savable_application_window :
 	typedef Gtk::Window base;
 
 public:
-	savable_application_window(const std::string& Name, k3d::icommand_node* const Parent);
+	savable_application_window(const k3d::string_t& Name, k3d::icommand_node* const Parent);
 	virtual ~savable_application_window();
 
-	bool on_key_press_event(GdkEventKey* event);
-	bool on_delete_event(GdkEventAny* event);
+	k3d::bool_t on_key_press_event(GdkEventKey* event);
+	k3d::bool_t on_delete_event(GdkEventAny* event);
 
 	/// Gives the user a chance to save changes, returns true iff all changes have been saved.
-	const bool save_changes();
+	const k3d::bool_t save_changes();
 	/// Closes the window safely, giving the user a chance to save changes or cancel.
 	void safe_close();
 	/// Closes the window.

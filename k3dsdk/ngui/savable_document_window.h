@@ -48,16 +48,16 @@ class savable_document_window :
 	typedef Gtk::Window base;
 
 public:
-	savable_document_window(document_state& Document, const std::string& Name);
+	savable_document_window(document_state& Document, const k3d::string_t& Name);
 	virtual ~savable_document_window();
 
 	k3d::idocument& document();
 
-	bool on_key_press_event(GdkEventKey* event);
-	bool on_delete_event(GdkEventAny* event);
+	k3d::bool_t on_key_press_event(GdkEventKey* event);
+	k3d::bool_t on_delete_event(GdkEventAny* event);
 
 	/// Gives the user a chance to save changes, returns true iff all changes have been saved.
-	const bool save_changes();
+	const k3d::bool_t save_changes();
 	/// Closes the window safely, giving the user a chance to save changes or cancel.
 	void safe_close();
 	/// Closes the window.
