@@ -6,3 +6,7 @@ ADD_CUSTOM_TARGET(package-binary-bundle
 	--config ${CMAKE_CURRENT_BINARY_DIR}/package-binary-bundle.cpack
 	)
 
+ADD_CUSTOM_TARGET(upload-binary-bundle
+	rsync -avP -e ssh ${CMAKE_CURRENT_BINARY_DIR}/k3d-setup-${K3D_VERSION}-${CMAKE_SYSTEM_PROCESSOR}.dmg ${K3D_SOURCEFORGE_USERNAME}@frs.sourceforge.net:uploads/
+	)
+
