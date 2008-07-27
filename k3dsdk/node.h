@@ -28,7 +28,6 @@
 #include "idocument.h"
 #include "inode.h"
 #include "ipersistent.h"
-#include "iselectable.h"
 #include "metadata.h"
 #include "persistent_property_collection.h"
 #include "property_collection.h"
@@ -44,7 +43,6 @@ class iplugin_factory;
 class node :
 	public inode,
 	public ipersistent,
-	public iselectable,
 	public property_collection,
 	public persistent_property_collection,
 	public metadata,
@@ -64,9 +62,6 @@ public:
 	void save(xml::element& Element, const ipersistent::save_context& Context);
 	void load(xml::element& Element, const ipersistent::load_context& Context);
 
-	double get_selection_weight();
-	void set_selection_weight(const double Weight);
-
 private:
 	void on_deleted();
 
@@ -80,10 +75,6 @@ private:
 	deleted_signal_t m_deleted_signal;
 	/// Used to signal observers when this node's name changes
 	name_changed_signal_t m_name_changed_signal;
-
-protected:
-	/// Stores the node's selection weight
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_selection_weight;
 };
 
 } // namespace k3d

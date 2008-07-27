@@ -30,6 +30,7 @@
 #include "imetadata.h"
 #include "inode.h"
 #include "inode_collection.h"
+#include "inode_selection.h"
 #include "ipersistent_lookup.h"
 #include "ipipeline.h"
 #include "iplugin_factory.h"
@@ -1260,6 +1261,60 @@ void upgrade_painters(element& XMLDocument)
 	xml_nodes->children.insert(xml_nodes->children.end(), new_nodes.begin(), new_nodes.end());
 }
 
+void upgrade_node_selection(element& XMLDocument)
+{
+	element* const xml_nodes = find_element(XMLDocument, "nodes");
+	if(!xml_nodes)
+		return;
+
+	ipersistent_lookup::id_type node_selection_id = max_node_id(XMLDocument) + 1;
+	
+	// Check if the document contains an inode_selection node
+	for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
+	{
+		if(xml_node->name != "node")
+			continue;
+
+		const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+		iplugin_factory* const node_factory = plugin::factory::lookup(node_factory_id);
+		if(!node_factory)
+			continue;
+
+		const ipersistent_lookup::id_type node_id = attribute_value<ipersistent_lookup::id_type>(*xml_node, "id", 0);
+		if(!node_id)
+			continue;
+
+		if(node_factory->implements(typeid(inode_selection)))
+			return;
+	}
+	
+	element node_selection("node",
+			attribute("name", "Node Selection"),
+			attribute("factory", plugin::factory::lookup("NodeSelection")->factory_id()),
+			attribute("id", node_selection_id),
+			element("metadata",
+					element("pair", "node_selection", attribute("name", "ngui:unique_node"))));
+	
+	xml_nodes->children.push_back(node_selection);
+	
+	// Now add the node_selection node to the GL Engine node(s)
+	for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
+	{
+		if(xml_node->name != "node")
+			continue;
+
+		const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+		if(node_factory_id != plugin::factory::lookup("OpenGLEngine")->factory_id())
+			continue;
+
+		element* const xml_properties = find_element(*xml_node, "properties");
+		if(!xml_properties)
+			continue;
+		
+		xml_properties->push_back(element("property", string_cast(node_selection_id), attribute("name", "node_selection")));
+	}
+}
+
 /// Helper functor for searching for shaders by name
 struct same_name
 {
@@ -1302,6 +1357,7 @@ void upgrade_document(element& XMLDocument)
 	detail::upgrade_poly_text_nodes(XMLDocument);
 	detail::upgrade_transformable_nodes(XMLDocument);
 	detail::upgrade_painters(XMLDocument);
+	detail::upgrade_node_selection(XMLDocument);
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -57,7 +57,6 @@ public:
 		m_draw_behind(init_owner(*this) + init_name("draw_behind") + init_label(_("Draw Behind")) + init_description(_("Draw the image so that always appears behind geometry")) + init_value(true)),
 		m_texture_name(0)
 	{
-		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
 		m_color.changed_signal().connect(make_async_redraw_slot());
 		m_opacity.changed_signal().connect(make_async_redraw_slot());
 		m_bitmap.changed_signal().connect(sigc::mem_fun(*this, &reference_image_3d::bitmap_changed));

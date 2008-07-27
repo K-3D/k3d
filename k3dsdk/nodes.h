@@ -25,6 +25,7 @@
 */
 
 #include "uuid.h"
+#include "imetadata.h"
 #include "inode_collection.h"
 #include "inode.h"
 
@@ -34,7 +35,7 @@
 
 #ifdef interface
 #undef interface
-#endif // inteface
+#endif // interface
 
 namespace k3d
 {
@@ -71,6 +72,26 @@ const nodes_t find_nodes(inode_collection& Nodes)
 			nodes.insert(nodes.end(), *node);
 	}
 
+	return nodes;
+}
+
+template<typename interface_t>
+const nodes_t find_nodes(inode_collection& Nodes, const string_t& MetaName, const string_t& MetaValue)
+{
+	nodes_t meta_nodes = find_nodes<imetadata>(Nodes);
+	nodes_t nodes;
+	for(nodes_t::iterator node = meta_nodes.begin(); node != meta_nodes.end(); ++node)
+	{
+		imetadata* meta_node = dynamic_cast<imetadata*>(*node);
+		imetadata::metadata_t metadata = meta_node->get_metadata();
+		imetadata::metadata_t::iterator pair = metadata.find(MetaName);
+		if(pair != metadata.end() && pair->second == MetaValue)
+		{
+			if(dynamic_cast<interface_t*>(*node))
+				nodes.push_back(*node);
+		}
+	}
+	
 	return nodes;
 }
 

@@ -80,7 +80,6 @@ public:
 	{
 		m_input_mesh.changed_signal().connect(make_mesh_changed_slot());
 		m_mesh_selection.changed_signal().connect(make_selection_changed_slot());
-		m_selection_weight.changed_signal().connect(make_selection_changed_slot());
 
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 		m_gl_painter.changed_signal().connect(make_async_redraw_slot());
@@ -190,10 +189,7 @@ public:
 			const k3d::mesh* const output_mesh = k3d::property::pipeline_value<k3d::mesh*>(m_output_mesh);
 			return_if_fail(output_mesh);
 			
-			k3d::node* parent = dynamic_cast<k3d::node*>(k3d::property::pipeline_value<k3d::inode*>(this->parent()));
-			double parent_selection = parent ? parent->get_selection_weight() : 0.0;
-
-			k3d::gl::painter_render_state render_state(State, matrix(), m_selection_weight.pipeline_value(), m_show_component_selection.pipeline_value(), parent_selection);
+			k3d::gl::painter_render_state render_state(State, matrix(), m_show_component_selection.pipeline_value());
 			try
 			{
 				painter->paint_mesh(*output_mesh, render_state);
@@ -212,9 +208,6 @@ public:
 			return;
 		if (m_document_closed)
 			return;
-		const double selection_weight = m_selection_weight.pipeline_value();
-		if(SelectionState.exclude_unselected_nodes && !selection_weight)
-			return;
 
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Select");
 		if(k3d::gl::imesh_painter* const painter = m_gl_painter.pipeline_value())
@@ -222,7 +215,7 @@ public:
 			const k3d::mesh* const output_mesh = k3d::property::pipeline_value<k3d::mesh*>(m_output_mesh);
 			return_if_fail(output_mesh);
 
-			k3d::gl::painter_render_state render_state(State, matrix(), selection_weight, m_show_component_selection.pipeline_value());
+			k3d::gl::painter_render_state render_state(State, matrix(), m_show_component_selection.pipeline_value());
 			k3d::gl::painter_selection_state selection_state(SelectionState);
 
 			// At the top-level, ID the entire instance ...

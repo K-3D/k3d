@@ -23,6 +23,7 @@
 
 #include "idocument_python.h"
 #include "interface_wrapper_python.h"
+#include "dynamic_cast_python.h"
 #include "node_python.h"
 
 #include <k3dsdk/classes.h>
@@ -116,6 +117,19 @@ static const object get_node(idocument_wrapper& Self, const std::string& Name)
 	return object(node(k3d::find_node(Self.wrapped().nodes(), Name)));
 }
 
+static const object get_node_by_metadata(idocument_wrapper& Self, const std::string& Type, const std::string& MetaName, const std::string& MetaValue)
+{
+	const k3d::inode_collection::nodes_t nodes = k3d::find_nodes<k3d::inode>(Self.wrapped().nodes(), MetaName, MetaValue);
+	
+	if(nodes.size() > 1)
+		throw std::runtime_error("multiple nodes exist with the given metadata");
+	
+	if(nodes.empty())
+		return object(node(0));
+	
+	return do_dynamic_cast(object(node(nodes.back())), Type);
+}
+
 static const bool has_node(idocument_wrapper& Self, const std::string& Name)
 {
 	if (k3d::find_node(Self.wrapped().nodes(), Name) != 0)
@@ -182,6 +196,7 @@ void define_class_idocument()
 		.def("nodes", &nodes)
 		.def("new_node", &new_node)
 		.def("get_node", &get_node)
+		.def("get_node_by_metadata", &get_node_by_metadata)
 		.def("has_node", &has_node)
 		.def("delete_node", &delete_node)
 		.def("get_dependency", &get_dependency)

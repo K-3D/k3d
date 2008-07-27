@@ -47,7 +47,6 @@ public:
 		m_psamples(init_owner(*this) + init_name("psamples") + init_label(_("psamples")) + init_description(_("PSamples")) + init_value(256) + init_constraint(k3d::data::constraint::minimum<k3d::int32_t>(0, k3d::data::constraint::maximum<k3d::int32_t>(1024)))),
 		m_dummy(init_owner(*this) + init_name("dummy") + init_label(_("dummy")) + init_description(_("Dummy (global photon)")) + init_value(false))
 	{
-		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
 	}
 
 	~area_light()
@@ -97,7 +96,7 @@ public:
 		glDisable(GL_LINE_STIPPLE);
 
 		glEnable(GL_LIGHTING);
-		draw_geometry(get_selection_weight() ? k3d::color(1, 0, 0) : k3d::color(0.4, 0.4, 0.4));
+		draw_geometry(State.node_selection ? k3d::color(1, 0, 0) : k3d::color(0.4, 0.4, 0.4));
 	}
 
 	void on_gl_select(const k3d::gl::render_state& State, const k3d::gl::selection_state& SelectState)

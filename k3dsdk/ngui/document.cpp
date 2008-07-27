@@ -37,6 +37,7 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/imesh_painter_ri.h>
+#include <k3dsdk/imetadata.h>
 #include <k3dsdk/irender_engine_ri.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/share.h>
@@ -169,17 +170,30 @@ void setup_renderman_document(k3d::idocument& Document)
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// setup_selection_document
+
+/// Adds a node to store the document node selection
+k3d::inode* setup_selection_document(k3d::idocument& Document)
+{
+	k3d::imetadata* node_selection = k3d::plugin::create<k3d::imetadata>("NodeSelection", Document, "Node Selection");
+	node_selection->set_metadata("ngui:unique_node", "node_selection"); // metadata to ensure this node is found by the UI layer
+	return dynamic_cast<k3d::inode*>(node_selection);
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // setup_document
 
 /// Adds nodes to a newly-created document to give the user a better out-of-box experience
 void setup_document(k3d::idocument& Document)
 {
 	k3d::plugin::create(k3d::classes::Axes(), Document, "Axes");
-	k3d::plugin::create(k3d::classes::OpenGLEngine(), Document, "GL Engine");
+	k3d::iunknown* gl_engine = k3d::plugin::create(k3d::classes::OpenGLEngine(), Document, "GL Engine");
 	k3d::plugin::create(k3d::classes::TimeSource(), Document, "TimeSource");
-
+	
 	setup_camera_document(Document);
 	setup_renderman_document(Document);
+	
+	return_if_fail(k3d::property::set_internal_value(*gl_engine, "node_selection", setup_selection_document(Document)));
 }
 
 /// Add document nodes that need an opengl context for extension checking

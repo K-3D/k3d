@@ -267,7 +267,7 @@ void instantiate_selected_nodes(document_state& DocumentState)
 	{
 		if(k3d::inode* new_node = detail::instantiate_mesh(DocumentState.document(), **selected_node))
 		{
-			k3d::selection::select(new_node);
+			DocumentState.select(*new_node);
 			new_nodes.push_back(new_node);
 		}
 	}
@@ -305,7 +305,7 @@ void duplicate_selected_nodes(document_state& DocumentState)
 
 		if(new_node)
 		{
-			k3d::selection::select(new_node);
+			DocumentState.select(*new_node);
 			new_nodes.push_back(new_node);
 		}
 	}

@@ -34,7 +34,10 @@
 #include <iterator>
 #include <set>
 
-namespace libk3dselection
+namespace module
+{
+
+namespace selection
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -116,4 +119,6 @@ k3d::iplugin_factory& select_companion_factory()
 	return select_companion::get_factory();
 }
 
-} // namespace libk3dselection
+} // namespace selection
+
+} // namespace module

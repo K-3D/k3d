@@ -1,5 +1,8 @@
+#ifndef K3DSDK_INODE_SELECTION_PYTHON_H_
+#define K3DSDK_INODE_SELECTION_PYTHON_H_
+
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -19,44 +22,19 @@
 
 /** \file
 	\author Timothy M. Shead (tshead@k-3d.com)
+	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "node_python.h"
-
-#include <k3dsdk/idocument.h>
-#include <k3dsdk/inode.h>
-#include <k3dsdk/inode_collection.h>
-#include <k3dsdk/inode_selection.h>
-#include <k3dsdk/iproperty_collection.h>
-#include <k3dsdk/nodes.h>
-
-#include <boost/python.hpp>
-using namespace boost::python;
-
-namespace k3d 
+namespace k3d
 {
-
+	
 namespace python
 {
 
-node::node() :
-	interface_wrapper<k3d::inode>(),
-	interface_wrapper<k3d::iproperty_collection>()
-{
-}
-
-node::node(k3d::iunknown* Node) :
-	interface_wrapper<k3d::inode>(dynamic_cast<k3d::inode*>(Node)),
-	interface_wrapper<k3d::iproperty_collection>(dynamic_cast<k3d::iproperty_collection*>(Node))
-{
-}
-
-void node::define_class()
-{
-	class_<node, bases<interface_wrapper<k3d::inode>, interface_wrapper<k3d::iproperty_collection> > >("node");
-}
+void define_class_inode_selection();
 
 } // namespace python
 
 } // namespace k3d
 
+#endif /* K3DSDK_INODE_SELECTION_PYTHON_H_ */

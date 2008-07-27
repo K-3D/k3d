@@ -162,11 +162,6 @@ const bool is_face_selected(const k3d::selection::record& Record)
 	return false;
 }
 
-const bool is_node_selected(const k3d::selection::record& Record)
-{
-	return k3d::selection::is_selected(k3d::selection::get_node(Record));
-}
-
 /// Defines a mapping of nodes to selection records
 typedef std::multimap<k3d::inode*, const k3d::selection::record*> node_selection_map_t;
 /// Given a set of selection records, generates a mapping of the corresponding nodes to each record
@@ -1111,7 +1106,8 @@ public:
 		m_rotate_tool(0),
 		m_scale_tool(0),
 		m_context_menu_node("context_menu", dynamic_cast<k3d::icommand_node*>(&Document)),
-		m_context_menu(0)
+		m_context_menu(0),
+		m_node_selection(0)
 	{
 		m_selection_mode.connect_explicit_change_signal(sigc::mem_fun(*this, &implementation::on_selection_mode_changed));
 
@@ -1132,6 +1128,9 @@ public:
 		delete m_rotate_tool;
 		delete m_move_tool;
 		delete m_selection_tool;
+		
+		m_node_selection_metadata_connection.disconnect();
+		m_node_selection_deleted_connection.disconnect();
 	}
 
 	/// Returns the document
@@ -1289,13 +1288,33 @@ public:
 	typedef std::set<k3d::legacy::mesh*> meshes_t;
 	typedef std::set<k3d::inode*> node_selection_t;
 
+	void on_node_selection_node_changed()
+	{
+		m_node_selection_metadata_connection.disconnect();
+		m_node_selection_deleted_connection.disconnect();
+		m_node_selection = 0;
+	}
+	
+	k3d::inode_selection* node_selection()
+	{
+		if(!m_node_selection)
+		{
+			k3d::inode_collection::nodes_t nodes = k3d::find_nodes<k3d::inode_selection>(m_document.nodes(), "ngui:unique_node", "node_selection");
+			if(nodes.size() != 1)
+				return 0;
+			m_node_selection = dynamic_cast<k3d::inode_selection*>(nodes.back());
+			// Make sure the node gets updated whenever the metadata is changed or the node is deleted
+			k3d::imetadata* metadata = dynamic_cast<k3d::imetadata*>(m_node_selection);
+			m_node_selection_metadata_connection = metadata->connect_metadata_changed_signal(sigc::mem_fun(*this, &implementation::on_node_selection_node_changed));
+			m_node_selection_deleted_connection = nodes.back()->deleted_signal().connect(sigc::mem_fun(*this, &implementation::on_node_selection_node_changed));
+		}
+		return m_node_selection;
+	}
+	
 	const bool is_selected(k3d::inode* Node)
 	{
-		if(k3d::iselectable* selectable = dynamic_cast<k3d::iselectable*>(Node))
-		{
-			if(selectable->get_selection_weight())
-				return true;
-		}
+		if(m_node_selection)
+			return m_node_selection->selection_weight(*Node);
 
 		return false;
 	}
@@ -1305,7 +1324,7 @@ public:
 		switch(m_selection_mode.internal_value())
 		{
 			case SELECT_NODES:
-				return detail::is_node_selected(Record);
+				return is_selected(k3d::selection::get_node(Record));
 			case SELECT_POINTS:
 				return detail::is_point_selected(Record);
 			case SELECT_LINES:
@@ -1367,7 +1386,7 @@ public:
 		{
 			if(k3d::inode* const node = k3d::selection::get_node(*record))
 			{
-				k3d::selection::select(node);
+				select(*node);
 
 				++selected_nodes;
 				selected_node = node;
@@ -1403,12 +1422,18 @@ public:
 
 		selection_changed();
 	}
+	
+	void select(k3d::inode& Node)
+	{
+		return_if_fail(node_selection());
+		node_selection()->select(Node, 1.0);	
+	}
 
 	void select_all_nodes()
 	{
 		const k3d::nodes_t& nodes = m_document.nodes().collection();
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-			k3d::selection::select(*node);
+			select(**node);
 	}
 
 	void select_all_points()
@@ -1467,7 +1492,7 @@ public:
 		for(k3d::selection::records::const_iterator record = Selection.begin(); record != Selection.end(); ++record)
 		{
 			if(k3d::inode* const node = k3d::selection::get_node(*record))
-				k3d::selection::deselect(node);
+				deselect(*node);
 		}
 	}
 
@@ -1491,11 +1516,17 @@ public:
 
 		selection_changed();
 	}
+	
+	void deselect(k3d::inode& Node)
+	{
+		if(node_selection())
+			node_selection()->select(Node, 0.0);
+	}
 
 	void deselect_all_nodes()
 	{
-		for(k3d::inode_collection::nodes_t::const_iterator node = m_document.nodes().collection().begin(); node != m_document.nodes().collection().end(); ++node)
-			k3d::selection::deselect(*node);
+		if(node_selection())
+			node_selection()->deselect_all();
 	}
 
 	void deselect_all_components()
@@ -1524,10 +1555,10 @@ public:
 	{
 		for(k3d::inode_collection::nodes_t::const_iterator node = m_document.nodes().collection().begin(); node != m_document.nodes().collection().end(); ++node)
 		{
-			if(k3d::selection::is_selected(*node))
-				k3d::selection::deselect(*node);
+			if(is_selected(*node))
+				deselect(**node);
 			else
-				k3d::selection::select(*node);
+				select(**node);
 		}
 	}
 
@@ -1571,21 +1602,22 @@ public:
 	{
 		k3d::nodes_t results;
 
-		for(k3d::inode_collection::nodes_t::const_iterator node = m_document.nodes().collection().begin(); node != m_document.nodes().collection().end(); ++node)
+		if(node_selection())
 		{
-			if(is_selected(*node))
-				results.push_back(*node);
+			k3d::inode_selection::selected_nodes_t selected_node_list = node_selection()->selected_nodes();
+			results.resize(selected_node_list.size());
+			std::copy(selected_node_list.begin(), selected_node_list.end(), results.begin());
 		}
-
+		
 		return results;
 	}
 
 	void hide_selection()
 	{
-		const k3d::nodes_t nodes = selected_nodes();
-		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+		k3d::nodes_t nodes = selected_nodes();
+		for(k3d::nodes_t::iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
-			k3d::selection::select(*node);
+			select(**node);
 			k3d::property::set_internal_value(**node, "viewport_visible", false);
 			k3d::property::set_internal_value(**node, "render_final", false);
 		}
@@ -1904,6 +1936,11 @@ public:
 	typedef std::vector<k3d::iunknown*> auto_start_plugins_t;
 	/// Stores auto-start plugins
 	auto_start_plugins_t m_auto_start_plugins;
+	
+	/// Cached pointer to the document node selection node
+	k3d::inode_selection* m_node_selection;
+	sigc::connection m_node_selection_metadata_connection;
+	sigc::connection m_node_selection_deleted_connection;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2129,6 +2166,16 @@ void document_state::select(const k3d::selection::records& Selection)
 	m_implementation->select(Selection);
 }
 
+void document_state::select(k3d::inode& Node)
+{
+	m_implementation->select(Node);
+}
+
+k3d::inode_selection* document_state::node_selection()
+{
+	return m_implementation->node_selection();
+}
+
 const bool document_state::is_selected(k3d::inode* Node)
 {
 	return m_implementation->is_selected(Node);
@@ -2167,6 +2214,11 @@ void document_state::deselect(const k3d::selection::record& Selection)
 void document_state::deselect(const k3d::selection::records& Selection)
 {
 	m_implementation->deselect(Selection);
+}
+
+void document_state::deselect(k3d::inode& Node)
+{
+	m_implementation->deselect(Node);
 }
 
 void document_state::deselect_all()

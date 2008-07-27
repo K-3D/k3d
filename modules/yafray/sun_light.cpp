@@ -44,7 +44,6 @@ public:
 		m_quadric(gluNewQuadric()),
 		m_power(init_owner(*this) + init_name("power") + init_label(_("power")) + init_description(_("Power")) + init_value(40.0))
 	{
-		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
 	}
 
 	~sun_light()
@@ -72,7 +71,7 @@ public:
 		k3d::gl::store_attributes attributes;
 
 		k3d::gl::material(GL_FRONT_AND_BACK, GL_AMBIENT, k3d::color(0, 0, 0));
-		k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, get_selection_weight() ? k3d::color(1, 1, 0) : k3d::color(0.4, 0.4, 0.4));
+		k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, State.node_selection ? k3d::color(1, 1, 0) : k3d::color(0.4, 0.4, 0.4));
 		k3d::gl::material(GL_FRONT_AND_BACK, GL_SPECULAR, k3d::color(0, 0, 0));
 		k3d::gl::material(GL_FRONT_AND_BACK, GL_EMISSION, k3d::color(0, 0, 0));
 

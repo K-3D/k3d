@@ -128,7 +128,7 @@ struct implementation
 			if(&Parent == *node)
 				continue;
 
-			if(!k3d::selection::is_selected(*node))
+			if(!m_document_state.is_selected(*node))
 				continue;
 
 			const transform_history_t history = parent_to_node_history(**node);
@@ -154,7 +154,7 @@ struct implementation
 		}
 
 		m_document_state.deselect_all();
-		k3d::selection::select(&Parent);
+		m_document_state.select(Parent);
 		m_document_state.document().pipeline().set_dependencies(dependencies);
 	}
 	
@@ -185,7 +185,7 @@ struct implementation
 		k3d::inode* const node = k3d::selection::get_node(selection);
 		return_if_fail(node);
 
-		if(k3d::selection::is_selected(node))
+		if(m_document_state.is_selected(node))
 		{
 			command_arguments arguments;
 			arguments.append_viewport_coordinates("mouse", Viewport, Event);

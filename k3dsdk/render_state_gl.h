@@ -82,6 +82,11 @@ public:
 	float gl_projection_matrix[16];
 	/// Stores the current OpenGL viewport
 	GLint gl_viewport[4];
+	
+	/// Stores the selection state of the calling node
+	double node_selection;
+	/// Stores the selection state of the parent of the calling node
+	double parent_selection;
 };
 
 } // namespace gl

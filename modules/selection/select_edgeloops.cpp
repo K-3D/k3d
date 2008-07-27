@@ -31,7 +31,10 @@
 #include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/shared_pointer.h>
 
-namespace libk3dselection
+namespace module
+{
+
+namespace selection
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -187,4 +190,6 @@ k3d::iplugin_factory& select_edgeloops_factory()
 	return select_edge_loops::get_factory();
 }
 
-} // namespace libk3dselection
+} // namespace selection
+
+} // namespace module

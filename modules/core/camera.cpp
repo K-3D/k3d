@@ -131,14 +131,6 @@ public:
 		m_world_target.changed_signal().connect(sigc::mem_fun(*this, &camera::on_position_changed));
 	}
 
-	void set_selection_weight(const double Weight)
-	{
-		if(Weight != get_selection_weight())
-			k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
-
-		base::set_selection_weight(Weight);
-	}
-
 	k3d::itransform_source& transformation()
 	{
 		return *this;
@@ -231,7 +223,7 @@ public:
 		glDisable(GL_TEXTURE_1D);
 		glDisable(GL_TEXTURE_2D);
 
-		k3d::gl::color3d(get_selection_weight() ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0));
+		k3d::gl::color3d(State.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0));
 		glLineWidth(1.0f);
 		glDisable(GL_LINE_STIPPLE);
 

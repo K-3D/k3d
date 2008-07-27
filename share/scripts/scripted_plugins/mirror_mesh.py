@@ -99,10 +99,11 @@ def get_factory_id( name):
 
 
 Document.start_change_set()
-try:
+try: 
+	selection_node = Document.get_node_by_metadata("inode_selection", "ngui:unique_node", "node_selection")
 	id_msh_inst = get_factory_id("MeshInstance")
 	for node in Document.nodes():
-		if id_msh_inst == node.factory().factory_id() and node.selection_weight:
+		if id_msh_inst == node.factory().factory_id() and selection_node.selection_weight(node):
 			temp = MirrorMesh(Document, node, "new")
 	Document.finish_change_set("Mirror selected instances with in a new instance")
 except: #there was an error

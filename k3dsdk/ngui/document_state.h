@@ -108,6 +108,13 @@ public:
 
 	void set_selection_mode(selection_mode_t Mode);
 
+	/// Returns a pointer to the document node selection, or null if there is none
+	/**
+	 * This node is identified by metadata with name "ngui:unique_node" and value
+	 * "node_selection" 
+	 */
+	k3d::inode_selection* node_selection();
+	
 	const bool is_selected(k3d::inode* Node);
 	const bool is_selected(const k3d::selection::record&);
 	
@@ -124,12 +131,16 @@ public:
 	void select(const k3d::selection::record& Selection);
 	/// Selects a collection of components
 	void select(const k3d::selection::records& Selection);
+	/// Selects the given node
+	void select(k3d::inode& Node);
 	/// Selects all nodes or components (depending on current selection mode)
 	void select_all();
 	/// Deselects a collection of components
 	void deselect(const k3d::selection::record& Selection);
 	/// Deselects a collection of components
 	void deselect(const k3d::selection::records& Selection);
+	/// Deselects the given node
+	void deselect(k3d::inode& Node);
 	/// Deselects all selected nodes and components
 	void deselect_all();
 	/// Inverts current selection

@@ -135,6 +135,21 @@ namespace detail
 {
 
 /////////////////////////////////////////////////////////////////////////////
+// select: selecting nodes using std::for_each
+
+struct select
+{
+	select(document_state& DocumentState) : m_document_state(DocumentState) {}
+	void operator()(k3d::inode* Node)
+	{
+		if(Node)
+			m_document_state.select(*Node);
+	}
+private:
+	document_state& m_document_state;
+};
+
+/////////////////////////////////////////////////////////////////////////////
 // sort_by_name
 
 struct sort_by_name
@@ -1794,7 +1809,7 @@ private:
 		for(k3d::inode_collection::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
 			// Skip unselected nodes
-			if(!k3d::selection::is_selected(*node))
+			if(!m_document_state.is_selected(*node))
 				continue;
 
 			// Skip non-parentable nodes
@@ -1810,7 +1825,7 @@ private:
 
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select parent"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.deselect_all();
-		std::for_each(parents.begin(), parents.end(), k3d::selection::select);
+		std::for_each(parents.begin(), parents.end(), detail::select(m_document_state));
 	}
 
 	void on_select_child()
@@ -1830,7 +1845,7 @@ private:
 			if(!parent)
 				continue;
 
-			if(k3d::selection::is_selected(parent))
+			if(m_document_state.is_selected(parent))
 				children.insert(*node);
 		}
 
@@ -1839,7 +1854,7 @@ private:
 
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select child"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.deselect_all();
-		std::for_each(children.begin(), children.end(), k3d::selection::select);
+		std::for_each(children.begin(), children.end(), detail::select(m_document_state));
 	}
 
 	void on_select_sibling()
@@ -1850,7 +1865,7 @@ private:
 		for(k3d::inode_collection::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
 			// Skip unselected nodes
-			if(!k3d::selection::is_selected(*node))
+			if(!m_document_state.is_selected(*node))
 				continue;
 
 			// Skip non-parentable nodes
@@ -1871,7 +1886,7 @@ private:
 		for(k3d::inode_collection::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
 			// Skip selected nodes
-			if(k3d::selection::is_selected(*node))
+			if(m_document_state.is_selected(*node))
 				continue;
 
 			// Skip non-parentable nodes
@@ -1893,7 +1908,7 @@ private:
 
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select sibling"), K3D_CHANGE_SET_CONTEXT);
 		m_document_state.deselect_all();
-		std::for_each(siblings.begin(), siblings.end(), k3d::selection::select);
+		std::for_each(siblings.begin(), siblings.end(), detail::select(m_document_state));
 	}
 
 	void on_select_nodes()

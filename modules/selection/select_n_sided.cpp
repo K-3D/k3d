@@ -33,7 +33,10 @@
 #include <map>
 #include <set>
 
-namespace libk3dselection
+namespace module
+{
+
+namespace selection
 {
 
 namespace detail
@@ -285,5 +288,7 @@ k3d::iplugin_factory& select_n_sided_factory()
 	return select_n_sided::get_factory();
 }
 
-} // namespace libk3dselection
+} // namespace selection
+
+} // namespace module
 

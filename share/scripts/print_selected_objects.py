@@ -2,8 +2,9 @@
 
 import k3d
 
-for node in Document.nodes():
-	if node.selection_weight:
+selection_node = Document.get_node_by_metadata("inode_selection", "ngui:unique_node", "node_selection")
+
+for node in selection_node.selected_nodes():
 		print "Selected:", node.name
 
 import sys

@@ -569,24 +569,6 @@ legacy::nupatch* get_nupatch(legacy::mesh& Mesh, const record& Record)
 }
 */
 
-///////////////////////////////////////////////////////////////////////////////////
-// select
-
-void select(inode* Node)
-{
-	if(iselectable* const selectable = dynamic_cast<iselectable*>(Node))
-		selectable->set_selection_weight(1.0);
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// deselect
-
-void deselect(inode* Node)
-{
-	if(iselectable* const selectable = dynamic_cast<iselectable*>(Node))
-		selectable->set_selection_weight(0.0);
-}
-
 } // namespace selection
 
 namespace gl

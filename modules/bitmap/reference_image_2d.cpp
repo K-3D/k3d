@@ -59,7 +59,6 @@ public:
 		m_aspect_ratio(init_owner(*this) + init_name("aspect_ratio") + init_label(_("Aspect Ratio")) + init_description(_("Aspect Ratio")) + init_value(1.0)),
 		m_texture_name(0)
 	{
-		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
 		m_color.changed_signal().connect(make_async_redraw_slot());
 		m_opacity.changed_signal().connect(make_async_redraw_slot());
 		m_camera.changed_signal().connect(make_async_redraw_slot());

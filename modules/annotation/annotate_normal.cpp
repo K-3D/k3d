@@ -51,7 +51,6 @@ public:
 		m_normal(init_owner(*this) + init_name("normal") + init_label(_("Normal")) + init_description(_("Normal")) + init_value(k3d::vector3(0, 0, 1))),
 		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Color")) + init_value(k3d::color(1, 1, 1)))
 	{
-		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
 		m_normal.changed_signal().connect(make_async_redraw_slot());
 		m_color.changed_signal().connect(make_async_redraw_slot());
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
@@ -59,7 +58,7 @@ public:
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		k3d::gl::color3d(get_selection_weight() ? k3d::color(1, 1, 1) : m_color.pipeline_value());
+		k3d::gl::color3d(State.node_selection ? k3d::color(1, 1, 1) : m_color.pipeline_value());
 		draw(State);
 	}
 

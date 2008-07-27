@@ -24,6 +24,7 @@
 #include "dynamic_cast_python.h"
 #include "idocument_python.h"
 #include "inode_python.h"
+#include "inode_selection_python.h"
 #include "interface_wrapper_python.h"
 #include "isnappable_python.h"
 #include "node_python.h"
@@ -34,6 +35,7 @@
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/imetadata.h>
 #include <k3dsdk/inode.h>
+#include <k3dsdk/inode_selection.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/isnappable.h>
@@ -80,6 +82,8 @@ object do_dynamic_cast(k3d::iunknown* const Source, const string_t& Type)
 		return detail::do_dynamic_cast<k3d::imetadata>(Source);
 	if(Type == "inode")
 		return detail::do_dynamic_cast<k3d::inode>(Source);
+	if(Type == "inode_selection")
+		return detail::do_dynamic_cast<k3d::inode_selection>(Source);
 	if(Type == "iproperty_collection")
 		return detail::do_dynamic_cast<k3d::iproperty_collection>(Source);
 	if(Type == "isnappable")
@@ -115,6 +119,10 @@ object do_dynamic_cast(const object& Source, const string_t& Type)
 	extract<k3d::python::interface_wrapper<k3d::inode> > inode(Source);
 	if(inode.check())
 		return do_dynamic_cast(inode().wrapped_ptr(), Type);
+	
+	extract<k3d::python::interface_wrapper<k3d::inode_selection> > inode_selection(Source);
+	if(inode_selection.check())
+		return do_dynamic_cast(inode_selection().wrapped_ptr(), Type);
 
 	extract<k3d::python::interface_wrapper<k3d::iproperty> > iproperty(Source);
 	if(iproperty.check())
@@ -131,7 +139,7 @@ object do_dynamic_cast(const object& Source, const string_t& Type)
 	extract<k3d::python::node> node(Source);
 	if(node.check())
 		return do_dynamic_cast(node().interface_wrapper<k3d::inode>::wrapped_ptr(), Type);
-
+	
 	extract<k3d::python::interface_wrapper<k3d::iunknown> > iunknown(Source);
 	if(iunknown.check())
 		return do_dynamic_cast(iunknown().wrapped_ptr(), Type);

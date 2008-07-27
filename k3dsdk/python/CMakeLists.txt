@@ -82,6 +82,8 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	imetadata_python.h
 	inode_python.cpp
 	inode_python.h
+	inode_selection_python.cpp
+	inode_selection_python.h
 	interface_wrapper_python.h
 	iplugin_factory_python.cpp
 	iplugin_factory_python.h

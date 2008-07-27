@@ -38,8 +38,7 @@ node::node(iplugin_factory& Factory, idocument& Document) :
 	property_collection(),
 	m_factory(Factory),
 	m_document(Document),
-	m_name(init_owner(*this) + init_name("name") + init_label(_("Name")) + init_description(_("Assign a human-readable name to identify this node.")) + init_value<std::string>("")),
-	m_selection_weight(init_owner(*this) + init_name("selection_weight") + init_label(_("Selection Weight")) + init_description(_("Node selection state, 1 = selected, 0 = unselected.")) + init_value(0.0))
+	m_name(init_owner(*this) + init_name("name") + init_label(_("Name")) + init_description(_("Assign a human-readable name to identify this node.")) + init_value<std::string>(""))
 {
 	m_deleted_signal.connect(sigc::mem_fun(*this, &node::on_deleted));
 	m_name.changed_signal().connect(sigc::hide(m_name_changed_signal.make_slot()));
@@ -99,16 +98,6 @@ void node::load(xml::element& Element, const ipersistent::load_context& Context)
 
 	// Load Variables
 	persistent_property_collection::load(Element, Context);
-}
-
-double node::get_selection_weight()
-{
-	return m_selection_weight.pipeline_value();
-}
-
-void node::set_selection_weight(const double Weight)
-{
-	m_selection_weight.set_value(Weight);
 }
 
 } // namespace k3d

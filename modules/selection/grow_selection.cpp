@@ -32,7 +32,10 @@
 #include <list>
 #include <set>
 
-namespace libk3dselection
+namespace module
+{
+
+namespace selection
 {
 
 namespace detail
@@ -324,5 +327,7 @@ k3d::iplugin_factory& grow_selection_factory()
 	return grow_selection::get_factory();
 }
 
-} // namespace libk3dselection
+} // namespace selection
+
+} // namespace module
 

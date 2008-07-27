@@ -37,13 +37,11 @@ class painter_render_state :
 	public render_state
 {
 public:
-	painter_render_state(const render_state& State, const matrix4& Matrix, const double NodeSelection, const bool ShowComponentSelection, const double ParentSelection = 0.0) :
+	painter_render_state(const render_state& State, const matrix4& Matrix, const bool ShowComponentSelection) :
 		render_state(State),
 		matrix(Matrix),
 		inside_out(k3d::inside_out(Matrix)),
-		node_selection(NodeSelection),
-		show_component_selection(ShowComponentSelection),
-		parent_selection(ParentSelection)
+		show_component_selection(ShowComponentSelection)
 	{
 	}
 
@@ -51,12 +49,8 @@ public:
 	matrix4 matrix;
 	/// Set to true if the mesh transform matrix will turn it inside-out
 	bool inside_out;
-	/// Stores the selection state of the calling node
-	double node_selection;
 	/// Set to true if painters should highlight selected gprims
 	bool show_component_selection;
-	/// Stores the selection state of the parent of the calling node
-	double parent_selection;
 };
 
 } // namespace gl

@@ -45,9 +45,6 @@ public:
 	node();
 	node(k3d::iunknown* Node);
 
-	const double get_selection_weight() const;
-	void set_selection_weight(const double Weight);
-
 	static void define_class();
 };
 

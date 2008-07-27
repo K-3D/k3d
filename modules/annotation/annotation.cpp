@@ -67,7 +67,6 @@ public:
 	{
 		m_text.set_metadata("k3d:property-type", "k3d:multi-line-text");
 
-		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
 		m_font_path.changed_signal().connect(make_async_redraw_slot());
 		m_font_size.changed_signal().connect(make_async_redraw_slot());
 		m_line_width.changed_signal().connect(make_async_redraw_slot());
@@ -82,7 +81,7 @@ public:
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		k3d::gl::color3d(get_selection_weight() ? k3d::color(1, 1, 1) : m_color.pipeline_value());
+		k3d::gl::color3d(State.node_selection ? k3d::color(1, 1, 1) : m_color.pipeline_value());
 		draw(State);
 	}
 

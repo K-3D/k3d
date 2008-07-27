@@ -38,6 +38,7 @@
 #include "imesh_storage_python.h"
 #include "imetadata_python.h"
 #include "inode_python.h"
+#include "inode_selection_python.h"
 #include "interface_wrapper_python.h"
 #include "iplugin_factory_python.h"
 #include "iproperty_python.h"
@@ -407,6 +408,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_imesh_storage();
 	define_class_imetadata();
 	define_class_inode();
+	define_class_inode_selection();
 	define_class_iplugin_factory();
 	define_class_iproperty();
 	define_class_iproperty_collection();

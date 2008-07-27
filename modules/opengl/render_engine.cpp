@@ -32,6 +32,8 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icrop_window.h>
 #include <k3dsdk/ilight_gl.h>
+#include <k3dsdk/inode_selection.h>
+#include <k3dsdk/iparentable.h>
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irender_viewport_gl.h>
@@ -91,33 +93,55 @@ private:
 class draw
 {
 public:
-	draw(const k3d::gl::render_state& State) :
-		m_state(State)
+	draw(k3d::gl::render_state& State, k3d::inode_selection* NodeSelection) :
+		m_state(State),
+		m_node_selection(NodeSelection)
 	{
 	}
 
 	void operator()(k3d::inode* const Object)
 	{
+		if(m_node_selection)
+		{
+			m_state.node_selection = m_node_selection->selection_weight(*Object);
+			k3d::node* parent = 0;
+			k3d::iparentable* const parentable = dynamic_cast<k3d::iparentable*>(Object);
+			if(parentable)
+				k3d::node* parent = dynamic_cast<k3d::node*>(k3d::property::pipeline_value<k3d::inode*>(parentable->parent()));
+			m_state.parent_selection = parent ? m_node_selection->selection_weight(*parent) : 0.0;
+		}
+		else
+		{
+			m_state.node_selection = 0.0;
+			m_state.parent_selection = 0.0;
+		}
+		
 		k3d::gl::irenderable* const renderable = dynamic_cast<k3d::gl::irenderable*>(Object);
 		if(renderable)
 			renderable->gl_draw(m_state);
 	}
 
 private:
-	const k3d::gl::render_state& m_state;
+	k3d::gl::render_state& m_state; // Note: no longer const, so selection weights can be set
+	k3d::inode_selection* m_node_selection;
 };
 
 /// Functor for selecting objects during OpenGL drawing
 class draw_selection
 {
 public:
-	draw_selection(const k3d::gl::render_state& State, const k3d::gl::selection_state& SelectState) :
-		m_state(State), m_selection_state(SelectState)
+	draw_selection(const k3d::gl::render_state& State, const k3d::gl::selection_state& SelectState, k3d::inode_selection* NodeSelection) :
+		m_state(State), m_selection_state(SelectState), m_node_selection(NodeSelection)
 	{
 	}
 
 	void operator()(k3d::inode* const Object)
 	{
+		k3d::double_t selection_weight = 0.0;
+		if(m_node_selection)
+			selection_weight = m_node_selection->selection_weight(*Object);
+		if(m_selection_state.exclude_unselected_nodes && !selection_weight)
+			return;
 		k3d::gl::irenderable* const renderable = dynamic_cast<k3d::gl::irenderable*>(Object);
 		if(renderable)
 			renderable->gl_select(m_state, m_selection_state);
@@ -126,6 +150,7 @@ public:
 private:
 	const k3d::gl::render_state& m_state;
 	const k3d::gl::selection_state& m_selection_state;
+	k3d::inode_selection* m_node_selection;
 };
 
 void gl_reset(const k3d::color BackgroundColor, const double PointSize)
@@ -283,7 +308,8 @@ public:
 		m_draw_safe_zone(init_owner(*this) + init_name("draw_safe_zone") + init_label(_("Draw Safe Zone")) + init_description(_("Draw Safe Zone")) + init_value(false)),
 		m_draw_aimpoint(init_owner(*this) + init_name("draw_aimpoint") + init_label(_("Draw Aim Point")) + init_description(_("Draw center screen cross")) + init_value(true)),
 		m_draw_crop_window(init_owner(*this) + init_name("draw_crop_window") + init_label(_("Draw Crop Window")) + init_description(_("Draw bounding rectangle for output rendering")) + init_value(true)),
-		m_draw_frustum(init_owner(*this) + init_name("draw_frustum") + init_label(_("Draw Frustum")) + init_description(_("Draw Camera Frustum")) + init_value(true))
+		m_draw_frustum(init_owner(*this) + init_name("draw_frustum") + init_label(_("Draw Frustum")) + init_description(_("Draw Camera Frustum")) + init_value(true)),
+		m_node_selection(init_owner(*this) + init_name("node_selection") + init_label(_("Node Selection")) + init_description(_("Node storing the currently selected nodes")) + init_value(static_cast<k3d::inode_selection*>(0)))
 	{
 		k3d::iproperty_group_collection::group visibility_group("Visibility");
 		visibility_group.properties.push_back(&static_cast<k3d::iproperty&>(m_draw_two_sided));
@@ -306,11 +332,26 @@ public:
 		m_draw_aimpoint.changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_redraw));
 		m_draw_crop_window.changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_redraw));
 		m_draw_frustum.changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_redraw));
+		m_node_selection.changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_node_selection_changed));
+	}
+	
+	~render_engine()
+	{
+		m_selection_changed_connection.disconnect();
 	}
 
 	void on_redraw(k3d::iunknown*)
 	{
 		m_redraw_request_signal.emit(k3d::gl::irender_viewport::ASYNCHRONOUS);
+	}
+	
+	void on_node_selection_changed(k3d::iunknown*)
+	{
+		k3d::inode_selection* node_selection = m_node_selection.pipeline_value();
+		if(node_selection)
+		{
+			m_selection_changed_connection = node_selection->selection_changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_redraw));
+		}
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -465,7 +506,7 @@ public:
 		if(m_show_lights.pipeline_value())
 			std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::light_setup());
 
-		std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::draw(state));
+		std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::draw(state, m_node_selection.pipeline_value()));
 
 /* I really hate to loose this feedback, but the GLU NURBS routines generate large numbers of errors, which ruins its utility :-(
 		for(GLenum gl_error = glGetError(); gl_error != GL_NO_ERROR; gl_error = glGetError())
@@ -484,7 +525,7 @@ public:
 
 		glDisable(GL_LIGHTING);
 
-		std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::draw_selection(state, SelectState));
+		std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::draw_selection(state, SelectState, m_node_selection.pipeline_value()));
 	}
 
 	redraw_request_signal_t& redraw_request_signal()
@@ -679,6 +720,8 @@ private:
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_aimpoint;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_crop_window;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_frustum;
+	k3d_data(k3d::inode_selection*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_node_selection;
+	sigc::connection m_selection_changed_connection;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -54,7 +54,6 @@ public:
 		base(Factory, Document),
 		m_shader(init_owner(*this) + init_name("shader") + init_label(_("Shader")) + init_description(_("Light shader")) + init_value<k3d::ri::ilight_shader*>(0))
 	{
-		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 	}
 
@@ -64,7 +63,7 @@ public:
 		glDisable(GL_TEXTURE_1D);
 		glDisable(GL_TEXTURE_2D);
 
-		k3d::gl::color3d(get_selection_weight() ? k3d::color(1, 1, 1) : k3d::color(1, 1, 0));
+		k3d::gl::color3d(State.node_selection ? k3d::color(1, 1, 1) : k3d::color(1, 1, 0));
 		glLineWidth(1.0f);
 		glDisable(GL_LINE_STIPPLE);
 

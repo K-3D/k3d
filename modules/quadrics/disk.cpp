@@ -48,7 +48,6 @@ public:
 		m_height.changed_signal().connect(sigc::mem_fun(*this, &disk::reset_geometry));
 		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &disk::reset_geometry));
 
-		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 		m_material.changed_signal().connect(make_async_redraw_slot());
 
@@ -131,7 +130,7 @@ public:
 
 		const nurbs_renderer_t nurbs = nurbs_renderer(State);
 
-		k3d::gl::color3d(get_selection_weight() ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0));
+		k3d::gl::color3d(State.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0));
 		gluNurbsProperty(nurbs, GLU_DISPLAY_MODE, GLU_OUTLINE_PATCH);
 		glDisable(GL_LIGHTING);
 		glDisable(GL_AUTO_NORMAL);

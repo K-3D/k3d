@@ -21,7 +21,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "gl.h"
+#include "inode_collection.h"
+#include "inode_selection.h"
 #include "iselectable.h"
+#include "nodes.h"
 #include <vector>
 
 namespace k3d
@@ -162,9 +165,6 @@ const bool is_selected(T* Object)
 	iselectable* const selectable = dynamic_cast<iselectable*>(Object);
 	return selectable && selectable->get_selection_weight();
 }
-
-void select(inode* Node);
-void deselect(inode* Node);
 
 /// Functor object for setting selection weight on a collection of objects - good with k3d::for_each_component
 struct set_weight

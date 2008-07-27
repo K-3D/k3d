@@ -110,7 +110,6 @@ public:
 	renderable_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		base::m_selection_weight.changed_signal().connect(base::make_async_redraw_slot());
 	}
 
 	void on_gl_draw(const k3d::gl::render_state& State)
@@ -121,7 +120,7 @@ public:
 		glDisable(GL_TEXTURE_1D);
 		glDisable(GL_TEXTURE_2D);
 
-		k3d::gl::color3d(base_t::get_selection_weight() ? k3d::color(1, 1, 1) : emitting ? k3d::color(1, 1, 0) : k3d::color(0, 0, 0));
+		k3d::gl::color3d(State.node_selection ? k3d::color(1, 1, 1) : emitting ? k3d::color(1, 1, 0) : k3d::color(0, 0, 0));
 		glLineWidth(1.0f);
 		glDisable(GL_LINE_STIPPLE);
 

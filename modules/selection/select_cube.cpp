@@ -31,7 +31,10 @@
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/transformable.h>
 
-namespace libk3dselection
+namespace module
+{
+
+namespace selection
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -147,5 +150,7 @@ k3d::iplugin_factory& select_cube_factory()
 	return select_cube::get_factory();
 }
 
-} // namespace libk3dselection
+} // namespace selection
+
+} // namespace module
 

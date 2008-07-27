@@ -28,7 +28,10 @@
 #include <k3dsdk/mesh_selection_modifier.h>
 #include <k3dsdk/shared_pointer.h>
 
-namespace libk3dselection
+namespace module
+{
+
+namespace selection
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -87,5 +90,7 @@ k3d::iplugin_factory& select_point_by_number_factory()
 	return select_point_by_number::get_factory();
 }
 
-} // namespace libk3dselection
+} // namespace selection
+
+} // namespace module
 

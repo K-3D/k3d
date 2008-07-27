@@ -403,7 +403,6 @@ public:
 	teapot(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		m_selection_weight.changed_signal().connect(make_async_redraw_slot());
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 
 		// Adjust the patch indices from one-based to zero-based to make things easier elsewhere ...
@@ -421,7 +420,7 @@ public:
 
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		if(get_selection_weight())
+		if(State.node_selection)
 		{
 			glPolygonOffset(1.0, 1.0);
 			glEnable(GL_POLYGON_OFFSET_FILL);
@@ -461,7 +460,7 @@ public:
 			}
 		}
 
-		if(get_selection_weight())
+		if(State.node_selection)
 		{
 			glDisable(GL_LIGHTING);
 			glColor3d(1, 1, 1);

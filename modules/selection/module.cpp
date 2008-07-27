@@ -24,10 +24,14 @@
 #include <k3dsdk/module.h>
 
 /// Namespace reserved for the selection plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dselection
+namespace module
+{
+
+namespace selection
 {
 
 extern k3d::iplugin_factory& grow_selection_factory();
+extern k3d::iplugin_factory& node_selection_factory();
 extern k3d::iplugin_factory& select_bicubic_patch_by_number_factory();
 extern k3d::iplugin_factory& select_bilinear_patch_by_number_factory();
 extern k3d::iplugin_factory& select_clockwise_factory();
@@ -44,24 +48,27 @@ extern k3d::iplugin_factory& select_nurbs_curve_by_number_factory();
 extern k3d::iplugin_factory& select_nurbs_patch_by_number_factory();
 extern k3d::iplugin_factory& select_point_by_number_factory();
 
-} // namespace libk3dselection
+} // namespace selection
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dselection::grow_selection_factory());
-	Registry.register_factory(libk3dselection::select_bicubic_patch_by_number_factory());
-	Registry.register_factory(libk3dselection::select_bilinear_patch_by_number_factory());
-	Registry.register_factory(libk3dselection::select_clockwise_factory());
-	Registry.register_factory(libk3dselection::select_companion_factory());
-	Registry.register_factory(libk3dselection::select_cube_factory());
-	Registry.register_factory(libk3dselection::select_cubic_curve_by_number_factory());
-	Registry.register_factory(libk3dselection::select_edge_by_number_factory());
-	Registry.register_factory(libk3dselection::select_edgeloops_factory());
-	Registry.register_factory(libk3dselection::select_edgerings_factory());
-	Registry.register_factory(libk3dselection::select_face_by_number_factory());
-	Registry.register_factory(libk3dselection::select_linear_curve_by_number_factory());
-	Registry.register_factory(libk3dselection::select_n_sided_factory());
-	Registry.register_factory(libk3dselection::select_nurbs_curve_by_number_factory());
-	Registry.register_factory(libk3dselection::select_nurbs_patch_by_number_factory());
-	Registry.register_factory(libk3dselection::select_point_by_number_factory());
+	Registry.register_factory(module::selection::grow_selection_factory());
+	Registry.register_factory(module::selection::node_selection_factory());
+	Registry.register_factory(module::selection::select_bicubic_patch_by_number_factory());
+	Registry.register_factory(module::selection::select_bilinear_patch_by_number_factory());
+	Registry.register_factory(module::selection::select_clockwise_factory());
+	Registry.register_factory(module::selection::select_companion_factory());
+	Registry.register_factory(module::selection::select_cube_factory());
+	Registry.register_factory(module::selection::select_cubic_curve_by_number_factory());
+	Registry.register_factory(module::selection::select_edge_by_number_factory());
+	Registry.register_factory(module::selection::select_edgeloops_factory());
+	Registry.register_factory(module::selection::select_edgerings_factory());
+	Registry.register_factory(module::selection::select_face_by_number_factory());
+	Registry.register_factory(module::selection::select_linear_curve_by_number_factory());
+	Registry.register_factory(module::selection::select_n_sided_factory());
+	Registry.register_factory(module::selection::select_nurbs_curve_by_number_factory());
+	Registry.register_factory(module::selection::select_nurbs_patch_by_number_factory());
+	Registry.register_factory(module::selection::select_point_by_number_factory());
 K3D_MODULE_END
 
