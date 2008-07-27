@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <string>
+#include <k3dsdk/types.h>
 
 namespace libk3dngui
 {
@@ -33,11 +33,11 @@ class unsaved_document
 {
 public:
 	/// Returns true iff there are unsaved changes to the underlying document.
-	virtual const bool unsaved_changes() = 0;
+	virtual const k3d::bool_t unsaved_changes() = 0;
 	/// Return a human-readable title for the underlying document.
-	virtual const std::string unsaved_document_title() = 0;
+	virtual const k3d::string_t unsaved_document_title() = 0;
 	/// Save the underlying document, returning true if it was saved successfully.  Implementations may need to the prompt the user for a filename, and should return false if the user cancels file selection.
-	virtual const bool save_unsaved_changes() = 0;
+	virtual const k3d::bool_t save_unsaved_changes() = 0;
 
 protected:
 	unsaved_document() {}
