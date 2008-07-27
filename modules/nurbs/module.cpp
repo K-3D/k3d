@@ -51,6 +51,7 @@ extern k3d::iplugin_factory& curve_traversal_factory();
 extern k3d::iplugin_factory& revolve_curve_factory();
 extern k3d::iplugin_factory& ruled_surface_factory();
 extern k3d::iplugin_factory& create_cap_factory();
+extern k3d::iplugin_factory& skinned_surface_factory();
 
 } // namespace nurbs
 
@@ -80,5 +81,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::nurbs::revolve_curve_factory());
 	Registry.register_factory(module::nurbs::ruled_surface_factory());
 	Registry.register_factory(module::nurbs::create_cap_factory());
+	Registry.register_factory(module::nurbs::skinned_surface_factory());
 K3D_MODULE_END
 

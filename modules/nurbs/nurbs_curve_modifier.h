@@ -58,8 +58,8 @@ namespace module{
         class nurbs_curve_modifier{
             public:
                 nurbs_curve_modifier(k3d::mesh& input);
-                nurbs_curve_modifier(nurbs_curve& curve);
 
+                int add_curve(nurbs_curve& curve, bool shared);
                 int selected_curve();
                 void print_knot_vector(size_t curve);
                 void replace_point(size_t newIndex, size_t curve, size_t point, bool continuous);
@@ -71,7 +71,7 @@ namespace module{
                 void remove_unused_points();
                 void delete_curve(size_t curve);
                 void join_curves(size_t point1, size_t curve1, size_t point2, size_t curve2);
-                bool point3_float_equal(const k3d::point3& p1, const k3d::point3& p2, float threshold);
+                static bool point3_float_equal(const k3d::point3& p1, const k3d::point3& p2, float threshold);
                 int find_span(size_t curve,double u);
                 std::vector<double> basis_functions(size_t curve, double u, size_t span);
                 k3d::point4 curve_point(size_t curve,double u);
@@ -81,6 +81,7 @@ namespace module{
                 k3d::point4 get_homogenous_point(size_t point);
                 void split_curve_at(size_t curve, double u);
 
+
                 nurbs_curve extract_curve(size_t curve);
                 void knot_vector_adaption(std::vector<size_t> curves);
 
@@ -89,8 +90,10 @@ namespace module{
                 void revolve_curve(size_t curve, double angle, int segments);
                 void ruled_surface(size_t curve1, size_t curve2);
                 bool create_cap(size_t curve);
+                void skinned_surface(std::vector<size_t> curves);
 
             private:
+                size_t insert_point(k3d::point3& point, bool shared);
                 int factorial(int n);
                 double binomial_coefficient(int n, int k);
                 int Min(int a, int b);

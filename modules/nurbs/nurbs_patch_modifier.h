@@ -55,6 +55,8 @@ namespace module
 	    };
 
 	    typedef struct nurbs_patch{
+	        size_t u_order;
+	        size_t v_order;
 	        k3d::mesh::knots_t u_knots;
 	        k3d::mesh::knots_t v_knots;
 	        k3d::mesh::weights_t point_weights;
@@ -71,8 +73,12 @@ namespace module
 
 				nurbs_patch extract_patch(size_t patch);
 				int get_patch_count();
+				void insert_patch(nurbs_patch& patch, bool share_points);
+
 
 			private:
+                size_t insert_point(k3d::point3& point, bool shared);
+
 				k3d::mesh *m_instance;
 				k3d::mesh::nurbs_patches_t *m_nurbs_patches;
 				k3d::mesh::indices_t *m_patch_first_points;
@@ -105,6 +111,8 @@ namespace module
                 k3d::mesh::knots_t *m_trim_curve_knots;
                 k3d::mesh::points_t *m_mesh_points;
                 k3d::mesh::selection_t *m_point_selections;
+
+
 
 		};
 	}
