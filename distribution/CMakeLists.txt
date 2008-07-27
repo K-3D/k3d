@@ -6,6 +6,14 @@ SET(K3D_SVN_BRANCHES "${K3D_SVN_ROOT}/branches")
 SET(K3D_BRANCH_TAG "k3d-release-${K3D_MAJOR_VERSION}.${K3D_MINOR_VERSION}")
 SET(K3D_VERSION_TAG "k3d-${K3D_MAJOR_VERSION}.${K3D_MINOR_VERSION}.${K3D_RELEASE_VERSION}.${K3D_BUILD_VERSION}")
 
+# Get a SourceForge username so we can upload distributables to the FRS
+IF(WIN32)
+	SET(K3D_SOURCEFORGE_USERNAME "$ENV{USERNAME}" CACHE STRING "SourceForge user account name, for uploading distribution files.")
+ELSE(WIN32)
+	SET(K3D_SOURCEFORGE_USERNAME "$ENV{USER}" CACHE STRING "SourceForge user account name, for uploading distribution files.")
+ENDIF(WIN32)
+MARK_AS_ADVANCED(K3D_SOURCEFORGE_USERNAME)
+
 ADD_CUSTOM_TARGET(changelog
 	COMMAND ${SVNCOMMAND} log > ${k3d_BINARY_DIR}/ChangeLog
 	WORKING_DIRECTORY ${k3d_SOURCE_DIR}
@@ -78,6 +86,11 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/package-source-zip.cpack.in ${CMAKE_C
 ADD_CUSTOM_TARGET(package-source-zip
 	${CMAKE_CPACK_COMMAND}
 	--config ${CMAKE_CURRENT_BINARY_DIR}/package-source-zip.cpack
+	)
+
+# Upload sources to SourceForge for use with the FRS
+ADD_CUSTOM_TARGET(upload-package-source-tgz
+	rsync -avP -e ssh ${CMAKE_CURRENT_BINARY_DIR}/${K3D_CPACK_SOURCE_PACKAGE_FILE_NAME}.tgz ${K3D_SOURCEFORGE_USERNAME}@frs.sourceforge.net:uploads/
 	)
 
 # Generate platform-specific binary packages
