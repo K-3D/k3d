@@ -9,8 +9,8 @@ import k3d
 class MirrorMesh:
 	"""
 		This class implements functions to Mirror selected Instances.
-		At the creation time the Mirror objects are created, there is no need to call a method later.
-		(actually is just like calling a function
+		At the construction time the Mirror objects are created, there is no need to call a method later.
+		(actually is just like calling a function)
 		Usage:
 		MirrorMesh(document, mesh_instance, axis="x", new_node="reuse", new_mesh_instance_sufix=" plus Mirror")
 		There are two ways of mirroring:
@@ -19,10 +19,10 @@ class MirrorMesh:
 				temp_unnecessary_object = MirrorMesh(Document, node, "reuse")
 			-creating parallel instance withe the name <Original mesh instance name>+<new_mesh_instance_sufix>
 			Example:
-				temp_unnecessary_object = MirrorMesh(Document, node, "new", " plus Mirror")
+				MirrorMesh(Document, node, "new", "Mirror")
 				#where "Mirror" is the sufix of the new created instances
 	"""
-	def __init__(self, document, mesh_instance, axis="x", new_node="reuse", new_mesh_instance_sufix=" Mirror and Weld"):
+	def __init__(self, document, mesh_instance, axis="x", new_node="reuse", new_mesh_instance_sufix="Mirror and Weld"):
 		self.doc = document
 		self.mesh_instance = mesh_instance
 		if new_node ==  "new":
@@ -126,8 +126,8 @@ try:
 	id_msh_inst = get_factory_id("MeshInstance")
 	for node in Document.nodes():
 		if id_msh_inst == node.factory().factory_id() and selection_node.selection_weight(node):
-			temp = MirrorMesh(Document, node, axis, creation_mode)
-	Document.finish_change_set("Mirror selected instances with in a new instance")
+			MirrorMesh(Document, node, axis, creation_mode)
+	Document.finish_change_set("Mirror Selected Mesh Instances")
 except: #there was an error
 	Document.cancel_change_set()
 	raise
