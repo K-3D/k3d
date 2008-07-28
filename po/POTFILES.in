@@ -210,7 +210,6 @@ modules/ngui_knot_vector_control/control.cpp
 modules/ngui_learning/dialog.cpp
 modules/ngui_log/dialog.cpp
 modules/ngui_morph_points_page/page.cpp
-modules/ngui_node_graph_panel/nodeGraph.cpp
 modules/ngui_node_history_panel/panel.cpp
 modules/ngui_node_list_panel/panel.cpp
 modules/ngui_node_properties_panel/panel.cpp
