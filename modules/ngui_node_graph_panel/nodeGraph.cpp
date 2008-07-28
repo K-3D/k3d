@@ -23,6 +23,17 @@ Contact:	alx.curtis@gmail.com
 #include <gtkmm/treeview.h>
 #include <gtk/gtkmain.h>
 
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/classes.h>
+#include <k3dsdk/command_tree.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/idocument_plugin_factory.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/imaterial_gl.h>
+#include <k3dsdk/imaterial_ri.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/command_arguments.h>
 #include <k3dsdk/ngui/document_state.h>
@@ -30,22 +41,9 @@ Contact:	alx.curtis@gmail.com
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/ngui/utility.h>
-
-#include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/classes.h>
-
-#include <k3dsdk/idocument.h>
-#include <k3dsdk/idocument_plugin_factory.h>
-#include <k3dsdk/inode_collection.h>
-#include <k3dsdk/iuser_interface.h>
-#include <k3dsdk/module.h>
 #include <k3dsdk/nodes.h>
 
 #include <boost/assign/list_of.hpp>
-
-#include <k3dsdk/imaterial.h>
-#include <k3dsdk/imaterial_gl.h>
-#include <k3dsdk/imaterial_ri.h>
 
 using namespace libk3dngui;
 
@@ -430,16 +428,17 @@ class panel :
 public:
 	panel() :
 		base(false, 0),
-		ui_component("mat_list", 0),
-		m_implementation(0){
+		m_implementation(0)
+	{
 	}
 
 	~panel(){
 		delete m_implementation;
 	}
 
-	void initialize(document_state& DocumentState, k3d::icommand_node& Parent){
-		ui_component::set_parent("mat_list", &Parent);
+	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	{
+		k3d::command_tree().add(*this, "mat_list", &Parent);
 
 		m_implementation = new mechanics::implementation(DocumentState);
 

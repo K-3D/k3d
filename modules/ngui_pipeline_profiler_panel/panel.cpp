@@ -22,24 +22,23 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3d-i18n-config.h>
-
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/box.h>
 
+#include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/command_tree.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/ipipeline_profiler.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/ui_component.h>
-
-#include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/inode.h>
-#include <k3dsdk/ipipeline_profiler.h>
-#include <k3dsdk/module.h>
 
 #include <boost/assign/list_of.hpp>
 
@@ -65,8 +64,7 @@ class panel :
 
 public:
 	panel() :
-		base(false, 0),
-		ui_component("pipeline_profiler", 0)
+		base(false, 0)
 	{
 		m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 		m_scrolled_window.add(m_view);
@@ -103,7 +101,7 @@ public:
 
 	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-		ui_component::set_parent("pipeline_profiler", &Parent);
+		k3d::command_tree().add(*this, "pipeline_profiler", &Parent);
 
 		DocumentState.document().pipeline_profiler().connect_node_execution_signal(sigc::mem_fun(*this, &panel::on_node_execution));
 		DocumentState.document().nodes().rename_node_signal().connect(sigc::mem_fun(*this, &panel::on_node_renamed));

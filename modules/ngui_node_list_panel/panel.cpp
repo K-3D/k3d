@@ -22,8 +22,6 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3d-i18n-config.h>
-
 #include <gtkmm/box.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/menu.h>
@@ -31,6 +29,19 @@
 #include <gtkmm/treeview.h>
 #include <gtk/gtkmain.h>
 
+#include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/classes.h>
+#include <k3dsdk/command_tree.h>
+#include <k3dsdk/gl.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/idocument_plugin_factory.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/inode_name_map.h>
+#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/iselectable.h>
+#include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/command_arguments.h>
 #include <k3dsdk/ngui/document_state.h>
@@ -41,18 +52,6 @@
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/ngui/utility.h>
-
-#include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/classes.h>
-#include <k3dsdk/gl.h>
-#include <k3dsdk/ipipeline.h>
-#include <k3dsdk/idocument.h>
-#include <k3dsdk/idocument_plugin_factory.h>
-#include <k3dsdk/inode_collection.h>
-#include <k3dsdk/inode_name_map.h>
-#include <k3dsdk/iselectable.h>
-#include <k3dsdk/iuser_interface.h>
-#include <k3dsdk/module.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/utility.h>
@@ -836,7 +835,6 @@ class panel :
 public:
 	panel() :
 		base(false, 0),
-		ui_component("node_list", 0),
 		m_implementation(0)
 	{
 	}
@@ -848,7 +846,7 @@ public:
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-		ui_component::set_parent("node_list", &Parent);
+		k3d::command_tree().add(*this, "node_list", &Parent);
 
 		m_implementation = new detail::implementation(DocumentState);
 

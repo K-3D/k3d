@@ -29,6 +29,7 @@
 #include "application.h"
 #include "classes.h"
 #include "command_node.h"
+#include "command_tree.h"
 #include "data.h"
 #include "dependencies.h"
 #include "document.h"
@@ -413,20 +414,20 @@ private:
 /// Encapsulates an open K-3D document
 class public_document_implementation :
 	public idocument,
-	public command_node::implementation,
+	public command_node,
 	public property_collection,
 	public sigc::trackable
 {
 public:
 	public_document_implementation(istate_recorder& StateRecorder, inode_collection& Nodes, ipipeline& Pipeline) :
-		command_node::implementation("document", 0),
-		property_collection(),
 		m_state_recorder(StateRecorder),
 		m_nodes(Nodes),
 		m_pipeline(Pipeline),
 		m_path(init_owner(*this) + init_name("path") + init_label(_("Document Path")) + init_description(_("Document Path")) + init_value(filesystem::path())),
 		m_title(init_owner(*this) + init_name("title") + init_label(_("Document Title")) + init_description(_("Document Title")) + init_value(k3d::ustring()))
 	{
+		command_tree().add(*this, "document", 0);
+
  		// Automatically add nodes to the unique node name collection
  		m_nodes.add_nodes_signal().connect(sigc::mem_fun(m_unique_node_names, &node_name_map::add_nodes));
 	}

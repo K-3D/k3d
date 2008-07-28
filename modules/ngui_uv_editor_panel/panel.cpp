@@ -21,16 +21,16 @@
 	\author Timothy M. Shead
 */
 
-#include <k3d-i18n-config.h>
-
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/box.h>
 #include <gtkmm/widget.h>
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/classes.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/file_range.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
@@ -43,6 +43,12 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/module.h>
+#include <k3dsdk/ngui/basic_input_model.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/enumeration_chooser.h>
+#include <k3dsdk/ngui/menubar.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/rectangle.h>
@@ -51,13 +57,6 @@
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/utility_gl.h>
-
-#include <k3dsdk/ngui/basic_input_model.h>
-#include <k3dsdk/ngui/document_state.h>
-#include <k3dsdk/ngui/menubar.h>
-#include <k3dsdk/ngui/enumeration_chooser.h>
-#include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/ui_component.h>
 
 #include <boost/assign/list_of.hpp>
 
@@ -190,7 +189,6 @@ class panel :
 {
 public:
 	panel() :
-		libk3dngui::ui_component("uveditor", 0),
 		m_glew_context( 0 ),
 		m_zoom_factor(1.0),
 		m_origin(-0.5, -0.5)
@@ -201,7 +199,7 @@ public:
 	{
 		m_document_state = &DocumentState;
 
-		ui_component::set_parent("uveditor", &Parent);
+		k3d::command_tree().add(*this, "uveditor", &Parent);
 
 		//libk3dngui::enumeration_chooser::proxy(property, state_recorder, property_name)
 		m_uv_set_model = new detail::uv_set_model( DocumentState );

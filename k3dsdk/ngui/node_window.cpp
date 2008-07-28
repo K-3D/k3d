@@ -24,6 +24,7 @@
 #include "asynchronous_update.h"
 #include "node_window.h"
 
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/inode.h>
 
 #include <gdk/gdkkeysyms.h>
@@ -51,9 +52,10 @@ public:
 
 node_window::node_window(k3d::inode& Node, k3d::icommand_node& Parent, const std::string& Name) :
 	base(Gtk::WINDOW_TOPLEVEL),
-	ui_component(Name, &Parent),
 	m_implementation(new implementation(Node))
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	Node.deleted_signal().connect(sigc::mem_fun(*this, &node_window::close));
 }
 

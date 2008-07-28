@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,8 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements k3d::script_button, which provides a MVC UI for boolean data sources
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "file_chooser_dialog.h"
@@ -28,8 +27,9 @@
 #include "utility.h"
 #include "widget_manip.h"
 
-#include <k3dsdk/classes.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/classes.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/options.h>
@@ -99,12 +99,13 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
 	base(false, 0),
-	ui_component(Name, &Parent),
 	m_load(_("Load")),
 	m_save(_("Save")),
 	m_edit(_("Edit Script")),
 	m_data(Data)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	m_load.signal_clicked().connect(sigc::mem_fun(*this, &control::on_load));
 	m_save.signal_clicked().connect(sigc::mem_fun(*this, &control::on_save));
 	m_edit.signal_clicked().connect(sigc::mem_fun(*this, &control::on_edit));

@@ -36,6 +36,7 @@
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/inode_collection.h>
@@ -354,9 +355,10 @@ public:
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, imodel* const Model, k3d::istate_recorder* StateRecorder) :
 	base(false, 0),
-	ui_component(Name, &Parent),
 	m_implementation(new implementation(Model, StateRecorder))
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	Gtk::Button* const edit_button = new Gtk::Button(_("Edit"));
 	edit_button->signal_clicked().connect(sigc::mem_fun(*this, &control::on_edit));
 	pack_start(*manage(edit_button), Gtk::PACK_SHRINK);

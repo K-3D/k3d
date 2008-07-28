@@ -25,6 +25,7 @@
 #include "interactive.h"
 #include "utility.h"
 
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/log.h>
 
 #include <gtkmm/menu.h>
@@ -43,27 +44,27 @@ namespace image_menu_item
 // control
 
 control::control(k3d::icommand_node& Parent, const std::string& Name) :
-	base(),
-	ui_component(Name, &Parent)
+	base()
 {
+	k3d::command_tree().add(*this, Name, &Parent);
 }
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, Gtk::Widget& image, const Glib::ustring& label, bool mnemonic) :
-	base(image, label, mnemonic),
-	ui_component(Name, &Parent)
+	base(image, label, mnemonic)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
 }
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, const Glib::ustring& label, bool mnemonic) :
-	base(label, mnemonic),
-	ui_component(Name, &Parent)
+	base(label, mnemonic)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
 }
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, const Gtk::StockID& stock_id) :
-	base(stock_id),
-	ui_component(Name, &Parent)
+	base(stock_id)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
 }
 
 const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)

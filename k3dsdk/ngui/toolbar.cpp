@@ -22,6 +22,8 @@
 */
 
 #include "toolbar.h"
+
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/result.h>
 
 namespace libk3dngui
@@ -34,9 +36,10 @@ namespace toolbar
 // control
 
 control::control(k3d::icommand_node& Parent, const std::string& Name) :
-	base(false, 0),
-	ui_component(Name, &Parent)
+	base(false, 0)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	set_name("k3d-toolbar");
 }
 

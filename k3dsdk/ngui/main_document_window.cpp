@@ -65,6 +65,7 @@
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
@@ -206,11 +207,12 @@ class tutorial_panel :
 {
 public:
 	tutorial_panel(icommand_node& Parent) :
-		ui_component("tutorial_panel", &Parent),
 		m_close(*this, "close", *Gtk::manage(new Gtk::Image(Gtk::Stock::CLOSE, Gtk::ICON_SIZE_BUTTON))),
 		m_stop(*this, "stop", *Gtk::manage(new Gtk::Image(Gtk::Stock::STOP, Gtk::ICON_SIZE_BUTTON))),
 		m_continue(*this, "continue", *Gtk::manage(new Gtk::Image(Gtk::Stock::YES, Gtk::ICON_SIZE_BUTTON)))
 	{
+		k3d::command_tree().add(*this, "tutorial_panel", &Parent);
+
 		m_continue.set_flags(Gtk::CAN_DEFAULT | Gtk::CAN_FOCUS);
 
 		m_close.set_tip(_("Close"));

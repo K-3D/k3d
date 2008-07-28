@@ -87,9 +87,10 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 // control
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
-	ui_component(Name, &Parent),
 	m_data(Data)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	if(m_data.get())
 		m_data->changed_signal().connect(sigc::mem_fun(*this, &control::data_changed));
 

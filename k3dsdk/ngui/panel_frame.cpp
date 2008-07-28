@@ -40,13 +40,14 @@
 #include "widget_manip.h"
 
 #include <k3dsdk/application.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/nodes.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/string_cast.h>
 
 #include <boost/format.hpp>
@@ -81,7 +82,6 @@ public:
 
 control::control(document_state& DocumentState, k3d::icommand_node& Parent, panel_focus_signal_t& PanelFocusSignal) :
 	base(),
-	ui_component("panel", &Parent),
 	k3d::property_collection(),
 	pinned(init_name("pinned") + init_label(_("Pinned Panel")) + init_description(_("Works with 'Hide Unpinned Panels' action")) + init_value(false)),
 	automagic(init_name("automagic") + init_label(_("Automagic")) + init_description(_("Allows panel to change depending on active tool")) + init_value(false)),
@@ -92,6 +92,8 @@ control::control(document_state& DocumentState, k3d::icommand_node& Parent, pane
 	m_panel_focus(false),
 	m_parent(Parent)
 {
+	k3d::command_tree().add(*this, "panel", &Parent);
+
 	m_panel_focus_changed_connection = m_panel_focus_signal.connect(sigc::mem_fun(*this, &control::on_panel_focus_changed));
 
 	// Don't set it to NORMAL else the focus color won't show

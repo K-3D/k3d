@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "icommand_tree.h"
@@ -42,7 +42,7 @@ class command_tree :
 	public icommand_tree
 {
 public:
-	void add(icommand_node& Node, const std::string& Name, icommand_node* const Parent)
+	void add(icommand_node& Node, const string_t& Name, icommand_node* const Parent)
 	{
 		m_original_name_map[&Node] = Name;
 		m_parent_map[&Node] = Parent;
@@ -68,7 +68,7 @@ public:
 		return_if_fail(m_name_map.count(&Node));
 		return_if_fail(m_parent_map.count(&Node));
 
-		const std::string original_name = m_original_name_map[&Node];
+		const string_t original_name = m_original_name_map[&Node];
 		icommand_node* const parent = m_parent_map[&Node];
 
 		m_original_name_map.erase(&Node);
@@ -96,10 +96,10 @@ public:
 		m_changed_signal.emit();
 	}
 
-	const std::string name(icommand_node& Node)
+	const string_t name(icommand_node& Node)
 	{
 		name_map_t::iterator node = m_name_map.find(&Node);
-		return_val_if_fail(node != m_name_map.end(), std::string());
+		return_val_if_fail(node != m_name_map.end(), string_t());
 
 		return node->second;
 	}
@@ -137,9 +137,9 @@ public:
 
 private:
 	/// This bizarre fellow helps us generate unique names
-	std::map<icommand_node*, std::map<std::string, nodes_t> > m_name_tree;
+	std::map<icommand_node*, std::map<string_t, nodes_t> > m_name_tree;
 	
-	typedef std::map<icommand_node*, std::string> name_map_t;
+	typedef std::map<icommand_node*, string_t> name_map_t;
 	/// Stores unmodified command node names
 	name_map_t m_original_name_map;
 	/// Stores modified (for uniqueness) command node names

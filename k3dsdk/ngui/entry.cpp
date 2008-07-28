@@ -25,6 +25,7 @@
 #include "interactive.h"
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/istate_recorder.h>
@@ -134,9 +135,10 @@ public:
 // control
 
 control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
-	ui_component(Name, &Parent),
 	m_implementation(new implementation(Model, StateRecorder))
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	set_name("k3d-entry");
 
 	// Synchronize the view with the data source ...

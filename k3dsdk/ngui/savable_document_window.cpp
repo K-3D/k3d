@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "application_state.h"
@@ -27,6 +27,7 @@
 #include "document_state.h"
 
 #include <k3dsdk/batch_mode.h>
+#include <k3dsdk/command_tree.h>
 
 #include <gtkmm/dialog.h>
 #include <gdk/gdkkeysyms.h>
@@ -39,9 +40,10 @@ namespace libk3dngui
 
 savable_document_window::savable_document_window(document_state& Document, const k3d::string_t& Name) :
 	base(Gtk::WINDOW_TOPLEVEL),
-	ui_component(Name, dynamic_cast<k3d::icommand_node*>(&Document.document())),
 	m_document(Document)
 {
+	k3d::command_tree().add(*this, Name, dynamic_cast<k3d::icommand_node*>(&Document.document()));
+
 	application_state::instance().connect_safe_close_signal(sigc::mem_fun(*this, &savable_document_window::on_safe_close));
 	m_document.connect_safe_close_signal(sigc::mem_fun(*this, &savable_document_window::on_safe_close));
 
@@ -134,3 +136,4 @@ void savable_document_window::on_close()
 }
 
 } // namespace libk3dngui
+

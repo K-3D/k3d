@@ -20,82 +20,71 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <gtk/gtkmain.h>
 #include <gtkmm.h>
+#include <gtkmm/comboboxtext.h>
+#include <gtkmm/drawingarea.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/label.h>
+#include <gtkmm/label.h>
+#include <gtkmm/menutoolbutton.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/separator.h>
+#include <gtkmm/textview.h>
+#include <gtkmm/toggletoolbutton.h>
+#include <gtkmm/toolbar.h>
+#include <gtkmm/treemodel.h>
 
 #include <k3d-i18n-config.h>
-		    
-#include <gtkmm/frame.h>
-#include <gtkmm/scrolledwindow.h>
-#include <gtkmm/label.h>
-#include <gtkmm/comboboxtext.h>
-#include <gtk/gtkmain.h>
-
-#include <gtkmm/textview.h>
-#include <gtkmm/treemodel.h>
-#include <gtkmm/label.h>
-#include <gtkmm/separator.h>
-#include <gtkmm/toolbar.h>
-#include <gtkmm/toggletoolbutton.h>
-#include <gtkmm/menutoolbutton.h>
-
-#include <k3dsdk/ngui/entry.h>
-#include <k3dsdk/ngui/text.h>
-
-#include <k3dsdk/ngui/asynchronous_update.h>
-#include <k3dsdk/ngui/command_arguments.h>
-#include <k3dsdk/ngui/document_state.h>
-#include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
-#include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/ui_component.h>
-#include <k3dsdk/ngui/utility.h>
-#include <k3dsdk/ngui/image_toggle_button.h>
-
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/classes.h>
-
+#include <k3dsdk/command_tree.h>
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/icamera.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>
-#include <k3dsdk/inode_collection.h>
-#include <k3dsdk/iuser_interface.h>
-#include <k3dsdk/module.h>
-#include <k3dsdk/nodes.h>
-
-#include <boost/assign/list_of.hpp>
-
-#include <k3dsdk/types.h>
-
+#include <k3dsdk/ilight_ri.h>
+#include <k3dsdk/ilight_shader_ri.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_gl.h>
 #include <k3dsdk/imaterial_ri.h>
-
-#include <k3dsdk/metadata.h>
-
-#include <gtkmm/drawingarea.h>
-#include <k3dsdk/fstream.h>
-#include <k3dsdk/system.h>
-
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/irender_camera_frame.h>
+#include <k3dsdk/irender_engine_ri.h>
+#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/iuser_property.h>
 #include <k3dsdk/log.h>
+#include <k3dsdk/metadata.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/command_arguments.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/entry.h>
+#include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/image_toggle_button.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/text.h>
+#include <k3dsdk/ngui/ui_component.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/nodes.h>
+#include <k3dsdk/path.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/share.h>
+#include <k3dsdk/system.h>
+#include <k3dsdk/system.h>
+#include <k3dsdk/transform.h>
+#include <k3dsdk/types.h>
+#include <k3dsdk/user_property_changed_signal.h>
+
+#include <boost/assign/list_of.hpp>
 #include <iostream>
 #include <sstream>
 #include <time.h>
-
-#include <k3dsdk/ngui/icons.h>
-#include <k3dsdk/icamera.h>
-#include <k3dsdk/irender_camera_frame.h>
-#include <k3dsdk/irender_engine_ri.h>
-#include <k3dsdk/iproperty.h>
-#include <k3dsdk/properties.h>
-#include <k3dsdk/iuser_property.h>
-#include <k3dsdk/user_property_changed_signal.h>
-#include <k3dsdk/transform.h>
-#include <k3dsdk/fstream.h>
-#include <k3dsdk/system.h>
-#include <k3dsdk/path.h>
-#include <k3dsdk/share.h>
-#include <k3dsdk/ilight_ri.h>
-#include <k3dsdk/ilight_shader_ri.h>
-#include <k3dsdk/itransform_sink.h>
 
 using namespace libk3dngui;
 using namespace k3d::data;
@@ -1973,7 +1962,6 @@ namespace module{
       public:
         panel() :
           baseContainer(false, 0),
-          ui_component("material_manager", 0),
           m_implementation(0)
         {
 
@@ -1986,7 +1974,7 @@ namespace module{
 
         void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
         {
-          ui_component::set_parent("material_manager", &Parent);
+	  k3d::command_tree().add(*this, "material_manager", &Parent);
 
           m_implementation = new mechanics::implementation(DocumentState, Parent);
 

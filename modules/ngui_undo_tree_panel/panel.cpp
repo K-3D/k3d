@@ -18,7 +18,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <k3d-i18n-config.h>
-
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/classes.h>
+#include <k3dsdk/command_tree.h>
+#include <k3dsdk/gl.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/idocument_plugin_factory.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/button.h>
 #include <k3dsdk/ngui/document_state.h>
@@ -26,16 +35,6 @@
 #include <k3dsdk/ngui/toolbar.h>
 #include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/ngui/undo_utility.h>
-
-#include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/classes.h>
-#include <k3dsdk/gl.h>
-#include <k3dsdk/ipipeline.h>
-#include <k3dsdk/idocument.h>
-#include <k3dsdk/idocument_plugin_factory.h>
-#include <k3dsdk/inode_collection.h>
-#include <k3dsdk/iuser_interface.h>
-#include <k3dsdk/module.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/utility.h>
@@ -459,7 +458,6 @@ class panel :
 public:
 	panel() :
 		base(false, 0),
-		ui_component("undo_tree", 0),
 		m_implementation(0)
 	{
 	}
@@ -471,7 +469,7 @@ public:
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-		ui_component::set_parent("undo_tree", &Parent);
+		k3d::command_tree().add(*this, "undo_tree", &Parent);
 
 		m_implementation = new detail::implementation(DocumentState, *this);
 

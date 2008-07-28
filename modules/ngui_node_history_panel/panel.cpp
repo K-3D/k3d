@@ -17,7 +17,6 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <k3d-i18n-config.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/menu.h>
@@ -25,6 +24,13 @@
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 
+#include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/command_tree.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/command_arguments.h>
 #include <k3dsdk/ngui/document_state.h>
@@ -33,12 +39,6 @@
 #include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/ui_component.h>
-
-#include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/ipipeline.h>
-#include <k3dsdk/inode_collection.h>
-#include <k3dsdk/iproperty_collection.h>
-#include <k3dsdk/module.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
@@ -414,7 +414,6 @@ class panel :
 public:
 	panel() :
 		base(false, 0),
-		ui_component("node_history", 0),
 		m_implementation(0)
 	{
 	}
@@ -426,7 +425,7 @@ public:
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-		ui_component::set_parent("node_history", &Parent);
+		k3d::command_tree().add(*this, "node_history", &Parent);
 
 		m_implementation = new detail::implementation(DocumentState);
 

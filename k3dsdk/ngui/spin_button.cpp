@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,10 +18,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the k3d::spin_button class, which provides a UI for numeric quantities
-		\author Tim Shead <tshead@k-3d.com>
-		\author Dan Erikson <derikson@montana.com>
-		\author Romain Behar <romainbehar@yahoo.com>
+	\author Tim Shead <tshead@k-3d.com>
+	\author Dan Erikson <derikson@montana.com>
+	\author Romain Behar <romainbehar@yahoo.com>
 */
 
 #include <gtkmm/arrow.h>
@@ -38,6 +37,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/imeasurement_property.h>
 #include <k3dsdk/inode.h>
@@ -229,9 +229,10 @@ public:
 
 control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
 	base(2, 8, true),
-	ui_component(Name, &Parent),
 	m_implementation(new implementation(Model, StateRecorder))
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	set_name("k3d-spin-button");
 
 	m_implementation->m_entry->set_name("entry");

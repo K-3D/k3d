@@ -171,19 +171,20 @@ void setup_default_hotkeys()
 // user_interface
 
 class user_interface :
-	public k3d::command_node::implementation,
+	public k3d::command_node,
 	public k3d::iuser_interface,
 	public k3d::ievent_loop,
 	public sigc::trackable
 {
-	typedef k3d::command_node::implementation base;
+	typedef k3d::command_node base;
 
 public:
 	user_interface() :
-		base("ui", 0),
 		m_show_learning_menu(options::nag("show_learning_menu")),
 		m_record_tutorials(false)
 	{
+		k3d::command_tree().add(*this, "ui", 0);
+
 		/// Redirect glib-based logging to our own standard logging mechanism
 		g_log_set_handler("", static_cast<GLogLevelFlags>(G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION), log_handler, 0);
 		g_log_set_handler("Gdk", static_cast<GLogLevelFlags>(G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION), log_handler, 0);

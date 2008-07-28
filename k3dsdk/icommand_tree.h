@@ -2,7 +2,7 @@
 #define K3DSDK_ICOMMAND_TREE_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,8 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares icommand_tree, an abstract interface for a directed graph of icommand_tree objects
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "icommand_node.h"
@@ -40,11 +39,11 @@ class icommand_tree :
 {
 public:
 	/// Adds a node to the tree, setting its name and parent node (top-level nodes have a NULL parent)
-	virtual void add(icommand_node& Node, const std::string& Name, icommand_node* const Parent) = 0;
+	virtual void add(icommand_node& Node, const string_t& Name, icommand_node* const Parent = 0) = 0;
 	/// Removes a node from the tree
 	virtual void remove(icommand_node& Node) = 0;
 	/// Returns a node's name
-	virtual const std::string name(icommand_node& Node) = 0;
+	virtual const string_t name(icommand_node& Node) = 0;
 	/// Returns a node's parent (could be NULL if it's a root node)
 	virtual icommand_node* parent(icommand_node& Node) = 0;
 
@@ -56,7 +55,7 @@ public:
 	virtual sigc::connection connect_changed_signal(const sigc::slot<void>& Slot) = 0;
 
 	/// Defines a signal for distributing K-3D commands to recorders
-	typedef sigc::signal<void, icommand_node&, const icommand_node::type, const std::string&, const std::string&> command_signal_t;
+	typedef sigc::signal<void, icommand_node&, const icommand_node::type, const string_t&, const string_t&> command_signal_t;
 	/// Returns a signal for distributing K-3D commands to recorders
 	virtual command_signal_t& command_signal() = 0;
 
@@ -70,5 +69,4 @@ protected:
 } // namespace k3d
 
 #endif // K3DSDK_ICOMMAND_TREE_H
-
 

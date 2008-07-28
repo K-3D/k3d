@@ -2,7 +2,7 @@
 #define K3DSDK_ICOMMAND_NODE_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,12 +21,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares icommand_node, an abstract interface for objects that can accept commands from external entities
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
-#include <string>
+#include "types.h"
 
 namespace k3d
 {
@@ -58,7 +57,7 @@ public:
 	} result;
 	
 	/// Executes a command, returning the command result
-	virtual const result execute_command(const std::string& Command, const std::string& Arguments) = 0;
+	virtual const result execute_command(const string_t& Command, const string_t& Arguments) = 0;
 
 protected:
 	icommand_node() {}

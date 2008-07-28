@@ -36,6 +36,7 @@
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/basic_math.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/ikeyframer.h>
 #include <k3dsdk/module.h>
@@ -895,7 +896,6 @@ class panel :
 public:
 	panel() :
 		base(false, 0),
-		ui_component("timeline", 0),
 		m_implementation(0)
 	{
 	}
@@ -907,7 +907,7 @@ public:
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-		ui_component::set_parent("timeline", &Parent);
+		k3d::command_tree().add(*this, "timeline", &Parent);
 
 		m_implementation = new detail::implementation(DocumentState, Parent);
 		

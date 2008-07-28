@@ -23,6 +23,7 @@
 
 #include "bitmap_preview.h"
 
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/properties.h>
 
 #include <gdkmm/pixbuf.h>
@@ -79,13 +80,14 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data)
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
 	base(Gtk::BUTTONBOX_START, 2),
-	ui_component(Name, &Parent),
 	m_image_buffer(64, 64),
 	m_alpha_buffer(64, 64),
 	m_image(new Gtk::Image()),
 	m_alpha(new Gtk::Image()),
 	m_data(Data)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	pack_start(*manage(m_image), Gtk::PACK_SHRINK);
 	pack_start(*manage(m_alpha), Gtk::PACK_SHRINK);
 

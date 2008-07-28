@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "application_window.h"
@@ -28,6 +28,7 @@
 #include "utility.h"
 #include "widget_manip.h"
 
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/types_ri.h>
 #include <k3dsdk/state_change_set.h>
@@ -206,10 +207,11 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 // control
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
-	ui_component(Name, &Parent),
 	m_area(new Gtk::DrawingArea()),
 	m_data(Data)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	m_area->signal_expose_event().connect(sigc::hide(sigc::mem_fun(*this, &control::on_redraw)));
 	add(*manage(m_area));
 

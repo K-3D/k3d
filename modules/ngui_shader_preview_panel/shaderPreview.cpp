@@ -33,7 +33,7 @@
 #include <gtk/gtkmain.h>
 
 #include <k3dsdk/ngui/spin_button.h>
-
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/command_arguments.h>
@@ -1031,7 +1031,6 @@ namespace module{
       public:
 	panel() :
           baseContainer(false, 0),
-          ui_component("material_preview", 0),
           m_implementation(0)
 	{
 	}
@@ -1043,7 +1042,7 @@ namespace module{
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-          ui_component::set_parent("material_preview", &Parent);
+	  k3d::command_tree().add(*this, "material_preview", &Parent);
 
           m_implementation = new mechanics::implementation(DocumentState, Parent);
 

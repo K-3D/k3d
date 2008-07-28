@@ -33,6 +33,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/classes.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/file_range.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
@@ -415,9 +416,10 @@ public:
 // control
 
 control::control(document_state& DocumentState, k3d::icommand_node& Parent) :
-	ui_component("viewport", &Parent),
 	m_implementation(new implementation(DocumentState))
 {
+	k3d::command_tree().add(*this, "viewport", &Parent);
+
 	m_implementation->m_camera.changed_signal().connect(sigc::mem_fun(*this, &control::on_camera_changed));
 	m_implementation->m_gl_engine.changed_signal().connect(sigc::mem_fun(*this, &control::on_gl_engine_changed));
 

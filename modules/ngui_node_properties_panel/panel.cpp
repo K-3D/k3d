@@ -20,6 +20,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iplugin_factory_collection.h>
@@ -318,7 +319,6 @@ class panel :
 
 public:
 	panel() :
-		ui_component("node_properties", 0),
 		m_implementation(0)
 	{
 	}
@@ -330,7 +330,7 @@ public:
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-		ui_component::set_parent("node_properties", &Parent);
+		k3d::command_tree().add(*this, "node_properties", &Parent);
 
 		m_implementation = new detail::implementation(DocumentState, *this);
 

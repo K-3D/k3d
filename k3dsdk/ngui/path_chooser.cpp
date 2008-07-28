@@ -29,6 +29,7 @@
 #include "path_chooser.h"
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/result.h>
@@ -124,13 +125,14 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
 	base(false, 0),
-	ui_component(Name, &Parent),
 	m_entry(new hotkey_entry),
 	m_button(new Gtk::Button("...")),
 	m_combo(new Gtk::ComboBox()),
 	m_data(Data),
 	m_disable_set_value(false)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	m_entry->signal_focus_out_event().connect(sigc::mem_fun(*this, &control::on_focus_out_event));
 	m_entry->signal_activate().connect(sigc::mem_fun(*this, &control::on_activate));
 

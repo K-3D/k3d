@@ -160,9 +160,10 @@ public:
 // control
 
 control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
-	ui_component(Name, &Parent),
 	m_implementation(new implementation(Model, StateRecorder))
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	if(Model)
 	{
 		Model->connect_changed(sigc::mem_fun(*this, &control::on_data_changed));

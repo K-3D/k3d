@@ -37,6 +37,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument.h>
@@ -107,13 +108,14 @@ struct sort_by_name
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data, std::auto_ptr<iselection_filter> Filter) :
 	base(false, 0),
-	ui_component(Name, &Parent),
 	m_data(Data),
 	m_filter(Filter),
 	m_label(new Gtk::Label()),
 	m_menu_button(new Gtk::Button()),
 	m_edit_button(new Gtk::Button())
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	m_menu_button->add(*Gtk::manage(m_label));
 	m_menu_button->signal_clicked().connect(sigc::mem_fun(*this, &control::on_choose));
 	pack_start(*manage(m_menu_button), Gtk::PACK_EXPAND_WIDGET);

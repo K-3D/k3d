@@ -38,11 +38,12 @@
 #include "utility.h"
 #include "widget_manip.h"
 
-#include <k3dsdk/color.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/color.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/idocument.h>
-#include <k3dsdk/iproperty.h>
 #include <k3dsdk/imesh_source.h>
+#include <k3dsdk/iproperty.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/properties.h>
@@ -58,11 +59,12 @@ namespace property_widget
 // control
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
-	ui_component(Name, &Parent),
 	m_data(Data),
 	m_show_connected(0),
 	m_disconnect(0)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	assert_warning(m_data.get());
 }
 

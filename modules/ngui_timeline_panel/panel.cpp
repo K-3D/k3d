@@ -18,7 +18,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <k3d-i18n-config.h>
-
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/command_tree.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/button.h>
 #include <k3dsdk/ngui/document_state.h>
@@ -27,11 +31,6 @@
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/ngui/utility.h>
-
-#include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/basic_math.h>
-#include <k3dsdk/data.h>
-#include <k3dsdk/module.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/time_source.h>
@@ -503,7 +502,6 @@ class panel :
 public:
 	panel() :
 		base(false, 0),
-		ui_component("timeline", 0),
 		m_implementation(0)
 	{
 	}
@@ -515,7 +513,7 @@ public:
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-		ui_component::set_parent("timeline", &Parent);
+		k3d::command_tree().add(*this, "timeline", &Parent);
 
 		m_implementation = new detail::implementation(DocumentState, Parent);
 		

@@ -27,6 +27,7 @@
 
 #include <k3dsdk/application.h>
 #include <k3dsdk/batch_mode.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/iapplication.h>
 
 #include <gtkmm/dialog.h>
@@ -39,9 +40,10 @@ namespace libk3dngui
 // savable_application_window
 
 savable_application_window::savable_application_window(const k3d::string_t& Name, k3d::icommand_node* const Parent) :
-	base(Gtk::WINDOW_TOPLEVEL),
-	ui_component(Name, Parent)
+	base(Gtk::WINDOW_TOPLEVEL)
 {
+	k3d::command_tree().add(*this, Name, Parent);
+
 	application_state::instance().connect_safe_close_signal(sigc::mem_fun(*this, &savable_application_window::on_safe_close));
 	k3d::application().connect_close_signal(sigc::mem_fun(*this, &savable_application_window::close));
 }
@@ -127,3 +129,4 @@ void savable_application_window::on_close()
 }
 
 } // namespace libk3dngui
+

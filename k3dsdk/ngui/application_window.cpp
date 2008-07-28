@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "application_state.h"
@@ -26,6 +26,7 @@
 
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/application.h>
+#include <k3dsdk/command_tree.h>
 
 #include <gdk/gdkkeysyms.h>
 
@@ -36,9 +37,9 @@ namespace libk3dngui
 // application_window
 
 application_window::application_window(const std::string& Name, k3d::icommand_node* const Parent) :
-	base(Gtk::WINDOW_TOPLEVEL),
-	ui_component(Name, Parent)
+	base(Gtk::WINDOW_TOPLEVEL)
 {
+	k3d::command_tree().add(*this, Name, Parent);
 	k3d::application().connect_close_signal(sigc::mem_fun(*this, &application_window::close));
 }
 

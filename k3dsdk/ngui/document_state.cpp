@@ -1105,10 +1105,11 @@ public:
 		m_move_tool(0),
 		m_rotate_tool(0),
 		m_scale_tool(0),
-		m_context_menu_node("context_menu", dynamic_cast<k3d::icommand_node*>(&Document)),
 		m_context_menu(0),
 		m_node_selection(0)
 	{
+		k3d::command_tree().add(m_context_menu_node, "context_menu", dynamic_cast<k3d::icommand_node*>(&Document));
+
 		m_selection_mode.connect_explicit_change_signal(sigc::mem_fun(*this, &implementation::on_selection_mode_changed));
 
 		// Process remove_nodes_signal
@@ -1915,7 +1916,7 @@ public:
 	std::map<k3d::string_t, tool*> m_tools;
 
 	/// Placeholder that "groups" context menu command nodes together
-	k3d::command_node::implementation m_context_menu_node;
+	k3d::command_node m_context_menu_node;
 	/// Document wide context menu
 	Gtk::Menu* m_context_menu;
 

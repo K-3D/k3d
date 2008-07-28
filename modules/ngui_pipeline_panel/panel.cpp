@@ -21,27 +21,26 @@
 	\author Timothy M. Shead
 */
 
-#include <k3d-i18n-config.h>
-
 #include "document_to_graph.h"
 #include "edge_indices.h"
 #include "extract_tree.h"
 #include "tree_layout.h"
 
-#include <k3dsdk/ngui/basic_input_model.h>
-#include <k3dsdk/ngui/document_state.h>
-#include <k3dsdk/ngui/file_chooser_dialog.h>
-#include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/ui_component.h>
-
+#include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/color.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/graph.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/named_array_operations.h>
+#include <k3dsdk/ngui/basic_input_model.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/pipeline.h>
@@ -109,7 +108,6 @@ class panel :
 {
 public:
 	panel() :
-		ui_component("pipeline", 0),
 		m_save_png("Save PNG"),
 		m_save_pdf("Save PDF"),
 		m_save_ps("Save PS"),
@@ -159,7 +157,7 @@ public:
 
 	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-		ui_component::set_parent("pipeline", &Parent);
+		k3d::command_tree().add(*this, "pipeline", &Parent);
 		m_document_state = &DocumentState;
 	
 		m_create_graph.reset(new document_to_graph(DocumentState.document()));

@@ -44,9 +44,9 @@ tool::tool() :
 }
 
 tool::tool(document_state& DocumentState, const k3d::string_t& Name) :
-	base(Name, dynamic_cast<k3d::icommand_node*>(&DocumentState.document())),
 	m_document_state(&DocumentState)
 {
+	k3d::command_tree().add(*this, Name, dynamic_cast<k3d::icommand_node*>(&DocumentState.document()));
 }
 
 tool::~tool()
@@ -57,6 +57,7 @@ void tool::initialize(document_state& DocumentState)
 {
 	// This should never be called more-than-once ...
 	assert(!m_document_state);
+
 	m_document_state = &DocumentState;
 	on_initialize(DocumentState);
 }

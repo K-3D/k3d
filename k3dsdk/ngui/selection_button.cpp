@@ -27,6 +27,7 @@
 #include "utility.h"
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/state_change_set.h>
 
@@ -90,12 +91,13 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
 	base(false, 0),
-	ui_component(Name, &Parent),
 	m_data(Data),
 	m_select_all_button(new Gtk::Button(_("Select All"))),
 	m_deselect_all_button(new Gtk::Button(_("Deselect All"))),
 	m_select_null_button(new Gtk::Button(_("Clear")))
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	set_name("k3d-selection-button");
 
 	m_select_all_button->signal_clicked().connect(sigc::mem_fun(*this, &control::on_select_all));

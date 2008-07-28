@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,10 +18,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "statusbar.h"
+#include <k3dsdk/command_tree.h>
 
 namespace libk3dngui
 {
@@ -33,9 +34,9 @@ namespace statusbar
 // control
 
 control::control(k3d::icommand_node& Parent, const std::string& Name) :
-	base(),
-	ui_component(Name, &Parent)
+	base()
 {
+	k3d::command_tree().add(*this, Name, &Parent);
 }
 
 } // namespace statusbar

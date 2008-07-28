@@ -22,7 +22,12 @@
 */
 
 #include <k3d-i18n-config.h>
-
+#include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/command_tree.h>
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/ipath_property.h>
+#include <k3dsdk/iselectable.h>
+#include <k3dsdk/module.h>
 #include <k3dsdk/ngui/button.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/icons.h>
@@ -35,13 +40,7 @@
 #include <k3dsdk/ngui/transform.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/ngui/widget_manip.h>
-
-#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/plugins.h>
-#include <k3dsdk/fstream.h>
-#include <k3dsdk/ipath_property.h>
-#include <k3dsdk/iselectable.h>
-#include <k3dsdk/module.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/utility_gl.h>
@@ -495,7 +494,6 @@ class panel :
 public:
 	panel() :
 		base(false, 0),
-		ui_component("toolbar", 0),
 		m_implementation(0)
 	{
 	}
@@ -507,7 +505,7 @@ public:
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-		ui_component::set_parent("toolbar", &Parent);
+		k3d::command_tree().add(*this, "toolbar", &Parent);
 
 		m_implementation = new detail::implementation(DocumentState, *this);
 		

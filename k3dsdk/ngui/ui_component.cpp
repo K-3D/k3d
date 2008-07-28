@@ -33,8 +33,7 @@ namespace libk3dngui
 ////////////////////////////////////////////////////////////////////////////////////////
 // ui_component
 
-ui_component::ui_component(const std::string& Name, k3d::icommand_node* const Parent) :
-	base(Name, Parent),
+ui_component::ui_component() :
 	m_enable_recording(true)
 {
 }

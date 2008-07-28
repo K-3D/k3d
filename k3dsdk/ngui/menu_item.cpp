@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,15 +18,15 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "interactive.h"
 #include "menu_item.h"
-//#include "utility.h"
+
+#include <k3dsdk/command_tree.h>
 
 #include <gtkmm/menu.h>
-//#include <gtkmm/stockitem.h>
 
 #include <iostream>
 
@@ -40,23 +40,26 @@ namespace menu_item
 // control
 
 control::control(k3d::icommand_node& Parent, const std::string& Name) :
-	base(),
-	ui_component(Name, &Parent)
+	base()
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	set_name("k3d-menu-item");
 }
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, Gtk::Widget& Widget) :
-	base(Widget),
-	ui_component(Name, &Parent)
+	base(Widget)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	set_name("k3d-menu-item");
 }
 
 control::control(k3d::icommand_node& Parent, const std::string& Name, const Glib::ustring& label, bool mnemonic) :
-	base(label, mnemonic),
-	ui_component(Name, &Parent)
+	base(label, mnemonic)
 {
+	k3d::command_tree().add(*this, Name, &Parent);
+
 	set_name("k3d-menu-item");
 }
 
@@ -80,5 +83,4 @@ void control::on_activate()
 } // namespace menu_item
 
 } // namespace libk3dngui
-
 

@@ -45,9 +45,9 @@ namespace viewport { class control; }
 
 /// Abstract base class for Tools - objects that generate state changes based on user interaction with viewports
 class tool :
-	public k3d::command_node::implementation
+	public k3d::command_node
 {
-	typedef k3d::command_node::implementation base;
+	typedef k3d::command_node base;
 
 public:
 	virtual ~tool();

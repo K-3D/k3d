@@ -133,7 +133,6 @@ class panel :
 
 public:
 	panel() :
-		ui_component("tool_properties", 0),
 		m_implementation(0)
 	{
 	}
@@ -145,7 +144,7 @@ public:
 
 	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
-		ui_component::set_parent("tool_properties", &Parent);
+		k3d::command_tree().add(*this, "tool_properties", &Parent);
 
 		m_implementation = new detail::implementation(DocumentState, *this);
 

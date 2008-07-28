@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,11 +18,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "document_window.h"
 #include "document_state.h"
+
+#include <k3dsdk/command_tree.h>
 
 #include <gdk/gdkkeysyms.h>
 
@@ -34,9 +36,10 @@ namespace libk3dngui
 
 document_window::document_window(document_state& Document, const std::string& Name) :
 	base(Gtk::WINDOW_TOPLEVEL),
-	ui_component(Name, dynamic_cast<k3d::icommand_node*>(&Document.document())),
 	m_document(Document)
 {
+	k3d::command_tree().add(*this, Name, dynamic_cast<k3d::icommand_node*>(&Document.document()));
+
 	Document.document().close_signal().connect(sigc::mem_fun(*this, &document_window::close));
 }
 

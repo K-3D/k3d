@@ -31,14 +31,14 @@ namespace libk3dngui
 //////////////////////////////////////////////////////////////////////////////////////////
 // ui_component
 
-/// Base-class for user interface components that makes them part of the command tree and provides other, standard behavior
+/// Base-class for user interface components that makes them command-nodes and provides other, standard behavior
 class ui_component :
-	public k3d::command_node::implementation
+	public k3d::command_node
 {
-	typedef k3d::command_node::implementation base;
+	typedef k3d::command_node base;
 
 public:
-	ui_component(const std::string& Name, k3d::icommand_node* const Parent);
+	ui_component();
 	virtual ~ui_component();
 
 	/// Records an interactive tutorial event (ignored if recording is disabled)
