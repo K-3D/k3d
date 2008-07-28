@@ -41,6 +41,7 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/gprim_factory.h>
+#include <deque>
 
 #include "nurbs_patch_modifier.h"
 
@@ -75,7 +76,7 @@ namespace module{
                 int find_span(size_t curve,double u);
                 std::vector<double> basis_functions(size_t curve, double u, size_t span);
                 k3d::point4 curve_point(size_t curve,double u);
-                void curve_knot_insertion(size_t curve,double u, size_t r);
+                bool curve_knot_insertion(size_t curve,double u, size_t r);
                 void close_curve(size_t curve,bool keep_ends);
                 int curve_degree_elevate(size_t curve);
                 k3d::point4 get_homogenous_point(size_t point);

@@ -984,7 +984,7 @@ namespace module
             Implementation of Algorithm "CurveKnotInsertion" from
             "The NURBS book", page 151, by Piegl and Tiller
         */
-        void nurbs_curve_modifier::curve_knot_insertion(size_t curve, double u, size_t r)
+        bool nurbs_curve_modifier::curve_knot_insertion(size_t curve, double u, size_t r)
         {
             try
             {
@@ -1045,7 +1045,7 @@ namespace module
                         //we had a knot that was already inserted too often, so dont insert it again
                         new_r = 0;
                         k3d::log() << error << "We're not going to insert the knot at all" << std::endl;
-                        return;
+                        return false;
                     }
                     r = new_r;
                     if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Reducing r to the maximum possible value " << r << std::endl;
@@ -1155,7 +1155,7 @@ namespace module
                 for ( size_t curr_curve = 0; curr_curve < count_all_curves_in_groups(); curr_curve++)
                 {
                     if (curve_first_knots->at(curr_curve) > curve_first_knots->at(curve))
-                        curve_first_knots->at(curr_curve) -= knot_offset;
+                        curve_first_knots->at(curr_curve) += knot_offset;
                 }
 
                 if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Inserting points" << std::endl;
@@ -1207,7 +1207,7 @@ namespace module
                 for ( size_t curr_curve = 0; curr_curve < count_all_curves_in_groups(); curr_curve++)
                 {
                     if (curve_first_points->at(curr_curve) > curve_first_points->at(curve))
-                        curve_first_points->at(curr_curve) -= point_offset;
+                        curve_first_points->at(curr_curve) += point_offset;
                 }
 
                 curve_point_counts->at(curve) += point_offset;
@@ -1215,10 +1215,12 @@ namespace module
                 remove_unused_points();
 
                 if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Inserted " << knot_offset << " knots and " << point_offset << " points!" << std::endl;
+                return true;
             }
             catch (...)
             {
                 k3d::log() << error << "Tried to access nonexisting value in a std::vector" <<std::endl;
+                return false;
             }
         }
 
@@ -1920,6 +1922,8 @@ namespace module
                 {
                     k3d::mesh::knots_t::iterator position = new_knot_vector.begin();
 
+                    normalize_knot_vector(curves.at(i));
+
                     const size_t curve_points_begin = curve_first_points->at(curves.at(i));
                     const size_t curve_points_end = curve_points_begin + curve_point_counts->at(curves.at(i));
 
@@ -1977,10 +1981,13 @@ namespace module
                         else
                         {
                             //insert the missing knot
-                            curve_knot_insertion(curves.at(i), new_knot_vector.at(k), 1);
+                            if(!curve_knot_insertion(curves.at(i), new_knot_vector.at(k), 1))
+                            {
+                                MY_DEBUG << "Tried to insert existing knot, something went wrong" << std::endl;
+                                break;
+                            }
                             k=0; //start looking again as knot vector changed?
                         }
-
                     }
                 }
             }
@@ -2006,7 +2013,7 @@ namespace module
                 diff = order - curve_orders->at(curve2);
                 for (int i = 0; i < diff; i++)
                 {
-                    curve_degree_elevate(curve1);
+                    curve_degree_elevate(curve2);
                 }
 
                 std::vector<size_t> curves;
@@ -2168,41 +2175,40 @@ namespace module
                 centers.push_back(k3d::vector3(c[0],c[1],c[2]));
             }
 
-            //order by distance
-            std::vector<std::vector<double> > distance_matrix;
-            std::vector<size_t> ordered_by_distance;
+            //order along y axis
+            std::deque<size_t> ordered_by_y;
 
-            for(int i = 0; i < curves.size(); i++)
+            ordered_by_y.push_back(0);
+
+            for(int i = 1; i < curves.size(); i++)
             {
-                std::vector<double> distances;
-                for(int j = 0; j < curves.size(); j++)
+                if(centers.at(ordered_by_y.back())[1] < centers.at(i)[1])
                 {
-                    distances.push_back(k3d::vector3(centers.at(i) - centers.at(j)).length());
+                    ordered_by_y.push_back(i);
                 }
-
-                distance_matrix.push_back(distances);
-            }
-
-            for(int i = 0; i < curves.size(); i++)
-            {
-                int shortest = 0;
-                for(int j = 0; j < curves.size(); j++)
+                else if(centers.at(ordered_by_y.front())[1] > centers.at(i)[1])
                 {
-                    if(distance_matrix.at(i).at(j) < distance_matrix.at(i).at(shortest) || std::find(ordered_by_distance.begin(),ordered_by_distance.end(),shortest) != ordered_by_distance.end())
+                    ordered_by_y.push_front(i);
+                }
+                else
+                {
+                    int j = 0;
+                    while(j < ordered_by_y.size() && centers.at(ordered_by_y.at(j))[1] < centers.at(i)[1])
                     {
-                        shortest = j;
+                        j++;
                     }
+                    std::deque<size_t>::iterator iter = ordered_by_y.begin() + j;
+                    ordered_by_y.insert(iter, i);
                 }
-                ordered_by_distance.push_back(shortest);
             }
 
             //create surface
             nurbs_patch skin;
             std::vector<nurbs_curve> rips;
 
-            for(int i = 0; i < ordered_by_distance.size(); i++)
+            for(int i = 0; i < ordered_by_y.size(); i++)
             {
-                rips.push_back(extract_curve(ordered_by_distance.at(i)));
+                rips.push_back(extract_curve(ordered_by_y.at(i)));
             }
 
             skin.u_order = rips.front().curve_knots.size() - rips.front().control_points.size();
@@ -2211,7 +2217,7 @@ namespace module
 
             skin.v_knots.push_back(0);
             skin.v_knots.push_back(0);
-            for(int i = 0; i < ordered_by_distance.size() - 1; i++)
+            for(int i = 0; i < ordered_by_y.size() - 1; i++)
             {
                 skin.v_knots.push_back(i);
             }
