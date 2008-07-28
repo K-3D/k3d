@@ -59,10 +59,11 @@ class dialog :
 
 public:
 	dialog(const k3d::filesystem::path& Path) :
-		base("test_case_recorder", 0),
 		m_script_engine(k3d::plugin::create<k3d::iscript_engine>(k3d::classes::PythonEngine())),
 		m_stream(Path)
 	{
+		k3d::command_tree().add(*this, "test_case_recorder");
+
 		assert_warning(m_script_engine);
 
 		if(m_script_engine)

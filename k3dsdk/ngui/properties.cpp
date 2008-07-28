@@ -30,6 +30,7 @@
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/ipersistent_collection.h>
@@ -74,8 +75,8 @@ class create_dialog :
 	typedef node_window base;
 
 public:
-	create_dialog(k3d::inode& Object, k3d::icommand_node& Parent) :
-		base(Object, Parent, "add_user_property"),
+	create_dialog(k3d::inode& Node, k3d::icommand_node& Parent) :
+		base(Node),
 		m_property_type(init_owner(*this) + init_name("property_type") + init_label("") + init_description("") + init_value(string_t("generic_property")) + init_enumeration(property_type_values())),
 		m_name(init_value(string_t(""))),
 		m_label(init_value(string_t(""))),
@@ -98,6 +99,8 @@ public:
 		m_name_control(0),
 		m_renderman_name_control(0)
 	{
+		k3d::command_tree().add(*this, "add_user_property", &Parent);
+
 		set_title(_("Add User Property:"));
 		set_role("add_user_property");
 		set_position(Gtk::WIN_POS_CENTER);

@@ -23,6 +23,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/log_control.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
@@ -54,9 +55,10 @@ class dialog :
 
 public:
 	dialog() :
-		base("log_window", 0),
 		console(Gtk::manage(new console::control(*this, "console")))
 	{
+		k3d::command_tree().add(*this, "log_window");
+
 		critical_tag = Gtk::TextTag::create("critical");
 		critical_tag->property_foreground() = "#ff0000";
 		critical_tag->property_weight() = Pango::WEIGHT_BOLD;

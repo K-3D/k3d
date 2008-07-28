@@ -38,25 +38,31 @@ namespace libk3dngui
 /////////////////////////////////////////////////////////////////////////////
 // savable_document_window
 
-savable_document_window::savable_document_window(document_state& Document, const k3d::string_t& Name) :
+savable_document_window::savable_document_window() :
 	base(Gtk::WINDOW_TOPLEVEL),
-	m_document(Document)
+	m_document(0)
 {
-	k3d::command_tree().add(*this, Name, dynamic_cast<k3d::icommand_node*>(&Document.document()));
-
 	application_state::instance().connect_safe_close_signal(sigc::mem_fun(*this, &savable_document_window::on_safe_close));
-	m_document.connect_safe_close_signal(sigc::mem_fun(*this, &savable_document_window::on_safe_close));
-
-	m_document.document().close_signal().connect(sigc::mem_fun(*this, &savable_document_window::close));
 }
 
 savable_document_window::~savable_document_window()
 {
 }
 
+void savable_document_window::initialize(document_state& Document)
+{
+	assert(!m_document);
+
+	m_document = &Document;
+
+	m_document->connect_safe_close_signal(sigc::mem_fun(*this, &savable_document_window::on_safe_close));
+	m_document->document().close_signal().connect(sigc::mem_fun(*this, &savable_document_window::close));
+}
+
 k3d::idocument& savable_document_window::document()
 {
-	return m_document.document();
+	assert(m_document);
+	return m_document->document();
 }
 
 k3d::bool_t savable_document_window::on_key_press_event(GdkEventKey* event)

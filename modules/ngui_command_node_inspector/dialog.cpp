@@ -65,9 +65,10 @@ class dialog :
 	typedef application_window base;
 
 public:
-	dialog() :
-		base("command_node_inspector", 0)
+	dialog()
 	{
+		k3d::command_tree().add(*this, "command_node_inspector");
+
 		m_node_store = Gtk::TreeStore::create(m_node_columns);
 
 		set_title(_("Command Node Inspector"));

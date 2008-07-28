@@ -36,10 +36,9 @@ namespace libk3dngui
 /////////////////////////////////////////////////////////////////////////////
 // application_window
 
-application_window::application_window(const std::string& Name, k3d::icommand_node* const Parent) :
+application_window::application_window() :
 	base(Gtk::WINDOW_TOPLEVEL)
 {
-	k3d::command_tree().add(*this, Name, Parent);
 	k3d::application().connect_close_signal(sigc::mem_fun(*this, &application_window::close));
 }
 

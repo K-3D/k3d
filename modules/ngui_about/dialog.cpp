@@ -21,6 +21,7 @@
 #include <k3d-version-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/contributors.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/button.h>
@@ -63,9 +64,10 @@ class dialog :
 	typedef libk3dngui::application_window base;
 
 public:
-	dialog() :
-		base("about_box", 0)
+	dialog()
 	{
+		k3d::command_tree().add(*this, "about_box");
+
 		set_title(_("About K-3D"));
 		set_role("about_box");
 		set_position(Gtk::WIN_POS_CENTER);

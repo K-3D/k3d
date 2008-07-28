@@ -71,9 +71,10 @@ class dialog :
 
 public:
 	dialog() :
-		base("event_recorder", 0),
 		m_stream(k3d::log())
 	{
+		k3d::command_tree().add(*this, "event_recorder");
+
 		Gtk::Label* const label = new Gtk::Label(_("Recording GTK+ events and K-3D commands to stderr ...\nClose window to cancel recording"));
 		add(*Gtk::manage(label));
 

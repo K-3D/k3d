@@ -59,9 +59,10 @@ class color_selection_dialog:
 
 public:
 	color_selection_dialog(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
-		base(Name, &Parent),
 		m_data(Data)
 	{
+		k3d::command_tree().add(*this, Name, &Parent);
+
 		Gtk::VBox* const vbox = new Gtk::VBox(false);
 		add(*manage(vbox));
 

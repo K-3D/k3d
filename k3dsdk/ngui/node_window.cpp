@@ -50,12 +50,10 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // node_window
 
-node_window::node_window(k3d::inode& Node, k3d::icommand_node& Parent, const std::string& Name) :
+node_window::node_window(k3d::inode& Node) :
 	base(Gtk::WINDOW_TOPLEVEL),
 	m_implementation(new implementation(Node))
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	Node.deleted_signal().connect(sigc::mem_fun(*this, &node_window::close));
 }
 
@@ -69,7 +67,7 @@ k3d::inode& node_window::node()
 	return m_implementation->m_node;
 }
 
-bool node_window::on_key_press_event(GdkEventKey* event)
+k3d::bool_t node_window::on_key_press_event(GdkEventKey* event)
 {
 	if(event->keyval == GDK_Escape)
 	{
@@ -81,14 +79,14 @@ bool node_window::on_key_press_event(GdkEventKey* event)
 	return base::on_key_press_event(event);
 }
 
-bool node_window::on_delete_event(GdkEventAny* event)
+k3d::bool_t node_window::on_delete_event(GdkEventAny* event)
 {
 	record_command("close_window");
 	safe_close();
 	return true;
 }
 
-bool node_window::safe_to_close()
+k3d::bool_t node_window::safe_to_close()
 {
 	return on_safe_to_close();
 }
@@ -110,7 +108,7 @@ void node_window::close()
 	delete this;
 }
 
-bool node_window::on_safe_to_close()
+k3d::bool_t node_window::on_safe_to_close()
 {
 	return true;
 }
@@ -119,7 +117,7 @@ void node_window::on_close()
 {
 }
 
-const k3d::icommand_node::result node_window::execute_command(const std::string& Command, const std::string& Arguments)
+const k3d::icommand_node::result node_window::execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 {
 	if(Command == "close_window")
 	{

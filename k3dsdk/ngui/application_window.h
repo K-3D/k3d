@@ -42,7 +42,7 @@ class application_window :
 	typedef Gtk::Window base;
 
 public:
-	application_window(const std::string& Name, k3d::icommand_node* const Parent);
+	application_window();
 	virtual ~application_window() {}
 
 	bool on_key_press_event(GdkEventKey* event);

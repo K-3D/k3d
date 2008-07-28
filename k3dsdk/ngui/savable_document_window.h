@@ -48,8 +48,11 @@ class savable_document_window :
 	typedef Gtk::Window base;
 
 public:
-	savable_document_window(document_state& Document, const k3d::string_t& Name);
+	savable_document_window();
 	virtual ~savable_document_window();
+
+	/// Called once after startup to complete initialization (we do this in a separate method for plugins that can't take constructor arguments).
+	void initialize(document_state& Document);
 
 	k3d::idocument& document();
 
@@ -69,7 +72,7 @@ private:
 	/// Override in derived classes to handle cleanup when the window is closed
 	virtual void on_close();
 
-	document_state& m_document;
+	document_state* m_document;
 };
 
 } // namespace libk3dngui

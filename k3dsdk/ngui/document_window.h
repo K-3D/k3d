@@ -46,7 +46,7 @@ class document_window :
 	typedef Gtk::Window base;
 
 public:
-	document_window(document_state& Document, const std::string& Name);
+	document_window(document_state& Document);
 	~document_window() {}
 
 	k3d::idocument& document();

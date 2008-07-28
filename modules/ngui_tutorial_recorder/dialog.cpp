@@ -84,13 +84,14 @@ class dialog :
 
 public:
 	dialog() :
-		base("tutorial_recorder", 0),
 		m_script_engine(k3d::plugin::create<k3d::iscript_engine>(k3d::classes::K3DScriptEngine())),
 		m_compression(true),
 		m_unsaved_changes(false),
 		m_recording(init_name("recording") + init_label(_("Recording")) + init_description(_("Tells whether the tutorial recorder records user actions")) + init_value(true)),
 		m_running(false)
 	{
+		k3d::command_tree().add(*this, "tutorial_recorder", 0);
+
 		k3d::ngui::tutorial::recording_started();
 
 		assert_warning(m_script_engine);

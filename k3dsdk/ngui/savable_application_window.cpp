@@ -39,11 +39,9 @@ namespace libk3dngui
 /////////////////////////////////////////////////////////////////////////////
 // savable_application_window
 
-savable_application_window::savable_application_window(const k3d::string_t& Name, k3d::icommand_node* const Parent) :
+savable_application_window::savable_application_window() :
 	base(Gtk::WINDOW_TOPLEVEL)
 {
-	k3d::command_tree().add(*this, Name, Parent);
-
 	application_state::instance().connect_safe_close_signal(sigc::mem_fun(*this, &savable_application_window::on_safe_close));
 	k3d::application().connect_close_signal(sigc::mem_fun(*this, &savable_application_window::close));
 }

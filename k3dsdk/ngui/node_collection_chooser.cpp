@@ -67,12 +67,13 @@ class list_window :
 {
 public:
 	list_window(k3d::icommand_node* const Parent, const k3d::string_t& Name, const boost::shared_ptr<imodel>& Model, k3d::istate_recorder* StateRecorder) :
-		application_window(Name, Parent),
 		m_model(Model),
 		m_state_recorder(StateRecorder),
 		m_block_update(false),
 		m_block_toggle(false)
 	{
+		k3d::command_tree().add(*this, Name, Parent);
+
 		set_title(m_model->label());
 		set_role("node_collection_chooser");
 		resize(400, 400);

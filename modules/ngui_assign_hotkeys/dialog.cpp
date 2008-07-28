@@ -23,6 +23,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/ngui/application_state.h>
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/button.h>
@@ -54,9 +55,10 @@ class dialog :
 {
 	typedef application_window base;
 public:
-	dialog() :
-		base("assign_hotkeys", 0)
+	dialog()
 	{
+		k3d::command_tree().add(*this, "assign_hotkeys");
+
 		is_open = true;
 
 		set_title(_("Assign Hotkeys:"));

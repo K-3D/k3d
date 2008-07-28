@@ -73,8 +73,9 @@ class floating_window :
 
 public:
 	floating_window(document_state& Document) :
-		base(Document, "floating_window")
+		base(Document)
 	{
+		k3d::command_tree().add(*this, "floating_window", dynamic_cast<k3d::icommand_node*>(&Document.document()));
 	}
 };
 

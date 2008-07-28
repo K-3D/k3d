@@ -44,7 +44,7 @@ class savable_application_window :
 	typedef Gtk::Window base;
 
 public:
-	savable_application_window(const k3d::string_t& Name, k3d::icommand_node* const Parent);
+	savable_application_window();
 	virtual ~savable_application_window();
 
 	k3d::bool_t on_key_press_event(GdkEventKey* event);

@@ -42,6 +42,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
+#include <k3dsdk/command_tree.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
@@ -69,10 +70,13 @@ class script_editor :
 
 public:
 	script_editor(document_state& Document) :
-		base(Document, "script_editor"),
 		m_unsaved_changes(false),
 		m_running(false)
 	{
+		base::initialize(Document);
+
+		k3d::command_tree().add(*this, "script_editor", dynamic_cast<k3d::icommand_node*>(&Document.document()));
+
 		menubar::control* const menubar = new menubar::control(*this, "menus");
 
 		Gtk::Menu* const menu_file = new Gtk::Menu();

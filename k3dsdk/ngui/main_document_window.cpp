@@ -381,7 +381,6 @@ class main_document_window :
 
 public:
 	main_document_window(document_state& DocumentState) :
-		base(DocumentState, "window"),
 		k3d::property_collection(),
 		m_tutorial_panel(*this),
 		m_statusbar(*this, "statusbar"),
@@ -401,6 +400,10 @@ public:
 		m_layout_kill_panel(0),
 		m_document_state(DocumentState)
 	{
+		base::initialize(DocumentState);
+
+		k3d::command_tree().add(*this, "window", dynamic_cast<k3d::icommand_node*>(&DocumentState.document()));
+
 		++m_count;
 
 		document().title().property_changed_signal().connect(sigc::mem_fun(*this, &main_document_window::on_document_title_changed));

@@ -44,26 +44,26 @@ class node_window :
 	typedef Gtk::Window base;
 
 public:
-	node_window(k3d::inode& Node, k3d::icommand_node& Parent, const std::string& Name);
+	node_window(k3d::inode& Node);
 	virtual ~node_window();
 
 	k3d::inode& node();
 
-	bool on_key_press_event(GdkEventKey* event);
-	bool on_delete_event(GdkEventAny* event);
+	k3d::bool_t on_key_press_event(GdkEventKey* event);
+	k3d::bool_t on_delete_event(GdkEventAny* event);
 
 	/// Call to determine whether it is safe to close the window
-	bool safe_to_close();
+	k3d::bool_t safe_to_close();
 	/// Closes the window safely, giving derived classes a chance to cancel
 	void safe_close();
 	/// Closes the window
 	void close();
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
+	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments);
 
 private:
 	/// Override in derived classes to determine whether it is safe to close the window
-	virtual bool on_safe_to_close();
+	virtual k3d::bool_t on_safe_to_close();
 	/// Override in derived classes to handle cleanup when the window is closed
 	virtual void on_close();
 

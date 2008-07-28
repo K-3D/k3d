@@ -24,8 +24,6 @@
 #include "document_window.h"
 #include "document_state.h"
 
-#include <k3dsdk/command_tree.h>
-
 #include <gdk/gdkkeysyms.h>
 
 namespace libk3dngui
@@ -34,12 +32,10 @@ namespace libk3dngui
 /////////////////////////////////////////////////////////////////////////////
 // document_window
 
-document_window::document_window(document_state& Document, const std::string& Name) :
+document_window::document_window(document_state& Document) :
 	base(Gtk::WINDOW_TOPLEVEL),
 	m_document(Document)
 {
-	k3d::command_tree().add(*this, Name, dynamic_cast<k3d::icommand_node*>(&Document.document()));
-
 	Document.document().close_signal().connect(sigc::mem_fun(*this, &document_window::close));
 }
 
