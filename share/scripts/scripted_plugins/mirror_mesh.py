@@ -1,7 +1,7 @@
 #python
 # k3d:plugin-class="application"
 # k3d:plugin-type="ActionScript"
-# k3d:plugin-name="Weld Mirror and Original"
+# k3d:plugin-name="Mirror and Weld"
 # ngui:action=""
 
 import k3d
@@ -12,7 +12,7 @@ class MirrorMesh:
 		At the creation time the Mirror objects are created, there is no need to call a method later.
 		(actually is just like calling a function
 		Usage:
-		MirrorMesh(document, mesh_instance, new_node="reuse", new_mesh_instance_sufix="")
+		MirrorMesh(document, mesh_instance, axis="x", new_node="reuse", new_mesh_instance_sufix=" plus Mirror")
 		There are two ways of mirroring:
 	 		-reusing the same instance (thus eliminating the option of
 			keep modifying the original half of object) Example:
@@ -22,12 +22,13 @@ class MirrorMesh:
 				temp_unnecessary_object = MirrorMesh(Document, node, "new", " plus Mirror")
 				#where "Mirror" is the sufix of the new created instances
 	"""
-	def __init__(self, document, mesh_instance, new_node="reuse", new_mesh_instance_sufix=" plus Mirror"):
+	def __init__(self, document, mesh_instance, axis="x", new_node="reuse", new_mesh_instance_sufix=" Mirror and Weld"):
 		self.doc = document
 		self.mesh_instance = mesh_instance
 		if new_node ==  "new":
 			self.new_mesh_instance_sufix = new_mesh_instance_sufix
 			self.create_new_mesh_instance()
+		self.axis = axis
 		
 		self.create_nodes()
 		self.mesh_instance_child = self.get_child(self.mesh_instance)
@@ -68,9 +69,16 @@ class MirrorMesh:
 		self.doc.set_dependency(node1.get_property(property1), node2.get_property(property2))
 	def set_mirror_matrix(self):
 		matrix = self.frozen_matrix.matrix
-		row = matrix[0]; row[0] = -1; matrix[0] = row
-		row = matrix[1]; row[1] = 1; matrix[1] = row
-		row = matrix[2]; row[2] = 1; matrix[2] = row
+		x = y = z = 1
+		if self.axis.lower() == "x":
+			x=-x
+		elif self.axis.lower() == "y":
+			y=-y
+		else:
+			z=-z
+		row = matrix[0]; row[0] = x; matrix[0] = row
+		row = matrix[1]; row[1] = y; matrix[1] = row
+		row = matrix[2]; row[2] = z; matrix[2] = row
 		self.frozen_matrix.matrix = matrix
 	def set_modifiers_selection(self):
 		selection = k3d.select_all()
@@ -97,6 +105,20 @@ def get_factory_id( name):
 	Document.delete_node(temp_node)
 	return id_node_factory
 
+chosen_axis = k3d.ui().query_message("Choose the mirroring Axis:", ["X", "Y", "Z"])
+keep_original = k3d.ui().query_message("Keep the Original Instance?", ["No", "Yes"])
+
+if chosen_axis == 1:
+	axis = "x"
+elif chosen_axis == 2:
+	axis = "y"
+else:
+	axis = "z"
+
+if keep_original == 1: #dont keep
+	creation_mode = "reuse"
+else: #keep
+	creation_mode = "new"
 
 Document.start_change_set()
 try: 
@@ -104,7 +126,7 @@ try:
 	id_msh_inst = get_factory_id("MeshInstance")
 	for node in Document.nodes():
 		if id_msh_inst == node.factory().factory_id() and selection_node.selection_weight(node):
-			temp = MirrorMesh(Document, node, "new")
+			temp = MirrorMesh(Document, node, axis, creation_mode)
 	Document.finish_change_set("Mirror selected instances with in a new instance")
 except: #there was an error
 	Document.cancel_change_set()
