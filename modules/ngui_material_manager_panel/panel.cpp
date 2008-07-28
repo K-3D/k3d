@@ -104,7 +104,7 @@ namespace module{
         const k3d::string_t glMaterialStr 	= "OpenGL Materials";
         const k3d::string_t otherStuffStr 	= "Other Stuff";	
        
-        const k3d::string_t holderImgFile = "renderingShader.png";
+        const k3d::string_t holderImgFile 	= "renderingShader.png";
 
         //forward declaration for list of materials
         class s_group;
@@ -129,7 +129,7 @@ namespace module{
             //Get Any Availible Data (If There Is Any)
             loadFromMeta();
 
-            //Drop Hind To Multiline Text Item
+            //Drop Hint To Multiline Text Item
             so_artistnotes.set_metadata("k3d:property-type", "k3d:multi-line-text");
 
             //Set Change Signals
@@ -558,7 +558,7 @@ namespace module{
                                                   k3d::filesystem::generic_path("shaders/light/k3d_pointlight.sl"));
 
                 k3d::property::set_internal_value(*panelLShader, 
-                                                  "intensity", k3d::double_t(2000));
+                                                  "intensity", k3d::double_t(1200));
 	      
                 //METADATA INSERT
                 if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelLShader))
@@ -578,7 +578,7 @@ namespace module{
                                                   k3d::filesystem::generic_path("shaders/light/k3d_pointlight.sl"));
 
                 k3d::property::set_internal_value(*panelLShaderFill, 
-                                                  "intensity", k3d::double_t(800));
+                                                  "intensity", k3d::double_t(650));
 	      
                 //METADATA INSERT
                 if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(panelLShaderFill))
@@ -928,6 +928,11 @@ namespace module{
             for(; hsepIter != s_breakers.end(); hsepIter++)
               delete (*hsepIter); 
 
+            //ALL Gtk Buttons*****************
+            std::vector<Gtk::Button*>::iterator buttIter = edit_shader_buttons.begin();
+            for(; buttIter != edit_shader_buttons.end(); buttIter++)
+              delete (*buttIter); 
+
 
             //ALL Gtk VSeparator*****************
             std::vector<Gtk::VSeparator*>::iterator vsepIter = label_data_breakers.begin();
@@ -1089,7 +1094,18 @@ namespace module{
                     Gtk::HSeparator *tmpHBreaker = new Gtk::HSeparator();
                     s_breakers.push_back(tmpHBreaker);
                     materialBoxes_c.pack_start(*tmpHBreaker, false, false, 0);
-		     
+
+                    //Edit Shader Buttons
+                    Gtk::Button *edit_shader_button = new Gtk::Button;
+                    k3d::string_t edit_graphic = (k3d::share_path() / k3d::filesystem::generic_path("ngui/pixmap") 
+                                                  / k3d::filesystem::generic_path("mat_edit_shader_icon.xpm")).native_filesystem_string();
+
+                    edit_shader_button->add_pixlabel(edit_graphic, "Edit Material");
+                    edit_shader_buttons.push_back(edit_shader_button);
+
+                    tmpHBox_ld->pack_end(*edit_shader_button, false, false, 0);
+
+
                     fileName_int++;
 
                   }//for
@@ -1223,6 +1239,8 @@ namespace module{
 
           std::vector<Gtk::VSeparator*> label_data_breakers;
 
+          std::vector<Gtk::Button*> edit_shader_buttons;
+
           Gtk::HBox s_name_c;
           Gtk::HBox s_type_c;
           Gtk::HBox s_datemod_c;
@@ -1247,7 +1265,7 @@ namespace module{
         public:
           so_content_pane(Gtk::HPaned *_m_Hpane, s_object *_m_so, k3d::icommand_node *_m_parent, document_state *_documentState)
             :content_pane(_m_Hpane, _m_parent, _documentState), m_so(_m_so),
-             so_preview_frame("Preview Render:"), artistnotes_frame("Artist's Notes:"),
+             so_preview_frame("Preview Render:"), artistnotes_frame("Artist's Notes:"), toolbox_frame("Toolbox:"),
              s_name_entry(*_m_parent, k3d::string_t("so_name_field"), entry::model(_m_so->so_name), 0),
              s_type_entry(*_m_parent, k3d::string_t("so_type_field"), entry::model(_m_so->so_type), 0),
              s_datemod_entry(*_m_parent, k3d::string_t("so_datestamp_field"), entry::model(_m_so->so_datestamp), 0),
@@ -1294,16 +1312,22 @@ namespace module{
 
                 main_detail_c.pack_start(preview_label_data_c, false, false, 0); 
 
+
                 preview_label_data_c.pack_start(preview_c, false, false, 0);
-                preview_label_data_c.pack_start(label_c, false, false, 0);
-                preview_label_data_c.pack_start(data_c, false, false, 0);
+                preview_label_data_c.pack_start(data_toolbar_c, false, false, 0);
+
+                data_toolbar_c.pack_start(label_data_c, true, true, 0);
+
+
+                label_data_c.pack_start(label_c, true, true, 0);
+                label_data_c.pack_start(data_c, true, true, 0);
 
                 preview_label_data_c.set_spacing(10);
 
                 //material Name
                 s_name_l.set_alignment(0.0);
                 label_c.pack_start(s_name_l, true, true, 0);
-                data_c.pack_start(s_name_entry, true, true, 0);
+                data_c.pack_start(s_name_entry, true, true, 2);
 
                 //material Type
                 s_type_l.set_alignment(0.0);
@@ -1330,6 +1354,37 @@ namespace module{
                 s_artistname_l.set_alignment(0.0);
                 label_c.pack_start(s_artistname_l, true, true, 0);
                 data_c.pack_start(s_artistname_entry, true, true, 0);	
+
+                //ToolBox *************************************************
+                toolbox_frame.set_size_request(-1, 48);
+                data_toolbar_c.pack_start(toolbox_frame, false, false, 8);
+                toolbox_frame.add(toolbox_c);
+                
+                toolbox_c.pack_start(pview_geo_combo, false, false, 2);
+
+                //Temp -> Get gui right first
+                pview_geo_combo.append_text("Sphere");
+                pview_geo_combo.append_text("Cube");
+                pview_geo_combo.set_active_text("Sphere");
+                pview_geo_combo.set_size_request(-1, 30);
+
+                //Preview Background Button
+                toolbox_c.pack_start(pview_back_button, false, false, 2);
+
+                k3d::string_t bg_graphic_path = (k3d::share_path() / k3d::filesystem::generic_path("ngui/pixmap") 
+                                              / k3d::filesystem::generic_path("mat_preview_bg_icon.xpm")).native_filesystem_string();
+
+                pview_back_button.add_pixlabel(bg_graphic_path, "BG");
+
+                //Temp -> Get gui right first
+                toolbox_c.pack_start(pview_engine_combo, false, false, 2);
+                pview_engine_combo.append_text("Renderman");
+                pview_engine_combo.append_text("Yafray");
+                pview_engine_combo.set_active_text("Renderman");
+                pview_engine_combo.set_size_request(-1, 30);
+
+
+                //**********************************************************
 
                 //Artist Notes
                 main_detail_c.pack_start(artistnotes_frame, true, true, 10);
@@ -1428,39 +1483,47 @@ namespace module{
 
         public:
           //GTK Widgets
-          Gtk::Label s_name_l;
-          Gtk::Label s_type_l;
-          Gtk::Label s_datemod_l;
-          Gtk::Label s_artistname_l;
+          Gtk::Label 		s_name_l;
+          Gtk::Label 		s_type_l;
+          Gtk::Label 		s_datemod_l;
+          Gtk::Label 		s_artistname_l;
 
           //Gtk::Entry s_name_entry;
-          Gtk::VBox main_detail_c;
-          Gtk::HBox preview_label_data_c;
-          Gtk::VBox label_c;
-          Gtk::VBox data_c;
-          Gtk::VBox preview_c;
-          Gtk::HBox date_dButton_c;
+          Gtk::VBox 			main_detail_c;
+          Gtk::HBox 			preview_label_data_c;
+          Gtk::VBox 			data_toolbar_c;
+          Gtk::HBox 			label_data_c;
+          Gtk::VBox 			label_c;
+          Gtk::VBox 			data_c;
+          Gtk::VBox 			preview_c;
+          Gtk::HBox 			date_dButton_c;
 
-          Gtk::HBox s_name_c;
-          Gtk::HBox s_type_c;
-          Gtk::HBox s_datemod_c;
-          Gtk::HBox s_artistname_c;
+          Gtk::HBox 			s_name_c;
+          Gtk::HBox 			s_type_c;
+          Gtk::HBox 			s_datemod_c;
+          Gtk::HBox 			s_artistname_c;
 
-          Gtk::HBox s_artistnotes_c;
+          Gtk::HBox 			s_artistnotes_c;
 
-          Gtk::Frame so_preview_frame;
-          Gtk::Frame artistnotes_frame;
+          Gtk::Frame 		so_preview_frame;
+          Gtk::Frame 		artistnotes_frame;
+          Gtk::Frame 		toolbox_frame;
 
-          entry::control s_name_entry;
-          entry::control s_type_entry;
-          entry::control s_datemod_entry;
-          entry::control s_artistname_entry;
+          entry::control 	s_name_entry;
+          entry::control 	s_type_entry;
+          entry::control 	s_datemod_entry;
+          entry::control 	s_artistname_entry;
 
-          Gtk::Button insert_date_button;
+          Gtk::Button 		insert_date_button;
+          text::control 	s_artistnotes_mltext;
 
-          text::control s_artistnotes_mltext;
+          k3d::string_t 	previewPath;
 
-          k3d::string_t previewPath;
+          //ToolBox Items
+          Gtk::HBox				toolbox_c;
+          Gtk::ComboBoxText 	pview_geo_combo;
+          Gtk::ComboBoxText 	pview_engine_combo;
+          Gtk::ToggleButton   pview_back_button;
 
         private:
           s_object *m_so;
@@ -1529,7 +1592,8 @@ namespace module{
           void on_nodes_added(const k3d::inode_collection::nodes_t& Nodes) ;
           void on_nodes_removed(const k3d::inode_collection::nodes_t& Nodes);
           void on_node_renamed(k3d::inode* const Node);
-	  
+          bool on_node_selection(k3d::inode* const Node);
+
           void on_add_button_button_clicked();
           void on_remove_button_button_clicked();
 	  
@@ -1539,6 +1603,8 @@ namespace module{
 	
         private:
           k3d::icommand_node *m_parent;
+          //Property Signal connection
+          sigc::connection m_pConnection;
 
         public:
           //GTK Widgets
@@ -1901,6 +1967,34 @@ namespace module{
 
           return false;
         }//on_node_renamed
+
+      //   bool implementation::on_node_selection(k3d::inode* const Node)
+//         {
+//           //return result (if RMAN Material)
+//           bool result = false;
+
+//           //Check If Node Is A RenderMan Material
+//           if((Node)->factory().implements(typeid(k3d::ri::imaterial))){
+
+//             //It Is A RMAN Material!
+//             result = true;
+
+//             //Disconnect Any Existing Connection With Properties
+//             m_pConnection.disconnect();
+
+//             //Create Connection For Node Change
+//             k3d::inode_change_signal *n_sig = dynamic_cast<k3d::inode_change_signal*>(Node);
+
+//             if(n_sig)
+//               m_pConnection =  n_sig->connect_node_changed_signal(sigc::mem_fun(*this, &implementation::propertySignalRender));
+
+//             //Change Tree Selection (which implicitly renders updated preview)
+
+//           return result;
+
+//         }//on_node_selection
+
+
 
 
         void implementation::on_add_button_button_clicked()
