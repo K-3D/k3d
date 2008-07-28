@@ -136,7 +136,6 @@ OPTION(K3D_BUILD_NGUI_LOG_MODULE "Build the user interface log window plugin mod
 OPTION(K3D_BUILD_NGUI_MATERIAL_MANAGER_PANEL_MODULE "Build the user interface manager manager panel plugin module" ON)
 OPTION(K3D_BUILD_NGUI_MODULE "Build the standard graphical user interface plugin module" ON)
 OPTION(K3D_BUILD_NGUI_MORPH_POINTS_PAGE_MODULE "Build the MorphPoints custom property page module" ON)
-OPTION(K3D_BUILD_NGUI_NODE_GRAPH_PANEL_MODULE "Build the node graph module" ON)
 OPTION(K3D_BUILD_NGUI_NODE_HISTORY_PANEL_MODULE "Build the user interface node history panel plugin module" ON)
 OPTION(K3D_BUILD_NGUI_NODE_LIST_PANEL_MODULE "Build the user interface node list panel plugin module" ON)
 OPTION(K3D_BUILD_NGUI_NODE_PROPERTIES_PANEL_MODULE "Build the user interface node properties panel plugin module" ON)
