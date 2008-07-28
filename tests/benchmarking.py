@@ -284,7 +284,7 @@ def extract_data(benchmarkPluginName, ColumnTitle = "Total", operation = CALC_AV
         splitLine = lines[k].strip().split(',')
         dimension = convert_dim_string_to_size_measure(splitLine[1])
         number_of_runs = int(splitLine[2])
-        
+        column_of_interest_index = -1;
         splitLine = lines[k+1].strip().split(',')
         if ('"' + ColumnTitle + '"') in splitLine:
             column_of_interest_index = splitLine.index('"' + ColumnTitle + '"')

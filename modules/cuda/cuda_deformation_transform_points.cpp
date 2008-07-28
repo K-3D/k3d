@@ -60,18 +60,17 @@ public:
 	{
 		document().pipeline_profiler().start_execution(*this, "");
 		const k3d::matrix4 Transformation = m_input_matrix.pipeline_value();
-			
+
 		int num_points = InputPoints.size();
 		void *cuda_array = NULL;
 
-		CUDA_initialize_device();		
 		// first convert the double precision mesh points to single precision for the GPU
 		// use 3 floats for the points, and a 4th for the selection weight
-		// TODO:  Use CUDA to allocate host memory for assynchronous transfer 
-		
+		// TODO:  Use CUDA to allocate host memory for assynchronous transfer
+
 		// a 4 x 4 matrix of floats
 		float *float_transformation = (float*) malloc ( 64 );
-		
+
 		float_transformation[0] = Transformation[0][0];
 		float_transformation[1] = Transformation[0][1];
 		float_transformation[2] = Transformation[0][2];
@@ -87,9 +86,9 @@ public:
 		float_transformation[12] = Transformation[3][0];
 		float_transformation[13] = Transformation[3][1];
 		float_transformation[14] = Transformation[3][2];
-		float_transformation[15] = Transformation[3][3]; 
+		float_transformation[15] = Transformation[3][3];
 		copy_and_bind_texture_to_array( &cuda_array, float_transformation, 4, 4 );
-		
+
 		// struct to store timing info for GPU implementation
     	timingInfo_t timing_info;
     	timing_info.numEntries = 0;
@@ -97,25 +96,25 @@ public:
     	timing_info.labels = 0;
 
     	document().pipeline_profiler().finish_execution(*this, "BIND_TEXTURE");
-    	
+
     	// use non-streamed version
     	transform_points_synchronous ( (double *)&(InputPoints[0]), (double *)&(PointSelection[0]), (double *)&(OutputPoints[0]), num_points, &timing_info );
-		
+
 		free_CUDA_array ( cuda_array );
 		free ( float_transformation );
-		
+
 		if ( timing_info.timings && timing_info.labels )
 		{
 			for ( int i = 0; i < timing_info.numEntries; i++ )
 			{
 				if ( timing_info.labels[i])
 				{
-					document().pipeline_profiler().add_timing_entry(*this, timing_info.labels[i], timing_info.timings[i]*1e-3);
+					document().pipeline_profiler().add_timing_entry(*this, timing_info.labels[i], timing_info.timings[i]);
 					free ( timing_info.labels[i] );
 				}
 				else
 				{
-					document().pipeline_profiler().add_timing_entry(*this, "", timing_info.timings[i]*1e-3);
+					document().pipeline_profiler().add_timing_entry(*this, "", timing_info.timings[i]);
 				}
 			}
 			free ( timing_info.labels );
@@ -170,15 +169,13 @@ public:
 	{
 		document().pipeline_profiler().start_execution(*this, "");
 		const k3d::matrix4 Transformation = m_input_matrix.pipeline_value();
-			
+
 		int num_points = InputPoints.size();
 		void *cuda_array = NULL;
 
-		CUDA_initialize_device();		
-
 		// a 4 x 4 matrix of floats
 		float *float_transformation = (float*) malloc ( 64 );
-		
+
 		float_transformation[0] = Transformation[0][0];
 		float_transformation[1] = Transformation[0][1];
 		float_transformation[2] = Transformation[0][2];
@@ -194,9 +191,9 @@ public:
 		float_transformation[12] = Transformation[3][0];
 		float_transformation[13] = Transformation[3][1];
 		float_transformation[14] = Transformation[3][2];
-		float_transformation[15] = Transformation[3][3]; 
+		float_transformation[15] = Transformation[3][3];
 		copy_and_bind_texture_to_array( &cuda_array, float_transformation, 4, 4 );
-		
+
 		// struct to store timing info for GPU implementation
     	timingInfo_t timing_info;
     	timing_info.numEntries = 0;
@@ -204,32 +201,32 @@ public:
     	timing_info.labels = 0;
 
     	document().pipeline_profiler().finish_execution(*this, "BIND_TEXTURE");
-    	
+
 		// use streams
 		transform_points_asynchronous ( (double *)&(InputPoints[0]), (double *)&(PointSelection[0]), (double *)&(OutputPoints[0]), num_points, &timing_info );
-		
+
 		free_CUDA_array ( cuda_array );
 		free ( float_transformation );
-		
+
 		if ( timing_info.timings && timing_info.labels )
 		{
 			for ( int i = 0; i < timing_info.numEntries; i++ )
 			{
 				if ( timing_info.labels[i])
 				{
-					document().pipeline_profiler().add_timing_entry(*this, timing_info.labels[i], timing_info.timings[i]*1e-3);
+					document().pipeline_profiler().add_timing_entry(*this, timing_info.labels[i], timing_info.timings[i]);
 					free ( timing_info.labels[i] );
 				}
 				else
 				{
-					document().pipeline_profiler().add_timing_entry(*this, "", timing_info.timings[i]*1e-3);
+					document().pipeline_profiler().add_timing_entry(*this, "", timing_info.timings[i]);
 				}
 			}
 			free ( timing_info.labels );
 			free ( timing_info.timings );
 		}
-		
-		
+
+
 	}
 
 	static k3d::iplugin_factory& get_factory()
