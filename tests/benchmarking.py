@@ -225,19 +225,19 @@ class ResultsProcessor(object):
 # run a mesh modifier benchmark for the specified node
 def mesh_modifier_benchmark(benchmarkPluginName, maxSize = 15, properties = {"input_matrix" : k3d.translate3(k3d.vector3(0, 0, 1))}):
     current_count = [1,1,1]
+    runsPerBenchmark = 10
     append = True
     for k in range(maxSize):
         try:
             benchmark_mesh = benchmarkMesh(current_count)
-            run_mesh_modifier_benchmark(benchmarkPluginName, benchmark_mesh, 1, properties, append, k == 0)
+            run_mesh_modifier_benchmark(benchmarkPluginName, benchmark_mesh, runsPerBenchmark, properties, append, k == 0)
             current_count[k % 3] *= 2
         except:
             break
         
-def bitmap_modifier_benchmark(benchmarkPluginName):
+def bitmap_modifier_benchmark(benchmarkPluginName, runsPerBenchmark = 10):
     # benchmark benchmarkPluginName for various image sizes
     sizes = [(640,480), (800,600), (1024,768), (1280,1024), (1600, 1200)]
-    runsPerBenchmark = 10
     append = True
     for k in range(len(sizes)):
         try:
