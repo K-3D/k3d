@@ -43,14 +43,14 @@
 #include "panel_frame.h"
 #include "render.h"
 #include "savable_document_window.h"
-#include "script_editor.h"
 #include "scripting.h"
 #include "statusbar.h"
 #include "target.h"
+#include "text_editor.h"
 #include "toolbar.h"
 #include "transform.h"
-#include "tutorials.h"
 #include "tutorial_message.h"
+#include "tutorials.h"
 #include "undo_utility.h"
 #include "uri.h"
 #include "utility.h"
@@ -2422,7 +2422,14 @@ private:
 
 	void on_scripting_script_editor()
 	{
-		create_script_editor(m_document_state);
+		//create_script_editor(m_document_state);
+		if(Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUITextEditorDialog"))
+		{
+			if(k3d::ngui::text_editor* const text_editor = dynamic_cast<k3d::ngui::text_editor*>(window))
+				text_editor->initialize(m_document_state);
+
+			window->set_transient_for(*this);
+		}
 	}
 
 	void on_scripting_tutorial_recorder()

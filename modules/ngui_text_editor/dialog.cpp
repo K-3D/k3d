@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,29 +18,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Provides a UI for recording interactive tutorials
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_state.h"
-#include "button.h"
-#include "check_menu_item.h"
-#include "document_state.h"
-#include "file_chooser_dialog.h"
-#include "icons.h"
-#include "image_menu_item.h"
-#include "image_toggle_button.h"
-#include "menubar.h"
-#include "menu_item.h"
-#include "messages.h"
-#include "savable_document_window.h"
-#include "script_editor.h"
-#include "scripting.h"
-#include "toolbar.h"
-#include "utility.h"
-#include "widget_manip.h"
-
 #include <k3d-i18n-config.h>
+#include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/data.h>
@@ -49,6 +31,24 @@
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/mime_types.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/check_menu_item.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/image_menu_item.h>
+#include <k3dsdk/ngui/image_toggle_button.h>
+#include <k3dsdk/ngui/menu_item.h>
+#include <k3dsdk/ngui/menubar.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/savable_document_window.h>
+#include <k3dsdk/ngui/scripting.h>
+#include <k3dsdk/ngui/text_editor.h>
+#include <k3dsdk/ngui/toolbar.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/string_cast.h>
 
@@ -60,39 +60,50 @@
 
 #include <sstream>
 
-namespace libk3dngui
+using namespace libk3dngui;
+
+namespace module
 {
 
-class script_editor :
+namespace ngui
+{
+
+namespace text_editor
+{
+
+class dialog :
+	public k3d::ngui::text_editor,
 	public savable_document_window
 {
-	typedef savable_document_window base;
-
 public:
-	script_editor(document_state& Document) :
+	dialog() :
 		m_unsaved_changes(false),
 		m_running(false)
 	{
-		base::initialize(Document);
+	}
 
-		k3d::command_tree().add(*this, "script_editor", dynamic_cast<k3d::icommand_node*>(&Document.document()));
+	void initialize(document_state& Document)
+	{
+		savable_document_window::initialize(Document);
+
+		k3d::command_tree().add(*this, get_factory().name(), dynamic_cast<k3d::icommand_node*>(&Document.document()));
 
 		menubar::control* const menubar = new menubar::control(*this, "menus");
 
 		Gtk::Menu* const menu_file = new Gtk::Menu();
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_new", Gtk::Stock::NEW), sigc::mem_fun(*this, &script_editor::on_file_new))));
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_open", Gtk::Stock::OPEN), sigc::mem_fun(*this, &script_editor::on_file_open))));
+		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_new", Gtk::Stock::NEW), sigc::mem_fun(*this, &dialog::on_file_new))));
+		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_open", Gtk::Stock::OPEN), sigc::mem_fun(*this, &dialog::on_file_open))));
 		menu_file->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_save", Gtk::Stock::SAVE), sigc::mem_fun(*this, &script_editor::on_file_save))));
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_save_as", Gtk::Stock::SAVE_AS), sigc::mem_fun(*this, &script_editor::on_file_save_as))));
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_revert", Gtk::Stock::REVERT_TO_SAVED), sigc::mem_fun(*this, &script_editor::on_file_revert))));
+		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_save", Gtk::Stock::SAVE), sigc::mem_fun(*this, &dialog::on_file_save))));
+		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_save_as", Gtk::Stock::SAVE_AS), sigc::mem_fun(*this, &dialog::on_file_save_as))));
+		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_revert", Gtk::Stock::REVERT_TO_SAVED), sigc::mem_fun(*this, &dialog::on_file_revert))));
 		menu_file->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_close", Gtk::Stock::CLOSE), sigc::mem_fun(*this, &script_editor::safe_close))));
+		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_close", Gtk::Stock::CLOSE), sigc::mem_fun(*this, &dialog::safe_close))));
 
 		Gtk::Menu* const menu_edit = new Gtk::Menu();
 		menu_edit->items().push_back(*Gtk::manage(
 			new menu_item::control(*menubar, "edit_play", _("Play")) <<
-			connect_menu_item(sigc::mem_fun(*this, &script_editor::on_edit_play))));
+			connect_menu_item(sigc::mem_fun(*this, &dialog::on_edit_play))));
 
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_File"), *manage(menu_file)));
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Edit"), *manage(menu_edit)));
@@ -102,7 +113,7 @@ public:
 		toolbar->row(0).pack_start(*Gtk::manage(
 			new button::control(*toolbar, "play",
 				*Gtk::manage(new Gtk::Image(load_icon("play", Gtk::ICON_SIZE_BUTTON)))) <<
-			connect_button(sigc::mem_fun(*this, &script_editor::on_edit_play)) <<
+			connect_button(sigc::mem_fun(*this, &dialog::on_edit_play)) <<
 			make_toolbar_button()), Gtk::PACK_SHRINK);
 
 		Gtk::HBox* const hbox1 = new Gtk::HBox(false);
@@ -121,18 +132,17 @@ public:
 		vbox1->pack_start(m_cursor_position, Gtk::PACK_SHRINK);
 
 		add(*Gtk::manage(vbox1));
-		set_role("script_editor");
+		set_role(get_factory().name());
 		resize(600, 300);
 
 		file_new();
 		show_all();
 
-		m_script.get_buffer()->signal_changed().connect(sigc::mem_fun(*this, &script_editor::on_script_changed));
-		m_script.get_buffer()->signal_mark_set().connect(sigc::mem_fun(*this, &script_editor::on_mark_set));
+		m_script.get_buffer()->signal_changed().connect(sigc::mem_fun(*this, &dialog::on_script_changed));
+		m_script.get_buffer()->signal_mark_set().connect(sigc::mem_fun(*this, &dialog::on_mark_set));
 	}
 
-private:
-	~script_editor()
+	~dialog()
 	{
 	}
 
@@ -196,8 +206,6 @@ private:
 			return;
 		}
 
-k3d::log() << debug << mime_type.str() << std::endl;
-		
 		const k3d::string_t name = get_title();
 
 		k3d::iscript_engine::context_t context;
@@ -308,6 +316,17 @@ k3d::log() << debug << mime_type.str() << std::endl;
 		set_title(title);
 	}
 
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<dialog> factory(
+			k3d::uuid(0xca41ccc9, 0xb9433dec, 0x30c65c83, 0x40eb359b),
+			"NGUITextEditorDialog",
+			_("Provides a general-purpose dialog for editing text, scripts, and shaders."),
+			"NGUI Dialog",
+			k3d::iplugin_factory::EXPERIMENTAL);
+
+		return factory;
+	}
 	/// Stores the file path (could be empty)
 	k3d::filesystem::path m_path;
 	/// Set to true iff there are unsaved changes
@@ -320,11 +339,13 @@ k3d::log() << debug << mime_type.str() << std::endl;
 	Gtk::Label m_cursor_position;
 };
 
-void create_script_editor(document_state& Document)
-{
-	new script_editor(Document);
-}
+} // namespace text_editor
 
-} // namespace libk3dngui
+} // namespace ngui
 
+} // namespace module
+
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::ngui::text_editor::dialog::get_factory());
+K3D_MODULE_END
 
