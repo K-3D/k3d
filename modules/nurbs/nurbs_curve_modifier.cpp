@@ -9,13 +9,10 @@ namespace module
             m_instance = &input;
             if (m_instance->nurbs_curve_groups == NULL)
             {
-                groups = new k3d::mesh::nurbs_curve_groups_t();
-            }
-            else
-            {
-                groups = k3d::make_unique(input.nurbs_curve_groups);
+                m_instance->nurbs_curve_groups = boost::shared_ptr<k3d::mesh::nurbs_curve_groups_t>( new k3d::mesh::nurbs_curve_groups_t() );
             }
 
+            groups = k3d::make_unique(input.nurbs_curve_groups);
             curve_knots = k3d::make_unique(groups->curve_knots);
             curve_points = k3d::make_unique(groups->curve_points);
             curve_point_weights = k3d::make_unique(groups->curve_point_weights);
@@ -36,7 +33,7 @@ namespace module
             try
             {
                 MY_DEBUG << "ADD_CURVE" << std::endl;
-                if(curve_counts->size() > 0)
+                if (curve_counts->size() > 0)
                 {
                     curve_counts->back()++;
                 }
@@ -53,6 +50,7 @@ namespace module
                 curve_knots->insert(curve_knots->end(), curve.curve_knots.begin(), curve.curve_knots.end());
                 curve_point_weights->insert(curve_point_weights->end(), curve.curve_point_weights.begin(), curve.curve_point_weights.end());
                 curve_selection->push_back(0.0);
+                materials->push_back(0);
 
                 k3d::mesh::indices_t points;
 
@@ -65,7 +63,7 @@ namespace module
 
                 return count_all_curves_in_groups() - 1;
             }
-            catch(...)
+            catch (...)
             {
                 k3d::log() << error << nurbs_debug << "Error in addCurve" << std::endl;
                 return -1;
@@ -447,7 +445,7 @@ namespace module
 
         void nurbs_curve_modifier::remove_empty_groups()
         {
-
+            MY_DEBUG << "Remove empty groups" << std::endl;
             const size_t group_begin = 0;
             const size_t group_end = group_begin + first_curves->size();
 
@@ -1770,7 +1768,7 @@ namespace module
             }
         }
 
-        void nurbs_curve_modifier::traverse_curve(size_t curve1, size_t curve2)
+        void nurbs_curve_modifier::traverse_curve(size_t curve1, size_t curve2, bool create_caps)
         {
             //move the 1st curve along the 2nd
 
@@ -1780,7 +1778,7 @@ namespace module
             const size_t curve_knots_begin[2] = { curve_first_knots->at(curve1), curve_first_knots->at(curve2)};
             const size_t curve_knots_end[2] = { curve_knots_begin[0] + curve_orders->at(curve1) + curve_point_counts->at(curve1), curve_knots_begin[1] + curve_orders->at(curve2) + curve_point_counts->at(curve2)};
 
-            k3d::mesh::indices_t new_points;
+            k3d::mesh::points_t new_points;
             k3d::mesh::weights_t new_weights;
 
             k3d::mesh::knots_t u_knots;
@@ -1804,21 +1802,66 @@ namespace module
                     k3d::point3 p_v = mesh_points->at( curve_points->at(curve_points_begin[0] + j) );
                     double w_v = curve_point_weights->at(curve_points_begin[0] + j);
 
-                    mesh_points->push_back(p_v + delta_u);
-                    point_selection->push_back(0.0);
-
-                    new_points.push_back(mesh_points->size()-1);
+                    new_points.push_back(p_v + delta_u);
                     new_weights.push_back(w_u * w_v);
                 }
             }
 
+            nurbs_patch_modifier mod(*m_instance);
+            nurbs_patch p;
+            p.control_points = new_points;
+            p.point_weights = new_weights;
+            p.u_knots = u_knots;
+            p.v_knots = v_knots;
+            p.u_order = u_order;
+            p.v_order = v_order;
 
-            MY_DEBUG << "Adding patch using gprim_factory" << std::endl;
-            k3d::gprim_factory fac(*m_instance);
-            fac.add_nurbs_patch(u_order, v_order, new_points, u_knots, v_knots, new_weights);
+            mod.insert_patch(p,true);
+            if(create_caps)
+            {
+                if(curve_points->at(curve_points_begin[0]) == curve_points->at(curve_points_end[0] - 1) || point3_float_equal(mesh_points->at(curve_points->at(curve_points_begin[0])), mesh_points->at(curve_points->at(curve_points_end[0] - 1)), 0.000001))
+                {
+                    create_cap(curve1);
+
+                    nurbs_curve temp = extract_curve(curve1);
+
+                    k3d::point3 delta_u = mesh_points->at( curve_points->at(curve_points_end[1] - 1) ) + (-mesh_points->at( curve_points->at(curve_points_begin[1]) ));
+                    double w_u = curve_point_weights->at(curve_points_end[1] - 1);
+
+                    for(int i = 0; i < temp.control_points.size(); i++)
+                    {
+                        temp.control_points.at(i) = delta_u + temp.control_points.at(i);
+                        temp.curve_point_weights.at(i) *= w_u;
+                    }
+
+                    int c = add_curve(temp,true);
+                    create_cap(c);
+                    delete_curve(c);
+                }
+
+                if(curve_points->at(curve_points_begin[1]) == curve_points->at(curve_points_end[1] - 1) || point3_float_equal(mesh_points->at(curve_points->at(curve_points_begin[1])), mesh_points->at(curve_points->at(curve_points_end[1] - 1)), 0.000001))
+                {
+                    create_cap(curve2);
+
+                    nurbs_curve temp = extract_curve(curve2);
+
+                    k3d::point3 delta_v = mesh_points->at( curve_points->at(curve_points_end[0] - 1) ) + (-mesh_points->at( curve_points->at(curve_points_begin[0]) ));
+                    double w_v = curve_point_weights->at(curve_points_end[0] - 1);
+
+                    for(int i = 0; i < temp.control_points.size(); i++)
+                    {
+                        temp.control_points.at(i) = delta_v + temp.control_points.at(i);
+                        temp.curve_point_weights.at(i) *= w_v;
+                    }
+
+                    int c = add_curve(temp,true);
+                    create_cap(c);
+                    delete_curve(c);
+                }
+            }
         }
 
-        void nurbs_curve_modifier::revolve_curve(size_t curve, double angle, int segments)
+        void nurbs_curve_modifier::revolve_curve(size_t curve, double angle, int segments, bool caps)
         {
             //revolve this curve to a certain angle
 
@@ -1840,7 +1883,7 @@ namespace module
             }
 
             //we're going to scale this arc to the size of the distance of each point of the curve
-            k3d::mesh::indices_t new_points;
+            k3d::mesh::points_t new_points;
             k3d::mesh::weights_t new_weights;
 
             k3d::mesh::knots_t v_knots;
@@ -1859,17 +1902,65 @@ namespace module
                 for (int j = 0; j < control_points.size(); j++)
                 {
                     k3d::point3 p_u(control_points.at(j)[0] * distance, control_points.at(j)[1] * distance, p[2]);
-                    mesh_points->push_back(p_u);
-                    point_selection->push_back(0.0);
-
-                    new_points.push_back(mesh_points->size()-1);
+                    new_points.push_back(p_u);
                     new_weights.push_back(w * weights.at(j));
                 }
             }
 
-            MY_DEBUG << "Adding patch using gprim_factory" << std::endl;
-            k3d::gprim_factory fac(*m_instance);
-            fac.add_nurbs_patch(u_order, v_order, new_points, u_knots, v_knots, new_weights);
+            {
+                nurbs_patch_modifier mod(*m_instance);
+                nurbs_patch p;
+                p.control_points = new_points;
+                p.point_weights = new_weights;
+                p.u_knots = u_knots;
+                p.v_knots = v_knots;
+                p.u_order = u_order;
+                p.v_order = v_order;
+
+                mod.insert_patch(p,true);
+            }
+
+            if (caps && angle >= M_PI * 2)
+            {
+                MY_DEBUG << "Creating Caps for the revolved curve" << std::endl;
+                int i = 0;
+                {
+                    k3d::point3 p = mesh_points->at(curve_points->at(curve_points_begin + i));
+                    double w = curve_point_weights->at(curve_points_begin + i);
+                    double distance = sqrt((p[0] * p[0]) + (p[1] * p[1])); // we want the distance to the z axis
+                    nurbs_curve cap_curve;
+                    for (int j = 0; j < control_points.size(); j++)
+                    {
+                        k3d::point3 p_u(control_points.at(j)[0] * distance, control_points.at(j)[1] * distance, p[2]);
+                        cap_curve.control_points.push_back(p_u);
+                        cap_curve.curve_point_weights.push_back(w * weights.at(j));
+                    }
+                    cap_curve.curve_knots.insert(cap_curve.curve_knots.begin(), u_knots.begin(), u_knots.end());
+
+                    int curve = add_curve(cap_curve,true);
+                    create_cap(curve);
+                    delete_curve(curve);
+                }
+
+                i = curve_point_counts->at(curve) - 1;
+                {
+                    k3d::point3 p = mesh_points->at(curve_points->at(curve_points_begin + i));
+                    double w = curve_point_weights->at(curve_points_begin + i);
+                    double distance = sqrt((p[0] * p[0]) + (p[1] * p[1])); // we want the distance to the z axis
+                    nurbs_curve cap_curve;
+                    for (int j = 0; j < control_points.size(); j++)
+                    {
+                        k3d::point3 p_u(control_points.at(j)[0] * distance, control_points.at(j)[1] * distance, p[2]);
+                        cap_curve.control_points.push_back(p_u);
+                        cap_curve.curve_point_weights.push_back(w * weights.at(j));
+                    }
+                    cap_curve.curve_knots.insert(cap_curve.curve_knots.begin(), u_knots.begin(), u_knots.end());
+
+                    int curve = add_curve(cap_curve,true);
+                    create_cap(curve);
+                    delete_curve(curve);
+                }
+            }
         }
 
         nurbs_curve nurbs_curve_modifier::extract_curve(size_t curve)
@@ -1904,7 +1995,7 @@ namespace module
 
                 return result;
             }
-            catch(...)
+            catch (...)
             {
                 k3d::log() << error << nurbs_debug << "Error in extractCurve" << std::endl;
             }
@@ -1981,7 +2072,7 @@ namespace module
                         else
                         {
                             //insert the missing knot
-                            if(!curve_knot_insertion(curves.at(i), new_knot_vector.at(k), 1))
+                            if (!curve_knot_insertion(curves.at(i), new_knot_vector.at(k), 1))
                             {
                                 MY_DEBUG << "Tried to insert existing knot, something went wrong" << std::endl;
                                 break;
@@ -2111,7 +2202,7 @@ namespace module
                     MY_DEBUG << "Insert patch into this mesh" << std::endl;
                     nurbs_patch_modifier mod3(*m_instance);
                     mod3.insert_patch(p, true);
-
+                    MY_DEBUG << "Done adding patch" << std::endl;
                     return true;
                 }
                 return false;
@@ -2132,7 +2223,7 @@ namespace module
         {
             MY_DEBUG << "Skinned Surface" << std::endl;
 
-            if(curves.size() < 2)
+            if (curves.size() < 2)
             {
                 k3d::log() << error << nurbs_debug << "Too few curves selected for skinning" << std::endl;
                 return;
@@ -2150,7 +2241,7 @@ namespace module
             {
                 int dif = max_degree - curve_orders->at(curves.at(i));
 
-                for(int j = 0; j < dif; j++)
+                for (int j = 0; j < dif; j++)
                 {
                     curve_degree_elevate(curves.at(i));
                 }
@@ -2167,7 +2258,7 @@ namespace module
                 k3d::point3 c;
                 const size_t curve_points_begin = curve_first_points->at(curves.at(i));
                 const size_t curve_points_end = curve_points_begin + curve_point_counts->at(curves.at(i));
-                for(int j = curve_points_begin; j < curve_points_end; j++)
+                for (int j = curve_points_begin; j < curve_points_end; j++)
                 {
                     c = c + mesh_points->at(curve_points->at(j));
                 }
@@ -2180,20 +2271,20 @@ namespace module
 
             ordered_by_y.push_back(0);
 
-            for(int i = 1; i < curves.size(); i++)
+            for (int i = 1; i < curves.size(); i++)
             {
-                if(centers.at(ordered_by_y.back())[1] < centers.at(i)[1])
+                if (centers.at(ordered_by_y.back())[1] < centers.at(i)[1])
                 {
                     ordered_by_y.push_back(i);
                 }
-                else if(centers.at(ordered_by_y.front())[1] > centers.at(i)[1])
+                else if (centers.at(ordered_by_y.front())[1] > centers.at(i)[1])
                 {
                     ordered_by_y.push_front(i);
                 }
                 else
                 {
                     int j = 0;
-                    while(j < ordered_by_y.size() && centers.at(ordered_by_y.at(j))[1] < centers.at(i)[1])
+                    while (j < ordered_by_y.size() && centers.at(ordered_by_y.at(j))[1] < centers.at(i)[1])
                     {
                         j++;
                     }
@@ -2206,7 +2297,7 @@ namespace module
             nurbs_patch skin;
             std::vector<nurbs_curve> rips;
 
-            for(int i = 0; i < ordered_by_y.size(); i++)
+            for (int i = 0; i < ordered_by_y.size(); i++)
             {
                 rips.push_back(extract_curve(ordered_by_y.at(i)));
             }
@@ -2217,14 +2308,14 @@ namespace module
 
             skin.v_knots.push_back(0);
             skin.v_knots.push_back(0);
-            for(int i = 0; i < ordered_by_y.size() - 1; i++)
+            for (int i = 0; i < ordered_by_y.size() - 1; i++)
             {
                 skin.v_knots.push_back(i);
             }
             skin.v_knots.push_back(skin.v_knots.back());
             skin.v_knots.push_back(skin.v_knots.back());
 
-            for(std::vector<nurbs_curve>::iterator i = rips.begin(); i != rips.end(); ++i)
+            for (std::vector<nurbs_curve>::iterator i = rips.begin(); i != rips.end(); ++i)
             {
                 skin.point_weights.insert(skin.point_weights.end(),(*i).curve_point_weights.begin(),(*i).curve_point_weights.end());
                 skin.control_points.insert(skin.control_points.end(),(*i).control_points.begin(),(*i).control_points.end());

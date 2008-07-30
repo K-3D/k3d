@@ -56,11 +56,13 @@ namespace module
 			revolve_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),
 				m_angle(init_owner(*this) + init_name("angle") + init_label(_("angle")) + init_description(_("The curve will be rotated to this angle, specify 360 for a closed shape")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
-                m_segments(init_owner(*this) + init_name("segments") + init_label(_("segments")) + init_description(_("Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+                m_segments(init_owner(*this) + init_name("segments") + init_label(_("segments")) + init_description(_("Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+                m_create_caps(init_owner(*this) + init_name(_("create_caps")) + init_label(_("Create caps?")) + init_description(_("Create caps at both ends of the revolved curve?")) + init_value(false) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 				m_angle.changed_signal().connect(make_update_mesh_slot());
                 m_segments.changed_signal().connect(make_update_mesh_slot());
+                m_create_caps.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -86,7 +88,7 @@ namespace module
                     return;
                 }
 
-                mod.revolve_curve(my_curve,m_angle.pipeline_value(),m_segments.pipeline_value());
+                mod.revolve_curve(my_curve,m_angle.pipeline_value(),m_segments.pipeline_value(),m_create_caps.pipeline_value());
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 				assert_warning(k3d::validate_nurbs_patches(Output));
@@ -107,6 +109,7 @@ namespace module
 		private:
             k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_angle;
             k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_segments;
+            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_create_caps;
 		};
 
 		//Create connect_curve factory

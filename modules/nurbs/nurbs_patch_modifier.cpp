@@ -10,13 +10,10 @@ namespace module
 
             if (m_instance->nurbs_patches == NULL)
             {
-                m_nurbs_patches = new k3d::mesh::nurbs_patches_t();
-            }
-            else
-            {
-                m_nurbs_patches = k3d::make_unique(m_instance->nurbs_patches);
+                m_instance->nurbs_patches = boost::shared_ptr<k3d::mesh::nurbs_patches_t>(new k3d::mesh::nurbs_patches_t());
             }
 
+            m_nurbs_patches = k3d::make_unique(m_instance->nurbs_patches);
             m_patch_first_points = k3d::make_unique(m_nurbs_patches->patch_first_points);
             m_patch_u_point_counts = k3d::make_unique(m_nurbs_patches->patch_u_point_counts);
             m_patch_v_point_counts = k3d::make_unique(m_nurbs_patches->patch_v_point_counts);
@@ -172,6 +169,7 @@ namespace module
 
         void nurbs_patch_modifier::insert_patch(nurbs_patch& patch, bool share_points)
         {
+            MY_DEBUG << "Inserting patch" << std::endl;
             k3d::mesh::indices_t patch_points;
 
             for (int i = 0; i < patch.control_points.size(); i++)
@@ -179,26 +177,42 @@ namespace module
                 patch_points.push_back(insert_point(patch.control_points.at(i),share_points));
             }
 
-            k3d::gprim_factory fac(*m_instance);
-            fac.add_nurbs_patch(patch.u_order, patch.v_order, patch_points, patch.u_knots, patch.v_knots, patch.point_weights);
+            m_patch_first_points->push_back(m_patch_points->size());
+            m_patch_selection->push_back(0.0);
+            m_patch_u_first_knots->push_back(m_patch_u_knots->size());
+            m_patch_v_first_knots->push_back(m_patch_v_knots->size());
+            m_patch_u_orders->push_back(patch.u_order);
+            m_patch_v_orders->push_back(patch.v_order);
+            m_patch_u_point_counts->push_back(patch.u_knots.size() - patch.u_order);
+            m_patch_v_point_counts->push_back(patch.v_knots.size() - patch.v_order);
+            m_patch_materials->push_back(0);
+            m_patch_trim_curve_loop_counts->push_back(0);
+            m_patch_first_trim_curve_loops->push_back(0);
+            m_patch_points->insert(m_patch_points->end(), patch_points.begin(), patch_points.end());
+            m_patch_point_weights->insert(m_patch_point_weights->end(), patch.point_weights.begin(), patch.point_weights.end());
+            m_patch_u_knots->insert(m_patch_u_knots->end(), patch.u_knots.begin(), patch.u_knots.end());
+            m_patch_v_knots->insert(m_patch_v_knots->end(), patch.v_knots.begin(), patch.v_knots.end());
         }
 
         size_t nurbs_patch_modifier::insert_point(k3d::point3& point, bool shared)
         {
             try
             {
+                MY_DEBUG << "Inserting points" << std::endl;
                 int found = -1;
 
                 for (int j = 0; j < m_mesh_points->size(); j++)
                 {
                     if (nurbs_curve_modifier::point3_float_equal(m_mesh_points->at(j),point,0.000001))
                     {
+                        MY_DEBUG << "Found point" << std::endl;
                         found = j;
                     }
                 }
 
                 if (found < 0 || !shared)
                 {
+                    MY_DEBUG << "Need to add the point to mesh" << std::endl;
                     //we need to insert the point
                     m_mesh_points->push_back(point);
                     m_point_selections->push_back(0.0);

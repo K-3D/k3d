@@ -54,9 +54,11 @@ namespace module
 			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 		public:
 			curve_traversal(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-				base(Factory, Document)
+				base(Factory, Document),
+				m_create_caps(init_owner(*this) + init_name(_("create_caps")) + init_label(_("Create caps?")) + init_description(_("Create caps at both ends of the revolved curve?")) + init_value(false) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+				m_create_caps.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -95,7 +97,7 @@ namespace module
 				else
 				{
                     nurbs_curve_modifier mod(Output);
-                    mod.traverse_curve(curves[0], curves[1]);
+                    mod.traverse_curve(curves[0], curves[1], m_create_caps.pipeline_value());
 				}
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
@@ -115,6 +117,7 @@ namespace module
 			}
 
 		private:
+            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_create_caps;
 		};
 
 		//Create connect_curve factory
