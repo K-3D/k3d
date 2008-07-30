@@ -6,6 +6,15 @@
 #include <cstring>
 #include <k3dsdk/algebra.h>
 
+namespace module
+{
+
+namespace md2
+{
+
+namespace io
+{
+
 typedef unsigned char byte;
 
 typedef char md2Skins[64];
@@ -108,5 +117,9 @@ private:
 	md2Skins *skins;
 
 };
+
+}
+}
+}
 
 #endif

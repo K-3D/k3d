@@ -21,6 +21,8 @@
 	\author Carlos Andres Dominguez Caballero (carlosadc@gmail.com)
 */
 
+// Main integration file
+
 #ifndef COLLADA_H
 #define COLLADA_H
 
@@ -51,7 +53,8 @@ namespace io
 
 	// "myGeom" --> "#myGeom"
 	std::string makeUriRef(const std::string& id);
-	
+
+	// Helper function to convert an array to a daeArray type
 	template<typename T>
 	daeTArray<T> rawArrayToDaeArray(T rawArray[], size_t count) 
 	{
@@ -60,20 +63,27 @@ namespace io
 			result.append(rawArray[i]);
 		return result;
 	}
-	
+
+	// Helper function to remove spaces in a string replacing them with 
+	// the character '_'
 	std::string removeSpaces(std::string str);
 
+	// Collada integration functions to add collada specific elements to a file
 	void addSource(daeElement* mesh, const std::string& srcID, const std::string& paramNames, domFloat values[], int valueCount);
 	void addInput(daeElement* triangles, const std::string& semantic, const std::string& srcID, int offset);
 	void addGeometry(daeElement* library_geometries, const std::string &name, k3d::mesh *mesh);
 	void addMeshInstance(daeElement * visualScene, k3d::inode *inode);
 	void addCameraInstance(daeElement * visualscene, k3d::inode *inode);
 
+	// Helper function to convert a domGeometry into a k3d::mesh
 	k3d::mesh to_k3d_mesh(domGeometry &geom);
 
 	class collada_obj
 	{
 	public:
+
+		// Creates a node with a frozen mesh and stores the mesh_source
+		// for referencing
 		collada_obj(k3d::idocument &Document, domGeometry &geom)
 		{
 			id = geom.getAttribute("id");
@@ -89,6 +99,10 @@ namespace io
 			k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(frozen_mesh);
 			mesh_source_output = &mesh_source->mesh_source_output();
 		}
+		// Creates a Camera node and store it's properties
+		// This camera won't be shown on screen and will be used as a 
+		// template for further referencing. Because of these we store it's values
+		// to connect them later with its instances
 		collada_obj(k3d::idocument &Document, domCamera &cam)
 		{
 			id = cam.getAttribute("id");
@@ -148,6 +162,8 @@ namespace io
 			far = k3d::property::get(*camera, "far");
 		}
 
+		// Creates a Light node and a LightShader node, this is still on development
+		// and not completely supported yet
 		collada_obj(k3d::idocument &Document, domLight &li)
 		{
 			id = li.getAttribute("id");
@@ -176,6 +192,7 @@ namespace io
 			//k3d::property::set_internal_value(*light_shader, "shader_path", shader_path);
 		}
 
+		// Creates a bitmap node containing an image taken from the <library_images>
 		collada_obj(k3d::idocument &Document, domImage &img)
 		{
 			id = img.getAttribute("id");
@@ -209,6 +226,7 @@ namespace io
 			}
 		}
 
+		// Accessor functions
 		std::string get_name(){return name;}
 		std::string get_type(){return type;}
 		std::string get_id(){return id;}

@@ -1,5 +1,14 @@
 #include "md2.h"
 
+namespace module
+{
+
+namespace md2
+{
+
+namespace io
+{
+
 md2Model::md2Model(const char *f)
 {
 //////////////////////////////////////////////////////////////
@@ -84,4 +93,8 @@ md2Model::~md2Model()
 	delete [] triangles;
 	delete [] texcoords;
 	delete [] skins;
+}
+
+}
+}
 }

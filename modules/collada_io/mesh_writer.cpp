@@ -68,15 +68,20 @@ public:
 
 		k3d::log() << info << "Writing .dae file: " << path.native_console_string() << std::endl;
 
+		// The main file where de mesh will be exported
 		DAE dae;
+		//Create root branch of the dae xml tree and create the only library we are 
+		// going to need, library_geometries where we are going to store the mesh
 		daeElement *root = dae.add(path.native_console_string());
 		daeElement *library_geometries = root->add("library_geometries");
 
+		// Every dae file needs an asset node for reference
 		daeElement *asset = root->add("asset");
 		daeElement* contributor = asset->add("contributor");
 		daeElement* created = asset->add("created");
 		daeElement* modified = asset->add("modified");
 
+		// Fill asset values. Note that the date is hardcoded, this is going to be changed soon
 		std::stringstream author;
 		author << "K-3D " << K3D_PACKAGE << " , " << K3D_VERSION << " , " << K3D_HOST;
 		contributor->setCharData(author.str().c_str());
@@ -84,9 +89,10 @@ public:
 		created->setCharData(date);
 		modified->setCharData(date);
 
+		// Store the mesh source into library_geometries using the name "K3DGeometry" for reference
 		addGeometry(library_geometries, "K3DGeometry", mesh);
 
-		//Setup visual scenes library and the main scene
+		// Setup visual scenes library and the main scene
 		SafeAdd(root, "library_visual_scenes", visualSceneLib);
 		SafeAdd(visualSceneLib, "visual_scene", visualScene);
 		visualScene->setAttribute("id", "mainScene");
@@ -95,10 +101,11 @@ public:
 		node->setAttribute("id", "K3DWriter_mesh");
 		node->setAttribute("name", "K3DWriter_mesh");
 
-		// Instantiate the <geometry>
+		// Instantiate the <geometry> so it is displayed on the scene
 		SafeAdd(node, "instance_geometry", instanceGeom);
 		instanceGeom->setAttribute("url", makeUriRef("K3DGeometry").c_str());
 
+		// Add the main scene to root file and instanciate the created visual_scene
 		root->add("scene instance_visual_scene")->setAttribute("url", makeUriRef("mainScene").c_str());
 
 		dae.writeAll();

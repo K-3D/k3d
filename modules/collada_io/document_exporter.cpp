@@ -99,6 +99,7 @@ public:
 
 		for(k3d::inode_collection::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
+			// Add cameras into file
 			if((*node)->factory().factory_id() == k3d::plugin::factory::lookup("Camera")->factory_id())
 			{
 				domCamera *camera = daeSafeCast<domCamera>(library_cameras->add("camera"));
@@ -117,6 +118,8 @@ public:
 
 				bool ortho = boost::any_cast<bool>(k3d::property::get(**node, "orthographic")->property_internal_value());
 
+				// attributes differ with camera type, some attributes had to be computed manually 
+				// as K-3D use them in a different way
 				domElement *cam_type;
 				if(ortho)
 				{
@@ -134,6 +137,7 @@ public:
 					yf->setCharData(to_string(yfov).c_str());
 				}
 
+				// Add common attributes
 				domElement *near = cam_type->add("znear");
 				near->setCharData(to_string(znear).c_str());
 				domElement *far = cam_type->add("zfar");
@@ -142,6 +146,8 @@ public:
 				aspect->setCharData(to_string(aspect_ratio).c_str());
 			}
 
+			// Add geometry to the collada file, this will take the Frozen mesh
+			// and store it into the library_geometries
 			k3d::iproperty *mesh_property = boost::any_cast<k3d::iproperty*>(k3d::property::get(**node, "output_mesh"));
 			if(mesh_property != NULL && (*node)->factory().factory_id() != k3d::plugin::factory::lookup("MeshInstance")->factory_id())
 			{
@@ -158,12 +164,18 @@ public:
 
 		for(k3d::inode_collection::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
+			// Add MeshInstance to instanciate the input_mesh in
+			// the visual scene with it's corresponding transformation
 			if((*node)->factory().factory_id() == k3d::plugin::factory::lookup("MeshInstance")->factory_id())
 				addMeshInstance(visualScene,(*node));
+
+			// Add Camera to instanciate the camera in
+			// the visual scene with it's corresponding transformation
 			if((*node)->factory().factory_id() == k3d::plugin::factory::lookup("Camera")->factory_id())
 				addCameraInstance(visualScene,(*node));
 		}
 
+		// Add the main scene to root file and instanciate the created visual_scene
 		root->add("scene instance_visual_scene")->setAttribute("url", makeUriRef("mainScene").c_str());
 
 		dae.writeAll();

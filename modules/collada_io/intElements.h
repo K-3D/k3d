@@ -21,6 +21,9 @@
 	\author Barbiero Mattia
 */
 
+// intElements is the implementation of the conversion between the dae format elements and
+// their equivalent on K-3D
+
 #ifndef __intGeometry_h__
 #define __intGeometry_h__
 
@@ -47,6 +50,8 @@ namespace collada
 namespace io
 {
 
+// Integrates mesh creation and loading 
+// from domGeometry -> FrozenMesh
 class intGeometry
 {
 private:
@@ -58,6 +63,8 @@ public: // Constuctor and Destructor
 	* Passes ccst (Current Coordinate System Transformation) to compute real vertex positions
 	*/
 	intGeometry(domGeometry&, const k3d::matrix4& ccst);
+
+	/// returns generated mesh in k3d::mesh format
 	k3d::mesh getMesh(){return Mesh;}
 	/**
 	 * Default Destructor.
@@ -65,6 +72,8 @@ public: // Constuctor and Destructor
 	~intGeometry(){}
 };
 
+// Integrates camera loading
+// from domCamera -> Camera
 class intCamera
 {
 private:
@@ -77,6 +86,9 @@ public:
 	k3d::point3 get_direction(){return Direction;}
 };
 
+
+// Integrates light loading
+// from domLight -> Light
 class intLight
 {
 private:

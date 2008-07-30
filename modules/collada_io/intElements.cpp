@@ -48,6 +48,9 @@ namespace io
 
 		k3d::gprim_factory factory(Mesh);
 
+		// a mesh could be composed either of triangles or polygons
+		// we initialize both variables, in the end it's the same as triangles are 3 sided
+		// polygons
 		domTriangles *triangles;
 		domPolylist *polygons;
 
@@ -64,9 +67,14 @@ namespace io
 			triangles = meshElement->getTriangles_array()[0];
 		}
 
+		// polyCount stores how many polygons there are
 		int polyCount = 0;
+		// inputArraysCount stores how many polygon arrays are
 		int inputArraysCount = 0;
 
+		// offset for the mesh declaration input string, 
+		// vertex, normal and texture values are stored in a single array
+		// if one of them is not present it is not taken into account
 		int v_offset = -1;
 		int n_offset = -1;
 		int t_offset = -1;
@@ -78,11 +86,14 @@ namespace io
 
 		domP *poly;
 
+
 		if(areTriangles)
 		{
 			polyCount = triangles->getCount();
 			inputArraysCount = triangles->getInput_array().getCount();
 
+			// Routine to declare the offsets if these attributes are present
+			// only VERTEX attributes are obligatory
 			for (int i=0; i<inputArraysCount; i++)
 			{
 				if(strcmp(triangles->getInput_array()[i]->getSemantic(),"VERTEX")==0){
@@ -101,6 +112,7 @@ namespace io
 					max_offset = triangles->getInput_array()[i]->getOffset();
 			}
 
+			// Stores the list of polygons
 			poly = triangles->getP();
 		}
 		else
@@ -109,6 +121,8 @@ namespace io
 			polyCount = polygons->getCount();
 			inputArraysCount = polygons->getInput_array().getCount();
 
+			// Routine to declare the offsets if these attributes are present
+			// only VERTEX attributes are obligatory
 			for (int i=0; i<inputArraysCount; i++)
 			{
 				if(strcmp(polygons->getInput_array()[i]->getSemantic(),"VERTEX")==0){
@@ -127,6 +141,7 @@ namespace io
 					max_offset = polygons->getInput_array()[i]->getOffset();
 			}
 
+			// Stores the list of polygons
 			poly = polygons->getP();
 		}
 
@@ -134,6 +149,7 @@ namespace io
 
 		int tot = 0;
 
+		// Add polygons into gprim_factory taking into account offsets to parse correctly
 		for (int i=0;i<polyCount;i++)
 		{
 			k3d::mesh::indices_t vertex_coordinates;

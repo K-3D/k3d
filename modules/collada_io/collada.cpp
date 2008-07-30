@@ -20,7 +20,7 @@ namespace io
 				str[i]='_';
 		return str;
 	}
-	
+
 	void addSource(daeElement* mesh, const std::string& srcID, const std::string& paramNames, domFloat values[], int valueCount)
 	{
 		SafeAdd(mesh, "source", src);

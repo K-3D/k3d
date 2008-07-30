@@ -104,13 +104,21 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
+		//static k3d::document_plugin_factory<mesh_reader_implementation,
+        ////        k3d::interface_list<k3d::imesh_source,
+        //        k3d::interface_list<k3d::imesh_storage> > > factory(
+		//	k3d::uuid(0xcd0962b6, 0x3e4a132b, 0x575537a5, 0xc4af7d0a),
+		//	"MD2MeshReader",
+		//	_("Reader that loads external MD2 (.md2) files into the document by reference"),
+		//	"MeshReader");
 		static k3d::document_plugin_factory<mesh_reader_implementation,
-                k3d::interface_list<k3d::imesh_source,
+               k3d::interface_list<k3d::imesh_source,
                 k3d::interface_list<k3d::imesh_storage> > > factory(
 			k3d::uuid(0xcd0962b6, 0x3e4a132b, 0x575537a5, 0xc4af7d0a),
 			"MD2MeshReader",
 			_("Reader that loads external MD2 (.md2) files into the document by reference"),
-			"MeshReader");
+			"MeshReader",
+			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
