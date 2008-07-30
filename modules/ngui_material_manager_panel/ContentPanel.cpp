@@ -351,6 +351,65 @@ void ContentPanel::createPreviewNodes()
 
 
 
+void ContentPanel::renderInit()
+{
+  //Re-init The Preview Render Dimensions
+  k3d::property::set_internal_value(*m_engine, 
+                                    "pixel_width", 
+                                    static_cast<k3d::int32_t>(m_pview_size));
+
+
+  k3d::property::set_internal_value(*m_engine, 
+                                    "pixel_height", 
+                                    static_cast<k3d::int32_t>(m_pview_size));
+
+
+  //Ensure Current Preview Engine Has Selected Nodes Only Visible
+  k3d::inode_collection::nodes_t::const_iterator node 
+    = m_document_state->document().nodes().collection().begin();
+
+  for(; node != m_document_state->document().nodes().collection().end(); ++node)
+    {
+      if((*node)->factory().implements(typeid(k3d::ri::ilight)))
+        {
+          //Disable Node Regardless In RMANEngine::lights and nodes
+          k3d::property::set_internal_value(*m_engine, 
+                                            "enabled_lights", 
+                                            k3d::inode_collection_property
+                                            ::nodes_t(0, (*node)));
+        }//if
+      else if((*node)->factory().implements(typeid(k3d::itransform_sink)))
+        {
+          k3d::property::set_internal_value(*m_engine, 
+                                            "visible_nodes", 
+                                            k3d::inode_collection_property
+                                            ::nodes_t(0, (*node)));
+        }//else if
+	    
+    }//for
+
+  //Vector List Of Lights To Be Enabled In Chosen Render Engine
+  std::vector<k3d::inode*>lightsEnabled;
+  lightsEnabled.push_back(m_main_light);
+  lightsEnabled.push_back(m_fill_light);
+  lightsEnabled.push_back(m_back_light);
+
+  //Simply Enable Now Only USed Lights & Geo
+  k3d::property::set_internal_value(*m_engine, 
+                                    "enabled_lights", lightsEnabled);
+ 
+
+
+  k3d::property::set_internal_value(*m_engine, 
+                                    "visible_nodes", 
+                                    k3d::inode_collection_property
+                                    ::nodes_t(1, m_geometry));
+
+}//renderInit
+
+
+
+
 }//namespace mechanics
 
 }//namespace material_manager

@@ -38,6 +38,7 @@
 #include <k3dsdk/ilight_shader_ri.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/share.h>
+#include <k3dsdk/itransform_sink.h>
 
 
 #include <gtkmm.h>
@@ -105,6 +106,9 @@ class ContentPanel
 
     //Initialization Of Object Contents Beyond Initial Values
     virtual void init()							= 0;
+
+    //Generic Render Initialization
+    void renderInit();
 
     //Accessor Functions
     //const k3d::string_t name() const		{return this->m_name.internal_value();}

@@ -132,80 +132,42 @@ void MaterialContentPanel::buildPanel()
 
 void MaterialContentPanel::renderPreview()
 {
-  //Re-init The Preview Render Dimensions
-  k3d::property::set_internal_value(*m_engine, 
-                                    "pixel_width", 
-                                    static_cast<k3d::int32_t>(m_pview_size));
-
-
-  k3d::property::set_internal_value(*m_engine, 
-                                    "pixel_height", 
-                                    static_cast<k3d::int32_t>(m_pview_size));
-
-  //Ensure Current Preview Engine Has Selected Nodes Only Visible
-  k3d::inode_collection::nodes_t::const_iterator node 
-    = m_document_state->document().nodes().collection().begin();
-
-  for(; node != m_document_state->document().nodes().collection().end(); ++node)
-    {
-      if((*node)->factory().implements(typeid(k3d::ri::ilight)))
-        {
-          //Disable Node Regardless In RMANEngine::lights and nodes
-          k3d::property::set_internal_value(*m_engine, 
-                                            "enabled_lights", 
-                                            k3d::inode_collection_property
-                                            ::nodes_t(0, (*node)));
-        }//if
-      else if((*node)->factory().implements(typeid(k3d::itransform_sink)))
-        {
-          k3d::property::set_internal_value(*m_engine, 
-                                            "visible_nodes", 
-                                            k3d::inode_collection_property
-                                            ::nodes_t(0, (*node)));
-        }//else if
-	    
-    }//for
-
-  //Vector List Of Lights To Be Enabled In Chosen Render Engine
-  std::vector<k3d::inode*>lightsEnabled;
-  lightsEnabled.push_back(m_main_light);
-  lightsEnabled.push_back(m_fill_light);
-  lightsEnabled.push_back(m_back_light);
-
-  //Simply Enable Now Only USed Lights & Geo
-  k3d::property::set_internal_value(*m_engine, 
-                                    "enabled_lights", lightsEnabled);
- 
-
-
-  k3d::property::set_internal_value(*m_engine, 
-                                    "visible_nodes", 
-                                    k3d::inode_collection_property
-                                    ::nodes_t(1, m_geometry));
+  //Invoke Generic Render Initialization
+  renderInit();
   
-  //Check If NodeIn sobject Is A RenderMan Material
-  //if(m_materialobj->docNode()->factory().implements(typeid(k3d::ri::imaterial)))
+  //Check If Selected Node Is A RenderMan Material
   if(m_materialobj->isMaterial())
     {
-      //If it is, assign to current geometry as surface shader
-      k3d::property::set_internal_value(*m_geometry, 
-                                        "material", 
-                                        const_cast<k3d::inode*>(m_materialobj->docNode()));
+      //If It Is, Assign To Current Geometry As A Surface Shader
+      k3d::property
+        ::set_internal_value(*m_geometry, 
+                             "material", 
+                             const_cast<k3d::inode*>(m_materialobj->docNode()));
 	   
 
       //Render The Preview Using Selected External Renderer
-      m_engine->render_camera_frame(*m_camera, k3d::system::get_temp_directory() 
+      m_engine->render_camera_frame(*m_camera, 
+                                    k3d::system::get_temp_directory() 
                                     / k3d::filesystem::generic_path(m_single_imgfile),
                                     false);
-
     }//if	 
+
   else
     {
-      k3d::log() << "Is NOT A Rman Material" << std::endl;
+      ; //Not A Renderman Material
     }
 	    
 }//renderPreview
 
+
+
+bool MaterialContentPanel::updatePreviewImage()
+{
+  //Invoke A Gtk Image Update / Refresh
+  m_material_preview.queue_resize();
+  m_material_preview.queue_draw();
+  return true;
+}	
 
 
 

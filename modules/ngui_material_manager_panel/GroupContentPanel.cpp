@@ -134,26 +134,26 @@ void GroupContentPanel::buildPanel()
       //Add Container To Right Pane From Implementation
       m_hpane->add2(m_toolbar_main_cont);
 
-      //ToolBar Setup
+      //Embed The ToolBar
       m_toolbar_main_cont.pack_start(m_toolbar, false, false, 0);
 
+      //----Insert Toolbar Setup HERE-----
 
+      //Setup & Embed The Panel ScrollWindow
       m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
       m_toolbar_main_cont.pack_start(m_scrolled_window, true, true, 0);
-
       m_scrolled_window.add(m_materials_cont);
 
-      //Setup ToolBar
-      m_materials_cont.pack_start(m_toolbar, false, false, 0);
-
-      //Integer To Tack onto filenames to make them unique
+      //Integer Value To Tack Onto Filenames To Make Them Unique (In This Panel)
       int fileName_int = 0;
 
       //For Each Of The Elements In Group->m_materials Create A GUI Strip
-      std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
+      std::list<MaterialObj*>::const_iterator mat_iter 
+        = m_materialgrp->materialBegin();
+
       for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
         {
-          //Create File Name For material Preview Image
+          //Create File Name For Material Preview Image
           k3d::string_t int_str;
           k3d::string_t finalFile_str;
           std::stringstream out;
@@ -163,39 +163,44 @@ void GroupContentPanel::buildPanel()
           finalFile_str.append(m_multi_imgfile);
           finalFile_str.append(int_str);		    
 
-          //Create The material Preview Image Object
-          RenderedImage *s_preview_obj = new RenderedImage(k3d::system::get_temp_directory() / k3d::filesystem::generic_path(finalFile_str));
+          //Create The Material Preview Image Object
+          RenderedImage *s_preview_obj 
+            = new RenderedImage(k3d::system::get_temp_directory() 
+                                / k3d::filesystem::generic_path(finalFile_str));
+
+          //Add Material Preview Image Object To List
           m_material_pviews.push_back(s_preview_obj);
 		    
+          //Create & Embed Container To Hold A Single Material Section
           Gtk::HBox *t_HBox = new Gtk::HBox;
           m_pview_data_conts.push_back(t_HBox);
           m_materials_cont.pack_start(*t_HBox, false, false, 10);
 
+          //Create & Embed The Preview Frame For Each Material
           Gtk::Frame *t_Frame = new Gtk::Frame("Preview Render:");
           t_Frame->add(*s_preview_obj);
           m_pview_frames.push_back(t_Frame);
           t_Frame->set_size_request(m_pview_size + 25, m_pview_size + 35);
           t_HBox->pack_start(*t_Frame, false, false, 5);
 
-          //Data & Notes VBox
+          //Create & Embed Data & Artist Notes Container
           Gtk::VBox *t_VBox_dd = new Gtk::VBox;
           m_data_desc_conts.push_back(t_VBox_dd);
           t_HBox->pack_start(*t_VBox_dd, true, true, 5); //HERE
 
-          //Data HBox (Contains x3 VBox -> Label, vertical break and Data)
+          //Data Container (Contains x3 VBox -> Label, vertical break and Data)
           Gtk::HBox *t_HBox_ld = new Gtk::HBox;
           m_label_data_conts.push_back(t_HBox_ld);
           t_VBox_dd->pack_start(*t_HBox_ld, false, false, 5);
 		    
-          //Label VBox
+          //Create & Embed The Label Container
           Gtk::VBox *t_VBox_label = new Gtk::VBox;
           m_label_conts.push_back(t_VBox_label);
           t_HBox_ld->pack_start(*t_VBox_label, false, false, 0);
-
           t_VBox_label->set_spacing(4);
 
-          //BUILD LABEL STUFF
-
+          
+          //Label (Non-Data) Creation
           Gtk::Label *t_Name_label = new Gtk::Label("Material Name:");
           Gtk::Label *t_Type_label = new Gtk::Label("Material Type:");
           Gtk::Label *t_dateMod_label = new Gtk::Label("Date Modified:");
@@ -212,25 +217,23 @@ void GroupContentPanel::buildPanel()
           t_VBox_label->pack_start(*t_ArtistName_label, false, false, 0);
 
           t_Name_label->set_alignment(0.0);
-
           t_Type_label->set_alignment(0.0);
           t_dateMod_label->set_alignment(0.0);
           t_ArtistName_label->set_alignment(0.0);
 
 
-          //Build Vertical Breaker
+          //Create Vertical Seperator Between Label & Label Data
           Gtk::VSeparator *t_VBreaker = new Gtk::VSeparator();
           m_label_data_seps.push_back(t_VBreaker);
           t_HBox_ld->pack_start(*t_VBreaker, false, false, 10);
 
-          //Data VBox
+          //Create & Embed Label Data Container
           Gtk::VBox *t_VBox_d = new Gtk::VBox;
           m_data_conts.push_back(t_VBox_d);
           t_HBox_ld->pack_start(*t_VBox_d, false, false, 0);
           t_VBox_d->set_spacing(4);
 
-          //BUILD DATA (READ ONLY) STUFF
-
+          //Label Data Creation
           Gtk::Label *t_Name_d = new Gtk::Label((*mat_iter)->name());
           Gtk::Label *t_Type_d = new Gtk::Label((*mat_iter)->type());
           Gtk::Label *t_dateMod_d = new Gtk::Label((*mat_iter)->dateStamp());
@@ -251,13 +254,12 @@ void GroupContentPanel::buildPanel()
           t_dateMod_d->set_alignment(0.0);
           t_ArtistName_d->set_alignment(0.0);
 
-          //Horizontal rule between data and notes
+          //Create Seperator Between Labels & Artist Notes
           Gtk::HSeparator *t_DataHBreaker = new Gtk::HSeparator();
           m_data_notes_seps.push_back(t_DataHBreaker);
           t_VBox_dd->pack_start(*t_DataHBreaker, false, false, 0);
 
-          //Artist Notes Build
-
+          //Create The Artist Notes ML Text Widget
           Glib::RefPtr<Gtk::TextBuffer> txtDisplay = Gtk::TextBuffer::create();
           txtDisplay->set_text((*mat_iter)->artistNotes());
 
@@ -265,109 +267,68 @@ void GroupContentPanel::buildPanel()
           t_NotesView->set_editable(false);	    
           m_artistnotes_mltext.push_back(t_NotesView);
 
+          //Embed The ml Text Widget Into A Scroll Window
           Gtk::ScrolledWindow *t_NotesScrollWin = new Gtk::ScrolledWindow;
           m_artistnotes_scrollwin.push_back(t_NotesScrollWin);
           t_NotesScrollWin->add(*t_NotesView);
-
           t_VBox_dd->pack_start(*t_NotesScrollWin, true, true, 0);
 
-          //Add Horizontal Breaker At Bottom
+          //Create Seperator Between Each Material Section
           Gtk::HSeparator *t_HBreaker = new Gtk::HSeparator();
           m_materials_seps.push_back(t_HBreaker);
           m_materials_cont.pack_start(*t_HBreaker, false, false, 0);
 
-          
+          //Increment Filename Tag For Unique Identifier
           fileName_int++;
 
         }//for
 
+      //Gtk Build / Show GUI Hint
+      m_hpane->show_all(); 
+
       //Set Off Renderer In New Process 
       renderPreview();
-
     }
   else
-    k3d::log() << "Invalid HPaned Pointer" << std::endl;  
-
-  //DEBUG INFO -> DELETE ON RELEASE
-  k3d::log() << "building Group panel" << std::endl;
-  m_hpane->show_all(); 
+    ; // Invalid HPanel Pointer 
 
 }//buildPanel
 
 
 void GroupContentPanel::renderPreview()
 {
-  //Re-init The Preview Render Dimensions
-  k3d::property::set_internal_value(*m_engine, 
-                                    "pixel_width", static_cast<k3d::int32_t>(m_pview_size));
+  //Invoke Generic Render Initialization
+  renderInit();
+ 
+  //Iterate Through Each Material In Group & Render
 
-
-  k3d::property::set_internal_value(*m_engine, 
-                                    "pixel_height", static_cast<k3d::int32_t>(m_pview_size));
-
-
-  //Ensure Current Preview Engine Has Selected Nodes Only Visible
-  k3d::inode_collection::nodes_t::const_iterator node = m_document_state->document().nodes().collection().begin();
-  for(; node != m_document_state->document().nodes().collection().end(); ++node){
-
-    if((*node)->factory().implements(typeid(k3d::ri::ilight)))
-      {
-        //Disable Node Regardless In RMANEngine::lights and nodes
-        k3d::property::set_internal_value(*m_engine, 
-                                          "enabled_lights", 
-                                          k3d::inode_collection_property::nodes_t(0, (*node)));
-      }//if
-    else if((*node)->factory().implements(typeid(k3d::itransform_sink)))
-      {
-        k3d::property::set_internal_value(*m_engine, 
-                                          "visible_nodes", 
-                                          k3d::inode_collection_property::nodes_t(0, (*node)));
-      }//else if
-	    
-  }//for
-
-
-  //Vector List Of Lights To Be Enabled In Chosen Render Engine
-  std::vector<k3d::inode*>lightsEnabled;
-  lightsEnabled.push_back(m_main_light);
-  lightsEnabled.push_back(m_fill_light);
-  lightsEnabled.push_back(m_back_light);
-
-  //Simply Enable Now Only USed Lights & Geo
-  k3d::property::set_internal_value(*m_engine, 
-                                    "enabled_lights", lightsEnabled);
-
-
-  k3d::property::set_internal_value(*m_engine, 
-                                    "visible_nodes", 
-                                    k3d::inode_collection_property::nodes_t(1, m_geometry));
-  
-  //Go Though Every material In Group Render To Image File.. Done
   std::list<MaterialObj*>::const_iterator soIter = m_materialgrp->materialBegin();
-  std::vector<RenderedImage*>::iterator pIter = m_material_pviews.begin();   //NEE TO FIX THIS AS ASSUMES TOO MUCH (CORRECT SIZES) -> DANGEROUS
+
+  std::vector<RenderedImage*>::iterator pIter = m_material_pviews.begin();  //NEED FIX 
+
   for(; soIter != m_materialgrp->materialEnd(); soIter++)
     {
-      //Check If NodeIn sobject Is A RenderMan Material
-      //if((*soIter)->docNode()->factory().implements(typeid(k3d::ri::imaterial)))
+      //Check If Selected Node Is A RenderMan Material
       if((*soIter)->isMaterial())
         {
-          k3d::log() << "PROBLEM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-          //If it is, assign to current geometry as surface shader
-          k3d::property::set_internal_value(*m_geometry, 
-                                            "material", const_cast<k3d::inode*>((*soIter)->docNode()));
-          k3d::log() << "PROBLEM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+          //If It Is, Assign To Current Geometry As A Surface Shader
+          k3d::property
+            ::set_internal_value(*m_geometry, 
+                                 "material", 
+                                 const_cast<k3d::inode*>((*soIter)->docNode()));
+ 
 
-	   
-          k3d::log() << "ABOUT TO RENDER" << std::endl;
           //Render The Preview Using Selected External Renderer
           m_engine->render_camera_frame(*m_camera, (*pIter)->imgFilePath(), false);
 
         }//if	 
+
       else
         {
-          k3d::log() << "Is NOT A Rman Material" << std::endl;
+          ; //Not A Renderman Material
         }
 
+      //Increment Preview Image Iterator -- FIX THIS
       pIter++;
 
     }//for  
@@ -378,11 +339,13 @@ void GroupContentPanel::renderPreview()
 
 bool GroupContentPanel::updatePreviewImage()
 {
+  //Invoke A Gtk Image Update / Refresh For Each Preview Image
   std::vector<RenderedImage*>::iterator simgIter = m_material_pviews.begin();
   for(; simgIter != m_material_pviews.end(); simgIter++)
     {
       (*simgIter)->queue_resize();
       (*simgIter)->queue_draw();
+
     }//for
 	    
   return true;

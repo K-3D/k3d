@@ -88,12 +88,7 @@ class MaterialContentPanel : public ContentPanel
       void renderPreview();
       
       //Invoke A Preview Image Update
-      bool updatePreviewImage()
-      {
-        m_material_preview.queue_resize();
-        m_material_preview.queue_draw();
-        return true;
-      }	
+      bool updatePreviewImage();
 
       //Todays Date Button Event Handler
       void onDateButtonPressed()
