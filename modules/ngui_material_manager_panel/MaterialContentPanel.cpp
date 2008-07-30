@@ -170,6 +170,12 @@ bool MaterialContentPanel::updatePreviewImage()
 }	
 
 
+void MaterialContentPanel::renderSinglePreview(k3d::inode *node)
+{
+  renderPreview();
+}
+
+
 
 }//namespace mechanics
 

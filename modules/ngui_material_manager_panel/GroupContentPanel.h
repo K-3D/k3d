@@ -65,11 +65,17 @@ class GroupContentPanel : public ContentPanel
     //Build The GUI Panel
     void buildPanel();
 
-    //Panel Specific Preview Render Mechanism
+    //Panel Specific Preview Render Mechanism (ALL)
     void renderPreview();
+
+    //Renders One Of The Materials In Group
+    void renderSinglePreview(k3d::inode *node);
 
     //Invoke A Preview Image Update
     bool updatePreviewImage();
+
+    //Find A Material From A Doc Node
+    bool findMaterial(const k3d::inode *node);
 
 
  private:

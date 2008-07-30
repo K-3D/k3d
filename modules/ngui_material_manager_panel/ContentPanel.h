@@ -56,6 +56,7 @@ namespace material_manager
 {
 namespace mechanics
 {
+
 class ContentPanel
 {
  public:
@@ -100,15 +101,19 @@ class ContentPanel
     void createPreviewNodes();
 
     //Abstract Functions To Be Used By Group & Profile Derivatives
-    virtual void renderPreview() 			= 0;
-    virtual bool updatePreviewImage() 		= 0;
-    virtual void buildPanel() 				= 0;
+    virtual void renderPreview() 				  				= 0;
+    virtual void renderSinglePreview(k3d::inode *node) 	= 0;
+    virtual bool updatePreviewImage() 							= 0;
+    virtual void buildPanel() 									= 0;
 
     //Initialization Of Object Contents Beyond Initial Values
-    virtual void init()							= 0;
+    virtual void init()												= 0;
 
     //Generic Render Initialization
     void renderInit();
+
+    //Find A Material From A Doc Node
+    virtual bool findMaterial(const k3d::inode *node) 	= 0;
 
     //Accessor Functions
     //const k3d::string_t name() const		{return this->m_name.internal_value();}

@@ -53,12 +53,12 @@ class RenderedImage: public Gtk::DrawingArea
   bool onUpdatePreview();
 
   //Variable Accessors
-  const k3d::filesystem::path imgFilePath()		{return m_imgFilePath;}
-  const k3d::filesystem::path imgHolderPath()		{return m_imgHolderPath;}
+  k3d::filesystem::path imgFilePath()			{return m_imgFilePath;}
+  k3d::filesystem::path imgHolderPath()		{return m_imgHolderPath;}
 
   //Variable Mutators
   void setImgFilePath(const k3d::filesystem::path &p)		{m_imgFilePath = p;}
-  void setImgHolderPath(const k3d::filesystem::path &p)		{m_imgHolderPath = p;}
+  void setImgHolderPath(const k3d::filesystem::path &p)	{m_imgHolderPath = p;}
 
  public:
 

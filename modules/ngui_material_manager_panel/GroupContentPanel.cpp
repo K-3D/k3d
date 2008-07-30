@@ -169,8 +169,13 @@ void GroupContentPanel::buildPanel()
                                 / k3d::filesystem::generic_path(finalFile_str));
 
           //Add Material Preview Image Object To List
-          m_material_pviews.push_back(s_preview_obj);
+          //m_material_pviews.push_back(s_preview_obj);
 		    
+          
+          //Set The MaterialObj's Preview Image Object
+          (*mat_iter)->setPviewImg(s_preview_obj);
+
+
           //Create & Embed Container To Hold A Single Material Section
           Gtk::HBox *t_HBox = new Gtk::HBox;
           m_pview_data_conts.push_back(t_HBox);
@@ -302,24 +307,23 @@ void GroupContentPanel::renderPreview()
  
   //Iterate Through Each Material In Group & Render
 
-  std::list<MaterialObj*>::const_iterator soIter = m_materialgrp->materialBegin();
+  std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
 
-  std::vector<RenderedImage*>::iterator pIter = m_material_pviews.begin();  //NEED FIX 
-
-  for(; soIter != m_materialgrp->materialEnd(); soIter++)
+  for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
     {
       //Check If Selected Node Is A RenderMan Material
-      if((*soIter)->isMaterial())
+      if((*mat_iter)->isMaterial())
         {
           //If It Is, Assign To Current Geometry As A Surface Shader
           k3d::property
             ::set_internal_value(*m_geometry, 
                                  "material", 
-                                 const_cast<k3d::inode*>((*soIter)->docNode()));
- 
+                                 const_cast<k3d::inode*>((*mat_iter)->docNode()));
 
           //Render The Preview Using Selected External Renderer
-          m_engine->render_camera_frame(*m_camera, (*pIter)->imgFilePath(), false);
+          m_engine
+            ->render_camera_frame(*m_camera, 
+                                  (const_cast<RenderedImage*>((*mat_iter)->pviewImg()))->imgFilePath(), false);
 
         }//if	 
 
@@ -327,9 +331,6 @@ void GroupContentPanel::renderPreview()
         {
           ; //Not A Renderman Material
         }
-
-      //Increment Preview Image Iterator -- FIX THIS
-      pIter++;
 
     }//for  
 
@@ -340,18 +341,95 @@ void GroupContentPanel::renderPreview()
 bool GroupContentPanel::updatePreviewImage()
 {
   //Invoke A Gtk Image Update / Refresh For Each Preview Image
-  std::vector<RenderedImage*>::iterator simgIter = m_material_pviews.begin();
-  for(; simgIter != m_material_pviews.end(); simgIter++)
-    {
-      (*simgIter)->queue_resize();
-      (*simgIter)->queue_draw();
+  std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
 
-    }//for
+  for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+    {
+      (const_cast<RenderedImage*>((*mat_iter)->pviewImg()))->queue_resize();
+      (const_cast<RenderedImage*>((*mat_iter)->pviewImg()))->queue_draw();
+    }
 	    
   return true;
 }
 
 
+
+void GroupContentPanel::renderSinglePreview(k3d::inode *node)
+{
+  //Iterate Through All Of The Stored MaterialObj's.
+   std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
+
+   MaterialObj* matching_material = 0;
+
+   for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+   {
+     //Check If MaterialObj's Doc Node Equals Argument Node
+     if((*mat_iter)->m_doc_node == node)
+       {
+         matching_material = (*mat_iter);
+         break;
+       }
+   }//for
+
+   //Start A Single Render Preview
+   if(matching_material)
+     {
+       //Invoke Generic Render Initialization
+       renderInit();
+
+       k3d::log() << "OK HERE!" << std::endl;
+
+       //Check If Selected Node Is A RenderMan Material
+       if(matching_material->isMaterial())
+         {
+           //If It Is, Assign To Current Geometry As A Surface Shader
+           k3d::property
+             ::set_internal_value(*m_geometry, 
+                                  "material", 
+                                  const_cast<k3d::inode*>(matching_material->docNode()));
+
+
+           //Get Path Of Target Render Image
+           k3d::filesystem::path pimg_path 
+             =(const_cast<RenderedImage*>((*mat_iter)->pviewImg()))->imgFilePath();
+
+           k3d::log() << "FILENAME!!!!!: " << pimg_path.native_filesystem_string() << std::endl; 
+
+           //Render The Preview Using Selected External Renderer
+           m_engine->render_camera_frame(*m_camera, 
+                                         pimg_path,
+                                         false);
+    }//if	 
+
+  else
+    {
+      ; //Not A Renderman Material
+    }
+
+
+
+     }//if
+  
+}
+
+
+bool GroupContentPanel::findMaterial(const k3d::inode *node)
+{
+  k3d::log() << "Error Could Be Here!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+
+  //Iterate Through All Of The Stored MaterialObj's.
+   std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
+
+   for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+     {
+       if((*mat_iter)->docNode() == node)
+         return true;
+     }
+
+   return false;
+
+
+}
 
 
 }//namespace mechanics

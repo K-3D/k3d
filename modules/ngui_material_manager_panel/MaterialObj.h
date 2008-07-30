@@ -34,6 +34,7 @@
 #include <iostream>
 #include <k3dsdk/log.h>
 
+#include "RenderedImage.h"
 #include "MaterialGroup.h"
 
 using namespace k3d::data;
@@ -65,7 +66,10 @@ class MaterialObj
       }
  
     ~MaterialObj()
-      {	   
+      {
+        //Clean Up
+        if(m_pview_img)
+          delete m_pview_img;
       }
 
  public:
@@ -74,11 +78,13 @@ class MaterialObj
     void init();
 
     //Accessor Functions
-    const k3d::string_t name() const		{return this->m_name.internal_value();}
-    const k3d::string_t type() const		{return this->m_type.internal_value();}
-    const k3d::string_t dateStamp() const	{return this->m_datestamp.internal_value();}
-    const k3d::string_t artistName() const	{return this->m_artistname.internal_value();}
-    const k3d::string_t artistNotes() const	{return this->m_artistnotes.internal_value();}  
+    const k3d::string_t name() const					{return this->m_name.internal_value();}
+    const k3d::string_t type() const					{return this->m_type.internal_value();}
+    const k3d::string_t dateStamp() const				{return this->m_datestamp.internal_value();}
+    const k3d::string_t artistName() const	  		{return this->m_artistname.internal_value();}
+    const k3d::string_t artistNotes() const			{return this->m_artistnotes.internal_value();}  
+    const RenderedImage* pviewImg() const			  	{return this->m_pview_img;}
+
     
  /*   m_data_t  nameData() const		{return this->m_name;}
     data_t* typeData() const		{return this->m_type;}
@@ -86,18 +92,19 @@ class MaterialObj
     data_t* artistNameData() const	{return this->m_artistname;}
      data_t* artistNotesData() const	{return this->m_artistnotes;} */
     
-    const k3d::inode* docNode() const 		{return this->m_doc_node;}
-    const k3d::string_t docNodeName() const	{return this->m_doc_node->factory().name();}
-    MaterialGroup* groupParent() const	 	{return this->m_group_parent;}
+    const k3d::inode* docNode() const 					{return this->m_doc_node;}
+    const k3d::string_t docNodeName() const			{return this->m_doc_node->factory().name();}
+    MaterialGroup* groupParent() const	 				{return this->m_group_parent;}
 
     //Mutator Functions
-    void setName(const k3d::string_t &_str)		{this->m_name.set_value(_str);}
-    void setType(const k3d::string_t &_str)		{this->m_type.set_value(_str);}
+    void setName(const k3d::string_t &_str)			{this->m_name.set_value(_str);}
+    void setType(const k3d::string_t &_str)			{this->m_type.set_value(_str);}
     void setDateStamp(const k3d::string_t &_str)	{this->m_datestamp.set_value(_str);}
     void setArtistName(const k3d::string_t &_str)	{this->m_artistname.set_value(_str);}
     void setArtistNotes(const k3d::string_t &_str)	{this->m_artistnotes.set_value(_str);}
-    void setDocNode(k3d::inode *_node_ptr) 		{this->m_doc_node = _node_ptr;}
+    void setDocNode(k3d::inode *_node_ptr) 			{this->m_doc_node = _node_ptr;}
     void setGroupParent(MaterialGroup *_gp_ptr) 	{this->m_group_parent = _gp_ptr;}
+    void setPviewImg(RenderedImage *img) 				{this->m_pview_img = img;}
 
     
     //Material Profile Signal Event Handlers
@@ -117,10 +124,10 @@ class MaterialObj
     //Find Out If This Is A k3d::ri::imaterial (A K3d Material)
     bool isMaterial()
     {
-    if(m_doc_node->factory().implements(typeid(k3d::ri::imaterial)))
-    return true;  
-    else 
-    return false;
+      if(m_doc_node->factory().implements(typeid(k3d::ri::imaterial)))
+        return true;  
+      else 
+        return false;
     }
    
 
@@ -147,8 +154,10 @@ class MaterialObj
                 no_property, no_serialization)> 					m_artistnotes;
 
 
-    k3d::inode				*m_doc_node;
+    k3d::inode					*m_doc_node;
     MaterialGroup 	  		*m_group_parent;
+
+    RenderedImage				*m_pview_img;
     
     
     

@@ -86,6 +86,9 @@ class MaterialContentPanel : public ContentPanel
 
       //Panel Specific Preview Render Mechanism
       void renderPreview();
+
+      //Simply Calls renderPreview (Required For Group Render Update)
+      void renderSinglePreview(k3d::inode *node);
       
       //Invoke A Preview Image Update
       bool updatePreviewImage();
@@ -95,6 +98,17 @@ class MaterialContentPanel : public ContentPanel
       {
         //Insert Todays Date (mm/dd/yyyy) into date entry
         m_materialobj->insertTodaysDate();
+      }
+
+      //Find A Material From A Doc Node
+      bool findMaterial(const k3d::inode *node)
+      {
+        if(m_materialobj->m_doc_node == node)
+          return true;
+
+        else
+          return false;
+
       }
 
   private:
