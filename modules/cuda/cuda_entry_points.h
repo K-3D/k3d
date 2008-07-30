@@ -27,7 +27,7 @@
 #include <k3d-platform-config.h>
 
 #if defined K3D_API_WIN32
-	#include "win32.h"
+	#include <k3dsdk/win32.h>
 	#define K3D_CUDA_DECLSPEC __declspec(dllexport)
 #else
 	#include <sys/time.h>

@@ -44,6 +44,15 @@ FIND_LIBRARY (CUDA_RUNTIME_LIBRARY
 	${CUDA_COMPILER_SUPER_DIR}/lib
 	${CUDA_COMPILER_DIR}
 	DOC "The CUDA runtime library")
+	
+IF(WIN32)
+FIND_PATH (VC_SDK_INCLUDE_PATH Windows.h
+    "C:/Program Files/Microsoft SDKs/Windows/v6.0A/Include"
+    DOC "The directory where the Visual Studio SDK include files reside")
+FIND_PATH (VC_SDK_LIB_PATH Uuid.lib
+    "C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib"
+    DOC "The directory where the Visual Studio SDK library files reside")
+ENDIF(WIN32)
 
 IF (CUDA_INCLUDE_PATH AND CUDA_RUNTIME_LIBRARY)
 	SET (CUDA_FOUND TRUE)
@@ -81,6 +90,11 @@ MACRO(GET_CUDA_INC_DIRS _cuda_INC_DIRS)
 	ENDFOREACH(_current ${_inc_DIRS})
 	
 	SET(${_cuda_INC_DIRS} ${${_cuda_INC_DIRS}} "-I" ${CUDA_INCLUDE_PATH})
+	
+	IF(WIN32)
+	    SET(${_cuda_INC_DIRS} ${${_cuda_INC_DIRS}} "-I" ${VC_SDK_INCLUDE_PATH})
+	    SET(${_cuda_INC_DIRS} ${${_cuda_INC_DIRS}} "-L" ${VC_SDK_LIB_PATH})
+	ENDIF(WIN32)
     
     #MESSAGE("_cuda_INC_DIRS = ${${_cuda_INC_DIRS}}")
 
