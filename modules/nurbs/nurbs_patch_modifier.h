@@ -48,12 +48,14 @@ namespace module
 {
 	namespace nurbs
 	{
+	    ///Simple representation of a nurbs curve, used to pass data between curves and patches
 	    typedef struct nurbs_curve{
 	        k3d::mesh::knots_t curve_knots;
 	        k3d::mesh::weights_t curve_point_weights;
 	        k3d::mesh::points_t control_points;
 	    };
 
+        ///A nurbs patch data struct
 	    typedef struct nurbs_patch{
 	        size_t u_order;
 	        size_t v_order;
@@ -63,20 +65,40 @@ namespace module
 	        k3d::mesh::points_t control_points;
 	    };
 
+        ///NurbsPatchModifier bundles all functionality that works on NURBS Patches
 		class nurbs_patch_modifier
 		{
 			public:
+                ///Create a nurbs_patch_modifier from the given mesh, working on its patches
+                ///\param input The mesh to operate on
 				nurbs_patch_modifier(k3d::mesh& input);
 
+                ///Extract a curve from a patch in u direction and return it
+                ///\param patch The patch where we want the curve from
+                ///\param v Which of the v curves do we want? Must be smaller than patch_v_point_counts
 				nurbs_curve extract_u_curve(size_t patch, size_t v);
+
+				///Extract a curve from a patch in v direction and return it
+                ///\param patch The patch where we want the curve from
+                ///\param u Which of the u curves do we want? Must be smaller than patch_u_point_counts
 				nurbs_curve extract_v_curve(size_t patch, size_t u);
 
+                ///Extract the patch with the given index, returns this patch
 				nurbs_patch extract_patch(size_t patch);
+
+				///Returns the number of patches in this mesh
 				int get_patch_count();
+
+				///Adds a patch to the mesh, existing points may be used
+				///\param patch The patch to insert
+				///\param share_points Whether to use existing vertices at the same position
 				void insert_patch(nurbs_patch& patch, bool share_points);
 
 
 			private:
+                ///Adds this point to the mesh's points_t instance, and returns the index to its position
+                ///\param point The point to add
+                ///\param shared If this is true then we'll try to use an existing point at the same position
                 size_t insert_point(k3d::point3& point, bool shared);
 
 				k3d::mesh *m_instance;
