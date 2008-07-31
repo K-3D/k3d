@@ -45,7 +45,7 @@ class RenderedImage: public Gtk::DrawingArea
 
   RenderedImage(k3d::filesystem::path _imgPath);
 
-  virtual ~RenderedImage();
+  ~RenderedImage();
 	  
  public:
 

@@ -223,6 +223,7 @@ public:
      m_model(new Model),
      m_parent(&Parent),
      m_current_mat_node(0),
+     m_init(false),
      add_group("Add"),
      remove_group("Remove")
   {
@@ -230,6 +231,8 @@ public:
 
   ~Implementation()
   {	
+    //Disconnect Any Existing Connection With Properties
+    m_pConnection.disconnect();
   }
 
   //Initialization Of Object Contents Beyond Initial Values
@@ -298,6 +301,9 @@ public:
   //The Right Content Pane For The Panel
   std::auto_ptr<ContentPanel> m_rpane_content;
 
+  //Flag To Hold Startup Routine Heads Up
+  bool								m_init;
+
   //Tree Model Used By Material Navigator
   class columns :
     public Gtk::TreeModel::ColumnRecord
@@ -330,6 +336,9 @@ public:
 
 void Implementation::init()
 {
+  //Currently In init
+  m_init = true;
+
   //Create The Material Tree Model
   tree_model = Gtk::TreeStore::create(m_columns);
   m_tree.set_model(tree_model);
@@ -349,8 +358,8 @@ void Implementation::init()
   m_document_state.document().nodes().rename_node_signal()
     .connect(sigc::mem_fun(*this, &Implementation::onNodeRenamed));
 
-  m_document_state.view_node_properties_signal()
-    .connect(sigc::mem_fun(*this, &Implementation::onNodeSelection));
+ //  m_document_state.view_node_properties_signal()
+//     .connect(sigc::mem_fun(*this, &Implementation::onNodeSelection));
 
   //Tree Editing Signal Connections
   add_group.signal_clicked()
@@ -369,8 +378,29 @@ void Implementation::init()
   //Build The GTK GUI
   buildGui();
 
+
   //Hint To GTK To Update Interface
   schedule_update();
+
+  //Try To Connect The Selected Node. (Otherwise Wont Work Until Re-Select)
+  k3d::inode_collection::nodes_t::const_iterator node_iter 
+    = m_document_state.document().nodes().collection().begin();
+
+  bool selected_result = false;
+	    
+  for(node_iter; node_iter != m_document_state.document().nodes().collection().end(); ++node_iter)
+    {
+      //Check If Node Is Selected
+      selected_result = m_document_state.is_selected((*node_iter));
+      if(selected_result)
+        {
+          onNodeSelection(*node_iter);
+          k3d::log() << "THERE IS A NODE SELECTED!" << std::endl;
+          //if(onNodeSelection((*node_iter)))
+           //break;
+        }
+    }//for
+
 
 }//init
 
@@ -494,6 +524,25 @@ void Implementation::onTreeRowChanged()
         {
           k3d::log() << row->get_value(m_columns.m_col_mgptr)->name() << std::endl;
           buildContentPanel(row, true);
+
+
+          k3d::inode_collection::nodes_t::const_iterator node_iter 
+            = m_document_state.document().nodes().collection().begin();
+
+          bool selected_result = false;
+     
+          // for(node_iter; node_iter != m_document_state.document().nodes().collection().end(); ++node_iter)
+//             {
+//               //Check If Node Selected
+//               selected_result = m_document_state.is_selected((*node_iter));
+
+//               if(selected_result)
+//             //     {
+//                   m_init = true;
+//                   onNodeSelection(m_current_mat_node);
+                  //}
+      
+                  // }
         }
 
       //Must Be A Material Object
@@ -510,7 +559,10 @@ void Implementation::onTreeRowChanged()
 
           //Build The GTK GUI Context
           buildContentPanel(row, false);
+
+          onNodeSelection(const_cast<k3d::inode*>(selectedNode));
         }
+
 
     }//if
 
@@ -760,71 +812,111 @@ bool Implementation::getRow(k3d::inode* const Node, Gtk::TreeIter& Row)
 
 bool Implementation::onNodeSelection(k3d::inode* const Node)
 {
-  //return result (if Not Material or Not Selected)
+  //return result (if Not Material)
   bool result = false;
 
   //Disconnect Any Existing Connection With Properties
   m_pConnection.disconnect();
 
+
   //Check If Node Is A Renderman Material
   if((Node)->factory().implements(typeid(k3d::ri::imaterial))){
 
-    //Get The Current Row Selection
-    Gtk::TreeModel::iterator iter = tree_selection->get_selected();
-    Gtk::TreeModel::Row row = *iter;
+    //Set Current Node Selected Member Variable (Used In Single Render)
+    m_current_mat_node = Node;
+    result = true;
 
-    k3d::inode *selected_node = 0;
+    //Check If This Function was Invoked By init()
+    if(m_init)
+      {
+        //Set Flag Back To False >> init() only called once
+        m_init = false;
 
-    //Check If Group Display Or Profile Display
-    if(row->get_value(m_columns.m_col_ismg))
-      {
-        //Check If Material Is Present With Node
-        if(m_rpane_content->findMaterial(Node))
-          {
-            selected_node = Node;
-            k3d::log() << "FOUND!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-            k3d::log() << selected_node->name() << std::endl;
-          }
-        else
-          {
-            selected_node = 0;
-            k3d::log() << "NOT FOUND!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-          }
-      }
-       //Material Profile Displayed (MaterialObj)
-    else
-      {
-        selected_node = (row->get_value(m_columns.m_col_moptr))->m_doc_node;
-      }
-          
-
-    //Check If Selected Node's "Node Pointer" Equals Argument Pointer
-    if(selected_node && selected_node == Node)
-      {
-        //It Is A Qualified Node!
-        result = true;
+        //THIS IS NOT IDEAL. NEEDS FIXING************V
 
         //Create Connection For Node Change
         k3d::inode_change_signal *n_sig 
           = dynamic_cast<k3d::inode_change_signal*>(Node);
 
-
-        //Set Current Node Selected Memeber Variable (Used In Single Render)
-        m_current_mat_node = Node;
-
-        if(n_sig)
+        if(n_sig){
           m_pConnection 
             = n_sig->connect_node_changed_signal(sigc::mem_fun(*this, 
-                                                                &Implementation
-                                                                ::propertySignalRender));
-
-      }//if
-
+                                                               &Implementation
+                                                               ::propertySignalRender));
+        }
+      }
     else
-      k3d::log() << "DEBUG: MATERIAL BUT NOT SELECTED MATERIAL" << std::endl;
+      {
+        //Get The Current Row Selection
+        Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+
+        k3d::log() << "OK HERE 1: !!!!!!!!!!!!!!" << std::endl;
+
+        Gtk::TreeModel::Row row = *iter;
 
 
-    }//if
+        k3d::log() << "OK HERE 2: !!!!!!!!!!!!!!" << std::endl;
+
+        //Check If The Selected Row In Tree IS A Valid Pointer
+        if(iter)
+          {
+            k3d::inode *selected_node = 0;
+
+            //Check If Group Display Or Profile Display
+            if(row->get_value(m_columns.m_col_ismg))
+              {
+                //Check If Material Is Present With Node
+                if(m_rpane_content->findMaterial(Node))
+                  {
+                    selected_node = Node;
+                    k3d::log() << "FOUND!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+                    k3d::log() << selected_node->name() << std::endl;
+                  }
+                else
+                  {
+                    selected_node = 0;
+                    k3d::log() << "NOT FOUND!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+                  }
+                //selected_node = 0;
+              }
+            //Material Profile Displayed (MaterialObj)
+            else
+              {
+                selected_node = (row->get_value(m_columns.m_col_moptr))->m_doc_node;
+              }
+          
+
+            //Check If Selected Node's "Node Pointer" Equals Argument Pointer
+            if(selected_node && selected_node == Node)
+              {
+            
+                //Create Connection For Node Change
+                k3d::inode_change_signal *n_sig 
+                  = dynamic_cast<k3d::inode_change_signal*>(Node);
+
+
+                if(n_sig){
+                  m_pConnection 
+                    = n_sig->connect_node_changed_signal(sigc::mem_fun(*this, 
+                                                                       &Implementation
+                                                                       ::propertySignalRender));
+
+                  k3d::log() << "Property Contected!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+                }
+                else
+                  {
+                    k3d::log() << "Property NOT Contected!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+                  }
+
+              }//if
+
+            else
+              k3d::log() << "DEBUG: MATERIAL BUT NOT SELECTED MATERIAL" << std::endl;
+
+
+          }//if
+      }
+  }
 
   return result;
 

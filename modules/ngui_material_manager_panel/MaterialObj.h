@@ -57,6 +57,7 @@ class MaterialObj
   MaterialObj(MaterialGroup *_parent, k3d::inode *_node, k3d::string_t _s_type)
     :m_group_parent(_parent), 
     m_doc_node(_node), 
+    m_pview_img(0),
     m_name(init_value(_node->name())),
     m_type(init_value(_s_type)),
     m_datestamp(init_value(k3d::string_t(""))),
