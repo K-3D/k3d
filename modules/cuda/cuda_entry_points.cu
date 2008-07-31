@@ -649,3 +649,68 @@ extern "C" void set_selection_value_entry ( float* points_and_selection, float s
     cudaThreadSynchronize();
 }
 
+extern "C" void find_companion_kernel_entry ( unsigned char* pdev_boundary_edges,
+											  unsigned int* pdev_adjacent_edge_indices,
+											  const int num_edges,
+											  const unsigned int* pdev_edge_point_indices,
+											  const unsigned int* pdev_clockwise_edges_point_indices,
+											  const unsigned int* pdev_first_edges,
+											  const unsigned int* pdev_valences,
+											  const unsigned int* pdev_point_edges )
+{
+	#define NUM_THREADS 64
+
+	dim3 threads_per_block(NUM_THREADS, 1);
+	dim3 blocks_per_grid( iDivUp(num_edges, NUM_THREADS), 1);
+
+	// initialize the values for the boundary edges to true and the adjacent edge list to zeros
+	cudaMemset(pdev_boundary_edges, 1, num_edges*sizeof(unsigned char));
+	cudaMemset(pdev_adjacent_edge_indices, 0, num_edges*sizeof(unsigned int));
+	cudaThreadSynchronize();
+
+	find_companion_kernel <<< blocks_per_grid, threads_per_block >>> ( pdev_boundary_edges,
+																	   pdev_adjacent_edge_indices,
+																	   num_edges,
+																	   pdev_edge_point_indices,
+																	   pdev_clockwise_edges_point_indices,
+																	   pdev_first_edges,
+																	   pdev_valences,
+																	   pdev_point_edges );
+
+	checkLastCudaError();
+
+	cudaThreadSynchronize();
+
+
+}
+
+extern "C" K3D_CUDA_DECLSPEC int create_vertex_valence_lookup_kernel_entry (
+																unsigned int* pdev_valence,
+																const unsigned int* pdev_edge_point_indices,
+																int num_edges
+																)
+{
+	int host_valence_size = 0;
+	int* pdev_valence_size;
+	allocate_device_memory((void**)&pdev_valence_size, sizeof(int));
+
+	// intialize the valence data on the device - set to zero
+	cudaMemset((void*)pdev_valence, 0, num_edges*2*sizeof(unsigned int));
+
+	// the following runs serially
+
+	dim3 threads_per_block(NUM_THREADS, 1);
+	dim3 blocks_per_grid(1, 1);
+
+	cudaThreadSynchronize();
+	create_vertex_valence_lookup_kernel<<< blocks_per_grid, threads_per_block >>> ( pdev_valence, pdev_edge_point_indices, pdev_valence_size, num_edges );
+	cudaThreadSynchronize();
+	checkLastCudaError();
+
+	copy_from_device_to_host((void*)&host_valence_size, (const void*)pdev_valence_size, sizeof(int));
+
+
+	free_device_memory((void*)pdev_valence_size);
+
+	return host_valence_size;
+}

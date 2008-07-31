@@ -14,10 +14,10 @@ __device__ float halfToFloat (unsigned short halfIn)
 	int s = (halfIn >> 15) & 0x00000001;
     int e = (halfIn >> 10) & 0x0000001f;
     int m =  halfIn        & 0x000003ff;
-	
+
 	int val = 0;
 	int done = 0;
-	
+
     if (e == 0)
     {
 		if (m == 0)
@@ -42,7 +42,7 @@ __device__ float halfToFloat (unsigned short halfIn)
 
 	    	e += 1;
 	    	m &= ~0x00000400;
-		}	
+		}
     }
     else if (e == 31)
     {
@@ -79,9 +79,9 @@ __device__ float halfToFloat (unsigned short halfIn)
     	//
 		val = (s << 31) | (e << 23) | m;
 	}
-	
+
 	return __int_as_float (val);
-		
+
 }
 
 // convert a single precision float to a half-float
@@ -96,9 +96,9 @@ __device__ unsigned short floatToHalf( float floatIn )
     // Adjust e, accounting for the different exponent bias
     // of float and half (127 versus 15).
     //
-	
+
 	int floatBits = __float_as_int( floatIn );
-	
+
     int s =  ((floatBits >> 16) & 0x00008000);
     int e = ((floatBits >> 23) & 0x000000ff) - (127 - 15);
     int m =   floatBits        & 0x007fffff;
@@ -120,13 +120,13 @@ __device__ unsigned short floatToHalf( float floatIn )
 
 	    	return 0;
 		}
-		
+
 		//
 		// E is between -10 and 0.  F is a normalized float,
 		// whose magnitude is less than HALF_NRM_MIN.
 		//
 		// We convert f to a denormalized half.
-		// 
+		//
 
 		m = (m | 0x00800000) >> (1 - e);
 
@@ -137,7 +137,7 @@ __device__ unsigned short floatToHalf( float floatIn )
 		// our number normalized.  Because of the way a half's bits
 		// are laid out, we don't have to treat this case separately;
 		// the code below will handle it correctly.
-		// 
+		//
 
 		if (m &  0x00001000)
 	    	m += 0x00002000;
@@ -197,54 +197,54 @@ __device__ unsigned short floatToHalf( float floatIn )
 		{
 			return s | 0x7c00;	// if this returns, the half becomes an
 	    	 // infinity with the same sign as f.
-		}   							
+		}
 
 		//
 		// Assemble the half from s, e and m.
 		//
 		return s | (e << 10) | (m >> 13);
-    }	
+    }
 }
 
 __global__ void add_kernel (ushort4 *image_RGBA, int width, int height, float value)
 {
 	const int ix = blockDim.x * blockIdx.x + threadIdx.x;
     const int iy = blockDim.y * blockIdx.y + threadIdx.y;
-    
+
     if(ix < width && iy < height)
     {
-        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w
         const int idx = width * iy + ix;
-        
+
         float4 pixelFloat;
-        
+
         pixelFloat.x = halfToFloat((unsigned short)image_RGBA[idx].x) + value;
         pixelFloat.y = halfToFloat((unsigned short)image_RGBA[idx].y) + value;
         pixelFloat.z = halfToFloat((unsigned short)image_RGBA[idx].z) + value;
-        
+
         image_RGBA[idx].x = floatToHalf(pixelFloat.x);
         image_RGBA[idx].y = floatToHalf(pixelFloat.y);
         image_RGBA[idx].z = floatToHalf(pixelFloat.z);
     }
 	__syncthreads();
-} 
+}
 
 __global__ void multiply_kernel (ushort4 *image_RGBA, int width, int height, float value)
 {
 	const int ix = blockDim.x * blockIdx.x + threadIdx.x;
     const int iy = blockDim.y * blockIdx.y + threadIdx.y;
-    
+
     if(ix < width && iy < height)
     {
-        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w
         const int idx = width * iy + ix;
-        
+
         float4 pixelFloat;
-        
+
         pixelFloat.x = halfToFloat((unsigned short)image_RGBA[idx].x) * value;
         pixelFloat.y = halfToFloat((unsigned short)image_RGBA[idx].y) * value;
         pixelFloat.z = halfToFloat((unsigned short)image_RGBA[idx].z) * value;
-        
+
         image_RGBA[idx].x = floatToHalf(pixelFloat.x);
         image_RGBA[idx].y = floatToHalf(pixelFloat.y);
         image_RGBA[idx].z = floatToHalf(pixelFloat.z);
@@ -259,18 +259,18 @@ __global__ void gamma_kernel (ushort4 *image_RGBA, int width, int height, float 
 {
     const int ix = blockDim.x * blockIdx.x + threadIdx.x;
     const int iy = blockDim.y * blockIdx.y + threadIdx.y;
-    
+
     if(ix < width && iy < height)
     {
-        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w
         const int idx = width * iy + ix;
-        
+
         float4 pixelFloat;
-        
+
         pixelFloat.x = powf(halfToFloat((unsigned short)image_RGBA[idx].x), value);
         pixelFloat.y = powf(halfToFloat((unsigned short)image_RGBA[idx].y), value);
         pixelFloat.z = powf(halfToFloat((unsigned short)image_RGBA[idx].z), value);
-        
+
         image_RGBA[idx].x = floatToHalf(pixelFloat.x);
         image_RGBA[idx].y = floatToHalf(pixelFloat.y);
         image_RGBA[idx].z = floatToHalf(pixelFloat.z);
@@ -283,21 +283,21 @@ __global__ void gamma_kernel (ushort4 *image_RGBA, int width, int height, float 
 __global__ void invert_kernel (ushort4 *image_RGBA, int width, int height)
 {
     #define MAX_HALF 1.0f
-    
+
     const int ix = blockDim.x * blockIdx.x + threadIdx.x;
     const int iy = blockDim.y * blockIdx.y + threadIdx.y;
-    
+
     if(ix < width && iy < height)
     {
-        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w
         const int idx = width * iy + ix;
-        
+
         float4 pixelFloat;
-        
+
         pixelFloat.x = MAX_HALF - halfToFloat((unsigned short)image_RGBA[idx].x);
         pixelFloat.y = MAX_HALF - halfToFloat((unsigned short)image_RGBA[idx].y);
         pixelFloat.z = MAX_HALF - halfToFloat((unsigned short)image_RGBA[idx].z);
-        
+
         image_RGBA[idx].x = floatToHalf(pixelFloat.x);
         image_RGBA[idx].y = floatToHalf(pixelFloat.y);
         image_RGBA[idx].z = floatToHalf(pixelFloat.z);
@@ -311,31 +311,31 @@ __global__ void matte_color_diff_kernel (ushort4 *image_RGBA, int width, int hei
 {
     const int ix = blockDim.x * blockIdx.x + threadIdx.x;
     const int iy = blockDim.y * blockIdx.y + threadIdx.y;
-    
+
     if(ix < width && iy < height)
     {
-        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w
         const int idx = width * iy + ix;
-        
+
         float4 pixelFloat;
-        
+
         pixelFloat.x = halfToFloat((unsigned short)image_RGBA[idx].x);
         pixelFloat.y = halfToFloat((unsigned short)image_RGBA[idx].y);
         pixelFloat.z = fminf(pixelFloat.y, halfToFloat((unsigned short)image_RGBA[idx].z));
-        
+
         if ( pixelFloat.z > threshold )
         {
             pixelFloat.w = 1 - pixelFloat.z + fmaxf(pixelFloat.x, pixelFloat.y);
         }
         else
-        { 
+        {
             pixelFloat.w = 1.0f;
         }
-        
+
         // red and green channels are unchanged
         image_RGBA[idx].z = floatToHalf(pixelFloat.z);
         image_RGBA[idx].w = floatToHalf(pixelFloat.w);
-        
+
     }
 }
 
@@ -345,19 +345,19 @@ __global__ void matte_color_diff_kernel (ushort4 *image_RGBA, int width, int hei
 __global__ void matte_invert_kernel (ushort4 *image_RGBA, int width, int height)
 {
     #define MAX_HALF 1.0f
-    
+
     const int ix = blockDim.x * blockIdx.x + threadIdx.x;
     const int iy = blockDim.y * blockIdx.y + threadIdx.y;
-    
+
     if(ix < width && iy < height)
     {
-        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w
         const int idx = width * iy + ix;
-        
+
         float newAlpha;
-        
+
         newAlpha = MAX_HALF - halfToFloat((unsigned short)image_RGBA[idx].w);
-        
+
         image_RGBA[idx].w = floatToHalf(newAlpha);
     }
 }
@@ -366,18 +366,18 @@ __global__ void color_monochrome_kernel ( ushort4 *image_RGBA, int width, int he
 {
 	const int ix = blockDim.x * blockIdx.x + threadIdx.x;
     const int iy = blockDim.y * blockIdx.y + threadIdx.y;
-    
+
     if(ix < width && iy < height)
     {
-        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w
         const int idx = width * iy + ix;
-        
+
         float monoValue;
-        
-        monoValue = halfToFloat(image_RGBA[idx].x) * redWeight 
-        		  + halfToFloat(image_RGBA[idx].y) * greenWeight 
-        		  + halfToFloat(image_RGBA[idx].z) * blueWeight;  
-        
+
+        monoValue = halfToFloat(image_RGBA[idx].x) * redWeight
+        		  + halfToFloat(image_RGBA[idx].y) * greenWeight
+        		  + halfToFloat(image_RGBA[idx].z) * blueWeight;
+
         image_RGBA[idx].x = floatToHalf(monoValue);
         image_RGBA[idx].y = floatToHalf(monoValue);
         image_RGBA[idx].z = floatToHalf(monoValue);
@@ -389,19 +389,19 @@ __global__ void threshold_kernel ( ushort4 *image_RGBA, int width, int height, f
 {
     const int ix = blockDim.x * blockIdx.x + threadIdx.x;
     const int iy = blockDim.y * blockIdx.y + threadIdx.y;
-    
+
     if(ix < width && iy < height)
     {
-        // the first, second, third, and fourth fields can be accessed using x, y, z, and w         
+        // the first, second, third, and fourth fields can be accessed using x, y, z, and w
         const int idx = width * iy + ix;
-        
+
         float4 pixelFloat;
-        
+
         pixelFloat.x = fmaxf(halfToFloat((unsigned short)image_RGBA[idx].x), redThreshold);
         pixelFloat.y = fmaxf(halfToFloat((unsigned short)image_RGBA[idx].y), blueThreshold);
         pixelFloat.z = fmaxf(halfToFloat((unsigned short)image_RGBA[idx].z), greenThreshold);
         pixelFloat.w = fmaxf(halfToFloat((unsigned short)image_RGBA[idx].w), alphaThreshold);
-        
+
         image_RGBA[idx].x = floatToHalf(pixelFloat.x);
         image_RGBA[idx].y = floatToHalf(pixelFloat.y);
         image_RGBA[idx].z = floatToHalf(pixelFloat.z);
@@ -414,12 +414,12 @@ __global__ void linear_transform_kernel ( float4 *points, int num_points )
 {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	__shared__ float T[4][4];
-	
+
 	__shared__ float4 ThreadPoints[64];
-	
+
 	/*
 	__syncthreads();
-	
+
 	if ( threadIdx.x < 1 )
 	{
 		T[0][0] = tex2D(transformTexture, 0, 0);
@@ -440,22 +440,22 @@ __global__ void linear_transform_kernel ( float4 *points, int num_points )
 		T[3][3] = tex2D(transformTexture, 3, 3);
 	}
 	*/
-	
+
     if ( threadIdx.x < 16 )
 	{
 		//const int row = idx >> 2;
-		//const int col = idx & 0x3; 
+		//const int col = idx & 0x3;
 		T[idx >> 2][idx & 0x3] = tex2D(transformTexture, idx & 0x3, idx >> 2);
 	}
 	if ( blockDim.x < 16 )
 	{
 		for ( int i = blockDim.x ; i < 16 ; i++ )
 		{
-			T[i >> 2][i & 0x3] = tex2D(transformTexture, i & 0x3, i >> 2);		
-		}	
+			T[i >> 2][i & 0x3] = tex2D(transformTexture, i & 0x3, i >> 2);
+		}
 	}
 	__syncthreads();
-	
+
 	if ( idx < num_points )
 	{
 		float4 vt;
@@ -465,39 +465,39 @@ __global__ void linear_transform_kernel ( float4 *points, int num_points )
 		vt.x = (T[0][0]*ThreadPoints[threadIdx.x].x + T[0][1]*ThreadPoints[threadIdx.x].y + T[0][2]*ThreadPoints[threadIdx.x].z + T[0][3])/vt.w;
 		vt.y = (T[1][0]*ThreadPoints[threadIdx.x].x + T[1][1]*ThreadPoints[threadIdx.x].y + T[1][2]*ThreadPoints[threadIdx.x].z + T[1][3])/vt.w;
 		vt.z = (T[2][0]*ThreadPoints[threadIdx.x].x + T[2][1]*ThreadPoints[threadIdx.x].y + T[2][2]*ThreadPoints[threadIdx.x].z + T[2][3])/vt.w;
-		
+
 		points[idx].x = ThreadPoints[threadIdx.x].x*(1 - ThreadPoints[threadIdx.x].w) + ThreadPoints[threadIdx.x].w*vt.x;
 		points[idx].y = ThreadPoints[threadIdx.x].y*(1 - ThreadPoints[threadIdx.x].w) + ThreadPoints[threadIdx.x].w*vt.y;
 		points[idx].z = ThreadPoints[threadIdx.x].z*(1 - ThreadPoints[threadIdx.x].w) + ThreadPoints[threadIdx.x].w*vt.z;
 	}
-	
-	__syncthreads();	
+
+	__syncthreads();
 
 }
 
 /**
  * Kernel for calculating the coordinates of the new points along the specified edges.
- * 
+ *
  */
-__global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices, 
-                                                     unsigned int num_edge_indices, 
+__global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices,
+                                                     unsigned int num_edge_indices,
                                                      float4* points_and_selection,
                                                      unsigned int num_points,
-                                                     float4* new_points_and_selection, 
+                                                     float4* new_points_and_selection,
                                                      unsigned int* edge_point_indices,
                                                      unsigned int* clockwise_edge_indices,
                                                      int num_split_points )
 {
     unsigned int edge_index_index = (blockIdx.x * blockDim.x) + threadIdx.x;
     int split_index = (blockIdx.y * blockDim.y) + threadIdx.y;
-    
+
     if ( edge_index_index < num_edge_indices )
     {
-        
+
         unsigned int edge_index = edge_indices[edge_index_index];
         unsigned int p_index = edge_point_indices[edge_index];
         unsigned int new_point_index = edge_index_index*num_split_points + split_index;
-        
+
         #ifdef __DEVICE_EMULATION__
             printf("Edge Index Index: %d\n", edge_index_index);
             printf("Split Index: %d\n", split_index);
@@ -506,9 +506,9 @@ __global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices,
             printf("Point Index: %d\n", edge_point_indices[edge_index]);
             printf("Clockwise Point Index: %d\n", edge_point_indices[clockwise_edge_indices[edge_index]]);
             printf("New Point Index: %d\n", new_point_index);
-        #endif 
-        
-        
+        #endif
+
+
         float4 p0 = points_and_selection[p_index];
         float4 p1 = points_and_selection[edge_point_indices[clockwise_edge_indices[edge_index]]];
 
@@ -516,52 +516,52 @@ __global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices,
             printf("P_0:%d: (%f, %f, %f)\n", p_index, p0.x, p0.y, p0.z);
             printf("P_1:%d: (%f, %f, %f)\n", edge_point_indices[clockwise_edge_indices[edge_index]], p1.x, p1.y, p1.z);
         #endif
-        
+
         p1.x = (p1.x - p0.x) / (num_split_points + 1);
         p1.y = (p1.y - p0.y) / (num_split_points + 1);
         p1.z = (p1.z - p0.z) / (num_split_points + 1);
-        
+
         #ifdef __DEVICE_EMULATION__
             printf("P_delta:(%f, %f, %f)\n", p1.x, p1.y, p1.z);
         #endif
-        
+
         new_points_and_selection[new_point_index].x = p0.x + (split_index + 1)*p1.x;
         new_points_and_selection[new_point_index].y = p0.y + (split_index + 1)*p1.y;
         new_points_and_selection[new_point_index].z = p0.z + (split_index + 1)*p1.z;
         new_points_and_selection[new_point_index].w = 1;
-        
-    } 
-      
+
+    }
+
 }
 
-__global__ void subdivide_edges_update_edge_indices_kernel ( unsigned int* output_edge_point_indices, 
-                                                        unsigned int* output_clockwise_edge_point_indices, 
-                                                        unsigned int* input_edge_point_indices, 
+__global__ void subdivide_edges_update_edge_indices_kernel ( unsigned int* output_edge_point_indices,
+                                                        unsigned int* output_clockwise_edge_point_indices,
+                                                        unsigned int* input_edge_point_indices,
                                                         unsigned int* input_clockwise_edge_point_indices,
                                                         unsigned int* edge_index_map,
                                                         int num_edge_maps)
 {
     unsigned int edge_index_index = (blockIdx.x * blockDim.x) + threadIdx.x;
-    
+
     if ( edge_index_index < num_edge_maps )
     {
         unsigned int out_edge_index = edge_index_map[edge_index_index];
-        
+
         #ifdef __DEVICE_EMULATION__
             printf("Edge: %d : Mapped Edge : %d \n", edge_index_index, out_edge_index);
         #endif
-                
+
         output_edge_point_indices[out_edge_index] = input_edge_point_indices[edge_index_index];
         output_clockwise_edge_point_indices[out_edge_index] = edge_index_map[input_clockwise_edge_point_indices[edge_index_index]];
-        
+
         #ifdef __DEVICE_EMULATION__
             printf("Input Edge Point: %d : Input CW Edge Point : %d \n", input_edge_point_indices[edge_index_index], input_clockwise_edge_point_indices[edge_index_index]);
         #endif
     }
 }
 
-__global__ void subdivide_edges_update_loop_first_edges_kernel ( 
-                                                        unsigned int* pdev_ouput_loop_first_edges, 
+__global__ void subdivide_edges_update_loop_first_edges_kernel (
+                                                        unsigned int* pdev_ouput_loop_first_edges,
                                                         int num_loops,
                                                         unsigned int* edge_index_map
                                                         )
@@ -574,74 +574,74 @@ __global__ void subdivide_edges_update_loop_first_edges_kernel (
     }
 }
 
-__global__ void subdivide_edges_split_edges_kernel (unsigned int* output_edge_point_indices, 
-                                                    unsigned int* output_clockwise_edge_point_indices, 
+__global__ void subdivide_edges_split_edges_kernel (unsigned int* output_edge_point_indices,
+                                                    unsigned int* output_clockwise_edge_point_indices,
                                                     unsigned int* input_clockwise_edge_point_indices,
                                                     unsigned int* edge_index_map,
-                                                    unsigned int* edge_indices, 
-                                                    unsigned int num_edge_indices, 
+                                                    unsigned int* edge_indices,
+                                                    unsigned int num_edge_indices,
                                                     int num_split_points,
                                                     unsigned int* pdev_first_midpoint,
                                                     unsigned int* pdev_companions,
                                                     unsigned char* pdev_boundary_edges
                                                     )
-                                                    
+
 {
     unsigned int edge_index_index = (blockIdx.x * blockDim.x) + threadIdx.x;
     int split_index = (blockIdx.y * blockDim.y) + threadIdx.y;
-    
+
     if ( edge_index_index < num_edge_indices )
     {
         unsigned int edge = edge_indices[edge_index_index];
         unsigned int old_clockwise = input_clockwise_edge_point_indices[edge];
         unsigned int new_edge = edge_index_map[edge] + 1 + split_index;
-        
+
         output_edge_point_indices[new_edge] = pdev_first_midpoint[edge] + split_index;
         output_clockwise_edge_point_indices[new_edge - 1] = new_edge;
-        
+
         if ( split_index == 0 )
         {
-            output_clockwise_edge_point_indices[new_edge + num_split_points - 1] = edge_index_map[old_clockwise];        
+            output_clockwise_edge_point_indices[new_edge + num_split_points - 1] = edge_index_map[old_clockwise];
         }
-        
-        
+
+
         #ifdef __DEVICE_EMULATION__
             printf("%c\n", pdev_boundary_edges[edge]);
-        #endif       
-                
+        #endif
+
         if ( !pdev_boundary_edges[edge] )
         {
             unsigned int companion = pdev_companions[edge];
             old_clockwise = input_clockwise_edge_point_indices[companion];
             new_edge = edge_index_map[companion] + 1 + split_index;
-            
+
             output_edge_point_indices[new_edge] = pdev_first_midpoint[edge] - split_index + num_split_points - 1;
             output_clockwise_edge_point_indices[new_edge - 1] = new_edge;
-            
+
             if ( split_index == 0 )
             {
-                output_clockwise_edge_point_indices[new_edge + num_split_points - 1] = edge_index_map[old_clockwise];                                
+                output_clockwise_edge_point_indices[new_edge + num_split_points - 1] = edge_index_map[old_clockwise];
             }
         }
     }
-           
+
 }
 
 __global__ void convert_uint_64_to_32_kernel ( uint2* p_uint_64, unsigned int* p_uint_32, int num_ints )
 {
     const int int_index = (blockDim.x * blockIdx.x) + threadIdx.x;
-    
+
     if ( int_index < num_ints )
     {
         // set the 32bit unsigned int to the lower 32bits of the 64bit unsigned int
-        p_uint_32[int_index] = p_uint_64[int_index].x;    
+        p_uint_32[int_index] = p_uint_64[int_index].x;
     }
 }
 
 __global__ void convert_uint_32_to_64_kernel ( uint2* p_uint_64, unsigned int* p_uint_32, int num_ints )
 {
     const int int_index = (blockDim.x * blockIdx.x) + threadIdx.x;
-    
+
     if ( int_index < num_ints )
     {
         // zero the upper 32bits and equate the lower 32
@@ -653,11 +653,120 @@ __global__ void convert_uint_32_to_64_kernel ( uint2* p_uint_64, unsigned int* p
 
 __global__ void set_selection_value_kernel ( float4* points_and_selection, float selection_value, int num_points )
 {
-    const int index = (blockDim.x * blockIdx.x) + threadIdx.x;      
+    const int index = (blockDim.x * blockIdx.x) + threadIdx.x;
     if ( index < num_points )
     {
-        points_and_selection[index].w = selection_value;    
-    } 
+        points_and_selection[index].w = selection_value;
+    }
+}
+
+/**
+ * Kernel for companion computation
+ */
+__global__ void find_companion_kernel(unsigned char* boundary_edges,
+									  unsigned int* adjacent_edge_indices,
+									  const int num_edges,
+									  const unsigned int* edge_point_indices,
+									  const unsigned int* clockwise_edges_point_indices,
+									  const unsigned int* first_edges,
+									  const unsigned int* valences,
+									  const unsigned int* point_edges)
+{
+	const int edge_index = (blockDim.x * blockIdx.x) + threadIdx.x;
+
+	if ( edge_index < num_edges )
+	{
+		const unsigned int vertex1 = edge_point_indices[edge_index];
+		const unsigned int vertex2 = edge_point_indices[clockwise_edges_point_indices[edge_index]];
+
+		const unsigned int first_index = first_edges[vertex2];
+		const unsigned int last_index = first_index + valences[vertex2];
+		for ( unsigned int i = first_index; i != last_index; ++i )
+		{
+			const unsigned int companion = point_edges[i];
+			if ( edge_point_indices[clockwise_edges_point_indices[companion]] == vertex1 )
+			{
+				boundary_edges[edge_index] = 0;
+				adjacent_edge_indices[edge_index] = companion;
+				break;
+			}
+		}
+	}
+
+}
+
+
+/**
+ * Kernel for looking up the valence of edges points
+ */
+__global__ void create_vertex_valence_lookup_kernel ( unsigned int* valence, const unsigned int* edge_point_indices, int* num_valence, int num_edges )
+{
+	int tmp_num_valence = 0;
+	unsigned int point_index = 0;
+
+	for ( unsigned int edge_index = 0; edge_index < num_edges ; edge_index++ )
+	{
+		point_index = edge_point_indices[edge_index];
+		valence[point_index] += 1;
+		tmp_num_valence = max(tmp_num_valence, (point_index+1));
+	}
+
+	*num_valence = tmp_num_valence;
+}
+
+/**
+ * Kernel to calculate first edges in edge_adjacency lookup
+ */
+__global__ void calculate_first_edges_block_kernel ( unsigned int* first_edge, const unsigned int* valences, int num_points )
+{
+	// use shared memory to store both the result per block as well as the initial block values
+	__shared__ extern uint2 shared_first[];
+
+	unsigned int point_index = ( blockDim.x * blockIdx.x) + threadIdx.x;
+
+	if ( point_index < num_points )
+	{
+		shared_first[threadIdx.x].x = valences[point_index];
+		shared_first[0].y = 0;
+
+		if ( point_index > 0 )
+		{
+			shared_first[threadIdx.x].y = valences[point_index-1];
+		}
+	}
+	__syncthreads();
+
+	if ( point_index < num_points )
+	{
+		for ( int i = 1; i < blockDim.x ; i++ )
+		{
+			if ( threadIdx.x >= i )
+			{
+				shared_first[threadIdx.x].x += shared_first[threadIdx.x - i].y;
+			}
+		}
+	}
+	__syncthreads();
+
+	if ( point_index < num_points )
+	{
+		if ( threadIdx.x == blockDim.x )
+		{
+			first_edge[point_index] = shared_first[threadIdx.x].x;
+		}
+	}
+
+	__syncthreads();
+
+
+
+
+
+}
+
+__global__ void calculate_first_edges_update_kernel ( unsigned int* first_edge, int num_edges )
+{
+
 }
 
 #endif // #ifndef _CUDA_KERNELS_H_

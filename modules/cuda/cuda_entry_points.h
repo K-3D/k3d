@@ -60,7 +60,6 @@ typedef struct
 } timingInfo_t;
 
 // forward declaration of the entry functions
-// split the entry functions for timing reasons
 extern "C" K3D_CUDA_DECLSPEC void bitmap_arithmetic_kernel_entry(int operation, unsigned short* p_deviceImage, int width, int height, float value);
 extern "C" K3D_CUDA_DECLSPEC void bitmap_color_monochrome_kernel_entry(unsigned short* p_deviceImage, int width, int height, float redWeight, float greenWeight, float blueWeight);
 extern "C" K3D_CUDA_DECLSPEC void bitmap_threshold_kernel_entry(unsigned short* p_deviceImage, int width, int height, float redThreshold, float greenThreshold, float blueThreshold, float alphaThreshold);
@@ -134,5 +133,21 @@ extern "C" K3D_CUDA_DECLSPEC void copy_2D_from_host_to_device_with_padding ( voi
 extern "C" K3D_CUDA_DECLSPEC void synchronize_threads ();
 
 extern "C" K3D_CUDA_DECLSPEC void set_selection_value_entry ( float* points_and_selection, float selection_value, int num_points );
+
+extern "C" K3D_CUDA_DECLSPEC void find_companion_kernel_entry ( unsigned char* pdev_boundary_edges,
+																unsigned int* pdev_adjacent_edge_indices,
+															    const int num_edges,
+															    const unsigned int* pdev_edge_point_indices,
+															    const unsigned int* pdev_clockwise_edges_point_indices,
+															    const unsigned int* pdev_first_edges,
+															    const unsigned int* pdev_valences,
+															    const unsigned int* pdev_point_edges
+															    );
+
+extern "C" K3D_CUDA_DECLSPEC int create_vertex_valence_lookup_kernel_entry (
+																unsigned int* pdev_valence,
+																const unsigned int* pdev_edge_point_indices,
+																int num_edges
+																);
 
 #endif // !CUDA_ENTRY_POINTS_H
