@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>5 0 0 5 5.0000000000255174 0 -2.5517059846396142e-11 5 0 -5.0000000000510338 4.9999999999744817 -0 -5 -5.1034119692792285e-11 -0 -4.9999999999489662 -5.0000000000765512 0 7.6551179539188427e-11 -5 0 5.0000000001020686 -4.9999999999234488 0 5 1.0206823938558457e-10 0</points>
+		<point_selection>0 0 0 0 0 0 0 0 0</point_selection>
+		<nurbs_curve_groups>
+			<first_curves>0</first_curves>
+			<curve_counts>1</curve_counts>
+			<materials>0</materials>
+			<curve_first_points>0</curve_first_points>
+			<curve_point_counts>9</curve_point_counts>
+			<curve_orders>3</curve_orders>
+			<curve_first_knots>0</curve_first_knots>
+			<curve_selection>1</curve_selection>
+			<curve_points>0 1 2 3 4 5 6 7 8</curve_points>
+			<curve_point_weights>1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1</curve_point_weights>
+			<curve_knots>0 0 0 1 1 2 2 3 3 4 4 4</curve_knots>
+		</nurbs_curve_groups>
+		<nurbs_patches>
+			<patch_first_points>0</patch_first_points>
+			<patch_u_point_counts>2</patch_u_point_counts>
+			<patch_v_point_counts>5</patch_v_point_counts>
+			<patch_u_orders>2</patch_u_orders>
+			<patch_v_orders>3</patch_v_orders>
+			<patch_u_first_knots>0</patch_u_first_knots>
+			<patch_v_first_knots>0</patch_v_first_knots>
+			<patch_selection>0</patch_selection>
+			<patch_materials>0</patch_materials>
+			<patch_points>4 4 3 5 2 6 1 7 8 8</patch_points>
+			<patch_point_weights>1 1 0.70710678118474324 0.70710678118474324 1 1 0.70710678118474324 0.70710678118474324 1 1</patch_point_weights>
+			<patch_u_knots>0 0 1 1</patch_u_knots>
+			<patch_v_knots>0 0 0 0.5 0.5 1 1 1</patch_v_knots>
+			<patch_trim_curve_loop_counts>0</patch_trim_curve_loop_counts>
+			<patch_first_trim_curve_loops>0</patch_first_trim_curve_loops>
+			<trim_points/>
+			<trim_point_selection/>
+			<first_trim_curves/>
+			<trim_curve_counts/>
+			<trim_curve_loop_selection/>
+			<trim_curve_first_points/>
+			<trim_curve_point_counts/>
+			<trim_curve_orders/>
+			<trim_curve_first_knots/>
+			<trim_curve_selection/>
+			<trim_curve_points/>
+			<trim_curve_point_weights/>
+			<trim_curve_knots/>
+		</nurbs_patches>
+	</mesh_arrays>
+</k3dml>
