@@ -93,6 +93,11 @@ namespace module
 				{
 					k3d::log() << error << nurbs_debug << "You need to select at least 2 curves!\n" << std::endl;
 				}
+				else if( curves.size() == 2 )
+				{
+                    nurbs_curve_modifier mod(Output);
+                    mod.ruled_surface(curves.at(0), curves.at(1));
+				}
 				else
 				{
                     nurbs_curve_modifier mod(Output);

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>-2.778354663078042 0.6295049650826483 0 -2.4799026629429455 -2.8461715677273025 0 -0.77835466307804202 -1.3486259645959615 0 0.22164533692195798 -2.8461715677273025 0 2.4080883697413884 -1.9998088399239204 0 3.2051620219961245 1.0004452162688571 0 0.21340367945904126 0.81497509067575269 0</points>
+		<point_selection>0 0 0 0 0 0 0</point_selection>
+		<nurbs_curve_groups>
+			<first_curves>0</first_curves>
+			<curve_counts>1</curve_counts>
+			<materials>0</materials>
+			<curve_first_points>0</curve_first_points>
+			<curve_point_counts>8</curve_point_counts>
+			<curve_orders>3</curve_orders>
+			<curve_first_knots>0</curve_first_knots>
+			<curve_selection>1</curve_selection>
+			<curve_points>6 0 1 2 3 4 5 6</curve_points>
+			<curve_point_weights>1 1 1 1 1 1 1 1</curve_point_weights>
+			<curve_knots>0 0 0 0.16666666666666666 0.33333333333333331 0.5 0.66666666666666663 0.83333333333333337 1 1 1</curve_knots>
+		</nurbs_curve_groups>
+	</mesh_arrays>
+</k3dml>
