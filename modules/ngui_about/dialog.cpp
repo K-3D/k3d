@@ -436,6 +436,11 @@ public:
 
 				Glib::RefPtr<Gtk::TextBuffer> text_buffer = text_view->get_buffer();
 
+				Glib::RefPtr<Gtk::TextTag> category_tag = Gtk::TextTag::create("category");
+				category_tag->property_foreground() = "#5555ff";
+				category_tag->property_scale() = 1.4;
+				text_buffer->get_tag_table()->add(category_tag);
+
 				Glib::RefPtr<Gtk::TextTag> name_tag = Gtk::TextTag::create("name");
 				name_tag->property_foreground() = "#000000";
 				name_tag->property_scale() = 1.2;
@@ -451,10 +456,19 @@ public:
 				const k3d::contributors_t& contributors = k3d::contributors();
 				for(k3d::contributors_t::const_iterator contributor = contributors.begin(); contributor != contributors.end(); ++contributor)
 				{
-					text_buffer->insert_with_tag(text_buffer->end(), contributor->name.raw(), name_tag);
-					text_buffer->insert(text_buffer->end(), "\n");
-					text_buffer->insert_with_tag(text_buffer->end(), contributor->description, description_tag);
-					text_buffer->insert(text_buffer->end(), "\n\n");
+					if(contributor->category.size())
+					{
+						text_buffer->insert(text_buffer->end(), "\n");
+						text_buffer->insert_with_tag(text_buffer->end(), contributor->category, category_tag);
+						text_buffer->insert(text_buffer->end(), "\n\n\n");
+					}
+					else
+					{
+						text_buffer->insert_with_tag(text_buffer->end(), contributor->name.raw(), name_tag);
+						text_buffer->insert(text_buffer->end(), "\n");
+						text_buffer->insert_with_tag(text_buffer->end(), contributor->description, description_tag);
+						text_buffer->insert(text_buffer->end(), "\n\n");
+					}
 				}
 				text_buffer->insert(text_buffer->end(), "\n\n\n\n");
 			

@@ -20,6 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "types.h"
 #include "ustring.h"
 #include <vector>
 
@@ -28,10 +29,12 @@ namespace k3d
 
 struct contributor
 {
-	contributor(const ustring& Name, const std::string& Description = "");
+	contributor(const string_t& Category);
+	contributor(const ustring& Name, const string_t& Description = "");
 
+	string_t category;
 	ustring name;
-	std::string description;
+	string_t description;
 };
 
 typedef std::vector<contributor> contributors_t;
