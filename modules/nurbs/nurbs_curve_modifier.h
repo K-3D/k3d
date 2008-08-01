@@ -71,6 +71,9 @@ namespace module{
                 ///Returns the index of the selected curve
                 int selected_curve();
 
+                ///Returns the indices of the selected curves
+                std::vector<unsigned int> selected_curves();
+
                 ///Print the knot vector of the selected curve to k3d::log
                 ///\param curve The index of the curve
                 void print_knot_vector(size_t curve);
@@ -155,8 +158,9 @@ namespace module{
                 ///\param curve The curve to extract
                 nurbs_curve extract_curve(size_t curve);
 
-                ///A common knot vector of the given list of curves (need to have the same degree!) will be
+                ///A common knot vector of the given list of curves will be
                 ///generated and then curve_knot_insertion is called so that all curves have this knot vector
+                ///Furthermore they all have the same degree after this operation
                 void knot_vector_adaption(std::vector<size_t> curves);
 
                 ///Moves curve2 along curve1 and creates a NURBS surface representing the area the curve has moved over

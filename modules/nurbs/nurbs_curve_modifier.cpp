@@ -278,6 +278,25 @@ namespace module
             return my_curve;
         }
 
+        std::vector<unsigned int> nurbs_curve_modifier::selected_curves()
+        {
+            std::vector<unsigned int> my_curves;
+
+            const size_t group_begin = 0;
+            const size_t group_end = group_begin + first_curves->size();
+            for (size_t group = group_begin; group != group_end; ++group)
+            {
+                const size_t curve_begin = first_curves->at(group);
+                const size_t curve_end = curve_begin + curve_counts->at(group);
+                for (size_t curve = curve_begin; curve != curve_end; ++curve)
+                {
+                    if ( curve_selection->at(curve)>0.0)
+                        my_curves.push_back(curve);
+                }
+            }
+            return my_curves;
+        }
+
         void nurbs_curve_modifier::print_knot_vector(size_t curve)
         {
             const size_t curve_knots_begin = curve_first_knots->at(curve);
@@ -2005,6 +2024,26 @@ namespace module
         {
             try
             {
+                //get maximum degree
+                int max_degree = -1;
+
+                for (int i = 0; i < curves.size(); i++)
+                {
+                    max_degree = Max(max_degree, curve_orders->at(curves.at(i)));
+                }
+
+                //degree elevate all which are below this one
+                for (int i = 0; i < curves.size(); i++)
+                {
+                    int dif = max_degree - curve_orders->at(curves.at(i));
+
+                    for (int j = 0; j < dif; j++)
+                    {
+                        curve_degree_elevate(curves.at(i));
+                    }
+                }
+
+
                 MY_DEBUG << "KnotVectorAdaption" << std::endl;
 
                 k3d::mesh::knots_t new_knot_vector;
@@ -2023,7 +2062,7 @@ namespace module
 
                     MY_DEBUG << "Checking curve " << curves.at(i) << " for new knots" << std::endl;
 
-                    for (k3d::mesh::knots_t::iterator j = curve_knots->begin() + curve_knots_begin; j != curve_knots->begin() + curve_knots_end; ++j)
+                    for (k3d::mesh::knots_t::iterator j = curve_knots->begin() + curve_knots_begin; j != curve_knots->begin() + curve_knots_end;)
                     {
                         //add all new knots to new_knot_vector
                         if (position == new_knot_vector.end())
@@ -2031,15 +2070,23 @@ namespace module
                             MY_DEBUG << "Found new knot at the end: " << *j << std::endl;
                             new_knot_vector.push_back(*j);
                             position = new_knot_vector.end();
+                            j++;
                         }
-                        else if (*position > *j)
+                        else if (*position > *j && fabs(*position - *j) > 0.000001)
                         {
-                            MY_DEBUG << "Found new knot: " << *j << std::endl;
-                            new_knot_vector.insert(position, *j);
+                            MY_DEBUG << "Found new knot before " << *position << ": " << *j << std::endl;
+                            position = new_knot_vector.insert(position, *j);
+                            position++;
+                            j++;
+                        }
+                        else if (*position < *j && fabs(*position - *j) > 0.000001)
+                        {
+                            position++;
                         }
                         else
                         {
                             position++;
+                            j++;
                         }
                     }
                 }
@@ -2074,7 +2121,7 @@ namespace module
                             //insert the missing knot
                             if (!curve_knot_insertion(curves.at(i), new_knot_vector.at(k), 1))
                             {
-                                MY_DEBUG << "Tried to insert existing knot, something went wrong" << std::endl;
+                                k3d::log() << error << nurbs_debug << "Tried to insert existing knot, something went wrong" << std::endl;
                                 break;
                             }
                             k=0; //start looking again as knot vector changed?
@@ -2182,13 +2229,15 @@ namespace module
                     k3d::mesh t;
                     nurbs_curve_modifier mod(t);
                     nurbs_curve tmp = extract_curve(curve);
+                    double u = tmp.curve_knots.size() * 0.5;
+                    u = tmp.curve_knots.at(floor(u));
                     mod.add_curve(tmp,false);
 
                     MY_DEBUG << "Curve extracted" << std::endl;
 
                     //split it up at the middle
                     mod.normalize_knot_vector(0);
-                    mod.split_curve_at(0, 0.5);
+                    mod.split_curve_at(0, u);
                     mod.flip_curve(0);
                     //->ruled surface
                     mod.ruled_surface(0, 1);
@@ -2228,25 +2277,6 @@ namespace module
                 k3d::log() << error << nurbs_debug << "Too few curves selected for skinning" << std::endl;
                 return;
             }
-            //get maximum degree
-            int max_degree = -1;
-
-            for (int i = 0; i < curves.size(); i++)
-            {
-                max_degree = Max(max_degree, curve_orders->at(curves.at(i)));
-            }
-
-            //degree elevate all which are below this one
-            for (int i = 0; i < curves.size(); i++)
-            {
-                int dif = max_degree - curve_orders->at(curves.at(i));
-
-                for (int j = 0; j < dif; j++)
-                {
-                    curve_degree_elevate(curves.at(i));
-                }
-            }
-
             //adapt knot vectors
             knot_vector_adaption(curves);
 
