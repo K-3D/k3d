@@ -309,6 +309,8 @@ K3D_ADD_TEST(ngui.bitmap.modifier.BitmapMultiply.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.bitmap.modifier.BitmapSubtract.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.bitmap.modifier.BitmapThreshold.py PYTHON NGUI)
 
+K3D_ADD_TEST(ngui.MaterialManager.init.py PYTHON NGUI)
+
 K3D_ADD_TEST(ngui.mesh.modifier.BevelPoints.undo.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.primitives.transform.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.shaders.undo_selection.py PYTHON NGUI)

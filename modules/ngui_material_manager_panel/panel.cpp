@@ -710,32 +710,37 @@ void Implementation::onNodesRemoved(const k3d::inode_collection::nodes_t& Nodes)
 
   k3d::inode_collection::nodes_t::const_iterator node_iter = Nodes.begin();
 
-    for(; node_iter != Nodes.end(); ++node_iter)
-      {       
-        //Check If Is A Material Type First
-        if((*node_iter)->factory().implements(typeid(k3d::imaterial)))
-          {
-            //Set Flag (Material Added) > Will Try To Update Panel
-            material_removed = true;
-          }
+  for(; node_iter != Nodes.end(); ++node_iter)
+    {       
+      //Check If Is A Material Type First
+      if((*node_iter)->factory().implements(typeid(k3d::imaterial)))
+        {
+          //Set Flag (Material Added) > Will Try To Update Panel
+          material_removed = true;
+        }
 
-        Gtk::TreeIter row;
-        return_if_fail(getRow(*node_iter, row));
+      Gtk::TreeIter row;
+      bool row_result = getRow(*node_iter, row);
+
+      if(row_result)
+        {
 	    
-        MaterialObj *tmpSObj = row->get_value(m_columns.m_col_moptr);
-        MaterialGroup *grpPtr = 0;
+          MaterialObj *tmpSObj = row->get_value(m_columns.m_col_moptr);
+          MaterialGroup *grpPtr = 0;
 
-        if(tmpSObj)  
-          grpPtr = tmpSObj->groupParent();
+          if(tmpSObj)  
+            grpPtr = tmpSObj->groupParent();
 	      
-        //Erase The Material Node From Tree
-        tree_model->erase(row);	
+          //Erase The Material Node From Tree
+          tree_model->erase(row);	
     
-        //Delete In Stored Model
-        if(grpPtr)
-          grpPtr->removeMaterial(tmpSObj);
+          //Delete In Stored Model
+          if(grpPtr)
+            grpPtr->removeMaterial(tmpSObj);
+
+        }//if
 	    
-      }//for
+    }//for
 
   //Rebuild Currently Selected Pane. Only If Material Removed
   if(material_removed)
@@ -761,13 +766,16 @@ void Implementation::onNodeRenamed(k3d::inode* const Node)
   Gtk::TreeIter row;
   
   //Find The Row On Tree That Has Pointer To Node
-  return_if_fail(getRow(Node, row));
+  bool row_result = getRow(Node, row);
 
-  //Rename That Row With The New Node Name
-  (*row)[m_columns.m_col_name] = Node->name();
+  if(row_result)
+    {
+      //Rename That Row With The New Node Name
+      (*row)[m_columns.m_col_name] = Node->name();
 
-  //Rename In Stored Model
-  (row->get_value(m_columns.m_col_moptr))->setName(Node->name());
+      //Rename In Stored Model
+      (row->get_value(m_columns.m_col_moptr))->setName(Node->name());
+    }
 
 }//onNodeRenamed
 
