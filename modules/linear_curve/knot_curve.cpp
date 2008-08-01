@@ -18,17 +18,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/legacy_mesh_source.h>
+#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/vectors.h>
 
 namespace module
@@ -41,9 +43,9 @@ namespace linear_curve
 // knot_curve
 
 class knot_curve :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	knot_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -55,40 +57,55 @@ public:
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Curve width")) + init_value(0.1) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_wrap(init_owner(*this) + init_name("closed") + init_label(_("Closed")) + init_description(_("Closed curve (loop)")) + init_value(true))
 	{
-		m_material.changed_signal().connect(make_reset_mesh_slot());
-		m_edge_count.changed_signal().connect(make_reset_mesh_slot());
-		m_meridian_wraps.changed_signal().connect(make_reset_mesh_slot());
-		m_longitudinal_wraps.changed_signal().connect(make_reset_mesh_slot());
-		m_scale.changed_signal().connect(make_reset_mesh_slot());
-		m_width.changed_signal().connect(make_reset_mesh_slot());
-		m_wrap.changed_signal().connect(make_reset_mesh_slot());
+		m_material.changed_signal().connect(make_topology_changed_slot());
+		m_edge_count.changed_signal().connect(make_topology_changed_slot());
+		m_meridian_wraps.changed_signal().connect(make_topology_changed_slot());
+		m_longitudinal_wraps.changed_signal().connect(make_topology_changed_slot());
+		m_scale.changed_signal().connect(make_topology_changed_slot());
+		m_width.changed_signal().connect(make_topology_changed_slot());
+		m_wrap.changed_signal().connect(make_topology_changed_slot());
 	}
 
-	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
+	void on_create_mesh_topology(k3d::mesh& Output)
 	{
-		const unsigned long edges = m_edge_count.pipeline_value();
-		const double mwraps = m_meridian_wraps.pipeline_value();
-		const double lwraps = m_longitudinal_wraps.pipeline_value();
-		const double scale = m_scale.pipeline_value();
-		const double width = m_width.pipeline_value();
-		const double wrap = m_wrap.pipeline_value();
+		const k3d::int32_t edge_count = m_edge_count.pipeline_value();
+		const k3d::double_t mwraps = m_meridian_wraps.pipeline_value();
+		const k3d::double_t lwraps = m_longitudinal_wraps.pipeline_value();
+		const k3d::double_t scale = m_scale.pipeline_value();
+		const k3d::double_t width = m_width.pipeline_value();
+		const k3d::double_t wrap = m_wrap.pipeline_value();
 
-		k3d::legacy::linear_curve_group* const group = new k3d::legacy::linear_curve_group();
-		group->material = m_material.pipeline_value();
-		group->wrap = wrap;
-		group->constant_data["width"] = width;
+		k3d::mesh::points_t& points = *k3d::make_unique(Output.points);
+		k3d::mesh::selection_t& point_selection = *k3d::make_unique(Output.point_selection);
 
-		k3d::legacy::linear_curve* const curve = new k3d::legacy::linear_curve();
-		group->curves.push_back(curve);
+		k3d::mesh::linear_curve_groups_t& linear_curve_groups = *k3d::make_unique(Output.linear_curve_groups);
+		k3d::mesh::indices_t& first_curves = *k3d::make_unique(linear_curve_groups.first_curves);
+		k3d::mesh::counts_t& curve_counts = *k3d::make_unique(linear_curve_groups.curve_counts);
+		k3d::mesh::bools_t& periodic_curves = *k3d::make_unique(linear_curve_groups.periodic_curves);
+		k3d::mesh::materials_t& materials = *k3d::make_unique(linear_curve_groups.materials);
+		k3d::mesh::indices_t& curve_first_points = *k3d::make_unique(linear_curve_groups.curve_first_points);
+		k3d::mesh::counts_t& curve_point_counts = *k3d::make_unique(linear_curve_groups.curve_point_counts);
+		k3d::mesh::selection_t& curve_selection = *k3d::make_unique(linear_curve_groups.curve_selection);
+		k3d::mesh::indices_t& curve_points = *k3d::make_unique(linear_curve_groups.curve_points);
 
-		Mesh.linear_curve_groups.push_back(group);
+		boost::shared_ptr<k3d::typed_array<k3d::double_t> > width_array(new k3d::typed_array<k3d::double_t>());
+		linear_curve_groups.constant_data["width"] = width_array;
 
-		// Create the curve ...
-		for(unsigned long n = 0; n != edges; n++)
+		first_curves.push_back(curve_first_points.size());
+		curve_counts.push_back(1);
+		periodic_curves.push_back(wrap);
+		materials.push_back(m_material.pipeline_value());
+		width_array->push_back(width);
+
+		curve_first_points.push_back(curve_points.size());
+		curve_point_counts.push_back(edge_count);
+		curve_selection.push_back(0.0);
+
+		for(k3d::uint32_t i = 0; i != edge_count; ++i)
 		{
-			const double percent = static_cast<double>(n) / static_cast<double>(edges);
-			const double radians = percent * k3d::pi_times_2();
-			const double mu = radians * mwraps;
+			const k3d::double_t percent = static_cast<k3d::double_t>(i) / static_cast<k3d::double_t>(edge_count);
+			const k3d::double_t radians = percent * k3d::pi_times_2();
+			const k3d::double_t mu = radians * mwraps;
 
 			k3d::point3 point;
 
@@ -96,14 +113,13 @@ public:
 			point[1] = sin(mu) * (1 + cos(lwraps * mu / mwraps) / 2.0);
 			point[2] = sin(lwraps * mu / mwraps) / 2.0;
 
-			k3d::legacy::point* const p = new k3d::legacy::point(point * scale);
-
-			Mesh.points.push_back(p);
-			curve->control_points.push_back(p);
+			points.push_back(point * scale);
+			point_selection.push_back(0.0);
+			curve_points.push_back(i);
 		}
 	}
 
-	void on_update_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 
@@ -123,9 +139,9 @@ private:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_edge_count;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_meridian_wraps;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_longitudinal_wraps;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_scale;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_width;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_wrap;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_scale;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_width;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_wrap;
 };
 
 k3d::iplugin_factory& knot_curve_factory()

@@ -8,6 +8,9 @@
 			<curve_counts>1</curve_counts>
 			<periodic_curves>1</periodic_curves>
 			<materials>0</materials>
+			<constant_data>
+				<array name="width" type="k3d::double_t">0.10000000000000001</array>
+			</constant_data>
 			<curve_first_points>0</curve_first_points>
 			<curve_point_counts>100</curve_point_counts>
 			<curve_selection>0</curve_selection>
