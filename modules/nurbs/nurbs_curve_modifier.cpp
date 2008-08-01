@@ -464,27 +464,38 @@ namespace module
 
         void nurbs_curve_modifier::remove_empty_groups()
         {
-            MY_DEBUG << "Remove empty groups" << std::endl;
-            const size_t group_begin = 0;
-            const size_t group_end = group_begin + first_curves->size();
-
-            std::vector<size_t> to_delete;
-
-            for (size_t group = group_begin; group < group_end; ++group)
+            try
             {
-                if (curve_counts->at(group) == 0)
-                    to_delete.push_back(group);
+                MY_DEBUG << "Remove empty groups" << std::endl;
+                const size_t group_begin = 0;
+                const size_t group_end = group_begin + first_curves->size();
+
+                std::vector<size_t> to_delete;
+
+                for (size_t group = group_begin; group < group_end; ++group)
+                {
+                    if (curve_counts->at(group) == 0)
+                        to_delete.push_back(group);
+                }
+
+                for (size_t i = 0; i < to_delete.size(); i++)
+                {
+                    k3d::mesh::indices_t::iterator first_iter = first_curves->begin() + to_delete[i];
+                    k3d::mesh::counts_t::iterator counts_iter = curve_counts->begin() + to_delete[i];
+                    k3d::mesh::materials_t::iterator mat_iter = materials->begin() + to_delete[i];
+
+                    first_curves->erase(first_iter);
+                    curve_counts->erase(counts_iter);
+                    materials->erase(mat_iter);
+                }
             }
-
-            for (size_t i = 0; i < to_delete.size(); i++)
+            catch (std::exception& e)
             {
-                k3d::mesh::indices_t::iterator first_iter = first_curves->begin() + to_delete[i];
-                k3d::mesh::counts_t::iterator counts_iter = curve_counts->begin() + to_delete[i];
-                k3d::mesh::materials_t::iterator mat_iter = materials->begin() + to_delete[i];
-
-                first_curves->erase(first_iter);
-                curve_counts->erase(counts_iter);
-                materials->erase(mat_iter);
+                MY_DEBUG << "Error in RemoveEmptyGroups: " << e.what() << std::endl;
+            }
+            catch (...)
+            {
+                MY_DEBUG << "Error in RemoveEmptyGroups" << std::endl;
             }
         }
 
@@ -1880,7 +1891,7 @@ namespace module
             }
         }
 
-        void nurbs_curve_modifier::revolve_curve(size_t curve, double angle, int segments, bool caps)
+        void nurbs_curve_modifier::revolve_curve(size_t curve, k3d::axis axis, double angle, int segments, bool caps)
         {
             //revolve this curve to a certain angle
 
@@ -1894,7 +1905,18 @@ namespace module
             k3d::mesh::knots_t u_knots;
             std::vector<double> weights;
             std::vector<k3d::point3> control_points;
-            k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, angle, segments, u_knots, weights, control_points);
+            switch(axis)
+            {
+                case k3d::Z :
+                    k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, angle, segments, u_knots, weights, control_points);
+                break;
+                case k3d::X :
+                    k3d::nurbs::circular_arc(k3d::point3(0, 0, 1), k3d::point3(0, 1, 0), 0, angle, segments, u_knots, weights, control_points);
+                break;
+                case k3d::Y :
+                    k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 0, 1), 0, angle, segments, u_knots, weights, control_points);
+                break;
+            }
 
             for (int i = 0; i < control_points.size(); i++)
             {
@@ -1915,12 +1937,38 @@ namespace module
             {
                 k3d::point3 p = mesh_points->at(curve_points->at(curve_points_begin + i));
                 double w = curve_point_weights->at(curve_points_begin + i);
-                double distance = sqrt((p[0] * p[0]) + (p[1] * p[1])); // we want the distance to the z axis
+                double distance;
+                switch(axis)
+                {
+                    case k3d::Z :
+                        distance = sqrt((p[0] * p[0]) + (p[1] * p[1])); // we want the distance to the z axis
+                    break;
+                    case k3d::X :
+                        distance = sqrt((p[2] * p[2]) + (p[1] * p[1])); // we want the distance to the x axis
+                    break;
+                    case k3d::Y :
+                        distance = sqrt((p[0] * p[0]) + (p[2] * p[2])); // we want the distance to the y axis
+                    break;
+                }
+
                 MY_DEBUG << "Working with point: " << output_point(p) << " and weight " << w << "Creating circle with radius: " << distance << std::endl;
 
                 for (int j = 0; j < control_points.size(); j++)
                 {
-                    k3d::point3 p_u(control_points.at(j)[0] * distance, control_points.at(j)[1] * distance, p[2]);
+                    k3d::point3 p_u;
+                    switch(axis)
+                    {
+                        case k3d::Z :
+                            p_u = k3d::point3(control_points.at(j)[0] * distance, control_points.at(j)[1] * distance, p[2]);
+                        break;
+                        case k3d::X :
+                            p_u = k3d::point3(p[0], control_points.at(j)[1] * distance, control_points.at(j)[2] * distance);
+                        break;
+                        case k3d::Y :
+                            p_u = k3d::point3(control_points.at(j)[0] * distance, p[1], control_points.at(j)[2] * distance);
+                        break;
+                    }
+
                     new_points.push_back(p_u);
                     new_weights.push_back(w * weights.at(j));
                 }
@@ -1946,11 +1994,35 @@ namespace module
                 {
                     k3d::point3 p = mesh_points->at(curve_points->at(curve_points_begin + i));
                     double w = curve_point_weights->at(curve_points_begin + i);
-                    double distance = sqrt((p[0] * p[0]) + (p[1] * p[1])); // we want the distance to the z axis
+                    double distance;
+                    switch(axis)
+                    {
+                        case k3d::Z :
+                            distance = sqrt((p[0] * p[0]) + (p[1] * p[1])); // we want the distance to the z axis
+                        break;
+                        case k3d::X :
+                            distance = sqrt((p[2] * p[2]) + (p[1] * p[1])); // we want the distance to the x axis
+                        break;
+                        case k3d::Y :
+                            distance = sqrt((p[0] * p[0]) + (p[2] * p[2])); // we want the distance to the y axis
+                        break;
+                    }
                     nurbs_curve cap_curve;
                     for (int j = 0; j < control_points.size(); j++)
                     {
-                        k3d::point3 p_u(control_points.at(j)[0] * distance, control_points.at(j)[1] * distance, p[2]);
+                        k3d::point3 p_u;
+                        switch(axis)
+                        {
+                            case k3d::Z :
+                                p_u = k3d::point3(control_points.at(j)[0] * distance, control_points.at(j)[1] * distance, p[2]);
+                            break;
+                            case k3d::X :
+                                p_u = k3d::point3(p[0], control_points.at(j)[1] * distance, control_points.at(j)[2] * distance);
+                            break;
+                            case k3d::Y :
+                                p_u = k3d::point3(control_points.at(j)[0] * distance, p[1], control_points.at(j)[2] * distance);
+                            break;
+                        }
                         cap_curve.control_points.push_back(p_u);
                         cap_curve.curve_point_weights.push_back(w * weights.at(j));
                     }
@@ -1965,11 +2037,35 @@ namespace module
                 {
                     k3d::point3 p = mesh_points->at(curve_points->at(curve_points_begin + i));
                     double w = curve_point_weights->at(curve_points_begin + i);
-                    double distance = sqrt((p[0] * p[0]) + (p[1] * p[1])); // we want the distance to the z axis
+                    double distance;
+                    switch(axis)
+                    {
+                        case k3d::Z :
+                            distance = sqrt((p[0] * p[0]) + (p[1] * p[1])); // we want the distance to the z axis
+                        break;
+                        case k3d::X :
+                            distance = sqrt((p[2] * p[2]) + (p[1] * p[1])); // we want the distance to the x axis
+                        break;
+                        case k3d::Y :
+                            distance = sqrt((p[0] * p[0]) + (p[2] * p[2])); // we want the distance to the y axis
+                        break;
+                    }
                     nurbs_curve cap_curve;
                     for (int j = 0; j < control_points.size(); j++)
                     {
-                        k3d::point3 p_u(control_points.at(j)[0] * distance, control_points.at(j)[1] * distance, p[2]);
+                        k3d::point3 p_u;
+                        switch(axis)
+                        {
+                            case k3d::Z :
+                                p_u = k3d::point3(control_points.at(j)[0] * distance, control_points.at(j)[1] * distance, p[2]);
+                            break;
+                            case k3d::X :
+                                p_u = k3d::point3(p[0], control_points.at(j)[1] * distance, control_points.at(j)[2] * distance);
+                            break;
+                            case k3d::Y :
+                                p_u = k3d::point3(control_points.at(j)[0] * distance, p[1], control_points.at(j)[2] * distance);
+                            break;
+                        }
                         cap_curve.control_points.push_back(p_u);
                         cap_curve.curve_point_weights.push_back(w * weights.at(j));
                     }
@@ -2218,7 +2314,7 @@ namespace module
             try
             {
                 MY_DEBUG << "Create Cap" << std::endl;
-
+                normalize_knot_vector(curve);
                 //check whether curve is a loop
                 const size_t curve_points_begin = curve_first_points->at(curve);
                 const size_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);

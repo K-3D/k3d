@@ -102,7 +102,9 @@ namespace module
                 }
 
                 for(int i = 0; i < my_curves.size(); i++)
-                    mod.split_curve_at(my_curves.at(i), u);
+                {
+                    mod.split_curve_at(my_curves.at(i)+i, u);
+                }
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 			}

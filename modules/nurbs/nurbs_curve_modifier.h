@@ -23,6 +23,7 @@
 		\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
+#include <k3dsdk/axis.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
@@ -170,12 +171,13 @@ namespace module{
                 ///\param create_caps Whether or not to create caps at the ends - only if one of the curves is a loop
                 void traverse_curve(size_t curve1, size_t curve2, bool create_caps);
 
-                ///Revolves the given curve around the z axis and adds the patch to this mesh
+                ///Revolves the given curve around the selected axis and adds the patch to this mesh
                 ///\param curve The curve which we're going to revolve
+                ///\param axis The axis to revolve around
                 ///\param angle the angle around which we do revolve (360 means a circle)
                 ///\param segments The number of segments our circle should have
                 ///\param caps Whether or not to create caps at the ends - just has influence if angle = 2*pi
-                void revolve_curve(size_t curve, double angle, int segments, bool caps);
+                void revolve_curve(size_t curve, k3d::axis axis, double angle, int segments, bool caps);
 
                 ///Spans up a NURBS surface between the 2 selected curves
                 ///\param curve1
