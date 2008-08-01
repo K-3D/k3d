@@ -240,7 +240,6 @@ modules/ngui_pipeline_panel/graph_source.h
 modules/ngui_pipeline_panel/panel.cpp
 modules/ngui_pipeline_profiler_panel/panel.cpp
 modules/ngui_render_region_tool/tool.cpp
-modules/ngui_shader_preview_panel/shaderPreview.cpp
 modules/ngui_snap_tool/snap_tool_detail.h
 modules/ngui_snap_tool/tool.cpp
 modules/ngui_test_case_recorder/dialog.cpp
