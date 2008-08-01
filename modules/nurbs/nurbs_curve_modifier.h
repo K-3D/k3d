@@ -193,7 +193,7 @@ namespace module{
                 ///The curves get ordered by their y-value, so make sure you take care of that when creating these
                 ///Your resulting surface will have order 3 in y-direction
                 ///\param curves A vector of curves which shall be used as skeleton for the skin
-                void skinned_surface(std::vector<size_t> curves);
+                void skinned_surface(std::vector<size_t> curves, k3d::axis axis);
 
             private:
 

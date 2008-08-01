@@ -2364,7 +2364,7 @@ namespace module
             }
         }
 
-        void nurbs_curve_modifier::skinned_surface(std::vector<size_t> curves)
+        void nurbs_curve_modifier::skinned_surface(std::vector<size_t> curves, k3d::axis axis)
         {
             MY_DEBUG << "Skinned Surface" << std::endl;
 
@@ -2393,29 +2393,43 @@ namespace module
             }
 
             //order along y axis
-            std::deque<size_t> ordered_by_y;
+            std::deque<size_t> ordered_by_axis;
 
-            ordered_by_y.push_back(0);
+            ordered_by_axis.push_back(0);
+            int component;
+
+            switch(axis)
+            {
+                case k3d::X :
+                    component = 0;
+                break;
+                case k3d::Y :
+                    component = 1;
+                break;
+                case k3d::Z :
+                    component = 2;
+                break;
+            }
 
             for (int i = 1; i < curves.size(); i++)
             {
-                if (centers.at(ordered_by_y.back())[1] < centers.at(i)[1])
+                if (centers.at(ordered_by_axis.back())[component] < centers.at(i)[component])
                 {
-                    ordered_by_y.push_back(i);
+                    ordered_by_axis.push_back(i);
                 }
-                else if (centers.at(ordered_by_y.front())[1] > centers.at(i)[1])
+                else if (centers.at(ordered_by_axis.front())[component] > centers.at(i)[component])
                 {
-                    ordered_by_y.push_front(i);
+                    ordered_by_axis.push_front(i);
                 }
                 else
                 {
                     int j = 0;
-                    while (j < ordered_by_y.size() && centers.at(ordered_by_y.at(j))[1] < centers.at(i)[1])
+                    while (j < ordered_by_axis.size() && centers.at(ordered_by_axis.at(j))[component] < centers.at(i)[component])
                     {
                         j++;
                     }
-                    std::deque<size_t>::iterator iter = ordered_by_y.begin() + j;
-                    ordered_by_y.insert(iter, i);
+                    std::deque<size_t>::iterator iter = ordered_by_axis.begin() + j;
+                    ordered_by_axis.insert(iter, i);
                 }
             }
 
@@ -2423,9 +2437,9 @@ namespace module
             nurbs_patch skin;
             std::vector<nurbs_curve> rips;
 
-            for (int i = 0; i < ordered_by_y.size(); i++)
+            for (int i = 0; i < ordered_by_axis.size(); i++)
             {
-                rips.push_back(extract_curve(ordered_by_y.at(i)));
+                rips.push_back(extract_curve(ordered_by_axis.at(i)));
             }
 
             skin.u_order = rips.front().curve_knots.size() - rips.front().control_points.size();
@@ -2434,7 +2448,7 @@ namespace module
 
             skin.v_knots.push_back(0);
             skin.v_knots.push_back(0);
-            for (int i = 0; i < ordered_by_y.size() - 1; i++)
+            for (int i = 0; i < ordered_by_axis.size() - 1; i++)
             {
                 skin.v_knots.push_back(i);
             }

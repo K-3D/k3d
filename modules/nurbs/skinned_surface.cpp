@@ -55,9 +55,11 @@ namespace module
 			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 		public:
 			skinned_surface(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-				base(Factory, Document)
+				base(Factory, Document),
+				m_along(init_owner(*this) + init_name("along") + init_label(_("Ordered along")) + init_description(_("Axis along which the curves are ordered")) + init_value(k3d::X) + init_enumeration(k3d::axis_values()))
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+				m_along.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -101,7 +103,7 @@ namespace module
 				else
 				{
                     nurbs_curve_modifier mod(Output);
-                    mod.skinned_surface(curves);
+                    mod.skinned_surface(curves, m_along.pipeline_value());
 				}
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
@@ -121,6 +123,7 @@ namespace module
 			}
 
 		private:
+            k3d_data(k3d::axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_along;
 		};
 
 		//Create connect_curve factory
