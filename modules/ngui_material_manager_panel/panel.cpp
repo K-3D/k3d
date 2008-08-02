@@ -536,6 +536,7 @@ void Implementation::buildTree()
 
 void Implementation::onTreeRowChanged()
 {
+  k3d::log() << "MAT_MANAGER_DEBUG: ONTREEROWCHANGED START" << std::endl;
   //Get The Current Row Selection
   Gtk::TreeModel::iterator iter = tree_selection->get_selected();
   
@@ -590,12 +591,17 @@ void Implementation::onTreeRowChanged()
 
     }//if
 
+  k3d::log() << "MAT_MANAGER_DEBUG: ONTREEROWCHANGED END" << std::endl;
+
 }//onTreeRowChanged
 
 
 
 void Implementation::buildContentPanel(Gtk::TreeModel::Row row, bool m_col_ismg)
 {
+
+k3d::log() << "MAT_MANAGER_DEBUG: BUILDCONTENTPANEL START" << std::endl;
+
   //Check If Building Group Panel Or Material Object Panel
   if(m_col_ismg)
     {
@@ -627,6 +633,9 @@ void Implementation::buildContentPanel(Gtk::TreeModel::Row row, bool m_col_ismg)
   //Build The Content Pane From Corrected Pointer
   m_rpane_content->buildPanel();
 
+  k3d::log() << "MAT_MANAGER_DEBUG: BUILDCONTENTPANEL END" << std::endl;
+
+
 }//buildContentPanel
 
 
@@ -634,6 +643,9 @@ void Implementation::buildContentPanel(Gtk::TreeModel::Row row, bool m_col_ismg)
 
 void Implementation::onNodesAdded(const k3d::inode_collection::nodes_t& Nodes)
 {
+
+  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESADDED START" << std::endl;
+
   //Flag Used For Possible Panel Update
   bool material_added = false;
 
@@ -721,6 +733,8 @@ void Implementation::onNodesAdded(const k3d::inode_collection::nodes_t& Nodes)
         }//if
     }//if
 
+  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESADDED END" << std::endl;
+
 
 }//onNodesAdded
 
@@ -804,6 +818,8 @@ void Implementation::onNodesRemoved(const k3d::inode_collection::nodes_t& Nodes)
 
 void Implementation::onNodeRenamed(k3d::inode* const Node)
 {
+
+  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESRENAMED START" << std::endl;
   Gtk::TreeIter row;
   
   //Find The Row On Tree That Has Pointer To Node
@@ -817,6 +833,9 @@ void Implementation::onNodeRenamed(k3d::inode* const Node)
       //Rename In Stored Model
       (row->get_value(m_columns.m_col_moptr))->setName(Node->name());
     }
+
+
+  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESRENAMED END" << std::endl;
 
 }//onNodeRenamed
 
@@ -848,6 +867,9 @@ bool getGroup(MaterialObj *matobj, Gtk::TreeIter& Row)
 
 bool Implementation::getRow(k3d::inode* const Node, Gtk::TreeIter& Row)
 {
+
+  k3d::log() << "MAT_MANAGER_DEBUG: GETROW START" << std::endl;
+
   Gtk::TreeNodeChildren rows = tree_model->children();
 
   //Iterate Through Each Row (Parent Rows)
@@ -874,6 +896,9 @@ bool Implementation::getRow(k3d::inode* const Node, Gtk::TreeIter& Row)
         }//for
     }//for
 
+  k3d::log() << "MAT_MANAGER_DEBUG: GETROW END" << std::endl;
+
+
   //No Node Found On Tree
   return false;
 
@@ -884,6 +909,9 @@ bool Implementation::getRow(k3d::inode* const Node, Gtk::TreeIter& Row)
 
 bool Implementation::onNodeSelection(k3d::inode* const Node)
 {
+
+  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESELECTION START" << std::endl;
+
   //return result (if Not Material)
   bool result = false;
 
@@ -989,6 +1017,8 @@ bool Implementation::onNodeSelection(k3d::inode* const Node)
           }//if
       }
   }
+
+  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESELECTION END" << std::endl;
 
   return result;
 
