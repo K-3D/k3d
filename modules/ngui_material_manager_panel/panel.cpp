@@ -1101,6 +1101,8 @@ public:
 
   void initialize(document_state& _document_sate, k3d::icommand_node& _parent)
   {
+    k3d::log() << "PANEL INIT START" << std::endl;
+
     k3d::command_tree().add(*this, "material_manager", &_parent);
 
     //Create New Implementation Object
@@ -1109,6 +1111,9 @@ public:
 
     //Pack Implementation Into This Panel
     pack_start(m_implementation->m_main_hpaned, Gtk::PACK_EXPAND_WIDGET);
+
+
+    k3d::log() << "PANEL INIT END" << std::endl;
 
     show_all();
   }

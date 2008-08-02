@@ -13,6 +13,8 @@ GroupContentPanel::~GroupContentPanel()
 {
   //Clean Up Dynamic Allocated Memory :)
 
+  k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL DESTRUCTOR START" << std::endl;
+  
   //Preview Image Cleanup
   std::vector<RenderedImage*>::iterator pview_iter = m_material_pviews.begin();
   for(; pview_iter != m_material_pviews.end(); pview_iter++)
@@ -114,6 +116,9 @@ GroupContentPanel::~GroupContentPanel()
 
   //Disconect Signal Connections****
   m_timer_connection.disconnect();
+
+
+  k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL DESTRUCTOR END" << std::endl;
 }
 
 
@@ -129,6 +134,9 @@ void GroupContentPanel::init()
 
 void GroupContentPanel::buildPanel()
 {
+
+  k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL BUILDPANEL START" << std::endl;
+
   if(m_hpane)
     {
       //Add Container To Right Pane From Implementation
@@ -297,6 +305,10 @@ void GroupContentPanel::buildPanel()
   else
     ; // Invalid HPanel Pointer 
 
+
+  k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL BUILDPANEL END" << std::endl;
+
+
 }//buildPanel
 
 
@@ -349,6 +361,9 @@ k3d::log() << "MAT_MANAGER_DEBUG: GROUPPANEL MATERIALOBJ PTR OKAY" << std::endl;
 
 bool GroupContentPanel::updatePreviewImage()
 {
+
+k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL UPDATEPREVIEWIMG START" << std::endl;
+
   //Invoke A Gtk Image Update / Refresh For Each Preview Image
   std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
 
@@ -358,6 +373,9 @@ bool GroupContentPanel::updatePreviewImage()
       (const_cast<RenderedImage*>((*mat_iter)->pviewImg()))->queue_draw();
     }
 	    
+
+  k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL UPDATEPREVIEWIMG END" << std::endl;
+
   return true;
 }
 
@@ -427,6 +445,10 @@ void GroupContentPanel::renderSinglePreview(k3d::inode *node)
 
 bool GroupContentPanel::findMaterial(const k3d::inode *node)
 {
+
+k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL FINDMATERIAL_NODE START" << std::endl;
+
+
   k3d::log() << "Error Could Be Here!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 
   //Iterate Through All Of The Stored MaterialObj's.
@@ -435,11 +457,15 @@ bool GroupContentPanel::findMaterial(const k3d::inode *node)
    for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
      {
        if((*mat_iter)->docNode() == node)
-         return true;
+         {
+           k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL FINDMATERIAL_NODE END" << std::endl;
+           return true;
+         }
      }
 
-   return false;
+   k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL FINDMATERIAL_NODE END" << std::endl;
 
+   return false;
 
 }
 
@@ -447,16 +473,25 @@ bool GroupContentPanel::findMaterial(const k3d::inode *node)
 
 bool GroupContentPanel::findMaterial(const MaterialObj *mat)
 {
+
+  k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL FINDMATERIAL_MATOBJ START" << std::endl;
+
+
   //Iterate Through All Of The Stored MaterialObj's.
   std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
 
   for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
      {
        if(*mat_iter == mat)
-         return true;
+         {
+           k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL FINDMATERIAL_MATOBJ END" << std::endl;
+           return true;
+         }
      }
 
-   return false;
+  k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL FINDMATERIAL_MATOBJ END" << std::endl;
+   
+  return false;
 
 
 }
