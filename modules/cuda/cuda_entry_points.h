@@ -117,15 +117,12 @@ extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_split_edges_entry (
                                                         unsigned int* pdev_output_clockwise_edge_point_indices,
                                                         unsigned int* pdev_input_clockwise_edge_point_indices,
                                                         unsigned int* pdev_edge_index_map,
-                                                        unsigned int* phost_edge_indices,
+                                                        unsigned int* pdev_edge_indices,
                                                         unsigned int num_edge_indices,
                                                         int num_split_points,
-                                                        unsigned int* phost_first_midpoint,
-                                                        int num_first_midpoints,
-                                                        unsigned int* phost_companions,
-                                                        int num_companions,
-                                                        unsigned char* phost_boundary_edges,
-                                                        int num_boundary_edges
+                                                        unsigned int* pdev_first_midpoint,
+                                                        unsigned int* pdev_companions,
+                                                        unsigned char* pdev_boundary_edges
                                                         );
 
 extern "C" K3D_CUDA_DECLSPEC void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, int device_pitch, int host_pitch, int width_in_bytes, int rows );
@@ -148,6 +145,34 @@ extern "C" K3D_CUDA_DECLSPEC int create_vertex_valence_lookup_kernel_entry (
 																unsigned int* pdev_valence,
 																const unsigned int* pdev_edge_point_indices,
 																int num_edges
+																);
+
+extern "C" K3D_CUDA_DECLSPEC void calculate_first_edge_entry ( unsigned int* pdev_first_edge, const unsigned int* pdev_valences, int num_edges );
+
+extern "C" K3D_CUDA_DECLSPEC void calculate_point_edges_entry (
+																unsigned int* pdev_point_edges,
+																unsigned int* pdev_found_edges,
+																const unsigned int* edge_point_indices,
+																const unsigned int* pdev_first_edges,
+																int num_edges,
+																int num_points);
+
+extern "C" K3D_CUDA_DECLSPEC unsigned int edge_index_calculator_entry (
+															unsigned int* pdev_edge_list,
+															unsigned int* phost_edge_list_size,
+															unsigned int* pdev_first_midpoint,
+															unsigned char* pdev_has_midpoint,
+															unsigned int* pdev_index_map,
+															const unsigned int* pdev_face_first_loops,
+															const unsigned int* pdev_face_loop_counts,
+															const unsigned int* pdev_loop_first_edges,
+															const unsigned int* pdev_clockwise_edges,
+															const float* pdev_edge_selection,
+															const unsigned int* pdev_companions,
+															const unsigned char* pdev_boundary_edges,
+															int split_point_count,
+															int num_faces,
+															int first_new_point_index
 																);
 
 #endif // !CUDA_ENTRY_POINTS_H

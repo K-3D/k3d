@@ -42,6 +42,7 @@
 #include <k3d-platform-config.h>
 
 #include "cuda_device_mesh.h"
+#include "cuda_mesh_topology_data.h"
 
 namespace module
 {
@@ -206,15 +207,27 @@ public:
         base(Factory, Document),
         m_vertices(init_owner(*this) + init_name("vertices") + init_label(_("Vertices")) + init_description(_("Number of vertices to insert in each selected edge")) + init_value(1L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
         m_p_output_device_mesh(),
-        m_p_input_device_mesh()
+        m_p_input_device_mesh(),
+        m_pdev_edge_list(0)
     {
         m_vertices.changed_signal().connect(make_reset_mesh_slot());
         m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
     }
 
+    ~cuda_mesh_subdivide_edges()
+    {
+    	if ( m_pdev_edge_list )
+    	{
+    		free_device_memory ( (void*) m_pdev_edge_list );
+    	}
+    }
+
     void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
     {
-        m_edge_list.clear();
+        if ( m_pdev_edge_list )
+        {
+        	free_device_memory( (void*) m_pdev_edge_list );
+        }
 
         // If there are no valid polyhedra, we give up
         document().pipeline_profiler().start_execution(*this, "Validate input");
@@ -250,33 +263,81 @@ public:
 #endif
         document().pipeline_profiler().finish_execution(*this, "Calculate companions");
 
-        const k3d::uint_t split_point_count = m_vertices.pipeline_value();
+        document().pipeline_profiler().start_execution(*this, "Convert Boundary");
+		k3d::typed_array<unsigned char> tmp_boundary (boundary_edges.size());
 
-        document().pipeline_profiler().start_execution(*this, "Calculate indices");
+		// need to convert the bit references to chars
+		for ( int k = 0; k < tmp_boundary.size() ; k++ )
+		{
+			if ( boundary_edges[k] )
+				tmp_boundary[k] = 1;
+			else
+				tmp_boundary[k] = 0;
+		}
+		document().pipeline_profiler().finish_execution(*this, "Convert Boundary");
+
+		document().pipeline_profiler().start_execution(*this, "Calculate indices");
+
+        const k3d::uint_t split_point_count = m_vertices.pipeline_value();
         const k3d::uint_t old_edge_count = polyhedra.edge_points->size();
-        k3d::mesh::indices_t index_map(old_edge_count);
-        detail::indices_t first_midpoint(old_edge_count);
-        k3d::mesh::bools_t has_midpoint(old_edge_count);
-        detail::edge_index_calculator edge_index_calculator(polyhedra,
-                companions,
-                boundary_edges,
-                split_point_count,
-                Input.points->size(),
-                m_edge_list,
-                index_map,
-                first_midpoint,
-                has_midpoint);
-        for(k3d::uint_t face = 0; face != polyhedra.face_first_loops->size(); ++face) edge_index_calculator(face);
+
+        k3d::uint32_t* pdev_index_map;
+        k3d::uint32_t* pdev_first_midpoint;
+        k3d::uint32_t* pdev_companions;
+        unsigned char* pdev_has_midpoint;
+        unsigned char* pdev_boundary_edges;
+
+
+        // allocate the device memory
+        allocate_device_memory((void**)&pdev_index_map, old_edge_count*sizeof(k3d::uint32_t));
+        allocate_device_memory((void**)&pdev_first_midpoint, old_edge_count*sizeof(k3d::uint32_t));
+        allocate_device_memory((void**)&pdev_has_midpoint, old_edge_count*sizeof(unsigned char));
+
+        // the edge list can maximally contain all the edges
+        allocate_device_memory((void**)&m_pdev_edge_list, tmp_boundary.size()*sizeof(k3d::uint32_t));
+
+        allocate_device_memory((void**)&pdev_companions, companions.size()*sizeof(k3d::uint32_t));
+        allocate_device_memory((void**)&pdev_boundary_edges, tmp_boundary.size()*sizeof(unsigned char));
+
+
+
+        copy_from_host_to_device((void*)pdev_companions, (const void*)&(companions.front()), companions.size()*sizeof(k3d::uint32_t));
+        copy_from_host_to_device((void*)pdev_boundary_edges, (const void*)&(tmp_boundary.front()), tmp_boundary.size()*sizeof(unsigned char));
+
+        unsigned int edge_index_calculator_edge_count;
+
+        k3d::log() << debug << "Call edge_index_calculator" << std::endl;
+
+        edge_index_calculator_edge_count = edge_index_calculator_entry (
+									(unsigned int*) m_pdev_edge_list,
+									&m_edge_list_size,
+									(unsigned int*) pdev_first_midpoint,
+									pdev_has_midpoint,
+									(unsigned int*) pdev_index_map,
+									(const unsigned int*)m_p_input_device_mesh->get_device_polyhedra().get_per_face_first_loops_pointer(),
+									(const unsigned int*)m_p_input_device_mesh->get_device_polyhedra().get_per_face_loop_counts_pointer(),
+									(const unsigned int*)m_p_input_device_mesh->get_device_polyhedra().get_per_loop_first_edges_pointer(),
+									(const unsigned int*)m_p_input_device_mesh->get_device_polyhedra().get_per_edge_clockwise_edges_pointer(),
+									m_p_input_device_mesh->get_device_polyhedra().get_per_edge_selection_pointer(),
+									(const unsigned int*) pdev_companions,
+									(const unsigned char*) pdev_boundary_edges,
+									split_point_count,
+									Input.polyhedra->face_first_loops->size(),
+									Input.points->size()
+									);
+
+        k3d::log() << debug << "Done: " << edge_index_calculator_edge_count << std::endl;
+
         document().pipeline_profiler().finish_execution(*this, "Calculate indices");
 
         document().pipeline_profiler().start_execution(*this, "Allocate memory");
 
-        boost::shared_ptr<k3d::mesh::indices_t> output_edge_points(new k3d::mesh::indices_t(edge_index_calculator.edge_count));
-        boost::shared_ptr<k3d::mesh::indices_t> output_clockwise_edges(new k3d::mesh::indices_t(edge_index_calculator.edge_count));
-        boost::shared_ptr<k3d::mesh::selection_t> output_edge_selection(new k3d::mesh::selection_t(edge_index_calculator.edge_count, 0.0));
+        boost::shared_ptr<k3d::mesh::indices_t> output_edge_points(new k3d::mesh::indices_t(edge_index_calculator_edge_count));
+        boost::shared_ptr<k3d::mesh::indices_t> output_clockwise_edges(new k3d::mesh::indices_t(edge_index_calculator_edge_count));
+        boost::shared_ptr<k3d::mesh::selection_t> output_edge_selection(new k3d::mesh::selection_t(edge_index_calculator_edge_count, 0.0));
         //k3d::mesh::points_t& output_points = *k3d::make_unique(Output.points);
         //k3d::mesh::selection_t& output_point_selection = *k3d::make_unique(Output.point_selection);
-        const k3d::uint_t new_point_count = m_edge_list.size() * split_point_count + Input.points->size();
+        const k3d::uint_t new_point_count = m_edge_list_size * split_point_count + Input.points->size();
 
 
 
@@ -284,8 +345,7 @@ public:
         //output_point_selection.resize(new_point_count, 1.0);
 
         k3d::mesh::indices_t& output_loop_first_edges = *k3d::make_unique(polyhedra.loop_first_edges);
-        polyhedra.face_varying_data = Input.polyhedra->face_varying_data.clone_types();
-        k3d::named_array_copier face_varying_data_copier(Input.polyhedra->face_varying_data, polyhedra.face_varying_data);
+
         document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
         document().pipeline_profiler().start_execution(*this, "Update indices");
@@ -298,97 +358,47 @@ public:
 
         m_p_output_device_mesh->resize_points_and_selection ( new_point_count, 1.0 );
 
-        unsigned int* pdev_edge_index_map;
-        allocate_device_memory ((void**)&pdev_edge_index_map, index_map.size()*sizeof(unsigned int));
-#ifndef K3D_UINT_T_64_BITS
-        copy_from_host_to_device((void*)pdev_edge_index_map, (const void*)&(index_map.front()), index_map.size()*sizeof(unsigned int));
-#else
-        document().pipeline_profiler().finish_execution(*this, "Update indices(1)");
-
-        // use host conversion
-        document().pipeline_profiler().start_execution(*this, "");
-        detail::indices_t index_map32(index_map.size());
-        std::copy(index_map.begin(), index_map.end(), index_map32.begin());
-        copy_from_host_to_device((void*)pdev_edge_index_map, (const void*)&(index_map32.front()), index_map32.size()*sizeof(unsigned int));
-        document().pipeline_profiler().finish_execution(*this, "64to32: Host");
-
-
-        // use GPU conversion
-        document().pipeline_profiler().start_execution(*this, "");
-        copy_from_host_to_device_64_to_32_convert ((void*)pdev_edge_index_map, (const void*)&(index_map.front()), index_map.size()*sizeof(unsigned int) );
-        document().pipeline_profiler().finish_execution(*this, "64to32: Device");
-
-        document().pipeline_profiler().start_execution(*this, "Update indices");
-#endif
-
         //k3d::log() << debug << "Pre-Kernel" << std::endl;
         subdivide_edges_update_indices_entry ((unsigned int*)m_p_input_device_mesh->get_polyhedra_edge_point_indices_pointer(),
                                               (unsigned int*)m_p_input_device_mesh->get_polyhedra_clockwise_edge_point_indices_pointer(),
                                               (unsigned int) Input.polyhedra->edge_points->size(),
                                               (unsigned int*)(m_p_output_device_mesh->get_polyhedra_edge_point_indices_pointer()),
                                               (unsigned int*)(m_p_output_device_mesh->get_polyhedra_clockwise_edge_point_indices_pointer()),
-                                              pdev_edge_index_map,
-                                              index_map.size());
+                                              pdev_index_map,
+                                              old_edge_count);// index_map.size = old_edge_count
 
         subdivide_edges_update_loop_first_edges_entry ((unsigned int*)m_p_output_device_mesh->get_polyhedra_loop_first_edges_pointer(),
                                                  (unsigned int)output_loop_first_edges.size(),
-                                                 pdev_edge_index_map,
-                                                 index_map.size());
+                                                 pdev_index_map,
+                                                 old_edge_count);// index_map.size = old_edge_count
 
 
         document().pipeline_profiler().finish_execution(*this, "Update indices");
-
-        document().pipeline_profiler().start_execution(*this, "Convert Boundary");
-        k3d::typed_array<unsigned char> tmp_boundary (boundary_edges.size());
-
-        // need to convert the bit references to chars
-        for ( int k = 0; k < tmp_boundary.size() ; k++ )
-        {
-            if ( boundary_edges[k] )
-                tmp_boundary[k] = 1;
-            else
-                tmp_boundary[k] = 0;
-        }
-        document().pipeline_profiler().finish_execution(*this, "Convert Boundary");
 
 
         document().pipeline_profiler().start_execution(*this, "Split edges");
         subdivide_edges_split_edges_entry ((unsigned int*)(m_p_output_device_mesh->get_polyhedra_edge_point_indices_pointer()),
                                            (unsigned int*)(m_p_output_device_mesh->get_polyhedra_clockwise_edge_point_indices_pointer()),
                                            (unsigned int*)m_p_input_device_mesh->get_polyhedra_clockwise_edge_point_indices_pointer(),
-                                           pdev_edge_index_map,
-                                           &(m_edge_list.front()),
-                                           (unsigned int)m_edge_list.size(),
+                                           pdev_index_map,
+                                           m_pdev_edge_list,
+                                           (unsigned int)m_edge_list_size,
                                            (unsigned int)m_vertices.pipeline_value(),
-                                           &(first_midpoint.front()),
-                                           first_midpoint.size(),
-                                           &(companions.front()),
-                                           companions.size(),
-                                           (unsigned char*)&(tmp_boundary.front()),
-                                           boundary_edges.size()
+                                           pdev_first_midpoint,
+                                           pdev_companions,
+                                           pdev_boundary_edges
                                            );
 
         synchronize_threads();
         m_p_output_device_mesh->copy_from_device( Output, POLYHEDRA_ALL_EDGES + POLYHEDRA_ALL_LOOPS);
 
-        free_device_memory ( pdev_edge_index_map );
+        free_device_memory ( pdev_index_map );
+        free_device_memory ( pdev_first_midpoint );
+        free_device_memory ( pdev_has_midpoint );
+        free_device_memory ( pdev_companions );
+        free_device_memory ( pdev_boundary_edges );
 
         document().pipeline_profiler().finish_execution(*this, "Split edges");
-
-        //k3d::log() << debug << Output << std::endl;
-
-        document().pipeline_profiler().start_execution(*this, "Copy varying data");
-        detail::varying_data_copier varying_data_copier(*Input.points,
-                    *Input.polyhedra->edge_points,
-                    *Input.polyhedra->clockwise_edges,
-                    companions,
-                    boundary_edges,
-                    has_midpoint,
-                    split_point_count,
-                    face_varying_data_copier);
-        const k3d::mesh::indices_t& input_edge_points = *Input.polyhedra->edge_points;
-        for(k3d::uint_t edge = 0; edge != input_edge_points.size(); ++edge) varying_data_copier(edge);
-        document().pipeline_profiler().finish_execution(*this, "Copy varying data");
 
         polyhedra.edge_selection = output_edge_selection;
         polyhedra.constant_data = Input.polyhedra->constant_data;
@@ -409,8 +419,8 @@ public:
 
         document().pipeline_profiler().start_execution(*this, "Calculate positions");
 
-        subdivide_edges_split_point_calculator ( &(m_edge_list.front()),
-                                                (unsigned int)m_edge_list.size(),
+        subdivide_edges_split_point_calculator ( m_pdev_edge_list,
+                                                (unsigned int)m_edge_list_size,
                                                 m_p_output_device_mesh->get_points_and_selection_pointer(),
                                                 (unsigned int)Input.points->size(),
                                                 m_p_input_device_mesh->get_device_polyhedra().get_per_edge_points_pointer(),
@@ -442,7 +452,10 @@ private:
     k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_vertices;
 
     // Cache the midpoints, for fast updating
-    detail::indices_t m_edge_list;
+    //detail::indices_t m_edge_list;
+
+    k3d::uint32_t* m_pdev_edge_list;
+    k3d::uint32_t m_edge_list_size;
     boost::shared_ptr<cuda_device_mesh> m_p_output_device_mesh;
     boost::shared_ptr<cuda_device_mesh> m_p_input_device_mesh;
 };

@@ -717,26 +717,26 @@ __global__ void create_vertex_valence_lookup_kernel ( unsigned int* valence, con
 /**
  * Kernel to calculate first edges in edge_adjacency lookup
  */
-__global__ void calculate_first_edges_block_kernel ( unsigned int* first_edge, const unsigned int* valences, int num_points )
+__global__ void calculate_first_edges_block_kernel ( unsigned int* first_edges, const unsigned int* valences, int num_edges )
 {
 	// use shared memory to store both the result per block as well as the initial block values
 	__shared__ extern uint2 shared_first[];
 
-	unsigned int point_index = ( blockDim.x * blockIdx.x) + threadIdx.x;
+	unsigned int edge_index = ( blockDim.x * blockIdx.x) + threadIdx.x;
 
-	if ( point_index < num_points )
+	if ( edge_index < num_edges )
 	{
-		shared_first[threadIdx.x].x = valences[point_index];
+		shared_first[threadIdx.x].x = valences[edge_index];
 		shared_first[0].y = 0;
 
-		if ( point_index > 0 )
+		if ( edge_index > 0 )
 		{
-			shared_first[threadIdx.x].y = valences[point_index-1];
+			shared_first[threadIdx.x].y = valences[edge_index-1];
 		}
 	}
 	__syncthreads();
 
-	if ( point_index < num_points )
+	if ( edge_index < num_edges )
 	{
 		for ( int i = 1; i < blockDim.x ; i++ )
 		{
@@ -748,25 +748,140 @@ __global__ void calculate_first_edges_block_kernel ( unsigned int* first_edge, c
 	}
 	__syncthreads();
 
-	if ( point_index < num_points )
+	if ( edge_index < num_edges )
 	{
-		if ( threadIdx.x == blockDim.x )
+		first_edges[edge_index] = shared_first[threadIdx.x].x;
+	}
+	__syncthreads();
+
+}
+
+__global__ void calculate_first_edges_update_kernel ( unsigned int* first_edges, int num_edges )
+{
+	__shared__ extern unsigned int shared_first_edge[];
+	__shared__ unsigned int update_val;
+
+	unsigned int edge_index = ( blockDim.x * blockIdx.x) + threadIdx.x;
+
+	if ( edge_index < num_edges )
+	{
+		shared_first_edge[threadIdx.x] = first_edges[edge_index];
+	}
+
+	if ( threadIdx.x == 0 )
+	{
+		update_val = 0;
+		for ( int k = 1 ; k <= ( blockIdx.x ) ; k++ )
 		{
-			first_edge[point_index] = shared_first[threadIdx.x].x;
+			update_val += first_edges[k*blockDim.x -1];
 		}
+	}
+	__syncthreads();
+
+
+	if ( edge_index < num_edges )
+	{
+		shared_first_edge[threadIdx.x] += update_val;
 	}
 
 	__syncthreads();
 
-
-
-
+	if ( edge_index < num_edges )
+	{
+		first_edges[edge_index] = shared_first_edge[threadIdx.x];
+	}
 
 }
 
-__global__ void calculate_first_edges_update_kernel ( unsigned int* first_edge, int num_edges )
+/**
+ * Kernel for calculating point edges
+ */
+__global__ void calculate_point_edges_kernel ( unsigned int* point_edges, unsigned int* found_edges, const unsigned int* edge_point_indices, const unsigned int* first_edges, int num_edges)
 {
+	unsigned int point_index;
+	for ( unsigned int edge_index = 0 ; edge_index < num_edges ; ++edge_index )
+	{
+		point_index = edge_point_indices[edge_index];
+		point_edges[first_edges[point_index] + found_edges[point_index]] = edge_index;
+		++found_edges[point_index];
+	}
+}
 
+/**
+ *
+ */
+__global__ void edge_index_calculator_kernel (
+											unsigned int* edge_list,
+											unsigned int* sizes,
+											unsigned int* first_midpoint,
+											unsigned char* has_midpoint,
+											unsigned int* index_map,
+											const unsigned int* face_first_loops,
+											const unsigned int* face_loop_counts,
+											const unsigned int* loop_first_edges,
+											const unsigned int* clockwise_edges,
+											const float* edge_selection,
+											const unsigned int* companions,
+											const unsigned char* boundary_edges,
+											int split_point_count,
+											int num_faces,
+											int first_new_point_index
+											 )
+{
+	unsigned int edge_count = 0;
+	unsigned int edge_list_count = 0;
+
+	for ( int face_index = 0; face_index < num_faces; ++face_index )
+	{
+
+		unsigned int loop_begin = face_first_loops[face_index];
+		unsigned int loop_end = loop_begin + face_loop_counts[face_index];
+		for ( int loop_index = loop_begin; loop_index < loop_end; ++loop_index )
+		{
+			unsigned int first_edge_index = loop_first_edges[loop_index];
+
+			for( unsigned int edge_index = first_edge_index; 1 ; )
+			{
+#ifdef __DEVICE_EMULATION__
+	printf("vals: %u %u\n", edge_count, edge_list_count);
+#endif
+				index_map[edge_index] = edge_count;
+				++edge_count;
+
+				if(!boundary_edges[edge_index] && edge_selection[companions[edge_index]] && !edge_selection[edge_index])
+				{
+					edge_count += split_point_count;
+					first_midpoint[edge_index] = first_midpoint[companions[edge_index]];
+				}
+
+				if(edge_selection[edge_index])
+				{
+					edge_count += split_point_count;
+					if(!boundary_edges[edge_index] && has_midpoint[companions[edge_index]])
+					{
+						first_midpoint[edge_index] = first_midpoint[companions[edge_index]];
+					}
+					else
+					{
+						first_midpoint[edge_index] = first_new_point_index + split_point_count * edge_list_count;
+						edge_list[edge_list_count] = edge_index;
+						edge_list_count++;
+						has_midpoint[edge_index] = 1;
+					}
+				}
+
+				edge_index = clockwise_edges[edge_index];
+				if (edge_index == first_edge_index)
+					break;
+			}
+		}
+	}
+
+#ifdef __DEVICE_EMULATION__
+	printf("vals: %u %u\n", edge_count, edge_list_count);
+#endif
+	sizes[1] = edge_list_count;
+	sizes[0] = edge_count;
 }
 
 #endif // #ifndef _CUDA_KERNELS_H_

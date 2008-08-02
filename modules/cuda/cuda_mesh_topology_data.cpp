@@ -99,7 +99,7 @@ private:
 
 }
 
-void cuda_create_edge_adjacency_lookup(const k3d::uint32_t* pdev_edgePoints, const k3d::uint32_t* pdev_clockwiseEdges, unsigned char* pdev_boundaryEdges, k3d::uint32_t* pdev_adjacentEdges, int num_edges)
+void cuda_create_edge_adjacency_lookup(const k3d::uint32_t* pdev_edgePoints, const k3d::uint32_t* pdev_clockwiseEdges, unsigned char* pdev_boundaryEdges, k3d::uint32_t* pdev_adjacentEdges, int num_edges, int num_points)
 {
 	k3d::uint32_t* pdev_valences;
 	k3d::uint32_t* pdev_found_edges;
@@ -114,40 +114,29 @@ void cuda_create_edge_adjacency_lookup(const k3d::uint32_t* pdev_edgePoints, con
 	allocate_device_memory((void**)&pdev_first_edges, valence_size*sizeof(k3d::uint32_t));
 	allocate_device_memory((void**)&pdev_point_edges, num_edges*sizeof(k3d::uint32_t));
 
-	/*
-	mesh::counts_t found_edges(valences.size(), 0);
-	mesh::indices_t first_edges(valences.size(), 0); // first edge in point_edges for each point
-	mesh::indices_t point_edges(EdgePoints.size(), 0);
-	uint_t count = 0;
-	for(uint_t point = 0; point != valences.size(); ++point)
-	{
-		first_edges[point] = count;
-		count += valences[point];
-	}
+	calculate_first_edge_entry ( (unsigned int*)pdev_first_edges, ( const unsigned int*)pdev_valences, num_edges );
 
-
-
-	BoundaryEdges.assign(EdgePoints.size(), true);
-	AdjacentEdges.assign(EdgePoints.size(), 0);
-
-	const uint_t edge_begin = 0;
-	const uint_t edge_end = edge_begin + EdgePoints.size();
-	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
-	{
-		const uint_t point = EdgePoints[edge];
-		point_edges[first_edges[point] + found_edges[point]] = edge;
-		++found_edges[point];
-	}
+	calculate_point_edges_entry ( (unsigned int*)pdev_point_edges,
+								(unsigned int*) pdev_found_edges,
+								(const unsigned int*) pdev_edgePoints,
+								(const unsigned int*) pdev_first_edges,
+								num_edges,
+								num_points);
 
 	find_companion_kernel_entry ( pdev_boundaryEdges,
 								  pdev_adjacentEdges,
-								  const int num_edges,
+								  num_edges,
 								  pdev_edgePoints,
 								  pdev_clockwiseEdges,
 								  pdev_first_edges,
 								  (unsigned int*) pdev_valences,
 								  pdev_point_edges );
-								  */
+
+	free_device_memory(pdev_valences);
+	free_device_memory(pdev_found_edges);
+	free_device_memory(pdev_first_edges);
+	free_device_memory(pdev_point_edges);
+
 }
 
 void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::indices_t& EdgeFaces)
