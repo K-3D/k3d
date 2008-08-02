@@ -126,8 +126,8 @@ GroupContentPanel::~GroupContentPanel()
 void GroupContentPanel::init()
 {
   //GLib Timer > Updates Preview Image Every 0.25s
-  m_timer_connection = Glib::signal_timeout()
-    .connect(sigc::mem_fun(*this, &GroupContentPanel::updatePreviewImage), 250);
+  //m_timer_connection = Glib::signal_timeout()
+  // .connect(sigc::mem_fun(*this, &GroupContentPanel::updatePreviewImage), 250);
 }
 
 
