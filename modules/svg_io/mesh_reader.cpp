@@ -105,7 +105,7 @@ public:
 		static k3d::document_plugin_factory<mesh_reader_implementation,
                 k3d::interface_list<k3d::imesh_source,
                 k3d::interface_list<k3d::imesh_storage> > > factory(
-			k3d::uuid(0x13f3ed30, 0xfd4690e4, 0x7802b380, 0x1acfd3f0),
+			k3d::uuid(0xa0149217, 0xf64844bb, 0x4ba01e8f, 0x21d7f651),
 			"SVGMeshReader",
 			_("Reader that loads external Scalable Vector Graphics (.svg) files into the document by reference"),
 			"MeshReader",
