@@ -146,10 +146,15 @@ void MaterialContentPanel::renderPreview()
 {
   //Invoke Generic Render Initialization
   renderInit();
+
+   k3d::log() << "MAT_MANAGER_DEBUG:GROUPPANEL RENDER INIT" << std::endl;
   
   //Check If Selected Node Is A RenderMan Material
   if(m_materialobj->isMaterial())
     {
+
+      k3d::log() << "MAT_MANAGER_DEBUG: GROUPPANEL MATERIALOBJ PTR OKAY" << std::endl;
+      
       //If It Is, Assign To Current Geometry As A Surface Shader
       k3d::property
         ::set_internal_value(*m_geometry, 
@@ -163,6 +168,8 @@ void MaterialContentPanel::renderPreview()
                                     / k3d::filesystem::generic_path(m_single_imgfile),
                                     false);
     }//if	 
+
+k3d::log() << "MAT_MANAGER_DEBUG:GROUPPANEL RENDER COMPLETED" << std::endl;
 
   else
     {
