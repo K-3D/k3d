@@ -27,6 +27,9 @@
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/gprim_factory.h>
+#include "3ds.h"
+#include "3dschunknames.h"
 
 namespace module
 {
@@ -71,6 +74,69 @@ public:
 		const k3d::filesystem::path path = m_file.pipeline_value();
 		if(path.empty())
 			return;
+
+		C3dsParser c3dsfile(path.native_console_string().c_str());
+
+		k3d::gprim_factory factory(Mesh);
+
+		float *verts = NULL;
+		unsigned short *polys;
+		unsigned short chunkname;
+		unsigned short numverts;
+		unsigned short numpolys;
+		unsigned long mem = 0;
+		unsigned long mem_poly = 0;
+		while(!c3dsfile.Eof()) {
+			chunkname = c3dsfile.GetChunkName();
+			switch (chunkname) {
+				case MAIN3DS:
+					c3dsfile.EnterChunk();
+					break;
+				case EDIT3DS:
+					c3dsfile.EnterChunk();
+					break;
+				case EDIT_OBJECT:
+					c3dsfile.SkipStrData();
+					break;
+				case OBJ_TRIMESH:
+					c3dsfile.EnterChunk();
+					break;
+				case TRI_FACEL1:
+					c3dsfile.GetChunkData(&numpolys,2);
+					mem_poly = numpolys * 4 * 2;
+					polys = (unsigned short *) malloc(mem_poly);
+					c3dsfile.GetChunkData(polys,mem_poly,2);
+					for (unsigned int x=0; x<4*(unsigned int)numpolys; x+=4)
+					{
+						k3d::mesh::indices_t vertex_indices;
+						for(int i=0; i<3; i++)
+						{
+							vertex_indices.push_back(polys[x+i]);
+							k3d::log() << debug << polys[x+i] << std::endl;
+						}
+						factory.add_polygon(vertex_indices);
+					}
+					c3dsfile.SkipChunk();
+					break;
+				case TRI_VERTEXL:
+					c3dsfile.GetChunkData(&numverts, 2);
+					mem = numverts * 3 * 4; // numverts vertices * 3 floats per vertex * 4 bytes per float
+					verts = (float *)malloc(mem);
+					if (verts == NULL)
+					{
+						k3d::log() << error << "No vertex data!" << std::endl;
+						return;
+					}
+					c3dsfile.GetChunkData(verts, mem, 2);
+					for (unsigned int x = 0; x < 3 * (unsigned int)numverts; x += 3) 
+					{
+						factory.add_point(k3d::point4(verts[x+0], verts[x+1], verts[x+2],1));
+					}
+				default:
+					c3dsfile.SkipChunk();
+					break;
+			}
+		}
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Mesh)
