@@ -167,10 +167,10 @@ void MaterialContentPanel::renderPreview()
                                     k3d::system::get_temp_directory() 
                                     / k3d::filesystem::generic_path(m_single_imgfile),
                                     false);
+
+      k3d::log() << "MAT_MANAGER_DEBUG:GROUPPANEL RENDER COMPLETED" << std::endl;
     }//if	 
-
-k3d::log() << "MAT_MANAGER_DEBUG:GROUPPANEL RENDER COMPLETED" << std::endl;
-
+ 
   else
     {
       ; //Not A Renderman Material
