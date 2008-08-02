@@ -16,9 +16,9 @@ GroupContentPanel::~GroupContentPanel()
   k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL DESTRUCTOR START" << std::endl;
   
   //Preview Image Cleanup
-  std::vector<RenderedImage*>::iterator pview_iter = m_material_pviews.begin();
-  for(; pview_iter != m_material_pviews.end(); pview_iter++)
-    delete (*pview_iter);   
+  // std::vector<RenderedImage*>::iterator pview_iter = m_material_pviews.begin();
+//   for(; pview_iter != m_material_pviews.end(); pview_iter++)
+//     delete (*pview_iter);   
 
   //All GTK Widgets >>
 
@@ -126,8 +126,8 @@ GroupContentPanel::~GroupContentPanel()
 void GroupContentPanel::init()
 {
   //GLib Timer > Updates Preview Image Every 0.25s
-  //m_timer_connection = Glib::signal_timeout()
-  // .connect(sigc::mem_fun(*this, &GroupContentPanel::updatePreviewImage), 250);
+  m_timer_connection = Glib::signal_timeout()
+    .connect(sigc::mem_fun(*this, &GroupContentPanel::updatePreviewImage), 250);
 }
 
 
