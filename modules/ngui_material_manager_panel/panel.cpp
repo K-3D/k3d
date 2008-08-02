@@ -340,9 +340,6 @@ public:
 
 void Implementation::init()
 {
-
-  k3d::log() << "MAT_MANAGER_DEBUG: START INIT" << std::endl;
-
   //Currently In init
   m_init = true;
 
@@ -365,8 +362,7 @@ void Implementation::init()
   m_document_state.document().nodes().rename_node_signal()
     .connect(sigc::mem_fun(*this, &Implementation::onNodeRenamed));
 
-  k3d::log() << "MAT_MANAGER_DEBUG: EVENT SETUP" << std::endl;
-
+ 
 //   m_document_state.view_node_properties_signal()
 //    .connect(sigc::mem_fun(*this, &Implementation::onNodeSelection));
 
@@ -382,26 +378,15 @@ void Implementation::init()
   //Delete Model Data
   m_model->clearModel();
 
-  k3d::log() << "MAT_MANAGER_DEBUG: MODEL CLEARED" << std::endl;
-
   //Rebuild Model Data
   m_model->buildModel(m_document_state);
-
-  k3d::log() << "MAT_MANAGER_DEBUG: MODEL BUILT" << std::endl;
-  
-
-  
 
   //Build The GTK GUI
   buildGui();
 
-
-  k3d::log() << "MAT_MANAGER_DEBUG: GUI BUILT" << std::endl;
-
   //Hint To GTK To Update Interface
   schedule_update();
 
-  k3d::log() << "MAT_MANAGER_DEBUG: UPDATED OKAY" << std::endl;
 
   //Try To Connect The Selected Node. (Otherwise Wont Work Until Re-Select)
   k3d::inode_collection::nodes_t::const_iterator node_iter 
@@ -416,15 +401,10 @@ void Implementation::init()
       if(selected_result)
         {
           onNodeSelection(*node_iter);
-          k3d::log() << "THERE IS A NODE SELECTED!" << std::endl;
           //if(onNodeSelection((*node_iter)))
            //break;
         }
     }//for
-
-  k3d::log() << "MAT_MANAGER_DEBUG: TRIED TO CONNECT WITH SELECTED MATERIAL NODE (IF THERE IS ONE)" << std::endl;
-  
-
 
 }//init
 
@@ -432,17 +412,11 @@ void Implementation::init()
 
 void Implementation::on_update()
 {
-
- k3d::log() << "MAT_MANAGER_DEBUG: ONUPDATE START" << std::endl;
-
   //Clear The Tree Model
   tree_model->clear();
 
   //Rebuild Tree From Rebuilt Model
   buildTree();
-
-  k3d::log() << "MAT_MANAGER_DEBUG: ONUPDATE END" << std::endl;
-
 
 }//on_update
 
@@ -450,9 +424,6 @@ void Implementation::on_update()
 
 void Implementation::buildGui()
 {
-
-  k3d::log() << "MAT_MANAGER_DEBUG: BUILDGUI START" << std::endl;
-
   //Setup The Material Tree
   m_tree.set_headers_visible(false);
   m_tree.set_reorderable(false);
@@ -489,18 +460,13 @@ void Implementation::buildGui()
 
   //Embed The Tree
   m_tool_tree_cont.pack_start(m_tree_scrolled_window, true, true, 0);
-
-
- k3d::log() << "MAT_MANAGER_DEBUG: BUILDGUI END" << std::endl;
-	  	  
+  	  
 }//buildGui
 
 
 
 void Implementation::buildTree()
 {
-  k3d::log() << "MAT_MANAGER_DEBUG: BUILDTREE START" << std::endl;
-
   //Iterate Through Known Groups & Build Tree Hierachy
   std::list<MaterialGroup*>::const_iterator group_iter = m_model->m_groups.begin();
 
@@ -544,16 +510,12 @@ void Implementation::buildTree()
   if(!on_first_row)
     tree_selection->select(first_group_row);	   
 
-
-  k3d::log() << "MAT_MANAGER_DEBUG: BUILDTREE END" << std::endl;
-
 }//buildTree
 
     
 
 void Implementation::onTreeRowChanged()
 {
-  k3d::log() << "MAT_MANAGER_DEBUG: ONTREEROWCHANGED START" << std::endl;
   //Get The Current Row Selection
   Gtk::TreeModel::iterator iter = tree_selection->get_selected();
   
@@ -608,17 +570,12 @@ void Implementation::onTreeRowChanged()
 
     }//if
 
-  k3d::log() << "MAT_MANAGER_DEBUG: ONTREEROWCHANGED END" << std::endl;
-
 }//onTreeRowChanged
 
 
 
 void Implementation::buildContentPanel(Gtk::TreeModel::Row row, bool m_col_ismg)
 {
-
-k3d::log() << "MAT_MANAGER_DEBUG: BUILDCONTENTPANEL START" << std::endl;
-
   //Check If Building Group Panel Or Material Object Panel
   if(m_col_ismg)
     {
@@ -650,9 +607,6 @@ k3d::log() << "MAT_MANAGER_DEBUG: BUILDCONTENTPANEL START" << std::endl;
   //Build The Content Pane From Corrected Pointer
   m_rpane_content->buildPanel();
 
-  k3d::log() << "MAT_MANAGER_DEBUG: BUILDCONTENTPANEL END" << std::endl;
-
-
 }//buildContentPanel
 
 
@@ -660,9 +614,6 @@ k3d::log() << "MAT_MANAGER_DEBUG: BUILDCONTENTPANEL START" << std::endl;
 
 void Implementation::onNodesAdded(const k3d::inode_collection::nodes_t& Nodes)
 {
-
-  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESADDED START" << std::endl;
-
   //Flag Used For Possible Panel Update
   bool material_added = false;
 
@@ -750,9 +701,6 @@ void Implementation::onNodesAdded(const k3d::inode_collection::nodes_t& Nodes)
         }//if
     }//if
 
-  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESADDED END" << std::endl;
-
-
 }//onNodesAdded
 
 
@@ -760,8 +708,6 @@ void Implementation::onNodesAdded(const k3d::inode_collection::nodes_t& Nodes)
 
 void Implementation::onNodesRemoved(const k3d::inode_collection::nodes_t& Nodes)
 {
-  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESREMOVED START" << std::endl;
-
   //Flag For Possible Panel Update
   bool material_removed = false;
 
@@ -830,9 +776,6 @@ void Implementation::onNodesRemoved(const k3d::inode_collection::nodes_t& Nodes)
         }//if
     }//if
 
-
-  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESREMOVED END" << std::endl;
-
 }//onNodesRemoved
 
 
@@ -840,8 +783,6 @@ void Implementation::onNodesRemoved(const k3d::inode_collection::nodes_t& Nodes)
 
 void Implementation::onNodeRenamed(k3d::inode* const Node)
 {
-
-  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESRENAMED START" << std::endl;
   Gtk::TreeIter row;
   
   //Find The Row On Tree That Has Pointer To Node
@@ -856,18 +797,12 @@ void Implementation::onNodeRenamed(k3d::inode* const Node)
       (row->get_value(m_columns.m_col_moptr))->setName(Node->name());
     }
 
-
-  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESRENAMED END" << std::endl;
-
 }//onNodeRenamed
 
 
 
 bool getGroup(MaterialObj *matobj, Gtk::TreeIter& Row)
 {
-
- k3d::log() << "MAT_MANAGER_DEBUG: GETGROUP START" << std::endl;
-
   bool result = false;
 
  //  //Go Through Each Group And Try To Find MaterialObj
@@ -882,8 +817,6 @@ bool getGroup(MaterialObj *matobj, Gtk::TreeIter& Row)
 
 //     }//for
 
-  k3d::log() << "MAT_MANAGER_DEBUG: GETGROUP END" << std::endl;
-
   return result;
 }
 
@@ -891,9 +824,6 @@ bool getGroup(MaterialObj *matobj, Gtk::TreeIter& Row)
 
 bool Implementation::getRow(k3d::inode* const Node, Gtk::TreeIter& Row)
 {
-
-  k3d::log() << "MAT_MANAGER_DEBUG: GETROW START" << std::endl;
-
   Gtk::TreeNodeChildren rows = tree_model->children();
 
   //Iterate Through Each Row (Parent Rows)
@@ -920,9 +850,6 @@ bool Implementation::getRow(k3d::inode* const Node, Gtk::TreeIter& Row)
         }//for
     }//for
 
-  k3d::log() << "MAT_MANAGER_DEBUG: GETROW END" << std::endl;
-
-
   //No Node Found On Tree
   return false;
 
@@ -933,9 +860,6 @@ bool Implementation::getRow(k3d::inode* const Node, Gtk::TreeIter& Row)
 
 bool Implementation::onNodeSelection(k3d::inode* const Node)
 {
-
-  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESELECTION START" << std::endl;
-
   //return result (if Not Material)
   bool result = false;
 
@@ -974,12 +898,7 @@ bool Implementation::onNodeSelection(k3d::inode* const Node)
         //Get The Current Row Selection
         Gtk::TreeModel::iterator iter = tree_selection->get_selected();
 
-        k3d::log() << "OK HERE 1: !!!!!!!!!!!!!!" << std::endl;
-
         Gtk::TreeModel::Row row = *iter;
-
-
-        k3d::log() << "OK HERE 2: !!!!!!!!!!!!!!" << std::endl;
 
         //Check If The Selected Row In Tree IS A Valid Pointer
         if(iter)
@@ -993,13 +912,10 @@ bool Implementation::onNodeSelection(k3d::inode* const Node)
                 if(m_rpane_content->findMaterial(Node))
                   {
                     selected_node = Node;
-                    k3d::log() << "FOUND!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-                    k3d::log() << selected_node->name() << std::endl;
                   }
                 else
                   {
                     selected_node = 0;
-                    k3d::log() << "NOT FOUND!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
                   }
                 //selected_node = 0;
               }
@@ -1042,8 +958,6 @@ bool Implementation::onNodeSelection(k3d::inode* const Node)
       }
   }
 
-  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESELECTION END" << std::endl;
-
   return result;
 
   }//onNodeSelection 
@@ -1052,15 +966,9 @@ bool Implementation::onNodeSelection(k3d::inode* const Node)
 
 void Implementation::propertySignalRender(k3d::iunknown* t)
 {
-  
-k3d::log() << "MAT_MANAGER_DEBUG: PROPERTYSIGNALRENDER BEGIN" << std::endl;
-
   //Render The Selected Node
   if(m_current_mat_node)
     m_rpane_content->renderSinglePreview(m_current_mat_node);
-  
-k3d::log() << "MAT_MANAGER_DEBUG: PROPERTYSIGNALRENDER END" << std::endl;
-
 }
 
 
@@ -1131,24 +1039,14 @@ public:
 
   void initialize(document_state& _document_sate, k3d::icommand_node& _parent)
   {
-    k3d::log() << "PANEL INIT START" << std::endl;
-
     k3d::command_tree().add(*this, "material_manager", &_parent);
 
     //Create New Implementation Object
     m_implementation = new mechanics::Implementation(_document_sate, _parent);
     m_implementation->init();
 
-    k3d::log() << "PANEL INIT m_implementation finshed" << std::endl;
-
     //Pack Implementation Into This Panel
     pack_start(m_implementation->m_main_hpaned, Gtk::PACK_EXPAND_WIDGET);
-
-
-    k3d::log() << "PANEL INIT m_imp->hpaned packed" << std::endl;
-
-
-    k3d::log() << "PANEL INIT END" << std::endl;
 
     show_all();
   }

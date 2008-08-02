@@ -31,9 +31,6 @@
 #include <k3dsdk/imaterial_gl.h>
 #include <k3dsdk/imaterial_ri.h>
 
-#include <iostream>
-#include <k3dsdk/log.h>
-
 #include "RenderedImage.h"
 #include "MaterialGroup.h"
 

@@ -27,10 +27,8 @@
 
 #include <k3dsdk/ngui/text.h>
 #include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/log.h>
 
 #include <sstream>
-#include <iostream>
 
 #include "ContentPanel.h"
 #include "MaterialObj.h"
