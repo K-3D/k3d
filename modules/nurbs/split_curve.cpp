@@ -114,7 +114,7 @@ namespace module
 				static k3d::document_plugin_factory<split_curve, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x9f5aa916, 0x8248cdec, 0x6cfbab9d, 0xd7f5f46f),
 					"NurbsSplitCurve",
-					_("Breaks a NURBS curve at the selected point"),
+					_("Breaks a NURBS curve at a given u value (0...1)"),
 					"NURBS",
 					k3d::iplugin_factory::EXPERIMENTAL);
 
