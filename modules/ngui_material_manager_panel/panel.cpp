@@ -129,6 +129,7 @@ public:
   {
   }
 
+
 public:
   void buildModel(document_state& DocumentState);
   void clearModel();
@@ -265,6 +266,9 @@ public:
 
   //Find Tree Row Based On 1st Argument
   bool getRow(k3d::inode* const Node, Gtk::TreeIter& Row);
+
+  //Find Group Based On Given Material
+  bool getGroup(MaterialObj *matobj, Gtk::TreeIter& Row);
 	
 private:
 
@@ -336,6 +340,9 @@ public:
 
 void Implementation::init()
 {
+
+  k3d::log() << "MAT_MANAGER_DEBUG: START INIT" << std::endl;
+
   //Currently In init
   m_init = true;
 
@@ -358,8 +365,10 @@ void Implementation::init()
   m_document_state.document().nodes().rename_node_signal()
     .connect(sigc::mem_fun(*this, &Implementation::onNodeRenamed));
 
- //  m_document_state.view_node_properties_signal()
-//     .connect(sigc::mem_fun(*this, &Implementation::onNodeSelection));
+  k3d::log() << "MAT_MANAGER_DEBUG: EVENT SETUP" << std::endl;
+
+//   m_document_state.view_node_properties_signal()
+//    .connect(sigc::mem_fun(*this, &Implementation::onNodeSelection));
 
   //Tree Editing Signal Connections
   add_group.signal_clicked()
@@ -369,18 +378,30 @@ void Implementation::init()
   remove_group.signal_clicked()
     .connect(sigc::mem_fun(*this, &Implementation::on_remove_button_button_clicked));
 
+
   //Delete Model Data
   m_model->clearModel();
 
+  k3d::log() << "MAT_MANAGER_DEBUG: MODEL CLEARED" << std::endl;
+
   //Rebuild Model Data
   m_model->buildModel(m_document_state);
+
+  k3d::log() << "MAT_MANAGER_DEBUG: MODEL BUILT" << std::endl;
+  
+
+  
 
   //Build The GTK GUI
   buildGui();
 
 
+  k3d::log() << "MAT_MANAGER_DEBUG: GUI BUILT" << std::endl;
+
   //Hint To GTK To Update Interface
   schedule_update();
+
+  k3d::log() << "MAT_MANAGER_DEBUG: UPDATED OKAY" << std::endl;
 
   //Try To Connect The Selected Node. (Otherwise Wont Work Until Re-Select)
   k3d::inode_collection::nodes_t::const_iterator node_iter 
@@ -400,6 +421,9 @@ void Implementation::init()
            //break;
         }
     }//for
+
+  k3d::log() << "MAT_MANAGER_DEBUG: TRIED TO CONNECT WITH SELECTED MATERIAL NODE (IF THERE IS ONE)" << std::endl;
+  
 
 
 }//init
@@ -730,6 +754,23 @@ void Implementation::onNodesRemoved(const k3d::inode_collection::nodes_t& Nodes)
 
           if(tmpSObj)  
             grpPtr = tmpSObj->groupParent();
+
+          
+          //If This Node Is The Selected Tree Row. Back Out To Parent Group
+          Gtk::TreeModel::iterator iter = tree_selection->get_selected();
+          if(iter)
+            {
+              Gtk::TreeModel::Row selected_row = *iter;
+              if(tmpSObj->m_doc_node == *node_iter)
+                {
+                  //Gtk::TreeIter parent_group_row;
+                  //getRow(, parent_group_row)
+                  ; //tree_selection->select(parent_group_row);
+                }
+
+         
+            }//if
+          
 	      
           //Erase The Material Node From Tree
           tree_model->erase(row);	
@@ -779,6 +820,29 @@ void Implementation::onNodeRenamed(k3d::inode* const Node)
 
 }//onNodeRenamed
 
+
+
+bool getGroup(MaterialObj *matobj, Gtk::TreeIter& Row)
+{
+
+  bool result = false;
+
+ //  //Go Through Each Group And Try To Find MaterialObj
+//   std::list<MaterialGroup*>::const_iterator grp_iter
+//     = m_model->m_groups.begin();
+
+  
+
+//   for(; grp_iter != m_model->m_groups.end(); grp_iter++)
+//     {
+//       if((*grp_iter)->findMaterial(matobj))
+
+//     }//for
+
+
+
+  return result;
+}
 
 
 

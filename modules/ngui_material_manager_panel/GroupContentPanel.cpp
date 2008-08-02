@@ -432,6 +432,25 @@ bool GroupContentPanel::findMaterial(const k3d::inode *node)
 }
 
 
+
+bool GroupContentPanel::findMaterial(const MaterialObj *mat)
+{
+  //Iterate Through All Of The Stored MaterialObj's.
+  std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
+
+  for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+     {
+       if(*mat_iter == mat)
+         return true;
+     }
+
+   return false;
+
+
+}
+
+
+
 }//namespace mechanics
 
 }//namespace material_manager

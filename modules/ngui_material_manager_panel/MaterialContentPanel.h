@@ -62,9 +62,11 @@ class MaterialContentPanel : public ContentPanel
       m_artistname_entry(*_m_parent, k3d::string_t("so_artistname_field"), 
                          entry::model(_m_materialobj->m_artistname), 0),
       m_artistnotes_mltext(*_m_parent, k3d::string_t("so_artistnotes_mltxt"), 
-                           text::model(_m_materialobj->m_artistnotes), 0),
-      m_material_preview(k3d::system::get_temp_directory() 
-                      / k3d::filesystem::generic_path(m_single_imgfile))
+                           text::model(_m_materialobj->m_artistnotes), 0)
+
+
+      /* m_material_preview(k3d::system::get_temp_directory()  */
+/*                       / k3d::filesystem::generic_path(m_single_imgfile)) */
 
         {
         }
@@ -155,7 +157,7 @@ class MaterialContentPanel : public ContentPanel
   private:
 
       MaterialObj 			*m_materialobj;
-      RenderedImage 			m_material_preview;
+
 
   };//MaterialContentPanel
 

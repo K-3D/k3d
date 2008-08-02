@@ -77,6 +77,11 @@ class GroupContentPanel : public ContentPanel
     //Find A Material From A Doc Node
     bool findMaterial(const k3d::inode *node);
 
+    //Find A Material From A MaterialObj Pointer
+    bool findMaterial(const MaterialObj *mat);
+
+
+
 
  private:
           

@@ -16,6 +16,15 @@ void MaterialContentPanel::init()
   m_datemod_label.set_text		("Date Modified: ");
   m_artistname_label.set_text	("Artist's Name: ");
 
+
+  //Create  A Preview Image In MaterialObj
+  RenderedImage *m_preview_img
+    = new RenderedImage(k3d::system::get_temp_directory() 
+                        / k3d::filesystem::generic_path(m_single_imgfile));
+
+  m_materialobj->setPviewImg(m_preview_img);
+
+
   //glib timer set that updates preview image every 0.25 seconds
   m_timer_connection 
     = Glib::signal_timeout()
@@ -24,6 +33,7 @@ void MaterialContentPanel::init()
   //Date Insert Connection
   m_date_button.signal_clicked()
     .connect(sigc::mem_fun(*this, &MaterialContentPanel::onDateButtonPressed));
+
 
 }//init
 
@@ -37,7 +47,9 @@ void MaterialContentPanel::buildPanel()
 
       //Setup Render Preview Frame
       m_pview_frame.set_size_request(m_pview_size + 25, m_pview_size + 35);
-      m_pview_frame.add(m_material_preview);
+      //m_pview_frame.add(m_material_preview);
+      m_pview_frame.add(*(m_materialobj->pviewImg()));
+
       m_pview_cont.pack_start(m_pview_frame, false, false, 8);
  	      
       //Add ScrollWindowed Panel To Right Pane From Implementation
@@ -164,8 +176,14 @@ void MaterialContentPanel::renderPreview()
 bool MaterialContentPanel::updatePreviewImage()
 {
   //Invoke A Gtk Image Update / Refresh
-  m_material_preview.queue_resize();
-  m_material_preview.queue_draw();
+  //m_material_preview.queue_resize();
+  //m_material_preview.queue_draw();
+
+
+  (m_materialobj->pviewImg())->queue_resize();
+  (m_materialobj->pviewImg())->queue_draw();
+
+
   return true;
 }	
 

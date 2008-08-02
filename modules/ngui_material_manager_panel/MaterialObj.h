@@ -68,7 +68,7 @@ class MaterialObj
  
     ~MaterialObj()
       {
-        //Clean Up
+        //Clean Up Preview Image Dynamic Memory
         if(m_pview_img)
           delete m_pview_img;
       }
@@ -84,7 +84,7 @@ class MaterialObj
     const k3d::string_t dateStamp() const				{return this->m_datestamp.internal_value();}
     const k3d::string_t artistName() const	  		{return this->m_artistname.internal_value();}
     const k3d::string_t artistNotes() const			{return this->m_artistnotes.internal_value();}  
-    const RenderedImage* pviewImg() const			  	{return this->m_pview_img;}
+    RenderedImage* pviewImg() const			  	{return this->m_pview_img;}
 
     
  /*   m_data_t  nameData() const		{return this->m_name;}
