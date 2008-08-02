@@ -302,8 +302,12 @@ void GroupContentPanel::buildPanel()
 
 void GroupContentPanel::renderPreview()
 {
+  k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPANEL RENDERPREVIEW" << std::endl;
+
   //Invoke Generic Render Initialization
   renderInit();
+
+  k3d::log() << "MAT_MANAGER_DEBUG:GROUPPANEL RENDER INIT" << std::endl;
  
   //Iterate Through Each Material In Group & Render
 
@@ -314,6 +318,9 @@ void GroupContentPanel::renderPreview()
       //Check If Selected Node Is A RenderMan Material
       if((*mat_iter)->isMaterial())
         {
+
+k3d::log() << "MAT_MANAGER_DEBUG: GROUPPANEL MATERIALOBJ PTR OKAY" << std::endl;
+
           //If It Is, Assign To Current Geometry As A Surface Shader
           k3d::property
             ::set_internal_value(*m_geometry, 
@@ -324,6 +331,8 @@ void GroupContentPanel::renderPreview()
           m_engine
             ->render_camera_frame(*m_camera, 
                                   (const_cast<RenderedImage*>((*mat_iter)->pviewImg()))->imgFilePath(), false);
+
+          k3d::log() << "MAT_MANAGER_DEBUG:GROUPPANEL RENDER COMPLETED" << std::endl;
 
         }//if	 
 
@@ -356,6 +365,7 @@ bool GroupContentPanel::updatePreviewImage()
 
 void GroupContentPanel::renderSinglePreview(k3d::inode *node)
 {
+  k3d::log() << "MAT_MANAGER_DEBUG: In GROUPPPANEL SINGLERENDERPREVIEW" << std::endl;
   //Iterate Through All Of The Stored MaterialObj's.
    std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
 
@@ -399,6 +409,8 @@ void GroupContentPanel::renderSinglePreview(k3d::inode *node)
            m_engine->render_camera_frame(*m_camera, 
                                          pimg_path,
                                          false);
+
+           k3d::log() << "MAT_MANAGER_DEBUG: FINSHED GROUPPANEL SINGLERENDERPREVIEW" << std::endl;
     }//if	 
 
   else

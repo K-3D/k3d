@@ -144,16 +144,19 @@ void MaterialContentPanel::buildPanel()
 
 void MaterialContentPanel::renderPreview()
 {
+  
+  k3d::log() << "MAT_MANAGER_DEBUG: In MATPANEL RENDERPREVIEW" << std::endl;
+
   //Invoke Generic Render Initialization
   renderInit();
 
-   k3d::log() << "MAT_MANAGER_DEBUG:GROUPPANEL RENDER INIT" << std::endl;
+   k3d::log() << "MAT_MANAGER_DEBUG:MATPANEL RENDER INIT" << std::endl;
   
   //Check If Selected Node Is A RenderMan Material
   if(m_materialobj->isMaterial())
     {
 
-      k3d::log() << "MAT_MANAGER_DEBUG: GROUPPANEL MATERIALOBJ PTR OKAY" << std::endl;
+      k3d::log() << "MAT_MANAGER_DEBUG: MATPANEL MATERIALOBJ PTR OKAY" << std::endl;
       
       //If It Is, Assign To Current Geometry As A Surface Shader
       k3d::property
@@ -168,7 +171,7 @@ void MaterialContentPanel::renderPreview()
                                     / k3d::filesystem::generic_path(m_single_imgfile),
                                     false);
 
-      k3d::log() << "MAT_MANAGER_DEBUG:GROUPPANEL RENDER COMPLETED" << std::endl;
+      k3d::log() << "MAT_MANAGER_DEBUG:MATPANEL RENDER COMPLETED" << std::endl;
     }//if	 
  
   else
@@ -197,7 +200,10 @@ bool MaterialContentPanel::updatePreviewImage()
 
 void MaterialContentPanel::renderSinglePreview(k3d::inode *node)
 {
+  k3d::log() << "MAT_MANAGER_DEBUG: In MATPANEL SINGLERENDERPREVIEW" << std::endl;
   renderPreview();
+
+  k3d::log() << "MAT_MANAGER_DEBUG: FINSHED MATPANEL SINGLERENDERPREVIEW" << std::endl;
 }
 
 
