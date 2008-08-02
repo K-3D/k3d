@@ -189,9 +189,13 @@ bool MaterialContentPanel::updatePreviewImage()
   //m_material_preview.queue_resize();
   //m_material_preview.queue_draw();
 
+  k3d::log() << "MAT_MANAGER_DEBUG: In MATPANEL UPDATEPREVIEWIMG START" << std::endl;
 
   (m_materialobj->pviewImg())->queue_resize();
   (m_materialobj->pviewImg())->queue_draw();
+
+
+  k3d::log() << "MAT_MANAGER_DEBUG: In MATPANEL UPDATEPREVIEWIMG END" << std::endl;
 
 
   return true;
