@@ -432,11 +432,17 @@ void Implementation::init()
 
 void Implementation::on_update()
 {
+
+ k3d::log() << "MAT_MANAGER_DEBUG: ONUPDATE START" << std::endl;
+
   //Clear The Tree Model
   tree_model->clear();
 
   //Rebuild Tree From Rebuilt Model
   buildTree();
+
+  k3d::log() << "MAT_MANAGER_DEBUG: ONUPDATE END" << std::endl;
+
 
 }//on_update
 
@@ -444,6 +450,9 @@ void Implementation::on_update()
 
 void Implementation::buildGui()
 {
+
+  k3d::log() << "MAT_MANAGER_DEBUG: BUILDGUI START" << std::endl;
+
   //Setup The Material Tree
   m_tree.set_headers_visible(false);
   m_tree.set_reorderable(false);
@@ -480,6 +489,9 @@ void Implementation::buildGui()
 
   //Embed The Tree
   m_tool_tree_cont.pack_start(m_tree_scrolled_window, true, true, 0);
+
+
+ k3d::log() << "MAT_MANAGER_DEBUG: BUILDGUI END" << std::endl;
 	  	  
 }//buildGui
 
@@ -487,6 +499,8 @@ void Implementation::buildGui()
 
 void Implementation::buildTree()
 {
+  k3d::log() << "MAT_MANAGER_DEBUG: BUILDTREE START" << std::endl;
+
   //Iterate Through Known Groups & Build Tree Hierachy
   std::list<MaterialGroup*>::const_iterator group_iter = m_model->m_groups.begin();
 
@@ -529,6 +543,9 @@ void Implementation::buildTree()
   //Ensure Tree Inital Selection Is The First Row 
   if(!on_first_row)
     tree_selection->select(first_group_row);	   
+
+
+  k3d::log() << "MAT_MANAGER_DEBUG: BUILDTREE END" << std::endl;
 
 }//buildTree
 
@@ -743,6 +760,8 @@ void Implementation::onNodesAdded(const k3d::inode_collection::nodes_t& Nodes)
 
 void Implementation::onNodesRemoved(const k3d::inode_collection::nodes_t& Nodes)
 {
+  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESREMOVED START" << std::endl;
+
   //Flag For Possible Panel Update
   bool material_removed = false;
 
@@ -811,6 +830,9 @@ void Implementation::onNodesRemoved(const k3d::inode_collection::nodes_t& Nodes)
         }//if
     }//if
 
+
+  k3d::log() << "MAT_MANAGER_DEBUG: ONNODESREMOVED END" << std::endl;
+
 }//onNodesRemoved
 
 
@@ -844,6 +866,8 @@ void Implementation::onNodeRenamed(k3d::inode* const Node)
 bool getGroup(MaterialObj *matobj, Gtk::TreeIter& Row)
 {
 
+ k3d::log() << "MAT_MANAGER_DEBUG: GETGROUP START" << std::endl;
+
   bool result = false;
 
  //  //Go Through Each Group And Try To Find MaterialObj
@@ -858,7 +882,7 @@ bool getGroup(MaterialObj *matobj, Gtk::TreeIter& Row)
 
 //     }//for
 
-
+  k3d::log() << "MAT_MANAGER_DEBUG: GETGROUP END" << std::endl;
 
   return result;
 }
@@ -1028,9 +1052,15 @@ bool Implementation::onNodeSelection(k3d::inode* const Node)
 
 void Implementation::propertySignalRender(k3d::iunknown* t)
 {
+  
+k3d::log() << "MAT_MANAGER_DEBUG: PROPERTYSIGNALRENDER BEGIN" << std::endl;
+
   //Render The Selected Node
   if(m_current_mat_node)
     m_rpane_content->renderSinglePreview(m_current_mat_node);
+  
+k3d::log() << "MAT_MANAGER_DEBUG: PROPERTYSIGNALRENDER END" << std::endl;
+
 }
 
 
@@ -1109,8 +1139,13 @@ public:
     m_implementation = new mechanics::Implementation(_document_sate, _parent);
     m_implementation->init();
 
+    k3d::log() << "PANEL INIT m_implementation finshed" << std::endl;
+
     //Pack Implementation Into This Panel
     pack_start(m_implementation->m_main_hpaned, Gtk::PACK_EXPAND_WIDGET);
+
+
+    k3d::log() << "PANEL INIT m_imp->hpaned packed" << std::endl;
 
 
     k3d::log() << "PANEL INIT END" << std::endl;
