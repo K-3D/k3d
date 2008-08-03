@@ -71,10 +71,10 @@ private:
 	/// Called whenever the output bitmap has been modified and needs to be updated.
 	void execute(const std::vector<ihint*>& Hints, bitmap& Bitmap)
 	{
-		bool resize_bitmap = false;
-		bool assign_pixels = false;
+		bool_t resize_bitmap = false;
+		bool_t assign_pixels = false;
 
-		for(int i = 0; i != Hints.size(); ++i)
+		for(uint_t i = 0; i != Hints.size(); ++i)
 		{
 			// Input pixels changed, so all we have to do is reassign ours ...
 			if(dynamic_cast<hint::bitmap_pixels_changed*>(Hints[i]))
