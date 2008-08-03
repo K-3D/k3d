@@ -37,7 +37,7 @@ namespace hint
 
 ihint* bitmap_dimensions_changed::clone()
 {
-	return new bitmap_dimensions_changed();
+	return new bitmap_dimensions_changed(*this);
 }
 
 void bitmap_dimensions_changed::print(std::ostream& Stream)
@@ -56,7 +56,7 @@ bitmap_dimensions_changed* bitmap_dimensions_changed::instance()
 
 ihint* bitmap_pixels_changed::clone()
 {
-	return new bitmap_pixels_changed();
+	return new bitmap_pixels_changed(*this);
 }
 
 void bitmap_pixels_changed::print(std::ostream& Stream)
@@ -73,76 +73,76 @@ bitmap_pixels_changed* bitmap_pixels_changed::instance()
 //////////////////////////////////////////////////////////////////////////////
 // selection_changed
 
-ihint* selection_changed_t::clone()
+ihint* selection_changed::clone()
 {
-	return new selection_changed_t();
+	return new selection_changed(*this);
 }
 
-void selection_changed_t::print(std::ostream& Stream)
+void selection_changed::print(std::ostream& Stream)
 {
-	Stream << "selection_changed_t";
+	Stream << "selection_changed";
 }
 
-selection_changed_t* selection_changed()
+selection_changed* selection_changed::instance()
 {
-	static selection_changed_t hint;
+	static selection_changed hint;
 	return &hint;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // mesh_geometry_changed
 
-ihint* mesh_geometry_changed_t::clone()
+ihint* mesh_geometry_changed::clone()
 {
-	return new mesh_geometry_changed_t();
+	return new mesh_geometry_changed(*this);
 }
 
-void mesh_geometry_changed_t::print(std::ostream& Stream)
+void mesh_geometry_changed::print(std::ostream& Stream)
 {
-	Stream << "mesh_geometry_changed_t";
+	Stream << "mesh_geometry_changed";
 }
 
-mesh_geometry_changed_t* mesh_geometry_changed()
+mesh_geometry_changed* mesh_geometry_changed::instance()
 {
-	static mesh_geometry_changed_t hint;
+	static mesh_geometry_changed hint;
 	return &hint;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // mesh_topology_changed
 
-ihint* mesh_topology_changed_t::clone()
+ihint* mesh_topology_changed::clone()
 {
-	return new mesh_topology_changed_t();
+	return new mesh_topology_changed(*this);
 }
 
-void mesh_topology_changed_t::print(std::ostream& Stream)
+void mesh_topology_changed::print(std::ostream& Stream)
 {
-	Stream << "mesh_topology_changed_t";
+	Stream << "mesh_topology_changed";
 }
 
-mesh_topology_changed_t* mesh_topology_changed()
+mesh_topology_changed* mesh_topology_changed::instance()
 {
-	static mesh_topology_changed_t hint;
+	static mesh_topology_changed hint;
 	return &hint;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // mesh_deleted
 
-ihint* mesh_deleted_t::clone()
+ihint* mesh_deleted::clone()
 {
-	return new mesh_deleted_t();
+	return new mesh_deleted(*this);
 }
 
-void mesh_deleted_t::print(std::ostream& Stream)
+void mesh_deleted::print(std::ostream& Stream)
 {
-	Stream << "mesh_deleted_t";
+	Stream << "mesh_deleted";
 }
 
-mesh_deleted_t* mesh_deleted()
+mesh_deleted* mesh_deleted::instance()
 {
-	static mesh_deleted_t hint;
+	static mesh_deleted hint;
 	return &hint;
 }
 

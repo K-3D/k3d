@@ -29,6 +29,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/named_array_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/vectors.h>
@@ -57,26 +58,38 @@ public:
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Curve width")) + init_value(0.1) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_wrap(init_owner(*this) + init_name("closed") + init_label(_("Closed")) + init_description(_("Closed curve (loop)")) + init_value(true))
 	{
-		m_material.changed_signal().connect(make_topology_changed_slot());
-		m_edge_count.changed_signal().connect(make_topology_changed_slot());
-		m_meridian_wraps.changed_signal().connect(make_topology_changed_slot());
-		m_longitudinal_wraps.changed_signal().connect(make_topology_changed_slot());
-		m_scale.changed_signal().connect(make_topology_changed_slot());
-		m_width.changed_signal().connect(make_topology_changed_slot());
-		m_wrap.changed_signal().connect(make_topology_changed_slot());
+		m_edge_count.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_wrap.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_width.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+
+		m_meridian_wraps.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
+		m_longitudinal_wraps.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
+		m_scale.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Output)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		const k3d::int32_t edge_count = m_edge_count.pipeline_value();
-		const k3d::double_t mwraps = m_meridian_wraps.pipeline_value();
-		const k3d::double_t lwraps = m_longitudinal_wraps.pipeline_value();
-		const k3d::double_t scale = m_scale.pipeline_value();
-		const k3d::double_t width = m_width.pipeline_value();
 		const k3d::double_t wrap = m_wrap.pipeline_value();
+		const k3d::double_t width = m_width.pipeline_value();
+		k3d::imaterial* const material = m_material.pipeline_value();
 
 		k3d::mesh::points_t& points = *k3d::make_unique(Output.points);
 		k3d::mesh::selection_t& point_selection = *k3d::make_unique(Output.point_selection);
+
+		points.resize(edge_count);
+		point_selection.assign(edge_count, 0.0);
 
 		k3d::mesh::linear_curve_groups_t& linear_curve_groups = *k3d::make_unique(Output.linear_curve_groups);
 		k3d::mesh::indices_t& first_curves = *k3d::make_unique(linear_curve_groups.first_curves);
@@ -87,19 +100,30 @@ public:
 		k3d::mesh::counts_t& curve_point_counts = *k3d::make_unique(linear_curve_groups.curve_point_counts);
 		k3d::mesh::selection_t& curve_selection = *k3d::make_unique(linear_curve_groups.curve_selection);
 		k3d::mesh::indices_t& curve_points = *k3d::make_unique(linear_curve_groups.curve_points);
-
-		boost::shared_ptr<k3d::typed_array<k3d::double_t> > width_array(new k3d::typed_array<k3d::double_t>());
-		linear_curve_groups.constant_data["width"] = width_array;
+		k3d::mesh::doubles_t& widths = k3d::get_array<k3d::mesh::doubles_t>(linear_curve_groups.constant_data, "width", 0);
 
 		first_curves.push_back(curve_first_points.size());
 		curve_counts.push_back(1);
 		periodic_curves.push_back(wrap);
-		materials.push_back(m_material.pipeline_value());
-		width_array->push_back(width);
+		materials.push_back(material);
+		widths.push_back(width);
 
 		curve_first_points.push_back(curve_points.size());
 		curve_point_counts.push_back(edge_count);
 		curve_selection.push_back(0.0);
+
+		for(k3d::uint32_t i = 0; i != edge_count; ++i)
+			curve_points.push_back(i);
+	}
+
+	void on_update_mesh_geometry(k3d::mesh& Output)
+	{
+		const k3d::int32_t edge_count = m_edge_count.pipeline_value();
+		const k3d::double_t mwraps = m_meridian_wraps.pipeline_value();
+		const k3d::double_t lwraps = m_longitudinal_wraps.pipeline_value();
+		const k3d::double_t scale = m_scale.pipeline_value();
+
+		k3d::mesh::points_t& points = const_cast<k3d::mesh::points_t&>(*Output.points);
 
 		for(k3d::uint32_t i = 0; i != edge_count; ++i)
 		{
@@ -113,14 +137,8 @@ public:
 			point[1] = sin(mu) * (1 + cos(lwraps * mu / mwraps) / 2.0);
 			point[2] = sin(lwraps * mu / mwraps) / 2.0;
 
-			points.push_back(point * scale);
-			point_selection.push_back(0.0);
-			curve_points.push_back(i);
+			points[i] = point * scale;
 		}
-	}
-
-	void on_update_mesh_geometry(k3d::mesh& Output)
-	{
 	}
 
 	static k3d::iplugin_factory& get_factory()

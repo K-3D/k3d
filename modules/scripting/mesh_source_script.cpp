@@ -49,22 +49,25 @@ public:
 	{
 		set_script(k3d::resource::get_string("/module/scripting/mesh_source_script.py"));
 
-		connect_script_changed_signal(make_topology_changed_slot());
+		connect_script_changed_signal(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
 		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = &Mesh;
+		context["Output"] = &Output;
 
 		execute_script(context);
 
-		k3d::validate(Mesh);
+		k3d::validate(Output);
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 

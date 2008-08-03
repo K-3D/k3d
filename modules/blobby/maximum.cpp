@@ -57,11 +57,14 @@ public:
 		base(Factory, Document),
 		m_user_property_changed_signal(*this)
 	{
-		m_user_property_changed_signal.connect(sigc::mem_fun(*this, &maximum::mesh_topology_changed));
+		m_user_property_changed_signal.connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 	
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		// Get the set of input meshes ...
 		detail::mesh_collection meshes;
 
@@ -83,10 +86,10 @@ public:
 		}
 
 		// Merge 'em ...
-		detail::merge(meshes, m_material.pipeline_value(), k3d::mesh::blobbies_t::MAXIMUM, true, Mesh);
+		detail::merge(meshes, m_material.pipeline_value(), k3d::mesh::blobbies_t::MAXIMUM, true, Output);
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 

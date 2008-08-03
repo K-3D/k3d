@@ -52,21 +52,27 @@ public:
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Grid height")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_orientation(init_owner(*this) + init_name("orientation") + init_label(_("Orientation")) + init_description(_("Orientation type (forward or backward along X, Y or Z axis)")) + init_value(k3d::PZ) + init_enumeration(k3d::signed_axis_values()))
 	{
-		m_columns.changed_signal().connect(make_topology_changed_slot());
-		m_rows.changed_signal().connect(make_topology_changed_slot());
-		m_material.changed_signal().connect(make_topology_changed_slot());
+		m_columns.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_rows.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 		
-		m_width.changed_signal().connect(make_geometry_changed_slot());
-		m_height.changed_signal().connect(make_geometry_changed_slot());
-		m_orientation.changed_signal().connect(make_geometry_changed_slot());
+		m_width.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
+		m_height.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
+		m_orientation.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		Mesh = k3d::create_grid(m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
+		Output = k3d::create_grid(m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 		const unsigned long point_rows = m_rows.pipeline_value() + 1;
 		const unsigned long point_columns = m_columns.pipeline_value() + 1;
@@ -103,7 +109,7 @@ public:
 				break;
 		}
 
-		k3d::mesh::points_t::iterator point = const_cast<k3d::mesh::points_t&>(*Mesh.points).begin();
+		k3d::mesh::points_t::iterator point = const_cast<k3d::mesh::points_t&>(*Output.points).begin();
 		for(unsigned long row = 0; row != point_rows; ++row)
 		{
 			const double row_percent = 0.5 - (static_cast<double>(row) / static_cast<double>(point_rows-1));

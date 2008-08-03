@@ -128,7 +128,7 @@ public:
 	
 	virtual k3d::ihint* hint() const
 	{
-		return k3d::hint::mesh_geometry_changed();
+		return k3d::hint::mesh_geometry_changed::instance();
 	}
 	
 	/// Update affected mesh components in the hint. This needs to be done only when the selection changed
@@ -272,7 +272,7 @@ public:
 	k3d_data(tweaks_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_tweaks;
 	
 private:
-	k3d::hint::mesh_geometry_changed_t m_hint;
+	k3d::hint::mesh_geometry_changed m_hint;
 	boost::shared_ptr<const k3d::mesh::points_t> m_input_points; // cached for access in on_drag_changed
 	boost::shared_ptr<const k3d::mesh::points_t> m_output_points; // cached for access in on_drag_changed
 	std::vector<k3d::vector3> m_selected_tweaks; // Cache for fast access to tweaks needed during drag motion

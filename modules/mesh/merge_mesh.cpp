@@ -651,14 +651,16 @@ public:
 	
 	void mesh_changed(k3d::ihint* Hint)
 	{
-		if (dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint))
-			mesh_geometry_changed(Hint);
+		if (dynamic_cast<k3d::hint::mesh_geometry_changed*>(Hint))
+			m_output_mesh.update(Hint);
 		else
-			mesh_topology_changed(Hint);
+			m_output_mesh.update(k3d::hint::mesh_topology_changed::instance());
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		const k3d::iproperty_collection::properties_t properties = k3d::property::user_properties(*static_cast<k3d::iproperty_collection*>(this));
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
 		{
@@ -670,23 +672,23 @@ public:
 					continue;
 				
 				// Make sure the points array is defined
-				k3d::make_unique(Mesh.points);
+				k3d::make_unique(Output.points);
 				
-				detail::merge_polyhedra(Mesh, *mesh, m_same_polyhedron.pipeline_value());
-				detail::merge_point_groups(Mesh, *mesh);
-				detail::merge_linear_curve_groups(Mesh, *mesh);
-				detail::merge_cubic_curve_groups(Mesh, *mesh);
-				detail::merge_nurbs_curve_groups(Mesh, *mesh);
-				detail::merge_bilinear_patches(Mesh, *mesh);
-				detail::merge_bicubic_patches(Mesh, *mesh);
-				detail::merge_nurbs_patches(Mesh, *mesh);
-				detail::merge_blobbies(Mesh, *mesh);
-				detail::merge_points(Mesh, *mesh); // Must be last to calculate correct offsets in other methods
+				detail::merge_polyhedra(Output, *mesh, m_same_polyhedron.pipeline_value());
+				detail::merge_point_groups(Output, *mesh);
+				detail::merge_linear_curve_groups(Output, *mesh);
+				detail::merge_cubic_curve_groups(Output, *mesh);
+				detail::merge_nurbs_curve_groups(Output, *mesh);
+				detail::merge_bilinear_patches(Output, *mesh);
+				detail::merge_bicubic_patches(Output, *mesh);
+				detail::merge_nurbs_patches(Output, *mesh);
+				detail::merge_blobbies(Output, *mesh);
+				detail::merge_points(Output, *mesh); // Must be last to calculate correct offsets in other methods
 			}
 		}	
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh) {}
+	void on_update_mesh_geometry(k3d::mesh& Output) {}
 
 	static k3d::iplugin_factory& get_factory()
 	{

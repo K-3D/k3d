@@ -81,7 +81,7 @@ public:
 	
 private:
 
-	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+	void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter)
 	{
 		if (m_affected_indices.empty())
 		{

@@ -65,9 +65,9 @@ public:
 protected:
 	/// Scheduler implementation
 	void on_schedule(k3d::inode* Painter);
-	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter);
-	void on_schedule(k3d::hint::selection_changed_t* Hint, k3d::inode* Painter);
-	void on_schedule(k3d::hint::mesh_topology_changed_t* Hint, k3d::inode* Painter) { on_schedule(Painter); }
+	void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter);
+	void on_schedule(k3d::hint::selection_changed* Hint, k3d::inode* Painter);
+	void on_schedule(k3d::hint::mesh_topology_changed* Hint, k3d::inode* Painter) { on_schedule(Painter); }
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
 private:
 	

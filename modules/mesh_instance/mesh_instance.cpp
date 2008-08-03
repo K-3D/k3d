@@ -127,12 +127,12 @@ public:
 	/// Needed to notify caches that we are deleted
 	void on_instance_delete()
 	{
-		mesh_changed(k3d::hint::mesh_deleted());
+		mesh_changed(k3d::hint::mesh_deleted::instance());
 	}
 
 	void selection_changed(k3d::ihint* const Hint)
 	{
-		mesh_changed(k3d::hint::selection_changed());
+		mesh_changed(k3d::hint::selection_changed::instance());
 	}
 
 	void create_mesh(k3d::mesh& OutputMesh)

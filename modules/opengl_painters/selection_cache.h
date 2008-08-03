@@ -72,7 +72,7 @@ protected:
 	{
 		m_selection_records.clear();
 	}
-	void on_schedule(k3d::hint::selection_changed_t* Hint, k3d::inode* Painter)
+	void on_schedule(k3d::hint::selection_changed* Hint, k3d::inode* Painter)
 	{
 		on_schedule(Painter);
 	}

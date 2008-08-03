@@ -48,7 +48,7 @@ public:
 	const k3d::mesh::normals_t& face_normals(k3d::inode* Painter);
 protected:
 	/// Scheduler implementation
-	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter);
+	void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter);
 	void on_schedule(k3d::inode* Painter);
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
 private:

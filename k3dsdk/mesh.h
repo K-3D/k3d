@@ -70,6 +70,8 @@ public:
 	typedef typed_array<vector3> vectors_t;
 	/// Defines storage for a collection of 2D points
 	typedef typed_array<point2> points_2d_t;
+	/// Defines storage for a collection of doubles
+	typedef typed_array<double_t> doubles_t;
 
 	/// Defines storage for point groups (particle clouds)
 	class point_groups_t

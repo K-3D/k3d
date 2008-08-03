@@ -55,18 +55,20 @@ namespace module
 				m_point_spacing(init_owner(*this) + init_name("point_spacing") + init_label(_("point_spacing")) + init_description(_("Space between points")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)) ),
 				m_order(init_owner(*this) + init_name("order") + init_label(_("order")) + init_description(_("Order of the curve (2-linear - 4-cubic)")) + init_value(3) + init_constraint(constraint::minimum(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) )
 			{
-				m_control_points.changed_signal().connect(make_topology_changed_slot());
-				m_point_spacing.changed_signal().connect(make_topology_changed_slot());
-				m_order.changed_signal().connect(make_topology_changed_slot());
-				m_material.changed_signal().connect(make_topology_changed_slot());
+				m_control_points.changed_signal().connect(k3d::hint::converter<
+					k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+				m_point_spacing.changed_signal().connect(k3d::hint::converter<
+					k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+				m_order.changed_signal().connect(k3d::hint::converter<
+					k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+				m_material.changed_signal().connect(k3d::hint::converter<
+					k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 			}
 
-			void on_create_mesh_topology(k3d::mesh& Mesh) 
+			void on_update_mesh_topology(k3d::mesh& Output) 
 			{
-			}
+				Output = k3d::mesh();
 
-			void on_update_mesh_geometry(k3d::mesh& Mesh)
-			{
 				//Add a new curve to our Mesh
 				boost::shared_ptr<k3d::mesh::nurbs_curve_groups_t> curve_group( new k3d::mesh::nurbs_curve_groups_t() );
 		
@@ -130,13 +132,17 @@ namespace module
 				curve_group->curve_point_weights = curve_point_weights;
 				curve_group->curve_knots = curve_knots;
 				
-				Mesh.points = points;
-				Mesh.point_selection = point_selection;
+				Output.points = points;
+				Output.point_selection = point_selection;
 
-				Mesh.nurbs_curve_groups = curve_group;
+				Output.nurbs_curve_groups = curve_group;
 
-				assert_warning(k3d::validate_nurbs_curve_groups(Mesh));
-				assert_warning(k3d::validate(Mesh));
+				assert_warning(k3d::validate_nurbs_curve_groups(Output));
+				assert_warning(k3d::validate(Output));
+			}
+
+			void on_update_mesh_geometry(k3d::mesh& Output)
+			{
 			}
 
 			static k3d::iplugin_factory& get_factory()

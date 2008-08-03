@@ -87,7 +87,7 @@ void point_vbo::on_schedule(k3d::inode* Painter)
 	m_indices.clear();
 }
 
-void point_vbo::on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+void point_vbo::on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter)
 {
 	if (m_indices.empty()) // Only set indices once (they are cleared upon execute()
 	{
@@ -190,7 +190,7 @@ void triangle_vbo::on_schedule(k3d::inode* Painter)
 	schedule_data<normal_cache>(m_mesh, 0, Painter);
 }
 
-void triangle_vbo::on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+void triangle_vbo::on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter)
 {
 	if (m_indices.empty()) // Only set indices once (they are cleared upon execute()
 	{

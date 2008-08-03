@@ -76,8 +76,8 @@ private:
 	void reset_mesh(ihint* Hint)
 	{
 		m_legacy_output.reset();
-		m_output_mesh.changed_signal().emit(hint::mesh_deleted());
-		m_output_mesh.reset(0, hint::mesh_topology_changed());
+		m_output_mesh.changed_signal().emit(hint::mesh_deleted::instance());
+		m_output_mesh.reset(0, hint::mesh_topology_changed::instance());
 	}
 
 	void initialize_mesh(k3d::mesh& Output)

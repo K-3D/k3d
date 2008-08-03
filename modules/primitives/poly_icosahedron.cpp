@@ -45,16 +45,18 @@ class poly_icosahedron :
 public:
 	poly_icosahedron(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-//		m_tessellation_level(init_owner(*this) + init_name("tessellation_level") + init_label(_("Tessellation level")) + init_description(_("Tessellation Level")) + init_value(3) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Sphere radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
-//		m_tessellation_level.changed_signal().connect(make_topology_changed_slot());
-		m_material.changed_signal().connect(make_topology_changed_slot());
-		m_radius.changed_signal().connect(make_topology_changed_slot());
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_radius.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		k3d::imaterial* const material = m_material.pipeline_value();
 		const double radius = m_radius.pipeline_value();
 
@@ -66,8 +68,8 @@ public:
 		for(size_t i = 0; i != point_count; ++i)
 			(*points)[i] = radius * k3d::point3(vdata[i][0], vdata[i][1], vdata[i][2]);
 
-		Mesh.points = points;
-		Mesh.point_selection = point_selection;
+		Output.points = points;
+		Output.point_selection = point_selection;
 
 		// Create triangles ...
 		const size_t triangle_count = 20;
@@ -128,10 +130,10 @@ public:
 		polyhedra->clockwise_edges = clockwise_edges;
 		polyhedra->edge_selection = edge_selection;
 
-		Mesh.polyhedra = polyhedra;
+		Output.polyhedra = polyhedra;
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 
@@ -148,7 +150,6 @@ public:
 	}
 
 private:
-//	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_tessellation_level;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
 
 	static double vdata[12][3];

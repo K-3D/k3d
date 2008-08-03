@@ -217,23 +217,28 @@ public:
 		m_output_coefficients(init_owner(*this) + init_name("output_coefficients") + init_label(_("Coefficients")) + init_description(_("Output Values of the coficients")) + init_value<k3d::string_t>("No values yet")),
 		m_user_property_changed_signal(*this)
 	{
-		m_columns.changed_signal().connect(make_topology_changed_slot());
-		m_rows.changed_signal().connect(make_topology_changed_slot());
-		m_material.changed_signal().connect(make_topology_changed_slot());
-		
-		m_input_mesh.changed_signal().connect(make_geometry_changed_slot());
-		m_width.changed_signal().connect(make_geometry_changed_slot());
-		m_height.changed_signal().connect(make_geometry_changed_slot());
-
-		m_user_property_changed_signal.connect(make_geometry_changed_slot());
+		m_columns.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_rows.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_input_mesh.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_width.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
+		m_height.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
+		m_user_property_changed_signal.connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-  	Mesh = k3d::create_grid(m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
+  		Output = k3d::create_grid(m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 		const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value();
 		if(!input_mesh)
@@ -289,7 +294,7 @@ public:
 		}
 		
 		//Plot the result
-		solver_and_plotter.plot(const_cast<k3d::mesh::points_t&> (*Mesh.points).begin(),
+		solver_and_plotter.plot(const_cast<k3d::mesh::points_t&> (*Output.points).begin(),
 														m_rows.pipeline_value() + 1,
 														m_columns.pipeline_value() + 1,
 														m_width.pipeline_value(),

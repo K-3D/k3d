@@ -69,12 +69,12 @@ void sds_cache::on_schedule(k3d::inode* Painter)
 	m_cache = 0;
 	m_selection_changed = false;
 }
-void sds_cache::on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+void sds_cache::on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter)
 {
 	register_painter(Painter);
 	m_indices = Hint->changed_points;
 }
-void sds_cache::on_schedule(k3d::hint::selection_changed_t* Hint, k3d::inode* Painter)
+void sds_cache::on_schedule(k3d::hint::selection_changed* Hint, k3d::inode* Painter)
 {
 	register_painter(Painter);
 	if (m_cache)

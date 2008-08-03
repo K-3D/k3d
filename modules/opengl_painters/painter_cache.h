@@ -74,7 +74,7 @@ template<class data_t, class key_t=const k3d::mesh* const> class painter_cache
 		/// Schedule a cache creation/update for the given key
 		void schedule_data(key_t Key, k3d::ihint* Hint, k3d::inode* Painter)
 		{
-			if(dynamic_cast<k3d::hint::mesh_deleted_t*>(Hint))
+			if(dynamic_cast<k3d::hint::mesh_deleted*>(Hint))
 			{
 				remove_data(Key);
 				return;
@@ -91,15 +91,15 @@ template<class data_t, class key_t=const k3d::mesh* const> class painter_cache
 			{
 				data.schedule(Painter);
 			}
-			else if(k3d::hint::mesh_geometry_changed_t* hint = dynamic_cast<k3d::hint::mesh_geometry_changed_t*>(Hint))
+			else if(k3d::hint::mesh_geometry_changed* hint = dynamic_cast<k3d::hint::mesh_geometry_changed*>(Hint))
 			{
 				data.schedule(hint, Painter);
 			}
-			else if(k3d::hint::selection_changed_t* hint = dynamic_cast<k3d::hint::selection_changed_t*>(Hint))
+			else if(k3d::hint::selection_changed* hint = dynamic_cast<k3d::hint::selection_changed*>(Hint))
 			{
 				data.schedule(hint, Painter);
 			}
-			else if(k3d::hint::mesh_topology_changed_t* hint = dynamic_cast<k3d::hint::mesh_topology_changed_t*>(Hint))
+			else if(k3d::hint::mesh_topology_changed* hint = dynamic_cast<k3d::hint::mesh_topology_changed*>(Hint))
 			{
 				data.schedule(hint, Painter);
 			}
@@ -195,17 +195,17 @@ public:
 		m_scheduled = true;
 		on_schedule(Painter);
 	}
-	void schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+	void schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter)
 	{
 		m_scheduled = true;
 		on_schedule(Hint, Painter);
 	}
-	void schedule(k3d::hint::selection_changed_t* Hint, k3d::inode* Painter)
+	void schedule(k3d::hint::selection_changed* Hint, k3d::inode* Painter)
 	{
 		m_scheduled = true;
 		on_schedule(Hint, Painter);
 	}
-	void schedule(k3d::hint::mesh_topology_changed_t* Hint, k3d::inode* Painter)
+	void schedule(k3d::hint::mesh_topology_changed* Hint, k3d::inode* Painter)
 	{
 		m_scheduled = true;
 		on_schedule(Hint, Painter);
@@ -224,9 +224,9 @@ public:
 protected:
 	/// Implements the scheduling phase of the operation
 	virtual void on_schedule(k3d::inode* Painter) {}
-	virtual void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter) {}
-	virtual void on_schedule(k3d::hint::selection_changed_t* Hint, k3d::inode* Painter) {}
-	virtual void on_schedule(k3d::hint::mesh_topology_changed_t* Hint, k3d::inode* Painter) { on_schedule(Painter); }
+	virtual void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter) {}
+	virtual void on_schedule(k3d::hint::selection_changed* Hint, k3d::inode* Painter) {}
+	virtual void on_schedule(k3d::hint::mesh_topology_changed* Hint, k3d::inode* Painter) { on_schedule(Painter); }
 	
 	/// Implements the execution phase of the operation
 	virtual void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter) = 0;

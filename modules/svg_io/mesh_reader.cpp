@@ -57,7 +57,8 @@ public:
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("svg_files"))
 	{
-		m_file.changed_signal().connect(make_topology_changed_slot());
+		m_file.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 		
 		count = 0;
 	}
@@ -67,7 +68,7 @@ public:
 		m_output_mesh.reset(Mesh);
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Mesh)
 	{
 		const k3d::filesystem::path svg_path = m_file.pipeline_value();
 		if(svg_path.empty())

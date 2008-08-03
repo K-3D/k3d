@@ -51,7 +51,8 @@ public:
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("obj_files"))
 	{
-		m_file.changed_signal().connect(make_topology_changed_slot());
+		m_file.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
 	void reset_mesh(k3d::mesh* const Mesh)
@@ -59,8 +60,10 @@ public:
 		m_output_mesh.reset(Mesh);
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		const k3d::filesystem::path path = m_file.pipeline_value();
 		if(path.empty())
 			return;
@@ -81,10 +84,10 @@ public:
 		k3d::ipersistent::load_context context(root_path, lookup);
 
 		if(k3d::xml::element* const xml_mesh_arrays = k3d::xml::find_element(xml_document, "mesh_arrays"))
-			k3d::xml::load(Mesh, *xml_mesh_arrays, context);
+			k3d::xml::load(Output, *xml_mesh_arrays, context);
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 

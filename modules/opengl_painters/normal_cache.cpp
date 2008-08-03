@@ -76,7 +76,7 @@ public:
 	k3d::mesh::indices_t indices;
 	
 protected:
-	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+	void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter)
 	{	
 		if (indices.empty()) // Only set indices once (they are cleared upon execute()
 		{
@@ -129,7 +129,7 @@ public:
 	k3d::mesh::indices_t indices;
 	
 protected:
-	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+	void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter)
 	{	
 		if (indices.empty()) // Only set indices once (they are cleared upon execute()
 		{
@@ -223,7 +223,7 @@ const k3d::mesh::normals_t& normal_cache::face_normals(k3d::inode* Painter)
 	return get_data<detail::face_normals>(m_mesh, Painter).f_normals;
 }
 
-void normal_cache::on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+void normal_cache::on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter)
 {
 	schedule_data<detail::face_normals>(m_mesh, Hint, Painter);
 	schedule_data<detail::point_normals>(m_mesh, Hint, Painter);

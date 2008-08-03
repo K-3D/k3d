@@ -54,16 +54,16 @@ class negate :
 public:
 	negate(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input_a(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh.")) + init_value<k3d::mesh*>(0)),
-		m_user_property_changed_signal(*this)
+		m_input_a(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh.")) + init_value<k3d::mesh*>(0))
 	{
-		m_input_a.changed_signal().connect(sigc::mem_fun(*this, &negate::mesh_topology_changed));
-
-		m_user_property_changed_signal.connect(sigc::mem_fun(*this, &negate::mesh_topology_changed));
+		m_input_a.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 	
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		// Get the set of input meshes ...
 		detail::mesh_collection meshes;
 		k3d::mesh* const input_a = m_input_a.pipeline_value();
@@ -72,10 +72,10 @@ public:
 			meshes.push_back(input_a);
 
 		// Merge 'em ...
-		detail::merge(meshes, m_material.pipeline_value(), k3d::mesh::blobbies_t::NEGATE, false, Mesh);
+		detail::merge(meshes, m_material.pipeline_value(), k3d::mesh::blobbies_t::NEGATE, false, Output);
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 
@@ -93,7 +93,6 @@ public:
 
 private:
 	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input_a;
-	k3d::user_property_changed_signal m_user_property_changed_signal;
 };
 
 /////////////////////////////////////////////////////////////////////////////

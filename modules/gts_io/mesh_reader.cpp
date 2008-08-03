@@ -69,11 +69,14 @@ public:
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("gts_files"))
 	{
-		m_file.changed_signal().connect(make_topology_changed_slot());
+		m_file.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		const k3d::filesystem::path path = m_file.pipeline_value();
 		if(path.empty())
 			return;
@@ -123,8 +126,8 @@ public:
 			point_selection->push_back(0.0);
 		}
 
-		Mesh.points = points;
-		Mesh.point_selection = point_selection;
+		Output.points = points;
+		Output.point_selection = point_selection;
 
 		// Read edges ...
 		std::vector<size_t> edge_from;
@@ -261,10 +264,10 @@ public:
 		polyhedra->clockwise_edges = clockwise_edges;
 		polyhedra->edge_selection = edge_selection;
 
-		Mesh.polyhedra = polyhedra;
+		Output.polyhedra = polyhedra;
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 

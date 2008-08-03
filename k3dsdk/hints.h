@@ -93,6 +93,67 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////////
+// selection_changed
+
+/// Hint object that indicates that an object's selection state has changed
+class selection_changed :
+	public ihint
+{
+public:
+	ihint* clone();
+	void print(std::ostream& Stream);
+
+	static selection_changed* instance();
+};
+
+//////////////////////////////////////////////////////////////////////////////
+// mesh_geometry_changed
+
+/// Hint object that indicates that a mesh's geometry (the locations of its points) has changed
+class mesh_geometry_changed :
+	public ihint
+{
+public:
+	ihint* clone();
+	void print(std::ostream& Stream);
+
+	static mesh_geometry_changed* instance();
+
+	/// Indices of the points affected by the change
+	k3d::mesh::indices_t changed_points;
+	/// Transformation matrix used for the change
+	k3d::matrix4 transformation_matrix;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+// mesh_topology_changed
+
+/// Hint object that indicates that a mesh's topology has changed
+class mesh_topology_changed :
+	public ihint
+{
+public:
+	ihint* clone();
+	void print(std::ostream& Stream);
+
+	static mesh_topology_changed* instance();
+};
+
+//////////////////////////////////////////////////////////////////////////////
+// mesh_deleted
+
+/// Hint object that indicates a mesh was deleted
+class mesh_deleted :
+	public ihint
+{
+public:
+	ihint* clone();
+	void print(std::ostream& Stream);
+
+	static mesh_deleted* instance();
+};
+
+//////////////////////////////////////////////////////////////////////////////
 // any
 
 /// Used when creating a hint-mapping that matches any incoming hint type.
@@ -157,6 +218,38 @@ public:
 	static ihint* convert(ihint*)
 	{
 		static bitmap_pixels_changed hint;
+		return &hint;
+	}
+};
+
+template<>
+class hint_traits<mesh_topology_changed>
+{
+public:
+	static const bool_t match(ihint* Hint)
+	{
+		return dynamic_cast<mesh_topology_changed*>(Hint);
+	}
+
+	static ihint* convert(ihint*)
+	{
+		static mesh_topology_changed hint;
+		return &hint;
+	}
+};
+
+template<>
+class hint_traits<mesh_geometry_changed>
+{
+public:
+	static const bool_t match(ihint* Hint)
+	{
+		return dynamic_cast<mesh_geometry_changed*>(Hint);
+	}
+
+	static ihint* convert(ihint*)
+	{
+		static mesh_geometry_changed hint;
 		return &hint;
 	}
 };
@@ -267,58 +360,6 @@ detail::converter<ListT> converter(const sigc::slot<void, ihint*>& Slot)
 {
 	return detail::converter<ListT>(Slot);
 }
-
-/// Hint object that indicates that an object's selection state has changed
-class selection_changed_t :
-	public ihint
-{
-public:
-	ihint* clone();
-	void print(std::ostream& Stream);
-};
-
-/// Convenience function that returns a reference to a static instance of selection_changed_t
-selection_changed_t* selection_changed();
-
-/// Hint object that indicates that a mesh's geometry (the locations of its points) has changed
-class mesh_geometry_changed_t :
-	public ihint
-{
-public:
-	ihint* clone();
-	void print(std::ostream& Stream);
-	/// Indices of the points affected by the change
-	k3d::mesh::indices_t changed_points;
-	/// Transformation matrix used for the change
-	k3d::matrix4 transformation_matrix;
-};
-
-/// Convenience function that returns a reference to a static instance of mesh_geometry_changed_t
-mesh_geometry_changed_t* mesh_geometry_changed();
-
-/// Hint object that indicates that a mesh's topology has changed
-class mesh_topology_changed_t :
-	public ihint
-{
-public:
-	ihint* clone();
-	void print(std::ostream& Stream);
-};
-
-/// Convenience function that returns a reference to a static instance of mesh_topology_changed_t
-mesh_topology_changed_t* mesh_topology_changed();
-
-/// Hint object that indicates a mesh was deleted
-class mesh_deleted_t :
-	public ihint
-{
-public:
-	ihint* clone();
-	void print(std::ostream& Stream);
-};
-
-/// Convenience function that returns a reference to a static instance of mesh_deleted_t
-mesh_deleted_t* mesh_deleted();
 
 } // namespace hint
 

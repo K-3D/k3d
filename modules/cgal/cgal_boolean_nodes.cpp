@@ -61,12 +61,16 @@ public:
 		m_type(init_owner(*this) + init_name("type") + init_label(_("Type")) + init_description(_("Boolean operation (intersection, union, difference, reverse difference)")) + init_value(BOOLEAN_INTERSECTION) + init_enumeration(boolean_values())),
 		m_user_property_changed_signal(*this)	
 	{
-		m_type.changed_signal().connect(make_topology_changed_slot());
-		m_user_property_changed_signal.connect(make_topology_changed_slot());
+		m_type.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_user_property_changed_signal.connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 	
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		CGAL::set_error_handler(k3d_failure_handler);
 		
 		Nef_polyhedron result;
@@ -147,10 +151,10 @@ public:
 			k3d::log() << error << "CGALBoolean: error executing boolean operation" << std::endl;
 		}
 
-		to_mesh(result, Mesh, static_cast<k3d::imaterial*>(0));
+		to_mesh(result, Output, static_cast<k3d::imaterial*>(0));
 	}
 	
-	void on_update_mesh_geometry(k3d::mesh& Mesh) {}
+	void on_update_mesh_geometry(k3d::mesh& Output) {}
 	
 	static k3d::iplugin_factory& get_factory()
 	{

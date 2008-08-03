@@ -62,7 +62,8 @@ public:
 		m_texture_v(init_owner(*this) + init_name("texture_v") + init_label(_("Texture V")) + init_description(_("Texture V")) + init_value(std::string("t"))),
 		m_texture_w(init_owner(*this) + init_name("texture_w") + init_label(_("Texture W")) + init_description(_("Texture W")) + init_value(std::string("w")))
 	{
-		m_file.changed_signal().connect(make_topology_changed_slot());
+		m_file.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 //		m_texture_u.changed_signal().connect(make_reset_mesh_slot());
 //		m_texture_v.changed_signal().connect(make_reset_mesh_slot());
 //		m_texture_w.changed_signal().connect(make_reset_mesh_slot());
@@ -73,8 +74,10 @@ public:
 		m_output_mesh.reset(Mesh);
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		const k3d::filesystem::path path = m_file.pipeline_value();
 		if(path.empty())
 			return;
@@ -90,7 +93,7 @@ public:
 		}
 		// Do the conversion. The conversion process throws an exception on error, so
 		// we'll include a try/catch handler.
-		daeParser dae_file(*root, Mesh);
+		daeParser dae_file(*root, Output);
 
 		// destroy the objects we created during the conversion process
 		freeConversionObjects<Node, domNode>(dae);
@@ -98,7 +101,7 @@ public:
 		//freeConversionObjects<Material, domMaterial>(dae);
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 

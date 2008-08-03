@@ -87,7 +87,7 @@ public:
 protected:
 	/// Implements the scheduling phase of a point position update
 	void on_schedule(k3d::inode* Painter);
-	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter);
+	void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter);
 	
 	/// Executes the point position update
 	virtual void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
@@ -134,7 +134,7 @@ public:
 	void draw_range(k3d::uint_t Start, k3d::uint_t End, k3d::inode* Painter);
 protected:
 	void on_schedule(k3d::inode* Painter);
-	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter);
+	void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter);
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
 private:
 	vbo* m_point_vbo;
@@ -193,12 +193,12 @@ protected:
 		register_painter(Painter);
 		schedule_data<sds_cache>(m_mesh, 0, Painter);
 	}
-	void on_schedule(k3d::hint::mesh_geometry_changed_t* Hint, k3d::inode* Painter)
+	void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter)
 	{
 		register_painter(Painter);
 		schedule_data<sds_cache>(m_mesh, Hint, Painter);
 	}
-	void on_schedule(k3d::hint::selection_changed_t* Hint, k3d::inode* Painter)
+	void on_schedule(k3d::hint::selection_changed* Hint, k3d::inode* Painter)
 	{
 		register_painter(Painter);
 		schedule_data<sds_cache>(m_mesh, Hint, Painter);

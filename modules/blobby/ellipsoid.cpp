@@ -19,6 +19,7 @@
 
 /** \file
 	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -55,18 +56,28 @@ public:
 		m_size_z(init_owner(*this) + init_name("size_z") + init_label(_("Z Size")) + init_description(_("Size on Z axis")) + init_value(1.0) + init_step_increment(0.1) + init_constraint(constraint::minimum<double>(0.1)) + init_units(typeid(k3d::measurement::distance))),
 		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Ellipsoid color")) + init_value(k3d::color(1, 1, 1)))
 	{
-		m_material.changed_signal().connect(make_topology_changed_slot());
-		m_x.changed_signal().connect(make_topology_changed_slot());
-		m_y.changed_signal().connect(make_topology_changed_slot());
-		m_z.changed_signal().connect(make_topology_changed_slot());
-		m_size_x.changed_signal().connect(make_topology_changed_slot());
-		m_size_y.changed_signal().connect(make_topology_changed_slot());
-		m_size_z.changed_signal().connect(make_topology_changed_slot());
-		m_color.changed_signal().connect(make_topology_changed_slot());
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_x.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_y.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_z.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_size_x.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_size_y.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_size_z.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_color.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Output)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		k3d::mesh::blobbies_t& blobbies = *k3d::make_unique(Output.blobbies);
 		k3d::mesh::indices_t& first_primitives = *k3d::make_unique(blobbies.first_primitives);
 		k3d::mesh::counts_t& primitive_counts = *k3d::make_unique(blobbies.primitive_counts);

@@ -61,12 +61,13 @@ public:
         }
     }
     
-    void on_create_mesh_topology(k3d::mesh& Mesh)
+    void on_update_mesh_topology(k3d::mesh& Output)
     {
         k3d::log() << info << "Create Topology" << std::endl;
+    	Output = k3d::mesh();
     }
     
-    void on_update_mesh_geometry(k3d::mesh& Mesh)
+    void on_update_mesh_geometry(k3d::mesh& Output)
     {
         k3d::log() << info << "Update Geometry" << std::endl;
     }

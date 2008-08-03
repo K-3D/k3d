@@ -59,8 +59,10 @@ public:
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("svg_files")),
 		m_frame(init_owner(*this) + init_name("frame") + init_label(_("Frame")) + init_description(_("Frame of model")) + init_value(0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
-		m_file.changed_signal().connect(make_topology_changed_slot());
-		m_frame.changed_signal().connect(make_topology_changed_slot());
+		m_file.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_frame.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
 	void reset_mesh(k3d::mesh* const Mesh)
@@ -68,8 +70,10 @@ public:
 		m_output_mesh.reset(Mesh);
 	}
 
-	void on_create_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		k3d::filesystem::path md2_path = m_file.pipeline_value();
 		if(md2_path.empty())
 			return;
@@ -83,7 +87,7 @@ public:
 			return;
 		}
 
-		k3d::gprim_factory factory(Mesh);
+		k3d::gprim_factory factory(Output);
 
 		for(int i=0; i<model->get_num_vertices(); i++)
 			factory.add_point(model->get_point(frame,i));
@@ -97,7 +101,7 @@ public:
 		}
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 		// add scale factor and scale code for changing its size
 	}
