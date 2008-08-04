@@ -66,7 +66,7 @@ public:
 	{
 		// Important!  We load our own matrices for efficiency (saves round-trips to the server) and to prevent problems with selection
 		gluNurbsProperty(nurbs_renderer, GLU_AUTO_LOAD_MATRIX, GL_FALSE);
-		gluNurbsProperty(nurbs_renderer, GLU_CULLING, GL_TRUE);
+		gluNurbsProperty(nurbs_renderer, GLU_CULLING, GL_FALSE);
 		gluNurbsCallback(nurbs_renderer, GLU_ERROR, GLU_NURBS_CALLBACK(on_nurbs_error));
 	}
 
