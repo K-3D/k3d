@@ -33,6 +33,7 @@ extern k3d::iplugin_factory& bend_points_factory();
 extern k3d::iplugin_factory& bulge_points_factory();
 extern k3d::iplugin_factory& center_points_factory();
 extern k3d::iplugin_factory& cylindrical_wave_points_factory();
+extern k3d::iplugin_factory& deformation_expression_factory();
 extern k3d::iplugin_factory& linear_point_noise_factory();
 extern k3d::iplugin_factory& linear_wave_points_factory();
 extern k3d::iplugin_factory& morph_points_factory();
@@ -46,7 +47,6 @@ extern k3d::iplugin_factory& transform_points_factory();
 extern k3d::iplugin_factory& translate_points_factory();
 extern k3d::iplugin_factory& tweak_points_factory();
 extern k3d::iplugin_factory& twist_points_factory();
-
 } // namespace deformation
 
 } // namespace module
@@ -56,6 +56,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::deformation::bulge_points_factory());
 	Registry.register_factory(module::deformation::center_points_factory());
 	Registry.register_factory(module::deformation::cylindrical_wave_points_factory());
+	Registry.register_factory(module::deformation::deformation_expression_factory());
 	Registry.register_factory(module::deformation::linear_point_noise_factory());
 	Registry.register_factory(module::deformation::linear_wave_points_factory());
 	Registry.register_factory(module::deformation::morph_points_factory());
