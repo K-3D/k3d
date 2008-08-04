@@ -238,7 +238,7 @@ public:
         }
         // should move up
         m_p_input_device_mesh.reset ( new cuda_device_mesh ( Input) );
-        m_p_input_device_mesh->copy_to_device( POLYHEDRA_ALL_EDGES );
+        m_p_input_device_mesh->copy_to_device( );// POLYHEDRA_ALL_EDGES );
 
         document().pipeline_profiler().finish_execution(*this, "Validate input");
 
@@ -292,13 +292,14 @@ public:
         allocate_device_memory((void**)&pdev_index_map, old_edge_count*sizeof(k3d::uint32_t));
         allocate_device_memory((void**)&pdev_first_midpoint, old_edge_count*sizeof(k3d::uint32_t));
         allocate_device_memory((void**)&pdev_has_midpoint, old_edge_count*sizeof(unsigned char));
+        set_device_memory((void*)pdev_has_midpoint, 0, old_edge_count*sizeof(unsigned char));
+
 
         // the edge list can maximally contain all the edges
-        allocate_device_memory((void**)&m_pdev_edge_list, tmp_boundary.size()*sizeof(k3d::uint32_t));
+        allocate_device_memory((void**)&m_pdev_edge_list, (1+split_point_count)*tmp_boundary.size()*sizeof(k3d::uint32_t));
 
         allocate_device_memory((void**)&pdev_companions, companions.size()*sizeof(k3d::uint32_t));
         allocate_device_memory((void**)&pdev_boundary_edges, tmp_boundary.size()*sizeof(unsigned char));
-
 
 
         copy_from_host_to_device((void*)pdev_companions, (const void*)&(companions.front()), companions.size()*sizeof(k3d::uint32_t));
@@ -306,7 +307,10 @@ public:
 
         unsigned int edge_index_calculator_edge_count;
 
-        k3d::log() << debug << "Call edge_index_calculator" << std::endl;
+        m_p_output_device_mesh.reset( new cuda_device_mesh ( Output ) );
+        m_p_output_device_mesh->copy_to_device(POLYHEDRA_ALL_EDGES);
+
+        //k3d::log() << debug << "Call edge_index_calculator" << std::endl;
 
         edge_index_calculator_edge_count = edge_index_calculator_entry (
 									(unsigned int*) m_pdev_edge_list,
@@ -318,15 +322,13 @@ public:
 									(const unsigned int*)m_p_input_device_mesh->get_device_polyhedra().get_per_face_loop_counts_pointer(),
 									(const unsigned int*)m_p_input_device_mesh->get_device_polyhedra().get_per_loop_first_edges_pointer(),
 									(const unsigned int*)m_p_input_device_mesh->get_device_polyhedra().get_per_edge_clockwise_edges_pointer(),
-									m_p_input_device_mesh->get_device_polyhedra().get_per_edge_selection_pointer(),
+									m_p_output_device_mesh->get_device_polyhedra().get_per_edge_selection_pointer(),
 									(const unsigned int*) pdev_companions,
 									(const unsigned char*) pdev_boundary_edges,
 									split_point_count,
 									Input.polyhedra->face_first_loops->size(),
 									Input.points->size()
 									);
-
-        k3d::log() << debug << "Done: " << edge_index_calculator_edge_count << std::endl;
 
         document().pipeline_profiler().finish_execution(*this, "Calculate indices");
 
@@ -354,11 +356,10 @@ public:
         polyhedra.clockwise_edges = output_clockwise_edges;
 
         m_p_output_device_mesh.reset( new cuda_device_mesh ( Output ) );
-        m_p_output_device_mesh->copy_to_device(MESH_POINTS + MESH_SELECTION + POLYHEDRA_ALL_EDGES + POLYHEDRA_ALL_LOOPS);
+        m_p_output_device_mesh->copy_to_device();
 
         m_p_output_device_mesh->resize_points_and_selection ( new_point_count, 1.0 );
 
-        //k3d::log() << debug << "Pre-Kernel" << std::endl;
         subdivide_edges_update_indices_entry ((unsigned int*)m_p_input_device_mesh->get_polyhedra_edge_point_indices_pointer(),
                                               (unsigned int*)m_p_input_device_mesh->get_polyhedra_clockwise_edge_point_indices_pointer(),
                                               (unsigned int) Input.polyhedra->edge_points->size(),
@@ -377,6 +378,7 @@ public:
 
 
         document().pipeline_profiler().start_execution(*this, "Split edges");
+
         subdivide_edges_split_edges_entry ((unsigned int*)(m_p_output_device_mesh->get_polyhedra_edge_point_indices_pointer()),
                                            (unsigned int*)(m_p_output_device_mesh->get_polyhedra_clockwise_edge_point_indices_pointer()),
                                            (unsigned int*)m_p_input_device_mesh->get_polyhedra_clockwise_edge_point_indices_pointer(),
@@ -426,7 +428,6 @@ public:
                                                 m_p_input_device_mesh->get_device_polyhedra().get_per_edge_points_pointer(),
                                                 m_p_input_device_mesh->get_device_polyhedra().get_per_edge_clockwise_edges_pointer(),
                                                 (unsigned int)m_vertices.pipeline_value());
-
 
 
         m_p_output_device_mesh->copy_from_device ( Output, MESH_POINTS + MESH_SELECTION );

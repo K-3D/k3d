@@ -842,9 +842,7 @@ __global__ void edge_index_calculator_kernel (
 
 			for( unsigned int edge_index = first_edge_index; 1 ; )
 			{
-#ifdef __DEVICE_EMULATION__
-	printf("vals: %u %u\n", edge_count, edge_list_count);
-#endif
+
 				index_map[edge_index] = edge_count;
 				++edge_count;
 
@@ -856,6 +854,20 @@ __global__ void edge_index_calculator_kernel (
 
 				if(edge_selection[edge_index])
 				{
+#ifdef __DEVICE_EMULATION__
+	printf("edge_index %u ", edge_index);
+	if ( boundary_edges[edge_index] )
+		printf("1 ");
+	else
+		printf("0 ");
+
+	if ( has_midpoint[companions[edge_index]] )
+		printf("1 ");
+	else
+		printf("0 ");
+
+	printf("\n");
+#endif
 					edge_count += split_point_count;
 					if(!boundary_edges[edge_index] && has_midpoint[companions[edge_index]])
 					{

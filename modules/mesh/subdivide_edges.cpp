@@ -172,7 +172,7 @@ public:
 				const k3d::uint_t new_edge = first_new_edge + i;
 				m_output_edge_points[new_edge] = m_first_midpoint[edge] + i;
 				m_output_clockwise_edges[new_edge- 1] = new_edge;
-				
+
 				// copy varying data
 				const k3d::double_t last_weight = weight_step * static_cast<k3d::double_t>(i+1);
 				const k3d::double_t weights[] = {1 - last_weight, last_weight};
@@ -191,7 +191,7 @@ public:
 				const k3d::uint_t new_edge = first_new_edge + i;
 				m_output_edge_points[new_edge] = m_first_midpoint[edge] + m_split_point_count - i - 1;
 				m_output_clockwise_edges[new_edge - 1] = new_edge;
-				
+
 				// copy varying data
 				const k3d::double_t last_weight = weight_step * static_cast<k3d::double_t>(i + 1);
 				const k3d::double_t weights[] = {1 - last_weight, last_weight};
@@ -376,6 +376,7 @@ public:
 				*output_edge_points,
 				*output_clockwise_edges,
 				face_varying_data_copier);
+
 		for(k3d::uint_t edge = 0; edge != index_map.size(); ++edge) edge_index_updater(edge);
 		for(k3d::uint_t loop = 0; loop != output_loop_first_edges.size(); ++loop)
 			output_loop_first_edges[loop] = index_map[output_loop_first_edges[loop]];

@@ -67,6 +67,7 @@ extern "C" K3D_CUDA_DECLSPEC void bitmap_threshold_kernel_entry(unsigned short* 
 extern "C" K3D_CUDA_DECLSPEC void apply_linear_transform_to_point_data ( float *device_points, float *device_matrix, int num_points );
 
 extern "C" K3D_CUDA_DECLSPEC void allocate_device_memory ( void** device_pointer, int size_in_bytes );
+extern "C" K3D_CUDA_DECLSPEC void set_device_memory ( void* device_pointer, int value, int size_in_bytes );
 extern "C" K3D_CUDA_DECLSPEC void copy_from_host_to_device ( void* device_pointer, const void* host_pointer, int size_in_bytes );
 extern "C" K3D_CUDA_DECLSPEC void copy_from_host_to_device_64_to_32_convert ( void* device_pointer, const void* host_pointer, int size_in_bytes );
 
