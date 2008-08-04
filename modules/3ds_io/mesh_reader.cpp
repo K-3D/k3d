@@ -70,15 +70,17 @@ public:
 		m_output_mesh.reset(Mesh);
 	}
 
-	void on_update_mesh_topology(k3d::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		const k3d::filesystem::path path = m_file.pipeline_value();
 		if(path.empty())
 			return;
 
 		C3dsParser c3dsfile(path.native_console_string().c_str());
 
-		k3d::gprim_factory factory(Mesh);
+		k3d::gprim_factory factory(Output);
 
 		float *verts = NULL;
 		unsigned short *polys;
@@ -140,7 +142,7 @@ public:
 		}
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 
