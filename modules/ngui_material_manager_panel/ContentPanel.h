@@ -40,11 +40,13 @@
 #include <k3dsdk/share.h>
 #include <k3dsdk/itransform_sink.h>
 
-
 #include <gtkmm.h>
 
 #include <sstream>
 
+#include "PreviewTorus.h"
+#include "PreviewSphere.h"
+#include "PreviewCube.h"
 
 using namespace libk3dngui;
 
@@ -93,12 +95,23 @@ class ContentPanel
       
     virtual ~ContentPanel()
       {
+        //Clean Up Used Geometry
+        std::list<PreviewObj*>::iterator geo_iter
+          = m_used_geometry.begin();
+
+        for(; geo_iter != m_used_geometry.end(); geo_iter++)
+          delete (*geo_iter);    
       }
 
  public:
 
     //Analyse Doc For Preview Nodes And Create As Appropriate
     void createPreviewNodes();
+
+    //Analyse Doc For Embedded Meta Data In Nodes
+    bool checkDocForMeta(const k3d::string_t meta_tag, 
+                         const k3d::string_t meta_data, 
+                         k3d::inode **node_ptr);
 
     //Abstract Functions To Be Used By Group & Profile Derivatives
     virtual void renderPreview() 				  				= 0;
@@ -148,12 +161,15 @@ class ContentPanel
 
     //NOTE: Back Uses Key Light Shader
 
-    geo_t 				*m_geometry;
+    geo_t 				*m_geometry;	//Current Selected Geometry
     rManEngine_t 		*m_engine;
     camera_t 			*m_camera;
 
     //Size Of Render Preview
     k3d::uint_t 		m_pview_size;
+
+    //All Used Geometry
+    std::list<PreviewObj*> m_used_geometry;
 
    
 };//ContentPanel

@@ -35,6 +35,11 @@ void MaterialContentPanel::init()
     .connect(sigc::mem_fun(*this, &MaterialContentPanel::onDateButtonPressed));
 
 
+  //Preview Geometry Combo Connection
+  m_tool_geo_combo.signal_changed()
+    .connect(sigc::mem_fun(*this, &MaterialContentPanel::onRenderComboSelect));
+
+
 }//init
 
 
@@ -109,8 +114,10 @@ void MaterialContentPanel::buildPanel()
                 
       //Setup Preview Geometry ComboBox
       m_toolbox_cont.pack_start(m_tool_geo_combo, false, false, 2);
+
       m_tool_geo_combo.append_text("Sphere");
       m_tool_geo_combo.append_text("Cube");
+      m_tool_geo_combo.append_text("Torus");
       m_tool_geo_combo.set_active_text("Sphere");
       m_tool_geo_combo.set_size_request(-1, 30);
 
@@ -186,6 +193,85 @@ bool MaterialContentPanel::updatePreviewImage()
 void MaterialContentPanel::renderSinglePreview(k3d::inode *node)
 {
   renderPreview();
+}
+
+
+
+void MaterialContentPanel::onRenderComboSelect()
+{
+  k3d::string_t selected_geo = m_tool_geo_combo.get_active_text();
+
+  k3d::string_t meta_data = "";
+
+  //Work Out Which Geometric Object Was Selected
+  if(selected_geo == "Sphere")
+    {
+      meta_data = "p_sphere_geo";
+
+    }
+  else if(selected_geo == "Cube")
+    {
+      meta_data = "p_cube_geo";
+    }
+  else
+    {
+      meta_data = "p_torus_geo";
+    }
+
+
+  //Meta Tag To Be Found / Added
+  k3d::string_t meta_tag = "PreviewCore::nametag";
+
+  //Node That Points To Actual Doc Node
+  k3d::inode *node_ptr = 0;
+
+  //Check If The Node Exists In The Document
+  checkDocForMeta(meta_tag, meta_data, &node_ptr);
+
+
+  if(node_ptr)
+    m_geometry = node_ptr; //Node Found In Document!
+  else
+    {
+      //Build The Correct Geometric Object From Scratch
+      PreviewObj *built_geo = 0;
+
+      if(selected_geo == "Sphere")
+        {
+          built_geo = new PreviewSphere("Sphere", m_document_state);
+          built_geo->init("Preview Core::Geo::Sphere", meta_data);
+        }        
+
+      else if(selected_geo == "Cube")
+        {
+        built_geo = new PreviewCube("Cube", m_document_state);
+        built_geo->init("Preview Core::Geo::Cube", meta_data);
+        }
+
+      else
+        {
+        built_geo = new PreviewTorus("Torus", m_document_state);
+        built_geo->init("Preview Core::Geo::Torus", "p_torus_geo");
+        }
+      
+      if(built_geo)
+        {
+          //Initalize The Creation & Placement Of Geomerty In World
+          //built_geo->init();
+
+          //Set The Current Geometric Object To This
+          m_geometry = built_geo->m_doc_node;
+
+        }
+
+    }//else
+
+  //Render & Refresh Preview
+  renderPreview();
+  updatePreviewImage();
+
+  k3d::log() << "Render Combo Changed" << std::endl;
+
 }
 
 

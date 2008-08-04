@@ -9,18 +9,69 @@ namespace material_manager
 namespace mechanics
 {
 
+bool ContentPanel::checkDocForMeta(const k3d::string_t meta_tag, 
+                                   const k3d::string_t meta_data, 
+                                   k3d::inode **node_ptr)
+{
+  //Iterate Through Document. If A Node Has Meta Data & Matches, Pass To node_ptr
+  k3d::inode_collection::nodes_t::const_iterator node 
+    = m_document_state->document().nodes().collection().begin();
+
+  for(; node != m_document_state->document().nodes().collection().end(); ++node)
+    {
+      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(*node))
+        {
+          k3d::string_t value = metadata->get_metadata()[meta_tag];
+          
+          if(value == meta_data)
+            {
+              //There Is A Match!
+              *node_ptr = *node;
+              return true;
+            }
+        }//if
+    }//for
+
+  //No Match Found
+  node_ptr = 0;
+  return false;
+
+}//checkDocForMeta
+
+
+
 void ContentPanel::createPreviewNodes()
 {
   //Flags For Each Node
   bool hasAqsis_renderer = 	false;
-  bool hasCamera = 		false;
-  bool hasGeo = 		false;
-  bool hasLight = 		false;
-  bool hasLightFill = 		false;
-  bool hasLightBack = 		false;
-  bool hasLight_shader = 	false;
+  bool hasCamera = 				false;
+  bool hasGeo = 					false;
+  bool hasLight = 				false;
+  bool hasLightFill = 			false;
+  bool hasLightBack = 			false;
+  bool hasLight_shader = 		false;
   bool hasLightFill_shader = 	false;
   bool hasRenderman_engine = 	false;
+
+
+  //Meta Data Strings
+  k3d::string_t aqsis_render_meta 	= "p_aqsis_renderer";
+  k3d::string_t camera_meta 			= "p_camera";
+
+  k3d::string_t sphere_geo_meta 		= "p_sphere_geo";
+  k3d::string_t cube_geo_meta 		= "p_cube_geo";
+  k3d::string_t torus_geo_meta 		= "p_torus_geo";
+
+  k3d::string_t key_light_meta 		= "p_light";
+  k3d::string_t fill_light_meta 		= "p_fill_light";
+  k3d::string_t back_light_meta 		= "p_back_light";
+
+  k3d::string_t key_bck_lshade_meta = "p_light_shader";
+  k3d::string_t fill_lshade_meta 	= "p_fill_light_shader";
+  
+  k3d::string_t rman_engine_meta   	= "p_rman_engine";
+
+  k3d::string_t nametag_metatag 		= "PreviewCore::nametag";
 
   //Pointer To Aqsis Engine For RMAN Engine Node
   k3d::ri::irender_engine* aqsis = 0;
@@ -29,72 +80,96 @@ void ContentPanel::createPreviewNodes()
   //Check Nodes MetaData To See If These Nodes Exist.
   //If They Do Dont Exist Then Create New Nodes
 
-  k3d::inode_collection::nodes_t::const_iterator node 
-    = m_document_state->document().nodes().collection().begin();
-
-  for(; node != m_document_state->document().nodes().collection().end(); ++node)
+  k3d::inode *node_ptr = 0;
+  
+  //Check For Aqsis Engine
+  if(checkDocForMeta(nametag_metatag, aqsis_render_meta, &node_ptr))
     {
-      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(*node))
-        {
-          k3d::string_t value = metadata->get_metadata()["PreviewCore::nametag"];
+      hasAqsis_renderer = true;
+      if(node_ptr)
+        aqsis = dynamic_cast<k3d::ri::irender_engine*>(node_ptr);
 
-          if(value == "p_aqsis_renderer")
-            {
-              hasAqsis_renderer = true;
-              aqsis = dynamic_cast<k3d::ri::irender_engine*>(*node);
-            }
+    }
 
-          if(value == "p_camera")
-            {
-              hasCamera = true;
-              m_camera = dynamic_cast<camera_t*>(*node);
-            }
-
-          if(value == "p_geo")
-            {
-              hasGeo = true;
-              m_geometry = dynamic_cast<geo_t*>(*node);
-            }
-
-          if(value == "p_light")
-            {
-              hasLight = true;
-              m_main_light = dynamic_cast<light_t*>(*node);
-            }
-
-          if(value == "p_fill_light")
-            {
-              hasLightFill = true;
-              m_fill_light = dynamic_cast<light_t*>(*node);
-            }
-
-          if(value == "p_back_light")
-            {
-              hasLightBack = true;
-              m_back_light = dynamic_cast<light_t*>(*node);
-            }
+  //Check For Camera
+  node_ptr = 0;
+  if(checkDocForMeta(nametag_metatag, camera_meta, &node_ptr))
+    {
+       hasCamera = true;
+       if(node_ptr)
+         m_camera = dynamic_cast<camera_t*>(node_ptr);
+    }
+                                     
+  //Check For Sphere Geometry
+  node_ptr = 0;
+  if(checkDocForMeta(nametag_metatag, sphere_geo_meta, &node_ptr))
+    {
+      hasGeo = true;
+      if(node_ptr)
+        m_geometry = dynamic_cast<geo_t*>(node_ptr);
+    }
 
 
-          if(value == "p_light_shader")
-            {
-              hasLight_shader = true;
-              m_light_shader = dynamic_cast<k3d::inode*>(*node);				
-            }
+  //Check For Main Key Light
+  node_ptr = 0;
+  if(checkDocForMeta(nametag_metatag, key_light_meta, &node_ptr))
+    {
+      hasLight = true;
+      if(node_ptr)
+        m_main_light = dynamic_cast<light_t*>(node_ptr);
+    }
 
-          if(value == "p_fill_light_shader")
-            {
-              hasLightFill_shader = true;
-              m_fill_light_shader = dynamic_cast<k3d::inode*>(*node);				
-            }          
 
-          if(value == "p_rman_engine")
-            {
-              hasRenderman_engine = true;
-              m_engine = dynamic_cast<rManEngine_t*>(*node);					
-            }		
+  //Check For Fill Light
+  node_ptr = 0;
+  if(checkDocForMeta(nametag_metatag, fill_light_meta, &node_ptr))
+    {
+      hasLightFill = true;
+      if(node_ptr)
+        m_fill_light = dynamic_cast<light_t*>(node_ptr);
+    }
 
-        }//if
-    }//for
+
+  //Check For Back Light
+  node_ptr = 0;
+  if(checkDocForMeta(nametag_metatag, back_light_meta, &node_ptr))
+    {
+      hasLightBack = true;
+      if(node_ptr)
+        m_back_light = dynamic_cast<light_t*>(node_ptr);
+    }
+
+
+  //Check For Key + Back Light Shader
+  node_ptr = 0;
+  if(checkDocForMeta(nametag_metatag, key_bck_lshade_meta, &node_ptr))
+    {
+      hasLight_shader = true;
+      if(node_ptr)
+        m_light_shader = dynamic_cast<k3d::inode*>(node_ptr);	
+    }
+
+
+  //Check For Fill Light Shader
+  node_ptr = 0;
+  if(checkDocForMeta(nametag_metatag, fill_lshade_meta, &node_ptr))
+    {
+      hasLightFill_shader = true;
+      if(node_ptr)
+        m_fill_light_shader = dynamic_cast<k3d::inode*>(node_ptr);
+    }
+
+
+  //Check For Render Engine
+  node_ptr = 0;
+  if(checkDocForMeta(nametag_metatag, rman_engine_meta, &node_ptr))
+    {
+      hasRenderman_engine = true;
+      if(node_ptr)
+        m_engine = dynamic_cast<rManEngine_t*>(node_ptr);
+    }
+
+
 
 
   //Setup Light Shader Preview Node**********
@@ -116,7 +191,7 @@ void ContentPanel::createPreviewNodes()
 	      
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_light_shader))
-        metadata->set_metadata("PreviewCore::nametag", "p_light_shader");
+        metadata->set_metadata(nametag_metatag, key_bck_lshade_meta);
    
     }//if
 
@@ -137,7 +212,7 @@ void ContentPanel::createPreviewNodes()
 	      
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_fill_light_shader))
-        metadata->set_metadata("PreviewCore::nametag", "p_fill_light_shader");
+        metadata->set_metadata(nametag_metatag, fill_lshade_meta);
    
     }//if
 
@@ -165,7 +240,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_main_light))
-        metadata->set_metadata("PreviewCore::nametag", "p_light");
+        metadata->set_metadata(nametag_metatag, key_light_meta);
 
     }//if
 
@@ -192,7 +267,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_fill_light))
-        metadata->set_metadata("PreviewCore::nametag", "p_fill_light");
+        metadata->set_metadata(nametag_metatag, fill_light_meta);
 
     }//if
 
@@ -218,7 +293,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_back_light))
-        metadata->set_metadata("PreviewCore::nametag", "p_back_light");
+        metadata->set_metadata(nametag_metatag, back_light_meta);
 
     }//if
 
@@ -257,7 +332,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_camera))
-        metadata->set_metadata("PreviewCore::nametag", "p_camera");
+        metadata->set_metadata(nametag_metatag, camera_meta);
 
     }//if
 
@@ -265,20 +340,13 @@ void ContentPanel::createPreviewNodes()
 
   if(!hasGeo)
     {
-      m_geometry 
-        = dynamic_cast<geo_t*>(k3d::plugin::create("Sphere", 
-                                                   m_document_state->document(), 
-                                                   "Preview Core::Geo::Sphere"));
+      //Create The Default Sphere Geometric Object
+      PreviewSphere *default_sphereObj = new PreviewSphere("Sphere", m_document_state);
+      default_sphereObj->init("Preview Core::Geo::Sphere", sphere_geo_meta);
+      m_used_geometry.push_back(default_sphereObj);
 
-      k3d::property::set_internal_value(*m_geometry, 
-                                        "render_shadows", false);
-
-      k3d::property::set_internal_value(*m_geometry, 
-                                        "viewport_visible", false);
-
-      //Create Meta Data
-      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_geometry))
-        metadata->set_metadata("PreviewCore::nametag", "p_geo");
+      //Set Current Geometry To The Sphere
+      m_geometry = default_sphereObj->m_doc_node;
 
     }//if
 
@@ -293,7 +361,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(aqsis))
-        metadata->set_metadata("PreviewCore::nametag", "p_aqsis_renderer");
+        metadata->set_metadata(nametag_metatag, aqsis_render_meta);
 
     }//if
 
@@ -343,7 +411,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_engine))
-        metadata->set_metadata("PreviewCore::nametag", "p_rman_engine");
+        metadata->set_metadata(nametag_metatag, rman_engine_meta);
 
     }//if
 

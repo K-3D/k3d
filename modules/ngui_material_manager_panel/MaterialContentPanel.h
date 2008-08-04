@@ -102,6 +102,9 @@ class MaterialContentPanel : public ContentPanel
         m_materialobj->insertTodaysDate();
       }
 
+      //Switch Preview Geometry On Combo Select
+      void onRenderComboSelect();
+
       //Find A Material From A Doc Node
       bool findMaterial(const k3d::inode *node)
       {
