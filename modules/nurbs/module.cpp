@@ -26,61 +26,65 @@
 namespace module
 {
 
-namespace nurbs
-{
+	namespace nurbs
+	{
 
-extern k3d::iplugin_factory& circle_factory();
-extern k3d::iplugin_factory& cone_factory();
-extern k3d::iplugin_factory& cylinder_factory();
-extern k3d::iplugin_factory& disk_factory();
-extern k3d::iplugin_factory& grid_factory();
-extern k3d::iplugin_factory& hyperboloid_factory();
-extern k3d::iplugin_factory& paraboloid_factory();
-extern k3d::iplugin_factory& polygon_factory();
-extern k3d::iplugin_factory& sphere_factory();
-extern k3d::iplugin_factory& torus_factory();
-extern k3d::iplugin_factory& create_curve_factory();
-extern k3d::iplugin_factory& set_weight_factory();
-extern k3d::iplugin_factory& connect_curves_factory();
-extern k3d::iplugin_factory& split_curve_factory();
-extern k3d::iplugin_factory& edit_knot_vector_factory();
-extern k3d::iplugin_factory& insert_knot_factory();
-extern k3d::iplugin_factory& close_curve_factory();
-extern k3d::iplugin_factory& curve_degree_elevation_factory();
-extern k3d::iplugin_factory& curve_traversal_factory();
-extern k3d::iplugin_factory& revolve_curve_factory();
-extern k3d::iplugin_factory& ruled_surface_factory();
-extern k3d::iplugin_factory& create_cap_factory();
-extern k3d::iplugin_factory& skinned_surface_factory();
+		extern k3d::iplugin_factory& circle_factory();
+		extern k3d::iplugin_factory& cone_factory();
+		extern k3d::iplugin_factory& cylinder_factory();
+		extern k3d::iplugin_factory& disk_factory();
+		extern k3d::iplugin_factory& grid_factory();
+		extern k3d::iplugin_factory& hyperboloid_factory();
+		extern k3d::iplugin_factory& paraboloid_factory();
+		extern k3d::iplugin_factory& polygon_factory();
+		extern k3d::iplugin_factory& sphere_factory();
+		extern k3d::iplugin_factory& torus_factory();
+		extern k3d::iplugin_factory& create_curve_factory();
+		extern k3d::iplugin_factory& set_weight_factory();
+		extern k3d::iplugin_factory& connect_curves_factory();
+		extern k3d::iplugin_factory& split_curve_factory();
+		extern k3d::iplugin_factory& edit_knot_vector_factory();
+		extern k3d::iplugin_factory& insert_knot_factory();
+		extern k3d::iplugin_factory& close_curve_factory();
+		extern k3d::iplugin_factory& curve_degree_elevation_factory();
+		extern k3d::iplugin_factory& curve_traversal_factory();
+		extern k3d::iplugin_factory& revolve_curve_factory();
+		extern k3d::iplugin_factory& ruled_surface_factory();
+		extern k3d::iplugin_factory& create_cap_factory();
+		extern k3d::iplugin_factory& skinned_surface_factory();
+		extern k3d::iplugin_factory& sweep_surface_factory();
+		extern k3d::iplugin_factory& patch_insert_knot_factory();
 
-} // namespace nurbs
+	} // namespace nurbs
 
 } // namespace module
 
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::nurbs::circle_factory());
-	Registry.register_factory(module::nurbs::cone_factory());
-	Registry.register_factory(module::nurbs::cylinder_factory());
-	Registry.register_factory(module::nurbs::disk_factory());
-	Registry.register_factory(module::nurbs::grid_factory());
-	Registry.register_factory(module::nurbs::hyperboloid_factory());
-	Registry.register_factory(module::nurbs::paraboloid_factory());
-	Registry.register_factory(module::nurbs::polygon_factory());
-	Registry.register_factory(module::nurbs::sphere_factory());
-	Registry.register_factory(module::nurbs::torus_factory());
-	Registry.register_factory(module::nurbs::create_curve_factory());
-	Registry.register_factory(module::nurbs::set_weight_factory());
-	Registry.register_factory(module::nurbs::connect_curves_factory());
-	Registry.register_factory(module::nurbs::split_curve_factory());
-	Registry.register_factory(module::nurbs::edit_knot_vector_factory());
-	Registry.register_factory(module::nurbs::insert_knot_factory());
-	Registry.register_factory(module::nurbs::close_curve_factory());
-	Registry.register_factory(module::nurbs::curve_degree_elevation_factory());
-	Registry.register_factory(module::nurbs::curve_traversal_factory());
-	Registry.register_factory(module::nurbs::revolve_curve_factory());
-	Registry.register_factory(module::nurbs::ruled_surface_factory());
-	Registry.register_factory(module::nurbs::create_cap_factory());
-	Registry.register_factory(module::nurbs::skinned_surface_factory());
+    Registry.register_factory(module::nurbs::circle_factory());
+    Registry.register_factory(module::nurbs::cone_factory());
+    Registry.register_factory(module::nurbs::cylinder_factory());
+    Registry.register_factory(module::nurbs::disk_factory());
+    Registry.register_factory(module::nurbs::grid_factory());
+    Registry.register_factory(module::nurbs::hyperboloid_factory());
+    Registry.register_factory(module::nurbs::paraboloid_factory());
+    Registry.register_factory(module::nurbs::polygon_factory());
+    Registry.register_factory(module::nurbs::sphere_factory());
+    Registry.register_factory(module::nurbs::torus_factory());
+    Registry.register_factory(module::nurbs::create_curve_factory());
+    Registry.register_factory(module::nurbs::set_weight_factory());
+    Registry.register_factory(module::nurbs::connect_curves_factory());
+    Registry.register_factory(module::nurbs::split_curve_factory());
+    Registry.register_factory(module::nurbs::edit_knot_vector_factory());
+    Registry.register_factory(module::nurbs::insert_knot_factory());
+    Registry.register_factory(module::nurbs::close_curve_factory());
+    Registry.register_factory(module::nurbs::curve_degree_elevation_factory());
+    Registry.register_factory(module::nurbs::curve_traversal_factory());
+    Registry.register_factory(module::nurbs::revolve_curve_factory());
+    Registry.register_factory(module::nurbs::ruled_surface_factory());
+    Registry.register_factory(module::nurbs::create_cap_factory());
+    Registry.register_factory(module::nurbs::skinned_surface_factory());
+    Registry.register_factory(module::nurbs::sweep_surface_factory());
+    Registry.register_factory(module::nurbs::patch_insert_knot_factory());
 K3D_MODULE_END
 

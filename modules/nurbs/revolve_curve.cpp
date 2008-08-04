@@ -101,7 +101,7 @@ namespace module
 				static k3d::document_plugin_factory<revolve_curve, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x973e535d, 0x434f2e26, 0x0f41d280, 0x2b79350b),
 					"NurbsRevolveCurve",
-					_("Take a NURBS curve and rotate it around the y axis"),
+					_("Take a NURBS curve and rotate it around one of the coordinate system axis"),
 					"NURBS",
 					k3d::iplugin_factory::EXPERIMENTAL);
 

@@ -92,12 +92,6 @@ namespace k3d
                     Array.push_back(value);
                 }
 
-                log() << debug << "Did load knot vector: ";
-                for(int i = 0; i < Array.size(); i++)
-                {
-                    log() << Array.at(i);
-                }
-                log() << std::endl;
                 property_policy_t::set_value(Array);
             }
 
@@ -151,8 +145,15 @@ namespace module
                     return;
                 }
 
+                if(m_knot_vector.pipeline_value().empty())
+                    m_knot_vector.set_value(extract_knots(Output, my_curve));
+                else
+                {
+                    const k3d::mesh::knots_t& knots = m_knot_vector.pipeline_value();
 
-                m_knot_vector.set_value(extract_knots(Output, my_curve));
+                    if (!insert_knots(knots, Output, my_curve))
+                        k3d::log() << error << "Invalid Knot Vector on curve " << my_curve << std::endl;
+                }
             }
 
 

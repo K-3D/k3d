@@ -43,6 +43,7 @@
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/gprim_factory.h>
 #include <deque>
+#include "math.h"
 
 #include "nurbs_patch_modifier.h"
 
@@ -195,6 +196,15 @@ namespace module{
                 ///\param curves A vector of curves which shall be used as skeleton for the skin
                 void skinned_surface(std::vector<size_t> curves, k3d::axis axis);
 
+                ///Moves curve2 along curve1 and adjusts is along the tangent of curve1 at this position
+                ///creates a NURBS surface representing the area the curve has moved over
+                ///It doesnt matter which curve is curve1 and which is curve2 as it results in the same shape
+                ///\param curve1 one curve
+                ///\param curve2 the other curve
+                ///\param segments how many segments the swept curve should have
+                ///\param create_caps Whether or not to create caps at the ends - only if one of the curves is a loop
+                void sweep_surface(size_t curve1, size_t curve2, size_t segments, bool create_caps);
+
             private:
 
                 ///Returns the span in which the knot value u lies
@@ -251,6 +261,11 @@ namespace module{
                 ///\param first the index which is the last one not offsetted
                 ///\param offset The amount to which all indices greater than first will be increased
                 void offset_all_after(k3d::mesh::indices_t *points, size_t first, int offset);
+
+                ///Calculates a tangent vector on this curve at knot value u (in 0,1)
+                ///This might give unpredictable results on non-deriveable curves
+                ///because it works with the difference quotient
+                k3d::point3 calculate_curve_tangent(size_t curve, double u);
 
                 k3d::mesh *m_instance;
                 k3d::mesh::nurbs_curve_groups_t *groups;
