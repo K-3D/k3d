@@ -30,13 +30,12 @@
 #include <k3dsdk/gprim_factory.h>
 #include "3ds.h"
 #include "3dschunknames.h"
+#include "integration.h"
 
 namespace module
 {
-
 namespace f3ds
 {
-
 namespace io
 {
 
@@ -78,6 +77,8 @@ public:
 		if(path.empty())
 			return;
 
+		f3dsParser f3ds_file(path.native_console_string().c_str(), Output);
+/*
 		C3dsParser c3dsfile(path.native_console_string().c_str());
 
 		k3d::gprim_factory factory(Output);
@@ -140,6 +141,7 @@ public:
 					break;
 			}
 		}
+		*/
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
@@ -152,7 +154,8 @@ public:
 			k3d::uuid(0xf8bbd8fb, 0x7d47911e, 0xbf64f3a3, 0x25652955),
 			"3DSMeshReader",
 			_("Mesh reader that loads external 3ds (.3ds) files into the document by reference"),
-			"MeshReader");
+			"MeshReader",
+			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
