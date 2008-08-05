@@ -354,10 +354,18 @@ void ContentPanel::createPreviewNodes()
 
   if(!hasAqsis_renderer)
     {
-      aqsis 
-        = k3d::plugin::create<k3d::ri::irender_engine>("AqsisRenderManEngine", 
-                                                       m_document_state->document(), 
-                                                       "Preview Core::Aqsis Renderer");
+			// Try the bundled engine first, for win32 installed versions
+			aqsis 
+  	        = k3d::plugin::create<k3d::ri::irender_engine>("BundledAqsisRenderManEngine", 
+  	                                                       m_document_state->document(), 
+  	                                                       "Preview Core::Aqsis Renderer");
+  	  if(!aqsis)
+  	  {
+				aqsis 
+					= k3d::plugin::create<k3d::ri::irender_engine>("AqsisRenderManEngine", 
+																												 m_document_state->document(), 
+																												 "Preview Core::Aqsis Renderer");
+  	  }
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(aqsis))

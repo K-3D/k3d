@@ -107,10 +107,10 @@ public:
 		k3d::inetwork_render_frame::environment environment;
 
 		k3d::inetwork_render_frame::arguments arguments;
-		arguments.push_back(k3d::inetwork_render_frame::argument("-displays=" + displays.native_filesystem_string()));
-		arguments.push_back(k3d::inetwork_render_frame::argument("-procedurals=" + procedurals.native_filesystem_string()));
-		arguments.push_back(k3d::inetwork_render_frame::argument("-plugins=" + plugins.native_filesystem_string()));
-		arguments.push_back(k3d::inetwork_render_frame::argument("-shaders=" + shaders.native_filesystem_string()));
+		arguments.push_back(k3d::inetwork_render_frame::argument("-displays=\"" + displays.native_filesystem_string() + "\""));
+		arguments.push_back(k3d::inetwork_render_frame::argument("-procedurals=\"" + procedurals.native_filesystem_string() + "\""));
+		arguments.push_back(k3d::inetwork_render_frame::argument("-plugins=\"" + plugins.native_filesystem_string() + "\""));
+		arguments.push_back(k3d::inetwork_render_frame::argument("-shaders=\"" + shaders.native_filesystem_string() + "\""));
 		arguments.push_back(k3d::inetwork_render_frame::argument(RIB.native_filesystem_string()));
 
 		Frame.add_exec_command(aqsis.native_filesystem_string(), environment, arguments);
