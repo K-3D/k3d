@@ -55,6 +55,7 @@ namespace module
 		extern k3d::iplugin_factory& sweep_surface_factory();
 		extern k3d::iplugin_factory& patch_insert_knot_factory();
 		extern k3d::iplugin_factory& patch_degree_elevation_factory();
+		extern k3d::iplugin_factory& split_patch_factory();
 
 	} // namespace nurbs
 
@@ -88,5 +89,6 @@ K3D_MODULE_START(Registry)
     Registry.register_factory(module::nurbs::sweep_surface_factory());
     Registry.register_factory(module::nurbs::patch_insert_knot_factory());
     Registry.register_factory(module::nurbs::patch_degree_elevation_factory());
+    Registry.register_factory(module::nurbs::split_patch_factory());
 K3D_MODULE_END
 

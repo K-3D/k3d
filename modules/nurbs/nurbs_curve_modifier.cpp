@@ -2484,14 +2484,6 @@ namespace module
 			mod.insert_patch(skin, true);
 		}
 
-		struct polar_coord
-		{
-			double distance;
-			double alpha;
-			double beta;
-			double weight;
-		};
-
 		void nurbs_curve_modifier::sweep_surface(size_t curve1, size_t curve2, size_t segments, bool create_caps)
 		{
 		    try{
@@ -2520,40 +2512,7 @@ namespace module
                 }
                 c = (1.0 / curve_point_counts->at(curve1)) * c;
 
-                std::vector<polar_coord> polars;
-
-                for (int j = curve_points_begin; j < curve_points_end; j++)
-                {
-                    k3d::point3 p = mesh_points->at(curve_points->at(j)) + (-c);
-                    polar_coord pol;
-                    pol.distance = sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
-                    if ( p[0] > 0 )
-                        pol.alpha = atan(p[1] / p[0]);
-                    else if ( p[0] < 0 )
-                        pol.alpha = M_PI + atan(p[1] / p[0]);
-                    else if ( p[1] < 0 )
-                        pol.alpha = M_PI * -0.5;
-                    else
-                        pol.alpha = M_PI * 0.5;
-
-                    pol.beta = atan(p[2] / sqrt(p[1] * p[1] + p[0] * p[0]));
-                    pol.weight = curve_point_weights->at(j);
-                    polars.push_back(pol);
-                }
-
-                k3d::point3 reference_tangent = calculate_curve_tangent(curve2, 0.0);
-                double tan_alpha;
-                if ( reference_tangent[0] > 0 )
-                    tan_alpha = atan(reference_tangent[1] / reference_tangent[0]);
-                else if ( reference_tangent[0] < 0 )
-                    tan_alpha = M_PI + atan(reference_tangent[1] / reference_tangent[0]);
-                else if ( reference_tangent[1] < 0 )
-                    tan_alpha = M_PI * -0.5;
-                else
-                    tan_alpha = M_PI * 0.5;
-
-                double tan_beta = atan(reference_tangent[2] / sqrt(reference_tangent[1] * reference_tangent[1] + reference_tangent[0] * reference_tangent[0]));
-
+                k3d::point3 rt = calculate_curve_tangent(curve2, 0.0);
 
                 k3d::mesh::points_t control_points;
                 k3d::mesh::weights_t new_weights;
@@ -2570,30 +2529,18 @@ namespace module
                     }
                     k3d::point3 t = calculate_curve_tangent(curve2, step * i);
 
-                    double new_tan_alpha;
-                    if ( t[0] > 0 )
-                        new_tan_alpha = atan(t[1] / t[0]);
-                    else if ( t[0] < 0 )
-                        new_tan_alpha = M_PI + atan(t[1] / t[0]);
-                    else if ( t[1] < 0 )
-                        new_tan_alpha = M_PI * -0.5;
-                    else
-                        new_tan_alpha = M_PI * 0.5;
+                    //cross product of the 2 tangents
+                    k3d::vector3 rotation_axis(t[1]*rt[2] - t[2]*rt[1], t[2]*rt[0] - t[0]*rt[2], t[0]*rt[1] - t[1]*rt[0]);
+                    //angle between the 2 tangents: r*rt / (length(r) * length(rt)) = cos alpha
+                    double alpha = atan(t[0]*rt[0] + t[1]*rt[1] + t[2]*rt[2]);
 
-                    double new_tan_beta = atan(t[2] / sqrt(t[1] * t[1] + t[0] * t[0]));
+                    k3d::matrix4 rot_mat = k3d::rotation3D(alpha, rotation_axis);
 
-                    double delta_alpha = new_tan_alpha - tan_alpha;
-                    double delta_beta = new_tan_beta - tan_beta;
-                    MY_DEBUG << "angle between referenceTangent and new Tangent: alpha=" << delta_alpha << " beta=" << delta_beta << std::endl;
-
-                    delta_beta = 0.0;
-
-                    for (int j = 0; j < polars.size(); j++)
+                    for (int j = curve_points_begin; j < curve_points_end; j++)
                     {
-                        control_points.push_back(k3d::point3( p[0] / p[3] + polars.at(j).distance * cos(polars.at(j).beta + delta_beta) * cos(polars.at(j).alpha + delta_alpha),
-                                                              p[1] / p[3] + polars.at(j).distance * cos(polars.at(j).beta + delta_beta) * sin(polars.at(j).alpha + delta_alpha),
-                                                              p[2] / p[3] + polars.at(j).distance * sin(polars.at(j).beta + delta_beta)));
-                        new_weights.push_back(polars.at(j).weight * p[3]);
+                        k3d::point3 cp = mesh_points->at(curve_points->at(j)) + (-c);
+                        control_points.push_back(k3d::point3( p[0] / p[3], p[1] / p[3], p[2] / p[3]) + rot_mat * cp);
+                        new_weights.push_back(curve_point_weights->at(j) * p[3]);
                     }
                 }
 
@@ -2628,17 +2575,17 @@ namespace module
 		k3d::point3 nurbs_curve_modifier::calculate_curve_tangent(size_t curve, double u)
 		{
 			normalize_knot_vector(curve);
-			k3d::point4 at_u = curve_point(curve, u);
-			MY_DEBUG << output_point(at_u) << std::endl;
 			k3d::point4 after_u;
 			if (u < 0.01)
 			{
+			    k3d::point4 at_u = curve_point(curve, u);
 				after_u = curve_point(curve, u + 0.01);
 				MY_DEBUG << output_point(after_u) << std::endl;
 				after_u = after_u + (-at_u);
 			}
 			else if (u > 0.99)
 			{
+			    k3d::point4 at_u = curve_point(curve, 0.99);
 				after_u = curve_point(curve, u - 0.01);
 				after_u = at_u + (-after_u);
 			}

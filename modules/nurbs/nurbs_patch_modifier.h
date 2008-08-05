@@ -116,6 +116,18 @@ namespace module
 				///\param degree If the patch had u-degree 2 and you specify 2 here, it'll get a new degree of 4
 				void patch_v_degree_elevation(size_t patch, size_t degree);
 
+				///Split a patch at the seleted u-value (so itgets split in u-direction)
+				///adds a new patch to the end
+				///\param patch
+				///\param u
+				void split_patch_u(size_t patch, double u);
+
+				///Split a patch at the seleted v-value (so itgets split in v-direction)
+				///adds a new patch to the end
+				///\param patch
+				///\param v
+				void split_patch_v(size_t patch, double u);
+
                 ///Returns the index of the selected patch
                 int get_selected_patch();
 
