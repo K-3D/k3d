@@ -46,6 +46,24 @@ namespace module
 				m_trim_curve_point_weights = k3d::make_unique(m_nurbs_patches->trim_curve_point_weights);
 				m_trim_curve_knots = k3d::make_unique(m_nurbs_patches->trim_curve_knots);
 			}
+			else
+			{
+			    m_patch_trim_curve_loop_counts = NULL;
+				m_patch_first_trim_curve_loops = NULL;
+				m_trim_points = NULL;
+				m_trim_point_selection = NULL;
+				m_first_trim_curves = NULL;
+				m_trim_curve_counts = NULL;
+				m_trim_curve_loop_selection = NULL;
+				m_trim_curve_first_points = NULL;
+				m_trim_curve_point_counts = NULL;
+				m_trim_curve_orders = NULL;
+				m_trim_curve_first_knots = NULL;
+				m_trim_curve_selection = NULL;
+				m_trim_curve_points = NULL;
+				m_trim_curve_point_weights = NULL;
+				m_trim_curve_knots = NULL;
+			}
 			m_mesh_points = k3d::make_unique(m_instance->points);
 			m_point_selections = k3d::make_unique(m_instance->point_selection);
 
@@ -57,6 +75,12 @@ namespace module
 			{
 
 				nurbs_curve result;
+
+                if(u >= m_patch_u_point_counts->at(patch))
+				{
+				    k3d::log() << error << nurbs_debug << "Cannot extract " << u << "th curve" << std::endl;
+                    return nurbs_curve();
+				}
 
 				const size_t points_begin = m_patch_first_points->at(patch) + u;
 				const size_t point_step =  m_patch_u_point_counts->at(patch);
@@ -97,7 +121,13 @@ namespace module
 			{
 				nurbs_curve result;
 
-				const size_t points_begin = m_patch_first_points->at(patch) + v * m_patch_v_point_counts->at(patch);
+				if(v >= m_patch_v_point_counts->at(patch))
+				{
+				    k3d::log() << error << nurbs_debug << "Cannot extract " << v << "th curve" << std::endl;
+                    return nurbs_curve();
+				}
+
+				const size_t points_begin = m_patch_first_points->at(patch) + v * m_patch_u_point_counts->at(patch);
 				const size_t point_step = 1;
 				const size_t points_end = points_begin + m_patch_u_point_counts->at(patch);
 
@@ -107,11 +137,13 @@ namespace module
 
 				for (int i = knots_begin; i < knots_begin + knot_count_u; i++)
 				{
+				    MY_DEBUG << "adding knot " << i << std::endl;
 					result.curve_knots.push_back(m_patch_u_knots->at(i));
 				}
 
 				for (int i = points_begin; i < points_end; i += point_step)
 				{
+				    MY_DEBUG << "adding point " << i << " of " << m_patch_points->size() << std::endl;
 					result.control_points.push_back(m_mesh_points->at( m_patch_points->at(i) ));
 					result.curve_point_weights.push_back( m_patch_point_weights->at(i) );
 				}
@@ -120,7 +152,7 @@ namespace module
 			}
 			catch (std::exception& e)
 			{
-				k3d::log() << error << nurbs_debug << "Error in Extract U Curve: " << e.what() << std::endl;
+				k3d::log() << error << nurbs_debug << "Error in Extract U Curve: " << e.what() << " with patch = " << patch << " v = " << v << std::endl;
 				return nurbs_curve();
 			}
 			catch (...)
@@ -205,21 +237,21 @@ namespace module
 		{
 			try
 			{
-				MY_DEBUG << "Inserting points" << std::endl;
+				//MY_DEBUG << "Inserting points" << std::endl;
 				int found = -1;
 
 				for (int j = 0; j < m_mesh_points->size(); j++)
 				{
 					if (nurbs_curve_modifier::point3_float_equal(m_mesh_points->at(j), point, 0.000001))
 					{
-						MY_DEBUG << "Found point" << std::endl;
+						//MY_DEBUG << "Found point" << std::endl;
 						found = j;
 					}
 				}
 
 				if (found < 0 || !shared)
 				{
-					MY_DEBUG << "Need to add the point to mesh" << std::endl;
+					//MY_DEBUG << "Need to add the point to mesh" << std::endl;
 					//we need to insert the point
 					m_mesh_points->push_back(point);
 					m_point_selections->push_back(0.0);
@@ -265,7 +297,7 @@ namespace module
 				}
 
 				const int point_count = m_patch_u_point_counts->at(patch) * m_patch_v_point_counts->at(patch);
-				const int point_offset = point_count - new_points.size();
+				const int point_offset = new_points.size() - point_count;
 				//insert points
 				k3d::mesh::indices_t::iterator points_begin = m_patch_points->begin() + m_patch_first_points->at(patch);
 				k3d::mesh::indices_t::iterator points_end = m_patch_points->begin() + m_patch_first_points->at(patch) + point_count;
@@ -312,7 +344,7 @@ namespace module
 			}
 			catch (...)
 			{
-				k3d::log() << error << nurbs_debug << "Error in Patch_v_knot_insertion" << std::endl;
+				k3d::log() << error << nurbs_debug << "Error in Patch_u_knot_insertion" << std::endl;
 			}
 		}
 
@@ -347,7 +379,7 @@ namespace module
 				}
 
 				const int point_count = m_patch_u_point_counts->at(patch) * m_patch_v_point_counts->at(patch);
-				const int point_offset = point_count - new_points.size();
+				const int point_offset = new_points.size() - point_count;
 				//insert points
 				k3d::mesh::indices_t::iterator points_begin = m_patch_points->begin() + m_patch_first_points->at(patch);
 				k3d::mesh::indices_t::iterator points_end = m_patch_points->begin() + m_patch_first_points->at(patch) + point_count;
@@ -394,6 +426,174 @@ namespace module
 			catch (...)
 			{
 				k3d::log() << error << nurbs_debug << "Error in Patch_v_knot_insertion" << std::endl;
+			}
+		}
+
+		void nurbs_patch_modifier::patch_u_degree_elevation(size_t patch, size_t degree)
+		{
+			try
+			{
+				std::vector<nurbs_curve> curves;
+				k3d::mesh::indices_t new_points;
+				k3d::mesh::weights_t new_weights;
+
+				for (int i = 0; i < m_patch_v_point_counts->at(patch); i++)
+				{
+					nurbs_curve c = extract_u_curve(patch, i);
+					k3d::mesh temp;
+					nurbs_curve_modifier mod(temp);
+					mod.add_curve(c, false);
+					mod.normalize_knot_vector(0);
+					for(int i = 0; i < degree; i++)
+					{
+                        mod.curve_degree_elevate(0);
+					}
+					curves.push_back(mod.extract_curve(0));
+
+					for (int j = 0; j < curves.back().control_points.size(); j++)
+					{
+						new_points.push_back(insert_point(curves.back().control_points.at(j), true));
+						new_weights.push_back(curves.back().curve_point_weights.at(j));
+					}
+				}
+
+                MY_DEBUG << "Adding new curves to patch" << std::endl;
+
+				const int point_count = m_patch_u_point_counts->at(patch) * m_patch_v_point_counts->at(patch);
+				const int point_offset = new_points.size() - point_count;
+				//insert points
+				k3d::mesh::indices_t::iterator points_begin = m_patch_points->begin() + m_patch_first_points->at(patch);
+				k3d::mesh::indices_t::iterator points_end = m_patch_points->begin() + m_patch_first_points->at(patch) + point_count;
+				m_patch_points->erase(points_begin, points_end);
+
+				points_begin = m_patch_points->begin() + m_patch_first_points->at(patch);
+
+				m_patch_points->insert(points_begin, new_points.begin(), new_points.end());
+
+				//insert weights
+				k3d::mesh::weights_t::iterator weights_begin = m_patch_point_weights->begin() + m_patch_first_points->at(patch);
+				k3d::mesh::weights_t::iterator weights_end = m_patch_point_weights->begin() + m_patch_first_points->at(patch) + point_count;
+				m_patch_point_weights->erase(weights_begin, weights_end);
+
+				weights_begin = m_patch_point_weights->begin() + m_patch_first_points->at(patch);
+
+				m_patch_point_weights->insert(weights_begin, new_weights.begin(), new_weights.end());
+
+				//offset all first_points which start behind this one
+				for (int i = 0; i < m_patch_first_points->size(); i++)
+				{
+					if (m_patch_first_points->at(i) > m_patch_first_points->at(patch))
+						m_patch_first_points->at(i) += point_offset;
+				}
+
+				//add the new knot vector
+				const int knot_count = m_patch_u_point_counts->at(patch) + m_patch_u_orders->at(patch);
+				const int knot_offset = curves.back().curve_knots.size() - knot_count;
+
+				k3d::mesh::knots_t::iterator knots_begin = m_patch_u_knots->begin() + m_patch_u_first_knots->at(patch);
+				k3d::mesh::knots_t::iterator knots_end = m_patch_u_knots->begin() + m_patch_u_first_knots->at(patch) + knot_count;
+				m_patch_u_knots->erase(knots_begin, knots_end);
+
+				knots_begin = m_patch_u_knots->begin() + m_patch_u_first_knots->at(patch);
+				m_patch_u_knots->insert(knots_begin, curves.back().curve_knots.begin(), curves.back().curve_knots.end());
+
+                m_patch_u_orders->at(patch) += degree;
+                m_patch_u_point_counts->at(patch) = curves.back().curve_knots.size() - m_patch_u_orders->at(patch);
+
+				for (int i = 0; i < m_patch_u_first_knots->size(); i++)
+				{
+					if (m_patch_u_first_knots->at(i) > m_patch_u_first_knots->at(patch))
+						m_patch_u_first_knots->at(i) += knot_offset;
+				}
+				MY_DEBUG << "Finished modifying patch" << std::endl;
+			}
+			catch (...)
+			{
+				k3d::log() << error << nurbs_debug << "Error in Patch_u_degree_elevation" << std::endl;
+			}
+		}
+
+		void nurbs_patch_modifier::patch_v_degree_elevation(size_t patch, size_t degree)
+		{
+			try
+			{
+				std::vector<nurbs_curve> curves;
+				k3d::mesh::indices_t new_points;
+				k3d::mesh::weights_t new_weights;
+
+				for (int i = 0; i < m_patch_u_point_counts->at(patch); i++)
+				{
+					nurbs_curve c = extract_v_curve(patch, i);
+					k3d::mesh temp;
+					nurbs_curve_modifier mod(temp);
+					mod.add_curve(c, false);
+					mod.normalize_knot_vector(0);
+					for(int i = 0; i < degree; i++)
+					{
+                        mod.curve_degree_elevate(0);
+					}
+					curves.push_back(mod.extract_curve(0));
+				}
+
+                for (int j = 0; j < curves.back().control_points.size(); j++)
+				{
+				    for (int i = 0; i < curves.size(); i++)
+                    {
+                        new_points.push_back(insert_point(curves.at(i).control_points.at(j), true));
+                        new_weights.push_back(curves.at(i).curve_point_weights.at(j));
+                    }
+				}
+
+				const int point_count = m_patch_u_point_counts->at(patch) * m_patch_v_point_counts->at(patch);
+				const int point_offset = new_points.size() - point_count;
+				//insert points
+				k3d::mesh::indices_t::iterator points_begin = m_patch_points->begin() + m_patch_first_points->at(patch);
+				k3d::mesh::indices_t::iterator points_end = m_patch_points->begin() + m_patch_first_points->at(patch) + point_count;
+				m_patch_points->erase(points_begin, points_end);
+
+				points_begin = m_patch_points->begin() + m_patch_first_points->at(patch);
+
+				m_patch_points->insert(points_begin, new_points.begin(), new_points.end());
+				//insert weights
+				k3d::mesh::weights_t::iterator weights_begin = m_patch_point_weights->begin() + m_patch_first_points->at(patch);
+				k3d::mesh::weights_t::iterator weights_end = m_patch_point_weights->begin() + m_patch_first_points->at(patch) + point_count;
+				m_patch_point_weights->erase(weights_begin, weights_end);
+
+				weights_begin = m_patch_point_weights->begin() + m_patch_first_points->at(patch);
+
+				m_patch_point_weights->insert(weights_begin, new_weights.begin(), new_weights.end());
+
+				//offset all first_points which start behind this one
+				for (int i = 0; i < m_patch_first_points->size(); i++)
+				{
+					if (m_patch_first_points->at(i) > m_patch_first_points->at(patch))
+						m_patch_first_points->at(i) += point_offset;
+				}
+
+				//add the new knot vector
+				const int knot_count = m_patch_v_point_counts->at(patch) + m_patch_v_orders->at(patch);
+				const int knot_offset = curves.back().curve_knots.size() - knot_count;
+
+				k3d::mesh::knots_t::iterator knots_begin = m_patch_v_knots->begin() + m_patch_v_first_knots->at(patch);
+				k3d::mesh::knots_t::iterator knots_end = m_patch_v_knots->begin() + m_patch_v_first_knots->at(patch) + knot_count;
+				m_patch_v_knots->erase(knots_begin, knots_end);
+
+				knots_begin = m_patch_v_knots->begin() + m_patch_v_first_knots->at(patch);
+				m_patch_v_knots->insert(knots_begin, curves.back().curve_knots.begin(), curves.back().curve_knots.end());
+
+                m_patch_v_orders->at(patch) += degree;
+                m_patch_v_point_counts->at(patch) = curves.back().curve_knots.size() - m_patch_v_orders->at(patch);
+
+
+				for (int i = 0; i < m_patch_v_first_knots->size(); i++)
+				{
+					if (m_patch_v_first_knots->at(i) > m_patch_v_first_knots->at(patch))
+						m_patch_v_first_knots->at(i) += knot_offset;
+				}
+			}
+			catch (...)
+			{
+				k3d::log() << error << nurbs_debug << "Error in Patch_v_degree_elevation" << std::endl;
 			}
 		}
 

@@ -106,6 +106,16 @@ namespace module
 				///\param multiplicity How often we want to insert that knot
 				void patch_v_knot_insertion(size_t patch, double v, size_t multiplicity);
 
+				///DegreeElevates all u-curves to the given amount
+				///\param patch The patch to degree elevate
+				///\param degree If the patch had u-degree 2 and you specify 2 here, it'll get a new degree of 4
+				void patch_u_degree_elevation(size_t patch, size_t degree);
+
+				///DegreeElevates all v-curves to the given amount
+				///\param patch The patch to degree elevate
+				///\param degree If the patch had u-degree 2 and you specify 2 here, it'll get a new degree of 4
+				void patch_v_degree_elevation(size_t patch, size_t degree);
+
                 ///Returns the index of the selected patch
                 int get_selected_patch();
 
