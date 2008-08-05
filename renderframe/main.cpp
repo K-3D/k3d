@@ -144,6 +144,56 @@ bool exec_command(const element& XMLCommand, const k3d::filesystem::path& FrameD
 		}
 	}
 
+#ifdef K3D_API_WIN32
+  STARTUPINFO si;
+  PROCESS_INFORMATION pi;
+
+  ZeroMemory( &si, sizeof(si) );
+  si.cb = sizeof(si);
+  ZeroMemory( &pi, sizeof(pi) );
+  
+  k3d::string_t command_line;
+  for(std::vector<k3d::string_t>::const_iterator argument = arguments.begin(); argument != arguments.end(); ++argument)
+  	command_line += *argument + " ";
+  
+  k3d::log() << debug << "Executing " << command_line << std::endl;
+  
+  std::vector<char> env;
+  for(std::vector<k3d::string_t>::const_iterator el = environment.begin(); el != environment.end(); ++el)
+  {
+  	for(k3d::uint_t i = 0; i != el->size(); ++i)
+  		env.push_back(el->at(i));
+  	env.push_back('\0');
+  }
+  env.push_back('\0');
+  
+  // Start the child process. 
+  if( !CreateProcess( NULL,   // No module name (use command line)
+  		const_cast<char*>(command_line.c_str()),        // Command line
+      NULL,           // Process handle not inheritable
+      NULL,           // Thread handle not inheritable
+      FALSE,          // Set handle inheritance to FALSE
+      CREATE_NO_WINDOW,              // Don't create a DOS window
+      &env[0],
+      const_cast<char*>(working_directory.c_str()),            
+      &si,            // Pointer to STARTUPINFO structure
+      &pi )           // Pointer to PROCESS_INFORMATION structure
+  ) 
+  {
+      k3d::log() << error << "CreateProcess failed " << GetLastError() << std::endl;
+      return false;
+  }
+
+  // Wait until child process exits.
+  WaitForSingleObject( pi.hProcess, INFINITE );
+
+  // Close process and thread handles. 
+  CloseHandle( pi.hProcess );
+  CloseHandle( pi.hThread );
+  
+  return true;
+#else
+	
 	try
 	{
 		k3d::log() << info;
@@ -171,6 +221,7 @@ bool exec_command(const element& XMLCommand, const k3d::filesystem::path& FrameD
 	}
 
 	return false;
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
