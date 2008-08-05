@@ -918,7 +918,7 @@ namespace module
 				const size_t curve_knots_begin = curve_first_knots->at(curve);
 				const size_t curve_knots_end = curve_knots_begin + (curve_point_end - curve_point_begin) + curve_orders->at(curve);
 
-				int n = curve_knots_end - curve_knots_begin - 1 - order;
+				int n = curve_knots_end - curve_knots_begin - order;
 
 				if (u == curve_knots->at(n + 1)) return n;
 
@@ -992,7 +992,6 @@ namespace module
         k3d::point4 nurbs_curve_modifier::curve_point(size_t curve, double u)
         {
             if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Evaluating point on curve " << curve << " with knot " << u << std::endl;
-
 
             size_t order = curve_orders->at(curve);
             size_t nr_points = curve_point_counts->at(curve);
@@ -1712,7 +1711,11 @@ namespace module
 
 				if (curve_point_index < 0)
 				{
-					k3d::log() << error << "Curve does not contain this point" << std::endl;
+					k3d::log() << error << nurbs_debug << "Curve does not contain this point" << std::endl << "Points are: " << std::endl;
+					for ( size_t point = curve_points_begin; point < curve_points_end; point++)
+                    {
+                        k3d::log() << error << nurbs_debug << output_point(mesh_points->at(curve_points->at(point))) << std::endl;
+                    }
 					return;
 				}
 				MY_DEBUG  << "Found in curve at index: " << curve_point_index << std::endl;

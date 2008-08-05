@@ -60,7 +60,7 @@ namespace module
 
 				const size_t points_begin = m_patch_first_points->at(patch) + u;
 				const size_t point_step =  m_patch_u_point_counts->at(patch);
-				const size_t points_end = points_begin + m_patch_v_point_counts->at(patch);
+				const size_t points_end = points_begin + (m_patch_v_point_counts->at(patch) - 1) * point_step + 1;
 
 				const size_t knot_count_v = m_patch_v_point_counts->at(patch) + m_patch_v_orders->at(patch);
 
@@ -81,12 +81,12 @@ namespace module
 			}
 			catch (std::exception& e)
 			{
-				MY_DEBUG << "Error in Extract V Curve: " << e.what() << std::endl;
+				k3d::log() << error << nurbs_debug << "Error in Extract V Curve: " << e.what() << std::endl;
 				return nurbs_curve();
 			}
 			catch (...)
 			{
-				MY_DEBUG << "Error in Extract V Curve" << std::endl;
+				k3d::log() << error << nurbs_debug << "Error in Extract V Curve" << std::endl;
 				return nurbs_curve();
 			}
 		}
@@ -120,12 +120,12 @@ namespace module
 			}
 			catch (std::exception& e)
 			{
-				MY_DEBUG << "Error in Extract U Curve: " << e.what() << std::endl;
+				k3d::log() << error << nurbs_debug << "Error in Extract U Curve: " << e.what() << std::endl;
 				return nurbs_curve();
 			}
 			catch (...)
 			{
-				MY_DEBUG << "Error in Extract U Curve" << std::endl;
+				k3d::log() << error << nurbs_debug << "Error in Extract U Curve" << std::endl;
 				return nurbs_curve();
 			}
 		}
@@ -302,7 +302,7 @@ namespace module
 				knots_begin = m_patch_u_knots->begin() + m_patch_u_first_knots->at(patch);
 				m_patch_u_knots->insert(knots_begin, curves.back().curve_knots.begin(), curves.back().curve_knots.end());
 
-                m_patch_u_point_counts->at(patch)++;
+                m_patch_u_point_counts->at(patch) += knot_offset;//we're inserting the same number of points and knots
 
 				for (int i = 0; i < m_patch_u_first_knots->size(); i++)
 				{
@@ -383,7 +383,7 @@ namespace module
 				knots_begin = m_patch_v_knots->begin() + m_patch_v_first_knots->at(patch);
 				m_patch_v_knots->insert(knots_begin, curves.back().curve_knots.begin(), curves.back().curve_knots.end());
 
-                m_patch_v_point_counts->at(patch)++;
+                m_patch_v_point_counts->at(patch) += knot_offset;//we're inserting the same number of points and knots
 
 				for (int i = 0; i < m_patch_v_first_knots->size(); i++)
 				{
