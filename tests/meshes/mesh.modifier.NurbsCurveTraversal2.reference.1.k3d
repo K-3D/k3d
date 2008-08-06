@@ -14,7 +14,7 @@
 			<curve_selection>1 1</curve_selection>
 			<curve_points>0 1 2 3 4 5 6 7 8 9 10 11 12 13</curve_points>
 			<curve_point_weights>1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 1 1 1 1 1</curve_point_weights>
-			<curve_knots>0 0 0 1 1 2 2 3 3 4 4 4 0 0 0 1 2 3 3 3</curve_knots>
+			<curve_knots>0 0 0 0.25 0.25 0.5 0.5 0.75 0.75 1 1 1 0 0 0 1 2 3 3 3</curve_knots>
 		</nurbs_curve_groups>
 		<nurbs_patches>
 			<patch_first_points>0 45 55</patch_first_points>
@@ -30,21 +30,6 @@
 			<patch_point_weights>1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 1 1 0.70710678118474324 0.70710678118474324 1 1 0.70710678118474324 0.70710678118474324 1 1 1 1 0.70710678118474324 0.70710678118474324 1 1 0.70710678118474324 0.70710678118474324 1 1</patch_point_weights>
 			<patch_u_knots>0 0 0 1 1 2 2 3 3 4 4 4 0 0 1 1 0 0 1 1</patch_u_knots>
 			<patch_v_knots>0 0 0 1 2 3 3 3 0 0 0 0.5 0.5 1 1 1 0 0 0 0.5 0.5 1 1 1</patch_v_knots>
-			<patch_trim_curve_loop_counts>0 0 0</patch_trim_curve_loop_counts>
-			<patch_first_trim_curve_loops>0 0 0</patch_first_trim_curve_loops>
-			<trim_points/>
-			<trim_point_selection/>
-			<first_trim_curves/>
-			<trim_curve_counts/>
-			<trim_curve_loop_selection/>
-			<trim_curve_first_points/>
-			<trim_curve_point_counts/>
-			<trim_curve_orders/>
-			<trim_curve_first_knots/>
-			<trim_curve_selection/>
-			<trim_curve_points/>
-			<trim_curve_point_weights/>
-			<trim_curve_knots/>
 		</nurbs_patches>
 	</mesh_arrays>
 </k3dml>
