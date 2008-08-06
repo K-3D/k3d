@@ -109,6 +109,7 @@ public:
 			return;
 		}				
 		
+		OutputPoints = InputPoints;
 		//Evaluate functions on each point.
 		k3d::point3 output_point(0,0,0);
 		const k3d::uint_t point_begin = 0;
