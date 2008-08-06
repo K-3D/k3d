@@ -205,6 +205,12 @@ namespace module{
                 ///\param create_caps Whether or not to create caps at the ends - only if one of the curves is a loop
                 void sweep_surface(size_t curve1, size_t curve2, size_t segments, bool create_caps);
 
+                ///Creates a linear_curve_groups representation of the given curve and deletes the original curve if thats selected
+                ///\param curve The curve we're going to poligonize
+                ///\param segments How many segments the new curve representation shall have
+                ///\param delete_curve Whether or not to delete the original NURBS curve
+                void polygonize_curve(size_t curve, size_t segments, bool delete_curve);
+
             private:
 
                 ///Returns the span in which the knot value u lies

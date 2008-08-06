@@ -907,7 +907,6 @@ namespace module
 		int nurbs_curve_modifier::find_span(size_t curve, double u)
 		{
 			try{
-				if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "FindSpan of " << u << " in curve " << curve << std::endl;
 
 				size_t order = curve_orders->at(curve);
 				size_t nr_points = curve_point_counts->at(curve);
@@ -920,7 +919,9 @@ namespace module
 
 				int n = curve_knots_end - curve_knots_begin - order;
 
-				if (u == curve_knots->at(n + 1)) return n - 1;
+				if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "FindSpan of " << u << " in curve " << curve << " with n=" << n << std::endl;
+
+				if (u >= curve_knots->at(curve_knots_begin + n + 1)) return n - 1;
 
 				int low = order - 1;
 				int high = n + 1;
@@ -1013,6 +1014,10 @@ namespace module
                     MY_DEBUG << "loading point(size = " << curve_points->size() << "): " << curve_points_begin + span - order + 1 + i << std::endl;
                     k3d::point3 p = mesh_points->at(curve_points->at(curve_points_begin + span - order + 1 + i));
                     double w = curve_point_weights->at(curve_points_begin + span - order + 1 + i);
+                    if(w==0.0)
+                    {
+                        k3d::log() << error << "A point had weight zero" << std::endl;
+                    }
                     cv = cv + bases.at(i)*k3d::point4(p[0]*w,p[1]*w,p[2]*w, w);
                 }
                 return cv;
@@ -2605,6 +2610,82 @@ namespace module
 			MY_DEBUG << "Calculated normalized Tangent: " << output_point(tangent) << std::endl;
 
 			return tangent;
+		}
+
+		void nurbs_curve_modifier::polygonize_curve(size_t curve, size_t segments, bool del_curve)
+		{
+            try
+            {
+                MY_DEBUG << "Polygonize_curve" << std::endl;
+                if (m_instance->linear_curve_groups == NULL)
+                {
+                    m_instance->linear_curve_groups = boost::shared_ptr<k3d::mesh::linear_curve_groups_t>( new k3d::mesh::linear_curve_groups_t() );
+                }
+
+                k3d::mesh::linear_curve_groups_t* linear_curve_groups = k3d::make_unique(m_instance->linear_curve_groups);
+
+                k3d::mesh::indices_t* linear_curve_points = k3d::make_unique(linear_curve_groups->curve_points);
+                k3d::mesh::counts_t* linear_curve_point_counts = k3d::make_unique(linear_curve_groups->curve_point_counts);
+
+                k3d::mesh::indices_t* linear_curve_first_points = k3d::make_unique(linear_curve_groups->curve_first_points);
+                k3d::mesh::counts_t* linear_curve_counts = k3d::make_unique(linear_curve_groups->curve_counts);
+                k3d::mesh::indices_t* linear_first_curves = k3d::make_unique(linear_curve_groups->first_curves);
+                k3d::mesh::bools_t* linear_periodic_curves = k3d::make_unique(linear_curve_groups->periodic_curves);
+
+                k3d::mesh::selection_t* linear_curve_selection = k3d::make_unique(linear_curve_groups->curve_selection);
+                k3d::mesh::materials_t* linear_materials = k3d::make_unique(linear_curve_groups->materials);
+
+                assert_warning(k3d::validate_linear_curve_groups(*m_instance));
+
+                if(linear_first_curves->size() == 0)
+                {
+                    linear_first_curves->push_back(0);
+                    linear_curve_counts->push_back(1);
+                    linear_curve_first_points->push_back(0);
+                }
+                else
+                {
+                    linear_curve_counts->at(linear_curve_counts->size() - 1)++;
+                    linear_curve_first_points->push_back(linear_curve_points->size());
+                }
+
+                linear_periodic_curves->push_back(false);
+                linear_curve_selection->push_back(0.0);
+                linear_materials->push_back(materials->at(get_curve_group(curve)));
+
+                normalize_knot_vector(curve);
+
+                linear_curve_point_counts->push_back(segments + 1);
+
+                double step = 1.0 / segments;
+
+                for(int i = 0; i <= segments; i++)
+                {
+                    k3d::point4 ph = curve_point(curve, i * step);
+                    if(ph[3] == 0.0)
+                    {
+                        k3d::log() << error << nurbs_debug << "Point weight equals zero" << std::endl;
+                    }
+                    k3d::point3 p(ph[0] / ph[3], ph[1] / ph[3], ph[2] / ph[3]);
+                    MY_DEBUG << "Adding point " << p << " as segment " << i << " to the linear curve" << std::endl;
+
+                    linear_curve_points->push_back(insert_point(p,false));
+                }
+
+                if(del_curve)
+                {
+                    delete_curve(curve);
+                    remove_unused_points();
+                }
+            }
+            catch (std::exception& e)
+			{
+				k3d::log() << error << nurbs_debug << "Error in Polygonize_curve: " << e.what() << std::endl;
+			}
+            catch(...)
+            {
+                k3d::log() << error << nurbs_debug << "Error in polygonize_curve" << std::endl;
+            }
 		}
 
 	}//nurbs
