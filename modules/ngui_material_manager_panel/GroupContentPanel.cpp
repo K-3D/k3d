@@ -331,7 +331,7 @@ void GroupContentPanel::renderPreview()
 
           //If It Is, Assign To Current Geometry As A Surface Shader
           k3d::property
-            ::set_internal_value(*m_geometry, 
+            ::set_internal_value(*selected_geo, 
                                  "material", 
                                  const_cast<k3d::inode*>((*mat_iter)->docNode()));
 
