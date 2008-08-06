@@ -20,10 +20,27 @@
 // ---------------------
 //
 
-#ifndef PREVIEWCUBE_H
-#define PREVIEWCUBE_H
+#ifndef DOCUMENTUTILITIES_H
+#define DOCUMENTUTILITIES_H
 
-#include "PreviewObj.h"
+#include <k3dsdk/types.h>
+#include <k3dsdk/icommand_node.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/metadata.h>
+#include <k3dsdk/nodes.h>
+#include <k3dsdk/irender_camera_frame.h>
+#include <k3dsdk/irender_engine_ri.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/system.h>
+#include <k3dsdk/icamera.h>
+#include <k3dsdk/ilight_ri.h>
+#include <k3dsdk/ilight_shader_ri.h>
+#include <k3dsdk/transform.h>
+#include <k3dsdk/share.h>
+#include <k3dsdk/itransform_sink.h>
+
+using namespace libk3dngui;
 
 namespace module
 {
@@ -34,31 +51,15 @@ namespace material_manager
 namespace mechanics
 {
 
-using namespace libk3dngui;
-
-class PreviewCube : public PreviewObj
-{
- public:
-  
-  PreviewCube(k3d::string_t _combo_value, document_state *_document_state)
-    :PreviewObj(_combo_value, _document_state)
-    {
-    }
-
-  virtual ~PreviewCube()
-    {
-    }
-
- public:
-
-  //Initialization Of Object Contents Beyond Initial Values
-  void init(k3d::string_t _node_name, k3d::string_t _meta_nametag);
-
-  //Create The Default Preview Object For Material Preview (Preview Core::...)
-  void defaultInit();
 
 
-};//PreviewCube
+//Analyse Doc For Specific Embedded Meta Data In Nodes
+bool checkDocForMeta(const k3d::string_t meta_tag, 
+                     const k3d::string_t meta_data, 
+                     k3d::inode **node_ptr, document_state *_document_state);
+
+
+
 
 
 }//namespace mechanics
@@ -68,6 +69,5 @@ class PreviewCube : public PreviewObj
 }//namespace ngui
 
 }//namespace module
-
 
 #endif

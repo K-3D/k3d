@@ -287,6 +287,8 @@ void GroupContentPanel::buildPanel()
       //Gtk Build / Show GUI Hint
       m_hpane->show_all(); 
 
+      matobjAttachGeo();
+
       //Set Off Renderer In New Process 
       renderPreview();
     }
@@ -300,6 +302,7 @@ void GroupContentPanel::renderPreview()
 {
   //Invoke Generic Render Initialization
   renderInit();
+
  
   //Iterate Through Each Material In Group & Render
 
@@ -310,6 +313,22 @@ void GroupContentPanel::renderPreview()
       //Check If Selected Node Is A RenderMan Material
       if((*mat_iter)->isMaterial())
         {
+          //Select Correct Geometry
+          k3d::inode *selected_geo = (*mat_iter)->m_preview_geo;
+
+          // k3d::property::set_internal_value(*m_engine, 
+//                                             "visible_nodes", 
+//                                             k3d::inode_collection_property
+//                                             ::nodes_t(1, m_geometry));
+
+          
+          k3d::property::set_internal_value(*m_engine, 
+                                            "visible_nodes", 
+                                            k3d::inode_collection_property
+                                            ::nodes_t(1, selected_geo));
+
+
+
           //If It Is, Assign To Current Geometry As A Surface Shader
           k3d::property
             ::set_internal_value(*m_geometry, 
@@ -372,6 +391,13 @@ void GroupContentPanel::renderSinglePreview(k3d::inode *node)
      {
        //Invoke Generic Render Initialization
        renderInit();
+
+
+       k3d::property::set_internal_value(*m_engine, 
+                                         "visible_nodes", 
+                                         k3d::inode_collection_property
+                                         ::nodes_t(1, m_geometry));
+
 
        //Check If Selected Node Is A RenderMan Material
        if(matching_material->isMaterial())
@@ -441,6 +467,147 @@ bool GroupContentPanel::findMaterial(const MaterialObj *mat)
   return false;
 }
 
+
+
+
+void GroupContentPanel::matobjAttachGeo()
+{
+  //Iterate Through All Of The Stored MaterialObj's.
+  std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
+
+  for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+    {
+      //Get The Doc Node From MaterialObj Ptr
+      k3d::inode *mat_node = (*mat_iter)->m_doc_node;
+
+      //Geometry Flags For Combo Update
+      bool sphereUsed = false;
+      bool cubeUsed = false;
+      bool torusUsed = false;
+
+      //Search m_doc_node Material For Attached Geometry
+      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(mat_node))
+        {
+          k3d::string_t value = metadata->get_metadata()[MaterialObj::attached_geo_nametag_mt];
+
+          k3d::inode *attached_geo = 0; //Geometry Is Already Availible
+          PreviewObj *attached_new_geo = 0; //Geometery Is New & Needs To Be Created
+
+          k3d::string_t meta_attachedgeo = "";
+
+          k3d::log() << "VALUE: " << value << std::endl;
+          
+          //Check If Sphere Attached
+          if(value == PreviewObj::sphere_md)
+            {
+              //Check If Doesnt Exist In Document
+              if(!checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::sphere_md, &attached_geo, m_document_state))
+                {
+                  //Create The Default Sphere For Preview
+                  attached_new_geo = new PreviewSphere("Sphere", m_document_state);
+                  attached_new_geo->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
+                }
+
+              meta_attachedgeo = PreviewObj::sphere_md;
+              sphereUsed = true;
+            }
+
+          //Check If Cube Attached
+          else if(value == PreviewObj::cube_md)
+            {
+              //Check If Doesnt Exist In Document
+              if(!checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::cube_md, &attached_geo, m_document_state))
+                {
+                  //Create The Default Cube For Preview
+                  attached_new_geo = new PreviewCube("Cube", m_document_state);
+                  attached_new_geo->init(PreviewObj::cube_node_name, PreviewObj::cube_md);
+                }
+
+              meta_attachedgeo = PreviewObj::cube_md;
+              cubeUsed = true;
+
+            }
+
+          //Check If Torus Attached
+          else if(value == PreviewObj::torus_md)
+            {
+              //Check If Doesnt Exist In Document
+              if(!checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::torus_md, &attached_geo, m_document_state))
+                {
+
+                  k3d::log() << "TORUS NEW BUILT!" << std::endl;
+                  //Create The Default Torus For Preview
+                  attached_new_geo = new PreviewTorus("torus", m_document_state);
+                  attached_new_geo->init(PreviewObj::torus_node_name, PreviewObj::torus_md);
+                }
+
+              meta_attachedgeo = PreviewObj::torus_md;
+              torusUsed = true;
+            }
+
+          else
+            {
+              //No Meta Data. Possibly Create & Attach Default Sphere
+              //k3d::inode *existing_sphere = 0;
+              if(!checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::sphere_md, &attached_geo, m_document_state))
+                {
+                  attached_new_geo =  new PreviewSphere("Sphere", m_document_state);
+                  attached_new_geo->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
+
+                  (*mat_iter)->setPreviewGeo(attached_new_geo->m_doc_node, PreviewObj::sphere_md);
+
+                  k3d::log() << "no meta, sphere node created: " << attached_new_geo->m_doc_node << std::endl;
+
+                }
+              else
+                {
+                  //Default Sphere Exists In Document
+                  if(attached_geo)
+                    {
+                      (*mat_iter)->setPreviewGeo(attached_geo, PreviewObj::sphere_md);
+                      k3d::log() << "no meta, sphere node Not created: " << attached_geo << std::endl;
+                    }
+
+                }
+
+
+              meta_attachedgeo = PreviewObj::sphere_md;
+              sphereUsed = true;
+
+
+            }
+
+
+          //Attach The Geometry To The MaterialObj**********************************
+
+          if(attached_geo)
+            {
+              (*mat_iter)->setPreviewGeo(attached_geo, meta_attachedgeo);
+              k3d::log() << "attached geo: " << (*mat_iter)->m_preview_geo << std::endl;
+            }
+
+          else if(attached_new_geo)
+            {
+              (*mat_iter)->setPreviewGeo(attached_new_geo->m_doc_node, meta_attachedgeo);
+              m_used_geometry.push_back(attached_new_geo);
+              k3d::log() << "attached new geo: " << (*mat_iter)->m_preview_geo << std::endl;
+            }
+
+
+          //************************************************************************
+
+              k3d::log() << "OI HERE BABY!" << std::endl;
+
+        }//if
+      
+
+     
+
+
+    }//for
+
+
+}
 
 
 }//namespace mechanics

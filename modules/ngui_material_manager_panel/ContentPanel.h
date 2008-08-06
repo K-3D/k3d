@@ -48,6 +48,8 @@
 #include "PreviewSphere.h"
 #include "PreviewCube.h"
 
+#include "DocumentUtilities.h"
+
 using namespace libk3dngui;
 
 namespace module
@@ -109,9 +111,9 @@ class ContentPanel
     void createPreviewNodes();
 
     //Analyse Doc For Embedded Meta Data In Nodes
-    bool checkDocForMeta(const k3d::string_t meta_tag, 
-                         const k3d::string_t meta_data, 
-                         k3d::inode **node_ptr);
+    /* bool checkDocForMeta(const k3d::string_t meta_tag,  */
+/*                          const k3d::string_t meta_data,  */
+/*                          k3d::inode **node_ptr); */
 
     //Abstract Functions To Be Used By Group & Profile Derivatives
     virtual void renderPreview() 				  				= 0;
@@ -121,6 +123,9 @@ class ContentPanel
 
     //Initialization Of Object Contents Beyond Initial Values
     virtual void init()												= 0;
+
+    //Attach Geometry To MaterialObj
+    virtual void matobjAttachGeo()								= 0;
 
     //Generic Render Initialization
     void renderInit();

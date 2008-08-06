@@ -20,10 +20,9 @@
 // ---------------------
 //
 
-#ifndef PREVIEWCUBE_H
-#define PREVIEWCUBE_H
+#include "DocumentUtilities.h"
 
-#include "PreviewObj.h"
+using namespace libk3dngui;
 
 namespace module
 {
@@ -34,31 +33,36 @@ namespace material_manager
 namespace mechanics
 {
 
-using namespace libk3dngui;
 
-class PreviewCube : public PreviewObj
+bool checkDocForMeta(const k3d::string_t meta_tag, 
+                     const k3d::string_t meta_data, 
+                     k3d::inode **node_ptr, document_state *_document_state)
+
 {
- public:
-  
-  PreviewCube(k3d::string_t _combo_value, document_state *_document_state)
-    :PreviewObj(_combo_value, _document_state)
+  //Iterate Through Document. If A Node Has Meta Data & Matches, Pass To node_ptr
+  k3d::inode_collection::nodes_t::const_iterator node 
+    = _document_state->document().nodes().collection().begin();
+
+  for(; node != _document_state->document().nodes().collection().end(); ++node)
     {
-    }
+      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(*node))
+        {
+          k3d::string_t value = metadata->get_metadata()[meta_tag];
+          
+          if(value == meta_data)
+            {
+              //There Is A Match!
+              *node_ptr = *node;
+              return true;
+            }
+        }//if
+    }//for
 
-  virtual ~PreviewCube()
-    {
-    }
+  //No Match Found
+  node_ptr = 0;
+  return false;
+}
 
- public:
-
-  //Initialization Of Object Contents Beyond Initial Values
-  void init(k3d::string_t _node_name, k3d::string_t _meta_nametag);
-
-  //Create The Default Preview Object For Material Preview (Preview Core::...)
-  void defaultInit();
-
-
-};//PreviewCube
 
 
 }//namespace mechanics
@@ -69,5 +73,3 @@ class PreviewCube : public PreviewObj
 
 }//namespace module
 
-
-#endif

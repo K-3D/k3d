@@ -9,6 +9,9 @@ namespace material_manager
 namespace mechanics
 {
 
+//Static Definitions
+const k3d::string_t MaterialObj::attached_geo_nametag_mt = "PreviewCore::attachedgeotag";
+
 void MaterialObj::init()
 {
   //Get Any Availible Data (If There Is Any)
@@ -32,6 +35,8 @@ void MaterialObj::init()
 
   m_artistnotes.changed_signal()
     .connect(sigc::mem_fun(*this, &MaterialObj::onArtistNotesChange));
+
+
 
 }//init
 
@@ -102,6 +107,20 @@ void MaterialObj::insertTodaysDate()
 
   setDateStamp(current_date_str);
 }
+
+
+void  MaterialObj::setPreviewGeo(k3d::inode *geo, k3d::string_t meta_attachedgeo)
+{
+  //Set Pointer To New Geometry
+  m_preview_geo = geo;
+
+  //Set Meta Data For Material
+  if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_doc_node))
+    metadata->set_metadata(MaterialObj::attached_geo_nametag_mt, meta_attachedgeo);
+
+
+}
+
 
 
 }//namespace mechanics

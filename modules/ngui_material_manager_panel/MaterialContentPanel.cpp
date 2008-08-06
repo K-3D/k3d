@@ -40,6 +40,9 @@ void MaterialContentPanel::init()
     .connect(sigc::mem_fun(*this, &MaterialContentPanel::onRenderComboSelect));
 
 
+  //matobjAttachGeo();
+
+
 }//init
 
 
@@ -48,7 +51,7 @@ void MaterialContentPanel::buildPanel()
   if(m_hpane)
     {
       //Set Off Renderer In New Process 
-      renderPreview();
+      //renderPreview();
 
       //Setup Render Preview Frame
       m_pview_frame.set_size_request(m_pview_size + 25, m_pview_size + 35);
@@ -116,9 +119,9 @@ void MaterialContentPanel::buildPanel()
       m_toolbox_cont.pack_start(m_tool_geo_combo, false, false, 2);
 
       m_tool_geo_combo.append_text("Sphere");
-      m_tool_geo_combo.append_text("Cube");
+      //tool_geo_combo.append_text("Cube");
       m_tool_geo_combo.append_text("Torus");
-      m_tool_geo_combo.set_active_text("Sphere");
+      //m_tool_geo_combo.set_active_text("Sphere");
       m_tool_geo_combo.set_size_request(-1, 30);
 
       //Setup Preview Background Button
@@ -141,6 +144,13 @@ void MaterialContentPanel::buildPanel()
       //Gtk Build / Show Hint
       m_hpane->show_all(); 
 
+
+      matobjAttachGeo();
+
+      //Set Off Renderer In New Process 
+      renderPreview();
+
+
     }
   else
     ; // Invalid HPanel Pointer	
@@ -153,7 +163,12 @@ void MaterialContentPanel::renderPreview()
 {
   //Invoke Generic Render Initialization
   renderInit();
- 
+
+k3d::property::set_internal_value(*m_engine, 
+                                  "visible_nodes", 
+                                  k3d::inode_collection_property
+                                  ::nodes_t(1, m_geometry));
+
   //Check If Selected Node Is A RenderMan Material
   if(m_materialobj->isMaterial())
     {  
@@ -206,61 +221,69 @@ void MaterialContentPanel::onRenderComboSelect()
   //Work Out Which Geometric Object Was Selected
   if(selected_geo == "Sphere")
     {
-      meta_data = "p_sphere_geo";
+      meta_data = PreviewObj::sphere_md;
 
     }
   else if(selected_geo == "Cube")
     {
-      meta_data = "p_cube_geo";
+      meta_data = PreviewObj::cube_md;
     }
   else
     {
-      meta_data = "p_torus_geo";
+      meta_data = PreviewObj::torus_md;
     }
 
 
   //Meta Tag To Be Found / Added
-  k3d::string_t meta_tag = "PreviewCore::nametag";
+  k3d::string_t meta_tag = PreviewObj::pview_geo_nametag_mt;
 
   //Node That Points To Actual Doc Node
   k3d::inode *node_ptr = 0;
 
   //Check If The Node Exists In The Document
-  checkDocForMeta(meta_tag, meta_data, &node_ptr);
+  checkDocForMeta(meta_tag, meta_data, &node_ptr, m_document_state);
 
 
   if(node_ptr)
-    m_geometry = node_ptr; //Node Found In Document!
+    {
+      m_materialobj->setPreviewGeo(node_ptr, meta_data);
+      m_geometry =  m_materialobj->m_preview_geo; //Node Found In Document!
+
+      // m_geometry = node_ptr; //Node Found In Document!
+
+    }
   else
     {
       //Build The Correct Geometric Object From Scratch
       PreviewObj *built_geo = 0;
 
+
       if(selected_geo == "Sphere")
         {
           built_geo = new PreviewSphere("Sphere", m_document_state);
-          built_geo->init("Preview Core::Geo::Sphere", meta_data);
+          built_geo->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
         }        
 
       else if(selected_geo == "Cube")
         {
         built_geo = new PreviewCube("Cube", m_document_state);
-        built_geo->init("Preview Core::Geo::Cube", meta_data);
+        built_geo->init(PreviewObj::cube_node_name, PreviewObj::cube_md);
         }
 
       else
         {
         built_geo = new PreviewTorus("Torus", m_document_state);
-        built_geo->init("Preview Core::Geo::Torus", "p_torus_geo");
+        built_geo->init(PreviewObj::torus_node_name, PreviewObj::torus_md);
         }
       
       if(built_geo)
         {
-          //Initalize The Creation & Placement Of Geomerty In World
-          //built_geo->init();
+          m_materialobj->setPreviewGeo(built_geo->m_doc_node, meta_data);
 
           //Set The Current Geometric Object To This
-          m_geometry = built_geo->m_doc_node;
+          m_geometry =  m_materialobj->m_preview_geo;
+
+          //m_geometry = built_geo->m_doc_node;
 
         }
 
@@ -271,6 +294,178 @@ void MaterialContentPanel::onRenderComboSelect()
   updatePreviewImage();
 
   k3d::log() << "Render Combo Changed" << std::endl;
+
+}
+
+
+
+void MaterialContentPanel::matobjAttachGeo()
+{
+  //Get The Doc Node From MaterialObj Ptr
+  k3d::inode *mat_node = m_materialobj->m_doc_node;
+
+  //Geometry Flags For Combo Update
+  bool sphereUsed = false;
+  bool cubeUsed = false;
+  bool torusUsed = false;
+
+  //Search m_doc_node Material For Attached Geometry
+  if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(mat_node))
+    {
+      k3d::string_t value = metadata->get_metadata()[MaterialObj::attached_geo_nametag_mt];
+
+      k3d::inode *attached_geo = 0; //Geometry Is Already Availible
+      PreviewObj *attached_new_geo = 0; //Geometery Is New & Needs To Be Created
+
+      k3d::string_t meta_attachedgeo = "";
+
+      k3d::log() << "VALUE: " << value << std::endl;
+          
+      //Check If Sphere Attached
+      if(value == PreviewObj::sphere_md)
+        {
+          //Check If Doesnt Exist In Document
+          if(!checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::sphere_md, &attached_geo, m_document_state))
+            {
+              //Create The Default Sphere For Preview
+              attached_new_geo = new PreviewSphere("Sphere", m_document_state);
+              attached_new_geo->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
+            }
+
+          meta_attachedgeo = PreviewObj::sphere_md;
+          sphereUsed = true;
+        }
+
+      //Check If Cube Attached
+      else if(value == PreviewObj::cube_md)
+        {
+          //Check If Doesnt Exist In Document
+          if(!checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::cube_md, &attached_geo, m_document_state))
+            {
+              //Create The Default Cube For Preview
+              attached_new_geo = new PreviewCube("Cube", m_document_state);
+              attached_new_geo->init(PreviewObj::cube_node_name, PreviewObj::cube_md);
+            }
+
+          meta_attachedgeo = PreviewObj::cube_md;
+          cubeUsed = true;
+
+        }
+
+      //Check If Torus Attached
+      else if(value == PreviewObj::torus_md)
+        {
+          //Check If Doesnt Exist In Document
+          if(!checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::torus_md, &attached_geo, m_document_state))
+            {
+
+              k3d::log() << "TORUS NEW BUILT!" << std::endl;
+              //Create The Default Torus For Preview
+              attached_new_geo = new PreviewTorus("torus", m_document_state);
+              attached_new_geo->init(PreviewObj::torus_node_name, PreviewObj::torus_md);
+            }
+
+          meta_attachedgeo = PreviewObj::torus_md;
+          torusUsed = true;
+        }
+
+      else
+        {
+          //No Meta Data. Possibly Create & Attach Default Sphere
+          //k3d::inode *existing_sphere = 0;
+          if(!checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::sphere_md, &attached_geo, m_document_state))
+            {
+              attached_new_geo =  new PreviewSphere("Sphere", m_document_state);
+              attached_new_geo->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
+
+              m_materialobj->setPreviewGeo(attached_new_geo->m_doc_node, PreviewObj::sphere_md);
+
+              k3d::log() << "no meta, sphere node created: " << attached_new_geo->m_doc_node << std::endl;
+
+            }
+          else
+            {
+              //Default Sphere Exists In Document
+              if(attached_geo)
+                {
+                  m_materialobj->setPreviewGeo(attached_geo, PreviewObj::sphere_md);
+                  k3d::log() << "no meta, sphere node Not created: " << attached_geo << std::endl;
+                }
+
+            }
+
+
+          meta_attachedgeo = PreviewObj::sphere_md;
+          sphereUsed = true;
+
+
+        }
+
+
+      //Attach The Geometry To The MaterialObj**********************************
+
+      if(attached_geo)
+        {
+        m_materialobj->setPreviewGeo(attached_geo, meta_attachedgeo);
+        k3d::log() << "attached geo: " << m_materialobj->m_preview_geo << std::endl;
+      }
+
+      else if(attached_new_geo)
+        {
+          m_materialobj->setPreviewGeo(attached_new_geo->m_doc_node, meta_attachedgeo);
+          m_used_geometry.push_back(attached_new_geo);
+          k3d::log() << "attached new geo: " << m_materialobj->m_preview_geo << std::endl;
+        }
+
+
+      //Update The Gui Combo
+      if(sphereUsed)
+        m_tool_geo_combo.set_active_text("Sphere");
+      else if(cubeUsed)
+        m_tool_geo_combo.set_active_text("Cube");
+      else if(torusUsed)
+        m_tool_geo_combo.set_active_text("Torus");
+
+
+
+      //************************************************************************
+
+          k3d::log() << "OI HERE BABY!" << std::endl;
+
+    }//if
+
+
+
+  // else
+//     {
+//       //No Meta Data. Possibly Create & Attach Default Sphere
+//       k3d::inode *existing_sphere = 0;
+//       if(!checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::sphere_node_name, &existing_sphere, m_document_state))
+//         {
+//           PreviewObj *default_sphere = new PreviewSphere("Sphere", m_document_state);
+//           default_sphere->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
+
+//           m_materialobj->setPreviewGeo(default_sphere->m_doc_node, PreviewObj::sphere_md);
+
+//           k3d::log() << "no meta, sphere node created: " << default_sphere->m_doc_node << std::endl;
+
+//         }
+//       else
+//         {
+//           //Default Sphere Exists In Document
+//           if(existing_sphere)
+//             {
+//               m_materialobj->setPreviewGeo(existing_sphere, PreviewObj::sphere_md);
+//               k3d::log() << "no meta, sphere node Not created: " << existing_sphere << std::endl;
+//             }
+
+//         }
+
+//     }
+
+  m_geometry =  m_materialobj->m_preview_geo;
+
+  
 
 }
 

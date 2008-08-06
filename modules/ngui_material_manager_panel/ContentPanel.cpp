@@ -9,34 +9,34 @@ namespace material_manager
 namespace mechanics
 {
 
-bool ContentPanel::checkDocForMeta(const k3d::string_t meta_tag, 
-                                   const k3d::string_t meta_data, 
-                                   k3d::inode **node_ptr)
-{
-  //Iterate Through Document. If A Node Has Meta Data & Matches, Pass To node_ptr
-  k3d::inode_collection::nodes_t::const_iterator node 
-    = m_document_state->document().nodes().collection().begin();
+// bool ContentPanel::checkDocForMeta(const k3d::string_t meta_tag, 
+//                                    const k3d::string_t meta_data, 
+//                                    k3d::inode **node_ptr)
+// {
+//   //Iterate Through Document. If A Node Has Meta Data & Matches, Pass To node_ptr
+//   k3d::inode_collection::nodes_t::const_iterator node 
+//     = m_document_state->document().nodes().collection().begin();
 
-  for(; node != m_document_state->document().nodes().collection().end(); ++node)
-    {
-      if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(*node))
-        {
-          k3d::string_t value = metadata->get_metadata()[meta_tag];
+//   for(; node != m_document_state->document().nodes().collection().end(); ++node)
+//     {
+//       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(*node))
+//         {
+//           k3d::string_t value = metadata->get_metadata()[meta_tag];
           
-          if(value == meta_data)
-            {
-              //There Is A Match!
-              *node_ptr = *node;
-              return true;
-            }
-        }//if
-    }//for
+//           if(value == meta_data)
+//             {
+//               //There Is A Match!
+//               *node_ptr = *node;
+//               return true;
+//             }
+//         }//if
+//     }//for
 
-  //No Match Found
-  node_ptr = 0;
-  return false;
+//   //No Match Found
+//   node_ptr = 0;
+//   return false;
 
-}//checkDocForMeta
+// }//checkDocForMeta
 
 
 
@@ -45,7 +45,9 @@ void ContentPanel::createPreviewNodes()
   //Flags For Each Node
   bool hasAqsis_renderer = 	false;
   bool hasCamera = 				false;
-  bool hasGeo = 					false;
+  bool hasGeoSphere = 		  	false;
+  bool hasGeoCube = 		 	 	false;
+  bool hasGeoTorus = 		  	false;
   bool hasLight = 				false;
   bool hasLightFill = 			false;
   bool hasLightBack = 			false;
@@ -58,9 +60,9 @@ void ContentPanel::createPreviewNodes()
   k3d::string_t aqsis_render_meta 	= "p_aqsis_renderer";
   k3d::string_t camera_meta 			= "p_camera";
 
-  k3d::string_t sphere_geo_meta 		= "p_sphere_geo";
-  k3d::string_t cube_geo_meta 		= "p_cube_geo";
-  k3d::string_t torus_geo_meta 		= "p_torus_geo";
+  // k3d::string_t sphere_geo_meta 		= "p_sphere_geo";
+//   k3d::string_t cube_geo_meta 		= "p_cube_geo";
+//   k3d::string_t torus_geo_meta 		= "p_torus_geo";
 
   k3d::string_t key_light_meta 		= "p_light";
   k3d::string_t fill_light_meta 		= "p_fill_light";
@@ -83,7 +85,7 @@ void ContentPanel::createPreviewNodes()
   k3d::inode *node_ptr = 0;
   
   //Check For Aqsis Engine
-  if(checkDocForMeta(nametag_metatag, aqsis_render_meta, &node_ptr))
+  if(checkDocForMeta(nametag_metatag, aqsis_render_meta, &node_ptr, m_document_state))
     {
       hasAqsis_renderer = true;
       if(node_ptr)
@@ -93,26 +95,49 @@ void ContentPanel::createPreviewNodes()
 
   //Check For Camera
   node_ptr = 0;
-  if(checkDocForMeta(nametag_metatag, camera_meta, &node_ptr))
+  if(checkDocForMeta(nametag_metatag, camera_meta, &node_ptr, m_document_state))
     {
        hasCamera = true;
        if(node_ptr)
          m_camera = dynamic_cast<camera_t*>(node_ptr);
     }
+
                                      
+  //Check For Geometry**********************************************************
+
   //Check For Sphere Geometry
   node_ptr = 0;
-  if(checkDocForMeta(nametag_metatag, sphere_geo_meta, &node_ptr))
+  if(checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::sphere_md, &node_ptr, m_document_state))
     {
-      hasGeo = true;
+      hasGeoSphere = true;
       if(node_ptr)
         m_geometry = dynamic_cast<geo_t*>(node_ptr);
     }
 
+  //Check For Cube Geometry
+  node_ptr = 0;
+  if(checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::cube_md, &node_ptr, m_document_state))
+    {
+      hasGeoCube = true;
+      if(node_ptr)
+        m_geometry = dynamic_cast<geo_t*>(node_ptr);
+    }
+
+  //Check For Torus Geometry
+  node_ptr = 0;
+  if(checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::torus_md, &node_ptr, m_document_state))
+    {
+      hasGeoTorus = true;
+      if(node_ptr)
+        m_geometry = dynamic_cast<geo_t*>(node_ptr);
+    }
+
+  //****************************************************************************
+
 
   //Check For Main Key Light
   node_ptr = 0;
-  if(checkDocForMeta(nametag_metatag, key_light_meta, &node_ptr))
+  if(checkDocForMeta(nametag_metatag, key_light_meta, &node_ptr, m_document_state))
     {
       hasLight = true;
       if(node_ptr)
@@ -122,7 +147,7 @@ void ContentPanel::createPreviewNodes()
 
   //Check For Fill Light
   node_ptr = 0;
-  if(checkDocForMeta(nametag_metatag, fill_light_meta, &node_ptr))
+  if(checkDocForMeta(nametag_metatag, fill_light_meta, &node_ptr, m_document_state))
     {
       hasLightFill = true;
       if(node_ptr)
@@ -132,7 +157,7 @@ void ContentPanel::createPreviewNodes()
 
   //Check For Back Light
   node_ptr = 0;
-  if(checkDocForMeta(nametag_metatag, back_light_meta, &node_ptr))
+  if(checkDocForMeta(nametag_metatag, back_light_meta, &node_ptr, m_document_state))
     {
       hasLightBack = true;
       if(node_ptr)
@@ -142,7 +167,7 @@ void ContentPanel::createPreviewNodes()
 
   //Check For Key + Back Light Shader
   node_ptr = 0;
-  if(checkDocForMeta(nametag_metatag, key_bck_lshade_meta, &node_ptr))
+  if(checkDocForMeta(nametag_metatag, key_bck_lshade_meta, &node_ptr, m_document_state))
     {
       hasLight_shader = true;
       if(node_ptr)
@@ -152,7 +177,7 @@ void ContentPanel::createPreviewNodes()
 
   //Check For Fill Light Shader
   node_ptr = 0;
-  if(checkDocForMeta(nametag_metatag, fill_lshade_meta, &node_ptr))
+  if(checkDocForMeta(nametag_metatag, fill_lshade_meta, &node_ptr, m_document_state))
     {
       hasLightFill_shader = true;
       if(node_ptr)
@@ -162,7 +187,7 @@ void ContentPanel::createPreviewNodes()
 
   //Check For Render Engine
   node_ptr = 0;
-  if(checkDocForMeta(nametag_metatag, rman_engine_meta, &node_ptr))
+  if(checkDocForMeta(nametag_metatag, rman_engine_meta, &node_ptr, m_document_state))
     {
       hasRenderman_engine = true;
       if(node_ptr)
@@ -336,19 +361,46 @@ void ContentPanel::createPreviewNodes()
 
     }//if
 
-  //Setup The Geometry
+  //Setup The Geometry**********************************************************
 
-  if(!hasGeo)
+  if(!hasGeoSphere)
     {
       //Create The Default Sphere Geometric Object
       PreviewSphere *default_sphereObj = new PreviewSphere("Sphere", m_document_state);
-      default_sphereObj->init("Preview Core::Geo::Sphere", sphere_geo_meta);
+      default_sphereObj->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
       m_used_geometry.push_back(default_sphereObj);
 
       //Set Current Geometry To The Sphere
       m_geometry = default_sphereObj->m_doc_node;
 
     }//if
+
+ //  if(!hasGeoCube)
+//     {
+//       //Create The Default Cube Geometric Object
+//       PreviewCube *default_cubeObj = new PreviewCube("Cube", m_document_state);
+//       default_cubeObj->init(PreviewObj::cube_node_name, PreviewObj::cube_md);
+//       m_used_geometry.push_back(default_cubeObj);
+
+//       //Set Current Geometry To The Sphere
+//       m_geometry = default_cubeObj->m_doc_node;
+
+//     }//if
+
+//   if(!hasGeoTorus)
+//     {
+//       //Create The Default Torus Geometric Object
+//       PreviewTorus *default_torusObj = new PreviewTorus("Torus", m_document_state);
+//       default_torusObj->init(PreviewObj::torus_node_name, PreviewObj::torus_md);
+//       m_used_geometry.push_back(default_torusObj);
+
+//       //Set Current Geometry To The Sphere
+//       m_geometry = default_torusObj->m_doc_node;
+
+//     }//if
+
+
+  //****************************************************************************
 
   //Setup The Aqsis Renderman Engine**********
 
@@ -476,10 +528,10 @@ void ContentPanel::renderInit()
  
 
 
-  k3d::property::set_internal_value(*m_engine, 
-                                    "visible_nodes", 
-                                    k3d::inode_collection_property
-                                    ::nodes_t(1, m_geometry));
+  // k3d::property::set_internal_value(*m_engine, 
+//                                     "visible_nodes", 
+//                                     k3d::inode_collection_property
+//                                     ::nodes_t(1, m_geometry));
 
 }//renderInit
 

@@ -34,6 +34,12 @@
 #include "RenderedImage.h"
 #include "MaterialGroup.h"
 
+#include "PreviewTorus.h"
+#include "PreviewSphere.h"
+#include "PreviewCube.h"
+
+#include "DocumentUtilities.h"
+
 using namespace k3d::data;
 
 namespace module
@@ -55,6 +61,7 @@ class MaterialObj
     :m_group_parent(_parent), 
     m_doc_node(_node), 
     m_pview_img(0),
+    m_preview_geo(0),
     m_name(init_value(_node->name())),
     m_type(init_value(_s_type)),
     m_datestamp(init_value(k3d::string_t(""))),
@@ -103,6 +110,8 @@ class MaterialObj
     void setDocNode(k3d::inode *_node_ptr) 			{this->m_doc_node = _node_ptr;}
     void setGroupParent(MaterialGroup *_gp_ptr) 	{this->m_group_parent = _gp_ptr;}
     void setPviewImg(RenderedImage *img) 				{this->m_pview_img = img;}
+
+    void setPreviewGeo(k3d::inode *geo, k3d::string_t meta_attachedgeo);
 
     
     //Material Profile Signal Event Handlers
@@ -157,6 +166,11 @@ class MaterialObj
 
     RenderedImage				*m_pview_img;
     
+    k3d::inode					*m_preview_geo;
+
+
+    //Static Attached Geometry MetaTag
+    static const k3d::string_t attached_geo_nametag_mt;
     
     
 	  

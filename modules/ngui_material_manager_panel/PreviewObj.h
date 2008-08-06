@@ -49,10 +49,9 @@ class PreviewObj
  public:
 
   PreviewObj(k3d::string_t _combo_value, document_state *_document_state)
-    :m_doc_node(0)
+    :m_doc_node(0),
+    m_document_state(_document_state)
     {
-      m_combo_value = _combo_value;
-      m_document_state = _document_state;
     }
 
   virtual ~PreviewObj()
@@ -62,15 +61,35 @@ class PreviewObj
 
  public:
 
-    //Abstract Functions To Be Used By Group & Profile Derivatives
+  //Abstract Functions To Be Used By Group & Profile Derivatives
   virtual void init(k3d::string_t _node_name, k3d::string_t _meta_nametag) = 0;
+
+  //Create The Default Preview Object For Material Preview (Preview Core::...)
+  virtual void defaultInit() = 0;
 
  public:
     k3d::inode 		*m_doc_node;
-    k3d::string_t		m_combo_value;
+    k3d::inode			*mesh_instance;
+
     document_state 	*m_document_state;
 
+    //Preview Geometry MetaTag
+    static const k3d::string_t pview_geo_nametag_mt;
+
+    //Preview Object MetaData
+    static const k3d::string_t sphere_md; 
+    static const k3d::string_t cube_md; 
+    static const k3d::string_t torus_md;
+
+
+    //Preview Object Node Name
+    static const k3d::string_t sphere_node_name; 
+    static const k3d::string_t cube_node_name; 
+    static const k3d::string_t torus_node_name;
+
 };//PreviewObj
+
+
 
 }//namespace mechanics
 

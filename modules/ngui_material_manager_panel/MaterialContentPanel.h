@@ -81,6 +81,10 @@ class MaterialContentPanel : public ContentPanel
       //Initialization Of Object Contents Beyond Initial Values
       void init();
 
+      //Attach Geometry To MaterialObj
+      void matobjAttachGeo();
+
+
   public:
       
       //Build The GUI Panel

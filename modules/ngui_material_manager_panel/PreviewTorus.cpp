@@ -38,6 +38,13 @@ void PreviewTorus::init(k3d::string_t _node_name, k3d::string_t _meta_nametag)
 }
 
 
+void PreviewTorus::defaultInit()
+{
+
+
+}
+
+
 }//namespace mechanics
 
 }//namespace material_manager

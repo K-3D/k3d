@@ -145,6 +145,59 @@ public:
 
 void Model::buildModel(document_state& DocumentState)
 {
+
+//Search m_doc_node Material For Attached Geometry
+ //  if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_doc_node))
+//     {
+//       k3d::string_t value = metadata->get_metadata()[attached_geo_nametag_mt];
+
+//       k3d::inode *attached_geo = 0;
+          
+//       //Check If Sphere Attached
+//       if(value == PreviewObj::sphere_md)
+//         {
+//           //Check If Exists In Document
+//           if(checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::sphere_node_name, &attached_geo, m_document_state))
+//             {
+//               if(attached_geo)
+//                 ;// m_preview_geo = dynamic_cast<k3d::inode*>(attached_geo);
+//             }
+//         }
+
+//       //Check If Cube Attached
+//       if(value == PreviewObj::cube_md)
+//         {
+//           ;
+
+//         }
+
+//       //Check If Torus Attached
+//       if(value == PreviewObj::torus_md)
+//         {
+//           ;
+
+//         }
+
+
+//     }//if
+//   else
+//     {
+//       //No Meta Data. Create & Attach Default Sphere
+      
+//       ;
+//     }
+
+
+
+  // if(checkDocForMeta(MaterialObj::attached_geo_nametag_mt, 
+//                      camera_meta, &m_doc_node, m_document_state))
+//     {
+
+//       ;
+//     }
+
+
+
   //Add Compulsory Groups To Group List
   m_groups.push_back(&m_rmangrp);
   m_groups.push_back(&m_glgrp);

@@ -54,7 +54,8 @@ class PreviewSphere : public PreviewObj
   //Initialization Of Object Contents Beyond Initial Values
   void init(k3d::string_t _node_name, k3d::string_t _meta_nametag);
 
- 
+ //Create The Default Preview Object For Material Preview (Preview Core::...)
+  void defaultInit();
 
   
 
