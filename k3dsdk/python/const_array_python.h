@@ -177,7 +177,7 @@ private:
 template<typename array_type>
 void export_const_array(const char* const ClassName, const char* const DocString)
 {
-	boost::python::class_<const_array<array_type> >(ClassName, DocString)
+	boost::python::class_<const_array<array_type> >(ClassName, DocString, boost::python::no_init)
 		.def("__len__", &const_array<array_type>::len)
 		.def("__getitem__", &const_array<array_type>::get_item);
 }
