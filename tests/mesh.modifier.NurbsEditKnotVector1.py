@@ -9,7 +9,7 @@ selection = k3d.deselect_all()
 selection.nurbs_curves = k3d.component_select_all()
 
 setup.modifier.mesh_selection = selection
-knot_vector = k3d.k3d_double_t_array(0.0,0.0,1.0,1.0,2.0,2.0,2.0)
+knot_vector = [0.0,0.0,1.0,1.0,2.0,2.0,2.0]
 
 setup.modifier.knot_vector = knot_vector
 

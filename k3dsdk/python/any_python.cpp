@@ -169,6 +169,17 @@ const object any_to_python(const boost::any& Value)
 		return results;
 	}
 
+	if(type == typeid(k3d::typed_array<double>))
+	{
+		k3d::typed_array<double> nodes = boost::any_cast<k3d::typed_array<double> >(Value);
+
+		boost::python::list results;
+		for(size_t i = 0; i != nodes.size(); ++i)
+			results.append(wrap(nodes[i]));
+
+		return results;
+	}
+
 	typedef std::map<k3d::string_t, k3d::double_t> profiler_task_records_t;
 	typedef std::map<k3d::inode*, profiler_task_records_t> profiler_node_records_t;
 	if(type == typeid(profiler_node_records_t))
@@ -197,7 +208,7 @@ const object any_to_python(const boost::any& Value)
 const boost::any python_to_any(const object& Value)
 {
 	PyObject* const value = Value.ptr();
-	
+
 	{
 		extract<interface_wrapper<k3d::idocument> > value(Value);
 		if(value.check())
@@ -325,6 +336,21 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 		results.resize(count);
 		for(size_t i = 0; i != count; ++i)
 			results[i] = extract<interface_wrapper<k3d::inode> >(nodes[i])().wrapped_ptr();
+
+		return boost::any(results);
+	}
+
+	if(TargetType == typeid(k3d::typed_array<double>))
+	{
+		k3d::typed_array<double> results;
+
+		boost::python::list values = extract<boost::python::list>(Value);
+		const size_t count = boost::python::len(values);
+		results.resize(count);
+		for(size_t i = 0; i != count; ++i)
+		{
+		    results[i] = *extract<interface_wrapper<double> >(values[i])().wrapped_ptr();
+		}
 
 		return boost::any(results);
 	}
