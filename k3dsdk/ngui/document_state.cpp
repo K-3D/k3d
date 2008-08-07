@@ -60,6 +60,7 @@
 #include <k3dsdk/imulti_mesh_sink.h>
 #include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/ipipeline.h>
+#include <k3dsdk/ireset_properties.h>
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itime_sink.h>
@@ -1789,6 +1790,10 @@ public:
 				}
 			}
 		}
+
+		// Give nodes a chance to initialize their property values based on their inputs, if any ...
+		if(k3d::ireset_properties* const reset_properties = dynamic_cast<k3d::ireset_properties*>(node))
+			reset_properties->reset_properties();
 
 		// Replace the current selection
 		deselect_all();

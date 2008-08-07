@@ -22,6 +22,7 @@
 */
 
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/ireset_properties.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
@@ -113,7 +114,8 @@ namespace module
     {
 
         class edit_knot_vector :
-                    public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+                    public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >,
+		    public k3d::ireset_properties
         {
             typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
         public:
@@ -125,6 +127,11 @@ namespace module
                 m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
                 m_knot_vector.changed_signal().connect(make_update_mesh_slot());
             }
+
+		void reset_properties()
+		{
+			assert_not_implemented();
+		}
 
             void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
             {
