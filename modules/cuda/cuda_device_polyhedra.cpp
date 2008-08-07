@@ -49,20 +49,20 @@ cuda_device_polyhedra::cuda_device_polyhedra ( const k3d::mesh::polyhedra_t& hos
     pdev_per_polygon_first_face = 0;
     pdev_per_polygon_face_count = 0;
     pdev_per_polygon_types = 0;
-    m_number_of_polygons = 0;
+    m_number_of_polygons = m_p_input_polyhedra->first_faces->size();
 
     pdev_per_face_first_loops = 0;
     pdev_per_face_loop_count = 0;
     pdev_per_face_selection = 0;
-    m_number_of_faces = 0;
+    m_number_of_faces = m_p_input_polyhedra->face_first_loops->size();
 
     pdev_per_loop_first_edge = 0;
-    m_number_of_loops = 0;
+    m_number_of_loops = m_p_input_polyhedra->loop_first_edges->size();
 
     pdev_per_edge_point = 0;
     pdev_per_edge_clockwise_edge = 0;
     pdev_per_edge_selection = 0;
-    m_number_of_edges = 0;
+    m_number_of_edges = m_p_input_polyhedra->edge_points->size();
 
 }
 
@@ -84,6 +84,26 @@ cuda_device_polyhedra::~cuda_device_polyhedra ()
     free_device_memory((void*)pdev_per_edge_clockwise_edge);
     free_device_memory((void*)pdev_per_edge_selection);
 
+    pdev_per_polygon_first_face = 0;
+	pdev_per_polygon_face_count = 0;
+	pdev_per_polygon_types = 0;
+	m_number_of_polygons = 0;
+
+	pdev_per_face_first_loops = 0;
+	pdev_per_face_loop_count = 0;
+	pdev_per_face_selection = 0;
+	m_number_of_faces = 0;
+
+	pdev_per_loop_first_edge = 0;
+	m_number_of_loops = 0;
+
+	pdev_per_edge_point = 0;
+	pdev_per_edge_clockwise_edge = 0;
+	pdev_per_edge_selection = 0;
+	m_number_of_edges = 0;
+
+	m_p_input_polyhedra = 0;
+
 }
 
 /**
@@ -93,7 +113,6 @@ void cuda_device_polyhedra::copy_to_device( k3d::uint32_t what_to_copy  )
 {
     if ( what_to_copy & POLYHEDRA_ALL_POLYGONS )
     {
-        m_number_of_polygons = m_p_input_polyhedra->first_faces->size();
         allocate_device_memory((void**)&pdev_per_polygon_first_face, m_number_of_polygons*sizeof(k3d::uint32_t));
         allocate_device_memory((void**)&pdev_per_polygon_face_count, m_number_of_polygons*sizeof(k3d::uint32_t));
         allocate_device_memory((void**)&pdev_per_polygon_types, m_number_of_polygons*sizeof(int32_t));
@@ -106,7 +125,6 @@ void cuda_device_polyhedra::copy_to_device( k3d::uint32_t what_to_copy  )
     float* face_selection_temp = 0;
     if ( what_to_copy & POLYHEDRA_ALL_FACES )
     {
-        m_number_of_faces = m_p_input_polyhedra->face_first_loops->size();
         allocate_device_memory((void**)&pdev_per_face_first_loops, m_number_of_faces*sizeof(k3d::uint32_t));
         allocate_device_memory((void**)&pdev_per_face_loop_count, m_number_of_faces*sizeof(k3d::uint32_t));
         allocate_device_memory((void**)&pdev_per_face_selection, m_number_of_faces*sizeof(float));
@@ -125,7 +143,7 @@ void cuda_device_polyhedra::copy_to_device( k3d::uint32_t what_to_copy  )
 
     if ( what_to_copy & POLYHEDRA_ALL_LOOPS )
     {
-        m_number_of_loops = m_p_input_polyhedra->loop_first_edges->size();
+
         allocate_device_memory((void**)&pdev_per_loop_first_edge, m_number_of_loops*sizeof(k3d::uint32_t));
         copy_from_host_to_device_uint_64_bit_check(pdev_per_loop_first_edge, &(m_p_input_polyhedra->loop_first_edges->front()), m_number_of_loops*sizeof(k3d::uint32_t));
     }
@@ -133,8 +151,6 @@ void cuda_device_polyhedra::copy_to_device( k3d::uint32_t what_to_copy  )
     float* edge_selection_temp = 0;
     if ( what_to_copy & POLYHEDRA_ALL_EDGES )
     {
-        m_number_of_edges = m_p_input_polyhedra->edge_points->size();
-
         allocate_device_memory((void**)&pdev_per_edge_point, m_number_of_edges*sizeof(k3d::uint32_t));
         allocate_device_memory((void**)&pdev_per_edge_clockwise_edge, m_number_of_edges*sizeof(k3d::uint32_t));
         allocate_device_memory((void**)&pdev_per_edge_selection, m_number_of_edges*sizeof(float));
@@ -388,4 +404,56 @@ k3d::uint32_t* cuda_device_polyhedra::get_per_face_loop_counts_pointer()
 float* cuda_device_polyhedra::get_per_edge_selection_pointer()
 {
 	return pdev_per_edge_selection;
+}
+
+/**
+ * Increase the size of the data structures corresponding to the edges
+ */
+void cuda_device_polyhedra::resize_edges ( k3d::uint32_t new_number_of_edges, bool clear )
+{
+	int new_edges_count = new_number_of_edges - m_number_of_edges;
+
+	if ( new_edges_count != 0 )
+	{
+		float* new_pdev_per_edge_selection = 0;
+		k3d::uint32_t* new_pdev_per_edge_point = 0;
+		k3d::uint32_t* new_pdev_per_edge_clockwise_edge = 0;
+
+		// resize the device memory structures
+		resize_device_memory_block((void**)&new_pdev_per_edge_selection, pdev_per_edge_selection, new_number_of_edges*sizeof(float), m_number_of_edges*sizeof(float), clear);
+		resize_device_memory_block((void**)&new_pdev_per_edge_point, pdev_per_edge_point, new_number_of_edges*sizeof(k3d::uint32_t), m_number_of_edges*sizeof(k3d::uint32_t), clear);
+		resize_device_memory_block((void**)&new_pdev_per_edge_clockwise_edge, pdev_per_edge_clockwise_edge, new_number_of_edges*sizeof(k3d::uint32_t), m_number_of_edges*sizeof(k3d::uint32_t), clear);
+
+		// update the member pointers and number of edges
+		pdev_per_edge_selection = new_pdev_per_edge_selection;
+		pdev_per_edge_point = new_pdev_per_edge_point;
+		pdev_per_edge_clockwise_edge = new_pdev_per_edge_clockwise_edge;
+
+		m_number_of_edges = new_number_of_edges;
+	}
+}
+
+/**
+ * Increase the size of the data structures corresponding to the loops
+ */
+void cuda_device_polyhedra::resize_loops ( k3d::uint32_t new_number_of_loops, bool clear )
+{
+	int new_loops_count = new_number_of_loops - m_number_of_loops;
+
+	if ( new_loops_count != 0 )
+	{
+		k3d::uint32_t* new_pdev_per_loop_first_edge = 0;
+		resize_device_memory_block((void**)&new_pdev_per_loop_first_edge, pdev_per_loop_first_edge, new_number_of_loops*sizeof(k3d::uint32_t), m_number_of_loops*sizeof(k3d::uint32_t), clear);
+		pdev_per_loop_first_edge = new_pdev_per_loop_first_edge;
+
+		m_number_of_loops = new_number_of_loops;
+	}
+}
+
+/**
+ * Increase the size of the data structures corresponding to the faces
+ */
+void cuda_device_polyhedra::resize_faces ( k3d::uint32_t new_number_of_faces, bool clear )
+{
+
 }

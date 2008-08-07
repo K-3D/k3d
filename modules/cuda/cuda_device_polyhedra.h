@@ -58,6 +58,10 @@ class cuda_device_polyhedra
 
         float* get_per_edge_selection_pointer();
 
+        void resize_edges ( k3d::uint32_t new_number_of_edges, bool clear = false );
+        void resize_loops ( k3d::uint32_t new_number_of_loops, bool clear = false );
+        void resize_faces ( k3d::uint32_t new_number_of_faces, bool clear = false );
+
     private:
         /// a pointer to uint arrays allocated on the device
         k3d::uint32_t* pdev_per_polygon_first_face;

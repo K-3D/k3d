@@ -808,6 +808,20 @@ __global__ void calculate_point_edges_kernel ( unsigned int* point_edges, unsign
 }
 
 /**
+ * Kernel to get the first loop index as well as the loop count for a given face
+ */
+__global__ void get_loop_index_and_count_kernel (
+											unsigned int* index_and_counts,
+											const unsigned int* face_first_loops,
+											const unsigned int* face_loop_counts,
+											int face_index )
+{
+	index_and_counts[0] = face_first_loops[face_index];
+	index_and_counts[1] = face_loop_counts[face_index];
+}
+
+
+/**
  *
  */
 __global__ void edge_index_calculator_kernel (
@@ -816,77 +830,67 @@ __global__ void edge_index_calculator_kernel (
 											unsigned int* first_midpoint,
 											unsigned char* has_midpoint,
 											unsigned int* index_map,
-											const unsigned int* face_first_loops,
-											const unsigned int* face_loop_counts,
 											const unsigned int* loop_first_edges,
 											const unsigned int* clockwise_edges,
 											const float* edge_selection,
 											const unsigned int* companions,
 											const unsigned char* boundary_edges,
 											int split_point_count,
-											int num_faces,
-											int first_new_point_index
+											int first_new_point_index,
+											int loop_index
 											 )
 {
-	unsigned int edge_count = 0;
-	unsigned int edge_list_count = 0;
+	unsigned int edge_count = sizes[0];
+	unsigned int edge_list_count = sizes[1];
 
-	for ( int face_index = 0; face_index < num_faces; ++face_index )
+
+	unsigned int first_edge_index = loop_first_edges[loop_index];
+
+	for( unsigned int edge_index = first_edge_index; 1 ; )
 	{
 
-		unsigned int loop_begin = face_first_loops[face_index];
-		unsigned int loop_end = loop_begin + face_loop_counts[face_index];
-		for ( int loop_index = loop_begin; loop_index < loop_end; ++loop_index )
+		index_map[edge_index] = edge_count;
+		++edge_count;
+
+		if(!boundary_edges[edge_index] && edge_selection[companions[edge_index]] && !edge_selection[edge_index])
 		{
-			unsigned int first_edge_index = loop_first_edges[loop_index];
+			edge_count += split_point_count;
+			first_midpoint[edge_index] = first_midpoint[companions[edge_index]];
+		}
 
-			for( unsigned int edge_index = first_edge_index; 1 ; )
-			{
-
-				index_map[edge_index] = edge_count;
-				++edge_count;
-
-				if(!boundary_edges[edge_index] && edge_selection[companions[edge_index]] && !edge_selection[edge_index])
-				{
-					edge_count += split_point_count;
-					first_midpoint[edge_index] = first_midpoint[companions[edge_index]];
-				}
-
-				if(edge_selection[edge_index])
-				{
+		if(edge_selection[edge_index])
+		{
 #ifdef __DEVICE_EMULATION__
-	printf("edge_index %u ", edge_index);
-	if ( boundary_edges[edge_index] )
-		printf("1 ");
-	else
-		printf("0 ");
+printf("edge_index %u ", edge_index);
+if ( boundary_edges[edge_index] )
+	printf("1 ");
+else
+	printf("0 ");
 
-	if ( has_midpoint[companions[edge_index]] )
-		printf("1 ");
-	else
-		printf("0 ");
+if ( has_midpoint[companions[edge_index]] )
+	printf("1 ");
+else
+	printf("0 ");
 
-	printf("\n");
+printf("\n");
 #endif
-					edge_count += split_point_count;
-					if(!boundary_edges[edge_index] && has_midpoint[companions[edge_index]])
-					{
-						first_midpoint[edge_index] = first_midpoint[companions[edge_index]];
-					}
-					else
-					{
-						first_midpoint[edge_index] = first_new_point_index + split_point_count * edge_list_count;
-						edge_list[edge_list_count] = edge_index;
-						edge_list_count++;
-						has_midpoint[edge_index] = 1;
-					}
-				}
-
-				edge_index = clockwise_edges[edge_index];
-				if (edge_index == first_edge_index)
-					break;
+			edge_count += split_point_count;
+			if(!boundary_edges[edge_index] && has_midpoint[companions[edge_index]])
+			{
+				first_midpoint[edge_index] = first_midpoint[companions[edge_index]];
+			}
+			else
+			{
+				first_midpoint[edge_index] = first_new_point_index + split_point_count * edge_list_count;
+				edge_list[edge_list_count] = edge_index;
+				edge_list_count++;
+				has_midpoint[edge_index] = 1;
 			}
 		}
+
+		edge_index = clockwise_edges[edge_index];
+		if (edge_index == first_edge_index)
+			break;
 	}
 
 #ifdef __DEVICE_EMULATION__

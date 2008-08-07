@@ -116,7 +116,7 @@ const mesh create_grid(const uint_t Rows, const uint_t Columns, imaterial* const
 	mesh::indices_t::iterator loop_first_edge = loop_first_edges->begin();
 	mesh::indices_t::iterator edge_point = edge_points->begin();
 	mesh::indices_t::iterator clockwise_edge = clockwise_edges->begin();
-	
+
 	uint_t face_number = 0;
 
 	for(unsigned long row = 0; row != rows; ++row)
@@ -191,7 +191,7 @@ const mesh create_cylinder(const uint_t Rows, const uint_t Columns, imaterial* c
 	mesh::indices_t::iterator loop_first_edge = loop_first_edges->begin();
 	mesh::indices_t::iterator edge_point = edge_points->begin();
 	mesh::indices_t::iterator clockwise_edge = clockwise_edges->begin();
-	
+
 	uint_t face_number = 0;
 
 	for(unsigned long row = 0; row != rows; ++row)
@@ -252,7 +252,7 @@ const bool_t is_triangles(const mesh& Mesh)
 {
 	if(!validate_polyhedra(Mesh))
 		return true;
-	
+
 	const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
 	const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
 	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
@@ -767,6 +767,7 @@ const bool_t validate_polyhedra(const mesh& Mesh)
 	return_val_if_fail(Mesh.polyhedra->edge_points->size() == Mesh.polyhedra->edge_selection->size(), false);
 
 	// Check for infinite loops
+	// TODO:  Catch segmentation faults
 	const mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
 	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
@@ -797,7 +798,6 @@ const bool_t validate_polyhedra(const mesh& Mesh)
 				break;
 		}
 	}
-
 	return true;
 }
 

@@ -60,6 +60,8 @@ typedef struct
 } timingInfo_t;
 
 // forward declaration of the entry functions
+
+extern "C" K3D_CUDA_DECLSPEC void checkLastCudaError ();
 extern "C" K3D_CUDA_DECLSPEC void bitmap_arithmetic_kernel_entry(int operation, unsigned short* p_deviceImage, int width, int height, float value);
 extern "C" K3D_CUDA_DECLSPEC void bitmap_color_monochrome_kernel_entry(unsigned short* p_deviceImage, int width, int height, float redWeight, float greenWeight, float blueWeight);
 extern "C" K3D_CUDA_DECLSPEC void bitmap_threshold_kernel_entry(unsigned short* p_deviceImage, int width, int height, float redThreshold, float greenThreshold, float blueThreshold, float alphaThreshold);
@@ -68,6 +70,7 @@ extern "C" K3D_CUDA_DECLSPEC void apply_linear_transform_to_point_data ( float *
 
 extern "C" K3D_CUDA_DECLSPEC void allocate_device_memory ( void** device_pointer, int size_in_bytes );
 extern "C" K3D_CUDA_DECLSPEC void set_device_memory ( void* device_pointer, int value, int size_in_bytes );
+extern "C" K3D_CUDA_DECLSPEC void resize_device_memory_block ( void** new_device_pointer, void* current_device_pointer, int new_size_in_bytes, int old_size_in_bytes, char clear );
 extern "C" K3D_CUDA_DECLSPEC void copy_from_host_to_device ( void* device_pointer, const void* host_pointer, int size_in_bytes );
 extern "C" K3D_CUDA_DECLSPEC void copy_from_host_to_device_64_to_32_convert ( void* device_pointer, const void* host_pointer, int size_in_bytes );
 

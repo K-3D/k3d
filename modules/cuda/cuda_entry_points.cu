@@ -108,7 +108,7 @@ int iDivUp(int a, int b)
 /**
  * Get the last CUDA error and display it if required
  */
-inline void checkLastCudaError ()
+extern "C" void checkLastCudaError ()
 {
 	cudaThreadSynchronize();
 	cudaError_t error = cudaGetLastError();
@@ -237,6 +237,46 @@ extern "C" void allocate_device_memory ( void** device_pointer, int size_in_byte
 extern "C" void set_device_memory ( void* device_pointer, int value, int size_in_bytes )
 {
 	cudaMemset(device_pointer, value, size_in_bytes);
+}
+
+extern "C" void resize_device_memory_block ( void** new_device_pointer, void* current_device_pointer, int new_size_in_bytes, int old_size_in_bytes, char clear )
+{
+	if ( new_size_in_bytes == old_size_in_bytes )
+	{
+		*new_device_pointer = current_device_pointer;
+	}
+	else
+	{
+		cudaMalloc(new_device_pointer, new_size_in_bytes);
+		cudaThreadSynchronize();
+
+		if ( !clear )
+		{
+			if ( new_size_in_bytes < old_size_in_bytes )
+			{
+				cudaMemcpy(*new_device_pointer, current_device_pointer, new_size_in_bytes, cudaMemcpyDeviceToDevice);
+			}
+			else
+			{
+				cudaMemset( *new_device_pointer, 0, new_size_in_bytes );
+				cudaThreadSynchronize();
+				cudaMemcpy(*new_device_pointer, current_device_pointer, old_size_in_bytes, cudaMemcpyDeviceToDevice);
+			}
+			cudaThreadSynchronize();
+		}
+		cudaFree ( current_device_pointer );
+	}
+
+	if ( clear )
+	{
+		cudaMemset( *new_device_pointer, 0, new_size_in_bytes );
+		cudaThreadSynchronize();
+	}
+	else
+	{
+		cudaThreadSynchronize();
+	}
+
 }
 
 extern "C" void copy_from_host_to_device ( void* device_pointer, const void* host_pointer, int size_in_bytes )
@@ -732,33 +772,51 @@ extern "C" unsigned int edge_index_calculator_entry (
 													int first_new_point_index
 													)
 {
+	unsigned int host_sizes[4];
 	unsigned int* pdev_sizes;
-	allocate_device_memory((void**)&pdev_sizes, 2*sizeof(unsigned int));
-
+	allocate_device_memory((void**)&pdev_sizes, 4*sizeof(unsigned int));
+	set_device_memory((void*)pdev_sizes, 0, 4*sizeof(unsigned int));
 	// runs serially
 	dim3 threads_per_block(1, 1);
 	dim3 blocks_per_grid(1, 1);
 	cudaThreadSynchronize();
 
-	edge_index_calculator_kernel <<< blocks_per_grid, threads_per_block >>> (
+	for ( int face_count = 0; face_count < num_faces ; face_count++ )
+	{
+		//printf("face %d of %d\n", face_count+1, num_faces);
+
+		get_loop_index_and_count_kernel <<< blocks_per_grid, threads_per_block >>> (
+												pdev_sizes+2,
+												pdev_face_first_loops,
+												pdev_face_loop_counts,
+												face_count );
+		checkLastCudaError();
+		copy_from_device_to_host((void*)(&host_sizes), (const void*)pdev_sizes, 4*sizeof(unsigned int));
+		checkLastCudaError();
+
+		for ( int loop_index = host_sizes[2]; loop_index < host_sizes[2] + host_sizes[3]; loop_index++ )
+		{
+			//printf("loop %d of %d\n", loop_index+1, host_sizes[2] + host_sizes[3]);
+			edge_index_calculator_kernel <<< blocks_per_grid, threads_per_block >>> (
 												pdev_edge_list,
 												pdev_sizes,
 												pdev_first_midpoint,
 												pdev_has_midpoint,
 												pdev_index_map,
-												pdev_face_first_loops,
-												pdev_face_loop_counts,
 												pdev_loop_first_edges,
 												pdev_clockwise_edges,
 												pdev_edge_selection,
 												pdev_companions,
 												pdev_boundary_edges,
 												split_point_count,
-												num_faces,
-												first_new_point_index
+												first_new_point_index,
+												loop_index
 												 );
-	checkLastCudaError();
-	unsigned int host_sizes[2];
+			checkLastCudaError();
+
+		}
+	}
+
 	copy_from_device_to_host((void*)(&host_sizes), (const void*)pdev_sizes, 2*sizeof(unsigned int));
 	cudaThreadSynchronize();
 	free_device_memory ( pdev_sizes );

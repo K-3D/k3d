@@ -124,10 +124,10 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh, k3d::uint3
     	// allocate temporary storage for the floats from the device
     	host_points_and_selection = (float*) malloc ( m_number_of_points*4*sizeof(float) );
     	copy_from_device_to_host( (void*) host_points_and_selection, (void*) pdev_points_and_selection, m_number_of_points*4*sizeof(float) );
-        
+
         double* out_points;
         double* out_selection;
-        
+
     	if ( copy_points )
         {
             // check to see if mesh's points exist
@@ -144,7 +144,7 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh, k3d::uint3
             }
             out_points = (double*)&(p_output_mesh->points->front());
         }
-        
+
         if ( copy_selection )
         {
     		if ( !(p_output_mesh->point_selection) )
@@ -158,7 +158,7 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh, k3d::uint3
             }
             out_selection = (double*)&(p_output_mesh->point_selection->front());
         }
-        
+
 		synchronize_threads();
 		for ( int point = 0 ; point < m_number_of_points ; ++point )
 		{
@@ -184,14 +184,14 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh, k3d::uint3
         {
             boost::shared_ptr<const k3d::mesh::polyhedra_t> polyhedra (new k3d::mesh::polyhedra_t());
             p_output_mesh->polyhedra = polyhedra;
-        }    
-                
+        }
+
         m_cuda_device_polyhedra.copy_from_device(*(p_output_mesh->polyhedra), what_to_copy);
 	}
 
 	// TODO:  copy vertex data
     p_output_mesh->vertex_data = m_p_host_mesh->vertex_data;
-    
+
     synchronize_threads();
     free ( host_points_and_selection );
 }
@@ -239,7 +239,7 @@ k3d::uint32_t* cuda_device_mesh::get_polyhedra_loop_first_edges_pointer()
 
 void cuda_device_mesh::set_device_polyhedra( const k3d::mesh::polyhedra_t& host_polyhedra )
 {
-    
+
 }
 
 /**
@@ -249,20 +249,20 @@ void cuda_device_mesh::resize_points_and_selection ( k3d::uint32_t new_number_of
 {
     float* new_pdev_point_and_selection;
     allocate_device_memory((void**)&new_pdev_point_and_selection, new_number_of_points*sizeof(float)*4);
-    
+
     if ( pdev_points_and_selection != 0 )
-    {   
+    {
         copy_from_device_to_device((void*)new_pdev_point_and_selection, (const void*)pdev_points_and_selection, std::min(m_number_of_points, new_number_of_points)*4*sizeof(float));
-        
+
         // initialize the selection to its default value
         if ( ( new_number_of_points > m_number_of_points ) & ( default_selection != 0 ) )
         {
-            set_selection_value_entry ( new_pdev_point_and_selection + m_number_of_points*4, default_selection, new_number_of_points - m_number_of_points );            
-        }                        
+            set_selection_value_entry ( new_pdev_point_and_selection + m_number_of_points*4, default_selection, new_number_of_points - m_number_of_points );
+        }
         // free the memory allocated previously
-        free_device_memory( pdev_points_and_selection );    
+        free_device_memory( pdev_points_and_selection );
     }
-    
+
     synchronize_threads();
     pdev_points_and_selection = new_pdev_point_and_selection;
     m_number_of_points = new_number_of_points;
