@@ -130,7 +130,7 @@ namespace module
 
 				void reset_properties()
 				{
-					m_knot_vector.set_value(extract_knots(*m_input_mesh, m_curve));
+					m_knot_vector.set_value(extract_knots(*m_input_mesh.pipeline_value(), m_curve));
 				}
 
 				void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -141,8 +141,6 @@ namespace module
 						return;
 
 					merge_selection(m_mesh_selection.pipeline_value(), Output);
-
-                    m_input_mesh = &Output;
 
 					nurbs_curve_modifier mod(Output);
 
@@ -200,7 +198,6 @@ namespace module
 
 			private:
 				k3d::metadata_property < k3d_data(k3d::mesh::knots_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, array_serialization) > m_knot_vector;
-				const k3d::mesh* m_input_mesh;
 				int m_curve;
 
 				k3d::mesh::knots_t extract_knots(const k3d::mesh& Output, int curve)

@@ -107,7 +107,7 @@ namespace module
 			}
 
 		private:
-            k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_degree;
+            k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_degree;
 		};
 
 		//Create connect_curve factory

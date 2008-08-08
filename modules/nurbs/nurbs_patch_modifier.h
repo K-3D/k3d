@@ -55,6 +55,13 @@ namespace module
 			k3d::mesh::points_t control_points;
 		};
 
+		///A trimming curve data struct
+		typedef struct nurbs_trim_curve{
+			k3d::mesh::knots_t curve_knots;
+			k3d::mesh::weights_t curve_point_weights;
+			k3d::mesh::points_2d_t control_points;
+		};
+
 		///A nurbs patch data struct
 		typedef struct nurbs_patch{
 			size_t u_order;
@@ -72,6 +79,14 @@ namespace module
 				///Create a nurbs_patch_modifier from the given mesh, working on its patches
 				///\param input The mesh to operate on
 				nurbs_patch_modifier(k3d::mesh& input);
+
+				///Add a trimming curve to the chosen patch
+				///\param patch The patch we want to trim
+				///\param curve The curve (still a common NURBS curve) we're using as trimming curve, it will be transformed to a trimming curve
+				///\param scale Scales the coordinates of the trim curve
+				///\param offset_u Offset the trim curve
+				///\param offset_v Offset the trim curve
+				void add_trim_curve(size_t patch, size_t curve, double scale, double offset_u, double offset_v);
 
 				///Extract the patch with the given index, returns this patch
 				nurbs_patch extract_patch(size_t patch);
@@ -115,6 +130,10 @@ namespace module
 				///\param patch The patch to degree elevate
 				///\param degree If the patch had u-degree 2 and you specify 2 here, it'll get a new degree of 4
 				void patch_v_degree_elevation(size_t patch, size_t degree);
+
+                ///Selects this patch and deselects all others
+                ///\param patch The patch to select
+                void select_patch(size_t patch);
 
 				///Split a patch at the seleted u-value (so itgets split in u-direction)
 				///adds a new patch to the end

@@ -2688,5 +2688,58 @@ namespace module
             }
 		}
 
+		nurbs_trim_curve nurbs_curve_modifier::create_trim_curve(size_t curve)
+		{
+		    nurbs_trim_curve result;
+		    nurbs_curve temp = extract_curve(curve);
+
+		    result.curve_knots.insert(result.curve_knots.begin(), temp.curve_knots.begin(), temp.curve_knots.end());
+		    result.curve_point_weights.insert(result.curve_point_weights.begin(), temp.curve_point_weights.begin(), temp.curve_point_weights.end());
+		    result.curve_point_weights.front() = 1.0;
+		    result.curve_point_weights.back() = 1.0;
+
+            double min_x, min_y, max_x, max_y;
+
+            for(int i = 0; i < temp.control_points.size() - 1; i++)
+		    {
+		        if(i == 0)
+		        {
+		            max_x = min_x = temp.control_points.at(i)[0];
+		            max_y = min_y = temp.control_points.at(i)[1];
+		        }
+		        else
+		        {
+		            if(max_x < temp.control_points.at(i)[0])
+                        max_x = temp.control_points.at(i)[0];
+                    if(min_x > temp.control_points.at(i)[0])
+                        min_x = temp.control_points.at(i)[0];
+
+                     if(max_y < temp.control_points.at(i)[1])
+                        max_y = temp.control_points.at(i)[1];
+                    if(min_y > temp.control_points.at(i)[1])
+                        min_y = temp.control_points.at(i)[1];
+		        }
+		    }
+
+		    for(int i = 0; i < temp.control_points.size() - 1; i++)
+		    {
+		        result.control_points.push_back(k3d::point2((temp.control_points.at(i)[0] - min_x) / max_x, (temp.control_points.at(i)[1] - min_y) / max_y));
+		    }
+		    result.control_points.push_back(result.control_points.front());
+
+		    return result;
+		}
+
+		void nurbs_curve_modifier::select_curve(size_t curve)
+		{
+		    for(int i = 0; i < count_all_curves_in_groups(); i++)
+		    {
+		        if(i!= curve)
+                    curve_selection->at(i) = 0.0;
+                else
+                    curve_selection->at(i) = 1.0;
+		    }
+		}
+
 	}//nurbs
 }//module
