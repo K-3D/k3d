@@ -250,6 +250,7 @@ void initialize_types()
 
 	/** \todo Come up with a more explicit type for these */
 	register_type(typeid(k3d::typed_array<unsigned int>), "k3d::typed_array<unsigned int>");
+	register_type(typeid(k3d::typed_array<k3d::double_t>), "k3d::typed_array<k3d::double_t>");
 	register_type(typeid(std::vector<k3d::point3>), "std::vector<k3d::point3>");
 	register_type(typeid(std::vector<unsigned int>), "std::vector<unsigned int>");
 	register_type(typeid(std::vector<k3d::inode*>), "std::vector<k3d::inode*>");

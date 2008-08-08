@@ -163,19 +163,19 @@ const object any_to_python(const boost::any& Value)
 		std::vector<k3d::inode*> nodes = boost::any_cast<std::vector<k3d::inode*> >(Value);
 
 		boost::python::list results;
-		for(size_t i = 0; i != nodes.size(); ++i)
+		for(k3d::uint_t i = 0; i != nodes.size(); ++i)
 			results.append(wrap(nodes[i]));
 
 		return results;
 	}
 
-	if(type == typeid(k3d::typed_array<double>))
+	if(type == typeid(k3d::typed_array<k3d::double_t>))
 	{
-		k3d::typed_array<double> nodes = boost::any_cast<k3d::typed_array<double> >(Value);
+		k3d::typed_array<k3d::double_t> nodes = boost::any_cast<k3d::typed_array<k3d::double_t> >(Value);
 
 		boost::python::list results;
-		for(size_t i = 0; i != nodes.size(); ++i)
-			results.append(wrap(nodes[i]));
+		for(k3d::uint_t i = 0; i != nodes.size(); ++i)
+			results.append(nodes[i]);
 
 		return results;
 	}
@@ -332,24 +332,24 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 		std::vector<k3d::inode*> results;
 
 		boost::python::list nodes = extract<boost::python::list>(Value);
-		const size_t count = boost::python::len(nodes);
+		const k3d::uint_t count = boost::python::len(nodes);
 		results.resize(count);
-		for(size_t i = 0; i != count; ++i)
+		for(k3d::uint_t i = 0; i != count; ++i)
 			results[i] = extract<interface_wrapper<k3d::inode> >(nodes[i])().wrapped_ptr();
 
 		return boost::any(results);
 	}
 
-	if(TargetType == typeid(k3d::typed_array<double>))
+	if(TargetType == typeid(k3d::typed_array<k3d::double_t>))
 	{
-		k3d::typed_array<double> results;
+		k3d::typed_array<k3d::double_t> results;
 
 		boost::python::list values = extract<boost::python::list>(Value);
-		const size_t count = boost::python::len(values);
+		const k3d::uint_t count = boost::python::len(values);
 		results.resize(count);
-		for(size_t i = 0; i != count; ++i)
+		for(k3d::uint_t i = 0; i != count; ++i)
 		{
-		    results[i] = *extract<interface_wrapper<double> >(values[i])().wrapped_ptr();
+		    results[i] = extract<k3d::double_t>(values[i])();
 		}
 
 		return boost::any(results);
