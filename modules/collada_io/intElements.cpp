@@ -43,7 +43,6 @@ namespace io
 
 	intGeometry::intGeometry(domGeometry& geomElement, const k3d::matrix4& ccst)
 	{
-
 		domMesh *meshElement = geomElement.getMesh();
 
 		k3d::gprim_factory factory(Mesh);

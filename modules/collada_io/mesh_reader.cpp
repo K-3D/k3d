@@ -109,7 +109,7 @@ public:
 	{
 		static k3d::document_plugin_factory<mesh_reader,k3d::interface_list<k3d::imesh_source,k3d::interface_list<k3d::imesh_storage> > > factory(
 			k3d::uuid(0x4d603851, 0x0441b8b5, 0x294d5a8c, 0x95478016),
-			"ColladaMeshReader",
+			"COLLADAMeshReader",
 			_("Mesh reader that loads external COLLADA (.dae) files into the document by reference"),
 			"MeshReader",
 			k3d::iplugin_factory::EXPERIMENTAL);
