@@ -287,6 +287,16 @@ void GroupContentPanel::buildPanel()
       //Gtk Build / Show GUI Hint
       m_hpane->show_all(); 
 
+
+     //  k3d::bool_t toggle_alpha = checkPviewBackground((*mat_iter));
+
+
+//       k3d::log() << "toggle_alpha ok" << std::endl;
+
+//       rEngineAlpha(toggle_alpha, (*mat_iter));
+
+//       k3d::log() << "renginealpha ok" << std::endl;
+
       matobjAttachGeo();
 
       //Set Off Renderer In New Process 
@@ -313,6 +323,11 @@ void GroupContentPanel::renderPreview()
       //Check If Selected Node Is A RenderMan Material
       if((*mat_iter)->isMaterial())
         {
+//Set Alpha Render In Render Engine
+          k3d::bool_t toggle_alpha = checkPviewBackground(*mat_iter);
+          rEngineAlpha(toggle_alpha, *mat_iter);
+
+
           //Select Correct Geometry
           k3d::inode *selected_geo = (*mat_iter)->m_preview_geo;
 

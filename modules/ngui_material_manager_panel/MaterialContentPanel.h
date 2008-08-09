@@ -64,10 +64,6 @@ class MaterialContentPanel : public ContentPanel
       m_artistnotes_mltext(*_m_parent, k3d::string_t("so_artistnotes_mltxt"), 
                            text::model(_m_materialobj->m_artistnotes), 0)
 
-
-      /* m_material_preview(k3d::system::get_temp_directory()  */
-/*                       / k3d::filesystem::generic_path(m_single_imgfile)) */
-
         {
         }
 
@@ -109,6 +105,9 @@ class MaterialContentPanel : public ContentPanel
       //Switch Preview Geometry On Combo Select
       void onRenderComboSelect();
 
+      //Displays Background (Or Not)
+      void onBGButtonPressed();
+
       //Find A Material From A Doc Node
       bool findMaterial(const k3d::inode *node)
       {
@@ -128,6 +127,8 @@ class MaterialContentPanel : public ContentPanel
       Gtk::Label 			m_datemod_label;
       Gtk::Label 			m_artistname_label;
 
+
+      Gtk::HBox 			m_master_pad_cont;
       Gtk::VBox 			m_pview_editor_cont;
       Gtk::HBox 			m_pview_data_cont;
       Gtk::VBox 			m_data_toolbar_cont;
@@ -159,7 +160,7 @@ class MaterialContentPanel : public ContentPanel
       //ToolBox Gtk Widgets
       Gtk::HBox			 	m_toolbox_cont;
       Gtk::ComboBoxText   	m_tool_geo_combo;
-      Gtk::ToggleButton   	m_tool_gb_button;
+      Gtk::Button   			m_tool_bg_button;
 
   private:
 

@@ -40,7 +40,10 @@ void MaterialContentPanel::init()
     .connect(sigc::mem_fun(*this, &MaterialContentPanel::onRenderComboSelect));
 
 
-  //matobjAttachGeo();
+  //Background Button Button Connection
+  m_tool_bg_button.signal_clicked()
+    .connect(sigc::mem_fun(*this, &MaterialContentPanel::onBGButtonPressed));
+
 
 
 }//init
@@ -53,6 +56,9 @@ void MaterialContentPanel::buildPanel()
       //Set Off Renderer In New Process 
       //renderPreview();
 
+      //Embed Everything In Master HBOX Padder
+      m_master_pad_cont.pack_start(m_pview_editor_cont, true, true, 5);
+
       //Setup Render Preview Frame
       m_pview_frame.set_size_request(m_pview_size + 25, m_pview_size + 35);
       //m_pview_frame.add(m_material_preview);
@@ -62,7 +68,8 @@ void MaterialContentPanel::buildPanel()
  	      
       //Add ScrollWindowed Panel To Right Pane From Implementation
       m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-      m_scrolled_window.add(m_pview_editor_cont);
+      m_scrolled_window.add(m_master_pad_cont);
+
       m_hpane->add2(m_scrolled_window);
 
       //Place Containers In Correct Hierachy
@@ -125,14 +132,14 @@ void MaterialContentPanel::buildPanel()
       m_tool_geo_combo.set_size_request(-1, 30);
 
       //Setup Preview Background Button
-      m_toolbox_cont.pack_start(m_tool_gb_button, false, false, 2);
+      m_toolbox_cont.pack_start(m_tool_bg_button, false, false, 2);
 
       k3d::string_t bg_graphic_path 
         = (k3d::share_path() / k3d::filesystem::generic_path("ngui/pixmap") 
            / k3d::filesystem::generic_path("mat_preview_bg_icon.xpm"))
         .native_filesystem_string();
 
-      m_tool_gb_button.add_pixlabel(bg_graphic_path, "BG");
+      m_tool_bg_button.add_pixlabel(bg_graphic_path, "Bg");
 
       //**********************************************************
       
@@ -143,7 +150,6 @@ void MaterialContentPanel::buildPanel()
 
       //Gtk Build / Show Hint
       m_hpane->show_all(); 
-
 
       matobjAttachGeo();
 
@@ -164,10 +170,15 @@ void MaterialContentPanel::renderPreview()
   //Invoke Generic Render Initialization
   renderInit();
 
-k3d::property::set_internal_value(*m_engine, 
-                                  "visible_nodes", 
-                                  k3d::inode_collection_property
-                                  ::nodes_t(1, m_geometry));
+  //Set Alpha Render In Render Engine
+  k3d::bool_t toggle_alpha = checkPviewBackground(m_materialobj);
+  rEngineAlpha(toggle_alpha, m_materialobj);
+
+
+  k3d::property::set_internal_value(*m_engine, 
+                                    "visible_nodes", 
+                                    k3d::inode_collection_property
+                                    ::nodes_t(1, m_geometry));
 
   //Check If Selected Node Is A RenderMan Material
   if(m_materialobj->isMaterial())
@@ -408,7 +419,7 @@ void MaterialContentPanel::matobjAttachGeo()
         {
         m_materialobj->setPreviewGeo(attached_geo, meta_attachedgeo);
         k3d::log() << "attached geo: " << m_materialobj->m_preview_geo << std::endl;
-      }
+        }
 
       else if(attached_new_geo)
         {
@@ -436,38 +447,31 @@ void MaterialContentPanel::matobjAttachGeo()
 
 
 
-  // else
-//     {
-//       //No Meta Data. Possibly Create & Attach Default Sphere
-//       k3d::inode *existing_sphere = 0;
-//       if(!checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::sphere_node_name, &existing_sphere, m_document_state))
-//         {
-//           PreviewObj *default_sphere = new PreviewSphere("Sphere", m_document_state);
-//           default_sphere->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
-
-//           m_materialobj->setPreviewGeo(default_sphere->m_doc_node, PreviewObj::sphere_md);
-
-//           k3d::log() << "no meta, sphere node created: " << default_sphere->m_doc_node << std::endl;
-
-//         }
-//       else
-//         {
-//           //Default Sphere Exists In Document
-//           if(existing_sphere)
-//             {
-//               m_materialobj->setPreviewGeo(existing_sphere, PreviewObj::sphere_md);
-//               k3d::log() << "no meta, sphere node Not created: " << existing_sphere << std::endl;
-//             }
-
-//         }
-
-//     }
-
   m_geometry =  m_materialobj->m_preview_geo;
 
-  
+}//matobjAttachGeo
 
-}
+
+
+
+void MaterialContentPanel::onBGButtonPressed()
+{
+  if(checkPviewBackground(m_materialobj))
+    {
+      rEngineAlpha(false, m_materialobj);
+    }
+  else
+    {
+      rEngineAlpha(true, m_materialobj);
+    }
+
+  //Render & Refresh Preview
+  renderPreview();
+  updatePreviewImage();
+
+  k3d::log() << "Change The Background!" << std::endl;
+
+}//onBGButtonPressed
 
 
 

@@ -11,6 +11,12 @@ namespace mechanics
 
 //Static Definitions
 const k3d::string_t MaterialObj::attached_geo_nametag_mt = "PreviewCore::attachedgeotag";
+const k3d::string_t MaterialObj::show_bg_nametag_mt = "PreviewCore::showbackground";
+const k3d::string_t MaterialObj::do_show_bg = "do_show_bg";
+const k3d::string_t MaterialObj::do_not_show_bg = "do_not_show_bg";
+
+
+
 
 void MaterialObj::init()
 {

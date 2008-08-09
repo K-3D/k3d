@@ -64,8 +64,10 @@ class RenderedImage: public Gtk::DrawingArea
 
   k3d::filesystem::path m_imgFilePath;
   k3d::filesystem::path m_imgHolderPath;
+  k3d::filesystem::path m_pview_bg_path;
 
   static const k3d::string_t m_holderImgFileName;
+  static const k3d::string_t m_pview_bg_filename;
 
  protected:
 

@@ -171,6 +171,13 @@ class MaterialObj
 
     //Static Attached Geometry MetaTag
     static const k3d::string_t attached_geo_nametag_mt;
+
+    //Static Show Background MetaTag
+    static const k3d::string_t show_bg_nametag_mt;
+
+    //Static Show Background MetaData
+    static const k3d::string_t do_show_bg;
+    static const k3d::string_t do_not_show_bg;
     
     
 	  

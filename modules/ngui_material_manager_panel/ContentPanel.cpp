@@ -415,8 +415,8 @@ void ContentPanel::createPreviewNodes()
   	  {
 				aqsis 
 					= k3d::plugin::create<k3d::ri::irender_engine>("AqsisRenderManEngine", 
-																												 m_document_state->document(), 
-																												 "Preview Core::Aqsis Renderer");
+                                                              m_document_state->document(), 
+                                                              "Preview Core::Aqsis Renderer");
   	  }
 
       //Create Meta Data
@@ -535,6 +535,78 @@ void ContentPanel::renderInit()
 
 }//renderInit
 
+
+
+void ContentPanel::rEngineAlpha(k3d::bool_t toggle, MaterialObj *mat)
+{
+  if(m_engine)
+    {
+      //Turn The Render Alpha Property On Or Off Depending On Switch
+      k3d::property::set_internal_value(*m_engine, 
+                                        "render_alpha", 
+                                        toggle);
+
+    }//if
+
+
+  //Get The Doc Node From MaterialObj Ptr
+  k3d::inode *mat_node = mat->m_doc_node;
+
+  if(mat_node)
+    {
+      //Set The MetaData For Background
+      if(toggle)
+        {
+          //Set MetaData To Show Background
+          if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(mat_node))
+            metadata->set_metadata(MaterialObj::show_bg_nametag_mt, MaterialObj::do_show_bg);
+        }
+      else
+        {
+          //Set MetaData To NOT Show Background
+          if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(mat_node))
+            metadata->set_metadata(MaterialObj::show_bg_nametag_mt, MaterialObj::do_not_show_bg);
+        }
+    }
+
+
+}//rEngineAlpha
+
+
+
+
+bool ContentPanel::checkPviewBackground(MaterialObj *mat)
+{
+  //Get The Doc Node From MaterialObj Ptr
+  k3d::inode *mat_node = mat->m_doc_node;
+
+  //Search m_doc_node Material For Attached Geometry
+  if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(mat_node))
+    {
+      k3d::string_t value = metadata->get_metadata()[MaterialObj::show_bg_nametag_mt];
+
+      if(value == MaterialObj::do_show_bg)
+        {
+          //Background Needs To Be Shown
+          return true;
+        }
+      else if(value == MaterialObj::do_not_show_bg)
+        {
+          //Background Does Not Need To Be Shown
+          return false;
+        }
+      else
+        {
+          //DEFAULT: Background Does Not Need To Be Shown
+          return false;
+        }
+
+
+
+    }//if
+
+
+}//checkPviewBackground
 
 
 

@@ -48,6 +48,8 @@
 #include "PreviewSphere.h"
 #include "PreviewCube.h"
 
+#include "MaterialObj.h"
+
 #include "DocumentUtilities.h"
 
 using namespace libk3dngui;
@@ -129,6 +131,12 @@ class ContentPanel
 
     //Generic Render Initialization
     void renderInit();
+
+    //Turn Render Engine Alpha On Or Off
+    void rEngineAlpha(k3d::bool_t toggle, MaterialObj *mat);
+
+    //Render Preview Background Checker
+    bool checkPviewBackground(MaterialObj *mat);
 
     //Find A Material From A Doc Node
     virtual bool findMaterial(const k3d::inode *node) 	= 0;
