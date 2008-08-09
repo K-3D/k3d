@@ -166,7 +166,7 @@ void control::grab_panel_focus()
 	m_panel_focus_signal.emit(this);
 }
 
-void control::mount_panel(panel::control& Panel, const std::string& Type)
+void control::mount_panel(panel::control& Panel, const k3d::string_t& Type)
 {
 	unmount();
 
@@ -178,7 +178,7 @@ void control::mount_panel(panel::control& Panel, const std::string& Type)
 	m_panel_type_connection.unblock();
 }
 
-void control::mount_panel(const std::string& Type, bool RequestCamera)
+void control::mount_panel(const k3d::string_t& Type, bool RequestCamera)
 {
 	if("NGUIViewportPanel" == Type)
 	{
@@ -226,7 +226,7 @@ void control::mount_panel(const std::string& Type, bool RequestCamera)
 	k3d::log() << error << "Couldn't mount panel of type : " << Type << std::endl;
 }
 
-void control::on_mount_panel(const std::string& Type)
+void control::on_mount_panel(const k3d::string_t& Type)
 {
 	record_command("mount", Type);
 	mount_panel(Type);
@@ -288,11 +288,11 @@ void control::load(k3d::xml::element& Element)
 {
 	return_if_fail("panel" == Element.name);
 
-	const std::string type = attribute_text(Element, "type");
-	const std::string is_pinned = attribute_text(Element, "pinned");
-	const std::string is_visible = attribute_text(Element, "visible");
-	const std::string is_automagic = attribute_text(Element, "automagic");
-	const std::string is_decorated = attribute_text(Element, "decorations");
+	const k3d::string_t type = attribute_text(Element, "type");
+	const k3d::string_t is_pinned = attribute_text(Element, "pinned");
+	const k3d::string_t is_visible = attribute_text(Element, "visible");
+	const k3d::string_t is_automagic = attribute_text(Element, "automagic");
+	const k3d::string_t is_decorated = attribute_text(Element, "decorations");
 
 	mount_panel(type);
 
@@ -331,9 +331,9 @@ void control::set_choices()
 		if(metadata["ngui:component-type"] != "panel")
 			continue;
 
-		const std::string panel_type = (**factory).name();
+		const k3d::string_t panel_type = (**factory).name();
 
-		const std::string panel_label = metadata["ngui:panel-label"];
+		const k3d::string_t panel_label = metadata["ngui:panel-label"];
 		if(panel_label.empty())
 		{
 			k3d::log() << error << "Panel plugin [" << panel_type << "] without ngui:panel-label metadata will be ignored" << std::endl;
@@ -348,7 +348,7 @@ void control::set_choices()
 	m_model->set_sort_column(m_columns.label, Gtk::SORT_ASCENDING);
 }
 
-void control::add_choice(const std::string& PanelType, const Glib::RefPtr<Gdk::Pixbuf> Icon, const Glib::ustring& Label, sigc::slot<void> Slot)
+void control::add_choice(const k3d::string_t& PanelType, const Glib::RefPtr<Gdk::Pixbuf> Icon, const Glib::ustring& Label, sigc::slot<void> Slot)
 {
 	Gtk::TreeRow row = *m_model->append();
 
@@ -375,7 +375,7 @@ void control::on_decorations_changed(k3d::iunknown*)
 		m_decorations.hide();
 }
 
-const unsigned long control::index(const std::string& PanelType)
+const unsigned long control::index(const k3d::string_t& PanelType)
 {
 	const Gtk::TreeModel::Children children = m_model->children();
 	for(unsigned long i = 0; i != children.size(); ++i)
@@ -384,11 +384,11 @@ const unsigned long control::index(const std::string& PanelType)
 			return i;
 	}
 
-	assert_not_reached();
+	k3d::log() << error << k3d_file_reference << ": error looking-up panel [" << PanelType << "]" << std::endl;
 	return 0;
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
+const k3d::icommand_node::result control::execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 {
 	if(Command == "float")
 	{

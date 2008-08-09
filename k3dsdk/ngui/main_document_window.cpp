@@ -545,7 +545,7 @@ public:
 			viewport::control* const control = new viewport::control(m_document_state, *this);
 			control->set_camera(camera1);
 			control->set_gl_engine(glengine1);
-			panel_frame4->mount_panel(*Gtk::manage(control), "viewport");
+			panel_frame4->mount_panel(*Gtk::manage(control), "NGUIViewportPanel");
 		}
 
 		// Node history below node list

@@ -2,7 +2,7 @@
 #define NGUI_PANEL_FRAME_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -68,10 +68,10 @@ public:
 	/// Assigns the frame the panel focus
 	void grab_panel_focus();
 
-	/// Mounts a panel to the frame (note: mainly for hacking purposes, prefer mount_panel(const std::string& Type) instead)
-	void mount_panel(panel::control& Panel, const std::string& Type);
+	/// Mounts a panel to the frame (note: mainly for hacking purposes, prefer mount_panel(const k3d::string_t& Type) instead)
+	void mount_panel(panel::control& Panel, const k3d::string_t& Type);
 	/// Mounts a panel based on type
-	void mount_panel(const std::string& Type, bool RequestCamera = false);
+	void mount_panel(const k3d::string_t& Type, bool RequestCamera = false);
 	/// Unmounts a mounted panel
 	void unmount();
 	/// Unmounts a mounted panel, placing it in a floating window
@@ -82,7 +82,7 @@ public:
 	/// Restores normal background
 	void unset_bg_color();
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
+	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments);
 
 	/// Returns the mounted panel, if any (could return NULL)
 	panel::control* const mounted_panel();
@@ -103,19 +103,19 @@ private:
 	void add(Widget&);
 	void remove();
 
-	void on_mount_panel(const std::string& Type);
+	void on_mount_panel(const k3d::string_t& Type);
 
 	void on_panel_focus_changed(control* Container);
 	void on_grab_focus();
 	void on_panel_type_changed();
 	void on_decorations_changed(k3d::iunknown*);
 
-	const unsigned long index(const std::string& Type);
+	const unsigned long index(const k3d::string_t& Type);
 
 	/// Called to update the contents of the combo-box for choosing panels
 	void set_choices();
 	/// Called to add a choice to the combo-box for choosing panels
-	void add_choice(const std::string& PanelType, const Glib::RefPtr<Gdk::Pixbuf> Icon, const Glib::ustring& Label, sigc::slot<void> Slot);
+	void add_choice(const k3d::string_t& PanelType, const Glib::RefPtr<Gdk::Pixbuf> Icon, const Glib::ustring& Label, sigc::slot<void> Slot);
 
 	class columns :
 		public Gtk::TreeModelColumnRecord
@@ -138,7 +138,7 @@ private:
 	Glib::RefPtr<Gtk::ListStore> m_model;
 
 	/// Stores a mapping from panel type to external plugin factory
-	std::map<std::string, k3d::iplugin_factory*> m_type_plugin_map;
+	std::map<k3d::string_t, k3d::iplugin_factory*> m_type_plugin_map;
 
 	Gtk::HBox m_decorations;
 	/// Provides a combo-box for choosing from available panel types
