@@ -26,7 +26,7 @@
 #include "detail.h"
 
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/named_array_copier.h>
+#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/shared_pointer.h>
 
 namespace module
@@ -41,8 +41,8 @@ namespace detail
 void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const k3d::mesh::blobbies_t::operator_type Operator, const k3d::bool_t VariableArguments, k3d::mesh& Output)
 {
 	// Collect all of the varying and vertex arrays to be merged ...
-	k3d::named_arrays::named_arrays_collection source_varying_data;
-	k3d::named_arrays::named_arrays_collection source_vertex_data;
+	k3d::mesh::attribute_arrays_t::attribute_arrays_collection source_varying_data;
+	k3d::mesh::attribute_arrays_t::attribute_arrays_collection source_vertex_data;
 	for(mesh_collection::const_iterator mesh = Inputs.begin(); mesh != Inputs.end(); ++mesh)
 	{
 		source_varying_data.push_back(&(**mesh).blobbies->varying_data);
@@ -59,16 +59,16 @@ void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const 
 	k3d::mesh::blobbies_t::primitives_t& target_primitives = *k3d::make_unique(target_blobbies.primitives);
 	k3d::mesh::indices_t& target_primitive_first_floats = *k3d::make_unique(target_blobbies.primitive_first_floats);
 	k3d::mesh::counts_t& target_primitive_float_counts = *k3d::make_unique(target_blobbies.primitive_float_counts);
-	k3d::named_arrays& target_varying_data = target_blobbies.varying_data;
-	k3d::named_arrays& target_vertex_data = target_blobbies.vertex_data;
+	k3d::mesh::attribute_arrays_t& target_varying_data = target_blobbies.varying_data;
+	k3d::mesh::attribute_arrays_t& target_vertex_data = target_blobbies.vertex_data;
 	k3d::mesh::blobbies_t::operators_t& target_operators = *k3d::make_unique(target_blobbies.operators);
 	k3d::mesh::indices_t& target_operator_first_operands = *k3d::make_unique(target_blobbies.operator_first_operands);
 	k3d::mesh::counts_t& target_operator_operand_counts = *k3d::make_unique(target_blobbies.operator_operand_counts);
 	k3d::mesh::blobbies_t::floats_t& target_floats = *k3d::make_unique(target_blobbies.floats);
 	k3d::mesh::blobbies_t::operands_t& target_operands = *k3d::make_unique(target_blobbies.operands);
 
-	target_varying_data = k3d::named_arrays::clone_types(source_varying_data);
-	target_vertex_data = k3d::named_arrays::clone_types(source_vertex_data);
+	target_varying_data = k3d::attribute_arrays::clone_types(source_varying_data);
+	target_vertex_data = k3d::attribute_arrays::clone_types(source_vertex_data);
 
 	target_first_primitives.push_back(0);
 	target_primitive_counts.push_back(0);
@@ -89,16 +89,16 @@ void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const 
 		const k3d::mesh::blobbies_t::primitives_t& source_primitives = *(*mesh)->blobbies->primitives;
 		const k3d::mesh::indices_t& source_primitive_first_floats = *(*mesh)->blobbies->primitive_first_floats;
 		const k3d::mesh::counts_t& source_primitive_float_counts = *(*mesh)->blobbies->primitive_float_counts;
-		const k3d::named_arrays& source_varying_data = (*mesh)->blobbies->varying_data;
-		const k3d::named_arrays& source_vertex_data = (*mesh)->blobbies->vertex_data;
+		const k3d::mesh::attribute_arrays_t& source_varying_data = (*mesh)->blobbies->varying_data;
+		const k3d::mesh::attribute_arrays_t& source_vertex_data = (*mesh)->blobbies->vertex_data;
 		const k3d::mesh::blobbies_t::operators_t& source_operators = *(*mesh)->blobbies->operators;
 		const k3d::mesh::indices_t& source_operator_first_operands = *(*mesh)->blobbies->operator_first_operands;
 		const k3d::mesh::counts_t& source_operator_operand_counts = *(*mesh)->blobbies->operator_operand_counts;
 		const k3d::mesh::blobbies_t::floats_t& source_floats = *(*mesh)->blobbies->floats;
 		const k3d::mesh::blobbies_t::operands_t& source_operands = *(*mesh)->blobbies->operands;
 
-		k3d::named_array_copier varying_copier(source_varying_data, target_varying_data, k3d::named_array_copier::copy_subset());
-		k3d::named_array_copier vertex_copier(source_vertex_data, target_vertex_data, k3d::named_array_copier::copy_subset());
+		k3d::attribute_array_copier varying_copier(source_varying_data, target_varying_data, k3d::attribute_array_copier::copy_subset());
+		k3d::attribute_array_copier vertex_copier(source_vertex_data, target_vertex_data, k3d::attribute_array_copier::copy_subset());
 
 		const k3d::uint_t blobby_begin = 0;
 		const k3d::uint_t blobby_end = blobby_begin + source_first_primitives.size();

@@ -1,5 +1,5 @@
-#ifndef K3DSDK_NAMED_ARRAY_COPIER_H
-#define K3DSDK_NAMED_ARRAY_COPIER_H
+#ifndef K3DSDK_ATTRIBUTE_ARRAY_COPIER_H
+#define K3DSDK_ATTRIBUTE_ARRAY_COPIER_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -24,13 +24,13 @@
 	\author Timothy M. Shead
 */
 
-#include "named_arrays.h"
+#include "attribute_arrays.h"
 
 namespace k3d
 {
 
-/// Handles random-access copying between named arrays
-class named_array_copier
+/// Handles random-access copying among attribute arrays
+class attribute_array_copier
 {
 public:
 	/// Abstract interface for policy objects that determine which source arrays get copied to which target arrays.
@@ -75,10 +75,10 @@ public:
 		void unused_target(const string_t& TargetName, const array& Target) const; 
 	};
 
-	/// Initializes named_array_copier to copy data from a collection of source arrays to a collection of target arrays, using a copy_policy
+	/// Initializes attribute_array_copier to copy data from a collection of source arrays to a collection of target arrays, using a copy_policy
 	/// object to determine how each source array maps to each target array.
-	named_array_copier(const named_arrays& Source, named_arrays& Target, const copy_policy& CopyPolicy = strict_copy());
-	~named_array_copier();
+	attribute_array_copier(const attribute_arrays& Source, attribute_arrays& Target, const copy_policy& CopyPolicy = strict_copy());
+	~attribute_array_copier();
 
 	/// Appends the given index value from each source array to each corresponding target array.
 	void push_back(const uint_t Index);
@@ -93,11 +93,11 @@ private:
 	class implementation;
 	implementation* const m_implementation;
 
-	named_array_copier(const named_array_copier&);
-	named_array_copier& operator=(const named_array_copier&);
+	attribute_array_copier(const attribute_array_copier&);
+	attribute_array_copier& operator=(const attribute_array_copier&);
 };
 
 } // namespace k3d
 
-#endif // !K3DSDK_NAMED_ARRAY_COPIER_H
+#endif // !K3DSDK_ATTRIBUTE_ARRAY_COPIER_H
 

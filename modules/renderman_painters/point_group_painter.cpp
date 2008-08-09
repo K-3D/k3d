@@ -58,12 +58,12 @@ public:
 
 		const k3d::mesh::indices_t& first_points = *Mesh.point_groups->first_points;
 		const k3d::mesh::counts_t& point_counts = *Mesh.point_groups->point_counts;
-		const k3d::mesh::named_arrays& constant_data = Mesh.point_groups->constant_data;
+		const k3d::mesh::attribute_arrays_t& constant_data = Mesh.point_groups->constant_data;
 		const k3d::mesh::materials_t& materials = *Mesh.point_groups->materials;
 		const k3d::mesh::indices_t& group_points = *Mesh.point_groups->points;
-		const k3d::mesh::named_arrays& varying_data = Mesh.point_groups->varying_data;
+		const k3d::mesh::attribute_arrays_t& varying_data = Mesh.point_groups->varying_data;
 		const k3d::mesh::points_t& points = *Mesh.points;
-		const k3d::mesh::named_arrays& vertex_data = Mesh.vertex_data;
+		const k3d::mesh::attribute_arrays_t& vertex_data = Mesh.vertex_data;
 
 		const size_t point_group_begin = 0;
 		const size_t point_group_end = point_group_begin + first_points.size();

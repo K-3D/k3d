@@ -40,7 +40,7 @@ namespace python
 class named_arrays::array_factory
 {
 public:
-	array_factory(const k3d::string_t& Name, const k3d::string_t& Type, boost::python::object& Array, k3d::named_arrays& Arrays) :
+	array_factory(const k3d::string_t& Name, const k3d::string_t& Type, boost::python::object& Array, k3d::attribute_arrays& Arrays) :
 		name(Name),
 		type(Type),
 		array(Array),
@@ -66,13 +66,13 @@ private:
 	k3d::string_t name;
 	k3d::string_t type;
 	boost::python::object& array;
-	k3d::named_arrays& arrays;
+	k3d::attribute_arrays& arrays;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // named_arrays
 
-named_arrays::named_arrays(k3d::named_arrays& NamedArrays) :
+named_arrays::named_arrays(k3d::attribute_arrays& NamedArrays) :
 	wrapped(NamedArrays)
 {
 }
@@ -81,7 +81,7 @@ list named_arrays::array_names()
 {
 	list results;
 
-	for(k3d::named_arrays::const_iterator array = wrapped.begin(); array != wrapped.end(); ++array)
+	for(k3d::attribute_arrays::const_iterator array = wrapped.begin(); array != wrapped.end(); ++array)
 		results.append(array->first);
 
 	return results;
@@ -118,7 +118,7 @@ object named_arrays::get_item(int item)
 	if(item < 0 || item >= wrapped.size())
 		throw std::out_of_range("index out-of-range");
 
-	k3d::named_arrays::const_iterator array_iterator = wrapped.begin();
+	k3d::attribute_arrays::const_iterator array_iterator = wrapped.begin();
 	std::advance(array_iterator, item);
 
 	return wrap_array(array_iterator->second.get());

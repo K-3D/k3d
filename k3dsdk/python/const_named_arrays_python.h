@@ -39,7 +39,7 @@ namespace python
 class const_named_arrays
 {
 public:
-	const_named_arrays(const k3d::mesh::named_arrays& NamedArrays);
+	const_named_arrays(const k3d::mesh::attribute_arrays_t& NamedArrays);
 
 	boost::python::list array_names();
 	boost::python::object array(const std::string& Name);
@@ -51,7 +51,7 @@ public:
 
 private:
 	boost::python::object wrap_array(const k3d::array* const Array);
-	const k3d::mesh::named_arrays& wrapped;
+	const k3d::mesh::attribute_arrays_t& wrapped;
 };
 
 } // namespace python

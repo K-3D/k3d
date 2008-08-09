@@ -65,9 +65,9 @@ void print(std::ostream& Stream, const std::string& Label, const pointer_type& P
 	}
 }
 
-void print(std::ostream& Stream, const std::string& Label, const k3d::mesh::named_arrays& Arrays)
+void print(std::ostream& Stream, const std::string& Label, const k3d::mesh::attribute_arrays_t& Arrays)
 {
-    for(k3d::mesh::named_arrays::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
+    for(k3d::mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
     {
         Stream << Label << " " << array_iterator->first << " (" << array_iterator->second->size() << "): ";
         if(typed_array<double>* const array = dynamic_cast<typed_array<double>*>(array_iterator->second.get()))

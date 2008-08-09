@@ -25,7 +25,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/mesh_modifier.h>
-#include <k3dsdk/named_array_operations.h>
+#include <k3dsdk/array_operations.h>
 #include <k3dsdk/shared_pointer.h>
 
 #include <iterator>

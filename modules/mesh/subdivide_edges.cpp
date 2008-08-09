@@ -31,7 +31,7 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/mesh_topology_data.h>
-#include <k3dsdk/named_array_copier.h>
+#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/shared_pointer.h>
@@ -145,7 +145,7 @@ public:
 			const k3d::uint_t SplitPointCount,
 			k3d::mesh::indices_t& OutputEdgePoints,
 			k3d::mesh::indices_t& OutputClockwiseEdges,
-			k3d::named_array_copier& Copier) :
+			k3d::attribute_array_copier& Copier) :
 				m_input_polyhedra(InputPolyhedra),
 				m_edge_list(EdgeList),
 				m_index_map(IndexMap),
@@ -211,7 +211,7 @@ private:
 	const k3d::uint_t m_split_point_count;
 	k3d::mesh::indices_t& m_output_edge_points;
 	k3d::mesh::indices_t& m_output_clockwise_edges;
-	k3d::named_array_copier& m_copier;
+	k3d::attribute_array_copier& m_copier;
 };
 
 /// Updates edge indices using the mapping from old to new indices
@@ -223,7 +223,7 @@ public:
 			const k3d::mesh::indices_t& IndexMap,
 			k3d::mesh::indices_t& OutputEdgePoints,
 			k3d::mesh::indices_t& OutputClockwiseEdges,
-			k3d::named_array_copier& Copier) :
+			k3d::attribute_array_copier& Copier) :
 				m_input_edge_points(InputEdgePoints),
 				m_input_clockwise_edges(InputClockwiseEdges),
 				m_index_map(IndexMap),
@@ -246,7 +246,7 @@ private:
 	const k3d::mesh::indices_t& m_index_map;
 	k3d::mesh::indices_t& m_output_edge_points;
 	k3d::mesh::indices_t& m_output_clockwise_edges;
-	k3d::named_array_copier& m_copier;
+	k3d::attribute_array_copier& m_copier;
 };
 
 /// Calculates the split points positions for each edge
@@ -366,7 +366,7 @@ public:
 		k3d::mesh::indices_t& output_loop_first_edges = *k3d::make_unique(polyhedra.loop_first_edges);
 		polyhedra.face_varying_data = Input.polyhedra->face_varying_data.clone_types();
 		polyhedra.face_varying_data.resize(edge_index_calculator.edge_count);
-		k3d::named_array_copier face_varying_data_copier(Input.polyhedra->face_varying_data, polyhedra.face_varying_data);
+		k3d::attribute_array_copier face_varying_data_copier(Input.polyhedra->face_varying_data, polyhedra.face_varying_data);
 		document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
 		document().pipeline_profiler().start_execution(*this, "Update indices");

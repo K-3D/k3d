@@ -61,17 +61,17 @@ public:
 		const k3d::mesh::indices_t& first_faces = *Mesh.polyhedra->first_faces;
 		const k3d::mesh::counts_t& face_counts = *Mesh.polyhedra->face_counts;
 		const k3d::mesh::polyhedra_t::types_t& types = *Mesh.polyhedra->types;
-		const k3d::mesh::named_arrays& constant_data = Mesh.polyhedra->constant_data;
+		const k3d::mesh::attribute_arrays_t& constant_data = Mesh.polyhedra->constant_data;
 		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
 		const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
 		const k3d::mesh::materials_t& face_materials = *Mesh.polyhedra->face_materials;
-		const k3d::mesh::named_arrays& uniform_data = Mesh.polyhedra->uniform_data; 
+		const k3d::mesh::attribute_arrays_t& uniform_data = Mesh.polyhedra->uniform_data; 
 		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
 		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::mesh::named_arrays& face_varying_data = Mesh.polyhedra->face_varying_data;
+		const k3d::mesh::attribute_arrays_t& face_varying_data = Mesh.polyhedra->face_varying_data;
 		const k3d::mesh::points_t& points = *Mesh.points;
-		const k3d::mesh::named_arrays& vertex_data = Mesh.vertex_data;
+		const k3d::mesh::attribute_arrays_t& vertex_data = Mesh.vertex_data;
 
 		const size_t polyhedron_begin = 0;
 		const size_t polyhedron_end = polyhedron_begin + types.size();

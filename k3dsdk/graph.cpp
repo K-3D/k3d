@@ -94,9 +94,9 @@ static void print(std::ostream& Stream, const std::string& Name, const boost::sh
 	Stream << "\n";
 }
 
-static void print(std::ostream& Stream, const k3d::graph::named_arrays_t& Arrays)
+static void print(std::ostream& Stream, const k3d::graph::attribute_arrays_t& Arrays)
 {
-    for(k3d::graph::named_arrays_t::const_iterator array = Arrays.begin(); array != Arrays.end(); ++array)
+    for(k3d::graph::attribute_arrays_t::const_iterator array = Arrays.begin(); array != Arrays.end(); ++array)
     	print(Stream, array->first, array->second);
 }
 

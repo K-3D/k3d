@@ -28,7 +28,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/named_array_operations.h>
+#include <k3dsdk/array_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/vectors.h>

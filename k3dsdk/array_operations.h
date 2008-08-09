@@ -1,5 +1,5 @@
-#ifndef K3DSDK_NAMED_ARRAY_OPERATIONS_H
-#define K3DSDK_NAMED_ARRAY_OPERATIONS_H
+#ifndef K3DSDK_ARRAY_OPERATIONS_H
+#define K3DSDK_ARRAY_OPERATIONS_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -24,14 +24,14 @@
 	\author Timothy M. Shead
 */
 
-#include "named_arrays.h"
+#include "attribute_arrays.h"
 
 namespace k3d
 {
 
 /// Retrieves an array with given name, type, and size
 template<typename array_t>
-array_t& get_array(named_arrays& Arrays, const std::string& Name, const uint_t Count)
+array_t& get_array(attribute_arrays& Arrays, const std::string& Name, const uint_t Count)
 {
 	array_t* result = 0;
 	if(Arrays.count(Name))
@@ -51,7 +51,7 @@ array_t& get_array(named_arrays& Arrays, const std::string& Name, const uint_t C
 
 /// Retrieves an array with given name and type, or NULL
 template<typename array_t>
-const array_t* get_array(const named_arrays& Arrays, const std::string& Name)
+const array_t* get_array(const attribute_arrays& Arrays, const std::string& Name)
 {
 	array_t* result = 0;
 	if(Arrays.count(Name))
@@ -62,5 +62,5 @@ const array_t* get_array(const named_arrays& Arrays, const std::string& Name)
 
 } // namespace k3d
 
-#endif // !K3DSDK_NAMED_ARRAY_OPERATIONS_H
+#endif // !K3DSDK_ARRAY_OPERATIONS_H
 

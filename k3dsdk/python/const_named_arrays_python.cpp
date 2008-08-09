@@ -34,7 +34,7 @@ namespace python
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // const_named_arrays
 
-const_named_arrays::const_named_arrays(const k3d::mesh::named_arrays& NamedArrays) :
+const_named_arrays::const_named_arrays(const k3d::mesh::attribute_arrays_t& NamedArrays) :
 	wrapped(NamedArrays)
 {
 }
@@ -43,7 +43,7 @@ list const_named_arrays::array_names()
 {
 	list results;
 
-	for(k3d::mesh::named_arrays::const_iterator array = wrapped.begin(); array != wrapped.end(); ++array)
+	for(k3d::mesh::attribute_arrays_t::const_iterator array = wrapped.begin(); array != wrapped.end(); ++array)
 		results.append(array->first);
 
 	return results;
@@ -67,7 +67,7 @@ object const_named_arrays::get_item(int item)
 	if(item < 0 || item >= wrapped.size())
 		throw std::out_of_range("index out-of-range");
 
-	k3d::mesh::named_arrays::const_iterator array_iterator = wrapped.begin();
+	k3d::mesh::attribute_arrays_t::const_iterator array_iterator = wrapped.begin();
 	std::advance(array_iterator, item);
 
 	return wrap_array(array_iterator->second.get());

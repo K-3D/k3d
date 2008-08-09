@@ -27,7 +27,7 @@
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
-#include <k3dsdk/named_array_copier.h>
+#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/shared_pointer.h>
 
@@ -60,7 +60,7 @@ public:
 			return;
 
 		const k3d::mesh::points_t& input_points = *Input.points;
-		const k3d::named_arrays& input_vertex_data = Input.vertex_data;
+		const k3d::mesh::attribute_arrays_t& input_vertex_data = Input.vertex_data;
 
 		k3d::mesh::blobbies_t& output_blobbies = *k3d::make_unique(Output.blobbies);
 		k3d::mesh::indices_t& output_first_primitives = *k3d::make_unique(output_blobbies.first_primitives);
@@ -71,7 +71,7 @@ public:
 		k3d::mesh::blobbies_t::primitives_t& output_primitives = *k3d::make_unique(output_blobbies.primitives);
 		k3d::mesh::indices_t& output_primitive_first_floats = *k3d::make_unique(output_blobbies.primitive_first_floats);
 		k3d::mesh::counts_t& output_primitive_float_counts = *k3d::make_unique(output_blobbies.primitive_float_counts);
-		k3d::named_arrays& output_vertex_data = output_blobbies.vertex_data;
+		k3d::mesh::attribute_arrays_t& output_vertex_data = output_blobbies.vertex_data;
 		k3d::mesh::blobbies_t::operators_t& output_operators = *k3d::make_unique(output_blobbies.operators);
 		k3d::mesh::indices_t& output_operator_first_operands = *k3d::make_unique(output_blobbies.operator_first_operands);
 		k3d::mesh::counts_t& output_operator_operand_counts = *k3d::make_unique(output_blobbies.operator_operand_counts);
@@ -79,7 +79,7 @@ public:
 		k3d::mesh::blobbies_t::operands_t& output_operands = *k3d::make_unique(output_blobbies.operands);
 
 		output_vertex_data = input_vertex_data.clone_types();
-		k3d::named_array_copier output_vertex_data_copier(input_vertex_data, output_vertex_data);
+		k3d::attribute_array_copier output_vertex_data_copier(input_vertex_data, output_vertex_data);
 
 		const double radius = m_radius.pipeline_value();
 		k3d::imaterial* const material = m_material.pipeline_value();

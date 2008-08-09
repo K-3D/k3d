@@ -23,7 +23,7 @@
 #include "sds_cache.h"
 
 #include <k3dsdk/hints.h>
-#include <k3dsdk/named_array_operations.h>
+#include <k3dsdk/array_operations.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/selection.h>

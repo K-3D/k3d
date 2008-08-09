@@ -146,7 +146,7 @@ object create_array(pointer_type& Pointer)
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // wrap_const_named_arrays
 
-object wrap_const_named_arrays(const k3d::mesh::named_arrays& NamedArrays)
+object wrap_const_named_arrays(const k3d::mesh::attribute_arrays_t& NamedArrays)
 {
 	return object(const_named_arrays(NamedArrays));
 }
@@ -154,7 +154,7 @@ object wrap_const_named_arrays(const k3d::mesh::named_arrays& NamedArrays)
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // wrap_non_const_named_arrays
 
-object wrap_non_const_named_arrays(k3d::mesh::named_arrays& NamedArrays)
+object wrap_non_const_named_arrays(k3d::mesh::attribute_arrays_t& NamedArrays)
 {
 	return object(named_arrays(NamedArrays));
 }

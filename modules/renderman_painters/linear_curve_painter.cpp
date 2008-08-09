@@ -60,14 +60,14 @@ public:
 		const k3d::mesh::counts_t& curve_counts = *Mesh.linear_curve_groups->curve_counts;
 		const k3d::mesh::bools_t& periodic_curves = *Mesh.linear_curve_groups->periodic_curves;
 		const k3d::mesh::materials_t& materials = *Mesh.linear_curve_groups->materials;
-		const k3d::mesh::named_arrays& constant_data = Mesh.linear_curve_groups->constant_data;
+		const k3d::mesh::attribute_arrays_t& constant_data = Mesh.linear_curve_groups->constant_data;
 		const k3d::mesh::indices_t& curve_first_points = *Mesh.linear_curve_groups->curve_first_points;
 		const k3d::mesh::counts_t& curve_point_counts = *Mesh.linear_curve_groups->curve_point_counts;
-		const k3d::mesh::named_arrays& uniform_data = Mesh.linear_curve_groups->uniform_data;
-		const k3d::mesh::named_arrays& varying_data = Mesh.linear_curve_groups->varying_data;
+		const k3d::mesh::attribute_arrays_t& uniform_data = Mesh.linear_curve_groups->uniform_data;
+		const k3d::mesh::attribute_arrays_t& varying_data = Mesh.linear_curve_groups->varying_data;
 		const k3d::mesh::indices_t& curve_points = *Mesh.linear_curve_groups->curve_points;
 		const k3d::mesh::points_t& points = *Mesh.points;
-		const k3d::mesh::named_arrays& vertex_data = Mesh.vertex_data;
+		const k3d::mesh::attribute_arrays_t& vertex_data = Mesh.vertex_data;
 
 		const size_t group_begin = 0;
 		const size_t group_end = group_begin + first_curves.size();

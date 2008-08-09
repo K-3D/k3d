@@ -1574,13 +1574,13 @@ private:
 /////////////////////////////////////////////////////////////////////////////
 // save_arrays
 
-void save_arrays(element& Container, element Storage, const mesh::named_arrays& Arrays, const ipersistent::save_context& Context)
+void save_arrays(element& Container, element Storage, const mesh::attribute_arrays_t& Arrays, const ipersistent::save_context& Context)
 {
 	if(!Arrays.size())
 		return;
 
 	element& container = Container.append(Storage);
-	for(mesh::named_arrays::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
+	for(mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
 	{
 		const k3d::string_t name = array_iterator->first;
 		array* const abstract_array = array_iterator->second.get();
@@ -1683,7 +1683,7 @@ void load_array(const element& Container, const k3d::string_t& Storage, boost::s
 class load_typed_array
 {
 public:
-	load_typed_array(const element& Storage, const k3d::string_t& Name, const k3d::string_t& Type, mesh::named_arrays& Arrays, const ipersistent::load_context& Context, k3d::bool_t& Loaded) :
+	load_typed_array(const element& Storage, const k3d::string_t& Name, const k3d::string_t& Type, mesh::attribute_arrays_t& Arrays, const ipersistent::load_context& Context, k3d::bool_t& Loaded) :
 		storage(Storage),
 		name(Name),
 		type(Type),
@@ -1712,7 +1712,7 @@ private:
 	const element& storage;
 	const k3d::string_t& name;
 	const k3d::string_t& type;
-	mesh::named_arrays& arrays;
+	mesh::attribute_arrays_t& arrays;
 	const ipersistent::load_context& context;
 	k3d::bool_t& loaded;
 };
@@ -1720,7 +1720,7 @@ private:
 /////////////////////////////////////////////////////////////////////////////
 // load_arrays
 
-void load_arrays(const element& Container, const k3d::string_t& Storage, mesh::named_arrays& Arrays, const ipersistent::load_context& Context)
+void load_arrays(const element& Container, const k3d::string_t& Storage, mesh::attribute_arrays_t& Arrays, const ipersistent::load_context& Context)
 {
 	const element* const container = find_element(Container, Storage);
 	if(!container)

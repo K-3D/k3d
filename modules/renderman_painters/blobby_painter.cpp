@@ -61,13 +61,13 @@ public:
 		const k3d::mesh::indices_t& first_operators = *Mesh.blobbies->first_operators;
 		const k3d::mesh::counts_t& operator_counts = *Mesh.blobbies->operator_counts;
 		const k3d::mesh::materials_t& materials = *Mesh.blobbies->materials;
-		const k3d::mesh::named_arrays& constant_data = Mesh.blobbies->constant_data;
-		const k3d::mesh::named_arrays& uniform_data = Mesh.blobbies->uniform_data;
+		const k3d::mesh::attribute_arrays_t& constant_data = Mesh.blobbies->constant_data;
+		const k3d::mesh::attribute_arrays_t& uniform_data = Mesh.blobbies->uniform_data;
 		const k3d::mesh::blobbies_t::primitives_t& primitives = *Mesh.blobbies->primitives;
 		const k3d::mesh::indices_t& primitive_first_floats = *Mesh.blobbies->primitive_first_floats;
 		const k3d::mesh::counts_t& primitive_float_counts = *Mesh.blobbies->primitive_float_counts;
-		const k3d::mesh::named_arrays& varying_data = Mesh.blobbies->varying_data;
-		const k3d::mesh::named_arrays& vertex_data = Mesh.blobbies->vertex_data;
+		const k3d::mesh::attribute_arrays_t& varying_data = Mesh.blobbies->varying_data;
+		const k3d::mesh::attribute_arrays_t& vertex_data = Mesh.blobbies->vertex_data;
 		const k3d::mesh::blobbies_t::operators_t& operators = *Mesh.blobbies->operators;
 		const k3d::mesh::indices_t& operator_first_operands = *Mesh.blobbies->operator_first_operands;
 		const k3d::mesh::counts_t& operator_operand_counts = *Mesh.blobbies->operator_operand_counts;

@@ -31,7 +31,7 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
-#include <k3dsdk/named_array_copier.h>
+#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/shared_pointer.h>
@@ -152,9 +152,9 @@ void merge_polyhedra(k3d::mesh& Output, const k3d::mesh& Input, bool SinglePolyh
   }
   
   // Take care of named arrays
-  k3d::named_array_copier constant_data_copier(input_polyhedra.constant_data, output_polyhedra.constant_data);
-  k3d::named_array_copier uniform_data_copier(input_polyhedra.uniform_data, output_polyhedra.uniform_data);
-  k3d::named_array_copier face_varying_data_copier(input_polyhedra.face_varying_data, output_polyhedra.face_varying_data);
+  k3d::attribute_array_copier constant_data_copier(input_polyhedra.constant_data, output_polyhedra.constant_data);
+  k3d::attribute_array_copier uniform_data_copier(input_polyhedra.uniform_data, output_polyhedra.uniform_data);
+  k3d::attribute_array_copier face_varying_data_copier(input_polyhedra.face_varying_data, output_polyhedra.face_varying_data);
   for (k3d::uint_t polyhedron = 0; polyhedron != input_first_faces.size(); ++polyhedron)
   	constant_data_copier.push_back(polyhedron);
   for (k3d::uint_t face = 0; face != input_face_first_loops.size(); ++face)
@@ -192,8 +192,8 @@ void merge_point_groups(k3d::mesh& Output, const k3d::mesh& Input)
 	extend_array(input_point_indices, output_point_indices, Output.points->size());
 	
 	// Named arrays
-	k3d::named_array_copier constant_data_copier(input_point_groups.constant_data, output_point_groups.constant_data);
-	k3d::named_array_copier varying_data_copier(input_point_groups.varying_data, output_point_groups.varying_data);
+	k3d::attribute_array_copier constant_data_copier(input_point_groups.constant_data, output_point_groups.constant_data);
+	k3d::attribute_array_copier varying_data_copier(input_point_groups.varying_data, output_point_groups.varying_data);
 	for (k3d::uint_t point_group = 0; point_group != input_first_points.size(); ++point_group)
   	constant_data_copier.push_back(point_group);
 	for (k3d::uint_t point = 0; point != input_point_indices.size(); ++point)
@@ -241,9 +241,9 @@ void merge_linear_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 	extend_array(input_curve_points, output_curve_points, Output.points->size());
 	
 	// Named arrays
-	k3d::named_array_copier constant_data_copier(input_linear_curve_groups.constant_data, output_linear_curve_groups.constant_data);
-	k3d::named_array_copier uniform_data_copier(input_linear_curve_groups.uniform_data, output_linear_curve_groups.uniform_data);
-	k3d::named_array_copier varying_data_copier(input_linear_curve_groups.varying_data, output_linear_curve_groups.varying_data);
+	k3d::attribute_array_copier constant_data_copier(input_linear_curve_groups.constant_data, output_linear_curve_groups.constant_data);
+	k3d::attribute_array_copier uniform_data_copier(input_linear_curve_groups.uniform_data, output_linear_curve_groups.uniform_data);
+	k3d::attribute_array_copier varying_data_copier(input_linear_curve_groups.varying_data, output_linear_curve_groups.varying_data);
 	for (k3d::uint_t curve_group = 0; curve_group != input_first_curves.size(); ++curve_group)
   	constant_data_copier.push_back(curve_group);
 	for (k3d::uint_t curve = 0; curve != input_curve_first_points.size(); ++curve)
@@ -293,9 +293,9 @@ void merge_cubic_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 	extend_array(input_curve_points, output_curve_points, Output.points->size());
 	
 	// Named arrays
-	k3d::named_array_copier constant_data_copier(input_cubic_curve_groups.constant_data, output_cubic_curve_groups.constant_data);
-	k3d::named_array_copier uniform_data_copier(input_cubic_curve_groups.uniform_data, output_cubic_curve_groups.uniform_data);
-	k3d::named_array_copier varying_data_copier(input_cubic_curve_groups.varying_data, output_cubic_curve_groups.varying_data);
+	k3d::attribute_array_copier constant_data_copier(input_cubic_curve_groups.constant_data, output_cubic_curve_groups.constant_data);
+	k3d::attribute_array_copier uniform_data_copier(input_cubic_curve_groups.uniform_data, output_cubic_curve_groups.uniform_data);
+	k3d::attribute_array_copier varying_data_copier(input_cubic_curve_groups.varying_data, output_cubic_curve_groups.varying_data);
 	for (k3d::uint_t curve_group = 0; curve_group != input_first_curves.size(); ++curve_group)
   	constant_data_copier.push_back(curve_group);
 	for (k3d::uint_t curve = 0; curve != input_curve_first_points.size(); ++curve)
@@ -355,9 +355,9 @@ void merge_nurbs_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 	output_curve_knots.insert(output_curve_knots.end(), input_curve_knots.begin(), input_curve_knots.end());
 	
 	// Named arrays
-	k3d::named_array_copier constant_data_copier(input_nurbs_curve_groups.constant_data, output_nurbs_curve_groups.constant_data);
-	k3d::named_array_copier uniform_data_copier(input_nurbs_curve_groups.uniform_data, output_nurbs_curve_groups.uniform_data);
-	k3d::named_array_copier varying_data_copier(input_nurbs_curve_groups.varying_data, output_nurbs_curve_groups.varying_data);
+	k3d::attribute_array_copier constant_data_copier(input_nurbs_curve_groups.constant_data, output_nurbs_curve_groups.constant_data);
+	k3d::attribute_array_copier uniform_data_copier(input_nurbs_curve_groups.uniform_data, output_nurbs_curve_groups.uniform_data);
+	k3d::attribute_array_copier varying_data_copier(input_nurbs_curve_groups.varying_data, output_nurbs_curve_groups.varying_data);
 	for (k3d::uint_t curve_group = 0; curve_group != input_first_curves.size(); ++curve_group)
   	constant_data_copier.push_back(curve_group);
 	for (k3d::uint_t curve = 0; curve != input_curve_first_points.size(); ++curve)
@@ -392,9 +392,9 @@ void merge_bilinear_patches(k3d::mesh& Output, const k3d::mesh& Input)
 	extend_array(input_patch_points, output_patch_points, Output.points->size());
 	
 	// Named arrays
-	k3d::named_array_copier constant_data_copier(input_patches.constant_data, output_patches.constant_data);
-	k3d::named_array_copier uniform_data_copier(input_patches.uniform_data, output_patches.uniform_data);
-	k3d::named_array_copier varying_data_copier(input_patches.varying_data, output_patches.varying_data);
+	k3d::attribute_array_copier constant_data_copier(input_patches.constant_data, output_patches.constant_data);
+	k3d::attribute_array_copier uniform_data_copier(input_patches.uniform_data, output_patches.uniform_data);
+	k3d::attribute_array_copier varying_data_copier(input_patches.varying_data, output_patches.varying_data);
 	for (k3d::uint_t patch = 0; patch != input_patch_selection.size(); ++patch)
 	{
   	constant_data_copier.push_back(patch);
@@ -430,9 +430,9 @@ void merge_bicubic_patches(k3d::mesh& Output, const k3d::mesh& Input)
 	extend_array(input_patch_points, output_patch_points, Output.points->size());
 	
 	// Named arrays
-	k3d::named_array_copier constant_data_copier(input_patches.constant_data, output_patches.constant_data);
-	k3d::named_array_copier uniform_data_copier(input_patches.uniform_data, output_patches.uniform_data);
-	k3d::named_array_copier varying_data_copier(input_patches.varying_data, output_patches.varying_data);
+	k3d::attribute_array_copier constant_data_copier(input_patches.constant_data, output_patches.constant_data);
+	k3d::attribute_array_copier uniform_data_copier(input_patches.uniform_data, output_patches.uniform_data);
+	k3d::attribute_array_copier varying_data_copier(input_patches.varying_data, output_patches.varying_data);
 	for (k3d::uint_t patch = 0; patch != input_patch_selection.size(); ++patch)
 	{
   	constant_data_copier.push_back(patch);
@@ -546,9 +546,9 @@ void merge_nurbs_patches(k3d::mesh& Output, const k3d::mesh& Input)
 	extend_array(input_patch_v_knots, output_patch_v_knots, 0);
 	
 	// Named arrays
-	k3d::named_array_copier constant_data_copier(input_nurbs_patches.constant_data, output_nurbs_patches.constant_data);
-	k3d::named_array_copier uniform_data_copier(input_nurbs_patches.uniform_data, output_nurbs_patches.uniform_data);
-	k3d::named_array_copier varying_data_copier(input_nurbs_patches.varying_data, output_nurbs_patches.varying_data);
+	k3d::attribute_array_copier constant_data_copier(input_nurbs_patches.constant_data, output_nurbs_patches.constant_data);
+	k3d::attribute_array_copier uniform_data_copier(input_nurbs_patches.uniform_data, output_nurbs_patches.uniform_data);
+	k3d::attribute_array_copier varying_data_copier(input_nurbs_patches.varying_data, output_nurbs_patches.varying_data);
 	for (k3d::uint_t patch = 0; patch != input_patch_selection.size(); ++patch)
 	{
   	constant_data_copier.push_back(patch);
@@ -624,7 +624,7 @@ void merge_points(k3d::mesh& Output, const k3d::mesh& Input)
 	extend_array(input_point_selection, output_point_selection, 0);
 	output_points.insert(output_points.end(), input_points.begin(), input_points.end());
 	
-	k3d::named_array_copier vertex_data_copier(Input.vertex_data, Output.vertex_data);
+	k3d::attribute_array_copier vertex_data_copier(Input.vertex_data, Output.vertex_data);
 	for (k3d::uint_t point = 0; point != input_points.size(); ++point)
 		vertex_data_copier.push_back(point);
 }

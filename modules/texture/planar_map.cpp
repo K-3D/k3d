@@ -88,7 +88,7 @@ public:
 
 		k3d::make_unique(Output.polyhedra);
 
-		k3d::mesh::named_arrays::const_iterator array_it = Output.polyhedra->face_varying_data.find(m_texcoord_set_name.pipeline_value());
+		k3d::mesh::named_arrays_t::const_iterator array_it = Output.polyhedra->face_varying_data.find(m_texcoord_set_name.pipeline_value());
 		boost::shared_ptr<texcoord_array_t> texcoords;
 		if(array_it != Output.polyhedra->face_varying_data.end())
 		{
@@ -110,7 +110,7 @@ public:
 		return_if_fail(Output.polyhedra->edge_points);
 		const k3d::mesh::indices_t& edge_points = *Output.polyhedra->edge_points.get();
 
-		k3d::mesh::named_arrays::const_iterator array_it = Output.polyhedra->face_varying_data.find(m_texcoord_set_name.pipeline_value());
+		k3d::mesh::named_arrays_t::const_iterator array_it = Output.polyhedra->face_varying_data.find(m_texcoord_set_name.pipeline_value());
 		return_if_fail(array_it !=  Output.polyhedra->face_varying_data.end());
 		return_if_fail(dynamic_cast< texcoord_array_t* >(array_it->second.get()));
 		texcoord_array_t& texcoords = *dynamic_cast< texcoord_array_t* >(array_it->second.get());

@@ -20,10 +20,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "named_arrays.h"
-#include "point2.h"
+#include "attribute_arrays.h"
+#include "named_array_types.h"
 #include "typed_array.h"
-#include "vector2.h"
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -77,16 +76,16 @@ public:
 	/// Defines storage for a generic collection of inode objects
 	typedef typed_array<inode*> nodes_t;
 	/// Defines a heterogeneous collection of named, shared arrays
-	typedef k3d::named_arrays named_arrays_t;
+	typedef k3d::attribute_arrays attribute_arrays_t;
 
 	/// Stores the graph topology
 	boost::shared_ptr<const adjacency_list_t> topology;
 	/// Stores user-defined per-graph data
-	named_arrays_t graph_data;
+	attribute_arrays_t graph_data;
 	/// Stores user-defined per-vertex data
-	named_arrays_t vertex_data;
-	/// Stores uder-defined per-edge data
-	named_arrays_t edge_data;
+	attribute_arrays_t vertex_data;
+	/// Stores user-defined per-edge data
+	attribute_arrays_t edge_data;
 };
 
 /// Stream serialization

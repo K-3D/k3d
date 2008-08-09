@@ -23,7 +23,7 @@
 
 #include "tree_layout.h"
 
-#include <k3dsdk/named_array_operations.h>
+#include <k3dsdk/array_operations.h>
 
 #include <boost/graph/breadth_first_search.hpp>
 

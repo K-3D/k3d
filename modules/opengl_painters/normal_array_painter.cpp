@@ -26,7 +26,7 @@
 #include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/named_array_operations.h>
+#include <k3dsdk/array_operations.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/selection.h>
 

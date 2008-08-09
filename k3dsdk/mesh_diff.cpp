@@ -116,13 +116,13 @@ const bool equal(const boost::shared_ptr<array_type>& A, const boost::shared_ptr
 }
 
 /// Return true iff two groups of named arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons)
-const bool equal(const named_arrays& A, const named_arrays& B, const boost::uint64_t Threshold)
+const bool equal(const attribute_arrays& A, const attribute_arrays& B, const boost::uint64_t Threshold)
 {
 	// If we have differing number of arrays, we aren't equal
 	if(A.size() != B.size())
 		return false;
 
-	for(named_arrays::const_iterator a = A.begin(), b = B.begin(); a != A.end() && b != B.end(); ++a, ++b)
+	for(attribute_arrays::const_iterator a = A.begin(), b = B.begin(); a != A.end() && b != B.end(); ++a, ++b)
 	{
 		// Each pair of arrays must have equal names
 		if(a->first != b->first)
@@ -293,13 +293,13 @@ void print_diff(std::ostream& Stream, const std::string& Label, const boost::sha
 	print_diff(Stream, Label, *A, *B, Threshold);
 }
 
-void print_diff(std::ostream& Stream, const std::string& Label, const k3d::mesh::named_arrays& A, const k3d::mesh::named_arrays& B, const boost::uint64_t Threshold)
+void print_diff(std::ostream& Stream, const std::string& Label, const k3d::mesh::attribute_arrays_t& A, const k3d::mesh::attribute_arrays_t& B, const boost::uint64_t Threshold)
 {
 	if(A.empty() && B.empty())
 		return;
 
-	named_arrays::const_iterator a = A.begin();
-	named_arrays::const_iterator b = B.begin();
+	attribute_arrays::const_iterator a = A.begin();
+	attribute_arrays::const_iterator b = B.begin();
 
 	for(; a != A.end() && b != B.end(); ++a, ++b)
 	{

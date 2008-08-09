@@ -95,7 +95,7 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		return_if_fail(Output.polyhedra);
-		k3d::mesh::named_arrays::const_iterator array_it = Output.polyhedra->face_varying_data.find("N");
+		k3d::mesh::named_arrays_t::const_iterator array_it = Output.polyhedra->face_varying_data.find("N");
 		return_if_fail(array_it !=  Output.polyhedra->face_varying_data.end());
 		return_if_fail(dynamic_cast<sharpness_array_t*>(array_it->second.get()));
 		

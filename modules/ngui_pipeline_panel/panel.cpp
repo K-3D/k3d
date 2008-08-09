@@ -35,7 +35,7 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/named_array_operations.h>
+#include <k3dsdk/array_operations.h>
 #include <k3dsdk/ngui/basic_input_model.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>

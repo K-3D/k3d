@@ -23,7 +23,7 @@
 
 #include "extract_tree.h"
 
-#include <k3dsdk/named_array_copier.h>
+#include <k3dsdk/attribute_array_copier.h>
 
 #include <boost/graph/breadth_first_search.hpp>
 
@@ -96,8 +96,8 @@ void extract_tree::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outp
 	Output.vertex_data = Input.vertex_data.clone_types();
 	Output.edge_data = Input.edge_data.clone_types();
 
-	k3d::named_array_copier vertex_data_copier(Input.vertex_data, Output.vertex_data);
-	k3d::named_array_copier edge_data_copier(Input.edge_data, Output.edge_data);
+	k3d::attribute_array_copier vertex_data_copier(Input.vertex_data, Output.vertex_data);
+	k3d::attribute_array_copier edge_data_copier(Input.edge_data, Output.edge_data);
 
 	std::map<k3d::graph::vertex_descriptor_t, k3d::graph::vertex_descriptor_t> vertex_map;
 	for(k3d::graph::vertex_descriptor_t vertex = 0; vertex != vertex_count; ++vertex)

@@ -20,11 +20,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "attribute_arrays.h"
 #include "named_arrays.h"
-#include "point2.h"
-#include "point3.h"
-#include "normal3.h"
-#include "vector3.h"
+#include "named_array_types.h"
 #include "typed_array.h"
 
 namespace k3d
@@ -44,34 +42,55 @@ class mesh
 public:
 	mesh();
 
-	/// Defines storage for a generic collection of indices
+	/// Defines storage for a collection of indices
 	typedef typed_array<uint_t> indices_t;
-	/// Defines storage for a generic collection of counts
+	/// Defines storage for a collection of counts
 	typedef typed_array<uint_t> counts_t;
-	/// Defines storage for a generic collection of orders
+	/// Defines storage for a collection of orders
 	typedef typed_array<uint_t> orders_t;
-	/// Defines storage for a generic collection of booleans
-	typedef typed_array<bool_t> bools_t;
-	/// Defines storage for a generic collection of weights
+	/// Defines storage for a collection of weights
 	typedef typed_array<double_t> weights_t;
-	/// Defines storage for a generic collection of knot vectors
+	/// Defines storage for a collection of knot vectors
 	typedef typed_array<double_t> knots_t;
 	/// Defines storage for gprim selection state
 	typedef typed_array<double_t> selection_t;
 	/// Defines storage for gprim materials
 	typedef typed_array<imaterial*> materials_t;
-	/// Defines a heterogeneous collection of named, shared arrays
-	typedef k3d::named_arrays named_arrays;
-	/// Defines storage for a collection of 3D points
-	typedef typed_array<point3> points_t;
-	/// Defines storage for a collection of 3D normals
-	typedef typed_array<normal3> normals_t;
-	/// Defines storage for a collection of 3D vectors
-	typedef typed_array<vector3> vectors_t;
-	/// Defines storage for a collection of 2D points
-	typedef typed_array<point2> points_2d_t;
-	/// Defines storage for a collection of doubles
+	/// Defines storage for a generic collection of boolean values
+	typedef typed_array<bool_t> bools_t;
+	/// Defines storage for a generic collection of colors
+	typedef typed_array<color> colors_t;
+	/// Defines storage for a generic collection of floating-point values
 	typedef typed_array<double_t> doubles_t;
+	/// Defines storage for a generic collection of 3D normals
+	typedef typed_array<normal3> normals_t;
+	/// Defines storage for a generic collection of 2D points
+	typedef typed_array<point2> points_2d_t;
+	/// Defines storage for a generic collection of 3D points
+	typedef typed_array<point3> points_t;
+	/// Defines storage for a generic collection of 3D vectors
+	typedef typed_array<vector3> vectors_t;
+	/// Defines a heterogeneous collection of named, shared arrays with varying lengths
+	typedef k3d::named_arrays named_arrays_t;
+	/// Defines a heterogeneous collection of named, shared arrays with identical length
+	typedef k3d::attribute_arrays attribute_arrays_t;
+	/// Defines a named collection of attribute arrays
+	typedef std::map<k3d::string_t, attribute_arrays_t> attributes_t;
+
+	/// Defines storage for a generic mesh primitive
+	class primitive
+	{
+	public:
+		/// Stores the primitive type ("point_groups", "polyhedra", etc.)
+		k3d::string_t type;
+		/// Stores the array data that defines the primitive's topology
+		named_arrays_t topology;
+		/// Stores the array data that defines the primitive's attributes
+		attributes_t attributes;
+	};
+
+	/// Defines storage for a collection of primitives
+	typedef std::vector<boost::shared_ptr<const primitive> > primitives_t;
 
 	/// Defines storage for point groups (particle clouds)
 	class point_groups_t
@@ -84,11 +103,11 @@ public:
 		/// Stores the set of per-point-group materials
 		boost::shared_ptr<const materials_t> materials;
 		/// Stores user-defined per-point-group data (maps to RenderMan constant data)
-		named_arrays constant_data;
+		attribute_arrays_t constant_data;
 		/// Stores per-point-group point lists
 		boost::shared_ptr<const indices_t> points;
 		/// Stores user-defined per-point-group-point data (maps to RenderMan varying data)
-		named_arrays varying_data;
+		attribute_arrays_t varying_data;
 	};
 
 	/// Defines storage for linear curve groups
@@ -104,7 +123,7 @@ public:
 		/// Stores the set of per-curve-group materials
 		boost::shared_ptr<const materials_t> materials;
 		/// Stores user-defined per-curve-group data (maps to RenderMan constant data)
-		named_arrays constant_data;
+		attribute_arrays_t constant_data;
 		/// Stores the set of per-curve first points
 		boost::shared_ptr<const indices_t> curve_first_points;
 		/// Stores the set of per-curve point counts
@@ -112,11 +131,11 @@ public:
 		/// Stores per-curve selection state
 		boost::shared_ptr<const selection_t> curve_selection;
 		/// Stores user-defined per-curve data (maps to RenderMan uniform data)
-		named_arrays uniform_data;
+		attribute_arrays_t uniform_data;
 		/// Stores per-curve point lists
 		boost::shared_ptr<const indices_t> curve_points;
 		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
-		named_arrays varying_data;
+		attribute_arrays_t varying_data;
 	};
 
 	/// Defines storage for cubic curve groups
@@ -132,7 +151,7 @@ public:
 		/// Stores the set of per-curve-group materials
 		boost::shared_ptr<const materials_t> materials;
 		/// Stores user-defined per-curve-group data (maps to RenderMan constant data)
-		named_arrays constant_data;
+		attribute_arrays_t constant_data;
 		/// Stores the set of per-curve first points
 		boost::shared_ptr<const indices_t> curve_first_points;
 		/// Stores the set of per-curve point counts
@@ -140,11 +159,11 @@ public:
 		/// Stores per-curve selection state
 		boost::shared_ptr<const selection_t> curve_selection;
 		/// Stores user-defined per-curve data (maps to RenderMan uniform data)
-		named_arrays uniform_data;
+		attribute_arrays_t uniform_data;
 		/// Stores per-curve point lists
 		boost::shared_ptr<const indices_t> curve_points;
 		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
-		named_arrays varying_data;
+		attribute_arrays_t varying_data;
 	};
 
 	/// Defines storage for NURBS curve groups
@@ -158,7 +177,7 @@ public:
 		/// Stores the set of per-curve-group materials
 		boost::shared_ptr<const materials_t> materials;
 		/// Stores user-defined per-curve-group data (maps to RenderMan constant data)
-		named_arrays constant_data;
+		attribute_arrays_t constant_data;
 		/// Stores the set of per-curve first points
 		boost::shared_ptr<const indices_t> curve_first_points;
 		/// Stores the set of per-curve point counts
@@ -170,11 +189,11 @@ public:
 		/// Stores per-curve selection state
 		boost::shared_ptr<const selection_t> curve_selection;
 		/// Stores user-defined per-curve data (maps to RenderMan uniform data)
-		named_arrays uniform_data;
+		attribute_arrays_t uniform_data;
 		/// Stores per-curve control points
 		boost::shared_ptr<const indices_t> curve_points;
 		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
-		named_arrays varying_data;
+		attribute_arrays_t varying_data;
 		/// Stores per-curve control point weights
 		boost::shared_ptr<const weights_t> curve_point_weights;
 		/// Stores per-curve knot vectors
@@ -190,13 +209,13 @@ public:
 		/// Stores the set of per-patch materials
 		boost::shared_ptr<const materials_t> patch_materials;
 		/// Stores user-defined per-patch data (maps to RenderMan constant data)
-		named_arrays constant_data;
+		attribute_arrays_t constant_data;
 		/// Stores user-defined per-patch data (maps to RenderMan uniform data)
-		named_arrays uniform_data;
+		attribute_arrays_t uniform_data;
 		/// Stores the set of per-patch points
 		boost::shared_ptr<const indices_t> patch_points;
 		/// Stores user-defined per-parametric-corner data (maps to RenderMan varying data)
-		named_arrays varying_data;
+		attribute_arrays_t varying_data;
 	};
 	
 	/// Defines storage for bicubic patches
@@ -208,13 +227,13 @@ public:
 		/// Stores the set of per-patch materials
 		boost::shared_ptr<const materials_t> patch_materials;
 		/// Stores user-defined per-patch data (maps to RenderMan constant data)
-		named_arrays constant_data;
+		attribute_arrays_t constant_data;
 		/// Stores user-defined per-patch data (maps to RenderMan uniform data)
-		named_arrays uniform_data;
+		attribute_arrays_t uniform_data;
 		/// Stores the set of per-patch points
 		boost::shared_ptr<const indices_t> patch_points;
 		/// Stores the set of per-parametric-corner data (maps to RenderMan varying data)
-		named_arrays varying_data;
+		attribute_arrays_t varying_data;
 	};
 	
 	/// Defines storage for NURBS patches
@@ -240,9 +259,9 @@ public:
 		/// Stores per-patch materials
 		boost::shared_ptr<const materials_t> patch_materials;
 		/// Stores user-defined per-patch data (maps to RenderMan constant data)
-		named_arrays constant_data;
+		attribute_arrays_t constant_data;
 		/// Stores user-defined per-patch data (maps to RenderMan uniform data)
-		named_arrays uniform_data;
+		attribute_arrays_t uniform_data;
 		/// Stores per-patch control points
 		boost::shared_ptr<const indices_t> patch_points;
 		/// Stores per-patch control point weights
@@ -252,7 +271,7 @@ public:
 		/// Stores per-patch knot vectors in the V parametric direction
 		boost::shared_ptr<const knots_t> patch_v_knots;
 		/// Stores user-defined per-parametric-corner data (maps to RenderMan varying data)
-		named_arrays varying_data;
+		attribute_arrays_t varying_data;
 		/// Stores the number of trim curve loops for each patch
 		boost::shared_ptr<const counts_t> patch_trim_curve_loop_counts;
 		/// Stores the first trim curve loop (index into first_trim_curves) for each patch
@@ -306,7 +325,7 @@ public:
 		/// Stores per-polyhedron types
 		boost::shared_ptr<const types_t> types;
 		/// Stores user-defined per-polyhedron data (maps to RenderMan constant data)
-		named_arrays constant_data;
+		attribute_arrays_t constant_data;
 		/// Stores per-face first loops
 		boost::shared_ptr<const indices_t> face_first_loops;
 		/// Stores per-face loop counts
@@ -316,7 +335,7 @@ public:
 		/// Stores per-face materials
 		boost::shared_ptr<const materials_t> face_materials;
 		/// Stores user-defined per-face data (maps to RenderMan uniform data)
-		named_arrays uniform_data;
+		attribute_arrays_t uniform_data;
 		/// Stores per-loop first edges
 		boost::shared_ptr<const indices_t> loop_first_edges;
 		/// Stores the start point of each edge
@@ -326,7 +345,7 @@ public:
 		/// Stores per-edge selection state
 		boost::shared_ptr<const selection_t> edge_selection;
 		/// Stores user-defined per-edge data (maps to RenderMan facevarying data)
-		named_arrays face_varying_data;
+		attribute_arrays_t face_varying_data;
 	};
 
 	/// Defines storage for blobbies (implicit surfaces)
@@ -374,9 +393,9 @@ public:
 		/// Stores per-blobby materials
 		boost::shared_ptr<const materials_t> materials;
 		/// Stores user-defined per-blobby data (maps to RenderMan constant data)
-		named_arrays constant_data;
+		attribute_arrays_t constant_data;
 		/// Stores user-defined per-blobby data (maps to RenderMan uniform data)
-		named_arrays uniform_data;
+		attribute_arrays_t uniform_data;
 		/// Stores blobby primitives
 		boost::shared_ptr<const primitives_t> primitives;
 		/// Stores per-primitive floating-point value offsets
@@ -384,9 +403,9 @@ public:
 		/// Stores per-primitive floating-point value counts
 		boost::shared_ptr<const counts_t> primitive_float_counts;
 		/// Stores user-defined per-primitive data (maps to RenderMan varying data)
-		named_arrays varying_data;
+		attribute_arrays_t varying_data;
 		/// Stores user-defined per-primitive data (maps to RenderMan vertex data)
-		named_arrays vertex_data;
+		attribute_arrays_t vertex_data;
 		/// Stores blobby operators
 		boost::shared_ptr<const operators_t> operators;
 		/// Stores operator operand offsets
@@ -404,7 +423,10 @@ public:
 	/// Stores per-point selection state
 	boost::shared_ptr<const selection_t> point_selection;
 	/// Stores user-defined per-point data (maps to RenderMan vertex data)
-	named_arrays vertex_data;
+	attribute_arrays_t vertex_data;
+
+	/// Stores mesh primitives
+	primitives_t primitives;
 
 	/// Stores point groups
 	boost::shared_ptr<const point_groups_t> point_groups;

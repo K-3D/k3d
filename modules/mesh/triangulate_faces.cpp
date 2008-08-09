@@ -27,7 +27,7 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/named_array_copier.h>
+#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/triangulator.h>
@@ -122,13 +122,13 @@ private:
 			m_polyhedra->constant_data = m_input->polyhedra->constant_data;
 
 			m_polyhedra->uniform_data = m_input->polyhedra->uniform_data.clone_types();
-			m_uniform_data_copier.reset(new k3d::named_array_copier(m_input->polyhedra->uniform_data, m_polyhedra->uniform_data));
+			m_uniform_data_copier.reset(new k3d::attribute_array_copier(m_input->polyhedra->uniform_data, m_polyhedra->uniform_data));
 
 			m_polyhedra->face_varying_data = m_input->polyhedra->face_varying_data.clone_types();
-			m_face_varying_data_copier.reset(new k3d::named_array_copier(m_input->polyhedra->face_varying_data, m_polyhedra->face_varying_data));
+			m_face_varying_data_copier.reset(new k3d::attribute_array_copier(m_input->polyhedra->face_varying_data, m_polyhedra->face_varying_data));
 
 			Output.vertex_data = m_input->vertex_data.clone();
-			m_vertex_data_copier.reset(new k3d::named_array_copier(m_input->vertex_data, Output.vertex_data));
+			m_vertex_data_copier.reset(new k3d::attribute_array_copier(m_input->vertex_data, Output.vertex_data));
 
 			// Setup the output mesh ...
 			Output.polyhedra = m_polyhedra;
@@ -268,9 +268,9 @@ private:
 		boost::shared_ptr<k3d::mesh::points_t> m_points;
 		boost::shared_ptr<k3d::mesh::selection_t> m_point_selection;
 
-		boost::shared_ptr<k3d::named_array_copier> m_uniform_data_copier;
-		boost::shared_ptr<k3d::named_array_copier> m_face_varying_data_copier;
-		boost::shared_ptr<k3d::named_array_copier> m_vertex_data_copier;
+		boost::shared_ptr<k3d::attribute_array_copier> m_uniform_data_copier;
+		boost::shared_ptr<k3d::attribute_array_copier> m_face_varying_data_copier;
+		boost::shared_ptr<k3d::attribute_array_copier> m_vertex_data_copier;
 
 		k3d::uint_t m_current_face;
 

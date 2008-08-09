@@ -57,12 +57,12 @@ public:
 			return;
 
 		const k3d::mesh::materials_t& patch_materials = *Mesh.bilinear_patches->patch_materials;
-		const k3d::mesh::named_arrays& constant_data = Mesh.bilinear_patches->constant_data;
-		const k3d::mesh::named_arrays& uniform_data = Mesh.bilinear_patches->uniform_data;
+		const k3d::mesh::attribute_arrays_t& constant_data = Mesh.bilinear_patches->constant_data;
+		const k3d::mesh::attribute_arrays_t& uniform_data = Mesh.bilinear_patches->uniform_data;
 		const k3d::mesh::indices_t& patch_points = *Mesh.bilinear_patches->patch_points;
 		const k3d::mesh::points_t& points = *Mesh.points;
-		const k3d::mesh::named_arrays& varying_data = Mesh.bilinear_patches->varying_data;
-		const k3d::mesh::named_arrays& vertex_data = Mesh.vertex_data;
+		const k3d::mesh::attribute_arrays_t& varying_data = Mesh.bilinear_patches->varying_data;
+		const k3d::mesh::attribute_arrays_t& vertex_data = Mesh.vertex_data;
 
 		const size_t patch_begin = 0;
 		const size_t patch_end = patch_begin + (patch_points.size() / 4);
