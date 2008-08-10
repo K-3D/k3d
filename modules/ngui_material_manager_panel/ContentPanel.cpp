@@ -469,6 +469,21 @@ void ContentPanel::createPreviewNodes()
                                         "pixel_aspect_ratio", aspectRatio);
 
 
+      //Set Render Quality Attributes: Optimized For Preview Render
+      k3d::double_t pixel_xy_samples = 1.0;
+
+      k3d::property::set_internal_value(*m_engine, 
+                                        "pixel_xsamples", pixel_xy_samples);
+
+      k3d::property::set_internal_value(*m_engine, 
+                                        "pixel_ysamples", pixel_xy_samples);
+
+
+      k3d::double_t shading_rate = 8.0;
+
+      k3d::property::set_internal_value(*m_engine, 
+                                        "shading_rate", shading_rate);
+
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_engine))
         metadata->set_metadata(nametag_metatag, rman_engine_meta);
