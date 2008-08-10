@@ -486,7 +486,7 @@ public:
 			k3d::uuid(0xfc49ed0c, 0x4fc0b829, 0xb9f08d9e, 0xf924718f),
 			"NGUIUVEditor",
 			_("Used for editing of UV coordinates"),
-			"NGUI Panels",
+			"NGUI Panel",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-type", "uveditor")("ngui:panel-label", "UVEditor"));
 

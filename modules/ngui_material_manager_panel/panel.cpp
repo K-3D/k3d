@@ -1121,7 +1121,7 @@ public:
       factory(k3d::uuid(0xd363f420, 0x7240b35e, 0x7cf38788, 0xda06e8e6),
               "NGUIMaterialManagerPanel",
               _("Material Manager Panel"),
-              "NGUI Panels",
+              "NGUI Panel",
               k3d::iplugin_factory::EXPERIMENTAL,
               boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Material Manager"));
 
