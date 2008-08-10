@@ -17,7 +17,7 @@ def plugin_sort(lhs, rhs):
 # Generate a mapping of categories to plugins ...
 categories = { "All" : [], "Stable" : [], "Experimental" : [], "Deprecated" : [] }
 
-for plugin in k3d.plugins():
+for plugin in k3d.plugin.factory.lookup():
 	if plugin.metadata().has_key("k3d:disable-documentation"):
 		continue
 
@@ -36,7 +36,7 @@ for plugin in k3d.plugins():
 		categories[category].append(plugin)
 
 # Create the main article for each plugin ...
-for plugin in sorted(k3d.plugins(), plugin_sort):
+for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 	if plugin.metadata().has_key("k3d:disable-documentation"):
 		continue
 
@@ -88,7 +88,7 @@ for category in sorted(categories.keys()):
 	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
 
 # Create the reference documentation for each plugin ...
-for plugin in sorted(k3d.plugins(), plugin_sort):
+for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 
 	if plugin.metadata().has_key("k3d:disable-documentation"):
 		continue
