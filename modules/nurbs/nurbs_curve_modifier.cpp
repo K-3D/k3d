@@ -2283,7 +2283,7 @@ namespace module
 
 				knot_vector_adaption(curves);
 
-				k3d::mesh::indices_t patch_points;
+				k3d::mesh::points_t patch_points;
 				k3d::mesh::weights_t patch_point_weights;
 
 				k3d::mesh::knots_t u_knots;
@@ -2313,15 +2313,23 @@ namespace module
 
 				for (int i = 0; i < curve_point_counts->at(curve1); i++)
 				{
-					patch_points.push_back( curve_points->at(curve_points_begin + i) );
-					patch_points.push_back( curve_points->at(curve2_points_begin + i) );
+					patch_points.push_back( mesh_points->at(curve_points->at(curve_points_begin + i)) );
+					patch_points.push_back( mesh_points->at(curve_points->at(curve2_points_begin + i)) );
 
 					patch_point_weights.push_back( curve_point_weights->at(curve_points_begin + i) );
 					patch_point_weights.push_back( curve_point_weights->at(curve2_points_begin + i) );
 				}
 
-				k3d::gprim_factory fac(*m_instance);
-				fac.add_nurbs_patch(2, v_order, patch_points, u_knots, v_knots, patch_point_weights);
+				nurbs_patch p;
+				p.u_knots = u_knots;
+				p.v_knots = v_knots;
+				p.u_order = 2;
+				p.v_order = v_order;
+				p.point_weights = patch_point_weights;
+				p.control_points = patch_points;
+
+				nurbs_patch_modifier mod(*m_instance);
+				mod.insert_patch(p, true);
 			}
 			catch (std::exception& e)
 			{

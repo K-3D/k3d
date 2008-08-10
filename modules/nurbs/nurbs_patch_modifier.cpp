@@ -1035,46 +1035,145 @@ namespace module
 		void nurbs_patch_modifier::delete_patch(size_t patch_idx)
 		{
 		    MY_DEBUG << "Deleting patch " << patch_idx << std::endl;
+            try
+            {
+                int patch = patch_idx;
 
-            int patch = patch_idx;
+                m_patch_points->erase(m_patch_points->begin() + m_patch_first_points->at(patch), m_patch_points->begin() + m_patch_first_points->at(patch) + m_patch_u_point_counts->at(patch) + m_patch_v_point_counts->at(patch));
+                m_patch_point_weights->erase(m_patch_point_weights->begin() + m_patch_first_points->at(patch), m_patch_point_weights->begin() + m_patch_first_points->at(patch) + m_patch_u_point_counts->at(patch) + m_patch_v_point_counts->at(patch));
+                m_patch_u_knots->erase(m_patch_u_knots->begin() + m_patch_u_first_knots->at(patch), m_patch_u_knots->begin() + m_patch_u_first_knots->at(patch) + m_patch_u_point_counts->at(patch) + m_patch_u_orders->at(patch));
+                m_patch_v_knots->erase(m_patch_v_knots->begin() + m_patch_v_first_knots->at(patch), m_patch_v_knots->begin() + m_patch_v_first_knots->at(patch) + m_patch_v_point_counts->at(patch) + m_patch_v_orders->at(patch));
 
-            m_patch_points->erase(m_patch_points->begin() + m_patch_first_points->at(patch), m_patch_points->begin() + m_patch_first_points->at(patch) + m_patch_u_point_counts->at(patch) + m_patch_v_point_counts->at(patch));
-			m_patch_point_weights->erase(m_patch_point_weights->begin() + m_patch_first_points->at(patch), m_patch_point_weights->begin() + m_patch_first_points->at(patch) + m_patch_u_point_counts->at(patch) + m_patch_v_point_counts->at(patch));
-			m_patch_u_knots->erase(m_patch_u_knots->begin() + m_patch_u_first_knots->at(patch), m_patch_u_knots->begin() + m_patch_u_first_knots->at(patch) + m_patch_u_point_counts->at(patch) + m_patch_u_orders->at(patch));
-			m_patch_v_knots->erase(m_patch_v_knots->begin() + m_patch_v_first_knots->at(patch), m_patch_v_knots->begin() + m_patch_v_first_knots->at(patch) + m_patch_v_point_counts->at(patch) + m_patch_v_orders->at(patch));
+                m_patch_first_points->erase(m_patch_first_points->begin() + patch);
+                m_patch_selection->erase(m_patch_selection->begin() + patch);
+                m_patch_u_first_knots->erase(m_patch_u_first_knots->begin() + patch);
+                m_patch_v_first_knots->erase(m_patch_v_first_knots->begin() + patch);
+                m_patch_u_orders->erase(m_patch_u_orders->begin() + patch);
+                m_patch_v_orders->erase(m_patch_v_orders->begin() + patch);
+                m_patch_u_point_counts->erase(m_patch_u_point_counts->begin() + patch);
+                m_patch_v_point_counts->erase(m_patch_v_point_counts->begin() + patch);
+                m_patch_materials->erase(m_patch_materials->begin() + patch);
+                if (m_patch_trim_curve_loop_counts)
+                {
+                    //erase trim curve data if any..
+                    if(m_patch_trim_curve_loop_counts->at(patch) > 0)
+                    {
+                        m_first_trim_curves->erase(m_first_trim_curves->begin() + patch);
+                        m_trim_curve_counts->erase(m_trim_curve_counts->begin() + patch);
+                        m_trim_curve_first_knots->erase(m_trim_curve_first_knots->begin() + patch);
+                        m_trim_curve_knots->erase(m_trim_curve_knots->begin() + patch);
+                        m_trim_curve_first_points->erase(m_trim_curve_first_points->begin() + patch);
+                        m_trim_curve_point_weights->erase(m_trim_curve_point_weights->begin() + patch);
+                        m_trim_curve_orders->erase(m_trim_curve_orders->begin() + patch);
+                        m_trim_curve_point_counts->erase(m_trim_curve_point_counts->begin() + patch);
+                        m_trim_curve_selection->erase(m_trim_curve_selection->begin() + patch);
+                        m_trim_curve_loop_selection->erase(m_trim_curve_loop_selection->begin() + patch);
+                    }
 
-			m_patch_first_points->erase(m_patch_first_points->begin() + patch);
-			m_patch_selection->erase(m_patch_selection->begin() + patch);
-			m_patch_u_first_knots->erase(m_patch_u_first_knots->begin() + patch);
-			m_patch_v_first_knots->erase(m_patch_v_first_knots->begin() + patch);
-			m_patch_u_orders->erase(m_patch_u_orders->begin() + patch);
-			m_patch_v_orders->erase(m_patch_v_orders->begin() + patch);
-			m_patch_u_point_counts->erase(m_patch_u_point_counts->begin() + patch);
-			m_patch_v_point_counts->erase(m_patch_v_point_counts->begin() + patch);
-			m_patch_materials->erase(m_patch_materials->begin() + patch);
-			if (m_patch_trim_curve_loop_counts)
-			{
-				//erase trim curve data if any..
-				if(m_patch_trim_curve_loop_counts->at(patch) > 0)
-				{
-				    m_first_trim_curves->erase(m_first_trim_curves->begin() + patch);
-                    m_trim_curve_counts->erase(m_trim_curve_counts->begin() + patch);
-                    m_trim_curve_first_knots->erase(m_trim_curve_first_knots->begin() + patch);
-                    m_trim_curve_knots->erase(m_trim_curve_knots->begin() + patch);
-                    m_trim_curve_first_points->erase(m_trim_curve_first_points->begin() + patch);
-                    m_trim_curve_point_weights->erase(m_trim_curve_point_weights->begin() + patch);
-                    m_trim_curve_orders->erase(m_trim_curve_orders->begin() + patch);
-                    m_trim_curve_point_counts->erase(m_trim_curve_point_counts->begin() + patch);
-                    m_trim_curve_selection->erase(m_trim_curve_selection->begin() + patch);
-                    m_trim_curve_loop_selection->erase(m_trim_curve_loop_selection->begin() + patch);
-				}
+                    m_patch_trim_curve_loop_counts->erase(m_patch_trim_curve_loop_counts->begin() + patch);
+                    m_patch_first_trim_curve_loops->erase(m_patch_first_trim_curve_loops->begin() + patch);
+                }
 
-				m_patch_trim_curve_loop_counts->erase(m_patch_trim_curve_loop_counts->begin() + patch);
-				m_patch_first_trim_curve_loops->erase(m_patch_first_trim_curve_loops->begin() + patch);
-			}
+                nurbs_curve_modifier mod(*m_instance);
+                mod.remove_unused_points();
+            }
+            catch(...)
+            {
+                k3d::log() << error << nurbs_debug << "Error in DeletePatch with patch=" << patch_idx << std::endl;
+            }
+		}
 
-            nurbs_curve_modifier mod(*m_instance);
-            mod.remove_unused_points();
+		void nurbs_patch_modifier::extrude_patch(size_t patch, k3d::axis axis, double distance, bool cap)
+		{
+		    try
+		    {
+                nurbs_patch p = extract_patch(patch);
+                nurbs_curve u0 = extract_u_curve(patch, 0);
+                nurbs_curve u1 = extract_u_curve(patch, m_patch_v_point_counts->at(patch) - 1);
+                nurbs_curve v0 = extract_v_curve(patch, 0);
+                nurbs_curve v1 = extract_v_curve(patch, m_patch_u_point_counts->at(patch) - 1);
+
+                k3d::point3 delta;
+                switch(axis)
+                {
+                    case k3d::X:
+                        delta = k3d::point3(1.0,0.0,0.0);
+                    break;
+                    case k3d::Y:
+                        delta = k3d::point3(0.0,1.0,0.0);
+                    break;
+                    case k3d::Z:
+                        delta = k3d::point3(0.0,0.0,1.0);
+                    break;
+                }
+
+                delta = delta * distance;
+
+                nurbs_patch p_1 = p;
+                nurbs_curve u0_1 = u0;
+                nurbs_curve u1_1 = u1;
+                nurbs_curve v0_1 = v0;
+                nurbs_curve v1_1 = v1;
+
+                for(int i = 0; i < p_1.control_points.size(); i++)
+                {
+                    p_1.control_points.at(i) = p_1.control_points.at(i) + delta;
+                }
+
+                for(int i = 0; i < u0_1.control_points.size(); i++)
+                {
+                    u0_1.control_points.at(i) = u0_1.control_points.at(i) + delta;
+                }
+
+                for(int i = 0; i < u1_1.control_points.size(); i++)
+                {
+                    u1_1.control_points.at(i) = u1_1.control_points.at(i) + delta;
+                }
+
+                for(int i = 0; i < v0_1.control_points.size(); i++)
+                {
+                    v0_1.control_points.at(i) = v0_1.control_points.at(i) + delta;
+                }
+
+                for(int i = 0; i < v1_1.control_points.size(); i++)
+                {
+                    v1_1.control_points.at(i) = v1_1.control_points.at(i) + delta;
+                }
+
+
+                k3d::mesh tmp;
+                nurbs_curve_modifier c_mod(tmp);
+                c_mod.add_curve(u0,true);
+                c_mod.add_curve(u0_1,true);
+                c_mod.ruled_surface(0,1);
+
+                c_mod.add_curve(u1,true);
+                c_mod.add_curve(u1_1,true);
+                c_mod.ruled_surface(2,3);
+
+                c_mod.add_curve(v0,true);
+                c_mod.add_curve(v0_1,true);
+                c_mod.ruled_surface(4,5);
+
+                c_mod.add_curve(v1,true);
+                c_mod.add_curve(v1_1,true);
+                c_mod.ruled_surface(6,7);
+
+                nurbs_patch_modifier p_mod(tmp);
+                insert_patch(p_mod.extract_patch(0),true);
+                insert_patch(p_mod.extract_patch(1),true);
+                insert_patch(p_mod.extract_patch(2),true);
+                insert_patch(p_mod.extract_patch(3),true);
+
+                if(cap)
+                {
+                    insert_patch(p_1,true);
+                }
+		    }
+		    catch(...)
+            {
+                k3d::log() << error << nurbs_debug << "Error in ExtrudePatch with patch=" << patch << " axis=" << axis << " distance=" << distance << " cap=" << cap << std::endl;
+            }
 		}
 	}
 }

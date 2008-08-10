@@ -105,6 +105,13 @@ namespace module
 				///\param u Which of the u curves do we want? Must be smaller than patch_u_point_counts
 				nurbs_curve extract_v_curve(size_t patch, size_t u);
 
+                ///Extrude the selected surface along the given axis
+                ///\param patch the patch to extrude
+                ///\param axis Along which Axis shall we extrude
+                ///\param distance How far to extrude the face
+                ///\param cap Whether to have caps at both ends or just at one
+                void extrude_patch(size_t patch, k3d::axis axis, double distance, bool cap);
+
 				///Returns the number of patches in this mesh
 				int get_patch_count();
 
