@@ -308,7 +308,7 @@ namespace module
 			{
 				str << " " << curve_knots->at(knot);
 			}
-			k3d::log() << debug << nurbs_debug << str.str() << std::endl;
+			MY_DEBUG << str.str() << std::endl;
 		}
 
 		void nurbs_curve_modifier::replace_point(size_t newIndex, size_t curve, size_t point, bool continuous)

@@ -47,7 +47,7 @@
 
 #include "nurbs_patch_modifier.h"
 
-#define MODULE_NURBS_DEBUG 1
+#define MODULE_NURBS_DEBUG 0
 #define nurbs_debug __FILE__ << ": " << __LINE__ << " "
 #define MY_DEBUG if(MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug
 
@@ -220,8 +220,6 @@ namespace module{
                 ///\param curve The curve to be converted. The original will still exist
                 nurbs_trim_curve create_trim_curve(size_t curve);
 
-            private:
-
                 ///Returns the span in which the knot value u lies
                 ///\param curve The curve to examine
                 ///\param u We want the span which contains this value
@@ -232,6 +230,8 @@ namespace module{
                 ///\param u The u-value where we want to know the basis functions
                 ///\param span The span in which u lies
                 std::vector<double> basis_functions(size_t curve, double u, size_t span);
+
+            private:
 
                 ///Adds this point to the mesh's points_t instance, and returns the index to its position
                 ///\param point The point to add

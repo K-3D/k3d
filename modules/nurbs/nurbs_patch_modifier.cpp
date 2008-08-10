@@ -1,4 +1,5 @@
 #include "nurbs_patch_modifier.h"
+#include <algorithm>
 
 namespace module
 {
@@ -161,13 +162,11 @@ namespace module
 
 				for (int i = knots_begin; i < knots_begin + knot_count_u; i++)
 				{
-					MY_DEBUG << "adding knot " << i << std::endl;
 					result.curve_knots.push_back(m_patch_u_knots->at(i));
 				}
 
 				for (int i = points_begin; i < points_end; i += point_step)
 				{
-					MY_DEBUG << "adding point " << i << " of " << m_patch_points->size() << std::endl;
 					result.control_points.push_back(m_mesh_points->at( m_patch_points->at(i) ));
 					result.curve_point_weights.push_back( m_patch_point_weights->at(i) );
 				}
@@ -899,6 +898,7 @@ namespace module
 				m_trim_curve_orders->push_back(tc.curve_knots.size() - tc.control_points.size());
 				m_trim_curve_point_counts->push_back(tc.control_points.size());
 				m_trim_curve_selection->push_back(0.0);
+				m_trim_curve_loop_selection->push_back(0.0);
 
                 //map control points to u x v = [0,1] x [0,1]??
                 MY_DEBUG << "Copying points" << std::endl;
@@ -928,6 +928,153 @@ namespace module
                 else
                     m_patch_selection->at(i) = 1.0;
 		    }
+		}
+
+		k3d::point4 nurbs_patch_modifier::patch_point(size_t patch, double u, double v)
+		{
+		    try
+		    {
+                nurbs_curve u_curve = extract_u_curve(patch,0);
+                nurbs_curve v_curve = extract_v_curve(patch,0);
+
+                k3d::mesh tmp1;
+                nurbs_curve_modifier u_mod(tmp1);
+                u_mod.add_curve(u_curve,false);
+                u_mod.normalize_knot_vector(0);
+
+                k3d::mesh tmp2;
+                nurbs_curve_modifier v_mod(tmp2);
+                v_mod.add_curve(v_curve,false);
+                v_mod.normalize_knot_vector(0);
+
+                int u_span = u_mod.find_span(0,u);
+                int v_span = v_mod.find_span(0,v);
+
+                int u_ind = u_span - m_patch_u_orders->at(patch) + 1;
+
+                std::vector<double> u_bases = u_mod.basis_functions(0, u, u_span);
+                std::vector<double> v_bases = v_mod.basis_functions(0, v, v_span);
+
+                k3d::point4 S;
+
+                for(int l = 0; l < m_patch_v_orders->at(patch); l++)
+                {
+                    k3d::point4 temp;
+                    int v_ind = v_span - m_patch_v_orders->at(patch) + 1 + l;
+                    for(int k = 0; k < m_patch_u_orders->at(patch); k++)
+                    {
+                        int position = m_patch_first_points->at(patch) + m_patch_u_point_counts->at(patch) * v_ind + k + u_ind;
+                        k3d::point3 mp = m_mesh_points->at(m_patch_points->at(position));
+                        double w = m_patch_point_weights->at(position);
+                        k3d::point4 p(mp[0]*w, mp[1]*w, mp[2]*w, w);
+                        temp = temp + u_bases.at(k)*p;
+                    }
+                    S = S + v_bases.at(l) * temp;
+                }
+                MY_DEBUG << "PatchPoint at (" << u << ", " << v << ") is: " << S[0] << " x " << S[1] << " x " << S[2] << " x " << S[3] << std::endl;
+
+                return S;
+		    }
+		    catch(...)
+		    {
+		        k3d::log() << error << nurbs_debug << "Error in patch_point (" << u << ", " << v << ")" << std::endl;
+		    }
+		}
+
+		void nurbs_patch_modifier::polygonize_patch(size_t patch, size_t segments, bool delete_orig, bool flip)
+		{
+		    MY_DEBUG << "Creating a polygonal representation of patch=" << patch << " with segments=" << segments << std::endl;
+
+		    k3d::gprim_factory fac(*m_instance);
+		    k3d::mesh::indices_t poly_points;
+
+            double step = 1.0 / segments;
+
+		    for(int i = 0; i < segments; i++)
+		    {
+                for(int j = 0; j < segments; j++)
+                {
+                    poly_points.clear();
+                    k3d::point4 p00 = patch_point(patch, i*step, j*step);
+                    k3d::point4 p10 = patch_point(patch, (i+1)*step, j*step);
+                    k3d::point4 p11 = patch_point(patch, (i+1)*step, (j+1)*step);
+                    k3d::point4 p01 = patch_point(patch, i*step, (j+1)*step);
+                    if(!flip)
+                    {
+                        poly_points.push_back(insert_point(k3d::point3(p00[0]/p00[3], p00[1]/p00[3], p00[2]/p00[3]),true));
+                        poly_points.push_back(insert_point(k3d::point3(p11[0]/p11[3], p11[1]/p11[3], p11[2]/p11[3]),true));
+                        poly_points.push_back(insert_point(k3d::point3(p10[0]/p10[3], p10[1]/p10[3], p10[2]/p10[3]),true));
+                        fac.add_polygon(poly_points);
+                        poly_points.clear();
+                        poly_points.push_back(insert_point(k3d::point3(p00[0]/p00[3], p00[1]/p00[3], p00[2]/p00[3]),true));
+                        poly_points.push_back(insert_point(k3d::point3(p01[0]/p01[3], p01[1]/p01[3], p01[2]/p01[3]),true));
+                        poly_points.push_back(insert_point(k3d::point3(p11[0]/p11[3], p11[1]/p11[3], p11[2]/p11[3]),true));
+                        fac.add_polygon(poly_points);
+                    }
+                    else
+                    {
+                        poly_points.push_back(insert_point(k3d::point3(p00[0]/p00[3], p00[1]/p00[3], p00[2]/p00[3]),true));
+                        poly_points.push_back(insert_point(k3d::point3(p10[0]/p10[3], p10[1]/p10[3], p10[2]/p10[3]),true));
+                        poly_points.push_back(insert_point(k3d::point3(p11[0]/p11[3], p11[1]/p11[3], p11[2]/p11[3]),true));
+                        fac.add_polygon(poly_points);
+                        poly_points.clear();
+                        poly_points.push_back(insert_point(k3d::point3(p00[0]/p00[3], p00[1]/p00[3], p00[2]/p00[3]),true));
+                        poly_points.push_back(insert_point(k3d::point3(p11[0]/p11[3], p11[1]/p11[3], p11[2]/p11[3]),true));
+                        poly_points.push_back(insert_point(k3d::point3(p01[0]/p01[3], p01[1]/p01[3], p01[2]/p01[3]),true));
+                        fac.add_polygon(poly_points);
+                    }
+                }
+		    }
+
+		    if(delete_orig)
+		    {
+		        delete_patch(patch);
+		    }
+		}
+
+		void nurbs_patch_modifier::delete_patch(size_t patch_idx)
+		{
+		    MY_DEBUG << "Deleting patch " << patch_idx << std::endl;
+
+            int patch = patch_idx;
+
+            m_patch_points->erase(m_patch_points->begin() + m_patch_first_points->at(patch), m_patch_points->begin() + m_patch_first_points->at(patch) + m_patch_u_point_counts->at(patch) + m_patch_v_point_counts->at(patch));
+			m_patch_point_weights->erase(m_patch_point_weights->begin() + m_patch_first_points->at(patch), m_patch_point_weights->begin() + m_patch_first_points->at(patch) + m_patch_u_point_counts->at(patch) + m_patch_v_point_counts->at(patch));
+			m_patch_u_knots->erase(m_patch_u_knots->begin() + m_patch_u_first_knots->at(patch), m_patch_u_knots->begin() + m_patch_u_first_knots->at(patch) + m_patch_u_point_counts->at(patch) + m_patch_u_orders->at(patch));
+			m_patch_v_knots->erase(m_patch_v_knots->begin() + m_patch_v_first_knots->at(patch), m_patch_v_knots->begin() + m_patch_v_first_knots->at(patch) + m_patch_v_point_counts->at(patch) + m_patch_v_orders->at(patch));
+
+			m_patch_first_points->erase(m_patch_first_points->begin() + patch);
+			m_patch_selection->erase(m_patch_selection->begin() + patch);
+			m_patch_u_first_knots->erase(m_patch_u_first_knots->begin() + patch);
+			m_patch_v_first_knots->erase(m_patch_v_first_knots->begin() + patch);
+			m_patch_u_orders->erase(m_patch_u_orders->begin() + patch);
+			m_patch_v_orders->erase(m_patch_v_orders->begin() + patch);
+			m_patch_u_point_counts->erase(m_patch_u_point_counts->begin() + patch);
+			m_patch_v_point_counts->erase(m_patch_v_point_counts->begin() + patch);
+			m_patch_materials->erase(m_patch_materials->begin() + patch);
+			if (m_patch_trim_curve_loop_counts)
+			{
+				//erase trim curve data if any..
+				if(m_patch_trim_curve_loop_counts->at(patch) > 0)
+				{
+				    m_first_trim_curves->erase(m_first_trim_curves->begin() + patch);
+                    m_trim_curve_counts->erase(m_trim_curve_counts->begin() + patch);
+                    m_trim_curve_first_knots->erase(m_trim_curve_first_knots->begin() + patch);
+                    m_trim_curve_knots->erase(m_trim_curve_knots->begin() + patch);
+                    m_trim_curve_first_points->erase(m_trim_curve_first_points->begin() + patch);
+                    m_trim_curve_point_weights->erase(m_trim_curve_point_weights->begin() + patch);
+                    m_trim_curve_orders->erase(m_trim_curve_orders->begin() + patch);
+                    m_trim_curve_point_counts->erase(m_trim_curve_point_counts->begin() + patch);
+                    m_trim_curve_selection->erase(m_trim_curve_selection->begin() + patch);
+                    m_trim_curve_loop_selection->erase(m_trim_curve_loop_selection->begin() + patch);
+				}
+
+				m_patch_trim_curve_loop_counts->erase(m_patch_trim_curve_loop_counts->begin() + patch);
+				m_patch_first_trim_curve_loops->erase(m_patch_first_trim_curve_loops->begin() + patch);
+			}
+
+            nurbs_curve_modifier mod(*m_instance);
+            mod.remove_unused_points();
 		}
 	}
 }

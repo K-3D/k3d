@@ -42,6 +42,7 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/shared_pointer.h>
 
+
 #include "nurbs_curve_modifier.h"
 
 namespace module
@@ -88,6 +89,9 @@ namespace module
 				///\param offset_v Offset the trim curve
 				void add_trim_curve(size_t patch, size_t curve, double scale, double offset_u, double offset_v);
 
+                ///Deletes the selected patch from this mesh, unused points will be removed
+                void delete_patch(size_t patch);
+
 				///Extract the patch with the given index, returns this patch
 				nurbs_patch extract_patch(size_t patch);
 
@@ -108,6 +112,9 @@ namespace module
 				///\param patch The patch to insert
 				///\param share_points Whether to use existing vertices at the same position
 				void insert_patch(const nurbs_patch& patch, bool share_points);
+
+                ///Returns the evaluated point on the surface at (u,v)
+                k3d::point4 patch_point(size_t patch, double u, double v);
 
 				///Inserts a knot into all u curves of the patch
 				///\param patch The patch we're going to work on
@@ -130,6 +137,12 @@ namespace module
 				///\param patch The patch to degree elevate
 				///\param degree If the patch had u-degree 2 and you specify 2 here, it'll get a new degree of 4
 				void patch_v_degree_elevation(size_t patch, size_t degree);
+
+				///Create a polygonal grid representing the NurbsPatch
+				///\param patch
+				///\param segments How many segments in each direction, if this is n then the resulting patch is n*n
+				///\param delete_orig Whether to delete the former patch
+				void polygonize_patch(size_t patch, size_t segments, bool delete_orig, bool flip);
 
                 ///Selects this patch and deselects all others
                 ///\param patch The patch to select
