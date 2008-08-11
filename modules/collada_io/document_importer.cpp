@@ -257,8 +257,6 @@ public:
 			}
 		}
 
-return true;
-
 		//Add all cameras to pipeline
 		domLibrary_cameras_Array library_cameras = root->getLibrary_cameras_array();
 		for(int j=0; j<library_cameras.getCount(); j++)

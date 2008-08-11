@@ -94,10 +94,10 @@ namespace io
 			k3d::inode *frozen_mesh = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("FrozenMesh"), Document, name);
 			k3d::imesh_storage* mesh_storage = dynamic_cast<k3d::imesh_storage*>(frozen_mesh);
 			mesh_storage->reset_mesh(mesh);
-			//*mesh  = 
-			intGeometry result(geom,k3d::identity3D());
-			//to_k3d_mesh(geom);
-return;
+			*mesh  = 
+			//intGeometry result(geom,k3d::identity3D());
+			to_k3d_mesh(geom);
+//return;
 
 			k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(frozen_mesh);
 			mesh_source_output = &mesh_source->mesh_source_output();
