@@ -263,24 +263,25 @@ daeParser::daeParser(domCOLLADA& root, k3d::mesh& Mesh)
 	// First find a <visual_scene> to load. In a real app we would look for and load all
 	// the <visual_scene>s in a document, but for this app we just convert the first
 	// <visual_scene> we find.
+
 	domVisual_scene* visualScene = daeSafeCast<domVisual_scene>(root.getDescendant("visual_scene"));
 	if(!visualScene)
 	{
-	     k3d::log() << "Invalid <visual_scene> element\n";
-	     return;
+		k3d::log() << "Invalid <visual_scene> element\n";
+		return;
 	}
 	// Now covert all the <node>s in the <visual_scene>. This is a recursive process,
 	// so any child nodes will also be converted.
 	domNode_Array& nodes = visualScene->getNode_array();
 	for (size_t i = 0; i < nodes.getCount(); i++)
 		lookup<Node, domNode>(*nodes[i],k3d::identity3D());
-		
+	//k3d::log() << "ASDFASDFASDf" << std::endl;
 	
-	for (size_t i = 0; i < nodes.getCount(); i++)
-		if(!lookup<Node, domNode>(*nodes[i],k3d::identity3D()).meshes.empty()){	
-			Mesh = lookup<Node, domNode>(*nodes[i],k3d::identity3D()).meshes.back()->getMesh();
-			return;
-		}
+	//for (size_t i = 0; i < nodes.getCount(); i++)
+	//	if(!lookup<Node, domNode>(*nodes[i],k3d::identity3D()).meshes.empty()){	
+	//		Mesh = lookup<Node, domNode>(*nodes[i],k3d::identity3D()).meshes.back()->getMesh();
+	//		return;
+	//	}
 	
 }
 

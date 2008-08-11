@@ -32,8 +32,10 @@
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/measurement.h>
 #include "intElements.h"
 #include "integration.h"
+#include "collada.h"
 
 namespace module
 {
@@ -60,9 +62,12 @@ public:
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("dae_files")),
 		m_texture_u(init_owner(*this) + init_name("texture_u") + init_label(_("Texture U")) + init_description(_("Texture U")) + init_value(std::string("s"))),
 		m_texture_v(init_owner(*this) + init_name("texture_v") + init_label(_("Texture V")) + init_description(_("Texture V")) + init_value(std::string("t"))),
-		m_texture_w(init_owner(*this) + init_name("texture_w") + init_label(_("Texture W")) + init_description(_("Texture W")) + init_value(std::string("w")))
+		m_texture_w(init_owner(*this) + init_name("texture_w") + init_label(_("Texture W")) + init_description(_("Texture W")) + init_value(std::string("w"))),
+		m_geom(init_owner(*this) + init_name("geom") + init_label(_("Geometry")) + init_description(_("Geometry index from file to extract mesh")) + init_value(0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_file.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_geom.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 //		m_texture_u.changed_signal().connect(make_reset_mesh_slot());
 //		m_texture_v.changed_signal().connect(make_reset_mesh_slot());
@@ -93,7 +98,25 @@ public:
 		}
 		// Do the conversion. The conversion process throws an exception on error, so
 		// we'll include a try/catch handler.
-		daeParser dae_file(*root, Output);
+		//daeParser dae_file(*root, Output);
+
+		//Add all possible Geometries to pipeline
+		domLibrary_geometries_Array library_geometries = root->getLibrary_geometries_array();
+
+		if(library_geometries.getCount()==0)
+			return;
+
+		domGeometry_Array geometries = library_geometries[0]->getGeometry_array();
+
+		int cur_geom = m_geom.pipeline_value();
+		if(cur_geom >= geometries.getCount())
+		{
+			k3d::log() << error << "There aren't that many geometries in file!" << std::endl;
+			return;
+		}
+
+		intGeometry geom = intGeometry(*geometries[cur_geom], k3d::identity3D());
+		Output = geom.getMesh();
 
 		// destroy the objects we created during the conversion process
 		freeConversionObjects<Node, domNode>(dae);
@@ -122,6 +145,7 @@ private:
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_texture_u;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_texture_v;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_texture_w;
+	k3d_data(int, immutable_name, change_signal, no_undo, local_storage, no_constraint, measurement_property, with_serialization) m_geom;
 };
 
 k3d::iplugin_factory& mesh_reader_factory()

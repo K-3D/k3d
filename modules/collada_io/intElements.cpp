@@ -68,8 +68,6 @@ namespace io
 			int t_offset = -1;
 
 			int max_offset = 0;
-	
-			domP *poly;
 
 			polyCount = polygons->getCount();
 			inputArraysCount = polygons->getInput_array().getCount();
@@ -95,7 +93,7 @@ namespace io
 			}
 
 			// Stores the list of polygons
-			poly = polygons->getP();
+			domP *poly = polygons->getP();
 
 			max_offset++;
 	
@@ -123,6 +121,8 @@ namespace io
 				// Push this polygon into the list of polygons in my structure.
 				factory.add_polygon(vertex_coordinates); //and soon texture_coordinates, normal_coordinates
 			}
+
+			//Add points
 		}
 
 		for(int i=0; i<meshElement->getTriangles_array().getCount()>0; i++)
@@ -199,137 +199,6 @@ namespace io
 			}
 		}
 
-/*
-		// a mesh could be composed either of triangles or polygons
-		// we initialize both variables, in the end it's the same as triangles are 3 sided
-		// polygons
-		domTriangles *triangles;
-		domPolylist *polygons;
-
-		bool areTriangles = false;
-		bool arePolygons = false;
-		if(meshElement->getPolylist_array().getCount() >0)
-		{
-			arePolygons = true;
-			polygons = meshElement->getPolylist_array()[0];
-		}
-		if(meshElement->getTriangles_array().getCount() >0)
-		{
-			areTriangles = true;
-			triangles = meshElement->getTriangles_array()[0];
-		}
-
-		// polyCount stores how many polygons there are
-		int polyCount = 0;
-		// inputArraysCount stores how many polygon arrays are
-		int inputArraysCount = 0;
-
-		// offset for the mesh declaration input string, 
-		// vertex, normal and texture values are stored in a single array
-		// if one of them is not present it is not taken into account
-		int v_offset = -1;
-		int n_offset = -1;
-		int t_offset = -1;
-
-		int max_offset = 0;
-		domInputLocalOffset* vertex_input;
-		domInputLocalOffset* normal_input;
-		domInputLocalOffset* texcoord_input;
-
-		domP *poly;
-
-
-		if(areTriangles)
-		{
-			polyCount = triangles->getCount();
-			inputArraysCount = triangles->getInput_array().getCount();
-
-			// Routine to declare the offsets if these attributes are present
-			// only VERTEX attributes are obligatory
-			for (int i=0; i<inputArraysCount; i++)
-			{
-				if(strcmp(triangles->getInput_array()[i]->getSemantic(),"VERTEX")==0){
-					v_offset = triangles->getInput_array()[i]->getOffset();
-					vertex_input = triangles->getInput_array()[i];
-				}else
-				if(strcmp(triangles->getInput_array()[i]->getSemantic(),"NORMAL")==0){
-					n_offset = triangles->getInput_array()[i]->getOffset();
-					normal_input = triangles->getInput_array()[i];
-				}else
-				if(strcmp(triangles->getInput_array()[i]->getSemantic(),"TEXCOORD")==0){
-					t_offset = triangles->getInput_array()[i]->getOffset();
-					texcoord_input = triangles->getInput_array()[i];
-				}
-				if(max_offset< triangles->getInput_array()[i]->getOffset())
-					max_offset = triangles->getInput_array()[i]->getOffset();
-			}
-
-			// Stores the list of polygons
-			poly = triangles->getP();
-		}
-		else
-		if(arePolygons)
-		{
-			polyCount = polygons->getCount();
-			inputArraysCount = polygons->getInput_array().getCount();
-
-			// Routine to declare the offsets if these attributes are present
-			// only VERTEX attributes are obligatory
-			for (int i=0; i<inputArraysCount; i++)
-			{
-				if(strcmp(polygons->getInput_array()[i]->getSemantic(),"VERTEX")==0){
-					v_offset = polygons->getInput_array()[i]->getOffset();
-					vertex_input = polygons->getInput_array()[i];
-				}else
-				if(strcmp(polygons->getInput_array()[i]->getSemantic(),"NORMAL")==0){
-					n_offset = polygons->getInput_array()[i]->getOffset();
-					normal_input = polygons->getInput_array()[i];
-				}else
-				if(strcmp(polygons->getInput_array()[i]->getSemantic(),"TEXCOORD")==0){
-					t_offset = polygons->getInput_array()[i]->getOffset();
-					texcoord_input = polygons->getInput_array()[i];
-				}
-				if(max_offset< polygons->getInput_array()[i]->getOffset())
-					max_offset = polygons->getInput_array()[i]->getOffset();
-			}
-
-			// Stores the list of polygons
-			poly = polygons->getP();
-		}
-
-		max_offset++;
-
-		int tot = 0;
-
-		// Add polygons into gprim_factory taking into account offsets to parse correctly
-		for (int i=0;i<polyCount;i++)
-		{
-			k3d::mesh::indices_t vertex_coordinates;
-			k3d::mesh::indices_t texture_coordinates;
-			k3d::mesh::indices_t normal_coordinates;
-	
-			// Copy all the indices from the domP into my structure.
-			int vcount = 0;
-			if(areTriangles)
-				vcount = 3;
-			else
-			if(arePolygons)
-				vcount = polygons->getVcount()->getValue()[i];
-			for(int v=0;v<vcount*max_offset;v+=max_offset)
-			{
-				if(v_offset!=-1)
-					vertex_coordinates.push_back(poly->getValue()[tot+v+v_offset]);		
-				if(n_offset!=-1)
-					normal_coordinates.push_back(poly->getValue()[tot+v+n_offset]);
-				if(t_offset!=-1)
-					texture_coordinates.push_back(poly->getValue()[tot+v+t_offset]);
-			}
-			tot+=vcount*max_offset;
-			// Push this polygon into the list of polygons in my structure.
-			factory.add_polygon(vertex_coordinates); //and soon texture_coordinates, normal_coordinates
-		}
-*/
-
 		// Copy the vertices we are going to use. To keep things simple,
 		// we will assume there is only one domSource and domFloatArray in the domMesh,
 		// that it is the array of vertices, and that it is in X, Y, Z format. A real
@@ -349,7 +218,6 @@ namespace io
 		
 		source_vertex = daeSafeCast<domSource>(domV->getInput_array()[0]->getSource().getElement());
 
-	/*
 		if(normal_input)
 		{
 			elementURI = &normal_input->getSource();
@@ -360,7 +228,7 @@ namespace io
 			elementURI = &texcoord_input->getSource();
 			source_texcoord = daeSafeCast<domSource>(elementURI->getElement());
 		}
-	*/
+
 		domFloat_array *floatArray_vertex;
 		domFloat_array *floatArray_normal;
 		domFloat_array *floatArray_texcoord;
@@ -368,12 +236,12 @@ namespace io
 		if(source_vertex)
 			floatArray_vertex = &source_vertex->getFloat_array()[0];
 	
-	/*	if(source_normal)
+		if(source_normal)
 			floatArray_normal = &source_normal->getFloat_array()[0];
 	
 		if(source_texcoord)
 			floatArray_texcoord = &source_texcoord->getFloat_array()[0];
-	*/
+
 		int stride = source_vertex->getTechnique_common()->getAccessor()->getStride();
 	
 		// Assume there are 3 values per vertex with a stride of 3.

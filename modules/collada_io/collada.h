@@ -94,7 +94,10 @@ namespace io
 			k3d::inode *frozen_mesh = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("FrozenMesh"), Document, name);
 			k3d::imesh_storage* mesh_storage = dynamic_cast<k3d::imesh_storage*>(frozen_mesh);
 			mesh_storage->reset_mesh(mesh);
-			*mesh  = to_k3d_mesh(geom);
+			//*mesh  = 
+			intGeometry result(geom,k3d::identity3D());
+			//to_k3d_mesh(geom);
+return;
 
 			k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(frozen_mesh);
 			mesh_source_output = &mesh_source->mesh_source_output();
@@ -106,7 +109,7 @@ namespace io
 		collada_obj(k3d::idocument &Document, domCamera &cam)
 		{
 			id = cam.getAttribute("id");
-			name = k3d::unique_name(Document.nodes(), "COLLADA " + cam.getAttribute("name"));
+			name = k3d::unique_name(Document.nodes(), "COLLADA " + id);
 			type = "camera";
 
 			k3d::inode *camera = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("Camera"), Document, name);
@@ -139,10 +142,23 @@ namespace io
 					aspect_ratio = perspective->getAspect_ratio()->getValue();
 				else
 					aspect_ratio = 1;
-				double yfov = perspective->getYfov()->getValue();
+				double x;
+				if(perspective->getYfov()!=NULL)
+				{
+					double yfov = perspective->getYfov()->getValue();
+					x = tan(k3d::radians(yfov/2))*znear;
+				}
+				else
+					if(perspective->getXfov()!=NULL)
+					{
+						double xfov = perspective->getXfov()->getValue();
+						x = tan(k3d::radians(xfov/2))*znear;
+					}
+					else
+						return;
+
 				znear = perspective->getZnear()->getValue();
 				zfar = perspective->getZfar()->getValue();
-				double x = tan(k3d::radians(yfov/2))*znear;
 				k3d::property::set_internal_value(*camera, "top", x);
 				k3d::property::set_internal_value(*camera, "bottom", x);
 				k3d::property::set_internal_value(*camera, "left", -x*aspect_ratio);
@@ -167,7 +183,7 @@ namespace io
 		collada_obj(k3d::idocument &Document, domLight &li)
 		{
 			id = li.getAttribute("id");
-			name = k3d::unique_name(Document.nodes(), "COLLADA " + li.getAttribute("name"));
+			name = k3d::unique_name(Document.nodes(), "COLLADA " + id);
 			std::string shader_name = k3d::unique_name(Document.nodes(), name + " Shader");
 			type = "light";
 
