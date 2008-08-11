@@ -47,7 +47,7 @@
 
 #include "nurbs_patch_modifier.h"
 
-#define MODULE_NURBS_DEBUG 0
+#define MODULE_NURBS_DEBUG 1
 #define nurbs_debug __FILE__ << ": " << __LINE__ << " "
 #define MY_DEBUG if(MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug
 

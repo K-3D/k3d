@@ -60,6 +60,7 @@ namespace module
 		extern k3d::iplugin_factory& polygonize_patch_factory();
 		extern k3d::iplugin_factory& add_trim_curve_factory();
 		extern k3d::iplugin_factory& extrude_patch_factory();
+		extern k3d::iplugin_factory& extrude_curve_factory();
 
 	} // namespace nurbs
 
@@ -98,5 +99,6 @@ K3D_MODULE_START(Registry)
     Registry.register_factory(module::nurbs::polygonize_patch_factory());
     Registry.register_factory(module::nurbs::add_trim_curve_factory());
     Registry.register_factory(module::nurbs::extrude_patch_factory());
+    Registry.register_factory(module::nurbs::extrude_curve_factory());
 K3D_MODULE_END
 
