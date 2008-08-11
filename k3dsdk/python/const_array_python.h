@@ -24,9 +24,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
+#include "imaterial_python.h"
 
-#include <k3dsdk/imaterial.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/typed_array.h>
 
@@ -112,7 +111,7 @@ public:
 			throw std::out_of_range("index out-of-range");
 
 		k3d::imaterial* const result = wrapped().at(item);
-		return result ? boost::python::object(k3d::python::interface_wrapper<k3d::imaterial>(result)) : boost::python::object();
+		return result ? boost::python::object(imaterial_wrapper(result)) : boost::python::object();
 	}
 
 private:

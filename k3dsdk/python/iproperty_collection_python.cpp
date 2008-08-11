@@ -22,13 +22,11 @@
 */
 
 #include "any_python.h"
-#include "interface_wrapper_python.h"
 #include "iproperty_collection_python.h"
+#include "iproperty_python.h"
 
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
-#include <k3dsdk/iproperty.h>
-#include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/property_types.h>
@@ -44,14 +42,12 @@ namespace k3d
 namespace python
 {
 
-typedef interface_wrapper<k3d::iproperty_collection> iproperty_collection_wrapper;
-
 static list properties(iproperty_collection_wrapper& Self)
 {
 	list results;
 	const k3d::iproperty_collection::properties_t& properties = Self.wrapped().properties();
 	for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-		results.append(interface_wrapper<k3d::iproperty>(*property));
+		results.append(iproperty_wrapper(*property));
 	return results;
 }
 

@@ -40,20 +40,20 @@ namespace python
 {
 
 node::node() :
-	interface_wrapper<k3d::inode>(),
-	interface_wrapper<k3d::iproperty_collection>()
+	inode_wrapper(),
+	iproperty_collection_wrapper()
 {
 }
 
 node::node(k3d::iunknown* Node) :
-	interface_wrapper<k3d::inode>(dynamic_cast<k3d::inode*>(Node)),
-	interface_wrapper<k3d::iproperty_collection>(dynamic_cast<k3d::iproperty_collection*>(Node))
+	inode_wrapper(dynamic_cast<k3d::inode*>(Node)),
+	iproperty_collection_wrapper(dynamic_cast<k3d::iproperty_collection*>(Node))
 {
 }
 
 void node::define_class()
 {
-	class_<node, bases<interface_wrapper<k3d::inode>, interface_wrapper<k3d::iproperty_collection> > >("node");
+	class_<node, bases<inode_wrapper, iproperty_collection_wrapper> >("node");
 }
 
 } // namespace python

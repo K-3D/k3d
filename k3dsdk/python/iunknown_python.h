@@ -24,11 +24,16 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "interface_wrapper_python.h"
+#include <k3dsdk/iunknown.h>
+
 namespace k3d
 {
 
 namespace python
 {
+
+typedef interface_wrapper<k3d::iunknown> iunknown_wrapper;
 
 void define_class_iunknown();
 

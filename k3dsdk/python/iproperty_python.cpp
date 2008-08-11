@@ -22,14 +22,12 @@
 */
 
 #include "any_python.h"
-#include "interface_wrapper_python.h"
 #include "iproperty_python.h"
 #include "node_python.h"
 
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
 #include <k3dsdk/inode.h>
-#include <k3dsdk/iproperty.h>
 #include <k3dsdk/imeasurement_property.h>
 #include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/measurement.h>
@@ -44,8 +42,6 @@ namespace k3d
 
 namespace python
 {
-
-typedef interface_wrapper<k3d::iproperty> iproperty_wrapper;
 
 const string_t name(iproperty_wrapper& Self)
 {

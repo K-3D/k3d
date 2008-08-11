@@ -22,11 +22,9 @@
 */
 
 #include "iplugin_factory_python.h"
-#include "interface_wrapper_python.h"
 
 #include <k3dsdk/iapplication_plugin_factory.h>
 #include <k3dsdk/idocument_plugin_factory.h>
-#include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/types.h>
 
@@ -38,8 +36,6 @@ namespace k3d
 
 namespace python
 {
-
-typedef interface_wrapper<k3d::iplugin_factory> iplugin_factory_wrapper;
 
 static const k3d::uuid factory_id(iplugin_factory_wrapper& Self)
 {

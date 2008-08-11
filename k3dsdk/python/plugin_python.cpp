@@ -17,7 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "interface_wrapper_python.h"
+#include "iplugin_factory_python.h"
 #include "plugin_python.h"
 
 #include <k3dsdk/mime_types.h>
@@ -55,7 +55,7 @@ public:
 		return wrap(k3d::plugin::create(Type));
 	}
 
-	static object create_by_factory(const interface_wrapper<iplugin_factory>& Factory)
+	static object create_by_factory(const iplugin_factory_wrapper& Factory)
 	{
 		return wrap(k3d::plugin::create(Factory.wrapped()));
 	}

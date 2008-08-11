@@ -24,6 +24,8 @@
 #include "angle_axis_python.h"
 #include "any_python.h"
 #include "bitmap_python.h"
+#include "idocument_python.h"
+#include "inode_python.h"
 #include "mesh_python.h"
 #include "node_python.h"
 #include "ri_render_state_python.h"
@@ -210,7 +212,7 @@ const boost::any python_to_any(const object& Value)
 	PyObject* const value = Value.ptr();
 
 	{
-		extract<interface_wrapper<k3d::idocument> > value(Value);
+		extract<idocument_wrapper> value(Value);
 		if(value.check())
 		{
 			return boost::any(value().wrapped_ptr());
@@ -218,7 +220,7 @@ const boost::any python_to_any(const object& Value)
 	}
 
 	{
-		extract<interface_wrapper<k3d::inode> > value(Value);
+		extract<inode_wrapper> value(Value);
 		if(value.check())
 		{
 			return boost::any(value().wrapped_ptr());
@@ -313,13 +315,13 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 		if(Value == boost::python::object())
 			return boost::any(static_cast<k3d::inode*>(0));
 
-		extract<interface_wrapper<k3d::inode> > inode(Value);
+		extract<inode_wrapper> inode(Value);
 		if(inode.check())
 			return boost::any(inode().wrapped_ptr());
 
 		extract<node> node(Value);
 		if(node.check())
-			return boost::any(node().interface_wrapper<k3d::inode>::wrapped_ptr());
+			return boost::any(node().inode_wrapper::wrapped_ptr());
 
 		return boost::any(static_cast<k3d::inode*>(0));
 	}
@@ -335,7 +337,7 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 		const k3d::uint_t count = boost::python::len(nodes);
 		results.resize(count);
 		for(k3d::uint_t i = 0; i != count; ++i)
-			results[i] = extract<interface_wrapper<k3d::inode> >(nodes[i])().wrapped_ptr();
+			results[i] = extract<inode_wrapper>(nodes[i])().wrapped_ptr();
 
 		return boost::any(results);
 	}

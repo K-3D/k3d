@@ -39,7 +39,6 @@
 #include "imetadata_python.h"
 #include "inode_python.h"
 #include "inode_selection_python.h"
-#include "interface_wrapper_python.h"
 #include "iplugin_factory_python.h"
 #include "iproperty_python.h"
 #include "iproperty_collection_python.h"
@@ -192,7 +191,7 @@ void module_check_node_environment(const dict& Locals, const string_t& PluginTyp
 		extract<node> node(object);
 		if(node.check())
 		{
-			if(node().interface_wrapper<k3d::inode>::wrapped().factory().name() == PluginType)
+			if(node().inode_wrapper::wrapped().factory().name() == PluginType)
 			{
 				return;
 			}
@@ -281,7 +280,7 @@ const list module_plugins()
 
 	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
 	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
-		plugins.append(interface_wrapper<k3d::iplugin_factory>(*factory));
+		plugins.append(iplugin_factory_wrapper(*factory));
 
 	return plugins;
 }
@@ -343,7 +342,7 @@ list module_documents()
 	return results;
 }
 
-void module_close_document(interface_wrapper<k3d::idocument>& Document)
+void module_close_document(idocument_wrapper& Document)
 {
 	k3d::application().close_document(Document.wrapped());
 }

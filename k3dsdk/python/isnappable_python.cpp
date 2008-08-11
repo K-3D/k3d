@@ -21,12 +21,10 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
 #include "isnappable_python.h"
 
 #include <k3dsdk/explicit_snap_source.h>
 #include <k3dsdk/explicit_snap_target.h>
-#include <k3dsdk/isnappable.h>
 #include <k3dsdk/result.h>
 
 #include <boost/python.hpp>
@@ -37,8 +35,6 @@ namespace k3d
 
 namespace python
 {
-
-typedef interface_wrapper<k3d::isnappable> isnappable_wrapper;
 
 static void add_snap_source(isnappable_wrapper& Self, const string_t& Label, const point3& Position)
 {

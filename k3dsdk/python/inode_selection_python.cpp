@@ -23,11 +23,8 @@
 */
 
 #include "any_python.h"
-#include "interface_wrapper_python.h"
 #include "inode_selection_python.h"
 #include "node_python.h"
-
-#include <k3dsdk/inode_selection.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -38,14 +35,12 @@ namespace k3d
 namespace python
 {
 
-typedef interface_wrapper<k3d::inode_selection> inode_selection_wrapper;
-
-static void select(inode_selection_wrapper& Self, interface_wrapper<k3d::inode>& Node, const k3d::double_t Weight)
+static void select(inode_selection_wrapper& Self, inode_wrapper& Node, const k3d::double_t Weight)
 {
 	Self.wrapped().select(Node.wrapped(), Weight);
 }
 
-static double selection_weight(inode_selection_wrapper& Self, interface_wrapper<k3d::inode>& Node)
+static double selection_weight(inode_selection_wrapper& Self, inode_wrapper& Node)
 {
 	return Self.wrapped().selection_weight(Node.wrapped());
 }

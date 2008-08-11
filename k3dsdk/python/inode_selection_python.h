@@ -25,11 +25,16 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
+#include "interface_wrapper_python.h"
+#include <k3dsdk/inode_selection.h>
+
 namespace k3d
 {
 	
 namespace python
 {
+
+typedef interface_wrapper<k3d::inode_selection> inode_selection_wrapper;
 
 void define_class_inode_selection();
 
@@ -38,3 +43,4 @@ void define_class_inode_selection();
 } // namespace k3d
 
 #endif /* K3DSDK_INODE_SELECTION_PYTHON_H_ */
+

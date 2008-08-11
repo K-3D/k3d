@@ -22,9 +22,7 @@
 */
 
 #include "iuser_interface_python.h"
-#include "interface_wrapper_python.h"
 
-#include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/path.h>
 
 #include <boost/python.hpp>
@@ -36,8 +34,6 @@ namespace k3d
 
 namespace python
 {
-
-typedef interface_wrapper<k3d::iuser_interface> iuser_interface_wrapper;
 
 static void open_uri(iuser_interface_wrapper& Self, const string_t& URI)
 {

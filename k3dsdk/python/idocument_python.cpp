@@ -22,15 +22,14 @@
 */
 
 #include "idocument_python.h"
-#include "interface_wrapper_python.h"
+#include "iplugin_factory_python.h"
+#include "iproperty_python.h"
 #include "dynamic_cast_python.h"
 #include "node_python.h"
 
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/plugins.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iplugin_factory_collection.h>
@@ -48,8 +47,6 @@ namespace k3d
 
 namespace python
 {
-
-typedef interface_wrapper<k3d::idocument> idocument_wrapper;
 
 static const bool save(idocument_wrapper& Self, const std::string& Path)
 {
@@ -103,7 +100,7 @@ static const object new_node(idocument_wrapper& Self, const object& Type)
 		return object(node(k3d::plugin::create<k3d::iunknown>(*plugin_factory, Self.wrapped(), k3d::unique_name(Self.wrapped().nodes(), plugin_name()))));
 	}
 
-	extract<interface_wrapper<k3d::iplugin_factory> > plugin_factory(Type);
+	extract<iplugin_factory_wrapper> plugin_factory(Type);
 	if(plugin_factory.check())
 	{
 		return object(node(k3d::plugin::create<k3d::iunknown>(plugin_factory().wrapped(), Self.wrapped())));
@@ -143,10 +140,10 @@ static void delete_node(idocument_wrapper& Self, object& Node)
 	if(!node.check())
 		throw std::invalid_argument("argument isn't a node");
 
-	k3d::delete_nodes(Self.wrapped(), k3d::make_collection<k3d::nodes_t>(node().interface_wrapper<k3d::inode>::wrapped_ptr()));
+	k3d::delete_nodes(Self.wrapped(), k3d::make_collection<k3d::nodes_t>(node().inode_wrapper::wrapped_ptr()));
 }
 
-static object get_dependency(idocument_wrapper& Self, interface_wrapper<k3d::iproperty>& Property)
+static object get_dependency(idocument_wrapper& Self, iproperty_wrapper& Property)
 {
 	k3d::iproperty* const property = Property.wrapped_ptr();
 	if(!property)
@@ -155,11 +152,11 @@ static object get_dependency(idocument_wrapper& Self, interface_wrapper<k3d::ipr
 	return wrap(Self.wrapped().pipeline().dependency(*property));
 }
 
-static void set_dependency(idocument_wrapper& Self, interface_wrapper<k3d::iproperty>& From, boost::python::object& To)
+static void set_dependency(idocument_wrapper& Self, iproperty_wrapper& From, boost::python::object& To)
 {
 	k3d::iproperty* to = 0;
 
-	extract<interface_wrapper<k3d::iproperty> > iproperty_value(To);
+	extract<iproperty_wrapper> iproperty_value(To);
 	if(iproperty_value.check())
 	{
 		to = iproperty_value().wrapped_ptr();

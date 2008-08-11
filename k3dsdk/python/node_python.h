@@ -24,10 +24,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
-
-#include <k3dsdk/inode.h>
-#include <k3dsdk/iproperty_collection.h>
+#include "inode_python.h"
+#include "iproperty_collection_python.h"
 
 namespace k3d
 {
@@ -38,8 +36,8 @@ namespace python
 {
 
 class node :
-	public interface_wrapper<k3d::inode>,
-	public interface_wrapper<k3d::iproperty_collection>
+	public inode_wrapper,
+	public iproperty_collection_wrapper 
 {
 public:
 	node();

@@ -22,9 +22,6 @@
 */
 
 #include "iunknown_python.h"
-#include "interface_wrapper_python.h"
-
-#include <k3dsdk/iunknown.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -34,8 +31,6 @@ namespace k3d
 
 namespace python
 {
-
-typedef interface_wrapper<k3d::iunknown> iunknown_wrapper;
 
 void define_class_iunknown()
 {

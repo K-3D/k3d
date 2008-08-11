@@ -22,11 +22,9 @@
 */
 
 #include "imesh_storage_python.h"
-#include "interface_wrapper_python.h"
 #include "mesh_python.h"
 
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/imesh_storage.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -36,8 +34,6 @@ namespace k3d
 
 namespace python
 {
-
-typedef interface_wrapper<k3d::imesh_storage> imesh_storage_wrapper;
 
 static k3d::python::mesh reset_mesh(imesh_storage_wrapper& Self)
 {

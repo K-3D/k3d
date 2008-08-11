@@ -22,7 +22,6 @@
 */
 
 #include "icommand_node_python.h"
-#include "interface_wrapper_python.h"
 
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/types.h>
@@ -35,8 +34,6 @@ namespace k3d
 
 namespace python
 {
-
-typedef interface_wrapper<k3d::icommand_node> icommand_node_wrapper;
 
 static const string_t name(icommand_node_wrapper& Self)
 {
