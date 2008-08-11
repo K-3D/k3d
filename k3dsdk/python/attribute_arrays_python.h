@@ -1,8 +1,8 @@
-#ifndef K3DSDK_NAMED_ARRAYS_PYTHON_H
-#define K3DSDK_NAMED_ARRAYS_PYTHON_H
+#ifndef K3DSDK_ATTRIBUTE_ARRAYS_PYTHON_H
+#define K3DSDK_ATTRIBUTE_ARRAYS_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,10 +24,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "array_python.h"
-
+#include "interface_wrapper_python.h"
 #include <k3dsdk/attribute_arrays.h>
-#include <boost/python.hpp>
 
 namespace k3d
 {
@@ -35,35 +33,13 @@ namespace k3d
 namespace python
 {
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// named_arrays
+typedef interface_wrapper<k3d::attribute_arrays> attribute_arrays_wrapper;
 
-class named_arrays
-{
-public:
-	named_arrays(k3d::attribute_arrays& NamedArrays);
-
-	boost::python::list array_names();
-	boost::python::object array(const std::string& Name);
-
-	boost::python::object create_array(const std::string& Name, const std::string& Type);
-
-	int len();
-
-	boost::python::object get_item(int item);
-
-	static void define_class();
-
-private:
-	boost::python::object wrap_array(const k3d::array* const Array);
-
-	class array_factory;
-	k3d::attribute_arrays& wrapped;
-};
+void define_class_attribute_arrays();
 
 } // namespace python
 
 } // namespace k3d
 
-#endif // !K3DSDK_NAMED_ARRAYS_PYTHON_H
+#endif // !K3DSDK_ATTRIBUTE_ARRAYS_PYTHON_H
 

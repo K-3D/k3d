@@ -21,11 +21,14 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "named_arrays_python.h"
+#include "array_python.h"
+#include "attribute_arrays_python.h"
 
 #include <k3dsdk/named_array_types.h>
 #include <k3dsdk/type_registry.h>
+#include <k3dsdk/typed_array.h>
 
+#include <boost/python.hpp>
 using namespace boost::python;
 
 namespace k3d
@@ -34,13 +37,16 @@ namespace k3d
 namespace python
 {
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// named_arrays::array_factory
+static object wrap_array(const k3d::array* const Array)
+{
+	throw std::runtime_error("wrap_array() not implemented");
+	return object();
+}
 
-class named_arrays::array_factory
+class attribute_arrays_array_factory
 {
 public:
-	array_factory(const k3d::string_t& Name, const k3d::string_t& Type, boost::python::object& Array, k3d::attribute_arrays& Arrays) :
+	attribute_arrays_array_factory(const string_t& Name, const string_t& Type, boost::python::object& Array, k3d::attribute_arrays& Arrays) :
 		name(Name),
 		type(Type),
 		array(Array),
@@ -63,84 +69,71 @@ public:
 	}
 
 private:
-	k3d::string_t name;
-	k3d::string_t type;
+	string_t name;
+	string_t type;
 	boost::python::object& array;
 	k3d::attribute_arrays& arrays;
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// named_arrays
-
-named_arrays::named_arrays(k3d::attribute_arrays& NamedArrays) :
-	wrapped(NamedArrays)
-{
-}
-
-list named_arrays::array_names()
+static list array_names(attribute_arrays_wrapper& Self)
 {
 	list results;
 
-	for(k3d::attribute_arrays::const_iterator array = wrapped.begin(); array != wrapped.end(); ++array)
+	for(k3d::attribute_arrays::const_iterator array = Self.wrapped().begin(); array != Self.wrapped().end(); ++array)
 		results.append(array->first);
 
 	return results;
 }
 
-object named_arrays::array(const k3d::string_t& Name)
+static object get_array(attribute_arrays_wrapper& Self, const string_t& Name)
 {
-	if(!wrapped.count(Name))
+	if(!Self.wrapped().count(Name))
 		throw std::runtime_error("Unknown array name: " + Name);
 
-	return wrap_array(wrapped.find(Name)->second.get());
+	return wrap_array(Self.wrapped().find(Name)->second.get());
 }
 
-object named_arrays::create_array(const k3d::string_t& Name, const k3d::string_t& Type)
+static object create_array(attribute_arrays_wrapper& Self, const string_t& Name, const string_t& Type)
 {
 	if(Name.empty())
 		throw std::runtime_error("Empty array name");
 
 	boost::python::object result;
-	boost::mpl::for_each<k3d::named_array_types>(array_factory(Name, Type, result, wrapped));
+	boost::mpl::for_each<k3d::named_array_types>(attribute_arrays_array_factory(Name, Type, result, Self.wrapped()));
 	if(result == boost::python::object())
 		throw std::runtime_error("Cannot create array [" + Name + "] with unknown type [" + Name + "]");
 
 	return result;
 }
 
-int named_arrays::len()
+static int len(attribute_arrays_wrapper& Self)
 {
-	return wrapped.size();
+	return Self.wrapped().size();
 }
 
-object named_arrays::get_item(int item)
+static object get_item(attribute_arrays_wrapper& Self, int Item)
 {
-	if(item < 0 || item >= wrapped.size())
+	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
 
-	k3d::attribute_arrays::const_iterator array_iterator = wrapped.begin();
-	std::advance(array_iterator, item);
+	k3d::attribute_arrays::const_iterator array_iterator = Self.wrapped().begin();
+	std::advance(array_iterator, Item);
 
 	return wrap_array(array_iterator->second.get());
 }
 
-object named_arrays::wrap_array(const k3d::array* const Array)
+void define_class_attribute_arrays()
 {
-	return object();
-}
-
-void named_arrays::define_class()
-{
-	class_<named_arrays>("named_arrays", 
-		"Stores a mutable (read-write) collection of named arrays, typically those stored as part of a L{mesh}.", no_init)
-		.def("array_names", &named_arrays::array_names,
+	class_<attribute_arrays_wrapper>("attribute_arrays", 
+		"Stores a mutable (read-write) collection of attribute arrays (named arrays of equal length).", no_init)
+		.def("array_names", &array_names,
 			"Returns a list containing names for all the arrays in the collection.")
-		.def("array", &named_arrays::array,
+		.def("array", &get_array,
 			"Returns the array with the given name, or throws an exception.")
-		.def("create_array", &named_arrays::create_array,
+		.def("create_array", &create_array,
 			"Creates an array with given name and type.")
-		.def("__len__", &named_arrays::len)
-		.def("__getitem__", &named_arrays::get_item);
+		.def("__len__", &len)
+		.def("__getitem__", &get_item);
 }
 
 } // namespace python

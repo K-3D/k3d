@@ -24,11 +24,12 @@
 #include "angle_axis_python.h"
 #include "any_python.h"
 #include "array_python.h"
+#include "attribute_arrays_python.h"
 #include "bitmap_python.h"
 #include "bounding_box3_python.h"
 #include "color_python.h"
 #include "const_array_python.h"
-#include "const_named_arrays_python.h"
+#include "const_attribute_arrays_python.h"
 #include "dynamic_cast_python.h"
 #include "euler_angles_python.h"
 #include "euler_python.h"
@@ -50,7 +51,6 @@
 #include "mesh_python.h"
 #include "mesh_selection_python.h"
 #include "mime_python.h"
-#include "named_arrays_python.h"
 #include "node_python.h"
 #include "normal3_python.h"
 #include "object_model_python.h"
@@ -398,9 +398,10 @@ BOOST_PYTHON_MODULE(k3d)
 	to_python_converter<k3d::mesh_selection::records_t, python_wrap<k3d::mesh_selection::records_t> >();
 
 	angle_axis::define_class();
-	const_named_arrays::define_class();
+	define_class_attribute_arrays();
 	define_class_bounding_box3();
 	define_class_color();
+	define_class_const_attribute_arrays();
 	define_class_icommand_node();
 	define_class_idocument();
 	define_class_imaterial();
@@ -435,7 +436,6 @@ BOOST_PYTHON_MODULE(k3d)
 	export_bitmap();
 	export_const_arrays();
 	mesh::define_class();
-	named_arrays::define_class();
 	node::define_class();
 	ri_render_state::define_class();
 

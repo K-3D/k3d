@@ -1,8 +1,8 @@
-#ifndef K3DSDK_CONST_NAMED_ARRAYS_PYTHON_H
-#define K3DSDK_CONST_NAMED_ARRAYS_PYTHON_H
+#ifndef K3DSDK_CONST_ATTRIBUTE_ARRAYS_PYTHON_H
+#define K3DSDK_CONST_ATTRIBUTE_ARRAYS_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,8 +24,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/mesh.h>
-#include <boost/python.hpp>
+#include "interface_wrapper_python.h"
+#include <k3dsdk/attribute_arrays.h>
 
 namespace k3d
 {
@@ -33,30 +33,13 @@ namespace k3d
 namespace python
 {
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// const_named_arrays
+typedef interface_wrapper<const k3d::attribute_arrays> const_attribute_arrays_wrapper;
 
-class const_named_arrays
-{
-public:
-	const_named_arrays(const k3d::mesh::attribute_arrays_t& NamedArrays);
-
-	boost::python::list array_names();
-	boost::python::object array(const std::string& Name);
-
-	int len();
-	boost::python::object get_item(int item);
-
-	static void define_class();
-
-private:
-	boost::python::object wrap_array(const k3d::array* const Array);
-	const k3d::mesh::attribute_arrays_t& wrapped;
-};
+void define_class_const_attribute_arrays();
 
 } // namespace python
 
 } // namespace k3d
 
-#endif // !K3DSDK_CONST_NAMED_ARRAYS_PYTHON_H
+#endif // !K3DSDK_CONST_ATTRIBUTE_ARRAYS_PYTHON_H
 

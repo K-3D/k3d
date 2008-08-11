@@ -22,12 +22,12 @@
 */
 
 #include "array_python.h"
+#include "attribute_arrays_python.h"
 #include "const_array_python.h"
-#include "const_named_arrays_python.h"
+#include "const_attribute_arrays_python.h"
 #include "imaterial_python.h"
 #include "interface_wrapper_python.h"
 #include "mesh_python.h"
-#include "named_arrays_python.h"
 
 #include <k3dsdk/color.h>
 #include <k3dsdk/imaterial.h>
@@ -143,22 +143,6 @@ object create_array(pointer_type& Pointer)
 	return object(k3d::python::array<array_type>(*new_array));
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// wrap_const_named_arrays
-
-object wrap_const_named_arrays(const k3d::mesh::attribute_arrays_t& NamedArrays)
-{
-	return object(const_named_arrays(NamedArrays));
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// wrap_non_const_named_arrays
-
-object wrap_non_const_named_arrays(k3d::mesh::attribute_arrays_t& NamedArrays)
-{
-	return object(named_arrays(NamedArrays));
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // const_point_groups
 
@@ -185,9 +169,9 @@ public:
 	object first_points() { return wrap_const_array(wrapped().first_points); }
 	object point_counts() { return wrap_const_array(wrapped().point_counts); }
 	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
 	object points() { return wrap_const_array(wrapped().points); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -216,16 +200,16 @@ public:
 	object first_points() { return wrap_const_array(wrapped().first_points); }
 	object point_counts() { return wrap_const_array(wrapped().point_counts); }
 	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
 	object points() { return wrap_const_array(wrapped().points); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 
 	object writable_first_points() { return wrap_non_const_array(wrapped().first_points); }
 	object writable_point_counts() { return wrap_non_const_array(wrapped().point_counts); }
 	object writable_materials() { return wrap_non_const_array(wrapped().materials); }
-	object writable_constant_data() { return wrap_non_const_named_arrays(wrapped().constant_data); }
+	object writable_constant_data() { return wrap(wrapped().constant_data); }
 	object writable_points() { return wrap_non_const_array(wrapped().points); }
-	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
+	object writable_varying_data() { return wrap(wrapped().varying_data); }
 
 	object create_first_points() { return create_array(wrapped().first_points); }
 	object create_point_counts() { return create_array(wrapped().point_counts); }
@@ -260,13 +244,13 @@ public:
 	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
 	object periodic_curves() { return wrap_const_array(wrapped().periodic_curves); }
 	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
 	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
 	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
 	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -296,25 +280,25 @@ public:
 	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
 	object periodic_curves() { return wrap_const_array(wrapped().periodic_curves); }
 	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
 	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
 	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
 	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 
 	object writable_first_curves() { return wrap_non_const_array(wrapped().first_curves); }
 	object writable_curve_counts() { return wrap_non_const_array(wrapped().curve_counts); }
 	object writable_periodic_curves() { return wrap_non_const_array(wrapped().periodic_curves); }
 	object writable_materials() { return wrap_non_const_array(wrapped().materials); }
-	object writable_constant_data() { return wrap_non_const_named_arrays(wrapped().constant_data); }
+	object writable_constant_data() { return wrap(wrapped().constant_data); }
 	object writable_curve_first_points() { return wrap_non_const_array(wrapped().curve_first_points); }
 	object writable_curve_point_counts() { return wrap_non_const_array(wrapped().curve_point_counts); }
 	object writable_curve_selection() { return wrap_non_const_array(wrapped().curve_selection); }
-	object writable_uniform_data() { return wrap_non_const_named_arrays(wrapped().uniform_data); }
+	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
 	object writable_curve_points() { return wrap_non_const_array(wrapped().curve_points); }
-	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
+	object writable_varying_data() { return wrap(wrapped().varying_data); }
 
 	object create_first_curves() { return create_array(wrapped().first_curves); }
 	object create_curve_counts() { return create_array(wrapped().curve_counts); }
@@ -353,13 +337,13 @@ public:
 	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
 	object periodic_curves() { return wrap_const_array(wrapped().periodic_curves); }
 	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
 	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
 	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
 	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -389,25 +373,25 @@ public:
 	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
 	object periodic_curves() { return wrap_const_array(wrapped().periodic_curves); }
 	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
 	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
 	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
 	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 
 	object writable_first_curves() { return wrap_non_const_array(wrapped().first_curves); }
 	object writable_curve_counts() { return wrap_non_const_array(wrapped().curve_counts); }
 	object writable_periodic_curves() { return wrap_non_const_array(wrapped().periodic_curves); }
 	object writable_materials() { return wrap_non_const_array(wrapped().materials); }
-	object writable_constant_data() { return wrap_non_const_named_arrays(wrapped().constant_data); }
+	object writable_constant_data() { return wrap(wrapped().constant_data); }
 	object writable_curve_first_points() { return wrap_non_const_array(wrapped().curve_first_points); }
 	object writable_curve_point_counts() { return wrap_non_const_array(wrapped().curve_point_counts); }
 	object writable_curve_selection() { return wrap_non_const_array(wrapped().curve_selection); }
-	object writable_uniform_data() { return wrap_non_const_named_arrays(wrapped().uniform_data); }
+	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
 	object writable_curve_points() { return wrap_non_const_array(wrapped().curve_points); }
-	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
+	object writable_varying_data() { return wrap(wrapped().varying_data); }
 
 	object create_first_curves() { return create_array(wrapped().first_curves); }
 	object create_curve_counts() { return create_array(wrapped().curve_counts); }
@@ -445,17 +429,17 @@ public:
 	object first_curves() { return wrap_const_array(wrapped().first_curves); }
 	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
 	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
 	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
 	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
 	object curve_orders() { return wrap_const_array(wrapped().curve_orders); }
 	object curve_first_knots() { return wrap_const_array(wrapped().curve_first_knots); }
 	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
 	object curve_point_weights() { return wrap_const_array(wrapped().curve_point_weights); }
 	object curve_knots() { return wrap_const_array(wrapped().curve_knots); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -484,32 +468,32 @@ public:
 	object first_curves() { return wrap_const_array(wrapped().first_curves); }
 	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
 	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
 	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
 	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
 	object curve_orders() { return wrap_const_array(wrapped().curve_orders); }
 	object curve_first_knots() { return wrap_const_array(wrapped().curve_first_knots); }
 	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object curve_points() { return wrap_const_array(wrapped().curve_points); }
 	object curve_point_weights() { return wrap_const_array(wrapped().curve_point_weights); }
 	object curve_knots() { return wrap_const_array(wrapped().curve_knots); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 
 	object writable_first_curves() { return wrap_non_const_array(wrapped().first_curves); }
 	object writable_curve_counts() { return wrap_non_const_array(wrapped().curve_counts); }
 	object writable_materials() { return wrap_non_const_array(wrapped().materials); }
-	object writable_constant_data() { return wrap_non_const_named_arrays(wrapped().constant_data); }
+	object writable_constant_data() { return wrap(wrapped().constant_data); }
 	object writable_curve_first_points() { return wrap_non_const_array(wrapped().curve_first_points); }
 	object writable_curve_point_counts() { return wrap_non_const_array(wrapped().curve_point_counts); }
 	object writable_curve_orders() { return wrap_non_const_array(wrapped().curve_orders); }
 	object writable_curve_first_knots() { return wrap_non_const_array(wrapped().curve_first_knots); }
 	object writable_curve_selection() { return wrap_non_const_array(wrapped().curve_selection); }
-	object writable_uniform_data() { return wrap_non_const_named_arrays(wrapped().uniform_data); }
+	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
 	object writable_curve_points() { return wrap_non_const_array(wrapped().curve_points); }
 	object writable_curve_point_weights() { return wrap_non_const_array(wrapped().curve_point_weights); }
 	object writable_curve_knots() { return wrap_non_const_array(wrapped().curve_knots); }
-	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
+	object writable_varying_data() { return wrap(wrapped().varying_data); }
 
 	object create_first_curves() { return create_array(wrapped().first_curves); }
 	object create_curve_counts() { return create_array(wrapped().curve_counts); }
@@ -549,10 +533,10 @@ public:
 
 	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
 	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object patch_points() { return wrap_const_array(wrapped().patch_points); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -580,17 +564,17 @@ public:
 
 	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
 	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object patch_points() { return wrap_const_array(wrapped().patch_points); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 
 	object writable_patch_selection() { return wrap_non_const_array(wrapped().patch_selection); }
 	object writable_patch_materials() { return wrap_non_const_array(wrapped().patch_materials); }
-	object writable_constant_data() { return wrap_non_const_named_arrays(wrapped().constant_data); }
-	object writable_uniform_data() { return wrap_non_const_named_arrays(wrapped().uniform_data); }
+	object writable_constant_data() { return wrap(wrapped().constant_data); }
+	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
 	object writable_patch_points() { return wrap_non_const_array(wrapped().patch_points); }
-	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
+	object writable_varying_data() { return wrap(wrapped().varying_data); }
 
 	object create_patch_selection() { return create_array(wrapped().patch_selection); }
 	object create_patch_materials() { return create_array(wrapped().patch_materials); }
@@ -622,10 +606,10 @@ public:
 
 	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
 	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object patch_points() { return wrap_const_array(wrapped().patch_points); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -653,17 +637,17 @@ public:
 
 	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
 	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object patch_points() { return wrap_const_array(wrapped().patch_points); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 
 	object writable_patch_selection() { return wrap_non_const_array(wrapped().patch_selection); }
 	object writable_patch_materials() { return wrap_non_const_array(wrapped().patch_materials); }
-	object writable_constant_data() { return wrap_non_const_named_arrays(wrapped().constant_data); }
-	object writable_uniform_data() { return wrap_non_const_named_arrays(wrapped().uniform_data); }
+	object writable_constant_data() { return wrap(wrapped().constant_data); }
+	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
 	object writable_patch_points() { return wrap_non_const_array(wrapped().patch_points); }
-	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
+	object writable_varying_data() { return wrap(wrapped().varying_data); }
 
 	object create_patch_selection() { return create_array(wrapped().patch_selection); }
 	object create_patch_materials() { return create_array(wrapped().patch_materials); }
@@ -702,13 +686,13 @@ public:
 	object patch_v_first_knots() { return wrap_const_array(wrapped().patch_v_first_knots); }
 	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
 	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object patch_points() { return wrap_const_array(wrapped().patch_points); }
 	object patch_point_weights() { return wrap_const_array(wrapped().patch_point_weights); }
 	object patch_u_knots() { return wrap_const_array(wrapped().patch_u_knots); }
 	object patch_v_knots() { return wrap_const_array(wrapped().patch_v_knots); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 	object patch_trim_curve_loop_counts() { return wrap_const_array(wrapped().patch_trim_curve_loop_counts); }
 	object patch_first_trim_curve_loops() { return wrap_const_array(wrapped().patch_first_trim_curve_loops); }
 	object trim_points() { return wrap_const_array(wrapped().trim_points); }
@@ -758,13 +742,13 @@ public:
 	object patch_v_first_knots() { return wrap_const_array(wrapped().patch_v_first_knots); }
 	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
 	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object patch_points() { return wrap_const_array(wrapped().patch_points); }
 	object patch_point_weights() { return wrap_const_array(wrapped().patch_point_weights); }
 	object patch_u_knots() { return wrap_const_array(wrapped().patch_u_knots); }
 	object patch_v_knots() { return wrap_const_array(wrapped().patch_v_knots); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
 	object patch_trim_curve_loop_counts() { return wrap_const_array(wrapped().patch_trim_curve_loop_counts); }
 	object patch_first_trim_curve_loops() { return wrap_const_array(wrapped().patch_first_trim_curve_loops); }
 	object trim_points() { return wrap_const_array(wrapped().trim_points); }
@@ -790,13 +774,13 @@ public:
 	object writable_patch_v_first_knots() { return wrap_non_const_array(wrapped().patch_v_first_knots); }
 	object writable_patch_selection() { return wrap_non_const_array(wrapped().patch_selection); }
 	object writable_patch_materials() { return wrap_non_const_array(wrapped().patch_materials); }
-	object writable_constant_data() { return wrap_non_const_named_arrays(wrapped().constant_data); }
-	object writable_uniform_data() { return wrap_non_const_named_arrays(wrapped().uniform_data); }
+	object writable_constant_data() { return wrap(wrapped().constant_data); }
+	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
 	object writable_patch_points() { return wrap_non_const_array(wrapped().patch_points); }
 	object writable_patch_point_weights() { return wrap_non_const_array(wrapped().patch_point_weights); }
 	object writable_patch_u_knots() { return wrap_non_const_array(wrapped().patch_u_knots); }
 	object writable_patch_v_knots() { return wrap_non_const_array(wrapped().patch_v_knots); }
-	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
+	object writable_varying_data() { return wrap(wrapped().varying_data); }
 	object writable_patch_trim_curve_loop_counts() { return wrap_non_const_array(wrapped().patch_trim_curve_loop_counts); }
 	object writable_patch_first_trim_curve_loops() { return wrap_non_const_array(wrapped().patch_first_trim_curve_loops); }
 	object writable_trim_points() { return wrap_non_const_array(wrapped().trim_points); }
@@ -869,17 +853,17 @@ public:
 	object first_faces() { return wrap_const_array(wrapped().first_faces); }
 	object face_counts() { return wrap_const_array(wrapped().face_counts); }
 	object types() { return wrap_const_array(wrapped().types); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
 	object face_first_loops() { return wrap_const_array(wrapped().face_first_loops); }
 	object face_loop_counts() { return wrap_const_array(wrapped().face_loop_counts); }
 	object face_selection() { return wrap_const_array(wrapped().face_selection); }
 	object face_materials() { return wrap_const_array(wrapped().face_materials); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object loop_first_edges() { return wrap_const_array(wrapped().loop_first_edges); }
 	object edge_points() { return wrap_const_array(wrapped().edge_points); }
 	object clockwise_edges() { return wrap_const_array(wrapped().clockwise_edges); }
 	object edge_selection() { return wrap_const_array(wrapped().edge_selection); }
-	object face_varying_data() { return wrap_const_named_arrays(wrapped().face_varying_data); }
+	object face_varying_data() { return wrap(wrapped().face_varying_data); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -908,32 +892,32 @@ public:
 	object first_faces() { return wrap_const_array(wrapped().first_faces); }
 	object face_counts() { return wrap_const_array(wrapped().face_counts); }
 	object types() { return wrap_const_array(wrapped().types); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
 	object face_first_loops() { return wrap_const_array(wrapped().face_first_loops); }
 	object face_loop_counts() { return wrap_const_array(wrapped().face_loop_counts); }
 	object face_selection() { return wrap_const_array(wrapped().face_selection); }
 	object face_materials() { return wrap_const_array(wrapped().face_materials); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object loop_first_edges() { return wrap_const_array(wrapped().loop_first_edges); }
 	object edge_points() { return wrap_const_array(wrapped().edge_points); }
 	object clockwise_edges() { return wrap_const_array(wrapped().clockwise_edges); }
 	object edge_selection() { return wrap_const_array(wrapped().edge_selection); }
-	object face_varying_data() { return wrap_const_named_arrays(wrapped().face_varying_data); }
+	object face_varying_data() { return wrap(wrapped().face_varying_data); }
 
 	object writable_first_faces() { return wrap_non_const_array(wrapped().first_faces); }
 	object writable_face_counts() { return wrap_non_const_array(wrapped().face_counts); }
 	object writable_types() { return wrap_non_const_array(wrapped().types); }
-	object writable_constant_data() { return wrap_non_const_named_arrays(wrapped().constant_data); }
+	object writable_constant_data() { return wrap(wrapped().constant_data); }
 	object writable_face_first_loops() { return wrap_non_const_array(wrapped().face_first_loops); }
 	object writable_face_loop_counts() { return wrap_non_const_array(wrapped().face_loop_counts); }
 	object writable_face_selection() { return wrap_non_const_array(wrapped().face_selection); }
 	object writable_face_materials() { return wrap_non_const_array(wrapped().face_materials); }
-	object writable_uniform_data() { return wrap_non_const_named_arrays(wrapped().uniform_data); }
+	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
 	object writable_loop_first_edges() { return wrap_non_const_array(wrapped().loop_first_edges); }
 	object writable_edge_points() { return wrap_non_const_array(wrapped().edge_points); }
 	object writable_clockwise_edges() { return wrap_non_const_array(wrapped().clockwise_edges); }
 	object writable_edge_selection() { return wrap_non_const_array(wrapped().edge_selection); }
-	object writable_face_varying_data() { return wrap_non_const_named_arrays(wrapped().face_varying_data); }
+	object writable_face_varying_data() { return wrap(wrapped().face_varying_data); }
 
 	object create_first_faces() { return create_array(wrapped().first_faces); }
 	object create_face_counts() { return create_array(wrapped().face_counts); }
@@ -976,13 +960,13 @@ public:
 	object first_operators() { return wrap_const_array(wrapped().first_operators); }
 	object operator_counts() { return wrap_const_array(wrapped().operator_counts); }
 	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object primitives() { return wrap_const_array(wrapped().primitives); }
 	object primitive_first_floats() { return wrap_const_array(wrapped().primitive_first_floats); }
 	object primitive_float_counts() { return wrap_const_array(wrapped().primitive_float_counts); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
-	object vertex_data() { return wrap_const_named_arrays(wrapped().vertex_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
+	object vertex_data() { return wrap(wrapped().vertex_data); }
 	object operators() { return wrap_const_array(wrapped().operators); }
 	object operator_first_operands() { return wrap_const_array(wrapped().operator_first_operands); }
 	object operator_operand_counts() { return wrap_const_array(wrapped().operator_operand_counts); }
@@ -1018,13 +1002,13 @@ public:
 	object first_operators() { return wrap_const_array(wrapped().first_operators); }
 	object operator_counts() { return wrap_const_array(wrapped().operator_counts); }
 	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap_const_named_arrays(wrapped().constant_data); }
-	object uniform_data() { return wrap_const_named_arrays(wrapped().uniform_data); }
+	object constant_data() { return wrap(wrapped().constant_data); }
+	object uniform_data() { return wrap(wrapped().uniform_data); }
 	object primitives() { return wrap_const_array(wrapped().primitives); }
 	object primitive_first_floats() { return wrap_const_array(wrapped().primitive_first_floats); }
 	object primitive_float_counts() { return wrap_const_array(wrapped().primitive_float_counts); }
-	object varying_data() { return wrap_const_named_arrays(wrapped().varying_data); }
-	object vertex_data() { return wrap_const_named_arrays(wrapped().vertex_data); }
+	object varying_data() { return wrap(wrapped().varying_data); }
+	object vertex_data() { return wrap(wrapped().vertex_data); }
 	object operators() { return wrap_const_array(wrapped().operators); }
 	object operator_first_operands() { return wrap_const_array(wrapped().operator_first_operands); }
 	object operator_operand_counts() { return wrap_const_array(wrapped().operator_operand_counts); }
@@ -1036,13 +1020,13 @@ public:
 	object writable_first_operators() { return wrap_non_const_array(wrapped().first_operators); }
 	object writable_operator_counts() { return wrap_non_const_array(wrapped().operator_counts); }
 	object writable_materials() { return wrap_non_const_array(wrapped().materials); }
-	object writable_constant_data() { return wrap_non_const_named_arrays(wrapped().constant_data); }
-	object writable_uniform_data() { return wrap_non_const_named_arrays(wrapped().uniform_data); }
+	object writable_constant_data() { return wrap(wrapped().constant_data); }
+	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
 	object writable_primitives() { return wrap_non_const_array(wrapped().primitives); }
 	object writable_primitive_first_floats() { return wrap_non_const_array(wrapped().primitive_first_floats); }
 	object writable_primitive_float_counts() { return wrap_non_const_array(wrapped().primitive_float_counts); }
-	object writable_varying_data() { return wrap_non_const_named_arrays(wrapped().varying_data); }
-	object writable_vertex_data() { return wrap_non_const_named_arrays(wrapped().vertex_data); }
+	object writable_varying_data() { return wrap(wrapped().varying_data); }
+	object writable_vertex_data() { return wrap(wrapped().vertex_data); }
 	object writable_operators() { return wrap_non_const_array(wrapped().operators); }
 	object writable_operator_first_operands() { return wrap_non_const_array(wrapped().operator_first_operands); }
 	object writable_operator_operand_counts() { return wrap_non_const_array(wrapped().operator_operand_counts); }
@@ -1106,7 +1090,7 @@ object mesh::point_groups() { return detail::wrap_const_object<detail::const_poi
 object mesh::point_selection() { return detail::wrap_const_array(wrapped().point_selection); } 
 object mesh::points() { return detail::wrap_const_array(wrapped().points); } 
 object mesh::polyhedra() { return detail::wrap_const_object<detail::const_polyhedra>(wrapped().polyhedra); } 
-object mesh::vertex_data() { return detail::wrap_const_named_arrays(wrapped().vertex_data); } 
+object mesh::vertex_data() { return wrap(wrapped().vertex_data); } 
 object mesh::writable_bicubic_patches() { return detail::wrap_non_const_object<detail::bicubic_patches>(wrapped().bicubic_patches); } 
 object mesh::writable_bilinear_patches() { return detail::wrap_non_const_object<detail::bilinear_patches>(wrapped().bilinear_patches); } 
 object mesh::writable_blobbies() { return detail::wrap_non_const_object<detail::blobbies>(wrapped().blobbies); }
@@ -1118,7 +1102,7 @@ object mesh::writable_point_groups() { return detail::wrap_non_const_object<deta
 object mesh::writable_point_selection() { return detail::wrap_non_const_array(wrapped().point_selection); } 
 object mesh::writable_points() { return detail::wrap_non_const_array(wrapped().points); } 
 object mesh::writable_polyhedra() { return detail::wrap_non_const_object<detail::polyhedra>(wrapped().polyhedra); } 
-object mesh::writable_vertex_data() { return detail::wrap_non_const_named_arrays(wrapped().vertex_data); } 
+object mesh::writable_vertex_data() { return wrap(wrapped().vertex_data); } 
 
 const std::string mesh::repr()
 {

@@ -62,10 +62,12 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	any_python.h
 	array_python.cpp
 	array_python.h
+	attribute_arrays_python.cpp
+	attribute_arrays_python.h
 	const_array_python.cpp
 	const_array_python.h
-	const_named_arrays_python.cpp
-	const_named_arrays_python.h
+	const_attribute_arrays_python.cpp
+	const_attribute_arrays_python.h
 	dynamic_cast_python.cpp
 	dynamic_cast_python.h
 	euler_python.cpp
@@ -101,8 +103,6 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	mesh_python.h
 	mesh_selection_python.cpp
 	mesh_selection_python.h
-	named_arrays_python.cpp
-	named_arrays_python.h
 	node_python.cpp
 	node_python.h
 	object_model_python.cpp
