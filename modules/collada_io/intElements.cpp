@@ -215,9 +215,9 @@ namespace io
 		
 		domVertices* domV;
 		domV = daeSafeCast<domVertices>(vertex_input->getSource().getElement());
-		
-		source_vertex = daeSafeCast<domSource>(domV->getInput_array()[0]->getSource().getElement());
 
+		source_vertex = daeSafeCast<domSource>(domV->getInput_array()[0]->getSource().getElement());
+		/*
 		if(normal_input)
 		{
 			elementURI = &normal_input->getSource();
@@ -228,6 +228,7 @@ namespace io
 			elementURI = &texcoord_input->getSource();
 			source_texcoord = daeSafeCast<domSource>(elementURI->getElement());
 		}
+		*/
 
 		domFloat_array *floatArray_vertex;
 		domFloat_array *floatArray_normal;
