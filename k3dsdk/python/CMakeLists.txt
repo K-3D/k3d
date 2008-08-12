@@ -20,6 +20,8 @@ ADD_LIBRARY(k3dsdk-python-types SHARED
 	bounding_box3_python.h
 	color_python.cpp
 	color_python.h
+	const_bitmap_python.cpp
+	const_bitmap_python.h
 	euler_angles_python.cpp
 	euler_angles_python.h
 	log_python.cpp

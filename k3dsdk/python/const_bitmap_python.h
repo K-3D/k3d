@@ -1,5 +1,5 @@
-#ifndef K3DSDK_BITMAP_PYTHON_H
-#define K3DSDK_BITMAP_PYTHON_H
+#ifndef K3DSDK_CONST_BITMAP_PYTHON_H
+#define K3DSDK_CONST_BITMAP_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -33,13 +33,13 @@ namespace k3d
 namespace python
 {
 
-typedef interface_wrapper<k3d::bitmap> bitmap_wrapper;
+typedef interface_wrapper<const k3d::bitmap> const_bitmap_wrapper;
 
-void define_class_bitmap();
+void define_class_const_bitmap();
 
 } // namespace python
 
 } // namespace k3d
 
-#endif // !K3DSDK_BITMAP_PYTHON_H
+#endif // !K3DSDK_CONST_BITMAP_PYTHON_H
 

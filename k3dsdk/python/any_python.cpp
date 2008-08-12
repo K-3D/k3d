@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,6 +24,7 @@
 #include "angle_axis_python.h"
 #include "any_python.h"
 #include "bitmap_python.h"
+#include "const_bitmap_python.h"
 #include "idocument_python.h"
 #include "inode_python.h"
 #include "mesh_python.h"
@@ -137,10 +138,14 @@ const object any_to_python(const boost::any& Value)
 		return value ? object(mesh(value)) : object();
 	}
 
+	if(type == typeid(const k3d::bitmap*))
+	{
+		return wrap(boost::any_cast<const k3d::bitmap*>(Value));
+	}
+
 	if(type == typeid(k3d::bitmap*))
 	{
-		k3d::bitmap* const value = boost::any_cast<k3d::bitmap*>(Value);
-		return value ? object(bitmap(value)) : object();
+		return wrap(boost::any_cast<k3d::bitmap*>(Value));
 	}
 
 	if(type == typeid(k3d::inode*))
@@ -326,8 +331,11 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 		return boost::any(static_cast<k3d::inode*>(0));
 	}
 
+	if(TargetType == typeid(const k3d::bitmap*))
+		return boost::any(extract<const_bitmap_wrapper>(Value)().wrapped_ptr());
+
 	if(TargetType == typeid(k3d::bitmap*))
-		return boost::any(extract<bitmap>(Value)().wrapped_ptr());
+		return boost::any(extract<bitmap_wrapper>(Value)().wrapped_ptr());
 
 	if(TargetType == typeid(std::vector<k3d::inode*>))
 	{

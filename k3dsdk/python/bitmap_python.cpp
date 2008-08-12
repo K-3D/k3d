@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,8 +22,10 @@
 */
 
 #include "bitmap_python.h"
+#include "const_bitmap_python.h"
 
 #include <boost/python.hpp>
+#include <boost/python/tuple.hpp>
 #include <boost/python/detail/api_placeholder.hpp>
 using namespace boost::python;
 
@@ -33,40 +35,30 @@ namespace k3d
 namespace python
 {
 
-bitmap::bitmap() :
-	base()
+static void assign(bitmap_wrapper& Self, bitmap_wrapper& RHS)
 {
+	Self.wrapped() = RHS.wrapped();
 }
 
-bitmap::bitmap(k3d::bitmap* Bitmap) :
-	base(Bitmap)
+static void assign_const(bitmap_wrapper& Self, const_bitmap_wrapper& RHS)
 {
+	Self.wrapped() = RHS.wrapped();
 }
 
-bitmap::bitmap(k3d::bitmap& Bitmap) :
-	base(Bitmap)
-{
-}
-
-void bitmap::assign(const bitmap& Bitmap)
-{
-	wrapped() = Bitmap.wrapped();
-}
-
-void bitmap::reset(const unsigned long Width, const unsigned long Height)
+static void reset(bitmap_wrapper& Self, const unsigned long Width, const unsigned long Height)
 {
 	k3d::bitmap temp(Width, Height);
-	wrapped().swap(temp);
+	Self.wrapped().swap(temp);
 }
 
-tuple bitmap::get_pixel(const unsigned long X, const unsigned long Y)
+static tuple get_pixel(bitmap_wrapper& Self, const unsigned long X, const unsigned long Y)
 {
-	if(X >= wrapped().width())
+	if(X >= Self.wrapped().width())
 		throw std::invalid_argument("X value out-of-range");
-	if(Y >= wrapped().height())
+	if(Y >= Self.wrapped().height())
 		throw std::invalid_argument("Y value out-of-range");
 
-	const k3d::bitmap::view_t& bitmap = boost::gil::view(wrapped());
+	const k3d::bitmap::view_t& bitmap = boost::gil::view(Self.wrapped());
 	k3d::pixel& pixel = bitmap(X, Y);
 
 	return boost::python::make_tuple(
@@ -76,16 +68,16 @@ tuple bitmap::get_pixel(const unsigned long X, const unsigned long Y)
 		boost::gil::get_color(pixel, boost::gil::alpha_t()));
 }
 
-void bitmap::set_pixel(const unsigned long X, const unsigned long Y, const tuple& Pixel)
+static void set_pixel(bitmap_wrapper& Self, const unsigned long X, const unsigned long Y, const tuple& Pixel)
 {
-	if(X >= wrapped().width())
+	if(X >= Self.wrapped().width())
 		throw std::invalid_argument("X value out-of-range");
-	if(Y >= wrapped().height())
+	if(Y >= Self.wrapped().height())
 		throw std::invalid_argument("Y value out-of-range");
 	if(len(Pixel) != 4)
 		throw std::invalid_argument("Pixel argument must be a 4-tuple");
 
-	const k3d::bitmap::view_t& bitmap = boost::gil::view(wrapped());
+	const k3d::bitmap::view_t& bitmap = boost::gil::view(Self.wrapped());
 	k3d::pixel& pixel = bitmap(X, Y);
 
 	pixel = k3d::pixel(
@@ -95,32 +87,35 @@ void bitmap::set_pixel(const unsigned long X, const unsigned long Y, const tuple
 		boost::python::extract<double>(Pixel[3])());
 }
 
-const unsigned long bitmap::width()
+static const unsigned long width(bitmap_wrapper& Self)
 {
-	return wrapped().width();
+	return Self.wrapped().width();
 }
 
-const unsigned long bitmap::height()
+static const unsigned long height(bitmap_wrapper& Self)
 {
-	return wrapped().height();
+	return Self.wrapped().height();
 }
 
-void export_bitmap()
+void define_class_bitmap()
 {
-	class_<bitmap>("bitmap",
+	class_<bitmap_wrapper>("bitmap",
 			"Stores a two-dimensional half-precision floating-point RGBA bitmap image.")
-		.def("assign", &bitmap::assign,
+		.def("assign", &assign,
 			"Replaces the current contents with a copy of the given bitmap.\n\n"
 			">>> mycopy.assign(myoriginal)\n\n")
-		.def("reset", &bitmap::reset,
+		.def("assign", &assign_const,
+			"Replaces the current contents with a copy of the given bitmap.\n\n"
+			">>> mycopy.assign(myoriginal)\n\n")
+		.def("reset", &reset,
 			"Replaces the current contents with an uninitialized bitmap with the given dimensions.\n\n"
 			">>> mybitmap.reset(640, 480)\n\n")
-		.def("width", &bitmap::width,
+		.def("width", &width,
 			"Returns the width of the image in pixels.")
-		.def("height", &bitmap::height,
+		.def("height", &height,
 			"Returns the height of the image in pixels.")
-		.def("get_pixel", &bitmap::get_pixel)
-		.def("set_pixel", &bitmap::set_pixel)
+		.def("get_pixel", &get_pixel)
+		.def("set_pixel", &set_pixel)
 		;
 }
 

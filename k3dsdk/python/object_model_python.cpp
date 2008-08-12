@@ -30,6 +30,7 @@
 #include "color_python.h"
 #include "const_array_python.h"
 #include "const_attribute_arrays_python.h"
+#include "const_bitmap_python.h"
 #include "dynamic_cast_python.h"
 #include "euler_angles_python.h"
 #include "euler_python.h"
@@ -402,9 +403,11 @@ BOOST_PYTHON_MODULE(k3d)
 
 	angle_axis::define_class();
 	define_class_attribute_arrays();
+	define_class_bitmap();
 	define_class_bounding_box3();
 	define_class_color();
 	define_class_const_attribute_arrays();
+	define_class_const_bitmap();
 	define_class_icommand_node();
 	define_class_idocument();
 	define_class_imaterial();
@@ -435,7 +438,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_plugin();
 	define_namespace_resource();
 	euler_angles::define_class();
-	export_bitmap();
 	mesh::define_class();
 	node::define_class();
 	ri_render_state::define_class();
