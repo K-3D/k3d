@@ -65,7 +65,7 @@ public:
 
 		k3d::typed_array<T>* const new_array = new k3d::typed_array<T>();
 		arrays[name].reset(new_array);
-		array = boost::python::object(k3d::python::array<k3d::typed_array<T> >(*new_array));
+		array = boost::python::object(wrap(*new_array));
 	}
 
 private:

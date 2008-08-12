@@ -32,12 +32,6 @@ namespace k3d
 namespace python
 {
 
-static object wrap_array(const k3d::array* const Array)
-{
-	throw std::runtime_error("wrap_array() not implemented");
-	return object();
-}
-
 static list array_names(const_attribute_arrays_wrapper& Self)
 {
 	list results;
@@ -53,7 +47,7 @@ static object array(const_attribute_arrays_wrapper& Self, const string_t& Name)
 	if(!Self.wrapped().count(Name))
 		return object();
 
-	return wrap_array(Self.wrapped().find(Name)->second.get());
+	return wrap(Self.wrapped().find(Name)->second.get());
 }
 
 static int len(const_attribute_arrays_wrapper& Self)
@@ -69,7 +63,7 @@ static object get_item(const_attribute_arrays_wrapper& Self, int Item)
 	k3d::attribute_arrays::const_iterator array_iterator = Self.wrapped().begin();
 	std::advance(array_iterator, Item);
 
-	return wrap_array(array_iterator->second.get());
+	return wrap(array_iterator->second.get());
 }
 
 void define_class_const_attribute_arrays()

@@ -397,6 +397,9 @@ BOOST_PYTHON_MODULE(k3d)
 {
 	to_python_converter<k3d::mesh_selection::records_t, python_wrap<k3d::mesh_selection::records_t> >();
 
+	define_array_classes();
+	define_const_array_classes();
+
 	angle_axis::define_class();
 	define_class_attribute_arrays();
 	define_class_bounding_box3();
@@ -432,9 +435,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_plugin();
 	define_namespace_resource();
 	euler_angles::define_class();
-	export_arrays();
 	export_bitmap();
-	export_const_arrays();
 	mesh::define_class();
 	node::define_class();
 	ri_render_state::define_class();

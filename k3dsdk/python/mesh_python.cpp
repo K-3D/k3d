@@ -113,7 +113,7 @@ object wrap_const_array(pointer_type& Pointer)
 	if(!Pointer)
 		return object();
 
-	return object(k3d::python::const_array<typename pointer_type::element_type>(*Pointer));
+	return object(interface_wrapper<typename pointer_type::element_type>(*Pointer));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ object wrap_non_const_array(pointer_type& Pointer)
 	if(!Pointer)
 		return object();
 
-	return object(k3d::python::array<array_type>(*k3d::make_unique(Pointer)));
+	return object(interface_wrapper<array_type>(*k3d::make_unique(Pointer)));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ object create_array(pointer_type& Pointer)
 
 	array_type* const new_array = new array_type();
 	Pointer.reset(new_array);
-	return object(k3d::python::array<array_type>(*new_array));
+	return object(interface_wrapper<array_type>(*new_array));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

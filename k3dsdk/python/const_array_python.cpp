@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,17 +22,14 @@
 */
 
 #include "const_array_python.h"
+#include "imaterial_python.h"
+#include "inode_python.h"
 
-#include <k3dsdk/algebra.h>
-#include <k3dsdk/color.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/normal3.h>
-#include <k3dsdk/point2.h>
-#include <k3dsdk/point3.h>
-#include <k3dsdk/point4.h>
-#include <k3dsdk/texture3.h>
-#include <k3dsdk/vector2.h>
-#include <k3dsdk/vector3.h>
+#include <k3dsdk/named_array_types.h>
+#include <k3dsdk/typed_array.h>
+
+#include <boost/python.hpp>
 
 namespace k3d
 {
@@ -40,57 +37,122 @@ namespace k3d
 namespace python
 {
 
-void export_const_arrays()
+template<typename array_type>
+static int len(interface_wrapper<array_type>& Self)
 {
-	export_const_array<const k3d::typed_array<k3d::bool_t> >("const_k3d_bool_t_array",
+	return Self.wrapped().size();
+}
+
+template<typename array_type>
+static typename array_type::value_type get_item(interface_wrapper<array_type>& Self, int Item)
+{
+	if(Item < 0 || Item >= Self.wrapped().size())
+		throw std::out_of_range("index out-of-range");
+
+	return Self.wrapped().at(Item);
+}
+
+static boost::python::object get_item_imaterial(interface_wrapper<const k3d::typed_array<k3d::imaterial*> >& Self, int Item)
+{
+	if(Item < 0 || Item >= Self.wrapped().size())
+		throw std::out_of_range("index out-of-range");
+
+	return wrap(Self.wrapped().at(Item));
+}
+
+static boost::python::object get_item_inode(interface_wrapper<const k3d::typed_array<k3d::inode*> >& Self, int Item)
+{
+	if(Item < 0 || Item >= Self.wrapped().size())
+		throw std::out_of_range("index out-of-range");
+
+	return wrap(Self.wrapped().at(Item));
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// define_class_const_array
+
+template<typename array_type>
+static void define_class_const_array(const char* const ClassName, const char* const DocString)
+{
+	boost::python::class_<interface_wrapper<array_type> >(ClassName, DocString, boost::python::no_init)
+		.def("__len__", &len<array_type>)
+		.def("__getitem__", &get_item<array_type>);
+}
+
+template<>
+static void define_class_const_array<const k3d::typed_array<k3d::imaterial*> >(const char* const ClassName, const char* const DocString)
+{
+	typedef const k3d::typed_array<k3d::imaterial*> array_type;
+
+	boost::python::class_<interface_wrapper<array_type> >(ClassName, DocString, boost::python::no_init)
+		.def("__len__", &len<array_type>)
+		.def("__getitem__", &get_item_imaterial);
+}
+
+template<>
+static void define_class_const_array<const k3d::typed_array<k3d::inode*> >(const char* const ClassName, const char* const DocString)
+{
+	typedef const k3d::typed_array<k3d::inode*> array_type;
+
+	boost::python::class_<interface_wrapper<array_type> >(ClassName, DocString, boost::python::no_init)
+		.def("__len__", &len<array_type>)
+		.def("__getitem__", &get_item_inode);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// define_const_array_classes
+
+void define_const_array_classes()
+{
+	define_class_const_array<const k3d::typed_array<k3d::bool_t> >("const_k3d_bool_t_array",
 		"Stores an immutable (read-only) collection of boolean values.");
-	export_const_array<const k3d::typed_array<k3d::double_t> >("const_k3d_double_t_array",
+	define_class_const_array<const k3d::typed_array<k3d::double_t> >("const_k3d_double_t_array",
 		"Stores an immutable (read-only) collection of floating-point values.");
-	export_const_array<const k3d::typed_array<k3d::int8_t> >("const_k3d_int8_t_array",
+	define_class_const_array<const k3d::typed_array<k3d::int8_t> >("const_k3d_int8_t_array",
 		"Stores an immutable (read-only) collection of 8-bit integer values.");
-	export_const_array<const k3d::typed_array<k3d::int16_t> >("const_k3d_int16_t_array",
+	define_class_const_array<const k3d::typed_array<k3d::int16_t> >("const_k3d_int16_t_array",
 		"Stores an immutable (read-only) collection of 16-bit integer values.");
-	export_const_array<const k3d::typed_array<k3d::int32_t> >("const_k3d_int32_t_array",
+	define_class_const_array<const k3d::typed_array<k3d::int32_t> >("const_k3d_int32_t_array",
 		"Stores an immutable (read-only) collection of 32-bit integer values.");
-	export_const_array<const k3d::typed_array<k3d::int64_t> >("const_k3d_int64_t_array",
+	define_class_const_array<const k3d::typed_array<k3d::int64_t> >("const_k3d_int64_t_array",
 		"Stores an immutable (read-only) collection of 64-bit integer values.");
-	export_const_array<const k3d::typed_array<k3d::mesh::polyhedra_t::polyhedron_type> >("const_k3d_mesh_polyhedra_t_polyhedron_type_array",
+	define_class_const_array<const k3d::typed_array<k3d::mesh::polyhedra_t::polyhedron_type> >("const_k3d_mesh_polyhedra_t_polyhedron_type_array",
 		"Stores an immutable (read-only) collection of polyhedron type values.");
-	export_const_array<const k3d::typed_array<k3d::mesh::blobbies_t::operator_type> >("const_k3d_mesh_blobbies_t_operator_type_array",
+	define_class_const_array<const k3d::typed_array<k3d::mesh::blobbies_t::operator_type> >("const_k3d_mesh_blobbies_t_operator_type_array",
 		"Stores an immutable (read-only) collection of blobby operator type values.");
-	export_const_array<const k3d::typed_array<k3d::mesh::blobbies_t::primitive_type> >("const_k3d_mesh_blobbies_t_primitive_type_array",
+	define_class_const_array<const k3d::typed_array<k3d::mesh::blobbies_t::primitive_type> >("const_k3d_mesh_blobbies_t_primitive_type_array",
 		"Stores an immutable (read-only) collection of blobby primitive type values.");
-	export_const_array<const k3d::typed_array<k3d::imaterial*> >("const_k3d_imaterial_array",
+	define_class_const_array<const k3d::typed_array<k3d::imaterial*> >("const_k3d_imaterial_array",
 		"Stores an immutable (read-only) collection of L{imaterial} objects.");
-	export_const_array<const k3d::typed_array<k3d::inode*> >("const_k3d_inode_array",
+	define_class_const_array<const k3d::typed_array<k3d::inode*> >("const_k3d_inode_array",
 		"Stores an immutable (read-only) collection of L{inode} objects.");
-	export_const_array<const k3d::typed_array<k3d::color> >("const_k3d_color_array",
+	define_class_const_array<const k3d::typed_array<k3d::color> >("const_k3d_color_array",
 		"Stores an immutable (read-only) collection of L{color} values.");
-	export_const_array<const k3d::typed_array<k3d::matrix4> >("const_k3d_matrix4_array",
+	define_class_const_array<const k3d::typed_array<k3d::matrix4> >("const_k3d_matrix4_array",
 		"Stores an immutable (read-only) collection of L{matrix4} values.");
-	export_const_array<const k3d::typed_array<k3d::normal3> >("const_k3d_normal3_array",
+	define_class_const_array<const k3d::typed_array<k3d::normal3> >("const_k3d_normal3_array",
 		"Stores an immutable (read-only) collection of L{normal3} values.");
-	export_const_array<const k3d::typed_array<k3d::point2> >("const_k3d_point2_array",
+	define_class_const_array<const k3d::typed_array<k3d::point2> >("const_k3d_point2_array",
 		"Stores an immutable (read-only) collection of L{point2} values.");
-	export_const_array<const k3d::typed_array<k3d::point3> >("const_k3d_point3_array",
+	define_class_const_array<const k3d::typed_array<k3d::point3> >("const_k3d_point3_array",
 		"Stores an immutable (read-only) collection of L{point3} values.");
-	export_const_array<const k3d::typed_array<k3d::point4> >("const_k3d_point4_array",
+	define_class_const_array<const k3d::typed_array<k3d::point4> >("const_k3d_point4_array",
 		"Stores an immutable (read-only) collection of L{point4} values.");
-	export_const_array<const k3d::typed_array<k3d::string_t> >("const_k3d_string_t_array",
+	define_class_const_array<const k3d::typed_array<k3d::string_t> >("const_k3d_string_t_array",
 		"Stores an immutable (read-only) collection of string values.");
-	export_const_array<const k3d::typed_array<k3d::texture3> >("const_k3d_texture3_array",
+	define_class_const_array<const k3d::typed_array<k3d::texture3> >("const_k3d_texture3_array",
 		"Stores an immutable (read-only) collection of L{texture3} values.");
-	export_const_array<const k3d::typed_array<k3d::uint8_t> >("const_k3d_uint8_t_array",
+	define_class_const_array<const k3d::typed_array<k3d::uint8_t> >("const_k3d_uint8_t_array",
 		"Stores an immutable (read-only) collection of unsigned 8-bit integer values.");
-	export_const_array<const k3d::typed_array<k3d::uint16_t> >("const_k3d_uint16_t_array",
+	define_class_const_array<const k3d::typed_array<k3d::uint16_t> >("const_k3d_uint16_t_array",
 		"Stores an immutable (read-only) collection of unsigned 16-bit integer values.");
-	export_const_array<const k3d::typed_array<k3d::uint32_t> >("const_k3d_uint32_t_array",
+	define_class_const_array<const k3d::typed_array<k3d::uint32_t> >("const_k3d_uint32_t_array",
 		"Stores an immutable (read-only) collection of unsigned 32-bit integer values.");
-	export_const_array<const k3d::typed_array<k3d::uint64_t> >("const_k3d_uint64_t_array",
+	define_class_const_array<const k3d::typed_array<k3d::uint64_t> >("const_k3d_uint64_t_array",
 		"Stores an immutable (read-only) collection of unsigned 64-bit integer values.");
-	export_const_array<const k3d::typed_array<k3d::vector2> >("const_k3d_vector2_array",
+	define_class_const_array<const k3d::typed_array<k3d::vector2> >("const_k3d_vector2_array",
 		"Stores an immutable (read-only) collection of L{vector2} values.");
-	export_const_array<const k3d::typed_array<k3d::vector3> >("const_k3d_vector3_array",
+	define_class_const_array<const k3d::typed_array<k3d::vector3> >("const_k3d_vector3_array",
 		"Stores an immutable (read-only) collection of L{vector3} values.");
 }
 
