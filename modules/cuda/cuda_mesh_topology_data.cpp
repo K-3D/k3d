@@ -97,7 +97,7 @@ private:
 	mesh::indices_t& m_adjacent_edges;
 };
 
-}
+} // namespace detail
 
 void cuda_create_edge_adjacency_lookup(const k3d::uint32_t* pdev_edgePoints, const k3d::uint32_t* pdev_clockwiseEdges, unsigned char* pdev_boundaryEdges, k3d::uint32_t* pdev_adjacentEdges, int num_edges, int num_points)
 {
@@ -110,18 +110,21 @@ void cuda_create_edge_adjacency_lookup(const k3d::uint32_t* pdev_edgePoints, con
 
 	int valence_size = create_vertex_valence_lookup_kernel_entry ( pdev_valences, (const unsigned int*)pdev_edgePoints, num_edges );
 
-	allocate_device_memory((void**)&pdev_found_edges, valence_size*sizeof(k3d::uint32_t));
+
 	allocate_device_memory((void**)&pdev_first_edges, valence_size*sizeof(k3d::uint32_t));
+
+	allocate_device_memory((void**)&pdev_found_edges, valence_size*sizeof(k3d::uint32_t));
 	allocate_device_memory((void**)&pdev_point_edges, num_edges*sizeof(k3d::uint32_t));
 
-	calculate_first_edge_entry ( (unsigned int*)pdev_first_edges, ( const unsigned int*)pdev_valences, num_edges );
+	synchronize_threads();
+	calculate_first_edge_entry ( (unsigned int*)pdev_first_edges, ( const unsigned int*)pdev_valences, valence_size );
 
-	calculate_point_edges_entry ( (unsigned int*)pdev_point_edges,
+	calculate_point_edges_entry ((unsigned int*) pdev_point_edges,
 								(unsigned int*) pdev_found_edges,
 								(const unsigned int*) pdev_edgePoints,
 								(const unsigned int*) pdev_first_edges,
 								num_edges,
-								num_points);
+								valence_size);
 
 	find_companion_kernel_entry ( pdev_boundaryEdges,
 								  pdev_adjacentEdges,

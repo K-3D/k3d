@@ -1,5 +1,5 @@
-#ifndef MESH_TOPOLOGY_H_
-#define MESH_TOPOLOGY_H_
+#ifndef CUDA_MESH_TOPOLOGY_DATA_H_
+#define CUDA_MESH_TOPOLOGY_DATA_H_
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -32,7 +32,7 @@ namespace k3d
 {
 
 /// Initializes arrays for constant-time lookup from an edge to the adjacent edge (if any)
-void cuda_create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);
+void cuda_create_edge_adjacency_lookup(const k3d::uint32_t* pdev_edgePoints, const k3d::uint32_t* pdev_clockwiseEdges, unsigned char* pdev_boundaryEdges, k3d::uint32_t* pdev_adjacentEdges, int num_edges, int num_points);
 
 /// Initializes an array for constant-time lookup from an edge to the face that owns it
 void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::indices_t& EdgeFaces);
@@ -53,4 +53,4 @@ void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const me
 
 } // namespace k3d
 
-#endif /*MESH_TOPOLOGY_H_*/
+#endif /*CUDA_MESH_TOPOLOGY_DATA_H_*/

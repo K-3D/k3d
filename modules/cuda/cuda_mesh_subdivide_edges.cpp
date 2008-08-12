@@ -31,7 +31,6 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/selection.h>
@@ -54,91 +53,6 @@ namespace detail
 {
 
 typedef std::vector<k3d::uint32_t> indices_t;
-
-/// Gets the edges to subdivide, and creates a mapping between the old edge index and the new index
-class edge_index_calculator
-{
-public:
-    edge_index_calculator(const k3d::mesh::polyhedra_t& Polyhedra,
-            const indices_t& Companions,
-            const k3d::mesh::bools_t& BoundaryEdges,
-            const k3d::uint_t SplitPointCount,
-            const k3d::uint_t FirstNewPoint,
-            indices_t& EdgeList,
-            k3d::mesh::indices_t& IndexMap,
-            indices_t& FirstMidPoint,
-            k3d::mesh::bools_t& HasMidPoint) :
-                edge_count(0),
-                m_polyhedra(Polyhedra),
-                m_companions(Companions),
-                m_boundary_edges(BoundaryEdges),
-                m_split_point_count(SplitPointCount),
-                m_first_new_point(FirstNewPoint),
-                m_edge_list(EdgeList),
-                m_index_map(IndexMap),
-                m_first_midpoint(FirstMidPoint),
-                m_has_midpoint(HasMidPoint)
-            {}
-
-    void operator()(const k3d::uint_t Face)
-    {
-        const k3d::mesh::indices_t& face_first_loops = *m_polyhedra.face_first_loops;
-        const k3d::mesh::counts_t& face_loop_counts = *m_polyhedra.face_loop_counts;
-        const k3d::mesh::selection_t& edge_selection = *m_polyhedra.edge_selection;
-        const k3d::mesh::indices_t& loop_first_edges = *m_polyhedra.loop_first_edges;
-        const k3d::mesh::indices_t& clockwise_edges = *m_polyhedra.clockwise_edges;
-
-        const k3d::uint_t loop_begin = face_first_loops[Face];
-        const k3d::uint_t loop_end = loop_begin + face_loop_counts[Face];
-        for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-        {
-            const k3d::uint_t first_edge = loop_first_edges[loop];
-            for(k3d::uint_t edge = first_edge; ; )
-            {
-                m_index_map[edge] = edge_count;
-                ++edge_count;
-                if(!m_boundary_edges[edge] && edge_selection[m_companions[edge]] && !edge_selection[edge])
-                {
-                    edge_count += m_split_point_count;
-                    m_first_midpoint[edge] = m_first_midpoint[m_companions[edge]];
-                }
-
-                if(edge_selection[edge])
-                {
-                    edge_count += m_split_point_count;
-                    if(!m_boundary_edges[edge] && m_has_midpoint[m_companions[edge]])
-                    {
-                        m_first_midpoint[edge] = m_first_midpoint[m_companions[edge]];
-                    }
-                    else
-                    {
-                        m_first_midpoint[edge] = m_first_new_point + m_split_point_count * m_edge_list.size();
-                        m_edge_list.push_back(edge);
-                        m_has_midpoint[edge] = true;
-                    }
-                }
-
-                edge = clockwise_edges[edge];
-                if(edge == first_edge)
-                    break;
-            }
-        }
-    }
-
-    /// The new total edge count
-    k3d::uint_t edge_count;
-
-private:
-    const k3d::mesh::polyhedra_t& m_polyhedra;
-    const indices_t& m_companions;
-    const k3d::mesh::bools_t& m_boundary_edges;
-    const k3d::uint_t m_split_point_count;
-    const k3d::uint_t m_first_new_point;
-    indices_t& m_edge_list;
-    k3d::mesh::indices_t& m_index_map;
-    indices_t& m_first_midpoint;
-    k3d::mesh::bools_t& m_has_midpoint;
-};
 
 /// Copies and interpolates the varying data as needed (serial usage only)
 class varying_data_copier
@@ -240,7 +154,7 @@ public:
         }
         // should move up
         m_p_input_device_mesh.reset ( new cuda_device_mesh ( Input) );
-        m_p_input_device_mesh->copy_to_device( );
+        m_p_input_device_mesh->copy_to_device( ); // TODO:  Selectively copy parts of mesh
 
         document().pipeline_profiler().finish_execution(*this, "Validate input");
 
@@ -253,42 +167,24 @@ public:
         k3d::mesh::polyhedra_t& polyhedra = *k3d::make_unique(Output.polyhedra);
 
         document().pipeline_profiler().start_execution(*this, "Calculate companions");
-        k3d::mesh::bools_t boundary_edges;
-        detail::indices_t companions;
-#ifndef K3D_UINT_T_64_BITS
-        k3d::create_edge_adjacency_lookup(*polyhedra.edge_points, *polyhedra.clockwise_edges, boundary_edges, static_cast<k3d::mesh::indices_t&>(companions));
-#else
-        k3d::mesh::indices_t companions_64;
-        k3d::create_edge_adjacency_lookup(*polyhedra.edge_points, *polyhedra.clockwise_edges, boundary_edges, companions_64);
-        companions.resize(companions_64.size());
-        std::copy(companions_64.begin(), companions_64.end(), companions.begin());
-#endif
+        k3d::uint32_t* pdev_companions;
+        unsigned char* pdev_boundary_edges;
+        const k3d::uint_t split_point_count = m_vertices.pipeline_value();
+		const k3d::uint_t old_edge_count = Input.polyhedra->edge_points->size();
+
+        allocate_device_memory((void**)&pdev_companions, old_edge_count*sizeof(k3d::uint32_t));
+		allocate_device_memory((void**)&pdev_boundary_edges, old_edge_count*sizeof(unsigned char));
+
+        k3d::cuda_create_edge_adjacency_lookup(m_p_input_device_mesh->get_polyhedra_edge_point_indices_pointer(), m_p_input_device_mesh->get_device_polyhedra().get_per_edge_clockwise_edges_pointer(), pdev_boundary_edges, pdev_companions, old_edge_count, Input.points->size());
+
         document().pipeline_profiler().finish_execution(*this, "Calculate companions");
-
-        document().pipeline_profiler().start_execution(*this, "Convert Boundary");
-		k3d::typed_array<unsigned char> tmp_boundary (boundary_edges.size());
-
-		// need to convert the bit references to chars
-		for ( int k = 0; k < tmp_boundary.size() ; k++ )
-		{
-			if ( boundary_edges[k] )
-				tmp_boundary[k] = 1;
-			else
-				tmp_boundary[k] = 0;
-		}
-		document().pipeline_profiler().finish_execution(*this, "Convert Boundary");
 
 		document().pipeline_profiler().start_execution(*this, "Calculate indices");
 
-        const k3d::uint_t split_point_count = m_vertices.pipeline_value();
-        const k3d::uint_t old_edge_count = polyhedra.edge_points->size();
-
         k3d::uint32_t* pdev_index_map;
         k3d::uint32_t* pdev_first_midpoint;
-        k3d::uint32_t* pdev_companions;
-        unsigned char* pdev_has_midpoint;
-        unsigned char* pdev_boundary_edges;
 
+        unsigned char* pdev_has_midpoint;
 
         // allocate the device memory
         allocate_device_memory((void**)&pdev_index_map, old_edge_count*sizeof(k3d::uint32_t));
@@ -296,23 +192,13 @@ public:
         allocate_device_memory((void**)&pdev_has_midpoint, old_edge_count*sizeof(unsigned char));
         set_device_memory((void*)pdev_has_midpoint, 0, old_edge_count*sizeof(unsigned char));
 
+        m_p_output_device_mesh.reset( new cuda_device_mesh ( Output ) );
+		m_p_output_device_mesh->copy_to_device(POLYHEDRA_ALL_EDGES+MESH_POINTS+MESH_SELECTION+POLYHEDRA_ALL_LOOPS);
 
-        // the edge list can maximally contain all the edges
-        allocate_device_memory((void**)&m_pdev_edge_list, (1+split_point_count)*tmp_boundary.size()*sizeof(k3d::uint32_t));
-
-        allocate_device_memory((void**)&pdev_companions, companions.size()*sizeof(k3d::uint32_t));
-        allocate_device_memory((void**)&pdev_boundary_edges, tmp_boundary.size()*sizeof(unsigned char));
-
-
-        copy_from_host_to_device((void*)pdev_companions, (const void*)&(companions.front()), companions.size()*sizeof(k3d::uint32_t));
-        copy_from_host_to_device((void*)pdev_boundary_edges, (const void*)&(tmp_boundary.front()), tmp_boundary.size()*sizeof(unsigned char));
+        // the edge list can maximally contain all the input edges
+        allocate_device_memory((void**)&m_pdev_edge_list, (1+split_point_count)*old_edge_count*sizeof(k3d::uint32_t));
 
         unsigned int edge_index_calculator_edge_count;
-
-        m_p_output_device_mesh.reset( new cuda_device_mesh ( Output ) );
-        m_p_output_device_mesh->copy_to_device(POLYHEDRA_ALL_EDGES+MESH_POINTS+MESH_SELECTION+POLYHEDRA_ALL_LOOPS);
-
-        k3d::log() << debug << "edge_index_calculator_entry" << std::endl;
 
         edge_index_calculator_edge_count = edge_index_calculator_entry (
 									(unsigned int*) m_pdev_edge_list,
@@ -332,15 +218,9 @@ public:
 									Input.points->size()
 									);
 
-        k3d::log() << debug << "resize edge list" << std::endl;
         // resize the edge_list allocated on the device
         k3d::uint32_t* tmp_pdev_edge_list;
-        allocate_device_memory((void**)&tmp_pdev_edge_list, m_edge_list_size*sizeof(k3d::uint32_t));
-        synchronize_threads();
-        copy_from_device_to_device((void*)tmp_pdev_edge_list, (const void*)m_pdev_edge_list, m_edge_list_size*sizeof(k3d::uint32_t));
-        synchronize_threads();
-        free_device_memory((void*)m_pdev_edge_list);
-        synchronize_threads();
+        resize_device_memory_block((void**)&tmp_pdev_edge_list, m_pdev_edge_list, m_edge_list_size*sizeof(k3d::uint32_t), m_edge_list_size*sizeof(k3d::uint32_t)+1, 0);
         m_pdev_edge_list = tmp_pdev_edge_list;
 
         document().pipeline_profiler().finish_execution(*this, "Calculate indices");
@@ -348,27 +228,14 @@ public:
         document().pipeline_profiler().start_execution(*this, "Allocate memory");
 
         m_p_output_device_mesh->get_device_polyhedra().resize_edges(edge_index_calculator_edge_count, true);
-        //boost::shared_ptr<k3d::mesh::indices_t> output_edge_points(new k3d::mesh::indices_t(edge_index_calculator_edge_count));
-        //boost::shared_ptr<k3d::mesh::indices_t> output_clockwise_edges(new k3d::mesh::indices_t(edge_index_calculator_edge_count));
-        //boost::shared_ptr<k3d::mesh::selection_t> output_edge_selection(new k3d::mesh::selection_t(edge_index_calculator_edge_count, 0.0));
-        //k3d::mesh::points_t& output_points = *k3d::make_unique(Output.points);
-        //k3d::mesh::selection_t& output_point_selection = *k3d::make_unique(Output.point_selection);
-        const k3d::uint_t new_point_count = m_edge_list_size * split_point_count + Input.points->size();
 
-        //k3d::mesh::indices_t& output_loop_first_edges = *k3d::make_unique(polyhedra.loop_first_edges);
+        const k3d::uint_t new_point_count = m_edge_list_size * split_point_count + Input.points->size();
 
         document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
         document().pipeline_profiler().start_execution(*this, "Update indices");
 
-        //polyhedra.edge_points = output_edge_points;
-        //polyhedra.clockwise_edges = output_clockwise_edges;
-
-        //m_p_output_device_mesh.reset( new cuda_device_mesh ( Output ) );
-        //m_p_output_device_mesh->copy_to_device();
-
         m_p_output_device_mesh->resize_points_and_selection ( new_point_count, 1.0 );
-        k3d::log() << debug << "subdivide_edges_update_indices_entry" << std::endl;
 
         subdivide_edges_update_indices_entry ((unsigned int*)m_p_input_device_mesh->get_polyhedra_edge_point_indices_pointer(),
                                               (unsigned int*)m_p_input_device_mesh->get_polyhedra_clockwise_edge_point_indices_pointer(),
@@ -377,7 +244,7 @@ public:
                                               (unsigned int*)(m_p_output_device_mesh->get_polyhedra_clockwise_edge_point_indices_pointer()),
                                               pdev_index_map,
                                               old_edge_count);// index_map.size = old_edge_count
-        k3d::log() << debug << "subdivide_edges_update_loop_first_edges_entry" << std::endl;
+
         subdivide_edges_update_loop_first_edges_entry ((unsigned int*)m_p_output_device_mesh->get_polyhedra_loop_first_edges_pointer(),
                                                  (unsigned int)Input.polyhedra->loop_first_edges->size(),
                                                  pdev_index_map,
@@ -388,7 +255,7 @@ public:
 
 
         document().pipeline_profiler().start_execution(*this, "Split edges");
-        k3d::log() << debug << "subdivide_edges_split_edges_entry" << std::endl;
+
         subdivide_edges_split_edges_entry ((unsigned int*)(m_p_output_device_mesh->get_polyhedra_edge_point_indices_pointer()),
                                            (unsigned int*)(m_p_output_device_mesh->get_polyhedra_clockwise_edge_point_indices_pointer()),
                                            (unsigned int*)m_p_input_device_mesh->get_polyhedra_clockwise_edge_point_indices_pointer(),
@@ -409,10 +276,9 @@ public:
         polyhedra.edge_selection.reset();
         polyhedra.loop_first_edges.reset();
 
-
         m_p_output_device_mesh->copy_from_device( Output, POLYHEDRA_ALL_EDGES + POLYHEDRA_ALL_LOOPS);
 
-        k3d::log() << debug << "free device memory" << std::endl;
+
         free_device_memory ( pdev_index_map );
         free_device_memory ( pdev_first_midpoint );
         free_device_memory ( pdev_has_midpoint );
@@ -421,10 +287,8 @@ public:
 
         document().pipeline_profiler().finish_execution(*this, "Split edges");
 
-        //polyhedra.edge_selection = output_edge_selection;
         polyhedra.constant_data = Input.polyhedra->constant_data;
         polyhedra.uniform_data = Input.polyhedra->uniform_data;
-        k3d::log() << debug << "on_create_mesh::end" << std::endl;
     }
 
     void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -450,7 +314,8 @@ public:
                                                 m_p_input_device_mesh->get_device_polyhedra().get_per_edge_clockwise_edges_pointer(),
                                                 (unsigned int)m_vertices.pipeline_value());
 
-
+        Output.points.reset();
+        Output.point_selection.reset();
         m_p_output_device_mesh->copy_from_device ( Output, MESH_POINTS + MESH_SELECTION );
 
         document().pipeline_profiler().finish_execution(*this, "Calculate positions");

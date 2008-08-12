@@ -151,7 +151,7 @@ extern "C" K3D_CUDA_DECLSPEC int create_vertex_valence_lookup_kernel_entry (
 																int num_edges
 																);
 
-extern "C" K3D_CUDA_DECLSPEC void calculate_first_edge_entry ( unsigned int* pdev_first_edge, const unsigned int* pdev_valences, int num_edges );
+extern "C" K3D_CUDA_DECLSPEC void calculate_first_edge_entry ( unsigned int* pdev_first_edge, const unsigned int* pdev_valences, int num_points );
 
 extern "C" K3D_CUDA_DECLSPEC void calculate_point_edges_entry (
 																unsigned int* pdev_point_edges,

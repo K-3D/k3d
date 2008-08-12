@@ -725,32 +725,34 @@ extern "C" int create_vertex_valence_lookup_kernel_entry (
 	return host_valence_size;
 }
 
-extern "C" void calculate_first_edge_entry ( unsigned int* pdev_first_edge, const unsigned int* pdev_valences, int num_edges )
+extern "C" void calculate_first_edge_entry ( unsigned int* pdev_first_edge, const unsigned int* pdev_valences, int num_points )
 {
-	int numThreads = 64;
+	// Serial execution
+	int numThreads = 1;
 	dim3 threads_per_block(numThreads, 1);
-	dim3 blocks_per_grid( iDivUp(num_edges, numThreads), 1);
+	dim3 blocks_per_grid( 1, 1);
 
-	calculate_first_edges_block_kernel<<< blocks_per_grid, threads_per_block, blocks_per_grid.x*2*sizeof(unsigned int) >>> ( pdev_first_edge, pdev_valences, num_edges );
-	cudaThreadSynchronize();
-	calculate_first_edges_update_kernel<<< blocks_per_grid, threads_per_block, blocks_per_grid.x*2*sizeof(unsigned int) >>> ( pdev_first_edge, num_edges );
-	cudaThreadSynchronize();
+	calculate_first_edges_kernel<<< blocks_per_grid, threads_per_block >>> ( pdev_first_edge, pdev_valences, num_points );
 	checkLastCudaError();
 
 }
 
-extern "C" void calculate_point_edges_entry (  unsigned int* pdev_point_edges, unsigned int* pdev_found_edges, const unsigned int* pdev_edge_point_indices, const unsigned int* pdev_first_edges, int num_edges, int num_points )
+extern "C" void calculate_point_edges_entry (
+											unsigned int* pdev_point_edges,
+											unsigned int* pdev_found_edges,
+											const unsigned int* pdev_edge_point_indices,
+											const unsigned int* pdev_first_edges,
+											int num_edges,
+											int num_points )
 {
 	// initialize the point edges
-	cudaMemset((void*)pdev_point_edges, 0, num_points*sizeof(unsigned int));
-	cudaMemset((void*)pdev_found_edges, 0, num_edges*sizeof(unsigned int));
-
+	cudaMemset((void*)pdev_point_edges, 0, num_edges*sizeof(unsigned int));
+	cudaMemset((void*)pdev_found_edges, 0, num_points*sizeof(unsigned int));
 	// runs serially
 	dim3 threads_per_block(1, 1);
 	dim3 blocks_per_grid(1, 1);
 	cudaThreadSynchronize();
 	calculate_point_edges_kernel<<<blocks_per_grid, threads_per_block>>> (pdev_point_edges, pdev_found_edges, pdev_edge_point_indices, pdev_first_edges, num_edges);
-	cudaThreadSynchronize();
 	checkLastCudaError();
 }
 

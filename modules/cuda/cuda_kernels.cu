@@ -717,6 +717,17 @@ __global__ void create_vertex_valence_lookup_kernel ( unsigned int* valence, con
 /**
  * Kernel to calculate first edges in edge_adjacency lookup
  */
+__global__ void calculate_first_edges_kernel ( unsigned int* first_edges, const unsigned int* valences, int num_points )
+{
+	unsigned int count = 0;
+
+	for ( unsigned int point = 0; point < num_points; ++point)
+	{
+		first_edges[point] = count;
+		count += valences[point];
+	}
+
+}
 __global__ void calculate_first_edges_block_kernel ( unsigned int* first_edges, const unsigned int* valences, int num_edges )
 {
 	// use shared memory to store both the result per block as well as the initial block values
@@ -734,6 +745,7 @@ __global__ void calculate_first_edges_block_kernel ( unsigned int* first_edges, 
 			shared_first[threadIdx.x].y = valences[edge_index-1];
 		}
 	}
+
 	__syncthreads();
 
 	if ( edge_index < num_edges )
@@ -746,8 +758,8 @@ __global__ void calculate_first_edges_block_kernel ( unsigned int* first_edges, 
 			}
 		}
 	}
-	__syncthreads();
 
+	__syncthreads();
 	if ( edge_index < num_edges )
 	{
 		first_edges[edge_index] = shared_first[threadIdx.x].x;
@@ -758,10 +770,15 @@ __global__ void calculate_first_edges_block_kernel ( unsigned int* first_edges, 
 
 __global__ void calculate_first_edges_update_kernel ( unsigned int* first_edges, int num_edges )
 {
+
 	__shared__ extern unsigned int shared_first_edge[];
 	__shared__ unsigned int update_val;
 
 	unsigned int edge_index = ( blockDim.x * blockIdx.x) + threadIdx.x;
+
+#ifdef __DEVICE_EMULATION__
+	printf("calculate_first_edges_update_kernel: %u of %d blah\n", edge_index, num_edges);
+#endif
 
 	if ( edge_index < num_edges )
 	{
@@ -798,7 +815,7 @@ __global__ void calculate_first_edges_update_kernel ( unsigned int* first_edges,
  */
 __global__ void calculate_point_edges_kernel ( unsigned int* point_edges, unsigned int* found_edges, const unsigned int* edge_point_indices, const unsigned int* first_edges, int num_edges)
 {
-	unsigned int point_index;
+	unsigned int point_index = 0;
 	for ( unsigned int edge_index = 0 ; edge_index < num_edges ; ++edge_index )
 	{
 		point_index = edge_point_indices[edge_index];
