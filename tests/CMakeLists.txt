@@ -303,6 +303,7 @@ K3D_ADD_TEST(offscreen.OpenGLFramebufferCameraToBitmap.py PYTHON REQUIRES K3D_BU
 K3D_ADD_TEST(offscreen.VirtualCameraToBitmap.py PYTHON REQUIRES K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE)
 K3D_ADD_TEST(offscreen.WGLCameraToBitmap.py PYTHON REQUIRES K3D_BUILD_WGL_MODULE)
 
+K3D_ADD_TEST(python.api.module.py PYTHON)
 K3D_ADD_TEST(python.api.angle_axis.py PYTHON)
 K3D_ADD_TEST(python.api.get_dependency.py PYTHON)
 K3D_ADD_TEST(python.api.named_arrays.py PYTHON)
