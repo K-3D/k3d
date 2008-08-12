@@ -29,7 +29,7 @@
 #include "inode_python.h"
 #include "mesh_python.h"
 #include "node_python.h"
-#include "ri_render_state_python.h"
+#include "ri_python.h"
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/bitmap.h>
@@ -162,7 +162,7 @@ const object any_to_python(const boost::any& Value)
 
 	if(type == typeid(const k3d::ri::render_state*))
 	{
-		return object(ri_render_state(boost::any_cast<const k3d::ri::render_state*>(Value)));
+		return wrap(boost::any_cast<const k3d::ri::render_state*>(Value));
 	}
 
 	if(type == typeid(std::vector<k3d::inode*>))

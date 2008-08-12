@@ -21,9 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "ri_render_state_python.h"
+#include "ri_python.h"
 
-#include <k3dsdk/render_state_ri.h>
 #include <k3dsdk/ishader_collection_ri.h>
 
 #include <boost/python.hpp>
@@ -35,26 +34,22 @@ namespace k3d
 namespace python
 {
 
-ri_render_state::ri_render_state(const k3d::ri::render_state* State) :
-	base(State)
+class ri
 {
+};
+
+static void use_shader(ri_render_state_wrapper& Self, const string_t& Shader)
+{
+	Self.wrapped().shaders.use_shader(filesystem::native_path(ustring::from_utf8(Shader)));
 }
 
-ri_render_state::ri_render_state(const k3d::ri::render_state& State) :
-	base(State)
+void define_namespace_ri()
 {
-}
+	scope outer = class_<ri>("ri", no_init);
 
-void ri_render_state::use_shader(const std::string& Shader)
-{
-	wrapped().shaders.use_shader(filesystem::native_path(ustring::from_utf8(Shader)));
-}
-
-void ri_render_state::define_class()
-{
-	class_<ri_render_state>("ri_render_state", 
+	class_<ri_render_state_wrapper>("render_state", 
 		"Used to pass RenderMan state from the render engine to an object being rendered.", no_init)
-		.def("use_shader", &ri_render_state::use_shader,
+		.def("use_shader", &use_shader,
 			"Inform the render engine that an object will be using the given shader (so the render system can compile the shader on-demand).");
 }
 

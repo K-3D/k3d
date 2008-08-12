@@ -25,30 +25,17 @@
 */
 
 #include "interface_wrapper_python.h"
-
-#include <string>
+#include <k3dsdk/render_state_ri.h>
 
 namespace k3d
 {
 
-namespace ri { class render_state; }
-
 namespace python
 {
 
-class ri_render_state :
-	public interface_wrapper<const k3d::ri::render_state>
-{
-	typedef interface_wrapper<const k3d::ri::render_state> base;
+typedef interface_wrapper<const k3d::ri::render_state> ri_render_state_wrapper;
 
-public:
-	ri_render_state(const k3d::ri::render_state* Value);
-	ri_render_state(const k3d::ri::render_state& Value);
-
-	void use_shader(const std::string& Shader);
-
-	static void define_class();
-};
+void define_namespace_ri();
 
 } // namespace python
 

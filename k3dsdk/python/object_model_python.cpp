@@ -62,7 +62,7 @@
 #include "point3_python.h"
 #include "point4_python.h"
 #include "resource_python.h"
-#include "ri_render_state_python.h"
+#include "ri_python.h"
 #include "texture3_python.h"
 #include "uuid_python.h"
 #include "vector3_python.h"
@@ -437,10 +437,10 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_parallel();
 	define_namespace_plugin();
 	define_namespace_resource();
+	define_namespace_ri();
 	euler_angles::define_class();
 	mesh::define_class();
 	node::define_class();
-	ri_render_state::define_class();
 
 	def("batch_mode", k3d::batch_mode,
 		"Returns True if batch (no user intervention) mode is enabled for the user interface.\n"
