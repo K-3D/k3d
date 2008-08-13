@@ -56,7 +56,7 @@ namespace module
 			extrude_patch(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),
 				m_distance(init_owner(*this) + init_name(_("distance")) + init_label(_("Distance")) + init_description(_("How far to extrude the patch")) + init_step_increment(0.5)+ init_units(typeid(k3d::measurement::scalar)) + init_value(1.0) ),
-				m_along(init_owner(*this) + init_name("along") + init_label(_("Extrude along")) + init_description(_("Axis along which the patch gets extruded")) + init_value(k3d::X) + init_enumeration(k3d::axis_values())),
+				m_along(init_owner(*this) + init_name("along") + init_label(_("Extrude along")) + init_description(_("Axis along which the patch gets extruded")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values())),
 				m_cap(init_owner(*this) + init_name(_("cap")) + init_label(_("Create Cap?")) + init_description(_("Extrusion can either create a cap or not")) + init_value(true) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());

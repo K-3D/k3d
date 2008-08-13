@@ -56,7 +56,7 @@ namespace module
 			polygonize_patch(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),
 				m_segments(init_owner(*this) + init_name(_("segments")) + init_label(_("Segments")) + init_description(_("The more segments the better the result")) + init_value(5) + init_constraint(constraint::minimum(3)) ),
-				m_delete_orig(init_owner(*this) + init_name(_("delete_orig")) + init_label(_("Delete original?")) + init_description(_("Delete original NURBS curve?")) + init_value(false) ),
+				m_delete_orig(init_owner(*this) + init_name(_("delete_orig")) + init_label(_("Delete original?")) + init_description(_("Delete original NURBS curve?")) + init_value(true) ),
 				m_flip(init_owner(*this) + init_name(_("flip")) + init_label(_("Flip Vertex order?")) + init_description(_("A face is only visible if its vertices are ordered counter-clockwise. If you don't see the side of the mesh you need, just check this to make all faces look to the other side")) + init_value(false) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());

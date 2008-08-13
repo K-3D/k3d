@@ -56,7 +56,7 @@ namespace module
 			polygonize_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),
 				m_segments(init_owner(*this) + init_name(_("segments")) + init_label(_("Segments")) + init_description(_("The more segments the better the result")) + init_value(10) + init_constraint(constraint::minimum(3)) ),
-				m_delete_orig(init_owner(*this) + init_name(_("delete_orig")) + init_label(_("Delete original?")) + init_description(_("Delete original NURBS curve?")) + init_value(false) )
+				m_delete_orig(init_owner(*this) + init_name(_("delete_orig")) + init_label(_("Delete original?")) + init_description(_("Delete original NURBS curve?")) + init_value(true) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 				m_segments.changed_signal().connect(make_update_mesh_slot());

@@ -57,7 +57,7 @@ namespace module
 				base(Factory, Document),
 				m_angle(init_owner(*this) + init_name("angle") + init_label(_("angle")) + init_description(_("The curve will be rotated to this angle, specify 360 for a closed shape")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
                 m_segments(init_owner(*this) + init_name("segments") + init_label(_("segments")) + init_description(_("Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-                m_around(init_owner(*this) + init_name("around") + init_label(_("Around")) + init_description(_("Axis to revolve around")) + init_value(k3d::X) + init_enumeration(k3d::axis_values())),
+                m_around(init_owner(*this) + init_name("around") + init_label(_("Around")) + init_description(_("Axis to revolve around")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values())),
                 m_create_caps(init_owner(*this) + init_name(_("create_caps")) + init_label(_("Create caps?")) + init_description(_("Create caps at both ends of the revolved curve?")) + init_value(false) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());

@@ -94,7 +94,7 @@ namespace module
 
 		}
 
-		nurbs_curve nurbs_patch_modifier::extract_v_curve(size_t patch, size_t u)
+		nurbs_curve nurbs_patch_modifier::extract_v_curve(k3d::uint_t patch, k3d::uint_t u)
 		{
 			try
 			{
@@ -107,13 +107,13 @@ namespace module
 					return nurbs_curve();
 				}
 
-				const size_t points_begin = m_patch_first_points->at(patch) + u;
-				const size_t point_step =  m_patch_u_point_counts->at(patch);
-				const size_t points_end = points_begin + (m_patch_v_point_counts->at(patch) - 1) * point_step + 1;
+				const k3d::uint_t points_begin = m_patch_first_points->at(patch) + u;
+				const k3d::uint_t point_step =  m_patch_u_point_counts->at(patch);
+				const k3d::uint_t points_end = points_begin + (m_patch_v_point_counts->at(patch) - 1) * point_step + 1;
 
-				const size_t knot_count_v = m_patch_v_point_counts->at(patch) + m_patch_v_orders->at(patch);
+				const k3d::uint_t knot_count_v = m_patch_v_point_counts->at(patch) + m_patch_v_orders->at(patch);
 
-				const size_t knots_begin = m_patch_v_first_knots->at(patch);
+				const k3d::uint_t knots_begin = m_patch_v_first_knots->at(patch);
 
 				for (int i = knots_begin; i < knots_begin + knot_count_v; i++)
 				{
@@ -140,7 +140,7 @@ namespace module
 			}
 		}
 
-		nurbs_curve nurbs_patch_modifier::extract_u_curve(size_t patch, size_t v)
+		nurbs_curve nurbs_patch_modifier::extract_u_curve(k3d::uint_t patch, k3d::uint_t v)
 		{
 			try
 			{
@@ -152,13 +152,13 @@ namespace module
 					return nurbs_curve();
 				}
 
-				const size_t points_begin = m_patch_first_points->at(patch) + v * m_patch_u_point_counts->at(patch);
-				const size_t point_step = 1;
-				const size_t points_end = points_begin + m_patch_u_point_counts->at(patch);
+				const k3d::uint_t points_begin = m_patch_first_points->at(patch) + v * m_patch_u_point_counts->at(patch);
+				const k3d::uint_t point_step = 1;
+				const k3d::uint_t points_end = points_begin + m_patch_u_point_counts->at(patch);
 
-				const size_t knot_count_u = m_patch_u_point_counts->at(patch) + m_patch_u_orders->at(patch);
+				const k3d::uint_t knot_count_u = m_patch_u_point_counts->at(patch) + m_patch_u_orders->at(patch);
 
-				const size_t knots_begin = m_patch_u_first_knots->at(patch);
+				const k3d::uint_t knots_begin = m_patch_u_first_knots->at(patch);
 
 				for (int i = knots_begin; i < knots_begin + knot_count_u; i++)
 				{
@@ -185,7 +185,7 @@ namespace module
 			}
 		}
 
-		nurbs_patch nurbs_patch_modifier::extract_patch(size_t patch)
+		nurbs_patch nurbs_patch_modifier::extract_patch(k3d::uint_t patch)
 		{
 			try
 			{
@@ -256,7 +256,7 @@ namespace module
 			m_patch_v_knots->insert(m_patch_v_knots->end(), patch.v_knots.begin(), patch.v_knots.end());
 		}
 
-		size_t nurbs_patch_modifier::insert_point(const k3d::point3& point, bool shared)
+		k3d::uint_t nurbs_patch_modifier::insert_point(const k3d::point3& point, bool shared)
 		{
 			try
 			{
@@ -274,7 +274,8 @@ namespace module
 
 				if (found < 0 || !shared)
 				{
-					//MY_DEBUG << "Need to add the point to mesh" << std::endl;
+					MY_DEBUG << "Need to add the point to mesh " << point[0] << " x " << point[1] << " x " << point[2] << std::endl;
+
 					//we need to insert the point
 					m_mesh_points->push_back(point);
 					m_point_selections->push_back(0.0);
@@ -294,7 +295,7 @@ namespace module
 			}
 		}
 
-		void nurbs_patch_modifier::patch_u_knot_insertion(size_t patch, double u, size_t multiplicity)
+		void nurbs_patch_modifier::patch_u_knot_insertion(k3d::uint_t patch, double u, k3d::uint_t multiplicity)
 		{
 			try
 			{
@@ -371,7 +372,7 @@ namespace module
 			}
 		}
 
-		void nurbs_patch_modifier::patch_v_knot_insertion(size_t patch, double v, size_t multiplicity)
+		void nurbs_patch_modifier::patch_v_knot_insertion(k3d::uint_t patch, double v, k3d::uint_t multiplicity)
 		{
 			try
 			{
@@ -452,7 +453,7 @@ namespace module
 			}
 		}
 
-		void nurbs_patch_modifier::patch_u_degree_elevation(size_t patch, size_t degree)
+		void nurbs_patch_modifier::patch_u_degree_elevation(k3d::uint_t patch, k3d::uint_t degree)
 		{
 			try
 			{
@@ -536,7 +537,7 @@ namespace module
 			}
 		}
 
-		void nurbs_patch_modifier::patch_v_degree_elevation(size_t patch, size_t degree)
+		void nurbs_patch_modifier::patch_v_degree_elevation(k3d::uint_t patch, k3d::uint_t degree)
 		{
 			try
 			{
@@ -620,7 +621,7 @@ namespace module
 			}
 		}
 
-		void nurbs_patch_modifier::split_patch_u(size_t patch, double u)
+		void nurbs_patch_modifier::split_patch_u(k3d::uint_t patch, double u)
 		{
 			try
 			{
@@ -725,7 +726,7 @@ namespace module
 			}
 		}
 
-		void nurbs_patch_modifier::split_patch_v(size_t patch, double v)
+		void nurbs_patch_modifier::split_patch_v(k3d::uint_t patch, double v)
 		{
 			try
 			{
@@ -855,9 +856,9 @@ namespace module
 			return selection;
 		}
 
-		std::vector<size_t> nurbs_patch_modifier::get_selected_patches()
+		std::vector<k3d::uint_t> nurbs_patch_modifier::get_selected_patches()
 		{
-			std::vector<size_t> selection;
+			std::vector<k3d::uint_t> selection;
 			for (int i = 0; i < m_patch_selection->size(); i++)
 			{
 				if (m_patch_selection->at(i) > 0.0)
@@ -869,7 +870,7 @@ namespace module
 			return selection;
 		}
 
-		void nurbs_patch_modifier::add_trim_curve(size_t patch, size_t curve, double scale, double offset_u, double offset_v)
+		void nurbs_patch_modifier::add_trim_curve(k3d::uint_t patch, k3d::uint_t curve, double scale, double offset_u, double offset_v)
 		{
 			try{
 			    MY_DEBUG << "Adding trim curve: patch=" << patch << " curve=" << curve << std::endl;
@@ -919,7 +920,7 @@ namespace module
 			}
 		}
 
-		void nurbs_patch_modifier::select_patch(size_t patch)
+		void nurbs_patch_modifier::select_patch(k3d::uint_t patch)
 		{
 		    for(int i = 0; i < get_patch_count(); i++)
 		    {
@@ -930,7 +931,7 @@ namespace module
 		    }
 		}
 
-		k3d::point4 nurbs_patch_modifier::patch_point(size_t patch, double u, double v)
+		k3d::point4 nurbs_patch_modifier::patch_point(k3d::uint_t patch, double u, double v)
 		{
 		    try
 		    {
@@ -981,7 +982,7 @@ namespace module
 		    }
 		}
 
-		void nurbs_patch_modifier::polygonize_patch(size_t patch, size_t segments, bool delete_orig, bool flip)
+		void nurbs_patch_modifier::polygonize_patch(k3d::uint_t patch, k3d::uint_t segments, bool delete_orig, bool flip)
 		{
 		    MY_DEBUG << "Creating a polygonal representation of patch=" << patch << " with segments=" << segments << std::endl;
 
@@ -1032,7 +1033,7 @@ namespace module
 		    }
 		}
 
-		void nurbs_patch_modifier::delete_patch(size_t patch_idx)
+		void nurbs_patch_modifier::delete_patch(k3d::uint_t patch_idx)
 		{
 		    MY_DEBUG << "Deleting patch " << patch_idx << std::endl;
             try
@@ -1083,7 +1084,7 @@ namespace module
             }
 		}
 
-		void nurbs_patch_modifier::extrude_patch(size_t patch, k3d::axis axis, double distance, bool cap)
+		void nurbs_patch_modifier::extrude_patch(k3d::uint_t patch, k3d::axis axis, double distance, bool cap)
 		{
 		    try
 		    {

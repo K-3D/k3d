@@ -81,7 +81,7 @@ namespace module
 
 				nurbs_curve_modifier mod(Output);
 
-				std::vector<unsigned int> my_curves = mod.selected_curves();
+				std::vector<k3d::uint_t> my_curves = mod.selected_curves();
 
 				if( my_curves.size() == 0 )
 				{

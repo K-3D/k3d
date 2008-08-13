@@ -81,7 +81,7 @@ namespace module
 
 				nurbs_patch_modifier mod(Output);
 
-				std::vector<unsigned int> my_patches = mod.get_selected_patches();
+				std::vector<k3d::uint_t> my_patches = mod.get_selected_patches();
 
 				if( my_patches.size() == 0 )
 				{

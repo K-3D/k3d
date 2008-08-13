@@ -65,8 +65,8 @@ namespace module
 
 		///A nurbs patch data struct
 		typedef struct nurbs_patch{
-			size_t u_order;
-			size_t v_order;
+			k3d::uint_t u_order;
+			k3d::uint_t v_order;
 			k3d::mesh::knots_t u_knots;
 			k3d::mesh::knots_t v_knots;
 			k3d::mesh::weights_t point_weights;
@@ -87,30 +87,30 @@ namespace module
 				///\param scale Scales the coordinates of the trim curve
 				///\param offset_u Offset the trim curve
 				///\param offset_v Offset the trim curve
-				void add_trim_curve(size_t patch, size_t curve, double scale, double offset_u, double offset_v);
+				void add_trim_curve(k3d::uint_t patch, k3d::uint_t curve, double scale, double offset_u, double offset_v);
 
                 ///Deletes the selected patch from this mesh, unused points will be removed
-                void delete_patch(size_t patch);
+                void delete_patch(k3d::uint_t patch);
 
 				///Extract the patch with the given index, returns this patch
-				nurbs_patch extract_patch(size_t patch);
+				nurbs_patch extract_patch(k3d::uint_t patch);
 
 				///Extract a curve from a patch in u direction and return it
 				///\param patch The patch where we want the curve from
 				///\param v Which of the v curves do we want? Must be smaller than patch_v_point_counts
-				nurbs_curve extract_u_curve(size_t patch, size_t v);
+				nurbs_curve extract_u_curve(k3d::uint_t patch, k3d::uint_t v);
 
 				///Extract a curve from a patch in v direction and return it
 				///\param patch The patch where we want the curve from
 				///\param u Which of the u curves do we want? Must be smaller than patch_u_point_counts
-				nurbs_curve extract_v_curve(size_t patch, size_t u);
+				nurbs_curve extract_v_curve(k3d::uint_t patch, k3d::uint_t u);
 
                 ///Extrude the selected surface along the given axis
                 ///\param patch the patch to extrude
                 ///\param axis Along which Axis shall we extrude
                 ///\param distance How far to extrude the face
                 ///\param cap Whether to have caps at both ends or just at one
-                void extrude_patch(size_t patch, k3d::axis axis, double distance, bool cap);
+                void extrude_patch(k3d::uint_t patch, k3d::axis axis, double distance, bool cap);
 
 				///Returns the number of patches in this mesh
 				int get_patch_count();
@@ -121,63 +121,63 @@ namespace module
 				void insert_patch(const nurbs_patch& patch, bool share_points);
 
                 ///Returns the evaluated point on the surface at (u,v)
-                k3d::point4 patch_point(size_t patch, double u, double v);
+                k3d::point4 patch_point(k3d::uint_t patch, double u, double v);
 
 				///Inserts a knot into all u curves of the patch
 				///\param patch The patch we're going to work on
 				///\param u The u value (between 0.0 and 1.0) where to insert the knot
 				///\param multiplicity How often we want to insert that knot
-				void patch_u_knot_insertion(size_t patch, double u, size_t multiplicity);
+				void patch_u_knot_insertion(k3d::uint_t patch, double u, k3d::uint_t multiplicity);
 
 				///Inserts a knot into all v curves of the patch
 				///\param patch The patch we're going to work on
 				///\param v The v value (between 0.0 and 1.0) where to insert the knot
 				///\param multiplicity How often we want to insert that knot
-				void patch_v_knot_insertion(size_t patch, double v, size_t multiplicity);
+				void patch_v_knot_insertion(k3d::uint_t patch, double v, k3d::uint_t multiplicity);
 
 				///DegreeElevates all u-curves to the given amount
 				///\param patch The patch to degree elevate
 				///\param degree If the patch had u-degree 2 and you specify 2 here, it'll get a new degree of 4
-				void patch_u_degree_elevation(size_t patch, size_t degree);
+				void patch_u_degree_elevation(k3d::uint_t patch, k3d::uint_t degree);
 
 				///DegreeElevates all v-curves to the given amount
 				///\param patch The patch to degree elevate
 				///\param degree If the patch had u-degree 2 and you specify 2 here, it'll get a new degree of 4
-				void patch_v_degree_elevation(size_t patch, size_t degree);
+				void patch_v_degree_elevation(k3d::uint_t patch, k3d::uint_t degree);
 
 				///Create a polygonal grid representing the NurbsPatch
 				///\param patch
 				///\param segments How many segments in each direction, if this is n then the resulting patch is n*n
 				///\param delete_orig Whether to delete the former patch
-				void polygonize_patch(size_t patch, size_t segments, bool delete_orig, bool flip);
+				void polygonize_patch(k3d::uint_t patch, k3d::uint_t segments, bool delete_orig, bool flip);
 
                 ///Selects this patch and deselects all others
                 ///\param patch The patch to select
-                void select_patch(size_t patch);
+                void select_patch(k3d::uint_t patch);
 
 				///Split a patch at the seleted u-value (so itgets split in u-direction)
 				///adds a new patch to the end
 				///\param patch
 				///\param u
-				void split_patch_u(size_t patch, double u);
+				void split_patch_u(k3d::uint_t patch, double u);
 
 				///Split a patch at the seleted v-value (so itgets split in v-direction)
 				///adds a new patch to the end
 				///\param patch
 				///\param v
-				void split_patch_v(size_t patch, double u);
+				void split_patch_v(k3d::uint_t patch, double u);
 
                 ///Returns the index of the selected patch
                 int get_selected_patch();
 
                 ///Returns the indices of the selected patches
-                std::vector<size_t> get_selected_patches();
+                std::vector<k3d::uint_t> get_selected_patches();
 
 			private:
 				///Adds this point to the mesh's points_t instance, and returns the index to its position
 				///\param point The point to add
 				///\param shared If this is true then we'll try to use an existing point at the same position
-				size_t insert_point(const k3d::point3& point, bool shared);
+				k3d::uint_t insert_point(const k3d::point3& point, bool shared);
 
 				k3d::mesh *m_instance;
 				k3d::mesh::nurbs_patches_t *m_nurbs_patches;
