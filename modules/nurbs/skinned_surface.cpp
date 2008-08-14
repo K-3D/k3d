@@ -76,15 +76,15 @@ namespace module
 
 				merge_selection(m_mesh_selection.pipeline_value(), Output);
 
-				std::vector<size_t> curves;
+				std::vector<k3d::uint_t> curves;
 
-				const size_t group_begin = 0;
-				const size_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
-				for(size_t group = group_begin; group != group_end; ++group)
+				const k3d::uint_t group_begin = 0;
+				const k3d::uint_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
+				for(k3d::uint_t group = group_begin; group != group_end; ++group)
 				{
-					const size_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
-					const size_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
-					for(size_t curve = curve_begin; curve != curve_end; ++curve)
+					const k3d::uint_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
+					const k3d::uint_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
+					for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 					{
 						if((*Output.nurbs_curve_groups->curve_selection)[curve] > 0.0)
                             curves.push_back(curve);

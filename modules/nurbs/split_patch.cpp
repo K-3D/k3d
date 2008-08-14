@@ -79,7 +79,7 @@ namespace module
 
 				nurbs_patch_modifier mod(Output);
 
-				size_t my_patch = mod.get_selected_patch();
+				k3d::uint_t my_patch = mod.get_selected_patch();
 
 				if( my_patch < 0 )
 				{

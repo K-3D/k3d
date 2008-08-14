@@ -48,7 +48,7 @@ namespace module
 
 	namespace nurbs
 	{
-		void connect_at_points(k3d::mesh& Mesh, size_t curve1, size_t curve2, size_t point1, size_t point2);
+		void connect_at_points(k3d::mesh& Mesh, k3d::uint_t curve1, k3d::uint_t curve2, k3d::uint_t point1, k3d::uint_t point2);
 		class connect_curves :
 			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 		{
@@ -74,25 +74,25 @@ namespace module
 
 				merge_selection(m_mesh_selection.pipeline_value(), Output);
 
-				std::vector<size_t> curves;
-				std::vector<size_t> points;
+				std::vector<k3d::uint_t> curves;
+				std::vector<k3d::uint_t> points;
 
-				const size_t group_begin = 0;
-				const size_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
-				for(size_t group = group_begin; group != group_end; ++group)
+				const k3d::uint_t group_begin = 0;
+				const k3d::uint_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
+				for(k3d::uint_t group = group_begin; group != group_end; ++group)
 				{
-					const size_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
-					const size_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
-					for(size_t curve = curve_begin; curve != curve_end; ++curve)
+					const k3d::uint_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
+					const k3d::uint_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
+					for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 					{
-						const size_t curve_point_begin = (*Output.nurbs_curve_groups->curve_first_points)[curve];
-						const size_t curve_point_end = curve_point_begin + (*Output.nurbs_curve_groups->curve_point_counts)[curve];
+						const k3d::uint_t curve_point_begin = (*Output.nurbs_curve_groups->curve_first_points)[curve];
+						const k3d::uint_t curve_point_end = curve_point_begin + (*Output.nurbs_curve_groups->curve_point_counts)[curve];
 
 						const k3d::mesh::weights_t& orig_weights = *Output.nurbs_curve_groups->curve_point_weights;
 
 						boost::shared_ptr<k3d::mesh::weights_t> curve_point_weights ( new k3d::mesh::weights_t() );
 
-						for(size_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+						for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
 						{
 							if((*Output.point_selection)[(*Output.nurbs_curve_groups->curve_points)[curve_point]])
 							{

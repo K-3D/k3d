@@ -84,17 +84,17 @@ public:
 
 
             //loop through all curves and check for selected points
-            const size_t group_begin = 0;
-            const size_t group_end = group_begin + (*groups->first_curves).size();
-            for(size_t group = group_begin; group != group_end; ++group)
+            const k3d::uint_t group_begin = 0;
+            const k3d::uint_t group_end = group_begin + (*groups->first_curves).size();
+            for(k3d::uint_t group = group_begin; group != group_end; ++group)
             {
-                const size_t curve_begin = (*groups->first_curves)[group];
-                const size_t curve_end = curve_begin + (*groups->curve_counts)[group];
-                for(size_t curve = curve_begin; curve != curve_end; ++curve)
+                const k3d::uint_t curve_begin = (*groups->first_curves)[group];
+                const k3d::uint_t curve_end = curve_begin + (*groups->curve_counts)[group];
+                for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
                 {
-                    const size_t curve_point_begin = (*groups->curve_first_points)[curve];
-                    const size_t curve_point_end = curve_point_begin + (*groups->curve_point_counts)[curve];
-                    for(size_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+                    const k3d::uint_t curve_point_begin = (*groups->curve_first_points)[curve];
+                    const k3d::uint_t curve_point_end = curve_point_begin + (*groups->curve_point_counts)[curve];
+                    for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
                         output_weights[curve_point] = k3d::mix(input_weights[curve_point], weight, (*Output.point_selection)[(*groups->curve_points)[curve_point]]);
                 }
             }

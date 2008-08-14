@@ -130,11 +130,13 @@ namespace module
 
 				void reset_properties()
 				{
+				    MY_DEBUG << "Reset Called" << std::endl;
 					m_knot_vector.set_value(extract_knots(*m_input_mesh.pipeline_value(), m_curve));
 				}
 
 				void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 				{
+				    MY_DEBUG << "Create Called" << std::endl;
 					Output = Input;
 
 					if (!k3d::validate_nurbs_curve_groups(Output))
@@ -155,12 +157,15 @@ namespace module
 					const k3d::mesh::knots_t& knots = m_knot_vector.pipeline_value();
 
 					if (!insert_knots(knots, Output, m_curve))
+					{
 						k3d::log() << error << "Invalid Knot Vector on curve " << m_curve << std::endl;
+					}
 				}
 
 
 				void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 				{
+				    MY_DEBUG << "Update Called" << std::endl;
 					Output = Input;
 
 					if (!k3d::validate_nurbs_curve_groups(Output))
@@ -206,10 +211,10 @@ namespace module
 					const k3d::mesh::knots_t& knots = *groups.curve_knots;
 					k3d::mesh::knots_t curve_knots;
 
-					const size_t curve_knots_begin = (*groups.curve_first_knots)[curve];
-					const size_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];
+					const k3d::uint_t curve_knots_begin = (*groups.curve_first_knots)[curve];
+					const k3d::uint_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];
 
-					for (size_t i = curve_knots_begin; i < curve_knots_end; i++)
+					for (k3d::uint_t i = curve_knots_begin; i < curve_knots_end; i++)
 						curve_knots.push_back( knots[i] );
 
 					return curve_knots;
@@ -220,13 +225,13 @@ namespace module
 					k3d::mesh::nurbs_curve_groups_t& groups = *k3d::make_unique(Output.nurbs_curve_groups);
 					k3d::mesh::knots_t& knots = *k3d::make_unique(groups.curve_knots);
 
-					const size_t curve_knots_begin = (*groups.curve_first_knots)[curve];
-					const size_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];
+					const k3d::uint_t curve_knots_begin = (*groups.curve_first_knots)[curve];
+					const k3d::uint_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];
 
 					if (curve_knots.size() != curve_knots_end - curve_knots_begin)
 						return false;
 
-					for (size_t i = curve_knots_begin; i < curve_knots_end; i++)
+					for (k3d::uint_t i = curve_knots_begin; i < curve_knots_end; i++)
 						knots[i] = curve_knots[i-curve_knots_begin];
 
 					return true;
