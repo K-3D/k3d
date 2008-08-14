@@ -36,6 +36,7 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iproperty.h>
+#include <k3dsdk/ireset_properties.h>
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
@@ -195,6 +196,10 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 				k3d::mesh_selection::select_null());
 		}
 	}
+	
+	// Give nodes a chance to initialize their property values based on their inputs, if any ...
+	if(k3d::ireset_properties* const reset_properties = dynamic_cast<k3d::ireset_properties*>(modifier))
+		reset_properties->reset_properties();
 
 	return modifier;
 }
@@ -259,6 +264,9 @@ void modify_selected_meshes(document_state& DocumentState, k3d::iplugin_factory*
 		}
 		document.pipeline().set_dependencies(dependencies);
 		k3d::delete_nodes(document, nodes_to_delete);
+		// Give nodes a chance to initialize their property values based on their inputs, if any ...
+		if(k3d::ireset_properties* const reset_properties = dynamic_cast<k3d::ireset_properties*>(multi_sink))
+			reset_properties->reset_properties();
 		DocumentState.view_node_properties_signal().emit(multi_sink);
 	}
 	else
