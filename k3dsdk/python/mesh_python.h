@@ -83,9 +83,9 @@ public:
 
 	const std::string repr();
 	const std::string str();
-
-	static void define_class();
 };
+
+void define_namespace_mesh();
 
 } // namespace python
 

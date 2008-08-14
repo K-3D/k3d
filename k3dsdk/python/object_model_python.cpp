@@ -437,13 +437,13 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_vector3();
 	define_namespace_euler();
 	define_namespace_log();
+	define_namespace_mesh();
 	define_namespace_mime();
 	define_namespace_parallel();
 	define_namespace_plugin();
 	define_namespace_resource();
 	define_namespace_ri();
 	euler_angles::define_class();
-	mesh::define_class();
 	node::define_class();
 
 	def("batch_mode", k3d::batch_mode,
