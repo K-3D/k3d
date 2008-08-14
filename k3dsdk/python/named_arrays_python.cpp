@@ -101,7 +101,7 @@ static object create_array(named_arrays_wrapper& Self, const string_t& Name, con
 	boost::python::object result;
 	boost::mpl::for_each<k3d::named_array_types>(named_arrays_array_factory(Name, Type, result, Self.wrapped()));
 	if(result == boost::python::object())
-		throw std::runtime_error("Cannot create array [" + Name + "] with unknown type [" + Name + "]");
+		throw std::runtime_error("Cannot create array [" + Name + "] with unknown type [" + Type + "]");
 
 	return result;
 }
