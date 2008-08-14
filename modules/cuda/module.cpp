@@ -45,6 +45,7 @@ extern k3d::iplugin_factory& cuda_deformation_transform_points_asynchronous_fact
 extern k3d::iplugin_factory& cuda_mesh_subdivide_edges_factory();
 extern k3d::iplugin_factory& cuda_mesh_k3d_to_cuda_converter_factory();
 extern k3d::iplugin_factory& cuda_mesh_cuda_to_k3d_converter_factory();
+extern k3d::iplugin_factory& cuda_mesh_poly_grid_factory();
 
 } // namespace cuda
 
@@ -68,6 +69,7 @@ K3D_MODULE_START(Registry)
     Registry.register_factory(module::cuda::cuda_mesh_subdivide_edges_factory());
     Registry.register_factory(module::cuda::cuda_mesh_k3d_to_cuda_converter_factory());
     Registry.register_factory(module::cuda::cuda_mesh_cuda_to_k3d_converter_factory());
-	
-K3D_MODULE_END 
+    Registry.register_factory(module::cuda::cuda_mesh_poly_grid_factory());
+
+K3D_MODULE_END
 

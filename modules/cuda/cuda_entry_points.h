@@ -179,4 +179,21 @@ extern "C" K3D_CUDA_DECLSPEC unsigned int edge_index_calculator_entry (
 															int first_new_point_index
 																);
 
+extern "C" K3D_CUDA_DECLSPEC void create_grid_structure_kernel_entry (
+												unsigned int* pdev_face_first_loops,
+												unsigned int* pdev_face_loop_count,
+												unsigned int* pdev_loop_first_edge,
+												unsigned int* pdev_edge_point,
+												unsigned int* pdev_clockwise_edge,
+												unsigned int rows,
+												unsigned int columns);
+
+extern "C" K3D_CUDA_DECLSPEC void calculate_grid_points_kernel_entry (
+												float* pdev_point_and_selection,
+												float* phost_x,
+												float* phost_y,
+												unsigned int rows,
+												unsigned int columns
+												);
+
 #endif // !CUDA_ENTRY_POINTS_H

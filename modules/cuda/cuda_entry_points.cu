@@ -826,3 +826,67 @@ extern "C" unsigned int edge_index_calculator_entry (
 	*phost_edge_list_size = host_sizes[1];
 	return host_sizes[0];
 }
+
+/**
+ * entry point for setting up a polygrid on the device
+ */
+extern "C" void create_grid_structure_kernel_entry (
+												unsigned int* pdev_face_first_loops,
+												unsigned int* pdev_face_loop_count,
+												unsigned int* pdev_loop_first_edge,
+												unsigned int* pdev_edge_point,
+												unsigned int* pdev_clockwise_edge,
+												unsigned int rows,
+												unsigned int columns)
+{
+	dim3 threads_per_block(8, 8);
+
+	dim3 blocks_per_grid(iDivUp(rows, 8), iDivUp(columns, 8));
+
+	create_grid_structure_kernel<<< blocks_per_grid, threads_per_block >>> (
+												pdev_face_first_loops,
+												pdev_face_loop_count,
+												pdev_loop_first_edge,
+												(uint4*) pdev_edge_point,
+												(uint4*) pdev_clockwise_edge,
+												rows,
+												columns );
+	checkLastCudaError();
+
+}
+
+/**
+ * Entry point for calculating polyGrid point positions
+ */
+extern "C" void calculate_grid_points_kernel_entry (
+												float* pdev_point_and_selection,
+												float* phost_x,
+												float* phost_y,
+												unsigned int rows,
+												unsigned int columns
+												)
+{
+	dim3 threads_per_block(8, 8);
+
+	dim3 blocks_per_grid(iDivUp(rows, 8), iDivUp(columns, 8));
+
+	float3 x;
+	x.x = phost_x[0];
+	x.y = phost_x[1];
+	x.z = phost_x[2];
+	float3 y;
+	y.x = phost_y[0];
+	y.y = phost_y[1];
+	y.z = phost_y[2];
+
+	calculate_grid_points_kernel <<< blocks_per_grid, threads_per_block >>> (
+															(float4*) pdev_point_and_selection,
+															x,
+															y,
+															rows,
+															columns
+															);
+	checkLastCudaError();
+
+}
+

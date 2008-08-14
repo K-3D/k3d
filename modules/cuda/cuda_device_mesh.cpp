@@ -25,13 +25,25 @@
 
 #include "cuda_device_mesh.h"
 
-/// Constructor
-cuda_device_mesh::cuda_device_mesh ( const k3d::mesh& mesh ):
-    m_p_host_mesh(&mesh),
-    m_cuda_device_polyhedra(*mesh.polyhedra)
+/// Constructors
+cuda_device_mesh::cuda_device_mesh ( ):
+	m_p_host_mesh(0),
+	m_cuda_device_polyhedra()
 {
-    pdev_points_and_selection = 0;
+	pdev_points_and_selection = 0;
     m_number_of_points = 0;
+}
+
+cuda_device_mesh::cuda_device_mesh ( const k3d::mesh& mesh ):
+	m_p_host_mesh(&mesh),
+	m_cuda_device_polyhedra()
+{
+	if ( mesh.polyhedra )
+	{
+		m_cuda_device_polyhedra.set_polyhedra(*mesh.polyhedra);
+	}
+    pdev_points_and_selection = 0;
+    m_number_of_points = mesh.points->size();
 }
 
 /// Destructor - frees the allocated device pointers
@@ -71,7 +83,6 @@ void cuda_device_mesh::copy_to_device( k3d::uint32_t what_to_copy )
     {
     	bool copy_points = what_to_copy & MESH_POINTS;
         bool copy_selection = what_to_copy & MESH_SELECTION;
-        m_number_of_points = m_p_host_mesh->points->size();
     	// allocate the memory for the points and the point selection
     	allocate_device_memory((void**)&pdev_points_and_selection, (m_number_of_points)*4*sizeof(float));
 
@@ -189,11 +200,31 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh, k3d::uint3
         m_cuda_device_polyhedra.copy_from_device(*(p_output_mesh->polyhedra), what_to_copy);
 	}
 
-	// TODO:  copy vertex data
-    p_output_mesh->vertex_data = m_p_host_mesh->vertex_data;
-
     synchronize_threads();
     free ( host_points_and_selection );
+}
+
+/**
+ * Allocate the memory for the mesh on the device - good for sources and output meshes
+ */
+void cuda_device_mesh::allocate_on_device( k3d::uint32_t what_to_allocate )
+{
+	if ( what_to_allocate & (MESH_POINTS + MESH_SELECTION) )
+	{
+		bool allocate_points = what_to_allocate & MESH_POINTS;
+		bool allocate_selection = what_to_allocate & MESH_SELECTION;
+		// allocate the memory for the points and the point selection
+		allocate_device_memory((void**)&pdev_points_and_selection, (m_number_of_points)*4*sizeof(float));
+	}
+
+	// remember to also copy the device versions of polyhedra etc
+	if ( what_to_allocate & ALL_POLYHEDRA_INFO )
+	{
+		m_cuda_device_polyhedra.allocate_on_device( what_to_allocate );
+	}
+
+	// free the temporary host data
+	synchronize_threads();
 }
 
 /**

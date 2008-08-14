@@ -42,28 +42,51 @@ inline void copy_from_device_to_host_uint_64_bit_check ( void* host_pointer, con
 #endif
 }
 
-/// Constructor
+/// Constructors
+cuda_device_polyhedra::cuda_device_polyhedra ( ):
+    m_p_input_polyhedra(0)
+{
+    pdev_per_polygon_first_face = 0;
+    pdev_per_polygon_face_count = 0;
+    pdev_per_polygon_types = 0;
+
+    m_number_of_polygons = 0;
+
+    pdev_per_face_first_loops = 0;
+    pdev_per_face_loop_count = 0;
+    pdev_per_face_selection = 0;
+
+	m_number_of_faces = 0;
+
+    pdev_per_loop_first_edge = 0;
+	m_number_of_loops = 0;
+
+    pdev_per_edge_point = 0;
+    pdev_per_edge_clockwise_edge = 0;
+    pdev_per_edge_selection = 0;
+
+    m_number_of_edges = 0;
+
+}
+
 cuda_device_polyhedra::cuda_device_polyhedra ( const k3d::mesh::polyhedra_t& host_polyhedra ):
     m_p_input_polyhedra(&host_polyhedra)
 {
     pdev_per_polygon_first_face = 0;
     pdev_per_polygon_face_count = 0;
     pdev_per_polygon_types = 0;
-    m_number_of_polygons = m_p_input_polyhedra->first_faces->size();
 
     pdev_per_face_first_loops = 0;
     pdev_per_face_loop_count = 0;
     pdev_per_face_selection = 0;
-    m_number_of_faces = m_p_input_polyhedra->face_first_loops->size();
 
     pdev_per_loop_first_edge = 0;
-    m_number_of_loops = m_p_input_polyhedra->loop_first_edges->size();
 
     pdev_per_edge_point = 0;
     pdev_per_edge_clockwise_edge = 0;
     pdev_per_edge_selection = 0;
-    m_number_of_edges = m_p_input_polyhedra->edge_points->size();
 
+    set_polyhedra( host_polyhedra );
 }
 
 /// Destructor - free the allocated device pointers
@@ -103,6 +126,47 @@ cuda_device_polyhedra::~cuda_device_polyhedra ()
 	m_number_of_edges = 0;
 
 	m_p_input_polyhedra = 0;
+
+}
+
+void cuda_device_polyhedra::set_polyhedra( const k3d::mesh::polyhedra_t& host_polyhedra )
+{
+	m_p_input_polyhedra = &host_polyhedra;
+	try
+	{
+		m_number_of_polygons = m_p_input_polyhedra->first_faces->size();
+	}
+	catch (...)
+	{
+		m_number_of_polygons = 0;
+	}
+
+	try
+	{
+		m_number_of_faces = m_p_input_polyhedra->face_first_loops->size();
+	}
+	catch (...)
+	{
+		m_number_of_faces = 0;
+	}
+
+	try
+	{
+		m_number_of_loops = m_p_input_polyhedra->loop_first_edges->size();
+	}
+	catch (...)
+	{
+		m_number_of_loops = 0;
+	}
+
+	try
+	{
+		m_number_of_edges = m_p_input_polyhedra->edge_points->size();
+	}
+	catch (...)
+	{
+		m_number_of_edges = 0;
+	}
 
 }
 
@@ -333,17 +397,43 @@ void cuda_device_polyhedra::copy_from_device(const k3d::mesh::polyhedra_t& desti
         copy_from_device_to_host_uint_64_bit_check((void*)&(p_output_polyhedra->face_counts->front()), (const void*)pdev_per_polygon_face_count, m_number_of_polygons*sizeof(k3d::uint32_t));
         copy_from_device_to_host((void*)&(p_output_polyhedra->types->front()), (const void*)pdev_per_polygon_types, m_number_of_polygons*sizeof(int32_t));
 
-        // TODO:  constant_data, face_materlials, face_varying_data
-        p_output_polyhedra->face_materials = m_p_input_polyhedra->face_materials;
-        p_output_polyhedra->constant_data = m_p_input_polyhedra->constant_data;
-        p_output_polyhedra->uniform_data = m_p_input_polyhedra->uniform_data;
-        p_output_polyhedra->face_varying_data = m_p_input_polyhedra->face_varying_data;
     }
 
     synchronize_threads();
     free ( face_selection_temp );
     free ( edge_selection_temp );
     //k3d::log() << debug << "cuda_device_polyhedra::copy_from_device::end" << std::endl;
+}
+
+void cuda_device_polyhedra::allocate_on_device( k3d::uint32_t what_to_allocate )
+{
+    if ( what_to_allocate & POLYHEDRA_ALL_POLYGONS )
+    {
+        allocate_device_memory((void**)&pdev_per_polygon_first_face, m_number_of_polygons*sizeof(k3d::uint32_t));
+        allocate_device_memory((void**)&pdev_per_polygon_face_count, m_number_of_polygons*sizeof(k3d::uint32_t));
+        allocate_device_memory((void**)&pdev_per_polygon_types, m_number_of_polygons*sizeof(int32_t));
+    }
+
+    if ( what_to_allocate & POLYHEDRA_ALL_FACES )
+    {
+        allocate_device_memory((void**)&pdev_per_face_first_loops, m_number_of_faces*sizeof(k3d::uint32_t));
+        allocate_device_memory((void**)&pdev_per_face_loop_count, m_number_of_faces*sizeof(k3d::uint32_t));
+        allocate_device_memory((void**)&pdev_per_face_selection, m_number_of_faces*sizeof(float));
+    }
+
+    if ( what_to_allocate & POLYHEDRA_ALL_LOOPS )
+    {
+        allocate_device_memory((void**)&pdev_per_loop_first_edge, m_number_of_loops*sizeof(k3d::uint32_t));
+    }
+
+    if ( what_to_allocate & POLYHEDRA_ALL_EDGES )
+    {
+        allocate_device_memory((void**)&pdev_per_edge_point, m_number_of_edges*sizeof(k3d::uint32_t));
+        allocate_device_memory((void**)&pdev_per_edge_clockwise_edge, m_number_of_edges*sizeof(k3d::uint32_t));
+        allocate_device_memory((void**)&pdev_per_edge_selection, m_number_of_edges*sizeof(float));
+    }
+
+    synchronize_threads();
 }
 
 /**
@@ -401,6 +491,11 @@ k3d::uint32_t* cuda_device_polyhedra::get_per_face_loop_counts_pointer()
 	return pdev_per_face_loop_count;
 }
 
+float* cuda_device_polyhedra::get_per_face_selection_pointer()
+{
+	return pdev_per_face_selection;
+}
+
 float* cuda_device_polyhedra::get_per_edge_selection_pointer()
 {
 	return pdev_per_edge_selection;
@@ -455,5 +550,24 @@ void cuda_device_polyhedra::resize_loops ( k3d::uint32_t new_number_of_loops, bo
  */
 void cuda_device_polyhedra::resize_faces ( k3d::uint32_t new_number_of_faces, bool clear )
 {
+	int new_faces_count = new_number_of_faces - m_number_of_faces;
 
+	if ( new_faces_count != 0 )
+	{
+		float* new_pdev_per_face_selection = 0;
+		k3d::uint32_t* new_pdev_per_face_first_loops = 0;
+		k3d::uint32_t* new_pdev_per_face_loop_count = 0;
+
+		// resize the device memory structures
+		resize_device_memory_block((void**)&new_pdev_per_face_selection, pdev_per_face_selection, new_number_of_faces*sizeof(float), m_number_of_faces*sizeof(float), clear);
+		resize_device_memory_block((void**)&new_pdev_per_face_first_loops, pdev_per_face_first_loops, new_number_of_faces*sizeof(k3d::uint32_t), m_number_of_faces*sizeof(k3d::uint32_t), clear);
+		resize_device_memory_block((void**)&new_pdev_per_face_loop_count, pdev_per_face_loop_count, new_number_of_faces*sizeof(k3d::uint32_t), m_number_of_faces*sizeof(k3d::uint32_t), clear);
+
+		// update the member pointers and number of edges
+		pdev_per_face_selection = new_pdev_per_face_selection;
+		pdev_per_face_first_loops = new_pdev_per_face_first_loops;
+		pdev_per_face_loop_count = new_pdev_per_face_loop_count;
+
+		m_number_of_faces = new_number_of_faces;
+	}
 }

@@ -30,6 +30,8 @@
 class cuda_device_mesh
 {
     public:
+    	/// Constructors
+    	cuda_device_mesh ( );
         cuda_device_mesh ( const k3d::mesh& host_mesh );
         ~cuda_device_mesh ();
 
@@ -38,6 +40,8 @@ class cuda_device_mesh
 
         void copy_to_device ( k3d::uint32_t what_to_copy = ALL_MESH_INFO );
         void copy_from_device ( k3d::mesh& destination_mesh, k3d::uint32_t what_to_copy = ALL_MESH_INFO );
+
+        void allocate_on_device ( k3d::uint32_t what_to_allocate = ALL_MESH_INFO );
 
         void output_debug_info ();
 

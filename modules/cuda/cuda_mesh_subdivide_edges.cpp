@@ -122,7 +122,8 @@ public:
         m_vertices(init_owner(*this) + init_name("vertices") + init_label(_("Vertices")) + init_description(_("Number of vertices to insert in each selected edge")) + init_value(1L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
         m_p_output_device_mesh(),
         m_p_input_device_mesh(),
-        m_pdev_edge_list(0)
+        m_pdev_edge_list(0),
+        m_edge_list_size(0)
     {
         m_vertices.changed_signal().connect(make_reset_mesh_slot());
         m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
@@ -143,6 +144,7 @@ public:
         	free_device_memory( (void*) m_pdev_edge_list );
         	synchronize_threads();
         	m_pdev_edge_list = 0;
+        	m_edge_list_size = 0;
         }
 
         // If there are no valid polyhedra, we give up

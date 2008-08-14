@@ -38,13 +38,17 @@ class cuda_device_polyhedra
 {
     public:
         /// Constructors
+    	cuda_device_polyhedra ( );
         cuda_device_polyhedra ( const k3d::mesh::polyhedra_t& host_polyhedra );
+
         /// Destructor
         ~cuda_device_polyhedra ();
 
+		void set_polyhedra( const k3d::mesh::polyhedra_t& host_polyhedra );
         void copy_to_device (  k3d::uint32_t what_to_copy = ALL_MESH_INFO  );
-        void copy_from_device ( k3d::mesh::polyhedra_t& destination_polyhedra,  k3d::uint32_t what_to_copy = ALL_MESH_INFO );
         void copy_from_device ( const k3d::mesh::polyhedra_t& destination_polyhedra,  k3d::uint32_t what_to_copy = ALL_MESH_INFO );
+
+        void allocate_on_device ( k3d::uint32_t what_to_allocate = ALL_MESH_INFO );
 
         void output_debug_info ();
 
@@ -55,6 +59,7 @@ class cuda_device_polyhedra
 
         k3d::uint32_t* get_per_face_first_loops_pointer();
         k3d::uint32_t* get_per_face_loop_counts_pointer();
+        float* get_per_face_selection_pointer();
 
         float* get_per_edge_selection_pointer();
 

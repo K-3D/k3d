@@ -917,5 +917,71 @@ printf("\n");
 	sizes[0] = edge_count;
 }
 
+/**
+ * Kernel to construct the mesh structure of the polyhedra
+ */
+__global__ void create_grid_structure_kernel (
+												unsigned int* face_first_loops,
+												unsigned int* face_loop_count,
+												unsigned int* loop_first_edge,
+												uint4* edge_point,
+												uint4* clockwise_edge,
+												unsigned int rows,
+												unsigned int columns
+												)
+{
+	unsigned int row_index = ( blockIdx.x * blockDim.x ) + threadIdx.x;
+	unsigned int col_index = ( blockIdx.y * blockDim.y ) + threadIdx.y;
+
+	if ( ( row_index < rows ) && (col_index < columns) )
+	{
+		unsigned int face_number = row_index * columns + col_index;
+		face_first_loops[face_number] = face_number;
+		face_loop_count[face_number] = 1;
+		loop_first_edge[face_number] = 4*face_number;
+
+		edge_point[face_number].x = face_number + row_index;
+		edge_point[face_number].y = face_number + row_index + 1;
+		edge_point[face_number].z = face_number + row_index + columns + 2;
+		edge_point[face_number].w = face_number + row_index + columns + 1;
+
+		clockwise_edge[face_number].x = 4*face_number + 1;
+		clockwise_edge[face_number].y = 4*face_number + 2;
+		clockwise_edge[face_number].z = 4*face_number + 3;
+		clockwise_edge[face_number].w = 4*face_number;
+
+	}
+
+}
+
+/**
+ * Kernel to calculate the point coordinates of a poly_grid
+ */
+__global__ void calculate_grid_points_kernel ( float4 *point_and_selection,
+												float3 x,
+												float3 y,
+												unsigned int rows,
+												unsigned int columns
+												)
+{
+	unsigned int row_index = ( blockIdx.x * blockDim.x ) + threadIdx.x;
+	unsigned int col_index = ( blockIdx.y * blockDim.y ) + threadIdx.y;
+
+	if ( ( row_index <= rows ) && (col_index <= columns) )
+	{
+		float row_percent = 0.5 - (float)row_index / (float)rows;
+		float col_percent = (float)col_index/(float)columns - 0.5;
+
+		unsigned int point_index = row_index*(columns+1) + col_index;
+
+		point_and_selection[point_index].x = col_percent * x.x + row_percent * y.x;
+		point_and_selection[point_index].y = col_percent * x.y + row_percent * y.y;
+		point_and_selection[point_index].z = col_percent * x.z + row_percent * y.z;
+		point_and_selection[point_index].w = 0;
+	}
+
+}
+
+
 #endif // #ifndef _CUDA_KERNELS_H_
 
