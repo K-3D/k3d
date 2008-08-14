@@ -506,7 +506,9 @@ void Implementation::buildGui()
   m_main_hpaned.add1(m_tool_tree_cont);
   m_toolbar.append(add_group);
   m_toolbar.append(remove_group);
-  m_tool_tree_cont.pack_start(m_toolbar, false, false, 0);
+
+  //TOOLBAR NEEDS SORTING OUT
+  //m_tool_tree_cont.pack_start(m_toolbar, false, false, 0);
 
   //Resize The Tree's Scroll Window To Fit Correctly
   m_tree_scrolled_window.set_size_request(220, -1);
