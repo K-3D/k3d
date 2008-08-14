@@ -1,5 +1,5 @@
-#ifndef K3DSDK_NAMED_ARRAYS_H
-#define K3DSDK_NAMED_ARRAYS_H
+#ifndef K3DSDK_NAMED_ARRAYS_PYTHON_H
+#define K3DSDK_NAMED_ARRAYS_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -20,31 +20,26 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "types.h"
+/** \file
+	\author Timothy M. Shead (tshead@k-3d.com)
+*/
 
-#include <boost/shared_ptr.hpp>
-#include <map>
-#include <vector>
+#include "interface_wrapper_python.h"
+#include <k3dsdk/named_arrays.h>
 
 namespace k3d
 {
 
-class array;
-
-/// Defines a heterogeneous collection of named, shared arrays.  Arrays in the collection are not length-constrained.
-/// For a collection of arrays that all have the same length, see attribute_arrays.  For a concrete list of the
-/// datatypes that can be stored using named_arrays, see k3d::named_array_types.
-class named_arrays :
-	public std::map<string_t, boost::shared_ptr<array> >
+namespace python
 {
-public:
-	/// Returns an object containing empty arrays with the same name and type as the originals.
-	named_arrays clone_types() const;
-	/// Returns an object containing deep copies of all the original arrays.
-	named_arrays clone() const;
-};
+
+typedef interface_wrapper<k3d::named_arrays> named_arrays_wrapper;
+
+void define_class_named_arrays();
+
+} // namespace python
 
 } // namespace k3d
 
-#endif // K3DSDK_NAMED_ARRAYS_H
+#endif // !K3DSDK_NAMED_ARRAYS_PYTHON_H
 
