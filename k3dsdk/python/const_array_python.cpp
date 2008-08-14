@@ -80,7 +80,7 @@ static void define_class_const_array(const char* const ClassName, const char* co
 }
 
 template<>
-static void define_class_const_array<const k3d::typed_array<k3d::imaterial*> >(const char* const ClassName, const char* const DocString)
+void define_class_const_array<const k3d::typed_array<k3d::imaterial*> >(const char* const ClassName, const char* const DocString)
 {
 	typedef const k3d::typed_array<k3d::imaterial*> array_type;
 
@@ -90,7 +90,7 @@ static void define_class_const_array<const k3d::typed_array<k3d::imaterial*> >(c
 }
 
 template<>
-static void define_class_const_array<const k3d::typed_array<k3d::inode*> >(const char* const ClassName, const char* const DocString)
+void define_class_const_array<const k3d::typed_array<k3d::inode*> >(const char* const ClassName, const char* const DocString)
 {
 	typedef const k3d::typed_array<k3d::inode*> array_type;
 

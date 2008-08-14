@@ -24,7 +24,7 @@
 #include <dae.h>
 #include <dae/daeDom.h>
 #include "intElements.h"
-#include <k3dsdk/gprim_factory.h>
+#include "gprim_factory.h"
 #include <iostream>
 #include <dom/domPolylist.h>
 #include <dom/domTriangles.h>
@@ -256,6 +256,28 @@ namespace io
 					1);
 			factory.add_point(ccst*vertex);
 		}
+
+		factory.add_texcoord(k3d::texture3(0,0,0),0);
+
+
+		//const k3d::mesh::indices_t& edge_points = Mesh.polyhedra->edge_points.get();
+
+		//k3d::mesh::named_arrays_t::const_iterator array_it = Output.polyhedra->face_varying_data.find(m_texcoord_set_name.pipeline_value());
+		//return_if_fail(array_it !=  Output.polyhedra->face_varying_data.end());
+		//return_if_fail(dynamic_cast< texcoord_array_t* >(array_it->second.get()));
+		//texcoord_array_t& texcoords = *dynamic_cast< texcoord_array_t* >(array_it->second.get());
+		
+		//k3d::matrix4 inv_matrix = inverse(m_input_matrix.pipeline_value());
+		//for(size_t edge = 0; edge<Output.polyhedra->edge_points->size(); ++edge)
+		{
+		//	k3d::point3 point = inv_matrix * (*Output.points.get())[edge_points[edge]];
+		//	texcoords[edge].n[0] = point.n[0];
+		//	texcoords[edge].n[1] = point.n[1];
+		//	texcoords[edge].n[2] = point.n[2];
+		}
+
+
+
 	}
 
 	intLight::intLight(domLight& Light, const k3d::matrix4& ccst)
