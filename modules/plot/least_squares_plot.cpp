@@ -309,7 +309,7 @@ public:
 			std::ostringstream o;
 			if (!(o << coefficients[func_index] ))
 				k3d::log() << error <<"Could Convert it " << std::endl;
-			// sumar cada valor
+			// Add every value
 			output_coefficients += o.str() + " ";
 		}
 		m_output_coefficients.set_value(output_coefficients);
