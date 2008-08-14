@@ -678,7 +678,9 @@ namespace module
                 k3d::mesh::weights_t::iterator weights_insert_at = curve_point_weights->begin() + curve_points_end[use1];
                 if(isOnePoint)
                 {
+                    weights_insert_at--;
                     *weights_insert_at = (*weights_insert_at + *weights_begin) / 2;
+                    weights_insert_at++;
                     weights_begin++;
                 }
 
@@ -741,8 +743,11 @@ namespace module
                 double a = *knots1_end;
                 if(isOnePoint)
                 {
-                    new_knots.push_back(1.0);
-                    new_knots.push_back(1.0);
+                    for(int i = 0; i < curve_orders->at(use_curve1); i++)
+                    {
+                        new_knots.push_back(1.0);//the first one is just a dummy but we need the rest
+                    }
+                    new_knots.push_back(*knots2_begin);
                 }
                 else
                 {
@@ -1714,10 +1719,11 @@ namespace module
 			}
 		}
 
-		void nurbs_curve_modifier::split_curve_at(k3d::uint_t curve, double u)
+		void nurbs_curve_modifier::split_curve_at(k3d::uint_t curve, double u, bool reconnect)
 		{
 			try
 			{
+
 				normalize_knot_vector(curve);
 				//prepare curve for splitting
 				curve_knot_insertion(curve, u, curve_orders->at(curve) - 1);
@@ -1732,6 +1738,10 @@ namespace module
 				k3d::uint_t curve_points_begin = curve_first_points->at(curve);
 				k3d::uint_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
 				int curve_point_index = -1;
+
+				bool is_closed = point3_float_equal(mesh_points->at(curve_points->at(curve_points_end - 1)), mesh_points->at(curve_points->at(curve_points_begin)), 0.000001);
+				k3d::uint_t point1 = curve_points_begin;
+				k3d::uint_t point2 = curve_points_end - 1;
 
 				for ( k3d::uint_t point = curve_points_begin; point < curve_points_end; point++)
 				{
@@ -1834,6 +1844,12 @@ namespace module
 					if (first_curves->at(group) > first_curves->at(my_group))
 						first_curves->at(group)++;
 				}
+
+                if(is_closed && reconnect)
+                {
+                    point2 = curve_first_points->at(curve+1) + curve_point_counts->at(curve + 1) - 1;
+                    join_curves(point1, curve, point2, curve + 1);
+                }
 
 				remove_unused_points();
 			}
@@ -2366,6 +2382,14 @@ namespace module
 			}
 		}
 
+		bool nurbs_curve_modifier::is_closed(k3d::uint_t curve)
+		{
+            k3d::uint_t curve_points_begin = curve_first_points->at(curve);
+            k3d::uint_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
+
+			return point3_float_equal(mesh_points->at(curve_points->at(curve_points_end - 1)), mesh_points->at(curve_points->at(curve_points_begin)), 0.000001);
+		}
+
 		bool nurbs_curve_modifier::create_cap(k3d::uint_t curve)
 		{
 			try
@@ -2390,7 +2414,7 @@ namespace module
 
 					//split it up at the middle
 					mod.normalize_knot_vector(0);
-					mod.split_curve_at(0, u);
+					mod.split_curve_at(0, u, false);
 					mod.flip_curve(0);
 					//->ruled surface
 					mod.ruled_surface(0, 1);

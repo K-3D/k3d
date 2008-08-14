@@ -57,11 +57,13 @@ namespace module
 			split_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),
 				m_u_value(init_owner(*this) + init_name(_("u_value")) + init_label(_("U value (in [0,1])")) + init_description(_("Split Curve at u in ]0,1[")) + init_step_increment(0.01)+ init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.5) ),
-				m_normalize_all(init_owner(*this) + init_name(_("normalize_all")) + init_label(_("Share Degree and KnotVector?")) + init_description(_("Make all selected curves have same Degree and KnotVector?")) + init_value(false) )
+				m_normalize_all(init_owner(*this) + init_name(_("normalize_all")) + init_label(_("Share Degree and KnotVector?")) + init_description(_("Make all selected curves have same Degree and KnotVector?")) + init_value(false) ),
+				m_reconnect(init_owner(*this) + init_name(_("reconnect")) + init_label(_("Stay Closed?")) + init_description(_("If this is a closed curve and you want it to stay connected at all other points than the new break, then enable this")) + init_value(true) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 				m_u_value.changed_signal().connect(make_update_mesh_slot());
 				m_normalize_all.changed_signal().connect(make_update_mesh_slot());
+				m_reconnect.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -103,7 +105,7 @@ namespace module
 
                 for(int i = 0; i < my_curves.size(); i++)
                 {
-                    mod.split_curve_at(my_curves.at(i)+i, u);
+                    mod.split_curve_at(my_curves.at(i)+i, u, m_reconnect.pipeline_value());
                 }
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
@@ -123,6 +125,7 @@ namespace module
 		private:
 			k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_value;
             k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_normalize_all;
+            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_reconnect;
 
 		};
 

@@ -113,6 +113,9 @@ namespace module{
                 ///\param curve The curve to delete
                 void delete_curve(k3d::uint_t curve);
 
+                ///Returns true if the start and endpoint coincidence
+                bool is_closed(k3d::uint_t curve);
+
                 ///Join (connect) the two curves at their selected end points, one of the curve gets deleted
                 ///\param point1 The end point of the first curve (needs to be an end point!)
                 ///\param curve1 One of the 2 curves to join
@@ -155,7 +158,8 @@ namespace module{
                 ///Follows the implementation of A. Piegl and W. Tiller in "The NURBS book"
                 ///\param curve The curve to śplit
                 ///\param u The u-value at which we're going to split
-                void split_curve_at(k3d::uint_t curve, double u);
+                ///\param reconnect If the curve was closed, connect it at the initial start/end point to have one single curve
+                void split_curve_at(k3d::uint_t curve, double u, bool reconnect);
 
                 ///Returns a nurbs_curve struct which is a copy of the chosen curve
                 ///\param curve The curve to extract

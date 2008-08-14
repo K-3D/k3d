@@ -56,11 +56,13 @@ namespace module
 			split_patch(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),
 				m_u_value(init_owner(*this) + init_name(_("u_value")) + init_label(_("u/v value of new knot")) + init_description(_("Insert knot at [0,1]")) + init_step_increment(0.01)+ init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.5) ),
-				m_insert_to_v(init_owner(*this) + init_name(_("insert_to_v")) + init_label(_("Insert knot in v? Otherwise u")) + init_description(_("By default the knot gets inserted into the patch in u direction, by checking this box you choose to insert it to v")) + init_value(false) )
+				m_insert_to_v(init_owner(*this) + init_name(_("insert_to_v")) + init_label(_("Insert knot in v? Otherwise u")) + init_description(_("By default the knot gets inserted into the patch in u direction, by checking this box you choose to insert it to v")) + init_value(false) ),
+				m_reconnect(init_owner(*this) + init_name(_("reconnect")) + init_label(_("Stay Closed?")) + init_description(_("If this is a closed curve and you want it to stay connected at all other points than the new break, then enable this")) + init_value(true) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 				m_u_value.changed_signal().connect(make_update_mesh_slot());
 				m_insert_to_v.changed_signal().connect(make_update_mesh_slot());
+				m_reconnect.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -90,9 +92,9 @@ namespace module
 				double u = m_u_value.pipeline_value();
 
                 if(!m_insert_to_v.pipeline_value())
-                        mod.split_patch_u(my_patch, u);
+                        mod.split_patch_u(my_patch, u,m_reconnect.pipeline_value());
                     else
-                        mod.split_patch_v(my_patch, u);
+                        mod.split_patch_v(my_patch, u,m_reconnect.pipeline_value());
 
                 nurbs_curve_modifier mod2(Output);
                 mod2.remove_unused_points();
@@ -114,6 +116,7 @@ namespace module
 		private:
 			k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_value;
 			k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_insert_to_v;
+			k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_reconnect;
 		};
 
 		//Create connect_curve factory
