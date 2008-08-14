@@ -5,6 +5,8 @@ import k3d
 
 CALC_AVERAGE = -1
 
+polyGridRange = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+
 def benchmark_path():
     return testing.benchmark_path()
 
@@ -179,7 +181,19 @@ class k3dProfilingProcessor(object):
        
     def output_file_to_Dart(self, filename):
          print """<DartMeasurementFile name="CSV_file" type="text/plain">""" + str(filename) + """</DartMeasurementFile>"""
-
+    
+    def output_and_save(self, nodeName, description, appendToFile, firstInFile):
+        self.output_as_dart_table(nodeName + ' : ' + description)
+        # save to CSV file
+        if (appendToFile or firstInFile):
+            if firstInFile:
+                appendToFile = False
+            CSV_output_file = k3d.generic_path(benchmark_path() + '/' + nodeName + '.benchmark.txt')
+        else:
+            CSV_output_file = k3d.generic_path(benchmark_path() + '/' + nodeName + description + '.benchmark.txt')
+        
+        self.output_as_CSV_file(str(CSV_output_file), description, appendToFile)
+        
 class ResultSet(object):
     def __init__(self, x, y, label, plot_style):
         self.x = x
@@ -244,6 +258,40 @@ def bitmap_modifier_benchmark(benchmarkPluginName, runsPerBenchmark = 10):
             run_bitmap_modifier_benchmark(benchmarkPluginName, sizes[k], runsPerBenchmark, append, k == 0)
         except:
             break
+
+def mesh_source_benchmark(benchmarkPluginName, properties = {}):
+    num_runs = 10e10
+    for p in properties.values():
+        if len(p) < num_runs:
+            num_runs = len(p)
+    
+    numberOfRuns = 10   
+    for k in range(num_runs):
+        properties_for_run = {}
+        for (p, val) in properties.items():
+            properties_for_run[p] = val[k]
+            
+        run_mesh_source_benchmark(benchmarkPluginName, numberOfRuns, properties_for_run, True, k == 0)
+    
+
+def run_mesh_source_benchmark(meshSourceNodeName, numberOfRuns = 1, properties = {}, appendToFile = False, firstInFile=False):
+    document = k3d.new_document()
+        
+    profiler = document.new_node("PipelineProfiler")
+    benchmarkNode = document.new_node(meshSourceNodeName)
+    
+    sizeMetric = 1
+    for (p, val) in properties.items():
+        benchmarkNode.get_property(p).set_value(val)
+        sizeMetric *= val
+   
+    profilingResults = k3dProfilingProcessor()
+    for n in range(numberOfRuns):
+        benchmarkNode.output_mesh
+        profilingResults.add_profiler_results_for_node(meshSourceNodeName, profiler.records)
+    
+    profilingResults.output_and_save(meshSourceNodeName, '%d' % (sizeMetric), appendToFile, firstInFile)
+ 
         
 def convert_dim_string_to_size_measure(dimString):
     # image where dimension is given as (width)x(height)
@@ -351,17 +399,9 @@ def run_bitmap_modifier_benchmark(BitmapNodeName, imageDimensions, numberOfRuns 
         profilingResults.add_profiler_results_for_node(BitmapNodeName, profiler.records)
     
     description = '%dx%d' % (imageDimensions[0], imageDimensions[1])
-    profilingResults.output_as_dart_table(BitmapNodeName + ' : ' + description)
-    
-    if (appendToFile or firstInFile):
-        if firstInFile:
-            appendToFile = False
-        CSV_output_file = k3d.generic_path(benchmark_path() + '/' + BitmapNodeName + '.benchmark.txt')
-    else:
-        CSV_output_file = k3d.generic_path(benchmark_path() + '/' + BitmapNodeName + description +  '.benchmark.txt')
 
-    profilingResults.output_as_CSV_file(str(CSV_output_file), description, appendToFile)
-    #profilingResults.output_file_to_Dart(str(CSV_output_file))                                        
+    profilingResults.output_and_save(BitmapNodeName, description, appendToFile, firstInFile)
+    
 
 """
     Run a benchmark for the specified mesh modifier
@@ -390,16 +430,7 @@ def run_mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRun
         profilingResults.add_profiler_results_for_node(meshModifierNodeName, profiler.records)
     
     description = '%d' % (benchmarkMesh.get_size_metric())
-    profilingResults.output_as_dart_table(meshModifierNodeName + ' : ' + description)
-    # save to CSV file
-    if (appendToFile or firstInFile):
-        if firstInFile:
-            appendToFile = False
-        CSV_output_file = k3d.generic_path(benchmark_path() + '/' + meshModifierNodeName + '.benchmark.txt')
-    else:
-        CSV_output_file = k3d.generic_path(benchmark_path() + '/' + meshModifierNodeName + description + '.benchmark.txt')
-    
-    profilingResults.output_as_CSV_file(str(CSV_output_file), description, appendToFile)
+    profilingResults.output_and_save(meshModifierNodeName, description, appendToFile, firstInFile)
 
 """
     selected is a list of tuples (PluginName, ColumnName)
