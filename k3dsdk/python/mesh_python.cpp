@@ -28,6 +28,7 @@
 #include "imaterial_python.h"
 #include "interface_wrapper_python.h"
 #include "mesh_python.h"
+#include "utility_python.h"
 
 #include <k3dsdk/color.h>
 #include <k3dsdk/imaterial.h>
@@ -1104,6 +1105,11 @@ object mesh::writable_points() { return detail::wrap_non_const_array(wrapped().p
 object mesh::writable_polyhedra() { return detail::wrap_non_const_object<detail::polyhedra>(wrapped().polyhedra); } 
 object mesh::writable_vertex_data() { return wrap(wrapped().vertex_data); } 
 
+static object mesh_primitives(mesh& Self)
+{
+	return wrap(Self.wrapped().primitives);
+}
+
 const string_t mesh::repr()
 {
 	std::ostringstream buffer;
@@ -1118,11 +1124,6 @@ const string_t mesh::str()
 	return buffer.str();
 }
 
-static object mesh_primitives(mesh& Self)
-{
-	return wrap(Self.wrapped().primitives);
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // const_mesh_primitive 
 
@@ -1133,9 +1134,14 @@ static const string_t const_mesh_primitive_get_type(const_mesh_primitive_wrapper
 	return Self.wrapped().type;
 }
 
-static boost::python::object const_mesh_primitive_get_topology(const_mesh_primitive_wrapper& Self)
+static object const_mesh_primitive_get_topology(const_mesh_primitive_wrapper& Self)
 {
 	return wrap(Self.wrapped().topology);
+}
+
+static object const_mesh_primitive_get_attributes(const_mesh_primitive_wrapper& Self)
+{
+	return wrap(Self.wrapped().attributes);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1153,9 +1159,14 @@ static void mesh_primitive_set_type(mesh_primitive_wrapper& Self, const string_t
 	Self.wrapped().type = Type;
 }
 
-static boost::python::object mesh_primitive_get_topology(mesh_primitive_wrapper& Self)
+static object mesh_primitive_get_topology(mesh_primitive_wrapper& Self)
 {
 	return wrap(Self.wrapped().topology);
+}
+
+static object mesh_primitive_get_attributes(mesh_primitive_wrapper& Self)
+{
+	return wrap(Self.wrapped().attributes);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1163,12 +1174,7 @@ static boost::python::object mesh_primitive_get_topology(mesh_primitive_wrapper&
 
 typedef interface_wrapper<const k3d::mesh::primitives_t> const_mesh_primitives_t_wrapper;
 
-static int const_mesh_primitives_t_len(const_mesh_primitives_t_wrapper& Self)
-{
-	return Self.wrapped().size();
-}
-
-static boost::python::object const_mesh_primitives_t_get_item(const_mesh_primitives_t_wrapper& Self, int Item)
+static object const_mesh_primitives_t_get_item(const_mesh_primitives_t_wrapper& Self, int Item)
 {
 	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
@@ -1177,16 +1183,11 @@ static boost::python::object const_mesh_primitives_t_get_item(const_mesh_primiti
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// mesh_primitives
+// mesh_primitives_t
 
 typedef interface_wrapper<k3d::mesh::primitives_t> mesh_primitives_t_wrapper;
 
-static int mesh_primitives_t_len(mesh_primitives_t_wrapper& Self)
-{
-	return Self.wrapped().size();
-}
-
-static boost::python::object mesh_primitives_t_get_item(mesh_primitives_t_wrapper& Self, int Item)
+static object mesh_primitives_t_get_item(mesh_primitives_t_wrapper& Self, int Item)
 {
 	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
@@ -1194,7 +1195,7 @@ static boost::python::object mesh_primitives_t_get_item(mesh_primitives_t_wrappe
 	return wrap(Self.wrapped().at(Item));
 }
 
-static boost::python::object mesh_primitives_t_create(mesh_primitives_t_wrapper& Self, const string_t& Type)
+static object mesh_primitives_t_create(mesh_primitives_t_wrapper& Self, const string_t& Type)
 {
 	boost::shared_ptr<k3d::mesh::primitive> primitive(new k3d::mesh::primitive());
 	primitive->type = Type;
@@ -1202,6 +1203,70 @@ static boost::python::object mesh_primitives_t_create(mesh_primitives_t_wrapper&
 
 	return wrap(primitive.get());
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// const_mesh_attributes_t
+
+typedef interface_wrapper<const k3d::mesh::attributes_t> const_mesh_attributes_t_wrapper;
+
+/*
+static object const_mesh_attributes_t_get_item(const_mesh_attributes_t_wrapper& Self, int Item)
+{
+	if(Item < 0 || Item >= Self.wrapped().size())
+		throw std::out_of_range("index out-of-range");
+
+	k3d::mesh::attributes_t::const_iterator iterator = Self.wrapped().begin();
+	std::advance(iterator, Item);
+
+	return wrap(iterator->second);
+}
+*/
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// mesh_attributes_t
+
+typedef interface_wrapper<k3d::mesh::attributes_t> mesh_attributes_t_wrapper;
+
+/*
+static object mesh_attributes_t_get_item(mesh_attributes_t_wrapper& Self, int Item)
+{
+	if(Item < 0 || Item >= Self.wrapped().size())
+		throw std::out_of_range("index out-of-range");
+
+	k3d::mesh::attributes_t::const_iterator iterator = Self.wrapped().begin();
+	std::advance(iterator, Item);
+
+	return wrap(iterator->second);
+}
+*/
+
+static object mesh_attributes_t_create(mesh_attributes_t_wrapper& Self, const string_t& Name)
+{
+	if(Name.empty())
+		throw std::runtime_error("empty attribute name");
+
+	if(Self.wrapped().count(Name))
+		throw std::runtime_error("name already exists");
+
+	Self.wrapped().insert(std::make_pair(Name, k3d::attribute_arrays()));
+	return wrap(Self.wrapped()[Name]);
+}
+
+namespace utility
+{
+
+/// Provides a boilerplate implementation of __getitem__ for objects with find(k3d::string_t) that are wrapped by-reference (e.g: k3d::named_array, k3d::mesh::attributes_t)
+template<typename self_t>
+static object wrapped_get_wrapped_item_by_key(self_t& Self, const string_t& Key)
+{
+	typename self_t::wrapped_type::const_iterator iterator = Self.wrapped().find(Key);
+	if(iterator == Self.wrapped().end())
+		throw std::runtime_error("unknown key");
+
+	return wrap(iterator->second);
+}
+
+} // namespace utility
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // define_namespace_mesh 
@@ -1830,22 +1895,35 @@ void define_namespace_mesh()
 	class_<const_mesh_primitive_wrapper>("const_primitive", no_init)
 		.add_property("type", &const_mesh_primitive_get_type)
 		.add_property("topology", &const_mesh_primitive_get_topology)
+		.add_property("attributes", &const_mesh_primitive_get_attributes)
 		;
 
 	class_<mesh_primitive_wrapper>("primitive", no_init)
 		.add_property("type", &mesh_primitive_get_type, &mesh_primitive_set_type)
 		.add_property("topology", &mesh_primitive_get_topology)
+		.add_property("attributes", &mesh_primitive_get_attributes)
 		;
 
 	class_<const_mesh_primitives_t_wrapper>("const_primitives_t", no_init)
-		.def("__len__", &const_mesh_primitives_t_len)
+		.def("__len__", &utility::wrapped_len<const_mesh_primitives_t_wrapper>)
 		.def("__getitem__", &const_mesh_primitives_t_get_item)
 		;
 
 	class_<mesh_primitives_t_wrapper>("primitives_t", no_init)
-		.def("__len__", &mesh_primitives_t_len)
+		.def("__len__", &utility::wrapped_len<mesh_primitives_t_wrapper>)
 		.def("__getitem__", &mesh_primitives_t_get_item)
 		.def("create", &mesh_primitives_t_create)
+		;
+
+	class_<const_mesh_attributes_t_wrapper>("const_attributes_t", no_init)
+		.def("__len__", &utility::wrapped_len<const_mesh_attributes_t_wrapper>)
+		.def("__getitem__", &utility::wrapped_get_wrapped_item_by_key<const_mesh_attributes_t_wrapper>)
+		;
+
+	class_<mesh_attributes_t_wrapper>("attributes_t", no_init)
+		.def("__len__", &utility::wrapped_len<mesh_attributes_t_wrapper>)
+		.def("__getitem__", &utility::wrapped_get_wrapped_item_by_key<mesh_attributes_t_wrapper>)
+		.def("create", &mesh_attributes_t_create)
 		;
 }
 

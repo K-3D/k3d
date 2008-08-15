@@ -40,6 +40,8 @@ template<typename T>
 class interface_wrapper
 {
 public:
+	typedef T wrapped_type;
+
 	interface_wrapper() :
 		m_wrapped(0)
 	{

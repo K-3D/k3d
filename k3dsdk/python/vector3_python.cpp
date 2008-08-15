@@ -22,8 +22,10 @@
 */
 
 #include "vector3_python.h"
+#include "utility_python.h"
 
-#include <k3dsdk/vectors.h>
+#include <k3dsdk/vector3.h>
+
 #include <boost/python.hpp>
 using namespace boost::python;
 
@@ -33,36 +35,15 @@ namespace k3d
 namespace python
 {
 
-int vector3_len(const k3d::vector3& lhs)
-{
-	return 3;
-}
-
-double vector3_getitem(const k3d::vector3& lhs, int item)
-{
-	if(item < 0 || item > 2)
-		throw std::out_of_range("index out-of-range");
-
-	return lhs[item];
-}
-
-void vector3_setitem(k3d::vector3& lhs, int item, double value)
-{
-	if(item < 0 || item > 2)
-		throw std::out_of_range("index out-of-range");
-
-	lhs[item] = value;
-}
-
 void define_class_vector3()
 {
 	class_<k3d::vector3>("vector3",
 		"Stores a direction vector in three-dimensional space", no_init)
 		.def(init<double, double, double>())
 		.def(init<const k3d::vector3&>())
-		.def("__len__", vector3_len)
-		.def("__getitem__", vector3_getitem)
-		.def("__setitem__", vector3_setitem)
+		.def("__len__", &utility::constant_len_len<k3d::vector3, 3>)
+		.def("__getitem__", &utility::constant_len_get_item<k3d::vector3, 3, k3d::double_t>)
+		.def("__setitem__", &utility::constant_len_set_item<k3d::vector3, 3, k3d::double_t>)
 		.def(self == self)
 		.def(self != self)
 		.def(self + self)

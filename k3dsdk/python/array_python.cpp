@@ -24,6 +24,7 @@
 #include "array_python.h"
 #include "imaterial_python.h"
 #include "inode_python.h"
+#include "utility_python.h"
 
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/named_array_types.h>
@@ -36,21 +37,6 @@ namespace k3d
 
 namespace python
 {
-
-template<typename array_type>
-static int len(interface_wrapper<array_type>& Self)
-{
-	return Self.wrapped().size();
-}
-
-template<typename array_type>
-static typename array_type::value_type get_item(interface_wrapper<array_type>& Self, int Item)
-{
-	if(Item < 0 || Item >= Self.wrapped().size())
-		throw std::out_of_range("index out-of-range");
-
-	return Self.wrapped().at(Item);
-}
 
 static boost::python::object get_item_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, int Item)
 {
@@ -207,9 +193,11 @@ void assign_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Self, const
 template<typename array_type>
 void define_class_array(const char* const ClassName, const char* const DocString)
 {
-	boost::python::class_<interface_wrapper<array_type> >(ClassName, DocString, boost::python::no_init)
-		.def("__len__", &len<array_type>)
-		.def("__getitem__", &get_item<array_type>)
+	typedef interface_wrapper<array_type> wrapper_type;
+
+	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
+		.def("__len__", &utility::wrapped_len<wrapper_type>)
+		.def("__getitem__", &utility::wrapped_get_item<wrapper_type, typename array_type::value_type>)
 		.def("__setitem__", &set_item<array_type>)
 		.def("append", &append<array_type>,
 			"Append a value to the end of the array, growing its size by one.")
@@ -221,9 +209,10 @@ template<>
 void define_class_array<k3d::typed_array<k3d::imaterial*> >(const char* const ClassName, const char* const DocString)
 {
 	typedef k3d::typed_array<k3d::imaterial*> array_type;
+	typedef interface_wrapper<array_type> wrapper_type;
 
-	boost::python::class_<interface_wrapper<array_type> >(ClassName, DocString, boost::python::no_init)
-		.def("__len__", &len<array_type>)
+	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
+		.def("__len__", &utility::wrapped_len<wrapper_type>)
 		.def("__getitem__", &get_item_imaterial)
 		.def("__setitem__", &set_item_imaterial)
 		.def("append", &append_imaterial,
@@ -236,9 +225,10 @@ template<>
 void define_class_array<k3d::typed_array<k3d::inode*> >(const char* const ClassName, const char* const DocString)
 {
 	typedef k3d::typed_array<k3d::inode*> array_type;
+	typedef interface_wrapper<array_type> wrapper_type;
 
-	boost::python::class_<interface_wrapper<array_type> >(ClassName, DocString, boost::python::no_init)
-		.def("__len__", &len<array_type>)
+	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
+		.def("__len__", &utility::wrapped_len<wrapper_type>)
 		.def("__getitem__", &get_item_inode)
 		.def("__setitem__", &set_item_inode)
 		.def("append", &append_inode,

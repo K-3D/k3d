@@ -22,8 +22,10 @@
 */
 
 #include "normal3_python.h"
+#include "utility_python.h"
 
-#include <k3dsdk/vectors.h>
+#include <k3dsdk/normal3.h>
+
 #include <boost/python.hpp>
 using namespace boost::python;
 
@@ -33,36 +35,15 @@ namespace k3d
 namespace python
 {
 
-int normal3_len(const k3d::normal3& lhs)
-{
-	return 3;
-}
-
-double normal3_getitem(const k3d::normal3& lhs, int item)
-{
-	if(item < 0 || item > 2)
-		throw std::out_of_range("index out-of-range");
-
-	return lhs[item];
-}
-
-void normal3_setitem(k3d::normal3& lhs, int item, double value)
-{
-	if(item < 0 || item > 2)
-		throw std::out_of_range("index out-of-range");
-
-	lhs[item] = value;
-}
-
 void define_class_normal3()
 {
 	class_<k3d::normal3>("normal3",
 		"Stores a normal vector in three-dimensional space", no_init)
 		.def(init<double, double, double>())
 		.def(init<const k3d::normal3&>())
-		.def("__len__", normal3_len)
-		.def("__getitem__", normal3_getitem)
-		.def("__setitem__", normal3_setitem)
+		.def("__len__", &utility::constant_len_len<k3d::normal3, 3>)
+		.def("__getitem__", &utility::constant_len_get_item<k3d::normal3, 3, k3d::double_t>)
+		.def("__setitem__", &utility::constant_len_set_item<k3d::normal3, 3, k3d::double_t>)
 		.def(self == self)
 		.def(self != self)
 		.def(self * double())

@@ -21,6 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "utility_python.h"
 #include "uuid_python.h"
 
 #include <k3dsdk/uuid.h>
@@ -32,11 +33,6 @@ namespace k3d
 
 namespace python
 {
-
-int uuid_len(const k3d::uuid& Value)
-{
-	return 4;
-}
 
 unsigned long uuid_getitem(const k3d::uuid& LHS, const int Item)
 {
@@ -85,7 +81,7 @@ void define_class_uuid()
 			"Returns a null (all zeros) identifier.").staticmethod("null")
 		.def("random", &k3d::uuid::random,
 			"Returns a randomly-generated identifier.").staticmethod("random")
-		.def("__len__", uuid_len)
+		.def("__len__", &utility::constant_len_len<k3d::uuid, 4>)
 		.def("__getitem__", uuid_getitem)
 		.def("__setitem__", uuid_setitem)
 		.def(self < self)

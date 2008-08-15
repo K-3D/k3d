@@ -23,6 +23,7 @@
 
 #include "array_python.h"
 #include "attribute_arrays_python.h"
+#include "utility_python.h"
 
 #include <k3dsdk/named_array_types.h>
 #include <k3dsdk/type_registry.h>
@@ -106,20 +107,15 @@ static object create_array(attribute_arrays_wrapper& Self, const string_t& Name,
 	return result;
 }
 
-static int len(attribute_arrays_wrapper& Self)
-{
-	return Self.wrapped().size();
-}
-
 static object get_item(attribute_arrays_wrapper& Self, int Item)
 {
 	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
 
-	k3d::attribute_arrays::const_iterator array_iterator = Self.wrapped().begin();
-	std::advance(array_iterator, Item);
+	k3d::attribute_arrays::const_iterator iterator = Self.wrapped().begin();
+	std::advance(iterator, Item);
 
-	return wrap_array(array_iterator->second.get());
+	return wrap_array(iterator->second.get());
 }
 
 void define_class_attribute_arrays()
@@ -132,7 +128,7 @@ void define_class_attribute_arrays()
 			"Returns the array with the given name, or throws an exception.")
 		.def("create_array", &create_array,
 			"Creates an array with given name and type.")
-		.def("__len__", &len)
+		.def("__len__", &utility::wrapped_len<attribute_arrays_wrapper>)
 		.def("__getitem__", &get_item);
 }
 

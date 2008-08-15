@@ -22,6 +22,7 @@
 */
 
 #include "point3_python.h"
+#include "utility_python.h"
 
 #include <k3dsdk/vectors.h>
 
@@ -35,36 +36,15 @@ namespace k3d
 namespace python
 {
 
-int point3_len(const k3d::point3& lhs)
-{
-	return 3;
-}
-
-double point3_getitem(const k3d::point3& lhs, int item)
-{
-	if(item < 0 || item > 2)
-		throw std::out_of_range("index out-of-range");
-
-	return lhs[item];
-}
-
-void point3_setitem(k3d::point3& lhs, int item, double value)
-{
-	if(item < 0 || item > 2)
-		throw std::out_of_range("index out-of-range");
-
-	lhs[item] = value;
-}
-
 void define_class_point3()
 {
 	class_<k3d::point3>("point3",
 		"Stores a position in three-dimensional space", no_init)
 		.def(init<double, double, double>())
 		.def(init<const k3d::point3&>())
-		.def("__len__", point3_len)
-		.def("__getitem__", point3_getitem)
-		.def("__setitem__", point3_setitem)
+		.def("__len__", &utility::constant_len_len<k3d::point3, 3>)
+		.def("__getitem__", &utility::constant_len_get_item<k3d::point3, 3, k3d::double_t>)
+		.def("__setitem__", &utility::constant_len_set_item<k3d::point3, 3, k3d::double_t>)
 		.def(self == self)
 		.def(self != self)
 		.def(self + self)

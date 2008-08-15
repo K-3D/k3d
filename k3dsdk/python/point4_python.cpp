@@ -22,8 +22,10 @@
 */
 
 #include "point4_python.h"
+#include "utility_python.h"
 
-#include <k3dsdk/vectors.h>
+#include <k3dsdk/point4.h>
+
 #include <boost/python.hpp>
 using namespace boost::python;
 
@@ -33,36 +35,15 @@ namespace k3d
 namespace python
 {
 
-int point4_len(const k3d::point4& lhs)
-{
-	return 4;
-}
-
-double point4_getitem(const k3d::point4& lhs, int item)
-{
-	if(item < 0 || item > 3)
-		throw std::out_of_range("index out-of-range");
-
-	return lhs[item];
-}
-
-void point4_setitem(k3d::point4& lhs, int item, double value)
-{
-	if(item < 0 || item > 3)
-		throw std::out_of_range("index out-of-range");
-
-	lhs[item] = value;
-}
-
 void define_class_point4()
 {
 	class_<k3d::point4>("point4",
 		"Stores a position in four-dimensional space", no_init)
 		.def(init<double, double, double, double>())
 		.def(init<const k3d::point4&>())
-		.def("__len__", point4_len)
-		.def("__getitem__", point4_getitem)
-		.def("__setitem__", point4_setitem)
+		.def("__len__", &utility::constant_len_len<k3d::point4, 4>)
+		.def("__getitem__", &utility::constant_len_get_item<k3d::point4, 4, k3d::double_t>)
+		.def("__setitem__", &utility::constant_len_set_item<k3d::point4, 4, k3d::double_t>)
 		.def(self == self)
 		.def(self != self)
 		.def(self + self)

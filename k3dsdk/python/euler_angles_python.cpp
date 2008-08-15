@@ -22,6 +22,7 @@
 */
 
 #include "euler_angles_python.h"
+#include "utility_python.h"
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -42,11 +43,6 @@ euler_angles::euler_angles(const k3d::euler_angles& EulerAngles) :
 euler_angles::euler_angles(const euler_angles::AngleOrder Order, const double A, const double B, const double C) :
 	base(radians(A), radians(B), radians(C), Order)
 {
-}
-
-const int euler_angles::len() const
-{
-	return 3;
 }
 
 const double euler_angles::getitem(const int Item) const
@@ -177,7 +173,7 @@ void euler_angles::define_class()
 		"Encodes a change in orientation as three rotations around mutally-perpendicular axes.", no_init)
 		.def(init<euler_angles::AngleOrder, double, double, double>())
 		.def_readwrite("order", &euler_angles::order)
-		.def("__len__", &euler_angles::len)
+		.def("__len__", &utility::constant_len_len<euler_angles, 3>)
 		.def("__getitem__", &euler_angles::getitem)
 		.def("__setitem__", &euler_angles::setitem)
 		.def("__str__", &euler_angles::str)
