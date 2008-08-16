@@ -87,6 +87,7 @@ extern "C" K3D_CUDA_DECLSPEC void free_pinned_host_memory ( void* pointer_on_hos
 extern "C" K3D_CUDA_DECLSPEC void copy_and_bind_texture_to_array( void** cudaArrayPointer, float* arrayData, int width, int height );
 extern "C" K3D_CUDA_DECLSPEC void free_CUDA_array ( void* cudaArrayPointer );
 
+extern "C" K3D_CUDA_DECLSPEC void transform_points_device_mesh ( float * pdev_output_points_and_selection, int num_points );
 extern "C" K3D_CUDA_DECLSPEC void transform_points_synchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 extern "C" K3D_CUDA_DECLSPEC void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 

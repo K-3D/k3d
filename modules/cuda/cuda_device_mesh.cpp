@@ -298,3 +298,22 @@ void cuda_device_mesh::resize_points_and_selection ( k3d::uint32_t new_number_of
     pdev_points_and_selection = new_pdev_point_and_selection;
     m_number_of_points = new_number_of_points;
 }
+
+/**
+ * Set all the selection values to 1
+ */
+void cuda_device_mesh::select_all_points()
+{
+	if ( pdev_points_and_selection )
+	{
+		set_selection_value_entry ( pdev_points_and_selection, 1.0, m_number_of_points );
+	}
+}
+
+/**
+ *  Get the number of points in the device mesh
+ */
+k3d::uint32_t cuda_device_mesh::get_number_of_points()
+{
+	return m_number_of_points;
+}

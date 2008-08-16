@@ -349,6 +349,15 @@ extern "C" void free_pinned_host_memory ( void* pointer_on_host )
 	cudaFreeHost(pointer_on_host);
 }
 
+extern "C" void transform_points_device_mesh ( float * pdev_output_points_and_selection, int num_points )
+{
+	dim3 threads_per_block(64, 1);
+	dim3 blocks_per_grid( iDivUp(num_points, 64), 1);
+
+	linear_transform_kernel <<< blocks_per_grid, threads_per_block >>> ((float4*)(pdev_output_points_and_selection), num_points);
+	checkLastCudaError();
+}
+
 extern "C" void transform_points_synchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo )
 {
 	#define SETUP 0

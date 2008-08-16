@@ -57,6 +57,12 @@ class cuda_device_mesh
         /// resize the point array - allow for adding points in an operation
         void resize_points_and_selection ( k3d::uint32_t new_number_of_points, float default_selection = 0);
 
+        void select_all_points ();
+
+        /// methods to get mesh size info
+
+        k3d::uint32_t get_number_of_points();
+
     private:
         /// a pointer to a array of float4's allocated on the device
         float* pdev_points_and_selection;
@@ -69,3 +75,4 @@ class cuda_device_mesh
         cuda_device_polyhedra m_cuda_device_polyhedra;
 };
 
+typedef boost::shared_ptr<cuda_device_mesh> cuda_device_mesh_p;

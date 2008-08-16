@@ -148,17 +148,17 @@ public:
         }
 
         // If there are no valid polyhedra, we give up
-        document().pipeline_profiler().start_execution(*this, "Validate input");
+        document().pipeline_profiler().start_execution(*this, "Create:Validate input");
         if(!k3d::validate_polyhedra(Input))
         {
-            document().pipeline_profiler().finish_execution(*this, "Validate input");
+            document().pipeline_profiler().finish_execution(*this, "Create:Validate input");
             return;
         }
         // should move up
         m_p_input_device_mesh.reset ( new cuda_device_mesh ( Input) );
         m_p_input_device_mesh->copy_to_device( ); // TODO:  Selectively copy parts of mesh
 
-        document().pipeline_profiler().finish_execution(*this, "Validate input");
+        document().pipeline_profiler().finish_execution(*this, "Create:Validate input");
 
         // Shallow copy of the input (no data is copied, only shared pointers are)
         document().pipeline_profiler().start_execution(*this, "Merge selection");
@@ -295,16 +295,14 @@ public:
 
     void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
     {
-        document().pipeline_profiler().start_execution(*this, "Validate input");
+        document().pipeline_profiler().start_execution(*this, "Update:Validate input");
 
         if(!k3d::validate_polyhedra(Input))
         {
-            document().pipeline_profiler().finish_execution(*this, "Validate input");
+            document().pipeline_profiler().finish_execution(*this, "Update:Validate input");
             return;
         }
-        document().pipeline_profiler().finish_execution(*this, "Validate input");
-
-        //k3d::mesh::points_t& output_points = *k3d::make_unique(Output.points);
+        document().pipeline_profiler().finish_execution(*this, "Update:Validate input");
 
         document().pipeline_profiler().start_execution(*this, "Calculate positions");
 
@@ -315,12 +313,14 @@ public:
                                                 m_p_input_device_mesh->get_device_polyhedra().get_per_edge_points_pointer(),
                                                 m_p_input_device_mesh->get_device_polyhedra().get_per_edge_clockwise_edges_pointer(),
                                                 (unsigned int)m_vertices.pipeline_value());
+        document().pipeline_profiler().finish_execution(*this, "Calculate positions");
 
+        document().pipeline_profiler().start_execution(*this, "Update:Copy");
         Output.points.reset();
         Output.point_selection.reset();
         m_p_output_device_mesh->copy_from_device ( Output, MESH_POINTS + MESH_SELECTION );
 
-        document().pipeline_profiler().finish_execution(*this, "Calculate positions");
+        document().pipeline_profiler().finish_execution(*this, "Update:Copy");
     }
 
     static k3d::iplugin_factory& get_factory()

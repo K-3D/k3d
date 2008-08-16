@@ -460,9 +460,20 @@ def compare_and_output_image(filename, selected_benchmarks, plotLabels = (None, 
     P.close()
     return image_filename
     
+def generate_component_image(description, node_name, columns = ["Total"] ):
+    selected = []
+    for col in columns:
+        selected += [(node_name, col),]
+        
+    filename = compare_and_output_image(description, selected)
+    
+    if filename != 0:
+        print '<DartMeasurementFile name="' + description + '" type="image/png">' + str(filename) + '</DartMeasurementFile>'
+    else:
+        print '<DartMeasurement name="' + description + '" type="text/string">  Error in comparison </DartMeasurementFile>'
 
 def generate_comparison_image(description, run_names, column = "Total"):
-    selected = [];
+    selected = []
     for run in run_names:
         selected += [(run, column),]
     
