@@ -1,5 +1,5 @@
-#ifndef LIBK3DRENDERMAN_ARRAY_HELPERS_H
-#define LIBK3DRENDERMAN_ARRAY_HELPERS_H
+#ifndef MODULE_RENDERMAN_PAINTERS_ARRAY_HELPERS_H
+#define MODULE_RENDERMAN_PAINTERS_ARRAY_HELPERS_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -27,7 +27,13 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/types_ri.h>
 
-namespace libk3drendermanpainters
+namespace module
+{
+
+namespace renderman
+{
+
+namespace painters
 {
 
 /// Makes an internal copy of a set of named mesh arrays
@@ -55,7 +61,11 @@ private:
 	implementation* const m_implementation;
 };
 
-} // namespace libk3drendermanpainters
+} // namespace painters
 
-#endif // !LIBK3DRENDERMAN_ARRAY_HELPERS_H
+} // namespace renderman
+
+} // namespace module
+
+#endif // !MODULE_RENDERMAN_PAINTERS_ARRAY_HELPERS_H
 

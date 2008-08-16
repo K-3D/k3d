@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,14 +18,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements procedures required to export K-3D objects from the core module
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the renderman plugin module, to protect public symbols from name clashes with other modules
-namespace libk3drendermanpainters
+namespace module
+{
+
+namespace renderman
+{
+
+namespace painters
 {
 
 extern k3d::iplugin_factory& bicubic_patch_painter_factory();
@@ -38,20 +42,26 @@ extern k3d::iplugin_factory& multi_painter_factory();
 extern k3d::iplugin_factory& nurbs_patch_painter_factory();
 extern k3d::iplugin_factory& point_group_painter_factory();
 extern k3d::iplugin_factory& polyhedron_painter_factory();
+extern k3d::iplugin_factory& scripted_painter_factory();
 extern k3d::iplugin_factory& subdivision_surface_painter_factory();
 
-} // namespace libk3drendermanpainters
+} // namespace painters
+
+} // namespace renderman
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3drendermanpainters::bicubic_patch_painter_factory());
-	Registry.register_factory(libk3drendermanpainters::bilinear_patch_painter_factory());
-	Registry.register_factory(libk3drendermanpainters::blobby_painter_factory());
-	Registry.register_factory(libk3drendermanpainters::cubic_curve_painter_factory());
-	Registry.register_factory(libk3drendermanpainters::linear_curve_painter_factory());
-	Registry.register_factory(libk3drendermanpainters::multi_painter_factory());
-	Registry.register_factory(libk3drendermanpainters::nurbs_patch_painter_factory());
-	Registry.register_factory(libk3drendermanpainters::point_group_painter_factory());
-	Registry.register_factory(libk3drendermanpainters::polyhedron_painter_factory());
-	Registry.register_factory(libk3drendermanpainters::subdivision_surface_painter_factory());
+	Registry.register_factory(module::renderman::painters::bicubic_patch_painter_factory());
+	Registry.register_factory(module::renderman::painters::bilinear_patch_painter_factory());
+	Registry.register_factory(module::renderman::painters::blobby_painter_factory());
+	Registry.register_factory(module::renderman::painters::cubic_curve_painter_factory());
+	Registry.register_factory(module::renderman::painters::linear_curve_painter_factory());
+	Registry.register_factory(module::renderman::painters::multi_painter_factory());
+	Registry.register_factory(module::renderman::painters::nurbs_patch_painter_factory());
+	Registry.register_factory(module::renderman::painters::point_group_painter_factory());
+	Registry.register_factory(module::renderman::painters::polyhedron_painter_factory());
+	Registry.register_factory(module::renderman::painters::scripted_painter_factory());
+	Registry.register_factory(module::renderman::painters::subdivision_surface_painter_factory());
 K3D_MODULE_END
 

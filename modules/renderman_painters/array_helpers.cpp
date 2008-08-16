@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,14 +18,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include "array_helpers.h"
+
 #include <k3dsdk/utility.h>
 #include <k3dsdk/texture3.h>
 
-namespace libk3drendermanpainters
+namespace module
+{
+
+namespace renderman
+{
+
+namespace painters
 {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,5 +187,9 @@ void array_copier::copy_to(const k3d::ri::storage_class_t StorageClass, k3d::ri:
 	m_implementation->copy_to(StorageClass, Destination);
 }
 
-} // namespace libk3drendermanpainters
+} // namespace painters
+
+} // namespace renderman
+
+} // namespace module
 

@@ -28,7 +28,13 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/properties.h>
 
-namespace libk3drendermanpainters
+namespace module
+{
+
+namespace renderman
+{
+
+namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -99,5 +105,9 @@ k3d::iplugin_factory& multi_painter_factory()
 	return multi_painter::get_factory();
 }
 
-} // namespace libk3drendermanpainters
+} // namespace painters
+
+} // namespace renderman
+
+} // namespace module
 

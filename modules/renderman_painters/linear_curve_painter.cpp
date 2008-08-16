@@ -33,7 +33,13 @@
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
-namespace libk3drendermanpainters
+namespace module
+{
+
+namespace renderman
+{
+
+namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -140,5 +146,9 @@ k3d::iplugin_factory& linear_curve_painter_factory()
 	return linear_curve_painter::get_factory();
 }
 
-} // namespace libk3drendermanpainters
+} // namespace painters
+
+} // namespace renderman
+
+} // namespace module
 

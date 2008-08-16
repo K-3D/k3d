@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,13 +18,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include "array_helpers.h"
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/mesh_operations.h>
@@ -33,7 +33,13 @@
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
-namespace libk3drendermanpainters
+namespace module
+{
+
+namespace renderman
+{
+
+namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -122,5 +128,9 @@ k3d::iplugin_factory& point_group_painter_factory()
 	return point_group_painter::get_factory();
 }
 
-} // namespace libk3drendermanpainters
+} // namespace painters
+
+} // namespace renderman
+
+} // namespace module
 

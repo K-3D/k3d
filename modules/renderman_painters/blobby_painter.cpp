@@ -33,7 +33,13 @@
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
-namespace libk3drendermanpainters
+namespace module
+{
+
+namespace renderman
+{
+
+namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -161,5 +167,9 @@ k3d::iplugin_factory& blobby_painter_factory()
 	return blobby_painter::get_factory();
 }
 
-} // namespace libk3drendermanpainters
+} // namespace painters
+
+} // namespace renderman
+
+} // namespace module
 
