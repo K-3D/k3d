@@ -62,16 +62,14 @@ ENDIF(NOT WIN32)
 ADD_LIBRARY(k3dsdk-python SHARED
 	any_python.cpp
 	any_python.h
-	array_python.cpp
-	array_python.h
 	attribute_arrays_python.cpp
 	attribute_arrays_python.h
-	const_array_python.cpp
-	const_array_python.h
 	const_attribute_arrays_python.cpp
 	const_attribute_arrays_python.h
 	const_named_arrays_python.cpp
 	const_named_arrays_python.h
+	const_typed_array_python.cpp
+	const_typed_array_python.h
 	dynamic_cast_python.cpp
 	dynamic_cast_python.h
 	euler_python.cpp
@@ -118,6 +116,8 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	plugin_python.h
 	resource_python.cpp
 	resource_python.h
+	typed_array_python.cpp
+	typed_array_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python)
         

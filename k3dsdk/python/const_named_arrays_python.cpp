@@ -22,6 +22,7 @@
 */
 
 #include "const_named_arrays_python.h"
+#include "const_typed_array_python.h"
 #include "utility_python.h"
 
 #include <boost/python.hpp>
@@ -33,7 +34,7 @@ namespace k3d
 namespace python
 {
 
-static list array_names(const_named_arrays_wrapper& Self)
+static list keys(const_named_arrays_wrapper& Self)
 {
 	list results;
 
@@ -43,33 +44,21 @@ static list array_names(const_named_arrays_wrapper& Self)
 	return results;
 }
 
-static object array(const_named_arrays_wrapper& Self, const string_t& Name)
+static object get_item(const_named_arrays_wrapper& Self, const string_t& Key)
 {
-	if(!Self.wrapped().count(Name))
-		return object();
+	k3d::named_arrays::const_iterator iterator = Self.wrapped().find(Key);
+	if(iterator == Self.wrapped().end())
+		throw std::runtime_error("unknown key: " + Key);
 
-	return wrap(Self.wrapped().find(Name)->second.get());
-}
-
-static object get_item(const_named_arrays_wrapper& Self, int Item)
-{
-	if(Item < 0 || Item >= Self.wrapped().size())
-		throw std::out_of_range("index out-of-range");
-
-	k3d::named_arrays::const_iterator iterator = Self.wrapped().begin();
-	std::advance(iterator, Item);
-
-	return wrap(iterator->second.get());
+	return wrap_array(iterator->second.get());
 }
 
 void define_class_const_named_arrays()
 {
 	class_<const_named_arrays_wrapper>("const_named_arrays", 
-		"Stores an immutable (read-only) collection of attribute arrays (named arrays with identical lengths).", no_init)
-		.def("array_names", &array_names,
+		"Stores an immutable (read-only) collection of named arrays (with unrelated lengths).", no_init)
+		.def("keys", &keys,
 			"Returns a list containing names for all the arrays in the collection.")
-		.def("array", &array,
-			"Returns the array with the given name if it exists, or None.")
 		.def("__len__", &utility::wrapped_len<const_named_arrays_wrapper>)
 		.def("__getitem__", &get_item);
 }

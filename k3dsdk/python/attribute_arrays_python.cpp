@@ -21,8 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "array_python.h"
 #include "attribute_arrays_python.h"
+#include "typed_array_python.h"
 #include "utility_python.h"
 
 #include <k3dsdk/named_array_types.h>
@@ -37,12 +37,6 @@ namespace k3d
 
 namespace python
 {
-
-static object wrap_array(const k3d::array* const Array)
-{
-	throw std::runtime_error("wrap_array() not implemented");
-	return object();
-}
 
 class attribute_arrays_array_factory
 {
@@ -76,7 +70,7 @@ private:
 	k3d::attribute_arrays& arrays;
 };
 
-static list array_names(attribute_arrays_wrapper& Self)
+static list keys(attribute_arrays_wrapper& Self)
 {
 	list results;
 
@@ -86,15 +80,7 @@ static list array_names(attribute_arrays_wrapper& Self)
 	return results;
 }
 
-static object get_array(attribute_arrays_wrapper& Self, const string_t& Name)
-{
-	if(!Self.wrapped().count(Name))
-		throw std::runtime_error("Unknown array name: " + Name);
-
-	return wrap_array(Self.wrapped().find(Name)->second.get());
-}
-
-static object create_array(attribute_arrays_wrapper& Self, const string_t& Name, const string_t& Type)
+static object create(attribute_arrays_wrapper& Self, const string_t& Name, const string_t& Type)
 {
 	if(Name.empty())
 		throw std::runtime_error("Empty array name");
@@ -107,13 +93,17 @@ static object create_array(attribute_arrays_wrapper& Self, const string_t& Name,
 	return result;
 }
 
-static object get_item(attribute_arrays_wrapper& Self, int Item)
+static object create_array(attribute_arrays_wrapper& Self, const string_t& Name, const string_t& Type)
 {
-	if(Item < 0 || Item >= Self.wrapped().size())
-		throw std::out_of_range("index out-of-range");
+	k3d::log() << warning << "create_array() is deprecated, use create() instead." << std::endl;
+	return create(Self, Name, Type);
+}
 
-	k3d::attribute_arrays::const_iterator iterator = Self.wrapped().begin();
-	std::advance(iterator, Item);
+static object get_item(attribute_arrays_wrapper& Self, const string_t& Key)
+{
+	k3d::attribute_arrays::const_iterator iterator = Self.wrapped().find(Key);
+	if(iterator == Self.wrapped().end())
+		throw std::runtime_error("unknown key: " + Key);
 
 	return wrap_array(iterator->second.get());
 }
@@ -122,10 +112,10 @@ void define_class_attribute_arrays()
 {
 	class_<attribute_arrays_wrapper>("attribute_arrays", 
 		"Stores a mutable (read-write) collection of attribute arrays (named arrays of equal length).", no_init)
-		.def("array_names", &array_names,
+		.def("keys", &keys,
 			"Returns a list containing names for all the arrays in the collection.")
-		.def("array", &get_array,
-			"Returns the array with the given name, or throws an exception.")
+		.def("create", &create,
+			"Creates an array with given name and type.")
 		.def("create_array", &create_array,
 			"Creates an array with given name and type.")
 		.def("__len__", &utility::wrapped_len<attribute_arrays_wrapper>)

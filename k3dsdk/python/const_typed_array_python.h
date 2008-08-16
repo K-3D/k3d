@@ -24,13 +24,19 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "interface_wrapper_python.h"
+#include <k3dsdk/array.h>
+
 namespace k3d
 {
 
 namespace python
 {
 
-void define_const_array_classes();
+boost::python::object wrap_array(const k3d::array* Wrapped);
+boost::python::object wrap_array(const k3d::array& Wrapped);
+
+void define_const_typed_array_classes();
 
 } // namespace python
 

@@ -21,9 +21,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "array_python.h"
 #include "imaterial_python.h"
 #include "inode_python.h"
+#include "typed_array_python.h"
 #include "utility_python.h"
 
 #include <k3dsdk/mesh.h>
@@ -147,7 +147,7 @@ static void assign(interface_wrapper<array_type>& Self, const boost::python::lis
 		storage[i] = boost::python::extract<typename array_type::value_type>(Value[i]);
 }
 
-void assign_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, const boost::python::list& Value)
+static void assign_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, const boost::python::list& Value)
 {
 	k3d::typed_array<k3d::imaterial*>& storage = Self.wrapped();
 
@@ -167,7 +167,7 @@ void assign_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial*> >& Sel
 	}
 }
 
-void assign_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Self, const boost::python::list& Value)
+static void assign_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Self, const boost::python::list& Value)
 {
 	k3d::typed_array<k3d::inode*>& storage = Self.wrapped();
 
@@ -188,10 +188,10 @@ void assign_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Self, const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// define_class_array
+// define_class_typed_array
 
 template<typename array_type>
-void define_class_array(const char* const ClassName, const char* const DocString)
+static void define_class_typed_array(const char* const ClassName, const char* const DocString)
 {
 	typedef interface_wrapper<array_type> wrapper_type;
 
@@ -206,7 +206,7 @@ void define_class_array(const char* const ClassName, const char* const DocString
 }
 
 template<>
-void define_class_array<k3d::typed_array<k3d::imaterial*> >(const char* const ClassName, const char* const DocString)
+void define_class_typed_array<k3d::typed_array<k3d::imaterial*> >(const char* const ClassName, const char* const DocString)
 {
 	typedef k3d::typed_array<k3d::imaterial*> array_type;
 	typedef interface_wrapper<array_type> wrapper_type;
@@ -222,7 +222,7 @@ void define_class_array<k3d::typed_array<k3d::imaterial*> >(const char* const Cl
 }
 
 template<>
-void define_class_array<k3d::typed_array<k3d::inode*> >(const char* const ClassName, const char* const DocString)
+void define_class_typed_array<k3d::typed_array<k3d::inode*> >(const char* const ClassName, const char* const DocString)
 {
 	typedef k3d::typed_array<k3d::inode*> array_type;
 	typedef interface_wrapper<array_type> wrapper_type;
@@ -237,60 +237,108 @@ void define_class_array<k3d::typed_array<k3d::inode*> >(const char* const ClassN
 			"Replace the contents of the array with a list of values.");
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-// define_array_classes
+//////////////////////////////////////////////////////////////////////////////////////////////
+// typed_array_array_factory
 
-void define_array_classes()
+class typed_array_array_factory
 {
-	define_class_array<k3d::typed_array<k3d::bool_t> >("k3d_bool_t_array",
+public:
+	typed_array_array_factory(k3d::array& Input, boost::python::object& Output) :
+		input(Input),
+		output(Output)
+	{
+		output = boost::python::object();
+	}
+
+	template<typename T>
+	void operator()(T) const
+	{
+		if(output != boost::python::object())
+			return;
+
+		typedef k3d::typed_array<T> array_type;
+
+		if(array_type* const array = dynamic_cast<array_type*>(&input))
+			output = wrap(array);
+	}
+
+private:
+	k3d::array& input;
+	boost::python::object& output;
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// wrap_array
+
+boost::python::object wrap_array(k3d::array* Wrapped)
+{
+	if(Wrapped)
+		return wrap_array(*Wrapped);
+
+	return boost::python::object();
+}
+
+boost::python::object wrap_array(k3d::array& Wrapped)
+{
+	boost::python::object result;
+	boost::mpl::for_each<k3d::named_array_types>(typed_array_array_factory(Wrapped, result));
+	return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+// define_typed_array_classes
+
+void define_typed_array_classes()
+{
+	define_class_typed_array<k3d::typed_array<k3d::bool_t> >("typed_array_bool_t",
 		"Stores a mutable (read-write) collection of boolean values.");
-	define_class_array<k3d::typed_array<k3d::double_t> >("k3d_double_t_array",
+	define_class_typed_array<k3d::typed_array<k3d::double_t> >("typed_array_double_t",
 		"Stores a mutable (read-write) collection of floating-point values.");
-	define_class_array<k3d::typed_array<k3d::int8_t> >("k3d_int8_t_array",
+	define_class_typed_array<k3d::typed_array<k3d::int8_t> >("typed_array_int8_t",
 		"Stores a mutable (read-write) collection of 8-bit integer values.");
-	define_class_array<k3d::typed_array<k3d::int16_t> >("k3d_int16_t_array",
+	define_class_typed_array<k3d::typed_array<k3d::int16_t> >("typed_array_int16_t",
 		"Stores a mutable (read-write) collection of 16-bit integer values.");
-	define_class_array<k3d::typed_array<k3d::int32_t> >("k3d_int32_t_array",
+	define_class_typed_array<k3d::typed_array<k3d::int32_t> >("typed_array_int32_t",
 		"Stores a mutable (read-write) collection of 32-bit integer values.");
-	define_class_array<k3d::typed_array<k3d::int64_t> >("k3d_int64_t_array",
+	define_class_typed_array<k3d::typed_array<k3d::int64_t> >("typed_array_int64_t",
 		"Stores a mutable (read-write) collection of 64-bit integer values.");
-	define_class_array<k3d::typed_array<k3d::mesh::polyhedra_t::polyhedron_type> >("k3d_mesh_polyheda_t_polyhedron_type_array",
+	define_class_typed_array<k3d::typed_array<k3d::mesh::polyhedra_t::polyhedron_type> >("typed_array_mesh_polyheda_t_polyhedron_type",
 		"Stores a mutable (read-write) collection of polyhedron type values.");
-	define_class_array<k3d::typed_array<k3d::mesh::blobbies_t::operator_type> >("k3d_mesh_blobbies_t_operator_type_array",
+	define_class_typed_array<k3d::typed_array<k3d::mesh::blobbies_t::operator_type> >("typed_array_mesh_blobbies_t_operator_type",
 		"Stores a mutable (read-write) collection of blobby operator type values.");
-	define_class_array<k3d::typed_array<k3d::mesh::blobbies_t::primitive_type> >("k3d_mesh_blobbies_t_primitive_type_array",
+	define_class_typed_array<k3d::typed_array<k3d::mesh::blobbies_t::primitive_type> >("typed_array_mesh_blobbies_t_primitive_type",
 		"Stores a mutable (read-write) collection of blobby primitive type values.");
-	define_class_array<k3d::typed_array<k3d::imaterial*> >("k3d_imaterial_array",
+	define_class_typed_array<k3d::typed_array<k3d::imaterial*> >("typed_array_imaterial",
 		"Stores a mutable (read-write) collection of L{imaterial} objects.");
-	define_class_array<k3d::typed_array<k3d::inode*> >("k3d_inode_array",
+	define_class_typed_array<k3d::typed_array<k3d::inode*> >("typed_array_inode",
 		"Stores a mutable (read-write) collection of L{inode} objects.");
-	define_class_array<k3d::typed_array<k3d::color> >("k3d_color_array",
+	define_class_typed_array<k3d::typed_array<k3d::color> >("typed_array_color",
 		"Stores a mutable (read-write) collection of L{color} values.");
-	define_class_array<k3d::typed_array<k3d::matrix4> >("k3d_matrix4_array",
+	define_class_typed_array<k3d::typed_array<k3d::matrix4> >("typed_array_matrix4",
 		"Stores a mutable (read-write) collection of L{matrix4} values.");
-	define_class_array<k3d::typed_array<k3d::normal3> >("k3d_normal3_array",
+	define_class_typed_array<k3d::typed_array<k3d::normal3> >("typed_array_normal3",
 		"Stores a mutable (read-write) collection of L{normal3} values.");
-	define_class_array<k3d::typed_array<k3d::point2> >("k3d_point2_array",
+	define_class_typed_array<k3d::typed_array<k3d::point2> >("typed_array_point2",
 		"Stores a mutable (read-write) collection of L{point2} values.");
-	define_class_array<k3d::typed_array<k3d::point3> >("k3d_point3_array",
+	define_class_typed_array<k3d::typed_array<k3d::point3> >("typed_array_point3",
 		"Stores a mutable (read-write) collection of L{point3} values.");
-	define_class_array<k3d::typed_array<k3d::point4> >("k3d_point4_array",
+	define_class_typed_array<k3d::typed_array<k3d::point4> >("typed_array_point4",
 		"Stores a mutable (read-write) collection of L{point4} values.");
-	define_class_array<k3d::typed_array<k3d::string_t> >("k3d_string_t_array",
+	define_class_typed_array<k3d::typed_array<k3d::string_t> >("typed_array_string_t",
 		"Stores a mutable (read-write) collection of string values.");
-	define_class_array<k3d::typed_array<k3d::texture3> >("k3d_texture3_array",
+	define_class_typed_array<k3d::typed_array<k3d::texture3> >("typed_array_texture3",
 		"Stores a mutable (read-write) collection of L{texture} values.");
-	define_class_array<k3d::typed_array<k3d::uint8_t> >("k3d_uint8_t_array",
+	define_class_typed_array<k3d::typed_array<k3d::uint8_t> >("typed_array_uint8_t",
 		"Stores a mutable (read-write) collection of unsigned 8-bit integer values.");
-	define_class_array<k3d::typed_array<k3d::uint16_t> >("k3d_uint16_t_array",
+	define_class_typed_array<k3d::typed_array<k3d::uint16_t> >("typed_array_uint16_t",
 		"Stores a mutable (read-write) collection of unsigned 16-bit integer values.");
-	define_class_array<k3d::typed_array<k3d::uint32_t> >("k3d_uint32_t_array",
+	define_class_typed_array<k3d::typed_array<k3d::uint32_t> >("typed_array_uint32_t",
 		"Stores a mutable (read-write) collection of unsigned 32-bit integer values.");
-	define_class_array<k3d::typed_array<k3d::uint64_t> >("k3d_uint64_t_array",
+	define_class_typed_array<k3d::typed_array<k3d::uint64_t> >("typed_array_uint64_t",
 		"Stores a mutable (read-write) collection of unsigned 64-bit integer values.");
-	define_class_array<k3d::typed_array<k3d::vector2> >("k3d_vector2_array",
+	define_class_typed_array<k3d::typed_array<k3d::vector2> >("typed_array_vector2",
 		"Stores a mutable (read-write) collection of L{vector2} values.");
-	define_class_array<k3d::typed_array<k3d::vector3> >("k3d_vector3_array",
+	define_class_typed_array<k3d::typed_array<k3d::vector3> >("typed_array_vector3",
 		"Stores a mutable (read-write) collection of L{vector3} values.");
 }
 

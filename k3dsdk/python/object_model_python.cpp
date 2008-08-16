@@ -23,15 +23,14 @@
 
 #include "angle_axis_python.h"
 #include "any_python.h"
-#include "array_python.h"
 #include "attribute_arrays_python.h"
 #include "bitmap_python.h"
 #include "bounding_box3_python.h"
 #include "color_python.h"
-#include "const_array_python.h"
 #include "const_attribute_arrays_python.h"
 #include "const_bitmap_python.h"
 #include "const_named_arrays_python.h"
+#include "const_typed_array_python.h"
 #include "dynamic_cast_python.h"
 #include "euler_angles_python.h"
 #include "euler_python.h"
@@ -43,8 +42,8 @@
 #include "inode_python.h"
 #include "inode_selection_python.h"
 #include "iplugin_factory_python.h"
-#include "iproperty_python.h"
 #include "iproperty_collection_python.h"
+#include "iproperty_python.h"
 #include "isnappable_python.h"
 #include "iunknown_python.h"
 #include "iuser_interface_python.h"
@@ -66,6 +65,7 @@
 #include "resource_python.h"
 #include "ri_python.h"
 #include "texture3_python.h"
+#include "typed_array_python.h"
 #include "uuid_python.h"
 #include "vector3_python.h"
 
@@ -400,8 +400,8 @@ BOOST_PYTHON_MODULE(k3d)
 {
 	to_python_converter<k3d::mesh_selection::records_t, python_wrap<k3d::mesh_selection::records_t> >();
 
-	define_array_classes();
-	define_const_array_classes();
+	define_typed_array_classes();
+	define_const_typed_array_classes();
 
 	angle_axis::define_class();
 	define_class_attribute_arrays();
