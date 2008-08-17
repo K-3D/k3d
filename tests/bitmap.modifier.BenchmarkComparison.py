@@ -15,6 +15,6 @@ compare_list = ["BitmapAdd",
 
 for run in compare_list:
     try:
-        benchmarking.generate_comparison_image(run, (run, "CUDA"+run))
+        benchmarking.generate_comparison_image(run, (run, "CUDA"+run), plotLabels=('Number of Pixels', 'Time [s]'), calculate_speedup = True)
     except:
         print "Error with: " + run

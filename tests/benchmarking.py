@@ -233,8 +233,47 @@ class ResultsProcessor(object):
         ltexts = P.gca().get_legend().get_texts()
         for lt in ltexts:
             P.setp(lt, fontsize = 10)
+        
+        return 1
             
-
+    def plot_speedup(self, xlabel=None, ylabel=None, ref_index = 0):
+        try:
+            import pylab as P
+        except:
+            return 0
+        
+        x = self.__results[0].x 
+        
+        y_ref = self.__results[0].y
+        
+        P.plot([x[0], x[-1]], [1,1], 'k--');
+        legend = ('Unity',)
+        
+        for r_index in range(1,len(self.__results)):
+            speedup = []
+            for k in range(len(self.__results[r_index].y)):
+                y = self.__results[r_index].y[k]
+                try:
+                    speedup += [y_ref[k]/y, ]
+                except:
+                    speedup += [0, ]
+                
+            P.plot(x, speedup, self.__results[r_index].plot_style)
+            legend += ("%s : %s" % (self.__results[r_index].label[0], self.__results[r_index].label[1]),)
+            
+        
+        if xlabel:
+            P.xlabel(xlabel)
+        
+        P.ylabel('Speedup vs %s:%s' % (self.__results[0].label[0], self.__results[0].label[1]))
+        
+        P.legend(legend, loc='lower right')
+        # set the legend fontsize    
+        ltexts = P.gca().get_legend().get_texts()
+        for lt in ltexts:
+            P.setp(lt, fontsize = 10)
+        
+        return 1
         
 # run a mesh modifier benchmark for the specified node
 def mesh_modifier_benchmark(benchmarkPluginName, maxSize = 15, properties = {"input_matrix" : k3d.translate3(k3d.vector3(0, 0, 1))}):
@@ -435,30 +474,50 @@ def run_mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRun
 """
     selected is a list of tuples (PluginName, ColumnName)
 """
-def compare_and_output_image(filename, selected_benchmarks, plotLabels = (None, None)):
+def compare_and_output_image(filename, selected_benchmarks, plotLabels = (None, None), plotSpeedup = False):
+    
     try:
         import pylab as P
     except:
-        return 0
+        print "Pylab not found"
+        return 0;
     
     import os
     
     processor = ResultsProcessor()
+    
     for selected in selected_benchmarks:
         processor.add_dataset(selected[0], selected[1])
+    
+    if plotSpeedup:
+        if processor.plot_speedup(plotLabels[0], plotLabels[1]) != 0:
+            speedup_filename =  benchmark_path() + '/' + filename + '.speedup.png';
+            try:
+                os.delete(speedup_filename)
+            except:
+                pass
+            
+            P.savefig(speedup_filename, format='png')
+            
+            P.close()
         
-    processor.plot_data(plotLabels[0], plotLabels[1])
-
-    image_filename = benchmark_path() + '/' + filename + '.png';
-    try:
-        os.delete(image_filename)
-    except:
-        pass
+            return speedup_filename
+        
+    if processor.plot_data(plotLabels[0], plotLabels[1]) != 0:
+        image_filename = benchmark_path() + '/' + filename + '.png';
+        try:
+            os.delete(image_filename)
+        except:
+            pass
+        
+        P.savefig(image_filename, format='png')
+        
+        P.close()
+        
+        return image_filename
     
-    P.savefig(image_filename, format='png')
+    return None
     
-    P.close()
-    return image_filename
     
 def generate_component_image(description, node_name, columns = ["Total"] ):
     selected = []
@@ -472,16 +531,22 @@ def generate_component_image(description, node_name, columns = ["Total"] ):
     else:
         print '<DartMeasurement name="' + description + '" type="text/string">  Error in comparison </DartMeasurementFile>'
 
-def generate_comparison_image(description, run_names, column = "Total"):
+def generate_comparison_image(description, run_names, column = "Total", plotLabels = (None, None), calculate_speedup = False):
     selected = []
     for run in run_names:
         selected += [(run, column),]
     
-    filename = compare_and_output_image(description, selected)
+    filename = compare_and_output_image(description, selected, plotLabels)
     
     
-    if filename != 0:
+    if filename:
         print '<DartMeasurementFile name="' + description + '" type="image/png">' + str(filename) + '</DartMeasurementFile>'
     else:
         print '<DartMeasurement name="' + description + '" type="text/string">  Error in comparison </DartMeasurementFile>'
-        
+    
+    if calculate_speedup:
+        filename = compare_and_output_image(description, selected, plotLabels, plotSpeedup = True)
+        if filename:
+            print '<DartMeasurementFile name="' + description + 'Speedup" type="image/png">' + str(filename) + '</DartMeasurementFile>'
+        else:
+            print '<DartMeasurement name="' + description + 'Speedup" type="text/string">  Error in comparison </DartMeasurementFile>'
