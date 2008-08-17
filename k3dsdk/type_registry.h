@@ -30,9 +30,18 @@
 namespace k3d
 {
 
-/// Returns the string representation for a registered type, or empty string
+/// Returns true iff the given type is registered
+const bool_t type_registered(const std::type_info& Info);
+/// Returns true iff the given type if registered
+template<typename T>
+const bool_t type_registered()
+{
+	return type_registered(typeid(T));
+}
+
+/// Returns the string representation for a registered type, or an empty string
 const string_t type_string(const std::type_info& Info);
-/// Returns the string representation for a registered type, or emtpy string
+/// Returns the string representation for a registered type, or an empty string
 template<typename T>
 const string_t type_string()
 {

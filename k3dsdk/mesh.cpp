@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -19,10 +19,13 @@
 
 #include "color.h"
 #include "imaterial.h"
+#include "iomanip.h"
 #include "legacy_mesh.h"
 #include "mesh.h"
 #include "shared_pointer.h"
 #include "type_registry.h"
+
+#include <boost/mpl/for_each.hpp>
 
 #include <iterator>
 #include <map>
@@ -33,87 +36,82 @@ namespace k3d
 namespace detail
 {
 
-/*
-/// Return true if two shared arrays are equivalent (handles cases where they point to the same memory, etc)
-template<typename array_type>
-const bool equal(const array_type& LHS, const array_type& RHS)
+/// Inserts whitespace into a stream, proportional to its indentation level
+std::ostream& indentation(std::ostream& Stream)
 {
-	if(LHS.get() == RHS.get())
-		return true;
-
-	if(LHS && RHS)
-		return *LHS == *RHS;
-
-	return false;
+	Stream << std::string(2 * current_indent(Stream), ' '); 
+	return Stream;
 }
-
-/// Return true if two groups of named arrays are equivalent (handles cases where they point to the same memory, etc)
-const bool equal(const mesh::named_arrays& LHS, const mesh::named_arrays& RHS)
-{
-	return true;
-}
-*/
 
 template<typename pointer_type>
-void print(std::ostream& Stream, const std::string& Label, const pointer_type& Pointer)
+void print(std::ostream& Stream, const string_t& Label, const pointer_type& Pointer)
 {
 	if(Pointer)
 	{
-		Stream << Label << " (" << Pointer->size() <<  "): ";
+		typedef typename pointer_type::element_type array_type;
+		typedef typename array_type::value_type value_type;
+
+		Stream << indentation << Label;
+		if(type_registered<value_type>())
+			Stream << " [" << type_string<value_type>() <<  "]";
+		Stream << " (" << Pointer->size() <<  "): ";
 		std::copy(Pointer->begin(), Pointer->end(), std::ostream_iterator<typename pointer_type::element_type::value_type>(Stream, " "));
 		Stream << "\n";
 	}
 }
 
-void print(std::ostream& Stream, const std::string& Label, const k3d::mesh::attribute_arrays_t& Arrays)
+class print_array
 {
-    for(k3d::mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
-    {
-        Stream << Label << " " << array_iterator->first << " (" << array_iterator->second->size() << "): ";
-        if(typed_array<double>* const array = dynamic_cast<typed_array<double>*>(array_iterator->second.get()))
-            std::copy(array->begin(), array->end(), std::ostream_iterator<double>(Stream, " "));
-        else if(typed_array<color>* const array = dynamic_cast<typed_array<color>*>(array_iterator->second.get()))
-            std::copy(array->begin(), array->end(), std::ostream_iterator<color>(Stream, " "));
-        else if(typed_array<point3>* const array = dynamic_cast<typed_array<point3>*>(array_iterator->second.get()))
-            std::copy(array->begin(), array->end(), std::ostream_iterator<point3>(Stream, " "));
-        else if(typed_array<normal3>* const array = dynamic_cast<typed_array<normal3>*>(array_iterator->second.get()))
-            std::copy(array->begin(), array->end(), std::ostream_iterator<normal3>(Stream, " "));
-        else if(typed_array<vector3>* const array = dynamic_cast<typed_array<vector3>*>(array_iterator->second.get()))
-            std::copy(array->begin(), array->end(), std::ostream_iterator<vector3>(Stream, " "));
-        else
-            Stream << "unknown type: " << k3d::demangle(typeid(*array_iterator->second.get())) << std::endl;
-        Stream << "\n";
-    }
+public:
+	print_array(std::ostream& Stream, const string_t& ArrayName, const array& Array) :
+		m_stream(Stream),
+		m_array_name(ArrayName),
+		m_array(Array)
+	{
+	}
+
+	template<typename T>
+	void operator()(T) const
+	{
+		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
+		{
+			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
+			std::copy(array->begin(), array->end(), std::ostream_iterator<T>(m_stream, " "));
+			m_stream << "\n";
+		}
+	}
+
+private:
+	std::ostream& m_stream;
+	const string_t& m_array_name;
+	const array& m_array;
+};
+
+void print(std::ostream& Stream, const string_t& Label, const mesh::named_arrays_t& Arrays)
+{
+	Stream << indentation << Label << " (" << Arrays.size() << "):\n" << push_indent;
+	for(mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
+		boost::mpl::for_each<named_array_types>(print_array(Stream, array_iterator->first, *array_iterator->second));
+	Stream << pop_indent;
+}
+
+void print(std::ostream& Stream, const string_t& Label, const mesh::attribute_arrays_t& Arrays)
+{
+	Stream << indentation << Label << " (" << Arrays.size() << "):\n" << push_indent;
+	for(mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
+		boost::mpl::for_each<named_array_types>(print_array(Stream, array_iterator->first, *array_iterator->second));
+	Stream << pop_indent;
+}
+
+void print(std::ostream& Stream, const string_t& Label, const mesh::attributes_t& Attributes)
+{
+	Stream << indentation << Label << " (" << Attributes.size() << "):\n" << push_indent;
+	for(mesh::attributes_t::const_iterator attributes = Attributes.begin(); attributes != Attributes.end(); ++attributes)
+		print(Stream, "attributes \"" + attributes->first + "\"", attributes->second);
+	Stream << pop_indent;
 }
 
 } // namespace detail
-
-///////////////////////////////////////////////////////////////////////////////////
-// mesh::point_groups_t
-
-////////////////////////////////////////////////////////////////////////////////////
-// mesh::linear_curve_groups_t
-
-////////////////////////////////////////////////////////////////////////////////////
-// mesh::cubic_curve_groups_t
-
-////////////////////////////////////////////////////////////////////////////////////
-// mesh::nurbs_curve_groups_t
-
-////////////////////////////////////////////////////////////////////////////////////
-// mesh::bilinear_patches_t
-
-////////////////////////////////////////////////////////////////////////////////////
-// mesh::bicubic_patches_t
-
-////////////////////////////////////////////////////////////////////////////////////
-// mesh::nurbs_patches_t
-
-////////////////////////////////////////////////////////////////////////////////////
-// mesh::polyhedra_t
-
-////////////////////////////////////////////////////////////////////////////////////
-// mesh::blobbies_t
 
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh
@@ -122,10 +120,10 @@ mesh::mesh()
 {
 }
 
-mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
+mesh& mesh::operator=(const legacy::mesh& RHS)
 {
 	// Convert points ...
-	std::map<k3d::legacy::point*, uint_t> point_map;
+	std::map<legacy::point*, uint_t> point_map;
 
 	const uint_t point_size = RHS.points.size();
 	boost::shared_ptr<points_t> points(new points_t(point_size));
@@ -150,13 +148,13 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 		boost::shared_ptr<materials_t> materials(new materials_t());
 		boost::shared_ptr<indices_t> points(new indices_t());
 
-		for(k3d::legacy::mesh::point_groups_t::const_iterator group = RHS.point_groups.begin(); group != RHS.point_groups.end(); ++group)
+		for(legacy::mesh::point_groups_t::const_iterator group = RHS.point_groups.begin(); group != RHS.point_groups.end(); ++group)
 		{
 			first_points->push_back(points->size());
 			point_counts->push_back((*group)->points.size());
 			materials->push_back((*group)->material);
 
-			for(k3d::legacy::point_group::points_t::const_iterator point = (*group)->points.begin(); point != (*group)->points.end(); ++point)
+			for(legacy::point_group::points_t::const_iterator point = (*group)->points.begin(); point != (*group)->points.end(); ++point)
 				points->push_back(point_map[*point]);
 		}
 
@@ -181,20 +179,20 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 		boost::shared_ptr<selection_t> curve_selection(new selection_t());
 		boost::shared_ptr<indices_t> curve_points(new indices_t());
 
-		for(k3d::legacy::mesh::linear_curve_groups_t::const_iterator group = RHS.linear_curve_groups.begin(); group != RHS.linear_curve_groups.end(); ++group)
+		for(legacy::mesh::linear_curve_groups_t::const_iterator group = RHS.linear_curve_groups.begin(); group != RHS.linear_curve_groups.end(); ++group)
 		{
 			first_curves->push_back(curve_first_points->size());
 			curve_counts->push_back((*group)->curves.size());
 			periodic_curves->push_back((*group)->wrap);
 			materials->push_back((*group)->material);
 
-			for(k3d::legacy::linear_curve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
+			for(legacy::linear_curve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
 			{
 				curve_first_points->push_back(curve_points->size());
 				curve_point_counts->push_back((*curve)->control_points.size());
 				curve_selection->push_back((*curve)->selection_weight);
 
-				for(k3d::legacy::linear_curve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
+				for(legacy::linear_curve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
 					curve_points->push_back(point_map[*point]);
 			}
 		}
@@ -224,20 +222,20 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 		boost::shared_ptr<selection_t> curve_selection(new selection_t());
 		boost::shared_ptr<indices_t> curve_points(new indices_t());
 
-		for(k3d::legacy::mesh::cubic_curve_groups_t::const_iterator group = RHS.cubic_curve_groups.begin(); group != RHS.cubic_curve_groups.end(); ++group)
+		for(legacy::mesh::cubic_curve_groups_t::const_iterator group = RHS.cubic_curve_groups.begin(); group != RHS.cubic_curve_groups.end(); ++group)
 		{
 			first_curves->push_back(curve_first_points->size());
 			curve_counts->push_back((*group)->curves.size());
 			periodic_curves->push_back((*group)->wrap);
 			materials->push_back((*group)->material);
 
-			for(k3d::legacy::cubic_curve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
+			for(legacy::cubic_curve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
 			{
 				curve_first_points->push_back(curve_points->size());
 				curve_point_counts->push_back((*curve)->control_points.size());
 				curve_selection->push_back((*curve)->selection_weight);
 
-				for(k3d::legacy::cubic_curve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
+				for(legacy::cubic_curve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
 					curve_points->push_back(point_map[*point]);
 			}
 		}
@@ -270,13 +268,13 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 		boost::shared_ptr<weights_t> curve_point_weights(new weights_t());
 		boost::shared_ptr<knots_t> curve_knots(new knots_t());
 
-		for(k3d::legacy::mesh::nucurve_groups_t::const_iterator group = RHS.nucurve_groups.begin(); group != RHS.nucurve_groups.end(); ++group)
+		for(legacy::mesh::nucurve_groups_t::const_iterator group = RHS.nucurve_groups.begin(); group != RHS.nucurve_groups.end(); ++group)
 		{
 			first_curves->push_back(curve_first_points->size());
 			curve_counts->push_back((*group)->curves.size());
 			materials->push_back((*group)->material);
 
-			for(k3d::legacy::nucurve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
+			for(legacy::nucurve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
 			{
 				curve_first_points->push_back(curve_points->size());
 				curve_point_counts->push_back((*curve)->knots.size() - (*curve)->order);
@@ -284,7 +282,7 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 				curve_first_knots->push_back(curve_knots->size());
 				curve_selection->push_back((*curve)->selection_weight);
 
-				for(k3d::legacy::nucurve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
+				for(legacy::nucurve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
 				{
 					curve_points->push_back(point_map[point->position]);
 					curve_point_weights->push_back(point->weight);
@@ -316,12 +314,12 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 		boost::shared_ptr<materials_t> patch_materials(new materials_t());
 		boost::shared_ptr<indices_t> patch_points(new indices_t());
 
-		for(k3d::legacy::mesh::bilinear_patches_t::const_iterator patch = RHS.bilinear_patches.begin(); patch != RHS.bilinear_patches.end(); ++patch)
+		for(legacy::mesh::bilinear_patches_t::const_iterator patch = RHS.bilinear_patches.begin(); patch != RHS.bilinear_patches.end(); ++patch)
 		{
 			patch_selection->push_back((*patch)->selection_weight);
 			patch_materials->push_back((*patch)->material);
 
-			for(k3d::legacy::bilinear_patch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
+			for(legacy::bilinear_patch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
 				patch_points->push_back(point_map[*point]);
 		}
 
@@ -339,12 +337,12 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 		boost::shared_ptr<materials_t> patch_materials(new materials_t());
 		boost::shared_ptr<indices_t> patch_points(new indices_t());
 
-		for(k3d::legacy::mesh::bicubic_patches_t::const_iterator patch = RHS.bicubic_patches.begin(); patch != RHS.bicubic_patches.end(); ++patch)
+		for(legacy::mesh::bicubic_patches_t::const_iterator patch = RHS.bicubic_patches.begin(); patch != RHS.bicubic_patches.end(); ++patch)
 		{
 			patch_selection->push_back((*patch)->selection_weight);
 			patch_materials->push_back((*patch)->material);
 
-			for(k3d::legacy::bicubic_patch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
+			for(legacy::bicubic_patch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
 				patch_points->push_back(point_map[*point]);
 		}
 
@@ -372,7 +370,7 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 		boost::shared_ptr<knots_t> patch_u_knots(new knots_t());
 		boost::shared_ptr<knots_t> patch_v_knots(new knots_t());
 
-		for(k3d::legacy::mesh::nupatches_t::const_iterator patch = RHS.nupatches.begin(); patch != RHS.nupatches.end(); ++patch)
+		for(legacy::mesh::nupatches_t::const_iterator patch = RHS.nupatches.begin(); patch != RHS.nupatches.end(); ++patch)
 		{
 			patch_first_points->push_back(patch_points->size());
 			patch_u_point_counts->push_back((*patch)->u_knots.size() - (*patch)->u_order);
@@ -384,7 +382,7 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 			patch_selection->push_back((*patch)->selection_weight);
 			patch_materials->push_back((*patch)->material);
 
-			for(k3d::legacy::nupatch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
+			for(legacy::nupatch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
 			{
 				patch_points->push_back(point_map[point->position]);
 				patch_point_weights->push_back(point->weight);
@@ -426,13 +424,13 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 		boost::shared_ptr<indices_t> clockwise_edges(new indices_t());
 		boost::shared_ptr<selection_t> edge_selection(new selection_t());
 
-		for(k3d::legacy::mesh::polyhedra_t::const_iterator polyhedron = RHS.polyhedra.begin(); polyhedron != RHS.polyhedra.end(); ++polyhedron)
+		for(legacy::mesh::polyhedra_t::const_iterator polyhedron = RHS.polyhedra.begin(); polyhedron != RHS.polyhedra.end(); ++polyhedron)
 		{
 			uint_t first_face = face_first_loops->size();
 			uint_t face_count = 0;
-			k3d::mesh::polyhedra_t::polyhedron_type type = (*polyhedron)->type == k3d::legacy::polyhedron::POLYGONS ? k3d::mesh::polyhedra_t::POLYGONS : k3d::mesh::polyhedra_t::CATMULL_CLARK;
+			mesh::polyhedra_t::polyhedron_type type = (*polyhedron)->type == legacy::polyhedron::POLYGONS ? mesh::polyhedra_t::POLYGONS : mesh::polyhedra_t::CATMULL_CLARK;
 
-			for(k3d::legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
+			for(legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
 			{
 				++face_count;
 
@@ -442,7 +440,7 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 				const uint_t first_edge = edge_points->size();
 
 				loop_first_edges->push_back(first_edge);
-				for(k3d::legacy::split_edge* edge = (*face)->first_edge; edge; edge = edge->face_clockwise)
+				for(legacy::split_edge* edge = (*face)->first_edge; edge; edge = edge->face_clockwise)
 				{
 					if(edge->vertex && edge->face_clockwise)
 					{
@@ -458,12 +456,12 @@ mesh& mesh::operator=(const k3d::legacy::mesh& RHS)
 					}
 				}
 
-				for(k3d::legacy::face::holes_t::iterator hole = (*face)->holes.begin(); hole != (*face)->holes.end(); ++hole)
+				for(legacy::face::holes_t::iterator hole = (*face)->holes.begin(); hole != (*face)->holes.end(); ++hole)
 				{
 					const uint_t first_edge = edge_points->size();
 
 					loop_first_edges->push_back(first_edge);
-					for(k3d::legacy::split_edge* edge = *hole; edge; edge = edge->face_clockwise)
+					for(legacy::split_edge* edge = *hole; edge; edge = edge->face_clockwise)
 					{
 						if(edge->vertex && edge->face_clockwise && edge->face_clockwise->vertex)
 						{
@@ -531,7 +529,7 @@ std::ostream& operator<<(std::ostream& Stream, const mesh::polyhedra_t::polyhedr
 
 std::istream& operator>>(std::istream& Stream, mesh::polyhedra_t::polyhedron_type& RHS)
 {
-	std::string buffer;
+	string_t buffer;
 	Stream >> buffer;
 
 	if(buffer == "polygons")
@@ -564,7 +562,7 @@ std::ostream& operator<<(std::ostream& Stream, const mesh::blobbies_t::primitive
 
 std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::primitive_type& RHS)
 {
-	std::string buffer;
+	string_t buffer;
 	Stream >> buffer;
 
 	if(buffer == "constant")
@@ -614,7 +612,7 @@ std::ostream& operator<<(std::ostream& Stream, const mesh::blobbies_t::operator_
 
 std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::operator_type& RHS)
 {
-	std::string buffer;
+	string_t buffer;
 	Stream >> buffer;
 
 	if(buffer == "add")
@@ -642,157 +640,195 @@ std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::operator_type& 
 /** \todo Print materials */
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 {
-	Stream << "mesh:" << std::endl;
+	Stream << detail::indentation << "mesh:\n" << push_indent;
 
 	if(RHS.point_groups)
 	{
-		Stream << "  point groups:" << std::endl;
-		detail::print(Stream, "    first points", RHS.point_groups->first_points);
-		detail::print(Stream, "    point counts", RHS.point_groups->point_counts);
-		detail::print(Stream, "    constant data", RHS.point_groups->constant_data);
-		detail::print(Stream, "    points", RHS.point_groups->points);
-		detail::print(Stream, "    varying data", RHS.point_groups->varying_data);
+		Stream << detail::indentation << "point_groups:\n" << push_indent;
+
+		detail::print(Stream, "first_points", RHS.point_groups->first_points);
+		detail::print(Stream, "point_counts", RHS.point_groups->point_counts);
+		detail::print(Stream, "constant_data", RHS.point_groups->constant_data);
+		detail::print(Stream, "points", RHS.point_groups->points);
+		detail::print(Stream, "varying_data", RHS.point_groups->varying_data);
+		
+		Stream << pop_indent;
 	}
 
 	if(RHS.linear_curve_groups)
 	{
-		Stream << "  linear curve groups:" << std::endl;
-		detail::print(Stream, "    first curves", RHS.linear_curve_groups->first_curves);
-		detail::print(Stream, "    curve counts", RHS.linear_curve_groups->curve_counts);
-		detail::print(Stream, "    periodic curves", RHS.linear_curve_groups->periodic_curves);
-		detail::print(Stream, "    constant data", RHS.linear_curve_groups->constant_data);
-		detail::print(Stream, "    curve first points", RHS.linear_curve_groups->curve_first_points);
-		detail::print(Stream, "    curve point counts", RHS.linear_curve_groups->curve_point_counts);
-		detail::print(Stream, "    curve selection", RHS.linear_curve_groups->curve_selection);
-		detail::print(Stream, "    uniform data", RHS.linear_curve_groups->uniform_data);
-		detail::print(Stream, "    curve points", RHS.linear_curve_groups->curve_points);
+		Stream << detail::indentation << "linear_curve_groups:\n" << push_indent;
+
+		detail::print(Stream, "first_curves", RHS.linear_curve_groups->first_curves);
+		detail::print(Stream, "curve_counts", RHS.linear_curve_groups->curve_counts);
+		detail::print(Stream, "periodic_curves", RHS.linear_curve_groups->periodic_curves);
+		detail::print(Stream, "constant_data", RHS.linear_curve_groups->constant_data);
+		detail::print(Stream, "curve_first points", RHS.linear_curve_groups->curve_first_points);
+		detail::print(Stream, "curve_point counts", RHS.linear_curve_groups->curve_point_counts);
+		detail::print(Stream, "curve_selection", RHS.linear_curve_groups->curve_selection);
+		detail::print(Stream, "uniform_data", RHS.linear_curve_groups->uniform_data);
+		detail::print(Stream, "curve_points", RHS.linear_curve_groups->curve_points);
+		
+		Stream << pop_indent;
 	}
 
 	if(RHS.cubic_curve_groups)
 	{
-		Stream << "  cubic curve groups:" << std::endl;
-		detail::print(Stream, "    first curves", RHS.cubic_curve_groups->first_curves);
-		detail::print(Stream, "    curve counts", RHS.cubic_curve_groups->curve_counts);
-		detail::print(Stream, "    periodic curves", RHS.cubic_curve_groups->periodic_curves);
-		detail::print(Stream, "    constant data", RHS.cubic_curve_groups->constant_data);
-		detail::print(Stream, "    curve first points", RHS.cubic_curve_groups->curve_first_points);
-		detail::print(Stream, "    curve point counts", RHS.cubic_curve_groups->curve_point_counts);
-		detail::print(Stream, "    curve selection", RHS.cubic_curve_groups->curve_selection);
-		detail::print(Stream, "    uniform data", RHS.cubic_curve_groups->uniform_data);
-		detail::print(Stream, "    curve points", RHS.cubic_curve_groups->curve_points);
+		Stream << detail::indentation << "cubic_curve_groups:\n" << push_indent;
+
+		detail::print(Stream, "first_curves", RHS.cubic_curve_groups->first_curves);
+		detail::print(Stream, "curve_counts", RHS.cubic_curve_groups->curve_counts);
+		detail::print(Stream, "periodic_curves", RHS.cubic_curve_groups->periodic_curves);
+		detail::print(Stream, "constant_data", RHS.cubic_curve_groups->constant_data);
+		detail::print(Stream, "curve_first_points", RHS.cubic_curve_groups->curve_first_points);
+		detail::print(Stream, "curve_point_counts", RHS.cubic_curve_groups->curve_point_counts);
+		detail::print(Stream, "curve_selection", RHS.cubic_curve_groups->curve_selection);
+		detail::print(Stream, "uniform_data", RHS.cubic_curve_groups->uniform_data);
+		detail::print(Stream, "curve_points", RHS.cubic_curve_groups->curve_points);
+		
+		Stream << pop_indent;
 	}
 
 	if(RHS.nurbs_curve_groups)
 	{
-		Stream << "  nurbs curve groups:" << std::endl;
-		detail::print(Stream, "    first curves", RHS.nurbs_curve_groups->first_curves);
-		detail::print(Stream, "    curve counts", RHS.nurbs_curve_groups->curve_counts);
-		detail::print(Stream, "    constant data", RHS.nurbs_curve_groups->constant_data);
-		detail::print(Stream, "    curve first points", RHS.nurbs_curve_groups->curve_first_points);
-		detail::print(Stream, "    curve point counts", RHS.nurbs_curve_groups->curve_point_counts);
-		detail::print(Stream, "    curve orders", RHS.nurbs_curve_groups->curve_orders);
-		detail::print(Stream, "    curve selection", RHS.nurbs_curve_groups->curve_selection);
-		detail::print(Stream, "    uniform data", RHS.nurbs_curve_groups->uniform_data);
-		detail::print(Stream, "    curve points", RHS.nurbs_curve_groups->curve_points);
-		detail::print(Stream, "    curve point weights", RHS.nurbs_curve_groups->curve_point_weights);
-		detail::print(Stream, "    curve knots", RHS.nurbs_curve_groups->curve_knots);
+		Stream << detail::indentation << "nurbs_curve_groups:\n" << push_indent;
+
+		detail::print(Stream, "first_curves", RHS.nurbs_curve_groups->first_curves);
+		detail::print(Stream, "curve_counts", RHS.nurbs_curve_groups->curve_counts);
+		detail::print(Stream, "constant_data", RHS.nurbs_curve_groups->constant_data);
+		detail::print(Stream, "curve_first_points", RHS.nurbs_curve_groups->curve_first_points);
+		detail::print(Stream, "curve_point_counts", RHS.nurbs_curve_groups->curve_point_counts);
+		detail::print(Stream, "curve_orders", RHS.nurbs_curve_groups->curve_orders);
+		detail::print(Stream, "curve_selection", RHS.nurbs_curve_groups->curve_selection);
+		detail::print(Stream, "uniform_data", RHS.nurbs_curve_groups->uniform_data);
+		detail::print(Stream, "curve_points", RHS.nurbs_curve_groups->curve_points);
+		detail::print(Stream, "curve_point_weights", RHS.nurbs_curve_groups->curve_point_weights);
+		detail::print(Stream, "curve_knots", RHS.nurbs_curve_groups->curve_knots);
+		
+		Stream << pop_indent;
 	}
 
 	if(RHS.bilinear_patches)
 	{
-		Stream << "  bilinear patches:" << std::endl;
-		detail::print(Stream, "    patch selection", RHS.bilinear_patches->patch_selection);
-		detail::print(Stream, "    constant data", RHS.bilinear_patches->constant_data);
-		detail::print(Stream, "    uniform data", RHS.bilinear_patches->uniform_data);
-		detail::print(Stream, "    patch points", RHS.bilinear_patches->patch_points);
-		detail::print(Stream, "    varying data", RHS.bilinear_patches->varying_data);
+		Stream << detail::indentation << "bilinear_patches:\n" << push_indent;
+
+		detail::print(Stream, "patch_selection", RHS.bilinear_patches->patch_selection);
+		detail::print(Stream, "constant_data", RHS.bilinear_patches->constant_data);
+		detail::print(Stream, "uniform_data", RHS.bilinear_patches->uniform_data);
+		detail::print(Stream, "patch_points", RHS.bilinear_patches->patch_points);
+		detail::print(Stream, "varying_data", RHS.bilinear_patches->varying_data);
+		
+		Stream << pop_indent;
 	}
 
 	if(RHS.bicubic_patches)
 	{
-		Stream << "  bicubic patches:" << std::endl;
-		detail::print(Stream, "    patch selection", RHS.bicubic_patches->patch_selection);
-		detail::print(Stream, "    constant data", RHS.bicubic_patches->constant_data);
-		detail::print(Stream, "    uniform data", RHS.bicubic_patches->uniform_data);
-		detail::print(Stream, "    patch points", RHS.bicubic_patches->patch_points);
-		detail::print(Stream, "    varying data", RHS.bicubic_patches->varying_data);
+		Stream << detail::indentation << "bicubic_patches:\n" << push_indent;
+
+		detail::print(Stream, "patch_selection", RHS.bicubic_patches->patch_selection);
+		detail::print(Stream, "constant_data", RHS.bicubic_patches->constant_data);
+		detail::print(Stream, "uniform_data", RHS.bicubic_patches->uniform_data);
+		detail::print(Stream, "patch_points", RHS.bicubic_patches->patch_points);
+		detail::print(Stream, "varying_data", RHS.bicubic_patches->varying_data);
+		
+		Stream << pop_indent;
 	}
 
 	if(RHS.nurbs_patches)
 	{
-		Stream << "  nurbs patches:" << std::endl;
-		detail::print(Stream, "    patch first points", RHS.nurbs_patches->patch_first_points);
-		detail::print(Stream, "    patch u point counts", RHS.nurbs_patches->patch_u_point_counts);
-		detail::print(Stream, "    patch v point counts", RHS.nurbs_patches->patch_v_point_counts);
-		detail::print(Stream, "    patch u orders", RHS.nurbs_patches->patch_u_orders);
-		detail::print(Stream, "    patch v orders", RHS.nurbs_patches->patch_v_orders);
-		detail::print(Stream, "    patch selection", RHS.nurbs_patches->patch_selection);
-		detail::print(Stream, "    constant data", RHS.nurbs_patches->constant_data);
-		detail::print(Stream, "    uniform data", RHS.nurbs_patches->uniform_data);
-		detail::print(Stream, "    patch points", RHS.nurbs_patches->patch_points);
-		detail::print(Stream, "    patch point weights", RHS.nurbs_patches->patch_point_weights);
-		detail::print(Stream, "    patch u knots", RHS.nurbs_patches->patch_u_knots);
-		detail::print(Stream, "    patch v knots", RHS.nurbs_patches->patch_v_knots);
-		detail::print(Stream, "    varying data", RHS.nurbs_patches->varying_data);
-		detail::print(Stream, "    patch_trim_curve_loop_counts", RHS.nurbs_patches->patch_trim_curve_loop_counts);
-		detail::print(Stream, "    patch_first_trim_curve_loops", RHS.nurbs_patches->patch_first_trim_curve_loops);
-		detail::print(Stream, "    trim_points", RHS.nurbs_patches->trim_points);
-		detail::print(Stream, "    trim_point_selection", RHS.nurbs_patches->trim_point_selection);
-		detail::print(Stream, "    first_trim_curves", RHS.nurbs_patches->first_trim_curves);
-		detail::print(Stream, "    trim_curve_counts", RHS.nurbs_patches->trim_curve_counts);
-		detail::print(Stream, "    trim_curve_loop_selection", RHS.nurbs_patches->trim_curve_loop_selection);
-		detail::print(Stream, "    trim_curve_first_points", RHS.nurbs_patches->trim_curve_first_points);
-		detail::print(Stream, "    trim_curve_point_counts", RHS.nurbs_patches->trim_curve_point_counts);
-		detail::print(Stream, "    trim_curve_orders", RHS.nurbs_patches->trim_curve_orders);
-		detail::print(Stream, "    trim_curve_first_knots", RHS.nurbs_patches->trim_curve_first_knots);
-		detail::print(Stream, "    trim_curve_selection", RHS.nurbs_patches->trim_curve_selection);
-		detail::print(Stream, "    trim_curve_points", RHS.nurbs_patches->trim_curve_points);
-		detail::print(Stream, "    trim_curve_point_weights", RHS.nurbs_patches->trim_curve_point_weights);
-		detail::print(Stream, "    trim_curve_knots", RHS.nurbs_patches->trim_curve_knots);
+		Stream << detail::indentation << "nurbs_patches:\n" << push_indent;
+
+		detail::print(Stream, "patch_first_points", RHS.nurbs_patches->patch_first_points);
+		detail::print(Stream, "patch_u_point_counts", RHS.nurbs_patches->patch_u_point_counts);
+		detail::print(Stream, "patch_v_point_counts", RHS.nurbs_patches->patch_v_point_counts);
+		detail::print(Stream, "patch_u_orders", RHS.nurbs_patches->patch_u_orders);
+		detail::print(Stream, "patch_v_orders", RHS.nurbs_patches->patch_v_orders);
+		detail::print(Stream, "patch_selection", RHS.nurbs_patches->patch_selection);
+		detail::print(Stream, "constant_data", RHS.nurbs_patches->constant_data);
+		detail::print(Stream, "uniform_data", RHS.nurbs_patches->uniform_data);
+		detail::print(Stream, "patch_points", RHS.nurbs_patches->patch_points);
+		detail::print(Stream, "patch_point_weights", RHS.nurbs_patches->patch_point_weights);
+		detail::print(Stream, "patch_u_knots", RHS.nurbs_patches->patch_u_knots);
+		detail::print(Stream, "patch_v_knots", RHS.nurbs_patches->patch_v_knots);
+		detail::print(Stream, "varying_data", RHS.nurbs_patches->varying_data);
+		detail::print(Stream, "patch_trim_curve_loop_counts", RHS.nurbs_patches->patch_trim_curve_loop_counts);
+		detail::print(Stream, "patch_first_trim_curve_loops", RHS.nurbs_patches->patch_first_trim_curve_loops);
+		detail::print(Stream, "trim_points", RHS.nurbs_patches->trim_points);
+		detail::print(Stream, "trim_point_selection", RHS.nurbs_patches->trim_point_selection);
+		detail::print(Stream, "first_trim_curves", RHS.nurbs_patches->first_trim_curves);
+		detail::print(Stream, "trim_curve_counts", RHS.nurbs_patches->trim_curve_counts);
+		detail::print(Stream, "trim_curve_loop_selection", RHS.nurbs_patches->trim_curve_loop_selection);
+		detail::print(Stream, "trim_curve_first_points", RHS.nurbs_patches->trim_curve_first_points);
+		detail::print(Stream, "trim_curve_point_counts", RHS.nurbs_patches->trim_curve_point_counts);
+		detail::print(Stream, "trim_curve_orders", RHS.nurbs_patches->trim_curve_orders);
+		detail::print(Stream, "trim_curve_first_knots", RHS.nurbs_patches->trim_curve_first_knots);
+		detail::print(Stream, "trim_curve_selection", RHS.nurbs_patches->trim_curve_selection);
+		detail::print(Stream, "trim_curve_points", RHS.nurbs_patches->trim_curve_points);
+		detail::print(Stream, "trim_curve_point_weights", RHS.nurbs_patches->trim_curve_point_weights);
+		detail::print(Stream, "trim_curve_knots", RHS.nurbs_patches->trim_curve_knots);
+		
+		Stream << pop_indent;
 	}
 
 	if(RHS.polyhedra)
 	{
-		Stream << "  polyhedra:" << std::endl;
-		detail::print(Stream, "    first faces", RHS.polyhedra->first_faces);
-		detail::print(Stream, "    face counts", RHS.polyhedra->face_counts);
-		detail::print(Stream, "    types", RHS.polyhedra->types);
-		detail::print(Stream, "    constant data", RHS.polyhedra->constant_data);
-		detail::print(Stream, "    face first loops", RHS.polyhedra->face_first_loops);
-		detail::print(Stream, "    face loop counts", RHS.polyhedra->face_loop_counts);
-		detail::print(Stream, "    face selection", RHS.polyhedra->face_selection);
-		detail::print(Stream, "    uniform data", RHS.polyhedra->uniform_data);
-		detail::print(Stream, "    loop first edges", RHS.polyhedra->loop_first_edges);
-		detail::print(Stream, "    edge points", RHS.polyhedra->edge_points);
-		detail::print(Stream, "    clockwise edges", RHS.polyhedra->clockwise_edges);
-		detail::print(Stream, "    edge selection", RHS.polyhedra->edge_selection);
-		detail::print(Stream, "    face varying data", RHS.polyhedra->face_varying_data);
+		Stream << detail::indentation << "polyhedra:\n" << push_indent;
+
+		detail::print(Stream, "first_faces", RHS.polyhedra->first_faces);
+		detail::print(Stream, "face_counts", RHS.polyhedra->face_counts);
+		detail::print(Stream, "types", RHS.polyhedra->types);
+		detail::print(Stream, "constant_data", RHS.polyhedra->constant_data);
+		detail::print(Stream, "face_first_loops", RHS.polyhedra->face_first_loops);
+		detail::print(Stream, "face_loop_counts", RHS.polyhedra->face_loop_counts);
+		detail::print(Stream, "face_selection", RHS.polyhedra->face_selection);
+		detail::print(Stream, "uniform_data", RHS.polyhedra->uniform_data);
+		detail::print(Stream, "loop_first_edges", RHS.polyhedra->loop_first_edges);
+		detail::print(Stream, "edge_points", RHS.polyhedra->edge_points);
+		detail::print(Stream, "clockwise_edges", RHS.polyhedra->clockwise_edges);
+		detail::print(Stream, "edge_selection", RHS.polyhedra->edge_selection);
+		detail::print(Stream, "face_varying_data", RHS.polyhedra->face_varying_data);
+		
+		Stream << pop_indent;
 	}
 
 	if(RHS.blobbies)
 	{
-		Stream << "  blobbies:" << std::endl;
-		detail::print(Stream, "    first primitives", RHS.blobbies->first_primitives);
-		detail::print(Stream, "    primitive counts", RHS.blobbies->primitive_counts);
-		detail::print(Stream, "    first operators", RHS.blobbies->first_operators);
-		detail::print(Stream, "    operator counts", RHS.blobbies->operator_counts);
-		detail::print(Stream, "    constant data", RHS.blobbies->constant_data);
-		detail::print(Stream, "    uniform data", RHS.blobbies->uniform_data);
-		detail::print(Stream, "    primitives", RHS.blobbies->primitives);
-		detail::print(Stream, "    primitive first floats", RHS.blobbies->primitive_first_floats);
-		detail::print(Stream, "    primitive float counts", RHS.blobbies->primitive_float_counts);
-		detail::print(Stream, "    varying data", RHS.blobbies->varying_data);
-		detail::print(Stream, "    vertex data", RHS.blobbies->vertex_data);
-		detail::print(Stream, "    operators", RHS.blobbies->operators);
-		detail::print(Stream, "    operator first operands", RHS.blobbies->operator_first_operands);
-		detail::print(Stream, "    operator operand counts", RHS.blobbies->operator_operand_counts);
-		detail::print(Stream, "    floats", RHS.blobbies->floats);
-		detail::print(Stream, "    operands", RHS.blobbies->operands);
+		Stream << detail::indentation << "blobbies:\n" << push_indent;
+
+		detail::print(Stream, "first_primitives", RHS.blobbies->first_primitives);
+		detail::print(Stream, "primitive_counts", RHS.blobbies->primitive_counts);
+		detail::print(Stream, "first_operators", RHS.blobbies->first_operators);
+		detail::print(Stream, "operator_counts", RHS.blobbies->operator_counts);
+		detail::print(Stream, "constant_data", RHS.blobbies->constant_data);
+		detail::print(Stream, "uniform_data", RHS.blobbies->uniform_data);
+		detail::print(Stream, "primitives", RHS.blobbies->primitives);
+		detail::print(Stream, "primitive_first_floats", RHS.blobbies->primitive_first_floats);
+		detail::print(Stream, "primitive_float_counts", RHS.blobbies->primitive_float_counts);
+		detail::print(Stream, "varying_data", RHS.blobbies->varying_data);
+		detail::print(Stream, "vertex_data", RHS.blobbies->vertex_data);
+		detail::print(Stream, "operators", RHS.blobbies->operators);
+		detail::print(Stream, "operator_first_operands", RHS.blobbies->operator_first_operands);
+		detail::print(Stream, "operator_operand_counts", RHS.blobbies->operator_operand_counts);
+		detail::print(Stream, "floats", RHS.blobbies->floats);
+		detail::print(Stream, "operands", RHS.blobbies->operands);
+		
+		Stream << pop_indent;
 	}
 
-	detail::print(Stream, "  points", RHS.points);
-	detail::print(Stream, "  point selection", RHS.point_selection);
-	detail::print(Stream, "  vertex data", RHS.vertex_data);
+	detail::print(Stream, "points", RHS.points);
+	detail::print(Stream, "point_selection", RHS.point_selection);
+	detail::print(Stream, "vertex_data", RHS.vertex_data);
+
+	Stream << detail::indentation << "primitives (" << RHS.primitives.size() << "):\n" << push_indent;
+	for(mesh::primitives_t::const_iterator primitive = RHS.primitives.begin(); primitive != RHS.primitives.end(); ++primitive)
+	{
+		Stream << detail::indentation << "primitive \"" << (*primitive)->type << "\"\n" << push_indent;
+		detail::print(Stream, "topology", (*primitive)->topology);
+		detail::print(Stream, "attributes", (*primitive)->attributes);
+		Stream << pop_indent;
+	}
+	Stream << pop_indent;
+	Stream << pop_indent;
 
 	return Stream;
 }

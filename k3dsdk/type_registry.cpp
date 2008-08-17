@@ -278,6 +278,13 @@ const string_t demangle(const string_t& Type)
 
 } // namespace detail
 
+const bool_t type_registered(const std::type_info& Info)
+{
+	detail::initialize_types();
+
+	return detail::type_to_name_map.count(detail::type_info(Info));
+}
+
 const string_t type_string(const std::type_info& Info)
 {
 	detail::initialize_types();

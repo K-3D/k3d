@@ -22,6 +22,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "iomanip.h"
 #include "log.h"
 #include "string_cast.h"
 #include "xml.h"
@@ -74,34 +75,11 @@ std::ostream& eol(std::ostream& Stream)
 	return Stream;
 }
 
-/// Returns the current indentation for a stream
-long& current_indent(std::ios& Stream)
-{
-	static const int index = std::ios::xalloc();
-	return Stream.iword(index);
-}
-
-/// Increments a stream's indentation
-std::ostream& push_indent(std::ostream& Stream)
-{
-	current_indent(Stream)++;
-	return Stream;
-}
-
-/// Decrements a stream's indentation
-std::ostream& pop_indent(std::ostream& Stream)
-{
-	if(current_indent(Stream) != 0)
-		current_indent(Stream)--;
-
-	return Stream;
-}
-
-/// Inserts whitespace into a stream, proportional to its indentation level
+/// Inserts whitespace into a stream, proportional to its indentation level (we override the default to implement single_line behavior).
 std::ostream& indentation(std::ostream& Stream)
 {
 	if(!single_line(Stream))
-		Stream << std::string(current_indent(Stream), '\t'); 
+		Stream << std::string(k3d::current_indent(Stream), '\t'); 
 	return Stream;
 }
 
@@ -618,9 +596,9 @@ std::ostream& operator<<(std::ostream& Stream, const element& RHS)
 
 	if(RHS.children.size())
 	{
-		Stream << detail::eol << detail::push_indent;
+		Stream << detail::eol << push_indent;
 		std::copy(RHS.children.begin(), RHS.children.end(), std::ostream_iterator<element>(Stream));
-		Stream << detail::pop_indent << detail::indentation;
+		Stream << pop_indent << detail::indentation;
 	}
 
 	Stream << "</" << RHS.name << ">" << detail::eol;
