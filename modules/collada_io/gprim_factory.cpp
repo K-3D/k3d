@@ -82,7 +82,6 @@ void normalize_knot_vector(mesh::knots_t& Knots, double& Factor, double& Offset)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // gprim_factory::implementation
-typedef k3d::typed_array<k3d::texture3> texcoord_array_t;
 
 class gprim_factory::implementation
 {
@@ -178,6 +177,8 @@ public:
 	mesh::indices_t* clockwise_edges;
 	mesh::selection_t* edge_selection;
 	boost::shared_ptr<texcoord_array_t> texcoords;
+	std::vector<k3d::texture3> texcoords_vec;
+	std::vector<k3d::texture3> edge_texcoords;
 
 	mesh::indices_t* nurbs_patch_first_points;
 	mesh::counts_t* nurbs_patch_u_point_counts;
@@ -261,6 +262,11 @@ void gprim_factory::add_point(const point3& Point)
 	m_implementation->point_weights->push_back(1.0);
 }
 
+void gprim_factory::add_texcoord(const k3d::texture3& texcoord)
+{
+	m_implementation->texcoords_vec.push_back(texcoord);
+}
+
 void gprim_factory::add_point(const point4& Point)
 {
 	if(!m_implementation->points)
@@ -306,6 +312,7 @@ void gprim_factory::add_polygon(const mesh::indices_t& Points)
 	const size_t point_begin = 0;
 	const size_t point_end = point_begin + Points.size();
 	const size_t first_edge = m_implementation->edge_points->size();
+
 	for(size_t point = point_begin; point != point_end; ++point)
 	{
 		m_implementation->edge_points->push_back(Points[point]);
@@ -315,8 +322,54 @@ void gprim_factory::add_polygon(const mesh::indices_t& Points)
 	m_implementation->clockwise_edges->back() = first_edge;
 }
 
-void gprim_factory::add_texcoord(k3d::texture3 tex, size_t point)
+void gprim_factory::add_polygon(const mesh::indices_t& Points, const mesh::indices_t& Texcoords)
 {
+	return_if_fail(Points.size());
+
+	if(!m_implementation->first_faces)
+	{
+		mesh::polyhedra_t* const polyhedra = make_unique(m_implementation->target_mesh.polyhedra);
+		m_implementation->first_faces = make_unique(polyhedra->first_faces);
+		m_implementation->face_counts = make_unique(polyhedra->face_counts);
+		m_implementation->types = make_unique(polyhedra->types);
+		m_implementation->face_first_loops = make_unique(polyhedra->face_first_loops);
+		m_implementation->face_loop_counts = make_unique(polyhedra->face_loop_counts);
+		m_implementation->face_selection = make_unique(polyhedra->face_selection);
+		m_implementation->face_materials = make_unique(polyhedra->face_materials);
+		m_implementation->loop_first_edges = make_unique(polyhedra->loop_first_edges);
+		m_implementation->edge_points = make_unique(polyhedra->edge_points);
+		m_implementation->clockwise_edges = make_unique(polyhedra->clockwise_edges);
+		m_implementation->edge_selection = make_unique(polyhedra->edge_selection);
+		m_implementation->first_faces->push_back(0);
+		m_implementation->types->push_back(mesh::polyhedra_t::POLYGONS);
+	}
+
+	m_implementation->face_first_loops->push_back(m_implementation->loop_first_edges->size());
+	m_implementation->face_loop_counts->push_back(1);
+	m_implementation->face_selection->push_back(0.0);
+	m_implementation->face_materials->push_back(static_cast<imaterial*>(0));
+	m_implementation->loop_first_edges->push_back(m_implementation->edge_points->size());
+
+	const size_t point_begin = 0;
+	const size_t point_end = point_begin + Points.size();
+	const size_t first_edge = m_implementation->edge_points->size();
+
+	//const k3d::mesh::indices_t& edge_points = *m_implementation->target_mesh.polyhedra->edge_points.get();
+
+	for(size_t point = point_begin; point != point_end; ++point)
+	{
+		m_implementation->edge_texcoords.push_back(m_implementation->texcoords_vec[Texcoords[point]]);
+		m_implementation->edge_points->push_back(Points[point]);
+		m_implementation->clockwise_edges->push_back(m_implementation->edge_points->size());
+		m_implementation->edge_selection->push_back(0.0);
+	}
+	m_implementation->clockwise_edges->back() = first_edge;
+}
+
+void gprim_factory::attach_texcoords()
+{
+	if(m_implementation->texcoords_vec.size() == 0 || m_implementation->edge_texcoords.size() == 0)
+		return;
 	if(!m_implementation->texcoords)
 	{
 		return_if_fail(m_implementation->target_mesh.polyhedra);
@@ -338,27 +391,26 @@ void gprim_factory::add_texcoord(k3d::texture3 tex, size_t point)
 		writable_polyhedra->face_varying_data["texcoord"] = m_implementation->texcoords;
 	}
 
-	return_if_fail(m_implementation->target_mesh.polyhedra->edge_points);
+	//return_if_fail(m_implementation->target_mesh.polyhedra->edge_points);
 	const k3d::mesh::indices_t& edge_points = *m_implementation->target_mesh.polyhedra->edge_points.get();
 
-	k3d::mesh::named_arrays_t::const_iterator array_it = m_implementation->target_mesh.polyhedra->face_varying_data.find("texcoord");
-	return_if_fail(array_it != m_implementation->target_mesh.polyhedra->face_varying_data.end());
-	return_if_fail(dynamic_cast< texcoord_array_t* >(array_it->second.get()));
+	//k3d::mesh::named_arrays_t::const_iterator array_it = m_implementation->target_mesh.polyhedra->face_varying_data.find("texcoord");
+	//return_if_fail(array_it != m_implementation->target_mesh.polyhedra->face_varying_data.end());
+	//return_if_fail(dynamic_cast< texcoord_array_t* >(array_it->second.get()));
 	//m_implementation->texcoords.reset(new texcoord_array_t(*dynamic_cast< texcoord_array_t* >(array_it->second.get())));
-	texcoord_array_t& texcoords1 = *dynamic_cast< texcoord_array_t* >(array_it->second.get());
+	//texcoord_array_t& texcoords1 = *dynamic_cast< texcoord_array_t* >(array_it->second.get());
 
 	//k3d::matrix4 inv_matrix = inverse(m_input_matrix.pipeline_value());
 	for(size_t edge = 0; edge<m_implementation->target_mesh.polyhedra->edge_points->size(); ++edge)
 	{
 		k3d::point3 point =  (*m_implementation->target_mesh.points.get())[edge_points[edge]];
-		//m_implementation->texcoords->at(edge).n[0] = point.n[0];
-		//m_implementation->texcoords->at(edge).n[1] = point.n[1];
-		//m_implementation->texcoords->at(edge).n[2] = point.n[2];
-		texcoords1[edge] = k3d::texture3(point.n[0], point.n[1], point.n[2]);
-		//texcoords1[edge].n[0] = point.n[0];
-		//texcoords1[edge].n[1] = point.n[1];
-		//texcoords1[edge].n[2] = point.n[2];
-		//k3d::log() << debug << point.n[0] << " , " << point.n[1] << " , " << point.n[2] << std::endl;
+		m_implementation->texcoords->at(edge) = m_implementation->edge_texcoords[edge];
+	}
+	//k3d::log() << debug << m_implementation->edge_texcoords.size() << m_implementation->target_mesh.polyhedra->edge_points->size() << std::endl;
+	//for(int i=0; i<m_implementation->edge_texcoords.size(); i++)
+	{
+		//k3d::texture3 t= m_implementation->edge_texcoords[i];
+		//k3d::log() << debug << t[0] << " , " << t[1] << " , " << t[2] << std::endl;
 	}
 }
 

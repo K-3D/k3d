@@ -27,6 +27,8 @@
 namespace k3d
 {
 
+typedef k3d::typed_array<k3d::texture3> texcoord_array_t;
+
 /// Provides a simplified interface for adding geometric primitives to a mesh
 class gprim_factory
 {
@@ -38,11 +40,13 @@ public:
 	/// Adds a new point to the Mesh.points array
 	void add_point(const point3& Point);
 	void add_point(const point4& Point);
+	void add_texcoord(const k3d::texture3& tex);
 	
-	void add_texcoord(k3d::texture3 tex, size_t point);
+	void attach_texcoords();
 
 	/// Creates a polygon, given the corner indices
 	void add_polygon(const mesh::indices_t& Points);
+	void add_polygon(const mesh::indices_t& Points, const mesh::indices_t& Texcoords);
 	
 	/// Adds a hole to the last face, given the corner indices
 	void add_hole(const mesh::indices_t& Points);

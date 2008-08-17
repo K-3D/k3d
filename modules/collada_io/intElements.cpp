@@ -43,6 +43,7 @@ namespace io
 
 	intGeometry::intGeometry(domGeometry& geomElement, const k3d::matrix4& ccst)
 	{
+		k3d::log() << debug << "una geom" << std::endl;
 		domMesh *meshElement = geomElement.getMesh();
 
 		k3d::gprim_factory factory(Mesh);
@@ -92,6 +93,75 @@ namespace io
 					max_offset = polygons->getInput_array()[i]->getOffset();
 			}
 
+
+////////////
+/////////////
+//////////////
+			domSource *source_vertex;
+			domSource *source_normal;
+			domSource *source_texcoord;
+			daeURI *elementURI;
+
+			domVertices* domV;
+			domV = daeSafeCast<domVertices>(vertex_input->getSource().getElement());
+	
+			source_vertex = daeSafeCast<domSource>(domV->getInput_array()[0]->getSource().getElement());
+	
+			if(texcoord_input)
+			{
+				elementURI = &texcoord_input->getSource();
+				source_texcoord = daeSafeCast<domSource>(elementURI->getElement());
+			}
+	
+			domFloat_array *floatArray_vertex;
+			domFloat_array *floatArray_normal;
+			domFloat_array *floatArray_texcoord;
+		
+			if(source_vertex)
+				floatArray_vertex = &source_vertex->getFloat_array()[0];
+		
+			//if(source_normal)
+			//	floatArray_normal = &source_normal->getFloat_array()[0];
+		
+			if(source_texcoord)
+				floatArray_texcoord = &source_texcoord->getFloat_array()[0];
+	
+			int stride = source_vertex->getTechnique_common()->getAccessor()->getStride();
+		
+			// Assume there are 3 values per vertex with a stride of 3.
+			// Copy the vertices into my structure one-by-one
+			// (converts from COLLADA's doubles to floats).
+	
+			for ( unsigned int i = 0; i < floatArray_vertex->getCount(); i+=stride )
+			{
+				k3d::point4 vertex(floatArray_vertex->getValue()[i],
+						floatArray_vertex->getValue()[i+1],
+						floatArray_vertex->getValue()[i+2],
+						1);
+				//k3d::texture3 texture(floatArray_texcoord->getValue()[i],
+				//		floatArray_texcoord->getValue()[i+1],
+				//		1);
+				factory.add_point(ccst*vertex);
+				//factory.add_texcoord(texture);
+			}
+
+			if(floatArray_texcoord->getCount()>0)
+			{
+				k3d::log() << debug << "a;sldkfjas;dlfkjads" << std::endl;
+				stride = source_texcoord->getTechnique_common()->getAccessor()->getStride();
+				//k3d::log() << debug << stride << " " << floatArray_texcoord->getCount() << std::endl;
+				for ( unsigned int i = 0; i < floatArray_texcoord->getCount(); i+=stride)
+				{
+					k3d::texture3 texture(floatArray_texcoord->getValue()[i],
+									1-floatArray_texcoord->getValue()[i+1],
+									1);
+					factory.add_texcoord(texture);
+				}
+			}
+////////////
+///////////
+//////////
+
 			// Stores the list of polygons
 			domP *poly = polygons->getP();
 
@@ -119,7 +189,7 @@ namespace io
 				}
 				tot+=vcount*max_offset;
 				// Push this polygon into the list of polygons in my structure.
-				factory.add_polygon(vertex_coordinates); //and soon texture_coordinates, normal_coordinates
+				factory.add_polygon(vertex_coordinates, texture_coordinates); //and soon texture_coordinates, normal_coordinates
 			}
 
 			//Add points
@@ -168,6 +238,79 @@ namespace io
 					max_offset = triangles->getInput_array()[i]->getOffset();
 			}
 
+
+////////////
+/////////////
+//////////////
+			domSource *source_vertex;
+			domSource *source_normal;
+			domSource *source_texcoord;
+			daeURI *elementURI;
+		
+			
+			domVertices* domV;
+			domV = daeSafeCast<domVertices>(vertex_input->getSource().getElement());
+	
+			source_vertex = daeSafeCast<domSource>(domV->getInput_array()[0]->getSource().getElement());
+	
+			if(texcoord_input)
+			{
+				elementURI = &texcoord_input->getSource();
+				source_texcoord = daeSafeCast<domSource>(elementURI->getElement());
+			}
+	
+			domFloat_array *floatArray_vertex;
+			domFloat_array *floatArray_normal;
+			domFloat_array *floatArray_texcoord;
+		
+			if(source_vertex)
+				floatArray_vertex = &source_vertex->getFloat_array()[0];
+		
+			//if(source_normal)
+			//	floatArray_normal = &source_normal->getFloat_array()[0];
+		
+			if(source_texcoord)
+				floatArray_texcoord = &source_texcoord->getFloat_array()[0];
+	
+			int stride = source_vertex->getTechnique_common()->getAccessor()->getStride();
+		
+			// Assume there are 3 values per vertex with a stride of 3.
+			// Copy the vertices into my structure one-by-one
+			// (converts from COLLADA's doubles to floats).
+	
+			for ( unsigned int i = 0; i < floatArray_vertex->getCount(); i+=stride )
+			{
+				k3d::point4 vertex(floatArray_vertex->getValue()[i],
+						floatArray_vertex->getValue()[i+1],
+						floatArray_vertex->getValue()[i+2],
+						1);
+				//if(source_texcoord)
+				{
+				//	k3d::texture3 texture(floatArray_texcoord->getValue()[i],
+								//floatArray_texcoord->getValue()[i+1],
+								
+				//				1);
+					//factory.add_texcoord(texture);
+				}
+				factory.add_point(ccst*vertex);
+			}
+
+			//if(source_texcoord)
+			{
+				//stride = source_texcoord->getTechnique_common()->getAccessor()->getStride();
+				//k3d::log() << debug << stride << " " << floatArray_texcoord->getCount() << std::endl;
+				//for ( unsigned int i = 0; i < floatArray_texcoord->getCount(); i+=stride)
+				{
+					//k3d::texture3 texture(floatArray_texcoord->getValue()[i],
+					//				floatArray_texcoord->getValue()[i+1],
+					//				1);
+				}
+			}
+////////////
+///////////
+//////////
+
+
 			// Stores the list of polygons
 			poly = triangles->getP();
 
@@ -207,6 +350,7 @@ namespace io
 		// and domTechnique.
 		
 		//For now each input MUST have only one source
+/*
 		domSource *source_vertex;
 		domSource *source_normal;
 		domSource *source_texcoord;
@@ -217,18 +361,12 @@ namespace io
 		domV = daeSafeCast<domVertices>(vertex_input->getSource().getElement());
 
 		source_vertex = daeSafeCast<domSource>(domV->getInput_array()[0]->getSource().getElement());
-		/*
-		if(normal_input)
-		{
-			elementURI = &normal_input->getSource();
-			source_normal = daeSafeCast<domSource>(elementURI->getElement());
-		}
+
 		if(texcoord_input)
 		{
 			elementURI = &texcoord_input->getSource();
 			source_texcoord = daeSafeCast<domSource>(elementURI->getElement());
 		}
-		*/
 
 		domFloat_array *floatArray_vertex;
 		domFloat_array *floatArray_normal;
@@ -248,6 +386,7 @@ namespace io
 		// Assume there are 3 values per vertex with a stride of 3.
 		// Copy the vertices into my structure one-by-one
 		// (converts from COLLADA's doubles to floats).
+
 		for ( unsigned int i = 0; i < floatArray_vertex->getCount(); i+=stride )
 		{
 			k3d::point4 vertex(floatArray_vertex->getValue()[i],
@@ -256,8 +395,8 @@ namespace io
 					1);
 			factory.add_point(ccst*vertex);
 		}
-
-		factory.add_texcoord(k3d::texture3(0,0,0),0);
+*/
+		factory.attach_texcoords();
 
 
 		//const k3d::mesh::indices_t& edge_points = Mesh.polyhedra->edge_points.get();
