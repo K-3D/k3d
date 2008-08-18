@@ -1739,7 +1739,7 @@ namespace module
 				k3d::uint_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
 				int curve_point_index = -1;
 
-				bool is_closed = point3_float_equal(mesh_points->at(curve_points->at(curve_points_end - 1)), mesh_points->at(curve_points->at(curve_points_begin)), 0.000001);
+				bool isClosed = is_closed(curve);
 				k3d::uint_t point1 = curve_points_begin;
 				k3d::uint_t point2 = curve_points_end - 1;
 
@@ -1845,7 +1845,7 @@ namespace module
 						first_curves->at(group)++;
 				}
 
-                if(is_closed && reconnect)
+                if(isClosed && reconnect)
                 {
                     point2 = curve_first_points->at(curve+1) + curve_point_counts->at(curve + 1) - 1;
                     join_curves(point1, curve, point2, curve + 1);
@@ -2177,7 +2177,9 @@ namespace module
 			}
 			catch (...)
 			{
-				k3d::log() << error << nurbs_debug << "Error in extractCurve" << std::endl;
+				k3d::log() << error << nurbs_debug << "Error in extractCurve " << curve << std::endl;
+				nurbs_curve tmp;
+				return tmp;
 			}
 		}
 
@@ -2387,7 +2389,7 @@ namespace module
             k3d::uint_t curve_points_begin = curve_first_points->at(curve);
             k3d::uint_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
 
-			return point3_float_equal(mesh_points->at(curve_points->at(curve_points_end - 1)), mesh_points->at(curve_points->at(curve_points_begin)), 0.000001);
+			return (curve_points->at(curve_points_begin) == curve_points->at(curve_points_end - 1));
 		}
 
 		bool nurbs_curve_modifier::create_cap(k3d::uint_t curve)
@@ -2557,17 +2559,19 @@ namespace module
 				const k3d::uint_t curve_points_begin = curve_first_points->at(curve1);
 				const k3d::uint_t curve_points_end = curve_points_begin + curve_point_counts->at(curve1);
 
-				bool isClosed = point3_float_equal( mesh_points->at(curve_points->at(curve_first_points->at(curve2))), mesh_points->at(curve_points->at(curve_first_points->at(curve2) + curve_point_counts->at(curve2) - 1)), 0.000001);
+				bool isClosed = point3_float_equal(mesh_points->at(curve_points->at(curve_first_points->at(curve2))), mesh_points->at(curve_points->at(curve_first_points->at(curve2) + curve_point_counts->at(curve2) - 1)), 0.000001);
 
 				const k3d::uint_t curve_knots_begin = curve_first_knots->at(curve1);
 				const k3d::uint_t curve_knots_end = curve_knots_begin + (curve_points_end - curve_points_begin) + curve_orders->at(curve1);
+
+                MY_DEBUG << "Calculating center" << std::endl;
 
 				for (int j = curve_points_begin; j < curve_points_end; j++)
 				{
 					bool already_there = false;
 					for (int i = curve_points_begin; i < j; i++)
 					{
-						if (point3_float_equal(mesh_points->at(j), mesh_points->at(i), 0.000001))
+						if (point3_float_equal(mesh_points->at(curve_points->at(j)), mesh_points->at(curve_points->at(i)), 0.000001))
 							already_there = true;
 					}
 
@@ -2575,6 +2579,8 @@ namespace module
 						c = c + mesh_points->at(curve_points->at(j));
 				}
 				c = (1.0 / curve_point_counts->at(curve1)) * c;
+
+                MY_DEBUG << "Getting first tangent" << std::endl;
 
 				k3d::point3 rt = calculate_curve_tangent(curve2, 0.0);
 
@@ -2820,6 +2826,22 @@ namespace module
 				else
 					curve_selection->at(i) = 1.0;
 			}
+		}
+
+		void nurbs_curve_modifier::open_up_curve(k3d::uint_t curve)
+		{
+		    const k3d::uint_t curve_points_begin = curve_first_points->at(curve);
+			const k3d::uint_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
+
+			if(!is_closed(curve))
+			{
+                k3d::log() << error << nurbs_debug << "Curve was not closed, cannot open it up" << std::endl;
+                return;
+			}
+
+			mesh_points->push_back(mesh_points->at(curve_points->at(curve_points_begin)));
+			point_selection->push_back(1.0);
+			curve_points->at(curve_points_end - 1) = mesh_points->size() - 1;
 		}
 
 	}//nurbs

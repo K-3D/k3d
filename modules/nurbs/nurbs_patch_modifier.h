@@ -159,13 +159,13 @@ namespace module
 				///adds a new patch to the end
 				///\param patch
 				///\param u
-				void split_patch_u(k3d::uint_t patch, double u, bool reconnect);
+				void split_patch_u(k3d::uint_t patch, double u);
 
 				///Split a patch at the seleted v-value (so itgets split in v-direction)
 				///adds a new patch to the end
 				///\param patch
 				///\param v
-				void split_patch_v(k3d::uint_t patch, double v, bool reconnect);
+				void split_patch_v(k3d::uint_t patch, double v);
 
                 ///Returns the index of the selected patch
                 int get_selected_patch();

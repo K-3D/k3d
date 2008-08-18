@@ -113,8 +113,11 @@ namespace module{
                 ///\param curve The curve to delete
                 void delete_curve(k3d::uint_t curve);
 
-                ///Returns true if the start and endpoint coincidence
+                ///Returns true if the start and endpoint reference to the same point
                 bool is_closed(k3d::uint_t curve);
+
+                ///Opens the selected curve, meaning the end point will no longer be shared as start&end point
+                void open_up_curve(k3d::uint_t curve);
 
                 ///Join (connect) the two curves at their selected end points, one of the curve gets deleted
                 ///\param point1 The end point of the first curve (needs to be an end point!)
