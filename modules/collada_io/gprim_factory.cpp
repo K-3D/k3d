@@ -358,7 +358,8 @@ void gprim_factory::add_polygon(const mesh::indices_t& Points, const mesh::indic
 
 	for(size_t point = point_begin; point != point_end; ++point)
 	{
-		m_implementation->edge_texcoords.push_back(m_implementation->texcoords_vec[Texcoords[point]]);
+		if(Texcoords.size()>0)
+			m_implementation->edge_texcoords.push_back(m_implementation->texcoords_vec[Texcoords[point]]);
 		m_implementation->edge_points->push_back(Points[point]);
 		m_implementation->clockwise_edges->push_back(m_implementation->edge_points->size());
 		m_implementation->edge_selection->push_back(0.0);

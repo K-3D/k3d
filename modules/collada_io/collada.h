@@ -212,33 +212,28 @@ namespace io
 		collada_obj(k3d::idocument &Document, domImage &img)
 		{
 			id = img.getAttribute("id");
-			name = k3d::unique_name(Document.nodes(), "COLLADA " + img.getAttribute("name"));
+			name = k3d::unique_name(Document.nodes(), "COLLADA " + img.getAttribute("id"));
 			type = "image";
 
 			domImage::domInit_from *init_from = img.getInit_from();
 
 			if(init_from != NULL)
 			{
-				std::string factory;
-				std::string img_path = init_from->getValue().str().substr(5);
-				std::string img_type = img_path.substr(img_path.length()-4);
-				if(img_type==".jpg")
-					factory = "JPEGBitmapReader";
-				else
-				if(img_type==".png")
-					factory = "PNGBitmapReader";
-				else
-				if(img_type==".tif"||img_type=="tiff")
-					factory = "TIFFBitmapReader";
-				else
+				//std::string factory;
+				std::string tmp_path = init_from->getValue().str().substr(5);
+				std::string img_path;
+				for(int i=0; i<tmp_path.length(); i++)
 				{
-					k3d::log() << error << "Image type required by " << img.getAttribute("name") << " not supported by K-3D yet!" << std::endl;
-					return;
+					if(tmp_path[i]=='%')
+					{
+						img_path = img_path + " ";
+						i+=2;
+						continue;
+					}
+					img_path = img_path + tmp_path[i];
 				}
-
-				k3d::inode *image = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup(factory),Document,name);
+				k3d::inode *image = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("BitmapReader"),Document,name);
 				k3d::property::set_internal_value(*image, "file", k3d::filesystem::generic_path(img_path));
-
 			}
 		}
 
