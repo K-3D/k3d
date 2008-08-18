@@ -1,5 +1,5 @@
 #include "integration.h"
-#include <k3dsdk/gprim_factory.h>
+#include "gprim_factory.h"
 #include <k3dsdk/algebra.h>
 #include <string.h>
 

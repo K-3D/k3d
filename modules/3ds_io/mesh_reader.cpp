@@ -27,7 +27,7 @@
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/gprim_factory.h>
+#include "gprim_factory.h"
 #include "3ds.h"
 #include "3dschunknames.h"
 #include "integration.h"

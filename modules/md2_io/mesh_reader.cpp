@@ -26,7 +26,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
-#include <k3dsdk/gprim_factory.h>
+#include "gprim_factory.h"
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
@@ -91,14 +91,21 @@ public:
 
 		for(int i=0; i<model->get_num_vertices(); i++)
 			factory.add_point(model->get_point(frame,i));
+		for(int i=0; i<model->get_num_texcoords(); i++)
+			factory.add_texcoord(model->get_texcoord(i));
 
 		for(int i=0; i<model->get_num_triangles(); i++)
 		{
 			k3d::mesh::indices_t vertex_indices;
+			k3d::mesh::indices_t texture_indices;
 			for(int j=0; j<3; j++)
+			{
 				vertex_indices.push_back(model->get_index(i,j));
-			factory.add_polygon(vertex_indices);
+				texture_indices.push_back(model->get_texindex(i,j));
+			}
+			factory.add_polygon(vertex_indices,texture_indices);
 		}
+		factory.attach_texcoords();
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

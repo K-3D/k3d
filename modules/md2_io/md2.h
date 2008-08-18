@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <k3dsdk/algebra.h>
+#include <k3dsdk/texture3.h>
 
 namespace module
 {
@@ -95,7 +96,9 @@ public:
 	int get_num_triangles(){return header.numTriangles;}
 	int get_num_frames(){return header.numFrames;}
 	int get_num_vertices(){return header.numVertex;}
+	int get_num_texcoords(){return header.numTexCoords;}
 	int get_index(int triangle, int p){return triangles[triangle].vertexIndices[p];}
+	int get_texindex(int triangle, int p){return triangles[triangle].textureIndices[p];}
 	k3d::point4 get_point(int frame, int index)
 	{
 		return k3d::point4(frames[frame].vertex[index].val[0],
@@ -107,6 +110,12 @@ public:
 		return k3d::point4(frames[frame].vertex[triangles[triangle].vertexIndices[p]].val[0],
 							frames[frame].vertex[triangles[triangle].vertexIndices[p]].val[1],
 							frames[frame].vertex[triangles[triangle].vertexIndices[p]].val[2], 1);
+	}
+	k3d::texture3 get_texcoord(int index)
+	{
+		return k3d::texture3(texcoords[index].val[0],
+							1-texcoords[index].val[1],
+							1);
 	}
 	
 private:
