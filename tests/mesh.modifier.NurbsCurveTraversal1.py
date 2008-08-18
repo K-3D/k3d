@@ -9,6 +9,7 @@ setup = testing.setup_mesh_reader_test("K3DMeshReader","mesh.modifier.NurbsCurve
 
 modifier = setup.document.new_node("NurbsCurveTraversal")
 modifier.create_caps = False
+modifier.delete_original = False
 
 document.set_dependency(modifier.get_property("input_mesh"), setup.reader.get_property("output_mesh"))
 

@@ -8,6 +8,7 @@ setup = testing.setup_mesh_reader_test("K3DMeshReader","mesh.modifier.NurbsSkinn
 
 modifier = setup.document.new_node("NurbsSkinnedSurface")
 modifier.along = 'y'
+modifier.delete_original = False
 
 document.set_dependency(modifier.get_property("input_mesh"), setup.reader.get_property("output_mesh"))
 
