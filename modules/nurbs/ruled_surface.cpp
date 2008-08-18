@@ -55,10 +55,12 @@ namespace module
 		public:
 			ruled_surface(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),
-				m_flip(init_owner(*this) + init_name(_("flip")) + init_label(_("flip")) + init_description(_("Flip one of the curves before creating the surface")) + init_value(false) )
+				m_flip(init_owner(*this) + init_name(_("flip")) + init_label(_("flip")) + init_description(_("Flip one of the curves before creating the surface")) + init_value(false) ),
+				m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curves")) + init_description(_("Delete the original curves")) + init_value(true) )
 			{
 			    m_flip.changed_signal().connect(make_update_mesh_slot());
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+				m_delete_original.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -100,6 +102,12 @@ namespace module
                     if(m_flip.pipeline_value())
                         mod.flip_curve(curves[1]);
                     mod.ruled_surface(curves[0], curves[1]);
+
+                    if(m_delete_original.pipeline_value())
+                    {
+                        mod.delete_curve(curves[0]);
+                        mod.delete_curve(curves[1]);
+                    }
 				}
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
@@ -120,6 +128,7 @@ namespace module
 
 		private:
             k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_flip;
+            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
 		};
 
 		//Create connect_curve factory

@@ -56,10 +56,12 @@ namespace module
 		public:
 			skinned_surface(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 				base(Factory, Document),
-				m_along(init_owner(*this) + init_name("along") + init_label(_("Ordered along")) + init_description(_("Axis along which the curves are ordered")) + init_value(k3d::X) + init_enumeration(k3d::axis_values()))
+				m_along(init_owner(*this) + init_name("along") + init_label(_("Ordered along")) + init_description(_("Axis along which the curves are ordered")) + init_value(k3d::X) + init_enumeration(k3d::axis_values())),
+				m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curves")) + init_description(_("Delete the original curves")) + init_value(true) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 				m_along.changed_signal().connect(make_update_mesh_slot());
+				m_delete_original.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -94,16 +96,25 @@ namespace module
 				if( curves.size() < 2)
 				{
 					k3d::log() << error << nurbs_debug << "You need to select at least 2 curves!\n" << std::endl;
-				}
-				else if( curves.size() == 2 )
-				{
-                    nurbs_curve_modifier mod(Output);
-                    mod.ruled_surface(curves.at(0), curves.at(1));
+					return;
 				}
 				else
 				{
-                    nurbs_curve_modifier mod(Output);
-                    mod.skinned_surface(curves, m_along.pipeline_value());
+				    nurbs_curve_modifier mod(Output);
+				    if( curves.size() == 2 )
+                    {
+                        mod.ruled_surface(curves.at(0), curves.at(1));
+                    }
+                    else
+                    {
+                        mod.skinned_surface(curves, m_along.pipeline_value());
+                    }
+
+                    if(m_delete_original.pipeline_value())
+                    {
+                        for(int i = curves.size() - 1; i >= 0; i--)
+                            mod.delete_curve(curves[i]);
+                    }
 				}
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
@@ -124,6 +135,7 @@ namespace module
 
 		private:
             k3d_data(k3d::axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_along;
+            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
 		};
 
 		//Create connect_curve factory

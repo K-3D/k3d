@@ -58,6 +58,7 @@ namespace module
 				m_angle(init_owner(*this) + init_name("angle") + init_label(_("angle")) + init_description(_("The curve will be rotated to this angle, specify 360 for a closed shape")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
                 m_segments(init_owner(*this) + init_name("segments") + init_label(_("segments")) + init_description(_("Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
                 m_around(init_owner(*this) + init_name("around") + init_label(_("Around")) + init_description(_("Axis to revolve around")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values())),
+                m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the original curve")) + init_value(true) ),
                 m_create_caps(init_owner(*this) + init_name(_("create_caps")) + init_label(_("Create caps?")) + init_description(_("Create caps at both ends of the revolved curve?")) + init_value(false) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
@@ -65,6 +66,7 @@ namespace module
                 m_segments.changed_signal().connect(make_update_mesh_slot());
                 m_create_caps.changed_signal().connect(make_update_mesh_slot());
                 m_around.changed_signal().connect(make_update_mesh_slot());
+                m_delete_original.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -92,6 +94,11 @@ namespace module
 
                 mod.revolve_curve(my_curve,m_around.pipeline_value(),m_angle.pipeline_value(),m_segments.pipeline_value(),m_create_caps.pipeline_value());
 
+                if(m_delete_original.pipeline_value())
+                {
+                    mod.delete_curve(my_curve);
+                }
+
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 				assert_warning(k3d::validate_nurbs_patches(Output));
 			}
@@ -113,6 +120,7 @@ namespace module
             k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_segments;
             k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_create_caps;
             k3d_data(k3d::axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_around;
+            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
 		};
 
 		//Create connect_curve factory

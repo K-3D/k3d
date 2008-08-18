@@ -58,6 +58,7 @@ namespace module
 				m_distance(init_owner(*this) + init_name(_("distance")) + init_label(_("Distance")) + init_description(_("How far to extrude the curve")) + init_step_increment(0.5)+ init_units(typeid(k3d::measurement::scalar)) + init_value(1.0) ),
 				m_segments(init_owner(*this) + init_name("segments") + init_label(_("segments")) + init_description(_("Segments")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 				m_along(init_owner(*this) + init_name("along") + init_label(_("Extrude along")) + init_description(_("Axis along which the curve gets extruded")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values())),
+				m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the original curve")) + init_value(true) ),
 				m_cap(init_owner(*this) + init_name(_("cap")) + init_label(_("Create Caps?")) + init_description(_("Create caps at both ends?")) + init_value(false) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
@@ -65,6 +66,7 @@ namespace module
 				m_segments.changed_signal().connect(make_update_mesh_slot());
 				m_along.changed_signal().connect(make_update_mesh_slot());
 				m_cap.changed_signal().connect(make_update_mesh_slot());
+				m_delete_original.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -127,6 +129,11 @@ namespace module
 				mod.traverse_curve(my_curve,curve_idx,create_cap);
                 mod.delete_curve(curve_idx);
 
+                if(m_delete_original.pipeline_value())
+                {
+                    mod.delete_curve(my_curve);
+                }
+
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 				assert_warning(k3d::validate_nurbs_patches(Output));
 			}
@@ -147,6 +154,7 @@ namespace module
             k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_distance;
             k3d_data(k3d::axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_along;
             k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_cap;
+            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
             k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_segments;
 		};
 

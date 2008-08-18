@@ -54,9 +54,11 @@ namespace module
 			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 		public:
 			create_cap(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-				base(Factory, Document)
+				base(Factory, Document),
+				m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the curve which was used to create the cap")) + init_value(false) )
 			{
 				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+				m_delete_original.changed_signal().connect(make_update_mesh_slot());
 			}
 
 			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -89,6 +91,11 @@ namespace module
 				    return;
 				}
 
+				if(m_delete_original.pipeline_value())
+                {
+                    mod.delete_curve(my_curve);
+                }
+
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 				assert_warning(k3d::validate_nurbs_patches(Output));
 			}
@@ -106,6 +113,7 @@ namespace module
 			}
 
 		private:
+            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
 		};
 
 		//Create connect_curve factory

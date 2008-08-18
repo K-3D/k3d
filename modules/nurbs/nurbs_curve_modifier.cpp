@@ -501,84 +501,91 @@ namespace module
 
 		void nurbs_curve_modifier::delete_curve(k3d::uint_t curve)
 		{
-			const k3d::uint_t curve_points_begin = curve_first_points->at(curve);
-			const k3d::uint_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
+		    try
+		    {
+                const k3d::uint_t curve_points_begin = curve_first_points->at(curve);
+                const k3d::uint_t curve_points_end = curve_points_begin + curve_point_counts->at(curve);
 
-			const k3d::uint_t curve_knots_begin = curve_first_knots->at(curve);
-			const k3d::uint_t curve_knots_end = curve_knots_begin + (curve_points_end - curve_points_begin) + curve_orders->at(curve);
+                const k3d::uint_t curve_knots_begin = curve_first_knots->at(curve);
+                const k3d::uint_t curve_knots_end = curve_knots_begin + (curve_points_end - curve_points_begin) + curve_orders->at(curve);
 
-			MY_DEBUG << "Deleting curve " << curve << " with points " << curve_points_begin << " to " << curve_points_end << " and knots " << curve_knots_begin << " to " << curve_knots_end << std::endl;
+                MY_DEBUG << "Deleting curve " << curve << " with points " << curve_points_begin << " to " << curve_points_end << " and knots " << curve_knots_begin << " to " << curve_knots_end << std::endl;
 
-			int point_offset = curve_points_end - curve_points_begin;
-			int knot_offset = curve_knots_end - curve_knots_begin;
+                int point_offset = curve_points_end - curve_points_begin;
+                int knot_offset = curve_knots_end - curve_knots_begin;
 
-			//offset all following points and knots
-			for ( k3d::uint_t curr_curve = 0; curr_curve < count_all_curves_in_groups(); curr_curve++)
-			{
-				if (curve_first_points->at(curr_curve) > curve_first_points->at(curve))
-					curve_first_points->at(curr_curve) -= point_offset;
-				if (curve_first_knots->at(curr_curve) > curve_first_knots->at(curve))
-					curve_first_knots->at(curr_curve) -= knot_offset;
-			}
+                //offset all following points and knots
+                for ( k3d::uint_t curr_curve = 0; curr_curve < count_all_curves_in_groups(); curr_curve++)
+                {
+                    if (curve_first_points->at(curr_curve) > curve_first_points->at(curve))
+                        curve_first_points->at(curr_curve) -= point_offset;
+                    if (curve_first_knots->at(curr_curve) > curve_first_knots->at(curve))
+                        curve_first_knots->at(curr_curve) -= knot_offset;
+                }
 
-			int curr_group = get_curve_group(curve);
+                int curr_group = get_curve_group(curve);
 
-			if (curr_group >= 0)
-			{
-				curve_counts->at(curr_group)--;
-				MY_DEBUG << "Decreasing curve count of group " << curr_group <<  " to " << curve_counts->at(curr_group) << std::endl;
-			}
+                if (curr_group >= 0)
+                {
+                    curve_counts->at(curr_group)--;
+                    MY_DEBUG << "Decreasing curve count of group " << curr_group <<  " to " << curve_counts->at(curr_group) << std::endl;
+                }
 
-			const k3d::uint_t group_begin = 0;
-			const k3d::uint_t group_end = group_begin + first_curves->size();
+                const k3d::uint_t group_begin = 0;
+                const k3d::uint_t group_end = group_begin + first_curves->size();
 
-			for (k3d::uint_t group = group_begin; group < group_end; group++)
-			{
-				if (first_curves->at(group) > first_curves->at(curr_group))
-				{
-					first_curves->at(group)--;
-					MY_DEBUG << "Decreasing first_curves of group " << group <<  " to " << first_curves->at(group) << std::endl;
-				}
-			}
+                for (k3d::uint_t group = group_begin; group < group_end; group++)
+                {
+                    if (first_curves->at(group) > first_curves->at(curr_group))
+                    {
+                        first_curves->at(group)--;
+                        MY_DEBUG << "Decreasing first_curves of group " << group <<  " to " << first_curves->at(group) << std::endl;
+                    }
+                }
 
-			//remove points, weights, knots, point_count and order
+                //remove points, weights, knots, point_count and order
 
-			if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing knots" << std::endl;
-			k3d::mesh::knots_t::iterator knot_pos = curve_knots->begin() + curve_first_knots->at(curve);
-			for ( k3d::uint_t i = 0; i < knot_offset; i++ )
-				curve_knots->erase(knot_pos);
+                if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing knots" << std::endl;
+                k3d::mesh::knots_t::iterator knot_pos = curve_knots->begin() + curve_first_knots->at(curve);
+                for ( k3d::uint_t i = 0; i < knot_offset; i++ )
+                    curve_knots->erase(knot_pos);
 
-			if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing points & weights" << std::endl;
-			k3d::mesh::indices_t::iterator point_pos = curve_points->begin() + curve_first_points->at(curve);
-			k3d::mesh::weights_t::iterator weight_pos = curve_point_weights->begin() + curve_first_points->at(curve);
-			for ( k3d::uint_t i = 0; i < point_offset; i++ )
-			{
-				curve_points->erase(point_pos);
-				curve_point_weights->erase(weight_pos);
-			}
+                if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing points & weights" << std::endl;
+                k3d::mesh::indices_t::iterator point_pos = curve_points->begin() + curve_first_points->at(curve);
+                k3d::mesh::weights_t::iterator weight_pos = curve_point_weights->begin() + curve_first_points->at(curve);
+                for ( k3d::uint_t i = 0; i < point_offset; i++ )
+                {
+                    curve_points->erase(point_pos);
+                    curve_point_weights->erase(weight_pos);
+                }
 
-			if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing point counts" << std::endl;
-			k3d::mesh::counts_t::iterator point_count_pos = curve_point_counts->begin() + curve;
-			curve_point_counts->erase(point_count_pos);
+                if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing point counts" << std::endl;
+                k3d::mesh::counts_t::iterator point_count_pos = curve_point_counts->begin() + curve;
+                curve_point_counts->erase(point_count_pos);
 
-			if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing orders" << std::endl;
-			k3d::mesh::orders_t::iterator order_pos = curve_orders->begin() + curve;
-			curve_orders->erase(order_pos);
+                if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing orders" << std::endl;
+                k3d::mesh::orders_t::iterator order_pos = curve_orders->begin() + curve;
+                curve_orders->erase(order_pos);
 
-			if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing first_points" << std::endl;
-			k3d::mesh::indices_t::iterator first_points_pos = curve_first_points->begin() + curve;
-			curve_first_points->erase(first_points_pos);
+                if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing first_points" << std::endl;
+                k3d::mesh::indices_t::iterator first_points_pos = curve_first_points->begin() + curve;
+                curve_first_points->erase(first_points_pos);
 
-			if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing first knots" << std::endl;
-			k3d::mesh::indices_t::iterator first_knots_pos = curve_first_knots->begin() + curve;
-			curve_first_knots->erase(first_knots_pos);
+                if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing first knots" << std::endl;
+                k3d::mesh::indices_t::iterator first_knots_pos = curve_first_knots->begin() + curve;
+                curve_first_knots->erase(first_knots_pos);
 
-			if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing selection" << std::endl;
-			k3d::mesh::selection_t::iterator selection_pos = curve_selection->begin() + curve;
-			curve_selection->erase(selection_pos);
+                if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Erasing selection" << std::endl;
+                k3d::mesh::selection_t::iterator selection_pos = curve_selection->begin() + curve;
+                curve_selection->erase(selection_pos);
 
-			remove_empty_groups();
-			remove_unused_points();
+                remove_empty_groups();
+                remove_unused_points();
+		    }
+		    catch(...)
+		    {
+		        k3d::log() << error << nurbs_debug << "Error in DeleteCurve " << curve << std::endl;
+		    }
 		}
 
 		void nurbs_curve_modifier::join_curves(k3d::uint_t point1, k3d::uint_t curve1, k3d::uint_t point2, k3d::uint_t curve2)
