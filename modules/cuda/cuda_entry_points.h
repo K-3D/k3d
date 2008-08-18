@@ -92,24 +92,28 @@ extern "C" K3D_CUDA_DECLSPEC void transform_points_synchronous ( double *InputPo
 extern "C" K3D_CUDA_DECLSPEC void transform_points_asynchronous ( double *InputPoints, double *PointSelection, double *OutputPoints, int num_points, timingInfo_t* tInfo );
 
 extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_split_point_calculator (
-                                                        unsigned int* phost_edge_indices,
-                                                        unsigned int num_edge_indices,
-                                                        float* pdev_points_and_selection,
-                                                        unsigned int num_input_points,
-                                                        unsigned int* pdev_edge_point_indices,
-                                                        unsigned int* pdev_clockwise_edge_indices,
-                                                        int num_split_points
+																														const unsigned int* pdev_first_midpoint,
+																														const unsigned char* pdev_has_midpoint,
+		                                                        float* pdev_points_and_selection,
+		                                                        unsigned int num_input_points,
+		                                                        unsigned int* pdev_edge_point_indices,
+		                                                        unsigned int* pdev_clockwise_edge_indices,
+		                                                        const float* pdev_edge_selection,
+		                                                        const unsigned int* pdev_companions,
+		                                                        const unsigned char* pdev_boundary_edges,
+		                                                        const unsigned int* pdev_edge_faces,
+		                                                        int num_split_points,
+		                                                        int num_edges
                                                             );
 
 extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_update_indices_entry (
-                                                        unsigned int* pdev_input_edge_point_indices,
-                                                        unsigned int* pdev_input_clockwise_edge_point_indices,
-                                                        unsigned int num_host_edges,
-                                                        unsigned int* pdev_output_edge_point_indices,
-                                                        unsigned int* pdev_output_clockwise_edge_point_indices,
-                                                        unsigned int* pdev_edge_index_map,
-                                                        int num_edge_maps
-                                                            );
+																													unsigned int* pdev_input_edge_point_indices,
+		                                                      unsigned int* pdev_input_clockwise_edge_point_indices,
+		                                                      unsigned int num_host_edges,
+		                                                      unsigned int* pdev_output_edge_point_indices,
+		                                                      unsigned int* pdev_output_clockwise_edge_point_indices,
+		                                                      unsigned int* pdev_edge_index_map,
+		                                                      int num_edge_maps);
 
 extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_update_loop_first_edges_entry (
                                                         unsigned int* pdev_ouput_loop_first_edges,
@@ -118,16 +122,18 @@ extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_update_loop_first_edges_entry 
                                                         int num_edge_maps
                                                             );
 extern "C" K3D_CUDA_DECLSPEC void subdivide_edges_split_edges_entry (
-                                                        unsigned int* pdev_output_edge_point_indices,
-                                                        unsigned int* pdev_output_clockwise_edge_point_indices,
-                                                        unsigned int* pdev_input_clockwise_edge_point_indices,
-                                                        unsigned int* pdev_edge_index_map,
-                                                        unsigned int* pdev_edge_indices,
-                                                        unsigned int num_edge_indices,
-                                                        int num_split_points,
-                                                        unsigned int* pdev_first_midpoint,
-                                                        unsigned int* pdev_companions,
-                                                        unsigned char* pdev_boundary_edges
+																												unsigned int* pdev_output_edge_point_indices,
+		                                                    unsigned int* pdev_output_clockwise_edge_point_indices,
+		                                                    unsigned int* pdev_input_clockwise_edge_point_indices,
+		                                                    const float* pdev_edge_selection,
+		                                                    unsigned int* pdev_edge_index_map,
+		                                                    unsigned int* pdev_first_midpoint,
+		                                                    unsigned char* pdev_has_midpoint,
+		                                                    int num_split_points,
+		                                                    unsigned int* pdev_companions,
+		                                                    unsigned char* pdev_boundary_edges,
+		                                                    const unsigned int num_edges,
+		                                                    const unsigned int* pdev_edge_faces
                                                         );
 
 extern "C" K3D_CUDA_DECLSPEC void copy_2D_from_host_to_device_with_padding ( void* device_pointer, const void* host_pointer, int device_pitch, int host_pitch, int width_in_bytes, int rows );
@@ -162,12 +168,11 @@ extern "C" K3D_CUDA_DECLSPEC void calculate_point_edges_entry (
 																int num_edges,
 																int num_points);
 
-extern "C" K3D_CUDA_DECLSPEC unsigned int edge_index_calculator_entry (
-															unsigned int* pdev_edge_list,
-															unsigned int* phost_edge_list_size,
+extern "C" K3D_CUDA_DECLSPEC void edge_index_calculator_entry (
 															unsigned int* pdev_first_midpoint,
 															unsigned char* pdev_has_midpoint,
 															unsigned int* pdev_index_map,
+															unsigned int* pdev_edge_faces,
 															const unsigned int* pdev_face_first_loops,
 															const unsigned int* pdev_face_loop_counts,
 															const unsigned int* pdev_loop_first_edges,
@@ -177,7 +182,9 @@ extern "C" K3D_CUDA_DECLSPEC unsigned int edge_index_calculator_entry (
 															const unsigned char* pdev_boundary_edges,
 															int split_point_count,
 															int num_faces,
-															int first_new_point_index
+															int first_new_point_index,
+															unsigned int* new_point_count,
+															unsigned int* new_edge_count
 																);
 
 extern "C" K3D_CUDA_DECLSPEC void create_grid_structure_kernel_entry (

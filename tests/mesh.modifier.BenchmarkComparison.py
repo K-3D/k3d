@@ -4,7 +4,7 @@ import benchmarking
 # a test to compare the benchmark results for a number of bitmap plugins
 
 compare_list = ["SubdivideEdges",
-                "TransformPoints", 
+                "TransformPoints",
                 ]
 
 for run in compare_list:

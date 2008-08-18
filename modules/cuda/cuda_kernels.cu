@@ -479,27 +479,30 @@ __global__ void linear_transform_kernel ( float4 *points, int num_points )
  * Kernel for calculating the coordinates of the new points along the specified edges.
  *
  */
-__global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices,
-                                                     unsigned int num_edge_indices,
+__global__ void subdivide_edges_split_point_kernel ( const unsigned int* first_midpoint,
+																											const unsigned char* has_midpoint,
                                                      float4* points_and_selection,
                                                      unsigned int num_points,
-                                                     float4* new_points_and_selection,
                                                      unsigned int* edge_point_indices,
                                                      unsigned int* clockwise_edge_indices,
-                                                     int num_split_points )
+                                                     const float* edge_selection,
+                                                     const unsigned int* companions,
+                                                     const unsigned char* boundary_edges,
+                                                     const unsigned int* edge_faces,
+                                                     int num_split_points,
+                                                     const int num_edges)
 {
-    unsigned int edge_index_index = (blockIdx.x * blockDim.x) + threadIdx.x;
+    unsigned int edge_index = (blockIdx.x * blockDim.x) + threadIdx.x;
     int split_index = (blockIdx.y * blockDim.y) + threadIdx.y;
 
-    if ( edge_index_index < num_edge_indices )
+    const unsigned char boundary = boundary_edges[edge_index];
+    const unsigned int companion = companions[edge_index];
+    if ( edge_index < num_edges  && has_midpoint[edge_index] && (boundary || (!boundary && (edge_faces[companion] > edge_faces[edge_index] || !edge_selection[companion]))))
     {
-
-        unsigned int edge_index = edge_indices[edge_index_index];
         unsigned int p_index = edge_point_indices[edge_index];
-        unsigned int new_point_index = edge_index_index*num_split_points + split_index;
+        unsigned int new_point_index = first_midpoint[edge_index] + split_index;
 
         #ifdef __DEVICE_EMULATION__
-            printf("Edge Index Index: %d\n", edge_index_index);
             printf("Split Index: %d\n", split_index);
             printf("Edge Index: %d\n", edge_index);
             printf("Clockwise Edge Index: %d\n", clockwise_edge_indices[edge_index]);
@@ -525,10 +528,10 @@ __global__ void subdivide_edges_split_point_kernel ( unsigned int* edge_indices,
             printf("P_delta:(%f, %f, %f)\n", p1.x, p1.y, p1.z);
         #endif
 
-        new_points_and_selection[new_point_index].x = p0.x + (split_index + 1)*p1.x;
-        new_points_and_selection[new_point_index].y = p0.y + (split_index + 1)*p1.y;
-        new_points_and_selection[new_point_index].z = p0.z + (split_index + 1)*p1.z;
-        new_points_and_selection[new_point_index].w = 1;
+        points_and_selection[new_point_index].x = p0.x + (split_index + 1)*p1.x;
+        points_and_selection[new_point_index].y = p0.y + (split_index + 1)*p1.y;
+        points_and_selection[new_point_index].z = p0.z + (split_index + 1)*p1.z;
+        points_and_selection[new_point_index].w = 1;
 
     }
 
@@ -577,26 +580,37 @@ __global__ void subdivide_edges_update_loop_first_edges_kernel (
 __global__ void subdivide_edges_split_edges_kernel (unsigned int* output_edge_point_indices,
                                                     unsigned int* output_clockwise_edge_point_indices,
                                                     unsigned int* input_clockwise_edge_point_indices,
+                                                    const float* edge_selection,
                                                     unsigned int* edge_index_map,
-                                                    unsigned int* edge_indices,
-                                                    unsigned int num_edge_indices,
-                                                    int num_split_points,
                                                     unsigned int* pdev_first_midpoint,
+                                                    unsigned char* has_midpoint,
+                                                    int num_split_points,
                                                     unsigned int* pdev_companions,
-                                                    unsigned char* pdev_boundary_edges
+                                                    unsigned char* pdev_boundary_edges,
+                                                    const unsigned int num_edges,
+                                                    const unsigned int* edge_faces
                                                     )
 
 {
-    unsigned int edge_index_index = (blockIdx.x * blockDim.x) + threadIdx.x;
+    unsigned int edge = (blockIdx.x * blockDim.x) + threadIdx.x;
     int split_index = (blockIdx.y * blockDim.y) + threadIdx.y;
-
-    if ( edge_index_index < num_edge_indices )
+    
+    if ( edge < num_edges  && has_midpoint[edge])
     {
-        unsigned int edge = edge_indices[edge_index_index];
         unsigned int old_clockwise = input_clockwise_edge_point_indices[edge];
         unsigned int new_edge = edge_index_map[edge] + 1 + split_index;
+        
+        const unsigned int companion = pdev_companions[edge];
+        const unsigned char boundary = pdev_boundary_edges[edge];
 
-        output_edge_point_indices[new_edge] = pdev_first_midpoint[edge] + split_index;
+        if(edge_selection[edge] && (boundary || (!boundary && (edge_faces[edge] < edge_faces[companion] || !edge_selection[companion]))))
+        {
+        	output_edge_point_indices[new_edge] = pdev_first_midpoint[edge] + split_index;
+        }
+        else
+        {
+        	output_edge_point_indices[new_edge] = pdev_first_midpoint[edge] - split_index + num_split_points - 1;
+        }
         output_clockwise_edge_point_indices[new_edge - 1] = new_edge;
 
         if ( split_index == 0 )
@@ -604,27 +618,7 @@ __global__ void subdivide_edges_split_edges_kernel (unsigned int* output_edge_po
             output_clockwise_edge_point_indices[new_edge + num_split_points - 1] = edge_index_map[old_clockwise];
         }
 
-
-        #ifdef __DEVICE_EMULATION__
-            printf("%c\n", pdev_boundary_edges[edge]);
-        #endif
-
-        if ( !pdev_boundary_edges[edge] )
-        {
-            unsigned int companion = pdev_companions[edge];
-            old_clockwise = input_clockwise_edge_point_indices[companion];
-            new_edge = edge_index_map[companion] + 1 + split_index;
-
-            output_edge_point_indices[new_edge] = pdev_first_midpoint[edge] - split_index + num_split_points - 1;
-            output_clockwise_edge_point_indices[new_edge - 1] = new_edge;
-
-            if ( split_index == 0 )
-            {
-                output_clockwise_edge_point_indices[new_edge + num_split_points - 1] = edge_index_map[old_clockwise];
-            }
-        }
     }
-
 }
 
 __global__ void convert_uint_64_to_32_kernel ( uint2* p_uint_64, unsigned int* p_uint_32, int num_ints )
@@ -839,82 +833,184 @@ __global__ void get_loop_index_and_count_kernel (
 
 
 /**
+ * Count the total number of edges each face will have after applying the edge subdivision, and the number of new points added per face
+ */
+
+__global__ void subdivide_edges_count_components_per_face(
+													const unsigned int* face_first_loops,
+													const int num_faces,
+													const unsigned int* face_loop_counts,
+													const unsigned int* loop_first_edges,
+													const unsigned int* clockwise_edges,
+													const float* edge_selection,
+													const unsigned int* companions,
+													const unsigned char* boundary_edges,
+													const int split_point_count,
+													const unsigned int* edge_faces,
+													unsigned int* face_edge_counts,
+													unsigned int* face_split_point_counts
+		)
+{
+	unsigned int face_index = (blockIdx.x * blockDim.x) + threadIdx.x;	
+	if(face_index >= num_faces)
+		return;
+	
+	unsigned int edge_count = 0;
+	unsigned int new_point_count = 0;
+	
+	unsigned int loop_begin = face_first_loops[face_index];
+	unsigned int loop_end = loop_begin + face_loop_counts[face_index];
+	for(unsigned int loop_index = loop_begin; loop_index != loop_end; ++loop_index)
+	{
+		unsigned int first_edge_index = loop_first_edges[loop_index];
+		
+		for( unsigned int edge_index = first_edge_index; 1 ; )
+		{
+			unsigned int companion = companions[edge_index]; 
+			++edge_count;
+	
+			edge_count += split_point_count * (edge_selection[edge_index] || (!boundary_edges[edge_index] && edge_selection[companion]));
+			unsigned int found_points = 0;
+			if(edge_selection[edge_index] && (boundary_edges[edge_index] || edge_faces[edge_index] < edge_faces[companion] || !edge_selection[companion]))
+				found_points = split_point_count;
+			//const unsigned int found_points = split_point_count * (edge_selection[edge_index] && !(!boundary_edges[edge_index] && (edge_faces[edge_index] > edge_faces[companion] || !edge_selection[companion])));
+			new_point_count += found_points;
+			
+#ifdef __DEVICE_EMULATION__
+	printf("adding %d points for edge %d\n", found_points, edge_index);
+#endif
+						
+			edge_index = clockwise_edges[edge_index];
+			if (edge_index == first_edge_index)
+				break;
+		}
+	}
+	
+	face_edge_counts[face_index] = edge_count;
+	face_split_point_counts[face_index] = new_point_count;
+}
+
+/**
  *
  */
-__global__ void edge_index_calculator_kernel (
-											unsigned int* edge_list,
-											unsigned int* sizes,
+__global__ void subdivide_edges_edge_index_calculator_kernel (
 											unsigned int* first_midpoint,
 											unsigned char* has_midpoint,
 											unsigned int* index_map,
+											const unsigned int* face_first_loops,
+											int num_faces,
+											const unsigned int* face_loop_counts,
 											const unsigned int* loop_first_edges,
 											const unsigned int* clockwise_edges,
 											const float* edge_selection,
 											const unsigned int* companions,
 											const unsigned char* boundary_edges,
+											const unsigned int* edge_faces,
+											const unsigned int* face_edge_counts,
+											const unsigned int* face_split_point_counts,
 											int split_point_count,
-											int first_new_point_index,
-											int loop_index
+											int first_new_point_index
 											 )
 {
-	unsigned int edge_count = sizes[0];
-	unsigned int edge_list_count = sizes[1];
 
+	unsigned int face_index = (blockIdx.x * blockDim.x) + threadIdx.x;
+	
+	if(face_index >= num_faces)
+		return;
+		
+	// initialize the edge count to the cumulative edge count of the previous faces
+	unsigned int edge_count = face_index == 0 ? 0 : face_edge_counts[face_index - 1];
+	// initialise the new midpoint point index to the cumulative new point count of the previous faces
+	unsigned int midpoint_index = face_index == 0 ? first_new_point_index : first_new_point_index + face_split_point_counts[face_index - 1];
 
-	unsigned int first_edge_index = loop_first_edges[loop_index];
-
-	for( unsigned int edge_index = first_edge_index; 1 ; )
+	unsigned int loop_begin = face_first_loops[face_index];
+	unsigned int loop_end = loop_begin + face_loop_counts[face_index];
+	for(unsigned int loop_index = loop_begin; loop_index != loop_end; ++loop_index)
 	{
-
-		index_map[edge_index] = edge_count;
-		++edge_count;
-
-		if(!boundary_edges[edge_index] && edge_selection[companions[edge_index]] && !edge_selection[edge_index])
+		unsigned int first_edge_index = loop_first_edges[loop_index];
+		for( unsigned int edge_index = first_edge_index; 1 ; )
 		{
-			edge_count += split_point_count;
-			first_midpoint[edge_index] = first_midpoint[companions[edge_index]];
-		}
-
-		if(edge_selection[edge_index])
-		{
-#ifdef __DEVICE_EMULATION__
-printf("edge_index %u ", edge_index);
-if ( boundary_edges[edge_index] )
-	printf("1 ");
-else
-	printf("0 ");
-
-if ( has_midpoint[companions[edge_index]] )
-	printf("1 ");
-else
-	printf("0 ");
-
-printf("\n");
-#endif
-			edge_count += split_point_count;
-			if(!boundary_edges[edge_index] && has_midpoint[companions[edge_index]])
+			index_map[edge_index] = edge_count;
+			const unsigned int companion = companions[edge_index];
+			const char boundary = boundary_edges[edge_index];
+			
+			// The midpoint was/is being/will be calculated in another kernel, but we still need to update the edge index counter for this face
+			if(!boundary && edge_selection[companion] && (!edge_selection[edge_index] || edge_faces[edge_index] > edge_faces[companion]))
 			{
-				first_midpoint[edge_index] = first_midpoint[companions[edge_index]];
+				edge_count += split_point_count;
 			}
-			else
+	
+			// Get the midpoint index, and set it for both ourselves and the companion edge if we are the kernel for the first face of the edge-companion pair
+			if(edge_selection[edge_index] && (boundary || (!boundary && (edge_faces[edge_index] < edge_faces[companion] || !edge_selection[companion]))))
 			{
-				first_midpoint[edge_index] = first_new_point_index + split_point_count * edge_list_count;
-				edge_list[edge_list_count] = edge_index;
-				edge_list_count++;
+				first_midpoint[edge_index] = midpoint_index;
 				has_midpoint[edge_index] = 1;
+				if(!boundary)
+				{
+					first_midpoint[companion] = midpoint_index;
+					has_midpoint[companion] = 1;
+				}
+				midpoint_index += split_point_count;
+				edge_count += split_point_count;
 			}
+	
+			edge_index = clockwise_edges[edge_index];
+			++edge_count;
+			if (edge_index == first_edge_index)
+				break;
 		}
-
-		edge_index = clockwise_edges[edge_index];
-		if (edge_index == first_edge_index)
-			break;
 	}
+}
 
-#ifdef __DEVICE_EMULATION__
-	printf("vals: %u %u\n", edge_count, edge_list_count);
-#endif
-	sizes[1] = edge_list_count;
-	sizes[0] = edge_count;
+/**
+ * Execute a single step in the iterative calculation of a cumulative sum. The algorithm
+ * has to as long as step_size < size
+ * \param input The input array
+ * \param output The result, which is partial as long as step_size < size
+ * \param size The number of elements in input and output
+ * \param step_size Equal to 2^(step_number), with step_number starting at 0
+ */
+__global__ void cumulative_sum_step(const unsigned int* input, unsigned int* output, const int size, const int step_size)
+{
+	const unsigned int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+	
+	if(index >= size)
+		return;
+	
+	char to_calculate = step_size <= index; // true if the number at index still needs calculating
+	output[index] = input[index] + input[(index - step_size) * to_calculate] * to_calculate;
+}
+
+/**
+ * Stores the face each edge belongs to
+ */
+__global__ void face_per_edge_kernel(
+													const unsigned int* face_first_loops,
+													const int num_faces,
+													const unsigned int* face_loop_counts,
+													const unsigned int* loop_first_edges,
+													const unsigned int* clockwise_edges,
+													unsigned int* edge_faces)
+{
+	unsigned int face_index = (blockIdx.x * blockDim.x) + threadIdx.x;	
+	if(face_index >= num_faces)
+		return;
+
+	unsigned int loop_begin = face_first_loops[face_index];
+	unsigned int loop_end = loop_begin + face_loop_counts[face_index];
+	for(unsigned int loop_index = loop_begin; loop_index != loop_end; ++loop_index)
+	{
+		unsigned int first_edge_index = loop_first_edges[loop_index];
+		
+		for( unsigned int edge_index = first_edge_index; 1 ; )
+		{
+			edge_faces[edge_index] = face_index;
+			
+			edge_index = clockwise_edges[edge_index];
+			if (edge_index == first_edge_index)
+				break;
+		}
+	}
 }
 
 /**
@@ -981,7 +1077,6 @@ __global__ void calculate_grid_points_kernel ( float4 *point_and_selection,
 	}
 
 }
-
 
 #endif // #ifndef _CUDA_KERNELS_H_
 

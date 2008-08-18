@@ -539,30 +539,38 @@ extern "C" void transform_points_asynchronous ( double *InputPoints, double *Poi
 	measureTimingInfoTimer(tInfo, DEV_CLEANUP);
 }
 
-extern "C" void subdivide_edges_split_point_calculator ( unsigned int* pdev_edge_indices,
-                                                        unsigned int num_edge_indices,
+extern "C" void subdivide_edges_split_point_calculator ( const unsigned int* pdev_first_midpoint,
+																												const unsigned char* pdev_has_midpoint,
                                                         float* pdev_points_and_selection,
                                                         unsigned int num_input_points,
                                                         unsigned int* pdev_edge_point_indices,
                                                         unsigned int* pdev_clockwise_edge_indices,
-                                                        int num_split_points )
+                                                        const float* pdev_edge_selection,
+                                                        const unsigned int* pdev_companions,
+                                                        const unsigned char* pdev_boundary_edges,
+                                                        const unsigned int* pdev_edge_faces,
+                                                        int num_split_points,
+                                                        int num_edges)
 {
     // allocate device memory for the edge_indices
-    if ( num_edge_indices > 0 & num_split_points > 0 & num_input_points > 0 )
+    if ( num_edges > 0 & num_split_points > 0 & num_input_points > 0 )
     {
         int threads_x = 512 / num_split_points;
 
         dim3 threads_per_block(threads_x, num_split_points);
-        dim3 blocks_per_grid( iDivUp(num_edge_indices, threads_x), 1);
-        subdivide_edges_split_point_kernel<<< blocks_per_grid, threads_per_block >>> ( pdev_edge_indices,
-                                                                                       num_edge_indices,
+        dim3 blocks_per_grid( iDivUp(num_edges, threads_x), 1);
+        subdivide_edges_split_point_kernel<<< blocks_per_grid, threads_per_block >>> ( pdev_first_midpoint,
+                                                                                       pdev_has_midpoint,
                                                                                        (float4*)pdev_points_and_selection,
                                                                                        num_input_points,
-                                                                                       (float4*)(pdev_points_and_selection + num_input_points*4),
                                                                                        pdev_edge_point_indices,
                                                                                        pdev_clockwise_edge_indices,
-                                                                                       num_split_points );
-
+                                                                                       pdev_edge_selection,
+                                                                                       pdev_companions,
+                                                                                       pdev_boundary_edges,
+                                                                                       pdev_edge_faces,
+                                                                                       num_split_points,
+                                                                                       num_edges);
         checkLastCudaError();
     }
 }
@@ -613,30 +621,34 @@ extern "C" void subdivide_edges_update_loop_first_edges_entry (
 extern "C" void subdivide_edges_split_edges_entry ( unsigned int* pdev_output_edge_point_indices,
                                                     unsigned int* pdev_output_clockwise_edge_point_indices,
                                                     unsigned int* pdev_input_clockwise_edge_point_indices,
+                                                    const float* pdev_edge_selection,
                                                     unsigned int* pdev_edge_index_map,
-                                                    unsigned int* pdev_edge_indices,
-                                                    unsigned int num_edge_indices,
-                                                    int num_split_points,
                                                     unsigned int* pdev_first_midpoint,
+                                                    unsigned char* pdev_has_midpoint,
+                                                    int num_split_points,
                                                     unsigned int* pdev_companions,
-                                                    unsigned char* pdev_boundary_edges
+                                                    unsigned char* pdev_boundary_edges,
+                                                    const unsigned int num_edges,
+                                                    const unsigned int* pdev_edge_faces
                                                     )
 {
     int threads_x = 512 / num_split_points;
     dim3 threads_per_block(threads_x, num_split_points);
-    dim3 blocks_per_grid( iDivUp(num_edge_indices, threads_x), 1);
+    dim3 blocks_per_grid( iDivUp(num_edges, threads_x), 1);
 
     subdivide_edges_split_edges_kernel<<< blocks_per_grid, threads_per_block >>>
                                                    (pdev_output_edge_point_indices,
                                                     pdev_output_clockwise_edge_point_indices,
                                                     pdev_input_clockwise_edge_point_indices,
+                                                    pdev_edge_selection,
                                                     pdev_edge_index_map,
-                                                    pdev_edge_indices,
-                                                    num_edge_indices,
-                                                    num_split_points,
                                                     pdev_first_midpoint,
+                                                    pdev_has_midpoint,
+                                                    num_split_points,
                                                     pdev_companions,
-                                                    pdev_boundary_edges
+                                                    pdev_boundary_edges,
+                                                    num_edges,
+                                                    pdev_edge_faces
                                                     );
     checkLastCudaError();
 }
@@ -765,12 +777,11 @@ extern "C" void calculate_point_edges_entry (
 	checkLastCudaError();
 }
 
-extern "C" unsigned int edge_index_calculator_entry (
-													unsigned int* pdev_edge_list,
-													unsigned int* phost_edge_list_size,
+extern "C" void edge_index_calculator_entry (
 													unsigned int* pdev_first_midpoint,
 													unsigned char* pdev_has_midpoint,
 													unsigned int* pdev_index_map,
+													unsigned int* pdev_edge_faces,
 													const unsigned int* pdev_face_first_loops,
 													const unsigned int* pdev_face_loop_counts,
 													const unsigned int* pdev_loop_first_edges,
@@ -780,60 +791,98 @@ extern "C" unsigned int edge_index_calculator_entry (
 													const unsigned char* pdev_boundary_edges,
 													int split_point_count,
 													int num_faces,
-													int first_new_point_index
+													int first_new_point_index,
+													unsigned int* new_point_count,
+													unsigned int* new_edge_count
 													)
 {
-	unsigned int host_sizes[4];
-	unsigned int* pdev_sizes;
-	allocate_device_memory((void**)&pdev_sizes, 4*sizeof(unsigned int));
-	set_device_memory((void*)pdev_sizes, 0, 4*sizeof(unsigned int));
-	// runs serially
-	dim3 threads_per_block(1, 1);
-	dim3 blocks_per_grid(1, 1);
-	cudaThreadSynchronize();
+	dim3 threads_per_block(64, 1);
+	dim3 blocks_per_grid( iDivUp(num_faces, 64), 1);
 
-	for ( int face_count = 0; face_count < num_faces ; face_count++ )
+	// Get the face for each edge
+	face_per_edge_kernel <<< blocks_per_grid, threads_per_block >>> (
+										pdev_face_first_loops,
+										num_faces,
+										pdev_face_loop_counts,
+										pdev_loop_first_edges,
+										pdev_clockwise_edges,
+										pdev_edge_faces);
+	checkLastCudaError();
+	cudaThreadSynchronize();
+	
+	// Allocate an array to store the per-face edge and new split point count
+	unsigned int* face_edge_counts;
+	allocate_device_memory((void**)&face_edge_counts, num_faces * sizeof(unsigned int));
+	unsigned int* face_split_point_counts;
+	allocate_device_memory((void**)&face_split_point_counts, num_faces * sizeof(unsigned int));
+
+	// count edges and new split points per face
+	subdivide_edges_count_components_per_face <<< blocks_per_grid, threads_per_block >>> (
+										pdev_face_first_loops,
+										num_faces,
+										pdev_face_loop_counts,
+										pdev_loop_first_edges,
+										pdev_clockwise_edges,
+										pdev_edge_selection,
+										pdev_companions,
+										pdev_boundary_edges,
+										split_point_count,
+										pdev_edge_faces,
+										face_edge_counts,
+										face_split_point_counts
+										 );
+	cudaThreadSynchronize();
+	
+	// Replace face_edge_counts with its cumulative sum
+	unsigned int* temp_e;
+	allocate_device_memory((void**)&temp_e, num_faces * sizeof(unsigned int));
+	unsigned int* temp_p;
+	allocate_device_memory((void**)&temp_p, num_faces * sizeof(unsigned int));
+	for(int step_size = 1; step_size < num_faces; step_size *= 2)
 	{
-		//printf("face %d of %d\n", face_count+1, num_faces);
-
-		get_loop_index_and_count_kernel <<< blocks_per_grid, threads_per_block >>> (
-												pdev_sizes+2,
-												pdev_face_first_loops,
-												pdev_face_loop_counts,
-												face_count );
+		unsigned int* temp2_e = face_edge_counts;
+		face_edge_counts = temp_e;
+		temp_e = temp2_e;
+		cumulative_sum_step<<< blocks_per_grid, threads_per_block >>>(temp_e, face_edge_counts, num_faces, step_size);
 		checkLastCudaError();
-		copy_from_device_to_host((void*)(&host_sizes), (const void*)pdev_sizes, 4*sizeof(unsigned int));
+		unsigned int* temp2_p = face_split_point_counts;
+		face_split_point_counts = temp_p;
+		temp_p = temp2_p;
+		cumulative_sum_step<<< blocks_per_grid, threads_per_block >>>(temp_p, face_split_point_counts, num_faces, step_size);
 		checkLastCudaError();
-
-		for ( int loop_index = host_sizes[2]; loop_index < host_sizes[2] + host_sizes[3]; loop_index++ )
-		{
-			//printf("loop %d of %d\n", loop_index+1, host_sizes[2] + host_sizes[3]);
-			edge_index_calculator_kernel <<< blocks_per_grid, threads_per_block >>> (
-												pdev_edge_list,
-												pdev_sizes,
-												pdev_first_midpoint,
-												pdev_has_midpoint,
-												pdev_index_map,
-												pdev_loop_first_edges,
-												pdev_clockwise_edges,
-												pdev_edge_selection,
-												pdev_companions,
-												pdev_boundary_edges,
-												split_point_count,
-												first_new_point_index,
-												loop_index
-												 );
-			checkLastCudaError();
-
-		}
+		cudaThreadSynchronize();
 	}
+	
+	// Calculate the new indices for the split points and the edges
+	subdivide_edges_edge_index_calculator_kernel <<< blocks_per_grid, threads_per_block >>> (
+										pdev_first_midpoint,
+										pdev_has_midpoint,
+										pdev_index_map,
+										pdev_face_first_loops,
+										num_faces,
+										pdev_face_loop_counts,
+										pdev_loop_first_edges,
+										pdev_clockwise_edges,
+										pdev_edge_selection,
+										pdev_companions,
+										pdev_boundary_edges,
+										pdev_edge_faces,
+										face_edge_counts,
+										face_split_point_counts,
+										split_point_count,
+										first_new_point_index
+										 );
+	checkLastCudaError();
 
-	copy_from_device_to_host((void*)(&host_sizes), (const void*)pdev_sizes, 2*sizeof(unsigned int));
 	cudaThreadSynchronize();
-	free_device_memory ( pdev_sizes );
-
-	*phost_edge_list_size = host_sizes[1];
-	return host_sizes[0];
+	
+	copy_from_device_to_host((void*) new_point_count, (void*) &(face_split_point_counts[num_faces - 1]), sizeof(unsigned int));
+	copy_from_device_to_host((void*) new_edge_count, (void*) &(face_edge_counts[num_faces - 1]), sizeof(unsigned int));
+			
+	free_device_memory(temp_e);
+	free_device_memory(temp_p);
+	free_device_memory(face_edge_counts);
+	free_device_memory(face_split_point_counts);
 }
 
 /**

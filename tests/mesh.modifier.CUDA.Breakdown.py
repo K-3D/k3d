@@ -3,16 +3,16 @@
 import benchmarking
 
 
-columns = ["Create:Validate input",
-           "Merge selection",
+columns = [#"Create:Validate input",
+           #"Merge selection",
            "Calculate companions",
            "Calculate indices",
            "Allocate memory",
            "Update indices",
            "Split edges",
-           "Update:Validate input",
+           #"Update:Validate input",
            "Calculate positions",
-           "Update:Copy",
+           #"Update:Copy",
            "Total"]
            
 
