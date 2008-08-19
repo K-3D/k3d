@@ -14,6 +14,16 @@ columns = ["Update Topology:init",
 
 benchmarking.generate_component_image("CUDAPolyGridBreakdown", "CUDAPolyGrid", columns )
 
+columns = ["Update Topology",
+           "Update Mesh Topology",
+           "Update Geometry",
+           "Update Mesh Geometry",
+           "Total"]
+
+benchmarking.generate_component_image("PolyGridBreakdown", "PolyGrid", columns )
+
+
+
 columns = ["Update Topology:init",
            "Update Topology:DeviceAllocate",
            "Update Topology:Kernel",
