@@ -2,7 +2,7 @@
 #define K3DSDK_GRAPH_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -23,6 +23,7 @@
 #include "attribute_arrays.h"
 #include "named_array_types.h"
 #include "typed_array.h"
+#include "uint_t_array.h"
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -64,7 +65,7 @@ public:
 	/// Defines storage for a generic collection of integer values
 	typedef typed_array<int32_t> ints_t;
 	/// Defines storage for a generic collection of index values
-	typedef typed_array<uint_t> indices_t;
+	typedef uint_t_array indices_t;
 	/// Defines storage for a generic collection of floating-point values
 	typedef typed_array<double_t> doubles_t;
 	/// Defines storage for a generic collection of string values

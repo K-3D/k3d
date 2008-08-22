@@ -137,7 +137,7 @@ public:
 			return;
 		}
 
-		const k3d::string_t from_property_name = attribute_text(Dependency, "from_property");
+		const string_t from_property_name = attribute_text(Dependency, "from_property");
 		return_if_fail(from_property_name.size());
 		iproperty* const from_property = property::get(*from_node, from_property_name);
 		if(!from_property)
@@ -158,7 +158,7 @@ public:
 			return;
 		}
 
-		const k3d::string_t to_property_name = attribute_text(Dependency, "to_property");
+		const string_t to_property_name = attribute_text(Dependency, "to_property");
 		return_if_fail(to_property_name.size());
 		iproperty* const to_property = property::get(*to_node, to_property_name);
 		if(!to_property)
@@ -718,7 +718,7 @@ const ipersistent_lookup::id_type max_node_id(element& XMLDocument)
 	return result;
 }
 
-void adjust_dependencies(element& XMLDocument, const ipersistent_lookup::id_type FromID, const k3d::string_t& FromProperty, const ipersistent_lookup::id_type ToID, const k3d::string_t& ToProperty)
+void adjust_dependencies(element& XMLDocument, const ipersistent_lookup::id_type FromID, const string_t& FromProperty, const ipersistent_lookup::id_type ToID, const string_t& ToProperty)
 {
 	if(element* const xml_dependencies = find_element(XMLDocument, "dependencies"))
 	{
@@ -794,7 +794,7 @@ void upgrade_transformable_nodes(element& XMLDocument)
 			if(xml_property->name != "property")
 				continue;
 
-			const k3d::string_t property_name = attribute_text(*xml_property, "name");
+			const string_t property_name = attribute_text(*xml_property, "name");
 			if(property_name == "position")
 				xml_position = &(*xml_property);
 			else if(property_name == "orientation")
@@ -809,7 +809,7 @@ void upgrade_transformable_nodes(element& XMLDocument)
 		if(xml_position->text == "0 0 0" && xml_orientation->text == "0 0 0 1" && xml_scale->text == "1 1 1")
 			continue;
 
-		const k3d::string_t node_name = attribute_text(*xml_node, "name");
+		const string_t node_name = attribute_text(*xml_node, "name");
 		log() << warning << "Upgrading old transformable node " << node_name << std::endl;
 
 		const point3 position = from_string<point3>(xml_position->text, point3(0, 0, 0));
@@ -1318,7 +1318,7 @@ void upgrade_node_selection(element& XMLDocument)
 /// Helper functor for searching for shaders by name
 struct same_name
 {
-	same_name(const k3d::string_t& Name) :
+	same_name(const string_t& Name) :
 		name(Name)
 	{
 	}
@@ -1329,7 +1329,7 @@ struct same_name
 		return LHS.name == name;
 	}
 
-	const k3d::string_t name;
+	const string_t name;
 };
 
 } // namespace detail
@@ -1482,10 +1482,69 @@ void save_array(element& Container, element Storage, const array_type& Array, co
 /////////////////////////////////////////////////////////////////////////////
 // save_array
 
-/// Specialization of save_array to ensure we don't lose precision when writing arrays of double
-void save_array(element& Container, element Storage, const typed_array<double>& Array, const ipersistent::save_context& Context)
+/// Specialization of save_array to ensure that 8-bit integers don't get serialized as characters
+void save_array(element& Container, element Storage, const typed_array<int8_t>& Array, const ipersistent::save_context& Context)
 {
-	typedef typed_array<double> array_type;
+	typedef typed_array<int8_t> array_type;
+
+	array_type::const_iterator item = Array.begin();
+	const array_type::const_iterator end = Array.end();
+
+	std::ostringstream buffer;
+
+	if(item != end)
+		buffer << static_cast<int16_t>(*item++);
+	for(; item != end; ++item)
+		buffer << " " << static_cast<int16_t>(*item);
+
+	Storage.text = buffer.str();
+	Container.append(Storage);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// save_array
+
+/// Specialization of save_array to ensure that 8-bit unsigned integers don't get serialized as characters
+void save_array(element& Container, element Storage, const typed_array<uint8_t>& Array, const ipersistent::save_context& Context)
+{
+	typedef typed_array<uint8_t> array_type;
+
+	array_type::const_iterator item = Array.begin();
+	const array_type::const_iterator end = Array.end();
+
+	std::ostringstream buffer;
+
+	if(item != end)
+		buffer << static_cast<uint16_t>(*item++);
+	for(; item != end; ++item)
+		buffer << " " << static_cast<uint16_t>(*item);
+
+	Storage.text = buffer.str();
+	Container.append(Storage);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// save_array
+
+/// Specialization of save_array to handle whitespace in strings
+void save_array(element& Container, element Storage, const typed_array<string_t>& Array, const ipersistent::save_context& Context)
+{
+	typedef typed_array<string_t> array_type;
+
+	const array_type::const_iterator end = Array.end();
+	for(array_type::const_iterator item = Array.begin(); item != end; ++item)
+		Storage.append(element("value", *item));
+
+	Container.append(Storage);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// save_array
+
+/// Specialization of save_array to ensure we don't lose precision when writing arrays of double
+void save_array(element& Container, element Storage, const typed_array<double_t>& Array, const ipersistent::save_context& Context)
+{
+	typedef typed_array<double_t> array_type;
 
 	array_type::const_iterator item = Array.begin();
 	const array_type::const_iterator end = Array.end();
@@ -1541,13 +1600,18 @@ void save_array(element& Container, element Storage, const boost::shared_ptr<con
 class save_typed_array
 {
 public:
-	save_typed_array(element& Container, const k3d::string_t& Name, array& AbstractArray, const ipersistent::save_context& Context, bool_t& Saved) :
+	save_typed_array(element& Container, const string_t& Name, array& AbstractArray, const ipersistent::save_context& Context, bool_t& Saved) :
 		container(Container),
 		name(Name),
 		abstract_array(AbstractArray),
 		context(Context),
 		saved(Saved)
 	{
+		if(uint_t_array* const concrete_array = dynamic_cast<uint_t_array*>(&abstract_array))
+		{
+			saved = true;
+			save_array(container, element("array", attribute("name", name), attribute("type", "k3d::uint_t")), *concrete_array, context);
+		}
 	}
 
 	template<typename T>
@@ -1558,14 +1622,14 @@ public:
 
 		if(typed_array<T>* const concrete_array = dynamic_cast<typed_array<T>*>(&abstract_array))
 		{
-			save_array(container, element("array", attribute("name", name), attribute("type", type_string<T>())), *concrete_array, context);
 			saved = true;
+			save_array(container, element("array", attribute("name", name), attribute("type", type_string<T>())), *concrete_array, context);
 		}
 	}
 
 private:
 	element& container;
-	const k3d::string_t& name;
+	const string_t& name;
 	array& abstract_array;
 	const ipersistent::save_context& context;
 	k3d::bool_t& saved;
@@ -1573,6 +1637,36 @@ private:
 
 /////////////////////////////////////////////////////////////////////////////
 // save_arrays
+
+void save_arrays(element& Container, element Storage, const mesh::named_arrays_t& Arrays, const ipersistent::save_context& Context)
+{
+	if(!Arrays.size())
+		return;
+
+	element& container = Container.append(Storage);
+	for(mesh::named_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
+	{
+		const string_t name = array_iterator->first;
+		array* const abstract_array = array_iterator->second.get();
+
+		if(name.empty())
+		{
+			log() << error << "will not serialize unnamed array" << std::endl;
+			continue;
+		}
+
+		if(!abstract_array)
+		{
+			log() << error << "will not serialize null array [" << name << "]" << std::endl;
+			continue;
+		}
+
+		bool_t saved = false;
+		boost::mpl::for_each<named_array_types>(save_typed_array(container, name, *abstract_array, Context, saved));
+		if(!saved)
+			log() << error << k3d_file_reference << ": array [" << name << "] with unknown type [" << demangle(typeid(*abstract_array)) << "] will not be serialized" << std::endl;
+	}
+}
 
 void save_arrays(element& Container, element Storage, const mesh::attribute_arrays_t& Arrays, const ipersistent::save_context& Context)
 {
@@ -1582,25 +1676,25 @@ void save_arrays(element& Container, element Storage, const mesh::attribute_arra
 	element& container = Container.append(Storage);
 	for(mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
 	{
-		const k3d::string_t name = array_iterator->first;
+		const string_t name = array_iterator->first;
 		array* const abstract_array = array_iterator->second.get();
 
 		if(name.empty())
 		{
-			k3d::log() << error << "will not serialize unnamed array" << std::endl;
+			log() << error << "will not serialize unnamed array" << std::endl;
 			continue;
 		}
 
 		if(!abstract_array)
 		{
-			k3d::log() << error << "will not serialize null array [" << name << "]" << std::endl;
+			log() << error << "will not serialize null array [" << name << "]" << std::endl;
 			continue;
 		}
 
-		k3d::bool_t saved = false;
+		bool_t saved = false;
 		boost::mpl::for_each<named_array_types>(save_typed_array(container, name, *abstract_array, Context, saved));
 		if(!saved)
-			k3d::log() << error << k3d_file_reference << ": array [" << name << "] with unknown type [" << demangle(typeid(*abstract_array)) << "] will not be serialized" << std::endl;
+			log() << error << k3d_file_reference << ": array [" << name << "] with unknown type [" << demangle(typeid(*abstract_array)) << "] will not be serialized" << std::endl;
 	}
 }
 
@@ -1621,6 +1715,58 @@ void load_array(const element& Storage, array_type& Array, const ipersistent::lo
 			break;
 
 		Array.push_back(value);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// load_array
+
+void load_array(const element& Storage, typed_array<int8_t>& Array, const ipersistent::load_context& Context)
+{
+	int16_t value;
+
+	std::istringstream buffer(Storage.text);
+	while(true)
+	{
+		buffer >> value;
+
+		if(!buffer)
+			break;
+
+		Array.push_back(static_cast<int8_t>(value));
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// load_array
+
+void load_array(const element& Storage, typed_array<uint8_t>& Array, const ipersistent::load_context& Context)
+{
+	uint16_t value;
+
+	std::istringstream buffer(Storage.text);
+	while(true)
+	{
+		buffer >> value;
+
+		if(!buffer)
+			break;
+
+		Array.push_back(static_cast<uint8_t>(value));
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// load_array
+
+void load_array(const element& Storage, typed_array<string_t>& Array, const ipersistent::load_context& Context)
+{
+	for(element::elements_t::const_iterator xml_value = Storage.children.begin(); xml_value != Storage.children.end(); ++xml_value)
+	{
+		if(xml_value->name != "value")
+			continue;
+
+		Array.push_back(xml_value->text);
 	}
 }
 
@@ -1664,7 +1810,7 @@ void load_array(const element& Storage, typed_array<inode*>& Array, const ipersi
 // load_array
 
 template<typename array_type>
-void load_array(const element& Container, const k3d::string_t& Storage, boost::shared_ptr<const array_type>& Array, const ipersistent::load_context& Context)
+void load_array(const element& Container, const string_t& Storage, boost::shared_ptr<const array_type>& Array, const ipersistent::load_context& Context)
 {
 	const element* const storage = find_element(Container, Storage);
 	if(!storage)
@@ -1680,10 +1826,11 @@ void load_array(const element& Container, const k3d::string_t& Storage, boost::s
 /////////////////////////////////////////////////////////////////////////////
 // load_typed_array
 
+template<typename arrays_t>
 class load_typed_array
 {
 public:
-	load_typed_array(const element& Storage, const k3d::string_t& Name, const k3d::string_t& Type, mesh::attribute_arrays_t& Arrays, const ipersistent::load_context& Context, k3d::bool_t& Loaded) :
+	load_typed_array(const element& Storage, const string_t& Name, const string_t& Type, arrays_t& Arrays, const ipersistent::load_context& Context, k3d::bool_t& Loaded) :
 		storage(Storage),
 		name(Name),
 		type(Type),
@@ -1691,6 +1838,13 @@ public:
 		context(Context),
 		loaded(Loaded)
 	{
+		if(type == "k3d::uint_t")
+		{
+			loaded = true;
+			uint_t_array* const array = new uint_t_array();
+			load_array(storage, *array, context);
+			arrays.insert(std::make_pair(name, array));
+		}
 	}
 
 	template<typename T>
@@ -1701,18 +1855,18 @@ public:
 
 		if(type_string<T>() == type)
 		{
+			loaded = true;
 			typed_array<T>* const array = new typed_array<T>();
 			load_array(storage, *array, context);
 			arrays.insert(std::make_pair(name, array));
-			loaded = true;
 		}
 	}
 
 private:
 	const element& storage;
-	const k3d::string_t& name;
-	const k3d::string_t& type;
-	mesh::attribute_arrays_t& arrays;
+	const string_t& name;
+	const string_t& type;
+	arrays_t& arrays;
 	const ipersistent::load_context& context;
 	k3d::bool_t& loaded;
 };
@@ -1720,50 +1874,71 @@ private:
 /////////////////////////////////////////////////////////////////////////////
 // load_arrays
 
-void load_arrays(const element& Container, const k3d::string_t& Storage, mesh::attribute_arrays_t& Arrays, const ipersistent::load_context& Context)
+template<typename arrays_t>
+void load_arrays(const element& Container, arrays_t& Arrays, const ipersistent::load_context& Context)
 {
-	const element* const container = find_element(Container, Storage);
-	if(!container)
-		return;
-
-	for(size_t i = 0; i != container->children.size(); ++i)
+	for(size_t i = 0; i != Container.children.size(); ++i)
 	{
-		const element& storage = container->children[i];
+		const element& storage = Container.children[i];
 
 		if(storage.name != "array")
 			continue;
 
-		const k3d::string_t name = attribute_text(storage, "name");
+		const string_t name = attribute_text(storage, "name");
 		if(name.empty())
 		{
-			k3d::log() << error << "unnamed array will not be loaded" << std::endl;
+			log() << error << "unnamed array will not be loaded" << std::endl;
 			continue;
 		}
 
 		if(Arrays.count(name))
 		{
-			k3d::log() << error << "duplicate array [" << name << "] will not be loaded" << std::endl;
+			log() << error << "duplicate array [" << name << "] will not be loaded" << std::endl;
 			continue;
 		}
 
-		const k3d::string_t type = attribute_text(storage, "type");
+		const string_t type = attribute_text(storage, "type");
 		if(type.empty())
 		{
-			k3d::log() << error << "untyped array [" << name << "] will not be loaded" << std::endl;
+			log() << error << "untyped array [" << name << "] will not be loaded" << std::endl;
 			continue;
 		}
 
 		bool loaded = false;
-		boost::mpl::for_each<named_array_types>(load_typed_array(storage, name, type, Arrays, Context, loaded));
+		boost::mpl::for_each<named_array_types>(load_typed_array<arrays_t>(storage, name, type, Arrays, Context, loaded));
 		if(!loaded)
-			k3d::log() << error << "array [" << name << "] with unknown type [" << type << "] will not be loaded" << std::endl;
+			log() << error << "array [" << name << "] with unknown type [" << type << "] will not be loaded" << std::endl;
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// load_arrays
+
+void load_arrays(const element& Container, const string_t& Storage, mesh::named_arrays_t& Arrays, const ipersistent::load_context& Context)
+{
+	const element* const container = find_element(Container, Storage);
+	if(!container)
+		return;
+
+	load_arrays<mesh::named_arrays_t>(*container, Arrays, Context);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// load_arrays
+
+void load_arrays(const element& Container, const string_t& Storage, mesh::attribute_arrays_t& Arrays, const ipersistent::load_context& Context)
+{
+	const element* const container = find_element(Container, Storage);
+	if(!container)
+		return;
+
+	load_arrays<mesh::attribute_arrays_t>(*container, Arrays, Context);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // save_selection
 
-void save_selection(element& Element, const mesh_selection::records_t& Records, const k3d::string_t& ElementName)
+void save_selection(element& Element, const mesh_selection::records_t& Records, const string_t& ElementName)
 {
 	if(Records.empty())
 		return;
@@ -1806,6 +1981,32 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 	detail::save_array(Container, element("points"), Mesh.points, Context);
 	detail::save_array(Container, element("point_selection"), Mesh.point_selection, Context);
 	detail::save_arrays(Container, element("vertex_data"), Mesh.vertex_data, Context);
+
+	if(Mesh.primitives.size())
+	{
+		element& xml_primitives = Container.append(element("primitives"));
+		for(mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		{
+			if(!primitive->get())
+				continue;
+
+			element& xml_primitive = xml_primitives.append(element("primitive", attribute("type", (*primitive)->type)));
+
+			if((*primitive)->topology.size())
+			{
+				detail::save_arrays(xml_primitive, element("topology"), (*primitive)->topology, Context);
+			}
+			
+			if((*primitive)->attributes.size())
+			{
+				element& xml_attributes = xml_primitive.append(element("attributes"));
+				for(mesh::attributes_t::const_iterator attribute = (*primitive)->attributes.begin(); attribute != (*primitive)->attributes.end(); ++attribute)
+				{
+					detail::save_arrays(xml_attributes, element("arrays", xml::attribute("type", attribute->first)), attribute->second, Context);
+				}
+			}
+		}
+	}
 
 	if(Mesh.point_groups)
 	{
@@ -1978,6 +2179,39 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 	detail::load_array(Container, "point_selection", Mesh.point_selection, Context);
 	detail::load_arrays(Container, "vertex_data", Mesh.vertex_data, Context);
 
+	if(const element* const xml_primitives = find_element(Container, "primitives"))
+	{
+		for(element::elements_t::const_iterator xml_primitive = xml_primitives->children.begin(); xml_primitive != xml_primitives->children.end(); ++xml_primitive)
+		{
+			if(xml_primitive->name != "primitive")
+				continue;
+
+			mesh::primitive* const primitive = new mesh::primitive();
+			primitive->type = attribute_text(*xml_primitive, "type");
+
+			if(const element* const xml_topology = find_element(*xml_primitive, "topology"))
+			{
+				detail::load_arrays(*xml_topology, primitive->topology, Context);
+			}
+
+			if(const element* const xml_attributes = find_element(*xml_primitive, "attributes"))
+			{
+				for(element::elements_t::const_iterator xml_arrays = xml_attributes->children.begin(); xml_arrays != xml_attributes->children.end(); ++xml_arrays)
+				{
+					if(xml_arrays->name != "arrays")
+						continue;
+
+					mesh::attribute_arrays_t arrays;
+					detail::load_arrays(*xml_arrays, arrays, Context);
+
+					primitive->attributes.insert(std::make_pair(attribute_text(*xml_arrays, "type"), arrays));
+				}
+			}
+			
+			Mesh.primitives.push_back(boost::shared_ptr<const mesh::primitive>(primitive));
+		}
+	}
+
 	if(element* const container = find_element(Container, "point_groups"))
 	{
 		mesh::point_groups_t* const point_groups = make_unique(Mesh.point_groups);
@@ -2144,7 +2378,7 @@ namespace detail
 {
 
 template<typename data_t>
-bool load_parameter(const k3d::string_t& XMLType, const k3d::string_t& Name, const k3d::string_t& Type, const k3d::string_t& Value, legacy::parameters_t& Parameters)
+bool load_parameter(const string_t& XMLType, const string_t& Name, const string_t& Type, const string_t& Value, legacy::parameters_t& Parameters)
 {
 	if(XMLType != Type)
 		return false;
@@ -2160,21 +2394,21 @@ void load_parameters(const element& Element, legacy::parameters_t& Parameters)
 		if(xml_parameter->name != "parameter")
 			continue;
 
-		const k3d::string_t name = attribute_text(*xml_parameter, "name");
+		const string_t name = attribute_text(*xml_parameter, "name");
 		if(name.empty())
 		{
 			log() << error << k3d_file_reference << " unnamed parameter will not be loaded" << std::endl;
 			continue;
 		}
 
-		const k3d::string_t type = attribute_text(*xml_parameter, "type");
+		const string_t type = attribute_text(*xml_parameter, "type");
 		if(type.empty())
 		{
 			log() << error << k3d_file_reference << " parameter [" << name << "] with unknown type will not be loaded" << std::endl;
 			continue;
 		}
 
-		const k3d::string_t value = attribute_text(*xml_parameter, "value");
+		const string_t value = attribute_text(*xml_parameter, "value");
 
 		if(load_parameter<ri::integer>("integer", name, type, value, Parameters)) continue;
 		if(load_parameter<ri::real>("real", name, type, value, Parameters)) continue;
@@ -2191,14 +2425,14 @@ void load_parameters(const element& Element, legacy::parameters_t& Parameters)
 	}
 }
 
-void load_parameters(const element& Element, const k3d::string_t& StorageClass, legacy::parameters_t& Parameters)
+void load_parameters(const element& Element, const string_t& StorageClass, legacy::parameters_t& Parameters)
 {
 	for(element::elements_t::const_iterator xml_parameters = Element.children.begin(); xml_parameters != Element.children.end(); ++xml_parameters)
 	{
 		if(xml_parameters->name != "parameters")
 			continue;
 
-		k3d::string_t storage_class = attribute_text(*xml_parameters, "storageclass");
+		string_t storage_class = attribute_text(*xml_parameters, "storageclass");
 		if(storage_class.empty())
 			storage_class = attribute_text(*xml_parameters, "type");
 		if(storage_class != StorageClass)
@@ -2220,10 +2454,10 @@ void load_varying_parameters(const element& Element, boost::array<legacy::parame
 		if(xml_parameters->name != "parameters")
 			continue;
 
-		k3d::string_t storage_class = attribute_text(*xml_parameters, "storageclass");
+		string_t storage_class = attribute_text(*xml_parameters, "storageclass");
 		if(storage_class.empty())
 			storage_class = attribute_text(*xml_parameters, "type");
-		k3d::string_t keyword("varying");
+		string_t keyword("varying");
 		if(storage_class != string_cast(keyword))
 			continue;
 
@@ -2248,10 +2482,10 @@ void load_varying_parameters(const element& Element, ContainerT& Parameters, con
 		if(xml_parameters->name != "parameters")
 			continue;
 
-		k3d::string_t storage_class = attribute_text(*xml_parameters, "storageclass");
+		string_t storage_class = attribute_text(*xml_parameters, "storageclass");
 		if(storage_class.empty())
 			storage_class = attribute_text(*xml_parameters, "type");
-		k3d::string_t keyword("varying");
+		string_t keyword("varying");
 		if(storage_class != string_cast(keyword))
 			continue;
 

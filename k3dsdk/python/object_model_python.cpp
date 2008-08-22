@@ -67,6 +67,7 @@
 #include "texture3_python.h"
 #include "typed_array_python.h"
 #include "uuid_python.h"
+#include "vector2_python.h"
 #include "vector3_python.h"
 
 #include <k3dsdk/algebra.h>
@@ -434,6 +435,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_point4();
 	define_class_texture3();
 	define_class_uuid();
+	define_class_vector2();
 	define_class_vector3();
 	define_namespace_euler();
 	define_namespace_log();

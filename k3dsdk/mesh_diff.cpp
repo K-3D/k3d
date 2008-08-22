@@ -93,10 +93,15 @@ private:
 /////////////////////////////////////////////////////////////////////
 // equal
 
-/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
-/// \note: This overload is used to compare concrete arrays.
+/// Return true iff two arrays are equivalent (handles "fuzzy" floating-point comparisons).
 template<typename T>
 const bool equal(const typed_array<T>& A, const typed_array<T>& B, const boost::uint64_t Threshold)
+{
+	return A.almost_equal(B, Threshold);
+}
+
+/// Return true iff two arrays are equivalent (handles "fuzzy" floating-point comparisons).
+const bool equal(const uint_t_array& A, const uint_t_array& B, const boost::uint64_t Threshold)
 {
 	return A.almost_equal(B, Threshold);
 }

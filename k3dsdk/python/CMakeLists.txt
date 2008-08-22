@@ -46,6 +46,8 @@ ADD_LIBRARY(k3dsdk-python-types SHARED
 	texture3_python.h
 	uuid_python.cpp
 	uuid_python.h
+	vector2_python.cpp
+	vector2_python.h
 	vector3_python.cpp
 	vector3_python.h
 	)

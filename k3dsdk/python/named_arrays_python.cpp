@@ -28,6 +28,7 @@
 #include <k3dsdk/named_array_types.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/typed_array.h>
+#include <k3dsdk/uint_t_array.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -47,6 +48,13 @@ public:
 		array(Array),
 		arrays(Arrays)
 	{
+		// Handle arrays of uint_t as a special-case ...
+		if(Type == "k3d::uint_t")
+		{
+			k3d::uint_t_array* const new_array = new k3d::uint_t_array();
+			arrays[name].reset(new_array);
+			array = wrap(*new_array);
+		}
 	}
 
 	template<typename T>
@@ -60,7 +68,7 @@ public:
 
 		k3d::typed_array<T>* const new_array = new k3d::typed_array<T>();
 		arrays[name].reset(new_array);
-		array = boost::python::object(wrap(*new_array));
+		array = wrap(*new_array);
 	}
 
 private:

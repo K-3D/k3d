@@ -29,6 +29,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/named_array_types.h>
 #include <k3dsdk/typed_array.h>
+#include <k3dsdk/uint_t_array.h>
 
 #include <boost/python.hpp>
 
@@ -57,22 +58,16 @@ static boost::python::object get_item_inode(interface_wrapper<k3d::typed_array<k
 template<typename array_type>
 static void set_item(interface_wrapper<array_type>& Self, int Item, const typename array_type::value_type& Value)
 {
-	if(Item < 0)
+	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
-
-	if(static_cast<uint_t>(Item) >= Self.wrapped().size())
-		Self.wrapped().resize(Item + 1);
 
 	Self.wrapped()[Item] = Value;
 }
 
 static void set_item_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, int Item, const boost::python::object& Value)
 {
-	if(Item < 0)
+	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
-
-	if(static_cast<uint_t>(Item) >= Self.wrapped().size())
-		Self.wrapped().resize(Item + 1);
 
 	if(Value)
 	{
@@ -87,11 +82,8 @@ static void set_item_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial
 
 static void set_item_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Self, int Item, const boost::python::object& Value)
 {
-	if(Item < 0)
+	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
-
-	if(static_cast<uint_t>(Item) >= Self.wrapped().size())
-		Self.wrapped().resize(Item + 1);
 
 	if(Value)
 	{
@@ -340,6 +332,9 @@ void define_typed_array_classes()
 		"Stores a mutable (read-write) collection of L{vector2} values.");
 	define_class_typed_array<k3d::typed_array<k3d::vector3> >("typed_array_vector3",
 		"Stores a mutable (read-write) collection of L{vector3} values.");
+
+	define_class_typed_array<k3d::uint_t_array>("uint_t_array",
+		"Stores a mutable (read-write) collection of 32- or 64-bit values (depending on platform).");
 }
 
 } // namespace python

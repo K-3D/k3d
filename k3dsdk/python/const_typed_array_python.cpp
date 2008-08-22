@@ -29,6 +29,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/named_array_types.h>
 #include <k3dsdk/typed_array.h>
+#include <k3dsdk/uint_t_array.h>
 
 #include <boost/python.hpp>
 
@@ -192,6 +193,9 @@ void define_const_typed_array_classes()
 		"Stores an immutable (read-only) collection of L{vector2} values.");
 	define_class_const_typed_array<const k3d::typed_array<k3d::vector3> >("const_typed_array_vector3",
 		"Stores an immutable (read-only) collection of L{vector3} values.");
+
+	define_class_const_typed_array<const k3d::uint_t_array>("const_uint_t_array",
+		"Stores an immutable (read-only) collection of 32- or 64-bit values (depending on platform).");
 }
 
 } // namespace python

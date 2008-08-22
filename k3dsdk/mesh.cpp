@@ -63,20 +63,84 @@ void print(std::ostream& Stream, const string_t& Label, const pointer_type& Poin
 class print_array
 {
 public:
-	print_array(std::ostream& Stream, const string_t& ArrayName, const array& Array) :
+	print_array(std::ostream& Stream, const string_t& ArrayName, const array& Array, bool_t& Printed) :
 		m_stream(Stream),
 		m_array_name(ArrayName),
-		m_array(Array)
+		m_array(Array),
+		m_printed(Printed)
 	{
+		if(const uint_t_array* const array = dynamic_cast<const uint_t_array*>(&m_array))
+		{
+			m_printed = true;
+			m_stream << indentation << "array \"" << m_array_name << "\" [k3d::uint_t] (" << m_array.size() << "): ";
+			std::copy(array->begin(), array->end(), std::ostream_iterator<uint_t>(m_stream, " "));
+			m_stream << "\n";
+		}
 	}
 
 	template<typename T>
-	void operator()(T) const
+	void operator()(T)
 	{
+		if(m_printed)
+			return;
+
 		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
 		{
+			m_printed = true;
 			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
 			std::copy(array->begin(), array->end(), std::ostream_iterator<T>(m_stream, " "));
+			m_stream << "\n";
+		}
+	}
+
+	// Special-case 8-bit integers so they don't get printed as characters
+	void operator()(int8_t)
+	{
+		typedef int8_t T;
+
+		if(m_printed)
+			return;
+
+		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
+		{
+			m_printed = true;
+			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
+			std::copy(array->begin(), array->end(), std::ostream_iterator<int16_t>(m_stream, " "));
+			m_stream << "\n";
+		}
+	}
+
+	// Special-case 8-bit unsigned integers so they don't get printed as characters
+	void operator()(uint8_t)
+	{
+		typedef uint8_t T;
+
+		if(m_printed)
+			return;
+
+		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
+		{
+			m_printed = true;
+			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
+			std::copy(array->begin(), array->end(), std::ostream_iterator<uint16_t>(m_stream, " "));
+			m_stream << "\n";
+		}
+	}
+
+	// Special-case strings so we handle whitespace correctly
+	void operator()(string_t)
+	{
+		typedef string_t T;
+
+		if(m_printed)
+			return;
+
+		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
+		{
+			m_printed = true;
+			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
+			for(typed_array<T>::const_iterator i = array->begin(); i != array->end(); ++i)
+				m_stream << "\"" << *i << "\" ";
 			m_stream << "\n";
 		}
 	}
@@ -85,13 +149,19 @@ private:
 	std::ostream& m_stream;
 	const string_t& m_array_name;
 	const array& m_array;
+	bool_t& m_printed;
 };
 
 void print(std::ostream& Stream, const string_t& Label, const mesh::named_arrays_t& Arrays)
 {
 	Stream << indentation << Label << " (" << Arrays.size() << "):\n" << push_indent;
 	for(mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
-		boost::mpl::for_each<named_array_types>(print_array(Stream, array_iterator->first, *array_iterator->second));
+	{
+		bool_t printed = false;
+		boost::mpl::for_each<named_array_types>(print_array(Stream, array_iterator->first, *array_iterator->second, printed));
+		if(!printed)
+			log() << error << k3d_file_reference << ": array [" << array_iterator->first << "] with unknown type [" << demangle(typeid(*array_iterator->second)) << "] will not be printed" << std::endl;
+	}
 	Stream << pop_indent;
 }
 
@@ -99,7 +169,12 @@ void print(std::ostream& Stream, const string_t& Label, const mesh::attribute_ar
 {
 	Stream << indentation << Label << " (" << Arrays.size() << "):\n" << push_indent;
 	for(mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
-		boost::mpl::for_each<named_array_types>(print_array(Stream, array_iterator->first, *array_iterator->second));
+	{
+		bool_t printed = false;
+		boost::mpl::for_each<named_array_types>(print_array(Stream, array_iterator->first, *array_iterator->second, printed));
+		if(!printed)
+			log() << error << k3d_file_reference << ": array [" << array_iterator->first << "] with unknown type [" << demangle(typeid(*array_iterator->second)) << "] will not be printed" << std::endl;
+	}
 	Stream << pop_indent;
 }
 

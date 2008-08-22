@@ -24,6 +24,7 @@
 #include "named_arrays.h"
 #include "named_array_types.h"
 #include "typed_array.h"
+#include "uint_t_array.h"
 
 namespace k3d
 {
@@ -43,11 +44,11 @@ public:
 	mesh();
 
 	/// Defines storage for a collection of indices
-	typedef typed_array<uint_t> indices_t;
+	typedef uint_t_array indices_t;
 	/// Defines storage for a collection of counts
-	typedef typed_array<uint_t> counts_t;
+	typedef uint_t_array counts_t;
 	/// Defines storage for a collection of orders
-	typedef typed_array<uint_t> orders_t;
+	typedef uint_t_array orders_t;
 	/// Defines storage for a collection of weights
 	typedef typed_array<double_t> weights_t;
 	/// Defines storage for a collection of knot vectors
@@ -380,7 +381,7 @@ public:
 		/// Defines storage for primitive floating-point values
 		typedef typed_array<double_t> floats_t;
 		/// Defines storage for operator operands
-		typedef typed_array<uint_t> operands_t;
+		typedef uint_t_array operands_t;
 
 		/// Stores per-blobby primitive offsets
 		boost::shared_ptr<const indices_t> first_primitives;

@@ -150,6 +150,8 @@ K3D_ADD_TEST(bitmap.source.BitmapSolid.py PYTHON REQUIRES K3D_BUILD_TIFF_IO_MODU
 K3D_ADD_TEST(test.mesh.solid.py PYTHON)
 K3D_ADD_TEST(test.mesh.solid.failure.py PYTHON XFAIL)
 
+K3D_ADD_TEST(mesh.serialization.py PYTHON)
+
 K3D_ADD_TEST(mesh.source.3DSMeshReader.py PYTHON REQUIRES K3D_BUILD_3DS_IO_MODULE)
 K3D_ADD_TEST(mesh.source.BlobbyEllipsoid.py PYTHON REQUIRES K3D_BUILD_BLOBBY_MODULE)
 K3D_ADD_TEST(mesh.source.BlobbySegment.py PYTHON REQUIRES K3D_BUILD_BLOBBY_MODULE)

@@ -43,9 +43,12 @@
 // Modified by Tim Shead for use with K-3D, January 1998
 
 #include "almost_equal.h"
+#include "result.h"
 
 #include <boost/io/ios_state.hpp>
+
 #include <cmath>
+#include <iomanip>
 
 namespace k3d
 {
