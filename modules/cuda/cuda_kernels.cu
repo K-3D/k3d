@@ -503,12 +503,14 @@ __global__ void subdivide_edges_split_point_kernel ( const unsigned int* first_m
         unsigned int new_point_index = first_midpoint[edge_index] + split_index;
 
         #ifdef __DEVICE_EMULATION__
+	/*
             printf("Split Index: %d\n", split_index);
             printf("Edge Index: %d\n", edge_index);
             printf("Clockwise Edge Index: %d\n", clockwise_edge_indices[edge_index]);
             printf("Point Index: %d\n", edge_point_indices[edge_index]);
             printf("Clockwise Point Index: %d\n", edge_point_indices[clockwise_edge_indices[edge_index]]);
             printf("New Point Index: %d\n", new_point_index);
+	*/
         #endif
 
 
@@ -516,8 +518,10 @@ __global__ void subdivide_edges_split_point_kernel ( const unsigned int* first_m
         float4 p1 = points_and_selection[edge_point_indices[clockwise_edge_indices[edge_index]]];
 
         #ifdef __DEVICE_EMULATION__
+	/*
             printf("P_0:%d: (%f, %f, %f)\n", p_index, p0.x, p0.y, p0.z);
             printf("P_1:%d: (%f, %f, %f)\n", edge_point_indices[clockwise_edge_indices[edge_index]], p1.x, p1.y, p1.z);
+	*/
         #endif
 
         p1.x = (p1.x - p0.x) / (num_split_points + 1);
@@ -525,7 +529,9 @@ __global__ void subdivide_edges_split_point_kernel ( const unsigned int* first_m
         p1.z = (p1.z - p0.z) / (num_split_points + 1);
 
         #ifdef __DEVICE_EMULATION__
+	/*
             printf("P_delta:(%f, %f, %f)\n", p1.x, p1.y, p1.z);
+	*/
         #endif
 
         points_and_selection[new_point_index].x = p0.x + (split_index + 1)*p1.x;
@@ -551,14 +557,18 @@ __global__ void subdivide_edges_update_edge_indices_kernel ( unsigned int* outpu
         unsigned int out_edge_index = edge_index_map[edge_index_index];
 
         #ifdef __DEVICE_EMULATION__
+	/*
             printf("Edge: %d : Mapped Edge : %d \n", edge_index_index, out_edge_index);
+	*/
         #endif
 
         output_edge_point_indices[out_edge_index] = input_edge_point_indices[edge_index_index];
         output_clockwise_edge_point_indices[out_edge_index] = edge_index_map[input_clockwise_edge_point_indices[edge_index_index]];
 
         #ifdef __DEVICE_EMULATION__
+	/*
             printf("Input Edge Point: %d : Input CW Edge Point : %d \n", input_edge_point_indices[edge_index_index], input_clockwise_edge_point_indices[edge_index_index]);
+	*/
         #endif
     }
 }
@@ -771,7 +781,9 @@ __global__ void calculate_first_edges_update_kernel ( unsigned int* first_edges,
 	unsigned int edge_index = ( blockDim.x * blockIdx.x) + threadIdx.x;
 
 #ifdef __DEVICE_EMULATION__
+/*
 	printf("calculate_first_edges_update_kernel: %u of %d blah\n", edge_index, num_edges);
+*/
 #endif
 
 	if ( edge_index < num_edges )
@@ -877,7 +889,9 @@ __global__ void subdivide_edges_count_components_per_face(
 			new_point_count += found_points;
 			
 #ifdef __DEVICE_EMULATION__
+/*
 	printf("adding %d points for edge %d\n", found_points, edge_index);
+*/
 #endif
 						
 			edge_index = clockwise_edges[edge_index];
