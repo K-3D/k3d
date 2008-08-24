@@ -30,6 +30,7 @@
 #include "const_attribute_arrays_python.h"
 #include "const_bitmap_python.h"
 #include "const_named_arrays_python.h"
+#include "const_named_attribute_arrays_python.h"
 #include "const_typed_array_python.h"
 #include "dynamic_cast_python.h"
 #include "euler_angles_python.h"
@@ -53,6 +54,7 @@
 #include "mesh_selection_python.h"
 #include "mime_python.h"
 #include "named_arrays_python.h"
+#include "named_attribute_arrays_python.h"
 #include "node_python.h"
 #include "normal3_python.h"
 #include "object_model_python.h"
@@ -374,6 +376,11 @@ object module_open_document(const string_t& Path)
 	return wrap(document);
 }
 
+const bool_t module_almost_equal_mesh(const mesh& A, const mesh& B, const uint64_t Threshold)
+{
+	return k3d::almost_equal<k3d::mesh>(Threshold)(A.wrapped(), B.wrapped());
+}
+
 const string_t module_print_diff(const object& A, const object& B, const object& Threshold)
 {
 	extract<mesh> a(A);
@@ -412,6 +419,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_const_attribute_arrays();
 	define_class_const_bitmap();
 	define_class_const_named_arrays();
+	define_class_const_named_attribute_arrays();
 	define_class_icommand_node();
 	define_class_idocument();
 	define_class_imaterial();
@@ -428,6 +436,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_matrix4();
 	define_class_mesh_selection();
 	define_class_named_arrays();
+	define_class_named_attribute_arrays();
 	define_class_normal3();
 	define_class_path();
 	define_class_point2();
@@ -448,6 +457,8 @@ BOOST_PYTHON_MODULE(k3d)
 	euler_angles::define_class();
 	node::define_class();
 
+	def("almost_equal", module_almost_equal_mesh,
+		"Tests two meshes for equality using fuzzy-comparisons for floating-point types.");
 	def("batch_mode", k3d::batch_mode,
 		"Returns True if batch (no user intervention) mode is enabled for the user interface.\n"
 		"@note: Well-behaved scripts should not prompt the user for input if batch mode is enabled.");

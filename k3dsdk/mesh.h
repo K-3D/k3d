@@ -2,7 +2,7 @@
 #define K3DSDK_MESH_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,6 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "attribute_arrays.h"
+#include "named_attribute_arrays.h"
 #include "named_arrays.h"
 #include "named_array_types.h"
 #include "typed_array.h"
@@ -76,18 +77,23 @@ public:
 	/// Defines a heterogeneous collection of named, shared arrays with identical length
 	typedef k3d::attribute_arrays attribute_arrays_t;
 	/// Defines a named collection of attribute arrays
-	typedef std::map<k3d::string_t, attribute_arrays_t> attributes_t;
+	typedef k3d::named_attribute_arrays named_attribute_arrays_t;
 
 	/// Defines storage for a generic mesh primitive
 	class primitive
 	{
 	public:
-		/// Stores the primitive type ("point_groups", "polyhedra", etc.)
-		k3d::string_t type;
-		/// Stores the array data that defines the primitive's topology
+		primitive(const string_t& Type);
+
+		/// Stores the primitive type ("point_groups", "polyhedra", "teapot", etc.)
+		string_t type;
+		/// Stores array data that defines the primitive's topology
 		named_arrays_t topology;
-		/// Stores the array data that defines the primitive's attributes
-		attributes_t attributes;
+		/// Stores array data that defines the primitive's attributes
+		named_attribute_arrays_t attributes;
+
+		/// Compares two primitives for equality using the fuzzy semantics of almost_equal
+		const bool_t almost_equal(const primitive& Other, const uint64_t Threshold) const;
 	};
 
 	/// Defines storage for a collection of primitives
@@ -425,7 +431,6 @@ public:
 	boost::shared_ptr<const selection_t> point_selection;
 	/// Stores user-defined per-point data (maps to RenderMan vertex data)
 	attribute_arrays_t vertex_data;
-
 	/// Stores mesh primitives
 	primitives_t primitives;
 
@@ -447,7 +452,10 @@ public:
 	boost::shared_ptr<const polyhedra_t> polyhedra;
 	/// Stores blobbies (implicit surfaces)
 	boost::shared_ptr<const blobbies_t> blobbies;
-	
+
+	/// Compares two meshes for equality using the fuzzy semantics of almost_equal
+	const bool_t almost_equal(const mesh& Other, const uint64_t Threshold) const;
+
 	/// Conversion from a legacy mesh to a new mesh
 	mesh& operator=(const k3d::legacy::mesh& RHS);
 };
@@ -474,7 +482,7 @@ template<>
 class almost_equal<mesh::polyhedra_t::polyhedron_type>
 {
 public:
-	almost_equal(const boost::uint64_t) { } 
+	almost_equal(const uint64_t) { } 
 	inline const bool_t operator()(const mesh::polyhedra_t::polyhedron_type A, const mesh::polyhedra_t::polyhedron_type B) const { return A == B; }
 };
 
@@ -482,7 +490,7 @@ template<>
 class almost_equal<mesh::blobbies_t::primitive_type>
 {
 public:
-	almost_equal(const boost::uint64_t) { } 
+	almost_equal(const uint64_t) { } 
 	inline const bool_t operator()(const mesh::blobbies_t::primitive_type A, const mesh::blobbies_t::primitive_type B) const { return A == B; }
 };
 
@@ -490,8 +498,48 @@ template<>
 class almost_equal<mesh::blobbies_t::operator_type>
 {
 public:
-	almost_equal(const boost::uint64_t) { } 
+	almost_equal(const uint64_t) { } 
 	inline const bool_t operator()(const mesh::blobbies_t::operator_type A, const mesh::blobbies_t::operator_type B) const { return A == B; }
+};
+
+/// Specialization of almost_equal that tests k3d::mesh for equality
+template<>
+class almost_equal<mesh>
+{
+	typedef mesh T;
+
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool_t operator()(const T& A, const T& B) const
+	{
+		return A.almost_equal(B, threshold);
+	}
+
+	const uint64_t threshold;
+};
+
+/// Specialization of almost_equal that tests k3d::mesh::primitive for equality
+template<>
+class almost_equal<mesh::primitive>
+{
+	typedef mesh::primitive T;
+
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool_t operator()(const T& A, const T& B) const
+	{
+		return A.almost_equal(B, threshold);
+	}
+
+	const uint64_t threshold;
 };
 
 } // namespace k3d

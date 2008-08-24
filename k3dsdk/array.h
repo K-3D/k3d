@@ -20,6 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "almost_equal.h"
 #include "types.h"
 
 namespace k3d
@@ -47,6 +48,25 @@ public:
 	/// Returns true iff this array is equivalent to the given array, using the imprecise semantics of almost_equal to compare values.
 	/// \note: Returns false if given an array with a different concrete type.
 	virtual const bool_t almost_equal(const array& Other, const uint64_t Threshold) const = 0;
+};
+
+/// Specialization of almost_equal that tests array for equality
+template<>
+class almost_equal<array>
+{
+	typedef array T;
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool operator()(const T& A, const T& B) const
+	{
+		return A.almost_equal(B, threshold);
+	}
+
+	const uint64_t threshold;
 };
 
 } // namespace k3d

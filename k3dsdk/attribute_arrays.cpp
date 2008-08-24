@@ -56,6 +56,37 @@ attribute_arrays attribute_arrays::clone(const uint_t Begin, const uint_t End) c
 	return result;
 }
 
+const bool_t attribute_arrays::almost_equal(const attribute_arrays& Other, const uint64_t Threshold) const
+{
+	// If we have differing numbers of arrays, we definitely aren't equal
+	if(size() != Other.size())
+		return false;
+
+	for(attribute_arrays::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
+	{
+		// Each pair of arrays must have equal names
+		if(a->first != b->first)
+			return false;
+
+		// If both arrays point to the same memory, they're equal
+		if(a->second.get() == b->second.get())
+			continue;
+
+		// Perform element-wise comparisons of the two arrays
+		if(a->second && b->second)
+		{
+			// The array::almost_equal method correctly handles type-mismatches between arrays
+			if(a->second->almost_equal(*b->second, Threshold))
+				continue;
+		}
+
+		// Either the element-wise comparison failed or one array was NULL and the other wasn't
+		return false;
+	}
+
+	return true;
+}
+
 attribute_arrays attribute_arrays::clone_types(const attribute_arrays_collection& AttributeArrays)
 {
 	attribute_arrays result;

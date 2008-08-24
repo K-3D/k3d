@@ -25,6 +25,7 @@
 */
 
 #include <k3dsdk/types.h>
+#include <boost/python/object.hpp>
 #include <stdexcept>
 
 namespace k3d
@@ -78,6 +79,17 @@ static value_t wrapped_get_item(self_t& Self, int Item)
 		throw std::out_of_range("index out-of-range");
 
 	return Self.wrapped().at(Item);
+}
+
+/// Provides a boilerplate implementation of __getitem__ for objects with find(k3d::string_t) that are wrapped by-reference (e.g: k3d::named_array, k3d::mesh::attributes_t)
+template<typename self_t>
+static boost::python::object wrapped_get_wrapped_item_by_key(self_t& Self, const string_t& Key)
+{
+	typename self_t::wrapped_type::const_iterator iterator = Self.wrapped().find(Key);
+	if(iterator == Self.wrapped().end())
+		throw std::runtime_error("unknown key: " + Key);
+
+	return wrap(iterator->second);
 }
 
 } // namespace utility

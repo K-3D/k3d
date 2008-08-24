@@ -36,12 +36,18 @@ namespace k3d
 namespace detail
 {
 
+////////////////////////////////////////////////////////////////////////////////////////////
+// indentation
+
 /// Inserts whitespace into a stream, proportional to its indentation level
 std::ostream& indentation(std::ostream& Stream)
 {
 	Stream << std::string(2 * current_indent(Stream), ' '); 
 	return Stream;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// print
 
 template<typename pointer_type>
 void print(std::ostream& Stream, const string_t& Label, const pointer_type& Pointer)
@@ -59,6 +65,9 @@ void print(std::ostream& Stream, const string_t& Label, const pointer_type& Poin
 		Stream << "\n";
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// print_array
 
 class print_array
 {
@@ -152,6 +161,9 @@ private:
 	bool_t& m_printed;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////
+// print
+
 void print(std::ostream& Stream, const string_t& Label, const mesh::named_arrays_t& Arrays)
 {
 	Stream << indentation << Label << " (" << Arrays.size() << "):\n" << push_indent;
@@ -164,6 +176,9 @@ void print(std::ostream& Stream, const string_t& Label, const mesh::named_arrays
 	}
 	Stream << pop_indent;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// print
 
 void print(std::ostream& Stream, const string_t& Label, const mesh::attribute_arrays_t& Arrays)
 {
@@ -178,21 +193,442 @@ void print(std::ostream& Stream, const string_t& Label, const mesh::attribute_ar
 	Stream << pop_indent;
 }
 
-void print(std::ostream& Stream, const string_t& Label, const mesh::attributes_t& Attributes)
+////////////////////////////////////////////////////////////////////////////////////////////
+// print
+
+void print(std::ostream& Stream, const string_t& Label, const mesh::named_attribute_arrays_t& Attributes)
 {
 	Stream << indentation << Label << " (" << Attributes.size() << "):\n" << push_indent;
-	for(mesh::attributes_t::const_iterator attributes = Attributes.begin(); attributes != Attributes.end(); ++attributes)
+	for(mesh::named_attribute_arrays_t::const_iterator attributes = Attributes.begin(); attributes != Attributes.end(); ++attributes)
 		print(Stream, "attributes \"" + attributes->first + "\"", attributes->second);
 	Stream << pop_indent;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
+template<typename T>
+const bool_t almost_equal(const boost::shared_ptr<const typed_array<T> >& A, const boost::shared_ptr<const typed_array<T> >& B, const uint64_t Threshold)
+{
+	if(A.get() == B.get())
+		return true;
+
+	if(A && B)
+		return A->almost_equal(*B, Threshold);
+
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
+const bool_t almost_equal(const boost::shared_ptr<const uint_t_array>& A, const boost::shared_ptr<const uint_t_array>& B, const uint64_t Threshold)
+{
+	if(A.get() == B.get())
+		return true;
+
+	if(A && B)
+		return A->almost_equal(*B, Threshold);
+
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+/// Return true iff two shared objects are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
+template<typename T>
+const bool_t almost_equal(const boost::shared_ptr<const T>& A, const boost::shared_ptr<const T>& B, const uint64_t Threshold)
+{
+	if(A.get() == B.get())
+		return true;
+
+	if(A && B)
+		return k3d::almost_equal<T>(Threshold)(*A, *B);
+
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+/// Return true iff two sets of attributes arrays are equivalent (we provide this function mainly for consistency).
+
+const bool_t almost_equal(const mesh::attribute_arrays_t& A, const mesh::attribute_arrays_t& B, const uint64_t Threshold)
+{
+	return k3d::almost_equal<mesh::attribute_arrays_t>(Threshold)(A, B);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+/// Return true iff two sets of primitives are equivalent.
+
+const bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t& B, const uint64_t Threshold)
+{
+	// If we have differing numbers of primitives, they definitely aren't equal
+	if(A.size() != B.size())
+		return false;
+
+	for(mesh::primitives_t::const_iterator a = A.begin(), b = B.begin(); a != A.end() && b != B.end(); ++a, ++b)
+	{
+		// If both primitives point to the same memory, they're equal
+		if(a->get() == b->get())
+			continue;
+
+		// Perform element-wise comparisons of the two primitives ...
+		if(a->get() && b->get())
+		{
+			if((**a).almost_equal((**b), Threshold))
+				continue;
+		}
+
+		// Either the element-wise comparison failed or one array was NULL and the other wasn't
+		return false;
+	}
+
+	return true;
+}
+
+
 } // namespace detail
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+template<>
+class almost_equal<mesh::point_groups_t>
+{
+	typedef mesh::point_groups_t T;
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool_t operator()(const T& A, const T& B)
+	{
+		return
+			detail::almost_equal(A.first_points, B.first_points, threshold) &&
+			detail::almost_equal(A.point_counts, B.point_counts, threshold) &&
+			detail::almost_equal(A.materials, B.materials, threshold) &&
+			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
+			detail::almost_equal(A.points, B.points, threshold) &&
+			detail::almost_equal(A.varying_data, B.varying_data, threshold);
+	}
+private:
+	const uint64_t threshold;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+template<>
+class almost_equal<mesh::linear_curve_groups_t>
+{
+	typedef mesh::linear_curve_groups_t T;
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool_t operator()(const T& A, const T& B)
+	{
+		return
+			detail::almost_equal(A.first_curves, B.first_curves, threshold) &&
+			detail::almost_equal(A.curve_counts, B.curve_counts, threshold) &&
+			detail::almost_equal(A.periodic_curves, B.periodic_curves, threshold) &&
+			detail::almost_equal(A.materials, B.materials, threshold) &&
+			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
+			detail::almost_equal(A.curve_first_points, B.curve_first_points, threshold) &&
+			detail::almost_equal(A.curve_point_counts, B.curve_point_counts, threshold) &&
+			detail::almost_equal(A.curve_selection, B.curve_selection, threshold) &&
+			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
+			detail::almost_equal(A.curve_points, B.curve_points, threshold);
+	}
+private:
+	const uint64_t threshold;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// detail::almost_equal
+
+template<>
+class almost_equal<mesh::cubic_curve_groups_t>
+{
+	typedef mesh::cubic_curve_groups_t T;
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool_t operator()(const T& A, const T& B)
+	{
+		return
+			detail::almost_equal(A.first_curves, B.first_curves, threshold) &&
+			detail::almost_equal(A.curve_counts, B.curve_counts, threshold) &&
+			detail::almost_equal(A.periodic_curves, B.periodic_curves, threshold) &&
+			detail::almost_equal(A.materials, B.materials, threshold) &&
+			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
+			detail::almost_equal(A.curve_first_points, B.curve_first_points, threshold) &&
+			detail::almost_equal(A.curve_point_counts, B.curve_point_counts, threshold) &&
+			detail::almost_equal(A.curve_selection, B.curve_selection, threshold) &&
+			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
+			detail::almost_equal(A.curve_points, B.curve_points, threshold);
+	}
+private:
+	const uint64_t threshold;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+template<>
+class almost_equal<mesh::nurbs_curve_groups_t>
+{
+	typedef mesh::nurbs_curve_groups_t T;
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool_t operator()(const T& A, const T& B)
+	{
+		return
+			detail::almost_equal(A.first_curves, B.first_curves, threshold) &&
+			detail::almost_equal(A.curve_counts, B.curve_counts, threshold) &&
+			detail::almost_equal(A.materials, B.materials, threshold) &&
+			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
+			detail::almost_equal(A.curve_first_points, B.curve_first_points, threshold) &&
+			detail::almost_equal(A.curve_point_counts, B.curve_point_counts, threshold) &&
+			detail::almost_equal(A.curve_orders, B.curve_orders, threshold) &&
+			detail::almost_equal(A.curve_first_knots, B.curve_first_knots, threshold) &&
+			detail::almost_equal(A.curve_selection, B.curve_selection, threshold) &&
+			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
+			detail::almost_equal(A.curve_points, B.curve_points, threshold) &&
+			detail::almost_equal(A.curve_point_weights, B.curve_point_weights, threshold) &&
+			detail::almost_equal(A.curve_knots, B.curve_knots, threshold);
+	}
+private:
+	const uint64_t threshold;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+template<>
+class almost_equal<mesh::bilinear_patches_t>
+{
+	typedef mesh::bilinear_patches_t T;
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool_t operator()(const T& A, const T& B)
+	{
+		return
+			detail::almost_equal(A.patch_selection, B.patch_selection, threshold) &&
+			detail::almost_equal(A.patch_materials, B.patch_materials, threshold) &&
+			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
+			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
+			detail::almost_equal(A.patch_points, B.patch_points, threshold) &&
+			detail::almost_equal(A.varying_data, B.varying_data, threshold);
+	}
+private:
+	const uint64_t threshold;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+template<>
+class almost_equal<mesh::bicubic_patches_t>
+{
+	typedef mesh::bicubic_patches_t T;
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool_t operator()(const T& A, const T& B)
+	{
+		return
+			detail::almost_equal(A.patch_selection, B.patch_selection, threshold) &&
+			detail::almost_equal(A.patch_materials, B.patch_materials, threshold) &&
+			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
+			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
+			detail::almost_equal(A.patch_points, B.patch_points, threshold) &&
+			detail::almost_equal(A.varying_data, B.varying_data, threshold);
+	}
+private:
+	const uint64_t threshold;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+template<>
+class almost_equal<mesh::nurbs_patches_t>
+{
+	typedef mesh::nurbs_patches_t T;
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool_t operator()(const T& A, const T& B)
+	{
+		const bool_t patches_equal =
+			detail::almost_equal(A.patch_first_points, B.patch_first_points, threshold) &&
+			detail::almost_equal(A.patch_u_point_counts, B.patch_u_point_counts, threshold) &&
+			detail::almost_equal(A.patch_v_point_counts, B.patch_v_point_counts, threshold) &&
+			detail::almost_equal(A.patch_u_orders, B.patch_u_orders, threshold) &&
+			detail::almost_equal(A.patch_v_orders, B.patch_v_orders, threshold) &&
+			detail::almost_equal(A.patch_u_first_knots, B.patch_u_first_knots, threshold) &&
+			detail::almost_equal(A.patch_v_first_knots, B.patch_v_first_knots, threshold) &&
+			detail::almost_equal(A.patch_selection, B.patch_selection, threshold) &&
+			detail::almost_equal(A.patch_materials, B.patch_materials, threshold) &&
+			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
+			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
+			detail::almost_equal(A.patch_points, B.patch_points, threshold) &&
+			detail::almost_equal(A.patch_point_weights, B.patch_point_weights, threshold) &&
+			detail::almost_equal(A.patch_u_knots, B.patch_u_knots, threshold) &&
+			detail::almost_equal(A.patch_v_knots, B.patch_v_knots, threshold) &&
+			detail::almost_equal(A.varying_data, B.varying_data, threshold);
+
+		bool_t trim_curves_equal = true;
+		if (A.patch_trim_curve_loop_counts && B.patch_trim_curve_loop_counts)
+		{
+			trim_curves_equal =
+				detail::almost_equal(A.patch_trim_curve_loop_counts, B.patch_trim_curve_loop_counts, threshold) &&
+				detail::almost_equal(A.patch_first_trim_curve_loops, B.patch_first_trim_curve_loops, threshold) &&
+				detail::almost_equal(A.trim_points, B.trim_points, threshold) &&
+				detail::almost_equal(A.trim_point_selection, B.trim_point_selection, threshold) &&
+				detail::almost_equal(A.first_trim_curves, B.first_trim_curves, threshold) &&
+				detail::almost_equal(A.trim_curve_counts, B.trim_curve_counts, threshold) &&
+				detail::almost_equal(A.trim_curve_loop_selection, B.trim_curve_loop_selection, threshold) &&
+				detail::almost_equal(A.trim_curve_first_points, B.trim_curve_first_points, threshold) &&
+				detail::almost_equal(A.trim_curve_point_counts, B.trim_curve_point_counts, threshold) &&
+				detail::almost_equal(A.trim_curve_orders, B.trim_curve_orders, threshold) &&
+				detail::almost_equal(A.trim_curve_first_knots, B.trim_curve_first_knots, threshold) &&
+				detail::almost_equal(A.trim_curve_selection, B.trim_curve_selection, threshold) &&
+				detail::almost_equal(A.trim_curve_points, B.trim_curve_points, threshold) &&
+				detail::almost_equal(A.trim_curve_point_weights, B.trim_curve_point_weights, threshold) &&
+				detail::almost_equal(A.trim_curve_knots, B.trim_curve_knots, threshold);
+		}
+		
+		return patches_equal && trim_curves_equal;
+	}
+private:
+	const uint64_t threshold;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+template<>
+class almost_equal<mesh::polyhedra_t>
+{
+	typedef mesh::polyhedra_t T;
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool_t operator()(const T& A, const T& B)
+	{
+		return
+			detail::almost_equal(A.first_faces, B.first_faces, threshold) &&
+			detail::almost_equal(A.face_counts, B.face_counts, threshold) &&
+			detail::almost_equal(A.types, B.types, threshold) &&
+			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
+			detail::almost_equal(A.face_first_loops, B.face_first_loops, threshold) &&
+			detail::almost_equal(A.face_loop_counts, B.face_loop_counts, threshold) &&
+			detail::almost_equal(A.face_selection, B.face_selection, threshold) &&
+			detail::almost_equal(A.face_materials, B.face_materials, threshold) &&
+			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
+			detail::almost_equal(A.loop_first_edges, B.loop_first_edges, threshold) &&
+			detail::almost_equal(A.edge_points, B.edge_points, threshold) &&
+			detail::almost_equal(A.clockwise_edges, B.clockwise_edges, threshold) &&
+			detail::almost_equal(A.edge_selection, B.edge_selection, threshold) &&
+			detail::almost_equal(A.face_varying_data, B.face_varying_data, threshold);
+	}
+private:
+	const uint64_t threshold;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// almost_equal
+
+template<>
+class almost_equal<mesh::blobbies_t>
+{
+	typedef mesh::blobbies_t T;
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline const bool_t operator()(const T& A, const T& B)
+	{
+		return
+			detail::almost_equal(A.first_primitives, B.first_primitives, threshold) &&
+			detail::almost_equal(A.primitive_counts, B.primitive_counts, threshold) &&
+			detail::almost_equal(A.first_operators, B.first_operators, threshold) &&
+			detail::almost_equal(A.operator_counts, B.operator_counts, threshold) &&
+			detail::almost_equal(A.materials, B.materials, threshold) &&
+			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
+			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
+			detail::almost_equal(A.primitives, B.primitives, threshold) &&
+			detail::almost_equal(A.primitive_first_floats, B.primitive_first_floats, threshold) &&
+			detail::almost_equal(A.primitive_float_counts, B.primitive_float_counts, threshold) &&
+			detail::almost_equal(A.varying_data, B.varying_data, threshold) &&
+			detail::almost_equal(A.vertex_data, B.vertex_data, threshold) &&
+			detail::almost_equal(A.operators, B.operators, threshold) &&
+			detail::almost_equal(A.operator_first_operands, B.operator_first_operands, threshold) &&
+			detail::almost_equal(A.operator_operand_counts, B.operator_operand_counts, threshold) &&
+			detail::almost_equal(A.floats, B.floats, threshold) &&
+			detail::almost_equal(A.operands, B.operands, threshold);
+	}
+private:
+	const uint64_t threshold;
+};
 
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh
 
 mesh::mesh()
 {
+}
+
+const bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) const
+{
+	return
+		detail::almost_equal(points, Other.points, Threshold) &&
+		detail::almost_equal(point_selection, Other.point_selection, Threshold) &&
+		detail::almost_equal(vertex_data, Other.vertex_data, Threshold) &&
+		detail::almost_equal(primitives, Other.primitives, Threshold) &&
+
+		detail::almost_equal(point_groups, Other.point_groups, Threshold) &&
+		detail::almost_equal(linear_curve_groups, Other.linear_curve_groups, Threshold) &&
+		detail::almost_equal(cubic_curve_groups, Other.cubic_curve_groups, Threshold) &&
+		detail::almost_equal(nurbs_curve_groups, Other.nurbs_curve_groups, Threshold) &&
+		detail::almost_equal(bilinear_patches, Other.bilinear_patches, Threshold) &&
+		detail::almost_equal(bicubic_patches, Other.bicubic_patches, Threshold) &&
+		detail::almost_equal(nurbs_patches, Other.nurbs_patches, Threshold) &&
+		detail::almost_equal(polyhedra, Other.polyhedra, Threshold) &&
+		detail::almost_equal(blobbies, Other.blobbies, Threshold);
 }
 
 mesh& mesh::operator=(const legacy::mesh& RHS)
@@ -586,6 +1022,25 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 
 	return *this;
 }
+
+////////////////////////////////////////////////////////////////////////////////////
+// mesh::primitive
+
+mesh::primitive::primitive(const string_t& Type) :
+	type(Type)
+{
+}
+
+const bool_t mesh::primitive::almost_equal(const primitive& Other, const uint64_t Threshold) const
+{
+	return
+		k3d::almost_equal<string_t>(Threshold)(type, Other.type) &&
+		k3d::almost_equal<named_arrays_t>(Threshold)(topology, Other.topology) &&
+		k3d::almost_equal<named_attribute_arrays_t>(Threshold)(attributes, Other.attributes);
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// serialization
 
 std::ostream& operator<<(std::ostream& Stream, const mesh::polyhedra_t::polyhedron_type& RHS)
 {

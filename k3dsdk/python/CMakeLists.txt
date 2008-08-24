@@ -70,6 +70,8 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	const_attribute_arrays_python.h
 	const_named_arrays_python.cpp
 	const_named_arrays_python.h
+	const_named_attribute_arrays_python.cpp
+	const_named_attribute_arrays_python.h
 	const_typed_array_python.cpp
 	const_typed_array_python.h
 	dynamic_cast_python.cpp
@@ -109,6 +111,8 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	mesh_selection_python.h
 	named_arrays_python.cpp
 	named_arrays_python.h
+	named_attribute_arrays_python.cpp
+	named_attribute_arrays_python.h
 	node_python.cpp
 	node_python.h
 	object_model_python.cpp

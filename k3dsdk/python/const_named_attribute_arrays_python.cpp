@@ -1,6 +1,3 @@
-#ifndef K3DSDK_MESH_DIFF_H
-#define K3DSDK_MESH_DIFF_H
-
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -20,17 +17,34 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh.h"
-#include <boost/cstdint.hpp>
-#include <iosfwd>
+/** \file
+	\author Timothy M. Shead (tshead@k-3d.com)
+*/
+
+#include "const_named_attribute_arrays_python.h"
+#include "utility_python.h"
+
+#include <boost/python.hpp>
+using namespace boost::python;
 
 namespace k3d
 {
 
-/// Prints the difference between two meshes to a stream
-void print_diff(std::ostream& Stream, const mesh& A, const mesh& B, const boost::uint64_t Threshold);
+namespace python
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// define_class_const_named_attribute_arrays 
+
+void define_class_const_named_attribute_arrays()
+{
+	class_<const_named_attribute_arrays_wrapper>("const_named_attribute_arrays", no_init)
+		.def("__len__", &utility::wrapped_len<const_named_attribute_arrays_wrapper>)
+		.def("__getitem__", &utility::wrapped_get_wrapped_item_by_key<const_named_attribute_arrays_wrapper>)
+		;
+}
+
+} // namespace python
 
 } // namespace k3d
-
-#endif // K3DSDK_MESH_DIFF_H
 

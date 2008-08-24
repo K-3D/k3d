@@ -1,5 +1,5 @@
-#ifndef K3DSDK_NAMED_ARRAYS_H
-#define K3DSDK_NAMED_ARRAYS_H
+#ifndef K3DSDK_NAMED_ATTRIBUTE_ARRAYS_H
+#define K3DSDK_NAMED_ATTRIBUTE_ARRAYS_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -20,38 +20,26 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "almost_equal.h"
-#include "types.h"
-
-#include <boost/shared_ptr.hpp>
-#include <map>
-#include <vector>
+#include "attribute_arrays.h"
 
 namespace k3d
 {
 
-class array;
-
-/// Defines a heterogeneous collection of named, shared arrays.  Arrays in the collection are not length-constrained.
-/// For a collection of arrays that all have the same length, see attribute_arrays.  For a concrete list of the
-/// datatypes that can be stored using named_arrays, see k3d::named_array_types.
-class named_arrays :
-	public std::map<string_t, boost::shared_ptr<array> >
+/// Defines a collection of named attribute_arrays objects.  The length of the individual
+/// attribute_arrays objects may vary.
+class named_attribute_arrays :
+	public std::map<string_t, attribute_arrays>
 {
 public:
-	/// Returns an object containing empty arrays with the same name and type as the originals.
-	named_arrays clone_types() const;
-	/// Returns an object containing deep copies of all the original arrays.
-	named_arrays clone() const;
 	/// Returns true iff two collections are equivalent, using the imprecise semantics of almost_equal to compare values.
-	const bool_t almost_equal(const named_arrays& Other, const uint64_t Threshold) const;
+	const bool_t almost_equal(const named_attribute_arrays& Other, const uint64_t Threshold) const;
 };
 
-/// Specialization of almost_equal that tests named_arrays for equality
+/// Specialization of almost_equal that tests named_attribute_arrays for equality
 template<>
-class almost_equal<named_arrays>
+class almost_equal<named_attribute_arrays>
 {
-	typedef named_arrays T;
+	typedef named_attribute_arrays T;
 
 public:
 	almost_equal(const uint64_t Threshold) :
@@ -69,5 +57,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_NAMED_ARRAYS_H
+#endif // K3DSDK_NAMED_ATTRIBUTE_ARRAYS_H
 

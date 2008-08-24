@@ -1197,50 +1197,11 @@ static object mesh_primitives_t_get_item(mesh_primitives_t_wrapper& Self, int It
 
 static object mesh_primitives_t_create(mesh_primitives_t_wrapper& Self, const string_t& Type)
 {
-	boost::shared_ptr<k3d::mesh::primitive> primitive(new k3d::mesh::primitive());
-	primitive->type = Type;
+	boost::shared_ptr<k3d::mesh::primitive> primitive(new k3d::mesh::primitive(Type));
 	Self.wrapped().push_back(primitive);
 
 	return wrap(primitive.get());
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// const_mesh_attributes_t
-
-typedef interface_wrapper<const k3d::mesh::attributes_t> const_mesh_attributes_t_wrapper;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// mesh_attributes_t
-
-typedef interface_wrapper<k3d::mesh::attributes_t> mesh_attributes_t_wrapper;
-
-static object mesh_attributes_t_create(mesh_attributes_t_wrapper& Self, const string_t& Name)
-{
-	if(Name.empty())
-		throw std::runtime_error("empty attribute name");
-
-	if(Self.wrapped().count(Name))
-		throw std::runtime_error("name already exists");
-
-	Self.wrapped().insert(std::make_pair(Name, k3d::attribute_arrays()));
-	return wrap(Self.wrapped()[Name]);
-}
-
-namespace utility
-{
-
-/// Provides a boilerplate implementation of __getitem__ for objects with find(k3d::string_t) that are wrapped by-reference (e.g: k3d::named_array, k3d::mesh::attributes_t)
-template<typename self_t>
-static object wrapped_get_wrapped_item_by_key(self_t& Self, const string_t& Key)
-{
-	typename self_t::wrapped_type::const_iterator iterator = Self.wrapped().find(Key);
-	if(iterator == Self.wrapped().end())
-		throw std::runtime_error("unknown key: " + Key);
-
-	return wrap(iterator->second);
-}
-
-} // namespace utility
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // define_namespace_mesh 
@@ -1887,17 +1848,6 @@ void define_namespace_mesh()
 		.def("__len__", &utility::wrapped_len<mesh_primitives_t_wrapper>)
 		.def("__getitem__", &mesh_primitives_t_get_item)
 		.def("create", &mesh_primitives_t_create)
-		;
-
-	class_<const_mesh_attributes_t_wrapper>("const_attributes_t", no_init)
-		.def("__len__", &utility::wrapped_len<const_mesh_attributes_t_wrapper>)
-		.def("__getitem__", &utility::wrapped_get_wrapped_item_by_key<const_mesh_attributes_t_wrapper>)
-		;
-
-	class_<mesh_attributes_t_wrapper>("attributes_t", no_init)
-		.def("__len__", &utility::wrapped_len<mesh_attributes_t_wrapper>)
-		.def("__getitem__", &utility::wrapped_get_wrapped_item_by_key<mesh_attributes_t_wrapper>)
-		.def("create", &mesh_attributes_t_create)
 		;
 }
 

@@ -23,7 +23,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/mesh_diff.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/user_property_changed_signal.h>
@@ -68,7 +68,7 @@ public:
 				{
 					if(const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property)))
 					{
-						if(!k3d::equal(*first_mesh, *mesh, threshold))
+						if(!k3d::almost_equal<k3d::mesh>(threshold)(*first_mesh, *mesh))
 							return false;
 					}
 				}

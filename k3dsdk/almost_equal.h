@@ -32,8 +32,8 @@ template<typename T>
 class almost_equal
 {
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const
 	{
 		// This will be triggered if this template is ever instantiated
 		BOOST_STATIC_ASSERT(sizeof(T) == 0);
@@ -41,139 +41,139 @@ public:
 	}
 };
 
-/// Specialization of almost_equal that tests k3d::bool_t for equality
+/// Specialization of almost_equal that tests bool_t for equality
 template<>
-class almost_equal<k3d::bool_t>
+class almost_equal<bool_t>
 {
-	typedef k3d::bool_t T;
+	typedef bool_t T;
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const { return A == B; }
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
-/// Specialization of almost_equal that tests k3d::int8_t for equality
+/// Specialization of almost_equal that tests int8_t for equality
 template<>
-class almost_equal<k3d::int8_t>
+class almost_equal<int8_t>
 {
-	typedef k3d::int8_t T;
+	typedef int8_t T;
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const { return A == B; }
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
-/// Specialization of almost_equal that tests k3d::int16_t for equality
+/// Specialization of almost_equal that tests int16_t for equality
 template<>
-class almost_equal<k3d::int16_t>
+class almost_equal<int16_t>
 {
-	typedef k3d::int16_t T;
+	typedef int16_t T;
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const { return A == B; }
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
-/// Specialization of almost_equal that tests k3d::int32_t for equality
+/// Specialization of almost_equal that tests int32_t for equality
 template<>
-class almost_equal<k3d::int32_t>
+class almost_equal<int32_t>
 {
-	typedef k3d::int32_t T;
+	typedef int32_t T;
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const { return A == B; }
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
-/// Specialization of almost_equal that tests k3d::int64_t for equality
+/// Specialization of almost_equal that tests int64_t for equality
 template<>
-class almost_equal<k3d::int64_t>
+class almost_equal<int64_t>
 {
-	typedef k3d::int64_t T;
+	typedef int64_t T;
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const { return A == B; }
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
-/// Specialization of almost_equal that tests k3d::uint8_t for equality
+/// Specialization of almost_equal that tests uint8_t for equality
 template<>
-class almost_equal<k3d::uint8_t>
+class almost_equal<uint8_t>
 {
-	typedef k3d::uint8_t T;
+	typedef uint8_t T;
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const { return A == B; }
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
-/// Specialization of almost_equal that tests k3d::uint16_t for equality
+/// Specialization of almost_equal that tests uint16_t for equality
 template<>
-class almost_equal<k3d::uint16_t>
+class almost_equal<uint16_t>
 {
-	typedef k3d::uint16_t T;
+	typedef uint16_t T;
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const { return A == B; }
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
-/// Specialization of almost_equal that tests k3d::uint32_t for equality
+/// Specialization of almost_equal that tests uint32_t for equality
 template<>
-class almost_equal<k3d::uint32_t>
+class almost_equal<uint32_t>
 {
-	typedef k3d::uint32_t T;
+	typedef uint32_t T;
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const { return A == B; }
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
-/// Specialization of almost_equal that tests k3d::uint64_t for equality
+/// Specialization of almost_equal that tests uint64_t for equality
 template<>
-class almost_equal<k3d::uint64_t>
+class almost_equal<uint64_t>
 {
-	typedef k3d::uint64_t T;
+	typedef uint64_t T;
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const { return A == B; }
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
-/// Specialization of almost_equal that tests two k3d::double_t values for near-equality - based on "Comparing floating point numbers" by Bruce Dawson
+/// Specialization of almost_equal that tests two double_t values for near-equality - based on "Comparing floating point numbers" by Bruce Dawson
 template<>
-class almost_equal<k3d::double_t>
+class almost_equal<double_t>
 {
-	typedef k3d::double_t T;
+	typedef double_t T;
 
 public:
-	almost_equal(const k3d::uint64_t Threshold) :
+	almost_equal(const uint64_t Threshold) :
 		threshold(Threshold)
 	{
 	}
 
-	inline const bool operator()(const T A, const T B) const
+	inline const bool_t operator()(const T A, const T B) const
 	{
-		const k3d::int64_t difference = representable_difference(A, B);
+		const int64_t difference = representable_difference(A, B);
 		return difference < 0 ? -difference <= threshold : difference <= threshold;
 	}
 
 private:
-	/// Convert a k3d::double_t to a lexicographically-ordered twos-complement integer
-	inline static const k3d::int64_t to_integer(const k3d::double_t Value)
+	/// Convert a double_t to a lexicographically-ordered twos-complement integer
+	inline static const int64_t to_integer(const double_t Value)
 	{
-		const k3d::int64_t value = *(k3d::int64_t*)&Value;
+		const int64_t value = *(int64_t*)&Value;
 		return value < 0 ? 0x8000000000000000LL - value : value;
 	}
 
-	/// Given two k3d::double_t, returns their difference expressed as the number of uniquely-representable floating-point values that separate them
-	inline static const k3d::int64_t representable_difference(const k3d::double_t A, const k3d::double_t B)
+	/// Given two double_t, returns their difference expressed as the number of uniquely-representable floating-point values that separate them
+	inline static const int64_t representable_difference(const double_t A, const double_t B)
 	{
 		return to_integer(B) - to_integer(A);
 	}
 
-	const k3d::uint64_t threshold;
+	const uint64_t threshold;
 };
 
-/// Specialization of almost_equal that tests k3d::string_t for equality
+/// Specialization of almost_equal that tests string_t for equality
 template<>
-class almost_equal<k3d::string_t>
+class almost_equal<string_t>
 {
-	typedef k3d::string_t T;
+	typedef string_t T;
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const { return A == B; }
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 #ifdef K3D_API_DARWIN
@@ -185,8 +185,8 @@ class almost_equal<unsigned long>
 {
 	typedef unsigned long T;
 public:
-	almost_equal(const k3d::uint64_t) { }
-	inline const bool operator()(const T A, const T B) const { return A == B; }
+	almost_equal(const uint64_t) { }
+	inline const bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 #endif // K3D_API_DARWIN

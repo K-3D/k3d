@@ -2000,7 +2000,7 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 			if((*primitive)->attributes.size())
 			{
 				element& xml_attributes = xml_primitive.append(element("attributes"));
-				for(mesh::attributes_t::const_iterator attribute = (*primitive)->attributes.begin(); attribute != (*primitive)->attributes.end(); ++attribute)
+				for(mesh::named_attribute_arrays_t::const_iterator attribute = (*primitive)->attributes.begin(); attribute != (*primitive)->attributes.end(); ++attribute)
 				{
 					detail::save_arrays(xml_attributes, element("arrays", xml::attribute("type", attribute->first)), attribute->second, Context);
 				}
@@ -2186,8 +2186,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 			if(xml_primitive->name != "primitive")
 				continue;
 
-			mesh::primitive* const primitive = new mesh::primitive();
-			primitive->type = attribute_text(*xml_primitive, "type");
+			mesh::primitive* const primitive = new mesh::primitive(attribute_text(*xml_primitive, "type"));
 
 			if(const element* const xml_topology = find_element(*xml_primitive, "topology"))
 			{
