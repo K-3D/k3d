@@ -237,9 +237,9 @@ public:
 gprim_factory::gprim_factory(mesh& Mesh) :
 	m_implementation(new implementation(Mesh))
 {
-	k3d::mesh::named_arrays_t::const_iterator array_it = Mesh.polyhedra->face_varying_data.find("texcoord");
-	return_if_fail(array_it !=  Mesh.polyhedra->face_varying_data.end());
-	return_if_fail(dynamic_cast< texcoord_array_t* >(array_it->second.get()));
+//	k3d::mesh::named_arrays_t::const_iterator array_it = Mesh.polyhedra->face_varying_data.find("texcoord");
+//	return_if_fail(array_it !=  Mesh.polyhedra->face_varying_data.end());
+//	return_if_fail(dynamic_cast< texcoord_array_t* >(array_it->second.get()));
 	//m_implementation->texcoords = dynamic_cast< texcoord_array_t* >(array_it->second.get());
 }
 
