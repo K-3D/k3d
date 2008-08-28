@@ -97,7 +97,12 @@ public:
 	};
 
 	/// Defines storage for a collection of primitives
-	typedef std::vector<boost::shared_ptr<const primitive> > primitives_t;
+	class primitives_t :
+		public std::vector<boost::shared_ptr<const primitive> >
+	{
+	public:
+		primitive& create(const string_t& Type);
+	};
 
 	/// Defines storage for point groups (particle clouds)
 	class point_groups_t

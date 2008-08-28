@@ -50,11 +50,7 @@ public:
 	{
 		// Handle arrays of uint_t as a special-case ...
 		if(Type == "k3d::uint_t")
-		{
-			k3d::uint_t_array* const new_array = new k3d::uint_t_array();
-			arrays[name].reset(new_array);
-			array = wrap(*new_array);
-		}
+			array = wrap(arrays.create<k3d::uint_t_array>(name));
 	}
 
 	template<typename T>
@@ -66,9 +62,7 @@ public:
 		if(type != k3d::type_string<T>())
 			return;
 
-		k3d::typed_array<T>* const new_array = new k3d::typed_array<T>();
-		arrays[name].reset(new_array);
-		array = wrap(*new_array);
+		array = wrap(arrays.create<k3d::typed_array<T> >(name));
 	}
 
 private:

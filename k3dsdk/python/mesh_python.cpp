@@ -1197,10 +1197,7 @@ static object mesh_primitives_t_get_item(mesh_primitives_t_wrapper& Self, int It
 
 static object mesh_primitives_t_create(mesh_primitives_t_wrapper& Self, const string_t& Type)
 {
-	boost::shared_ptr<k3d::mesh::primitive> primitive(new k3d::mesh::primitive(Type));
-	Self.wrapped().push_back(primitive);
-
-	return wrap(primitive.get());
+	return wrap(Self.wrapped().create(Type));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

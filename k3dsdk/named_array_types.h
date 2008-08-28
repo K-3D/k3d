@@ -22,6 +22,7 @@
 
 #include "algebra.h"
 #include "color.h"
+#include "imaterial.h"
 #include "inode.h"
 #include "normal3.h"
 #include "point2.h"
@@ -39,10 +40,11 @@ namespace k3d
 
 /// Enumerates all of the data types that can be stored using k3d::named_arrays.
 /// If you create a named array that stores a type not in this list, some operations will fail with runtime errors.
-typedef boost::mpl::vector21<
+typedef boost::mpl::vector22<
 	bool_t,
 	color,
 	double_t,
+	imaterial*,
 	inode*,
 	int16_t,
 	int32_t,

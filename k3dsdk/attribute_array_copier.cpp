@@ -257,6 +257,24 @@ matrix4 weighted_sum(const typed_array<matrix4>& Source, const uint_t Count, con
 }
 
 /// Returns the weighted sum of a random-access subset of array values
+imaterial* weighted_sum(const typed_array<imaterial*>& Source, const uint_t Count, const uint_t* Indices, const double_t* Weights)
+{
+	// We return whichever value has the highest weight ...
+	double_t weight = -std::numeric_limits<double_t>::max();
+
+	imaterial* result = 0;
+	for(uint_t i = 0; i != Count; ++i)
+	{
+		if(Weights[i] >= weight)
+		{
+			weight = Weights[i];
+			result = Source[Indices[i]];
+		}
+	}
+	return result;
+}
+
+/// Returns the weighted sum of a random-access subset of array values
 inode* weighted_sum(const typed_array<inode*>& Source, const uint_t Count, const uint_t* Indices, const double_t* Weights)
 {
 	// We return whichever value has the highest weight ...

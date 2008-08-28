@@ -1040,6 +1040,16 @@ const bool_t mesh::primitive::almost_equal(const primitive& Other, const uint64_
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+// mesh::primitives_t
+
+mesh::primitive& mesh::primitives_t::create(const string_t& Type)
+{
+	mesh::primitive* const result = new mesh::primitive(Type);
+	push_back(boost::shared_ptr<mesh::primitive>(result));
+	return *result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
 // serialization
 
 std::ostream& operator<<(std::ostream& Stream, const mesh::polyhedra_t::polyhedron_type& RHS)

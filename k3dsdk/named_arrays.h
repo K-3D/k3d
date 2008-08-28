@@ -39,6 +39,15 @@ class named_arrays :
 	public std::map<string_t, boost::shared_ptr<array> >
 {
 public:
+	/// Creates a new array with given name and type, inserting it into the collection and returning a reference to the result.
+	/** \note: An existing array with the same name will be replaced by the new array. */
+	template<typename ArrayT>
+	ArrayT& create(const string_t& Name)
+	{
+		ArrayT* result = new ArrayT();
+		(*this)[Name].reset(result);
+		return *result;
+	}
 	/// Returns an object containing empty arrays with the same name and type as the originals.
 	named_arrays clone_types() const;
 	/// Returns an object containing deep copies of all the original arrays.

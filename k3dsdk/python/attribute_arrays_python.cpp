@@ -50,11 +50,7 @@ public:
 	{
 		// Handle arrays of uint_t as a special-case ...
 		if(Type == "k3d::uint_t")
-		{
-			k3d::uint_t_array* const new_array = new k3d::uint_t_array();
-			arrays[name].reset(new_array);
-			array = wrap(*new_array);
-		}
+			array = wrap(arrays.create<k3d::uint_t_array>(name));
 	}
 
 	template<typename T>
@@ -66,9 +62,7 @@ public:
 		if(type != k3d::type_string<T>())
 			return;
 
-		k3d::typed_array<T>* const new_array = new k3d::typed_array<T>();
-		arrays[name].reset(new_array);
-		array = wrap(*new_array);
+		array = wrap(arrays.create<k3d::typed_array<T> >(name));
 	}
 
 private:
@@ -107,6 +101,11 @@ static object create_array(attribute_arrays_wrapper& Self, const string_t& Name,
 	return create(Self, Name, Type);
 }
 
+static void resize(attribute_arrays_wrapper& Self, const uint_t NewSize)
+{
+	Self.wrapped().resize(NewSize);
+}
+
 static object get_item(attribute_arrays_wrapper& Self, const string_t& Key)
 {
 	k3d::attribute_arrays::const_iterator iterator = Self.wrapped().find(Key);
@@ -126,6 +125,8 @@ void define_class_attribute_arrays()
 			"Creates an array with given name and type.")
 		.def("create_array", &create_array,
 			"Creates an array with given name and type.")
+		.def("resize", &resize,
+			"Sets the size of every array in the collection.")
 		.def("__len__", &utility::wrapped_len<attribute_arrays_wrapper>)
 		.def("__getitem__", &get_item);
 }

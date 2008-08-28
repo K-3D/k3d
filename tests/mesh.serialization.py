@@ -12,8 +12,8 @@ mesh = k3d.dynamic_cast(source, "imesh_storage").reset_mesh()
 
 primitive = mesh.primitives().create("test")
 
-array_types = [ "k3d::bool_t", "k3d::color", "k3d::double_t", "k3d::inode*", "k3d::int16_t", "k3d::int32_t", "k3d::int64_t", "k3d::int8_t", "k3d::matrix4", "k3d::normal3", "k3d::point2", "k3d::point3", "k3d::point4", "k3d::string_t", "k3d::texture3", "k3d::uint16_t", "k3d::uint32_t", "k3d::uint64_t", "k3d::uint8_t", "k3d::vector2", "k3d::vector3", "k3d::uint_t" ]
-array_values = [ True, k3d.color(1, 2, 3), 1.0, None, 1, 2, 3, 4, k3d.identity3(), k3d.normal3(1, 2, 3), k3d.point2(1, 2), k3d.point3(1, 2, 3), k3d.point4(1, 2, 3, 4), "A String", k3d.texture3(1, 2, 3), 1, 2, 3, 4, k3d.vector2(1, 2), k3d.vector3(1, 2, 3), 7 ]
+array_types = [ "k3d::bool_t", "k3d::color", "k3d::double_t", "k3d::imaterial*", "k3d::inode*", "k3d::int16_t", "k3d::int32_t", "k3d::int64_t", "k3d::int8_t", "k3d::matrix4", "k3d::normal3", "k3d::point2", "k3d::point3", "k3d::point4", "k3d::string_t", "k3d::texture3", "k3d::uint16_t", "k3d::uint32_t", "k3d::uint64_t", "k3d::uint8_t", "k3d::vector2", "k3d::vector3", "k3d::uint_t" ]
+array_values = [ True, k3d.color(1, 2, 3), 1.0, None, None, 1, 2, 3, 4, k3d.identity3(), k3d.normal3(1, 2, 3), k3d.point2(1, 2), k3d.point3(1, 2, 3), k3d.point4(1, 2, 3, 4), "A String", k3d.texture3(1, 2, 3), 1, 2, 3, 4, k3d.vector2(1, 2), k3d.vector3(1, 2, 3), 7 ]
 
 attributes = primitive.attributes().create("uniform")
 for i in range(len(array_types)):
