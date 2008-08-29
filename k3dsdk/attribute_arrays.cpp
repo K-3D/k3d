@@ -26,6 +26,12 @@ namespace k3d
 ///////////////////////////////////////////////////////////////////////////
 // attribute_arrays
 
+const array* attribute_arrays::lookup(const string_t& Name) const
+{
+	const_iterator result = find(Name);
+	return result == end() ? static_cast<array*>(0) : result->second.get();
+}
+
 attribute_arrays attribute_arrays::clone_types() const
 {
 	attribute_arrays result;

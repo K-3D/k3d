@@ -25,6 +25,12 @@ namespace k3d
 ///////////////////////////////////////////////////////////////////////////
 // named_attribute_arrays
 
+const attribute_arrays* named_attribute_arrays::lookup(const string_t& Name) const
+{
+	const_iterator result = find(Name);
+	return result == end() ? static_cast<attribute_arrays*>(0) : &result->second;
+}
+
 const bool_t named_attribute_arrays::almost_equal(const named_attribute_arrays& Other, const uint64_t Threshold) const
 {
 	// If our sizes differ, we definitely ain't equal

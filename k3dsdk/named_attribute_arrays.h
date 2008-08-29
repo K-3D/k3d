@@ -31,6 +31,8 @@ class named_attribute_arrays :
 	public std::map<string_t, attribute_arrays>
 {
 public:
+	/// Return an attribute_array by name, or NULL
+	const attribute_arrays* lookup(const string_t& Name) const;
 	/// Returns true iff two collections are equivalent, using the imprecise semantics of almost_equal to compare values.
 	const bool_t almost_equal(const named_attribute_arrays& Other, const uint64_t Threshold) const;
 };

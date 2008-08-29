@@ -48,6 +48,14 @@ public:
 		(*this)[Name].reset(result);
 		return *result;
 	}
+	/// Returns an existing array with the given name, or NULL if no matching array exists.
+	const array* lookup(const string_t& Name) const;
+	/// Returns an existing array with the given name and type, or NULL if no matching array exists.
+	template<typename ArrayT>
+	const ArrayT* lookup(const string_t& Name) const
+	{
+		return dynamic_cast<const ArrayT*>(lookup(Name));
+	}
 	/// Returns an object containing empty arrays with the same name and type as the originals.
 	attribute_arrays clone_types() const;
 	/// Returns an object containing deep copies of all the original arrays.
