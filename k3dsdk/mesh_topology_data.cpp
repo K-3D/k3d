@@ -63,6 +63,7 @@ public:
 
 			const uint_t first_index = m_first_edges[vertex2];
 			const uint_t last_index = first_index + m_valences[vertex2];
+			m_adjacent_edges[edge] = edge;
 			for(uint_t i = first_index; i != last_index; ++i)
 			{
 				const uint_t companion = m_point_edges[i];
