@@ -103,11 +103,11 @@ static object create_array(named_arrays_wrapper& Self, const string_t& Name, con
 
 static object get_item(named_arrays_wrapper& Self, const string_t& Key)
 {
-	k3d::named_arrays::const_iterator iterator = Self.wrapped().find(Key);
+	k3d::named_arrays::iterator iterator = Self.wrapped().find(Key);
 	if(iterator == Self.wrapped().end())
 		throw std::runtime_error("unknown key: " + Key);
 
-	return wrap_array(iterator->second.get());
+	return wrap_array(iterator->second.writable());
 }
 
 void define_class_named_arrays()

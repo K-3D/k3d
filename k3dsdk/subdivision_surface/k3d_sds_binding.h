@@ -48,7 +48,7 @@ class k3d_cache_input : public cache_input<k3d::mesh>
 {
 public:
 	
-	k3d_cache_input(boost::shared_ptr<const k3d::mesh::points_t> Points, boost::shared_ptr<const k3d::mesh::polyhedra_t> Polyhedra,  boost::shared_ptr<const k3d::mesh::selection_t> PointSelection);
+	k3d_cache_input(const pipeline_data<k3d::mesh::points_t>& Points, const pipeline_data<k3d::mesh::polyhedra_t>& Polyhedra, const pipeline_data<k3d::mesh::selection_t>& PointSelection);
 	~k3d_cache_input();
 
 	//////
@@ -92,9 +92,9 @@ public:
 
 private:
 
-	boost::shared_ptr<const k3d::mesh::points_t> m_input_points;
-	boost::shared_ptr<const k3d::mesh::polyhedra_t> m_input_polyhedra;
-	boost::shared_ptr<const k3d::mesh::selection_t> m_point_selection;
+	pipeline_data<k3d::mesh::points_t> m_input_points;
+	pipeline_data<k3d::mesh::polyhedra_t> m_input_polyhedra;
+	pipeline_data<k3d::mesh::selection_t> m_point_selection;
 	
 	facevertices_map m_modified_faces;
 	

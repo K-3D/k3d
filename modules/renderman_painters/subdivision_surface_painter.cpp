@@ -22,7 +22,6 @@
 */
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/array_operations.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_painter_ri.h>
@@ -51,7 +50,7 @@ class subdivision_surface_painter :
 	public k3d::ri::imesh_painter
 {
 	typedef k3d::node base;
-	typedef k3d::typed_array<std::string> tags_t;
+	typedef k3d::typed_array<k3d::string_t> strings_t;
 public:
 	subdivision_surface_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
@@ -72,8 +71,8 @@ public:
 		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 		const k3d::mesh::points_t& points = *Mesh.points;
-		
-		const tags_t* const interpolateboundary_tags = k3d::get_array<tags_t>(Mesh.polyhedra->constant_data, "interpolateboundary");
+	
+		const strings_t* const interpolateboundary_tags = Mesh.polyhedra->constant_data.lookup<strings_t>("interpolateboundary");
 
 		const size_t polyhedron_begin = 0;
 		const size_t polyhedron_end = polyhedron_begin + types.size();

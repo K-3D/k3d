@@ -29,7 +29,6 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/shared_pointer.h>
 
 #include <iterator>
 #include <set>
@@ -86,20 +85,20 @@ public:
 		}
 
 		// Setup arrays to build a new blobby ...
-		k3d::mesh::blobbies_t& blobbies = *k3d::make_unique(Output.blobbies);
-		k3d::mesh::indices_t& first_primitives = *k3d::make_unique(blobbies.first_primitives);
-		k3d::mesh::counts_t& primitive_counts = *k3d::make_unique(blobbies.primitive_counts);
-		k3d::mesh::indices_t& first_operators = *k3d::make_unique(blobbies.first_operators);
-		k3d::mesh::counts_t& operator_counts = *k3d::make_unique(blobbies.operator_counts);
-		k3d::mesh::materials_t& materials = *k3d::make_unique(blobbies.materials);
-		k3d::mesh::blobbies_t::primitives_t& primitives = *k3d::make_unique(blobbies.primitives);
-		k3d::mesh::indices_t& primitive_first_floats = *k3d::make_unique(blobbies.primitive_first_floats);
-		k3d::mesh::counts_t& primitive_float_counts = *k3d::make_unique(blobbies.primitive_float_counts);
-		k3d::mesh::blobbies_t::operators_t& operators = *k3d::make_unique(blobbies.operators);
-		k3d::mesh::indices_t& operator_first_operands = *k3d::make_unique(blobbies.operator_first_operands);
-		k3d::mesh::counts_t& operator_operand_counts = *k3d::make_unique(blobbies.operator_operand_counts);
-		k3d::mesh::blobbies_t::floats_t& floats = *k3d::make_unique(blobbies.floats);
-		k3d::mesh::blobbies_t::operands_t& operands = *k3d::make_unique(blobbies.operands);
+		k3d::mesh::blobbies_t& blobbies = Output.blobbies.create();
+		k3d::mesh::indices_t& first_primitives = blobbies.first_primitives.create();
+		k3d::mesh::counts_t& primitive_counts = blobbies.primitive_counts.create();
+		k3d::mesh::indices_t& first_operators = blobbies.first_operators.create();
+		k3d::mesh::counts_t& operator_counts = blobbies.operator_counts.create();
+		k3d::mesh::materials_t& materials = blobbies.materials.create();
+		k3d::mesh::blobbies_t::primitives_t& primitives = blobbies.primitives.create();
+		k3d::mesh::indices_t& primitive_first_floats = blobbies.primitive_first_floats.create();
+		k3d::mesh::counts_t& primitive_float_counts = blobbies.primitive_float_counts.create();
+		k3d::mesh::blobbies_t::operators_t& operators = blobbies.operators.create();
+		k3d::mesh::indices_t& operator_first_operands = blobbies.operator_first_operands.create();
+		k3d::mesh::counts_t& operator_operand_counts = blobbies.operator_operand_counts.create();
+		k3d::mesh::blobbies_t::floats_t& floats = blobbies.floats.create();
+		k3d::mesh::blobbies_t::operands_t& operands = blobbies.operands.create();
 
 		first_primitives.push_back(primitives.size());
 		primitive_counts.push_back(edges.size());

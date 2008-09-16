@@ -125,14 +125,10 @@ public:
 			const k3d::mesh* mesh = *mesh_it;
 			if(!mesh->polyhedra)
 				continue;
-			k3d::typed_array<k3d::texture3>* texcoords = 0;
 			for(k3d::named_arrays::const_iterator array_it = mesh->polyhedra->face_varying_data.begin(); array_it != mesh->polyhedra->face_varying_data.end(); ++array_it)
 			{
-				texcoords = dynamic_cast< k3d::typed_array<k3d::texture3>* >(array_it->second.get());
-				if( texcoords != 0 )
-				{
-					texcoord_sets.insert( array_it->first );
-				}
+				if(dynamic_cast<const k3d::typed_array<k3d::texture3>*>(array_it->second.get()))
+					texcoord_sets.insert(array_it->first);
 			}
 		}
 
@@ -399,10 +395,10 @@ public:
 			if(!mesh->polyhedra)
 				continue;
 
-            k3d::typed_array<k3d::texture3>* texcoords = 0;
+            const k3d::typed_array<k3d::texture3>* texcoords = 0;
             k3d::named_arrays::const_iterator array_it = mesh->polyhedra->face_varying_data.find( m_uv_set_model->value() );
             if( array_it != mesh->polyhedra->face_varying_data.end() )
-              texcoords = dynamic_cast< k3d::typed_array<k3d::texture3>* >(array_it->second.get());
+              texcoords = dynamic_cast<const k3d::typed_array<k3d::texture3>*>(array_it->second.get());
 
             if( texcoords )
             {

@@ -96,20 +96,17 @@ public:
 			return;
 		}
 
-		size_t point_count = 0;
-		size_t edge_count = 0;
-		size_t triangle_count = 0;
+		k3d::uint_t point_count = 0;
+		k3d::uint_t edge_count = 0;
+		k3d::uint_t triangle_count = 0;
 		std::stringstream line_buffer(buffer);
 		line_buffer >> point_count >> edge_count >> triangle_count;
 
 		// Read points ...
-		boost::shared_ptr<k3d::mesh::points_t> points(new k3d::mesh::points_t());
-		boost::shared_ptr<k3d::mesh::selection_t> point_selection(new k3d::mesh::selection_t());
+		k3d::mesh::points_t& points = Output.points.create(new k3d::mesh::points_t(point_count));
+		k3d::mesh::selection_t& point_selection = Output.point_selection.create(new k3d::mesh::selection_t(point_count, 0.0));
 
-		points->reserve(point_count);
-		point_selection->reserve(point_count);
-
-		for(size_t i = 0; i != point_count; ++i)
+		for(k3d::uint_t i = 0; i != point_count; ++i)
 		{
 			gts_line(file, buffer);
 			if(!file)
@@ -122,21 +119,17 @@ public:
 			std::stringstream line_buffer(buffer);
 			line_buffer >> point[0] >> point[1] >> point[2];
 
-			points->push_back(point);
-			point_selection->push_back(0.0);
+			points[i] = point;
 		}
 
-		Output.points = points;
-		Output.point_selection = point_selection;
-
 		// Read edges ...
-		std::vector<size_t> edge_from;
-		std::vector<size_t> edge_to;
+		std::vector<k3d::uint_t> edge_from;
+		std::vector<k3d::uint_t> edge_to;
 
 		edge_from.reserve(edge_count);
 		edge_to.reserve(edge_count);
 
-		for(size_t i = 0; i != edge_count; ++i)
+		for(k3d::uint_t i = 0; i != edge_count; ++i)
 		{
 			gts_line(file, buffer);
 			if(!file)
@@ -145,8 +138,8 @@ public:
 				return;
 			}
 
-			size_t from;
-			size_t to;
+			k3d::uint_t from;
+			k3d::uint_t to;
 			std::stringstream line_buffer(buffer);
 			line_buffer >> from >> to;
 
@@ -155,33 +148,33 @@ public:
 		}
 
 		// Read faces ...
-		boost::shared_ptr<k3d::mesh::polyhedra_t> polyhedra(new k3d::mesh::polyhedra_t());
-		boost::shared_ptr<k3d::mesh::indices_t> first_faces(new k3d::mesh::indices_t());
-		boost::shared_ptr<k3d::mesh::counts_t> face_counts(new k3d::mesh::counts_t());
-		boost::shared_ptr<k3d::mesh::polyhedra_t::types_t> types(new k3d::mesh::polyhedra_t::types_t());
-		boost::shared_ptr<k3d::mesh::indices_t> face_first_loops(new k3d::mesh::indices_t());
-		boost::shared_ptr<k3d::mesh::counts_t> face_loop_counts(new k3d::mesh::counts_t());
-		boost::shared_ptr<k3d::mesh::selection_t> face_selection(new k3d::mesh::selection_t());
-		boost::shared_ptr<k3d::mesh::materials_t> face_materials(new k3d::mesh::materials_t());
-		boost::shared_ptr<k3d::mesh::indices_t> loop_first_edges(new k3d::mesh::indices_t());
-		boost::shared_ptr<k3d::mesh::indices_t> edge_points(new k3d::mesh::indices_t());
-		boost::shared_ptr<k3d::mesh::indices_t> clockwise_edges(new k3d::mesh::indices_t());
-		boost::shared_ptr<k3d::mesh::selection_t> edge_selection(new k3d::mesh::selection_t());
+		k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.create();
+		k3d::mesh::indices_t& first_faces = polyhedra.first_faces.create();
+		k3d::mesh::counts_t& face_counts = polyhedra.face_counts.create();
+		k3d::mesh::polyhedra_t::types_t& types = polyhedra.types.create();
+		k3d::mesh::indices_t& face_first_loops = polyhedra.face_first_loops.create();
+		k3d::mesh::counts_t& face_loop_counts = polyhedra.face_loop_counts.create();
+		k3d::mesh::selection_t& face_selection = polyhedra.face_selection.create();
+		k3d::mesh::materials_t& face_materials = polyhedra.face_materials.create();
+		k3d::mesh::indices_t& loop_first_edges = polyhedra.loop_first_edges.create();
+		k3d::mesh::indices_t& edge_points = polyhedra.edge_points.create();
+		k3d::mesh::indices_t& clockwise_edges = polyhedra.clockwise_edges.create();
+		k3d::mesh::selection_t& edge_selection = polyhedra.edge_selection.create();
 
-		first_faces->push_back(face_first_loops->size());
-		face_counts->push_back(triangle_count);
-		types->push_back(k3d::mesh::polyhedra_t::POLYGONS);
+		first_faces.push_back(face_first_loops.size());
+		face_counts.push_back(triangle_count);
+		types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 
-		face_first_loops->reserve(triangle_count);
-		face_loop_counts->reserve(triangle_count);
-		face_selection->reserve(triangle_count);
-		face_materials->reserve(triangle_count);
-		loop_first_edges->reserve(triangle_count);
-		edge_points->reserve(3 * triangle_count);
-		clockwise_edges->reserve(3 * triangle_count);
-		edge_selection->reserve(3 * triangle_count);
+		face_first_loops.reserve(triangle_count);
+		face_loop_counts.reserve(triangle_count);
+		face_selection.reserve(triangle_count);
+		face_materials.reserve(triangle_count);
+		loop_first_edges.reserve(triangle_count);
+		edge_points.reserve(3 * triangle_count);
+		clockwise_edges.reserve(3 * triangle_count);
+		edge_selection.reserve(3 * triangle_count);
 
-		for(size_t i = 0; i != triangle_count; ++i)
+		for(k3d::uint_t i = 0; i != triangle_count; ++i)
 		{
 			gts_line(file, buffer);
 			if(!file)
@@ -190,23 +183,23 @@ public:
 				return;
 			}
 
-			size_t edge1;
-			size_t edge2;
-//			size_t edge3; This is totally redundant ... strange file format!
+			k3d::uint_t edge1;
+			k3d::uint_t edge2;
+//			k3d::uint_t edge3; This is totally redundant ... strange file format!
 
 			std::stringstream line_buffer(buffer);
 			line_buffer >> edge1 >> edge2 /* >> edge3 */;
 
 			// Calculate a consistent order for triangle points ...
-			const size_t edge1_from = edge_from[edge1 - 1];
-			const size_t edge1_to = edge_to[edge1 - 1];
-			const size_t edge2_from = edge_from[edge2 - 1];
-			const size_t edge2_to = edge_to[edge2 - 1];
+			const k3d::uint_t edge1_from = edge_from[edge1 - 1];
+			const k3d::uint_t edge1_to = edge_to[edge1 - 1];
+			const k3d::uint_t edge2_from = edge_from[edge2 - 1];
+			const k3d::uint_t edge2_to = edge_to[edge2 - 1];
 
 			// Determine triangle orientation
-			size_t point1;
-			size_t point2;
-			size_t point3;
+			k3d::uint_t point1;
+			k3d::uint_t point2;
+			k3d::uint_t point3;
 
 			if(edge1_from == edge2_from)
 			{
@@ -233,38 +226,24 @@ public:
 				point3 = edge2_from;
 			}
 
-			face_first_loops->push_back(loop_first_edges->size());
-			face_loop_counts->push_back(1);
-			face_selection->push_back(0.0);
-			face_materials->push_back(0);
-			loop_first_edges->push_back(edge_points->size());
+			face_first_loops.push_back(loop_first_edges.size());
+			face_loop_counts.push_back(1);
+			face_selection.push_back(0.0);
+			face_materials.push_back(0);
+			loop_first_edges.push_back(edge_points.size());
 			
-			edge_points->push_back(point1);
-			clockwise_edges->push_back(edge_points->size());
-			edge_selection->push_back(0.0);
+			edge_points.push_back(point1);
+			clockwise_edges.push_back(edge_points.size());
+			edge_selection.push_back(0.0);
 
-			edge_points->push_back(point2);
-			clockwise_edges->push_back(edge_points->size());
-			edge_selection->push_back(0.0);
+			edge_points.push_back(point2);
+			clockwise_edges.push_back(edge_points.size());
+			edge_selection.push_back(0.0);
 
-			edge_points->push_back(point3);
-			clockwise_edges->push_back(edge_points->size() - 3);
-			edge_selection->push_back(0.0);
+			edge_points.push_back(point3);
+			clockwise_edges.push_back(edge_points.size() - 3);
+			edge_selection.push_back(0.0);
 		}
-
-		polyhedra->first_faces = first_faces;
-		polyhedra->face_counts = face_counts;
-		polyhedra->types = types;
-		polyhedra->face_first_loops = face_first_loops;
-		polyhedra->face_loop_counts = face_loop_counts;
-		polyhedra->face_selection = face_selection;
-		polyhedra->face_materials = face_materials;
-		polyhedra->loop_first_edges = loop_first_edges;
-		polyhedra->edge_points = edge_points;
-		polyhedra->clockwise_edges = clockwise_edges;
-		polyhedra->edge_selection = edge_selection;
-
-		Output.polyhedra = polyhedra;
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

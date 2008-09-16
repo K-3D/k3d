@@ -27,6 +27,7 @@
 #include "result.h"
 #include "typed_array.h"
 #include "type_registry.h"
+#include "uint_t_array.h"
 
 #include <boost/bind.hpp>
 #include <boost/mpl/for_each.hpp>
@@ -127,6 +128,15 @@ uint64_t weighted_sum(const typed_array<uint64_t>& Source, const uint_t Count, c
 	uint64_t result = 0;
 	for(uint_t i = 0; i != Count; ++i)
 		result += static_cast<uint64_t>(Source[Indices[i]] * std::max(0.0, Weights[i]));
+	return result;
+}
+
+/// Returns the weighted sum of a random-access subset of array values
+uint_t weighted_sum(const uint_t_array& Source, const uint_t Count, const uint_t* Indices, const double_t* Weights)
+{
+	uint_t result = 0;
+	for(uint_t i = 0; i != Count; ++i)
+		result += static_cast<uint_t>(Source[Indices[i]] * std::max(0.0, Weights[i]));
 	return result;
 }
 
@@ -310,7 +320,7 @@ public:
 		const attribute_arrays::iterator target_end = Target.end();
 	
 		uint_t target_index = 0;
-		for(attribute_arrays::const_iterator target = target_begin; target != target_end; ++target, ++target_index)
+		for(attribute_arrays::iterator target = target_begin; target != target_end; ++target, ++target_index)
 		{
 			uint_t source_index = 0;
 			for(attribute_arrays::const_iterator source = source_begin; source != source_end; ++source, ++source_index)
@@ -320,7 +330,7 @@ public:
 					used_source[source_index] = true;
 					used_target[target_index] = true;
 
-					if(!copier_factory::create_copier(source->second.get(), target->second.get(), copiers))
+					if(!copier_factory::create_copier(*source->second, target->second.writable(), copiers))
 					{
 						log() << error << "array [" << target->first << "] of unknown type [" << demangle(typeid(*target->second)) << "] will not receive data." << std::endl;
 					}
@@ -391,7 +401,7 @@ private:
 	class copier_factory
 	{
 	public:
-		static const bool create_copier(const array* Source, array* Target, copiers_t& Copiers)
+		static const bool create_copier(const array& Source, array& Target, copiers_t& Copiers)
 		{
 			bool result = false;
 			boost::mpl::for_each<named_array_types>(copier_factory(Source, Target, Copiers, result));
@@ -404,9 +414,9 @@ private:
 			if(created)
 				return;
 
-			if(const typed_array<T>* const typed_source = dynamic_cast<const typed_array<T>* >(source))
+			if(const typed_array<T>* const typed_source = dynamic_cast<const typed_array<T>* >(&source))
 			{
-				if(typed_array<T>* const typed_target = dynamic_cast<typed_array<T>* >(target))
+				if(typed_array<T>* const typed_target = dynamic_cast<typed_array<T>* >(&target))
 				{
 					copiers.push_back(new typed_array_copier<typed_array<T> >(*typed_source, *typed_target));
 					created = true;
@@ -415,12 +425,21 @@ private:
 		}
 
 	private:
-		copier_factory(const array* Source, array* Target, copiers_t& Copiers, bool& Created) :
+		copier_factory(const array& Source, array& Target, copiers_t& Copiers, bool& Created) :
 			source(Source),
 			target(Target),
 			copiers(Copiers),
 			created(Created)
 		{
+			// Special-case handling for uint_t_array ...
+			if(const uint_t_array* const typed_source = dynamic_cast<const uint_t_array*>(&source))
+			{
+				if(uint_t_array* const typed_target = dynamic_cast<uint_t_array*>(&target))
+				{
+					copiers.push_back(new typed_array_copier<uint_t_array>(*typed_source, *typed_target));
+					created = true;
+				}
+			}
 		}
 
 		/// Concrete array_copier implementation that is templated on the array type
@@ -460,8 +479,8 @@ private:
 			array_t& target;
 		};
 
-		const array* const source;
-		array* const target;
+		const array& source;
+		array& target;
 		copiers_t& copiers;
 		bool& created;
 	};

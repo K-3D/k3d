@@ -26,7 +26,6 @@
 #include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/array_operations.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/selection.h>
 
@@ -164,7 +163,7 @@ public:
 			{
 				if(k3d::validate_polyhedra(Mesh))
 				{
-					if(const k3d::mesh::normals_t* const array = k3d::get_array<k3d::mesh::normals_t>(Mesh.polyhedra->uniform_data, array_name))
+					if(const k3d::mesh::normals_t* const array = Mesh.polyhedra->uniform_data.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
 						glDisable(GL_LIGHTING);
@@ -193,7 +192,7 @@ public:
 			{
 				if(k3d::validate_polyhedra(Mesh))
 				{
-					if(const k3d::mesh::normals_t* const array = k3d::get_array<k3d::mesh::normals_t>(Mesh.polyhedra->face_varying_data, array_name))
+					if(const k3d::mesh::normals_t* const array = Mesh.polyhedra->face_varying_data.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
 						glDisable(GL_LIGHTING);
@@ -239,7 +238,7 @@ public:
 			{
 				if(k3d::validate_polyhedra(Mesh))
 				{
-					if(const k3d::mesh::normals_t* const array = k3d::get_array<k3d::mesh::normals_t>(Mesh.vertex_data, array_name))
+					if(const k3d::mesh::normals_t* const array = Mesh.vertex_data.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
 						glDisable(GL_LIGHTING);

@@ -24,7 +24,6 @@
 #include "gprim_factory.h"
 
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/texture3.h>
 
 namespace k3d

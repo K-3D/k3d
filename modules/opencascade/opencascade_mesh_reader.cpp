@@ -28,7 +28,6 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/path.h>
-#include <k3dsdk/shared_pointer.h>
 
 #include "opencascade_to_k3d.h"
 

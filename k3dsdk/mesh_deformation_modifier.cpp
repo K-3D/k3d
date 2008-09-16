@@ -23,7 +23,6 @@
 
 #include "mesh_deformation_modifier.h"
 #include "mesh_operations.h"
-#include "shared_pointer.h"
 
 namespace k3d
 {
@@ -50,9 +49,9 @@ void mesh_deformation_modifier::on_update_mesh(const mesh& Input, mesh& Output)
 	return_if_fail(Output.point_selection);
 	return_if_fail(Output.point_selection->size() == Output.points->size());
 
-    const mesh::points_t& input_points = *Input.points;
+	const mesh::points_t& input_points = *Input.points;
 	const mesh::selection_t& selection = *Output.point_selection;
-	mesh::points_t& output_points = *make_unique(Output.points);
+	mesh::points_t& output_points = Output.points.writable();
 
 	on_deform_mesh(Input, input_points, selection, output_points);
 }

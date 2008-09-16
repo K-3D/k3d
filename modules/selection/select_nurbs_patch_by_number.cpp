@@ -26,7 +26,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_modifier.h>
-#include <k3dsdk/shared_pointer.h>
 
 namespace module
 {
@@ -55,8 +54,8 @@ public:
 	{
 		if(Output.nurbs_patches && Output.nurbs_patches->patch_selection)
 		{
-		    k3d::mesh::nurbs_patches_t& nurbs_patches = *k3d::make_unique(Output.nurbs_patches);
-		    k3d::mesh::selection_t& patch_selection = *k3d::make_unique(nurbs_patches.patch_selection);
+		    k3d::mesh::nurbs_patches_t& nurbs_patches = Output.nurbs_patches.writable();
+		    k3d::mesh::selection_t& patch_selection = nurbs_patches.patch_selection.writable();
 			std::fill(patch_selection.begin(), patch_selection.end(), 0.0);
 
 			const unsigned long index = m_index.pipeline_value();

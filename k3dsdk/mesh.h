@@ -24,6 +24,7 @@
 #include "named_attribute_arrays.h"
 #include "named_arrays.h"
 #include "named_array_types.h"
+#include "pipeline_data.h"
 #include "typed_array.h"
 #include "uint_t_array.h"
 
@@ -98,7 +99,7 @@ public:
 
 	/// Defines storage for a collection of primitives
 	class primitives_t :
-		public std::vector<boost::shared_ptr<const primitive> >
+		public std::vector<pipeline_data<primitive> >
 	{
 	public:
 		primitive& create(const string_t& Type);
@@ -109,15 +110,15 @@ public:
 	{
 	public:
 		/// Stores the set of per-point-group first points
-		boost::shared_ptr<const indices_t> first_points;
+		pipeline_data<indices_t> first_points;
 		/// Stores the set of per-point-group point counts
-		boost::shared_ptr<const counts_t> point_counts;
+		pipeline_data<counts_t> point_counts;
 		/// Stores the set of per-point-group materials
-		boost::shared_ptr<const materials_t> materials;
+		pipeline_data<materials_t> materials;
 		/// Stores user-defined per-point-group data (maps to RenderMan constant data)
 		attribute_arrays_t constant_data;
 		/// Stores per-point-group point lists
-		boost::shared_ptr<const indices_t> points;
+		pipeline_data<indices_t> points;
 		/// Stores user-defined per-point-group-point data (maps to RenderMan varying data)
 		attribute_arrays_t varying_data;
 	};
@@ -127,25 +128,25 @@ public:
 	{
 	public:
 		/// Stores the set of per-curve-group first points
-		boost::shared_ptr<const indices_t> first_curves;
+		pipeline_data<indices_t> first_curves;
 		/// Stores the set of per-curve-group curve counts
-		boost::shared_ptr<const counts_t> curve_counts;
+		pipeline_data<counts_t> curve_counts;
 		/// Stores the set of per-curve-group periodic state
-		boost::shared_ptr<const bools_t> periodic_curves;
+		pipeline_data<bools_t> periodic_curves;
 		/// Stores the set of per-curve-group materials
-		boost::shared_ptr<const materials_t> materials;
+		pipeline_data<materials_t> materials;
 		/// Stores user-defined per-curve-group data (maps to RenderMan constant data)
 		attribute_arrays_t constant_data;
 		/// Stores the set of per-curve first points
-		boost::shared_ptr<const indices_t> curve_first_points;
+		pipeline_data<indices_t> curve_first_points;
 		/// Stores the set of per-curve point counts
-		boost::shared_ptr<const counts_t> curve_point_counts;
+		pipeline_data<counts_t> curve_point_counts;
 		/// Stores per-curve selection state
-		boost::shared_ptr<const selection_t> curve_selection;
+		pipeline_data<selection_t> curve_selection;
 		/// Stores user-defined per-curve data (maps to RenderMan uniform data)
 		attribute_arrays_t uniform_data;
 		/// Stores per-curve point lists
-		boost::shared_ptr<const indices_t> curve_points;
+		pipeline_data<indices_t> curve_points;
 		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
 		attribute_arrays_t varying_data;
 	};
@@ -155,25 +156,25 @@ public:
 	{
 	public:
 		/// Stores the set of per-curve-group first points
-		boost::shared_ptr<const indices_t> first_curves;
+		pipeline_data<indices_t> first_curves;
 		/// Stores the set of per-curve-group curve counts
-		boost::shared_ptr<const counts_t> curve_counts;
+		pipeline_data<counts_t> curve_counts;
 		/// Stores the set of per-curve-group periodic state
-		boost::shared_ptr<const bools_t> periodic_curves;
+		pipeline_data<bools_t> periodic_curves;
 		/// Stores the set of per-curve-group materials
-		boost::shared_ptr<const materials_t> materials;
+		pipeline_data<materials_t> materials;
 		/// Stores user-defined per-curve-group data (maps to RenderMan constant data)
 		attribute_arrays_t constant_data;
 		/// Stores the set of per-curve first points
-		boost::shared_ptr<const indices_t> curve_first_points;
+		pipeline_data<indices_t> curve_first_points;
 		/// Stores the set of per-curve point counts
-		boost::shared_ptr<const counts_t> curve_point_counts;
+		pipeline_data<counts_t> curve_point_counts;
 		/// Stores per-curve selection state
-		boost::shared_ptr<const selection_t> curve_selection;
+		pipeline_data<selection_t> curve_selection;
 		/// Stores user-defined per-curve data (maps to RenderMan uniform data)
 		attribute_arrays_t uniform_data;
 		/// Stores per-curve point lists
-		boost::shared_ptr<const indices_t> curve_points;
+		pipeline_data<indices_t> curve_points;
 		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
 		attribute_arrays_t varying_data;
 	};
@@ -183,33 +184,33 @@ public:
 	{
 	public:
 		/// Stores the set of per-curve-group first points
-		boost::shared_ptr<const indices_t> first_curves;
+		pipeline_data<indices_t> first_curves;
 		/// Stores the set of per-curve-group curve counts
-		boost::shared_ptr<const counts_t> curve_counts;
+		pipeline_data<counts_t> curve_counts;
 		/// Stores the set of per-curve-group materials
-		boost::shared_ptr<const materials_t> materials;
+		pipeline_data<materials_t> materials;
 		/// Stores user-defined per-curve-group data (maps to RenderMan constant data)
 		attribute_arrays_t constant_data;
 		/// Stores the set of per-curve first points
-		boost::shared_ptr<const indices_t> curve_first_points;
+		pipeline_data<indices_t> curve_first_points;
 		/// Stores the set of per-curve point counts
-		boost::shared_ptr<const counts_t> curve_point_counts;
+		pipeline_data<counts_t> curve_point_counts;
 		/// Stores the set of per-curve orders
-		boost::shared_ptr<const orders_t> curve_orders;
+		pipeline_data<orders_t> curve_orders;
 		/// Stores the set of per-curve first knots
-		boost::shared_ptr<const indices_t> curve_first_knots;
+		pipeline_data<indices_t> curve_first_knots;
 		/// Stores per-curve selection state
-		boost::shared_ptr<const selection_t> curve_selection;
+		pipeline_data<selection_t> curve_selection;
 		/// Stores user-defined per-curve data (maps to RenderMan uniform data)
 		attribute_arrays_t uniform_data;
 		/// Stores per-curve control points
-		boost::shared_ptr<const indices_t> curve_points;
+		pipeline_data<indices_t> curve_points;
 		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
 		attribute_arrays_t varying_data;
 		/// Stores per-curve control point weights
-		boost::shared_ptr<const weights_t> curve_point_weights;
+		pipeline_data<weights_t> curve_point_weights;
 		/// Stores per-curve knot vectors
-		boost::shared_ptr<const knots_t> curve_knots;
+		pipeline_data<knots_t> curve_knots;
 	};
 
 	/// Defines storage for bilinear patches
@@ -217,15 +218,15 @@ public:
 	{
 	public:
 		/// Stores per-patch selection state
-		boost::shared_ptr<const selection_t> patch_selection;
+		pipeline_data<selection_t> patch_selection;
 		/// Stores the set of per-patch materials
-		boost::shared_ptr<const materials_t> patch_materials;
+		pipeline_data<materials_t> patch_materials;
 		/// Stores user-defined per-patch data (maps to RenderMan constant data)
 		attribute_arrays_t constant_data;
 		/// Stores user-defined per-patch data (maps to RenderMan uniform data)
 		attribute_arrays_t uniform_data;
 		/// Stores the set of per-patch points
-		boost::shared_ptr<const indices_t> patch_points;
+		pipeline_data<indices_t> patch_points;
 		/// Stores user-defined per-parametric-corner data (maps to RenderMan varying data)
 		attribute_arrays_t varying_data;
 	};
@@ -235,15 +236,15 @@ public:
 	{
 	public:
 		/// Stores per-patch selection state
-		boost::shared_ptr<const selection_t> patch_selection;
+		pipeline_data<selection_t> patch_selection;
 		/// Stores the set of per-patch materials
-		boost::shared_ptr<const materials_t> patch_materials;
+		pipeline_data<materials_t> patch_materials;
 		/// Stores user-defined per-patch data (maps to RenderMan constant data)
 		attribute_arrays_t constant_data;
 		/// Stores user-defined per-patch data (maps to RenderMan uniform data)
 		attribute_arrays_t uniform_data;
 		/// Stores the set of per-patch points
-		boost::shared_ptr<const indices_t> patch_points;
+		pipeline_data<indices_t> patch_points;
 		/// Stores the set of per-parametric-corner data (maps to RenderMan varying data)
 		attribute_arrays_t varying_data;
 	};
@@ -253,67 +254,67 @@ public:
 	{
 	public:
 		/// Stores the set of per-patch first points
-		boost::shared_ptr<const indices_t> patch_first_points;
+		pipeline_data<indices_t> patch_first_points;
 		/// Stores the set of per-patch point counts in the U parametric direction
-		boost::shared_ptr<const counts_t> patch_u_point_counts;
+		pipeline_data<counts_t> patch_u_point_counts;
 		/// Stores the set of per-patch point counts in the V parametric direction
-		boost::shared_ptr<const counts_t> patch_v_point_counts;
+		pipeline_data<counts_t> patch_v_point_counts;
 		/// Stores the set of per-patch orders in the U parametric direction
-		boost::shared_ptr<const orders_t> patch_u_orders;
+		pipeline_data<orders_t> patch_u_orders;
 		/// Stores the set of per-patch orders in the V parametric direction
-		boost::shared_ptr<const orders_t> patch_v_orders;
+		pipeline_data<orders_t> patch_v_orders;
 		/// Stores the set of per-patch first knots in the U parametric direction
-		boost::shared_ptr<const indices_t> patch_u_first_knots;
+		pipeline_data<indices_t> patch_u_first_knots;
 		/// Stores the set of per-patch first knots in the V parametric direction
-		boost::shared_ptr<const indices_t> patch_v_first_knots;
+		pipeline_data<indices_t> patch_v_first_knots;
 		/// Stores per-patch selection state
-		boost::shared_ptr<const selection_t> patch_selection;
+		pipeline_data<selection_t> patch_selection;
 		/// Stores per-patch materials
-		boost::shared_ptr<const materials_t> patch_materials;
+		pipeline_data<materials_t> patch_materials;
 		/// Stores user-defined per-patch data (maps to RenderMan constant data)
 		attribute_arrays_t constant_data;
 		/// Stores user-defined per-patch data (maps to RenderMan uniform data)
 		attribute_arrays_t uniform_data;
 		/// Stores per-patch control points
-		boost::shared_ptr<const indices_t> patch_points;
+		pipeline_data<indices_t> patch_points;
 		/// Stores per-patch control point weights
-		boost::shared_ptr<const weights_t> patch_point_weights;
+		pipeline_data<weights_t> patch_point_weights;
 		/// Stores per-patch knot vectors in the U parametric direction
-		boost::shared_ptr<const knots_t> patch_u_knots;
+		pipeline_data<knots_t> patch_u_knots;
 		/// Stores per-patch knot vectors in the V parametric direction
-		boost::shared_ptr<const knots_t> patch_v_knots;
+		pipeline_data<knots_t> patch_v_knots;
 		/// Stores user-defined per-parametric-corner data (maps to RenderMan varying data)
 		attribute_arrays_t varying_data;
 		/// Stores the number of trim curve loops for each patch
-		boost::shared_ptr<const counts_t> patch_trim_curve_loop_counts;
+		pipeline_data<counts_t> patch_trim_curve_loop_counts;
 		/// Stores the first trim curve loop (index into first_trim_curves) for each patch
-		boost::shared_ptr<const indices_t> patch_first_trim_curve_loops;
+		pipeline_data<indices_t> patch_first_trim_curve_loops;
 		/// Stores the trim curve control points, expressed in parameter space
-		boost::shared_ptr<const points_2d_t> trim_points;
+		pipeline_data<points_2d_t> trim_points;
 		/// Stores the trim curve control point selection
-		boost::shared_ptr<const selection_t> trim_point_selection;
+		pipeline_data<selection_t> trim_point_selection;
 		/// Stores the set of per-curve-loop first curves (index into trim_curve_first_points)
-		boost::shared_ptr<const indices_t> first_trim_curves;
+		pipeline_data<indices_t> first_trim_curves;
 		/// Stores the set of per-curve-loop curve counts
-		boost::shared_ptr<const counts_t> trim_curve_counts;
+		pipeline_data<counts_t> trim_curve_counts;
 		/// Stores per-curve-loop selection
-		boost::shared_ptr<const selection_t> trim_curve_loop_selection;
+		pipeline_data<selection_t> trim_curve_loop_selection;
 		/// Stores the set of per-curve first points
-		boost::shared_ptr<const indices_t> trim_curve_first_points;
+		pipeline_data<indices_t> trim_curve_first_points;
 		/// Stores the set of per-curve point counts
-		boost::shared_ptr<const counts_t> trim_curve_point_counts;
+		pipeline_data<counts_t> trim_curve_point_counts;
 		/// Stores the set of per-curve orders
-		boost::shared_ptr<const orders_t> trim_curve_orders;
+		pipeline_data<orders_t> trim_curve_orders;
 		/// Stores the set of per-curve first knots
-		boost::shared_ptr<const indices_t> trim_curve_first_knots;
+		pipeline_data<indices_t> trim_curve_first_knots;
 		/// Stores per-curve selection state
-		boost::shared_ptr<const selection_t> trim_curve_selection;
+		pipeline_data<selection_t> trim_curve_selection;
 		/// Stores per-curve control points
-		boost::shared_ptr<const indices_t> trim_curve_points;
+		pipeline_data<indices_t> trim_curve_points;
 		/// Stores per-curve control point weights
-		boost::shared_ptr<const weights_t> trim_curve_point_weights;
+		pipeline_data<weights_t> trim_curve_point_weights;
 		/// Stores per-curve knot vectors
-		boost::shared_ptr<const knots_t> trim_curve_knots;
+		pipeline_data<knots_t> trim_curve_knots;
 	};
 
 	/// Defines storage for polyhedra (polygons and subdivision surfaces)
@@ -331,31 +332,31 @@ public:
 		typedef typed_array<polyhedron_type> types_t;
 
 		/// Stores per-polyhedron first faces
-		boost::shared_ptr<const indices_t> first_faces;
+		pipeline_data<indices_t> first_faces;
 		/// Stores per-polyhedron face counts
-		boost::shared_ptr<const counts_t> face_counts;
+		pipeline_data<counts_t> face_counts;
 		/// Stores per-polyhedron types
-		boost::shared_ptr<const types_t> types;
+		pipeline_data<types_t> types;
 		/// Stores user-defined per-polyhedron data (maps to RenderMan constant data)
 		attribute_arrays_t constant_data;
 		/// Stores per-face first loops
-		boost::shared_ptr<const indices_t> face_first_loops;
+		pipeline_data<indices_t> face_first_loops;
 		/// Stores per-face loop counts
-		boost::shared_ptr<const counts_t> face_loop_counts;
+		pipeline_data<counts_t> face_loop_counts;
 		/// Stores per-face selection state
-		boost::shared_ptr<const selection_t> face_selection;
+		pipeline_data<selection_t> face_selection;
 		/// Stores per-face materials
-		boost::shared_ptr<const materials_t> face_materials;
+		pipeline_data<materials_t> face_materials;
 		/// Stores user-defined per-face data (maps to RenderMan uniform data)
 		attribute_arrays_t uniform_data;
 		/// Stores per-loop first edges
-		boost::shared_ptr<const indices_t> loop_first_edges;
+		pipeline_data<indices_t> loop_first_edges;
 		/// Stores the start point of each edge
-		boost::shared_ptr<const indices_t> edge_points;
+		pipeline_data<indices_t> edge_points;
 		/// Stores the next edge in clockwise direction
-		boost::shared_ptr<const indices_t> clockwise_edges;
+		pipeline_data<indices_t> clockwise_edges;
 		/// Stores per-edge selection state
-		boost::shared_ptr<const selection_t> edge_selection;
+		pipeline_data<selection_t> edge_selection;
 		/// Stores user-defined per-edge data (maps to RenderMan facevarying data)
 		attribute_arrays_t face_varying_data;
 	};
@@ -395,68 +396,68 @@ public:
 		typedef uint_t_array operands_t;
 
 		/// Stores per-blobby primitive offsets
-		boost::shared_ptr<const indices_t> first_primitives;
+		pipeline_data<indices_t> first_primitives;
 		/// Stores per-blobby primitive counts
-		boost::shared_ptr<const counts_t> primitive_counts;
+		pipeline_data<counts_t> primitive_counts;
 		/// Stores per-blobby operator offsets
-		boost::shared_ptr<const indices_t> first_operators;
+		pipeline_data<indices_t> first_operators;
 		/// Stores per-blobby operator counts
-		boost::shared_ptr<const counts_t> operator_counts;
+		pipeline_data<counts_t> operator_counts;
 		/// Stores per-blobby materials
-		boost::shared_ptr<const materials_t> materials;
+		pipeline_data<materials_t> materials;
 		/// Stores user-defined per-blobby data (maps to RenderMan constant data)
 		attribute_arrays_t constant_data;
 		/// Stores user-defined per-blobby data (maps to RenderMan uniform data)
 		attribute_arrays_t uniform_data;
 		/// Stores blobby primitives
-		boost::shared_ptr<const primitives_t> primitives;
+		pipeline_data<primitives_t> primitives;
 		/// Stores per-primitive floating-point value offsets
-		boost::shared_ptr<const indices_t> primitive_first_floats;
+		pipeline_data<indices_t> primitive_first_floats;
 		/// Stores per-primitive floating-point value counts
-		boost::shared_ptr<const counts_t> primitive_float_counts;
+		pipeline_data<counts_t> primitive_float_counts;
 		/// Stores user-defined per-primitive data (maps to RenderMan varying data)
 		attribute_arrays_t varying_data;
 		/// Stores user-defined per-primitive data (maps to RenderMan vertex data)
 		attribute_arrays_t vertex_data;
 		/// Stores blobby operators
-		boost::shared_ptr<const operators_t> operators;
+		pipeline_data<operators_t> operators;
 		/// Stores operator operand offsets
-		boost::shared_ptr<const indices_t> operator_first_operands;
+		pipeline_data<indices_t> operator_first_operands;
 		/// Stores operator operand counts
-		boost::shared_ptr<const counts_t> operator_operand_counts;
+		pipeline_data<counts_t> operator_operand_counts;
 		/// Stores primitive floating-point values
-		boost::shared_ptr<const floats_t> floats;
+		pipeline_data<floats_t> floats;
 		/// Stores operator operands
-		boost::shared_ptr<const operands_t> operands;
+		pipeline_data<operands_t> operands;
 	};
 
 	/// Stores the set of mesh points
-	boost::shared_ptr<const points_t> points;
+	pipeline_data<points_t> points;
 	/// Stores per-point selection state
-	boost::shared_ptr<const selection_t> point_selection;
+	pipeline_data<selection_t> point_selection;
 	/// Stores user-defined per-point data (maps to RenderMan vertex data)
 	attribute_arrays_t vertex_data;
 	/// Stores mesh primitives
 	primitives_t primitives;
 
 	/// Stores point groups
-	boost::shared_ptr<const point_groups_t> point_groups;
+	pipeline_data<point_groups_t> point_groups;
 	/// Stores linear curve groups
-	boost::shared_ptr<const linear_curve_groups_t> linear_curve_groups;
+	pipeline_data<linear_curve_groups_t> linear_curve_groups;
 	/// Stores cubic curve groups
-	boost::shared_ptr<const cubic_curve_groups_t> cubic_curve_groups;
+	pipeline_data<cubic_curve_groups_t> cubic_curve_groups;
 	/// Stores nurbs curve groups
-	boost::shared_ptr<const nurbs_curve_groups_t> nurbs_curve_groups;
+	pipeline_data<nurbs_curve_groups_t> nurbs_curve_groups;
 	/// Stores bilinear patches
-	boost::shared_ptr<const bilinear_patches_t> bilinear_patches;
+	pipeline_data<bilinear_patches_t> bilinear_patches;
 	/// Stores bicubic patches
-	boost::shared_ptr<const bicubic_patches_t> bicubic_patches;
+	pipeline_data<bicubic_patches_t> bicubic_patches;
 	/// Stores nurbs patches
-	boost::shared_ptr<const nurbs_patches_t> nurbs_patches;
+	pipeline_data<nurbs_patches_t> nurbs_patches;
 	/// Stores polyhedra
-	boost::shared_ptr<const polyhedra_t> polyhedra;
+	pipeline_data<polyhedra_t> polyhedra;
 	/// Stores blobbies (implicit surfaces)
-	boost::shared_ptr<const blobbies_t> blobbies;
+	pipeline_data<blobbies_t> blobbies;
 
 	/// Compares two meshes for equality using the fuzzy semantics of almost_equal
 	const bool_t almost_equal(const mesh& Other, const uint64_t Threshold) const;

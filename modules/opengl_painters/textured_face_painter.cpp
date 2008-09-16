@@ -29,7 +29,6 @@
 #include <k3dsdk/hints.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/array_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
@@ -149,10 +148,10 @@ public:
 		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
 		normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
 
-		k3d::typed_array<k3d::texture3>* texcoords = 0;
+		const k3d::typed_array<k3d::texture3>* texcoords = 0;
 		for(k3d::named_arrays::const_iterator array_it = Mesh.polyhedra->face_varying_data.begin(); array_it != Mesh.polyhedra->face_varying_data.end(); ++array_it)
 		{
-			texcoords = dynamic_cast< k3d::typed_array<k3d::texture3>* >(array_it->second.get());
+			texcoords = dynamic_cast<const k3d::typed_array<k3d::texture3>* >(array_it->second.get());
 			if(texcoords)
 				break;
 		}

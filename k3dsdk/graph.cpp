@@ -31,7 +31,7 @@ namespace k3d
 namespace detail
 {
 
-static void print(std::ostream& Stream, const boost::shared_ptr<const graph::adjacency_list_t>& Topology)
+static void print(std::ostream& Stream, const pipeline_data<graph::adjacency_list_t>& Topology)
 {
 	if(!Topology)
 		return;
@@ -55,7 +55,7 @@ static bool print(std::ostream& Stream, const array& Array)
 	return false;
 }
 
-static void print(std::ostream& Stream, const std::string& Name, const boost::shared_ptr<array>& Array)
+static void print(std::ostream& Stream, const std::string& Name, const pipeline_data<array>& Array)
 {
 	Stream << "  " << Name << ": ";
 	if(Array)
@@ -96,8 +96,8 @@ static void print(std::ostream& Stream, const std::string& Name, const boost::sh
 
 static void print(std::ostream& Stream, const k3d::graph::attribute_arrays_t& Arrays)
 {
-    for(k3d::graph::attribute_arrays_t::const_iterator array = Arrays.begin(); array != Arrays.end(); ++array)
-    	print(Stream, array->first, array->second);
+	for(k3d::graph::attribute_arrays_t::const_iterator array = Arrays.begin(); array != Arrays.end(); ++array)
+		print(Stream, array->first, array->second);
 }
 
 } // namespace detail

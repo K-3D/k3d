@@ -23,17 +23,15 @@
 */
 
 #include "md2.h"
+
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/fstream.h>
-#include "gprim_factory.h"
 #include <k3dsdk/imesh_storage.h>
+#include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/xml.h>
-#include <k3dsdk/nurbs.h>
-#include <k3dsdk/measurement.h>
-#include <stack>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -78,34 +76,65 @@ public:
 		if(md2_path.empty())
 			return;
 
-		md2Model *model = new md2Model(md2_path.native_console_string().c_str());
+		boost::scoped_ptr<md2Model> model(new md2Model(md2_path.native_filesystem_string().c_str()));
 
-		int frame = m_frame.pipeline_value();
-		if(frame>=model->get_num_frames())
+		const k3d::int32_t frame = m_frame.pipeline_value();
+		if(frame < 0 || frame >= model->get_num_frames())
 		{
-			k3d::log() << error << "Frame does not exist on md2 model!" << std::endl;
+			k3d::log() << error << "frame [" << frame << "] out-of-range for [" << md2_path.native_console_string() << "]" << std::endl;
 			return;
 		}
 
-		k3d::gprim_factory factory(Output);
+		const k3d::int32_t vertex_count = model->get_num_vertices();
+		const k3d::int32_t triangle_count = model->get_num_triangles();
 
-		for(int i=0; i<model->get_num_vertices(); i++)
-			factory.add_point(model->get_point(frame,i));
-		for(int i=0; i<model->get_num_texcoords(); i++)
-			factory.add_texcoord(model->get_texcoord(i));
+		k3d::mesh::points_t& points = Output.points.create(new k3d::mesh::points_t(vertex_count));
+		k3d::mesh::selection_t& point_selection = Output.point_selection.create(new k3d::mesh::selection_t(vertex_count, 0.0));
+		for(k3d::int32_t i = 0; i != vertex_count; ++i)
+			points[i] = model->get_point(frame, i);
 
-		for(int i=0; i<model->get_num_triangles(); i++)
+		k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.create();
+		k3d::mesh::indices_t& first_faces = polyhedra.first_faces.create();
+		k3d::mesh::counts_t& face_counts = polyhedra.face_counts.create();
+		k3d::mesh::polyhedra_t::types_t& types = polyhedra.types.create();
+		k3d::mesh::indices_t& face_first_loops = polyhedra.face_first_loops.create();
+		k3d::mesh::counts_t& face_loop_counts = polyhedra.face_loop_counts.create();
+		k3d::mesh::selection_t& face_selection = polyhedra.face_selection.create();
+		k3d::mesh::materials_t& face_materials = polyhedra.face_materials.create();
+		k3d::mesh::indices_t& loop_first_edges = polyhedra.loop_first_edges.create();
+		k3d::mesh::indices_t& edge_points = polyhedra.edge_points.create();
+		k3d::mesh::indices_t& clockwise_edges = polyhedra.clockwise_edges.create();
+		k3d::mesh::selection_t& edge_selection = polyhedra.edge_selection.create();
+
+		first_faces.push_back(face_first_loops.size());
+		face_counts.push_back(triangle_count);
+		types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+
+		face_first_loops.reserve(triangle_count);
+		face_loop_counts.reserve(triangle_count);
+		face_selection.reserve(triangle_count);
+		face_materials.reserve(triangle_count);
+		loop_first_edges.reserve(triangle_count);
+		edge_points.reserve(3 * triangle_count);
+		clockwise_edges.reserve(3 * triangle_count);
+		edge_selection.reserve(3 * triangle_count);
+
+		for(k3d::int32_t i = 0; i != triangle_count; ++i)
 		{
-			k3d::mesh::indices_t vertex_indices;
-			k3d::mesh::indices_t texture_indices;
-			for(int j=0; j<3; j++)
+			face_first_loops.push_back(loop_first_edges.size());
+			face_loop_counts.push_back(1);
+			face_selection.push_back(0);
+			face_materials.push_back(0);
+			loop_first_edges.push_back(edge_points.size());
+
+			for(k3d::uint_t j = 0; j != 3; ++j)
 			{
-				vertex_indices.push_back(model->get_index(i,j));
-				texture_indices.push_back(model->get_texindex(i,j));
+				edge_points.push_back(model->get_index(i, j));
+				clockwise_edges.push_back(edge_points.size());
+				edge_selection.push_back(0);
 			}
-			factory.add_polygon(vertex_indices,texture_indices);
+			clockwise_edges.back() = loop_first_edges.back();
 		}
-		factory.attach_texcoords();
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
@@ -115,28 +144,21 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		//static k3d::document_plugin_factory<mesh_reader_implementation,
-        ////        k3d::interface_list<k3d::imesh_source,
-        //        k3d::interface_list<k3d::imesh_storage> > > factory(
-		//	k3d::uuid(0xcd0962b6, 0x3e4a132b, 0x575537a5, 0xc4af7d0a),
-		//	"MD2MeshReader",
-		//	_("Reader that loads external MD2 (.md2) files into the document by reference"),
-		//	"MeshReader");
 		static k3d::document_plugin_factory<mesh_reader_implementation,
-               k3d::interface_list<k3d::imesh_source,
-                k3d::interface_list<k3d::imesh_storage> > > factory(
-			k3d::uuid(0xcd0962b6, 0x3e4a132b, 0x575537a5, 0xc4af7d0a),
-			"MD2MeshReader",
-			_("Reader that loads external MD2 (.md2) files into the document by reference"),
-			"MeshReader",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::interface_list<k3d::imesh_source,
+			k3d::interface_list<k3d::imesh_storage> > > factory(
+				k3d::uuid(0xcd0962b6, 0x3e4a132b, 0x575537a5, 0xc4af7d0a),
+				"MD2MeshReader",
+				_("Reader that loads external MD2 (.md2) files into the document by reference"),
+				"MeshReader",
+				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
 
 private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
-	k3d_data(int, immutable_name, change_signal, no_undo, local_storage, no_constraint, measurement_property, with_serialization) m_frame;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, measurement_property, with_serialization) m_frame;
 };
 
 k3d::iplugin_factory& mesh_reader_factory()

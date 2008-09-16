@@ -22,7 +22,6 @@
 */
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/array_operations.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_painter_gl.h>
@@ -80,7 +79,7 @@ public:
 		k3d::typed_array<k3d::color> default_color_array;
 
 		// Get the color array ...
-		const k3d::mesh::colors_t* color_array_p = k3d::get_array<k3d::mesh::colors_t>(Mesh.polyhedra->uniform_data, m_color_array.pipeline_value());
+		const k3d::mesh::colors_t* color_array_p = Mesh.polyhedra->uniform_data.lookup<k3d::mesh::colors_t>(m_color_array.pipeline_value());
 		if(!color_array_p)
 		{
 			default_color_array.resize(face_count, k3d::color(0.9, 0.9, 0.9));

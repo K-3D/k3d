@@ -107,7 +107,7 @@ private:
 	virtual void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], k3d::double_t Weights[4], k3d::uint_t& NewVertex);
 	virtual void add_triangle(k3d::uint_t Vertices[3], k3d::uint_t Edges[3]);
 	
-	boost::shared_ptr<const k3d::mesh::points_t> m_input_points;
+	k3d::pipeline_data<k3d::mesh::points_t> m_input_points;
 	
 	// mapping between mesh point index and triangulation point index (valid for the face being processed only!)
 	typedef std::map<k3d::uint_t, k3d::uint_t> point_map_t;

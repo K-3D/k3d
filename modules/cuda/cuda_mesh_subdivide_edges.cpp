@@ -34,7 +34,6 @@
 #include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/selection.h>
-#include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
 
@@ -178,7 +177,7 @@ public:
         k3d::merge_selection(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
         document().pipeline_profiler().finish_execution(*this, "Merge selection");
 
-        k3d::mesh::polyhedra_t& polyhedra = *k3d::make_unique(Output.polyhedra);
+        k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.writable();
 
         document().pipeline_profiler().start_execution(*this, "Calculate companions");
 

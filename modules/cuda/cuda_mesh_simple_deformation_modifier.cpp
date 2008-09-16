@@ -23,7 +23,6 @@
  */
 
 #include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/shared_pointer.h>
 
 #include "cuda_mesh_simple_deformation_modifier.h"
 

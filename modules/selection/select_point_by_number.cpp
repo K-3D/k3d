@@ -26,7 +26,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_modifier.h>
-#include <k3dsdk/shared_pointer.h>
 
 namespace module
 {
@@ -55,7 +54,7 @@ public:
 	{
 		if(Output.point_selection)
 		{
-			k3d::mesh::selection_t& point_selection = *k3d::make_unique(Output.point_selection);
+			k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
 			std::fill(point_selection.begin(), point_selection.end(), 0.0);
 
 			const unsigned long index = m_index.pipeline_value();

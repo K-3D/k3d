@@ -29,7 +29,13 @@ namespace k3d
 const array* named_arrays::lookup(const string_t& Name) const
 {
 	const_iterator result = find(Name);
-	return result == end() ? static_cast<array*>(0) : result->second.get();
+	return result == end() ? static_cast<const array*>(0) : result->second.get();
+}
+
+array* named_arrays::writable(const string_t& Name)
+{
+	iterator result = find(Name);
+	return result == end() ? static_cast<array*>(0) : &result->second.writable();
 }
 
 named_arrays named_arrays::clone_types() const

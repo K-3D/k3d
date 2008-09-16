@@ -31,13 +31,13 @@ md2Model::md2Model(const char *f)
 	}
 //Extract Skin names
 	skins = new md2Skins[header.numSkins];
-	for(int i=0; i<header.numSkins;i++)
+	for(k3d::int32_t i=0; i<header.numSkins;i++)
 		fread(skins[i],1,sizeof(md2Skins), md2file);
 //Extract Texture coordinates
 	texcoords = new md2TexCoords[header.numTexCoords];
 	md2TmpTexCoords tmpcoords;
 	fseek(md2file, header.offsetTexCoords, SEEK_SET);
-	for(int i=0; i<header.numTexCoords;i++)
+	for(k3d::int32_t i=0; i<header.numTexCoords;i++)
 	{
 		//Converting values to [0,1]
 		fread(&tmpcoords, sizeof(md2TmpTexCoords), 1, md2file);
@@ -48,14 +48,14 @@ md2Model::md2Model(const char *f)
 //Extract triangle indices
 	triangles = new md2Triangles[header.numTriangles];
 	fseek(md2file, header.offsetTriangles, SEEK_SET);
-	for(int i=0; i<header.numTriangles; i++)
+	for(k3d::int32_t i=0; i<header.numTriangles; i++)
 		fread(&triangles[i], 1, sizeof(md2Triangles), md2file);
 //Extract frames and vertices
 	byte buffer[2048*4+128];
 	float a;
 	frames = new md2Frames[header.numFrames];
 
-	for(int i=0; i<header.numFrames; i++)
+	for(k3d::int32_t i=0; i<header.numFrames; i++)
 	{
 		md2SingleFrame *frame = (md2SingleFrame *) buffer;
 		frames[i].vertex = new md2Vertex[header.numVertex];
@@ -76,7 +76,7 @@ md2Model::md2Model(const char *f)
 		strcpy(frames[i].name, frame->name);
 		//printf("%s\n", frame->name);
 		fread(frame->vertex, sizeof(md2TriangleVertex), header.numVertex, md2file);
-		for(int j=0; j<header.numVertex; j++)
+		for(k3d::int32_t j=0; j<header.numVertex; j++)
 		{
 			frames[i].vertex[j].val[0] = frame->vertex[j].val[0]*frame->scale[0] + frame->translate[0];
 			frames[i].vertex[j].val[2] = frame->vertex[j].val[1]*frame->scale[1] + frame->translate[1];

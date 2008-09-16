@@ -29,7 +29,6 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/triangulator.h>
 
 namespace module
@@ -90,33 +89,20 @@ private:
 			m_input = &Input;
 
 			// Allocate new data structures for our output ...
-			m_polyhedra.reset(new k3d::mesh::polyhedra_t());
-			m_first_faces.reset(new k3d::mesh::indices_t());
-			m_face_counts.reset(new k3d::mesh::counts_t());
-			m_types.reset(new k3d::mesh::polyhedra_t::types_t());
-			m_face_first_loops.reset(new k3d::mesh::indices_t());
-			m_face_loop_counts.reset(new k3d::mesh::counts_t());
-			m_face_selection.reset(new k3d::mesh::selection_t());
-			m_face_materials.reset(new k3d::mesh::materials_t());
-			m_loop_first_edges.reset(new k3d::mesh::indices_t());
-			m_edge_points.reset(new k3d::mesh::indices_t());
-			m_clockwise_edges.reset(new k3d::mesh::indices_t());
-			m_edge_selection.reset(new k3d::mesh::selection_t());
-			m_points.reset(new k3d::mesh::points_t(*m_input->points));
-			m_point_selection.reset(new k3d::mesh::selection_t(m_input->point_selection->size(), 0.0));
-
-			// Hook everything together ...
-			m_polyhedra->first_faces = m_first_faces;
-			m_polyhedra->face_counts = m_face_counts;
-			m_polyhedra->types = m_types;
-			m_polyhedra->face_first_loops = m_face_first_loops;
-			m_polyhedra->face_loop_counts = m_face_loop_counts;
-			m_polyhedra->face_selection = m_face_selection;
-			m_polyhedra->face_materials = m_face_materials;
-			m_polyhedra->loop_first_edges = m_loop_first_edges;
-			m_polyhedra->edge_points = m_edge_points;
-			m_polyhedra->clockwise_edges = m_clockwise_edges;
-			m_polyhedra->edge_selection = m_edge_selection;
+			m_polyhedra = &Output.polyhedra.create();
+			m_first_faces = &m_polyhedra->first_faces.create();
+			m_face_counts = &m_polyhedra->face_counts.create();
+			m_types = &m_polyhedra->types.create();
+			m_face_first_loops = &m_polyhedra->face_first_loops.create();
+			m_face_loop_counts = &m_polyhedra->face_loop_counts.create();
+			m_face_selection = &m_polyhedra->face_selection.create();
+			m_face_materials = &m_polyhedra->face_materials.create();
+			m_loop_first_edges = &m_polyhedra->loop_first_edges.create();
+			m_edge_points = &m_polyhedra->edge_points.create();
+			m_clockwise_edges = &m_polyhedra->clockwise_edges.create();
+			m_edge_selection = &m_polyhedra->edge_selection.create();
+			m_points = &Output.points.create(new k3d::mesh::points_t(*Input.points));
+			m_point_selection = &Output.point_selection.create(new k3d::mesh::selection_t(Input.points->size(), 0.0));
 
 			// Setup copying of attribute arrays ...
 			m_polyhedra->constant_data = m_input->polyhedra->constant_data;
@@ -131,10 +117,6 @@ private:
 			m_vertex_data_copier.reset(new k3d::attribute_array_copier(m_input->vertex_data, Output.vertex_data));
 
 			// Setup the output mesh ...
-			Output.polyhedra = m_polyhedra;
-			Output.points = m_points;
-			Output.point_selection = m_point_selection;
-
 			k3d::mesh::selection_t input_face_selection(*m_input->polyhedra->face_selection);
 			k3d::merge_selection(Selection.faces, input_face_selection);
 
@@ -253,20 +235,20 @@ private:
 
 		const k3d::mesh* m_input;
 
-		boost::shared_ptr<k3d::mesh::polyhedra_t> m_polyhedra;
-		boost::shared_ptr<k3d::mesh::indices_t> m_first_faces;
-		boost::shared_ptr<k3d::mesh::counts_t> m_face_counts;
-		boost::shared_ptr<k3d::mesh::polyhedra_t::types_t> m_types;
-		boost::shared_ptr<k3d::mesh::indices_t> m_face_first_loops;
-		boost::shared_ptr<k3d::mesh::counts_t> m_face_loop_counts;
-		boost::shared_ptr<k3d::mesh::selection_t> m_face_selection;
-		boost::shared_ptr<k3d::mesh::materials_t> m_face_materials;
-		boost::shared_ptr<k3d::mesh::indices_t> m_loop_first_edges;
-		boost::shared_ptr<k3d::mesh::indices_t> m_edge_points;
-		boost::shared_ptr<k3d::mesh::indices_t> m_clockwise_edges;
-		boost::shared_ptr<k3d::mesh::selection_t> m_edge_selection;
-		boost::shared_ptr<k3d::mesh::points_t> m_points;
-		boost::shared_ptr<k3d::mesh::selection_t> m_point_selection;
+		k3d::mesh::polyhedra_t* m_polyhedra;
+		k3d::mesh::indices_t* m_first_faces;
+		k3d::mesh::counts_t* m_face_counts;
+		k3d::mesh::polyhedra_t::types_t* m_types;
+		k3d::mesh::indices_t* m_face_first_loops;
+		k3d::mesh::counts_t* m_face_loop_counts;
+		k3d::mesh::selection_t* m_face_selection;
+		k3d::mesh::materials_t* m_face_materials;
+		k3d::mesh::indices_t* m_loop_first_edges;
+		k3d::mesh::indices_t* m_edge_points;
+		k3d::mesh::indices_t* m_clockwise_edges;
+		k3d::mesh::selection_t* m_edge_selection;
+		k3d::mesh::points_t* m_points;
+		k3d::mesh::selection_t* m_point_selection;
 
 		boost::shared_ptr<k3d::attribute_array_copier> m_uniform_data_copier;
 		boost::shared_ptr<k3d::attribute_array_copier> m_face_varying_data_copier;

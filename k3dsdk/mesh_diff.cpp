@@ -231,7 +231,7 @@ void print_diff(std::ostream& Stream, const std::string& Label, const array& A, 
 	k3d::log() << error << k3d_file_reference << ": unknown array type: " << demangle(typeid(A)) << std::endl;
 }
 
-void print_diff(std::ostream& Stream, const std::string& Label, const boost::shared_ptr<array>& A, const boost::shared_ptr<array>& B, const boost::uint64_t Threshold)
+void print_diff(std::ostream& Stream, const std::string& Label, const pipeline_data<array>& A, const pipeline_data<array>& B, const boost::uint64_t Threshold)
 {
 	print_diff(Stream, Label, *A, *B, Threshold);
 }

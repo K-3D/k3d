@@ -7,25 +7,20 @@ namespace module
 		nurbs_curve_modifier::nurbs_curve_modifier(k3d::mesh& input)
 		{
 			m_instance = &input;
-			if (m_instance->nurbs_curve_groups == NULL)
-			{
-				m_instance->nurbs_curve_groups = boost::shared_ptr<k3d::mesh::nurbs_curve_groups_t>( new k3d::mesh::nurbs_curve_groups_t() );
-			}
-
-			groups = k3d::make_unique(input.nurbs_curve_groups);
-			curve_knots = k3d::make_unique(groups->curve_knots);
-			curve_points = k3d::make_unique(groups->curve_points);
-			curve_point_weights = k3d::make_unique(groups->curve_point_weights);
-			curve_counts = k3d::make_unique(groups->curve_counts);
-			curve_orders = k3d::make_unique(groups->curve_orders);
-			curve_point_counts = k3d::make_unique(groups->curve_point_counts);
-			curve_first_points = k3d::make_unique(groups->curve_first_points);
-			curve_first_knots = k3d::make_unique(groups->curve_first_knots);
-			first_curves = k3d::make_unique(groups->first_curves);
-			curve_selection = k3d::make_unique(groups->curve_selection);
-			point_selection = k3d::make_unique(input.point_selection);
-			mesh_points = k3d::make_unique(input.points);
-			materials = k3d::make_unique(groups->materials);
+			groups = &input.nurbs_curve_groups.create();
+			curve_knots = &groups->curve_knots.create();
+			curve_points = &groups->curve_points.create();
+			curve_point_weights = &groups->curve_point_weights.create();
+			curve_counts = &groups->curve_counts.create();
+			curve_orders = &groups->curve_orders.create();
+			curve_point_counts = &groups->curve_point_counts.create();
+			curve_first_points = &groups->curve_first_points.create();
+			curve_first_knots = &groups->curve_first_knots.create();
+			first_curves = &groups->first_curves.create();
+			curve_selection = &groups->curve_selection.create();
+			point_selection = &input.point_selection.create();
+			mesh_points = &input.points.create();
+			materials = &groups->materials.create();
 		}
 
 		int nurbs_curve_modifier::add_curve(nurbs_curve& curve, bool shared)
@@ -107,7 +102,7 @@ namespace module
 
 		bool nurbs_curve_modifier::find_point_inside(k3d::mesh::indices_t *points, k3d::uint_t index)
 		{
-			if (points == NULL)
+			if (points == 0)
 				return false;
 
 			for (k3d::uint_t j = 0; j < points->size(); j++)
@@ -120,7 +115,7 @@ namespace module
 
 		void nurbs_curve_modifier::offset_all_after(k3d::mesh::indices_t *points, k3d::uint_t first, int offset)
 		{
-			if (points == NULL)
+			if (points == 0)
 				return;
 
 			try
@@ -151,67 +146,67 @@ namespace module
 		{
 			try
 			{
-				k3d::mesh::point_groups_t *point_groups = NULL;
-				k3d::mesh::indices_t *point_group_points = NULL;
+				k3d::mesh::point_groups_t *point_groups = 0;
+				k3d::mesh::indices_t *point_group_points = 0;
 
-				k3d::mesh::linear_curve_groups_t *linear_curve_groups = NULL;
-				k3d::mesh::indices_t *linear_curve_points = NULL;
+				k3d::mesh::linear_curve_groups_t *linear_curve_groups = 0;
+				k3d::mesh::indices_t *linear_curve_points = 0;
 
-				k3d::mesh::cubic_curve_groups_t *cubic_curve_groups = NULL;
-				k3d::mesh::indices_t *cubic_curve_points = NULL;
+				k3d::mesh::cubic_curve_groups_t *cubic_curve_groups = 0;
+				k3d::mesh::indices_t *cubic_curve_points = 0;
 
-				k3d::mesh::bilinear_patches_t *bilinear_patches = NULL;
-				k3d::mesh::indices_t *bilinear_patch_points = NULL;
+				k3d::mesh::bilinear_patches_t *bilinear_patches = 0;
+				k3d::mesh::indices_t *bilinear_patch_points = 0;
 
-				k3d::mesh::bicubic_patches_t *bicubic_patches = NULL;
-				k3d::mesh::indices_t *bicubic_patch_points = NULL;
+				k3d::mesh::bicubic_patches_t *bicubic_patches = 0;
+				k3d::mesh::indices_t *bicubic_patch_points = 0;
 
-				k3d::mesh::nurbs_patches_t *nurbs_patches = NULL;
-				k3d::mesh::indices_t *nurbs_patch_points = NULL;
+				k3d::mesh::nurbs_patches_t *nurbs_patches = 0;
+				k3d::mesh::indices_t *nurbs_patch_points = 0;
 
-				k3d::mesh::polyhedra_t *polyhedra = NULL;
-				k3d::mesh::indices_t *polyhedra_edge_points = NULL;
+				k3d::mesh::polyhedra_t *polyhedra = 0;
+				k3d::mesh::indices_t *polyhedra_edge_points = 0;
 
-				if (m_instance->point_groups != NULL)
+				if (!m_instance->point_groups)
 				{
-					point_groups = k3d::make_unique(m_instance->point_groups);
-					point_group_points = k3d::make_unique(point_groups->points);
+					point_groups = &m_instance->point_groups.writable();
+					point_group_points = &point_groups->points.writable();
 				}
 
-				if (m_instance->linear_curve_groups != NULL)
+				if (!m_instance->linear_curve_groups)
 				{
-					linear_curve_groups = k3d::make_unique(m_instance->linear_curve_groups);
-					linear_curve_points = k3d::make_unique(linear_curve_groups->curve_points);
+					linear_curve_groups = &m_instance->linear_curve_groups.writable();
+					linear_curve_points = &linear_curve_groups->curve_points.writable();
 				}
 
-				if (m_instance->cubic_curve_groups != NULL)
+				if (!m_instance->cubic_curve_groups)
 				{
-					cubic_curve_groups = k3d::make_unique(m_instance->cubic_curve_groups);
-					cubic_curve_points = k3d::make_unique(cubic_curve_groups->curve_points);
+					cubic_curve_groups = &m_instance->cubic_curve_groups.writable();
+					cubic_curve_points = &cubic_curve_groups->curve_points.writable();
 				}
 
-				if (m_instance->bilinear_patches != NULL)
+				if (!m_instance->bilinear_patches)
 				{
-					bilinear_patches = k3d::make_unique(m_instance->bilinear_patches);
-					bilinear_patch_points = k3d::make_unique(bilinear_patches->patch_points);
+					bilinear_patches = &m_instance->bilinear_patches.writable();
+					bilinear_patch_points = &bilinear_patches->patch_points.writable();
 				}
 
-				if (m_instance->bicubic_patches != NULL)
+				if (!m_instance->bicubic_patches)
 				{
-					bicubic_patches = k3d::make_unique(m_instance->bicubic_patches);
-					bicubic_patch_points = k3d::make_unique(bicubic_patches->patch_points);
+					bicubic_patches = &m_instance->bicubic_patches.writable();
+					bicubic_patch_points = &bicubic_patches->patch_points.writable();
 				}
 
-				if (m_instance->nurbs_patches != NULL)
+				if (!m_instance->nurbs_patches)
 				{
-					nurbs_patches = k3d::make_unique(m_instance->nurbs_patches);
-					nurbs_patch_points = k3d::make_unique(nurbs_patches->patch_points);
+					nurbs_patches = &m_instance->nurbs_patches.writable();
+					nurbs_patch_points = &nurbs_patches->patch_points.writable();
 				}
 
-				if (m_instance->polyhedra != NULL)
+				if (!m_instance->polyhedra)
 				{
-					polyhedra = k3d::make_unique(m_instance->polyhedra);
-					polyhedra_edge_points = k3d::make_unique(polyhedra->edge_points);
+					polyhedra = &m_instance->polyhedra.writable();
+					polyhedra_edge_points = &polyhedra->edge_points.writable();
 				}
 
 				std::vector<bool> is_used(mesh_points->size(), false);
@@ -2711,23 +2706,23 @@ namespace module
 			try
 			{
 				MY_DEBUG << "Polygonize_curve" << std::endl;
-				if (m_instance->linear_curve_groups == NULL)
+				if (m_instance->linear_curve_groups == 0)
 				{
-					m_instance->linear_curve_groups = boost::shared_ptr<k3d::mesh::linear_curve_groups_t>( new k3d::mesh::linear_curve_groups_t() );
+					m_instance->linear_curve_groups.create();
 				}
 
-				k3d::mesh::linear_curve_groups_t* linear_curve_groups = k3d::make_unique(m_instance->linear_curve_groups);
+				k3d::mesh::linear_curve_groups_t* linear_curve_groups = &m_instance->linear_curve_groups.writable();
 
-				k3d::mesh::indices_t* linear_curve_points = k3d::make_unique(linear_curve_groups->curve_points);
-				k3d::mesh::counts_t* linear_curve_point_counts = k3d::make_unique(linear_curve_groups->curve_point_counts);
+				k3d::mesh::indices_t* linear_curve_points = &linear_curve_groups->curve_points.writable();
+				k3d::mesh::counts_t* linear_curve_point_counts = &linear_curve_groups->curve_point_counts.writable();
 
-				k3d::mesh::indices_t* linear_curve_first_points = k3d::make_unique(linear_curve_groups->curve_first_points);
-				k3d::mesh::counts_t* linear_curve_counts = k3d::make_unique(linear_curve_groups->curve_counts);
-				k3d::mesh::indices_t* linear_first_curves = k3d::make_unique(linear_curve_groups->first_curves);
-				k3d::mesh::bools_t* linear_periodic_curves = k3d::make_unique(linear_curve_groups->periodic_curves);
+				k3d::mesh::indices_t* linear_curve_first_points = &linear_curve_groups->curve_first_points.writable();
+				k3d::mesh::counts_t* linear_curve_counts = &linear_curve_groups->curve_counts.writable();
+				k3d::mesh::indices_t* linear_first_curves = &linear_curve_groups->first_curves.writable();
+				k3d::mesh::bools_t* linear_periodic_curves = &linear_curve_groups->periodic_curves.writable();
 
-				k3d::mesh::selection_t* linear_curve_selection = k3d::make_unique(linear_curve_groups->curve_selection);
-				k3d::mesh::materials_t* linear_materials = k3d::make_unique(linear_curve_groups->materials);
+				k3d::mesh::selection_t* linear_curve_selection = &linear_curve_groups->curve_selection.writable();
+				k3d::mesh::materials_t* linear_materials = &linear_curve_groups->materials.writable();
 
 				assert_warning(k3d::validate_linear_curve_groups(*m_instance));
 

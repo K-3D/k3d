@@ -21,7 +21,6 @@
 #include "mesh_operations.h"
 #include "mesh_selection.h"
 #include "polyhedra.h"
-#include "shared_pointer.h"
 #include "vectors.h"
 
 namespace k3d
@@ -30,7 +29,7 @@ namespace k3d
 namespace detail
 {
 
-void store_selection(const boost::shared_ptr<const mesh::selection_t>& MeshSelection, mesh_selection::records_t& Records)
+void store_selection(const pipeline_data<mesh::selection_t>& MeshSelection, mesh_selection::records_t& Records)
 {
 	if(!MeshSelection)
 		return;
@@ -59,63 +58,64 @@ void merge_selection(const mesh_selection::records_t& Records, mesh::selection_t
 }
 
 template<typename gprims_type>
-void merge_selection(const mesh_selection::records_t& Records, const gprims_type& GPrims, boost::shared_ptr<const mesh::selection_t>& Selection)
+void merge_selection(const mesh_selection::records_t& Records, const gprims_type& GPrims, pipeline_data<mesh::selection_t>& Selection)
 {
 	return_if_fail(GPrims);
 
 	const uint_t gprim_count = GPrims->size();
 
 	if(!Selection || Selection->size() != gprim_count)
-		Selection.reset(new mesh::selection_t(gprim_count));
+		Selection.create(new mesh::selection_t(gprim_count));
 
-	mesh::selection_t& selection = *make_unique(Selection);
+	mesh::selection_t& selection = Selection.writable();
 
 	detail::merge_selection(Records, selection);
 }
 
 template<typename gprims_type>
-void clear_selection(const gprims_type& GPrims, boost::shared_ptr<const mesh::selection_t>& Selection)
+void clear_selection(const gprims_type& GPrims, pipeline_data<mesh::selection_t>& Selection)
 {
 	return_if_fail(GPrims);
 
 	const uint_t gprim_count = GPrims->size();
 
-	Selection.reset(new mesh::selection_t(gprim_count, 0.0));
+	Selection.create(new mesh::selection_t(gprim_count, 0.0));
 }
 
 } // namespace detail
 
 const mesh create_grid(const uint_t Rows, const uint_t Columns, imaterial* const Material)
 {
-	return_val_if_fail(Rows, mesh());
-	return_val_if_fail(Columns, mesh());
-
 	mesh result;
+
+	return_val_if_fail(Rows, result);
+	return_val_if_fail(Columns, result);
 
 	const unsigned long rows = Rows;
 	const unsigned long columns = Columns;
 	const unsigned long point_rows = rows + 1;
 	const unsigned long point_columns = columns + 1;
 
-	boost::shared_ptr<mesh::polyhedra_t> polyhedra(new mesh::polyhedra_t());
-	boost::shared_ptr<mesh::indices_t> first_faces(new mesh::indices_t(1, 0));
-	boost::shared_ptr<mesh::counts_t> face_counts(new mesh::counts_t(1, rows * columns));
-	boost::shared_ptr<mesh::polyhedra_t::types_t> types(new mesh::polyhedra_t::types_t(1, mesh::polyhedra_t::POLYGONS));
-	boost::shared_ptr<mesh::indices_t> face_first_loops(new mesh::indices_t(rows * columns));
-	boost::shared_ptr<mesh::counts_t> face_loop_counts(new mesh::counts_t(rows * columns, 1));
-	boost::shared_ptr<mesh::selection_t> face_selection(new mesh::selection_t(rows * columns, 0.0));
-	boost::shared_ptr<mesh::materials_t> face_materials(new mesh::materials_t(rows * columns, Material));
-	boost::shared_ptr<mesh::indices_t> loop_first_edges(new mesh::indices_t(rows * columns));
-	boost::shared_ptr<mesh::indices_t> edge_points(new mesh::indices_t(4 * rows * columns));
-	boost::shared_ptr<mesh::indices_t> clockwise_edges(new mesh::indices_t(4 * rows * columns));
-	boost::shared_ptr<mesh::selection_t> edge_selection(new mesh::selection_t(4 * rows * columns, 0.0));
-	boost::shared_ptr<mesh::points_t> points(new mesh::points_t(point_rows * point_columns));
-	boost::shared_ptr<mesh::selection_t> point_selection(new mesh::selection_t(point_rows * point_columns, 0.0));
+	mesh::polyhedra_t& polyhedra = result.polyhedra.create(new mesh::polyhedra_t());
+	mesh::indices_t& first_faces = polyhedra.first_faces.create(new mesh::indices_t(1, 0));
+	mesh::counts_t& face_counts = polyhedra.face_counts.create(new mesh::counts_t(1, rows * columns));
+	mesh::polyhedra_t::types_t types = polyhedra.types.create(new mesh::polyhedra_t::types_t(1, mesh::polyhedra_t::POLYGONS));
+	mesh::indices_t& face_first_loops = polyhedra.face_first_loops.create(new mesh::indices_t(rows * columns));
+	mesh::counts_t& face_loop_counts = polyhedra.face_loop_counts.create(new mesh::counts_t(rows * columns, 1));
+	mesh::selection_t& face_selection = polyhedra.face_selection.create(new mesh::selection_t(rows * columns, 0.0));
+	mesh::materials_t& face_materials = polyhedra.face_materials.create(new mesh::materials_t(rows * columns, Material));
+	mesh::indices_t& loop_first_edges = polyhedra.loop_first_edges.create(new mesh::indices_t(rows * columns));
+	mesh::indices_t& edge_points = polyhedra.edge_points.create(new mesh::indices_t(4 * rows * columns));
+	mesh::indices_t& clockwise_edges = polyhedra.clockwise_edges.create(new mesh::indices_t(4 * rows * columns));
+	mesh::selection_t& edge_selection = polyhedra.edge_selection.create(new mesh::selection_t(4 * rows * columns, 0.0));
 
-	mesh::indices_t::iterator face_first_loop = face_first_loops->begin();
-	mesh::indices_t::iterator loop_first_edge = loop_first_edges->begin();
-	mesh::indices_t::iterator edge_point = edge_points->begin();
-	mesh::indices_t::iterator clockwise_edge = clockwise_edges->begin();
+	mesh::points_t& points = result.points.create(new mesh::points_t(point_rows * point_columns));
+	mesh::selection_t& point_selection = result.point_selection.create(new mesh::selection_t(point_rows * point_columns, 0.0));
+
+	mesh::indices_t::iterator face_first_loop = face_first_loops.begin();
+	mesh::indices_t::iterator loop_first_edge = loop_first_edges.begin();
+	mesh::indices_t::iterator edge_point = edge_points.begin();
+	mesh::indices_t::iterator clockwise_edge = clockwise_edges.begin();
 
 	uint_t face_number = 0;
 
@@ -141,56 +141,41 @@ const mesh create_grid(const uint_t Rows, const uint_t Columns, imaterial* const
 		}
 	}
 
-	polyhedra->first_faces = first_faces;
-	polyhedra->face_counts = face_counts;
-	polyhedra->types = types;
-	polyhedra->face_first_loops = face_first_loops;
-	polyhedra->face_loop_counts = face_loop_counts;
-	polyhedra->face_selection = face_selection;
-	polyhedra->face_materials = face_materials;
-	polyhedra->loop_first_edges = loop_first_edges;
-	polyhedra->edge_points = edge_points;
-	polyhedra->clockwise_edges = clockwise_edges;
-	polyhedra->edge_selection = edge_selection;
-
-	result.polyhedra = polyhedra;
-	result.points = points;
-	result.point_selection = point_selection;
-
 	return result;
 }
 
 const mesh create_cylinder(const uint_t Rows, const uint_t Columns, imaterial* const Material)
 {
-	return_val_if_fail(Rows, mesh());
-	return_val_if_fail(Columns > 1, mesh());
-
 	mesh result;
+
+	return_val_if_fail(Rows, result);
+	return_val_if_fail(Columns > 1, result);
 
 	const unsigned long rows = Rows;
 	const unsigned long columns = Columns;
 	const unsigned long point_rows = rows + 1;
 	const unsigned long point_columns = columns;
 
-	boost::shared_ptr<mesh::polyhedra_t> polyhedra(new mesh::polyhedra_t());
-	boost::shared_ptr<mesh::indices_t> first_faces(new mesh::indices_t(1, 0));
-	boost::shared_ptr<mesh::counts_t> face_counts(new mesh::counts_t(1, rows * columns));
-	boost::shared_ptr<mesh::polyhedra_t::types_t> types(new mesh::polyhedra_t::types_t(1, mesh::polyhedra_t::POLYGONS));
-	boost::shared_ptr<mesh::indices_t> face_first_loops(new mesh::indices_t(rows * columns));
-	boost::shared_ptr<mesh::counts_t> face_loop_counts(new mesh::counts_t(rows * columns, 1));
-	boost::shared_ptr<mesh::selection_t> face_selection(new mesh::selection_t(rows * columns, 0.0));
-	boost::shared_ptr<mesh::materials_t> face_materials(new mesh::materials_t(rows * columns, Material));
-	boost::shared_ptr<mesh::indices_t> loop_first_edges(new mesh::indices_t(rows * columns));
-	boost::shared_ptr<mesh::indices_t> edge_points(new mesh::indices_t(4 * rows * columns));
-	boost::shared_ptr<mesh::indices_t> clockwise_edges(new mesh::indices_t(4 * rows * columns));
-	boost::shared_ptr<mesh::selection_t> edge_selection(new mesh::selection_t(4 * rows * columns, 0.0));
-	boost::shared_ptr<mesh::points_t> points(new mesh::points_t(point_rows * point_columns));
-	boost::shared_ptr<mesh::selection_t> point_selection(new mesh::selection_t(point_rows * point_columns, 0.0));
+	mesh::polyhedra_t& polyhedra = result.polyhedra.create(new mesh::polyhedra_t());
+	mesh::indices_t& first_faces = polyhedra.first_faces.create(new mesh::indices_t(1, 0));
+	mesh::counts_t& face_counts = polyhedra.face_counts.create(new mesh::counts_t(1, rows * columns));
+	mesh::polyhedra_t::types_t& types = polyhedra.types.create(new mesh::polyhedra_t::types_t(1, mesh::polyhedra_t::POLYGONS));
+	mesh::indices_t& face_first_loops = polyhedra.face_first_loops.create(new mesh::indices_t(rows * columns));
+	mesh::counts_t& face_loop_counts = polyhedra.face_loop_counts.create(new mesh::counts_t(rows * columns, 1));
+	mesh::selection_t& face_selection = polyhedra.face_selection.create(new mesh::selection_t(rows * columns, 0.0));
+	mesh::materials_t& face_materials = polyhedra.face_materials.create(new mesh::materials_t(rows * columns, Material));
+	mesh::indices_t& loop_first_edges = polyhedra.loop_first_edges.create(new mesh::indices_t(rows * columns));
+	mesh::indices_t& edge_points = polyhedra.edge_points.create(new mesh::indices_t(4 * rows * columns));
+	mesh::indices_t& clockwise_edges = polyhedra.clockwise_edges.create(new mesh::indices_t(4 * rows * columns));
+	mesh::selection_t& edge_selection = polyhedra.edge_selection.create(new mesh::selection_t(4 * rows * columns, 0.0));
+	
+	mesh::points_t& points = result.points.create(new mesh::points_t(point_rows * point_columns));
+	mesh::selection_t& point_selection = result.point_selection.create(new mesh::selection_t(point_rows * point_columns, 0.0));
 
-	mesh::indices_t::iterator face_first_loop = face_first_loops->begin();
-	mesh::indices_t::iterator loop_first_edge = loop_first_edges->begin();
-	mesh::indices_t::iterator edge_point = edge_points->begin();
-	mesh::indices_t::iterator clockwise_edge = clockwise_edges->begin();
+	mesh::indices_t::iterator face_first_loop = face_first_loops.begin();
+	mesh::indices_t::iterator loop_first_edge = loop_first_edges.begin();
+	mesh::indices_t::iterator edge_point = edge_points.begin();
+	mesh::indices_t::iterator clockwise_edge = clockwise_edges.begin();
 
 	uint_t face_number = 0;
 
@@ -215,23 +200,7 @@ const mesh create_cylinder(const uint_t Rows, const uint_t Columns, imaterial* c
 			++face_number;
 		}
 	}
-
-	polyhedra->first_faces = first_faces;
-	polyhedra->face_counts = face_counts;
-	polyhedra->types = types;
-	polyhedra->face_first_loops = face_first_loops;
-	polyhedra->face_loop_counts = face_loop_counts;
-	polyhedra->face_selection = face_selection;
-	polyhedra->face_materials = face_materials;
-	polyhedra->loop_first_edges = loop_first_edges;
-	polyhedra->edge_points = edge_points;
-	polyhedra->clockwise_edges = clockwise_edges;
-	polyhedra->edge_selection = edge_selection;
-
-	result.polyhedra = polyhedra;
-	result.points = points;
-	result.point_selection = point_selection;
-
+	
 	return result;
 }
 
@@ -371,50 +340,50 @@ void merge_selection(const mesh_selection& MeshSelection, mesh& Mesh)
 
 	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
 	{
-		k3d::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
-		detail::merge_selection(MeshSelection.edges, polyhedra->edge_points, polyhedra->edge_selection);
+		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
+		detail::merge_selection(MeshSelection.edges, polyhedra.edge_points, polyhedra.edge_selection);
 	}
 
 	if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops)
 	{
-		k3d::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
-		detail::merge_selection(MeshSelection.faces, polyhedra->face_first_loops, polyhedra->face_selection);
+		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
+		detail::merge_selection(MeshSelection.faces, polyhedra.face_first_loops, polyhedra.face_selection);
 	}
 
 	if(Mesh.linear_curve_groups)
 	{
-		k3d::mesh::linear_curve_groups_t* const linear_curve_groups = make_unique(Mesh.linear_curve_groups);
-		detail::merge_selection(MeshSelection.linear_curves, linear_curve_groups->curve_first_points, linear_curve_groups->curve_selection);
+		k3d::mesh::linear_curve_groups_t& linear_curve_groups = Mesh.linear_curve_groups.writable();
+		detail::merge_selection(MeshSelection.linear_curves, linear_curve_groups.curve_first_points, linear_curve_groups.curve_selection);
 	}
 
 	if(Mesh.cubic_curve_groups)
 	{
-		k3d::mesh::cubic_curve_groups_t* const cubic_curve_groups = make_unique(Mesh.cubic_curve_groups);
-		detail::merge_selection(MeshSelection.cubic_curves, cubic_curve_groups->curve_first_points, cubic_curve_groups->curve_selection);
+		k3d::mesh::cubic_curve_groups_t& cubic_curve_groups = Mesh.cubic_curve_groups.writable();
+		detail::merge_selection(MeshSelection.cubic_curves, cubic_curve_groups.curve_first_points, cubic_curve_groups.curve_selection);
 	}
 
 	if(Mesh.nurbs_curve_groups)
 	{
-		k3d::mesh::nurbs_curve_groups_t* const nurbs_curve_groups = make_unique(Mesh.nurbs_curve_groups);
-		detail::merge_selection(MeshSelection.nurbs_curves, nurbs_curve_groups->curve_first_points, nurbs_curve_groups->curve_selection);
+		k3d::mesh::nurbs_curve_groups_t& nurbs_curve_groups = Mesh.nurbs_curve_groups.writable();
+		detail::merge_selection(MeshSelection.nurbs_curves, nurbs_curve_groups.curve_first_points, nurbs_curve_groups.curve_selection);
 	}
 
 	if(Mesh.bilinear_patches)
 	{
-		k3d::mesh::bilinear_patches_t* const bilinear_patches = make_unique(Mesh.bilinear_patches);
-		detail::merge_selection(MeshSelection.bilinear_patches, bilinear_patches->patch_materials, bilinear_patches->patch_selection);
+		k3d::mesh::bilinear_patches_t& bilinear_patches = Mesh.bilinear_patches.writable();
+		detail::merge_selection(MeshSelection.bilinear_patches, bilinear_patches.patch_materials, bilinear_patches.patch_selection);
 	}
 
 	if(Mesh.bicubic_patches)
 	{
-		k3d::mesh::bicubic_patches_t* const bicubic_patches = make_unique(Mesh.bicubic_patches);
-		detail::merge_selection(MeshSelection.bicubic_patches, bicubic_patches->patch_materials, bicubic_patches->patch_selection);
+		k3d::mesh::bicubic_patches_t& bicubic_patches = Mesh.bicubic_patches.writable();
+		detail::merge_selection(MeshSelection.bicubic_patches, bicubic_patches.patch_materials, bicubic_patches.patch_selection);
 	}
 
 	if(Mesh.nurbs_patches)
 	{
-		k3d::mesh::nurbs_patches_t* const nurbs_patches = make_unique(Mesh.nurbs_patches);
-		detail::merge_selection(MeshSelection.nurbs_patches, nurbs_patches->patch_materials, nurbs_patches->patch_selection);
+		k3d::mesh::nurbs_patches_t& nurbs_patches = Mesh.nurbs_patches.writable();
+		detail::merge_selection(MeshSelection.nurbs_patches, nurbs_patches.patch_materials, nurbs_patches.patch_selection);
 	}
 }
 
@@ -429,50 +398,50 @@ void clear_component_selection(mesh& Mesh)
 
 	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
 	{
-		k3d::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
-		detail::clear_selection(polyhedra->edge_points, polyhedra->edge_selection);
+		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
+		detail::clear_selection(polyhedra.edge_points, polyhedra.edge_selection);
 	}
 
 	if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops)
 	{
-		k3d::mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
-		detail::clear_selection(polyhedra->face_first_loops, polyhedra->face_selection);
+		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
+		detail::clear_selection(polyhedra.face_first_loops, polyhedra.face_selection);
 	}
 
 	if(Mesh.linear_curve_groups)
 	{
-		k3d::mesh::linear_curve_groups_t* const linear_curve_groups = make_unique(Mesh.linear_curve_groups);
-		detail::clear_selection(linear_curve_groups->curve_first_points, linear_curve_groups->curve_selection);
+		k3d::mesh::linear_curve_groups_t& linear_curve_groups = Mesh.linear_curve_groups.writable();
+		detail::clear_selection(linear_curve_groups.curve_first_points, linear_curve_groups.curve_selection);
 	}
 
 	if(Mesh.cubic_curve_groups)
 	{
-		k3d::mesh::cubic_curve_groups_t* const cubic_curve_groups = make_unique(Mesh.cubic_curve_groups);
-		detail::clear_selection(cubic_curve_groups->curve_first_points, cubic_curve_groups->curve_selection);
+		k3d::mesh::cubic_curve_groups_t& cubic_curve_groups = Mesh.cubic_curve_groups.writable();
+		detail::clear_selection(cubic_curve_groups.curve_first_points, cubic_curve_groups.curve_selection);
 	}
 
 	if(Mesh.nurbs_curve_groups)
 	{
-		k3d::mesh::nurbs_curve_groups_t* const nurbs_curve_groups = make_unique(Mesh.nurbs_curve_groups);
-		detail::clear_selection(nurbs_curve_groups->curve_first_points, nurbs_curve_groups->curve_selection);
+		k3d::mesh::nurbs_curve_groups_t& nurbs_curve_groups = Mesh.nurbs_curve_groups.writable();
+		detail::clear_selection(nurbs_curve_groups.curve_first_points, nurbs_curve_groups.curve_selection);
 	}
 
 	if(Mesh.bilinear_patches)
 	{
-		k3d::mesh::bilinear_patches_t* const bilinear_patches = make_unique(Mesh.bilinear_patches);
-		detail::clear_selection(bilinear_patches->patch_materials, bilinear_patches->patch_selection);
+		k3d::mesh::bilinear_patches_t& bilinear_patches = Mesh.bilinear_patches.writable();
+		detail::clear_selection(bilinear_patches.patch_materials, bilinear_patches.patch_selection);
 	}
 
 	if(Mesh.bicubic_patches)
 	{
-		k3d::mesh::bicubic_patches_t* const bicubic_patches = make_unique(Mesh.bicubic_patches);
-		detail::clear_selection(bicubic_patches->patch_materials, bicubic_patches->patch_selection);
+		k3d::mesh::bicubic_patches_t& bicubic_patches = Mesh.bicubic_patches.writable();
+		detail::clear_selection(bicubic_patches.patch_materials, bicubic_patches.patch_selection);
 	}
 
 	if(Mesh.nurbs_patches)
 	{
-		k3d::mesh::nurbs_patches_t* const nurbs_patches = make_unique(Mesh.nurbs_patches);
-		detail::clear_selection(nurbs_patches->patch_materials, nurbs_patches->patch_selection);
+		k3d::mesh::nurbs_patches_t& nurbs_patches = Mesh.nurbs_patches.writable();
+		detail::clear_selection(nurbs_patches.patch_materials, nurbs_patches.patch_selection);
 	}
 }
 

@@ -21,9 +21,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "almost_equal.h"
+#include "pipeline_data.h"
 #include "types.h"
 
-#include <boost/shared_ptr.hpp>
 #include <map>
 #include <vector>
 
@@ -36,7 +36,7 @@ class array;
 /// array in the collection must remain equal at all times.
 /// For a concrete list of the datatypes that can be stored using attribute_arrays, see k3d::named_array_types.
 class attribute_arrays :
-	public std::map<string_t, boost::shared_ptr<array> >
+	public std::map<string_t, pipeline_data<array> >
 {
 public:
 	/// Creates a new array with given name and type, inserting it into the collection and returning a reference to the result.
@@ -44,9 +44,17 @@ public:
 	template<typename ArrayT>
 	ArrayT& create(const string_t& Name)
 	{
-		ArrayT* result = new ArrayT();
-		(*this)[Name].reset(result);
-		return *result;
+		ArrayT* const array = new ArrayT();
+		(*this)[Name].create(array);
+		return *array;
+	}
+	/// Inserts a new array into the collection with the given name, returning a reference to the result.
+	/** \note: An existing array with the same name will be replaced by the new array. */
+	template<typename ArrayT>
+	ArrayT& create(const string_t& Name, ArrayT* Array)
+	{
+		(*this)[Name].create(Array);
+		return *Array;
 	}
 	/// Returns an existing array with the given name, or NULL if no matching array exists.
 	const array* lookup(const string_t& Name) const;
@@ -55,6 +63,14 @@ public:
 	const ArrayT* lookup(const string_t& Name) const
 	{
 		return dynamic_cast<const ArrayT*>(lookup(Name));
+	}
+	/// Returns an existing array with the given name, or NULL if no matching array exists.
+	array* writable(const string_t& Name);
+	/// Returns an existing array with the given name and type, or NULL if no matching array exists.
+	template<typename ArrayT>
+	ArrayT* writable(const string_t& Name)
+	{
+		return dynamic_cast<ArrayT*>(writable(Name));
 	}
 	/// Returns an object containing empty arrays with the same name and type as the originals.
 	attribute_arrays clone_types() const;

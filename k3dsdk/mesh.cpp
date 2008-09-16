@@ -22,7 +22,6 @@
 #include "iomanip.h"
 #include "legacy_mesh.h"
 #include "mesh.h"
-#include "shared_pointer.h"
 #include "type_registry.h"
 
 #include <boost/mpl/for_each.hpp>
@@ -209,7 +208,7 @@ void print(std::ostream& Stream, const string_t& Label, const mesh::named_attrib
 
 /// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
 template<typename T>
-const bool_t almost_equal(const boost::shared_ptr<const typed_array<T> >& A, const boost::shared_ptr<const typed_array<T> >& B, const uint64_t Threshold)
+const bool_t almost_equal(const pipeline_data<typed_array<T> >& A, const pipeline_data<typed_array<T> >& B, const uint64_t Threshold)
 {
 	if(A.get() == B.get())
 		return true;
@@ -224,7 +223,7 @@ const bool_t almost_equal(const boost::shared_ptr<const typed_array<T> >& A, con
 // almost_equal
 
 /// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
-const bool_t almost_equal(const boost::shared_ptr<const uint_t_array>& A, const boost::shared_ptr<const uint_t_array>& B, const uint64_t Threshold)
+const bool_t almost_equal(const pipeline_data<uint_t_array>& A, const pipeline_data<uint_t_array>& B, const uint64_t Threshold)
 {
 	if(A.get() == B.get())
 		return true;
@@ -240,7 +239,7 @@ const bool_t almost_equal(const boost::shared_ptr<const uint_t_array>& A, const 
 
 /// Return true iff two shared objects are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
 template<typename T>
-const bool_t almost_equal(const boost::shared_ptr<const T>& A, const boost::shared_ptr<const T>& B, const uint64_t Threshold)
+const bool_t almost_equal(const pipeline_data<T>& A, const pipeline_data<T>& B, const uint64_t Threshold)
 {
 	if(A.get() == B.get())
 		return true;
@@ -637,307 +636,237 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 	std::map<legacy::point*, uint_t> point_map;
 
 	const uint_t point_size = RHS.points.size();
-	boost::shared_ptr<points_t> points(new points_t(point_size));
-	boost::shared_ptr<selection_t> point_selection(new selection_t(point_size));
+	points_t& points = this->points.create(new points_t(point_size));
+	selection_t& point_selection = this->point_selection.create(new selection_t(point_size));
 
 	for(uint_t i = 0; i != point_size; ++i)
 	{
-		(*points)[i] = RHS.points[i]->position;
-		(*point_selection)[i] = RHS.points[i]->selection_weight;
+		points[i] = RHS.points[i]->position;
+		point_selection[i] = RHS.points[i]->selection_weight;
 		point_map[RHS.points[i]] = i;
 	}
-
-	this->points = points;
-	this->point_selection = point_selection;
 
 	// Convert point groups ...
 	if(RHS.point_groups.size())
 	{
-		boost::shared_ptr<point_groups_t> point_groups(new point_groups_t());
-		boost::shared_ptr<indices_t> first_points(new indices_t());
-		boost::shared_ptr<counts_t> point_counts(new counts_t());
-		boost::shared_ptr<materials_t> materials(new materials_t());
-		boost::shared_ptr<indices_t> points(new indices_t());
+		point_groups_t& point_groups = this->point_groups.create();
+		indices_t& first_points = point_groups.first_points.create();
+		counts_t& point_counts = point_groups.point_counts.create();
+		materials_t& materials = point_groups.materials.create();
+		indices_t& points = point_groups.points.create();
 
 		for(legacy::mesh::point_groups_t::const_iterator group = RHS.point_groups.begin(); group != RHS.point_groups.end(); ++group)
 		{
-			first_points->push_back(points->size());
-			point_counts->push_back((*group)->points.size());
-			materials->push_back((*group)->material);
+			first_points.push_back(points.size());
+			point_counts.push_back((*group)->points.size());
+			materials.push_back((*group)->material);
 
 			for(legacy::point_group::points_t::const_iterator point = (*group)->points.begin(); point != (*group)->points.end(); ++point)
-				points->push_back(point_map[*point]);
+				points.push_back(point_map[*point]);
 		}
-
-		point_groups->first_points = first_points;
-		point_groups->point_counts = point_counts;
-		point_groups->materials = materials;
-		point_groups->points = points;
-
-		this->point_groups = point_groups;
 	}
 
 	// Convert linear curves ...
 	if(RHS.linear_curve_groups.size())
 	{
-		boost::shared_ptr<linear_curve_groups_t> linear_curve_groups(new linear_curve_groups_t());
-		boost::shared_ptr<indices_t> first_curves(new indices_t());
-		boost::shared_ptr<counts_t> curve_counts(new counts_t());
-		boost::shared_ptr<bools_t> periodic_curves(new bools_t());
-		boost::shared_ptr<materials_t> materials(new materials_t());
-		boost::shared_ptr<indices_t> curve_first_points(new indices_t());
-		boost::shared_ptr<counts_t> curve_point_counts(new counts_t());
-		boost::shared_ptr<selection_t> curve_selection(new selection_t());
-		boost::shared_ptr<indices_t> curve_points(new indices_t());
+		linear_curve_groups_t& linear_curve_groups = this->linear_curve_groups.create();
+		indices_t& first_curves = linear_curve_groups.first_curves.create();
+		counts_t& curve_counts = linear_curve_groups.curve_counts.create();
+		bools_t& periodic_curves = linear_curve_groups.periodic_curves.create();
+		materials_t& materials = linear_curve_groups.materials.create();
+		indices_t& curve_first_points = linear_curve_groups.curve_first_points.create();
+		counts_t& curve_point_counts = linear_curve_groups.curve_point_counts.create();
+		selection_t& curve_selection = linear_curve_groups.curve_selection.create();
+		indices_t& curve_points = linear_curve_groups.curve_points.create();
 
 		for(legacy::mesh::linear_curve_groups_t::const_iterator group = RHS.linear_curve_groups.begin(); group != RHS.linear_curve_groups.end(); ++group)
 		{
-			first_curves->push_back(curve_first_points->size());
-			curve_counts->push_back((*group)->curves.size());
-			periodic_curves->push_back((*group)->wrap);
-			materials->push_back((*group)->material);
+			first_curves.push_back(curve_first_points.size());
+			curve_counts.push_back((*group)->curves.size());
+			periodic_curves.push_back((*group)->wrap);
+			materials.push_back((*group)->material);
 
 			for(legacy::linear_curve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
 			{
-				curve_first_points->push_back(curve_points->size());
-				curve_point_counts->push_back((*curve)->control_points.size());
-				curve_selection->push_back((*curve)->selection_weight);
+				curve_first_points.push_back(curve_points.size());
+				curve_point_counts.push_back((*curve)->control_points.size());
+				curve_selection.push_back((*curve)->selection_weight);
 
 				for(legacy::linear_curve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
-					curve_points->push_back(point_map[*point]);
+					curve_points.push_back(point_map[*point]);
 			}
 		}
-
-		linear_curve_groups->first_curves = first_curves;
-		linear_curve_groups->curve_counts = curve_counts;
-		linear_curve_groups->periodic_curves = periodic_curves;
-		linear_curve_groups->materials = materials;
-		linear_curve_groups->curve_first_points = curve_first_points;
-		linear_curve_groups->curve_point_counts = curve_point_counts;
-		linear_curve_groups->curve_selection = curve_selection;
-		linear_curve_groups->curve_points = curve_points;
-
-		this->linear_curve_groups = linear_curve_groups;
 	}
 
 	// Convert cubic curves ...
 	if(RHS.cubic_curve_groups.size())
 	{
-		boost::shared_ptr<cubic_curve_groups_t> cubic_curve_groups(new cubic_curve_groups_t());
-		boost::shared_ptr<indices_t> first_curves(new indices_t());
-		boost::shared_ptr<counts_t> curve_counts(new counts_t());
-		boost::shared_ptr<bools_t> periodic_curves(new bools_t());
-		boost::shared_ptr<materials_t> materials(new materials_t());
-		boost::shared_ptr<indices_t> curve_first_points(new indices_t());
-		boost::shared_ptr<counts_t> curve_point_counts(new counts_t());
-		boost::shared_ptr<selection_t> curve_selection(new selection_t());
-		boost::shared_ptr<indices_t> curve_points(new indices_t());
+		cubic_curve_groups_t& cubic_curve_groups = this->cubic_curve_groups.create();
+		indices_t& first_curves = cubic_curve_groups.first_curves.create();
+		counts_t& curve_counts = cubic_curve_groups.curve_counts.create();
+		bools_t& periodic_curves = cubic_curve_groups.periodic_curves.create();
+		materials_t& materials = cubic_curve_groups.materials.create();
+		indices_t& curve_first_points = cubic_curve_groups.curve_first_points.create();
+		counts_t& curve_point_counts = cubic_curve_groups.curve_point_counts.create();
+		selection_t& curve_selection = cubic_curve_groups.curve_selection.create();
+		indices_t& curve_points = cubic_curve_groups.curve_points.create();
 
 		for(legacy::mesh::cubic_curve_groups_t::const_iterator group = RHS.cubic_curve_groups.begin(); group != RHS.cubic_curve_groups.end(); ++group)
 		{
-			first_curves->push_back(curve_first_points->size());
-			curve_counts->push_back((*group)->curves.size());
-			periodic_curves->push_back((*group)->wrap);
-			materials->push_back((*group)->material);
+			first_curves.push_back(curve_first_points.size());
+			curve_counts.push_back((*group)->curves.size());
+			periodic_curves.push_back((*group)->wrap);
+			materials.push_back((*group)->material);
 
 			for(legacy::cubic_curve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
 			{
-				curve_first_points->push_back(curve_points->size());
-				curve_point_counts->push_back((*curve)->control_points.size());
-				curve_selection->push_back((*curve)->selection_weight);
+				curve_first_points.push_back(curve_points.size());
+				curve_point_counts.push_back((*curve)->control_points.size());
+				curve_selection.push_back((*curve)->selection_weight);
 
 				for(legacy::cubic_curve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
-					curve_points->push_back(point_map[*point]);
+					curve_points.push_back(point_map[*point]);
 			}
 		}
-
-		cubic_curve_groups->first_curves = first_curves;
-		cubic_curve_groups->curve_counts = curve_counts;
-		cubic_curve_groups->periodic_curves = periodic_curves;
-		cubic_curve_groups->materials = materials;
-		cubic_curve_groups->curve_first_points = curve_first_points;
-		cubic_curve_groups->curve_point_counts = curve_point_counts;
-		cubic_curve_groups->curve_selection = curve_selection;
-		cubic_curve_groups->curve_points = curve_points;
-
-		this->cubic_curve_groups = cubic_curve_groups;
 	}
 
 	// Convert NURBS curves ...
 	if(RHS.nucurve_groups.size())
 	{
-		boost::shared_ptr<nurbs_curve_groups_t> nurbs_curve_groups(new nurbs_curve_groups_t());
-		boost::shared_ptr<indices_t> first_curves(new indices_t());
-		boost::shared_ptr<counts_t> curve_counts(new counts_t());
-		boost::shared_ptr<materials_t> materials(new materials_t());
-		boost::shared_ptr<indices_t> curve_first_points(new indices_t());
-		boost::shared_ptr<counts_t> curve_point_counts(new counts_t());
-		boost::shared_ptr<orders_t> curve_orders(new orders_t());
-		boost::shared_ptr<indices_t> curve_first_knots(new indices_t());
-		boost::shared_ptr<selection_t> curve_selection(new selection_t());
-		boost::shared_ptr<indices_t> curve_points(new indices_t());
-		boost::shared_ptr<weights_t> curve_point_weights(new weights_t());
-		boost::shared_ptr<knots_t> curve_knots(new knots_t());
+		nurbs_curve_groups_t& nurbs_curve_groups = this->nurbs_curve_groups.create();
+		indices_t& first_curves = nurbs_curve_groups.first_curves.create();
+		counts_t& curve_counts = nurbs_curve_groups.curve_counts.create();
+		materials_t& materials = nurbs_curve_groups.materials.create();
+		indices_t& curve_first_points = nurbs_curve_groups.curve_first_points.create();
+		counts_t& curve_point_counts = nurbs_curve_groups.curve_point_counts.create();
+		orders_t& curve_orders = nurbs_curve_groups.curve_orders.create();
+		indices_t& curve_first_knots = nurbs_curve_groups.curve_first_knots.create();
+		selection_t& curve_selection = nurbs_curve_groups.curve_selection.create();
+		indices_t& curve_points = nurbs_curve_groups.curve_points.create();
+		weights_t& curve_point_weights = nurbs_curve_groups.curve_point_weights.create();
+		knots_t& curve_knots = nurbs_curve_groups.curve_knots.create();
 
 		for(legacy::mesh::nucurve_groups_t::const_iterator group = RHS.nucurve_groups.begin(); group != RHS.nucurve_groups.end(); ++group)
 		{
-			first_curves->push_back(curve_first_points->size());
-			curve_counts->push_back((*group)->curves.size());
-			materials->push_back((*group)->material);
+			first_curves.push_back(curve_first_points.size());
+			curve_counts.push_back((*group)->curves.size());
+			materials.push_back((*group)->material);
 
 			for(legacy::nucurve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
 			{
-				curve_first_points->push_back(curve_points->size());
-				curve_point_counts->push_back((*curve)->knots.size() - (*curve)->order);
-				curve_orders->push_back((*curve)->order);
-				curve_first_knots->push_back(curve_knots->size());
-				curve_selection->push_back((*curve)->selection_weight);
+				curve_first_points.push_back(curve_points.size());
+				curve_point_counts.push_back((*curve)->knots.size() - (*curve)->order);
+				curve_orders.push_back((*curve)->order);
+				curve_first_knots.push_back(curve_knots.size());
+				curve_selection.push_back((*curve)->selection_weight);
 
 				for(legacy::nucurve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
 				{
-					curve_points->push_back(point_map[point->position]);
-					curve_point_weights->push_back(point->weight);
+					curve_points.push_back(point_map[point->position]);
+					curve_point_weights.push_back(point->weight);
 				}
 
-				curve_knots->insert(curve_knots->end(), (*curve)->knots.begin(), (*curve)->knots.end());
+				curve_knots.insert(curve_knots.end(), (*curve)->knots.begin(), (*curve)->knots.end());
 			}
 		}
-
-		nurbs_curve_groups->first_curves = first_curves;
-		nurbs_curve_groups->curve_counts = curve_counts;
-		nurbs_curve_groups->materials = materials;
-		nurbs_curve_groups->curve_first_points = curve_first_points;
-		nurbs_curve_groups->curve_point_counts = curve_point_counts;
-		nurbs_curve_groups->curve_orders = curve_orders;
-		nurbs_curve_groups->curve_first_knots = curve_first_knots;
-		nurbs_curve_groups->curve_selection = curve_selection;
-		nurbs_curve_groups->curve_points = curve_points;
-		nurbs_curve_groups->curve_point_weights = curve_point_weights;
-		nurbs_curve_groups->curve_knots = curve_knots;
-		this->nurbs_curve_groups = nurbs_curve_groups;
 	}
 
 	// Convert bilinear patches ...
 	if(RHS.bilinear_patches.size())
 	{
-		boost::shared_ptr<bilinear_patches_t> bilinear_patches(new bilinear_patches_t());
-		boost::shared_ptr<selection_t> patch_selection(new selection_t());
-		boost::shared_ptr<materials_t> patch_materials(new materials_t());
-		boost::shared_ptr<indices_t> patch_points(new indices_t());
+		bilinear_patches_t& bilinear_patches = this->bilinear_patches.create();
+		selection_t& patch_selection = bilinear_patches.patch_selection.create();
+		materials_t& patch_materials = bilinear_patches.patch_materials.create();
+		indices_t& patch_points = bilinear_patches.patch_points.create();
 
 		for(legacy::mesh::bilinear_patches_t::const_iterator patch = RHS.bilinear_patches.begin(); patch != RHS.bilinear_patches.end(); ++patch)
 		{
-			patch_selection->push_back((*patch)->selection_weight);
-			patch_materials->push_back((*patch)->material);
+			patch_selection.push_back((*patch)->selection_weight);
+			patch_materials.push_back((*patch)->material);
 
 			for(legacy::bilinear_patch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
-				patch_points->push_back(point_map[*point]);
+				patch_points.push_back(point_map[*point]);
 		}
-
-		bilinear_patches->patch_selection = patch_selection;
-		bilinear_patches->patch_materials = patch_materials;
-		bilinear_patches->patch_points = patch_points;
-		this->bilinear_patches = bilinear_patches;
 	}
 
 	// Convert bicubic patches ...
 	if(RHS.bicubic_patches.size())
 	{
-		boost::shared_ptr<bicubic_patches_t> bicubic_patches(new bicubic_patches_t());
-		boost::shared_ptr<selection_t> patch_selection(new selection_t());
-		boost::shared_ptr<materials_t> patch_materials(new materials_t());
-		boost::shared_ptr<indices_t> patch_points(new indices_t());
+		bicubic_patches_t& bicubic_patches = this->bicubic_patches.create();
+		selection_t& patch_selection = bicubic_patches.patch_selection.create();
+		materials_t& patch_materials = bicubic_patches.patch_materials.create();
+		indices_t& patch_points = bicubic_patches.patch_points.create();
 
 		for(legacy::mesh::bicubic_patches_t::const_iterator patch = RHS.bicubic_patches.begin(); patch != RHS.bicubic_patches.end(); ++patch)
 		{
-			patch_selection->push_back((*patch)->selection_weight);
-			patch_materials->push_back((*patch)->material);
+			patch_selection.push_back((*patch)->selection_weight);
+			patch_materials.push_back((*patch)->material);
 
 			for(legacy::bicubic_patch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
-				patch_points->push_back(point_map[*point]);
+				patch_points.push_back(point_map[*point]);
 		}
-
-		bicubic_patches->patch_selection = patch_selection;
-		bicubic_patches->patch_materials = patch_materials;
-		bicubic_patches->patch_points = patch_points;
-		this->bicubic_patches = bicubic_patches;
 	}
 
 	// Convert NURBS patches ...
 	if(RHS.nupatches.size())
 	{
-		boost::shared_ptr<nurbs_patches_t> nurbs_patches(new nurbs_patches_t());
-		boost::shared_ptr<indices_t> patch_first_points(new indices_t());
-		boost::shared_ptr<counts_t> patch_u_point_counts(new counts_t());
-		boost::shared_ptr<counts_t> patch_v_point_counts(new counts_t());
-		boost::shared_ptr<orders_t> patch_u_orders(new orders_t());
-		boost::shared_ptr<orders_t> patch_v_orders(new orders_t());
-		boost::shared_ptr<indices_t> patch_u_first_knots(new indices_t());
-		boost::shared_ptr<indices_t> patch_v_first_knots(new indices_t());
-		boost::shared_ptr<selection_t> patch_selection(new selection_t());
-		boost::shared_ptr<materials_t> patch_materials(new materials_t());
-		boost::shared_ptr<indices_t> patch_points(new indices_t());
-		boost::shared_ptr<weights_t> patch_point_weights(new weights_t());
-		boost::shared_ptr<knots_t> patch_u_knots(new knots_t());
-		boost::shared_ptr<knots_t> patch_v_knots(new knots_t());
+		nurbs_patches_t& nurbs_patches = this->nurbs_patches.create();
+		indices_t& patch_first_points = nurbs_patches.patch_first_points.create();
+		counts_t& patch_u_point_counts = nurbs_patches.patch_u_point_counts.create();
+		counts_t& patch_v_point_counts = nurbs_patches.patch_v_point_counts.create();
+		orders_t& patch_u_orders = nurbs_patches.patch_u_orders.create();
+		orders_t& patch_v_orders = nurbs_patches.patch_v_orders.create();
+		indices_t& patch_u_first_knots = nurbs_patches.patch_u_first_knots.create();
+		indices_t& patch_v_first_knots = nurbs_patches.patch_v_first_knots.create();
+		selection_t& patch_selection = nurbs_patches.patch_selection.create();
+		materials_t& patch_materials = nurbs_patches.patch_materials.create();
+		indices_t& patch_points = nurbs_patches.patch_points.create();
+		weights_t& patch_point_weights = nurbs_patches.patch_point_weights.create();
+		knots_t& patch_u_knots = nurbs_patches.patch_u_knots.create();
+		knots_t& patch_v_knots = nurbs_patches.patch_v_knots.create();
 
 		for(legacy::mesh::nupatches_t::const_iterator patch = RHS.nupatches.begin(); patch != RHS.nupatches.end(); ++patch)
 		{
-			patch_first_points->push_back(patch_points->size());
-			patch_u_point_counts->push_back((*patch)->u_knots.size() - (*patch)->u_order);
-			patch_v_point_counts->push_back((*patch)->v_knots.size() - (*patch)->v_order);
-			patch_u_orders->push_back((*patch)->u_order);
-			patch_v_orders->push_back((*patch)->v_order);
-			patch_u_first_knots->push_back(patch_u_knots->size());
-			patch_v_first_knots->push_back(patch_v_knots->size());
-			patch_selection->push_back((*patch)->selection_weight);
-			patch_materials->push_back((*patch)->material);
+			patch_first_points.push_back(patch_points.size());
+			patch_u_point_counts.push_back((*patch)->u_knots.size() - (*patch)->u_order);
+			patch_v_point_counts.push_back((*patch)->v_knots.size() - (*patch)->v_order);
+			patch_u_orders.push_back((*patch)->u_order);
+			patch_v_orders.push_back((*patch)->v_order);
+			patch_u_first_knots.push_back(patch_u_knots.size());
+			patch_v_first_knots.push_back(patch_v_knots.size());
+			patch_selection.push_back((*patch)->selection_weight);
+			patch_materials.push_back((*patch)->material);
 
 			for(legacy::nupatch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
 			{
-				patch_points->push_back(point_map[point->position]);
-				patch_point_weights->push_back(point->weight);
+				patch_points.push_back(point_map[point->position]);
+				patch_point_weights.push_back(point->weight);
 			}
 
-			patch_u_knots->insert(patch_u_knots->end(), (*patch)->u_knots.begin(), (*patch)->u_knots.end());
-			patch_v_knots->insert(patch_v_knots->end(), (*patch)->v_knots.begin(), (*patch)->v_knots.end());
+			patch_u_knots.insert(patch_u_knots.end(), (*patch)->u_knots.begin(), (*patch)->u_knots.end());
+			patch_v_knots.insert(patch_v_knots.end(), (*patch)->v_knots.begin(), (*patch)->v_knots.end());
 		}
-
-		nurbs_patches->patch_first_points = patch_first_points;
-		nurbs_patches->patch_u_point_counts = patch_u_point_counts;
-		nurbs_patches->patch_v_point_counts = patch_v_point_counts;
-		nurbs_patches->patch_u_orders = patch_u_orders;
-		nurbs_patches->patch_v_orders = patch_v_orders;
-		nurbs_patches->patch_u_first_knots = patch_u_first_knots;
-		nurbs_patches->patch_v_first_knots = patch_v_first_knots;
-		nurbs_patches->patch_selection = patch_selection;
-		nurbs_patches->patch_materials = patch_materials;
-		nurbs_patches->patch_points = patch_points;
-		nurbs_patches->patch_point_weights = patch_point_weights;
-		nurbs_patches->patch_u_knots = patch_u_knots;
-		nurbs_patches->patch_v_knots = patch_v_knots;
-		this->nurbs_patches = nurbs_patches;
 	}
 
 	// Convert polyhedra ...
 	if(RHS.polyhedra.size())
 	{
-		boost::shared_ptr<polyhedra_t> polyhedra(new polyhedra_t());
-		boost::shared_ptr<indices_t> first_faces(new indices_t());
-		boost::shared_ptr<counts_t> face_counts(new counts_t());
-		boost::shared_ptr<polyhedra_t::types_t> types(new polyhedra_t::types_t());
-		boost::shared_ptr<indices_t> face_first_loops(new indices_t());
-		boost::shared_ptr<counts_t> face_loop_counts(new counts_t());
-		boost::shared_ptr<selection_t> face_selection(new selection_t());
-		boost::shared_ptr<materials_t> face_materials(new materials_t());
-		boost::shared_ptr<indices_t> loop_first_edges(new indices_t());
-		boost::shared_ptr<indices_t> edge_points(new indices_t());
-		boost::shared_ptr<indices_t> clockwise_edges(new indices_t());
-		boost::shared_ptr<selection_t> edge_selection(new selection_t());
+		polyhedra_t& polyhedra = this->polyhedra.create();
+		indices_t& first_faces = polyhedra.first_faces.create();
+		counts_t& face_counts = polyhedra.face_counts.create();
+		polyhedra_t::types_t& types = polyhedra.types.create();
+		indices_t& face_first_loops = polyhedra.face_first_loops.create();
+		counts_t& face_loop_counts = polyhedra.face_loop_counts.create();
+		selection_t& face_selection = polyhedra.face_selection.create();
+		materials_t& face_materials = polyhedra.face_materials.create();
+		indices_t& loop_first_edges = polyhedra.loop_first_edges.create();
+		indices_t& edge_points = polyhedra.edge_points.create();
+		indices_t& clockwise_edges = polyhedra.clockwise_edges.create();
+		selection_t& edge_selection = polyhedra.edge_selection.create();
 
 		for(legacy::mesh::polyhedra_t::const_iterator polyhedron = RHS.polyhedra.begin(); polyhedron != RHS.polyhedra.end(); ++polyhedron)
 		{
-			uint_t first_face = face_first_loops->size();
+			uint_t first_face = face_first_loops.size();
 			uint_t face_count = 0;
 			mesh::polyhedra_t::polyhedron_type type = (*polyhedron)->type == legacy::polyhedron::POLYGONS ? mesh::polyhedra_t::POLYGONS : mesh::polyhedra_t::CATMULL_CLARK;
 
@@ -945,73 +874,60 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 			{
 				++face_count;
 
-				uint_t face_first_loop = loop_first_edges->size();
+				uint_t face_first_loop = loop_first_edges.size();
 				uint_t face_loop_count = 1 + (*face)->holes.size();
 
-				const uint_t first_edge = edge_points->size();
+				const uint_t first_edge = edge_points.size();
 
-				loop_first_edges->push_back(first_edge);
+				loop_first_edges.push_back(first_edge);
 				for(legacy::split_edge* edge = (*face)->first_edge; edge; edge = edge->face_clockwise)
 				{
 					if(edge->vertex && edge->face_clockwise)
 					{
-						edge_points->push_back(point_map[edge->vertex]);
-						clockwise_edges->push_back(edge_points->size());
-						edge_selection->push_back(edge->selection_weight);
+						edge_points.push_back(point_map[edge->vertex]);
+						clockwise_edges.push_back(edge_points.size());
+						edge_selection.push_back(edge->selection_weight);
 					}
 
 					if(edge->face_clockwise == (*face)->first_edge)
 					{
-						clockwise_edges->back() = first_edge;
+						clockwise_edges.back() = first_edge;
 						break;
 					}
 				}
 
 				for(legacy::face::holes_t::iterator hole = (*face)->holes.begin(); hole != (*face)->holes.end(); ++hole)
 				{
-					const uint_t first_edge = edge_points->size();
+					const uint_t first_edge = edge_points.size();
 
-					loop_first_edges->push_back(first_edge);
+					loop_first_edges.push_back(first_edge);
 					for(legacy::split_edge* edge = *hole; edge; edge = edge->face_clockwise)
 					{
 						if(edge->vertex && edge->face_clockwise && edge->face_clockwise->vertex)
 						{
-							edge_points->push_back(point_map[edge->vertex]);
-							clockwise_edges->push_back(edge_points->size());
-							edge_selection->push_back(edge->selection_weight);
+							edge_points.push_back(point_map[edge->vertex]);
+							clockwise_edges.push_back(edge_points.size());
+							edge_selection.push_back(edge->selection_weight);
 						}
 
 						if(edge->face_clockwise == (*hole))
 						{
-							clockwise_edges->back() = first_edge;
+							clockwise_edges.back() = first_edge;
 							break;
 						}
 					}
 				}
 
-				face_first_loops->push_back(face_first_loop);
-				face_loop_counts->push_back(face_loop_count);
-				face_selection->push_back((*face)->selection_weight);
-				face_materials->push_back((*face)->material);
+				face_first_loops.push_back(face_first_loop);
+				face_loop_counts.push_back(face_loop_count);
+				face_selection.push_back((*face)->selection_weight);
+				face_materials.push_back((*face)->material);
 			}
 
-			first_faces->push_back(first_face);
-			face_counts->push_back(face_count);
-			types->push_back(type);
+			first_faces.push_back(first_face);
+			face_counts.push_back(face_count);
+			types.push_back(type);
 		}
-
-		polyhedra->edge_selection = edge_selection;
-		polyhedra->clockwise_edges = clockwise_edges;
-		polyhedra->edge_points = edge_points;
-		polyhedra->loop_first_edges = loop_first_edges;
-		polyhedra->face_materials = face_materials;
-		polyhedra->face_selection = face_selection;
-		polyhedra->face_loop_counts = face_loop_counts;
-		polyhedra->face_first_loops = face_first_loops;
-		polyhedra->types = types;
-		polyhedra->face_counts = face_counts;
-		polyhedra->first_faces = first_faces;
-		this->polyhedra = polyhedra;
 	}
 
 	// Convert blobbies ...
@@ -1044,9 +960,8 @@ const bool_t mesh::primitive::almost_equal(const primitive& Other, const uint64_
 
 mesh::primitive& mesh::primitives_t::create(const string_t& Type)
 {
-	mesh::primitive* const result = new mesh::primitive(Type);
-	push_back(boost::shared_ptr<mesh::primitive>(result));
-	return *result;
+	push_back(pipeline_data<mesh::primitive>());
+	return back().create(new mesh::primitive(Type));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

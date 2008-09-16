@@ -39,7 +39,10 @@ public:
 	const k3d::attribute_arrays* uniform_data;
 };
 
-/// Returns true iff the given mesh primitive contains a valid teapots primitive
+/// Creates a new teapots mesh primitive, initializing an object containing references to its member arrays.
+void create(mesh& Mesh, primitive& Primitive);
+
+/// Returns true iff the given mesh primitive contains a valid teapots primitive, initializing an object to reference to its member arrays.
 const bool_t validate(const mesh::primitive& GenericPrimitive, primitive& Primitive);
 
 } // namespace teapots

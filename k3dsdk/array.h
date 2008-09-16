@@ -2,7 +2,7 @@
 #define K3DSDK_ARRAY_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "almost_equal.h"
-#include "types.h"
+#include "pipeline_data.h"
 
 namespace k3d
 {
@@ -50,7 +50,7 @@ public:
 	virtual const bool_t almost_equal(const array& Other, const uint64_t Threshold) const = 0;
 };
 
-/// Specialization of almost_equal that tests array for equality
+/// Specialization of almost_equal that tests k3d::array for equality
 template<>
 class almost_equal<array>
 {
@@ -67,6 +67,17 @@ public:
 	}
 
 	const uint64_t threshold;
+};
+
+/// Specialization of pipeline_data_traits for use with k3d::array
+template<>
+class pipeline_data_traits<array>
+{
+public:
+	static array* clone(const array& Other)
+	{
+		return Other.clone();
+	}
 };
 
 } // namespace k3d

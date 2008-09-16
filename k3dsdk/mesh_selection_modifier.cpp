@@ -22,7 +22,6 @@
 */
 
 #include "mesh_selection_modifier.h"
-#include "shared_pointer.h"
 
 namespace k3d
 {

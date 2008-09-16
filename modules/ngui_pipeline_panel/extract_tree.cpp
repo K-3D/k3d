@@ -89,9 +89,8 @@ void extract_tree::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outp
 	boost::breadth_first_search(input_topology, m_root.pipeline_value(), visitor(extract_tree_visitor));
 
 	// Create a new graph, only copying those vertices and edges that were marked for extraction ...
-	boost::shared_ptr<k3d::graph::adjacency_list_t> output_topology(new k3d::graph::adjacency_list_t());
+	k3d::graph::adjacency_list_t& output_topology = Output.topology.create();
 
-	Output.topology = output_topology;
 	Output.graph_data = Input.graph_data;
 	Output.vertex_data = Input.vertex_data.clone_types();
 	Output.edge_data = Input.edge_data.clone_types();
@@ -104,7 +103,7 @@ void extract_tree::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outp
 	{
 		if(extract_vertex[vertex])
 		{
-			vertex_map[vertex] = boost::add_vertex(*output_topology);
+			vertex_map[vertex] = boost::add_vertex(output_topology);
 			vertex_data_copier.push_back(vertex);
 		}
 	}
@@ -116,15 +115,14 @@ void extract_tree::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outp
 
 		if(extract_edge[edge_index])
 		{
-			boost::add_edge(vertex_map[boost::source(edge, input_topology)], vertex_map[boost::target(edge, input_topology)], *output_topology);
+			boost::add_edge(vertex_map[boost::source(edge, input_topology)], vertex_map[boost::target(edge, input_topology)], output_topology);
 			edge_data_copier.push_back(edge_index);
 		}
 	}
 
 	// Mark the new graph as a tree by specifying the index of the root vertex
-	boost::shared_ptr<k3d::graph::indices_t> root(new k3d::graph::indices_t());
-	root->push_back(vertex_map[m_root.pipeline_value()]);
-	Output.graph_data["root"] = root;
+	k3d::graph::indices_t& root = Output.graph_data.create<k3d::graph::indices_t>("root");
+	root.push_back(vertex_map[m_root.pipeline_value()]);
 }
 
 void extract_tree::on_update_graph(const k3d::graph& Input, k3d::graph& Output)

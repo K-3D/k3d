@@ -28,7 +28,6 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_modifier.h>
 #include <k3dsdk/mesh_topology_data.h>
-#include <k3dsdk/shared_pointer.h>
 
 namespace module
 {
@@ -93,8 +92,8 @@ private:
 		const k3d::mesh::selection_t edge_selection = *Output.polyhedra->edge_selection;
 		const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
 		const k3d::uint_t edge_count = edge_selection.size();
-		k3d::mesh::polyhedra_t* target_polyhedra = k3d::make_unique(Output.polyhedra);
-		k3d::mesh::selection_t& target_selection = *k3d::make_unique(target_polyhedra->edge_selection);
+		k3d::mesh::polyhedra_t& target_polyhedra = Output.polyhedra.writable();
+		k3d::mesh::selection_t& target_selection = target_polyhedra.edge_selection.writable();
 		for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
 		{
 			double selection_weight = edge_selection[edge];

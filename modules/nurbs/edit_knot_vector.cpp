@@ -38,7 +38,6 @@
 #include <k3dsdk/point3.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/shared_pointer.h>
 
 #include <iostream>
 #include <vector>
@@ -222,8 +221,8 @@ namespace module
 
 				bool insert_knots(const k3d::mesh::knots_t& curve_knots, k3d::mesh& Output, int curve)
 				{
-					k3d::mesh::nurbs_curve_groups_t& groups = *k3d::make_unique(Output.nurbs_curve_groups);
-					k3d::mesh::knots_t& knots = *k3d::make_unique(groups.curve_knots);
+					k3d::mesh::nurbs_curve_groups_t& groups = Output.nurbs_curve_groups.writable();
+					k3d::mesh::knots_t& knots = groups.curve_knots.writable();
 
 					const k3d::uint_t curve_knots_begin = (*groups.curve_first_knots)[curve];
 					const k3d::uint_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];

@@ -69,73 +69,55 @@ namespace module
 			{
 				Output = k3d::mesh();
 
-				//Add a new curve to our Mesh
-				boost::shared_ptr<k3d::mesh::nurbs_curve_groups_t> curve_group( new k3d::mesh::nurbs_curve_groups_t() );
+				k3d::mesh::points_t& points = Output.points.create();
+				k3d::mesh::selection_t& point_selection = Output.point_selection.create();
+
+				k3d::mesh::nurbs_curve_groups_t& curve_group = Output.nurbs_curve_groups.create();
+				k3d::mesh::indices_t& first_curves = curve_group.first_curves.create();
+				k3d::mesh::counts_t& curve_counts = curve_group.curve_counts.create();
+				k3d::mesh::materials_t& materials = curve_group.materials.create();
+				k3d::mesh::indices_t& curve_first_points = curve_group.curve_first_points.create();
+				k3d::mesh::counts_t& curve_point_counts = curve_group.curve_point_counts.create();
+				k3d::mesh::orders_t& curve_orders = curve_group.curve_orders.create();
+				k3d::mesh::indices_t& curve_first_knots = curve_group.curve_first_knots.create();
+				k3d::mesh::selection_t& curve_selection = curve_group.curve_selection.create();
+				k3d::mesh::indices_t& curve_points = curve_group.curve_points.create();
+				k3d::mesh::weights_t& curve_point_weights = curve_group.curve_point_weights.create();
+				k3d::mesh::knots_t& curve_knots = curve_group.curve_knots.create();
 
 				const int control_points=m_control_points.pipeline_value();
 
-				boost::shared_ptr<k3d::mesh::indices_t> first_curves( new k3d::mesh::indices_t() );
-				boost::shared_ptr<k3d::mesh::counts_t> curve_counts( new k3d::mesh::counts_t() );
-				boost::shared_ptr<k3d::mesh::materials_t> materials( new k3d::mesh::materials_t() );
-				boost::shared_ptr<k3d::mesh::indices_t> curve_first_points( new k3d::mesh::indices_t() );
-				boost::shared_ptr<k3d::mesh::counts_t> curve_point_counts( new k3d::mesh::counts_t() );
-				boost::shared_ptr<k3d::mesh::orders_t> curve_orders( new k3d::mesh::orders_t() );
-				boost::shared_ptr<k3d::mesh::indices_t> curve_first_knots( new k3d::mesh::indices_t() );
-				boost::shared_ptr<k3d::mesh::selection_t> curve_selection( new k3d::mesh::selection_t() );
-				boost::shared_ptr<k3d::mesh::indices_t> curve_points( new k3d::mesh::indices_t() );
-				boost::shared_ptr<k3d::mesh::weights_t> curve_point_weights( new k3d::mesh::weights_t() );
-				boost::shared_ptr<k3d::mesh::knots_t> curve_knots( new k3d::mesh::knots_t() ); //there are as much knots as controlpoints+degree+1
-				boost::shared_ptr<k3d::mesh::points_t> points( new k3d::mesh::points_t() );
-				boost::shared_ptr<k3d::mesh::selection_t> point_selection( new k3d::mesh::selection_t() );
-
-				first_curves->push_back(0);
-				curve_counts->push_back(1);
-				materials->push_back(m_material.pipeline_value());
-				curve_first_points->push_back(0);
-				curve_first_knots->push_back(0);
-				curve_point_counts->push_back(control_points);
-				curve_orders->push_back(m_order.pipeline_value());
-				curve_selection->push_back(0.0);
+				first_curves.push_back(0);
+				curve_counts.push_back(1);
+				materials.push_back(m_material.pipeline_value());
+				curve_first_points.push_back(0);
+				curve_first_knots.push_back(0);
+				curve_point_counts.push_back(control_points);
+				curve_orders.push_back(m_order.pipeline_value());
+				curve_selection.push_back(0.0);
 
 
 				//we need at least as much control points as the order is
-				assert_warning(curve_orders->back() < control_points);
+				assert_warning(curve_orders.back() < control_points);
 
-				for(k3d::uint_t i = 0; i < curve_orders->back(); ++i) //first point order times
-					curve_knots->push_back(0);
+				for(k3d::uint_t i = 0; i < curve_orders.back(); ++i) //first point order times
+					curve_knots.push_back(0);
 
-				for(k3d::uint_t i = 0; i < control_points - curve_orders->back() + 1; ++i)
-					curve_knots->push_back(curve_knots->back()+1); //curve_knots is not empty!
+				for(k3d::uint_t i = 0; i < control_points - curve_orders.back() + 1; ++i)
+					curve_knots.push_back(curve_knots.back()+1); //curve_knots is not empty!
 
-				for(k3d::uint_t i = 0; i < curve_orders->back() - 1; ++i) //last point order times
-					curve_knots->push_back(curve_knots->back());
+				for(k3d::uint_t i = 0; i < curve_orders.back() - 1; ++i) //last point order times
+					curve_knots.push_back(curve_knots.back());
 
 				for(k3d::uint_t point = 0; point < control_points; point++ )
 				{
-					curve_points->push_back(point); //store the index of the point
-					points->push_back(k3d::point3(static_cast<double>(point) * m_point_spacing.pipeline_value(), 0.0, 0.0) );//store the point (a straight line along x-axis)
-					curve_point_weights->push_back(1.0);
+					curve_points.push_back(point); //store the index of the point
+					points.push_back(k3d::point3(static_cast<double>(point) * m_point_spacing.pipeline_value(), 0.0, 0.0) );//store the point (a straight line along x-axis)
+					curve_point_weights.push_back(1.0);
 
-					point_selection->push_back(0.0);
+					point_selection.push_back(0.0);
 				}
 
-
-				curve_group->first_curves = first_curves;
-				curve_group->curve_counts = curve_counts;
-				curve_group->materials = materials;
-				curve_group->curve_first_points = curve_first_points;
-				curve_group->curve_point_counts = curve_point_counts;
-				curve_group->curve_orders = curve_orders;
-				curve_group->curve_first_knots = curve_first_knots;
-				curve_group->curve_selection = curve_selection;
-				curve_group->curve_points = curve_points;
-				curve_group->curve_point_weights = curve_point_weights;
-				curve_group->curve_knots = curve_knots;
-
-				Output.points = points;
-				Output.point_selection = point_selection;
-
-				Output.nurbs_curve_groups = curve_group;
 
 				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 				assert_warning(k3d::validate(Output));

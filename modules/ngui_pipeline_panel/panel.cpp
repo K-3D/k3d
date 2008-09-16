@@ -35,7 +35,6 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/array_operations.h>
 #include <k3dsdk/ngui/basic_input_model.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
@@ -403,7 +402,7 @@ public:
 		const k3d::graph::adjacency_list_t& topology = *graph.topology;
 		const k3d::uint_t vertex_count = boost::num_vertices(topology);
 
-		const k3d::graph::nodes_t& vertex_node = k3d::get_array<k3d::graph::nodes_t>(graph.vertex_data, "node", vertex_count);
+		const k3d::graph::nodes_t& vertex_node = *graph.vertex_data.lookup<k3d::graph::nodes_t>("node");
 		for(k3d::uint_t vertex = 0; vertex != vertex_count; ++vertex)
 		{
 			if(vertex_node[vertex] == Node)
@@ -596,9 +595,9 @@ public:
 			const k3d::uint_t vertex_count = boost::num_vertices(topology);
 			const k3d::uint_t edge_count = boost::num_edges(topology);
 
-			const k3d::graph::nodes_t& vertex_node = *k3d::get_array<k3d::graph::nodes_t>(graph.vertex_data, "node");
-			const k3d::graph::points_t& vertex_position = *k3d::get_array<k3d::graph::points_t>(graph.vertex_data, "position");
-			const k3d::graph::indices_t& edge_type = *k3d::get_array<k3d::graph::indices_t>(graph.edge_data, "type");
+			const k3d::graph::nodes_t& vertex_node = *graph.vertex_data.lookup<k3d::graph::nodes_t>("node");
+			const k3d::graph::points_t& vertex_position = *graph.vertex_data.lookup<k3d::graph::points_t>("position");
+			const k3d::graph::indices_t& edge_type = *graph.edge_data.lookup<k3d::graph::indices_t>("type");
 			
 			// Render the graph edges ...
 			Context->save();

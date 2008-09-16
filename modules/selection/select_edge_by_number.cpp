@@ -26,7 +26,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_modifier.h>
-#include <k3dsdk/shared_pointer.h>
 
 namespace module
 {
@@ -55,8 +54,8 @@ public:
 	{
 		if(Output.polyhedra && Output.polyhedra->edge_selection)
 		{
-		    k3d::mesh::polyhedra_t& polyhedra = *k3d::make_unique(Output.polyhedra);
-		    k3d::mesh::selection_t& edge_selection = *k3d::make_unique(polyhedra.edge_selection);
+		    k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.writable();
+		    k3d::mesh::selection_t& edge_selection = polyhedra.edge_selection.writable();
 			std::fill(edge_selection.begin(), edge_selection.end(), 0.0);
 
 			const unsigned long index = m_index.pipeline_value();

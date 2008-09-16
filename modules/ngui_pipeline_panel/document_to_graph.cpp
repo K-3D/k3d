@@ -53,9 +53,9 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 
 	const k3d::nodes_t nodes = m_document.nodes().collection();
 
-	boost::shared_ptr<k3d::graph::adjacency_list_t> topology(new k3d::graph::adjacency_list_t());
-	boost::shared_ptr<k3d::graph::nodes_t> vertex_node(new k3d::graph::nodes_t());
-	boost::shared_ptr<k3d::graph::indices_t> edge_type(new k3d::graph::indices_t());
+	k3d::graph::adjacency_list_t& topology = Output.topology.create();
+	k3d::graph::nodes_t& vertex_node = Output.vertex_data.create<k3d::graph::nodes_t>("node");
+	k3d::graph::indices_t& edge_type = Output.vertex_data.create<k3d::graph::indices_t>("type");
 
 	// Insert nodes ...
 	std::map<k3d::inode*, k3d::graph::vertex_descriptor_t> node_map;
@@ -68,8 +68,8 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 		if(!include_painters && dynamic_cast<k3d::ri::imesh_painter*>(*node))
 			continue;
 
-		node_map[*node] = boost::add_vertex(*topology);
-		vertex_node->push_back(*node);
+		node_map[*node] = boost::add_vertex(topology);
+		vertex_node.push_back(*node);
 	}
 
 	// Insert edges ...
@@ -90,8 +90,8 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 						if(!node_map.count(referenced_node))
 							continue;
 
-						boost::add_edge(node_map[referenced_node], node_map[*node], *topology).first;
-						edge_type->push_back(BEHAVIOR_EDGE);
+						boost::add_edge(node_map[referenced_node], node_map[*node], topology).first;
+						edge_type.push_back(BEHAVIOR_EDGE);
 					}
 				}
 			}
@@ -109,14 +109,10 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 			if(!node_map.count(dependency->first->property_node()))
 				continue;
 
-			boost::add_edge(node_map[dependency->second->property_node()], node_map[dependency->first->property_node()], *topology).first;
-			edge_type->push_back(DATA_EDGE);
+			boost::add_edge(node_map[dependency->second->property_node()], node_map[dependency->first->property_node()], topology).first;
+			edge_type.push_back(DATA_EDGE);
 		}
 	}
-
-	Output.topology = topology;
-	Output.vertex_data["node"] = vertex_node;
-	Output.edge_data["type"] = edge_type;
 }
 
 void document_to_graph::on_update_graph(k3d::graph& Output)

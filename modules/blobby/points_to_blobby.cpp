@@ -29,7 +29,6 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/shared_pointer.h>
 
 namespace module
 {
@@ -62,21 +61,21 @@ public:
 		const k3d::mesh::points_t& input_points = *Input.points;
 		const k3d::mesh::attribute_arrays_t& input_vertex_data = Input.vertex_data;
 
-		k3d::mesh::blobbies_t& output_blobbies = *k3d::make_unique(Output.blobbies);
-		k3d::mesh::indices_t& output_first_primitives = *k3d::make_unique(output_blobbies.first_primitives);
-		k3d::mesh::counts_t& output_primitive_counts = *k3d::make_unique(output_blobbies.primitive_counts);
-		k3d::mesh::indices_t& output_first_operators = *k3d::make_unique(output_blobbies.first_operators);
-		k3d::mesh::counts_t& output_operator_counts = *k3d::make_unique(output_blobbies.operator_counts);
-		k3d::mesh::materials_t& output_materials = *k3d::make_unique(output_blobbies.materials);
-		k3d::mesh::blobbies_t::primitives_t& output_primitives = *k3d::make_unique(output_blobbies.primitives);
-		k3d::mesh::indices_t& output_primitive_first_floats = *k3d::make_unique(output_blobbies.primitive_first_floats);
-		k3d::mesh::counts_t& output_primitive_float_counts = *k3d::make_unique(output_blobbies.primitive_float_counts);
+		k3d::mesh::blobbies_t& output_blobbies = Output.blobbies.create();
+		k3d::mesh::indices_t& output_first_primitives = output_blobbies.first_primitives.create();
+		k3d::mesh::counts_t& output_primitive_counts = output_blobbies.primitive_counts.create();
+		k3d::mesh::indices_t& output_first_operators = output_blobbies.first_operators.create();
+		k3d::mesh::counts_t& output_operator_counts = output_blobbies.operator_counts.create();
+		k3d::mesh::materials_t& output_materials = output_blobbies.materials.create();
+		k3d::mesh::blobbies_t::primitives_t& output_primitives = output_blobbies.primitives.create();
+		k3d::mesh::indices_t& output_primitive_first_floats = output_blobbies.primitive_first_floats.create();
+		k3d::mesh::counts_t& output_primitive_float_counts = output_blobbies.primitive_float_counts.create();
 		k3d::mesh::attribute_arrays_t& output_vertex_data = output_blobbies.vertex_data;
-		k3d::mesh::blobbies_t::operators_t& output_operators = *k3d::make_unique(output_blobbies.operators);
-		k3d::mesh::indices_t& output_operator_first_operands = *k3d::make_unique(output_blobbies.operator_first_operands);
-		k3d::mesh::counts_t& output_operator_operand_counts = *k3d::make_unique(output_blobbies.operator_operand_counts);
-		k3d::mesh::blobbies_t::floats_t& output_floats = *k3d::make_unique(output_blobbies.floats);
-		k3d::mesh::blobbies_t::operands_t& output_operands = *k3d::make_unique(output_blobbies.operands);
+		k3d::mesh::blobbies_t::operators_t& output_operators = output_blobbies.operators.create();
+		k3d::mesh::indices_t& output_operator_first_operands = output_blobbies.operator_first_operands.create();
+		k3d::mesh::counts_t& output_operator_operand_counts = output_blobbies.operator_operand_counts.create();
+		k3d::mesh::blobbies_t::floats_t& output_floats = output_blobbies.floats.create();
+		k3d::mesh::blobbies_t::operands_t& output_operands = output_blobbies.operands.create();
 
 		output_vertex_data = input_vertex_data.clone_types();
 		k3d::attribute_array_copier output_vertex_data_copier(input_vertex_data, output_vertex_data);

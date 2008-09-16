@@ -34,7 +34,6 @@
 #include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/properties.h>
-#include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
 #include <k3dsdk/parallel/blocked_range.h>
@@ -91,18 +90,18 @@ void merge_polyhedra(k3d::mesh& Output, const k3d::mesh& Input, bool SinglePolyh
 {
 	if(!k3d::validate_polyhedra(Input))
 		return;
-	k3d::mesh::polyhedra_t& output_polyhedra = *k3d::make_unique(Output.polyhedra);
-	k3d::mesh::indices_t& output_first_faces = *k3d::make_unique(output_polyhedra.first_faces);
-	k3d::mesh::counts_t& output_face_counts = *k3d::make_unique(output_polyhedra.face_counts);
-	k3d::mesh::polyhedra_t::types_t& output_types = *k3d::make_unique(output_polyhedra.types);
-	k3d::mesh::indices_t& output_face_first_loops = *k3d::make_unique(output_polyhedra.face_first_loops);
-	k3d::mesh::counts_t& output_face_loop_counts = *k3d::make_unique(output_polyhedra.face_loop_counts);
-	k3d::mesh::selection_t& output_face_selection = *k3d::make_unique(output_polyhedra.face_selection);
-	k3d::mesh::materials_t& output_face_materials = *k3d::make_unique(output_polyhedra.face_materials);
-	k3d::mesh::indices_t& output_loop_first_edges = *k3d::make_unique(output_polyhedra.loop_first_edges);
-	k3d::mesh::indices_t& output_edge_points = *k3d::make_unique(output_polyhedra.edge_points);
-	k3d::mesh::indices_t& output_clockwise_edges = *k3d::make_unique(output_polyhedra.clockwise_edges);
-	k3d::mesh::selection_t& output_edge_selection = *k3d::make_unique(output_polyhedra.edge_selection);
+	k3d::mesh::polyhedra_t& output_polyhedra = Output.polyhedra.create();
+	k3d::mesh::indices_t& output_first_faces = output_polyhedra.first_faces.create();
+	k3d::mesh::counts_t& output_face_counts = output_polyhedra.face_counts.create();
+	k3d::mesh::polyhedra_t::types_t& output_types = output_polyhedra.types.create();
+	k3d::mesh::indices_t& output_face_first_loops = output_polyhedra.face_first_loops.create();
+	k3d::mesh::counts_t& output_face_loop_counts = output_polyhedra.face_loop_counts.create();
+	k3d::mesh::selection_t& output_face_selection = output_polyhedra.face_selection.create();
+	k3d::mesh::materials_t& output_face_materials = output_polyhedra.face_materials.create();
+	k3d::mesh::indices_t& output_loop_first_edges = output_polyhedra.loop_first_edges.create();
+	k3d::mesh::indices_t& output_edge_points = output_polyhedra.edge_points.create();
+	k3d::mesh::indices_t& output_clockwise_edges = output_polyhedra.clockwise_edges.create();
+	k3d::mesh::selection_t& output_edge_selection = output_polyhedra.edge_selection.create();
 	
 	const k3d::mesh::polyhedra_t& input_polyhedra = *Input.polyhedra;
 	const k3d::mesh::indices_t& input_first_faces = *input_polyhedra.first_faces;
@@ -167,11 +166,11 @@ void merge_point_groups(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if(!k3d::validate_point_groups(Input))
 		return;
-	k3d::mesh::point_groups_t& output_point_groups = *k3d::make_unique(Output.point_groups);
-	k3d::mesh::indices_t& output_first_points = *k3d::make_unique(output_point_groups.first_points);
-	k3d::mesh::counts_t& output_point_counts = *k3d::make_unique(output_point_groups.point_counts);
-	k3d::mesh::materials_t& output_materials = *k3d::make_unique(output_point_groups.materials);
-	k3d::mesh::indices_t& output_point_indices = *k3d::make_unique(output_point_groups.points);
+	k3d::mesh::point_groups_t& output_point_groups = Output.point_groups.create();
+	k3d::mesh::indices_t& output_first_points = output_point_groups.first_points.create();
+	k3d::mesh::counts_t& output_point_counts = output_point_groups.point_counts.create();
+	k3d::mesh::materials_t& output_materials = output_point_groups.materials.create();
+	k3d::mesh::indices_t& output_point_indices = output_point_groups.points.create();
 	
 	const k3d::mesh::point_groups_t& input_point_groups = *Input.point_groups;
 	const k3d::mesh::indices_t& input_first_points = *input_point_groups.first_points;
@@ -204,15 +203,15 @@ void merge_linear_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if(!k3d::validate_linear_curve_groups(Input))
 		return;
-	k3d::mesh::linear_curve_groups_t& output_linear_curve_groups = *k3d::make_unique(Output.linear_curve_groups);
-	k3d::mesh::indices_t& output_first_curves = *k3d::make_unique(output_linear_curve_groups.first_curves);
-	k3d::mesh::counts_t& output_curve_counts = *k3d::make_unique(output_linear_curve_groups.curve_counts);
-	k3d::mesh::bools_t& output_periodic_curves = *k3d::make_unique(output_linear_curve_groups.periodic_curves);
-	k3d::mesh::materials_t& output_materials = *k3d::make_unique(output_linear_curve_groups.materials);
-	k3d::mesh::indices_t& output_curve_first_points = *k3d::make_unique(output_linear_curve_groups.curve_first_points);
-	k3d::mesh::counts_t& output_curve_point_counts = *k3d::make_unique(output_linear_curve_groups.curve_point_counts);
-	k3d::mesh::selection_t& output_curve_selection = *k3d::make_unique(output_linear_curve_groups.curve_selection);
-	k3d::mesh::indices_t& output_curve_points = *k3d::make_unique(output_linear_curve_groups.curve_points);
+	k3d::mesh::linear_curve_groups_t& output_linear_curve_groups = Output.linear_curve_groups.create();
+	k3d::mesh::indices_t& output_first_curves = output_linear_curve_groups.first_curves.create();
+	k3d::mesh::counts_t& output_curve_counts = output_linear_curve_groups.curve_counts.create();
+	k3d::mesh::bools_t& output_periodic_curves = output_linear_curve_groups.periodic_curves.create();
+	k3d::mesh::materials_t& output_materials = output_linear_curve_groups.materials.create();
+	k3d::mesh::indices_t& output_curve_first_points = output_linear_curve_groups.curve_first_points.create();
+	k3d::mesh::counts_t& output_curve_point_counts = output_linear_curve_groups.curve_point_counts.create();
+	k3d::mesh::selection_t& output_curve_selection = output_linear_curve_groups.curve_selection.create();
+	k3d::mesh::indices_t& output_curve_points = output_linear_curve_groups.curve_points.create();
 	
 	const k3d::mesh::linear_curve_groups_t& input_linear_curve_groups = *Input.linear_curve_groups;
 	const k3d::mesh::indices_t& input_first_curves = *input_linear_curve_groups.first_curves;
@@ -256,15 +255,15 @@ void merge_cubic_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if(!k3d::validate_cubic_curve_groups(Input))
 		return;
-	k3d::mesh::cubic_curve_groups_t& output_cubic_curve_groups = *k3d::make_unique(Output.cubic_curve_groups);
-	k3d::mesh::indices_t& output_first_curves = *k3d::make_unique(output_cubic_curve_groups.first_curves);
-	k3d::mesh::counts_t& output_curve_counts = *k3d::make_unique(output_cubic_curve_groups.curve_counts);
-	k3d::mesh::bools_t& output_periodic_curves = *k3d::make_unique(output_cubic_curve_groups.periodic_curves);
-	k3d::mesh::materials_t& output_materials = *k3d::make_unique(output_cubic_curve_groups.materials);
-	k3d::mesh::indices_t& output_curve_first_points = *k3d::make_unique(output_cubic_curve_groups.curve_first_points);
-	k3d::mesh::counts_t& output_curve_point_counts = *k3d::make_unique(output_cubic_curve_groups.curve_point_counts);
-	k3d::mesh::selection_t& output_curve_selection = *k3d::make_unique(output_cubic_curve_groups.curve_selection);
-	k3d::mesh::indices_t& output_curve_points = *k3d::make_unique(output_cubic_curve_groups.curve_points);
+	k3d::mesh::cubic_curve_groups_t& output_cubic_curve_groups = Output.cubic_curve_groups.create();
+	k3d::mesh::indices_t& output_first_curves = output_cubic_curve_groups.first_curves.create();
+	k3d::mesh::counts_t& output_curve_counts = output_cubic_curve_groups.curve_counts.create();
+	k3d::mesh::bools_t& output_periodic_curves = output_cubic_curve_groups.periodic_curves.create();
+	k3d::mesh::materials_t& output_materials = output_cubic_curve_groups.materials.create();
+	k3d::mesh::indices_t& output_curve_first_points = output_cubic_curve_groups.curve_first_points.create();
+	k3d::mesh::counts_t& output_curve_point_counts = output_cubic_curve_groups.curve_point_counts.create();
+	k3d::mesh::selection_t& output_curve_selection = output_cubic_curve_groups.curve_selection.create();
+	k3d::mesh::indices_t& output_curve_points = output_cubic_curve_groups.curve_points.create();
 	
 	const k3d::mesh::cubic_curve_groups_t& input_cubic_curve_groups = *Input.cubic_curve_groups;
 	const k3d::mesh::indices_t& input_first_curves = *input_cubic_curve_groups.first_curves;
@@ -309,18 +308,18 @@ void merge_nurbs_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 	if(!k3d::validate_nurbs_curve_groups(Input))
 		return;
 	
-	k3d::mesh::nurbs_curve_groups_t& output_nurbs_curve_groups = *k3d::make_unique(Output.nurbs_curve_groups);
-	k3d::mesh::indices_t& output_first_curves = *k3d::make_unique(output_nurbs_curve_groups.first_curves);
-	k3d::mesh::counts_t& output_curve_counts = *k3d::make_unique(output_nurbs_curve_groups.curve_counts);
-	k3d::mesh::materials_t& output_materials = *k3d::make_unique(output_nurbs_curve_groups.materials);
-	k3d::mesh::indices_t& output_curve_first_points = *k3d::make_unique(output_nurbs_curve_groups.curve_first_points);
-	k3d::mesh::counts_t& output_curve_point_counts = *k3d::make_unique(output_nurbs_curve_groups.curve_point_counts);
-	k3d::mesh::orders_t& output_curve_orders = *k3d::make_unique(output_nurbs_curve_groups.curve_orders);
-	k3d::mesh::indices_t& output_curve_first_knots = *k3d::make_unique(output_nurbs_curve_groups.curve_first_knots);
-	k3d::mesh::selection_t& output_curve_selection = *k3d::make_unique(output_nurbs_curve_groups.curve_selection);
-	k3d::mesh::indices_t& output_curve_points = *k3d::make_unique(output_nurbs_curve_groups.curve_points);
-	k3d::mesh::weights_t& output_curve_point_weights = *k3d::make_unique(output_nurbs_curve_groups.curve_point_weights);
-	k3d::mesh::knots_t& output_curve_knots = *k3d::make_unique(output_nurbs_curve_groups.curve_knots);
+	k3d::mesh::nurbs_curve_groups_t& output_nurbs_curve_groups = Output.nurbs_curve_groups.create();
+	k3d::mesh::indices_t& output_first_curves = output_nurbs_curve_groups.first_curves.create();
+	k3d::mesh::counts_t& output_curve_counts = output_nurbs_curve_groups.curve_counts.create();
+	k3d::mesh::materials_t& output_materials = output_nurbs_curve_groups.materials.create();
+	k3d::mesh::indices_t& output_curve_first_points = output_nurbs_curve_groups.curve_first_points.create();
+	k3d::mesh::counts_t& output_curve_point_counts = output_nurbs_curve_groups.curve_point_counts.create();
+	k3d::mesh::orders_t& output_curve_orders = output_nurbs_curve_groups.curve_orders.create();
+	k3d::mesh::indices_t& output_curve_first_knots = output_nurbs_curve_groups.curve_first_knots.create();
+	k3d::mesh::selection_t& output_curve_selection = output_nurbs_curve_groups.curve_selection.create();
+	k3d::mesh::indices_t& output_curve_points = output_nurbs_curve_groups.curve_points.create();
+	k3d::mesh::weights_t& output_curve_point_weights = output_nurbs_curve_groups.curve_point_weights.create();
+	k3d::mesh::knots_t& output_curve_knots = output_nurbs_curve_groups.curve_knots.create();
 	
 	const k3d::mesh::nurbs_curve_groups_t& input_nurbs_curve_groups = *Input.nurbs_curve_groups;
 	const k3d::mesh::indices_t& input_first_curves = *input_nurbs_curve_groups.first_curves;
@@ -370,10 +369,10 @@ void merge_bilinear_patches(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if(!k3d::validate_bilinear_patches(Input))
 		return;
-	k3d::mesh::bilinear_patches_t& output_patches = *k3d::make_unique(Output.bilinear_patches);
-	k3d::mesh::selection_t& output_patch_selection = *k3d::make_unique(output_patches.patch_selection);
-	k3d::mesh::materials_t& output_patch_materials = *k3d::make_unique(output_patches.patch_materials);
-	k3d::mesh::indices_t& output_patch_points = *k3d::make_unique(output_patches.patch_points);
+	k3d::mesh::bilinear_patches_t& output_patches = Output.bilinear_patches.create();
+	k3d::mesh::selection_t& output_patch_selection = output_patches.patch_selection.create();
+	k3d::mesh::materials_t& output_patch_materials = output_patches.patch_materials.create();
+	k3d::mesh::indices_t& output_patch_points = output_patches.patch_points.create();
 
 	const k3d::mesh::bilinear_patches_t& input_patches = *Input.bilinear_patches;
 	const k3d::mesh::selection_t& input_patch_selection = *input_patches.patch_selection;
@@ -408,10 +407,10 @@ void merge_bicubic_patches(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if(!k3d::validate_bicubic_patches(Input))
 		return;
-	k3d::mesh::bicubic_patches_t& output_patches = *k3d::make_unique(Output.bicubic_patches);
-	k3d::mesh::selection_t& output_patch_selection = *k3d::make_unique(output_patches.patch_selection);
-	k3d::mesh::materials_t& output_patch_materials = *k3d::make_unique(output_patches.patch_materials);
-	k3d::mesh::indices_t& output_patch_points = *k3d::make_unique(output_patches.patch_points);
+	k3d::mesh::bicubic_patches_t& output_patches = Output.bicubic_patches.create();
+	k3d::mesh::selection_t& output_patch_selection = output_patches.patch_selection.create();
+	k3d::mesh::materials_t& output_patch_materials = output_patches.patch_materials.create();
+	k3d::mesh::indices_t& output_patch_points = output_patches.patch_points.create();
 
 	const k3d::mesh::bicubic_patches_t& input_patches = *Input.bicubic_patches;
 	const k3d::mesh::selection_t& input_patch_selection = *input_patches.patch_selection;
@@ -447,20 +446,20 @@ void merge_nurbs_patches(k3d::mesh& Output, const k3d::mesh& Input)
 	if (!k3d::validate_nurbs_patches(Input))
 		return;
 	
-	k3d::mesh::nurbs_patches_t& output_nurbs_patches = *k3d::make_unique(Output.nurbs_patches);
-	k3d::mesh::indices_t& output_patch_first_points = *k3d::make_unique(output_nurbs_patches.patch_first_points);
-	k3d::mesh::counts_t& output_patch_u_point_counts = *k3d::make_unique(output_nurbs_patches.patch_u_point_counts);
-	k3d::mesh::counts_t& output_patch_v_point_counts = *k3d::make_unique(output_nurbs_patches.patch_v_point_counts);
-	k3d::mesh::orders_t& output_patch_u_orders = *k3d::make_unique(output_nurbs_patches.patch_u_orders);
-	k3d::mesh::orders_t& output_patch_v_orders = *k3d::make_unique(output_nurbs_patches.patch_v_orders);
-	k3d::mesh::indices_t& output_patch_u_first_knots = *k3d::make_unique(output_nurbs_patches.patch_u_first_knots);
-	k3d::mesh::indices_t& output_patch_v_first_knots = *k3d::make_unique(output_nurbs_patches.patch_v_first_knots);
-	k3d::mesh::selection_t& output_patch_selection = *k3d::make_unique(output_nurbs_patches.patch_selection);
-	k3d::mesh::materials_t& output_patch_materials = *k3d::make_unique(output_nurbs_patches.patch_materials);
-	k3d::mesh::indices_t& output_patch_points = *k3d::make_unique(output_nurbs_patches.patch_points);
-	k3d::mesh::weights_t& output_patch_point_weights = *k3d::make_unique(output_nurbs_patches.patch_point_weights);
-	k3d::mesh::knots_t& output_patch_u_knots = *k3d::make_unique(output_nurbs_patches.patch_u_knots);
-	k3d::mesh::knots_t& output_patch_v_knots = *k3d::make_unique(output_nurbs_patches.patch_v_knots);
+	k3d::mesh::nurbs_patches_t& output_nurbs_patches = Output.nurbs_patches.create();
+	k3d::mesh::indices_t& output_patch_first_points = output_nurbs_patches.patch_first_points.create();
+	k3d::mesh::counts_t& output_patch_u_point_counts = output_nurbs_patches.patch_u_point_counts.create();
+	k3d::mesh::counts_t& output_patch_v_point_counts = output_nurbs_patches.patch_v_point_counts.create();
+	k3d::mesh::orders_t& output_patch_u_orders = output_nurbs_patches.patch_u_orders.create();
+	k3d::mesh::orders_t& output_patch_v_orders = output_nurbs_patches.patch_v_orders.create();
+	k3d::mesh::indices_t& output_patch_u_first_knots = output_nurbs_patches.patch_u_first_knots.create();
+	k3d::mesh::indices_t& output_patch_v_first_knots = output_nurbs_patches.patch_v_first_knots.create();
+	k3d::mesh::selection_t& output_patch_selection = output_nurbs_patches.patch_selection.create();
+	k3d::mesh::materials_t& output_patch_materials = output_nurbs_patches.patch_materials.create();
+	k3d::mesh::indices_t& output_patch_points = output_nurbs_patches.patch_points.create();
+	k3d::mesh::weights_t& output_patch_point_weights = output_nurbs_patches.patch_point_weights.create();
+	k3d::mesh::knots_t& output_patch_u_knots = output_nurbs_patches.patch_u_knots.create();
+	k3d::mesh::knots_t& output_patch_v_knots = output_nurbs_patches.patch_v_knots.create();
 	
 	const k3d::mesh::nurbs_patches_t& input_nurbs_patches = *Input.nurbs_patches;
 	const k3d::mesh::indices_t& input_patch_first_points = *input_nurbs_patches.patch_first_points;
@@ -479,21 +478,21 @@ void merge_nurbs_patches(k3d::mesh& Output, const k3d::mesh& Input)
 
 	if (input_nurbs_patches.patch_trim_curve_loop_counts && input_nurbs_patches.trim_points)
 	{
-		k3d::mesh::counts_t& output_patch_trim_curve_loop_counts = *k3d::make_unique(output_nurbs_patches.patch_trim_curve_loop_counts);
-		k3d::mesh::indices_t& output_patch_first_trim_curve_loops = *k3d::make_unique(output_nurbs_patches.patch_first_trim_curve_loops);
-		k3d::mesh::points_2d_t& output_trim_points = *k3d::make_unique(output_nurbs_patches.trim_points);
-		k3d::mesh::selection_t& output_trim_point_selection = *k3d::make_unique(output_nurbs_patches.trim_point_selection);
-		k3d::mesh::indices_t& output_first_trim_curves = *k3d::make_unique(output_nurbs_patches.first_trim_curves);
-		k3d::mesh::counts_t& output_trim_curve_counts = *k3d::make_unique(output_nurbs_patches.trim_curve_counts);
-		k3d::mesh::selection_t& output_trim_curve_loop_selection = *k3d::make_unique(output_nurbs_patches.trim_curve_loop_selection);
-		k3d::mesh::indices_t& output_trim_curve_first_points = *k3d::make_unique(output_nurbs_patches.trim_curve_first_points);
-		k3d::mesh::counts_t& output_trim_curve_point_counts = *k3d::make_unique(output_nurbs_patches.trim_curve_point_counts);
-		k3d::mesh::orders_t& output_trim_curve_orders = *k3d::make_unique(output_nurbs_patches.trim_curve_orders);
-		k3d::mesh::indices_t& output_trim_curve_first_knots = *k3d::make_unique(output_nurbs_patches.trim_curve_first_knots);
-		k3d::mesh::selection_t& output_trim_curve_selection = *k3d::make_unique(output_nurbs_patches.trim_curve_selection);
-		k3d::mesh::indices_t& output_trim_curve_points = *k3d::make_unique(output_nurbs_patches.trim_curve_points);
-		k3d::mesh::weights_t& output_trim_curve_point_weights = *k3d::make_unique(output_nurbs_patches.trim_curve_point_weights);
-		k3d::mesh::knots_t& output_trim_curve_knots = *k3d::make_unique(output_nurbs_patches.trim_curve_knots);
+		k3d::mesh::counts_t& output_patch_trim_curve_loop_counts = output_nurbs_patches.patch_trim_curve_loop_counts.create();
+		k3d::mesh::indices_t& output_patch_first_trim_curve_loops = output_nurbs_patches.patch_first_trim_curve_loops.create();
+		k3d::mesh::points_2d_t& output_trim_points = output_nurbs_patches.trim_points.create();
+		k3d::mesh::selection_t& output_trim_point_selection = output_nurbs_patches.trim_point_selection.create();
+		k3d::mesh::indices_t& output_first_trim_curves = output_nurbs_patches.first_trim_curves.create();
+		k3d::mesh::counts_t& output_trim_curve_counts = output_nurbs_patches.trim_curve_counts.create();
+		k3d::mesh::selection_t& output_trim_curve_loop_selection = output_nurbs_patches.trim_curve_loop_selection.create();
+		k3d::mesh::indices_t& output_trim_curve_first_points = output_nurbs_patches.trim_curve_first_points.create();
+		k3d::mesh::counts_t& output_trim_curve_point_counts = output_nurbs_patches.trim_curve_point_counts.create();
+		k3d::mesh::orders_t& output_trim_curve_orders = output_nurbs_patches.trim_curve_orders.create();
+		k3d::mesh::indices_t& output_trim_curve_first_knots = output_nurbs_patches.trim_curve_first_knots.create();
+		k3d::mesh::selection_t& output_trim_curve_selection = output_nurbs_patches.trim_curve_selection.create();
+		k3d::mesh::indices_t& output_trim_curve_points = output_nurbs_patches.trim_curve_points.create();
+		k3d::mesh::weights_t& output_trim_curve_point_weights = output_nurbs_patches.trim_curve_point_weights.create();
+		k3d::mesh::knots_t& output_trim_curve_knots = output_nurbs_patches.trim_curve_knots.create();
 		
 		output_patch_first_trim_curve_loops.resize(output_patch_first_points.size(), 0);
 		output_patch_trim_curve_loop_counts.resize(output_patch_first_points.size(), 0);
@@ -564,20 +563,20 @@ void merge_blobbies(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if (!k3d::validate_blobbies(Input))
 		return;
-	k3d::mesh::blobbies_t& output_blobbies = *k3d::make_unique(Output.blobbies);
-	k3d::mesh::indices_t& output_first_primitives = *k3d::make_unique(output_blobbies.first_primitives);
-	k3d::mesh::counts_t& output_primitive_counts = *k3d::make_unique(output_blobbies.primitive_counts);
-	k3d::mesh::indices_t& output_first_operators = *k3d::make_unique(output_blobbies.first_operators);
-	k3d::mesh::counts_t& output_operator_counts = *k3d::make_unique(output_blobbies.operator_counts);
-	k3d::mesh::materials_t& output_materials = *k3d::make_unique(output_blobbies.materials);
-	k3d::mesh::blobbies_t::primitives_t& output_primitives = *k3d::make_unique(output_blobbies.primitives);
-	k3d::mesh::indices_t& output_primitive_first_floats = *k3d::make_unique(output_blobbies.primitive_first_floats);
-	k3d::mesh::counts_t& output_primitive_float_counts = *k3d::make_unique(output_blobbies.primitive_float_counts);
-	k3d::mesh::blobbies_t::operators_t& output_operators = *k3d::make_unique(output_blobbies.operators);
-	k3d::mesh::indices_t& output_operator_first_operands = *k3d::make_unique(output_blobbies.operator_first_operands);
-	k3d::mesh::counts_t& output_operator_operand_counts = *k3d::make_unique(output_blobbies.operator_operand_counts);
-	k3d::mesh::blobbies_t::floats_t& output_floats = *k3d::make_unique(output_blobbies.floats);
-	k3d::mesh::blobbies_t::operands_t& output_operands = *k3d::make_unique(output_blobbies.operands);
+	k3d::mesh::blobbies_t& output_blobbies = Output.blobbies.create();
+	k3d::mesh::indices_t& output_first_primitives = output_blobbies.first_primitives.create();
+	k3d::mesh::counts_t& output_primitive_counts = output_blobbies.primitive_counts.create();
+	k3d::mesh::indices_t& output_first_operators = output_blobbies.first_operators.create();
+	k3d::mesh::counts_t& output_operator_counts = output_blobbies.operator_counts.create();
+	k3d::mesh::materials_t& output_materials = output_blobbies.materials.create();
+	k3d::mesh::blobbies_t::primitives_t& output_primitives = output_blobbies.primitives.create();
+	k3d::mesh::indices_t& output_primitive_first_floats = output_blobbies.primitive_first_floats.create();
+	k3d::mesh::counts_t& output_primitive_float_counts = output_blobbies.primitive_float_counts.create();
+	k3d::mesh::blobbies_t::operators_t& output_operators = output_blobbies.operators.create();
+	k3d::mesh::indices_t& output_operator_first_operands = output_blobbies.operator_first_operands.create();
+	k3d::mesh::counts_t& output_operator_operand_counts = output_blobbies.operator_operand_counts.create();
+	k3d::mesh::blobbies_t::floats_t& output_floats = output_blobbies.floats.create();
+	k3d::mesh::blobbies_t::operands_t& output_operands = output_blobbies.operands.create();
 	
 	const k3d::mesh::blobbies_t& input_blobbies = *Input.blobbies;
 	const k3d::mesh::indices_t& input_first_primitives = *input_blobbies.first_primitives;
@@ -613,8 +612,8 @@ void merge_points(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if(!k3d::validate_points(Input))
 		return;
-	k3d::mesh::points_t& output_points = *k3d::make_unique(Output.points);
-	k3d::mesh::selection_t& output_point_selection = *k3d::make_unique(Output.point_selection);
+	k3d::mesh::points_t& output_points = Output.points.create();
+	k3d::mesh::selection_t& output_point_selection = Output.point_selection.create();
 	const k3d::mesh::points_t& input_points = *Input.points;
 	const k3d::mesh::selection_t& input_point_selection = *Input.point_selection;
 	
@@ -672,7 +671,7 @@ public:
 					continue;
 				
 				// Make sure the points array is defined
-				k3d::make_unique(Output.points);
+				Output.points.create();
 				
 				detail::merge_polyhedra(Output, *mesh, m_same_polyhedron.pipeline_value());
 				detail::merge_point_groups(Output, *mesh);

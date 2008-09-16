@@ -47,7 +47,6 @@
 #include "result.h"
 #include "serialization_xml.h"
 #include "share.h"
-#include "shared_pointer.h"
 #include "string_cast.h"
 #include "type_registry.h"
 #include "types_ri.h"
@@ -1586,7 +1585,7 @@ void save_array(element& Container, element Storage, const typed_array<imaterial
 // save_array
 
 template<typename array_type>
-void save_array(element& Container, element Storage, const boost::shared_ptr<const array_type>& Array, const ipersistent::save_context& Context)
+void save_array(element& Container, element Storage, const pipeline_data<array_type>& Array, const ipersistent::save_context& Context)
 {
 	if(!Array)
 		return;
@@ -1600,14 +1599,14 @@ void save_array(element& Container, element Storage, const boost::shared_ptr<con
 class save_typed_array
 {
 public:
-	save_typed_array(element& Container, const string_t& Name, array& AbstractArray, const ipersistent::save_context& Context, bool_t& Saved) :
+	save_typed_array(element& Container, const string_t& Name, const array& AbstractArray, const ipersistent::save_context& Context, bool_t& Saved) :
 		container(Container),
 		name(Name),
 		abstract_array(AbstractArray),
 		context(Context),
 		saved(Saved)
 	{
-		if(uint_t_array* const concrete_array = dynamic_cast<uint_t_array*>(&abstract_array))
+		if(const uint_t_array* const concrete_array = dynamic_cast<const uint_t_array*>(&abstract_array))
 		{
 			saved = true;
 			save_array(container, element("array", attribute("name", name), attribute("type", "k3d::uint_t")), *concrete_array, context);
@@ -1620,7 +1619,7 @@ public:
 		if(saved)
 			return;
 
-		if(typed_array<T>* const concrete_array = dynamic_cast<typed_array<T>*>(&abstract_array))
+		if(const typed_array<T>* const concrete_array = dynamic_cast<const typed_array<T>*>(&abstract_array))
 		{
 			saved = true;
 			save_array(container, element("array", attribute("name", name), attribute("type", type_string<T>())), *concrete_array, context);
@@ -1630,7 +1629,7 @@ public:
 private:
 	element& container;
 	const string_t& name;
-	array& abstract_array;
+	const array& abstract_array;
 	const ipersistent::save_context& context;
 	k3d::bool_t& saved;
 };
@@ -1647,7 +1646,7 @@ void save_arrays(element& Container, element Storage, const mesh::named_arrays_t
 	for(mesh::named_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
 	{
 		const string_t name = array_iterator->first;
-		array* const abstract_array = array_iterator->second.get();
+		const array* const abstract_array = array_iterator->second.get();
 
 		if(name.empty())
 		{
@@ -1677,7 +1676,7 @@ void save_arrays(element& Container, element Storage, const mesh::attribute_arra
 	for(mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
 	{
 		const string_t name = array_iterator->first;
-		array* const abstract_array = array_iterator->second.get();
+		const array* const abstract_array = array_iterator->second.get();
 
 		if(name.empty())
 		{
@@ -1810,16 +1809,13 @@ void load_array(const element& Storage, typed_array<inode*>& Array, const ipersi
 // load_array
 
 template<typename array_type>
-void load_array(const element& Container, const string_t& Storage, boost::shared_ptr<const array_type>& Array, const ipersistent::load_context& Context)
+void load_array(const element& Container, const string_t& Storage, pipeline_data<array_type>& Array, const ipersistent::load_context& Context)
 {
 	const element* const storage = find_element(Container, Storage);
 	if(!storage)
 		return;
 
-	array_type* const array = Array ? make_unique(Array) : new array_type();
-	if(!Array)
-		Array.reset(array);
-
+	array_type* const array = Array ? &Array.writable() : &Array.create();
 	load_array(*storage, *array, Context);
 }
 
@@ -2186,11 +2182,11 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 			if(xml_primitive->name != "primitive")
 				continue;
 
-			mesh::primitive* const primitive = new mesh::primitive(attribute_text(*xml_primitive, "type"));
+			mesh::primitive& primitive = Mesh.primitives.create(attribute_text(*xml_primitive, "type"));
 
 			if(const element* const xml_topology = find_element(*xml_primitive, "topology"))
 			{
-				detail::load_arrays(*xml_topology, primitive->topology, Context);
+				detail::load_arrays(*xml_topology, primitive.topology, Context);
 			}
 
 			if(const element* const xml_attributes = find_element(*xml_primitive, "attributes"))
@@ -2203,17 +2199,15 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 					mesh::attribute_arrays_t arrays;
 					detail::load_arrays(*xml_arrays, arrays, Context);
 
-					primitive->attributes.insert(std::make_pair(attribute_text(*xml_arrays, "type"), arrays));
+					primitive.attributes.insert(std::make_pair(attribute_text(*xml_arrays, "type"), arrays));
 				}
 			}
-			
-			Mesh.primitives.push_back(boost::shared_ptr<const mesh::primitive>(primitive));
 		}
 	}
 
 	if(element* const container = find_element(Container, "point_groups"))
 	{
-		mesh::point_groups_t* const point_groups = make_unique(Mesh.point_groups);
+		mesh::point_groups_t* const point_groups = &Mesh.point_groups.create();
 		detail::load_array(*container, "first_points", point_groups->first_points, Context);
 		detail::load_array(*container, "point_counts", point_groups->point_counts, Context);
 		detail::load_array(*container, "materials", point_groups->materials, Context);
@@ -2224,7 +2218,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "linear_curve_groups"))
 	{
-		mesh::linear_curve_groups_t* const linear_curve_groups = make_unique(Mesh.linear_curve_groups);
+		mesh::linear_curve_groups_t* const linear_curve_groups = &Mesh.linear_curve_groups.create();
 		detail::load_array(*container, "first_curves", linear_curve_groups->first_curves, Context);
 		detail::load_array(*container, "curve_counts", linear_curve_groups->curve_counts, Context);
 		detail::load_array(*container, "periodic_curves", linear_curve_groups->periodic_curves, Context);
@@ -2239,7 +2233,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "cubic_curve_groups"))
 	{
-		mesh::cubic_curve_groups_t* const cubic_curve_groups = make_unique(Mesh.cubic_curve_groups);
+		mesh::cubic_curve_groups_t* const cubic_curve_groups = &Mesh.cubic_curve_groups.create();
 		detail::load_array(*container, "first_curves", cubic_curve_groups->first_curves, Context);
 		detail::load_array(*container, "curve_counts", cubic_curve_groups->curve_counts, Context);
 		detail::load_array(*container, "periodic_curves", cubic_curve_groups->periodic_curves, Context);
@@ -2254,7 +2248,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "nurbs_curve_groups"))
 	{
-		mesh::nurbs_curve_groups_t* const nurbs_curve_groups = make_unique(Mesh.nurbs_curve_groups);
+		mesh::nurbs_curve_groups_t* const nurbs_curve_groups = &Mesh.nurbs_curve_groups.create();
 		detail::load_array(*container, "first_curves", nurbs_curve_groups->first_curves, Context);
 		detail::load_array(*container, "curve_counts", nurbs_curve_groups->curve_counts, Context);
 		detail::load_array(*container, "materials", nurbs_curve_groups->materials, Context);
@@ -2272,7 +2266,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "bilinear_patches"))
 	{
-		mesh::bilinear_patches_t* const bilinear_patches = make_unique(Mesh.bilinear_patches);
+		mesh::bilinear_patches_t* const bilinear_patches = &Mesh.bilinear_patches.create();
 		detail::load_array(*container, "patch_selection", bilinear_patches->patch_selection, Context);
 		detail::load_array(*container, "patch_materials", bilinear_patches->patch_materials, Context);
 		detail::load_arrays(*container, "constant_data", bilinear_patches->constant_data, Context);
@@ -2283,7 +2277,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "bicubic_patches"))
 	{
-		mesh::bicubic_patches_t* const bicubic_patches = make_unique(Mesh.bicubic_patches);
+		mesh::bicubic_patches_t* const bicubic_patches = &Mesh.bicubic_patches.create();
 		detail::load_array(*container, "patch_selection", bicubic_patches->patch_selection, Context);
 		detail::load_array(*container, "patch_materials", bicubic_patches->patch_materials, Context);
 		detail::load_arrays(*container, "constant_data", bicubic_patches->constant_data, Context);
@@ -2294,7 +2288,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "nurbs_patches"))
 	{
-		mesh::nurbs_patches_t* const nurbs_patches = make_unique(Mesh.nurbs_patches);
+		mesh::nurbs_patches_t* const nurbs_patches = &Mesh.nurbs_patches.create();
 		detail::load_array(*container, "patch_first_points", nurbs_patches->patch_first_points, Context);
 		detail::load_array(*container, "patch_u_point_counts", nurbs_patches->patch_u_point_counts, Context);
 		detail::load_array(*container, "patch_v_point_counts", nurbs_patches->patch_v_point_counts, Context);
@@ -2330,7 +2324,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "polyhedra"))
 	{
-		mesh::polyhedra_t* const polyhedra = make_unique(Mesh.polyhedra);
+		mesh::polyhedra_t* const polyhedra = &Mesh.polyhedra.create();
 		detail::load_array(*container, "first_faces", polyhedra->first_faces, Context);
 		detail::load_array(*container, "face_counts", polyhedra->face_counts, Context);
 		detail::load_array(*container, "types", polyhedra->types, Context);
@@ -2349,7 +2343,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "blobbies"))
 	{
-		mesh::blobbies_t* const blobbies = make_unique(Mesh.blobbies);
+		mesh::blobbies_t* const blobbies = &Mesh.blobbies.create();
 		detail::load_array(*container, "first_primitives", blobbies->first_primitives, Context);
 		detail::load_array(*container, "primitive_counts", blobbies->primitive_counts, Context);
 		detail::load_array(*container, "first_operators", blobbies->first_operators, Context);

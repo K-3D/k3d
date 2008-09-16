@@ -67,10 +67,10 @@ public:
 		Output.point_selection = Input.point_selection;
 		Output.vertex_data = Input.vertex_data;
 
-		k3d::mesh::bilinear_patches_t* const bilinear_patches = new k3d::mesh::bilinear_patches_t();
-		k3d::mesh::selection_t* const patch_selection = new k3d::mesh::selection_t();
-		k3d::mesh::materials_t* const patch_materials = new k3d::mesh::materials_t();
-		k3d::mesh::indices_t* const patch_points = new k3d::mesh::indices_t();
+		k3d::mesh::bilinear_patches_t& bilinear_patches = Output.bilinear_patches.create();
+		k3d::mesh::selection_t& patch_selection = bilinear_patches.patch_selection.create();
+		k3d::mesh::materials_t& patch_materials = bilinear_patches.patch_materials.create();
+		k3d::mesh::indices_t& patch_points = bilinear_patches.patch_points.create();
 
 		const size_t face_begin = 0;
 		const size_t face_end = face_begin + face_first_loops.size();
@@ -91,19 +91,14 @@ public:
 			if(edges.size() != 4)
 				continue;
 
-			patch_selection->push_back(face_selection[face]);
-			patch_materials->push_back(face_materials[face]);
+			patch_selection.push_back(face_selection[face]);
+			patch_materials.push_back(face_materials[face]);
 
-			patch_points->push_back(edge_points[edges[0]]);
-			patch_points->push_back(edge_points[edges[1]]);
-			patch_points->push_back(edge_points[edges[3]]); // Bilinear patch control points *aren't* in clockwise order!
-			patch_points->push_back(edge_points[edges[2]]);
+			patch_points.push_back(edge_points[edges[0]]);
+			patch_points.push_back(edge_points[edges[1]]);
+			patch_points.push_back(edge_points[edges[3]]); // Bilinear patch control points *aren't* in clockwise order!
+			patch_points.push_back(edge_points[edges[2]]);
 		}
-
-		bilinear_patches->patch_selection.reset(patch_selection);
-		bilinear_patches->patch_materials.reset(patch_materials);
-		bilinear_patches->patch_points.reset(patch_points);
-		Output.bilinear_patches.reset(bilinear_patches);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

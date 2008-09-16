@@ -34,7 +34,6 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/type_registry.h>
 
 #include <boost/python.hpp>
@@ -73,75 +72,67 @@ const bool is_uninitialized(const mesh& Mesh)
 ///////////////////////////////////////////////////////////////////////////////////////
 // wrap_const_object
 
-template<typename return_type, typename pointer_type>
-object wrap_const_object(const pointer_type& Pointer)
+template<typename return_type, typename value_type>
+object wrap_const_object(const pipeline_data<value_type>& Data)
 {
-	if(!Pointer)
+	if(!Data)
 		return object();
 
-	return object(return_type(*Pointer));
+	return object(return_type(*Data));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // wrap_non_const_object
 
-template<typename return_type, typename pointer_type>
-object wrap_non_const_object(pointer_type& Pointer)
+template<typename return_type, typename value_type>
+object wrap_non_const_object(pipeline_data<value_type>& Data)
 {
-	if(!Pointer)
+	if(!Data)
 		return object();
 
-	return object(return_type(*k3d::make_unique(Pointer)));
+	return object(return_type(Data.writable()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // create_object
 
-template<typename return_type, typename new_type, typename pointer_type>
-object create_object(pointer_type& Pointer)
+template<typename return_type, typename value_type>
+object create_object(pipeline_data<value_type>& Data)
 {
-	new_type* const new_object = new new_type();
-	Pointer.reset(new_object);
-	return object(return_type(*new_object));
+	return object(return_type(Data.create()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // wrap_const_array
 
-template<typename pointer_type>
-object wrap_const_array(pointer_type& Pointer)
+template<typename array_type>
+object wrap_const_array(const pipeline_data<array_type>& Data)
 {
-	if(!Pointer)
+	if(!Data)
 		return object();
 
-	return object(interface_wrapper<typename pointer_type::element_type>(*Pointer));
+	return object(interface_wrapper<const array_type>(*Data));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // wrap_non_const_array
 
-template<typename pointer_type>
-object wrap_non_const_array(pointer_type& Pointer)
+template<typename array_type>
+object wrap_non_const_array(pipeline_data<array_type>& Data)
 {
-	typedef typename boost::remove_const<typename pointer_type::element_type>::type array_type;
-
-	if(!Pointer)
+	if(!Data)
 		return object();
 
-	return object(interface_wrapper<array_type>(*k3d::make_unique(Pointer)));
+	return object(interface_wrapper<array_type>(Data.writable()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // create_array
 
-template<typename pointer_type>
-object create_array(pointer_type& Pointer)
+template<typename array_type>
+object create_array(pipeline_data<array_type>& Data)
 {
-	typedef typename boost::remove_const<typename pointer_type::element_type>::type array_type;
-
-	array_type* const new_array = new array_type();
-	Pointer.reset(new_array);
-	return object(interface_wrapper<array_type>(*new_array));
+	return object(interface_wrapper<array_type>(Data.create()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

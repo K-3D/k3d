@@ -28,9 +28,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/array_operations.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/vectors.h>
 
 namespace module
@@ -111,22 +109,22 @@ public:
 		const k3d::double_t width = m_width.pipeline_value();
 		k3d::imaterial* const material = m_material.pipeline_value();
 
-		k3d::mesh::points_t& points = *k3d::make_unique(Output.points);
-		k3d::mesh::selection_t& point_selection = *k3d::make_unique(Output.point_selection);
+		k3d::mesh::points_t& points = Output.points.create();
+		k3d::mesh::selection_t& point_selection = Output.point_selection.create();
 
 		points.resize(edge_count);
 		point_selection.assign(edge_count, 0.0);
 
-		k3d::mesh::linear_curve_groups_t& linear_curve_groups = *k3d::make_unique(Output.linear_curve_groups);
-		k3d::mesh::indices_t& first_curves = *k3d::make_unique(linear_curve_groups.first_curves);
-		k3d::mesh::counts_t& curve_counts = *k3d::make_unique(linear_curve_groups.curve_counts);
-		k3d::mesh::bools_t& periodic_curves = *k3d::make_unique(linear_curve_groups.periodic_curves);
-		k3d::mesh::materials_t& materials = *k3d::make_unique(linear_curve_groups.materials);
-		k3d::mesh::indices_t& curve_first_points = *k3d::make_unique(linear_curve_groups.curve_first_points);
-		k3d::mesh::counts_t& curve_point_counts = *k3d::make_unique(linear_curve_groups.curve_point_counts);
-		k3d::mesh::selection_t& curve_selection = *k3d::make_unique(linear_curve_groups.curve_selection);
-		k3d::mesh::indices_t& curve_points = *k3d::make_unique(linear_curve_groups.curve_points);
-		k3d::mesh::doubles_t& widths = k3d::get_array<k3d::mesh::doubles_t>(linear_curve_groups.constant_data, "width", 0);
+		k3d::mesh::linear_curve_groups_t& linear_curve_groups = Output.linear_curve_groups.create();
+		k3d::mesh::indices_t& first_curves = linear_curve_groups.first_curves.create();
+		k3d::mesh::counts_t& curve_counts = linear_curve_groups.curve_counts.create();
+		k3d::mesh::bools_t& periodic_curves = linear_curve_groups.periodic_curves.create();
+		k3d::mesh::materials_t& materials = linear_curve_groups.materials.create();
+		k3d::mesh::indices_t& curve_first_points = linear_curve_groups.curve_first_points.create();
+		k3d::mesh::counts_t& curve_point_counts = linear_curve_groups.curve_point_counts.create();
+		k3d::mesh::selection_t& curve_selection = linear_curve_groups.curve_selection.create();
+		k3d::mesh::indices_t& curve_points = linear_curve_groups.curve_points.create();
+		k3d::mesh::doubles_t& widths = linear_curve_groups.constant_data.create<k3d::mesh::doubles_t>("width");
 
 		first_curves.push_back(curve_first_points.size());
 		curve_counts.push_back(1);

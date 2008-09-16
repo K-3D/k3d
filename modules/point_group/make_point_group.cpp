@@ -62,20 +62,13 @@ public:
 		Output.point_selection = Input.point_selection;
 		Output.vertex_data = Input.vertex_data;
 
-		k3d::mesh::point_groups_t* const point_groups = new k3d::mesh::point_groups_t();
-		k3d::mesh::indices_t* const first_points = new k3d::mesh::indices_t(1, 0);
-		k3d::mesh::counts_t* const point_counts = new k3d::mesh::counts_t(1, point_count);
-		k3d::mesh::materials_t* const materials = new k3d::mesh::materials_t(1, static_cast<k3d::imaterial*>(0));
-		k3d::mesh::indices_t* const points = new k3d::mesh::indices_t(point_count);
+		k3d::mesh::point_groups_t& point_groups = Output.point_groups.create();
+		k3d::mesh::indices_t& first_points = point_groups.first_points.create(new k3d::mesh::indices_t(1, 0));
+		k3d::mesh::counts_t& point_counts = point_groups.point_counts.create(new k3d::mesh::counts_t(1, point_count));
+		k3d::mesh::materials_t& materials = point_groups.materials.create(new k3d::mesh::materials_t(1, static_cast<k3d::imaterial*>(0)));
+		k3d::mesh::indices_t& points = point_groups.points.create(new k3d::mesh::indices_t(point_count));
 		for(size_t i = 0; i != point_count; ++i)
-			(*points)[i] = i;
-
-		point_groups->first_points.reset(first_points);
-		point_groups->point_counts.reset(point_counts);
-		point_groups->materials.reset(materials);
-		point_groups->points.reset(points);
-
-		Output.point_groups.reset(point_groups);
+			points[i] = i;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

@@ -29,7 +29,13 @@ namespace k3d
 const array* attribute_arrays::lookup(const string_t& Name) const
 {
 	const_iterator result = find(Name);
-	return result == end() ? static_cast<array*>(0) : result->second.get();
+	return result == end() ? static_cast<const array*>(0) : result->second.get();
+}
+
+array* attribute_arrays::writable(const string_t& Name)
+{
+	iterator result = find(Name);
+	return result == end() ? static_cast<array*>(0) : &result->second.writable();
 }
 
 attribute_arrays attribute_arrays::clone_types() const
@@ -122,8 +128,8 @@ attribute_arrays attribute_arrays::clone_types(const attribute_arrays_collection
 
 void attribute_arrays::resize(const uint_t NewSize)
 {
-	for(const_iterator array = begin(); array != end(); ++array)
-		array->second->resize(NewSize);
+	for(iterator array = begin(); array != end(); ++array)
+		array->second.writable().resize(NewSize);
 }
 
 } // namespace k3d

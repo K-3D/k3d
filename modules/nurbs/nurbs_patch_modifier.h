@@ -40,7 +40,6 @@
 #include <k3dsdk/point4.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/shared_pointer.h>
 
 
 #include "nurbs_curve_modifier.h"

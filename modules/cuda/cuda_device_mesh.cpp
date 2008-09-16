@@ -144,14 +144,13 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh, k3d::uint3
             // check to see if mesh's points exist
             if ( !(p_output_mesh->points) )
             {
-                boost::shared_ptr<k3d::mesh::points_t> points(new k3d::mesh::points_t(m_number_of_points));
-                p_output_mesh->points = points;
+                p_output_mesh->points.create(new k3d::mesh::points_t(m_number_of_points));
             }
             // check to see if the number of points has changed
             else if ( m_number_of_points  != p_output_mesh->points->size() )
             {
-                p_output_mesh->points.reset( new k3d::mesh::points_t ( m_number_of_points ) );
-                p_output_mesh->point_selection.reset ( new k3d::mesh::selection_t ( m_number_of_points ) );
+                p_output_mesh->points.create( new k3d::mesh::points_t ( m_number_of_points ) );
+                p_output_mesh->point_selection.create ( new k3d::mesh::selection_t ( m_number_of_points ) );
             }
             out_points = (double*)&(p_output_mesh->points->front());
         }
@@ -160,12 +159,11 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh, k3d::uint3
         {
     		if ( !(p_output_mesh->point_selection) )
     		{
-    			boost::shared_ptr<k3d::mesh::selection_t> point_selection(new k3d::mesh::selection_t(m_number_of_points));
-    			p_output_mesh->point_selection = point_selection;
+    			p_output_mesh->point_selection.create(new k3d::mesh::selection_t(m_number_of_points));
     		}
             else if ( m_number_of_points  != p_output_mesh->point_selection->size() )
             {
-                p_output_mesh->point_selection.reset ( new k3d::mesh::selection_t ( m_number_of_points ) );
+                p_output_mesh->point_selection.create ( new k3d::mesh::selection_t ( m_number_of_points ) );
             }
             out_selection = (double*)&(p_output_mesh->point_selection->front());
         }
@@ -193,8 +191,7 @@ void cuda_device_mesh::copy_from_device( k3d::mesh& destination_mesh, k3d::uint3
 	{
         if ( !p_output_mesh->polyhedra )
         {
-            boost::shared_ptr<const k3d::mesh::polyhedra_t> polyhedra (new k3d::mesh::polyhedra_t());
-            p_output_mesh->polyhedra = polyhedra;
+            p_output_mesh->polyhedra.create();
         }
 
         m_cuda_device_polyhedra.copy_from_device(*(p_output_mesh->polyhedra), what_to_copy);

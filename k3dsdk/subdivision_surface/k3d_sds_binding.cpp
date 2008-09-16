@@ -71,7 +71,7 @@ void k3d_cache_input::set_new_addresses(const k3d::mesh& Mesh)
 	m_point_selection = Mesh.point_selection;
 }
 
-k3d_cache_input::k3d_cache_input(boost::shared_ptr<const k3d::mesh::points_t> Points, boost::shared_ptr<const k3d::mesh::polyhedra_t> Polyhedra, boost::shared_ptr<const k3d::mesh::selection_t> PointSelection) :
+k3d_cache_input::k3d_cache_input(const pipeline_data<k3d::mesh::points_t>& Points, const pipeline_data<k3d::mesh::polyhedra_t>& Polyhedra, const pipeline_data<k3d::mesh::selection_t>& PointSelection) :
 		m_input_points(Points),
 		m_input_polyhedra(Polyhedra),
 		m_point_selection(PointSelection),

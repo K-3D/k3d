@@ -25,8 +25,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/mesh_modifier.h>
-#include <k3dsdk/array_operations.h>
-#include <k3dsdk/shared_pointer.h>
 
 #include <iterator>
 
@@ -61,16 +59,12 @@ public:
 
 		if(Output.polyhedra && Output.polyhedra->types)
 		{
-			k3d::mesh::polyhedra_t* const polyhedra = k3d::make_unique(Output.polyhedra);
-			k3d::mesh::polyhedra_t::types_t* const types = k3d::make_unique(polyhedra->types);
-			std::fill(types->begin(), types->end(), k3d::mesh::polyhedra_t::CATMULL_CLARK);
+			k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.writable();
+			k3d::mesh::polyhedra_t::types_t& types = polyhedra.types.writable();
+			std::fill(types.begin(), types.end(), k3d::mesh::polyhedra_t::CATMULL_CLARK);
 			
-			if (interpolateboundary)
-			{
-				boost::shared_ptr<tags_t> tags(new tags_t(types->size()));
-				std::fill(tags->begin(), tags->end(), std::string("interpolateboundary"));
-				polyhedra->constant_data["interpolateboundary"] = tags;
-			}
+			if(interpolateboundary)
+				polyhedra.constant_data.create("interpolateboundary", new k3d::typed_array<k3d::string_t>(types.size(), "interpolateboundary"));
 		}
 	}
 

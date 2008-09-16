@@ -11,64 +11,64 @@ namespace module
 
 				m_instance = &input;
 
-				if (m_instance->nurbs_patches == NULL)
+				if (!m_instance->nurbs_patches)
 				{
-					m_instance->nurbs_patches = boost::shared_ptr<k3d::mesh::nurbs_patches_t>(new k3d::mesh::nurbs_patches_t());
+					m_instance->nurbs_patches.create();
 				}
 
-				m_nurbs_patches = k3d::make_unique(m_instance->nurbs_patches);
-				m_patch_first_points = k3d::make_unique(m_nurbs_patches->patch_first_points);
-				m_patch_u_point_counts = k3d::make_unique(m_nurbs_patches->patch_u_point_counts);
-				m_patch_v_point_counts = k3d::make_unique(m_nurbs_patches->patch_v_point_counts);
-				m_patch_u_orders = k3d::make_unique(m_nurbs_patches->patch_u_orders);
-				m_patch_v_orders = k3d::make_unique(m_nurbs_patches->patch_v_orders);
-				m_patch_u_first_knots = k3d::make_unique(m_nurbs_patches->patch_u_first_knots);
-				m_patch_v_first_knots = k3d::make_unique(m_nurbs_patches->patch_v_first_knots);
-				m_patch_selection = k3d::make_unique(m_nurbs_patches->patch_selection);
-				m_patch_materials = k3d::make_unique(m_nurbs_patches->patch_materials);
-				m_patch_points = k3d::make_unique(m_nurbs_patches->patch_points);
-				m_patch_point_weights = k3d::make_unique(m_nurbs_patches->patch_point_weights);
-				m_patch_u_knots = k3d::make_unique(m_nurbs_patches->patch_u_knots);
-				m_patch_v_knots = k3d::make_unique(m_nurbs_patches->patch_v_knots);
+				m_nurbs_patches = &m_instance->nurbs_patches.writable();
+				m_patch_first_points = &m_nurbs_patches->patch_first_points.writable();
+				m_patch_u_point_counts = &m_nurbs_patches->patch_u_point_counts.writable();
+				m_patch_v_point_counts = &m_nurbs_patches->patch_v_point_counts.writable();
+				m_patch_u_orders = &m_nurbs_patches->patch_u_orders.writable();
+				m_patch_v_orders = &m_nurbs_patches->patch_v_orders.writable();
+				m_patch_u_first_knots = &m_nurbs_patches->patch_u_first_knots.writable();
+				m_patch_v_first_knots = &m_nurbs_patches->patch_v_first_knots.writable();
+				m_patch_selection = &m_nurbs_patches->patch_selection.writable();
+				m_patch_materials = &m_nurbs_patches->patch_materials.writable();
+				m_patch_points = &m_nurbs_patches->patch_points.writable();
+				m_patch_point_weights = &m_nurbs_patches->patch_point_weights.writable();
+				m_patch_u_knots = &m_nurbs_patches->patch_u_knots.writable();
+				m_patch_v_knots = &m_nurbs_patches->patch_v_knots.writable();
 
 				bool not_initialized = false;
 
 				if (!m_nurbs_patches->patch_trim_curve_loop_counts)
 				{
 					not_initialized = true;
-					m_nurbs_patches->patch_first_trim_curve_loops = boost::shared_ptr<k3d::mesh::indices_t>(new k3d::mesh::indices_t());
-					m_nurbs_patches->patch_trim_curve_loop_counts = boost::shared_ptr<k3d::mesh::counts_t>(new k3d::mesh::counts_t());
-					m_nurbs_patches->patch_first_trim_curve_loops = boost::shared_ptr<k3d::mesh::indices_t>(new k3d::mesh::indices_t());
-					m_nurbs_patches->trim_points = boost::shared_ptr<k3d::mesh::points_2d_t>(new k3d::mesh::points_2d_t());
-					m_nurbs_patches->trim_point_selection = boost::shared_ptr<k3d::mesh::selection_t>(new k3d::mesh::selection_t());
-					m_nurbs_patches->first_trim_curves = boost::shared_ptr<k3d::mesh::indices_t>(new k3d::mesh::indices_t());
-					m_nurbs_patches->trim_curve_counts = boost::shared_ptr<k3d::mesh::counts_t>(new k3d::mesh::counts_t());
-					m_nurbs_patches->trim_curve_loop_selection = boost::shared_ptr<k3d::mesh::selection_t>(new k3d::mesh::selection_t());
-					m_nurbs_patches->trim_curve_first_points = boost::shared_ptr<k3d::mesh::indices_t>(new k3d::mesh::indices_t());
-					m_nurbs_patches->trim_curve_point_counts = boost::shared_ptr<k3d::mesh::counts_t>(new k3d::mesh::counts_t());
-					m_nurbs_patches->trim_curve_orders = boost::shared_ptr<k3d::mesh::orders_t>(new k3d::mesh::orders_t());
-					m_nurbs_patches->trim_curve_first_knots = boost::shared_ptr<k3d::mesh::indices_t>(new k3d::mesh::indices_t());
-					m_nurbs_patches->trim_curve_selection = boost::shared_ptr<k3d::mesh::selection_t>(new k3d::mesh::selection_t());
-					m_nurbs_patches->trim_curve_points = boost::shared_ptr<k3d::mesh::indices_t>(new k3d::mesh::indices_t());
-					m_nurbs_patches->trim_curve_point_weights = boost::shared_ptr<k3d::mesh::weights_t>(new k3d::mesh::weights_t());
-					m_nurbs_patches->trim_curve_knots = boost::shared_ptr<k3d::mesh::knots_t>(new k3d::mesh::knots_t());
+					m_nurbs_patches->patch_first_trim_curve_loops.create();
+					m_nurbs_patches->patch_trim_curve_loop_counts.create();
+					m_nurbs_patches->patch_first_trim_curve_loops.create();
+					m_nurbs_patches->trim_points.create();
+					m_nurbs_patches->trim_point_selection.create();
+					m_nurbs_patches->first_trim_curves.create();
+					m_nurbs_patches->trim_curve_counts.create();
+					m_nurbs_patches->trim_curve_loop_selection.create();
+					m_nurbs_patches->trim_curve_first_points.create();
+					m_nurbs_patches->trim_curve_point_counts.create();
+					m_nurbs_patches->trim_curve_orders.create();
+					m_nurbs_patches->trim_curve_first_knots.create();
+					m_nurbs_patches->trim_curve_selection.create();
+					m_nurbs_patches->trim_curve_points.create();
+					m_nurbs_patches->trim_curve_point_weights.create();
+					m_nurbs_patches->trim_curve_knots.create();
 				}
 
-				m_patch_trim_curve_loop_counts = k3d::make_unique(m_nurbs_patches->patch_trim_curve_loop_counts);
-				m_patch_first_trim_curve_loops = k3d::make_unique(m_nurbs_patches->patch_first_trim_curve_loops);
-				m_trim_points = k3d::make_unique(m_nurbs_patches->trim_points);
-				m_trim_point_selection = k3d::make_unique(m_nurbs_patches->trim_point_selection);
-				m_first_trim_curves = k3d::make_unique(m_nurbs_patches->first_trim_curves);
-				m_trim_curve_counts = k3d::make_unique(m_nurbs_patches->trim_curve_counts);
-				m_trim_curve_loop_selection = k3d::make_unique(m_nurbs_patches->trim_curve_loop_selection);
-				m_trim_curve_first_points = k3d::make_unique(m_nurbs_patches->trim_curve_first_points);
-				m_trim_curve_point_counts = k3d::make_unique(m_nurbs_patches->trim_curve_point_counts);
-				m_trim_curve_orders = k3d::make_unique(m_nurbs_patches->trim_curve_orders);
-				m_trim_curve_first_knots = k3d::make_unique(m_nurbs_patches->trim_curve_first_knots);
-				m_trim_curve_selection = k3d::make_unique(m_nurbs_patches->trim_curve_selection);
-				m_trim_curve_points = k3d::make_unique(m_nurbs_patches->trim_curve_points);
-				m_trim_curve_point_weights = k3d::make_unique(m_nurbs_patches->trim_curve_point_weights);
-				m_trim_curve_knots = k3d::make_unique(m_nurbs_patches->trim_curve_knots);
+				m_patch_trim_curve_loop_counts = &m_nurbs_patches->patch_trim_curve_loop_counts.writable();
+				m_patch_first_trim_curve_loops = &m_nurbs_patches->patch_first_trim_curve_loops.writable();
+				m_trim_points = &m_nurbs_patches->trim_points.writable();
+				m_trim_point_selection = &m_nurbs_patches->trim_point_selection.writable();
+				m_first_trim_curves = &m_nurbs_patches->first_trim_curves.writable();
+				m_trim_curve_counts = &m_nurbs_patches->trim_curve_counts.writable();
+				m_trim_curve_loop_selection = &m_nurbs_patches->trim_curve_loop_selection.writable();
+				m_trim_curve_first_points = &m_nurbs_patches->trim_curve_first_points.writable();
+				m_trim_curve_point_counts = &m_nurbs_patches->trim_curve_point_counts.writable();
+				m_trim_curve_orders = &m_nurbs_patches->trim_curve_orders.writable();
+				m_trim_curve_first_knots = &m_nurbs_patches->trim_curve_first_knots.writable();
+				m_trim_curve_selection = &m_nurbs_patches->trim_curve_selection.writable();
+				m_trim_curve_points = &m_nurbs_patches->trim_curve_points.writable();
+				m_trim_curve_point_weights = &m_nurbs_patches->trim_curve_point_weights.writable();
+				m_trim_curve_knots = &m_nurbs_patches->trim_curve_knots.writable();
 
 				if (not_initialized)
 				{
@@ -80,8 +80,8 @@ namespace module
 				}
 
 
-				m_mesh_points = k3d::make_unique(m_instance->points);
-				m_point_selections = k3d::make_unique(m_instance->point_selection);
+				m_mesh_points = &m_instance->points.writable();
+				m_point_selections = &m_instance->point_selection.writable();
 			}
 			catch (std::exception& e)
 			{

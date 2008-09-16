@@ -23,7 +23,6 @@
 #include "sds_cache.h"
 
 #include <k3dsdk/hints.h>
-#include <k3dsdk/array_operations.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/selection.h>
@@ -436,7 +435,7 @@ void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::s
 {
 	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
 	{
-		if (k3d::get_array<tags_t>(Mesh.polyhedra->constant_data, "interpolateboundary") != 0)
+		if(Mesh.polyhedra->constant_data.lookup<tags_t>("interpolateboundary"))
 		{
 			face_visitor visitor;
 			Cache.visit_faces(visitor, Level, false);
@@ -487,7 +486,7 @@ void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::s
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
 		GLuint* indices = static_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY));
 		
-		if (k3d::get_array<tags_t>(Mesh.polyhedra->constant_data, "interpolateboundary") != 0)
+		if(Mesh.polyhedra->constant_data.lookup<tags_t>("interpolateboundary"))
 		{
 			update_face_vbo_visitor visitor(face_starts, indices, points);
 			Cache.visit_faces(visitor, Level, true);

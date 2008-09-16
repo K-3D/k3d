@@ -82,17 +82,11 @@ public:
 		k3d::uint32_t columns = m_columns.pipeline_value();
 
 		// Setup some of the data structure on the host
-		boost::shared_ptr<k3d::mesh::polyhedra_t> polyhedra(new k3d::mesh::polyhedra_t());
-		boost::shared_ptr<k3d::mesh::indices_t> first_faces(new k3d::mesh::indices_t(1, 0));
-		boost::shared_ptr<k3d::mesh::counts_t> face_counts(new k3d::mesh::counts_t(1, rows * columns));
-		boost::shared_ptr<k3d::mesh::polyhedra_t::types_t> types(new k3d::mesh::polyhedra_t::types_t(1, k3d::mesh::polyhedra_t::POLYGONS));
-		boost::shared_ptr<k3d::mesh::materials_t> face_materials(new k3d::mesh::materials_t(rows * columns, m_material.pipeline_value()));
-
-		polyhedra->first_faces = first_faces;
-		polyhedra->face_counts = face_counts;
-		polyhedra->types = types;
-		polyhedra->face_materials = face_materials;
-		Output.polyhedra = polyhedra;
+		k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.create(new k3d::mesh::polyhedra_t());
+		k3d::mesh::indices_t& first_faces = polyhedra.first_faces.create(new k3d::mesh::indices_t(1, 0));
+		k3d::mesh::counts_t& face_counts = polyhedra.face_counts.create(new k3d::mesh::counts_t(1, rows * columns));
+		k3d::mesh::polyhedra_t::types_t& types = polyhedra.types.create(new k3d::mesh::polyhedra_t::types_t(1, k3d::mesh::polyhedra_t::POLYGONS));
+		k3d::mesh::materials_t& face_materials = polyhedra.face_materials.create(new k3d::mesh::materials_t(rows * columns, m_material.pipeline_value()));
 
 		document().pipeline_profiler().finish_execution(*this, "Update Topology:init");
 

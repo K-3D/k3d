@@ -80,7 +80,7 @@ public:
 	typedef k3d::attribute_arrays attribute_arrays_t;
 
 	/// Stores the graph topology
-	boost::shared_ptr<const adjacency_list_t> topology;
+	pipeline_data<adjacency_list_t> topology;
 	/// Stores user-defined per-graph data
 	attribute_arrays_t graph_data;
 	/// Stores user-defined per-vertex data

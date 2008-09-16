@@ -33,7 +33,6 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/xml.h>
 
 #include <list>
@@ -51,8 +50,8 @@ class sharp_edges :
 	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
-	typedef std::vector<size_t> sharp_edges_t;
-	typedef k3d::typed_array<bool> sharpness_array_t;
+	typedef std::vector<k3d::uint_t> sharp_edges_t;
+	typedef k3d::typed_array<k3d::bool_t> sharpness_array_t;
 public:
 	sharp_edges(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
@@ -66,8 +65,7 @@ public:
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-		k3d::make_unique(Output.points);
-		
+
 		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output);
 		
 		return_if_fail(Output.polyhedra);
@@ -76,8 +74,8 @@ public:
 		
 		sharp_edges_t sharp_edge_list;
 		
-		size_t edgecount = Output.polyhedra->edge_selection->size();
-		for (size_t edge = 0; edge != edgecount; ++edge)
+		k3d::uint_t edgecount = Output.polyhedra->edge_selection->size();
+		for (k3d::uint_t edge = 0; edge != edgecount; ++edge)
 		{
 			if (Output.polyhedra->edge_selection->at(edge))
 			{
@@ -87,7 +85,7 @@ public:
 		
 		k3d::mesh::polyhedra_t* writable_polyhedra = const_cast<k3d::mesh::polyhedra_t*>(Output.polyhedra.get());
 		if (Output.polyhedra->face_varying_data.find("N") == Output.polyhedra->face_varying_data.end())
-			writable_polyhedra->face_varying_data["N"] = boost::shared_ptr<sharpness_array_t>(new sharpness_array_t(edgecount, false));
+			writable_polyhedra->face_varying_data["N"].create(new sharpness_array_t(edgecount, false));
 		m_sharp_edges.set_value(sharp_edge_list);
 	}
 	
@@ -95,14 +93,14 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		return_if_fail(Output.polyhedra);
-		k3d::mesh::named_arrays_t::const_iterator array_it = Output.polyhedra->face_varying_data.find("N");
-		return_if_fail(array_it !=  Output.polyhedra->face_varying_data.end());
-		return_if_fail(dynamic_cast<sharpness_array_t*>(array_it->second.get()));
+		k3d::mesh::named_arrays_t::iterator array_it = Output.polyhedra->face_varying_data.find("N");
+		return_if_fail(array_it != Output.polyhedra->face_varying_data.end());
+		return_if_fail(dynamic_cast<const sharpness_array_t*>(array_it->second.get()));
 		
-		sharpness_array_t& sharpness_array = *dynamic_cast<sharpness_array_t*>(array_it->second.get());
+		sharpness_array_t& sharpness_array = *dynamic_cast<sharpness_array_t*>(array_it->second.writable());
 		const sharp_edges_t& sharp_edge_list = m_sharp_edges.pipeline_value();
-		size_t sharpcount = sharp_edge_list.size();
-		for (size_t edge = 0; edge != sharpcount; ++edge)
+		k3d::uint_t sharpcount = sharp_edge_list.size();
+		for (k3d::uint_t edge = 0; edge != sharpcount; ++edge)
 		{
 			sharpness_array[sharp_edge_list[edge]] = true;
 		}

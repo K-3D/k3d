@@ -28,7 +28,6 @@
 #include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/named_arrays.h>
-#include <k3dsdk/array_operations.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/selection.h>
@@ -84,7 +83,7 @@ public:
 		k3d::typed_array<k3d::color> default_color_array;
 
 		// Get the color array ...
-		const k3d::typed_array<k3d::color>* color_array_p = k3d::get_array<k3d::typed_array<k3d::color> >(Mesh.polyhedra->face_varying_data, m_color_array.pipeline_value());
+		const k3d::mesh::colors_t* color_array_p = Mesh.polyhedra->face_varying_data.lookup<k3d::mesh::colors_t>(m_color_array.pipeline_value());
 		if(!color_array_p)
 		{
 			default_color_array.resize(edge_count, k3d::color(0.9, 0.9, 0.9));

@@ -36,6 +36,17 @@ primitive::primitive() :
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
+// create
+
+void create(mesh& Mesh, primitive& Primitive)
+{
+	k3d::mesh::primitive& generic_primitive = Mesh.primitives.create("teapots");
+	Primitive.matrices = &generic_primitive.topology.create<k3d::typed_array<k3d::matrix4> >("matrices");
+	Primitive.materials = &generic_primitive.topology.create<k3d::typed_array<k3d::imaterial*> >("materials");
+	Primitive.uniform_data = &generic_primitive.attributes["uniform"];
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
 const bool_t validate(const mesh::primitive& GenericPrimitive, primitive& Primitive)

@@ -35,7 +35,6 @@
 #include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/selection.h>
-#include <k3dsdk/shared_pointer.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
 
@@ -784,12 +783,12 @@ public:
 
 		// Make writeable copies of the arrays we intend to modify
 		document().pipeline_profiler().start_execution(*this, "Copy input");
-		k3d::mesh::polyhedra_t& output_polyhedra = *k3d::make_unique(Output.polyhedra);
-		k3d::mesh::polyhedra_t::types_t& output_types = *k3d::make_unique(output_polyhedra.types);
-		k3d::mesh::indices_t& output_loop_first_edges = *k3d::make_unique(output_polyhedra.loop_first_edges);
-		k3d::mesh::indices_t& output_edge_points = *k3d::make_unique(output_polyhedra.edge_points);
-		k3d::mesh::indices_t& output_clockwise_edges = *k3d::make_unique(output_polyhedra.clockwise_edges);
-		k3d::mesh::selection_t& output_edge_selection = *k3d::make_unique(output_polyhedra.edge_selection);
+		k3d::mesh::polyhedra_t& output_polyhedra = Output.polyhedra.create();
+		k3d::mesh::polyhedra_t::types_t& output_types = output_polyhedra.types.create();
+		k3d::mesh::indices_t& output_loop_first_edges = output_polyhedra.loop_first_edges.create();
+		k3d::mesh::indices_t& output_edge_points = output_polyhedra.edge_points.create();
+		k3d::mesh::indices_t& output_clockwise_edges = output_polyhedra.clockwise_edges.create();
+		k3d::mesh::selection_t& output_edge_selection = output_polyhedra.edge_selection.create();
 
 		// Copy the unaffected constant data
 		output_polyhedra.constant_data = Input.polyhedra->constant_data;
@@ -953,16 +952,6 @@ public:
 		// Update selection arrays
 		output_edge_selection.assign(output_edge_points.size(), 0.0);
 
-		// Set the arrays that were rebuilt
-		output_polyhedra.first_faces = output_first_faces;
-		output_polyhedra.face_counts = output_face_counts;
-		output_polyhedra.face_first_loops = output_face_first_loops;
-		output_polyhedra.face_loop_counts = output_face_loop_counts;
-		output_polyhedra.face_selection = output_face_selection;
-		output_polyhedra.face_materials = output_face_materials;
-		Output.points = output_points;
-		Output.point_selection = output_point_selection;
-		
 		// Calculate vertex valences, needed for corner point updates.
 		document().pipeline_profiler().start_execution(*this, "Vertex valence calculation");
 		k3d::create_vertex_valence_lookup(Input.points->size(), input_edge_points, m_vertex_valences);
@@ -991,7 +980,7 @@ public:
 		const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
 		k3d::merge_selection(mesh_selection.faces, input_face_selection);
 
-		k3d::mesh::points_t& output_points = *k3d::make_unique(Output.points);
+		k3d::mesh::points_t& output_points = Output.points.create();
 		output_points.assign(output_points.size(), k3d::point3(0,0,0));
 
 		// Calculate face centers

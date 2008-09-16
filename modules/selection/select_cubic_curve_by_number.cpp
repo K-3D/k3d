@@ -26,7 +26,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_modifier.h>
-#include <k3dsdk/shared_pointer.h>
 
 namespace module
 {
@@ -55,8 +54,8 @@ public:
 	{
 		if(Output.cubic_curve_groups && Output.cubic_curve_groups->curve_selection)
 		{
-		    k3d::mesh::cubic_curve_groups_t& cubic_curve_groups = *k3d::make_unique(Output.cubic_curve_groups);
-		    k3d::mesh::selection_t& curve_selection = *k3d::make_unique(cubic_curve_groups.curve_selection);
+		    k3d::mesh::cubic_curve_groups_t& cubic_curve_groups = Output.cubic_curve_groups.writable();
+		    k3d::mesh::selection_t& curve_selection = cubic_curve_groups.curve_selection.writable();
 			std::fill(curve_selection.begin(), curve_selection.end(), 0.0);
 
 			const unsigned long index = m_index.pipeline_value();

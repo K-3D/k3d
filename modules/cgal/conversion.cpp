@@ -38,78 +38,64 @@ namespace cgal
 typedef std::map<const Polyhedron::Vertex*, size_t> point_map_t;
 
 // helper function to add points
-size_t get_point(boost::shared_ptr<k3d::mesh::points_t>& Points, point_map_t& PointMap, Polyhedron::Halfedge::Vertex_const_handle Vertex)
+size_t get_point(k3d::mesh::points_t& Points, point_map_t& PointMap, Polyhedron::Halfedge::Vertex_const_handle Vertex)
 {
-	std::pair<point_map_t::iterator, bool> insert_result = PointMap.insert(std::make_pair(&(*Vertex), Points->size()));
+	std::pair<point_map_t::iterator, bool> insert_result = PointMap.insert(std::make_pair(&(*Vertex), Points.size()));
 	if (insert_result.second)
 	{
 		Point_3 mesh_point = Vertex->point();
-		Points->push_back(k3d::point3(CGAL::to_double(mesh_point.x()), CGAL::to_double(mesh_point.y()), CGAL::to_double(mesh_point.z()))); 
+		Points.push_back(k3d::point3(CGAL::to_double(mesh_point.x()), CGAL::to_double(mesh_point.y()), CGAL::to_double(mesh_point.z()))); 
 	}
 	return insert_result.first->second;
 }
 
 void to_mesh(const Polyhedron& Polyhedron, k3d::mesh& Mesh, k3d::imaterial* const Material)
 {
-  boost::shared_ptr<k3d::mesh::points_t> points(new k3d::mesh::points_t());
-  boost::shared_ptr<k3d::mesh::polyhedra_t> polyhedra(new k3d::mesh::polyhedra_t());
-	boost::shared_ptr<k3d::mesh::indices_t> first_faces(new k3d::mesh::indices_t());
-	boost::shared_ptr<k3d::mesh::counts_t> face_counts(new k3d::mesh::counts_t());
-	boost::shared_ptr<k3d::mesh::polyhedra_t::types_t> types(new k3d::mesh::polyhedra_t::types_t());
-	boost::shared_ptr<k3d::mesh::indices_t> face_first_loops(new k3d::mesh::indices_t());
-	boost::shared_ptr<k3d::mesh::counts_t> face_loop_counts(new k3d::mesh::counts_t());
-	boost::shared_ptr<k3d::mesh::selection_t> face_selection(new k3d::mesh::selection_t());
-	boost::shared_ptr<k3d::mesh::indices_t> loop_first_edges(new k3d::mesh::indices_t());
-	boost::shared_ptr<k3d::mesh::indices_t> edge_points(new k3d::mesh::indices_t());
-	boost::shared_ptr<k3d::mesh::indices_t> clockwise_edges(new k3d::mesh::indices_t());
-	boost::shared_ptr<k3d::mesh::selection_t> edge_selection(new k3d::mesh::selection_t());
-  point_map_t point_map;
-  
-  types->push_back(k3d::mesh::polyhedra_t::POLYGONS);
-  
-  for (Polyhedron::Facet_const_iterator f = Polyhedron.facets_begin(); f != Polyhedron.facets_end(); ++f)
-  {
-  	size_t face_first_loop = loop_first_edges->size();
-  	const size_t first_edge = edge_points->size();
-  	loop_first_edges->push_back(first_edge);
-  	
-  	Polyhedron::Facet::Halfedge_around_facet_const_circulator facet_start = f->facet_begin();
-  	Polyhedron::Facet::Halfedge_around_facet_const_circulator edge_circulator = facet_start;
-  	do
-  	{
-  		const Polyhedron::Halfedge& halfedge = *edge_circulator;
-			edge_points->push_back(get_point(points, point_map, halfedge.prev()->vertex()));
-			clockwise_edges->push_back(edge_points->size());
-			edge_selection->push_back(0.0);
-  		++edge_circulator;
-  	} while (facet_start != edge_circulator); 
-  	clockwise_edges->back() = first_edge;
-  	
-  	face_first_loops->push_back(face_first_loop);
-		face_loop_counts->push_back(1);
-		face_selection->push_back(0.0);
-  }
-  
-  boost::shared_ptr<k3d::mesh::selection_t> point_selection(new k3d::mesh::selection_t(points->size()));
-  
-  first_faces->push_back(0);
-	face_counts->push_back(face_first_loops->size());
-	boost::shared_ptr<k3d::mesh::materials_t> face_materials(new k3d::mesh::materials_t(face_first_loops->size(), Material));
-	
-  polyhedra->edge_selection = edge_selection;
-	polyhedra->clockwise_edges = clockwise_edges;
-	polyhedra->edge_points = edge_points;
-	polyhedra->loop_first_edges = loop_first_edges;
-	polyhedra->face_materials = face_materials;
-	polyhedra->face_selection = face_selection;
-	polyhedra->face_loop_counts = face_loop_counts;
-	polyhedra->face_first_loops = face_first_loops;
-	polyhedra->types = types;
-	polyhedra->face_counts = face_counts;
-	polyhedra->first_faces = first_faces;
-  Mesh.points = points;
-  Mesh.point_selection = point_selection;
-  Mesh.polyhedra = polyhedra;
+	k3d::mesh::points_t& points = Mesh.points.create();
+	k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.create();
+	k3d::mesh::indices_t& first_faces = polyhedra.first_faces.create();
+	k3d::mesh::counts_t& face_counts = polyhedra.face_counts.create();
+	k3d::mesh::polyhedra_t::types_t& types = polyhedra.types.create();
+	k3d::mesh::indices_t& face_first_loops = polyhedra.face_first_loops.create();
+	k3d::mesh::counts_t& face_loop_counts = polyhedra.face_loop_counts.create();
+	k3d::mesh::selection_t& face_selection = polyhedra.face_selection.create();
+	k3d::mesh::indices_t& loop_first_edges = polyhedra.loop_first_edges.create();
+	k3d::mesh::indices_t& edge_points = polyhedra.edge_points.create();
+	k3d::mesh::indices_t& clockwise_edges = polyhedra.clockwise_edges.create();
+	k3d::mesh::selection_t& edge_selection = polyhedra.edge_selection.create();
+	point_map_t point_map;
+
+	types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+
+	for(Polyhedron::Facet_const_iterator f = Polyhedron.facets_begin(); f != Polyhedron.facets_end(); ++f)
+	{
+		k3d::uint_t face_first_loop = loop_first_edges.size();
+		const k3d::uint_t first_edge = edge_points.size();
+		loop_first_edges.push_back(first_edge);
+
+		Polyhedron::Facet::Halfedge_around_facet_const_circulator facet_start = f->facet_begin();
+		Polyhedron::Facet::Halfedge_around_facet_const_circulator edge_circulator = facet_start;
+		do
+		{
+			const Polyhedron::Halfedge& halfedge = *edge_circulator;
+			edge_points.push_back(get_point(points, point_map, halfedge.prev()->vertex()));
+			clockwise_edges.push_back(edge_points.size());
+			edge_selection.push_back(0.0);
+			++edge_circulator;
+		} while (facet_start != edge_circulator); 
+		clockwise_edges.back() = first_edge;
+
+		face_first_loops.push_back(face_first_loop);
+		face_loop_counts.push_back(1);
+		face_selection.push_back(0.0);
+	}
+
+	Mesh.point_selection.create(new k3d::mesh::selection_t(points.size()));
+
+	first_faces.push_back(0);
+	face_counts.push_back(face_first_loops.size());
+
+	polyhedra.face_materials.create(new k3d::mesh::materials_t(face_first_loops.size(), Material));
 }
 
 // Note: Nef_polyhedron to mesh conversion based on the to_Polyhedron_3 conversion from Nef_polyhedron_3.h in the CGAL distribution,

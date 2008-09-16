@@ -22,9 +22,7 @@
 */
 
 #include "gprim_factory.h"
-
 #include "imaterial.h"
-#include "shared_pointer.h"
 
 namespace k3d
 {
@@ -244,8 +242,8 @@ void gprim_factory::add_point(const point3& Point)
 {
 	if(!m_implementation->points)
 	{
-		m_implementation->points = make_unique(m_implementation->target_mesh.points);
-		m_implementation->point_selection = make_unique(m_implementation->target_mesh.point_selection);
+		m_implementation->points = &m_implementation->target_mesh.points.writable();
+		m_implementation->point_selection = &m_implementation->target_mesh.point_selection.writable();
 		m_implementation->point_weights = new mesh::weights_t(); // Note: *not* part of the mesh!
 	}
 
@@ -258,8 +256,8 @@ void gprim_factory::add_point(const point4& Point)
 {
 	if(!m_implementation->points)
 	{
-		m_implementation->points = make_unique(m_implementation->target_mesh.points);
-		m_implementation->point_selection = make_unique(m_implementation->target_mesh.point_selection);
+		m_implementation->points = &m_implementation->target_mesh.points.writable();
+		m_implementation->point_selection = &m_implementation->target_mesh.point_selection.writable();
 		m_implementation->point_weights = new mesh::weights_t(); // Note: *not* part of the mesh!
 	}
 
@@ -274,18 +272,18 @@ void gprim_factory::add_polygon(const mesh::indices_t& Points)
 
 	if(!m_implementation->first_faces)
 	{
-		mesh::polyhedra_t* const polyhedra = make_unique(m_implementation->target_mesh.polyhedra);
-		m_implementation->first_faces = make_unique(polyhedra->first_faces);
-		m_implementation->face_counts = make_unique(polyhedra->face_counts);
-		m_implementation->types = make_unique(polyhedra->types);
-		m_implementation->face_first_loops = make_unique(polyhedra->face_first_loops);
-		m_implementation->face_loop_counts = make_unique(polyhedra->face_loop_counts);
-		m_implementation->face_selection = make_unique(polyhedra->face_selection);
-		m_implementation->face_materials = make_unique(polyhedra->face_materials);
-		m_implementation->loop_first_edges = make_unique(polyhedra->loop_first_edges);
-		m_implementation->edge_points = make_unique(polyhedra->edge_points);
-		m_implementation->clockwise_edges = make_unique(polyhedra->clockwise_edges);
-		m_implementation->edge_selection = make_unique(polyhedra->edge_selection);
+		mesh::polyhedra_t* const polyhedra = &m_implementation->target_mesh.polyhedra.writable();
+		m_implementation->first_faces = &polyhedra->first_faces.writable();
+		m_implementation->face_counts = &polyhedra->face_counts.writable();
+		m_implementation->types = &polyhedra->types.writable();
+		m_implementation->face_first_loops = &polyhedra->face_first_loops.writable();
+		m_implementation->face_loop_counts = &polyhedra->face_loop_counts.writable();
+		m_implementation->face_selection = &polyhedra->face_selection.writable();
+		m_implementation->face_materials = &polyhedra->face_materials.writable();
+		m_implementation->loop_first_edges = &polyhedra->loop_first_edges.writable();
+		m_implementation->edge_points = &polyhedra->edge_points.writable();
+		m_implementation->clockwise_edges = &polyhedra->clockwise_edges.writable();
+		m_implementation->edge_selection = &polyhedra->edge_selection.writable();
 		m_implementation->first_faces->push_back(0);
 		m_implementation->types->push_back(mesh::polyhedra_t::POLYGONS);
 	}
@@ -332,20 +330,20 @@ bool gprim_factory::add_nurbs_patch(const size_t UOrder, const size_t VOrder, co
 {
 	if(!m_implementation->nurbs_patch_first_points)
 	{
-		mesh::nurbs_patches_t* const nurbs_patches = make_unique(m_implementation->target_mesh.nurbs_patches);
-		m_implementation->nurbs_patch_first_points = make_unique(nurbs_patches->patch_first_points);
-		m_implementation->nurbs_patch_u_point_counts = make_unique(nurbs_patches->patch_u_point_counts);
-		m_implementation->nurbs_patch_v_point_counts = make_unique(nurbs_patches->patch_v_point_counts);
-		m_implementation->nurbs_patch_u_orders = make_unique(nurbs_patches->patch_u_orders);
-		m_implementation->nurbs_patch_v_orders = make_unique(nurbs_patches->patch_v_orders);
-		m_implementation->nurbs_patch_u_first_knots = make_unique(nurbs_patches->patch_u_first_knots);
-		m_implementation->nurbs_patch_v_first_knots = make_unique(nurbs_patches->patch_v_first_knots);
-		m_implementation->nurbs_patch_selection = make_unique(nurbs_patches->patch_selection);
-		m_implementation->nurbs_patch_materials = make_unique(nurbs_patches->patch_materials);
-		m_implementation->nurbs_patch_points = make_unique(nurbs_patches->patch_points);
-		m_implementation->nurbs_patch_point_weights = make_unique(nurbs_patches->patch_point_weights);
-		m_implementation->nurbs_patch_u_knots = make_unique(nurbs_patches->patch_u_knots);
-		m_implementation->nurbs_patch_v_knots = make_unique(nurbs_patches->patch_v_knots);
+		mesh::nurbs_patches_t* const nurbs_patches = &m_implementation->target_mesh.nurbs_patches.writable();
+		m_implementation->nurbs_patch_first_points = &nurbs_patches->patch_first_points.writable();
+		m_implementation->nurbs_patch_u_point_counts = &nurbs_patches->patch_u_point_counts.writable();
+		m_implementation->nurbs_patch_v_point_counts = &nurbs_patches->patch_v_point_counts.writable();
+		m_implementation->nurbs_patch_u_orders = &nurbs_patches->patch_u_orders.writable();
+		m_implementation->nurbs_patch_v_orders = &nurbs_patches->patch_v_orders.writable();
+		m_implementation->nurbs_patch_u_first_knots = &nurbs_patches->patch_u_first_knots.writable();
+		m_implementation->nurbs_patch_v_first_knots = &nurbs_patches->patch_v_first_knots.writable();
+		m_implementation->nurbs_patch_selection = &nurbs_patches->patch_selection.writable();
+		m_implementation->nurbs_patch_materials = &nurbs_patches->patch_materials.writable();
+		m_implementation->nurbs_patch_points = &nurbs_patches->patch_points.writable();
+		m_implementation->nurbs_patch_point_weights = &nurbs_patches->patch_point_weights.writable();
+		m_implementation->nurbs_patch_u_knots = &nurbs_patches->patch_u_knots.writable();
+		m_implementation->nurbs_patch_v_knots = &nurbs_patches->patch_v_knots.writable();
 	}
 
 	m_implementation->u_offsets.push_back(0.0);
@@ -394,27 +392,27 @@ bool gprim_factory::add_nurbs_patch(const size_t UOrder, const size_t VOrder, co
 
 bool gprim_factory::add_trim_curve(const uint_t Order, const mesh::points_2d_t& Points, const mesh::knots_t& Knots, const mesh::weights_t& Weights)
 {
-	mesh::nurbs_patches_t* const nurbs_patches = make_unique(m_implementation->target_mesh.nurbs_patches);
+	mesh::nurbs_patches_t* const nurbs_patches = &m_implementation->target_mesh.nurbs_patches.writable();
 
 	if (!m_implementation->patch_trim_curve_loop_counts)
 	{
-		m_implementation->patch_trim_curve_loop_counts = make_unique(nurbs_patches->patch_trim_curve_loop_counts);
-		m_implementation->patch_first_trim_curve_loops = make_unique(nurbs_patches->patch_first_trim_curve_loops);
+		m_implementation->patch_trim_curve_loop_counts = &nurbs_patches->patch_trim_curve_loop_counts.writable();
+		m_implementation->patch_first_trim_curve_loops = &nurbs_patches->patch_first_trim_curve_loops.writable();
 		m_implementation->patch_trim_curve_loop_counts->resize(m_implementation->nurbs_patch_first_points->size(), 0);
 		m_implementation->patch_first_trim_curve_loops->resize(m_implementation->nurbs_patch_first_points->size(), 0);
-		m_implementation->trim_points = make_unique(nurbs_patches->trim_points);
-		m_implementation->trim_point_selection = make_unique(nurbs_patches->trim_point_selection);
-		m_implementation->first_trim_curves = make_unique(nurbs_patches->first_trim_curves);
-		m_implementation->trim_curve_counts = make_unique(nurbs_patches->trim_curve_counts);
-		m_implementation->trim_curve_loop_selection = make_unique(nurbs_patches->trim_curve_loop_selection);
-		m_implementation->trim_curve_first_points = make_unique(nurbs_patches->trim_curve_first_points);
-		m_implementation->trim_curve_point_counts = make_unique(nurbs_patches->trim_curve_point_counts);
-		m_implementation->trim_curve_orders = make_unique(nurbs_patches->trim_curve_orders);
-		m_implementation->trim_curve_first_knots = make_unique(nurbs_patches->trim_curve_first_knots);
-		m_implementation->trim_curve_selection = make_unique(nurbs_patches->trim_curve_selection);
-		m_implementation->trim_curve_points = make_unique(nurbs_patches->trim_curve_points);
-		m_implementation->trim_curve_point_weights = make_unique(nurbs_patches->trim_curve_point_weights);
-		m_implementation->trim_curve_knots = make_unique(nurbs_patches->trim_curve_knots);
+		m_implementation->trim_points = &nurbs_patches->trim_points.writable();
+		m_implementation->trim_point_selection = &nurbs_patches->trim_point_selection.writable();
+		m_implementation->first_trim_curves = &nurbs_patches->first_trim_curves.writable();
+		m_implementation->trim_curve_counts = &nurbs_patches->trim_curve_counts.writable();
+		m_implementation->trim_curve_loop_selection = &nurbs_patches->trim_curve_loop_selection.writable();
+		m_implementation->trim_curve_first_points = &nurbs_patches->trim_curve_first_points.writable();
+		m_implementation->trim_curve_point_counts = &nurbs_patches->trim_curve_point_counts.writable();
+		m_implementation->trim_curve_orders = &nurbs_patches->trim_curve_orders.writable();
+		m_implementation->trim_curve_first_knots = &nurbs_patches->trim_curve_first_knots.writable();
+		m_implementation->trim_curve_selection = &nurbs_patches->trim_curve_selection.writable();
+		m_implementation->trim_curve_points = &nurbs_patches->trim_curve_points.writable();
+		m_implementation->trim_curve_point_weights = &nurbs_patches->trim_curve_point_weights.writable();
+		m_implementation->trim_curve_knots = &nurbs_patches->trim_curve_knots.writable();
 	}
 
 	return_val_if_fail(!m_implementation->nurbs_patch_first_points->empty(), false);
@@ -492,20 +490,20 @@ void gprim_factory::close_trim_loop()
 
 void gprim_factory::add_nurbs_curve(const uint_t Order, const mesh::indices_t& Points, const mesh::knots_t& Knots, const mesh::weights_t& Weights)
 {
-	mesh::nurbs_curve_groups_t* const nurbs_curves = make_unique(m_implementation->target_mesh.nurbs_curve_groups);
+	mesh::nurbs_curve_groups_t* const nurbs_curves = &m_implementation->target_mesh.nurbs_curve_groups.writable();
 	if (!m_implementation->first_curves)
 	{
-		m_implementation->first_curves = make_unique(nurbs_curves->first_curves);
-		m_implementation->curve_counts = make_unique(nurbs_curves->curve_counts);
-		m_implementation->materials = make_unique(nurbs_curves->materials);
-		m_implementation->curve_first_points = make_unique(nurbs_curves->curve_first_points);
-		m_implementation->curve_point_counts = make_unique(nurbs_curves->curve_point_counts);
-		m_implementation->curve_orders = make_unique(nurbs_curves->curve_orders);
-		m_implementation->curve_first_knots = make_unique(nurbs_curves->curve_first_knots);
-		m_implementation->curve_selection = make_unique(nurbs_curves->curve_selection);
-		m_implementation->curve_points = make_unique(nurbs_curves->curve_points);
-		m_implementation->curve_point_weights = make_unique(nurbs_curves->curve_point_weights);
-		m_implementation->curve_knots = make_unique(nurbs_curves->curve_knots);
+		m_implementation->first_curves = &nurbs_curves->first_curves.writable();
+		m_implementation->curve_counts = &nurbs_curves->curve_counts.writable();
+		m_implementation->materials = &nurbs_curves->materials.writable();
+		m_implementation->curve_first_points = &nurbs_curves->curve_first_points.writable();
+		m_implementation->curve_point_counts = &nurbs_curves->curve_point_counts.writable();
+		m_implementation->curve_orders = &nurbs_curves->curve_orders.writable();
+		m_implementation->curve_first_knots = &nurbs_curves->curve_first_knots.writable();
+		m_implementation->curve_selection = &nurbs_curves->curve_selection.writable();
+		m_implementation->curve_points = &nurbs_curves->curve_points.writable();
+		m_implementation->curve_point_weights = &nurbs_curves->curve_point_weights.writable();
+		m_implementation->curve_knots = &nurbs_curves->curve_knots.writable();
 		m_implementation->first_curves->push_back(0);
 		m_implementation->curve_counts->push_back(0);
 		m_implementation->materials->push_back(static_cast<imaterial*>(0));

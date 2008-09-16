@@ -29,7 +29,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_topology_data.h>
-#include <k3dsdk/array_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
@@ -124,7 +123,7 @@ class sds_face_painter : public sds_painter<face_selection>
 {
 	typedef sds_painter<face_selection> base;
 	typedef face_selection selection_t;
-	typedef k3d::typed_array<std::string> tags_t;
+	typedef k3d::typed_array<std::string> strings_t;
 public:
 	sds_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, k3d::color(0.2,0.2,0.2),k3d::color(0.6,0.6,0.6))
@@ -154,7 +153,7 @@ protected:
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
-		bool interpolateboundary = (k3d::get_array<tags_t>(Mesh.polyhedra->constant_data, "interpolateboundary") != 0);
+		const k3d::bool_t interpolateboundary = Mesh.polyhedra->constant_data.lookup<strings_t>("interpolateboundary") ? true : false;
 		k3d::mesh::indices_t companions;
 		k3d::mesh::bools_t boundary_edges;
 		k3d::mesh::bools_t boundary_faces;

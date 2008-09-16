@@ -27,31 +27,26 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/mesh.h>
 
-#include <lib3ds/file.h>
-#include <lib3ds/camera.h>
-#include <lib3ds/mesh.h>
-#include <lib3ds/node.h>
-#include <lib3ds/material.h>
-#include <lib3ds/matrix.h>
-#include <lib3ds/vector.h>
-#include <lib3ds/light.h>
-
 namespace module
 {
+
 namespace f3ds
 {
+
 namespace io
 {
 
-	class f3dsParser
-	{
-	public:
-		f3dsParser(const char *filename, k3d::mesh &Mesh);
-		f3dsParser(const char *filename, k3d::idocument& Document);
-	};
+class f3dsParser
+{
+public:
+	f3dsParser(const char *filename, k3d::mesh &Mesh);
+};
 
-}
-}
-}
+} // namespace io
+
+} // namespace f3ds
+
+} // namespace module
 
 #endif
+

@@ -255,32 +255,29 @@ void cuda_device_polyhedra::copy_from_device(const k3d::mesh::polyhedra_t& desti
 
         if ( !p_output_polyhedra->edge_points )
         {
-            boost::shared_ptr<const k3d::mesh::indices_t> edge_points ( new k3d::mesh::indices_t ( m_number_of_edges ) );
-            p_output_polyhedra->edge_points = edge_points;
+            p_output_polyhedra->edge_points.create(new k3d::mesh::indices_t ( m_number_of_edges ) );
         }
         else if ( p_output_polyhedra->edge_points->size() != m_number_of_edges )
         {
-            p_output_polyhedra->edge_points.reset ( new k3d::mesh::indices_t ( m_number_of_edges ) );
+            p_output_polyhedra->edge_points.create ( new k3d::mesh::indices_t ( m_number_of_edges ) );
         }
 
         if ( !p_output_polyhedra->clockwise_edges )
         {
-            boost::shared_ptr<const k3d::mesh::indices_t> clockwise_edges ( new k3d::mesh::indices_t ( m_number_of_edges ) );
-            p_output_polyhedra->clockwise_edges = clockwise_edges;
+            p_output_polyhedra->clockwise_edges.create(new k3d::mesh::indices_t ( m_number_of_edges ) );
         }
         else if ( p_output_polyhedra->clockwise_edges->size() != m_number_of_edges )
         {
-            p_output_polyhedra->clockwise_edges.reset ( new k3d::mesh::indices_t ( m_number_of_edges ) );
+            p_output_polyhedra->clockwise_edges.create( new k3d::mesh::indices_t ( m_number_of_edges ) );
         }
 
         if ( !p_output_polyhedra->edge_selection )
         {
-            boost::shared_ptr<const k3d::mesh::selection_t> edge_selection ( new k3d::mesh::selection_t ( m_number_of_edges ) );
-            p_output_polyhedra->edge_selection = edge_selection;
+            p_output_polyhedra->edge_selection.create( new k3d::mesh::selection_t ( m_number_of_edges ) );
         }
         else if ( p_output_polyhedra->edge_selection->size() != m_number_of_edges )
         {
-            p_output_polyhedra->edge_selection.reset ( new k3d::mesh::selection_t ( m_number_of_edges ) );
+            p_output_polyhedra->edge_selection.create( new k3d::mesh::selection_t ( m_number_of_edges ) );
         }
 
         synchronize_threads();
@@ -299,12 +296,11 @@ void cuda_device_polyhedra::copy_from_device(const k3d::mesh::polyhedra_t& desti
         //k3d::log() << debug << "cuda_device_polyhedra::copy_from_device::POLYHEDRA_ALL_LOOPS" << std::endl;
         if ( !p_output_polyhedra->loop_first_edges )
         {
-            boost::shared_ptr<const k3d::mesh::indices_t> loop_first_edges ( new k3d::mesh::indices_t ( m_number_of_loops ) );
-            p_output_polyhedra->loop_first_edges = loop_first_edges;
+            p_output_polyhedra->loop_first_edges.create( new k3d::mesh::indices_t ( m_number_of_loops ) );
         }
         else if ( p_output_polyhedra->loop_first_edges->size() != m_number_of_loops )
         {
-            p_output_polyhedra->loop_first_edges.reset ( new k3d::mesh::indices_t ( m_number_of_loops ) );
+            p_output_polyhedra->loop_first_edges.create( new k3d::mesh::indices_t ( m_number_of_loops ) );
         }
 
         copy_from_device_to_host_uint_64_bit_check((void*)&(p_output_polyhedra->loop_first_edges->front()), (const void*)pdev_per_loop_first_edge, m_number_of_loops*sizeof(k3d::uint32_t));
@@ -320,32 +316,29 @@ void cuda_device_polyhedra::copy_from_device(const k3d::mesh::polyhedra_t& desti
 
         if ( !p_output_polyhedra->face_first_loops )
         {
-            boost::shared_ptr<const k3d::mesh::indices_t> face_first_loops ( new k3d::mesh::indices_t ( m_number_of_faces ) );
-            p_output_polyhedra->face_first_loops = face_first_loops;
+            p_output_polyhedra->face_first_loops.create( new k3d::mesh::indices_t ( m_number_of_faces ) );
         }
         else if ( p_output_polyhedra->face_first_loops->size() != m_number_of_faces )
         {
-            p_output_polyhedra->face_first_loops.reset ( new k3d::mesh::indices_t ( m_number_of_faces ) );
+            p_output_polyhedra->face_first_loops.create( new k3d::mesh::indices_t ( m_number_of_faces ) );
         }
 
         if ( !p_output_polyhedra->face_loop_counts )
         {
-            boost::shared_ptr<const k3d::mesh::indices_t> face_loop_counts ( new k3d::mesh::indices_t ( m_number_of_faces ) );
-            p_output_polyhedra->face_loop_counts = face_loop_counts;
+            p_output_polyhedra->face_loop_counts.create( new k3d::mesh::indices_t ( m_number_of_faces ) );
         }
         else if ( p_output_polyhedra->face_loop_counts->size() != m_number_of_faces )
         {
-            p_output_polyhedra->face_loop_counts.reset ( new k3d::mesh::indices_t ( m_number_of_faces ) );
+            p_output_polyhedra->face_loop_counts.create( new k3d::mesh::indices_t ( m_number_of_faces ) );
         }
 
         if ( !p_output_polyhedra->face_selection )
         {
-            boost::shared_ptr<const k3d::mesh::selection_t> face_selection ( new k3d::mesh::selection_t ( m_number_of_faces ) );
-            p_output_polyhedra->face_selection = face_selection;
+            p_output_polyhedra->face_selection.create(new k3d::mesh::selection_t ( m_number_of_faces ) );
         }
         else if ( p_output_polyhedra->face_selection->size() != m_number_of_faces )
         {
-            p_output_polyhedra->face_selection.reset ( new k3d::mesh::selection_t ( m_number_of_faces ) );
+            p_output_polyhedra->face_selection.create(new k3d::mesh::selection_t ( m_number_of_faces ) );
         }
 
         synchronize_threads();
@@ -365,32 +358,29 @@ void cuda_device_polyhedra::copy_from_device(const k3d::mesh::polyhedra_t& desti
 
         if ( !p_output_polyhedra->first_faces )
         {
-            boost::shared_ptr<const k3d::mesh::indices_t> first_faces ( new k3d::mesh::indices_t ( m_number_of_polygons ) );
-            p_output_polyhedra->first_faces = first_faces;
+            p_output_polyhedra->first_faces.create(new k3d::mesh::indices_t ( m_number_of_polygons ) );
         }
         else if ( p_output_polyhedra->first_faces->size() != m_number_of_polygons )
         {
-            p_output_polyhedra->first_faces.reset ( new k3d::mesh::indices_t ( m_number_of_polygons ) );
+            p_output_polyhedra->first_faces.create(new k3d::mesh::indices_t ( m_number_of_polygons ) );
         }
 
         if ( !p_output_polyhedra->face_counts )
         {
-            boost::shared_ptr<const k3d::mesh::indices_t> face_counts ( new k3d::mesh::indices_t ( m_number_of_polygons ) );
-            p_output_polyhedra->face_counts = face_counts;
+            p_output_polyhedra->face_counts.create(new k3d::mesh::indices_t ( m_number_of_polygons ) );
         }
         else if ( p_output_polyhedra->face_counts->size() != m_number_of_polygons )
         {
-            p_output_polyhedra->face_counts.reset ( new k3d::mesh::indices_t ( m_number_of_polygons ) );
+            p_output_polyhedra->face_counts.create(new k3d::mesh::indices_t ( m_number_of_polygons ) );
         }
 
         if ( !p_output_polyhedra->types )
         {
-            boost::shared_ptr<const k3d::mesh::polyhedra_t::types_t> types ( new k3d::mesh::polyhedra_t::types_t ( m_number_of_polygons ) );
-            p_output_polyhedra->types = types;
+            p_output_polyhedra->types.create(new k3d::mesh::polyhedra_t::types_t ( m_number_of_polygons ) );
         }
         else if ( p_output_polyhedra->types->size() != m_number_of_polygons )
         {
-            p_output_polyhedra->types.reset ( new k3d::mesh::polyhedra_t::types_t ( m_number_of_polygons ) );
+            p_output_polyhedra->types.create(new k3d::mesh::polyhedra_t::types_t ( m_number_of_polygons ) );
         }
 
         copy_from_device_to_host_uint_64_bit_check((void*)&(p_output_polyhedra->first_faces->front()), (const void*)pdev_per_polygon_first_face, m_number_of_polygons*sizeof(k3d::uint32_t));

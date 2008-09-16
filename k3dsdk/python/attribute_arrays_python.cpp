@@ -108,11 +108,11 @@ static void resize(attribute_arrays_wrapper& Self, const uint_t NewSize)
 
 static object get_item(attribute_arrays_wrapper& Self, const string_t& Key)
 {
-	k3d::attribute_arrays::const_iterator iterator = Self.wrapped().find(Key);
+	k3d::attribute_arrays::iterator iterator = Self.wrapped().find(Key);
 	if(iterator == Self.wrapped().end())
 		throw std::runtime_error("unknown key: " + Key);
 
-	return wrap_array(iterator->second.get());
+	return wrap_array(iterator->second.writable());
 }
 
 void define_class_attribute_arrays()
