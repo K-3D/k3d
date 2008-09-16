@@ -75,7 +75,7 @@ public:
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-		k3d::make_unique(Output.points);
+		k3d::mesh::points_t& output_points = Output.points.writable();
 		m_input_points = Input.points;
 		m_output_points = Output.points;
 		
@@ -85,7 +85,7 @@ public:
 		tweaks_t::const_iterator last = tweaks.end();
 		--last;
 		size_t max_index = last->first;
-		if (!Output.points || max_index > Output.points->size())
+		if (!Output.points || max_index > output_points.size())
 		{
 			m_tweaks.set_value(tweaks_t());
 			return;
@@ -111,7 +111,7 @@ public:
 		return_if_fail(Output.point_selection->size() == Output.points->size());
 
 		const k3d::mesh::points_t& input_points = *Input.points;
-		k3d::mesh::points_t& output_points = *(const_cast<k3d::mesh::points_t*>(Output.points.get()));
+		k3d::mesh::points_t& output_points = Output.points.writable();
 		m_input_points = Input.points;
 		m_output_points = Output.points;
 		
@@ -272,8 +272,8 @@ public:
 	
 private:
 	k3d::hint::mesh_geometry_changed m_hint;
-	boost::shared_ptr<const k3d::mesh::points_t> m_input_points; // cached for access in on_drag_changed
-	boost::shared_ptr<const k3d::mesh::points_t> m_output_points; // cached for access in on_drag_changed
+	k3d::pipeline_data<k3d::mesh::points_t> m_input_points; // cached for access in on_drag_changed
+	k3d::pipeline_data<k3d::mesh::points_t> m_output_points; // cached for access in on_drag_changed
 	std::vector<k3d::vector3> m_selected_tweaks; // Cache for fast access to tweaks needed during drag motion
 	bool m_selection_copied;
 
