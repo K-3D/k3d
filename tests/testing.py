@@ -400,7 +400,7 @@ def bitmap_compare_plugin_outputs(referenceName, pluginToTest, pluginPropertyVal
 	# calculate the perceptual difference
 	bitmap_perceptual_difference(document, referenceNode.get_property("output_bitmap"), testNode.get_property("output_bitmap"))
 
-def image_comparison(document, image, image_name, threshold):
+def image_comparison(document, image_property, image_name, threshold):
 
 	output_file = k3d.generic_path(binary_path() + "/" + image_name + ".output.png")
 	reference_file = k3d.generic_path(source_path() + "/bitmaps/" + image_name + ".reference.png")
@@ -408,25 +408,33 @@ def image_comparison(document, image, image_name, threshold):
 
 	reference = document.new_node("PNGBitmapReader")
 	reference.file = reference_file
+	reference_property = reference.get_property("output_bitmap")
 
 	difference = document.new_node("BitmapPerceptualDifference")
 	difference.field_of_view = 10.0
 	difference.luminance = 100
-	document.set_dependency(difference.get_property("input_a"), image)
-	document.set_dependency(difference.get_property("input_b"), reference.get_property("output_bitmap"))
+	difference_property = difference.get_property("output_bitmap")
+	document.set_dependency(difference.get_property("input_a"), image_property)
+	document.set_dependency(difference.get_property("input_b"), reference_property)
 
 	image_writer = document.new_node("PNGBitmapWriter")
 	image_writer.file = output_file
-	document.set_dependency(image_writer.get_property("input_bitmap"), image)
+	document.set_dependency(image_writer.get_property("input_bitmap"), image_property)
 
 	difference_writer = document.new_node("PNGBitmapWriter")
 	difference_writer.file= difference_file
-	document.set_dependency(difference_writer.get_property("input_bitmap"), difference.get_property("output"))
+	document.set_dependency(difference_writer.get_property("input_bitmap"), difference_property)
 
-	pixel_count = image.internal_value().width() * image.internal_value().height()
+	pixel_count = image_property.pipeline_value().width() * image_property.pipeline_value().height()
 	pixel_difference = difference.difference
 	difference_measurement = float(pixel_difference) / float(pixel_count)
 
+	print """<DartMeasurement name="Source Width" type="numeric/float">""" + str(image_property.pipeline_value().width()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Source Height" type="numeric/float">""" + str(image_property.pipeline_value().height()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Reference Width" type="numeric/float">""" + str(reference_property.pipeline_value().width()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Reference Height" type="numeric/float">""" + str(reference_property.pipeline_value().height()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Difference Width" type="numeric/float">""" + str(difference_property.pipeline_value().width()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Difference Height" type="numeric/float">""" + str(difference_property.pipeline_value().height()) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Pixel Difference" type="numeric/float">""" + str(pixel_difference) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Pixel Count" type="numeric/float">""" + str(pixel_count) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Difference" type="numeric/float">""" + str(difference_measurement) + """</DartMeasurement>"""
