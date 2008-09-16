@@ -53,9 +53,9 @@ ADD_TEST(k3dsdk.path.relative.001 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "
 ADD_TEST(k3dsdk.path.relative.002 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/home/bubba" "k3d/test.k3d")
 ADD_TEST(k3dsdk.path.relative.003 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/var/documents" "../../home/bubba/k3d/test.k3d")
 
-ADD_EXECUTABLE(test-shared-arrays shared_arrays.cpp)
-ADD_TEST(k3dsdk.shared-arrays ${EXECUTABLE_OUTPUT_PATH}/test-shared-arrays)
-
 ADD_EXECUTABLE(test-xml-sanity-checks xml_sanity_checks.cpp)
 ADD_TEST(k3dsdk.xml-sanity-checks ${EXECUTABLE_OUTPUT_PATH}/test-xml-sanity-checks)
+
+ADD_EXECUTABLE(test-pipeline-data pipeline_data.cpp)
+ADD_TEST(k3dsdk.pipeline-data ${EXECUTABLE_OUTPUT_PATH}/test-pipeline-data)
 
