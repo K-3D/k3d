@@ -256,8 +256,8 @@ void gprim_factory::add_point(const point4& Point)
 {
 	if(!m_implementation->points)
 	{
-		m_implementation->points = &m_implementation->target_mesh.points.writable();
-		m_implementation->point_selection = &m_implementation->target_mesh.point_selection.writable();
+		m_implementation->points = &m_implementation->target_mesh.points.create();
+		m_implementation->point_selection = &m_implementation->target_mesh.point_selection.create();
 		m_implementation->point_weights = new mesh::weights_t(); // Note: *not* part of the mesh!
 	}
 
@@ -272,18 +272,18 @@ void gprim_factory::add_polygon(const mesh::indices_t& Points)
 
 	if(!m_implementation->first_faces)
 	{
-		mesh::polyhedra_t* const polyhedra = &m_implementation->target_mesh.polyhedra.writable();
-		m_implementation->first_faces = &polyhedra->first_faces.writable();
-		m_implementation->face_counts = &polyhedra->face_counts.writable();
-		m_implementation->types = &polyhedra->types.writable();
-		m_implementation->face_first_loops = &polyhedra->face_first_loops.writable();
-		m_implementation->face_loop_counts = &polyhedra->face_loop_counts.writable();
-		m_implementation->face_selection = &polyhedra->face_selection.writable();
-		m_implementation->face_materials = &polyhedra->face_materials.writable();
-		m_implementation->loop_first_edges = &polyhedra->loop_first_edges.writable();
-		m_implementation->edge_points = &polyhedra->edge_points.writable();
-		m_implementation->clockwise_edges = &polyhedra->clockwise_edges.writable();
-		m_implementation->edge_selection = &polyhedra->edge_selection.writable();
+		mesh::polyhedra_t* const polyhedra = &m_implementation->target_mesh.polyhedra.create();
+		m_implementation->first_faces = &polyhedra->first_faces.create();
+		m_implementation->face_counts = &polyhedra->face_counts.create();
+		m_implementation->types = &polyhedra->types.create();
+		m_implementation->face_first_loops = &polyhedra->face_first_loops.create();
+		m_implementation->face_loop_counts = &polyhedra->face_loop_counts.create();
+		m_implementation->face_selection = &polyhedra->face_selection.create();
+		m_implementation->face_materials = &polyhedra->face_materials.create();
+		m_implementation->loop_first_edges = &polyhedra->loop_first_edges.create();
+		m_implementation->edge_points = &polyhedra->edge_points.create();
+		m_implementation->clockwise_edges = &polyhedra->clockwise_edges.create();
+		m_implementation->edge_selection = &polyhedra->edge_selection.create();
 		m_implementation->first_faces->push_back(0);
 		m_implementation->types->push_back(mesh::polyhedra_t::POLYGONS);
 	}
@@ -330,20 +330,20 @@ bool gprim_factory::add_nurbs_patch(const size_t UOrder, const size_t VOrder, co
 {
 	if(!m_implementation->nurbs_patch_first_points)
 	{
-		mesh::nurbs_patches_t* const nurbs_patches = &m_implementation->target_mesh.nurbs_patches.writable();
-		m_implementation->nurbs_patch_first_points = &nurbs_patches->patch_first_points.writable();
-		m_implementation->nurbs_patch_u_point_counts = &nurbs_patches->patch_u_point_counts.writable();
-		m_implementation->nurbs_patch_v_point_counts = &nurbs_patches->patch_v_point_counts.writable();
-		m_implementation->nurbs_patch_u_orders = &nurbs_patches->patch_u_orders.writable();
-		m_implementation->nurbs_patch_v_orders = &nurbs_patches->patch_v_orders.writable();
-		m_implementation->nurbs_patch_u_first_knots = &nurbs_patches->patch_u_first_knots.writable();
-		m_implementation->nurbs_patch_v_first_knots = &nurbs_patches->patch_v_first_knots.writable();
-		m_implementation->nurbs_patch_selection = &nurbs_patches->patch_selection.writable();
-		m_implementation->nurbs_patch_materials = &nurbs_patches->patch_materials.writable();
-		m_implementation->nurbs_patch_points = &nurbs_patches->patch_points.writable();
-		m_implementation->nurbs_patch_point_weights = &nurbs_patches->patch_point_weights.writable();
-		m_implementation->nurbs_patch_u_knots = &nurbs_patches->patch_u_knots.writable();
-		m_implementation->nurbs_patch_v_knots = &nurbs_patches->patch_v_knots.writable();
+		mesh::nurbs_patches_t* const nurbs_patches = &m_implementation->target_mesh.nurbs_patches.create();
+		m_implementation->nurbs_patch_first_points = &nurbs_patches->patch_first_points.create();
+		m_implementation->nurbs_patch_u_point_counts = &nurbs_patches->patch_u_point_counts.create();
+		m_implementation->nurbs_patch_v_point_counts = &nurbs_patches->patch_v_point_counts.create();
+		m_implementation->nurbs_patch_u_orders = &nurbs_patches->patch_u_orders.create();
+		m_implementation->nurbs_patch_v_orders = &nurbs_patches->patch_v_orders.create();
+		m_implementation->nurbs_patch_u_first_knots = &nurbs_patches->patch_u_first_knots.create();
+		m_implementation->nurbs_patch_v_first_knots = &nurbs_patches->patch_v_first_knots.create();
+		m_implementation->nurbs_patch_selection = &nurbs_patches->patch_selection.create();
+		m_implementation->nurbs_patch_materials = &nurbs_patches->patch_materials.create();
+		m_implementation->nurbs_patch_points = &nurbs_patches->patch_points.create();
+		m_implementation->nurbs_patch_point_weights = &nurbs_patches->patch_point_weights.create();
+		m_implementation->nurbs_patch_u_knots = &nurbs_patches->patch_u_knots.create();
+		m_implementation->nurbs_patch_v_knots = &nurbs_patches->patch_v_knots.create();
 	}
 
 	m_implementation->u_offsets.push_back(0.0);
