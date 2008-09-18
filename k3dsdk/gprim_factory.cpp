@@ -490,20 +490,23 @@ void gprim_factory::close_trim_loop()
 
 void gprim_factory::add_nurbs_curve(const uint_t Order, const mesh::indices_t& Points, const mesh::knots_t& Knots, const mesh::weights_t& Weights)
 {
-	mesh::nurbs_curve_groups_t* const nurbs_curves = &m_implementation->target_mesh.nurbs_curve_groups.writable();
+	mesh::nurbs_curve_groups_t* const nurbs_curves = m_implementation->target_mesh.nurbs_curve_groups
+		? &m_implementation->target_mesh.nurbs_curve_groups.writable()
+		: &m_implementation->target_mesh.nurbs_curve_groups.create();
+
 	if (!m_implementation->first_curves)
 	{
-		m_implementation->first_curves = &nurbs_curves->first_curves.writable();
-		m_implementation->curve_counts = &nurbs_curves->curve_counts.writable();
-		m_implementation->materials = &nurbs_curves->materials.writable();
-		m_implementation->curve_first_points = &nurbs_curves->curve_first_points.writable();
-		m_implementation->curve_point_counts = &nurbs_curves->curve_point_counts.writable();
-		m_implementation->curve_orders = &nurbs_curves->curve_orders.writable();
-		m_implementation->curve_first_knots = &nurbs_curves->curve_first_knots.writable();
-		m_implementation->curve_selection = &nurbs_curves->curve_selection.writable();
-		m_implementation->curve_points = &nurbs_curves->curve_points.writable();
-		m_implementation->curve_point_weights = &nurbs_curves->curve_point_weights.writable();
-		m_implementation->curve_knots = &nurbs_curves->curve_knots.writable();
+		m_implementation->first_curves = &nurbs_curves->first_curves.create();
+		m_implementation->curve_counts = &nurbs_curves->curve_counts.create();
+		m_implementation->materials = &nurbs_curves->materials.create();
+		m_implementation->curve_first_points = &nurbs_curves->curve_first_points.create();
+		m_implementation->curve_point_counts = &nurbs_curves->curve_point_counts.create();
+		m_implementation->curve_orders = &nurbs_curves->curve_orders.create();
+		m_implementation->curve_first_knots = &nurbs_curves->curve_first_knots.create();
+		m_implementation->curve_selection = &nurbs_curves->curve_selection.create();
+		m_implementation->curve_points = &nurbs_curves->curve_points.create();
+		m_implementation->curve_point_weights = &nurbs_curves->curve_point_weights.create();
+		m_implementation->curve_knots = &nurbs_curves->curve_knots.create();
 		m_implementation->first_curves->push_back(0);
 		m_implementation->curve_counts->push_back(0);
 		m_implementation->materials->push_back(static_cast<imaterial*>(0));

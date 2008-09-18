@@ -49,22 +49,22 @@ void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const 
 	}
 
 	// Setup the initial state of the output mesh ...
-	k3d::mesh::blobbies_t& target_blobbies = Output.blobbies.writable();
-	k3d::mesh::indices_t& target_first_primitives = target_blobbies.first_primitives.writable();
-	k3d::mesh::counts_t& target_primitive_counts = target_blobbies.primitive_counts.writable();
-	k3d::mesh::indices_t& target_first_operators = target_blobbies.first_operators.writable();
-	k3d::mesh::counts_t& target_operator_counts = target_blobbies.operator_counts.writable();
-	k3d::mesh::materials_t& target_materials = target_blobbies.materials.writable();
-	k3d::mesh::blobbies_t::primitives_t& target_primitives = target_blobbies.primitives.writable();
-	k3d::mesh::indices_t& target_primitive_first_floats = target_blobbies.primitive_first_floats.writable();
-	k3d::mesh::counts_t& target_primitive_float_counts = target_blobbies.primitive_float_counts.writable();
+	k3d::mesh::blobbies_t& target_blobbies = Output.blobbies.create();
+	k3d::mesh::indices_t& target_first_primitives = target_blobbies.first_primitives.create();
+	k3d::mesh::counts_t& target_primitive_counts = target_blobbies.primitive_counts.create();
+	k3d::mesh::indices_t& target_first_operators = target_blobbies.first_operators.create();
+	k3d::mesh::counts_t& target_operator_counts = target_blobbies.operator_counts.create();
+	k3d::mesh::materials_t& target_materials = target_blobbies.materials.create();
+	k3d::mesh::blobbies_t::primitives_t& target_primitives = target_blobbies.primitives.create();
+	k3d::mesh::indices_t& target_primitive_first_floats = target_blobbies.primitive_first_floats.create();
+	k3d::mesh::counts_t& target_primitive_float_counts = target_blobbies.primitive_float_counts.create();
 	k3d::mesh::attribute_arrays_t& target_varying_data = target_blobbies.varying_data;
 	k3d::mesh::attribute_arrays_t& target_vertex_data = target_blobbies.vertex_data;
-	k3d::mesh::blobbies_t::operators_t& target_operators = target_blobbies.operators.writable();
-	k3d::mesh::indices_t& target_operator_first_operands = target_blobbies.operator_first_operands.writable();
-	k3d::mesh::counts_t& target_operator_operand_counts = target_blobbies.operator_operand_counts.writable();
-	k3d::mesh::blobbies_t::floats_t& target_floats = target_blobbies.floats.writable();
-	k3d::mesh::blobbies_t::operands_t& target_operands = target_blobbies.operands.writable();
+	k3d::mesh::blobbies_t::operators_t& target_operators = target_blobbies.operators.create();
+	k3d::mesh::indices_t& target_operator_first_operands = target_blobbies.operator_first_operands.create();
+	k3d::mesh::counts_t& target_operator_operand_counts = target_blobbies.operator_operand_counts.create();
+	k3d::mesh::blobbies_t::floats_t& target_floats = target_blobbies.floats.create();
+	k3d::mesh::blobbies_t::operands_t& target_operands = target_blobbies.operands.create();
 
 	target_varying_data = k3d::attribute_arrays::clone_types(source_varying_data);
 	target_vertex_data = k3d::attribute_arrays::clone_types(source_vertex_data);
