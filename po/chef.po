@@ -1,9 +1,7 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Timothy M. Shead
+# Swedish Chef translation of K-3D HEAD
+# Copyright (C) 2008, Timothy M. Shead
 # This file is distributed under the same license as the K-3D package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# Timothy M. Shead <tshead@k-3d.com>, 2008.
 msgid ""
 msgstr ""
 "Project-Id-Version: K-3D 0.7\n"
