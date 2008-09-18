@@ -33,7 +33,7 @@ IF(K3D_BUILD_NLS)
 
 	FOREACH(catalog ${K3D_CATALOGS})
 		ADD_CUSTOM_TARGET(nls-update-${catalog}.po
-			${K3D_MSGMERGE} ${catalog} k3d -o ${catalog}.po --no-wrap
+			${K3D_MSGMERGE} ${po_SOURCE_DIR}/${catalog}.po ${po_BINARY_DIR}/k3d.pot -o ${catalog}.po --no-wrap --sort-output
 			DEPENDS ${po_SOURCE_DIR}/${catalog}.po
 			WORKING_DIRECTORY ${po_SOURCE_DIR}
 			)
