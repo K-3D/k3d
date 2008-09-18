@@ -303,7 +303,7 @@ public:
 
 		// gtkmm expects to parse and modify argc / argv, so create some temporary storage for it to fiddle with ...
 		std::vector<char*> argv_buffer;
-		argv_buffer.push_back("k3d");
+		argv_buffer.push_back(const_cast<char*>("k3d"));
 //		for(arguments_t::const_iterator argument = Arguments.begin(); argument != Arguments.end(); ++argument)
 //			argv_buffer.push_back(const_cast<char*>(argument->c_str()));
 		int argc = argv_buffer.size();

@@ -273,7 +273,7 @@ const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(cons
 
 	// Qt expects to parse and modify argc / argv, so create some temporary storage for it to fiddle with ...
 	static std::vector<char*> argv_buffer;
-	argv_buffer.push_back("k3d");
+	argv_buffer.push_back(const_cast<char*>("k3d"));
 	int argc = argv_buffer.size();
 	char** argv = &argv_buffer[0];
 

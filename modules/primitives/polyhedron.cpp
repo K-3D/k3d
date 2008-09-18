@@ -153,7 +153,7 @@ inline Kvector operator ^ (const Kvector& a, const Kvector& b) {
 
 
 typedef struct { // See uniformnames.cpp for explanation of the fields
-	char *Wythoff, *name, *dual;
+	const char *Wythoff, *name, *dual;
 	short Coxeter, Wenninger;
 } Uniform;
 
@@ -367,7 +367,7 @@ int Polyhedron::UnpackSym(unsigned int nsym)
 	if(nsym < 1 || nsym > 80)
 		Err("Bad number");
 
-	char* sym = uniform[index = nsym - 1].Wythoff;
+	const char* sym = uniform[index = nsym - 1].Wythoff;
 
 	int i = 0, bars = 0;
 	char c;
