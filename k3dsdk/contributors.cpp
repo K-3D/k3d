@@ -1,6 +1,6 @@
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -101,6 +101,7 @@ const contributors_t& contributors()
 		storage.push_back(contributor(ustring::from_utf8("Patrick Mauritz"), "Plugin build enhancements")); 
 		storage.push_back(contributor(ustring::from_utf8("Peter Balon"), "GCC 3.3 fixes")); 
 		storage.push_back(contributor(ustring::from_utf8("Paul Gregory"), "Win32 build, subdivision surfaces, bug fixes"));
+		storage.push_back(contributor(ustring::from_utf8("Steve Sorensen"), "Documentation"));
 		storage.push_back(contributor(ustring::from_utf8("Tom Browder"), "GNU Triangulated Surface support")); 
 		storage.push_back(contributor(ustring::from_utf8("Wladyslaw Strugala"), "Win32 build and support")); 
 	}
