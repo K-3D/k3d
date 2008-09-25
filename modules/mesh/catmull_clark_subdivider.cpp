@@ -550,43 +550,45 @@ public:
 				}
 			}
 		}
-
-		const k3d::uint_t first_edge = m_mesh_arrays.loop_first_edges[m_mesh_arrays.face_first_loops[Face]];
-		k3d::point3& center = m_output_points[m_face_centers[Face]];
-		center = k3d::point3(0,0,0);
-		k3d::uint_t count = 0;
-		//indices for target of the varying data copy
-		k3d::mesh::indices_t edges;
-		k3d::mesh::indices_t points;
-		for(k3d::uint_t edge = first_edge; ; )
+		else
 		{
-			center += k3d::to_vector(m_input_points[m_input_edge_points[edge]]);
-			++count;
-			edges.push_back(edge);
-			points.push_back(m_input_edge_points[edge]);
-
-			edge = m_mesh_arrays.clockwise_edges[edge];
-			if(edge == first_edge)
-				break;
+			const k3d::uint_t first_edge = m_mesh_arrays.loop_first_edges[m_mesh_arrays.face_first_loops[Face]];
+			k3d::point3& center = m_output_points[m_face_centers[Face]];
+			center = k3d::point3(0,0,0);
+			k3d::uint_t count = 0;
+			//indices for target of the varying data copy
+			k3d::mesh::indices_t edges;
+			k3d::mesh::indices_t points;
+			for(k3d::uint_t edge = first_edge; ; )
+			{
+				center += k3d::to_vector(m_input_points[m_input_edge_points[edge]]);
+				++count;
+				edges.push_back(edge);
+				points.push_back(m_input_edge_points[edge]);
+	
+				edge = m_mesh_arrays.clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+	
+			center /= count;
+			k3d::mesh::weights_t weights(count, 1.0/static_cast<double>(count));
+	
+			k3d::uint_t output_face = first_new_face;
+			for(k3d::uint_t edge = first_edge; ; )
+			{
+				const k3d::uint_t output_first_edge = m_output_loop_first_edges[m_output_face_first_loops[output_face]];
+				m_face_varying_copier.copy(count, &edges[0], &weights[0], output_first_edge);
+				m_face_varying_copier.copy(m_mesh_arrays.clockwise_edges[edge], m_output_clockwise_edges[m_output_clockwise_edges[output_first_edge]]);
+				m_uniform_copier.copy(Face, output_face);
+	
+				++output_face;
+				edge = m_mesh_arrays.clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+			m_vertex_copier.copy(count, &points[0], &weights[0], m_face_centers[Face]);
 		}
-
-		center /= count;
-		k3d::mesh::weights_t weights(count, 1.0/static_cast<double>(count));
-
-		k3d::uint_t output_face = first_new_face;
-		for(k3d::uint_t edge = first_edge; ; )
-		{
-			const k3d::uint_t output_first_edge = m_output_loop_first_edges[m_output_face_first_loops[output_face]];
-			m_face_varying_copier.copy(count, &edges[0], &weights[0], output_first_edge);
-			m_face_varying_copier.copy(m_mesh_arrays.clockwise_edges[edge], m_output_clockwise_edges[m_output_clockwise_edges[output_first_edge]]);
-			m_uniform_copier.copy(Face, output_face);
-
-			++output_face;
-			edge = m_mesh_arrays.clockwise_edges[edge];
-			if(edge == first_edge)
-				break;
-		}
-		m_vertex_copier.copy(count, &points[0], &weights[0], m_face_centers[Face]);
 	}
 
 private:
