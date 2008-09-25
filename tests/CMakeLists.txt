@@ -236,6 +236,7 @@ K3D_ADD_TEST(mesh.modifier.BulgePoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_
 K3D_ADD_TEST(mesh.modifier.CalculateNormals.py PYTHON REQUIRES K3D_BUILD_MESH_ATTRIBUTES_MODULE)
 K3D_ADD_TEST(mesh.modifier.CalculateNormals.2.py PYTHON REQUIRES K3D_BUILD_MESH_ATTRIBUTES_MODULE)
 K3D_ADD_TEST(mesh.modifier.CatmullClark.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
+K3D_ADD_TEST(mesh.modifier.CatmullClark.complex.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
 K3D_ADD_TEST(mesh.modifier.CenterPoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
 K3D_ADD_TEST(mesh.modifier.CGALBoolean.cubes.py PYTHON REQUIRES K3D_BUILD_BOOLEANS_MODULE)
 K3D_ADD_TEST(mesh.modifier.CGALBoolean.cylinders.py PYTHON REQUIRES K3D_BUILD_BOOLEANS_MODULE)
@@ -350,6 +351,8 @@ K3D_ADD_TEST(ngui.tutorials.basic_selection NGUI TUTORIAL basic_selection.k3dscr
 K3D_ADD_TEST(ngui.tutorials.mug NGUI TUTORIAL mug.k3dscript)
 
 K3D_ADD_TEST(ngui.performance.sds.polycube.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.performance.sds.init.legacy.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.performance.sds.init.py PYTHON NGUI)
 
 K3D_ADD_TEST(bitmap.modifier.CUDABitmapAdd.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE REQUIRES K3D_BUILD_CUDA_MODULE)
 K3D_ADD_TEST(bitmap.modifier.CUDABitmapMultiply.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE REQUIRES K3D_BUILD_CUDA_MODULE)

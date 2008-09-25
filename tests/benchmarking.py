@@ -193,6 +193,13 @@ class k3dProfilingProcessor(object):
             CSV_output_file = k3d.generic_path(benchmark_path() + '/' + nodeName + description + '.benchmark.txt')
         
         self.output_as_CSV_file(str(CSV_output_file), description, appendToFile)
+
+def total_profiler_time(profilerRecords):
+  total = 0.0
+  for (node, timing) in profilerRecords.items():
+    for t in timing:
+        total += timing[t]
+  return total
         
 class ResultSet(object):
     def __init__(self, x, y, label, plot_style):

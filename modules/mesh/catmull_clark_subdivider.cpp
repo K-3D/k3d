@@ -284,8 +284,7 @@ public:
 				{
 					if(m_mesh_arrays.first_corner(edge))
 					{
-						const k3d::uint_t clockwise = m_mesh_arrays.clockwise_edges[edge];
-						k3d::log() << debug << "setting unaffected corner point " << m_edge_points[clockwise] << " to " << point_count << std::endl; 
+						const k3d::uint_t clockwise = m_mesh_arrays.clockwise_edges[edge]; 
 						m_corner_points[m_edge_points[clockwise]] = point_count;
 						++point_count;
 					}
@@ -313,7 +312,6 @@ public:
 				
 				if(m_mesh_arrays.first_corner(edge))
 				{
-					k3d::log() << debug << "setting affected corner point " << m_edge_points[clockwise] << " to " << point_count << std::endl;
 					m_corner_points[m_edge_points[clockwise]] = point_count;
 					++point_count;
 				}
@@ -557,15 +555,13 @@ public:
 		k3d::point3& center = m_output_points[m_face_centers[Face]];
 		center = k3d::point3(0,0,0);
 		k3d::uint_t count = 0;
-		// weights and indices for target of the varying data copy
-		k3d::mesh::weights_t weights;
+		//indices for target of the varying data copy
 		k3d::mesh::indices_t edges;
 		k3d::mesh::indices_t points;
 		for(k3d::uint_t edge = first_edge; ; )
 		{
 			center += k3d::to_vector(m_input_points[m_input_edge_points[edge]]);
 			++count;
-			weights.push_back(1.0);
 			edges.push_back(edge);
 			points.push_back(m_input_edge_points[edge]);
 
@@ -575,13 +571,14 @@ public:
 		}
 
 		center /= count;
+		k3d::mesh::weights_t weights(count, 1.0/static_cast<double>(count));
 
 		k3d::uint_t output_face = first_new_face;
 		for(k3d::uint_t edge = first_edge; ; )
 		{
 			const k3d::uint_t output_first_edge = m_output_loop_first_edges[m_output_face_first_loops[output_face]];
 			m_face_varying_copier.copy(count, &edges[0], &weights[0], output_first_edge);
-			m_face_varying_copier.copy(edge, m_output_clockwise_edges[output_first_edge]);
+			m_face_varying_copier.copy(m_mesh_arrays.clockwise_edges[edge], m_output_clockwise_edges[m_output_clockwise_edges[output_first_edge]]);
 			m_uniform_copier.copy(Face, output_face);
 
 			++output_face;
@@ -691,9 +688,9 @@ public:
 					const k3d::double_t weights[] = {0.25, 0.25, 0.25, 0.25};
 					m_vertex_copier.copy(4, indices, weights, m_edge_midpoints[edge]);
 				}
-				copy_varying_data(edge, output_edge1, face_edges);
-				copy_varying_data(m_mesh_arrays.clockwise_edges[edge], output_edge2, face_edges);
 			}
+			copy_varying_data(edge, output_edge1, face_edges);
+			copy_varying_data(m_mesh_arrays.clockwise_edges[edge], output_edge2, face_edges);
 
 			++output_face;
 			edge = m_mesh_arrays.clockwise_edges[edge];
@@ -807,13 +804,10 @@ public:
 				++affected_edge_count;
 			if(m_mesh_arrays.boundary(edge))
 				++boundary_edge_count;
-		}
-		
-		k3d::log() << debug << "affected_edge_count is " << affected_edge_count << " for valence " << valence << std::endl; 
+		} 
 		
 		if(affected_edge_count == valence && boundary_edge_count == 0) // Interior point of the subdivided surface
 		{
-			k3d::log() << debug << "interior point " << Point << std::endl;
 			output_position *= static_cast<double>(valence - 2.0) / static_cast<double>(valence); // adjust initial position
 			k3d::vector3 sum(0, 0, 0);
 			for(k3d::uint_t index = start_index; index != end_index; ++index)
@@ -845,14 +839,12 @@ public:
 				}
 				if(m_mesh_arrays.companions[counter_clockwise] == counter_clockwise && m_mesh_arrays.is_affected(m_mesh_arrays.edge_faces[counter_clockwise]))
 				{
-					k3d::log() << debug << "adding cc contribution for point " << Point << std::endl;
 					output_position += 0.25 * k3d::to_vector(m_output_points[m_edge_midpoints[counter_clockwise]]);
 				}
 				if(!m_mesh_arrays.boundary(edge))
 					continue;
 				if(m_mesh_arrays.companions[edge] != edge || m_mesh_arrays.is_affected(m_mesh_arrays.edge_faces[edge]))
 				{
-					k3d::log() << debug << "adding contribution for point " << Point << std::endl;
 					output_position += 0.25 * k3d::to_vector(m_output_points[m_edge_midpoints[edge]]);
 				}
 			}
