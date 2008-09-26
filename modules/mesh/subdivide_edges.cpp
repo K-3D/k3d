@@ -22,6 +22,7 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
+#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
@@ -31,7 +32,6 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/mesh_topology_data.h>
-#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility.h>
@@ -354,15 +354,15 @@ public:
 		document().pipeline_profiler().finish_execution(*this, "Calculate indices");
 
 		document().pipeline_profiler().start_execution(*this, "Allocate memory");
-		boost::shared_ptr<k3d::mesh::indices_t> output_edge_points(new k3d::mesh::indices_t(edge_index_calculator.edge_count));
-		boost::shared_ptr<k3d::mesh::indices_t> output_clockwise_edges(new k3d::mesh::indices_t(edge_index_calculator.edge_count));
-		boost::shared_ptr<k3d::mesh::selection_t> output_edge_selection(new k3d::mesh::selection_t(edge_index_calculator.edge_count, 0.0));
+		k3d::mesh::indices_t& output_edge_points = polyhedra.edge_points.create(new k3d::mesh::indices_t(edge_index_calculator.edge_count));
+		k3d::mesh::indices_t& output_clockwise_edges = polyhedra.clockwise_edges.create(new k3d::mesh::indices_t(edge_index_calculator.edge_count));
+		k3d::mesh::selection_t& output_edge_selection = polyhedra.edge_selection.create(new k3d::mesh::selection_t(edge_index_calculator.edge_count, 0.0));
 		k3d::mesh::points_t& output_points = Output.points.writable();
 		k3d::mesh::selection_t& output_point_selection = Output.point_selection.writable();
 		const k3d::uint_t new_point_count = m_edge_list.size() * split_point_count + Input.points->size();
 		output_points.resize(new_point_count);
 		output_point_selection.resize(new_point_count, 1.0);
-		k3d::mesh::indices_t& output_loop_first_edges = polyhedra.loop_first_edges.create();
+		k3d::mesh::indices_t& output_loop_first_edges = polyhedra.loop_first_edges.writable();
 		polyhedra.face_varying_data = Input.polyhedra->face_varying_data.clone_types();
 		polyhedra.face_varying_data.resize(edge_index_calculator.edge_count);
 		k3d::attribute_array_copier face_varying_data_copier(Input.polyhedra->face_varying_data, polyhedra.face_varying_data);
@@ -372,8 +372,8 @@ public:
 		detail::edge_index_updater edge_index_updater(*polyhedra.edge_points,
 				*polyhedra.clockwise_edges,
 				index_map,
-				*output_edge_points,
-				*output_clockwise_edges,
+				output_edge_points,
+				output_clockwise_edges,
 				face_varying_data_copier);
 
 		for(k3d::uint_t edge = 0; edge != index_map.size(); ++edge) edge_index_updater(edge);
@@ -389,8 +389,8 @@ public:
 					companions,
 					boundary_edges,
 					split_point_count,
-					*output_edge_points,
-					*output_clockwise_edges,
+					output_edge_points,
+					output_clockwise_edges,
 					face_varying_data_copier);
 		for(k3d::uint_t edge_index = 0; edge_index != m_edge_list.size(); ++edge_index) edge_splitter(edge_index);
 		document().pipeline_profiler().finish_execution(*this, "Split edges");
@@ -406,7 +406,7 @@ public:
 		}
 		document().pipeline_profiler().finish_execution(*this, "Validate input");
 
-		k3d::mesh::points_t& output_points = Output.points.create();
+		k3d::mesh::points_t& output_points = Output.points.writable();
 
 		document().pipeline_profiler().start_execution(*this, "Calculate positions");
 		detail::split_point_calculator split_point_calculator(m_edge_list,
