@@ -23,7 +23,7 @@
 */
 
 #include <k3d-i18n-config.h>
-
+#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
@@ -33,13 +33,10 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/mesh_topology_data.h>
-#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
-
-#include <set>
 
 namespace module
 {
@@ -850,13 +847,6 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		subdivision_t subdivision_type = m_subdivision_type.pipeline_value();
-		// Shallow copy of the input (no data is copied, only shared pointers are)
-		document().pipeline_profiler().start_execution(*this, "Merge selection");
-		Output = Input;
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
-		document().pipeline_profiler().finish_execution(*this, "Merge selection");
-
 		// If there are no valid polyhedra, we give up
 		document().pipeline_profiler().start_execution(*this, "Validate input");
 		if(!k3d::validate_polyhedra(Input))
@@ -866,17 +856,23 @@ public:
 		}
 		document().pipeline_profiler().finish_execution(*this, "Validate input");
 
+		subdivision_t subdivision_type = m_subdivision_type.pipeline_value();
+		// Shallow copy of the input (no data is copied, only shared pointers are)
+		document().pipeline_profiler().start_execution(*this, "Merge selection");
+		Output = Input;
+		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
+		document().pipeline_profiler().finish_execution(*this, "Merge selection");
 
 		// Make writeable copies of the arrays we intend to modify
 		document().pipeline_profiler().start_execution(*this, "Copy input");
-		k3d::mesh::points_t& output_points = Output.points.create();
-		k3d::mesh::selection_t& output_point_selection = Output.point_selection.create();
-		k3d::mesh::polyhedra_t& output_polyhedra = Output.polyhedra.create();
-		k3d::mesh::polyhedra_t::types_t& output_types = output_polyhedra.types.create();
-		k3d::mesh::indices_t& output_loop_first_edges = output_polyhedra.loop_first_edges.create();
-		k3d::mesh::indices_t& output_edge_points = output_polyhedra.edge_points.create();
-		k3d::mesh::indices_t& output_clockwise_edges = output_polyhedra.clockwise_edges.create();
-		k3d::mesh::selection_t& output_edge_selection = output_polyhedra.edge_selection.create();
+		k3d::mesh::points_t& output_points = Output.points.writable();
+		k3d::mesh::selection_t& output_point_selection = Output.point_selection.writable();
+		k3d::mesh::polyhedra_t& output_polyhedra = Output.polyhedra.writable();
+		k3d::mesh::polyhedra_t::types_t& output_types = output_polyhedra.types.writable();
+		k3d::mesh::indices_t& output_loop_first_edges = output_polyhedra.loop_first_edges.writable();
+		k3d::mesh::indices_t& output_edge_points = output_polyhedra.edge_points.writable();
+		k3d::mesh::indices_t& output_clockwise_edges = output_polyhedra.clockwise_edges.writable();
+		k3d::mesh::selection_t& output_edge_selection = output_polyhedra.edge_selection.writable();
 
 		// Copy the unaffected constant data
 		output_polyhedra.constant_data = Input.polyhedra->constant_data;
@@ -888,20 +884,20 @@ public:
 
 		// Face-related arrays can not be appended to because of the possibility of multiple polyhedra,
 		// so we will rebuild them from scratch in the new order
-		const k3d::mesh::indices_t& input_first_faces = *(output_polyhedra.first_faces);
-		const k3d::mesh::counts_t& input_face_counts = *(output_polyhedra.face_counts);
-		const k3d::mesh::indices_t& input_face_first_loops = *(output_polyhedra.face_first_loops);
+		const k3d::mesh::indices_t& input_first_faces = *Input.polyhedra->first_faces;
+		const k3d::mesh::counts_t& input_face_counts = *Input.polyhedra->face_counts;
+		const k3d::mesh::indices_t& input_face_first_loops = *Input.polyhedra->face_first_loops;
 		const k3d::mesh::indices_t& input_loop_first_edges = *Input.polyhedra->loop_first_edges;
 		const k3d::mesh::indices_t& input_clockwise_edges = *Input.polyhedra->clockwise_edges;
-		const k3d::mesh::counts_t& input_face_loop_counts = *(output_polyhedra.face_loop_counts);
-		const k3d::mesh::selection_t& input_face_selection = *(output_polyhedra.face_selection);
-		const k3d::mesh::materials_t& input_face_materials = *(output_polyhedra.face_materials);
-		boost::shared_ptr<k3d::mesh::indices_t> output_first_faces(new k3d::mesh::indices_t());
-		boost::shared_ptr<k3d::mesh::counts_t> output_face_counts(new k3d::mesh::counts_t());
-		boost::shared_ptr<k3d::mesh::indices_t> output_face_first_loops(new k3d::mesh::indices_t());
-		boost::shared_ptr<k3d::mesh::counts_t> output_face_loop_counts(new k3d::mesh::counts_t());
-		boost::shared_ptr<k3d::mesh::selection_t> output_face_selection(new k3d::mesh::selection_t());
-		boost::shared_ptr<k3d::mesh::materials_t> output_face_materials(new k3d::mesh::materials_t());
+		const k3d::mesh::counts_t& input_face_loop_counts = *Input.polyhedra->face_loop_counts;
+		const k3d::mesh::selection_t& input_face_selection = *Input.polyhedra->face_selection;
+		const k3d::mesh::materials_t& input_face_materials = *Input.polyhedra->face_materials;
+		k3d::mesh::indices_t& output_first_faces = output_polyhedra.first_faces.create();
+		k3d::mesh::counts_t& output_face_counts = output_polyhedra.face_counts.create();
+		k3d::mesh::indices_t& output_face_first_loops = output_polyhedra.face_first_loops.create();
+		k3d::mesh::counts_t& output_face_loop_counts = output_polyhedra.face_loop_counts.create();
+		k3d::mesh::selection_t& output_face_selection = output_polyhedra.face_selection.create();
+		k3d::mesh::materials_t& output_face_materials = output_polyhedra.face_materials.create();
 
 		m_affected_edges.clear();
 		m_edge_midpoints.clear();
@@ -979,8 +975,8 @@ public:
 				first_new_faces,
 				first_new_loops,
 				face_edge_counts,
-				*output_first_faces,
-				*output_face_counts);
+				output_first_faces,
+				output_face_counts);
 		for(k3d::uint_t polyhedron = 0; polyhedron != input_first_faces.size(); ++polyhedron)
 		{
 			k3d::uint_t face_start = input_first_faces[polyhedron];
@@ -1014,10 +1010,10 @@ public:
 		output_edge_points.resize(face_edge_counter.edge_count, 0);
 		output_clockwise_edges.resize(face_edge_counter.edge_count, 0);
 		output_loop_first_edges.resize(face_edge_counter.loop_count);
-		output_face_first_loops->resize(face_edge_counter.face_count);
-		output_face_loop_counts->resize(face_edge_counter.face_count, 1);
-		output_face_selection->resize(face_edge_counter.face_count, 0.0);
-		output_face_materials->resize(face_edge_counter.face_count);
+		output_face_first_loops.resize(face_edge_counter.face_count);
+		output_face_loop_counts.resize(face_edge_counter.face_count, 1);
+		output_face_selection.resize(face_edge_counter.face_count, 0.0);
+		output_face_materials.resize(face_edge_counter.face_count);
 		output_polyhedra.face_varying_data.resize(face_edge_counter.edge_count);
 		output_polyhedra.uniform_data.resize(face_edge_counter.face_count);
 		document().pipeline_profiler().finish_execution(*this, "Allocate memory");
@@ -1040,16 +1036,16 @@ public:
 						face_centers,
 						companions,
 						boundary_edges,
-						*output_first_faces,
+						output_first_faces,
 						loops_per_polyhedra,
 						face_edge_counts,
 						output_edge_points,
 						output_clockwise_edges,
 						output_loop_first_edges,
-						*output_face_first_loops,
-						*output_face_loop_counts,
-						*output_face_materials,
-						*output_face_selection,
+						output_face_first_loops,
+						output_face_loop_counts,
+						output_face_materials,
+						output_face_selection,
 						uniform_data_copier,
 						face_varying_data_copier);
 
@@ -1121,7 +1117,7 @@ public:
 		const k3d::mesh::indices_t& input_clockwise_edges = *Input.polyhedra->clockwise_edges;
 		const k3d::mesh::indices_t& input_edge_points = *Input.polyhedra->edge_points;
 
-		k3d::mesh::points_t& output_points = Output.points.create();
+		k3d::mesh::points_t& output_points = Output.points.writable();
 
 		if(subdivision_type != CONTIGUOUSMIDPOINTS)
 		{
