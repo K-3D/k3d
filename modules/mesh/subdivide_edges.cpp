@@ -331,13 +331,13 @@ public:
 		document().pipeline_profiler().start_execution(*this, "Calculate companions");
 		k3d::mesh::bools_t boundary_edges;
 		k3d::mesh::indices_t companions;
-		k3d::create_edge_adjacency_lookup(*polyhedra.edge_points, *polyhedra.clockwise_edges, boundary_edges, companions);
+		k3d::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, boundary_edges, companions);
 		document().pipeline_profiler().finish_execution(*this, "Calculate companions");
 
 		const k3d::uint_t split_point_count = m_vertices.pipeline_value();
 
 		document().pipeline_profiler().start_execution(*this, "Calculate indices");
-		const k3d::uint_t old_edge_count = polyhedra.edge_points->size();
+		const k3d::uint_t old_edge_count = Input.polyhedra->edge_points->size();
 		k3d::mesh::indices_t index_map(old_edge_count);
 		k3d::mesh::indices_t first_midpoint(old_edge_count);
 		k3d::mesh::bools_t has_midpoint(old_edge_count);
@@ -350,7 +350,7 @@ public:
 				index_map,
 				first_midpoint,
 				has_midpoint);
-		for(k3d::uint_t face = 0; face != polyhedra.face_first_loops->size(); ++face) edge_index_calculator(face);
+		for(k3d::uint_t face = 0; face != Input.polyhedra->face_first_loops->size(); ++face) edge_index_calculator(face);
 		document().pipeline_profiler().finish_execution(*this, "Calculate indices");
 
 		document().pipeline_profiler().start_execution(*this, "Allocate memory");
@@ -369,13 +369,12 @@ public:
 		document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
 		document().pipeline_profiler().start_execution(*this, "Update indices");
-		detail::edge_index_updater edge_index_updater(*polyhedra.edge_points,
-				*polyhedra.clockwise_edges,
+		detail::edge_index_updater edge_index_updater(*Input.polyhedra->edge_points,
+				*Input.polyhedra->clockwise_edges,
 				index_map,
 				output_edge_points,
 				output_clockwise_edges,
 				face_varying_data_copier);
-
 		for(k3d::uint_t edge = 0; edge != index_map.size(); ++edge) edge_index_updater(edge);
 		for(k3d::uint_t loop = 0; loop != output_loop_first_edges.size(); ++loop)
 			output_loop_first_edges[loop] = index_map[output_loop_first_edges[loop]];
