@@ -28,58 +28,106 @@ namespace teapots
 /////////////////////////////////////////////////////////////////////////////////////////////
 // primitive
 
-primitive::primitive() :
-	matrices(0),
-	materials(0),
-	uniform_data(0)
+primitive::primitive(const typed_array<matrix4>& Matrices, const typed_array<imaterial*>& Materials, const attribute_arrays& UniformData) :
+	matrices(Matrices),
+	materials(Materials),
+	uniform_data(UniformData)
+{
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// writable_primitive
+
+writable_primitive::writable_primitive(typed_array<matrix4>& Matrices, typed_array<imaterial*>& Materials, attribute_arrays& UniformData) :
+	matrices(Matrices),
+	materials(Materials),
+	uniform_data(UniformData)
 {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create
 
-void create(mesh& Mesh, primitive& Primitive)
+writable_primitive create(mesh& Mesh)
 {
-	k3d::mesh::primitive& generic_primitive = Mesh.primitives.create("teapots");
-	Primitive.matrices = &generic_primitive.topology.create<k3d::typed_array<k3d::matrix4> >("matrices");
-	Primitive.materials = &generic_primitive.topology.create<k3d::typed_array<k3d::imaterial*> >("materials");
-	Primitive.uniform_data = &generic_primitive.attributes["uniform"];
+	mesh::primitive& generic_primitive = Mesh.primitives.create("teapots");
+
+	writable_primitive result(
+		generic_primitive.topology.create<typed_array<matrix4> >("matrices"),
+		generic_primitive.topology.create<typed_array<imaterial*> >("materials"),
+		generic_primitive.attributes["uniform"]
+		);
+
+	return result;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
-const bool_t validate(const mesh::primitive& GenericPrimitive, primitive& Primitive)
+primitive* validate(const mesh::primitive& GenericPrimitive)
 {
 	if(GenericPrimitive.type != "teapots")
-		return false;
+		return 0;
 
-	Primitive.matrices = GenericPrimitive.topology.lookup<k3d::typed_array<k3d::matrix4> >("matrices");
-	if(!Primitive.matrices)
+	const typed_array<matrix4>* const matrices = GenericPrimitive.topology.lookup<typed_array<matrix4> >("matrices");
+	if(!matrices)
 	{
-		k3d::log() << error << "[" << GenericPrimitive.type << "] primitive missing matrices array" << std::endl;
-		return false;
+		log() << error << "[" << GenericPrimitive.type << "] primitive missing matrices array" << std::endl;
+		return 0;
 	}
-	Primitive.materials = GenericPrimitive.topology.lookup<k3d::typed_array<k3d::imaterial*> >("materials");
-	if(!Primitive.materials)
+	const typed_array<imaterial*>* const materials = GenericPrimitive.topology.lookup<typed_array<imaterial*> >("materials");
+	if(!materials)
 	{
-		k3d::log() << error << "[" << GenericPrimitive.type << "] primitive missing materials array" << std::endl;
-		return false;
+		log() << error << "[" << GenericPrimitive.type << "] primitive missing materials array" << std::endl;
+		return 0;
 	}
-	Primitive.uniform_data = GenericPrimitive.attributes.lookup("uniform");
-	if(!Primitive.uniform_data)
+	const attribute_arrays* const uniform_data = GenericPrimitive.attributes.lookup("uniform");
+	if(!uniform_data)
 	{
-		k3d::log() << error << "[" << GenericPrimitive.type << "] primitive uniform attribute data" << std::endl;
-		return false;
-	}
-
-	if(Primitive.matrices->size() != Primitive.materials->size())
-	{
-		k3d::log() << error << "[" << GenericPrimitive.type << "] primitive array-length mismatch" << std::endl;
-		return false;
+		log() << error << "[" << GenericPrimitive.type << "] primitive uniform attribute data" << std::endl;
+		return 0;
 	}
 
-	return true;
+	if(matrices->size() != materials->size())
+	{
+		log() << error << "[" << GenericPrimitive.type << "] primitive array-length mismatch" << std::endl;
+		return 0;
+	}
+
+	return new primitive(*matrices, *materials, *uniform_data);
+}
+
+writable_primitive* validate(mesh::primitive& GenericPrimitive)
+{
+	if(GenericPrimitive.type != "teapots")
+		return 0;
+
+	typed_array<matrix4>* const matrices = GenericPrimitive.topology.writable<typed_array<matrix4> >("matrices");
+	if(!matrices)
+	{
+		log() << error << "[" << GenericPrimitive.type << "] primitive missing matrices array" << std::endl;
+		return 0;
+	}
+	typed_array<imaterial*>* const materials = GenericPrimitive.topology.writable<typed_array<imaterial*> >("materials");
+	if(!materials)
+	{
+		log() << error << "[" << GenericPrimitive.type << "] primitive missing materials array" << std::endl;
+		return 0;
+	}
+	attribute_arrays* const uniform_data = GenericPrimitive.attributes.writable("uniform");
+	if(!uniform_data)
+	{
+		log() << error << "[" << GenericPrimitive.type << "] primitive uniform attribute data" << std::endl;
+		return 0;
+	}
+
+	if(matrices->size() != materials->size())
+	{
+		log() << error << "[" << GenericPrimitive.type << "] primitive array-length mismatch" << std::endl;
+		return 0;
+	}
+
+	return new writable_primitive(*matrices, *materials, *uniform_data);
 }
 
 } // namespace teapots

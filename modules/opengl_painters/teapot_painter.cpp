@@ -29,6 +29,8 @@
 #include <k3dsdk/teapots.h>
 #include <k3dsdk/utility_gl.h>
 
+#include <boost/scoped_ptr.hpp>
+
 namespace module
 {
 
@@ -65,10 +67,10 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		k3d::teapots::primitive teapots;
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			if(!k3d::teapots::validate(**primitive, teapots))
+			boost::scoped_ptr<k3d::teapots::primitive> teapots(k3d::teapots::validate(**primitive));
+			if(!teapots)
 				continue;
 
 			glPolygonOffset(1.0, 1.0);
@@ -77,10 +79,10 @@ public:
 			glColor3d(0.8, 0.8, 0.8);
 
 			glMatrixMode(GL_MODELVIEW);
-			for(k3d::uint_t i = 0; i != teapots.matrices->size(); ++i)
+			for(k3d::uint_t i = 0; i != teapots->matrices.size(); ++i)
 			{
 				glPushMatrix();
-				k3d::gl::push_matrix((*teapots.matrices)[i]);
+				k3d::gl::push_matrix(teapots->matrices[i]);
 				glCallList(get_solid_display_list());
 				glPopMatrix();
 			}
@@ -90,10 +92,10 @@ public:
 				glDisable(GL_LIGHTING);
 				glColor3d(1, 1, 1);
 
-				for(k3d::uint_t i = 0; i != teapots.matrices->size(); ++i)
+				for(k3d::uint_t i = 0; i != teapots->matrices.size(); ++i)
 				{
 					glPushMatrix();
-					k3d::gl::push_matrix((*teapots.matrices)[i]);
+					k3d::gl::push_matrix(teapots->matrices[i]);
 					glCallList(get_wireframe_display_list());
 					glPopMatrix();
 				}
@@ -103,19 +105,19 @@ public:
 
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		k3d::teapots::primitive teapots;
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			if(!k3d::teapots::validate(**primitive, teapots))
+			boost::scoped_ptr<k3d::teapots::primitive> teapots(k3d::teapots::validate(**primitive));
+			if(!teapots)
 				continue;
 
 			glDisable(GL_LIGHTING);
 
 			glMatrixMode(GL_MODELVIEW);
-			for(k3d::uint_t i = 0; i != teapots.matrices->size(); ++i)
+			for(k3d::uint_t i = 0; i != teapots->matrices.size(); ++i)
 			{
 				glPushMatrix();
-				k3d::gl::push_matrix((*teapots.matrices)[i]);
+				k3d::gl::push_matrix(teapots->matrices[i]);
 				glCallList(get_solid_display_list());
 				glPopMatrix();
 			}

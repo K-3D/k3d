@@ -32,18 +32,33 @@ namespace teapots
 class primitive
 {
 public:
-	primitive();
+	primitive(const typed_array<matrix4>&, const typed_array<imaterial*>&, const attribute_arrays&);
 
-	const k3d::typed_array<k3d::matrix4>* matrices;
-	const k3d::typed_array<k3d::imaterial*>* materials;
-	const k3d::attribute_arrays* uniform_data;
+	const typed_array<matrix4>& matrices;
+	const typed_array<imaterial*>& materials;
+	const attribute_arrays& uniform_data;
 };
 
-/// Creates a new teapots mesh primitive, initializing an object containing references to its member arrays.
-void create(mesh& Mesh, primitive& Primitive);
+/// Gathers the member arrays of a teapots primitive into a convenient package
+class writable_primitive
+{
+public:
+	writable_primitive(typed_array<matrix4>&, typed_array<imaterial*>&, attribute_arrays&);
 
-/// Returns true iff the given mesh primitive contains a valid teapots primitive, initializing an object to reference to its member arrays.
-const bool_t validate(const mesh::primitive& GenericPrimitive, primitive& Primitive);
+	typed_array<matrix4>& matrices;
+	typed_array<imaterial*>& materials;
+	attribute_arrays& uniform_data;
+};
+
+/// Creates a new teapots mesh primitive, returning references to its member arrays.
+writable_primitive create(mesh& Mesh);
+
+/// Tests the given mesh primitive to see if it is a valid teapots primitive, returning references to its member arrays, or NULL.
+/// The caller is responsible for the lifetime of the returned object.
+primitive* validate(const mesh::primitive& GenericPrimitive);
+/// Tests the given mesh primitive to see if it is a valid teapots primitive, returning references to its member arrays, or NULL.
+/// The caller is responsible for the lifetime of the returned object.
+writable_primitive* validate(mesh::primitive& GenericPrimitive);
 
 } // namespace teapots
 
