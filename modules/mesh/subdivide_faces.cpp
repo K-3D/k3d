@@ -62,6 +62,7 @@ public:
 	 * \param HasMidpoint True for each affected edge that has a midpoint
 	 */
 	midpoint_index_calculator(const k3d::mesh::polyhedra_t& Polyhedra,
+			const k3d::mesh::selection_t& InputFaceSelection,
 			const k3d::mesh::indices_t& Companions,
 			const k3d::mesh::bools_t& BoundaryEdges,
 			const k3d::bool_t StoreMidpoints,
@@ -72,6 +73,7 @@ public:
 			k3d::mesh::indices_t& FaceCenters,
 			const k3d::uint_t FirstMidpoint) :
 		m_polyhedra(Polyhedra),
+		m_input_face_selection(InputFaceSelection),
 		m_companions(Companions),
 		m_boundary_edges(BoundaryEdges),
 		m_store_midpoints(StoreMidpoints),
@@ -87,7 +89,7 @@ public:
 	{
 		const k3d::mesh::indices_t& face_first_loops = *m_polyhedra.face_first_loops;
 		const k3d::mesh::counts_t& face_loop_counts = *m_polyhedra.face_loop_counts;
-		const k3d::mesh::selection_t& face_selection = *m_polyhedra.face_selection;
+		const k3d::mesh::selection_t& face_selection = m_input_face_selection;
 		const k3d::mesh::indices_t& loop_first_edges = *m_polyhedra.loop_first_edges;
 		const k3d::mesh::indices_t& clockwise_edges = *m_polyhedra.clockwise_edges;
 
@@ -125,6 +127,7 @@ public:
 
 private:
 	const k3d::mesh::polyhedra_t& m_polyhedra;
+	const k3d::mesh::selection_t& m_input_face_selection;
 	const k3d::mesh::indices_t& m_companions;
 	const k3d::mesh::bools_t& m_boundary_edges;
 	const k3d::bool_t m_store_midpoints;
@@ -153,6 +156,7 @@ public:
 	 * \param FirstNewLoops The first new loop index for each face
 	 */
 	face_edge_counter(const k3d::mesh::polyhedra_t& Polyhedra,
+			const k3d::mesh::selection_t& InputFaceSelection,
 			const k3d::mesh::indices_t& Companions,
 			const k3d::mesh::bools_t& BoundaryEdges,
 			const k3d::mesh::bools_t& HasMidpoint,
@@ -171,6 +175,7 @@ public:
 		face_count(0),
 		loop_count(0),
 		m_polyhedra(Polyhedra),
+		m_input_face_selection(InputFaceSelection),
 		m_companions(Companions),
 		m_boundary_edges(BoundaryEdges),
 		m_has_midpoint(HasMidpoint),
@@ -212,7 +217,7 @@ public:
 		const k3d::mesh::indices_t& first_faces = *m_polyhedra.first_faces;
 		const k3d::mesh::indices_t& face_first_loops = *m_polyhedra.face_first_loops;
 		const k3d::mesh::counts_t& face_loop_counts = *m_polyhedra.face_loop_counts;
-		const k3d::mesh::selection_t& face_selection = *m_polyhedra.face_selection;
+		const k3d::mesh::selection_t& face_selection = m_input_face_selection;
 		const k3d::mesh::indices_t& loop_first_edges = *m_polyhedra.loop_first_edges;
 		const k3d::mesh::indices_t& clockwise_edges = *m_polyhedra.clockwise_edges;
 
@@ -290,6 +295,7 @@ public:
 
 private:
 	const k3d::mesh::polyhedra_t& m_polyhedra;
+	const k3d::mesh::selection_t& m_input_face_selection;
 	const k3d::mesh::indices_t& m_companions;
 	const k3d::mesh::bools_t& m_boundary_edges;
 	const k3d::mesh::bools_t& m_has_midpoint;
@@ -861,6 +867,7 @@ public:
 		document().pipeline_profiler().start_execution(*this, "Merge selection");
 		Output = Input;
 		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
+		const k3d::mesh::selection_t input_face_selection = *Output.polyhedra->face_selection; // copy this, so we can keep using it
 		document().pipeline_profiler().finish_execution(*this, "Merge selection");
 
 		// Make writeable copies of the arrays we intend to modify
@@ -890,7 +897,6 @@ public:
 		const k3d::mesh::indices_t& input_loop_first_edges = *Input.polyhedra->loop_first_edges;
 		const k3d::mesh::indices_t& input_clockwise_edges = *Input.polyhedra->clockwise_edges;
 		const k3d::mesh::counts_t& input_face_loop_counts = *Input.polyhedra->face_loop_counts;
-		const k3d::mesh::selection_t& input_face_selection = *Input.polyhedra->face_selection;
 		const k3d::mesh::materials_t& input_face_materials = *Input.polyhedra->face_materials;
 		k3d::mesh::indices_t& output_first_faces = output_polyhedra.first_faces.create();
 		k3d::mesh::counts_t& output_face_counts = output_polyhedra.face_counts.create();
@@ -926,7 +932,8 @@ public:
 		k3d::mesh::bools_t has_midpoint(output_edge_points.size(), false);
 		k3d::mesh::indices_t face_centers(input_face_first_loops.size());
 		// Get the indices of the midpoints, the number of midpoints to calculate and the indices of face centers, if they are needed
-		detail::midpoint_index_calculator midpoint_index_calculator(output_polyhedra,
+		detail::midpoint_index_calculator midpoint_index_calculator(*Input.polyhedra,
+				input_face_selection,
 				companions,
 				boundary_edges,
 				subdivision_type != CENTERTOPOINTS,
@@ -962,7 +969,8 @@ public:
 		}
 		// Count the rest of the geometry
 		detail::face_edge_counter face_edge_counter(
-				output_polyhedra,
+				*Input.polyhedra,
+				input_face_selection,
 				companions,
 				boundary_edges,
 				has_midpoint,
