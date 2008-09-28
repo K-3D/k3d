@@ -44,6 +44,7 @@ extern k3d::iplugin_factory& point_group_painter_factory();
 extern k3d::iplugin_factory& polyhedron_painter_factory();
 extern k3d::iplugin_factory& scripted_painter_factory();
 extern k3d::iplugin_factory& subdivision_surface_painter_factory();
+extern k3d::iplugin_factory& teapot_painter_factory();
 
 } // namespace painters
 
@@ -63,5 +64,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::renderman::painters::polyhedron_painter_factory());
 	Registry.register_factory(module::renderman::painters::scripted_painter_factory());
 	Registry.register_factory(module::renderman::painters::subdivision_surface_painter_factory());
+	Registry.register_factory(module::renderman::painters::teapot_painter_factory());
 K3D_MODULE_END
 

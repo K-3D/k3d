@@ -123,6 +123,7 @@ void setup_renderman_document(k3d::idocument& Document)
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "bicubic_patches", "Bicubic Patches", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManBicubicPatchPainter", Document, "RenderMan Bicubic Patch Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "nurbs_patches", "NURBS Patches", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManNURBSPatchPainter", Document, "RenderMan NURBS Patch Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "blobbies", "Blobbies", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManBlobbyPainter", Document, "RenderMan Blobby Painter"));
+	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "teapots", "Teapots", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManTeapotPainter", Document, "RenderMan Teapot Painter"));
 
 	// Setup a default RenderMan shading model ...
 	k3d::inode* const surface_shader = k3d::plugin::create<k3d::inode>("RenderManSurfaceShader", Document, "Surface Shader");
@@ -236,6 +237,7 @@ void setup_opengl_document(k3d::idocument& Document)
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "blobbies", "Blobbies", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLBlobbyPointPainter", Document, "GL Blobby Point Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "face_normals", "Face Normals", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLFaceNormalPainter", Document, "GL Face Normal Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "face_orientation", "Face Orientation", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLFaceOrientationPainter", Document, "GL Face Orientation Painter"));
+	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "teapots", "Teapots", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLTeapotPainter", Document, "GL Teapot Painter"));
 }
 
 } // namespace detail

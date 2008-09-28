@@ -27,7 +27,9 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/teapots.h>
+#include <k3dsdk/teapot.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -61,11 +63,11 @@ public:
 	{
 		Output = k3d::mesh();
 
-		k3d::teapots::writable_primitive primitive = k3d::teapots::create(Output);
-		k3d::typed_array<k3d::color>& colors = primitive.uniform_data.create<k3d::typed_array<k3d::color> >("Cs");
+		boost::scoped_ptr<k3d::teapot::writable_primitive> primitive(k3d::teapot::create(Output));
+		k3d::typed_array<k3d::color>& colors = primitive->uniform_data.create<k3d::typed_array<k3d::color> >("Cs");
 
-		primitive.matrices.push_back(m_transformation.pipeline_value());
-		primitive.materials.push_back(m_material.pipeline_value());
+		primitive->matrices.push_back(m_transformation.pipeline_value());
+		primitive->materials.push_back(m_material.pipeline_value());
 		colors.push_back(m_color.pipeline_value());
 	}
 
