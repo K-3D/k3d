@@ -280,8 +280,8 @@ const bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t&
 		// Perform element-wise comparisons of the two primitives ...
 		if(a->get() && b->get())
 		{
-			if((**a).almost_equal((**b), Threshold))
-				continue;
+			if(!(**a).almost_equal((**b), Threshold))
+				return false;
 		}
 		// One array was NULL and the other wasn't
 		else if(a->get() || b->get())

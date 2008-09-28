@@ -4,10 +4,14 @@ import k3d
 
 def test_equal(a, b, test):
 	if not k3d.almost_equal(a, b, 0):
+		print repr(a)
+		print repr(b)
 		raise Exception(test + " should test equal")
 
 def test_unequal(a, b, test):
 	if k3d.almost_equal(a, b, 0):
+		print repr(a)
+		print repr(b)
 		raise Exception(test + " should test unequal")
 
 document = k3d.new_document()
