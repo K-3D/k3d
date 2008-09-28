@@ -28,6 +28,7 @@
 #include <k3dsdk/gl.h>
 #include <k3dsdk/hints.h>
 #include <k3dsdk/imesh_painter_gl.h>
+#include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
@@ -82,7 +83,9 @@ public:
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
+		document().pipeline_profiler().start_execution(*this, "Triangulate");
 		cached_triangulation& triangles = get_data<cached_triangulation>(&Mesh, this);
+		document().pipeline_profiler().finish_execution(*this, "Triangulate");
 		const k3d::mesh::indices_t& face_starts = triangles.face_starts();
 		if (face_starts.empty())
 			return;

@@ -28,6 +28,7 @@
 #include <k3dsdk/hints.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/imesh_painter_gl.h>
+#include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
@@ -86,7 +87,9 @@ public:
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
+		document().pipeline_profiler().start_execution(*this, "Triangulate");
 		triangle_vbo& vbos = get_data<triangle_vbo>(&Mesh, this);
+		document().pipeline_profiler().finish_execution(*this, "Triangulate");
 		face_selection& selected_faces = get_data<face_selection>(&Mesh, this);
 		
 		size_t face_count = Mesh.polyhedra->face_first_loops->size();
