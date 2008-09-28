@@ -35,9 +35,17 @@ namespace k3d
 namespace python
 {
 
-static k3d::python::mesh reset_mesh(imesh_storage_wrapper& Self)
+static k3d::python::mesh reset_mesh_1(imesh_storage_wrapper& Self)
 {
 	k3d::mesh* const mesh = new k3d::mesh();
+	Self.wrapped().reset_mesh(new k3d::mesh());
+
+	return k3d::python::mesh(mesh);
+}
+
+static k3d::python::mesh reset_mesh_2(imesh_storage_wrapper& Self, mesh& Mesh)
+{
+	k3d::mesh* const mesh = new k3d::mesh(Mesh.wrapped());
 	Self.wrapped().reset_mesh(mesh);
 
 	return k3d::python::mesh(mesh);
@@ -52,9 +60,12 @@ void define_class_imesh_storage()
 {
 	class_<imesh_storage_wrapper>("imesh_storage",
 		"Abstract interface implemented by nodes that can provide persistent storage of L{mesh} objects.", no_init)
-		.def("reset_mesh", &reset_mesh,
+		.def("reset_mesh", &reset_mesh_1,
 			"Creates a new L{mesh} object whose lifetime will be managed by the imesh_storage object.\n\n"
 			"@return: Returns a new L{mesh} object.")
+		.def("reset_mesh", &reset_mesh_2,
+			"Assigns a shallow-copy of an existing L{mesh} object whose lifetime will be managed by the imesh_storage object.\n\n"
+			"@return: Returns the copied L{mesh} object.")
 		.def("clear_mesh", &clear_mesh,
 			"Deletes the stored mesh and resets the storage to a null mesh.");
 }

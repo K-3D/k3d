@@ -101,6 +101,11 @@ static object create_array(attribute_arrays_wrapper& Self, const string_t& Name,
 	return create(Self, Name, Type);
 }
 
+static void delete_1(attribute_arrays_wrapper& Self, const string_t& Name)
+{
+	Self.wrapped().erase(Name);	
+}
+
 static void resize(attribute_arrays_wrapper& Self, const uint_t NewSize)
 {
 	Self.wrapped().resize(NewSize);
@@ -125,6 +130,8 @@ void define_class_attribute_arrays()
 			"Creates an array with given name and type.")
 		.def("create_array", &create_array,
 			"Creates an array with given name and type.")
+		.def("delete", &delete_1,
+			"Deletes an array with given name, if any.")
 		.def("resize", &resize,
 			"Sets the size of every array in the collection.")
 		.def("__len__", &utility::wrapped_len<attribute_arrays_wrapper>)

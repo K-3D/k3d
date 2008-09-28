@@ -48,6 +48,11 @@ static object named_attribute_arrays_create(named_attribute_arrays_wrapper& Self
 	return wrap(Self.wrapped()[Name]);
 }
 
+static void delete_1(named_attribute_arrays_wrapper& Self, const string_t& Name)
+{
+	Self.wrapped().erase(Name);	
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // define_class_named_attribute_arrays 
 
@@ -57,6 +62,8 @@ void define_class_named_attribute_arrays()
 		.def("__len__", &utility::wrapped_len<named_attribute_arrays_wrapper>)
 		.def("__getitem__", &utility::wrapped_get_wrapped_item_by_key<named_attribute_arrays_wrapper>)
 		.def("create", &named_attribute_arrays_create)
+		.def("delete", &delete_1,
+			"Deletes a set of attribute arrays with the given name, if any.")
 		;
 }
 

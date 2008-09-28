@@ -101,6 +101,11 @@ static object create_array(named_arrays_wrapper& Self, const string_t& Name, con
 	return create(Self, Name, Type);
 }
 
+static void delete_1(named_arrays_wrapper& Self, const string_t& Name)
+{
+	Self.wrapped().erase(Name);	
+}
+
 static object get_item(named_arrays_wrapper& Self, const string_t& Key)
 {
 	k3d::named_arrays::iterator iterator = Self.wrapped().find(Key);
@@ -120,6 +125,8 @@ void define_class_named_arrays()
 			"Creates an array with given name and type.")
 		.def("create_array", &create_array,
 			"Creates an array with given name and type.")
+		.def("delete", &delete_1,
+			"Deletes an array with given name, if any.")
 		.def("__len__", &utility::wrapped_len<named_arrays_wrapper>)
 		.def("__getitem__", &get_item);
 }
