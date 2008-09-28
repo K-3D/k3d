@@ -283,9 +283,11 @@ const bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t&
 			if((**a).almost_equal((**b), Threshold))
 				continue;
 		}
-
-		// Either the element-wise comparison failed or one array was NULL and the other wasn't
-		return false;
+		// One array was NULL and the other wasn't
+		else if(a->get() || b->get())
+		{
+			return false;
+		}
 	}
 
 	return true;
