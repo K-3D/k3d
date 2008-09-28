@@ -242,8 +242,8 @@ void gprim_factory::add_point(const point3& Point)
 {
 	if(!m_implementation->points)
 	{
-		m_implementation->points = &m_implementation->target_mesh.points.writable();
-		m_implementation->point_selection = &m_implementation->target_mesh.point_selection.writable();
+		m_implementation->points = &m_implementation->target_mesh.points.create();
+		m_implementation->point_selection = &m_implementation->target_mesh.point_selection.create();
 		m_implementation->point_weights = new mesh::weights_t(); // Note: *not* part of the mesh!
 	}
 
@@ -396,23 +396,23 @@ bool gprim_factory::add_trim_curve(const uint_t Order, const mesh::points_2d_t& 
 
 	if (!m_implementation->patch_trim_curve_loop_counts)
 	{
-		m_implementation->patch_trim_curve_loop_counts = &nurbs_patches->patch_trim_curve_loop_counts.writable();
-		m_implementation->patch_first_trim_curve_loops = &nurbs_patches->patch_first_trim_curve_loops.writable();
+		m_implementation->patch_trim_curve_loop_counts = &nurbs_patches->patch_trim_curve_loop_counts.create();
+		m_implementation->patch_first_trim_curve_loops = &nurbs_patches->patch_first_trim_curve_loops.create();
 		m_implementation->patch_trim_curve_loop_counts->resize(m_implementation->nurbs_patch_first_points->size(), 0);
 		m_implementation->patch_first_trim_curve_loops->resize(m_implementation->nurbs_patch_first_points->size(), 0);
-		m_implementation->trim_points = &nurbs_patches->trim_points.writable();
-		m_implementation->trim_point_selection = &nurbs_patches->trim_point_selection.writable();
-		m_implementation->first_trim_curves = &nurbs_patches->first_trim_curves.writable();
-		m_implementation->trim_curve_counts = &nurbs_patches->trim_curve_counts.writable();
-		m_implementation->trim_curve_loop_selection = &nurbs_patches->trim_curve_loop_selection.writable();
-		m_implementation->trim_curve_first_points = &nurbs_patches->trim_curve_first_points.writable();
-		m_implementation->trim_curve_point_counts = &nurbs_patches->trim_curve_point_counts.writable();
-		m_implementation->trim_curve_orders = &nurbs_patches->trim_curve_orders.writable();
-		m_implementation->trim_curve_first_knots = &nurbs_patches->trim_curve_first_knots.writable();
-		m_implementation->trim_curve_selection = &nurbs_patches->trim_curve_selection.writable();
-		m_implementation->trim_curve_points = &nurbs_patches->trim_curve_points.writable();
-		m_implementation->trim_curve_point_weights = &nurbs_patches->trim_curve_point_weights.writable();
-		m_implementation->trim_curve_knots = &nurbs_patches->trim_curve_knots.writable();
+		m_implementation->trim_points = &nurbs_patches->trim_points.create();
+		m_implementation->trim_point_selection = &nurbs_patches->trim_point_selection.create();
+		m_implementation->first_trim_curves = &nurbs_patches->first_trim_curves.create();
+		m_implementation->trim_curve_counts = &nurbs_patches->trim_curve_counts.create();
+		m_implementation->trim_curve_loop_selection = &nurbs_patches->trim_curve_loop_selection.create();
+		m_implementation->trim_curve_first_points = &nurbs_patches->trim_curve_first_points.create();
+		m_implementation->trim_curve_point_counts = &nurbs_patches->trim_curve_point_counts.create();
+		m_implementation->trim_curve_orders = &nurbs_patches->trim_curve_orders.create();
+		m_implementation->trim_curve_first_knots = &nurbs_patches->trim_curve_first_knots.create();
+		m_implementation->trim_curve_selection = &nurbs_patches->trim_curve_selection.create();
+		m_implementation->trim_curve_points = &nurbs_patches->trim_curve_points.create();
+		m_implementation->trim_curve_point_weights = &nurbs_patches->trim_curve_point_weights.create();
+		m_implementation->trim_curve_knots = &nurbs_patches->trim_curve_knots.create();
 	}
 
 	return_val_if_fail(!m_implementation->nurbs_patch_first_points->empty(), false);
