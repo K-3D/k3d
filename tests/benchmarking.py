@@ -200,6 +200,11 @@ def total_profiler_time(profilerRecords):
     for t in timing:
         total += timing[t]
   return total
+
+def print_profiler_records(profilerRecords):
+  for (node, timing) in profilerRecords.items():
+    for t in timing:
+        print """<DartMeasurement name=\"""" + node.name + "::" + t +  """\" type="numeric/float">""" + str(timing[t]) + """</DartMeasurement>"""
         
 class ResultSet(object):
     def __init__(self, x, y, label, plot_style):

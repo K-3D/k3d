@@ -28,5 +28,6 @@ document.set_dependency(sds.get_property("input_mesh"), source.get_property("out
 document.set_dependency(mesh_instance.get_property("input_mesh"), sds.get_property("output_mesh"))
 k3d.ui().synchronize()
 
+benchmarking.print_profiler_records(profiler.records)
 print """<DartMeasurement name="SDS Time" type="numeric/float">""" + str(benchmarking.total_profiler_time(profiler.records)) + """</DartMeasurement>"""
 
