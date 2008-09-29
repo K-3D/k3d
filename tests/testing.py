@@ -309,6 +309,9 @@ def mesh_comparison_to_reference(document, input_mesh, reference_mesh_name, thre
 			return
 	
 	# if there is a difference, output it
+	print repr(input_mesh.pipeline_value())
+	print repr(reference.output_mesh)
+
 	output_mesh_difference(input_mesh.pipeline_value(), reference.output_mesh, threshold)
 	raise Exception("output mesh differs from reference")
 

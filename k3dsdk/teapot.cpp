@@ -28,7 +28,11 @@ namespace teapot
 /////////////////////////////////////////////////////////////////////////////////////////////
 // primitive
 
-primitive::primitive(const typed_array<matrix4>& Matrices, const typed_array<imaterial*>& Materials, const attribute_arrays& ConstantData, const attribute_arrays& UniformData) :
+primitive::primitive(
+	const typed_array<matrix4>& Matrices,
+	const typed_array<imaterial*>& Materials,
+	const attribute_arrays& ConstantData,
+	const attribute_arrays& UniformData) :
 	matrices(Matrices),
 	materials(Materials),
 	constant_data(ConstantData),
@@ -39,7 +43,11 @@ primitive::primitive(const typed_array<matrix4>& Matrices, const typed_array<ima
 /////////////////////////////////////////////////////////////////////////////////////////////
 // writable_primitive
 
-writable_primitive::writable_primitive(typed_array<matrix4>& Matrices, typed_array<imaterial*>& Materials, attribute_arrays& ConstantData, attribute_arrays& UniformData) :
+writable_primitive::writable_primitive(
+	typed_array<matrix4>& Matrices,
+	typed_array<imaterial*>& Materials,
+	attribute_arrays& ConstantData,
+	attribute_arrays& UniformData) :
 	matrices(Matrices),
 	materials(Materials),
 	constant_data(ConstantData),
