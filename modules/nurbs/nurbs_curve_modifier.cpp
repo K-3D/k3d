@@ -7,20 +7,48 @@ namespace module
 		nurbs_curve_modifier::nurbs_curve_modifier(k3d::mesh& input)
 		{
 			m_instance = &input;
-			groups = &input.nurbs_curve_groups.create();
-			curve_knots = &groups->curve_knots.create();
-			curve_points = &groups->curve_points.create();
-			curve_point_weights = &groups->curve_point_weights.create();
-			curve_counts = &groups->curve_counts.create();
-			curve_orders = &groups->curve_orders.create();
-			curve_point_counts = &groups->curve_point_counts.create();
-			curve_first_points = &groups->curve_first_points.create();
-			curve_first_knots = &groups->curve_first_knots.create();
-			first_curves = &groups->first_curves.create();
-			curve_selection = &groups->curve_selection.create();
-			point_selection = &input.point_selection.create();
-			mesh_points = &input.points.create();
-			materials = &groups->materials.create();
+			if(input.nurbs_curve_groups)
+			{
+				groups = &input.nurbs_curve_groups.writable();
+				curve_knots = &groups->curve_knots.writable();
+				curve_points = &groups->curve_points.writable();
+				curve_point_weights = &groups->curve_point_weights.writable();
+				curve_counts = &groups->curve_counts.writable();
+				curve_orders = &groups->curve_orders.writable();
+				curve_point_counts = &groups->curve_point_counts.writable();
+				curve_first_points = &groups->curve_first_points.writable();
+				curve_first_knots = &groups->curve_first_knots.writable();
+				first_curves = &groups->first_curves.writable();
+				curve_selection = &groups->curve_selection.writable();
+				materials = &groups->materials.writable();
+			}
+			else
+			{
+				groups = &input.nurbs_curve_groups.create();
+				curve_knots = &groups->curve_knots.create();
+				curve_points = &groups->curve_points.create();
+				curve_point_weights = &groups->curve_point_weights.create();
+				curve_counts = &groups->curve_counts.create();
+				curve_orders = &groups->curve_orders.create();
+				curve_point_counts = &groups->curve_point_counts.create();
+				curve_first_points = &groups->curve_first_points.create();
+				curve_first_knots = &groups->curve_first_knots.create();
+				first_curves = &groups->first_curves.create();
+				curve_selection = &groups->curve_selection.create();
+				materials = &groups->materials.create();
+			}
+			
+			if(input.points.get())
+			{
+				point_selection = &input.point_selection.writable();
+				mesh_points = &input.points.writable();
+			}
+			else
+			{
+				point_selection = &input.point_selection.create();
+				mesh_points = &input.points.create();
+			}
+			
 		}
 
 		int nurbs_curve_modifier::add_curve(nurbs_curve& curve, bool shared)
@@ -100,7 +128,7 @@ namespace module
 			}
 		}
 
-		bool nurbs_curve_modifier::find_point_inside(k3d::mesh::indices_t *points, k3d::uint_t index)
+		bool nurbs_curve_modifier::find_point_inside(const k3d::mesh::indices_t *points, k3d::uint_t index)
 		{
 			if (points == 0)
 				return false;
@@ -146,67 +174,47 @@ namespace module
 		{
 			try
 			{
-				k3d::mesh::point_groups_t *point_groups = 0;
 				k3d::mesh::indices_t *point_group_points = 0;
-
-				k3d::mesh::linear_curve_groups_t *linear_curve_groups = 0;
 				k3d::mesh::indices_t *linear_curve_points = 0;
-
-				k3d::mesh::cubic_curve_groups_t *cubic_curve_groups = 0;
 				k3d::mesh::indices_t *cubic_curve_points = 0;
-
-				k3d::mesh::bilinear_patches_t *bilinear_patches = 0;
 				k3d::mesh::indices_t *bilinear_patch_points = 0;
-
-				k3d::mesh::bicubic_patches_t *bicubic_patches = 0;
 				k3d::mesh::indices_t *bicubic_patch_points = 0;
-
-				k3d::mesh::nurbs_patches_t *nurbs_patches = 0;
 				k3d::mesh::indices_t *nurbs_patch_points = 0;
-
-				k3d::mesh::polyhedra_t *polyhedra = 0;
 				k3d::mesh::indices_t *polyhedra_edge_points = 0;
 
-				if (!m_instance->point_groups)
+				if (m_instance->point_groups)
 				{
-					point_groups = &m_instance->point_groups.writable();
-					point_group_points = &point_groups->points.writable();
+					point_group_points = &m_instance->point_groups.writable().points.writable();
 				}
 
-				if (!m_instance->linear_curve_groups)
+				if (m_instance->linear_curve_groups)
 				{
-					linear_curve_groups = &m_instance->linear_curve_groups.writable();
-					linear_curve_points = &linear_curve_groups->curve_points.writable();
+					linear_curve_points = &m_instance->linear_curve_groups.writable().curve_points.writable();
 				}
 
-				if (!m_instance->cubic_curve_groups)
+				if (m_instance->cubic_curve_groups)
 				{
-					cubic_curve_groups = &m_instance->cubic_curve_groups.writable();
-					cubic_curve_points = &cubic_curve_groups->curve_points.writable();
+					cubic_curve_points = &m_instance->cubic_curve_groups.writable().curve_points.writable();
 				}
 
-				if (!m_instance->bilinear_patches)
+				if (m_instance->bilinear_patches)
 				{
-					bilinear_patches = &m_instance->bilinear_patches.writable();
-					bilinear_patch_points = &bilinear_patches->patch_points.writable();
+					bilinear_patch_points = &m_instance->bilinear_patches.writable().patch_points.writable();
 				}
 
-				if (!m_instance->bicubic_patches)
+				if (m_instance->bicubic_patches)
 				{
-					bicubic_patches = &m_instance->bicubic_patches.writable();
-					bicubic_patch_points = &bicubic_patches->patch_points.writable();
+					bicubic_patch_points = &m_instance->bicubic_patches.writable().patch_points.writable();
 				}
 
-				if (!m_instance->nurbs_patches)
+				if (m_instance->nurbs_patches)
 				{
-					nurbs_patches = &m_instance->nurbs_patches.writable();
-					nurbs_patch_points = &nurbs_patches->patch_points.writable();
+					nurbs_patch_points = &m_instance->nurbs_patches.writable().patch_points.writable();
 				}
 
-				if (!m_instance->polyhedra)
+				if (m_instance->polyhedra)
 				{
-					polyhedra = &m_instance->polyhedra.writable();
-					polyhedra_edge_points = &polyhedra->edge_points.writable();
+					polyhedra_edge_points = &m_instance->polyhedra.writable().edge_points.writable();
 				}
 
 				std::vector<bool> is_used(mesh_points->size(), false);
@@ -2708,7 +2716,15 @@ namespace module
 				MY_DEBUG << "Polygonize_curve" << std::endl;
 				if (m_instance->linear_curve_groups == 0)
 				{
-					m_instance->linear_curve_groups.create();
+					k3d::mesh::linear_curve_groups_t& curves = m_instance->linear_curve_groups.create();
+					curves.curve_points.create();
+					curves.curve_point_counts.create();
+					curves.curve_first_points.create();
+					curves.curve_counts.create();
+					curves.first_curves.create();
+					curves.periodic_curves.create();
+					curves.curve_selection.create();
+					curves.materials.create();
 				}
 
 				k3d::mesh::linear_curve_groups_t* linear_curve_groups = &m_instance->linear_curve_groups.writable();

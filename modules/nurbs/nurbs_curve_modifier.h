@@ -275,7 +275,7 @@ namespace module{
                 ///Returns true if index was inside the list of points
                 ///\param points The indices array to search through
                 ///\param index The index to look for
-                bool find_point_inside(k3d::mesh::indices_t *points, k3d::uint_t index);
+                bool find_point_inside(const k3d::mesh::indices_t *points, k3d::uint_t index);
 
                 ///Offset all indices in "points" greater than "first" to the amount of offset
                 ///\param points The indices to operate on

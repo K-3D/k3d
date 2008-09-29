@@ -13,7 +13,20 @@ namespace module
 
 				if (!m_instance->nurbs_patches)
 				{
-					m_instance->nurbs_patches.create();
+					m_nurbs_patches = &m_instance->nurbs_patches.create();
+					m_nurbs_patches->patch_first_points.create();
+					m_nurbs_patches->patch_u_point_counts.create();
+					m_nurbs_patches->patch_v_point_counts.create();
+					m_nurbs_patches->patch_u_orders.create();
+					m_nurbs_patches->patch_v_orders.create();
+					m_nurbs_patches->patch_u_first_knots.create();
+					m_nurbs_patches->patch_v_first_knots.create();
+					m_nurbs_patches->patch_selection.create();
+					m_nurbs_patches->patch_materials.create();
+					m_nurbs_patches->patch_points.create();
+					m_nurbs_patches->patch_point_weights.create();
+					m_nurbs_patches->patch_u_knots.create();
+					m_nurbs_patches->patch_v_knots.create();
 				}
 
 				m_nurbs_patches = &m_instance->nurbs_patches.writable();
