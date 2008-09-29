@@ -1639,9 +1639,6 @@ private:
 
 void save_arrays(element& Container, element Storage, const mesh::named_arrays_t& Arrays, const ipersistent::save_context& Context)
 {
-	if(!Arrays.size())
-		return;
-
 	element& container = Container.append(Storage);
 	for(mesh::named_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
 	{
@@ -1669,9 +1666,6 @@ void save_arrays(element& Container, element Storage, const mesh::named_arrays_t
 
 void save_arrays(element& Container, element Storage, const mesh::attribute_arrays_t& Arrays, const ipersistent::save_context& Context)
 {
-	if(!Arrays.size())
-		return;
-
 	element& container = Container.append(Storage);
 	for(mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
 	{
