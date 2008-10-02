@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 2008, Timothy M. Shead 
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,11 +18,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Tim Shead (tshead@k-3d.com)
-	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "detail.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/material_sink.h>
+#include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh_source.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/sphere.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -34,179 +42,76 @@ namespace quadrics
 // sphere
 
 class sphere :
-	public quadric
+	public k3d::material_sink<k3d::mesh_source<k3d::node> >
 {
-	typedef quadric base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node> > base;
 
 public:
 	sphere(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Sphere radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_zmin(init_owner(*this) + init_name("zmin") + init_label(_("Z min")) + init_description(_("From RenderMan specification")) + init_value(-1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_zmax(init_owner(*this) + init_name("zmax") + init_label(_("Z max")) + init_description(_("From RenderMan specification")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("Theta max")) + init_description(_("From RenderMan specification")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
+		m_transformation(init_owner(*this) + init_name("transformation") + init_label(_("Transformation")) + init_description(_("Transformation matrix used to position / orient / scale the output sphere.")) + init_value(k3d::identity3D())),
+		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Controls the radius the output sphere.")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_z_min(init_owner(*this) + init_name("z_min") + init_label(_("Z Min")) + init_description(_("Optionally truncates the sphere along the -Z axis.")) + init_value(-1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_z_max(init_owner(*this) + init_name("z_max") + init_label(_("Z Max")) + init_description(_("Optionally truncates the sphere along the +Z axis.")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_sweep_angle(init_owner(*this) + init_name("sweep_angle") + init_label(_("Sweep Angle")) + init_description(_("Optionally limits the sweep angle of the sphere to less-than 360 degrees.")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle))),
+		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Controls the color of the output sphere.")) + init_value(k3d::color(1, 1, 1)))
 	{
-		m_radius.changed_signal().connect(sigc::mem_fun(*this, &sphere::reset_geometry));
-		m_zmin.changed_signal().connect(sigc::mem_fun(*this, &sphere::reset_geometry));
-		m_zmax.changed_signal().connect(sigc::mem_fun(*this, &sphere::reset_geometry));
-		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &sphere::reset_geometry));
-
-		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
-
-		m_radius.changed_signal().connect(make_node_change_slot());
-		m_input_matrix.changed_signal().connect(make_node_change_slot());
-		m_material.changed_signal().connect(make_async_redraw_slot());
-
-		add_snap_target(new k3d::snap_target(_("Surface"), sigc::mem_fun(*this, &sphere::surface_target_position), sigc::mem_fun(*this, &sphere::surface_target_orientation)));
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_transformation.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_radius.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_z_min.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_z_max.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_sweep_angle.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_color.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	bool surface_target_position(const k3d::point3& Position, k3d::point3& TargetPosition)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		TargetPosition = k3d::to_point(k3d::normalize(k3d::to_vector(Position)) * m_radius.pipeline_value());
-		return true;
+		Output = k3d::mesh();
+
+		boost::scoped_ptr<k3d::sphere::writable_primitive> primitive(k3d::sphere::create(Output));
+		k3d::typed_array<k3d::color>& colors = primitive->uniform_data.create<k3d::typed_array<k3d::color> >("Cs");
+
+		primitive->matrices.push_back(m_transformation.pipeline_value());
+		primitive->materials.push_back(m_material.pipeline_value());
+		primitive->radii.push_back(m_radius.pipeline_value());
+		primitive->z_min.push_back(m_z_min.pipeline_value());
+		primitive->z_max.push_back(m_z_max.pipeline_value());
+		primitive->sweep_angles.push_back(m_sweep_angle.pipeline_value());
+		colors.push_back(m_color.pipeline_value());
 	}
 
-	bool surface_target_orientation(const k3d::point3& Position, k3d::vector3& Look, k3d::vector3& Up)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
-		Look = k3d::to_vector(Position);
-		Up = Look ^ (Look ^ k3d::vector3(0, 0, 1));
-		return true;
-	}
-
-	const k3d::bounding_box3 extents()
-	{
-		const double radius = m_radius.pipeline_value();
-		const double zmax = m_zmax.pipeline_value();
-		const double zmin = m_zmin.pipeline_value();
-
-		return k3d::bounding_box3(radius, -radius, radius, -radius, zmax * radius, zmin * radius);
-	}
-
-	void reset_geometry(k3d::iunknown*)
-	{
-		m_gl_control_points.clear();
-		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
-	}
-
-	void draw(const nurbs_renderer_t Nurbs)
-	{
-		if(m_gl_control_points.empty())
-		{
-			const double radius = m_radius.pipeline_value();
-			const double zmin = m_zmin.pipeline_value();
-			const double zmax = m_zmax.pipeline_value();
-			const double thetamax = m_thetamax.pipeline_value();
-
-			const double phimin = (zmin > -1) ? asin(zmin) : -k3d::pi_over_2();
-			const double phimax = (zmax < 1) ? asin(zmax) : k3d::pi_over_2();
-
-			if(thetamax == 0.0 || (zmin == zmax))
-				return;
-
-			std::vector<double> v_weights;
-			std::vector<k3d::point3> v_arc_points;
-			k3d::nurbs::circular_arc(k3d::point3(0, 1, 0), k3d::point3(0, 0, 1), phimin, phimax, 2, m_gl_v_knot_vector, v_weights, v_arc_points);
-
-			std::vector<double> u_weights;
-			std::vector<k3d::point3> u_arc_points;
-			k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, thetamax, 4, m_gl_u_knot_vector, u_weights, u_arc_points);
-
-			for(unsigned long v = 0; v != v_arc_points.size(); ++v)
-			{
-				const k3d::point3 offset = radius * v_arc_points[v][2] * k3d::point3(0, 0, 1);
-				const double radius2 = radius * v_arc_points[v][1];
-				const double v_weight = v_weights[v];
-
-				for(unsigned long u = 0; u != u_arc_points.size(); ++u)
-				{
-					m_gl_control_points.push_back(v_weight * u_weights[u] * (radius2 * u_arc_points[u][0] + offset[0]));
-					m_gl_control_points.push_back(v_weight * u_weights[u] * (radius2 * u_arc_points[u][1] + offset[1]));
-					m_gl_control_points.push_back(v_weight * u_weights[u] * (radius2 * u_arc_points[u][2] + offset[2]));
-					m_gl_control_points.push_back(v_weight * u_weights[u]);
-				}
-			}
-		}
-
-		gluBeginSurface(Nurbs);
-		gluNurbsSurface(Nurbs, m_gl_u_knot_vector.size(), &m_gl_u_knot_vector[0], m_gl_v_knot_vector.size(), &m_gl_v_knot_vector[0], 4, 36, &m_gl_control_points[0], 3, 3, GL_MAP2_VERTEX_4);
-		gluEndSurface(Nurbs);
-	}
-
-	void on_gl_draw(const k3d::gl::render_state& State)
-	{
-		k3d::gl::setup_material(m_material.pipeline_value());
-
-		const nurbs_renderer_t nurbs = nurbs_renderer(State);
-
-		k3d::gl::color3d(State.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0));
-		gluNurbsProperty(nurbs, GLU_DISPLAY_MODE, GLU_OUTLINE_PATCH);
-		glDisable(GL_LIGHTING);
-		glDisable(GL_AUTO_NORMAL);
-		draw(nurbs);
-
-		if(!State.draw_two_sided)
-			glEnable(GL_CULL_FACE);
-
-		gluNurbsProperty(nurbs, GLU_DISPLAY_MODE, GLU_FILL);
-		glEnable(GL_LIGHTING);
-		glEnable(GL_AUTO_NORMAL);
-		glPolygonOffset(1.0, 1.0);
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		draw(nurbs);
-		glDisable(GL_POLYGON_OFFSET_FILL);
-	}
-
-	void on_gl_select(const k3d::gl::render_state& State, const k3d::gl::selection_state& SelectState)
-	{
-		const nurbs_renderer_t nurbs = nurbs_renderer(State);
-		gluNurbsProperty(nurbs, GLU_DISPLAY_MODE, GLU_FILL);
-		glDisable(GL_LIGHTING);
-		glDisable(GL_AUTO_NORMAL);
-		glDisable(GL_CULL_FACE);
-
-		k3d::gl::push_selection_token(this);
-		draw(nurbs);
-		k3d::gl::pop_selection_token();
-	}
-
-	void on_renderman_render(const k3d::ri::render_state& State)
-	{
-		const double radius = m_radius.pipeline_value();
-		const double zmin = m_zmin.pipeline_value();
-		const double zmax = m_zmax.pipeline_value();
-		const double thetamax = k3d::degrees(m_thetamax.pipeline_value());
-
-		k3d::ri::setup_material(m_material.pipeline_value(), State);
-		State.stream.RiSphereV(radius, radius * zmin, radius * zmax, thetamax);
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<sphere,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
-				k3d::classes::Sphere(),
-				"Sphere",
-				_("Sphere primitive"),
-				"Quadric",
-				k3d::iplugin_factory::STABLE);
+		static k3d::document_plugin_factory<sphere > factory(
+			k3d::uuid(0xcaf583f9, 0xdb4579fe, 0xf5be1084, 0x1e5ebc61),
+			"Sphere",
+			"Creates a sphere primitive",
+			"Quadric",
+			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_zmin;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_zmax;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_thetamax;
-
-	std::vector<GLfloat> m_gl_u_knot_vector;
-	std::vector<GLfloat> m_gl_v_knot_vector;
-	std::vector<GLfloat> m_gl_control_points;
+	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_transformation;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z_min;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z_max;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_sweep_angle;
+	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
 };
-
-/////////////////////////////////////////////////////////////////////////////
-// sphere_factory
 
 k3d::iplugin_factory& sphere_factory()
 {

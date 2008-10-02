@@ -42,22 +42,22 @@ namespace nurbs
 /// Storage for a NURBS curve
 struct curve3
 {
-	curve3(const unsigned int Order) : order(Order) {}
+	curve3(const uint32_t Order) : order(Order) {}
 	
 	/// Stores the curve order (note - the curve order is defined as the curve degree plus 1)
-	unsigned int order;
+	uint32_t order;
 	/// Defines a collection of knots
-	typedef std::vector<double> knots_t;
+	typedef std::vector<double_t> knots_t;
 	/// The set of knots that define the curve's knot vector
 	knots_t knots;
 	/// Defines a control point - a combination of a value and a weight
 	struct control_point
 	{
 		control_point() : weight(0) {}
-		control_point(const point3& Position, const double Weight = 1.0) : position(Position), weight(Weight) {}
+		control_point(const point3& Position, const double_t Weight = 1.0) : position(Position), weight(Weight) {}
 
 		point3 position;
-		double weight;
+		double_t weight;
 	};
 	/// Defines a collection of control points
 	typedef std::vector<control_point> control_points_t;
@@ -75,35 +75,26 @@ std::istream& operator>>(std::istream& Stream, curve3& RHS);
 bool is_valid(const curve3& Curve);
 
 /// Evaluates the given NURBS curve for a specific parameter value
-const point3 evaluate(const curve3& Curve, const double T);
+const point3 evaluate(const curve3& Curve, const double_t T);
 
-/** Calculates a 3rd-order NURBS curve that creates a circular arc centered at the origin with unit radius
-	\param X Defines the X axis of the plane containing the arc
-	\param Y Defines the Y axis of the plane containing the arc
-	\param StartAngle Start angle of the arc in radians
-	\param EndAngle End angle of the arc in radians
-	\param Segments The number of NURBS segments in the resulting arc
-	\param Knots Output container for the resulting arc knot vector
-	\param Weights Output container for the resulting arc control point weights
-	\param ControlPoints Output container for the resulting arc control point positions
-*/
+/** \deprecated */
 template<typename knots_t, typename weights_t, typename control_points_t>
-void circular_arc(const point3& X, const point3& Y, const double StartAngle, const double EndAngle, const unsigned long Segments, knots_t& Knots, weights_t& Weights, control_points_t& ControlPoints)
+void circular_arc(const point3& X, const point3& Y, const double_t StartAngle, const double_t EndAngle, const uint32_t Segments, knots_t& Knots, weights_t& Weights, control_points_t& ControlPoints)
 {
-	const double start_angle = std::min(StartAngle, EndAngle);
-	const double end_angle = std::max(StartAngle, EndAngle);
-	const double theta = (end_angle - start_angle) / static_cast<double>(Segments);
-	const double weight = std::cos(theta * 0.5);
+	const double_t start_angle = std::min(StartAngle, EndAngle);
+	const double_t end_angle = std::max(StartAngle, EndAngle);
+	const double_t theta = (end_angle - start_angle) / static_cast<double_t>(Segments);
+	const double_t weight = std::cos(theta * 0.5);
 
 	Knots.clear();
 	Knots.insert(Knots.end(), 3, 0);
-	for(unsigned long i = 1; i != Segments; ++i)
+	for(uint32_t i = 1; i != Segments; ++i)
 		Knots.insert(Knots.end(), 2, i);
 	Knots.insert(Knots.end(), 3, Segments);
 
 	Weights.clear();
 	Weights.push_back(1.0);
-	for(unsigned long i = 0; i != Segments; ++i)
+	for(uint32_t i = 0; i != Segments; ++i)
 	{
 		Weights.push_back(weight);
 		Weights.push_back(1);
@@ -111,10 +102,10 @@ void circular_arc(const point3& X, const point3& Y, const double StartAngle, con
 
 	ControlPoints.clear();
 	ControlPoints.push_back(std::cos(start_angle) * X + std::sin(start_angle) * Y);
-	for(unsigned long i = 0; i != Segments; ++i)
+	for(uint32_t i = 0; i != Segments; ++i)
 	{
-		const double a0 = start_angle + (theta * (i));
-		const double a2 = start_angle + (theta * (i + 1));
+		const double_t a0 = start_angle + (theta * (i));
+		const double_t a2 = start_angle + (theta * (i + 1));
 
 		const point3 p0(std::cos(a0) * X + std::sin(a0) * Y);
 		const point3 p2(std::cos(a2) * X + std::sin(a2) * Y);
@@ -128,6 +119,22 @@ void circular_arc(const point3& X, const point3& Y, const double StartAngle, con
 		ControlPoints.push_back(p1);
 		ControlPoints.push_back(p2);
 	}
+}
+
+/** Calculates a 3rd-order NURBS curve that creates a circular arc centered at the origin with unit radius
+	\param X Defines the X axis of the plane containing the arc
+	\param Y Defines the Y axis of the plane containing the arc
+	\param StartAngle Start angle of the arc in radians
+	\param EndAngle End angle of the arc in radians
+	\param Segments The number of NURBS segments in the resulting arc
+	\param Knots Output container for the resulting arc knot vector
+	\param Weights Output container for the resulting arc control point weights
+	\param ControlPoints Output container for the resulting arc control point positions
+*/
+template<typename knots_t, typename weights_t, typename control_points_t>
+void circular_arc(const vector3& X, const vector3& Y, const double_t StartAngle, const double_t EndAngle, const uint32_t Segments, knots_t& Knots, weights_t& Weights, control_points_t& ControlPoints)
+{
+	circular_arc(to_point(X), to_point(Y), StartAngle, EndAngle, Segments, Knots, Weights, ControlPoints);
 }
 
 } // namespace nurbs

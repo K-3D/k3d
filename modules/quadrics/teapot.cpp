@@ -38,15 +38,15 @@ namespace quadrics
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// teapot_source
+// teapot
 
-class teapot_source :
+class teapot :
 	public k3d::material_sink<k3d::mesh_source<k3d::node> >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node> > base;
 
 public:
-	teapot_source(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	teapot(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Controls the color of the output teapot.")) + init_value(k3d::color(1, 1, 1))),
 		m_transformation(init_owner(*this) + init_name("transformation") + init_label(_("Transformation")) + init_description(_("Transformation matrix used to position / orient / scale the output teapot.")) + init_value(k3d::identity3D()))
@@ -77,9 +77,9 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<teapot_source > factory(
+		static k3d::document_plugin_factory<teapot > factory(
 			k3d::uuid(0xf0df2bd5, 0xd94e10ca, 0x1883899e, 0xd39d0c29),
-			"TeapotSource",
+			"Teapot",
 			"Creates a classic teapot primitive",
 			"Quadric",
 			k3d::iplugin_factory::EXPERIMENTAL);
@@ -92,9 +92,9 @@ private:
 	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_transformation;
 };
 
-k3d::iplugin_factory& teapot_source_factory()
+k3d::iplugin_factory& teapot_factory()
 {
-	return teapot_source::get_factory();
+	return teapot::get_factory();
 }
 
 } // namespace quadrics
