@@ -38,7 +38,7 @@ namespace python
 static k3d::python::mesh reset_mesh_1(imesh_storage_wrapper& Self)
 {
 	k3d::mesh* const mesh = new k3d::mesh();
-	Self.wrapped().reset_mesh(new k3d::mesh());
+	Self.wrapped().reset_mesh(mesh);
 
 	return k3d::python::mesh(mesh);
 }
