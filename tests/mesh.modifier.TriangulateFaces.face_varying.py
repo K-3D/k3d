@@ -24,7 +24,7 @@ loop_first_edges = polyhedra.create_loop_first_edges()
 edge_points = polyhedra.create_edge_points()
 clockwise_edges = polyhedra.create_clockwise_edges()
 edge_selection = polyhedra.create_edge_selection()
-Cs = polyhedra.writable_face_varying_data().create_array("Cs", "k3d::color")
+Cs = polyhedra.writable_face_varying_data().create("Cs", "k3d::color")
 
 positions = [(0, 0, 1), (1, 0, 1), (2, 0, 0), (2, 0, 1), (1, 0, 0), (0, 0, 0)]
 for position in positions:
