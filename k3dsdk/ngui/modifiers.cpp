@@ -73,8 +73,10 @@ const factories_t& mesh_modifiers()
 		const k3d::plugin::factory::collection_t data_source_modifiers = k3d::plugin::factory::lookup<k3d::imesh_source>();
 		const k3d::plugin::factory::collection_t data_sink_modifiers = k3d::plugin::factory::lookup<k3d::imesh_sink>();
 		const k3d::plugin::factory::collection_t multi_sink_modifiers = k3d::plugin::factory::lookup<k3d::imulti_mesh_sink>();
+		const k3d::plugin::factory::collection_t scripted_modifiers = k3d::plugin::factory::lookup("k3d:plugin-type", "MeshModifierScript");
 		std::set_intersection(data_source_modifiers.begin(), data_source_modifiers.end(), data_sink_modifiers.begin(), data_sink_modifiers.end(), std::inserter(modifiers, modifiers.end()));
 		modifiers.insert(modifiers.end(), multi_sink_modifiers.begin(), multi_sink_modifiers.end());
+		modifiers.insert(modifiers.end(), scripted_modifiers.begin(), scripted_modifiers.end());
 		std::sort(modifiers.begin(), modifiers.end(), detail::sort_by_name());
 	}
 

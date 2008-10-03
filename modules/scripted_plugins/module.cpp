@@ -187,7 +187,10 @@ void register_plugins(const k3d::filesystem::path& Path, k3d::iplugin_registry& 
 			if(name == "k3d:plugin-class")
 				plugin_class = value;
 			else if(name == "k3d:plugin-type")
+			{
 				plugin_type = value;
+				plugin_metadata.insert(std::make_pair(name, value));
+			}
 			else if(name == "k3d:plugin-name")
 				plugin_name = value;
 			else if(name == "k3d:plugin-description")
