@@ -88,8 +88,6 @@ public:
 	void copy(const uint_t SourceIndex, const uint_t TargetIndex);
 	/// Computes a weighted sum of N values from each source array and copies the result to the corresponding target array at the given TargetIndex.
 	void copy(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex);
-	/// Computes a weighted sum of N values from each target array and copies the result to the same target array at the given TargetIndex.
-	void mix(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex);
 
 private:
 	class implementation;

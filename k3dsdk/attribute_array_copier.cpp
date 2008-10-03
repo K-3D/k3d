@@ -378,11 +378,6 @@ public:
 	{
 		std::for_each(copiers.begin(), copiers.end(), boost::bind(&array_copier::copy, _1, Count, Indices, Weights, TargetIndex));
 	}
-	
-	void mix(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex)
-	{
-		std::for_each(copiers.begin(), copiers.end(), boost::bind(&array_copier::mix, _1, Count, Indices, Weights, TargetIndex));
-	}
 
 private:
 	/// Abstract interface for concrete objects that provide array-copying operations
@@ -397,8 +392,6 @@ private:
 		virtual void copy(const uint_t SourceIndex, const uint_t TargetIndex) = 0;
 		/// Called to compute a weighted sum from the source array and store the result at TargetIndex in the target array
 		virtual void copy(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TagetIndex) = 0;
-		/// Called to compute a weighted sum from the target array and store the result at TargetIndex in the target array
-		virtual void mix(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TagetIndex) = 0;
 	};
 
 	/// Defines storage for a collection of array copiers
@@ -479,11 +472,6 @@ private:
 			void copy(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex)
 			{
 				target[TargetIndex] = weighted_sum(source, Count, Indices, Weights);
-			}
-			
-			void mix(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex)
-			{
-				target[TargetIndex] = weighted_sum(target, Count, Indices, Weights);
 			}
 
 		private:
@@ -575,11 +563,6 @@ void attribute_array_copier::copy(const uint_t SourceIndex, const uint_t TargetI
 void attribute_array_copier::copy(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex)
 {
 	m_implementation->copy(Count, Indices, Weights, TargetIndex);
-}
-
-void attribute_array_copier::mix(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex)
-{
-	m_implementation->mix(Count, Indices, Weights, TargetIndex);
 }
 
 } // namespace k3d
