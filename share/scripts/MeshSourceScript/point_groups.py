@@ -15,10 +15,10 @@ materials = point_groups.create_materials()
 group_points = point_groups.create_points()
 
 # Create an (optional) array to store per-group point widths
-constantwidth = point_groups.writable_constant_data().create_array("constantwidth", "k3d::double_t")
+constantwidth = point_groups.writable_constant_data().create("constantwidth", "k3d::double_t")
 
 # Create an (optional) array to store per-point point colors
-Cs = point_groups.writable_varying_data().create_array("Cs", "k3d::color")
+Cs = point_groups.writable_varying_data().create("Cs", "k3d::color")
 
 # Create two point groups ...
 for i in range(2):

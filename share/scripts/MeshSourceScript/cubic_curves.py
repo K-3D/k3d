@@ -19,10 +19,10 @@ curve_selection = groups.create_curve_selection()
 curve_points = groups.create_curve_points()
 
 # Create an (optional) array to store per-group curve widths
-constantwidth = groups.writable_constant_data().create_array("constantwidth", "k3d::double_t")
+constantwidth = groups.writable_constant_data().create("constantwidth", "k3d::double_t")
 
 # Create an (optional) array to store per-curve curve colors
-Cs = groups.writable_uniform_data().create_array("Cs", "k3d::color")
+Cs = groups.writable_uniform_data().create("Cs", "k3d::color")
 
 # Create two curve groups ...
 for i in range(2):

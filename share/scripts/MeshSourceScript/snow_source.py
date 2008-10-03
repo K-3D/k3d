@@ -26,7 +26,7 @@ point_counts.append(len(points))
 materials = point_groups.create_materials()
 materials.append(None)
 
-constantwidth = point_groups.writable_constant_data().create_array("constantwidth", "double")
+constantwidth = point_groups.writable_constant_data().create("constantwidth", "double")
 constantwidth.append(0.2)
 
 group_points = point_groups.create_points()

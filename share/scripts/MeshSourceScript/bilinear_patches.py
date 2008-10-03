@@ -15,7 +15,7 @@ patch_points = bilinear_patches.create_patch_points()
 
 # Create an (optional) array to hold color values at the parametric
 # corners of each patch ...
-Cs = bilinear_patches.writable_varying_data().create_array("Cs", "k3d::color")
+Cs = bilinear_patches.writable_varying_data().create("Cs", "k3d::color")
 
 # We will create two identical bilinear patches
 for i in range(2):

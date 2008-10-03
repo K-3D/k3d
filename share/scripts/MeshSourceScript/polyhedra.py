@@ -22,7 +22,7 @@ clockwise_edges = polyhedra.create_clockwise_edges()
 edge_selection = polyhedra.create_edge_selection()
 
 # Create an (optional) array to store uniform (per-face) colors ...
-Cs = polyhedra.writable_uniform_data().create_array("Cs", "k3d::color")
+Cs = polyhedra.writable_uniform_data().create("Cs", "k3d::color")
 
 # Create two polyhedra ...
 for i in range(2):

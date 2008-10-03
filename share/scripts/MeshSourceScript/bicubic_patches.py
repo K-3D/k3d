@@ -15,7 +15,7 @@ patch_points = bicubic_patches.create_patch_points()
 
 # Create an (optional) array to hold color values at the parametric
 # corners of each patch ...
-Cs = bicubic_patches.writable_varying_data().create_array("Cs", "k3d::color")
+Cs = bicubic_patches.writable_varying_data().create("Cs", "k3d::color")
 
 # We will create two identical bicubic patches ...
 for i in range(2):

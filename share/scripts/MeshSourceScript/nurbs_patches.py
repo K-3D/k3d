@@ -25,7 +25,7 @@ patch_v_knots = nurbs_patches.create_patch_v_knots()
 
 # Create an (optional) array to hold color values at the parametric
 # corners of each patch ...
-Cs = nurbs_patches.writable_varying_data().create_array("Cs", "k3d::color")
+Cs = nurbs_patches.writable_varying_data().create("Cs", "k3d::color")
 
 # We will create two identical NURBS patches ...
 for i in range(2):
