@@ -53,7 +53,7 @@ public:
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Controls the radius the output sphere.")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_z_min(init_owner(*this) + init_name("z_min") + init_label(_("Z Min")) + init_description(_("Optionally truncates the sphere along the -Z axis.")) + init_value(-1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_z_max(init_owner(*this) + init_name("z_max") + init_label(_("Z Max")) + init_description(_("Optionally truncates the sphere along the +Z axis.")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_sweep_angle(init_owner(*this) + init_name("sweep_angle") + init_label(_("Sweep Angle")) + init_description(_("Optionally limits the sweep angle of the sphere to less-than 360 degrees.")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle))),
+		m_sweep_angle(init_owner(*this) + init_name("sweep_angle") + init_label(_("Sweep Angle")) + init_description(_("Optionally limits the sweep angle of the sphere to less-than 360 degrees.")) + init_value(k3d::pi_times_2()) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle))),
 		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Controls the color of the output sphere.")) + init_value(k3d::color(1, 1, 1)))
 	{
 		m_material.changed_signal().connect(k3d::hint::converter<
