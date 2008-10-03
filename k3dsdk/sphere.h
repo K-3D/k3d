@@ -40,7 +40,8 @@ public:
 		const typed_array<double_t>& ZMax,
 		const typed_array<double_t>& SweepAngles,
 		const attribute_arrays& ConstantData,
-		const attribute_arrays& UniformData);
+		const attribute_arrays& UniformData,
+		const attribute_arrays& VaryingData);
 
 	const typed_array<matrix4>& matrices;
 	const typed_array<imaterial*>& materials;
@@ -50,6 +51,7 @@ public:
 	const typed_array<double_t>& sweep_angles;
 	const attribute_arrays& constant_data;
 	const attribute_arrays& uniform_data;
+	const attribute_arrays& varying_data;
 };
 
 /// Gathers the member arrays of a sphere primitive into a convenient package
@@ -64,7 +66,8 @@ public:
 		typed_array<double_t>& ZMax,
 		typed_array<double_t>& SweepAngles,
 		attribute_arrays& ConstantData,
-		attribute_arrays& UniformData);
+		attribute_arrays& UniformData,
+		attribute_arrays& VaryingData);
 
 	typed_array<matrix4>& matrices;
 	typed_array<imaterial*>& materials;
@@ -74,6 +77,7 @@ public:
 	typed_array<double_t>& sweep_angles;
 	attribute_arrays& constant_data;
 	attribute_arrays& uniform_data;
+	attribute_arrays& varying_data;
 };
 
 /// Creates a new sphere mesh primitive, returning references to its member arrays.

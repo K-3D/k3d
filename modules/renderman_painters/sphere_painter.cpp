@@ -85,6 +85,12 @@ public:
 				ri_uniform_data.add_arrays(sphere->uniform_data);
 				ri_uniform_data.push_back(i);
 				ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
+
+				array_copier ri_varying_data;
+				ri_varying_data.add_arrays(sphere->varying_data);
+				for(k3d::uint_t j = 0; j != 4; ++j)
+					ri_varying_data.push_back((i * 4) + j);
+				ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
 				
 				RenderState.stream.RiSphereV(
 					sphere->radii[i],

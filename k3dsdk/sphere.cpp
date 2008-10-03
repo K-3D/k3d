@@ -36,7 +36,8 @@ primitive::primitive(
 	const typed_array<double_t>& ZMax,
 	const typed_array<double_t>& SweepAngles,
 	const attribute_arrays& ConstantData,
-	const attribute_arrays& UniformData) :
+	const attribute_arrays& UniformData,
+	const attribute_arrays& VaryingData) :
 	matrices(Matrices),
 	materials(Materials),
 	radii(Radii),
@@ -44,7 +45,8 @@ primitive::primitive(
 	z_max(ZMax),
 	sweep_angles(SweepAngles),
 	constant_data(ConstantData),
-	uniform_data(UniformData)
+	uniform_data(UniformData),
+	varying_data(VaryingData)
 {
 }
 
@@ -59,7 +61,8 @@ writable_primitive::writable_primitive(
 	typed_array<double_t>& ZMax,
 	typed_array<double_t>& SweepAngles,
 	attribute_arrays& ConstantData,
-	attribute_arrays& UniformData) :
+	attribute_arrays& UniformData,
+	attribute_arrays& VaryingData) :
 	matrices(Matrices),
 	materials(Materials),
 	radii(Radii),
@@ -67,7 +70,8 @@ writable_primitive::writable_primitive(
 	z_max(ZMax),
 	sweep_angles(SweepAngles),
 	constant_data(ConstantData),
-	uniform_data(UniformData)
+	uniform_data(UniformData),
+	varying_data(VaryingData)
 {
 }
 
@@ -86,7 +90,8 @@ writable_primitive* create(mesh& Mesh)
 		generic_primitive.topology.create<typed_array<double_t> >("z_max"),
 		generic_primitive.topology.create<typed_array<double_t> >("sweep_angles"),
 		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["uniform"]);
+		generic_primitive.attributes["uniform"],
+		generic_primitive.attributes["varying"]);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,6 +150,12 @@ primitive* validate(const mesh::primitive& GenericPrimitive)
 		log() << error << "[" << GenericPrimitive.type << "] primitive missing uniform attribute data" << std::endl;
 		return 0;
 	}
+	const attribute_arrays* const varying_data = GenericPrimitive.attributes.lookup("varying");
+	if(!varying_data)
+	{
+		log() << error << "[" << GenericPrimitive.type << "] primitive missing varying attribute data" << std::endl;
+		return 0;
+	}
 
 	if(!(
 		matrices->size() == materials->size()
@@ -158,7 +169,7 @@ primitive* validate(const mesh::primitive& GenericPrimitive)
 		return 0;
 	}
 
-	return new primitive(*matrices, *materials, *radii, *z_min, *z_max, *sweep_angles, *constant_data, *uniform_data);
+	return new primitive(*matrices, *materials, *radii, *z_min, *z_max, *sweep_angles, *constant_data, *uniform_data, *varying_data);
 }
 
 writable_primitive* validate(mesh::primitive& GenericPrimitive)
@@ -214,6 +225,12 @@ writable_primitive* validate(mesh::primitive& GenericPrimitive)
 		log() << error << "[" << GenericPrimitive.type << "] primitive missing uniform attribute data" << std::endl;
 		return 0;
 	}
+	attribute_arrays* const varying_data = GenericPrimitive.attributes.writable("varying");
+	if(!varying_data)
+	{
+		log() << error << "[" << GenericPrimitive.type << "] primitive missing varying attribute data" << std::endl;
+		return 0;
+	}
 
 	if(!(
 		matrices->size() == materials->size()
@@ -227,7 +244,7 @@ writable_primitive* validate(mesh::primitive& GenericPrimitive)
 		return 0;
 	}
 
-	return new writable_primitive(*matrices, *materials, *radii, *z_min, *z_max, *sweep_angles, *constant_data, *uniform_data);
+	return new writable_primitive(*matrices, *materials, *radii, *z_min, *z_max, *sweep_angles, *constant_data, *uniform_data, *varying_data);
 }
 
 } // namespace sphere
