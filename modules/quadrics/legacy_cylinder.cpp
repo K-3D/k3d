@@ -29,23 +29,23 @@ namespace module
 namespace quadrics
 {
 
-class cylinder :
+class legacy_cylinder :
 	public quadric
 {
 	typedef quadric base;
 
 public:
-	cylinder(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	legacy_cylinder(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Cylinder radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_zmin(init_owner(*this) + init_name("zmin") + init_label(_("Z min")) + init_description(_("Bottom cap position")) + init_value(-5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_zmax(init_owner(*this) + init_name("zmax") + init_label(_("Z max")) + init_description(_("Top cap position")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("Theta max")) + init_description(_("From RenderMan specification")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
 	{
-		m_radius.changed_signal().connect(sigc::mem_fun(*this, &cylinder::reset_geometry));
-		m_zmin.changed_signal().connect(sigc::mem_fun(*this, &cylinder::reset_geometry));
-		m_zmax.changed_signal().connect(sigc::mem_fun(*this, &cylinder::reset_geometry));
-		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &cylinder::reset_geometry));
+		m_radius.changed_signal().connect(sigc::mem_fun(*this, &legacy_cylinder::reset_geometry));
+		m_zmin.changed_signal().connect(sigc::mem_fun(*this, &legacy_cylinder::reset_geometry));
+		m_zmax.changed_signal().connect(sigc::mem_fun(*this, &legacy_cylinder::reset_geometry));
+		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &legacy_cylinder::reset_geometry));
 
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 		m_material.changed_signal().connect(make_async_redraw_slot());
@@ -54,7 +54,7 @@ public:
 		m_gl_v_knot_vector.insert(m_gl_v_knot_vector.end(), 1);
 		m_gl_v_knot_vector.insert(m_gl_v_knot_vector.end(), 2, 2);
 
-		add_snap_target(new k3d::snap_target(_("Surface"), sigc::mem_fun(*this, &cylinder::surface_target_position), sigc::mem_fun(*this, &cylinder::surface_target_orientation)));
+		add_snap_target(new k3d::snap_target(_("Surface"), sigc::mem_fun(*this, &legacy_cylinder::surface_target_position), sigc::mem_fun(*this, &legacy_cylinder::surface_target_orientation)));
 	}
 
 	bool surface_target_position(const k3d::point3& Position, k3d::point3& TargetPosition)
@@ -173,14 +173,14 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<cylinder,
+		static k3d::document_plugin_factory<legacy_cylinder,
 			k3d::interface_list<k3d::itransform_source,
 			k3d::interface_list<k3d::itransform_sink > > > factory(
 				k3d::classes::Cylinder(),
-				"Cylinder",
+				"LegacyCylinder",
 				_("Cylinder primitive"),
 				"Quadric",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
@@ -197,11 +197,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// cylinder_factory
+// legacy_cylinder_factory
 
-k3d::iplugin_factory& cylinder_factory()
+k3d::iplugin_factory& legacy_cylinder_factory()
 {
-	return cylinder::get_factory();
+	return legacy_cylinder::get_factory();
 }
 
 } // namespace quadrics

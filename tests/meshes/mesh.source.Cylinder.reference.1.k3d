@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<vertex_data/>
+		<primitives>
+			<primitive type="cylinder">
+				<topology>
+					<array name="materials" type="k3d::imaterial*">0</array>
+					<array name="matrices" type="k3d::matrix4">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</array>
+					<array name="radii" type="k3d::double_t">1</array>
+					<array name="sweep_angles" type="k3d::double_t">6.2831853071795862</array>
+					<array name="z_max" type="k3d::double_t">1</array>
+					<array name="z_min" type="k3d::double_t">-1</array>
+				</topology>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="uniform">
+						<array name="Cs" type="k3d::color">1 1 1</array>
+					</arrays>
+					<arrays type="varying"/>
+				</attributes>
+			</primitive>
+		</primitives>
+	</mesh_arrays>
+</k3dml>

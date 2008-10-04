@@ -1,5 +1,5 @@
-#ifndef K3DSDK_SPHERE_H
-#define K3DSDK_SPHERE_H
+#ifndef K3DSDK_CYLINDER_H
+#define K3DSDK_CYLINDER_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -25,10 +25,10 @@
 namespace k3d
 {
 
-namespace sphere
+namespace cylinder
 {
 
-/// Gathers the member arrays of a sphere primitive into a convenient package
+/// Gathers the member arrays of a cylinder primitive into a convenient package
 class primitive
 {
 public:
@@ -54,7 +54,7 @@ public:
 	const attribute_arrays& varying_data;
 };
 
-/// Gathers the member arrays of a sphere primitive into a convenient package
+/// Gathers the member arrays of a cylinder primitive into a convenient package
 class writable_primitive
 {
 public:
@@ -80,20 +80,20 @@ public:
 	attribute_arrays& varying_data;
 };
 
-/// Creates a new sphere mesh primitive, returning references to its member arrays.
+/// Creates a new cylinder mesh primitive, returning references to its member arrays.
 /// The caller is responsible for the lifetime of the returned object.
 writable_primitive* create(mesh& Mesh);
 
-/// Tests the given mesh primitive to see if it is a valid sphere primitive, returning references to its member arrays, or NULL.
+/// Tests the given mesh primitive to see if it is a valid cylinder primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 primitive* validate(const mesh::primitive& GenericPrimitive);
-/// Tests the given mesh primitive to see if it is a valid sphere primitive, returning references to its member arrays, or NULL.
+/// Tests the given mesh primitive to see if it is a valid cylinder primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 writable_primitive* validate(mesh::primitive& GenericPrimitive);
 
-} // namespace sphere
+} // namespace cylinder
 
 } // namespace k3d
 
-#endif // K3DSDK_SPHERE_H
+#endif // K3DSDK_TEAPOT_H
 
