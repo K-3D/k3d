@@ -169,6 +169,24 @@ primitive* validate(const mesh::primitive& GenericPrimitive)
 		return 0;
 	}
 
+	if(!constant_data->match_size(matrices->size()))
+	{
+		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per sphere" << std::endl;
+		return 0;
+	}
+
+	if(!uniform_data->match_size(matrices->size()))
+	{
+		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per sphere" << std::endl;
+		return 0;
+	}
+
+	if(!varying_data->match_size(matrices->size() * 4))
+	{
+		log() << error << "[" << GenericPrimitive.type << "] varying attributes must contain four values per sphere" << std::endl;
+		return 0;
+	}
+
 	return new primitive(*matrices, *materials, *radii, *z_min, *z_max, *sweep_angles, *constant_data, *uniform_data, *varying_data);
 }
 
@@ -241,6 +259,24 @@ writable_primitive* validate(mesh::primitive& GenericPrimitive)
 		))
 	{
 		log() << error << "[" << GenericPrimitive.type << "] primitive array-length mismatch" << std::endl;
+		return 0;
+	}
+
+	if(!constant_data->match_size(matrices->size()))
+	{
+		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per sphere" << std::endl;
+		return 0;
+	}
+
+	if(!uniform_data->match_size(matrices->size()))
+	{
+		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per sphere" << std::endl;
+		return 0;
+	}
+
+	if(!varying_data->match_size(matrices->size() * 4))
+	{
+		log() << error << "[" << GenericPrimitive.type << "] varying attributes must contain four values per sphere" << std::endl;
 		return 0;
 	}
 

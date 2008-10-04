@@ -108,6 +108,18 @@ primitive* validate(const mesh::primitive& GenericPrimitive)
 		return 0;
 	}
 
+	if(!constant_data->match_size(matrices->size()))
+	{
+		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per teapot" << std::endl;
+		return 0;
+	}
+
+	if(!uniform_data->match_size(matrices->size()))
+	{
+		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per teapot" << std::endl;
+		return 0;
+	}
+
 	return new primitive(*matrices, *materials, *constant_data, *uniform_data);
 }
 
@@ -144,6 +156,18 @@ writable_primitive* validate(mesh::primitive& GenericPrimitive)
 	if(matrices->size() != materials->size())
 	{
 		log() << error << "[" << GenericPrimitive.type << "] primitive array-length mismatch" << std::endl;
+		return 0;
+	}
+
+	if(!constant_data->match_size(matrices->size()))
+	{
+		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per teapot" << std::endl;
+		return 0;
+	}
+
+	if(!uniform_data->match_size(matrices->size()))
+	{
+		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per teapot" << std::endl;
 		return 0;
 	}
 
