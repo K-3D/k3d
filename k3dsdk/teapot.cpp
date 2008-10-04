@@ -26,9 +26,9 @@ namespace teapot
 {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// primitive
+// const_primitive
 
-primitive::primitive(
+const_primitive::const_primitive(
 	const typed_array<matrix4>& Matrices,
 	const typed_array<imaterial*>& Materials,
 	const attribute_arrays& ConstantData,
@@ -41,9 +41,9 @@ primitive::primitive(
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// writable_primitive
+// primitive
 
-writable_primitive::writable_primitive(
+primitive::primitive(
 	typed_array<matrix4>& Matrices,
 	typed_array<imaterial*>& Materials,
 	attribute_arrays& ConstantData,
@@ -58,11 +58,11 @@ writable_primitive::writable_primitive(
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create
 
-writable_primitive* create(mesh& Mesh)
+primitive* create(mesh& Mesh)
 {
 	mesh::primitive& generic_primitive = Mesh.primitives.create("teapot");
 
-	return new writable_primitive(
+	return new primitive(
 		generic_primitive.topology.create<typed_array<matrix4> >("matrices"),
 		generic_primitive.topology.create<typed_array<imaterial*> >("materials"),
 		generic_primitive.attributes["constant"],
@@ -72,7 +72,7 @@ writable_primitive* create(mesh& Mesh)
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
-primitive* validate(const mesh::primitive& GenericPrimitive)
+const_primitive* validate(const mesh::primitive& GenericPrimitive)
 {
 	if(GenericPrimitive.type != "teapot")
 		return 0;
@@ -120,10 +120,10 @@ primitive* validate(const mesh::primitive& GenericPrimitive)
 		return 0;
 	}
 
-	return new primitive(*matrices, *materials, *constant_data, *uniform_data);
+	return new const_primitive(*matrices, *materials, *constant_data, *uniform_data);
 }
 
-writable_primitive* validate(mesh::primitive& GenericPrimitive)
+primitive* validate(mesh::primitive& GenericPrimitive)
 {
 	if(GenericPrimitive.type != "teapot")
 		return 0;
@@ -171,7 +171,7 @@ writable_primitive* validate(mesh::primitive& GenericPrimitive)
 		return 0;
 	}
 
-	return new writable_primitive(*matrices, *materials, *constant_data, *uniform_data);
+	return new primitive(*matrices, *materials, *constant_data, *uniform_data);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

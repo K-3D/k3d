@@ -76,7 +76,7 @@ public:
 	{
 		Output = k3d::mesh();
 
-		boost::scoped_ptr<k3d::cylinder::writable_primitive> primitive(k3d::cylinder::create(Output));
+		boost::scoped_ptr<k3d::cylinder::primitive> primitive(k3d::cylinder::create(Output));
 		k3d::typed_array<k3d::color>& colors = primitive->uniform_data.create<k3d::typed_array<k3d::color> >("Cs");
 
 		primitive->matrices.push_back(m_transformation.pipeline_value());

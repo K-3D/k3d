@@ -59,7 +59,7 @@ public:
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::sphere::primitive> sphere(k3d::sphere::validate(**primitive));
+			boost::scoped_ptr<k3d::sphere::const_primitive> sphere(k3d::sphere::validate(**primitive));
 			if(!sphere)
 				continue;
 
@@ -100,7 +100,7 @@ public:
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::sphere::primitive> sphere(k3d::sphere::validate(**primitive));
+			boost::scoped_ptr<k3d::sphere::const_primitive> sphere(k3d::sphere::validate(**primitive));
 			if(!sphere)
 				continue;
 

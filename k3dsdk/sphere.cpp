@@ -26,9 +26,9 @@ namespace sphere
 {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// primitive
+// const_primitive
 
-primitive::primitive(
+const_primitive::const_primitive(
 	const typed_array<matrix4>& Matrices,
 	const typed_array<imaterial*>& Materials,
 	const typed_array<double_t>& Radii,
@@ -51,9 +51,9 @@ primitive::primitive(
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// writable_primitive
+// primitive
 
-writable_primitive::writable_primitive(
+primitive::primitive(
 	typed_array<matrix4>& Matrices,
 	typed_array<imaterial*>& Materials,
 	typed_array<double_t>& Radii,
@@ -78,11 +78,11 @@ writable_primitive::writable_primitive(
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create
 
-writable_primitive* create(mesh& Mesh)
+primitive* create(mesh& Mesh)
 {
 	mesh::primitive& generic_primitive = Mesh.primitives.create("sphere");
 
-	return new writable_primitive(
+	return new primitive(
 		generic_primitive.topology.create<typed_array<matrix4> >("matrices"),
 		generic_primitive.topology.create<typed_array<imaterial*> >("materials"),
 		generic_primitive.topology.create<typed_array<double_t> >("radii"),
@@ -97,7 +97,7 @@ writable_primitive* create(mesh& Mesh)
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
-primitive* validate(const mesh::primitive& GenericPrimitive)
+const_primitive* validate(const mesh::primitive& GenericPrimitive)
 {
 	if(GenericPrimitive.type != "sphere")
 		return 0;
@@ -187,10 +187,10 @@ primitive* validate(const mesh::primitive& GenericPrimitive)
 		return 0;
 	}
 
-	return new primitive(*matrices, *materials, *radii, *z_min, *z_max, *sweep_angles, *constant_data, *uniform_data, *varying_data);
+	return new const_primitive(*matrices, *materials, *radii, *z_min, *z_max, *sweep_angles, *constant_data, *uniform_data, *varying_data);
 }
 
-writable_primitive* validate(mesh::primitive& GenericPrimitive)
+primitive* validate(mesh::primitive& GenericPrimitive)
 {
 	if(GenericPrimitive.type != "sphere")
 		return 0;
@@ -280,7 +280,7 @@ writable_primitive* validate(mesh::primitive& GenericPrimitive)
 		return 0;
 	}
 
-	return new writable_primitive(*matrices, *materials, *radii, *z_min, *z_max, *sweep_angles, *constant_data, *uniform_data, *varying_data);
+	return new primitive(*matrices, *materials, *radii, *z_min, *z_max, *sweep_angles, *constant_data, *uniform_data, *varying_data);
 }
 
 } // namespace sphere

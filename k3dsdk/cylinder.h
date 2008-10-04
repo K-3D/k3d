@@ -29,10 +29,10 @@ namespace cylinder
 {
 
 /// Gathers the member arrays of a cylinder primitive into a convenient package
-class primitive
+class const_primitive
 {
 public:
-	primitive(
+	const_primitive(
 		const typed_array<matrix4>& Matrices,
 		const typed_array<imaterial*>& Materials,
 		const typed_array<double_t>& Radii,
@@ -55,10 +55,10 @@ public:
 };
 
 /// Gathers the member arrays of a cylinder primitive into a convenient package
-class writable_primitive
+class primitive
 {
 public:
-	writable_primitive(
+	primitive(
 		typed_array<matrix4>& Matrices,
 		typed_array<imaterial*>& Materials,
 		typed_array<double_t>& Radii,
@@ -82,14 +82,14 @@ public:
 
 /// Creates a new cylinder mesh primitive, returning references to its member arrays.
 /// The caller is responsible for the lifetime of the returned object.
-writable_primitive* create(mesh& Mesh);
+primitive* create(mesh& Mesh);
 
 /// Tests the given mesh primitive to see if it is a valid cylinder primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
-primitive* validate(const mesh::primitive& GenericPrimitive);
+const_primitive* validate(const mesh::primitive& GenericPrimitive);
 /// Tests the given mesh primitive to see if it is a valid cylinder primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
-writable_primitive* validate(mesh::primitive& GenericPrimitive);
+primitive* validate(mesh::primitive& GenericPrimitive);
 
 } // namespace cylinder
 
