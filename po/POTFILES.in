@@ -301,6 +301,7 @@ modules/opengl_painters/cached_triangulation.h
 modules/opengl_painters/colored_selection_painter_gl.h
 modules/opengl_painters/color_face_painter.cpp
 modules/opengl_painters/cubic_curve_painter.cpp
+modules/opengl_painters/cylinder_painter.cpp
 modules/opengl_painters/edge_numbering_painter.cpp
 modules/opengl_painters/edge_painter.cpp
 modules/opengl_painters/face_normal_painter.cpp
@@ -327,7 +328,6 @@ modules/opengl_painters/sphere_painter.cpp
 modules/opengl_painters/teapot_painter.cpp
 modules/opengl_painters/textured_face_painter.cpp
 modules/opengl_painters/utility.h
-modules/opengl_painters/varying_color_face_painter.cpp
 modules/opengl_painters/varying_data_painter.cpp
 modules/opengl_painters/vbo.cpp
 modules/opengl_painters/vbo_edge_painter.cpp
@@ -335,6 +335,7 @@ modules/opengl_painters/vbo_face_painter.cpp
 modules/opengl_painters/vbo.h
 modules/opengl_painters/vbo_point_painter.cpp
 modules/opengl_painters/vbo_sds_painter.cpp
+modules/opengl_painters/vertex_data_painter.cpp
 modules/opengl/render_engine.cpp
 modules/osx/uri_handler.cpp
 modules/pdiff/perceptual_difference.cpp
@@ -367,6 +368,7 @@ modules/primitives/poly_torus.cpp
 modules/primitives/sphere_eversion.cpp
 modules/python/engine.cpp
 modules/qslim/quadric_decimation.cpp
+modules/quadrics/cylinder.cpp
 modules/quadrics/detail.h
 modules/quadrics/legacy_cone.cpp
 modules/quadrics/legacy_cylinder.cpp
@@ -403,6 +405,7 @@ modules/renderman_painters/bicubic_patch_painter.cpp
 modules/renderman_painters/bilinear_patch_painter.cpp
 modules/renderman_painters/blobby_painter.cpp
 modules/renderman_painters/cubic_curve_painter.cpp
+modules/renderman_painters/cylinder_painter.cpp
 modules/renderman_painters/linear_curve_painter.cpp
 modules/renderman_painters/multi_painter.cpp
 modules/renderman_painters/nurbs_patch_painter.cpp
