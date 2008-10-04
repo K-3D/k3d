@@ -31,9 +31,9 @@
 <command node="/ui" command="tutorial_message" arguments="The Timeline Panel can be used to control playback of animations ..."/>
 <command node="/document/window/timeline" command="highlight" arguments=""/>
 <command node="/ui" command="tutorial_message" arguments="The Tool Properties Panel is used to display Tool-specific options (and resembles the Node Properties Panel) ..."/>
-<command node="/document/window/panel" command="mount_tool_properties" arguments=""/>
+<command node="/document/window/panel" command="mount" arguments="NGUIToolPropertiesPanel"/>
 <command node="/ui" command="tutorial_message" arguments="Finally, the Undo Tree Panel displays all of the changes you&apos;ve made to your Document, allowing you to undo or redo changes, exploring &quot;branches&quot; of modification ..."/>
-<command node="/document/window/panel1" command="mount_undo_tree" arguments=""/>
+<command node="/document/window/panel" command="mount" arguments="NGUIUndoTreePanel"/>
 <command node="/document/window/undo_tree/toolbar/undo" command="activate" arguments=""/>
 <command node="/document/window/undo_tree/toolbar/redo" command="activate" arguments=""/>
 <command node="/ui" command="tutorial_message" arguments="That&apos;s it for the Panels overview ... we&apos;ll explore the individual Panel types in more detail as we go.  For now, let&apos;s move on to the next Tutorial ..."/>
