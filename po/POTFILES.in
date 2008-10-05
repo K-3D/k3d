@@ -300,6 +300,7 @@ modules/opengl_painters/cached_triangulation.cpp
 modules/opengl_painters/cached_triangulation.h
 modules/opengl_painters/colored_selection_painter_gl.h
 modules/opengl_painters/color_face_painter.cpp
+modules/opengl_painters/cone_painter.cpp
 modules/opengl_painters/cubic_curve_painter.cpp
 modules/opengl_painters/cylinder_painter.cpp
 modules/opengl_painters/edge_numbering_painter.cpp
@@ -317,6 +318,7 @@ modules/opengl_painters/nurbs_curve_numbering_painter.cpp
 modules/opengl_painters/nurbs_curve_painter.cpp
 modules/opengl_painters/nurbs_patch_numbering_painter.cpp
 modules/opengl_painters/nurbs_patch_painter.cpp
+modules/opengl_painters/paraboloid_painter.cpp
 modules/opengl_painters/point_normal_painter.cpp
 modules/opengl_painters/point_numbering_painter.cpp
 modules/opengl_painters/point_painter.cpp
@@ -368,6 +370,7 @@ modules/primitives/poly_torus.cpp
 modules/primitives/sphere_eversion.cpp
 modules/python/engine.cpp
 modules/qslim/quadric_decimation.cpp
+modules/quadrics/cone.cpp
 modules/quadrics/cylinder.cpp
 modules/quadrics/detail.h
 modules/quadrics/legacy_cone.cpp
@@ -377,6 +380,7 @@ modules/quadrics/legacy_hyperboloid.cpp
 modules/quadrics/legacy_paraboloid.cpp
 modules/quadrics/legacy_sphere.cpp
 modules/quadrics/legacy_torus.cpp
+modules/quadrics/paraboloid.cpp
 modules/quadrics/sphere.cpp
 modules/quadrics/teapot.cpp
 modules/quadrilateral_remeshing/quadrilateral_remeshing.cpp
@@ -404,11 +408,13 @@ modules/renderman/material.cpp
 modules/renderman_painters/bicubic_patch_painter.cpp
 modules/renderman_painters/bilinear_patch_painter.cpp
 modules/renderman_painters/blobby_painter.cpp
+modules/renderman_painters/cone_painter.cpp
 modules/renderman_painters/cubic_curve_painter.cpp
 modules/renderman_painters/cylinder_painter.cpp
 modules/renderman_painters/linear_curve_painter.cpp
 modules/renderman_painters/multi_painter.cpp
 modules/renderman_painters/nurbs_patch_painter.cpp
+modules/renderman_painters/paraboloid_painter.cpp
 modules/renderman_painters/point_group_painter.cpp
 modules/renderman_painters/polyhedron_painter.cpp
 modules/renderman_painters/scripted_painter.cpp
