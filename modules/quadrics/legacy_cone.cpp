@@ -30,23 +30,23 @@ namespace quadrics
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// cone
+// legacy_cone
 
-class cone :
+class legacy_cone :
 	public quadric
 {
 	typedef quadric base;
 
 public:
-	cone(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	legacy_cone(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Base radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Cone height")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("Theta max")) + init_description(_("From RenderMan specification")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
 	{
-		m_radius.changed_signal().connect(sigc::mem_fun(*this, &cone::reset_geometry));
-		m_height.changed_signal().connect(sigc::mem_fun(*this, &cone::reset_geometry));
-		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &cone::reset_geometry));
+		m_radius.changed_signal().connect(sigc::mem_fun(*this, &legacy_cone::reset_geometry));
+		m_height.changed_signal().connect(sigc::mem_fun(*this, &legacy_cone::reset_geometry));
+		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &legacy_cone::reset_geometry));
 
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 		m_material.changed_signal().connect(make_async_redraw_slot());
@@ -55,7 +55,7 @@ public:
 		m_gl_v_knot_vector.insert(m_gl_v_knot_vector.end(), 1);
 		m_gl_v_knot_vector.insert(m_gl_v_knot_vector.end(), 2, 2);
 
-		add_snap_target(new k3d::snap_target(_("Tip"), sigc::mem_fun(*this, &cone::tip_target_position), sigc::mem_fun(*this, &cone::tip_target_orientation)));
+		add_snap_target(new k3d::snap_target(_("Tip"), sigc::mem_fun(*this, &legacy_cone::tip_target_position), sigc::mem_fun(*this, &legacy_cone::tip_target_orientation)));
 	}
 
 
@@ -168,14 +168,14 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<cone,
+		static k3d::document_plugin_factory<legacy_cone,
 			k3d::interface_list<k3d::itransform_source,
 			k3d::interface_list<k3d::itransform_sink > > > factory(
 				k3d::classes::Cone(),
-				"Cone",
+				"LegacyCone",
 				_("Cone primitive"),
 				"Quadric",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
@@ -191,11 +191,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// cone_factory
+// legacy_cone_factory
 
-k3d::iplugin_factory& cone_factory()
+k3d::iplugin_factory& legacy_cone_factory()
 {
-	return cone::get_factory();
+	return legacy_cone::get_factory();
 }
 
 } // namespace quadrics

@@ -123,6 +123,7 @@ void setup_renderman_document(k3d::idocument& Document)
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "bicubic_patches", "Bicubic Patches", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManBicubicPatchPainter", Document, "RenderMan Bicubic Patch Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "nurbs_patches", "NURBS Patches", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManNURBSPatchPainter", Document, "RenderMan NURBS Patch Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "blobbies", "Blobbies", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManBlobbyPainter", Document, "RenderMan Blobby Painter"));
+	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "cones", "Cones", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManConePainter", Document, "RenderMan Cone Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "cylinders", "Cylinders", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManCylinderPainter", Document, "RenderMan Cylinder Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "spheres", "Spheres", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManSpherePainter", Document, "RenderMan Sphere Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "teapots", "Teapots", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManTeapotPainter", Document, "RenderMan Teapot Painter"));
@@ -239,6 +240,7 @@ void setup_opengl_document(k3d::idocument& Document)
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "blobbies", "Blobbies", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLBlobbyPointPainter", Document, "GL Blobby Point Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "face_normals", "Face Normals", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLFaceNormalPainter", Document, "GL Face Normal Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "face_orientation", "Face Orientation", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLFaceOrientationPainter", Document, "GL Face Orientation Painter"));
+	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "cones", "Cones", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLConePainter", Document, "GL Cone Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "cylinders", "Cylinders", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLCylinderPainter", Document, "GL Cylinder Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "spheres", "Spheres", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLSpherePainter", Document, "GL Sphere Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "teapots", "Teapots", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLTeapotPainter", Document, "GL Teapot Painter"));
