@@ -42,6 +42,7 @@ extern k3d::iplugin_factory& linear_curve_painter_factory();
 extern k3d::iplugin_factory& multi_painter_factory();
 extern k3d::iplugin_factory& multi_painter_factory();
 extern k3d::iplugin_factory& nurbs_patch_painter_factory();
+extern k3d::iplugin_factory& paraboloid_painter_factory();
 extern k3d::iplugin_factory& point_group_painter_factory();
 extern k3d::iplugin_factory& polyhedron_painter_factory();
 extern k3d::iplugin_factory& scripted_painter_factory();
@@ -65,6 +66,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::renderman::painters::linear_curve_painter_factory());
 	Registry.register_factory(module::renderman::painters::multi_painter_factory());
 	Registry.register_factory(module::renderman::painters::nurbs_patch_painter_factory());
+	Registry.register_factory(module::renderman::painters::paraboloid_painter_factory());
 	Registry.register_factory(module::renderman::painters::point_group_painter_factory());
 	Registry.register_factory(module::renderman::painters::polyhedron_painter_factory());
 	Registry.register_factory(module::renderman::painters::scripted_painter_factory());

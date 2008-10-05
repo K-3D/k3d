@@ -31,25 +31,25 @@ namespace quadrics
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// paraboloid
+// legacy_paraboloid
 
-class paraboloid :
+class legacy_paraboloid :
 	public quadric
 {
 	typedef quadric base;
 
 public:
-	paraboloid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	legacy_paraboloid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_zmax(init_owner(*this) + init_name("zmax") + init_label(_("Z max")) + init_description(_("Maximum point position")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_zmin(init_owner(*this) + init_name("zmin") + init_label(_("Z min")) + init_description(_("Origin position")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("Theta max")) + init_description(_("From RenderMan specification")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
 	{
-		m_radius.changed_signal().connect(sigc::mem_fun(*this, &paraboloid::reset_geometry));
-		m_zmin.changed_signal().connect(sigc::mem_fun(*this, &paraboloid::reset_geometry));
-		m_zmax.changed_signal().connect(sigc::mem_fun(*this, &paraboloid::reset_geometry));
-		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &paraboloid::reset_geometry));
+		m_radius.changed_signal().connect(sigc::mem_fun(*this, &legacy_paraboloid::reset_geometry));
+		m_zmin.changed_signal().connect(sigc::mem_fun(*this, &legacy_paraboloid::reset_geometry));
+		m_zmax.changed_signal().connect(sigc::mem_fun(*this, &legacy_paraboloid::reset_geometry));
+		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &legacy_paraboloid::reset_geometry));
 
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 		m_material.changed_signal().connect(make_async_redraw_slot());
@@ -188,14 +188,14 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<paraboloid,
+		static k3d::document_plugin_factory<legacy_paraboloid,
 			k3d::interface_list<k3d::itransform_source,
 			k3d::interface_list<k3d::itransform_sink > > > factory(
 				k3d::classes::Paraboloid(),
-				"Paraboloid",
+				"LegacyParaboloid",
 				_("Paraboloid primitive"),
 				"Quadric",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
@@ -212,11 +212,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// paraboloid_factory
+// legacy_paraboloid_factory
 
-k3d::iplugin_factory& paraboloid_factory()
+k3d::iplugin_factory& legacy_paraboloid_factory()
 {
-	return paraboloid::get_factory();
+	return legacy_paraboloid::get_factory();
 }
 
 } // namespace quadrics
