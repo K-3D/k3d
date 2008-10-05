@@ -50,8 +50,8 @@ public:
 	cone(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_transformation(init_owner(*this) + init_name("transformation") + init_label(_("Transformation")) + init_description(_("Transformation matrix used to position / orient / scale the output cone.")) + init_value(k3d::identity3D())),
-		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Defines the cone height along the +Z axis.")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Controls the radius of the output cone.")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Defines the cone height along the +Z axis.")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Controls the radius of the output cone.")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_sweep_angle(init_owner(*this) + init_name("sweep_angle") + init_label(_("Sweep Angle")) + init_description(_("Optionally limits the sweep angle of the cone to less-than 360 degrees.")) + init_value(k3d::pi_times_2()) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle))),
 		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Controls the color of the output cone.")) + init_value(k3d::color(1, 1, 1)))
 	{
