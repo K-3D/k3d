@@ -38,6 +38,7 @@ extern k3d::iplugin_factory& legacy_cylinder_factory();
 extern k3d::iplugin_factory& legacy_disk_factory();
 extern k3d::iplugin_factory& legacy_paraboloid_factory();
 extern k3d::iplugin_factory& legacy_sphere_factory();
+extern k3d::iplugin_factory& legacy_torus_factory();
 extern k3d::iplugin_factory& paraboloid_factory();
 extern k3d::iplugin_factory& sphere_factory();
 extern k3d::iplugin_factory& teapot_factory();
@@ -57,6 +58,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::quadrics::legacy_disk_factory());
 	Registry.register_factory(module::quadrics::legacy_paraboloid_factory());
 	Registry.register_factory(module::quadrics::legacy_sphere_factory());
+	Registry.register_factory(module::quadrics::legacy_torus_factory());
 	Registry.register_factory(module::quadrics::paraboloid_factory());
 	Registry.register_factory(module::quadrics::sphere_factory());
 	Registry.register_factory(module::quadrics::teapot_factory());

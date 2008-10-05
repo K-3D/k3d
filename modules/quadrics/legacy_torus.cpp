@@ -31,15 +31,15 @@ namespace quadrics
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// torus
+// legacy_torus
 
-class torus :
+class legacy_torus :
 	public quadric
 {
 	typedef quadric base;
 
 public:
-	torus(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	legacy_torus(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_majorradius(init_owner(*this) + init_name("majorradius") + init_label(_("Major radius")) + init_description(_("Torus major radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_minorradius(init_owner(*this) + init_name("minorradius") + init_label(_("Minor radius")) + init_description(_("Torus minor radius")) + init_value(2.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
@@ -47,11 +47,11 @@ public:
 		m_phimax(init_owner(*this) + init_name("phimax") + init_label(_("Phi max")) + init_description(_("From RenderMan specification")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
 		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("Theta max")) + init_description(_("From RenderMan specification")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
 	{
-		m_majorradius.changed_signal().connect(sigc::mem_fun(*this, &torus::reset_geometry));
-		m_minorradius.changed_signal().connect(sigc::mem_fun(*this, &torus::reset_geometry));
-		m_phimin.changed_signal().connect(sigc::mem_fun(*this, &torus::reset_geometry));
-		m_phimax.changed_signal().connect(sigc::mem_fun(*this, &torus::reset_geometry));
-		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &torus::reset_geometry));
+		m_majorradius.changed_signal().connect(sigc::mem_fun(*this, &legacy_torus::reset_geometry));
+		m_minorradius.changed_signal().connect(sigc::mem_fun(*this, &legacy_torus::reset_geometry));
+		m_phimin.changed_signal().connect(sigc::mem_fun(*this, &legacy_torus::reset_geometry));
+		m_phimax.changed_signal().connect(sigc::mem_fun(*this, &legacy_torus::reset_geometry));
+		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &legacy_torus::reset_geometry));
 
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 		m_material.changed_signal().connect(make_async_redraw_slot());
@@ -166,14 +166,14 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<torus,
+		static k3d::document_plugin_factory<legacy_torus,
 			k3d::interface_list<k3d::itransform_source,
 			k3d::interface_list<k3d::itransform_sink > > > factory(
 				k3d::classes::Torus(),
-				"Torus",
+				"LegacyTorus",
 				_("Torus primitive"),
 				"Quadric",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
@@ -191,11 +191,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// torus_factory
+// legacy_torus_factory
 
-k3d::iplugin_factory& torus_factory()
+k3d::iplugin_factory& legacy_torus_factory()
 {
-	return torus::get_factory();
+	return legacy_torus::get_factory();
 }
 
 } // namespace quadrics

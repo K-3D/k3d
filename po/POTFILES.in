@@ -330,6 +330,7 @@ modules/opengl_painters/selection_cache.h
 modules/opengl_painters/sphere_painter.cpp
 modules/opengl_painters/teapot_painter.cpp
 modules/opengl_painters/textured_face_painter.cpp
+modules/opengl_painters/torus_painter.cpp
 modules/opengl_painters/utility.h
 modules/opengl_painters/varying_data_painter.cpp
 modules/opengl_painters/vbo.cpp
@@ -385,6 +386,7 @@ modules/quadrics/legacy_torus.cpp
 modules/quadrics/paraboloid.cpp
 modules/quadrics/sphere.cpp
 modules/quadrics/teapot.cpp
+modules/quadrics/torus.cpp
 modules/quadrilateral_remeshing/quadrilateral_remeshing.cpp
 modules/renderman/area_light.cpp
 modules/renderman/array_1d.cpp
@@ -424,6 +426,7 @@ modules/renderman_painters/scripted_painter.cpp
 modules/renderman_painters/sphere_painter.cpp
 modules/renderman_painters/subdivision_surface_painter.cpp
 modules/renderman_painters/teapot_painter.cpp
+modules/renderman_painters/torus_painter.cpp
 modules/renderman/read_archive.cpp
 modules/renderman/render_engine.cpp
 modules/renderman/renderman_script.cpp

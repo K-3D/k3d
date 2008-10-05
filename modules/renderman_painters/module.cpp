@@ -50,6 +50,7 @@ extern k3d::iplugin_factory& scripted_painter_factory();
 extern k3d::iplugin_factory& sphere_painter_factory();
 extern k3d::iplugin_factory& subdivision_surface_painter_factory();
 extern k3d::iplugin_factory& teapot_painter_factory();
+extern k3d::iplugin_factory& torus_painter_factory();
 
 } // namespace painters
 
@@ -75,5 +76,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::renderman::painters::sphere_painter_factory());
 	Registry.register_factory(module::renderman::painters::subdivision_surface_painter_factory());
 	Registry.register_factory(module::renderman::painters::teapot_painter_factory());
+	Registry.register_factory(module::renderman::painters::torus_painter_factory());
 K3D_MODULE_END
 

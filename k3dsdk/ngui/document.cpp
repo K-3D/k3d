@@ -129,6 +129,7 @@ void setup_renderman_document(k3d::idocument& Document)
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "paraboloids", "Paraboloids", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManParaboloidPainter", Document, "RenderMan Paraboloid Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "spheres", "Spheres", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManSpherePainter", Document, "RenderMan Sphere Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "teapots", "Teapots", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManTeapotPainter", Document, "RenderMan Teapot Painter"));
+	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "tori", "Tori", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManTorusPainter", Document, "RenderMan Torus Painter"));
 
 	// Setup a default RenderMan shading model ...
 	k3d::inode* const surface_shader = k3d::plugin::create<k3d::inode>("RenderManSurfaceShader", Document, "Surface Shader");
@@ -248,6 +249,7 @@ void setup_opengl_document(k3d::idocument& Document)
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "paraboloids", "Paraboloids", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLParaboloidPainter", Document, "GL Paraboloid Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "spheres", "Spheres", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLSpherePainter", Document, "GL Sphere Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "teapots", "Teapots", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLTeapotPainter", Document, "GL Teapot Painter"));
+	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "tori", "Tori", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLTorusPainter", Document, "GL Torus Painter"));
 }
 
 } // namespace detail
