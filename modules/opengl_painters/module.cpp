@@ -39,6 +39,7 @@ extern k3d::iplugin_factory& color_face_painter_factory();
 extern k3d::iplugin_factory& cone_painter_factory();
 extern k3d::iplugin_factory& cubic_curve_painter_factory();
 extern k3d::iplugin_factory& cylinder_painter_factory();
+extern k3d::iplugin_factory& disk_painter_factory();
 extern k3d::iplugin_factory& edge_numbering_painter_factory();
 extern k3d::iplugin_factory& edge_painter_factory();
 extern k3d::iplugin_factory& face_normal_painter_factory();
@@ -87,6 +88,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::opengl::painters::cone_painter_factory());
 	Registry.register_factory(module::opengl::painters::cubic_curve_painter_factory());
 	Registry.register_factory(module::opengl::painters::cylinder_painter_factory());
+	Registry.register_factory(module::opengl::painters::disk_painter_factory());
 	Registry.register_factory(module::opengl::painters::edge_numbering_painter_factory());
 	Registry.register_factory(module::opengl::painters::edge_painter_factory());
 	Registry.register_factory(module::opengl::painters::face_normal_painter_factory());

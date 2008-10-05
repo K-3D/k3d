@@ -303,6 +303,7 @@ modules/opengl_painters/color_face_painter.cpp
 modules/opengl_painters/cone_painter.cpp
 modules/opengl_painters/cubic_curve_painter.cpp
 modules/opengl_painters/cylinder_painter.cpp
+modules/opengl_painters/disk_painter.cpp
 modules/opengl_painters/edge_numbering_painter.cpp
 modules/opengl_painters/edge_painter.cpp
 modules/opengl_painters/face_normal_painter.cpp
@@ -373,6 +374,7 @@ modules/qslim/quadric_decimation.cpp
 modules/quadrics/cone.cpp
 modules/quadrics/cylinder.cpp
 modules/quadrics/detail.h
+modules/quadrics/disk.cpp
 modules/quadrics/legacy_cone.cpp
 modules/quadrics/legacy_cylinder.cpp
 modules/quadrics/legacy_disk.cpp
@@ -411,6 +413,7 @@ modules/renderman_painters/blobby_painter.cpp
 modules/renderman_painters/cone_painter.cpp
 modules/renderman_painters/cubic_curve_painter.cpp
 modules/renderman_painters/cylinder_painter.cpp
+modules/renderman_painters/disk_painter.cpp
 modules/renderman_painters/linear_curve_painter.cpp
 modules/renderman_painters/multi_painter.cpp
 modules/renderman_painters/nurbs_patch_painter.cpp

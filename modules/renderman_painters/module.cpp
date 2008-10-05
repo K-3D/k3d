@@ -38,6 +38,7 @@ extern k3d::iplugin_factory& blobby_painter_factory();
 extern k3d::iplugin_factory& cone_painter_factory();
 extern k3d::iplugin_factory& cubic_curve_painter_factory();
 extern k3d::iplugin_factory& cylinder_painter_factory();
+extern k3d::iplugin_factory& disk_painter_factory();
 extern k3d::iplugin_factory& linear_curve_painter_factory();
 extern k3d::iplugin_factory& multi_painter_factory();
 extern k3d::iplugin_factory& multi_painter_factory();
@@ -63,6 +64,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::renderman::painters::cone_painter_factory());
 	Registry.register_factory(module::renderman::painters::cubic_curve_painter_factory());
 	Registry.register_factory(module::renderman::painters::cylinder_painter_factory());
+	Registry.register_factory(module::renderman::painters::disk_painter_factory());
 	Registry.register_factory(module::renderman::painters::linear_curve_painter_factory());
 	Registry.register_factory(module::renderman::painters::multi_painter_factory());
 	Registry.register_factory(module::renderman::painters::nurbs_patch_painter_factory());

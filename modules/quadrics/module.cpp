@@ -35,6 +35,7 @@ extern k3d::iplugin_factory& disk_factory();
 extern k3d::iplugin_factory& hyperboloid_factory();
 extern k3d::iplugin_factory& legacy_cone_factory();
 extern k3d::iplugin_factory& legacy_cylinder_factory();
+extern k3d::iplugin_factory& legacy_disk_factory();
 extern k3d::iplugin_factory& legacy_paraboloid_factory();
 extern k3d::iplugin_factory& legacy_sphere_factory();
 extern k3d::iplugin_factory& paraboloid_factory();
@@ -53,6 +54,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::quadrics::hyperboloid_factory());
 	Registry.register_factory(module::quadrics::legacy_cone_factory());
 	Registry.register_factory(module::quadrics::legacy_cylinder_factory());
+	Registry.register_factory(module::quadrics::legacy_disk_factory());
 	Registry.register_factory(module::quadrics::legacy_paraboloid_factory());
 	Registry.register_factory(module::quadrics::legacy_sphere_factory());
 	Registry.register_factory(module::quadrics::paraboloid_factory());
