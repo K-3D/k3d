@@ -17,13 +17,13 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "hyperboloid.h"
 #include "primitive_detail.h"
-#include "torus.h"
 
 namespace k3d
 {
 
-namespace torus
+namespace hyperboloid
 {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,20 +32,16 @@ namespace torus
 const_primitive::const_primitive(
 	const typed_array<matrix4>& Matrices,
 	const typed_array<imaterial*>& Materials,
-	const typed_array<double_t>& MajorRadii,
-	const typed_array<double_t>& MinorRadii,
-	const typed_array<double_t>& PhiMin,
-	const typed_array<double_t>& PhiMax,
+	const typed_array<point3>& StartPoints,
+	const typed_array<point3>& EndPoints,
 	const typed_array<double_t>& SweepAngles,
 	const attribute_arrays& ConstantData,
 	const attribute_arrays& UniformData,
 	const attribute_arrays& VaryingData) :
 	matrices(Matrices),
 	materials(Materials),
-	major_radii(MajorRadii),
-	minor_radii(MinorRadii),
-	phi_min(PhiMin),
-	phi_max(PhiMax),
+	start_points(StartPoints),
+	end_points(EndPoints),
 	sweep_angles(SweepAngles),
 	constant_data(ConstantData),
 	uniform_data(UniformData),
@@ -59,20 +55,16 @@ const_primitive::const_primitive(
 primitive::primitive(
 	typed_array<matrix4>& Matrices,
 	typed_array<imaterial*>& Materials,
-	typed_array<double_t>& MajorRadii,
-	typed_array<double_t>& MinorRadii,
-	typed_array<double_t>& PhiMin,
-	typed_array<double_t>& PhiMax,
+	typed_array<point3>& StartPoints,
+	typed_array<point3>& EndPoints,
 	typed_array<double_t>& SweepAngles,
 	attribute_arrays& ConstantData,
 	attribute_arrays& UniformData,
 	attribute_arrays& VaryingData) :
 	matrices(Matrices),
 	materials(Materials),
-	major_radii(MajorRadii),
-	minor_radii(MinorRadii),
-	phi_min(PhiMin),
-	phi_max(PhiMax),
+	start_points(StartPoints),
+	end_points(EndPoints),
 	sweep_angles(SweepAngles),
 	constant_data(ConstantData),
 	uniform_data(UniformData),
@@ -85,15 +77,13 @@ primitive::primitive(
 
 primitive* create(mesh& Mesh)
 {
-	mesh::primitive& generic_primitive = Mesh.primitives.create("torus");
+	mesh::primitive& generic_primitive = Mesh.primitives.create("hyperboloid");
 
 	return new primitive(
 		generic_primitive.topology.create<typed_array<matrix4> >("matrices"),
 		generic_primitive.topology.create<typed_array<imaterial*> >("materials"),
-		generic_primitive.topology.create<typed_array<double_t> >("major_radii"),
-		generic_primitive.topology.create<typed_array<double_t> >("minor_radii"),
-		generic_primitive.topology.create<typed_array<double_t> >("phi_min"),
-		generic_primitive.topology.create<typed_array<double_t> >("phi_max"),
+		generic_primitive.topology.create<typed_array<point3> >("start_points"),
+		generic_primitive.topology.create<typed_array<point3> >("end_points"),
 		generic_primitive.topology.create<typed_array<double_t> >("sweep_angles"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
@@ -105,15 +95,13 @@ primitive* create(mesh& Mesh)
 
 const_primitive* validate(const mesh::primitive& GenericPrimitive)
 {
-	if(GenericPrimitive.type != "torus")
+	if(GenericPrimitive.type != "hyperboloid")
 		return 0;
 
 	require_const_array(GenericPrimitive, matrices, typed_array<matrix4>);
 	require_const_array(GenericPrimitive, materials, typed_array<imaterial*>);
-	require_const_array(GenericPrimitive, major_radii, typed_array<double_t>);
-	require_const_array(GenericPrimitive, minor_radii, typed_array<double_t>);
-	require_const_array(GenericPrimitive, phi_min, typed_array<double_t>);
-	require_const_array(GenericPrimitive, phi_max, typed_array<double_t>);
+	require_const_array(GenericPrimitive, start_points, typed_array<point3>);
+	require_const_array(GenericPrimitive, end_points, typed_array<point3>);
 	require_const_array(GenericPrimitive, sweep_angles, typed_array<double_t>);
 
 	require_const_attribute_arrays(GenericPrimitive, constant);
@@ -122,10 +110,8 @@ const_primitive* validate(const mesh::primitive& GenericPrimitive)
 
 	if(!(
 		matrices->size() == materials->size()
-		&& matrices->size() == major_radii->size()
-		&& matrices->size() == minor_radii->size()
-		&& matrices->size() == phi_min->size()
-		&& matrices->size() == phi_max->size()
+		&& matrices->size() == start_points->size()
+		&& matrices->size() == end_points->size()
 		&& matrices->size() == sweep_angles->size()
 		))
 	{
@@ -135,49 +121,44 @@ const_primitive* validate(const mesh::primitive& GenericPrimitive)
 
 	if(!constant_data->match_size(matrices->size()))
 	{
-		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per torus" << std::endl;
+		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per hyperboloid" << std::endl;
 		return 0;
 	}
 
 	if(!uniform_data->match_size(matrices->size()))
 	{
-		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per torus" << std::endl;
+		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per hyperboloid" << std::endl;
 		return 0;
 	}
 
 	if(!varying_data->match_size(matrices->size() * 4))
 	{
-		log() << error << "[" << GenericPrimitive.type << "] varying attributes must contain four values per torus" << std::endl;
+		log() << error << "[" << GenericPrimitive.type << "] varying attributes must contain four values per hyperboloid" << std::endl;
 		return 0;
 	}
 
-	return new const_primitive(*matrices, *materials, *major_radii, *minor_radii, *phi_min, *phi_max, *sweep_angles, *constant_data, *uniform_data, *varying_data);
+	return new const_primitive(*matrices, *materials, *start_points, *end_points, *sweep_angles, *constant_data, *uniform_data, *varying_data);
 }
 
 primitive* validate(mesh::primitive& GenericPrimitive)
 {
-	if(GenericPrimitive.type != "torus")
+	if(GenericPrimitive.type != "hyperboloid")
 		return 0;
 
 	require_array(GenericPrimitive, matrices, typed_array<matrix4>);
 	require_array(GenericPrimitive, materials, typed_array<imaterial*>);
-	require_array(GenericPrimitive, major_radii, typed_array<double_t>);
-	require_array(GenericPrimitive, minor_radii, typed_array<double_t>);
-	require_array(GenericPrimitive, phi_min, typed_array<double_t>);
-	require_array(GenericPrimitive, phi_max, typed_array<double_t>);
+	require_array(GenericPrimitive, start_points, typed_array<point3>);
+	require_array(GenericPrimitive, end_points, typed_array<point3>);
 	require_array(GenericPrimitive, sweep_angles, typed_array<double_t>);
 
 	require_attribute_arrays(GenericPrimitive, constant);
 	require_attribute_arrays(GenericPrimitive, uniform);
 	require_attribute_arrays(GenericPrimitive, varying);
 
-
 	if(!(
 		matrices->size() == materials->size()
-		&& matrices->size() == major_radii->size()
-		&& matrices->size() == minor_radii->size()
-		&& matrices->size() == phi_min->size()
-		&& matrices->size() == phi_max->size()
+		&& matrices->size() == start_points->size()
+		&& matrices->size() == end_points->size()
 		&& matrices->size() == sweep_angles->size()
 		))
 	{
@@ -187,26 +168,26 @@ primitive* validate(mesh::primitive& GenericPrimitive)
 
 	if(!constant_data->match_size(matrices->size()))
 	{
-		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per torus" << std::endl;
+		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per hyperboloid" << std::endl;
 		return 0;
 	}
 
 	if(!uniform_data->match_size(matrices->size()))
 	{
-		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per torus" << std::endl;
+		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per hyperboloid" << std::endl;
 		return 0;
 	}
 
 	if(!varying_data->match_size(matrices->size() * 4))
 	{
-		log() << error << "[" << GenericPrimitive.type << "] varying attributes must contain four values per torus" << std::endl;
+		log() << error << "[" << GenericPrimitive.type << "] varying attributes must contain four values per hyperboloid" << std::endl;
 		return 0;
 	}
 
-	return new primitive(*matrices, *materials, *major_radii, *minor_radii, *phi_min, *phi_max, *sweep_angles, *constant_data, *uniform_data, *varying_data);
+	return new primitive(*matrices, *materials, *start_points, *end_points, *sweep_angles, *constant_data, *uniform_data, *varying_data);
 }
 
-} // namespace torus
+} // namespace hyperboloid
 
 } // namespace k3d
 

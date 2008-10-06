@@ -126,6 +126,7 @@ void setup_renderman_document(k3d::idocument& Document)
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "cones", "Cones", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManConePainter", Document, "RenderMan Cone Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "cylinders", "Cylinders", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManCylinderPainter", Document, "RenderMan Cylinder Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "disks", "Disks", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManDiskPainter", Document, "RenderMan Disk Painter"));
+	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "hyperboloids", "Hyperboloids", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManHyperboloidPainter", Document, "RenderMan Hyperboloid Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "paraboloids", "Paraboloids", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManParaboloidPainter", Document, "RenderMan Paraboloid Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "spheres", "Spheres", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManSpherePainter", Document, "RenderMan Sphere Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "teapots", "Teapots", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManTeapotPainter", Document, "RenderMan Teapot Painter"));
@@ -246,6 +247,7 @@ void setup_opengl_document(k3d::idocument& Document)
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "cones", "Cones", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLConePainter", Document, "GL Cone Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "cylinders", "Cylinders", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLCylinderPainter", Document, "GL Cylinder Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "disks", "Disks", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLDiskPainter", Document, "GL Disk Painter"));
+	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "hyperboloids", "Hyperboloids", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLHyperboloidPainter", Document, "GL Hyperboloid Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "paraboloids", "Paraboloids", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLParaboloidPainter", Document, "GL Paraboloid Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "spheres", "Spheres", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLSpherePainter", Document, "GL Sphere Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "teapots", "Teapots", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLTeapotPainter", Document, "GL Teapot Painter"));

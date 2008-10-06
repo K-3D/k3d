@@ -312,6 +312,7 @@ modules/opengl_painters/face_orientation_painter.cpp
 modules/opengl_painters/face_painter.cpp
 modules/opengl_painters/face_varying_painter.cpp
 modules/opengl_painters/hidden_line_painter.cpp
+modules/opengl_painters/hyperboloid_painter.cpp
 modules/opengl_painters/linear_curve_painter.cpp
 modules/opengl_painters/multi_painter.cpp
 modules/opengl_painters/normal_array_painter.cpp
@@ -376,6 +377,7 @@ modules/quadrics/cone.cpp
 modules/quadrics/cylinder.cpp
 modules/quadrics/detail.h
 modules/quadrics/disk.cpp
+modules/quadrics/hyperboloid.cpp
 modules/quadrics/legacy_cone.cpp
 modules/quadrics/legacy_cylinder.cpp
 modules/quadrics/legacy_disk.cpp
@@ -416,6 +418,7 @@ modules/renderman_painters/cone_painter.cpp
 modules/renderman_painters/cubic_curve_painter.cpp
 modules/renderman_painters/cylinder_painter.cpp
 modules/renderman_painters/disk_painter.cpp
+modules/renderman_painters/hyperboloid_painter.cpp
 modules/renderman_painters/linear_curve_painter.cpp
 modules/renderman_painters/multi_painter.cpp
 modules/renderman_painters/nurbs_patch_painter.cpp

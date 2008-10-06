@@ -30,15 +30,15 @@ namespace quadrics
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// hyperboloid
+// legacy_hyperboloid
 
-class hyperboloid :
+class legacy_hyperboloid :
 	public quadric
 {
 	typedef quadric base;
 
 public:
-	hyperboloid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	legacy_hyperboloid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_x1(init_owner(*this) + init_name("x1") + init_label(_("X1")) + init_description(_("From RenderMan specification")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_y1(init_owner(*this) + init_name("y1") + init_label(_("Y1")) + init_description(_("From RenderMan specification")) + init_value(-5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
@@ -48,13 +48,13 @@ public:
 		m_z2(init_owner(*this) + init_name("z2") + init_label(_("Z2")) + init_description(_("From RenderMan specification")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("Theta max")) + init_description(_("From RenderMan specification")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
 	{
-		m_x1.changed_signal().connect(sigc::mem_fun(*this, &hyperboloid::reset_geometry));
-		m_y1.changed_signal().connect(sigc::mem_fun(*this, &hyperboloid::reset_geometry));
-		m_z1.changed_signal().connect(sigc::mem_fun(*this, &hyperboloid::reset_geometry));
-		m_x2.changed_signal().connect(sigc::mem_fun(*this, &hyperboloid::reset_geometry));
-		m_y2.changed_signal().connect(sigc::mem_fun(*this, &hyperboloid::reset_geometry));
-		m_z2.changed_signal().connect(sigc::mem_fun(*this, &hyperboloid::reset_geometry));
-		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &hyperboloid::reset_geometry));
+		m_x1.changed_signal().connect(sigc::mem_fun(*this, &legacy_hyperboloid::reset_geometry));
+		m_y1.changed_signal().connect(sigc::mem_fun(*this, &legacy_hyperboloid::reset_geometry));
+		m_z1.changed_signal().connect(sigc::mem_fun(*this, &legacy_hyperboloid::reset_geometry));
+		m_x2.changed_signal().connect(sigc::mem_fun(*this, &legacy_hyperboloid::reset_geometry));
+		m_y2.changed_signal().connect(sigc::mem_fun(*this, &legacy_hyperboloid::reset_geometry));
+		m_z2.changed_signal().connect(sigc::mem_fun(*this, &legacy_hyperboloid::reset_geometry));
+		m_thetamax.changed_signal().connect(sigc::mem_fun(*this, &legacy_hyperboloid::reset_geometry));
 
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 		m_material.changed_signal().connect(make_async_redraw_slot());
@@ -183,14 +183,14 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<hyperboloid,
+		static k3d::document_plugin_factory<legacy_hyperboloid,
 			k3d::interface_list<k3d::itransform_source,
 			k3d::interface_list<k3d::itransform_source > > > factory(
 				k3d::classes::Hyperboloid(),
-				"Hyperboloid",
+				"LegacyHyperboloid",
 				_("Hyperboloid primitive"),
 				"Quadric",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
@@ -210,11 +210,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// hyperboloid_factory
+// legacy_hyperboloid_factory
 
-k3d::iplugin_factory& hyperboloid_factory()
+k3d::iplugin_factory& legacy_hyperboloid_factory()
 {
-	return hyperboloid::get_factory();
+	return legacy_hyperboloid::get_factory();
 }
 
 } // namespace quadrics
