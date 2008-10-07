@@ -448,7 +448,7 @@ def image_comparison(document, image_property, image_name, threshold):
 	sys.stdout.flush()
 
 	if difference_measurement > threshold:
-		raise "pixel difference exceeds threshold"
+		raise Exception("pixel difference exceeds threshold")
 
 def scalar_comparison(value, expected_value):
 	print """<DartMeasurement name="Value" type="numeric/float">""" + str(value) + """</DartMeasurement>"""
