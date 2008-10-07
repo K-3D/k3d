@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-200 7, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "teapot.h"
+#include "primitive_detail.h"
 
 namespace k3d
 {
@@ -77,30 +78,11 @@ const_primitive* validate(const mesh::primitive& GenericPrimitive)
 	if(GenericPrimitive.type != "teapot")
 		return 0;
 
-	const typed_array<matrix4>* const matrices = GenericPrimitive.topology.lookup<typed_array<matrix4> >("matrices");
-	if(!matrices)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing matrices array" << std::endl;
-		return 0;
-	}
-	const typed_array<imaterial*>* const materials = GenericPrimitive.topology.lookup<typed_array<imaterial*> >("materials");
-	if(!materials)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing materials array" << std::endl;
-		return 0;
-	}
-	const attribute_arrays* const constant_data = GenericPrimitive.attributes.lookup("constant");
-	if(!constant_data)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing constant attribute data" << std::endl;
-		return 0;
-	}
-	const attribute_arrays* const uniform_data = GenericPrimitive.attributes.lookup("uniform");
-	if(!uniform_data)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing uniform attribute data" << std::endl;
-		return 0;
-	}
+	require_const_array(GenericPrimitive, matrices, typed_array<matrix4>);
+	require_const_array(GenericPrimitive, materials, typed_array<imaterial*>);
+
+	require_const_attribute_arrays(GenericPrimitive, constant);
+	require_const_attribute_arrays(GenericPrimitive, uniform);
 
 	if(matrices->size() != materials->size())
 	{
@@ -128,30 +110,11 @@ primitive* validate(mesh::primitive& GenericPrimitive)
 	if(GenericPrimitive.type != "teapot")
 		return 0;
 
-	typed_array<matrix4>* const matrices = GenericPrimitive.topology.writable<typed_array<matrix4> >("matrices");
-	if(!matrices)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing matrices array" << std::endl;
-		return 0;
-	}
-	typed_array<imaterial*>* const materials = GenericPrimitive.topology.writable<typed_array<imaterial*> >("materials");
-	if(!materials)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing materials array" << std::endl;
-		return 0;
-	}
-	attribute_arrays* const constant_data = GenericPrimitive.attributes.writable("constant");
-	if(!constant_data)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing constant attribute data" << std::endl;
-		return 0;
-	}
-	attribute_arrays* const uniform_data = GenericPrimitive.attributes.writable("uniform");
-	if(!uniform_data)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing uniform attribute data" << std::endl;
-		return 0;
-	}
+	require_array(GenericPrimitive, matrices, typed_array<matrix4>);
+	require_array(GenericPrimitive, materials, typed_array<imaterial*>);
+
+	require_attribute_arrays(GenericPrimitive, constant);
+	require_attribute_arrays(GenericPrimitive, uniform);
 
 	if(matrices->size() != materials->size())
 	{

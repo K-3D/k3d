@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "disk.h"
+#include "primitive_detail.h"
 
 namespace k3d
 {
@@ -97,54 +98,15 @@ const_primitive* validate(const mesh::primitive& GenericPrimitive)
 	if(GenericPrimitive.type != "disk")
 		return 0;
 
-	const typed_array<matrix4>* const matrices = GenericPrimitive.topology.lookup<typed_array<matrix4> >("matrices");
-	if(!matrices)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing matrices array" << std::endl;
-		return 0;
-	}
-	const typed_array<imaterial*>* const materials = GenericPrimitive.topology.lookup<typed_array<imaterial*> >("materials");
-	if(!materials)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing materials array" << std::endl;
-		return 0;
-	}
-	const typed_array<double_t>* const heights = GenericPrimitive.topology.lookup<typed_array<double_t> >("heights");
-	if(!heights)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing heights array" << std::endl;
-		return 0;
-	}
-	const typed_array<double_t>* const radii = GenericPrimitive.topology.lookup<typed_array<double_t> >("radii");
-	if(!radii)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing radii array" << std::endl;
-		return 0;
-	}
-	const typed_array<double_t>* const sweep_angles = GenericPrimitive.topology.lookup<typed_array<double_t> >("sweep_angles");
-	if(!sweep_angles)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing sweep_angles array" << std::endl;
-		return 0;
-	}
-	const attribute_arrays* const constant_data = GenericPrimitive.attributes.lookup("constant");
-	if(!constant_data)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing constant attribute data" << std::endl;
-		return 0;
-	}
-	const attribute_arrays* const uniform_data = GenericPrimitive.attributes.lookup("uniform");
-	if(!uniform_data)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing uniform attribute data" << std::endl;
-		return 0;
-	}
-	const attribute_arrays* const varying_data = GenericPrimitive.attributes.lookup("varying");
-	if(!varying_data)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing varying attribute data" << std::endl;
-		return 0;
-	}
+	require_const_array(GenericPrimitive, matrices, typed_array<matrix4>);
+	require_const_array(GenericPrimitive, materials, typed_array<imaterial*>);
+	require_const_array(GenericPrimitive, heights, typed_array<double_t>);
+	require_const_array(GenericPrimitive, radii, typed_array<double_t>);
+	require_const_array(GenericPrimitive, sweep_angles, typed_array<double_t>);
+
+	require_const_attribute_arrays(GenericPrimitive, constant);
+	require_const_attribute_arrays(GenericPrimitive, uniform);
+	require_const_attribute_arrays(GenericPrimitive, varying);
 
 	if(!(
 		matrices->size() == materials->size()
@@ -183,54 +145,15 @@ primitive* validate(mesh::primitive& GenericPrimitive)
 	if(GenericPrimitive.type != "disk")
 		return 0;
 
-	typed_array<matrix4>* const matrices = GenericPrimitive.topology.writable<typed_array<matrix4> >("matrices");
-	if(!matrices)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing matrices array" << std::endl;
-		return 0;
-	}
-	typed_array<imaterial*>* const materials = GenericPrimitive.topology.writable<typed_array<imaterial*> >("materials");
-	if(!materials)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing materials array" << std::endl;
-		return 0;
-	}
-	typed_array<double_t>* const heights = GenericPrimitive.topology.writable<typed_array<double_t> >("heights");
-	if(!heights)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing heights array" << std::endl;
-		return 0;
-	}
-	typed_array<double_t>* const radii = GenericPrimitive.topology.writable<typed_array<double_t> >("radii");
-	if(!radii)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing radii array" << std::endl;
-		return 0;
-	}
-	typed_array<double_t>* const sweep_angles = GenericPrimitive.topology.writable<typed_array<double_t> >("sweep_angles");
-	if(!sweep_angles)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing sweep_angles array" << std::endl;
-		return 0;
-	}
-	attribute_arrays* const constant_data = GenericPrimitive.attributes.writable("constant");
-	if(!constant_data)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing constant attribute data" << std::endl;
-		return 0;
-	}
-	attribute_arrays* const uniform_data = GenericPrimitive.attributes.writable("uniform");
-	if(!uniform_data)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing uniform attribute data" << std::endl;
-		return 0;
-	}
-	attribute_arrays* const varying_data = GenericPrimitive.attributes.writable("varying");
-	if(!varying_data)
-	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive missing varying attribute data" << std::endl;
-		return 0;
-	}
+	require_array(GenericPrimitive, matrices, typed_array<matrix4>);
+	require_array(GenericPrimitive, materials, typed_array<imaterial*>);
+	require_array(GenericPrimitive, heights, typed_array<double_t>);
+	require_array(GenericPrimitive, radii, typed_array<double_t>);
+	require_array(GenericPrimitive, sweep_angles, typed_array<double_t>);
+
+	require_attribute_arrays(GenericPrimitive, constant);
+	require_attribute_arrays(GenericPrimitive, uniform);
+	require_attribute_arrays(GenericPrimitive, varying);
 
 	if(!(
 		matrices->size() == materials->size()
