@@ -13,6 +13,10 @@ material = doc.new_node("RenderManMaterial")
 torus = doc.new_node("Torus")
 torus.material = material
 
+mesh_instance = doc.new_node("MeshInstance")
+mesh_instance.gl_painter = doc.new_node("OpenGLTorusPainter")
+doc.set_dependency(mesh_instance.get_property("input_mesh"), torus.get_property("output_mesh"))
+
 camera = testing.create_camera(doc)
 render_engine = testing.create_opengl_engine(doc)
 
