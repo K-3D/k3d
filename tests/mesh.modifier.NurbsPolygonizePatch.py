@@ -10,5 +10,5 @@ modifier = setup.document.new_node("NurbsPolygonizePatch")
 
 document.set_dependency(modifier.get_property("input_mesh"), setup.reader.get_property("output_mesh"))
 
-testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsPolygonizePatch", 1)
+testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsPolygonizePatch", 16)
 
