@@ -30,5 +30,5 @@ for position in positions:
 
 document.set_dependency(source.get_property("input_mesh"), input_points.get_property("output_mesh"))
 
-testing.mesh_comparison_to_reference(document, source.get_property("output_mesh"), "mesh.source.LeastSquaresPlot", 4)
+testing.mesh_comparison_to_reference(document, source.get_property("output_mesh"), "mesh.source.LeastSquaresPlot", 2048)
 
