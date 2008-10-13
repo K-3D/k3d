@@ -17,43 +17,53 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/** \file
-	\author Tim Shead (tshead@k-3d.com)
-*/
-
-#include "metadata.h"
+#include "array.h"
 
 namespace k3d
 {
 
-void metadata::set_metadata(const string_t& name, const string_t& value)
+/////////////////////////////////////////////////////////////////////////////
+// array
+
+array::array()
 {
-	m_storage[name] = value;
-	m_changed_signal.emit();
 }
 
-void metadata::set_metadata(const metadata_t& values)
+array::array(const metadata_t& Metadata) :
+	metadata(Metadata)
+{
+}
+
+array::~array()
+{
+}
+
+void array::set_metadata_value(const string_t& name, const string_t& value)
+{
+	metadata[name] = value;
+}
+
+void array::set_metadata(const metadata_t& values)
 {
 	// Note ... we don't use insert() here because we want to overwrite any existing values
 	for(metadata_t::const_iterator pair = values.begin(); pair != values.end(); ++pair)
-		m_storage[pair->first] = pair->second;
-	m_changed_signal.emit();
+		metadata[pair->first] = pair->second;
 }
 
-metadata::metadata_t metadata::get_metadata()
+array::metadata_t array::get_metadata() const
 {
-	return m_storage;
+	return metadata;
 }
 
-void metadata::erase_metadata(const string_t& name)
+const string_t array::get_metadata_value(const string_t& name) const
 {
-	m_storage.erase(name);
-	m_changed_signal.emit();
+	metadata_t::const_iterator pair = metadata.find(name);
+	return pair != metadata.end() ? pair->second : string_t();
 }
 
-sigc::connection metadata::connect_metadata_changed_signal(const sigc::slot<void>& Slot)
+void array::erase_metadata_value(const string_t& name)
 {
-	return m_changed_signal.connect(Slot);
+	metadata.erase(name);
 }
 
 } // namespace k3d

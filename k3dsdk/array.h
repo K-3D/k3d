@@ -22,15 +22,23 @@
 
 #include "almost_equal.h"
 #include "pipeline_data.h"
+#include <map>
 
 namespace k3d
 {
 
-/// Abstract base class for an array - with it, we can create heterogeneous collections of arrays
+/// Abstract interface that can be used to store heterogeneous collections of arrays.
+/// Methods are provided for cloning arrays (virtual ctor pattern), plus type-agnostic
+/// methods similar to std::vector, and storage for arbitrary metadata (name-value pairs).
 class array
 {
 public:
-	virtual ~array() {}
+	/// Storage for array metadata
+	typedef std::map<string_t, string_t> metadata_t;
+
+	array();
+	array(const metadata_t& Metadata);
+	virtual ~array();
 
 	/// Returns an empty array with the same concrete type as this array (a variation on virtual ctor)
 	virtual array* clone_type() const = 0;
@@ -45,9 +53,24 @@ public:
 	virtual const uint_t size() const = 0;
 	/// Returns true iff this array is empty
 	virtual const bool_t empty() const = 0;
-	/// Returns true iff this array is equivalent to the given array, using the imprecise semantics of almost_equal to compare values.
+	/// Returns true iff this array is equivalent to another, using the imprecise semantics of almost_equal to compare values.
 	/// \note: Returns false if given an array with a different concrete type.
 	virtual const bool_t almost_equal(const array& Other, const uint64_t Threshold) const = 0;
+
+	/// Sets a new name-value pair, overwriting the value if the name already exists
+	void set_metadata_value(const string_t& name, const string_t& value);
+	/// Sets a collection of name-value pairs, overwriting any existing values
+	void set_metadata(const metadata_t& values);
+	/// Returns the set of all name-value pairs
+	metadata_t get_metadata() const;
+	/// Returns a value by name, or empty-string if the name doesn't exist
+	const string_t get_metadata_value(const string_t& name) const;
+	/// Erases an existing name-value pair
+	void erase_metadata_value(const string_t& name);
+
+protected:
+	/// Storage for array metadata
+	metadata_t metadata;
 };
 
 /// Specialization of almost_equal that tests k3d::array for equality

@@ -77,12 +77,15 @@ public:
 		m_array(Array),
 		m_printed(Printed)
 	{
+		// Special-case k3d::uint_t_array so the type is labeled correctly ...
 		if(const uint_t_array* const array = dynamic_cast<const uint_t_array*>(&m_array))
 		{
 			m_printed = true;
 			m_stream << indentation << "array \"" << m_array_name << "\" [k3d::uint_t] (" << m_array.size() << "): ";
 			std::copy(array->begin(), array->end(), std::ostream_iterator<uint_t>(m_stream, " "));
 			m_stream << "\n";
+
+			print_metadata();
 		}
 	}
 
@@ -98,10 +101,12 @@ public:
 			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
 			std::copy(array->begin(), array->end(), std::ostream_iterator<T>(m_stream, " "));
 			m_stream << "\n";
+
+			print_metadata();
 		}
 	}
 
-	// Special-case 8-bit integers so they don't get printed as characters
+	/// Special-case printing of 8-bit integers so they aren't printed as characters
 	void operator()(int8_t)
 	{
 		typedef int8_t T;
@@ -115,10 +120,12 @@ public:
 			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
 			std::copy(array->begin(), array->end(), std::ostream_iterator<int16_t>(m_stream, " "));
 			m_stream << "\n";
+
+			print_metadata();
 		}
 	}
 
-	// Special-case 8-bit unsigned integers so they don't get printed as characters
+	/// Special-case printing of 8-bit unsigned integers so they aren't printed as characters
 	void operator()(uint8_t)
 	{
 		typedef uint8_t T;
@@ -132,10 +139,12 @@ public:
 			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
 			std::copy(array->begin(), array->end(), std::ostream_iterator<uint16_t>(m_stream, " "));
 			m_stream << "\n";
+
+			print_metadata();
 		}
 	}
 
-	// Special-case strings so we handle whitespace correctly
+	/// Special-case printing of strings so whitespace is handled correctly
 	void operator()(string_t)
 	{
 		typedef string_t T;
@@ -150,10 +159,19 @@ public:
 			for(typed_array<T>::const_iterator i = array->begin(); i != array->end(); ++i)
 				m_stream << "\"" << *i << "\" ";
 			m_stream << "\n";
+
+			print_metadata();
 		}
 	}
 
 private:
+	void print_metadata()
+	{
+		const array::metadata_t metadata = m_array.get_metadata();
+		for(array::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
+			m_stream << push_indent << indentation << "metadata: " << pair->first << " = " << pair->second << "\n" << pop_indent;
+	}
+
 	std::ostream& m_stream;
 	const string_t& m_array_name;
 	const array& m_array;

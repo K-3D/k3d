@@ -179,6 +179,36 @@ static void assign_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Self
 	}
 }
 
+template<typename self_t>
+static void set_metadata_value(self_t& Self, const string_t& Name, const string_t& Value)
+{
+	Self.wrapped().set_metadata_value(Name, Value);
+}
+
+template<typename self_t>
+static string_t get_metadata_value(const self_t& Self, const string_t& Name)
+{
+	return Self.wrapped().get_metadata_value(Name);
+}
+
+template<typename self_t>
+static boost::python::dict get_metadata(const self_t& Self)
+{
+	boost::python::dict result;
+
+	const array::metadata_t metadata = Self.wrapped().get_metadata();
+	for(array::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
+		result[pair->first] = pair->second;
+
+	return result;
+}
+
+template<typename self_t>
+static void erase_metadata_value(self_t& Self, const string_t& Name)
+{
+	Self.wrapped().erase_metadata_value(Name);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 // define_class_typed_array
 
@@ -194,7 +224,12 @@ static void define_class_typed_array(const char* const ClassName, const char* co
 		.def("append", &append<array_type>,
 			"Append a value to the end of the array, growing its size by one.")
 		.def("assign", &assign<array_type>,
-			"Replace the contents of the array with a list of values.");
+			"Replace the contents of the array with a list of values.")
+		.def("set_metadata_value", &set_metadata_value<wrapper_type>)
+		.def("get_metadata_value", &get_metadata_value<wrapper_type>)
+		.def("get_metadata", &get_metadata<wrapper_type>)
+		.def("erase_metadata_value", &erase_metadata_value<wrapper_type>)
+		;
 }
 
 template<>
@@ -210,7 +245,12 @@ void define_class_typed_array<k3d::typed_array<k3d::imaterial*> >(const char* co
 		.def("append", &append_imaterial,
 			"Append a value to the end of the array, growing its size by one.")
 		.def("assign", &assign_imaterial,
-			"Replace the contents of the array with a list of values.");
+			"Replace the contents of the array with a list of values.")
+		.def("set_metadata_value", &set_metadata_value<wrapper_type>)
+		.def("get_metadata_value", &get_metadata_value<wrapper_type>)
+		.def("get_metadata", &get_metadata<wrapper_type>)
+		.def("erase_metadata_value", &erase_metadata_value<wrapper_type>)
+		;
 }
 
 template<>
@@ -226,7 +266,12 @@ void define_class_typed_array<k3d::typed_array<k3d::inode*> >(const char* const 
 		.def("append", &append_inode,
 			"Append a value to the end of the array, growing its size by one.")
 		.def("assign", &assign_inode,
-			"Replace the contents of the array with a list of values.");
+			"Replace the contents of the array with a list of values.")
+		.def("set_metadata_value", &set_metadata_value<wrapper_type>)
+		.def("get_metadata_value", &get_metadata_value<wrapper_type>)
+		.def("get_metadata", &get_metadata<wrapper_type>)
+		.def("erase_metadata_value", &erase_metadata_value<wrapper_type>)
+		;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

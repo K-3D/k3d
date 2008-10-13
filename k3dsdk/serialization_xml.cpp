@@ -1459,6 +1459,21 @@ namespace detail
 {
 
 /////////////////////////////////////////////////////////////////////////////
+// save_array_metadata
+
+void save_array_metadata(element& Storage, const array& Array, const ipersistent::save_context& Context)
+{
+	const array::metadata_t metadata = Array.get_metadata();
+	if(metadata.empty())
+		return;
+
+	element& xml_metadata = Storage.append(element("metadata"));
+
+	for(array::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
+		xml_metadata.append(element("pair", attribute("name", pair->first), pair->second));
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // save_array
 
 template<typename array_type>
@@ -1475,6 +1490,8 @@ void save_array(element& Container, element Storage, const array_type& Array, co
 		buffer << " " << *item;
 
 	Storage.text = buffer.str();
+	save_array_metadata(Storage, Array, Context);
+
 	Container.append(Storage);
 }
 
@@ -1497,6 +1514,8 @@ void save_array(element& Container, element Storage, const typed_array<int8_t>& 
 		buffer << " " << static_cast<int16_t>(*item);
 
 	Storage.text = buffer.str();
+	save_array_metadata(Storage, Array, Context);
+
 	Container.append(Storage);
 }
 
@@ -1519,6 +1538,8 @@ void save_array(element& Container, element Storage, const typed_array<uint8_t>&
 		buffer << " " << static_cast<uint16_t>(*item);
 
 	Storage.text = buffer.str();
+	save_array_metadata(Storage, Array, Context);
+
 	Container.append(Storage);
 }
 
@@ -1533,6 +1554,8 @@ void save_array(element& Container, element Storage, const typed_array<string_t>
 	const array_type::const_iterator end = Array.end();
 	for(array_type::const_iterator item = Array.begin(); item != end; ++item)
 		Storage.append(element("value", *item));
+
+	save_array_metadata(Storage, Array, Context);
 
 	Container.append(Storage);
 }
@@ -1557,6 +1580,8 @@ void save_array(element& Container, element Storage, const typed_array<double_t>
 		buffer << " " << *item;
 
 	Storage.text = buffer.str();
+	save_array_metadata(Storage, Array, Context);
+
 	Container.append(Storage);
 }
 
@@ -1578,6 +1603,8 @@ void save_array(element& Container, element Storage, const typed_array<imaterial
 		buffer << " " << Context.lookup.lookup_id(*item);
 
 	Storage.text = buffer.str();
+	save_array_metadata(Storage, Array, Context);
+
 	Container.append(Storage);
 }
 
@@ -1692,6 +1719,23 @@ void save_arrays(element& Container, element Storage, const mesh::attribute_arra
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// load_array_metadata
+
+void load_array_metadata(const element& Storage, array& Array, const ipersistent::load_context& Context)
+{
+	if(const xml::element* const xml_metadata = xml::find_element(Storage, "metadata"))
+	{
+		for(xml::element::elements_t::const_iterator xml_pair = xml_metadata->children.begin(); xml_pair != xml_metadata->children.end(); ++xml_pair)
+		{
+			if(xml_pair->name != "pair")
+				continue;
+
+			Array.set_metadata_value(xml::attribute_text(*xml_pair, "name"), xml_pair->text);
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // load_array
 
 template<typename array_type>
@@ -1709,6 +1753,8 @@ void load_array(const element& Storage, array_type& Array, const ipersistent::lo
 
 		Array.push_back(value);
 	}
+
+	load_array_metadata(Storage, Array, Context);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1728,6 +1774,8 @@ void load_array(const element& Storage, typed_array<int8_t>& Array, const ipersi
 
 		Array.push_back(static_cast<int8_t>(value));
 	}
+
+	load_array_metadata(Storage, Array, Context);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1747,6 +1795,8 @@ void load_array(const element& Storage, typed_array<uint8_t>& Array, const ipers
 
 		Array.push_back(static_cast<uint8_t>(value));
 	}
+
+	load_array_metadata(Storage, Array, Context);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1761,6 +1811,8 @@ void load_array(const element& Storage, typed_array<string_t>& Array, const iper
 
 		Array.push_back(xml_value->text);
 	}
+
+	load_array_metadata(Storage, Array, Context);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1779,6 +1831,8 @@ void load_array(const element& Storage, typed_array<imaterial*>& Array, const ip
 
 		Array.push_back(dynamic_cast<imaterial*>(Context.lookup.lookup_object(id)));
 	}
+
+	load_array_metadata(Storage, Array, Context);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1797,6 +1851,8 @@ void load_array(const element& Storage, typed_array<inode*>& Array, const ipersi
 
 		Array.push_back(dynamic_cast<inode*>(Context.lookup.lookup_object(id)));
 	}
+
+	load_array_metadata(Storage, Array, Context);
 }
 
 /////////////////////////////////////////////////////////////////////////////

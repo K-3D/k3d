@@ -55,6 +55,24 @@ static boost::python::object get_item_inode(interface_wrapper<const k3d::typed_a
 	return wrap(Self.wrapped().at(Item));
 }
 
+template<typename self_t>
+static string_t get_metadata_value(const self_t& Self, const string_t& Name)
+{
+	return Self.wrapped().get_metadata_value(Name);
+}
+
+template<typename self_t>
+static boost::python::dict get_metadata(const self_t& Self)
+{
+	boost::python::dict result;
+
+	const array::metadata_t metadata = Self.wrapped().get_metadata();
+	for(array::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
+		result[pair->first] = pair->second;
+
+	return result;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 // define_class_const_typed_array
 
@@ -65,7 +83,10 @@ static void define_class_const_typed_array(const char* const ClassName, const ch
 
 	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
 		.def("__len__", &utility::wrapped_len<wrapper_type>)
-		.def("__getitem__", &utility::wrapped_get_item<wrapper_type, typename array_type::value_type>);
+		.def("__getitem__", &utility::wrapped_get_item<wrapper_type, typename array_type::value_type>)
+		.def("get_metadata_value", &get_metadata_value<wrapper_type>)
+		.def("get_metadata", &get_metadata<wrapper_type>)
+		;
 }
 
 template<>
@@ -76,7 +97,10 @@ void define_class_const_typed_array<const k3d::typed_array<k3d::imaterial*> >(co
 
 	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
 		.def("__len__", &utility::wrapped_len<wrapper_type>)
-		.def("__getitem__", &get_item_imaterial);
+		.def("__getitem__", &get_item_imaterial)
+		.def("get_metadata_value", &get_metadata_value<wrapper_type>)
+		.def("get_metadata", &get_metadata<wrapper_type>)
+		;
 }
 
 template<>
@@ -87,7 +111,10 @@ void define_class_const_typed_array<const k3d::typed_array<k3d::inode*> >(const 
 
 	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
 		.def("__len__", &utility::wrapped_len<wrapper_type>)
-		.def("__getitem__", &get_item_inode);
+		.def("__getitem__", &get_item_inode)
+		.def("get_metadata_value", &get_metadata_value<wrapper_type>)
+		.def("get_metadata", &get_metadata<wrapper_type>)
+		;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

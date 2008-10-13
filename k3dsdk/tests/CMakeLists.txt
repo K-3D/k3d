@@ -13,6 +13,9 @@ LINK_LIBRARIES(k3dsdk)
 ADD_EXECUTABLE(test-almost-equal almost_equal.cpp)
 ADD_TEST(k3dsdk.equal.almost ${EXECUTABLE_OUTPUT_PATH}/test-almost-equal)
 
+ADD_EXECUTABLE(test-array-metadata array_metadata.cpp)
+ADD_TEST(k3dsdk.array.metadata ${EXECUTABLE_OUTPUT_PATH}/test-array-metadata)
+
 IF(WIN32 AND K3D_COMPILER_GCC)
 	# For some reason, building with optimizations enabled causes link problems with half::eLut and auto-import
 	SET_SOURCE_FILES_PROPERTIES(bitmap_conversion.cpp PROPERTIES COMPILE_FLAGS -O0)

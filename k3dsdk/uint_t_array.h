@@ -55,7 +55,8 @@ public:
 	}
 
 	uint_t_array(const this_type& right) :
-		base_type(right)
+		base_type(right),
+		array(right.metadata)
 	{
 	}
 
@@ -67,17 +68,22 @@ public:
 
 	array* clone_type() const
 	{
-	    return new this_type();
+		this_type* const result = new this_type();
+		result->metadata = metadata;
+		return result;
 	}
 
 	array* clone() const
 	{
-	    return new this_type(*this);
+		this_type* const result = new this_type(*this);
+		return result;
 	}
 
 	array* clone(const uint_t Begin, const uint_t End) const
 	{
-	    return new this_type(this->begin() + Begin, this->begin() + End);
+		this_type* const result = new this_type(this->begin() + Begin, this->begin() + End);
+		result->metadata = metadata;
+		return result;
 	}
 
 	void resize(const uint_t NewSize)
@@ -102,19 +108,19 @@ public:
 
 	const bool_t almost_equal(const array& Other, const uint64_t Threshold) const
 	{
-		if(base_type::size() != Other.size())
-			return false;
-
 		const this_type* const other = dynamic_cast<const this_type*>(&Other);
 		if(!other)
 			return false;
 
-		return std::equal(base_type::begin(), base_type::end(), other->begin(), k3d::almost_equal<uint_t>(Threshold));
+		return almost_equal(*other, Threshold);
 	}
 
 	const bool_t almost_equal(const this_type& Other, const uint64_t Threshold) const
 	{
 		if(base_type::size() != Other.size())
+			return false;
+
+		if(metadata != Other.metadata)
 			return false;
 
 		return std::equal(base_type::begin(), base_type::end(), Other.begin(), k3d::almost_equal<uint_t>(Threshold));
