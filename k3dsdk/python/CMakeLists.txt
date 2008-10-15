@@ -11,7 +11,25 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 LINK_DIRECTORIES(${K3D_BOOST_LIB_DIRS})
 LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
 
-ADD_LIBRARY(k3dsdk-python-types SHARED
+ADD_LIBRARY(k3dsdk-python-arrays SHARED
+	typed_array_python.cpp
+	typed_array_python.h
+	)
+K3D_GENERATE_DEF_FILE(k3dsdk-python-arrays)
+TARGET_LINK_LIBRARIES(k3dsdk-python-arrays k3dsdk)
+TARGET_LINK_LIBRARIES(k3dsdk-python-arrays ${K3D_BOOST_PYTHON_LIBS})
+TARGET_LINK_LIBRARIES(k3dsdk-python-arrays ${PYTHON_LIBRARIES})
+
+ADD_LIBRARY(k3dsdk-python-const-arrays SHARED
+	const_typed_array_python.cpp
+	const_typed_array_python.h
+	)
+K3D_GENERATE_DEF_FILE(k3dsdk-python-const-arrays)
+TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays k3dsdk)
+TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays ${K3D_BOOST_PYTHON_LIBS})
+TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays ${PYTHON_LIBRARIES})
+
+ADD_LIBRARY(k3dsdk-python-a SHARED
 	angle_axis_python.cpp
 	angle_axis_python.h
 	bitmap_python.cpp
@@ -51,19 +69,12 @@ ADD_LIBRARY(k3dsdk-python-types SHARED
 	vector3_python.cpp
 	vector3_python.h
 	)
-K3D_GENERATE_DEF_FILE(k3dsdk-python-types)
+K3D_GENERATE_DEF_FILE(k3dsdk-python-a)
+TARGET_LINK_LIBRARIES(k3dsdk-python-a k3dsdk)
+TARGET_LINK_LIBRARIES(k3dsdk-python-a ${K3D_BOOST_PYTHON_LIBS})
+TARGET_LINK_LIBRARIES(k3dsdk-python-a ${PYTHON_LIBRARIES})
 
-TARGET_LINK_LIBRARIES(k3dsdk-python-types k3dsdk)
-TARGET_LINK_LIBRARIES(k3dsdk-python-types ${K3D_BOOST_PYTHON_LIBS})
-TARGET_LINK_LIBRARIES(k3dsdk-python-types ${PYTHON_LIBRARIES})
-
-IF(NOT WIN32)
-	TARGET_LINK_LIBRARIES(k3dsdk-python-types pthread)
-ENDIF(NOT WIN32)
-
-ADD_LIBRARY(k3dsdk-python SHARED
-	any_python.cpp
-	any_python.h
+ADD_LIBRARY(k3dsdk-python-b SHARED
 	attribute_arrays_python.cpp
 	attribute_arrays_python.h
 	const_attribute_arrays_python.cpp
@@ -72,65 +83,97 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	const_named_arrays_python.h
 	const_named_attribute_arrays_python.cpp
 	const_named_attribute_arrays_python.h
-	const_typed_array_python.cpp
-	const_typed_array_python.h
-	dynamic_cast_python.cpp
-	dynamic_cast_python.h
-	euler_python.cpp
-	euler_python.h
 	icommand_node_python.cpp
 	icommand_node_python.h
-	idocument_python.cpp
-	idocument_python.h
 	imaterial_python.cpp
 	imaterial_python.h
-	imesh_storage_python.cpp
-	imesh_storage_python.h
 	imetadata_python.cpp
 	imetadata_python.h
 	inode_python.cpp
 	inode_python.h
-	inode_selection_python.cpp
-	inode_selection_python.h
 	interface_wrapper_python.h
 	iplugin_factory_python.cpp
 	iplugin_factory_python.h
-	iproperty_collection_python.cpp
-	iproperty_collection_python.h
-	iproperty_python.cpp
-	iproperty_python.h
 	isnappable_python.cpp
 	isnappable_python.h
 	iunknown_python.cpp
 	iunknown_python.h
 	iuser_interface_python.cpp
 	iuser_interface_python.h
-	mesh_python.cpp
-	mesh_python.h
-	mesh_selection_python.cpp
-	mesh_selection_python.h
 	named_arrays_python.cpp
 	named_arrays_python.h
 	named_attribute_arrays_python.cpp
 	named_attribute_arrays_python.h
-	node_python.cpp
-	node_python.h
-	object_model_python.cpp
-	object_model_python.h
 	parallel_python.cpp
 	plugin_python.cpp
 	plugin_python.h
 	resource_python.cpp
 	resource_python.h
-	typed_array_python.cpp
-	typed_array_python.h
+	)
+K3D_GENERATE_DEF_FILE(k3dsdk-python-b)
+TARGET_LINK_LIBRARIES(k3dsdk-python-b k3dsdk-python-arrays)
+TARGET_LINK_LIBRARIES(k3dsdk-python-b k3dsdk-python-const-arrays)
+TARGET_LINK_LIBRARIES(k3dsdk-python-b k3dsdk-resource)
+
+ADD_LIBRARY(k3dsdk-python-d SHARED
+	any_python.cpp
+	any_python.h
+	dynamic_cast_python.cpp
+	dynamic_cast_python.h
+	euler_python.cpp
+	euler_python.h
+	idocument_python.cpp
+	idocument_python.h
+	imesh_storage_python.cpp
+	imesh_storage_python.h
+	inode_selection_python.cpp
+	inode_selection_python.h
+	iproperty_collection_python.cpp
+	iproperty_collection_python.h
+	iproperty_python.cpp
+	iproperty_python.h
+	mesh_python.cpp
+	mesh_python.h
+	mesh_selection_python.cpp
+	mesh_selection_python.h
+	node_python.cpp
+	node_python.h
+	)
+K3D_GENERATE_DEF_FILE(k3dsdk-python-d)
+TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk)
+TARGET_LINK_LIBRARIES(k3dsdk-python-d ${K3D_BOOST_PYTHON_LIBS})
+TARGET_LINK_LIBRARIES(k3dsdk-python-d ${PYTHON_LIBRARIES})
+TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk-python-a)
+TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk-python-b)
+
+ADD_LIBRARY(k3dsdk-python SHARED
+	object_model_python.cpp
+	object_model_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python)
-        
-TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-python-types)
-TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-resource)
+TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-python-d)
 
-INSTALL(TARGETS k3dsdk-python-types
+INSTALL(TARGETS k3dsdk-python-arrays
+	RUNTIME DESTINATION bin 
+	LIBRARY DESTINATION ${K3D_LIBDIR}
+	ARCHIVE DESTINATION ${K3D_LIBDIR})
+
+INSTALL(TARGETS k3dsdk-python-const-arrays
+	RUNTIME DESTINATION bin 
+	LIBRARY DESTINATION ${K3D_LIBDIR}
+	ARCHIVE DESTINATION ${K3D_LIBDIR})
+
+INSTALL(TARGETS k3dsdk-python-a
+	RUNTIME DESTINATION bin 
+	LIBRARY DESTINATION ${K3D_LIBDIR}
+	ARCHIVE DESTINATION ${K3D_LIBDIR})
+
+INSTALL(TARGETS k3dsdk-python-b
+	RUNTIME DESTINATION bin 
+	LIBRARY DESTINATION ${K3D_LIBDIR}
+	ARCHIVE DESTINATION ${K3D_LIBDIR})
+
+INSTALL(TARGETS k3dsdk-python-d
 	RUNTIME DESTINATION bin 
 	LIBRARY DESTINATION ${K3D_LIBDIR}
 	ARCHIVE DESTINATION ${K3D_LIBDIR})
