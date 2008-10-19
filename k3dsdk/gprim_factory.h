@@ -39,8 +39,12 @@ public:
 	void add_point(const point3& Point);
 	void add_point(const point4& Point);
 	
+	void add_texcoord(const k3d::texture3& tex);
+	void attach_texcoords();
+	
 	/// Creates a polygon, given the corner indices
 	void add_polygon(const mesh::indices_t& Points);
+	void add_polygon(const mesh::indices_t& Points, const mesh::indices_t& Texcoords);
 	
 	/// Adds a hole to the last face, given the corner indices
 	void add_hole(const mesh::indices_t& Points);
@@ -54,7 +58,7 @@ public:
 	 * \param VKnots V knot vector
 	 * \param Weights Weigts associated with each control point
 	 */
-	bool add_nurbs_patch(const size_t UOrder, const size_t VOrder, const mesh::indices_t& Points, const mesh::knots_t& UKnots, const mesh::knots_t VKnots, const mesh::weights_t& Weights);
+	bool add_nurbs_patch(const uint_t UOrder, const uint_t VOrder, const mesh::indices_t& Points, const mesh::knots_t& UKnots, const mesh::knots_t VKnots, const mesh::weights_t& Weights);
 	/// Adds a new trim curve to the last loop of the last patch. Returns true if succesful.
 	/**
 	 *  Note: Trim curves need to be added in the order they will appear in the trim curve loop

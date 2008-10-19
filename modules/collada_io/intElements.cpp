@@ -24,7 +24,7 @@
 #include <dae.h>
 #include <dae/daeDom.h>
 #include "intElements.h"
-#include "gprim_factory.h"
+#include <k3dsdk/gprim_factory.h>
 #include <iostream>
 #include <dom/domPolylist.h>
 #include <dom/domTriangles.h>

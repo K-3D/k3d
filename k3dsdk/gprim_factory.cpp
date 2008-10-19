@@ -23,9 +23,12 @@
 
 #include "gprim_factory.h"
 #include "imaterial.h"
+#include "texture3.h"
 
 namespace k3d
 {
+
+typedef k3d::typed_array<k3d::texture3> texcoord_array_t;
 
 namespace detail
 {
@@ -173,6 +176,9 @@ public:
 	mesh::indices_t* edge_points;
 	mesh::indices_t* clockwise_edges;
 	mesh::selection_t* edge_selection;
+	
+	std::vector<k3d::texture3> texcoords_vec;
+	std::vector<k3d::texture3> edge_texcoords;
 
 	mesh::indices_t* nurbs_patch_first_points;
 	mesh::counts_t* nurbs_patch_u_point_counts;
@@ -266,6 +272,26 @@ void gprim_factory::add_point(const point4& Point)
 	m_implementation->point_weights->push_back(Point[3]);
 }
 
+void gprim_factory::add_texcoord(const k3d::texture3& texcoord)
+{
+	m_implementation->texcoords_vec.push_back(texcoord);
+}
+
+void gprim_factory::attach_texcoords()
+{
+	if(m_implementation->texcoords_vec.size() == 0 || m_implementation->edge_texcoords.size() == 0 || m_implementation->target_mesh.polyhedra.get() == 0)
+		return;
+
+	const k3d::mesh::indices_t& edge_points = *m_implementation->target_mesh.polyhedra->edge_points.get();
+	k3d::mesh::polyhedra_t& writable_polyhedra = m_implementation->target_mesh.polyhedra.writable();
+	texcoord_array_t& texcoords = writable_polyhedra.face_varying_data.create("texcoord", new texcoord_array_t(edge_points.size()));
+
+	for(size_t edge = 0; edge < edge_points.size(); ++edge)
+	{
+		texcoords[edge] = m_implementation->edge_texcoords[edge];
+	}
+}
+
 void gprim_factory::add_polygon(const mesh::indices_t& Points)
 {
 	return_if_fail(Points.size());
@@ -306,6 +332,20 @@ void gprim_factory::add_polygon(const mesh::indices_t& Points)
 	m_implementation->clockwise_edges->back() = first_edge;
 }
 
+void gprim_factory::add_polygon(const mesh::indices_t& Points, const mesh::indices_t& Texcoords)
+{
+	add_polygon(Points);
+	if(Texcoords.empty())
+		return;
+	
+	const size_t point_begin = 0;
+	const size_t point_end = point_begin + Points.size();
+	for(size_t point = point_begin; point != point_end; ++point)
+	{
+		m_implementation->edge_texcoords.push_back(m_implementation->texcoords_vec[Texcoords[point]]);
+	}
+}
+
 void gprim_factory::add_hole(const mesh::indices_t& Points)
 {
 	return_if_fail(Points.size());
@@ -326,7 +366,7 @@ void gprim_factory::add_hole(const mesh::indices_t& Points)
 	m_implementation->clockwise_edges->back() = first_edge;
 }
 
-bool gprim_factory::add_nurbs_patch(const size_t UOrder, const size_t VOrder, const mesh::indices_t& Points, const mesh::knots_t& UKnots, const mesh::knots_t VKnots, const mesh::weights_t& Weights)
+bool gprim_factory::add_nurbs_patch(const uint_t UOrder, const uint_t VOrder, const mesh::indices_t& Points, const mesh::knots_t& UKnots, const mesh::knots_t VKnots, const mesh::weights_t& Weights)
 {
 	if(!m_implementation->nurbs_patch_first_points)
 	{
