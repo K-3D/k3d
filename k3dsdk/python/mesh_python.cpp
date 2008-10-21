@@ -136,80 +136,6 @@ object create_array(pipeline_data<array_type>& Data)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// const_point_groups
-
-class const_point_groups :
-	public interface_wrapper<const k3d::mesh::point_groups_t>
-{
-	typedef interface_wrapper<const k3d::mesh::point_groups_t> base;
-public:
-	const_point_groups() :
-		base()
-	{
-	}
-
-	const_point_groups(const k3d::mesh::point_groups_t* CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	const_point_groups(const k3d::mesh::point_groups_t& CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	object first_points() { return wrap_const_array(wrapped().first_points); }
-	object point_counts() { return wrap_const_array(wrapped().point_counts); }
-	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object points() { return wrap_const_array(wrapped().points); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// point_groups
-
-class point_groups :
-	public interface_wrapper<k3d::mesh::point_groups_t>
-{
-	typedef interface_wrapper<k3d::mesh::point_groups_t> base;
-public:
-	point_groups() :
-		base()
-	{
-	}
-
-	point_groups(k3d::mesh::point_groups_t* CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	point_groups(k3d::mesh::point_groups_t& CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	object first_points() { return wrap_const_array(wrapped().first_points); }
-	object point_counts() { return wrap_const_array(wrapped().point_counts); }
-	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object points() { return wrap_const_array(wrapped().points); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-
-	object writable_first_points() { return wrap_non_const_array(wrapped().first_points); }
-	object writable_point_counts() { return wrap_non_const_array(wrapped().point_counts); }
-	object writable_materials() { return wrap_non_const_array(wrapped().materials); }
-	object writable_constant_data() { return wrap(wrapped().constant_data); }
-	object writable_points() { return wrap_non_const_array(wrapped().points); }
-	object writable_varying_data() { return wrap(wrapped().varying_data); }
-
-	object create_first_points() { return create_array(wrapped().first_points); }
-	object create_point_counts() { return create_array(wrapped().point_counts); }
-	object create_materials() { return create_array(wrapped().materials); }
-	object create_points() { return create_array(wrapped().points); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 // const_linear_curve_groups
 
 class const_linear_curve_groups :
@@ -1070,7 +996,6 @@ object mesh::create_cubic_curve_groups() { return detail::create_object<detail::
 object mesh::create_linear_curve_groups() { return detail::create_object<detail::linear_curve_groups, k3d::mesh::linear_curve_groups_t>(wrapped().linear_curve_groups); }
 object mesh::create_nurbs_curve_groups() { return detail::create_object<detail::nurbs_curve_groups, k3d::mesh::nurbs_curve_groups_t>(wrapped().nurbs_curve_groups); }
 object mesh::create_nurbs_patches() { return detail::create_object<detail::nurbs_patches, k3d::mesh::nurbs_patches_t>(wrapped().nurbs_patches); }
-object mesh::create_point_groups() { return detail::create_object<detail::point_groups, k3d::mesh::point_groups_t>(wrapped().point_groups); } 
 object mesh::create_point_selection() { return detail::create_array(wrapped().point_selection); } 
 object mesh::create_points() { return detail::create_array(wrapped().points); }
 object mesh::create_polyhedra() { return detail::create_object<detail::polyhedra, k3d::mesh::polyhedra_t>(wrapped().polyhedra); } 
@@ -1078,7 +1003,6 @@ object mesh::cubic_curve_groups() { return detail::wrap_const_object<detail::con
 object mesh::linear_curve_groups() { return detail::wrap_const_object<detail::const_linear_curve_groups>(wrapped().linear_curve_groups); } 
 object mesh::nurbs_curve_groups() { return detail::wrap_const_object<detail::const_nurbs_curve_groups>(wrapped().nurbs_curve_groups); } 
 object mesh::nurbs_patches() { return detail::wrap_const_object<detail::const_nurbs_patches>(wrapped().nurbs_patches); } 
-object mesh::point_groups() { return detail::wrap_const_object<detail::const_point_groups>(wrapped().point_groups); } 
 object mesh::point_selection() { return detail::wrap_const_array(wrapped().point_selection); } 
 object mesh::points() { return detail::wrap_const_array(wrapped().points); } 
 object mesh::polyhedra() { return detail::wrap_const_object<detail::const_polyhedra>(wrapped().polyhedra); } 
@@ -1090,7 +1014,6 @@ object mesh::writable_cubic_curve_groups() { return detail::wrap_non_const_objec
 object mesh::writable_linear_curve_groups() { return detail::wrap_non_const_object<detail::linear_curve_groups>(wrapped().linear_curve_groups); } 
 object mesh::writable_nurbs_curve_groups() { return detail::wrap_non_const_object<detail::nurbs_curve_groups>(wrapped().nurbs_curve_groups); } 
 object mesh::writable_nurbs_patches() { return detail::wrap_non_const_object<detail::nurbs_patches>(wrapped().nurbs_patches); } 
-object mesh::writable_point_groups() { return detail::wrap_non_const_object<detail::point_groups>(wrapped().point_groups); } 
 object mesh::writable_point_selection() { return detail::wrap_non_const_array(wrapped().point_selection); } 
 object mesh::writable_points() { return detail::wrap_non_const_array(wrapped().points); } 
 object mesh::writable_polyhedra() { return detail::wrap_non_const_object<detail::polyhedra>(wrapped().polyhedra); } 
@@ -1196,36 +1119,6 @@ static object mesh_primitives_t_create(mesh_primitives_t_wrapper& Self, const st
 
 void define_namespace_mesh()
 {
-	class_<detail::const_point_groups>("const_point_groups",
-		"Stores an immutable (read-only) collection of point primitives.")
-		.def("first_points", &detail::const_point_groups::first_points)
-		.def("point_counts", &detail::const_point_groups::point_counts)
-		.def("materials", &detail::const_point_groups::materials)
-		.def("constant_data", &detail::const_point_groups::constant_data)
-		.def("points", &detail::const_point_groups::points)
-		.def("varying_data", &detail::const_point_groups::varying_data);
-
-	class_<detail::point_groups>("point_groups",
-		"Stores a mutable (read-write) collection of point primitives.")
-		.def("first_points", &detail::point_groups::first_points)
-		.def("point_counts", &detail::point_groups::point_counts)
-		.def("materials", &detail::point_groups::materials)
-		.def("constant_data", &detail::point_groups::constant_data)
-		.def("points", &detail::point_groups::points)
-		.def("varying_data", &detail::point_groups::varying_data)
-
-		.def("writable_first_points", &detail::point_groups::writable_first_points)
-		.def("writable_point_counts", &detail::point_groups::writable_point_counts)
-		.def("writable_materials", &detail::point_groups::writable_materials)
-		.def("writable_constant_data", &detail::point_groups::writable_constant_data)
-		.def("writable_points", &detail::point_groups::writable_points)
-		.def("writable_varying_data", &detail::point_groups::writable_varying_data)
-
-		.def("create_first_points", &detail::point_groups::create_first_points)
-		.def("create_point_counts", &detail::point_groups::create_point_counts)
-		.def("create_materials", &detail::point_groups::create_materials)
-		.def("create_points", &detail::point_groups::create_points);
-
 	class_<detail::const_linear_curve_groups>("const_linear_curve_groups",
 		"Stores an immutable (read-only) collection of linear curve primitives.")
 		.def("first_curves", &detail::const_linear_curve_groups::first_curves)
@@ -1754,8 +1647,6 @@ void define_namespace_mesh()
 			"Returns a L{const_nurbs_patches} object containing an immutable (read-only) collection of NURBS patch primitives, or None.")
 		.def("vertex_data", &mesh::vertex_data,
 			"Returns a L{const_named_arrays} object containing a collection of immutable (read-only) per-vertex data, or None.")
-		.def("point_groups", &mesh::point_groups,
-			"Returns a L{const_point_groups} object containing a collection of immutable (read-only) point primitives, or None.")
 		.def("point_selection", &mesh::point_selection,
 			"Returns an immutable (read-only) L{const_double_array} object containing the selection state of every vertex in the mesh, or None.")
 		.def("points", &mesh::points,
@@ -1778,8 +1669,6 @@ void define_namespace_mesh()
 			"Returns a L{nurbs_patches} object containing a mutable (read-write) collection of NURBS patch primitives, or None.")
 		.def("writable_vertex_data", &mesh::writable_vertex_data,
 			"Returns a L{named_arrays} object containing a collection of mutable (read-write) per-vertex data, or None.")
-		.def("writable_point_groups", &mesh::writable_point_groups,
-			"Returns a L{point_groups} object containing a collection of mutable (read-write) point primitives, or None.")
 		.def("writable_point_selection", &mesh::writable_point_selection,
 			"Returns a mutable (read-write) L{double_array} object containing the selection state of every vertex in the mesh, or None.")
 		.def("writable_points", &mesh::writable_points,
@@ -1802,8 +1691,6 @@ void define_namespace_mesh()
 			"Creates and returns a new L{nurbs_curve_groups} object for storing NURBS curve primitives.")
 		.def("create_nurbs_patches", &mesh::create_nurbs_patches,
 			"Creates and returns a new L{nurbs_patches} object for storing NURBS patch primitives.")
-		.def("create_point_groups", &mesh::create_point_groups,
-			"Creates and returns a new L{point_groups} object for storing point primitives.")
 		.def("create_point_selection", &mesh::create_point_selection,
 			"Creates and returns a new L{double_array} object used to store the selection state of every vertex in the mesh.")
 		.def("create_points", &mesh::create_points,

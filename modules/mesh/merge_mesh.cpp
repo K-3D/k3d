@@ -170,43 +170,6 @@ void merge_polyhedra(k3d::mesh& Output, const k3d::mesh& Input, bool SinglePolyh
   	face_varying_data_copier.push_back(edge);
 }
 
-void merge_point_groups(k3d::mesh& Output, const k3d::mesh& Input)
-{
-	if(!k3d::validate_point_groups(Input))
-		return;
-	k3d::mesh::point_groups_t& output_point_groups = create_if_not_exists(Output.point_groups);
-	k3d::mesh::indices_t& output_first_points = create_if_not_exists(output_point_groups.first_points);
-	k3d::mesh::counts_t& output_point_counts = create_if_not_exists(output_point_groups.point_counts);
-	k3d::mesh::materials_t& output_materials = create_if_not_exists(output_point_groups.materials);
-	k3d::mesh::indices_t& output_point_indices = create_if_not_exists(output_point_groups.points);
-	
-	const k3d::mesh::point_groups_t& input_point_groups = *Input.point_groups;
-	const k3d::mesh::indices_t& input_first_points = *input_point_groups.first_points;
-	const k3d::mesh::counts_t& input_point_counts = *input_point_groups.point_counts;
-	const k3d::mesh::materials_t& input_materials = *input_point_groups.materials;
-	const k3d::mesh::indices_t& input_point_indices = *input_point_groups.points;
-	
-	if (output_point_indices.empty()) // for the first appended mesh, we simply copy the named arrays
-  {
-  	output_point_groups.constant_data = input_point_groups.constant_data;
-  	output_point_groups.varying_data = input_point_groups.varying_data;
-  }
-	
-	k3d::uint_t point_offset = output_point_indices.size();
-	extend_array(input_first_points, output_first_points, point_offset);
-	extend_array(input_point_counts, output_point_counts, 0);
-	output_materials.insert(output_materials.end(), input_materials.begin(), input_materials.end());
-	extend_array(input_point_indices, output_point_indices, Output.points->size());
-	
-	// Named arrays
-	k3d::attribute_array_copier constant_data_copier(input_point_groups.constant_data, output_point_groups.constant_data);
-	k3d::attribute_array_copier varying_data_copier(input_point_groups.varying_data, output_point_groups.varying_data);
-	for (k3d::uint_t point_group = 0; point_group != input_first_points.size(); ++point_group)
-  	constant_data_copier.push_back(point_group);
-	for (k3d::uint_t point = 0; point != input_point_indices.size(); ++point)
-		varying_data_copier.push_back(point);
-}
-
 void merge_linear_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if(!k3d::validate_linear_curve_groups(Input))
@@ -682,7 +645,6 @@ public:
 				detail::create_if_not_exists(Output.points);
 				
 				detail::merge_polyhedra(Output, *mesh, m_same_polyhedron.pipeline_value());
-				detail::merge_point_groups(Output, *mesh);
 				detail::merge_linear_curve_groups(Output, *mesh);
 				detail::merge_cubic_curve_groups(Output, *mesh);
 				detail::merge_nurbs_curve_groups(Output, *mesh);

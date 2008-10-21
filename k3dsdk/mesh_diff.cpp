@@ -266,17 +266,6 @@ void print_diff(std::ostream& Stream, const std::string& Label, const k3d::mesh:
 
 void print_diff(std::ostream& Stream, const mesh& A, const mesh& B, const boost::uint64_t Threshold)
 {
-	detail::print_diff(Stream, "point groups", A.point_groups, B.point_groups);
-	if(A.point_groups && B.point_groups)
-	{
-		detail::print_diff(Stream, "first points", A.point_groups->first_points, B.point_groups->first_points, Threshold);
-		detail::print_diff(Stream, "point counts", A.point_groups->point_counts, B.point_groups->point_counts, Threshold);
-		detail::print_diff(Stream, "materials", A.point_groups->materials, B.point_groups->materials, Threshold);
-		detail::print_diff(Stream, "constant data", A.point_groups->constant_data, B.point_groups->constant_data, Threshold);
-		detail::print_diff(Stream, "points", A.point_groups->points, B.point_groups->points, Threshold);
-		detail::print_diff(Stream, "varying data", A.point_groups->varying_data, B.point_groups->varying_data, Threshold);
-	}
-
 	detail::print_diff(Stream, "linear curve groups", A.linear_curve_groups, B.linear_curve_groups);
 	if(A.linear_curve_groups && B.linear_curve_groups)
 	{

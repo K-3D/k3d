@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>-2.5 -2.5 2.5 -2.5 2.5 2.5 2.5 -2.5 2.5 2.5 2.5 2.5 -2.5 -2.5 -2.5 2.5 -2.5 -2.5 2.5 2.5 -2.5 -2.5 2.5 -2.5</points>
+		<point_selection>0 0 0 0 0 0 0 0</point_selection>
+		<vertex_data/>
+		<primitives>
+			<primitive type="point_group">
+				<topology>
+					<array name="first_points" type="k3d::uint32_t">0</array>
+					<array name="materials" type="k3d::imaterial*">0</array>
+					<array name="point_counts" type="k3d::uint32_t">8</array>
+					<array name="points" type="k3d::uint32_t">0 1 2 3 4 5 6 7</array>
+				</topology>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="varying"/>
+				</attributes>
+			</primitive>
+		</primitives>
+	</mesh_arrays>
+</k3dml>

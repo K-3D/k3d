@@ -2054,17 +2054,6 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 		}
 	}
 
-	if(Mesh.point_groups)
-	{
-		element& container = Container.append(element("point_groups"));
-		detail::save_array(container, element("first_points"), Mesh.point_groups->first_points, Context);
-		detail::save_array(container, element("point_counts"), Mesh.point_groups->point_counts, Context);
-		detail::save_array(container, element("materials"), Mesh.point_groups->materials, Context);
-		detail::save_arrays(container, element("constant_data"), Mesh.point_groups->constant_data, Context);
-		detail::save_array(container, element("points"), Mesh.point_groups->points, Context);
-		detail::save_arrays(container, element("varying_data"), Mesh.point_groups->varying_data, Context);
-	}
-
 	if(Mesh.linear_curve_groups)
 	{
 		element& container = Container.append(element("linear_curve_groups"));
@@ -2257,6 +2246,8 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "point_groups"))
 	{
+assert_not_implemented();
+/*
 		mesh::point_groups_t* const point_groups = &Mesh.point_groups.create();
 		detail::load_array(*container, "first_points", point_groups->first_points, Context);
 		detail::load_array(*container, "point_counts", point_groups->point_counts, Context);
@@ -2264,6 +2255,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_arrays(*container, "constant_data", point_groups->constant_data, Context);
 		detail::load_array(*container, "points", point_groups->points, Context);
 		detail::load_arrays(*container, "varying_data", point_groups->varying_data, Context);
+*/
 	}
 
 	if(element* const container = find_element(Container, "linear_curve_groups"))
@@ -2572,6 +2564,8 @@ void load(legacy::mesh& Mesh, element& XML, const ipersistent::load_context& Con
 	// Load point groups ...
 	if(element* const xml_point_groups = find_element(XML, "pointgroups"))
 	{
+		assert_not_implemented();
+/*
 		for(element::elements_t::iterator xml_group = xml_point_groups->children.begin(); xml_group != xml_point_groups->children.end(); ++xml_group)
 		{
 			if(xml_group->name != "group")
@@ -2595,6 +2589,7 @@ void load(legacy::mesh& Mesh, element& XML, const ipersistent::load_context& Con
 
 			detail::load_parameters(*xml_group, ri::CONSTANT, group->constant_data);
 		}
+*/
 	}
 
 	// Load polyhedra ...

@@ -318,33 +318,6 @@ const bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t&
 // almost_equal
 
 template<>
-class almost_equal<mesh::point_groups_t>
-{
-	typedef mesh::point_groups_t T;
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline const bool_t operator()(const T& A, const T& B)
-	{
-		return
-			detail::almost_equal(A.first_points, B.first_points, threshold) &&
-			detail::almost_equal(A.point_counts, B.point_counts, threshold) &&
-			detail::almost_equal(A.materials, B.materials, threshold) &&
-			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
-			detail::almost_equal(A.points, B.points, threshold) &&
-			detail::almost_equal(A.varying_data, B.varying_data, threshold);
-	}
-private:
-	const uint64_t threshold;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-template<>
 class almost_equal<mesh::linear_curve_groups_t>
 {
 	typedef mesh::linear_curve_groups_t T;
@@ -639,7 +612,6 @@ const bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) con
 		detail::almost_equal(vertex_data, Other.vertex_data, Threshold) &&
 		detail::almost_equal(primitives, Other.primitives, Threshold) &&
 
-		detail::almost_equal(point_groups, Other.point_groups, Threshold) &&
 		detail::almost_equal(linear_curve_groups, Other.linear_curve_groups, Threshold) &&
 		detail::almost_equal(cubic_curve_groups, Other.cubic_curve_groups, Threshold) &&
 		detail::almost_equal(nurbs_curve_groups, Other.nurbs_curve_groups, Threshold) &&
@@ -664,26 +636,6 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 		points[i] = RHS.points[i]->position;
 		point_selection[i] = RHS.points[i]->selection_weight;
 		point_map[RHS.points[i]] = i;
-	}
-
-	// Convert point groups ...
-	if(RHS.point_groups.size())
-	{
-		point_groups_t& point_groups = this->point_groups.create();
-		indices_t& first_points = point_groups.first_points.create();
-		counts_t& point_counts = point_groups.point_counts.create();
-		materials_t& materials = point_groups.materials.create();
-		indices_t& points = point_groups.points.create();
-
-		for(legacy::mesh::point_groups_t::const_iterator group = RHS.point_groups.begin(); group != RHS.point_groups.end(); ++group)
-		{
-			first_points.push_back(points.size());
-			point_counts.push_back((*group)->points.size());
-			materials.push_back((*group)->material);
-
-			for(legacy::point_group::points_t::const_iterator point = (*group)->points.begin(); point != (*group)->points.end(); ++point)
-				points.push_back(point_map[*point]);
-		}
 	}
 
 	// Convert linear curves ...
@@ -1116,19 +1068,6 @@ std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::operator_type& 
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 {
 	Stream << detail::indentation << "mesh:\n" << push_indent;
-
-	if(RHS.point_groups)
-	{
-		Stream << detail::indentation << "point_groups:\n" << push_indent;
-
-		detail::print(Stream, "first_points", RHS.point_groups->first_points);
-		detail::print(Stream, "point_counts", RHS.point_groups->point_counts);
-		detail::print(Stream, "constant_data", RHS.point_groups->constant_data);
-		detail::print(Stream, "points", RHS.point_groups->points);
-		detail::print(Stream, "varying_data", RHS.point_groups->varying_data);
-		
-		Stream << pop_indent;
-	}
 
 	if(RHS.linear_curve_groups)
 	{

@@ -105,24 +105,6 @@ public:
 		primitive& create(const string_t& Type);
 	};
 
-	/// Defines storage for point groups (particle clouds)
-	class point_groups_t
-	{
-	public:
-		/// Stores the set of per-point-group first points
-		pipeline_data<indices_t> first_points;
-		/// Stores the set of per-point-group point counts
-		pipeline_data<counts_t> point_counts;
-		/// Stores the set of per-point-group materials
-		pipeline_data<materials_t> materials;
-		/// Stores user-defined per-point-group data (maps to RenderMan constant data)
-		attribute_arrays_t constant_data;
-		/// Stores per-point-group point lists
-		pipeline_data<indices_t> points;
-		/// Stores user-defined per-point-group-point data (maps to RenderMan varying data)
-		attribute_arrays_t varying_data;
-	};
-
 	/// Defines storage for linear curve groups
 	class linear_curve_groups_t
 	{
@@ -440,8 +422,6 @@ public:
 	/// Stores mesh primitives
 	primitives_t primitives;
 
-	/// Stores point groups
-	pipeline_data<point_groups_t> point_groups;
 	/// Stores linear curve groups
 	pipeline_data<linear_curve_groups_t> linear_curve_groups;
 	/// Stores cubic curve groups

@@ -47,14 +47,6 @@ point::point(const double X, const double Y, const double Z) :
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// point_group
-
-point_group::point_group() :
-	material(0)
-{
-}
-
-/////////////////////////////////////////////////////////////////////////////
 // split_edge
 
 split_edge::~split_edge()
@@ -570,7 +562,6 @@ mesh::~mesh()
 	std::for_each(cubic_curve_groups.begin(), cubic_curve_groups.end(), delete_object());
 	std::for_each(linear_curve_groups.begin(), linear_curve_groups.end(), delete_object());
 	std::for_each(polyhedra.begin(), polyhedra.end(), delete_object());
-	std::for_each(point_groups.begin(), point_groups.end(), delete_object());
 	std::for_each(points.begin(), points.end(), delete_object());
 }
 
@@ -590,29 +581,6 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 			legacy_point->selection_weight = point_selection[point];
 
 			points.push_back(legacy_point);
-		}
-	}
-
-	if(validate_point_groups(Mesh))
-	{
-		const k3d::mesh::indices_t& first_points = *Mesh.point_groups->first_points;
-		const k3d::mesh::counts_t& point_counts = *Mesh.point_groups->point_counts;
-		const k3d::mesh::materials_t& materials = *Mesh.point_groups->materials;
-		const k3d::mesh::indices_t& group_points = *Mesh.point_groups->points;
-
-		const uint_t group_begin = 0;
-		const uint_t group_end = group_begin + first_points.size();
-		for(uint_t group = group_begin; group != group_end; ++group)
-		{
-			legacy::point_group* const legacy_group = new legacy::point_group();
-			point_groups.push_back(legacy_group);
-
-			legacy_group->material = materials[group];
-
-			const uint_t point_begin = first_points[group];
-			const uint_t point_end = point_begin + point_counts[group];
-			for(uint_t point = point_begin; point != point_end; ++point)
-				legacy_group->points.push_back(points[group_points[point]]);
 		}
 	}
 
@@ -1173,14 +1141,6 @@ void deep_copy(const mesh& Input, mesh& Output)
 	{
 		Output.points.push_back(new point(**p));
 		point_map.insert(std::make_pair(*p, Output.points.back()));
-	}
-
-	// Duplicate point clouds ...
-	for(mesh::point_groups_t::const_iterator pt_group = Input.point_groups.begin(); pt_group != Input.point_groups.end(); ++pt_group)
-	{
-		point_group* const new_point_group = new point_group(**pt_group);
-		std::transform(new_point_group->points.begin(), new_point_group->points.end(), new_point_group->points.begin(), point_map);
-		Output.point_groups.push_back(new_point_group);
 	}
 
 	// Duplicate polyhedra ...

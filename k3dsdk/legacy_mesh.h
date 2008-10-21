@@ -69,25 +69,6 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// point_group
-
-/// Encapsulates a group of rendered points
-class point_group :
-	public selectable
-{
-public:
-	point_group();
-
-	typedef std::vector<point*> points_t;
-	points_t points;
-
-	/// Stores a reference to the material to use rendering the point group
-	imaterial* material;
-	/// Stores constant data for the group
-	parameters_t constant_data;
-};
-
-/////////////////////////////////////////////////////////////////////////////
 // split_edge
 
 /// Encapsulates a split-edge data structure for representing topology information in a polygon mesh
@@ -640,11 +621,6 @@ public:
 	typedef std::vector<point*> points_t;
 	/// Stores the set of points within the mesh that are shared among the rest of the mesh geometry
 	points_t points;
-
-	/// Defines a collection of rendered point groups
-	typedef std::vector<point_group*> point_groups_t;
-	/// Stores a collection of rendered point groups
-	point_groups_t point_groups;
 
 	/// Defines a collection of manifold polyhedra
 	typedef std::vector<polyhedron*> polyhedra_t;

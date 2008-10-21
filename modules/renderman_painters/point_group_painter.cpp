@@ -29,9 +29,11 @@
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/point_group.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>
-#include <k3dsdk/utility_gl.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -59,47 +61,50 @@ public:
 
 	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
-		if(!k3d::validate_point_groups(Mesh))
+		if(!k3d::validate_points(Mesh))
 			return;
 
-		const k3d::mesh::indices_t& first_points = *Mesh.point_groups->first_points;
-		const k3d::mesh::counts_t& point_counts = *Mesh.point_groups->point_counts;
-		const k3d::mesh::attribute_arrays_t& constant_data = Mesh.point_groups->constant_data;
-		const k3d::mesh::materials_t& materials = *Mesh.point_groups->materials;
-		const k3d::mesh::indices_t& group_points = *Mesh.point_groups->points;
-		const k3d::mesh::attribute_arrays_t& varying_data = Mesh.point_groups->varying_data;
 		const k3d::mesh::points_t& points = *Mesh.points;
 		const k3d::mesh::attribute_arrays_t& vertex_data = Mesh.vertex_data;
 
-		const size_t point_group_begin = 0;
-		const size_t point_group_end = point_group_begin + first_points.size();
-		for(size_t point_group = point_group_begin; point_group != point_group_end; ++point_group)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			array_copier ri_constant_data;
-			ri_constant_data.add_arrays(constant_data);
+			boost::scoped_ptr<k3d::point_group::const_primitive> point_group(k3d::point_group::validate(**primitive));
+			if(!point_group)
+				continue;
 
-			array_copier ri_varying_data;
-			ri_varying_data.add_arrays(varying_data);
+			
 
-			array_copier ri_vertex_data;
-			ri_vertex_data.add_arrays(vertex_data);
-			ri_vertex_data.add_array(k3d::ri::RI_P(), points);
+			const k3d::uint_t point_group_begin = 0;
+			const k3d::uint_t point_group_end = point_group_begin + point_group->first_points.size();
+			for(k3d::uint_t point_group_index = point_group_begin; point_group_index != point_group_end; ++point_group_index)
+			{
+				array_copier ri_constant_data;
+				ri_constant_data.add_arrays(point_group->constant_data);
 
-			const size_t point_begin = first_points[point_group];
-			const size_t point_end = point_begin + point_counts[point_group];
-			for(size_t point = point_begin; point != point_end; ++point)
-				ri_vertex_data.push_back(group_points[point]);
+				array_copier ri_varying_data;
+				ri_varying_data.add_arrays(point_group->varying_data);
 
-			ri_constant_data.push_back(point_group);
-			ri_varying_data.insert(point_begin, point_end);
+				array_copier ri_vertex_data;
+				ri_vertex_data.add_arrays(vertex_data);
+				ri_vertex_data.add_array(k3d::ri::RI_P(), points);
 
-			k3d::ri::parameter_list ri_parameters;
-			ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
-			ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
-			ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
+				const k3d::uint_t point_begin = point_group->first_points[point_group_index];
+				const k3d::uint_t point_end = point_begin + point_group->point_counts[point_group_index];
+				for(k3d::uint_t point = point_begin; point != point_end; ++point)
+					ri_vertex_data.push_back(point_group->points[point]);
 
-			k3d::ri::setup_material(materials[point_group], RenderState);
-			RenderState.stream.RiPointsV(point_counts[point_group], ri_parameters);
+				ri_constant_data.push_back(point_group_index);
+				ri_varying_data.insert(point_begin, point_end);
+
+				k3d::ri::parameter_list ri_parameters;
+				ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
+				ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
+				ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
+
+				k3d::ri::setup_material(point_group->materials[point_group_index], RenderState);
+				RenderState.stream.RiPointsV(point_group->point_counts[point_group_index], ri_parameters);
+			}
 		}
 	}
 

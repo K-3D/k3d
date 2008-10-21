@@ -100,8 +100,11 @@ public:
 
 		if(m_tag_point_groups.pipeline_value())
 		{
+assert_not_implemented();
+/*
 			for(k3d::legacy::mesh::point_groups_t::iterator group = Target.point_groups.begin(); group != Target.point_groups.end(); ++group)
 				set_color(**group, new_color, default_color, (*group)->constant_data);
+*/
 		}
 
 		if(m_tag_linear_curve_groups.pipeline_value())

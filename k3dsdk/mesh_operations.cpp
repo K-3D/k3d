@@ -267,8 +267,6 @@ const bool_t is_uninitialized(const mesh& Mesh)
 		return false;
 	if (Mesh.nurbs_patches)
 		return false;
-	if (Mesh.point_groups)
-		return false;
 	if (Mesh.polyhedra)
 		return false;
 	if (Mesh.point_selection)
@@ -543,9 +541,6 @@ const bool_t validate(mesh& Mesh)
 	if(Mesh.points && !validate_points(Mesh))
 		result = false;
 
-	if(Mesh.point_groups && !validate_point_groups(Mesh))
-		result = false;
-
 	if(Mesh.linear_curve_groups && !validate_linear_curve_groups(Mesh))
 		result = false;
 
@@ -583,20 +578,6 @@ const bool_t validate_points(const mesh& Mesh)
 
 	// The point and point selection arrays must be the same length
 	return_val_if_fail(Mesh.points->size() == Mesh.point_selection->size(), false);
-
-	return true;
-}
-
-const bool_t validate_point_groups(const mesh& Mesh)
-{
-	if(!Mesh.point_groups)
-		return false;
-
-	return_val_if_fail(validate_points(Mesh), false);
-	return_val_if_fail(Mesh.point_groups->first_points, false);
-	return_val_if_fail(Mesh.point_groups->point_counts, false);
-	return_val_if_fail(Mesh.point_groups->points, false);
-	return_val_if_fail(Mesh.point_groups->materials, false);
 
 	return true;
 }

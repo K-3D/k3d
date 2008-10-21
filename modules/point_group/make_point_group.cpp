@@ -24,12 +24,15 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/imaterial.h>
+#include <k3dsdk/hints.h>
+#include <k3dsdk/material_sink.h>
+#include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/point_group.h>
 
-#include <iterator>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -41,14 +44,17 @@ namespace point_group
 // make_point_group
 
 class make_point_group :
-	public k3d::mesh_modifier<k3d::node >
+	public k3d::material_sink<k3d::mesh_modifier<k3d::node> >
 {
-	typedef k3d::mesh_modifier<k3d::node > base;
+	typedef k3d::material_sink<k3d::mesh_modifier<k3d::node> > base;
 
 public:
 	make_point_group(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document)
+		base(Factory, Document),
+		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Controls the width of the output points.")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
+		m_material.changed_signal().connect(make_reset_mesh_slot());
+		m_width.changed_signal().connect(make_reset_mesh_slot());
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -56,19 +62,22 @@ public:
 		if(!k3d::validate_points(Input))
 			return;
 
-		const size_t point_count = Input.points->size();
+		const k3d::uint_t point_count = Input.points->size();
 
 		Output.points = Input.points;
 		Output.point_selection = Input.point_selection;
 		Output.vertex_data = Input.vertex_data;
 
-		k3d::mesh::point_groups_t& point_groups = Output.point_groups.create();
-		k3d::mesh::indices_t& first_points = point_groups.first_points.create(new k3d::mesh::indices_t(1, 0));
-		k3d::mesh::counts_t& point_counts = point_groups.point_counts.create(new k3d::mesh::counts_t(1, point_count));
-		k3d::mesh::materials_t& materials = point_groups.materials.create(new k3d::mesh::materials_t(1, static_cast<k3d::imaterial*>(0)));
-		k3d::mesh::indices_t& points = point_groups.points.create(new k3d::mesh::indices_t(point_count));
-		for(size_t i = 0; i != point_count; ++i)
-			points[i] = i;
+		boost::scoped_ptr<k3d::point_group::primitive> primitive(k3d::point_group::create(Output));
+		k3d::typed_array<k3d::double_t>& width = primitive->constant_data.create<k3d::typed_array<k3d::double_t> >("constantwidth");
+
+		primitive->first_points.push_back(0);
+		primitive->point_counts.push_back(point_count);
+		primitive->materials.push_back(m_material.pipeline_value());
+		primitive->points.assign(point_count, 0);
+		for(k3d::uint_t i = 0; i != point_count; ++i)
+			primitive->points[i] = i;
+		width.push_back(m_width.pipeline_value());
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -88,6 +97,8 @@ public:
 
 		return factory;
 	}
+
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_width;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -101,5 +112,4 @@ k3d::iplugin_factory& make_point_group_factory()
 } // namespace point_group
 
 } // namespace module
-
 

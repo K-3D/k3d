@@ -33,6 +33,7 @@
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/inode_collection.h>
+#include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/serialization_xml.h>
@@ -49,14 +50,21 @@ namespace libk3dk3dio
 
 /////////////////////////////////////////////////////////////////////////////
 // k3d_document_importer
+	
+static void node_execution(k3d::inode& Node, const k3d::string_t& Task, k3d::double_t Time)
+{
+	k3d::log() << debug << Node.name() << " " << Task << " " << Time << std::endl;
+}
 
 class k3d_document_importer :
 	public k3d::idocument_importer
 {
 public:
-	bool read_file(k3d::idocument& Document, const k3d::filesystem::path& FilePath)
+	k3d::bool_t read_file(k3d::idocument& Document, const k3d::filesystem::path& FilePath)
 	{
 		k3d::log() << info << "Reading " << FilePath.native_console_string() << " using " << get_factory().name() << std::endl;
+
+		sigc::connection connection = Document.pipeline_profiler().connect_node_execution_signal(sigc::ptr_fun(&node_execution));
 
 		k3d::xml::element xml("k3dml");
 		try
@@ -105,7 +113,7 @@ public:
 					if(xml_node->name != "node")
 						continue;
 
-					if(k3d::xml::attribute_value<bool>(*xml_node, "do_not_load", false))
+					if(k3d::xml::attribute_value<k3d::bool_t>(*xml_node, "do_not_load", false))
 						continue;
 
 					const std::string name = k3d::xml::attribute_text(*xml_node, "name");
@@ -171,6 +179,8 @@ public:
 			// Load the DAG ...
 			k3d::xml::load_pipeline(Document, *xml_document, context);
 		}
+
+		connection.disconnect();
 
 		return true;
 	}

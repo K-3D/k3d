@@ -174,18 +174,12 @@ namespace module
 		{
 			try
 			{
-				k3d::mesh::indices_t *point_group_points = 0;
 				k3d::mesh::indices_t *linear_curve_points = 0;
 				k3d::mesh::indices_t *cubic_curve_points = 0;
 				k3d::mesh::indices_t *bilinear_patch_points = 0;
 				k3d::mesh::indices_t *bicubic_patch_points = 0;
 				k3d::mesh::indices_t *nurbs_patch_points = 0;
 				k3d::mesh::indices_t *polyhedra_edge_points = 0;
-
-				if (m_instance->point_groups)
-				{
-					point_group_points = &m_instance->point_groups.writable().points.writable();
-				}
 
 				if (m_instance->linear_curve_groups)
 				{
@@ -222,7 +216,7 @@ namespace module
 				//look for unused points
 				for (k3d::uint_t i = 0; i < mesh_points->size(); i++)
 				{
-					is_used.at(i) = find_point_inside(point_group_points, i) || find_point_inside(linear_curve_points, i) || find_point_inside(cubic_curve_points, i) ||
+					is_used.at(i) = find_point_inside(linear_curve_points, i) || find_point_inside(cubic_curve_points, i) ||
 					                find_point_inside(bilinear_patch_points, i) || find_point_inside(bicubic_patch_points, i) || find_point_inside(nurbs_patch_points, i) ||
 					                find_point_inside(polyhedra_edge_points, i) || find_point_inside(curve_points, i);
 				}
@@ -238,7 +232,6 @@ namespace module
 						k3d::mesh::selection_t::iterator sel_loc = point_selection->begin() + i;
 						point_selection->erase(sel_loc);
 
-						offset_all_after(point_group_points, i, -1);
 						offset_all_after(linear_curve_points, i, -1);
 						offset_all_after(cubic_curve_points, i, -1);
 						offset_all_after(bilinear_patch_points, i, -1);
