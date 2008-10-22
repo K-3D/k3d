@@ -638,6 +638,9 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 		point_map[RHS.points[i]] = i;
 	}
 
+	// Convert primitives ...
+	primitives = RHS.primitives;
+
 	// Convert linear curves ...
 	if(RHS.linear_curve_groups.size())
 	{

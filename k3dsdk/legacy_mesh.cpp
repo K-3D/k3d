@@ -568,6 +568,8 @@ mesh::~mesh()
 /** \todo support all gprims */
 mesh& mesh::operator=(const k3d::mesh& Mesh)
 {
+	primitives = Mesh.primitives;
+
 	if(Mesh.points && Mesh.point_selection)
 	{
 		const k3d::mesh::points_t& new_points = *Mesh.points;

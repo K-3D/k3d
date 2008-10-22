@@ -22,6 +22,7 @@
 
 #include "algebra.h"
 #include "bounding_box3.h"
+#include "mesh.h"
 #include "selectable.h"
 #include "utility.h"
 
@@ -38,7 +39,6 @@ namespace k3d
 {
 
 class imaterial;
-class mesh;
 
 namespace legacy
 {
@@ -664,7 +664,9 @@ public:
 
 	/// Conversion from a new mesh to a legacy mesh
 	mesh& operator=(const k3d::mesh& RHS);
-	
+
+	k3d::mesh::primitives_t primitives;
+
 private:
 	mesh(const mesh& RHS);
 	mesh& operator=(const mesh& RHS);
