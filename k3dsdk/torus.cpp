@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-200 7, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -39,7 +39,8 @@ const_primitive::const_primitive(
 	const typed_array<double_t>& SweepAngles,
 	const attribute_arrays& ConstantData,
 	const attribute_arrays& UniformData,
-	const attribute_arrays& VaryingData) :
+	const attribute_arrays& VaryingData
+		) :
 	matrices(Matrices),
 	materials(Materials),
 	major_radii(MajorRadii),
@@ -66,7 +67,8 @@ primitive::primitive(
 	typed_array<double_t>& SweepAngles,
 	attribute_arrays& ConstantData,
 	attribute_arrays& UniformData,
-	attribute_arrays& VaryingData) :
+	attribute_arrays& VaryingData
+		) :
 	matrices(Matrices),
 	materials(Materials),
 	major_radii(MajorRadii),
@@ -87,7 +89,7 @@ primitive* create(mesh& Mesh)
 {
 	mesh::primitive& generic_primitive = Mesh.primitives.create("torus");
 
-	return new primitive(
+	primitive* const result = new primitive(
 		generic_primitive.topology.create<typed_array<matrix4> >("matrices"),
 		generic_primitive.topology.create<typed_array<imaterial*> >("materials"),
 		generic_primitive.topology.create<typed_array<double_t> >("major_radii"),
@@ -97,113 +99,93 @@ primitive* create(mesh& Mesh)
 		generic_primitive.topology.create<typed_array<double_t> >("sweep_angles"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
-		generic_primitive.attributes["varying"]);
+		generic_primitive.attributes["varying"]
+		);
+
+	return result;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
-const_primitive* validate(const mesh::primitive& GenericPrimitive)
+const_primitive* validate(const mesh::primitive& Primitive)
 {
-	if(GenericPrimitive.type != "torus")
+	if(Primitive.type != "torus")
 		return 0;
 
-	require_const_array(GenericPrimitive, matrices, typed_array<matrix4>);
-	require_const_array(GenericPrimitive, materials, typed_array<imaterial*>);
-	require_const_array(GenericPrimitive, major_radii, typed_array<double_t>);
-	require_const_array(GenericPrimitive, minor_radii, typed_array<double_t>);
-	require_const_array(GenericPrimitive, phi_min, typed_array<double_t>);
-	require_const_array(GenericPrimitive, phi_max, typed_array<double_t>);
-	require_const_array(GenericPrimitive, sweep_angles, typed_array<double_t>);
-
-	require_const_attribute_arrays(GenericPrimitive, constant);
-	require_const_attribute_arrays(GenericPrimitive, uniform);
-	require_const_attribute_arrays(GenericPrimitive, varying);
-
-	if(!(
-		matrices->size() == materials->size()
-		&& matrices->size() == major_radii->size()
-		&& matrices->size() == minor_radii->size()
-		&& matrices->size() == phi_min->size()
-		&& matrices->size() == phi_max->size()
-		&& matrices->size() == sweep_angles->size()
-		))
+	try
 	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive array-length mismatch" << std::endl;
-		return 0;
+		const typed_array<matrix4>& matrices = require_const_array<typed_array<matrix4> >(Primitive, "matrices");
+		const typed_array<imaterial*>& materials = require_const_array<typed_array<imaterial*> >(Primitive, "materials");
+		const typed_array<double_t>& major_radii = require_const_array<typed_array<double_t> >(Primitive, "major_radii");
+		const typed_array<double_t>& minor_radii = require_const_array<typed_array<double_t> >(Primitive, "minor_radii");
+		const typed_array<double_t>& phi_min = require_const_array<typed_array<double_t> >(Primitive, "phi_min");
+		const typed_array<double_t>& phi_max = require_const_array<typed_array<double_t> >(Primitive, "phi_max");
+		const typed_array<double_t>& sweep_angles = require_const_array<typed_array<double_t> >(Primitive, "sweep_angles");
+
+		const attribute_arrays& constant_data = require_const_attribute_arrays(Primitive, "constant");
+		const attribute_arrays& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
+		const attribute_arrays& varying_data = require_const_attribute_arrays(Primitive, "varying");
+
+		require_array_size(Primitive, materials, "materials", matrices.size());
+		require_array_size(Primitive, major_radii, "major_radii", matrices.size());
+		require_array_size(Primitive, minor_radii, "minor_radii", matrices.size());
+		require_array_size(Primitive, phi_min, "phi_min", matrices.size());
+		require_array_size(Primitive, phi_max, "phi_max", matrices.size());
+		require_array_size(Primitive, sweep_angles, "sweep_angles", matrices.size());
+
+		require_attribute_arrays_size(Primitive, constant_data, "constant", matrices.size());
+		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
+		require_attribute_arrays_size(Primitive, varying_data, "varying", matrices.size() * 4);
+
+		return new const_primitive(matrices, materials, major_radii, minor_radii, phi_min, phi_max, sweep_angles, constant_data, uniform_data, varying_data);
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
 	}
 
-	if(!constant_data->match_size(matrices->size()))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per torus" << std::endl;
-		return 0;
-	}
-
-	if(!uniform_data->match_size(matrices->size()))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per torus" << std::endl;
-		return 0;
-	}
-
-	if(!varying_data->match_size(matrices->size() * 4))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] varying attributes must contain four values per torus" << std::endl;
-		return 0;
-	}
-
-	return new const_primitive(*matrices, *materials, *major_radii, *minor_radii, *phi_min, *phi_max, *sweep_angles, *constant_data, *uniform_data, *varying_data);
+	return 0;
 }
 
-primitive* validate(mesh::primitive& GenericPrimitive)
+primitive* validate(mesh::primitive& Primitive)
 {
-	if(GenericPrimitive.type != "torus")
+	if(Primitive.type != "torus")
 		return 0;
 
-	require_array(GenericPrimitive, matrices, typed_array<matrix4>);
-	require_array(GenericPrimitive, materials, typed_array<imaterial*>);
-	require_array(GenericPrimitive, major_radii, typed_array<double_t>);
-	require_array(GenericPrimitive, minor_radii, typed_array<double_t>);
-	require_array(GenericPrimitive, phi_min, typed_array<double_t>);
-	require_array(GenericPrimitive, phi_max, typed_array<double_t>);
-	require_array(GenericPrimitive, sweep_angles, typed_array<double_t>);
-
-	require_attribute_arrays(GenericPrimitive, constant);
-	require_attribute_arrays(GenericPrimitive, uniform);
-	require_attribute_arrays(GenericPrimitive, varying);
-
-
-	if(!(
-		matrices->size() == materials->size()
-		&& matrices->size() == major_radii->size()
-		&& matrices->size() == minor_radii->size()
-		&& matrices->size() == phi_min->size()
-		&& matrices->size() == phi_max->size()
-		&& matrices->size() == sweep_angles->size()
-		))
+	try
 	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive array-length mismatch" << std::endl;
-		return 0;
+		typed_array<matrix4>& matrices = require_array<typed_array<matrix4> >(Primitive, "matrices");
+		typed_array<imaterial*>& materials = require_array<typed_array<imaterial*> >(Primitive, "materials");
+		typed_array<double_t>& major_radii = require_array<typed_array<double_t> >(Primitive, "major_radii");
+		typed_array<double_t>& minor_radii = require_array<typed_array<double_t> >(Primitive, "minor_radii");
+		typed_array<double_t>& phi_min = require_array<typed_array<double_t> >(Primitive, "phi_min");
+		typed_array<double_t>& phi_max = require_array<typed_array<double_t> >(Primitive, "phi_max");
+		typed_array<double_t>& sweep_angles = require_array<typed_array<double_t> >(Primitive, "sweep_angles");
+
+		attribute_arrays& constant_data = require_attribute_arrays(Primitive, "constant");
+		attribute_arrays& uniform_data = require_attribute_arrays(Primitive, "uniform");
+		attribute_arrays& varying_data = require_attribute_arrays(Primitive, "varying");
+
+		require_array_size(Primitive, materials, "materials", matrices.size());
+		require_array_size(Primitive, major_radii, "major_radii", matrices.size());
+		require_array_size(Primitive, minor_radii, "minor_radii", matrices.size());
+		require_array_size(Primitive, phi_min, "phi_min", matrices.size());
+		require_array_size(Primitive, phi_max, "phi_max", matrices.size());
+		require_array_size(Primitive, sweep_angles, "sweep_angles", matrices.size());
+
+		require_attribute_arrays_size(Primitive, constant_data, "constant", matrices.size());
+		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
+		require_attribute_arrays_size(Primitive, varying_data, "varying", matrices.size() * 4);
+
+		return new primitive(matrices, materials, major_radii, minor_radii, phi_min, phi_max, sweep_angles, constant_data, uniform_data, varying_data);
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
 	}
 
-	if(!constant_data->match_size(matrices->size()))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per torus" << std::endl;
-		return 0;
-	}
-
-	if(!uniform_data->match_size(matrices->size()))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per torus" << std::endl;
-		return 0;
-	}
-
-	if(!varying_data->match_size(matrices->size() * 4))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] varying attributes must contain four values per torus" << std::endl;
-		return 0;
-	}
-
-	return new primitive(*matrices, *materials, *major_radii, *minor_radii, *phi_min, *phi_max, *sweep_angles, *constant_data, *uniform_data, *varying_data);
+	return 0;
 }
 
 } // namespace torus

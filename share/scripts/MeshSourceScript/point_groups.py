@@ -7,18 +7,20 @@ k3d.check_node_environment(locals(), "MeshSourceScript")
 points = Output.create_points()
 point_selection = Output.create_point_selection()
 
-# Perform required one-time setup to store point groups in the mesh ...
-point_groups = Output.create_point_groups()
-first_points = point_groups.create_first_points()
-point_counts = point_groups.create_point_counts()
-materials = point_groups.create_materials()
-group_points = point_groups.create_points()
+# Construct a point group mesh primitive ...
+point_groups = Output.primitives().create("point_group")
+first_points = point_groups.topology().create("first_points", "k3d::uint_t")
+point_counts = point_groups.topology().create("point_counts", "k3d::uint_t")
+materials = point_groups.topology().create("materials", "k3d::imaterial*")
+group_points = point_groups.topology().create("points", "k3d::uint_t")
+constant = point_groups.attributes().create("constant")
+varying = point_groups.attributes().create("varying")
 
 # Create an (optional) array to store per-group point widths
-constantwidth = point_groups.writable_constant_data().create("constantwidth", "k3d::double_t")
+constantwidth = constant.create("constantwidth", "k3d::double_t")
 
 # Create an (optional) array to store per-point point colors
-Cs = point_groups.writable_varying_data().create("Cs", "k3d::color")
+Cs = varying.create("Cs", "k3d::color")
 
 # Create two point groups ...
 for i in range(2):

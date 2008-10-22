@@ -20,47 +20,60 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "mesh.h"
+
+#include <sstream>
+#include <stdexcept>
+
 namespace k3d
 {
 
 //@{
 
-/// Helper macros for use with in mesh primitive validate() functions only!
+/// Helper methods for use with in mesh primitive validate() functions only!
 
-#define require_const_array(Primitive, Name, Type) \
-	const Type* const Name = Primitive.topology.lookup< Type >(#Name); \
-	if(!Name) \
-	{ \
-		log() << error << "[" << Primitive.type << "] primitive missing [" << #Name << "] array" << std::endl; \
-		return 0; \
-	}
+template<typename ArrayT>
+const ArrayT& require_const_array(const mesh::primitive& Primitive, const string_t& Name)
+{
+	const ArrayT* const array = Primitive.topology.lookup<ArrayT>(Name);
 
-#define require_array(Primitive, Name, Type) \
-	Type* const Name = Primitive.topology.writable< Type >(#Name); \
-	if(!Name) \
-	{ \
-		log() << error << "[" << Primitive.type << "] primitive missing [" << #Name << "] array" << std::endl; \
-		return 0; \
-	}
+	if(!array)
+		throw std::runtime_error("[" + Primitive.type + "] primitive missing array [" + Name + "]");
 
-#define require_const_attribute_arrays(Primitive, Name) \
-	const attribute_arrays* const Name##_data = Primitive.attributes.lookup(#Name); \
-	if(!Name##_data) \
-	{ \
-		log() << error << "[" << Primitive.type << "] primitive missing [" << #Name << "] attribute data" << std::endl; \
-		return 0; \
-	}
+	return *array;
+}
 
-#define require_attribute_arrays(Primitive, Name) \
-	attribute_arrays* const Name##_data = Primitive.attributes.writable(#Name); \
-	if(!Name##_data) \
-	{ \
-		log() << error << "[" << Primitive.type << "] primitive missing [" << #Name << "] attribute data" << std::endl; \
-		return 0; \
+template<typename ArrayT>
+ArrayT& require_array(mesh::primitive& Primitive, const string_t& Name)
+{
+	ArrayT* const array = Primitive.topology.writable<ArrayT>(Name);
+
+	if(!array)
+		throw std::runtime_error("[" + Primitive.type + "] primitive missing array [" + Name + "]");
+
+	return *array;
+}
+
+const attribute_arrays& require_const_attribute_arrays(const mesh::primitive& Primitive, const string_t& Name);
+
+attribute_arrays& require_attribute_arrays(mesh::primitive& Primitive, const string_t& Name);
+
+template<typename ArrayT>
+void require_array_size(const mesh::primitive& Primitive, const ArrayT& Array, const string_t& ArrayName, const uint_t Reference)
+{
+	if(Array.size() != Reference)
+	{
+		std::ostringstream buffer;
+		buffer << "[" << Primitive.type << "] primitive [" << ArrayName << "] incorrect array length [" << Array.size() << "], expected [" << Reference << "]";
+		throw std::runtime_error(buffer.str());
 	}
+}
+
+void require_attribute_arrays_size(const mesh::primitive& Primitive, const attribute_arrays& Attributes, const string_t& AttributesName, const uint_t Reference);
 
 //@}
 
 } // namespace k3d
 
 #endif // !K3DSDK_PRIMITIVE_DETAIL_H
+

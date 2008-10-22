@@ -73,8 +73,6 @@ public:
 			if(!point_group)
 				continue;
 
-			
-
 			const k3d::uint_t point_group_begin = 0;
 			const k3d::uint_t point_group_end = point_group_begin + point_group->first_points.size();
 			for(k3d::uint_t point_group_index = point_group_begin; point_group_index != point_group_end; ++point_group_index)

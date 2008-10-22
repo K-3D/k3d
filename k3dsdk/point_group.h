@@ -33,18 +33,18 @@ class const_primitive
 {
 public:
 	const_primitive(
-		const typed_array<uint_t>& FirstPoints,
-		const typed_array<uint_t>& PointCounts,
+		const uint_t_array& FirstPoints,
+		const uint_t_array& PointCounts,
 		const typed_array<imaterial*>& Materials,
-		const typed_array<uint_t>& Points,
+		const uint_t_array& Points,
 		const attribute_arrays& ConstantData,
 		const attribute_arrays& VaryingData
 		);
 
-	const typed_array<uint_t>& first_points;
-	const typed_array<uint_t>& point_counts;
+	const uint_t_array& first_points;
+	const uint_t_array& point_counts;
 	const typed_array<imaterial*>& materials;
-	const typed_array<uint_t>& points;
+	const uint_t_array& points;
 	const attribute_arrays& constant_data;
 	const attribute_arrays& varying_data;
 };
@@ -54,18 +54,18 @@ class primitive
 {
 public:
 	primitive(
-		typed_array<uint_t>& FirstPoints,
-		typed_array<uint_t>& PointCounts,
+		uint_t_array& FirstPoints,
+		uint_t_array& PointCounts,
 		typed_array<imaterial*>& Materials,
-		typed_array<uint_t>& Points,
+		uint_t_array& Points,
 		attribute_arrays& ConstantData,
 		attribute_arrays& VaryingData
 		);
 
-	typed_array<uint_t>& first_points;
-	typed_array<uint_t>& point_counts;
+	uint_t_array& first_points;
+	uint_t_array& point_counts;
 	typed_array<imaterial*>& materials;
-	typed_array<uint_t>& points;
+	uint_t_array& points;
 	attribute_arrays& constant_data;
 	attribute_arrays& varying_data;
 };

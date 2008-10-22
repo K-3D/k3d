@@ -33,7 +33,8 @@ const_primitive::const_primitive(
 	const typed_array<matrix4>& Matrices,
 	const typed_array<imaterial*>& Materials,
 	const attribute_arrays& ConstantData,
-	const attribute_arrays& UniformData) :
+	const attribute_arrays& UniformData
+		) :
 	matrices(Matrices),
 	materials(Materials),
 	constant_data(ConstantData),
@@ -48,7 +49,8 @@ primitive::primitive(
 	typed_array<matrix4>& Matrices,
 	typed_array<imaterial*>& Materials,
 	attribute_arrays& ConstantData,
-	attribute_arrays& UniformData) :
+	attribute_arrays& UniformData
+		) :
 	matrices(Matrices),
 	materials(Materials),
 	constant_data(ConstantData),
@@ -63,78 +65,73 @@ primitive* create(mesh& Mesh)
 {
 	mesh::primitive& generic_primitive = Mesh.primitives.create("teapot");
 
-	return new primitive(
+	primitive* const result = new primitive(
 		generic_primitive.topology.create<typed_array<matrix4> >("matrices"),
 		generic_primitive.topology.create<typed_array<imaterial*> >("materials"),
 		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["uniform"]);
+		generic_primitive.attributes["uniform"]
+		);
+
+	return result;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
-const_primitive* validate(const mesh::primitive& GenericPrimitive)
+const_primitive* validate(const mesh::primitive& Primitive)
 {
-	if(GenericPrimitive.type != "teapot")
+	if(Primitive.type != "teapot")
 		return 0;
 
-	require_const_array(GenericPrimitive, matrices, typed_array<matrix4>);
-	require_const_array(GenericPrimitive, materials, typed_array<imaterial*>);
-
-	require_const_attribute_arrays(GenericPrimitive, constant);
-	require_const_attribute_arrays(GenericPrimitive, uniform);
-
-	if(matrices->size() != materials->size())
+	try
 	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive array-length mismatch" << std::endl;
-		return 0;
+		const typed_array<matrix4>& matrices = require_const_array<typed_array<matrix4> >(Primitive, "matrices");
+		const typed_array<imaterial*>& materials = require_const_array<typed_array<imaterial*> >(Primitive, "materials");
+
+		const attribute_arrays& constant_data = require_const_attribute_arrays(Primitive, "constant");
+		const attribute_arrays& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
+
+		require_array_size(Primitive, materials, "materials", matrices.size());
+
+		require_attribute_arrays_size(Primitive, constant_data, "constant", matrices.size());
+		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
+
+		return new const_primitive(matrices, materials, constant_data, uniform_data);
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
 	}
 
-	if(!constant_data->match_size(matrices->size()))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per teapot" << std::endl;
-		return 0;
-	}
-
-	if(!uniform_data->match_size(matrices->size()))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per teapot" << std::endl;
-		return 0;
-	}
-
-	return new const_primitive(*matrices, *materials, *constant_data, *uniform_data);
+	return 0;
 }
 
-primitive* validate(mesh::primitive& GenericPrimitive)
+primitive* validate(mesh::primitive& Primitive)
 {
-	if(GenericPrimitive.type != "teapot")
+	if(Primitive.type != "teapot")
 		return 0;
 
-	require_array(GenericPrimitive, matrices, typed_array<matrix4>);
-	require_array(GenericPrimitive, materials, typed_array<imaterial*>);
-
-	require_attribute_arrays(GenericPrimitive, constant);
-	require_attribute_arrays(GenericPrimitive, uniform);
-
-	if(matrices->size() != materials->size())
+	try
 	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive array-length mismatch" << std::endl;
-		return 0;
+		typed_array<matrix4>& matrices = require_array<typed_array<matrix4> >(Primitive, "matrices");
+		typed_array<imaterial*>& materials = require_array<typed_array<imaterial*> >(Primitive, "materials");
+
+		attribute_arrays& constant_data = require_attribute_arrays(Primitive, "constant");
+		attribute_arrays& uniform_data = require_attribute_arrays(Primitive, "uniform");
+
+		require_array_size(Primitive, materials, "materials", matrices.size());
+
+		require_attribute_arrays_size(Primitive, constant_data, "constant", matrices.size());
+		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
+
+		return new primitive(matrices, materials, constant_data, uniform_data);
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
 	}
 
-	if(!constant_data->match_size(matrices->size()))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per teapot" << std::endl;
-		return 0;
-	}
-
-	if(!uniform_data->match_size(matrices->size()))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] uniform attributes must contain one value per teapot" << std::endl;
-		return 0;
-	}
-
-	return new primitive(*matrices, *materials, *constant_data, *uniform_data);
+	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

@@ -32,13 +32,13 @@ namespace point_group
 // const_primitive
 
 const_primitive::const_primitive(
-	const typed_array<uint_t>& FirstPoints,
-	const typed_array<uint_t>& PointCounts,
+	const uint_t_array& FirstPoints,
+	const uint_t_array& PointCounts,
 	const typed_array<imaterial*>& Materials,
-	const typed_array<uint_t>& Points,
+	const uint_t_array& Points,
 	const attribute_arrays& ConstantData,
 	const attribute_arrays& VaryingData
-	) :
+		) :
 	first_points(FirstPoints),
 	point_counts(PointCounts),
 	materials(Materials),
@@ -52,13 +52,13 @@ const_primitive::const_primitive(
 // primitive
 
 primitive::primitive(
-	typed_array<uint_t>& FirstPoints,
-	typed_array<uint_t>& PointCounts,
+	uint_t_array& FirstPoints,
+	uint_t_array& PointCounts,
 	typed_array<imaterial*>& Materials,
-	typed_array<uint_t>& Points,
+	uint_t_array& Points,
 	attribute_arrays& ConstantData,
 	attribute_arrays& VaryingData
-	) :
+		) :
 	first_points(FirstPoints),
 	point_counts(PointCounts),
 	materials(Materials),
@@ -75,90 +75,83 @@ primitive* create(mesh& Mesh)
 {
 	mesh::primitive& generic_primitive = Mesh.primitives.create("point_group");
 
-	return new primitive(
-		generic_primitive.topology.create<typed_array<uint_t> >("first_points"),
-		generic_primitive.topology.create<typed_array<uint_t> >("point_counts"),
+	primitive* const result = new primitive(
+		generic_primitive.topology.create<uint_t_array >("first_points"),
+		generic_primitive.topology.create<uint_t_array >("point_counts"),
 		generic_primitive.topology.create<typed_array<imaterial*> >("materials"),
-		generic_primitive.topology.create<typed_array<uint_t> >("points"),
+		generic_primitive.topology.create<uint_t_array >("points"),
 		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["varying"]);
+		generic_primitive.attributes["varying"]
+		);
+
+	result->points.set_metadata_value("k3d:mesh-point-indices", "true");
+
+	return result;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
-const_primitive* validate(const mesh::primitive& GenericPrimitive)
+const_primitive* validate(const mesh::primitive& Primitive)
 {
-	if(GenericPrimitive.type != "point_group")
+	if(Primitive.type != "point_group")
 		return 0;
 
-	require_const_array(GenericPrimitive, first_points, typed_array<uint_t>);
-	require_const_array(GenericPrimitive, point_counts, typed_array<uint_t>);
-	require_const_array(GenericPrimitive, materials, typed_array<imaterial*>);
-	require_const_array(GenericPrimitive, points, typed_array<uint_t>);
-
-	require_const_attribute_arrays(GenericPrimitive, constant);
-	require_const_attribute_arrays(GenericPrimitive, varying);
-
-	if(!(
-		first_points->size() == point_counts->size()
-		&& first_points->size() == materials->size()
-		))
+	try
 	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive array-length mismatch" << std::endl;
-		return 0;
+		const uint_t_array& first_points = require_const_array<uint_t_array >(Primitive, "first_points");
+		const uint_t_array& point_counts = require_const_array<uint_t_array >(Primitive, "point_counts");
+		const typed_array<imaterial*>& materials = require_const_array<typed_array<imaterial*> >(Primitive, "materials");
+		const uint_t_array& points = require_const_array<uint_t_array >(Primitive, "points");
+
+		const attribute_arrays& constant_data = require_const_attribute_arrays(Primitive, "constant");
+		const attribute_arrays& varying_data = require_const_attribute_arrays(Primitive, "varying");
+
+		require_array_size(Primitive, point_counts, "point_counts", first_points.size());
+		require_array_size(Primitive, materials, "materials", first_points.size());
+
+		require_attribute_arrays_size(Primitive, constant_data, "constant", first_points.size());
+		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(point_counts.begin(), point_counts.end(), 0));
+
+		return new const_primitive(first_points, point_counts, materials, points, constant_data, varying_data);
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
 	}
 
-	if(!constant_data->match_size(first_points->size()))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per point_group" << std::endl;
-		return 0;
-	}
-
-	if(!varying_data->match_size(std::accumulate(point_counts->begin(), point_counts->end(), 0)))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] varying attributes must contain one value per point" << std::endl;
-		return 0;
-	}
-
-	return new const_primitive(*first_points, *point_counts, *materials, *points, *constant_data, *varying_data);
+	return 0;
 }
 
-primitive* validate(mesh::primitive& GenericPrimitive)
+primitive* validate(mesh::primitive& Primitive)
 {
-	if(GenericPrimitive.type != "point_group")
+	if(Primitive.type != "point_group")
 		return 0;
 
-	require_array(GenericPrimitive, first_points, typed_array<uint_t>);
-	require_array(GenericPrimitive, point_counts, typed_array<uint_t>);
-	require_array(GenericPrimitive, materials, typed_array<imaterial*>);
-	require_array(GenericPrimitive, points, typed_array<uint_t>);
-
-	require_attribute_arrays(GenericPrimitive, constant);
-	require_attribute_arrays(GenericPrimitive, varying);
-
-	if(!(
-		first_points->size() == point_counts->size()
-		&& first_points->size() == materials->size()
-		))
+	try
 	{
-		log() << error << "[" << GenericPrimitive.type << "] primitive array-length mismatch" << std::endl;
-		return 0;
+		uint_t_array& first_points = require_array<uint_t_array >(Primitive, "first_points");
+		uint_t_array& point_counts = require_array<uint_t_array >(Primitive, "point_counts");
+		typed_array<imaterial*>& materials = require_array<typed_array<imaterial*> >(Primitive, "materials");
+		uint_t_array& points = require_array<uint_t_array >(Primitive, "points");
+
+		attribute_arrays& constant_data = require_attribute_arrays(Primitive, "constant");
+		attribute_arrays& varying_data = require_attribute_arrays(Primitive, "varying");
+
+		require_array_size(Primitive, point_counts, "point_counts", first_points.size());
+		require_array_size(Primitive, materials, "materials", first_points.size());
+
+		require_attribute_arrays_size(Primitive, constant_data, "constant", first_points.size());
+		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(point_counts.begin(), point_counts.end(), 0));
+
+		return new primitive(first_points, point_counts, materials, points, constant_data, varying_data);
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
 	}
 
-	if(!constant_data->match_size(first_points->size()))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] constant attributes must contain one value per point_group" << std::endl;
-		return 0;
-	}
-
-	if(!varying_data->match_size(std::accumulate(point_counts->begin(), point_counts->end(), 0)))
-	{
-		log() << error << "[" << GenericPrimitive.type << "] varying attributes must contain one value per point" << std::endl;
-		return 0;
-	}
-
-	return new primitive(*first_points, *point_counts, *materials, *points, *constant_data, *varying_data);
+	return 0;
 }
 
 } // namespace point_group
