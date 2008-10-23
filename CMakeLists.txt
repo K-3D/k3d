@@ -497,6 +497,3 @@ MARK_AS_ADVANCED(CMAKE_USE_CHRPATH)
 MARK_AS_ADVANCED(EXECUTABLE_OUTPUT_PATH)
 MARK_AS_ADVANCED(LIBRARY_OUTPUT_PATH)
 
-# Test to ensure that none of our filenames exceed 90 characters in length (causes portability issues with tar)
-INCLUDE(K3DCheckFilenames)
-

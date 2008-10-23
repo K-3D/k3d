@@ -1,0 +1,23 @@
+# Test to ensure that none of our filenames exceed 90 characters in length (causes portability issues with tar)
+
+FILE(GLOB_RECURSE ALL_SOURCE_FILES *)
+
+SET(REPORT_ERROR 0)
+SET(MAX_LENGTH 90)
+
+FOREACH(SOURCE_FILE ${ALL_SOURCE_FILES})
+	IF(NOT SOURCE_FILE MATCHES ".*/[.]svn/.*")
+		FILE(RELATIVE_PATH SOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCE_FILE})
+		STRING(LENGTH ${SOURCE_FILE} FILENAME_LENGTH)
+
+		IF(FILENAME_LENGTH GREATER ${MAX_LENGTH})
+			SET(REPORT_ERROR 1)
+			MESSAGE("File too long [${FILENAME_LENGTH} chars] ${SOURCE_FILE}")
+		ENDIF()
+	ENDIF()
+ENDFOREACH()
+
+IF(REPORT_ERROR)
+	MESSAGE(SEND_ERROR "Filenames longer than ${MAX_LENGTH} characters cause portability problems with tar.")
+ENDIF(REPORT_ERROR)
+
