@@ -1314,6 +1314,69 @@ void upgrade_node_selection(element& XMLDocument)
 	}
 }
 
+/// Inserts a SelectCompanion modifier before old Delete nodes
+void upgrade_delete_components_nodes(element& XMLDocument)
+{
+	element* const xml_nodes = find_element(XMLDocument, "nodes");
+	if(!xml_nodes)
+		return;
+	
+	element* const xml_dependencies = find_element(XMLDocument, "dependencies");
+	if(!xml_dependencies)
+		return;
+	
+	ipersistent_lookup::id_type next_id = max_node_id(XMLDocument) + 1;
+	k3d::uint_t sequence = 1;
+	
+	element::elements_t new_nodes;
+	for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
+	{
+		if(xml_node->name != "node")
+			continue;
+
+		const uuid node_factory_id = attribute_value<uuid>(*xml_node, "factory", uuid::null());
+		if(node_factory_id != uuid(0xc98c37d5, 0xa50c43c7, 0xb88c3687, 0x73cd3c4d)) // Old Delete ID
+			continue;
+
+		const ipersistent_lookup::id_type node_id = attribute_value<ipersistent_lookup::id_type>(*xml_node, "id", 0);
+		if(!node_id)
+			continue;
+		
+		// Upgrade the factory attribute
+		set_attribute(*xml_node, attribute("factory", string_cast(plugin::factory::lookup("Delete")->factory_id())));
+		
+		element select_companion("node",
+				attribute("name", "Select Companion " + string_cast(sequence)),
+				attribute("factory", plugin::factory::lookup("SelectCompanion")->factory_id()),
+				attribute("id", next_id),
+				element("properties",
+						element("property", "true", attribute("name", "keep_original_selection"))));
+		new_nodes.push_back(select_companion);
+		
+		element::elements_t new_dependencies;
+		for(element::elements_t::iterator xml_dependency = xml_dependencies->children.begin(); xml_dependency != xml_dependencies->children.end(); ++xml_dependency)
+		{
+			if(attribute_value<ipersistent_lookup::id_type>(*xml_dependency, "to_node", 0) == node_id
+					&& attribute_value<string_t>(*xml_dependency, "to_property", "") == "input_mesh")
+			{
+				ipersistent_lookup::id_type from_node = attribute_value<ipersistent_lookup::id_type>(*xml_dependency, "from_node", 0);
+				element new_dependency("dependency",
+						attribute("from_node", string_cast(from_node)),
+						attribute("from_property", "output_mesh"),
+						attribute("to_node", string_cast(next_id)),
+						attribute("to_property", "input_mesh"));
+				new_dependencies.push_back(new_dependency);
+				set_attribute(*xml_dependency, attribute("from_node", string_cast(next_id)));
+			}
+		}
+		xml_dependencies->children.insert(xml_dependencies->children.end(), new_dependencies.begin(), new_dependencies.end());
+		
+		++sequence;
+		++next_id;
+	}
+	xml_nodes->children.insert(xml_nodes->children.end(), new_nodes.begin(), new_nodes.end());
+}
+
 /// Helper functor for searching for shaders by name
 struct same_name
 {
@@ -1357,6 +1420,7 @@ void upgrade_document(element& XMLDocument)
 	detail::upgrade_transformable_nodes(XMLDocument);
 	detail::upgrade_painters(XMLDocument);
 	detail::upgrade_node_selection(XMLDocument);
+	detail::upgrade_delete_components_nodes(XMLDocument);
 }
 
 /////////////////////////////////////////////////////////////////////////////

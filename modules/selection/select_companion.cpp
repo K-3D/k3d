@@ -26,7 +26,10 @@
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/utility.h>
 
@@ -45,54 +48,53 @@ namespace selection
 
 /** \todo Decide whether this plugin is needed at all */
 class select_companion :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
 	select_companion(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document)
+		base(Factory, Document),
+		m_keep_original_selection(init_owner(*this) + init_name("keep_original_selection") + init_label(_("Keep Original Selection")) + init_description(_("Keep the original selection, rather than selecting only the companions")) + init_value(false))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+		m_keep_original_selection.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
+		Output = Input;
+		
+		if(!k3d::validate_polyhedra(Input))
+			return;
+		
+		k3d::mesh::bools_t boundary_edges;
+		k3d::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, boundary_edges, m_companions);
 	}
 
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Mesh);
-
-		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
+		if(!k3d::validate_polyhedra(Output))
+			return;
+		
+		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::mesh::selection_t& edge_selection = Output.polyhedra.writable().edge_selection.writable();
+		
+		return_if_fail(edge_selection.size() == m_companions.size());
+		
+		const k3d::bool_t keep_selection = m_keep_original_selection.pipeline_value();
+		
+		for(k3d::uint_t edge = 0; edge != edge_selection.size(); ++edge)
 		{
-			std::set<k3d::legacy::split_edge*> selected_edges;
-			for(k3d::legacy::polyhedron::faces_t::iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
+			// select the companions
+			if(edge_selection[edge])
 			{
-				for(k3d::legacy::split_edge* edge = (*face)->first_edge; edge; edge = edge->face_clockwise)
-				{
-					if(edge->selection_weight)
-						selected_edges.insert(edge);
-
-					if(edge->face_clockwise == (*face)->first_edge)
-						break;
-				}
+				edge_selection[m_companions[edge]] = edge_selection[edge];
 			}
-
-			for(std::set<k3d::legacy::split_edge*>::iterator edge = selected_edges.begin(); edge != selected_edges.end(); ++edge)
-			{
-				if((*edge)->companion)
-				{
-					(*edge)->companion->selection_weight = 1.0;
-
-					(*edge)->selection_weight = 0.0;
-				}
-				else
-				{
-					(*edge)->selection_weight = 1.0;
-				}
-			}
+			
+			// deselect original, if requested
+			if(!keep_selection && edge != m_companions[edge])
+				edge_selection[edge] = 0.0;
 		}
 	}
 
@@ -109,6 +111,9 @@ public:
 
 		return factory;
 	}
+private:
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_keep_original_selection;
+	k3d::mesh::indices_t m_companions;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -19,13 +19,21 @@
 
 /** \file
 		\author Romain Behar (romainbehar@yahoo.com)
+		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
+#include <k3dsdk/attribute_arrays.h>
+#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/utility.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <list>
 #include <set>
@@ -39,230 +47,296 @@ namespace mesh
 namespace detail
 {
 
-typedef std::set<k3d::legacy::point*> point_set_t;
+/// For each point, create a fast lookup of the outbound edges
+// TODO: Move to mesh_topology_data and provide an alternate create_edge_adjacency_lookup that uses the result from this.
+void create_vertex_edge_lookup(const k3d::mesh::indices_t& EdgePoints, const k3d::mesh::counts_t& Valences, k3d::mesh::indices_t& PointFirstEdges, k3d::mesh::indices_t& PointEdges)
+{
+	k3d::mesh::counts_t found_edges(Valences.size(), 0);
+	PointFirstEdges.resize(Valences.size(), 0);
+	PointEdges.resize(EdgePoints.size(), 0);
+	k3d::uint_t count = 0;
+	for(k3d::uint_t point = 0; point != Valences.size(); ++point)
+	{
+		PointFirstEdges[point] = count;
+		count += Valences[point];
+	}
+	
+	const k3d::uint_t edge_begin = 0;
+	const k3d::uint_t edge_end = edge_begin + EdgePoints.size();
+	for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		const k3d::uint_t point = EdgePoints[edge];
+		PointEdges[PointFirstEdges[point] + found_edges[point]] = edge;
+		++found_edges[point];
+	}
+}
 
-/// Removes used k3d::legacy::point* elements from PointSet
-class remove_used_points
+/// Return true for selected components
+class selected
 {
 public:
-	remove_used_points(point_set_t& PointSet) :
-		point_set(PointSet)
+	selected(const k3d::mesh::selection_t& Selection) : m_selection(Selection)
 	{
 	}
-
-	void operator()(k3d::legacy::point&) { }
-	void operator()(k3d::legacy::face&) { }
-
-	void operator()(k3d::legacy::split_edge& Edge)
+	
+	const k3d::bool_t operator()(const k3d::uint_t Index) const
 	{
-		if(!point_set.size())
-			return;
-
-		point_set_t::iterator point = point_set.find(Edge.vertex);
-		if(point != point_set.end())
-			point_set.erase(point);
+		return m_selection[Index];
 	}
+	
+private:
+	const k3d::mesh::selection_t& m_selection;
+};
 
-	void operator()(k3d::legacy::linear_curve& Curve)
+/// Marks the components that will be removed
+template<typename FunctorT>
+class marker
+{
+public:
+	marker(const k3d::mesh::indices_t& FaceFirstLoops,
+			const k3d::mesh::counts_t& FaceLoopCounts,
+			const k3d::mesh::indices_t& LoopFirstEdges,
+			const k3d::mesh::indices_t& ClockwiseEdges,
+			const k3d::mesh::indices_t& EdgePoints,
+			const FunctorT& PointTest,
+			const FunctorT& EdgeTest,
+			const FunctorT& FaceTest,
+			k3d::mesh::counts_t& AdjustedFaceLoopCounts,
+			k3d::mesh::counts_t& EdgesToRemove,
+			k3d::mesh::counts_t& LoopsToRemove,
+			k3d::mesh::counts_t& FacesToRemove) :
+				m_face_first_loops(FaceFirstLoops),
+				m_face_loop_counts(FaceLoopCounts),
+				m_loop_first_edges(LoopFirstEdges),
+				m_clockwise_edges(ClockwiseEdges),
+				m_edge_points(EdgePoints),
+				m_point_test(PointTest),
+				m_edge_test(EdgeTest),
+				m_face_test(FaceTest),
+				m_adjusted_face_loop_counts(AdjustedFaceLoopCounts),
+				m_edges_to_remove(EdgesToRemove),
+				m_loops_to_remove(LoopsToRemove),
+				m_faces_to_remove(FacesToRemove)
+	{}
+	
+	void operator()(const k3d::uint_t Face)
 	{
-		if(!point_set.size())
-			return;
-
-		for(k3d::legacy::linear_curve::control_points_t::iterator curve_point = Curve.control_points.begin(); curve_point != Curve.control_points.end(); ++curve_point)
+		const k3d::uint_t loop_begin = m_face_first_loops[Face];
+		const k3d::uint_t loop_end = loop_begin + m_face_loop_counts[Face];
+		if(m_face_test(Face))
 		{
-			point_set_t::iterator point = point_set.find(*curve_point);
-			if(point != point_set.end())
-				point_set.erase(point);
+			m_faces_to_remove[Face] = 1;
+		}
+		for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			k3d::uint_t edge_count = 0;
+			k3d::uint_t removed_edge_count = 0;
+			const k3d::uint_t first_edge = m_loop_first_edges[loop];
+			for(k3d::uint_t edge = first_edge; ;)
+			{
+				++edge_count;
+				if(m_edge_test(edge) || m_point_test(m_edge_points[edge]) || m_face_test(Face))
+				{
+					++removed_edge_count;
+					m_loops_to_remove[loop] = 1;
+					m_edges_to_remove[edge] = 1;
+				}
+				
+				edge = m_clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+			
+			if(m_loops_to_remove[loop])
+				--m_adjusted_face_loop_counts[Face];
+			
+			if(loop == loop_begin && m_loops_to_remove[loop]) // We only remove the whole face if the first loop is removed
+				m_faces_to_remove[Face] = 1;
+			
+			// second loop in case an edge triggered face removal
+			if(m_loops_to_remove[loop] && edge_count != removed_edge_count)
+			{
+				for(k3d::uint_t edge = first_edge; ;)
+				{
+					m_edges_to_remove[edge] = 1;
+					
+					edge = m_clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
+				}		
+			}
 		}
 	}
+private:
+	const k3d::mesh::indices_t& m_face_first_loops;
+	const k3d::mesh::counts_t& m_face_loop_counts;
+	const k3d::mesh::indices_t& m_loop_first_edges;
+	const k3d::mesh::indices_t& m_clockwise_edges;
+	const k3d::mesh::indices_t& m_edge_points;
+	const FunctorT& m_point_test;
+	const FunctorT& m_edge_test;
+	const FunctorT& m_face_test;
+	k3d::mesh::counts_t& m_adjusted_face_loop_counts;
+	k3d::mesh::counts_t& m_edges_to_remove;
+	k3d::mesh::counts_t& m_loops_to_remove;
+	k3d::mesh::counts_t& m_faces_to_remove;
+};
 
-	void operator()(k3d::legacy::linear_curve_group&) { }
-
-	void operator()(k3d::legacy::cubic_curve& Curve)
+/// Marks the points to remove
+class point_marker
+{
+public:
+	point_marker(const k3d::mesh::counts_t& Valences,
+			const k3d::mesh::indices_t& PointFirstEdges,
+			const k3d::mesh::indices_t& PointEdges,
+			const k3d::mesh::counts_t& EdgesToRemove,
+			k3d::mesh::counts_t& PointsToRemove) :
+				m_valences(Valences),
+				m_point_first_edges(PointFirstEdges),
+				m_point_edges(PointEdges),
+				m_edges_to_remove(EdgesToRemove),
+				m_points_to_remove(PointsToRemove)
+	{}
+	
+	void operator()(const k3d::uint_t Point)
 	{
-		if(!point_set.size())
-			return;
-
-		for(k3d::legacy::cubic_curve::control_points_t::iterator curve_point = Curve.control_points.begin(); curve_point != Curve.control_points.end(); ++curve_point)
-		{
-			point_set_t::iterator point = point_set.find(*curve_point);
-			if(point != point_set.end())
-				point_set.erase(point);
-		}
+		k3d::uint_t selected_edge_count = 0;
+		const k3d::uint_t edge_begin = m_point_first_edges[Point];
+		const k3d::uint_t edge_end = edge_begin + m_valences[Point];
+		for(k3d::uint_t edge_index = edge_begin; edge_index != edge_end; ++edge_index)
+			selected_edge_count += m_edges_to_remove[m_point_edges[edge_index]];
+		if(selected_edge_count == m_valences[Point])
+			m_points_to_remove[Point] = 1;
 	}
-
-	void operator()(k3d::legacy::cubic_curve_group&) { }
-
-	void operator()(k3d::legacy::nucurve& Curve)
-	{
-		if(!point_set.size())
-			return;
-
-		for(k3d::legacy::nucurve::control_points_t::iterator curve_point = Curve.control_points.begin(); curve_point != Curve.control_points.end(); ++curve_point)
-		{
-			point_set_t::iterator point = point_set.find(curve_point->position);
-			if(point != point_set.end())
-				point_set.erase(point);
-		}
-	}
-
-	void operator()(k3d::legacy::nucurve_group&) { }
-
-	void operator()(k3d::legacy::bilinear_patch& Patch)
-	{
-		if(!point_set.size())
-			return;
-
-		for(k3d::legacy::bilinear_patch::control_points_t::iterator control_point = Patch.control_points.begin(); control_point != Patch.control_points.end(); ++control_point)
-		{
-			point_set_t::iterator point = point_set.find(*control_point);
-			if(point != point_set.end())
-				point_set.erase(point);
-		}
-	}
-
-	void operator()(k3d::legacy::bicubic_patch& Patch)
-	{
-		if(!point_set.size())
-			return;
-
-		for(k3d::legacy::bicubic_patch::control_points_t::iterator control_point = Patch.control_points.begin(); control_point != Patch.control_points.end(); ++control_point)
-		{
-			point_set_t::iterator point = point_set.find(*control_point);
-			if(point != point_set.end())
-				point_set.erase(point);
-		}
-	}
-
-	void operator()(k3d::legacy::nupatch& Patch)
-	{
-		if(!point_set.size())
-			return;
-
-		for(k3d::legacy::nupatch::control_points_t::iterator control_point = Patch.control_points.begin(); control_point != Patch.control_points.end(); ++control_point)
-		{
-			point_set_t::iterator point = point_set.find(control_point->position);
-			if(point != point_set.end())
-				point_set.erase(point);
-		}
-	}
-
-	void operator()(k3d::legacy::polyhedron&) { }
-	void operator()(k3d::legacy::mesh&) { }
 
 private:
-	point_set_t& point_set;
+	const k3d::mesh::counts_t& m_valences;
+	const k3d::mesh::indices_t& m_point_first_edges;
+	const k3d::mesh::indices_t& m_point_edges;
+	const k3d::mesh::counts_t& m_edges_to_remove;
+	k3d::mesh::counts_t& m_points_to_remove;
 };
 
-/// Returns whether k3d::legacy::point* is in given set
-struct is_in_point_set
+/// Replace the elements of Array with their cumulative sum
+template<class ArrayT> void cumulative_sum(ArrayT& Array)
 {
-	is_in_point_set(point_set_t& PointSet) :
-		point_set(PointSet)
-	{
-	}
+	const k3d::uint_t array_begin = 0;
+	const k3d::uint_t array_end = Array.size();
+	for(k3d::uint_t i = array_begin + 1; i != array_end; ++i)
+		Array[i] += Array[i-1];
+}
 
-	bool operator()(k3d::legacy::point* Point)
-	{
-		point_set_t::const_iterator point = point_set.find(Point);
-		if(point != point_set.end())
-			return true;
-
-		return false;
-	}
-
-	point_set_t& point_set;
-};
-
-/// Deletes selected components and their parent components
-struct delete_components
+class index_updater
 {
-	delete_components(k3d::legacy::mesh& Mesh) :
-		mesh(Mesh)
+public:
+	/// Create a new functor to update an array of indices and the values of those indexes
+	/**
+	 * \param ToRemoveIndicesSum Each ToRemoveIndicesSum[i] contains the number of removed
+	 * items from InputArray up until index i in InputArray
+	 * \param ToRemoveValuesSum Is the ToRemoveIndicesSum for the array for which InputArray contains indices
+	 */
+	index_updater(const k3d::mesh::counts_t& ToRemoveIndicesSum,
+			const k3d::mesh::counts_t& ToRemoveValuesSum,
+			const k3d::mesh::indices_t& InputArray,
+			k3d::mesh::indices_t& OutputArray) :
+				m_to_remove_indices_sum(ToRemoveIndicesSum),
+				m_to_remove_values_sum(ToRemoveValuesSum),
+				m_input_array(InputArray),
+				m_output_array(OutputArray)
+	{}
+	
+	void operator()(const k3d::uint_t Index)
 	{
-	}
-
-	void operator()(k3d::legacy::polyhedron* Polyhedron)
-	{
-		k3d::legacy::polyhedron& polyhedron = *Polyhedron;
-
-		// Find selected faces and save touched points
-		point_set_t touched_points;
-		for(k3d::legacy::polyhedron::faces_t::iterator face = polyhedron.faces.begin(); face != polyhedron.faces.end(); ++face)
+		if((Index == 0 && m_to_remove_indices_sum[0] == 0) || (Index != 0 && m_to_remove_indices_sum[Index - 1] == m_to_remove_indices_sum[Index]))
 		{
-			// Find selected faces and faces containing selected edges or vertices
-			bool delete_face = false;
-			if((*face)->selection_weight)
-				delete_face = true;
-			else
-			{
-				// Check for selected edges
-				k3d::legacy::split_edge* edge = (*face)->first_edge;
-				do
-				{
-					// If edge (or its companion) or its vertex is selected, delete face
-					if(edge->selection_weight || (edge->companion && edge->companion->selection_weight) || edge->vertex->selection_weight)
-					{
-						delete_face = true;
-						break;
-					}
-
-					edge = edge->face_clockwise;
-				}
-				while(edge != (*face)->first_edge);
-			}
-
-			if(!delete_face)
-				continue;
-
-			// Save touched points and select companion edges
-			k3d::legacy::split_edge* edge = (*face)->first_edge;
-			do
-			{
-				touched_points.insert(edge->vertex);
-
-				// Make sure companion is selected (edge selection doesn't currently select companion)
-				if(edge->companion && edge->selection_weight)
-					edge->companion->selection_weight = 1.0;
-
-				edge = edge->face_clockwise;
-			}
-			while(edge != (*face)->first_edge);
-
-			// Save holes touched points
-			for(k3d::legacy::face::holes_t::iterator hole = (*face)->holes.begin(); hole != (*face)->holes.end(); ++hole)
-			{
-				for(k3d::legacy::split_edge* edge = *hole; edge; edge = edge->face_clockwise)
-				{
-					touched_points.insert(edge->vertex);
-
-					if(edge->face_clockwise == (*hole))
-						break;
-				}
-			}
-
-			// Delete face
-			delete *face;
-			*face = 0;
+			const k3d::uint_t new_value = m_input_array[Index] < m_to_remove_values_sum[m_input_array[Index]] ? 0 : m_input_array[Index] - m_to_remove_values_sum[m_input_array[Index]];
+			m_output_array[Index - m_to_remove_indices_sum[Index]] = new_value;
 		}
-
-		// Erase deleted faces
-		polyhedron.faces.erase(std::remove_if(polyhedron.faces.begin(), polyhedron.faces.end(), std::bind2nd(std::equal_to<k3d::legacy::face*>(), (k3d::legacy::face*)0)), polyhedron.faces.end());
-
-		// Delete floating points
-		k3d::legacy::for_each_component(mesh, remove_used_points(touched_points));
-		if(touched_points.size())
-		{
-			mesh.points.erase(std::remove_if(mesh.points.begin(), mesh.points.end(), is_in_point_set(touched_points)), mesh.points.end());
-			std::for_each(touched_points.begin(), touched_points.end(), k3d::delete_object());
-		}
-
-		// Sanity check
-		assert_warning(is_valid(polyhedron));
 	}
-
-	k3d::legacy::mesh& mesh;
+	
+private:
+	const k3d::mesh::counts_t& m_to_remove_indices_sum;
+	const k3d::mesh::counts_t& m_to_remove_values_sum;
+	const k3d::mesh::indices_t& m_input_array;
+	k3d::mesh::indices_t& m_output_array;
+	
 };
+
+/// Delete elements of an array
+template<typename ArrayT>
+class array_element_deleter
+{
+public:
+	array_element_deleter(const k3d::mesh::counts_t& ToRemoveIndicesSum,
+			const ArrayT& InputArray,
+			ArrayT& OutputArray) :
+				m_to_remove_indices_sum(ToRemoveIndicesSum),
+				m_input_array(InputArray),
+				m_output_array(OutputArray)
+	{
+		OutputArray.resize(InputArray.size() - ToRemoveIndicesSum.back());
+	}
+	
+	void operator()(const k3d::uint_t Index)
+	{
+		if((Index == 0 && m_to_remove_indices_sum[0] == 0) || (Index != 0 && m_to_remove_indices_sum[Index - 1] == m_to_remove_indices_sum[Index]))
+			m_output_array[Index - m_to_remove_indices_sum[Index]] = m_input_array[Index];
+	}
+	
+private:
+	const k3d::mesh::counts_t& m_to_remove_indices_sum;
+	const ArrayT& m_input_array;
+	ArrayT& m_output_array;
+};
+
+/// Delete elements of an attribute array
+template<>
+class array_element_deleter<k3d::mesh::attribute_arrays_t>
+{
+public:
+	array_element_deleter(const k3d::mesh::counts_t& ToRemoveIndicesSum,
+			const k3d::mesh::attribute_arrays_t& InputArray,
+			k3d::mesh::attribute_arrays_t& OutputArray) :
+				m_to_remove_indices_sum(ToRemoveIndicesSum)
+	{
+		OutputArray = InputArray.clone_types();
+		OutputArray.resize(ToRemoveIndicesSum.size() - ToRemoveIndicesSum.back());
+		m_copier.reset(new k3d::attribute_array_copier(InputArray, OutputArray));
+	}
+	
+	void operator()(const k3d::uint_t Index)
+	{
+		if((Index == 0 && m_to_remove_indices_sum[0] == 0) || (Index != 0 && m_to_remove_indices_sum[Index - 1] == m_to_remove_indices_sum[Index]))
+			m_copier->copy(Index, Index - m_to_remove_indices_sum[Index]);
+	}
+	
+private:
+	const k3d::mesh::counts_t& m_to_remove_indices_sum;
+	boost::scoped_ptr<k3d::attribute_array_copier> m_copier;
+};
+
+
+
+void update_indices(const k3d::mesh::counts_t& ToRemoveIndicesSum,
+			const k3d::mesh::counts_t& ToRemoveValuesSum,
+			const k3d::mesh::indices_t& InputArray,
+			k3d::mesh::indices_t& OutputArray)
+{
+	OutputArray.resize(InputArray.size() - ToRemoveIndicesSum.back());
+	index_updater updater(ToRemoveIndicesSum, ToRemoveValuesSum, InputArray, OutputArray);
+	for(k3d::uint_t i = 0; i != ToRemoveIndicesSum.size(); ++i) updater(i);
+}
+
+template<typename ArrayT>
+void delete_elements(const k3d::mesh::counts_t& ToRemoveIndicesSum,
+			const ArrayT& InputArray,
+			ArrayT& OutputArray)
+{
+	if(InputArray.size() == 0)
+		return;
+	array_element_deleter<ArrayT> deleter(ToRemoveIndicesSum, InputArray, OutputArray);
+	for(k3d::uint_t i = 0; i != ToRemoveIndicesSum.size(); ++i) deleter(i);
+}
 
 } // namespace detail
 
@@ -270,9 +344,9 @@ struct delete_components
 // delete_components
 
 class delete_components :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
 	delete_components(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -281,134 +355,100 @@ public:
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
 	}
 
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
-	}
-
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Mesh);
-
-		// Delete faces, edges and points
-		std::for_each(Mesh.polyhedra.begin(), Mesh.polyhedra.end(), detail::delete_components(Mesh));
-
-		// Delete patches and points
-		detail::point_set_t touched_points;
-
-		// Delete bilinear patches
-		for(k3d::legacy::mesh::bilinear_patches_t::iterator patch = Mesh.bilinear_patches.begin(); patch != Mesh.bilinear_patches.end(); ++patch)
+		if(!k3d::validate_polyhedra(Input))
+			return;
+		
+		Output = Input;
+		const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
+		k3d::mesh::selection_t point_selection = *Input.point_selection;
+		k3d::merge_selection(mesh_selection.points, point_selection);
+		k3d::mesh::selection_t edge_selection = *Input.polyhedra->edge_selection;
+		k3d::merge_selection(mesh_selection.edges, edge_selection);
+		k3d::mesh::selection_t face_selection = *Input.polyhedra->face_selection;
+		k3d::merge_selection(mesh_selection.faces, face_selection);
+		const k3d::uint_t point_count = Input.points->size();
+		const k3d::uint_t edge_count = Input.polyhedra->edge_points->size();
+		const k3d::uint_t face_count = Input.polyhedra->face_first_loops->size();
+		const k3d::uint_t loop_count = Input.polyhedra->loop_first_edges->size();
+		m_points_to_remove.assign(point_count, 0);
+		k3d::mesh::counts_t adjusted_face_loop_counts = *Input.polyhedra->face_loop_counts;
+		k3d::mesh::counts_t edges_to_remove(edge_count, 0);
+		k3d::mesh::counts_t loops_to_remove(loop_count, 0);
+		k3d::mesh::counts_t faces_to_remove(face_count, 0);
+		detail::marker<detail::selected> marker(*Input.polyhedra->face_first_loops,
+				*Input.polyhedra->face_loop_counts,
+				*Input.polyhedra->loop_first_edges,
+				*Input.polyhedra->clockwise_edges,
+				*Input.polyhedra->edge_points,
+				detail::selected(point_selection),
+				detail::selected(edge_selection),
+				detail::selected(face_selection),
+				adjusted_face_loop_counts,
+				edges_to_remove,
+				loops_to_remove,
+				faces_to_remove);
+		for(k3d::uint_t face = 0; face != face_count; ++face) marker(face);
+		
+		k3d::mesh::counts_t valences;
+		k3d::create_vertex_valence_lookup(Input.points->size(), *Input.polyhedra->edge_points, valences);
+		k3d::mesh::indices_t point_first_edges, point_edges;
+		detail::create_vertex_edge_lookup(*Input.polyhedra->edge_points, valences, point_first_edges, point_edges);
+		
+		detail::point_marker point_marker(valences, point_first_edges, point_edges, edges_to_remove, m_points_to_remove);
+		for(k3d::uint_t point = 0; point != Input.points->size(); ++point) point_marker(point);
+		
+		detail::cumulative_sum(m_points_to_remove);
+		detail::cumulative_sum(edges_to_remove);
+		detail::cumulative_sum(loops_to_remove);
+		detail::cumulative_sum(faces_to_remove);
+		
+		k3d::mesh::polyhedra_t& output_polyhedra = Output.polyhedra.writable();
+		
+		detail::update_indices(faces_to_remove, loops_to_remove, *Input.polyhedra->face_first_loops, output_polyhedra.face_first_loops.create());
+		detail::delete_elements(faces_to_remove, face_selection, output_polyhedra.face_selection.create());
+		detail::delete_elements(faces_to_remove, adjusted_face_loop_counts, output_polyhedra.face_loop_counts.create());
+		detail::delete_elements(faces_to_remove, *Input.polyhedra->face_materials, output_polyhedra.face_materials.create());
+		detail::update_indices(loops_to_remove, edges_to_remove, *Input.polyhedra->loop_first_edges, output_polyhedra.loop_first_edges.create());
+		detail::update_indices(edges_to_remove, m_points_to_remove, *Input.polyhedra->edge_points, output_polyhedra.edge_points.create());
+		detail::update_indices(edges_to_remove, edges_to_remove, *Input.polyhedra->clockwise_edges, output_polyhedra.clockwise_edges.create());
+		detail::delete_elements(edges_to_remove, edge_selection, output_polyhedra.edge_selection.create());
+		detail::delete_elements(m_points_to_remove, point_selection, Output.point_selection.writable());
+		detail::delete_elements(m_points_to_remove, Input.vertex_data, Output.vertex_data);
+		detail::delete_elements(edges_to_remove, Input.polyhedra->face_varying_data, output_polyhedra.face_varying_data);
+		detail::delete_elements(faces_to_remove, Input.polyhedra->uniform_data, output_polyhedra.uniform_data);
+		
+		// Update the per-polyhedra arrays
+		const k3d::mesh::indices_t& input_first_faces = *Input.polyhedra->first_faces;
+		const k3d::mesh::counts_t& input_face_counts = *Input.polyhedra->face_counts;
+		k3d::mesh::indices_t& output_first_faces = output_polyhedra.first_faces.create();
+		k3d::mesh::counts_t& output_face_counts = output_polyhedra.face_counts.create();
+		const k3d::uint_t polyhedra_count = input_first_faces.size();
+		k3d::uint_t new_first_face = 0;
+		k3d::uint_t total_removed_faces = 0;
+		output_polyhedra.constant_data = Input.polyhedra->constant_data.clone_types();
+		k3d::attribute_array_copier constant_copier(Input.polyhedra->constant_data, output_polyhedra.constant_data);
+		k3d::mesh::polyhedra_t::types_t& polyhedra_types = output_polyhedra.types.create();
+		for(k3d::uint_t polyhedron = 0; polyhedron < polyhedra_count; ++polyhedron)
 		{
-			// Find selected patches and patches containing selected points
-			bool delete_patch = false;
-			if((*patch)->selection_weight)
-				delete_patch = true;
-			else
+			k3d::uint_t deleted_face_count = faces_to_remove[input_first_faces[polyhedron] + input_face_counts[polyhedron] - 1] - total_removed_faces;
+			total_removed_faces += deleted_face_count;
+			k3d::uint_t new_face_count = input_face_counts[polyhedron] - deleted_face_count;
+			if(new_face_count > 0)
 			{
-				for(k3d::legacy::bilinear_patch::control_points_t::iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
-				{
-					if((*point)->selection_weight)
-					{
-						delete_patch = true;
-						break;
-					}
-				}
+				output_face_counts.push_back(new_face_count);
+				output_first_faces.push_back(new_first_face);
+				constant_copier.push_back(polyhedron);
+				polyhedra_types.push_back(Input.polyhedra->types->at(polyhedron));
 			}
-
-			if(!delete_patch)
-				continue;
-
-			// Save touched points and select companion edges
-			for(k3d::legacy::bilinear_patch::control_points_t::iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
-				touched_points.insert(*point);
-
-			delete *patch;
-			*patch = 0;
-		}
-		// Erase deleted patches
-		Mesh.bilinear_patches.erase(std::remove_if(Mesh.bilinear_patches.begin(), Mesh.bilinear_patches.end(), std::bind2nd(std::equal_to<k3d::legacy::bilinear_patch*>(), (k3d::legacy::bilinear_patch*)0)), Mesh.bilinear_patches.end());
-
-
-		// Delete bicubic patches
-		for(k3d::legacy::mesh::bicubic_patches_t::iterator patch = Mesh.bicubic_patches.begin(); patch != Mesh.bicubic_patches.end(); ++patch)
-		{
-			// Find selected patches and patches containing selected points
-			bool delete_patch = false;
-			if((*patch)->selection_weight)
-				delete_patch = true;
-			else
-			{
-				for(k3d::legacy::bicubic_patch::control_points_t::iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
-				{
-					if((*point)->selection_weight)
-					{
-						delete_patch = true;
-						break;
-					}
-				}
-			}
-
-			if(!delete_patch)
-				continue;
-
-			// Save touched points and select companion edges
-			for(k3d::legacy::bicubic_patch::control_points_t::iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
-				touched_points.insert(*point);
-
-			delete *patch;
-			*patch = 0;
-		}
-		// Erase deleted patches
-		Mesh.bicubic_patches.erase(std::remove_if(Mesh.bicubic_patches.begin(), Mesh.bicubic_patches.end(), std::bind2nd(std::equal_to<k3d::legacy::bicubic_patch*>(), (k3d::legacy::bicubic_patch*)0)), Mesh.bicubic_patches.end());
-
-
-		// Delete nupatches
-		for(k3d::legacy::mesh::nupatches_t::iterator patch = Mesh.nupatches.begin(); patch != Mesh.nupatches.end(); ++patch)
-		{
-			// Find selected patches and patches containing selected points
-			bool delete_patch = false;
-			if((*patch)->selection_weight)
-				delete_patch = true;
-			else
-			{
-				for(k3d::legacy::nupatch::control_points_t::iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
-				{
-					if(point->position->selection_weight)
-					{
-						delete_patch = true;
-						break;
-					}
-				}
-			}
-
-			if(!delete_patch)
-				continue;
-
-			// Save touched points and select companion edges
-			for(k3d::legacy::nupatch::control_points_t::iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
-				touched_points.insert(point->position);
-
-			delete *patch;
-			*patch = 0;
-		}
-		// Erase deleted patches
-		Mesh.nupatches.erase(std::remove_if(Mesh.nupatches.begin(), Mesh.nupatches.end(), std::bind2nd(std::equal_to<k3d::legacy::nupatch*>(), (k3d::legacy::nupatch*)0)), Mesh.nupatches.end());
-
-
-		// Delete floating points
-		k3d::legacy::for_each_component(Mesh, detail::remove_used_points(touched_points));
-		if(touched_points.size())
-		{
-			Mesh.points.erase(std::remove_if(Mesh.points.begin(), Mesh.points.end(), detail::is_in_point_set(touched_points)), Mesh.points.end());
-			std::for_each(touched_points.begin(), touched_points.end(), k3d::delete_object());
+			new_first_face = output_first_faces.empty() ? 0 : output_first_faces.back() + output_face_counts.back();
 		}
 	}
 
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		detail::delete_elements(m_points_to_remove, *Input.points, Output.points.writable());
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -416,7 +456,7 @@ public:
 		static k3d::document_plugin_factory<delete_components,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
-				k3d::uuid(0xc98c37d5, 0xa50c43c7, 0xb88c3687, 0x73cd3c4d),
+				k3d::uuid(0x2d738b7a, 0x6f473349, 0x53a066ad, 0xa857f734),
 				"Delete",
 				"Deletes selected faces, edges and vertices",
 				"Mesh",
@@ -424,6 +464,8 @@ public:
 
 		return factory;
 	}
+private:
+	k3d::mesh::counts_t m_points_to_remove;
 };
 
 /////////////////////////////////////////////////////////////////////////////
