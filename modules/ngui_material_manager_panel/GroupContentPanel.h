@@ -1,3 +1,6 @@
+#ifndef MODULES_NGUI_MATERIAL_MANAGER_PANEL_GROUPCONTENTPANEL_H
+#define MODULES_NGUI_MATERIAL_MANAGER_PANEL_GROUPCONTENTPANEL_H
+
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -19,9 +22,6 @@
 //
 // ---------------------
 //
-
-#ifndef GROUPCONTENTPANEL_H
-#define GROUPCONTENTPANEL_H
 
 #include <gtkmm/textview.h>
 
@@ -137,4 +137,5 @@ class GroupContentPanel : public ContentPanel
 
 }//namespace module
 
-#endif
+#endif // !MODULES_NGUI_MATERIAL_MANAGER_PANEL_GROUPCONTENTPANEL_H
+

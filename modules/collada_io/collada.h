@@ -1,3 +1,6 @@
+#ifndef MODULES_COLLADA_IO_COLLADA_H
+#define MODULES_COLLADA_IO_COLLADA_H
+
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
 //
@@ -22,9 +25,6 @@
 */
 
 // Main integration file
-
-#ifndef COLLADA_H
-#define COLLADA_H
 
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_operations.h>
@@ -263,5 +263,5 @@ namespace io
 }
 }
 
-#endif
+#endif // !MODULES_COLLADA_IO_COLLADA_H
 

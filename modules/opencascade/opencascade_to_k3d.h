@@ -1,5 +1,5 @@
-#ifndef OPENCASCADE_TO_K3D_H_
-#define OPENCASCADE_TO_K3D_H_
+#ifndef MODULES_OPENCASCADE_OPENCASCADE_TO_K3D_H
+#define MODULES_OPENCASCADE_OPENCASCADE_TO_K3D_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -68,4 +68,4 @@ private:
 
 } // module
 
-#endif /*OPENCASCADE_TO_K3D_H_*/
+#endif // !MODULES_OPENCASCADE_OPENCASCADE_TO_K3D_H

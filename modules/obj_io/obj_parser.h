@@ -1,3 +1,6 @@
+#ifndef MODULES_OBJ_IO_OBJ_PARSER_H
+#define MODULES_OBJ_IO_OBJ_PARSER_H
+
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
 //
@@ -98,4 +101,6 @@ private:
 } // namespace obj
 
 } // namespace module
+
+#endif // !MODULES_OBJ_IO_OBJ_PARSER_H
 

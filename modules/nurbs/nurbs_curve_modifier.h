@@ -1,5 +1,5 @@
-#ifndef MODULE_NURBS_CURVE_MODIFIER_H
-#define MODULE_NURBS_CURVE_MODIFIER_H
+#ifndef MODULES_NURBS_NURBS_CURVE_MODIFIER_H
+#define MODULES_NURBS_NURBS_CURVE_MODIFIER_H
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
 //
@@ -307,4 +307,4 @@ namespace module{
 	}//namespace nurbs
 }//namespace module
 
-#endif // MODULE_NURBS_CURVE_OPERATIONS_H
+#endif // !MODULES_NURBS_NURBS_CURVE_MODIFIER_H

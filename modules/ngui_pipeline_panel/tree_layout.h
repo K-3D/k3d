@@ -1,5 +1,5 @@
-#ifndef TREE_LAYOUT_H
-#define TREE_LAYOUT_H
+#ifndef MODULES_NGUI_PIPELINE_PANEL_TREE_LAYOUT_H
+#define MODULES_NGUI_PIPELINE_PANEL_TREE_LAYOUT_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -67,5 +67,5 @@ private:
 
 } // namespace module
 
-#endif // !TREE_LAYOUT
+#endif // !MODULES_NGUI_PIPELINE_PANEL_TREE_LAYOUT_H
 

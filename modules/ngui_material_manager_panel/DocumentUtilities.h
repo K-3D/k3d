@@ -1,3 +1,6 @@
+#ifndef MODULES_NGUI_MATERIAL_MANAGER_PANEL_DOCUMENTUTILITIES_H
+#define MODULES_NGUI_MATERIAL_MANAGER_PANEL_DOCUMENTUTILITIES_H
+
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -19,9 +22,6 @@
 //
 // ---------------------
 //
-
-#ifndef DOCUMENTUTILITIES_H
-#define DOCUMENTUTILITIES_H
 
 #include <k3dsdk/types.h>
 #include <k3dsdk/icommand_node.h>
@@ -70,4 +70,5 @@ bool checkDocForMeta(const k3d::string_t meta_tag,
 
 }//namespace module
 
-#endif
+#endif // !MODULES_NGUI_MATERIAL_MANAGER_PANEL_DOCUMENTUTILITIES_H
+

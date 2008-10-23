@@ -1,3 +1,6 @@
+#ifndef MODULES_CLOTH_CLOTH_SOLVER_H
+#define MODULES_CLOTH_CLOTH_SOLVER_H
+
 #include <vector>
 #include <iostream>
 #include "particle.h"
@@ -251,3 +254,6 @@ public:
 	double damping;
 	double stiffness;
 };
+
+#endif // !MODULES_CLOTH_CLOTH_SOLVER_H
+

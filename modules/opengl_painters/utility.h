@@ -1,5 +1,5 @@
-#ifndef LIBK3DOPENGL_UTILITY_H
-#define LIBK3DOPENGL_UTILITY_H
+#ifndef MODULES_OPENGL_PAINTERS_UTILITY_H
+#define MODULES_OPENGL_PAINTERS_UTILITY_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -149,5 +149,5 @@ private:
 
 } // namespace module
 
-#endif // !LIBK3DOPENGL_UTILITY_H
+#endif // !MODULES_OPENGL_PAINTERS_UTILITY_H
 

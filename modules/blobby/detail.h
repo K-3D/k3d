@@ -1,3 +1,6 @@
+#ifndef MODULES_BLOBBY_DETAIL_H
+#define MODULES_BLOBBY_DETAIL_H
+
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -44,4 +47,6 @@ void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const 
 } // namespace blobby
 
 } // namespace module
+
+#endif // !MODULES_BLOBBY_DETAIL_H
 

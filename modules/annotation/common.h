@@ -1,5 +1,5 @@
-#ifndef ANNOTATION_COMMON_H
-#define ANNOTATION_COMMON_H
+#ifndef MODULES_ANNOTATION_COMMON_H
+#define MODULES_ANNOTATION_COMMON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -50,5 +50,5 @@ const k3d::ienumeration_property::enumeration_values_t& alignment_values();
 
 } // namespace module
 
-#endif // !ANNOTAION_COMMON_H
+#endif // !MODULES_ANNOTATION_COMMON_H
 

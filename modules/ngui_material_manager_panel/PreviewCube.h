@@ -1,3 +1,6 @@
+#ifndef MODULES_NGUI_MATERIAL_MANAGER_PANEL_PREVIEWCUBE_H
+#define MODULES_NGUI_MATERIAL_MANAGER_PANEL_PREVIEWCUBE_H
+
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -19,9 +22,6 @@
 //
 // ---------------------
 //
-
-#ifndef PREVIEWCUBE_H
-#define PREVIEWCUBE_H
 
 #include "PreviewObj.h"
 
@@ -69,5 +69,5 @@ class PreviewCube : public PreviewObj
 
 }//namespace module
 
+#endif // !MODULES_NGUI_MATERIAL_MANAGER_PANEL_PREVIEWCUBE_H
 
-#endif

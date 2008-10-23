@@ -1,5 +1,5 @@
-#ifndef CUDA_ENTRY_POINTS_H
-#define CUDA_ENTRY_POINTS_H
+#ifndef MODULES_CUDA_CUDA_ENTRY_POINTS_H
+#define MODULES_CUDA_CUDA_ENTRY_POINTS_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -204,4 +204,4 @@ extern "C" K3D_CUDA_DECLSPEC void calculate_grid_points_kernel_entry (
 												unsigned int columns
 												);
 
-#endif // !CUDA_ENTRY_POINTS_H
+#endif // !MODULES_CUDA_CUDA_ENTRY_POINTS_H

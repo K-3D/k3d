@@ -1,3 +1,6 @@
+#ifndef MODULES_CLOTH_PARTICLE_H
+#define MODULES_CLOTH_PARTICLE_H
+
 #include "d_Vec3f.h"
 
 using namespace d_Math;
@@ -47,3 +50,6 @@ d_Vec3f add_damping(d_Vec3f x, float k)
 {
 	return x*(-k);
 }
+
+#endif // !MODULES_CLOTH_PARTICLE_H
+

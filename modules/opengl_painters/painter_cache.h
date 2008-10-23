@@ -1,5 +1,5 @@
-#ifndef PAINTER_CACHE_H_
-#define PAINTER_CACHE_H_
+#ifndef MODULES_OPENGL_PAINTERS_PAINTER_CACHE_H
+#define MODULES_OPENGL_PAINTERS_PAINTER_CACHE_H
 
 #include <k3dsdk/hints.h>
 #include <k3dsdk/idocument.h>
@@ -241,4 +241,4 @@ protected:
 
 } // namespace module
 
-#endif /*PAINTER_CACHE_H_*/
+#endif // !MODULES_OPENGL_PAINTERS_PAINTER_CACHE_H

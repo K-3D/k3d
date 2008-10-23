@@ -1,4 +1,5 @@
-
+#ifndef MODULES_3DS_IO_3DSCHUNKNAMES_H
+#define MODULES_3DS_IO_3DSCHUNKNAMES_H
 
 
 
@@ -94,3 +95,5 @@
  #define LIGHT         0x0009
  #define DISABLED      0x0010
  #define BOGUS         0x0011
+
+#endif // !MODULES_3DS_IO_3DSCHUNKNAMES_H

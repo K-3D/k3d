@@ -1,5 +1,5 @@
-#ifndef COLORED_SELECTION_PAINTER_GL_H_
-#define COLORED_SELECTION_PAINTER_GL_H_
+#ifndef MODULES_OPENGL_PAINTERS_COLORED_SELECTION_PAINTER_GL_H
+#define MODULES_OPENGL_PAINTERS_COLORED_SELECTION_PAINTER_GL_H
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
 //
@@ -136,5 +136,6 @@ inline void color4d(const colored_selection_painter::color_t& Color)
 
 } // namespace module
 
-#endif /*COLORED_SELECTION_PAINTER_GL_H_*/
+#endif // !MODULES_OPENGL_PAINTERS_COLORED_SELECTION_PAINTER_GL_H
+
 

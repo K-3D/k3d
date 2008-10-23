@@ -1,3 +1,6 @@
+#ifndef MODULES_NGUI_MATERIAL_MANAGER_PANEL_PREVIEWTORUS_H
+#define MODULES_NGUI_MATERIAL_MANAGER_PANEL_PREVIEWTORUS_H
+
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -19,9 +22,6 @@
 //
 // ---------------------
 //
-
-#ifndef PREVIEWTORUS_H
-#define PREVIEWTORUS_H
 
 #include "PreviewObj.h"
 
@@ -71,4 +71,4 @@ class PreviewTorus : public PreviewObj
 }//namespace module
 
 
-#endif
+#endif // !MODULES_NGUI_MATERIAL_MANAGER_PANEL_PREVIEWTORUS_H

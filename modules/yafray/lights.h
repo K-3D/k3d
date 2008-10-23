@@ -1,5 +1,5 @@
-#ifndef YAFRAY_LIGHTS_H
-#define YAFRAY_LIGHTS_H
+#ifndef MODULES_YAFRAY_LIGHTS_H
+#define MODULES_YAFRAY_LIGHTS_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -187,5 +187,5 @@ protected:
 
 } // namespace module
 
-#endif // !YAFRAY_LIGHTS_H
+#endif // !MODULES_YAFRAY_LIGHTS_H
 

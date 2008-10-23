@@ -1,5 +1,5 @@
-#ifndef NGUI_SNAP_TOOL_DETAIL_H
-#define NGUI_SNAP_TOOL_DETAIL_H
+#ifndef MODULES_NGUI_SNAP_TOOL_SNAP_TOOL_DETAIL_H
+#define MODULES_NGUI_SNAP_TOOL_SNAP_TOOL_DETAIL_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -463,5 +463,5 @@ protected:
 
 } // namespace module
 
-#endif // !NGUI_SNAP_TOOL_DETAIL_H
+#endif // !MODULES_NGUI_SNAP_TOOL_SNAP_TOOL_DETAIL_H
 

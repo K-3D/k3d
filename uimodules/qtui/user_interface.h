@@ -1,5 +1,5 @@
-#ifndef QTUI_USER_INTERFACE_H
-#define QTUI_USER_INTERFACE_H
+#ifndef UIMODULES_QTUI_USER_INTERFACE_H
+#define UIMODULES_QTUI_USER_INTERFACE_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -165,5 +165,5 @@ private:
 
 } // namespace module
 
-#endif // !QTUI_USER_INTERFACE_H
+#endif // !UIMODULES_QTUI_USER_INTERFACE_H
 

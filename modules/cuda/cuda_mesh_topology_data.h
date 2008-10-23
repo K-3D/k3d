@@ -1,5 +1,5 @@
-#ifndef CUDA_MESH_TOPOLOGY_DATA_H_
-#define CUDA_MESH_TOPOLOGY_DATA_H_
+#ifndef MODULES_CUDA_CUDA_MESH_TOPOLOGY_DATA_H
+#define MODULES_CUDA_CUDA_MESH_TOPOLOGY_DATA_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -53,4 +53,5 @@ void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const me
 
 } // namespace k3d
 
-#endif /*CUDA_MESH_TOPOLOGY_DATA_H_*/
+#endif // !MODULES_CUDA_CUDA_MESH_TOPOLOGY_DATA_H
+

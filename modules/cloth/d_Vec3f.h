@@ -1,5 +1,5 @@
-#ifndef D_VEC3F_H
-#define D_VEC3F_H
+#ifndef MODULES_CLOTH_D_VEC3F_H
+#define MODULES_CLOTH_D_VEC3F_H
 
 namespace d_Math
 {
@@ -77,7 +77,5 @@ namespace d_Math
 	}
 }
 
-
-
-#endif
+#endif // !MODULES_CLOTH_D_VEC3F_H
 

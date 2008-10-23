@@ -1,5 +1,5 @@
-#ifndef EXTRACT_TREE_H
-#define EXTRACT_TREE_H
+#ifndef MODULES_NGUI_PIPELINE_PANEL_EXTRACT_TREE_H
+#define MODULES_NGUI_PIPELINE_PANEL_EXTRACT_TREE_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -61,5 +61,5 @@ private:
 
 } // namespace module
 
-#endif // !EXTRACT_TREE
+#endif // !MODULES_NGUI_PIPELINE_PANEL_EXTRACT_TREE_H
 

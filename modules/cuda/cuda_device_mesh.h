@@ -1,3 +1,6 @@
+#ifndef MODULES_CUDA_CUDA_DEVICE_MESH_H
+#define MODULES_CUDA_CUDA_DEVICE_MESH_H
+
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -76,3 +79,6 @@ class cuda_device_mesh
 };
 
 typedef boost::shared_ptr<cuda_device_mesh> cuda_device_mesh_p;
+
+#endif // !MODULES_CUDA_CUDA_DEVICE_MESH_H
+

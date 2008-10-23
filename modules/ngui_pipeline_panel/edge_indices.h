@@ -1,5 +1,5 @@
-#ifndef EDGE_INDICES_H
-#define EDGE_INDICES_H
+#ifndef MODULES_NGUI_PIPELINE_PANEL_EDGE_INDICES_H
+#define MODULES_NGUI_PIPELINE_PANEL_EDGE_INDICES_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -55,5 +55,5 @@ private:
 
 } // namespace module
 
-#endif // !EDGE_INDICES
+#endif // !MODULES_NGUI_PIPELINE_PANEL_EDGE_INDICES_H
 

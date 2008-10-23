@@ -1,5 +1,5 @@
-#ifndef K3D_TO_NEF_H_
-#define K3D_TO_NEF_H_
+#ifndef MODULES_CGAL_K3D_TO_NEF_H
+#define MODULES_CGAL_K3D_TO_NEF_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -325,4 +325,4 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
 
 } // namespace module
 
-#endif /*K3D_TO_NEF_H_*/
+#endif // !MODULES_CGAL_K3D_TO_NEF_H

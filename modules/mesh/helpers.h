@@ -1,5 +1,5 @@
-#ifndef MESH_HELPERS_H
-#define MESH_HELPERS_H
+#ifndef MODULES_MESH_HELPERS_H
+#define MODULES_MESH_HELPERS_H
 
 // K-3D
 // Copyright (c) 2005, Romain Behar
@@ -89,5 +89,5 @@ inline k3d::legacy::face* fill_hole(ReverseIteratorType RBegin, ReverseIteratorT
 
 } // namespace module
 
-#endif // MESH_HELPERS_H
+#endif // !MODULES_MESH_HELPERS_H
 

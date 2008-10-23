@@ -1,5 +1,5 @@
-#ifndef SDS_CACHE_H_
-#define SDS_CACHE_H_
+#ifndef MODULES_OPENGL_PAINTERS_SDS_CACHE_H
+#define MODULES_OPENGL_PAINTERS_SDS_CACHE_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -197,4 +197,4 @@ private:
 
 } // namespace module
 
-#endif /*SDS_CACHE_H_*/
+#endif // !MODULES_OPENGL_PAINTERS_SDS_CACHE_H

@@ -1,3 +1,6 @@
+#ifndef MODULES_COLLADA_IO_INTEGRATION_H
+#define MODULES_COLLADA_IO_INTEGRATION_H
+
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
 //
@@ -21,9 +24,6 @@
 	\author Carlos Andres Dominguez Caballero (carlosadc@gmail.com)
 	\author Barbiero Mattia
 */
-
-#ifndef __integration_h__
-#define __integration_h__
 
 #include <list>
 #include <vector>
@@ -97,4 +97,6 @@ namespace io
 	};
 	//void convertModel(domCOLLADA&, k3d::mesh& );
 }}}
-#endif
+
+#endif // !MODULES_COLLADA_IO_INTEGRATION_H
+

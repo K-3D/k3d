@@ -1,5 +1,5 @@
-#ifndef INTERPOLATOR_H_
-#define INTERPOLATOR_H_
+#ifndef MODULES_ANIMATION_INTERPOLATOR_H
+#define MODULES_ANIMATION_INTERPOLATOR_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -142,5 +142,5 @@ protected:
 
 } // namespace module
 
-#endif /*INTERPOLATOR_H_*/
+#endif // !MODULES_ANIMATION_INTERPOLATOR_H
 

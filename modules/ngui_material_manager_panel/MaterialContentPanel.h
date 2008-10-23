@@ -1,3 +1,6 @@
+#ifndef MODULES_NGUI_MATERIAL_MANAGER_PANEL_MATERIALCONTENTPANEL_H
+#define MODULES_NGUI_MATERIAL_MANAGER_PANEL_MATERIALCONTENTPANEL_H
+
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -19,9 +22,6 @@
 //
 // ---------------------
 //
-
-#ifndef MATERIALCONTENTPANEL_H
-#define MATERIALCONTENTPANEL_H
 
 #include <k3dsdk/ngui/entry.h>
 #include <k3dsdk/ngui/icons.h>
@@ -180,4 +180,4 @@ class MaterialContentPanel : public ContentPanel
 
 }//namespace module
 
-#endif
+#endif // !MODULES_NGUI_MATERIAL_MANAGER_PANEL_MATERIALCONTENTPANEL_H

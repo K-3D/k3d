@@ -1,3 +1,6 @@
+#ifndef MODULES_PGP_REMESH_PGP_H
+#define MODULES_PGP_REMESH_PGP_H
+
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
 //
@@ -21,9 +24,6 @@
 		\brief 
 		\author Ian South-Dickinson (ian.southd@gmail.com)
 */
-
-#ifndef PGP_PGP_H
-#define PGP_PGP_H
 
 #include "diff_geom.h"
 #include "mesh_info.h"
@@ -297,4 +297,6 @@ namespace detail {
 };
 
 }; // namespace pgp_module
-#endif
+
+#endif // !MODULES_PGP_REMESH_PGP_H
+

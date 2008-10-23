@@ -1,3 +1,6 @@
+#ifndef MODULES_COLLADA_IO_INTELEMENTS_H
+#define MODULES_COLLADA_IO_INTELEMENTS_H
+
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
 //
@@ -23,9 +26,6 @@
 
 // intElements is the implementation of the conversion between the dae format elements and
 // their equivalent on K-3D
-
-#ifndef __intGeometry_h__
-#define __intGeometry_h__
 
 
 #include <k3dsdk/mesh.h>
@@ -99,4 +99,6 @@ public:
 };
 
 }}}
-#endif
+
+#endif // !MODULES_COLLADA_IO_INTELEMENTS_H
+

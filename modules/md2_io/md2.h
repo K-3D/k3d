@@ -1,5 +1,5 @@
-#ifndef _MD2_H_
-#define _MD2_H_
+#ifndef MODULES_MD2_IO_MD2_H
+#define MODULES_MD2_IO_MD2_H
 
 #include <cstdio>
 #include <cstdlib>
@@ -137,5 +137,5 @@ private:
 }
 }
 
-#endif
+#endif // !MODULES_MD2_IO_MD2_H
 

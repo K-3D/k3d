@@ -1,5 +1,5 @@
-#ifndef RENDEREDIMAGE_H
-#define RENDEREDIMAGE_H
+#ifndef MODULES_NGUI_MATERIAL_MANAGER_PANEL_RENDEREDIMAGE_H
+#define MODULES_NGUI_MATERIAL_MANAGER_PANEL_RENDEREDIMAGE_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -136,4 +136,4 @@ class RenderedImage: public Gtk::DrawingArea
 
 } //namespace module
 
-#endif
+#endif // !MODULES_NGUI_MATERIAL_MANAGER_PANEL_RENDEREDIMAGE_H

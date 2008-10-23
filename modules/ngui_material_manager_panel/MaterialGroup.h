@@ -1,3 +1,6 @@
+#ifndef MODULES_NGUI_MATERIAL_MANAGER_PANEL_MATERIALGROUP_H
+#define MODULES_NGUI_MATERIAL_MANAGER_PANEL_MATERIALGROUP_H
+
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -19,9 +22,6 @@
 //
 // ---------------------
 //
-
-#ifndef MATERIALGROUP_H
-#define MATERIALGROUP_H
 
 #include <k3dsdk/types.h>
 
@@ -99,4 +99,5 @@ class MaterialGroup
 
 }//namespace module
 
-#endif
+#endif // !MODULES_NGUI_MATERIAL_MANAGER_PANEL_MATERIALGROUP_H
+

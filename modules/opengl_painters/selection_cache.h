@@ -1,5 +1,5 @@
-#ifndef SELECTION_CACHE_H_
-#define SELECTION_CACHE_H_
+#ifndef MODULES_OPENGL_PAINTERS_SELECTION_CACHE_H
+#define MODULES_OPENGL_PAINTERS_SELECTION_CACHE_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -124,4 +124,4 @@ protected:
 
 } // namespace module
 
-#endif /*SELECTION_CACHE_H_*/
+#endif // !MODULES_OPENGL_PAINTERS_SELECTION_CACHE_H

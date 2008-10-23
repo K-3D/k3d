@@ -1,5 +1,5 @@
-#ifndef VBO_H
-#define VBO_H
+#ifndef MODULES_OPENGL_PAINTERS_VBO_H
+#define MODULES_OPENGL_PAINTERS_VBO_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -340,4 +340,4 @@ void clean_vbo_state();
 
 } // namespace module
 
-#endif
+#endif // !MODULES_OPENGL_PAINTERS_VBO_H

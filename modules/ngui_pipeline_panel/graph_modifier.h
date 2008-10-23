@@ -1,5 +1,5 @@
-#ifndef GRAPH_MODIFIER_H
-#define GRAPH_MODIFIER_H
+#ifndef MODULES_NGUI_PIPELINE_PANEL_GRAPH_MODIFIER_H
+#define MODULES_NGUI_PIPELINE_PANEL_GRAPH_MODIFIER_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -104,5 +104,5 @@ private:
 
 } // namespace module
 
-#endif // !GRAPH_MODIFIER
+#endif // !MODULES_NGUI_PIPELINE_PANEL_GRAPH_MODIFIER_H
 

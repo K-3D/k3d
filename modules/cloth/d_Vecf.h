@@ -1,7 +1,7 @@
-#include <math.h>
+#ifndef MODULES_CLOTH_D_VECF_H
+#define MODULES_CLOTH_D_VECF_H
 
-#ifndef D_VECF_H
-#define D_VECF_H
+#include <math.h>
 
 namespace d_Math
 {
@@ -104,5 +104,5 @@ namespace d_Math
 	};
 }
 
-#endif //D_VECF_H
+#endif // !MODULES_CLOTH_D_VECF_H
 

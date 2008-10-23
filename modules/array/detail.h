@@ -1,5 +1,5 @@
-#ifndef MODULE_ARRAY_DETAIL_H
-#define MODULE_ARRAY_DETAIL_H
+#ifndef MODULES_ARRAY_DETAIL_H
+#define MODULES_ARRAY_DETAIL_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -180,5 +180,5 @@ private:
 
 } // namespace module
 
-#endif // !MODULE_ARRAY_DETAIL_H
+#endif // !MODULES_ARRAY_DETAIL_H
 

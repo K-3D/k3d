@@ -1,5 +1,5 @@
-#ifndef GTS_HELPERS_H
-#define GTS_HELPERS_H
+#ifndef MODULES_GTS_HELPERS_H
+#define MODULES_GTS_HELPERS_H
 
 // K-3D
 // Copyright (c) 2004-2007, Romain Behar
@@ -78,5 +78,5 @@ private:
 
 } // namespace module
 
-#endif // GTS_HELPERS_H
+#endif // !MODULES_GTS_HELPERS_H
 

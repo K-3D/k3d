@@ -1,3 +1,6 @@
+#ifndef MODULES_NGUI_MATERIAL_MANAGER_PANEL_PREVIEWOBJ_H
+#define MODULES_NGUI_MATERIAL_MANAGER_PANEL_PREVIEWOBJ_H
+
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -19,9 +22,6 @@
 //
 // ---------------------
 //
-
-#ifndef PREVIEWOBJ_H
-#define PREVIEWOBJ_H
 
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/types.h>
@@ -99,6 +99,5 @@ class PreviewObj
 
 }//namespace module
 
-
-#endif
+#endif // !MODULES_NGUI_MATERIAL_MANAGER_PANEL_PREVIEWOBJ_H
 

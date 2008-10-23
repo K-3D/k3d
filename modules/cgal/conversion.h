@@ -1,5 +1,5 @@
-#ifndef CONVERSION_H_
-#define CONVERSION_H_
+#ifndef MODULES_CGAL_CONVERSION_H
+#define MODULES_CGAL_CONVERSION_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -79,4 +79,4 @@ namespace cgal
 
 } // namespace module
 
-#endif /*CONVERSION_H_*/
+#endif // !MODULES_CGAL_CONVERSION_H

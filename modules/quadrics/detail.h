@@ -1,5 +1,5 @@
-#ifndef QUADRICS_DETAIL_H
-#define QUADRICS_DETAIL_H
+#ifndef MODULES_QUADRICS_DETAIL_H
+#define MODULES_QUADRICS_DETAIL_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -95,5 +95,5 @@ private:
 
 } // namespace module
 
-#endif // QUADRICS_DETAIL_H
+#endif // !MODULES_QUADRICS_DETAIL_H
 

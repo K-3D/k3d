@@ -1,5 +1,5 @@
-#ifndef DOCUMENT_TO_GRAPH_H
-#define DOCUMENT_TO_GRAPH_H
+#ifndef MODULES_NGUI_PIPELINE_PANEL_DOCUMENT_TO_GRAPH_H
+#define MODULES_NGUI_PIPELINE_PANEL_DOCUMENT_TO_GRAPH_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -70,5 +70,5 @@ private:
 
 } // namespace module
 
-#endif // !DOCUMENT_TO_GRAPH
+#endif // !MODULES_NGUI_PIPELINE_PANEL_DOCUMENT_TO_GRAPH_H
 

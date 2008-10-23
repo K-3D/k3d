@@ -1,3 +1,6 @@
+#ifndef MODULES_CUDA_CUDA_DEVICE_POLYHEDRA_H
+#define MODULES_CUDA_CUDA_DEVICE_POLYHEDRA_H
+
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -106,3 +109,6 @@ class cuda_device_polyhedra
         /// a pointer to the host version of the polyhedra_t
         const k3d::mesh::polyhedra_t* m_p_input_polyhedra;
 };
+
+#endif // !MODULES_CUDA_CUDA_DEVICE_POLYHEDRA_H
+

@@ -1,3 +1,6 @@
+#ifndef MODULES_3DS_IO_INTEGRATION_H
+#define MODULES_3DS_IO_INTEGRATION_H
+
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
 //
@@ -20,9 +23,6 @@
 /** \file
 	\author Carlos Andres Dominguez Caballero (carlosadc@gmail.com)
 */
-
-#ifndef __integration_h__
-#define __integration_h__
 
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/mesh.h>
@@ -48,5 +48,5 @@ public:
 
 } // namespace module
 
-#endif
+#endif // !MODULES_3DS_IO_INTEGRATION_H
 

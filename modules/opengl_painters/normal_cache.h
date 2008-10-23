@@ -1,5 +1,5 @@
-#ifndef NORMAL_CACHE_H_
-#define NORMAL_CACHE_H_
+#ifndef MODULES_OPENGL_PAINTERS_NORMAL_CACHE_H
+#define MODULES_OPENGL_PAINTERS_NORMAL_CACHE_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -64,4 +64,4 @@ bool backfacing(const k3d::point3& Point, k3d::icamera& Camera, const k3d::norma
 
 } // namespace module
 
-#endif /*NORMAL_CACHE_H_*/
+#endif // !MODULES_OPENGL_PAINTERS_NORMAL_CACHE_H

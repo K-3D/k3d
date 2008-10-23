@@ -1,3 +1,6 @@
+#ifndef MODULES_PGP_REMESH_MESH_INFO_H
+#define MODULES_PGP_REMESH_MESH_INFO_H
+
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
 //
@@ -21,8 +24,6 @@
 		\brief 
 		\author Ian South-Dickinson (ian.southd@gmail.com)
 */
-#ifndef PGP_MESH_INFO_H
-#define PGP_MESH_INFO_H
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/log.h>
@@ -286,4 +287,6 @@ namespace detail {
 	};
 };
 }; // namespace pgp_module
-#endif
+
+#endif // !MODULES_PGP_REMESH_MESH_INFO_H
+

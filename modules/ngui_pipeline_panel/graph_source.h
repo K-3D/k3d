@@ -1,5 +1,5 @@
-#ifndef GRAPH_SOURCE_H
-#define GRAPH_SOURCE_H
+#ifndef MODULES_NGUI_PIPELINE_PANEL_GRAPH_SOURCE_H
+#define MODULES_NGUI_PIPELINE_PANEL_GRAPH_SOURCE_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -89,5 +89,5 @@ private:
 
 } // namespace module
 
-#endif // !GRAPH_SOURCE
+#endif // !MODULES_NGUI_PIPELINE_PANEL_GRAPH_SOURCE_H
 
