@@ -149,6 +149,8 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk-python-b)
 ADD_LIBRARY(k3dsdk-python-primitives SHARED
 	cone_python.cpp
 	cone_python.h
+	cylinder_python.cpp
+	cylinder_python.h
 	point_group_python.cpp
 	point_group_python.h
 	teapot_python.cpp

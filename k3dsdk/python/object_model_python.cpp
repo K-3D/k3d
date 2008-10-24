@@ -33,6 +33,7 @@
 #include "const_named_arrays_python.h"
 #include "const_named_attribute_arrays_python.h"
 #include "const_typed_array_python.h"
+#include "cylinder_python.h"
 #include "dynamic_cast_python.h"
 #include "euler_angles_python.h"
 #include "euler_python.h"
@@ -450,6 +451,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_vector2();
 	define_class_vector3();
 	define_namespace_cone();
+	define_namespace_cylinder();
 	define_namespace_euler();
 	define_namespace_log();
 	define_namespace_mesh();

@@ -147,6 +147,7 @@ K3D_ADD_TEST(mesh.source.MeshSourceScript.bicubic.patches.py PYTHON REQUIRES K3D
 K3D_ADD_TEST(mesh.source.MeshSourceScript.bilinear.patches.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.cones.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.cubic.curves.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
+K3D_ADD_TEST(mesh.source.MeshSourceScript.cylinders.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.linear.curves.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.nurbs.curves.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.nurbs.patches.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
