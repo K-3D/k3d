@@ -25,15 +25,21 @@
 */
 
 #include "interface_wrapper_python.h"
+
+#include <k3dsdk/mesh.h>
 #include <boost/python/object.hpp>
 
 namespace k3d
 {
 
-class mesh;
-	
 namespace python
 {
+
+typedef interface_wrapper<k3d::mesh> mesh_wrapper;
+
+typedef interface_wrapper<k3d::mesh::primitive> mesh_primitive_wrapper;
+
+typedef interface_wrapper<const k3d::mesh::primitive> const_mesh_primitive_wrapper;
 
 class mesh :
 	public interface_wrapper<k3d::mesh>

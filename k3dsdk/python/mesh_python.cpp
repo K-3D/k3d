@@ -1041,8 +1041,6 @@ const string_t mesh::str()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // const_mesh_primitive 
 
-typedef interface_wrapper<const k3d::mesh::primitive> const_mesh_primitive_wrapper;
-
 static const string_t const_mesh_primitive_get_type(const_mesh_primitive_wrapper& Self)
 {
 	return Self.wrapped().type;
@@ -1060,8 +1058,6 @@ static object const_mesh_primitive_get_attributes(const_mesh_primitive_wrapper& 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // mesh_primitive 
-
-typedef interface_wrapper<k3d::mesh::primitive> mesh_primitive_wrapper;
 
 static const string_t mesh_primitive_get_type(mesh_primitive_wrapper& Self)
 {
