@@ -1,5 +1,5 @@
-#ifndef K3DSDK_EULER_ANGLES_PYTHON_H
-#define K3DSDK_EULER_ANGLES_PYTHON_H
+#ifndef K3DSDK_PYTHON_EULER_ANGLES_PYTHON_H
+#define K3DSDK_PYTHON_EULER_ANGLES_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -56,5 +56,5 @@ const euler_angles operator*(const double LHS, const euler_angles& RHS);
 
 } // namespace k3d
 
-#endif // !K3DSDK_EULER_ANGLES_PYTHON_H
+#endif // !K3DSDK_PYTHON_EULER_ANGLES_PYTHON_H
 

@@ -1,5 +1,5 @@
-#ifndef K3DSDK_DYNAMIC_CAST_PYTHON_H
-#define K3DSDK_DYNAMIC_CAST_PYTHON_H
+#ifndef K3DSDK_PYTHON_DYNAMIC_CAST_PYTHON_H
+#define K3DSDK_PYTHON_DYNAMIC_CAST_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -38,5 +38,5 @@ boost::python::object do_dynamic_cast(const boost::python::object& Source, const
 
 } // namespace k3d
 
-#endif // K3DSDK_DYNAMIC_CAST_PYTHON_H
+#endif // !K3DSDK_PYTHON_DYNAMIC_CAST_PYTHON_H
 

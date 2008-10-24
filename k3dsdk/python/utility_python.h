@@ -1,5 +1,5 @@
-#ifndef K3DSDK_UTILITY_PYTHON_H
-#define K3DSDK_UTILITY_PYTHON_H
+#ifndef K3DSDK_PYTHON_UTILITY_PYTHON_H
+#define K3DSDK_PYTHON_UTILITY_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -98,5 +98,5 @@ static boost::python::object wrapped_get_wrapped_item_by_key(self_t& Self, const
 
 } // namespace k3d
 
-#endif // !K3DSDK_UTILITY_PYTHON_H
+#endif // !K3DSDK_PYTHON_UTILITY_PYTHON_H
 

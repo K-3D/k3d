@@ -1,5 +1,5 @@
-#ifndef K3DSDK_INTERFACE_WRAPPER_PYTHON_H
-#define K3DSDK_INTERFACE_WRAPPER_PYTHON_H
+#ifndef K3DSDK_PYTHON_INSTANCE_WRAPPER_PYTHON_H
+#define K3DSDK_PYTHON_INSTANCE_WRAPPER_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -34,30 +34,30 @@ namespace python
 {
 
 ////////////////////////////////////////////////////////////////////////////////////
-// interface_wrapper
+// instance_wrapper
 
 template<typename T>
-class interface_wrapper
+class instance_wrapper
 {
 public:
 	typedef T wrapped_type;
 
-	interface_wrapper() :
+	instance_wrapper() :
 		m_wrapped(0)
 	{
 	}
 
-	interface_wrapper(T* Wrapped) :
+	instance_wrapper(T* Wrapped) :
 		m_wrapped(Wrapped)
 	{
 	}
 
-	interface_wrapper(T& Wrapped) :
+	instance_wrapper(T& Wrapped) :
 		m_wrapped(&Wrapped)
 	{
 	}
 
-	friend const bool operator==(const interface_wrapper& lhs, const interface_wrapper& rhs)
+	friend const bool operator==(const instance_wrapper& lhs, const instance_wrapper& rhs)
 	{
 		return lhs.m_wrapped == rhs.m_wrapped;
 	}
@@ -82,18 +82,18 @@ private:
 template<typename T>
 boost::python::object wrap(T* Wrapped)
 {
-	return Wrapped ? boost::python::object(interface_wrapper<T>(*Wrapped)) : boost::python::object();
+	return Wrapped ? boost::python::object(instance_wrapper<T>(*Wrapped)) : boost::python::object();
 }
 
 template<typename T>
 boost::python::object wrap(T& Wrapped)
 {
-	return boost::python::object(interface_wrapper<T>(Wrapped));
+	return boost::python::object(instance_wrapper<T>(Wrapped));
 }
 
 } // namespace python
 
 } // namespace k3d
 
-#endif // K3DSDK_INTERFACE_WRAPPER_PYTHON_H
+#endif // !K3DSDK_PYTHON_INSTANCE_WRAPPER_PYTHON_H
 

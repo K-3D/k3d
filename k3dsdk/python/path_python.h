@@ -1,5 +1,5 @@
-#ifndef PATH_PYTHON_H_
-#define PATH_PYTHON_H_
+#ifndef K3DSDK_PYTHON_PATH_PYTHON_H
+#define K3DSDK_PYTHON_PATH_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -36,4 +36,5 @@ void define_class_path();
 
 } // namespace k3d
 
-#endif /*PATH_PYTHON_H_*/
+#endif // !K3DSDK_PYTHON_PATH_PYTHON_H
+

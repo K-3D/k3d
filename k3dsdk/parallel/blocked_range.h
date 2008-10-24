@@ -1,5 +1,5 @@
-#ifndef K3DSDK_BLOCKED_RANGE_H
-#define K3DSDK_BLOCKED_RANGE_H
+#ifndef K3DSDK_PARALLEL_BLOCKED_RANGE_H
+#define K3DSDK_PARALLEL_BLOCKED_RANGE_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -137,5 +137,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_BLOCKED_RANGE_H
+#endif // !K3DSDK_PARALLEL_BLOCKED_RANGE_H
 

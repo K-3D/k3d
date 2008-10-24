@@ -39,7 +39,7 @@ namespace k3d
 namespace python
 {
 
-static boost::python::object get_item_imaterial(interface_wrapper<const k3d::typed_array<k3d::imaterial*> >& Self, int Item)
+static boost::python::object get_item_imaterial(instance_wrapper<const k3d::typed_array<k3d::imaterial*> >& Self, int Item)
 {
 	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
@@ -47,7 +47,7 @@ static boost::python::object get_item_imaterial(interface_wrapper<const k3d::typ
 	return wrap(Self.wrapped().at(Item));
 }
 
-static boost::python::object get_item_inode(interface_wrapper<const k3d::typed_array<k3d::inode*> >& Self, int Item)
+static boost::python::object get_item_inode(instance_wrapper<const k3d::typed_array<k3d::inode*> >& Self, int Item)
 {
 	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
@@ -79,7 +79,7 @@ static boost::python::dict get_metadata(const self_t& Self)
 template<typename array_type>
 static void define_class_const_typed_array(const char* const ClassName, const char* const DocString)
 {
-	typedef interface_wrapper<array_type> wrapper_type;
+	typedef instance_wrapper<array_type> wrapper_type;
 
 	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
 		.def("__len__", &utility::wrapped_len<wrapper_type>)
@@ -93,7 +93,7 @@ template<>
 void define_class_const_typed_array<const k3d::typed_array<k3d::imaterial*> >(const char* const ClassName, const char* const DocString)
 {
 	typedef const k3d::typed_array<k3d::imaterial*> array_type;
-	typedef interface_wrapper<array_type> wrapper_type;
+	typedef instance_wrapper<array_type> wrapper_type;
 
 	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
 		.def("__len__", &utility::wrapped_len<wrapper_type>)
@@ -107,7 +107,7 @@ template<>
 void define_class_const_typed_array<const k3d::typed_array<k3d::inode*> >(const char* const ClassName, const char* const DocString)
 {
 	typedef const k3d::typed_array<k3d::inode*> array_type;
-	typedef interface_wrapper<array_type> wrapper_type;
+	typedef instance_wrapper<array_type> wrapper_type;
 
 	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
 		.def("__len__", &utility::wrapped_len<wrapper_type>)

@@ -1,5 +1,5 @@
-#ifndef K3DSDK_MESH_PYTHON_H
-#define K3DSDK_MESH_PYTHON_H
+#ifndef K3DSDK_PYTHON_MESH_PYTHON_H
+#define K3DSDK_PYTHON_MESH_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -24,7 +24,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
+#include "instance_wrapper_python.h"
 
 #include <k3dsdk/mesh.h>
 #include <boost/python/object.hpp>
@@ -35,16 +35,16 @@ namespace k3d
 namespace python
 {
 
-typedef interface_wrapper<k3d::mesh> mesh_wrapper;
+typedef instance_wrapper<k3d::mesh> mesh_wrapper;
 
-typedef interface_wrapper<k3d::mesh::primitive> mesh_primitive_wrapper;
+typedef instance_wrapper<k3d::mesh::primitive> mesh_primitive_wrapper;
 
-typedef interface_wrapper<const k3d::mesh::primitive> const_mesh_primitive_wrapper;
+typedef instance_wrapper<const k3d::mesh::primitive> const_mesh_primitive_wrapper;
 
 class mesh :
-	public interface_wrapper<k3d::mesh>
+	public instance_wrapper<k3d::mesh>
 {
-	typedef interface_wrapper<k3d::mesh> base;
+	typedef instance_wrapper<k3d::mesh> base;
 public:
 	mesh();
 	mesh(k3d::mesh* Mesh);
@@ -97,5 +97,5 @@ void define_namespace_mesh();
 
 } // namespace k3d
 
-#endif // !K3DSDK_MESH_PYTHON_H
+#endif // !K3DSDK_PYTHON_MESH_PYTHON_H
 

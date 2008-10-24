@@ -1,5 +1,5 @@
-#ifndef PLUGIN_PYTHON_H
-#define PLUGIN_PYTHON_H
+#ifndef K3DSDK_PYTHON_PLUGIN_PYTHON_H
+#define K3DSDK_PYTHON_PLUGIN_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -36,5 +36,5 @@ void define_namespace_plugin();
 
 } // namespace k3d
 
-#endif // PLUGIN_PYTHON_H
+#endif // !K3DSDK_PYTHON_PLUGIN_PYTHON_H
 

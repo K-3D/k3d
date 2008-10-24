@@ -1,5 +1,5 @@
-#ifndef K3DSDK_THREADS_H
-#define K3DSDK_THREADS_H
+#ifndef K3DSDK_PARALLEL_THREADS_H
+#define K3DSDK_PARALLEL_THREADS_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -49,5 +49,5 @@ const uint_t grain_size();
 
 } // namespace k3d
 
-#endif // K3DSDK_THREADS_H
+#endif // !K3DSDK_PARALLEL_THREADS_H
 

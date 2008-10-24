@@ -1,5 +1,5 @@
-#ifndef K3DSDK_POINT4_PYTHON_H
-#define K3DSDK_POINT4_PYTHON_H
+#ifndef K3DSDK_PYTHON_POINT4_PYTHON_H
+#define K3DSDK_PYTHON_POINT4_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -36,4 +36,4 @@ void define_class_point4();
 
 } // namespace k3d
 
-#endif // !K3DSDK_POINT4_PYTHON_H
+#endif // !K3DSDK_PYTHON_POINT4_PYTHON_H

@@ -1,5 +1,5 @@
-#ifndef K3DSDK_ICOMMAND_NODE_PYTHON_H
-#define K3DSDK_ICOMMAND_NODE_PYTHON_H
+#ifndef K3DSDK_PYTHON_ICOMMAND_NODE_PYTHON_H
+#define K3DSDK_PYTHON_ICOMMAND_NODE_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -24,7 +24,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
+#include "instance_wrapper_python.h"
 #include <k3dsdk/icommand_node.h>
 
 namespace k3d
@@ -33,7 +33,7 @@ namespace k3d
 namespace python
 {
 
-typedef interface_wrapper<k3d::icommand_node> icommand_node_wrapper;
+typedef instance_wrapper<k3d::icommand_node> icommand_node_wrapper;
 
 void define_class_icommand_node();
 
@@ -41,5 +41,5 @@ void define_class_icommand_node();
 
 } // namespace k3d
 
-#endif // !K3DSDK_ICOMMAND_NODE_PYTHON_H
+#endif // !K3DSDK_PYTHON_ICOMMAND_NODE_PYTHON_H
 

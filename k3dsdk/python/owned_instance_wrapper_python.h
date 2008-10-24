@@ -96,5 +96,5 @@ boost::python::object wrap_owned(T& Wrapped)
 
 } // namespace k3d
 
-#endif // K3DSDK_PYTHON_OWNED_INSTANCE_WRAPPER_PYTHON_H
+#endif // !K3DSDK_PYTHON_OWNED_INSTANCE_WRAPPER_PYTHON_H
 

@@ -1,5 +1,5 @@
-#ifndef K3DSDK_ARRAY_PYTHON_H
-#define K3DSDK_ARRAY_PYTHON_H
+#ifndef K3DSDK_PYTHON_TYPED_ARRAY_PYTHON_H
+#define K3DSDK_PYTHON_TYPED_ARRAY_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -24,7 +24,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
+#include "instance_wrapper_python.h"
 #include <k3dsdk/array.h>
 
 namespace k3d
@@ -42,5 +42,5 @@ void define_typed_array_classes();
 
 } // namespace k3d
 
-#endif // !K3DSDK_ARRAY_PYTHON_H
+#endif // !K3DSDK_PYTHON_TYPED_ARRAY_PYTHON_H
 

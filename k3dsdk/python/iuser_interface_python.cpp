@@ -35,27 +35,27 @@ namespace k3d
 namespace python
 {
 
-static void open_uri(iuser_interface_wrapper& Self, const string_t& URI)
+static void open_uri(iuser_instance_wrapper& Self, const string_t& URI)
 {
 	Self.wrapped().open_uri(URI);
 }
 
-static void message(iuser_interface_wrapper& Self, const string_t& Message)
+static void message(iuser_instance_wrapper& Self, const string_t& Message)
 {
 	Self.wrapped().message(Message);
 }
 
-static void warning_message(iuser_interface_wrapper& Self, const string_t& Message)
+static void warning_message(iuser_instance_wrapper& Self, const string_t& Message)
 {
 	Self.wrapped().warning_message(Message);
 }
 
-static void error_message(iuser_interface_wrapper& Self, const string_t& Message)
+static void error_message(iuser_instance_wrapper& Self, const string_t& Message)
 {
 	Self.wrapped().error_message(Message);
 }
 
-static unsigned long query_message(iuser_interface_wrapper& Self, const string_t& Message, const list& Buttons)
+static unsigned long query_message(iuser_instance_wrapper& Self, const string_t& Message, const list& Buttons)
 {
 	std::vector<string_t> buttons;
 	for(long i = 0; i != len(Buttons); ++i)
@@ -63,7 +63,7 @@ static unsigned long query_message(iuser_interface_wrapper& Self, const string_t
 	return Self.wrapped().query_message(Message, 0, buttons);
 }
 
-static const filesystem::path get_file_path(iuser_interface_wrapper& Self, const string_t& Direction, const string_t& Type, const string_t& Message, const string_t& StartPath)
+static const filesystem::path get_file_path(iuser_instance_wrapper& Self, const string_t& Direction, const string_t& Type, const string_t& Message, const string_t& StartPath)
 {
 	const filesystem::path old_path = filesystem::native_path(ustring::from_utf8(StartPath));
 	filesystem::path new_path;
@@ -77,14 +77,14 @@ static const filesystem::path get_file_path(iuser_interface_wrapper& Self, const
 	return new_path;
 }
 
-static void synchronize(iuser_interface_wrapper& Self)
+static void synchronize(iuser_instance_wrapper& Self)
 {
 	Self.wrapped().synchronize();
 }
 
 void define_class_iuser_interface()
 {
-	class_<iuser_interface_wrapper>("iuser_interface", 
+	class_<iuser_instance_wrapper>("iuser_interface", 
 		"Provides access to the user interface plugin specified by the user at program startup.", no_init)
 		.def("open_uri", &open_uri,
 			"Opens a Uniform Resource Identifier (URI) in the user's preferred application.\n"

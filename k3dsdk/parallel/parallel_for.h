@@ -1,5 +1,5 @@
-#ifndef K3DSDK_PARALLEL_FOR_H
-#define K3DSDK_PARALLEL_FOR_H
+#ifndef K3DSDK_PARALLEL_PARALLEL_FOR_H
+#define K3DSDK_PARALLEL_PARALLEL_FOR_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -61,5 +61,5 @@ void parallel_for(const RangeT& Range, const BodyT& Body)
 
 } // namespace k3d
 
-#endif // K3DSDK_PARALLEL_FOR_H
+#endif // !K3DSDK_PARALLEL_PARALLEL_FOR_H
 

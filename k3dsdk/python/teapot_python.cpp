@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "mesh_python.h"
-#include "owned_instance_wrapper.h"
+#include "owned_instance_wrapper_python.h"
 #include "teapot_python.h"
 
 #include <k3dsdk/teapot.h>

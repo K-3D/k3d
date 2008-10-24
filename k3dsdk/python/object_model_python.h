@@ -1,5 +1,5 @@
-#ifndef K3DSDK_OBJECT_MODEL_H
-#define K3DSDK_OBJECT_MODEL_H
+#ifndef K3DSDK_PYTHON_OBJECT_MODEL_PYTHON_H
+#define K3DSDK_PYTHON_OBJECT_MODEL_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -45,5 +45,5 @@ void get_context(boost::python::dict& Dictionary, iscript_engine::context_t& Con
 
 } // namespace k3d
 
-#endif // !K3DSDK_OBJECT_MODEL_H
+#endif // !K3DSDK_PYTHON_OBJECT_MODEL_PYTHON_H
 

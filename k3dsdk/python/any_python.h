@@ -1,3 +1,6 @@
+#ifndef K3DSDK_PYTHON_ANY_PYTHON_H
+#define K3DSDK_PYTHON_ANY_PYTHON_H
+
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
 //
@@ -41,3 +44,4 @@ const boost::any python_to_any(const boost::python::object& Value, const std::ty
 
 } // namespace k3d
 
+#endif // !K3DSDK_PYTHON_ANY_PYTHON_H

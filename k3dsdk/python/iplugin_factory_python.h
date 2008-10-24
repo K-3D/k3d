@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IPLUGIN_FACTORY_PYTHON_H
-#define K3DSDK_IPLUGIN_FACTORY_PYTHON_H
+#ifndef K3DSDK_PYTHON_IPLUGIN_FACTORY_PYTHON_H
+#define K3DSDK_PYTHON_IPLUGIN_FACTORY_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -24,7 +24,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "interface_wrapper_python.h"
+#include "instance_wrapper_python.h"
 #include <k3dsdk/iplugin_factory.h>
 
 namespace k3d
@@ -33,7 +33,7 @@ namespace k3d
 namespace python
 {
 
-typedef interface_wrapper<k3d::iplugin_factory> iplugin_factory_wrapper;
+typedef instance_wrapper<k3d::iplugin_factory> iplugin_factory_wrapper;
 
 void define_class_iplugin_factory();
 
@@ -41,5 +41,5 @@ void define_class_iplugin_factory();
 
 } // namespace k3d
 
-#endif // !K3DSDK_IPLUGIN_FACTORY_PYTHON_H
+#endif // !K3DSDK_PYTHON_IPLUGIN_FACTORY_PYTHON_H
 

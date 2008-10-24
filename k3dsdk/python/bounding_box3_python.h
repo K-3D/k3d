@@ -1,5 +1,5 @@
-#ifndef K3DSDK_BOUNDING_BOX_PYTHON_H
-#define K3DSDK_BOUNDING_BOX_PYTHON_H
+#ifndef K3DSDK_PYTHON_BOUNDING_BOX3_PYTHON_H
+#define K3DSDK_PYTHON_BOUNDING_BOX3_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -36,5 +36,5 @@ void define_class_bounding_box3();
 
 } // namespace k3d
 
-#endif // !K3DSDK_BOUNDING_BOX_PYTHON_H
+#endif // !K3DSDK_PYTHON_BOUNDING_BOX3_PYTHON_H
 

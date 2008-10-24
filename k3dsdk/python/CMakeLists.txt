@@ -91,7 +91,7 @@ ADD_LIBRARY(k3dsdk-python-b SHARED
 	imetadata_python.h
 	inode_python.cpp
 	inode_python.h
-	interface_wrapper_python.h
+	instance_wrapper_python.h
 	iplugin_factory_python.cpp
 	iplugin_factory_python.h
 	isnappable_python.cpp

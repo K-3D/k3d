@@ -1,5 +1,5 @@
-#ifndef LOG_PYTHON_H
-#define LOG_PYTHON_H
+#ifndef K3DSDK_PYTHON_LOG_PYTHON_H
+#define K3DSDK_PYTHON_LOG_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -36,5 +36,5 @@ void define_namespace_log();
 
 } // namespace k3d
 
-#endif // LOG_PYTHON_H
+#endif // !K3DSDK_PYTHON_LOG_PYTHON_H
 

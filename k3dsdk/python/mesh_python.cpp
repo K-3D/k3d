@@ -25,7 +25,7 @@
 #include "const_attribute_arrays_python.h"
 #include "const_typed_array_python.h"
 #include "imaterial_python.h"
-#include "interface_wrapper_python.h"
+#include "instance_wrapper_python.h"
 #include "mesh_python.h"
 #include "typed_array_python.h"
 #include "utility_python.h"
@@ -111,7 +111,7 @@ object wrap_const_array(const pipeline_data<array_type>& Data)
 	if(!Data)
 		return object();
 
-	return object(interface_wrapper<const array_type>(*Data));
+	return object(instance_wrapper<const array_type>(*Data));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,7 +123,7 @@ object wrap_non_const_array(pipeline_data<array_type>& Data)
 	if(!Data)
 		return object();
 
-	return object(interface_wrapper<array_type>(Data.writable()));
+	return object(instance_wrapper<array_type>(Data.writable()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,16 +132,16 @@ object wrap_non_const_array(pipeline_data<array_type>& Data)
 template<typename array_type>
 object create_array(pipeline_data<array_type>& Data)
 {
-	return object(interface_wrapper<array_type>(Data.create()));
+	return object(instance_wrapper<array_type>(Data.create()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // const_linear_curve_groups
 
 class const_linear_curve_groups :
-	public interface_wrapper<const k3d::mesh::linear_curve_groups_t>
+	public instance_wrapper<const k3d::mesh::linear_curve_groups_t>
 {
-	typedef interface_wrapper<const k3d::mesh::linear_curve_groups_t> base;
+	typedef instance_wrapper<const k3d::mesh::linear_curve_groups_t> base;
 public:
 	const_linear_curve_groups() :
 		base()
@@ -175,9 +175,9 @@ public:
 // linear_curve_groups
 
 class linear_curve_groups :
-	public interface_wrapper<k3d::mesh::linear_curve_groups_t>
+	public instance_wrapper<k3d::mesh::linear_curve_groups_t>
 {
-	typedef interface_wrapper<k3d::mesh::linear_curve_groups_t> base;
+	typedef instance_wrapper<k3d::mesh::linear_curve_groups_t> base;
 public:
 	linear_curve_groups() :
 		base()
@@ -232,9 +232,9 @@ public:
 // const_cubic_curve_groups
 
 class const_cubic_curve_groups :
-	public interface_wrapper<const k3d::mesh::cubic_curve_groups_t>
+	public instance_wrapper<const k3d::mesh::cubic_curve_groups_t>
 {
-	typedef interface_wrapper<const k3d::mesh::cubic_curve_groups_t> base;
+	typedef instance_wrapper<const k3d::mesh::cubic_curve_groups_t> base;
 public:
 	const_cubic_curve_groups() :
 		base()
@@ -268,9 +268,9 @@ public:
 // cubic_curve_groups
 
 class cubic_curve_groups :
-	public interface_wrapper<k3d::mesh::cubic_curve_groups_t>
+	public instance_wrapper<k3d::mesh::cubic_curve_groups_t>
 {
-	typedef interface_wrapper<k3d::mesh::cubic_curve_groups_t> base;
+	typedef instance_wrapper<k3d::mesh::cubic_curve_groups_t> base;
 public:
 	cubic_curve_groups() :
 		base()
@@ -325,9 +325,9 @@ public:
 // const_nurbs_curve_groups
 
 class const_nurbs_curve_groups :
-	public interface_wrapper<const k3d::mesh::nurbs_curve_groups_t>
+	public instance_wrapper<const k3d::mesh::nurbs_curve_groups_t>
 {
-	typedef interface_wrapper<const k3d::mesh::nurbs_curve_groups_t> base;
+	typedef instance_wrapper<const k3d::mesh::nurbs_curve_groups_t> base;
 public:
 	const_nurbs_curve_groups() :
 		base()
@@ -364,9 +364,9 @@ public:
 // nurbs_curve_groups
 
 class nurbs_curve_groups :
-	public interface_wrapper<k3d::mesh::nurbs_curve_groups_t>
+	public instance_wrapper<k3d::mesh::nurbs_curve_groups_t>
 {
-	typedef interface_wrapper<k3d::mesh::nurbs_curve_groups_t> base;
+	typedef instance_wrapper<k3d::mesh::nurbs_curve_groups_t> base;
 public:
 	nurbs_curve_groups() :
 		base()
@@ -430,9 +430,9 @@ public:
 // const_bilinear_patches
 
 class const_bilinear_patches :
-	public interface_wrapper<const k3d::mesh::bilinear_patches_t>
+	public instance_wrapper<const k3d::mesh::bilinear_patches_t>
 {
-	typedef interface_wrapper<const k3d::mesh::bilinear_patches_t> base;
+	typedef instance_wrapper<const k3d::mesh::bilinear_patches_t> base;
 public:
 	const_bilinear_patches() :
 		base()
@@ -461,9 +461,9 @@ public:
 // bilinear_patches
 
 class bilinear_patches :
-	public interface_wrapper<k3d::mesh::bilinear_patches_t>
+	public instance_wrapper<k3d::mesh::bilinear_patches_t>
 {
-	typedef interface_wrapper<k3d::mesh::bilinear_patches_t> base;
+	typedef instance_wrapper<k3d::mesh::bilinear_patches_t> base;
 public:
 	bilinear_patches() :
 		base()
@@ -503,9 +503,9 @@ public:
 // const_bicubic_patches
 
 class const_bicubic_patches :
-	public interface_wrapper<const k3d::mesh::bicubic_patches_t>
+	public instance_wrapper<const k3d::mesh::bicubic_patches_t>
 {
-	typedef interface_wrapper<const k3d::mesh::bicubic_patches_t> base;
+	typedef instance_wrapper<const k3d::mesh::bicubic_patches_t> base;
 public:
 	const_bicubic_patches() :
 		base()
@@ -534,9 +534,9 @@ public:
 // bicubic_patches
 
 class bicubic_patches :
-	public interface_wrapper<k3d::mesh::bicubic_patches_t>
+	public instance_wrapper<k3d::mesh::bicubic_patches_t>
 {
-	typedef interface_wrapper<k3d::mesh::bicubic_patches_t> base;
+	typedef instance_wrapper<k3d::mesh::bicubic_patches_t> base;
 public:
 	bicubic_patches() :
 		base()
@@ -576,9 +576,9 @@ public:
 // const_nurbs_patches
 
 class const_nurbs_patches :
-	public interface_wrapper<const k3d::mesh::nurbs_patches_t>
+	public instance_wrapper<const k3d::mesh::nurbs_patches_t>
 {
-	typedef interface_wrapper<const k3d::mesh::nurbs_patches_t> base;
+	typedef instance_wrapper<const k3d::mesh::nurbs_patches_t> base;
 public:
 	const_nurbs_patches() :
 		base()
@@ -632,9 +632,9 @@ public:
 // nurbs_patches
 
 class nurbs_patches :
-	public interface_wrapper<k3d::mesh::nurbs_patches_t>
+	public instance_wrapper<k3d::mesh::nurbs_patches_t>
 {
-	typedef interface_wrapper<k3d::mesh::nurbs_patches_t> base;
+	typedef instance_wrapper<k3d::mesh::nurbs_patches_t> base;
 public:
 	nurbs_patches() :
 		base()
@@ -749,9 +749,9 @@ public:
 // const_polyhedra
 
 class const_polyhedra :
-	public interface_wrapper<const k3d::mesh::polyhedra_t>
+	public instance_wrapper<const k3d::mesh::polyhedra_t>
 {
-	typedef interface_wrapper<const k3d::mesh::polyhedra_t> base;
+	typedef instance_wrapper<const k3d::mesh::polyhedra_t> base;
 public:
 	const_polyhedra() :
 		base()
@@ -788,9 +788,9 @@ public:
 // polyhedra
 
 class polyhedra :
-	public interface_wrapper<k3d::mesh::polyhedra_t>
+	public instance_wrapper<k3d::mesh::polyhedra_t>
 {
-	typedef interface_wrapper<k3d::mesh::polyhedra_t> base;
+	typedef instance_wrapper<k3d::mesh::polyhedra_t> base;
 public:
 	polyhedra() :
 		base()
@@ -854,9 +854,9 @@ public:
 // const_blobbies
 
 class const_blobbies :
-	public interface_wrapper<const k3d::mesh::blobbies_t>
+	public instance_wrapper<const k3d::mesh::blobbies_t>
 {
-	typedef interface_wrapper<const k3d::mesh::blobbies_t> base;
+	typedef instance_wrapper<const k3d::mesh::blobbies_t> base;
 public:
 	const_blobbies() :
 		base()
@@ -896,9 +896,9 @@ public:
 //blobbies 
 
 class blobbies :
-	public interface_wrapper<k3d::mesh::blobbies_t>
+	public instance_wrapper<k3d::mesh::blobbies_t>
 {
-	typedef interface_wrapper<k3d::mesh::blobbies_t> base;
+	typedef instance_wrapper<k3d::mesh::blobbies_t> base;
 public:
 	blobbies() :
 		base()
@@ -1082,7 +1082,7 @@ static object mesh_primitive_get_attributes(mesh_primitive_wrapper& Self)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // const_mesh_primitives_t
 
-typedef interface_wrapper<const k3d::mesh::primitives_t> const_mesh_primitives_t_wrapper;
+typedef instance_wrapper<const k3d::mesh::primitives_t> const_mesh_primitives_t_wrapper;
 
 static object const_mesh_primitives_t_get_item(const_mesh_primitives_t_wrapper& Self, int Item)
 {
@@ -1095,7 +1095,7 @@ static object const_mesh_primitives_t_get_item(const_mesh_primitives_t_wrapper& 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // mesh_primitives_t
 
-typedef interface_wrapper<k3d::mesh::primitives_t> mesh_primitives_t_wrapper;
+typedef instance_wrapper<k3d::mesh::primitives_t> mesh_primitives_t_wrapper;
 
 static object mesh_primitives_t_get_item(mesh_primitives_t_wrapper& Self, int Item)
 {

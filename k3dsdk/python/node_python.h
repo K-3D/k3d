@@ -1,5 +1,5 @@
-#ifndef K3DSDK_NODE_PYTHON_H
-#define K3DSDK_NODE_PYTHON_H
+#ifndef K3DSDK_PYTHON_NODE_PYTHON_H
+#define K3DSDK_PYTHON_NODE_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -50,5 +50,5 @@ public:
 
 } // namespace k3d
 
-#endif // !K3DSDK_NODE_PYTHON_H
+#endif // !K3DSDK_PYTHON_NODE_PYTHON_H
 

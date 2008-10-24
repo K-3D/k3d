@@ -39,7 +39,7 @@ namespace k3d
 namespace python
 {
 
-static boost::python::object get_item_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, int Item)
+static boost::python::object get_item_imaterial(instance_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, int Item)
 {
 	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
@@ -47,7 +47,7 @@ static boost::python::object get_item_imaterial(interface_wrapper<k3d::typed_arr
 	return wrap(Self.wrapped().at(Item));
 }
 
-static boost::python::object get_item_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Self, int Item)
+static boost::python::object get_item_inode(instance_wrapper<k3d::typed_array<k3d::inode*> >& Self, int Item)
 {
 	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
@@ -56,7 +56,7 @@ static boost::python::object get_item_inode(interface_wrapper<k3d::typed_array<k
 }
 
 template<typename array_type>
-static void set_item(interface_wrapper<array_type>& Self, int Item, const typename array_type::value_type& Value)
+static void set_item(instance_wrapper<array_type>& Self, int Item, const typename array_type::value_type& Value)
 {
 	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
@@ -64,7 +64,7 @@ static void set_item(interface_wrapper<array_type>& Self, int Item, const typena
 	Self.wrapped()[Item] = Value;
 }
 
-static void set_item_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, int Item, const boost::python::object& Value)
+static void set_item_imaterial(instance_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, int Item, const boost::python::object& Value)
 {
 	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
@@ -80,7 +80,7 @@ static void set_item_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial
 	}
 }
 
-static void set_item_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Self, int Item, const boost::python::object& Value)
+static void set_item_inode(instance_wrapper<k3d::typed_array<k3d::inode*> >& Self, int Item, const boost::python::object& Value)
 {
 	if(Item < 0 || Item >= Self.wrapped().size())
 		throw std::out_of_range("index out-of-range");
@@ -97,12 +97,12 @@ static void set_item_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Se
 }
 
 template<typename array_type>
-static void append(interface_wrapper<array_type>& Self, const typename array_type::value_type& Value)
+static void append(instance_wrapper<array_type>& Self, const typename array_type::value_type& Value)
 {
 	Self.wrapped().push_back(Value);
 }
 
-static void append_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, const boost::python::object& Value)
+static void append_imaterial(instance_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, const boost::python::object& Value)
 {
 	if(Value)
 	{
@@ -115,7 +115,7 @@ static void append_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial*>
 	}
 }
 
-static void append_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Self, const boost::python::object& Value)
+static void append_inode(instance_wrapper<k3d::typed_array<k3d::inode*> >& Self, const boost::python::object& Value)
 {
 	if(Value)
 	{
@@ -129,7 +129,7 @@ static void append_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Self
 }
 
 template<typename array_type>
-static void assign(interface_wrapper<array_type>& Self, const boost::python::list& Value)
+static void assign(instance_wrapper<array_type>& Self, const boost::python::list& Value)
 {
 	array_type& storage = Self.wrapped();
 
@@ -139,7 +139,7 @@ static void assign(interface_wrapper<array_type>& Self, const boost::python::lis
 		storage[i] = boost::python::extract<typename array_type::value_type>(Value[i]);
 }
 
-static void assign_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, const boost::python::list& Value)
+static void assign_imaterial(instance_wrapper<k3d::typed_array<k3d::imaterial*> >& Self, const boost::python::list& Value)
 {
 	k3d::typed_array<k3d::imaterial*>& storage = Self.wrapped();
 
@@ -159,7 +159,7 @@ static void assign_imaterial(interface_wrapper<k3d::typed_array<k3d::imaterial*>
 	}
 }
 
-static void assign_inode(interface_wrapper<k3d::typed_array<k3d::inode*> >& Self, const boost::python::list& Value)
+static void assign_inode(instance_wrapper<k3d::typed_array<k3d::inode*> >& Self, const boost::python::list& Value)
 {
 	k3d::typed_array<k3d::inode*>& storage = Self.wrapped();
 
@@ -215,7 +215,7 @@ static void erase_metadata_value(self_t& Self, const string_t& Name)
 template<typename array_type>
 static void define_class_typed_array(const char* const ClassName, const char* const DocString)
 {
-	typedef interface_wrapper<array_type> wrapper_type;
+	typedef instance_wrapper<array_type> wrapper_type;
 
 	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
 		.def("__len__", &utility::wrapped_len<wrapper_type>)
@@ -236,7 +236,7 @@ template<>
 void define_class_typed_array<k3d::typed_array<k3d::imaterial*> >(const char* const ClassName, const char* const DocString)
 {
 	typedef k3d::typed_array<k3d::imaterial*> array_type;
-	typedef interface_wrapper<array_type> wrapper_type;
+	typedef instance_wrapper<array_type> wrapper_type;
 
 	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
 		.def("__len__", &utility::wrapped_len<wrapper_type>)
@@ -257,7 +257,7 @@ template<>
 void define_class_typed_array<k3d::typed_array<k3d::inode*> >(const char* const ClassName, const char* const DocString)
 {
 	typedef k3d::typed_array<k3d::inode*> array_type;
-	typedef interface_wrapper<array_type> wrapper_type;
+	typedef instance_wrapper<array_type> wrapper_type;
 
 	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
 		.def("__len__", &utility::wrapped_len<wrapper_type>)
