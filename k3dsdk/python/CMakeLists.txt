@@ -138,10 +138,6 @@ ADD_LIBRARY(k3dsdk-python-d SHARED
 	mesh_selection_python.h
 	node_python.cpp
 	node_python.h
-	point_group_python.cpp
-	point_group_python.h
-	teapot_python.cpp
-	teapot_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python-d)
 TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk)
@@ -150,12 +146,23 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-d ${PYTHON_LIBRARIES})
 TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk-python-a)
 TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk-python-b)
 
+ADD_LIBRARY(k3dsdk-python-primitives SHARED
+	cone_python.cpp
+	cone_python.h
+	point_group_python.cpp
+	point_group_python.h
+	teapot_python.cpp
+	teapot_python.h
+	)
+K3D_GENERATE_DEF_FILE(k3dsdk-python-primitives)
+TARGET_LINK_LIBRARIES(k3dsdk-python-primitives k3dsdk-python-d)
+
 ADD_LIBRARY(k3dsdk-python SHARED
 	object_model_python.cpp
 	object_model_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python)
-TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-python-d)
+TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-python-primitives)
 
 INSTALL(TARGETS k3dsdk-python-arrays
 	RUNTIME DESTINATION bin 
