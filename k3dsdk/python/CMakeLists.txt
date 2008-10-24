@@ -138,6 +138,8 @@ ADD_LIBRARY(k3dsdk-python-d SHARED
 	mesh_selection_python.h
 	node_python.cpp
 	node_python.h
+	point_group_python.cpp
+	point_group_python.h
 	teapot_python.cpp
 	teapot_python.h
 	)
