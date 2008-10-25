@@ -151,10 +151,20 @@ ADD_LIBRARY(k3dsdk-python-primitives SHARED
 	cone_python.h
 	cylinder_python.cpp
 	cylinder_python.h
+	disk_python.cpp
+	disk_python.h
+	hyperboloid_python.cpp
+	hyperboloid_python.h
+	paraboloid_python.cpp
+	paraboloid_python.h
 	point_group_python.cpp
 	point_group_python.h
+	sphere_python.cpp
+	sphere_python.h
 	teapot_python.cpp
 	teapot_python.h
+	torus_python.cpp
+	torus_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python-primitives)
 TARGET_LINK_LIBRARIES(k3dsdk-python-primitives k3dsdk-python-d)

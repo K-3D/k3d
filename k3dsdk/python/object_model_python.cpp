@@ -34,9 +34,11 @@
 #include "const_named_attribute_arrays_python.h"
 #include "const_typed_array_python.h"
 #include "cylinder_python.h"
+#include "disk_python.h"
 #include "dynamic_cast_python.h"
 #include "euler_angles_python.h"
 #include "euler_python.h"
+#include "hyperboloid_python.h"
 #include "icommand_node_python.h"
 #include "idocument_python.h"
 #include "imaterial_python.h"
@@ -60,6 +62,7 @@
 #include "node_python.h"
 #include "normal3_python.h"
 #include "object_model_python.h"
+#include "paraboloid_python.h"
 #include "parallel_python.h"
 #include "path_python.h"
 #include "plugin_python.h"
@@ -69,8 +72,10 @@
 #include "point_group_python.h"
 #include "resource_python.h"
 #include "ri_python.h"
+#include "sphere_python.h"
 #include "teapot_python.h"
 #include "texture3_python.h"
+#include "torus_python.h"
 #include "typed_array_python.h"
 #include "uuid_python.h"
 #include "vector2_python.h"
@@ -452,16 +457,21 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_vector3();
 	define_namespace_cone();
 	define_namespace_cylinder();
+	define_namespace_disk();
 	define_namespace_euler();
+	define_namespace_hyperboloid();
 	define_namespace_log();
 	define_namespace_mesh();
 	define_namespace_mime();
+	define_namespace_paraboloid();
 	define_namespace_parallel();
 	define_namespace_plugin();
 	define_namespace_point_group();
 	define_namespace_resource();
 	define_namespace_ri();
+	define_namespace_sphere();
 	define_namespace_teapot();
+	define_namespace_torus();
 	euler_angles::define_class();
 	node::define_class();
 
