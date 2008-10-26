@@ -151,6 +151,10 @@ public:
 			OutputMesh = *input_mesh;
 			k3d::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
 		}
+		else
+		{
+			OutputMesh = k3d::mesh();
+		}
 		m_updating = false;
 	}
 

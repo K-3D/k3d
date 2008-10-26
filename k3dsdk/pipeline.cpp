@@ -72,12 +72,14 @@ public:
 			old_dependency->second = dependency->second;
 
 			m_change_connections[dependency->first].disconnect();
+			m_delete_connections[dependency->second].disconnect();
 			if(dependency->second)
 			{
 				m_change_connections[dependency->first] =
 					dependency->second->property_changed_signal().connect(
 						signal::make_loop_safe_slot(
 							dependency->first->property_changed_signal()));
+				m_delete_connections[dependency->second] = dependency->second->property_deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &implementation::on_property_deleted), dependency->second));
 			}
 
 			dependency->first->property_set_dependency(dependency->second);
@@ -111,18 +113,19 @@ public:
 	void on_property_deleted(iproperty* Property)
 	{
 		dependencies_t::iterator dependency = dependencies.find(Property);
-		return_if_fail(dependency != dependencies.end());
-
-		if(state_recorder && state_recorder->current_change_set())
+		if(dependency != dependencies.end())
 		{
-			dependencies_t old_dependencies;
-			old_dependencies.insert(*dependency);
-			state_recorder->current_change_set()->record_old_state(new set_dependencies_container(*this, old_dependencies));
-			state_recorder->current_change_set()->record_new_state(new delete_property_container(*this, Property));
+			if(state_recorder && state_recorder->current_change_set())
+			{
+				dependencies_t old_dependencies;
+				old_dependencies.insert(*dependency);
+				state_recorder->current_change_set()->record_old_state(new set_dependencies_container(*this, old_dependencies));
+				state_recorder->current_change_set()->record_new_state(new delete_property_container(*this, Property));
+			}
+	
+			dependencies.erase(dependency);
 		}
-
-		dependencies.erase(dependency);
-
+		
 		m_delete_connections[Property].disconnect();
 		m_delete_connections.erase(Property);
 
@@ -148,6 +151,7 @@ public:
 		if(result == dependencies.end())
 		{
 			result = dependencies.insert(std::make_pair(Property, static_cast<iproperty*>(0))).first;
+			m_delete_connections[Property].disconnect();
 			m_delete_connections[Property] = Property->property_deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &implementation::on_property_deleted), Property));
 		}
 
