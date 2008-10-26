@@ -55,7 +55,7 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 
 	k3d::graph::adjacency_list_t& topology = Output.topology.create();
 	k3d::graph::nodes_t& vertex_node = Output.vertex_data.create<k3d::graph::nodes_t>("node");
-	k3d::graph::indices_t& edge_type = Output.vertex_data.create<k3d::graph::indices_t>("type");
+	k3d::graph::indices_t& edge_type = Output.edge_data.create<k3d::graph::indices_t>("type");
 
 	// Insert nodes ...
 	std::map<k3d::inode*, k3d::graph::vertex_descriptor_t> node_map;
