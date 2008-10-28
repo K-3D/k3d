@@ -52,5 +52,15 @@ void require_attribute_arrays_size(const mesh::primitive& Primitive, const attri
 	}
 }
 
+void require_metadata(const mesh::primitive& Primitive, const array& Array, const string_t& ArrayName, const string_t& MetadataName, const string_t& MetadataValue)
+{
+	if(Array.get_metadata_value(MetadataName) != MetadataValue)
+	{
+		std::ostringstream buffer;
+		buffer << "[" << Primitive.type << "] primitive [" << ArrayName << "] array missing [" << MetadataName << "] metadata value [" << MetadataValue << "]";
+		throw std::runtime_error(buffer.str());
+	}
+}
+
 } // namespace k3d
 

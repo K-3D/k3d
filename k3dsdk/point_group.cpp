@@ -17,6 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "array_metadata.h"
 #include "point_group.h"
 #include "primitive_detail.h"
 
@@ -84,7 +85,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["varying"]
 		);
 
-	result->points.set_metadata_value("k3d:mesh-point-indices", "true");
+	result->points.set_metadata_value(mesh_point_indices(), "true");
 
 	return result;
 }
@@ -106,6 +107,8 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 		const attribute_arrays& constant_data = require_const_attribute_arrays(Primitive, "constant");
 		const attribute_arrays& varying_data = require_const_attribute_arrays(Primitive, "varying");
+
+		require_metadata(Primitive, points, "points", mesh_point_indices(), "true");
 
 		require_array_size(Primitive, point_counts, "point_counts", first_points.size());
 		require_array_size(Primitive, materials, "materials", first_points.size());
@@ -137,6 +140,8 @@ primitive* validate(mesh::primitive& Primitive)
 
 		attribute_arrays& constant_data = require_attribute_arrays(Primitive, "constant");
 		attribute_arrays& varying_data = require_attribute_arrays(Primitive, "varying");
+
+		require_metadata(Primitive, points, "points", mesh_point_indices(), "true");
 
 		require_array_size(Primitive, point_counts, "point_counts", first_points.size());
 		require_array_size(Primitive, materials, "materials", first_points.size());
