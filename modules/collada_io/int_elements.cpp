@@ -23,7 +23,7 @@
 */
 #include <dae.h>
 #include <dae/daeDom.h>
-#include "intElements.h"
+#include "int_elements.h"
 #include <k3dsdk/gprim_factory.h>
 #include <iostream>
 #include <dom/domPolylist.h>

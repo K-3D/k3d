@@ -39,7 +39,7 @@
 #include <dom/domCOLLADA.h>
 #include <dom/domLight.h>
 #include <dom/domCamera.h>
-#include "intElements.h"
+#include "int_elements.h"
 
 #define SafeAdd(elt, name, var) \
 	daeElement* var = elt->add(name);

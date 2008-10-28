@@ -33,7 +33,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/measurement.h>
-#include "intElements.h"
+#include "int_elements.h"
 #include "integration.h"
 #include "collada.h"
 

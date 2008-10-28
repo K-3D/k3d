@@ -35,7 +35,7 @@
 #include <dom/domNode.h>
 #include <dom/domCOLLADA.h>
 #include <k3dsdk/mesh_source.h>
-#include "intElements.h"
+#include "int_elements.h"
 
 using namespace std;
 namespace module

@@ -45,7 +45,7 @@
 #include <k3dsdk/icamera.h>
 
 #include "integration.h"
-#include "intElements.h"
+#include "int_elements.h"
 using namespace std;
 namespace module
 {

@@ -24,7 +24,7 @@
 	\author Barbiero Mattia
 */
 
-// intElements is the implementation of the conversion between the dae format elements and
+// int_elements is the implementation of the conversion between the dae format elements and
 // their equivalent on K-3D
 
 

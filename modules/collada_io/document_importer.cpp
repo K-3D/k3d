@@ -46,7 +46,7 @@
 
 #include <k3dsdk/plugins.h>
 
-#include "intElements.h"
+#include "int_elements.h"
 #include "integration.h"
 #include "collada.h"
 
