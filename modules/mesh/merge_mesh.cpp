@@ -23,6 +23,8 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
+#include <k3dsdk/array_metadata.h>
+#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/hints.h>
 #include <k3dsdk/imaterial.h>
@@ -31,14 +33,12 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
-#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/properties.h>
-#include <k3dsdk/user_property_changed_signal.h>
-
 #include <k3dsdk/parallel/blocked_range.h>
 #include <k3dsdk/parallel/parallel_for.h>
 #include <k3dsdk/parallel/threads.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/user_property_changed_signal.h>
 
 namespace module
 {
@@ -579,11 +579,14 @@ void merge_blobbies(k3d::mesh& Output, const k3d::mesh& Input)
 	output_operands.insert(output_operands.end(), input_operands.begin(), input_operands.end());
 }
 
-void merge_points(k3d::mesh& Output, const k3d::mesh& Input)
+const k3d::uint_t merge_points(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if(!k3d::validate_points(Input))
-		return;
+		return 0;
+
 	k3d::mesh::points_t& output_points = create_if_not_exists(Output.points);
+	const k3d::uint_t point_offset = Output.points->size();
+
 	k3d::mesh::selection_t& output_point_selection = create_if_not_exists(Output.point_selection);
 	const k3d::mesh::points_t& input_points = *Input.points;
 	const k3d::mesh::selection_t& input_point_selection = *Input.point_selection;
@@ -632,27 +635,77 @@ public:
 		Output = k3d::mesh();
 
 		const k3d::iproperty_collection::properties_t properties = k3d::property::user_properties(*static_cast<k3d::iproperty_collection*>(this));
-		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
+		for(k3d::iproperty_collection::properties_t::const_iterator p = properties.begin(); p != properties.end(); ++p)
 		{
-			k3d::iproperty& property = **prop;
-			if(property.property_type() == typeid(k3d::mesh*))
+			k3d::iproperty& property = **p;
+			if(property.property_type() != typeid(k3d::mesh*))
+				continue;
+
+			if(!k3d::property::pipeline_value<k3d::mesh*>(property))
+				continue;
+
+			const k3d::mesh& mesh = *k3d::property::pipeline_value<k3d::mesh*>(property);
+			
+			// Make sure the points array is defined
+			detail::create_if_not_exists(Output.points);
+			
+			detail::merge_polyhedra(Output, mesh, m_same_polyhedron.pipeline_value());
+			detail::merge_linear_curve_groups(Output, mesh);
+			detail::merge_cubic_curve_groups(Output, mesh);
+			detail::merge_nurbs_curve_groups(Output, mesh);
+			detail::merge_bilinear_patches(Output, mesh);
+			detail::merge_bicubic_patches(Output, mesh);
+			detail::merge_nurbs_patches(Output, mesh);
+			detail::merge_blobbies(Output, mesh);
+
+			// Must be last to calculate correct offsets in other methods
+			const k3d::uint_t point_offset = detail::merge_points(Output, mesh);
+k3d::log() << debug << "point_offset: " << point_offset << std::endl;
+
+			
+			for(k3d::mesh::primitives_t::const_iterator primitive = mesh.primitives.begin(); primitive != mesh.primitives.end(); ++primitive)
 			{
-				const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property));
-				if (!mesh)
-					continue;
-				
-				// Make sure the points array is defined
-				detail::create_if_not_exists(Output.points);
-				
-				detail::merge_polyhedra(Output, *mesh, m_same_polyhedron.pipeline_value());
-				detail::merge_linear_curve_groups(Output, *mesh);
-				detail::merge_cubic_curve_groups(Output, *mesh);
-				detail::merge_nurbs_curve_groups(Output, *mesh);
-				detail::merge_bilinear_patches(Output, *mesh);
-				detail::merge_bicubic_patches(Output, *mesh);
-				detail::merge_nurbs_patches(Output, *mesh);
-				detail::merge_blobbies(Output, *mesh);
-				detail::merge_points(Output, *mesh); // Must be last to calculate correct offsets in other methods
+				Output.primitives.push_back(*primitive);
+				k3d::mesh::primitive& new_primitive = Output.primitives.back().writable();
+
+				for(k3d::mesh::named_arrays_t::iterator a = new_primitive.topology.begin(); a != new_primitive.topology.end(); ++a)
+				{
+					const k3d::string_t& array_name = a->first;
+					k3d::array& array = a->second.writable();
+
+					if(array.get_metadata_value(k3d::mesh_point_indices()) != "true")
+						continue;
+
+					k3d::uint_t_array* const index_array = dynamic_cast<k3d::uint_t_array*>(&array);
+					if(!index_array)
+					{
+						k3d::log() << error << k3d::mesh_point_indices() << " array [" << array_name << "] must be a k3d::uint_t_array." << std::endl;
+						continue;
+					}
+
+					std::transform(index_array->begin(), index_array->end(), index_array->begin(), std::bind2nd(std::plus<k3d::uint_t>(), point_offset));
+				}
+
+				for(k3d::mesh::named_attribute_arrays_t::iterator attributes = new_primitive.attributes.begin(); attributes != new_primitive.attributes.end(); ++attributes)
+				{
+					for(k3d::mesh::attribute_arrays_t::iterator a = attributes->second.begin(); a != attributes->second.end(); ++a)
+					{
+						const k3d::string_t& array_name = a->first;
+						k3d::array& array = a->second.writable();
+
+						if(array.get_metadata_value(k3d::mesh_point_indices()) != "true")
+							continue;
+
+						k3d::uint_t_array* const index_array = dynamic_cast<k3d::uint_t_array*>(&array);
+						if(!index_array)
+						{
+							k3d::log() << error << k3d::mesh_point_indices() << " array [" << array_name << "] must be a k3d::uint_t_array." << std::endl;
+							continue;
+						}
+
+						std::transform(index_array->begin(), index_array->end(), index_array->begin(), std::bind2nd(std::plus<k3d::uint_t>(), point_offset));
+					}
+				}
 			}
 		}
 	}
