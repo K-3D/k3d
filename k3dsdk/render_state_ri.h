@@ -70,5 +70,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_RENDER_STATE_RI_H
+#endif // !K3DSDK_RENDER_STATE_RI_H
 

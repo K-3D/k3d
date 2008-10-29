@@ -40,5 +40,5 @@ const bool_t is_solid(const mesh& Mesh, const uint_t Polyhedron);
 
 } // namespace k3d
 
-#endif // K3DSDK_POLYHEDRA_H
+#endif // !K3DSDK_POLYHEDRA_H
 

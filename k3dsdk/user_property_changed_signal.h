@@ -52,5 +52,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_USER_PROPERTY_CHANGED_SIGNAL_H
+#endif // !K3DSDK_USER_PROPERTY_CHANGED_SIGNAL_H
 

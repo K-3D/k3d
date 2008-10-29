@@ -86,5 +86,5 @@ inline const color noise(const point3& Pt)
 
 } // namespace k3d
 
-#endif // K3DSDK_NOISE_H
+#endif // !K3DSDK_NOISE_H
 

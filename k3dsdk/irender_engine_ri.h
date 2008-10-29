@@ -59,5 +59,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IRENDER_ENGINE_RI_H
+#endif // !K3DSDK_IRENDER_ENGINE_RI_H
 

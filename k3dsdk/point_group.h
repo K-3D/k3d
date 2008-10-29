@@ -85,5 +85,5 @@ primitive* validate(mesh::primitive& GenericPrimitive);
 
 } // namespace k3d
 
-#endif // K3DSDK_POINT_GROUP_H
+#endif // !K3DSDK_POINT_GROUP_H
 

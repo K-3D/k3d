@@ -1,5 +1,5 @@
-#ifndef K3DSDK_RESOURCE_H
-#define K3DSDK_RESOURCE_H
+#ifndef K3DSDK_RESOURCE_RESOURCE_H
+#define K3DSDK_RESOURCE_RESOURCE_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -51,5 +51,5 @@ const string_t get_string(const string_t& Path);
 
 } // namespace k3d
 
-#endif // K3DSDK_RESOURCE_H
+#endif // !K3DSDK_RESOURCE_RESOURCE_H
 

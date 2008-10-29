@@ -228,5 +228,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_NORMAL3_H
+#endif // !K3DSDK_NORMAL3_H
 

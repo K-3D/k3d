@@ -50,5 +50,5 @@ private:
 
 } // namespace k3d
 
-#endif // !K3DSDK_MESH_SELECTION_MODIFIER
+#endif // !K3DSDK_MESH_SELECTION_MODIFIER_H
 

@@ -174,5 +174,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_RENDERABLE_RI_H
+#endif // !K3DSDK_RENDERABLE_RI_H
 

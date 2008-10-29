@@ -172,5 +172,5 @@ void generate_metafile(std::ostream& Stream, const shaders_t Shaders);
 
 } // namespace k3d
 
-#endif // K3DSDK_SL_H
+#endif // !K3DSDK_SL_H
 

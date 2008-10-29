@@ -34,5 +34,5 @@ void set_shader_cache_path(const filesystem::path& SharePath);
 
 } // namespace k3d
 
-#endif // K3DSDK_SHADER_CACHE_DETAIL_H
+#endif // !K3DSDK_SHADER_CACHE_DETAIL_H
 

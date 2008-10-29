@@ -110,5 +110,5 @@ private:
 
 } // namespace k3d
 
-#endif // !K3DSDK_MESH_MODIFIER
+#endif // !K3DSDK_MESH_MODIFIER_H
 

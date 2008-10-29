@@ -32,5 +32,5 @@ const filesystem::path shader_cache_path();
 
 } // namespace k3d
 
-#endif // K3DSDK_SHADER_CACHE_H
+#endif // !K3DSDK_SHADER_CACHE_H
 

@@ -1,3 +1,6 @@
+#ifndef K3DSDK_PIPELINE_H
+#define K3DSDK_PIPELINE_H
+
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
 //
@@ -58,4 +61,6 @@ private:
 };
 
 } // namespace k3d
+
+#endif // !K3DSDK_PIPELINE_H
 

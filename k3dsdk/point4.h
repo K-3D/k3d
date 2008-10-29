@@ -264,5 +264,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_POINT4_H
+#endif // !K3DSDK_POINT4_H
 

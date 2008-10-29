@@ -196,5 +196,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_POINT2_H
+#endif // !K3DSDK_POINT2_H
 

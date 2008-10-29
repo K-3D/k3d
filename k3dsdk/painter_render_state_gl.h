@@ -57,5 +57,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_PAINTER_RENDER_STATE_GL_H
+#endif // !K3DSDK_PAINTER_RENDER_STATE_GL_H
 

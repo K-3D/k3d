@@ -59,5 +59,5 @@ const plane operator*(const plane& Plane, const matrix4& Matrix);
 
 } // namespace k3d
 
-#endif // K3DSDK_PLANE_H
+#endif // !K3DSDK_PLANE_H
 

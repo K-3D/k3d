@@ -69,5 +69,5 @@ typedef boost::mpl::vector<
 
 } // namespace k3d
 
-#endif // K3DSDK_PROPERTY_TYPES_RI_H
+#endif // !K3DSDK_PROPERTY_TYPES_RI_H
 

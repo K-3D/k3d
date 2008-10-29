@@ -56,5 +56,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_PROPERTY_COLLECTION_H
+#endif // !K3DSDK_PROPERTY_COLLECTION_H
 

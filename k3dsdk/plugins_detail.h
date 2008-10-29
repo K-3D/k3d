@@ -1,5 +1,5 @@
-#ifndef K3DSDK_PLUGIN_DETAIL_H
-#define K3DSDK_PLUGIN_DETAIL_H
+#ifndef K3DSDK_PLUGINS_DETAIL_H
+#define K3DSDK_PLUGINS_DETAIL_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -51,5 +51,5 @@ inode* create_document_plugin(const uuid& FactoryID, idocument& Document, const 
 
 } // namespace k3d
 
-#endif // !K3DSDK_PLUGIN_DETAIL_H
+#endif // !K3DSDK_PLUGINS_DETAIL_H
 

@@ -92,5 +92,5 @@ void execute(const code& Script, const string_t& ScriptName, iscript_engine::con
 
 } // namespace k3d
 
-#endif // K3DSDK_SCRIPTING_H
+#endif // !K3DSDK_SCRIPTING_H
 

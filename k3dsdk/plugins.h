@@ -1,5 +1,5 @@
-#ifndef K3DSDK_PLUGIN_H
-#define K3DSDK_PLUGIN_H
+#ifndef K3DSDK_PLUGINS_H
+#define K3DSDK_PLUGINS_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -276,5 +276,5 @@ inline iunknown* create(const uuid& FactoryID, idocument& Document, const string
 
 } // namespace k3d
 
-#endif // !K3DSDK_PLUGIN_H
+#endif // !K3DSDK_PLUGINS_H
 

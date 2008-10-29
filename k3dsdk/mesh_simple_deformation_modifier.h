@@ -56,5 +56,5 @@ private:
 
 } // namespace k3d
 
-#endif // !K3DSDK_MESH_SIMPLE_DEFORMATION_MODIFIER
+#endif // !K3DSDK_MESH_SIMPLE_DEFORMATION_MODIFIER_H
 

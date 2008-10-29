@@ -35,5 +35,5 @@ void register_application(k3d::iapplication& Application);
 
 } // namespace k3d
 
-#endif // K3DSDK_REGISTER_APPLICATION_H
+#endif // !K3DSDK_REGISTER_APPLICATION_H
 

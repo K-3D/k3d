@@ -53,5 +53,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_NODE_CHANGE_SIGNAL_H
+#endif // !K3DSDK_NODE_CHANGE_SIGNAL_H
 

@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IOPTIONS_FACTORY_H
-#define K3DSDK_IOPTIONS_FACTORY_H
+#ifndef K3DSDK_OPTIONS_POLICY_H
+#define K3DSDK_OPTIONS_POLICY_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -76,6 +76,5 @@ void set_storage(istorage& OptionStorage);
 
 } // namespace k3d
 
-#endif // !K3DSDK_IOPTIONS_FACTORY_H
-
+#endif // !K3DSDK_OPTIONS_POLICY_H
 

@@ -73,5 +73,5 @@ std::istream& operator>>(std::istream& Stream, rectangle& Arg);
 
 } // namespace k3d
 
-#endif // K3DSDK_RECTANGLE_H
+#endif // !K3DSDK_RECTANGLE_H
 

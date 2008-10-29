@@ -70,5 +70,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_SELECTION_STATE_GL_H
+#endif // !K3DSDK_SELECTION_STATE_GL_H
 

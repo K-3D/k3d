@@ -58,5 +58,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_PARENTABLE_H
+#endif // !K3DSDK_PARENTABLE_H
 

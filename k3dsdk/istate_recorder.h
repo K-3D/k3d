@@ -102,5 +102,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_ISTATE_RECORDER_H
+#endif // !K3DSDK_ISTATE_RECORDER_H
 
