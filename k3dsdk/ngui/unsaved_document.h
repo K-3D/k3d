@@ -1,5 +1,5 @@
-#ifndef NGUI_UNSAVED_DOCUMENT_H
-#define NGUI_UNSAVED_DOCUMENT_H
+#ifndef K3DSDK_NGUI_UNSAVED_DOCUMENT_H
+#define K3DSDK_NGUI_UNSAVED_DOCUMENT_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -48,5 +48,5 @@ protected:
 
 } // namespace libk3dngui
 
-#endif // !NGUI_UNSAVED_DOCUMENT_H	
+#endif // !K3DSDK_NGUI_UNSAVED_DOCUMENT_H	
 

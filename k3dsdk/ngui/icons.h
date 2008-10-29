@@ -1,5 +1,5 @@
-#ifndef NGUI_ICONS_H
-#define NGUI_ICONS_H
+#ifndef K3DSDK_NGUI_ICONS_H
+#define K3DSDK_NGUI_ICONS_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -40,4 +40,4 @@ Glib::RefPtr<Gdk::Pixbuf> quiet_load_icon(const std::string& Name, const Gtk::Ic
 
 } // namespace libk3dngui
 
-#endif // !NGUI_ICONS_H
+#endif // !K3DSDK_NGUI_ICONS_H

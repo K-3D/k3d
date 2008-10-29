@@ -1,5 +1,5 @@
-#ifndef NGUI_RENDER_H
-#define NGUI_RENDER_H
+#ifndef K3DSDK_NGUI_RENDER_H
+#define K3DSDK_NGUI_RENDER_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -83,5 +83,5 @@ void render(document_state& DocumentState, k3d::icamera& Camera, k3d::irender_ca
 
 } // namespace libk3dngui
 
-#endif // !NGUI_RENDER_H
+#endif // !K3DSDK_NGUI_RENDER_H
 

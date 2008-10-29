@@ -1,5 +1,5 @@
-#ifndef NGUI_VIEWPORT_INPUT_MODEL_H
-#define NGUI_VIEWPORT_INPUT_MODEL_H
+#ifndef K3DSDK_NGUI_VIEWPORT_INPUT_MODEL_H
+#define K3DSDK_NGUI_VIEWPORT_INPUT_MODEL_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -60,5 +60,5 @@ protected:
 
 } // namespace libk3dngui
 
-#endif // NGUI_VIEWPORT_INPUT_MODEL_H
+#endif // !K3DSDK_NGUI_VIEWPORT_INPUT_MODEL_H
 

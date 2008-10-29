@@ -1,5 +1,5 @@
-#ifndef BLOBBY_POLYGONIZER_H
-#define BLOBBY_POLYGONIZER_H
+#ifndef K3DSDK_SURFACE_POLYGONIZER_BLOBBY_POLYGONIZER_H
+#define K3DSDK_SURFACE_POLYGONIZER_BLOBBY_POLYGONIZER_H
 
 // K-3D
 // Copyright (c) 2004-2006, Romain Behar
@@ -31,5 +31,5 @@ void polygonize_blobby(k3d::legacy::blobby* Opcode, unsigned long Voxels,
 	std::vector<k3d::point3>& Vertices, std::vector<k3d::point3>& Normals,
 	std::vector< std::vector<unsigned long> >& Polygons);
 
-#endif // BLOBBY_POLYGONIZER_H
+#endif // !K3DSDK_SURFACE_POLYGONIZER_BLOBBY_POLYGONIZER_H
 

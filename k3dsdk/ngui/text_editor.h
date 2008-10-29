@@ -1,5 +1,5 @@
-#ifndef NGUI_TEXT_EDITOR_H
-#define NGUI_TEXT_EDITOR_H
+#ifndef K3DSDK_NGUI_TEXT_EDITOR_H
+#define K3DSDK_NGUI_TEXT_EDITOR_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -54,5 +54,5 @@ protected:
 
 } // namespace k3d
 
-#endif // NGUI_TEXT_EDITOR_H
+#endif // !K3DSDK_NGUI_TEXT_EDITOR_H
 

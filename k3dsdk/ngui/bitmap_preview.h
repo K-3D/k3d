@@ -1,5 +1,5 @@
-#ifndef NGUI_BITMAP_PREVIEW_H
-#define NGUI_BITMAP_PREVIEW_H
+#ifndef K3DSDK_NGUI_BITMAP_PREVIEW_H
+#define K3DSDK_NGUI_BITMAP_PREVIEW_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -133,6 +133,6 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data);
 
 } // namespace libk3dngui
 
-#endif // !NGUI_BITMAP_PREVIEW_H
+#endif // !K3DSDK_NGUI_BITMAP_PREVIEW_H
 
 

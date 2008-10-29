@@ -1,5 +1,5 @@
-#ifndef K3D_SDS_BINDING
-#define K3D_SDS_BINDING
+#ifndef K3DSDK_SUBDIVISION_SURFACE_K3D_SDS_BINDING_H
+#define K3DSDK_SUBDIVISION_SURFACE_K3D_SDS_BINDING_H
 
 // K-3D SDS preview
 // Copyright (c) 2005, Bart Janssens
@@ -223,4 +223,4 @@ protected:
 
 } // namespace k3d
 
-#endif // #ifndef K3D_SDS_BINDING
+#endif // !K3DSDK_SUBDIVISION_SURFACE_K3D_SDS_BINDING_H

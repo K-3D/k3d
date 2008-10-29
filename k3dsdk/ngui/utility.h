@@ -1,5 +1,5 @@
-#ifndef NGUI_UTILITY_H
-#define NGUI_UTILITY_H
+#ifndef K3DSDK_NGUI_UTILITY_H
+#define K3DSDK_NGUI_UTILITY_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -48,5 +48,5 @@ const k3d::color convert(const Gdk::Color& RHS);
 
 } // namespace libk3dngui
 
-#endif // !NGUI_UTILITY_H
+#endif // !K3DSDK_NGUI_UTILITY_H
 

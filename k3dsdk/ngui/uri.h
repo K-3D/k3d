@@ -1,5 +1,5 @@
-#ifndef NGUI_OPEN_URI_H
-#define NGUI_OPEN_URI_H
+#ifndef K3DSDK_NGUI_URI_H
+#define K3DSDK_NGUI_URI_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -44,5 +44,5 @@ void open(const std::string& URI);
 
 } // namespace k3d
 
-#endif // !NGUI_OPEN_URI_H
+#endif // !K3DSDK_NGUI_URI_H
 

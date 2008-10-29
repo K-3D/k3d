@@ -1,5 +1,5 @@
-#ifndef NGUI_TUTORIALS_H
-#define NGUI_TUTORIALS_H
+#ifndef K3DSDK_NGUI_TUTORIALS_H
+#define K3DSDK_NGUI_TUTORIALS_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -53,5 +53,5 @@ void playback_finished();
 
 } // namespace k3d
 
-#endif // NGUI_TUTORIALS_H
+#endif // !K3DSDK_NGUI_TUTORIALS_H
 

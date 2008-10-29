@@ -1,5 +1,5 @@
-#ifndef NGUI_MODIFIERS_H
-#define NGUI_MODIFIERS_H
+#ifndef K3DSDK_NGUI_MODIFIERS_H
+#define K3DSDK_NGUI_MODIFIERS_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -132,6 +132,6 @@ struct mesh_modifier
 
 } // namespace libk3dngui
 
-#endif // !NGUI_MODIFIERS_H
+#endif // !K3DSDK_NGUI_MODIFIERS_H
 
 

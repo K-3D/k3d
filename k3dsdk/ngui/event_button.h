@@ -1,5 +1,5 @@
-#ifndef NGUI_EVENT_BUTTON_H
-#define NGUI_EVENT_BUTTON_H
+#ifndef K3DSDK_NGUI_EVENT_BUTTON_H
+#define K3DSDK_NGUI_EVENT_BUTTON_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -52,4 +52,4 @@ private:
 
 } // namespace libk3dngui
 
-#endif // !NGUI_EVENT_BUTTON_H
+#endif // !K3DSDK_NGUI_EVENT_BUTTON_H

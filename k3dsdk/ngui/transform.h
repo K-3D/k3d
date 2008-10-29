@@ -1,5 +1,5 @@
-#ifndef NGUI_TRANSFORM_H
-#define NGUI_TRANSFORM_H
+#ifndef K3DSDK_NGUI_TRANSFORM_H
+#define K3DSDK_NGUI_TRANSFORM_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -51,5 +51,5 @@ void unparent(k3d::inode& Node);
 
 } // namespace libk3dngui
 
-#endif // !NGUI_TRANSFORM_H
+#endif // !K3DSDK_NGUI_TRANSFORM_H
 

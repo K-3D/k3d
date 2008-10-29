@@ -1,5 +1,5 @@
-#ifndef NGUI_MERGE_NODES_H
-#define NGUI_MERGE_NODES_H
+#ifndef K3DSDK_NGUI_MERGE_NODES_H
+#define K3DSDK_NGUI_MERGE_NODES_H
 
 // K-3D
 // Copyright (c) 2005, Romain Behar
@@ -35,6 +35,6 @@ void merge_nodes(k3d::idocument& Document);
 
 } // namespace libk3dngui
 
-#endif // !NGUI_MERGE_NODES_H
+#endif // !K3DSDK_NGUI_MERGE_NODES_H
 
 

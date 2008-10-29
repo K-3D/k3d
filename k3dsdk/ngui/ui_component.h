@@ -1,5 +1,5 @@
-#ifndef NGUI_UI_COMPONENT_H
-#define NGUI_UI_COMPONENT_H
+#ifndef K3DSDK_NGUI_UI_COMPONENT_H
+#define K3DSDK_NGUI_UI_COMPONENT_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -64,5 +64,5 @@ private:
 
 } // namespace libk3dngui
 
-#endif // !NGUI_UI_COMPONENT_H	
+#endif // !K3DSDK_NGUI_UI_COMPONENT_H	
 

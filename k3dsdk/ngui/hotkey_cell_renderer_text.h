@@ -1,5 +1,5 @@
-#ifndef NGUI_HOTKEY_CELL_RENDERER_TEXT_H
-#define NGUI_HOTKEY_CELL_RENDERER_TEXT_H
+#ifndef K3DSDK_NGUI_HOTKEY_CELL_RENDERER_TEXT_H
+#define K3DSDK_NGUI_HOTKEY_CELL_RENDERER_TEXT_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -55,6 +55,6 @@ private:
 
 } // namespace libk3dngui
 
-#endif // !NGUI_HOTKEY_CELL_RENDERER_TEXT_H
+#endif // !K3DSDK_NGUI_HOTKEY_CELL_RENDERER_TEXT_H
 
 

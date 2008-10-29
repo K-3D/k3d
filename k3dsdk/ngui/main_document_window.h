@@ -1,5 +1,5 @@
-#ifndef NGUI_MAIN_DOCUMENT_WINDOW_H
-#define NGUI_MAIN_DOCUMENT_WINDOW_H
+#ifndef K3DSDK_NGUI_MAIN_DOCUMENT_WINDOW_H
+#define K3DSDK_NGUI_MAIN_DOCUMENT_WINDOW_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -34,5 +34,5 @@ void create_main_document_window(document_state& DocumentState);
 
 } // namespace libk3dngui
 
-#endif // NGUI_MAIN_DOCUMENT_WINDOW_H
+#endif // !K3DSDK_NGUI_MAIN_DOCUMENT_WINDOW_H
 

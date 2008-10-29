@@ -1,5 +1,5 @@
-#ifndef NGUI_STATUSBAR_H
-#define NGUI_STATUSBAR_H
+#ifndef K3DSDK_NGUI_STATUSBAR_H
+#define K3DSDK_NGUI_STATUSBAR_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -51,5 +51,5 @@ public:
 
 } // namespace libk3dngui
 
-#endif // NGUI_STATUSBAR_H
+#endif // !K3DSDK_NGUI_STATUSBAR_H
 

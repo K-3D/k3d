@@ -1,5 +1,5 @@
-#ifndef NGUI_INTERACTIVE_H
-#define NGUI_INTERACTIVE_H
+#ifndef K3DSDK_NGUI_INTERACTIVE_H
+#define K3DSDK_NGUI_INTERACTIVE_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -86,5 +86,5 @@ void select_row(Gtk::ComboBox& ComboBox, const Gtk::TreeIter& Row);
 
 } // namespace libk3dngui
 
-#endif // !NGUI_INTERACTIVE_H
+#endif // !K3DSDK_NGUI_INTERACTIVE_H
 

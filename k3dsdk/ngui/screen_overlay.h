@@ -1,5 +1,5 @@
-#ifndef NGUI_SCREEN_OVERLAY_H
-#define NGUI_SCREEN_OVERLAY_H
+#ifndef K3DSDK_NGUI_SCREEN_OVERLAY_H
+#define K3DSDK_NGUI_SCREEN_OVERLAY_H
 
 // SDPGTK
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -62,5 +62,5 @@ private:
 
 } // namespace libk3dngui
 
-#endif // !NGUI_SCREEN_OVERLAY_H
+#endif // !K3DSDK_NGUI_SCREEN_OVERLAY_H
 

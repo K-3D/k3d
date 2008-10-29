@@ -1,5 +1,5 @@
-#ifndef NGUI_COMMAND_ARGUMENTS_H
-#define NGUI_COMMAND_ARGUMENTS_H
+#ifndef K3DSDK_NGUI_COMMAND_ARGUMENTS_H
+#define K3DSDK_NGUI_COMMAND_ARGUMENTS_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -123,5 +123,5 @@ private:
 
 } // namespace libk3dngui
 
-#endif // NGUI_COMMAND_ARGUMENTS_H
+#endif // !K3DSDK_NGUI_COMMAND_ARGUMENTS_H
 

@@ -1,5 +1,5 @@
-#ifndef NGUI_PROPERTY_BUTTON_H
-#define NGUI_PROPERTY_BUTTON_H
+#ifndef K3DSDK_NGUI_PROPERTY_BUTTON_H
+#define K3DSDK_NGUI_PROPERTY_BUTTON_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -66,6 +66,6 @@ private:
 
 } // namespace libk3dngui
 
-#endif // !NGUI_PROPERTY_BUTTON_H
+#endif // !K3DSDK_NGUI_PROPERTY_BUTTON_H
 
 

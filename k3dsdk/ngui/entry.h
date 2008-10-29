@@ -1,5 +1,5 @@
-#ifndef NGUI_ENTRY_H
-#define NGUI_ENTRY_H
+#ifndef K3DSDK_NGUI_ENTRY_H
+#define K3DSDK_NGUI_ENTRY_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -147,5 +147,5 @@ private:
 
 } // namespace libk3dngui
 
-#endif // !NGUI_ENTRY_H
+#endif // !K3DSDK_NGUI_ENTRY_H
 

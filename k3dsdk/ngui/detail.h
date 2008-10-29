@@ -1,5 +1,5 @@
-#ifndef NGUI_DETAIL_H
-#define NGUI_DETAIL_H
+#ifndef K3DSDK_NGUI_DETAIL_H
+#define K3DSDK_NGUI_DETAIL_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -43,6 +43,6 @@ void duplicate_selected_nodes(document_state& DocumentState);
 
 } // namespace libk3dngui
 
-#endif // !NGUI_DETAIL_H
+#endif // !K3DSDK_NGUI_DETAIL_H
 
 

@@ -1,5 +1,5 @@
-#ifndef NGUI_MENU_ITEM_H
-#define NGUI_MENU_ITEM_H
+#ifndef K3DSDK_NGUI_MENU_ITEM_H
+#define K3DSDK_NGUI_MENU_ITEM_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -57,6 +57,5 @@ public:
 
 } // namespace libk3dngui
 
-#endif // NGUI_MENU_ITEM_H
-
+#endif // !K3DSDK_NGUI_MENU_ITEM_H
 

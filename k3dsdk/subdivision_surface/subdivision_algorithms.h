@@ -1,5 +1,5 @@
-#ifndef SUBDIVISION_ALGORITHMS_H
-#define SUBDIVISION_ALGORITHMS_H
+#ifndef K3DSDK_SUBDIVISION_SURFACE_SUBDIVISION_ALGORITHMS_H
+#define K3DSDK_SUBDIVISION_SURFACE_SUBDIVISION_ALGORITHMS_H
 
 // K-3D SDS preview
 // Copyright (c) 2005, Bart Janssens
@@ -949,6 +949,6 @@ position_t normal(const position_t& p1, const position_t& p2, const position_t& 
 
 } // namespace k3d
 
-#endif
+#endif // !K3DSDK_SUBDIVISION_SURFACE_SUBDIVISION_ALGORITHMS_H
 
 

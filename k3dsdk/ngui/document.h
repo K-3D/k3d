@@ -1,5 +1,5 @@
-#ifndef NGUI_DOCUMENT_H
-#define NGUI_DOCUMENT_H
+#ifndef K3DSDK_NGUI_DOCUMENT_H
+#define K3DSDK_NGUI_DOCUMENT_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -39,5 +39,5 @@ void open_document(const k3d::filesystem::path& Path);
 
 } // namespace libk3dngui
 
-#endif // NGUI_DOCUMENT_H
+#endif // !K3DSDK_NGUI_DOCUMENT_H
 

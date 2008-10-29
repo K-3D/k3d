@@ -1,5 +1,5 @@
-#ifndef NGUI_TOOL_SELECTION_H
-#define NGUI_TOOL_SELECTION_H
+#ifndef K3DSDK_NGUI_TOOL_SELECTION_H
+#define K3DSDK_NGUI_TOOL_SELECTION_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -210,5 +210,5 @@ protected:
 
 } // namespace libk3dngui
 
-#endif // !NGUI_TOOL_SELECTION_H
+#endif // !K3DSDK_NGUI_TOOL_SELECTION_H
 

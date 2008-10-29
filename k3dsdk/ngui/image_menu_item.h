@@ -1,5 +1,5 @@
-#ifndef NGUI_IMAGE_MENU_ITEM_H
-#define NGUI_IMAGE_MENU_ITEM_H
+#ifndef K3DSDK_NGUI_IMAGE_MENU_ITEM_H
+#define K3DSDK_NGUI_IMAGE_MENU_ITEM_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -68,6 +68,5 @@ image_menu_item::control* connect(image_menu_item::control* const Control, const
 
 } // namespace libk3dngui
 
-#endif // NGUI_IMAGE_MENU_ITEM_H
-
+#endif // !K3DSDK_NGUI_IMAGE_MENU_ITEM_H
 

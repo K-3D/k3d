@@ -1,5 +1,5 @@
-#ifndef K3D_NGUI_COLLAPSIBLE_FRAME_H
-#define K3D_NGUI_COLLAPSIBLE_FRAME_H
+#ifndef K3DSDK_NGUI_COLLAPSIBLE_FRAME_H
+#define K3DSDK_NGUI_COLLAPSIBLE_FRAME_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -77,4 +77,4 @@ private:
 
 } // namespace libk3dngui
 
-#endif // !K3D_NGUI_COLLAPSIBLE_FRAME_H
+#endif // !K3DSDK_NGUI_COLLAPSIBLE_FRAME_H

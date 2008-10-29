@@ -1,5 +1,5 @@
-#ifndef NGUI_KEYBOARD_H
-#define NGUI_KEYBOARD_H
+#ifndef K3DSDK_NGUI_KEYBOARD_H
+#define K3DSDK_NGUI_KEYBOARD_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -37,5 +37,5 @@ const unsigned int convert(const k3d::key_modifiers Modifiers);
 
 } // namespace libk3dngui
 
-#endif // !NGUI_KEYBOARD_H
+#endif // !K3DSDK_NGUI_KEYBOARD_H
 

@@ -1,5 +1,5 @@
-#ifndef NGUI_TARGET_H
-#define NGUI_TARGET_H
+#ifndef K3DSDK_NGUI_TARGET_H
+#define K3DSDK_NGUI_TARGET_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -37,4 +37,4 @@ void frame_selection(document_state& DocumentState, viewport::control& Viewport)
 
 } // namespace libk3dngui
 
-#endif // !NGUI_TARGET_H
+#endif // !K3DSDK_NGUI_TARGET_H

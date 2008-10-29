@@ -1,5 +1,5 @@
-#ifndef NGUI_PANEL_H
-#define NGUI_PANEL_H
+#ifndef K3DSDK_NGUI_PANEL_H
+#define K3DSDK_NGUI_PANEL_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -59,5 +59,5 @@ protected:
 
 } // namespace libk3dngui
 
-#endif // NGUI_PANEL_H
+#endif // !K3DSDK_NGUI_PANEL_H
 

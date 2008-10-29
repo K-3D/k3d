@@ -1,5 +1,5 @@
-#ifndef NGUI_NODE_CHOOSER_H
-#define NGUI_NODE_CHOOSER_H
+#ifndef K3DSDK_NGUI_NODE_CHOOSER_H
+#define K3DSDK_NGUI_NODE_CHOOSER_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -297,6 +297,5 @@ std::auto_ptr<iselection_filter> filter(k3d::iproperty& Data);
 
 } // namespace libk3dngui
 
-#endif // NGUI_NODE_CHOOSER_H
-
+#endif // !K3DSDK_NGUI_NODE_CHOOSER_H
 

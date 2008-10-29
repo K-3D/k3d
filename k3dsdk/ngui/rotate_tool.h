@@ -1,5 +1,5 @@
-#ifndef NGUI_ROTATE_TOOL_H
-#define NGUI_ROTATE_TOOL_H
+#ifndef K3DSDK_NGUI_ROTATE_TOOL_H
+#define K3DSDK_NGUI_ROTATE_TOOL_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -224,5 +224,5 @@ private:
 
 } // namespace libk3dngui
 
-#endif // NGUI_ROTATE_TOOL_H
+#endif // !K3DSDK_NGUI_ROTATE_TOOL_H
 

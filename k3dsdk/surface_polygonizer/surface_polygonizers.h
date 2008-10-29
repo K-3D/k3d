@@ -1,5 +1,5 @@
-#ifndef SURFACE_POLYGONIZERS_H
-#define SURFACE_POLYGONIZERS_H
+#ifndef K3DSDK_SURFACE_POLYGONIZER_SURFACE_POLYGONIZERS_H
+#define K3DSDK_SURFACE_POLYGONIZER_SURFACE_POLYGONIZERS_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -83,6 +83,6 @@ private:
 	bloomenthal_polygonizer* m_bloomenthal_polygonizer;
 };
 
-#endif // SURFACE_POLYGONIZERS_H
+#endif // !K3DSDK_SURFACE_POLYGONIZER_SURFACE_POLYGONIZERS_H
 
 

@@ -1,5 +1,5 @@
-#ifndef JULES_BLOOMENTHAL_H
-#define JULES_BLOOMENTHAL_H
+#ifndef K3DSDK_SURFACE_POLYGONIZER_JULES_BLOOMENTHAL_H
+#define K3DSDK_SURFACE_POLYGONIZER_JULES_BLOOMENTHAL_H
 
 // A C++ Implicit Surface Polygonizer
 // Copyright 2002-2004, Romain Behar <romainbehar@yahoo.com>
@@ -369,6 +369,6 @@ private:
 	void SaveTriangle(unsigned long u, unsigned long v, unsigned long w);
 };
 
-#endif // JULES_BLOOMENTHAL_H
+#endif // !K3DSDK_SURFACE_POLYGONIZER_JULES_BLOOMENTHAL_H
 
 

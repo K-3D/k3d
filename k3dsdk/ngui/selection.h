@@ -1,5 +1,5 @@
-#ifndef NGUI_SELECTION_H
-#define NGUI_SELECTION_H
+#ifndef K3DSDK_NGUI_SELECTION_H
+#define K3DSDK_NGUI_SELECTION_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -47,6 +47,5 @@ std::istream& operator>>(std::istream& Stream, selection_mode_t& Value);
 
 } // namespace libk3dngui
 
-#endif // NGUI_SELECTION_H
-
+#endif // !K3DSDK_NGUI_SELECTION_H
 

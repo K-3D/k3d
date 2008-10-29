@@ -1,5 +1,5 @@
-#ifndef NGUI_APPLICATION_WINDOW_H
-#define NGUI_APPLICATION_WINDOW_H
+#ifndef K3DSDK_NGUI_APPLICATION_WINDOW_H
+#define K3DSDK_NGUI_APPLICATION_WINDOW_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -58,5 +58,5 @@ private:
 
 } // namespace libk3dngui
 
-#endif // NGUI_APPLICATION_WINDOW_H
+#endif // !K3DSDK_NGUI_APPLICATION_WINDOW_H
 

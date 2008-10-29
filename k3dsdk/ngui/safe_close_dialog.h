@@ -1,5 +1,5 @@
-#ifndef NGUI_SAFE_CLOSE_DIALOG_H
-#define NGUI_SAFE_CLOSE_DIALOG_H
+#ifndef K3DSDK_NGUI_SAFE_CLOSE_DIALOG_H
+#define K3DSDK_NGUI_SAFE_CLOSE_DIALOG_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -79,5 +79,5 @@ int run(Gtk::Window& Parent, entries_t& UnsavedDocuments);
 
 } // namespace libk3dngui
 
-#endif // !NGUI_SAFE_CLOSE_DIALOG_H
+#endif // !K3DSDK_NGUI_SAFE_CLOSE_DIALOG_H
 

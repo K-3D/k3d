@@ -1,5 +1,5 @@
-#ifndef NGUI_TUTORIAL_MESSAGE_H
-#define NGUI_TUTORIAL_MESSAGE_H
+#ifndef K3DSDK_NGUI_TUTORIAL_MESSAGE_H
+#define K3DSDK_NGUI_TUTORIAL_MESSAGE_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -69,5 +69,5 @@ private:
 
 } // namespace libk3dngui
 
-#endif // NGUI_TUTORIAL_MESSAGE_H
+#endif // !K3DSDK_NGUI_TUTORIAL_MESSAGE_H
 

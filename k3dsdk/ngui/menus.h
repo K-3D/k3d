@@ -1,5 +1,5 @@
-#ifndef NGUI_MENUS_H
-#define NGUI_MENUS_H
+#ifndef K3DSDK_NGUI_MENUS_H
+#define K3DSDK_NGUI_MENUS_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -40,4 +40,4 @@ image_menu_item::control* create_menu_item(k3d::icommand_node& Parent, const std
 
 } // namespace libk3dngui
 
-#endif // !NGUI_MENUS_H
+#endif // !K3DSDK_NGUI_MENUS_H

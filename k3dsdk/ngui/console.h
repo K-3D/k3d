@@ -1,5 +1,5 @@
-#ifndef NGUI_CONSOLE_H
-#define NGUI_CONSOLE_H
+#ifndef K3DSDK_NGUI_CONSOLE_H
+#define K3DSDK_NGUI_CONSOLE_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -65,5 +65,5 @@ private:
 
 } // namespace libk3dngui
 
-#endif // NGUI_CONSOLE_H
+#endif // !K3DSDK_NGUI_CONSOLE_H
 

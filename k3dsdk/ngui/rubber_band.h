@@ -1,5 +1,5 @@
-#ifndef RUBBER_BAND_H
-#define RUBBER_BAND_H
+#ifndef K3DSDK_NGUI_RUBBER_BAND_H
+#define K3DSDK_NGUI_RUBBER_BAND_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -57,4 +57,4 @@ private:
 
 } // namespace libk3dngui
 
-#endif // !RUBBER_BAND_H
+#endif // !K3DSDK_NGUI_RUBBER_BAND_H

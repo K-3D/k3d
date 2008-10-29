@@ -1,5 +1,5 @@
-#ifndef NGUI_WIDGET_MANIP_H
-#define NGUI_WIDGET_MANIP_H
+#ifndef K3DSDK_NGUI_WIDGET_MANIP_H
+#define K3DSDK_NGUI_WIDGET_MANIP_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -281,5 +281,5 @@ T* operator<<(T* LHS, const disable_recording& RHS)
 
 } // namespace libk3dngui
 
-#endif // NGUI_WIDGET_MANIP_H
+#endif // !K3DSDK_NGUI_WIDGET_MANIP_H
 

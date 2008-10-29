@@ -1,5 +1,5 @@
-#ifndef NGUI_FILE_CHOOSER_DIALOG_H
-#define NGUI_FILE_CHOOSER_DIALOG_H
+#ifndef K3DSDK_NGUI_FILE_CHOOSER_DIALOG_H
+#define K3DSDK_NGUI_FILE_CHOOSER_DIALOG_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -82,5 +82,5 @@ private:
 
 } // namespace libk3dngui
 
-#endif // !NGUI_FILE_CHOOSER_DIALOG_H
+#endif // !K3DSDK_NGUI_FILE_CHOOSER_DIALOG_H
 

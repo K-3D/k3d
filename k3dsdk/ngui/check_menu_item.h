@@ -1,5 +1,5 @@
-#ifndef NGUI_CHECK_MENU_ITEM_H
-#define NGUI_CHECK_MENU_ITEM_H
+#ifndef K3DSDK_NGUI_CHECK_MENU_ITEM_H
+#define K3DSDK_NGUI_CHECK_MENU_ITEM_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -159,6 +159,6 @@ inline std::auto_ptr<idata_proxy> proxy()
 
 } // namespace libk3dngui
 
-#endif // !NGUI_CHECK_MENU_ITEM_H
+#endif // !K3DSDK_NGUI_CHECK_MENU_ITEM_H
 
 

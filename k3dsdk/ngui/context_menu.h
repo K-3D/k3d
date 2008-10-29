@@ -1,5 +1,5 @@
-#ifndef NGUI_CONTEXT_MENU_H
-#define NGUI_CONTEXT_MENU_H
+#ifndef K3DSDK_NGUI_CONTEXT_MENU_H
+#define K3DSDK_NGUI_CONTEXT_MENU_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -39,6 +39,5 @@ Gtk::Menu* create_context_menu(document_state& DocumentState, k3d::icommand_node
 
 } // namespace libk3dngui
 
-#endif // !NGUI_CONTEXT_MENU_H
-
+#endif // !K3DSDK_NGUI_CONTEXT_MENU_H
 

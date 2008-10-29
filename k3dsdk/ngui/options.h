@@ -1,5 +1,5 @@
-#ifndef NGUI_OPTIONS_H
-#define NGUI_OPTIONS_H
+#ifndef K3DSDK_NGUI_OPTIONS_H
+#define K3DSDK_NGUI_OPTIONS_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -46,5 +46,5 @@ void enable_nag(const std::string& Type, const bool Enabled);
 
 } // namespace libk3dngui
 
-#endif // !NGUI_OPTIONS_H
+#endif // !K3DSDK_NGUI_OPTIONS_H
 

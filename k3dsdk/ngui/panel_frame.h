@@ -1,5 +1,5 @@
-#ifndef NGUI_PANEL_FRAME_H
-#define NGUI_PANEL_FRAME_H
+#ifndef K3DSDK_NGUI_PANEL_FRAME_H
+#define K3DSDK_NGUI_PANEL_FRAME_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -172,5 +172,5 @@ typedef std::vector<control*> controls;
 
 } // namespace libk3dngui
 
-#endif // NGUI_PANEL_FRAME_H
+#endif // !K3DSDK_NGUI_PANEL_FRAME_H
 

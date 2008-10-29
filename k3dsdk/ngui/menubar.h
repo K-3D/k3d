@@ -1,5 +1,5 @@
-#ifndef NGUI_MENUBAR_H
-#define NGUI_MENUBAR_H
+#ifndef K3DSDK_NGUI_MENUBAR_H
+#define K3DSDK_NGUI_MENUBAR_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -51,6 +51,5 @@ public:
 
 } // namespace libk3dngui
 
-#endif // NGUI_MENUBAR_H
-
+#endif // !K3DSDK_NGUI_MENUBAR_H
 

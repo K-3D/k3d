@@ -1,5 +1,5 @@
-#ifndef NGUI_MESSAGES_H
-#define NGUI_MESSAGES_H
+#ifndef K3DSDK_NGUI_MESSAGES_H
+#define K3DSDK_NGUI_MESSAGES_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -50,5 +50,5 @@ void nag_message(const std::string& Type, const k3d::ustring& Message, const k3d
 
 } // namespace libk3dngui
 
-#endif // !NGUI_MESSAGES_H
+#endif // !K3DSDK_NGUI_MESSAGES_H
 

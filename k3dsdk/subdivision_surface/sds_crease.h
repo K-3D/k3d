@@ -1,5 +1,5 @@
-#ifndef SDS_CREASE_H
-#define SDS_CREASE_H
+#ifndef K3DSDK_SUBDIVISION_SURFACE_SDS_CREASE_H
+#define K3DSDK_SUBDIVISION_SURFACE_SDS_CREASE_H
 
 // K-3D SDS creases
 // Copyright (c) 2004-2005, Bart Janssens
@@ -195,6 +195,6 @@ private:
 
 } // namespace k3d
 
-#endif // SDS_CREASE_H
+#endif // !K3DSDK_SUBDIVISION_SURFACE_SDS_CREASE_H
 
 

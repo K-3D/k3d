@@ -1,5 +1,5 @@
-#ifndef NGUI_PATH_CHOOSER_H
-#define NGUI_PATH_CHOOSER_H
+#ifndef K3DSDK_NGUI_PATH_CHOOSER_H
+#define K3DSDK_NGUI_PATH_CHOOSER_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -195,5 +195,5 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 
 } // namespace libk3dngui
 
-#endif // !NGUI_PATH_CHOOSER_H
+#endif // !K3DSDK_NGUI_PATH_CHOOSER_H
 

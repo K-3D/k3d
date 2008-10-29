@@ -1,5 +1,5 @@
-#ifndef NGUI_UNDO_UTILITY_H
-#define NGUI_UNDO_UTILITY_H
+#ifndef K3DSDK_NGUI_UNDO_UTILITY_H
+#define K3DSDK_NGUI_UNDO_UTILITY_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -39,4 +39,4 @@ const k3d::istate_recorder::node* next_redo(k3d::istate_recorder& StateRecorder)
 
 } // namespace libk3dngui
 
-#endif // !NGUI_UNDO_UTILITY_H
+#endif // !K3DSDK_NGUI_UNDO_UTILITY_H

@@ -1,5 +1,5 @@
-#ifndef NGUI_POINT_CONTROL_H
-#define NGUI_POINT_CONTROL_H
+#ifndef K3DSDK_NGUI_POINT3_H
+#define K3DSDK_NGUI_POINT3_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -116,6 +116,5 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 
 } // namespace libk3dngui
 
-#endif // NGUI_POINT_CONTROL_H
-
+#endif // !K3DSDK_NGUI_POINT3_H
 

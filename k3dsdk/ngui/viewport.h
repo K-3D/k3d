@@ -1,5 +1,5 @@
-#ifndef NGUI_VIEWPORT_H
-#define NGUI_VIEWPORT_H
+#ifndef K3DSDK_NGUI_VIEWPORT_H
+#define K3DSDK_NGUI_VIEWPORT_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -205,5 +205,5 @@ const k3d::line3 mouse_to_world(viewport::control& Viewport, const k3d::point2& 
 
 } // namespace libk3dngui
 
-#endif // NGUI_VIEWPORT_H
+#endif // !K3DSDK_NGUI_VIEWPORT_H
 

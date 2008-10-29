@@ -1,5 +1,5 @@
-#ifndef NGUI_SCRIPT_BUTTON_H
-#define NGUI_SCRIPT_BUTTON_H
+#ifndef K3DSDK_NGUI_SCRIPT_BUTTON_H
+#define K3DSDK_NGUI_SCRIPT_BUTTON_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -166,5 +166,5 @@ inline std::auto_ptr<idata_proxy> proxy()
 
 } // namespace libk3dngui
 
-#endif // !NGUI_SCRIPT_BUTTON_H
+#endif // !K3DSDK_NGUI_SCRIPT_BUTTON_H
 

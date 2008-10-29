@@ -1,5 +1,5 @@
-#ifndef NGUI_SCRIPTING_H
-#define NGUI_SCRIPTING_H
+#ifndef K3DSDK_NGUI_SCRIPTING_H
+#define K3DSDK_NGUI_SCRIPTING_H
 
 // K-3D
 // Copyright (c) 1995-2005, Timothy M. Shead
@@ -41,5 +41,5 @@ bool execute_script(const k3d::filesystem::path& Script, k3d::iscript_engine::co
 
 } // namespace libk3dngui
 
-#endif // NGUI_SCRIPTING_H
+#endif // !K3DSDK_NGUI_SCRIPTING_H
 

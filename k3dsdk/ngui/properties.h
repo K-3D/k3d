@@ -1,5 +1,5 @@
-#ifndef NGUI_PROPERTIES_H
-#define NGUI_PROPERTIES_H
+#ifndef K3DSDK_NGUI_PROPERTIES_H
+#define K3DSDK_NGUI_PROPERTIES_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -45,5 +45,5 @@ void create(inode& Node, icommand_node& Parent);
 
 } // namespace k3d
 
-#endif // NGUI_PROPERTIES_H
+#endif // !K3DSDK_NGUI_PROPERTIES_H
 

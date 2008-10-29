@@ -1,5 +1,5 @@
-#ifndef NGUI_AUTO_PROPERTY_TOOLBAR_H
-#define NGUI_AUTO_PROPERTY_TOOLBAR_H
+#ifndef K3DSDK_NGUI_AUTO_PROPERTY_TOOLBAR_H
+#define K3DSDK_NGUI_AUTO_PROPERTY_TOOLBAR_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -65,5 +65,5 @@ private:
 
 } // namespace k3d
 
-#endif // NGUI_AUTO_PROPERTY_TOOLBAR_H
+#endif // !K3DSDK_NGUI_AUTO_PROPERTY_TOOLBAR_H
 
