@@ -34,5 +34,5 @@ void set_share_path(const filesystem::path& SharePath);
 
 } // namespace k3d
 
-#endif // K3DSDK_SHARE_DETAIL_H
+#endif // !K3DSDK_SHARE_DETAIL_H
 

@@ -53,5 +53,5 @@ bool intersect_lines(const point3& P1, const vector3& T1, const point3& P2, cons
 
 } // namespace k3d
 
-#endif // K3DSDK_GEOMETRIC_OPERATIONS_H
+#endif // !K3DSDK_GEOMETRIC_OPERATIONS_H
 

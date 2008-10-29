@@ -100,5 +100,5 @@ template<class type> type mix(const type& x, const type& y, const double alpha)
 
 } // namespace k3d
 
-#endif // K3DSDK_BASIC_MATH_H
+#endif // !K3DSDK_BASIC_MATH_H
 

@@ -32,5 +32,5 @@ void set_batch_mode(const bool Mode);
 
 } // namespace k3d
 
-#endif // K3DSDK_BATCH_MODE_INIT_H
+#endif // !K3DSDK_BATCH_MODE_INIT_H
 

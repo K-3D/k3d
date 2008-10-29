@@ -43,5 +43,5 @@ const contributors_t& contributors();
 
 } // namespace k3d
 
-#endif // K3DSDK_CONTRIBUTORS_H
+#endif // !K3DSDK_CONTRIBUTORS_H
 

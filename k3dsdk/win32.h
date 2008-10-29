@@ -34,5 +34,5 @@
 #undef near
 #undef far
 
-#endif // K3DSDK_WIN32_H
+#endif // !K3DSDK_WIN32_H
 

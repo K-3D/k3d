@@ -57,5 +57,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_UUID_H
+#endif // !K3DSDK_UUID_H
 

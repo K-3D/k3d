@@ -60,5 +60,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_USER_PROPERTIES_H
+#endif // !K3DSDK_USER_PROPERTIES_H
 

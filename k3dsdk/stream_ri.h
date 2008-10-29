@@ -161,5 +161,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_STREAM_RI_H
+#endif // !K3DSDK_STREAM_RI_H
 

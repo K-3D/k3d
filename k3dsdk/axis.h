@@ -67,4 +67,4 @@ std::istream& operator>>(std::istream& Stream, signed_axis& Value);
 
 } // namespace k3d
 
-#endif // K3DSDK_AXIS_H
+#endif // !K3DSDK_AXIS_H

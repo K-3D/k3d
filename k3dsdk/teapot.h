@@ -83,5 +83,5 @@ const patches_array_t& patches();
 
 } // namespace k3d
 
-#endif // K3DSDK_TEAPOT_H
+#endif // !K3DSDK_TEAPOT_H
 

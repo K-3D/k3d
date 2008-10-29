@@ -365,5 +365,5 @@ detail::converter<ListT> converter(const sigc::slot<void, ihint*>& Slot)
 
 } // namespace k3d
 
-#endif // K3DSDK_HINTS_H
+#endif // !K3DSDK_HINTS_H
 

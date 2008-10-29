@@ -1,5 +1,5 @@
-#ifndef IKEYFRAMER_H_
-#define IKEYFRAMER_H_
+#ifndef K3DSDK_IKEYFRAMER_H
+#define K3DSDK_IKEYFRAMER_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -60,4 +60,4 @@ public:
 
 }
 
-#endif /*IKEYFRAMER_H_*/
+#endif // !K3DSDK_IKEYFRAMER_H

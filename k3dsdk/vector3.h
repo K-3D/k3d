@@ -260,5 +260,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_VECTOR3_H
+#endif // !K3DSDK_VECTOR3_H
 

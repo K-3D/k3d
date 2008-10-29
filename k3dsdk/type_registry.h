@@ -64,5 +64,5 @@ const string_t demangle(const std::type_info& Type);
 
 } // namespace k3d
 
-#endif // K3DSDK_TYPE_REGISTRY_H
+#endif // !K3DSDK_TYPE_REGISTRY_H
 

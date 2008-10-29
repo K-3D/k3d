@@ -55,5 +55,5 @@ private:
 // Required if GLEW_MX is defined:
 #define glewGetContext() glew_context::instance().context()
 
-#endif // K3DSDK_GL_H
+#endif // !K3DSDK_GL_H
 

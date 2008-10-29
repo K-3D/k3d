@@ -1,5 +1,5 @@
-#ifndef K3DSDK_SYSTEM
-#define K3DSDK_SYSTEM
+#ifndef K3DSDK_SYSTEM_H
+#define K3DSDK_SYSTEM_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -78,5 +78,5 @@ void sleep(const double Seconds);
 
 } // namespace k3d
 
-#endif // !K3DSDK_SYSTEM
+#endif // !K3DSDK_SYSTEM_H
 

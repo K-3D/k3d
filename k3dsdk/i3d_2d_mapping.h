@@ -49,5 +49,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_I3D_2D_MAPPING_H
+#endif // !K3DSDK_I3D_2D_MAPPING_H
 

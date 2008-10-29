@@ -68,5 +68,5 @@ private:
 
 } // namespace k3d
 
-#endif // !K3DSDK_EXPRESSION_BASIC_PARSER-H
+#endif // !K3DSDK_EXPRESSION_BASIC_PARSER_H
 

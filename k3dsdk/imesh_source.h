@@ -52,6 +52,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IMESH_SOURCE_H
-
+#endif // !K3DSDK_IMESH_SOURCE_H
 

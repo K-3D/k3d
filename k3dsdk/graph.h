@@ -94,5 +94,5 @@ std::ostream& operator<<(std::ostream& Stream, const graph& RHS);
 
 } // namespace k3d
 
-#endif // K3DSDK_GRAPH_H
+#endif // !K3DSDK_GRAPH_H
 

@@ -34,5 +34,5 @@ iapplication& application();
 
 } // namespace k3d
 
-#endif // K3DSDK_APPLICATION_H
+#endif // !K3DSDK_APPLICATION_H
 

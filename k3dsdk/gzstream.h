@@ -1,3 +1,6 @@
+#ifndef K3DSDK_GZSTREAM_H
+#define K3DSDK_GZSTREAM_H
+
 // ============================================================================
 // gzstream, C++ iostream classes wrapping the zlib compression library.
 // Copyright (C) 2001  Deepak Bandyopadhyay, Lutz Kettner
@@ -27,9 +30,6 @@
 // ============================================================================
 
 // Integrated into the K-3D SDK by Tim Shead, April 2006
-
-#ifndef K3DSDK_GZSTREAM_H
-#define K3DSDK_GZSTREAM_H
 
 #include <iostream>
 
@@ -90,5 +90,5 @@ public:
 
 } // namespace k3d
 
-#endif //!K3DSDK_GZSTREAM_H
+#endif // !K3DSDK_GZSTREAM_H
 

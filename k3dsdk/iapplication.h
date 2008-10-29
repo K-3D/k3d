@@ -79,5 +79,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IAPPLICATION_H
+#endif // !K3DSDK_IAPPLICATION_H
 

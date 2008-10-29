@@ -60,5 +60,5 @@ typedef std::string string_t;
 
 } // namespace k3d
 
-#endif // K3DSDK_TYPES_H
+#endif // !K3DSDK_TYPES_H
 

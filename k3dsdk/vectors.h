@@ -226,5 +226,5 @@ inline const normal3 to_normal(const vector3& v)
 
 } // namespace k3d
 
-#endif // K3DSDK_VECTORS_H
+#endif // !K3DSDK_VECTORS_H
 

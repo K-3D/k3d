@@ -69,5 +69,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_TRIANGULATOR_H
+#endif // !K3DSDK_TRIANGULATOR_H
 

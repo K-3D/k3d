@@ -34,6 +34,5 @@ icommand_tree& command_tree();
 
 } // namespace k3d
 
-#endif // K3DSDK_COMMANDTREE
-
+#endif // !K3DSDK_COMMAND_TREE_H
 

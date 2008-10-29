@@ -34,5 +34,5 @@ void set_user_interface(iuser_interface& UserInterface);
 
 } // namespace k3d
 
-#endif // K3DSDK_USER_INTERFACE_INIT_H
+#endif // !K3DSDK_USER_INTERFACE_INIT_H
 

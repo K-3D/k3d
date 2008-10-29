@@ -59,5 +59,5 @@ const uint_t number(const mesh& Mesh, const uint_t Polyhedron);
 
 } // namespace k3d
 
-#endif // K3DSDK_EULER_OPERATIONS_H
+#endif // !K3DSDK_EULER_OPERATIONS_H
 

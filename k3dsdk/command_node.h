@@ -50,5 +50,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_COMMAND_NODE_H
+#endif // !K3DSDK_COMMAND_NODE_H
 

@@ -53,5 +53,5 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_SNAPPABLE_DETAIL_H
+#endif // !K3DSDK_SNAPPABLE_DETAIL_H
 

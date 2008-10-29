@@ -51,5 +51,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IATTRIBUTE_PROPERTY_RI_H
+#endif // !K3DSDK_IATTRIBUTE_PROPERTY_RI_H
 

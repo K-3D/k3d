@@ -55,5 +55,5 @@ bool query_vbo();
 
 } // namespace k3d
 
-#endif // K3DSDK_EXTENSION_GL_H
+#endif // !K3DSDK_EXTENSION_GL_H
 

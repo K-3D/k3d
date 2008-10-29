@@ -38,5 +38,5 @@ void close_document(idocument& Document);
 
 } // namespace k3d
 
-#endif // K3DSDK_DOCUMENT_H
+#endif // !K3DSDK_DOCUMENT_H
 

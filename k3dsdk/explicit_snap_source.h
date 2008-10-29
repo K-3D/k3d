@@ -55,5 +55,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_EXPLICIT_SNAP_SOURCE_H
+#endif // !K3DSDK_EXPLICIT_SNAP_SOURCE_H
 

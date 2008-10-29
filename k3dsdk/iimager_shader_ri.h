@@ -52,5 +52,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IIMAGER_SHADER_RI_H
+#endif // !K3DSDK_IIMAGER_SHADER_RI_H
 

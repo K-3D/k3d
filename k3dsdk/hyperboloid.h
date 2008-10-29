@@ -91,5 +91,5 @@ primitive* validate(mesh::primitive& GenericPrimitive);
 
 } // namespace k3d
 
-#endif // K3DSDK_TEAPOT_H
+#endif // !K3DSDK_HYPERBOLOID_H
 

@@ -193,5 +193,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_ALMOST_EQUAL_H
+#endif // !K3DSDK_ALMOST_EQUAL_H
 

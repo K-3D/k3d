@@ -51,5 +51,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_IMESH_PAINTER_RI_H
+#endif // !K3DSDK_IMESH_PAINTER_RI_H
 

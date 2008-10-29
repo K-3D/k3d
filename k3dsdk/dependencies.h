@@ -50,4 +50,4 @@ private:
 
 } // namespace k3d
 
-#endif // K3DSDK_DEPENDENCIES_H
+#endif // !K3DSDK_DEPENDENCIES_H

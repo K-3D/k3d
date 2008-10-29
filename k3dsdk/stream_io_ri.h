@@ -129,5 +129,5 @@ std::ostream& operator<<(std::ostream& Stream, const parameter_list& RHS);
 
 } // namespace k3d
 
-#endif // K3DSDK_STREAM_IO_RI_H
+#endif // !K3DSDK_STREAM_IO_RI_H
 

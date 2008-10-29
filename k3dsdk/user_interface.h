@@ -34,5 +34,5 @@ iuser_interface& user_interface();
 
 } // namespace k3d
 
-#endif // K3DSDK_USER_INTERFACE_H
+#endif // !K3DSDK_USER_INTERFACE_H
 

@@ -29,5 +29,5 @@ const string_t mesh_point_indices();
 
 } // namespace k3d
 
-#endif // K3DSDK_ARRAY_METADATA_H
+#endif // !K3DSDK_ARRAY_METADATA_H
 

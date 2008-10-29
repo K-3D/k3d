@@ -70,5 +70,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_TRANSFORMABLE_H
+#endif // !K3DSDK_TRANSFORMABLE_H
 

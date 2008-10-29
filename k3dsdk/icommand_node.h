@@ -68,5 +68,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_ICOMMAND_NODE_H
+#endif // !K3DSDK_ICOMMAND_NODE_H
 

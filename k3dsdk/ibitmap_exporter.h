@@ -49,5 +49,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IBITMAP_EXPORTER_H
+#endif // !K3DSDK_IBITMAP_EXPORTER_H
 

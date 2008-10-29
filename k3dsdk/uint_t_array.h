@@ -129,5 +129,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_UINT_T_ARRAY_H
+#endif // !K3DSDK_UINT_T_ARRAY_H
 

@@ -121,4 +121,4 @@ typedef basic_fstream<char> fstream;
 
 } // namespace k3d
 
-#endif // K3DSDK_FSTREAM_H
+#endif // !K3DSDK_FSTREAM_H

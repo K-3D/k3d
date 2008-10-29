@@ -32,6 +32,6 @@ const char* const make_token(const char* const Token);
 
 } // namespace k3d
 
-#endif // K3DSDK_TOKENS_H
+#endif // !K3DSDK_TOKENS_H
 
 

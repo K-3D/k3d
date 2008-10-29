@@ -1,3 +1,6 @@
+#ifndef K3DSDK_GPRIM_FACTORY_H
+#define K3DSDK_GPRIM_FACTORY_H
+
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
 //
@@ -83,4 +86,6 @@ private:
 };
 
 } // k3d
+
+#endif // !K3DSDK_GPRIM_FACTORY_H
 

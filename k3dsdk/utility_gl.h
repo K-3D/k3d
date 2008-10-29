@@ -127,5 +127,5 @@ void tex_image_2d(const bitmap& Bitmap);
 
 } // namespace k3d
 
-#endif // K3DSDK_UTILITY_GL_H
+#endif // !K3DSDK_UTILITY_GL_H
 

@@ -60,5 +60,5 @@ std::ostream& operator<<(std::ostream& Stream, const frames& RHS);
 
 } // namespace k3d
 
-#endif // K3DSDK_FRAMES_H
+#endif // !K3DSDK_FRAMES_H
 

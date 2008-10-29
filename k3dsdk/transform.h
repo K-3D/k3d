@@ -44,5 +44,5 @@ k3d::inode* set_matrix(iunknown& Node, const k3d::matrix4& Matrix);
 
 } // namespace k3d
 
-#endif // K3DSDK_TRANSFORM_H
+#endif // !K3DSDK_TRANSFORM_H
 
