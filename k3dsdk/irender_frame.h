@@ -47,5 +47,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IRENDER_FRAME_H
+#endif // !K3DSDK_IRENDER_FRAME_H
 

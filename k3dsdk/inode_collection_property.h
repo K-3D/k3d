@@ -50,5 +50,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_INODE_COLLECTION_PROPERTY_H
+#endif // !K3DSDK_INODE_COLLECTION_PROPERTY_H
 

@@ -102,5 +102,5 @@ std::istream& operator>>(std::istream&, ipath_property::reference_t&);
 
 } // namespace k3d
 
-#endif // K3DSDK_IPATH_PROPERTY_H
+#endif // !K3DSDK_IPATH_PROPERTY_H
 

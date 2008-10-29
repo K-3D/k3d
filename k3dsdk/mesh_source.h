@@ -113,5 +113,5 @@ private:
 
 } // namespace k3d
 
-#endif // !K3DSDK_MESH_SOURCE
+#endif // !K3DSDK_MESH_SOURCE_H
 

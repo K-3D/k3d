@@ -55,4 +55,4 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IPLUGIN_REGISTRY_H
+#endif // !K3DSDK_IPLUGIN_REGISTRY_H

@@ -45,5 +45,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_ISCRIPT_PROPERTY_H
+#endif // !K3DSDK_ISCRIPT_PROPERTY_H
 

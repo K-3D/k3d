@@ -205,5 +205,5 @@ private:
 
 } // namespace detail
 
-#endif // K3DSDK_MESH_TRIANGULATE_DETAIL_H
+#endif // !K3DSDK_MESH_TRIANGULATE_DETAIL_H
 

@@ -1,5 +1,5 @@
-#ifndef MESH_TOPOLOGY_H_
-#define MESH_TOPOLOGY_H_
+#ifndef K3DSDK_MESH_TOPOLOGY_DATA_H
+#define K3DSDK_MESH_TOPOLOGY_DATA_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -51,4 +51,4 @@ void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const me
 
 } // namespace k3d
 
-#endif /*MESH_TOPOLOGY_H_*/
+#endif // !K3DSDK_MESH_TOPOLOGY_DATA_H

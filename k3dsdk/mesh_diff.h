@@ -32,5 +32,5 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B, const boost:
 
 } // namespace k3d
 
-#endif // K3DSDK_MESH_DIFF_H
+#endif // !K3DSDK_MESH_DIFF_H
 

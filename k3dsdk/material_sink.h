@@ -1,5 +1,5 @@
-#ifndef K3DSDK_MATERIAL_CLIENT_H
-#define K3DSDK_MATERIAL_CLIENT_H
+#ifndef K3DSDK_MATERIAL_SINK_H
+#define K3DSDK_MATERIAL_SINK_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -58,5 +58,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_MATERIAL_CLIENT_H
+#endif // !K3DSDK_MATERIAL_SINK_H
 

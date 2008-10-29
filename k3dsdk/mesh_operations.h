@@ -194,5 +194,5 @@ void traverse_selected_face_points(const mesh& Mesh, visitor_t& Visitor)
 
 } // namespace k3d
 
-#endif // K3DSDK_MESH_OPERATIONS_H
+#endif // !K3DSDK_MESH_OPERATIONS_H
 

@@ -49,5 +49,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_INETWORK_RENDER_JOB_H
+#endif // !K3DSDK_INETWORK_RENDER_JOB_H
 

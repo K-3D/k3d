@@ -64,5 +64,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_METADATA_H
+#endif // !K3DSDK_METADATA_H
 

@@ -1,5 +1,5 @@
-#ifndef K3DSDK_IPROPERTY_GROUPS_H
-#define K3DSDK_IPROPERTY_GROUPS_H
+#ifndef K3DSDK_IPROPERTY_GROUP_COLLECTION_H
+#define K3DSDK_IPROPERTY_GROUP_COLLECTION_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -77,4 +77,4 @@ protected:
 } // namespace k3d
 
 
-#endif // K3DSDK_IPROPERTY_GROUPS_H
+#endif // !K3DSDK_IPROPERTY_GROUP_COLLECTION_H

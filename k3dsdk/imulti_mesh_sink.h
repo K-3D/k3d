@@ -1,5 +1,5 @@
-#ifndef IMULTI_MESH_SINK_H_
-#define IMULTI_MESH_SINK_H_
+#ifndef K3DSDK_IMULTI_MESH_SINK_H
+#define K3DSDK_IMULTI_MESH_SINK_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -44,4 +44,5 @@ protected:
 
 } // namespace k3d
 
-#endif /*IMULTI_MESH_SINK_H_*/
+#endif // !K3DSDK_IMULTI_MESH_SINK_H
+

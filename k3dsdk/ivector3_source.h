@@ -48,5 +48,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IVECTOR3_SOURCE_H
+#endif // !K3DSDK_IVECTOR3_SOURCE_H
 

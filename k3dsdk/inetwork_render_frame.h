@@ -97,5 +97,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_INETWORK_RENDER_FRAME_H
+#endif // !K3DSDK_INETWORK_RENDER_FRAME_H
 

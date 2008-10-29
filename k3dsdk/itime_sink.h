@@ -49,6 +49,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_ITIME_SINK_H
-
+#endif // !K3DSDK_ITIME_SINK_H
 

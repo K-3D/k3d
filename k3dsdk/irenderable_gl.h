@@ -53,5 +53,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IRENDERABLE_GL_H
+#endif // !K3DSDK_IRENDERABLE_GL_H
 

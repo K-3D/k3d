@@ -46,5 +46,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_ITRANSFORM_ARRAY_3D_H
+#endif // !K3DSDK_ITRANSFORM_ARRAY_3D_H
 

@@ -260,5 +260,5 @@ inline const std::string RI_Z() { return "z"; }
 
 } // namespace k3d
 
-#endif // K3DSDK_ISTREAM_RI_H
+#endif // !K3DSDK_ISTREAM_RI_H
 

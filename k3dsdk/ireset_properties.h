@@ -54,5 +54,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IRESET_PROPERTIES_H
+#endif // !K3DSDK_IRESET_PROPERTIES_H
 

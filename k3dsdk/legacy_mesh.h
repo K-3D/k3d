@@ -894,5 +894,5 @@ const bounding_box3 bounds(const mesh& Mesh);
 
 } // namespace k3d
 
-#endif // K3DSDK_LEGACY_MESH_H
+#endif // !K3DSDK_LEGACY_MESH_H
 

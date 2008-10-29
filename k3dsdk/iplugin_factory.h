@@ -86,5 +86,5 @@ std::istream& operator>>(std::istream&, iplugin_factory::quality_t&);
 
 } // namespace k3d
 
-#endif // K3DSDK_IPLUGIN_FACTORY_H
+#endif // !K3DSDK_IPLUGIN_FACTORY_H
 

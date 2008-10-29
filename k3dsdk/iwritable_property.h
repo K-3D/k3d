@@ -48,5 +48,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IWRITABLE_PROPERTY_H
+#endif // !K3DSDK_IWRITABLE_PROPERTY_H
 

@@ -49,5 +49,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IRENDER_CAMERA_ANIMATION_H
+#endif // !K3DSDK_IRENDER_CAMERA_ANIMATION_H
 

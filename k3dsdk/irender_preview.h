@@ -45,5 +45,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IRENDER_PREVIEW_H
+#endif // !K3DSDK_IRENDER_PREVIEW_H
 

@@ -49,5 +49,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_INODE_CHANGE_SIGNAL_H
+#endif // !K3DSDK_INODE_CHANGE_SIGNAL_H
 

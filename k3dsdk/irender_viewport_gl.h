@@ -87,5 +87,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IRENDER_VIEWPORT_GL_H
+#endif // !K3DSDK_IRENDER_VIEWPORT_GL_H
 

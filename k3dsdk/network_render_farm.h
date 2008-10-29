@@ -34,5 +34,5 @@ inetwork_render_farm& get_network_render_farm();
 
 } // namespace k3d
 
-#endif // K3DSDK_NETWORK_RENDER_FARM_H
+#endif // !K3DSDK_NETWORK_RENDER_FARM_H
 

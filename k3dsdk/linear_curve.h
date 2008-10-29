@@ -105,5 +105,5 @@ primitive* validate(mesh::primitive& GenericPrimitive);
 
 } // namespace k3d
 
-#endif // K3DSDK_LINEAR_CURVE_H
+#endif // !K3DSDK_LINEAR_CURVE_H
 

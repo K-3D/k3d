@@ -67,5 +67,5 @@ typedef boost::mpl::vector22<
 
 } // namespace k3d
 
-#endif // K3DSDK_NAMED_ARRAY_TYPES_H
+#endif // !K3DSDK_NAMED_ARRAY_TYPES_H
 

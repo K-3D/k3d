@@ -92,5 +92,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IUSER_INTERFACE_H
+#endif // !K3DSDK_IUSER_INTERFACE_H
 

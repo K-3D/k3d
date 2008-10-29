@@ -44,5 +44,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_ISTATE_CONTAINER_H
+#endif // !K3DSDK_ISTATE_CONTAINER_H
 

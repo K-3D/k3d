@@ -54,5 +54,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_IPLUGIN_FACTORY_COLLECTION_H
+#endif // !K3DSDK_IPLUGIN_FACTORY_COLLECTION_H
 

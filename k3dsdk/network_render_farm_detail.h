@@ -52,5 +52,5 @@ void set_network_render_farm(inetwork_render_farm& RenderFarm);
 
 } // namespace k3d
 
-#endif // K3DSDK_NETWORK_RENDER_FARM_DETAIL_H
+#endif // !K3DSDK_NETWORK_RENDER_FARM_DETAIL_H
 

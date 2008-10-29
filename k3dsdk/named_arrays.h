@@ -101,5 +101,5 @@ public:
 
 } // namespace k3d
 
-#endif // K3DSDK_NAMED_ARRAYS_H
+#endif // !K3DSDK_NAMED_ARRAYS_H
 

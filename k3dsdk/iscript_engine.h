@@ -103,5 +103,5 @@ protected:
 
 } // namespace k3d
 
-#endif // K3DSDK_ISCRIPT_ENGINE_H
+#endif // !K3DSDK_ISCRIPT_ENGINE_H
 

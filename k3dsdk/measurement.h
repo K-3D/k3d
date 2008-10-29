@@ -389,6 +389,5 @@ const volume& volume_units(const std::string Symbol);
 
 } // namespace k3d
 
-#endif // K3DSDK_MEASUREMENT_H
-
+#endif // !K3DSDK_MEASUREMENT_H
 

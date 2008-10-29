@@ -64,5 +64,5 @@ const bool operator==(const string_t&, const type&);
 
 } // namespace k3d
 
-#endif // K3DSDK_MIME_TYPES_H
+#endif // !K3DSDK_MIME_TYPES_H
 

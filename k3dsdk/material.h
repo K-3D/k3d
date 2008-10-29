@@ -71,5 +71,5 @@ InterfaceT* lookup(iunknown* const Material)
 
 } // namespace k3d
 
-#endif // K3DSDK_MATERIAL_H
+#endif // !K3DSDK_MATERIAL_H
 
