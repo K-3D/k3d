@@ -1,6 +1,7 @@
 # Test to ensure that none of our filenames exceed 90 characters in length (causes portability issues with tar)
 
 FILE(GLOB_RECURSE ALL_SOURCE_FILES *)
+LIST(SORT ALL_SOURCE_FILES)
 
 SET(REPORT_ERROR 0)
 SET(MAX_LENGTH 90)
