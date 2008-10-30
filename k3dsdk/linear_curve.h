@@ -39,8 +39,8 @@ public:
 		const typed_array<imaterial*>& Materials,
 		const uint_t_array& CurveFirstPoints,
 		const uint_t_array& CurvePointCounts,
-		const uint_t_array& CurvePoints,
 		const typed_array<double_t>& CurveSelections,
+		const uint_t_array& CurvePoints,
 		const attribute_arrays& ConstantData,
 		const attribute_arrays& UniformData,
 		const attribute_arrays& VaryingData
@@ -52,8 +52,8 @@ public:
 	const typed_array<imaterial*>& materials;
 	const uint_t_array& curve_first_points;
 	const uint_t_array& curve_point_counts;
-	const uint_t_array& curve_points;
 	const typed_array<double_t>& curve_selections;
+	const uint_t_array& curve_points;
 	const attribute_arrays& constant_data;
 	const attribute_arrays& uniform_data;
 	const attribute_arrays& varying_data;
@@ -70,8 +70,8 @@ public:
 		typed_array<imaterial*>& Materials,
 		uint_t_array& CurveFirstPoints,
 		uint_t_array& CurvePointCounts,
-		uint_t_array& CurvePoints,
 		typed_array<double_t>& CurveSelections,
+		uint_t_array& CurvePoints,
 		attribute_arrays& ConstantData,
 		attribute_arrays& UniformData,
 		attribute_arrays& VaryingData
@@ -83,8 +83,8 @@ public:
 	typed_array<imaterial*>& materials;
 	uint_t_array& curve_first_points;
 	uint_t_array& curve_point_counts;
-	uint_t_array& curve_points;
 	typed_array<double_t>& curve_selections;
+	uint_t_array& curve_points;
 	attribute_arrays& constant_data;
 	attribute_arrays& uniform_data;
 	attribute_arrays& varying_data;
