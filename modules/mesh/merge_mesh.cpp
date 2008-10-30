@@ -600,6 +600,8 @@ const k3d::uint_t merge_points(k3d::mesh& Output, const k3d::mesh& Input)
 	k3d::attribute_array_copier vertex_data_copier(Input.vertex_data, Output.vertex_data);
 	for (k3d::uint_t point = 0; point != input_points.size(); ++point)
 		vertex_data_copier.push_back(point);
+
+	return point_offset;
 }
 
 }
@@ -660,8 +662,6 @@ public:
 
 			// Must be last to calculate correct offsets in other methods
 			const k3d::uint_t point_offset = detail::merge_points(Output, mesh);
-k3d::log() << debug << "point_offset: " << point_offset << std::endl;
-
 			
 			for(k3d::mesh::primitives_t::const_iterator primitive = mesh.primitives.begin(); primitive != mesh.primitives.end(); ++primitive)
 			{
