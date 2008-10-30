@@ -72,16 +72,6 @@ void merge_selection(const mesh_selection::records_t& Records, const gprims_type
 	detail::merge_selection(Records, selection);
 }
 
-template<typename gprims_type>
-void clear_selection(const gprims_type& GPrims, pipeline_data<mesh::selection_t>& Selection)
-{
-	return_if_fail(GPrims);
-
-	const uint_t gprim_count = GPrims->size();
-
-	Selection.create(new mesh::selection_t(gprim_count, 0.0));
-}
-
 } // namespace detail
 
 const mesh create_grid(const uint_t Rows, const uint_t Columns, imaterial* const Material)
@@ -388,59 +378,6 @@ void merge_selection(const mesh_selection& MeshSelection, mesh& Mesh)
 void merge_selection(const mesh_selection::records_t& Records, mesh::selection_t& Selection)
 {
 	detail::merge_selection(Records, Selection);
-}
-
-void clear_component_selection(mesh& Mesh)
-{
-	detail::clear_selection(Mesh.points, Mesh.point_selection);
-
-	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
-	{
-		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
-		detail::clear_selection(polyhedra.edge_points, polyhedra.edge_selection);
-	}
-
-	if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops)
-	{
-		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
-		detail::clear_selection(polyhedra.face_first_loops, polyhedra.face_selection);
-	}
-
-	if(Mesh.linear_curve_groups)
-	{
-		k3d::mesh::linear_curve_groups_t& linear_curve_groups = Mesh.linear_curve_groups.writable();
-		detail::clear_selection(linear_curve_groups.curve_first_points, linear_curve_groups.curve_selection);
-	}
-
-	if(Mesh.cubic_curve_groups)
-	{
-		k3d::mesh::cubic_curve_groups_t& cubic_curve_groups = Mesh.cubic_curve_groups.writable();
-		detail::clear_selection(cubic_curve_groups.curve_first_points, cubic_curve_groups.curve_selection);
-	}
-
-	if(Mesh.nurbs_curve_groups)
-	{
-		k3d::mesh::nurbs_curve_groups_t& nurbs_curve_groups = Mesh.nurbs_curve_groups.writable();
-		detail::clear_selection(nurbs_curve_groups.curve_first_points, nurbs_curve_groups.curve_selection);
-	}
-
-	if(Mesh.bilinear_patches)
-	{
-		k3d::mesh::bilinear_patches_t& bilinear_patches = Mesh.bilinear_patches.writable();
-		detail::clear_selection(bilinear_patches.patch_materials, bilinear_patches.patch_selection);
-	}
-
-	if(Mesh.bicubic_patches)
-	{
-		k3d::mesh::bicubic_patches_t& bicubic_patches = Mesh.bicubic_patches.writable();
-		detail::clear_selection(bicubic_patches.patch_materials, bicubic_patches.patch_selection);
-	}
-
-	if(Mesh.nurbs_patches)
-	{
-		k3d::mesh::nurbs_patches_t& nurbs_patches = Mesh.nurbs_patches.writable();
-		detail::clear_selection(nurbs_patches.patch_materials, nurbs_patches.patch_selection);
-	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
