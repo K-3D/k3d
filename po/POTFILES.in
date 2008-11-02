@@ -103,7 +103,6 @@ modules/bitmap/solid.cpp
 modules/bitmap/subtract.cpp
 modules/bitmap/threshold.cpp
 modules/blobby/add.cpp
-modules/blobby/blobbies.cpp
 modules/blobby/divide.cpp
 modules/blobby/edges_to_blobby.cpp
 modules/blobby/ellipsoid.cpp
@@ -522,3 +521,4 @@ share/scripts/scripted_plugins/ogre_exporter.py
 uimodules/ngui/splash_box.cpp
 uimodules/ngui/user_interface.cpp
 uimodules/qtui/user_interface.cpp
+modules/selection/select_companion.cpp
