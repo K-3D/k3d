@@ -2245,28 +2245,6 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 		detail::save_array(container, element("edge_selection"), Mesh.polyhedra->edge_selection, Context);
 		detail::save_arrays(container, element("face_varying_data"), Mesh.polyhedra->face_varying_data, Context);
 	}
-
-	if(Mesh.blobbies)
-	{
-		element& container = Container.append(element("blobbies"));
-		detail::save_array(container, element("first_primitives"), Mesh.blobbies->first_primitives, Context);
-		detail::save_array(container, element("primitive_counts"), Mesh.blobbies->primitive_counts, Context);
-		detail::save_array(container, element("first_operators"), Mesh.blobbies->first_operators, Context);
-		detail::save_array(container, element("operator_counts"), Mesh.blobbies->operator_counts, Context);
-		detail::save_array(container, element("materials"), Mesh.blobbies->materials, Context);
-		detail::save_arrays(container, element("constant_data"), Mesh.blobbies->constant_data, Context);
-		detail::save_arrays(container, element("uniform_data"), Mesh.blobbies->uniform_data, Context);
-		detail::save_array(container, element("primitives"), Mesh.blobbies->primitives, Context);
-		detail::save_array(container, element("primitive_first_floats"), Mesh.blobbies->primitive_first_floats, Context);
-		detail::save_array(container, element("primitive_float_counts"), Mesh.blobbies->primitive_float_counts, Context);
-		detail::save_arrays(container, element("varying_data"), Mesh.blobbies->varying_data, Context);
-		detail::save_arrays(container, element("vertex_data"), Mesh.blobbies->vertex_data, Context);
-		detail::save_array(container, element("operators"), Mesh.blobbies->operators, Context);
-		detail::save_array(container, element("operator_first_operands"), Mesh.blobbies->operator_first_operands, Context);
-		detail::save_array(container, element("operator_operand_counts"), Mesh.blobbies->operator_operand_counts, Context);
-		detail::save_array(container, element("floats"), Mesh.blobbies->floats, Context);
-		detail::save_array(container, element("operands"), Mesh.blobbies->operands, Context);
-	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2447,6 +2425,7 @@ assert_not_implemented();
 		detail::load_arrays(*container, "face_varying_data", polyhedra->face_varying_data, Context);
 	}
 
+/*
 	if(element* const container = find_element(Container, "blobbies"))
 	{
 		mesh::blobbies_t* const blobbies = &Mesh.blobbies.create();
@@ -2468,6 +2447,7 @@ assert_not_implemented();
 		detail::load_array(*container, "floats", blobbies->floats, Context);
 		detail::load_array(*container, "operands", blobbies->operands, Context);
 	}
+*/
 }
 
 ////////////////////////////////////////////////////

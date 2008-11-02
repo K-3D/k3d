@@ -850,122 +850,6 @@ public:
 	object create_edge_selection() { return create_array(wrapped().edge_selection); }
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// const_blobbies
-
-class const_blobbies :
-	public instance_wrapper<const k3d::mesh::blobbies_t>
-{
-	typedef instance_wrapper<const k3d::mesh::blobbies_t> base;
-public:
-	const_blobbies() :
-		base()
-	{
-	}
-
-	const_blobbies(const k3d::mesh::blobbies_t* Blobbies) :
-		base(Blobbies)
-	{
-	}
-
-	const_blobbies(const k3d::mesh::blobbies_t& Blobbies) :
-		base(Blobbies)
-	{
-	}
-
-	object first_primitives() { return wrap_const_array(wrapped().first_primitives); }
-	object primitive_counts() { return wrap_const_array(wrapped().primitive_counts); }
-	object first_operators() { return wrap_const_array(wrapped().first_operators); }
-	object operator_counts() { return wrap_const_array(wrapped().operator_counts); }
-	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object primitives() { return wrap_const_array(wrapped().primitives); }
-	object primitive_first_floats() { return wrap_const_array(wrapped().primitive_first_floats); }
-	object primitive_float_counts() { return wrap_const_array(wrapped().primitive_float_counts); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-	object vertex_data() { return wrap(wrapped().vertex_data); }
-	object operators() { return wrap_const_array(wrapped().operators); }
-	object operator_first_operands() { return wrap_const_array(wrapped().operator_first_operands); }
-	object operator_operand_counts() { return wrap_const_array(wrapped().operator_operand_counts); }
-	object floats() { return wrap_const_array(wrapped().floats); }
-	object operands() { return wrap_const_array(wrapped().operands); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//blobbies 
-
-class blobbies :
-	public instance_wrapper<k3d::mesh::blobbies_t>
-{
-	typedef instance_wrapper<k3d::mesh::blobbies_t> base;
-public:
-	blobbies() :
-		base()
-	{
-	}
-
-	blobbies(k3d::mesh::blobbies_t* Blobbies) :
-		base(Blobbies)
-	{
-	}
-
-	blobbies(k3d::mesh::blobbies_t& Blobbies) :
-		base(Blobbies)
-	{
-	}
-
-	object first_primitives() { return wrap_const_array(wrapped().first_primitives); }
-	object primitive_counts() { return wrap_const_array(wrapped().primitive_counts); }
-	object first_operators() { return wrap_const_array(wrapped().first_operators); }
-	object operator_counts() { return wrap_const_array(wrapped().operator_counts); }
-	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object primitives() { return wrap_const_array(wrapped().primitives); }
-	object primitive_first_floats() { return wrap_const_array(wrapped().primitive_first_floats); }
-	object primitive_float_counts() { return wrap_const_array(wrapped().primitive_float_counts); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-	object vertex_data() { return wrap(wrapped().vertex_data); }
-	object operators() { return wrap_const_array(wrapped().operators); }
-	object operator_first_operands() { return wrap_const_array(wrapped().operator_first_operands); }
-	object operator_operand_counts() { return wrap_const_array(wrapped().operator_operand_counts); }
-	object floats() { return wrap_const_array(wrapped().floats); }
-	object operands() { return wrap_const_array(wrapped().operands); }
-
-	object writable_first_primitives() { return wrap_non_const_array(wrapped().first_primitives); }
-	object writable_primitive_counts() { return wrap_non_const_array(wrapped().primitive_counts); }
-	object writable_first_operators() { return wrap_non_const_array(wrapped().first_operators); }
-	object writable_operator_counts() { return wrap_non_const_array(wrapped().operator_counts); }
-	object writable_materials() { return wrap_non_const_array(wrapped().materials); }
-	object writable_constant_data() { return wrap(wrapped().constant_data); }
-	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
-	object writable_primitives() { return wrap_non_const_array(wrapped().primitives); }
-	object writable_primitive_first_floats() { return wrap_non_const_array(wrapped().primitive_first_floats); }
-	object writable_primitive_float_counts() { return wrap_non_const_array(wrapped().primitive_float_counts); }
-	object writable_varying_data() { return wrap(wrapped().varying_data); }
-	object writable_vertex_data() { return wrap(wrapped().vertex_data); }
-	object writable_operators() { return wrap_non_const_array(wrapped().operators); }
-	object writable_operator_first_operands() { return wrap_non_const_array(wrapped().operator_first_operands); }
-	object writable_operator_operand_counts() { return wrap_non_const_array(wrapped().operator_operand_counts); }
-	object writable_floats() { return wrap_non_const_array(wrapped().floats); }
-	object writable_operands() { return wrap_non_const_array(wrapped().operands); }
-
-	object create_first_primitives() { return create_array(wrapped().first_primitives); }
-	object create_primitive_counts() { return create_array(wrapped().primitive_counts); }
-	object create_first_operators() { return create_array(wrapped().first_operators); }
-	object create_operator_counts() { return create_array(wrapped().operator_counts); }
-	object create_materials() { return create_array(wrapped().materials); }
-	object create_primitives() { return create_array(wrapped().primitives); }
-	object create_primitive_first_floats() { return create_array(wrapped().primitive_first_floats); }
-	object create_primitive_float_counts() { return create_array(wrapped().primitive_float_counts); }
-	object create_operators() { return create_array(wrapped().operators); }
-	object create_operator_first_operands() { return create_array(wrapped().operator_first_operands); }
-	object create_operator_operand_counts() { return create_array(wrapped().operator_operand_counts); }
-	object create_floats() { return create_array(wrapped().floats); }
-	object create_operands() { return create_array(wrapped().operands); }
-};
-
 } // namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -988,10 +872,8 @@ void mesh::copy(const mesh& RHS)
 
 object mesh::bicubic_patches() { return detail::wrap_const_object<detail::const_bicubic_patches>(wrapped().bicubic_patches); } 
 object mesh::bilinear_patches() { return detail::wrap_const_object<detail::const_bilinear_patches>(wrapped().bilinear_patches); } 
-object mesh::blobbies() { return detail::wrap_const_object<detail::const_blobbies>(wrapped().blobbies); }
 object mesh::create_bicubic_patches() { return detail::create_object<detail::bicubic_patches, k3d::mesh::bicubic_patches_t>(wrapped().bicubic_patches); }
 object mesh::create_bilinear_patches() { return detail::create_object<detail::bilinear_patches, k3d::mesh::bilinear_patches_t>(wrapped().bilinear_patches); }
-object mesh::create_blobbies() { return detail::create_object<detail::blobbies, k3d::mesh::blobbies_t>(wrapped().blobbies); }
 object mesh::create_cubic_curve_groups() { return detail::create_object<detail::cubic_curve_groups, k3d::mesh::cubic_curve_groups_t>(wrapped().cubic_curve_groups); }
 object mesh::create_linear_curve_groups() { return detail::create_object<detail::linear_curve_groups, k3d::mesh::linear_curve_groups_t>(wrapped().linear_curve_groups); }
 object mesh::create_nurbs_curve_groups() { return detail::create_object<detail::nurbs_curve_groups, k3d::mesh::nurbs_curve_groups_t>(wrapped().nurbs_curve_groups); }
@@ -1009,7 +891,6 @@ object mesh::polyhedra() { return detail::wrap_const_object<detail::const_polyhe
 object mesh::vertex_data() { return wrap(wrapped().vertex_data); } 
 object mesh::writable_bicubic_patches() { return detail::wrap_non_const_object<detail::bicubic_patches>(wrapped().bicubic_patches); } 
 object mesh::writable_bilinear_patches() { return detail::wrap_non_const_object<detail::bilinear_patches>(wrapped().bilinear_patches); } 
-object mesh::writable_blobbies() { return detail::wrap_non_const_object<detail::blobbies>(wrapped().blobbies); }
 object mesh::writable_cubic_curve_groups() { return detail::wrap_non_const_object<detail::cubic_curve_groups>(wrapped().cubic_curve_groups); } 
 object mesh::writable_linear_curve_groups() { return detail::wrap_non_const_object<detail::linear_curve_groups>(wrapped().linear_curve_groups); } 
 object mesh::writable_nurbs_curve_groups() { return detail::wrap_non_const_object<detail::nurbs_curve_groups>(wrapped().nurbs_curve_groups); } 
@@ -1522,98 +1403,9 @@ void define_namespace_mesh()
 		.def("create_clockwise_edges", &detail::polyhedra::create_clockwise_edges)
 		.def("create_edge_selection", &detail::polyhedra::create_edge_selection);
 
-	class_<detail::const_blobbies>("const_blobbies",
-		"Stores an immutable (read-only) collection of blobby (implicit surface) primitives.")
-		.def("first_primitives", &detail::const_blobbies::first_primitives)
-		.def("primitive_counts", &detail::const_blobbies::primitive_counts)
-		.def("first_operators", &detail::const_blobbies::first_operators)
-		.def("operator_counts", &detail::const_blobbies::operator_counts)
-		.def("materials", &detail::const_blobbies::materials)
-		.def("constant_data", &detail::const_blobbies::constant_data)
-		.def("uniform_data", &detail::const_blobbies::uniform_data)
-		.def("primitives", &detail::const_blobbies::primitives)
-		.def("primitive_first_floats", &detail::const_blobbies::primitive_first_floats)
-		.def("primitive_float_counts", &detail::const_blobbies::primitive_float_counts)
-		.def("varying_data", &detail::const_blobbies::varying_data)
-		.def("vertex_data", &detail::const_blobbies::vertex_data)
-		.def("operators", &detail::const_blobbies::operators)
-		.def("operator_first_operands", &detail::const_blobbies::operator_first_operands)
-		.def("operator_operand_counts", &detail::const_blobbies::operator_operand_counts)
-		.def("operands", &detail::const_blobbies::operands)
-		.def("floats", &detail::const_blobbies::floats);
-
-	class_<detail::blobbies>("blobbies",
-		"Stores a mutable (read-write) collection of blobby (implicit surface) primitives.")
-		.def("first_primitives", &detail::blobbies::first_primitives)
-		.def("primitive_counts", &detail::blobbies::primitive_counts)
-		.def("first_operators", &detail::blobbies::first_operators)
-		.def("operator_counts", &detail::blobbies::operator_counts)
-		.def("materials", &detail::blobbies::materials)
-		.def("constant_data", &detail::blobbies::constant_data)
-		.def("uniform_data", &detail::blobbies::uniform_data)
-		.def("primitives", &detail::blobbies::primitives)
-		.def("primitive_first_floats", &detail::blobbies::primitive_first_floats)
-		.def("primitive_float_counts", &detail::blobbies::primitive_float_counts)
-		.def("varying_data", &detail::blobbies::varying_data)
-		.def("vertex_data", &detail::blobbies::vertex_data)
-		.def("operators", &detail::blobbies::operators)
-		.def("operator_first_operands", &detail::blobbies::operator_first_operands)
-		.def("operator_operand_counts", &detail::blobbies::operator_operand_counts)
-		.def("operands", &detail::blobbies::operands)
-		.def("floats", &detail::blobbies::floats)
-
-		.def("writable_first_primitives", &detail::blobbies::writable_first_primitives)
-		.def("writable_primitive_counts", &detail::blobbies::writable_primitive_counts)
-		.def("writable_first_operators", &detail::blobbies::writable_first_operators)
-		.def("writable_operator_counts", &detail::blobbies::writable_operator_counts)
-		.def("writable_materials", &detail::blobbies::writable_materials)
-		.def("writable_constant_data", &detail::blobbies::writable_constant_data)
-		.def("writable_uniform_data", &detail::blobbies::writable_uniform_data)
-		.def("writable_primitives", &detail::blobbies::writable_primitives)
-		.def("writable_primitive_first_floats", &detail::blobbies::writable_primitive_first_floats)
-		.def("writable_primitive_float_counts", &detail::blobbies::writable_primitive_float_counts)
-		.def("writable_varying_data", &detail::blobbies::writable_varying_data)
-		.def("writable_vertex_data", &detail::blobbies::writable_vertex_data)
-		.def("writable_operators", &detail::blobbies::writable_operators)
-		.def("writable_operator_first_operands", &detail::blobbies::writable_operator_first_operands)
-		.def("writable_operator_operand_counts", &detail::blobbies::writable_operator_operand_counts)
-		.def("writable_operands", &detail::blobbies::writable_operands)
-		.def("writable_floats", &detail::blobbies::writable_floats)
-
-		.def("create_first_primitives", &detail::blobbies::create_first_primitives)
-		.def("create_primitive_counts", &detail::blobbies::create_primitive_counts)
-		.def("create_first_operators", &detail::blobbies::create_first_operators)
-		.def("create_operator_counts", &detail::blobbies::create_operator_counts)
-		.def("create_materials", &detail::blobbies::create_materials)
-		.def("create_primitives", &detail::blobbies::create_primitives)
-		.def("create_primitive_first_floats", &detail::blobbies::create_primitive_first_floats)
-		.def("create_primitive_float_counts", &detail::blobbies::create_primitive_float_counts)
-		.def("create_operators", &detail::blobbies::create_operators)
-		.def("create_operator_first_operands", &detail::blobbies::create_operator_first_operands)
-		.def("create_operator_operand_counts", &detail::blobbies::create_operator_operand_counts)
-		.def("create_operands", &detail::blobbies::create_operands)
-		.def("create_floats", &detail::blobbies::create_floats);
-
 	enum_<k3d::mesh::polyhedra_t::polyhedron_type>("polyhedron_type")
 		.value("polygons", k3d::mesh::polyhedra_t::POLYGONS)
 		.value("catmull_clark", k3d::mesh::polyhedra_t::CATMULL_CLARK)
-		.attr("__module__") = "k3d";
-
-	enum_<k3d::mesh::blobbies_t::primitive_type>("primitive_type")
-		.value("constant", k3d::mesh::blobbies_t::CONSTANT)
-		.value("ellipsoid", k3d::mesh::blobbies_t::ELLIPSOID)
-		.value("segment", k3d::mesh::blobbies_t::SEGMENT)
-		.attr("__module__") = "k3d";
-
-	enum_<k3d::mesh::blobbies_t::operator_type>("operator_type")
-		.value("add", k3d::mesh::blobbies_t::ADD)
-		.value("multiply", k3d::mesh::blobbies_t::MULTIPLY)
-		.value("maximum", k3d::mesh::blobbies_t::MAXIMUM)
-		.value("minimum", k3d::mesh::blobbies_t::MINIMUM)
-		.value("divide", k3d::mesh::blobbies_t::DIVIDE)
-		.value("subtract", k3d::mesh::blobbies_t::SUBTRACT)
-		.value("negate", k3d::mesh::blobbies_t::NEGATE)
-		.value("identity", k3d::mesh::blobbies_t::IDENTITY)
 		.attr("__module__") = "k3d";
 
 	def("validate", detail::validate,
@@ -1631,8 +1423,6 @@ void define_namespace_mesh()
 			"Returns a L{const_bicubic_patches} object containing an immutable (read-only) collection of bicubic patch primitives, or None.")
 		.def("bilinear_patches", &mesh::bilinear_patches,
 			"Returna a L{const_bilinear_patches} object containing an immutable (read-only) collection of bilinear patch primitives, or None.")
-		.def("blobbies", &mesh::blobbies,
-			"Returns a L{const_blobbies} object containing an immutable (read-only) collection of blobby primitives, or None.")
 		.def("cubic_curve_groups", &mesh::cubic_curve_groups,
 			"Returns a L{const_cubic_curve_groups} object containing an immutable (read-only) collection of cubic curve primitives, or None.")
 		.def("linear_curve_groups", &mesh::linear_curve_groups,
@@ -1653,8 +1443,6 @@ void define_namespace_mesh()
 			"Returns a L{bicubic_patches} object containing a mutable (read-write) collection of bicubic patch primitives, or None.")
 		.def("writable_bilinear_patches", &mesh::writable_bilinear_patches,
 			"Returns a L{bilinear_patches} object containing a mutable (read-write) collection of bilinear patch primitives, or None.")
-		.def("writable_blobbies", &mesh::writable_blobbies,
-			"Returns a L{blobbies} object containing a mutable (read-write) collection of blobby primitives, or None.")
 		.def("writable_cubic_curve_groups", &mesh::writable_cubic_curve_groups,
 			"Returns a L{cubic_curve_groups} object containing a mutable (read-write) collection of cubic curve primitives, or None.")
 		.def("writable_linear_curve_groups", &mesh::writable_linear_curve_groups,
@@ -1677,8 +1465,6 @@ void define_namespace_mesh()
 			"Creates and returns a new L{bicubic_patches} object for storing bicubic patch primitives.")
 		.def("create_bilinear_patches", &mesh::create_bilinear_patches,
 			"Creates and returns a new L{bilinear_patches} object for storing bilinear patch primitives.")
-		.def("create_blobbies", &mesh::create_blobbies,
-			"Creates and returns a new L{blobbies} object for storing blobby primitives.")
 		.def("create_cubic_curve_groups", &mesh::create_cubic_curve_groups,
 			"Creates and returns a new L{cubic_curve_groups} object for storing cubic curve primitives.")
 		.def("create_linear_curve_groups", &mesh::create_linear_curve_groups,

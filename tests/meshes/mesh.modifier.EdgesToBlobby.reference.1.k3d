@@ -1,20 +1,31 @@
 <?xml version="1.0" ?>
 <k3dml>
 	<mesh_arrays>
-		<blobbies>
-			<first_primitives>0</first_primitives>
-			<primitive_counts>12</primitive_counts>
-			<first_operators>0</first_operators>
-			<operator_counts>1</operator_counts>
-			<materials>0</materials>
-			<primitives>segment segment segment segment segment segment segment segment segment segment segment segment</primitives>
-			<primitive_first_floats>0 23 46 69 92 115 138 161 184 207 230 253</primitive_first_floats>
-			<primitive_float_counts>23 23 23 23 23 23 23 23 23 23 23 23</primitive_float_counts>
-			<operators>maximum</operators>
-			<operator_first_operands>0</operator_first_operands>
-			<operator_operand_counts>13</operator_operand_counts>
-			<floats>-2.5 -2.5 2.5 -2.5 2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 2.5 2.5 -2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 2.5 -2.5 -2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 2.5 2.5 2.5 2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 2.5 2.5 -2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 -2.5 2.5 2.5 2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 -2.5 2.5 2.5 -2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 2.5 2.5 2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 -2.5 2.5 -2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 -2.5 -2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 -2.5 -2.5 2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 2.5 -2.5 -2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</floats>
-			<operands>12 0 1 2 3 4 5 6 7 8 9 10 11</operands>
-		</blobbies>
+		<vertex_data/>
+		<primitives>
+			<primitive type="blobby">
+				<topology>
+					<array name="first_operators" type="k3d::uint_t">0</array>
+					<array name="first_primitives" type="k3d::uint_t">0</array>
+					<array name="floats" type="k3d::double_t">-2.5 -2.5 2.5 -2.5 2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 2.5 2.5 -2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 2.5 -2.5 -2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 2.5 2.5 2.5 2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 2.5 2.5 -2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 -2.5 2.5 2.5 2.5 2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 -2.5 2.5 2.5 -2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 2.5 2.5 2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 -2.5 2.5 -2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 -2.5 -2.5 -2.5 -2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 -2.5 -2.5 2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.5 2.5 -2.5 -2.5 2.5 -2.5 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</array>
+					<array name="materials" type="k3d::imaterial*">0</array>
+					<array name="operands" type="k3d::uint_t">12 0 1 2 3 4 5 6 7 8 9 10 11</array>
+					<array name="operator_counts" type="k3d::uint_t">1</array>
+					<array name="operator_first_operands" type="k3d::uint_t">0</array>
+					<array name="operator_operand_counts" type="k3d::uint_t">13</array>
+					<array name="operators" type="k3d::int32_t">2</array>
+					<array name="primitive_counts" type="k3d::uint_t">12</array>
+					<array name="primitive_first_floats" type="k3d::uint_t">0 23 46 69 92 115 138 161 184 207 230 253</array>
+					<array name="primitive_float_counts" type="k3d::uint_t">23 23 23 23 23 23 23 23 23 23 23 23</array>
+					<array name="primitives" type="k3d::int32_t">1002 1002 1002 1002 1002 1002 1002 1002 1002 1002 1002 1002</array>
+				</topology>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="uniform"/>
+					<arrays type="varying"/>
+					<arrays type="vertex"/>
+				</attributes>
+			</primitive>
+		</primitives>
 	</mesh_arrays>
 </k3dml>

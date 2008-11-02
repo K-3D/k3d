@@ -81,8 +81,6 @@ const bool_t validate_bicubic_patches(const mesh& Mesh);
 const bool_t validate_nurbs_patches(const mesh& Mesh);
 /// Returns true iff the given mesh contains valid polyhedron data (i.e. every array is defined).
 const bool_t validate_polyhedra(const mesh& Mesh);
-/// Returns true iff the given mesh contains valid blobby data (i.e. every array is defined).
-const bool_t validate_blobbies(const mesh& Mesh);
 
 /// Returns true iff the given mesh should be rendered as SDS.
 const bool_t is_sds(const mesh& Mesh);

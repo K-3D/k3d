@@ -343,76 +343,6 @@ public:
 		attribute_arrays_t face_varying_data;
 	};
 
-	/// Defines storage for blobbies (implicit surfaces)
-	class blobbies_t
-	{
-	public:
-		/// Defines allowable opcode types
-		typedef enum
-		{
-			CONSTANT = 1000,
-			ELLIPSOID = 1001,
-			SEGMENT = 1002,
-		} primitive_type;
-
-		typedef enum
-		{
-			ADD = 0,
-			MULTIPLY = 1,
-			MAXIMUM = 2,
-			MINIMUM = 3,
-			SUBTRACT = 4,
-			DIVIDE = 5,
-			NEGATE = 6,
-			IDENTITY = 7
-
-		} operator_type;
-
-		/// Defines storage for blobby primitives
-		typedef typed_array<primitive_type> primitives_t;
-		/// Defines storage for blobby operators
-		typedef typed_array<operator_type> operators_t;
-		/// Defines storage for primitive floating-point values
-		typedef typed_array<double_t> floats_t;
-		/// Defines storage for operator operands
-		typedef uint_t_array operands_t;
-
-		/// Stores per-blobby primitive offsets
-		pipeline_data<indices_t> first_primitives;
-		/// Stores per-blobby primitive counts
-		pipeline_data<counts_t> primitive_counts;
-		/// Stores per-blobby operator offsets
-		pipeline_data<indices_t> first_operators;
-		/// Stores per-blobby operator counts
-		pipeline_data<counts_t> operator_counts;
-		/// Stores per-blobby materials
-		pipeline_data<materials_t> materials;
-		/// Stores user-defined per-blobby data (maps to RenderMan constant data)
-		attribute_arrays_t constant_data;
-		/// Stores user-defined per-blobby data (maps to RenderMan uniform data)
-		attribute_arrays_t uniform_data;
-		/// Stores blobby primitives
-		pipeline_data<primitives_t> primitives;
-		/// Stores per-primitive floating-point value offsets
-		pipeline_data<indices_t> primitive_first_floats;
-		/// Stores per-primitive floating-point value counts
-		pipeline_data<counts_t> primitive_float_counts;
-		/// Stores user-defined per-primitive data (maps to RenderMan varying data)
-		attribute_arrays_t varying_data;
-		/// Stores user-defined per-primitive data (maps to RenderMan vertex data)
-		attribute_arrays_t vertex_data;
-		/// Stores blobby operators
-		pipeline_data<operators_t> operators;
-		/// Stores operator operand offsets
-		pipeline_data<indices_t> operator_first_operands;
-		/// Stores operator operand counts
-		pipeline_data<counts_t> operator_operand_counts;
-		/// Stores primitive floating-point values
-		pipeline_data<floats_t> floats;
-		/// Stores operator operands
-		pipeline_data<operands_t> operands;
-	};
-
 	/// Stores the set of mesh points
 	pipeline_data<points_t> points;
 	/// Stores per-point selection state
@@ -436,8 +366,6 @@ public:
 	pipeline_data<nurbs_patches_t> nurbs_patches;
 	/// Stores polyhedra
 	pipeline_data<polyhedra_t> polyhedra;
-	/// Stores blobbies (implicit surfaces)
-	pipeline_data<blobbies_t> blobbies;
 
 	/// Compares two meshes for equality using the fuzzy semantics of almost_equal
 	const bool_t almost_equal(const mesh& Other, const uint64_t Threshold) const;
@@ -452,16 +380,6 @@ std::ostream& operator<<(std::ostream& Stream, const mesh::polyhedra_t::polyhedr
 std::istream& operator>>(std::istream& Stream, mesh::polyhedra_t::polyhedron_type& RHS);
 
 /// Stream serialization
-std::ostream& operator<<(std::ostream& Stream, const mesh::blobbies_t::primitive_type& RHS);
-/// Stream extraction
-std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::primitive_type& RHS);
-
-/// Stream serialization
-std::ostream& operator<<(std::ostream& Stream, const mesh::blobbies_t::operator_type& RHS);
-/// Stream extraction
-std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::operator_type& RHS);
-
-/// Stream serialization
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS);
 
 template<>
@@ -470,22 +388,6 @@ class almost_equal<mesh::polyhedra_t::polyhedron_type>
 public:
 	almost_equal(const uint64_t) { } 
 	inline const bool_t operator()(const mesh::polyhedra_t::polyhedron_type A, const mesh::polyhedra_t::polyhedron_type B) const { return A == B; }
-};
-
-template<>
-class almost_equal<mesh::blobbies_t::primitive_type>
-{
-public:
-	almost_equal(const uint64_t) { } 
-	inline const bool_t operator()(const mesh::blobbies_t::primitive_type A, const mesh::blobbies_t::primitive_type B) const { return A == B; }
-};
-
-template<>
-class almost_equal<mesh::blobbies_t::operator_type>
-{
-public:
-	almost_equal(const uint64_t) { } 
-	inline const bool_t operator()(const mesh::blobbies_t::operator_type A, const mesh::blobbies_t::operator_type B) const { return A == B; }
 };
 
 /// Specialization of almost_equal that tests k3d::mesh for equality

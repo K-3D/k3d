@@ -23,12 +23,15 @@
 */
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/blobby.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -75,23 +78,6 @@ public:
 
 	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		Output = k3d::mesh();
-
-		k3d::mesh::blobbies_t& blobbies = Output.blobbies.create();
-		k3d::mesh::indices_t& first_primitives = blobbies.first_primitives.create();
-		k3d::mesh::counts_t& primitive_counts = blobbies.primitive_counts.create();
-		k3d::mesh::indices_t& first_operators = blobbies.first_operators.create();
-		k3d::mesh::counts_t& operator_counts = blobbies.operator_counts.create();
-		k3d::mesh::materials_t& materials = blobbies.materials.create();
-		k3d::mesh::blobbies_t::primitives_t& primitives = blobbies.primitives.create();
-		k3d::mesh::indices_t& primitive_first_floats = blobbies.primitive_first_floats.create();
-		k3d::mesh::counts_t& primitive_float_counts = blobbies.primitive_float_counts.create();
-		k3d::mesh::blobbies_t::operators_t& operators = blobbies.operators.create();
-		k3d::mesh::indices_t& operator_first_operands = blobbies.operator_first_operands.create();
-		k3d::mesh::counts_t& operator_operand_counts = blobbies.operator_operand_counts.create();
-		k3d::mesh::blobbies_t::floats_t& floats = blobbies.floats.create();
-		k3d::mesh::blobbies_t::operands_t& operands = blobbies.operands.create();
-
 		k3d::imaterial* const material = m_material.pipeline_value();
 		const double x = m_x.pipeline_value();
 		const double y = m_y.pipeline_value();
@@ -101,20 +87,24 @@ public:
 		const double size_z = m_size_z.pipeline_value();
 		const k3d::color color = m_color.pipeline_value();
 
-		first_primitives.push_back(primitives.size());
-		primitive_counts.push_back(1);
-		first_operators.push_back(operators.size());
-		operator_counts.push_back(0);
-		materials.push_back(material);
+		Output = k3d::mesh();
 
-		primitives.push_back(k3d::mesh::blobbies_t::ELLIPSOID);
-		primitive_first_floats.push_back(floats.size());
-		primitive_float_counts.push_back(16);
+		boost::scoped_ptr<k3d::blobby::primitive> blobby(k3d::blobby::create(Output));
+		k3d::typed_array<k3d::color>& varying_colors = blobby->varying_data.create<k3d::typed_array<k3d::color> >("Cs");
+
+		blobby->first_primitives.push_back(blobby->primitives.size());
+		blobby->primitive_counts.push_back(1);
+		blobby->first_operators.push_back(blobby->operators.size());
+		blobby->operator_counts.push_back(0);
+		blobby->materials.push_back(material);
+
+		blobby->primitives.push_back(k3d::blobby::ELLIPSOID);
+		blobby->primitive_first_floats.push_back(blobby->floats.size());
+		blobby->primitive_float_counts.push_back(16);
 
 		k3d::matrix4 matrix = k3d::transpose(k3d::translation3D(k3d::point3(x, y, z)) * k3d::scaling3D(k3d::point3(size_x, size_y, size_z)));
-		floats.insert(floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
+		blobby->floats.insert(blobby->floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
 
-		k3d::typed_array<k3d::color>& varying_colors = blobbies.varying_data.create<k3d::typed_array<k3d::color> >("Cs");
 		varying_colors.push_back(color);
 	}
 

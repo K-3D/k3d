@@ -872,11 +872,6 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		}
 	}
 
-	if(validate_blobbies(Mesh))
-	{
-		assert_not_implemented();
-	}
-
 	return *this;
 }
 

@@ -247,8 +247,6 @@ const bool_t is_uninitialized(const mesh& Mesh)
 		return false;
 	if (Mesh.bilinear_patches)
 		return false;
-	if (Mesh.blobbies)
-		return false;
 	if (Mesh.cubic_curve_groups)
 		return false;
 	if (Mesh.linear_curve_groups)
@@ -499,9 +497,6 @@ const bool_t validate(mesh& Mesh)
 	if(Mesh.polyhedra && !validate_polyhedra(Mesh))
 		result = false;
 
-	if(Mesh.blobbies && !validate_blobbies(Mesh))
-		result = false;
-
 	return result;
 }
 
@@ -685,27 +680,6 @@ const bool_t validate_polyhedra(const mesh& Mesh)
 				break;
 		}
 	}
-	return true;
-}
-
-const bool_t validate_blobbies(const mesh& Mesh)
-{
-	if(!Mesh.blobbies)
-		return false;
-
-	return_val_if_fail(Mesh.blobbies->first_primitives, false);
-	return_val_if_fail(Mesh.blobbies->primitive_counts, false);
-	return_val_if_fail(Mesh.blobbies->first_operators, false);
-	return_val_if_fail(Mesh.blobbies->operator_counts, false);
-	return_val_if_fail(Mesh.blobbies->primitives, false);
-	return_val_if_fail(Mesh.blobbies->primitive_first_floats, false);
-	return_val_if_fail(Mesh.blobbies->primitive_float_counts, false);
-	return_val_if_fail(Mesh.blobbies->operators, false);
-	return_val_if_fail(Mesh.blobbies->operator_first_operands, false);
-	return_val_if_fail(Mesh.blobbies->floats, false);
-	return_val_if_fail(Mesh.blobbies->operands, false);
-	return_val_if_fail(Mesh.blobbies->materials, false);
-
 	return true;
 }
 

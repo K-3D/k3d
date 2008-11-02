@@ -23,12 +23,15 @@
 */
 
 #include <k3dsdk/algebra.h>
+#include <k3dsdk/attribute_array_copier.h>
+#include <k3dsdk/blobby.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
-#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -61,53 +64,39 @@ public:
 		const k3d::mesh::points_t& input_points = *Input.points;
 		const k3d::mesh::attribute_arrays_t& input_vertex_data = Input.vertex_data;
 
-		k3d::mesh::blobbies_t& output_blobbies = Output.blobbies.create();
-		k3d::mesh::indices_t& output_first_primitives = output_blobbies.first_primitives.create();
-		k3d::mesh::counts_t& output_primitive_counts = output_blobbies.primitive_counts.create();
-		k3d::mesh::indices_t& output_first_operators = output_blobbies.first_operators.create();
-		k3d::mesh::counts_t& output_operator_counts = output_blobbies.operator_counts.create();
-		k3d::mesh::materials_t& output_materials = output_blobbies.materials.create();
-		k3d::mesh::blobbies_t::primitives_t& output_primitives = output_blobbies.primitives.create();
-		k3d::mesh::indices_t& output_primitive_first_floats = output_blobbies.primitive_first_floats.create();
-		k3d::mesh::counts_t& output_primitive_float_counts = output_blobbies.primitive_float_counts.create();
-		k3d::mesh::attribute_arrays_t& output_vertex_data = output_blobbies.vertex_data;
-		k3d::mesh::blobbies_t::operators_t& output_operators = output_blobbies.operators.create();
-		k3d::mesh::indices_t& output_operator_first_operands = output_blobbies.operator_first_operands.create();
-		k3d::mesh::counts_t& output_operator_operand_counts = output_blobbies.operator_operand_counts.create();
-		k3d::mesh::blobbies_t::floats_t& output_floats = output_blobbies.floats.create();
-		k3d::mesh::blobbies_t::operands_t& output_operands = output_blobbies.operands.create();
+		boost::scoped_ptr<k3d::blobby::primitive> blobby(k3d::blobby::create(Output));
 
-		output_vertex_data = input_vertex_data.clone_types();
-		k3d::attribute_array_copier output_vertex_data_copier(input_vertex_data, output_vertex_data);
+		blobby->vertex_data = input_vertex_data.clone_types();
+		k3d::attribute_array_copier vertex_data_copier(input_vertex_data, blobby->vertex_data);
 
-		const double radius = m_radius.pipeline_value();
+		const k3d::double_t radius = m_radius.pipeline_value();
 		k3d::imaterial* const material = m_material.pipeline_value();
 
-		output_first_primitives.push_back(output_primitives.size());
-		output_primitive_counts.push_back(input_points.size());
-		output_first_operators.push_back(output_operators.size());
-		output_operator_counts.push_back(1);
-		output_materials.push_back(material);
+		blobby->first_primitives.push_back(blobby->primitives.size());
+		blobby->primitive_counts.push_back(input_points.size());
+		blobby->first_operators.push_back(blobby->operators.size());
+		blobby->operator_counts.push_back(1);
+		blobby->materials.push_back(material);
 
-		const size_t points_begin = 0;
-		const size_t points_end = points_begin + input_points.size();
-		for(size_t point = points_begin; point != points_end; ++point)
+		const k3d::uint_t points_begin = 0;
+		const k3d::uint_t points_end = points_begin + input_points.size();
+		for(k3d::uint_t point = points_begin; point != points_end; ++point)
 		{
-			output_primitives.push_back(k3d::mesh::blobbies_t::ELLIPSOID);
-			output_primitive_first_floats.push_back(output_floats.size());
-			output_primitive_float_counts.push_back(16);
-			output_vertex_data_copier.push_back(point);
+			blobby->primitives.push_back(k3d::blobby::ELLIPSOID);
+			blobby->primitive_first_floats.push_back(blobby->floats.size());
+			blobby->primitive_float_counts.push_back(16);
+			vertex_data_copier.push_back(point);
 
 			k3d::matrix4 matrix = k3d::transpose(k3d::translation3D(input_points[point]) * k3d::scaling3D(k3d::point3(radius, radius, radius)));
-			output_floats.insert(output_floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
+			blobby->floats.insert(blobby->floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
 		}
 
-		output_operators.push_back(k3d::mesh::blobbies_t::ADD);
-		output_operator_first_operands.push_back(output_operands.size());
-		output_operator_operand_counts.push_back(input_points.size() + 1);
-		output_operands.push_back(input_points.size());
-		for(size_t i = 0; i != input_points.size(); ++i)
-			output_operands.push_back(i);
+		blobby->operators.push_back(k3d::blobby::ADD);
+		blobby->operator_first_operands.push_back(blobby->operands.size());
+		blobby->operator_operand_counts.push_back(input_points.size() + 1);
+		blobby->operands.push_back(input_points.size());
+		for(k3d::uint_t i = 0; i != input_points.size(); ++i)
+			blobby->operands.push_back(i);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -129,7 +118,7 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
 };
 
 /////////////////////////////////////////////////////////////////////////////

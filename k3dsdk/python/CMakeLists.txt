@@ -147,6 +147,8 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk-python-a)
 TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk-python-b)
 
 ADD_LIBRARY(k3dsdk-python-primitives SHARED
+	blobby_python.cpp
+	blobby_python.h
 	cone_python.cpp
 	cone_python.h
 	cylinder_python.cpp

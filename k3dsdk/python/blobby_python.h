@@ -1,5 +1,5 @@
-#ifndef MODULES_BLOBBY_DETAIL_H
-#define MODULES_BLOBBY_DETAIL_H
+#ifndef K3DSDK_PYTHON_BLOBBY_PYTHON_H
+#define K3DSDK_PYTHON_BLOBBY_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -22,33 +22,19 @@
 
 /** \file
 	\author Timothy M. Shead (tshead@k-3d.com)
-	\author Romain Behar (romainbehar@yahoo.com)
-	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include <k3dsdk/blobby.h>
-#include <vector>
-
-namespace k3d { class mesh; }
-
-namespace module
+namespace k3d
 {
 
-namespace blobby
+namespace python
 {
 
-namespace detail
-{
+void define_namespace_blobby();
 
-typedef std::vector<const k3d::mesh*> mesh_collection;
+} // namespace python
 
-void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const k3d::blobby::operator_type Operator, const k3d::bool_t VariableArguments, k3d::mesh& Output);
+} // namespace k3d
 
-} // namespace detail
-
-} // namespace blobby
-
-} // namespace module
-
-#endif // !MODULES_BLOBBY_DETAIL_H
+#endif // !K3DSDK_PYTHON_BLOBBY_PYTHON_H
 

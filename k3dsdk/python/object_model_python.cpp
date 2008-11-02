@@ -25,6 +25,7 @@
 #include "any_python.h"
 #include "attribute_arrays_python.h"
 #include "bitmap_python.h"
+#include "blobby_python.h"
 #include "bounding_box3_python.h"
 #include "color_python.h"
 #include "cone_python.h"
@@ -455,6 +456,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_uuid();
 	define_class_vector2();
 	define_class_vector3();
+	define_namespace_blobby();
 	define_namespace_cone();
 	define_namespace_cylinder();
 	define_namespace_disk();

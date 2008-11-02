@@ -391,28 +391,6 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B, const boost:
 		detail::print_diff(Stream, "face varying data", A.polyhedra->face_varying_data, B.polyhedra->face_varying_data, Threshold);
 	}
 
-	detail::print_diff(Stream, "blobbies", A.blobbies, B.blobbies);
-	if(A.blobbies && B.blobbies)
-	{
-		detail::print_diff(Stream, "first primitives", A.blobbies->first_primitives, B.blobbies->first_primitives, Threshold);
-		detail::print_diff(Stream, "primitive counts", A.blobbies->primitive_counts, B.blobbies->primitive_counts, Threshold);
-		detail::print_diff(Stream, "first operators", A.blobbies->first_operators, B.blobbies->first_operators, Threshold);
-		detail::print_diff(Stream, "operator counts", A.blobbies->operator_counts, B.blobbies->operator_counts, Threshold);
-		detail::print_diff(Stream, "materials", A.blobbies->materials, B.blobbies->materials, Threshold);
-		detail::print_diff(Stream, "constant data", A.blobbies->constant_data, B.blobbies->constant_data, Threshold);
-		detail::print_diff(Stream, "uniform data", A.blobbies->uniform_data, B.blobbies->uniform_data, Threshold);
-		detail::print_diff(Stream, "primitives", A.blobbies->primitives, B.blobbies->primitives, Threshold);
-		detail::print_diff(Stream, "primitive first floats", A.blobbies->primitive_first_floats, B.blobbies->primitive_first_floats, Threshold);
-		detail::print_diff(Stream, "primitive float counts", A.blobbies->primitive_float_counts, B.blobbies->primitive_float_counts, Threshold);
-		detail::print_diff(Stream, "varying data", A.blobbies->varying_data, B.blobbies->varying_data, Threshold);
-		detail::print_diff(Stream, "vertex data", A.blobbies->vertex_data, B.blobbies->vertex_data, Threshold);
-		detail::print_diff(Stream, "operators", A.blobbies->operators, B.blobbies->operators, Threshold);
-		detail::print_diff(Stream, "operator first operands", A.blobbies->operator_first_operands, B.blobbies->operator_first_operands, Threshold);
-		detail::print_diff(Stream, "operator operand counts", A.blobbies->operator_operand_counts, B.blobbies->operator_operand_counts, Threshold);
-		detail::print_diff(Stream, "floats", A.blobbies->floats, B.blobbies->floats, Threshold);
-		detail::print_diff(Stream, "operands", A.blobbies->operands, B.blobbies->operands, Threshold);
-	}
-
 	detail::print_diff(Stream, "mesh", &A, &B);
 	detail::print_diff(Stream, "points", A.points, B.points, Threshold);
 	detail::print_diff(Stream, "point selection", A.point_selection, B.point_selection, Threshold);

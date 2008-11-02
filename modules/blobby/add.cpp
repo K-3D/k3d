@@ -74,19 +74,13 @@ public:
 			k3d::iproperty& property = **prop;
 			if(property.property_type() == typeid(k3d::mesh*))
 			{
-				const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property));
-				if(!mesh)
-					continue;
-				
-				if(!k3d::validate_blobbies(*mesh))
-					continue;
-
-				meshes.push_back(mesh);
+				if(const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property)))
+					meshes.push_back(mesh);
 			}
 		}
 
 		// Merge 'em ...
-		detail::merge(meshes, m_material.pipeline_value(), k3d::mesh::blobbies_t::ADD, true, Output);
+		detail::merge(meshes, m_material.pipeline_value(), k3d::blobby::ADD, true, Output);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

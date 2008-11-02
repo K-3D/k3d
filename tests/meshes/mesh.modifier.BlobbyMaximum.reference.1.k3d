@@ -1,23 +1,33 @@
 <?xml version="1.0" ?>
 <k3dml>
 	<mesh_arrays>
-		<blobbies>
-			<first_primitives>0</first_primitives>
-			<primitive_counts>2</primitive_counts>
-			<first_operators>0</first_operators>
-			<operator_counts>1</operator_counts>
-			<materials>0</materials>
-			<primitives>ellipsoid segment</primitives>
-			<primitive_first_floats>0 16</primitive_first_floats>
-			<primitive_float_counts>16 23</primitive_float_counts>
-			<varying_data>
-				<array name="Cs" type="k3d::color">1 0 0 1 1 0</array>
-			</varying_data>
-			<operators>maximum</operators>
-			<operator_first_operands>0</operator_first_operands>
-			<operator_operand_counts>3</operator_operand_counts>
-			<floats>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 3 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</floats>
-			<operands>2 0 1</operands>
-		</blobbies>
+		<vertex_data/>
+		<primitives>
+			<primitive type="blobby">
+				<topology>
+					<array name="first_operators" type="k3d::uint_t">0</array>
+					<array name="first_primitives" type="k3d::uint_t">0</array>
+					<array name="floats" type="k3d::double_t">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 3 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</array>
+					<array name="materials" type="k3d::imaterial*">0</array>
+					<array name="operands" type="k3d::uint_t">2 0 1</array>
+					<array name="operator_counts" type="k3d::uint_t">1</array>
+					<array name="operator_first_operands" type="k3d::uint_t">0</array>
+					<array name="operator_operand_counts" type="k3d::uint_t">3</array>
+					<array name="operators" type="k3d::int32_t">2</array>
+					<array name="primitive_counts" type="k3d::uint_t">2</array>
+					<array name="primitive_first_floats" type="k3d::uint_t">0 16</array>
+					<array name="primitive_float_counts" type="k3d::uint_t">16 23</array>
+					<array name="primitives" type="k3d::int32_t">1001 1002</array>
+				</topology>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="uniform"/>
+					<arrays type="varying">
+						<array name="Cs" type="k3d::color">1 0 0 1 1 0</array>
+					</arrays>
+					<arrays type="vertex"/>
+				</attributes>
+			</primitive>
+		</primitives>
 	</mesh_arrays>
 </k3dml>

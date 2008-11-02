@@ -530,55 +530,6 @@ void merge_nurbs_patches(k3d::mesh& Output, const k3d::mesh& Input)
 	}
 }
 
-void merge_blobbies(k3d::mesh& Output, const k3d::mesh& Input)
-{
-	if (!k3d::validate_blobbies(Input))
-		return;
-	k3d::mesh::blobbies_t& output_blobbies = create_if_not_exists(Output.blobbies);
-	k3d::mesh::indices_t& output_first_primitives = create_if_not_exists(output_blobbies.first_primitives);
-	k3d::mesh::counts_t& output_primitive_counts = create_if_not_exists(output_blobbies.primitive_counts);
-	k3d::mesh::indices_t& output_first_operators = create_if_not_exists(output_blobbies.first_operators);
-	k3d::mesh::counts_t& output_operator_counts = create_if_not_exists(output_blobbies.operator_counts);
-	k3d::mesh::materials_t& output_materials = create_if_not_exists(output_blobbies.materials);
-	k3d::mesh::blobbies_t::primitives_t& output_primitives = create_if_not_exists(output_blobbies.primitives);
-	k3d::mesh::indices_t& output_primitive_first_floats = create_if_not_exists(output_blobbies.primitive_first_floats);
-	k3d::mesh::counts_t& output_primitive_float_counts = create_if_not_exists(output_blobbies.primitive_float_counts);
-	k3d::mesh::blobbies_t::operators_t& output_operators = create_if_not_exists(output_blobbies.operators);
-	k3d::mesh::indices_t& output_operator_first_operands = create_if_not_exists(output_blobbies.operator_first_operands);
-	k3d::mesh::counts_t& output_operator_operand_counts = create_if_not_exists(output_blobbies.operator_operand_counts);
-	k3d::mesh::blobbies_t::floats_t& output_floats = create_if_not_exists(output_blobbies.floats);
-	k3d::mesh::blobbies_t::operands_t& output_operands = create_if_not_exists(output_blobbies.operands);
-	
-	const k3d::mesh::blobbies_t& input_blobbies = *Input.blobbies;
-	const k3d::mesh::indices_t& input_first_primitives = *input_blobbies.first_primitives;
-	const k3d::mesh::counts_t& input_primitive_counts = *input_blobbies.primitive_counts;
-	const k3d::mesh::indices_t& input_first_operators = *input_blobbies.first_operators;
-	const k3d::mesh::counts_t& input_operator_counts = *input_blobbies.operator_counts;
-	const k3d::mesh::materials_t& input_materials = *input_blobbies.materials;
-	const k3d::mesh::blobbies_t::primitives_t& input_primitives = *input_blobbies.primitives;
-	const k3d::mesh::indices_t& input_primitive_first_floats = *input_blobbies.primitive_first_floats;
-	const k3d::mesh::counts_t& input_primitive_float_counts = *input_blobbies.primitive_float_counts;
-	const k3d::mesh::blobbies_t::operators_t& input_operators = *input_blobbies.operators;
-	const k3d::mesh::indices_t& input_operator_first_operands = *input_blobbies.operator_first_operands;
-	const k3d::mesh::counts_t& input_operator_operand_counts = *input_blobbies.operator_operand_counts;
-	const k3d::mesh::blobbies_t::floats_t& input_floats = *input_blobbies.floats;
-	const k3d::mesh::blobbies_t::operands_t& input_operands = *input_blobbies.operands;
-	
-	extend_array(input_first_primitives, output_first_primitives, output_primitives.size());
-	extend_array(input_primitive_counts, output_primitive_counts, 0);
-	extend_array(input_first_operators, output_first_operators, output_operators.size());
-	extend_array(input_operator_counts, output_operator_counts, 0);
-	output_materials.insert(output_materials.end(), input_materials.begin(), input_materials.end());
-	output_primitives.insert(output_primitives.end(), input_primitives.begin(), input_primitives.end());
-	extend_array(input_primitive_first_floats, output_primitive_first_floats, output_floats.size());
-	extend_array(input_primitive_float_counts, output_primitive_float_counts, 0);
-	output_operators.insert(output_operators.end(), input_operators.begin(), input_operators.end());
-	extend_array(input_operator_first_operands, output_operator_first_operands, output_operands.size());
-	extend_array(input_operator_operand_counts, output_operator_operand_counts, 0);
-	output_floats.insert(output_floats.end(), input_floats.begin(), input_floats.end());
-	output_operands.insert(output_operands.end(), input_operands.begin(), input_operands.end());
-}
-
 const k3d::uint_t merge_points(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if(!k3d::validate_points(Input))
@@ -658,7 +609,6 @@ public:
 			detail::merge_bilinear_patches(Output, mesh);
 			detail::merge_bicubic_patches(Output, mesh);
 			detail::merge_nurbs_patches(Output, mesh);
-			detail::merge_blobbies(Output, mesh);
 
 			// Must be last to calculate correct offsets in other methods
 			const k3d::uint_t point_offset = detail::merge_points(Output, mesh);

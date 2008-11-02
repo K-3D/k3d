@@ -73,14 +73,14 @@ public:
 		k3d::mesh* const input_a = m_input_a.pipeline_value();
 		k3d::mesh* const input_b = m_input_b.pipeline_value();
 
-		if(input_a && k3d::validate_blobbies(*input_a))
+		if(input_a)
 			meshes.push_back(input_a);
 
-		if(input_b && k3d::validate_blobbies(*input_b))
+		if(input_b)
 			meshes.push_back(input_b);
 
 		// Merge 'em ...
-		detail::merge(meshes, m_material.pipeline_value(), k3d::mesh::blobbies_t::DIVIDE, false, Output);
+		detail::merge(meshes, m_material.pipeline_value(), k3d::blobby::DIVIDE, false, Output);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

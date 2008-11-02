@@ -559,44 +559,6 @@ private:
 	const uint64_t threshold;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-template<>
-class almost_equal<mesh::blobbies_t>
-{
-	typedef mesh::blobbies_t T;
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline const bool_t operator()(const T& A, const T& B)
-	{
-		return
-			detail::almost_equal(A.first_primitives, B.first_primitives, threshold) &&
-			detail::almost_equal(A.primitive_counts, B.primitive_counts, threshold) &&
-			detail::almost_equal(A.first_operators, B.first_operators, threshold) &&
-			detail::almost_equal(A.operator_counts, B.operator_counts, threshold) &&
-			detail::almost_equal(A.materials, B.materials, threshold) &&
-			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
-			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
-			detail::almost_equal(A.primitives, B.primitives, threshold) &&
-			detail::almost_equal(A.primitive_first_floats, B.primitive_first_floats, threshold) &&
-			detail::almost_equal(A.primitive_float_counts, B.primitive_float_counts, threshold) &&
-			detail::almost_equal(A.varying_data, B.varying_data, threshold) &&
-			detail::almost_equal(A.vertex_data, B.vertex_data, threshold) &&
-			detail::almost_equal(A.operators, B.operators, threshold) &&
-			detail::almost_equal(A.operator_first_operands, B.operator_first_operands, threshold) &&
-			detail::almost_equal(A.operator_operand_counts, B.operator_operand_counts, threshold) &&
-			detail::almost_equal(A.floats, B.floats, threshold) &&
-			detail::almost_equal(A.operands, B.operands, threshold);
-	}
-private:
-	const uint64_t threshold;
-};
-
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh
 
@@ -618,8 +580,7 @@ const bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) con
 		detail::almost_equal(bilinear_patches, Other.bilinear_patches, Threshold) &&
 		detail::almost_equal(bicubic_patches, Other.bicubic_patches, Threshold) &&
 		detail::almost_equal(nurbs_patches, Other.nurbs_patches, Threshold) &&
-		detail::almost_equal(polyhedra, Other.polyhedra, Threshold) &&
-		detail::almost_equal(blobbies, Other.blobbies, Threshold);
+		detail::almost_equal(polyhedra, Other.polyhedra, Threshold);
 }
 
 mesh& mesh::operator=(const legacy::mesh& RHS)
@@ -905,12 +866,6 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 		}
 	}
 
-	// Convert blobbies ...
-	if(RHS.blobbies.size())
-	{
-		assert_not_implemented();
-	}
-
 	return *this;
 }
 
@@ -972,6 +927,7 @@ std::istream& operator>>(std::istream& Stream, mesh::polyhedra_t::polyhedron_typ
 	return Stream;
 }
 
+/*
 std::ostream& operator<<(std::ostream& Stream, const mesh::blobbies_t::primitive_type& RHS)
 {
 	switch(RHS)
@@ -1066,6 +1022,7 @@ std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::operator_type& 
 
 	return Stream;
 }
+*/
 
 /** \todo Print materials */
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
@@ -1204,30 +1161,6 @@ std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 		detail::print(Stream, "clockwise_edges", RHS.polyhedra->clockwise_edges);
 		detail::print(Stream, "edge_selection", RHS.polyhedra->edge_selection);
 		detail::print(Stream, "face_varying_data", RHS.polyhedra->face_varying_data);
-		
-		Stream << pop_indent;
-	}
-
-	if(RHS.blobbies)
-	{
-		Stream << detail::indentation << "blobbies:\n" << push_indent;
-
-		detail::print(Stream, "first_primitives", RHS.blobbies->first_primitives);
-		detail::print(Stream, "primitive_counts", RHS.blobbies->primitive_counts);
-		detail::print(Stream, "first_operators", RHS.blobbies->first_operators);
-		detail::print(Stream, "operator_counts", RHS.blobbies->operator_counts);
-		detail::print(Stream, "constant_data", RHS.blobbies->constant_data);
-		detail::print(Stream, "uniform_data", RHS.blobbies->uniform_data);
-		detail::print(Stream, "primitives", RHS.blobbies->primitives);
-		detail::print(Stream, "primitive_first_floats", RHS.blobbies->primitive_first_floats);
-		detail::print(Stream, "primitive_float_counts", RHS.blobbies->primitive_float_counts);
-		detail::print(Stream, "varying_data", RHS.blobbies->varying_data);
-		detail::print(Stream, "vertex_data", RHS.blobbies->vertex_data);
-		detail::print(Stream, "operators", RHS.blobbies->operators);
-		detail::print(Stream, "operator_first_operands", RHS.blobbies->operator_first_operands);
-		detail::print(Stream, "operator_operand_counts", RHS.blobbies->operator_operand_counts);
-		detail::print(Stream, "floats", RHS.blobbies->floats);
-		detail::print(Stream, "operands", RHS.blobbies->operands);
 		
 		Stream << pop_indent;
 	}

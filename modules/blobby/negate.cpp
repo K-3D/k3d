@@ -66,13 +66,11 @@ public:
 
 		// Get the set of input meshes ...
 		detail::mesh_collection meshes;
-		k3d::mesh* const input_a = m_input_a.pipeline_value();
-
-		if(input_a && k3d::validate_blobbies(*input_a))
+		if(k3d::mesh* const input_a = m_input_a.pipeline_value())
 			meshes.push_back(input_a);
 
 		// Merge 'em ...
-		detail::merge(meshes, m_material.pipeline_value(), k3d::mesh::blobbies_t::NEGATE, false, Output);
+		detail::merge(meshes, m_material.pipeline_value(), k3d::blobby::NEGATE, false, Output);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

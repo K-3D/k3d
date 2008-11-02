@@ -23,12 +23,15 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
+#include <k3dsdk/blobby.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <iterator>
 #include <set>
@@ -63,7 +66,7 @@ public:
 		if(!k3d::validate_polyhedra(Input))
 			return;
 
-		const double radius = m_radius.pipeline_value();
+		const k3d::double_t radius = m_radius.pipeline_value();
 		const operation_t type = m_type.pipeline_value();
 		k3d::imaterial* const material = m_material.pipeline_value();
 
@@ -85,67 +88,54 @@ public:
 		}
 
 		// Setup arrays to build a new blobby ...
-		k3d::mesh::blobbies_t& blobbies = Output.blobbies.create();
-		k3d::mesh::indices_t& first_primitives = blobbies.first_primitives.create();
-		k3d::mesh::counts_t& primitive_counts = blobbies.primitive_counts.create();
-		k3d::mesh::indices_t& first_operators = blobbies.first_operators.create();
-		k3d::mesh::counts_t& operator_counts = blobbies.operator_counts.create();
-		k3d::mesh::materials_t& materials = blobbies.materials.create();
-		k3d::mesh::blobbies_t::primitives_t& primitives = blobbies.primitives.create();
-		k3d::mesh::indices_t& primitive_first_floats = blobbies.primitive_first_floats.create();
-		k3d::mesh::counts_t& primitive_float_counts = blobbies.primitive_float_counts.create();
-		k3d::mesh::blobbies_t::operators_t& operators = blobbies.operators.create();
-		k3d::mesh::indices_t& operator_first_operands = blobbies.operator_first_operands.create();
-		k3d::mesh::counts_t& operator_operand_counts = blobbies.operator_operand_counts.create();
-		k3d::mesh::blobbies_t::floats_t& floats = blobbies.floats.create();
-		k3d::mesh::blobbies_t::operands_t& operands = blobbies.operands.create();
+		boost::scoped_ptr<k3d::blobby::primitive> blobby(k3d::blobby::create(Output));
 
-		first_primitives.push_back(primitives.size());
-		primitive_counts.push_back(edges.size());
-		first_operators.push_back(operators.size());
-		operator_counts.push_back(1);
-		materials.push_back(material);
+		blobby->first_primitives.push_back(blobby->primitives.size());
+		blobby->primitive_counts.push_back(edges.size());
+		blobby->first_operators.push_back(blobby->operators.size());
+		blobby->operator_counts.push_back(1);
+		blobby->materials.push_back(material);
 
 		// Add a blobby segment for each edge ...
 		for(edges_t::const_iterator edge = edges.begin(); edge != edges.end(); ++edge)
 		{
-			primitives.push_back(k3d::mesh::blobbies_t::SEGMENT);
-			primitive_first_floats.push_back(floats.size());
-			primitive_float_counts.push_back(23);
+			blobby->primitives.push_back(k3d::blobby::SEGMENT);
+			blobby->primitive_first_floats.push_back(blobby->floats.size());
+			blobby->primitive_float_counts.push_back(23);
 
-			floats.push_back(points[edge->first][0]);
-			floats.push_back(points[edge->first][1]);
-			floats.push_back(points[edge->first][2]);
-			floats.push_back(points[edge->second][0]);
-			floats.push_back(points[edge->second][1]);
-			floats.push_back(points[edge->second][2]);
-			floats.push_back(radius);
+			blobby->floats.push_back(points[edge->first][0]);
+			blobby->floats.push_back(points[edge->first][1]);
+			blobby->floats.push_back(points[edge->first][2]);
+			blobby->floats.push_back(points[edge->second][0]);
+			blobby->floats.push_back(points[edge->second][1]);
+			blobby->floats.push_back(points[edge->second][2]);
+			blobby->floats.push_back(radius);
 
 			k3d::matrix4 matrix = k3d::transpose(k3d::identity3D());
-			floats.insert(floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
+			blobby->floats.insert(blobby->floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
 		}
 
 		// Merge the edges together ...
 		switch(type)
 		{
 			case ADD:
-				operators.push_back(k3d::mesh::blobbies_t::ADD);
+				blobby->operators.push_back(k3d::blobby::ADD);
 				break;
 			case MULT:
-				operators.push_back(k3d::mesh::blobbies_t::MULTIPLY);
+				blobby->operators.push_back(k3d::blobby::MULTIPLY);
 				break;
 			case MIN:
-				operators.push_back(k3d::mesh::blobbies_t::MINIMUM);
+				blobby->operators.push_back(k3d::blobby::MINIMUM);
 				break;
 			case MAX:
-				operators.push_back(k3d::mesh::blobbies_t::MAXIMUM);
+				blobby->operators.push_back(k3d::blobby::MAXIMUM);
 				break;
 		}
-		operator_first_operands.push_back(operands.size());
-		operator_operand_counts.push_back(edges.size() + 1);
-		operands.push_back(edges.size());
+		blobby->operator_first_operands.push_back(blobby->operands.size());
+		blobby->operator_operand_counts.push_back(edges.size() + 1);
+		blobby->operands.push_back(edges.size());
 		for(k3d::uint_t i = 0; i != edges.size(); ++i)
-			operands.push_back(i);
+			blobby->operands.push_back(i);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -229,7 +219,7 @@ private:
 		return values;
 	}
 
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
 	k3d_data(operation_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_type;
 };
 
