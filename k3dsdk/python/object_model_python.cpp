@@ -53,6 +53,7 @@
 #include "isnappable_python.h"
 #include "iunknown_python.h"
 #include "iuser_interface_python.h"
+#include "linear_curve_python.h"
 #include "log_python.h"
 #include "matrix4_python.h"
 #include "mesh_python.h"
@@ -462,6 +463,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_disk();
 	define_namespace_euler();
 	define_namespace_hyperboloid();
+	define_namespace_linear_curve();
 	define_namespace_log();
 	define_namespace_mesh();
 	define_namespace_mime();

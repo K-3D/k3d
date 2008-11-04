@@ -157,6 +157,8 @@ ADD_LIBRARY(k3dsdk-python-primitives SHARED
 	disk_python.h
 	hyperboloid_python.cpp
 	hyperboloid_python.h
+	linear_curve_python.cpp
+	linear_curve_python.h
 	paraboloid_python.cpp
 	paraboloid_python.h
 	point_group_python.cpp
