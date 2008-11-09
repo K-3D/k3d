@@ -24,6 +24,7 @@
 #include "data.h"
 #include "idocument.h"
 #include "inode_collection_sink.h"
+#include "ipipeline.h"
 #include "iplugin_factory.h"
 #include "iproperty_collection.h"
 #include "istate_recorder.h"
@@ -32,6 +33,10 @@
 #include "string_cast.h"
 #include "string_modifiers.h"
 #include "utility.h"
+
+// The following includes are needed to compare typeinfo of properties in skip_nodes
+#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {
@@ -77,6 +82,43 @@ template<typename functor_t>
 name_filter_t<functor_t> name_filter(const std::string Name, functor_t Functor)
 {
 	return name_filter_t<functor_t>(Name, Functor);
+}
+
+void skip_node(inode& Node, ipipeline::dependencies_t& NewDependencies)
+{
+	idocument& document = Node.document();
+	ipipeline& pipeline = document.pipeline();
+	try
+	{
+		iproperty_collection& property_collection = dynamic_cast<iproperty_collection&>(Node);
+		iproperty_collection::properties_t properties = property_collection.properties();
+		for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+		{
+			iproperty* connected_property = pipeline.dependency(**property);
+			if(!connected_property)
+				continue;
+			
+			for(ipipeline::dependencies_t::const_iterator dependency = pipeline.dependencies().begin(); dependency != pipeline.dependencies().end(); ++dependency)
+			{
+				iproperty* output_property = dependency->second;
+				if(output_property && output_property->property_node() == &Node && 
+						output_property->property_name() == connected_property->property_name() && output_property->property_type() == connected_property->property_type())
+				{
+					NewDependencies[dependency->first] = connected_property;
+				}
+			}
+		}
+	}
+	catch(std::bad_cast& E) // Catch the exception when the dynamic cast to ioperty_collection fails
+	{
+		return;
+	}
+}
+
+void skip_nodes(nodes_t Nodes, ipipeline::dependencies_t& NewDependencies)
+{
+	for(nodes_t::iterator node = Nodes.begin(); node != Nodes.end(); ++node)
+		skip_node(**node, NewDependencies);
 }
 
 } // namespace detail
@@ -163,6 +205,9 @@ const std::string unique_name(inode_collection& Nodes, const std::string& Name)
 
 void delete_nodes(idocument& Document, const nodes_t& Nodes)
 {
+	ipipeline::dependencies_t skip_dependencies;
+	// Get the dependencies needed to skip the deleted node
+	//detail::skip_nodes(Nodes, skip_dependencies);
 	// Let the nodes know that they're about to be deleted ...
 	for(nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
 		(*node)->deleted_signal().emit();
@@ -201,6 +246,8 @@ void delete_nodes(idocument& Document, const nodes_t& Nodes)
 	// Make sure the node gets cleaned-up properly after a redo ...
 	for(nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
 		k3d::undoable_delete(*node, Document);
+	
+	Document.pipeline().set_dependencies(skip_dependencies);
 }
 
 } // namespace k3d

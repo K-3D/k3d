@@ -352,6 +352,11 @@ public:
 		// Look-up the actual node ...
 		k3d::inode* const node = row[m_columns.node];
 		return_if_fail(node);
+		
+		// Select only the selected node
+		m_document_state.set_selection_mode(SELECT_NODES);
+		m_document_state.deselect_all();
+		m_document_state.select(*node);
 
 		command_arguments arguments;
 		arguments.append("node", node);
