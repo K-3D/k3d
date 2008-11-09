@@ -282,6 +282,22 @@ void gl_setup_lights(const bool Headlight)
 	}
 }
 
+/// Gets the deselected nodes for this document
+void get_deselected_nodes(k3d::inode_selection* NodeSelection, const k3d::inode_collection::nodes_t& DocumentNodes, k3d::inode_collection::nodes_t& DeselectedNodes)
+{
+	if(!NodeSelection)
+	{
+		DeselectedNodes.insert(DeselectedNodes.begin(), DocumentNodes.begin(), DocumentNodes.end());
+		return;
+	}
+	
+	for(k3d::inode_collection::nodes_t::const_iterator node = DocumentNodes.begin(); node != DocumentNodes.end(); ++node)
+	{
+		if(!NodeSelection->selection_weight(**node))
+			DeselectedNodes.push_back(*node);
+	}
+}
+
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
@@ -505,8 +521,18 @@ public:
 
 		if(m_show_lights.pipeline_value())
 			std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::light_setup());
+		
+		k3d::inode_selection* node_selection = m_node_selection.pipeline_value();
+		k3d::inode_collection::nodes_t deselected_nodes;
+		detail::get_deselected_nodes(node_selection, document().nodes().collection(), deselected_nodes);
 
-		std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::draw(state, m_node_selection.pipeline_value()));
+		// Draw selected nodes first, so they are "on top" when creating geometry
+		if(node_selection)
+		{
+			const k3d::inode_selection::selected_nodes_t selected_nodes = node_selection->selected_nodes();
+			std::for_each(selected_nodes.begin(), selected_nodes.end(), detail::draw(state, node_selection));
+		}
+		std::for_each(deselected_nodes.begin(), deselected_nodes.end(), detail::draw(state, node_selection));
 
 /* I really hate to loose this feedback, but the GLU NURBS routines generate large numbers of errors, which ruins its utility :-(
 		for(GLenum gl_error = glGetError(); gl_error != GL_NO_ERROR; gl_error = glGetError())
