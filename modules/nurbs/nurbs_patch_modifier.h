@@ -49,21 +49,21 @@ namespace module
 	namespace nurbs
 	{
 		///Simple representation of a nurbs curve, used to pass data between curves and patches
-		typedef struct nurbs_curve{
+		struct nurbs_curve{
 			k3d::mesh::knots_t curve_knots;
 			k3d::mesh::weights_t curve_point_weights;
 			k3d::mesh::points_t control_points;
 		};
 
 		///A trimming curve data struct
-		typedef struct nurbs_trim_curve{
+		struct nurbs_trim_curve{
 			k3d::mesh::knots_t curve_knots;
 			k3d::mesh::weights_t curve_point_weights;
 			k3d::mesh::points_2d_t control_points;
 		};
 
 		///A nurbs patch data struct
-		typedef struct nurbs_patch{
+		struct nurbs_patch{
 			k3d::uint_t u_order;
 			k3d::uint_t v_order;
 			k3d::mesh::knots_t u_knots;
