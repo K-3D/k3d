@@ -184,7 +184,7 @@ const node_selection_map_t map_nodes(const k3d::selection::records& Selection)
 /// Policy class that updates a mesh_selection to select the given points
 struct select_points
 {
-	select_points(const double Weight, const k3d::mesh* Mesh) :
+	select_points(const double Weight, const k3d::mesh::indices_t& Companions) :
 		weight(Weight)
 	{
 	}
@@ -210,11 +210,9 @@ struct select_points
 /// Policy class that updates a mesh_selection to select the given lines
 struct select_lines
 {
-	select_lines(const double Weight, const k3d::mesh* Mesh) :
-		weight(Weight)
+	select_lines(const double Weight, const k3d::mesh::indices_t& Companions) :
+		weight(Weight), companions(Companions)
 	{
-		if(Mesh->polyhedra && Mesh->polyhedra->edge_points && Mesh->polyhedra->clockwise_edges)
-			k3d::create_edge_adjacency_lookup(*Mesh->polyhedra->edge_points, *Mesh->polyhedra->clockwise_edges, boundary_edges, companions);
 	}
 
 	void operator()(const k3d::selection::record& Record, k3d::mesh_selection& Selection) const
@@ -226,7 +224,7 @@ struct select_lines
 			{
 				case k3d::selection::ABSOLUTE_SPLIT_EDGE:
 					Selection.edges.push_back(k3d::mesh_selection::record(edge, edge+1, weight));
-					if(edge < companions.size() && !boundary_edges[edge])
+					if(edge < companions.size() && companions[edge] != edge)
 					{
 						const k3d::uint_t companion = companions[edge];
 						Selection.edges.push_back(k3d::mesh_selection::record(companion, companion+1, weight));
@@ -252,14 +250,13 @@ struct select_lines
 	}
 
 	const double weight;
-	k3d::mesh::indices_t companions;
-	k3d::mesh::bools_t boundary_edges;
+	const k3d::mesh::indices_t& companions;
 };
 
 /// Policy class that updates a mesh_selection to select the given faces
 struct select_faces
 {
-	select_faces(const double Weight, const k3d::mesh* Mesh) :
+	select_faces(const double Weight, const k3d::mesh::indices_t& Companions) :
 		weight(Weight)
 	{
 	}
@@ -300,8 +297,11 @@ template<typename UpdatePolicyT>
 void select_components(const k3d::selection::records& Selection, const k3d::double_t Weight)
 {
 	k3d::inode* node = 0;
+	const k3d::mesh* mesh = 0;
 	k3d::mesh_selection selection;
 	k3d::imesh_selection_sink* sink = 0;
+	k3d::mesh::bools_t boundary_edges;
+	k3d::mesh::indices_t companions;
 
 	const node_selection_map_t nodes = map_nodes(Selection);
 	for(node_selection_map_t::const_iterator n = nodes.begin(); n != nodes.end(); ++n)
@@ -318,17 +318,23 @@ void select_components(const k3d::selection::records& Selection, const k3d::doub
 			sink = dynamic_cast<k3d::imesh_selection_sink*>(node);
 			if(sink)
 				selection = boost::any_cast<k3d::mesh_selection>(sink->mesh_selection_sink_input().property_internal_value());
+				
+			companions.clear();
+			boundary_edges.clear();
+				
+			k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(node);
+			if(mesh_source)
+				mesh = k3d::property::pipeline_value<k3d::mesh*>(mesh_source->mesh_source_output());
+			if(mesh && mesh->polyhedra && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
+			{
+				k3d::create_edge_adjacency_lookup(*mesh->polyhedra->edge_points, *mesh->polyhedra->clockwise_edges, boundary_edges, companions);
+			}
 		}
 
 		if(!sink)
 			continue;
 		
-		k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(node);
-		const k3d::mesh* mesh = 0;
-		if(mesh_source)
-			mesh = k3d::property::pipeline_value<k3d::mesh*>(mesh_source->mesh_source_output());
-		
-		UpdatePolicyT policy(Weight, mesh);
+		UpdatePolicyT policy(Weight, companions);
 		policy(*n->second, selection);
 	}
 
@@ -676,7 +682,6 @@ struct convert_to_points
 	bool m_keep_selection;
 };
 
-/** \todo Select adjacent edges */
 struct convert_to_lines
 {
 	struct implementation
