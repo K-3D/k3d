@@ -131,6 +131,7 @@ public:
 	{
 		storage = Other.storage;
 		originator = false;
+		return *this;
 	}
 
 	operator bool() const
