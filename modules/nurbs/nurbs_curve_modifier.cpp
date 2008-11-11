@@ -37,7 +37,7 @@ namespace module
 				curve_selection = &groups->curve_selection.create();
 				materials = &groups->materials.create();
 			}
-			
+
 			if(input.points.get())
 			{
 				point_selection = &input.point_selection.writable();
@@ -48,7 +48,7 @@ namespace module
 				point_selection = &input.point_selection.create();
 				mesh_points = &input.points.create();
 			}
-			
+
 		}
 
 		int nurbs_curve_modifier::add_curve(nurbs_curve& curve, bool shared)
@@ -1457,7 +1457,7 @@ namespace module
 		    Implementation of Algorithm A5.9 "DegreeElevateCurve" from
 		    "The NURBS book", page 206, by Piegl and Tiller
 		*/
-		int nurbs_curve_modifier::curve_degree_elevate(k3d::uint_t curve)
+		void nurbs_curve_modifier::curve_degree_elevate(k3d::uint_t curve)
 		{
 			try
 			{

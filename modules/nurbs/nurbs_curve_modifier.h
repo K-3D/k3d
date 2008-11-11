@@ -150,7 +150,7 @@ namespace module{
                 ///DegreeElevation increases the degree and order of the curve with a step of 1
                 ///Follows the implementation of A. Piegl and W. Tiller in "The NURBS book"
                 ///\param curve The curve we want to degree elevate
-                int curve_degree_elevate(k3d::uint_t curve);
+                void curve_degree_elevate(k3d::uint_t curve);
 
                 ///Returns the homogenous point with index point
                 ///\param point The index to the point in curve_points and curve_point_weights
