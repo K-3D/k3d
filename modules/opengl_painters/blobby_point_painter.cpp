@@ -69,12 +69,12 @@ public:
 			const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 1, 1);
 			k3d::gl::color3d(color);
 
-			const size_t primitives_begin = 0;
-			const size_t primitives_end = primitives_begin + blobby->primitives.size();
-			for(size_t primitive = primitives_begin; primitive != primitives_end; ++primitive)
+			const k3d::uint_t primitives_begin = 0;
+			const k3d::uint_t primitives_end = primitives_begin + blobby->primitives.size();
+			for(k3d::uint_t primitive = primitives_begin; primitive != primitives_end; ++primitive)
 			{
-				const size_t first_float = blobby->primitive_first_floats[primitive];
-				const size_t float_count = blobby->primitive_float_counts[primitive];
+				const k3d::uint_t first_float = blobby->primitive_first_floats[primitive];
+				const k3d::uint_t float_count = blobby->primitive_float_counts[primitive];
 
 				switch(blobby->primitives[primitive])
 				{
@@ -125,6 +125,84 @@ public:
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
+		k3d::uint_t primitive_index = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive, ++primitive_index)
+		{
+			boost::scoped_ptr<k3d::blobby::const_primitive> blobby(k3d::blobby::validate(**primitive));
+			if(!blobby)
+				continue;
+
+			k3d::gl::store_attributes attributes;
+			glDisable(GL_LIGHTING);
+
+			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
+			k3d::gl::push_selection_token(k3d::selection::CONSTANT, 0);
+			k3d::gl::push_selection_token(k3d::selection::UNIFORM, 0);
+
+			const k3d::uint_t primitives_begin = 0;
+			const k3d::uint_t primitives_end = primitives_begin + blobby->primitives.size();
+			for(k3d::uint_t primitive = primitives_begin; primitive != primitives_end; ++primitive)
+			{
+				k3d::gl::push_selection_token(k3d::selection::VARYING, primitive);
+				k3d::gl::push_selection_token(k3d::selection::VERTEX, primitive);
+
+				const k3d::uint_t first_float = blobby->primitive_first_floats[primitive];
+				const k3d::uint_t float_count = blobby->primitive_float_counts[primitive];
+
+				switch(blobby->primitives[primitive])
+				{
+					case k3d::blobby::CONSTANT:
+						break;
+					case k3d::blobby::ELLIPSOID:
+					{
+						return_if_fail(float_count == 16);
+
+						const k3d::point3 point(0, 0, 0);
+
+						glMatrixMode(GL_MODELVIEW);
+						glPushMatrix();
+						glMultMatrixd(&blobby->floats[first_float]);
+
+						glBegin(GL_POINTS);
+						k3d::gl::vertex3d(point);
+						glEnd();
+
+						glPopMatrix();
+						
+						break;
+					}
+					case k3d::blobby::SEGMENT:
+					{
+						return_if_fail(float_count == 23);
+
+						const k3d::point3 point1(blobby->floats[first_float + 0], blobby->floats[first_float + 1], blobby->floats[first_float + 2]);
+						const k3d::point3 point2(blobby->floats[first_float + 3], blobby->floats[first_float + 4], blobby->floats[first_float + 5]);
+
+						glMatrixMode(GL_MODELVIEW);
+						glPushMatrix();
+						glMultMatrixd(&blobby->floats[first_float + 7]);
+
+						glBegin(GL_LINES);
+						k3d::gl::vertex3d(point1);
+						k3d::gl::vertex3d(point2);
+						glEnd();
+
+						glPopMatrix();
+
+						break;
+					}
+				}
+
+				k3d::gl::pop_selection_token(); // VERTEX
+				k3d::gl::pop_selection_token(); // VARYING
+
+			}
+
+			k3d::gl::pop_selection_token(); // UNIFORM
+			k3d::gl::pop_selection_token(); // CONSTANT
+			k3d::gl::pop_selection_token(); // PRIMITIVE
+
+		}
 	}
 	
 	static k3d::iplugin_factory& get_factory()
@@ -153,5 +231,4 @@ k3d::iplugin_factory& blobby_point_painter_factory()
 } // namespace opengl
 
 } // namespace module
-
 
