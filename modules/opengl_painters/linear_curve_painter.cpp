@@ -74,23 +74,23 @@ public:
 			const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0);
 			const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
 
-			const size_t group_begin = 0;
-			const size_t group_end = group_begin + first_curves.size();
-			for(size_t group = group_begin; group != group_end; ++group)
+			const k3d::uint_t group_begin = 0;
+			const k3d::uint_t group_end = group_begin + first_curves.size();
+			for(k3d::uint_t group = group_begin; group != group_end; ++group)
 			{
 				const GLenum curve_wrap = periodic_curves[group] ? GL_LINE_LOOP : GL_LINE_STRIP;
 
-				const size_t curve_begin = first_curves[group];
-				const size_t curve_end = curve_begin + curve_counts[group];
-				for(size_t curve = curve_begin; curve != curve_end; ++curve)
+				const k3d::uint_t curve_begin = first_curves[group];
+				const k3d::uint_t curve_end = curve_begin + curve_counts[group];
+				for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 				{
-					const size_t curve_point_begin = curve_first_points[curve];
-					const size_t curve_point_end = curve_point_begin + curve_point_counts[curve];
+					const k3d::uint_t curve_point_begin = curve_first_points[curve];
+					const k3d::uint_t curve_point_end = curve_point_begin + curve_point_counts[curve];
 
 					k3d::gl::color3d(curve_selection[curve] ? selected_color : color);
 
 					glBegin(curve_wrap);
-					for(size_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+					for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
 						k3d::gl::vertex3d(points[curve_points[curve_point]]);
 					glEnd();
 				}
@@ -111,23 +111,23 @@ public:
 			const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0);
 			const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
 
-			const size_t group_begin = 0;
-			const size_t group_end = group_begin + linear_curve->first_curves.size();
-			for(size_t group = group_begin; group != group_end; ++group)
+			const k3d::uint_t group_begin = 0;
+			const k3d::uint_t group_end = group_begin + linear_curve->first_curves.size();
+			for(k3d::uint_t group = group_begin; group != group_end; ++group)
 			{
 				const GLenum curve_wrap = linear_curve->periodic_curves[group] ? GL_LINE_LOOP : GL_LINE_STRIP;
 
-				const size_t curve_begin = linear_curve->first_curves[group];
-				const size_t curve_end = curve_begin + linear_curve->curve_counts[group];
-				for(size_t curve = curve_begin; curve != curve_end; ++curve)
+				const k3d::uint_t curve_begin = linear_curve->first_curves[group];
+				const k3d::uint_t curve_end = curve_begin + linear_curve->curve_counts[group];
+				for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 				{
-					const size_t curve_point_begin = linear_curve->curve_first_points[curve];
-					const size_t curve_point_end = curve_point_begin + linear_curve->curve_point_counts[curve];
+					const k3d::uint_t curve_point_begin = linear_curve->curve_first_points[curve];
+					const k3d::uint_t curve_point_end = curve_point_begin + linear_curve->curve_point_counts[curve];
 
 					k3d::gl::color3d(linear_curve->curve_selections[curve] ? selected_color : color);
 
 					glBegin(curve_wrap);
-					for(size_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+					for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
 						k3d::gl::vertex3d(points[linear_curve->curve_points[curve_point]]);
 					glEnd();
 				}
@@ -153,23 +153,23 @@ public:
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);
 
-			const size_t group_begin = 0;
-			const size_t group_end = group_begin + first_curves.size();
-			for(size_t group = group_begin; group != group_end; ++group)
+			const k3d::uint_t group_begin = 0;
+			const k3d::uint_t group_end = group_begin + first_curves.size();
+			for(k3d::uint_t group = group_begin; group != group_end; ++group)
 			{
 				const GLenum curve_wrap = periodic_curves[group] ? GL_LINE_LOOP : GL_LINE_STRIP;
 
-				const size_t curve_begin = first_curves[group];
-				const size_t curve_end = curve_begin + curve_counts[group];
-				for(size_t curve = curve_begin; curve != curve_end; ++curve)
+				const k3d::uint_t curve_begin = first_curves[group];
+				const k3d::uint_t curve_end = curve_begin + curve_counts[group];
+				for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 				{
-					const size_t curve_point_begin = curve_first_points[curve];
-					const size_t curve_point_end = curve_point_begin + curve_point_counts[curve];
+					const k3d::uint_t curve_point_begin = curve_first_points[curve];
+					const k3d::uint_t curve_point_end = curve_point_begin + curve_point_counts[curve];
 
 					k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_LINEAR_CURVE, curve);
 
 					glBegin(curve_wrap);
-					for(size_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+					for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
 						k3d::gl::vertex3d(points[curve_points[curve_point]]);
 					glEnd();
 
@@ -178,7 +178,8 @@ public:
 			}
 		}
 
-		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		k3d::uint_t primitive_index = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive, ++primitive_index)
 		{
 			boost::scoped_ptr<k3d::linear_curve::const_primitive> linear_curve(k3d::linear_curve::validate(**primitive));
 			if(!linear_curve)
@@ -189,25 +190,38 @@ public:
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);
 
-			const size_t group_begin = 0;
-			const size_t group_end = group_begin + linear_curve->first_curves.size();
-			for(size_t group = group_begin; group != group_end; ++group)
+			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
+
+			const k3d::uint_t group_begin = 0;
+			const k3d::uint_t group_end = group_begin + linear_curve->first_curves.size();
+			for(k3d::uint_t group = group_begin; group != group_end; ++group)
 			{
+				k3d::gl::push_selection_token(k3d::selection::CONSTANT, group);
+
 				const GLenum curve_wrap = linear_curve->periodic_curves[group] ? GL_LINE_LOOP : GL_LINE_STRIP;
 
-				const size_t curve_begin = linear_curve->first_curves[group];
-				const size_t curve_end = curve_begin + linear_curve->curve_counts[group];
-				for(size_t curve = curve_begin; curve != curve_end; ++curve)
+				k3d::uint_t curve_index = 0;
+				const k3d::uint_t curve_begin = linear_curve->first_curves[group];
+				const k3d::uint_t curve_end = curve_begin + linear_curve->curve_counts[group];
+				for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve, ++curve_index)
 				{
-					const size_t curve_point_begin = linear_curve->curve_first_points[curve];
-					const size_t curve_point_end = curve_point_begin + linear_curve->curve_point_counts[curve];
+					k3d::gl::push_selection_token(k3d::selection::UNIFORM, curve_index);
+
+					const k3d::uint_t curve_point_begin = linear_curve->curve_first_points[curve];
+					const k3d::uint_t curve_point_end = curve_point_begin + linear_curve->curve_point_counts[curve];
 
 					glBegin(curve_wrap);
-					for(size_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+					for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
 						k3d::gl::vertex3d(points[linear_curve->curve_points[curve_point]]);
 					glEnd();
+
+					k3d::gl::pop_selection_token(); // UNIFORM
 				}
+
+				k3d::gl::pop_selection_token(); // CONSTANT
 			}
+
+			k3d::gl::pop_selection_token(); // PRIMITIVE
 		}
 	}
 	
