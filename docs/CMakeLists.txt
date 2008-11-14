@@ -1,4 +1,5 @@
-SUBDIRS(doxygen)
-SUBDIRS(epydoc)
-SUBDIRS(wiki)
+ADD_SUBDIRECTORY(coding_style)
+ADD_SUBDIRECTORY(doxygen)
+ADD_SUBDIRECTORY(epydoc)
+ADD_SUBDIRECTORY(wiki)
 

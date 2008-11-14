@@ -1,0 +1,49 @@
+# This is a style file for the "Artistic Style" code formatting program, astyle.
+#
+# It encodes roughly how we'd like the code to look in K-3D, but isn't really
+# a substitute for writing neat code by hand.
+#
+# See the files codestyle.{cpp,h} for a better introduction to the K-3D coding
+# style.
+
+#-------------------------------------------------------------------------------
+# C/C++ indenting mode.
+mode=c
+
+style=ansi
+
+#-------------------------------------------------------------------------------
+# Always put block brackets on seperate lines.
+#brackets=break
+# If two statements are on a line, leave them that way.
+#one-line=keep-statements
+
+#-------------------------------------------------------------------------------
+### Indenting
+# Indent 'class' blocks so that the blocks 'public:', 'protected:' and 'private:' are indented.
+#indent-classes
+# Indent with tabs equal to four spaces.
+#indent=tab=4
+# Indent switch blocks. The astyle docs seem a bit confused about this (ie,
+# indent-cases seems to do what indent-switches is advertised to do in the docs...)
+#indent-switches
+#indent-cases
+
+#-------------------------------------------------------------------------------
+### Space-padding
+# We could also insert padding of a single space around all operators:
+#pad=oper
+# And also pad the brackets:
+#pad=paren
+
+# Space is better chosen carefully for emphasis however.  Compare:
+#
+# x = 2*(a-f) + b*(c-d)/2;
+#
+# x = 2 * (a - f) + b * (c - d) / 2;
+#
+# x = 2 * ( a - f ) + b * ( c - d ) / 2;
+#
+# The first is rather clearer than the others.  Unfortunately, we've gotta
+# forgo any astyle padding to get it to stay that way.
+

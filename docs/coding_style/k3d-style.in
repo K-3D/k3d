@@ -1,0 +1,4 @@
+#!/bin/sh
+
+@ASTYLE_COMMAND@ --mode=c --style=ansi --indent=tab=2 --pad=oper --unpad=paren --suffix=none $*
+
