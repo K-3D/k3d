@@ -127,6 +127,7 @@ K3D_ADD_TEST(test.script.failure.lang.k3dscript K3DSCRIPT XFAIL)
 K3D_ADD_TEST(test.script.failure.lang.python.py PYTHON XFAIL)
 K3D_ADD_TEST(test.script.failure.lang.python.exception.py PYTHON XFAIL)
 
+K3D_ADD_TEST(test.platform.py PYTHON)
 K3D_ADD_TEST(test.measurements.py PYTHON)
 K3D_ADD_TEST(test.PipelineProfiler.py PYTHON)
 
