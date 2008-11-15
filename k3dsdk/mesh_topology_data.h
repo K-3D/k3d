@@ -49,6 +49,47 @@ void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t
 /// Initialise boundary_faces array for constant time lookup of faces that are on the mesh boundary. BoundaryEdges and AdjacentEdges can be created using create_edge_adjacency_lookup
 void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, mesh::bools_t& BoundaryFaces);
 
+/// Initialize an array to mark unused mesh points (points not used by any primitive).
+void lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints);
+/// Remove unused points from a mesh, adjusting point indices in all remaining primitives.
+void delete_unused_points(mesh& Mesh);
+
+/// Iterates over every array in every generic primitive in the given mesh, passing the array name and array to a functor.
+template<typename FunctorT>
+void visit_primitive_arrays(const mesh& Mesh, FunctorT Functor)
+{
+	for(mesh::primitives_t::const_iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
+	{
+		const mesh::primitive& primitive = **p;
+		for(mesh::named_arrays_t::const_iterator array = primitive.topology.begin(); array != primitive.topology.end(); ++array)
+			Functor(array->first, array->second);
+
+		for(mesh::named_attribute_arrays_t::const_iterator attributes = primitive.attributes.begin(); attributes != primitive.attributes.end(); ++attributes)
+		{
+			for(mesh::attribute_arrays_t::const_iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
+				Functor(array->first, array->second);
+		}
+	}
+}
+
+/// Iterates over every array in every generic primitive in the given mesh, passing the array name and array to a functor.
+template<typename FunctorT>
+void visit_primitive_arrays(mesh& Mesh, FunctorT Functor)
+{
+	for(mesh::primitives_t::iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
+	{
+		mesh::primitive& primitive = p->writable();
+		for(mesh::named_arrays_t::iterator array = primitive.topology.begin(); array != primitive.topology.end(); ++array)
+			Functor(array->first, array->second);
+
+		for(mesh::named_attribute_arrays_t::iterator attributes = primitive.attributes.begin(); attributes != primitive.attributes.end(); ++attributes)
+		{
+			for(mesh::attribute_arrays_t::iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
+				Functor(array->first, array->second);
+		}
+	}
+}
+
 } // namespace k3d
 
 #endif // !K3DSDK_MESH_TOPOLOGY_DATA_H
