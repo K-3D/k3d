@@ -247,10 +247,6 @@ const bool_t is_uninitialized(const mesh& Mesh)
 		return false;
 	if (Mesh.bilinear_patches)
 		return false;
-	if (Mesh.cubic_curve_groups)
-		return false;
-	if (Mesh.linear_curve_groups)
-		return false;
 	if (Mesh.nurbs_curve_groups)
 		return false;
 	if (Mesh.nurbs_patches)
@@ -269,8 +265,6 @@ void store_selection(const mesh& Mesh, mesh_selection& Selection)
 	Selection.points.clear();
 	Selection.edges.clear();
 	Selection.faces.clear();
-	Selection.linear_curves.clear();
-	Selection.cubic_curves.clear();
 	Selection.nurbs_curves.clear();
 	Selection.bilinear_patches.clear();
 	Selection.bicubic_patches.clear();
@@ -282,16 +276,6 @@ void store_selection(const mesh& Mesh, mesh_selection& Selection)
 	{
 		detail::store_selection(Mesh.polyhedra->edge_selection, Selection.edges);
 		detail::store_selection(Mesh.polyhedra->face_selection, Selection.faces);
-	}
-
-	if(Mesh.linear_curve_groups)
-	{
-		detail::store_selection(Mesh.linear_curve_groups->curve_selection, Selection.linear_curves);
-	}
-
-	if(Mesh.cubic_curve_groups)
-	{
-		detail::store_selection(Mesh.cubic_curve_groups->curve_selection, Selection.cubic_curves);
 	}
 
 	if(Mesh.nurbs_curve_groups)
@@ -334,18 +318,6 @@ void merge_selection(const mesh_selection& MeshSelection, mesh& Mesh)
 	{
 		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
 		detail::merge_selection(MeshSelection.faces, polyhedra.face_first_loops, polyhedra.face_selection);
-	}
-
-	if(Mesh.linear_curve_groups)
-	{
-		k3d::mesh::linear_curve_groups_t& linear_curve_groups = Mesh.linear_curve_groups.writable();
-		detail::merge_selection(MeshSelection.linear_curves, linear_curve_groups.curve_first_points, linear_curve_groups.curve_selection);
-	}
-
-	if(Mesh.cubic_curve_groups)
-	{
-		k3d::mesh::cubic_curve_groups_t& cubic_curve_groups = Mesh.cubic_curve_groups.writable();
-		detail::merge_selection(MeshSelection.cubic_curves, cubic_curve_groups.curve_first_points, cubic_curve_groups.curve_selection);
 	}
 
 	if(Mesh.nurbs_curve_groups)
@@ -476,12 +448,6 @@ const bool_t validate(mesh& Mesh)
 	if(Mesh.points && !validate_points(Mesh))
 		result = false;
 
-	if(Mesh.linear_curve_groups && !validate_linear_curve_groups(Mesh))
-		result = false;
-
-	if(Mesh.cubic_curve_groups && !validate_cubic_curve_groups(Mesh))
-		result = false;
-
 	if(Mesh.nurbs_curve_groups && !validate_nurbs_curve_groups(Mesh))
 		result = false;
 
@@ -510,42 +476,6 @@ const bool_t validate_points(const mesh& Mesh)
 
 	// The point and point selection arrays must be the same length
 	return_val_if_fail(Mesh.points->size() == Mesh.point_selection->size(), false);
-
-	return true;
-}
-
-const bool_t validate_linear_curve_groups(const mesh& Mesh)
-{
-	if(!Mesh.linear_curve_groups)
-		return false;
-
-	return_val_if_fail(validate_points(Mesh), false);
-	return_val_if_fail(Mesh.linear_curve_groups->first_curves, false);
-	return_val_if_fail(Mesh.linear_curve_groups->curve_counts, false);
-	return_val_if_fail(Mesh.linear_curve_groups->periodic_curves, false);
-	return_val_if_fail(Mesh.linear_curve_groups->curve_first_points, false);
-	return_val_if_fail(Mesh.linear_curve_groups->curve_point_counts, false);
-	return_val_if_fail(Mesh.linear_curve_groups->curve_points, false);
-	return_val_if_fail(Mesh.linear_curve_groups->curve_selection, false);
-	return_val_if_fail(Mesh.linear_curve_groups->materials, false);
-
-	return true;
-}
-
-const bool_t validate_cubic_curve_groups(const mesh& Mesh)
-{
-	if(!Mesh.cubic_curve_groups)
-		return false;
-
-	return_val_if_fail(validate_points(Mesh), false);
-	return_val_if_fail(Mesh.cubic_curve_groups->first_curves, false);
-	return_val_if_fail(Mesh.cubic_curve_groups->curve_counts, false);
-	return_val_if_fail(Mesh.cubic_curve_groups->periodic_curves, false);
-	return_val_if_fail(Mesh.cubic_curve_groups->curve_first_points, false);
-	return_val_if_fail(Mesh.cubic_curve_groups->curve_point_counts, false);
-	return_val_if_fail(Mesh.cubic_curve_groups->curve_points, false);
-	return_val_if_fail(Mesh.cubic_curve_groups->curve_selection, false);
-	return_val_if_fail(Mesh.cubic_curve_groups->materials, false);
 
 	return true;
 }

@@ -46,70 +46,70 @@
 namespace module
 {
 
-	namespace nurbs
-	{
-		class close_curve :
+namespace nurbs
+{
+class close_curve :
 			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+{
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
+public:
+	close_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+			base(Factory, Document),
+			m_keep_ends(init_owner(*this) + init_name("keep_ends") + init_label(_("Keep end points as CVs")) + init_description(_("If enabled, the endpoints will work as CVs and a new endpoint gets added")) + init_value(false))
+	{
+		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+		m_keep_ends.changed_signal().connect(make_update_mesh_slot());
+	}
+
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	{
+		Output = Input;
+	}
+
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	{
+		Output = Input;
+
+		if (!k3d::validate_nurbs_curve_groups(Output))
+			return;
+
+		merge_selection(m_mesh_selection.pipeline_value(), Output);
+
+		nurbs_curve_modifier mod(Output);
+		int my_curve = mod.selected_curve();
+
+		if (my_curve < 0)
 		{
-			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
-		public:
-			close_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-				base(Factory, Document),
-				m_keep_ends(init_owner(*this) + init_name("keep_ends") + init_label(_("Keep end points as CVs")) + init_description(_("If enabled, the endpoints will work as CVs and a new endpoint gets added")) + init_value(false) )
-			{
-				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
-				m_keep_ends.changed_signal().connect(make_update_mesh_slot());
-			}
-
-			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
-			{
-				Output = Input;
-			}
-
-			void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
-			{
-				Output = Input;
-
-				if(!k3d::validate_nurbs_curve_groups(Output))
-					return;
-
-                merge_selection(m_mesh_selection.pipeline_value(), Output);
-
-                nurbs_curve_modifier mod(Output);
-				int my_curve = mod.selected_curve();
-
-				if( my_curve < 0)
-				{
-					k3d::log() << error << "You need to select exactly curve!" << std::endl;
-					return;
-				}
-
-                mod.close_curve(my_curve,m_keep_ends.pipeline_value());
-
-				assert_warning(k3d::validate_nurbs_curve_groups(Output));
-			}
-
-			static k3d::iplugin_factory& get_factory()
-			{
-				static k3d::document_plugin_factory<close_curve, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
-				k3d::uuid(0xc412ed0d, 0xbf48776e, 0x5c703091, 0x8b788353),
-					"NurbsCloseCurve",
-					_("Connects the 2 end points of the selected curve"),
-					"NURBS",
-					k3d::iplugin_factory::EXPERIMENTAL);
-
-				return factory;
-			}
-
-		private:
-            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_keep_ends;
-		};
-
-		//Create connect_curve factory
-		k3d::iplugin_factory& close_curve_factory()
-		{
-			return close_curve::get_factory();
+			k3d::log() << error << "You need to select exactly curve!" << std::endl;
+			return;
 		}
 
-	}//namespace nurbs
+		mod.close_curve(my_curve, m_keep_ends.pipeline_value());
+
+		assert_warning(k3d::validate_nurbs_curve_groups(Output));
+	}
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::document_plugin_factory<close_curve, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
+		  k3d::uuid(0xc412ed0d, 0xbf48776e, 0x5c703091, 0x8b788353),
+		  "NurbsCloseCurve",
+		  _("Connects the 2 end points of the selected curve"),
+		  "NURBS",
+		  k3d::iplugin_factory::EXPERIMENTAL);
+
+		return factory;
+	}
+
+private:
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_keep_ends;
+};
+
+//Create connect_curve factory
+k3d::iplugin_factory& close_curve_factory()
+{
+	return close_curve::get_factory();
+}
+
+}//namespace nurbs
 } //namespace module

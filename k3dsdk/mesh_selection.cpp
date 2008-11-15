@@ -75,10 +75,6 @@ public:
 	{
 	}
 
-	void operator()(legacy::cubic_curve_group&)
-	{
-	}
-
 	void operator()(legacy::nucurve_group&)
 	{
 	}

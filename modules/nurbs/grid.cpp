@@ -41,19 +41,19 @@ namespace nurbs
 // grid
 
 class grid :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+			public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
 
 public:
 	grid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_u_order(init_owner(*this) + init_name("u_order") + init_label(_("u_order")) + init_description(_("U Order")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_v_order(init_owner(*this) + init_name("v_order") + init_label(_("v_order")) + init_description(_("V Order")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Columns")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("v_segments")) + init_description(_("Rows")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_width(init_owner(*this) + init_name("width") + init_label(_("width")) + init_description(_("Width")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_height(init_owner(*this) + init_name("height") + init_label(_("height")) + init_description(_("Height")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
+			base(Factory, Document),
+			m_u_order(init_owner(*this) + init_name("u_order") + init_label(_("u_order")) + init_description(_("U Order")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+			m_v_order(init_owner(*this) + init_name("v_order") + init_label(_("v_order")) + init_description(_("V Order")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+			m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Columns")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+			m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("v_segments")) + init_description(_("Rows")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+			m_width(init_owner(*this) + init_name("width") + init_label(_("width")) + init_description(_("Width")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+			m_height(init_owner(*this) + init_name("height") + init_label(_("height")) + init_description(_("Height")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
 		m_material.changed_signal().connect(make_reset_mesh_slot());
 		m_u_order.changed_signal().connect(make_reset_mesh_slot());
@@ -89,22 +89,22 @@ public:
 		patch->v_order = v_order;
 
 		patch->u_knots.insert(patch->u_knots.end(), u_order, 0);
-		for(unsigned long i = 1; i != u_segments; ++i)
-			patch->u_knots.insert(patch->u_knots.end(), u_order-1, i);
+		for (unsigned long i = 1; i != u_segments; ++i)
+			patch->u_knots.insert(patch->u_knots.end(), u_order - 1, i);
 		patch->u_knots.insert(patch->u_knots.end(), u_order, u_segments);
 
 		patch->v_knots.insert(patch->v_knots.end(), v_order, 0);
-		for(unsigned long i = 1; i != v_segments; ++i)
-			patch->v_knots.insert(patch->v_knots.end(), v_order-1, i);
+		for (unsigned long i = 1; i != v_segments; ++i)
+			patch->v_knots.insert(patch->v_knots.end(), v_order - 1, i);
 		patch->v_knots.insert(patch->v_knots.end(), v_order, v_segments);
 
-		for(unsigned long row = 0; row != v_points; ++row)
+		for (unsigned long row = 0; row != v_points; ++row)
 		{
-			const double row_percent = 0.5 - (static_cast<double>(row) / static_cast<double>(v_points-1));
+			const double row_percent = 0.5 - (static_cast<double>(row) / static_cast<double>(v_points - 1));
 
-			for(unsigned long column = 0; column != u_points; ++column)
+			for (unsigned long column = 0; column != u_points; ++column)
 			{
-				const double column_percent = (static_cast<double>(column) / static_cast<double>(u_points-1)) - 0.5;
+				const double column_percent = (static_cast<double>(column) / static_cast<double>(u_points - 1)) - 0.5;
 
 				k3d::legacy::point* point = new k3d::legacy::point(width * column_percent, height * row_percent, 0);
 				Mesh.points.push_back(point);
@@ -122,11 +122,11 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<grid, k3d::interface_list<k3d::imesh_source > > factory(
-			k3d::uuid(0x5aac4e72, 0xf9b04b61, 0xf8b1bdbc, 0x851cf62e),
-			"NurbsGrid",
-			_("Generates a NURBS grid"),
-			"NURBS",
-			k3d::iplugin_factory::STABLE);
+		  k3d::uuid(0x5aac4e72, 0xf9b04b61, 0xf8b1bdbc, 0x851cf62e),
+		  "NurbsGrid",
+		  _("Generates a NURBS grid"),
+		  "NURBS",
+		  k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

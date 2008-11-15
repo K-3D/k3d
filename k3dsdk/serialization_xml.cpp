@@ -2118,36 +2118,6 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 		}
 	}
 
-	if(Mesh.linear_curve_groups)
-	{
-		element& container = Container.append(element("linear_curve_groups"));
-		detail::save_array(container, element("first_curves"), Mesh.linear_curve_groups->first_curves, Context);
-		detail::save_array(container, element("curve_counts"), Mesh.linear_curve_groups->curve_counts, Context);
-		detail::save_array(container, element("periodic_curves"), Mesh.linear_curve_groups->periodic_curves, Context);
-		detail::save_array(container, element("materials"), Mesh.linear_curve_groups->materials, Context);
-		detail::save_arrays(container, element("constant_data"), Mesh.linear_curve_groups->constant_data, Context);
-		detail::save_array(container, element("curve_first_points"), Mesh.linear_curve_groups->curve_first_points, Context);
-		detail::save_array(container, element("curve_point_counts"), Mesh.linear_curve_groups->curve_point_counts, Context);
-		detail::save_array(container, element("curve_selection"), Mesh.linear_curve_groups->curve_selection, Context);
-		detail::save_arrays(container, element("uniform_data"), Mesh.linear_curve_groups->uniform_data, Context);
-		detail::save_array(container, element("curve_points"), Mesh.linear_curve_groups->curve_points, Context);
-	}
-
-	if(Mesh.cubic_curve_groups)
-	{
-		element& container = Container.append(element("cubic_curve_groups"));
-		detail::save_array(container, element("first_curves"), Mesh.cubic_curve_groups->first_curves, Context);
-		detail::save_array(container, element("curve_counts"), Mesh.cubic_curve_groups->curve_counts, Context);
-		detail::save_array(container, element("periodic_curves"), Mesh.cubic_curve_groups->periodic_curves, Context);
-		detail::save_array(container, element("materials"), Mesh.cubic_curve_groups->materials, Context);
-		detail::save_arrays(container, element("constant_data"), Mesh.cubic_curve_groups->constant_data, Context);
-		detail::save_array(container, element("curve_first_points"), Mesh.cubic_curve_groups->curve_first_points, Context);
-		detail::save_array(container, element("curve_point_counts"), Mesh.cubic_curve_groups->curve_point_counts, Context);
-		detail::save_array(container, element("curve_selection"), Mesh.cubic_curve_groups->curve_selection, Context);
-		detail::save_arrays(container, element("uniform_data"), Mesh.cubic_curve_groups->uniform_data, Context);
-		detail::save_array(container, element("curve_points"), Mesh.cubic_curve_groups->curve_points, Context);
-	}
-
 	if(Mesh.nurbs_curve_groups)
 	{
 		element& container = Container.append(element("nurbs_curve_groups"));
@@ -2288,7 +2258,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "point_groups"))
 	{
-assert_not_implemented();
+		assert_not_implemented();
 /*
 		mesh::point_groups_t* const point_groups = &Mesh.point_groups.create();
 		detail::load_array(*container, "first_points", point_groups->first_points, Context);
@@ -2302,6 +2272,8 @@ assert_not_implemented();
 
 	if(element* const container = find_element(Container, "linear_curve_groups"))
 	{
+		assert_not_implemented();
+/*
 		mesh::linear_curve_groups_t* const linear_curve_groups = &Mesh.linear_curve_groups.create();
 		detail::load_array(*container, "first_curves", linear_curve_groups->first_curves, Context);
 		detail::load_array(*container, "curve_counts", linear_curve_groups->curve_counts, Context);
@@ -2313,10 +2285,13 @@ assert_not_implemented();
 		detail::load_array(*container, "curve_selection", linear_curve_groups->curve_selection, Context);
 		detail::load_arrays(*container, "uniform_data", linear_curve_groups->uniform_data, Context);
 		detail::load_array(*container, "curve_points", linear_curve_groups->curve_points, Context);
+*/
 	}
 
 	if(element* const container = find_element(Container, "cubic_curve_groups"))
 	{
+		assert_not_implemented();
+/*
 		mesh::cubic_curve_groups_t* const cubic_curve_groups = &Mesh.cubic_curve_groups.create();
 		detail::load_array(*container, "first_curves", cubic_curve_groups->first_curves, Context);
 		detail::load_array(*container, "curve_counts", cubic_curve_groups->curve_counts, Context);
@@ -2328,6 +2303,7 @@ assert_not_implemented();
 		detail::load_array(*container, "curve_selection", cubic_curve_groups->curve_selection, Context);
 		detail::load_arrays(*container, "uniform_data", cubic_curve_groups->uniform_data, Context);
 		detail::load_array(*container, "curve_points", cubic_curve_groups->curve_points, Context);
+*/
 	}
 
 	if(element* const container = find_element(Container, "nurbs_curve_groups"))

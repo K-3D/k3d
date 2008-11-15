@@ -45,96 +45,96 @@
 namespace module
 {
 
-	namespace nurbs
-	{
-		void connect_at_points(k3d::mesh& Mesh, k3d::uint_t curve1, k3d::uint_t curve2, k3d::uint_t point1, k3d::uint_t point2);
-		class connect_curves :
+namespace nurbs
+{
+void connect_at_points(k3d::mesh& Mesh, k3d::uint_t curve1, k3d::uint_t curve2, k3d::uint_t point1, k3d::uint_t point2);
+class connect_curves :
 			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+{
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
+public:
+	connect_curves(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+			base(Factory, Document)
+	{
+		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+	}
+
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	{
+		Output = Input;
+	}
+
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	{
+		Output = Input;
+
+		if (!k3d::validate_nurbs_curve_groups(Output))
+			return;
+
+		merge_selection(m_mesh_selection.pipeline_value(), Output);
+
+		std::vector<k3d::uint_t> curves;
+		std::vector<k3d::uint_t> points;
+
+		const k3d::uint_t group_begin = 0;
+		const k3d::uint_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
+		for (k3d::uint_t group = group_begin; group != group_end; ++group)
 		{
-			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
-		public:
-			connect_curves(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-				base(Factory, Document)
+			const k3d::uint_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
+			const k3d::uint_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
+			for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
-				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
-			}
+				const k3d::uint_t curve_point_begin = (*Output.nurbs_curve_groups->curve_first_points)[curve];
+				const k3d::uint_t curve_point_end = curve_point_begin + (*Output.nurbs_curve_groups->curve_point_counts)[curve];
 
-			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
-			{
-				Output = Input;
-			}
+				const k3d::mesh::weights_t& orig_weights = *Output.nurbs_curve_groups->curve_point_weights;
 
-			void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
-			{
-				Output = Input;
+				boost::shared_ptr<k3d::mesh::weights_t> curve_point_weights(new k3d::mesh::weights_t());
 
-				if(!k3d::validate_nurbs_curve_groups(Output))
-					return;
-
-				merge_selection(m_mesh_selection.pipeline_value(), Output);
-
-				std::vector<k3d::uint_t> curves;
-				std::vector<k3d::uint_t> points;
-
-				const k3d::uint_t group_begin = 0;
-				const k3d::uint_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
-				for(k3d::uint_t group = group_begin; group != group_end; ++group)
+				for (k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
 				{
-					const k3d::uint_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
-					const k3d::uint_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
-					for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
+					if ((*Output.point_selection)[(*Output.nurbs_curve_groups->curve_points)[curve_point]])
 					{
-						const k3d::uint_t curve_point_begin = (*Output.nurbs_curve_groups->curve_first_points)[curve];
-						const k3d::uint_t curve_point_end = curve_point_begin + (*Output.nurbs_curve_groups->curve_point_counts)[curve];
-
-						const k3d::mesh::weights_t& orig_weights = *Output.nurbs_curve_groups->curve_point_weights;
-
-						boost::shared_ptr<k3d::mesh::weights_t> curve_point_weights ( new k3d::mesh::weights_t() );
-
-						for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
-						{
-							if((*Output.point_selection)[(*Output.nurbs_curve_groups->curve_points)[curve_point]])
-							{
-								curves.push_back(curve);
-								points.push_back(curve_point);
-							}
-						}
+						curves.push_back(curve);
+						points.push_back(curve_point);
 					}
 				}
-
-				if( curves.size() != 2 || points.size() != 2 || curves[0] == curves[1])
-				{
-					k3d::log() << error << "You need to select exactly 2 points on 2 different curves!\n"<<"Selected: "<<points.size()<<" points on "<<curves.size()<<" curves" << std::endl;
-				}
-				else
-				{
-                    nurbs_curve_modifier mod(Output);
-                    mod.join_curves(points[0], curves[0], points[1], curves[1]);
-				}
-
-				assert_warning(k3d::validate_nurbs_curve_groups(Output));
 			}
-
-			static k3d::iplugin_factory& get_factory()
-			{
-				static k3d::document_plugin_factory<connect_curves, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
-				k3d::uuid(0x959eb84b, 0x544d0672, 0xd53d899b, 0x6a568e86),
-					"NurbsConnectCurves",
-					_("Connects a set of NURBS curves"),
-					"NURBS",
-					k3d::iplugin_factory::EXPERIMENTAL);
-
-				return factory;
-			}
-
-		private:
-		};
-
-		//Create connect_curve factory
-		k3d::iplugin_factory& connect_curves_factory()
-		{
-			return connect_curves::get_factory();
 		}
 
-	}//namespace nurbs
+		if (curves.size() != 2 || points.size() != 2 || curves[0] == curves[1])
+		{
+			k3d::log() << error << "You need to select exactly 2 points on 2 different curves!\n" << "Selected: " << points.size() << " points on " << curves.size() << " curves" << std::endl;
+		}
+		else
+		{
+			nurbs_curve_modifier mod(Output);
+			mod.join_curves(points[0], curves[0], points[1], curves[1]);
+		}
+
+		assert_warning(k3d::validate_nurbs_curve_groups(Output));
+	}
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::document_plugin_factory<connect_curves, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
+		  k3d::uuid(0x959eb84b, 0x544d0672, 0xd53d899b, 0x6a568e86),
+		  "NurbsConnectCurves",
+		  _("Connects a set of NURBS curves"),
+		  "NURBS",
+		  k3d::iplugin_factory::EXPERIMENTAL);
+
+		return factory;
+	}
+
+private:
+};
+
+//Create connect_curve factory
+k3d::iplugin_factory& connect_curves_factory()
+{
+	return connect_curves::get_factory();
+}
+
+}//namespace nurbs
 } //namespace module

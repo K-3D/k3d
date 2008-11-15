@@ -40,19 +40,19 @@ namespace nurbs
 // sphere
 
 class sphere :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+			public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
 
 public:
 	sphere(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_zmax(init_owner(*this) + init_name("zmax") + init_label(_("zmax")) + init_description(_("ZMax")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_zmin(init_owner(*this) + init_name("zmin") + init_label(_("zmin")) + init_description(_("ZMin")) + init_value(-1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("thetamax")) + init_description(_("thetamax")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
-		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Radial Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("v_segments")) + init_description(_("Radial Segments")) + init_value(2) + init_constraint(constraint::minimum<k3d::int32_t>(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+			base(Factory, Document),
+			m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+			m_zmax(init_owner(*this) + init_name("zmax") + init_label(_("zmax")) + init_description(_("ZMax")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+			m_zmin(init_owner(*this) + init_name("zmin") + init_label(_("zmin")) + init_description(_("ZMin")) + init_value(-1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+			m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("thetamax")) + init_description(_("thetamax")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
+			m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Radial Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+			m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("v_segments")) + init_description(_("Radial Segments")) + init_value(2) + init_constraint(constraint::minimum<k3d::int32_t>(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_material.changed_signal().connect(make_reset_mesh_slot());
 		m_radius.changed_signal().connect(make_reset_mesh_slot());
@@ -77,7 +77,7 @@ public:
 
 		k3d::legacy::nupatch* const nupatch = new k3d::legacy::nupatch();
 		Mesh.nupatches.push_back(nupatch);
-		
+
 		nupatch->material = m_material.pipeline_value();
 		nupatch->u_order = 3;
 		nupatch->v_order = 3;
@@ -90,13 +90,13 @@ public:
 		std::vector<k3d::point3> u_arc_points;
 		k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, thetamax, u_segments, nupatch->u_knots, u_weights, u_arc_points);
 
-		for(unsigned long v = 0; v != v_arc_points.size(); ++v)
+		for (unsigned long v = 0; v != v_arc_points.size(); ++v)
 		{
 			const k3d::point3 offset = radius * v_arc_points[v][2] * k3d::point3(0, 0, 1);
 			const double radius2 = radius * v_arc_points[v][1];
 			const double v_weight = v_weights[v];
 
-			for(unsigned long u = 0; u != u_arc_points.size(); ++u)
+			for (unsigned long u = 0; u != u_arc_points.size(); ++u)
 			{
 				Mesh.points.push_back(new k3d::legacy::point(radius2 * u_arc_points[u] + offset));
 				nupatch->control_points.push_back(k3d::legacy::nupatch::control_point(Mesh.points.back(), v_weight * u_weights[u]));
@@ -113,11 +113,11 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<sphere, k3d::interface_list<k3d::imesh_source > > factory(
-		k3d::uuid(0x082eeef0, 0x837f4277, 0xa7c21ff1, 0x839b286e),
-			"NurbsSphere",
-			_("Generates a NURBS sphere"),
-			"NURBS",
-			k3d::iplugin_factory::STABLE);
+		  k3d::uuid(0x082eeef0, 0x837f4277, 0xa7c21ff1, 0x839b286e),
+		  "NurbsSphere",
+		  _("Generates a NURBS sphere"),
+		  "NURBS",
+		  k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

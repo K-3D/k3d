@@ -67,10 +67,6 @@ const bool_t validate(mesh& Mesh);
 
 /// Returns true iff the given mesh contains valid point data (i.e. both point and point_selection arrays are defined).
 const bool_t validate_points(const mesh& Mesh);
-/// Returns true iff the given mesh contains valid linear curve group data (i.e. every array is defined).
-const bool_t validate_linear_curve_groups(const mesh& Mesh);
-/// Returns true iff the given mesh contains valid cubic curve group data (i.e. every array is defined).
-const bool_t validate_cubic_curve_groups(const mesh& Mesh);
 /// Returns true iff the given mesh contains valid nurbs curve group data (i.e. every array is defined).
 const bool_t validate_nurbs_curve_groups(const mesh& Mesh);
 /// Returns true iff the given mesh contains valid bilinear patch data (i.e. every array is defined).

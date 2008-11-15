@@ -129,6 +129,7 @@ const bool is_line_selected(const k3d::selection::record& Record)
 			return (*mesh->polyhedra->edge_selection)[id];
 	}
 
+/*
 	if(mesh->linear_curve_groups && mesh->linear_curve_groups->curve_selection)
 	{
 		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_LINEAR_CURVE);
@@ -142,6 +143,7 @@ const bool is_line_selected(const k3d::selection::record& Record)
 		if(id < mesh->cubic_curve_groups->curve_selection->size())
 			return (*mesh->cubic_curve_groups->curve_selection)[id];
 	}
+*/
 
 	return false;
 }
@@ -550,6 +552,7 @@ struct convert_to_points
 	    } 
 		}
 
+/*
 		// Convert linear curve selections to point selections ...
 		if(Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_first_points && Mesh.linear_curve_groups->curve_point_counts && Mesh.linear_curve_groups->curve_selection && Mesh.linear_curve_groups->curve_points)
 		{
@@ -587,6 +590,7 @@ struct convert_to_points
 			}
 		    }
 		}
+*/
 
 		// Convert nurbs curve selections to point selections ...
 		if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_first_points && Mesh.nurbs_curve_groups->curve_point_counts && Mesh.nurbs_curve_groups->curve_selection && Mesh.nurbs_curve_groups->curve_points)
@@ -733,6 +737,7 @@ struct convert_to_lines
 			}
 		}
 
+/*
 		// Convert point selections to linear curve selections ...
 		if(Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_first_points && Mesh.linear_curve_groups->curve_point_counts && Mesh.linear_curve_groups->curve_selection && Mesh.linear_curve_groups->curve_points && Mesh.point_selection)
 		{
@@ -761,7 +766,7 @@ struct convert_to_lines
 				}
 			}
 		}
-		
+
 		// Convert point selections to cubic curve selections ...
 		if(Mesh.cubic_curve_groups && Mesh.cubic_curve_groups->curve_first_points && Mesh.cubic_curve_groups->curve_point_counts && Mesh.cubic_curve_groups->curve_selection && Mesh.cubic_curve_groups->curve_points && Mesh.point_selection)
 		{
@@ -790,6 +795,7 @@ struct convert_to_lines
 				}
 			}
 		}
+*/
 		
 		// Convert point selections to nurbs curve selections ...
 		if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_first_points && Mesh.nurbs_curve_groups->curve_point_counts && Mesh.nurbs_curve_groups->curve_selection && Mesh.nurbs_curve_groups->curve_points && Mesh.point_selection)
@@ -1034,7 +1040,8 @@ struct keep_selection
 					Selection.faces.push_back(k3d::mesh_selection::record(face, 1.0));
 			}
 		}
-		
+
+/*
 		if (Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_selection)
 		{
 			for (k3d::uint_t curve = 0; curve != Mesh.linear_curve_groups->curve_selection->size(); ++curve)
@@ -1043,7 +1050,7 @@ struct keep_selection
 					Selection.linear_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
 			}
 		}
-		
+
 		if (Mesh.cubic_curve_groups && Mesh.cubic_curve_groups->curve_selection)
 		{
 			for (k3d::uint_t curve = 0; curve != Mesh.cubic_curve_groups->curve_selection->size(); ++curve)
@@ -1052,6 +1059,7 @@ struct keep_selection
 					Selection.cubic_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
 			}
 		}
+*/
 		
 		if (Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_selection)
 		{

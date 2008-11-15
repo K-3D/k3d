@@ -50,68 +50,21 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case MESH:
 			Stream << "mesh";
 			break;
-/*
-		case POINT_GROUP:
-			Stream << "point_group";
-			break;
-		case POINT:
-			Stream << "point";
-			break;
-*/
 		case ABSOLUTE_POINT:
 			Stream << "absolute_point";
 			break;
-/*&
-		case POLYHEDRON:
-			Stream << "polyhedron";
-			break;
-		case FACE:
-			Stream << "face";
-			break;
-*/
 		case ABSOLUTE_FACE:
 			Stream << "absolute_face";
 			break;
-/*
-		case FACE_HOLE:
-			Stream << "face_hole";
-			break;
-		case SPLIT_EDGE:
-			Stream << "split_edge";
-			break;
-*/
 		case ABSOLUTE_SPLIT_EDGE:
 			Stream << "absolute_split_edge";
 			break;
-/*
-		case LINEAR_CURVE_GROUP:
-			Stream << "linear_curve_group";
-			break;
-		case LINEAR_CURVE:
-			Stream << "linear_curve";
-			break;
-*/
 		case ABSOLUTE_LINEAR_CURVE:
 			Stream << "absolute_linear_curve";
 			break;
-/*
-		case CUBIC_CURVE_GROUP:
-			Stream << "cubic_curve_group";
-			break;
-		case CUBIC_CURVE:
-			Stream << "cubic_curve";
-			break;
-*/
 		case ABSOLUTE_CUBIC_CURVE:
 			Stream << "absolute_cubic_curve";
 			break;
-/*		case NUCURVE_GROUP:
-			Stream << "nucurve_group";
-			break;
-		case NUCURVE:
-			Stream << "nucurve";
-			break;
-*/
 		case ABSOLUTE_NURBS_CURVE:
 			Stream << "absolute_nurbs_curve";
 			break;
@@ -126,6 +79,30 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 			break;
 		case USER1:
 			Stream << "user1";
+			break;
+		case PRIMITIVE:
+			Stream << "primitive";
+			break;
+		case CONSTANT:
+			Stream << "constant";
+			break;
+		case UNIFORM:
+			Stream << "uniform";
+			break;
+		case VARYING:
+			Stream << "varying";
+			break;
+		case FACE_VARYING:
+			Stream << "face_varying";
+			break;
+		case SPLIT_EDGE:
+			Stream << "split_edge";
+			break;
+		case VERTEX:
+			Stream << "vertex";
+			break;
+		default:
+			Stream << RHS;
 			break;
 	}
 
@@ -143,47 +120,16 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = NODE;
 	else if(buffer == "mesh")
 		RHS = MESH;
-/*	else if(buffer == "point_group")
-		RHS = POINT_GROUP;
-	else if(buffer == "point")
-		RHS = POINT;
-*/
 	else if(buffer == "absolute_point")
 		RHS = ABSOLUTE_POINT;
-
-/*	else if(buffer == "polyhedron")
-		RHS = POLYHEDRON;
-	else if(buffer == "face")
-		RHS = FACE;
-*/
 	else if(buffer == "absolute_face")
 		RHS = ABSOLUTE_FACE;
-/*	else if(buffer == "face_hole")
-		RHS = FACE_HOLE;
-	else if(buffer == "split_edge")
-		RHS = SPLIT_EDGE;
-*/
 	else if(buffer == "absolute_split_edge")
 		RHS = ABSOLUTE_SPLIT_EDGE;
-/*	else if(buffer == "linear_curve_group")
-		RHS = LINEAR_CURVE_GROUP;
-	else if(buffer == "linear_curve")
-		RHS = LINEAR_CURVE;
-*/
 	else if(buffer == "absolute_linear_curve")
 		RHS = ABSOLUTE_LINEAR_CURVE;
-/*	else if(buffer == "cubic_curve_group")
-		RHS = CUBIC_CURVE_GROUP;
-	else if(buffer == "cubic_curve")
-		RHS = CUBIC_CURVE;
-*/
 	else if(buffer == "absolute_cubic_curve")
 		RHS = ABSOLUTE_CUBIC_CURVE;
-/*	else if(buffer == "nucurve_group")
-		RHS = NUCURVE_GROUP;
-	else if(buffer == "nucurve")
-		RHS = NUCURVE;
-*/
 	else if(buffer == "absolute_nurbs_curve" || buffer == "absolute_nucurve")
 		RHS = ABSOLUTE_NURBS_CURVE;
 	else if(buffer == "absolute_bilinear_patch")
@@ -194,6 +140,20 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = ABSOLUTE_NURBS_PATCH;
 	else if(buffer == "user1")
 		RHS = USER1;
+	else if(buffer == "primitive")
+		RHS = PRIMITIVE;
+	else if(buffer == "constant")
+		RHS = CONSTANT;
+	else if(buffer == "uniform")
+		RHS = UNIFORM;
+	else if(buffer == "varying")
+		RHS = VARYING;
+	else if(buffer == "face_varying")
+		RHS = FACE_VARYING;
+	else if(buffer == "split_edge")
+		RHS = SPLIT_EDGE;
+	else if(buffer == "vertex")
+		RHS = VERTEX;
 	else
 		log() << error << k3d_file_reference << ": could not extract value [" << buffer << "]" << std::endl;
 

@@ -49,10 +49,6 @@ public:
 		m_polyhedron_count(init_owner(*this) + init_name("polyhedron_count") + init_label(_("Polyhedron Count")) + init_description(_("Polyhedron count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_polyhedron_count))),
 		m_edge_count(init_owner(*this) + init_name("edge_count") + init_label(_("Edge count")) + init_description(_("Edge count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_edge_count))),
 		m_face_count(init_owner(*this) + init_name("face_count") + init_label(_("Face count")) + init_description(_("Face count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_face_count))),
-		m_linear_curve_group_count(init_owner(*this) + init_name("linear_curve_group_count") + init_label(_("Linear curve group count")) + init_description(_("Linear curve group count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_linear_curve_group_count))),
-		m_linear_curve_count(init_owner(*this) + init_name("linear_curve_count") + init_label(_("Linear curve count")) + init_description(_("Linear curve count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_linear_curve_count))),
-		m_cubic_curve_group_count(init_owner(*this) + init_name("cubic_curve_group_count") + init_label(_("Cubic curve group count")) + init_description(_("Cubic curve group count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_cubic_curve_group_count))),
-		m_cubic_curve_count(init_owner(*this) + init_name("cubic_curve_count") + init_label(_("Cubic curve count")) + init_description(_("Cubic curve count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_cubic_curve_count))),
 		m_nucurve_group_count(init_owner(*this) + init_name("nucurve_group_count") + init_label(_("Nucurve group count")) + init_description(_("Nucurve group count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_nucurve_group_count))),
 		m_nucurve_count(init_owner(*this) + init_name("nucurve_count") + init_label(_("Nucurve count")) + init_description(_("Nucurve count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_nucurve_count))),
 		m_bilinear_patch_count(init_owner(*this) + init_name("bilinear_patch_count") + init_label(_("Bilinear patch count")) + init_description(_("Bilinear patch count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_bilinear_patch_count))),
@@ -63,10 +59,6 @@ public:
 		m_input_mesh.changed_signal().connect(m_polyhedron_count.make_reset_slot());
 		m_input_mesh.changed_signal().connect(m_edge_count.make_reset_slot());
 		m_input_mesh.changed_signal().connect(m_face_count.make_reset_slot());
-		m_input_mesh.changed_signal().connect(m_linear_curve_group_count.make_reset_slot());
-		m_input_mesh.changed_signal().connect(m_linear_curve_count.make_reset_slot());
-		m_input_mesh.changed_signal().connect(m_cubic_curve_group_count.make_reset_slot());
-		m_input_mesh.changed_signal().connect(m_cubic_curve_count.make_reset_slot());
 		m_input_mesh.changed_signal().connect(m_nucurve_group_count.make_reset_slot());
 		m_input_mesh.changed_signal().connect(m_nucurve_count.make_reset_slot());
 		m_input_mesh.changed_signal().connect(m_bilinear_patch_count.make_reset_slot());
@@ -124,50 +116,6 @@ public:
 				return mesh->polyhedra->face_first_loops->size();
 		}
 
-		return 0;
-	}
-
-	k3d::int32_t get_linear_curve_group_count()
-	{
-		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
-		{
-			if(mesh->linear_curve_groups && mesh->linear_curve_groups->first_curves)
-				return mesh->linear_curve_groups->first_curves->size();
-		}
-
-		return 0;
-	}
-
-	k3d::int32_t get_linear_curve_count()
-	{
-		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
-		{
-			if(mesh->linear_curve_groups && mesh->linear_curve_groups->curve_first_points)
-				return mesh->linear_curve_groups->curve_first_points->size();
-		}
-		
-		return 0;
-	}
-
-	k3d::int32_t get_cubic_curve_group_count()
-	{
-		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
-		{
-			if(mesh->cubic_curve_groups && mesh->cubic_curve_groups->first_curves)
-				return mesh->cubic_curve_groups->first_curves->size();
-		}
-
-		return 0;
-	}
-
-	k3d::int32_t get_cubic_curve_count()
-	{
-		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
-		{
-			if(mesh->cubic_curve_groups && mesh->cubic_curve_groups->curve_first_points)
-				return mesh->cubic_curve_groups->curve_first_points->size();
-		}
-		
 		return 0;
 	}
 
@@ -245,10 +193,6 @@ private:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_polyhedron_count;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_edge_count;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_face_count;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_linear_curve_group_count;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_linear_curve_count;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_cubic_curve_group_count;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_cubic_curve_count;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_nucurve_group_count;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_nucurve_count;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_bilinear_patch_count;

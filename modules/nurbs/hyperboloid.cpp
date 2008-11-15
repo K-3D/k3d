@@ -40,20 +40,20 @@ namespace nurbs
 // hyperboloid
 
 class hyperboloid :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+			public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
 
 public:
 	hyperboloid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_x1(init_owner(*this) + init_name("x1") + init_label(_("x1")) + init_description(_("x1")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_y1(init_owner(*this) + init_name("y1") + init_label(_("y1")) + init_description(_("y1")) + init_value(-5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_z1(init_owner(*this) + init_name("z1") + init_label(_("z1")) + init_description(_("z1")) + init_value(-5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_x2(init_owner(*this) + init_name("x2") + init_label(_("x2")) + init_description(_("x2")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_y2(init_owner(*this) + init_name("y2") + init_label(_("y2")) + init_description(_("y2")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_z2(init_owner(*this) + init_name("z2") + init_label(_("z2")) + init_description(_("z2")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("thetamax")) + init_description(_("thetamax")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
+			base(Factory, Document),
+			m_x1(init_owner(*this) + init_name("x1") + init_label(_("x1")) + init_description(_("x1")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+			m_y1(init_owner(*this) + init_name("y1") + init_label(_("y1")) + init_description(_("y1")) + init_value(-5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+			m_z1(init_owner(*this) + init_name("z1") + init_label(_("z1")) + init_description(_("z1")) + init_value(-5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+			m_x2(init_owner(*this) + init_name("x2") + init_label(_("x2")) + init_description(_("x2")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+			m_y2(init_owner(*this) + init_name("y2") + init_label(_("y2")) + init_description(_("y2")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+			m_z2(init_owner(*this) + init_name("z2") + init_label(_("z2")) + init_description(_("z2")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+			m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("thetamax")) + init_description(_("thetamax")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
 	{
 		m_material.changed_signal().connect(make_reset_mesh_slot());
 		m_x1.changed_signal().connect(make_reset_mesh_slot());
@@ -86,7 +86,7 @@ public:
 
 		k3d::legacy::nupatch* const nupatch = new k3d::legacy::nupatch();
 		Mesh.nupatches.push_back(nupatch);
-		
+
 		nupatch->material = m_material.pipeline_value();
 		nupatch->u_order = 3;
 		nupatch->v_order = 2;
@@ -94,7 +94,7 @@ public:
 		std::vector<double> weights1;
 		std::vector<k3d::point3> arc_points1;
 		k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), thetamin1, thetamin1 + thetamax, 4, nupatch->u_knots, weights1, arc_points1);
-		
+
 		std::vector<double> weights2;
 		std::vector<k3d::point3> arc_points2;
 		k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), thetamin2, thetamin2 + thetamax, 4, nupatch->u_knots, weights2, arc_points2);
@@ -102,13 +102,13 @@ public:
 		nupatch->v_knots.insert(nupatch->v_knots.end(), 2, 0);
 		nupatch->v_knots.insert(nupatch->v_knots.end(), 2, 1);
 
-		for(unsigned long j = 0; j != arc_points1.size(); ++j)
+		for (unsigned long j = 0; j != arc_points1.size(); ++j)
 		{
 			Mesh.points.push_back(new k3d::legacy::point(radius1 * arc_points1[j] + offset1));
 			nupatch->control_points.push_back(k3d::legacy::nupatch::control_point(Mesh.points.back(), weights1[j]));
 		}
-		
-		for(unsigned long j = 0; j != arc_points2.size(); ++j)
+
+		for (unsigned long j = 0; j != arc_points2.size(); ++j)
 		{
 			Mesh.points.push_back(new k3d::legacy::point(radius2 * arc_points2[j] + offset2));
 			nupatch->control_points.push_back(k3d::legacy::nupatch::control_point(Mesh.points.back(), weights2[j]));
@@ -124,11 +124,11 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<hyperboloid, k3d::interface_list<k3d::imesh_source > > factory(
-		k3d::uuid(0xb653277c, 0x7bba4505, 0xbabcd65d, 0x591ecedf),
-			"NurbsHyperboloid",
-			_("Generates a NURBS hyperboloid"),
-			"NURBS",
-			k3d::iplugin_factory::STABLE);
+		  k3d::uuid(0xb653277c, 0x7bba4505, 0xbabcd65d, 0x591ecedf),
+		  "NurbsHyperboloid",
+		  _("Generates a NURBS hyperboloid"),
+		  "NURBS",
+		  k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

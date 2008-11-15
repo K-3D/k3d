@@ -932,6 +932,8 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	}
 	else if(tokens.count(k3d::selection::ABSOLUTE_LINEAR_CURVE))
 	{
+		assert_not_implemented();
+/*
 		if(mesh->linear_curve_groups && mesh->linear_curve_groups->curve_first_points && mesh->linear_curve_groups->curve_point_counts && mesh->linear_curve_groups->curve_points)
 		{
 			const k3d::selection::id curve = tokens[k3d::selection::ABSOLUTE_LINEAR_CURVE];
@@ -952,9 +954,12 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 					distance);
 			}
 		}
+*/
 	}
 	else if(tokens.count(k3d::selection::ABSOLUTE_CUBIC_CURVE))
 	{
+		assert_not_implemented();
+/*
 		if(mesh->cubic_curve_groups && mesh->cubic_curve_groups->curve_first_points && mesh->cubic_curve_groups->curve_point_counts && mesh->cubic_curve_groups->curve_points)
 		{
 			const k3d::selection::id curve = tokens[k3d::selection::ABSOLUTE_CUBIC_CURVE];
@@ -975,6 +980,7 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 					distance);
 			}
 		}
+*/
 	}
 	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_CURVE))
 	{
@@ -1289,6 +1295,10 @@ const k3d::selection::records control::get_selection(const k3d::gl::selection_st
 
 		selection.push_back(record);
 	}
+
+k3d::log() << debug << "get_selection(): \n";
+std::copy(selection.begin(), selection.end(), std::ostream_iterator<k3d::selection::record>(k3d::log(), "\n"));
+k3d::log() << std::endl;
 
 	return selection;
 }

@@ -39,15 +39,15 @@ namespace nurbs
 // polygon
 
 class polygon :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+			public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
 
 public:
 	polygon(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Sides")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
+			base(Factory, Document),
+			m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Sides")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+			m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
 		m_material.changed_signal().connect(make_reset_mesh_slot());
 		m_u_segments.changed_signal().connect(make_reset_mesh_slot());
@@ -71,14 +71,14 @@ public:
 
 		// Build knot vector ...
 		nucurve->knots.push_back(0);
-		for(unsigned long n = 0; n <= u_segments; ++n)
+		for (unsigned long n = 0; n <= u_segments; ++n)
 			nucurve->knots.push_back(n);
 		nucurve->knots.push_back(u_segments);
 
 		// Build control vertices ...
 		const double radius = m_radius.pipeline_value();
 
-		for(unsigned long n = 0; n != u_segments; ++n)
+		for (unsigned long n = 0; n != u_segments; ++n)
 		{
 			const double angle = k3d::pi_over_2() + k3d::pi_times_2() / static_cast<double>(u_segments) * static_cast<double>(n);
 
@@ -98,11 +98,11 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<polygon, k3d::interface_list<k3d::imesh_source > > factory(
-		k3d::uuid(0x49796f52, 0x2e29f346, 0xbd47e3c9, 0xfb899a81),
-			"NurbsPolygon",
-			_("Generates a NURBS polygon"),
-			"NURBS",
-			k3d::iplugin_factory::STABLE);
+		  k3d::uuid(0x49796f52, 0x2e29f346, 0xbd47e3c9, 0xfb899a81),
+		  "NurbsPolygon",
+		  _("Generates a NURBS polygon"),
+		  "NURBS",
+		  k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

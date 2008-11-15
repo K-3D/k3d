@@ -136,192 +136,6 @@ object create_array(pipeline_data<array_type>& Data)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// const_linear_curve_groups
-
-class const_linear_curve_groups :
-	public instance_wrapper<const k3d::mesh::linear_curve_groups_t>
-{
-	typedef instance_wrapper<const k3d::mesh::linear_curve_groups_t> base;
-public:
-	const_linear_curve_groups() :
-		base()
-	{
-	}
-
-	const_linear_curve_groups(const k3d::mesh::linear_curve_groups_t* CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	const_linear_curve_groups(const k3d::mesh::linear_curve_groups_t& CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	object first_curves() { return wrap_const_array(wrapped().first_curves); }
-	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
-	object periodic_curves() { return wrap_const_array(wrapped().periodic_curves); }
-	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
-	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
-	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object curve_points() { return wrap_const_array(wrapped().curve_points); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// linear_curve_groups
-
-class linear_curve_groups :
-	public instance_wrapper<k3d::mesh::linear_curve_groups_t>
-{
-	typedef instance_wrapper<k3d::mesh::linear_curve_groups_t> base;
-public:
-	linear_curve_groups() :
-		base()
-	{
-	}
-
-	linear_curve_groups(k3d::mesh::linear_curve_groups_t* CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	linear_curve_groups(k3d::mesh::linear_curve_groups_t& CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	object first_curves() { return wrap_const_array(wrapped().first_curves); }
-	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
-	object periodic_curves() { return wrap_const_array(wrapped().periodic_curves); }
-	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
-	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
-	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object curve_points() { return wrap_const_array(wrapped().curve_points); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-
-	object writable_first_curves() { return wrap_non_const_array(wrapped().first_curves); }
-	object writable_curve_counts() { return wrap_non_const_array(wrapped().curve_counts); }
-	object writable_periodic_curves() { return wrap_non_const_array(wrapped().periodic_curves); }
-	object writable_materials() { return wrap_non_const_array(wrapped().materials); }
-	object writable_constant_data() { return wrap(wrapped().constant_data); }
-	object writable_curve_first_points() { return wrap_non_const_array(wrapped().curve_first_points); }
-	object writable_curve_point_counts() { return wrap_non_const_array(wrapped().curve_point_counts); }
-	object writable_curve_selection() { return wrap_non_const_array(wrapped().curve_selection); }
-	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
-	object writable_curve_points() { return wrap_non_const_array(wrapped().curve_points); }
-	object writable_varying_data() { return wrap(wrapped().varying_data); }
-
-	object create_first_curves() { return create_array(wrapped().first_curves); }
-	object create_curve_counts() { return create_array(wrapped().curve_counts); }
-	object create_periodic_curves() { return create_array(wrapped().periodic_curves); }
-	object create_materials() { return create_array(wrapped().materials); }
-	object create_curve_first_points() { return create_array(wrapped().curve_first_points); }
-	object create_curve_point_counts() { return create_array(wrapped().curve_point_counts); }
-	object create_curve_selection() { return create_array(wrapped().curve_selection); }
-	object create_curve_points() { return create_array(wrapped().curve_points); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// const_cubic_curve_groups
-
-class const_cubic_curve_groups :
-	public instance_wrapper<const k3d::mesh::cubic_curve_groups_t>
-{
-	typedef instance_wrapper<const k3d::mesh::cubic_curve_groups_t> base;
-public:
-	const_cubic_curve_groups() :
-		base()
-	{
-	}
-
-	const_cubic_curve_groups(const k3d::mesh::cubic_curve_groups_t* CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	const_cubic_curve_groups(const k3d::mesh::cubic_curve_groups_t& CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	object first_curves() { return wrap_const_array(wrapped().first_curves); }
-	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
-	object periodic_curves() { return wrap_const_array(wrapped().periodic_curves); }
-	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
-	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
-	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object curve_points() { return wrap_const_array(wrapped().curve_points); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// cubic_curve_groups
-
-class cubic_curve_groups :
-	public instance_wrapper<k3d::mesh::cubic_curve_groups_t>
-{
-	typedef instance_wrapper<k3d::mesh::cubic_curve_groups_t> base;
-public:
-	cubic_curve_groups() :
-		base()
-	{
-	}
-
-	cubic_curve_groups(k3d::mesh::cubic_curve_groups_t* CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	cubic_curve_groups(k3d::mesh::cubic_curve_groups_t& CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	object first_curves() { return wrap_const_array(wrapped().first_curves); }
-	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
-	object periodic_curves() { return wrap_const_array(wrapped().periodic_curves); }
-	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
-	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
-	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object curve_points() { return wrap_const_array(wrapped().curve_points); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-
-	object writable_first_curves() { return wrap_non_const_array(wrapped().first_curves); }
-	object writable_curve_counts() { return wrap_non_const_array(wrapped().curve_counts); }
-	object writable_periodic_curves() { return wrap_non_const_array(wrapped().periodic_curves); }
-	object writable_materials() { return wrap_non_const_array(wrapped().materials); }
-	object writable_constant_data() { return wrap(wrapped().constant_data); }
-	object writable_curve_first_points() { return wrap_non_const_array(wrapped().curve_first_points); }
-	object writable_curve_point_counts() { return wrap_non_const_array(wrapped().curve_point_counts); }
-	object writable_curve_selection() { return wrap_non_const_array(wrapped().curve_selection); }
-	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
-	object writable_curve_points() { return wrap_non_const_array(wrapped().curve_points); }
-	object writable_varying_data() { return wrap(wrapped().varying_data); }
-
-	object create_first_curves() { return create_array(wrapped().first_curves); }
-	object create_curve_counts() { return create_array(wrapped().curve_counts); }
-	object create_periodic_curves() { return create_array(wrapped().periodic_curves); }
-	object create_materials() { return create_array(wrapped().materials); }
-	object create_curve_first_points() { return create_array(wrapped().curve_first_points); }
-	object create_curve_point_counts() { return create_array(wrapped().curve_point_counts); }
-	object create_curve_selection() { return create_array(wrapped().curve_selection); }
-	object create_curve_points() { return create_array(wrapped().curve_points); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 // const_nurbs_curve_groups
 
 class const_nurbs_curve_groups :
@@ -874,15 +688,11 @@ object mesh::bicubic_patches() { return detail::wrap_const_object<detail::const_
 object mesh::bilinear_patches() { return detail::wrap_const_object<detail::const_bilinear_patches>(wrapped().bilinear_patches); } 
 object mesh::create_bicubic_patches() { return detail::create_object<detail::bicubic_patches, k3d::mesh::bicubic_patches_t>(wrapped().bicubic_patches); }
 object mesh::create_bilinear_patches() { return detail::create_object<detail::bilinear_patches, k3d::mesh::bilinear_patches_t>(wrapped().bilinear_patches); }
-object mesh::create_cubic_curve_groups() { return detail::create_object<detail::cubic_curve_groups, k3d::mesh::cubic_curve_groups_t>(wrapped().cubic_curve_groups); }
-object mesh::create_linear_curve_groups() { return detail::create_object<detail::linear_curve_groups, k3d::mesh::linear_curve_groups_t>(wrapped().linear_curve_groups); }
 object mesh::create_nurbs_curve_groups() { return detail::create_object<detail::nurbs_curve_groups, k3d::mesh::nurbs_curve_groups_t>(wrapped().nurbs_curve_groups); }
 object mesh::create_nurbs_patches() { return detail::create_object<detail::nurbs_patches, k3d::mesh::nurbs_patches_t>(wrapped().nurbs_patches); }
 object mesh::create_point_selection() { return detail::create_array(wrapped().point_selection); } 
 object mesh::create_points() { return detail::create_array(wrapped().points); }
 object mesh::create_polyhedra() { return detail::create_object<detail::polyhedra, k3d::mesh::polyhedra_t>(wrapped().polyhedra); } 
-object mesh::cubic_curve_groups() { return detail::wrap_const_object<detail::const_cubic_curve_groups>(wrapped().cubic_curve_groups); }
-object mesh::linear_curve_groups() { return detail::wrap_const_object<detail::const_linear_curve_groups>(wrapped().linear_curve_groups); } 
 object mesh::nurbs_curve_groups() { return detail::wrap_const_object<detail::const_nurbs_curve_groups>(wrapped().nurbs_curve_groups); } 
 object mesh::nurbs_patches() { return detail::wrap_const_object<detail::const_nurbs_patches>(wrapped().nurbs_patches); } 
 object mesh::point_selection() { return detail::wrap_const_array(wrapped().point_selection); } 
@@ -891,8 +701,6 @@ object mesh::polyhedra() { return detail::wrap_const_object<detail::const_polyhe
 object mesh::vertex_data() { return wrap(wrapped().vertex_data); } 
 object mesh::writable_bicubic_patches() { return detail::wrap_non_const_object<detail::bicubic_patches>(wrapped().bicubic_patches); } 
 object mesh::writable_bilinear_patches() { return detail::wrap_non_const_object<detail::bilinear_patches>(wrapped().bilinear_patches); } 
-object mesh::writable_cubic_curve_groups() { return detail::wrap_non_const_object<detail::cubic_curve_groups>(wrapped().cubic_curve_groups); } 
-object mesh::writable_linear_curve_groups() { return detail::wrap_non_const_object<detail::linear_curve_groups>(wrapped().linear_curve_groups); } 
 object mesh::writable_nurbs_curve_groups() { return detail::wrap_non_const_object<detail::nurbs_curve_groups>(wrapped().nurbs_curve_groups); } 
 object mesh::writable_nurbs_patches() { return detail::wrap_non_const_object<detail::nurbs_patches>(wrapped().nurbs_patches); } 
 object mesh::writable_point_selection() { return detail::wrap_non_const_array(wrapped().point_selection); } 
@@ -996,104 +804,6 @@ static object mesh_primitives_t_create(mesh_primitives_t_wrapper& Self, const st
 
 void define_namespace_mesh()
 {
-	class_<detail::const_linear_curve_groups>("const_linear_curve_groups",
-		"Stores an immutable (read-only) collection of linear curve primitives.")
-		.def("first_curves", &detail::const_linear_curve_groups::first_curves)
-		.def("curve_counts", &detail::const_linear_curve_groups::curve_counts)
-		.def("periodic_curves", &detail::const_linear_curve_groups::periodic_curves)
-		.def("materials", &detail::const_linear_curve_groups::materials)
-		.def("constant_data", &detail::const_linear_curve_groups::constant_data)
-		.def("curve_first_points", &detail::const_linear_curve_groups::curve_first_points)
-		.def("curve_point_counts", &detail::const_linear_curve_groups::curve_point_counts)
-		.def("curve_selection", &detail::const_linear_curve_groups::curve_selection)
-		.def("uniform_data", &detail::const_linear_curve_groups::uniform_data)
-		.def("varying_data", &detail::const_linear_curve_groups::varying_data)
-		.def("curve_points", &detail::const_linear_curve_groups::curve_points);
-
-	class_<detail::linear_curve_groups>("linear_curve_groups",
-		"Stores a mutable (read-write) collection of linear curve primitives.")
-		.def("first_curves", &detail::linear_curve_groups::first_curves)
-		.def("curve_counts", &detail::linear_curve_groups::curve_counts)
-		.def("periodic_curves", &detail::linear_curve_groups::periodic_curves)
-		.def("materials", &detail::linear_curve_groups::materials)
-		.def("constant_data", &detail::linear_curve_groups::constant_data)
-		.def("curve_first_points", &detail::linear_curve_groups::curve_first_points)
-		.def("curve_point_counts", &detail::linear_curve_groups::curve_point_counts)
-		.def("curve_selection", &detail::linear_curve_groups::curve_selection)
-		.def("uniform_data", &detail::linear_curve_groups::uniform_data)
-		.def("varying_data", &detail::const_linear_curve_groups::varying_data)
-		.def("curve_points", &detail::linear_curve_groups::curve_points)
-
-		.def("writable_first_curves", &detail::linear_curve_groups::writable_first_curves)
-		.def("writable_curve_counts", &detail::linear_curve_groups::writable_curve_counts)
-		.def("writable_periodic_curves", &detail::linear_curve_groups::writable_periodic_curves)
-		.def("writable_materials", &detail::linear_curve_groups::writable_materials)
-		.def("writable_constant_data", &detail::linear_curve_groups::writable_constant_data)
-		.def("writable_curve_first_points", &detail::linear_curve_groups::writable_curve_first_points)
-		.def("writable_curve_point_counts", &detail::linear_curve_groups::writable_curve_point_counts)
-		.def("writable_curve_selection", &detail::linear_curve_groups::writable_curve_selection)
-		.def("writable_uniform_data", &detail::linear_curve_groups::writable_uniform_data)
-		.def("writable_varying_data", &detail::linear_curve_groups::writable_varying_data)
-		.def("writable_curve_points", &detail::linear_curve_groups::writable_curve_points)
-
-		.def("create_first_curves", &detail::linear_curve_groups::create_first_curves)
-		.def("create_curve_counts", &detail::linear_curve_groups::create_curve_counts)
-		.def("create_periodic_curves", &detail::linear_curve_groups::create_periodic_curves)
-		.def("create_materials", &detail::linear_curve_groups::create_materials)
-		.def("create_curve_first_points", &detail::linear_curve_groups::create_curve_first_points)
-		.def("create_curve_point_counts", &detail::linear_curve_groups::create_curve_point_counts)
-		.def("create_curve_selection", &detail::linear_curve_groups::create_curve_selection)
-		.def("create_curve_points", &detail::linear_curve_groups::create_curve_points);
-
-	class_<detail::const_cubic_curve_groups>("const_cubic_curve_groups",
-		"Stores an immutable (read-only) collection of cubic curve primitives.")
-		.def("first_curves", &detail::const_cubic_curve_groups::first_curves)
-		.def("curve_counts", &detail::const_cubic_curve_groups::curve_counts)
-		.def("periodic_curves", &detail::const_cubic_curve_groups::periodic_curves)
-		.def("materials", &detail::const_cubic_curve_groups::materials)
-		.def("constant_data", &detail::const_cubic_curve_groups::constant_data)
-		.def("curve_first_points", &detail::const_cubic_curve_groups::curve_first_points)
-		.def("curve_point_counts", &detail::const_cubic_curve_groups::curve_point_counts)
-		.def("curve_selection", &detail::const_cubic_curve_groups::curve_selection)
-		.def("uniform_data", &detail::const_cubic_curve_groups::uniform_data)
-		.def("varying_data", &detail::const_cubic_curve_groups::varying_data)
-		.def("curve_points", &detail::const_cubic_curve_groups::curve_points);
-
-	class_<detail::cubic_curve_groups>("cubic_curve_groups",
-		"Stores a mutable (read-write) collection of cubic curve primitives.")
-		.def("first_curves", &detail::cubic_curve_groups::first_curves)
-		.def("curve_counts", &detail::cubic_curve_groups::curve_counts)
-		.def("periodic_curves", &detail::cubic_curve_groups::periodic_curves)
-		.def("materials", &detail::cubic_curve_groups::materials)
-		.def("constant_data", &detail::cubic_curve_groups::constant_data)
-		.def("curve_first_points", &detail::cubic_curve_groups::curve_first_points)
-		.def("curve_point_counts", &detail::cubic_curve_groups::curve_point_counts)
-		.def("curve_selection", &detail::cubic_curve_groups::curve_selection)
-		.def("uniform_data", &detail::cubic_curve_groups::uniform_data)
-		.def("varying_data", &detail::cubic_curve_groups::varying_data)
-		.def("curve_points", &detail::cubic_curve_groups::curve_points)
-
-		.def("writable_first_curves", &detail::cubic_curve_groups::writable_first_curves)
-		.def("writable_curve_counts", &detail::cubic_curve_groups::writable_curve_counts)
-		.def("writable_periodic_curves", &detail::cubic_curve_groups::writable_periodic_curves)
-		.def("writable_materials", &detail::cubic_curve_groups::writable_materials)
-		.def("writable_constant_data", &detail::cubic_curve_groups::writable_constant_data)
-		.def("writable_curve_first_points", &detail::cubic_curve_groups::writable_curve_first_points)
-		.def("writable_curve_point_counts", &detail::cubic_curve_groups::writable_curve_point_counts)
-		.def("writable_curve_selection", &detail::cubic_curve_groups::writable_curve_selection)
-		.def("writable_uniform_data", &detail::cubic_curve_groups::writable_uniform_data)
-		.def("writable_varying_data", &detail::cubic_curve_groups::writable_varying_data)
-		.def("writable_curve_points", &detail::cubic_curve_groups::writable_curve_points)
-
-		.def("create_first_curves", &detail::cubic_curve_groups::create_first_curves)
-		.def("create_curve_counts", &detail::cubic_curve_groups::create_curve_counts)
-		.def("create_periodic_curves", &detail::cubic_curve_groups::create_periodic_curves)
-		.def("create_materials", &detail::cubic_curve_groups::create_materials)
-		.def("create_curve_first_points", &detail::cubic_curve_groups::create_curve_first_points)
-		.def("create_curve_point_counts", &detail::cubic_curve_groups::create_curve_point_counts)
-		.def("create_curve_selection", &detail::cubic_curve_groups::create_curve_selection)
-		.def("create_curve_points", &detail::cubic_curve_groups::create_curve_points);
-
 	class_<detail::const_nurbs_curve_groups>("const_nurbs_curve_groups",
 		"Stores an immutable (read-only) collection of NURBS curve primitives.")
 		.def("first_curves", &detail::const_nurbs_curve_groups::first_curves)
@@ -1423,10 +1133,6 @@ void define_namespace_mesh()
 			"Returns a L{const_bicubic_patches} object containing an immutable (read-only) collection of bicubic patch primitives, or None.")
 		.def("bilinear_patches", &mesh::bilinear_patches,
 			"Returna a L{const_bilinear_patches} object containing an immutable (read-only) collection of bilinear patch primitives, or None.")
-		.def("cubic_curve_groups", &mesh::cubic_curve_groups,
-			"Returns a L{const_cubic_curve_groups} object containing an immutable (read-only) collection of cubic curve primitives, or None.")
-		.def("linear_curve_groups", &mesh::linear_curve_groups,
-			"Returns a L{const_linear_curve_groups} object containing an immutable (read-only) collection of linear curve primitives, or None.")
 		.def("nurbs_curve_groups", &mesh::nurbs_curve_groups,
 			"Returns a L{const_nurbs_curve_groups} object containing an immutable (read-only) collection of NURBS curve primitives, or None.")
 		.def("nurbs_patches", &mesh::nurbs_patches,
@@ -1443,10 +1149,6 @@ void define_namespace_mesh()
 			"Returns a L{bicubic_patches} object containing a mutable (read-write) collection of bicubic patch primitives, or None.")
 		.def("writable_bilinear_patches", &mesh::writable_bilinear_patches,
 			"Returns a L{bilinear_patches} object containing a mutable (read-write) collection of bilinear patch primitives, or None.")
-		.def("writable_cubic_curve_groups", &mesh::writable_cubic_curve_groups,
-			"Returns a L{cubic_curve_groups} object containing a mutable (read-write) collection of cubic curve primitives, or None.")
-		.def("writable_linear_curve_groups", &mesh::writable_linear_curve_groups,
-			"Returns a L{linear_curve_groups} object containing a mutable (read-write) collection of linear curve primitives, or None.")
 		.def("writable_nurbs_curve_groups", &mesh::writable_nurbs_curve_groups,
 			"Returns a L{nurbs_curve_groups} object containing a mutable (read-write) collection of NURBS curve primitives, or None.")
 		.def("writable_nurbs_patches", &mesh::writable_nurbs_patches,
@@ -1465,10 +1167,6 @@ void define_namespace_mesh()
 			"Creates and returns a new L{bicubic_patches} object for storing bicubic patch primitives.")
 		.def("create_bilinear_patches", &mesh::create_bilinear_patches,
 			"Creates and returns a new L{bilinear_patches} object for storing bilinear patch primitives.")
-		.def("create_cubic_curve_groups", &mesh::create_cubic_curve_groups,
-			"Creates and returns a new L{cubic_curve_groups} object for storing cubic curve primitives.")
-		.def("create_linear_curve_groups", &mesh::create_linear_curve_groups,
-			"Creates and returns a new L{linear_curve_groups} object for storing linear curve primitives.")
 		.def("create_nurbs_curve_groups", &mesh::create_nurbs_curve_groups,
 			"Creates and returns a new L{nurbs_curve_groups} object for storing NURBS curve primitives.")
 		.def("create_nurbs_patches", &mesh::create_nurbs_patches,

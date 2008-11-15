@@ -45,94 +45,94 @@
 namespace module
 {
 
-	namespace nurbs
-	{
-		class curve_traversal :
+namespace nurbs
+{
+class curve_traversal :
 			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+{
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
+public:
+	curve_traversal(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+			base(Factory, Document),
+			m_create_caps(init_owner(*this) + init_name(_("create_caps")) + init_label(_("Create caps?")) + init_description(_("Create caps at both ends of the revolved curve?")) + init_value(false)),
+			m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curves")) + init_description(_("Delete the curves used to construct the surface")) + init_value(true))
+	{
+		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+		m_create_caps.changed_signal().connect(make_update_mesh_slot());
+		m_delete_original.changed_signal().connect(make_update_mesh_slot());
+	}
+
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	{
+		Output = Input;
+	}
+
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	{
+		Output = Input;
+
+		if (!k3d::validate_nurbs_curve_groups(Output))
+			return;
+
+		merge_selection(m_mesh_selection.pipeline_value(), Output);
+
+		std::vector<k3d::uint_t> curves;
+
+		const k3d::uint_t group_begin = 0;
+		const k3d::uint_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
+		for (k3d::uint_t group = group_begin; group != group_end; ++group)
 		{
-			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
-		public:
-			curve_traversal(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-				base(Factory, Document),
-				m_create_caps(init_owner(*this) + init_name(_("create_caps")) + init_label(_("Create caps?")) + init_description(_("Create caps at both ends of the revolved curve?")) + init_value(false) ),
-				m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curves")) + init_description(_("Delete the curves used to construct the surface")) + init_value(true) )
+			const k3d::uint_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
+			const k3d::uint_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
+			for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
-				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
-				m_create_caps.changed_signal().connect(make_update_mesh_slot());
-				m_delete_original.changed_signal().connect(make_update_mesh_slot());
+				if ((*Output.nurbs_curve_groups->curve_selection)[curve] > 0.0)
+					curves.push_back(curve);
 			}
-
-			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
-			{
-				Output = Input;
-			}
-
-			void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
-			{
-				Output = Input;
-
-				if(!k3d::validate_nurbs_curve_groups(Output))
-					return;
-
-				merge_selection(m_mesh_selection.pipeline_value(), Output);
-
-				std::vector<k3d::uint_t> curves;
-
-				const k3d::uint_t group_begin = 0;
-				const k3d::uint_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
-				for(k3d::uint_t group = group_begin; group != group_end; ++group)
-				{
-					const k3d::uint_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
-					const k3d::uint_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
-					for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
-					{
-						if((*Output.nurbs_curve_groups->curve_selection)[curve] > 0.0)
-                            curves.push_back(curve);
-					}
-				}
-
-				if( curves.size() != 2)
-				{
-					k3d::log() << error << nurbs_debug << "You need to select 2 curves!\n" << std::endl;
-				}
-				else
-				{
-                    nurbs_curve_modifier mod(Output);
-                    mod.traverse_curve(curves[0], curves[1], m_create_caps.pipeline_value());
-
-                    if(m_delete_original.pipeline_value())
-                    {
-                        mod.delete_curve(curves[0]);
-                        mod.delete_curve(curves[1]);
-                    }
-				}
-
-				assert_warning(k3d::validate_nurbs_curve_groups(Output));
-				assert_warning(k3d::validate_nurbs_patches(Output));
-			}
-
-			static k3d::iplugin_factory& get_factory()
-			{
-				static k3d::document_plugin_factory<curve_traversal, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
-				k3d::uuid(0x9e316d5f, 0x9945f986, 0xbb2f70b6, 0xec54bada),
-					"NurbsCurveTraversal",
-					_("Creates a NURBS surface while traversing one NURBS curve along another"),
-					"NURBS",
-					k3d::iplugin_factory::EXPERIMENTAL);
-
-				return factory;
-			}
-
-		private:
-            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_create_caps;
-            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
-		};
-
-		//Create connect_curve factory
-		k3d::iplugin_factory& curve_traversal_factory()
-		{
-			return curve_traversal::get_factory();
 		}
 
-	}//namespace nurbs
+		if (curves.size() != 2)
+		{
+			k3d::log() << error << nurbs_debug << "You need to select 2 curves!\n" << std::endl;
+		}
+		else
+		{
+			nurbs_curve_modifier mod(Output);
+			mod.traverse_curve(curves[0], curves[1], m_create_caps.pipeline_value());
+
+			if (m_delete_original.pipeline_value())
+			{
+				mod.delete_curve(curves[0]);
+				mod.delete_curve(curves[1]);
+			}
+		}
+
+		assert_warning(k3d::validate_nurbs_curve_groups(Output));
+		assert_warning(k3d::validate_nurbs_patches(Output));
+	}
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::document_plugin_factory<curve_traversal, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
+		  k3d::uuid(0x9e316d5f, 0x9945f986, 0xbb2f70b6, 0xec54bada),
+		  "NurbsCurveTraversal",
+		  _("Creates a NURBS surface while traversing one NURBS curve along another"),
+		  "NURBS",
+		  k3d::iplugin_factory::EXPERIMENTAL);
+
+		return factory;
+	}
+
+private:
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_create_caps;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
+};
+
+//Create connect_curve factory
+k3d::iplugin_factory& curve_traversal_factory()
+{
+	return curve_traversal::get_factory();
+}
+
+}//namespace nurbs
 } //namespace module

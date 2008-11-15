@@ -318,68 +318,6 @@ const bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t&
 // almost_equal
 
 template<>
-class almost_equal<mesh::linear_curve_groups_t>
-{
-	typedef mesh::linear_curve_groups_t T;
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline const bool_t operator()(const T& A, const T& B)
-	{
-		return
-			detail::almost_equal(A.first_curves, B.first_curves, threshold) &&
-			detail::almost_equal(A.curve_counts, B.curve_counts, threshold) &&
-			detail::almost_equal(A.periodic_curves, B.periodic_curves, threshold) &&
-			detail::almost_equal(A.materials, B.materials, threshold) &&
-			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
-			detail::almost_equal(A.curve_first_points, B.curve_first_points, threshold) &&
-			detail::almost_equal(A.curve_point_counts, B.curve_point_counts, threshold) &&
-			detail::almost_equal(A.curve_selection, B.curve_selection, threshold) &&
-			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
-			detail::almost_equal(A.curve_points, B.curve_points, threshold);
-	}
-private:
-	const uint64_t threshold;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// detail::almost_equal
-
-template<>
-class almost_equal<mesh::cubic_curve_groups_t>
-{
-	typedef mesh::cubic_curve_groups_t T;
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline const bool_t operator()(const T& A, const T& B)
-	{
-		return
-			detail::almost_equal(A.first_curves, B.first_curves, threshold) &&
-			detail::almost_equal(A.curve_counts, B.curve_counts, threshold) &&
-			detail::almost_equal(A.periodic_curves, B.periodic_curves, threshold) &&
-			detail::almost_equal(A.materials, B.materials, threshold) &&
-			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
-			detail::almost_equal(A.curve_first_points, B.curve_first_points, threshold) &&
-			detail::almost_equal(A.curve_point_counts, B.curve_point_counts, threshold) &&
-			detail::almost_equal(A.curve_selection, B.curve_selection, threshold) &&
-			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
-			detail::almost_equal(A.curve_points, B.curve_points, threshold);
-	}
-private:
-	const uint64_t threshold;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-template<>
 class almost_equal<mesh::nurbs_curve_groups_t>
 {
 	typedef mesh::nurbs_curve_groups_t T;
@@ -574,8 +512,6 @@ const bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) con
 		detail::almost_equal(vertex_data, Other.vertex_data, Threshold) &&
 		detail::almost_equal(primitives, Other.primitives, Threshold) &&
 
-		detail::almost_equal(linear_curve_groups, Other.linear_curve_groups, Threshold) &&
-		detail::almost_equal(cubic_curve_groups, Other.cubic_curve_groups, Threshold) &&
 		detail::almost_equal(nurbs_curve_groups, Other.nurbs_curve_groups, Threshold) &&
 		detail::almost_equal(bilinear_patches, Other.bilinear_patches, Threshold) &&
 		detail::almost_equal(bicubic_patches, Other.bicubic_patches, Threshold) &&
@@ -601,70 +537,6 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 
 	// Convert primitives ...
 	primitives = RHS.primitives;
-
-	// Convert linear curves ...
-	if(RHS.linear_curve_groups.size())
-	{
-		linear_curve_groups_t& linear_curve_groups = this->linear_curve_groups.create();
-		indices_t& first_curves = linear_curve_groups.first_curves.create();
-		counts_t& curve_counts = linear_curve_groups.curve_counts.create();
-		bools_t& periodic_curves = linear_curve_groups.periodic_curves.create();
-		materials_t& materials = linear_curve_groups.materials.create();
-		indices_t& curve_first_points = linear_curve_groups.curve_first_points.create();
-		counts_t& curve_point_counts = linear_curve_groups.curve_point_counts.create();
-		selection_t& curve_selection = linear_curve_groups.curve_selection.create();
-		indices_t& curve_points = linear_curve_groups.curve_points.create();
-
-		for(legacy::mesh::linear_curve_groups_t::const_iterator group = RHS.linear_curve_groups.begin(); group != RHS.linear_curve_groups.end(); ++group)
-		{
-			first_curves.push_back(curve_first_points.size());
-			curve_counts.push_back((*group)->curves.size());
-			periodic_curves.push_back((*group)->wrap);
-			materials.push_back((*group)->material);
-
-			for(legacy::linear_curve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
-			{
-				curve_first_points.push_back(curve_points.size());
-				curve_point_counts.push_back((*curve)->control_points.size());
-				curve_selection.push_back((*curve)->selection_weight);
-
-				for(legacy::linear_curve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
-					curve_points.push_back(point_map[*point]);
-			}
-		}
-	}
-
-	// Convert cubic curves ...
-	if(RHS.cubic_curve_groups.size())
-	{
-		cubic_curve_groups_t& cubic_curve_groups = this->cubic_curve_groups.create();
-		indices_t& first_curves = cubic_curve_groups.first_curves.create();
-		counts_t& curve_counts = cubic_curve_groups.curve_counts.create();
-		bools_t& periodic_curves = cubic_curve_groups.periodic_curves.create();
-		materials_t& materials = cubic_curve_groups.materials.create();
-		indices_t& curve_first_points = cubic_curve_groups.curve_first_points.create();
-		counts_t& curve_point_counts = cubic_curve_groups.curve_point_counts.create();
-		selection_t& curve_selection = cubic_curve_groups.curve_selection.create();
-		indices_t& curve_points = cubic_curve_groups.curve_points.create();
-
-		for(legacy::mesh::cubic_curve_groups_t::const_iterator group = RHS.cubic_curve_groups.begin(); group != RHS.cubic_curve_groups.end(); ++group)
-		{
-			first_curves.push_back(curve_first_points.size());
-			curve_counts.push_back((*group)->curves.size());
-			periodic_curves.push_back((*group)->wrap);
-			materials.push_back((*group)->material);
-
-			for(legacy::cubic_curve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
-			{
-				curve_first_points.push_back(curve_points.size());
-				curve_point_counts.push_back((*curve)->control_points.size());
-				curve_selection.push_back((*curve)->selection_weight);
-
-				for(legacy::cubic_curve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
-					curve_points.push_back(point_map[*point]);
-			}
-		}
-	}
 
 	// Convert NURBS curves ...
 	if(RHS.nucurve_groups.size())
@@ -1028,40 +900,6 @@ std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::operator_type& 
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 {
 	Stream << detail::indentation << "mesh:\n" << push_indent;
-
-	if(RHS.linear_curve_groups)
-	{
-		Stream << detail::indentation << "linear_curve_groups:\n" << push_indent;
-
-		detail::print(Stream, "first_curves", RHS.linear_curve_groups->first_curves);
-		detail::print(Stream, "curve_counts", RHS.linear_curve_groups->curve_counts);
-		detail::print(Stream, "periodic_curves", RHS.linear_curve_groups->periodic_curves);
-		detail::print(Stream, "constant_data", RHS.linear_curve_groups->constant_data);
-		detail::print(Stream, "curve_first points", RHS.linear_curve_groups->curve_first_points);
-		detail::print(Stream, "curve_point counts", RHS.linear_curve_groups->curve_point_counts);
-		detail::print(Stream, "curve_selection", RHS.linear_curve_groups->curve_selection);
-		detail::print(Stream, "uniform_data", RHS.linear_curve_groups->uniform_data);
-		detail::print(Stream, "curve_points", RHS.linear_curve_groups->curve_points);
-		
-		Stream << pop_indent;
-	}
-
-	if(RHS.cubic_curve_groups)
-	{
-		Stream << detail::indentation << "cubic_curve_groups:\n" << push_indent;
-
-		detail::print(Stream, "first_curves", RHS.cubic_curve_groups->first_curves);
-		detail::print(Stream, "curve_counts", RHS.cubic_curve_groups->curve_counts);
-		detail::print(Stream, "periodic_curves", RHS.cubic_curve_groups->periodic_curves);
-		detail::print(Stream, "constant_data", RHS.cubic_curve_groups->constant_data);
-		detail::print(Stream, "curve_first_points", RHS.cubic_curve_groups->curve_first_points);
-		detail::print(Stream, "curve_point_counts", RHS.cubic_curve_groups->curve_point_counts);
-		detail::print(Stream, "curve_selection", RHS.cubic_curve_groups->curve_selection);
-		detail::print(Stream, "uniform_data", RHS.cubic_curve_groups->uniform_data);
-		detail::print(Stream, "curve_points", RHS.cubic_curve_groups->curve_points);
-		
-		Stream << pop_indent;
-	}
 
 	if(RHS.nurbs_curve_groups)
 	{

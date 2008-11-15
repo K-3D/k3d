@@ -3,21 +3,33 @@
 	<mesh_arrays>
 		<points>0 0 5 5 0 0 0 0 -5 5 0 5 10 0 0 5 0 -5 10 0 5 15 0 0 10 0 -5 15 0 5 20 0 0 15 0 -5 20 0 5 25 0 0 20 0 -5 0 -5 5 5 -5 0 0 -5 -5 5 -5 5 10 -5 0 5 -5 -5 10 -5 5 15 -5 0 10 -5 -5 15 -5 5 20 -5 0 15 -5 -5 20 -5 5 25 -5 0 20 -5 -5</points>
 		<point_selection>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</point_selection>
-		<linear_curve_groups>
-			<first_curves>0 5</first_curves>
-			<curve_counts>5 5</curve_counts>
-			<periodic_curves>0 0</periodic_curves>
-			<materials>0 0</materials>
-			<constant_data>
-				<array name="constantwidth" type="k3d::double_t">0.5 1.5</array>
-			</constant_data>
-			<curve_first_points>0 3 6 9 12 15 18 21 24 27</curve_first_points>
-			<curve_point_counts>3 3 3 3 3 3 3 3 3 3</curve_point_counts>
-			<curve_selection>0 0 0 0 0 0 0 0 0 0</curve_selection>
-			<uniform_data>
-				<array name="Cs" type="k3d::color">1 1 0 1 1 0.2 1 1 0.4 1 1 0.6 1 1 0.8 1 1 0 1 1 0.2 1 1 0.4 1 1 0.6 1 1 0.8</array>
-			</uniform_data>
-			<curve_points>0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29</curve_points>
-		</linear_curve_groups>
+		<vertex_data/>
+		<primitives>
+			<primitive type="linear_curve">
+				<topology>
+					<array name="curve_counts" type="k3d::uint_t">5 5</array>
+					<array name="curve_first_points" type="k3d::uint_t">0 3 6 9 12 15 18 21 24 27</array>
+					<array name="curve_point_counts" type="k3d::uint_t">3 3 3 3 3 3 3 3 3 3</array>
+					<array name="curve_points" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29
+						<metadata>
+							<pair name="k3d:mesh-point-indices">true</pair>
+						</metadata>
+					</array>
+					<array name="curve_selections" type="k3d::double_t">0 0 0 0 0 0 0 0 0 0</array>
+					<array name="first_curves" type="k3d::uint_t">0 5</array>
+					<array name="materials" type="k3d::imaterial*">0 0</array>
+					<array name="periodic_curves" type="k3d::bool_t">0 0</array>
+				</topology>
+				<attributes>
+					<arrays type="constant">
+						<array name="constantwidth" type="k3d::double_t">0.5 1.5</array>
+					</arrays>
+					<arrays type="uniform">
+						<array name="Cs" type="k3d::color">1 1 0 1 1 0.20000000000000001 1 1 0.40000000000000002 1 1 0.60000000000000009 1 1 0.80000000000000004 1 1 0 1 1 0.20000000000000001 1 1 0.40000000000000002 1 1 0.60000000000000009 1 1 0.80000000000000004</array>
+					</arrays>
+					<arrays type="varying"/>
+				</attributes>
+			</primitive>
+		</primitives>
 	</mesh_arrays>
 </k3dml>

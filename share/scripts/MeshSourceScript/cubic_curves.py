@@ -8,44 +8,36 @@ points = Output.create_points()
 point_selection = Output.create_point_selection()
 
 # Perform required one-time setup to store cubic curves in the mesh ...
-groups = Output.create_cubic_curve_groups()
-first_curves = groups.create_first_curves()
-curve_counts = groups.create_curve_counts()
-periodic_curves = groups.create_periodic_curves()
-materials = groups.create_materials()
-curve_first_points = groups.create_curve_first_points()
-curve_point_counts = groups.create_curve_point_counts()
-curve_selection = groups.create_curve_selection()
-curve_points = groups.create_curve_points()
+curves = k3d.cubic_curve.create(Output)
 
 # Create an (optional) array to store per-group curve widths
-constantwidth = groups.writable_constant_data().create("constantwidth", "k3d::double_t")
+constantwidth = curves.constant_data().create("constantwidth", "k3d::double_t")
 
 # Create an (optional) array to store per-curve curve colors
-Cs = groups.writable_uniform_data().create("Cs", "k3d::color")
+Cs = curves.uniform_data().create("Cs", "k3d::color")
 
 # Create two curve groups ...
 for i in range(2):
-	first_curves.append(len(curve_first_points))
-	curve_counts.append(5)
-	periodic_curves.append(False)
-	materials.append(None)
+	curves.first_curves().append(len(curves.curve_first_points()))
+	curves.curve_counts().append(5)
+	curves.periodic_curves().append(False)
+	curves.materials().append(None)
 
 	constantwidth.append(i + 0.5)
 
 	# Create five curves in each group ...
 	for j in range(5):
-		curve_first_points.append(len(curve_points))
-		curve_point_counts.append(7)
-		curve_selection.append(0.0)
+		curves.curve_first_points().append(len(curves.curve_points()))
+		curves.curve_point_counts().append(7)
+		curves.curve_selections().append(0.0)
 
-		curve_points.append(len(points) + 0)
-		curve_points.append(len(points) + 1)
-		curve_points.append(len(points) + 2)
-		curve_points.append(len(points) + 3)
-		curve_points.append(len(points) + 4)
-		curve_points.append(len(points) + 5)
-		curve_points.append(len(points) + 6)
+		curves.curve_points().append(len(points) + 0)
+		curves.curve_points().append(len(points) + 1)
+		curves.curve_points().append(len(points) + 2)
+		curves.curve_points().append(len(points) + 3)
+		curves.curve_points().append(len(points) + 4)
+		curves.curve_points().append(len(points) + 5)
+		curves.curve_points().append(len(points) + 6)
 
 		positions = [(0, 0, 5), (-5, 0, 5), (-5, 0, 0), (0, 0, 0), (5, 0, 0), (5, 0, -5), (0, 0, -5)]
 		for position in positions:

@@ -151,6 +151,8 @@ ADD_LIBRARY(k3dsdk-python-primitives SHARED
 	blobby_python.h
 	cone_python.cpp
 	cone_python.h
+	cubic_curve_python.cpp
+	cubic_curve_python.h
 	cylinder_python.cpp
 	cylinder_python.h
 	disk_python.cpp

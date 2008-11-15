@@ -25,6 +25,7 @@
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
+#include <k3dsdk/linear_curve.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
@@ -102,12 +103,12 @@ public:
 
 	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		Output = k3d::mesh();
-
 		const k3d::uint32_t edge_count = m_edge_count.pipeline_value();
 		const k3d::bool_t wrap = m_wrap.pipeline_value();
 		const k3d::double_t width = m_width.pipeline_value();
 		k3d::imaterial* const material = m_material.pipeline_value();
+
+		Output = k3d::mesh();
 
 		k3d::mesh::points_t& points = Output.points.create();
 		k3d::mesh::selection_t& point_selection = Output.point_selection.create();
@@ -115,29 +116,21 @@ public:
 		points.resize(edge_count);
 		point_selection.assign(edge_count, 0.0);
 
-		k3d::mesh::linear_curve_groups_t& linear_curve_groups = Output.linear_curve_groups.create();
-		k3d::mesh::indices_t& first_curves = linear_curve_groups.first_curves.create();
-		k3d::mesh::counts_t& curve_counts = linear_curve_groups.curve_counts.create();
-		k3d::mesh::bools_t& periodic_curves = linear_curve_groups.periodic_curves.create();
-		k3d::mesh::materials_t& materials = linear_curve_groups.materials.create();
-		k3d::mesh::indices_t& curve_first_points = linear_curve_groups.curve_first_points.create();
-		k3d::mesh::counts_t& curve_point_counts = linear_curve_groups.curve_point_counts.create();
-		k3d::mesh::selection_t& curve_selection = linear_curve_groups.curve_selection.create();
-		k3d::mesh::indices_t& curve_points = linear_curve_groups.curve_points.create();
-		k3d::mesh::doubles_t& widths = linear_curve_groups.constant_data.create<k3d::mesh::doubles_t>("width");
+		boost::scoped_ptr<k3d::linear_curve::primitive> primitive(k3d::linear_curve::create(Output));
+		k3d::mesh::doubles_t& widths = primitive->constant_data.create<k3d::mesh::doubles_t>("width");
 
-		first_curves.push_back(curve_first_points.size());
-		curve_counts.push_back(1);
-		periodic_curves.push_back(wrap);
-		materials.push_back(material);
+		primitive->first_curves.push_back(primitive->curve_first_points.size());
+		primitive->curve_counts.push_back(1);
+		primitive->periodic_curves.push_back(wrap);
+		primitive->materials.push_back(material);
 		widths.push_back(width);
 
-		curve_first_points.push_back(curve_points.size());
-		curve_point_counts.push_back(edge_count);
-		curve_selection.push_back(0.0);
+		primitive->curve_first_points.push_back(primitive->curve_points.size());
+		primitive->curve_point_counts.push_back(edge_count);
+		primitive->curve_selections.push_back(0.0);
 
 		for(k3d::uint32_t i = 0; i != edge_count; ++i)
-			curve_points.push_back(i);
+			primitive->curve_points.push_back(i);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
@@ -156,7 +149,7 @@ public:
 		const k3d::double_t zfreq = m_zfreq.pipeline_value();
 		const k3d::double_t zphase = m_zphase.pipeline_value();
 
-		k3d::mesh::points_t& points = const_cast<k3d::mesh::points_t&>(*Output.points);
+		k3d::mesh::points_t& points = Output.points.writable();
 
 		for(k3d::uint32_t i = 0; i != edge_count; ++i)
 		{

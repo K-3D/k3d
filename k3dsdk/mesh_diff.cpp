@@ -266,36 +266,6 @@ void print_diff(std::ostream& Stream, const std::string& Label, const k3d::mesh:
 
 void print_diff(std::ostream& Stream, const mesh& A, const mesh& B, const boost::uint64_t Threshold)
 {
-	detail::print_diff(Stream, "linear curve groups", A.linear_curve_groups, B.linear_curve_groups);
-	if(A.linear_curve_groups && B.linear_curve_groups)
-	{
-		detail::print_diff(Stream, "first curves", A.linear_curve_groups->first_curves, B.linear_curve_groups->first_curves, Threshold);
-		detail::print_diff(Stream, "curve counts", A.linear_curve_groups->curve_counts, B.linear_curve_groups->curve_counts, Threshold);
-		detail::print_diff(Stream, "periodic curves", A.linear_curve_groups->periodic_curves, B.linear_curve_groups->periodic_curves, Threshold);
-		detail::print_diff(Stream, "materials", A.linear_curve_groups->materials, B.linear_curve_groups->materials, Threshold);
-		detail::print_diff(Stream, "constant data", A.linear_curve_groups->constant_data, B.linear_curve_groups->constant_data, Threshold);
-		detail::print_diff(Stream, "curve first points", A.linear_curve_groups->curve_first_points, B.linear_curve_groups->curve_first_points, Threshold);
-		detail::print_diff(Stream, "curve point counts", A.linear_curve_groups->curve_point_counts, B.linear_curve_groups->curve_point_counts, Threshold);
-		detail::print_diff(Stream, "curve selection", A.linear_curve_groups->curve_selection, B.linear_curve_groups->curve_selection, Threshold);
-		detail::print_diff(Stream, "uniform data", A.linear_curve_groups->uniform_data, B.linear_curve_groups->uniform_data, Threshold);
-		detail::print_diff(Stream, "curve points", A.linear_curve_groups->curve_points, B.linear_curve_groups->curve_points, Threshold);
-	}
-
-	detail::print_diff(Stream, "cubic curve groups", A.cubic_curve_groups, B.cubic_curve_groups);
-	if(A.cubic_curve_groups && B.cubic_curve_groups)
-	{
-		detail::print_diff(Stream, "first curves", A.cubic_curve_groups->first_curves, B.cubic_curve_groups->first_curves, Threshold);
-		detail::print_diff(Stream, "curve counts", A.cubic_curve_groups->curve_counts, B.cubic_curve_groups->curve_counts, Threshold);
-		detail::print_diff(Stream, "periodic curves", A.cubic_curve_groups->periodic_curves, B.cubic_curve_groups->periodic_curves, Threshold);
-		detail::print_diff(Stream, "materials", A.cubic_curve_groups->materials, B.cubic_curve_groups->materials, Threshold);
-		detail::print_diff(Stream, "constant data", A.cubic_curve_groups->constant_data, B.cubic_curve_groups->constant_data, Threshold);
-		detail::print_diff(Stream, "curve first points", A.cubic_curve_groups->curve_first_points, B.cubic_curve_groups->curve_first_points, Threshold);
-		detail::print_diff(Stream, "curve point counts", A.cubic_curve_groups->curve_point_counts, B.cubic_curve_groups->curve_point_counts, Threshold);
-		detail::print_diff(Stream, "curve selection", A.cubic_curve_groups->curve_selection, B.cubic_curve_groups->curve_selection, Threshold);
-		detail::print_diff(Stream, "uniform data", A.cubic_curve_groups->uniform_data, B.cubic_curve_groups->uniform_data, Threshold);
-		detail::print_diff(Stream, "curve points", A.cubic_curve_groups->curve_points, B.cubic_curve_groups->curve_points, Threshold);
-	}
-
 	detail::print_diff(Stream, "nurbs curve groups", A.nurbs_curve_groups, B.nurbs_curve_groups);
 	if(A.nurbs_curve_groups && B.nurbs_curve_groups)
 	{

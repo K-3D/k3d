@@ -3,19 +3,7 @@
 	<mesh_arrays>
 		<points>-5 5 0 5 5 0 -5 1.6666666666666665 0 5 1.6666666666666665 0 -5 -1.6666666666666665 0 5 -1.6666666666666665 0 -5 -5 0 5 -5 0 -2.5 5 0 0 5 0 2.5 5 0 -2.5 1.6666666666666665 0 0 1.6666666666666665 0 2.5 1.6666666666666665 0 -2.5 -1.6666666666666665 0 0 -1.6666666666666665 0 2.5 -1.6666666666666665 0 -2.5 -5 0 0 -5 0 2.5 -5 0</points>
 		<point_selection>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</point_selection>
-		<nurbs_curve_groups>
-			<first_curves/>
-			<curve_counts/>
-			<materials/>
-			<curve_first_points/>
-			<curve_point_counts/>
-			<curve_orders/>
-			<curve_first_knots/>
-			<curve_selection/>
-			<curve_points/>
-			<curve_point_weights/>
-			<curve_knots/>
-		</nurbs_curve_groups>
+		<vertex_data/>
 		<nurbs_patches>
 			<patch_first_points>0</patch_first_points>
 			<patch_u_point_counts>5</patch_u_point_counts>
@@ -25,11 +13,14 @@
 			<patch_u_first_knots>0</patch_u_first_knots>
 			<patch_v_first_knots>0</patch_v_first_knots>
 			<patch_selection>1</patch_selection>
-			<patch_materials>2</patch_materials>
+			<patch_materials>0</patch_materials>
+			<constant_data/>
+			<uniform_data/>
 			<patch_points>0 8 9 10 1 2 11 12 13 3 4 14 15 16 5 6 17 18 19 7</patch_points>
 			<patch_point_weights>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</patch_point_weights>
 			<patch_u_knots>0 0 0 0 0 1 1 1 1 1</patch_u_knots>
 			<patch_v_knots>0 0 0 0 1 1 1 1</patch_v_knots>
+			<varying_data/>
 			<patch_trim_curve_loop_counts>0</patch_trim_curve_loop_counts>
 			<patch_first_trim_curve_loops>0</patch_first_trim_curve_loops>
 			<trim_points/>

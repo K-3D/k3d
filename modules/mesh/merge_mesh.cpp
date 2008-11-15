@@ -170,110 +170,6 @@ void merge_polyhedra(k3d::mesh& Output, const k3d::mesh& Input, bool SinglePolyh
   	face_varying_data_copier.push_back(edge);
 }
 
-void merge_linear_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
-{
-	if(!k3d::validate_linear_curve_groups(Input))
-		return;
-	k3d::mesh::linear_curve_groups_t& output_linear_curve_groups = create_if_not_exists(Output.linear_curve_groups);
-	k3d::mesh::indices_t& output_first_curves = create_if_not_exists(output_linear_curve_groups.first_curves);
-	k3d::mesh::counts_t& output_curve_counts = create_if_not_exists(output_linear_curve_groups.curve_counts);
-	k3d::mesh::bools_t& output_periodic_curves = create_if_not_exists(output_linear_curve_groups.periodic_curves);
-	k3d::mesh::materials_t& output_materials = create_if_not_exists(output_linear_curve_groups.materials);
-	k3d::mesh::indices_t& output_curve_first_points = create_if_not_exists(output_linear_curve_groups.curve_first_points);
-	k3d::mesh::counts_t& output_curve_point_counts = create_if_not_exists(output_linear_curve_groups.curve_point_counts);
-	k3d::mesh::selection_t& output_curve_selection = create_if_not_exists(output_linear_curve_groups.curve_selection);
-	k3d::mesh::indices_t& output_curve_points = create_if_not_exists(output_linear_curve_groups.curve_points);
-	
-	const k3d::mesh::linear_curve_groups_t& input_linear_curve_groups = *Input.linear_curve_groups;
-	const k3d::mesh::indices_t& input_first_curves = *input_linear_curve_groups.first_curves;
-	const k3d::mesh::counts_t& input_curve_counts = *input_linear_curve_groups.curve_counts;
-	const k3d::mesh::bools_t& input_periodic_curves = *input_linear_curve_groups.periodic_curves;
-	const k3d::mesh::materials_t& input_materials = *input_linear_curve_groups.materials;
-	const k3d::mesh::indices_t& input_curve_first_points = *input_linear_curve_groups.curve_first_points;
-	const k3d::mesh::counts_t& input_curve_point_counts = *input_linear_curve_groups.curve_point_counts;
-	const k3d::mesh::selection_t& input_curve_selection = *input_linear_curve_groups.curve_selection;
-	const k3d::mesh::indices_t& input_curve_points = *input_linear_curve_groups.curve_points;
-	
-	if (output_curve_points.empty()) // for the first appended mesh, we simply copy the named arrays
-  {
-  	output_linear_curve_groups.constant_data = input_linear_curve_groups.constant_data;
-  	output_linear_curve_groups.uniform_data = input_linear_curve_groups.uniform_data;
-  	output_linear_curve_groups.varying_data = input_linear_curve_groups.varying_data;
-  }
-	
-	extend_array(input_first_curves, output_first_curves, output_curve_first_points.size());
-	extend_array(input_curve_counts, output_curve_counts, 0);
-	output_periodic_curves.insert(output_periodic_curves.end(), input_periodic_curves.begin(), input_periodic_curves.end());
-	output_materials.insert(output_materials.end(), input_materials.begin(), input_materials.end());
-	extend_array(input_curve_first_points, output_curve_first_points, output_curve_points.size());
-	extend_array(input_curve_point_counts, output_curve_point_counts, 0);
-	extend_array(input_curve_selection, output_curve_selection, 0);
-	extend_array(input_curve_points, output_curve_points, Output.points->size());
-	
-	// Named arrays
-	k3d::attribute_array_copier constant_data_copier(input_linear_curve_groups.constant_data, output_linear_curve_groups.constant_data);
-	k3d::attribute_array_copier uniform_data_copier(input_linear_curve_groups.uniform_data, output_linear_curve_groups.uniform_data);
-	k3d::attribute_array_copier varying_data_copier(input_linear_curve_groups.varying_data, output_linear_curve_groups.varying_data);
-	for (k3d::uint_t curve_group = 0; curve_group != input_first_curves.size(); ++curve_group)
-  	constant_data_copier.push_back(curve_group);
-	for (k3d::uint_t curve = 0; curve != input_curve_first_points.size(); ++curve)
-		uniform_data_copier.push_back(curve);
-	for (k3d::uint_t point = 0; point != input_curve_points.size(); ++point)
-		varying_data_copier.push_back(point);
-}
-
-void merge_cubic_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
-{
-	if(!k3d::validate_cubic_curve_groups(Input))
-		return;
-	k3d::mesh::cubic_curve_groups_t& output_cubic_curve_groups = create_if_not_exists(Output.cubic_curve_groups);
-	k3d::mesh::indices_t& output_first_curves = create_if_not_exists(output_cubic_curve_groups.first_curves);
-	k3d::mesh::counts_t& output_curve_counts = create_if_not_exists(output_cubic_curve_groups.curve_counts);
-	k3d::mesh::bools_t& output_periodic_curves = create_if_not_exists(output_cubic_curve_groups.periodic_curves);
-	k3d::mesh::materials_t& output_materials = create_if_not_exists(output_cubic_curve_groups.materials);
-	k3d::mesh::indices_t& output_curve_first_points = create_if_not_exists(output_cubic_curve_groups.curve_first_points);
-	k3d::mesh::counts_t& output_curve_point_counts = create_if_not_exists(output_cubic_curve_groups.curve_point_counts);
-	k3d::mesh::selection_t& output_curve_selection = create_if_not_exists(output_cubic_curve_groups.curve_selection);
-	k3d::mesh::indices_t& output_curve_points = create_if_not_exists(output_cubic_curve_groups.curve_points);
-	
-	const k3d::mesh::cubic_curve_groups_t& input_cubic_curve_groups = *Input.cubic_curve_groups;
-	const k3d::mesh::indices_t& input_first_curves = *input_cubic_curve_groups.first_curves;
-	const k3d::mesh::counts_t& input_curve_counts = *input_cubic_curve_groups.curve_counts;
-	const k3d::mesh::bools_t& input_periodic_curves = *input_cubic_curve_groups.periodic_curves;
-	const k3d::mesh::materials_t& input_materials = *input_cubic_curve_groups.materials;
-	const k3d::mesh::indices_t& input_curve_first_points = *input_cubic_curve_groups.curve_first_points;
-	const k3d::mesh::counts_t& input_curve_point_counts = *input_cubic_curve_groups.curve_point_counts;
-	const k3d::mesh::selection_t& input_curve_selection = *input_cubic_curve_groups.curve_selection;
-	const k3d::mesh::indices_t& input_curve_points = *input_cubic_curve_groups.curve_points;
-	
-	if (output_curve_points.empty()) // for the first appended mesh, we simply copy the named arrays
-  {
-  	output_cubic_curve_groups.constant_data = input_cubic_curve_groups.constant_data;
-  	output_cubic_curve_groups.uniform_data = input_cubic_curve_groups.uniform_data;
-  	output_cubic_curve_groups.varying_data = input_cubic_curve_groups.varying_data;
-  }
-	
-	extend_array(input_first_curves, output_first_curves, output_curve_first_points.size());
-	extend_array(input_curve_counts, output_curve_counts, 0);
-	output_periodic_curves.insert(output_periodic_curves.end(), input_periodic_curves.begin(), input_periodic_curves.end());
-	output_materials.insert(output_materials.end(), input_materials.begin(), input_materials.end());
-	extend_array(input_curve_first_points, output_curve_first_points, output_curve_points.size());
-	extend_array(input_curve_point_counts, output_curve_point_counts, 0);
-	extend_array(input_curve_selection, output_curve_selection, 0);
-	extend_array(input_curve_points, output_curve_points, Output.points->size());
-	
-	// Named arrays
-	k3d::attribute_array_copier constant_data_copier(input_cubic_curve_groups.constant_data, output_cubic_curve_groups.constant_data);
-	k3d::attribute_array_copier uniform_data_copier(input_cubic_curve_groups.uniform_data, output_cubic_curve_groups.uniform_data);
-	k3d::attribute_array_copier varying_data_copier(input_cubic_curve_groups.varying_data, output_cubic_curve_groups.varying_data);
-	for (k3d::uint_t curve_group = 0; curve_group != input_first_curves.size(); ++curve_group)
-  	constant_data_copier.push_back(curve_group);
-	for (k3d::uint_t curve = 0; curve != input_curve_first_points.size(); ++curve)
-		uniform_data_copier.push_back(curve);
-	for (k3d::uint_t point = 0; point != input_curve_points.size(); ++point)
-		varying_data_copier.push_back(point);
-}
-
 void merge_nurbs_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if(!k3d::validate_nurbs_curve_groups(Input))
@@ -603,8 +499,6 @@ public:
 			detail::create_if_not_exists(Output.points);
 			
 			detail::merge_polyhedra(Output, mesh, m_same_polyhedron.pipeline_value());
-			detail::merge_linear_curve_groups(Output, mesh);
-			detail::merge_cubic_curve_groups(Output, mesh);
 			detail::merge_nurbs_curve_groups(Output, mesh);
 			detail::merge_bilinear_patches(Output, mesh);
 			detail::merge_bicubic_patches(Output, mesh);

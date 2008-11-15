@@ -46,103 +46,103 @@
 namespace module
 {
 
-	namespace nurbs
-	{
-		class skinned_surface :
+namespace nurbs
+{
+class skinned_surface :
 			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+{
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
+public:
+	skinned_surface(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+			base(Factory, Document),
+			m_along(init_owner(*this) + init_name("along") + init_label(_("Ordered along")) + init_description(_("Axis along which the curves are ordered")) + init_value(k3d::X) + init_enumeration(k3d::axis_values())),
+			m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curves")) + init_description(_("Delete the original curves")) + init_value(true))
+	{
+		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+		m_along.changed_signal().connect(make_update_mesh_slot());
+		m_delete_original.changed_signal().connect(make_update_mesh_slot());
+	}
+
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	{
+		Output = Input;
+	}
+
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	{
+		Output = Input;
+
+		if (!k3d::validate_nurbs_curve_groups(Output))
+			return;
+
+		merge_selection(m_mesh_selection.pipeline_value(), Output);
+
+		std::vector<k3d::uint_t> curves;
+
+		const k3d::uint_t group_begin = 0;
+		const k3d::uint_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
+		for (k3d::uint_t group = group_begin; group != group_end; ++group)
 		{
-			typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
-		public:
-			skinned_surface(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-				base(Factory, Document),
-				m_along(init_owner(*this) + init_name("along") + init_label(_("Ordered along")) + init_description(_("Axis along which the curves are ordered")) + init_value(k3d::X) + init_enumeration(k3d::axis_values())),
-				m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curves")) + init_description(_("Delete the original curves")) + init_value(true) )
+			const k3d::uint_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
+			const k3d::uint_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
+			for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
-				m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
-				m_along.changed_signal().connect(make_update_mesh_slot());
-				m_delete_original.changed_signal().connect(make_update_mesh_slot());
+				if ((*Output.nurbs_curve_groups->curve_selection)[curve] > 0.0)
+					curves.push_back(curve);
 			}
-
-			void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
-			{
-				Output = Input;
-			}
-
-			void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
-			{
-				Output = Input;
-
-				if(!k3d::validate_nurbs_curve_groups(Output))
-					return;
-
-				merge_selection(m_mesh_selection.pipeline_value(), Output);
-
-				std::vector<k3d::uint_t> curves;
-
-				const k3d::uint_t group_begin = 0;
-				const k3d::uint_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
-				for(k3d::uint_t group = group_begin; group != group_end; ++group)
-				{
-					const k3d::uint_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
-					const k3d::uint_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
-					for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
-					{
-						if((*Output.nurbs_curve_groups->curve_selection)[curve] > 0.0)
-                            curves.push_back(curve);
-					}
-				}
-
-				if( curves.size() < 2)
-				{
-					k3d::log() << error << nurbs_debug << "You need to select at least 2 curves!\n" << std::endl;
-					return;
-				}
-				else
-				{
-				    nurbs_curve_modifier mod(Output);
-				    if( curves.size() == 2 )
-                    {
-                        mod.ruled_surface(curves.at(0), curves.at(1));
-                    }
-                    else
-                    {
-                        mod.skinned_surface(curves, m_along.pipeline_value());
-                    }
-
-                    if(m_delete_original.pipeline_value())
-                    {
-                        for(int i = curves.size() - 1; i >= 0; i--)
-                            mod.delete_curve(curves[i]);
-                    }
-				}
-
-				assert_warning(k3d::validate_nurbs_curve_groups(Output));
-				assert_warning(k3d::validate_nurbs_patches(Output));
-			}
-
-			static k3d::iplugin_factory& get_factory()
-			{
-				static k3d::document_plugin_factory<skinned_surface, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
-				k3d::uuid(0xe6e5899a, 0x9c445204, 0xa7758297, 0x86cd38e4),
-					"NurbsSkinnedSurface",
-					_("Creates a NURBS surface stretched along all selected curves"),
-					"NURBS",
-					k3d::iplugin_factory::EXPERIMENTAL);
-
-				return factory;
-			}
-
-		private:
-            k3d_data(k3d::axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_along;
-            k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
-		};
-
-		//Create connect_curve factory
-		k3d::iplugin_factory& skinned_surface_factory()
-		{
-			return skinned_surface::get_factory();
 		}
 
-	}//namespace nurbs
+		if (curves.size() < 2)
+		{
+			k3d::log() << error << nurbs_debug << "You need to select at least 2 curves!\n" << std::endl;
+			return;
+		}
+		else
+		{
+			nurbs_curve_modifier mod(Output);
+			if (curves.size() == 2)
+			{
+				mod.ruled_surface(curves.at(0), curves.at(1));
+			}
+			else
+			{
+				mod.skinned_surface(curves, m_along.pipeline_value());
+			}
+
+			if (m_delete_original.pipeline_value())
+			{
+				for (int i = curves.size() - 1; i >= 0; i--)
+					mod.delete_curve(curves[i]);
+			}
+		}
+
+		assert_warning(k3d::validate_nurbs_curve_groups(Output));
+		assert_warning(k3d::validate_nurbs_patches(Output));
+	}
+
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::document_plugin_factory<skinned_surface, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_sink > > > factory(
+		  k3d::uuid(0xe6e5899a, 0x9c445204, 0xa7758297, 0x86cd38e4),
+		  "NurbsSkinnedSurface",
+		  _("Creates a NURBS surface stretched along all selected curves"),
+		  "NURBS",
+		  k3d::iplugin_factory::EXPERIMENTAL);
+
+		return factory;
+	}
+
+private:
+	k3d_data(k3d::axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_along;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
+};
+
+//Create connect_curve factory
+k3d::iplugin_factory& skinned_surface_factory()
+{
+	return skinned_surface::get_factory();
+}
+
+}//namespace nurbs
 } //namespace module
 

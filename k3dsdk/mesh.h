@@ -105,62 +105,6 @@ public:
 		primitive& create(const string_t& Type);
 	};
 
-	/// Defines storage for linear curve groups
-	class linear_curve_groups_t
-	{
-	public:
-		/// Stores the set of per-curve-group first points
-		pipeline_data<indices_t> first_curves;
-		/// Stores the set of per-curve-group curve counts
-		pipeline_data<counts_t> curve_counts;
-		/// Stores the set of per-curve-group periodic state
-		pipeline_data<bools_t> periodic_curves;
-		/// Stores the set of per-curve-group materials
-		pipeline_data<materials_t> materials;
-		/// Stores user-defined per-curve-group data (maps to RenderMan constant data)
-		attribute_arrays_t constant_data;
-		/// Stores the set of per-curve first points
-		pipeline_data<indices_t> curve_first_points;
-		/// Stores the set of per-curve point counts
-		pipeline_data<counts_t> curve_point_counts;
-		/// Stores per-curve selection state
-		pipeline_data<selection_t> curve_selection;
-		/// Stores user-defined per-curve data (maps to RenderMan uniform data)
-		attribute_arrays_t uniform_data;
-		/// Stores per-curve point lists
-		pipeline_data<indices_t> curve_points;
-		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
-		attribute_arrays_t varying_data;
-	};
-
-	/// Defines storage for cubic curve groups
-	class cubic_curve_groups_t
-	{
-	public:
-		/// Stores the set of per-curve-group first points
-		pipeline_data<indices_t> first_curves;
-		/// Stores the set of per-curve-group curve counts
-		pipeline_data<counts_t> curve_counts;
-		/// Stores the set of per-curve-group periodic state
-		pipeline_data<bools_t> periodic_curves;
-		/// Stores the set of per-curve-group materials
-		pipeline_data<materials_t> materials;
-		/// Stores user-defined per-curve-group data (maps to RenderMan constant data)
-		attribute_arrays_t constant_data;
-		/// Stores the set of per-curve first points
-		pipeline_data<indices_t> curve_first_points;
-		/// Stores the set of per-curve point counts
-		pipeline_data<counts_t> curve_point_counts;
-		/// Stores per-curve selection state
-		pipeline_data<selection_t> curve_selection;
-		/// Stores user-defined per-curve data (maps to RenderMan uniform data)
-		attribute_arrays_t uniform_data;
-		/// Stores per-curve point lists
-		pipeline_data<indices_t> curve_points;
-		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
-		attribute_arrays_t varying_data;
-	};
-
 	/// Defines storage for NURBS curve groups
 	class nurbs_curve_groups_t
 	{
@@ -352,10 +296,6 @@ public:
 	/// Stores mesh primitives
 	primitives_t primitives;
 
-	/// Stores linear curve groups
-	pipeline_data<linear_curve_groups_t> linear_curve_groups;
-	/// Stores cubic curve groups
-	pipeline_data<cubic_curve_groups_t> cubic_curve_groups;
 	/// Stores nurbs curve groups
 	pipeline_data<nurbs_curve_groups_t> nurbs_curve_groups;
 	/// Stores bilinear patches
