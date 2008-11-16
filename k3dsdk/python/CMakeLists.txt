@@ -147,6 +147,10 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk-python-a)
 TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk-python-b)
 
 ADD_LIBRARY(k3dsdk-python-primitives SHARED
+	bicubic_patch_python.cpp
+	bicubic_patch_python.h
+	bilinear_patch_python.cpp
+	bilinear_patch_python.h
 	blobby_python.cpp
 	blobby_python.h
 	cone_python.cpp

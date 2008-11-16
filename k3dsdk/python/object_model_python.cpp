@@ -24,6 +24,8 @@
 #include "angle_axis_python.h"
 #include "any_python.h"
 #include "attribute_arrays_python.h"
+#include "bicubic_patch_python.h"
+#include "bilinear_patch_python.h"
 #include "bitmap_python.h"
 #include "blobby_python.h"
 #include "bounding_box3_python.h"
@@ -458,6 +460,8 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_uuid();
 	define_class_vector2();
 	define_class_vector3();
+	define_namespace_bicubic_patch();
+	define_namespace_bilinear_patch();
 	define_namespace_blobby();
 	define_namespace_cone();
 	define_namespace_cubic_curve();

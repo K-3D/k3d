@@ -8,22 +8,19 @@ points = Output.create_points()
 point_selection = Output.create_point_selection()
 
 # Perform required one-time setup to store bicubic patches in the mesh ...
-bicubic_patches = Output.create_bicubic_patches()
-patch_selection = bicubic_patches.create_patch_selection()
-patch_materials = bicubic_patches.create_patch_materials()
-patch_points = bicubic_patches.create_patch_points()
+patches = k3d.bicubic_patch.create(Output)
 
 # Create an (optional) array to hold color values at the parametric
 # corners of each patch ...
-Cs = bicubic_patches.writable_varying_data().create("Cs", "k3d::color")
+Cs = patches.varying_data().create("Cs", "k3d::color")
 
 # We will create two identical bicubic patches ...
 for i in range(2):
-	patch_selection.append(0)
-	patch_materials.append(None)
+	patches.patch_selections().append(0)
+	patches.patch_materials().append(None)
 
 	for j in range(16):
-		patch_points.append(len(points) + j)
+		patches.patch_points().append(len(points) + j)
 
 	positions = [
 		(-5, -5, 0), (-2, -5, 2), (2, -5, -2), (5, -5, 0),

@@ -21,13 +21,16 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/mesh_painter_gl.h>
+#include <k3dsdk/bicubic_patch.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/selection.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -54,54 +57,108 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		if(!k3d::validate_bicubic_patches(Mesh))
-			return;
-
-		const k3d::mesh::selection_t& patch_selection = *Mesh.bicubic_patches->patch_selection;
-		const k3d::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
-		const k3d::mesh::points_t& points = *Mesh.points;
-
-		k3d::gl::store_attributes attributes;
-		glEnable(GL_LIGHTING);
-
-		const k3d::color color = k3d::color(0.8, 0.8, 0.8);
-		const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
-
-		glFrontFace(RenderState.inside_out ? GL_CW : GL_CCW);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
-
-		const unsigned int u_count = 5;
-		const unsigned int v_count = 5;
-		const GLint u_order = 4;
-		const GLint v_order = 4;
-		const GLint u_stride = 3;
-		const GLint v_stride = 4 * u_stride;
-
-		glEnable(GL_MAP2_VERTEX_3);
-		glEnable(GL_AUTO_NORMAL);
-		glMapGrid2d(u_count, 0.0, 1.0, v_count, 0.0, 1.0);
-
-		GLdouble gl_patch_points[4 * 4 * 3];
-		const size_t patch_begin = 0;
-		const size_t patch_end = patch_begin + (patch_points.size() / 16);
-		for(size_t patch = patch_begin; patch != patch_end; ++patch)
+		if(k3d::validate_bicubic_patches(Mesh))
 		{
-			k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, patch_selection[patch] ? selected_color : color);
+			const k3d::mesh::selection_t& patch_selection = *Mesh.bicubic_patches->patch_selection;
+			const k3d::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
+			const k3d::mesh::points_t& points = *Mesh.points;
 
-			GLdouble* gl_patch_point = gl_patch_points;
-			
-			const size_t point_begin = patch * 16;
-			const size_t point_end = point_begin + 16;
-			for(size_t point = point_begin; point != point_end; ++point)
+			k3d::gl::store_attributes attributes;
+			glEnable(GL_LIGHTING);
+
+			const k3d::color color = k3d::color(0.8, 0.8, 0.8);
+			const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
+
+			glFrontFace(RenderState.inside_out ? GL_CW : GL_CCW);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
+
+			const unsigned int u_count = 5;
+			const unsigned int v_count = 5;
+			const GLint u_order = 4;
+			const GLint v_order = 4;
+			const GLint u_stride = 3;
+			const GLint v_stride = 4 * u_stride;
+
+			glEnable(GL_MAP2_VERTEX_3);
+			glEnable(GL_AUTO_NORMAL);
+			glMapGrid2d(u_count, 0.0, 1.0, v_count, 0.0, 1.0);
+
+			GLdouble gl_patch_points[4 * 4 * 3];
+			const size_t patch_begin = 0;
+			const size_t patch_end = patch_begin + (patch_points.size() / 16);
+			for(size_t patch = patch_begin; patch != patch_end; ++patch)
 			{
-				*gl_patch_point++ = points[patch_points[point]][0];
-				*gl_patch_point++ = points[patch_points[point]][1];
-				*gl_patch_point++ = points[patch_points[point]][2];
-			}
+				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, patch_selection[patch] ? selected_color : color);
 
-			glMap2d(GL_MAP2_VERTEX_3, 0, 1, u_stride, u_order, 0, 1, v_stride, v_order, &gl_patch_points[0]);
-			glEvalMesh2(GL_FILL, 0, u_count, 0, v_count);
+				GLdouble* gl_patch_point = gl_patch_points;
+				
+				const size_t point_begin = patch * 16;
+				const size_t point_end = point_begin + 16;
+				for(size_t point = point_begin; point != point_end; ++point)
+				{
+					*gl_patch_point++ = points[patch_points[point]][0];
+					*gl_patch_point++ = points[patch_points[point]][1];
+					*gl_patch_point++ = points[patch_points[point]][2];
+				}
+
+				glMap2d(GL_MAP2_VERTEX_3, 0, 1, u_stride, u_order, 0, 1, v_stride, v_order, &gl_patch_points[0]);
+				glEvalMesh2(GL_FILL, 0, u_count, 0, v_count);
+			}
+		}
+
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::bicubic_patch::const_primitive> bicubic_patch(k3d::bicubic_patch::validate(**primitive));
+			if(!bicubic_patch)
+				continue;
+
+			const k3d::mesh::selection_t& patch_selections = bicubic_patch->patch_selections;
+			const k3d::mesh::indices_t& patch_points = bicubic_patch->patch_points;
+			const k3d::mesh::points_t& points = *Mesh.points;
+
+			k3d::gl::store_attributes attributes;
+			glEnable(GL_LIGHTING);
+
+			const k3d::color color = k3d::color(0.8, 0.8, 0.8);
+			const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
+
+			glFrontFace(RenderState.inside_out ? GL_CW : GL_CCW);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
+
+			const unsigned int u_count = 5;
+			const unsigned int v_count = 5;
+			const GLint u_order = 4;
+			const GLint v_order = 4;
+			const GLint u_stride = 3;
+			const GLint v_stride = 4 * u_stride;
+
+			glEnable(GL_MAP2_VERTEX_3);
+			glEnable(GL_AUTO_NORMAL);
+			glMapGrid2d(u_count, 0.0, 1.0, v_count, 0.0, 1.0);
+
+			GLdouble gl_patch_points[4 * 4 * 3];
+			const k3d::uint_t patch_begin = 0;
+			const k3d::uint_t patch_end = patch_begin + (patch_points.size() / 16);
+			for(k3d::uint_t patch = patch_begin; patch != patch_end; ++patch)
+			{
+				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, patch_selections[patch] ? selected_color : color);
+
+				GLdouble* gl_patch_point = gl_patch_points;
+				
+				const k3d::uint_t point_begin = patch * 16;
+				const k3d::uint_t point_end = point_begin + 16;
+				for(k3d::uint_t point = point_begin; point != point_end; ++point)
+				{
+					*gl_patch_point++ = points[patch_points[point]][0];
+					*gl_patch_point++ = points[patch_points[point]][1];
+					*gl_patch_point++ = points[patch_points[point]][2];
+				}
+
+				glMap2d(GL_MAP2_VERTEX_3, 0, 1, u_stride, u_order, 0, 1, v_stride, v_order, &gl_patch_points[0]);
+				glEvalMesh2(GL_FILL, 0, u_count, 0, v_count);
+			}
 		}
 	}
 	
@@ -110,51 +167,107 @@ public:
 		if(!SelectionState.select_bicubic_patches)
 			return;
 
-		if(!k3d::validate_bicubic_patches(Mesh))
-			return;
-
-		const k3d::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
-		const k3d::mesh::points_t& points = *Mesh.points;
-
-		k3d::gl::store_attributes attributes;
-
-		glFrontFace(RenderState.inside_out ? GL_CW : GL_CCW);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
-
-		const unsigned int u_count = 5;
-		const unsigned int v_count = 5;
-		const GLint u_order = 4;
-		const GLint v_order = 4;
-		const GLint u_stride = 3;
-		const GLint v_stride = 4 * u_stride;
-
-		glEnable(GL_MAP2_VERTEX_3);
-		glEnable(GL_AUTO_NORMAL);
-		glMapGrid2d(u_count, 0.0, 1.0, v_count, 0.0, 1.0);
-
-		GLdouble gl_patch_points[4 * 4 * 3];
-		const size_t patch_begin = 0;
-		const size_t patch_end = patch_begin + (patch_points.size() / 16);
-		for(size_t patch = patch_begin; patch != patch_end; ++patch)
+		if(k3d::validate_bicubic_patches(Mesh))
 		{
-			GLdouble* gl_patch_point = gl_patch_points;
-			
-			const size_t point_begin = patch * 16;
-			const size_t point_end = point_begin + 16;
-			for(size_t point = point_begin; point != point_end; ++point)
+			const k3d::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
+			const k3d::mesh::points_t& points = *Mesh.points;
+
+			k3d::gl::store_attributes attributes;
+
+			glFrontFace(RenderState.inside_out ? GL_CW : GL_CCW);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
+
+			const unsigned int u_count = 5;
+			const unsigned int v_count = 5;
+			const GLint u_order = 4;
+			const GLint v_order = 4;
+			const GLint u_stride = 3;
+			const GLint v_stride = 4 * u_stride;
+
+			glEnable(GL_MAP2_VERTEX_3);
+			glEnable(GL_AUTO_NORMAL);
+			glMapGrid2d(u_count, 0.0, 1.0, v_count, 0.0, 1.0);
+
+			GLdouble gl_patch_points[4 * 4 * 3];
+			const size_t patch_begin = 0;
+			const size_t patch_end = patch_begin + (patch_points.size() / 16);
+			for(size_t patch = patch_begin; patch != patch_end; ++patch)
 			{
-				*gl_patch_point++ = points[patch_points[point]][0];
-				*gl_patch_point++ = points[patch_points[point]][1];
-				*gl_patch_point++ = points[patch_points[point]][2];
+				GLdouble* gl_patch_point = gl_patch_points;
+				
+				const size_t point_begin = patch * 16;
+				const size_t point_end = point_begin + 16;
+				for(size_t point = point_begin; point != point_end; ++point)
+				{
+					*gl_patch_point++ = points[patch_points[point]][0];
+					*gl_patch_point++ = points[patch_points[point]][1];
+					*gl_patch_point++ = points[patch_points[point]][2];
+				}
+
+				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_BICUBIC_PATCH, patch);
+
+				glMap2d(GL_MAP2_VERTEX_3, 0, 1, u_stride, u_order, 0, 1, v_stride, v_order, &gl_patch_points[0]);
+				glEvalMesh2(GL_FILL, 0, u_count, 0, v_count);
+
+				k3d::gl::pop_selection_token(); // ABSOLUTE_BICUBIC_PATCH
+			}
+		}
+
+		k3d::uint_t primitive_index = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive, ++primitive_index)
+		{
+			boost::scoped_ptr<k3d::bicubic_patch::const_primitive> bicubic_patch(k3d::bicubic_patch::validate(**primitive));
+			if(!bicubic_patch)
+				continue;
+
+			const k3d::mesh::indices_t& patch_points = bicubic_patch->patch_points;
+			const k3d::mesh::points_t& points = *Mesh.points;
+
+			k3d::gl::store_attributes attributes;
+
+			glFrontFace(RenderState.inside_out ? GL_CW : GL_CCW);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
+
+			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
+
+			const unsigned int u_count = 5;
+			const unsigned int v_count = 5;
+			const GLint u_order = 4;
+			const GLint v_order = 4;
+			const GLint u_stride = 3;
+			const GLint v_stride = 4 * u_stride;
+
+			glEnable(GL_MAP2_VERTEX_3);
+			glEnable(GL_AUTO_NORMAL);
+			glMapGrid2d(u_count, 0.0, 1.0, v_count, 0.0, 1.0);
+
+			GLdouble gl_patch_points[4 * 4 * 3];
+			const size_t patch_begin = 0;
+			const size_t patch_end = patch_begin + (patch_points.size() / 16);
+			for(size_t patch = patch_begin; patch != patch_end; ++patch)
+			{
+				GLdouble* gl_patch_point = gl_patch_points;
+				
+				const size_t point_begin = patch * 16;
+				const size_t point_end = point_begin + 16;
+				for(size_t point = point_begin; point != point_end; ++point)
+				{
+					*gl_patch_point++ = points[patch_points[point]][0];
+					*gl_patch_point++ = points[patch_points[point]][1];
+					*gl_patch_point++ = points[patch_points[point]][2];
+				}
+
+				k3d::gl::push_selection_token(k3d::selection::UNIFORM, patch);
+
+				glMap2d(GL_MAP2_VERTEX_3, 0, 1, u_stride, u_order, 0, 1, v_stride, v_order, &gl_patch_points[0]);
+				glEvalMesh2(GL_FILL, 0, u_count, 0, v_count);
+
+				k3d::gl::pop_selection_token(); // UNIFORM
 			}
 
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_BICUBIC_PATCH, patch);
-
-			glMap2d(GL_MAP2_VERTEX_3, 0, 1, u_stride, u_order, 0, 1, v_stride, v_order, &gl_patch_points[0]);
-			glEvalMesh2(GL_FILL, 0, u_count, 0, v_count);
-
-			k3d::gl::pop_selection_token(); // ABSOLUTE_BICUBIC_PATCH
+			k3d::gl::pop_selection_token(); // PRIMITIVE
 		}
 	}
 	

@@ -3,13 +3,26 @@
 	<mesh_arrays>
 		<points>-5 0 5 5 0 5 0 -5 -5 0 5 -5 7 0 5 17 0 5 12 -5 -5 12 5 -5</points>
 		<point_selection>0 0 0 0 0 0 0 0</point_selection>
-		<bilinear_patches>
-			<patch_selection>0 0</patch_selection>
-			<patch_materials>0 0</patch_materials>
-			<patch_points>0 1 2 3 4 5 6 7</patch_points>
-			<varying_data>
-				<array name="Cs" type="k3d::color">1 0 0 0 1 0 0 0 1 1 1 1 1 0 0 0 1 0 0 0 1 1 1 1</array>
-			</varying_data>
-		</bilinear_patches>
+		<vertex_data/>
+		<primitives>
+			<primitive type="bilinear_patch">
+				<topology>
+					<array name="patch_materials" type="k3d::imaterial*">0 0</array>
+					<array name="patch_points" type="k3d::uint_t">0 1 2 3 4 5 6 7
+						<metadata>
+							<pair name="k3d:mesh-point-indices">true</pair>
+						</metadata>
+					</array>
+					<array name="patch_selections" type="k3d::double_t">0 0</array>
+				</topology>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="uniform"/>
+					<arrays type="varying">
+						<array name="Cs" type="k3d::color">1 0 0 0 1 0 0 0 1 1 1 1 1 0 0 0 1 0 0 0 1 1 1 1</array>
+					</arrays>
+				</attributes>
+			</primitive>
+		</primitives>
 	</mesh_arrays>
 </k3dml>

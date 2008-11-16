@@ -8,22 +8,19 @@ points = Output.create_points()
 point_selection = Output.create_point_selection()
 
 # Perform required one-time setup to store bilinear patches in the mesh ...
-bilinear_patches = Output.create_bilinear_patches()
-patch_selection = bilinear_patches.create_patch_selection()
-patch_materials = bilinear_patches.create_patch_materials()
-patch_points = bilinear_patches.create_patch_points()
+patches = k3d.bilinear_patch.create(Output)
 
 # Create an (optional) array to hold color values at the parametric
 # corners of each patch ...
-Cs = bilinear_patches.writable_varying_data().create("Cs", "k3d::color")
+Cs = patches.varying_data().create("Cs", "k3d::color")
 
 # We will create two identical bilinear patches
 for i in range(2):
-	patch_selection.append(0)
-	patch_materials.append(None)
+	patches.patch_selections().append(0)
+	patches.patch_materials().append(None)
 
 	for j in range(4):
-		patch_points.append(len(points) + j)
+		patches.patch_points().append(len(points) + j)
 
 	positions = [ (-5, 0, 5), (5, 0, 5), (0, -5, -5), (0, 5, -5) ]
 
