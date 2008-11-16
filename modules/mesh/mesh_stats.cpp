@@ -51,8 +51,6 @@ public:
 		m_face_count(init_owner(*this) + init_name("face_count") + init_label(_("Face count")) + init_description(_("Face count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_face_count))),
 		m_nucurve_group_count(init_owner(*this) + init_name("nucurve_group_count") + init_label(_("Nucurve group count")) + init_description(_("Nucurve group count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_nucurve_group_count))),
 		m_nucurve_count(init_owner(*this) + init_name("nucurve_count") + init_label(_("Nucurve count")) + init_description(_("Nucurve count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_nucurve_count))),
-		m_bilinear_patch_count(init_owner(*this) + init_name("bilinear_patch_count") + init_label(_("Bilinear patch count")) + init_description(_("Bilinear patch count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_bilinear_patch_count))),
-		m_bicubic_patch_count(init_owner(*this) + init_name("bicubic_patch_count") + init_label(_("Bicubic Patch Count")) + init_description(_("Bicubic Patch Count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_bicubic_patch_count))),
 		m_nupatch_count(init_owner(*this) + init_name("nupatch_count") + init_label(_("Nupatch Count")) + init_description(_("Nupatch Count")) + init_slot(sigc::mem_fun(*this, &mesh_stats::get_nupatch_count)))
 	{
 		m_input_mesh.changed_signal().connect(m_point_count.make_reset_slot());
@@ -61,8 +59,6 @@ public:
 		m_input_mesh.changed_signal().connect(m_face_count.make_reset_slot());
 		m_input_mesh.changed_signal().connect(m_nucurve_group_count.make_reset_slot());
 		m_input_mesh.changed_signal().connect(m_nucurve_count.make_reset_slot());
-		m_input_mesh.changed_signal().connect(m_bilinear_patch_count.make_reset_slot());
-		m_input_mesh.changed_signal().connect(m_bicubic_patch_count.make_reset_slot());
 		m_input_mesh.changed_signal().connect(m_nupatch_count.make_reset_slot());
 	}
 
@@ -141,28 +137,6 @@ public:
 		return 0;
 	}
 
-	k3d::int32_t get_bilinear_patch_count()
-	{
-		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
-		{
-			if(mesh->bilinear_patches && mesh->bilinear_patches->patch_selection)
-				return mesh->bilinear_patches->patch_selection->size();
-		}
-
-		return 0;
-	}
-
-	k3d::int32_t get_bicubic_patch_count()
-	{
-		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
-		{
-			if(mesh->bicubic_patches && mesh->bicubic_patches->patch_selection)
-				return mesh->bicubic_patches->patch_selection->size();
-		}
-
-		return 0;
-	}
-
 	k3d::int32_t get_nupatch_count()
 	{
 		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
@@ -195,8 +169,6 @@ private:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_face_count;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_nucurve_group_count;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_nucurve_count;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_bilinear_patch_count;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_bicubic_patch_count;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_nupatch_count;
 };
 

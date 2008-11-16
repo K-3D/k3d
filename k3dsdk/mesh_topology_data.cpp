@@ -275,12 +275,6 @@ void lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
 	if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_points)
 		detail::mark_used_points(*Mesh.nurbs_curve_groups->curve_points, UnusedPoints);
 
-	if(Mesh.bilinear_patches && Mesh.bilinear_patches->patch_points)
-		detail::mark_used_points(*Mesh.bilinear_patches->patch_points, UnusedPoints);
-
-	if(Mesh.bicubic_patches && Mesh.bicubic_patches->patch_points)
-		detail::mark_used_points(*Mesh.bicubic_patches->patch_points, UnusedPoints);
-
 	if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_points)
 		detail::mark_used_points(*Mesh.nurbs_patches->patch_points, UnusedPoints);
 
@@ -362,12 +356,6 @@ void delete_unused_points(mesh& Mesh)
 	// Update legacy mesh primitives so they use the correct indices ...
 	if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_points)
 		detail::remap_points(Mesh.nurbs_curve_groups.writable().curve_points.writable(), point_map);
-
-	if(Mesh.bilinear_patches && Mesh.bilinear_patches->patch_points)
-		detail::remap_points(Mesh.bilinear_patches.writable().patch_points.writable(), point_map);
-
-	if(Mesh.bicubic_patches && Mesh.bicubic_patches->patch_points)
-		detail::remap_points(Mesh.bicubic_patches.writable().patch_points.writable(), point_map);
 
 	if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_points)
 		detail::remap_points(Mesh.nurbs_patches.writable().patch_points.writable(), point_map);

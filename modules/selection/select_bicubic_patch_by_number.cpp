@@ -22,10 +22,13 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/bicubic_patch.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_modifier.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -44,24 +47,29 @@ class select_bicubic_patch_by_number :
 public:
 	select_bicubic_patch_by_number(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_index(init_owner(*this) + init_name("index") + init_label(_("Patch Index")) + init_description(_("Patch Index")) + init_value(0L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0)))
+		m_primitive(init_owner(*this) + init_name("primitive") + init_label(_("Primitive Number")) + init_description(_("Primitive Number.")) + init_value(0L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0))),
+		m_index(init_owner(*this) + init_name("index") + init_label(_("Patch Number")) + init_description(_("Patch Number")) + init_value(0L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0)))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+		m_primitive.changed_signal().connect(make_update_mesh_slot());
 		m_index.changed_signal().connect(make_update_mesh_slot());
 	}
 
 	void on_select_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		if(Output.bicubic_patches && Output.bicubic_patches->patch_selection)
-		{
-			k3d::mesh::bicubic_patches_t& bicubic_patches = Output.bicubic_patches.writable();
-			k3d::mesh::selection_t& patch_selection = bicubic_patches.patch_selection.writable();
-			std::fill(patch_selection.begin(), patch_selection.end(), 0.0);
+		const k3d::int32_t primitive = m_primitive.pipeline_value();
+		if(primitive >= Output.primitives.size())
+			return;
 
-			const unsigned long index = m_index.pipeline_value();
-			if(index < patch_selection.size())
-				patch_selection[index] = 1.0;
-		}
+		boost::scoped_ptr<k3d::bicubic_patch::primitive> patches(k3d::bicubic_patch::validate(Output.primitives[primitive].writable()));
+		if(!patches)
+			return;
+		
+		std::fill(patches->patch_selections.begin(), patches->patch_selections.end(), 0.0);
+
+		const k3d::int32_t index = m_index.pipeline_value();
+		if(index < patches->patch_selections.size())
+			patches->patch_selections[index] = 1.0;
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -79,6 +87,7 @@ public:
 	}
 
 private:
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_primitive;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_index;
 };
 

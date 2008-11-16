@@ -232,82 +232,6 @@ void merge_nurbs_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 		varying_data_copier.push_back(point);
 }
 
-void merge_bilinear_patches(k3d::mesh& Output, const k3d::mesh& Input)
-{
-	if(!k3d::validate_bilinear_patches(Input))
-		return;
-	k3d::mesh::bilinear_patches_t& output_patches = create_if_not_exists(Output.bilinear_patches);
-	k3d::mesh::selection_t& output_patch_selection = create_if_not_exists(output_patches.patch_selection);
-	k3d::mesh::materials_t& output_patch_materials = create_if_not_exists(output_patches.patch_materials);
-	k3d::mesh::indices_t& output_patch_points = create_if_not_exists(output_patches.patch_points);
-
-	const k3d::mesh::bilinear_patches_t& input_patches = *Input.bilinear_patches;
-	const k3d::mesh::selection_t& input_patch_selection = *input_patches.patch_selection;
-	const k3d::mesh::materials_t& input_patch_materials = *input_patches.patch_materials;
-	const k3d::mesh::indices_t& input_patch_points = *input_patches.patch_points;
-
-	if (output_patch_points.empty()) // for the first appended mesh, we simply copy the named arrays
-  {
-  	output_patches.constant_data = input_patches.constant_data;
-  	output_patches.uniform_data = input_patches.uniform_data;
-  	output_patches.varying_data = input_patches.varying_data;
-  }
-	
-	extend_array(input_patch_selection, output_patch_selection, 0);
-	output_patch_materials.insert(output_patch_materials.end(), input_patch_materials.begin(), input_patch_materials.end());
-	extend_array(input_patch_points, output_patch_points, Output.points->size());
-	
-	// Named arrays
-	k3d::attribute_array_copier constant_data_copier(input_patches.constant_data, output_patches.constant_data);
-	k3d::attribute_array_copier uniform_data_copier(input_patches.uniform_data, output_patches.uniform_data);
-	k3d::attribute_array_copier varying_data_copier(input_patches.varying_data, output_patches.varying_data);
-	for (k3d::uint_t patch = 0; patch != input_patch_selection.size(); ++patch)
-	{
-  	constant_data_copier.push_back(patch);
-  	uniform_data_copier.push_back(patch);
-	}
-	for (k3d::uint_t corner = 0; corner != input_patch_points.size(); ++corner)
-		varying_data_copier.push_back(corner);
-}
-
-void merge_bicubic_patches(k3d::mesh& Output, const k3d::mesh& Input)
-{
-	if(!k3d::validate_bicubic_patches(Input))
-		return;
-	k3d::mesh::bicubic_patches_t& output_patches = create_if_not_exists(Output.bicubic_patches);
-	k3d::mesh::selection_t& output_patch_selection = create_if_not_exists(output_patches.patch_selection);
-	k3d::mesh::materials_t& output_patch_materials = create_if_not_exists(output_patches.patch_materials);
-	k3d::mesh::indices_t& output_patch_points = create_if_not_exists(output_patches.patch_points);
-
-	const k3d::mesh::bicubic_patches_t& input_patches = *Input.bicubic_patches;
-	const k3d::mesh::selection_t& input_patch_selection = *input_patches.patch_selection;
-	const k3d::mesh::materials_t& input_patch_materials = *input_patches.patch_materials;
-	const k3d::mesh::indices_t& input_patch_points = *input_patches.patch_points;
-
-	if (output_patch_points.empty()) // for the first appended mesh, we simply copy the named arrays
-  {
-  	output_patches.constant_data = input_patches.constant_data;
-  	output_patches.uniform_data = input_patches.uniform_data;
-  	output_patches.varying_data = input_patches.varying_data;
-  }
-	
-	extend_array(input_patch_selection, output_patch_selection, 0);
-	output_patch_materials.insert(output_patch_materials.end(), input_patch_materials.begin(), input_patch_materials.end());
-	extend_array(input_patch_points, output_patch_points, Output.points->size());
-	
-	// Named arrays
-	k3d::attribute_array_copier constant_data_copier(input_patches.constant_data, output_patches.constant_data);
-	k3d::attribute_array_copier uniform_data_copier(input_patches.uniform_data, output_patches.uniform_data);
-	k3d::attribute_array_copier varying_data_copier(input_patches.varying_data, output_patches.varying_data);
-	for (k3d::uint_t patch = 0; patch != input_patch_selection.size(); ++patch)
-	{
-  	constant_data_copier.push_back(patch);
-  	uniform_data_copier.push_back(patch);
-	}
-	for (k3d::uint_t corner = 0; corner != input_patch_points.size(); ++corner)
-		varying_data_copier.push_back(corner);
-}
-
 void merge_nurbs_patches(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if (!k3d::validate_nurbs_patches(Input))
@@ -500,8 +424,6 @@ public:
 			
 			detail::merge_polyhedra(Output, mesh, m_same_polyhedron.pipeline_value());
 			detail::merge_nurbs_curve_groups(Output, mesh);
-			detail::merge_bilinear_patches(Output, mesh);
-			detail::merge_bicubic_patches(Output, mesh);
 			detail::merge_nurbs_patches(Output, mesh);
 
 			// Must be last to calculate correct offsets in other methods

@@ -631,52 +631,6 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		}
 	}
 
-	if(validate_bilinear_patches(Mesh))
-	{
-		const k3d::mesh::selection_t& patch_selection = *Mesh.bilinear_patches->patch_selection;
-		const k3d::mesh::materials_t& patch_materials = *Mesh.bilinear_patches->patch_materials;
-		const k3d::mesh::indices_t& patch_points = *Mesh.bilinear_patches->patch_points;
-
-		const uint_t patch_begin = 0;
-		const uint_t patch_end = patch_begin + (patch_points.size() / 4);
-		for(uint_t patch = patch_begin; patch != patch_end; ++patch)
-		{
-			legacy::bilinear_patch* const legacy_patch = new legacy::bilinear_patch();
-			bilinear_patches.push_back(legacy_patch);
-
-			legacy_patch->selection_weight = patch_selection[patch];
-			legacy_patch->material = patch_materials[patch];
-
-			const uint_t point_begin = patch * 4;
-			const uint_t point_end = point_begin + 4;
-			for(uint_t point = point_begin, legacy_point = 0; point != point_end; ++point, ++legacy_point)
-				legacy_patch->control_points[legacy_point] = points[patch_points[point]];
-		}
-	}
-
-	if(validate_bicubic_patches(Mesh))
-	{
-		const k3d::mesh::selection_t& patch_selection = *Mesh.bicubic_patches->patch_selection;
-		const k3d::mesh::materials_t& patch_materials = *Mesh.bicubic_patches->patch_materials;
-		const k3d::mesh::indices_t& patch_points = *Mesh.bicubic_patches->patch_points;
-
-		const uint_t patch_begin = 0;
-		const uint_t patch_end = patch_begin + (patch_points.size() / 16);
-		for(uint_t patch = patch_begin; patch != patch_end; ++patch)
-		{
-			legacy::bicubic_patch* const legacy_patch = new legacy::bicubic_patch();
-			bicubic_patches.push_back(legacy_patch);
-
-			legacy_patch->selection_weight = patch_selection[patch];
-			legacy_patch->material = patch_materials[patch];
-
-			const uint_t point_begin = patch * 16;
-			const uint_t point_end = point_begin + 16;
-			for(uint_t point = point_begin, legacy_point = 0; point != point_end; ++point, ++legacy_point)
-				legacy_patch->control_points[legacy_point] = points[patch_points[point]];
-		}
-	}
-
 	if(validate_nurbs_patches(Mesh))
 	{
 		const k3d::mesh::indices_t& patch_first_points = *Mesh.nurbs_patches->patch_first_points;

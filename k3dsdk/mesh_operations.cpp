@@ -243,10 +243,6 @@ const bool_t is_uninitialized(const mesh& Mesh)
 {
 	if (Mesh.points)
 		return false;
-	if (Mesh.bicubic_patches)
-		return false;
-	if (Mesh.bilinear_patches)
-		return false;
 	if (Mesh.nurbs_curve_groups)
 		return false;
 	if (Mesh.nurbs_patches)
@@ -266,8 +262,6 @@ void store_selection(const mesh& Mesh, mesh_selection& Selection)
 	Selection.edges.clear();
 	Selection.faces.clear();
 	Selection.nurbs_curves.clear();
-	Selection.bilinear_patches.clear();
-	Selection.bicubic_patches.clear();
 	Selection.nurbs_patches.clear();
 
 	detail::store_selection(Mesh.point_selection, Selection.points);
@@ -281,16 +275,6 @@ void store_selection(const mesh& Mesh, mesh_selection& Selection)
 	if(Mesh.nurbs_curve_groups)
 	{
 		detail::store_selection(Mesh.nurbs_curve_groups->curve_selection, Selection.nurbs_curves);
-	}
-
-	if(Mesh.bilinear_patches)
-	{
-		detail::store_selection(Mesh.bilinear_patches->patch_selection, Selection.bilinear_patches);
-	}
-
-	if(Mesh.bicubic_patches)
-	{
-		detail::store_selection(Mesh.bicubic_patches->patch_selection, Selection.bicubic_patches);
 	}
 
 	if(Mesh.nurbs_patches)
@@ -324,18 +308,6 @@ void merge_selection(const mesh_selection& MeshSelection, mesh& Mesh)
 	{
 		k3d::mesh::nurbs_curve_groups_t& nurbs_curve_groups = Mesh.nurbs_curve_groups.writable();
 		detail::merge_selection(MeshSelection.nurbs_curves, nurbs_curve_groups.curve_first_points, nurbs_curve_groups.curve_selection);
-	}
-
-	if(Mesh.bilinear_patches)
-	{
-		k3d::mesh::bilinear_patches_t& bilinear_patches = Mesh.bilinear_patches.writable();
-		detail::merge_selection(MeshSelection.bilinear_patches, bilinear_patches.patch_materials, bilinear_patches.patch_selection);
-	}
-
-	if(Mesh.bicubic_patches)
-	{
-		k3d::mesh::bicubic_patches_t& bicubic_patches = Mesh.bicubic_patches.writable();
-		detail::merge_selection(MeshSelection.bicubic_patches, bicubic_patches.patch_materials, bicubic_patches.patch_selection);
 	}
 
 	if(Mesh.nurbs_patches)
@@ -451,12 +423,6 @@ const bool_t validate(mesh& Mesh)
 	if(Mesh.nurbs_curve_groups && !validate_nurbs_curve_groups(Mesh))
 		result = false;
 
-	if(Mesh.bilinear_patches && !validate_bilinear_patches(Mesh))
-		result = false;
-
-	if(Mesh.bicubic_patches && !validate_bicubic_patches(Mesh))
-		result = false;
-
 	if(Mesh.nurbs_patches && !validate_nurbs_patches(Mesh))
 		result = false;
 
@@ -497,32 +463,6 @@ const bool_t validate_nurbs_curve_groups(const mesh& Mesh)
 	return_val_if_fail(Mesh.nurbs_curve_groups->curve_knots, false);
 	return_val_if_fail(Mesh.nurbs_curve_groups->curve_selection, false);
 	return_val_if_fail(Mesh.nurbs_curve_groups->materials, false);
-
-	return true;
-}
-
-const bool_t validate_bilinear_patches(const mesh& Mesh)
-{
-	if(!Mesh.bilinear_patches)
-		return false;
-
-	return_val_if_fail(validate_points(Mesh), false);
-	return_val_if_fail(Mesh.bilinear_patches->patch_points, false);
-	return_val_if_fail(Mesh.bilinear_patches->patch_selection, false);
-	return_val_if_fail(Mesh.bilinear_patches->patch_materials, false);
-
-	return true;
-}
-
-const bool_t validate_bicubic_patches(const mesh& Mesh)
-{
-	if(!Mesh.bicubic_patches)
-		return false;
-
-	return_val_if_fail(validate_points(Mesh), false);
-	return_val_if_fail(Mesh.bicubic_patches->patch_points, false);
-	return_val_if_fail(Mesh.bicubic_patches->patch_selection, false);
-	return_val_if_fail(Mesh.bicubic_patches->patch_materials, false);
 
 	return true;
 }

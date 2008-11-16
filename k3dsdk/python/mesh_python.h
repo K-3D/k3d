@@ -51,32 +51,20 @@ public:
 
 	void copy(const mesh& RHS);
 
-	boost::python::object bicubic_patches();
-	boost::python::object bilinear_patches();
-	boost::python::object blobbies();
-	boost::python::object create_bicubic_patches();
-	boost::python::object create_bilinear_patches();
-	boost::python::object create_blobbies();
 	boost::python::object create_nurbs_curve_groups();
 	boost::python::object create_nurbs_patches();
-	boost::python::object create_point_groups();
 	boost::python::object create_point_selection();
 	boost::python::object create_points();
 	boost::python::object create_polyhedra();
 	boost::python::object nurbs_curve_groups();
 	boost::python::object nurbs_patches();
 	boost::python::object vertex_data();
-	boost::python::object point_groups();
 	boost::python::object point_selection();
 	boost::python::object points();
 	boost::python::object polyhedra();
-	boost::python::object writable_bicubic_patches();
-	boost::python::object writable_bilinear_patches();
-	boost::python::object writable_blobbies();
 	boost::python::object writable_nurbs_curve_groups();
 	boost::python::object writable_nurbs_patches();
 	boost::python::object writable_vertex_data();
-	boost::python::object writable_point_groups();
 	boost::python::object writable_point_selection();
 	boost::python::object writable_points();
 	boost::python::object writable_polyhedra();

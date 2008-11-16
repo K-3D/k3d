@@ -611,6 +611,7 @@ struct convert_to_points
 		    }
 		}
 
+/*
 		// Convert bilinear patch selections to point selections ...
 		if(Mesh.bilinear_patches && Mesh.bilinear_patches->patch_selection && Mesh.bilinear_patches->patch_points)
 		{
@@ -648,6 +649,7 @@ struct convert_to_points
 				}
 			}
 		}
+*/
 
 		// Convert nurbs patch selections to point selections ...
 		if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_first_points && Mesh.nurbs_patches->patch_u_point_counts && Mesh.nurbs_patches->patch_v_point_counts && Mesh.nurbs_patches->patch_selection && Mesh.nurbs_patches->patch_points)
@@ -915,7 +917,8 @@ struct convert_to_faces
 				}
 			}
 		}
-		
+
+/*
 		// Convert point selections to bilinear patch selections ...
 		if(Mesh.point_selection && Mesh.bilinear_patches && Mesh.bilinear_patches->patch_selection && Mesh.bilinear_patches->patch_points)
 		{
@@ -967,6 +970,7 @@ struct convert_to_faces
 				}
 			}
 		}
+*/
 
 		// Convert point selections to nurbs patch selections ...
 		if(Mesh.point_selection && Mesh.nurbs_patches && Mesh.nurbs_patches->patch_first_points && Mesh.nurbs_patches->patch_u_point_counts && Mesh.nurbs_patches->patch_v_point_counts && Mesh.nurbs_patches->patch_selection && Mesh.nurbs_patches->patch_points)
@@ -1069,7 +1073,8 @@ struct keep_selection
 					Selection.nurbs_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
 			}
 		}
-		
+
+/*
 		if (Mesh.bilinear_patches && Mesh.bilinear_patches->patch_selection)
 		{
 			for (k3d::uint_t patch = 0; patch != Mesh.bilinear_patches->patch_selection->size(); ++patch)
@@ -1087,7 +1092,7 @@ struct keep_selection
 					Selection.bicubic_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
 			}
 		}
-		
+*/		
 		if (Mesh.nurbs_patches && Mesh.nurbs_patches->patch_selection)
 		{
 			for (k3d::uint_t patch = 0; patch != Mesh.nurbs_patches->patch_selection->size(); ++patch)

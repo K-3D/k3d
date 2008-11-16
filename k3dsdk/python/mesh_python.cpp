@@ -241,152 +241,6 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// const_bilinear_patches
-
-class const_bilinear_patches :
-	public instance_wrapper<const k3d::mesh::bilinear_patches_t>
-{
-	typedef instance_wrapper<const k3d::mesh::bilinear_patches_t> base;
-public:
-	const_bilinear_patches() :
-		base()
-	{
-	}
-
-	const_bilinear_patches(const k3d::mesh::bilinear_patches_t* Patches) :
-		base(Patches)
-	{
-	}
-
-	const_bilinear_patches(const k3d::mesh::bilinear_patches_t& Patches) :
-		base(Patches)
-	{
-	}
-
-	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
-	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object patch_points() { return wrap_const_array(wrapped().patch_points); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// bilinear_patches
-
-class bilinear_patches :
-	public instance_wrapper<k3d::mesh::bilinear_patches_t>
-{
-	typedef instance_wrapper<k3d::mesh::bilinear_patches_t> base;
-public:
-	bilinear_patches() :
-		base()
-	{
-	}
-
-	bilinear_patches(k3d::mesh::bilinear_patches_t* Patches) :
-		base(Patches)
-	{
-	}
-
-	bilinear_patches(k3d::mesh::bilinear_patches_t& Patches) :
-		base(Patches)
-	{
-	}
-
-	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
-	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object patch_points() { return wrap_const_array(wrapped().patch_points); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-
-	object writable_patch_selection() { return wrap_non_const_array(wrapped().patch_selection); }
-	object writable_patch_materials() { return wrap_non_const_array(wrapped().patch_materials); }
-	object writable_constant_data() { return wrap(wrapped().constant_data); }
-	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
-	object writable_patch_points() { return wrap_non_const_array(wrapped().patch_points); }
-	object writable_varying_data() { return wrap(wrapped().varying_data); }
-
-	object create_patch_selection() { return create_array(wrapped().patch_selection); }
-	object create_patch_materials() { return create_array(wrapped().patch_materials); }
-	object create_patch_points() { return create_array(wrapped().patch_points); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// const_bicubic_patches
-
-class const_bicubic_patches :
-	public instance_wrapper<const k3d::mesh::bicubic_patches_t>
-{
-	typedef instance_wrapper<const k3d::mesh::bicubic_patches_t> base;
-public:
-	const_bicubic_patches() :
-		base()
-	{
-	}
-
-	const_bicubic_patches(const k3d::mesh::bicubic_patches_t* Patches) :
-		base(Patches)
-	{
-	}
-
-	const_bicubic_patches(const k3d::mesh::bicubic_patches_t& Patches) :
-		base(Patches)
-	{
-	}
-
-	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
-	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object patch_points() { return wrap_const_array(wrapped().patch_points); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// bicubic_patches
-
-class bicubic_patches :
-	public instance_wrapper<k3d::mesh::bicubic_patches_t>
-{
-	typedef instance_wrapper<k3d::mesh::bicubic_patches_t> base;
-public:
-	bicubic_patches() :
-		base()
-	{
-	}
-
-	bicubic_patches(k3d::mesh::bicubic_patches_t* Patches) :
-		base(Patches)
-	{
-	}
-
-	bicubic_patches(k3d::mesh::bicubic_patches_t& Patches) :
-		base(Patches)
-	{
-	}
-
-	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
-	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object patch_points() { return wrap_const_array(wrapped().patch_points); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-
-	object writable_patch_selection() { return wrap_non_const_array(wrapped().patch_selection); }
-	object writable_patch_materials() { return wrap_non_const_array(wrapped().patch_materials); }
-	object writable_constant_data() { return wrap(wrapped().constant_data); }
-	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
-	object writable_patch_points() { return wrap_non_const_array(wrapped().patch_points); }
-	object writable_varying_data() { return wrap(wrapped().varying_data); }
-
-	object create_patch_selection() { return create_array(wrapped().patch_selection); }
-	object create_patch_materials() { return create_array(wrapped().patch_materials); }
-	object create_patch_points() { return create_array(wrapped().patch_points); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 // const_nurbs_patches
 
 class const_nurbs_patches :
@@ -684,10 +538,6 @@ void mesh::copy(const mesh& RHS)
 	wrapped() = RHS.wrapped();
 }
 
-object mesh::bicubic_patches() { return detail::wrap_const_object<detail::const_bicubic_patches>(wrapped().bicubic_patches); } 
-object mesh::bilinear_patches() { return detail::wrap_const_object<detail::const_bilinear_patches>(wrapped().bilinear_patches); } 
-object mesh::create_bicubic_patches() { return detail::create_object<detail::bicubic_patches, k3d::mesh::bicubic_patches_t>(wrapped().bicubic_patches); }
-object mesh::create_bilinear_patches() { return detail::create_object<detail::bilinear_patches, k3d::mesh::bilinear_patches_t>(wrapped().bilinear_patches); }
 object mesh::create_nurbs_curve_groups() { return detail::create_object<detail::nurbs_curve_groups, k3d::mesh::nurbs_curve_groups_t>(wrapped().nurbs_curve_groups); }
 object mesh::create_nurbs_patches() { return detail::create_object<detail::nurbs_patches, k3d::mesh::nurbs_patches_t>(wrapped().nurbs_patches); }
 object mesh::create_point_selection() { return detail::create_array(wrapped().point_selection); } 
@@ -699,8 +549,6 @@ object mesh::point_selection() { return detail::wrap_const_array(wrapped().point
 object mesh::points() { return detail::wrap_const_array(wrapped().points); } 
 object mesh::polyhedra() { return detail::wrap_const_object<detail::const_polyhedra>(wrapped().polyhedra); } 
 object mesh::vertex_data() { return wrap(wrapped().vertex_data); } 
-object mesh::writable_bicubic_patches() { return detail::wrap_non_const_object<detail::bicubic_patches>(wrapped().bicubic_patches); } 
-object mesh::writable_bilinear_patches() { return detail::wrap_non_const_object<detail::bilinear_patches>(wrapped().bilinear_patches); } 
 object mesh::writable_nurbs_curve_groups() { return detail::wrap_non_const_object<detail::nurbs_curve_groups>(wrapped().nurbs_curve_groups); } 
 object mesh::writable_nurbs_patches() { return detail::wrap_non_const_object<detail::nurbs_patches>(wrapped().nurbs_patches); } 
 object mesh::writable_point_selection() { return detail::wrap_non_const_array(wrapped().point_selection); } 
@@ -864,64 +712,6 @@ void define_namespace_mesh()
 		.def("create_curve_points", &detail::nurbs_curve_groups::create_curve_points)
 		.def("create_curve_point_weights", &detail::nurbs_curve_groups::create_curve_point_weights)
 		.def("create_curve_knots", &detail::nurbs_curve_groups::create_curve_knots);
-
-	class_<detail::const_bilinear_patches>("const_bilinear_patches",
-		"Stores an immutable (read-only) collection of bilinear patch primitives.")
-		.def("patch_selection", &detail::const_bilinear_patches::patch_selection)
-		.def("patch_materials", &detail::const_bilinear_patches::patch_materials)
-		.def("constant_data", &detail::const_bilinear_patches::constant_data)
-		.def("uniform_data", &detail::const_bilinear_patches::uniform_data)
-		.def("patch_points", &detail::const_bilinear_patches::patch_points)
-		.def("varying_data", &detail::const_bilinear_patches::varying_data);
-
-	class_<detail::bilinear_patches>("bilinear_patches",
-		"Stores a mutable (read-write) collection of bilinear patch primitives.")
-		.def("patch_selection", &detail::bilinear_patches::patch_selection)
-		.def("patch_materials", &detail::bilinear_patches::patch_materials)
-		.def("constant_data", &detail::bilinear_patches::constant_data)
-		.def("uniform_data", &detail::bilinear_patches::uniform_data)
-		.def("patch_points", &detail::bilinear_patches::patch_points)
-		.def("varying_data", &detail::bilinear_patches::varying_data)
-
-		.def("writable_patch_selection", &detail::bilinear_patches::writable_patch_selection)
-		.def("writable_patch_materials", &detail::bilinear_patches::writable_patch_materials)
-		.def("writable_constant_data", &detail::bilinear_patches::writable_constant_data)
-		.def("writable_uniform_data", &detail::bilinear_patches::writable_uniform_data)
-		.def("writable_patch_points", &detail::bilinear_patches::writable_patch_points)
-		.def("writable_varying_data", &detail::bilinear_patches::writable_varying_data)
-
-		.def("create_patch_selection", &detail::bilinear_patches::create_patch_selection)
-		.def("create_patch_materials", &detail::bilinear_patches::create_patch_materials)
-		.def("create_patch_points", &detail::bilinear_patches::create_patch_points);
-
-	class_<detail::const_bicubic_patches>("const_bicubic_patches",
-		"Stores an immutable (read-only) collection of bicubic patch primitives.")
-		.def("patch_selection", &detail::const_bicubic_patches::patch_selection)
-		.def("patch_materials", &detail::const_bicubic_patches::patch_materials)
-		.def("constant_data", &detail::const_bicubic_patches::constant_data)
-		.def("uniform_data", &detail::const_bicubic_patches::uniform_data)
-		.def("patch_points", &detail::const_bicubic_patches::patch_points)
-		.def("varying_data", &detail::const_bicubic_patches::varying_data);
-
-	class_<detail::bicubic_patches>("bicubic_patches",
-		"Stores a mutable (read-write) collection of bicubic patch primitives.")
-		.def("patch_selection", &detail::bicubic_patches::patch_selection)
-		.def("patch_materials", &detail::bicubic_patches::patch_materials)
-		.def("constant_data", &detail::bicubic_patches::constant_data)
-		.def("uniform_data", &detail::bicubic_patches::uniform_data)
-		.def("patch_points", &detail::bicubic_patches::patch_points)
-		.def("varying_data", &detail::bicubic_patches::varying_data)
-
-		.def("writable_patch_selection", &detail::bicubic_patches::writable_patch_selection)
-		.def("writable_patch_materials", &detail::bicubic_patches::writable_patch_materials)
-		.def("writable_constant_data", &detail::bicubic_patches::writable_constant_data)
-		.def("writable_uniform_data", &detail::bicubic_patches::writable_uniform_data)
-		.def("writable_patch_points", &detail::bicubic_patches::writable_patch_points)
-		.def("writable_varying_data", &detail::bicubic_patches::writable_varying_data)
-
-		.def("create_patch_selection", &detail::bicubic_patches::create_patch_selection)
-		.def("create_patch_materials", &detail::bicubic_patches::create_patch_materials)
-		.def("create_patch_points", &detail::bicubic_patches::create_patch_points);
 
 	class_<detail::const_nurbs_patches>("const_nurbs_patches",
 		"Stores an immutable (read-only) collection of NURBS patch primitives.")
@@ -1129,10 +919,6 @@ void define_namespace_mesh()
 
 	scope outer = class_<mesh>("mesh", 
 		"Stores a heterogeneous collection of geometric mesh primitives.", no_init)
-		.def("bicubic_patches", &mesh::bicubic_patches,
-			"Returns a L{const_bicubic_patches} object containing an immutable (read-only) collection of bicubic patch primitives, or None.")
-		.def("bilinear_patches", &mesh::bilinear_patches,
-			"Returna a L{const_bilinear_patches} object containing an immutable (read-only) collection of bilinear patch primitives, or None.")
 		.def("nurbs_curve_groups", &mesh::nurbs_curve_groups,
 			"Returns a L{const_nurbs_curve_groups} object containing an immutable (read-only) collection of NURBS curve primitives, or None.")
 		.def("nurbs_patches", &mesh::nurbs_patches,
@@ -1145,10 +931,6 @@ void define_namespace_mesh()
 			"Returns an immutable (read-only) L{const_point3_array} object containing the geometric coordinates of every vertex in the mesh, or None.")
 		.def("polyhedra", &mesh::polyhedra,
 			"Returns a L{const_polyhedra} object containing a collection of immutable (read-only) polyhedron primitives, or None.")
-		.def("writable_bicubic_patches", &mesh::writable_bicubic_patches,
-			"Returns a L{bicubic_patches} object containing a mutable (read-write) collection of bicubic patch primitives, or None.")
-		.def("writable_bilinear_patches", &mesh::writable_bilinear_patches,
-			"Returns a L{bilinear_patches} object containing a mutable (read-write) collection of bilinear patch primitives, or None.")
 		.def("writable_nurbs_curve_groups", &mesh::writable_nurbs_curve_groups,
 			"Returns a L{nurbs_curve_groups} object containing a mutable (read-write) collection of NURBS curve primitives, or None.")
 		.def("writable_nurbs_patches", &mesh::writable_nurbs_patches,
@@ -1163,10 +945,6 @@ void define_namespace_mesh()
 			"Returns a L{polyhedra} object containing a mutable (read-write) collection of polyhedron primitives, or None.")
 		.def("copy", &mesh::copy,
 			"Store a shallow copy of the given L{mesh}.")
-		.def("create_bicubic_patches", &mesh::create_bicubic_patches,
-			"Creates and returns a new L{bicubic_patches} object for storing bicubic patch primitives.")
-		.def("create_bilinear_patches", &mesh::create_bilinear_patches,
-			"Creates and returns a new L{bilinear_patches} object for storing bilinear patch primitives.")
 		.def("create_nurbs_curve_groups", &mesh::create_nurbs_curve_groups,
 			"Creates and returns a new L{nurbs_curve_groups} object for storing NURBS curve primitives.")
 		.def("create_nurbs_patches", &mesh::create_nurbs_patches,

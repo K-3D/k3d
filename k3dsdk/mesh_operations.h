@@ -69,10 +69,6 @@ const bool_t validate(mesh& Mesh);
 const bool_t validate_points(const mesh& Mesh);
 /// Returns true iff the given mesh contains valid nurbs curve group data (i.e. every array is defined).
 const bool_t validate_nurbs_curve_groups(const mesh& Mesh);
-/// Returns true iff the given mesh contains valid bilinear patch data (i.e. every array is defined).
-const bool_t validate_bilinear_patches(const mesh& Mesh);
-/// Returns true iff the given mesh contains valid bicubic patch data (i.e. every array is defined).
-const bool_t validate_bicubic_patches(const mesh& Mesh);
 /// Returns true iff the given mesh contains valid nurbs patch data (i.e. every array is defined).
 const bool_t validate_nurbs_patches(const mesh& Mesh);
 /// Returns true iff the given mesh contains valid polyhedron data (i.e. every array is defined).

@@ -1007,6 +1007,8 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	}
 	else if(tokens.count(k3d::selection::ABSOLUTE_BILINEAR_PATCH))
 	{
+		assert_not_implemented();
+/*
 		if(k3d::validate_bilinear_patches(*mesh))
 		{
 			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_BILINEAR_PATCH];
@@ -1026,9 +1028,12 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 					distance);
 			}
 		}
+*/
 	}
 	else if(tokens.count(k3d::selection::ABSOLUTE_BICUBIC_PATCH))
 	{
+		assert_not_implemented();
+/*
 		if(k3d::validate_bicubic_patches(*mesh))
 		{
 			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_BICUBIC_PATCH];
@@ -1048,6 +1053,7 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 					distance);
 			}
 		}
+*/
 	}
 	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_PATCH))
 	{

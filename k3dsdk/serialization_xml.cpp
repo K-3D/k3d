@@ -2136,28 +2136,6 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 		detail::save_array(container, element("curve_knots"), Mesh.nurbs_curve_groups->curve_knots, Context);
 	}
 
-	if(Mesh.bilinear_patches)
-	{
-		element& container = Container.append(element("bilinear_patches"));
-		detail::save_array(container, element("patch_selection"), Mesh.bilinear_patches->patch_selection, Context);
-		detail::save_array(container, element("patch_materials"), Mesh.bilinear_patches->patch_materials, Context);
-		detail::save_arrays(container, element("constant_data"), Mesh.bilinear_patches->constant_data, Context);
-		detail::save_arrays(container, element("uniform_data"), Mesh.bilinear_patches->uniform_data, Context);
-		detail::save_array(container, element("patch_points"), Mesh.bilinear_patches->patch_points, Context);
-		detail::save_arrays(container, element("varying_data"), Mesh.bilinear_patches->varying_data, Context);
-	}
-
-	if(Mesh.bicubic_patches)
-	{
-		element& container = Container.append(element("bicubic_patches"));
-		detail::save_array(container, element("patch_selection"), Mesh.bicubic_patches->patch_selection, Context);
-		detail::save_array(container, element("patch_materials"), Mesh.bicubic_patches->patch_materials, Context);
-		detail::save_arrays(container, element("constant_data"), Mesh.bicubic_patches->constant_data, Context);
-		detail::save_arrays(container, element("uniform_data"), Mesh.bicubic_patches->uniform_data, Context);
-		detail::save_array(container, element("patch_points"), Mesh.bicubic_patches->patch_points, Context);
-		detail::save_arrays(container, element("varying_data"), Mesh.bicubic_patches->varying_data, Context);
-	}
-
 	if(Mesh.nurbs_patches)
 	{
 		element& container = Container.append(element("nurbs_patches"));
@@ -2326,6 +2304,9 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "bilinear_patches"))
 	{
+		assert_not_implemented();
+
+/*
 		mesh::bilinear_patches_t* const bilinear_patches = &Mesh.bilinear_patches.create();
 		detail::load_array(*container, "patch_selection", bilinear_patches->patch_selection, Context);
 		detail::load_array(*container, "patch_materials", bilinear_patches->patch_materials, Context);
@@ -2333,10 +2314,14 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_arrays(*container, "uniform_data", bilinear_patches->uniform_data, Context);
 		detail::load_array(*container, "patch_points", bilinear_patches->patch_points, Context);
 		detail::load_arrays(*container, "varying_data", bilinear_patches->varying_data, Context);
+*/
 	}
 
 	if(element* const container = find_element(Container, "bicubic_patches"))
 	{
+		assert_not_implemented();
+
+/*
 		mesh::bicubic_patches_t* const bicubic_patches = &Mesh.bicubic_patches.create();
 		detail::load_array(*container, "patch_selection", bicubic_patches->patch_selection, Context);
 		detail::load_array(*container, "patch_materials", bicubic_patches->patch_materials, Context);
@@ -2344,6 +2329,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_arrays(*container, "uniform_data", bicubic_patches->uniform_data, Context);
 		detail::load_array(*container, "patch_points", bicubic_patches->patch_points, Context);
 		detail::load_arrays(*container, "varying_data", bicubic_patches->varying_data, Context);
+*/
 	}
 
 	if(element* const container = find_element(Container, "nurbs_patches"))

@@ -62,53 +62,6 @@ public:
 
 	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
-		if(k3d::validate_bilinear_patches(Mesh))
-		{
-			const k3d::mesh::materials_t& patch_materials = *Mesh.bilinear_patches->patch_materials;
-			const k3d::mesh::attribute_arrays_t& constant_data = Mesh.bilinear_patches->constant_data;
-			const k3d::mesh::attribute_arrays_t& uniform_data = Mesh.bilinear_patches->uniform_data;
-			const k3d::mesh::indices_t& patch_points = *Mesh.bilinear_patches->patch_points;
-			const k3d::mesh::points_t& points = *Mesh.points;
-			const k3d::mesh::attribute_arrays_t& varying_data = Mesh.bilinear_patches->varying_data;
-			const k3d::mesh::attribute_arrays_t& vertex_data = Mesh.vertex_data;
-
-			const size_t patch_begin = 0;
-			const size_t patch_end = patch_begin + (patch_points.size() / 4);
-			for(size_t patch = patch_begin; patch != patch_end; ++patch)
-			{
-				array_copier ri_constant_data;
-				ri_constant_data.add_arrays(constant_data);
-
-				array_copier ri_uniform_data;
-				ri_uniform_data.add_arrays(uniform_data);
-
-				array_copier ri_varying_data;
-				ri_varying_data.add_arrays(varying_data);
-
-				array_copier ri_vertex_data;
-				ri_vertex_data.add_arrays(vertex_data);
-				ri_vertex_data.add_array(k3d::ri::RI_P(), points);
-
-				const size_t patch_points_begin = 4 * patch;
-				const size_t patch_points_end = patch_points_begin + 4;
-				for(size_t patch_point = patch_points_begin; patch_point != patch_points_end; ++patch_point)
-					ri_vertex_data.push_back(patch_points[patch_point]);
-
-				ri_constant_data.push_back(patch);
-				ri_uniform_data.push_back(patch);
-				ri_varying_data.insert(4 * patch, 4 * (patch + 1));
-
-				k3d::ri::parameter_list ri_parameters;
-				ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
-				ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
-				ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
-				ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
-
-				k3d::ri::setup_material(patch_materials[patch], RenderState);
-				RenderState.stream.RiPatchV("bilinear", ri_parameters);
-			}
-		}
-
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
 			boost::scoped_ptr<k3d::bilinear_patch::const_primitive> bilinear_patch(k3d::bilinear_patch::validate(**primitive));

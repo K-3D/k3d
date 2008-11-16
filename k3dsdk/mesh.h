@@ -141,42 +141,6 @@ public:
 		pipeline_data<knots_t> curve_knots;
 	};
 
-	/// Defines storage for bilinear patches
-	class bilinear_patches_t
-	{
-	public:
-		/// Stores per-patch selection state
-		pipeline_data<selection_t> patch_selection;
-		/// Stores the set of per-patch materials
-		pipeline_data<materials_t> patch_materials;
-		/// Stores user-defined per-patch data (maps to RenderMan constant data)
-		attribute_arrays_t constant_data;
-		/// Stores user-defined per-patch data (maps to RenderMan uniform data)
-		attribute_arrays_t uniform_data;
-		/// Stores the set of per-patch points
-		pipeline_data<indices_t> patch_points;
-		/// Stores user-defined per-parametric-corner data (maps to RenderMan varying data)
-		attribute_arrays_t varying_data;
-	};
-	
-	/// Defines storage for bicubic patches
-	class bicubic_patches_t
-	{
-	public:
-		/// Stores per-patch selection state
-		pipeline_data<selection_t> patch_selection;
-		/// Stores the set of per-patch materials
-		pipeline_data<materials_t> patch_materials;
-		/// Stores user-defined per-patch data (maps to RenderMan constant data)
-		attribute_arrays_t constant_data;
-		/// Stores user-defined per-patch data (maps to RenderMan uniform data)
-		attribute_arrays_t uniform_data;
-		/// Stores the set of per-patch points
-		pipeline_data<indices_t> patch_points;
-		/// Stores the set of per-parametric-corner data (maps to RenderMan varying data)
-		attribute_arrays_t varying_data;
-	};
-	
 	/// Defines storage for NURBS patches
 	class nurbs_patches_t
 	{
@@ -300,10 +264,6 @@ public:
 
 	/// Stores nurbs curve groups
 	pipeline_data<nurbs_curve_groups_t> nurbs_curve_groups;
-	/// Stores bilinear patches
-	pipeline_data<bilinear_patches_t> bilinear_patches;
-	/// Stores bicubic patches
-	pipeline_data<bicubic_patches_t> bicubic_patches;
 	/// Stores nurbs patches
 	pipeline_data<nurbs_patches_t> nurbs_patches;
 	/// Stores polyhedra

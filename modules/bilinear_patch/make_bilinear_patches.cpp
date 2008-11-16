@@ -23,13 +23,14 @@
 */
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/bilinear_patch.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/mesh_modifier.h>
 
-#include <iterator>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -38,15 +39,15 @@ namespace bilinear_patch
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// make_bilinear_patches_implementation
+// make_bilinear_patches
 
-class make_bilinear_patches_implementation :
+class make_bilinear_patches:
 	public k3d::mesh_modifier<k3d::node >
 {
 	typedef k3d::mesh_modifier<k3d::node > base;
 
 public:
-	make_bilinear_patches_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	make_bilinear_patches(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
@@ -67,19 +68,16 @@ public:
 		Output.point_selection = Input.point_selection;
 		Output.vertex_data = Input.vertex_data;
 
-		k3d::mesh::bilinear_patches_t& bilinear_patches = Output.bilinear_patches.create();
-		k3d::mesh::selection_t& patch_selection = bilinear_patches.patch_selection.create();
-		k3d::mesh::materials_t& patch_materials = bilinear_patches.patch_materials.create();
-		k3d::mesh::indices_t& patch_points = bilinear_patches.patch_points.create();
+		boost::scoped_ptr<k3d::bilinear_patch::primitive> primitive(k3d::bilinear_patch::create(Output));
 
-		const size_t face_begin = 0;
-		const size_t face_end = face_begin + face_first_loops.size();
-		for(size_t face = face_begin; face != face_end; ++face)
+		const k3d::uint_t face_begin = 0;
+		const k3d::uint_t face_end = face_begin + face_first_loops.size();
+		for(k3d::uint_t face = face_begin; face != face_end; ++face)
 		{
-			std::vector<size_t> edges;
+			std::vector<k3d::uint_t> edges;
 
-			const size_t first_edge = loop_first_edges[face_first_loops[face]];
-			for(size_t edge = first_edge; ;)
+			const k3d::uint_t first_edge = loop_first_edges[face_first_loops[face]];
+			for(k3d::uint_t edge = first_edge; ;)
 			{
 				edges.push_back(edge);
 
@@ -91,13 +89,13 @@ public:
 			if(edges.size() != 4)
 				continue;
 
-			patch_selection.push_back(face_selection[face]);
-			patch_materials.push_back(face_materials[face]);
+			primitive->patch_selections.push_back(face_selection[face]);
+			primitive->patch_materials.push_back(face_materials[face]);
 
-			patch_points.push_back(edge_points[edges[0]]);
-			patch_points.push_back(edge_points[edges[1]]);
-			patch_points.push_back(edge_points[edges[3]]); // Bilinear patch control points *aren't* in clockwise order!
-			patch_points.push_back(edge_points[edges[2]]);
+			primitive->patch_points.push_back(edge_points[edges[0]]);
+			primitive->patch_points.push_back(edge_points[edges[1]]);
+			primitive->patch_points.push_back(edge_points[edges[3]]); // Bilinear patch control points *aren't* in clockwise order!
+			primitive->patch_points.push_back(edge_points[edges[2]]);
 		}
 	}
 
@@ -107,7 +105,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<make_bilinear_patches_implementation,
+		static k3d::document_plugin_factory<make_bilinear_patches,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink> > > factory(
 				k3d::uuid(0xe99f3672, 0x6e85457d, 0x9ce1f9dc, 0x6bb71691),
@@ -125,7 +123,7 @@ public:
 
 k3d::iplugin_factory& make_bilinear_patches_factory()
 {
-	return make_bilinear_patches_implementation::get_factory();
+	return make_bilinear_patches::get_factory();
 }
 
 } // namespace bilinear_patch

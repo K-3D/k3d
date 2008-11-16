@@ -283,28 +283,6 @@ void print_diff(std::ostream& Stream, const mesh& A, const mesh& B, const boost:
 		detail::print_diff(Stream, "curve knots", A.nurbs_curve_groups->curve_knots, B.nurbs_curve_groups->curve_knots, Threshold);
 	}
 
-	detail::print_diff(Stream, "bilinear patches", A.bilinear_patches, B.bilinear_patches);
-	if(A.bilinear_patches && B.bilinear_patches)
-	{
-		detail::print_diff(Stream, "patch selection", A.bilinear_patches->patch_selection, B.bilinear_patches->patch_selection, Threshold);
-		detail::print_diff(Stream, "patch materials", A.bilinear_patches->patch_materials, B.bilinear_patches->patch_materials, Threshold);
-		detail::print_diff(Stream, "constant data", A.bilinear_patches->constant_data, B.bilinear_patches->constant_data, Threshold);
-		detail::print_diff(Stream, "uniform data", A.bilinear_patches->uniform_data, B.bilinear_patches->uniform_data, Threshold);
-		detail::print_diff(Stream, "patch points", A.bilinear_patches->patch_points, B.bilinear_patches->patch_points, Threshold);
-		detail::print_diff(Stream, "varying data", A.bilinear_patches->varying_data, B.bilinear_patches->varying_data, Threshold);
-	}
-
-	detail::print_diff(Stream, "bicubic patches", A.bicubic_patches, B.bicubic_patches);
-	if(A.bicubic_patches && B.bicubic_patches)
-	{
-		detail::print_diff(Stream, "patch selection", A.bicubic_patches->patch_selection, B.bicubic_patches->patch_selection, Threshold);
-		detail::print_diff(Stream, "patch materials", A.bicubic_patches->patch_materials, B.bicubic_patches->patch_materials, Threshold);
-		detail::print_diff(Stream, "constant data", A.bicubic_patches->constant_data, B.bicubic_patches->constant_data, Threshold);
-		detail::print_diff(Stream, "uniform data", A.bicubic_patches->uniform_data, B.bicubic_patches->uniform_data, Threshold);
-		detail::print_diff(Stream, "patch points", A.bicubic_patches->patch_points, B.bicubic_patches->patch_points, Threshold);
-		detail::print_diff(Stream, "varying data", A.bicubic_patches->varying_data, B.bicubic_patches->varying_data, Threshold);
-	}
-
 	detail::print_diff(Stream, "nurbs patches", A.nurbs_patches, B.nurbs_patches);
 	if(A.nurbs_patches && B.nurbs_patches)
 	{

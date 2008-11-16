@@ -352,60 +352,6 @@ private:
 // almost_equal
 
 template<>
-class almost_equal<mesh::bilinear_patches_t>
-{
-	typedef mesh::bilinear_patches_t T;
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline const bool_t operator()(const T& A, const T& B)
-	{
-		return
-			detail::almost_equal(A.patch_selection, B.patch_selection, threshold) &&
-			detail::almost_equal(A.patch_materials, B.patch_materials, threshold) &&
-			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
-			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
-			detail::almost_equal(A.patch_points, B.patch_points, threshold) &&
-			detail::almost_equal(A.varying_data, B.varying_data, threshold);
-	}
-private:
-	const uint64_t threshold;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-template<>
-class almost_equal<mesh::bicubic_patches_t>
-{
-	typedef mesh::bicubic_patches_t T;
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline const bool_t operator()(const T& A, const T& B)
-	{
-		return
-			detail::almost_equal(A.patch_selection, B.patch_selection, threshold) &&
-			detail::almost_equal(A.patch_materials, B.patch_materials, threshold) &&
-			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
-			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
-			detail::almost_equal(A.patch_points, B.patch_points, threshold) &&
-			detail::almost_equal(A.varying_data, B.varying_data, threshold);
-	}
-private:
-	const uint64_t threshold;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-template<>
 class almost_equal<mesh::nurbs_patches_t>
 {
 	typedef mesh::nurbs_patches_t T;
@@ -513,8 +459,6 @@ const bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) con
 		detail::almost_equal(primitives, Other.primitives, Threshold) &&
 
 		detail::almost_equal(nurbs_curve_groups, Other.nurbs_curve_groups, Threshold) &&
-		detail::almost_equal(bilinear_patches, Other.bilinear_patches, Threshold) &&
-		detail::almost_equal(bicubic_patches, Other.bicubic_patches, Threshold) &&
 		detail::almost_equal(nurbs_patches, Other.nurbs_patches, Threshold) &&
 		detail::almost_equal(polyhedra, Other.polyhedra, Threshold);
 }
@@ -576,42 +520,6 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 
 				curve_knots.insert(curve_knots.end(), (*curve)->knots.begin(), (*curve)->knots.end());
 			}
-		}
-	}
-
-	// Convert bilinear patches ...
-	if(RHS.bilinear_patches.size())
-	{
-		bilinear_patches_t& bilinear_patches = this->bilinear_patches.create();
-		selection_t& patch_selection = bilinear_patches.patch_selection.create();
-		materials_t& patch_materials = bilinear_patches.patch_materials.create();
-		indices_t& patch_points = bilinear_patches.patch_points.create();
-
-		for(legacy::mesh::bilinear_patches_t::const_iterator patch = RHS.bilinear_patches.begin(); patch != RHS.bilinear_patches.end(); ++patch)
-		{
-			patch_selection.push_back((*patch)->selection_weight);
-			patch_materials.push_back((*patch)->material);
-
-			for(legacy::bilinear_patch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
-				patch_points.push_back(point_map[*point]);
-		}
-	}
-
-	// Convert bicubic patches ...
-	if(RHS.bicubic_patches.size())
-	{
-		bicubic_patches_t& bicubic_patches = this->bicubic_patches.create();
-		selection_t& patch_selection = bicubic_patches.patch_selection.create();
-		materials_t& patch_materials = bicubic_patches.patch_materials.create();
-		indices_t& patch_points = bicubic_patches.patch_points.create();
-
-		for(legacy::mesh::bicubic_patches_t::const_iterator patch = RHS.bicubic_patches.begin(); patch != RHS.bicubic_patches.end(); ++patch)
-		{
-			patch_selection.push_back((*patch)->selection_weight);
-			patch_materials.push_back((*patch)->material);
-
-			for(legacy::bicubic_patch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
-				patch_points.push_back(point_map[*point]);
 		}
 	}
 
@@ -916,32 +824,6 @@ std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 		detail::print(Stream, "curve_points", RHS.nurbs_curve_groups->curve_points);
 		detail::print(Stream, "curve_point_weights", RHS.nurbs_curve_groups->curve_point_weights);
 		detail::print(Stream, "curve_knots", RHS.nurbs_curve_groups->curve_knots);
-		
-		Stream << pop_indent;
-	}
-
-	if(RHS.bilinear_patches)
-	{
-		Stream << detail::indentation << "bilinear_patches:\n" << push_indent;
-
-		detail::print(Stream, "patch_selection", RHS.bilinear_patches->patch_selection);
-		detail::print(Stream, "constant_data", RHS.bilinear_patches->constant_data);
-		detail::print(Stream, "uniform_data", RHS.bilinear_patches->uniform_data);
-		detail::print(Stream, "patch_points", RHS.bilinear_patches->patch_points);
-		detail::print(Stream, "varying_data", RHS.bilinear_patches->varying_data);
-		
-		Stream << pop_indent;
-	}
-
-	if(RHS.bicubic_patches)
-	{
-		Stream << detail::indentation << "bicubic_patches:\n" << push_indent;
-
-		detail::print(Stream, "patch_selection", RHS.bicubic_patches->patch_selection);
-		detail::print(Stream, "constant_data", RHS.bicubic_patches->constant_data);
-		detail::print(Stream, "uniform_data", RHS.bicubic_patches->uniform_data);
-		detail::print(Stream, "patch_points", RHS.bicubic_patches->patch_points);
-		detail::print(Stream, "varying_data", RHS.bicubic_patches->varying_data);
 		
 		Stream << pop_indent;
 	}
