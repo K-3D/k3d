@@ -65,6 +65,8 @@ public:
 	typedef typed_array<color> colors_t;
 	/// Defines storage for a generic collection of floating-point values
 	typedef typed_array<double_t> doubles_t;
+	/// Defines storage for a generic collection of 4x4 matrices
+	typedef typed_array<matrix4> matrices_t;
 	/// Defines storage for a generic collection of 3D normals
 	typedef typed_array<normal3> normals_t;
 	/// Defines storage for a generic collection of 2D points

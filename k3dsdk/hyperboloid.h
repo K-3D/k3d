@@ -33,23 +33,23 @@ class const_primitive
 {
 public:
 	const_primitive(
-		const typed_array<matrix4>& Matrices,
-		const typed_array<imaterial*>& Materials,
-		const typed_array<point3>& StartPoints,
-		const typed_array<point3>& EndPoints,
-		const typed_array<double_t>& SweepAngles,
-		const attribute_arrays& ConstantData,
-		const attribute_arrays& UniformData,
-		const attribute_arrays& VaryingData);
+		const mesh::matrices_t& Matrices,
+		const mesh::materials_t& Materials,
+		const mesh::points_t& StartPoints,
+		const mesh::points_t& EndPoints,
+		const mesh::doubles_t& SweepAngles,
+		const mesh::attribute_arrays_t& ConstantData,
+		const mesh::attribute_arrays_t& UniformData,
+		const mesh::attribute_arrays_t& VaryingData);
 
-	const typed_array<matrix4>& matrices;
-	const typed_array<imaterial*>& materials;
-	const typed_array<point3>& start_points;
-	const typed_array<point3>& end_points;
-	const typed_array<double_t>& sweep_angles;
-	const attribute_arrays& constant_data;
-	const attribute_arrays& uniform_data;
-	const attribute_arrays& varying_data;
+	const mesh::matrices_t& matrices;
+	const mesh::materials_t& materials;
+	const mesh::points_t& start_points;
+	const mesh::points_t& end_points;
+	const mesh::doubles_t& sweep_angles;
+	const mesh::attribute_arrays_t& constant_data;
+	const mesh::attribute_arrays_t& uniform_data;
+	const mesh::attribute_arrays_t& varying_data;
 };
 
 /// Gathers the member arrays of a hyperboloid primitive into a convenient package
@@ -57,23 +57,23 @@ class primitive
 {
 public:
 	primitive(
-		typed_array<matrix4>& Matrices,
-		typed_array<imaterial*>& Materials,
-		typed_array<point3>& StartPoints,
-		typed_array<point3>& EndPoints,
-		typed_array<double_t>& SweepAngles,
-		attribute_arrays& ConstantData,
-		attribute_arrays& UniformData,
-		attribute_arrays& VaryingData);
+		mesh::matrices_t& Matrices,
+		mesh::materials_t& Materials,
+		mesh::points_t& StartPoints,
+		mesh::points_t& EndPoints,
+		mesh::doubles_t& SweepAngles,
+		mesh::attribute_arrays_t& ConstantData,
+		mesh::attribute_arrays_t& UniformData,
+		mesh::attribute_arrays_t& VaryingData);
 
-	typed_array<matrix4>& matrices;
-	typed_array<imaterial*>& materials;
-	typed_array<point3>& start_points;
-	typed_array<point3>& end_points;
-	typed_array<double_t>& sweep_angles;
-	attribute_arrays& constant_data;
-	attribute_arrays& uniform_data;
-	attribute_arrays& varying_data;
+	mesh::matrices_t& matrices;
+	mesh::materials_t& materials;
+	mesh::points_t& start_points;
+	mesh::points_t& end_points;
+	mesh::doubles_t& sweep_angles;
+	mesh::attribute_arrays_t& constant_data;
+	mesh::attribute_arrays_t& uniform_data;
+	mesh::attribute_arrays_t& varying_data;
 };
 
 /// Creates a new hyperboloid mesh primitive, returning references to its member arrays.

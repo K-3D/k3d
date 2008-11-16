@@ -22,7 +22,7 @@
 namespace k3d
 {
 
-const attribute_arrays& require_const_attribute_arrays(const mesh::primitive& Primitive, const string_t& Name)
+const mesh::attribute_arrays_t& require_const_attribute_arrays(const mesh::primitive& Primitive, const string_t& Name)
 {
 	const attribute_arrays* const attributes = Primitive.attributes.lookup(Name);
 
@@ -32,7 +32,7 @@ const attribute_arrays& require_const_attribute_arrays(const mesh::primitive& Pr
 	return *attributes;
 }
 
-attribute_arrays& require_attribute_arrays(mesh::primitive& Primitive, const string_t& Name)
+mesh::attribute_arrays_t& require_attribute_arrays(mesh::primitive& Primitive, const string_t& Name)
 {
 	attribute_arrays* const attributes = Primitive.attributes.writable(Name);
 

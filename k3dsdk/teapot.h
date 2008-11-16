@@ -33,15 +33,15 @@ class const_primitive
 {
 public:
 	const_primitive(
-		const typed_array<matrix4>& Matrices,
-		const typed_array<imaterial*>& Materials,
-		const attribute_arrays& ConstantData,
-		const attribute_arrays& UniformData);
+		const mesh::matrices_t& Matrices,
+		const mesh::materials_t& Materials,
+		const mesh::attribute_arrays_t& ConstantData,
+		const mesh::attribute_arrays_t& UniformData);
 
-	const typed_array<matrix4>& matrices;
-	const typed_array<imaterial*>& materials;
-	const attribute_arrays& constant_data;
-	const attribute_arrays& uniform_data;
+	const mesh::matrices_t& matrices;
+	const mesh::materials_t& materials;
+	const mesh::attribute_arrays_t& constant_data;
+	const mesh::attribute_arrays_t& uniform_data;
 };
 
 /// Gathers the member arrays of a teapot primitive into a convenient package
@@ -49,15 +49,15 @@ class primitive
 {
 public:
 	primitive(
-		typed_array<matrix4>& Matrices,
-		typed_array<imaterial*>& Materials,
-		attribute_arrays& ConstantData,
-		attribute_arrays& UniformData);
+		mesh::matrices_t& Matrices,
+		mesh::materials_t& Materials,
+		mesh::attribute_arrays_t& ConstantData,
+		mesh::attribute_arrays_t& UniformData);
 
-	typed_array<matrix4>& matrices;
-	typed_array<imaterial*>& materials;
-	attribute_arrays& constant_data;
-	attribute_arrays& uniform_data;
+	mesh::matrices_t& matrices;
+	mesh::materials_t& materials;
+	mesh::attribute_arrays_t& constant_data;
+	mesh::attribute_arrays_t& uniform_data;
 };
 
 /// Creates a new teapot mesh primitive, returning references to its member arrays.

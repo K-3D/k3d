@@ -30,10 +30,10 @@ namespace teapot
 // const_primitive
 
 const_primitive::const_primitive(
-	const typed_array<matrix4>& Matrices,
-	const typed_array<imaterial*>& Materials,
-	const attribute_arrays& ConstantData,
-	const attribute_arrays& UniformData
+	const mesh::matrices_t& Matrices,
+	const mesh::materials_t& Materials,
+	const mesh::attribute_arrays_t& ConstantData,
+	const mesh::attribute_arrays_t& UniformData
 		) :
 	matrices(Matrices),
 	materials(Materials),
@@ -46,10 +46,10 @@ const_primitive::const_primitive(
 // primitive
 
 primitive::primitive(
-	typed_array<matrix4>& Matrices,
-	typed_array<imaterial*>& Materials,
-	attribute_arrays& ConstantData,
-	attribute_arrays& UniformData
+	mesh::matrices_t& Matrices,
+	mesh::materials_t& Materials,
+	mesh::attribute_arrays_t& ConstantData,
+	mesh::attribute_arrays_t& UniformData
 		) :
 	matrices(Matrices),
 	materials(Materials),
@@ -66,8 +66,8 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("teapot");
 
 	primitive* const result = new primitive(
-		generic_primitive.topology.create<typed_array<matrix4> >("matrices"),
-		generic_primitive.topology.create<typed_array<imaterial*> >("materials"),
+		generic_primitive.topology.create<mesh::matrices_t >("matrices"),
+		generic_primitive.topology.create<mesh::materials_t >("materials"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"]
 		);
@@ -85,11 +85,11 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
-		const typed_array<matrix4>& matrices = require_const_array<typed_array<matrix4> >(Primitive, "matrices");
-		const typed_array<imaterial*>& materials = require_const_array<typed_array<imaterial*> >(Primitive, "materials");
+		const mesh::matrices_t& matrices = require_const_array<mesh::matrices_t >(Primitive, "matrices");
+		const mesh::materials_t& materials = require_const_array<mesh::materials_t >(Primitive, "materials");
 
-		const attribute_arrays& constant_data = require_const_attribute_arrays(Primitive, "constant");
-		const attribute_arrays& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
+		const mesh::attribute_arrays_t& constant_data = require_const_attribute_arrays(Primitive, "constant");
+		const mesh::attribute_arrays_t& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
 
 		require_array_size(Primitive, materials, "materials", matrices.size());
 
@@ -113,11 +113,11 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
-		typed_array<matrix4>& matrices = require_array<typed_array<matrix4> >(Primitive, "matrices");
-		typed_array<imaterial*>& materials = require_array<typed_array<imaterial*> >(Primitive, "materials");
+		mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, "matrices");
+		mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, "materials");
 
-		attribute_arrays& constant_data = require_attribute_arrays(Primitive, "constant");
-		attribute_arrays& uniform_data = require_attribute_arrays(Primitive, "uniform");
+		mesh::attribute_arrays_t& constant_data = require_attribute_arrays(Primitive, "constant");
+		mesh::attribute_arrays_t& uniform_data = require_attribute_arrays(Primitive, "uniform");
 
 		require_array_size(Primitive, materials, "materials", matrices.size());
 

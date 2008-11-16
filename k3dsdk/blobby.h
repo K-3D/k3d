@@ -54,42 +54,42 @@ class const_primitive
 {
 public:
 	const_primitive(
-		const uint_t_array& FirstPrimitives,
-		const uint_t_array& PrimitiveCounts,
-		const uint_t_array& FirstOperators,
-		const uint_t_array& OperatorCounts,
-		const typed_array<imaterial*>& Materials,
+		const mesh::indices_t& FirstPrimitives,
+		const mesh::counts_t& PrimitiveCounts,
+		const mesh::indices_t& FirstOperators,
+		const mesh::counts_t& OperatorCounts,
+		const mesh::materials_t& Materials,
 		const typed_array<int32_t>& Primitives,
-		const uint_t_array& PrimitiveFirstFloats,
-		const uint_t_array& PrimitiveFloatCounts,
+		const mesh::indices_t& PrimitiveFirstFloats,
+		const mesh::counts_t& PrimitiveFloatCounts,
 		const typed_array<int32_t>& Operators,
-		const uint_t_array& OperatorFirstOperands,
-		const uint_t_array& OperatorOperandCounts,
-		const typed_array<double_t>& Floats,
-		const uint_t_array& Operands,
-		const attribute_arrays& ConstantData,
-		const attribute_arrays& UniformData,
-		const attribute_arrays& VaryingData,
-		const attribute_arrays& VertexData
+		const mesh::indices_t& OperatorFirstOperands,
+		const mesh::counts_t& OperatorOperandCounts,
+		const mesh::doubles_t& Floats,
+		const mesh::indices_t& Operands,
+		const mesh::attribute_arrays_t& ConstantData,
+		const mesh::attribute_arrays_t& UniformData,
+		const mesh::attribute_arrays_t& VaryingData,
+		const mesh::attribute_arrays_t& VertexData
 		);
 
-	const uint_t_array& first_primitives;
-	const uint_t_array& primitive_counts;
-	const uint_t_array& first_operators;
-	const uint_t_array& operator_counts;
-	const typed_array<imaterial*>& materials;
+	const mesh::indices_t& first_primitives;
+	const mesh::counts_t& primitive_counts;
+	const mesh::indices_t& first_operators;
+	const mesh::counts_t& operator_counts;
+	const mesh::materials_t& materials;
 	const typed_array<int32_t>& primitives;
-	const uint_t_array& primitive_first_floats;
-	const uint_t_array& primitive_float_counts;
+	const mesh::indices_t& primitive_first_floats;
+	const mesh::counts_t& primitive_float_counts;
 	const typed_array<int32_t>& operators;
-	const uint_t_array& operator_first_operands;
-	const uint_t_array& operator_operand_counts;
-	const typed_array<double_t>& floats;
-	const uint_t_array& operands;
-	const attribute_arrays& constant_data;
-	const attribute_arrays& uniform_data;
-	const attribute_arrays& varying_data;
-	const attribute_arrays& vertex_data;
+	const mesh::indices_t& operator_first_operands;
+	const mesh::counts_t& operator_operand_counts;
+	const mesh::doubles_t& floats;
+	const mesh::indices_t& operands;
+	const mesh::attribute_arrays_t& constant_data;
+	const mesh::attribute_arrays_t& uniform_data;
+	const mesh::attribute_arrays_t& varying_data;
+	const mesh::attribute_arrays_t& vertex_data;
 };
 
 /// Gathers the member arrays of a blobby primitive into a convenient package
@@ -97,42 +97,42 @@ class primitive
 {
 public:
 	primitive(
-		uint_t_array& FirstPrimitives,
-		uint_t_array& PrimitiveCounts,
-		uint_t_array& FirstOperators,
-		uint_t_array& OperatorCounts,
-		typed_array<imaterial*>& Materials,
+		mesh::indices_t& FirstPrimitives,
+		mesh::counts_t& PrimitiveCounts,
+		mesh::indices_t& FirstOperators,
+		mesh::counts_t& OperatorCounts,
+		mesh::materials_t& Materials,
 		typed_array<int32_t>& Primitives,
-		uint_t_array& PrimitiveFirstFloats,
-		uint_t_array& PrimitiveFloatCounts,
+		mesh::indices_t& PrimitiveFirstFloats,
+		mesh::counts_t& PrimitiveFloatCounts,
 		typed_array<int32_t>& Operators,
-		uint_t_array& OperatorFirstOperands,
-		uint_t_array& OperatorOperandCounts,
-		typed_array<double_t>& Floats,
-		uint_t_array& Operands,
-		attribute_arrays& ConstantData,
-		attribute_arrays& UniformData,
-		attribute_arrays& VaryingData,
-		attribute_arrays& VertexData
+		mesh::indices_t& OperatorFirstOperands,
+		mesh::counts_t& OperatorOperandCounts,
+		mesh::doubles_t& Floats,
+		mesh::indices_t& Operands,
+		mesh::attribute_arrays_t& ConstantData,
+		mesh::attribute_arrays_t& UniformData,
+		mesh::attribute_arrays_t& VaryingData,
+		mesh::attribute_arrays_t& VertexData
 		);
 
-	uint_t_array& first_primitives;
-	uint_t_array& primitive_counts;
-	uint_t_array& first_operators;
-	uint_t_array& operator_counts;
-	typed_array<imaterial*>& materials;
+	mesh::indices_t& first_primitives;
+	mesh::counts_t& primitive_counts;
+	mesh::indices_t& first_operators;
+	mesh::counts_t& operator_counts;
+	mesh::materials_t& materials;
 	typed_array<int32_t>& primitives;
-	uint_t_array& primitive_first_floats;
-	uint_t_array& primitive_float_counts;
+	mesh::indices_t& primitive_first_floats;
+	mesh::counts_t& primitive_float_counts;
 	typed_array<int32_t>& operators;
-	uint_t_array& operator_first_operands;
-	uint_t_array& operator_operand_counts;
-	typed_array<double_t>& floats;
-	uint_t_array& operands;
-	attribute_arrays& constant_data;
-	attribute_arrays& uniform_data;
-	attribute_arrays& varying_data;
-	attribute_arrays& vertex_data;
+	mesh::indices_t& operator_first_operands;
+	mesh::counts_t& operator_operand_counts;
+	mesh::doubles_t& floats;
+	mesh::indices_t& operands;
+	mesh::attribute_arrays_t& constant_data;
+	mesh::attribute_arrays_t& uniform_data;
+	mesh::attribute_arrays_t& varying_data;
+	mesh::attribute_arrays_t& vertex_data;
 };
 
 /// Creates a new blobby mesh primitive, returning references to its member arrays.

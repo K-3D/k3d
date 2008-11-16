@@ -33,30 +33,30 @@ class const_primitive
 {
 public:
 	const_primitive(
-		const uint_t_array& FirstCurves,
-		const uint_t_array& CurveCounts,
-		const typed_array<bool_t>& PeriodicCurves,
-		const typed_array<imaterial*>& Materials,
-		const uint_t_array& CurveFirstPoints,
-		const uint_t_array& CurvePointCounts,
-		const typed_array<double_t>& CurveSelections,
-		const uint_t_array& CurvePoints,
-		const attribute_arrays& ConstantData,
-		const attribute_arrays& UniformData,
-		const attribute_arrays& VaryingData
+		const mesh::indices_t& FirstCurves,
+		const mesh::counts_t& CurveCounts,
+		const mesh::bools_t& PeriodicCurves,
+		const mesh::materials_t& Materials,
+		const mesh::indices_t& CurveFirstPoints,
+		const mesh::counts_t& CurvePointCounts,
+		const mesh::selection_t& CurveSelections,
+		const mesh::indices_t& CurvePoints,
+		const mesh::attribute_arrays_t& ConstantData,
+		const mesh::attribute_arrays_t& UniformData,
+		const mesh::attribute_arrays_t& VaryingData
 		);
 
-	const uint_t_array& first_curves;
-	const uint_t_array& curve_counts;
-	const typed_array<bool_t>& periodic_curves;
-	const typed_array<imaterial*>& materials;
-	const uint_t_array& curve_first_points;
-	const uint_t_array& curve_point_counts;
-	const typed_array<double_t>& curve_selections;
-	const uint_t_array& curve_points;
-	const attribute_arrays& constant_data;
-	const attribute_arrays& uniform_data;
-	const attribute_arrays& varying_data;
+	const mesh::indices_t& first_curves;
+	const mesh::counts_t& curve_counts;
+	const mesh::bools_t& periodic_curves;
+	const mesh::materials_t& materials;
+	const mesh::indices_t& curve_first_points;
+	const mesh::counts_t& curve_point_counts;
+	const mesh::selection_t& curve_selections;
+	const mesh::indices_t& curve_points;
+	const mesh::attribute_arrays_t& constant_data;
+	const mesh::attribute_arrays_t& uniform_data;
+	const mesh::attribute_arrays_t& varying_data;
 };
 
 /// Gathers the member arrays of a linear_curve primitive into a convenient package
@@ -64,30 +64,30 @@ class primitive
 {
 public:
 	primitive(
-		uint_t_array& FirstCurves,
-		uint_t_array& CurveCounts,
-		typed_array<bool_t>& PeriodicCurves,
-		typed_array<imaterial*>& Materials,
-		uint_t_array& CurveFirstPoints,
-		uint_t_array& CurvePointCounts,
-		typed_array<double_t>& CurveSelections,
-		uint_t_array& CurvePoints,
-		attribute_arrays& ConstantData,
-		attribute_arrays& UniformData,
-		attribute_arrays& VaryingData
+		mesh::indices_t& FirstCurves,
+		mesh::counts_t& CurveCounts,
+		mesh::bools_t& PeriodicCurves,
+		mesh::materials_t& Materials,
+		mesh::indices_t& CurveFirstPoints,
+		mesh::counts_t& CurvePointCounts,
+		mesh::selection_t& CurveSelections,
+		mesh::indices_t& CurvePoints,
+		mesh::attribute_arrays_t& ConstantData,
+		mesh::attribute_arrays_t& UniformData,
+		mesh::attribute_arrays_t& VaryingData
 		);
 
-	uint_t_array& first_curves;
-	uint_t_array& curve_counts;
-	typed_array<bool_t>& periodic_curves;
-	typed_array<imaterial*>& materials;
-	uint_t_array& curve_first_points;
-	uint_t_array& curve_point_counts;
-	typed_array<double_t>& curve_selections;
-	uint_t_array& curve_points;
-	attribute_arrays& constant_data;
-	attribute_arrays& uniform_data;
-	attribute_arrays& varying_data;
+	mesh::indices_t& first_curves;
+	mesh::counts_t& curve_counts;
+	mesh::bools_t& periodic_curves;
+	mesh::materials_t& materials;
+	mesh::indices_t& curve_first_points;
+	mesh::counts_t& curve_point_counts;
+	mesh::selection_t& curve_selections;
+	mesh::indices_t& curve_points;
+	mesh::attribute_arrays_t& constant_data;
+	mesh::attribute_arrays_t& uniform_data;
+	mesh::attribute_arrays_t& varying_data;
 };
 
 /// Creates a new linear_curve mesh primitive, returning references to its member arrays.

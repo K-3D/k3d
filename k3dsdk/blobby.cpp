@@ -33,23 +33,23 @@ namespace blobby
 // const_primitive
 
 const_primitive::const_primitive(
-	const uint_t_array& FirstPrimitives,
-	const uint_t_array& PrimitiveCounts,
-	const uint_t_array& FirstOperators,
-	const uint_t_array& OperatorCounts,
-	const typed_array<imaterial*>& Materials,
+	const mesh::indices_t& FirstPrimitives,
+	const mesh::counts_t& PrimitiveCounts,
+	const mesh::indices_t& FirstOperators,
+	const mesh::counts_t& OperatorCounts,
+	const mesh::materials_t& Materials,
 	const typed_array<int32_t>& Primitives,
-	const uint_t_array& PrimitiveFirstFloats,
-	const uint_t_array& PrimitiveFloatCounts,
+	const mesh::indices_t& PrimitiveFirstFloats,
+	const mesh::counts_t& PrimitiveFloatCounts,
 	const typed_array<int32_t>& Operators,
-	const uint_t_array& OperatorFirstOperands,
-	const uint_t_array& OperatorOperandCounts,
-	const typed_array<double_t>& Floats,
-	const uint_t_array& Operands,
-	const attribute_arrays& ConstantData,
-	const attribute_arrays& UniformData,
-	const attribute_arrays& VaryingData,
-	const attribute_arrays& VertexData
+	const mesh::indices_t& OperatorFirstOperands,
+	const mesh::counts_t& OperatorOperandCounts,
+	const mesh::doubles_t& Floats,
+	const mesh::indices_t& Operands,
+	const mesh::attribute_arrays_t& ConstantData,
+	const mesh::attribute_arrays_t& UniformData,
+	const mesh::attribute_arrays_t& VaryingData,
+	const mesh::attribute_arrays_t& VertexData
 		) :
 	first_primitives(FirstPrimitives),
 	primitive_counts(PrimitiveCounts),
@@ -75,23 +75,23 @@ const_primitive::const_primitive(
 // primitive
 
 primitive::primitive(
-	uint_t_array& FirstPrimitives,
-	uint_t_array& PrimitiveCounts,
-	uint_t_array& FirstOperators,
-	uint_t_array& OperatorCounts,
-	typed_array<imaterial*>& Materials,
+	mesh::indices_t& FirstPrimitives,
+	mesh::counts_t& PrimitiveCounts,
+	mesh::indices_t& FirstOperators,
+	mesh::counts_t& OperatorCounts,
+	mesh::materials_t& Materials,
 	typed_array<int32_t>& Primitives,
-	uint_t_array& PrimitiveFirstFloats,
-	uint_t_array& PrimitiveFloatCounts,
+	mesh::indices_t& PrimitiveFirstFloats,
+	mesh::counts_t& PrimitiveFloatCounts,
 	typed_array<int32_t>& Operators,
-	uint_t_array& OperatorFirstOperands,
-	uint_t_array& OperatorOperandCounts,
-	typed_array<double_t>& Floats,
-	uint_t_array& Operands,
-	attribute_arrays& ConstantData,
-	attribute_arrays& UniformData,
-	attribute_arrays& VaryingData,
-	attribute_arrays& VertexData
+	mesh::indices_t& OperatorFirstOperands,
+	mesh::counts_t& OperatorOperandCounts,
+	mesh::doubles_t& Floats,
+	mesh::indices_t& Operands,
+	mesh::attribute_arrays_t& ConstantData,
+	mesh::attribute_arrays_t& UniformData,
+	mesh::attribute_arrays_t& VaryingData,
+	mesh::attribute_arrays_t& VertexData
 		) :
 	first_primitives(FirstPrimitives),
 	primitive_counts(PrimitiveCounts),
@@ -121,19 +121,19 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("blobby");
 
 	primitive* const result = new primitive(
-		generic_primitive.topology.create<uint_t_array >("first_primitives"),
-		generic_primitive.topology.create<uint_t_array >("primitive_counts"),
-		generic_primitive.topology.create<uint_t_array >("first_operators"),
-		generic_primitive.topology.create<uint_t_array >("operator_counts"),
-		generic_primitive.topology.create<typed_array<imaterial*> >("materials"),
+		generic_primitive.topology.create<mesh::indices_t>("first_primitives"),
+		generic_primitive.topology.create<mesh::counts_t>("primitive_counts"),
+		generic_primitive.topology.create<mesh::indices_t>("first_operators"),
+		generic_primitive.topology.create<mesh::counts_t>("operator_counts"),
+		generic_primitive.topology.create<mesh::materials_t>("materials"),
 		generic_primitive.topology.create<typed_array<int32_t> >("primitives"),
-		generic_primitive.topology.create<uint_t_array >("primitive_first_floats"),
-		generic_primitive.topology.create<uint_t_array >("primitive_float_counts"),
+		generic_primitive.topology.create<mesh::indices_t>("primitive_first_floats"),
+		generic_primitive.topology.create<mesh::counts_t>("primitive_float_counts"),
 		generic_primitive.topology.create<typed_array<int32_t> >("operators"),
-		generic_primitive.topology.create<uint_t_array >("operator_first_operands"),
-		generic_primitive.topology.create<uint_t_array >("operator_operand_counts"),
-		generic_primitive.topology.create<typed_array<double_t> >("floats"),
-		generic_primitive.topology.create<uint_t_array >("operands"),
+		generic_primitive.topology.create<mesh::indices_t>("operator_first_operands"),
+		generic_primitive.topology.create<mesh::counts_t >("operator_operand_counts"),
+		generic_primitive.topology.create<mesh::doubles_t>("floats"),
+		generic_primitive.topology.create<mesh::indices_t>("operands"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
 		generic_primitive.attributes["varying"],
@@ -153,24 +153,24 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
-		const uint_t_array& first_primitives = require_const_array<uint_t_array >(Primitive, "first_primitives");
-		const uint_t_array& primitive_counts = require_const_array<uint_t_array >(Primitive, "primitive_counts");
-		const uint_t_array& first_operators = require_const_array<uint_t_array >(Primitive, "first_operators");
-		const uint_t_array& operator_counts = require_const_array<uint_t_array >(Primitive, "operator_counts");
-		const typed_array<imaterial*>& materials = require_const_array<typed_array<imaterial*> >(Primitive, "materials");
+		const mesh::indices_t& first_primitives = require_const_array<mesh::indices_t>(Primitive, "first_primitives");
+		const mesh::counts_t& primitive_counts = require_const_array<mesh::counts_t>(Primitive, "primitive_counts");
+		const mesh::indices_t& first_operators = require_const_array<mesh::indices_t>(Primitive, "first_operators");
+		const mesh::counts_t& operator_counts = require_const_array<mesh::counts_t>(Primitive, "operator_counts");
+		const mesh::materials_t& materials = require_const_array<mesh::materials_t>(Primitive, "materials");
 		const typed_array<int32_t>& primitives = require_const_array<typed_array<int32_t> >(Primitive, "primitives");
-		const uint_t_array& primitive_first_floats = require_const_array<uint_t_array >(Primitive, "primitive_first_floats");
-		const uint_t_array& primitive_float_counts = require_const_array<uint_t_array >(Primitive, "primitive_float_counts");
+		const mesh::indices_t& primitive_first_floats = require_const_array<mesh::indices_t>(Primitive, "primitive_first_floats");
+		const mesh::counts_t& primitive_float_counts = require_const_array<mesh::counts_t>(Primitive, "primitive_float_counts");
 		const typed_array<int32_t>& operators = require_const_array<typed_array<int32_t> >(Primitive, "operators");
-		const uint_t_array& operator_first_operands = require_const_array<uint_t_array >(Primitive, "operator_first_operands");
-		const uint_t_array& operator_operand_counts = require_const_array<uint_t_array >(Primitive, "operator_operand_counts");
-		const typed_array<double_t>& floats = require_const_array<typed_array<double_t> >(Primitive, "floats");
-		const uint_t_array& operands = require_const_array<uint_t_array >(Primitive, "operands");
+		const mesh::indices_t& operator_first_operands = require_const_array<mesh::indices_t>(Primitive, "operator_first_operands");
+		const mesh::counts_t& operator_operand_counts = require_const_array<mesh::counts_t>(Primitive, "operator_operand_counts");
+		const mesh::doubles_t& floats = require_const_array<mesh::doubles_t>(Primitive, "floats");
+		const mesh::indices_t& operands = require_const_array<mesh::indices_t>(Primitive, "operands");
 
-		const attribute_arrays& constant_data = require_const_attribute_arrays(Primitive, "constant");
-		const attribute_arrays& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
-		const attribute_arrays& varying_data = require_const_attribute_arrays(Primitive, "varying");
-		const attribute_arrays& vertex_data = require_const_attribute_arrays(Primitive, "vertex");
+		const mesh::attribute_arrays_t& constant_data = require_const_attribute_arrays(Primitive, "constant");
+		const mesh::attribute_arrays_t& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
+		const mesh::attribute_arrays_t& varying_data = require_const_attribute_arrays(Primitive, "varying");
+		const mesh::attribute_arrays_t& vertex_data = require_const_attribute_arrays(Primitive, "vertex");
 
 /*
 		require_array_size(Primitive, curve_counts, "curve_counts", first_curves.size());
@@ -207,24 +207,24 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
-		uint_t_array& first_primitives = require_array<uint_t_array >(Primitive, "first_primitives");
-		uint_t_array& primitive_counts = require_array<uint_t_array >(Primitive, "primitive_counts");
-		uint_t_array& first_operators = require_array<uint_t_array >(Primitive, "first_operators");
-		uint_t_array& operator_counts = require_array<uint_t_array >(Primitive, "operator_counts");
-		typed_array<imaterial*>& materials = require_array<typed_array<imaterial*> >(Primitive, "materials");
+		mesh::indices_t& first_primitives = require_array<mesh::indices_t>(Primitive, "first_primitives");
+		mesh::counts_t& primitive_counts = require_array<mesh::counts_t>(Primitive, "primitive_counts");
+		mesh::indices_t& first_operators = require_array<mesh::indices_t>(Primitive, "first_operators");
+		mesh::counts_t& operator_counts = require_array<mesh::counts_t>(Primitive, "operator_counts");
+		mesh::materials_t& materials = require_array<mesh::materials_t>(Primitive, "materials");
 		typed_array<int32_t>& primitives = require_array<typed_array<int32_t> >(Primitive, "primitives");
-		uint_t_array& primitive_first_floats = require_array<uint_t_array >(Primitive, "primitive_first_floats");
-		uint_t_array& primitive_float_counts = require_array<uint_t_array >(Primitive, "primitive_float_counts");
+		mesh::indices_t& primitive_first_floats = require_array<mesh::indices_t>(Primitive, "primitive_first_floats");
+		mesh::counts_t& primitive_float_counts = require_array<mesh::counts_t>(Primitive, "primitive_float_counts");
 		typed_array<int32_t>& operators = require_array<typed_array<int32_t> >(Primitive, "operators");
-		uint_t_array& operator_first_operands = require_array<uint_t_array >(Primitive, "operator_first_operands");
-		uint_t_array& operator_operand_counts = require_array<uint_t_array >(Primitive, "operator_operand_counts");
-		typed_array<double_t>& floats = require_array<typed_array<double_t> >(Primitive, "floats");
-		uint_t_array& operands = require_array<uint_t_array >(Primitive, "operands");
+		mesh::indices_t& operator_first_operands = require_array<mesh::indices_t>(Primitive, "operator_first_operands");
+		mesh::counts_t& operator_operand_counts = require_array<mesh::counts_t>(Primitive, "operator_operand_counts");
+		mesh::doubles_t& floats = require_array<mesh::doubles_t>(Primitive, "floats");
+		mesh::indices_t& operands = require_array<mesh::indices_t>(Primitive, "operands");
 
-		attribute_arrays& constant_data = require_attribute_arrays(Primitive, "constant");
-		attribute_arrays& uniform_data = require_attribute_arrays(Primitive, "uniform");
-		attribute_arrays& varying_data = require_attribute_arrays(Primitive, "varying");
-		attribute_arrays& vertex_data = require_attribute_arrays(Primitive, "vertex");
+		mesh::attribute_arrays_t& constant_data = require_attribute_arrays(Primitive, "constant");
+		mesh::attribute_arrays_t& uniform_data = require_attribute_arrays(Primitive, "uniform");
+		mesh::attribute_arrays_t& varying_data = require_attribute_arrays(Primitive, "varying");
+		mesh::attribute_arrays_t& vertex_data = require_attribute_arrays(Primitive, "vertex");
 
 /*
 		require_array_size(Primitive, curve_counts, "curve_counts", first_curves.size());

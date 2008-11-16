@@ -30,14 +30,14 @@ namespace hyperboloid
 // const_primitive
 
 const_primitive::const_primitive(
-	const typed_array<matrix4>& Matrices,
-	const typed_array<imaterial*>& Materials,
-	const typed_array<point3>& StartPoints,
-	const typed_array<point3>& EndPoints,
-	const typed_array<double_t>& SweepAngles,
-	const attribute_arrays& ConstantData,
-	const attribute_arrays& UniformData,
-	const attribute_arrays& VaryingData
+	const mesh::matrices_t& Matrices,
+	const mesh::materials_t& Materials,
+	const mesh::points_t& StartPoints,
+	const mesh::points_t& EndPoints,
+	const mesh::doubles_t& SweepAngles,
+	const mesh::attribute_arrays_t& ConstantData,
+	const mesh::attribute_arrays_t& UniformData,
+	const mesh::attribute_arrays_t& VaryingData
 		) :
 	matrices(Matrices),
 	materials(Materials),
@@ -54,14 +54,14 @@ const_primitive::const_primitive(
 // primitive
 
 primitive::primitive(
-	typed_array<matrix4>& Matrices,
-	typed_array<imaterial*>& Materials,
-	typed_array<point3>& StartPoints,
-	typed_array<point3>& EndPoints,
-	typed_array<double_t>& SweepAngles,
-	attribute_arrays& ConstantData,
-	attribute_arrays& UniformData,
-	attribute_arrays& VaryingData
+	mesh::matrices_t& Matrices,
+	mesh::materials_t& Materials,
+	mesh::points_t& StartPoints,
+	mesh::points_t& EndPoints,
+	mesh::doubles_t& SweepAngles,
+	mesh::attribute_arrays_t& ConstantData,
+	mesh::attribute_arrays_t& UniformData,
+	mesh::attribute_arrays_t& VaryingData
 		) :
 	matrices(Matrices),
 	materials(Materials),
@@ -82,11 +82,11 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("hyperboloid");
 
 	primitive* const result = new primitive(
-		generic_primitive.topology.create<typed_array<matrix4> >("matrices"),
-		generic_primitive.topology.create<typed_array<imaterial*> >("materials"),
-		generic_primitive.topology.create<typed_array<point3> >("start_points"),
-		generic_primitive.topology.create<typed_array<point3> >("end_points"),
-		generic_primitive.topology.create<typed_array<double_t> >("sweep_angles"),
+		generic_primitive.topology.create<mesh::matrices_t >("matrices"),
+		generic_primitive.topology.create<mesh::materials_t >("materials"),
+		generic_primitive.topology.create<mesh::points_t >("start_points"),
+		generic_primitive.topology.create<mesh::points_t >("end_points"),
+		generic_primitive.topology.create<mesh::doubles_t >("sweep_angles"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
 		generic_primitive.attributes["varying"]
@@ -105,15 +105,15 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
-		const typed_array<matrix4>& matrices = require_const_array<typed_array<matrix4> >(Primitive, "matrices");
-		const typed_array<imaterial*>& materials = require_const_array<typed_array<imaterial*> >(Primitive, "materials");
-		const typed_array<point3>& start_points = require_const_array<typed_array<point3> >(Primitive, "start_points");
-		const typed_array<point3>& end_points = require_const_array<typed_array<point3> >(Primitive, "end_points");
-		const typed_array<double_t>& sweep_angles = require_const_array<typed_array<double_t> >(Primitive, "sweep_angles");
+		const mesh::matrices_t& matrices = require_const_array<mesh::matrices_t >(Primitive, "matrices");
+		const mesh::materials_t& materials = require_const_array<mesh::materials_t >(Primitive, "materials");
+		const mesh::points_t& start_points = require_const_array<mesh::points_t >(Primitive, "start_points");
+		const mesh::points_t& end_points = require_const_array<mesh::points_t >(Primitive, "end_points");
+		const mesh::doubles_t& sweep_angles = require_const_array<mesh::doubles_t >(Primitive, "sweep_angles");
 
-		const attribute_arrays& constant_data = require_const_attribute_arrays(Primitive, "constant");
-		const attribute_arrays& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
-		const attribute_arrays& varying_data = require_const_attribute_arrays(Primitive, "varying");
+		const mesh::attribute_arrays_t& constant_data = require_const_attribute_arrays(Primitive, "constant");
+		const mesh::attribute_arrays_t& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
+		const mesh::attribute_arrays_t& varying_data = require_const_attribute_arrays(Primitive, "varying");
 
 		require_array_size(Primitive, materials, "materials", matrices.size());
 		require_array_size(Primitive, start_points, "start_points", matrices.size());
@@ -141,15 +141,15 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
-		typed_array<matrix4>& matrices = require_array<typed_array<matrix4> >(Primitive, "matrices");
-		typed_array<imaterial*>& materials = require_array<typed_array<imaterial*> >(Primitive, "materials");
-		typed_array<point3>& start_points = require_array<typed_array<point3> >(Primitive, "start_points");
-		typed_array<point3>& end_points = require_array<typed_array<point3> >(Primitive, "end_points");
-		typed_array<double_t>& sweep_angles = require_array<typed_array<double_t> >(Primitive, "sweep_angles");
+		mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, "matrices");
+		mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, "materials");
+		mesh::points_t& start_points = require_array<mesh::points_t >(Primitive, "start_points");
+		mesh::points_t& end_points = require_array<mesh::points_t >(Primitive, "end_points");
+		mesh::doubles_t& sweep_angles = require_array<mesh::doubles_t >(Primitive, "sweep_angles");
 
-		attribute_arrays& constant_data = require_attribute_arrays(Primitive, "constant");
-		attribute_arrays& uniform_data = require_attribute_arrays(Primitive, "uniform");
-		attribute_arrays& varying_data = require_attribute_arrays(Primitive, "varying");
+		mesh::attribute_arrays_t& constant_data = require_attribute_arrays(Primitive, "constant");
+		mesh::attribute_arrays_t& uniform_data = require_attribute_arrays(Primitive, "uniform");
+		mesh::attribute_arrays_t& varying_data = require_attribute_arrays(Primitive, "varying");
 
 		require_array_size(Primitive, materials, "materials", matrices.size());
 		require_array_size(Primitive, start_points, "start_points", matrices.size());

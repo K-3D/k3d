@@ -57,10 +57,10 @@ ArrayT& require_array(mesh::primitive& Primitive, const string_t& Name)
 }
 
 /// Tests a primitive to verify that it contains a set of named attributes, throws an exception otherwise.
-const attribute_arrays& require_const_attribute_arrays(const mesh::primitive& Primitive, const string_t& Name);
+const mesh::attribute_arrays_t& require_const_attribute_arrays(const mesh::primitive& Primitive, const string_t& Name);
 
 /// Tests a primitive to verify that it contains a set of named attributes, throws an exception otherwise.
-attribute_arrays& require_attribute_arrays(mesh::primitive& Primitive, const string_t& Name);
+mesh::attribute_arrays_t& require_attribute_arrays(mesh::primitive& Primitive, const string_t& Name);
 
 /// Tests a primitive array to verify that it matches the given length, throws an exception otherwise.
 template<typename ArrayT>
