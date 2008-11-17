@@ -21,16 +21,18 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "array_metadata.h"
-#include "mesh_topology_data.h"
-
+#include "mesh_operations.h"
 #include "parallel/blocked_range.h"
 #include "parallel/parallel_for.h"
 #include "parallel/threads.h"
+#include "polyhedron.h"
 
 #include <iterator>
 
 namespace k3d
+{
+
+namespace polyhedron
 {
 
 namespace detail
@@ -233,143 +235,66 @@ void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const me
 	}
 }
 
-namespace detail
+const uint_t count(const mesh& Mesh)
 {
+	if(!validate_polyhedra(Mesh))
+		return 0;
 
-/// Helper function used by lookup_unused_points()
-void mark_used_points(const mesh::indices_t& PrimitivePoints, mesh::bools_t& UnusedPoints)
-{
-	const uint_t begin = 0;
-	const uint_t end = PrimitivePoints.size();
-	for(uint_t i = begin; i != end; ++i)
-		UnusedPoints[PrimitivePoints[i]] = false;
+	return Mesh.polyhedra->first_faces->size();
 }
 
-/// Helper object used by lookup_unused_points()
-struct mark_used_primitive_points
+const bool_t is_solid(const mesh& Mesh, const uint_t Polyhedron)
 {
-	mark_used_primitive_points(mesh::bools_t& UnusedPoints) :
-		unused_points(UnusedPoints)
+	// K-3D uses a split-edge data structure to represent polyhedra.
+	// We test for solidity by counting the number of edges that
+	// connect each pair of points in the polyhedron.  A polyhedron is 
+	// solid if-and-only-if each pair of points is used by two edges.
+
+	return_val_if_fail(Polyhedron < count(Mesh), false);
+
+	const mesh::indices_t& first_faces = *Mesh.polyhedra->first_faces;
+	const mesh::counts_t& face_counts = *Mesh.polyhedra->face_counts;
+	const mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+	const mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+	const mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+
+	typedef std::map<std::pair<uint_t, uint_t>, uint_t> adjacent_edges_t;
+	adjacent_edges_t adjacent_edges;
+
+	const uint_t face_begin = first_faces[Polyhedron];
+	const uint_t face_end = face_begin + face_counts[Polyhedron];
+	for(uint_t face = face_begin; face != face_end; ++face)
 	{
-	}
-
-	void operator()(const string_t&, const pipeline_data<array>& Array)
-	{
-		if(Array->get_metadata_value(k3d::mesh_point_indices()) != "true")
-			return;
-
-		if(const mesh::indices_t* const array = dynamic_cast<const mesh::indices_t*>(Array.get()))
-			mark_used_points(*array, unused_points);
-	}
-
-	mesh::bools_t& unused_points;
-};
-
-} // namespace detail
-
-void lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
-{
-	UnusedPoints.assign(Mesh.points ? Mesh.points->size() : 0, true);
-
-	// Mark points used by legacy primitives ...
-	if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_points)
-		detail::mark_used_points(*Mesh.nurbs_curve_groups->curve_points, UnusedPoints);
-
-	if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_points)
-		detail::mark_used_points(*Mesh.nurbs_patches->patch_points, UnusedPoints);
-
-	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
-		detail::mark_used_points(*Mesh.polyhedra->edge_points, UnusedPoints);
-
-	// Mark points used by generic mesh primtiives ...
-	visit_primitive_arrays(Mesh, detail::mark_used_primitive_points(UnusedPoints));
-}
-
-namespace detail
-{
-
-/// Helper function used by delete_unused_points()
-void remap_points(mesh::indices_t& PrimitivePoints, const mesh::indices_t& PointMap)
-{
-	const uint_t begin = 0;
-	const uint_t end = PrimitivePoints.size();
-	for(uint_t i = begin; i != end; ++i)
-		PrimitivePoints[i] = PointMap[PrimitivePoints[i]];
-}
-
-/// Helper object used by delete_unused_points()
-struct remap_primitive_points
-{
-	remap_primitive_points(mesh::indices_t& PointMap) :
-		point_map(PointMap)
-	{
-	}
-
-	void operator()(const string_t&, pipeline_data<array>& Array)
-	{
-		if(Array->get_metadata_value(k3d::mesh_point_indices()) != "true")
-			return;
-
-		if(mesh::indices_t* const array = dynamic_cast<mesh::indices_t*>(&Array.writable()))
-			remap_points(*array, point_map);
-	}
-
-	mesh::indices_t& point_map;
-};
-
-} // namespace detail
-
-void delete_unused_points(mesh& Mesh)
-{
-	// Create a bitmap marking which points are unused ...
-	mesh::bools_t unused_points;
-	lookup_unused_points(Mesh, unused_points);
-
-	// Count how many points will be left when we're done ...
-	const uint_t points_remaining = std::count(unused_points.begin(), unused_points.end(), false);
-
-	// Create an array that will map from current-point-indices to new-point-indices,
-	// taking into account the points that will be removed.
-	mesh::indices_t point_map(unused_points.size());
-
-	const uint_t begin = 0;
-	const uint_t end = unused_points.size();
-	for(uint_t current_index = begin, new_index = begin; current_index != end; ++current_index)
-	{
-		point_map[current_index] = new_index;
-		if(!unused_points[current_index])
-			++new_index;
-	}
-
-	// Move leftover points (and point selections) into their final positions ...
-	mesh::points_t& points = Mesh.points.writable();
-	mesh::selection_t& point_selection = Mesh.point_selection.writable();
-	for(uint_t i = begin; i != end; ++i)
-	{
-		if(!unused_points[i])
+		const uint_t loop_begin = face_first_loops[face];
+		const uint_t loop_end = loop_begin + face_loop_counts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 		{
-			points[point_map[i]] = points[i];
-			point_selection[point_map[i]] = point_selection[i];
+			const uint_t first_edge = loop_first_edges[loop];
+			for(uint_t edge = first_edge; ;)
+			{
+				const uint_t vertex1 = std::min(edge_points[edge], edge_points[clockwise_edges[edge]]);
+				const uint_t vertex2 = std::max(edge_points[edge], edge_points[clockwise_edges[edge]]);
+				adjacent_edges[std::make_pair(vertex1, vertex2)] += 1;
+
+				edge = clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
 		}
 	}
 
-	// Update legacy mesh primitives so they use the correct indices ...
-	if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_points)
-		detail::remap_points(Mesh.nurbs_curve_groups.writable().curve_points.writable(), point_map);
+	for(adjacent_edges_t::iterator edges = adjacent_edges.begin(); edges != adjacent_edges.end(); ++edges)
+	{
+		if(edges->second != 2)
+			return false;
+	}
 
-	if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_points)
-		detail::remap_points(Mesh.nurbs_patches.writable().patch_points.writable(), point_map);
-
-	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
-		detail::remap_points(Mesh.polyhedra.writable().edge_points.writable(), point_map);
-
-	// Update generic mesh primitives so they use the correct indices ...
-	visit_primitive_arrays(Mesh, detail::remap_primitive_points(point_map));
-
-	// Free leftover memory ...
-	points.resize(points_remaining);
-	point_selection.resize(points_remaining);
+	return true;
 }
+
+} // namespace polyhedron
 
 } // namespace k3d
 

@@ -31,7 +31,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_deformation_modifier.h>
-#include <k3dsdk/mesh_topology_data.h>
 
 #include "d_Vec3f.h"
 #include "cloth_solver.h"

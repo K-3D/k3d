@@ -32,8 +32,8 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
@@ -943,13 +943,13 @@ public:
 			// Get the "companion" edge for each edge
 			m_node.document().pipeline_profiler().start_execution(m_node, "Calculate companions");
 			k3d::mesh::bools_t boundary_edges;
-			k3d::create_edge_adjacency_lookup(output_edge_points, output_clockwise_edges, boundary_edges, topology_data.companions);
+			k3d::polyhedron::create_edge_adjacency_lookup(output_edge_points, output_clockwise_edges, boundary_edges, topology_data.companions);
 			m_node.document().pipeline_profiler().finish_execution(m_node, "Calculate companions");
 
 			m_node.document().pipeline_profiler().start_execution(m_node, "Calculate indices");
 			// For each edge, get the face it belongs to
 			topology_data.edge_faces.resize(input_edge_count);
-			k3d::create_edge_face_lookup(input_face_first_loops, input_face_loop_counts, input_loop_first_edges, input_clockwise_edges, topology_data.edge_faces);
+			k3d::polyhedron::create_edge_face_lookup(input_face_first_loops, input_face_loop_counts, input_loop_first_edges, input_clockwise_edges, topology_data.edge_faces);
 			// Count the number of components of the new mesh per old face
 			topology_data.face_subface_counts.resize(input_face_count);
 			k3d::mesh::indices_t face_subloop_counts(input_face_count);
@@ -1038,7 +1038,7 @@ public:
 			
 			// Calculate vertex valences, needed for corner point updates.
 			m_node.document().pipeline_profiler().start_execution(m_node, "Vertex valence calculation");
-			k3d::create_vertex_valence_lookup(input.points->size(), input_edge_points, topology_data.vertex_valences);
+			k3d::polyhedron::create_vertex_valence_lookup(input.points->size(), input_edge_points, topology_data.vertex_valences);
 			detail_sds::create_vertex_edge_lookup(input_edge_points, topology_data.vertex_valences, topology_data.point_first_edges, topology_data.point_edges);
 			m_node.document().pipeline_profiler().finish_execution(m_node, "Vertex valence calculation");
 		}

@@ -24,7 +24,7 @@
 
 #include <k3dsdk/hints.h>
 #include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/mesh_topology_data.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
@@ -457,8 +457,8 @@ void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::s
 		}
 		else // interpolateboundary not set
 		{
-			k3d::create_edge_adjacency_lookup(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, m_boundary_edges, m_companions);
-			k3d::create_boundary_face_lookup(*Mesh.polyhedra->face_first_loops, *Mesh.polyhedra->face_loop_counts, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->clockwise_edges, m_boundary_edges, m_companions, boundary_faces);
+			k3d::polyhedron::create_edge_adjacency_lookup(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, m_boundary_edges, m_companions);
+			k3d::polyhedron::create_boundary_face_lookup(*Mesh.polyhedra->face_first_loops, *Mesh.polyhedra->face_loop_counts, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->clockwise_edges, m_boundary_edges, m_companions, boundary_faces);
 			
 			face_visitor_no_boundary visitor(boundary_faces);
 			Cache.visit_faces(visitor, Level, false);

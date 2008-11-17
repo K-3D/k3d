@@ -31,7 +31,6 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/mesh_source.h>
-#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/nurbs.h>
@@ -94,7 +93,7 @@ public:
 		else
 			mod.split_patch_v(my_patch, u);
 
-		k3d::delete_unused_points(Output);
+		k3d::mesh::delete_unused_points(Output);
 
 		assert_warning(k3d::validate_nurbs_patches(Output));
 	}

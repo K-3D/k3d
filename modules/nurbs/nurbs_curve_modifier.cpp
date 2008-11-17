@@ -2,7 +2,6 @@
 
 #include <k3dsdk/array_metadata.h>
 #include <k3dsdk/linear_curve.h>
-#include <k3dsdk/mesh_topology_data.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -464,7 +463,7 @@ void nurbs_curve_modifier::delete_curve(k3d::uint_t curve)
 		curve_selection->erase(selection_pos);
 
 		remove_empty_groups();
-		k3d::delete_unused_points(*m_instance);
+		k3d::mesh::delete_unused_points(*m_instance);
 	}
 	catch (...)
 	{
@@ -805,7 +804,7 @@ void nurbs_curve_modifier::close_curve(k3d::uint_t curve, bool keep_ends)
 	}
 
 	k3d::log() << debug << *m_instance << std::endl;
-	k3d::delete_unused_points(*m_instance);
+	k3d::mesh::delete_unused_points(*m_instance);
 	k3d::log() << debug << *m_instance << std::endl;
 
 }
@@ -1187,7 +1186,7 @@ bool nurbs_curve_modifier::curve_knot_insertion(k3d::uint_t curve, double u, k3d
 
 		curve_point_counts->at(curve) += point_offset;
 
-		k3d::delete_unused_points(*m_instance);
+		k3d::mesh::delete_unused_points(*m_instance);
 
 		if (MODULE_NURBS_DEBUG) k3d::log() << debug << nurbs_debug << "Inserted " << knot_offset << " knots and " << point_offset << " points!" << std::endl;
 		return true;
@@ -1606,7 +1605,7 @@ void nurbs_curve_modifier::curve_degree_elevate(k3d::uint_t curve)
 		curve_point_counts->at(curve) += point_offset;
 		curve_orders->at(curve)++;
 
-		k3d::delete_unused_points(*m_instance);
+		k3d::mesh::delete_unused_points(*m_instance);
 
 		MY_DEBUG << "DegreeElevation ended, added curve!" << std::endl;
 	}
@@ -1748,7 +1747,7 @@ void nurbs_curve_modifier::split_curve_at(k3d::uint_t curve, double u, bool reco
 			join_curves(point1, curve, point2, curve + 1);
 		}
 
-		k3d::delete_unused_points(*m_instance);
+		k3d::mesh::delete_unused_points(*m_instance);
 	}
 	catch (std::exception& e)
 	{

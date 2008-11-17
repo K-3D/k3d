@@ -66,8 +66,8 @@
 #include <k3dsdk/itime_sink.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_selection.h>
-#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/time_source.h>
@@ -329,7 +329,7 @@ void select_components(const k3d::selection::records& Selection, const k3d::doub
 				mesh = k3d::property::pipeline_value<k3d::mesh*>(mesh_source->mesh_source_output());
 			if(mesh && mesh->polyhedra && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
 			{
-				k3d::create_edge_adjacency_lookup(*mesh->polyhedra->edge_points, *mesh->polyhedra->clockwise_edges, boundary_edges, companions);
+				k3d::polyhedron::create_edge_adjacency_lookup(*mesh->polyhedra->edge_points, *mesh->polyhedra->clockwise_edges, boundary_edges, companions);
 			}
 		}
 
@@ -720,7 +720,7 @@ struct convert_to_lines
 			
 			if(m_implementation->mesh != &Mesh)
 			{
-				k3d::create_edge_adjacency_lookup(edge_points, clockwise_edges, m_implementation->boundary_edges, m_implementation->companions);
+				k3d::polyhedron::create_edge_adjacency_lookup(edge_points, clockwise_edges, m_implementation->boundary_edges, m_implementation->companions);
 				m_implementation->mesh = &Mesh;
 			}
 

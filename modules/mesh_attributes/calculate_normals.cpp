@@ -29,8 +29,8 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 
 #include <boost/scoped_ptr.hpp>
 #include <iterator>
@@ -118,7 +118,7 @@ public:
 			k3d::mesh::indices_t point_first_faces;
 			k3d::mesh::counts_t point_face_counts;
 			k3d::mesh::indices_t point_faces;
-			k3d::create_vertex_face_lookup(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, point_first_faces, point_face_counts, point_faces);
+			k3d::polyhedron::create_vertex_face_lookup(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, point_first_faces, point_face_counts, point_faces);
 
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{

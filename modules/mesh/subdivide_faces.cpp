@@ -32,8 +32,8 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
@@ -918,7 +918,7 @@ public:
 		k3d::mesh::bools_t boundary_edges;
 		if(subdivision_type == CENTERTOMIDPOINTS || subdivision_type == CONTIGUOUSMIDPOINTS)
 		{
-			k3d::create_edge_adjacency_lookup(output_edge_points, output_clockwise_edges, boundary_edges, companions);
+			k3d::polyhedron::create_edge_adjacency_lookup(output_edge_points, output_clockwise_edges, boundary_edges, companions);
 		}
 		else
 		{ // We don't need companions if no midpoints are being calculated

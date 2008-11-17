@@ -28,10 +28,10 @@
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 #include <k3dsdk/utility_gl.h>
@@ -159,8 +159,8 @@ protected:
 		k3d::mesh::bools_t boundary_faces;
 		if (!interpolateboundary)
 		{
-			k3d::create_edge_adjacency_lookup(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, boundary_edges, companions);
-			k3d::create_boundary_face_lookup(*Mesh.polyhedra->face_first_loops, *Mesh.polyhedra->face_loop_counts, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->clockwise_edges, boundary_edges, companions, boundary_faces);
+			k3d::polyhedron::create_edge_adjacency_lookup(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, boundary_edges, companions);
+			k3d::polyhedron::create_boundary_face_lookup(*Mesh.polyhedra->face_first_loops, *Mesh.polyhedra->face_loop_counts, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->clockwise_edges, boundary_edges, companions, boundary_faces);
 		}
 		
 		face_visitor visitor;

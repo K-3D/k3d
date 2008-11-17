@@ -1,5 +1,4 @@
 #include "nurbs_patch_modifier.h"
-#include <k3dsdk/mesh_topology_data.h>
 #include <algorithm>
 
 namespace module
@@ -1102,7 +1101,7 @@ void nurbs_patch_modifier::delete_patch(k3d::uint_t patch_idx)
 			m_patch_first_trim_curve_loops->erase(m_patch_first_trim_curve_loops->begin() + patch);
 		}
 
-		k3d::delete_unused_points(*m_instance);
+		k3d::mesh::delete_unused_points(*m_instance);
 	}
 	catch (...)
 	{

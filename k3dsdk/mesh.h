@@ -274,6 +274,48 @@ public:
 
 	/// Conversion from a legacy mesh to a new mesh
 	mesh& operator=(const k3d::legacy::mesh& RHS);
+
+	/// Initialize an array to mark unused mesh points (points not used by any primitive).
+	static void lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints);
+	/// Remove unused points from a mesh, adjusting point indices in all remaining primitives.
+	static void delete_unused_points(mesh& Mesh);
+
+	/// Iterates over every array in every generic primitive in the given mesh, passing the array name and array to a functor.
+	template<typename FunctorT>
+	static void visit_primitive_arrays(const mesh& Mesh, FunctorT Functor)
+	{
+		for(mesh::primitives_t::const_iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
+		{
+			const mesh::primitive& primitive = **p;
+			for(mesh::named_arrays_t::const_iterator array = primitive.topology.begin(); array != primitive.topology.end(); ++array)
+				Functor(array->first, array->second);
+
+			for(mesh::named_attribute_arrays_t::const_iterator attributes = primitive.attributes.begin(); attributes != primitive.attributes.end(); ++attributes)
+			{
+				for(mesh::attribute_arrays_t::const_iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
+					Functor(array->first, array->second);
+			}
+		}
+	}
+
+	/// Iterates over every array in every generic primitive in the given mesh, passing the array name and array to a functor.
+	template<typename FunctorT>
+	static void visit_primitive_arrays(mesh& Mesh, FunctorT Functor)
+	{
+		for(mesh::primitives_t::iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
+		{
+			mesh::primitive& primitive = p->writable();
+			for(mesh::named_arrays_t::iterator array = primitive.topology.begin(); array != primitive.topology.end(); ++array)
+				Functor(array->first, array->second);
+
+			for(mesh::named_attribute_arrays_t::iterator attributes = primitive.attributes.begin(); attributes != primitive.attributes.end(); ++attributes)
+			{
+				for(mesh::attribute_arrays_t::iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
+					Functor(array->first, array->second);
+			}
+		}
+	}
+
 };
 
 /// Stream serialization

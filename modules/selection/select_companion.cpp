@@ -29,8 +29,8 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/utility.h>
 
 #include <iomanip>
@@ -69,7 +69,7 @@ public:
 			return;
 		
 		k3d::mesh::bools_t boundary_edges;
-		k3d::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, boundary_edges, m_companions);
+		k3d::polyhedron::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, boundary_edges, m_companions);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

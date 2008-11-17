@@ -31,8 +31,8 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
@@ -331,7 +331,7 @@ public:
 		document().pipeline_profiler().start_execution(*this, "Calculate companions");
 		k3d::mesh::bools_t boundary_edges;
 		k3d::mesh::indices_t companions;
-		k3d::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, boundary_edges, companions);
+		k3d::polyhedron::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, boundary_edges, companions);
 		document().pipeline_profiler().finish_execution(*this, "Calculate companions");
 
 		const k3d::uint_t split_point_count = m_vertices.pipeline_value();

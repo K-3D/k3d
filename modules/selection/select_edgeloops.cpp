@@ -22,13 +22,13 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/hints.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_modifier.h>
-#include <k3dsdk/mesh_topology_data.h>
+#include <k3dsdk/polyhedron.h>
 
 namespace module
 {
@@ -89,8 +89,8 @@ private:
 		
 		if (m_companions.empty() || m_valences.empty() || m_boundary_edges.empty())
 		{
-			k3d::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, m_boundary_edges, m_companions);
-			k3d::create_vertex_valence_lookup(Input.points->size(), *Input.polyhedra->edge_points, m_valences);
+			k3d::polyhedron::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, m_boundary_edges, m_companions);
+			k3d::polyhedron::create_vertex_valence_lookup(Input.points->size(), *Input.polyhedra->edge_points, m_valences);
 		}
 		
 		// Make sure the Output selection arrays contain the correct selection

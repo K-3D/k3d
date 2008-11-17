@@ -27,7 +27,6 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_source.h>
-#include <k3dsdk/mesh_topology_data.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/nurbs.h>
@@ -88,7 +87,7 @@ public:
 		mod.polygonize_curve(my_curve, segments, delete_original);
 
 		if (delete_original)
-			k3d::delete_unused_points(Output);
+			k3d::mesh::delete_unused_points(Output);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

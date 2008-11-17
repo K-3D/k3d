@@ -17,6 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "array_metadata.h"
 #include "color.h"
 #include "imaterial.h"
 #include "iomanip.h"
@@ -648,6 +649,145 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 
 	return *this;
 }
+
+namespace detail
+{
+
+/// Helper function used by lookup_unused_points()
+void mark_used_points(const mesh::indices_t& PrimitivePoints, mesh::bools_t& UnusedPoints)
+{
+	const uint_t begin = 0;
+	const uint_t end = PrimitivePoints.size();
+	for(uint_t i = begin; i != end; ++i)
+		UnusedPoints[PrimitivePoints[i]] = false;
+}
+
+/// Helper object used by lookup_unused_points()
+struct mark_used_primitive_points
+{
+	mark_used_primitive_points(mesh::bools_t& UnusedPoints) :
+		unused_points(UnusedPoints)
+	{
+	}
+
+	void operator()(const string_t&, const pipeline_data<array>& Array)
+	{
+		if(Array->get_metadata_value(k3d::mesh_point_indices()) != "true")
+			return;
+
+		if(const mesh::indices_t* const array = dynamic_cast<const mesh::indices_t*>(Array.get()))
+			mark_used_points(*array, unused_points);
+	}
+
+	mesh::bools_t& unused_points;
+};
+
+} // namespace detail
+
+void mesh::lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
+{
+	UnusedPoints.assign(Mesh.points ? Mesh.points->size() : 0, true);
+
+	// Mark points used by legacy primitives ...
+	if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_points)
+		detail::mark_used_points(*Mesh.nurbs_curve_groups->curve_points, UnusedPoints);
+
+	if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_points)
+		detail::mark_used_points(*Mesh.nurbs_patches->patch_points, UnusedPoints);
+
+	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
+		detail::mark_used_points(*Mesh.polyhedra->edge_points, UnusedPoints);
+
+	// Mark points used by generic mesh primtiives ...
+	visit_primitive_arrays(Mesh, detail::mark_used_primitive_points(UnusedPoints));
+}
+
+namespace detail
+{
+
+/// Helper function used by delete_unused_points()
+void remap_points(mesh::indices_t& PrimitivePoints, const mesh::indices_t& PointMap)
+{
+	const uint_t begin = 0;
+	const uint_t end = PrimitivePoints.size();
+	for(uint_t i = begin; i != end; ++i)
+		PrimitivePoints[i] = PointMap[PrimitivePoints[i]];
+}
+
+/// Helper object used by delete_unused_points()
+struct remap_primitive_points
+{
+	remap_primitive_points(mesh::indices_t& PointMap) :
+		point_map(PointMap)
+	{
+	}
+
+	void operator()(const string_t&, pipeline_data<array>& Array)
+	{
+		if(Array->get_metadata_value(k3d::mesh_point_indices()) != "true")
+			return;
+
+		if(mesh::indices_t* const array = dynamic_cast<mesh::indices_t*>(&Array.writable()))
+			remap_points(*array, point_map);
+	}
+
+	mesh::indices_t& point_map;
+};
+
+} // namespace detail
+
+void mesh::delete_unused_points(mesh& Mesh)
+{
+	// Create a bitmap marking which points are unused ...
+	mesh::bools_t unused_points;
+	lookup_unused_points(Mesh, unused_points);
+
+	// Count how many points will be left when we're done ...
+	const uint_t points_remaining = std::count(unused_points.begin(), unused_points.end(), false);
+
+	// Create an array that will map from current-point-indices to new-point-indices,
+	// taking into account the points that will be removed.
+	mesh::indices_t point_map(unused_points.size());
+
+	const uint_t begin = 0;
+	const uint_t end = unused_points.size();
+	for(uint_t current_index = begin, new_index = begin; current_index != end; ++current_index)
+	{
+		point_map[current_index] = new_index;
+		if(!unused_points[current_index])
+			++new_index;
+	}
+
+	// Move leftover points (and point selections) into their final positions ...
+	mesh::points_t& points = Mesh.points.writable();
+	mesh::selection_t& point_selection = Mesh.point_selection.writable();
+	for(uint_t i = begin; i != end; ++i)
+	{
+		if(!unused_points[i])
+		{
+			points[point_map[i]] = points[i];
+			point_selection[point_map[i]] = point_selection[i];
+		}
+	}
+
+	// Update legacy mesh primitives so they use the correct indices ...
+	if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_points)
+		detail::remap_points(Mesh.nurbs_curve_groups.writable().curve_points.writable(), point_map);
+
+	if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_points)
+		detail::remap_points(Mesh.nurbs_patches.writable().patch_points.writable(), point_map);
+
+	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
+		detail::remap_points(Mesh.polyhedra.writable().edge_points.writable(), point_map);
+
+	// Update generic mesh primitives so they use the correct indices ...
+	visit_primitive_arrays(Mesh, detail::remap_primitive_points(point_map));
+
+	// Free leftover memory ...
+	points.resize(points_remaining);
+	point_selection.resize(points_remaining);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::primitive
