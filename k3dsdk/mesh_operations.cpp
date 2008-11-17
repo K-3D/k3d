@@ -20,7 +20,7 @@
 #include "imaterial.h"
 #include "mesh_operations.h"
 #include "mesh_selection.h"
-#include "polyhedra.h"
+#include "polyhedron.h"
 #include "vectors.h"
 
 namespace k3d

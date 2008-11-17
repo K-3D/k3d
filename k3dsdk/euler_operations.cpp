@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "euler_operations.h"
-#include "polyhedra.h"
+#include "polyhedron.h"
 
 #include <set>
 
