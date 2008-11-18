@@ -57,87 +57,6 @@ namespace libk3dngui
 namespace detail
 {
 
-/// Duplicates first node's transformation into a FrozenTransformationa and connects it to second node
-void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocument& Document)
-{
-	// Check for "input_matrix" property
-	k3d::iproperty* const transformation_property = k3d::property::get<k3d::matrix4>(FromNode, "input_matrix");
-	if(!transformation_property)
-		return;
-
-	// Check whether it's connected
-	if(!Document.pipeline().dependency(*transformation_property))
-		return;
-
-	// Duplicate input matrix into a new FrozenTransformation
-	k3d::inode* frozen_transformation = k3d::plugin::create<k3d::inode>(k3d::classes::FrozenTransformation(), Document);
-	return_if_fail(frozen_transformation);
-
-	frozen_transformation->set_name(k3d::unique_name(Document.nodes(), ToNode.name() + " Transformation"));
-
-	// Connect new FrozenTransformation and ToNode
-	k3d::itransform_sink* const transformation_sink = dynamic_cast<k3d::itransform_sink*>(&ToNode);
-	return_if_fail(transformation_sink);
-	k3d::itransform_source* const transformation_source = dynamic_cast<k3d::itransform_source*>(frozen_transformation);
-	return_if_fail(transformation_source);
-
-	k3d::ipipeline::dependencies_t dependencies;
-	dependencies.insert(std::make_pair(&transformation_sink->transform_sink_input(), &transformation_source->transform_source_output()));
-	Document.pipeline().set_dependencies(dependencies);
-
-	// Copy transformation value
-	const k3d::matrix4 transformation = k3d::node_to_world_matrix(FromNode);
-	k3d::property::set_internal_value(*frozen_transformation, "matrix", transformation);
-}
-
-/// Instantiates a mesh : creates a new mesh instance connected to the mesh output
-k3d::inode* instantiate_mesh(k3d::idocument& Document, k3d::inode& Node)
-{
-	// Get the upstream property
-	k3d::iproperty_collection* property_collection = dynamic_cast<k3d::iproperty_collection*>(&Node);
-	return_val_if_fail(property_collection, 0);
-
-	k3d::imesh_sink* const downstream_sink = dynamic_cast<k3d::imesh_sink*>(&Node);
-	return_val_if_fail(downstream_sink, 0);
-
-	k3d::iproperty& downstream_input = downstream_sink->mesh_sink_input();
-
-	k3d::iproperty* const upstream_output = Document.pipeline().dependency(downstream_input);
-	return_val_if_fail(upstream_output, 0);
-
-	// Create a mesh instance
-	k3d::inode* mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), Document, k3d::unique_name(Document.nodes(), Node.name()));
-	return_val_if_fail(mesh_instance, 0);
-
-	// Get its input property
-	k3d::imesh_sink* const mesh_instance_sink = dynamic_cast<k3d::imesh_sink*>(mesh_instance);
-	return_val_if_fail(mesh_instance_sink, 0);
-
-	// Insert the instance into the DAG
-	k3d::ipipeline::dependencies_t dependencies;
-	dependencies.insert(std::make_pair(&mesh_instance_sink->mesh_sink_input(), upstream_output));
-	Document.pipeline().set_dependencies(dependencies);
-
-	// Duplicate transformation, if any
-	freeze_transformation(Node, *mesh_instance, Document);
-
-	// Copy property values
-	const k3d::iproperty_collection::properties_t properties = property_collection->properties();
-	for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-	{
-		const std::string name = (*property)->property_name();
-		if(name != "output_matrix"	// Property not writable
-			&& name != "name"
-			&& name != "input_mesh"
-			&& name != "output_mesh")
-		{
-			k3d::property::set_internal_value(*mesh_instance, name, (*property)->property_internal_value());
-		}
-	}
-
-	return mesh_instance;
-}
-
 /// Duplicates mesh source into a FrozenMesh and instantiate the new object
 k3d::inode* duplicate_mesh(k3d::idocument& Document, k3d::inode& Node)
 {
@@ -245,6 +164,39 @@ k3d::inode* duplicate_node(k3d::idocument& Document, k3d::inode& Node)
 
 } // namespace detail
 
+/// Duplicates first node's transformation into a FrozenTransformationa and connects it to second node
+void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocument& Document)
+{
+	// Check for "input_matrix" property
+	k3d::iproperty* const transformation_property = k3d::property::get<k3d::matrix4>(FromNode, "input_matrix");
+	if(!transformation_property)
+		return;
+
+	// Check whether it's connected
+	if(!Document.pipeline().dependency(*transformation_property))
+		return;
+
+	// Duplicate input matrix into a new FrozenTransformation
+	k3d::inode* frozen_transformation = k3d::plugin::create<k3d::inode>(k3d::classes::FrozenTransformation(), Document);
+	return_if_fail(frozen_transformation);
+
+	frozen_transformation->set_name(k3d::unique_name(Document.nodes(), ToNode.name() + " Transformation"));
+
+	// Connect new FrozenTransformation and ToNode
+	k3d::itransform_sink* const transformation_sink = dynamic_cast<k3d::itransform_sink*>(&ToNode);
+	return_if_fail(transformation_sink);
+	k3d::itransform_source* const transformation_source = dynamic_cast<k3d::itransform_source*>(frozen_transformation);
+	return_if_fail(transformation_source);
+
+	k3d::ipipeline::dependencies_t dependencies;
+	dependencies.insert(std::make_pair(&transformation_sink->transform_sink_input(), &transformation_source->transform_source_output()));
+	Document.pipeline().set_dependencies(dependencies);
+
+	// Copy transformation value
+	const k3d::matrix4 transformation = k3d::node_to_world_matrix(FromNode);
+	k3d::property::set_internal_value(*frozen_transformation, "matrix", transformation);
+}
+
 void instantiate_selected_nodes(document_state& DocumentState)
 {
 	// Save selection
@@ -265,7 +217,7 @@ void instantiate_selected_nodes(document_state& DocumentState)
 	k3d::nodes_t new_nodes;
 	for(k3d::nodes_t::const_iterator selected_node = nodes.begin(); selected_node != nodes.end(); ++selected_node)
 	{
-		if(k3d::inode* new_node = detail::instantiate_mesh(DocumentState.document(), **selected_node))
+		if(k3d::inode* new_node = DocumentState.instantiate_mesh(*selected_node))
 		{
 			DocumentState.select(*new_node);
 			new_nodes.push_back(new_node);

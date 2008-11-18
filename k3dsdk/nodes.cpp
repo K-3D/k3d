@@ -207,7 +207,7 @@ void delete_nodes(idocument& Document, const nodes_t& Nodes)
 {
 	ipipeline::dependencies_t skip_dependencies;
 	// Get the dependencies needed to skip the deleted node
-	//detail::skip_nodes(Nodes, skip_dependencies);
+	detail::skip_nodes(Nodes, skip_dependencies);
 	// Let the nodes know that they're about to be deleted ...
 	for(nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
 		(*node)->deleted_signal().emit();

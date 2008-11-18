@@ -139,8 +139,8 @@ public:
 			}
 		}
 
-		if(new_dependencies.size())
-			set_dependencies(new_dependencies);
+		new_dependencies[Property] = 0;
+		set_dependencies(new_dependencies);
 	}
 
 	dependencies_t::iterator get_dependency(iproperty* Property)

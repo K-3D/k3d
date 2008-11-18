@@ -33,6 +33,7 @@
 
 #include "application_state.h"
 #include "context_menu.h"
+#include "detail.h"
 #include "document_state.h"
 #include "move_tool.h"
 #include "rotate_tool.h"
@@ -64,6 +65,7 @@
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itime_sink.h>
+#include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
@@ -1705,6 +1707,74 @@ public:
 		const k3d::nodes_t nodes = k3d::find_nodes(m_document.nodes(), "RenderMan Default Painter");
 	        return (1 == nodes.size()) ? *nodes.begin() : 0;
 	}
+	
+	k3d::inode* instantiate_mesh(k3d::inode* Node)
+	{
+		k3d::inode* mesh_instance = 0;
+		k3d::iproperty* mesh_source_property = 0;
+		if(k3d::classes::MeshInstance() == Node->factory().factory_id()) // Instantiate the input in case of a mesh instance
+		{
+			k3d::imesh_sink* sink = dynamic_cast<k3d::imesh_sink*>(Node);
+			mesh_source_property = Node->document().pipeline().dependency(sink->mesh_sink_input());
+			if(mesh_source_property)
+				mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), Node->name() + " Instance"));
+		}
+		else
+		{
+			k3d::ipipeline& pipeline = Node->document().pipeline();
+			const k3d::ipipeline::dependencies_t& dependencies = pipeline.dependencies();
+			k3d::imesh_source* mesh_source = dynamic_cast<k3d::imesh_source*>(Node);
+			if(!mesh_source)
+				return 0;
+			mesh_source_property = &(mesh_source->mesh_source_output());
+			if(mesh_source_property)
+				mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), Node->name() + " Instance"));
+				
+			k3d::iproperty* instance_mesh_source_property = &dynamic_cast<k3d::imesh_source*>(mesh_instance)->mesh_source_output();
+			k3d::iproperty* instance_transform_source_property = &dynamic_cast<k3d::itransform_source*>(mesh_instance)->transform_source_output();
+			
+			k3d::itransform_source* transform_source = dynamic_cast<k3d::itransform_source*>(Node);
+			k3d::iproperty* transform_source_property = 0;
+			if(transform_source)
+				transform_source_property = &(transform_source->transform_source_output());
+			
+			// Connect the MeshInstance outputs to the inputs of the downstream node, if any
+			k3d::ipipeline::dependencies_t new_dependencies;
+			for(k3d::ipipeline::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
+			{
+				if(dependency->second == mesh_source_property)
+				{
+					dependency->first->property_set_dependency(0);
+					new_dependencies.insert(std::make_pair(dependency->first, instance_mesh_source_property));
+				}
+				if(transform_source_property && dependency->second == transform_source_property)
+				{
+					dependency->first->property_set_dependency(0);
+					new_dependencies.insert(std::make_pair(dependency->first, instance_transform_source_property));
+				}
+			}
+			pipeline.set_dependencies(new_dependencies);
+			
+		}
+		 
+		if(!mesh_source_property)
+			return 0;
+		
+		// Assign a default painter ...
+		k3d::property::set_internal_value(*mesh_instance, "gl_painter", default_gl_painter());
+		k3d::property::set_internal_value(*mesh_instance, "ri_painter", default_ri_painter());
+
+		// Connect the mesh instance to the source ...
+		k3d::ipipeline::dependencies_t dependencies;
+		k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(mesh_instance);
+		if(mesh_sink)
+			dependencies.insert(std::make_pair(&mesh_sink->mesh_sink_input(), mesh_source_property));
+		Node->document().pipeline().set_dependencies(dependencies);
+		
+		freeze_transformation(*Node, *mesh_instance, m_document);
+		
+		return mesh_instance;
+	}
 
 	k3d::inode* create_node(k3d::iplugin_factory* Factory)
 	{
@@ -1735,18 +1805,9 @@ public:
 		if(mesh_source && k3d::classes::MeshInstance() != Factory->factory_id())
 		{
 			// Create a mesh instance ...
-			k3d::inode* const mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), node_name + " Instance"));
-
+			k3d::inode* const mesh_instance = instantiate_mesh(node);
+			return_val_if_fail(mesh_instance, 0);
 			new_nodes.push_back(mesh_instance);
-
-			// Assign a default painter ...
-			k3d::property::set_internal_value(*mesh_instance, "gl_painter", default_gl_painter());
-			k3d::property::set_internal_value(*mesh_instance, "ri_painter", default_ri_painter());
-
-			// Connect the mesh instance to the source ...
-			k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(mesh_instance);
-			if(mesh_sink)
-				dependencies.insert(std::make_pair(&mesh_sink->mesh_sink_input(), &mesh_source->mesh_source_output()));
 
 			// In this case, we want to select the mesh instance instead of the mesh source ...
 			to_be_selected = mesh_instance;
@@ -2303,6 +2364,11 @@ document_state::pop_status_message_signal_t& document_state::pop_status_message_
 k3d::inode* document_state::create_node(k3d::iplugin_factory* Factory)
 {
 	return m_implementation->create_node(Factory);
+}
+
+k3d::inode* document_state::instantiate_mesh(k3d::inode* Node)
+{
+	return m_implementation->instantiate_mesh(Node);
 }
 
 void document_state::popup_context_menu(const bool UserAction)

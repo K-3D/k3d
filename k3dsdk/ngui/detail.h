@@ -36,6 +36,8 @@ namespace libk3dngui
 // Forward declarations
 class document_state;
 
+/// Duplicates first node's transformation into a FrozenTransformationa and connects it to second node
+void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocument& Document);
 /// Instantiates selected nodes (currently, only mesh sources are instantiable)
 void instantiate_selected_nodes(document_state& DocumentState);
 /// Duplicates selected nodes with their input transformation, if any
