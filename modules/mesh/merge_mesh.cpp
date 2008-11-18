@@ -476,7 +476,25 @@ public:
 		}
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Output) {}
+	void on_update_mesh_geometry(k3d::mesh& Output)
+	{
+		Output.points.writable().clear();
+		Output.point_selection.writable().clear();
+		const k3d::iproperty_collection::properties_t properties = k3d::property::user_properties(*static_cast<k3d::iproperty_collection*>(this));
+		for(k3d::iproperty_collection::properties_t::const_iterator p = properties.begin(); p != properties.end(); ++p)
+		{
+			k3d::iproperty& property = **p;
+			if(property.property_type() != typeid(k3d::mesh*))
+				continue;
+
+			if(!k3d::property::pipeline_value<k3d::mesh*>(property))
+				continue;
+
+			const k3d::mesh& mesh = *k3d::property::pipeline_value<k3d::mesh*>(property);
+
+			detail::merge_points(Output, mesh);
+		}
+	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
