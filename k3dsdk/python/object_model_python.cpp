@@ -75,6 +75,7 @@
 #include "point3_python.h"
 #include "point4_python.h"
 #include "point_group_python.h"
+#include "polyhedron_python.h"
 #include "resource_python.h"
 #include "ri_python.h"
 #include "sphere_python.h"
@@ -477,6 +478,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_parallel();
 	define_namespace_plugin();
 	define_namespace_point_group();
+	define_namespace_polyhedron();
 	define_namespace_resource();
 	define_namespace_ri();
 	define_namespace_sphere();

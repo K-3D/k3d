@@ -21,8 +21,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file Declares structures to add extra "convenience" data to a mesh
-	\author Bart Janssens (bart.janssens@lid.kviv.be)
 	\author Timothy M. Shead (tshead@k-3d.com)
+	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
 #include "mesh.h"
@@ -32,6 +32,99 @@ namespace k3d
 
 namespace polyhedron
 {
+
+/// Defines allowable polyhedron types
+enum polyhedron_type
+{
+	POLYGONS = 0,
+	CATMULL_CLARK = 1,
+};
+
+/// Gathers the member arrays of a polyhedron primitive into a convenient package
+class const_primitive
+{
+public:
+	const_primitive(
+		const mesh::indices_t& FirstFaces,
+		const mesh::counts_t& FaceCounts,
+//		const typed_array<int32_t>& PolyhedronTypes,
+		const mesh::polyhedra_t::types_t& PolyhedronTypes,
+		const mesh::indices_t& FaceFirstLoops,
+		const mesh::counts_t& FaceLoopCounts,
+		const mesh::selection_t& FaceSelections,
+		const mesh::materials_t& FaceMaterials,
+		const mesh::indices_t& LoopFirstEdges,
+		const mesh::indices_t& EdgePoints,
+		const mesh::indices_t& ClockwiseEdges,
+		const mesh::selection_t& EdgeSelections,
+		const mesh::attribute_arrays_t& ConstantData,
+		const mesh::attribute_arrays_t& UniformData,
+		const mesh::attribute_arrays_t& FaceVaryingData
+		);
+
+	const mesh::indices_t& first_faces;
+	const mesh::counts_t& face_counts;
+//	const typed_array<int32_t>& polyhedron_types;
+	const mesh::polyhedra_t::types_t& polyhedron_types;
+	const mesh::indices_t& face_first_loops;
+	const mesh::counts_t& face_loop_counts;
+	const mesh::selection_t& face_selections;
+	const mesh::materials_t& face_materials;
+	const mesh::indices_t& loop_first_edges;
+	const mesh::indices_t& edge_points;
+	const mesh::indices_t& clockwise_edges;
+	const mesh::selection_t& edge_selections;
+	const mesh::attribute_arrays_t& constant_data;
+	const mesh::attribute_arrays_t& uniform_data;
+	const mesh::attribute_arrays_t& face_varying_data;
+};
+
+/// Gathers the member arrays of a polyhedron primitive into a convenient package
+class primitive
+{
+public:
+	primitive(
+		mesh::indices_t& FirstFaces,
+		mesh::counts_t& FaceCounts,
+//		typed_array<int32_t>& PolyhedronTypes,
+		mesh::polyhedra_t::types_t& PolyhedronTypes,
+		mesh::indices_t& FaceFirstLoops,
+		mesh::counts_t& FaceLoopCounts,
+		mesh::selection_t& FaceSelections,
+		mesh::materials_t& FaceMaterials,
+		mesh::indices_t& LoopFirstEdges,
+		mesh::indices_t& EdgePoints,
+		mesh::indices_t& ClockwiseEdges,
+		mesh::selection_t& EdgeSelections,
+		mesh::attribute_arrays_t& ConstantData,
+		mesh::attribute_arrays_t& UniformData,
+		mesh::attribute_arrays_t& FaceVaryingData
+		);
+
+	mesh::indices_t& first_faces;
+	mesh::counts_t& face_counts;
+//	typed_array<int32_t>& polyhedron_types;
+	mesh::polyhedra_t::types_t& polyhedron_types;
+	mesh::indices_t& face_first_loops;
+	mesh::counts_t& face_loop_counts;
+	mesh::selection_t& face_selections;
+	mesh::materials_t& face_materials;
+	mesh::indices_t& loop_first_edges;
+	mesh::indices_t& edge_points;
+	mesh::indices_t& clockwise_edges;
+	mesh::selection_t& edge_selections;
+	mesh::attribute_arrays_t& constant_data;
+	mesh::attribute_arrays_t& uniform_data;
+	mesh::attribute_arrays_t& face_varying_data;
+};
+
+/// Creates a new polyhedron mesh primitive, returning references to its member arrays.
+/// The caller is responsible for the lifetime of the returned object.
+primitive* create(mesh& Mesh);
+
+/// Creates a new polyhedron mesh primitive from a list of vertices and face indices, returning references to its member arrays.
+/// The caller is responsible for the lifetime of the returned object.
+primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts_t& VertexCounts, const mesh::indices_t& VertexIndices);
 
 /// Initializes arrays for constant-time lookup from an edge to the adjacent edge (if any)
 void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);

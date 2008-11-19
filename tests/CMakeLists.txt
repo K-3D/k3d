@@ -158,6 +158,7 @@ K3D_ADD_TEST(mesh.source.MeshSourceScript.nurbs.patches.py PYTHON REQUIRES K3D_B
 K3D_ADD_TEST(mesh.source.MeshSourceScript.paraboloids.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.point_groups.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.polyhedra.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
+K3D_ADD_TEST(mesh.source.MeshSourceScript.simple_polyhedron.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.spheres.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.teapots.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
 K3D_ADD_TEST(mesh.source.MeshSourceScript.tori.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)

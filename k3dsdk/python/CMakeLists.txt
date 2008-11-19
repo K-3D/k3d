@@ -169,6 +169,8 @@ ADD_LIBRARY(k3dsdk-python-primitives SHARED
 	paraboloid_python.h
 	point_group_python.cpp
 	point_group_python.h
+	polyhedron_python.cpp
+	polyhedron_python.h
 	sphere_python.cpp
 	sphere_python.h
 	teapot_python.cpp

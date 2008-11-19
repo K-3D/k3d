@@ -27,7 +27,9 @@
 #include "parallel/threads.h"
 #include "polyhedron.h"
 
+#include <functional>
 #include <iterator>
+#include <numeric>
 
 namespace k3d
 {
@@ -35,8 +37,196 @@ namespace k3d
 namespace polyhedron
 {
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// const_primitive
+
+const_primitive::const_primitive(
+	const mesh::indices_t& FirstFaces,
+	const mesh::counts_t& FaceCounts,
+//	const typed_array<int32_t>& PolyhedronTypes,
+	const mesh::polyhedra_t::types_t& PolyhedronTypes,
+	const mesh::indices_t& FaceFirstLoops,
+	const mesh::counts_t& FaceLoopCounts,
+	const mesh::selection_t& FaceSelections,
+	const mesh::materials_t& FaceMaterials,
+	const mesh::indices_t& LoopFirstEdges,
+	const mesh::indices_t& EdgePoints,
+	const mesh::indices_t& ClockwiseEdges,
+	const mesh::selection_t& EdgeSelections,
+	const mesh::attribute_arrays_t& ConstantData,
+	const mesh::attribute_arrays_t& UniformData,
+	const mesh::attribute_arrays_t& FaceVaryingData
+		) :
+	first_faces(FirstFaces),
+	face_counts(FaceCounts),
+	polyhedron_types(PolyhedronTypes),
+	face_first_loops(FaceFirstLoops),
+	face_loop_counts(FaceLoopCounts),
+	face_selections(FaceSelections),
+	face_materials(FaceMaterials),
+	loop_first_edges(LoopFirstEdges),
+	edge_points(EdgePoints),
+	clockwise_edges(ClockwiseEdges),
+	edge_selections(EdgeSelections),
+	constant_data(ConstantData),
+	uniform_data(UniformData),
+	face_varying_data(FaceVaryingData)
+{
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// primitive
+
+primitive::primitive(
+	mesh::indices_t& FirstFaces,
+	mesh::counts_t& FaceCounts,
+//	typed_array<int32_t>& PolyhedronTypes,
+	mesh::polyhedra_t::types_t& PolyhedronTypes,
+	mesh::indices_t& FaceFirstLoops,
+	mesh::counts_t& FaceLoopCounts,
+	mesh::selection_t& FaceSelections,
+	mesh::materials_t& FaceMaterials,
+	mesh::indices_t& LoopFirstEdges,
+	mesh::indices_t& EdgePoints,
+	mesh::indices_t& ClockwiseEdges,
+	mesh::selection_t& EdgeSelections,
+	mesh::attribute_arrays_t& ConstantData,
+	mesh::attribute_arrays_t& UniformData,
+	mesh::attribute_arrays_t& FaceVaryingData
+		) :
+	first_faces(FirstFaces),
+	face_counts(FaceCounts),
+	polyhedron_types(PolyhedronTypes),
+	face_first_loops(FaceFirstLoops),
+	face_loop_counts(FaceLoopCounts),
+	face_selections(FaceSelections),
+	face_materials(FaceMaterials),
+	loop_first_edges(LoopFirstEdges),
+	edge_points(EdgePoints),
+	clockwise_edges(ClockwiseEdges),
+	edge_selections(EdgeSelections),
+	constant_data(ConstantData),
+	uniform_data(UniformData),
+	face_varying_data(FaceVaryingData)
+{
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create
+
+primitive* create(mesh& Mesh)
+{
+	mesh::polyhedra_t& polyhedra = Mesh.polyhedra.create();
+	mesh::indices_t& first_faces = polyhedra.first_faces.create();
+	mesh::counts_t& face_counts = polyhedra.face_counts.create();
+	mesh::polyhedra_t::types_t& polyhedron_types = polyhedra.types.create();
+	mesh::indices_t& face_first_loops = polyhedra.face_first_loops.create();
+	mesh::counts_t& face_loop_counts = polyhedra.face_loop_counts.create();
+	mesh::selection_t& face_selection = polyhedra.face_selection.create();
+	mesh::materials_t& face_materials = polyhedra.face_materials.create();
+	mesh::indices_t& loop_first_edges = polyhedra.loop_first_edges.create();
+	mesh::indices_t& edge_points = polyhedra.edge_points.create();
+	mesh::indices_t& clockwise_edges = polyhedra.clockwise_edges.create();
+	mesh::selection_t& edge_selection = polyhedra.edge_selection.create();
+
+	primitive* const result = new primitive(
+		first_faces,
+		face_counts,
+		polyhedron_types,
+		face_first_loops,
+		face_loop_counts,
+		face_selection,
+		face_materials,
+		loop_first_edges,
+		edge_points,
+		clockwise_edges,
+		edge_selection,
+		polyhedra.constant_data,
+		polyhedra.uniform_data,
+		polyhedra.face_varying_data
+		);
+
+	return result;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create
+
+primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts_t& VertexCounts, const mesh::indices_t& VertexIndices)
+{
+	try
+	{
+		if(std::count_if(VertexCounts.begin(), VertexCounts.end(), std::bind2nd(std::less<uint_t>(), 3)))
+		{
+			throw std::runtime_error("each face must have three-or-more vertices.");
+		}
+
+		const uint_t expected_indices = std::accumulate(VertexCounts.begin(), VertexCounts.end(), 0);
+		if(VertexIndices.size() != expected_indices)
+		{
+			std::ostringstream buffer;
+			buffer << "expected [" << expected_indices << "] vertex indices, received [" << VertexIndices.size() << "]";
+			throw std::runtime_error(buffer.str());
+		}
+
+		if(std::count_if(VertexIndices.begin(), VertexIndices.end(), std::bind2nd(std::greater_equal<uint_t>(), Vertices.size())))
+		{
+			throw std::runtime_error("vertex indices out-of-bounds");
+		}
+
+		// Append points to the mesh (create the arrays if they don't already exist) ...
+		mesh::points_t& points = Mesh.points ? Mesh.points.writable() : Mesh.points.create();
+		mesh::selection_t& point_selection = Mesh.point_selection ? Mesh.point_selection.writable() : Mesh.point_selection.create();
+
+		const uint_t point_offset = points.size();
+		points.insert(points.end(), Vertices.begin(), Vertices.end());
+		point_selection.insert(point_selection.end(), Vertices.size(), 0.0);
+		Mesh.vertex_data.resize(points.size());
+
+		// Append a new polyhedron to the mesh ...
+		primitive* const polyhedron = create(Mesh);
+		polyhedron->first_faces.push_back(0);
+		polyhedron->face_counts.push_back(VertexCounts.size());
+		polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+
+		uint_t face_vertex = 0;
+		const uint_t face_begin = 0;
+		const uint_t face_end = face_begin + VertexCounts.size();
+		for(uint_t face = face_begin; face != face_end; ++face)
+		{
+			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+			polyhedron->face_loop_counts.push_back(1);
+			polyhedron->face_selections.push_back(0.0);
+			polyhedron->face_materials.push_back(0);
+			polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
+
+			const uint_t vertex_begin = 0;
+			const uint_t vertex_end = vertex_begin + VertexCounts[face];
+			const uint_t loop_begin = polyhedron->edge_points.size();
+			for(uint_t vertex = vertex_begin; vertex != vertex_end; ++vertex, ++face_vertex)
+			{
+				polyhedron->edge_points.push_back(VertexIndices[face_vertex]);
+				polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+				polyhedron->edge_selections.push_back(0.0);
+			}
+			polyhedron->clockwise_edges.back() = loop_begin;
+		}
+
+		return polyhedron;
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
+	}
+
+	return 0;
+}
+
 namespace detail
 {
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// find_companion_worker
 
 class find_companion_worker
 {
@@ -96,6 +286,9 @@ private:
 
 } // namespace detail
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_edge_adjacency_lookup
+
 void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges)
 {
 	mesh::counts_t valences;
@@ -127,6 +320,9 @@ void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh:
 				detail::find_companion_worker(EdgePoints, ClockwiseEdges, valences, first_edges, point_edges, BoundaryEdges, AdjacentEdges));
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_edge_face_lookup
+
 void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::indices_t& EdgeFaces)
 {
 	EdgeFaces.assign(ClockwiseEdges.size(), 0);
@@ -151,6 +347,9 @@ void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::
 		}
 	}
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_vertex_face_lookup
 
 void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces)
 {
@@ -190,6 +389,9 @@ void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh
 	}
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_vertex_valence_lookup
+
 void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& EdgePoints, mesh::counts_t& Valences)
 {
 	Valences.assign(PointCount, 0);
@@ -204,6 +406,9 @@ void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t
 		++Valences[edge_point];
 	}
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_boundary_face_lookup
 
 void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, mesh::bools_t& BoundaryFaces)
 {
@@ -235,6 +440,9 @@ void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const me
 	}
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// count
+
 const uint_t count(const mesh& Mesh)
 {
 	if(!validate_polyhedra(Mesh))
@@ -242,6 +450,9 @@ const uint_t count(const mesh& Mesh)
 
 	return Mesh.polyhedra->first_faces->size();
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// is_solid
 
 const bool_t is_solid(const mesh& Mesh, const uint_t Polyhedron)
 {
