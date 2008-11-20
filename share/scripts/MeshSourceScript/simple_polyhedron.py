@@ -1,6 +1,7 @@
 #python
 
 import k3d
+k3d.check_node_environment(locals(), "MeshSourceScript")
 
 # Create two triangles, arranged to form a square ...
 vertices = [k3d.point3(-3, -3, 0), k3d.point3(3, -3, 0), k3d.point3(3, 3, 0), k3d.point3(-3, 3, 0)]
