@@ -66,6 +66,8 @@
 #include "named_attribute_arrays_python.h"
 #include "node_python.h"
 #include "normal3_python.h"
+#include "nurbs_curve_python.h"
+#include "nurbs_patch_python.h"
 #include "object_model_python.h"
 #include "paraboloid_python.h"
 #include "parallel_python.h"
@@ -474,6 +476,8 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_log();
 	define_namespace_mesh();
 	define_namespace_mime();
+	define_namespace_nurbs_curve();
+	define_namespace_nurbs_patch();
 	define_namespace_paraboloid();
 	define_namespace_parallel();
 	define_namespace_plugin();

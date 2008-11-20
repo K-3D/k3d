@@ -165,6 +165,10 @@ ADD_LIBRARY(k3dsdk-python-primitives SHARED
 	hyperboloid_python.h
 	linear_curve_python.cpp
 	linear_curve_python.h
+	nurbs_curve_python.cpp
+	nurbs_curve_python.h
+	nurbs_patch_python.cpp
+	nurbs_patch_python.h
 	paraboloid_python.cpp
 	paraboloid_python.h
 	point_group_python.cpp
