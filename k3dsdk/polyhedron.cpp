@@ -116,34 +116,23 @@ primitive::primitive(
 
 primitive* create(mesh& Mesh)
 {
-	mesh::polyhedra_t& polyhedra = Mesh.polyhedra.create();
-	mesh::indices_t& first_faces = polyhedra.first_faces.create();
-	mesh::counts_t& face_counts = polyhedra.face_counts.create();
-	mesh::polyhedra_t::types_t& polyhedron_types = polyhedra.types.create();
-	mesh::indices_t& face_first_loops = polyhedra.face_first_loops.create();
-	mesh::counts_t& face_loop_counts = polyhedra.face_loop_counts.create();
-	mesh::selection_t& face_selection = polyhedra.face_selection.create();
-	mesh::materials_t& face_materials = polyhedra.face_materials.create();
-	mesh::indices_t& loop_first_edges = polyhedra.loop_first_edges.create();
-	mesh::indices_t& edge_points = polyhedra.edge_points.create();
-	mesh::indices_t& clockwise_edges = polyhedra.clockwise_edges.create();
-	mesh::selection_t& edge_selection = polyhedra.edge_selection.create();
+	mesh::polyhedra_t& polyhedron = Mesh.polyhedra.create();
 
 	primitive* const result = new primitive(
-		first_faces,
-		face_counts,
-		polyhedron_types,
-		face_first_loops,
-		face_loop_counts,
-		face_selection,
-		face_materials,
-		loop_first_edges,
-		edge_points,
-		clockwise_edges,
-		edge_selection,
-		polyhedra.constant_data,
-		polyhedra.uniform_data,
-		polyhedra.face_varying_data
+		polyhedron.first_faces.create(),
+		polyhedron.face_counts.create(),
+		polyhedron.types.create(),
+		polyhedron.face_first_loops.create(),
+		polyhedron.face_loop_counts.create(),
+		polyhedron.face_selection.create(),
+		polyhedron.face_materials.create(),
+		polyhedron.loop_first_edges.create(),
+		polyhedron.edge_points.create(),
+		polyhedron.clockwise_edges.create(),
+		polyhedron.edge_selection.create(),
+		polyhedron.constant_data,
+		polyhedron.uniform_data,
+		polyhedron.face_varying_data
 		);
 
 	return result;
@@ -205,7 +194,7 @@ primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts
 			const uint_t loop_begin = polyhedron->edge_points.size();
 			for(uint_t vertex = vertex_begin; vertex != vertex_end; ++vertex, ++face_vertex)
 			{
-				polyhedron->edge_points.push_back(VertexIndices[face_vertex]);
+				polyhedron->edge_points.push_back(point_offset + VertexIndices[face_vertex]);
 				polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
 				polyhedron->edge_selections.push_back(0.0);
 			}
