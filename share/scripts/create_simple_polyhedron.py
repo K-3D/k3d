@@ -13,7 +13,8 @@ try:
 	vertices = [k3d.point3(-3, -3, 0), k3d.point3(3, -3, 0), k3d.point3(3, 3, 0), k3d.point3(-3, 3, 0)]
 	vertex_counts = [3, 3]
 	vertex_indices = [0, 1, 3, 1, 2, 3]
-	polyhedron = k3d.polyhedron.create(mesh, vertices, vertex_counts, vertex_indices)
+	material = None
+	polyhedron = k3d.polyhedron.create(mesh, vertices, vertex_counts, vertex_indices, material)
 
 	mesh_instance = doc.new_node("MeshInstance")
 	mesh_instance.name = "Simple Polyhedron Instance"

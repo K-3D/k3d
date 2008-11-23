@@ -17,6 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "imaterial_python.h"
 #include "mesh_python.h"
 #include "owned_instance_wrapper_python.h"
 #include "polyhedron_python.h"
@@ -86,17 +87,18 @@ public:
 		return wrap_owned(k3d::polyhedron::create(Mesh.wrapped()));
 	}
 
-	static object create2(mesh& Mesh, list Vertices, list VertexCounts, list VertexIndices)
+	static object create2(mesh& Mesh, list Vertices, list VertexCounts, list VertexIndices, object Material)
 	{
 		k3d::mesh::points_t vertices;
 		k3d::mesh::counts_t vertex_counts;
 		k3d::mesh::indices_t vertex_indices;
+		k3d::imaterial* const material = Material ? boost::python::extract<imaterial_wrapper>(Material)().wrapped_ptr()  : 0;
 
 		utility::copy(Vertices, vertices);
 		utility::copy(VertexCounts, vertex_counts);
 		utility::copy(VertexIndices, vertex_indices);
 
-		return wrap_owned(k3d::polyhedron::create(Mesh.wrapped(), vertices, vertex_counts, vertex_indices));
+		return wrap_owned(k3d::polyhedron::create(Mesh.wrapped(), vertices, vertex_counts, vertex_indices, material));
 	}
 
 /*
@@ -114,9 +116,12 @@ public:
 
 void define_namespace_polyhedron()
 {
-	scope outer = class_<polyhedron>("polyhedron", no_init)
-		.def("create", &polyhedron::create)
-		.def("create", &polyhedron::create2)
+	scope outer = class_<polyhedron>("polyhedron",
+		"Provides functionality to create and manipulate polyhedron mesh primitives.", no_init)
+		.def("create", &polyhedron::create,
+			"Creates an empty polyhedron, returning an object that can be used to access all of its arrays.")
+		.def("create", &polyhedron::create2,
+			"Creates a polyhedron, populating it from a list of vertices, a list of per-face vertex counts, a list of per-face vertices, and an optional material node.")
 		.staticmethod("create")
 /*
 		.def("validate", &polyhedron::validate)

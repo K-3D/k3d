@@ -73,6 +73,8 @@ public:
 	typedef typed_array<point2> points_2d_t;
 	/// Defines storage for a generic collection of 3D points
 	typedef typed_array<point3> points_t;
+	/// Defines storage for a generic collection of 3D texture coordinates
+	typedef typed_array<texture3> texture_coordinates_t;
 	/// Defines storage for a generic collection of 3D vectors
 	typedef typed_array<vector3> vectors_t;
 	/// Defines a heterogeneous collection of named, shared arrays with varying lengths

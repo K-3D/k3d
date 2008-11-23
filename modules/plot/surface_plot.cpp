@@ -32,10 +32,10 @@
 #include <k3dsdk/log.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_property_changed_signal.h>
@@ -87,7 +87,8 @@ public:
 
 	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		Output = k3d::create_grid(m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
+		Output = k3d::mesh();
+		k3d::polyhedron::create_grid(Output, m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

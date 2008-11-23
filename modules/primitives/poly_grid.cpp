@@ -26,9 +26,9 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 
 #include <iterator>
 
@@ -70,7 +70,8 @@ public:
 	void on_update_mesh_topology(k3d::mesh& Output)
 	{
 		document().pipeline_profiler().start_execution(*this, "Update Mesh Topology");
-		Output = k3d::create_grid(m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
+		Output = k3d::mesh();
+		k3d::polyhedron::create_grid(Output, m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
 		document().pipeline_profiler().finish_execution(*this, "Update Mesh Topology");
 	}
 

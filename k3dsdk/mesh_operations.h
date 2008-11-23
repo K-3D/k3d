@@ -31,11 +31,6 @@ namespace k3d
 
 class imaterial;
 
-/// Returns a mesh containing a topological "grid" of polygons with the given number of polys in each parametric direction.
-const mesh create_grid(const uint_t Rows, const uint_t Columns, imaterial* const Material = 0);
-/// Returns a mesh containing a topological "cylinder" of polygons with the given number of polys in each parametric direction.
-const mesh create_cylinder(const uint_t Rows, const uint_t Columns, imaterial* const Material = 0);
-
 /// Returns true iff every polyhedron in the given mesh is a solid volume.
 const bool_t is_solid(const mesh& Mesh);
 /// Returns true iff every face in the given mesh is a triangle.

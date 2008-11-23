@@ -124,7 +124,22 @@ primitive* create(mesh& Mesh);
 
 /// Creates a new polyhedron mesh primitive from a list of vertices and face indices, returning references to its member arrays.
 /// The caller is responsible for the lifetime of the returned object.
-primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts_t& VertexCounts, const mesh::indices_t& VertexIndices);
+primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts_t& VertexCounts, const mesh::indices_t& VertexIndices, imaterial* const Material);
+
+/// Creates a new polyhedron mesh primitive from a list of vertices, texture coordinates, and face indices, returning references to its member arrays.
+/// The caller is responsible for the lifetime of the returned object.
+primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts_t& VertexCounts, const mesh::indices_t& VertexIndices, const mesh::texture_coordinates_t& TextureCoordinates, imaterial* const Material);
+
+/// Creates a new polyhedron mesh primitive whose faces form a topological "grid" with the given number of rows and columns.
+/// The geometry (vertex coordinates) of the grid is undefined, and must be set by the caller after create_grid() returns.
+/// The caller is responsible for the lifetime of the returned object.
+primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
+/// Creates a new polyhedron mesh primitive whose faces form a topological "cylinder" with the given number of rows and columns,
+/// and the first and last columns stitched-together.  The geometry (vertex coordinates) of the cylinder is undefined, and must
+/// be set by the caller after create_grid() returns.  Note that many surfaces-of-revolution can be represented as topological
+/// cylinders, including disks, cones, cylinders, hyperboloids, paraboloids, and spheres.  The caller is responsible for the
+/// lifetime of the returned object.
+primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
 
 /// Initializes arrays for constant-time lookup from an edge to the adjacent edge (if any)
 void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);
