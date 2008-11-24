@@ -214,43 +214,45 @@ public:
 				// Allow custom property controls to override our defaults ...
 				if(!control)
 				{
-					if(imetadata* const metadata = dynamic_cast<imetadata*>(&property))
+					// Look for an explicit property control type ...
+					string_t property_control_type;
+					if(imetadata* const property_metadata = dynamic_cast<imetadata*>(&property))
+						property_control_type = property_metadata->get_metadata()["k3d:property-type"];
+
+					// Otherwise, fall-back on the C++ property type ...
+					if(property_control_type.empty())
+						property_control_type = k3d::type_string(property_type);
+
+					static plugin::factory::collection_t control_factories = plugin::factory::lookup("ngui:component-type", "property-control");
+					for(plugin::factory::collection_t::const_iterator factory = control_factories.begin(); factory != control_factories.end(); ++factory)
 					{
-						imetadata::metadata_t property_metadata = metadata->get_metadata();
-						if(property_metadata.count("k3d:property-type"))
+						if((**factory).metadata()["ngui:property-type"] != property_control_type)
+							continue;
+
+						if(custom_property::control* const custom_control = plugin::create<custom_property::control>(**factory))
 						{
-							static plugin::factory::collection_t control_factories = plugin::factory::lookup("ngui:component-type", "property-control");
-							for(plugin::factory::collection_t::const_iterator factory = control_factories.begin(); factory != control_factories.end(); ++factory)
+							if(control = dynamic_cast<Gtk::Widget*>(custom_control))
 							{
-								iplugin_factory::metadata_t factory_metadata = (**factory).metadata();
-								if(factory_metadata["ngui:property-type"] != property_metadata["k3d:property-type"])
-									continue;
-
-								if(custom_property::control* const custom_control = plugin::create<custom_property::control>(**factory))
-								{
-									if(control = dynamic_cast<Gtk::Widget*>(custom_control))
-									{
-										custom_control->initialize(m_document_state, m_parent, property);
-									}
-									else
-									{
-										k3d::log() << error << "custom property control must derive from Gtk::Widget" << std::endl;
-									}
-								}
-								else
-								{
-									k3d::log() << error << "error creating custom property control" << std::endl;
-								}
-
-								break;
+								custom_control->initialize(m_document_state, m_parent, property);
+							}
+							else
+							{
+								k3d::log() << error << "custom property control must derive from Gtk::Widget" << std::endl;
 							}
 						}
+						else
+						{
+							k3d::log() << error << "error creating custom property control" << std::endl;
+						}
+
+						break;
 					}
 				}
 
-				// Boolean properties ...
+				// Otherwise, provide our own hard-wired controls based on property type ...
 				if(!control)
 				{
+					// Boolean properties ...
 					if(property_type == typeid(bool_t))
 					{
 						control = new check_button::control(m_parent, property_name, check_button::proxy(property, state_recorder, property_name));
