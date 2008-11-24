@@ -449,13 +449,12 @@ private:
 	//Format i.e. "x,y" or "x y"
 	void get_pair(float& x, float& y, std::istringstream& def_stream)
 	{
-		std::string arg;
-		def_stream >> arg;
-		if(is_together(arg))
-			sscanf(arg.c_str(), "%f,%f", &x, &y);
-		else
+		// Based on Tim's code in obj_io
+		def_stream >> x;
+		if(def_stream.peek() == ',' || def_stream.peek() == ' ')
 		{
-			x = atof(arg.c_str());
+			char separator;
+			def_stream >> separator;
 			def_stream >> y;
 		}
 	}

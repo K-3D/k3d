@@ -170,7 +170,8 @@ void store_selection(const mesh& Mesh, mesh_selection& Selection)
 
 void merge_selection(const mesh_selection& MeshSelection, mesh& Mesh)
 {
-	detail::merge_selection(MeshSelection.points, Mesh.points, Mesh.point_selection);
+	if(Mesh.points && Mesh.point_selection)
+		detail::merge_selection(MeshSelection.points, Mesh.points, Mesh.point_selection);
 
 	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
 	{
