@@ -699,7 +699,7 @@ void mesh::lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
 		detail::mark_used_points(*Mesh.polyhedra->edge_points, UnusedPoints);
 
 	// Mark points used by generic mesh primtiives ...
-	visit_primitive_arrays(Mesh, detail::mark_used_primitive_points(UnusedPoints));
+	visit_arrays(Mesh, detail::mark_used_primitive_points(UnusedPoints));
 }
 
 namespace detail
@@ -781,7 +781,7 @@ void mesh::delete_unused_points(mesh& Mesh)
 		detail::remap_points(Mesh.polyhedra.writable().edge_points.writable(), point_map);
 
 	// Update generic mesh primitives so they use the correct indices ...
-	visit_primitive_arrays(Mesh, detail::remap_primitive_points(point_map));
+	visit_arrays(Mesh, detail::remap_primitive_points(point_map));
 
 	// Free leftover memory ...
 	points.resize(points_remaining);

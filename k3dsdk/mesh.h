@@ -284,7 +284,7 @@ public:
 
 	/// Iterates over every array in every generic primitive in the given mesh, passing the array name and array to a functor.
 	template<typename FunctorT>
-	static void visit_primitive_arrays(const mesh& Mesh, FunctorT Functor)
+	static void visit_arrays(const mesh& Mesh, FunctorT Functor)
 	{
 		for(mesh::primitives_t::const_iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
 		{
@@ -302,7 +302,7 @@ public:
 
 	/// Iterates over every array in every generic primitive in the given mesh, passing the array name and array to a functor.
 	template<typename FunctorT>
-	static void visit_primitive_arrays(mesh& Mesh, FunctorT Functor)
+	static void visit_arrays(mesh& Mesh, FunctorT Functor)
 	{
 		for(mesh::primitives_t::iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
 		{
@@ -317,7 +317,6 @@ public:
 			}
 		}
 	}
-
 };
 
 /// Stream serialization
