@@ -223,7 +223,7 @@ public:
 			stream << indentation << "v" << current_array << " [label=\"{|||...|}\"]\n";
 			stream << indentation << "v" << current_topology_arrays << ":" << Name << ":e -> " << "v" << current_array << ":w\n";
 
-			if(Array.get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::mesh_point_indices())
+			if(Array.get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::mesh_point_indices_domain())
 				stream << indentation << "v" << current_array << ":n -> " << "v" << current_mesh->points.get() << ":n\n";
 
 			current_array = 0;
