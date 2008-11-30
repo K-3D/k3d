@@ -216,7 +216,7 @@ void ContentPanel::createPreviewNodes()
 	      
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_light_shader))
-        metadata->set_metadata(nametag_metatag, key_bck_lshade_meta);
+        metadata->set_metadata_value(nametag_metatag, key_bck_lshade_meta);
    
     }//if
 
@@ -237,7 +237,7 @@ void ContentPanel::createPreviewNodes()
 	      
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_fill_light_shader))
-        metadata->set_metadata(nametag_metatag, fill_lshade_meta);
+        metadata->set_metadata_value(nametag_metatag, fill_lshade_meta);
    
     }//if
 
@@ -265,7 +265,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_main_light))
-        metadata->set_metadata(nametag_metatag, key_light_meta);
+        metadata->set_metadata_value(nametag_metatag, key_light_meta);
 
     }//if
 
@@ -292,7 +292,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_fill_light))
-        metadata->set_metadata(nametag_metatag, fill_light_meta);
+        metadata->set_metadata_value(nametag_metatag, fill_light_meta);
 
     }//if
 
@@ -318,7 +318,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_back_light))
-        metadata->set_metadata(nametag_metatag, back_light_meta);
+        metadata->set_metadata_value(nametag_metatag, back_light_meta);
 
     }//if
 
@@ -357,7 +357,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_camera))
-        metadata->set_metadata(nametag_metatag, camera_meta);
+        metadata->set_metadata_value(nametag_metatag, camera_meta);
 
     }//if
 
@@ -421,7 +421,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(aqsis))
-        metadata->set_metadata(nametag_metatag, aqsis_render_meta);
+        metadata->set_metadata_value(nametag_metatag, aqsis_render_meta);
 
     }//if
 
@@ -486,7 +486,7 @@ void ContentPanel::createPreviewNodes()
 
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_engine))
-        metadata->set_metadata(nametag_metatag, rman_engine_meta);
+        metadata->set_metadata_value(nametag_metatag, rman_engine_meta);
 
     }//if
 
@@ -574,13 +574,13 @@ void ContentPanel::rEngineAlpha(k3d::bool_t toggle, MaterialObj *mat)
         {
           //Set MetaData To Show Background
           if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(mat_node))
-            metadata->set_metadata(MaterialObj::show_bg_nametag_mt, MaterialObj::do_show_bg);
+            metadata->set_metadata_value(MaterialObj::show_bg_nametag_mt, MaterialObj::do_show_bg);
         }
       else
         {
           //Set MetaData To NOT Show Background
           if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(mat_node))
-            metadata->set_metadata(MaterialObj::show_bg_nametag_mt, MaterialObj::do_not_show_bg);
+            metadata->set_metadata_value(MaterialObj::show_bg_nametag_mt, MaterialObj::do_not_show_bg);
         }
     }
 

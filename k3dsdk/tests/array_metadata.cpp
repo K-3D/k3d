@@ -1,3 +1,4 @@
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/typed_array.h>
 #include <k3dsdk/uint_t_array.h>
 
@@ -30,25 +31,25 @@ int main(int argc, char* argv[])
 		test_expression(a.size() == 2);
 
 		// Assign some metadata ...
-		a.set_metadata_value("k3d:mesh-point-index", "true");
+		a.set_metadata_value(k3d::metadata::key::domain(), k3d::metadata::value::mesh_point_indices_domain());
 		test_expression(a.get_metadata().size() == 1);
-		test_expression(a.get_metadata_value("k3d:mesh-point-index") == "true");
+		test_expression(a.get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::mesh_point_indices_domain());
 
 		// Verify that metadata is copied correctly ...
 		k3d::uint_t_array b = a;
 		test_expression(b.size() == 2);
 		test_expression(b.get_metadata().size() == 1);
-		test_expression(b.get_metadata_value("k3d:mesh-point-index") == "true");
+		test_expression(b.get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::mesh_point_indices_domain());
 
 		boost::scoped_ptr<k3d::array> c(a.clone());
 		test_expression(c->size() == 2);
 		test_expression(c->get_metadata().size() == 1);
-		test_expression(c->get_metadata_value("k3d:mesh-point-index") == "true");
+		test_expression(c->get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::mesh_point_indices_domain());
 
 		boost::scoped_ptr<k3d::array> d(a.clone_type());
 		test_expression(d->empty());
 		test_expression(d->get_metadata().size() == 1);
-		test_expression(d->get_metadata_value("k3d:mesh-point-index") == "true");
+		test_expression(d->get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::mesh_point_indices_domain());
 
 		// Verify that metadata is handled correctly when testing for equality ...
 		k3d::uint_t_array e = a;
@@ -60,7 +61,7 @@ int main(int argc, char* argv[])
 		e.erase_metadata_value("foo");
 		test_expression(e.almost_equal(a, 0));
 
-		e.set_metadata_value("k3d:mesh-point-index", "false");
+		e.set_metadata_value(k3d::metadata::key::domain(), "../array[@name=\"clockwise_edges\"]/indices()");
 		test_expression(!e.almost_equal(a, 0));
 	}
 	catch(std::exception& e)

@@ -12,7 +12,7 @@
 					<array name="curve_point_counts" type="k3d::uint_t">11</array>
 					<array name="curve_points" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10
 						<metadata>
-							<pair name="k3d:mesh-point-indices">true</pair>
+							<pair name="k3d:domain">/points/indices()</pair>
 						</metadata>
 					</array>
 					<array name="curve_selections" type="k3d::double_t">0</array>

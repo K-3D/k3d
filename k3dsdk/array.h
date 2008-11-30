@@ -58,15 +58,15 @@ public:
 	virtual const bool_t almost_equal(const array& Other, const uint64_t Threshold) const = 0;
 
 	/// Sets a new name-value pair, overwriting the value if the name already exists
-	void set_metadata_value(const string_t& name, const string_t& value);
+	void set_metadata_value(const string_t& Name, const string_t& Value);
 	/// Sets a collection of name-value pairs, overwriting any existing values
-	void set_metadata(const metadata_t& values);
+	void set_metadata(const metadata_t& Values);
 	/// Returns the set of all name-value pairs
 	metadata_t get_metadata() const;
 	/// Returns a value by name, or empty-string if the name doesn't exist
-	const string_t get_metadata_value(const string_t& name) const;
+	const string_t get_metadata_value(const string_t& Name) const;
 	/// Erases an existing name-value pair
-	void erase_metadata_value(const string_t& name);
+	void erase_metadata_value(const string_t& Name);
 
 protected:
 	/// Storage for array metadata

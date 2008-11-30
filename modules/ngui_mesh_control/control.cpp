@@ -19,15 +19,15 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/array_metadata.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/iomanip.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/custom_property_control.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/entry.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
-#include <k3dsdk/mesh.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/type_registry.h>
 
@@ -223,7 +223,7 @@ public:
 			stream << indentation << "v" << current_array << " [label=\"{|||...|}\"]\n";
 			stream << indentation << "v" << current_topology_arrays << ":" << Name << ":e -> " << "v" << current_array << ":w\n";
 
-			if(Array.get_metadata_value(k3d::mesh_point_indices()) == "true")
+			if(Array.get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::mesh_point_indices())
 				stream << indentation << "v" << current_array << ":n -> " << "v" << current_mesh->points.get() << ":n\n";
 
 			current_array = 0;

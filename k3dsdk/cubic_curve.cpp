@@ -17,8 +17,8 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "array_metadata.h"
 #include "cubic_curve.h"
+#include "metadata_keys.h"
 #include "primitive_detail.h"
 
 #include <numeric>
@@ -110,7 +110,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["varying"]
 		);
 
-	result->curve_points.set_metadata_value(mesh_point_indices(), "true");
+	result->curve_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
 }
@@ -138,7 +138,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::attribute_arrays_t& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
 		const mesh::attribute_arrays_t& varying_data = require_const_attribute_arrays(Primitive, "varying");
 
-		require_metadata(Primitive, curve_points, "curve_points", mesh_point_indices(), "true");
+		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_array_size(Primitive, curve_counts, "curve_counts", first_curves.size());
 		require_array_size(Primitive, periodic_curves, "periodic_curves", first_curves.size());
@@ -186,7 +186,7 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::attribute_arrays_t& uniform_data = require_attribute_arrays(Primitive, "uniform");
 		mesh::attribute_arrays_t& varying_data = require_attribute_arrays(Primitive, "varying");
 
-		require_metadata(Primitive, curve_points, "curve_points", mesh_point_indices(), "true");
+		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_array_size(Primitive, curve_counts, "curve_counts", first_curves.size());
 		require_array_size(Primitive, periodic_curves, "periodic_curves", first_curves.size());

@@ -184,7 +184,7 @@ void setup_renderman_document(k3d::idocument& Document)
 k3d::inode* setup_selection_document(k3d::idocument& Document)
 {
 	k3d::imetadata* node_selection = k3d::plugin::create<k3d::imetadata>("NodeSelection", Document, "Node Selection");
-	node_selection->set_metadata("ngui:unique_node", "node_selection"); // metadata to ensure this node is found by the UI layer
+	node_selection->set_metadata_value("ngui:unique_node", "node_selection"); // metadata to ensure this node is found by the UI layer
 	return dynamic_cast<k3d::inode*>(node_selection);
 }
 

@@ -17,8 +17,8 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "array_metadata.h"
 #include "bicubic_patch.h"
+#include "metadata_keys.h"
 #include "primitive_detail.h"
 
 #include <numeric>
@@ -85,7 +85,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["varying"]
 		);
 
-	result->patch_points.set_metadata_value(mesh_point_indices(), "true");
+	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
 }
@@ -108,7 +108,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const attribute_arrays& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
 		const attribute_arrays& varying_data = require_const_attribute_arrays(Primitive, "varying");
 
-		require_metadata(Primitive, patch_points, "patch_points", mesh_point_indices(), "true");
+		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_array_size(Primitive, patch_materials, "patch_materials", patch_selections.size());
 		require_array_size(Primitive, patch_points, "patch_points", patch_selections.size() * 16);
@@ -142,7 +142,7 @@ primitive* validate(mesh::primitive& Primitive)
 		attribute_arrays& uniform_data = require_attribute_arrays(Primitive, "uniform");
 		attribute_arrays& varying_data = require_attribute_arrays(Primitive, "varying");
 
-		require_metadata(Primitive, patch_points, "patch_points", mesh_point_indices(), "true");
+		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_array_size(Primitive, patch_materials, "patch_materials", patch_selections.size());
 		require_array_size(Primitive, patch_points, "patch_points", patch_selections.size() * 16);

@@ -30,7 +30,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/metadata.h>
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/nurbs.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/selection.h>
@@ -122,7 +122,7 @@ public:
 			base(Factory, Document),
 			m_knot_vector(init_owner(*this) + init_name("knot_vector") + init_label(_("Knot Vector")) + init_description(_("Enter a new knot vector containing knot values separated with spaces.")) + init_value(k3d::mesh::knots_t()))
 	{
-		m_knot_vector.set_metadata("k3d:property-type", "k3d:nurbs-knot-vector");
+		m_knot_vector.set_metadata_value(k3d::metadata::key::domain(), k3d::metadata::value::nurbs_knot_vector_domain());
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
 		m_knot_vector.changed_signal().connect(make_update_mesh_slot());
 	}
@@ -201,7 +201,7 @@ public:
 	}
 
 private:
-	k3d::metadata_property < k3d_data(k3d::mesh::knots_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, array_serialization) > m_knot_vector;
+	k3d::metadata::property< k3d_data(k3d::mesh::knots_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, array_serialization) > m_knot_vector;
 	int m_curve;
 
 	k3d::mesh::knots_t extract_knots(const k3d::mesh& Output, int curve)

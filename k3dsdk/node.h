@@ -45,7 +45,7 @@ class node :
 	public ipersistent,
 	public property_collection,
 	public persistent_property_collection,
-	public metadata,
+	public metadata::storage,
 	public sigc::trackable
 {
 public:

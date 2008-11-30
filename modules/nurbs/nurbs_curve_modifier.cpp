@@ -1,6 +1,6 @@
 #include "nurbs_curve_modifier.h"
 
-#include <k3dsdk/array_metadata.h>
+#include <k3dsdk/metadata.h>
 #include <k3dsdk/linear_curve.h>
 
 #include <boost/scoped_ptr.hpp>

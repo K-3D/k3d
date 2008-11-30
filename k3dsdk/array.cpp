@@ -38,15 +38,15 @@ array::~array()
 {
 }
 
-void array::set_metadata_value(const string_t& name, const string_t& value)
+void array::set_metadata_value(const string_t& Name, const string_t& Value)
 {
-	metadata[name] = value;
+	metadata[Name] = Value;
 }
 
-void array::set_metadata(const metadata_t& values)
+void array::set_metadata(const metadata_t& Values)
 {
 	// Note ... we don't use insert() here because we want to overwrite any existing values
-	for(metadata_t::const_iterator pair = values.begin(); pair != values.end(); ++pair)
+	for(metadata_t::const_iterator pair = Values.begin(); pair != Values.end(); ++pair)
 		metadata[pair->first] = pair->second;
 }
 
@@ -55,15 +55,15 @@ array::metadata_t array::get_metadata() const
 	return metadata;
 }
 
-const string_t array::get_metadata_value(const string_t& name) const
+const string_t array::get_metadata_value(const string_t& Name) const
 {
-	metadata_t::const_iterator pair = metadata.find(name);
+	metadata_t::const_iterator pair = metadata.find(Name);
 	return pair != metadata.end() ? pair->second : string_t();
 }
 
-void array::erase_metadata_value(const string_t& name)
+void array::erase_metadata_value(const string_t& Name)
 {
-	metadata.erase(name);
+	metadata.erase(Name);
 }
 
 } // namespace k3d

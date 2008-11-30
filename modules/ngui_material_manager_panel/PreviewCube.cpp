@@ -43,7 +43,7 @@ void PreviewCube::init(k3d::string_t _node_name, k3d::string_t _meta_nametag)
 
   //Create Meta Data
   if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_doc_node))
-    metadata->set_metadata("PreviewCore::nametag", _meta_nametag);
+    metadata->set_metadata_value("PreviewCore::nametag", _meta_nametag);
 }
 
 

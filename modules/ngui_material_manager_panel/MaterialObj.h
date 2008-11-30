@@ -155,7 +155,7 @@ class MaterialObj
              no_undo, local_storage, no_constraint, 
              no_property, no_serialization) 						m_artistname;
 
-    k3d::metadata_property
+    k3d::metadata::property
       <k3d_data(k3d::string_t, no_name, change_signal, 
                 no_undo, local_storage, no_constraint, 
                 no_property, no_serialization)> 					m_artistnotes;

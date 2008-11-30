@@ -24,7 +24,7 @@ void MaterialObj::init()
   loadFromMeta();
 
   //Drop Hint To Multiline Text Item
-  m_artistnotes.set_metadata("k3d:property-type", "k3d:multi-line-text");
+  m_artistnotes.set_metadata_value("k3d:property-type", "k3d:multi-line-text");
 
   //Change Signals For Data Variables
   m_name.changed_signal()
@@ -56,28 +56,28 @@ void MaterialObj::onNameChange(k3d::ihint *_h)
 void MaterialObj::onTypeChange(k3d::ihint *_h)
 {
   if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_doc_node))
-    metadata->set_metadata("materialManager::material_type", type());
+    metadata->set_metadata_value("materialManager::material_type", type());
 }
 
 
 void MaterialObj::onDateStampChange(k3d::ihint *_h)
 {
   if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_doc_node))
-    metadata->set_metadata("materialManager::material_datestamp", dateStamp());
+    metadata->set_metadata_value("materialManager::material_datestamp", dateStamp());
 }
 
 
 void MaterialObj::onArtistNameChange(k3d::ihint *_h)
 {
   if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_doc_node))
-    metadata->set_metadata("materialManager::material_artistname", artistName());
+    metadata->set_metadata_value("materialManager::material_artistname", artistName());
 }
 
 
 void MaterialObj::onArtistNotesChange(k3d::ihint *h_)
 {
   if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_doc_node))
-    metadata->set_metadata("materialManager::material_artistnotes", artistNotes());
+    metadata->set_metadata_value("materialManager::material_artistnotes", artistNotes());
 }	
 
 
@@ -122,7 +122,7 @@ void  MaterialObj::setPreviewGeo(k3d::inode *geo, k3d::string_t meta_attachedgeo
 
   //Set Meta Data For Material
   if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_doc_node))
-    metadata->set_metadata(MaterialObj::attached_geo_nametag_mt, meta_attachedgeo);
+    metadata->set_metadata_value(MaterialObj::attached_geo_nametag_mt, meta_attachedgeo);
 
 
 }

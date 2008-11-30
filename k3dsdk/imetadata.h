@@ -41,13 +41,15 @@ public:
 	typedef std::map<string_t, string_t> metadata_t;
 
 	/// Sets a new name-value pair, overwriting the value if the name already exists
-	virtual void set_metadata(const string_t& name, const string_t& value) = 0;
+	virtual void set_metadata_value(const string_t& Name, const string_t& Value) = 0;
 	/// Sets a collection of name-value pair, overwriting any existing values
-	virtual void set_metadata(const metadata_t& values) = 0;
+	virtual void set_metadata(const metadata_t& Values) = 0;
 	/// Returns the set of existing name-value pairs
 	virtual metadata_t get_metadata() = 0;
+	/// Returns a value by name, or empty-string if the name doesn't exist
+	virtual const string_t get_metadata_value(const string_t& Name) = 0;
 	/// Erases an existing name-value pair
-	virtual void erase_metadata(const string_t& name) = 0;
+	virtual void erase_metadata_value(const string_t& Name) = 0;
 
 	/// Connects a slot to a signal that will be emitted whenever the metadata contents change
 	virtual sigc::connection connect_metadata_changed_signal(const sigc::slot<void>& Slot) = 0;

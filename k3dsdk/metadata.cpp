@@ -26,35 +26,49 @@
 namespace k3d
 {
 
-void metadata::set_metadata(const string_t& name, const string_t& value)
+namespace metadata
 {
-	m_storage[name] = value;
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// storage
+
+void storage::set_metadata_value(const string_t& Name, const string_t& Value)
+{
+	m_storage[Name] = Value;
 	m_changed_signal.emit();
 }
 
-void metadata::set_metadata(const metadata_t& values)
+void storage::set_metadata(const metadata_t& Values)
 {
 	// Note ... we don't use insert() here because we want to overwrite any existing values
-	for(metadata_t::const_iterator pair = values.begin(); pair != values.end(); ++pair)
+	for(metadata_t::const_iterator pair = Values.begin(); pair != Values.end(); ++pair)
 		m_storage[pair->first] = pair->second;
 	m_changed_signal.emit();
 }
 
-metadata::metadata_t metadata::get_metadata()
+storage::metadata_t storage::get_metadata()
 {
 	return m_storage;
 }
 
-void metadata::erase_metadata(const string_t& name)
+const string_t storage::get_metadata_value(const string_t& Name)
 {
-	m_storage.erase(name);
+	metadata_t::const_iterator pair = m_storage.find(Name);
+	return pair != m_storage.end() ? pair->second : string_t();
+}
+
+void storage::erase_metadata_value(const string_t& Name)
+{
+	m_storage.erase(Name);
 	m_changed_signal.emit();
 }
 
-sigc::connection metadata::connect_metadata_changed_signal(const sigc::slot<void>& Slot)
+sigc::connection storage::connect_metadata_changed_signal(const sigc::slot<void>& Slot)
 {
 	return m_changed_signal.connect(Slot);
 }
+
+} // namespace metadata
 
 } // namespace k3d
 

@@ -23,7 +23,6 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include <k3dsdk/array_metadata.h>
 #include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/hints.h>
@@ -33,6 +32,7 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/parallel/blocked_range.h>
 #include <k3dsdk/parallel/parallel_for.h>
@@ -439,13 +439,13 @@ public:
 					const k3d::string_t& array_name = a->first;
 					k3d::array& array = a->second.writable();
 
-					if(array.get_metadata_value(k3d::mesh_point_indices()) != "true")
+					if(array.get_metadata_value(k3d::metadata::key::domain()) != k3d::metadata::value::mesh_point_indices_domain())
 						continue;
 
 					k3d::uint_t_array* const index_array = dynamic_cast<k3d::uint_t_array*>(&array);
 					if(!index_array)
 					{
-						k3d::log() << error << k3d::mesh_point_indices() << " array [" << array_name << "] must be a k3d::uint_t_array." << std::endl;
+						k3d::log() << error << "array [" << array_name << "] must be a k3d::uint_t_array." << std::endl;
 						continue;
 					}
 
@@ -459,13 +459,13 @@ public:
 						const k3d::string_t& array_name = a->first;
 						k3d::array& array = a->second.writable();
 
-						if(array.get_metadata_value(k3d::mesh_point_indices()) != "true")
+						if(array.get_metadata_value(k3d::metadata::key::domain()) != k3d::metadata::value::mesh_point_indices_domain())
 							continue;
 
 						k3d::uint_t_array* const index_array = dynamic_cast<k3d::uint_t_array*>(&array);
 						if(!index_array)
 						{
-							k3d::log() << error << k3d::mesh_point_indices() << " array [" << array_name << "] must be a k3d::uint_t_array." << std::endl;
+							k3d::log() << error << "array [" << array_name << "] must be a k3d::uint_t_array." << std::endl;
 							continue;
 						}
 

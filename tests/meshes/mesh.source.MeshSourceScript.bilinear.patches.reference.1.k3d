@@ -10,7 +10,7 @@
 					<array name="patch_materials" type="k3d::imaterial*">0 0</array>
 					<array name="patch_points" type="k3d::uint_t">0 1 2 3 4 5 6 7
 						<metadata>
-							<pair name="k3d:mesh-point-indices">true</pair>
+							<pair name="k3d:domain">/points/indices()</pair>
 						</metadata>
 					</array>
 					<array name="patch_selections" type="k3d::double_t">0 0</array>

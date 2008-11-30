@@ -17,15 +17,54 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "array_metadata.h"
+/** \file
+	\author Tim Shead (tshead@k-3d.com)
+*/
+
+#include "metadata_keys.h"
 
 namespace k3d
 {
 
-const string_t mesh_point_indices()
+namespace metadata
 {
-	return "k3d:mesh-point-indices";
+
+namespace key
+{
+
+const string_t authors()
+{
+	return "k3d:authors";
 }
+
+const string_t copyright()
+{
+	return "k3d:copyright";
+}
+
+const string_t domain()
+{
+	return "k3d:domain";
+}
+
+} // namespace key
+
+namespace value
+{
+
+const string_t mesh_point_indices_domain()
+{
+	return "/points/indices()";
+}
+
+const string_t nurbs_knot_vector_domain()
+{
+	return "k3d:nurbs-knot-vector";
+}
+
+} // namespace value
+
+} // namespace metadata
 
 } // namespace k3d
 

@@ -55,7 +55,7 @@ template<typename property_t>
 class user_property :
 	public property_t,
 	public iuser_property,
-	public metadata
+	public metadata::storage
 {
 public:
 	template<typename init_t>

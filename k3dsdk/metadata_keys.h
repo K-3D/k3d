@@ -1,5 +1,5 @@
-#ifndef K3DSDK_METADATA_H
-#define K3DSDK_METADATA_H
+#ifndef K3DSDK_METADATA_KEYS_H
+#define K3DSDK_METADATA_KEYS_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "imetadata.h"
+#include "types.h"
 
 namespace k3d
 {
@@ -32,43 +32,33 @@ namespace k3d
 namespace metadata
 {
 
-/// Provides a boilerplate implementation of imetadata
-class storage :
-	public imetadata 
+namespace key
 {
-public:
-	void set_metadata_value(const string_t& Name, const string_t& Value);
-	void set_metadata(const metadata_t& Values);
-	metadata_t get_metadata();
-	const string_t get_metadata_value(const string_t& Name);
-	void erase_metadata_value(const string_t& Name);
-	sigc::connection connect_metadata_changed_signal(const sigc::slot<void>& Slot);
 
-private:
-	metadata_t m_storage;
-	sigc::signal<void> m_changed_signal;
-};
+/// Storage for a collection of authors
+const string_t authors();
+/// Storage for a copyright notice
+const string_t copyright();
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// property
+/// Metadata key "k3d:domain" is used to define the domain over which a value / collection of values is defined.
+/// It is commonly used with generic mesh primitives to specify that one array contains indices into another.
+const string_t domain();
 
-/// Wraps a k3d_data object to add metadata
-template<typename property_t>
-class property :
-	public property_t,
-	public storage
+} // namespace key
+
+namespace value
 {
-public:
-	template<typename init_t>
-	property(const init_t& Init) :
-		property_t(Init)
-	{
-	}
-};
+
+/// Metadata value for use with "k3d:domain" that specifies the mesh point array
+const string_t mesh_point_indices_domain();
+/// Metadata value for use with "k3d:domain" that specifies that an array of floating-point values is a NURBS knot vector
+const string_t nurbs_knot_vector_domain();
+
+} // namespace value
 
 } // namespace metadata
 
 } // namespace k3d
 
-#endif // !K3DSDK_METADATA_H
+#endif // !K3DSDK_METADATA_KEYS_H
 

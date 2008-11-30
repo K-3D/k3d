@@ -65,7 +65,7 @@ public:
 		m_leader(init_owner(*this) + init_name("leader") + init_label(_("Leader")) + init_description(_("Leader line")) + init_value(false)),
 		m_leader_target(init_owner(*this) + init_name("leader_target") + init_label(_("Leader Target")) + init_description(_("Leader line target")) + init_value(k3d::identity3D()))
 	{
-		m_text.set_metadata("k3d:property-type", "k3d:multi-line-text");
+		m_text.set_metadata_value("k3d:property-type", "k3d:multi-line-text");
 
 		m_font_path.changed_signal().connect(make_async_redraw_slot());
 		m_font_size.changed_signal().connect(make_async_redraw_slot());
@@ -170,7 +170,7 @@ private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_line_width;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_line_spacing;
 	k3d_data(alignment_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_alignment;
-	k3d::metadata_property<k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization)> m_text;
+	k3d::metadata::property<k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization)> m_text;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_leader;
 	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_leader_target;

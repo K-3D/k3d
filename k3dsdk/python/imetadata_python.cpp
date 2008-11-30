@@ -32,9 +32,9 @@ namespace k3d
 namespace python
 {
 
-static void set_metadata(imetadata_wrapper& Self, const string_t& Name, const string_t& Value)
+static void set_metadata_value(imetadata_wrapper& Self, const string_t& Name, const string_t& Value)
 {
-	Self.wrapped().set_metadata(Name, Value);
+	Self.wrapped().set_metadata_value(Name, Value);
 }
 
 static boost::python::dict get_metadata(imetadata_wrapper& Self)
@@ -48,9 +48,14 @@ static boost::python::dict get_metadata(imetadata_wrapper& Self)
 	return result;
 }
 
-static void erase_metadata(imetadata_wrapper& Self, const string_t& Name)
+static string_t get_metadata_value(imetadata_wrapper& Self, const string_t& Name)
 {
-	Self.wrapped().erase_metadata(Name);
+	return Self.wrapped().get_metadata_value(Name);
+}
+
+static void erase_metadata_value(imetadata_wrapper& Self, const string_t& Name)
+{
+	Self.wrapped().erase_metadata_value(Name);
 }
 
 void define_class_imetadata()
@@ -58,9 +63,10 @@ void define_class_imetadata()
 	class_<imetadata_wrapper>("imetadata", 
 		"Abstract interface for objects that can store user-defined metadata.",
 		no_init)
-		.def("set_metadata", &set_metadata)
+		.def("set_metadata_value", &set_metadata_value)
 		.def("get_metadata", &get_metadata)
-		.def("erase_metadata", &erase_metadata)
+		.def("get_metadata_value", &get_metadata_value)
+		.def("erase_metadata_value", &erase_metadata_value)
 		;
 }
 

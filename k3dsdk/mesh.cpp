@@ -17,12 +17,12 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "array_metadata.h"
 #include "color.h"
 #include "imaterial.h"
 #include "iomanip.h"
 #include "legacy_mesh.h"
 #include "mesh.h"
+#include "metadata_keys.h"
 #include "type_registry.h"
 
 #include <boost/mpl/for_each.hpp>
@@ -672,7 +672,7 @@ struct mark_used_primitive_points
 
 	void operator()(const string_t&, const pipeline_data<array>& Array)
 	{
-		if(Array->get_metadata_value(k3d::mesh_point_indices()) != "true")
+		if(Array->get_metadata_value(metadata::key::domain()) != metadata::value::mesh_point_indices_domain())
 			return;
 
 		if(const mesh::indices_t* const array = dynamic_cast<const mesh::indices_t*>(Array.get()))
@@ -724,7 +724,7 @@ struct remap_primitive_points
 
 	void operator()(const string_t&, pipeline_data<array>& Array)
 	{
-		if(Array->get_metadata_value(k3d::mesh_point_indices()) != "true")
+		if(Array->get_metadata_value(metadata::key::domain()) != metadata::value::mesh_point_indices_domain())
 			return;
 
 		if(mesh::indices_t* const array = dynamic_cast<mesh::indices_t*>(&Array.writable()))
