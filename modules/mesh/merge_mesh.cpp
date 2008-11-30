@@ -403,6 +403,33 @@ public:
 			m_output_mesh.update(k3d::hint::mesh_topology_changed::instance());
 	}
 
+	class offset_point_indices
+	{
+	public:
+		offset_point_indices(const k3d::uint_t Offset) :
+			offset(Offset)
+		{
+		}
+
+		void operator()(const k3d::string_t& Name, k3d::pipeline_data<k3d::array>& Array)
+		{
+			if(Array->get_metadata_value(k3d::metadata::key::domain()) != k3d::metadata::value::mesh_point_indices_domain())
+				return;
+
+			k3d::uint_t_array* const array = dynamic_cast<k3d::uint_t_array*>(&Array.writable());
+			if(!array)
+			{
+				k3d::log() << error << "array [" << Name << "] must be a k3d::uint_t_array." << std::endl;
+				return;
+			}
+
+			std::transform(array->begin(), array->end(), array->begin(), std::bind2nd(std::plus<k3d::uint_t>(), offset));
+		}
+
+	private:
+		const k3d::uint_t offset;	
+	};
+
 	void on_update_mesh_topology(k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
@@ -428,50 +455,11 @@ public:
 
 			// Must be last to calculate correct offsets in other methods
 			const k3d::uint_t point_offset = detail::merge_points(Output, mesh);
-			
 			for(k3d::mesh::primitives_t::const_iterator primitive = mesh.primitives.begin(); primitive != mesh.primitives.end(); ++primitive)
 			{
 				Output.primitives.push_back(*primitive);
 				k3d::mesh::primitive& new_primitive = Output.primitives.back().writable();
-
-				for(k3d::mesh::named_arrays_t::iterator a = new_primitive.topology.begin(); a != new_primitive.topology.end(); ++a)
-				{
-					const k3d::string_t& array_name = a->first;
-					k3d::array& array = a->second.writable();
-
-					if(array.get_metadata_value(k3d::metadata::key::domain()) != k3d::metadata::value::mesh_point_indices_domain())
-						continue;
-
-					k3d::uint_t_array* const index_array = dynamic_cast<k3d::uint_t_array*>(&array);
-					if(!index_array)
-					{
-						k3d::log() << error << "array [" << array_name << "] must be a k3d::uint_t_array." << std::endl;
-						continue;
-					}
-
-					std::transform(index_array->begin(), index_array->end(), index_array->begin(), std::bind2nd(std::plus<k3d::uint_t>(), point_offset));
-				}
-
-				for(k3d::mesh::named_attribute_arrays_t::iterator attributes = new_primitive.attributes.begin(); attributes != new_primitive.attributes.end(); ++attributes)
-				{
-					for(k3d::mesh::attribute_arrays_t::iterator a = attributes->second.begin(); a != attributes->second.end(); ++a)
-					{
-						const k3d::string_t& array_name = a->first;
-						k3d::array& array = a->second.writable();
-
-						if(array.get_metadata_value(k3d::metadata::key::domain()) != k3d::metadata::value::mesh_point_indices_domain())
-							continue;
-
-						k3d::uint_t_array* const index_array = dynamic_cast<k3d::uint_t_array*>(&array);
-						if(!index_array)
-						{
-							k3d::log() << error << "array [" << array_name << "] must be a k3d::uint_t_array." << std::endl;
-							continue;
-						}
-
-						std::transform(index_array->begin(), index_array->end(), index_array->begin(), std::bind2nd(std::plus<k3d::uint_t>(), point_offset));
-					}
-				}
+				k3d::mesh::visit_arrays(new_primitive, offset_point_indices(point_offset));
 			}
 		}
 	}

@@ -282,22 +282,40 @@ public:
 	/// Remove unused points from a mesh, adjusting point indices in all remaining primitives.
 	static void delete_unused_points(mesh& Mesh);
 
+	/// Iterates over every array in a generic mesh primitive, passing the array name and array to a functor.
+	template<typename FunctorT>
+	static void visit_arrays(const mesh::primitive& Primitive, FunctorT Functor)
+	{
+		for(mesh::named_arrays_t::const_iterator array = Primitive.topology.begin(); array != Primitive.topology.end(); ++array)
+			Functor(array->first, array->second);
+
+		for(mesh::named_attribute_arrays_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
+		{
+			for(mesh::attribute_arrays_t::const_iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
+				Functor(array->first, array->second);
+		}
+	}
+
+	/// Iterates over every array in a generic mesh primitive, passing the array name and array to a functor.
+	template<typename FunctorT>
+	static void visit_arrays(mesh::primitive& Primitive, FunctorT Functor)
+	{
+		for(mesh::named_arrays_t::iterator array = Primitive.topology.begin(); array != Primitive.topology.end(); ++array)
+			Functor(array->first, array->second);
+
+		for(mesh::named_attribute_arrays_t::iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
+		{
+			for(mesh::attribute_arrays_t::iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
+				Functor(array->first, array->second);
+		}
+	}
+
 	/// Iterates over every array in every generic primitive in the given mesh, passing the array name and array to a functor.
 	template<typename FunctorT>
 	static void visit_arrays(const mesh& Mesh, FunctorT Functor)
 	{
 		for(mesh::primitives_t::const_iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
-		{
-			const mesh::primitive& primitive = **p;
-			for(mesh::named_arrays_t::const_iterator array = primitive.topology.begin(); array != primitive.topology.end(); ++array)
-				Functor(array->first, array->second);
-
-			for(mesh::named_attribute_arrays_t::const_iterator attributes = primitive.attributes.begin(); attributes != primitive.attributes.end(); ++attributes)
-			{
-				for(mesh::attribute_arrays_t::const_iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
-					Functor(array->first, array->second);
-			}
-		}
+			visit_arrays(**p, Functor);
 	}
 
 	/// Iterates over every array in every generic primitive in the given mesh, passing the array name and array to a functor.
@@ -305,17 +323,7 @@ public:
 	static void visit_arrays(mesh& Mesh, FunctorT Functor)
 	{
 		for(mesh::primitives_t::iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
-		{
-			mesh::primitive& primitive = p->writable();
-			for(mesh::named_arrays_t::iterator array = primitive.topology.begin(); array != primitive.topology.end(); ++array)
-				Functor(array->first, array->second);
-
-			for(mesh::named_attribute_arrays_t::iterator attributes = primitive.attributes.begin(); attributes != primitive.attributes.end(); ++attributes)
-			{
-				for(mesh::attribute_arrays_t::iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
-					Functor(array->first, array->second);
-			}
-		}
+			visit_arrays(p->writable(), Functor);
 	}
 };
 

@@ -698,7 +698,7 @@ void mesh::lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
 	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
 		detail::mark_used_points(*Mesh.polyhedra->edge_points, UnusedPoints);
 
-	// Mark points used by generic mesh primtiives ...
+	// Mark points used by generic mesh primitives ...
 	visit_arrays(Mesh, detail::mark_used_primitive_points(UnusedPoints));
 }
 
