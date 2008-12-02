@@ -3,10 +3,8 @@ PROJECT(k3dsdk)
 FILE(GLOB HEADERS *.h)
 FILE(GLOB SOURCES *.cpp)
 
-IF(CMAKE_HAS_SORT)
-	LIST(SORT HEADERS)
-	LIST(SORT SOURCES)
-ENDIF(CMAKE_HAS_SORT)
+LIST(SORT HEADERS)
+LIST(SORT SOURCES)
 
 IF(WIN32 AND K3D_COMPILER_GCC)
 	# For some reason, serialization_xml.cpp takes *forever* to build with optimizations enabled
