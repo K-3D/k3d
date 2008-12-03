@@ -95,7 +95,7 @@ public:
 			XVisualInfo* const visual = glXChooseVisual(display, DefaultScreen(display), config);
 			return_if_fail(visual);
 
-			const GLXContext context = glXCreateContext(display, visual, 0, true);
+			const GLXContext context = glXCreateContext(display, visual, 0, false);
 			return_if_fail(context);
 
 			Pixmap pixmap = XCreatePixmap(display, RootWindow(display, visual->screen), width, height, visual->depth);
