@@ -162,7 +162,8 @@ public:
 	///\param curve The curve to śplit
 	///\param u The u-value at which we're going to split
 	///\param reconnect If the curve was closed, connect it at the initial start/end point to have one single curve
-	void split_curve_at(k3d::uint_t curve, double u, bool reconnect);
+	///\return True on success
+	bool split_curve_at(k3d::uint_t curve, double u, bool reconnect);
 
 	///Returns a nurbs_curve struct which is a copy of the chosen curve
 	///\param curve The curve to extract

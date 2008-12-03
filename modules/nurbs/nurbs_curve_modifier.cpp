@@ -1615,7 +1615,7 @@ void nurbs_curve_modifier::curve_degree_elevate(k3d::uint_t curve)
 	}
 }
 
-void nurbs_curve_modifier::split_curve_at(k3d::uint_t curve, double u, bool reconnect)
+bool nurbs_curve_modifier::split_curve_at(k3d::uint_t curve, double u, bool reconnect)
 {
 	try
 	{
@@ -1648,7 +1648,7 @@ void nurbs_curve_modifier::split_curve_at(k3d::uint_t curve, double u, bool reco
 				else
 				{
 					k3d::log() << error << "Curve contains this point several times, don't know where to split" << std::endl;
-					return;
+					return false;
 				}
 			}
 		}
@@ -1660,7 +1660,7 @@ void nurbs_curve_modifier::split_curve_at(k3d::uint_t curve, double u, bool reco
 			{
 				k3d::log() << error << nurbs_debug << output_point(mesh_points->at(curve_points->at(point))) << std::endl;
 			}
-			return;
+			return false;
 		}
 		MY_DEBUG  << "Found in curve at index: " << curve_point_index << std::endl;
 
@@ -1689,7 +1689,7 @@ void nurbs_curve_modifier::split_curve_at(k3d::uint_t curve, double u, bool reco
 		if (knot_index < 0)
 		{
 			k3d::log() << error << "Curve does not contain knot " << u << std::endl;
-			return;
+			return false;
 		}
 		MY_DEBUG  << "First occurrence of knot " << u << " is " << knot_index << std::endl;
 
@@ -1752,11 +1752,14 @@ void nurbs_curve_modifier::split_curve_at(k3d::uint_t curve, double u, bool reco
 	catch (std::exception& e)
 	{
 		MY_DEBUG << "Error in SplitCurve: " << e.what() << std::endl;
+		return false;
 	}
 	catch (...)
 	{
 		MY_DEBUG << "Error in SplitCurve" << std::endl;
+		return false;
 	}
+	return true;
 }
 
 void nurbs_curve_modifier::traverse_curve(k3d::uint_t curve1, k3d::uint_t curve2, bool create_caps)
@@ -2312,7 +2315,8 @@ bool nurbs_curve_modifier::create_cap(k3d::uint_t curve)
 
 			//split it up at the middle
 			mod.normalize_knot_vector(0);
-			mod.split_curve_at(0, u, false);
+			if(!mod.split_curve_at(0, u, false))
+				return false;
 			mod.flip_curve(0);
 			//->ruled surface
 			mod.ruled_surface(0, 1);
