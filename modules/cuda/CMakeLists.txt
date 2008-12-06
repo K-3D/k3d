@@ -1,4 +1,5 @@
 INCLUDE ( FindCUDA.cmake )
+LINK_DIRECTORIES(${k3d_BINARY_DIR}/bin)
 
 WRAP_CUDA(CUDA_SOURCES cuda_entry_points.cu)
 
