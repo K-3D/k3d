@@ -279,6 +279,12 @@ void cuda_device_polyhedra::copy_from_device(const k3d::mesh::polyhedra_t& desti
         {
             p_output_polyhedra->edge_selection.create( new k3d::mesh::selection_t ( m_number_of_edges ) );
         }
+        
+        // Create a default face materials array
+        if(!p_output_polyhedra->face_materials)
+        {
+        	p_output_polyhedra->face_materials.create(new k3d::mesh::materials_t(m_number_of_faces));
+        }
 
         synchronize_threads();
         double* out_selection = (double*)&(p_output_polyhedra->edge_selection->front());

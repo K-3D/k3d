@@ -22,4 +22,4 @@ modifier.level = 2
 
 document.set_dependency(modifier.get_property("input_mesh"), varying_colors.get_property("output_mesh"))
 
-testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.CatmullClark.complex", 1)
+testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.CatmullClark.complex", 2)

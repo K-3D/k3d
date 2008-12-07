@@ -391,6 +391,7 @@ K3D_ADD_TEST(ngui.tutorials.panel_basics NGUI TUTORIAL panel_basics.k3dscript)
 K3D_ADD_TEST(ngui.tutorials.navigation NGUI TUTORIAL navigation.k3dscript)
 K3D_ADD_TEST(ngui.tutorials.basic_selection NGUI TUTORIAL basic_selection.k3dscript)
 K3D_ADD_TEST(ngui.tutorials.mug NGUI TUTORIAL mug.k3dscript)
+K3D_ADD_TEST(ngui.tutorials.nurbs_skinned_surface NGUI TUTORIAL nurbs_skinned_surface.k3dscript)
 
 K3D_ADD_TEST(ngui.performance.sds.polycube.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.performance.sds.init.legacy.py PYTHON NGUI)
