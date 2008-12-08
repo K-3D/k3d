@@ -90,7 +90,7 @@ edge_selection.append(0.0)
 Cs.append(k3d.color(1, 1, 1))
 
 modifier = document.new_node("TriangulateFaces")
-mesh_selection = k3d.select_all()
+mesh_selection = k3d.mesh_selection.select_all()
 modifier.mesh_selection = mesh_selection
 document.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
 

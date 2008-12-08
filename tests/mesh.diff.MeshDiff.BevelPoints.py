@@ -15,7 +15,7 @@ for i in range(100):
 	cube = doc.new_node("PolyCube")
 
 	bevel_points = doc.new_node("BevelPoints")
-	selection = k3d.deselect_all()
+	selection = k3d.mesh_selection.deselect_all()
 	selection.points = [(0, 4, 1), (4, 1000, 0)]
 	bevel_points.mesh_selection = selection;
 

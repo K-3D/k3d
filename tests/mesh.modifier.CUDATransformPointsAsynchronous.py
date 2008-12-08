@@ -5,8 +5,8 @@ import testing
 
 setup = testing.setup_mesh_modifier_test("PolyCube", "CUDATransformPointsAsynchronous")
 
-selection = k3d.deselect_all()
-selection.points = k3d.component_select_all()
+selection = k3d.mesh_selection.deselect_all()
+selection.points = k3d.mesh_selection.component_select_all()
 
 setup.modifier.mesh_selection = selection
 setup.modifier.input_matrix = k3d.translate3(k3d.vector3(0, 0, 1))

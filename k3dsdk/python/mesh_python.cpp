@@ -648,9 +648,9 @@ static object mesh_primitives_t_create(mesh_primitives_t_wrapper& Self, const st
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// define_namespace_mesh 
+// define_class_mesh 
 
-void define_namespace_mesh()
+void define_class_mesh()
 {
 	class_<detail::const_nurbs_curve_groups>("const_nurbs_curve_groups",
 		"Stores an immutable (read-only) collection of NURBS curve primitives.")

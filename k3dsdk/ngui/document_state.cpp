@@ -235,6 +235,7 @@ struct select_lines
 					}
 					return;
 
+/*
 				case k3d::selection::ABSOLUTE_LINEAR_CURVE:
 					Selection.linear_curves.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
@@ -242,7 +243,7 @@ struct select_lines
 				case k3d::selection::ABSOLUTE_CUBIC_CURVE:
 					Selection.cubic_curves.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
-
+*/
 				case k3d::selection::ABSOLUTE_NURBS_CURVE:
 					Selection.nurbs_curves.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
@@ -275,6 +276,7 @@ struct select_faces
 					Selection.faces.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
 
+/*
 				case k3d::selection::ABSOLUTE_BILINEAR_PATCH:
 					Selection.bilinear_patches.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
@@ -282,7 +284,7 @@ struct select_faces
 				case k3d::selection::ABSOLUTE_BICUBIC_PATCH:
 					Selection.bicubic_patches.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
-
+*/
 				case k3d::selection::ABSOLUTE_NURBS_PATCH:
 					Selection.nurbs_patches.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
@@ -386,11 +388,7 @@ struct select_all_points
 		Selection.points = k3d::mesh_selection::component_select_all();
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
 		Selection.faces = k3d::mesh_selection::component_deselect_all();
-		Selection.linear_curves = k3d::mesh_selection::component_deselect_all();
-		Selection.cubic_curves = k3d::mesh_selection::component_deselect_all();
 		Selection.nurbs_curves = k3d::mesh_selection::component_deselect_all();
-		Selection.bilinear_patches = k3d::mesh_selection::component_deselect_all();
-		Selection.bicubic_patches = k3d::mesh_selection::component_deselect_all();
 		Selection.nurbs_patches = k3d::mesh_selection::component_deselect_all();
 	}
 };
@@ -402,11 +400,7 @@ struct select_all_lines
 		Selection.points = k3d::mesh_selection::component_deselect_all();
 		Selection.edges = k3d::mesh_selection::component_select_all();
 		Selection.faces = k3d::mesh_selection::component_deselect_all();
-		Selection.linear_curves = k3d::mesh_selection::component_select_all();
-		Selection.cubic_curves = k3d::mesh_selection::component_select_all();
 		Selection.nurbs_curves = k3d::mesh_selection::component_select_all();
-		Selection.bilinear_patches = k3d::mesh_selection::component_deselect_all();
-		Selection.bicubic_patches = k3d::mesh_selection::component_deselect_all();
 		Selection.nurbs_patches = k3d::mesh_selection::component_deselect_all();
 	}
 };
@@ -418,11 +412,7 @@ struct select_all_faces
 		Selection.points = k3d::mesh_selection::component_deselect_all();
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
 		Selection.faces = k3d::mesh_selection::component_select_all();
-		Selection.linear_curves = k3d::mesh_selection::component_deselect_all();
-		Selection.cubic_curves = k3d::mesh_selection::component_deselect_all();
 		Selection.nurbs_curves = k3d::mesh_selection::component_deselect_all();
-		Selection.bilinear_patches = k3d::mesh_selection::component_select_all();
-		Selection.bicubic_patches = k3d::mesh_selection::component_select_all();
 		Selection.nurbs_patches = k3d::mesh_selection::component_select_all();
 	}
 };
@@ -462,8 +452,6 @@ struct invert_lines
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		invert(Selection.edges);
-		invert(Selection.linear_curves);
-		invert(Selection.cubic_curves);
 		invert(Selection.nurbs_curves);
 	}
 };
@@ -473,8 +461,6 @@ struct invert_faces
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		invert(Selection.faces);
-		invert(Selection.bilinear_patches);
-		invert(Selection.bicubic_patches);
 		invert(Selection.nurbs_patches);
 	}
 };
@@ -489,11 +475,7 @@ void deselect_gaps(k3d::mesh_selection& Selection)
 	deselect_gaps(Selection.points);
 	deselect_gaps(Selection.edges);
 	deselect_gaps(Selection.faces);
-	deselect_gaps(Selection.linear_curves);
-	deselect_gaps(Selection.cubic_curves);
 	deselect_gaps(Selection.nurbs_curves);
-	deselect_gaps(Selection.bilinear_patches);
-	deselect_gaps(Selection.bicubic_patches);
 	deselect_gaps(Selection.nurbs_patches);
 }
 
@@ -676,11 +658,7 @@ struct convert_to_points
 		{
 			Selection.edges.clear();
 			Selection.faces.clear();
-			Selection.linear_curves.clear();
-			Selection.cubic_curves.clear();
 			Selection.nurbs_curves.clear();
-			Selection.bilinear_patches.clear();
-			Selection.bicubic_patches.clear();
 			Selection.nurbs_patches.clear();
 		}
 
@@ -868,8 +846,6 @@ struct convert_to_lines
 		{
 			Selection.points.clear();
 			Selection.faces.clear();
-			Selection.bilinear_patches.clear();
-			Selection.bicubic_patches.clear();
 			Selection.nurbs_patches.clear();
 		}
 
@@ -1004,8 +980,6 @@ struct convert_to_faces
 		{
 			Selection.points.clear();
 			Selection.edges.clear();
-			Selection.linear_curves.clear();
-			Selection.cubic_curves.clear();
 			Selection.nurbs_curves.clear();
 		}
 

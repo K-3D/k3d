@@ -80,6 +80,7 @@
 #include "polyhedron_python.h"
 #include "resource_python.h"
 #include "ri_python.h"
+#include "selection_python.h"
 #include "sphere_python.h"
 #include "teapot_python.h"
 #include "texture3_python.h"
@@ -104,7 +105,6 @@
 #include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/mesh_diff.h>
-#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/render_state_ri.h> // MinGW needs typeinfo
 #include <k3dsdk/scripting.h>
@@ -153,31 +153,6 @@ struct python_wrap<double>
 	static PyObject* convert(const double Value)
 	{
 		return Py_BuildValue("d", Value);
-	}
-};
-
-template<>
-struct python_wrap<mesh_selection::records_t>
-{
-	static PyObject* convert(const k3d::mesh_selection::records_t& Value)
-	{
-		PyObject* const py_records = PyList_New(Value.size());
-		return_val_if_fail(py_records, 0);
-
-		size_t index = 0;
-		for(k3d::mesh_selection::records_t::const_iterator record = Value.begin(); record != Value.end(); ++record, ++index)
-		{
-			PyObject* const py_record = PyTuple_New(3);
-			return_val_if_fail(py_record, 0);
-
-			PyTuple_SetItem(py_record, 0, python_wrap<unsigned long>::convert(static_cast<unsigned long>(record->begin)));
-			PyTuple_SetItem(py_record, 1, python_wrap<unsigned long>::convert(static_cast<unsigned long>(record->end)));
-			PyTuple_SetItem(py_record, 2, python_wrap<double>::convert(record->weight));
-
-			PyList_SetItem(py_records, index, py_record);
-		}
-
-		return py_records;
 	}
 };
 
@@ -423,8 +398,6 @@ const k3d::vector3 module_to_vector3(const k3d::point3& v)
 
 BOOST_PYTHON_MODULE(k3d)
 {
-	to_python_converter<k3d::mesh_selection::records_t, python_wrap<k3d::mesh_selection::records_t> >();
-
 	define_typed_array_classes();
 	define_const_typed_array_classes();
 
@@ -451,6 +424,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_iunknown();
 	define_class_iuser_interface();
 	define_class_matrix4();
+	define_class_mesh();
 	define_class_mesh_selection();
 	define_class_named_arrays();
 	define_class_named_attribute_arrays();
@@ -474,7 +448,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_hyperboloid();
 	define_namespace_linear_curve();
 	define_namespace_log();
-	define_namespace_mesh();
 	define_namespace_mime();
 	define_namespace_nurbs_curve();
 	define_namespace_nurbs_patch();
@@ -485,6 +458,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_polyhedron();
 	define_namespace_resource();
 	define_namespace_ri();
+	define_namespace_selection();
 	define_namespace_sphere();
 	define_namespace_teapot();
 	define_namespace_torus();
@@ -502,14 +476,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Closes an open document.");
 	def("command_nodes", module_command_nodes,
 		"Returns the root(s) of the command node hierarchy.");
-	def("component_deselect_all", k3d::mesh_selection::component_deselect_all,
-		"Returns a list for use with L{mesh_selection} that deselects an entire range of mesh components.");
-	def("component_select_all", k3d::mesh_selection::component_select_all,
-		"Returns a list for use with L{mesh_selection} that selects an entire range of mesh components.");
 	def("create_plugin", module_create_plugin,
 		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
-	def("deselect_all", k3d::mesh_selection::deselect_all,
-		"Returns a L{mesh_selection} that explicitly deselects every component.");
 	def("documents", module_documents,
 		"Returns a list containing all open documents.");
 	def("dynamic_cast", do_dynamic_cast,
@@ -550,10 +518,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns a L{matrix4} containing a three-dimensional rotation matrix.");
 	def("scale3", module_scale3,
 		"Returns a L{matrix4} containing a three-dimensional scaling matrix.");
-	def("select_all", k3d::mesh_selection::select_all,
-		"Returns a L{mesh_selection} that explicitly selects every component.");
-	def("select_null", k3d::mesh_selection::select_null,
-		"Returns a L{mesh_selection} that does not select or deselect any components.");
 	def("share_path", k3d::share_path,
 		"Returns the runtime path to shared data.");
 	def("to_vector3", module_to_vector3,

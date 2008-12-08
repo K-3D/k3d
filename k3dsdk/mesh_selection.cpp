@@ -106,15 +106,19 @@ private:
 const mesh_selection mesh_selection::select_all()
 {
 	mesh_selection result;
+
 	result.points = component_select_all();
 	result.edges = component_select_all();
 	result.faces = component_select_all();
-	result.linear_curves = component_select_all();
-	result.cubic_curves = component_select_all();
 	result.nurbs_curves = component_select_all();
-	result.bilinear_patches = component_select_all();
-	result.bicubic_patches = component_select_all();
 	result.nurbs_patches = component_select_all();
+
+	result.add_record(selection::CONSTANT, 0, uint_t(-1), 0, uint_t(-1), 1.0);
+	result.add_record(selection::UNIFORM, 0, uint_t(-1), 0, uint_t(-1), 1.0);
+	result.add_record(selection::VARYING, 0, uint_t(-1), 0, uint_t(-1), 1.0);
+	result.add_record(selection::FACE_VARYING, 0, uint_t(-1), 0, uint_t(-1), 1.0);
+	result.add_record(selection::SPLIT_EDGE, 0, uint_t(-1), 0, uint_t(-1), 1.0);
+	result.add_record(selection::VERTEX, 0, uint_t(-1), 0, uint_t(-1), 1.0);
 
 	return result;
 }
@@ -122,15 +126,19 @@ const mesh_selection mesh_selection::select_all()
 const mesh_selection mesh_selection::deselect_all()
 {
 	mesh_selection result;
+
 	result.points = component_deselect_all();
 	result.edges = component_deselect_all();
 	result.faces = component_deselect_all();
-	result.linear_curves = component_deselect_all();
-	result.cubic_curves = component_deselect_all();
 	result.nurbs_curves = component_deselect_all();
-	result.bilinear_patches = component_deselect_all();
-	result.bicubic_patches = component_deselect_all();
 	result.nurbs_patches = component_deselect_all();
+
+	result.add_record(selection::CONSTANT, 0, uint_t(-1), 0, uint_t(-1), 0.0);
+	result.add_record(selection::UNIFORM, 0, uint_t(-1), 0, uint_t(-1), 0.0);
+	result.add_record(selection::VARYING, 0, uint_t(-1), 0, uint_t(-1), 0.0);
+	result.add_record(selection::FACE_VARYING, 0, uint_t(-1), 0, uint_t(-1), 0.0);
+	result.add_record(selection::SPLIT_EDGE, 0, uint_t(-1), 0, uint_t(-1), 0.0);
+	result.add_record(selection::VERTEX, 0, uint_t(-1), 0, uint_t(-1), 0.0);
 
 	return result;
 }
@@ -140,18 +148,41 @@ const mesh_selection mesh_selection::select_null()
 	return mesh_selection();
 }
 
+void mesh_selection::add_record(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight)
+{
+	type.push_back(Type);
+	primitive_begin.push_back(PrimitiveBegin);
+	primitive_end.push_back(PrimitiveEnd);
+	index_begin.push_back(IndexBegin);
+	index_end.push_back(IndexEnd);
+	weight.push_back(Weight);
+}
+
+void mesh_selection::clear()
+{
+	points.clear();
+	edges.clear();
+	faces.clear();
+	nurbs_curves.clear();
+	nurbs_patches.clear();
+
+	type.clear();
+	primitive_begin.clear();
+	primitive_end.clear();
+	index_begin.clear();
+	index_end.clear();
+	weight.clear();
+}
+
 bool mesh_selection::empty() const
 {
 	return
 		points.empty() &&
 		edges.empty() &&
 		faces.empty() &&
-		linear_curves.empty() &&
-		cubic_curves.empty() &&
 		nurbs_curves.empty() &&
-		bilinear_patches.empty() &&
-		bicubic_patches.empty() &&
-		nurbs_patches.empty();
+		nurbs_patches.empty() &&
+		type.empty();
 }
 
 bool mesh_selection::operator==(const mesh_selection& RHS) const
@@ -160,12 +191,14 @@ bool mesh_selection::operator==(const mesh_selection& RHS) const
 		points == RHS.points &&
 		edges == RHS.edges &&
 		faces == RHS.faces &&
-		linear_curves == RHS.linear_curves &&
-		cubic_curves == RHS.cubic_curves &&
 		nurbs_curves == RHS.nurbs_curves &&
-		bilinear_patches == RHS.bilinear_patches &&
-		bicubic_patches == RHS.bicubic_patches &&
-		nurbs_patches == RHS.nurbs_patches;
+		nurbs_patches == RHS.nurbs_patches &&
+		type == RHS.type &&
+		primitive_begin == RHS.primitive_begin &&
+		primitive_end == RHS.primitive_end &&
+		index_begin == RHS.index_begin &&
+		index_end == RHS.index_end &&
+		weight == RHS.weight;
 }
 
 bool mesh_selection::operator!=(const mesh_selection& RHS) const
@@ -198,99 +231,6 @@ void show_selection_list(const mesh_selection::records_t& Selections)
 	k3d::log() << debug << "--------end selection list-------" << std::endl;
 }
 
-/*
-void mesh_selection::insert(const uint_t Begin, const record& Record, records_t& Selections)
-{
-
-	// first element, no checking needed
-	if (Selections.empty())
-	{
-		Selections.insert(std::make_pair(Begin, Record));
-		return;
-	}
-
-	// find first element equal than or greater than start of record to insert
-	records_t::iterator after_start = Selections.lower_bound(Begin);
-	// find the first element after the end of the record to insert
-	records_t::iterator after_end = Selections.upper_bound(Record.end);
-	// record right before the one we are about to insert, or Selections.end() if there is none
-	records_t::iterator before;
-	if (after_start == Selections.begin())
-	{
-		before = Selections.end();
-	}
-	else
-	{
-		before = after_start;
-		--before;
-	}
-
-	// collapse records that come after the record to insert
-	records_t::iterator a_record = after_start;
-	record new_record = Record;
-	record saved_record(0,0.0);
-	int saved_start = -1;
-	int count = 0;
-	while (a_record != after_end && a_record->first <= new_record.end)
-	{
-		if (a_record->second.weight == Record.weight) // simple collapse with following record
-		{
-			new_record.end = a_record->second.end > new_record.end ? a_record->second.end : new_record.end; // expand range if needed
-			records_t::iterator to_delete = a_record;
-			++a_record;
-			Selections.erase(to_delete);
-			++count;
-		}
-		else
-		{
-			if (a_record->second.end <= new_record.end)
-			{ // completeley overwrite old selection record
-				records_t::iterator to_delete = a_record;
-				++a_record;
-				Selections.erase(to_delete);
-			}
-			else
-			{ // save non-overlapped selection with other value
-				saved_record = a_record->second;
-				saved_start = new_record.end;
-				records_t::iterator to_delete = a_record;
-				++a_record;
-				Selections.erase(to_delete);
-			}
-		}
-	}
-
-	if (saved_start > -1)
-		Selections.insert(std::make_pair(saved_start, saved_record));
-
-	// collapse with record before the one we are inserting
-	if (before != Selections.end() && Begin <= before->second.end)
-	{
-		if (before->second.weight == Record.weight) // simple collapse
-		{
-			before->second.end = new_record.end;
-			//show_selection_list(Selections); // FIXME extremely slow debug output
-			return; // collapsed with record before the one to insert, so we're done
-		}
-		else // split up if selection weight differs
-		{
-			uint_t old_end = before->second.end;
-			before->second.end = Begin;
-			if (old_end > new_record.end)
-			{
-				Selections.insert(std::make_pair(new_record.end, record(old_end, before->second.weight)));
-			}
-			if (before->first == before->second.end)
-				Selections.erase(before);
-		}
-	}
-
-	Selections.insert(std::make_pair(Begin, new_record));
-
-	//show_selection_list(Selections); // FIXME extremely slow debug output
-}
-*/
-
 std::ostream& operator<<(std::ostream& Stream, const mesh_selection::records_t& RHS)
 {
 	for(mesh_selection::records_t::const_iterator record = RHS.begin(); record != RHS.end(); ++record)
@@ -309,12 +249,19 @@ std::ostream& operator<<(std::ostream& Stream, const mesh_selection& RHS)
 	Stream << "points:           " << RHS.points << "\n";
 	Stream << "edges:            " << RHS.edges << "\n";
 	Stream << "faces:            " << RHS.faces << "\n";
-	Stream << "linear curves:    " << RHS.linear_curves << "\n";
-	Stream << "cubic curves:     " << RHS.cubic_curves << "\n";
 	Stream << "nurbs_curves:     " << RHS.nurbs_curves << "\n";
-	Stream << "bilinear patches: " << RHS.bilinear_patches << "\n";
-	Stream << "bicubic patches:  " << RHS.bicubic_patches << "\n";
 	Stream << "nurbs_patches:    " << RHS.nurbs_patches << "\n";
+
+	for(uint_t i = 0; i != RHS.type.size(); ++i)
+	{
+		Stream << RHS.type[i];
+		Stream << " " << RHS.primitive_begin[i];
+		Stream << " " << RHS.primitive_end[i];
+		Stream << " " << RHS.index_begin[i];
+		Stream << " " << RHS.index_end[i];
+		Stream << " " << RHS.weight[i];
+		Stream << "\n";
+	}
 
 	return Stream;
 }
@@ -327,11 +274,7 @@ void store_selection(const legacy::mesh& Mesh, mesh_selection& MeshSelection)
 	MeshSelection.points.clear();
 	MeshSelection.edges.clear();
 	MeshSelection.faces.clear();
-	MeshSelection.linear_curves.clear();
-	MeshSelection.cubic_curves.clear();
 	MeshSelection.nurbs_curves.clear();
-	MeshSelection.bilinear_patches.clear();
-	MeshSelection.bicubic_patches.clear();
 	MeshSelection.nurbs_patches.clear();
 
 	std::for_each(Mesh.points.begin(), Mesh.points.end(), detail::store_selection(MeshSelection.points));
@@ -355,20 +298,10 @@ void store_selection(const legacy::mesh& Mesh, mesh_selection& MeshSelection)
 	for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 		std::for_each((*polyhedron)->faces.begin(), (*polyhedron)->faces.end(), store_face_selection);
 
-	detail::store_selection store_linear_curve_selection(MeshSelection.linear_curves);
-	for(legacy::mesh::linear_curve_groups_t::const_iterator group = Mesh.linear_curve_groups.begin(); group != Mesh.linear_curve_groups.end(); ++group)
-		std::for_each((*group)->curves.begin(), (*group)->curves.end(), store_linear_curve_selection);
-
-	detail::store_selection store_cubic_curve_selection(MeshSelection.cubic_curves);
-	for(legacy::mesh::cubic_curve_groups_t::const_iterator group = Mesh.cubic_curve_groups.begin(); group != Mesh.cubic_curve_groups.end(); ++group)
-		std::for_each((*group)->curves.begin(), (*group)->curves.end(), store_cubic_curve_selection);
-
 	detail::store_selection store_nurbs_curve_selection(MeshSelection.nurbs_curves);
 	for(legacy::mesh::nucurve_groups_t::const_iterator group = Mesh.nucurve_groups.begin(); group != Mesh.nucurve_groups.end(); ++group)
 		std::for_each((*group)->curves.begin(), (*group)->curves.end(), store_nurbs_curve_selection);
 
-	std::for_each(Mesh.bilinear_patches.begin(), Mesh.bilinear_patches.end(), detail::store_selection(MeshSelection.bilinear_patches));
-	std::for_each(Mesh.bicubic_patches.begin(), Mesh.bicubic_patches.end(), detail::store_selection(MeshSelection.bicubic_patches));
 	std::for_each(Mesh.nupatches.begin(), Mesh.nupatches.end(), detail::store_selection(MeshSelection.nurbs_patches));
 }
 
@@ -413,11 +346,7 @@ void merge_selection(const mesh_selection& MeshSelection, legacy::mesh& Mesh)
 	}
 
 	k3d::legacy::for_each_face(Mesh, detail::merge_selection(MeshSelection.faces));
-	k3d::legacy::for_each_linear_curve(Mesh, detail::merge_selection(MeshSelection.linear_curves));
-	k3d::legacy::for_each_cubic_curve(Mesh, detail::merge_selection(MeshSelection.cubic_curves));
 	k3d::legacy::for_each_nucurve(Mesh, detail::merge_selection(MeshSelection.nurbs_curves));
-	k3d::legacy::for_each_bilinear_patch(Mesh, detail::merge_selection(MeshSelection.bilinear_patches));
-	k3d::legacy::for_each_bicubic_patch(Mesh, detail::merge_selection(MeshSelection.bicubic_patches));
 	k3d::legacy::for_each_nupatch(Mesh, detail::merge_selection(MeshSelection.nurbs_patches));
 }
 

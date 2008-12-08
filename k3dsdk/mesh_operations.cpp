@@ -138,11 +138,7 @@ const bool_t is_uninitialized(const mesh& Mesh)
 
 void store_selection(const mesh& Mesh, mesh_selection& Selection)
 {
-	Selection.points.clear();
-	Selection.edges.clear();
-	Selection.faces.clear();
-	Selection.nurbs_curves.clear();
-	Selection.nurbs_patches.clear();
+	Selection.clear();
 
 	detail::store_selection(Mesh.point_selection, Selection.points);
 
@@ -161,8 +157,6 @@ void store_selection(const mesh& Mesh, mesh_selection& Selection)
 	{
 		detail::store_selection(Mesh.nurbs_patches->patch_selection, Selection.nurbs_patches);
 	}
-
-	/** \todo Store blobby and quadric selections */
 }
 
 /////////////////////////////////////////////////////////////////////////////

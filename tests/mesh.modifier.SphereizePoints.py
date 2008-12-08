@@ -9,8 +9,8 @@ setup.source.rows = 2
 setup.source.columns = 2
 setup.source.slices = 2
 
-selection = k3d.deselect_all()
-selection.points = k3d.component_select_all()
+selection = k3d.mesh_selection.deselect_all()
+selection.points = k3d.mesh_selection.component_select_all()
 
 setup.modifier.mesh_selection = selection
 

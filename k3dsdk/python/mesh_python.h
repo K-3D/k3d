@@ -73,7 +73,7 @@ public:
 	const std::string str();
 };
 
-void define_namespace_mesh();
+void define_class_mesh();
 
 } // namespace python
 

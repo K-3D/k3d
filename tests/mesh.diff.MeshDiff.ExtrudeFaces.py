@@ -16,7 +16,7 @@ for i in range(100):
 
 	extrude_faces = doc.new_node("ExtrudeFaces")
 	extrude_faces.region = False
-	selection = k3d.deselect_all()
+	selection = k3d.mesh_selection.deselect_all()
 	selection.faces = [(0, 3, 1), (3, 1000, 0)]
 	extrude_faces.mesh_selection = selection
 

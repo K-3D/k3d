@@ -5,8 +5,8 @@ import testing
 
 setup = testing.setup_mesh_modifier_test2("PolyCube", "TranslatePoints", "CenterPoints")
 
-selection = k3d.deselect_all()
-selection.points = k3d.component_select_all()
+selection = k3d.mesh_selection.deselect_all()
+selection.points = k3d.mesh_selection.component_select_all()
 
 setup.modifier1.mesh_selection = selection
 setup.modifier1.x = 1.0

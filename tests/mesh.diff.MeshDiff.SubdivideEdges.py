@@ -15,7 +15,7 @@ for i in range(100):
 	cube = doc.new_node("PolyCube")
 
 	subdivide_edges = doc.new_node("SubdivideEdges")
-	selection = k3d.deselect_all()
+	selection = k3d.mesh_selection.deselect_all()
 	selection.edges = [(0, 4, 1), (4, 1000, 0)]
 	subdivide_edges.mesh_selection = selection
 

@@ -8,7 +8,7 @@ setup = testing.setup_mesh_modifier_test("PolyGrid", "ScalePoints")
 setup.source.rows = 1
 setup.source.columns = 1
 
-mesh_selection = k3d.select_null()
+mesh_selection = k3d.mesh_selection.select_null()
 setup.modifier.mesh_selection = mesh_selection
 setup.modifier.x = 2
 

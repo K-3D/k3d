@@ -24,6 +24,7 @@
 #include "mesh_selection_python.h"
 
 #include <k3dsdk/mesh_selection.h>
+#include <k3dsdk/result.h>
 
 #include <boost/python.hpp>
 #include <boost/python/detail/api_placeholder.hpp>
@@ -35,7 +36,17 @@ namespace k3d
 namespace python
 {
 
-const k3d::mesh_selection::records_t mesh_selection_records(const list& Value)
+static boost::python::object convert(const k3d::mesh_selection::records_t& Value)
+{
+	boost::python::list records;
+
+	for(k3d::mesh_selection::records_t::const_iterator record = Value.begin(); record != Value.end(); ++record)
+		records.append(boost::python::make_tuple(record->begin, record->end, record->weight));
+
+	return records;
+}
+
+static const k3d::mesh_selection::records_t convert(const list& Value)
 {
 	k3d::mesh_selection::records_t records;
 
@@ -52,94 +63,64 @@ const k3d::mesh_selection::records_t mesh_selection_records(const list& Value)
 	return records;
 }
 
-const k3d::mesh_selection::records_t mesh_selection_get_points(const k3d::mesh_selection& lhs)
+static const boost::python::object get_points(const k3d::mesh_selection& Self)
 {
-	return lhs.points;
+	return convert(Self.points);
 }
 
-const k3d::mesh_selection::records_t mesh_selection_get_edges(const k3d::mesh_selection& lhs)
+static const boost::python::object get_edges(const k3d::mesh_selection& Self)
 {
-	return lhs.edges;
+	return convert(Self.edges);
 }
 
-const k3d::mesh_selection::records_t mesh_selection_get_faces(const k3d::mesh_selection& lhs)
+static const boost::python::object get_faces(const k3d::mesh_selection& Self)
 {
-	return lhs.faces;
+	return convert(Self.faces);
 }
 
-const k3d::mesh_selection::records_t mesh_selection_get_linear_curves(const k3d::mesh_selection& lhs)
+static const boost::python::object get_nurbs_curves(const k3d::mesh_selection& Self)
 {
-	return lhs.linear_curves;
+	return convert(Self.nurbs_curves);
 }
 
-const k3d::mesh_selection::records_t mesh_selection_get_cubic_curves(const k3d::mesh_selection& lhs)
+static const boost::python::object get_nurbs_patches(const k3d::mesh_selection& Self)
 {
-	return lhs.cubic_curves;
+	return convert(Self.nurbs_patches);
 }
 
-const k3d::mesh_selection::records_t mesh_selection_get_nurbs_curves(const k3d::mesh_selection& lhs)
+static void set_points(k3d::mesh_selection& Self, const list& Value)
 {
-	return lhs.nurbs_curves;
+	Self.points = convert(Value);
 }
 
-const k3d::mesh_selection::records_t mesh_selection_get_bilinear_patches(const k3d::mesh_selection& lhs)
+static void set_edges(k3d::mesh_selection& Self, const list& Value)
 {
-	return lhs.bilinear_patches;
+	Self.edges = convert(Value);
 }
 
-const k3d::mesh_selection::records_t mesh_selection_get_bicubic_patches(const k3d::mesh_selection& lhs)
+static void set_faces(k3d::mesh_selection& Self, const list& Value)
 {
-	return lhs.bicubic_patches;
+	Self.faces = convert(Value);
 }
 
-const k3d::mesh_selection::records_t mesh_selection_get_nurbs_patches(const k3d::mesh_selection& lhs)
+static void set_nurbs_curves(k3d::mesh_selection& Self, const list& Value)
 {
-	return lhs.nurbs_patches;
+	Self.nurbs_curves = convert(Value);
 }
 
-void mesh_selection_set_points(k3d::mesh_selection& lhs, const list& rhs)
+static void set_nurbs_patches(k3d::mesh_selection& Self, const list& Value)
 {
-	lhs.points = mesh_selection_records(rhs);
+	Self.nurbs_patches = convert(Value);
 }
 
-void mesh_selection_set_edges(k3d::mesh_selection& lhs, const list& rhs)
+static boost::python::object component_select_all()
 {
-	lhs.edges = mesh_selection_records(rhs);
+	return convert(k3d::mesh_selection::component_select_all());
 }
 
-void mesh_selection_set_faces(k3d::mesh_selection& lhs, const list& rhs)
+static boost::python::object component_deselect_all()
 {
-	lhs.faces = mesh_selection_records(rhs);
-}
-
-void mesh_selection_set_linear_curves(k3d::mesh_selection& lhs, const list& rhs)
-{
-	lhs.linear_curves = mesh_selection_records(rhs);
-}
-
-void mesh_selection_set_cubic_curves(k3d::mesh_selection& lhs, const list& rhs)
-{
-	lhs.cubic_curves = mesh_selection_records(rhs);
-}
-
-void mesh_selection_set_nurbs_curves(k3d::mesh_selection& lhs, const list& rhs)
-{
-	lhs.nurbs_curves = mesh_selection_records(rhs);
-}
-
-void mesh_selection_set_bilinear_patches(k3d::mesh_selection& lhs, const list& rhs)
-{
-	lhs.bilinear_patches = mesh_selection_records(rhs);
-}
-
-void mesh_selection_set_bicubic_patches(k3d::mesh_selection& lhs, const list& rhs)
-{
-	lhs.bicubic_patches = mesh_selection_records(rhs);
-}
-
-void mesh_selection_set_nurbs_patches(k3d::mesh_selection& lhs, const list& rhs)
-{
-	lhs.nurbs_patches = mesh_selection_records(rhs);
+	return convert(k3d::mesh_selection::component_deselect_all());
 }
 
 void define_class_mesh_selection()
@@ -149,29 +130,41 @@ void define_class_mesh_selection()
 		"Changes are stored as lists of tuples, where each tuple represents a seletion weight to be applied to a range of indices.  "
 		"There is one list for each type of primitive: vertices, polyhedron edges, polyhedron faces, linear curves, cubic curves, "
 		"NURBS curves, bilinear patches, bicubic patches, and NURBS patches.")
+		.def("select_all", k3d::mesh_selection::select_all,
+			"Returns a L{mesh_selection} that explicitly selects every component.")
+		.staticmethod("select_all")
+		.def("deselect_all", k3d::mesh_selection::deselect_all,
+			"Returns a L{mesh_selection} that explicitly deselects every component.")
+		.staticmethod("deselect_all")
+		.def("select_null", k3d::mesh_selection::select_null,
+			"Returns a L{mesh_selection} that does not select or deselect any components.")
+		.staticmethod("select_null")
+		.def("add_record", &k3d::mesh_selection::add_record)
+		.def("clear", &k3d::mesh_selection::clear,
+			"Clears a mesh selection so that it will not have any effect on mesh state.")
 		.def("empty", &k3d::mesh_selection::empty,
-			"Returns True if the entire mesh selection is empty (will not have any effect on mesh selection state).")
-		.add_property("points", mesh_selection_get_points, mesh_selection_set_points,
-			"Stores changes in selection state for mesh vertices.")
-		.add_property("edges", mesh_selection_get_edges, mesh_selection_set_edges,
-			"Stores changes in selection state for polyhedron vertices.")
-		.add_property("faces", mesh_selection_get_faces, mesh_selection_set_faces,
-			"Stores changes in selection state for polyhedron face primitives.")
-		.add_property("linear_curves", mesh_selection_get_linear_curves, mesh_selection_set_linear_curves,
-			"Stores changes in selection state for linear curve primitives.")
-		.add_property("cubic_curves", mesh_selection_get_cubic_curves, mesh_selection_set_cubic_curves,
-			"Stores changes in selection state for cubic curve primitives.")
-		.add_property("nurbs_curves", mesh_selection_get_nurbs_curves, mesh_selection_set_nurbs_curves,
-			"Stores changes in selection state for NURBS curve primitives.")
-		.add_property("bilinear_patches", mesh_selection_get_bilinear_patches, mesh_selection_set_bilinear_patches,
-			"Stores changes in selection state for bilinear patch primitives.")
-		.add_property("bicubic_patches", mesh_selection_get_bicubic_patches, mesh_selection_set_bicubic_patches,
-			"Stores changes in selection state for bicubic patch primitives.")
-		.add_property("nurbs_patches", mesh_selection_get_nurbs_patches, mesh_selection_set_nurbs_patches,
-			"Stores changes in selection state for NURBS patch primitives.")
+			"Returns True if the entire mesh selection is empty (will not have any effect on mesh state).")
 		.def(self == self)
 		.def(self != self)
-		.def(self_ns::str(self));
+		.def(self_ns::str(self))
+		// Deprecated
+		.add_property("points", get_points, set_points,
+			"Stores changes in selection state for mesh vertices.")
+		.add_property("edges", get_edges, set_edges,
+			"Stores changes in selection state for polyhedron vertices.")
+		.add_property("faces", get_faces, set_faces,
+			"Stores changes in selection state for polyhedron face primitives.")
+		.add_property("nurbs_curves", get_nurbs_curves, set_nurbs_curves,
+			"Stores changes in selection state for NURBS curve primitives.")
+		.add_property("nurbs_patches", get_nurbs_patches, set_nurbs_patches,
+			"Stores changes in selection state for NURBS patch primitives.")
+		.def("component_deselect_all", component_deselect_all,
+			"Returns a list for use with L{mesh_selection} that deselects an entire range of mesh components.")
+		.staticmethod("component_deselect_all")
+		.def("component_select_all", component_select_all,
+			"Returns a list for use with L{mesh_selection} that selects an entire range of mesh components.")
+		.staticmethod("component_select_all")
+		;
 }
 
 } // namespace python

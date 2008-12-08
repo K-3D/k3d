@@ -5,8 +5,8 @@ import testing
 
 setup = testing.setup_mesh_modifier_test("NurbsGrid","NurbsPatchDegreeElevation")
 
-selection = k3d.deselect_all()
-selection.nurbs_patches = k3d.component_select_all()
+selection = k3d.mesh_selection.deselect_all()
+selection.nurbs_patches = k3d.mesh_selection.component_select_all()
 
 setup.modifier.mesh_selection = selection
 setup.modifier.degree = 1

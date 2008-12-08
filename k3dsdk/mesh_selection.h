@@ -2,7 +2,7 @@
 #define K3DSDK_MESH_SELECTION_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,6 +24,7 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "selection.h"
 #include "serialization_xml.h"
 #include "types.h"
 #include "xml.h"
@@ -45,6 +46,37 @@ namespace legacy { class mesh; }
 class mesh_selection
 {
 public:
+	/// Constructs a mesh selection that explicitly selects everything
+	static const mesh_selection select_all();
+	/// Constructs a mesh selection that explicitly deselects everything
+	static const mesh_selection deselect_all();
+	/// Constructs a mesh selection that explicitly doesn't alter selection at all
+	static const mesh_selection select_null();
+
+	/// Appends a selection that will be applied to selections with the given type, across a range of primitives, across a range of indices.
+	void add_record(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight);
+
+	/// Clears the selection.
+	void clear();
+	/// Returns true if the selection is "empty", i.e. none of the components are selected
+	bool empty() const;
+	/// Equivalence
+	bool operator==(const mesh_selection& RHS) const;
+	/// Non-equivalence
+	bool operator!=(const mesh_selection& RHS) const;
+
+	/** \name Storage for generic mesh component selections */
+	//@{
+	std::vector<selection::type> type;
+	std::vector<uint_t> primitive_begin;
+	std::vector<uint_t> primitive_end;
+	std::vector<uint_t> index_begin;
+	std::vector<uint_t> index_end;
+	std::vector<double_t> weight;
+	//@}
+	
+	/** \name Deprecated for generic mesh primitives */
+	//@{
 	/// Stores selection data that will apply to a range of components
 	struct record
 	{
@@ -82,36 +114,15 @@ public:
 		}
 	};
 
-	/// Constructs a mesh selection that explicitly selects everything
-	static const mesh_selection select_all();
-	/// Constructs a mesh selection that explicitly deselects everything
-	static const mesh_selection deselect_all();
-	/// Constructs a mesh selection that explicitly doesn't alter selection at all
-	static const mesh_selection select_null();
-
-	/// Returns true if the selection is "empty", i.e. none of the components are selected
-	bool empty() const;
-	/// Equivalence
-	bool operator==(const mesh_selection& RHS) const;
-	/// Non-equivalence
-	bool operator!=(const mesh_selection& RHS) const;
-
 	/// Stores a set of selection ranges, where the map key is the beginning of the range, and the map value contains the end
 	typedef std::vector<record> records_t;
-
 	static const records_t component_select_all();
 	static const records_t component_deselect_all();
 
-	/** \name Individual component selection storage */
-	//@{
 	records_t points;
 	records_t edges;
 	records_t faces;
-	records_t linear_curves;
-	records_t cubic_curves;
 	records_t nurbs_curves;
-	records_t bilinear_patches;
-	records_t bicubic_patches;
 	records_t nurbs_patches;
 	//@}
 };

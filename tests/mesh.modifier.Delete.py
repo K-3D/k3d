@@ -10,7 +10,7 @@ source = document.new_node("PolyGrid")
 modifier = document.new_node("Delete")
 
 # select some faces, distributed along polyhedra
-selection = k3d.deselect_all()
+selection = k3d.mesh_selection.deselect_all()
 selection.faces = [(12, 13, 1)]
 modifier.mesh_selection = selection
 

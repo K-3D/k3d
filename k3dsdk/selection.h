@@ -2,7 +2,7 @@
 #define K3DSDK_SELECTION_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -109,7 +109,7 @@ VARYING = 28,
 FACE_VARYING = 29,
 /// Storage for a zero-based split-edge index (relative to a primitive)
 SPLIT_EDGE = 30,
-/// Storage for a zero-based vertex index (relative to a primitive)
+/// Storage for a zero-based vertex index (relative to a mesh)
 VERTEX = 31,
 
 };

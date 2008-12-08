@@ -2953,11 +2953,7 @@ void save(const mesh_selection& Selection, element& XML, const ipersistent::save
 	detail::save_selection(XML, Selection.points, "points");
 	detail::save_selection(XML, Selection.edges, "edges");
 	detail::save_selection(XML, Selection.faces, "faces");
-	detail::save_selection(XML, Selection.linear_curves, "linearcurves");
-	detail::save_selection(XML, Selection.cubic_curves, "cubiccurves");
 	detail::save_selection(XML, Selection.nurbs_curves, "nurbscurves");
-	detail::save_selection(XML, Selection.bilinear_patches, "bilinearpatches");
-	detail::save_selection(XML, Selection.bicubic_patches, "bicubicpatches");
 	detail::save_selection(XML, Selection.nurbs_patches, "nurbspatches");
 }
 
@@ -2971,16 +2967,8 @@ void load(mesh_selection& Selection, element& XML, const ipersistent::load_conte
 			detail::load_selection(*xml_selection, Selection.edges);
 		if(xml_selection->name == "faces")
 			detail::load_selection(*xml_selection, Selection.faces);
-		if(xml_selection->name == "linearcurves")
-			detail::load_selection(*xml_selection, Selection.linear_curves);
-		if(xml_selection->name == "cubiccurves")
-			detail::load_selection(*xml_selection, Selection.cubic_curves);
 		if(xml_selection->name == "nurbscurves" || xml_selection->name == "nucurves")
 			detail::load_selection(*xml_selection, Selection.nurbs_curves);
-		if(xml_selection->name == "bilinearpatches")
-			detail::load_selection(*xml_selection, Selection.bilinear_patches);
-		if(xml_selection->name == "bicubicpatches")
-			detail::load_selection(*xml_selection, Selection.bicubic_patches);
 		if(xml_selection->name == "nurbspatches" || xml_selection->name == "nupatches")
 			detail::load_selection(*xml_selection, Selection.nurbs_patches);
 	}

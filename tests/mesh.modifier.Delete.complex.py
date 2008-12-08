@@ -16,7 +16,7 @@ document.set_dependency(varying_colors.get_property("input_mesh"), reader.get_pr
 modifier = document.new_node("Delete")
 
 # select some faces, distributed along polyhedra
-selection = k3d.deselect_all()
+selection = k3d.mesh_selection.deselect_all()
 selection.faces = [(0, 6, 0), (6, 7, 1), (7, 8, 0), (8, 9, 1), (9, 13, 0), (13, 15, 1), (15, 16, 0), (16, 17, 1), (17, 19, 0), (19, 20, 1), (20, 23, 0)]
 selection.points = [(0, 7, 0), (7, 8, 1), (8, 10000, 0)]
 selection.edges = [(0, 25, 0), (25, 26, 1), (26, 10000, 0)]

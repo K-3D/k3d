@@ -5,8 +5,8 @@ import testing
 
 setup = testing.setup_mesh_modifier_test("NurbsCurve","NurbsEditCurveKnotVector")
 
-selection = k3d.deselect_all()
-selection.nurbs_curves = k3d.component_select_all()
+selection = k3d.mesh_selection.deselect_all()
+selection.nurbs_curves = k3d.mesh_selection.component_select_all()
 
 setup.modifier.mesh_selection = selection
 knot_vector = [0.0,0.0,1.0,1.0,2.0,2.0,2.0]

@@ -15,7 +15,7 @@ for i in range(100):
 	cube = doc.new_node("PolyCube")
 
 	connect_vertices = doc.new_node("ConnectVertices")
-	selection = k3d.deselect_all()
+	selection = k3d.mesh_selection.deselect_all()
 	selection.points = [(0, 1, 1), (1, 2, 0), (2, 3, 1), (3, 1000, 0)]
 	connect_vertices.mesh_selection = selection
 

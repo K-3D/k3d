@@ -5,7 +5,7 @@ import testing
 import math
 
 setup = testing.setup_mesh_modifier_test("PolyCube", "CalculateNormals")
-setup.modifier.mesh_selection = k3d.select_all()
+setup.modifier.mesh_selection = k3d.mesh_selection.select_all()
 setup.modifier.max_angle = math.radians(91.0)
 setup.modifier.uniform = True
 setup.modifier.face_varying = True

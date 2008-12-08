@@ -138,6 +138,8 @@ ADD_LIBRARY(k3dsdk-python-d SHARED
 	mesh_selection_python.h
 	node_python.cpp
 	node_python.h
+	selection_python.cpp
+	selection_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python-d)
 TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk)

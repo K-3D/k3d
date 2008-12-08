@@ -57,7 +57,7 @@ Cs = polyhedra.writable_face_varying_data().create_array("Cs", "k3d::color")
 Cs.assign([k3d.color(1, 0, 0), k3d.color(0, 1, 0), k3d.color(0, 0, 1), k3d.color(1, 1, 1)])
 
 modifier = document.new_node("TriangulateFaces")
-mesh_selection = k3d.select_all()
+mesh_selection = k3d.mesh_selection.select_all()
 modifier.mesh_selection = mesh_selection
 document.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
 

@@ -19,8 +19,8 @@ document.set_dependency(modifier.get_property("input_mesh"), source1.get_propert
 document.set_dependency(modifier.get_property("input1"), source2.get_property("output_mesh"))
 document.set_dependency(modifier.get_property("input2"), source3.get_property("output_mesh"))
 
-selection = k3d.deselect_all()
-selection.points = k3d.component_select_all()
+selection = k3d.mesh_selection.deselect_all()
+selection.points = k3d.mesh_selection.component_select_all()
 
 modifier.mesh_selection = selection
 

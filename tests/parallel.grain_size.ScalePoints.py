@@ -9,8 +9,8 @@ setup = testing.setup_mesh_modifier_test("PolyGrid", "ScalePoints")
 setup.source.rows = 100
 setup.source.columns = 100
 
-selection = k3d.deselect_all()
-selection.points = k3d.component_select_all()
+selection = k3d.mesh_selection.deselect_all()
+selection.points = k3d.mesh_selection.component_select_all()
 setup.modifier.mesh_selection = selection
 
 profiler = setup.document.new_node("PipelineProfiler")
