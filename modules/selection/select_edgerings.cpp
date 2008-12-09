@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -27,6 +27,8 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_modifier.h>
+#include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
 
 namespace module
@@ -39,26 +41,17 @@ namespace selection
 // select_edge_rings
 
 class select_edge_rings :
-	public k3d::mesh_selection_modifier
+	public k3d::mesh_selection_sink<k3d::mesh_selection_modifier<k3d::node> >
 {
-	typedef k3d::mesh_selection_modifier base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_selection_modifier<k3d::node> > base;
 public:
 	select_edge_rings(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		mesh_sink_input().property_changed_signal().connect(sigc::mem_fun(*this, &select_edge_rings::mesh_changed));
+		m_mesh_selection.property_changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
 	}
 	
-	/// Clears cached valencies and companions if the mesh topology is changed
-	void mesh_changed(k3d::ihint* Hint)
-	{
-		if (!Hint || dynamic_cast<k3d::hint::mesh_topology_changed*>(Hint))
-		{
-			m_companions.clear();
-			m_valences.clear();
-			m_boundary_edges.clear();
-		}
-	}
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<select_edge_rings,
@@ -74,11 +67,15 @@ public:
 	}
 
 private:	
-	void on_select_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		if (!k3d::validate_polyhedra(Input))
 			return;
 		
+		m_companions.clear();
+		m_valences.clear();
+		m_boundary_edges.clear();
+
 		if (m_companions.empty() || m_valences.empty() || m_boundary_edges.empty())
 		{
 			k3d::polyhedron::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, m_boundary_edges, m_companions);

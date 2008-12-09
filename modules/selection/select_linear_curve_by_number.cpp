@@ -27,6 +27,7 @@
 #include <k3dsdk/linear_curve.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_modifier.h>
+#include <k3dsdk/node.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -40,9 +41,9 @@ namespace selection
 // select_linear_curve_by_number
 
 class select_linear_curve_by_number :
-	public k3d::mesh_selection_modifier
+	public k3d::mesh_selection_modifier<k3d::node>
 {
-	typedef k3d::mesh_selection_modifier base;
+	typedef k3d::mesh_selection_modifier<k3d::node> base;
 
 public:
 	select_linear_curve_by_number(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -50,12 +51,14 @@ public:
 		m_primitive(init_owner(*this) + init_name("primitive") + init_label(_("Primitive Number")) + init_description(_("Primitive Number.")) + init_value(0L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0))),
 		m_index(init_owner(*this) + init_name("index") + init_label(_("Curve Number")) + init_description(_("Curve Number.")) + init_value(0L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0)))
 	{
-		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
-		m_primitive.changed_signal().connect(make_update_mesh_slot());
-		m_index.changed_signal().connect(make_update_mesh_slot());
+		m_primitive.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
+
+		m_index.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
 	}
 
-	void on_select_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		const k3d::int32_t primitive = m_primitive.pipeline_value();
 		if(primitive >= Output.primitives.size())
