@@ -22,7 +22,7 @@ source.columns = 25
 source.slices = 25
 sds = document.new_node("CatmullClark")
 sds.level = 2
-sds.mesh_selection = k3d.select_all()
+sds.mesh_selection = k3d.mesh_selection.select_all()
 k3d.ui().synchronize()
 
 profiler = document.new_node("PipelineProfiler")
