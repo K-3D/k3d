@@ -52,8 +52,7 @@ public:
 		m_transformation(init_owner(*this) + init_name("transformation") + init_label(_("Transformation")) + init_description(_("Transformation matrix used to position / orient / scale the output hyperboloid.")) + init_value(k3d::identity3D())),
 		m_start_point(init_owner(*this) + init_name("start_point") + init_label(_("Start Point")) + init_description(_("First point in the swept line segment that defines the output hyperboloid.")) + init_value(k3d::point3(5, -5, -5))),
 		m_end_point(init_owner(*this) + init_name("end_point") + init_label(_("End Point")) + init_description(_("Second point in the swept line segment that defines the output hyperboloid.")) + init_value(k3d::point3(5, 5, 5))),
-		m_sweep_angle(init_owner(*this) + init_name("sweep_angle") + init_label(_("Sweep Angle")) + init_description(_("Optionally limits the sweep angle of the hyperboloid to less-than 360 degrees.")) + init_value(k3d::pi_times_2()) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle))),
-		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Controls the color of the output hyperboloid.")) + init_value(k3d::color(1, 1, 1)))
+		m_sweep_angle(init_owner(*this) + init_name("sweep_angle") + init_label(_("Sweep Angle")) + init_description(_("Optionally limits the sweep angle of the hyperboloid to less-than 360 degrees.")) + init_value(k3d::pi_times_2()) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle)))
 	{
 		m_material.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
@@ -65,8 +64,6 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 		m_sweep_angle.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
-		m_color.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
 	void on_update_mesh_topology(k3d::mesh& Output)
@@ -74,14 +71,12 @@ public:
 		Output = k3d::mesh();
 
 		boost::scoped_ptr<k3d::hyperboloid::primitive> primitive(k3d::hyperboloid::create(Output));
-		k3d::typed_array<k3d::color>& colors = primitive->uniform_data.create<k3d::typed_array<k3d::color> >("Cs");
 
 		primitive->matrices.push_back(m_transformation.pipeline_value());
 		primitive->materials.push_back(m_material.pipeline_value());
 		primitive->start_points.push_back(m_start_point.pipeline_value());
 		primitive->end_points.push_back(m_end_point.pipeline_value());
 		primitive->sweep_angles.push_back(m_sweep_angle.pipeline_value());
-		colors.push_back(m_color.pipeline_value());
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
@@ -105,7 +100,6 @@ private:
 	k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_start_point;
 	k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_end_point;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_sweep_angle;
-	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
 };
 
 k3d::iplugin_factory& hyperboloid_factory()

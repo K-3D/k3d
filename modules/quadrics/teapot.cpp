@@ -48,12 +48,9 @@ class teapot :
 public:
 	teapot(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Controls the color of the output teapot.")) + init_value(k3d::color(1, 1, 1))),
 		m_transformation(init_owner(*this) + init_name("transformation") + init_label(_("Transformation")) + init_description(_("Transformation matrix used to position / orient / scale the output teapot.")) + init_value(k3d::identity3D()))
 	{
 		m_material.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
-		m_color.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 		m_transformation.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
@@ -64,11 +61,9 @@ public:
 		Output = k3d::mesh();
 
 		boost::scoped_ptr<k3d::teapot::primitive> primitive(k3d::teapot::create(Output));
-		k3d::typed_array<k3d::color>& colors = primitive->uniform_data.create<k3d::typed_array<k3d::color> >("Cs");
 
 		primitive->matrices.push_back(m_transformation.pipeline_value());
 		primitive->materials.push_back(m_material.pipeline_value());
-		colors.push_back(m_color.pipeline_value());
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
@@ -88,7 +83,6 @@ public:
 	}
 
 private:
-	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
 	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_transformation;
 };
 

@@ -54,8 +54,7 @@ public:
 		m_minor_radius(init_owner(*this) + init_name("minor_radius") + init_label(_("Minor Radius")) + init_description(_("Controls the minor radius of the output torus.")) + init_value(2.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_phi_min(init_owner(*this) + init_name("phi_min") + init_label(_("Phi Min")) + init_description(_("Phi Min.")) + init_value(0.0) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle))),
 		m_phi_max(init_owner(*this) + init_name("phi_max") + init_label(_("Phi Max")) + init_description(_("Phi Max.")) + init_value(k3d::pi_times_2()) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle))),
-		m_sweep_angle(init_owner(*this) + init_name("sweep_angle") + init_label(_("Sweep Angle")) + init_description(_("Optionally limits the sweep angle of the torus to less-than 360 degrees.")) + init_value(k3d::pi_times_2()) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle))),
-		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Controls the color of the output torus.")) + init_value(k3d::color(1, 1, 1)))
+		m_sweep_angle(init_owner(*this) + init_name("sweep_angle") + init_label(_("Sweep Angle")) + init_description(_("Optionally limits the sweep angle of the torus to less-than 360 degrees.")) + init_value(k3d::pi_times_2()) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle)))
 	{
 		m_material.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
@@ -71,8 +70,6 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 		m_sweep_angle.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
-		m_color.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
 	void on_update_mesh_topology(k3d::mesh& Output)
@@ -80,7 +77,6 @@ public:
 		Output = k3d::mesh();
 
 		boost::scoped_ptr<k3d::torus::primitive> primitive(k3d::torus::create(Output));
-		k3d::typed_array<k3d::color>& colors = primitive->uniform_data.create<k3d::typed_array<k3d::color> >("Cs");
 
 		primitive->matrices.push_back(m_transformation.pipeline_value());
 		primitive->materials.push_back(m_material.pipeline_value());
@@ -89,7 +85,6 @@ public:
 		primitive->phi_min.push_back(m_phi_min.pipeline_value());
 		primitive->phi_max.push_back(m_phi_max.pipeline_value());
 		primitive->sweep_angles.push_back(m_sweep_angle.pipeline_value());
-		colors.push_back(m_color.pipeline_value());
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
@@ -115,7 +110,6 @@ private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_phi_min;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_phi_max;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_sweep_angle;
-	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
 };
 
 k3d::iplugin_factory& torus_factory()

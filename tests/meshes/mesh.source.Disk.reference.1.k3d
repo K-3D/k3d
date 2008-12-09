@@ -13,9 +13,7 @@
 				</topology>
 				<attributes>
 					<arrays type="constant"/>
-					<arrays type="uniform">
-						<array name="Cs" type="k3d::color">1 1 1</array>
-					</arrays>
+					<arrays type="uniform"/>
 					<arrays type="varying"/>
 				</attributes>
 			</primitive>
