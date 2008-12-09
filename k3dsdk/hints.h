@@ -223,6 +223,22 @@ public:
 };
 
 template<>
+class hint_traits<selection_changed>
+{
+public:
+	static const bool_t match(ihint* Hint)
+	{
+		return dynamic_cast<selection_changed*>(Hint);
+	}
+
+	static ihint* convert(ihint*)
+	{
+		static selection_changed hint;
+		return &hint;
+	}
+};
+
+template<>
 class hint_traits<mesh_topology_changed>
 {
 public:
