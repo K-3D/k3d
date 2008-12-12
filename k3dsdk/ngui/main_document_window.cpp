@@ -2483,7 +2483,7 @@ private:
 
 	void on_help_file_bug_report()
 	{
-		assert_error(k3d::system::spawn_async("k3d-bug-buddy"));
+		k3d::ngui::uri::open("http://sourceforge.net/tracker/?func=add&group_id=11113&atid=111113");
 	}
 
 	void on_help_open_log_window()
