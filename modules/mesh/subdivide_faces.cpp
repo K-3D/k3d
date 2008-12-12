@@ -866,7 +866,7 @@ public:
 		// Shallow copy of the input (no data is copied, only shared pointers are)
 		document().pipeline_profiler().start_execution(*this, "Merge selection");
 		Output = Input;
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
 		const k3d::mesh::selection_t input_face_selection = *Output.polyhedra->face_selection; // copy this, so we can keep using it
 		document().pipeline_profiler().finish_execution(*this, "Merge selection");
 

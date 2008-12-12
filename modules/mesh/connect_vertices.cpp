@@ -61,7 +61,7 @@ public:
 	{
 		// Create output geometry
 		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Mesh);
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Mesh);
 
 		// Keep track of newly-created edges ...
 		new_edges_t new_edges;

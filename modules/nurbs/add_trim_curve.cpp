@@ -84,7 +84,7 @@ public:
 		if (!k3d::validate_nurbs_patches(Output))
 			return;
 
-		merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 		nurbs_patch_modifier mod(Output);
 		nurbs_curve_modifier mod2(Output);
 

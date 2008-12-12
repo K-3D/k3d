@@ -118,7 +118,7 @@ private:
 
 			// Setup the output mesh ...
 			k3d::mesh::selection_t input_face_selection(*m_input->polyhedra->face_selection);
-			k3d::merge_selection(Selection.faces, input_face_selection);
+			k3d::mesh_selection::merge(Selection.faces, input_face_selection);
 
 			const k3d::uint_t face_begin = 0;
 			const k3d::uint_t face_end = face_begin + m_input->polyhedra->face_first_loops->size();

@@ -67,7 +67,7 @@ public:
 		// Always cache pipeline values, they may be expensive to compute ...
 		const double weight = m_weight.pipeline_value();
 		// Merge the stored selection state with the output ...
-		merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		// There's no guarantee that the mesh contains NURBS!
 		if (k3d::validate_nurbs_curve_groups(Output))

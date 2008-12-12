@@ -72,7 +72,7 @@ public:
 
 		// Create output geometry
 		k3d::legacy::deep_copy(Input, Output);
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron_i = Output.polyhedra.begin(); polyhedron_i != Output.polyhedra.end(); ++polyhedron_i)
 		{

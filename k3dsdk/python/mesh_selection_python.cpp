@@ -139,7 +139,6 @@ void define_class_mesh_selection()
 		.def("select_null", k3d::mesh_selection::select_null,
 			"Returns a L{mesh_selection} that does not select or deselect any components.")
 		.staticmethod("select_null")
-		.def("add_record", &k3d::mesh_selection::add_record)
 		.def("clear", &k3d::mesh_selection::clear,
 			"Clears a mesh selection so that it will not have any effect on mesh state.")
 		.def("empty", &k3d::mesh_selection::empty,

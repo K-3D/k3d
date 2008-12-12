@@ -83,7 +83,7 @@ private:
 		}
 		
 		// Make sure the Output selection arrays contain the correct selection
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 		
 		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
 		const k3d::mesh::selection_t edge_selection = *Output.polyhedra->edge_selection;

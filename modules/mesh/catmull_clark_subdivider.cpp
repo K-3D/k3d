@@ -1203,7 +1203,7 @@ public:
 		m_subdivider = new detail_sds::catmull_clark_subdivider(m_level.pipeline_value(), *this);
 		k3d::mesh::selection_t input_face_selection = *Input.polyhedra->face_selection; // copy, so we can merge selection
 		const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
-		k3d::merge_selection(mesh_selection.faces, input_face_selection);
+		k3d::mesh_selection::merge(mesh_selection.faces, input_face_selection);
 		m_subdivider->create_mesh(Input, input_face_selection, Output);
 	}
 
@@ -1211,7 +1211,7 @@ public:
 	{
 		const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
 		k3d::mesh::selection_t input_face_selection = *Input.polyhedra->face_selection; // copy, so we can merge selection
-		k3d::merge_selection(mesh_selection.faces, input_face_selection);
+		k3d::mesh_selection::merge(mesh_selection.faces, input_face_selection);
 		m_subdivider->update_mesh(Input, input_face_selection, Output);
 	}
 

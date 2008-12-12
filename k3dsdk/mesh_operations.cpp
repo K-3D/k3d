@@ -26,54 +26,6 @@
 namespace k3d
 {
 
-namespace detail
-{
-
-void store_selection(const pipeline_data<mesh::selection_t>& MeshSelection, mesh_selection::records_t& Records)
-{
-	if(!MeshSelection)
-		return;
-
-	const mesh::selection_t& selection_weight = *MeshSelection;
-
-	const uint_t selection_begin = 0;
-	const uint_t selection_end = selection_begin + selection_weight.size();
-	for(uint_t selection = selection_begin; selection != selection_end; ++selection)
-		Records.push_back(mesh_selection::record(selection, selection+1, selection_weight[selection]));
-}
-
-void merge_selection(const mesh_selection::records_t& Records, mesh::selection_t& Selection)
-{
-	const uint_t selection_count = Selection.size();
-
-	for(mesh_selection::records_t::const_iterator record = Records.begin(); record != Records.end(); ++record)
-	{
-		if(record->begin >= selection_count)
-			break;
-
-		mesh::selection_t::iterator begin = Selection.begin() + record->begin;
-		mesh::selection_t::iterator end = Selection.begin() + std::min(selection_count, record->end);
-		std::fill(begin, end, record->weight);
-	}
-}
-
-template<typename gprims_type>
-void merge_selection(const mesh_selection::records_t& Records, const gprims_type& GPrims, pipeline_data<mesh::selection_t>& Selection)
-{
-	return_if_fail(GPrims);
-
-	const uint_t gprim_count = GPrims->size();
-
-	if(!Selection || Selection->size() != gprim_count)
-		Selection.create(new mesh::selection_t(gprim_count));
-
-	mesh::selection_t& selection = Selection.writable();
-
-	detail::merge_selection(Records, selection);
-}
-
-} // namespace detail
-
 const bool_t is_solid(const mesh& Mesh)
 {
 	const uint_t polyhedron_begin = 0;
@@ -131,70 +83,6 @@ const bool_t is_uninitialized(const mesh& Mesh)
 		return false;
 	if (Mesh.point_selection)
 		return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// store_selection
-
-void store_selection(const mesh& Mesh, mesh_selection& Selection)
-{
-	Selection.clear();
-
-	detail::store_selection(Mesh.point_selection, Selection.points);
-
-	if(Mesh.polyhedra)
-	{
-		detail::store_selection(Mesh.polyhedra->edge_selection, Selection.edges);
-		detail::store_selection(Mesh.polyhedra->face_selection, Selection.faces);
-	}
-
-	if(Mesh.nurbs_curve_groups)
-	{
-		detail::store_selection(Mesh.nurbs_curve_groups->curve_selection, Selection.nurbs_curves);
-	}
-
-	if(Mesh.nurbs_patches)
-	{
-		detail::store_selection(Mesh.nurbs_patches->patch_selection, Selection.nurbs_patches);
-	}
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// merge_selection
-
-void merge_selection(const mesh_selection& MeshSelection, mesh& Mesh)
-{
-	if(Mesh.points && Mesh.point_selection)
-		detail::merge_selection(MeshSelection.points, Mesh.points, Mesh.point_selection);
-
-	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
-	{
-		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
-		detail::merge_selection(MeshSelection.edges, polyhedra.edge_points, polyhedra.edge_selection);
-	}
-
-	if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops)
-	{
-		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
-		detail::merge_selection(MeshSelection.faces, polyhedra.face_first_loops, polyhedra.face_selection);
-	}
-
-	if(Mesh.nurbs_curve_groups)
-	{
-		k3d::mesh::nurbs_curve_groups_t& nurbs_curve_groups = Mesh.nurbs_curve_groups.writable();
-		detail::merge_selection(MeshSelection.nurbs_curves, nurbs_curve_groups.curve_first_points, nurbs_curve_groups.curve_selection);
-	}
-
-	if(Mesh.nurbs_patches)
-	{
-		k3d::mesh::nurbs_patches_t& nurbs_patches = Mesh.nurbs_patches.writable();
-		detail::merge_selection(MeshSelection.nurbs_patches, nurbs_patches.patch_materials, nurbs_patches.patch_selection);
-	}
-}
-
-void merge_selection(const mesh_selection::records_t& Records, mesh::selection_t& Selection)
-{
-	detail::merge_selection(Records, Selection);
 }
 
 /////////////////////////////////////////////////////////////////////////////

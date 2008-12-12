@@ -50,7 +50,7 @@ void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& O
 
 	if(m_selection_changed)
 	{
-		merge_selection(m_mesh_selection.pipeline_value(), Output);
+		mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 		m_selection_changed = false;
 	}
 	return_if_fail(Output.point_selection);

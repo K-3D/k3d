@@ -26,7 +26,6 @@
 
 #include "algebra.h"
 #include "ihint.h"
-#include "mesh_selection.h"
 #include "mesh.h"
 #include "signal_system.h"
 
@@ -37,8 +36,6 @@
 namespace k3d
 {
 
-class mesh_selection;
-	
 /// Namespace reserved for "hints" that pass metadata about an upstream change to downstream nodes
 namespace hint
 {

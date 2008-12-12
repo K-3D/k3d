@@ -24,6 +24,7 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "mesh.h"
 #include "selection.h"
 #include "serialization_xml.h"
 #include "types.h"
@@ -46,35 +47,6 @@ namespace legacy { class mesh; }
 class mesh_selection
 {
 public:
-	/// Constructs a mesh selection that explicitly selects everything
-	static const mesh_selection select_all();
-	/// Constructs a mesh selection that explicitly deselects everything
-	static const mesh_selection deselect_all();
-	/// Constructs a mesh selection that explicitly doesn't alter selection at all
-	static const mesh_selection select_null();
-
-	/// Appends a selection that will be applied to selections with the given type, across a range of primitives, across a range of indices.
-	void add_record(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight);
-
-	/// Clears the selection.
-	void clear();
-	/// Returns true if the selection is "empty", i.e. none of the components are selected
-	bool empty() const;
-	/// Equivalence
-	bool operator==(const mesh_selection& RHS) const;
-	/// Non-equivalence
-	bool operator!=(const mesh_selection& RHS) const;
-
-	/** \name Storage for generic mesh component selections */
-	//@{
-	std::vector<selection::type> type;
-	std::vector<uint_t> primitive_begin;
-	std::vector<uint_t> primitive_end;
-	std::vector<uint_t> index_begin;
-	std::vector<uint_t> index_end;
-	std::vector<double_t> weight;
-	//@}
-	
 	/** \name Deprecated for generic mesh primitives */
 	//@{
 	/// Stores selection data that will apply to a range of components
@@ -125,22 +97,58 @@ public:
 	records_t nurbs_curves;
 	records_t nurbs_patches;
 	//@}
+
+
+	/// Constructs a mesh selection that explicitly selects everything
+	static const mesh_selection select_all();
+	/// Constructs a mesh selection that explicitly deselects everything
+	static const mesh_selection deselect_all();
+	/// Constructs a mesh selection that explicitly doesn't alter selection at all
+	static const mesh_selection select_null();
+
+	/// Copies the selection state of a mesh into a mesh_selection.
+	static void store(const mesh& Mesh, mesh_selection& Selection);
+	/// Copies the selection state of a mesh into a mesh_selection
+	static void store(const legacy::mesh& Mesh, mesh_selection& MeshSelection);
+
+	/// Merges a mesh_selection with the current selection state in the given mesh.
+	static void merge(const mesh_selection& MeshSelection, mesh& Mesh);
+	/// Merges a set of mesh_selection records with the current selection state in the given array.
+	static void merge(const mesh_selection::records_t& Records, mesh::selection_t& Selection);
+	/// Copies mesh_selection state over any previous selection state in the given mesh
+	static void merge(const mesh_selection& MeshSelection, legacy::mesh& Mesh);
+
+	/// Clears the selection.
+	void clear();
+	/// Returns true if the selection is "empty", i.e. none of the components are selected
+	bool empty() const;
+	/// Equivalence
+	bool operator==(const mesh_selection& RHS) const;
+	/// Non-equivalence
+	bool operator!=(const mesh_selection& RHS) const;
+
+	struct component
+	{
+		component();
+		component(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd);
+		component(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight);
+
+		selection::type type;
+		uint_t primitive_begin;
+		uint_t primitive_end;
+
+		std::vector<uint_t> index_begin;
+		std::vector<uint_t> index_end;
+		std::vector<double_t> weight;
+
+		bool operator==(const component& RHS) const;
+	};
+
+	std::vector<component> components;
 };
 
 std::ostream& operator<<(std::ostream&, const mesh_selection::records_t&);
 std::ostream& operator<<(std::ostream&, const mesh_selection&);
-
-/////////////////////////////////////////////////////////////////////////////
-// store_selection
-
-/// Copies the selection state of a mesh into a mesh_selection
-void store_selection(const legacy::mesh& Mesh, mesh_selection& MeshSelection);
-
-/////////////////////////////////////////////////////////////////////////////
-// merge_selection
-
-/// Copies mesh_selection state over any previous selection state in the given mesh
-void merge_selection(const mesh_selection& MeshSelection, legacy::mesh& Mesh);
 
 /////////////////////////////////////////////////////////////////////////////
 // mesh_selection_serialization

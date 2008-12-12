@@ -53,7 +53,7 @@ public:
 	
 	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 	}
 	
 	static k3d::iplugin_factory& get_factory()

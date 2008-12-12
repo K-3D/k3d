@@ -81,7 +81,7 @@ public:
 	{
 		Output = Input;
 
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		if(!k3d::validate_polyhedra(Output))
 			return;

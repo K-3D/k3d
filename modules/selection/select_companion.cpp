@@ -77,7 +77,7 @@ public:
 		if(!k3d::validate_polyhedra(Output))
 			return;
 		
-		k3d::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 		k3d::mesh::selection_t& edge_selection = Output.polyhedra.writable().edge_selection.writable();
 		
 		return_if_fail(edge_selection.size() == m_companions.size());

@@ -363,11 +363,11 @@ public:
 		Output = Input;
 		const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
 		k3d::mesh::selection_t point_selection = *Input.point_selection;
-		k3d::merge_selection(mesh_selection.points, point_selection);
+		k3d::mesh_selection::merge(mesh_selection.points, point_selection);
 		k3d::mesh::selection_t edge_selection = *Input.polyhedra->edge_selection;
-		k3d::merge_selection(mesh_selection.edges, edge_selection);
+		k3d::mesh_selection::merge(mesh_selection.edges, edge_selection);
 		k3d::mesh::selection_t face_selection = *Input.polyhedra->face_selection;
-		k3d::merge_selection(mesh_selection.faces, face_selection);
+		k3d::mesh_selection::merge(mesh_selection.faces, face_selection);
 		const k3d::uint_t point_count = Input.points->size();
 		const k3d::uint_t edge_count = Input.polyhedra->edge_points->size();
 		const k3d::uint_t face_count = Input.polyhedra->face_first_loops->size();

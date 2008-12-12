@@ -21,6 +21,7 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "mesh.h"
 #include "legacy_mesh.h"
 #include "log.h"
 #include "mesh_selection.h"
@@ -32,11 +33,54 @@ namespace k3d
 namespace detail
 {
 
+void store_selection(const pipeline_data<mesh::selection_t>& Selection, mesh_selection::records_t& Records)
+{
+	if(!Selection)
+		return;
+
+	const mesh::selection_t& selection_weight = *Selection;
+
+	const uint_t selection_begin = 0;
+	const uint_t selection_end = selection_begin + selection_weight.size();
+	for(uint_t selection = selection_begin; selection != selection_end; ++selection)
+		Records.push_back(mesh_selection::record(selection, selection+1, selection_weight[selection]));
+}
+
+void merge_selection(const mesh_selection::records_t& Records, mesh::selection_t& Selection)
+{
+	const uint_t selection_count = Selection.size();
+
+	for(mesh_selection::records_t::const_iterator record = Records.begin(); record != Records.end(); ++record)
+	{
+		if(record->begin >= selection_count)
+			break;
+
+		mesh::selection_t::iterator begin = Selection.begin() + record->begin;
+		mesh::selection_t::iterator end = Selection.begin() + std::min(selection_count, record->end);
+		std::fill(begin, end, record->weight);
+	}
+}
+
+template<typename gprims_type>
+void merge_selection(const mesh_selection::records_t& Records, const gprims_type& GPrims, pipeline_data<mesh::selection_t>& Selection)
+{
+	return_if_fail(GPrims);
+
+	const uint_t gprim_count = GPrims->size();
+
+	if(!Selection || Selection->size() != gprim_count)
+		Selection.create(new mesh::selection_t(gprim_count));
+
+	mesh::selection_t& selection = Selection.writable();
+
+	detail::merge_selection(Records, selection);
+}
+
 /// Stores mesh component selection data in the given collection of selection records
-class store_selection
+class store_selection_helper
 {
 public:
-	store_selection(mesh_selection::records_t& Records) :
+	store_selection_helper(mesh_selection::records_t& Records) :
 		records(Records),
 		index(0)
 	{
@@ -56,10 +100,10 @@ private:
 };
 
 /// Updates mesh components using stored selection data.  Note: if selection data doesn't exist for a given component, leaves it alone
-class merge_selection
+class merge_selection_helper
 {
 public:
-	merge_selection(const mesh_selection::records_t& Records) :
+	merge_selection_helper(const mesh_selection::records_t& Records) :
 		records(Records),
 		current_record(Records.begin()),
 		end_record(Records.end()),
@@ -113,12 +157,12 @@ const mesh_selection mesh_selection::select_all()
 	result.nurbs_curves = component_select_all();
 	result.nurbs_patches = component_select_all();
 
-	result.add_record(selection::CONSTANT, 0, uint_t(-1), 0, uint_t(-1), 1.0);
-	result.add_record(selection::UNIFORM, 0, uint_t(-1), 0, uint_t(-1), 1.0);
-	result.add_record(selection::VARYING, 0, uint_t(-1), 0, uint_t(-1), 1.0);
-	result.add_record(selection::FACE_VARYING, 0, uint_t(-1), 0, uint_t(-1), 1.0);
-	result.add_record(selection::SPLIT_EDGE, 0, uint_t(-1), 0, uint_t(-1), 1.0);
-	result.add_record(selection::VERTEX, 0, uint_t(-1), 0, uint_t(-1), 1.0);
+	result.components.push_back(component(selection::CONSTANT, 0, uint_t(-1), 0, uint_t(-1), 1.0));
+	result.components.push_back(component(selection::UNIFORM, 0, uint_t(-1), 0, uint_t(-1), 1.0));
+	result.components.push_back(component(selection::VARYING, 0, uint_t(-1), 0, uint_t(-1), 1.0));
+	result.components.push_back(component(selection::FACE_VARYING, 0, uint_t(-1), 0, uint_t(-1), 1.0));
+	result.components.push_back(component(selection::SPLIT_EDGE, 0, uint_t(-1), 0, uint_t(-1), 1.0));
+	result.components.push_back(component(selection::VERTEX, 0, uint_t(-1), 0, uint_t(-1), 1.0));
 
 	return result;
 }
@@ -133,12 +177,12 @@ const mesh_selection mesh_selection::deselect_all()
 	result.nurbs_curves = component_deselect_all();
 	result.nurbs_patches = component_deselect_all();
 
-	result.add_record(selection::CONSTANT, 0, uint_t(-1), 0, uint_t(-1), 0.0);
-	result.add_record(selection::UNIFORM, 0, uint_t(-1), 0, uint_t(-1), 0.0);
-	result.add_record(selection::VARYING, 0, uint_t(-1), 0, uint_t(-1), 0.0);
-	result.add_record(selection::FACE_VARYING, 0, uint_t(-1), 0, uint_t(-1), 0.0);
-	result.add_record(selection::SPLIT_EDGE, 0, uint_t(-1), 0, uint_t(-1), 0.0);
-	result.add_record(selection::VERTEX, 0, uint_t(-1), 0, uint_t(-1), 0.0);
+	result.components.push_back(component(selection::CONSTANT, 0, uint_t(-1), 0, uint_t(-1), 0.0));
+	result.components.push_back(component(selection::UNIFORM, 0, uint_t(-1), 0, uint_t(-1), 0.0));
+	result.components.push_back(component(selection::VARYING, 0, uint_t(-1), 0, uint_t(-1), 0.0));
+	result.components.push_back(component(selection::FACE_VARYING, 0, uint_t(-1), 0, uint_t(-1), 0.0));
+	result.components.push_back(component(selection::SPLIT_EDGE, 0, uint_t(-1), 0, uint_t(-1), 0.0));
+	result.components.push_back(component(selection::VERTEX, 0, uint_t(-1), 0, uint_t(-1), 0.0));
 
 	return result;
 }
@@ -148,138 +192,39 @@ const mesh_selection mesh_selection::select_null()
 	return mesh_selection();
 }
 
-void mesh_selection::add_record(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight)
+void mesh_selection::store(const mesh& Mesh, mesh_selection& Selection)
 {
-	type.push_back(Type);
-	primitive_begin.push_back(PrimitiveBegin);
-	primitive_end.push_back(PrimitiveEnd);
-	index_begin.push_back(IndexBegin);
-	index_end.push_back(IndexEnd);
-	weight.push_back(Weight);
-}
+	Selection.clear();
 
-void mesh_selection::clear()
-{
-	points.clear();
-	edges.clear();
-	faces.clear();
-	nurbs_curves.clear();
-	nurbs_patches.clear();
+	detail::store_selection(Mesh.point_selection, Selection.points);
 
-	type.clear();
-	primitive_begin.clear();
-	primitive_end.clear();
-	index_begin.clear();
-	index_end.clear();
-	weight.clear();
-}
-
-bool mesh_selection::empty() const
-{
-	return
-		points.empty() &&
-		edges.empty() &&
-		faces.empty() &&
-		nurbs_curves.empty() &&
-		nurbs_patches.empty() &&
-		type.empty();
-}
-
-bool mesh_selection::operator==(const mesh_selection& RHS) const
-{
-	return
-		points == RHS.points &&
-		edges == RHS.edges &&
-		faces == RHS.faces &&
-		nurbs_curves == RHS.nurbs_curves &&
-		nurbs_patches == RHS.nurbs_patches &&
-		type == RHS.type &&
-		primitive_begin == RHS.primitive_begin &&
-		primitive_end == RHS.primitive_end &&
-		index_begin == RHS.index_begin &&
-		index_end == RHS.index_end &&
-		weight == RHS.weight;
-}
-
-bool mesh_selection::operator!=(const mesh_selection& RHS) const
-{
-	return !(operator==(RHS));
-}
-
-const mesh_selection::records_t mesh_selection::component_select_all()
-{
-	mesh_selection::records_t result;
-	result.push_back(record(0, uint_t(-1), 1.0));
-
-	return result;
-}
-
-const mesh_selection::records_t mesh_selection::component_deselect_all()
-{
-	mesh_selection::records_t result;
-	result.push_back(record(0, uint_t(-1), 0.0));
-
-	return result;
-}
-
-// very slow debug output of selection list. Uncomment calls below if needed
-void show_selection_list(const mesh_selection::records_t& Selections)
-{
-	k3d::log() << debug << "------start selection list-------" << std::endl;
-	for (mesh_selection::records_t::const_iterator selection = Selections.begin(); selection != Selections.end(); ++selection)
-		k3d::log() << debug <<  selection->begin << "->" << selection->end << " with weight " << selection->weight << std::endl;
-	k3d::log() << debug << "--------end selection list-------" << std::endl;
-}
-
-std::ostream& operator<<(std::ostream& Stream, const mesh_selection::records_t& RHS)
-{
-	for(mesh_selection::records_t::const_iterator record = RHS.begin(); record != RHS.end(); ++record)
+	if(Mesh.polyhedra)
 	{
-		if(record != RHS.begin())
-			Stream << " ";
-
-		Stream << "[" << record->begin << ", " << record->end << ") " << record->weight;
+		detail::store_selection(Mesh.polyhedra->edge_selection, Selection.edges);
+		detail::store_selection(Mesh.polyhedra->face_selection, Selection.faces);
 	}
 
-	return Stream;
-}
-
-std::ostream& operator<<(std::ostream& Stream, const mesh_selection& RHS)
-{
-	Stream << "points:           " << RHS.points << "\n";
-	Stream << "edges:            " << RHS.edges << "\n";
-	Stream << "faces:            " << RHS.faces << "\n";
-	Stream << "nurbs_curves:     " << RHS.nurbs_curves << "\n";
-	Stream << "nurbs_patches:    " << RHS.nurbs_patches << "\n";
-
-	for(uint_t i = 0; i != RHS.type.size(); ++i)
+	if(Mesh.nurbs_curve_groups)
 	{
-		Stream << RHS.type[i];
-		Stream << " " << RHS.primitive_begin[i];
-		Stream << " " << RHS.primitive_end[i];
-		Stream << " " << RHS.index_begin[i];
-		Stream << " " << RHS.index_end[i];
-		Stream << " " << RHS.weight[i];
-		Stream << "\n";
+		detail::store_selection(Mesh.nurbs_curve_groups->curve_selection, Selection.nurbs_curves);
 	}
 
-	return Stream;
+	if(Mesh.nurbs_patches)
+	{
+		detail::store_selection(Mesh.nurbs_patches->patch_selection, Selection.nurbs_patches);
+	}
+
+	// Handle generic mesh primitives ...
+	assert_not_implemented();
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// store_selection
-
-void store_selection(const legacy::mesh& Mesh, mesh_selection& MeshSelection)
+void mesh_selection::store(const legacy::mesh& Mesh, mesh_selection& Selection)
 {
-	MeshSelection.points.clear();
-	MeshSelection.edges.clear();
-	MeshSelection.faces.clear();
-	MeshSelection.nurbs_curves.clear();
-	MeshSelection.nurbs_patches.clear();
+	Selection.clear();
 
-	std::for_each(Mesh.points.begin(), Mesh.points.end(), detail::store_selection(MeshSelection.points));
+	std::for_each(Mesh.points.begin(), Mesh.points.end(), detail::store_selection_helper(Selection.points));
 
-	detail::store_selection store_edge_selection(MeshSelection.edges);
+	detail::store_selection_helper store_edge_selection(Selection.edges);
 	for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 	{
 		for(legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
@@ -294,32 +239,66 @@ void store_selection(const legacy::mesh& Mesh, mesh_selection& MeshSelection)
 		}
 	}
 
-	detail::store_selection store_face_selection(MeshSelection.faces);
+	detail::store_selection_helper store_face_selection(Selection.faces);
 	for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 		std::for_each((*polyhedron)->faces.begin(), (*polyhedron)->faces.end(), store_face_selection);
 
-	detail::store_selection store_nurbs_curve_selection(MeshSelection.nurbs_curves);
+	detail::store_selection_helper store_nurbs_curve_selection(Selection.nurbs_curves);
 	for(legacy::mesh::nucurve_groups_t::const_iterator group = Mesh.nucurve_groups.begin(); group != Mesh.nucurve_groups.end(); ++group)
 		std::for_each((*group)->curves.begin(), (*group)->curves.end(), store_nurbs_curve_selection);
 
-	std::for_each(Mesh.nupatches.begin(), Mesh.nupatches.end(), detail::store_selection(MeshSelection.nurbs_patches));
+	std::for_each(Mesh.nupatches.begin(), Mesh.nupatches.end(), detail::store_selection_helper(Selection.nurbs_patches));
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// merge_selection
+void mesh_selection::merge(const mesh_selection& Selection, mesh& Mesh)
+{
+	if(Mesh.points && Mesh.point_selection)
+		detail::merge_selection(Selection.points, Mesh.points, Mesh.point_selection);
 
-void merge_selection(const mesh_selection& MeshSelection, legacy::mesh& Mesh)
+	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
+	{
+		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
+		detail::merge_selection(Selection.edges, polyhedra.edge_points, polyhedra.edge_selection);
+	}
+
+	if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops)
+	{
+		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
+		detail::merge_selection(Selection.faces, polyhedra.face_first_loops, polyhedra.face_selection);
+	}
+
+	if(Mesh.nurbs_curve_groups)
+	{
+		k3d::mesh::nurbs_curve_groups_t& nurbs_curve_groups = Mesh.nurbs_curve_groups.writable();
+		detail::merge_selection(Selection.nurbs_curves, nurbs_curve_groups.curve_first_points, nurbs_curve_groups.curve_selection);
+	}
+
+	if(Mesh.nurbs_patches)
+	{
+		k3d::mesh::nurbs_patches_t& nurbs_patches = Mesh.nurbs_patches.writable();
+		detail::merge_selection(Selection.nurbs_patches, nurbs_patches.patch_materials, nurbs_patches.patch_selection);
+	}
+
+	// Handle generic mesh primitives ...
+}
+
+void mesh_selection::merge(const mesh_selection::records_t& Records, mesh::selection_t& Selection)
+{
+	detail::merge_selection(Records, Selection);
+}
+
+void mesh_selection::merge(const mesh_selection& Selection, legacy::mesh& Mesh)
 {
 	// This is a policy decision that may belong elsewhere ... if the mesh_selection is
 	// empty, don't modify the mesh at all.  This makes it possible for a plugin to have an
 	// "empty" selection property, in which-case the plugin will alter its input using whatever
 	// selection the input already carries.
-	if(MeshSelection.empty())
+	if(Selection.empty())
 		return;
 
-	k3d::legacy::for_each_point(Mesh, detail::merge_selection(MeshSelection.points));
+	k3d::legacy::for_each_point(Mesh, detail::merge_selection_helper(Selection.points));
 
-	detail::merge_selection replace_edge_selection(MeshSelection.edges);
+	detail::merge_selection_helper replace_edge_selection(Selection.edges);
 	for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 	{
 		for(legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
@@ -345,9 +324,149 @@ void merge_selection(const mesh_selection& MeshSelection, legacy::mesh& Mesh)
 		}
 	}
 
-	k3d::legacy::for_each_face(Mesh, detail::merge_selection(MeshSelection.faces));
-	k3d::legacy::for_each_nucurve(Mesh, detail::merge_selection(MeshSelection.nurbs_curves));
-	k3d::legacy::for_each_nupatch(Mesh, detail::merge_selection(MeshSelection.nurbs_patches));
+	k3d::legacy::for_each_face(Mesh, detail::merge_selection_helper(Selection.faces));
+	k3d::legacy::for_each_nucurve(Mesh, detail::merge_selection_helper(Selection.nurbs_curves));
+	k3d::legacy::for_each_nupatch(Mesh, detail::merge_selection_helper(Selection.nurbs_patches));
+}
+
+void mesh_selection::clear()
+{
+	points.clear();
+	edges.clear();
+	faces.clear();
+	nurbs_curves.clear();
+	nurbs_patches.clear();
+
+	components.clear();
+}
+
+bool mesh_selection::empty() const
+{
+	return
+		points.empty() &&
+		edges.empty() &&
+		faces.empty() &&
+		nurbs_curves.empty() &&
+		nurbs_patches.empty() &&
+		components.empty();
+}
+
+bool mesh_selection::operator==(const mesh_selection& RHS) const
+{
+	return
+		points == RHS.points &&
+		edges == RHS.edges &&
+		faces == RHS.faces &&
+		nurbs_curves == RHS.nurbs_curves &&
+		nurbs_patches == RHS.nurbs_patches &&
+		components == RHS.components;
+}
+
+bool mesh_selection::operator!=(const mesh_selection& RHS) const
+{
+	return !(operator==(RHS));
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// mesh_selection::component
+
+mesh_selection::component::component() :
+	type(selection::NONE),
+	primitive_begin(0),
+	primitive_end(0)
+{
+}
+
+mesh_selection::component::component(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd) :
+	type(Type),
+	primitive_begin(PrimitiveBegin),
+	primitive_end(PrimitiveEnd)
+{
+}
+
+mesh_selection::component::component(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight) :
+	type(Type),
+	primitive_begin(PrimitiveBegin),
+	primitive_end(PrimitiveEnd),
+	index_begin(1, IndexBegin),
+	index_end(1, IndexEnd),
+	weight(1, Weight)
+{
+}
+
+bool mesh_selection::component::operator==(const component& RHS) const
+{
+	return type == RHS.type
+		&& primitive_begin == RHS.primitive_begin
+		&& primitive_end == RHS.primitive_end
+		&& index_begin == RHS.index_begin
+		&& index_end == RHS.index_end
+		&& weight == RHS.weight
+		;
+}
+
+const mesh_selection::records_t mesh_selection::component_select_all()
+{
+	mesh_selection::records_t result;
+	result.push_back(record(0, uint_t(-1), 1.0));
+
+	return result;
+}
+
+const mesh_selection::records_t mesh_selection::component_deselect_all()
+{
+	mesh_selection::records_t result;
+	result.push_back(record(0, uint_t(-1), 0.0));
+
+	return result;
+}
+
+/*
+// very slow debug output of selection list. Uncomment calls below if needed
+void show_selection_list(const mesh_selection::records_t& Selections)
+{
+	k3d::log() << debug << "------start selection list-------" << std::endl;
+	for (mesh_selection::records_t::const_iterator selection = Selections.begin(); selection != Selections.end(); ++selection)
+		k3d::log() << debug <<  selection->begin << "->" << selection->end << " with weight " << selection->weight << std::endl;
+	k3d::log() << debug << "--------end selection list-------" << std::endl;
+}
+*/
+
+std::ostream& operator<<(std::ostream& Stream, const mesh_selection::records_t& RHS)
+{
+	for(mesh_selection::records_t::const_iterator record = RHS.begin(); record != RHS.end(); ++record)
+	{
+		if(record != RHS.begin())
+			Stream << " ";
+
+		Stream << "[" << record->begin << ", " << record->end << ") " << record->weight;
+	}
+
+	return Stream;
+}
+
+std::ostream& operator<<(std::ostream& Stream, const mesh_selection& RHS)
+{
+	Stream << "points:           " << RHS.points << "\n";
+	Stream << "edges:            " << RHS.edges << "\n";
+	Stream << "faces:            " << RHS.faces << "\n";
+	Stream << "nurbs_curves:     " << RHS.nurbs_curves << "\n";
+	Stream << "nurbs_patches:    " << RHS.nurbs_patches << "\n";
+
+/*
+	for(uint_t i = 0; i != RHS.type.size(); ++i)
+	{
+		Stream << RHS.type[i];
+		Stream << " " << RHS.primitive_begin[i];
+		Stream << " " << RHS.primitive_end[i];
+		Stream << " " << RHS.index_begin[i];
+		Stream << " " << RHS.index_end[i];
+		Stream << " " << RHS.weight[i];
+		Stream << "\n";
+	}
+*/
+
+	return Stream;
 }
 
 } // namespace k3d
