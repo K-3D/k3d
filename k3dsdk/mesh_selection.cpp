@@ -157,12 +157,12 @@ const mesh_selection mesh_selection::select_all()
 	result.nurbs_curves = component_select_all();
 	result.nurbs_patches = component_select_all();
 
-	result.components.push_back(component(selection::CONSTANT, 0, uint_t(-1), 0, uint_t(-1), 1.0));
-	result.components.push_back(component(selection::UNIFORM, 0, uint_t(-1), 0, uint_t(-1), 1.0));
-	result.components.push_back(component(selection::VARYING, 0, uint_t(-1), 0, uint_t(-1), 1.0));
-	result.components.push_back(component(selection::FACE_VARYING, 0, uint_t(-1), 0, uint_t(-1), 1.0));
-	result.components.push_back(component(selection::SPLIT_EDGE, 0, uint_t(-1), 0, uint_t(-1), 1.0));
-	result.components.push_back(component(selection::VERTEX, 0, uint_t(-1), 0, uint_t(-1), 1.0));
+	result.components.push_back(component(0, uint_t(-1), selection::CONSTANT, 0, uint_t(-1), 1.0));
+	result.components.push_back(component(0, uint_t(-1), selection::UNIFORM, 0, uint_t(-1), 1.0));
+	result.components.push_back(component(0, uint_t(-1), selection::VARYING, 0, uint_t(-1), 1.0));
+	result.components.push_back(component(0, uint_t(-1), selection::FACE_VARYING, 0, uint_t(-1), 1.0));
+	result.components.push_back(component(0, uint_t(-1), selection::SPLIT_EDGE, 0, uint_t(-1), 1.0));
+	result.components.push_back(component(0, uint_t(-1), selection::VERTEX, 0, uint_t(-1), 1.0));
 
 	return result;
 }
@@ -177,12 +177,12 @@ const mesh_selection mesh_selection::deselect_all()
 	result.nurbs_curves = component_deselect_all();
 	result.nurbs_patches = component_deselect_all();
 
-	result.components.push_back(component(selection::CONSTANT, 0, uint_t(-1), 0, uint_t(-1), 0.0));
-	result.components.push_back(component(selection::UNIFORM, 0, uint_t(-1), 0, uint_t(-1), 0.0));
-	result.components.push_back(component(selection::VARYING, 0, uint_t(-1), 0, uint_t(-1), 0.0));
-	result.components.push_back(component(selection::FACE_VARYING, 0, uint_t(-1), 0, uint_t(-1), 0.0));
-	result.components.push_back(component(selection::SPLIT_EDGE, 0, uint_t(-1), 0, uint_t(-1), 0.0));
-	result.components.push_back(component(selection::VERTEX, 0, uint_t(-1), 0, uint_t(-1), 0.0));
+	result.components.push_back(component(0, uint_t(-1), selection::CONSTANT, 0, uint_t(-1), 0.0));
+	result.components.push_back(component(0, uint_t(-1), selection::UNIFORM, 0, uint_t(-1), 0.0));
+	result.components.push_back(component(0, uint_t(-1), selection::VARYING, 0, uint_t(-1), 0.0));
+	result.components.push_back(component(0, uint_t(-1), selection::FACE_VARYING, 0, uint_t(-1), 0.0));
+	result.components.push_back(component(0, uint_t(-1), selection::SPLIT_EDGE, 0, uint_t(-1), 0.0));
+	result.components.push_back(component(0, uint_t(-1), selection::VERTEX, 0, uint_t(-1), 0.0));
 
 	return result;
 }
@@ -329,6 +329,11 @@ void mesh_selection::merge(const mesh_selection& Selection, legacy::mesh& Mesh)
 	k3d::legacy::for_each_nupatch(Mesh, detail::merge_selection_helper(Selection.nurbs_patches));
 }
 
+void mesh_selection::add_component(const component& Component)
+{
+	components.push_back(Component);
+}
+
 void mesh_selection::clear()
 {
 	points.clear();
@@ -371,27 +376,34 @@ bool mesh_selection::operator!=(const mesh_selection& RHS) const
 // mesh_selection::component
 
 mesh_selection::component::component() :
-	type(selection::NONE),
 	primitive_begin(0),
-	primitive_end(0)
+	primitive_end(0),
+	type(selection::NONE)
 {
 }
 
-mesh_selection::component::component(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd) :
-	type(Type),
+mesh_selection::component::component(const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const selection::type Type) :
 	primitive_begin(PrimitiveBegin),
-	primitive_end(PrimitiveEnd)
+	primitive_end(std::max(PrimitiveBegin, PrimitiveEnd)),
+	type(Type)
 {
 }
 
-mesh_selection::component::component(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight) :
-	type(Type),
+mesh_selection::component::component(const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const selection::type Type, const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight) :
 	primitive_begin(PrimitiveBegin),
-	primitive_end(PrimitiveEnd),
+	primitive_end(std::max(PrimitiveBegin, PrimitiveEnd)),
+	type(Type),
 	index_begin(1, IndexBegin),
-	index_end(1, IndexEnd),
+	index_end(1, std::max(IndexBegin, IndexEnd)),
 	weight(1, Weight)
 {
+}
+
+void mesh_selection::component::add_range(const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight)
+{
+	index_begin.push_back(IndexBegin);
+	index_end.push_back(std::max(IndexBegin, IndexEnd));
+	weight.push_back(Weight);
 }
 
 bool mesh_selection::component::operator==(const component& RHS) const
@@ -453,18 +465,21 @@ std::ostream& operator<<(std::ostream& Stream, const mesh_selection& RHS)
 	Stream << "nurbs_curves:     " << RHS.nurbs_curves << "\n";
 	Stream << "nurbs_patches:    " << RHS.nurbs_patches << "\n";
 
-/*
-	for(uint_t i = 0; i != RHS.type.size(); ++i)
+	std::copy(RHS.components.begin(), RHS.components.end(), std::ostream_iterator<mesh_selection::component>(Stream, "\n"));
+
+	return Stream;
+}
+
+std::ostream& operator<<(std::ostream& Stream, const mesh_selection::component& RHS)
+{
+	Stream << "primitives: [" << RHS.primitive_begin << ", " << RHS.primitive_end << ")";
+	Stream << " " << RHS.type;
+	
+	for(uint_t i = 0; i != RHS.index_begin.size(); ++i)
 	{
-		Stream << RHS.type[i];
-		Stream << " " << RHS.primitive_begin[i];
-		Stream << " " << RHS.primitive_end[i];
-		Stream << " " << RHS.index_begin[i];
-		Stream << " " << RHS.index_end[i];
+		Stream << " " << "[" << RHS.index_begin[i] << ", " << RHS.index_end[i] << ")";
 		Stream << " " << RHS.weight[i];
-		Stream << "\n";
 	}
-*/
 
 	return Stream;
 }

@@ -21,6 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "mesh_python.h"
 #include "mesh_selection_python.h"
 
 #include <k3dsdk/mesh_selection.h>
@@ -123,22 +124,39 @@ static boost::python::object component_deselect_all()
 	return convert(k3d::mesh_selection::component_deselect_all());
 }
 
+static void store(const k3d::python::mesh& Mesh, k3d::mesh_selection& Selection)
+{
+	k3d::mesh_selection::store(Mesh.wrapped(), Selection);
+}
+
+static void merge(const k3d::mesh_selection& Selection, k3d::python::mesh& Mesh)
+{
+	k3d::mesh_selection::merge(Selection, Mesh.wrapped());
+}
+
 void define_class_mesh_selection()
 {
-	class_<k3d::mesh_selection>("mesh_selection",
+	scope outer = class_<k3d::mesh_selection>("mesh_selection",
 		"Stores a change in mesh selection state.\n\n"
 		"Changes are stored as lists of tuples, where each tuple represents a seletion weight to be applied to a range of indices.  "
 		"There is one list for each type of primitive: vertices, polyhedron edges, polyhedron faces, linear curves, cubic curves, "
 		"NURBS curves, bilinear patches, bicubic patches, and NURBS patches.")
-		.def("select_all", k3d::mesh_selection::select_all,
+		.def("select_all", &k3d::mesh_selection::select_all,
 			"Returns a L{mesh_selection} that explicitly selects every component.")
 		.staticmethod("select_all")
-		.def("deselect_all", k3d::mesh_selection::deselect_all,
+		.def("deselect_all", &k3d::mesh_selection::deselect_all,
 			"Returns a L{mesh_selection} that explicitly deselects every component.")
 		.staticmethod("deselect_all")
-		.def("select_null", k3d::mesh_selection::select_null,
+		.def("select_null", &k3d::mesh_selection::select_null,
 			"Returns a L{mesh_selection} that does not select or deselect any components.")
 		.staticmethod("select_null")
+		.def("store", &store,
+			"Stores a mesh's selection state in a L{mesh_selection}.")
+		.staticmethod("store")
+		.def("merge", &merge,
+			"Merges a L{mesh_selection} with a mesh's selection state.")
+		.staticmethod("merge")
+		.def("add_component", &k3d::mesh_selection::add_component)
 		.def("clear", &k3d::mesh_selection::clear,
 			"Clears a mesh selection so that it will not have any effect on mesh state.")
 		.def("empty", &k3d::mesh_selection::empty,
@@ -163,6 +181,13 @@ void define_class_mesh_selection()
 		.def("component_select_all", component_select_all,
 			"Returns a list for use with L{mesh_selection} that selects an entire range of mesh components.")
 		.staticmethod("component_select_all")
+		;
+
+	class_<k3d::mesh_selection::component>("component")
+		.def(init<uint_t, uint_t, k3d::selection::type>())
+		.def(init<uint_t, uint_t, k3d::selection::type, uint_t, uint_t, double_t>())
+		.def("add_range", &k3d::mesh_selection::component::add_range)
+		.def(self == self)
 		;
 }
 

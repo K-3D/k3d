@@ -118,6 +118,27 @@ public:
 	/// Copies mesh_selection state over any previous selection state in the given mesh
 	static void merge(const mesh_selection& MeshSelection, legacy::mesh& Mesh);
 
+	struct component
+	{
+		component();
+		component(const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const selection::type Type);
+		component(const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const selection::type Type, const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight);
+
+		void add_range(const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight);
+
+		uint_t primitive_begin;
+		uint_t primitive_end;
+		selection::type type;
+
+		std::vector<uint_t> index_begin;
+		std::vector<uint_t> index_end;
+		std::vector<double_t> weight;
+
+		bool operator==(const component& RHS) const;
+	};
+
+	/// Adds a new component to the selection.
+	void add_component(const component& Component);
 	/// Clears the selection.
 	void clear();
 	/// Returns true if the selection is "empty", i.e. none of the components are selected
@@ -127,28 +148,13 @@ public:
 	/// Non-equivalence
 	bool operator!=(const mesh_selection& RHS) const;
 
-	struct component
-	{
-		component();
-		component(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd);
-		component(const selection::type Type, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight);
-
-		selection::type type;
-		uint_t primitive_begin;
-		uint_t primitive_end;
-
-		std::vector<uint_t> index_begin;
-		std::vector<uint_t> index_end;
-		std::vector<double_t> weight;
-
-		bool operator==(const component& RHS) const;
-	};
-
-	std::vector<component> components;
+	typedef std::vector<component> components_t;
+	components_t components;
 };
 
 std::ostream& operator<<(std::ostream&, const mesh_selection::records_t&);
 std::ostream& operator<<(std::ostream&, const mesh_selection&);
+std::ostream& operator<<(std::ostream&, const mesh_selection::component&);
 
 /////////////////////////////////////////////////////////////////////////////
 // mesh_selection_serialization
