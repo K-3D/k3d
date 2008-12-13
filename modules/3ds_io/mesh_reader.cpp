@@ -26,8 +26,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
-#include <k3dsdk/imesh_storage.h>
-#include <k3dsdk/mesh_source.h>
+#include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
 
 namespace module
@@ -43,37 +42,20 @@ namespace io
 // mesh_reader
 
 class mesh_reader :
-	public k3d::mesh_source<k3d::node >,
-	public k3d::imesh_storage
+	public k3d::mesh_reader<k3d::node >
 {
-	typedef k3d::mesh_source<k3d::node > base;
+	typedef k3d::mesh_reader<k3d::node > base;
 
 public:
-	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) : base(Factory, Document),
-		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("dae_files"))
+	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) : base(Factory, Document)
 	{
-		m_file.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void reset_mesh(k3d::mesh* const Mesh)
-	{
-		m_output_mesh.reset(Mesh);
-	}
-
-	void on_update_mesh_topology(k3d::mesh& Output)
+	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
 
-		const k3d::filesystem::path path = m_file.pipeline_value();
-		if(path.empty())
-			return;
-
-		f3dsParser f3ds_file(path.native_console_string().c_str(), Output);
-	}
-
-	void on_update_mesh_geometry(k3d::mesh& Output)
-	{
+		f3dsParser f3ds_file(Path.native_console_string().c_str(), Output);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -87,9 +69,6 @@ public:
 
 		return factory;
 	}
-
-private:
-	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
 };
 
 k3d::iplugin_factory& mesh_reader_factory()

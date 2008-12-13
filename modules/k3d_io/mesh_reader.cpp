@@ -28,58 +28,46 @@
 #include <k3dsdk/file_helpers.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/imesh_storage.h>
-#include <k3dsdk/mesh_source.h>
+#include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/serialization_xml.h>
 
-namespace libk3dk3dio
+namespace module
+{
+
+namespace k3d_io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// k3d_mesh_reader
+// mesh_reader
 
-class k3d_mesh_reader :
-	public k3d::mesh_source<k3d::node >,
-	public k3d::imesh_storage
+class mesh_reader :
+	public k3d::mesh_reader<k3d::node >
 {
-	typedef k3d::mesh_source<k3d::node > base;
+	typedef k3d::mesh_reader<k3d::node > base;
 
 public:
-	k3d_mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("obj_files"))
+	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+		base(Factory, Document)
 	{
-		m_file.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void reset_mesh(k3d::mesh* const Mesh)
-	{
-		m_output_mesh.reset(Mesh);
-	}
-
-	void on_update_mesh_topology(k3d::mesh& Output)
+	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
 
-		const k3d::filesystem::path path = m_file.pipeline_value();
-		if(path.empty())
-			return;
-
-		k3d::log() << info << "Reading " << path.native_console_string() << " using " << get_factory().name() << std::endl;
-		k3d::filesystem::ifstream file(path);
+		k3d::filesystem::ifstream file(Path);
 		if(!file)
 		{
-			k3d::log() << error << k3d_file_reference << ": error opening [" << path.native_console_string() << "]" << std::endl;
+			k3d::log() << error << k3d_file_reference << ": error opening [" << Path.native_console_string() << "]" << std::endl;
 			return;
 		}
 
 		k3d::xml::element xml_document("k3dml");
 		file >> xml_document;
 
-		const k3d::filesystem::path root_path = path.branch_path();
+		const k3d::filesystem::path root_path = Path.branch_path();
 		k3d::persistent_lookup lookup;
 		k3d::ipersistent::load_context context(root_path, lookup);
 
@@ -87,13 +75,9 @@ public:
 			k3d::xml::load(Output, *xml_mesh_arrays, context);
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Output)
-	{
-	}
-
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<k3d_mesh_reader,
+		static k3d::document_plugin_factory<mesh_reader,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_storage> > > factory(
 				k3d::uuid(0x7dd19499, 0x965e4c06, 0xb970f545, 0x0e47855d),
@@ -103,15 +87,14 @@ public:
 
 		return factory;
 	}
-
-private:
-	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
 };
 
-k3d::iplugin_factory& k3d_mesh_reader_factory()
+k3d::iplugin_factory& mesh_reader_factory()
 {
-	return k3d_mesh_reader::get_factory();
+	return mesh_reader::get_factory();
 }
 
-} // namespace libk3dk3dio
+} // namespace k3d_io
+
+} // namespace module
 

@@ -23,21 +23,25 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the k3d plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dk3dio
+namespace module
 {
 
-extern k3d::iplugin_factory& k3d_document_importer_factory();
-extern k3d::iplugin_factory& k3d_document_exporter_factory();
-extern k3d::iplugin_factory& k3d_mesh_reader_factory();
-extern k3d::iplugin_factory& k3d_mesh_writer_factory();
+namespace k3d_io
+{
 
-} // libk3dk3dio
+extern k3d::iplugin_factory& document_importer_factory();
+extern k3d::iplugin_factory& document_exporter_factory();
+extern k3d::iplugin_factory& mesh_reader_factory();
+extern k3d::iplugin_factory& mesh_writer_factory();
+
+} // namespace k3d_io
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dk3dio::k3d_document_importer_factory());
-	Registry.register_factory(libk3dk3dio::k3d_document_exporter_factory());
-	Registry.register_factory(libk3dk3dio::k3d_mesh_reader_factory());
-	Registry.register_factory(libk3dk3dio::k3d_mesh_writer_factory());
+	Registry.register_factory(module::k3d_io::document_importer_factory());
+	Registry.register_factory(module::k3d_io::document_exporter_factory());
+	Registry.register_factory(module::k3d_io::mesh_reader_factory());
+	Registry.register_factory(module::k3d_io::mesh_writer_factory());
 K3D_MODULE_END
 

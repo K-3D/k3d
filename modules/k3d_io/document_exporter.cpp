@@ -39,14 +39,17 @@
 #include <k3dsdk/string_modifiers.h>
 #include <k3dsdk/xml.h>
 
-namespace libk3dk3dio
+namespace module
+{
+
+namespace k3d_io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// k3d_document_exporter
+// document_exporter
 
 /// Serializes a K-3D document using the native K-3D XML format
-class k3d_document_exporter :
+class document_exporter :
 	public k3d::idocument_exporter
 {
 public:
@@ -99,7 +102,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<k3d_document_exporter, k3d::interface_list<k3d::idocument_exporter> > factory(
+		static k3d::application_plugin_factory<document_exporter, k3d::interface_list<k3d::idocument_exporter> > factory(
 			k3d::classes::DocumentExporter(),
 			"K3DDocumentExporter",
 			_("K-3D Native ( .k3d )"),
@@ -109,10 +112,12 @@ public:
 	}
 };
 
-k3d::iplugin_factory& k3d_document_exporter_factory()
+k3d::iplugin_factory& document_exporter_factory()
 {
-	return k3d_document_exporter::get_factory();
+	return document_exporter::get_factory();
 }
 
-} // namespace libk3dk3dio
+} // namespace k3d_io
+
+} // namespace module
 

@@ -26,9 +26,8 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh_source.h>
+#include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -46,42 +45,29 @@ namespace io
 // mesh_reader_implementation
 
 class mesh_reader_implementation :
-	public k3d::mesh_source<k3d::node >,
-	public k3d::imesh_storage
+	public k3d::mesh_reader<k3d::node >
 {
-	typedef k3d::mesh_source<k3d::node > base;
+	typedef k3d::mesh_reader<k3d::node > base;
 
 public:
 	mesh_reader_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("svg_files")),
 		m_frame(init_owner(*this) + init_name("frame") + init_label(_("Frame")) + init_description(_("Frame of model")) + init_value(0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
-		m_file.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 		m_frame.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reload_mesh_slot()));
 	}
 
-	void reset_mesh(k3d::mesh* const Mesh)
-	{
-		m_output_mesh.reset(Mesh);
-	}
-
-	void on_update_mesh_topology(k3d::mesh& Output)
+	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
 
-		k3d::filesystem::path md2_path = m_file.pipeline_value();
-		if(md2_path.empty())
-			return;
-
-		boost::scoped_ptr<md2Model> model(new md2Model(md2_path.native_filesystem_string().c_str()));
+		boost::scoped_ptr<md2Model> model(new md2Model(Path.native_filesystem_string().c_str()));
 
 		const k3d::int32_t frame = m_frame.pipeline_value();
 		if(frame < 0 || frame >= model->get_num_frames())
 		{
-			k3d::log() << error << "frame [" << frame << "] out-of-range for [" << md2_path.native_console_string() << "]" << std::endl;
+			k3d::log() << error << "frame [" << frame << "] out-of-range for [" << Path.native_console_string() << "]" << std::endl;
 			return;
 		}
 
@@ -137,11 +123,6 @@ public:
 		}
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Output)
-	{
-		// add scale factor and scale code for changing its size
-	}
-
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<mesh_reader_implementation,
@@ -157,7 +138,6 @@ public:
 	}
 
 private:
-	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, measurement_property, with_serialization) m_frame;
 };
 

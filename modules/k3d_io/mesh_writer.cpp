@@ -32,24 +32,27 @@
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/serialization_xml.h>
 
-namespace libk3dk3dio
+namespace module
+{
+
+namespace k3d_io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// k3d_mesh_writer
+// mesh_writer
 
-class k3d_mesh_writer :
+class mesh_writer :
 	public k3d::mesh_sink<k3d::node >
 {
 	typedef k3d::mesh_sink<k3d::node > base;
 
 public:
-	k3d_mesh_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	mesh_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Output file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::WRITE) + init_path_type("k3d_files"))
 	{
-		m_file.changed_signal().connect(sigc::mem_fun(*this, &k3d_mesh_writer::on_write_file));
-		m_input_mesh.changed_signal().connect(sigc::mem_fun(*this, &k3d_mesh_writer::on_write_file));
+		m_file.changed_signal().connect(sigc::mem_fun(*this, &mesh_writer::on_write_file));
+		m_input_mesh.changed_signal().connect(sigc::mem_fun(*this, &mesh_writer::on_write_file));
 	}
 
 	void on_write_file(k3d::iunknown*)
@@ -83,7 +86,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<k3d_mesh_writer, k3d::interface_list<k3d::imesh_sink > > factory(
+		static k3d::document_plugin_factory<mesh_writer, k3d::interface_list<k3d::imesh_sink > > factory(
 			k3d::uuid(0xefdcb347, 0x0e984075, 0x87973a80, 0xca8b196d),
 			"K3DMeshWriter",
 			_("Mesh writer that saves K-3D XML (.k3d) files"),
@@ -97,10 +100,12 @@ private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
 };
 
-k3d::iplugin_factory& k3d_mesh_writer_factory()
+k3d::iplugin_factory& mesh_writer_factory()
 {
-	return k3d_mesh_writer::get_factory();
+	return mesh_writer::get_factory();
 }
 
-} // namespace libk3dk3dio
+} // namespace k3d_io
+
+} // namespace module
 

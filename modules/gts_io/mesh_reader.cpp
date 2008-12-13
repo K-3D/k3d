@@ -28,7 +28,7 @@
 #include <k3dsdk/file_helpers.h>
 #include <k3dsdk/gzstream.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/mesh_source.h>
+#include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/string_modifiers.h>
 
@@ -60,39 +60,32 @@ void gts_line(std::istream& Stream, std::string& Buffer)
 // mesh_reader
 
 class mesh_reader :
-	public k3d::material_sink<k3d::mesh_source<k3d::node > >
+	public k3d::material_sink<k3d::mesh_reader<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
+	typedef k3d::material_sink<k3d::mesh_reader<k3d::node > > base;
 
 public:
 	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("gts_files"))
+		base(Factory, Document)
 	{
-		m_file.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_update_mesh_topology(k3d::mesh& Output)
+	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
 
-		const k3d::filesystem::path path = m_file.pipeline_value();
-		if(path.empty())
-			return;
-		
-		k3d::filesystem::igzstream file(path);
+		k3d::filesystem::igzstream file(Path);
 		if(!file)
 			return;
 
-		k3d::log() << info << "Loading GNU Triangulated Surface file: " << path.native_console_string() << std::endl;
+		k3d::log() << info << "Loading GNU Triangulated Surface file: " << Path.native_console_string() << std::endl;
 
 		// Read point, edge, and triangle counts ...
 		std::string buffer;
 		gts_line(file, buffer);
 		if(!file)
 		{
-			k3d::log() << error << "Empty GTS file: " << path.native_console_string() << std::endl;
+			k3d::log() << error << "Empty GTS file: " << Path.native_console_string() << std::endl;
 			return;
 		}
 
@@ -111,7 +104,7 @@ public:
 			gts_line(file, buffer);
 			if(!file)
 			{
-				k3d::log() << error << "Unexpected end-of-file: " << path.native_console_string() << std::endl;
+				k3d::log() << error << "Unexpected end-of-file: " << Path.native_console_string() << std::endl;
 				return;
 			}
 
@@ -134,7 +127,7 @@ public:
 			gts_line(file, buffer);
 			if(!file)
 			{
-				k3d::log() << error << "Unexpected end-of-file: " << path.native_console_string() << std::endl;
+				k3d::log() << error << "Unexpected end-of-file: " << Path.native_console_string() << std::endl;
 				return;
 			}
 
@@ -179,7 +172,7 @@ public:
 			gts_line(file, buffer);
 			if(!file)
 			{
-				k3d::log() << error << "Unexpected end-of-file: " << path.native_console_string() << std::endl;
+				k3d::log() << error << "Unexpected end-of-file: " << Path.native_console_string() << std::endl;
 				return;
 			}
 
@@ -246,10 +239,6 @@ public:
 		}
 	}
 
-	void on_update_mesh_geometry(k3d::mesh& Output)
-	{
-	}
-
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<mesh_reader, k3d::interface_list<k3d::imesh_source> > factory(
@@ -260,9 +249,6 @@ public:
 
 		return factory;
 	}
-
-private:
-	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
 };
 
 k3d::iplugin_factory& mesh_reader_factory()

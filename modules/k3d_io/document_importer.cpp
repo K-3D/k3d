@@ -18,8 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements the DocumentReader K-3D plugin, which imports the K-3D native file format
-		\author Tim Shead (tshead@k-3d.com)
+	\brief Implements the DocumentReader K-3D plugin, which imports the K-3D native file format
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -45,18 +45,21 @@
 
 #include <iostream>
 
-namespace libk3dk3dio
+namespace module
+{
+
+namespace k3d_io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// k3d_document_importer
+// document_importer
 	
 static void node_execution(k3d::inode& Node, const k3d::string_t& Task, k3d::double_t Time)
 {
 	k3d::log() << debug << Node.name() << " " << Task << " " << Time << std::endl;
 }
 
-class k3d_document_importer :
+class document_importer :
 	public k3d::idocument_importer
 {
 public:
@@ -187,7 +190,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<k3d_document_importer, k3d::interface_list<k3d::idocument_importer> > factory(
+		static k3d::application_plugin_factory<document_importer, k3d::interface_list<k3d::idocument_importer> > factory(
 			k3d::classes::DocumentImporter(),
 			"K3DDocumentImporter",
 			_("K-3D Native ( .k3d )"),
@@ -199,10 +202,12 @@ public:
 	}
 };
 
-k3d::iplugin_factory& k3d_document_importer_factory()
+k3d::iplugin_factory& document_importer_factory()
 {
-	return k3d_document_importer::get_factory();
+	return document_importer::get_factory();
 }
 
-} // namespace libk3dk3dio
+} // namespace k3d_io
+
+} // namespace module
 
