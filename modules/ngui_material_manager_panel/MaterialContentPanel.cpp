@@ -185,7 +185,7 @@ void MaterialContentPanel::renderPreview()
     {  
       //If It Is, Assign To Current Geometry As A Surface Shader
       k3d::property
-        ::set_internal_value(*m_geometry, 
+        ::set_internal_value(*get_material_sink(m_geometry, m_document_state->document().pipeline()), 
                              "material", 
                              const_cast<k3d::inode*>(m_materialobj->docNode()));
 	   
@@ -272,19 +272,19 @@ void MaterialContentPanel::onRenderComboSelect()
       if(selected_geo == "Sphere")
         {
           built_geo = new PreviewSphere("Sphere", m_document_state);
-          built_geo->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
+          built_geo->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md, m_engine);
         }        
 
       else if(selected_geo == "Cube")
         {
         built_geo = new PreviewCube("Cube", m_document_state);
-        built_geo->init(PreviewObj::cube_node_name, PreviewObj::cube_md);
+        built_geo->init(PreviewObj::cube_node_name, PreviewObj::cube_md, m_engine);
         }
 
       else
         {
         built_geo = new PreviewTorus("Torus", m_document_state);
-        built_geo->init(PreviewObj::torus_node_name, PreviewObj::torus_md);
+        built_geo->init(PreviewObj::torus_node_name, PreviewObj::torus_md, m_engine);
         }
       
       if(built_geo)
@@ -340,7 +340,7 @@ void MaterialContentPanel::matobjAttachGeo()
             {
               //Create The Default Sphere For Preview
               attached_new_geo = new PreviewSphere("Sphere", m_document_state);
-              attached_new_geo->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
+              attached_new_geo->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md, m_engine);
             }
 
           meta_attachedgeo = PreviewObj::sphere_md;
@@ -355,7 +355,7 @@ void MaterialContentPanel::matobjAttachGeo()
             {
               //Create The Default Cube For Preview
               attached_new_geo = new PreviewCube("Cube", m_document_state);
-              attached_new_geo->init(PreviewObj::cube_node_name, PreviewObj::cube_md);
+              attached_new_geo->init(PreviewObj::cube_node_name, PreviewObj::cube_md, m_engine);
             }
 
           meta_attachedgeo = PreviewObj::cube_md;
@@ -373,7 +373,7 @@ void MaterialContentPanel::matobjAttachGeo()
               k3d::log() << "TORUS NEW BUILT!" << std::endl;
               //Create The Default Torus For Preview
               attached_new_geo = new PreviewTorus("torus", m_document_state);
-              attached_new_geo->init(PreviewObj::torus_node_name, PreviewObj::torus_md);
+              attached_new_geo->init(PreviewObj::torus_node_name, PreviewObj::torus_md, m_engine);
             }
 
           meta_attachedgeo = PreviewObj::torus_md;
@@ -387,7 +387,7 @@ void MaterialContentPanel::matobjAttachGeo()
           if(!checkDocForMeta(PreviewObj::pview_geo_nametag_mt, PreviewObj::sphere_md, &attached_geo, m_document_state))
             {
               attached_new_geo =  new PreviewSphere("Sphere", m_document_state);
-              attached_new_geo->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
+              attached_new_geo->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md, m_engine);
 
               m_materialobj->setPreviewGeo(attached_new_geo->m_doc_node, PreviewObj::sphere_md);
 

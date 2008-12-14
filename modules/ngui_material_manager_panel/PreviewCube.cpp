@@ -10,7 +10,7 @@ namespace mechanics
 {
 
 
-void PreviewCube::init(k3d::string_t _node_name, k3d::string_t _meta_nametag)
+void PreviewCube::init(k3d::string_t _node_name, k3d::string_t _meta_nametag, k3d::irender_camera_frame* RenderEngine)
 {
   //Create The Poly Cube
   m_doc_node 
@@ -35,11 +35,11 @@ void PreviewCube::init(k3d::string_t _node_name, k3d::string_t _meta_nametag)
 //   k3d::inode* torus_transformation = k3d::set_matrix(*m_doc_node, torus_transform);
 
 
-  k3d::property::set_internal_value(*m_doc_node, 
-                                    "render_shadows", false);
+  //k3d::property::set_internal_value(*m_doc_node, 
+   //                                 "render_shadows", false);
   
-  k3d::property::set_internal_value(*m_doc_node, 
-                                    "viewport_visible", false);
+  //k3d::property::set_internal_value(*m_doc_node, 
+  //                                  "viewport_visible", false);
 
   //Create Meta Data
   if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_doc_node))

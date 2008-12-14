@@ -330,7 +330,7 @@ public:
 			_("COLLADA ( .dae )"),
 			"",
 			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("k3d:mime-types", "application/x-k3d"));
+			boost::assign::map_list_of("k3d:mime-types", "application/x-collada"));
 
 		return factory;
 	}

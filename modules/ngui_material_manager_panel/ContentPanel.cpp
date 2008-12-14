@@ -1,4 +1,5 @@
 #include "ContentPanel.h"
+#include <k3dsdk/inode_collection_sink.h>
 
 namespace module
 {
@@ -361,45 +362,6 @@ void ContentPanel::createPreviewNodes()
 
     }//if
 
-  //Setup The Geometry**********************************************************
-
-  if(!hasGeoSphere)
-    {
-      //Create The Default Sphere Geometric Object
-      PreviewSphere *default_sphereObj = new PreviewSphere("Sphere", m_document_state);
-      default_sphereObj->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md);
-      m_used_geometry.push_back(default_sphereObj);
-
-      //Set Current Geometry To The Sphere
-      m_geometry = default_sphereObj->m_doc_node;
-
-    }//if
-
- //  if(!hasGeoCube)
-//     {
-//       //Create The Default Cube Geometric Object
-//       PreviewCube *default_cubeObj = new PreviewCube("Cube", m_document_state);
-//       default_cubeObj->init(PreviewObj::cube_node_name, PreviewObj::cube_md);
-//       m_used_geometry.push_back(default_cubeObj);
-
-//       //Set Current Geometry To The Sphere
-//       m_geometry = default_cubeObj->m_doc_node;
-
-//     }//if
-
-//   if(!hasGeoTorus)
-//     {
-//       //Create The Default Torus Geometric Object
-//       PreviewTorus *default_torusObj = new PreviewTorus("Torus", m_document_state);
-//       default_torusObj->init(PreviewObj::torus_node_name, PreviewObj::torus_md);
-//       m_used_geometry.push_back(default_torusObj);
-
-//       //Set Current Geometry To The Sphere
-//       m_geometry = default_torusObj->m_doc_node;
-
-//     }//if
-
-
   //****************************************************************************
 
   //Setup The Aqsis Renderman Engine**********
@@ -411,6 +373,14 @@ void ContentPanel::createPreviewNodes()
   	        = k3d::plugin::create<k3d::ri::irender_engine>("BundledAqsisRenderManEngine", 
   	                                                       m_document_state->document(), 
   	                                                       "Preview Core::Aqsis Renderer");
+  	  
+  	  // bundled engine is not installed, remove it
+  	  if(aqsis && !aqsis->installed())
+  	  {
+  	  	k3d::delete_nodes(m_document_state->document(), k3d::nodes_t(1, dynamic_cast<k3d::inode*>(aqsis)));
+  	  	aqsis = 0;
+  	  }
+  	  
   	  if(!aqsis)
   	  {
 				aqsis 
@@ -487,8 +457,47 @@ void ContentPanel::createPreviewNodes()
       //Create Meta Data
       if(k3d::imetadata* const metadata = dynamic_cast<k3d::imetadata*>(m_engine))
         metadata->set_metadata_value(nametag_metatag, rman_engine_meta);
+      
 
     }//if
+  
+  //Setup The Geometry**********************************************************
+
+  if(!hasGeoSphere)
+    {
+      //Create The Default Sphere Geometric Object
+      PreviewSphere *default_sphereObj = new PreviewSphere("Sphere", m_document_state);
+      default_sphereObj->init(PreviewObj::sphere_node_name, PreviewObj::sphere_md, m_engine);
+      m_used_geometry.push_back(default_sphereObj);
+
+      //Set Current Geometry To The Sphere
+      m_geometry = default_sphereObj->m_doc_node;
+
+    }//if
+
+ //  if(!hasGeoCube)
+//     {
+//       //Create The Default Cube Geometric Object
+//       PreviewCube *default_cubeObj = new PreviewCube("Cube", m_document_state);
+//       default_cubeObj->init(PreviewObj::cube_node_name, PreviewObj::cube_md);
+//       m_used_geometry.push_back(default_cubeObj);
+
+//       //Set Current Geometry To The Sphere
+//       m_geometry = default_cubeObj->m_doc_node;
+
+//     }//if
+
+//   if(!hasGeoTorus)
+//     {
+//       //Create The Default Torus Geometric Object
+//       PreviewTorus *default_torusObj = new PreviewTorus("Torus", m_document_state);
+//       default_torusObj->init(PreviewObj::torus_node_name, PreviewObj::torus_md);
+//       m_used_geometry.push_back(default_torusObj);
+
+//       //Set Current Geometry To The Sphere
+//       m_geometry = default_torusObj->m_doc_node;
+
+//     }//if
 
 }//createPreviewNodes
 

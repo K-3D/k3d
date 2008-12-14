@@ -13,7 +13,7 @@ modifier = document.new_node("SubdivideEdges")
 cuda_modifier = document.new_node("CUDASubdivideEdges")
 
 
-selection = k3d.select_all()
+selection = k3d.mesh_selection.select_all()
 modifier.mesh_selection = selection
 modifier.vertices = 1
 

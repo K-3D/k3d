@@ -43,6 +43,7 @@ namespace k3d
 // Forward declarations
 class idocument;
 class iproperty;
+class inode_collection_sink;
 
 /// Defines a collection of nodes
 typedef inode_collection::nodes_t nodes_t;
@@ -100,6 +101,9 @@ const std::string unique_name(inode_collection& Nodes, const std::string& Name);
 
 /// Deletes a collection of nodes, cleaning-up all references and resources (this operation is undo-able, if state change recording is in effect)
 void delete_nodes(idocument& Document, const nodes_t& Nodes);
+
+/// Marks the given nodes as visible in the given node collection sink
+void make_visible(const nodes_t& Nodes, inode_collection_sink& NodeCollectionSink);
 
 } // namespace k3d
 

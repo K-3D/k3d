@@ -32,6 +32,7 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/path.h>
 
 #include <dae.h>
 #include <dom/domCOLLADA.h>
@@ -61,7 +62,7 @@ public:
 		m_geom(init_owner(*this) + init_name("geom") + init_label(_("Geometry")) + init_description(_("Geometry index from file to extract mesh")) + init_value(0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_geom.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reload_mesh_slot()));
 	}
 
 	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
@@ -71,7 +72,7 @@ public:
 		// Instantiate the reference implementation
 		DAE dae;
 
-		domCOLLADA* root = dae.open(k3d::string_cast<k3d::filesystem::path>(path));
+		domCOLLADA* root = dae.open(Path.native_filesystem_string());
 		if(!root) {
             		k3d::log() << error << k3d_file_reference << ": error opening [" << Path.native_console_string() << "]" << std::endl;
 			return;

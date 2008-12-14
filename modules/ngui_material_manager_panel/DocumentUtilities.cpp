@@ -22,6 +22,9 @@
 
 #include "DocumentUtilities.h"
 
+#include <k3dsdk/imaterial_sink.h>
+#include <k3dsdk/imesh_sink.h>
+
 using namespace libk3dngui;
 
 namespace module
@@ -61,6 +64,24 @@ bool checkDocForMeta(const k3d::string_t meta_tag,
   //No Match Found
   node_ptr = 0;
   return false;
+}
+
+k3d::inode* get_material_sink(k3d::inode* Node, k3d::ipipeline& Pipeline)
+{
+	k3d::inode* material_sink = Node;
+	if(!dynamic_cast<k3d::imaterial_sink*>(material_sink))
+	{
+		k3d::imesh_sink* mesh_sink = dynamic_cast<k3d::imesh_sink*>(Node);
+		if(mesh_sink)
+		{
+			k3d::iproperty* material_sink_property = Pipeline.dependency(mesh_sink->mesh_sink_input());
+			return_val_if_fail(material_sink_property, Node);
+			material_sink = material_sink_property->property_node();
+		}
+	}
+	if(!dynamic_cast<k3d::imaterial_sink*>(material_sink))
+		k3d::log() << error << "get_material_sink: Failed to find a material sink" << std::endl;
+	return material_sink;
 }
 
 

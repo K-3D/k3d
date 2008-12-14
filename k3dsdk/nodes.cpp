@@ -250,5 +250,18 @@ void delete_nodes(idocument& Document, const nodes_t& Nodes)
 	Document.pipeline().set_dependencies(skip_dependencies);
 }
 
+void make_visible(const nodes_t& Nodes, inode_collection_sink& NodeCollectionSink)
+{
+	const k3d::inode_collection_sink::properties_t properties = NodeCollectionSink.node_collection_properties();
+	for(k3d::inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+	{
+		if(k3d::inode_collection_property* const node_collection_property = dynamic_cast<k3d::inode_collection_property*>(*property))
+		{
+			k3d::inode_collection_property::nodes_t nodes = k3d::property::internal_value<k3d::inode_collection_property::nodes_t>(**property);
+			nodes.insert(nodes.end(), Nodes.begin(), Nodes.end());
+		}
+	}
+}
+
 } // namespace k3d
 

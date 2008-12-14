@@ -36,6 +36,7 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/ilight_ri.h>
 #include <k3dsdk/ilight_shader_ri.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/itransform_sink.h>
@@ -58,7 +59,8 @@ bool checkDocForMeta(const k3d::string_t meta_tag,
                      const k3d::string_t meta_data, 
                      k3d::inode **node_ptr, document_state *_document_state);
 
-
+/// Gets the upstream node if the top node is not a material sink
+k3d::inode* get_material_sink(k3d::inode* Node, k3d::ipipeline& Pipeline);
 
 
 

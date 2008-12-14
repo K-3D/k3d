@@ -81,6 +81,9 @@ public:
 		if(test_type(".tif", "image/tiff", File, FileType)) return true;
 		if(test_type(".tiff", "image/tiff", File, FileType)) return true;
 		
+		// COLLADA
+		if(test_type(".dae", "application/x-collada", File, FileType)) return true;
+		
 		// OpenCascade types
 		if(test_type(".rle", "application/x-brep", File, FileType)) return true;
 		if(test_type(".brep", "application/x-brep", File, FileType)) return true;

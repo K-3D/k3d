@@ -32,6 +32,8 @@
 #include <k3dsdk/system.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/irender_camera_frame.h>
+
 
 namespace module
 {
@@ -62,7 +64,7 @@ class PreviewObj
  public:
 
   //Abstract Functions To Be Used By Group & Profile Derivatives
-  virtual void init(k3d::string_t _node_name, k3d::string_t _meta_nametag) = 0;
+  virtual void init(k3d::string_t _node_name, k3d::string_t _meta_nametag, k3d::irender_camera_frame* RenderEngine) = 0;
 
   //Create The Default Preview Object For Material Preview (Preview Core::...)
   virtual void defaultInit() = 0;
