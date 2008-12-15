@@ -187,7 +187,7 @@ public:
 			{
 				double d = (delta - (m_JointPosition - m_Radius)) / (m_Radius * 2.0);
 				double factor = m_Radius * length / tan(m_BendAngle * 0.5);
-				k3d::matrix4 rotation = k3d::rotation3D(d * m_BendAngle, axis);
+				k3d::matrix4 rotation = k3d::rotate3(d * m_BendAngle, axis);
 				offset = offset * factor;
 				coords -= k3d::to_vector(pivot + offset);
 				coords = rotation * coords;
@@ -195,7 +195,7 @@ public:
 			}
 			else if(delta >= m_JointPosition + m_Radius)
 			{
-				k3d::matrix4 rotation = k3d::rotation3D(m_BendAngle, axis);
+				k3d::matrix4 rotation = k3d::rotate3(m_BendAngle, axis);
 				coords -= k3d::to_vector(m_Origin);
 				coords = rotation * coords;
 				coords += k3d::to_vector(m_Origin);

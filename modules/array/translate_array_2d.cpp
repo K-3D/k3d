@@ -43,8 +43,8 @@ class translate_array_2d :
 public:
 	translate_array_2d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_offset1(init_owner(*this) + init_name("offset1") + init_label(_("Offset 1")) + init_description(_("Offset 1")) + init_value(k3d::point3(5, 0, 0))),
-		m_offset2(init_owner(*this) + init_name("offset2") + init_label(_("Offset 2")) + init_description(_("Offset 2")) + init_value(k3d::point3(0, -5, 0)))
+		m_offset1(init_owner(*this) + init_name("offset1") + init_label(_("Offset 1")) + init_description(_("Offset 1")) + init_value(k3d::vector3(5, 0, 0))),
+		m_offset2(init_owner(*this) + init_name("offset2") + init_label(_("Offset 2")) + init_description(_("Offset 2")) + init_value(k3d::vector3(0, -5, 0)))
 	{
 		m_offset1.changed_signal().connect(make_node_change_slot());
 		m_offset2.changed_signal().connect(make_node_change_slot());
@@ -52,7 +52,7 @@ public:
 
 	const k3d::matrix4 on_get_element(unsigned long Index1, unsigned long Count1, unsigned long Index2, unsigned long Count2)
 	{
-		return k3d::translation3D((m_offset1.pipeline_value() * Index1) + (m_offset2.pipeline_value() * Index2));
+		return k3d::translate3((m_offset1.pipeline_value() * Index1) + (m_offset2.pipeline_value() * Index2));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -69,8 +69,8 @@ public:
 	}
 
 private:
-	k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_offset1;
-	k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_offset2;
+	k3d_data(k3d::vector3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_offset1;
+	k3d_data(k3d::vector3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_offset2;
 };
 
 k3d::iplugin_factory& translate_array_2d_factory()

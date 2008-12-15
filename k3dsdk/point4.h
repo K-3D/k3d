@@ -56,6 +56,8 @@
 namespace k3d
 {
 
+class vector4;
+
 /////////////////////////////////////////////////////////////////////////////
 // point4
 
@@ -79,56 +81,11 @@ public:
 		n[3] = w;
 	}
 
-/*
-	point4(const double d[4])
-	{
-		n[0] = d[0];
-		n[1] = d[1];
-		n[2] = d[2];
-		n[3] = d[3];
-	}
+	/// Addition of a vector
+	point4& operator+=(const vector4& v);
 
-	/// Casts n point3 to n point4 with the given fourth dimension
-	point4(const point3& v, const double d)
-	{
-		n[0] = v.n[0];
-		n[1] = v.n[1];
-		n[2] = v.n[2];
-		n[3] = d;
-	}
-
-	/// Assignment of a C/C++ array
-	point4& operator=(const double d[4])
-	{
-		n[0] = d[0];
-		n[1] = d[1];
-		n[2] = d[2];
-		n[3] = d[3];
-		return *this;
-	}
-*/
-
-	/// Addition
-	/** \deprecated This is used by matrix4, need to get rid of it */
-	point4& operator+=(const point4& v)
-	{
-		n[0] += v.n[0];
-		n[1] += v.n[1];
-		n[2] += v.n[2];
-		n[3] += v.n[3];
-		return *this;
-	}
-
-	/// Subtraction
-	/** \deprecated This is used by matrix4, need to get rid of it */
-	point4& operator-=(const point4& v)
-	{
-		n[0] -= v.n[0];
-		n[1] -= v.n[1];
-		n[2] -= v.n[2];
-		n[3] -= v.n[3];
-		return *this;
-	}
+	/// Subtraction of a vector
+	point4& operator-=(const vector4& v);
 
 	/// Multiplication by a constant
 	point4& operator*=(const double d)
@@ -165,20 +122,6 @@ public:
 		return n[i];
 	}
 
-/*
-	/// Integrate with legacy array-oriented APIs
-	const double* data() const
-	{
-		return &n[0];
-	}
-
-	/// Integrate with legacy array-oriented APIs
-	double* data()
-	{
-		return &n[0];
-	}
-*/
-
 	friend std::ostream& operator<<(std::ostream& Stream, const point4& RHS)
 	{
 		boost::io::ios_flags_saver stream_state(Stream);
@@ -204,13 +147,6 @@ inline const point4 operator-(const point4& a)
 inline const point4 operator+(const point4& a, const point4& b)
 {
 	return point4(a.n[0] + b.n[0], a.n[1] + b.n[1], a.n[2] + b.n[2], a.n[3] + b.n[3]);
-}
-
-/// Substraction
-/** \deprecated This is used by matrix4, need to get rid of it */
-inline const point4 operator-(const point4& a, const point4& b)
-{
-	return point4(a.n[0] - b.n[0], a.n[1] - b.n[1], a.n[2] - b.n[2], a.n[3] - b.n[3]);
 }
 
 /// Multiplication by a constant

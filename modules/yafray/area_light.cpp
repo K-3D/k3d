@@ -157,7 +157,7 @@ private:
 		gluQuadricNormals(m_quadric, GLU_SMOOTH);
 		gluCylinder(m_quadric, 0.1, 0.001, 1, 8, 1);
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(k3d::point3(0, 0, 0.5)));
+		k3d::gl::push_matrix(k3d::translate3(0, 0, 0.5));
 		gluCylinder(m_quadric, 0.3, 0.001, 0.5, 8, 1);
 		glPopMatrix();
 	}

@@ -149,7 +149,7 @@ void setup_renderman_document(k3d::idocument& Document)
 	return_if_fail(light);
 	k3d::property::set_internal_value(*light, "shader", light_shader);
 
-	k3d::inode* light_transformation = k3d::set_matrix(*light, k3d::translation3D(k3d::point3(-20, 20, 30)));
+	k3d::inode* light_transformation = k3d::set_matrix(*light, k3d::translate3(-20, 20, 30));
 	return_if_fail(light_transformation);
 	light_transformation->set_name("Light Transformation");
 

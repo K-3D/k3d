@@ -1463,7 +1463,7 @@ void nurbs_curve_modifier::curve_degree_elevate(k3d::uint_t curve)
 				int mpi = Min(power, i);
 				for (int j = Max(0, i - t); j <= mpi; j++)
 				{
-					ebpts.at(i) += bezalfs.at(i).at(j) * bpts.at(j);
+					ebpts.at(i) += k3d::to_vector(bezalfs.at(i).at(j) * bpts.at(j));
 					MY_DEBUG << "ebpts[" << i << "] = " << output_point(ebpts.at(i)) << " = " << bezalfs.at(i).at(j) << " * " << output_point(bpts.at(j)) << std::endl;
 				}
 			}
@@ -2519,7 +2519,7 @@ void nurbs_curve_modifier::sweep_surface(k3d::uint_t curve1, k3d::uint_t curve2,
 				alpha = - acos(alpha);
 			}
 
-			k3d::matrix4 rot_mat = k3d::rotation3D(alpha, rotation_axis);
+			k3d::matrix4 rot_mat = k3d::rotate3(alpha, rotation_axis);
 
 			for (int j = curve_points_begin; j < curve_points_end; j++)
 			{

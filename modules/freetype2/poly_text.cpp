@@ -374,30 +374,30 @@ public:
 		switch(m_orientation.pipeline_value())
 		{
 			case k3d::PX:
-				char_orientation = k3d::rotation3D(k3d::angle_axis(k3d::radians(-90), k3d::vector3(0, 0, 1))) *
-					k3d::rotation3D(k3d::angle_axis(k3d::radians(90), k3d::vector3(1, 0, 0)));
+				char_orientation = k3d::rotate3(k3d::angle_axis(k3d::radians(-90), k3d::vector3(0, 0, 1))) *
+					k3d::rotate3(k3d::angle_axis(k3d::radians(90), k3d::vector3(1, 0, 0)));
 				offset_direction = k3d::vector3(0, -1, 0);
 				break;
 			case k3d::NX:
-				char_orientation = k3d::rotation3D(k3d::angle_axis(k3d::radians(90), k3d::vector3(0, 0, 1))) *
-					k3d::rotation3D(k3d::angle_axis(k3d::radians(90), k3d::vector3(1, 0, 0)));
+				char_orientation = k3d::rotate3(k3d::angle_axis(k3d::radians(90), k3d::vector3(0, 0, 1))) *
+					k3d::rotate3(k3d::angle_axis(k3d::radians(90), k3d::vector3(1, 0, 0)));
 				offset_direction = k3d::vector3(0, 1, 0);
 				break;
 			case k3d::PY:
-				char_orientation = k3d::rotation3D(k3d::angle_axis(k3d::radians(90), k3d::vector3(1, 0, 0)));
+				char_orientation = k3d::rotate3(k3d::angle_axis(k3d::radians(90), k3d::vector3(1, 0, 0)));
 				offset_direction = k3d::vector3(1, 0, 0);
 				break;
 			case k3d::NY:
-				char_orientation = k3d::rotation3D(k3d::angle_axis(k3d::radians(180), k3d::vector3(0, 0, 1))) *
-					k3d::rotation3D(k3d::angle_axis(k3d::radians(90), k3d::vector3(1, 0, 0)));
+				char_orientation = k3d::rotate3(k3d::angle_axis(k3d::radians(180), k3d::vector3(0, 0, 1))) *
+					k3d::rotate3(k3d::angle_axis(k3d::radians(90), k3d::vector3(1, 0, 0)));
 				offset_direction = k3d::vector3(-1, 0, 0);
 				break;
 			case k3d::PZ:
-				char_orientation = k3d::rotation3D(k3d::angle_axis(k3d::radians(180), k3d::vector3(1, 0, 0)));
+				char_orientation = k3d::rotate3(k3d::angle_axis(k3d::radians(180), k3d::vector3(1, 0, 0)));
 				offset_direction = k3d::vector3(1, 0, 0);
 				break;
 			case k3d::NZ:
-				char_orientation = k3d::identity3D();
+				char_orientation = k3d::identity3();
 				offset_direction = k3d::vector3(1, 0, 0);
 				break;
 		}
@@ -441,7 +441,7 @@ public:
 			}
 
 			const k3d::matrix4 matrix =
-				k3d::translation3D(offset_direction * (offset * scale)) * char_orientation * k3d::scaling3D(k3d::point3(scale, scale, scale));
+				k3d::translate3(offset_direction * (offset * scale)) * char_orientation * k3d::scale3(scale);
 
 			outline.convert(ft_face.face()->glyph->outline, Mesh, *polyhedron, material, matrix);
 

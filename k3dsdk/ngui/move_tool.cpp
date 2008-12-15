@@ -217,7 +217,7 @@ public:
 		k3d::gl::store_attributes attributes;
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(Position));
+		k3d::gl::push_matrix(k3d::translate3(k3d::to_vector(Position)));
 		k3d::gl::push_matrix(Orientation);
 
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -240,12 +240,12 @@ public:
 			if(is_front_facing(Viewport, k3d::vector3(1, 0, 0), Position, Orientation))
 			{
 				px = k3d::vector3(1, 0, 0);
-				draw_axis(m_x_color, m_current_constraint == &m_x_constraint ? m_current_color : m_x_color, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(0, 1, 0)));
+				draw_axis(m_x_color, m_current_constraint == &m_x_constraint ? m_current_color : m_x_color, k3d::rotate3(k3d::radians(90.0), k3d::vector3(0, 1, 0)));
 			}
 			else
 			{
 				px = k3d::vector3(-1, 0, 0);
-				draw_axis(m_x_color, m_current_constraint == &m_x_constraint ? m_current_color : m_x_color, k3d::rotation3D(k3d::radians(-90.0), k3d::vector3(0, 1, 0)));
+				draw_axis(m_x_color, m_current_constraint == &m_x_constraint ? m_current_color : m_x_color, k3d::rotate3(k3d::radians(-90.0), k3d::vector3(0, 1, 0)));
 			}
 		}
 
@@ -254,12 +254,12 @@ public:
 			if(is_front_facing(Viewport, k3d::vector3(0, -1, 0), Position, Orientation))
 			{
 				py = k3d::vector3(0, -1, 0);
-				draw_axis(m_y_color, m_current_constraint == &m_y_constraint ? m_current_color : m_y_color, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
+				draw_axis(m_y_color, m_current_constraint == &m_y_constraint ? m_current_color : m_y_color, k3d::rotate3(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
 			}
 			else
 			{
 				py = k3d::vector3(0, 1, 0);
-				draw_axis(m_y_color, m_current_constraint == &m_y_constraint ? m_current_color : m_y_color, k3d::rotation3D(k3d::radians(-90.0), k3d::vector3(1, 0, 0)));
+				draw_axis(m_y_color, m_current_constraint == &m_y_constraint ? m_current_color : m_y_color, k3d::rotate3(k3d::radians(-90.0), k3d::vector3(1, 0, 0)));
 			}
 		}
 
@@ -268,12 +268,12 @@ public:
 			if(is_front_facing(Viewport, k3d::vector3(0, 0, 1), Position, Orientation))
 			{
 				pz = k3d::vector3(0, 0, 1);
-				draw_axis(m_z_color, m_current_constraint == &m_z_constraint ? m_current_color : m_z_color, k3d::rotation3D(k3d::radians(0.0), k3d::vector3(0, 1, 0)));
+				draw_axis(m_z_color, m_current_constraint == &m_z_constraint ? m_current_color : m_z_color, k3d::rotate3(k3d::radians(0.0), k3d::vector3(0, 1, 0)));
 			}
 			else
 			{
 				pz = k3d::vector3(0, 0, -1);
-				draw_axis(m_z_color, m_current_constraint == &m_z_constraint ? m_current_color : m_z_color, k3d::rotation3D(k3d::radians(180.0), k3d::vector3(0, 1, 0)));
+				draw_axis(m_z_color, m_current_constraint == &m_z_constraint ? m_current_color : m_z_color, k3d::rotate3(k3d::radians(180.0), k3d::vector3(0, 1, 0)));
 			}
 		}
 
@@ -296,7 +296,7 @@ public:
 		k3d::gl::store_attributes attributes;
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(Position));
+		k3d::gl::push_matrix(k3d::translate3(k3d::to_vector(Position)));
 		k3d::gl::push_matrix(Orientation);
 
 		glDisable(GL_LIGHTING);
@@ -313,34 +313,34 @@ public:
 		if(is_front_facing(Viewport, k3d::vector3(1, 0, 0), Position, Orientation))
 		{
 			px = k3d::vector3(1, 0, 0);
-			select_axis(m_x_constraint, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(0, 1, 0)));
+			select_axis(m_x_constraint, k3d::rotate3(k3d::radians(90.0), k3d::vector3(0, 1, 0)));
 		}
 		else
 		{
 			px = k3d::vector3(-1, 0, 0);
-			select_axis(m_x_constraint, k3d::rotation3D(k3d::radians(-90.0), k3d::vector3(0, 1, 0)));
+			select_axis(m_x_constraint, k3d::rotate3(k3d::radians(-90.0), k3d::vector3(0, 1, 0)));
 		}
 
 		if(is_front_facing(Viewport, k3d::vector3(0, -1, 0), Position, Orientation))
 		{
 			py = k3d::vector3(0, -1, 0);
-			select_axis(m_y_constraint, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
+			select_axis(m_y_constraint, k3d::rotate3(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
 		}
 		else
 		{
 			py = k3d::vector3(0, 1, 0);
-			select_axis(m_y_constraint, k3d::rotation3D(k3d::radians(-90.0), k3d::vector3(1, 0, 0)));
+			select_axis(m_y_constraint, k3d::rotate3(k3d::radians(-90.0), k3d::vector3(1, 0, 0)));
 		}
 
 		if(is_front_facing(Viewport, k3d::vector3(0, 0, 1), Position, Orientation))
 		{
 			pz = k3d::vector3(0, 0, 1);
-			select_axis(m_z_constraint, k3d::rotation3D(k3d::radians(0.0), k3d::vector3(0, 1, 0)));
+			select_axis(m_z_constraint, k3d::rotate3(k3d::radians(0.0), k3d::vector3(0, 1, 0)));
 		}
 		else
 		{
 			pz = k3d::vector3(0, 0, -1);
-			select_axis(m_z_constraint, k3d::rotation3D(k3d::radians(180.0), k3d::vector3(0, 1, 0)));
+			select_axis(m_z_constraint, k3d::rotate3(k3d::radians(180.0), k3d::vector3(0, 1, 0)));
 		}
 
 		select_plane(m_yz_constraint, py, py + pz, pz);
@@ -511,7 +511,7 @@ private:
 		k3d::gl::push_matrix(Matrix);
 
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(k3d::point3(0, 0, m_axis_end - (0.5 * m_axis_arrow_length))));
+		k3d::gl::push_matrix(k3d::translate3(0, 0, m_axis_end - (0.5 * m_axis_arrow_length)));
 		glEnable(GL_LIGHTING);
 
 		k3d::gl::material(GL_FRONT_AND_BACK, GL_AMBIENT, k3d::color(0, 0, 0));
@@ -546,7 +546,7 @@ private:
 
 		k3d::gl::push_selection_token(Constraint.m_selection_token);
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(k3d::point3(0, 0, m_axis_end - (0.5 * m_axis_arrow_length))));
+		k3d::gl::push_matrix(k3d::translate3(0, 0, m_axis_end - (0.5 * m_axis_arrow_length)));
 		gluQuadricDrawStyle(m_quadric, GLU_FILL);
 		gluQuadricNormals(m_quadric, GLU_NONE);
 		gluCylinder(m_quadric, m_axis_arrow_radius, m_axis_arrow_radius * 0.001, m_axis_arrow_length, m_axis_arrow_slices, 1);

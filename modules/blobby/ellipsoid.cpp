@@ -102,7 +102,7 @@ public:
 		blobby->primitive_first_floats.push_back(blobby->floats.size());
 		blobby->primitive_float_counts.push_back(16);
 
-		k3d::matrix4 matrix = k3d::transpose(k3d::translation3D(k3d::point3(x, y, z)) * k3d::scaling3D(k3d::point3(size_x, size_y, size_z)));
+		k3d::matrix4 matrix = k3d::transpose(k3d::translate3(x, y, z) * k3d::scale3(size_x, size_y, size_z));
 		blobby->floats.insert(blobby->floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
 
 		varying_colors.push_back(color);

@@ -95,7 +95,7 @@ namespace io
 			k3d::imesh_storage* mesh_storage = dynamic_cast<k3d::imesh_storage*>(frozen_mesh);
 			mesh_storage->reset_mesh(mesh);
 			*mesh  = 
-			//intGeometry result(geom,k3d::identity3D());
+			//intGeometry result(geom,k3d::identity3());
 			to_k3d_mesh(geom);
 //return;
 

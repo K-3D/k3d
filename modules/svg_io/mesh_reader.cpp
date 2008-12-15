@@ -75,7 +75,7 @@ public:
 		factory = new k3d::gprim_factory(Mesh);
 		count = 0; 
 
-        	mstack.push(k3d::identity3D());
+        	mstack.push(k3d::identity3());
 		parse_graphics(xml_svg);
 		delete factory;
 	}
@@ -116,7 +116,7 @@ private:
 			//If there is a transformation extract matrix from data and push into stack
 			if(trans!="none")
 			{
-				k3d::matrix4 mat = k3d::identity3D();
+				k3d::matrix4 mat = k3d::identity3();
 				std::istringstream trans_stream(trans);
 				float x,y;
 				char token;
@@ -124,7 +124,7 @@ private:
 				while(!trans_stream.eof())
 				{
 					trans_stream >> token;
-					k3d::matrix4 tmp_mat = k3d::identity3D();
+					k3d::matrix4 tmp_mat = k3d::identity3();
 					switch(token)
 					{
 
@@ -477,7 +477,7 @@ private:
 					float rx, float ry, bool large_arc_flag, bool sweep_flag, int segments,
 					std::vector<k3d::point3>& control_points, k3d::mesh::knots_t& knots, k3d::mesh::weights_t& weights)
 	{
-		k3d::matrix4 T = k3d::identity3D();
+		k3d::matrix4 T = k3d::identity3();
 		k3d::point4 xp, cp, c;
 		k3d::vector3 v1, v2;
 		float theta_one, theta_two, delta_theta;
@@ -487,7 +487,7 @@ private:
 		T[1][0] = -sin(phi);
 		T[1][1] = cos(phi);
 
-		xp = T*((p1-p2)/2);
+		xp = T * k3d::to_point((p1 - p2) / 2);
 
 		cp = std::sqrt(std::abs(rx*rx*ry*ry - rx*rx*xp[1]*xp[1] - ry*ry*xp[0]*xp[0])/(rx*rx*xp[1]*xp[1] + ry*ry*xp[0]*xp[0]))*k3d::point4((rx/ry)*xp[1], (-ry/rx)*xp[0], 0, 1);
 		

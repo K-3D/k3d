@@ -87,7 +87,7 @@ public:
 			blobby->primitive_float_counts.push_back(16);
 			vertex_data_copier.push_back(point);
 
-			k3d::matrix4 matrix = k3d::transpose(k3d::translation3D(input_points[point]) * k3d::scaling3D(k3d::point3(radius, radius, radius)));
+			k3d::matrix4 matrix = k3d::transpose(k3d::translate3(k3d::to_vector(input_points[point])) * k3d::scale3(radius, radius, radius));
 			blobby->floats.insert(blobby->floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
 		}
 

@@ -46,8 +46,8 @@ class scale :
 public:
 	scale(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3D())),
-		m_space(init_owner(*this) + init_name("space") + init_label(_("Coordinate space")) + init_description(_("Coordinate space (matrix)")) + init_value(k3d::identity3D())),
+		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3())),
+		m_space(init_owner(*this) + init_name("space") + init_label(_("Coordinate space")) + init_description(_("Coordinate space (matrix)")) + init_value(k3d::identity3())),
 		m_x(init_owner(*this) + init_name("x") + init_label(_("X")) + init_description(_("X scaling")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
 		m_y(init_owner(*this) + init_name("y") + init_label(_("Y")) + init_description(_("Y scaling")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
 		m_z(init_owner(*this) + init_name("z") + init_label(_("Z")) + init_description(_("Z scaling")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
@@ -72,7 +72,7 @@ public:
 
 	k3d::matrix4 output_value()
 	{
-		return m_input.pipeline_value() * m_space.pipeline_value() * scaling3D(k3d::point3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value())) * k3d::inverse(m_space.pipeline_value());
+		return m_input.pipeline_value() * m_space.pipeline_value() * k3d::scale3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value()) * k3d::inverse(m_space.pipeline_value());
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -260,7 +260,7 @@ private:
 			if(PARENT == current_system_type)
 				return k3d::extract_rotation(k3d::parent_to_world_matrix(*node));
 
-			return k3d::identity3D();
+			return k3d::identity3();
 		}
 
 		// Modifier

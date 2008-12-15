@@ -63,7 +63,7 @@ public:
 		m_text(init_owner(*this) + init_name("text") + init_label(_("Text")) + init_description(_("Annotation text")) + init_value(k3d::string_t(_("Annotation")))),
 		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Annotation color")) + init_value(k3d::color(0, 0, 0))),
 		m_leader(init_owner(*this) + init_name("leader") + init_label(_("Leader")) + init_description(_("Leader line")) + init_value(false)),
-		m_leader_target(init_owner(*this) + init_name("leader_target") + init_label(_("Leader Target")) + init_description(_("Leader line target")) + init_value(k3d::identity3D()))
+		m_leader_target(init_owner(*this) + init_name("leader_target") + init_label(_("Leader Target")) + init_description(_("Leader line target")) + init_value(k3d::identity3()))
 	{
 		m_text.set_metadata_value("k3d:property-type", "k3d:multi-line-text");
 

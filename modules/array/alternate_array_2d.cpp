@@ -55,11 +55,11 @@ public:
 		const k3d::axis axis1 = m_axis1.pipeline_value();
 		const k3d::axis axis2 = m_axis2.pipeline_value();
 
-		k3d::point3 vector1(k3d::X == axis1 ? -1 : 1, k3d::Y == axis1 ? -1 : 1, k3d::Z == axis1 ? -1 : 1);
-		k3d::point3 point2(k3d::X == axis2 ? -1 : 1, k3d::Y == axis2 ? -1 : 1, k3d::Z == axis2 ? -1 : 1);
+		k3d::point3 scale1(k3d::X == axis1 ? -1 : 1, k3d::Y == axis1 ? -1 : 1, k3d::Z == axis1 ? -1 : 1);
+		k3d::point3 scale2(k3d::X == axis2 ? -1 : 1, k3d::Y == axis2 ? -1 : 1, k3d::Z == axis2 ? -1 : 1);
 
-		const k3d::matrix4 matrix1 = (Index1 % 2) ? k3d::scaling3D(vector1) : k3d::identity3D();
-		const k3d::matrix4 matrix2 = (Index2 % 2) ? k3d::scaling3D(point2) : k3d::identity3D();
+		const k3d::matrix4 matrix1 = (Index1 % 2) ? k3d::scale3(scale1[0], scale1[1], scale1[2]) : k3d::identity3();
+		const k3d::matrix4 matrix2 = (Index2 % 2) ? k3d::scale3(scale2[0], scale2[1], scale2[2]) : k3d::identity3();
 
 		return matrix1 * matrix2;
 	}

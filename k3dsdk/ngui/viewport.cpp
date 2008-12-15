@@ -519,7 +519,7 @@ void control::set_camera_animation_engine(k3d::irender_camera_animation* const E
 
 const k3d::matrix4 control::get_view_matrix()
 {
-	return_val_if_fail(camera(), k3d::identity3D());
+	return_val_if_fail(camera(), k3d::identity3());
 	return k3d::node_to_world_matrix(camera()->navigation_target());
 }
 

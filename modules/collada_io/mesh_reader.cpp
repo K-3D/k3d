@@ -96,7 +96,7 @@ public:
 			return;
 		}
 
-		intGeometry geom = intGeometry(*geometries[cur_geom], k3d::identity3D());
+		intGeometry geom = intGeometry(*geometries[cur_geom], k3d::identity3());
 		Output = geom.getMesh();
 
 		// destroy the objects we created during the conversion process

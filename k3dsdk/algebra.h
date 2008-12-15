@@ -90,10 +90,10 @@ class matrix4
 {
 public:
 	/// Stores the matrix elements
-	point4 v[4];
+	vector4 v[4];
 	// Constructors
 	matrix4();
-	matrix4(const point4& v0, const point4& v1, const point4& v2, const point4& v3);
+	matrix4(const vector4& v0, const vector4& v1, const vector4& v2, const vector4& v3);
 	matrix4(const double d);
 	matrix4(euler_angles Angles);
 	/// Copy constructor
@@ -115,9 +115,9 @@ public:
 	/// Division by a constant
 	matrix4& operator/=(const double d);
 	/// Returns a vector by index
-	point4& operator[](int i);
+	vector4& operator[](int i);
 	/// Returns a vector by index
-	const point4& operator[](int i) const;
+	const vector4& operator[](int i) const;
 	/// Copies the matrix contents into a C/C++ style array
 	void CopyArray(float m[16]) const;
 	/// Copies the matrix contents into a C/C++ style array
@@ -149,28 +149,28 @@ point4 operator*(const matrix4& a, const point4& v);
 /// Linear transformation
 point3 operator*(const matrix4& a, const point3& v);
 /// Returns a three-dimensional identity matrix
-inline matrix4 identity3D()
+inline matrix4 identity3()
 {
 	return matrix4(
-		point4(1, 0, 0, 0),
-		point4(0, 1, 0, 0),
-		point4(0, 0, 1, 0),
-		point4(0, 0, 0, 1));
+		vector4(1, 0, 0, 0),
+		vector4(0, 1, 0, 0),
+		vector4(0, 0, 1, 0),
+		vector4(0, 0, 0, 1));
 }
 /// Returns the transposition of a matrix
 inline matrix4 transpose(const matrix4& v)
 {
 	return matrix4(
-		point4(v[0][0], v[1][0], v[2][0], v[3][0]),
-		point4(v[0][1], v[1][1], v[2][1], v[3][1]),
-		point4(v[0][2], v[1][2], v[2][2], v[3][2]),
-		point4(v[0][3], v[1][3], v[2][3], v[3][3]));
+		vector4(v[0][0], v[1][0], v[2][0], v[3][0]),
+		vector4(v[0][1], v[1][1], v[2][1], v[3][1]),
+		vector4(v[0][2], v[1][2], v[2][2], v[3][2]),
+		vector4(v[0][3], v[1][3], v[2][3], v[3][3]));
 }
 /// Returns the inverse of a matrix
 inline matrix4 inverse(const matrix4& v)
 {
 	matrix4 a(v),	 // As a evolves from original mat into identity
-	b(identity3D()); // b evolves from identity into inverse(a)
+	b(identity3()); // b evolves from identity into inverse(a)
 
 	// Loop over cols of a from left to right, eliminating above and below diag
 	for(int j=0; j<4; ++j) { // Find largest pivot in column j among rows j..3
@@ -223,7 +223,7 @@ inline const bool inside_out(const matrix4& m)
 /// Linear transformation
 inline const vector3 operator*(const matrix4& a, const vector3& v)
 {
-	const point4 temp((a * point4(v[0], v[1], v[2], 1)) - (a * point4(0, 0, 0, 1)));
+	const vector4 temp((a * point4(v[0], v[1], v[2], 1)) - (a * point4(0, 0, 0, 1)));
 	return vector3(temp.n[0], temp.n[1], temp.n[2]);
 }
 
@@ -236,7 +236,7 @@ inline const vector3 operator*(const vector3& v, const matrix4& a)
 /// Linear transformation
 inline const normal3 operator*(const matrix4& a, const normal3& v)
 {
-	const point4 temp((a * point4(v[0], v[1], v[2], 1)) - (a * point4(0, 0, 0, 1)));
+	const vector4 temp((a * point4(v[0], v[1], v[2], 1)) - (a * point4(0, 0, 0, 1)));
 	return normal3(temp.n[0], temp.n[1], temp.n[2]);
 }
 
@@ -468,58 +468,60 @@ std::ostream& operator<<(std::ostream& Stream, const euler_angles& Arg);
 std::istream& operator>>(std::istream& Stream, euler_angles& Arg);
 
 /// Returns a three-dimensional translation matrix
-inline const matrix4 translation3D(const point3& v)
+inline const matrix4 translate3(const vector3& v)
 {
 	return matrix4(
-		point4(1, 0, 0, v[0]),
-		point4(0, 1, 0, v[1]),
-		point4(0, 0, 1, v[2]),
-		point4(0, 0, 0, 1));
+		vector4(1, 0, 0, v[0]),
+		vector4(0, 1, 0, v[1]),
+		vector4(0, 0, 1, v[2]),
+		vector4(0, 0, 0, 1));
 }
+
 /// Returns a three-dimensional translation matrix
-inline const matrix4 translation3D(const vector3& v)
+inline const matrix4 translate3(const double_t X, const double_t Y, const double_t Z)
 {
 	return matrix4(
-		point4(1, 0, 0, v[0]),
-		point4(0, 1, 0, v[1]),
-		point4(0, 0, 1, v[2]),
-		point4(0, 0, 0, 1));
+		vector4(1, 0, 0, X),
+		vector4(0, 1, 0, Y),
+		vector4(0, 0, 1, Z),
+		vector4(0, 0, 0, 1));
 }
+
 /// Returns a three-dimensional rotation matrix about an arbitrary axis
-inline const matrix4 rotation3D(const double Angle, vector3 Axis)
+inline const matrix4 rotate3(const double Angle, vector3 Axis)
 {
 	const double c = cos(Angle), s = sin(Angle), t = 1.0 - c;
 
 	Axis = normalize(Axis);
 
 	return matrix4(
-		point4(t * Axis[0] * Axis[0] + c, t * Axis[0] * Axis[1] - s * Axis[2], t * Axis[0] * Axis[2] + s * Axis[1], 0),
-		point4(t * Axis[0] * Axis[1] + s * Axis[2], t * Axis[1] * Axis[1] + c, t * Axis[1] * Axis[2] - s * Axis[0], 0),
-		point4(t * Axis[0] * Axis[2] - s * Axis[1], t * Axis[1] * Axis[2] + s * Axis[0], t * Axis[2] * Axis[2] + c, 0),
-		point4(0, 0, 0, 1));
+		vector4(t * Axis[0] * Axis[0] + c, t * Axis[0] * Axis[1] - s * Axis[2], t * Axis[0] * Axis[2] + s * Axis[1], 0),
+		vector4(t * Axis[0] * Axis[1] + s * Axis[2], t * Axis[1] * Axis[1] + c, t * Axis[1] * Axis[2] - s * Axis[0], 0),
+		vector4(t * Axis[0] * Axis[2] - s * Axis[1], t * Axis[1] * Axis[2] + s * Axis[0], t * Axis[2] * Axis[2] + c, 0),
+		vector4(0, 0, 0, 1));
 }
 /// Returns a three-dimensional rotation matrix about an arbitrary axis
-inline const matrix4 rotation3D(const angle_axis& AngleAxis)
+inline const matrix4 rotate3(const angle_axis& AngleAxis)
 {
-	return rotation3D(AngleAxis.angle, AngleAxis.axis);
+	return rotate3(AngleAxis.angle, AngleAxis.axis);
 }
 /// Returns a three-dimensional rotation matrix based on a set of Euler angles
-inline const matrix4 rotation3D(const point3& EulerAngles)
+inline const matrix4 rotate3(const point3& EulerAngles)
 {
-	matrix4 matrix = identity3D();
-	matrix = matrix * rotation3D(EulerAngles[1], vector3(0, 1, 0));
-	matrix = matrix * rotation3D(EulerAngles[0], vector3(1, 0, 0));
-	matrix = matrix * rotation3D(EulerAngles[2], vector3(0, 0, 1));
+	matrix4 matrix = identity3();
+	matrix = matrix * rotate3(EulerAngles[1], vector3(0, 1, 0));
+	matrix = matrix * rotate3(EulerAngles[0], vector3(1, 0, 0));
+	matrix = matrix * rotate3(EulerAngles[2], vector3(0, 0, 1));
 
 	return matrix;
 }
 /// Returns a three-dimensional rotation matrix based on a quaternion
-inline const matrix4 rotation3D(const quaternion& Quaternion)
+inline const matrix4 rotate3(const quaternion& Quaternion)
 {
-	return rotation3D(angle_axis(Quaternion));
+	return rotate3(angle_axis(Quaternion));
 }
 /// Returns a quaternion based on a three-dimensional rotation matrix
-inline const quaternion rotation3D(const matrix4& m)
+inline const quaternion rotate3(const matrix4& m)
 {
 	double d0 = m[0][0];
 	double d1 = m[1][1];
@@ -550,32 +552,42 @@ inline const quaternion rotation3D(const matrix4& m)
 	}
 }
 
-/// Returns a three-dimensional scaling matrix
-inline const matrix4 scaling3D(const point3& v)
+/// Returns a three-dimensional scaling matrix that scales uniformly along each dimension.
+inline const matrix4 scale3(const double_t S)
 {
 	return matrix4(
-		point4(v[0], 0, 0, 0),
-		point4(0, v[1], 0, 0),
-		point4(0, 0, v[2], 0),
-		point4(0, 0, 0, 1));
+		vector4(S, 0, 0, 0),
+		vector4(0, S, 0, 0),
+		vector4(0, 0, S, 0),
+		vector4(0, 0, 0, 1));
 }
-/// Returns a three-dimensional perspective matrix
-inline const matrix4 perspective3D(const double d)
+
+/// Returns a three-dimensional scaling matrix that can scale non-uniformly along each dimension.
+inline const matrix4 scale3(const double_t X, const double_t Y, const double_t Z)
 {
 	return matrix4(
-		point4(1, 0, 0, 0),
-		point4(0, 1, 0, 0),
-		point4(0, 0, 1, 0),
-		point4(0, 0, 1/d, 0));
+		vector4(X, 0, 0, 0),
+		vector4(0, Y, 0, 0),
+		vector4(0, 0, Z, 0),
+		vector4(0, 0, 0, 1));
 }
-/// Returns a three-dimensional shearing matrix
-inline const matrix4 shearing3D(const double XY, const double XZ, const double YX, const double YZ, const double ZX, const double ZY)
+/// Returns a three-dimensional perspective matrix.
+inline const matrix4 perspective3(const double d)
 {
 	return matrix4(
-		point4(1, XY, XZ, 0),
-		point4(YX, 1, YZ, 0),
-		point4(ZX, ZY, 1, 0),
-		point4(0, 0, 0, 1));
+		vector4(1, 0, 0, 0),
+		vector4(0, 1, 0, 0),
+		vector4(0, 0, 1, 0),
+		vector4(0, 0, 1/d, 0));
+}
+/// Returns a three-dimensional shearing matrix.
+inline const matrix4 shear3(const double XY, const double XZ, const double YX, const double YZ, const double ZX, const double ZY)
+{
+	return matrix4(
+		vector4(1, XY, XZ, 0),
+		vector4(YX, 1, YZ, 0),
+		vector4(ZX, ZY, 1, 0),
+		vector4(0, 0, 0, 1));
 }
 
 /// Extract a "look" vector from a view matrix
@@ -610,10 +622,10 @@ inline const matrix4 view_matrix(const vector3& Look, const vector3& Up, const p
 	const vector3 up = normalize(look ^ right);
 
 	return matrix4(
-		point4(right[0], up[0], look[0], Position[0]),
-		point4(right[1], up[1], look[1], Position[1]),
-		point4(right[2], up[2], look[2], Position[2]),
-		point4(0, 0, 0, 1));
+		vector4(right[0], up[0], look[0], Position[0]),
+		vector4(right[1], up[1], look[1], Position[1]),
+		vector4(right[2], up[2], look[2], Position[2]),
+		vector4(0, 0, 0, 1));
 }
 
 //	Matrix utilities for affine matrices.
@@ -632,10 +644,10 @@ inline const vector3 extract_translation(const matrix4& m)
 inline const matrix4 extract_scaling(const matrix4& m)
 {
 	return matrix4(
-		point4(sqrt(m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0]), 0, 0, 0),
-		point4(0, sqrt(m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1]), 0, 0),
-		point4(0, 0, sqrt(m[0][2] * m[0][2] + m[1][2] * m[1][2] + m[2][2] * m[2][2]), 0),
-		point4(0, 0, 0, 1));
+		vector4(sqrt(m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0]), 0, 0, 0),
+		vector4(0, sqrt(m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1]), 0, 0),
+		vector4(0, 0, sqrt(m[0][2] * m[0][2] + m[1][2] * m[1][2] + m[2][2] * m[2][2]), 0),
+		vector4(0, 0, 0, 1));
 }
 /// Extracts rotation from a matrix
 inline const matrix4 extract_rotation(const matrix4& m)
@@ -644,19 +656,16 @@ inline const matrix4 extract_rotation(const matrix4& m)
 	const double scale_x = sqrt(m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0]);
 	const double scale_y = sqrt(m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1]);
 	const double scale_z = sqrt(m[0][2] * m[0][2] + m[1][2] * m[1][2] + m[2][2] * m[2][2]);
-	return_val_if_fail(scale_x && scale_y && scale_z, identity3D());
-
-	// Compute the inverse of scaling ...
-	point3 invscale(1.0 / scale_x, 1.0 / scale_y, 1.0 / scale_z);
+	return_val_if_fail(scale_x && scale_y && scale_z, identity3());
 
 	// Apply inverse of scaling as a transformation, to get unit scale ...
-	matrix4 unscaled(m * scaling3D(invscale));
+	matrix4 unscaled(m * scale3(1.0 / scale_x, 1.0 / scale_y, 1.0 / scale_z));
 
 	return matrix4(
-		point4(unscaled[0][0], unscaled[0][1], unscaled[0][2], 0),
-		point4(unscaled[1][0], unscaled[1][1], unscaled[1][2], 0),
-		point4(unscaled[2][0], unscaled[2][1], unscaled[2][2], 0),
-		point4(0, 0, 0, 1));
+		vector4(unscaled[0][0], unscaled[0][1], unscaled[0][2], 0),
+		vector4(unscaled[1][0], unscaled[1][1], unscaled[1][2], 0),
+		vector4(unscaled[2][0], unscaled[2][1], unscaled[2][2], 0),
+		vector4(0, 0, 0, 1));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -693,11 +702,11 @@ inline point4 operator*(const point4& v, const matrix4& a)
 
 inline matrix4::matrix4() {}
 
-inline matrix4::matrix4(const point4& v0, const point4& v1, const point4& v2, const point4& v3)
+inline matrix4::matrix4(const vector4& v0, const vector4& v1, const vector4& v2, const vector4& v3)
 { v[0] = v0; v[1] = v1; v[2] = v2; v[3] = v3; }
 
 inline matrix4::matrix4(const double d)
-{ v[0] = v[1] = v[2] = v[3] = point4(d, d, d, d); }
+{ v[0] = v[1] = v[2] = v[3] = vector4(d, d, d, d); }
 
 inline matrix4::matrix4(const matrix4& m)
 { v[0] = m.v[0]; v[1] = m.v[1]; v[2] = m.v[2]; v[3] = m.v[3]; }
@@ -726,7 +735,7 @@ inline matrix4::matrix4(euler_angles Angles)
 	const double cc = ci*ch, cs = ci*sh;
 	const double sc = si*ch, ss = si*sh;
 
-	matrix4 m = identity3D();
+	matrix4 m = identity3();
 	if(repetition == euler_angles::Repeats)
 	{
 		m[i][i] =  cj;		m[i][j] =  sj*si;	m[i][k] =  sj*ci;
@@ -778,15 +787,13 @@ inline matrix4& matrix4::operator/=(const double d)
 	return *this;
 }
 
-inline point4& matrix4::operator[](int i)
+inline vector4& matrix4::operator[](int i)
 {
-	return_val_if_fail((i >= 0 && i <= 3), v[0]);
 	return v[i];
 }
 
-inline const point4& matrix4::operator[](int i) const
+inline const vector4& matrix4::operator[](int i) const
 {
-	return_val_if_fail((i >= 0 && i <= 3), v[0]);
 	return v[i];
 }
 
@@ -819,10 +826,10 @@ inline matrix4 operator*(const matrix4& a, const matrix4& b)
 {
 #define ROWCOL(i, j) a.v[i].n[0]*b.v[0][j] + a.v[i].n[1]*b.v[1][j] + a.v[i].n[2]*b.v[2][j] + a.v[i].n[3]*b.v[3][j]
 	return matrix4(
-		point4(ROWCOL(0,0), ROWCOL(0,1), ROWCOL(0,2), ROWCOL(0,3)),
-		point4(ROWCOL(1,0), ROWCOL(1,1), ROWCOL(1,2), ROWCOL(1,3)),
-		point4(ROWCOL(2,0), ROWCOL(2,1), ROWCOL(2,2), ROWCOL(2,3)),
-		point4(ROWCOL(3,0), ROWCOL(3,1), ROWCOL(3,2), ROWCOL(3,3)));
+		vector4(ROWCOL(0,0), ROWCOL(0,1), ROWCOL(0,2), ROWCOL(0,3)),
+		vector4(ROWCOL(1,0), ROWCOL(1,1), ROWCOL(1,2), ROWCOL(1,3)),
+		vector4(ROWCOL(2,0), ROWCOL(2,1), ROWCOL(2,2), ROWCOL(2,3)),
+		vector4(ROWCOL(3,0), ROWCOL(3,1), ROWCOL(3,2), ROWCOL(3,3)));
 }
 
 inline matrix4 operator*(const matrix4& a, const double d)
@@ -1158,7 +1165,7 @@ inline euler_angles::euler_angles(const quaternion& Quaternion, AngleOrder Order
 	const double xx = Quaternion.v[0]*xs, xy = Quaternion.v[0]*ys, xz = Quaternion.v[0]*zs;
 	const double yy = Quaternion.v[1]*ys, yz = Quaternion.v[1]*zs, zz = Quaternion.v[2]*zs;
 
-	matrix4 matrix = identity3D();
+	matrix4 matrix = identity3();
 	matrix[0][0] = 1.0 - (yy + zz);
 	matrix[0][1] = xy - wz;
 	matrix[0][2] = xz + wy;
@@ -1273,7 +1280,7 @@ public:
 	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
 	inline const bool operator()(const T& A, const T& B) const
 	{
-		return std::equal(A.v, A.v + 4, B.v, almost_equal<point4>(threshold));
+		return std::equal(A.v, A.v + 4, B.v, almost_equal<vector4>(threshold));
 	}
 
 private:

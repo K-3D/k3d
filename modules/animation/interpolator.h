@@ -134,7 +134,7 @@ protected:
 		k3d::quaternion q_l(angles_l);
 		k3d::quaternion q_u(angles_u);
 		k3d::quaternion q_i = k3d::Slerp(q_l, q_u, (Time - t_lower)/(t_upper - t_lower));
-		return k3d::matrix4(norotation * k3d::rotation3D(q_i));
+		return k3d::matrix4(norotation * k3d::rotate3(q_i));
 	}
 };
 

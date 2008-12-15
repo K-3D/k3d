@@ -54,6 +54,7 @@
 #include "point4.h"
 #include "vector2.h"
 #include "vector3.h"
+#include "vector4.h"
 
 #include <algorithm>
 #include <cmath>
@@ -167,6 +168,43 @@ inline const vector3 operator^(const normal3& a, const vector3& b)
 	return vector3(a.n[1] * b.n[2] - a.n[2] * b.n[1], a.n[2] * b.n[0] - a.n[0] * b.n[2], a.n[0] * b.n[1] - a.n[1] * b.n[0]);
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// vector4 / point4 operations
+
+/// Add a point and a vector, returning the modified point
+inline const point4 operator+(const point4& a, const vector4& b)
+{
+	return point4(a.n[0] + b.n[0], a.n[1] + b.n[1], a.n[2] + b.n[2], a.n[3] + b.n[3]);
+}
+
+/// Adds a vector and a point, returning the modified point
+inline const point4 operator+(const vector4& a, const point4& b)
+{
+	return point4(a.n[0] + b.n[0], a.n[1] + b.n[1], a.n[2] + b.n[2], a.n[3] + b.n[3]);
+}
+
+/// Subtracts a vector from a point, returning the modified point
+inline const point4 operator-(const point4& a, const vector4& b)
+{
+	return point4(a.n[0] - b.n[0], a.n[1] - b.n[1], a.n[2] - b.n[2], a.n[3] - b.n[3]);
+}
+
+/// Returns the vector difference between two points
+inline const vector4 operator-(const point4& a, const point4& b)
+{
+	return vector4(a.n[0] - b.n[0], a.n[1] - b.n[1], a.n[2] - b.n[2], a.n[3] - b.n[3]);
+}
+
+inline point4& point4::operator+=(const vector4& v)
+{
+	n[0] += v.n[0]; n[1] += v.n[1]; n[2] += v.n[2]; n[3] += v.n[3]; return *this;
+}
+
+inline point4& point4::operator-=(const vector4& v)
+{
+	n[0] -= v.n[0]; n[1] -= v.n[1]; n[2] -= v.n[2]; n[3] -= v.n[3]; return *this;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Odds-and-ends
 
@@ -178,6 +216,12 @@ inline const double distance(const point2& P1, const point2& P2)
 
 /// Returns the distance between two points
 inline const double distance(const point3& P1, const point3& P2)
+{
+	return length(P2 - P1);
+}
+
+/// Returns the distance between two points
+inline const double distance(const point4& P1, const point4& P2)
 {
 	return length(P2 - P1);
 }
@@ -222,6 +266,18 @@ inline const normal3 to_normal(const point3& v)
 inline const normal3 to_normal(const vector3& v)
 {
 	return normal3(v.n[0], v.n[1], v.n[2]);
+}
+
+/// Explicit conversion
+inline const vector4 to_vector(const point4& v)
+{
+	return vector4(v.n[0], v.n[1], v.n[2], v.n[3]);
+}
+
+/// Explicit conversion
+inline const point4 to_point(const vector4& v)
+{
+	return point4(v.n[0], v.n[1], v.n[2], v.n[3]);
 }
 
 } // namespace k3d

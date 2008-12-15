@@ -118,13 +118,13 @@ private:
 		const k3d::point3 to = k3d::point3(0, 0, 0);
 		const k3d::vector3 spherical = k3d::spherical(to - from);
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::inverse(k3d::extract_rotation(m_input_matrix.pipeline_value())) * rotation3D(k3d::quaternion(k3d::euler_angles(0, -spherical[2], spherical[1], k3d::euler_angles::ZXYstatic))));
+		k3d::gl::push_matrix(k3d::inverse(k3d::extract_rotation(m_input_matrix.pipeline_value())) * rotate3(k3d::quaternion(k3d::euler_angles(0, -spherical[2], spherical[1], k3d::euler_angles::ZXYstatic))));
 
 		gluQuadricDrawStyle(m_quadric, GLU_FILL);
 		gluQuadricNormals(m_quadric, GLU_SMOOTH);
 		gluCylinder(m_quadric, 0.1, 0.001, 1, 8, 1);
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(k3d::point3(0, 0, 0.5)));
+		k3d::gl::push_matrix(k3d::translate3(0, 0, 0.5));
 		gluCylinder(m_quadric, 0.3, 0.001, 0.5, 8, 1);
 		glPopMatrix();
 

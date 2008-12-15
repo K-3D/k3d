@@ -66,7 +66,7 @@ namespace io
 
 k3d::matrix4 getTransformation(domNode& node)
 {
-	k3d::matrix4 result = k3d::identity3D();
+	k3d::matrix4 result = k3d::identity3();
 
 	// Look for Translations
 	domTranslate_Array translate_array = node.getTranslate_array();
@@ -74,7 +74,7 @@ k3d::matrix4 getTransformation(domNode& node)
 	{
 		domTranslate* translate = translate_array[i];
 		domFloat3 trans = translate->getValue();
-		k3d::matrix4 tmp_matrix = k3d::identity3D();
+		k3d::matrix4 tmp_matrix = k3d::identity3();
 		tmp_matrix[0][3] = trans[0];
 		tmp_matrix[1][3] = trans[1];
 		tmp_matrix[2][3] = trans[2];
@@ -87,7 +87,7 @@ k3d::matrix4 getTransformation(domNode& node)
 	{
 		domScale* scale = scale_array[i];
 		domFloat3 sc = scale->getValue();
-		k3d::matrix4 tmp_matrix = k3d::identity3D();
+		k3d::matrix4 tmp_matrix = k3d::identity3();
 		tmp_matrix[0][0] = sc[0];
 		tmp_matrix[1][1] = sc[1];
 		tmp_matrix[2][2] = sc[2];
@@ -100,7 +100,7 @@ k3d::matrix4 getTransformation(domNode& node)
 	{
 		domRotate* rotate = rotate_array[i];
 		domFloat4 rot = rotate->getValue();
-		k3d::matrix4 tmp_matrix = k3d::identity3D();
+		k3d::matrix4 tmp_matrix = k3d::identity3();
 		float c = cos(k3d::radians(rot[3])), s = sin(k3d::radians(rot[3])), C = 1-c;
 		float x = rot[0], y = rot[1], z = rot[2];
 		float xs = x*s, ys = y*s, zs = z*s;
@@ -123,7 +123,7 @@ k3d::matrix4 getTransformation(domNode& node)
 	for(int k=0; k<matrix_array.getCount(); k++)
 	{
 		domFloat4x4 mat = matrix_array[k]->getValue();
-		k3d::matrix4 tmp_matrix = k3d::identity3D();
+		k3d::matrix4 tmp_matrix = k3d::identity3();
 		for(int i=0; i<4; i++)
 			for(int j=0; j<4; j++)
 				tmp_matrix[i][j] = mat[4*i+j];

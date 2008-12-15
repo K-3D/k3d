@@ -219,10 +219,10 @@ void frame_selection(document_state& DocumentState, viewport::control& Viewport)
 	
 	// Transformation to camera coordinates (x = right, y = look, z = up)
 	k3d::matrix4 view_transformation(
-			k3d::point4(right_vector[0], right_vector[1], right_vector[2], -right_vector*k3d::to_vector(pan_translation + position)),
-			k3d::point4(look_vector[0], look_vector[1], look_vector[2], -look_vector*k3d::to_vector(pan_translation + position)),
-			k3d::point4(up_vector[0], up_vector[1], up_vector[2], -up_vector*k3d::to_vector(pan_translation + position)),
-			k3d::point4(0,0,0,1));
+			k3d::vector4(right_vector[0], right_vector[1], right_vector[2], -right_vector*k3d::to_vector(pan_translation + position)),
+			k3d::vector4(look_vector[0], look_vector[1], look_vector[2], -look_vector*k3d::to_vector(pan_translation + position)),
+			k3d::vector4(up_vector[0], up_vector[1], up_vector[2], -up_vector*k3d::to_vector(pan_translation + position)),
+			k3d::vector4(0,0,0,1));
 	
 	// Find the point with the largest viewing angle
 	double factor = std::numeric_limits<double>::max();

@@ -189,7 +189,7 @@ struct tool::implementation :
 		m_xy_constraint(_("Move XY"), load_icon("move_cursor_xy", Gtk::ICON_SIZE_BUTTON), k3d::selection::token(k3d::selection::USER1, 4)),
 		m_xz_constraint(_("Move XZ"), load_icon("move_cursor_xz", Gtk::ICON_SIZE_BUTTON), k3d::selection::token(k3d::selection::USER1, 5)),
 		m_yz_constraint(_("Move YZ"), load_icon("move_cursor_yz", Gtk::ICON_SIZE_BUTTON), k3d::selection::token(k3d::selection::USER1, 6)),
-		m_transformation(init_owner(*this) + init_name("transformation") + init_label(_("Transformation")) + init_description(_("Transformation")) + init_value(k3d::identity3D())),
+		m_transformation(init_owner(*this) + init_name("transformation") + init_label(_("Transformation")) + init_description(_("Transformation")) + init_value(k3d::identity3())),
 		m_target(init_owner(*this) + init_name("target") + init_label(_("Target")) + init_description(_("Target")) + init_value(static_cast<k3d::isnappable*>(0))),
 		m_snap_target(init_owner(*this) + init_name("snap_target") + init_label(_("Snap Target")) + init_description(_("Snap Target")) + init_value(std::string("")) + init_values(m_snap_targets)),
 		m_snap_distance(init_owner(*this) + init_name("snap_distance") + init_label(_("Snap Distance")) + init_description(_("Snap Distance")) + init_value(5.0)),
@@ -423,7 +423,7 @@ struct tool::implementation :
 		const k3d::vector3 screen_normal = screen_matrix * k3d::vector3(0, 0, 1);
 
 		const k3d::point3 origin = m_transformation.internal_value() * k3d::point3();
-		const k3d::matrix4 orientation = k3d::identity3D();
+		const k3d::matrix4 orientation = k3d::identity3();
 
 		// Update the screen xy constraint so it always aligns with the camera direction vector in world coordinates
 		m_screen_xy_constraint.set_plane(k3d::plane(screen_normal, origin), 1, 1, 1);
@@ -445,7 +445,7 @@ struct tool::implementation :
 		k3d::gl::store_attributes attributes;
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(origin));
+		k3d::gl::push_matrix(k3d::translate3(k3d::to_vector(origin)));
 		k3d::gl::push_matrix(orientation);
 
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -468,12 +468,12 @@ struct tool::implementation :
 			if(front_facing(Viewport, k3d::vector3(1, 0, 0), origin))
 			{
 				px = k3d::vector3(1, 0, 0);
-				draw_axis(m_x_color, m_current_constraint == &m_x_constraint ? m_current_color : m_x_color, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(0, 1, 0)));
+				draw_axis(m_x_color, m_current_constraint == &m_x_constraint ? m_current_color : m_x_color, k3d::rotate3(k3d::radians(90.0), k3d::vector3(0, 1, 0)));
 			}
 			else
 			{
 				px = k3d::vector3(-1, 0, 0);
-				draw_axis(m_x_color, m_current_constraint == &m_x_constraint ? m_current_color : m_x_color, k3d::rotation3D(k3d::radians(-90.0), k3d::vector3(0, 1, 0)));
+				draw_axis(m_x_color, m_current_constraint == &m_x_constraint ? m_current_color : m_x_color, k3d::rotate3(k3d::radians(-90.0), k3d::vector3(0, 1, 0)));
 			}
 		}
 
@@ -482,12 +482,12 @@ struct tool::implementation :
 			if(front_facing(Viewport, k3d::vector3(0, -1, 0), origin))
 			{
 				py = k3d::vector3(0, -1, 0);
-				draw_axis(m_y_color, m_current_constraint == &m_y_constraint ? m_current_color : m_y_color, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
+				draw_axis(m_y_color, m_current_constraint == &m_y_constraint ? m_current_color : m_y_color, k3d::rotate3(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
 			}
 			else
 			{
 				py = k3d::vector3(0, 1, 0);
-				draw_axis(m_y_color, m_current_constraint == &m_y_constraint ? m_current_color : m_y_color, k3d::rotation3D(k3d::radians(-90.0), k3d::vector3(1, 0, 0)));
+				draw_axis(m_y_color, m_current_constraint == &m_y_constraint ? m_current_color : m_y_color, k3d::rotate3(k3d::radians(-90.0), k3d::vector3(1, 0, 0)));
 			}
 		}
 
@@ -496,12 +496,12 @@ struct tool::implementation :
 			if(front_facing(Viewport, k3d::vector3(0, 0, 1), origin))
 			{
 				pz = k3d::vector3(0, 0, 1);
-				draw_axis(m_z_color, m_current_constraint == &m_z_constraint ? m_current_color : m_z_color, k3d::rotation3D(k3d::radians(0.0), k3d::vector3(0, 1, 0)));
+				draw_axis(m_z_color, m_current_constraint == &m_z_constraint ? m_current_color : m_z_color, k3d::rotate3(k3d::radians(0.0), k3d::vector3(0, 1, 0)));
 			}
 			else
 			{
 				pz = k3d::vector3(0, 0, -1);
-				draw_axis(m_z_color, m_current_constraint == &m_z_constraint ? m_current_color : m_z_color, k3d::rotation3D(k3d::radians(180.0), k3d::vector3(0, 1, 0)));
+				draw_axis(m_z_color, m_current_constraint == &m_z_constraint ? m_current_color : m_z_color, k3d::rotate3(k3d::radians(180.0), k3d::vector3(0, 1, 0)));
 			}
 		}
 
@@ -525,12 +525,12 @@ struct tool::implementation :
 			return;
 
 		const k3d::point3 origin = m_transformation.internal_value() * k3d::point3();
-		const k3d::matrix4 orientation = k3d::identity3D();
+		const k3d::matrix4 orientation = k3d::identity3();
 
 		k3d::gl::store_attributes attributes;
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(origin));
+		k3d::gl::push_matrix(k3d::translate3(k3d::to_vector(origin)));
 		k3d::gl::push_matrix(orientation);
 
 		glDisable(GL_LIGHTING);
@@ -547,34 +547,34 @@ struct tool::implementation :
 		if(front_facing(Viewport, k3d::vector3(1, 0, 0), origin))
 		{
 			px = k3d::vector3(1, 0, 0);
-			select_axis(m_x_constraint, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(0, 1, 0)));
+			select_axis(m_x_constraint, k3d::rotate3(k3d::radians(90.0), k3d::vector3(0, 1, 0)));
 		}
 		else
 		{
 			px = k3d::vector3(-1, 0, 0);
-			select_axis(m_x_constraint, k3d::rotation3D(k3d::radians(-90.0), k3d::vector3(0, 1, 0)));
+			select_axis(m_x_constraint, k3d::rotate3(k3d::radians(-90.0), k3d::vector3(0, 1, 0)));
 		}
 
 		if(front_facing(Viewport, k3d::vector3(0, -1, 0), origin))
 		{
 			py = k3d::vector3(0, -1, 0);
-			select_axis(m_y_constraint, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
+			select_axis(m_y_constraint, k3d::rotate3(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
 		}
 		else
 		{
 			py = k3d::vector3(0, 1, 0);
-			select_axis(m_y_constraint, k3d::rotation3D(k3d::radians(-90.0), k3d::vector3(1, 0, 0)));
+			select_axis(m_y_constraint, k3d::rotate3(k3d::radians(-90.0), k3d::vector3(1, 0, 0)));
 		}
 
 		if(front_facing(Viewport, k3d::vector3(0, 0, 1), origin))
 		{
 			pz = k3d::vector3(0, 0, 1);
-			select_axis(m_z_constraint, k3d::rotation3D(k3d::radians(0.0), k3d::vector3(0, 1, 0)));
+			select_axis(m_z_constraint, k3d::rotate3(k3d::radians(0.0), k3d::vector3(0, 1, 0)));
 		}
 		else
 		{
 			pz = k3d::vector3(0, 0, -1);
-			select_axis(m_z_constraint, k3d::rotation3D(k3d::radians(180.0), k3d::vector3(0, 1, 0)));
+			select_axis(m_z_constraint, k3d::rotate3(k3d::radians(180.0), k3d::vector3(0, 1, 0)));
 		}
 
 		select_plane(m_yz_constraint, py, py + pz, pz);
@@ -837,7 +837,7 @@ private:
 			// Constrain movement to the "nearest" axis
 			const k3d::point2 mouse(Coordinates);
 			const k3d::point2 coords = Viewport.project(origin);
-			const k3d::matrix4 orientation = k3d::identity3D();
+			const k3d::matrix4 orientation = k3d::identity3();
 
 			std::map<double, constraint*> constraints;
 			constraints.insert(std::make_pair(k3d::distance(mouse, k3d::line2(coords, Viewport.project(origin + (orientation * k3d::vector3(1, 0, 0))))), &m_x_constraint));
@@ -852,7 +852,7 @@ private:
 
 	virtual void reset()
 	{
-		m_transformation.set_value(k3d::identity3D());
+		m_transformation.set_value(k3d::identity3());
 	}
 
 	// Manipulator drawing/selection functions
@@ -905,7 +905,7 @@ private:
 		k3d::gl::push_matrix(Matrix);
 
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(k3d::point3(0, 0, m_axis_end - (0.5 * m_axis_arrow_length))));
+		k3d::gl::push_matrix(k3d::translate3(0, 0, m_axis_end - (0.5 * m_axis_arrow_length)));
 		glEnable(GL_LIGHTING);
 
 		k3d::gl::material(GL_FRONT_AND_BACK, GL_AMBIENT, k3d::color(0, 0, 0));
@@ -940,7 +940,7 @@ private:
 
 		k3d::gl::push_selection_token(Constraint.m_selection_token);
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(k3d::point3(0, 0, m_axis_end - (0.5 * m_axis_arrow_length))));
+		k3d::gl::push_matrix(k3d::translate3(0, 0, m_axis_end - (0.5 * m_axis_arrow_length)));
 		gluQuadricDrawStyle(m_quadric, GLU_FILL);
 		gluQuadricNormals(m_quadric, GLU_NONE);
 		gluCylinder(m_quadric, m_axis_arrow_radius, m_axis_arrow_radius * 0.001, m_axis_arrow_length, m_axis_arrow_slices, 1);
@@ -993,7 +993,7 @@ private:
 		return_val_if_fail(m_current_constraint, k3d::vector3(0, 0, 0));
 
 		// Transform mouse move to a world move
-		const k3d::matrix4 orientation = k3d::identity3D();
+		const k3d::matrix4 orientation = k3d::identity3();
 		const k3d::vector3 delta = m_current_constraint->mouse_move(Viewport, Coordinates, orientation);
 
 		return delta;
@@ -1037,7 +1037,7 @@ private:
 		if(Delta == k3d::vector3(0, 0, 0))
 			return;
 
-		m_transformation.set_value(k3d::translation3D(Delta) * m_transformation.internal_value());
+		m_transformation.set_value(k3d::translate3(Delta) * m_transformation.internal_value());
 	}
 
 	void on_move(k3d::iunknown*)

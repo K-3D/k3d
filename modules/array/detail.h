@@ -157,7 +157,7 @@ public:
 		{
 			if(!Index1 && !Index2 && !Index3)
 				k3d::log() << warning << "breaking array_3d infinite loop" << std::endl;
-			return k3d::identity3D();
+			return k3d::identity3();
 		}
 
 		m_processing = true;

@@ -1293,7 +1293,7 @@ public:
 		{
 			k3d::legacy::deep_copy(*strip_mesh, Mesh);
 
-			k3d::matrix4 rotation(k3d::rotation3D(k3d::point3(0, 0, static_cast<double>(n) * strip_rotation)));
+			k3d::matrix4 rotation(k3d::rotate3(k3d::point3(0, 0, static_cast<double>(n) * strip_rotation)));
 			if(n > 0)
 				for(k3d::legacy::mesh::points_t::iterator p = Mesh.points.end() - original_points; p != Mesh.points.end(); p++)
 				{
@@ -1308,7 +1308,7 @@ public:
 			if(!polygonal)
 			{
 				k3d::legacy::deep_copy(*strip_mesh, Mesh);
-				k3d::matrix4 rotation2(k3d::rotation3D(k3d::point3(k3d::pi(), 0, 0)));
+				k3d::matrix4 rotation2(k3d::rotate3(k3d::point3(k3d::pi(), 0, 0)));
 				if(n > 0)
 					rotation = rotation2 * rotation;
 				else

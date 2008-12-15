@@ -162,7 +162,7 @@ public:
 		}
 
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::scaling3D(k3d::point3(Radius, Radius, Radius)));
+		k3d::gl::push_matrix(k3d::scale3(Radius));
 
 		GLUnurbsObj* const nurbs_renderer = gluNewNurbsRenderer();
 

@@ -57,7 +57,7 @@ public:
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const k3d::matrix4 transformation = k3d::translation3D(k3d::point3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value()));
+		const k3d::matrix4 transformation = k3d::translate3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value());
 
 		k3d::parallel::parallel_for(
 			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), k3d::parallel::grain_size()),

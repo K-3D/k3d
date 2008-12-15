@@ -46,8 +46,8 @@ class look_at :
 public:
 	look_at(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3D())),
-		m_target(init_owner(*this) + init_name("target_matrix") + init_label(_("Target matrix")) + init_description(_("Target matrix")) + init_value(k3d::identity3D())),
+		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3())),
+		m_target(init_owner(*this) + init_name("target_matrix") + init_label(_("Target matrix")) + init_description(_("Target matrix")) + init_value(k3d::identity3())),
 		m_output(init_owner(*this) + init_name("output_matrix") + init_label(_("Output matrix")) + init_description(_("Read only")) + init_slot(sigc::mem_fun(*this, &look_at::output_value)))
 	{
 		m_input.changed_signal().connect(m_output.make_reset_slot());
@@ -73,7 +73,7 @@ public:
 		const k3d::point3 to = target_matrix * k3d::point3(0, 0, 0);
 		const k3d::vector3 spherical = k3d::spherical(to - from);
 
-		return input_matrix * rotation3D(k3d::quaternion(k3d::euler_angles(0, -spherical[2], spherical[1], k3d::euler_angles::ZXYstatic)));
+		return input_matrix * rotate3(k3d::quaternion(k3d::euler_angles(0, -spherical[2], spherical[1], k3d::euler_angles::ZXYstatic)));
 	}
 
 	static k3d::iplugin_factory& get_factory()

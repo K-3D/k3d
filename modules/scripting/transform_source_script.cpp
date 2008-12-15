@@ -56,11 +56,11 @@ public:
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
 		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = k3d::identity3D();
+		context["Output"] = k3d::identity3();
 
 		execute_script(context);
 
-		return_val_if_fail(context["Output"].type() == typeid(k3d::matrix4), k3d::identity3D());
+		return_val_if_fail(context["Output"].type() == typeid(k3d::matrix4), k3d::identity3());
 
 		return boost::any_cast<k3d::matrix4>(context["Output"]);
 	}

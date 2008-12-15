@@ -42,7 +42,7 @@ class transformable :
 public:
 	transformable(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
-		m_input_matrix(init_owner(*this) + init_name("input_matrix") + init_label(_("Input Matrix")) + init_description("Input matrix") + init_value(identity3D())),
+		m_input_matrix(init_owner(*this) + init_name("input_matrix") + init_label(_("Input Matrix")) + init_description("Input matrix") + init_value(identity3())),
 		m_output_matrix(init_owner(*this) + init_name("output_matrix") + init_label(_("Output Matrix")) + init_description(_("Output Matrix")) + init_slot(sigc::mem_fun(*this, &transformable<base_t>::matrix)))
 	{
 		m_input_matrix.changed_signal().connect(m_output_matrix.make_reset_slot());

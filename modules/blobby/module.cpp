@@ -38,7 +38,6 @@ extern k3d::iplugin_factory& minimum_factory();
 extern k3d::iplugin_factory& multiply_factory();
 extern k3d::iplugin_factory& negate_factory();
 extern k3d::iplugin_factory& points_to_blobby_factory();
-extern k3d::iplugin_factory& polygonize_blobbies_factory();
 extern k3d::iplugin_factory& segment_factory();
 extern k3d::iplugin_factory& subtract_factory();
 
@@ -56,7 +55,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::blobby::multiply_factory());
 	Registry.register_factory(module::blobby::negate_factory());
 	Registry.register_factory(module::blobby::points_to_blobby_factory());
-	Registry.register_factory(module::blobby::polygonize_blobbies_factory());
 	Registry.register_factory(module::blobby::segment_factory());
 	Registry.register_factory(module::blobby::subtract_factory());
 K3D_MODULE_END

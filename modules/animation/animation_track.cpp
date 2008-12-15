@@ -447,7 +447,7 @@ class animation_track_double_matrix4 : public animation_track<double, k3d::matri
 	typedef animation_track<double, k3d::matrix4> base;
 public:
 	animation_track_double_matrix4(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document, 0.0, k3d::identity3D()) {}
+		base(Factory, Document, 0.0, k3d::identity3()) {}
 	
 	static k3d::iplugin_factory& get_factory()
 	{

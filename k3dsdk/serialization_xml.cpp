@@ -811,10 +811,10 @@ void upgrade_transformable_nodes(element& XMLDocument)
 		const string_t node_name = attribute_text(*xml_node, "name");
 		log() << warning << "Upgrading old transformable node " << node_name << std::endl;
 
-		const point3 position = from_string<point3>(xml_position->text, point3(0, 0, 0));
+		const vector3 position = from_string<vector3>(xml_position->text, vector3(0, 0, 0));
 		const angle_axis orientation = from_string<angle_axis>(xml_orientation->text, angle_axis(0, point3(0, 0, 1)));
 		const point3 scale = from_string<point3>(xml_scale->text, point3(1, 1, 1));
-		const matrix4 matrix = translation3D(position) * rotation3D(orientation) * scaling3D(scale);
+		const matrix4 matrix = translate3(position) * rotate3(orientation) * scale3(scale[0], scale[1], scale[2]);
 
 		adjust_dependencies(XMLDocument, next_node_id, "input_matrix", node_id, "input_matrix");
 
@@ -831,7 +831,7 @@ void upgrade_transformable_nodes(element& XMLDocument)
 				attribute("factory", classes::FrozenTransformation()),
 				attribute("id", next_node_id),
 				element("properties",
-					element("property", string_cast(identity3D()),
+					element("property", string_cast(identity3()),
 						attribute("name", "input_matrix")),
 					element("property", string_cast(matrix),
 						attribute("name", "matrix")))));

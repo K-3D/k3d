@@ -115,7 +115,7 @@ void snap_tool_detail::transform_target::reset(k3d::iunknown*)
 void snap_tool_detail::transform_target::start_transform()
 {
 	if(create_transform_modifier("Snap "))
-		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3D()));
+		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3()));
 
 	m_origin = k3d::point3();
 //	m_world_position = k3d::point3();
@@ -127,7 +127,7 @@ void snap_tool_detail::transform_target::start_transform()
 			m_system_orientation = k3d::inverse(k3d::node_to_world_matrix(*node));
 			break;
 		case LOCAL:
-			m_system_orientation = k3d::identity3D();
+			m_system_orientation = k3d::identity3();
 			break;
 		case PARENT:
 			m_system_orientation = k3d::inverse(k3d::node_to_world_matrix(*node)) * k3d::parent_to_world_matrix(*node);
@@ -145,7 +145,7 @@ const k3d::matrix4 upstream_matrix(k3d::inode& Node)
 			return boost::any_cast<k3d::matrix4>(upstream_output->property_internal_value());
 	}
 
-	return k3d::identity3D();
+	return k3d::identity3();
 }
 
 const k3d::matrix4 snap_tool_detail::transform_target::snap(k3d::isnappable* const Target, k3d::isnap_target* const SnapTarget, const double SnapDistance, const bool SnapOrientation, const bool MatchGroups, const k3d::matrix4& Transformation)
@@ -218,23 +218,23 @@ const k3d::matrix4 snap_tool_detail::transform_target::snap(k3d::isnappable* con
 			k3d::vector3 target_up;
 			if(snap_target->target_orientation(source_position, target_look, target_up))
 			{
-				k3d::matrix4 rotation1 = k3d::rotation3D(k3d::angle_axis(
+				k3d::matrix4 rotation1 = k3d::rotate3(k3d::angle_axis(
 					std::acos(k3d::normalize(source_look) * k3d::normalize(target_look)),
 					source_look ^ target_look));
 
 				source_up = rotation1 * source_up;
 
-				k3d::matrix4 rotation2 = k3d::rotation3D(k3d::angle_axis(
+				k3d::matrix4 rotation2 = k3d::rotate3(k3d::angle_axis(
 					std::acos(k3d::normalize(source_up) * k3d::normalize(target_up)),
 					source_up ^ target_up));
 
-				return k3d::translation3D(target_position - source_position) * Transformation * rotation2 * rotation1;
+				return k3d::translate3(target_position - source_position) * Transformation * rotation2 * rotation1;
 			}
 		}
 	}
 
 	// Just snap the position
-	return k3d::translation3D(target_position - source_position) * Transformation;
+	return k3d::translate3(target_position - source_position) * Transformation;
 }
 
 void snap_tool_detail::transform_target::transform(k3d::isnappable* const Target, k3d::isnap_target* const SnapTarget, const double SnapDistance, const bool SnapOrientation, const bool MatchGroups, const k3d::matrix4& Transform)
@@ -337,8 +337,8 @@ void snap_tool_detail::mesh_target::init_transformation()
 			m_system_orientation_inverse[0][3] = m_system_orientation_inverse[1][3] = m_system_orientation_inverse[2][3] = 0;
 			break;
 		case LOCAL:
-			m_system_orientation = k3d::identity3D();
-			m_system_orientation_inverse = k3d::identity3D();
+			m_system_orientation = k3d::identity3();
+			m_system_orientation_inverse = k3d::identity3();
 			break;
 		case PARENT:
 			m_system_orientation = k3d::inverse(k3d::node_to_world_matrix(*node)) * k3d::parent_to_world_matrix(*node);
@@ -933,7 +933,7 @@ bool snap_tool_detail::front_facing(viewport::control& Viewport, const k3d::vect
 	return_val_if_fail(Viewport.camera(), false);
 
 	const k3d::matrix4 matrix = k3d::inverse(k3d::node_to_world_matrix(*Viewport.camera()));
-	const k3d::matrix4 orientation = k3d::identity3D();
+	const k3d::matrix4 orientation = k3d::identity3();
 	const k3d::point3 a = Origin + (orientation * Normal);
 	const k3d::point3 b = Origin + (orientation * -Normal);
 	return k3d::to_vector(matrix * a).length2() < k3d::to_vector(matrix * b).length2();

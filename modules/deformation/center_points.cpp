@@ -67,7 +67,7 @@ public:
 		const bool center_y = m_center_y.pipeline_value();
 		const bool center_z = m_center_z.pipeline_value();
 
-		const k3d::matrix4 transformation = k3d::translation3D(k3d::vector3(
+		const k3d::matrix4 transformation = k3d::translate3(k3d::vector3(
 			center_x ? -0.5 * (bounds.px + bounds.nx) : 0,
 			center_y ? -0.5 * (bounds.py + bounds.ny) : 0,
 			center_z ? -0.5 * (bounds.pz + bounds.nz) : 0));

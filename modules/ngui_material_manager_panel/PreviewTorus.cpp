@@ -22,10 +22,10 @@ void PreviewTorus::init(k3d::string_t _node_name, k3d::string_t _meta_nametag, k
 	k3d::property::set_internal_value(*m_doc_node, "gl_painter", static_cast<k3d::inode*>(0));
 
   //Scale The Torus To Fit In Camera
-  k3d::point4 v1(0.7642975655067189, 0, 0, 0);
-  k3d::point4 v2(0, 0.63264167284287942, 0.42885345098536998, 5.5511151231257827e-17);
-  k3d::point4 v3(0, -0.42885345098536998, 0.63264167284287942, 0.75945015577859709);
-  k3d::point4 v4(0, 0, 0, 1);
+  k3d::vector4 v1(0.7642975655067189, 0, 0, 0);
+  k3d::vector4 v2(0, 0.63264167284287942, 0.42885345098536998, 5.5511151231257827e-17);
+  k3d::vector4 v3(0, -0.42885345098536998, 0.63264167284287942, 0.75945015577859709);
+  k3d::vector4 v4(0, 0, 0, 1);
 
   k3d::matrix4 torus_transform(v1, v2, v3, v4);
   k3d::inode* torus_transformation = k3d::set_matrix(*m_doc_node, torus_transform);

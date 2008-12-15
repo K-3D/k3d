@@ -21,10 +21,10 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "point4_python.h"
+#include "vector4_python.h"
 #include "utility_python.h"
 
-#include <k3dsdk/vectors.h>
+#include <k3dsdk/vector4.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -35,27 +35,26 @@ namespace k3d
 namespace python
 {
 
-void define_class_point4()
+void define_class_vector4()
 {
-	class_<k3d::point4>("point4",
-		"Stores a position in four-dimensional space", no_init)
+	class_<k3d::vector4>("vector4",
+		"Stores a direction vector in four-dimensional space", no_init)
 		.def(init<double_t, double_t, double_t, double_t>())
-		.def(init<const k3d::point4&>())
-		.def("__len__", &utility::constant_len_len<k3d::point4, 4>)
-		.def("__getitem__", &utility::constant_len_get_item<k3d::point4, 4, k3d::double_t>)
-		.def("__setitem__", &utility::constant_len_set_item<k3d::point4, 4, k3d::double_t>)
+		.def(init<const k3d::vector4&>())
+		.def("__len__", &utility::constant_len_len<k3d::vector4, 4>)
+		.def("__getitem__", &utility::constant_len_get_item<k3d::vector4, 4, k3d::double_t>)
+		.def("__setitem__", &utility::constant_len_set_item<k3d::vector4, 4, k3d::double_t>)
 		.def(self == self)
 		.def(self != self)
 		.def(self + self)
 		.def(self - self)
-		.def(self * double_t())
-		.def(double_t() * self)
-		.def(self += k3d::vector4())
-		.def(self -= k3d::vector4())
-		.def(self *= double_t())
-		.def(self /= double_t())
+		.def(self * double())
+		.def(double() * self)
+		.def(self += self)
+		.def(self -= self)
+		.def(self *= double())
+		.def(self /= double())
 		.def(self_ns::str(self));
-
 }
 
 } // namespace python

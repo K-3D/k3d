@@ -49,7 +49,7 @@ class torus :
 public:
 	torus(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_transformation(init_owner(*this) + init_name("transformation") + init_label(_("Transformation")) + init_description(_("Transformation matrix used to position / orient / scale the output torus.")) + init_value(k3d::identity3D())),
+		m_transformation(init_owner(*this) + init_name("transformation") + init_label(_("Transformation")) + init_description(_("Transformation matrix used to position / orient / scale the output torus.")) + init_value(k3d::identity3())),
 		m_major_radius(init_owner(*this) + init_name("major_radius") + init_label(_("Major Radius")) + init_description(_("Controls the major radius of the output torus.")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_minor_radius(init_owner(*this) + init_name("minor_radius") + init_label(_("Minor Radius")) + init_description(_("Controls the minor radius of the output torus.")) + init_value(2.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_phi_min(init_owner(*this) + init_name("phi_min") + init_label(_("Phi Min")) + init_description(_("Phi Min.")) + init_value(0.0) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle))),

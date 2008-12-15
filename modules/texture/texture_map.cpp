@@ -95,27 +95,27 @@ public:
 		const double default_s = m_default_s.pipeline_value();
 		const double default_t = m_default_t.pipeline_value();
 
-		k3d::matrix4 transformation = k3d::identity3D();
+		k3d::matrix4 transformation = k3d::identity3();
 		switch(m_axis.pipeline_value())
 		{
 			case k3d::NX:
-				transformation = k3d::rotation3D(k3d::radians(90.0), k3d::vector3(0, 1, 0));
+				transformation = k3d::rotate3(k3d::radians(90.0), k3d::vector3(0, 1, 0));
 				break;
 
 			case k3d::PX:
-				transformation = k3d::rotation3D(k3d::radians(-90.0), k3d::vector3(0, 1, 0));
+				transformation = k3d::rotate3(k3d::radians(-90.0), k3d::vector3(0, 1, 0));
 				break;
 
 			case k3d::NY:
-				transformation = k3d::rotation3D(k3d::radians(-90.0), k3d::vector3(1, 0, 0));
+				transformation = k3d::rotate3(k3d::radians(-90.0), k3d::vector3(1, 0, 0));
 				break;
 
 			case k3d::PY:
-				transformation = k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0));
+				transformation = k3d::rotate3(k3d::radians(90.0), k3d::vector3(1, 0, 0));
 				break;
 
 			case k3d::NZ:
-				transformation = k3d::rotation3D(k3d::radians(180.0), k3d::vector3(0, 1, 0));
+				transformation = k3d::rotate3(k3d::radians(180.0), k3d::vector3(0, 1, 0));
 				break;
 
 			case k3d::PZ:

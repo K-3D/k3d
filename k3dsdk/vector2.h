@@ -83,8 +83,8 @@ public:
 
 	vector2& operator-=(const vector2& v)
 	{
-		n[0] += v.n[0];
-		n[1] += v.n[1];
+		n[0] -= v.n[0];
+		n[1] -= v.n[1];
 		return *this;
 	}
 

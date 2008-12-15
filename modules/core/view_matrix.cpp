@@ -43,9 +43,9 @@ class view_matrix :
 public:
 	view_matrix(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_position(init_owner(*this) + init_name("position") + init_label(_("Position")) + init_description(_("Position")) + init_value(k3d::identity3D())),
-		m_look(init_owner(*this) + init_name("look") + init_label(_("Look Position")) + init_description(_("Look Position")) + init_value(k3d::translation3D(k3d::vector3(0, 0, 1)))),
-		m_up(init_owner(*this) + init_name("up") + init_label(_("Up Position")) + init_description(_("Up Position")) + init_value(k3d::translation3D(k3d::vector3(0, 1, 0)))),
+		m_position(init_owner(*this) + init_name("position") + init_label(_("Position")) + init_description(_("Position")) + init_value(k3d::identity3())),
+		m_look(init_owner(*this) + init_name("look") + init_label(_("Look Position")) + init_description(_("Look Position")) + init_value(k3d::translate3(k3d::vector3(0, 0, 1)))),
+		m_up(init_owner(*this) + init_name("up") + init_label(_("Up Position")) + init_description(_("Up Position")) + init_value(k3d::translate3(k3d::vector3(0, 1, 0)))),
 		m_output(init_owner(*this) + init_name("output_matrix") + init_label(_("Output matrix")) + init_description(_("Read only")) + init_slot(sigc::mem_fun(*this, &view_matrix::output_value)))
 	{
 		m_position.changed_signal().connect(m_output.make_reset_slot());

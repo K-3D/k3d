@@ -242,7 +242,7 @@ const double command_arguments::get_double(const std::string& Name) const
 const k3d::matrix4 command_arguments::get_matrix4(const std::string& Name) const
 {
 	k3d::xml::element* const xml_storage = get_storage(Name);
-	return k3d::from_string<k3d::matrix4>(xml_storage->text, k3d::identity3D());
+	return k3d::from_string<k3d::matrix4>(xml_storage->text, k3d::identity3());
 }
 
 const k3d::point2 command_arguments::get_point2(const std::string& Name) const

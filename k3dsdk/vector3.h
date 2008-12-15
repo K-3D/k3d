@@ -90,9 +90,9 @@ public:
 
 	vector3& operator-=(const vector3& v)
 	{
-		n[0] += v.n[0];
-		n[1] += v.n[1];
-		n[2] += v.n[2];
+		n[0] -= v.n[0];
+		n[1] -= v.n[1];
+		n[2] -= v.n[2];
 		return *this;
 	}
 

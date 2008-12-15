@@ -47,7 +47,7 @@ class show_matrix :
 public:
 	show_matrix(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) +init_description(_("Input matrix")) + init_value(k3d::identity3D())),
+		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) +init_description(_("Input matrix")) + init_value(k3d::identity3())),
 		m_line1(init_owner(*this) + init_name("line1") + init_label(_("Line1")) + init_description(_("First matrix line or row")) + init_value<std::string>("0 0 0 0")),
 		m_line2(init_owner(*this) + init_name("line2") + init_label(_("Line2")) + init_description(_("Second matrix line or row")) + init_value<std::string>("0 0 0 0")),
 		m_line3(init_owner(*this) + init_name("line3") + init_label(_("Line3")) + init_description(_("Third matrix line or row")) + init_value<std::string>("0 0 0 0")),

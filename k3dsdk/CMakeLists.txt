@@ -79,7 +79,6 @@ ADD_SUBDIRECTORY(parallel)
 ADD_SUBDIRECTORY(resource)
 ADD_SUBDIRECTORY(sgi_tesselator)
 ADD_SUBDIRECTORY(subdivision_surface)
-ADD_SUBDIRECTORY(surface_polygonizer)
 
 IF(K3D_BUILD_NGUI_MODULE)
 	ADD_SUBDIRECTORY(ngui)

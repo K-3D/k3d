@@ -42,14 +42,14 @@ class translate_array_1d :
 public:
 	translate_array_1d(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_offset(init_owner(*this) + init_name("offset") + init_label(_("Offset")) + init_description(_("Offset")) + init_value(k3d::point3(5, 0, 0)))
+		m_offset(init_owner(*this) + init_name("offset") + init_label(_("Offset")) + init_description(_("Offset")) + init_value(k3d::vector3(5, 0, 0)))
 	{
 		m_offset.changed_signal().connect(make_node_change_slot());
 	}
 
 	const k3d::matrix4 on_get_element(unsigned long Index1, unsigned long Count1)
 	{
-		return k3d::translation3D((m_offset.pipeline_value() * Index1));
+		return k3d::translate3((m_offset.pipeline_value() * Index1));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -66,7 +66,7 @@ public:
 	}
 
 private:
-	k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_offset;
+	k3d_data(k3d::vector3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_offset;
 };
 
 k3d::iplugin_factory& translate_array_1d_factory()

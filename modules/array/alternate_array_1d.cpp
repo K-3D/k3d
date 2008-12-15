@@ -51,9 +51,9 @@ public:
 	const k3d::matrix4 on_get_element(unsigned long Index1, unsigned long Count1)
 	{
 		const k3d::axis axis1 = m_axis1.pipeline_value();
-		k3d::point3 vector1(k3d::X == axis1 ? -1 : 1, k3d::Y == axis1 ? -1 : 1, k3d::Z == axis1 ? -1 : 1);
+		k3d::point3 scale1(k3d::X == axis1 ? -1 : 1, k3d::Y == axis1 ? -1 : 1, k3d::Z == axis1 ? -1 : 1);
 
-		const k3d::matrix4 matrix1 = (Index1 % 2) ? k3d::scaling3D(vector1) : k3d::identity3D();
+		const k3d::matrix4 matrix1 = (Index1 % 2) ? k3d::scale3(scale1[0], scale1[1], scale1[2]) : k3d::identity3();
 
 		return matrix1;
 	}

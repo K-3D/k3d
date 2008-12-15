@@ -89,6 +89,7 @@
 #include "uuid_python.h"
 #include "vector2_python.h"
 #include "vector3_python.h"
+#include "vector4_python.h"
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/application.h>
@@ -283,35 +284,34 @@ const list module_plugins()
 	return plugins;
 }
 
-const k3d::matrix4 module_rotate3(const object& Value)
+static const k3d::matrix4 rotate3_a(const k3d::python::angle_axis& Value)
 {
-	extract<angle_axis> angle_axis_value(Value);
-	if(angle_axis_value.check())
-		return k3d::rotation3D(angle_axis_value());
-
-	extract<euler_angles> euler_angles_value(Value);
-	if(euler_angles_value.check())
-		return k3d::rotation3D(k3d::quaternion(euler_angles_value()));
-
-	throw std::invalid_argument("can't generate rotation matrix from given type");
+	return k3d::rotate3(Value);
 }
 
-const k3d::matrix4 module_scale3(const double X, const double Y, const double Z)
+static const k3d::matrix4 rotate3_b(const k3d::python::euler_angles& Value)
 {
-	return k3d::scaling3D(k3d::point3(X, Y, Z));
+	return k3d::rotate3(k3d::quaternion(Value));
 }
 
-const k3d::matrix4 module_translate3(const object& Value)
+static const k3d::matrix4 scale3_a(const double_t X, const double_t Y, const double_t Z)
 {
-	extract<k3d::vector3> vector3(Value);
-	if(vector3.check())
-		return k3d::translation3D(vector3());
+	return k3d::scale3(X, Y, Z);
+}
 
-	extract<k3d::point3> point3(Value);
-	if(point3.check())
-		return k3d::translation3D(point3());
+static const k3d::matrix4 scale3_b(const double_t S)
+{
+	return k3d::scale3(S);
+}
 
-	throw std::invalid_argument("cannot generate translation matrix from given type");
+static const k3d::matrix4 translate3_a(const k3d::vector3& Offset)
+{
+	return k3d::translate3(Offset);
+}
+
+static const k3d::matrix4 translate3_b(const double_t X, const double_t Y, const double_t Z)
+{
+	return k3d::translate3(X, Y, Z);
 }
 
 object module_ui()
@@ -437,6 +437,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_uuid();
 	define_class_vector2();
 	define_class_vector3();
+	define_class_vector4();
 	define_namespace_bicubic_patch();
 	define_namespace_bilinear_patch();
 	define_namespace_blobby();
@@ -494,7 +495,7 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns a command node by path.");
 	def("intersect_lines", k3d::intersect_lines,
 		"Find the point at which two infinite lines intersect.");
-	def("identity3", k3d::identity3D,
+	def("identity3", k3d::identity3,
 		"Returns a L{matrix4} containing a three-dimensional identity matrix.");
 	def("length", module_length,
 		"Returns the length of a L{vector3}.");
@@ -514,15 +515,21 @@ BOOST_PYTHON_MODULE(k3d)
 		"Opens an existing document stored on disk.");
 	def("plugins", module_plugins,
 		"Returns a list containing the set of all plugin factories.");
-	def("rotate3", module_rotate3,
+	def("rotate3", rotate3_a,
 		"Returns a L{matrix4} containing a three-dimensional rotation matrix.");
-	def("scale3", module_scale3,
+	def("rotate3", rotate3_b,
+		"Returns a L{matrix4} containing a three-dimensional rotation matrix.");
+	def("scale3", scale3_a,
+		"Returns a L{matrix4} containing a three-dimensional scaling matrix.");
+	def("scale3", scale3_b,
 		"Returns a L{matrix4} containing a three-dimensional scaling matrix.");
 	def("share_path", k3d::share_path,
 		"Returns the runtime path to shared data.");
 	def("to_vector3", module_to_vector3,
 		"Explicit conversion from point3 to vector3");
-	def("translate3", module_translate3,
+	def("translate3", translate3_a,
+		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
+	def("translate3", translate3_b,
 		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
 	def("ui", module_ui,
 		"Returns the singleton runtime L{iuser_interface} plugin instance.");

@@ -257,7 +257,7 @@ void ContentPanel::createPreviewNodes()
 
       k3d::inode* light_transformation 
         = k3d::set_matrix(*m_main_light, 
-                          k3d::translation3D(k3d::point3(-20, 20, 20)));
+                          k3d::translate3(-20, 20, 20));
       
 
       k3d::property::set_internal_value(*m_main_light, 
@@ -284,7 +284,7 @@ void ContentPanel::createPreviewNodes()
 
       k3d::inode* light_transformation 
         = k3d::set_matrix(*m_fill_light, 
-                          k3d::translation3D(k3d::point3(20, 28, -18)));
+                          k3d::translate3(20, 28, -18));
 
 
       k3d::property::set_internal_value(*m_fill_light, 
@@ -311,7 +311,7 @@ void ContentPanel::createPreviewNodes()
 
       k3d::inode* light_transformation 
         = k3d::set_matrix(*m_back_light, 
-                          k3d::translation3D(k3d::point3(0, -38, 18)));
+                          k3d::translate3(0, -38, 18));
 
 
       k3d::property::set_internal_value(*m_back_light, 

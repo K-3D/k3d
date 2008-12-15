@@ -1804,7 +1804,7 @@ public:
 
 		// If the new node is a camera, orient it horizontally
 		if(k3d::classes::Camera() == Factory->factory_id())
-			k3d::set_matrix(*node, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
+			k3d::set_matrix(*node, k3d::rotate3(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
 		
 		// If the new node is a multiple mesh sink, add two mesh inputs
 		if(Factory->implements(typeid(k3d::imulti_mesh_sink)))

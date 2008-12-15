@@ -2,7 +2,7 @@
 #define K3DSDK_POINT3_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -86,48 +86,9 @@ public:
 		n[1] = d[1];
 		n[2] = d[2];
 	}
-	
-/*
-	/// Casts a point2 to a point3 with the given third dimension
-	point3(const point2& v, double d)
-	{
-		n[0] = v.n[0];
-		n[1] = v.n[1];
-		n[2] = d;
-	}
-
-	/// Assignment of a C/C++ style array
-	point3& operator=(const double d[3])
-	{
-		n[0] = d[0];
-		n[1] = d[1];
-		n[2] = d[2];
-		return *this;
-	}
-
-	/// Addition
-	point3& operator+=(const point3& v)
-	{
-		n[0] += v.n[0];
-		n[1] += v.n[1];
-		n[2] += v.n[2];
-		return *this;
-	}
-*/
 
 	/// Addition of a vector
 	point3& operator+=(const vector3& v);
-
-/*
-	/// Subtraction
-	point3& operator-=(const point3& v)
-	{
-		n[0] -= v.n[0];
-		n[1] -= v.n[1];
-		n[2] -= v.n[2];
-		return *this;
-	}
-*/
 
 	/// Subtraction of a vector
 	point3& operator-=(const vector3& v);
@@ -165,20 +126,6 @@ public:
 	{
 		return n[i];
 	}
-
-/*
-	/// Integrate with legacy array-oriented APIs
-	const double* data() const
-	{
-		return &n[0];
-	}
-
-	/// Integrate with legacy array-oriented APIs
-	double* data()
-	{
-		return &n[0];
-	}
-*/
 
 	friend std::ostream& operator<<(std::ostream& Stream, const point3& RHS)
 	{

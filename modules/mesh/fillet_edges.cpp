@@ -503,7 +503,7 @@ k3d::point3 slerp_points(const unsigned long SegmentNumber, const k3d::point3& V
 		const double t = static_cast<double>(n) / segment_number;
 
 		k3d::quaternion rotation = k3d::Slerp(qrot1, qrot2, t * 0.5);
-		k3d::vector3 new_orientation = k3d::rotation3D(rotation) * orientation1;
+		k3d::vector3 new_orientation = k3d::rotate3(rotation) * orientation1;
 		const double length_lerp = length1 + t * (length2 - length1);
 		k3d::point3 new_position = rotation_center + length_lerp * new_orientation;
 
@@ -943,7 +943,7 @@ k3d::point3 slerp_orientations(const k3d::point3& Point1, const k3d::point3& Poi
 	k3d::quaternion qrot2(0, orientation2);
 
 	k3d::quaternion rotation = k3d::Slerp(qrot1, qrot2, t * 0.5);
-	k3d::vector3 new_orientation = k3d::rotation3D(rotation) * orientation1;
+	k3d::vector3 new_orientation = k3d::rotate3(rotation) * orientation1;
 	const double length_lerp = length1 + t * (length2 - length1);
 
 	return Center + length_lerp * new_orientation;

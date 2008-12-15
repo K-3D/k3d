@@ -1,10 +1,10 @@
-#ifndef K3DSDK_SURFACE_POLYGONIZER_BLOBBY_POLYGONIZER_H
-#define K3DSDK_SURFACE_POLYGONIZER_BLOBBY_POLYGONIZER_H
+#ifndef K3DSDK_PYTHON_VECTOR4_PYTHON_H
+#define K3DSDK_PYTHON_VECTOR4_PYTHON_H
 
 // K-3D
-// Copyright (c) 2004-2006, Romain Behar
+// Copyright (c) 1995-2006, Timothy M. Shead
 //
-// Contact: romainbehar@yahoo.com
+// Contact: tshead@k-3d.com
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -21,15 +21,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Defines RiBlobby polygonizer interface
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/legacy_mesh.h>
+namespace k3d
+{
 
-void polygonize_blobby(k3d::legacy::blobby* Opcode, unsigned long Voxels,
-	std::vector<k3d::point3>& Vertices, std::vector<k3d::point3>& Normals,
-	std::vector< std::vector<unsigned long> >& Polygons);
+namespace python
+{
 
-#endif // !K3DSDK_SURFACE_POLYGONIZER_BLOBBY_POLYGONIZER_H
+void define_class_vector4();
 
+} // namespace python
+
+} // namespace k3d
+
+#endif // !K3DSDK_PYTHON_VECTOR4_PYTHON_H

@@ -54,7 +54,7 @@ class tweak_points :
 public:
 	tweak_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_matrix(init_owner(*this) + init_name("matrix") + init_label(_("Matrix")) + init_description(_("Tweaks matrix")) + init_value(k3d::identity3D())),
+		m_matrix(init_owner(*this) + init_name("matrix") + init_label(_("Matrix")) + init_description(_("Tweaks matrix")) + init_value(k3d::identity3())),
 		m_center(init_owner(*this) + init_name("center") + init_label(_("Transformation Center")) + init_description(_("Center around which scaling or rotation happen")) + init_value(k3d::point3(0.0,0.0,0.0))),
 		m_selected_points(init_owner(*this) + init_name("selected_points") + init_label(_("Selected points")) + init_description(_("Indices of points being transformed")) + init_value(0)),
 		m_tweaks(init_owner(*this) + init_name("tweaks") + init_label(_("Tweaks")) + init_description(_("Map containing the difference vectors for all transformations performed by this node")) + init_value(tweaks_t())),
@@ -318,7 +318,7 @@ private:
 				m_selected_tweaks.push_back(k3d::vector3(0.0,0.0,0.0));
 			}
 		}
-		m_matrix.set_value(k3d::identity3D());
+		m_matrix.set_value(k3d::identity3());
 	}
 };
 

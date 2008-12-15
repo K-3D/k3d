@@ -46,8 +46,8 @@ class orientation :
 public:
 	orientation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3D())),
-		m_space(init_owner(*this) + init_name("space") + init_label(_("Coordinate space")) + init_description(_("Coordinate space")) + init_value(k3d::identity3D())),
+		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3())),
+		m_space(init_owner(*this) + init_name("space") + init_label(_("Coordinate space")) + init_description(_("Coordinate space")) + init_value(k3d::identity3())),
 		m_x(init_owner(*this) + init_name("x") + init_label(_("X")) + init_description(_("X rotation angle")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
 		m_y(init_owner(*this) + init_name("y") + init_label(_("Y")) + init_description(_("Y rotation angle")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
 		m_z(init_owner(*this) + init_name("z") + init_label(_("Z")) + init_description(_("Z rotation angle")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
@@ -72,7 +72,7 @@ public:
 
 	k3d::matrix4 output_value()
 	{
-		return m_input.pipeline_value() * m_space.pipeline_value() * rotation3D(k3d::point3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value())) * k3d::inverse(m_space.pipeline_value());
+		return m_input.pipeline_value() * m_space.pipeline_value() * rotate3(k3d::point3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value())) * k3d::inverse(m_space.pipeline_value());
 	}
 
 	static k3d::iplugin_factory& get_factory()

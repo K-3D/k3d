@@ -43,7 +43,7 @@ class position :
 public:
 	position(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_space(init_owner(*this) + init_name("space") + init_label(_("Coordinate space")) + init_description(_("Coordinate space")) + init_value(k3d::identity3D())),
+		m_space(init_owner(*this) + init_name("space") + init_label(_("Coordinate space")) + init_description(_("Coordinate space")) + init_value(k3d::identity3())),
 		m_x(init_owner(*this) + init_name("x") + init_label(_("X")) + init_description(_("X offset")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_y(init_owner(*this) + init_name("y") + init_label(_("Y")) + init_description(_("Y offset")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_z(init_owner(*this) + init_name("z") + init_label(_("Z")) + init_description(_("Z offset")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
@@ -56,7 +56,7 @@ public:
 
 	k3d::matrix4 matrix()
 	{
-		k3d::matrix4 result = m_input_matrix.pipeline_value() * m_space.pipeline_value() * translation3D(k3d::vector3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value())) * k3d::inverse(m_space.pipeline_value());
+		k3d::matrix4 result = m_input_matrix.pipeline_value() * m_space.pipeline_value() * translate3(k3d::vector3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value())) * k3d::inverse(m_space.pipeline_value());
 		return result;
 	}
 

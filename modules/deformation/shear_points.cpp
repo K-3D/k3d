@@ -70,7 +70,7 @@ public:
 		const double zx = k3d::Z == direction && k3d::X == axis ? shear_factor : 0;
 		const double zy = k3d::Z == direction && k3d::Y == axis ? shear_factor : 0;
 
-		const k3d::matrix4 transformation = k3d::shearing3D(xy, xz, yx, yz, zx, zy);
+		const k3d::matrix4 transformation = k3d::shear3(xy, xz, yx, yz, zx, zy);
 
 		k3d::parallel::parallel_for(
 			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), k3d::parallel::grain_size()),

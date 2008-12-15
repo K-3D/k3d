@@ -200,7 +200,7 @@ Node::Node(domNode& node, const k3d::matrix4& mat)
 
 k3d::matrix4 Node::getTransformation(domNode& node)
 {
-	k3d::matrix4 result = k3d::identity3D();
+	k3d::matrix4 result = k3d::identity3();
 
 	// Look for Translations
 	domTranslate_Array translate_array = node.getTranslate_array();
@@ -208,7 +208,7 @@ k3d::matrix4 Node::getTransformation(domNode& node)
 	{
 		domTranslate* translate = translate_array[i];
 		domFloat3 trans = translate->getValue();
-		k3d::matrix4 tmp_matrix = k3d::identity3D();
+		k3d::matrix4 tmp_matrix = k3d::identity3();
 		tmp_matrix[0][3] = trans[0];
 		tmp_matrix[1][3] = trans[1];
 		tmp_matrix[2][3] = trans[2];
@@ -221,7 +221,7 @@ k3d::matrix4 Node::getTransformation(domNode& node)
 	{
 		domScale* scale = scale_array[i];
 		domFloat3 sc = scale->getValue();
-		k3d::matrix4 tmp_matrix = k3d::identity3D();
+		k3d::matrix4 tmp_matrix = k3d::identity3();
 		tmp_matrix[0][0] = sc[0];
 		tmp_matrix[1][1] = sc[1];
 		tmp_matrix[2][2] = sc[2];
@@ -234,7 +234,7 @@ k3d::matrix4 Node::getTransformation(domNode& node)
 	{
 		domRotate* rotate = rotate_array[i];
 		domFloat4 rot = rotate->getValue();
-		k3d::matrix4 tmp_matrix = k3d::identity3D();
+		k3d::matrix4 tmp_matrix = k3d::identity3();
 		float c = cos(k3d::radians(rot[3])), s = sin(k3d::radians(rot[3])), C = 1-c;
 		float x = rot[0], y = rot[1], z = rot[2];
 		float xs = x*s, ys = y*s, zs = z*s;
@@ -274,12 +274,12 @@ daeParser::daeParser(domCOLLADA& root, k3d::mesh& Mesh)
 	// so any child nodes will also be converted.
 	domNode_Array& nodes = visualScene->getNode_array();
 	for (size_t i = 0; i < nodes.getCount(); i++)
-		lookup<Node, domNode>(*nodes[i],k3d::identity3D());
+		lookup<Node, domNode>(*nodes[i],k3d::identity3());
 	//k3d::log() << "ASDFASDFASDf" << std::endl;
 	
 	//for (size_t i = 0; i < nodes.getCount(); i++)
-	//	if(!lookup<Node, domNode>(*nodes[i],k3d::identity3D()).meshes.empty()){	
-	//		Mesh = lookup<Node, domNode>(*nodes[i],k3d::identity3D()).meshes.back()->getMesh();
+	//	if(!lookup<Node, domNode>(*nodes[i],k3d::identity3()).meshes.empty()){	
+	//		Mesh = lookup<Node, domNode>(*nodes[i],k3d::identity3()).meshes.back()->getMesh();
 	//		return;
 	//	}
 	
@@ -303,7 +303,7 @@ daeParser::daeParser(domCOLLADA& root, k3d::idocument& Document)
 	// so any child nodes will also be converted.
 	domNode_Array& scene_nodes = visualScene->getNode_array();
 	for (size_t i = 0; i < scene_nodes.getCount(); i++)
-		lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D());
+		lookup<Node, domNode>(*scene_nodes[i],k3d::identity3());
 
 
 	////////////////////////////////////////////////////
@@ -317,23 +317,23 @@ daeParser::daeParser(domCOLLADA& root, k3d::idocument& Document)
 		std::string name;// = "Light";
 		k3d::uuid factory_id;// = k3d::uuid(1,0,0,29);
 
-		if(!lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D()).lights.empty())
+		if(!lookup<Node, domNode>(*scene_nodes[i],k3d::identity3()).lights.empty())
 		{
 			k3d::inode *light_node;
 			light_node = create_light(Document,"COLLADA Light");
 		}
 		else
-		if(!lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D()).cameras.empty())
+		if(!lookup<Node, domNode>(*scene_nodes[i],k3d::identity3()).cameras.empty())
 		{
 			k3d::inode *camera_node;
 			camera_node = create_camera(Document,"COLLADA Camera");
 		}
 		else
-		if(!lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D()).meshes.empty())
+		if(!lookup<Node, domNode>(*scene_nodes[i],k3d::identity3()).meshes.empty())
 		{
 			k3d::mesh *mesh = new k3d::mesh();
 			create_frozen_mesh(Document,"COLLADA Mesh", mesh);
-			*mesh = lookup<Node, domNode>(*scene_nodes[i],k3d::identity3D()).meshes.back()->getMesh();
+			*mesh = lookup<Node, domNode>(*scene_nodes[i],k3d::identity3()).meshes.back()->getMesh();
 			continue;
 		}
 		else

@@ -81,7 +81,7 @@ class snap :
 public:
 	snap(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input_matrix(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3D())),
+		m_input_matrix(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3())),
 		m_output_matrix(init_owner(*this) + init_name("output_matrix") + init_label(_("Output matrix")) + init_description(_("Read only")) + init_slot(sigc::mem_fun(*this, &snap::output_value))),
 		m_source(init_owner(*this) + init_name("source") + init_label(_("Source Node")) + init_description(_("Source Node")) + init_value(static_cast<k3d::isnappable*>(0))),
 		m_snap_source(init_owner(*this) + init_name("snap_source") + init_label(_("Snap Source")) + init_description(_("Snap Source")) + init_value(std::string("-- None --")) + init_values(m_snap_sources)),
@@ -178,17 +178,17 @@ public:
 				k3d::vector3 target_orientation;
 				if(target->target_orientation(source_position, target_orientation))
 				{
-					k3d::matrix4 rotation = k3d::rotation3D(k3d::angle_axis(
+					k3d::matrix4 rotation = k3d::rotate3(k3d::angle_axis(
 						std::acos(k3d::normalize(source_orientation) * k3d::normalize(target_orientation)),
 						source_orientation ^ target_orientation));
 
-					return k3d::translation3D(target_position - source_position) * input_matrix * rotation;
+					return k3d::translate3(target_position - source_position) * input_matrix * rotation;
 				}
 			}
 		}
 */
 
-		return k3d::translation3D(target_position - source_position) * input_matrix;
+		return k3d::translate3(target_position - source_position) * input_matrix;
 	}
 
 	static k3d::iplugin_factory& get_factory()

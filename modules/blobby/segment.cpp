@@ -114,7 +114,7 @@ public:
 		blobby->floats.push_back(z2);
 		blobby->floats.push_back(radius);
 
-		k3d::matrix4 matrix = k3d::transpose(k3d::identity3D());
+		k3d::matrix4 matrix = k3d::transpose(k3d::identity3());
 		blobby->floats.insert(blobby->floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
 
 		varying_colors.push_back(color);

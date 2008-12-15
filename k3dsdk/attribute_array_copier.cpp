@@ -253,7 +253,7 @@ point4 weighted_sum(const typed_array<point4>& Source, const uint_t Count, const
 {
 	point4 result;
 	for(uint_t i = 0; i != Count; ++i)
-		result += Source[Indices[i]] * Weights[i];
+		result += to_vector(Source[Indices[i]] * Weights[i]);
 	return result;
 }
 

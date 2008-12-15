@@ -195,7 +195,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		if(PARENT == current_system_type)
 			return k3d::extract_rotation(k3d::parent_to_world_matrix(*node));
 
-		return k3d::identity3D();
+		return k3d::identity3();
 	}
 
 	void transform_tool::itarget::set_transform_modifier(k3d::inode* Modifier)
@@ -221,8 +221,8 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 				m_system_matrix_inverse[0][3] = m_system_matrix_inverse[1][3] = m_system_matrix_inverse[2][3] = 0;
 				break;
 			case LOCAL:
-				m_system_matrix = k3d::identity3D();
-				m_system_matrix_inverse = k3d::identity3D();
+				m_system_matrix = k3d::identity3();
+				m_system_matrix_inverse = k3d::identity3();
 				break;
 			case PARENT:
 				m_system_matrix = k3d::inverse(k3d::node_to_world_matrix(*node)) * k3d::parent_to_world_matrix(*node);
@@ -263,7 +263,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 	void transform_tool::transform_target::start_move()
 	{
 		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Move "))
-			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3D()));
+			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3()));
 
 		// Setup matrices
 		set_original_matrix();
@@ -276,14 +276,14 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		if(!modifier)
 			start_move();
 
-		const k3d::matrix4 translation = k3d::translation3D(m_system_matrix * Move);
+		const k3d::matrix4 translation = k3d::translate3(m_system_matrix * Move);
 		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * translation));
 	}
 
 	void transform_tool::transform_target::start_rotation()
 	{
 		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Rotate "))
-			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3D()));
+			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3()));
 
 		// Setup matrices
 		set_original_matrix();
@@ -298,14 +298,14 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		
 		k3d::vector3 translation = WorldCenter - m_original_matrix * k3d::point3(0,0,0);
 		
-		const k3d::matrix4 current_coordinate_system_rotation = m_system_matrix * k3d::translation3D(translation) * RotationMatrix * k3d::translation3D(-translation) * m_system_matrix_inverse;
+		const k3d::matrix4 current_coordinate_system_rotation = m_system_matrix * k3d::translate3(translation) * RotationMatrix * k3d::translate3(-translation) * m_system_matrix_inverse;
 		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_rotation));
 	}
 
 	void transform_tool::transform_target::start_scaling()
 	{
 		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Scale "))
-			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3D()));
+			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3()));
 
 		// Setup matrices
 		set_original_matrix();
@@ -320,7 +320,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 		
 		k3d::vector3 translation = WorldCenter - m_original_matrix * k3d::point3(0,0,0);
 
-		const k3d::matrix4 current_coordinate_system_scaling = m_system_matrix * k3d::translation3D(translation) * k3d::scaling3D(Scaling) * k3d::translation3D(-translation) * m_system_matrix_inverse;
+		const k3d::matrix4 current_coordinate_system_scaling = m_system_matrix * k3d::translate3(translation) * k3d::scale3(Scaling[0], Scaling[1], Scaling[2]) * k3d::translate3(-translation) * m_system_matrix_inverse;
 		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_scaling));
 	}
 
@@ -465,7 +465,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 
 		m_drag_mutex = true;
 		
-		const k3d::matrix4 translation = k3d::translation3D(m_system_matrix * Move);
+		const k3d::matrix4 translation = k3d::translate3(m_system_matrix * Move);
 		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * translation));
 
 		// Update manipulators position
@@ -501,7 +501,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 
 		m_drag_mutex = true;
 
-		const k3d::matrix4 current_coordinate_system_scaling = m_system_matrix * k3d::scaling3D(Scaling) * m_system_matrix_inverse;
+		const k3d::matrix4 current_coordinate_system_scaling = m_system_matrix * k3d::scale3(Scaling[0], Scaling[1], Scaling[2]) * m_system_matrix_inverse;
 		assert_warning(k3d::property::set_internal_value(*modifier, "center", k3d::inverse(k3d::node_to_world_matrix(*node))*WorldCenter)); // set center first, so we can ride on the change signal of the matrix
 		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_scaling));
 	}
@@ -1075,7 +1075,7 @@ k3d::matrix4 transform_tool::world_orientation()
 		return t->world_orientation();
 	}
 
-	return k3d::identity3D();
+	return k3d::identity3();
 }
 
 void transform_tool::update_manipulators_scale(viewport::control& Viewport, const k3d::point3& Origin)

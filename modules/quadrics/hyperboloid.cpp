@@ -49,7 +49,7 @@ class hyperboloid :
 public:
 	hyperboloid(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_transformation(init_owner(*this) + init_name("transformation") + init_label(_("Transformation")) + init_description(_("Transformation matrix used to position / orient / scale the output hyperboloid.")) + init_value(k3d::identity3D())),
+		m_transformation(init_owner(*this) + init_name("transformation") + init_label(_("Transformation")) + init_description(_("Transformation matrix used to position / orient / scale the output hyperboloid.")) + init_value(k3d::identity3())),
 		m_start_point(init_owner(*this) + init_name("start_point") + init_label(_("Start Point")) + init_description(_("First point in the swept line segment that defines the output hyperboloid.")) + init_value(k3d::point3(5, -5, -5))),
 		m_end_point(init_owner(*this) + init_name("end_point") + init_label(_("End Point")) + init_description(_("Second point in the swept line segment that defines the output hyperboloid.")) + init_value(k3d::point3(5, 5, 5))),
 		m_sweep_angle(init_owner(*this) + init_name("sweep_angle") + init_label(_("Sweep Angle")) + init_description(_("Optionally limits the sweep angle of the hyperboloid to less-than 360 degrees.")) + init_value(k3d::pi_times_2()) + init_step_increment(k3d::radians(5.0)) + init_units(typeid(k3d::measurement::angle)))

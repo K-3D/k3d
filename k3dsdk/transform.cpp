@@ -46,14 +46,14 @@ namespace detail
 const matrix4 upstream_matrix(inode& Node)
 {
 	itransform_sink* const downstream_sink = dynamic_cast<itransform_sink*>(&Node);
-	return_val_if_fail(downstream_sink, k3d::identity3D());
+	return_val_if_fail(downstream_sink, k3d::identity3());
 
 	iproperty& downstream_input = downstream_sink->transform_sink_input();
 	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
 	if(upstream_output)
 		return boost::any_cast<k3d::matrix4>(upstream_output->property_internal_value());
 		
-	return k3d::identity3D();
+	return k3d::identity3();
 }
 
 inode* upstream_frozen_transformation(inode& Node)
@@ -118,7 +118,7 @@ const matrix4 node_to_world_matrix(iunknown& Node)
 	if(property)
 		return boost::any_cast<matrix4>(property->property_internal_value());
 
-	return identity3D();
+	return identity3();
 }
 
 const matrix4 parent_to_world_matrix(iunknown& Node)
@@ -128,7 +128,7 @@ const matrix4 parent_to_world_matrix(iunknown& Node)
 	if(parent)
 		return node_to_world_matrix(*parent);
 
-	return identity3D();
+	return identity3();
 }
 
 k3d::inode* set_matrix(iunknown& Node, const matrix4& Matrix)

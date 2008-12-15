@@ -205,7 +205,7 @@ namespace io
 
 	k3d::mesh to_k3d_mesh(domGeometry &geom)
 	{
-		intGeometry result(geom,k3d::identity3D());
+		intGeometry result(geom,k3d::identity3());
 		return result.getMesh();
 	}
 

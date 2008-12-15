@@ -46,8 +46,8 @@ class frozen_transformation :
 public:
 	frozen_transformation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3D())),
-		m_matrix(init_owner(*this) + init_name("matrix") + init_label(_("Matrix")) + init_description(_("Transformation matrix")) + init_value(k3d::identity3D())),
+		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3())),
+		m_matrix(init_owner(*this) + init_name("matrix") + init_label(_("Matrix")) + init_description(_("Transformation matrix")) + init_value(k3d::identity3())),
 		m_output(init_owner(*this) + init_name("output_matrix") + init_label(_("Output Matrix")) + init_description(_("Output matrix (read only)")) + init_slot(sigc::mem_fun(*this, &frozen_transformation::output_value)))
 	{
 		m_input.changed_signal().connect(m_output.make_reset_slot());

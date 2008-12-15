@@ -79,7 +79,7 @@ public:
 			for(k3d::uint_t point = point_begin; point != point_end; ++point)
 			{
 				const double twist = input_points[point][axis] / size;
-				output_points[point] = k3d::mix(input_points[point], k3d::rotation3D(angles * twist) * input_points[point], point_selection[point]);
+				output_points[point] = k3d::mix(input_points[point], k3d::rotate3(angles * twist) * input_points[point], point_selection[point]);
 			}
 		}
 

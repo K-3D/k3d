@@ -68,6 +68,8 @@ ADD_LIBRARY(k3dsdk-python-a SHARED
 	vector2_python.h
 	vector3_python.cpp
 	vector3_python.h
+	vector4_python.cpp
+	vector4_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python-a)
 TARGET_LINK_LIBRARIES(k3dsdk-python-a k3dsdk)

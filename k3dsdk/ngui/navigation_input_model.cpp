@@ -445,8 +445,8 @@ struct navigation_input_model::implementation
 		const double deltay = last_ndc[1] - current_ndc[1];
 
 		const k3d::matrix4 matrix =
-			k3d::rotation3D(k3d::angle_axis(sensitivity * direction * deltax, Viewport.get_up_axis())) *
-			k3d::rotation3D(k3d::angle_axis(ysensitivity * sensitivity * direction * deltay, right_vector));
+			k3d::rotate3(k3d::angle_axis(sensitivity * direction * deltax, Viewport.get_up_axis())) *
+			k3d::rotate3(k3d::angle_axis(ysensitivity * sensitivity * direction * deltay, right_vector));
 
 		const k3d::vector3 new_look_vector = matrix * look_vector;
 		const k3d::vector3 new_up_vector = matrix * up_vector;
@@ -484,7 +484,7 @@ struct navigation_input_model::implementation
 		const double theta = current_ndc[0] - last_ndc[0];
 		const double phi = -(current_ndc[1] - last_ndc[1]);
 
-		const k3d::matrix4 matrix = k3d::rotation3D(k3d::angle_axis(theta, up_vector)) * k3d::rotation3D(k3d::angle_axis(phi, right_vector));
+		const k3d::matrix4 matrix = k3d::rotate3(k3d::angle_axis(theta, up_vector)) * k3d::rotate3(k3d::angle_axis(phi, right_vector));
 
 		const k3d::vector3 new_look_vector = matrix * look_vector;
 		const k3d::vector3 new_up_vector = matrix * up_vector;
@@ -521,7 +521,7 @@ struct navigation_input_model::implementation
 		const k3d::point2 last_ndc = ndc(Viewport, m_last_mouse);
 		const double theta = detail::angle(k3d::to_vector(current_ndc)) - detail::angle(k3d::to_vector(last_ndc));
 
-		const k3d::matrix4 roll_matrix = k3d::rotation3D(k3d::angle_axis(-theta, look_vector));
+		const k3d::matrix4 roll_matrix = k3d::rotate3(k3d::angle_axis(-theta, look_vector));
 		const k3d::vector3 new_up_vector = roll_matrix * up_vector;
 		const k3d::vector3 new_right_vector = roll_matrix * right_vector;
 

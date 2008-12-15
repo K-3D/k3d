@@ -19,7 +19,7 @@ for center in ellipsoids:
 	blobby.primitives().append(k3d.blobby.primitive_type.ELLIPSOID)
 	blobby.primitive_first_floats().append(len(blobby.floats()))
 	blobby.primitive_float_counts().append(16)
-	for i in (k3d.translate3(center) * k3d.scale3(1, 1, 1)).column_major_list():
+	for i in (k3d.translate3(center[0], center[1], center[2]) * k3d.scale3(1)).column_major_list():
 		blobby.floats().append(i)
 
 # Add a segment to the blobby ...

@@ -84,7 +84,7 @@ public:
 						k3d::legacy::deep_copy(InputMesh, Mesh);
 
 						// Apply offsets ...
-						const k3d::matrix4 matrix = layout ? layout->get_element(i, count1, j, count2, k, count3) : k3d::identity3D();
+						const k3d::matrix4 matrix = layout ? layout->get_element(i, count1, j, count2, k, count3) : k3d::identity3();
 						for(unsigned long i = first_new_point; i != Mesh.points.size(); ++i)
 							Mesh.points[i]->position = matrix * Mesh.points[i]->position;
 					}

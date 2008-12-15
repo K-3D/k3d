@@ -57,9 +57,9 @@ public:
 		const k3d::angle_axis angle2 = m_angle2.pipeline_value();
 		const k3d::angle_axis angle3 = m_angle3.pipeline_value();
 
-		return k3d::rotation3D(k3d::angle_axis(angle1.angle * Index1, angle1.axis)) *
-			k3d::rotation3D(k3d::angle_axis(angle2.angle * Index2, angle2.axis)) *
-			k3d::rotation3D(k3d::angle_axis(angle3.angle * Index3, angle3.axis));
+		return k3d::rotate3(k3d::angle_axis(angle1.angle * Index1, angle1.axis)) *
+			k3d::rotate3(k3d::angle_axis(angle2.angle * Index2, angle2.axis)) *
+			k3d::rotate3(k3d::angle_axis(angle3.angle * Index3, angle3.axis));
 	}
 
 	static k3d::iplugin_factory& get_factory()

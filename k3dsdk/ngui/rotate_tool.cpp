@@ -223,7 +223,7 @@ public:
 		k3d::gl::store_attributes attributes;
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(Position));
+		k3d::gl::push_matrix(k3d::translate3(k3d::to_vector(Position)));
 
 		glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -239,11 +239,11 @@ public:
 		glPushMatrix();
 		k3d::gl::push_matrix(Orientation);
 		if(!motion || &m_x_constraint == m_current_constraint)
-			draw_handle(m_current_constraint == &m_x_constraint ? m_current_color : m_x_color, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(0, 1, 0)), m_handle_size);
+			draw_handle(m_current_constraint == &m_x_constraint ? m_current_color : m_x_color, k3d::rotate3(k3d::radians(90.0), k3d::vector3(0, 1, 0)), m_handle_size);
 		if(!motion || &m_y_constraint == m_current_constraint)
-			draw_handle(m_current_constraint == &m_y_constraint ? m_current_color : m_y_color, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0)), m_handle_size);
+			draw_handle(m_current_constraint == &m_y_constraint ? m_current_color : m_y_color, k3d::rotate3(k3d::radians(90.0), k3d::vector3(1, 0, 0)), m_handle_size);
 		if(!motion || &m_z_constraint == m_current_constraint)
-			draw_handle(m_current_constraint == &m_z_constraint ? m_current_color : m_z_color, k3d::rotation3D(k3d::radians(0.0), k3d::vector3(1, 0, 0)), m_handle_size);
+			draw_handle(m_current_constraint == &m_z_constraint ? m_current_color : m_z_color, k3d::rotate3(k3d::radians(0.0), k3d::vector3(1, 0, 0)), m_handle_size);
 		glPopMatrix();
 
 		if(!motion || &m_screen_z_constraint == m_current_constraint)
@@ -264,7 +264,7 @@ public:
 		k3d::gl::store_attributes attributes;
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		k3d::gl::push_matrix(k3d::translation3D(Position));
+		k3d::gl::push_matrix(k3d::translate3(k3d::to_vector(Position)));
 
 		glDisable(GL_LIGHTING);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -275,9 +275,9 @@ public:
 		// Draw manipulators
 		glPushMatrix();
 		k3d::gl::push_matrix(Orientation);
-		select_handle(m_x_constraint, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(0, 1, 0)), m_handle_size);
-		select_handle(m_y_constraint, k3d::rotation3D(k3d::radians(90.0), k3d::vector3(1, 0, 0)), m_handle_size);
-		select_handle(m_z_constraint, k3d::rotation3D(k3d::radians(0.0), k3d::vector3(1, 0, 0)), m_handle_size);
+		select_handle(m_x_constraint, k3d::rotate3(k3d::radians(90.0), k3d::vector3(0, 1, 0)), m_handle_size);
+		select_handle(m_y_constraint, k3d::rotate3(k3d::radians(90.0), k3d::vector3(1, 0, 0)), m_handle_size);
+		select_handle(m_z_constraint, k3d::rotate3(k3d::radians(0.0), k3d::vector3(1, 0, 0)), m_handle_size);
 		glPopMatrix();
 
 		k3d::matrix4 screen_matrix = k3d::node_to_world_matrix(*Viewport.camera());
@@ -796,7 +796,7 @@ void rotate_tool::on_rotate(k3d::iunknown*)
 	if(m_mutex)
 		return;
 
-	rotate_targets(k3d::rotation3D(m_rotation.internal_value()));
+	rotate_targets(k3d::rotate3(m_rotation.internal_value()));
 }
 
 } // namespace libk3dngui
