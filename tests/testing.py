@@ -115,6 +115,8 @@ def setup_mesh_reader_test(reader_name, source_file):
 	doc = k3d.new_document()
 	reader = doc.new_node(reader_name)
 	reader.file = k3d.generic_path(source_path() + "/meshes/" + source_file)
+	reader.center = False
+	reader.scale_to_size = False
 
 	class result_object:
 		pass
@@ -288,6 +290,8 @@ def mesh_comparison_to_reference(document, input_mesh, reference_mesh_name, thre
 	document.set_dependency(mesh_writer.get_property("input_mesh"), input_mesh)
 
 	reference = document.new_node("K3DMeshReader")
+	reference.center = False
+	reference.scale_to_size = False
 
 	difference = get_mesh_difference(document, input_mesh, reference.get_property("output_mesh"), threshold)
 

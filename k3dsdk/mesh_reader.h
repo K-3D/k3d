@@ -30,7 +30,9 @@
 #include "ipipeline_profiler.h"
 #include "imesh_source.h"
 #include "imesh_storage.h"
+#include "measurement.h"
 #include "mesh.h"
+#include "mesh_operations.h"
 #include "node.h"
 #include "pointer_demand_storage.h"
 
@@ -67,16 +69,31 @@ protected:
 	mesh_reader(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file path.")) + init_value(filesystem::path()) + init_path_mode(ipath_property::READ) + init_path_type("")),
+		m_center(init_owner(*this) + init_name("center") + init_label(_("Center on Origin")) + init_description(_("Center the output mesh around the origin.")) + init_value(true)),
+		m_scale_to_size(init_owner(*this) + init_name("scale_to_size") + init_label(_("Scale to Size")) + init_description(_("Scale the output mesh to fit within a fixed-size bounding-box.")) + init_value(true)),
+		m_size(init_owner(*this) + init_name("size") + init_label(_("Size")) + init_description(_("Output mesh size when \"Scale to Size\" is enabled.")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(measurement::distance))),
 		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description("Output mesh"))
 	{
 		m_file.changed_signal().connect(hint::converter<
+			hint::convert<hint::any, hint::none> >(make_reload_mesh_slot()));
+		m_center.changed_signal().connect(hint::converter<
+			hint::convert<hint::any, hint::none> >(make_reload_mesh_slot()));
+		m_scale_to_size.changed_signal().connect(hint::converter<
+			hint::convert<hint::any, hint::none> >(make_reload_mesh_slot()));
+		m_size.changed_signal().connect(hint::converter<
 			hint::convert<hint::any, hint::none> >(make_reload_mesh_slot()));
 
 		m_output_mesh.set_update_slot(sigc::mem_fun(*this, &mesh_reader<base_t>::execute));
 	}
 
-	/// Stores the input file path
+	/// Stores the input file path.
 	k3d_data(filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
+	/// Center the output mesh on the origin.
+	k3d_data(bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_center;
+	/// Scale the output mesh to fit within a fixed-size bounding-box.
+	k3d_data(bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_scale_to_size;
+	/// Stores the size of the bounding-box used with m_scale_to_size.
+	k3d_data(double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_size;
 	/// Stores the output mesh, which is created / updated on-demand.
 	k3d_data(mesh*, immutable_name, change_signal, no_undo, pointer_demand_storage, no_constraint, read_only_property, no_serialization) m_output_mesh;
 
@@ -103,6 +120,43 @@ private:
 		base_t::document().pipeline_profiler().start_execution(*this, "Load Mesh");
 		on_load_mesh(path, Mesh);
 		base_t::document().pipeline_profiler().finish_execution(*this, "Load Mesh");
+
+		base_t::document().pipeline_profiler().start_execution(*this, "Transform Mesh");
+
+		if(Mesh.points)
+		{
+			const bool_t center = m_center.pipeline_value();
+			const bool_t scale_to_size = m_scale_to_size.pipeline_value();
+
+			bounding_box3 bounding_box;
+			matrix4 transformation = identity3();
+
+			mesh::points_t& output_points = Mesh.points.writable();
+			if(center || scale_to_size)
+				bounding_box = bounds(output_points);
+
+			if(center)
+			{
+				transformation = transformation * translate3(vector3(
+					-0.5 * (bounding_box.px + bounding_box.nx),
+					-0.5 * (bounding_box.py + bounding_box.ny),
+					-0.5 * (bounding_box.pz + bounding_box.nz)));
+			}
+
+			if(scale_to_size)
+			{
+				const double_t current_size = std::max(bounding_box.width(), std::max(bounding_box.height(), bounding_box.depth()));
+				if(current_size)
+					transformation = scale3(m_size.pipeline_value() / current_size) * transformation;
+			}
+
+			const uint_t point_begin = 0;
+			const uint_t point_end = output_points.size();
+			for(uint_t point = point_begin; point != point_end; ++point)
+				output_points[point] = transformation * output_points[point];
+		}
+
+		base_t::document().pipeline_profiler().finish_execution(*this, "Transform Mesh");
 	}
 
 
