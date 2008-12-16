@@ -6,8 +6,9 @@ import testing
 document = k3d.new_document()
 
 reader = document.new_node("K3DMeshReader")
-
 reader.file = k3d.generic_path(testing.source_path() + "/meshes/testmesh.polyhedra.k3d")
+reader.center = False
+reader.scale_to_size = False
 
 script_path = testing.source_path() + "/../share/scripts/MeshModifierScript/random_face_varying_colors.py"
 script_file = open(script_path, "r")

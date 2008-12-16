@@ -19,6 +19,8 @@ doc.set_dependency(writer.get_property("input_mesh"), source.get_property("outpu
 # Read the geometry back in ...
 reader = doc.new_node("OBJMeshReader")
 reader.file = file
+reader.center = False
+reader.scale_to_size = False
 
 # Compare the original to the imported data ...
 
