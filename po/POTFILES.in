@@ -1,6 +1,5 @@
 application/k3d_main.cpp
 application/main.cpp
-bug-buddy/main.cpp
 k3dsdk/bitmap_modifier.h
 k3dsdk/bitmap_sink.h
 k3dsdk/bitmap_source.h
@@ -13,6 +12,8 @@ k3dsdk/legacy_mesh_source.h
 k3dsdk/material_sink.h
 k3dsdk/mesh_modifier.h
 k3dsdk/mesh_painter_gl.h
+k3dsdk/mesh_reader.h
+k3dsdk/mesh_selection_modifier.h
 k3dsdk/mesh_selection_sink.h
 k3dsdk/mesh_sink.h
 k3dsdk/mesh_source.h
@@ -111,7 +112,6 @@ modules/blobby/minimum.cpp
 modules/blobby/multiply.cpp
 modules/blobby/negate.cpp
 modules/blobby/points_to_blobby.cpp
-modules/blobby/polygonize_blobbies.cpp
 modules/blobby/segment.cpp
 modules/blobby/subtract.cpp
 modules/bundled_renderman_engines/aqsis.cpp
@@ -185,10 +185,10 @@ modules/imagemagick_io/bitmap_importer.cpp
 modules/jpeg_io/bitmap_importer.cpp
 modules/jpeg_io/bitmap_reader.cpp
 modules/jpeg_io/bitmap_writer.cpp
-modules/k3d_io/k3d_document_exporter.cpp
-modules/k3d_io/k3d_document_importer.cpp
-modules/k3d_io/k3d_mesh_reader.cpp
-modules/k3d_io/k3d_mesh_writer.cpp
+modules/k3d_io/document_exporter.cpp
+modules/k3d_io/document_importer.cpp
+modules/k3d_io/mesh_reader.cpp
+modules/k3d_io/mesh_writer.cpp
 modules/k3dscript/engine.cpp
 modules/linear_curve/knot_curve.cpp
 modules/linear_curve/lissajous_curve.cpp
@@ -233,6 +233,7 @@ modules/ngui_knot_vector_control/control.cpp
 modules/ngui_learning/dialog.cpp
 modules/ngui_log/dialog.cpp
 modules/ngui_material_manager_panel/panel.cpp
+modules/ngui_mesh_control/control.cpp
 modules/ngui_morph_points_page/page.cpp
 modules/ngui_node_history_panel/panel.cpp
 modules/ngui_node_list_panel/panel.cpp
@@ -463,10 +464,12 @@ modules/scripting/transform_modifier_script.cpp
 modules/scripting/transform_source_script.cpp
 modules/scripting/vector3_source_script.cpp
 modules/selection/grow_selection.cpp
+modules/selection/mesh_selection.cpp
 modules/selection/node_selection.cpp
 modules/selection/select_bicubic_patch_by_number.cpp
 modules/selection/select_bilinear_patch_by_number.cpp
 modules/selection/select_clockwise.cpp
+modules/selection/select_companion.cpp
 modules/selection/select_cube.cpp
 modules/selection/select_cubic_curve_by_number.cpp
 modules/selection/select_edge_by_number.cpp
@@ -521,4 +524,3 @@ share/scripts/scripted_plugins/ogre_exporter.py
 uimodules/ngui/splash_box.cpp
 uimodules/ngui/user_interface.cpp
 uimodules/qtui/user_interface.cpp
-modules/selection/select_companion.cpp
