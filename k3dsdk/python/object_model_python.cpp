@@ -24,6 +24,7 @@
 #include "angle_axis_python.h"
 #include "any_python.h"
 #include "attribute_arrays_python.h"
+#include "bezier_triangle_patch_python.h"
 #include "bicubic_patch_python.h"
 #include "bilinear_patch_python.h"
 #include "bitmap_python.h"
@@ -438,6 +439,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_vector2();
 	define_class_vector3();
 	define_class_vector4();
+	define_namespace_bezier_triangle_patch();
 	define_namespace_bicubic_patch();
 	define_namespace_bilinear_patch();
 	define_namespace_blobby();

@@ -109,6 +109,7 @@ const k3d::gl::selection_state select_faces(bool Backfacing)
 	result.select_bilinear_patches = true;
 	result.select_bicubic_patches = true;
 	result.select_nurbs_patches = true;
+	result.select_bezier_triangle_patches = true;
 	result.select_backfacing = Backfacing;
 
 	return result;
@@ -128,6 +129,7 @@ const k3d::gl::selection_state select_nodes()
 	result.select_bilinear_patches = true;
 	result.select_bicubic_patches = true;
 	result.select_nurbs_patches = true;
+	result.select_bezier_triangle_patches = true;
 	result.select_blobbies = true;
 	result.select_backfacing = true;
 
@@ -825,6 +827,7 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	selection_state.select_bilinear_patches = true;
 	selection_state.select_bicubic_patches = true;
 	selection_state.select_nurbs_patches = true;
+	selection_state.select_bezier_triangle_patches = true;
 	selection_state.select_backfacing = Backfacing;
 
 	const double sensitivity = 5;

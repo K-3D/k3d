@@ -46,6 +46,7 @@ public:
 		select_bilinear_patches(false),
 		select_bicubic_patches(false),
 		select_nurbs_patches(false),
+		select_bezier_triangle_patches(false),
 		select_blobbies(false),
 		select_backfacing(false)
 	{
@@ -62,6 +63,7 @@ public:
 	bool select_bilinear_patches;
 	bool select_bicubic_patches;
 	bool select_nurbs_patches;
+	bool select_bezier_triangle_patches;
 	bool select_blobbies;
 	bool select_backfacing;
 };

@@ -56,6 +56,12 @@ inline void push_matrix(const matrix4& Matrix)
 	glMultMatrixd(glmatrix);
 }
 
+/// Passes a k3d::point4 to glVertex4d()
+inline void vertex4d(const point4& Vertex)
+{
+	glVertex4d(Vertex.n[0], Vertex.n[1], Vertex.n[2], Vertex.n[3]);
+}
+
 /// Passes a k3d::point3 to glVertex3d()
 inline void vertex3d(const point3& Vertex)
 {

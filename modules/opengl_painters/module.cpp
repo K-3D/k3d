@@ -32,6 +32,7 @@ namespace opengl
 namespace painters
 {
 
+extern k3d::iplugin_factory& bezier_triangle_patch_painter_factory();
 extern k3d::iplugin_factory& bicubic_patch_painter_factory();
 extern k3d::iplugin_factory& bilinear_patch_painter_factory();
 extern k3d::iplugin_factory& blobby_point_painter_factory();
@@ -83,6 +84,7 @@ extern k3d::iplugin_factory& vertex_data_painter_factory();
 } // namespace module
 
 K3D_MODULE_START(Registry)
+	Registry.register_factory(module::opengl::painters::bezier_triangle_patch_painter_factory());
 	Registry.register_factory(module::opengl::painters::bicubic_patch_painter_factory());
 	Registry.register_factory(module::opengl::painters::bilinear_patch_painter_factory());
 	Registry.register_factory(module::opengl::painters::blobby_point_painter_factory());

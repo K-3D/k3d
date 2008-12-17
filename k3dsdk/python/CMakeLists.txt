@@ -151,6 +151,8 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk-python-a)
 TARGET_LINK_LIBRARIES(k3dsdk-python-d k3dsdk-python-b)
 
 ADD_LIBRARY(k3dsdk-python-primitives SHARED
+	bezier_triangle_patch_python.cpp
+	bezier_triangle_patch_python.h
 	bicubic_patch_python.cpp
 	bicubic_patch_python.h
 	bilinear_patch_python.cpp

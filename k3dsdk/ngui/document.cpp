@@ -217,6 +217,7 @@ void setup_opengl_document(k3d::idocument& Document)
 	return_if_fail(k3d::plugin::factory::lookup("OpenGLMultiPainter"));
 	return_if_fail(k3d::plugin::factory::lookup("OpenGLNURBSCurvePainter"));
 	return_if_fail(k3d::plugin::factory::lookup("OpenGLNURBSPatchPainter"));
+	return_if_fail(k3d::plugin::factory::lookup("OpenGLBezierTrianglePatchPainter"));
 	return_if_fail(k3d::plugin::factory::lookup("VirtualOpenGLEdgePainter"));
 	return_if_fail(k3d::plugin::factory::lookup("VirtualOpenGLFacePainter"));
 	return_if_fail(k3d::plugin::factory::lookup("VirtualOpenGLPointPainter"));
@@ -241,6 +242,7 @@ void setup_opengl_document(k3d::idocument& Document)
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "bilinear_patches", "Bilinear Patches", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLBilinearPatchPainter", Document, "GL Bilinear Patch Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "bicubic_patches", "Bicubic Patches", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLBicubicPatchPainter", Document, "GL Bicubic Patch Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "nurbs_patches", "NURBS Patches", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLNURBSPatchPainter", Document, "GL NURBS Patch Painter"));
+	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "bezier_triangle_patches", "Bezier Triangle Patches", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLBezierTrianglePatchPainter", Document, "GL Bezier Triangle Patch Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "blobbies", "Blobbies", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLBlobbyPointPainter", Document, "GL Blobby Point Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "face_normals", "Face Normals", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLFaceNormalPainter", Document, "GL Face Normal Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "face_orientation", "Face Orientation", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLFaceOrientationPainter", Document, "GL Face Orientation Painter"));

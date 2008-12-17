@@ -71,6 +71,33 @@ inline double factorial(double N)
 	return result;
 }
 
+/// Computes an integer power of a base via successive squaring
+template <typename Type>
+Type fast_pow(Type base, int exponent)
+{
+	bool invert = exponent < 0;
+	if (invert)
+		exponent = -exponent;
+
+	// loop invariant: prod * base^exponent
+	Type prod = Type(1);
+	while (exponent > 0) {
+		if (exponent % 2 == 0) {
+			base *= base;
+			exponent /= 2;
+		}
+		else {
+			prod *= base;
+			--exponent;
+		}
+	}
+
+	if (invert)
+		prod = Type(1) / prod;
+
+	return prod;
+}
+
 /// Returns the sign of an argument: -1 if negative, 0 if zero, +1 if positive
 template<class type> double sign(const type& Arg)
 {
