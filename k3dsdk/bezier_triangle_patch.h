@@ -38,22 +38,22 @@ class const_primitive
 public:
 	const_primitive(
 		const mesh::indices_t& PatchFirstPoints,
+		const mesh::orders_t& PatchOrders,
 		const mesh::selection_t& PatchSelections,
 		const mesh::materials_t& PatchMaterials,
 		const mesh::indices_t& PatchPoints,
-		const mesh::weights_t& PatchWeights,
-		const mesh::orders_t& PatchOrders,
+		const mesh::weights_t& PatchPointWeights,
 		const mesh::attribute_arrays_t& ConstantData,
 		const mesh::attribute_arrays_t& UniformData,
 		const mesh::attribute_arrays_t& VaryingData
 		);
 
 	const mesh::indices_t& patch_first_points;
+	const mesh::orders_t& patch_orders;
 	const mesh::selection_t& patch_selections;
 	const mesh::materials_t& patch_materials;
 	const mesh::indices_t& patch_points;
-	const mesh::weights_t& patch_weights;
-	const mesh::orders_t& patch_orders;
+	const mesh::weights_t& patch_point_weights;
 	const mesh::attribute_arrays_t& constant_data;
 	const mesh::attribute_arrays_t& uniform_data;
 	const mesh::attribute_arrays_t& varying_data;
@@ -65,22 +65,22 @@ class primitive
 public:
 	primitive(
 		mesh::indices_t& PatchFirstPoints,
+		mesh::orders_t& PatchOrders,
 		mesh::selection_t& PatchSelections,
 		mesh::materials_t& PatchMaterials,
 		mesh::indices_t& PatchPoints,
-		mesh::weights_t& PatchWeights,
-		mesh::orders_t& PatchOrders,
+		mesh::weights_t& PatchPointWeights,
 		mesh::attribute_arrays_t& ConstantData,
 		mesh::attribute_arrays_t& UniformData,
 		mesh::attribute_arrays_t& VaryingData
 		);
 
 	mesh::indices_t& patch_first_points;
+	mesh::orders_t& patch_orders;
 	mesh::selection_t& patch_selections;
 	mesh::materials_t& patch_materials;
 	mesh::indices_t& patch_points;
-	mesh::weights_t& patch_weights;
-	mesh::orders_t& patch_orders;
+	mesh::weights_t& patch_point_weights;
 	mesh::attribute_arrays_t& constant_data;
 	mesh::attribute_arrays_t& uniform_data;
 	mesh::attribute_arrays_t& varying_data;

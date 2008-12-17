@@ -43,11 +43,11 @@ public:
 		typedef owned_instance_wrapper<k3d::bezier_triangle_patch::const_primitive> wrapper;
 
 		static object patch_first_points(wrapper& Self) { return wrap(Self.wrapped().patch_first_points); }
+		static object patch_orders(wrapper& Self) { return wrap(Self.wrapped().patch_orders); }
 		static object patch_selections(wrapper& Self) { return wrap(Self.wrapped().patch_selections); }
 		static object patch_materials(wrapper& Self) { return wrap(Self.wrapped().patch_materials); }
 		static object patch_points(wrapper& Self) { return wrap(Self.wrapped().patch_points); }
-		static object patch_weights(wrapper& Self) { return wrap(Self.wrapped().patch_weights); }
-		static object patch_orders(wrapper& Self) { return wrap(Self.wrapped().patch_orders); }
+		static object patch_point_weights(wrapper& Self) { return wrap(Self.wrapped().patch_point_weights); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -59,11 +59,11 @@ public:
 		typedef owned_instance_wrapper<k3d::bezier_triangle_patch::primitive> wrapper;
 
 		static object patch_first_points(wrapper& Self) { return wrap(Self.wrapped().patch_first_points); }
+		static object patch_orders(wrapper& Self) { return wrap(Self.wrapped().patch_orders); }
 		static object patch_selections(wrapper& Self) { return wrap(Self.wrapped().patch_selections); }
 		static object patch_materials(wrapper& Self) { return wrap(Self.wrapped().patch_materials); }
 		static object patch_points(wrapper& Self) { return wrap(Self.wrapped().patch_points); }
-		static object patch_weights(wrapper& Self) { return wrap(Self.wrapped().patch_weights); }
-		static object patch_orders(wrapper& Self) { return wrap(Self.wrapped().patch_orders); }
+		static object patch_point_weights(wrapper& Self) { return wrap(Self.wrapped().patch_point_weights); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -98,11 +98,11 @@ void define_namespace_bezier_triangle_patch()
 
 	class_<bezier_triangle_patch::const_primitive::wrapper>("const_primitive", no_init)
 		.def("patch_first_points", &bezier_triangle_patch::const_primitive::patch_first_points)
+		.def("patch_orders", &bezier_triangle_patch::const_primitive::patch_orders)
 		.def("patch_selections", &bezier_triangle_patch::const_primitive::patch_selections)
 		.def("patch_materials", &bezier_triangle_patch::const_primitive::patch_materials)
 		.def("patch_points", &bezier_triangle_patch::const_primitive::patch_points)
-		.def("patch_weights", &bezier_triangle_patch::const_primitive::patch_weights)
-		.def("patch_orders", &bezier_triangle_patch::const_primitive::patch_orders)
+		.def("patch_point_weights", &bezier_triangle_patch::const_primitive::patch_point_weights)
 		.def("constant_data", &bezier_triangle_patch::const_primitive::constant_data)
 		.def("uniform_data", &bezier_triangle_patch::const_primitive::uniform_data)
 		.def("varying_data", &bezier_triangle_patch::const_primitive::varying_data)
@@ -110,11 +110,11 @@ void define_namespace_bezier_triangle_patch()
 
 	class_<bezier_triangle_patch::primitive::wrapper>("primitive", no_init)
 		.def("patch_first_points", &bezier_triangle_patch::primitive::patch_first_points)
+		.def("patch_orders", &bezier_triangle_patch::primitive::patch_orders)
 		.def("patch_selections", &bezier_triangle_patch::primitive::patch_selections)
 		.def("patch_materials", &bezier_triangle_patch::primitive::patch_materials)
 		.def("patch_points", &bezier_triangle_patch::primitive::patch_points)
-		.def("patch_weights", &bezier_triangle_patch::primitive::patch_weights)
-		.def("patch_orders", &bezier_triangle_patch::primitive::patch_orders)
+		.def("patch_point_weights", &bezier_triangle_patch::primitive::patch_point_weights)
 		.def("constant_data", &bezier_triangle_patch::primitive::constant_data)
 		.def("uniform_data", &bezier_triangle_patch::primitive::uniform_data)
 		.def("varying_data", &bezier_triangle_patch::primitive::varying_data)

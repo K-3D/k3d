@@ -258,9 +258,9 @@ private:
 				continue;
 
 			const k3d::mesh::indices_t& patch_first_points = bezier_triangle_patch->patch_first_points;
-			const k3d::mesh::indices_t& patch_points = bezier_triangle_patch->patch_points;
-			const k3d::mesh::weights_t& patch_weights = bezier_triangle_patch->patch_weights;
 			const k3d::mesh::orders_t& patch_orders = bezier_triangle_patch->patch_orders;
+			const k3d::mesh::indices_t& patch_points = bezier_triangle_patch->patch_points;
+			const k3d::mesh::weights_t& patch_point_weights = bezier_triangle_patch->patch_point_weights;
 			const k3d::mesh::points_t& points = *Mesh.points;
 
 			const k3d::uint_t num_patches = patch_orders.size();
@@ -301,7 +301,7 @@ private:
 
 				for(k3d::uint_t point = point_begin; point < point_end; ++point)
 				{
-					const k3d::double_t weight = patch_weights[point];
+					const k3d::double_t weight = patch_point_weights[point];
 					bezier_control_points.push_back(k3d::point4(
 						weight * points[patch_points[point]][0],
 						weight * points[patch_points[point]][1],

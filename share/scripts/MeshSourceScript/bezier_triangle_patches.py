@@ -13,14 +13,14 @@ patches = k3d.bezier_triangle_patch.create(Output)
 # We will create two identical bezier triangle patches ...
 for i in range(2):
 	patches.patch_first_points().append(len(points))
+	patches.patch_orders().append(5)
 	patches.patch_selections().append(0)
 	patches.patch_materials().append(None)
-	patches.patch_orders().append(5)
 
 	# Assign patch_points and patch_weights here ...
 	#for j in range(something_or_other):
 	#	patches.patch_points().append(len(points) + j)
-	#	patches.patch_weights().append(1)
+	#	patches.patch_point_weights().append(1)
 
 	#positions = [
 	#	(-5, -5, 0), (-2, -5, 2), (2, -5, -2), (5, -5, 0),
