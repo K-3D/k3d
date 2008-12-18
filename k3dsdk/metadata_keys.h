@@ -44,6 +44,10 @@ const string_t copyright();
 /// It is commonly used with generic mesh primitives to specify that one array contains indices into another.
 const string_t domain();
 
+/// Metadata key "k3d:selection-component" is used to identify mesh arrays that hold selection values.  The
+/// key value will be a selection type from the k3d::selection::type enumeration.
+const string_t selection_component();
+
 } // namespace key
 
 namespace value

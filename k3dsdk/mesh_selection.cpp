@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,10 +18,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include "mesh.h"
+#include "metadata_keys.h"
 #include "legacy_mesh.h"
 #include "log.h"
 #include "mesh_selection.h"
@@ -33,6 +34,44 @@ namespace k3d
 namespace detail
 {
 
+class merge_generic_selection
+{
+public:
+	merge_generic_selection(const mesh_selection::component& Component) :
+		component(Component),
+		selection_component(string_cast(Component.type))
+	{
+	}
+
+	void operator()(const string_t& Name, pipeline_data<array>& Array)
+	{
+		if(Array->get_metadata_value(metadata::key::selection_component()) != selection_component)
+			return;
+
+		typed_array<double_t>* const array = dynamic_cast<typed_array<double_t>*>(&Array.writable());
+		if(!array)
+		{
+			log() << error << "unexpected type for array [" << Name << "] with k3d:selection-component = " << selection_component << std::endl;
+			return;
+		}
+
+		const uint_t range_begin = 0;
+		const uint_t range_end = component.index_begin.size();
+		for(uint_t range = range_begin; range != range_end; ++range)
+		{
+			std::fill(
+				array->begin() + std::min(array->size(), component.index_begin[range]),
+				array->begin() + std::min(array->size(), component.index_end[range]),
+				component.weight[range]);
+		}
+	}
+
+private:
+	const mesh_selection::component& component;
+	const string_t selection_component;
+};
+
+/** \deprecated */
 void store_selection(const pipeline_data<mesh::selection_t>& Selection, mesh_selection::records_t& Records)
 {
 	if(!Selection)
@@ -46,41 +85,11 @@ void store_selection(const pipeline_data<mesh::selection_t>& Selection, mesh_sel
 		Records.push_back(mesh_selection::record(selection, selection+1, selection_weight[selection]));
 }
 
-void merge_selection(const mesh_selection::records_t& Records, mesh::selection_t& Selection)
-{
-	const uint_t selection_count = Selection.size();
-
-	for(mesh_selection::records_t::const_iterator record = Records.begin(); record != Records.end(); ++record)
-	{
-		if(record->begin >= selection_count)
-			break;
-
-		mesh::selection_t::iterator begin = Selection.begin() + record->begin;
-		mesh::selection_t::iterator end = Selection.begin() + std::min(selection_count, record->end);
-		std::fill(begin, end, record->weight);
-	}
-}
-
-template<typename gprims_type>
-void merge_selection(const mesh_selection::records_t& Records, const gprims_type& GPrims, pipeline_data<mesh::selection_t>& Selection)
-{
-	return_if_fail(GPrims);
-
-	const uint_t gprim_count = GPrims->size();
-
-	if(!Selection || Selection->size() != gprim_count)
-		Selection.create(new mesh::selection_t(gprim_count));
-
-	mesh::selection_t& selection = Selection.writable();
-
-	detail::merge_selection(Records, selection);
-}
-
-/// Stores mesh component selection data in the given collection of selection records
-class store_selection_helper
+/** \deprecated */
+class legacy_store_selection
 {
 public:
-	store_selection_helper(mesh_selection::records_t& Records) :
+	legacy_store_selection(mesh_selection::records_t& Records) :
 		records(Records),
 		index(0)
 	{
@@ -99,11 +108,43 @@ private:
 	uint_t index;
 };
 
-/// Updates mesh components using stored selection data.  Note: if selection data doesn't exist for a given component, leaves it alone
-class merge_selection_helper
+/** \deprecated */
+void merge_selection(const mesh_selection::records_t& Records, mesh::selection_t& Selection)
+{
+	const uint_t selection_count = Selection.size();
+
+	for(mesh_selection::records_t::const_iterator record = Records.begin(); record != Records.end(); ++record)
+	{
+		if(record->begin >= selection_count)
+			break;
+
+		mesh::selection_t::iterator begin = Selection.begin() + record->begin;
+		mesh::selection_t::iterator end = Selection.begin() + std::min(selection_count, record->end);
+		std::fill(begin, end, record->weight);
+	}
+}
+
+/** \deprecated */
+template<typename gprims_type>
+void merge_selection(const mesh_selection::records_t& Records, const gprims_type& GPrims, pipeline_data<mesh::selection_t>& Selection)
+{
+	return_if_fail(GPrims);
+
+	const uint_t gprim_count = GPrims->size();
+
+	if(!Selection || Selection->size() != gprim_count)
+		Selection.create(new mesh::selection_t(gprim_count));
+
+	mesh::selection_t& selection = Selection.writable();
+
+	detail::merge_selection(Records, selection);
+}
+
+/** \deprecated */
+class legacy_merge_selection
 {
 public:
-	merge_selection_helper(const mesh_selection::records_t& Records) :
+	legacy_merge_selection(const mesh_selection::records_t& Records) :
 		records(Records),
 		current_record(Records.begin()),
 		end_record(Records.end()),
@@ -222,9 +263,9 @@ void mesh_selection::store(const legacy::mesh& Mesh, mesh_selection& Selection)
 {
 	Selection.clear();
 
-	std::for_each(Mesh.points.begin(), Mesh.points.end(), detail::store_selection_helper(Selection.points));
+	std::for_each(Mesh.points.begin(), Mesh.points.end(), detail::legacy_store_selection(Selection.points));
 
-	detail::store_selection_helper store_edge_selection(Selection.edges);
+	detail::legacy_store_selection store_edge_selection(Selection.edges);
 	for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 	{
 		for(legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
@@ -239,15 +280,15 @@ void mesh_selection::store(const legacy::mesh& Mesh, mesh_selection& Selection)
 		}
 	}
 
-	detail::store_selection_helper store_face_selection(Selection.faces);
+	detail::legacy_store_selection store_face_selection(Selection.faces);
 	for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 		std::for_each((*polyhedron)->faces.begin(), (*polyhedron)->faces.end(), store_face_selection);
 
-	detail::store_selection_helper store_nurbs_curve_selection(Selection.nurbs_curves);
+	detail::legacy_store_selection store_nurbs_curve_selection(Selection.nurbs_curves);
 	for(legacy::mesh::nucurve_groups_t::const_iterator group = Mesh.nucurve_groups.begin(); group != Mesh.nucurve_groups.end(); ++group)
 		std::for_each((*group)->curves.begin(), (*group)->curves.end(), store_nurbs_curve_selection);
 
-	std::for_each(Mesh.nupatches.begin(), Mesh.nupatches.end(), detail::store_selection_helper(Selection.nurbs_patches));
+	std::for_each(Mesh.nupatches.begin(), Mesh.nupatches.end(), detail::legacy_store_selection(Selection.nurbs_patches));
 }
 
 void mesh_selection::merge(const mesh_selection& Selection, mesh& Mesh)
@@ -280,6 +321,13 @@ void mesh_selection::merge(const mesh_selection& Selection, mesh& Mesh)
 	}
 
 	// Handle generic mesh primitives ...
+	for(components_t::const_iterator component = Selection.components.begin(); component != Selection.components.end(); ++component)
+	{
+		const uint_t primitive_begin = std::min(Mesh.primitives.size(), component->primitive_begin);
+		const uint_t primitive_end = std::min(Mesh.primitives.size(), component->primitive_end);
+		for(uint_t primitive = primitive_begin; primitive != primitive_end; ++primitive)
+			mesh::visit_arrays(Mesh.primitives[primitive].writable(), detail::merge_generic_selection(*component));
+	}
 }
 
 void mesh_selection::merge(const mesh_selection::records_t& Records, mesh::selection_t& Selection)
@@ -296,9 +344,9 @@ void mesh_selection::merge(const mesh_selection& Selection, legacy::mesh& Mesh)
 	if(Selection.empty())
 		return;
 
-	k3d::legacy::for_each_point(Mesh, detail::merge_selection_helper(Selection.points));
+	k3d::legacy::for_each_point(Mesh, detail::legacy_merge_selection(Selection.points));
 
-	detail::merge_selection_helper replace_edge_selection(Selection.edges);
+	detail::legacy_merge_selection replace_edge_selection(Selection.edges);
 	for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 	{
 		for(legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
@@ -324,9 +372,9 @@ void mesh_selection::merge(const mesh_selection& Selection, legacy::mesh& Mesh)
 		}
 	}
 
-	k3d::legacy::for_each_face(Mesh, detail::merge_selection_helper(Selection.faces));
-	k3d::legacy::for_each_nucurve(Mesh, detail::merge_selection_helper(Selection.nurbs_curves));
-	k3d::legacy::for_each_nupatch(Mesh, detail::merge_selection_helper(Selection.nurbs_patches));
+	k3d::legacy::for_each_face(Mesh, detail::legacy_merge_selection(Selection.faces));
+	k3d::legacy::for_each_nucurve(Mesh, detail::legacy_merge_selection(Selection.nurbs_curves));
+	k3d::legacy::for_each_nupatch(Mesh, detail::legacy_merge_selection(Selection.nurbs_patches));
 }
 
 void mesh_selection::add_component(const component& Component)

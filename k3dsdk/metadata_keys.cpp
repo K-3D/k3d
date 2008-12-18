@@ -47,6 +47,11 @@ const string_t domain()
 	return "k3d:domain";
 }
 
+const string_t selection_component()
+{
+	return "k3d:selection-component";
+}
+
 } // namespace key
 
 namespace value
