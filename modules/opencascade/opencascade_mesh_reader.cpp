@@ -24,8 +24,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/gprim_factory.h>
-#include <k3dsdk/imesh_storage.h>
-#include <k3dsdk/mesh_source.h>
+#include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/path.h>
 
@@ -55,51 +54,13 @@ namespace detail
 	}
 }
 
-class opencascade_mesh_reader_implementation :
-	public k3d::mesh_source<k3d::node >,
-	public k3d::imesh_storage
+class opencascade_mesh_reader_implementation : public k3d::mesh_reader<k3d::node>
 {
-	typedef k3d::mesh_source<k3d::node > base;
-
+	typedef k3d::mesh_reader<k3d::node> base;
 public:
 	opencascade_mesh_reader_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("dxf_files"))
-	{
-		m_file.changed_signal().connect(make_topology_changed_slot());
-	}
-	
-	void reset_mesh(k3d::mesh* const Mesh)
-	{
-		m_output_mesh.reset(Mesh);
-	}
-	
-	void on_create_mesh_topology(k3d::mesh& Mesh)
-	{
-		const k3d::filesystem::path path = m_file.pipeline_value();
-		if(path.empty())
-			return;
-
-		k3d::gprim_factory factory(Mesh);
-		try
-		{
-			opencascade_document_processor document(path);
-			detail::process_level(document, factory);
-		}
-		catch(...)
-		{
-			k3d::log() << error << "Error loading OpenCascade document" << std::endl;
-		}
-		
-		// OpenCascade works in mm, but K-3D works in m, so scale everything
-		k3d::mesh::points_t& points = *k3d::make_unique(Mesh.points);
-		for (k3d::uint_t point = 0; point != points.size(); ++point)
-			points[point] *= 0.001;
-	}
-	
-	void on_update_mesh_geometry(k3d::mesh& Mesh)
-	{
-	}
+		base(Factory, Document)
+	{}
 	
 	static k3d::iplugin_factory& get_factory()
 	{
@@ -113,9 +74,22 @@ public:
 	
 		return factory;
 	}
-
+	
 private:
-	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
+	/// k3d::mesh_reader implementation
+	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
+	{
+		k3d::gprim_factory factory(Output);
+		try
+		{
+			opencascade_document_processor document(Path);
+			detail::process_level(document, factory);
+		}
+		catch(...)
+		{
+			k3d::log() << error << "Error loading OpenCascade document" << std::endl;
+		}
+	}
 		
 };
 

@@ -32,6 +32,11 @@
 #include <BRep_Tool.hxx>
 #include <BRepTools.hxx>
 #include <BRepTools_WireExplorer.hxx>
+#include <Convert_ConeToBSplineSurface.hxx>
+#include <Convert_CylinderToBSplineSurface.hxx>
+#include <Convert_ElementarySurfaceToBSplineSurface.hxx>
+#include <Convert_SphereToBSplineSurface.hxx>
+#include <Convert_TorusToBSplineSurface.hxx>
 #include <Geom2d_BezierCurve.hxx>
 #include <Geom2d_BSplineCurve.hxx>
 #include <Geom2d_Curve.hxx>
@@ -40,11 +45,20 @@
 #include <GeomConvert.hxx>
 #include <Geom_BSplineCurve.hxx>
 #include <Geom_BSplineSurface.hxx>
+#include <Geom_ConicalSurface.hxx>
 #include <Geom_Curve.hxx>
+#include <Geom_CylindricalSurface.hxx>
+#include <Geom_ElementarySurface.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
+#include <Geom_SphericalSurface.hxx>
 #include <Geom_Surface.hxx>
+#include <Geom_ToroidalSurface.hxx>
+#include <gp_Cone.hxx>
+#include <gp_Cylinder.hxx>
 #include <gp_Pnt2d.hxx>
+#include <gp_Sphere.hxx>
+#include <gp_Torus.hxx>
 #include <IGESCAFControl_Reader.hxx>
 #include <ShapeAnalysis_Surface.hxx>
 #include <ShapeConstruct_CompBezierCurves2dToBSplineCurve2d.hxx>
@@ -96,7 +110,7 @@ struct implementation
 	shapes_t shapes;
 };
 
-bool on_bspline_surface(const Handle(Geom_BSplineSurface)& Patch, k3d::gprim_factory& Factory)
+bool on_bspline_surface(Handle(Geom_BSplineSurface)& Patch, k3d::gprim_factory& Factory)
 {
 	const double min_knot_diff = 2e-5; // Minimal difference between two knots
 	k3d::int32_t nup = Patch->NbUPoles();
@@ -113,29 +127,47 @@ bool on_bspline_surface(const Handle(Geom_BSplineSurface)& Patch, k3d::gprim_fac
 			weights.push_back(Patch->Weight(i, j));
 		}
 	}
-	
+
 	k3d::uint_t u_order = Patch->UDegree()+1;
 	k3d::uint_t v_order = Patch->VDegree()+1;
-	
+
 	k3d::mesh::knots_t uknots;
 	k3d::int32_t nuk = Patch->NbUKnots();
+	k3d::double_t u_knot_factor = 1.0;
+	if(Patch->IsUPeriodic())
+	{
+		const k3d::double_t last_periodic_knot = Patch->UKnot(nuk);
+		Patch->SetUNotPeriodic();
+		nuk = Patch->NbUKnots();
+		const k3d::double_t last_knot = Patch->UKnot(nuk);
+		u_knot_factor = last_periodic_knot / last_knot;
+	}
 	for (k3d::int32_t i = 1; i <= nuk; ++i)
 	{
 		for (k3d::int32_t j = 0; j < Patch->UMultiplicity(i); ++j)
-			uknots.push_back(Patch->UKnot(i));
+			uknots.push_back(Patch->UKnot(i) * u_knot_factor);
 	}
-	
+
 	k3d::mesh::knots_t vknots;
 	k3d::int32_t nvk = Patch->NbVKnots();
+	k3d::double_t v_knot_factor = 1.0;
+	if(Patch->IsVPeriodic())
+	{
+		const k3d::double_t last_periodic_knot = Patch->VKnot(nvk);
+		Patch->SetVNotPeriodic();
+		nvk = Patch->NbVKnots();
+		const k3d::double_t last_knot = Patch->VKnot(nvk);
+		v_knot_factor = last_periodic_knot / last_knot;
+	}
 	for (k3d::int32_t i = 1; i <= nvk; ++i)
 	{
 		for (k3d::int32_t j = 0; j < Patch->VMultiplicity(i); ++j)
-			vknots.push_back(Patch->VKnot(i));
+			vknots.push_back(Patch->VKnot(i) * v_knot_factor);
 	}
 	
 	return_val_if_fail(u_order == uknots.size() - nup, false);
 	return_val_if_fail(v_order == vknots.size() - nvp, false);
-	
+
 	return Factory.add_nurbs_patch(u_order, v_order, control_points, uknots, vknots, weights);
 }
 
@@ -161,17 +193,17 @@ void on_nurbs_curve(const Handle(Geom_BSplineCurve)& Curve, k3d::gprim_factory& 
 	Factory.add_nurbs_curve(Curve->Degree() + 1, points, knots, weights);
 }
 
-void on_trim_curve(const Handle(Geom2d_BSplineCurve)& Curve, const Handle(Geom_Surface)& Surface, const Handle(Geom_Surface)& NurbsSurface, const double Precision, k3d::gprim_factory& Factory)
+void on_trim_curve(const Handle(Geom2d_BSplineCurve)& Curve, const Handle(Geom_Surface)& Surface, const Handle(Geom_BSplineSurface)& NurbsSurface, const double Precision, k3d::gprim_factory& Factory)
 {
 	if (Curve.IsNull())
 		return;
 	k3d::int32_t n_poles = Curve->NbPoles();
 	k3d::mesh::points_2d_t points;
 	k3d::mesh::weights_t weights;
-	
+
 	double u1, u2, v1, v2;
 	NurbsSurface->Bounds(u1, u2, v1, v2);
-	
+
 	k3d::mesh::indices_t points_3d;
 	
 	for (k3d::int32_t i = 1; i <= n_poles; ++i)
@@ -199,14 +231,14 @@ void on_trim_curve(const Handle(Geom2d_BSplineCurve)& Curve, const Handle(Geom_S
 				v_min = std::abs(pole_uv.Y() - v_min) > 0.5 * std::abs(v2-v1) ? pole_uv.Y() : v_min;
 			}
 		}
-		
+
 		points.push_back(k3d::point2(u_min, v_min)); // Control point in UV space of the NURBS surface
-		
+
 		weights.push_back(Curve->Weight(i));
 	}
-	
+
 	k3d::uint_t order = Curve->Degree() + 1;
-	
+
 	k3d::mesh::knots_t knots;
 	k3d::int32_t n_knots = Curve->NbKnots();
 	for (k3d::int32_t i = 1; i <= n_knots; ++i)
@@ -214,9 +246,9 @@ void on_trim_curve(const Handle(Geom2d_BSplineCurve)& Curve, const Handle(Geom_S
 		for (k3d::int32_t j = 0; j < Curve->Multiplicity(i); ++j)
 			knots.push_back(Curve->Knot(i));
 	}
-	
+
 	return_if_fail(order == knots.size() - n_poles);
-	
+
 	Factory.add_trim_curve(order, points, knots, weights);
 }
 
@@ -224,9 +256,9 @@ void on_trim_curve(const Handle(Geom2d_BSplineCurve)& Curve, const Handle(Geom_S
 // process a face
 void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const double Precision)
 {
-	const double maxsize = 1000; // Maximum size of the bbox in any direction 
+	const double maxsize = 1000; // Maximum size of the bbox in any direction
 	const TopoDS_Face& face = Face;
-	
+
 	Handle(ShapeCustom_RestrictionParameters) nurbs_parameters = new ShapeCustom_RestrictionParameters();
 	// Set conversion parameters
 	nurbs_parameters->ConvertBezierSurf() = true;
@@ -239,7 +271,7 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 	nurbs_parameters->ConvertPlane() = true;
 	nurbs_parameters->ConvertRevolutionSurf() = true;
 	nurbs_parameters->SegmentSurfaceMode() = true;
-	
+
 	ShapeCustom_BSplineRestriction nurbs_convertor(true,
 			true,
 			true,
@@ -252,19 +284,17 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 			true,
 			false,
 			nurbs_parameters);
-	
+
 	//Handle(Geom_Surface) surface = BRep_Tool::Surface(face);
 	Handle(Geom_Surface) surface;
 	TopLoc_Location L;
 	Standard_Real tol;
 	Standard_Boolean rev_wires, rev_face;
 	nurbs_convertor.NewSurface(face, surface, L, tol, rev_wires, rev_face);
-	//k3d::log() << debug << "Surface conversion tolerance: " << tol << std::endl;
 	Handle(Geom_BSplineSurface) nurbs_surface;
 	if(surface.IsNull())
 	{
 		surface = BRep_Tool::Surface(face);
-		k3d::log() << debug << "Passing unconverted surface" << std::endl;
 	}
 	Standard_Real UF,UL,VF,VL;
 	surface->Bounds(UF,UL,VF,VL);
@@ -277,13 +307,114 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 	{
 		nurbs_surface = Handle(Geom_BSplineSurface)::DownCast(surface);
 	}
-//	else
-//	{
-//		if(nurbs_convertor.ConvertSurface(surface, nurbs_surface, UF, UL, VF, VL, false))
-//			k3d::log() << debug << "Converted surface with a precision of " << nurbs_convertor.SurfaceError() << std::endl;
-//		else
-//			k3d::log() << debug << "Failed to convert surface" << std::endl;
-//	}
+	else if(surface->IsKind(STANDARD_TYPE(Geom_ElementarySurface)))
+	{
+		Convert_ElementarySurfaceToBSplineSurface* elementary_converter = 0;
+		if(surface->IsKind(STANDARD_TYPE(Geom_ConicalSurface)))
+		{
+			Handle(Geom_ConicalSurface) el_surface = Handle(Geom_ConicalSurface)::DownCast(surface);
+			if(!surface->IsVClosed())
+			{
+				if(!surface->IsUClosed() && !surface->IsUPeriodic())
+					elementary_converter = new Convert_ConeToBSplineSurface(el_surface->Cone(), UF, UL, VF, VL);
+				else
+					elementary_converter = new Convert_ConeToBSplineSurface(el_surface->Cone(), VF, VL);
+			}
+			else
+			{
+				k3d::log() << debug << "Closed cone could not be converted" << std::endl;
+			}
+		}
+		if(surface->IsKind(STANDARD_TYPE(Geom_CylindricalSurface)))
+		{
+			Handle(Geom_CylindricalSurface) el_surface = Handle(Geom_CylindricalSurface)::DownCast(surface);
+			if(!surface->IsVClosed())
+			{
+				if(!surface->IsUClosed() && !surface->IsUPeriodic())
+					elementary_converter = new Convert_CylinderToBSplineSurface(el_surface->Cylinder(), UF, UL, VF, VL);
+				else
+					elementary_converter = new Convert_CylinderToBSplineSurface(el_surface->Cylinder(), VF, VL);
+			}
+			else
+			{
+				k3d::log() << debug << "Closed cylinder could not be converted" << std::endl;
+			}
+		}
+		if(surface->IsKind(STANDARD_TYPE(Geom_SphericalSurface)))
+		{
+			Handle(Geom_SphericalSurface) el_surface = Handle(Geom_SphericalSurface)::DownCast(surface);
+			if(!surface->IsVClosed())
+			{
+				if(!surface->IsUClosed() && !surface->IsUPeriodic())
+					elementary_converter = new Convert_SphereToBSplineSurface(el_surface->Sphere(), UF, UL, VF, VL);
+				else
+					elementary_converter = new Convert_SphereToBSplineSurface(el_surface->Sphere(), VF, VL, false);
+			}
+			else
+			{
+				elementary_converter = new Convert_SphereToBSplineSurface(el_surface->Sphere());
+			}
+		}
+		if(surface->IsKind(STANDARD_TYPE(Geom_ToroidalSurface)))
+		{
+			Handle(Geom_ToroidalSurface) el_surface = Handle(Geom_ToroidalSurface)::DownCast(surface);
+			if(!surface->IsUClosed() && !surface->IsUPeriodic() && !surface->IsVClosed() && !surface->IsVPeriodic())
+			{
+				elementary_converter = new Convert_TorusToBSplineSurface(el_surface->Torus(), UF, UL, VF, VL);
+			}
+			else if(!surface->IsUClosed() && !surface->IsUPeriodic())
+			{
+				elementary_converter = new Convert_TorusToBSplineSurface(el_surface->Torus(), UF, UL);
+			}
+			else if(!surface->IsVClosed() && !surface->IsVPeriodic())
+			{
+				elementary_converter = new Convert_TorusToBSplineSurface(el_surface->Torus(), VF, VL);
+			}
+		}
+		if(elementary_converter)
+		{
+			k3d::int32_t nb_upoles = elementary_converter->NbUPoles();
+			k3d::int32_t nb_vpoles = elementary_converter->NbVPoles();
+			k3d::int32_t nb_uknots = elementary_converter->NbUKnots();
+			k3d::int32_t nb_vknots = elementary_converter->NbVKnots();
+			TColgp_Array2OfPnt poles(1, nb_upoles, 1, nb_vpoles);
+			TColStd_Array1OfReal uknots(1, nb_uknots);
+			TColStd_Array1OfReal vknots(1, nb_vknots);
+			TColStd_Array1OfInteger umults(1, nb_uknots);
+			TColStd_Array1OfInteger vmults(1, nb_vknots);
+			for(k3d::int32_t upole = 1; upole <= nb_upoles; ++upole)
+			{
+				for(k3d::int32_t vpole = 1; vpole <= nb_vpoles; ++vpole)
+				{
+					poles.SetValue(upole, vpole, elementary_converter->Pole(upole, vpole));
+				}
+			}
+			for(k3d::int32_t uknot = 1; uknot <= nb_uknots; ++uknot)
+			{
+				uknots.SetValue(uknot, elementary_converter->UKnot(uknot));
+				umults.SetValue(uknot, elementary_converter->UMultiplicity(uknot));
+			}
+			for(k3d::int32_t vknot = 1; vknot <= nb_vknots; ++vknot)
+			{
+				vknots.SetValue(vknot, elementary_converter->VKnot(vknot));
+				vmults.SetValue(vknot, elementary_converter->VMultiplicity(vknot));
+			}
+			nurbs_surface = new Geom_BSplineSurface(poles, uknots, vknots, umults, vmults,
+					elementary_converter->UDegree(), elementary_converter->VDegree(),
+					elementary_converter->IsUPeriodic(), elementary_converter->IsVPeriodic());
+			for(k3d::int32_t upole = 1; upole <= nb_upoles; ++upole)
+			{
+				for(k3d::int32_t vpole = 1; vpole <= nb_vpoles; ++vpole)
+				{
+					nurbs_surface->SetWeight(upole, vpole, elementary_converter->Weight(upole, vpole));
+				}
+			}
+		}
+		else
+		{
+			k3d::log() << debug << "Failed to find an elementary converter" << std::endl;
+		}
+	}
 	if(nurbs_surface.IsNull())
 	{
 		k3d::log() << debug << "Failed to convert surface of type " << surface->DynamicType() << " to NURBS" << std::endl;
@@ -291,6 +422,7 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 	}
 	if (!on_bspline_surface(nurbs_surface, Factory))
 	{
+		// TODO: Add ConvertSurfaceToBSpline method here
 		return;
 	}
 	// Visit trim curves in their connected order, and add them to the mesh
@@ -300,7 +432,7 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 		TopAbs_Orientation wire_orientation = wire_explorer.Current().Orientation();
 		if (wire_orientation != TopAbs_FORWARD && wire_orientation != TopAbs_REVERSED) // not a trim curve loop
 			continue;
-		
+
 		BRepTools_WireExplorer trim_explorer;
 		// Stores curves in the order they need to be processed, reversing curves if needed
 		typedef std::deque<Handle(Geom2d_BSplineCurve)> curves_t;
@@ -358,7 +490,7 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 					return;
 				}
 			}
-			
+
 			Handle(Geom_Curve) curve_3d = BRep_Tool::Curve(TopoDS::Edge(trim_explorer.Current()), first, last);
 			if (!curve_3d.IsNull())
 			{
@@ -366,7 +498,7 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 				if (!nurbs_curve_3d.IsNull()) // Ignore 3D curves that were skipped in the conversion to NURBS
 					on_nurbs_curve(nurbs_curve_3d, Factory);
 			}
-			
+
 			if (edge_orientation != wire_orientation)
 				nurbs_trim->Reverse();
 			if (wire_orientation == TopAbs_FORWARD)
@@ -390,112 +522,56 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 // process surface components (Shape should at least be a Shell)
 void process_surface(const TopoDS_Shape& Shape, k3d::gprim_factory& Factory)
 {
-	// Attempt some global shape fixing, as suggested by Matthias Teich on the OpenCascade forum.
-	ShapeFix_Shape fixer(Shape);
-	fixer.Perform();
-	BRepBuilderAPI_Sewing sew;
-	sew.Add(fixer.Shape());
-	sew.Perform();
-	const TopoDS_Shape& sewed_shape = sew.SewedShape();
-	return_if_fail(!sewed_shape.IsNull());
 	// Global precision for the conversion to NURBS
 	const double precision = 1e-4;
 	// Split up conversion by shell, to conserve memory
 	TopExp_Explorer shell_explorer;
-	for (shell_explorer.Init(Shape,TopAbs_SHELL); shell_explorer.More(); shell_explorer.Next())
+	for (shell_explorer.Init(Shape,TopAbs_FACE); shell_explorer.More(); shell_explorer.Next())
 	{
 		try
 		{
 			// Eliminate all elementary surfaces, which would be ignored by the BSpline converter
 			TopoDS_Shape revolution_shape = ShapeCustom::ConvertToRevolution(shell_explorer.Current());
-			
+
 			// Split closed shapes
-			ShapeUpgrade_ShapeDivideAngle angle_tool(k3d::pi(), revolution_shape);
-			if (!angle_tool.Perform() && angle_tool.Status (ShapeExtend_FAIL)) {
-			  k3d::log() << debug << "Splitting of angles failed" << std::endl;
-			  return;
-			}
-			
-//			ShapeUpgrade_ShapeConvertToBezier bezier_converter(angle_tool.Result());
-//			bezier_converter.SetSurfaceConversion(true);
-//			bezier_converter.SetRevolutionMode(true);
-//			bezier_converter.SetSurfaceSegmentMode(true);
-//			bezier_converter.Set2dConversion(true);
-//			bezier_converter.Set3dConversion(false);
-//			bezier_converter.SetBSplineMode(false);
-//			bezier_converter.SetPlaneMode(false);
-//			bezier_converter.Set3dConicConversion(true);
-//			try {
-//			if (!bezier_converter.Perform() && bezier_converter.Status(ShapeExtend_FAIL))
-//			{
-//				k3d::log() << debug << "Bezier conversion failed" << std::endl;
-//				return;
+//			ShapeUpgrade_ShapeDivideAngle angle_tool(k3d::pi()/2, revolution_shape);
+//			if (!angle_tool.Perform() && angle_tool.Status (ShapeExtend_FAIL)) {
+//			  k3d::log() << debug << "Splitting of angles failed" << std::endl;
+//			  return;
 //			}
-//			} catch(...)
+
+//			TopExp_Explorer face_explorer;
+//			for (face_explorer.Init(angle_tool.Result(),TopAbs_FACE); face_explorer.More(); face_explorer.Next())
 //			{
-//				k3d::log() << debug << "Exception in bezier conversion" << std::endl;
+				process_face(TopoDS::Face(revolution_shape), Factory, precision);
 //			}
-			
-			
-//			// Convert everything to NURBS
-//			Handle(ShapeCustom_RestrictionParameters) nurbs_parameters = new ShapeCustom_RestrictionParameters();
-//			// Set conversion parameters
-//			nurbs_parameters->ConvertBezierSurf() = true;
-//			nurbs_parameters->ConvertCurve2d() = true;
-//			nurbs_parameters->ConvertCurve3d() = true;
-//			nurbs_parameters->ConvertExtrusionSurf() = true;
-//			nurbs_parameters->ConvertOffsetCurv2d() = true;
-//			nurbs_parameters->ConvertOffsetCurv3d() = true;
-//			nurbs_parameters->ConvertOffsetSurf() = true;
-//			nurbs_parameters->ConvertPlane() = true;
-//			nurbs_parameters->ConvertRevolutionSurf() = true;
-//			nurbs_parameters->SegmentSurfaceMode() = true;
-//			// Execute the conversion
-//			TopoDS_Shape nurbs_shape = ShapeCustom::BSplineRestriction(angle_tool.Result(),
-//					precision,
-//					precision,
-//					512,
-//					409600,
-//					GeomAbs_C2,
-//					GeomAbs_C2,
-//					true,
-//					false,
-//					nurbs_parameters);
-			
-			//TopoDS_Shape nurbs_shape = ShapeCustom::ConvertToBSpline(angle_tool.Result(), true, true, true);
-			
-			TopExp_Explorer face_explorer;
-			for (face_explorer.Init(angle_tool.Result(),TopAbs_FACE); face_explorer.More(); face_explorer.Next())
-			{
-				process_face(TopoDS::Face(face_explorer.Current()), Factory, precision);
-			}
 		}
 		catch(Standard_Failure& Exception)
 		{
-			k3d::log() << warning << "Error converting shell: " << Exception.GetMessageString() << std::endl; 
+			k3d::log() << warning << "Error converting face: " << Exception.GetMessageString() << std::endl;
 		}
 		catch(...)
 		{
 			k3d::log() << warning << "Unknown error converting shell" << std::endl;
 		}
 	}
+
 	// Explore all faces not part of a shell
-	
-	for (TopExp_Explorer lost_face_explorer(Shape, TopAbs_FACE, TopAbs_SHELL); lost_face_explorer.More(); lost_face_explorer.Next())
-	{
-		try
-		{
-			process_face(TopoDS::Face(lost_face_explorer.Current()), Factory, precision);
-		}
-		catch(Standard_Failure& Exception)
-		{
-			k3d::log() << warning << "Error converting lost face: " << Exception.GetMessageString() << std::endl; 
-		}
-		catch(...)
-		{
-			k3d::log() << warning << "Unknown error converting a lost face" << std::endl;
-		}
-	}
+//	for (TopExp_Explorer lost_face_explorer(Shape, TopAbs_FACE, TopAbs_SHELL); lost_face_explorer.More(); lost_face_explorer.Next())
+//	{
+//		try
+//		{
+//			process_face(TopoDS::Face(lost_face_explorer.Current()), Factory, precision);
+//		}
+//		catch(Standard_Failure& Exception)
+//		{
+//			k3d::log() << warning << "Error converting lost face: " << Exception.GetMessageString() << std::endl;
+//		}
+//		catch(...)
+//		{
+//			k3d::log() << warning << "Unknown error converting a lost face" << std::endl;
+//		}
+//	}
 }
 
 template<typename ReaderT> void load_file(const k3d::filesystem::path& FilePath, const TCollection_ExtendedString& TypeName, implementation* Implementation)
@@ -508,20 +584,20 @@ template<typename ReaderT> void load_file(const k3d::filesystem::path& FilePath,
 		k3d::log() << error << k3d_file_reference << ": error opening [" << FilePath.native_console_string() << "]" << std::endl;
 		throw std::exception();
 	}
-	
+
 	Implementation->xde_doc = new TDocStd_Document(TypeName); // initialise an empty document
 	if (!reader.Transfer(Implementation->xde_doc)) // attempt to transfer the STEP file contents to the document
 	{
 		k3d::log() << error << "Failed to transfer OpenCascade file" << std::endl;
 		throw std::exception();
 	}
-	
+
 	if(!XCAFDoc_DocumentTool::IsXCAFDocument(Implementation->xde_doc)) // sanity check
 	{
 		k3d::log() << error << "Invalid document" << std::endl;
 		throw std::exception();
 	}
-	
+
 	TDF_Label shaperoot = XCAFDoc_DocumentTool::ShapesLabel(Implementation->xde_doc->Main()); // get the root node for the geometric shapes
 	Implementation->shapes.push(TDF_ChildIterator(shaperoot));
 }
@@ -579,7 +655,7 @@ void opencascade_document_processor::process_current(k3d::gprim_factory& Factory
   Name = string_stream.str();
   if (Name.empty())
   	Name = "OpenCascade shape";
-	
+
 	TopoDS_Shape shape = TDataStd_Shape::Get(label);
 	if (!shape.IsNull())
 	{
@@ -614,7 +690,7 @@ void opencascade_document_processor::process_current(k3d::gprim_factory& Factory
 		}
 		catch(Standard_Failure& Exception)
 		{
-			k3d::log() << warning << "Error converting shape " << Name << ": " << Exception.GetMessageString() << std::endl; 
+			k3d::log() << warning << "Error converting shape " << Name << ": " << Exception.GetMessageString() << std::endl;
 		}
 		catch(...)
 		{
