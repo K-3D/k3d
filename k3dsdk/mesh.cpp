@@ -841,7 +841,7 @@ std::istream& operator>>(std::istream& Stream, mesh::polyhedra_t::polyhedron_typ
 		RHS = mesh::polyhedra_t::POLYGONS;
 	else if(buffer == "catmull_clark")
 		RHS = mesh::polyhedra_t::CATMULL_CLARK;
-	else
+	else if(!buffer.empty())
 		log() << error << "Unknown polyhedron type [" << buffer << "]" << std::endl;
 
 	return Stream;
