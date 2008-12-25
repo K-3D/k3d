@@ -1,0 +1,23 @@
+SET(K3D_GTHREAD_FOUND 0)
+
+######################################################################
+# Posix specific configuration
+
+INCLUDE(K3DFindPkgConfig)
+PKG_CHECK_MODULES(GTHREAD gthread-2.0)
+
+IF(GTHREAD_FOUND)
+	SET(K3D_GTHREAD_INCLUDE_DIRS
+		${GTHREAD_INCLUDE_DIRS}
+		)
+
+	SET(K3D_GTHREAD_LIB_DIRS
+		${GTHREAD_LIBRARY_DIRS}
+		)
+
+	SET(K3D_GTHREAD_LIBS
+		${GTHREAD_LIBRARIES}
+		)
+
+	SET(K3D_GTHREAD_FOUND 1)
+ENDIF(GTHREAD_FOUND)

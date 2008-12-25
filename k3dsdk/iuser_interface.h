@@ -82,6 +82,17 @@ public:
 
 	/// Returns a connection to a signal that will be emitted at the requested frame rate (could return an empty connection, if the UI doesn't support timers)
 	virtual sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot) = 0;
+	
+	/// Call a slot whenever given filesystem path is modified.  Note that we are watching the
+	/// path, not an inode, so it isn't an error to specify a path for a nonexistent file.
+	/// The slot will be called when a file is created / modified / renamed / deleted at that
+	/// location.  Returns a nonzero watch identifier that is used to cancel the watch later-on,
+	/// or 0 if there is an error or the implementation does not support path-watching.
+	virtual uint_t watch_path(const filesystem::path& Path, const sigc::slot<void>& Slot) = 0;
+
+	/// Stop watching the given path.
+	virtual void unwatch_path(const uint_t WatchID) = 0;
+
 
 protected:
 	iuser_interface() {}

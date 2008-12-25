@@ -152,7 +152,9 @@ public:
 	bool show(iunknown& Object);
 	void synchronize();
 	sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot);
-	k3d::iplugin_factory& factory();
+	k3d::uint_t watch_path(const k3d::filesystem::path& Path, const sigc::slot<void>& Slot);
+	void unwatch_path(const k3d::uint_t WatchID) {}
+	k3d::iplugin_factory& factory() {}
 	static k3d::iplugin_factory& get_factory();
 
 private:

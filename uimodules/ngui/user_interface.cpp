@@ -48,6 +48,7 @@
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
 #include <k3dsdk/idocument_importer.h>
+#include <k3dsdk/ifile_change_notifier.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iuser_interface.h>
@@ -74,6 +75,7 @@
 
 #include <k3dsdk/fstream.h>
 #include <boost/format.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include <iostream>
 
@@ -507,6 +509,17 @@ public:
 		const unsigned int interval = static_cast<unsigned int>(1000.0 / FrameRate);
 		return Glib::signal_timeout().connect(sigc::bind_return(Slot, true), interval);
 	}
+	
+	k3d::uint_t watch_path(const k3d::filesystem::path& Path, const sigc::slot<void>& Slot)
+	{
+		if(file_change_notifier())
+			return file_change_notifier()->watch_file(Path, Slot);
+	}
+	void unwatch_path(const k3d::uint_t WatchID)
+	{
+		if(file_change_notifier())
+			file_change_notifier()->unwatch_file(WatchID);
+	}
 
 	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 	{
@@ -580,6 +593,25 @@ private:
 
 		m_auto_start_plugins.clear();
 	}
+	
+	k3d::ifile_change_notifier* file_change_notifier()
+	{
+		if(!m_file_change_notifier)
+		{
+			// Use the first file change notifier found
+			const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::ifile_change_notifier>();
+			if(factories.empty())
+			{
+				k3d::log() << debug << "ngui::user_interface: no file change notification plugin found" << std::endl;
+			}
+			else
+			{
+				k3d::log() << debug << "ngui::user_interface: creating file change notifier: " << (*factories.begin())->name() << std::endl;
+				m_file_change_notifier = k3d::plugin::create<k3d::ifile_change_notifier>(**factories.begin());
+			}
+		}
+		return m_file_change_notifier;
+	}
 
 	/// Set to true iff we should display the tutorial menu at startup
 	bool m_show_learning_menu;
@@ -596,7 +628,11 @@ private:
 	typedef std::vector<k3d::iunknown*> auto_start_plugins_t;
 	/// Stores (optional) auto-start plugins
 	auto_start_plugins_t m_auto_start_plugins;
+	/// The file change notification plugin
+	static k3d::ifile_change_notifier* m_file_change_notifier;
 };
+	
+k3d::ifile_change_notifier* user_interface::m_file_change_notifier = 0;
 
 /////////////////////////////////////////////////////////////////////////////
 // user_interface_factory
