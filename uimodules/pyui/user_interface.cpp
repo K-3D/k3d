@@ -149,8 +149,14 @@ public:
 		return sigc::connection();
 	}
 	
-	k3d::uint_t watch_path(const k3d::filesystem::path& Path, const sigc::slot<void>& Slot) {}
-	void unwatch_path(const k3d::uint_t WatchID) {}
+	k3d::uint_t watch_path(const k3d::filesystem::path& Path, const sigc::slot<void>& Slot)
+	{
+		return 0;
+	}
+
+	void unwatch_path(const k3d::uint_t WatchID)
+	{
+	}
 
 	k3d::iplugin_factory& factory()
 	{

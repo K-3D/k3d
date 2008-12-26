@@ -386,6 +386,15 @@ sigc::connection user_interface::get_timer(const double FrameRate, sigc::slot<vo
 	return helper->m_signal.connect(Slot);
 }
 
+k3d::uint_t user_interface::watch_path(const k3d::filesystem::path& Path, const sigc::slot<void>& Slot)
+{
+	return 0;
+}
+
+void user_interface::unwatch_path(const k3d::uint_t WatchID)
+{
+}
+
 k3d::iplugin_factory& user_interface::factory()
 {
 	return get_factory();

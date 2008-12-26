@@ -596,7 +596,8 @@ private:
 	
 	k3d::ifile_change_notifier* file_change_notifier()
 	{
-		if(!m_file_change_notifier)
+		static k3d::ifile_change_notifier* notifier = 0;
+		if(!notifier)
 		{
 			// Use the first file change notifier found
 			const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::ifile_change_notifier>();
@@ -607,10 +608,11 @@ private:
 			else
 			{
 				k3d::log() << debug << "ngui::user_interface: creating file change notifier: " << (*factories.begin())->name() << std::endl;
-				m_file_change_notifier = k3d::plugin::create<k3d::ifile_change_notifier>(**factories.begin());
+				notifier = k3d::plugin::create<k3d::ifile_change_notifier>(**factories.begin());
 			}
 		}
-		return m_file_change_notifier;
+
+		return notifier;
 	}
 
 	/// Set to true iff we should display the tutorial menu at startup
@@ -628,12 +630,8 @@ private:
 	typedef std::vector<k3d::iunknown*> auto_start_plugins_t;
 	/// Stores (optional) auto-start plugins
 	auto_start_plugins_t m_auto_start_plugins;
-	/// The file change notification plugin
-	static k3d::ifile_change_notifier* m_file_change_notifier;
 };
 	
-k3d::ifile_change_notifier* user_interface::m_file_change_notifier = 0;
-
 /////////////////////////////////////////////////////////////////////////////
 // user_interface_factory
 
