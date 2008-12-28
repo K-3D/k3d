@@ -21,6 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "file_notification.h"
 #include "splash_box.h"
 
 #include <k3d-i18n-config.h>
@@ -446,28 +447,13 @@ public:
 
 	void start_event_loop()
 	{
-		if(file_change_notifier())
-		{
-#ifdef G_THREADS_ENABLED
-			if(!Glib::thread_supported())
-				Glib::thread_init();
-			m_file_notification_dispatcher.reset(new Glib::Dispatcher());
-			m_file_notification_mutex.reset(new Glib::Mutex());
-			m_file_notification_cond.reset(new Glib::Cond());
-			m_file_notification_connection = m_file_notification_dispatcher->connect(sigc::mem_fun(*this, &user_interface::on_notify_file_changes_threaded));
-			Glib::Thread::create(sigc::mem_fun(*this, &user_interface::notify_file_change_thread_function), false);
-#else
-			m_file_notification_connection = Glib::signal_timeout().connect(sigc::bind_return(sigc::mem_fun(*this, &user_interface::on_notify_file_changes), true), 1000);
-#endif
-		}
-
+		m_file_notification.start();
 		m_main->run();
 	}
 
 	void stop_event_loop()
 	{
-		m_file_notification_connection.disconnect();
-
+		m_file_notification.stop();
 		m_main->quit();
 	}
 
@@ -529,13 +515,11 @@ public:
 	
 	k3d::uint_t watch_path(const k3d::filesystem::path& Path, const sigc::slot<void>& Slot)
 	{
-		if(file_change_notifier())
-			return file_change_notifier()->watch_file(Path, Slot);
+		return m_file_notification.watch_path(Path, Slot);
 	}
 	void unwatch_path(const k3d::uint_t WatchID)
 	{
-		if(file_change_notifier())
-			file_change_notifier()->unwatch_file(WatchID);
+		m_file_notification.unwatch_path(WatchID);
 	}
 
 	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
@@ -611,55 +595,6 @@ private:
 		m_auto_start_plugins.clear();
 	}
 	
-	k3d::ifile_change_notifier* file_change_notifier()
-	{
-		static k3d::ifile_change_notifier* notifier = 0;
-		if(!notifier)
-		{
-			// Use the first file change notifier found
-			const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::ifile_change_notifier>();
-			if(factories.empty())
-			{
-				k3d::log() << debug << "ngui::user_interface: no file change notification plugin found" << std::endl;
-			}
-			else
-			{
-				k3d::log() << debug << "ngui::user_interface: creating file change notifier: " << (*factories.begin())->name() << std::endl;
-				notifier = k3d::plugin::create<k3d::ifile_change_notifier>(**factories.begin());
-			}
-		}
-
-		return notifier;
-	}
-
-	void on_notify_file_changes()
-	{
-		while(file_change_notifier()->pending_changes())
-			file_change_notifier()->notify_change();
-	}
-	
-	void on_notify_file_changes_threaded()
-	{
-		Glib::Mutex::Lock lock(*m_file_notification_mutex);
-		on_notify_file_changes();
-		m_file_notification_cond->signal();
-	}
-	
-	void notify_file_change_thread_function()
-	{
-		while(true)
-		{
-			if(file_change_notifier()->pending_changes(true))
-			{
-				// Signal the main thread that events have occurred
-				m_file_notification_dispatcher->emit();
-				// Wait until the main thread has handled the events
-				Glib::Mutex::Lock lock(*m_file_notification_mutex);
-				m_file_notification_cond->wait(*m_file_notification_mutex);
-			}
-		}
-	}
-
 	/// Set to true iff we should display the tutorial menu at startup
 	bool m_show_learning_menu;
 	/// Set to true iff we should begin recording a tutorial immediately at startup
@@ -676,13 +611,8 @@ private:
 	/// Stores (optional) auto-start plugins
 	auto_start_plugins_t m_auto_start_plugins;
 
-	/// Controls a timeout loop or thread that handles file-notification events ...
-	sigc::connection m_file_notification_connection;
-	/// Dispatcher used for threaded file change notification
-	boost::scoped_ptr<Glib::Dispatcher> m_file_notification_dispatcher;
-	/// Mutex and condition, used to make the watching thread wait until the event has been handled
-	boost::scoped_ptr<Glib::Mutex> m_file_notification_mutex;
-	boost::scoped_ptr<Glib::Cond> m_file_notification_cond;
+	/// Handles file-notification functionality
+	file_notification m_file_notification;
 };
 	
 /////////////////////////////////////////////////////////////////////////////
