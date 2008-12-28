@@ -156,13 +156,23 @@ public:
 		}
 	}
 	
-	const k3d::bool_t pending_changes()
+	const k3d::bool_t pending_changes(const k3d::bool_t Blocking = false)
 	{
 		if(!inotify)
 			return false;
-
-		inotify->WaitForEvents();
-		return inotify->GetEventCount();
+		
+		if(!Blocking)
+		{
+			inotify->SetNonBlock(true);
+			inotify->WaitForEvents();
+			return inotify->GetEventCount();
+		}
+		// In the blocking case, we check for events in a manner that does not require holding a lock on the inotify object
+		inotify->SetNonBlock(false);
+		fd_set read_descriptors;
+		FD_ZERO(&read_descriptors);
+		FD_SET(inotify->GetDescriptor(), &read_descriptors);
+		return (select(inotify->GetDescriptor() + 1, &read_descriptors, NULL, NULL, NULL) > 0);
 	}
 	
 	void notify_change()

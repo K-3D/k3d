@@ -447,7 +447,19 @@ public:
 	void start_event_loop()
 	{
 		if(file_change_notifier())
+		{
+#ifdef G_THREADS_ENABLED
+			if(!Glib::thread_supported())
+				Glib::thread_init();
+			m_file_notification_dispatcher.reset(new Glib::Dispatcher());
+			m_file_notification_mutex.reset(new Glib::Mutex());
+			m_file_notification_cond.reset(new Glib::Cond());
+			m_file_notification_connection = m_file_notification_dispatcher->connect(sigc::mem_fun(*this, &user_interface::on_notify_file_changes_threaded));
+			Glib::Thread::create(sigc::mem_fun(*this, &user_interface::notify_file_change_thread_function), false);
+#else
 			m_file_notification_connection = Glib::signal_timeout().connect(sigc::bind_return(sigc::mem_fun(*this, &user_interface::on_notify_file_changes), true), 1000);
+#endif
+		}
 
 		m_main->run();
 	}
@@ -625,6 +637,28 @@ private:
 		while(file_change_notifier()->pending_changes())
 			file_change_notifier()->notify_change();
 	}
+	
+	void on_notify_file_changes_threaded()
+	{
+		Glib::Mutex::Lock lock(*m_file_notification_mutex);
+		on_notify_file_changes();
+		m_file_notification_cond->signal();
+	}
+	
+	void notify_file_change_thread_function()
+	{
+		while(true)
+		{
+			if(file_change_notifier()->pending_changes(true))
+			{
+				// Signal the main thread that events have occurred
+				m_file_notification_dispatcher->emit();
+				// Wait until the main thread has handled the events
+				Glib::Mutex::Lock lock(*m_file_notification_mutex);
+				m_file_notification_cond->wait(*m_file_notification_mutex);
+			}
+		}
+	}
 
 	/// Set to true iff we should display the tutorial menu at startup
 	bool m_show_learning_menu;
@@ -642,8 +676,13 @@ private:
 	/// Stores (optional) auto-start plugins
 	auto_start_plugins_t m_auto_start_plugins;
 
-	/// Controls a timeout loop that handles file-notification events ...
+	/// Controls a timeout loop or thread that handles file-notification events ...
 	sigc::connection m_file_notification_connection;
+	/// Dispatcher used for threaded file change notification
+	boost::scoped_ptr<Glib::Dispatcher> m_file_notification_dispatcher;
+	/// Mutex and condition, used to make the watching thread wait until the event has been handled
+	boost::scoped_ptr<Glib::Mutex> m_file_notification_mutex;
+	boost::scoped_ptr<Glib::Cond> m_file_notification_cond;
 };
 	
 /////////////////////////////////////////////////////////////////////////////

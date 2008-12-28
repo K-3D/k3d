@@ -59,8 +59,8 @@ public:
 	/// Stop watching the given path.
 	virtual void unwatch_file(const uint_t WatchID) = 0;
 
-	/// Returns true if there are any notification events waiting.
-	virtual const bool_t pending_changes() = 0;
+	/// Returns true if there are any notification events waiting. Will block until an event occurs if Blocking is true.
+	virtual const bool_t pending_changes(const k3d::bool_t Blocking = false) = 0;
 
 	/// Handles the next notification event (calls one slot), blocking if there are no events pending.
 	virtual void notify_change() = 0;
