@@ -46,6 +46,7 @@
 #include "hyperboloid_python.h"
 #include "icommand_node_python.h"
 #include "idocument_python.h"
+#include "ifile_change_notifier_python.h"
 #include "imaterial_python.h"
 #include "imesh_storage_python.h"
 #include "imetadata_python.h"
@@ -413,6 +414,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_const_named_attribute_arrays();
 	define_class_icommand_node();
 	define_class_idocument();
+	define_class_ifile_change_notifier();
 	define_class_imaterial();
 	define_class_imesh_storage();
 	define_class_imetadata();

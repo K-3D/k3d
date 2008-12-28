@@ -87,6 +87,8 @@ ADD_LIBRARY(k3dsdk-python-b SHARED
 	const_named_attribute_arrays_python.h
 	icommand_node_python.cpp
 	icommand_node_python.h
+	ifile_change_notifier_python.cpp
+	ifile_change_notifier_python.h
 	imaterial_python.cpp
 	imaterial_python.h
 	imetadata_python.cpp

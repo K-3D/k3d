@@ -19,10 +19,8 @@
  * 
  */
 
-
-
-#ifndef MODULES_DEVELOPMENT_INOTIFYCXX_H
-#define MODULES_DEVELOPMENT_INOTIFYCXX_H
+#ifndef MODULES_INOTIFY_INOTIFY_CXX_H
+#define MODULES_INOTIFY_INOTIFY_CXX_H
 
 #include <stdint.h>
 #include <string>
@@ -883,5 +881,5 @@ private:
 };
 
 
-#endif // MODULES_DEVELOPMENT_INOTIFYCXX_H
+#endif // !MODULES_INOTIFY_INOTIFY_CXX_H
 

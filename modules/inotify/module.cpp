@@ -22,32 +22,18 @@
 */
 
 #include <k3dsdk/module.h>
-#include <k3d-platform-config.h>
 
 namespace module
 {
 
-namespace file_change_notifier
-{
-
 namespace inotify
 {
-#ifndef FILE_CHANGE_NOTIFIER_THREAD
-extern k3d::iplugin_factory& file_change_notifier_poll_factory();
-#else
-extern k3d::iplugin_factory& file_change_notifier_thread_factory();
-#endif
+extern k3d::iplugin_factory& file_change_notifier_factory();
 
 } // namespace inotify
-
-} // namespace file_change_notifier
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-#ifndef FILE_CHANGE_NOTIFIER_THREAD
-	Registry.register_factory(module::file_change_notifier::inotify::file_change_notifier_poll_factory());
-#else
-	Registry.register_factory(module::file_change_notifier::inotify::file_change_notifier_thread_factory());
-#endif
+	Registry.register_factory(module::inotify::file_change_notifier_factory());
 K3D_MODULE_END
