@@ -446,11 +446,16 @@ public:
 
 	void start_event_loop()
 	{
+		if(file_change_notifier())
+			m_file_notification_connection = Glib::signal_timeout().connect(sigc::bind_return(sigc::mem_fun(*this, &user_interface::on_notify_file_changes), true), 1000);
+
 		m_main->run();
 	}
 
 	void stop_event_loop()
 	{
+		m_file_notification_connection.disconnect();
+
 		m_main->quit();
 	}
 
@@ -615,6 +620,12 @@ private:
 		return notifier;
 	}
 
+	void on_notify_file_changes()
+	{
+		while(file_change_notifier()->pending_changes())
+			file_change_notifier()->notify_change();
+	}
+
 	/// Set to true iff we should display the tutorial menu at startup
 	bool m_show_learning_menu;
 	/// Set to true iff we should begin recording a tutorial immediately at startup
@@ -630,6 +641,9 @@ private:
 	typedef std::vector<k3d::iunknown*> auto_start_plugins_t;
 	/// Stores (optional) auto-start plugins
 	auto_start_plugins_t m_auto_start_plugins;
+
+	/// Controls a timeout loop that handles file-notification events ...
+	sigc::connection m_file_notification_connection;
 };
 	
 /////////////////////////////////////////////////////////////////////////////
