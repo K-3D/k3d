@@ -447,13 +447,13 @@ public:
 
 	void start_event_loop()
 	{
-		m_file_notification.start();
+		get_file_notification()->start();
 		m_main->run();
 	}
 
 	void stop_event_loop()
 	{
-		m_file_notification.stop();
+		get_file_notification()->stop();
 		m_main->quit();
 	}
 
@@ -515,11 +515,11 @@ public:
 	
 	k3d::uint_t watch_path(const k3d::filesystem::path& Path, const sigc::slot<void>& Slot)
 	{
-		return m_file_notification.watch_path(Path, Slot);
+		return get_file_notification()->watch_path(Path, Slot);
 	}
 	void unwatch_path(const k3d::uint_t WatchID)
 	{
-		m_file_notification.unwatch_path(WatchID);
+		get_file_notification()->unwatch_path(WatchID);
 	}
 
 	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
@@ -595,6 +595,15 @@ private:
 		m_auto_start_plugins.clear();
 	}
 	
+	/// Handles file-notification functionality
+	file_notification* get_file_notification()
+	{
+		static file_notification* file_notifier = 0;
+		if(!file_notifier)
+			file_notifier = new file_notification();
+		return file_notifier;
+	}
+	
 	/// Set to true iff we should display the tutorial menu at startup
 	bool m_show_learning_menu;
 	/// Set to true iff we should begin recording a tutorial immediately at startup
@@ -610,9 +619,6 @@ private:
 	typedef std::vector<k3d::iunknown*> auto_start_plugins_t;
 	/// Stores (optional) auto-start plugins
 	auto_start_plugins_t m_auto_start_plugins;
-
-	/// Handles file-notification functionality
-	file_notification m_file_notification;
 };
 	
 /////////////////////////////////////////////////////////////////////////////
