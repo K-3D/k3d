@@ -81,10 +81,9 @@ class MirrorMesh:
 		row = matrix[2]; row[2] = z; matrix[2] = row
 		self.frozen_matrix.matrix = matrix
 	def set_modifiers_selection(self):
-		selection = k3d.select_all()
-		#selection.points = k3d.component_select_all()
+		selection = k3d.mesh_selection.select_all()
 		self.transform_points.mesh_selection = selection
-		selection = k3d.select_all()
+		selection = k3d.mesh_selection.select_all()
 		self.flip_orientation.mesh_selection = selection
 	def get_child(self, node):
 		return self.doc.get_dependency(node.get_property("input_mesh")).node()
