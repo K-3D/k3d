@@ -78,14 +78,19 @@ static void unwatch_file(ifile_change_notifier_wrapper& Self, const uint_t Watch
 	return Self.wrapped().unwatch_file(WatchID);
 }
 
-static bool_t pending_changes(ifile_change_notifier_wrapper& Self)
+static void wait_for_changes(ifile_change_notifier_wrapper& Self)
 {
-	return Self.wrapped().pending_changes();
+	Self.wrapped().wait_for_changes();
 }
 
-static void notify_change(ifile_change_notifier_wrapper& Self)
+static uint_t change_count(ifile_change_notifier_wrapper& Self)
 {
-	Self.wrapped().notify_change();
+	return Self.wrapped().change_count();
+}
+
+static void signal_change(ifile_change_notifier_wrapper& Self)
+{
+	Self.wrapped().signal_change();
 }
 
 void define_class_ifile_change_notifier()
@@ -96,11 +101,13 @@ void define_class_ifile_change_notifier()
 			"Watch a file for changes.\n\n"
 			"@rtype: integer watch identifier\n")
 		.def("unwatch_file", &unwatch_file,
-			"Stops watching a file for changes.\n\n")
-		.def("pending_changes", &pending_changes,
-			"Returns True if there are any file changes pending.\n\n")
-		.def("notify_change", &notify_change,
-			"Process the next pending file change.  Blocks if no changes are pending.")
+			"Stops watching a file for changes.")
+		.def("wait_for_changes", &wait_for_changes,
+			"Blocks indefinitely until at least one file change has been received.")
+		.def("change_count", &change_count,
+			"Returns the number of file changes that are pending, ready to be signalled.  This method never blocks.")
+		.def("signal_change", &signal_change,
+			"Signals the next file change that is pending, if any.  This method never blocks.")
 		;
 
 	class_<file_change_receiver>("file_change_receiver",

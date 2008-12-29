@@ -116,8 +116,8 @@ void file_notification::stop()
 
 void file_notification::on_notify_file_changes()
 {
-	while(m_implementation->m_notifier->pending_changes())
-		m_implementation->m_notifier->notify_change();
+	while(m_implementation->m_notifier->change_count())
+		m_implementation->m_notifier->signal_change();
 }
 
 void file_notification::on_notify_file_changes_threaded()
@@ -131,14 +131,12 @@ void file_notification::notify_file_change_thread_function()
 {
 	while(true)
 	{
-		if(m_implementation->m_notifier->pending_changes(true))
-		{
-			// Signal the main thread that events have occurred
-			m_implementation->m_file_notification_dispatcher->emit();
-			// Wait until the main thread has handled the events
-			Glib::Mutex::Lock lock(*m_implementation->m_file_notification_mutex);
-			m_implementation->m_file_notification_cond->wait(*m_implementation->m_file_notification_mutex);
-		}
+		m_implementation->m_notifier->wait_for_changes();
+		// Signal the main thread that events have occurred
+		m_implementation->m_file_notification_dispatcher->emit();
+		// Wait until the main thread has handled the events
+		Glib::Mutex::Lock lock(*m_implementation->m_file_notification_mutex);
+		m_implementation->m_file_notification_cond->wait(*m_implementation->m_file_notification_mutex);
 	}
 }
 

@@ -40,6 +40,7 @@ class path;
 
 }
 
+/// Interface implemented by objects that can signal changes to files.
 class ifile_change_notifier :
 	public virtual iunknown
 {
@@ -51,7 +52,7 @@ public:
 	* Note that we are watching the
 	* path, not an inode, so it isn't an error to specify a path for a nonexistent file.
 	* The slot will be called when a file is created / modified / renamed / deleted at that
-	* location.  Returns a nonzero watch identifier that is used to cancel the watch later-on,
+	* location.  Returns a nonzero watch identifier that can be used to cancel the watch later-on,
 	* or 0 if there is an error.
 	*/
 	virtual uint_t watch_file(const filesystem::path& Path, const sigc::slot<void>& Slot) = 0;
@@ -59,11 +60,14 @@ public:
 	/// Stop watching the given path.
 	virtual void unwatch_file(const uint_t WatchID) = 0;
 
-	/// Returns true if there are any notification events waiting. Will block until an event occurs if Blocking is true.
-	virtual const bool_t pending_changes(const k3d::bool_t Blocking = false) = 0;
+	/// Blocks indefinitely until there is at least one file change ready to be signalled.
+	virtual void wait_for_changes() = 0;
 
-	/// Handles the next notification event (calls one slot), blocking if there are no events pending.
-	virtual void notify_change() = 0;
+	/// Returns the number of file changes that are pending and ready to be signalled.  This method never blocks.
+	virtual const uint_t change_count() = 0;
+
+	/// Handles signalling for the next file change that is pending, if any.  This method never blocks.
+	virtual void signal_change() = 0;
   
 protected:
 	ifile_change_notifier() {}

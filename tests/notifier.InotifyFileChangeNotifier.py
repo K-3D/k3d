@@ -27,18 +27,18 @@ id3 = notifier.watch_file(path, receiver)
 if not id3:
 	raise Exception("couldn't create 3rd watch")
 
-if notifier.pending_changes():
+if notifier.change_count():
 	raise Exception("unexpected changes pending")
 
 f = file(str(path), "w")
 f.write("World!\n")
 f.close()
 
-if not notifier.pending_changes():
+if not notifier.change_count():
 	raise Exception("missing changes pending")
 
-while notifier.pending_changes():
-	notifier.notify_change()
+while notifier.change_count():
+	notifier.signal_change()
 
 changed = receiver.changed()
 if len(changed) != 1:

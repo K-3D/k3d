@@ -155,58 +155,38 @@ public:
 			k3d::log() << error << e.what() << std::endl;
 		}
 	}
-	
-	const k3d::bool_t pending_changes(const k3d::bool_t Blocking = false)
+
+	void wait_for_changes()
 	{
 		if(!inotify)
-			return false;
+			return;
 		
-		if(!Blocking)
-		{
-			inotify->SetNonBlock(true);
-			inotify->WaitForEvents();
-			return inotify->GetEventCount();
-		}
 		// In the blocking case, we check for events in a manner that does not require holding a lock on the inotify object
 		inotify->SetNonBlock(false);
 		fd_set read_descriptors;
 		FD_ZERO(&read_descriptors);
 		FD_SET(inotify->GetDescriptor(), &read_descriptors);
-		return (select(inotify->GetDescriptor() + 1, &read_descriptors, NULL, NULL, NULL) > 0);
+		select(inotify->GetDescriptor() + 1, &read_descriptors, NULL, NULL, NULL);
 	}
 	
-	void notify_change()
+	const k3d::uint_t change_count()
+	{
+		if(!inotify)
+			return 0;
+		
+		inotify->SetNonBlock(true);
+		inotify->WaitForEvents();
+		return inotify->GetEventCount();
+	}
+	
+	void signal_change()
 	{
 		if(!inotify)
 			return;
 
 		if(!inotify->GetEventCount())
-		{
-			inotify->SetNonBlock(false);
-			inotify->WaitForEvents();
-			inotify->SetNonBlock(true);
-		}
+			return;
 		
-		handle_event();
-	}
-
-	static k3d::iplugin_factory& get_factory()
-	{
-		static k3d::application_plugin_factory<file_change_notifier,
-			k3d::interface_list<k3d::ifile_change_notifier> > factory(
-				k3d::uuid(0x37e5155b, 0xed45e9aa, 0xd1f0ed88, 0xb582ea76),
-				"InotifyFileChangeNotifier",
-				_("Monitors files for changes, using the Linux inotify system"),
-				"Desktop",
-				k3d::iplugin_factory::STABLE);
-
-		return factory;
-	}
-	
-private:
-	/// Assumes an event is on the queue, and handles it
-	void handle_event()
-	{
 		InotifyEvent event;
 		if(!inotify->GetEvent(&event))
 		{
@@ -224,6 +204,20 @@ private:
 		}
 	}
 
+	static k3d::iplugin_factory& get_factory()
+	{
+		static k3d::application_plugin_factory<file_change_notifier,
+			k3d::interface_list<k3d::ifile_change_notifier> > factory(
+				k3d::uuid(0x37e5155b, 0xed45e9aa, 0xd1f0ed88, 0xb582ea76),
+				"InotifyFileChangeNotifier",
+				_("Monitors files for changes, using the Linux inotify system"),
+				"Desktop",
+				k3d::iplugin_factory::STABLE);
+
+		return factory;
+	}
+	
+private:
 	boost::scoped_ptr<Inotify> inotify;
 
 	typedef std::map<k3d::filesystem::path, boost::shared_ptr<InotifyWatch> > paths_t;
