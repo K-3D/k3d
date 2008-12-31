@@ -166,13 +166,18 @@ public:
 			stream << indentation << "node [shape=\"record\" fontname=\"Helvetica\" fontsize=12 height=0 width=0]\n";
 			stream << indentation << "edge [fontname=\"Helvetica\" fontsize=10]\n";
 
-			stream << indentation << "v" << current_mesh << " [label=\"k3d::mesh|<points>points|<point_selection>point_selection|<primitives>primitives\"]\n";
+			stream << indentation << "v" << current_mesh << " [label=\"<mesh>Mesh|<points>points|<point_selection>point_selection|<primitives>primitives\"]\n";
 			stream << k3d::push_indent;
 		}
 
 		void mesh_points(const k3d::mesh::points_t& Points)
 		{
 			current_array = &Points;
+
+			stream << indentation << "subgraph cluster_0\n";
+			stream << indentation << "{\n";
+			stream << k3d::push_indent;
+			stream << indentation << "color=white;\n";
 
 			stream << indentation << "v" << current_array << " [label=\"{|||...|}\"]\n";
 			stream << indentation << "v" << current_mesh << ":points:e -> " << "v" << current_array << ":w\n";
@@ -187,6 +192,9 @@ public:
 			stream << indentation << "v" << current_array << " [label=\"{|||...|}\"]\n";
 			stream << indentation << "v" << current_mesh << ":point_selection:e -> " << "v" << current_array << ":w\n";
 
+			stream << k3d::pop_indent;
+			stream << indentation << "}\n";
+
 			current_array = 0;
 		}
 
@@ -194,8 +202,8 @@ public:
 		{
 			current_primitive = &Primitive;
 
-			stream << indentation << "v" << current_primitive << " [label=\"k3d::mesh::primitive|<type>type|<topology>topology|<attributes>attributes\"]\n";
-			stream << indentation << "v" << current_mesh << ":primitives:e -> " << "v" << current_primitive << ":w\n";
+			stream << indentation << "v" << current_primitive << " [label=\"<mesh_primitive>Mesh Primitive|<type>type|<topology>topology|<attributes>attributes\"]\n";
+			stream << indentation << "v" << current_mesh << ":primitives:e -> " << "v" << current_primitive << ":mesh_primitive:w\n";
 			stream << k3d::push_indent;
 
 			stream << indentation << "v" << current_primitive << "type [label=\"\\\"" << current_primitive->type << "\\\"\" shape=\"plaintext\"]\n";
@@ -207,13 +215,13 @@ public:
 			current_topology_arrays = &Topology;
 
 			stream << indentation << "v" << current_topology_arrays;
-			stream << " [label=\"k3d::named_arrays";
+			stream << " [label=\"<named_arrays>Named Arrays";
 			
 			for(k3d::mesh::named_arrays_t::const_iterator array = Topology.begin(); array != Topology.end(); ++array)
 				stream << "|<" << array->first << ">" << "\\\"" << array->first << "\\\"";
 
 			stream << "\"]\n";
-			stream << indentation << "v" << current_primitive << ":topology:e -> " << "v" << current_topology_arrays << ":w\n";
+			stream << indentation << "v" << current_primitive << ":topology:e -> " << "v" << current_topology_arrays << ":named_arrays:w\n";
 		}
 
 		void topology_array(const k3d::string_t& Name, const k3d::array& Array)
@@ -239,13 +247,13 @@ public:
 			current_named_attribute_arrays = &NamedAttributes;
 
 			stream << indentation << "v" << current_named_attribute_arrays;
-			stream << " [label=\"k3d::named_attribute_arrays";
+			stream << " [label=\"<named_attribute_arrays>Named Attribute Arrays";
 			
 			for(k3d::mesh::named_attribute_arrays_t::const_iterator attributes = NamedAttributes.begin(); attributes != NamedAttributes.end(); ++attributes)
 				stream << "|<" << attributes->first << ">" << "\\\"" << attributes->first << "\\\"";
 
 			stream << "\"]\n";
-			stream << indentation << "v" << current_primitive << ":attributes:e -> " << "v" << current_named_attribute_arrays << ":w\n";
+			stream << indentation << "v" << current_primitive << ":attributes:e -> " << "v" << current_named_attribute_arrays << ":named_attribute_arrays:w\n";
 			stream << k3d::push_indent;
 		}
 
@@ -254,13 +262,13 @@ public:
 			current_attribute_arrays = &Attributes;
 
 			stream << indentation << "v" << current_attribute_arrays;
-			stream << " [label=\"k3d::attribute_arrays";
+			stream << " [label=\"<attribute_arrays>Attribute Arrays";
 
 			for(k3d::mesh::attribute_arrays_t::const_iterator array = Attributes.begin(); array != Attributes.end(); ++array)
 				stream << "|<" << array->first << ">" << "\\\"" << array->first << "\\\"";
 
 			stream << "\"]\n";
-			stream << indentation << "v" << current_named_attribute_arrays << ":" << Name << ":e -> " << "v" << current_attribute_arrays << ":w\n";
+			stream << indentation << "v" << current_named_attribute_arrays << ":" << Name << ":e -> " << "v" << current_attribute_arrays << ":attribute_arrays:w\n";
 		}
 
 		void attribute_array(const k3d::string_t& Name, const k3d::array& Array)
