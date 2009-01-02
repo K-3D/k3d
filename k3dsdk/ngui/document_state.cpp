@@ -1323,9 +1323,9 @@ public:
 				return is_selected(k3d::selection::get_node(Record));
 			case SELECT_POINTS:
 				return detail::is_point_selected(Record);
-			case SELECT_LINES:
+			case SELECT_SPLIT_EDGES:
 				return detail::is_line_selected(Record);
-			case SELECT_FACES:
+			case SELECT_UNIFORM:
 				return detail::is_face_selected(Record);
 		}
 
@@ -1408,10 +1408,10 @@ public:
 			case SELECT_POINTS:
 				select_points(Selection);
 				break;
-			case SELECT_LINES:
+			case SELECT_SPLIT_EDGES:
 				select_lines(Selection);
 				break;
-			case SELECT_FACES:
+			case SELECT_UNIFORM:
 				select_faces(Selection);
 				break;
 		}
@@ -1457,10 +1457,10 @@ public:
 			case SELECT_POINTS:
 				select_all_points();
 				break;
-			case SELECT_LINES:
+			case SELECT_SPLIT_EDGES:
 				select_all_lines();
 				break;
-			case SELECT_FACES:
+			case SELECT_UNIFORM:
 				select_all_faces();
 				break;
 		}
@@ -1502,10 +1502,10 @@ public:
 			case SELECT_POINTS:
 				deselect_points(Selection);
 				break;
-			case SELECT_LINES:
+			case SELECT_SPLIT_EDGES:
 				deselect_lines(Selection);
 				break;
-			case SELECT_FACES:
+			case SELECT_UNIFORM:
 				deselect_faces(Selection);
 				break;
 		}
@@ -1538,8 +1538,8 @@ public:
 				deselect_all_nodes();
 				break;
 			case SELECT_POINTS:
-			case SELECT_LINES:
-			case SELECT_FACES:
+			case SELECT_SPLIT_EDGES:
+			case SELECT_UNIFORM:
 				deselect_all_components();
 				break;
 		}
@@ -1583,10 +1583,10 @@ public:
 			case SELECT_POINTS:
 				invert_point_selection();
 				break;
-			case SELECT_LINES:
+			case SELECT_SPLIT_EDGES:
 				invert_line_selection();
 				break;
-			case SELECT_FACES:
+			case SELECT_UNIFORM:
 				invert_face_selection();
 				break;
 		}
@@ -1923,10 +1923,10 @@ public:
 			case SELECT_POINTS:
 				on_set_point_mode();
 				break;
-			case SELECT_LINES:
+			case SELECT_SPLIT_EDGES:
 				on_set_line_mode();
 				break;
-			case SELECT_FACES:
+			case SELECT_UNIFORM:
 				on_set_face_mode();
 				break;
 		}

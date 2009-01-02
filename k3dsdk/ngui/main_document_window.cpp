@@ -1931,13 +1931,13 @@ private:
 	void on_select_edges()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Lines mode"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.set_selection_mode(SELECT_LINES);
+		m_document_state.set_selection_mode(SELECT_SPLIT_EDGES);
 	}
 
 	void on_select_faces()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Faces mode"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.set_selection_mode(SELECT_FACES);
+		m_document_state.set_selection_mode(SELECT_UNIFORM);
 	}
 
 	void on_layout_maximize_panel()

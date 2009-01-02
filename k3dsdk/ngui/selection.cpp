@@ -41,10 +41,10 @@ std::ostream& operator<<(std::ostream& Stream, const selection_mode_t& RHS)
 		case SELECT_POINTS:
 			Stream << "points";
 			break;
-		case SELECT_LINES:
+		case SELECT_SPLIT_EDGES:
 			Stream << "lines";
 			break;
-		case SELECT_FACES:
+		case SELECT_UNIFORM:
 			Stream << "faces";
 			break;
 	}
@@ -62,9 +62,9 @@ std::istream& operator>>(std::istream& Stream, selection_mode_t& RHS)
         else if(text == "points")
                 RHS = SELECT_POINTS;
         else if(text == "lines")
-                RHS = SELECT_LINES;
+                RHS = SELECT_SPLIT_EDGES;
         else if(text == "faces")
-                RHS = SELECT_FACES;
+                RHS = SELECT_UNIFORM;
         else
                 k3d::log() << error << "Unknown enumeration [" << text << "]"<< std::endl;
 

@@ -411,7 +411,7 @@ struct selection_input_model::implementation :
 
 			case MOTION_RUBBER_BAND_REPLACE:
 			{
-				const k3d::selection::records selection = Viewport.get_selectable_objects(m_rubber_band.box, m_rubber_band_backfacing);
+				const k3d::selection::records selection = Viewport.get_object_selectables(m_rubber_band.box, m_rubber_band_backfacing);
 
 				command_arguments arguments;
 				arguments.append_viewport_coordinates("mouse", Viewport, Event);
@@ -428,7 +428,7 @@ struct selection_input_model::implementation :
 
 			case MOTION_RUBBER_BAND_SELECT:
 			{
-				const k3d::selection::records selection = Viewport.get_selectable_objects(m_rubber_band.box, m_rubber_band_backfacing);
+				const k3d::selection::records selection = Viewport.get_object_selectables(m_rubber_band.box, m_rubber_band_backfacing);
 
 				command_arguments arguments;
 				arguments.append_viewport_coordinates("mouse", Viewport, Event);
@@ -444,7 +444,7 @@ struct selection_input_model::implementation :
 
 			case MOTION_RUBBER_BAND_DESELECT:
 			{
-				const k3d::selection::records selection = Viewport.get_selectable_objects(m_rubber_band.box, m_rubber_band_backfacing);
+				const k3d::selection::records selection = Viewport.get_object_selectables(m_rubber_band.box, m_rubber_band_backfacing);
 
 				command_arguments arguments;
 				arguments.append_viewport_coordinates("mouse", Viewport, Event);

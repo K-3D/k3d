@@ -251,7 +251,7 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "select_edges",
-				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_LINES, _("Select Lines mode")),
+				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_SPLIT_EDGES, _("Select Lines mode")),
 				&m_document_state.document().state_recorder(),
 				load_icon("edge", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Lines"))
@@ -260,7 +260,7 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "select_faces",
-				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_FACES, _("Select Faces mode")),
+				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_UNIFORM, _("Select Faces mode")),
 				&m_document_state.document().state_recorder(),
 				load_icon("face", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Faces"))

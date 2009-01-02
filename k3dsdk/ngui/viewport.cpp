@@ -740,64 +740,46 @@ bool control::on_key_release_event(GdkEventKey* Event)
 	return true;
 }
 
-k3d::selection::records control::get_selectable_points(const k3d::rectangle& SelectionRegion, bool Backfacing)
-{
-	return get_selection(detail::select_points(Backfacing), SelectionRegion);
-}
-
-k3d::selection::records control::get_selectable_lines(const k3d::rectangle& SelectionRegion, bool Backfacing)
-{
-	return get_selection(detail::select_lines(Backfacing), SelectionRegion);
-}
-
-k3d::selection::records control::get_selectable_faces(const k3d::rectangle& SelectionRegion, bool Backfacing)
-{
-	return get_selection(detail::select_faces(Backfacing), SelectionRegion);
-}
-
-k3d::selection::records control::get_selectable_nodes(const k3d::rectangle& SelectionRegion)
+k3d::selection::records control::get_node_selectables(const k3d::rectangle& SelectionRegion)
 {
 	return get_selection(detail::select_nodes(), SelectionRegion);
 }
 
-k3d::selection::records control::get_selectable_objects(const k3d::rectangle& SelectionRegion, bool Backfacing)
+k3d::selection::records control::get_point_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
+{
+	return get_selection(detail::select_points(Backfacing), SelectionRegion);
+}
+
+k3d::selection::records control::get_split_edge_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
+{
+	return get_selection(detail::select_lines(Backfacing), SelectionRegion);
+}
+
+k3d::selection::records control::get_uniform_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
+{
+	return get_selection(detail::select_faces(Backfacing), SelectionRegion);
+}
+
+k3d::selection::records control::get_object_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
 {
 	switch(m_implementation->m_document_state.selection_mode().internal_value())
 	{
 		case SELECT_NODES:
-			return get_selectable_nodes(SelectionRegion);
+			return get_node_selectables(SelectionRegion);
 			break;
 		case SELECT_POINTS:
-			return get_selectable_points(SelectionRegion, Backfacing);
+			return get_point_selectables(SelectionRegion, Backfacing);
 			break;
-		case SELECT_LINES:
-			return get_selectable_lines(SelectionRegion, Backfacing);
+		case SELECT_SPLIT_EDGES:
+			return get_split_edge_selectables(SelectionRegion, Backfacing);
 			break;
-		case SELECT_FACES:
-			return get_selectable_faces(SelectionRegion, Backfacing);
+		case SELECT_UNIFORM:
+			return get_uniform_selectables(SelectionRegion, Backfacing);
 			break;
 	}
 
 	assert_not_reached();
 	return k3d::selection::records();
-}
-
-k3d::selection::record control::pick_point(const k3d::point2& Coordinates, bool Backfacing)
-{
-	k3d::selection::records records;
-	return pick_point(Coordinates, records, Backfacing);
-}
-
-k3d::selection::record control::pick_line(const k3d::point2& Coordinates, bool Backfacing)
-{
-	k3d::selection::records records;
-	return pick_line(Coordinates, records, Backfacing);
-}
-
-k3d::selection::record control::pick_face(const k3d::point2& Coordinates, bool Backfacing)
-{
-	k3d::selection::records records;
-	return pick_face(Coordinates, records, Backfacing);
 }
 
 k3d::selection::record control::pick_node(const k3d::point2& Coordinates)
@@ -806,10 +788,50 @@ k3d::selection::record control::pick_node(const k3d::point2& Coordinates)
 	return pick_node(Coordinates, records);
 }
 
+k3d::selection::record control::pick_point(const k3d::point2& Coordinates, bool Backfacing)
+{
+	k3d::selection::records records;
+	return pick_point(Coordinates, records, Backfacing);
+}
+
+k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, bool Backfacing)
+{
+	k3d::selection::records records;
+	return pick_split_edge(Coordinates, records, Backfacing);
+}
+
+k3d::selection::record control::pick_uniform(const k3d::point2& Coordinates, bool Backfacing)
+{
+	k3d::selection::records records;
+	return pick_uniform(Coordinates, records, Backfacing);
+}
+
 k3d::selection::record control::pick_object(const k3d::point2& Coordinates, bool Backfacing)
 {
 	k3d::selection::records records;
 	return pick_object(Coordinates, records, Backfacing);
+}
+
+k3d::selection::record control::pick_node(const k3d::point2& Coordinates, k3d::selection::records& Records)
+{
+	const double sensitivity = 3;
+
+	const k3d::rectangle selection_region(
+		Coordinates[0] - sensitivity,
+		Coordinates[0] + sensitivity,
+		Coordinates[1] - sensitivity,
+		Coordinates[1] + sensitivity);
+
+	Records = get_selection(detail::select_nodes(), selection_region);
+	std::sort(Records.begin(), Records.end(), detail::sort_by_zmin());
+
+	for(k3d::selection::records::iterator record = Records.begin(); record != Records.end(); ++record)
+	{
+		if(record->tokens.size() && record->tokens[0].type == k3d::selection::NODE)
+			return *record;
+	}
+
+	return k3d::selection::record::empty_record();
 }
 
 k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
@@ -1093,7 +1115,7 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	return k3d::selection::record::empty_record();
 }
 
-k3d::selection::record control::pick_line(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
+k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
 {
 	// Draw everything (will find nearest line if some other component type is picked)
 	k3d::gl::selection_state selection_state;
@@ -1205,8 +1227,7 @@ k3d::selection::record control::pick_line(const k3d::point2& Coordinates, k3d::s
 	return k3d::selection::record::empty_record();
 }
 
-/// Retrieves the face (if any) under the given widget coordinates
-k3d::selection::record control::pick_face(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
+k3d::selection::record control::pick_uniform(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
 {
 	const double sensitivity = 3;
 	const k3d::rectangle selection_region(
@@ -1230,28 +1251,6 @@ k3d::selection::record control::pick_face(const k3d::point2& Coordinates, k3d::s
 	return k3d::selection::record::empty_record();
 }
 
-k3d::selection::record control::pick_node(const k3d::point2& Coordinates, k3d::selection::records& Records)
-{
-	const double sensitivity = 3;
-
-	const k3d::rectangle selection_region(
-		Coordinates[0] - sensitivity,
-		Coordinates[0] + sensitivity,
-		Coordinates[1] - sensitivity,
-		Coordinates[1] + sensitivity);
-
-	Records = get_selection(detail::select_nodes(), selection_region);
-	std::sort(Records.begin(), Records.end(), detail::sort_by_zmin());
-
-	for(k3d::selection::records::iterator record = Records.begin(); record != Records.end(); ++record)
-	{
-		if(record->tokens.size() && record->tokens[0].type == k3d::selection::NODE)
-			return *record;
-	}
-
-	return k3d::selection::record::empty_record();
-}
-
 k3d::selection::record control::pick_object(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
 {
 	switch(m_implementation->m_document_state.selection_mode().internal_value())
@@ -1262,11 +1261,11 @@ k3d::selection::record control::pick_object(const k3d::point2& Coordinates, k3d:
 		case SELECT_POINTS:
 			return pick_point(Coordinates, Records, Backfacing);
 			break;
-		case SELECT_LINES:
-			return pick_line(Coordinates, Records, Backfacing);
+		case SELECT_SPLIT_EDGES:
+			return pick_split_edge(Coordinates, Records, Backfacing);
 			break;
-		case SELECT_FACES:
-			return pick_face(Coordinates, Records, Backfacing);
+		case SELECT_UNIFORM:
+			return pick_uniform(Coordinates, Records, Backfacing);
 			break;
 	}
 

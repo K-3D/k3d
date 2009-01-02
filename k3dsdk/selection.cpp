@@ -98,8 +98,8 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case SPLIT_EDGE:
 			Stream << "split_edge";
 			break;
-		case VERTEX:
-			Stream << "vertex";
+		case POINT:
+			Stream << "point";
 			break;
 		default:
 			Stream << RHS;
@@ -152,8 +152,8 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = FACE_VARYING;
 	else if(buffer == "split_edge")
 		RHS = SPLIT_EDGE;
-	else if(buffer == "vertex")
-		RHS = VERTEX;
+	else if(buffer == "point")
+		RHS = POINT;
 	else
 		log() << error << k3d_file_reference << ": could not extract value [" << buffer << "]" << std::endl;
 

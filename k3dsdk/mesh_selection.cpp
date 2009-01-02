@@ -203,7 +203,7 @@ const mesh_selection mesh_selection::select_all()
 	result.components.push_back(component(0, uint_t(-1), selection::VARYING, 0, uint_t(-1), 1.0));
 	result.components.push_back(component(0, uint_t(-1), selection::FACE_VARYING, 0, uint_t(-1), 1.0));
 	result.components.push_back(component(0, uint_t(-1), selection::SPLIT_EDGE, 0, uint_t(-1), 1.0));
-	result.components.push_back(component(0, uint_t(-1), selection::VERTEX, 0, uint_t(-1), 1.0));
+	result.components.push_back(component(0, uint_t(-1), selection::POINT, 0, uint_t(-1), 1.0));
 
 	return result;
 }
@@ -223,7 +223,7 @@ const mesh_selection mesh_selection::deselect_all()
 	result.components.push_back(component(0, uint_t(-1), selection::VARYING, 0, uint_t(-1), 0.0));
 	result.components.push_back(component(0, uint_t(-1), selection::FACE_VARYING, 0, uint_t(-1), 0.0));
 	result.components.push_back(component(0, uint_t(-1), selection::SPLIT_EDGE, 0, uint_t(-1), 0.0));
-	result.components.push_back(component(0, uint_t(-1), selection::VERTEX, 0, uint_t(-1), 0.0));
+	result.components.push_back(component(0, uint_t(-1), selection::POINT, 0, uint_t(-1), 0.0));
 
 	return result;
 }

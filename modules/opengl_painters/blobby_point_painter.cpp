@@ -144,7 +144,7 @@ public:
 			for(k3d::uint_t primitive = primitives_begin; primitive != primitives_end; ++primitive)
 			{
 				k3d::gl::push_selection_token(k3d::selection::VARYING, primitive);
-				k3d::gl::push_selection_token(k3d::selection::VERTEX, primitive);
+				k3d::gl::push_selection_token(k3d::selection::POINT, primitive);
 
 				const k3d::uint_t first_float = blobby->primitive_first_floats[primitive];
 				const k3d::uint_t float_count = blobby->primitive_float_counts[primitive];
@@ -193,7 +193,7 @@ public:
 					}
 				}
 
-				k3d::gl::pop_selection_token(); // VERTEX
+				k3d::gl::pop_selection_token(); // POINT
 				k3d::gl::pop_selection_token(); // VARYING
 
 			}

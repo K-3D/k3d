@@ -109,8 +109,8 @@ VARYING = 28,
 FACE_VARYING = 29,
 /// Storage for a zero-based split-edge index (relative to a primitive)
 SPLIT_EDGE = 30,
-/// Storage for a zero-based vertex index (relative to a mesh)
-VERTEX = 31,
+/// Storage for a zero-based point index (relative to a mesh)
+POINT = 31,
 
 };
 

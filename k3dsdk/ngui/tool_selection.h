@@ -119,8 +119,8 @@ protected:
 			switch(m_document_state.selection_mode().internal_value())
 			{
 				case SELECT_POINTS:
-				case SELECT_LINES:
-				case SELECT_FACES:
+				case SELECT_SPLIT_EDGES:
+				case SELECT_UNIFORM:
 					if(!m_document_state.is_selected(node))
 						m_mouse_down_selection = k3d::selection::record::empty_record();;
 					break;
@@ -182,7 +182,7 @@ protected:
 	void on_box_select_objects(viewport::control& Viewport, const k3d::point2& Coordinates, const k3d::rectangle& SelectionRegion)
 	{
 		bool rubber_band_backfacing = m_document_state.rubber_band_backfacing();
-		const k3d::selection::records selection = Viewport.get_selectable_objects(normalize(SelectionRegion), rubber_band_backfacing);
+		const k3d::selection::records selection = Viewport.get_object_selectables(normalize(SelectionRegion), rubber_band_backfacing);
 
 		switch(m_mouse_down_content)
 		{

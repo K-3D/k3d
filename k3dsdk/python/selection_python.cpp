@@ -51,7 +51,7 @@ void define_namespace_selection()
 		.value("VARYING", k3d::selection::VARYING)
 		.value("FACE_VARYING", k3d::selection::FACE_VARYING)
 		.value("SPLIT_EDGE", k3d::selection::SPLIT_EDGE)
-		.value("VERTEX", k3d::selection::VERTEX)
+		.value("POINT", k3d::selection::POINT)
 		.attr("__module__") = "k3d";
 }
 

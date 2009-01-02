@@ -83,7 +83,7 @@ bool selection_position(const selection_mode_t& SelectionMode, const k3d::nodes_
 		const k3d::matrix4 transformation = k3d::node_to_world_matrix(**node);
 		point_visitor visitor(BoundingBox, Points, transformation);
 
-		if (SelectionMode == SELECT_NODES)
+		if(SelectionMode == SELECT_NODES)
 		{
 			if(k3d::ibounded* bounded = dynamic_cast<k3d::ibounded*>(*node))
 			{
@@ -94,28 +94,28 @@ bool selection_position(const selection_mode_t& SelectionMode, const k3d::nodes_
 				BoundingBox.insert(k3d::world_position(**node));
 			}
 		}
-		if (!(*node)->factory().implements(typeid(k3d::imesh_source)))
+		if(!(*node)->factory().implements(typeid(k3d::imesh_source)))
 			continue;
 		const k3d::mesh* mesh = k3d::property::pipeline_value<k3d::mesh*>(dynamic_cast<k3d::imesh_source*>(*node)->mesh_source_output());
-		if (!mesh)
+		if(!mesh)
 			continue;
-		if (!mesh->points)
+		if(!mesh->points)
 			continue;
-		if (SelectionMode == SELECT_NODES)
+		if(SelectionMode == SELECT_NODES)
 		{
 			const k3d::mesh::points_t& points = *mesh->points;
 			for (k3d::uint_t point = 0; point != points.size(); ++point)
 				Points.push_back(transformation * points[point]);
 		}
-		if (SelectionMode == SELECT_POINTS)
+		if(SelectionMode == SELECT_POINTS)
 		{
 			k3d::traverse_selected_points(*mesh, visitor);
 		}
-		if (SelectionMode == SELECT_LINES)
+		if(SelectionMode == SELECT_SPLIT_EDGES)
 		{
 			k3d::traverse_selected_edge_points(*mesh, visitor);
 		}
-		if (SelectionMode == SELECT_FACES)
+		if(SelectionMode == SELECT_UNIFORM)
 		{
 			k3d::traverse_selected_face_points(*mesh, visitor);
 		}

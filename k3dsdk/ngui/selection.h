@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <iosfwd>
@@ -34,12 +34,12 @@ typedef enum
 {
 	/// Select individual nodes
 	SELECT_NODES,
-	/// Select points / point groups
+	/// Select points
 	SELECT_POINTS,
-	/// Select polyhedron edges / curves
-	SELECT_LINES,
-	/// Select polyhedron faces / patches
-	SELECT_FACES
+	/// Select polyhedron split-edges
+	SELECT_SPLIT_EDGES,
+	/// Select uniform components
+	SELECT_UNIFORM
 } selection_mode_t;
 
 std::ostream& operator<<(std::ostream& Stream, const selection_mode_t& Value);
