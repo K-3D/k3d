@@ -2,7 +2,7 @@
 #define K3DSDK_SELECTION_STATE_GL_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,6 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "types.h"
+
 namespace k3d
 {
 
@@ -37,35 +39,25 @@ public:
 	selection_state() :
 		exclude_unselected_nodes(false),
 		select_points(false),
-		select_point_groups(false),
-		select_edges(false),
 		select_faces(false),
-		select_linear_curves(false),
-		select_cubic_curves(false),
 		select_nurbs_curves(false),
-		select_bilinear_patches(false),
-		select_bicubic_patches(false),
 		select_nurbs_patches(false),
 		select_bezier_triangle_patches(false),
-		select_blobbies(false),
-		select_backfacing(false)
+		select_backfacing(false),
+		select_uniform(false),
+		select_split_edges(false)
 	{
 	}
 
-	bool exclude_unselected_nodes;
-	bool select_points;
-	bool select_point_groups;
-	bool select_edges;
-	bool select_faces;
-	bool select_linear_curves;
-	bool select_cubic_curves;
-	bool select_nurbs_curves;
-	bool select_bilinear_patches;
-	bool select_bicubic_patches;
-	bool select_nurbs_patches;
-	bool select_bezier_triangle_patches;
-	bool select_blobbies;
-	bool select_backfacing;
+	bool_t exclude_unselected_nodes;
+	bool_t select_points;
+	bool_t select_faces;
+	bool_t select_nurbs_curves;
+	bool_t select_nurbs_patches;
+	bool_t select_bezier_triangle_patches;
+	bool_t select_backfacing;
+	bool_t select_uniform;
+	bool_t select_split_edges;
 };
 
 } // namespace gl

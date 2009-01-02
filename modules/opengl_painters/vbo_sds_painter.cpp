@@ -288,7 +288,7 @@ private:
 	
 	virtual void select(vbo_t& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if (!SelectionState.select_edges)
+		if (!SelectionState.select_split_edges)
 					return;
 
 		glDisable(GL_LIGHTING);

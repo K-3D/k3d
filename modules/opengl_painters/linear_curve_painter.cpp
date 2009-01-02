@@ -97,7 +97,7 @@ public:
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!SelectionState.select_linear_curves)
+		if(!SelectionState.select_uniform)
 			return;
 
 		k3d::uint_t primitive_index = 0;

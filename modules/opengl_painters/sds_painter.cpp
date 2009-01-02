@@ -335,7 +335,7 @@ private:
 	
 	virtual void select(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if (!SelectionState.select_edges)
+		if (!SelectionState.select_split_edges)
 			return;
 
 		glDisable(GL_LIGHTING);

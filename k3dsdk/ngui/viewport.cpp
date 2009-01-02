@@ -80,34 +80,29 @@ const k3d::gl::selection_state select_points(bool Backfacing)
 
 	result.exclude_unselected_nodes = true;
 	result.select_points = true;
-	result.select_point_groups = true;
 	result.select_backfacing = Backfacing;
 
 	return result;
 }
 
-const k3d::gl::selection_state select_lines(bool Backfacing)
+const k3d::gl::selection_state select_split_edges(bool Backfacing)
 {
 	k3d::gl::selection_state result;
 
 	result.exclude_unselected_nodes = true;
-	result.select_edges = true;
-	result.select_linear_curves = true;
-	result.select_cubic_curves = true;
+	result.select_split_edges = true;
 	result.select_nurbs_curves = true;
 	result.select_backfacing = Backfacing;
 
 	return result;
 }
 
-const k3d::gl::selection_state select_faces(bool Backfacing)
+const k3d::gl::selection_state select_uniform(bool Backfacing)
 {
 	k3d::gl::selection_state result;
 
 	result.exclude_unselected_nodes = true;
 	result.select_faces = true;
-	result.select_bilinear_patches = true;
-	result.select_bicubic_patches = true;
 	result.select_nurbs_patches = true;
 	result.select_bezier_triangle_patches = true;
 	result.select_backfacing = Backfacing;
@@ -120,18 +115,13 @@ const k3d::gl::selection_state select_nodes()
 	k3d::gl::selection_state result;
 
 	result.select_points = true;
-	result.select_point_groups = true;
-	result.select_edges = true;
 	result.select_faces = true;
-	result.select_linear_curves = true;
-	result.select_cubic_curves = true;
 	result.select_nurbs_curves = true;
-	result.select_bilinear_patches = true;
-	result.select_bicubic_patches = true;
 	result.select_nurbs_patches = true;
 	result.select_bezier_triangle_patches = true;
-	result.select_blobbies = true;
 	result.select_backfacing = true;
+	result.select_uniform = true;
+	result.select_split_edges = true;
 
 	return result;
 }
@@ -752,12 +742,12 @@ k3d::selection::records control::get_point_selectables(const k3d::rectangle& Sel
 
 k3d::selection::records control::get_split_edge_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
 {
-	return get_selection(detail::select_lines(Backfacing), SelectionRegion);
+	return get_selection(detail::select_split_edges(Backfacing), SelectionRegion);
 }
 
 k3d::selection::records control::get_uniform_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
 {
-	return get_selection(detail::select_faces(Backfacing), SelectionRegion);
+	return get_selection(detail::select_uniform(Backfacing), SelectionRegion);
 }
 
 k3d::selection::records control::get_object_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
@@ -840,17 +830,13 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	k3d::gl::selection_state selection_state;
 	selection_state.exclude_unselected_nodes = true;
 	selection_state.select_points = true;
-	selection_state.select_point_groups = true;
-	selection_state.select_edges = true;
 	selection_state.select_faces = true;
-	selection_state.select_linear_curves = true;
-	selection_state.select_cubic_curves = true;
 	selection_state.select_nurbs_curves = true;
-	selection_state.select_bilinear_patches = true;
-	selection_state.select_bicubic_patches = true;
 	selection_state.select_nurbs_patches = true;
 	selection_state.select_bezier_triangle_patches = true;
 	selection_state.select_backfacing = Backfacing;
+	selection_state.select_uniform = true;
+	selection_state.select_split_edges = true;
 
 	const double sensitivity = 5;
 	const k3d::rectangle selection_region(
@@ -1120,10 +1106,8 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 	// Draw everything (will find nearest line if some other component type is picked)
 	k3d::gl::selection_state selection_state;
 	selection_state.exclude_unselected_nodes = true;
-	selection_state.select_edges = true;
+	selection_state.select_split_edges = true;
 	selection_state.select_faces = true;
-	selection_state.select_linear_curves = true;
-	selection_state.select_cubic_curves = true;
 	selection_state.select_nurbs_curves = true;
 	selection_state.select_backfacing = Backfacing;
 
@@ -1236,7 +1220,7 @@ k3d::selection::record control::pick_uniform(const k3d::point2& Coordinates, k3d
 		Coordinates[1] - sensitivity,
 		Coordinates[1] + sensitivity);
 
-	Records = get_selection(detail::select_faces(Backfacing), selection_region);
+	Records = get_selection(detail::select_uniform(Backfacing), selection_region);
 	std::sort(Records.begin(), Records.end(), detail::sort_by_zmin());
 
 	for(k3d::selection::records::const_iterator record = Records.begin(); record != Records.end(); ++record)

@@ -113,7 +113,7 @@ public:
 		if(!k3d::validate_polyhedra(Mesh))
 			return;
 			
-		if (!SelectionState.select_edges)
+		if (!SelectionState.select_split_edges)
 			return;
 		
 		if(Mesh.polyhedra->edge_points->empty())
