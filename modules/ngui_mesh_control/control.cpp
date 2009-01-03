@@ -202,8 +202,8 @@ public:
 		{
 			current_primitive = &Primitive;
 
-			stream << indentation << "v" << current_primitive << " [label=\"<mesh_primitive>Mesh Primitive|<type>type|<topology>topology|<attributes>attributes\"]\n";
-			stream << indentation << "v" << current_mesh << ":primitives:e -> " << "v" << current_primitive << ":mesh_primitive:w\n";
+			stream << indentation << "v" << current_primitive << " [label=\"<primitive>Primitive|<type>type|<structure>structure|<attributes>attributes\"]\n";
+			stream << indentation << "v" << current_mesh << ":primitives:e -> " << "v" << current_primitive << ":primitive:w\n";
 			stream << k3d::push_indent;
 
 			stream << indentation << "v" << current_primitive << "type [label=\"\\\"" << current_primitive->type << "\\\"\" shape=\"plaintext\"]\n";
@@ -221,7 +221,7 @@ public:
 				stream << "|<" << array->first << ">" << "\\\"" << array->first << "\\\"";
 
 			stream << "\"]\n";
-			stream << indentation << "v" << current_primitive << ":topology:e -> " << "v" << current_topology_arrays << ":named_arrays:w\n";
+			stream << indentation << "v" << current_primitive << ":structure:e -> " << "v" << current_topology_arrays << ":named_arrays:w\n";
 		}
 
 		void topology_array(const k3d::string_t& Name, const k3d::array& Array)
