@@ -92,8 +92,8 @@ public:
 
 		/// Stores the primitive type ("point_groups", "polyhedra", "teapot", etc.)
 		string_t type;
-		/// Stores array data that defines the primitive's topology
-		named_arrays_t topology;
+		/// Stores array data that defines the primitive's structure (topology and geometry)
+		named_arrays_t structure;
 		/// Stores array data that defines the primitive's attributes
 		named_attribute_arrays_t attributes;
 
@@ -286,7 +286,7 @@ public:
 	template<typename FunctorT>
 	static void visit_arrays(const mesh::primitive& Primitive, FunctorT Functor)
 	{
-		for(mesh::named_arrays_t::const_iterator array = Primitive.topology.begin(); array != Primitive.topology.end(); ++array)
+		for(mesh::named_arrays_t::const_iterator array = Primitive.structure.begin(); array != Primitive.structure.end(); ++array)
 			Functor(array->first, array->second);
 
 		for(mesh::named_attribute_arrays_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
@@ -300,7 +300,7 @@ public:
 	template<typename FunctorT>
 	static void visit_arrays(mesh::primitive& Primitive, FunctorT Functor)
 	{
-		for(mesh::named_arrays_t::iterator array = Primitive.topology.begin(); array != Primitive.topology.end(); ++array)
+		for(mesh::named_arrays_t::iterator array = Primitive.structure.begin(); array != Primitive.structure.end(); ++array)
 			Functor(array->first, array->second);
 
 		for(mesh::named_attribute_arrays_t::iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)

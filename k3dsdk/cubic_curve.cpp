@@ -33,10 +33,8 @@ namespace cubic_curve
 // const_primitive
 
 const_primitive::const_primitive(
-	const mesh::indices_t& FirstCurves,
-	const mesh::counts_t& CurveCounts,
-	const mesh::bools_t& PeriodicCurves,
-	const mesh::materials_t& Materials,
+	const mesh::bools_t& Periodic,
+	const mesh::materials_t& Material,
 	const mesh::indices_t& CurveFirstPoints,
 	const mesh::counts_t& CurvePointCounts,
 	const mesh::selection_t& CurveSelections,
@@ -45,10 +43,8 @@ const_primitive::const_primitive(
 	const mesh::attribute_arrays_t& UniformData,
 	const mesh::attribute_arrays_t& VaryingData
 		) :
-	first_curves(FirstCurves),
-	curve_counts(CurveCounts),
-	periodic_curves(PeriodicCurves),
-	materials(Materials),
+	periodic(Periodic),
+	material(Material),
 	curve_first_points(CurveFirstPoints),
 	curve_point_counts(CurvePointCounts),
 	curve_selections(CurveSelections),
@@ -63,10 +59,8 @@ const_primitive::const_primitive(
 // primitive
 
 primitive::primitive(
-	mesh::indices_t& FirstCurves,
-	mesh::counts_t& CurveCounts,
-	mesh::bools_t& PeriodicCurves,
-	mesh::materials_t& Materials,
+	mesh::bools_t& Periodic,
+	mesh::materials_t& Material,
 	mesh::indices_t& CurveFirstPoints,
 	mesh::counts_t& CurvePointCounts,
 	mesh::selection_t& CurveSelections,
@@ -75,10 +69,8 @@ primitive::primitive(
 	mesh::attribute_arrays_t& UniformData,
 	mesh::attribute_arrays_t& VaryingData
 		) :
-	first_curves(FirstCurves),
-	curve_counts(CurveCounts),
-	periodic_curves(PeriodicCurves),
-	materials(Materials),
+	periodic(Periodic),
+	material(Material),
 	curve_first_points(CurveFirstPoints),
 	curve_point_counts(CurvePointCounts),
 	curve_selections(CurveSelections),
@@ -97,14 +89,12 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("cubic_curve");
 
 	primitive* const result = new primitive(
-		generic_primitive.topology.create<mesh::indices_t>("first_curves"),
-		generic_primitive.topology.create<mesh::counts_t>("curve_counts"),
-		generic_primitive.topology.create<mesh::bools_t>("periodic_curves"),
-		generic_primitive.topology.create<mesh::materials_t>("materials"),
-		generic_primitive.topology.create<mesh::indices_t>("curve_first_points"),
-		generic_primitive.topology.create<mesh::counts_t>("curve_point_counts"),
-		generic_primitive.topology.create<mesh::selection_t>("curve_selections"),
-		generic_primitive.topology.create<mesh::indices_t>("curve_points"),
+		generic_primitive.structure.create<mesh::bools_t>("periodic"),
+		generic_primitive.structure.create<mesh::materials_t>("material"),
+		generic_primitive.structure.create<mesh::indices_t>("curve_first_points"),
+		generic_primitive.structure.create<mesh::counts_t>("curve_point_counts"),
+		generic_primitive.structure.create<mesh::selection_t>("curve_selections"),
+		generic_primitive.structure.create<mesh::indices_t>("curve_points"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
 		generic_primitive.attributes["varying"]
@@ -125,10 +115,8 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
-		const mesh::indices_t& first_curves = require_const_array<mesh::indices_t>(Primitive, "first_curves");
-		const mesh::counts_t& curve_counts = require_const_array<mesh::counts_t>(Primitive, "curve_counts");
-		const mesh::bools_t& periodic_curves = require_const_array<mesh::bools_t>(Primitive, "periodic_curves");
-		const mesh::materials_t& materials = require_const_array<mesh::materials_t>(Primitive, "materials");
+		const mesh::bools_t& periodic = require_const_array<mesh::bools_t>(Primitive, "periodic");
+		const mesh::materials_t& material = require_const_array<mesh::materials_t>(Primitive, "material");
 		const mesh::indices_t& curve_first_points = require_const_array<mesh::indices_t>(Primitive, "curve_first_points");
 		const mesh::counts_t& curve_point_counts = require_const_array<mesh::counts_t>(Primitive, "curve_point_counts");
 		const mesh::selection_t& curve_selections = require_const_array<mesh::selection_t>(Primitive, "curve_selections");
@@ -140,23 +128,17 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_array_size(Primitive, curve_counts, "curve_counts", first_curves.size());
-		require_array_size(Primitive, periodic_curves, "periodic_curves", first_curves.size());
-		require_array_size(Primitive, materials, "materials", first_curves.size());
-
-		require_array_size(Primitive, curve_first_points, "curve_first_points", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-		require_array_size(Primitive, curve_point_counts, "curve_point_counts", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-		require_array_size(Primitive, curve_selections, "curve_selections", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-
+		require_array_size(Primitive, periodic, "periodic", 1);
+		require_array_size(Primitive, material, "material", 1);
+		require_array_size(Primitive, curve_point_counts, "curve_point_counts", curve_first_points.size());
+		require_array_size(Primitive, curve_selections, "curve_selections", curve_first_points.size());
 		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", first_curves.size());
-		
-		require_attribute_arrays_size(Primitive, uniform_data, "uniform", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-		
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
+		require_attribute_arrays_size(Primitive, uniform_data, "uniform", curve_first_points.size());
 		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		return new const_primitive(first_curves, curve_counts, periodic_curves, materials, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_data, uniform_data, varying_data);
+		return new const_primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_data, uniform_data, varying_data);
 	}
 	catch(std::exception& e)
 	{
@@ -173,10 +155,8 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
-		mesh::indices_t& first_curves = require_array<mesh::indices_t>(Primitive, "first_curves");
-		mesh::counts_t& curve_counts = require_array<mesh::counts_t>(Primitive, "curve_counts");
-		mesh::bools_t& periodic_curves = require_array<mesh::bools_t>(Primitive, "periodic_curves");
-		mesh::materials_t& materials = require_array<mesh::materials_t>(Primitive, "materials");
+		mesh::bools_t& periodic = require_array<mesh::bools_t>(Primitive, "periodic");
+		mesh::materials_t& material = require_array<mesh::materials_t>(Primitive, "material");
 		mesh::indices_t& curve_first_points = require_array<mesh::indices_t>(Primitive, "curve_first_points");
 		mesh::counts_t& curve_point_counts = require_array<mesh::counts_t>(Primitive, "curve_point_counts");
 		mesh::selection_t& curve_selections = require_array<mesh::selection_t>(Primitive, "curve_selections");
@@ -188,23 +168,17 @@ primitive* validate(mesh::primitive& Primitive)
 
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_array_size(Primitive, curve_counts, "curve_counts", first_curves.size());
-		require_array_size(Primitive, periodic_curves, "periodic_curves", first_curves.size());
-		require_array_size(Primitive, materials, "materials", first_curves.size());
-
-		require_array_size(Primitive, curve_first_points, "curve_first_points", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-		require_array_size(Primitive, curve_point_counts, "curve_point_counts", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-		require_array_size(Primitive, curve_selections, "curve_selections", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-
+		require_array_size(Primitive, periodic, "periodic", 1);
+		require_array_size(Primitive, material, "material", 1);
+		require_array_size(Primitive, curve_point_counts, "curve_point_counts", curve_first_points.size());
+		require_array_size(Primitive, curve_selections, "curve_selections", curve_first_points.size());
 		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", first_curves.size());
-
-		require_attribute_arrays_size(Primitive, uniform_data, "uniform", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
+		require_attribute_arrays_size(Primitive, uniform_data, "uniform", curve_first_points.size());
 		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		return new primitive(first_curves, curve_counts, periodic_curves, materials, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_data, uniform_data, varying_data);
+		return new primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_data, uniform_data, varying_data);
 	}
 	catch(std::exception& e)
 	{

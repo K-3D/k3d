@@ -33,10 +33,8 @@ class const_primitive
 {
 public:
 	const_primitive(
-		const mesh::indices_t& FirstCurves,
-		const mesh::counts_t& CurveCounts,
-		const mesh::bools_t& PeriodicCurves,
-		const mesh::materials_t& Materials,
+		const mesh::bools_t& Periodic,
+		const mesh::materials_t& Material,
 		const mesh::indices_t& CurveFirstPoints,
 		const mesh::counts_t& CurvePointCounts,
 		const mesh::selection_t& CurveSelections,
@@ -46,10 +44,8 @@ public:
 		const mesh::attribute_arrays_t& VaryingData
 		);
 
-	const mesh::indices_t& first_curves;
-	const mesh::counts_t& curve_counts;
-	const mesh::bools_t& periodic_curves;
-	const mesh::materials_t& materials;
+	const mesh::bools_t& periodic;
+	const mesh::materials_t& material;
 	const mesh::indices_t& curve_first_points;
 	const mesh::counts_t& curve_point_counts;
 	const mesh::selection_t& curve_selections;
@@ -64,10 +60,8 @@ class primitive
 {
 public:
 	primitive(
-		mesh::indices_t& FirstCurves,
-		mesh::counts_t& CurveCounts,
-		mesh::bools_t& PeriodicCurves,
-		mesh::materials_t& Materials,
+		mesh::bools_t& Periodic,
+		mesh::materials_t& Material,
 		mesh::indices_t& CurveFirstPoints,
 		mesh::counts_t& CurvePointCounts,
 		mesh::selection_t& CurveSelections,
@@ -77,10 +71,8 @@ public:
 		mesh::attribute_arrays_t& VaryingData
 		);
 
-	mesh::indices_t& first_curves;
-	mesh::counts_t& curve_counts;
-	mesh::bools_t& periodic_curves;
-	mesh::materials_t& materials;
+	mesh::bools_t& periodic;
+	mesh::materials_t& material;
 	mesh::indices_t& curve_first_points;
 	mesh::counts_t& curve_point_counts;
 	mesh::selection_t& curve_selections;

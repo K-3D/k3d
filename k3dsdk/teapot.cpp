@@ -66,8 +66,8 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("teapot");
 
 	primitive* const result = new primitive(
-		generic_primitive.topology.create<mesh::matrices_t >("matrices"),
-		generic_primitive.topology.create<mesh::materials_t >("materials"),
+		generic_primitive.structure.create<mesh::matrices_t >("matrices"),
+		generic_primitive.structure.create<mesh::materials_t >("materials"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"]
 		);
@@ -93,7 +93,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 		require_array_size(Primitive, materials, "materials", matrices.size());
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", matrices.size());
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
 		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
 
 		return new const_primitive(matrices, materials, constant_data, uniform_data);
@@ -121,7 +121,7 @@ primitive* validate(mesh::primitive& Primitive)
 
 		require_array_size(Primitive, materials, "materials", matrices.size());
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", matrices.size());
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
 		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
 
 		return new primitive(matrices, materials, constant_data, uniform_data);

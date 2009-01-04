@@ -71,26 +71,21 @@ public:
 			const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0);
 			const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
 
-			const k3d::uint_t group_begin = 0;
-			const k3d::uint_t group_end = group_begin + linear_curve->first_curves.size();
-			for(k3d::uint_t group = group_begin; group != group_end; ++group)
+			const GLenum curve_wrap = linear_curve->periodic[0] ? GL_LINE_LOOP : GL_LINE_STRIP;
+
+			const k3d::uint_t curve_begin = 0;
+			const k3d::uint_t curve_end = curve_begin + linear_curve->curve_first_points.size();
+			for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
-				const GLenum curve_wrap = linear_curve->periodic_curves[group] ? GL_LINE_LOOP : GL_LINE_STRIP;
+				const k3d::uint_t curve_point_begin = linear_curve->curve_first_points[curve];
+				const k3d::uint_t curve_point_end = curve_point_begin + linear_curve->curve_point_counts[curve];
 
-				const k3d::uint_t curve_begin = linear_curve->first_curves[group];
-				const k3d::uint_t curve_end = curve_begin + linear_curve->curve_counts[group];
-				for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
-				{
-					const k3d::uint_t curve_point_begin = linear_curve->curve_first_points[curve];
-					const k3d::uint_t curve_point_end = curve_point_begin + linear_curve->curve_point_counts[curve];
+				k3d::gl::color3d(linear_curve->curve_selections[curve] ? selected_color : color);
 
-					k3d::gl::color3d(linear_curve->curve_selections[curve] ? selected_color : color);
-
-					glBegin(curve_wrap);
-					for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
-						k3d::gl::vertex3d(points[linear_curve->curve_points[curve_point]]);
-					glEnd();
-				}
+				glBegin(curve_wrap);
+				for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+					k3d::gl::vertex3d(points[linear_curve->curve_points[curve_point]]);
+				glEnd();
 			}
 		}
 	}
@@ -114,33 +109,23 @@ public:
 
 			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
 
-			const k3d::uint_t group_begin = 0;
-			const k3d::uint_t group_end = group_begin + linear_curve->first_curves.size();
-			for(k3d::uint_t group = group_begin; group != group_end; ++group)
+			const GLenum curve_wrap = linear_curve->periodic[0] ? GL_LINE_LOOP : GL_LINE_STRIP;
+
+			const k3d::uint_t curve_begin = 0;
+			const k3d::uint_t curve_end = curve_begin + linear_curve->curve_first_points.size();
+			for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
-				k3d::gl::push_selection_token(k3d::selection::CONSTANT, group);
+				k3d::gl::push_selection_token(k3d::selection::UNIFORM, curve);
 
-				const GLenum curve_wrap = linear_curve->periodic_curves[group] ? GL_LINE_LOOP : GL_LINE_STRIP;
+				const k3d::uint_t curve_point_begin = linear_curve->curve_first_points[curve];
+				const k3d::uint_t curve_point_end = curve_point_begin + linear_curve->curve_point_counts[curve];
 
-				k3d::uint_t curve_index = 0;
-				const k3d::uint_t curve_begin = linear_curve->first_curves[group];
-				const k3d::uint_t curve_end = curve_begin + linear_curve->curve_counts[group];
-				for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve, ++curve_index)
-				{
-					k3d::gl::push_selection_token(k3d::selection::UNIFORM, curve_index);
+				glBegin(curve_wrap);
+				for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+					k3d::gl::vertex3d(points[linear_curve->curve_points[curve_point]]);
+				glEnd();
 
-					const k3d::uint_t curve_point_begin = linear_curve->curve_first_points[curve];
-					const k3d::uint_t curve_point_end = curve_point_begin + linear_curve->curve_point_counts[curve];
-
-					glBegin(curve_wrap);
-					for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
-						k3d::gl::vertex3d(points[linear_curve->curve_points[curve_point]]);
-					glEnd();
-
-					k3d::gl::pop_selection_token(); // UNIFORM
-				}
-
-				k3d::gl::pop_selection_token(); // CONSTANT
+				k3d::gl::pop_selection_token(); // UNIFORM
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE

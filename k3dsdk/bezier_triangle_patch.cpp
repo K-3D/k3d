@@ -93,12 +93,12 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("bezier_triangle_patch");
 
 	primitive* const result = new primitive(
-		generic_primitive.topology.create<mesh::indices_t >("patch_first_points"),
-		generic_primitive.topology.create<mesh::orders_t >("patch_orders"),
-		generic_primitive.topology.create<mesh::selection_t >("patch_selections"),
-		generic_primitive.topology.create<mesh::materials_t >("patch_materials"),
-		generic_primitive.topology.create<mesh::indices_t >("patch_points"),
-		generic_primitive.topology.create<mesh::weights_t >("patch_point_weights"),
+		generic_primitive.structure.create<mesh::indices_t >("patch_first_points"),
+		generic_primitive.structure.create<mesh::orders_t >("patch_orders"),
+		generic_primitive.structure.create<mesh::selection_t >("patch_selections"),
+		generic_primitive.structure.create<mesh::materials_t >("patch_materials"),
+		generic_primitive.structure.create<mesh::indices_t >("patch_points"),
+		generic_primitive.structure.create<mesh::weights_t >("patch_point_weights"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
 		generic_primitive.attributes["varying"]

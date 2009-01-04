@@ -2606,38 +2606,16 @@ void nurbs_curve_modifier::polygonize_curve(k3d::uint_t curve, k3d::uint_t segme
 	{
 		MY_DEBUG << "Polygonize_curve" << std::endl;
 
-		boost::scoped_ptr<k3d::linear_curve::primitive> linear_curve_groups(k3d::linear_curve::create(*m_instance));
+		boost::scoped_ptr<k3d::linear_curve::primitive> linear_curves(k3d::linear_curve::create(*m_instance));
 
-		k3d::mesh::indices_t* linear_curve_points = &linear_curve_groups->curve_points;
-		k3d::mesh::counts_t* linear_curve_point_counts = &linear_curve_groups->curve_point_counts;
-
-		k3d::mesh::indices_t* linear_curve_first_points = &linear_curve_groups->curve_first_points;
-		k3d::mesh::counts_t* linear_curve_counts = &linear_curve_groups->curve_counts;
-		k3d::mesh::indices_t* linear_first_curves = &linear_curve_groups->first_curves;
-		k3d::mesh::bools_t* linear_periodic_curves = &linear_curve_groups->periodic_curves;
-
-		k3d::mesh::selection_t* linear_curve_selection = &linear_curve_groups->curve_selections;
-		k3d::mesh::materials_t* linear_materials = &linear_curve_groups->materials;
-
-		if (linear_first_curves->size() == 0)
-		{
-			linear_first_curves->push_back(0);
-			linear_curve_counts->push_back(1);
-			linear_curve_first_points->push_back(0);
-		}
-		else
-		{
-			linear_curve_counts->at(linear_curve_counts->size() - 1)++;
-			linear_curve_first_points->push_back(linear_curve_points->size());
-		}
-
-		linear_periodic_curves->push_back(false);
-		linear_curve_selection->push_back(0.0);
-		linear_materials->push_back(materials->at(get_curve_group(curve)));
+		linear_curves->periodic.push_back(false);
+		linear_curves->material.push_back(materials->at(get_curve_group(curve)));
 
 		normalize_knot_vector(curve);
 
-		linear_curve_point_counts->push_back(segments + 1);
+		linear_curves->curve_first_points.push_back(0);
+		linear_curves->curve_point_counts.push_back(segments + 1);
+		linear_curves->curve_selections.push_back(0.0);
 
 		double step = 1.0 / segments;
 
@@ -2651,7 +2629,7 @@ void nurbs_curve_modifier::polygonize_curve(k3d::uint_t curve, k3d::uint_t segme
 			k3d::point3 p(ph[0] / ph[3], ph[1] / ph[3], ph[2] / ph[3]);
 			MY_DEBUG << "Adding point " << p << " as segment " << i << " to the linear curve" << std::endl;
 
-			linear_curve_points->push_back(insert_point(p, false));
+			linear_curves->curve_points.push_back(insert_point(p, false));
 		}
 
 		if (del_curve)

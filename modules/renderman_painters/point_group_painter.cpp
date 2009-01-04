@@ -73,36 +73,31 @@ public:
 			if(!point_group)
 				continue;
 
-			const k3d::uint_t point_group_begin = 0;
-			const k3d::uint_t point_group_end = point_group_begin + point_group->first_points.size();
-			for(k3d::uint_t point_group_index = point_group_begin; point_group_index != point_group_end; ++point_group_index)
-			{
-				array_copier ri_constant_data;
-				ri_constant_data.add_arrays(point_group->constant_data);
+			array_copier ri_constant_data;
+			ri_constant_data.add_arrays(point_group->constant_data);
 
-				array_copier ri_varying_data;
-				ri_varying_data.add_arrays(point_group->varying_data);
+			array_copier ri_varying_data;
+			ri_varying_data.add_arrays(point_group->varying_data);
 
-				array_copier ri_vertex_data;
-				ri_vertex_data.add_arrays(vertex_data);
-				ri_vertex_data.add_array(k3d::ri::RI_P(), points);
+			array_copier ri_vertex_data;
+			ri_vertex_data.add_arrays(vertex_data);
+			ri_vertex_data.add_array(k3d::ri::RI_P(), points);
 
-				const k3d::uint_t point_begin = point_group->first_points[point_group_index];
-				const k3d::uint_t point_end = point_begin + point_group->point_counts[point_group_index];
-				for(k3d::uint_t point = point_begin; point != point_end; ++point)
-					ri_vertex_data.push_back(point_group->points[point]);
+			const k3d::uint_t point_begin = 0;
+			const k3d::uint_t point_end = point_begin + point_group->points.size();
+			for(k3d::uint_t point = point_begin; point != point_end; ++point)
+				ri_vertex_data.push_back(point_group->points[point]);
 
-				ri_constant_data.push_back(point_group_index);
-				ri_varying_data.insert(point_begin, point_end);
+			ri_constant_data.push_back(0);
+			ri_varying_data.insert(point_begin, point_end);
 
-				k3d::ri::parameter_list ri_parameters;
-				ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
-				ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
-				ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
+			k3d::ri::parameter_list ri_parameters;
+			ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
+			ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
+			ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
 
-				k3d::ri::setup_material(point_group->materials[point_group_index], RenderState);
-				RenderState.stream.RiPointsV(point_group->point_counts[point_group_index], ri_parameters);
-			}
+			k3d::ri::setup_material(point_group->material[0], RenderState);
+			RenderState.stream.RiPointsV(point_group->points.size(), ri_parameters);
 		}
 	}
 

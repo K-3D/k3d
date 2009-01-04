@@ -6,8 +6,7 @@
 		<vertex_data/>
 		<primitives>
 			<primitive type="linear_curve">
-				<topology>
-					<array name="curve_counts" type="k3d::uint_t">1</array>
+				<structure>
 					<array name="curve_first_points" type="k3d::uint_t">0</array>
 					<array name="curve_point_counts" type="k3d::uint_t">11</array>
 					<array name="curve_points" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10
@@ -20,10 +19,9 @@
 							<pair name="k3d:selection-component">uniform</pair>
 						</metadata>
 					</array>
-					<array name="first_curves" type="k3d::uint_t">0</array>
-					<array name="materials" type="k3d::imaterial*">0</array>
-					<array name="periodic_curves" type="k3d::bool_t">0</array>
-				</topology>
+					<array name="material" type="k3d::imaterial*">0</array>
+					<array name="periodic" type="k3d::bool_t">0</array>
+				</structure>
 				<attributes>
 					<arrays type="constant"/>
 					<arrays type="uniform"/>

@@ -71,50 +71,45 @@ public:
 			const k3d::mesh::points_t& points = *Mesh.points;
 			const k3d::mesh::attribute_arrays_t& vertex_data = Mesh.vertex_data;
 
-			const k3d::uint_t group_begin = 0;
-			const k3d::uint_t group_end = group_begin + linear_curve->first_curves.size();
-			for(k3d::uint_t group = group_begin; group != group_end; ++group)
+			k3d::ri::unsigned_integers ri_point_counts;
+
+			array_copier ri_constant_data;
+			ri_constant_data.add_arrays(linear_curve->constant_data);
+
+			array_copier ri_uniform_data;
+			ri_uniform_data.add_arrays(linear_curve->uniform_data);
+			
+			array_copier ri_varying_data;
+			ri_varying_data.add_arrays(linear_curve->varying_data);
+
+			array_copier ri_vertex_data;
+			ri_vertex_data.add_arrays(vertex_data);
+			ri_vertex_data.add_array(k3d::ri::RI_P(), points);
+
+			const k3d::uint_t curves_begin = 0;
+			const k3d::uint_t curves_end = curves_begin + linear_curve->curve_first_points.size();
+			for(k3d::uint_t curve = curves_begin; curve != curves_end; ++curve)
 			{
-				k3d::ri::unsigned_integers ri_point_counts;
+				const k3d::uint_t curve_points_begin = linear_curve->curve_first_points[curve];
+				const k3d::uint_t curve_points_end = curve_points_begin + linear_curve->curve_point_counts[curve];
+				for(k3d::uint_t curve_point = curve_points_begin; curve_point != curve_points_end; ++curve_point)
+					ri_vertex_data.push_back(linear_curve->curve_points[curve_point]);
 
-				array_copier ri_constant_data;
-				ri_constant_data.add_arrays(linear_curve->constant_data);
-
-				array_copier ri_uniform_data;
-				ri_uniform_data.add_arrays(linear_curve->uniform_data);
-				
-				array_copier ri_varying_data;
-				ri_varying_data.add_arrays(linear_curve->varying_data);
-
-				array_copier ri_vertex_data;
-				ri_vertex_data.add_arrays(vertex_data);
-				ri_vertex_data.add_array(k3d::ri::RI_P(), points);
-
-				const k3d::uint_t curves_begin = linear_curve->first_curves[group];
-				const k3d::uint_t curves_end = curves_begin + linear_curve->curve_counts[group];
-				for(k3d::uint_t curve = curves_begin; curve != curves_end; ++curve)
-				{
-					const k3d::uint_t curve_points_begin = linear_curve->curve_first_points[curve];
-					const k3d::uint_t curve_points_end = curve_points_begin + linear_curve->curve_point_counts[curve];
-					for(k3d::uint_t curve_point = curve_points_begin; curve_point != curve_points_end; ++curve_point)
-						ri_vertex_data.push_back(linear_curve->curve_points[curve_point]);
-
-					ri_point_counts.push_back(linear_curve->curve_point_counts[curve]);
-					ri_varying_data.insert(curve_points_begin, curve_points_end);
-				}
-
-				ri_constant_data.push_back(group);
-				ri_uniform_data.insert(curves_begin, curves_end);
-
-				k3d::ri::parameter_list ri_parameters;
-				ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
-				ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
-				ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
-				ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
-
-				k3d::ri::setup_material(linear_curve->materials[group], RenderState);
-				RenderState.stream.RiCurvesV("linear", ri_point_counts, linear_curve->periodic_curves[group] ? "periodic" : "nonperiodic", ri_parameters);
+				ri_point_counts.push_back(linear_curve->curve_point_counts[curve]);
+				ri_varying_data.insert(curve_points_begin, curve_points_end);
 			}
+
+			ri_constant_data.push_back(0);
+			ri_uniform_data.insert(curves_begin, curves_end);
+
+			k3d::ri::parameter_list ri_parameters;
+			ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
+			ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
+			ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
+			ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
+
+			k3d::ri::setup_material(linear_curve->material[0], RenderState);
+			RenderState.stream.RiCurvesV("linear", ri_point_counts, linear_curve->periodic[0] ? "periodic" : "nonperiodic", ri_parameters);
 		}
 	}
 

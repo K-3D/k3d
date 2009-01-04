@@ -2102,9 +2102,9 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 
 			element& xml_primitive = xml_primitives.append(element("primitive", attribute("type", (*primitive)->type)));
 
-			if((*primitive)->topology.size())
+			if((*primitive)->structure.size())
 			{
-				detail::save_arrays(xml_primitive, element("topology"), (*primitive)->topology, Context);
+				detail::save_arrays(xml_primitive, element("structure"), (*primitive)->structure, Context);
 			}
 			
 			if((*primitive)->attributes.size())
@@ -2213,9 +2213,13 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 			mesh::primitive& primitive = Mesh.primitives.create(attribute_text(*xml_primitive, "type"));
 
-			if(const element* const xml_topology = find_element(*xml_primitive, "topology"))
+			if(const element* const xml_structure = find_element(*xml_primitive, "structure"))
 			{
-				detail::load_arrays(*xml_topology, primitive.topology, Context);
+				detail::load_arrays(*xml_structure, primitive.structure, Context);
+			}
+			else if(const element* const xml_topology = find_element(*xml_primitive, "topology"))
+			{
+				detail::load_arrays(*xml_topology, primitive.structure, Context);
 			}
 
 			if(const element* const xml_attributes = find_element(*xml_primitive, "attributes"))

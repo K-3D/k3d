@@ -80,40 +80,35 @@ public:
 			glMapGrid1d(v_count, 0.0, 1.0);
 			GLdouble patch_points[4 * 3];
 
-			const k3d::uint_t group_begin = 0;
-			const k3d::uint_t group_end = group_begin + cubic_curve->first_curves.size();
-			for(k3d::uint_t group = group_begin; group != group_end; ++group)
+			const k3d::uint_t curve_begin = 0;
+			const k3d::uint_t curve_end = curve_begin + cubic_curve->curve_first_points.size();
+			for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
-				const k3d::uint_t curve_begin = cubic_curve->first_curves[group];
-				const k3d::uint_t curve_end = curve_begin + cubic_curve->curve_counts[group];
-				for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
+				const k3d::uint_t curve_point_begin = cubic_curve->curve_first_points[curve];
+				const k3d::uint_t curve_point_end = curve_point_begin + cubic_curve->curve_point_counts[curve];
+
+				k3d::gl::color3d(cubic_curve->curve_selections[curve] ? selected_color : color);
+
+				for(k3d::uint_t curve_point = curve_point_begin; curve_point_end - curve_point >= 4; curve_point += 3)
 				{
-					const k3d::uint_t curve_point_begin = cubic_curve->curve_first_points[curve];
-					const k3d::uint_t curve_point_end = curve_point_begin + cubic_curve->curve_point_counts[curve];
+					GLdouble* pp = patch_points;
 
-					k3d::gl::color3d(cubic_curve->curve_selections[curve] ? selected_color : color);
+					*pp++ = points[cubic_curve->curve_points[curve_point]][0];
+					*pp++ = points[cubic_curve->curve_points[curve_point]][1];
+					*pp++ = points[cubic_curve->curve_points[curve_point]][2];
+					*pp++ = points[cubic_curve->curve_points[curve_point+1]][0];
+					*pp++ = points[cubic_curve->curve_points[curve_point+1]][1];
+					*pp++ = points[cubic_curve->curve_points[curve_point+1]][2];
+					*pp++ = points[cubic_curve->curve_points[curve_point+2]][0];
+					*pp++ = points[cubic_curve->curve_points[curve_point+2]][1];
+					*pp++ = points[cubic_curve->curve_points[curve_point+2]][2];
+					*pp++ = points[cubic_curve->curve_points[curve_point+3]][0];
+					*pp++ = points[cubic_curve->curve_points[curve_point+3]][1];
+					*pp++ = points[cubic_curve->curve_points[curve_point+3]][2];
 
-					for(k3d::uint_t curve_point = curve_point_begin; curve_point_end - curve_point >= 4; curve_point += 3)
-					{
-						GLdouble* pp = patch_points;
+					glMap1d(GL_MAP1_VERTEX_3, 0, 1, v_stride, v_order, patch_points);
 
-						*pp++ = points[cubic_curve->curve_points[curve_point]][0];
-						*pp++ = points[cubic_curve->curve_points[curve_point]][1];
-						*pp++ = points[cubic_curve->curve_points[curve_point]][2];
-						*pp++ = points[cubic_curve->curve_points[curve_point+1]][0];
-						*pp++ = points[cubic_curve->curve_points[curve_point+1]][1];
-						*pp++ = points[cubic_curve->curve_points[curve_point+1]][2];
-						*pp++ = points[cubic_curve->curve_points[curve_point+2]][0];
-						*pp++ = points[cubic_curve->curve_points[curve_point+2]][1];
-						*pp++ = points[cubic_curve->curve_points[curve_point+2]][2];
-						*pp++ = points[cubic_curve->curve_points[curve_point+3]][0];
-						*pp++ = points[cubic_curve->curve_points[curve_point+3]][1];
-						*pp++ = points[cubic_curve->curve_points[curve_point+3]][2];
-
-						glMap1d(GL_MAP1_VERTEX_3, 0, 1, v_stride, v_order, patch_points);
-
-						glEvalMesh1(GL_LINE, 0, v_count);
-					}
+					glEvalMesh1(GL_LINE, 0, v_count);
 				}
 			}
 		}
@@ -147,48 +142,39 @@ public:
 			glMapGrid1d(v_count, 0.0, 1.0);
 			GLdouble patch_points[4 * 3];
 
-			const k3d::uint_t group_begin = 0;
-			const k3d::uint_t group_end = group_begin + cubic_curve->first_curves.size();
-			for(k3d::uint_t group = group_begin; group != group_end; ++group)
+			const k3d::uint_t curve_begin = 0;
+			const k3d::uint_t curve_end = curve_begin + cubic_curve->curve_first_points.size();
+			k3d::uint_t curve_index = 0;
+			for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve, ++curve_index)
 			{
-				k3d::gl::push_selection_token(k3d::selection::CONSTANT, group);
+				k3d::gl::push_selection_token(k3d::selection::UNIFORM, curve_index);
 
-				const k3d::uint_t curve_begin = cubic_curve->first_curves[group];
-				const k3d::uint_t curve_end = curve_begin + cubic_curve->curve_counts[group];
-				k3d::uint_t curve_index = 0;
-				for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve, ++curve_index)
+				const k3d::uint_t curve_point_begin = cubic_curve->curve_first_points[curve];
+				const k3d::uint_t curve_point_end = curve_point_begin + cubic_curve->curve_point_counts[curve];
+
+				for(k3d::uint_t curve_point = curve_point_begin; curve_point_end - curve_point >= 4; curve_point += 3)
 				{
-					k3d::gl::push_selection_token(k3d::selection::UNIFORM, curve_index);
+					GLdouble* pp = patch_points;
 
-					const k3d::uint_t curve_point_begin = cubic_curve->curve_first_points[curve];
-					const k3d::uint_t curve_point_end = curve_point_begin + cubic_curve->curve_point_counts[curve];
+					*pp++ = points[cubic_curve->curve_points[curve_point]][0];
+					*pp++ = points[cubic_curve->curve_points[curve_point]][1];
+					*pp++ = points[cubic_curve->curve_points[curve_point]][2];
+					*pp++ = points[cubic_curve->curve_points[curve_point+1]][0];
+					*pp++ = points[cubic_curve->curve_points[curve_point+1]][1];
+					*pp++ = points[cubic_curve->curve_points[curve_point+1]][2];
+					*pp++ = points[cubic_curve->curve_points[curve_point+2]][0];
+					*pp++ = points[cubic_curve->curve_points[curve_point+2]][1];
+					*pp++ = points[cubic_curve->curve_points[curve_point+2]][2];
+					*pp++ = points[cubic_curve->curve_points[curve_point+3]][0];
+					*pp++ = points[cubic_curve->curve_points[curve_point+3]][1];
+					*pp++ = points[cubic_curve->curve_points[curve_point+3]][2];
 
-					for(k3d::uint_t curve_point = curve_point_begin; curve_point_end - curve_point >= 4; curve_point += 3)
-					{
-						GLdouble* pp = patch_points;
+					glMap1d(GL_MAP1_VERTEX_3, 0, 1, v_stride, v_order, patch_points);
 
-						*pp++ = points[cubic_curve->curve_points[curve_point]][0];
-						*pp++ = points[cubic_curve->curve_points[curve_point]][1];
-						*pp++ = points[cubic_curve->curve_points[curve_point]][2];
-						*pp++ = points[cubic_curve->curve_points[curve_point+1]][0];
-						*pp++ = points[cubic_curve->curve_points[curve_point+1]][1];
-						*pp++ = points[cubic_curve->curve_points[curve_point+1]][2];
-						*pp++ = points[cubic_curve->curve_points[curve_point+2]][0];
-						*pp++ = points[cubic_curve->curve_points[curve_point+2]][1];
-						*pp++ = points[cubic_curve->curve_points[curve_point+2]][2];
-						*pp++ = points[cubic_curve->curve_points[curve_point+3]][0];
-						*pp++ = points[cubic_curve->curve_points[curve_point+3]][1];
-						*pp++ = points[cubic_curve->curve_points[curve_point+3]][2];
-
-						glMap1d(GL_MAP1_VERTEX_3, 0, 1, v_stride, v_order, patch_points);
-
-						glEvalMesh1(GL_LINE, 0, v_count);
-					}
-
-					k3d::gl::pop_selection_token(); // UNIFORM
+					glEvalMesh1(GL_LINE, 0, v_count);
 				}
 
-				k3d::gl::pop_selection_token(); // CONSTANT
+				k3d::gl::pop_selection_token(); // UNIFORM
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE

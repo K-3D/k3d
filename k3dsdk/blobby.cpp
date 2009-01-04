@@ -120,19 +120,19 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("blobby");
 
 	primitive* const result = new primitive(
-		generic_primitive.topology.create<mesh::indices_t>("first_primitives"),
-		generic_primitive.topology.create<mesh::counts_t>("primitive_counts"),
-		generic_primitive.topology.create<mesh::indices_t>("first_operators"),
-		generic_primitive.topology.create<mesh::counts_t>("operator_counts"),
-		generic_primitive.topology.create<mesh::materials_t>("materials"),
-		generic_primitive.topology.create<typed_array<int32_t> >("primitives"),
-		generic_primitive.topology.create<mesh::indices_t>("primitive_first_floats"),
-		generic_primitive.topology.create<mesh::counts_t>("primitive_float_counts"),
-		generic_primitive.topology.create<typed_array<int32_t> >("operators"),
-		generic_primitive.topology.create<mesh::indices_t>("operator_first_operands"),
-		generic_primitive.topology.create<mesh::counts_t >("operator_operand_counts"),
-		generic_primitive.topology.create<mesh::doubles_t>("floats"),
-		generic_primitive.topology.create<mesh::indices_t>("operands"),
+		generic_primitive.structure.create<mesh::indices_t>("first_primitives"),
+		generic_primitive.structure.create<mesh::counts_t>("primitive_counts"),
+		generic_primitive.structure.create<mesh::indices_t>("first_operators"),
+		generic_primitive.structure.create<mesh::counts_t>("operator_counts"),
+		generic_primitive.structure.create<mesh::materials_t>("materials"),
+		generic_primitive.structure.create<typed_array<int32_t> >("primitives"),
+		generic_primitive.structure.create<mesh::indices_t>("primitive_first_floats"),
+		generic_primitive.structure.create<mesh::counts_t>("primitive_float_counts"),
+		generic_primitive.structure.create<typed_array<int32_t> >("operators"),
+		generic_primitive.structure.create<mesh::indices_t>("operator_first_operands"),
+		generic_primitive.structure.create<mesh::counts_t >("operator_operand_counts"),
+		generic_primitive.structure.create<mesh::doubles_t>("floats"),
+		generic_primitive.structure.create<mesh::indices_t>("operands"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
 		generic_primitive.attributes["varying"],
@@ -182,7 +182,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", first_curves.size());
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
 		
 		require_attribute_arrays_size(Primitive, uniform_data, "uniform", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
 		
@@ -236,7 +236,7 @@ primitive* validate(mesh::primitive& Primitive)
 
 		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", first_curves.size());
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
 		
 		require_attribute_arrays_size(Primitive, uniform_data, "uniform", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
 		

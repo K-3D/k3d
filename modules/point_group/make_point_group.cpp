@@ -71,9 +71,7 @@ public:
 		boost::scoped_ptr<k3d::point_group::primitive> primitive(k3d::point_group::create(Output));
 		k3d::typed_array<k3d::double_t>& width = primitive->constant_data.create<k3d::typed_array<k3d::double_t> >("constantwidth");
 
-		primitive->first_points.push_back(0);
-		primitive->point_counts.push_back(point_count);
-		primitive->materials.push_back(m_material.pipeline_value());
+		primitive->material.push_back(m_material.pipeline_value());
 		primitive->points.assign(point_count, 0);
 		for(k3d::uint_t i = 0; i != point_count; ++i)
 			primitive->points[i] = i;

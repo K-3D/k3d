@@ -86,12 +86,12 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("paraboloid");
 
 	primitive* const result = new primitive(
-		generic_primitive.topology.create<mesh::matrices_t >("matrices"),
-		generic_primitive.topology.create<mesh::materials_t >("materials"),
-		generic_primitive.topology.create<mesh::doubles_t >("radii"),
-		generic_primitive.topology.create<mesh::doubles_t >("z_min"),
-		generic_primitive.topology.create<mesh::doubles_t >("z_max"),
-		generic_primitive.topology.create<mesh::doubles_t >("sweep_angles"),
+		generic_primitive.structure.create<mesh::matrices_t >("matrices"),
+		generic_primitive.structure.create<mesh::materials_t >("materials"),
+		generic_primitive.structure.create<mesh::doubles_t >("radii"),
+		generic_primitive.structure.create<mesh::doubles_t >("z_min"),
+		generic_primitive.structure.create<mesh::doubles_t >("z_max"),
+		generic_primitive.structure.create<mesh::doubles_t >("sweep_angles"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
 		generic_primitive.attributes["varying"]
@@ -127,7 +127,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_array_size(Primitive, z_max, "z_max", matrices.size());
 		require_array_size(Primitive, sweep_angles, "sweep_angles", matrices.size());
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", matrices.size());
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
 		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
 		require_attribute_arrays_size(Primitive, varying_data, "varying", matrices.size() * 4);
 
@@ -165,7 +165,7 @@ primitive* validate(mesh::primitive& Primitive)
 		require_array_size(Primitive, z_max, "z_max", matrices.size());
 		require_array_size(Primitive, sweep_angles, "sweep_angles", matrices.size());
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", matrices.size());
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
 		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
 		require_attribute_arrays_size(Primitive, varying_data, "varying", matrices.size() * 4);
 

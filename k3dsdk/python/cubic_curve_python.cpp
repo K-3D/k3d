@@ -42,10 +42,8 @@ public:
 	public:
 		typedef owned_instance_wrapper<k3d::cubic_curve::const_primitive> wrapper;
 
-		static object first_curves(wrapper& Self) { return wrap(Self.wrapped().first_curves); }
-		static object curve_counts(wrapper& Self) { return wrap(Self.wrapped().curve_counts); }
-		static object periodic_curves(wrapper& Self) { return wrap(Self.wrapped().periodic_curves); }
-		static object materials(wrapper& Self) { return wrap(Self.wrapped().materials); }
+		static object periodic(wrapper& Self) { return wrap(Self.wrapped().periodic); }
+		static object material(wrapper& Self) { return wrap(Self.wrapped().material); }
 		static object curve_first_points(wrapper& Self) { return wrap(Self.wrapped().curve_first_points); }
 		static object curve_point_counts(wrapper& Self) { return wrap(Self.wrapped().curve_point_counts); }
 		static object curve_selections(wrapper& Self) { return wrap(Self.wrapped().curve_selections); }
@@ -60,10 +58,8 @@ public:
 	public:
 		typedef owned_instance_wrapper<k3d::cubic_curve::primitive> wrapper;
 
-		static object first_curves(wrapper& Self) { return wrap(Self.wrapped().first_curves); }
-		static object curve_counts(wrapper& Self) { return wrap(Self.wrapped().curve_counts); }
-		static object periodic_curves(wrapper& Self) { return wrap(Self.wrapped().periodic_curves); }
-		static object materials(wrapper& Self) { return wrap(Self.wrapped().materials); }
+		static object periodic(wrapper& Self) { return wrap(Self.wrapped().periodic); }
+		static object material(wrapper& Self) { return wrap(Self.wrapped().material); }
 		static object curve_first_points(wrapper& Self) { return wrap(Self.wrapped().curve_first_points); }
 		static object curve_point_counts(wrapper& Self) { return wrap(Self.wrapped().curve_point_counts); }
 		static object curve_selections(wrapper& Self) { return wrap(Self.wrapped().curve_selections); }
@@ -101,10 +97,8 @@ void define_namespace_cubic_curve()
 		;
 
 	class_<cubic_curve::const_primitive::wrapper>("const_primitive", no_init)
-		.def("first_curves", &cubic_curve::const_primitive::first_curves)
-		.def("curve_counts", &cubic_curve::const_primitive::curve_counts)
-		.def("periodic_curves", &cubic_curve::const_primitive::periodic_curves)
-		.def("materials", &cubic_curve::const_primitive::materials)
+		.def("periodic", &cubic_curve::const_primitive::periodic)
+		.def("material", &cubic_curve::const_primitive::material)
 		.def("curve_first_points", &cubic_curve::const_primitive::curve_first_points)
 		.def("curve_point_counts", &cubic_curve::const_primitive::curve_point_counts)
 		.def("curve_selections", &cubic_curve::const_primitive::curve_selections)
@@ -115,10 +109,8 @@ void define_namespace_cubic_curve()
 		;
 
 	class_<cubic_curve::primitive::wrapper>("primitive", no_init)
-		.def("first_curves", &cubic_curve::primitive::first_curves)
-		.def("curve_counts", &cubic_curve::primitive::curve_counts)
-		.def("periodic_curves", &cubic_curve::primitive::periodic_curves)
-		.def("materials", &cubic_curve::primitive::materials)
+		.def("periodic", &cubic_curve::primitive::periodic)
+		.def("material", &cubic_curve::primitive::material)
 		.def("curve_first_points", &cubic_curve::primitive::curve_first_points)
 		.def("curve_point_counts", &cubic_curve::primitive::curve_point_counts)
 		.def("curve_selections", &cubic_curve::primitive::curve_selections)

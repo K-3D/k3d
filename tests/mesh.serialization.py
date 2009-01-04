@@ -20,7 +20,7 @@ for i in range(len(array_types)):
 	type = array_types[i]
 	value = array_values[i]
 
-	named_array = primitive.topology().create(type, type)
+	named_array = primitive.structure().create(type, type)
 	named_array.append(value)
 	named_array.append(value)
 

@@ -33,17 +33,13 @@ class const_primitive
 {
 public:
 	const_primitive(
-		const uint_t_array& FirstPoints,
-		const uint_t_array& PointCounts,
-		const typed_array<imaterial*>& Materials,
+		const typed_array<imaterial*>& Material,
 		const uint_t_array& Points,
 		const attribute_arrays& ConstantData,
 		const attribute_arrays& VaryingData
 		);
 
-	const uint_t_array& first_points;
-	const uint_t_array& point_counts;
-	const typed_array<imaterial*>& materials;
+	const typed_array<imaterial*>& material;
 	const uint_t_array& points;
 	const attribute_arrays& constant_data;
 	const attribute_arrays& varying_data;
@@ -54,17 +50,13 @@ class primitive
 {
 public:
 	primitive(
-		uint_t_array& FirstPoints,
-		uint_t_array& PointCounts,
-		typed_array<imaterial*>& Materials,
+		typed_array<imaterial*>& Material,
 		uint_t_array& Points,
 		attribute_arrays& ConstantData,
 		attribute_arrays& VaryingData
 		);
 
-	uint_t_array& first_points;
-	uint_t_array& point_counts;
-	typed_array<imaterial*>& materials;
+	typed_array<imaterial*>& material;
 	uint_t_array& points;
 	attribute_arrays& constant_data;
 	attribute_arrays& varying_data;

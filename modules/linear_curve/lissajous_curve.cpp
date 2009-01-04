@@ -119,10 +119,8 @@ public:
 		boost::scoped_ptr<k3d::linear_curve::primitive> primitive(k3d::linear_curve::create(Output));
 		k3d::mesh::doubles_t& widths = primitive->constant_data.create<k3d::mesh::doubles_t>("width");
 
-		primitive->first_curves.push_back(primitive->curve_first_points.size());
-		primitive->curve_counts.push_back(1);
-		primitive->periodic_curves.push_back(wrap);
-		primitive->materials.push_back(material);
+		primitive->periodic.push_back(wrap);
+		primitive->material.push_back(material);
 		widths.push_back(width);
 
 		primitive->curve_first_points.push_back(primitive->curve_points.size());

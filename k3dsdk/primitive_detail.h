@@ -36,7 +36,7 @@ namespace k3d
 template<typename ArrayT>
 const ArrayT& require_const_array(const mesh::primitive& Primitive, const string_t& Name)
 {
-	const ArrayT* const array = Primitive.topology.lookup<ArrayT>(Name);
+	const ArrayT* const array = Primitive.structure.lookup<ArrayT>(Name);
 
 	if(!array)
 		throw std::runtime_error("[" + Primitive.type + "] primitive missing array [" + Name + "]");
@@ -48,7 +48,7 @@ const ArrayT& require_const_array(const mesh::primitive& Primitive, const string
 template<typename ArrayT>
 ArrayT& require_array(mesh::primitive& Primitive, const string_t& Name)
 {
-	ArrayT* const array = Primitive.topology.writable<ArrayT>(Name);
+	ArrayT* const array = Primitive.structure.writable<ArrayT>(Name);
 
 	if(!array)
 		throw std::runtime_error("[" + Primitive.type + "] primitive missing array [" + Name + "]");

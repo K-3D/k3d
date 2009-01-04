@@ -16,20 +16,15 @@ constantwidth = point_group.constant_data().create("constantwidth", "k3d::double
 # Create an (optional) array to store per-point point colors
 Cs = point_group.varying_data().create("Cs", "k3d::color")
 
-# Create two point groups ...
-for i in range(2):
-	point_group.first_points().append(len(point_group.points()))
-	point_group.point_counts().append(30)
-	point_group.materials().append(None)
+# Add some points ...
+point_group.material().append(None)
+constantwidth.append(0.5)
 
-	constantwidth.append(i + 0.5)
-
-	# Add 30 points to each group ...
-	for j in range(30):
+for x in range(-5, 6):
+	for z in range (-5, 6):
 		point_group.points().append(len(points))
 
-		points.append(k3d.point3(j - 15, 0 - (5 * i), 0))
+		points.append(k3d.point3(x, 0, z))
 		point_selection.append(0.0)
-
-		Cs.append(k3d.color(1, j / 30.0, 0))
+		Cs.append(k3d.color((x / 10.0) + 0.5, 1, (z / 10.0) + 0.5))
 

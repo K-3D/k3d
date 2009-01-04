@@ -583,9 +583,9 @@ static const string_t const_mesh_primitive_get_type(const_mesh_primitive_wrapper
 	return Self.wrapped().type;
 }
 
-static object const_mesh_primitive_get_topology(const_mesh_primitive_wrapper& Self)
+static object const_mesh_primitive_get_structure(const_mesh_primitive_wrapper& Self)
 {
-	return wrap(Self.wrapped().topology);
+	return wrap(Self.wrapped().structure);
 }
 
 static object const_mesh_primitive_get_attributes(const_mesh_primitive_wrapper& Self)
@@ -606,9 +606,9 @@ static void mesh_primitive_set_type(mesh_primitive_wrapper& Self, const string_t
 	Self.wrapped().type = Type;
 }
 
-static object mesh_primitive_get_topology(mesh_primitive_wrapper& Self)
+static object mesh_primitive_get_structure(mesh_primitive_wrapper& Self)
 {
-	return wrap(Self.wrapped().topology);
+	return wrap(Self.wrapped().structure);
 }
 
 static object mesh_primitive_get_attributes(mesh_primitive_wrapper& Self)
@@ -962,13 +962,13 @@ void define_class_mesh()
 
 	class_<const_mesh_primitive_wrapper>("const_primitive", no_init)
 		.def("type", &const_mesh_primitive_get_type)
-		.def("topology", &const_mesh_primitive_get_topology)
+		.def("structure", &const_mesh_primitive_get_structure)
 		.def("attributes", &const_mesh_primitive_get_attributes)
 		;
 
 	class_<mesh_primitive_wrapper>("primitive", no_init)
 		.def("type", &mesh_primitive_get_type)
-		.def("topology", &mesh_primitive_get_topology)
+		.def("structure", &mesh_primitive_get_structure)
 		.def("attributes", &mesh_primitive_get_attributes)
 		;
 

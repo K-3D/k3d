@@ -801,7 +801,7 @@ const bool_t mesh::primitive::almost_equal(const primitive& Other, const uint64_
 {
 	return
 		k3d::almost_equal<string_t>(Threshold)(type, Other.type) &&
-		k3d::almost_equal<named_arrays_t>(Threshold)(topology, Other.topology) &&
+		k3d::almost_equal<named_arrays_t>(Threshold)(structure, Other.structure) &&
 		k3d::almost_equal<named_attribute_arrays_t>(Threshold)(attributes, Other.attributes);
 }
 
@@ -1033,7 +1033,7 @@ std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 	for(mesh::primitives_t::const_iterator primitive = RHS.primitives.begin(); primitive != RHS.primitives.end(); ++primitive)
 	{
 		Stream << detail::indentation << "primitive \"" << (*primitive)->type << "\"\n" << push_indent;
-		detail::print(Stream, "topology", (*primitive)->topology);
+		detail::print(Stream, "structure", (*primitive)->structure);
 		detail::print(Stream, "attributes", (*primitive)->attributes);
 		Stream << pop_indent;
 	}

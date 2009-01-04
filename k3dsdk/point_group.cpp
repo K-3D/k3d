@@ -33,16 +33,12 @@ namespace point_group
 // const_primitive
 
 const_primitive::const_primitive(
-	const uint_t_array& FirstPoints,
-	const uint_t_array& PointCounts,
-	const typed_array<imaterial*>& Materials,
+	const typed_array<imaterial*>& Material,
 	const uint_t_array& Points,
 	const attribute_arrays& ConstantData,
 	const attribute_arrays& VaryingData
 		) :
-	first_points(FirstPoints),
-	point_counts(PointCounts),
-	materials(Materials),
+	material(Material),
 	points(Points),
 	constant_data(ConstantData),
 	varying_data(VaryingData)
@@ -53,16 +49,12 @@ const_primitive::const_primitive(
 // primitive
 
 primitive::primitive(
-	uint_t_array& FirstPoints,
-	uint_t_array& PointCounts,
-	typed_array<imaterial*>& Materials,
+	typed_array<imaterial*>& Material,
 	uint_t_array& Points,
 	attribute_arrays& ConstantData,
 	attribute_arrays& VaryingData
 		) :
-	first_points(FirstPoints),
-	point_counts(PointCounts),
-	materials(Materials),
+	material(Material),
 	points(Points),
 	constant_data(ConstantData),
 	varying_data(VaryingData)
@@ -77,10 +69,8 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("point_group");
 
 	primitive* const result = new primitive(
-		generic_primitive.topology.create<uint_t_array >("first_points"),
-		generic_primitive.topology.create<uint_t_array >("point_counts"),
-		generic_primitive.topology.create<typed_array<imaterial*> >("materials"),
-		generic_primitive.topology.create<uint_t_array >("points"),
+		generic_primitive.structure.create<typed_array<imaterial*> >("material"),
+		generic_primitive.structure.create<uint_t_array >("points"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["varying"]
 		);
@@ -100,9 +90,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
-		const uint_t_array& first_points = require_const_array<uint_t_array >(Primitive, "first_points");
-		const uint_t_array& point_counts = require_const_array<uint_t_array >(Primitive, "point_counts");
-		const typed_array<imaterial*>& materials = require_const_array<typed_array<imaterial*> >(Primitive, "materials");
+		const typed_array<imaterial*>& material = require_const_array<typed_array<imaterial*> >(Primitive, "material");
 		const uint_t_array& points = require_const_array<uint_t_array >(Primitive, "points");
 
 		const attribute_arrays& constant_data = require_const_attribute_arrays(Primitive, "constant");
@@ -110,13 +98,12 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 		require_metadata(Primitive, points, "points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_array_size(Primitive, point_counts, "point_counts", first_points.size());
-		require_array_size(Primitive, materials, "materials", first_points.size());
+		require_array_size(Primitive, material, "material", 1);
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", first_points.size());
-		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(point_counts.begin(), point_counts.end(), 0));
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
+		require_attribute_arrays_size(Primitive, varying_data, "varying", points.size());
 
-		return new const_primitive(first_points, point_counts, materials, points, constant_data, varying_data);
+		return new const_primitive(material, points, constant_data, varying_data);
 	}
 	catch(std::exception& e)
 	{
@@ -133,9 +120,7 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
-		uint_t_array& first_points = require_array<uint_t_array >(Primitive, "first_points");
-		uint_t_array& point_counts = require_array<uint_t_array >(Primitive, "point_counts");
-		typed_array<imaterial*>& materials = require_array<typed_array<imaterial*> >(Primitive, "materials");
+		typed_array<imaterial*>& material = require_array<typed_array<imaterial*> >(Primitive, "material");
 		uint_t_array& points = require_array<uint_t_array >(Primitive, "points");
 
 		attribute_arrays& constant_data = require_attribute_arrays(Primitive, "constant");
@@ -143,13 +128,12 @@ primitive* validate(mesh::primitive& Primitive)
 
 		require_metadata(Primitive, points, "points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_array_size(Primitive, point_counts, "point_counts", first_points.size());
-		require_array_size(Primitive, materials, "materials", first_points.size());
+		require_array_size(Primitive, material, "material", 1);
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", first_points.size());
-		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(point_counts.begin(), point_counts.end(), 0));
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
+		require_attribute_arrays_size(Primitive, varying_data, "varying", points.size());
 
-		return new primitive(first_points, point_counts, materials, points, constant_data, varying_data);
+		return new primitive(material, points, constant_data, varying_data);
 	}
 	catch(std::exception& e)
 	{

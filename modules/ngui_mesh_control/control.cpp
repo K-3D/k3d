@@ -59,10 +59,10 @@ namespace k3d
 			const mesh::primitive& primitive = **p;
 			Functor.start_primitive(primitive);
 
-			Functor.start_topology(primitive.topology);
-			for(mesh::named_arrays_t::const_iterator array = primitive.topology.begin(); array != primitive.topology.end(); ++array)
-				Functor.topology_array(array->first, *array->second);
-			Functor.finish_topology(primitive.topology);
+			Functor.start_structure(primitive.structure);
+			for(mesh::named_arrays_t::const_iterator array = primitive.structure.begin(); array != primitive.structure.end(); ++array)
+				Functor.structure_array(array->first, *array->second);
+			Functor.finish_structure(primitive.structure);
 
 			Functor.start_named_attributes(primitive.attributes);
 			for(mesh::named_attribute_arrays_t::const_iterator attributes = primitive.attributes.begin(); attributes != primitive.attributes.end(); ++attributes)
@@ -139,7 +139,7 @@ public:
 		save_dotfile(std::ostream& Stream) :
 			current_mesh(0),
 			current_primitive(0),
-			current_topology_arrays(0),
+			current_structure_arrays(0),
 			current_named_attribute_arrays(0),
 			current_attribute_arrays(0),
 			current_array(0),
@@ -210,26 +210,26 @@ public:
 			stream << indentation << "v" << current_primitive << ":type:e -> " << "v" << current_primitive << "type:w\n";
 		}
 
-		void start_topology(const k3d::mesh::named_arrays_t& Topology)
+		void start_structure(const k3d::mesh::named_arrays_t& Structure)
 		{
-			current_topology_arrays = &Topology;
+			current_structure_arrays = &Structure;
 
-			stream << indentation << "v" << current_topology_arrays;
+			stream << indentation << "v" << current_structure_arrays;
 			stream << " [label=\"<named_arrays>Named Arrays";
 			
-			for(k3d::mesh::named_arrays_t::const_iterator array = Topology.begin(); array != Topology.end(); ++array)
+			for(k3d::mesh::named_arrays_t::const_iterator array = Structure.begin(); array != Structure.end(); ++array)
 				stream << "|<" << array->first << ">" << "\\\"" << array->first << "\\\"";
 
 			stream << "\"]\n";
-			stream << indentation << "v" << current_primitive << ":structure:e -> " << "v" << current_topology_arrays << ":named_arrays:w\n";
+			stream << indentation << "v" << current_primitive << ":structure:e -> " << "v" << current_structure_arrays << ":named_arrays:w\n";
 		}
 
-		void topology_array(const k3d::string_t& Name, const k3d::array& Array)
+		void structure_array(const k3d::string_t& Name, const k3d::array& Array)
 		{
 			current_array = &Array;
 
 			stream << indentation << "v" << current_array << " [label=\"{|||...|}\"]\n";
-			stream << indentation << "v" << current_topology_arrays << ":" << Name << ":e -> " << "v" << current_array << ":w\n";
+			stream << indentation << "v" << current_structure_arrays << ":" << Name << ":e -> " << "v" << current_array << ":w\n";
 
 			if(Array.get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::mesh_point_indices_domain())
 				stream << indentation << "v" << current_array << ":n -> " << "v" << current_mesh->points.get() << ":n\n";
@@ -237,9 +237,9 @@ public:
 			current_array = 0;
 		}
 
-		void finish_topology(const k3d::mesh::named_arrays_t& Topology)
+		void finish_structure(const k3d::mesh::named_arrays_t& Structure)
 		{
-			current_topology_arrays = 0;
+			current_structure_arrays = 0;
 		}
 
 		void start_named_attributes(const k3d::mesh::named_attribute_arrays_t& NamedAttributes)
@@ -309,7 +309,7 @@ public:
 	private:
 		const k3d::mesh* current_mesh;
 		const k3d::mesh::primitive* current_primitive;
-		const k3d::mesh::named_arrays_t* current_topology_arrays;
+		const k3d::mesh::named_arrays_t* current_structure_arrays;
 		const k3d::mesh::named_attribute_arrays_t* current_named_attribute_arrays;
 		const k3d::mesh::attribute_arrays_t* current_attribute_arrays;
 		const k3d::array* current_array;
