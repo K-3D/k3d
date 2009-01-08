@@ -83,17 +83,34 @@ public:
 		return factory;
 	}
 
-//	/// Converts the homogeneous coordinate to Cartesian.
-//	point3 cartesian() const
-//	{
-//		k3d::double_t denom_inv = (d[3] == 0) ? k3d::double_t(1.0) : k3d::double_t(1.0) / d[3];
-//		return point3(d[0] * denom, d[1] * denom, d[2] * denom);
-//	}
+#define TRI_BEZ_VIEW_SKIP 1 // for debugging
 
 	/// Render a rational triangle Bezier patch.
 	static void gl_render_bezier_triangle(const std::vector<k3d::point4 > &control_points, k3d::uint_t order, k3d::bool_t select_mode)
 	{
 		assert(order > 0);
+		assert(control_points.size() == ( order * (order + 1) / 2 ));
+
+#if (TRI_BEZ_VIEW_SKIP)
+		{
+		// Render only the base triangle, defined by the three corners of the
+		// Bezier patch, with flat shading.
+		const k3d::uint_t n = order * (order + 1) / 2;
+		k3d::point3 p0 = cartesian(control_points[0]);
+		k3d::point3 p1 = cartesian(control_points[n - 1]);
+		k3d::point3 p2 = cartesian(control_points[n - order]);
+		k3d::vector3 nor = k3d::normalize((p1 - p0) ^ (p2 - p1));
+		glBegin(GL_TRIANGLES);
+			k3d::gl::normal3d(nor);
+			k3d::gl::vertex3d(p0);
+			k3d::gl::normal3d(nor);
+			k3d::gl::vertex3d(p1);
+			k3d::gl::normal3d(nor);
+			k3d::gl::vertex3d(p2);
+		glEnd();
+		return;
+		}
+#endif
 
 		// The selection mode is passed in so that it may be
 		// (eventually) used to render a lower-resolution patch on
@@ -155,6 +172,7 @@ public:
 				k3d::point4 &eval_pt = eval_points[eval_i];
 				k3d::point4 eval_diff_u_homog; // derivatives of the homogeneous coordinates
 				k3d::point4 eval_diff_v_homog;
+
 				// eval_points[eval_i] and eval_normals[eval_i] should already be 0
 				for(k3d::uint_t i = 0; i < order; ++i)
 				{

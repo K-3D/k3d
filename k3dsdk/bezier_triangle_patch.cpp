@@ -144,7 +144,6 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		{
 			const k3d::uint_t patch_begin = patch_first_points[patch];
 			const k3d::uint_t patch_end = patch_begin + patch_orders[patch];
-			require_array_size(Primitive, patch_points, "patch_points", patch_selections.size() * 16);
 
 			const k3d::uint_t patch_size = (patch_orders[patch] * (patch_orders[patch] + 1)) / 2;
 			num_control_points += patch_size;
