@@ -208,6 +208,13 @@ inline point4& point4::operator-=(const vector4& v)
 //////////////////////////////////////////////////////////////////////////
 // Odds-and-ends
 
+/// Converts homogeneous coordinates to Cartesian.
+inline const point3 cartesian(const point4& p)
+{
+	double_t denom_inv = (p.n[3] == 0) ? double_t(1.0) : double_t(1.0) / p.n[3];
+	return point3(p.n[0] * denom_inv, p.n[1] * denom_inv, p.n[2] * denom_inv);
+}
+
 /// Returns the distance between two points
 inline const double distance(const point2& P1, const point2& P2)
 {
