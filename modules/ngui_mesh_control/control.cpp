@@ -166,7 +166,7 @@ public:
 			stream << indentation << "node [shape=\"record\" fontname=\"Helvetica\" fontsize=12 height=0 width=0]\n";
 			stream << indentation << "edge [fontname=\"Helvetica\" fontsize=10]\n";
 
-			stream << indentation << "v" << current_mesh << " [label=\"<mesh>Mesh|<points>points|<point_selection>point_selection|<primitives>primitives\"]\n";
+			stream << indentation << "v" << current_mesh << " [label=\"<geometry>Geometry|<points>points|<point_selection>point_selection|<primitives>primitives\"]\n";
 			stream << k3d::push_indent;
 		}
 
