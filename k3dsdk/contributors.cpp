@@ -50,6 +50,7 @@ const contributors_t& contributors()
 		storage.push_back(contributor(ustring::from_utf8("Alexander Curtis"), "Integrated material manager"));
 		storage.push_back(contributor(ustring::from_utf8("Anders Dahnielson"), "Documentation, script engines, web design"));
 		storage.push_back(contributor(ustring::from_utf8("Anders Stenberg"), "UV mapping, MSVC build"));
+		storage.push_back(contributor(ustring::from_utf8("Ashish Myles"), "Bezier Triangles"));
 		storage.push_back(contributor(ustring::from_utf8("Carlos Andres Dominguez Caballero"), "File import / export plugins"));
 		storage.push_back(contributor(ustring::from_utf8("Carsten Thomas Haubold"), "NURBS modeling tools"));
 		storage.push_back(contributor(ustring::from_utf8("Daniel S. \"Scalable Vector\" Matthews"), "Win32 build, icons, documentation, samples"));
