@@ -106,6 +106,7 @@ const k3d::gl::selection_state select_uniform(bool Backfacing)
 	result.select_nurbs_patches = true;
 	result.select_bezier_triangle_patches = true;
 	result.select_backfacing = Backfacing;
+	result.select_uniform = true;
 
 	return result;
 }

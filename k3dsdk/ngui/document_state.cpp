@@ -118,7 +118,7 @@ const bool is_point_selected(const k3d::selection::record& Record)
 }
 
 /** \todo Support nucurves */
-const bool is_line_selected(const k3d::selection::record& Record)
+const bool is_split_edge_selected(const k3d::selection::record& Record)
 {
 	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
 	if(!mesh)
@@ -151,7 +151,7 @@ const bool is_line_selected(const k3d::selection::record& Record)
 }
 
 /** \todo Support patches */
-const bool is_face_selected(const k3d::selection::record& Record)
+const bool is_uniform_selected(const k3d::selection::record& Record)
 {
 	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
 	if(!mesh)
@@ -212,9 +212,9 @@ struct select_points
 };
 
 /// Policy class that updates a mesh_selection to select the given lines
-struct select_lines
+struct select_split_edges
 {
-	select_lines(const double Weight, const k3d::mesh::indices_t& Companions) :
+	select_split_edges(const double Weight, const k3d::mesh::indices_t& Companions) :
 		weight(Weight), companions(Companions)
 	{
 	}
@@ -258,10 +258,10 @@ struct select_lines
 	const k3d::mesh::indices_t& companions;
 };
 
-/// Policy class that updates a mesh_selection to select the given faces
-struct select_faces
+/// Policy class that updates a mesh_selection to select the given uniform components
+struct select_uniform
 {
-	select_faces(const double Weight, const k3d::mesh::indices_t& Companions) :
+	select_uniform(const double Weight, const k3d::mesh::indices_t& Companions) :
 		weight(Weight)
 	{
 	}
@@ -276,15 +276,6 @@ struct select_faces
 					Selection.faces.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
 
-/*
-				case k3d::selection::ABSOLUTE_BILINEAR_PATCH:
-					Selection.bilinear_patches.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
-					return;
-
-				case k3d::selection::ABSOLUTE_BICUBIC_PATCH:
-					Selection.bicubic_patches.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
-					return;
-*/
 				case k3d::selection::ABSOLUTE_NURBS_PATCH:
 					Selection.nurbs_patches.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
@@ -393,7 +384,7 @@ struct select_all_points
 	}
 };
 
-struct select_all_lines
+struct select_all_split_edges
 {
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
@@ -405,7 +396,7 @@ struct select_all_lines
 	}
 };
 
-struct select_all_faces
+struct select_all_uniform
 {
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
@@ -447,7 +438,7 @@ struct invert_points
 	}
 };
 
-struct invert_lines
+struct invert_split_edges
 {
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
@@ -456,7 +447,7 @@ struct invert_lines
 	}
 };
 
-struct invert_faces
+struct invert_uniform
 {
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
@@ -668,7 +659,7 @@ struct convert_to_points
 	bool m_keep_selection;
 };
 
-struct convert_to_lines
+struct convert_to_split_edges
 {
 	struct implementation
 	{
@@ -678,12 +669,12 @@ struct convert_to_lines
 		const k3d::mesh* mesh;
 	};
 	
-	convert_to_lines(bool KeepSelection) : m_keep_selection(KeepSelection)
+	convert_to_split_edges(bool KeepSelection) : m_keep_selection(KeepSelection)
 	{
 		m_implementation = new implementation();
 	}
 	
-	~convert_to_lines()
+	~convert_to_split_edges()
 	{
 		delete m_implementation;
 	}
@@ -857,9 +848,9 @@ struct convert_to_lines
 };
 
 /** \todo Handle adjacent edge selections */
-struct convert_to_faces
+struct convert_to_uniform
 {
-	convert_to_faces(bool KeepSelection) : m_keep_selection(KeepSelection) {}
+	convert_to_uniform(bool KeepSelection) : m_keep_selection(KeepSelection) {}
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		// Convert point and edge selections to face selections ...
@@ -1324,9 +1315,9 @@ public:
 			case SELECT_POINTS:
 				return detail::is_point_selected(Record);
 			case SELECT_SPLIT_EDGES:
-				return detail::is_line_selected(Record);
+				return detail::is_split_edge_selected(Record);
 			case SELECT_UNIFORM:
-				return detail::is_face_selected(Record);
+				return detail::is_uniform_selected(Record);
 		}
 
 		return false;
@@ -1363,14 +1354,9 @@ public:
 		detail::select_components<detail::select_points>(Selection, 1.0);
 	}
 
-	void select_lines(const k3d::selection::records& Selection)
+	void select_split_edges(const k3d::selection::records& Selection)
 	{
-		detail::select_components<detail::select_lines>(Selection, 1.0);
-	}
-
-	void select_faces(const k3d::selection::records& Selection)
-	{
-		detail::select_components<detail::select_faces>(Selection, 1.0);
+		detail::select_components<detail::select_split_edges>(Selection, 1.0);
 	}
 
 	void select_nodes(const k3d::selection::records& Selection)
@@ -1409,10 +1395,10 @@ public:
 				select_points(Selection);
 				break;
 			case SELECT_SPLIT_EDGES:
-				select_lines(Selection);
+				select_split_edges(Selection);
 				break;
 			case SELECT_UNIFORM:
-				select_faces(Selection);
+				detail::select_components<detail::select_uniform>(Selection, 1.0);
 				break;
 		}
 
@@ -1439,12 +1425,12 @@ public:
 
 	void select_all_lines()
 	{
-		detail::update_component_selection(selected_nodes(), detail::select_all_lines(), true);
+		detail::update_component_selection(selected_nodes(), detail::select_all_split_edges(), true);
 	}
 
-	void select_all_faces()
+	void select_all_uniform()
 	{
-		detail::update_component_selection(selected_nodes(), detail::select_all_faces(), true);
+		detail::update_component_selection(selected_nodes(), detail::select_all_uniform(), true);
 	}
 
 	void select_all()
@@ -1461,7 +1447,7 @@ public:
 				select_all_lines();
 				break;
 			case SELECT_UNIFORM:
-				select_all_faces();
+				select_all_uniform();
 				break;
 		}
 
@@ -1473,14 +1459,9 @@ public:
 		detail::select_components<detail::select_points>(Selection, 0.0);
 	}
 
-	void deselect_lines(const k3d::selection::records& Selection)
+	void deselect_split_edges(const k3d::selection::records& Selection)
 	{
-		detail::select_components<detail::select_lines>(Selection, 0.0);
-	}
-
-	void deselect_faces(const k3d::selection::records& Selection)
-	{
-		detail::select_components<detail::select_faces>(Selection, 0.0);
+		detail::select_components<detail::select_split_edges>(Selection, 0.0);
 	}
 
 	void deselect_nodes(const k3d::selection::records& Selection)
@@ -1503,10 +1484,10 @@ public:
 				deselect_points(Selection);
 				break;
 			case SELECT_SPLIT_EDGES:
-				deselect_lines(Selection);
+				deselect_split_edges(Selection);
 				break;
 			case SELECT_UNIFORM:
-				deselect_faces(Selection);
+				detail::select_components<detail::select_uniform>(Selection, 0.0);
 				break;
 		}
 
@@ -1563,14 +1544,14 @@ public:
 		detail::update_component_selection(m_document.nodes().collection(), detail::invert_points(), true);
 	}
 
-	void invert_line_selection()
+	void invert_split_edge_selection()
 	{
-		detail::update_component_selection(m_document.nodes().collection(), detail::invert_lines(), true);
+		detail::update_component_selection(m_document.nodes().collection(), detail::invert_split_edges(), true);
 	}
 
-	void invert_face_selection()
+	void invert_uniform_selection()
 	{
-		detail::update_component_selection(m_document.nodes().collection(), detail::invert_faces(), true);
+		detail::update_component_selection(m_document.nodes().collection(), detail::invert_uniform(), true);
 	}
 
 	void invert_selection()
@@ -1584,10 +1565,10 @@ public:
 				invert_point_selection();
 				break;
 			case SELECT_SPLIT_EDGES:
-				invert_line_selection();
+				invert_split_edge_selection();
 				break;
 			case SELECT_UNIFORM:
-				invert_face_selection();
+				invert_uniform_selection();
 				break;
 		}
 
@@ -1890,20 +1871,20 @@ public:
 			detail::update_component_selection(selected_nodes(), detail::keep_selection(), true);
 	}
 
-	/// Sets the current selection when line selection mode is chosen
-	void on_set_line_mode()
+	/// Sets the current selection when split edge selection mode is chosen
+	void on_set_split_edge_mode()
 	{
 		if (m_selection_tool->convert_selection())
-			detail::update_component_selection(selected_nodes(), detail::convert_to_lines(m_selection_tool->keep_selection()), true);
+			detail::update_component_selection(selected_nodes(), detail::convert_to_split_edges(m_selection_tool->keep_selection()), true);
 		else
 			detail::update_component_selection(selected_nodes(), detail::keep_selection(), true);
 	}
 
-	/// Sets the current selection when face selection mode is chosen
-	void on_set_face_mode()
+	/// Sets the current selection when uniform selection mode is chosen
+	void on_set_uniform_mode()
 	{
 		if (m_selection_tool->convert_selection())
-			detail::update_component_selection(selected_nodes(), detail::convert_to_faces(m_selection_tool->keep_selection()), true);
+			detail::update_component_selection(selected_nodes(), detail::convert_to_uniform(m_selection_tool->keep_selection()), true);
 		else
 			detail::update_component_selection(selected_nodes(), detail::keep_selection(), true);
 	}
@@ -1924,10 +1905,10 @@ public:
 				on_set_point_mode();
 				break;
 			case SELECT_SPLIT_EDGES:
-				on_set_line_mode();
+				on_set_split_edge_mode();
 				break;
 			case SELECT_UNIFORM:
-				on_set_face_mode();
+				on_set_uniform_mode();
 				break;
 		}
 
