@@ -83,34 +83,35 @@ public:
 		return factory;
 	}
 
-#define TRI_BEZ_VIEW_SKIP 1 // for debugging
-
 	/// Render a rational triangle Bezier patch.
 	static void gl_render_bezier_triangle(const std::vector<k3d::point4 > &control_points, k3d::uint_t order, k3d::bool_t select_mode)
 	{
 		assert(order > 0);
 		assert(control_points.size() == ( order * (order + 1) / 2 ));
 
-#if (TRI_BEZ_VIEW_SKIP)
-		{
-		// Render only the base triangle, defined by the three corners of the
-		// Bezier patch, with flat shading.
-		const k3d::uint_t n = order * (order + 1) / 2;
-		k3d::point3 p0 = cartesian(control_points[0]);
-		k3d::point3 p1 = cartesian(control_points[n - 1]);
-		k3d::point3 p2 = cartesian(control_points[n - order]);
-		k3d::vector3 nor = k3d::normalize((p1 - p0) ^ (p2 - p1));
-		glBegin(GL_TRIANGLES);
-			k3d::gl::normal3d(nor);
-			k3d::gl::vertex3d(p0);
-			k3d::gl::normal3d(nor);
-			k3d::gl::vertex3d(p1);
-			k3d::gl::normal3d(nor);
-			k3d::gl::vertex3d(p2);
-		glEnd();
-		return;
+		if (!select_mode) {
+			// TODO
+			// - Should probably be moved into a separate painter at some point.
+
+			// Display control mesh.
+			//    0
+			//   1 2
+			//  3 4 5
+			// 6 7 8 9
+			for(k3d::uint_t i = 1; i < order; ++i) {
+				for(k3d::uint_t j = 0; j < i; ++j) {
+					k3d::uint_t beg = i * (i - 1) / 2;
+					k3d::point3 p0 = cartesian(control_points[beg     + j  ]);
+					k3d::point3 p1 = cartesian(control_points[beg + i + j  ]);
+					k3d::point3 p2 = cartesian(control_points[beg + i + j+1]);
+					glBegin(GL_LINE_LOOP);
+						k3d::gl::vertex3d(p0);
+						k3d::gl::vertex3d(p1);
+						k3d::gl::vertex3d(p2);
+					glEnd();
+				}
+			}
 		}
-#endif
 
 		// The selection mode is passed in so that it may be
 		// (eventually) used to render a lower-resolution patch on
@@ -123,13 +124,14 @@ public:
 		k3d::uint_t num_segments = 1;
 		while (num_segments < order)
 			num_segments *= 2;
+  		num_segments *= 4;
 
 		// Pre-tabulate the factorials
 		std::vector<k3d::double_t > fact_inv_tab(order);
-		k3d::double_t deg_fact  = k3d::factorial(order - 1);
-		k3d::double_t degm_fact = k3d::factorial(order - 2);
-		for(k3d::double_t n; n < k3d::double_t(order); n += 1.0)
-			fact_inv_tab[n] = k3d::double_t(1.0) / k3d::factorial(n);
+		const k3d::double_t deg_fact  = k3d::factorial(order - 1);
+		const k3d::double_t degm_fact = k3d::factorial(order - 2);
+		for(k3d::uint_t n = 0; n < order; ++n)
+			fact_inv_tab[n] = k3d::double_t(1.0) / k3d::factorial(k3d::double_t(n));
 
 		// BEZIER TRIANGLES:
 		//     http://en.wikipedia.org/wiki/B%C3%A9zier_triangle
@@ -151,39 +153,46 @@ public:
 		//
 		std::vector<k3d::point4 >  eval_points ((num_segments + 1) * (num_segments + 2) / 2);
 		std::vector<k3d::vector3 > eval_normals((num_segments + 1) * (num_segments + 2) / 2);
-		for(k3d::uint_t ui = 0; ui <= num_segments; ++ui)
-		{
-			// When  ui  =  num_segments  :=  uvw_count - 1,  then  u = 0.
-			// Similarly for v.
-			const k3d::double_t u = k3d::double_t(ui) / num_segments;
-			for(k3d::uint_t vi = 0; vi <= ui; ++vi)
-			{
-				const k3d::double_t v = k3d::double_t(vi) / num_segments;
-				const k3d::double_t w = k3d::double_t(1.0) - u - v;
 
-				// Indexing of eval_points and control_points.
-				//          003                0
-				//  ijk   102 012      -->    1 2  index
-				//      201 111 021          3 4 5
-				//    300 210 120 030       6 7 8 9
-				// ...
-				// index = (i+j) * ((i+j)+1) / 2 + j
-				k3d::uint_t eval_i = (ui + vi) * (ui + vi + 1) / 2 + vi;
+		// Going top-to-down order (decreasing k index) for best cache
+		// coherency (see indexing below).
+		// Indexing of eval_points and control_points.
+		//          003                0
+		//  ijk   102 012      -->    1 2  index
+		//      201 111 021          3 4 5
+		//    300 210 120 030       6 7 8 9
+		// ...
+		// index = (deg-k) * (deg-k+1) / 2 + j
+		for(k3d::uint_t erow = 0; erow <= num_segments; ++erow)
+		{
+			// When  ei  =  num_segments  :=  uvw_count - 1,  then  u = 0.
+			// Similarly for v and w.
+			const k3d::uint_t ek = num_segments - erow;
+			const k3d::double_t w = k3d::double_t(ek) / num_segments;
+			for(k3d::uint_t ej = 0; ej <= num_segments - ek; ++ej)
+			{
+				const k3d::uint_t ei = num_segments - ej - ek;
+				const k3d::double_t v = k3d::double_t(ej) / num_segments;
+				const k3d::double_t u = k3d::double_t(1.0) - w - v;
+
+				const k3d::uint_t eval_i = erow * (erow + 1) / 2 + ej;
 				k3d::point4 &eval_pt = eval_points[eval_i];
 				k3d::point4 eval_diff_u_homog; // derivatives of the homogeneous coordinates
 				k3d::point4 eval_diff_v_homog;
 
 				// eval_points[eval_i] and eval_normals[eval_i] should already be 0
-				for(k3d::uint_t i = 0; i < order; ++i)
+				for(k3d::uint_t row = 0; row < order; ++row)
 				{
-					const k3d::double_t upi  = k3d::fast_pow(u, i);
-					const k3d::double_t upim = k3d::fast_pow(u, i - 1);
-					for(k3d::uint_t j = 0; j < order - i; ++j)
+					const k3d::uint_t k = order - 1 - row;
+					const k3d::double_t wpk  = k3d::fast_pow(w, k);
+					const k3d::double_t wpkm = k3d::fast_pow(w, k - 1);
+					for(k3d::uint_t j = 0; j < order - k; ++j)
 					{
-						const k3d::uint_t k = order - 1 - i - j;
+						const k3d::uint_t i = order - 1 - k - j;
 						const k3d::double_t vpjm = k3d::fast_pow(v, j - 1);
+						const k3d::double_t upim = k3d::fast_pow(u, i - 1);
 						const k3d::double_t vpj  = k3d::fast_pow(v, j);
-						const k3d::double_t wpk  = k3d::fast_pow(w, k);
+						const k3d::double_t upi  = k3d::fast_pow(u, i);
 						k3d::double_t coeff = deg_fact * fact_inv_tab[i] * fact_inv_tab[j] * fact_inv_tab[k];
 
 						//         0
@@ -191,31 +200,36 @@ public:
 						//   3    ij    5
 						// 6    7    8    9
 						//
-						k3d::uint_t cpts_ij  = (i + j) * (i + j + 1) / 2 + j;
-						eval_pt += (coeff * upi * vpj * wpk) * to_vector(control_points[cpts_ij]);
+						k3d::uint_t cpts_ijk = row * (row + 1) / 2 + j;
+						eval_pt += (coeff * upi * vpj * wpk) * to_vector(control_points[cpts_ijk]);
 
 						// (Homogeneous) derivatives
-						const k3d::point4 &c_ij = control_points[cpts_ij];
+						//          003                0
+						//  ijk   102 012      -->    1 2  index
+						//      201 111 021          3 4 5
+						//    300 210 120 030       6 7 8 9
+						const k3d::point4 &c_ijk = control_points[cpts_ijk];
 						if (i > 0) {
-							assert(int(cpts_ij) - int(i) >= 0);
-							k3d::uint_t cpts_imj = cpts_ij - i;
-							const k3d::point4 &c_imj = control_points[cpts_imj];
+							assert(int(cpts_ijk) - int(i) >= 0);
+							k3d::uint_t cpts_imjk = cpts_ijk - row;
+							const k3d::point4 &c_imjk = control_points[cpts_imjk];
 							k3d::double_t coeff_du = degm_fact * fact_inv_tab[i - 1] * fact_inv_tab[j] * fact_inv_tab[k];
-							eval_diff_u_homog += (coeff_du * upi/u * vpj * wpk) * (
-									k3d::vector4( c_ij[0] - c_imj[0], c_ij[1] - c_imj[1],
-									             c_ij[2] - c_imj[2], c_ij[3] - c_imj[3] ));
+							eval_diff_u_homog += (coeff_du * upim * vpj * wpk) * (
+									k3d::vector4( c_ijk[0] - c_imjk[0], c_ijk[1] - c_imjk[1],
+									              c_ijk[2] - c_imjk[2], c_ijk[3] - c_imjk[3] ));
 						}
 						if (j > 0) {
-							assert(int(cpts_ij) - int(i) - 1 >= 0);
-							k3d::uint_t cpts_ijm = cpts_ij - i - 1;
-							const k3d::point4 &c_ijm = control_points[cpts_ijm];
+							assert(int(cpts_ijk) - int(i) - 1 >= 0);
+							k3d::uint_t cpts_ijkm = cpts_ijk - row - 1;
+							const k3d::point4 &c_ijkm = control_points[cpts_ijkm];
 							k3d::double_t coeff_dv = degm_fact * fact_inv_tab[i] * fact_inv_tab[j - 1] * fact_inv_tab[k];
-							eval_diff_v_homog += (coeff_dv * upi * vpj/v * wpk) * (
-									k3d::vector4( c_ij[0] - c_ijm[0], c_ij[1] - c_ijm[1],
-									             c_ij[2] - c_ijm[2], c_ij[3] - c_ijm[3] ));
+							eval_diff_v_homog += (coeff_dv * upi * vpjm * wpk) * (
+									k3d::vector4( c_ijk[0] - c_ijkm[0], c_ijk[1] - c_ijkm[1],
+									              c_ijk[2] - c_ijkm[2], c_ijk[3] - c_ijkm[3] ));
 						}
 					}
 				}
+
 				// Since we have a rational patch in general, we need
 				// to use the division rule to compute tangents.
 				//     diff(a/b) = (b a' - a b') / b^2
@@ -240,24 +254,26 @@ public:
 						);
 
 				// normal = the normalized cross-product of the derivatives.
-				eval_normals[eval_i] = k3d::normalize( eval_diff_u ^ eval_diff_v );
+				eval_normals[eval_i] = eval_diff_u ^ eval_diff_v;
+				if (eval_normals[eval_i].length2() > 0)
+					k3d::normalize(eval_normals[eval_i]);
 			}
 		}
 
 		// Render using triangle strips
-		for (k3d::uint_t ui = 1; ui <= num_segments; ++ui)
+		for (k3d::uint_t ei = 1; ei <= num_segments; ++ei)
 		{
 			glBegin(GL_TRIANGLE_STRIP);
-			k3d::uint_t eval_i  = ui * (ui + 1) / 2;
-			k3d::uint_t eval_im = eval_i - ui;
+			k3d::uint_t eval_i  = ei * (ei + 1) / 2;
+			k3d::uint_t eval_im = eval_i - ei;
 			k3d::gl::normal3d(eval_normals[eval_i]);
 			k3d::gl::vertex4d(eval_points [eval_i]);
-			for (k3d::uint_t vi = 0; vi < ui; ++vi)
+			for (k3d::uint_t ej = 0; ej < ei; ++ej)
 			{
-				k3d::gl::normal3d(eval_normals[eval_i + vi + 1]);
-				k3d::gl::vertex4d(eval_points [eval_i + vi + 1]);
-				k3d::gl::normal3d(eval_normals[eval_im + vi]);
-				k3d::gl::vertex4d(eval_points [eval_im + vi]);
+				k3d::gl::normal3d(eval_normals[eval_im + ej]);
+				k3d::gl::vertex4d(eval_points [eval_im + ej]);
+				k3d::gl::normal3d(eval_normals[eval_i + ej + 1]);
+				k3d::gl::vertex4d(eval_points [eval_i + ej + 1]);
 			}
 
 			glEnd();
@@ -298,7 +314,7 @@ private:
 			if (select_mode) // Tokens are only for SELECTION MODE
 				k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
 
-			std::vector<k3d::point4> bezier_control_points;
+			std::vector<k3d::point4> weighted_bezier_control_points;
 			const k3d::uint_t patch_begin = 0;
 			const k3d::uint_t patch_end = patch_begin + num_patches;
 			for(k3d::uint_t patch = patch_begin; patch < patch_end; ++patch)
@@ -311,8 +327,8 @@ private:
 				const k3d::uint_t patch_size = (order * (order + 1)) / 2;
 
 				// Convert control points to weighted points (since it is a rational patch in general).
-				bezier_control_points.clear();
-				bezier_control_points.reserve(patch_size);
+				weighted_bezier_control_points.clear();
+				weighted_bezier_control_points.reserve(patch_size);
 				const k3d::uint_t point_begin = patch_first_points[patch];
 				const k3d::uint_t point_end = point_begin + patch_size;
 				assert(point_end <= patch_points.size());
@@ -320,7 +336,7 @@ private:
 				for(k3d::uint_t point = point_begin; point < point_end; ++point)
 				{
 					const k3d::double_t weight = patch_point_weights[point];
-					bezier_control_points.push_back(k3d::point4(
+					weighted_bezier_control_points.push_back(k3d::point4(
 						weight * points[patch_points[point]][0],
 						weight * points[patch_points[point]][1],
 						weight * points[patch_points[point]][2],
@@ -331,7 +347,7 @@ private:
 					k3d::gl::push_selection_token(k3d::selection::UNIFORM, patch);
 
 				// Tessellate/evaluate and render the patch.
-				bezier_triangle_patch_painter::gl_render_bezier_triangle(bezier_control_points, order, false);
+				bezier_triangle_patch_painter::gl_render_bezier_triangle(weighted_bezier_control_points, order, false);
 
 				if (select_mode) // Tokens are only for SELECTION MODE
 					k3d::gl::pop_selection_token(); // UNIFORM

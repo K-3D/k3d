@@ -30,11 +30,6 @@ for i in range(2):
 		(-3,-3,3), (-7,-1,1), (-7,1,-1), (-3,3,-3) ]
 
 	# Assign patch_points and patch_weights here ...
-	# Platonic spheroid: the tetroid
-	# (3,-3,-3) (1,-1,-7) (-1,1,-7) (-3,3,-3)
-	#    (1,-7,-1) (-11,-11,-11) (-7,1,-1)
-	#           (-1,-7,1) (-7,-1,1)
-	#                (-3,-3,3)
 	for j in range(0,len(positions)):
 		patches.patch_points().append(len(points) + j)
 		patches.patch_point_weights().append(1)
