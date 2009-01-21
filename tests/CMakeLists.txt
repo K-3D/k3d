@@ -106,6 +106,8 @@ ENDMACRO(K3D_ADD_CMAKE_TEST)
 K3D_ADD_CMAKE_TEST(code.filename.case ${CMAKE_CURRENT_SOURCE_DIR}/code.filename.case.cmake ${CMAKE_SOURCE_DIR})
 K3D_ADD_CMAKE_TEST(code.filename.length ${CMAKE_CURRENT_SOURCE_DIR}/code.filename.length.cmake ${CMAKE_SOURCE_DIR})
 K3D_ADD_CMAKE_TEST(code.header_guard ${CMAKE_CURRENT_SOURCE_DIR}/code.header_guard.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.pretty_function ${CMAKE_CURRENT_SOURCE_DIR}/code.pretty_function.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.printf ${CMAKE_CURRENT_SOURCE_DIR}/code.printf.cmake ${CMAKE_SOURCE_DIR})
 K3D_ADD_CMAKE_TEST(code.typed_array.uint_t ${CMAKE_CURRENT_SOURCE_DIR}/code.typed_array.uint_t.cmake ${CMAKE_SOURCE_DIR})
 
 K3D_ADD_TEST(test.startup)

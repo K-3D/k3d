@@ -1,0 +1,35 @@
+# Test to ensure that committed code never uses the nonstandard gcc __PRETTY_FUNCTION__ preprocessor symbol
+
+SET(ERROR_COUNT 0)
+SET(SKIP_FILES
+	"[.]svn"
+	"^modules/inotify/inotify-cxx.h$"
+	"^tests/code.pretty_function.cmake$"
+	)
+
+FILE(GLOB_RECURSE SOURCE_FILES "*")
+LIST(SORT SOURCE_FILES)
+
+FOREACH(SOURCE_FILE ${SOURCE_FILES})
+	FILE(RELATIVE_PATH RELATIVE_SOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR} ${SOURCE_FILE})
+
+	SET(TEST_FILE 1)
+	FOREACH(SKIP_FILE ${SKIP_FILES})
+		IF(RELATIVE_SOURCE_FILE MATCHES "${SKIP_FILE}")
+			SET(TEST_FILE 0)
+		ENDIF()
+	ENDFOREACH()
+
+	IF(TEST_FILE)
+		FILE(READ ${SOURCE_FILE} SOURCE)
+		IF(SOURCE MATCHES "__PRETTY_FUNCTION__")
+			MATH(EXPR ERROR_COUNT "${ERROR_COUNT} + 1")
+			MESSAGE("${SOURCE_FILE} uses '__PRETTY_FUNCTION__' which is a nonstandard gcc extension.")
+		ENDIF()
+	ENDIF()
+ENDFOREACH(SOURCE_FILE)
+
+IF(ERROR_COUNT)
+	MESSAGE(SEND_ERROR "Found ${ERROR_COUNT} files using __PRETTY_FUNCTION__.")	
+ENDIF()
+
