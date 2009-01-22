@@ -268,6 +268,7 @@ struct select_uniform
 
 	void operator()(const k3d::selection::record& Record, k3d::mesh_selection& Selection) const
 	{
+		// Legacy selection behavior ...
 		for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
 		{
 			switch(token->type)
@@ -283,6 +284,37 @@ struct select_uniform
 				default:
 					break;
 			}
+		}
+
+		// Generic geometry selection behavior ...
+		k3d::mesh_selection::component current_component(0, 0, k3d::selection::UNIFORM);
+		for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
+		{
+			switch(token->type)
+			{
+				case k3d::selection::PRIMITIVE:
+					if((current_component.primitive_begin != token->id) || (current_component.primitive_end != token->id + 1))
+					{
+						if(!current_component.empty())
+						{
+							Selection.add_component(current_component);
+							current_component.clear();
+						}
+						current_component.primitive_begin = token->id;
+						current_component.primitive_end = token->id + 1;
+						current_component.type = k3d::selection::UNIFORM;
+					}
+					break;
+				case k3d::selection::UNIFORM:
+					current_component.add_range(token->id, token->id+1, weight);
+					break;
+				default:
+					break;
+			}
+		}
+		if(!current_component.empty())
+		{
+			Selection.add_component(current_component);
 		}
 	}
 
@@ -1349,16 +1381,6 @@ public:
 		m_document_selection_change_signal.emit();
 	}
 
-	void select_points(const k3d::selection::records& Selection)
-	{
-		detail::select_components<detail::select_points>(Selection, 1.0);
-	}
-
-	void select_split_edges(const k3d::selection::records& Selection)
-	{
-		detail::select_components<detail::select_split_edges>(Selection, 1.0);
-	}
-
 	void select_nodes(const k3d::selection::records& Selection)
 	{
 		unsigned long selected_nodes = 0;
@@ -1392,10 +1414,10 @@ public:
 				select_nodes(Selection);
 				break;
 			case SELECT_POINTS:
-				select_points(Selection);
+				detail::select_components<detail::select_points>(Selection, 1.0);
 				break;
 			case SELECT_SPLIT_EDGES:
-				select_split_edges(Selection);
+				detail::select_components<detail::select_split_edges>(Selection, 1.0);
 				break;
 			case SELECT_UNIFORM:
 				detail::select_components<detail::select_uniform>(Selection, 1.0);
@@ -1418,21 +1440,6 @@ public:
 			select(**node);
 	}
 
-	void select_all_points()
-	{
-		detail::update_component_selection(selected_nodes(), detail::select_all_points(), true);
-	}
-
-	void select_all_lines()
-	{
-		detail::update_component_selection(selected_nodes(), detail::select_all_split_edges(), true);
-	}
-
-	void select_all_uniform()
-	{
-		detail::update_component_selection(selected_nodes(), detail::select_all_uniform(), true);
-	}
-
 	void select_all()
 	{
 		switch(m_selection_mode.internal_value())
@@ -1441,27 +1448,17 @@ public:
 				select_all_nodes();
 				break;
 			case SELECT_POINTS:
-				select_all_points();
+				detail::update_component_selection(selected_nodes(), detail::select_all_points(), true);
 				break;
 			case SELECT_SPLIT_EDGES:
-				select_all_lines();
+				detail::update_component_selection(selected_nodes(), detail::select_all_split_edges(), true);
 				break;
 			case SELECT_UNIFORM:
-				select_all_uniform();
+				detail::update_component_selection(selected_nodes(), detail::select_all_uniform(), true);
 				break;
 		}
 
 		selection_changed();
-	}
-
-	void deselect_points(const k3d::selection::records& Selection)
-	{
-		detail::select_components<detail::select_points>(Selection, 0.0);
-	}
-
-	void deselect_split_edges(const k3d::selection::records& Selection)
-	{
-		detail::select_components<detail::select_split_edges>(Selection, 0.0);
 	}
 
 	void deselect_nodes(const k3d::selection::records& Selection)
@@ -1481,10 +1478,10 @@ public:
 				deselect_nodes(Selection);
 				break;
 			case SELECT_POINTS:
-				deselect_points(Selection);
+				detail::select_components<detail::select_points>(Selection, 0.0);
 				break;
 			case SELECT_SPLIT_EDGES:
-				deselect_split_edges(Selection);
+				detail::select_components<detail::select_split_edges>(Selection, 0.0);
 				break;
 			case SELECT_UNIFORM:
 				detail::select_components<detail::select_uniform>(Selection, 0.0);
@@ -1506,11 +1503,6 @@ public:
 			node_selection()->deselect_all();
 	}
 
-	void deselect_all_components()
-	{
-		detail::update_component_selection(m_document.nodes().collection(), detail::deselect_all(), true);
-	}
-
 	void deselect_all()
 	{
 		switch(m_selection_mode.internal_value())
@@ -1521,7 +1513,7 @@ public:
 			case SELECT_POINTS:
 			case SELECT_SPLIT_EDGES:
 			case SELECT_UNIFORM:
-				deselect_all_components();
+				detail::update_component_selection(m_document.nodes().collection(), detail::deselect_all(), true);
 				break;
 		}
 
@@ -1539,21 +1531,6 @@ public:
 		}
 	}
 
-	void invert_point_selection()
-	{
-		detail::update_component_selection(m_document.nodes().collection(), detail::invert_points(), true);
-	}
-
-	void invert_split_edge_selection()
-	{
-		detail::update_component_selection(m_document.nodes().collection(), detail::invert_split_edges(), true);
-	}
-
-	void invert_uniform_selection()
-	{
-		detail::update_component_selection(m_document.nodes().collection(), detail::invert_uniform(), true);
-	}
-
 	void invert_selection()
 	{
 		switch(m_selection_mode.internal_value())
@@ -1562,13 +1539,13 @@ public:
 				invert_node_selection();
 				break;
 			case SELECT_POINTS:
-				invert_point_selection();
+				detail::update_component_selection(m_document.nodes().collection(), detail::invert_points(), true);
 				break;
 			case SELECT_SPLIT_EDGES:
-				invert_split_edge_selection();
+				detail::update_component_selection(m_document.nodes().collection(), detail::invert_split_edges(), true);
 				break;
 			case SELECT_UNIFORM:
-				invert_uniform_selection();
+				detail::update_component_selection(m_document.nodes().collection(), detail::invert_uniform(), true);
 				break;
 		}
 

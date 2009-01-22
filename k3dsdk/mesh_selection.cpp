@@ -454,6 +454,21 @@ void mesh_selection::component::add_range(const uint_t IndexBegin, const uint_t 
 	weight.push_back(Weight);
 }
 
+void mesh_selection::component::clear()
+{
+	primitive_begin = 0;
+	primitive_end = 0;
+	type = selection::NONE;
+	index_begin.clear();
+	index_end.clear();
+	weight.clear();
+}
+
+const bool_t mesh_selection::component::empty() const
+{
+	return (primitive_begin == primitive_end) || index_begin.empty();
+}
+
 bool mesh_selection::component::operator==(const component& RHS) const
 {
 	return type == RHS.type
