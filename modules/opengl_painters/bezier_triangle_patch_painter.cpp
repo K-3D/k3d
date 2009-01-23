@@ -65,7 +65,7 @@ public:
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if (!SelectionState.select_bezier_triangle_patches)
+		if(!SelectionState.select_uniform)
 			return;
 
 		extract_and_render_bezier_triangle(Mesh, RenderState, true);

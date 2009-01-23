@@ -42,7 +42,6 @@ public:
 		select_faces(false),
 		select_nurbs_curves(false),
 		select_nurbs_patches(false),
-		select_bezier_triangle_patches(false),
 		select_backfacing(false),
 		select_uniform(false),
 		select_split_edges(false)
@@ -54,7 +53,6 @@ public:
 	bool_t select_faces;
 	bool_t select_nurbs_curves;
 	bool_t select_nurbs_patches;
-	bool_t select_bezier_triangle_patches;
 	bool_t select_backfacing;
 	bool_t select_uniform;
 	bool_t select_split_edges;

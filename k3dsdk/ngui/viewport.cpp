@@ -104,7 +104,6 @@ const k3d::gl::selection_state select_uniform(bool Backfacing)
 	result.exclude_unselected_nodes = true;
 	result.select_faces = true;
 	result.select_nurbs_patches = true;
-	result.select_bezier_triangle_patches = true;
 	result.select_backfacing = Backfacing;
 	result.select_uniform = true;
 
@@ -119,7 +118,6 @@ const k3d::gl::selection_state select_nodes()
 	result.select_faces = true;
 	result.select_nurbs_curves = true;
 	result.select_nurbs_patches = true;
-	result.select_bezier_triangle_patches = true;
 	result.select_backfacing = true;
 	result.select_uniform = true;
 	result.select_split_edges = true;
@@ -834,7 +832,6 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	selection_state.select_faces = true;
 	selection_state.select_nurbs_curves = true;
 	selection_state.select_nurbs_patches = true;
-	selection_state.select_bezier_triangle_patches = true;
 	selection_state.select_backfacing = Backfacing;
 	selection_state.select_uniform = true;
 	selection_state.select_split_edges = true;
