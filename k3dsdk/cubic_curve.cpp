@@ -20,6 +20,8 @@
 #include "cubic_curve.h"
 #include "metadata_keys.h"
 #include "primitive_detail.h"
+#include "selection.h"
+#include "string_cast.h"
 
 #include <numeric>
 
@@ -100,6 +102,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["varying"]
 		);
 
+	result->curve_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
 	result->curve_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
@@ -126,6 +129,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::attribute_arrays_t& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
 		const mesh::attribute_arrays_t& varying_data = require_const_attribute_arrays(Primitive, "varying");
 
+		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_array_size(Primitive, periodic, "periodic", 1);
@@ -166,6 +170,7 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::attribute_arrays_t& uniform_data = require_attribute_arrays(Primitive, "uniform");
 		mesh::attribute_arrays_t& varying_data = require_attribute_arrays(Primitive, "varying");
 
+		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_array_size(Primitive, periodic, "periodic", 1);

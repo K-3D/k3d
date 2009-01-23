@@ -14,7 +14,11 @@
 							<pair name="k3d:domain">/points/indices()</pair>
 						</metadata>
 					</array>
-					<array name="curve_selections" type="k3d::double_t">0 0 0 0 0</array>
+					<array name="curve_selections" type="k3d::double_t">0 0 0 0 0
+						<metadata>
+							<pair name="k3d:selection-component">uniform</pair>
+						</metadata>
+					</array>
 					<array name="material" type="k3d::imaterial*">0</array>
 					<array name="periodic" type="k3d::bool_t">0</array>
 				</structure>
