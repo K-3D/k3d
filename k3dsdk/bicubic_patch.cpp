@@ -20,6 +20,8 @@
 #include "bicubic_patch.h"
 #include "metadata_keys.h"
 #include "primitive_detail.h"
+#include "selection.h"
+#include "string_cast.h"
 
 #include <numeric>
 
@@ -85,6 +87,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["varying"]
 		);
 
+	result->patch_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
 	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
@@ -108,6 +111,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const attribute_arrays& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
 		const attribute_arrays& varying_data = require_const_attribute_arrays(Primitive, "varying");
 
+		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_array_size(Primitive, patch_materials, "patch_materials", patch_selections.size());
@@ -142,6 +146,7 @@ primitive* validate(mesh::primitive& Primitive)
 		attribute_arrays& uniform_data = require_attribute_arrays(Primitive, "uniform");
 		attribute_arrays& varying_data = require_attribute_arrays(Primitive, "varying");
 
+		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_array_size(Primitive, patch_materials, "patch_materials", patch_selections.size());

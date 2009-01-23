@@ -6,15 +6,19 @@
 		<vertex_data/>
 		<primitives>
 			<primitive type="bicubic_patch">
-				<topology>
+				<structure>
 					<array name="patch_materials" type="k3d::imaterial*">0 0</array>
 					<array name="patch_points" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
 						<metadata>
 							<pair name="k3d:domain">/points/indices()</pair>
 						</metadata>
 					</array>
-					<array name="patch_selections" type="k3d::double_t">0 0</array>
-				</topology>
+					<array name="patch_selections" type="k3d::double_t">0 0
+						<metadata>
+							<pair name="k3d:selection-component">uniform</pair>
+						</metadata>
+					</array>
+				</structure>
 				<attributes>
 					<arrays type="constant"/>
 					<arrays type="uniform"/>
