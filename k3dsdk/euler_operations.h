@@ -55,6 +55,20 @@ namespace euler
 
 const uint_t number(const mesh& Mesh, const uint_t Polyhedron);
 
+/// Apply the Kill Edge Make Loop (KEML) Euler operation to all selected edges that are not boundary edges
+/**
+ * This operations removes an edge and its companion, and makes one loop out of the loops that are on either side of the edge.
+ * This effectively merges two faces, if neither loop is a hole.
+ */
+void kill_edge_make_loop(mesh::polyhedra_t& Output, const mesh::points_t& Points, const mesh::selection_t& EdgeSelection, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const mesh::normals_t& FaceNormals);
+
+/// Apply the Kill Edge and Vertex (KEV) Euler operation to all selected edges
+/**
+ * This operation removes an edge and its vertex. If an edge pair is selected, the vertex of the lowest numbered halfedge in
+ * the pair is removed. If only one halfedge of an edge pair is selected, the vertex belonging to that edge is removed.
+ */
+void kill_edge_and_vertex(mesh::polyhedra_t& Output, const mesh::selection_t& EdgeSelection, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const uint_t PointCount);
+
 } // namespace euler
 
 } // namespace k3d

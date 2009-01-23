@@ -429,6 +429,22 @@ private:
 	mesh::indices_t& m_adjacent_edges;
 };
 
+/// Returns true if a and b are collinear, up to the give threshold
+/**
+ * The surfaces of the parallelogram formed by the projections of a and b in the
+ * XY, XZ and YZ plane all need to be < Threshold for the points to be collinear
+ */
+const bool_t is_collinear(const vector3& a, const vector3& b, const double_t Threshold)
+{
+	if(std::abs(a[0]*b[1] - a[1]*b[0]) > Threshold)
+		return false;
+	if(std::abs(a[0]*b[2] - a[2]*b[0]) > Threshold)
+		return false;
+	if(std::abs(a[1]*b[2] - a[2]*b[1]) > Threshold)
+		return false;
+	return true;
+}
+
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -648,6 +664,63 @@ const bool_t is_solid(const mesh& Mesh, const uint_t Polyhedron)
 	}
 
 	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// mark_collinear_edges
+
+void mark_collinear_edges(mesh::selection_t& MarkedEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold)
+{
+	MarkedEdges.assign(EdgePoints.size(), 0.0);
+	for(uint_t edge = 0; edge != EdgePoints.size(); ++edge)
+	{
+		if(!EdgeSelection[edge])
+			continue;
+		const uint_t clockwise = ClockwiseEdges[edge];
+		const uint_t p1_index = EdgePoints[edge];
+		const uint_t p2_index = EdgePoints[clockwise];
+		const uint_t p3_index = EdgePoints[ClockwiseEdges[clockwise]];
+		// valence must be 2 for internal edges or 1 for boundary edges
+		if(!((!BoundaryEdges[clockwise] && VertexValences[p2_index] == 2) || (BoundaryEdges[clockwise] && VertexValences[p2_index] == 1)))
+			continue;
+		
+		const point3& p1 = Points[p1_index];
+		const point3& p2 = Points[p2_index];
+		const point3& p3 = Points[p3_index];
+		
+		if(detail::is_collinear(p1-p2, p1-p3, Threshold))
+		{
+			MarkedEdges[clockwise] = 1.0;
+		}
+	}
+}
+
+void mark_coplanar_edges(const mesh::indices_t& Companions,
+		const mesh::bools_t& BoundaryEdges,
+		const mesh::normals_t& Normals,
+		const mesh::indices_t& EdgeFaces,
+		const mesh::selection_t& FaceSelection,
+		mesh::selection_t& RedundantEdges,
+		const double_t Threshold)
+{
+	RedundantEdges.assign(Companions.size(), 0.0);
+	for(uint_t edge = 0; edge != Companions.size(); ++edge)
+	{
+		if(BoundaryEdges[edge])
+			continue;
+		
+		const uint_t face = EdgeFaces[edge];
+		if(!FaceSelection[face])
+			continue;
+		
+		const uint_t companion = Companions[edge];
+		const uint_t companion_face = EdgeFaces[companion];
+		if(!FaceSelection[companion_face])
+			continue;
+		
+		if((!Normals[face].length()) || (std::abs((Normals[face] * Normals[companion_face]) - 1) < Threshold))
+			RedundantEdges[edge] = 1.0;
+	}
 }
 
 } // namespace polyhedron

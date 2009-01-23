@@ -167,6 +167,18 @@ const uint_t count(const mesh& Mesh);
 /// Returns true iff a polyhedron is a solid volume.
 const bool_t is_solid(const mesh& Mesh, const uint_t Polyhedron);
 
+/// Adds edges that are collinear and with points of valence 1 for boundary edges or valence 2 otherwise to MarkedEdges
+void mark_collinear_edges(mesh::selection_t& MarkedEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold = 1e-8);
+
+/// Marks edges that are shared by coplanar faces among the selected faces
+void mark_coplanar_edges(const mesh::indices_t& Companions,
+		const mesh::bools_t& BoundaryEdges,
+		const mesh::normals_t& Normals,
+		const mesh::indices_t& EdgeFaces,
+		const mesh::selection_t& FaceSelection,
+		mesh::selection_t& RedundantEdges,
+		const double_t Threshold = 1e-8);
+
 } // namespace polyhedron
 
 } // namespace k3d

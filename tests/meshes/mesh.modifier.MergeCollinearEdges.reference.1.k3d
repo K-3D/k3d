@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>5 5 0 -5 5 0 1.6666666666666665 1.6666666666666665 0 -1.6666666666666665 1.6666666666666665 0 1.6666666666666665 -1.6666666666666665 0 -1.6666666666666665 -1.6666666666666665 0 5 -5 0 -5 -5 0</points>
+		<point_selection>0 0 0 0 0 0 0 0</point_selection>
+		<vertex_data/>
+		<polyhedra>
+			<first_faces>0</first_faces>
+			<face_counts>1</face_counts>
+			<types>polygons</types>
+			<constant_data/>
+			<face_first_loops>0</face_first_loops>
+			<face_loop_counts>2</face_loop_counts>
+			<face_selection>0</face_selection>
+			<face_materials>0</face_materials>
+			<uniform_data/>
+			<loop_first_edges>4 0</loop_first_edges>
+			<edge_points>4 7 1 5 0 3 6 2</edge_points>
+			<clockwise_edges>3 6 1 5 2 7 4 0</clockwise_edges>
+			<edge_selection>0 0 0 0 0 0 0 0</edge_selection>
+			<face_varying_data/>
+		</polyhedra>
+	</mesh_arrays>
+</k3dml>
