@@ -942,10 +942,10 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 			}
 		}
 	}
+/*
 	else if(tokens.count(k3d::selection::ABSOLUTE_LINEAR_CURVE))
 	{
 		assert_not_implemented();
-/*
 		if(mesh->linear_curve_groups && mesh->linear_curve_groups->curve_first_points && mesh->linear_curve_groups->curve_point_counts && mesh->linear_curve_groups->curve_points)
 		{
 			const k3d::selection::id curve = tokens[k3d::selection::ABSOLUTE_LINEAR_CURVE];
@@ -966,12 +966,10 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 					distance);
 			}
 		}
-*/
 	}
 	else if(tokens.count(k3d::selection::ABSOLUTE_CUBIC_CURVE))
 	{
 		assert_not_implemented();
-/*
 		if(mesh->cubic_curve_groups && mesh->cubic_curve_groups->curve_first_points && mesh->cubic_curve_groups->curve_point_counts && mesh->cubic_curve_groups->curve_points)
 		{
 			const k3d::selection::id curve = tokens[k3d::selection::ABSOLUTE_CUBIC_CURVE];
@@ -992,8 +990,8 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 					distance);
 			}
 		}
-*/
 	}
+*/
 	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_CURVE))
 	{
 		if(mesh->nurbs_curve_groups && mesh->nurbs_curve_groups->curve_first_points && mesh->nurbs_curve_groups->curve_point_counts && mesh->nurbs_curve_groups->curve_points)
@@ -1017,10 +1015,10 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 			}
 		}
 	}
+/*
 	else if(tokens.count(k3d::selection::ABSOLUTE_BILINEAR_PATCH))
 	{
 		assert_not_implemented();
-/*
 		if(k3d::validate_bilinear_patches(*mesh))
 		{
 			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_BILINEAR_PATCH];
@@ -1040,12 +1038,10 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 					distance);
 			}
 		}
-*/
 	}
 	else if(tokens.count(k3d::selection::ABSOLUTE_BICUBIC_PATCH))
 	{
 		assert_not_implemented();
-/*
 		if(k3d::validate_bicubic_patches(*mesh))
 		{
 			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_BICUBIC_PATCH];
@@ -1065,13 +1061,13 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 					distance);
 			}
 		}
-*/
 	}
+*/
 	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_PATCH))
 	{
 		if(k3d::validate_nurbs_patches(*mesh))
 		{
-			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_BICUBIC_PATCH];
+			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_NURBS_PATCH];
 			k3d::uint_t patch_begin = mesh->nurbs_patches->patch_first_points->at(patch);
 			k3d::uint_t patch_end = patch_begin + (mesh->nurbs_patches->patch_u_point_counts->at(patch) * mesh->nurbs_patches->patch_v_point_counts->at(patch));
 			for(k3d::uint_t patch_point = patch_begin; patch_point != patch_end; ++patch_point)
@@ -1149,14 +1145,6 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 	{
 		return record;
 	}
-	else if(tokens.count(k3d::selection::ABSOLUTE_LINEAR_CURVE))
-	{
-		return record;
-	}
-	else if(tokens.count(k3d::selection::ABSOLUTE_CUBIC_CURVE))
-	{
-		return record;
-	}
 	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_CURVE))
 	{
 		return record;
@@ -1228,8 +1216,13 @@ k3d::selection::record control::pick_uniform(const k3d::point2& Coordinates, k3d
 	{
 		for(k3d::selection::record::tokens_t::const_iterator token = record->tokens.begin(); token != record->tokens.end(); ++token)
 		{
-			if(token->type == k3d::selection::ABSOLUTE_FACE || token->type == k3d::selection::ABSOLUTE_BILINEAR_PATCH || token->type == k3d::selection::ABSOLUTE_BICUBIC_PATCH || token->type == k3d::selection::ABSOLUTE_NURBS_PATCH)
-				return *record;
+			switch(token->type)
+			{
+				case k3d::selection::ABSOLUTE_FACE:
+				case k3d::selection::ABSOLUTE_NURBS_PATCH:
+				case k3d::selection::UNIFORM:
+					return *record;
+			}
 		}
 	}
 

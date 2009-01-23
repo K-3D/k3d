@@ -79,20 +79,16 @@ ABSOLUTE_FACE = 8,
 ABSOLUTE_SPLIT_EDGE = 11,
 //LINEAR_CURVE_GROUP = 12,
 //LINEAR_CURVE = 13,
-/** \deprecated Storage for a zero-based linear curve index (relative to a mesh) */
-ABSOLUTE_LINEAR_CURVE = 14,
+//ABSOLUTE_LINEAR_CURVE = 14,
 //CUBIC_CURVE_GROUP = 15,
 //CUBIC_CURVE = 16,
-/** \deprecated Storage for a zero-based cubic curve group index (relative to a mesh) */
-ABSOLUTE_CUBIC_CURVE = 17,
+//ABSOLUTE_CUBIC_CURVE = 17,
 //NUCURVE_GROUP = 18,
 //NUCURVE = 19,
 /** \deprecated Storage for a zero-based NURBS curve index (relative to a mesh) */
 ABSOLUTE_NURBS_CURVE = 20,
-/** \deprecated Storage for a zero-based bilinear patch index (relative to a mesh) */
-ABSOLUTE_BILINEAR_PATCH = 21,
-/** \deprecated Storage for a zero-based bicubic patch index (relative to a mesh) */
-ABSOLUTE_BICUBIC_PATCH = 22,
+//ABSOLUTE_BILINEAR_PATCH = 21,
+//ABSOLUTE_BICUBIC_PATCH = 22,
 /** \deprecated Storage for a zero-based NURBS patch index (relative to a mesh) */
 ABSOLUTE_NURBS_PATCH = 23,
 /// Storage for a user-defined index
