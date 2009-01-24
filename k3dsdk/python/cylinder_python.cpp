@@ -48,6 +48,7 @@ public:
 		static object z_min(wrapper& Self) { return wrap(Self.wrapped().z_min); }
 		static object z_max(wrapper& Self) { return wrap(Self.wrapped().z_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -64,6 +65,7 @@ public:
 		static object z_min(wrapper& Self) { return wrap(Self.wrapped().z_min); }
 		static object z_max(wrapper& Self) { return wrap(Self.wrapped().z_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -103,6 +105,7 @@ void define_namespace_cylinder()
 		.def("z_min", &cylinder::const_primitive::z_min)
 		.def("z_max", &cylinder::const_primitive::z_max)
 		.def("sweep_angles", &cylinder::const_primitive::sweep_angles)
+		.def("selections", &cylinder::const_primitive::selections)
 		.def("constant_data", &cylinder::const_primitive::constant_data)
 		.def("uniform_data", &cylinder::const_primitive::uniform_data)
 		.def("varying_data", &cylinder::const_primitive::varying_data)
@@ -115,6 +118,7 @@ void define_namespace_cylinder()
 		.def("z_min", &cylinder::primitive::z_min)
 		.def("z_max", &cylinder::primitive::z_max)
 		.def("sweep_angles", &cylinder::primitive::sweep_angles)
+		.def("selections", &cylinder::primitive::selections)
 		.def("constant_data", &cylinder::primitive::constant_data)
 		.def("uniform_data", &cylinder::primitive::uniform_data)
 		.def("varying_data", &cylinder::primitive::varying_data)
