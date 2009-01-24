@@ -17,8 +17,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "metadata_keys.h"
 #include "paraboloid.h"
 #include "primitive_detail.h"
+#include "selection.h"
+#include "string_cast.h"
 
 namespace k3d
 {
@@ -36,6 +39,7 @@ const_primitive::const_primitive(
 	const mesh::doubles_t& ZMin,
 	const mesh::doubles_t& ZMax,
 	const mesh::doubles_t& SweepAngles,
+	const mesh::selection_t& Selections,
 	const mesh::attribute_arrays_t& ConstantData,
 	const mesh::attribute_arrays_t& UniformData,
 	const mesh::attribute_arrays_t& VaryingData
@@ -46,6 +50,7 @@ const_primitive::const_primitive(
 	z_min(ZMin),
 	z_max(ZMax),
 	sweep_angles(SweepAngles),
+	selections(Selections),
 	constant_data(ConstantData),
 	uniform_data(UniformData),
 	varying_data(VaryingData)
@@ -62,6 +67,7 @@ primitive::primitive(
 	mesh::doubles_t& ZMin,
 	mesh::doubles_t& ZMax,
 	mesh::doubles_t& SweepAngles,
+	mesh::selection_t& Selections,
 	mesh::attribute_arrays_t& ConstantData,
 	mesh::attribute_arrays_t& UniformData,
 	mesh::attribute_arrays_t& VaryingData
@@ -72,6 +78,7 @@ primitive::primitive(
 	z_min(ZMin),
 	z_max(ZMax),
 	sweep_angles(SweepAngles),
+	selections(Selections),
 	constant_data(ConstantData),
 	uniform_data(UniformData),
 	varying_data(VaryingData)
@@ -92,10 +99,13 @@ primitive* create(mesh& Mesh)
 		generic_primitive.structure.create<mesh::doubles_t >("z_min"),
 		generic_primitive.structure.create<mesh::doubles_t >("z_max"),
 		generic_primitive.structure.create<mesh::doubles_t >("sweep_angles"),
+		generic_primitive.structure.create<mesh::selection_t>("selections"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
 		generic_primitive.attributes["varying"]
 		);
+
+	result->selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
 
 	return result;
 }
@@ -116,22 +126,26 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::doubles_t& z_min = require_const_array<mesh::doubles_t >(Primitive, "z_min");
 		const mesh::doubles_t& z_max = require_const_array<mesh::doubles_t >(Primitive, "z_max");
 		const mesh::doubles_t& sweep_angles = require_const_array<mesh::doubles_t >(Primitive, "sweep_angles");
+		const mesh::selection_t& selections = require_const_array<mesh::selection_t>(Primitive, "selections");
 
 		const mesh::attribute_arrays_t& constant_data = require_const_attribute_arrays(Primitive, "constant");
 		const mesh::attribute_arrays_t& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
 		const mesh::attribute_arrays_t& varying_data = require_const_attribute_arrays(Primitive, "varying");
+
+		require_metadata(Primitive, selections, "selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 
 		require_array_size(Primitive, materials, "materials", matrices.size());
 		require_array_size(Primitive, radii, "radii", matrices.size());
 		require_array_size(Primitive, z_min, "z_min", matrices.size());
 		require_array_size(Primitive, z_max, "z_max", matrices.size());
 		require_array_size(Primitive, sweep_angles, "sweep_angles", matrices.size());
+		require_array_size(Primitive, selections, "selections", matrices.size());
 
 		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
 		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
 		require_attribute_arrays_size(Primitive, varying_data, "varying", matrices.size() * 4);
 
-		return new const_primitive(matrices, materials, radii, z_min, z_max, sweep_angles, constant_data, uniform_data, varying_data);
+		return new const_primitive(matrices, materials, radii, z_min, z_max, sweep_angles, selections, constant_data, uniform_data, varying_data);
 	}
 	catch(std::exception& e)
 	{
@@ -154,22 +168,26 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::doubles_t& z_min = require_array<mesh::doubles_t >(Primitive, "z_min");
 		mesh::doubles_t& z_max = require_array<mesh::doubles_t >(Primitive, "z_max");
 		mesh::doubles_t& sweep_angles = require_array<mesh::doubles_t >(Primitive, "sweep_angles");
+		mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, "selections");
 
 		mesh::attribute_arrays_t& constant_data = require_attribute_arrays(Primitive, "constant");
 		mesh::attribute_arrays_t& uniform_data = require_attribute_arrays(Primitive, "uniform");
 		mesh::attribute_arrays_t& varying_data = require_attribute_arrays(Primitive, "varying");
+
+		require_metadata(Primitive, selections, "selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 
 		require_array_size(Primitive, materials, "materials", matrices.size());
 		require_array_size(Primitive, radii, "radii", matrices.size());
 		require_array_size(Primitive, z_min, "z_min", matrices.size());
 		require_array_size(Primitive, z_max, "z_max", matrices.size());
 		require_array_size(Primitive, sweep_angles, "sweep_angles", matrices.size());
+		require_array_size(Primitive, selections, "selections", matrices.size());
 
 		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
 		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
 		require_attribute_arrays_size(Primitive, varying_data, "varying", matrices.size() * 4);
 
-		return new primitive(matrices, materials, radii, z_min, z_max, sweep_angles, constant_data, uniform_data, varying_data);
+		return new primitive(matrices, materials, radii, z_min, z_max, sweep_angles, selections, constant_data, uniform_data, varying_data);
 	}
 	catch(std::exception& e)
 	{

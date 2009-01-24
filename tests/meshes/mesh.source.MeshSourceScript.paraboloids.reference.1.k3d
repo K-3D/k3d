@@ -4,14 +4,19 @@
 		<vertex_data/>
 		<primitives>
 			<primitive type="paraboloid">
-				<topology>
+				<structure>
 					<array name="materials" type="k3d::imaterial*">0 0</array>
 					<array name="matrices" type="k3d::matrix4">1 0 0 -5 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 5 0 1 0 0 0 0 1 0 0 0 0 1</array>
 					<array name="radii" type="k3d::double_t">3 3</array>
+					<array name="selections" type="k3d::double_t">0 0
+						<metadata>
+							<pair name="k3d:selection-component">uniform</pair>
+						</metadata>
+					</array>
 					<array name="sweep_angles" type="k3d::double_t">6.2831853071795862 6.2831853071795862</array>
 					<array name="z_max" type="k3d::double_t">6 6</array>
 					<array name="z_min" type="k3d::double_t">0 0</array>
-				</topology>
+				</structure>
 				<attributes>
 					<arrays type="constant"/>
 					<arrays type="uniform"/>

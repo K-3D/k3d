@@ -48,6 +48,7 @@ public:
 		static object z_min(wrapper& Self) { return wrap(Self.wrapped().z_min); }
 		static object z_max(wrapper& Self) { return wrap(Self.wrapped().z_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -64,6 +65,7 @@ public:
 		static object z_min(wrapper& Self) { return wrap(Self.wrapped().z_min); }
 		static object z_max(wrapper& Self) { return wrap(Self.wrapped().z_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -103,6 +105,7 @@ void define_namespace_paraboloid()
 		.def("z_min", &paraboloid::const_primitive::z_min)
 		.def("z_max", &paraboloid::const_primitive::z_max)
 		.def("sweep_angles", &paraboloid::const_primitive::sweep_angles)
+		.def("selections", &paraboloid::const_primitive::selections)
 		.def("constant_data", &paraboloid::const_primitive::constant_data)
 		.def("uniform_data", &paraboloid::const_primitive::uniform_data)
 		.def("varying_data", &paraboloid::const_primitive::varying_data)
@@ -115,6 +118,7 @@ void define_namespace_paraboloid()
 		.def("z_min", &paraboloid::primitive::z_min)
 		.def("z_max", &paraboloid::primitive::z_max)
 		.def("sweep_angles", &paraboloid::primitive::sweep_angles)
+		.def("selections", &paraboloid::primitive::selections)
 		.def("constant_data", &paraboloid::primitive::constant_data)
 		.def("uniform_data", &paraboloid::primitive::uniform_data)
 		.def("varying_data", &paraboloid::primitive::varying_data)
