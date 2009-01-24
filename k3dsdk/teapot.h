@@ -35,11 +35,13 @@ public:
 	const_primitive(
 		const mesh::matrices_t& Matrices,
 		const mesh::materials_t& Materials,
+		const mesh::selection_t& Selections,
 		const mesh::attribute_arrays_t& ConstantData,
 		const mesh::attribute_arrays_t& UniformData);
 
 	const mesh::matrices_t& matrices;
 	const mesh::materials_t& materials;
+	const mesh::selection_t& selections;
 	const mesh::attribute_arrays_t& constant_data;
 	const mesh::attribute_arrays_t& uniform_data;
 };
@@ -51,11 +53,13 @@ public:
 	primitive(
 		mesh::matrices_t& Matrices,
 		mesh::materials_t& Materials,
+		mesh::selection_t& Selections,
 		mesh::attribute_arrays_t& ConstantData,
 		mesh::attribute_arrays_t& UniformData);
 
 	mesh::matrices_t& matrices;
 	mesh::materials_t& materials;
+	mesh::selection_t& selections;
 	mesh::attribute_arrays_t& constant_data;
 	mesh::attribute_arrays_t& uniform_data;
 };

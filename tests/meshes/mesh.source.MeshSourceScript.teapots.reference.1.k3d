@@ -4,10 +4,15 @@
 		<vertex_data/>
 		<primitives>
 			<primitive type="teapot">
-				<topology>
+				<structure>
 					<array name="materials" type="k3d::imaterial*">0 0 0</array>
 					<array name="matrices" type="k3d::matrix4">1 0 0 -7 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 7 0 1 0 0 0 0 1 0 0 0 0 1</array>
-				</topology>
+					<array name="selections" type="k3d::double_t">0 0 0
+						<metadata>
+							<pair name="k3d:selection-component">uniform</pair>
+						</metadata>
+					</array>
+				</structure>
 				<attributes>
 					<arrays type="constant"/>
 					<arrays type="uniform">

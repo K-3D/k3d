@@ -64,6 +64,7 @@ public:
 
 		primitive->matrices.push_back(m_transformation.pipeline_value());
 		primitive->materials.push_back(m_material.pipeline_value());
+		primitive->selections.push_back(0.0);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
