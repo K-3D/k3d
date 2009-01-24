@@ -48,6 +48,7 @@ public:
 		static object z_min(wrapper& Self) { return wrap(Self.wrapped().z_min); }
 		static object z_max(wrapper& Self) { return wrap(Self.wrapped().z_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -64,6 +65,7 @@ public:
 		static object z_min(wrapper& Self) { return wrap(Self.wrapped().z_min); }
 		static object z_max(wrapper& Self) { return wrap(Self.wrapped().z_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -103,6 +105,7 @@ void define_namespace_sphere()
 		.def("z_min", &sphere::const_primitive::z_min)
 		.def("z_max", &sphere::const_primitive::z_max)
 		.def("sweep_angles", &sphere::const_primitive::sweep_angles)
+		.def("selections", &sphere::const_primitive::selections)
 		.def("constant_data", &sphere::const_primitive::constant_data)
 		.def("uniform_data", &sphere::const_primitive::uniform_data)
 		.def("varying_data", &sphere::const_primitive::varying_data)
@@ -115,6 +118,7 @@ void define_namespace_sphere()
 		.def("z_min", &sphere::primitive::z_min)
 		.def("z_max", &sphere::primitive::z_max)
 		.def("sweep_angles", &sphere::primitive::sweep_angles)
+		.def("selections", &sphere::primitive::selections)
 		.def("constant_data", &sphere::primitive::constant_data)
 		.def("uniform_data", &sphere::primitive::uniform_data)
 		.def("varying_data", &sphere::primitive::varying_data)
