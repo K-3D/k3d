@@ -47,6 +47,7 @@ public:
 		static object heights(wrapper& Self) { return wrap(Self.wrapped().heights); }
 		static object radii(wrapper& Self) { return wrap(Self.wrapped().radii); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -62,6 +63,7 @@ public:
 		static object heights(wrapper& Self) { return wrap(Self.wrapped().heights); }
 		static object radii(wrapper& Self) { return wrap(Self.wrapped().radii); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -100,6 +102,7 @@ void define_namespace_disk()
 		.def("heights", &disk::const_primitive::heights)
 		.def("radii", &disk::const_primitive::radii)
 		.def("sweep_angles", &disk::const_primitive::sweep_angles)
+		.def("selections", &disk::const_primitive::selections)
 		.def("constant_data", &disk::const_primitive::constant_data)
 		.def("uniform_data", &disk::const_primitive::uniform_data)
 		.def("varying_data", &disk::const_primitive::varying_data)
@@ -111,6 +114,7 @@ void define_namespace_disk()
 		.def("heights", &disk::primitive::heights)
 		.def("radii", &disk::primitive::radii)
 		.def("sweep_angles", &disk::primitive::sweep_angles)
+		.def("selections", &disk::primitive::selections)
 		.def("constant_data", &disk::primitive::constant_data)
 		.def("uniform_data", &disk::primitive::uniform_data)
 		.def("varying_data", &disk::primitive::varying_data)

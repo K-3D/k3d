@@ -22,12 +22,14 @@
 */
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/disk.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/nurbs.h>
 #include <k3dsdk/painter_render_state_gl.h>
-#include <k3dsdk/disk.h>
+#include <k3dsdk/painter_selection_state_gl.h>
+#include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -57,6 +59,9 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
+		const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0.8, 0.8, 0.8);
+		const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
+
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
 			boost::scoped_ptr<k3d::disk::const_primitive> disk(k3d::disk::validate(**primitive));
@@ -67,54 +72,49 @@ public:
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glEnable(GL_LIGHTING);
 
-			glColor3d(0.8, 0.8, 0.8);
-
 			glMatrixMode(GL_MODELVIEW);
 			for(k3d::uint_t i = 0; i != disk->matrices.size(); ++i)
 			{
+				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, disk->selections[i] ? selected_color : color);
+
 				glPushMatrix();
 				k3d::gl::push_matrix(disk->matrices[i]);
 				draw_solid(RenderState, disk->heights[i], disk->radii[i], disk->sweep_angles[i]);
 				glPopMatrix();
 			}
-
-/*
-			if(RenderState.node_selection)
-			{
-				glDisable(GL_LIGHTING);
-				glColor3d(1, 1, 1);
-
-				for(k3d::uint_t i = 0; i != disk->matrices.size(); ++i)
-				{
-					glPushMatrix();
-					k3d::gl::push_matrix(disk->matrices[i]);
-					glCallList(get_wireframe_display_list());
-					glPopMatrix();
-				}
-			}
-*/
 		}
 	}
 
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		if(!SelectionState.select_uniform)
+			return;
+
+		k3d::uint_t primitive_index = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive, ++primitive_index)
 		{
 			boost::scoped_ptr<k3d::disk::const_primitive> disk(k3d::disk::validate(**primitive));
 			if(!disk)
 				continue;
+
+			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
 
 			glDisable(GL_LIGHTING);
 
 			glMatrixMode(GL_MODELVIEW);
 			for(k3d::uint_t i = 0; i != disk->matrices.size(); ++i)
 			{
+				k3d::gl::push_selection_token(k3d::selection::UNIFORM, i);
+
 				glPushMatrix();
 				k3d::gl::push_matrix(disk->matrices[i]);
 				draw_solid(RenderState, disk->heights[i], disk->radii[i], disk->sweep_angles[i]);
 				glPopMatrix();
+
+				k3d::gl::pop_selection_token(); // UNIFORM
 			}
 
+			k3d::gl::pop_selection_token(); // PRIMITIVE
 		}
 	}
 

@@ -139,6 +139,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_array_size(Primitive, z_min, "z_min", matrices.size());
 		require_array_size(Primitive, z_max, "z_max", matrices.size());
 		require_array_size(Primitive, sweep_angles, "sweep_angles", matrices.size());
+		require_array_size(Primitive, selections, "selections", matrices.size());
 
 		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
 		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
@@ -180,6 +181,7 @@ primitive* validate(mesh::primitive& Primitive)
 		require_array_size(Primitive, z_min, "z_min", matrices.size());
 		require_array_size(Primitive, z_max, "z_max", matrices.size());
 		require_array_size(Primitive, sweep_angles, "sweep_angles", matrices.size());
+		require_array_size(Primitive, selections, "selections", matrices.size());
 
 		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
 		require_attribute_arrays_size(Primitive, uniform_data, "uniform", matrices.size());
