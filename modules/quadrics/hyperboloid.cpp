@@ -77,6 +77,7 @@ public:
 		primitive->start_points.push_back(m_start_point.pipeline_value());
 		primitive->end_points.push_back(m_end_point.pipeline_value());
 		primitive->sweep_angles.push_back(m_sweep_angle.pipeline_value());
+		primitive->selections.push_back(0.0);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

@@ -47,6 +47,7 @@ public:
 		static object start_points(wrapper& Self) { return wrap(Self.wrapped().start_points); }
 		static object end_points(wrapper& Self) { return wrap(Self.wrapped().end_points); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -62,6 +63,7 @@ public:
 		static object start_points(wrapper& Self) { return wrap(Self.wrapped().start_points); }
 		static object end_points(wrapper& Self) { return wrap(Self.wrapped().end_points); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -100,6 +102,7 @@ void define_namespace_hyperboloid()
 		.def("start_points", &hyperboloid::const_primitive::start_points)
 		.def("end_points", &hyperboloid::const_primitive::end_points)
 		.def("sweep_angles", &hyperboloid::const_primitive::sweep_angles)
+		.def("selections", &hyperboloid::const_primitive::selections)
 		.def("constant_data", &hyperboloid::const_primitive::constant_data)
 		.def("uniform_data", &hyperboloid::const_primitive::uniform_data)
 		.def("varying_data", &hyperboloid::const_primitive::varying_data)
@@ -111,6 +114,7 @@ void define_namespace_hyperboloid()
 		.def("start_points", &hyperboloid::primitive::start_points)
 		.def("end_points", &hyperboloid::primitive::end_points)
 		.def("sweep_angles", &hyperboloid::primitive::sweep_angles)
+		.def("selections", &hyperboloid::primitive::selections)
 		.def("constant_data", &hyperboloid::primitive::constant_data)
 		.def("uniform_data", &hyperboloid::primitive::uniform_data)
 		.def("varying_data", &hyperboloid::primitive::varying_data)

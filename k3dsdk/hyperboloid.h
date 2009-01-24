@@ -38,6 +38,7 @@ public:
 		const mesh::points_t& StartPoints,
 		const mesh::points_t& EndPoints,
 		const mesh::doubles_t& SweepAngles,
+		const mesh::selection_t& Selections,
 		const mesh::attribute_arrays_t& ConstantData,
 		const mesh::attribute_arrays_t& UniformData,
 		const mesh::attribute_arrays_t& VaryingData);
@@ -47,6 +48,7 @@ public:
 	const mesh::points_t& start_points;
 	const mesh::points_t& end_points;
 	const mesh::doubles_t& sweep_angles;
+	const mesh::selection_t& selections;
 	const mesh::attribute_arrays_t& constant_data;
 	const mesh::attribute_arrays_t& uniform_data;
 	const mesh::attribute_arrays_t& varying_data;
@@ -62,6 +64,7 @@ public:
 		mesh::points_t& StartPoints,
 		mesh::points_t& EndPoints,
 		mesh::doubles_t& SweepAngles,
+		mesh::selection_t& Selections,
 		mesh::attribute_arrays_t& ConstantData,
 		mesh::attribute_arrays_t& UniformData,
 		mesh::attribute_arrays_t& VaryingData);
@@ -71,6 +74,7 @@ public:
 	mesh::points_t& start_points;
 	mesh::points_t& end_points;
 	mesh::doubles_t& sweep_angles;
+	mesh::selection_t& selections;
 	mesh::attribute_arrays_t& constant_data;
 	mesh::attribute_arrays_t& uniform_data;
 	mesh::attribute_arrays_t& varying_data;
