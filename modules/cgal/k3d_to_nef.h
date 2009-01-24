@@ -2,7 +2,7 @@
 #define MODULES_CGAL_K3D_TO_NEF_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -30,10 +30,19 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "conversion.h"
+#include "cgal_simplifying_constructors.h"
 
+#include <CGAL/assertions.h>
+#include <CGAL/Gmpz.h>
+#include <CGAL/Homogeneous.h>
 #include <CGAL/Nef_3/SNC_structure.h>
+#include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/normal_vector_newell_3.h>
+#include <CGAL/to_rational.h>
+
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/polyhedron.h>
 
 namespace module
 {
@@ -41,32 +50,42 @@ namespace module
 namespace cgal
 {
 
-typedef CGAL::Plane_3<Kernel> Plane;
-typedef CGAL::Vector_3<Kernel> Vector;
-typedef std::vector<Point_3> points_t;
-
-typedef Nef_polyhedron::SNC_structure SNC_structure;
+/// Using standard integers, with the risk of overflow
+/**
+ * The purpose of this kernel is to avoid creating points with coordinates that are to big to
+ * represent in a 64 bit integer. Unfortunately, even when simplifying the homogeneous coordinates as much
+ * as possible, this happens even in the simplest of cases when doing booleans.
+ * TODO: See if we can use this with a number type that switches to Gmpz only when int64 overflows
+ */
+typedef simplifying_kernel<k3d::int64_t> int_kernel;
+/// Homogeneous kernel, using the GMP integer of arbitrary length. Robust but slow.
+typedef CGAL::Homogeneous<CGAL::Gmpz> exact_kernel;
+/// Corresponding Nef polyhedron types
+typedef CGAL::Nef_polyhedron_3<int_kernel, CGAL::SNC_indexed_items> int_nef;
+typedef CGAL::Nef_polyhedron_3<exact_kernel, CGAL::SNC_indexed_items> exact_nef;
 
 /// Create a Point_3 from the given k3d::point3
-Point_3 to_cgal_point3(const k3d::point3& Point)
+template<typename kernel_t>
+typename kernel_t::Point_3 to_cgal_point3(const k3d::point3& Point, const k3d::double_t Factor)
 {
-//	NT common_denominator(1);
-//	Rational x = CGAL::to_rational<Rational>(Point[0]);
-//	common_denominator *= x.denominator();
-//	Rational y = CGAL::to_rational<Rational>(Point[1]);
-//	common_denominator *= y.denominator();
-//	Rational z = CGAL::to_rational<Rational>(Point[2]);
-//	common_denominator *= z.denominator();
-//	
-//	return Point_3(x.numerator()*common_denominator/x.denominator(), y.numerator()*common_denominator/y.denominator(), z.numerator()*common_denominator/z.denominator(), common_denominator);
-	return Point_3(Point[0], Point[1], Point[2]);
+	typedef typename kernel_t::RT RT;
+	typedef typename kernel_t::Point_3 point_t;
+	point_t point(RT(k3d::round(Point[0]*Factor)), RT(k3d::round(Point[1]*Factor)), RT(k3d::round(Point[2]*Factor)), RT(Factor));
+	return point;
 }
 
-/// Returns the plane containing the face given to operator().
-struct face_plane {
+/// Returns the plane containing the face given to operator()
+template<typename kernel_t>
+class face_plane
+{
+	typedef typename kernel_t::Point_3 Point_3;
+	typedef typename kernel_t::Vector_3 Vector_3;
+	typedef typename kernel_t::Plane_3 Plane_3;
+	typedef std::vector<Point_3> points_t;
+public:
 	face_plane(const k3d::mesh& Mesh, points_t& Points) : m_mesh(Mesh), m_points(Points) {}
 	
-  Plane operator()(size_t FirstLoop) {     
+  typename kernel_t::Plane_3 operator()(size_t FirstLoop) {     
     const k3d::mesh::indices_t& face_first_loops = *m_mesh.polyhedra->face_first_loops;
 		const k3d::mesh::counts_t& face_loop_counts = *m_mesh.polyhedra->face_loop_counts;
 		const k3d::mesh::indices_t& loop_first_edges = *m_mesh.polyhedra->loop_first_edges;
@@ -74,7 +93,7 @@ struct face_plane {
 		const k3d::mesh::indices_t& clockwise_edges = *m_mesh.polyhedra->clockwise_edges;
 		
 		std::vector<size_t> corners;
-		std::vector<Point_3> corner_points;
+		points_t corner_points;
 		size_t first_edge = loop_first_edges[FirstLoop];
 		for(size_t edge = first_edge; ; )
 		{
@@ -87,15 +106,19 @@ struct face_plane {
 		}
 		
 		if (corner_points.size() < 3)
-			throw 1; // Using throw here, since there really is no usable default if this fails
+			throw std::runtime_error("face_plane: Error determining plane: less than 3 points");
 		
-		Vector n;
+		Vector_3 n;
 		
 		CGAL::normal_vector_newell_3(corner_points.begin(), corner_points.end(), n);
 		
-		Plane plane(corner_points[0], n);
+		Plane_3 plane(corner_points[0], n);
 		if(plane.is_degenerate())
-			throw 2;
+		{
+			std::stringstream error_message;
+			error_message << "face_plane: Degenerate plane with normal " << n;
+			throw std::runtime_error(error_message.str());
+		}
 		
     return plane;
   }
@@ -104,21 +127,26 @@ struct face_plane {
   points_t& m_points;
 };
 
-void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
+template<typename nef_t>
+void k3d_to_nef(const k3d::mesh& Mesh, typename nef_t::SNC_structure& S, const k3d::double_t Factor)
 {
-  typedef SNC_structure::SNC_decorator      SNC_decorator;
-  typedef SNC_structure::SM_decorator       SM_decorator;
-  typedef SNC_structure::Vertex_handle      Vertex_handle;
-  typedef SNC_structure::SVertex_handle     SVertex_handle;
-  typedef SNC_structure::SHalfedge_handle   SHalfedge_handle;
-  typedef SNC_structure::SFace_handle       SFace_handle;
-  typedef SNC_structure::Sphere_point       Sphere_point;
-  typedef SNC_structure::Sphere_segment     Sphere_segment;
-  typedef SNC_structure::Sphere_circle      Sphere_circle;
-  typedef std::vector<SHalfedge_handle> indices_t;
-
-  typedef Polyhedron::Halfedge_around_vertex_const_circulator
-                               Halfedge_around_vertex_const_circulator;
+	typedef typename nef_t::Kernel Kernel;
+	typedef typename nef_t::Plane_3 Plane_3;
+	typedef typename nef_t::Vector_3 Vector_3;
+	typedef typename nef_t::Point_3 Point_3;
+	typedef std::vector<Point_3> points_t;
+	
+	typedef typename nef_t::SNC_structure							SNC_structure;
+  typedef typename SNC_structure::SNC_decorator      SNC_decorator;
+  typedef typename SNC_structure::SM_decorator       SM_decorator;
+  typedef typename SNC_structure::Vertex_handle      Vertex_handle;
+  typedef typename SNC_structure::SVertex_handle     SVertex_handle;
+  typedef typename SNC_structure::SHalfedge_handle   SHalfedge_handle;
+  typedef typename SNC_structure::SFace_handle       SFace_handle;
+  typedef typename SNC_structure::Sphere_point       Sphere_point;
+  typedef typename SNC_structure::Sphere_segment     Sphere_segment;
+  typedef typename SNC_structure::Sphere_circle      Sphere_circle;
+  typedef std::vector<SHalfedge_handle> 		indices_t;
 		
 	const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
 	const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
@@ -131,87 +159,29 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
 	
 	// Convert to Point_3 representation
 	for (size_t point = 0; point != k3d_points.size(); ++point)
-		points.push_back(to_cgal_point3(k3d_points[point]));
+		points.push_back(to_cgal_point3<Kernel>(k3d_points[point], Factor));
 	
-	std::vector<Plane> planes(face_first_loops.size());
+	std::vector<Plane_3> planes(face_first_loops.size());
   
 	std::transform(face_first_loops.begin(), face_first_loops.end(),
-		planes.begin(), face_plane(Mesh, points));
-
-		  	
-	// check coplanarity
-  for (size_t face = 0; face != face_first_loops.size(); ++face)
-	{
-		for (size_t loop = 0; loop != face_loop_counts[face]; ++loop)
-		{
-			size_t first_edge = loop_first_edges[face_first_loops[face] + loop];
-			for(size_t edge = first_edge; ; )
-			{
-				size_t point = edge_points[edge];
-				if (!planes[face].has_on(points[point]))
-				{
-					const Point_3& p = points[point];
-					const Plane& pl = planes[face];
-					Point_3 proj = pl.projection(p);
-					Vector diff(proj, p);
-					k3d::log() << debug << "point " << p << " is not on face " << face << "! Projection: " << CGAL::to_double(proj.x()) << ", " << CGAL::to_double(proj.y()) << ", " << CGAL::to_double(proj.z()) << ", " << std::endl;
-					k3d::log() << "face: " << CGAL::to_double(pl.a()) << ", " << CGAL::to_double(pl.b()) << ", " << CGAL::to_double(pl.c()) << ", " << (pl.d()) << std::endl;
-					k3d::log() << error << "k3d_to_nef: Non planar faces in input" << std::endl;
-					throw 3;
-				}
-				
-				edge = clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
-			}
-		}
-	}
-
+		planes.begin(), face_plane<Kernel>(Mesh, points));
+	
 	// Calculate companions
-	std::vector<size_t> companions(edge_points.size());
-	std::map<std::pair<size_t, size_t>, size_t > edge_end_points; // maps edge start and endpoint to edge number
-	std::vector<size_t> first_in_edges(points.size()); // Store an incoming edge for each point
-	size_t edge_count = edge_points.size();
-	for (size_t edge = 0; edge != edge_count; ++edge)
-		edge_end_points[std::make_pair(edge_points[edge], edge_points[clockwise_edges[edge]])] = edge;
-	for (size_t edge = 0; edge != edge_count; ++edge)
-	{
-		size_t start_point = edge_points[edge];
-		size_t end_point = edge_points[clockwise_edges[edge]];
-		first_in_edges[end_point] = edge;
-		size_t companion = edge;
-		std::map<std::pair<size_t, size_t>, size_t >::iterator it = edge_end_points.find(std::make_pair(end_point, start_point));
-		if (it != edge_end_points.end())
-		{
-			companion = it->second;
-		}
-		else
-		{
-			// volume is not closed, user should be notified.
-			assert_not_reached();
-		}
-		companions[edge] = companion;
-	}
+	k3d::mesh::indices_t companions;
+	k3d::mesh::bools_t boundary_edges;
+	k3d::polyhedron::create_edge_adjacency_lookup(edge_points, clockwise_edges, boundary_edges, companions);
 	
 	// Provide an edge-to-face link
-	std::vector<size_t> face_for_edge(edge_points.size());
-	for (size_t face = 0; face != face_first_loops.size(); ++face)
-	{
-		for (size_t loop = 0; loop != face_loop_counts[face]; ++loop)
-		{
-			size_t first_edge = loop_first_edges[face_first_loops[face] + loop];
-			for(size_t edge = first_edge; ; )
-			{
-				face_for_edge[edge] = face;
-				edge = clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
-			}
-		}
-	}
+	k3d::mesh::indices_t face_for_edge;
+	k3d::polyhedron::create_edge_face_lookup(face_first_loops, face_loop_counts, loop_first_edges, clockwise_edges, face_for_edge);
+	
+	// Store an incoming edge for each point
+	k3d::mesh::indices_t first_in_edges(points.size());
+	size_t edge_count = edge_points.size();
+	for (size_t edge = 0; edge != edge_count; ++edge)
+		first_in_edges[edge_points[clockwise_edges[edge]]] = edge;
 	
 	indices_t indices(edge_points.size()); // for indexed items
-
   for (size_t point = 0; point != points.size(); ++point)
   {
 	  Vertex_handle nv = S.new_vertex();
@@ -238,7 +208,7 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
       Sphere_point sp(sp_point);
       SVertex_handle sv = SM.new_svertex(sp);
       sv->mark() = true;
-      Plane ss_plane(CGAL::ORIGIN, planes[face_for_edge[prev_edge]].opposite().orthogonal_vector());
+      Plane_3 ss_plane(CGAL::ORIGIN, planes[face_for_edge[prev_edge]].opposite().orthogonal_vector());
       Sphere_circle ss_circle(ss_plane);
 
       SHalfedge_handle e = SM.new_shalfedge_pair(sv_prev, sv);
@@ -254,7 +224,7 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
     }
     while(edge != first_edge);
 
-    Plane ss_plane(CGAL::ORIGIN, planes[face_for_edge[prev_edge]].opposite().orthogonal_vector());
+    Plane_3 ss_plane(CGAL::ORIGIN, planes[face_for_edge[prev_edge]].opposite().orthogonal_vector());
     Sphere_circle ss_circle(ss_plane);
  
     SHalfedge_handle e = SM.new_shalfedge_pair(sv_prev, sv_0);
@@ -276,13 +246,7 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
     SM.check_integrity_and_topological_planarity();   
   }
   
-  // resolve indices
-//  k3d::mesh::indices_t previous_edges(clockwise_edges.size());
-//  for (size_t i = 0; i != clockwise_edges.size(); ++i)
-//  {
-//  	previous_edges[clockwise_edges[i]] = i;
-//  }
-  
+  // resolve indices  
   for (size_t face = 0; face != face_first_loops.size(); ++face)
 	{
   	int se, set;
@@ -318,7 +282,6 @@ void k3d_to_nef(const k3d::mesh& Mesh, SNC_structure& S)
 			indices[first_edge]->source()->set_index(sv);
 		}
 	}
-  
 }
 
 } // namespace cgal
