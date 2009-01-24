@@ -49,6 +49,7 @@ public:
 		static object phi_min(wrapper& Self) { return wrap(Self.wrapped().phi_min); }
 		static object phi_max(wrapper& Self) { return wrap(Self.wrapped().phi_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -66,6 +67,7 @@ public:
 		static object phi_min(wrapper& Self) { return wrap(Self.wrapped().phi_min); }
 		static object phi_max(wrapper& Self) { return wrap(Self.wrapped().phi_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
+		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
 		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
 		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
@@ -106,6 +108,7 @@ void define_namespace_torus()
 		.def("phi_min", &torus::const_primitive::phi_min)
 		.def("phi_max", &torus::const_primitive::phi_max)
 		.def("sweep_angles", &torus::const_primitive::sweep_angles)
+		.def("selections", &torus::const_primitive::selections)
 		.def("constant_data", &torus::const_primitive::constant_data)
 		.def("uniform_data", &torus::const_primitive::uniform_data)
 		.def("varying_data", &torus::const_primitive::varying_data)
@@ -119,6 +122,7 @@ void define_namespace_torus()
 		.def("phi_min", &torus::primitive::phi_min)
 		.def("phi_max", &torus::primitive::phi_max)
 		.def("sweep_angles", &torus::primitive::sweep_angles)
+		.def("selections", &torus::primitive::selections)
 		.def("constant_data", &torus::primitive::constant_data)
 		.def("uniform_data", &torus::primitive::uniform_data)
 		.def("varying_data", &torus::primitive::varying_data)
