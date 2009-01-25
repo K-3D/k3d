@@ -326,7 +326,6 @@ K3D_ADD_TEST(mesh.modifier.QuadrilateralRemeshing.py PYTHON REQUIRES K3D_BUILD_Q
 K3D_ADD_TEST(mesh.modifier.RotatePoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
 K3D_ADD_TEST(mesh.modifier.ScalePoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
 K3D_ADD_TEST(mesh.modifier.ShearPoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
-K3D_ADD_TEST(mesh.modifier.SimplifyPolyhedra.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
 K3D_ADD_TEST(mesh.modifier.SmoothPoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
 K3D_ADD_TEST(mesh.modifier.SphereizePoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
 K3D_ADD_TEST(mesh.modifier.SubdivideEdges.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
@@ -378,8 +377,6 @@ K3D_ADD_TEST(ngui.bitmap.modifier.BitmapMatteColorDiff.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.bitmap.modifier.BitmapMultiply.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.bitmap.modifier.BitmapSubtract.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.bitmap.modifier.BitmapThreshold.py PYTHON NGUI)
-
-K3D_ADD_TEST(ngui.FileChangeNotifier.py PYTHON NGUI)
 
 K3D_ADD_TEST(ngui.MaterialManager.init.py PYTHON NGUI)
 
