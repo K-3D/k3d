@@ -1,5 +1,5 @@
-#ifndef MODULES_CGAL_THRESHOLD_NUMBER_H
-#define MODULES_CGAL_THRESHOLD_NUMBER_H
+#ifndef MODULES_CGAL_BIG_INTEGER_H
+#define MODULES_CGAL_BIG_INTEGER_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -138,4 +138,4 @@ inline std::ostream& operator<<(std::ostream& Stream, const big_integer& N)
 
 CGAL_END_NAMESPACE
 
-#endif // !MODULES_CGAL_THRESHOLD_NUMBER_H
+#endif // !MODULES_CGAL_BIG_INTEGER_H
