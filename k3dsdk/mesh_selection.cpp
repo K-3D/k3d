@@ -323,8 +323,8 @@ void mesh_selection::merge(const mesh_selection& Selection, mesh& Mesh)
 	// Handle generic mesh primitives ...
 	for(components_t::const_iterator component = Selection.components.begin(); component != Selection.components.end(); ++component)
 	{
-		const uint_t primitive_begin = std::min(Mesh.primitives.size(), component->primitive_begin);
-		const uint_t primitive_end = std::min(Mesh.primitives.size(), component->primitive_end);
+		const uint_t primitive_begin = std::min(static_cast<uint_t>(Mesh.primitives.size()), component->primitive_begin);
+		const uint_t primitive_end = std::min(static_cast<uint_t>(Mesh.primitives.size()), component->primitive_end);
 		for(uint_t primitive = primitive_begin; primitive != primitive_end; ++primitive)
 			mesh::visit_arrays(Mesh.primitives[primitive].writable(), detail::merge_generic_selection(*component));
 	}
