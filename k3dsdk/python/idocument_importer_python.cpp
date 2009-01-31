@@ -1,6 +1,3 @@
-#ifndef K3DSDK_IDOCUMENT_EXPORTER_H
-#define K3DSDK_IDOCUMENT_EXPORTER_H
-
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -21,33 +18,41 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Tim Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
+#include "idocument_importer_python.h"
+#include "idocument_python.h"
+
+#include <k3dsdk/path.h>
+
+#include <boost/python.hpp>
+using namespace boost::python;
 
 namespace k3d
 {
 
-class idocument;
-namespace filesystem { class path; }
-	
-/// Abstract interface implemented by objects that can export data from a K-3D document
-class idocument_exporter :
-	public virtual iunknown
+namespace python
 {
-public:
-	virtual ~idocument_exporter() {}
 
-	virtual bool write_file(idocument& Document, const filesystem::path& File) = 0;
+///////////////////////////////////////////////////////////////////////////////////////////////
+// idocument_importer
 
-protected:
-	idocument_exporter() {}
-	idocument_exporter(const idocument_exporter&) {}
-	idocument_exporter& operator = (const idocument_exporter&) { return *this; }
-};
+static bool_t read_file(idocument_importer_wrapper& Self, idocument_wrapper& Document, const filesystem::path& Path)
+{
+	return Self.wrapped().read_file(Document.wrapped(), Path);
+}
 
-} //namespace k3d
+void define_class_idocument_importer()
+{
+	class_<idocument_importer_wrapper>("idocument_importer",
+		"Abstract interface for objects that can import file data into a document.", no_init)
+		.def("read_file", &read_file,
+			"Import a file's contents into a document.")
+		;
+}
 
-#endif // !K3DSDK_IDOCUMENT_EXPORTER_H
+} // namespace python
+
+} // namespace k3d
 

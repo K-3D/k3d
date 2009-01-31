@@ -1,8 +1,8 @@
-#ifndef K3DSDK_IDOCUMENT_IMPORTER_H
-#define K3DSDK_IDOCUMENT_IMPORTER_H
+#ifndef K3DSDK_PYTHON_IDOCUMENT_IMPORTER_PYTHON_H
+#define K3DSDK_PYTHON_IDOCUMENT_IMPORTER_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,33 +21,25 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Tim Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
+#include "instance_wrapper_python.h"
+#include <k3dsdk/idocument_importer.h>
 
 namespace k3d
 {
-
-class idocument;
-namespace filesystem { class path; }
-
-/// Abstract interface for objects that can import data into a K-3D document
-class idocument_importer :
-	public virtual iunknown
+	
+namespace python
 {
-public:
-	virtual ~idocument_importer() {}
 
-	virtual bool read_file(idocument& Document, const filesystem::path& File) = 0;
+typedef instance_wrapper<k3d::idocument_importer> idocument_importer_wrapper;
 
-protected:
-	idocument_importer() {}
-	idocument_importer(const idocument_importer&) {}
-	idocument_importer& operator = (const idocument_importer&) { return *this; }
-};
+void define_class_idocument_importer();
+
+} // namespace python
 
 } // namespace k3d
 
-#endif // !K3DSDK_IDOCUMENT_IMPORTER_H
+#endif // !K3DSDK_PYTHON_IDOCUMENT_IMPORTER_PYTHON_H
 

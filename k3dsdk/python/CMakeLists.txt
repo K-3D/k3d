@@ -126,6 +126,10 @@ ADD_LIBRARY(k3dsdk-python-d SHARED
 	dynamic_cast_python.h
 	euler_python.cpp
 	euler_python.h
+	idocument_exporter_python.cpp
+	idocument_exporter_python.h
+	idocument_importer_python.cpp
+	idocument_importer_python.h
 	idocument_python.cpp
 	idocument_python.h
 	imesh_storage_python.cpp
