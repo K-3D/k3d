@@ -32,6 +32,9 @@
 
 #include "k3d_to_nef.h"
 
+// For debug off output
+#include <CGAL/IO/Nef_polyhedron_iostream_3.h>
+
 #include <k3dsdk/gprim_factory.h>
 #include <k3dsdk/imaterial.h>
 
@@ -54,7 +57,7 @@ class nef_visitor
 	typedef typename nef_t::SHalfedge_around_facet_const_circulator SHalfedge_around_facet_const_circulator;
 public:
 	nef_visitor(k3d::gprim_factory& Factory, const CGAL::Object_index<Vertex_const_iterator>& VertexIndices)
-	: m_factory(Factory), m_vertex_indices(VertexIndices) {}
+	: m_factory(Factory), m_vertex_indices(VertexIndices), m_edge(0) {}
 	
 	void visit(Halffacet_const_handle OppositeFacet)
 	{
@@ -93,7 +96,7 @@ public:
 	}
 	
 	void visit(typename nef_t::SFace_const_handle) {}
-  void visit(typename nef_t::Halfedge_const_handle) {}
+  void visit(typename nef_t::Halfedge_const_handle edge) {}
   void visit(typename nef_t::Vertex_const_handle) {}
   void visit(SHalfedge_const_handle) {}
   void visit(typename nef_t::SHalfloop_const_handle) {}
@@ -101,6 +104,7 @@ public:
 private:
 	k3d::gprim_factory& m_factory;
 	const CGAL::Object_index<Vertex_const_iterator>& m_vertex_indices;
+	k3d::uint_t m_edge;
 };
 
 /// Converts a Nef_polyhedron to a k3d mesh
@@ -114,6 +118,10 @@ void to_mesh(nef_t& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* const Materi
 	k3d::gprim_factory factory(Mesh);
 	k3d::int32_t skip_volumes = nef_t::Infi_box::extended_kernel() ? 2 : 1;
 	
+	//k3d::log() << debug << "--------------- BEGIN OUTPUT NEF ----------------" << std::endl;
+	//k3d::log() << NefPolyhedron << std::endl;
+	//k3d::log() << debug << "---------------- END OUTPUT NEF -----------------" << std::endl;
+	
 	Vertex_const_iterator v;
 	CGAL::Object_index<Vertex_const_iterator> vertex_indices; 
 	CGAL_forall_vertices(v, NefPolyhedron)
@@ -121,6 +129,7 @@ void to_mesh(nef_t& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* const Materi
 		if(nef_t::Infi_box::is_standard(v->point()))
 		{
 			Point_3 mesh_point = v->point();
+			//factory.add_point(k3d::point3(k3d::round(Factor*CGAL::to_double(mesh_point.x()))/Factor, k3d::round(Factor*CGAL::to_double(mesh_point.y()))/Factor, k3d::round(Factor*CGAL::to_double(mesh_point.z()))/Factor));
 			factory.add_point(k3d::point3(CGAL::to_double(mesh_point.x()), CGAL::to_double(mesh_point.y()), CGAL::to_double(mesh_point.z())));
 			vertex_indices[v] = Mesh.points->size() - 1;
 		}
@@ -143,13 +152,13 @@ void to_mesh(nef_t& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* const Materi
  * so part is (c) the authors of that file.
  */
 template<typename nef_t>
-boost::shared_ptr<nef_t> to_nef(const k3d::mesh& Mesh, const k3d::double_t Factor = 1e8)
+boost::shared_ptr<nef_t> to_nef(const k3d::mesh& Mesh)
 {
 	typedef typename nef_t::SNC_structure SNC_structure;
 	SNC_structure snc;
 	try
 	{
-		k3d_to_nef<nef_t>(Mesh, snc, Factor);
+		k3d_to_nef<nef_t>(Mesh, snc);
 	}
 	catch(std::exception& E)
 	{
@@ -159,6 +168,9 @@ boost::shared_ptr<nef_t> to_nef(const k3d::mesh& Mesh, const k3d::double_t Facto
 	boost::shared_ptr<nef_t> nef(new nef_t(snc));
 	nef->build_external_structure();
 	nef->simplify();
+	//k3d::log() << debug << "--------------- BEGIN INPUT NEF ----------------" << std::endl;
+	//k3d::log() << *nef << std::endl;
+	//k3d::log() << debug << "---------------- END INPUT NEF -----------------" << std::endl;
 	return nef;
 }
 

@@ -283,11 +283,11 @@ void merge_coplanar_faces(k3d::mesh& Mesh, const double_t Threshold)
 	
 	k3d::mesh::indices_t edge_faces;
 	k3d::polyhedron::create_edge_face_lookup(face_first_loops, *Mesh.polyhedra->face_loop_counts, loop_first_edges, clockwise_edges, edge_faces);
-	k3d::mesh::selection_t redundant_edges;
+	k3d::mesh::indices_t redundant_edges;
 	k3d::polyhedron::mark_coplanar_edges(companions, boundary_edges, face_normals, edge_faces, input_face_selection, redundant_edges, Threshold);
 
 	k3d::mesh::polyhedra_t& output_polyhedra = Mesh.polyhedra.writable();
-	k3d::euler::kill_edge_make_loop(output_polyhedra, points, redundant_edges, boundary_edges, companions, face_normals);
+	k3d::euler::kill_edge_make_loop(output_polyhedra, redundant_edges, boundary_edges, companions, points, face_normals);
 }
 
 void merge_collinear_edges(k3d::mesh& Mesh, const double_t Threshold)
@@ -307,7 +307,7 @@ void merge_collinear_edges(k3d::mesh& Mesh, const double_t Threshold)
 	
 	k3d::mesh::counts_t vertex_valences;
 	k3d::polyhedron::create_vertex_valence_lookup(points.size(), edge_points, vertex_valences);
-	k3d::mesh::selection_t redundant_edges;
+	k3d::mesh::indices_t redundant_edges;
 	k3d::polyhedron::mark_collinear_edges(redundant_edges, input_edge_selection, points, edge_points, clockwise_edges, vertex_valences, boundary_edges, companions, Threshold);
 	
 	k3d::euler::kill_edge_and_vertex(Mesh.polyhedra.writable(), redundant_edges, boundary_edges, companions, points.size());
@@ -344,9 +344,12 @@ public:
 		try
 		{
 			do_boolean<exact_nef>(Output);
-			detail::merge_coplanar_faces(Output, m_threshold.pipeline_value());
-			detail::merge_collinear_edges(Output, m_threshold.pipeline_value());
-			k3d::mesh::delete_unused_points(Output);
+			if(Output.points && k3d::validate_polyhedra(Output))
+			{
+				detail::merge_coplanar_faces(Output, m_threshold.pipeline_value());
+				detail::merge_collinear_edges(Output, m_threshold.pipeline_value());
+				k3d::mesh::delete_unused_points(Output);
+			}
 		}
 		catch (std::exception& E)
 		{
@@ -385,11 +388,8 @@ private:
 	class boolean_functor
 	{
 	public:
-		boolean_functor(const boolean::boolean_t BooleanType, const k3d::int32_t Digits, nef_t& Result) : m_boolean_type(BooleanType), m_result(Result), m_started(false)
+		boolean_functor(const boolean::boolean_t BooleanType, nef_t& Result) : m_boolean_type(BooleanType), m_result(Result), m_started(false)
 		{
-			m_factor = 10.0;
-			for(k3d::uint_t i = 0; i != Digits; ++i)
-				m_factor *= 10.0;
 		}
 		void operator()(k3d::iproperty* const Property)
 		{
@@ -404,11 +404,11 @@ private:
 				// First triangulate inputs
 				k3d::mesh triangulated_mesh;
 				detail::create_triangles().process(*mesh, k3d::mesh_selection::select_all(), triangulated_mesh);
-				k3d::log() << debug << "triangulation: " << timer.elapsed() << std::endl;
+				k3d::log() << debug << "CGALBoolean: triangulation: " << timer.elapsed() << std::endl;
 				
 				timer.restart();
-				boost::shared_ptr<nef_t> operand = to_nef<nef_t>(triangulated_mesh, m_factor);
-				k3d::log() << debug << "convert to nef: " << timer.elapsed() << std::endl;
+				boost::shared_ptr<nef_t> operand = to_nef<nef_t>(triangulated_mesh);
+				k3d::log() << debug << "CGALBoolean: convert to nef: " << timer.elapsed() << std::endl;
 				return_if_fail(operand.get());
 				if (!m_started)
 				{
@@ -436,13 +436,12 @@ private:
 							m_result -= *operand;
 							break;
 					}
-					k3d::log() << debug << "boolean op: " << timer.elapsed() << std::endl;
+					k3d::log() << debug << "CGALBoolean: boolean op: " << timer.elapsed() << std::endl;
 				}
 			}
 		}
 	private:
 		const boolean::boolean_t m_boolean_type;
-		k3d::double_t m_factor;
 		nef_t& m_result;
 		k3d::bool_t m_started;
 	};
@@ -453,10 +452,10 @@ private:
 	{
 		Output = k3d::mesh();
 		nef_t result;
-		const boolean_t boolean_type = m_type.pipeline_value(); 
+		const boolean_t boolean_type = m_type.pipeline_value();
 		
 		const k3d::iproperty_collection::properties_t properties = k3d::property::user_properties(*static_cast<k3d::iproperty_collection*>(this));
-		boolean_functor<nef_t> functor(boolean_type, 16, result);
+		boolean_functor<nef_t> functor(boolean_type, result);
 		if (boolean_type == BOOLEAN_REVERSE_DIFFERENCE)
 		{
 			std::for_each(properties.rbegin(), properties.rend(), functor);

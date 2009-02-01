@@ -25,6 +25,7 @@
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/euler_operations.h>
+#include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/measurement.h>
@@ -60,6 +61,7 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		k3d::timer timer;
 		// If there are no valid polyhedra, we give up
 		if(!k3d::validate_polyhedra(Input))
 		{
@@ -71,6 +73,12 @@ public:
 		k3d::mesh::selection_t input_edge_selection = *Input.polyhedra->edge_selection;
 		const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
 		k3d::mesh_selection::merge(mesh_selection.edges, input_edge_selection);
+		
+		const k3d::uint_t edge_count = input_edge_selection.size();
+		k3d::mesh::indices_t edge_list;
+		for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
+			if(input_edge_selection[edge])
+				edge_list.push_back(edge);
 		
 		const k3d::mesh::points_t& points = *Input.points;
 		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
@@ -91,9 +99,10 @@ public:
 				face_normals[face] = k3d::normalize(k3d::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]));
 		}
 		
-		k3d::euler::kill_edge_make_loop(Output.polyhedra.writable(), points, input_edge_selection, boundary_edges, companions, face_normals);
+		k3d::euler::kill_edge_make_loop(Output.polyhedra.writable(), edge_list, boundary_edges, companions, points, face_normals);
 		
 		k3d::mesh::delete_unused_points(Output);
+		k3d::log() << debug << "EulerKillEdgeMakeLoop took " << timer.elapsed() << "s" << std::endl;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

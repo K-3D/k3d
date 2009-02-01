@@ -88,7 +88,7 @@ public:
 		
 		k3d::mesh::counts_t vertex_valences;
 		k3d::polyhedron::create_vertex_valence_lookup(Output.points->size(), *Output.polyhedra->edge_points, vertex_valences);
-		k3d::mesh::selection_t redundant_edges;
+		k3d::mesh::indices_t redundant_edges;
 		k3d::polyhedron::mark_collinear_edges(redundant_edges, input_edge_selection, points, edge_points, clockwise_edges, vertex_valences, boundary_edges, companions, m_threshold.pipeline_value());
 		
 		k3d::euler::kill_edge_and_vertex(Output.polyhedra.writable(), redundant_edges, boundary_edges, companions, points.size());

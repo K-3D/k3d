@@ -286,7 +286,7 @@ const uint_t number(const mesh& Mesh, const uint_t Polyhedron)
 	return vertex_count - edge_count + face_count - (loop_count - face_count);
 }
 
-void kill_edge_make_loop(mesh::polyhedra_t& Output, const mesh::points_t& Points, const mesh::selection_t& EdgeSelection, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const mesh::normals_t& FaceNormals)
+void kill_edge_make_loop(mesh::polyhedra_t& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const mesh::points_t& Points, const mesh::normals_t& FaceNormals)
 {
 	// Copies, so we can use them as temp storage between the individiual KEML operations
 	const mesh::indices_t face_first_loops = *Output.face_first_loops;
@@ -314,11 +314,17 @@ void kill_edge_make_loop(mesh::polyhedra_t& Output, const mesh::points_t& Points
 		counter_clockwise_edges[clockwise_edges[edge]] = edge;
 	}
 	
-	uint_t edge = 0;
-	for(edge = 0; edge != edge_count; ++edge)
+	mesh::selection_t marked_edges(edge_count, 0.0); 
+	
+	for(uint_t i = 0; i != EdgeList.size(); ++i)
+		marked_edges[EdgeList[i]] = 1.0;
+	
+	
+	for(uint_t edge_list_index = 0; edge_list_index != EdgeList.size(); ++edge_list_index)
 	{
+		const uint_t edge = EdgeList[edge_list_index];
 		const uint_t companion = AdjacentEdges[edge];
-		if(!EdgeSelection[edge] && !EdgeSelection[companion])
+		if(!marked_edges[edge] && !marked_edges[companion])
 			continue;
 		if(BoundaryEdges[edge])
 			continue;
@@ -443,7 +449,7 @@ void kill_edge_make_loop(mesh::polyhedra_t& Output, const mesh::points_t& Points
 	mesh::selection_t& edge_selection = Output.edge_selection.create(new mesh::selection_t(Output.edge_points->size(), 0.0));
 }
 
-void kill_edge_and_vertex(mesh::polyhedra_t& Output, const mesh::selection_t& EdgeSelection, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const uint_t PointCount)
+void kill_edge_and_vertex(mesh::polyhedra_t& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const uint_t PointCount)
 {
 	const mesh::indices_t face_first_loops = *Output.face_first_loops;
 	mesh::counts_t face_loop_counts = *Output.face_loop_counts;
@@ -476,10 +482,9 @@ void kill_edge_and_vertex(mesh::polyhedra_t& Output, const mesh::selection_t& Ed
 	for(uint_t point = 0; point != PointCount; ++point)
 		point_map[point] = point;
 	
-	for(uint_t edge = 0; edge != edge_count; ++edge)
+	for(uint_t edge_list_index = 0; edge_list_index != EdgeList.size(); ++edge_list_index)
 	{
-		if(!EdgeSelection[edge])
-			continue;
+		const uint_t edge = EdgeList[edge_list_index];
 		//const uint_t edge = affected_edges[i];
 		const uint_t companion = companions[edge];
 		const uint_t loop = edge_loops[edge];

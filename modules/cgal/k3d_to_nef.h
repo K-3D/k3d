@@ -64,15 +64,28 @@ typedef CGAL::Homogeneous<CGAL::Gmpz> exact_kernel;
 typedef CGAL::Nef_polyhedron_3<int_kernel, CGAL::SNC_indexed_items> int_nef;
 typedef CGAL::Nef_polyhedron_3<exact_kernel, CGAL::SNC_indexed_items> exact_nef;
 
-/// Create a Point_3 from the given k3d::point3
+/// Convert coordinates to the format of kernel_t
 template<typename kernel_t>
-typename kernel_t::Point_3 to_cgal_point3(const k3d::point3& Point, const k3d::double_t Factor)
+class point_converter
 {
+public:
+	
 	typedef typename kernel_t::RT RT;
-	typedef typename kernel_t::Point_3 point_t;
-	point_t point(RT(k3d::round(Point[0]*Factor)), RT(k3d::round(Point[1]*Factor)), RT(k3d::round(Point[2]*Factor)), RT(Factor));
-	return point;
-}
+	typedef typename kernel_t::Point_3 Point_3; 
+	
+	point_converter() : m_factor(1e10)
+	{
+	}
+	
+	const Point_3 operator()(const k3d::point3& Point)
+	{
+		return Point_3(RT(k3d::round(Point[0]*m_factor)), RT(k3d::round(Point[1]*m_factor)), RT(k3d::round(Point[2]*m_factor)), RT(m_factor));
+	}
+
+private:
+	/// Factor to multiply by before rounding off 
+	const k3d::double_t m_factor;
+};
 
 /// Returns the plane containing the face given to operator()
 template<typename kernel_t>
@@ -128,7 +141,7 @@ public:
 };
 
 template<typename nef_t>
-void k3d_to_nef(const k3d::mesh& Mesh, typename nef_t::SNC_structure& S, const k3d::double_t Factor)
+void k3d_to_nef(const k3d::mesh& Mesh, typename nef_t::SNC_structure& S)
 {
 	typedef typename nef_t::Kernel Kernel;
 	typedef typename nef_t::Plane_3 Plane_3;
@@ -157,9 +170,13 @@ void k3d_to_nef(const k3d::mesh& Mesh, typename nef_t::SNC_structure& S, const k
 	const k3d::mesh::points_t& k3d_points = *Mesh.points;
 	points_t points;
 	
+	point_converter<Kernel> converter;
+	
 	// Convert to Point_3 representation
 	for (size_t point = 0; point != k3d_points.size(); ++point)
-		points.push_back(to_cgal_point3<Kernel>(k3d_points[point], Factor));
+	{ 
+		points.push_back(converter(k3d_points[point]));
+	}
 	
 	std::vector<Plane_3> planes(face_first_loops.size());
   

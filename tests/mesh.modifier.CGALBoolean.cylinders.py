@@ -6,12 +6,15 @@ import testing
 document = k3d.new_document()
 
 small_cylinder = document.new_node("PolyCylinder")
-small_cylinder.radius = 2.5
+small_cylinder.radius = 2.0
 small_cylinder.zmax = 7.5
 small_cylinder.zmin = -7.5
 small_cylinder.u_segments = 8
 big_cylinder = document.new_node("PolyCylinder")
+big_cylinder.u_segments = 8
 torus = document.new_node("PolyTorus")
+torus.u_segments = 8
+torus.v_segments = 4
 
 first_boolean = document.new_node("CGALBoolean")
 first_boolean.type = "difference"

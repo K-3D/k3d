@@ -632,35 +632,17 @@ const bool_t is_solid(const mesh& Mesh, const uint_t Polyhedron)
 	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 
-	typedef std::map<std::pair<uint_t, uint_t>, uint_t> adjacent_edges_t;
-	adjacent_edges_t adjacent_edges;
-
-	const uint_t face_begin = first_faces[Polyhedron];
-	const uint_t face_end = face_begin + face_counts[Polyhedron];
-	for(uint_t face = face_begin; face != face_end; ++face)
+	mesh::bools_t boundary_edges;
+	mesh::indices_t adjacent_edges;
+	create_edge_adjacency_lookup(edge_points, clockwise_edges, boundary_edges, adjacent_edges);
+	
+	for(uint_t edge = 0; edge != boundary_edges.size(); ++edge)
 	{
-		const uint_t loop_begin = face_first_loops[face];
-		const uint_t loop_end = loop_begin + face_loop_counts[face];
-		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		if(boundary_edges[edge])
 		{
-			const uint_t first_edge = loop_first_edges[loop];
-			for(uint_t edge = first_edge; ;)
-			{
-				const uint_t vertex1 = std::min(edge_points[edge], edge_points[clockwise_edges[edge]]);
-				const uint_t vertex2 = std::max(edge_points[edge], edge_points[clockwise_edges[edge]]);
-				adjacent_edges[std::make_pair(vertex1, vertex2)] += 1;
-
-				edge = clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
-			}
-		}
-	}
-
-	for(adjacent_edges_t::iterator edges = adjacent_edges.begin(); edges != adjacent_edges.end(); ++edges)
-	{
-		if(edges->second != 2)
+			k3d::log() << debug << "k3d::polyhedron::is_solid: found boundary edge " << edge << std::endl;
 			return false;
+		}
 	}
 
 	return true;
@@ -669,9 +651,8 @@ const bool_t is_solid(const mesh& Mesh, const uint_t Polyhedron)
 /////////////////////////////////////////////////////////////////////////////////////////////
 // mark_collinear_edges
 
-void mark_collinear_edges(mesh::selection_t& MarkedEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold)
+void mark_collinear_edges(mesh::indices_t& RedundantEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold)
 {
-	MarkedEdges.assign(EdgePoints.size(), 0.0);
 	for(uint_t edge = 0; edge != EdgePoints.size(); ++edge)
 	{
 		if(!EdgeSelection[edge])
@@ -690,7 +671,7 @@ void mark_collinear_edges(mesh::selection_t& MarkedEdges, const mesh::selection_
 		
 		if(detail::is_collinear(p1-p2, p1-p3, Threshold))
 		{
-			MarkedEdges[clockwise] = 1.0;
+			RedundantEdges.push_back(clockwise);
 		}
 	}
 }
@@ -700,10 +681,9 @@ void mark_coplanar_edges(const mesh::indices_t& Companions,
 		const mesh::normals_t& Normals,
 		const mesh::indices_t& EdgeFaces,
 		const mesh::selection_t& FaceSelection,
-		mesh::selection_t& RedundantEdges,
+		mesh::indices_t& RedundantEdges,
 		const double_t Threshold)
 {
-	RedundantEdges.assign(Companions.size(), 0.0);
 	for(uint_t edge = 0; edge != Companions.size(); ++edge)
 	{
 		if(BoundaryEdges[edge])
@@ -719,7 +699,7 @@ void mark_coplanar_edges(const mesh::indices_t& Companions,
 			continue;
 		
 		if((!Normals[face].length()) || (std::abs((Normals[face] * Normals[companion_face]) - 1) < Threshold))
-			RedundantEdges[edge] = 1.0;
+			RedundantEdges.push_back(edge);
 	}
 }
 

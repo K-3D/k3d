@@ -74,6 +74,7 @@ public:
 		k3d::mesh::selection_t input_face_selection = *Input.polyhedra->face_selection;
 		const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
 		k3d::mesh_selection::merge(mesh_selection.faces, input_face_selection);
+		k3d::mesh_selection::merge(mesh_selection, Output);
 		
 		const k3d::mesh::points_t& points = *Input.points;
 		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
@@ -96,14 +97,13 @@ public:
 		
 		k3d::mesh::indices_t edge_faces;
 		k3d::polyhedron::create_edge_face_lookup(face_first_loops, *Input.polyhedra->face_loop_counts, loop_first_edges, clockwise_edges, edge_faces);
-		k3d::mesh::selection_t redundant_edges;
+		k3d::mesh::indices_t redundant_edges;
 		k3d::polyhedron::mark_coplanar_edges(companions, boundary_edges, face_normals, edge_faces, input_face_selection, redundant_edges, m_threshold.pipeline_value());
 	
 		k3d::mesh::polyhedra_t& output_polyhedra = Output.polyhedra.writable();
-		k3d::euler::kill_edge_make_loop(output_polyhedra, points, redundant_edges, boundary_edges, companions, face_normals);
+		k3d::euler::kill_edge_make_loop(output_polyhedra, redundant_edges, boundary_edges, companions, points, face_normals);
 		
 		k3d::mesh::delete_unused_points(Output);
-		Output.point_selection.create(new k3d::mesh::selection_t(Output.points->size(), 0.0));
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

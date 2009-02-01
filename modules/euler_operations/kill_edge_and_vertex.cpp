@@ -72,6 +72,13 @@ public:
 		const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
 		k3d::mesh_selection::merge(mesh_selection.edges, input_edge_selection);
 		
+		const k3d::uint_t edge_count = input_edge_selection.size();
+		k3d::mesh::indices_t edge_list;
+		for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
+			if(input_edge_selection[edge])
+				edge_list.push_back(edge);
+		
+		
 		const k3d::mesh::points_t& points = *Input.points;
 		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
 		const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
@@ -87,7 +94,7 @@ public:
 		k3d::mesh::counts_t vertex_valences;
 		k3d::polyhedron::create_vertex_valence_lookup(points.size(), edge_points, vertex_valences);
 		
-		k3d::euler::kill_edge_and_vertex(Output.polyhedra.writable(), input_edge_selection, boundary_edges, companions, points.size());
+		k3d::euler::kill_edge_and_vertex(Output.polyhedra.writable(), edge_list, boundary_edges, companions, points.size());
 		
 		k3d::mesh::delete_unused_points(Output);
 	}
