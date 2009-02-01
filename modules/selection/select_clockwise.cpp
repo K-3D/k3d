@@ -27,7 +27,8 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/mesh_selection_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/utility.h>
 
@@ -45,51 +46,38 @@ namespace selection
 // select_clockwise
 
 class select_clockwise :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_modifier<k3d::mesh_selection_sink<k3d::node> >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
-
+	typedef k3d::mesh_selection_modifier<k3d::mesh_selection_sink<k3d::node> > base;
 public:
 	select_clockwise(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_number(init_owner(*this) + init_name("number") + init_label(_("number")) + init_description(_("Edge number")) + init_constraint(constraint::minimum<k3d::int32_t>(0)) + init_value(0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+		base(Factory, Document)
 	{
-		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
-		m_number.changed_signal().connect(make_reset_mesh_slot());
+		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
+					k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// Create output geometry ...
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Mesh);
-
-		// For each polyhedron ...
-		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
+		if(Output.polyhedra && Output.polyhedra->edge_selection)
 		{
-			std::set<k3d::legacy::split_edge*> selected_edges;
-			for(k3d::legacy::polyhedron::faces_t::iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
+			k3d::mesh::selection_t input_edge_selection = *Input.polyhedra->edge_selection;
+			const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
+			k3d::mesh_selection::merge(mesh_selection.edges, input_edge_selection);
+			
+			k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.writable();
+			k3d::mesh::selection_t& edge_selection = polyhedra.edge_selection.writable();
+			std::fill(edge_selection.begin(), edge_selection.end(), 0.0);
+			const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
+			
+			for(k3d::uint_t edge = 0; edge != edge_selection.size(); ++edge)
 			{
-				k3d::legacy::split_edge* edge = (*face)->first_edge;
-				do
+				if(input_edge_selection[edge])
 				{
-					if(edge->selection_weight)
-						selected_edges.insert(edge);
-
-					edge = edge->face_clockwise;
+					edge_selection[clockwise_edges[edge]] = 1.0;
+					break;
 				}
-				while(edge != (*face)->first_edge);
 			}
-
-			for(std::set<k3d::legacy::split_edge*>::iterator it = selected_edges.begin(); it != selected_edges.end(); ++it)
-			{
-				(*it)->selection_weight = 0.0;
-			}
-			unsigned long number = m_number.pipeline_value();
-			k3d::legacy::split_edge* edge = *(selected_edges.begin());
-			for (unsigned long i = 0; i <= number; ++i)
-				edge = edge->face_clockwise;
-			edge->selection_weight = 1.0;
 		}
 	}
 
@@ -110,8 +98,6 @@ public:
 
 		return factory;
 	}
-private:
-	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_number;
 };
 
 /////////////////////////////////////////////////////////////////////////////
