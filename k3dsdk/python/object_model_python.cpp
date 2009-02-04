@@ -129,39 +129,6 @@ namespace python
 {
 
 ////////////////////////////////////////////////////////////////////////////////////
-// Conversion to python
-
-/// Prevent implicit conversions - a separate python_wrap() implementation should be created for every required type
-template<typename T>
-struct python_wrap
-{
-	static PyObject* convert(const T&)
-	{
-		BOOST_STATIC_ASSERT(sizeof(T) == 0);
-		k3d::log() << critical << k3d_file_reference << " should not be reached" << std::endl;
-		return 0;
-	}
-};
-
-template<>
-struct python_wrap<unsigned long>
-{
-	static PyObject* convert(const unsigned long Value)
-	{
-		return PyLong_FromUnsignedLong(Value);
-	}
-};
-
-template<>
-struct python_wrap<double>
-{
-	static PyObject* convert(const double Value)
-	{
-		return Py_BuildValue("d", Value);
-	}
-};
-
-////////////////////////////////////////////////////////////////////////////////////
 // k3d module helpers
 
 const list module_command_nodes()
