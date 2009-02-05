@@ -29,6 +29,9 @@
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -139,31 +142,20 @@ public:
 			}
 			else if(element_type == "face")
 			{
-				k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.create();
-				k3d::mesh::indices_t& first_faces = polyhedra.first_faces.create();
-				k3d::mesh::counts_t& face_counts = polyhedra.face_counts.create();
-				k3d::mesh::polyhedra_t::types_t& types = polyhedra.types.create();
-				k3d::mesh::indices_t& face_first_loops = polyhedra.face_first_loops.create();
-				k3d::mesh::counts_t& face_loop_counts = polyhedra.face_loop_counts.create();
-				k3d::mesh::selection_t& face_selection = polyhedra.face_selection.create();
-				k3d::mesh::materials_t& face_materials = polyhedra.face_materials.create();
-				k3d::mesh::indices_t& loop_first_edges = polyhedra.loop_first_edges.create();
-				k3d::mesh::indices_t& edge_points = polyhedra.edge_points.create();
-				k3d::mesh::indices_t& clockwise_edges = polyhedra.clockwise_edges.create();
-				k3d::mesh::selection_t& edge_selection = polyhedra.edge_selection.create();
+				boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 		
-				first_faces.push_back(face_first_loops.size());
-				face_counts.push_back(element_count);
-				types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+				polyhedron->first_faces.push_back(polyhedron->face_first_loops.size());
+				polyhedron->face_counts.push_back(element_count);
+				polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 
-				face_first_loops.reserve(element_count);
-				face_loop_counts.reserve(element_count);
-				face_selection.reserve(element_count);
-				face_materials.reserve(element_count);
-				loop_first_edges.reserve(element_count);
-				edge_points.reserve(3 * element_count);
-				clockwise_edges.reserve(3 * element_count);
-				edge_selection.reserve(3 * element_count);
+				polyhedron->face_first_loops.reserve(element_count);
+				polyhedron->face_loop_counts.reserve(element_count);
+				polyhedron->face_selections.reserve(element_count);
+				polyhedron->face_materials.reserve(element_count);
+				polyhedron->loop_first_edges.reserve(element_count);
+				polyhedron->edge_points.reserve(3 * element_count);
+				polyhedron->clockwise_edges.reserve(3 * element_count);
+				polyhedron->edge_selections.reserve(3 * element_count);
 				
 				for(k3d::uint_t j = 0; j != element_count; ++j)
 				{
@@ -178,31 +170,27 @@ public:
 					k3d::uint_t point_count = 0;
 					line_buffer >> point_count;
 
-					face_first_loops.push_back(loop_first_edges.size());
-					face_loop_counts.push_back(1);
-					face_selection.push_back(0.0);
-					face_materials.push_back(0);
-					loop_first_edges.push_back(edge_points.size());
+					polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+					polyhedron->face_loop_counts.push_back(1);
+					polyhedron->face_selections.push_back(0.0);
+					polyhedron->face_materials.push_back(0);
+					polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
 					
 					for(k3d::uint_t k = 0; k != point_count; ++k)
 					{
 						k3d::uint_t point = 0;
 						line_buffer >> point;
 
-						edge_points.push_back(point);
-						clockwise_edges.push_back(edge_points.size());
-						edge_selection.push_back(0.0);
+						polyhedron->edge_points.push_back(point);
+						polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+						polyhedron->edge_selections.push_back(0.0);
 					}
 
-					if(loop_first_edges.size() && clockwise_edges.size())
-						clockwise_edges.back() = loop_first_edges.back();
+					if(polyhedron->loop_first_edges.size() && polyhedron->clockwise_edges.size())
+						polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
 				}
 			}
 		}
-
-		// Sanity check: make sure we have points if we have polyhedra ...
-		if(!Output.points)
-			Output.polyhedra.reset();
 	}
 
 	static k3d::iplugin_factory& get_factory()
