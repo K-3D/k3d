@@ -367,6 +367,28 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 	return 0;
 }
 
+const_primitive* validate(const mesh& Mesh)
+{
+	if(!validate_polyhedra(Mesh))
+		return 0;
+
+	return new const_primitive(
+		*Mesh.polyhedra->first_faces,
+		*Mesh.polyhedra->face_counts,
+		*Mesh.polyhedra->types,
+		*Mesh.polyhedra->face_first_loops,
+		*Mesh.polyhedra->face_loop_counts,
+		*Mesh.polyhedra->face_selection,
+		*Mesh.polyhedra->face_materials,
+		*Mesh.polyhedra->loop_first_edges,
+		*Mesh.polyhedra->edge_points,
+		*Mesh.polyhedra->clockwise_edges,
+		*Mesh.polyhedra->edge_selection,
+		Mesh.polyhedra->constant_data,
+		Mesh.polyhedra->uniform_data,
+		Mesh.polyhedra->face_varying_data);
+}
+
 namespace detail
 {
 

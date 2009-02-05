@@ -141,6 +141,9 @@ primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imat
 /// lifetime of the returned object.
 primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
 
+/** \deprecated This method exists for the sole purpose of easing the transition to generic primitives. */
+const_primitive* validate(const mesh& Mesh);
+
 /// Initializes arrays for constant-time lookup from an edge to the adjacent edge (if any)
 void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);
 
