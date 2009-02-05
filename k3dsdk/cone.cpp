@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-200 7, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
