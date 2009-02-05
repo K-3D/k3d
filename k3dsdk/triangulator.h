@@ -25,7 +25,9 @@
 namespace k3d
 {
 
-/// Provides a template design pattern object for triangulating polygons.
+namespace polyhedron { class const_primitive; }
+
+/// Provides a template design pattern object for triangulating polyhedra.
 /// To generate triangulated data, derive from k3d::triangulator and
 /// override the private virtual methods to process triangles
 class triangulator
@@ -34,8 +36,8 @@ public:
 	triangulator();
 	~triangulator();
 
-	/// Generates triangles for every polyhedron face in a mesh
-	void process(const mesh& SourceMesh);
+	/// Generates triangles for every face in a polyhedron
+	void process(const mesh& Mesh, const polyhedron::const_primitive& Polyhedron);
 
 	/// Generates triangles for a single polyhedron face
 	void process(

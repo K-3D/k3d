@@ -53,6 +53,7 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
@@ -60,6 +61,8 @@
 #include <k3dsdk/transform.h>
 #include <k3dsdk/triangulator.h>
 #include <k3dsdk/utility_gl.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <iomanip>
 #include <iterator>
@@ -317,7 +320,9 @@ private:
 		k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(MeshInstance, "output_mesh");
 		if(!mesh)
 			return;
-		if(!k3d::validate_polyhedra(*mesh))
+
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh));
+		if(!polyhedron)
 			return;
 
 		// Triangulate the mesh faces ...
@@ -329,7 +334,7 @@ private:
 		k3d::mesh::indices_t b_points;
 		k3d::mesh::indices_t c_points;
 		k3d::mesh::materials_t materials;
-		create_triangles(*mesh->polyhedra->face_materials, points, a_points, b_points, c_points, materials).process(*mesh);
+		create_triangles(polyhedron->face_materials, points, a_points, b_points, c_points, materials).process(*mesh, *polyhedron);
 
 		// Sort faces by material ...
 		typedef std::vector<k3d::uint_t> faces_t;

@@ -19,6 +19,7 @@
 
 #include "gl.h"
 #include "mesh_operations.h"
+#include "polyhedron.h"
 #include "sgi_tesselator.h"
 #include "triangulator.h"
 #include <set>
@@ -51,29 +52,19 @@ public:
 		sgiDeleteTess(tessellator);
 	}
 
-	void process(const mesh& Mesh)
+	void process(const mesh& Mesh, const polyhedron::const_primitive& Polyhedron)
 	{
-		if(!validate_polyhedra(Mesh))
-			return;
-
-		const mesh::points_t& points = *Mesh.points;
-		const mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-		const mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-
 		const uint_t face_begin = 0;
-		const uint_t face_end = face_begin + face_first_loops.size();
+		const uint_t face_end = face_begin + Polyhedron.face_first_loops.size();
 		for(uint_t face = face_begin; face != face_end; ++face)
 		{
 			process(
-				points,
-				face_first_loops,
-				face_loop_counts,
-				loop_first_edges,
-				edge_points,
-				clockwise_edges,
+				*Mesh.points,
+				Polyhedron.face_first_loops,
+				Polyhedron.face_loop_counts,
+				Polyhedron.loop_first_edges,
+				Polyhedron.edge_points,
+				Polyhedron.clockwise_edges,
 				face);
 		}
 	}
@@ -278,10 +269,10 @@ triangulator::~triangulator()
 	delete m_implementation;
 }
 
-void triangulator::process(const mesh& SourceMesh)
+void triangulator::process(const mesh& SourceMesh, const polyhedron::const_primitive& Polyhedron)
 {
 	start_processing(SourceMesh);
-	m_implementation->process(SourceMesh);
+	m_implementation->process(SourceMesh, Polyhedron);
 	finish_processing(SourceMesh);
 }
 
