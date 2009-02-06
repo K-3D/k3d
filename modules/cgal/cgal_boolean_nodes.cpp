@@ -259,7 +259,7 @@ private:
 	std::map<k3d::uint_t, new_face_varying_record> m_new_face_varying_data;
 };
 	
-void merge_coplanar_faces(k3d::mesh& Mesh, const double_t Threshold)
+void merge_coplanar_faces(k3d::mesh& Mesh, const k3d::double_t Threshold)
 {
 	const k3d::mesh::points_t& points = *Mesh.points;
 	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
@@ -290,7 +290,7 @@ void merge_coplanar_faces(k3d::mesh& Mesh, const double_t Threshold)
 	k3d::euler::kill_edge_make_loop(output_polyhedra, redundant_edges, boundary_edges, companions, points, face_normals);
 }
 
-void merge_collinear_edges(k3d::mesh& Mesh, const double_t Threshold)
+void merge_collinear_edges(k3d::mesh& Mesh, const k3d::double_t Threshold)
 {
 	const k3d::mesh::points_t& points = *Mesh.points;
 	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
