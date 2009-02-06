@@ -29,6 +29,7 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -79,47 +80,36 @@ public:
 		for(k3d::int32_t i = 0; i != vertex_count; ++i)
 			points[i] = model->get_point(frame, i);
 
-		k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.create();
-		k3d::mesh::indices_t& first_faces = polyhedra.first_faces.create();
-		k3d::mesh::counts_t& face_counts = polyhedra.face_counts.create();
-		k3d::mesh::polyhedra_t::types_t& types = polyhedra.types.create();
-		k3d::mesh::indices_t& face_first_loops = polyhedra.face_first_loops.create();
-		k3d::mesh::counts_t& face_loop_counts = polyhedra.face_loop_counts.create();
-		k3d::mesh::selection_t& face_selection = polyhedra.face_selection.create();
-		k3d::mesh::materials_t& face_materials = polyhedra.face_materials.create();
-		k3d::mesh::indices_t& loop_first_edges = polyhedra.loop_first_edges.create();
-		k3d::mesh::indices_t& edge_points = polyhedra.edge_points.create();
-		k3d::mesh::indices_t& clockwise_edges = polyhedra.clockwise_edges.create();
-		k3d::mesh::selection_t& edge_selection = polyhedra.edge_selection.create();
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 
-		first_faces.push_back(face_first_loops.size());
-		face_counts.push_back(triangle_count);
-		types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+		polyhedron->first_faces.push_back(polyhedron->face_first_loops.size());
+		polyhedron->face_counts.push_back(triangle_count);
+		polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 
-		face_first_loops.reserve(triangle_count);
-		face_loop_counts.reserve(triangle_count);
-		face_selection.reserve(triangle_count);
-		face_materials.reserve(triangle_count);
-		loop_first_edges.reserve(triangle_count);
-		edge_points.reserve(3 * triangle_count);
-		clockwise_edges.reserve(3 * triangle_count);
-		edge_selection.reserve(3 * triangle_count);
+		polyhedron->face_first_loops.reserve(triangle_count);
+		polyhedron->face_loop_counts.reserve(triangle_count);
+		polyhedron->face_selections.reserve(triangle_count);
+		polyhedron->face_materials.reserve(triangle_count);
+		polyhedron->loop_first_edges.reserve(triangle_count);
+		polyhedron->edge_points.reserve(3 * triangle_count);
+		polyhedron->clockwise_edges.reserve(3 * triangle_count);
+		polyhedron->edge_selections.reserve(3 * triangle_count);
 
 		for(k3d::int32_t i = 0; i != triangle_count; ++i)
 		{
-			face_first_loops.push_back(loop_first_edges.size());
-			face_loop_counts.push_back(1);
-			face_selection.push_back(0);
-			face_materials.push_back(0);
-			loop_first_edges.push_back(edge_points.size());
+			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+			polyhedron->face_loop_counts.push_back(1);
+			polyhedron->face_selections.push_back(0);
+			polyhedron->face_materials.push_back(0);
+			polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
 
 			for(k3d::uint_t j = 0; j != 3; ++j)
 			{
-				edge_points.push_back(model->get_index(i, j));
-				clockwise_edges.push_back(edge_points.size());
-				edge_selection.push_back(0);
+				polyhedron->edge_points.push_back(model->get_index(i, j));
+				polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+				polyhedron->edge_selections.push_back(0);
 			}
-			clockwise_edges.back() = loop_first_edges.back();
+			polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
 		}
 	}
 
