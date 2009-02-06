@@ -28,6 +28,9 @@
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -93,19 +96,6 @@ private:
 			point_selection(0),
 			point_weights(0),
 
-			polyhedra(0),
-			first_faces(0),
-			face_counts(0),
-			types(0),
-			face_first_loops(0),
-			face_loop_counts(0),
-			face_selection(0),
-			face_materials(0),
-			loop_first_edges(0),
-			edge_points(0),
-			clockwise_edges(0),
-			edge_selection(0),
-
 			nurbs_patches(0),
 			nurbs_patch_first_points(0),
 			nurbs_patch_u_point_counts(0),
@@ -140,19 +130,8 @@ private:
 		k3d::mesh::points_t* points;
 		k3d::mesh::selection_t* point_selection;
 		k3d::mesh::weights_t* point_weights; // Note: *not* part of the mesh!
-	
-		k3d::mesh::polyhedra_t* polyhedra;	
-		k3d::mesh::indices_t* first_faces;
-		k3d::mesh::counts_t* face_counts;
-		k3d::mesh::polyhedra_t::types_t* types;
-		k3d::mesh::indices_t* face_first_loops;
-		k3d::mesh::counts_t* face_loop_counts;
-		k3d::mesh::selection_t* face_selection;
-		k3d::mesh::materials_t* face_materials;
-		k3d::mesh::indices_t* loop_first_edges;
-		k3d::mesh::indices_t* edge_points;
-		k3d::mesh::indices_t* clockwise_edges;
-		k3d::mesh::selection_t* edge_selection;
+
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron;
 
 		k3d::mesh::nurbs_patches_t* nurbs_patches;
 		k3d::mesh::indices_t* nurbs_patch_first_points;
@@ -200,69 +179,32 @@ private:
 
 		void on_face(const k3d::mesh::indices_t& Points, const k3d::mesh::indices_t& TexturePoints, const k3d::mesh::indices_t& Normals)
 		{
-			if(!polyhedra)
-				polyhedra = &mesh.polyhedra.create();
-
-			if(!first_faces)
+			if(!polyhedron)
 			{
-				first_faces = &polyhedra->first_faces.create();
-				first_faces->push_back(0);
+				polyhedron.reset(k3d::polyhedron::create(mesh));
+				polyhedron->first_faces.push_back(0);
+				polyhedron->face_counts.push_back(0);
+				polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 			}
 
-			if(!face_counts)
-			{
-				face_counts = &polyhedra->face_counts.create();
-				face_counts->push_back(0);
-			}
-
-			if(!types)
-			{
-				types = &polyhedra->types.create();
-				types->push_back(k3d::mesh::polyhedra_t::POLYGONS);
-			}
-
-			if(!face_first_loops)
-				face_first_loops = &polyhedra->face_first_loops.create();
-
-			if(!face_loop_counts)
-				face_loop_counts = &polyhedra->face_loop_counts.create();
-
-			if(!face_selection)
-				face_selection = &polyhedra->face_selection.create();
-
-			if(!face_materials)
-				face_materials = &polyhedra->face_materials.create();
-
-			if(!loop_first_edges)
-				loop_first_edges = &polyhedra->loop_first_edges.create();
-
-			if(!edge_points)
-				edge_points = &polyhedra->edge_points.create();
-
-			if(!clockwise_edges)
-				clockwise_edges = &polyhedra->clockwise_edges.create();
-
-			if(!edge_selection)
-				edge_selection = &polyhedra->edge_selection.create();
-
-			face_first_loops->push_back(loop_first_edges->size());
-			face_loop_counts->push_back(1);
-			face_selection->push_back(0.0);
-			face_materials->push_back(static_cast<k3d::imaterial*>(0));
-			loop_first_edges->push_back(edge_points->size());
+			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+			polyhedron->face_loop_counts.push_back(1);
+			polyhedron->face_selections.push_back(0.0);
+			polyhedron->face_materials.push_back(static_cast<k3d::imaterial*>(0));
+			polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
 
 			const k3d::uint_t point_begin = 0;
 			const k3d::uint_t point_end = point_begin + Points.size();
-			const k3d::uint_t first_edge = edge_points->size();
+			const k3d::uint_t first_edge = polyhedron->edge_points.size();
 			for(k3d::uint_t point = point_begin; point != point_end; ++point)
 			{
-				edge_points->push_back(Points[point]);
-				clockwise_edges->push_back(edge_points->size());
-				edge_selection->push_back(0.0);
+				polyhedron->edge_points.push_back(Points[point]);
+				polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+				polyhedron->edge_selections.push_back(0.0);
 			}
-			clockwise_edges->back() = first_edge;
+			polyhedron->clockwise_edges.back() = first_edge;
 
-			face_counts->back() = face_counts->back() + 1;
+			polyhedron->face_counts.back() = polyhedron->face_counts.back() + 1;
 		}
 
 		void on_curve_surface_type(const k3d::string_t& Type)

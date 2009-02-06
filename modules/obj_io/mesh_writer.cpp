@@ -30,6 +30,9 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_sink.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -81,57 +84,46 @@ public:
 		{
 			const k3d::mesh::points_t& points = *mesh->points;
 			
-			const size_t point_begin = 0;
-			const size_t point_end = point_begin + points.size();
-			for(size_t point = point_begin; point != point_end; ++point)
+			const k3d::uint_t point_begin = 0;
+			const k3d::uint_t point_end = point_begin + points.size();
+			for(k3d::uint_t point = point_begin; point != point_end; ++point)
 				file << "v " << points[point][0] << " " << points[point][1] << " " << points[point][2] << "\n";	
 		}
 
 		// Store polyhedra ...
-		if(k3d::validate_polyhedra(*mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh));
+		if(!polyhedron)
+			return;
+
+		const k3d::uint_t shell_begin = 0;
+		const k3d::uint_t shell_end = shell_begin + polyhedron->first_faces.size();
+		for(k3d::uint_t shell = shell_begin; shell != shell_end; ++shell)
 		{
-			const k3d::mesh::indices_t& first_faces = *mesh->polyhedra->first_faces;
-			const k3d::mesh::counts_t& face_counts = *mesh->polyhedra->face_counts;
-			const k3d::mesh::polyhedra_t::types_t& types = *mesh->polyhedra->types;
-			const k3d::mesh::indices_t& face_first_loops = *mesh->polyhedra->face_first_loops;
-			const k3d::mesh::counts_t& face_loop_counts = *mesh->polyhedra->face_loop_counts;
-//			const k3d::mesh::selection_t& face_selection = *mesh->polyhedra->face_selection.get();
-//			const k3d::mesh::materials_t& face_materials = *mesh->polyhedra->face_materials.get();
-			const k3d::mesh::indices_t& loop_first_edges = *mesh->polyhedra->loop_first_edges;
-			const k3d::mesh::indices_t& edge_points = *mesh->polyhedra->edge_points;
-			const k3d::mesh::indices_t& clockwise_edges = *mesh->polyhedra->clockwise_edges;
-//			const k3d::mesh::selection_t& edge_selection = *mesh->polyhedra->edge_selection.get();
-
-			const size_t polyhedron_begin = 0;
-			const size_t polyhedron_end = polyhedron_begin + first_faces.size();
-			for(size_t polyhedron = polyhedron_begin; polyhedron != polyhedron_end; ++polyhedron)
+			const k3d::uint_t face_begin = polyhedron->first_faces[shell];
+			const k3d::uint_t face_end = face_begin + polyhedron->face_counts[shell];
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				const size_t face_begin = first_faces[polyhedron];
-				const size_t face_end = face_begin + face_counts[polyhedron];
-				for(size_t face = face_begin; face != face_end; ++face)
+				file << "f";
+
+				const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+				const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
+				for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
 				{
-					file << "f";
-
-					const size_t loop_begin = face_first_loops[face];
-					const size_t loop_end = loop_begin + face_loop_counts[face];
-					for(size_t loop = loop_begin; loop != loop_end; ++loop)
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+					for(k3d::uint_t edge = first_edge; ; )
 					{
-						const size_t first_edge = loop_first_edges[loop];
-						for(size_t edge = first_edge; ; )
-						{
-							file << " " << edge_points[edge] + 1; //specs want indices starting with 1
+						file << " " << polyhedron->edge_points[edge] + 1; //specs want indices starting with 1
 
-							edge = clockwise_edges[edge];
-							if(edge == first_edge)
-								break;
-						}
-
-						/** \todo Support faces with holes */
-						break;
+						edge = polyhedron->clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
 					}
 
-					file << "\n";
+					/** \todo Support faces with holes */
+					break;
 				}
+
+				file << "\n";
 			}
 		}
 	}
