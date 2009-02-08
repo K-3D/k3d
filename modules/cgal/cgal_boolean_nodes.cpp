@@ -32,9 +32,9 @@
 #include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/euler_operations.h>
-#include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imulti_mesh_sink.h>
+#include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_operations.h>
@@ -343,12 +343,14 @@ public:
 	{
 		try
 		{
-			do_boolean<exact_nef>(Output);
+			do_boolean<exact_nef>(Output, *this);
 			if(Output.points && k3d::validate_polyhedra(Output))
 			{
+				document().pipeline_profiler().start_execution(*this, "Simplify output");
 				detail::merge_coplanar_faces(Output, m_threshold.pipeline_value());
 				detail::merge_collinear_edges(Output, m_threshold.pipeline_value());
 				k3d::mesh::delete_unused_points(Output);
+				document().pipeline_profiler().finish_execution(*this, "Simplify output");
 			}
 		}
 		catch (std::exception& E)
@@ -388,14 +390,13 @@ private:
 	class boolean_functor
 	{
 	public:
-		boolean_functor(const boolean::boolean_t BooleanType, nef_t& Result) : m_boolean_type(BooleanType), m_result(Result), m_started(false)
+		boolean_functor(const boolean::boolean_t BooleanType, nef_t& Result, k3d::inode& Node) : m_boolean_type(BooleanType), m_result(Result), m_started(false), m_node(Node), m_sequence(1)
 		{
 		}
 		void operator()(k3d::iproperty* const Property)
 		{
 			if(Property->property_type() == typeid(k3d::mesh*))
 			{
-				k3d::timer timer;
 				const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(*Property));
 				return_if_fail(mesh);
 				return_if_fail(k3d::validate_polyhedra(*mesh));
@@ -403,12 +404,17 @@ private:
 				
 				// First triangulate inputs
 				k3d::mesh triangulated_mesh;
-				detail::create_triangles().process(*mesh, k3d::mesh_selection::select_all(), triangulated_mesh);
-				k3d::log() << debug << "CGALBoolean: triangulation: " << timer.elapsed() << std::endl;
 				
-				timer.restart();
+				k3d::string_t boolean_op = k3d::string_cast(m_sequence - 1);
+				k3d::string_t sequence_string = k3d::string_cast(m_sequence++); 
+				
+				m_node.document().pipeline_profiler().start_execution(m_node, "Triangulate input " + sequence_string);
+				detail::create_triangles().process(*mesh, k3d::mesh_selection::select_all(), triangulated_mesh);
+				m_node.document().pipeline_profiler().finish_execution(m_node, "Triangulate input " + sequence_string);
+				
+				m_node.document().pipeline_profiler().start_execution(m_node, "Convert input " + sequence_string + " to Nef");
 				boost::shared_ptr<nef_t> operand = to_nef<nef_t>(triangulated_mesh);
-				k3d::log() << debug << "CGALBoolean: convert to nef: " << timer.elapsed() << std::endl;
+				m_node.document().pipeline_profiler().finish_execution(m_node, "Convert input " + sequence_string + " to Nef");
 				return_if_fail(operand.get());
 				if (!m_started)
 				{
@@ -417,7 +423,7 @@ private:
 				}
 				else
 				{
-					timer.restart();
+					m_node.document().pipeline_profiler().start_execution(m_node, "Execute boolean operation " + boolean_op);
 					switch(m_boolean_type)
 					{
 						case BOOLEAN_INTERSECTION:
@@ -436,7 +442,7 @@ private:
 							m_result -= *operand;
 							break;
 					}
-					k3d::log() << debug << "CGALBoolean: boolean op: " << timer.elapsed() << std::endl;
+					m_node.document().pipeline_profiler().finish_execution(m_node, "Execute boolean operation " + boolean_op);
 				}
 			}
 		}
@@ -444,18 +450,20 @@ private:
 		const boolean::boolean_t m_boolean_type;
 		nef_t& m_result;
 		k3d::bool_t m_started;
+		k3d::inode& m_node;
+		k3d::uint_t m_sequence;
 	};
 	
 	/// Executes a boolean operation, using the given Nef polyhedron type
 	template<typename nef_t>
-	void do_boolean(k3d::mesh& Output)
+	void do_boolean(k3d::mesh& Output, k3d::inode& Node)
 	{
 		Output = k3d::mesh();
 		nef_t result;
 		const boolean_t boolean_type = m_type.pipeline_value();
 		
 		const k3d::iproperty_collection::properties_t properties = k3d::property::user_properties(*static_cast<k3d::iproperty_collection*>(this));
-		boolean_functor<nef_t> functor(boolean_type, result);
+		boolean_functor<nef_t> functor(boolean_type, result, Node);
 		if (boolean_type == BOOLEAN_REVERSE_DIFFERENCE)
 		{
 			std::for_each(properties.rbegin(), properties.rend(), functor);
