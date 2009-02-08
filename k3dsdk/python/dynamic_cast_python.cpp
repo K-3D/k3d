@@ -103,9 +103,9 @@ object do_dynamic_cast(const object& Source, const string_t& Type)
 	if(icommand_node.check())
 		return do_dynamic_cast(icommand_node().wrapped_ptr(), Type);
 
-	extract<idocument_exporter_wrapper> idocument_exporter(Source);
-	if(idocument_exporter.check())
-		return do_dynamic_cast(idocument_exporter().wrapped_ptr(), Type);
+//	extract<idocument_exporter_wrapper> idocument_exporter(Source);
+//	if(idocument_exporter.check())
+//		return do_dynamic_cast(idocument_exporter().wrapped_ptr(), Type);
 
 	extract<idocument_importer_wrapper> idocument_importer(Source);
 	if(idocument_importer.check())

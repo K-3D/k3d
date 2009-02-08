@@ -75,6 +75,17 @@ public:
 		return m_wrapped;
 	}
 	
+	template<typename CastT>
+	CastT& wrapped() const
+	{
+		if(!m_wrapped)
+			throw std::runtime_error("wrapped interface is null");
+		CastT* cast_wrapped = dynamic_cast<CastT*>(m_wrapped);
+		if(!cast_wrapped)
+			throw std::runtime_error("failed to convert wrapped object to requested type");
+		return *cast_wrapped;
+	}
+	
 private:
 	T* m_wrapped;
 };

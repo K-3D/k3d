@@ -23,6 +23,7 @@
 
 #include "idocument_exporter_python.h"
 #include "idocument_python.h"
+#include "iunknown_python.h"
 
 #include <k3dsdk/path.h>
 
@@ -38,18 +39,14 @@ namespace python
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // idocument_exporter
 
-static bool_t write_file(idocument_exporter_wrapper& Self, idocument_wrapper& Document, const filesystem::path& Path)
+static bool_t write_file(iunknown_wrapper& Self, idocument_wrapper& Document, const filesystem::path& Path)
 {
-	return Self.wrapped().write_file(Document.wrapped(), Path);
+	return Self.wrapped<idocument_exporter>().write_file(Document.wrapped(), Path);
 }
 
-void define_class_idocument_exporter()
+void add_functions(idocument_exporter*, boost::python::object& Result, boost::python::object& NewModule)
 {
-	class_<idocument_exporter_wrapper>("idocument_exporter",
-		"Abstract interface for objects that can export a document to a file.", no_init)
-		.def("write_file", &write_file,
-			"Write a document to a file.")
-		;
+	add_function(make_function(write_file), Result, NewModule, "write_file");
 }
 
 } // namespace python
