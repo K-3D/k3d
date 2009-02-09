@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares ipath_property, an abstract interface for discovering information about a property that uses real-world units-of-measure
+		\brief Declares ipath_property, an abstract interface for discovering information about a property that stores filesystem paths
 		\author Tim Shead (tshead@k-3d.com)
 */
 

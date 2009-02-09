@@ -30,14 +30,13 @@
 #include "ipipeline_profiler.h"
 #include "imesh_source.h"
 #include "imesh_storage.h"
-#include "ifile_change_notifier.h"
-#include "iuser_interface.h"
 #include "measurement.h"
 #include "mesh.h"
 #include "mesh_operations.h"
 #include "node.h"
 #include "pointer_demand_storage.h"
 #include "user_interface.h"
+#include "watched_path_property.h"
 
 namespace k3d
 {
@@ -72,17 +71,13 @@ protected:
 	mesh_reader(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Input file path.")) + init_value(filesystem::path()) + init_path_mode(ipath_property::READ) + init_path_type("")),
-		m_watch_file(init_owner(*this) + init_name("watch_file") + init_label(_("Watch File")) + init_description(_("Watch the file for changes")) + init_value(true)),
 		m_center(init_owner(*this) + init_name("center") + init_label(_("Center on Origin")) + init_description(_("Center the output mesh around the origin.")) + init_value(true)),
 		m_scale_to_size(init_owner(*this) + init_name("scale_to_size") + init_label(_("Scale to Size")) + init_description(_("Scale the output mesh to fit within a fixed-size bounding-box.")) + init_value(true)),
 		m_size(init_owner(*this) + init_name("size") + init_label(_("Size")) + init_description(_("Output mesh size when \"Scale to Size\" is enabled.")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(measurement::distance))),
-		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description("Output mesh")),
-		m_file_watch_id(0)
+		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description("Output mesh"))
 	{
 		m_file.changed_signal().connect(hint::converter<
-			hint::convert<hint::any, hint::none> >(sigc::mem_fun(*this, &mesh_reader::on_path_changed)));
-		m_watch_file.changed_signal().connect(hint::converter<
-			hint::convert<hint::any, hint::none> >(sigc::mem_fun(*this, &mesh_reader::on_path_changed)));
+			hint::convert<hint::any, hint::none> >(make_reload_mesh_slot()));
 		m_center.changed_signal().connect(hint::converter<
 			hint::convert<hint::any, hint::none> >(make_reload_mesh_slot()));
 		m_scale_to_size.changed_signal().connect(hint::converter<
@@ -94,9 +89,7 @@ protected:
 	}
 
 	/// Stores the input file path.
-	k3d_data(filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
-	/// Watch the file for changes
-	k3d_data(bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_watch_file;
+	k3d_data(filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, watched_path_property, path_serialization) m_file;
 	/// Center the output mesh on the origin.
 	k3d_data(bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_center;
 	/// Scale the output mesh to fit within a fixed-size bounding-box.
@@ -107,28 +100,6 @@ protected:
 	k3d_data(mesh*, immutable_name, change_signal, no_undo, pointer_demand_storage, no_constraint, read_only_property, no_serialization) m_output_mesh;
 
 private:
-	/// Called whenever the path to the file to load has changed. Unaffected by hints.
-	void on_path_changed(k3d::ihint* Hint)
-	{
-		k3d::user_interface().unwatch_path(m_file_watch_id);
-		
-		const filesystem::path path = m_file.pipeline_value();
-		if(path.empty() || !m_watch_file.pipeline_value())
-		{
-			m_output_mesh.update();
-			return;
-		}
-		
-		m_file_watch_id = k3d::user_interface().watch_path(path, sigc::mem_fun(*this, &mesh_reader::on_file_changed));
-		m_output_mesh.update();
-	}
-	
-	/// Called whenever the file changed on disk
-	void on_file_changed()
-	{
-		m_output_mesh.update();
-	}
-	
 	/// Called whenever the output mesh has been modified and needs to be updated.
 	/// Note that execution is unaffected by the types of hints we've received.
 	void execute(const std::vector<ihint*>& Hints, mesh& Mesh)
@@ -194,9 +165,6 @@ private:
 	/// Implement this in derived classes to read the input file and produce an output mesh.  Note that the
 	/// output mesh will be empty every time this method is called.
 	virtual void on_load_mesh(const filesystem::path& Path, mesh& Output) = 0;
-	
-	// Unique identifier to keep track of the watched file
-	uint_t m_file_watch_id;
 };
 
 } // namespace k3d

@@ -149,6 +149,20 @@ public:
 
 	static mesh_deleted* instance();
 };
+	
+//////////////////////////////////////////////////////////////////////////////
+// file_changed
+
+/// Hint object that indicates a file was changed
+class file_changed :
+	public ihint
+{
+public:
+	ihint* clone();
+	void print(std::ostream& Stream);
+
+	static file_changed* instance();
+};
 
 //////////////////////////////////////////////////////////////////////////////
 // any

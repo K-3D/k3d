@@ -147,6 +147,25 @@ mesh_deleted* mesh_deleted::instance()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// file_changed
+
+ihint* file_changed::clone()
+{
+	return new file_changed(*this);
+}
+
+void file_changed::print(std::ostream& Stream)
+{
+	Stream << "file_changed";
+}
+
+file_changed* file_changed::instance()
+{
+	static file_changed hint;
+	return &hint;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // print
 
 print::print(ihint* Hint) :
