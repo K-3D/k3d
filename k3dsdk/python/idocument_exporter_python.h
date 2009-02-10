@@ -24,17 +24,17 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/idocument_exporter.h>
-
 #include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
 
+class iunknown;
+
 namespace python
 {
 
-void add_functions(idocument_exporter*, boost::python::object& Result, boost::python::object& NewModule);
+void define_methods_idocument_exporter(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 

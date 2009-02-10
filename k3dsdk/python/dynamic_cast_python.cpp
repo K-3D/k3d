@@ -23,7 +23,6 @@
 
 #include "dynamic_cast_python.h"
 #include "icommand_node_python.h"
-#include "idocument_exporter_python.h"
 #include "idocument_importer_python.h"
 #include "idocument_python.h"
 #include "ifile_change_notifier_python.h"
@@ -71,8 +70,6 @@ object do_dynamic_cast(k3d::iunknown* const Source, const string_t& Type)
 {
 	if(Type == "icommand_node")
 		return detail::do_dynamic_cast<k3d::icommand_node>(Source);
-	if(Type == "idocument_exporter")
-		return detail::do_dynamic_cast<k3d::idocument_exporter>(Source);
 	if(Type == "idocument_importer")
 		return detail::do_dynamic_cast<k3d::idocument_importer>(Source);
 	if(Type == "ifile_change_notifier")
@@ -102,10 +99,6 @@ object do_dynamic_cast(const object& Source, const string_t& Type)
 	extract<icommand_node_wrapper> icommand_node(Source);
 	if(icommand_node.check())
 		return do_dynamic_cast(icommand_node().wrapped_ptr(), Type);
-
-//	extract<idocument_exporter_wrapper> idocument_exporter(Source);
-//	if(idocument_exporter.check())
-//		return do_dynamic_cast(idocument_exporter().wrapped_ptr(), Type);
 
 	extract<idocument_importer_wrapper> idocument_importer(Source);
 	if(idocument_importer.check())

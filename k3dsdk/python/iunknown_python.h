@@ -25,11 +25,7 @@
 */
 
 #include "instance_wrapper_python.h"
-
 #include <k3dsdk/iunknown.h>
-#include <k3dsdk/types.h>
-
-#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
@@ -38,16 +34,6 @@ namespace python
 {
 
 typedef instance_wrapper<k3d::iunknown> iunknown_wrapper;
-
-void add_function(boost::python::object Function, boost::python::object& Result, boost::python::object& NewModule, const string_t& Name);
-
-boost::python::object wrap_unknown(iunknown* Unknown);
-
-template<>
-inline boost::python::object wrap(iunknown* Wrapped)
-{
-	return Wrapped ? wrap_unknown(Wrapped) : boost::python::object();
-}
 
 void define_class_iunknown();
 

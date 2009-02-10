@@ -26,6 +26,7 @@
 
 #include <k3dsdk/types.h>
 
+#include <boost/python/import.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/object.hpp>
 
@@ -103,6 +104,12 @@ void copy(const boost::python::list& Source, target_t& Target)
 	Target.resize(count);
 	for(k3d::uint_t i = 0; i != count; ++i)
 		Target[i] = boost::python::extract<typename target_t::value_type>(Source[i]);
+}
+
+/// Adds a method to an existing Python class instance
+inline void add_method(const boost::python::object& Function, const string_t& Name, boost::python::object& Result)
+{
+        setattr(Result, Name, boost::python::import("new").attr("instancemethod")(Function, Result));
 }
 
 } // namespace utility

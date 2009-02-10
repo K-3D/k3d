@@ -25,9 +25,7 @@
 
 #include "idocument_exporter_python.h"
 
-#include <boost/mpl/vector.hpp>
 #include <boost/python.hpp>
-
 using namespace boost::python;
 
 namespace k3d
@@ -36,41 +34,15 @@ namespace k3d
 namespace python
 {
 
-void add_function(object Function, object& Result, object& NewModule, const string_t& Name)
+object wrap(iunknown* Unknown)
 {
-	object method = NewModule.attr("instancemethod")(Function, Result);
-	setattr(Result, Name, method);
+	return Unknown ? wrap(*Unknown) : object();
 }
 
-typedef boost::mpl::vector<idocument_exporter*> interfaces_t;
-
-class function_factory
-{
-public:
-	function_factory(object& Result, object& NewModule, iunknown* Unknown) : m_result(Result), m_new_module(NewModule), m_unknown(Unknown)
-	{}
-	
-	template<typename T>
-	void operator()(T) const
-	{
-		T implemented_interface = dynamic_cast<T>(m_unknown); 
-		if(implemented_interface)
-		{
-			add_functions(implemented_interface, m_result, m_new_module);
-		}
-	}
-	
-private:
-	object& m_result;
-	object& m_new_module;
-	iunknown* m_unknown;
-};
-
-object wrap_unknown(iunknown* Unknown)
+object wrap(iunknown& Unknown)
 {
 	object result = object(iunknown_wrapper(Unknown));
-	object new_module = import("new");
-	boost::mpl::for_each<interfaces_t>(function_factory(result, new_module, Unknown));
+	define_methods_idocument_exporter(Unknown, result);
 	
 	return result;
 }

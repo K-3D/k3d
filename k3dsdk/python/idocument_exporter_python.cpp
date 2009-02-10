@@ -24,7 +24,9 @@
 #include "idocument_exporter_python.h"
 #include "idocument_python.h"
 #include "iunknown_python.h"
+#include "utility_python.h"
 
+#include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/path.h>
 
 #include <boost/python.hpp>
@@ -41,12 +43,15 @@ namespace python
 
 static bool_t write_file(iunknown_wrapper& Self, idocument_wrapper& Document, const filesystem::path& Path)
 {
-	return Self.wrapped<idocument_exporter>().write_file(Document.wrapped(), Path);
+	return dynamic_cast<idocument_exporter&>(Self.wrapped()).write_file(Document.wrapped(), Path);
 }
 
-void add_functions(idocument_exporter*, boost::python::object& Result, boost::python::object& NewModule)
+void define_methods_idocument_exporter(iunknown& Interface, boost::python::object& Instance)
 {
-	add_function(make_function(write_file), Result, NewModule, "write_file");
+	if(!dynamic_cast<idocument_exporter*>(&Interface))
+		return;
+
+	utility::add_method(make_function(write_file), "write_file", Instance);
 }
 
 } // namespace python

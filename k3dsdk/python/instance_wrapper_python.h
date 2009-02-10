@@ -24,6 +24,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/iunknown.h>
+
 #include <boost/python/object.hpp>
 #include <stdexcept>
 
@@ -75,17 +77,6 @@ public:
 		return m_wrapped;
 	}
 	
-	template<typename CastT>
-	CastT& wrapped() const
-	{
-		if(!m_wrapped)
-			throw std::runtime_error("wrapped interface is null");
-		CastT* cast_wrapped = dynamic_cast<CastT*>(m_wrapped);
-		if(!cast_wrapped)
-			throw std::runtime_error("failed to convert wrapped object to requested type");
-		return *cast_wrapped;
-	}
-	
 private:
 	T* m_wrapped;
 };
@@ -101,6 +92,9 @@ boost::python::object wrap(T& Wrapped)
 {
 	return boost::python::object(instance_wrapper<T>(Wrapped));
 }
+
+boost::python::object wrap(k3d::iunknown* Wrapped);
+boost::python::object wrap(k3d::iunknown& Wrapped);
 
 } // namespace python
 
