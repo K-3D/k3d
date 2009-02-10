@@ -1831,7 +1831,7 @@ public:
 	{
 		if (!m_selection_tool->keep_selection())
 		{
-			detail::update_component_selection(selected_nodes(), detail::deselect_all(), true);
+			detail::update_component_selection(selected_nodes(), detail::deselect_all(), false);
 		}
 		else
 		{
