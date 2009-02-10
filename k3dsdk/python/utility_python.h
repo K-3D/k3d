@@ -109,7 +109,7 @@ void copy(const boost::python::list& Source, target_t& Target)
 /// Adds a method to an existing Python class instance
 inline void add_method(const boost::python::object& Function, const string_t& Name, boost::python::object& Result)
 {
-        setattr(Result, Name, boost::python::import("new").attr("instancemethod")(Function, Result));
+	setattr(Result, Name, boost::python::import("types").attr("MethodType")(Function, Result));
 }
 
 } // namespace utility
