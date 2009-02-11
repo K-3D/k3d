@@ -53,9 +53,6 @@ protected:
 	virtual ~iwatched_path_property() {}
 };
 
-std::ostream& operator<<(std::ostream&, const ipath_property::reference_t&);
-std::istream& operator>>(std::istream&, ipath_property::reference_t&);
-
 } // namespace k3d
 
 #endif // !K3DSDK_IWATCHED_PATH_PROPERTY_H
