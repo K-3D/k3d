@@ -3,7 +3,7 @@ SET(K3D_BOOST_FOUND 0)
 ######################################################################
 # Posix specific configuration
 
-IF(UNIX AND NOT APPLE)
+IF(UNIX)
 
 	SET(Boost_ADDITIONAL_VERSIONS 1.37 1.38)
 	FIND_PACKAGE(Boost 1.34.1 COMPONENTS program_options python regex)
@@ -23,48 +23,7 @@ IF(UNIX AND NOT APPLE)
 		${Boost_REGEX_LIBRARY}
 		)
 
-ENDIF(UNIX AND NOT APPLE)
-
-######################################################################
-# Apple specific configuration
-
-IF(UNIX AND APPLE)
-	FIND_PATH(K3D_BOOST_INCLUDE_DIR boost
-		/opt/local/include
-		DOC "Directory where the boost header files are located"
-		)
-	MARK_AS_ADVANCED(K3D_BOOST_INCLUDE_DIR)
-
-	SET(K3D_BOOST_LIB_DIR /opt/local/lib CACHE PATH "Directory where the boost libraries are located")
-	MARK_AS_ADVANCED(K3D_BOOST_LIB_DIR)
-
-	SET(K3D_BOOST_PROGRAM_OPTIONS_LIB boost_program_options CACHE STRING "")
-	MARK_AS_ADVANCED(K3D_BOOST_PROGRAM_OPTIONS_LIB)
-
-	SET(K3D_BOOST_PYTHON_LIB boost_python CACHE STRING "")
-	MARK_AS_ADVANCED(K3D_BOOST_PYTHON_LIB)
-
-	SET(K3D_BOOST_REGEX_LIB boost_regex CACHE STRING "")
-	MARK_AS_ADVANCED(K3D_BOOST_REGEX_LIB)
-
-	SET(K3D_BOOST_INCLUDE_DIRS
-		${K3D_BOOST_INCLUDE_DIR}
-		)
-	SET(K3D_BOOST_LIB_DIRS
-		${K3D_BOOST_LIB_DIR}
-		)
-	SET(K3D_BOOST_PROGRAM_OPTIONS_LIBS
-		${K3D_BOOST_PROGRAM_OPTIONS_LIB}
-		)
-	SET(K3D_BOOST_PYTHON_LIBS
-		${K3D_BOOST_PYTHON_LIB}
-		)
-	SET(K3D_BOOST_REGEX_LIBS
-		${K3D_BOOST_REGEX_LIB}
-		)
-	SET(K3D_BOOST_FOUND 1)
-
-ENDIF(UNIX AND APPLE)
+ENDIF(UNIX)
 
 ######################################################################
 # Win32 specific configuration
