@@ -24,6 +24,7 @@
 #include "iunknown_python.h"
 
 #include "idocument_exporter_python.h"
+#include "idocument_importer_python.h"
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -42,7 +43,9 @@ object wrap(iunknown* Unknown)
 object wrap(iunknown& Unknown)
 {
 	object result = object(iunknown_wrapper(Unknown));
+
 	define_methods_idocument_exporter(Unknown, result);
+	define_methods_idocument_importer(Unknown, result);
 	
 	return result;
 }

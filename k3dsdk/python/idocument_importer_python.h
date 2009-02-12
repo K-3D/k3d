@@ -24,18 +24,17 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "instance_wrapper_python.h"
-#include <k3dsdk/idocument_importer.h>
+#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
-	
+
+class iunknown;
+
 namespace python
 {
 
-typedef instance_wrapper<k3d::idocument_importer> idocument_importer_wrapper;
-
-void define_class_idocument_importer();
+void define_methods_idocument_importer(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 

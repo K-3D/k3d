@@ -23,7 +23,10 @@
 
 #include "idocument_importer_python.h"
 #include "idocument_python.h"
+#include "iunknown_python.h"
+#include "utility_python.h"
 
+#include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/path.h>
 
 #include <boost/python.hpp>
@@ -38,18 +41,17 @@ namespace python
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // idocument_importer
 
-static bool_t read_file(idocument_importer_wrapper& Self, idocument_wrapper& Document, const filesystem::path& Path)
+static bool_t read_file(iunknown_wrapper& Self, idocument_wrapper& Document, const filesystem::path& Path)
 {
-	return Self.wrapped().read_file(Document.wrapped(), Path);
+	return dynamic_cast<idocument_importer&>(Self.wrapped()).read_file(Document.wrapped(), Path);
 }
 
-void define_class_idocument_importer()
+void define_methods_idocument_importer(iunknown& Interface, boost::python::object& Instance)
 {
-	class_<idocument_importer_wrapper>("idocument_importer",
-		"Abstract interface for objects that can import file data into a document.", no_init)
-		.def("read_file", &read_file,
-			"Import a file's contents into a document.")
-		;
+	if(!dynamic_cast<idocument_importer*>(&Interface))
+		return;
+
+	utility::add_method(make_function(read_file), "read_file", Instance);
 }
 
 } // namespace python
