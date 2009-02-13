@@ -22,8 +22,8 @@
 */
 
 #include "idocument_python.h"
-#include "iplugin_factory_python.h"
 #include "iproperty_python.h"
+#include "iunknown_python.h"
 #include "dynamic_cast_python.h"
 #include "node_python.h"
 
@@ -100,10 +100,10 @@ static const object new_node(idocument_wrapper& Self, const object& Type)
 		return object(node(k3d::plugin::create<k3d::iunknown>(*plugin_factory, Self.wrapped(), k3d::unique_name(Self.wrapped().nodes(), plugin_name()))));
 	}
 
-	extract<iplugin_factory_wrapper> plugin_factory(Type);
+	extract<iunknown_wrapper> plugin_factory(Type);
 	if(plugin_factory.check())
 	{
-		return object(node(k3d::plugin::create<k3d::iunknown>(plugin_factory().wrapped(), Self.wrapped())));
+		return object(node(k3d::plugin::create<k3d::iunknown>(dynamic_cast<k3d::iplugin_factory&>(plugin_factory().wrapped()), Self.wrapped())));
 	}
 
 	throw std::invalid_argument("can't create new node from given argument");

@@ -28,6 +28,7 @@
 
 #include <boost/python/import.hpp>
 #include <boost/python/list.hpp>
+#include <boost/python/make_function.hpp>
 #include <boost/python/object.hpp>
 
 #include <stdexcept>
@@ -104,6 +105,15 @@ void copy(const boost::python::list& Source, target_t& Target)
 	Target.resize(count);
 	for(k3d::uint_t i = 0; i != count; ++i)
 		Target[i] = boost::python::extract<typename target_t::value_type>(Source[i]);
+}
+
+/// Creates a function with documentation
+template<typename FunctionT>
+inline boost::python::object make_function(FunctionT Function, const char* const Docstring = "")
+{
+	boost::python::object result = boost::python::make_function(Function);
+	setattr(result, "__doc__", Docstring);
+	return result;
 }
 
 /// Adds a method to an existing Python class instance

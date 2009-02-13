@@ -25,6 +25,9 @@
 
 #include "idocument_exporter_python.h"
 #include "idocument_importer_python.h"
+#include "iplugin_factory_python.h"
+
+#include <k3dsdk/log.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -35,17 +38,18 @@ namespace k3d
 namespace python
 {
 
-object wrap(iunknown* Unknown)
+object wrap_unknown(iunknown* Unknown)
 {
-	return Unknown ? wrap(*Unknown) : object();
+	return Unknown ? wrap_unknown(*Unknown) : object();
 }
 
-object wrap(iunknown& Unknown)
+object wrap_unknown(iunknown& Unknown)
 {
 	object result = object(iunknown_wrapper(Unknown));
 
 	define_methods_idocument_exporter(Unknown, result);
 	define_methods_idocument_importer(Unknown, result);
+	define_methods_iplugin_factory(Unknown, result);
 	
 	return result;
 }

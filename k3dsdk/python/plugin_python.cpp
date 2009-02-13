@@ -17,9 +17,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "iplugin_factory_python.h"
+#include "iunknown_python.h"
 #include "plugin_python.h"
 
+#include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/plugins.h>
 
@@ -40,24 +41,24 @@ public:
 		list python_factories;
 
 		for(k3d::plugin::factory::collection_t::const_iterator factory = Factories.begin(); factory != Factories.end(); ++factory)
-			python_factories.append(wrap(*factory));
+			python_factories.append(wrap_unknown(*factory));
 
 		return python_factories;
 	}
 
 	static object create_by_uuid(const uuid& ID)
 	{
-		return wrap(k3d::plugin::create(ID));
+		return wrap_unknown(k3d::plugin::create(ID));
 	}
 
 	static object create_by_name(const string_t& Type)
 	{
-		return wrap(k3d::plugin::create(Type));
+		return wrap_unknown(k3d::plugin::create(Type));
 	}
 
-	static object create_by_factory(const iplugin_factory_wrapper& Factory)
+	static object create_by_factory(const iunknown_wrapper& Factory)
 	{
-		return wrap(k3d::plugin::create(Factory.wrapped()));
+		return wrap_unknown(k3d::plugin::create(dynamic_cast<k3d::iplugin_factory&>(Factory.wrapped())));
 	}
 
 	class factory
@@ -70,12 +71,12 @@ public:
 
 		static object lookup_by_uuid(const uuid& ID)
 		{
-			return wrap(k3d::plugin::factory::lookup(ID));
+			return wrap_unknown(k3d::plugin::factory::lookup(ID));
 		}
 
 		static object lookup_by_name(const string_t& Name)
 		{
-			return wrap(k3d::plugin::factory::lookup(Name));
+			return wrap_unknown(k3d::plugin::factory::lookup(Name));
 		}
 
 		static list lookup_by_metadata(const string_t& MetadataName, const string_t& MetadataValue)

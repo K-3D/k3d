@@ -93,9 +93,6 @@ boost::python::object wrap(T& Wrapped)
 	return boost::python::object(instance_wrapper<T>(Wrapped));
 }
 
-boost::python::object wrap(k3d::iunknown* Wrapped);
-boost::python::object wrap(k3d::iunknown& Wrapped);
-
 } // namespace python
 
 } // namespace k3d

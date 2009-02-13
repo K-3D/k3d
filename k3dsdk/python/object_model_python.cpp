@@ -52,7 +52,6 @@
 #include "imetadata_python.h"
 #include "inode_python.h"
 #include "inode_selection_python.h"
-#include "iplugin_factory_python.h"
 #include "iproperty_collection_python.h"
 #include "iproperty_python.h"
 #include "isnappable_python.h"
@@ -212,45 +211,32 @@ const double module_length(const object& Value)
 
 void module_log_critical(const string_t& Message)
 {
-	k3d::log() << warning << "k3d.log_critical() is deprecated, use k3d.log.critical() instead." << std::endl;
-	k3d::log() << critical << Message << std::endl;
+	throw std::runtime_error("k3d.log_critical() has been removed, use k3d.log.critical() instead.");
 }
 
 void module_log_debug(const string_t& Message)
 {
-	k3d::log() << warning << "k3d.log_debug() is deprecated, use k3d.log.debug() instead." << std::endl;
-	k3d::log() << debug << Message << std::endl;
+	throw std::runtime_error("k3d.log_debug() has been removed, use k3d.log.debug() instead.");
 }
 
 void module_log_error(const string_t& Message)
 {
-	k3d::log() << warning << "k3d.log_error() is deprecated, use k3d.log.error() instead." << std::endl;
-	k3d::log() << error << Message << std::endl;
+	throw std::runtime_error("k3d.log_error() has been removed, use k3d.log.error() instead.");
 }
 
 void module_log_info(const string_t& Message)
 {
-	k3d::log() << warning << "k3d.log_info() is deprecated, use k3d.log.info() instead." << std::endl;
-	k3d::log() << info << Message << std::endl;
+	throw std::runtime_error("k3d.log_info() has been removed, use k3d.log.info() instead.");
 }
 
 void module_log_warning(const string_t& Message)
 {
-	k3d::log() << warning << "k3d.log_warning() is deprecated, use k3d.log.warning() instead." << std::endl;
-	k3d::log() << warning << Message << std::endl;
+	throw std::runtime_error("k3d.log_warning() has been removed, use k3d.log.warning() instead.");
 }
 
 const list module_plugins()
 {
-	k3d::log() << warning << "k3d.plugins() is deprecated, use k3d.plugin.factory.lookup() instead." << std::endl;
-
-	list plugins;
-
-	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
-	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
-		plugins.append(iplugin_factory_wrapper(*factory));
-
-	return plugins;
+	throw std::runtime_error("k3d.plugins() has been removed, use k3d.plugin.factory.lookup() instead.");
 }
 
 static const k3d::matrix4 rotate3_a(const k3d::python::angle_axis& Value)
@@ -387,7 +373,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_imetadata();
 	define_class_inode();
 	define_class_inode_selection();
-	define_class_iplugin_factory();
 	define_class_iproperty();
 	define_class_iproperty_collection();
 	define_class_isnappable();

@@ -37,6 +37,9 @@ typedef instance_wrapper<k3d::iunknown> iunknown_wrapper;
 
 void define_class_iunknown();
 
+boost::python::object wrap_unknown(k3d::iunknown* Wrapped);
+boost::python::object wrap_unknown(k3d::iunknown& Wrapped);
+
 } // namespace python
 
 } // namespace k3d

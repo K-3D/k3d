@@ -24,18 +24,17 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "instance_wrapper_python.h"
-#include <k3dsdk/iplugin_factory.h>
+#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
 
+class iunknown;
+
 namespace python
 {
 
-typedef instance_wrapper<k3d::iplugin_factory> iplugin_factory_wrapper;
-
-void define_class_iplugin_factory();
+void define_methods_iplugin_factory(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 

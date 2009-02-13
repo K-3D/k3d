@@ -22,9 +22,12 @@
 */
 
 #include "iplugin_factory_python.h"
+#include "iunknown_python.h"
+#include "utility_python.h"
 
 #include <k3dsdk/iapplication_plugin_factory.h>
 #include <k3dsdk/idocument_plugin_factory.h>
+#include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/types.h>
 
@@ -37,45 +40,45 @@ namespace k3d
 namespace python
 {
 
-static const k3d::uuid factory_id(iplugin_factory_wrapper& Self)
+static const k3d::uuid factory_id(iunknown_wrapper& Self)
 {
-	return Self.wrapped().factory_id();
+	return dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).factory_id();
 }
 
-static const string_t name(iplugin_factory_wrapper& Self)
+static const string_t name(iunknown_wrapper& Self)
 {
-	return Self.wrapped().name();
+	return dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).name();
 }
 
-static const string_t short_description(iplugin_factory_wrapper& Self)
+static const string_t short_description(iunknown_wrapper& Self)
 {
-	return Self.wrapped().short_description();
+	return dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).short_description();
 }
 
-static const bool_t is_application_plugin(iplugin_factory_wrapper& Self)
+static const bool_t is_application_plugin(iunknown_wrapper& Self)
 {
 	return dynamic_cast<k3d::iapplication_plugin_factory*>(&Self.wrapped()) ? true : false;
 }
 
-static const bool_t is_document_plugin(iplugin_factory_wrapper& Self)
+static const bool_t is_document_plugin(iunknown_wrapper& Self)
 {
 	return dynamic_cast<k3d::idocument_plugin_factory*>(&Self.wrapped()) ? true : false;
 }
 
-static const list categories(iplugin_factory_wrapper& Self)
+static const list categories(iunknown_wrapper& Self)
 {
 	list results;
 	
-	const k3d::iplugin_factory::categories_t& categories = Self.wrapped().categories();
+	const k3d::iplugin_factory::categories_t& categories = dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).categories();
 	for(k3d::iplugin_factory::categories_t::const_iterator category = categories.begin(); category != categories.end(); ++category)
 		results.append(*category);
 
 	return results;
 }
 
-static const string_t quality(iplugin_factory_wrapper& Self)
+static const string_t quality(iunknown_wrapper& Self)
 {
-	switch(Self.wrapped().quality())
+	switch(dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).quality())
 	{
 		case k3d::iplugin_factory::STABLE:
 			return "stable";
@@ -89,37 +92,30 @@ static const string_t quality(iplugin_factory_wrapper& Self)
 	return "unknown";
 }
 
-static boost::python::dict metadata(iplugin_factory_wrapper& Self)
+static boost::python::dict metadata(iunknown_wrapper& Self)
 {
 	boost::python::dict result;
 
-	const iplugin_factory::metadata_t metadata = Self.wrapped().metadata();
+	const iplugin_factory::metadata_t metadata = dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).metadata();
 	for(iplugin_factory::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
 		result[pair->first] = pair->second;
 
 	return result;
 }
 
-void define_class_iplugin_factory()
+void define_methods_iplugin_factory(iunknown& Interface, boost::python::object& Instance)
 {
-	class_<iplugin_factory_wrapper>("iplugin_factory",
-		"Encapsulates a K-3D plugin factory, which stores metadata describing a plugin type.")
-		.def("factory_id", &factory_id,
-			"Returns a universally-unique identifier for this factory.")
-		.def("name", &name,
-			"Returns the human-readable plugin name, which is displayed in the user interface and can be used to instantiate plugins.")
-		.def("short_description", &short_description,
-			"Returns a short human-readable description of the plugin's purpose.")
-		.def("is_application_plugin", &is_application_plugin,
-			"Returns true if the plugin is an application plugin.")
-		.def("is_document_plugin", &is_document_plugin,
-			"Returns true if the plugin is a document plugin.")
-		.def("categories", &categories,
-			"Returns an arbitrary collection of human-readable categories used to organize the list of plugins in the user interface.")
-		.def("quality", &quality,
-			"Returns the string \"stable\", \"experimental\", or \"deprecated\".")
-		.def("metadata", &metadata,
-			"Returns plugin metadata as a dict containing name-value pairs.");
+	if(!dynamic_cast<iplugin_factory*>(&Interface))
+		return;
+
+	utility::add_method(utility::make_function(&factory_id, "Returns a universally-unique identifier for this factory."), "factory_id", Instance);
+	utility::add_method(utility::make_function(&name, "Returns the human-readable plugin name, which is displayed in the user interface and can be used to instantiate plugins."), "name", Instance);
+	utility::add_method(utility::make_function(&short_description, "Returns a short human-readable description of the plugin's purpose."), "short_description", Instance);
+	utility::add_method(utility::make_function(&is_application_plugin, "Returns true if the plugin is an application plugin."), "is_application_function", Instance);
+	utility::add_method(utility::make_function(&is_document_plugin, "Returns true if the plugin is a document plugin."), "is_document_plugin", Instance);
+	utility::add_method(utility::make_function(&categories, "Returns an arbitrary collection of human-readable categories used to organize the list of plugins in the user interface."), "categories", Instance);
+	utility::add_method(utility::make_function(&quality, "Returns the string \"stable\", \"experimental\", or \"deprecated\"."), "quality", Instance);
+	utility::add_method(utility::make_function(&metadata, "Returns plugin metadata as a dict containing name-value pairs."), "metadata", Instance);
 }
 
 } // namespace python
