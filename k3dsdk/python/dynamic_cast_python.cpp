@@ -23,7 +23,6 @@
 
 #include "dynamic_cast_python.h"
 #include "idocument_python.h"
-#include "ifile_change_notifier_python.h"
 #include "imaterial_python.h"
 #include "imesh_storage_python.h"
 #include "imetadata_python.h"
@@ -65,8 +64,6 @@ object do_dynamic_cast(k3d::iunknown* Unknown)
 	
 object do_dynamic_cast(k3d::iunknown* const Source, const string_t& Type)
 {
-	if(Type == "ifile_change_notifier")
-		return detail::do_dynamic_cast<k3d::ifile_change_notifier>(Source);
 	if(Type == "imaterial")
 		return detail::do_dynamic_cast<k3d::imaterial>(Source);
 	if(Type == "imesh_storage")
@@ -92,10 +89,6 @@ object do_dynamic_cast(const object& Source, const string_t& Type)
 	extract<idocument_wrapper> idocument(Source);
 	if(idocument.check())
 		return do_dynamic_cast(idocument().wrapped_ptr(), Type);
-
-	extract<ifile_change_notifier_wrapper> ifile_change_notifier(Source);
-	if(ifile_change_notifier.check())
-		return do_dynamic_cast(ifile_change_notifier().wrapped_ptr(), Type);
 
 	extract<imaterial_wrapper> imaterial(Source);
 	if(imaterial.check())

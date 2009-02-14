@@ -139,13 +139,7 @@ const list module_command_nodes()
 
 object module_create_plugin(const string_t& Type)
 {
-	k3d::log() << warning << "k3d.create_plugin() is deprecated, use k3d.plugin.create() instead." << std::endl;
-
-	k3d::iplugin_factory* const plugin_factory = k3d::plugin::factory::lookup(Type);
-	if(!plugin_factory)
-		throw std::invalid_argument("unknown plugin type: " + Type);
-
-	return wrap(k3d::plugin::create(*plugin_factory));
+	throw std::runtime_error("k3d.create_plugin() has been removed, use k3d.plugin.create() instead.");
 }
 
 void module_check_node_environment(const dict& Locals, const string_t& PluginType)
@@ -363,8 +357,8 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_const_bitmap();
 	define_class_const_named_arrays();
 	define_class_const_named_attribute_arrays();
+	define_class_file_change_receiver();
 	define_class_idocument();
-	define_class_ifile_change_notifier();
 	define_class_imaterial();
 	define_class_imesh_storage();
 	define_class_imetadata();

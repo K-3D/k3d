@@ -4,7 +4,7 @@ import k3d
 import testing
 
 receiver = k3d.file_change_receiver()
-notifier = k3d.dynamic_cast(k3d.plugin.create("InotifyFileChangeNotifier"), "ifile_change_notifier")
+notifier = k3d.plugin.create("InotifyFileChangeNotifier")
 
 path = k3d.generic_path(testing.binary_path() + "/" + "notifier.InotifyFileChangeNotifier.test")
 

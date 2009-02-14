@@ -24,6 +24,7 @@
 #include "icommand_node_python.h"
 #include "idocument_exporter_python.h"
 #include "idocument_importer_python.h"
+#include "ifile_change_notifier_python.h"
 #include "iplugin_factory_python.h"
 #include "iproperty_python.h"
 #include "iunknown_python.h"
@@ -49,6 +50,7 @@ object wrap_unknown(iunknown& Unknown)
 	define_methods_icommand_node(Unknown, result);
 	define_methods_idocument_exporter(Unknown, result);
 	define_methods_idocument_importer(Unknown, result);
+	define_methods_ifile_change_notifier(Unknown, result);
 	define_methods_iplugin_factory(Unknown, result);
 	define_methods_iproperty(Unknown, result);
 	

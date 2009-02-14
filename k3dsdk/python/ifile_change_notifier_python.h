@@ -25,18 +25,18 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "instance_wrapper_python.h"
-#include <k3dsdk/ifile_change_notifier.h>
+#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
-	
+
+class iunknown;
+
 namespace python
 {
 
-typedef instance_wrapper<k3d::ifile_change_notifier> ifile_change_notifier_wrapper;
-
-void define_class_ifile_change_notifier();
+void define_class_file_change_receiver();
+void define_methods_ifile_change_notifier(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 

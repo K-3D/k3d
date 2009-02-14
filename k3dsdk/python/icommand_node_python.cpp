@@ -84,7 +84,7 @@ static void execute_command(iunknown_wrapper& Self, const string_t& Command, con
 
 void define_methods_icommand_node(k3d::iunknown& Interface, boost::python::object& Instance)
 {
-	if(!dynamic_cast<icommand_node*>(&Interface))
+	if(!dynamic_cast<k3d::icommand_node*>(&Interface))
 		return;
 
 	utility::add_method(utility::make_function(&name, "Returns the name of this command node as a string."), "command_node_name", Instance);

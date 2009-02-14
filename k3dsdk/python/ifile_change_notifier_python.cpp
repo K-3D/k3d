@@ -21,12 +21,12 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "any_python.h"
 #include "ifile_change_notifier_python.h"
-#include "node_python.h"
+#include "iunknown_python.h"
+#include "utility_python.h"
 
+#include <k3dsdk/ifile_change_notifier.h>
 #include <k3dsdk/path.h>
-#include <k3dsdk/result.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -68,48 +68,33 @@ private:
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // ifile_change_notifier
 
-static uint_t watch_file(ifile_change_notifier_wrapper& Self, const filesystem::path& Path, file_change_receiver& Receiver)
+static uint_t watch_file(iunknown_wrapper& Self, const filesystem::path& Path, file_change_receiver& Receiver)
 {
-	return Self.wrapped().watch_file(Path, sigc::bind(sigc::mem_fun(Receiver, &file_change_receiver::file_changed), Path));
+	return dynamic_cast<ifile_change_notifier&>(Self.wrapped()).watch_file(Path, sigc::bind(sigc::mem_fun(Receiver, &file_change_receiver::file_changed), Path));
 }
 
-static void unwatch_file(ifile_change_notifier_wrapper& Self, const uint_t WatchID)
+static void unwatch_file(iunknown_wrapper& Self, const uint_t WatchID)
 {
-	return Self.wrapped().unwatch_file(WatchID);
+	dynamic_cast<ifile_change_notifier&>(Self.wrapped()).unwatch_file(WatchID);
 }
 
-static void wait_for_changes(ifile_change_notifier_wrapper& Self)
+static void wait_for_changes(iunknown_wrapper& Self)
 {
-	Self.wrapped().wait_for_changes();
+	dynamic_cast<ifile_change_notifier&>(Self.wrapped()).wait_for_changes();
 }
 
-static uint_t change_count(ifile_change_notifier_wrapper& Self)
+static uint_t change_count(iunknown_wrapper& Self)
 {
-	return Self.wrapped().change_count();
+	return dynamic_cast<ifile_change_notifier&>(Self.wrapped()).change_count();
 }
 
-static void signal_change(ifile_change_notifier_wrapper& Self)
+static void signal_change(iunknown_wrapper& Self)
 {
-	Self.wrapped().signal_change();
+	dynamic_cast<ifile_change_notifier&>(Self.wrapped()).signal_change();
 }
 
-void define_class_ifile_change_notifier()
+void define_class_file_change_receiver()
 {
-	class_<ifile_change_notifier_wrapper>("ifile_change_notifier",
-		"Abstract interface for objects that can notify when a file has been created / changed / deleted.", no_init)
-		.def("watch_file", &watch_file,
-			"Watch a file for changes.\n\n"
-			"@rtype: integer watch identifier\n")
-		.def("unwatch_file", &unwatch_file,
-			"Stops watching a file for changes.")
-		.def("wait_for_changes", &wait_for_changes,
-			"Blocks indefinitely until at least one file change has been received.")
-		.def("change_count", &change_count,
-			"Returns the number of file changes that are pending, ready to be signalled.  This method never blocks.")
-		.def("signal_change", &signal_change,
-			"Signals the next file change that is pending, if any.  This method never blocks.")
-		;
-
 	class_<file_change_receiver>("file_change_receiver",
 		"Helper class that caches file-change notifications for later retrieval.")
 		.def("changed", &file_change_receiver::changed,
@@ -117,6 +102,18 @@ void define_class_ifile_change_notifier()
 		.def("clear", &file_change_receiver::clear,
 			"Clears the list of files that have changed.")
 		;
+}
+
+void define_methods_ifile_change_notifier(k3d::iunknown& Interface, boost::python::object& Instance)
+{
+	if(!dynamic_cast<ifile_change_notifier*>(&Interface))
+		return;
+
+	utility::add_method(utility::make_function(&watch_file, "Watch a file for changes.\n\n" "@rtype: integer watch identifier\n"), "watch_file", Instance);
+	utility::add_method(utility::make_function(&unwatch_file, "Stops watching a file for changes."), "unwatch_file", Instance);
+	utility::add_method(utility::make_function(&wait_for_changes, "Blocks indefinitely until at least one file change has been received."), "wait_for_changes", Instance);
+	utility::add_method(utility::make_function(&change_count, "Returns the number of file changes that are pending, ready to be signalled.  This method never blocks."), "change_count", Instance);
+	utility::add_method(utility::make_function(&signal_change, "Signals the next file change that is pending, if any.  This method never blocks."), "signal_change", Instance);
 }
 
 } // namespace python
