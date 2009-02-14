@@ -21,6 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "icommand_node_python.h"
 #include "idocument_exporter_python.h"
 #include "idocument_importer_python.h"
 #include "iplugin_factory_python.h"
@@ -45,6 +46,7 @@ object wrap_unknown(iunknown& Unknown)
 {
 	object result = object(iunknown_wrapper(Unknown));
 
+	define_methods_icommand_node(Unknown, result);
 	define_methods_idocument_exporter(Unknown, result);
 	define_methods_idocument_importer(Unknown, result);
 	define_methods_iplugin_factory(Unknown, result);

@@ -44,7 +44,6 @@
 #include "euler_angles_python.h"
 #include "euler_python.h"
 #include "hyperboloid_python.h"
-#include "icommand_node_python.h"
 #include "idocument_python.h"
 #include "ifile_change_notifier_python.h"
 #include "imaterial_python.h"
@@ -133,7 +132,7 @@ const list module_command_nodes()
 
 	k3d::icommand_tree::nodes_t children = k3d::command_tree().children(0);
 	for(k3d::icommand_tree::nodes_t::iterator child = children.begin(); child != children.end(); ++child)
-		nodes.append(wrap(*child));
+		nodes.append(wrap_unknown(*child));
 
 	return nodes;
 }
@@ -364,7 +363,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_const_bitmap();
 	define_class_const_named_arrays();
 	define_class_const_named_attribute_arrays();
-	define_class_icommand_node();
 	define_class_idocument();
 	define_class_ifile_change_notifier();
 	define_class_imaterial();

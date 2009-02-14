@@ -24,18 +24,17 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "instance_wrapper_python.h"
-#include <k3dsdk/icommand_node.h>
+#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
-	
+
+class iunknown;
+
 namespace python
 {
 
-typedef instance_wrapper<k3d::icommand_node> icommand_node_wrapper;
-
-void define_class_icommand_node();
+void define_methods_icommand_node(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 
