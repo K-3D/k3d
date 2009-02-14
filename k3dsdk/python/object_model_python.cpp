@@ -54,7 +54,6 @@
 #include "iproperty_collection_python.h"
 #include "isnappable_python.h"
 #include "iunknown_python.h"
-#include "iuser_interface_python.h"
 #include "linear_curve_python.h"
 #include "log_python.h"
 #include "matrix4_python.h"
@@ -263,7 +262,7 @@ static const k3d::matrix4 translate3_b(const double_t X, const double_t Y, const
 
 object module_ui()
 {
-	return wrap(k3d::user_interface());
+	return wrap_unknown(k3d::user_interface());
 }
 
 void module_exit()
@@ -367,7 +366,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_iproperty_collection();
 	define_class_isnappable();
 	define_class_iunknown();
-	define_class_iuser_interface();
 	define_class_matrix4();
 	define_class_mesh();
 	define_class_mesh_selection();
@@ -478,7 +476,7 @@ BOOST_PYTHON_MODULE(k3d)
 	def("translate3", translate3_b,
 		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
 	def("ui", module_ui,
-		"Returns the singleton runtime L{iuser_interface} plugin instance.");
+		"Returns the singleton runtime user interface plugin instance.");
 
 	scope().attr("__doc__") = "Provides access to the K-3D API";
 }

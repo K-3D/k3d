@@ -28,6 +28,7 @@
 #include "iplugin_factory_python.h"
 #include "iproperty_python.h"
 #include "iunknown_python.h"
+#include "iuser_interface_python.h"
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -53,6 +54,7 @@ object wrap_unknown(iunknown& Unknown)
 	define_methods_ifile_change_notifier(Unknown, result);
 	define_methods_iplugin_factory(Unknown, result);
 	define_methods_iproperty(Unknown, result);
+	define_methods_iuser_interface(Unknown, result);
 	
 	return result;
 }

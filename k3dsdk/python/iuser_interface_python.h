@@ -24,18 +24,17 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "instance_wrapper_python.h"
-#include <k3dsdk/iuser_interface.h>
+#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
 
+class iunknown;
+
 namespace python
 {
 
-typedef instance_wrapper<k3d::iuser_interface> iuser_instance_wrapper;
-
-void define_class_iuser_interface();
+void define_methods_iuser_interface(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 
