@@ -21,13 +21,11 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "iunknown_python.h"
-
 #include "idocument_exporter_python.h"
 #include "idocument_importer_python.h"
 #include "iplugin_factory_python.h"
-
-#include <k3dsdk/log.h>
+#include "iproperty_python.h"
+#include "iunknown_python.h"
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -50,6 +48,7 @@ object wrap_unknown(iunknown& Unknown)
 	define_methods_idocument_exporter(Unknown, result);
 	define_methods_idocument_importer(Unknown, result);
 	define_methods_iplugin_factory(Unknown, result);
+	define_methods_iproperty(Unknown, result);
 	
 	return result;
 }

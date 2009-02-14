@@ -23,7 +23,9 @@
 
 #include "any_python.h"
 #include "iproperty_python.h"
+#include "iunknown_python.h"
 #include "node_python.h"
+#include "utility_python.h"
 
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
@@ -43,63 +45,63 @@ namespace k3d
 namespace python
 {
 
-const string_t name(iproperty_wrapper& Self)
+static const string_t name(iunknown_wrapper& Self)
 {
-	return Self.wrapped().property_name();
+	return dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_name();
 }
 
-const string_t label(iproperty_wrapper& Self)
+static const string_t label(iunknown_wrapper& Self)
 {
-	return Self.wrapped().property_label();
+	return dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_label();
 }
 
-const string_t description(iproperty_wrapper& Self)
+static const string_t description(iunknown_wrapper& Self)
 {
-	return Self.wrapped().property_description();
+	return dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_description();
 }
 
-const string_t type(iproperty_wrapper& Self)
+static const string_t type(iunknown_wrapper& Self)
 {
-	return k3d::type_string(Self.wrapped().property_type());
+	return k3d::type_string(dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_type());
 }
 
-object internal_value(iproperty_wrapper& Self)
+static object internal_value(iunknown_wrapper& Self)
 {
-	return any_to_python(k3d::property::internal_value(Self.wrapped()));
+	return any_to_python(k3d::property::internal_value(dynamic_cast<k3d::iproperty&>(Self.wrapped())));
 }
 
-object pipeline_value(iproperty_wrapper& Self)
+static object pipeline_value(iunknown_wrapper& Self)
 {
-	return any_to_python(k3d::property::pipeline_value(Self.wrapped()));
+	return any_to_python(k3d::property::pipeline_value(dynamic_cast<k3d::iproperty&>(Self.wrapped())));
 }
 
-object node(iproperty_wrapper& Self)
+static object node(iunknown_wrapper& Self)
 {
-	return any_to_python(Self.wrapped().property_node());
+	return any_to_python(dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_node());
 }
 
-const bool is_writable(iproperty_wrapper& Self)
+static const bool is_writable(iunknown_wrapper& Self)
 {
 	return dynamic_cast<k3d::iwritable_property*>(Self.wrapped_ptr()) ? true : false;
 }
 
-void set_value(iproperty_wrapper& Self, const boost::python::object& Value)
+static void set_value(iunknown_wrapper& Self, const boost::python::object& Value)
 {
 	if(k3d::iwritable_property* const writable = dynamic_cast<k3d::iwritable_property*>(Self.wrapped_ptr()))
 	{
-		writable->property_set_value(python_to_any(Value, Self.wrapped_ptr()->property_type()));
+		writable->property_set_value(python_to_any(Value, dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_type()));
 		return;
 	}
 
-	throw std::runtime_error("property " + Self.wrapped().property_name() + " is a read-only property");
+	throw std::runtime_error("property " + dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_name() + " is a read-only property");
 }
 
-const bool is_enumeration(iproperty_wrapper& Self)
+static const bool is_enumeration(iunknown_wrapper& Self)
 {
 	return dynamic_cast<k3d::ienumeration_property*>(Self.wrapped_ptr()) ? true : false;
 }
 
-list enumeration_values(iproperty_wrapper& Self)
+static list enumeration_values(iunknown_wrapper& Self)
 {
 	list results;
 	if(k3d::ienumeration_property* const enumeration = dynamic_cast<k3d::ienumeration_property*>(Self.wrapped_ptr()))
@@ -112,7 +114,7 @@ list enumeration_values(iproperty_wrapper& Self)
 	return results;
 }
 
-const string_t units(iproperty_wrapper& Self)
+static const string_t units(iunknown_wrapper& Self)
 {
 	if(k3d::imeasurement_property* const measurement = dynamic_cast<k3d::imeasurement_property*>(Self.wrapped_ptr()))
 	{
@@ -151,35 +153,23 @@ const string_t units(iproperty_wrapper& Self)
 	return "";
 }
 
-void define_class_iproperty()
+void define_methods_iproperty(iunknown& Interface, boost::python::object& Instance)
 {
-	class_<iproperty_wrapper>("iproperty",
-		"Encapsulates a K-3D property. In K-3D, a document contains nodes, and nodes contain properties, "
-		"which are the external representations of a node's internal state.", no_init)
-		.def("name", &name,
-			"Unique identifier, used for serialization and scripting.")
-		.def("label", &label,
-			"Localized, human-readable text that labels the property in the user interface.")
-		.def("description", &description,
-			"Localized, human-readable description of the property.")
-		.def("type", &type,
-			"Returns the type of data the property stores as a string.")
-		.def("internal_value", &internal_value,
-			"Returns the value stored by the property.")
-		.def("pipeline_value", &pipeline_value,
-			"Returns the property's 'pipeline' value, which will differ from its internal value if it's connected to another property by the Visualization Pipeline.")
-		.def("node", &node,
-			"Returns the node (if any) that owns the property, or None.")
-		.def("is_writable", &is_writable,
-			"Returns true if the property's internal value can be modified.")
-		.def("set_value", &set_value,
-			"Sets the property's internal value.")
-		.def("is_enumeration", &is_enumeration,
-			"Returns true if the property datatype is an enumeration.")
-		.def("enumeration_values", &enumeration_values,
-			"Returns a list containing the set of allowable property values, if the property is an enumeration.")
-		.def("units", &units,
-			"Returns a string describing the real-world unit-of-measure stored by the property, if any.");
+	if(!dynamic_cast<iproperty*>(&Interface))
+		return;
+
+	utility::add_method(utility::make_function(&name, "Unique identifier, used for serialization and scripting."), "name", Instance);
+	utility::add_method(utility::make_function(&label, "Localized, human-readable text that labels the property in the user interface."), "label", Instance);
+	utility::add_method(utility::make_function(&description, "Localized, human-readable description of the property."), "description", Instance);
+	utility::add_method(utility::make_function(&type, "Returns the type of data the property stores as a string."), "type", Instance);
+	utility::add_method(utility::make_function(&internal_value, "Returns the value stored by the property."), "internal_value", Instance);
+	utility::add_method(utility::make_function(&pipeline_value, "Returns the property's 'pipeline' value, which will differ from its internal value if it's connected to another property by the Visualization Pipeline."), "pipeline_value", Instance);
+	utility::add_method(utility::make_function(&node, "Returns the node (if any) that owns the property, or None."), "node", Instance);
+	utility::add_method(utility::make_function(&is_writable, "Returns true if the property's internal value can be modified."), "is_writable", Instance);
+	utility::add_method(utility::make_function(&set_value, "Sets the property's internal value."), "set_value", Instance);
+	utility::add_method(utility::make_function(&is_enumeration, "Returns true if the property datatype is an enumeration."), "is_enumeration", Instance);
+	utility::add_method(utility::make_function(&enumeration_values, "Returns a list containing the set of allowable property values, if the property is an enumeration."), "enumeration_value", Instance);
+	utility::add_method(utility::make_function(&units, "Returns a string describing the real-world unit-of-measure stored by the property, if any."), "units", Instance);
 }
 
 } // namespace python

@@ -30,7 +30,6 @@
 #include "imetadata_python.h"
 #include "inode_python.h"
 #include "inode_selection_python.h"
-#include "iproperty_python.h"
 #include "iproperty_collection_python.h"
 #include "isnappable_python.h"
 #include "iunknown_python.h"
@@ -124,10 +123,6 @@ object do_dynamic_cast(const object& Source, const string_t& Type)
 	extract<inode_selection_wrapper> inode_selection(Source);
 	if(inode_selection.check())
 		return do_dynamic_cast(inode_selection().wrapped_ptr(), Type);
-
-	extract<iproperty_wrapper> iproperty(Source);
-	if(iproperty.check())
-		return do_dynamic_cast(iproperty().wrapped_ptr(), Type);
 
 	extract<iproperty_collection_wrapper> iproperty_collection(Source);
 	if(iproperty_collection.check())

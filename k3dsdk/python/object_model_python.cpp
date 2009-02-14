@@ -53,7 +53,6 @@
 #include "inode_python.h"
 #include "inode_selection_python.h"
 #include "iproperty_collection_python.h"
-#include "iproperty_python.h"
 #include "isnappable_python.h"
 #include "iunknown_python.h"
 #include "iuser_interface_python.h"
@@ -373,7 +372,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_imetadata();
 	define_class_inode();
 	define_class_inode_selection();
-	define_class_iproperty();
 	define_class_iproperty_collection();
 	define_class_isnappable();
 	define_class_iunknown();

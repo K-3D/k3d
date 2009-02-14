@@ -143,23 +143,28 @@ static void delete_node(idocument_wrapper& Self, object& Node)
 	k3d::delete_nodes(Self.wrapped(), k3d::make_collection<k3d::nodes_t>(node().inode_wrapper::wrapped_ptr()));
 }
 
-static object get_dependency(idocument_wrapper& Self, iproperty_wrapper& Property)
+static object get_dependency(idocument_wrapper& Self, iunknown_wrapper& Property)
 {
-	k3d::iproperty* const property = Property.wrapped_ptr();
-	if(!property)
-		throw std::invalid_argument("property cannot be null");
+	if(!dynamic_cast<k3d::iproperty*>(Property.wrapped_ptr()))
+		throw std::invalid_argument("not a property");
 
-	return wrap(Self.wrapped().pipeline().dependency(*property));
+	return wrap_unknown(Self.wrapped().pipeline().dependency(dynamic_cast<k3d::iproperty&>(Property.wrapped())));
 }
 
-static void set_dependency(idocument_wrapper& Self, iproperty_wrapper& From, boost::python::object& To)
+static void set_dependency(idocument_wrapper& Self, iunknown_wrapper& From, boost::python::object& To)
 {
+	k3d::iproperty* const from = dynamic_cast<k3d::iproperty*>(From.wrapped_ptr());
+	if(!from)
+		throw std::invalid_argument("first argument must be a valid property object");
+
 	k3d::iproperty* to = 0;
 
-	extract<iproperty_wrapper> iproperty_value(To);
-	if(iproperty_value.check())
+	extract<iunknown_wrapper> to_value(To);
+	if(to_value.check())
 	{
-		to = iproperty_value().wrapped_ptr();
+		to = dynamic_cast<k3d::iproperty*>(to_value().wrapped_ptr());
+		if(!to)
+			throw std::invalid_argument("second argument must be a valid property instance or None");
 	}
 	else if(To.ptr() == boost::python::object().ptr())
 	{
@@ -167,12 +172,8 @@ static void set_dependency(idocument_wrapper& Self, iproperty_wrapper& From, boo
 	}
 	else
 	{
-		throw std::invalid_argument("to property must be an iproperty instance or None");
+		throw std::invalid_argument("second argument must be a valid property instance or None");
 	}
-
-	k3d::iproperty* const from = From.wrapped_ptr();
-	if(!from)
-		throw std::invalid_argument("from property cannot be null");
 
 	if(from && to && from->property_type() != to->property_type())
 		throw std::invalid_argument("property types do not match");

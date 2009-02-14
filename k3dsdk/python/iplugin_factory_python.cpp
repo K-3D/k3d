@@ -111,7 +111,7 @@ void define_methods_iplugin_factory(iunknown& Interface, boost::python::object& 
 	utility::add_method(utility::make_function(&factory_id, "Returns a universally-unique identifier for this factory."), "factory_id", Instance);
 	utility::add_method(utility::make_function(&name, "Returns the human-readable plugin name, which is displayed in the user interface and can be used to instantiate plugins."), "name", Instance);
 	utility::add_method(utility::make_function(&short_description, "Returns a short human-readable description of the plugin's purpose."), "short_description", Instance);
-	utility::add_method(utility::make_function(&is_application_plugin, "Returns true if the plugin is an application plugin."), "is_application_function", Instance);
+	utility::add_method(utility::make_function(&is_application_plugin, "Returns true if the plugin is an application plugin."), "is_application_plugin", Instance);
 	utility::add_method(utility::make_function(&is_document_plugin, "Returns true if the plugin is a document plugin."), "is_document_plugin", Instance);
 	utility::add_method(utility::make_function(&categories, "Returns an arbitrary collection of human-readable categories used to organize the list of plugins in the user interface."), "categories", Instance);
 	utility::add_method(utility::make_function(&quality, "Returns the string \"stable\", \"experimental\", or \"deprecated\"."), "quality", Instance);

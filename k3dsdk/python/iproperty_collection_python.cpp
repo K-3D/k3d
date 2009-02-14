@@ -23,7 +23,7 @@
 
 #include "any_python.h"
 #include "iproperty_collection_python.h"
-#include "iproperty_python.h"
+#include "iunknown_python.h"
 
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
@@ -47,13 +47,13 @@ static list properties(iproperty_collection_wrapper& Self)
 	list results;
 	const k3d::iproperty_collection::properties_t& properties = Self.wrapped().properties();
 	for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-		results.append(iproperty_wrapper(*property));
+		results.append(wrap_unknown(*property));
 	return results;
 }
 
 static object get_property(iproperty_collection_wrapper& Self, const string_t& Name)
 {
-	return wrap(k3d::property::get(Self.wrapped(), Name));
+	return wrap_unknown(k3d::property::get(Self.wrapped(), Name));
 }
 
 static object create_property(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& Name, const string_t& Label, const string_t& Description)
@@ -66,7 +66,7 @@ static object create_property(iproperty_collection_wrapper& Self, const string_t
 	if(!result)
 		throw std::invalid_argument("unknown user property type: " + Type);
 
-	return wrap(result);
+	return wrap_unknown(result);
 }
 
 static object create_renderman_attribute(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& AttributeName, const string_t& Name, const string_t& Label, const string_t& Description)
@@ -79,7 +79,7 @@ static object create_renderman_attribute(iproperty_collection_wrapper& Self, con
 	if(!result)
 		throw std::invalid_argument("unknown attribute type: " + Type);
 
-	return wrap(result);
+	return wrap_unknown(result);
 }
 
 static object create_renderman_option(iproperty_collection_wrapper& Self, const string_t& Type, const string_t& OptionName, const string_t& Name, const string_t& Label, const string_t& Description)
@@ -92,14 +92,12 @@ static object create_renderman_option(iproperty_collection_wrapper& Self, const 
 	if(!result)
 		throw std::invalid_argument("unknown option type: " + Type);
 
-	return wrap(result);
+	return wrap_unknown(result);
 }
 
 static bool has_property(iproperty_collection_wrapper& Self, const string_t& Name)
 {
-	if (k3d::property::get(Self.wrapped(), Name))
-		return true;
-	return false;
+	return k3d::property::get(Self.wrapped(), Name) ? true : false;
 }
 
 static object getattr(iproperty_collection_wrapper& Self, const string_t& Name)
