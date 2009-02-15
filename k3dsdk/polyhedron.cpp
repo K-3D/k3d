@@ -389,6 +389,30 @@ const_primitive* validate(const mesh& Mesh)
 		Mesh.polyhedra->face_varying_data);
 }
 
+primitive* validate(mesh& Mesh)
+{
+	if(!validate_polyhedra(Mesh))
+		return 0;
+
+	mesh::polyhedra_t& polyhedron = Mesh.polyhedra.writable();
+
+	return new primitive(
+		polyhedron.first_faces.writable(),
+		polyhedron.face_counts.writable(),
+		polyhedron.types.writable(),
+		polyhedron.face_first_loops.writable(),
+		polyhedron.face_loop_counts.writable(),
+		polyhedron.face_selection.writable(),
+		polyhedron.face_materials.writable(),
+		polyhedron.loop_first_edges.writable(),
+		polyhedron.edge_points.writable(),
+		polyhedron.clockwise_edges.writable(),
+		polyhedron.edge_selection.writable(),
+		polyhedron.constant_data,
+		polyhedron.uniform_data,
+		polyhedron.face_varying_data);
+}
+
 namespace detail
 {
 

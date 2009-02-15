@@ -317,7 +317,7 @@ private:
 
 	void render_mesh_instance(const shader_names_t& ShaderNames, const k3d::string_t& Name, k3d::inode& MeshInstance, std::ostream& Stream)
 	{
-		k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(MeshInstance, "output_mesh");
+		const k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(MeshInstance, "output_mesh");
 		if(!mesh)
 			return;
 
