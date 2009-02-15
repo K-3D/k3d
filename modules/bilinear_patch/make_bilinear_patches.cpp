@@ -26,9 +26,9 @@
 #include <k3dsdk/bilinear_patch.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/node.h>
 #include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -54,15 +54,9 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		if(!k3d::validate_polyhedra(Input))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input));
+		if(!polyhedron)
 			return;
-
-		const k3d::mesh::indices_t& face_first_loops = *Input.polyhedra->face_first_loops;
-		const k3d::mesh::selection_t& face_selection = *Input.polyhedra->face_selection;
-		const k3d::mesh::materials_t& face_materials = *Input.polyhedra->face_materials;
-		const k3d::mesh::indices_t& loop_first_edges = *Input.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
 
 		Output.points = Input.points;
 		Output.point_selection = Input.point_selection;
@@ -71,17 +65,17 @@ public:
 		boost::scoped_ptr<k3d::bilinear_patch::primitive> primitive(k3d::bilinear_patch::create(Output));
 
 		const k3d::uint_t face_begin = 0;
-		const k3d::uint_t face_end = face_begin + face_first_loops.size();
+		const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
 		for(k3d::uint_t face = face_begin; face != face_end; ++face)
 		{
 			std::vector<k3d::uint_t> edges;
 
-			const k3d::uint_t first_edge = loop_first_edges[face_first_loops[face]];
+			const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
 			for(k3d::uint_t edge = first_edge; ;)
 			{
 				edges.push_back(edge);
 
-				edge = clockwise_edges[edge];
+				edge = polyhedron->clockwise_edges[edge];
 				if(edge == first_edge)
 					break;
 			}
@@ -89,13 +83,13 @@ public:
 			if(edges.size() != 4)
 				continue;
 
-			primitive->patch_selections.push_back(face_selection[face]);
-			primitive->patch_materials.push_back(face_materials[face]);
+			primitive->patch_selections.push_back(polyhedron->face_selections[face]);
+			primitive->patch_materials.push_back(polyhedron->face_materials[face]);
 
-			primitive->patch_points.push_back(edge_points[edges[0]]);
-			primitive->patch_points.push_back(edge_points[edges[1]]);
-			primitive->patch_points.push_back(edge_points[edges[3]]); // Bilinear patch control points *aren't* in clockwise order!
-			primitive->patch_points.push_back(edge_points[edges[2]]);
+			primitive->patch_points.push_back(polyhedron->edge_points[edges[0]]);
+			primitive->patch_points.push_back(polyhedron->edge_points[edges[1]]);
+			primitive->patch_points.push_back(polyhedron->edge_points[edges[3]]); // Bilinear patch control points *aren't* in clockwise order!
+			primitive->patch_points.push_back(polyhedron->edge_points[edges[2]]);
 		}
 	}
 

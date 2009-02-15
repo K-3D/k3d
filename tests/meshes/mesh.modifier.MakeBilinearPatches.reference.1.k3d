@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>-2.5 -2.5 2.5 -2.5 2.5 2.5 2.5 -2.5 2.5 2.5 2.5 2.5 -2.5 -2.5 -2.5 2.5 -2.5 -2.5 2.5 2.5 -2.5 -2.5 2.5 -2.5</points>
+		<point_selection>0 0 0 0 0 0 0 0</point_selection>
+		<vertex_data/>
+		<primitives>
+			<primitive type="bilinear_patch">
+				<structure>
+					<array name="patch_materials" type="k3d::imaterial*">0 0 0 0 0 0</array>
+					<array name="patch_points" type="k3d::uint_t">0 2 1 3 0 1 4 7 2 0 5 4 3 2 6 5 1 3 7 6 5 4 6 7
+						<metadata>
+							<pair name="k3d:domain">/points/indices()</pair>
+						</metadata>
+					</array>
+					<array name="patch_selections" type="k3d::double_t">0 0 0 0 0 0
+						<metadata>
+							<pair name="k3d:selection-component">uniform</pair>
+						</metadata>
+					</array>
+				</structure>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="uniform"/>
+					<arrays type="varying"/>
+				</attributes>
+			</primitive>
+		</primitives>
+	</mesh_arrays>
+</k3dml>
