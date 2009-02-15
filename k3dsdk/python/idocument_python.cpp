@@ -24,7 +24,6 @@
 #include "idocument_python.h"
 #include "iproperty_python.h"
 #include "iunknown_python.h"
-#include "dynamic_cast_python.h"
 
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
@@ -113,7 +112,7 @@ static const object get_node(idocument_wrapper& Self, const std::string& Name)
 	return wrap_unknown(k3d::find_node(Self.wrapped().nodes(), Name));
 }
 
-static const object get_node_by_metadata(idocument_wrapper& Self, const std::string& Type, const std::string& MetaName, const std::string& MetaValue)
+static const object get_node_by_metadata(idocument_wrapper& Self, const std::string& MetaName, const std::string& MetaValue)
 {
 	const k3d::inode_collection::nodes_t nodes = k3d::find_nodes<k3d::inode>(Self.wrapped().nodes(), MetaName, MetaValue);
 	
@@ -123,7 +122,7 @@ static const object get_node_by_metadata(idocument_wrapper& Self, const std::str
 	if(nodes.empty())
 		return boost::python::object();
 	
-	return do_dynamic_cast(wrap_unknown(nodes.back()), Type);
+	return wrap_unknown(nodes.back());
 }
 
 static const bool has_node(idocument_wrapper& Self, const std::string& Name)
