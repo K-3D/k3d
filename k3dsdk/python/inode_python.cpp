@@ -23,6 +23,11 @@
 
 #include "idocument_python.h"
 #include "inode_python.h"
+#include "iunknown_python.h"
+#include "utility_python.h"
+
+#include <k3dsdk/inode.h>
+#include <k3dsdk/iplugin_factory.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -33,33 +38,29 @@ namespace k3d
 namespace python
 {
 
-static object document(inode_wrapper& Self)
+static object document(iunknown_wrapper& Self)
 {
-	return wrap(Self.wrapped().document());
+	return wrap(Self.wrapped<k3d::inode>().document());
 }
 
-static object factory(inode_wrapper& Self)
+static object factory(iunknown_wrapper& Self)
 {
-	return wrap(Self.wrapped().factory());
+	return wrap_unknown(Self.wrapped<k3d::inode>().factory());
 }
 
-static boost::uint64_t hash(inode_wrapper& Self)
+static boost::uint64_t hash(iunknown_wrapper& Self)
 {
 	return reinterpret_cast<boost::uint64_t>(Self.wrapped_ptr());
 }
 
-void define_class_inode()
+void define_methods_inode(iunknown& Interface, boost::python::object& Instance)
 {
-	class_<inode_wrapper>("inode",
-		"Abstract interface implemented by all document nodes.\n\n"
-		"Use L{dynamic_cast} to test whether an inode object implements a specific interface / "
-		"convert an inode object to a specific interface type.", no_init)
-		.def("document", &document,
-			"Returns the L{idocument} that owns this node.")
-		.def("factory", &factory,
-			"Returns the L{iplugin_factory} used to create this node type.")
-		.def("__hash__", &hash,
-			"Returns a hash value that can be used as a key when storing inode objects in a map.");
+	if(!dynamic_cast<k3d::inode*>(&Interface))
+		return;
+
+	utility::add_method(utility::make_function(&document, "Returns the L{idocument} that owns this node."), "document", Instance);
+	utility::add_method(utility::make_function(&factory, "Returns the plugin factory used to create this node type."), "factory", Instance);
+	utility::add_method(utility::make_function(&hash, "Returns a hash value that can be used as a key when storing inode objects in a map."), "__hash__", Instance);
 }
 
 } // namespace python

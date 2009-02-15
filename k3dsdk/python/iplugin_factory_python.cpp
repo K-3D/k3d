@@ -42,34 +42,34 @@ namespace python
 
 static const k3d::uuid factory_id(iunknown_wrapper& Self)
 {
-	return dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).factory_id();
+	return Self.wrapped<k3d::iplugin_factory>().factory_id();
 }
 
 static const string_t name(iunknown_wrapper& Self)
 {
-	return dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).name();
+	return Self.wrapped<k3d::iplugin_factory>().name();
 }
 
 static const string_t short_description(iunknown_wrapper& Self)
 {
-	return dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).short_description();
+	return Self.wrapped<k3d::iplugin_factory>().short_description();
 }
 
 static const bool_t is_application_plugin(iunknown_wrapper& Self)
 {
-	return dynamic_cast<k3d::iapplication_plugin_factory*>(&Self.wrapped()) ? true : false;
+	return Self.wrapped_ptr<k3d::iapplication_plugin_factory>() ? true : false;
 }
 
 static const bool_t is_document_plugin(iunknown_wrapper& Self)
 {
-	return dynamic_cast<k3d::idocument_plugin_factory*>(&Self.wrapped()) ? true : false;
+	return Self.wrapped_ptr<k3d::idocument_plugin_factory>() ? true : false;
 }
 
 static const list categories(iunknown_wrapper& Self)
 {
 	list results;
 	
-	const k3d::iplugin_factory::categories_t& categories = dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).categories();
+	const k3d::iplugin_factory::categories_t& categories = Self.wrapped<k3d::iplugin_factory>().categories();
 	for(k3d::iplugin_factory::categories_t::const_iterator category = categories.begin(); category != categories.end(); ++category)
 		results.append(*category);
 
@@ -78,7 +78,7 @@ static const list categories(iunknown_wrapper& Self)
 
 static const string_t quality(iunknown_wrapper& Self)
 {
-	switch(dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).quality())
+	switch(Self.wrapped<k3d::iplugin_factory>().quality())
 	{
 		case k3d::iplugin_factory::STABLE:
 			return "stable";
@@ -96,7 +96,7 @@ static boost::python::dict metadata(iunknown_wrapper& Self)
 {
 	boost::python::dict result;
 
-	const iplugin_factory::metadata_t metadata = dynamic_cast<k3d::iplugin_factory&>(Self.wrapped()).metadata();
+	const iplugin_factory::metadata_t metadata = Self.wrapped<k3d::iplugin_factory>().metadata();
 	for(iplugin_factory::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
 		result[pair->first] = pair->second;
 
@@ -105,7 +105,7 @@ static boost::python::dict metadata(iunknown_wrapper& Self)
 
 void define_methods_iplugin_factory(iunknown& Interface, boost::python::object& Instance)
 {
-	if(!dynamic_cast<iplugin_factory*>(&Interface))
+	if(!dynamic_cast<k3d::iplugin_factory*>(&Interface))
 		return;
 
 	utility::add_method(utility::make_function(&factory_id, "Returns a universally-unique identifier for this factory."), "factory_id", Instance);

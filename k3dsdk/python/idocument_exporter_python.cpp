@@ -43,12 +43,12 @@ namespace python
 
 static bool_t write_file(iunknown_wrapper& Self, idocument_wrapper& Document, const filesystem::path& Path)
 {
-	return dynamic_cast<idocument_exporter&>(Self.wrapped()).write_file(Document.wrapped(), Path);
+	return Self.wrapped<k3d::idocument_exporter>().write_file(Document.wrapped(), Path);
 }
 
 void define_methods_idocument_exporter(iunknown& Interface, boost::python::object& Instance)
 {
-	if(!dynamic_cast<idocument_exporter*>(&Interface))
+	if(!dynamic_cast<k3d::idocument_exporter*>(&Interface))
 		return;
 
 	utility::add_method(make_function(write_file), "write_file", Instance);

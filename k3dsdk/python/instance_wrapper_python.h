@@ -72,11 +72,23 @@ public:
 		return *m_wrapped;
 	}
 
+	template<typename Y>
+	Y& wrapped() const
+	{
+		return dynamic_cast<Y&>(wrapped());
+	}
+
 	T* wrapped_ptr() const
 	{
 		return m_wrapped;
 	}
-	
+
+	template<typename Y>
+	Y* wrapped_ptr() const
+	{
+		return dynamic_cast<Y*>(wrapped_ptr());
+	}
+
 private:
 	T* m_wrapped;
 };
@@ -84,7 +96,7 @@ private:
 template<typename T>
 boost::python::object wrap(T* Wrapped)
 {
-	return Wrapped ? boost::python::object(instance_wrapper<T>(*Wrapped)) : boost::python::object();
+	return Wrapped ? boost::python::object(instance_wrapper<T>(Wrapped)) : boost::python::object();
 }
 
 template<typename T>

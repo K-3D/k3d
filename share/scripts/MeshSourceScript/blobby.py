@@ -13,7 +13,7 @@ blobby.first_primitives().append(len(blobby.primitives()))
 blobby.primitive_counts().append(len(ellipsoids) + 1)
 blobby.first_operators().append(len(blobby.operators()))
 blobby.operator_counts().append(1)
-blobby.materials().append(k3d.dynamic_cast(Document.get_node("Material"), "imaterial"))
+blobby.materials().append(Document.get_node("Material"))
 
 for center in ellipsoids:
 	blobby.primitives().append(k3d.blobby.primitive_type.ELLIPSOID)

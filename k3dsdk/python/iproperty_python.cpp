@@ -24,7 +24,6 @@
 #include "any_python.h"
 #include "iproperty_python.h"
 #include "iunknown_python.h"
-#include "node_python.h"
 #include "utility_python.h"
 
 #include <k3dsdk/idocument.h>
@@ -47,64 +46,64 @@ namespace python
 
 static const string_t name(iunknown_wrapper& Self)
 {
-	return dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_name();
+	return Self.wrapped<k3d::iproperty>().property_name();
 }
 
 static const string_t label(iunknown_wrapper& Self)
 {
-	return dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_label();
+	return Self.wrapped<k3d::iproperty>().property_label();
 }
 
 static const string_t description(iunknown_wrapper& Self)
 {
-	return dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_description();
+	return Self.wrapped<k3d::iproperty>().property_description();
 }
 
 static const string_t type(iunknown_wrapper& Self)
 {
-	return k3d::type_string(dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_type());
+	return k3d::type_string(Self.wrapped<k3d::iproperty>().property_type());
 }
 
 static object internal_value(iunknown_wrapper& Self)
 {
-	return any_to_python(k3d::property::internal_value(dynamic_cast<k3d::iproperty&>(Self.wrapped())));
+	return any_to_python(k3d::property::internal_value(Self.wrapped<k3d::iproperty>()));
 }
 
 static object pipeline_value(iunknown_wrapper& Self)
 {
-	return any_to_python(k3d::property::pipeline_value(dynamic_cast<k3d::iproperty&>(Self.wrapped())));
+	return any_to_python(k3d::property::pipeline_value(Self.wrapped<k3d::iproperty>()));
 }
 
 static object node(iunknown_wrapper& Self)
 {
-	return any_to_python(dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_node());
+	return any_to_python(Self.wrapped<k3d::iproperty>().property_node());
 }
 
 static const bool is_writable(iunknown_wrapper& Self)
 {
-	return dynamic_cast<k3d::iwritable_property*>(Self.wrapped_ptr()) ? true : false;
+	return Self.wrapped_ptr<k3d::iwritable_property>() ? true : false;
 }
 
 static void set_value(iunknown_wrapper& Self, const boost::python::object& Value)
 {
-	if(k3d::iwritable_property* const writable = dynamic_cast<k3d::iwritable_property*>(Self.wrapped_ptr()))
+	if(k3d::iwritable_property* const writable = Self.wrapped_ptr<k3d::iwritable_property>())
 	{
-		writable->property_set_value(python_to_any(Value, dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_type()));
+		writable->property_set_value(python_to_any(Value, Self.wrapped<k3d::iproperty>().property_type()));
 		return;
 	}
 
-	throw std::runtime_error("property " + dynamic_cast<k3d::iproperty&>(Self.wrapped()).property_name() + " is a read-only property");
+	throw std::runtime_error("property " + Self.wrapped<k3d::iproperty>().property_name() + " is a read-only property");
 }
 
 static const bool is_enumeration(iunknown_wrapper& Self)
 {
-	return dynamic_cast<k3d::ienumeration_property*>(Self.wrapped_ptr()) ? true : false;
+	return Self.wrapped_ptr<k3d::ienumeration_property>() ? true : false;
 }
 
 static list enumeration_values(iunknown_wrapper& Self)
 {
 	list results;
-	if(k3d::ienumeration_property* const enumeration = dynamic_cast<k3d::ienumeration_property*>(Self.wrapped_ptr()))
+	if(k3d::ienumeration_property* const enumeration = Self.wrapped_ptr<k3d::ienumeration_property>())
 	{
 		const k3d::ienumeration_property::enumeration_values_t values = enumeration->enumeration_values();
 		for(k3d::ienumeration_property::enumeration_values_t::const_iterator value = values.begin(); value != values.end(); ++value)
@@ -116,7 +115,7 @@ static list enumeration_values(iunknown_wrapper& Self)
 
 static const string_t units(iunknown_wrapper& Self)
 {
-	if(k3d::imeasurement_property* const measurement = dynamic_cast<k3d::imeasurement_property*>(Self.wrapped_ptr()))
+	if(k3d::imeasurement_property* const measurement = Self.wrapped_ptr<k3d::imeasurement_property>())
 	{
 		const std::type_info& units = measurement->property_units();
 

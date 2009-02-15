@@ -19,8 +19,8 @@ document = k3d.new_document()
 source_a = document.new_node("FrozenMesh")
 source_b = document.new_node("FrozenMesh")
 
-mesh_a = k3d.dynamic_cast(source_a, "imesh_storage").reset_mesh()
-mesh_b = k3d.dynamic_cast(source_b, "imesh_storage").reset_mesh()
+mesh_a = source_a.create_mesh()
+mesh_b = source_b.create_mesh()
 
 test_equal(mesh_a, mesh_b, "empty meshes")
 

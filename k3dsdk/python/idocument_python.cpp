@@ -25,7 +25,6 @@
 #include "iproperty_python.h"
 #include "iunknown_python.h"
 #include "dynamic_cast_python.h"
-#include "node_python.h"
 
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
@@ -83,7 +82,7 @@ static const list nodes(idocument_wrapper& Self)
 
 	const k3d::inode_collection::nodes_t nodes = Self.wrapped().nodes().collection();
 	for(k3d::inode_collection::nodes_t::const_iterator n = nodes.begin(); n != nodes.end(); ++n)
-		results.append(node(*n));
+		results.append(wrap_unknown(*n));
 
 	return results;
 }
@@ -97,13 +96,13 @@ static const object new_node(idocument_wrapper& Self, const object& Type)
 		if(!plugin_factory)
 			throw std::runtime_error("no factory for plugin type " + plugin_name());
 
-		return object(node(k3d::plugin::create<k3d::iunknown>(*plugin_factory, Self.wrapped(), k3d::unique_name(Self.wrapped().nodes(), plugin_name()))));
+		return wrap_unknown(k3d::plugin::create<k3d::iunknown>(*plugin_factory, Self.wrapped(), k3d::unique_name(Self.wrapped().nodes(), plugin_name())));
 	}
 
 	extract<iunknown_wrapper> plugin_factory(Type);
 	if(plugin_factory.check())
 	{
-		return object(node(k3d::plugin::create<k3d::iunknown>(dynamic_cast<k3d::iplugin_factory&>(plugin_factory().wrapped()), Self.wrapped())));
+		return wrap_unknown(k3d::plugin::create<k3d::iunknown>(dynamic_cast<k3d::iplugin_factory&>(plugin_factory().wrapped()), Self.wrapped()));
 	}
 
 	throw std::invalid_argument("can't create new node from given argument");
@@ -111,7 +110,7 @@ static const object new_node(idocument_wrapper& Self, const object& Type)
 
 static const object get_node(idocument_wrapper& Self, const std::string& Name)
 {
-	return object(node(k3d::find_node(Self.wrapped().nodes(), Name)));
+	return wrap_unknown(k3d::find_node(Self.wrapped().nodes(), Name));
 }
 
 static const object get_node_by_metadata(idocument_wrapper& Self, const std::string& Type, const std::string& MetaName, const std::string& MetaValue)
@@ -122,30 +121,28 @@ static const object get_node_by_metadata(idocument_wrapper& Self, const std::str
 		throw std::runtime_error("multiple nodes exist with the given metadata");
 	
 	if(nodes.empty())
-		return object(node(0));
+		return boost::python::object();
 	
-	return do_dynamic_cast(object(node(nodes.back())), Type);
+	return do_dynamic_cast(wrap_unknown(nodes.back()), Type);
 }
 
 static const bool has_node(idocument_wrapper& Self, const std::string& Name)
 {
-	if (k3d::find_node(Self.wrapped().nodes(), Name) != 0)
-		return true;
-	return false;
+	return k3d::find_node(Self.wrapped().nodes(), Name) ? true : false;
 }
 
 static void delete_node(idocument_wrapper& Self, object& Node)
 {
-	extract<node> node(Node);
+	extract<iunknown_wrapper> node(Node);
 	if(!node.check())
 		throw std::invalid_argument("argument isn't a node");
 
-	k3d::delete_nodes(Self.wrapped(), k3d::make_collection<k3d::nodes_t>(node().inode_wrapper::wrapped_ptr()));
+	k3d::delete_nodes(Self.wrapped(), k3d::make_collection<k3d::nodes_t>(node().wrapped_ptr<k3d::inode>()));
 }
 
 static object get_dependency(idocument_wrapper& Self, iunknown_wrapper& Property)
 {
-	if(!dynamic_cast<k3d::iproperty*>(Property.wrapped_ptr()))
+	if(!Property.wrapped_ptr<k3d::iproperty>())
 		throw std::invalid_argument("not a property");
 
 	return wrap_unknown(Self.wrapped().pipeline().dependency(dynamic_cast<k3d::iproperty&>(Property.wrapped())));
@@ -153,7 +150,7 @@ static object get_dependency(idocument_wrapper& Self, iunknown_wrapper& Property
 
 static void set_dependency(idocument_wrapper& Self, iunknown_wrapper& From, boost::python::object& To)
 {
-	k3d::iproperty* const from = dynamic_cast<k3d::iproperty*>(From.wrapped_ptr());
+	k3d::iproperty* const from = From.wrapped_ptr<k3d::iproperty>();
 	if(!from)
 		throw std::invalid_argument("first argument must be a valid property object");
 
@@ -162,7 +159,7 @@ static void set_dependency(idocument_wrapper& Self, iunknown_wrapper& From, boos
 	extract<iunknown_wrapper> to_value(To);
 	if(to_value.check())
 	{
-		to = dynamic_cast<k3d::iproperty*>(to_value().wrapped_ptr());
+		to = to_value().wrapped_ptr<k3d::iproperty>();
 		if(!to)
 			throw std::invalid_argument("second argument must be a valid property instance or None");
 	}

@@ -23,7 +23,10 @@
 
 #include "imesh_storage_python.h"
 #include "mesh_python.h"
+#include "iunknown_python.h"
+#include "utility_python.h"
 
+#include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh.h>
 
 #include <boost/python.hpp>
@@ -35,39 +38,40 @@ namespace k3d
 namespace python
 {
 
-static k3d::python::mesh reset_mesh_1(imesh_storage_wrapper& Self)
+static k3d::python::mesh create_mesh(iunknown_wrapper& Self)
 {
 	k3d::mesh* const mesh = new k3d::mesh();
-	Self.wrapped().reset_mesh(mesh);
+	Self.wrapped<k3d::imesh_storage>().reset_mesh(mesh);
 
 	return k3d::python::mesh(mesh);
 }
 
-static k3d::python::mesh reset_mesh_2(imesh_storage_wrapper& Self, mesh& Mesh)
+static k3d::python::mesh set_mesh(iunknown_wrapper& Self, mesh& Mesh)
 {
 	k3d::mesh* const mesh = new k3d::mesh(Mesh.wrapped());
-	Self.wrapped().reset_mesh(mesh);
+	Self.wrapped<k3d::imesh_storage>().reset_mesh(mesh);
 
 	return k3d::python::mesh(mesh);
 }
 
-static void clear_mesh(imesh_storage_wrapper& Self)
+static void clear_mesh(iunknown_wrapper& Self)
 {
-	Self.wrapped().reset_mesh(0);
+	Self.wrapped<k3d::imesh_storage>().reset_mesh(0);
 }
 
-void define_class_imesh_storage()
+void define_methods_imesh_storage(iunknown& Interface, boost::python::object& Instance)
 {
-	class_<imesh_storage_wrapper>("imesh_storage",
-		"Abstract interface implemented by nodes that can provide persistent storage of L{mesh} objects.", no_init)
-		.def("reset_mesh", &reset_mesh_1,
-			"Creates a new L{mesh} object whose lifetime will be managed by the imesh_storage object.\n\n"
-			"@return: Returns a new L{mesh} object.")
-		.def("reset_mesh", &reset_mesh_2,
-			"Assigns a shallow-copy of an existing L{mesh} object whose lifetime will be managed by the imesh_storage object.\n\n"
-			"@return: Returns the copied L{mesh} object.")
-		.def("clear_mesh", &clear_mesh,
-			"Deletes the stored mesh and resets the storage to a null mesh.");
+	if(!dynamic_cast<k3d::imesh_storage*>(&Interface))
+		return;
+
+	utility::add_method(utility::make_function(&create_mesh,
+		"Creates a new L{mesh} object whose lifetime will be managed by the imesh_storage object.\n\n"
+		"@return: Returns a new L{mesh} object."), "create_mesh", Instance);
+	utility::add_method(utility::make_function(&set_mesh,
+		"Assigns a shallow-copy of an existing L{mesh} object whose lifetime will be managed by the imesh_storage object.\n\n"
+		"@return: Returns the copied L{mesh} object."), "set_mesh", Instance);
+	utility::add_method(utility::make_function(&clear_mesh,
+		"Deletes the stored mesh and resets the storage to a null mesh."), "clear_mesh", Instance);
 }
 
 } // namespace python

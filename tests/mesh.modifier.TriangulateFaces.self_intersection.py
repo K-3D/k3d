@@ -6,8 +6,7 @@ import testing
 document = k3d.new_document()
 
 source = document.new_node("FrozenMesh")
-
-mesh = k3d.dynamic_cast(source, "imesh_storage").reset_mesh()
+mesh = source.create_mesh()
 
 positions = [(-5, 5, 0), (5, 5, 0), (-5, -5, 0), (5, -5, 0)]
 

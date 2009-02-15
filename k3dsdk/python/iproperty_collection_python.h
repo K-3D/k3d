@@ -24,18 +24,17 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "instance_wrapper_python.h"
-#include <k3dsdk/iproperty_collection.h>
+#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
-	
+
+class iunknown;
+
 namespace python
 {
 
-typedef instance_wrapper<k3d::iproperty_collection> iproperty_collection_wrapper;
-
-void define_class_iproperty_collection();
+void define_methods_iproperty_collection(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 

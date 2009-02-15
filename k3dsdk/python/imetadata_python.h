@@ -24,18 +24,17 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "instance_wrapper_python.h"
-#include <k3dsdk/imetadata.h>
+#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
 
+class iunknown;
+
 namespace python
 {
 
-typedef instance_wrapper<k3d::imetadata> imetadata_wrapper;
-
-void define_class_imetadata();
+void define_methods_imetadata(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 

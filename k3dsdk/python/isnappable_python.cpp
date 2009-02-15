@@ -22,9 +22,12 @@
 */
 
 #include "isnappable_python.h"
+#include "iunknown_python.h"
+#include "utility_python.h"
 
 #include <k3dsdk/explicit_snap_source.h>
 #include <k3dsdk/explicit_snap_target.h>
+#include <k3dsdk/isnappable.h>
 #include <k3dsdk/result.h>
 
 #include <boost/python.hpp>
@@ -36,25 +39,20 @@ namespace k3d
 namespace python
 {
 
-static void add_snap_source(isnappable_wrapper& Self, const string_t& Label, const point3& Position)
+static void add_snap_source(iunknown_wrapper& Self, const string_t& Label, const point3& Position)
 {
-	Self.wrapped().add_snap_source(new k3d::explicit_snap_source(Label, Position));
+	Self.wrapped<k3d::isnappable>().add_snap_source(new k3d::explicit_snap_source(Label, Position));
 }
 
-static void add_snap_target(isnappable_wrapper& Self, const string_t& Label, const point3& Position)
+static void add_snap_target(iunknown_wrapper& Self, const string_t& Label, const point3& Position)
 {
-	Self.wrapped().add_snap_target(new k3d::explicit_snap_target(Label, Position));
+	Self.wrapped<k3d::isnappable>().add_snap_target(new k3d::explicit_snap_target(Label, Position));
 }
 
-void define_class_isnappable()
+void define_methods_isnappable(iunknown& Interface, boost::python::object& Instance)
 {
-	class_<isnappable_wrapper>("isnappable",
-		"Abstract interface implemented by nodes that can be interactive \"snapped\" to one another.", no_init)
-		.def("add_snap_source", &add_snap_source,
-			"Adds a new snap source to the object.\n\n")
-		.def("add_snap_target", &add_snap_target,
-			"Adds a new snap target to the object.\n\n")
-		;
+	utility::add_method(utility::make_function(&add_snap_source, "Adds a new snap source to the object."), "add_snap_source", Instance);
+	utility::add_method(utility::make_function(&add_snap_target, "Adds a new snap target to the object."), "add_snap_target", Instance);
 }
 
 } // namespace python

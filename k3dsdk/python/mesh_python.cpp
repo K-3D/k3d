@@ -24,14 +24,12 @@
 #include "attribute_arrays_python.h"
 #include "const_attribute_arrays_python.h"
 #include "const_typed_array_python.h"
-#include "imaterial_python.h"
 #include "instance_wrapper_python.h"
 #include "mesh_python.h"
 #include "typed_array_python.h"
 #include "utility_python.h"
 
 #include <k3dsdk/color.h>
-#include <k3dsdk/imaterial.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/type_registry.h>

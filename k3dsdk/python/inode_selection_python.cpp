@@ -24,7 +24,11 @@
 
 #include "any_python.h"
 #include "inode_selection_python.h"
-#include "node_python.h"
+#include "iunknown_python.h"
+#include "utility_python.h"
+
+#include <k3dsdk/inode.h>
+#include <k3dsdk/inode_selection.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -35,48 +39,47 @@ namespace k3d
 namespace python
 {
 
-static void select(inode_selection_wrapper& Self, inode_wrapper& Node, const k3d::double_t Weight)
+static void select(iunknown_wrapper& Self, iunknown_wrapper& Node, const k3d::double_t Weight)
 {
-	Self.wrapped().select(Node.wrapped(), Weight);
+	Self.wrapped<k3d::inode_selection>().select(Node.wrapped<k3d::inode>(), Weight);
 }
 
-static double selection_weight(inode_selection_wrapper& Self, inode_wrapper& Node)
+static double selection_weight(iunknown_wrapper& Self, iunknown_wrapper& Node)
 {
-	return Self.wrapped().selection_weight(Node.wrapped());
+	return Self.wrapped<k3d::inode_selection>().selection_weight(Node.wrapped<k3d::inode&>());
 }
 
-static list selected_nodes(inode_selection_wrapper& Self)
+static list selected_nodes(iunknown_wrapper& Self)
 {
 	list results;
 	
-	const k3d::inode_selection::selected_nodes_t selected_nodes = Self.wrapped().selected_nodes();
+	const k3d::inode_selection::selected_nodes_t selected_nodes = Self.wrapped<k3d::inode_selection>().selected_nodes();
 	for(k3d::inode_selection::selected_nodes_t::const_iterator n = selected_nodes.begin(); n != selected_nodes.end(); ++n)
-	{
-		results.append(node(*n));
-	}
+		results.append(wrap_unknown(*n));
 	
 	return results;
 }
 
-static void deselect_all(inode_selection_wrapper& Self)
+static void deselect_all(iunknown_wrapper& Self)
 {
-	Self.wrapped().deselect_all();
+	Self.wrapped<k3d::inode_selection>().deselect_all();
 }
 
-void define_class_inode_selection()
+void define_methods_inode_selection(iunknown& Interface, boost::python::object& Instance)
 {
-	class_<inode_selection_wrapper>("inode_selection",
-		"Abstract interface for storage of node selections", no_init)
-		.def("select", &select,
-			"Select the supplied node with the given selection weight\n\n")
-		.def("selection_weight", &selection_weight,
-			"Returns the selection weight of the supplied node.\n\n"
-			"@rtype: double\n")
-		.def("selected_nodes", &selected_nodes,
-			"Returns a list of selected nodes\n\n"
-			"@return: A list of L{inode} objects.\n\n")
-		.def("deselect_all", &deselect_all,
-			"Clears the stored selection.");
+	if(!dynamic_cast<k3d::inode_selection*>(&Interface))
+		return;
+
+	utility::add_method(utility::make_function(&select,
+		"Select the supplied node with the given selection weight\n\n"), "select", Instance);
+	utility::add_method(utility::make_function(&selection_weight,
+		"Returns the selection weight of the supplied node.\n\n"
+		"@rtype: double\n"), "selection_weight", Instance);
+	utility::add_method(utility::make_function(&selected_nodes,
+		"Returns a list of selected nodes\n\n"
+		"@return: A list of L{inode} objects.\n\n"), "selected_nodes", Instance);
+	utility::add_method(utility::make_function(&deselect_all,
+		"Clears the stored selection."), "deselect_all", Instance);
 }
 
 } // namespace python

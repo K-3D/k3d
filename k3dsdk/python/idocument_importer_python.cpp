@@ -43,12 +43,12 @@ namespace python
 
 static bool_t read_file(iunknown_wrapper& Self, idocument_wrapper& Document, const filesystem::path& Path)
 {
-	return dynamic_cast<idocument_importer&>(Self.wrapped()).read_file(Document.wrapped(), Path);
+	return Self.wrapped<k3d::idocument_importer>().read_file(Document.wrapped(), Path);
 }
 
 void define_methods_idocument_importer(iunknown& Interface, boost::python::object& Instance)
 {
-	if(!dynamic_cast<idocument_importer*>(&Interface))
+	if(!dynamic_cast<k3d::idocument_importer*>(&Interface))
 		return;
 
 	utility::add_method(make_function(read_file), "read_file", Instance);

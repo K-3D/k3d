@@ -21,14 +21,28 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "any_python.h"
 #include "icommand_node_python.h"
 #include "idocument_exporter_python.h"
 #include "idocument_importer_python.h"
 #include "ifile_change_notifier_python.h"
+#include "imesh_storage_python.h"
+#include "imetadata_python.h"
+#include "inode_python.h"
+#include "inode_selection_python.h"
 #include "iplugin_factory_python.h"
 #include "iproperty_python.h"
+#include "iproperty_collection_python.h"
+#include "isnappable_python.h"
 #include "iunknown_python.h"
 #include "iuser_interface_python.h"
+
+#include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/iwritable_property.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/types.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -52,11 +66,58 @@ object wrap_unknown(iunknown& Unknown)
 	define_methods_idocument_exporter(Unknown, result);
 	define_methods_idocument_importer(Unknown, result);
 	define_methods_ifile_change_notifier(Unknown, result);
+	define_methods_imesh_storage(Unknown, result);
+	define_methods_imetadata(Unknown, result);
+	define_methods_inode(Unknown, result);
+	define_methods_inode_selection(Unknown, result);
 	define_methods_iplugin_factory(Unknown, result);
 	define_methods_iproperty(Unknown, result);
+	define_methods_iproperty_collection(Unknown, result);
+	define_methods_isnappable(Unknown, result);
 	define_methods_iuser_interface(Unknown, result);
 	
 	return result;
+}
+
+// This rightfully belongs with the rest of the iproperty_collection code, but for some reason __getattr__
+// doesn't seem to work with our dynamically-added instance methods.
+static object getattr(iunknown_wrapper& Self, const string_t& Name)
+{
+	// Return K-3D properties as attributes whenever they're available ...
+	if(k3d::iproperty_collection* const property_collection = Self.wrapped_ptr<k3d::iproperty_collection>())
+	{
+		if(k3d::iproperty* property = k3d::property::get(*property_collection, Name))
+			return any_to_python(k3d::property::pipeline_value(*property));
+
+		throw std::invalid_argument("unknown property: " + Name);
+	}
+}
+
+// This rightfully belongs with the rest of the iproperty_collection code, but for some reason __getattr__
+// doesn't seem to work with our dynamically-added instance methods.
+static void setattr(object& Self, const string_t& Name, const object& Value)
+{
+	// If this is a K-3D property, set its internal value ...
+	extract<iunknown_wrapper> unknown(Self);
+	if(unknown.check())
+	{
+		if(k3d::iproperty_collection* const property_collection = unknown().wrapped_ptr<k3d::iproperty_collection>())
+		{
+			if(k3d::iproperty* const property = k3d::property::get(*property_collection, Name))
+			{
+				if(k3d::iwritable_property* const writable = dynamic_cast<k3d::iwritable_property*>(property))
+				{
+					writable->property_set_value(python_to_any(Value, property->property_type()));
+					return;
+				}
+
+				throw std::invalid_argument("read-only property: " + Name);
+			}
+		}
+	}
+
+	// Otherwise, fallback on default behavior ...
+	Self.attr("__dict__")[Name] = Value;
 }
 
 void define_class_iunknown()
@@ -64,7 +125,10 @@ void define_class_iunknown()
 	class_<iunknown_wrapper>("iunknown", 
 		"Abstract interface that represents an object with unknown capabilities.\n\n"
 		"Methods for other implemented interfaces are added dynamically at runtime.",
-		no_init);
+		no_init)
+		.def("__getattr__", getattr)
+		.def("__setattr__", setattr)
+		;
 }
 
 } // namespace python

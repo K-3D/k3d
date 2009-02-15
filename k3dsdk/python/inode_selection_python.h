@@ -25,18 +25,17 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "instance_wrapper_python.h"
-#include <k3dsdk/inode_selection.h>
+#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
-	
+
+class iunknown;
+
 namespace python
 {
 
-typedef instance_wrapper<k3d::inode_selection> inode_selection_wrapper;
-
-void define_class_inode_selection();
+void define_methods_inode_selection(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 

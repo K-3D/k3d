@@ -39,14 +39,14 @@ namespace python
 
 static const string_t name(iunknown_wrapper& Self)
 {
-	return k3d::command_tree().name(dynamic_cast<k3d::icommand_node&>(Self.wrapped()));
+	return k3d::command_tree().name(Self.wrapped<k3d::icommand_node>());
 }
 
 static const list children(iunknown_wrapper& Self)
 {
 	list results;
 	
-	const k3d::icommand_tree::nodes_t children = k3d::command_tree().children(&dynamic_cast<k3d::icommand_node&>(Self.wrapped()));
+	const k3d::icommand_tree::nodes_t children = k3d::command_tree().children(&Self.wrapped<k3d::icommand_node>());
 	for(k3d::icommand_tree::nodes_t::const_iterator child = children.begin(); child != children.end(); ++child)
 		results.append(wrap_unknown(*child));
 	
@@ -55,7 +55,7 @@ static const list children(iunknown_wrapper& Self)
 
 static object get_child(iunknown_wrapper& Self, const string_t& Name)
 {
-	k3d::icommand_tree::nodes_t children = k3d::command_tree().children(&dynamic_cast<k3d::icommand_node&>(Self.wrapped()));
+	k3d::icommand_tree::nodes_t children = k3d::command_tree().children(&Self.wrapped<k3d::icommand_node>());
 	for(k3d::icommand_tree::nodes_t::iterator child = children.begin(); child != children.end(); ++child)
 	{
 		if(Name == k3d::command_tree().name(**child))
@@ -67,7 +67,7 @@ static object get_child(iunknown_wrapper& Self, const string_t& Name)
 
 static void execute_command(iunknown_wrapper& Self, const string_t& Command, const string_t& Arguments)
 {
-	switch(dynamic_cast<k3d::icommand_node&>(Self.wrapped()).execute_command(Command, Arguments))
+	switch(Self.wrapped<k3d::icommand_node>().execute_command(Command, Arguments))
 	{
 		case k3d::icommand_node::RESULT_STOP:
 			throw std::runtime_error("Stop executing");

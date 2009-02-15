@@ -22,8 +22,6 @@
 */
 
 #include "const_typed_array_python.h"
-#include "imaterial_python.h"
-#include "inode_python.h"
 #include "utility_python.h"
 
 #include <k3dsdk/mesh.h>

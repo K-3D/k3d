@@ -17,12 +17,13 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "imaterial_python.h"
+#include "iunknown_python.h"
 #include "mesh_python.h"
 #include "owned_instance_wrapper_python.h"
 #include "polyhedron_python.h"
 #include "utility_python.h"
 
+#include <k3dsdk/imaterial.h>
 #include <k3dsdk/polyhedron.h>
 
 #include <boost/python.hpp>
@@ -92,7 +93,7 @@ public:
 		k3d::mesh::points_t vertices;
 		k3d::mesh::counts_t vertex_counts;
 		k3d::mesh::indices_t vertex_indices;
-		k3d::imaterial* const material = Material ? boost::python::extract<imaterial_wrapper>(Material)().wrapped_ptr()  : 0;
+		k3d::imaterial* const material = Material ? &dynamic_cast<k3d::imaterial&>(boost::python::extract<iunknown_wrapper>(Material)().wrapped())  : 0;
 
 		utility::copy(Vertices, vertices);
 		utility::copy(VertexCounts, vertex_counts);

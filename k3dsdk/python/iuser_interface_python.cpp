@@ -40,22 +40,22 @@ namespace python
 
 static void open_uri(iunknown_wrapper& Self, const string_t& URI)
 {
-	dynamic_cast<k3d::iuser_interface&>(Self.wrapped()).open_uri(URI);
+	Self.wrapped<k3d::iuser_interface>().open_uri(URI);
 }
 
 static void message(iunknown_wrapper& Self, const string_t& Message)
 {
-	dynamic_cast<k3d::iuser_interface&>(Self.wrapped()).message(Message);
+	Self.wrapped<k3d::iuser_interface>().message(Message);
 }
 
 static void warning_message(iunknown_wrapper& Self, const string_t& Message)
 {
-	dynamic_cast<k3d::iuser_interface&>(Self.wrapped()).warning_message(Message);
+	Self.wrapped<k3d::iuser_interface>().warning_message(Message);
 }
 
 static void error_message(iunknown_wrapper& Self, const string_t& Message)
 {
-	dynamic_cast<k3d::iuser_interface&>(Self.wrapped()).error_message(Message);
+	Self.wrapped<k3d::iuser_interface>().error_message(Message);
 }
 
 static unsigned long query_message(iunknown_wrapper& Self, const string_t& Message, const list& Buttons)
@@ -63,7 +63,7 @@ static unsigned long query_message(iunknown_wrapper& Self, const string_t& Messa
 	std::vector<string_t> buttons;
 	for(long i = 0; i != len(Buttons); ++i)
 		buttons.push_back(extract<string_t>(Buttons[i]));
-	return dynamic_cast<k3d::iuser_interface&>(Self.wrapped()).query_message(Message, 0, buttons);
+	return Self.wrapped<k3d::iuser_interface>().query_message(Message, 0, buttons);
 }
 
 static const filesystem::path get_file_path(iunknown_wrapper& Self, const string_t& Direction, const string_t& Type, const string_t& Message, const string_t& StartPath)
@@ -71,9 +71,9 @@ static const filesystem::path get_file_path(iunknown_wrapper& Self, const string
 	const filesystem::path old_path = filesystem::native_path(ustring::from_utf8(StartPath));
 	filesystem::path new_path;
 	if(Direction == "r" || Direction == "read")
-		dynamic_cast<k3d::iuser_interface&>(Self.wrapped()).get_file_path(k3d::ipath_property::READ, Type, Message, old_path, new_path);
+		Self.wrapped<k3d::iuser_interface>().get_file_path(k3d::ipath_property::READ, Type, Message, old_path, new_path);
 	else if(Direction == "w" || Direction == "write")
-		dynamic_cast<k3d::iuser_interface&>(Self.wrapped()).get_file_path(k3d::ipath_property::WRITE, Type, Message, old_path, new_path);
+		Self.wrapped<k3d::iuser_interface>().get_file_path(k3d::ipath_property::WRITE, Type, Message, old_path, new_path);
 	else
 		throw std::invalid_argument("unknown file path operation, should be \"read\" or \"write\"");
 
@@ -82,7 +82,7 @@ static const filesystem::path get_file_path(iunknown_wrapper& Self, const string
 
 static void synchronize(iunknown_wrapper& Self)
 {
-	dynamic_cast<k3d::iuser_interface&>(Self.wrapped()).synchronize();
+	Self.wrapped<k3d::iuser_interface>().synchronize();
 }
 
 void define_methods_iuser_interface(k3d::iunknown& Interface, boost::python::object& Instance)

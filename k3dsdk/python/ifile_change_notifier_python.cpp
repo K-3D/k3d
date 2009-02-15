@@ -70,27 +70,27 @@ private:
 
 static uint_t watch_file(iunknown_wrapper& Self, const filesystem::path& Path, file_change_receiver& Receiver)
 {
-	return dynamic_cast<ifile_change_notifier&>(Self.wrapped()).watch_file(Path, sigc::bind(sigc::mem_fun(Receiver, &file_change_receiver::file_changed), Path));
+	return Self.wrapped<k3d::ifile_change_notifier>().watch_file(Path, sigc::bind(sigc::mem_fun(Receiver, &file_change_receiver::file_changed), Path));
 }
 
 static void unwatch_file(iunknown_wrapper& Self, const uint_t WatchID)
 {
-	dynamic_cast<ifile_change_notifier&>(Self.wrapped()).unwatch_file(WatchID);
+	Self.wrapped<k3d::ifile_change_notifier>().unwatch_file(WatchID);
 }
 
 static void wait_for_changes(iunknown_wrapper& Self)
 {
-	dynamic_cast<ifile_change_notifier&>(Self.wrapped()).wait_for_changes();
+	Self.wrapped<k3d::ifile_change_notifier>().wait_for_changes();
 }
 
 static uint_t change_count(iunknown_wrapper& Self)
 {
-	return dynamic_cast<ifile_change_notifier&>(Self.wrapped()).change_count();
+	return Self.wrapped<k3d::ifile_change_notifier>().change_count();
 }
 
 static void signal_change(iunknown_wrapper& Self)
 {
-	dynamic_cast<ifile_change_notifier&>(Self.wrapped()).signal_change();
+	Self.wrapped<k3d::ifile_change_notifier>().signal_change();
 }
 
 void define_class_file_change_receiver()
@@ -106,7 +106,7 @@ void define_class_file_change_receiver()
 
 void define_methods_ifile_change_notifier(k3d::iunknown& Interface, boost::python::object& Instance)
 {
-	if(!dynamic_cast<ifile_change_notifier*>(&Interface))
+	if(!dynamic_cast<k3d::ifile_change_notifier*>(&Interface))
 		return;
 
 	utility::add_method(utility::make_function(&watch_file, "Watch a file for changes.\n\n" "@rtype: integer watch identifier\n"), "watch_file", Instance);

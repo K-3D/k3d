@@ -24,18 +24,17 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "instance_wrapper_python.h"
-#include <k3dsdk/imesh_storage.h>
+#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
 
+class iunknown;
+
 namespace python
 {
 
-typedef instance_wrapper<k3d::imesh_storage> imesh_storage_wrapper;
-
-void define_class_imesh_storage();
+void define_methods_imesh_storage(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 

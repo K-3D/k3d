@@ -24,18 +24,17 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "instance_wrapper_python.h"
-#include <k3dsdk/isnappable.h>
+#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
 
+class iunknown;
+
 namespace python
 {
 
-typedef instance_wrapper<k3d::isnappable> isnappable_wrapper;
-
-void define_class_isnappable();
+void define_methods_isnappable(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 

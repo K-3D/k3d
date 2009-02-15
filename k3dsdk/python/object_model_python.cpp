@@ -40,19 +40,11 @@
 #include "cubic_curve_python.h"
 #include "cylinder_python.h"
 #include "disk_python.h"
-#include "dynamic_cast_python.h"
 #include "euler_angles_python.h"
 #include "euler_python.h"
 #include "hyperboloid_python.h"
 #include "idocument_python.h"
 #include "ifile_change_notifier_python.h"
-#include "imaterial_python.h"
-#include "imesh_storage_python.h"
-#include "imetadata_python.h"
-#include "inode_python.h"
-#include "inode_selection_python.h"
-#include "iproperty_collection_python.h"
-#include "isnappable_python.h"
 #include "iunknown_python.h"
 #include "linear_curve_python.h"
 #include "log_python.h"
@@ -62,7 +54,6 @@
 #include "mime_python.h"
 #include "named_arrays_python.h"
 #include "named_attribute_arrays_python.h"
-#include "node_python.h"
 #include "normal3_python.h"
 #include "nurbs_curve_python.h"
 #include "nurbs_patch_python.h"
@@ -146,10 +137,10 @@ void module_check_node_environment(const dict& Locals, const string_t& PluginTyp
 	if(Locals.has_key("Node"))
 	{
 		object object = Locals.get("Node");
-		extract<node> node(object);
+		extract<iunknown_wrapper> node(object);
 		if(node.check())
 		{
-			if(node().inode_wrapper::wrapped().factory().name() == PluginType)
+			if(node().wrapped<k3d::inode>().factory().name() == PluginType)
 			{
 				return;
 			}
@@ -358,13 +349,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_const_named_attribute_arrays();
 	define_class_file_change_receiver();
 	define_class_idocument();
-	define_class_imaterial();
-	define_class_imesh_storage();
-	define_class_imetadata();
-	define_class_inode();
-	define_class_inode_selection();
-	define_class_iproperty_collection();
-	define_class_isnappable();
 	define_class_iunknown();
 	define_class_matrix4();
 	define_class_mesh();
@@ -408,7 +392,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_teapot();
 	define_namespace_torus();
 	euler_angles::define_class();
-	node::define_class();
 
 	def("almost_equal", module_almost_equal_mesh,
 		"Tests two meshes for equality using fuzzy-comparisons for floating-point types.");
@@ -425,8 +408,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
 	def("documents", module_documents,
 		"Returns a list containing all open documents.");
-	def("dynamic_cast", do_dynamic_cast,
-		"Attempts to coerce an object from one type to another.");
 	def("print_diff", module_print_diff,
 		"Returns the difference of two L{mesh} objects as a string.");
 	def("execute_script", module_execute_script,

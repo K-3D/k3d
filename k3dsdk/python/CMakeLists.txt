@@ -89,8 +89,6 @@ ADD_LIBRARY(k3dsdk-python-b SHARED
 	icommand_node_python.h
 	ifile_change_notifier_python.cpp
 	ifile_change_notifier_python.h
-	imaterial_python.cpp
-	imaterial_python.h
 	imetadata_python.cpp
 	imetadata_python.h
 	inode_python.cpp
@@ -122,8 +120,6 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-b k3dsdk-resource)
 ADD_LIBRARY(k3dsdk-python-d SHARED
 	any_python.cpp
 	any_python.h
-	dynamic_cast_python.cpp
-	dynamic_cast_python.h
 	euler_python.cpp
 	euler_python.h
 	idocument_exporter_python.cpp
@@ -144,8 +140,6 @@ ADD_LIBRARY(k3dsdk-python-d SHARED
 	mesh_python.h
 	mesh_selection_python.cpp
 	mesh_selection_python.h
-	node_python.cpp
-	node_python.h
 	selection_python.cpp
 	selection_python.h
 	)

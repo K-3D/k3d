@@ -21,8 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "imaterial_python.h"
-#include "inode_python.h"
+#include "iunknown_python.h"
 #include "typed_array_python.h"
 #include "utility_python.h"
 
@@ -71,8 +70,7 @@ static void set_item_imaterial(instance_wrapper<k3d::typed_array<k3d::imaterial*
 
 	if(Value)
 	{
-		imaterial_wrapper material = boost::python::extract<imaterial_wrapper>(Value);
-		Self.wrapped()[Item] = &material.wrapped();
+		Self.wrapped()[Item] = &dynamic_cast<k3d::imaterial&>(boost::python::extract<iunknown_wrapper>(Value)().wrapped());
 	}
 	else
 	{
@@ -87,8 +85,7 @@ static void set_item_inode(instance_wrapper<k3d::typed_array<k3d::inode*> >& Sel
 
 	if(Value)
 	{
-		inode_wrapper node = boost::python::extract<inode_wrapper>(Value);
-		Self.wrapped()[Item] = &node.wrapped();
+		Self.wrapped()[Item] = &dynamic_cast<k3d::inode&>(boost::python::extract<iunknown_wrapper>(Value)().wrapped());
 	}
 	else
 	{
@@ -106,8 +103,7 @@ static void append_imaterial(instance_wrapper<k3d::typed_array<k3d::imaterial*> 
 {
 	if(Value)
 	{
-		imaterial_wrapper material = boost::python::extract<imaterial_wrapper>(Value);
-		Self.wrapped().push_back(&material.wrapped());
+		Self.wrapped().push_back(&dynamic_cast<k3d::imaterial&>(boost::python::extract<iunknown_wrapper>(Value)().wrapped()));
 	}
 	else
 	{
@@ -119,8 +115,7 @@ static void append_inode(instance_wrapper<k3d::typed_array<k3d::inode*> >& Self,
 {
 	if(Value)
 	{
-		inode_wrapper node = boost::python::extract<inode_wrapper>(Value);
-		Self.wrapped().push_back(&node.wrapped());
+		Self.wrapped().push_back(&dynamic_cast<k3d::inode&>(boost::python::extract<iunknown_wrapper>(Value)().wrapped()));
 	}
 	else
 	{
@@ -149,8 +144,7 @@ static void assign_imaterial(instance_wrapper<k3d::typed_array<k3d::imaterial*> 
 	{
 		if(Value[i])
 		{
-			imaterial_wrapper material = boost::python::extract<imaterial_wrapper>(Value[i]);
-			storage[i] = &material.wrapped();
+			storage[i] = &dynamic_cast<k3d::imaterial&>(boost::python::extract<iunknown_wrapper>(Value[i])().wrapped());
 		}
 		else
 		{
@@ -169,8 +163,7 @@ static void assign_inode(instance_wrapper<k3d::typed_array<k3d::inode*> >& Self,
 	{
 		if(Value[i])
 		{
-			inode_wrapper node = boost::python::extract<inode_wrapper>(Value[i]);
-			storage[i] = &node.wrapped();
+			storage[i] = &dynamic_cast<k3d::inode&>(boost::python::extract<iunknown_wrapper>(Value[i])().wrapped());
 		}
 		else
 		{

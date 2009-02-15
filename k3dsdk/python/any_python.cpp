@@ -26,9 +26,8 @@
 #include "bitmap_python.h"
 #include "const_bitmap_python.h"
 #include "idocument_python.h"
-#include "inode_python.h"
+#include "iunknown_python.h"
 #include "mesh_python.h"
-#include "node_python.h"
 #include "ri_python.h"
 
 #include <k3dsdk/algebra.h>
@@ -151,7 +150,7 @@ const object any_to_python(const boost::any& Value)
 	if(type == typeid(k3d::inode*))
 	{
 		k3d::inode* const value = boost::any_cast<k3d::inode*>(Value);
-		return value ? object(node(value)) : object();
+		return wrap_unknown(value);
 	}
 
 	if(type == typeid(k3d::idocument*))
@@ -203,7 +202,7 @@ const object any_to_python(const boost::any& Value)
 			for(profiler_task_records_t::const_iterator task_record = task_records.begin(); task_record != task_records.end(); ++task_record)
 				python_task_records[task_record->first] = task_record->second;
 
-			python_node_records[k3d::python::node(node)] = python_task_records;
+			python_node_records[wrap_unknown(node)] = python_task_records;
 		}
 
 		return python_node_records;
@@ -215,7 +214,6 @@ const object any_to_python(const boost::any& Value)
 const boost::any python_to_any(const object& Value)
 {
 	PyObject* const value = Value.ptr();
-
 	{
 		extract<idocument_wrapper> value(Value);
 		if(value.check())
@@ -225,7 +223,7 @@ const boost::any python_to_any(const object& Value)
 	}
 
 	{
-		extract<inode_wrapper> value(Value);
+		extract<iunknown_wrapper> value(Value);
 		if(value.check())
 		{
 			return boost::any(value().wrapped_ptr());
@@ -320,13 +318,9 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 		if(Value == boost::python::object())
 			return boost::any(static_cast<k3d::inode*>(0));
 
-		extract<inode_wrapper> inode(Value);
-		if(inode.check())
-			return boost::any(inode().wrapped_ptr());
-
-		extract<node> node(Value);
+		extract<iunknown_wrapper> node(Value);
 		if(node.check())
-			return boost::any(node().inode_wrapper::wrapped_ptr());
+			return boost::any(node().wrapped_ptr<k3d::inode>());
 
 		return boost::any(static_cast<k3d::inode*>(0));
 	}
@@ -345,7 +339,7 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 		const k3d::uint_t count = boost::python::len(nodes);
 		results.resize(count);
 		for(k3d::uint_t i = 0; i != count; ++i)
-			results[i] = extract<inode_wrapper>(nodes[i])().wrapped_ptr();
+			results[i] = &dynamic_cast<k3d::inode&>(extract<iunknown_wrapper>(nodes[i])().wrapped());
 
 		return boost::any(results);
 	}

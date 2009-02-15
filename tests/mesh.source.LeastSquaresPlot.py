@@ -16,8 +16,7 @@ source.function_2 = "sin(v)"
 source.function_3 = "u*v"
 
 input_points = document.new_node("FrozenMesh")
-
-mesh = k3d.dynamic_cast(input_points, "imesh_storage").reset_mesh()
+mesh = input_points.create_mesh()
 
 positions = [(-5, 1, 3), (4, 2, 4), (3, 3, -5), (-4, 4, -3)]
 

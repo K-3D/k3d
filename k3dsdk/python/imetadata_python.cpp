@@ -22,6 +22,10 @@
 */
 
 #include "imetadata_python.h"
+#include "iunknown_python.h"
+#include "utility_python.h"
+
+#include <k3dsdk/imetadata.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;
@@ -32,42 +36,38 @@ namespace k3d
 namespace python
 {
 
-static void set_metadata_value(imetadata_wrapper& Self, const string_t& Name, const string_t& Value)
+static void set_metadata_value(iunknown_wrapper& Self, const string_t& Name, const string_t& Value)
 {
-	Self.wrapped().set_metadata_value(Name, Value);
+	Self.wrapped<k3d::imetadata>().set_metadata_value(Name, Value);
 }
 
-static boost::python::dict get_metadata(imetadata_wrapper& Self)
+static boost::python::dict get_metadata(iunknown_wrapper& Self)
 {
 	boost::python::dict result;
 
-	const imetadata::metadata_t metadata = Self.wrapped().get_metadata();
+	const imetadata::metadata_t metadata = Self.wrapped<k3d::imetadata>().get_metadata();
 	for(imetadata::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
 		result[pair->first] = pair->second;
 
 	return result;
 }
 
-static string_t get_metadata_value(imetadata_wrapper& Self, const string_t& Name)
+static string_t get_metadata_value(iunknown_wrapper& Self, const string_t& Name)
 {
-	return Self.wrapped().get_metadata_value(Name);
+	return Self.wrapped<k3d::imetadata>().get_metadata_value(Name);
 }
 
-static void erase_metadata_value(imetadata_wrapper& Self, const string_t& Name)
+static void erase_metadata_value(iunknown_wrapper& Self, const string_t& Name)
 {
-	Self.wrapped().erase_metadata_value(Name);
+	Self.wrapped<k3d::imetadata>().erase_metadata_value(Name);
 }
 
-void define_class_imetadata()
+void define_methods_imetadata(iunknown& Interface, boost::python::object& Instance)
 {
-	class_<imetadata_wrapper>("imetadata", 
-		"Abstract interface for objects that can store user-defined metadata.",
-		no_init)
-		.def("set_metadata_value", &set_metadata_value)
-		.def("get_metadata", &get_metadata)
-		.def("get_metadata_value", &get_metadata_value)
-		.def("erase_metadata_value", &erase_metadata_value)
-		;
+	utility::add_method(utility::make_function(&set_metadata_value), "set_metadata_value", Instance);
+	utility::add_method(utility::make_function(&get_metadata), "get_metadata", Instance);
+	utility::add_method(utility::make_function(&get_metadata_value), "get_metadata_value", Instance);
+	utility::add_method(utility::make_function(&erase_metadata_value), "erase_metadata_value", Instance);
 }
 
 } // namespace python
