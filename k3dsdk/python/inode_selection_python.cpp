@@ -46,7 +46,7 @@ static void select(iunknown_wrapper& Self, iunknown_wrapper& Node, const k3d::do
 
 static double selection_weight(iunknown_wrapper& Self, iunknown_wrapper& Node)
 {
-	return Self.wrapped<k3d::inode_selection>().selection_weight(Node.wrapped<k3d::inode&>());
+	return Self.wrapped<k3d::inode_selection>().selection_weight(Node.wrapped<k3d::inode>());
 }
 
 static list selected_nodes(iunknown_wrapper& Self)
