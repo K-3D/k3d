@@ -17,6 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "mesh_operations.h"
 #include "metadata.h"
 #include "nurbs_curve.h"
 #include "primitive_detail.h"
@@ -137,6 +138,52 @@ primitive* create(mesh& Mesh)
 		);
 
 	return result;
+}
+
+const_primitive* validate(const mesh& Mesh)
+{
+	if(!validate_nurbs_curve_groups(Mesh))
+		return 0;
+
+	return new const_primitive(
+		*Mesh.nurbs_curve_groups->first_curves,
+		*Mesh.nurbs_curve_groups->curve_counts,
+		*Mesh.nurbs_curve_groups->materials,
+		*Mesh.nurbs_curve_groups->curve_first_points,
+		*Mesh.nurbs_curve_groups->curve_point_counts,
+		*Mesh.nurbs_curve_groups->curve_orders,
+		*Mesh.nurbs_curve_groups->curve_first_knots,
+		*Mesh.nurbs_curve_groups->curve_selection,
+		*Mesh.nurbs_curve_groups->curve_points,
+		*Mesh.nurbs_curve_groups->curve_point_weights,
+		*Mesh.nurbs_curve_groups->curve_knots,
+		Mesh.nurbs_curve_groups->constant_data,
+		Mesh.nurbs_curve_groups->uniform_data,
+		Mesh.nurbs_curve_groups->varying_data);
+}
+
+primitive* validate(mesh& Mesh)
+{
+	if(!validate_nurbs_curve_groups(Mesh))
+		return 0;
+
+	mesh::nurbs_curve_groups_t& nurbs = Mesh.nurbs_curve_groups.writable();
+
+	return new primitive(
+		nurbs.first_curves.writable(),
+		nurbs.curve_counts.writable(),
+		nurbs.materials.writable(),
+		nurbs.curve_first_points.writable(),
+		nurbs.curve_point_counts.writable(),
+		nurbs.curve_orders.writable(),
+		nurbs.curve_first_knots.writable(),
+		nurbs.curve_selection.writable(),
+		nurbs.curve_points.writable(),
+		nurbs.curve_point_weights.writable(),
+		nurbs.curve_knots.writable(),
+		nurbs.constant_data,
+		nurbs.uniform_data,
+		nurbs.varying_data);
 }
 
 } // namespace nurbs_curve

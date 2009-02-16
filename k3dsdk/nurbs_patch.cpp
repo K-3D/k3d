@@ -17,6 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "mesh_operations.h"
 #include "metadata.h"
 #include "nurbs_patch.h"
 #include "primitive_detail.h"
@@ -211,6 +212,86 @@ primitive* create(mesh& Mesh)
 		);
 
 	return result;
+}
+
+const_primitive* validate(const mesh& Mesh)
+{
+	if(!validate_nurbs_patches(Mesh))
+		return 0;
+
+	return new const_primitive(
+		*Mesh.nurbs_patches->patch_first_points,
+		*Mesh.nurbs_patches->patch_u_point_counts,
+		*Mesh.nurbs_patches->patch_v_point_counts,
+		*Mesh.nurbs_patches->patch_u_orders,
+		*Mesh.nurbs_patches->patch_v_orders,
+		*Mesh.nurbs_patches->patch_u_first_knots,
+		*Mesh.nurbs_patches->patch_v_first_knots,
+		*Mesh.nurbs_patches->patch_selection,
+		*Mesh.nurbs_patches->patch_materials,
+		*Mesh.nurbs_patches->patch_points,
+		*Mesh.nurbs_patches->patch_point_weights,
+		*Mesh.nurbs_patches->patch_u_knots,
+		*Mesh.nurbs_patches->patch_v_knots,
+		*Mesh.nurbs_patches->patch_trim_curve_loop_counts,
+		*Mesh.nurbs_patches->patch_first_trim_curve_loops,
+		*Mesh.nurbs_patches->first_trim_curves,
+		*Mesh.nurbs_patches->trim_curve_counts,
+		*Mesh.nurbs_patches->trim_curve_loop_selection,
+		*Mesh.nurbs_patches->trim_curve_first_points,
+		*Mesh.nurbs_patches->trim_curve_point_counts,
+		*Mesh.nurbs_patches->trim_curve_orders,
+		*Mesh.nurbs_patches->trim_curve_first_knots,
+		*Mesh.nurbs_patches->trim_curve_selection,
+		*Mesh.nurbs_patches->trim_curve_points,
+		*Mesh.nurbs_patches->trim_curve_point_weights,
+		*Mesh.nurbs_patches->trim_curve_knots,
+		*Mesh.nurbs_patches->trim_points,
+		*Mesh.nurbs_patches->trim_point_selection,
+		Mesh.nurbs_patches->constant_data,
+		Mesh.nurbs_patches->uniform_data,
+		Mesh.nurbs_patches->varying_data);
+}
+
+primitive* validate(mesh& Mesh)
+{
+	if(!validate_nurbs_patches(Mesh))
+		return 0;
+
+	mesh::nurbs_patches_t& nurbs = Mesh.nurbs_patches.writable();
+
+	return new primitive(
+		nurbs.patch_first_points.writable(),
+		nurbs.patch_u_point_counts.writable(),
+		nurbs.patch_v_point_counts.writable(),
+		nurbs.patch_u_orders.writable(),
+		nurbs.patch_v_orders.writable(),
+		nurbs.patch_u_first_knots.writable(),
+		nurbs.patch_v_first_knots.writable(),
+		nurbs.patch_selection.writable(),
+		nurbs.patch_materials.writable(),
+		nurbs.patch_points.writable(),
+		nurbs.patch_point_weights.writable(),
+		nurbs.patch_u_knots.writable(),
+		nurbs.patch_v_knots.writable(),
+		nurbs.patch_trim_curve_loop_counts.writable(),
+		nurbs.patch_first_trim_curve_loops.writable(),
+		nurbs.first_trim_curves.writable(),
+		nurbs.trim_curve_counts.writable(),
+		nurbs.trim_curve_loop_selection.writable(),
+		nurbs.trim_curve_first_points.writable(),
+		nurbs.trim_curve_point_counts.writable(),
+		nurbs.trim_curve_orders.writable(),
+		nurbs.trim_curve_first_knots.writable(),
+		nurbs.trim_curve_selection.writable(),
+		nurbs.trim_curve_points.writable(),
+		nurbs.trim_curve_point_weights.writable(),
+		nurbs.trim_curve_knots.writable(),
+		nurbs.trim_points.writable(),
+		nurbs.trim_point_selection.writable(),
+		nurbs.constant_data,
+		nurbs.uniform_data,
+		nurbs.varying_data);
 }
 
 } // namespace nurbs_patch
